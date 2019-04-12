@@ -1,14 +1,16 @@
 dependencies {
-    compileOnly project(":inject")
-    compile project(":http")
-    compile project(":validation")
-    compile dependencyVersion('swagger')
-    compile dependencyModuleVersion('swagger', 'swagger-models')
-    compile dependencyModuleVersion('swagger', 'swagger-annotations')
+    annotationProcessor "io.micronaut:micronaut-inject-java"
+    compileOnly "io.micronaut:micronaut-inject-java"
+    annotationProcessor "io.micronaut.docs:micronaut-docs-asciidoc-config-props:$micronautDocsVersion"
+    compile "io.micronaut:micronaut-http"
+    compile "io.micronaut:micronaut-validation"
+    compile "io.swagger.core.v3:swagger-core:$swaggerVersion"
+    compile "io.swagger.core.v3:swagger-models:$swaggerVersion"
+    compile "io.swagger.core.v3:swagger-annotations:$swaggerVersion"
 
-    testCompile project(":runtime")
-    testCompile project(":security")
-    testCompile project(":inject-groovy")
-    testCompile project(":inject-java-test")
-    testCompile dependencyVersion("rxjava2")
+    testCompile "io.micronaut:micronaut-runtime"
+    testCompile "io.micronaut:micronaut-security"
+    testCompile "io.micronaut:micronaut-inject-groovy"
+    testCompile "io.micronaut:micronaut-inject-java-test"
+    testCompile "io.reactivex.rxjava2:rxjava:$rxJava2Version"
 }
