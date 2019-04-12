@@ -153,4 +153,5 @@ allprojects {
             testOutputDir file('build/classes/groovy/test')
         }
     }
+    apply from: rootProject.file('gradle/license.gradle')
 }
