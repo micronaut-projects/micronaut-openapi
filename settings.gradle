@@ -1,3 +1,6 @@
 rootProject.name="openapi-root"
 
 include "openapi"
+include 'docs-examples:example-groovy'
+include 'docs-examples:example-java'
+include 'docs-examples:example-kotlin'

@@ -1,0 +1,38 @@
+plugins {
+    id "groovy"
+    id "io.spring.dependency-management"
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "io.micronaut:micronaut-bom:$micronautVersion"
+    }
+}
+
+dependencies {
+    testCompile project(":openapi")
+    testCompile "io.micronaut:micronaut-inject"
+    testCompileOnly "io.micronaut:micronaut-inject-groovy"
+    testCompile "org.testcontainers:spock:1.10.5"
+    testCompile("org.spockframework:spock-core") {
+        exclude group: "org.codehaus.groovy", module: "groovy-all"
+    }
+    testRuntime "ch.qos.logback:logback-classic:1.2.3"
+    testCompile "io.projectreactor:reactor-core"
+}
+
+licenseTest.enabled = false
+
+test {
+    jvmArgs '-Duser.country=US'
+    jvmArgs '-Duser.language=en'
+    testLogging {
+        showStandardStreams = true
+        exceptionFormat = 'full'
+    }
+    failFast = true
+}
+
+tasks.withType(GroovyCompile) {
+    groovyOptions.forkOptions.jvmArgs.add('-Dgroovy.parameters=true')
+}

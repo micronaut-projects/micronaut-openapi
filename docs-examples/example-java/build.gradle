@@ -1,0 +1,39 @@
+plugins {
+    id "java"
+    id "io.spring.dependency-management"
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "io.micronaut:micronaut-bom:$micronautVersion"
+    }
+}
+
+dependencies {
+    testAnnotationProcessor "io.micronaut:micronaut-inject-java"
+    testCompile "io.micronaut:micronaut-inject"
+    testCompile project(":openapi")
+    testCompile "org.testcontainers:testcontainers:1.10.5"
+    testCompile 'org.awaitility:awaitility:3.1.6'
+    testCompile "org.junit.jupiter:junit-jupiter-api:$junitVersion"
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$junitVersion"
+    testRuntime "ch.qos.logback:logback-classic:1.2.3"
+    testCompile "io.projectreactor:reactor-core"
+}
+
+licenseTest.enabled = false
+
+compileJava.options.compilerArgs += '-parameters'
+compileTestJava.options.compilerArgs += '-parameters'
+
+test {
+    useJUnitPlatform()
+    
+    jvmArgs '-Duser.country=US'
+    jvmArgs '-Duser.language=en'
+    testLogging {
+        showStandardStreams = true
+        exceptionFormat = 'full'
+    }
+    failFast = true
+}
