@@ -8,17 +8,28 @@ The resulting output will be:
 .Example Generated Swagger Output
 [source,yaml]
 ----
+openapi: 3.0.1
+info:
+  title: Hello World
+  description: My API
+  contact:
+    name: Fred
+    url: http://gigantic-server.com
+    email: Fred@gigagantic-server.com
+  license:
+    name: Apache 2.0
+    url: http://foo.bar
+  version: "0.0"
 paths:
   /hello/{name}:
     get:
       description: ""
-      operationId: hello
+      operationId: index
       parameters:
       - name: name
         in: path
         description: The person's name
         required: true
-        explode: false
         schema:
           type: string
       responses:
@@ -28,9 +39,55 @@ paths:
             text/plain:
               schema:
                 type: string
+
 ----
 
 Notice how the javadoc comments are used to fill out the description of the API. If this is not desirable then you can take full control by augmenting your definition with Swagger annotations:
 
 .Using Swagger Annotations
 snippet::io.micronaut.configuration.openapi.docs.controllers.annotations.HelloController[tags="imports,clazz", project-base="docs-examples/example]
+
+The resulting output will be:
+
+.Example Generated Swagger Output
+[source,yaml]
+----
+openapi: 3.0.1
+info:
+  title: Hello World
+  description: My API
+  contact:
+    name: Fred
+    url: http://gigantic-server.com
+    email: Fred@gigagantic-server.com
+  license:
+    name: Apache 2.0
+    url: http://foo.bar
+  version: "0.0"
+paths:
+  /greetings/{name}:
+    get:
+      tags:
+      - greeting
+      summary: Greets a person
+      description: A friendly greeting is returned
+      operationId: greetings
+      parameters:
+      - name: name
+        in: path
+        description: The name of the person
+        required: true
+        schema:
+          minLength: 1
+          type: string
+      responses:
+        default:
+          content:
+            text/plain:
+              schema:
+                type: string
+        400:
+          description: Invalid Name Supplied
+        404:
+          description: Person not found
+----
