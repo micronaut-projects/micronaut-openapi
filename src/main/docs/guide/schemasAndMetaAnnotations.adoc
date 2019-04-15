@@ -1,0 +1,16 @@
+If you don't have control of the source code and don't want to have to annotation each parameter with `@Schema` then it can be convenient to instead use a meta annotation.
+
+For example if the aforementioned `Pet` class cannot be annotated with `@Schema` you can define a meta annotation:
+
+.Swagger Meta Annotation
+[source,java]
+----
+@Documented
+@Retention(RUNTIME)
+@Target({ElementType.PARAMETER, ElementType.FIELD})
+@Schema(name="MyPet", description="Pet description")
+@interface MyAnn {
+}
+----
+
+Then whenever `Pet` is used as a parameter you can annotate the parameter with `@MyAnn`.

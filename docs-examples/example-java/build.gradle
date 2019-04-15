@@ -10,15 +10,16 @@ dependencyManagement {
 }
 
 dependencies {
-    testAnnotationProcessor "io.micronaut:micronaut-inject-java"
-    testCompile "io.micronaut:micronaut-inject"
     testCompile project(":openapi")
-    testCompile "org.testcontainers:testcontainers:1.10.5"
+    testCompile "io.micronaut:micronaut-inject-java"
+    testCompile "io.micronaut:micronaut-validation"
+    testCompile "io.swagger.core.v3:swagger-annotations"
+    testCompile "io.micronaut.configuration:micronaut-hibernate-validator"
     testCompile 'org.awaitility:awaitility:3.1.6'
     testCompile "org.junit.jupiter:junit-jupiter-api:$junitVersion"
+    testCompileOnly "io.micronaut:micronaut-inject-java"
     testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$junitVersion"
     testRuntime "ch.qos.logback:logback-classic:1.2.3"
-    testCompile "io.projectreactor:reactor-core"
 }
 
 licenseTest.enabled = false

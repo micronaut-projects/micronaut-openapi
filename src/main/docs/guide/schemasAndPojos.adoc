@@ -1,0 +1,49 @@
+If you return types are not simple strings and primitive types then Micronaut will attempt to generate a Schema definition. You can customize the
+generation of the Schema by using the `@Schema` annotation on your POJO. For example:
+
+.Using the @Schema Annotation
+[source,java]
+----
+@Schema(name="MyPet", description="Pet description") // <1>
+class Pet {
+    private PetType type;
+    private int age;
+    private String name;
+
+    public void setAge(int a) {
+        age = a;
+    }
+
+    /**
+     * The age
+     */
+    @Schema(description="Pet age", maximum="20") // <2>
+    public int getAge() {
+        return age;
+    }
+
+    public void setName(String n) {
+        name = n;
+    }
+
+    @Schema(description="Pet name", maxLength=20)
+    public String getName() {
+        return name;
+    }
+
+    public void setType(PetType t) {
+        type = t;
+    }
+
+    public PetType getType() {
+        return type;
+    }
+}
+
+enum PetType {
+    DOG, CAT;
+}
+----
+
+<1> The `@Schema` annotation is used to customize the name of the schema
+<2> Properties can be customized too.

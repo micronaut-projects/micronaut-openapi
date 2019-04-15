@@ -11,14 +11,16 @@ dependencyManagement {
 }
 
 dependencies {
-    testCompile project(":openapi")
+    kapt project(":openapi")
+    kapt "io.micronaut:micronaut-inject-java"
+    kapt "io.micronaut:micronaut-validation"
+    kaptTest "io.micronaut:micronaut-inject-java"
+    testCompile "io.swagger.core.v3:swagger-annotations"
+    testCompile "io.micronaut.configuration:micronaut-hibernate-validator"
     testRuntime "ch.qos.logback:logback-classic:1.2.3"
-    testCompile "org.testcontainers:testcontainers:1.10.5"
     testCompile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
     testCompile "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
-    kaptTest "io.micronaut:micronaut-inject-java"
     testCompile 'io.kotlintest:kotlintest-runner-junit5:3.2.1'
-    testCompile "io.projectreactor:reactor-core"
 }
 
 licenseTest.enabled = false

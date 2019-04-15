@@ -11,14 +11,16 @@ dependencyManagement {
 
 dependencies {
     testCompile project(":openapi")
-    testCompile "io.micronaut:micronaut-inject"
+    testCompile "io.micronaut:micronaut-runtime-groovy"
+    testCompile "io.micronaut:micronaut-validation"
+    testCompile "io.swagger.core.v3:swagger-annotations"
+    testCompile "io.micronaut.configuration:micronaut-hibernate-validator"
     testCompileOnly "io.micronaut:micronaut-inject-groovy"
     testCompile "org.testcontainers:spock:1.10.5"
     testCompile("org.spockframework:spock-core") {
         exclude group: "org.codehaus.groovy", module: "groovy-all"
     }
     testRuntime "ch.qos.logback:logback-classic:1.2.3"
-    testCompile "io.projectreactor:reactor-core"
 }
 
 licenseTest.enabled = false
