@@ -36,7 +36,6 @@ class HelloController {
     @ApiResponse(responseCode = "400", description = "Invalid Name Supplied")
     @ApiResponse(responseCode = "404", description = "Person not found")
     @Tag(name = "greeting")
-    @Get( uri = "/greetings/{name}")
     Single<String> greetings(@Parameter(description="The name of the person") @NotBlank String name) {
         return Single.just("Hello $name, How are you doing?")
     }
