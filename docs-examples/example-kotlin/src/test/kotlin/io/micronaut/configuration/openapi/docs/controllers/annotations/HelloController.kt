@@ -4,6 +4,7 @@ package io.micronaut.configuration.openapi.docs.controllers.annotations
 import io.micronaut.http.MediaType
 import io.micronaut.http.annotation.Controller
 import io.micronaut.http.annotation.Get
+import io.micronaut.validation.Validated
 import io.reactivex.Single
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
@@ -14,7 +15,8 @@ import io.swagger.v3.oas.annotations.tags.Tag
 // end::imports[]
 // tag::clazz[]
 @Controller("/")
-class HelloController {
+@Validated
+open class HelloController {
 
     /**
      * @param name The person's name
@@ -30,7 +32,7 @@ class HelloController {
                 ApiResponse(responseCode = "404", description = "Person not found")
             ])
     @Tag(name = "greeting")
-    fun greetings(name: String): Single<String> {
+    open fun greetings(name: String): Single<String> {
         return Single.just("Hello $name, how are you doing?")
     }
 }

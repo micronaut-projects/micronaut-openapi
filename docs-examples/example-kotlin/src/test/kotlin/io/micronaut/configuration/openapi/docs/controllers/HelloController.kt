@@ -11,14 +11,14 @@ import io.reactivex.Single
 // tag::clazz[]
 @Validated
 @Controller("/")
-class HelloController {
+open class HelloController {
 
     /**
      * @param name The person's name
      * @return The greeting
      */
     @Get(uri = "/hello/{name}", produces = [MediaType.TEXT_PLAIN])
-    fun index(name: String): Single<String> {
+    open fun index(name: String): Single<String> {
         return Single.just("Hello $name!")
     }
 }
