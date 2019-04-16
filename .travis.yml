@@ -2,7 +2,6 @@ language: java
 install: true
 jdk:
 - openjdk8
-- openjdk11
 script:
 - if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then bash ./travis-build-pr.sh; fi
 - if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then bash ./travis-build.sh; fi
