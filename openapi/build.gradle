@@ -14,5 +14,7 @@ dependencies {
     testCompile "io.micronaut:micronaut-inject-java"
     testCompile "io.micronaut:micronaut-inject-java-test"
     testCompile "io.reactivex.rxjava2:rxjava:$rxJava2Version"
-    testCompile files(org.gradle.internal.jvm.Jvm.current().toolsJar)
+    if (org.gradle.internal.jvm.Jvm.current().getJavaVersion().isJava8()) {
+        testCompile files(org.gradle.internal.jvm.Jvm.current().toolsJar)
+    }
 }
