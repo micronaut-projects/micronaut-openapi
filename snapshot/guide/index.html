@@ -1,0 +1,770 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+    <title>OpenAPI/Swagger Support</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="stylesheet" href="../css/main.css" type="text/css" media="screen, print" title="Style" charset="utf-8" />
+    <link rel="stylesheet" href="../css/custom.css" type="text/css" media="screen, print" title="Style" charset="utf-8" />
+    <link rel="stylesheet" href="../css/pdf.css" type="text/css" media="print" title="PDF" charset="utf-8" />
+    <link rel="stylesheet" href="../css/highlight/agate.css">
+    <script src="../js/highlight.pack.js"></script>
+    <script src="../js/guide.js"></script>
+    <script src="../js/multi-language-sample.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+    <link rel="stylesheet" href="../css/multi-language-sample.css"/>
+    <script src="../js/docs.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.5.13/clipboard.min.js"></script>
+    <script type="text/javascript">
+        function addJsClass(el) {
+            var classes = document.body.className.split(" ");
+            classes.push("js");
+            document.body.className = classes.join(" ");
+        }
+    </script>
+
+</head>
+
+<body class="body" id="docs" onload="addJsClass();" onhashchange="highlightMenu()">
+
+<div id="table-of-content-nav-link" class="desktop">
+    <a title="Collapse/Open Table of contents" title="Hide Table of Contents" href="javascript:hideTableOfContents();" class="button">[ + ]</a>
+</div>
+
+<div id="main">
+    <div id="navigation" class="no-print">
+        <div class="navTitle">
+            <span id="logo"><a href="http://micronaut.io" title="Go to Micronaut Website"><img src="../img/micronaut-logo-white.svg" alt="Micronaut"/></a></span>
+        </div>
+        <div class="navLinks">
+            <ul>
+                    <li>
+                        <div id="nav-summary" onmouseover="toggleNavSummary(false)" onmouseout="toggleNavSummary(true)" class="desktop">
+                            <a href="../guide/index.html" class="button">Table of contents</a>
+                            <div id="nav-summary-childs" style="display:none;">
+                                
+                                <div class="toc-item" style="margin-left:0"><a href="#introduction"><strong>1</strong><span>Introduction</span></a></div>
+                                
+                                <div class="toc-item" style="margin-left:0"><a href="#cli"><strong>2</strong><span>Using the Micronaut CLI</span></a></div>
+                                
+                                <div class="toc-item" style="margin-left:0"><a href="#gettingStarted"><strong>3</strong><span>Getting Started with Swagger</span></a></div>
+                                
+                                <div class="toc-item" style="margin-left:0"><a href="#exposingSwaggerOutput"><strong>4</strong><span>Exposing Swagger Output</span></a></div>
+                                
+                                <div class="toc-item" style="margin-left:0"><a href="#controllersAndSwaggerAnnotations"><strong>5</strong><span>Controllers and Swagger Annotations</span></a></div>
+                                
+                                <div class="toc-item" style="margin-left:0"><a href="#schemasAndPojos"><strong>6</strong><span>Schemas and POJOs</span></a></div>
+                                
+                                <div class="toc-item" style="margin-left:0"><a href="#schemasAndMetaAnnotations"><strong>7</strong><span>Schemas and Meta Annotations</span></a></div>
+                                
+                                <div class="toc-item" style="margin-left:0"><a href="#schemasAndGenerics"><strong>8</strong><span>Schemas and Generics</span></a></div>
+                                
+                            </div>
+                        </div>
+                    </li>
+
+                <li id="table-of-content-nav-link-mobile" class="mobile">
+                    <a title="Scroll to Table of contents" href="javascript:scrollToTop();" class="button">Toc</a>
+                </li>
+                <li class="desktop">
+                    <a title="Go to API documentation" href="../api/index.html" class="button">API Reference</a>
+                </li>
+                <li class="mobile">
+                    <a title="Go to API documentation" href="../api/index.html" class="button">API</a>
+                </li>
+
+            </ul>
+
+        </div>
+    </div>
+    
+    <div id="table-of-content">
+        <div class="toc-content">
+
+        <h2>Table of Contents</h2>
+        
+        <div class="toc-item" style="margin-left:0px" id="toc-item-introduction"><a href="#introduction"><strong>1</strong><span>Introduction</span></a></div>
+        
+        <div class="toc-item" style="margin-left:0px" id="toc-item-cli"><a href="#cli"><strong>2</strong><span>Using the Micronaut CLI</span></a></div>
+        
+        <div class="toc-item" style="margin-left:0px" id="toc-item-gettingStarted"><a href="#gettingStarted"><strong>3</strong><span>Getting Started with Swagger</span></a></div>
+        
+        <div class="toc-item" style="margin-left:0px" id="toc-item-exposingSwaggerOutput"><a href="#exposingSwaggerOutput"><strong>4</strong><span>Exposing Swagger Output</span></a></div>
+        
+        <div class="toc-item" style="margin-left:0px" id="toc-item-controllersAndSwaggerAnnotations"><a href="#controllersAndSwaggerAnnotations"><strong>5</strong><span>Controllers and Swagger Annotations</span></a></div>
+        
+        <div class="toc-item" style="margin-left:0px" id="toc-item-schemasAndPojos"><a href="#schemasAndPojos"><strong>6</strong><span>Schemas and POJOs</span></a></div>
+        
+        <div class="toc-item" style="margin-left:0px" id="toc-item-schemasAndMetaAnnotations"><a href="#schemasAndMetaAnnotations"><strong>7</strong><span>Schemas and Meta Annotations</span></a></div>
+        
+        <div class="toc-item" style="margin-left:0px" id="toc-item-schemasAndGenerics"><a href="#schemasAndGenerics"><strong>8</strong><span>Schemas and Generics</span></a></div>
+        
+        </div>
+    </div>
+    
+    <div class="docs-content">
+    <div class="project">
+        <h1>OpenAPI/Swagger Support</h1>
+        <p></p>
+        <p>Configuration to integrate Micronaut and OpenAPI/Swagger</p>
+        <p><strong>Version:</strong> 1.1.1.BUILD-SNAPSHOT</p>
+    </div>
+    
+
+<h1 id="introduction">1 Introduction</h1>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/introduction.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>Micronaut includes experimental support for producing OpenAPI (Swagger) YAML at compilation time. Micronaut will at compile time produce a Swagger 2.x compliant YAML file just based on the regular Micronaut annotations and the javadoc comments within your code.</p>
+</div>
+<div class="paragraph">
+<p>You can customize the generated Swagger using the standard <a href="https://github.com/swagger-api/swagger-core/wiki/Swagger-2.X---Annotations">Swagger Annotations</a>.</p>
+</div>
+
+
+<h1 id="cli">2 Using the Micronaut CLI</h1>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/cli.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>To create a project with OpenAPI/Swagger support using the Micronaut CLI, supply the <code>swagger-*</code> feature to the <code>features</code> flag. For example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>$ mn create-app my-openapi-app --features swagger-java</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This will create a project with the minimum necessary configuration for OpenAPI.</p>
+</div>
+
+
+<h1 id="gettingStarted">3 Getting Started with Swagger</h1>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/gettingStarted.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>To enable this support you should add the following dependencies to your build configuration:</p>
+</div>
+<div class="listingblock">
+<div class="title">Adding the Swagger Dependencies</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">annotationProcessor "io.micronaut.configuration:micronaut-openapi" <i class="conum" data-value="1"></i><b>(1)</b>
+compile "io.swagger.core.v3:swagger-annotations" <i class="conum" data-value="2"></i><b>(2)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>The <code>openapi</code> configuration gets added into the annotation processor scope</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>The <a href="https://github.com/swagger-api/swagger-core/wiki/Swagger-2.X---Annotations">Swagger Annotations</a> are added to the compile classpath</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+For Kotlin the <code>openapi</code> dependency should be in the <code>kapt</code> scope and for Groovy in the <code>compileOnly</code> scope.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Once dependencies have been configured a minimum requirement is to add a <code>@OpenAPIDefinition</code> annotation to your <code>Application</code> class:</p>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">import io.micronaut.runtime.Micronaut;
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.info.Contact;
+import io.swagger.v3.oas.annotations.info.Info;
+import io.swagger.v3.oas.annotations.info.License;
+
+
+@OpenAPIDefinition(
+        info = @Info(
+                title = "Hello World",
+                version = "0.0",
+                description = "My API",
+                license = @License(name = "Apache 2.0", url = "http://foo.bar"),
+                contact = @Contact(url = "http://gigantic-server.com", name = "Fred", email = "Fred@gigagantic-server.com")
+        )
+)
+public class Application {
+
+    public static void main(String[] args) {
+        Micronaut.run(Application.class);
+    }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlight"><code class="language-groovy" data-lang="groovy">import io.micronaut.runtime.Micronaut
+import groovy.transform.CompileStatic
+import io.swagger.v3.oas.annotations.*
+import io.swagger.v3.oas.annotations.info.*
+
+
+@OpenAPIDefinition(
+        info = @Info(
+                title = "Hello World",
+                version = "0.0",
+                description = "My API",
+                license = @License(name = "Apache 2.0", url = "http://foo.bar"),
+                contact = @Contact(url = "http://gigantic-server.com", name = "Fred", email = "Fred@gigagantic-server.com")
+        )
+)
+@CompileStatic
+class Application {
+    static void main(String[] args) {
+        Micronaut.run(Application)
+    }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlight"><code class="language-kotlin" data-lang="kotlin">import io.micronaut.runtime.Micronaut
+import io.swagger.v3.oas.annotations.OpenAPIDefinition
+import io.swagger.v3.oas.annotations.info.Contact
+import io.swagger.v3.oas.annotations.info.Info
+import io.swagger.v3.oas.annotations.info.License
+
+
+@OpenAPIDefinition(
+        info = Info(
+                title = "Hello World",
+                version = "0.0",
+                description = "My API",
+                license = License(name = "Apache 2.0", url = "http://foo.bar"),
+                contact = Contact(url = "http://gigantic-server.com", name = "Fred", email = "Fred@gigagantic-server.com")
+        )
+)
+object Application {
+
+    @JvmStatic
+    fun main(args: Array&lt;String&gt;) {
+        Micronaut.run(Application.javaClass)
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>With that in place you compile your project and a Swagger YAML file will be generated to the <code>META-INF/swagger</code> directory of your project&#8217;s class output. For example the above configuration for Java will be generated to <code>build/classes/java/main/META-INF/swagger/hello-world-0.0.yml</code>.</p>
+</div>
+<div class="paragraph">
+<p>The previously defined annotations will produce YAML like the following:</p>
+</div>
+<div class="listingblock">
+<div class="title">Generated Swagger YAML</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">openapi: 3.0.1
+info:
+  title: the title
+  description: My API
+  contact:
+    name: Fred
+    url: http://gigantic-server.com
+    email: Fred@gigagantic-server.com
+  license:
+    name: Apache 2.0
+    url: http://foo.bar
+  version: "0.0"</code></pre>
+</div>
+</div>
+
+
+<h1 id="exposingSwaggerOutput">4 Exposing Swagger Output</h1>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/exposingSwaggerOutput.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>If you wish to expose the generated Swagger output from your running application you can simply add the necessary static resource configuration. For example:</p>
+</div>
+<div class="listingblock">
+<div class="title">Exposing Swagger YAML</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">micronaut:
+    router:
+        static-resources:
+            swagger:
+                paths: classpath:META-INF/swagger
+                mapping: /swagger/**</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>With the above configuration in place when you run your application you can access your Swagger documentation at <code><a href="http://localhost:8080/swagger/the-title-0.0.yml" class="bare">http://localhost:8080/swagger/the-title-0.0.yml</a></code>.</p>
+</div>
+
+
+<h1 id="controllersAndSwaggerAnnotations">5 Controllers and Swagger Annotations</h1>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/controllersAndSwaggerAnnotations.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>By default Micronaut will automatically at compile time build out the Swagger YAML definition from your defined controllers and methods. For example given the following class:</p>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">import io.micronaut.http.MediaType;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.micronaut.validation.Validated;
+import io.reactivex.Single;
+
+
+@Validated
+@Controller("/")
+public class HelloController {
+
+    /**
+     * @param name The person's name
+     * @return The greeting
+     */
+    @Get(uri = "/hello/{name}", produces = MediaType.TEXT_PLAIN)
+    public Single&lt;String&gt; index(String name) {
+        return Single.just("Hello " + name + "!");
+    }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlight"><code class="language-groovy" data-lang="groovy">import io.micronaut.http.MediaType
+import io.micronaut.http.annotation.Controller
+import io.micronaut.http.annotation.Get
+import io.micronaut.validation.Validated
+import io.reactivex.Single
+
+
+@Validated
+@Controller("/")
+class HelloController {
+
+    /**
+     * @param name The person's name
+     * @return The greeting
+     */
+    @Get(uri = "/hello/{name}", produces = MediaType.TEXT_PLAIN)
+    Single&lt;String&gt; index(String name) {
+        return Single.just("Hello $name!")
+    }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlight"><code class="language-kotlin" data-lang="kotlin">import io.micronaut.http.MediaType
+import io.micronaut.http.annotation.Controller
+import io.micronaut.http.annotation.Get
+import io.micronaut.validation.Validated
+import io.reactivex.Single
+
+
+@Validated
+@Controller("/")
+open class HelloController {
+
+    /**
+     * @param name The person's name
+     * @return The greeting
+     */
+    @Get(uri = "/hello/{name}", produces = [MediaType.TEXT_PLAIN])
+    open fun index(name: String): Single&lt;String&gt; {
+        return Single.just("Hello $name!")
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The resulting output will be:</p>
+</div>
+<div class="listingblock">
+<div class="title">Example Generated Swagger Output</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">openapi: 3.0.1
+info:
+  title: Hello World
+  description: My API
+  contact:
+    name: Fred
+    url: http://gigantic-server.com
+    email: Fred@gigagantic-server.com
+  license:
+    name: Apache 2.0
+    url: http://foo.bar
+  version: "0.0"
+paths:
+  /hello/{name}:
+    get:
+      description: ""
+      operationId: index
+      parameters:
+      - name: name
+        in: path
+        description: The person's name
+        required: true
+        schema:
+          type: string
+      responses:
+        default:
+          description: The greeting
+          content:
+            text/plain:
+              schema:
+                type: string</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Notice how the javadoc comments are used to fill out the description of the API. If this is not desirable then you can take full control by augmenting your definition with Swagger annotations:</p>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">import io.micronaut.http.MediaType;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.micronaut.validation.Validated;
+import io.reactivex.Single;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
+import javax.validation.constraints.NotBlank;
+
+
+@Controller("/")
+@Validated
+public class HelloController {
+
+    /**
+     * @param name The person's name
+     * @return The greeting message
+     */
+    @Get(uri="/greetings/{name}", produces= MediaType.TEXT_PLAIN)
+    @Operation(summary = "Greets a person",
+            description = "A friendly greeting is returned"
+    )
+    @ApiResponse(
+            content = @Content(mediaType = "text/plain",
+                    schema = @Schema(type="string"))
+    )
+    @ApiResponse(responseCode = "400", description = "Invalid Name Supplied")
+    @ApiResponse(responseCode = "404", description = "Person not found")
+    @Tag(name = "greeting")
+    public Single&lt;String&gt; greetings(@Parameter(description="The name of the person") @NotBlank String name) {
+        return Single.just("Hello " + name + ", How are you doing?");
+    }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlight"><code class="language-groovy" data-lang="groovy">@Controller("/")
+@Validated
+class HelloController {
+
+    /**
+     * @param name The person's name
+     * @return The greeting message
+     */
+    @Get(uri="/greetings/{name}", produces= MediaType.TEXT_PLAIN)
+    @Operation(summary = "Greets a person",
+            description = "A friendly greeting is returned"
+    )
+    @ApiResponse(
+            content = @Content(mediaType = "text/plain",
+                    schema = @Schema(type="string"))
+    )
+    @ApiResponse(responseCode = "400", description = "Invalid Name Supplied")
+    @ApiResponse(responseCode = "404", description = "Person not found")
+    @Tag(name = "greeting")
+    Single&lt;String&gt; greetings(@Parameter(description="The name of the person") @NotBlank String name) {
+        return Single.just("Hello $name, How are you doing?")
+    }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlight"><code class="language-kotlin" data-lang="kotlin">import io.micronaut.http.MediaType
+import io.micronaut.http.annotation.Controller
+import io.micronaut.http.annotation.Get
+import io.micronaut.validation.Validated
+import io.reactivex.Single
+import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.media.Content
+import io.swagger.v3.oas.annotations.media.Schema
+import io.swagger.v3.oas.annotations.responses.ApiResponse
+import io.swagger.v3.oas.annotations.responses.ApiResponses
+import io.swagger.v3.oas.annotations.tags.Tag
+
+
+@Controller("/")
+@Validated
+open class HelloController {
+
+    /**
+     * @param name The person's name
+     * @return The greeting message
+     */
+    @Get(uri = "/greetings/{name}", produces = [MediaType.TEXT_PLAIN])
+    @Operation(summary = "Greets a person", description = "A friendly greeting is returned")
+    // Please Note: Repeatable Annotations with non-SOURCE retentions are not yet supported with Kotlin so we are using `@ApiResponses`
+    // instead of `@ApiResponse`, see https://youtrack.jetbrains.com/issue/KT-12794
+    @ApiResponses(
+            ApiResponse(content = [Content(mediaType = "text/plain", schema = Schema(type = "string"))]),
+            ApiResponse(responseCode = "400", description = "Invalid Name Supplied"),
+            ApiResponse(responseCode = "404", description = "Person not found")
+    )
+    @Tag(name = "greeting")
+    open fun greetings(name: String): Single&lt;String&gt; {
+        return Single.just("Hello $name, how are you doing?")
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The resulting output will be:</p>
+</div>
+<div class="listingblock">
+<div class="title">Example Generated Swagger Output</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">openapi: 3.0.1
+info:
+  title: Hello World
+  description: My API
+  contact:
+    name: Fred
+    url: http://gigantic-server.com
+    email: Fred@gigagantic-server.com
+  license:
+    name: Apache 2.0
+    url: http://foo.bar
+  version: "0.0"
+paths:
+  /greetings/{name}:
+    get:
+      tags:
+      - greeting
+      summary: Greets a person
+      description: A friendly greeting is returned
+      operationId: greetings
+      parameters:
+      - name: name
+        in: path
+        description: The name of the person
+        required: true
+        schema:
+          minLength: 1
+          type: string
+      responses:
+        default:
+          content:
+            text/plain:
+              schema:
+                type: string
+        400:
+          description: Invalid Name Supplied
+        404:
+          description: Person not found</code></pre>
+</div>
+</div>
+
+
+<h1 id="schemasAndPojos">6 Schemas and POJOs</h1>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/schemasAndPojos.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>If you return types are not simple strings and primitive types then Micronaut will attempt to generate a Schema definition. You can customize the
+generation of the Schema by using the <code>@Schema</code> annotation on your POJO. For example:</p>
+</div>
+<div class="listingblock">
+<div class="title">Using the @Schema Annotation</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Schema(name="MyPet", description="Pet description") <i class="conum" data-value="1"></i><b>(1)</b>
+class Pet {
+    private PetType type;
+    private int age;
+    private String name;
+
+    public void setAge(int a) {
+        age = a;
+    }
+
+    /**
+     * The age
+     */
+    @Schema(description="Pet age", maximum="20") <i class="conum" data-value="2"></i><b>(2)</b>
+    public int getAge() {
+        return age;
+    }
+
+    public void setName(String n) {
+        name = n;
+    }
+
+    @Schema(description="Pet name", maxLength=20)
+    public String getName() {
+        return name;
+    }
+
+    public void setType(PetType t) {
+        type = t;
+    }
+
+    public PetType getType() {
+        return type;
+    }
+}
+
+enum PetType {
+    DOG, CAT;
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>The <code>@Schema</code> annotation is used to customize the name of the schema</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Properties can be customized too.</td>
+</tr>
+</table>
+</div>
+
+
+<h1 id="schemasAndMetaAnnotations">7 Schemas and Meta Annotations</h1>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/schemasAndMetaAnnotations.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>If you don&#8217;t have control of the source code and don&#8217;t want to have to annotation each parameter with <code>@Schema</code> then it can be convenient to instead use a meta annotation.</p>
+</div>
+<div class="paragraph">
+<p>For example if the aforementioned <code>Pet</code> class cannot be annotated with <code>@Schema</code> you can define a meta annotation:</p>
+</div>
+<div class="listingblock">
+<div class="title">Swagger Meta Annotation</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Documented
+@Retention(RUNTIME)
+@Target({ElementType.PARAMETER, ElementType.FIELD})
+@Schema(name="MyPet", description="Pet description")
+@interface MyAnn {
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Then whenever <code>Pet</code> is used as a parameter you can annotate the parameter with <code>@MyAnn</code>.</p>
+</div>
+
+
+<h1 id="schemasAndGenerics">8 Schemas and Generics</h1>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/schemasAndGenerics.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>If a method return type includes generics then these will included when calculating the schema name. For example the following:</p>
+</div>
+<div class="listingblock">
+<div class="title">Swagger returns types and generics</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">class Response&lt;T&gt; {
+    private T r;
+    public T getResult() {
+        return r;
+    };
+}
+
+@Controller("/")
+class MyController {
+
+    @Put("/")
+    public Response&lt;Pet&gt; updatePet(Pet pet) {
+        ...
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Will result in a schema called <code>#/components/schemas/Response&lt;Pet&gt;</code> being generated. If you wish to alter the name of the schema you can do so with the <code>@Schema</code> annotation:</p>
+</div>
+<div class="listingblock">
+<div class="title">Changing the name of response schema</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Put("/")
+@Schema(name="ResponseOfPet")
+public Response&lt;Pet&gt; updatePet(Pet pet) {
+    ...
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>In the above case the generated schema will be named <code>#/components/schemas/ResponseOfPet</code>.</p>
+</div>
+
+    </div>
+</div>
+
+<script type="text/javascript">
+
+</script>
+</body>
+</html>

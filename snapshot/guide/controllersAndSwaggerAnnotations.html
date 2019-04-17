@@ -1,0 +1,407 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+    <title>5 Controllers and Swagger Annotations 1.1.1.BUILD-SNAPSHOT</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" href="../css/main.css" type="text/css" media="screen, print" title="Style" charset="utf-8"/>
+    <link rel="stylesheet" href="../css/pdf.css" type="text/css" media="print" title="PDF" charset="utf-8"/>
+    <script type="text/javascript">
+function addJsClass() {
+    var classes = document.body.className.split(" ");
+    classes.push("js");
+    document.body.className = classes.join(" ");
+}
+    </script>
+</head>
+
+<body class="body" onload="addJsClass();">
+<div id="navigation">
+    <div class="navTitle">
+        
+        OpenAPI/Swagger Support
+    </div>
+    <div class="navLinks">
+        <ul>
+            <li>
+                <div id="nav-summary" onmouseover="toggleNavSummary(false)" onmouseout="toggleNavSummary(true)">
+                    <a href="../guide/index.html" class="button">Table of contents</a>
+
+                    <div id="nav-summary-childs" style="display:none;">
+                        
+                        <div class="toc-item" style="margin-left:0"><a href="../guide/introduction.html"><strong>1</strong><span>Introduction</span></a>
+                        </div>
+                        
+                        <div class="toc-item" style="margin-left:0"><a href="../guide/cli.html"><strong>2</strong><span>Using the Micronaut CLI</span></a>
+                        </div>
+                        
+                        <div class="toc-item" style="margin-left:0"><a href="../guide/gettingStarted.html"><strong>3</strong><span>Getting Started with Swagger</span></a>
+                        </div>
+                        
+                        <div class="toc-item" style="margin-left:0"><a href="../guide/exposingSwaggerOutput.html"><strong>4</strong><span>Exposing Swagger Output</span></a>
+                        </div>
+                        
+                        <div class="toc-item" style="margin-left:0"><a href="../guide/controllersAndSwaggerAnnotations.html"><strong>5</strong><span>Controllers and Swagger Annotations</span></a>
+                        </div>
+                        
+                        <div class="toc-item" style="margin-left:0"><a href="../guide/schemasAndPojos.html"><strong>6</strong><span>Schemas and POJOs</span></a>
+                        </div>
+                        
+                        <div class="toc-item" style="margin-left:0"><a href="../guide/schemasAndMetaAnnotations.html"><strong>7</strong><span>Schemas and Meta Annotations</span></a>
+                        </div>
+                        
+                        <div class="toc-item" style="margin-left:0"><a href="../guide/schemasAndGenerics.html"><strong>8</strong><span>Schemas and Generics</span></a>
+                        </div>
+                        
+                    </div>
+                </div>
+            </li>
+            <li class="separator selected">
+                <a id="ref-button" onclick="localToggle(); return false;" href="#">Quick Reference</a>
+            </li>
+        </ul>
+    </div>
+
+
+</div>
+
+<table id="colset" border="0" cellpadding="0" cellspacing="0">
+    <tr>
+        <td id="col1">
+            <div id="main" class="corner-all">
+
+                
+                    <div class="toc-item prev-left"><a href="../guide/exposingSwaggerOutput.html">&lt;&lt; <strong>4</strong><span>Exposing Swagger Output</span></a></div>
+                
+
+                <span id='toggle-col1' class="toggle">(<a href="#" onclick="localToggle(); return false;">Quick Reference</a>)</span>
+
+                
+                    <div class="toc-item next-right"><a href="../guide/schemasAndPojos.html"><strong>6</strong><span>Schemas and POJOs</span> >></a></div>
+                
+
+
+                <div class="project">
+                    <h1>5 Controllers and Swagger Annotations</h1>
+
+                    <p><strong>Version:</strong> 1.1.1.BUILD-SNAPSHOT</p>
+                </div>
+
+                
+
+                
+
+<h1 id="controllersAndSwaggerAnnotations">5 Controllers and Swagger Annotations</h1>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/controllersAndSwaggerAnnotations.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>By default Micronaut will automatically at compile time build out the Swagger YAML definition from your defined controllers and methods. For example given the following class:</p>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">import io.micronaut.http.MediaType;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.micronaut.validation.Validated;
+import io.reactivex.Single;
+
+
+@Validated
+@Controller("/")
+public class HelloController {
+
+    /**
+     * @param name The person's name
+     * @return The greeting
+     */
+    @Get(uri = "/hello/{name}", produces = MediaType.TEXT_PLAIN)
+    public Single&lt;String&gt; index(String name) {
+        return Single.just("Hello " + name + "!");
+    }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlight"><code class="language-groovy" data-lang="groovy">import io.micronaut.http.MediaType
+import io.micronaut.http.annotation.Controller
+import io.micronaut.http.annotation.Get
+import io.micronaut.validation.Validated
+import io.reactivex.Single
+
+
+@Validated
+@Controller("/")
+class HelloController {
+
+    /**
+     * @param name The person's name
+     * @return The greeting
+     */
+    @Get(uri = "/hello/{name}", produces = MediaType.TEXT_PLAIN)
+    Single&lt;String&gt; index(String name) {
+        return Single.just("Hello $name!")
+    }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlight"><code class="language-kotlin" data-lang="kotlin">import io.micronaut.http.MediaType
+import io.micronaut.http.annotation.Controller
+import io.micronaut.http.annotation.Get
+import io.micronaut.validation.Validated
+import io.reactivex.Single
+
+
+@Validated
+@Controller("/")
+open class HelloController {
+
+    /**
+     * @param name The person's name
+     * @return The greeting
+     */
+    @Get(uri = "/hello/{name}", produces = [MediaType.TEXT_PLAIN])
+    open fun index(name: String): Single&lt;String&gt; {
+        return Single.just("Hello $name!")
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The resulting output will be:</p>
+</div>
+<div class="listingblock">
+<div class="title">Example Generated Swagger Output</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">openapi: 3.0.1
+info:
+  title: Hello World
+  description: My API
+  contact:
+    name: Fred
+    url: http://gigantic-server.com
+    email: Fred@gigagantic-server.com
+  license:
+    name: Apache 2.0
+    url: http://foo.bar
+  version: "0.0"
+paths:
+  /hello/{name}:
+    get:
+      description: ""
+      operationId: index
+      parameters:
+      - name: name
+        in: path
+        description: The person's name
+        required: true
+        schema:
+          type: string
+      responses:
+        default:
+          description: The greeting
+          content:
+            text/plain:
+              schema:
+                type: string</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Notice how the javadoc comments are used to fill out the description of the API. If this is not desirable then you can take full control by augmenting your definition with Swagger annotations:</p>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">import io.micronaut.http.MediaType;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.micronaut.validation.Validated;
+import io.reactivex.Single;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
+import javax.validation.constraints.NotBlank;
+
+
+@Controller("/")
+@Validated
+public class HelloController {
+
+    /**
+     * @param name The person's name
+     * @return The greeting message
+     */
+    @Get(uri="/greetings/{name}", produces= MediaType.TEXT_PLAIN)
+    @Operation(summary = "Greets a person",
+            description = "A friendly greeting is returned"
+    )
+    @ApiResponse(
+            content = @Content(mediaType = "text/plain",
+                    schema = @Schema(type="string"))
+    )
+    @ApiResponse(responseCode = "400", description = "Invalid Name Supplied")
+    @ApiResponse(responseCode = "404", description = "Person not found")
+    @Tag(name = "greeting")
+    public Single&lt;String&gt; greetings(@Parameter(description="The name of the person") @NotBlank String name) {
+        return Single.just("Hello " + name + ", How are you doing?");
+    }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlight"><code class="language-groovy" data-lang="groovy">@Controller("/")
+@Validated
+class HelloController {
+
+    /**
+     * @param name The person's name
+     * @return The greeting message
+     */
+    @Get(uri="/greetings/{name}", produces= MediaType.TEXT_PLAIN)
+    @Operation(summary = "Greets a person",
+            description = "A friendly greeting is returned"
+    )
+    @ApiResponse(
+            content = @Content(mediaType = "text/plain",
+                    schema = @Schema(type="string"))
+    )
+    @ApiResponse(responseCode = "400", description = "Invalid Name Supplied")
+    @ApiResponse(responseCode = "404", description = "Person not found")
+    @Tag(name = "greeting")
+    Single&lt;String&gt; greetings(@Parameter(description="The name of the person") @NotBlank String name) {
+        return Single.just("Hello $name, How are you doing?")
+    }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlight"><code class="language-kotlin" data-lang="kotlin">import io.micronaut.http.MediaType
+import io.micronaut.http.annotation.Controller
+import io.micronaut.http.annotation.Get
+import io.micronaut.validation.Validated
+import io.reactivex.Single
+import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.media.Content
+import io.swagger.v3.oas.annotations.media.Schema
+import io.swagger.v3.oas.annotations.responses.ApiResponse
+import io.swagger.v3.oas.annotations.responses.ApiResponses
+import io.swagger.v3.oas.annotations.tags.Tag
+
+
+@Controller("/")
+@Validated
+open class HelloController {
+
+    /**
+     * @param name The person's name
+     * @return The greeting message
+     */
+    @Get(uri = "/greetings/{name}", produces = [MediaType.TEXT_PLAIN])
+    @Operation(summary = "Greets a person", description = "A friendly greeting is returned")
+    // Please Note: Repeatable Annotations with non-SOURCE retentions are not yet supported with Kotlin so we are using `@ApiResponses`
+    // instead of `@ApiResponse`, see https://youtrack.jetbrains.com/issue/KT-12794
+    @ApiResponses(
+            ApiResponse(content = [Content(mediaType = "text/plain", schema = Schema(type = "string"))]),
+            ApiResponse(responseCode = "400", description = "Invalid Name Supplied"),
+            ApiResponse(responseCode = "404", description = "Person not found")
+    )
+    @Tag(name = "greeting")
+    open fun greetings(name: String): Single&lt;String&gt; {
+        return Single.just("Hello $name, how are you doing?")
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The resulting output will be:</p>
+</div>
+<div class="listingblock">
+<div class="title">Example Generated Swagger Output</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">openapi: 3.0.1
+info:
+  title: Hello World
+  description: My API
+  contact:
+    name: Fred
+    url: http://gigantic-server.com
+    email: Fred@gigagantic-server.com
+  license:
+    name: Apache 2.0
+    url: http://foo.bar
+  version: "0.0"
+paths:
+  /greetings/{name}:
+    get:
+      tags:
+      - greeting
+      summary: Greets a person
+      description: A friendly greeting is returned
+      operationId: greetings
+      parameters:
+      - name: name
+        in: path
+        description: The name of the person
+        required: true
+        schema:
+          minLength: 1
+          type: string
+      responses:
+        default:
+          content:
+            text/plain:
+              schema:
+                type: string
+        400:
+          description: Invalid Name Supplied
+        404:
+          description: Person not found</code></pre>
+</div>
+</div>
+
+
+                <div style="clear:both;margin-top:15px;"></div>
+                
+                    <div class="toc-item prev-left"><a href="../guide/exposingSwaggerOutput.html">&lt;&lt; <strong>4</strong><span>Exposing Swagger Output</span></a></div>
+                
+                    <div class="toc-item next-right"><a href="../guide/schemasAndPojos.html"><strong>6</strong><span>Schemas and POJOs</span> >></a></div>
+                
+                <div style="clear:both"></div>
+            </div>
+        </td>
+        <td id="col2">
+            <div class="local clearfix">
+                <div class="local-title">
+                    <a href="../guide/index.html" target="mainFrame">Quick Reference</a>
+                    <span class="toggle">(<a href="#" onclick="localToggle(); return false;">hide</a>)</span>
+                </div>
+                <div class="menu">
+                    
+                </div>
+            </div>
+        </td>
+    </tr>
+</table>
+
+<div id="footer">
+    
+    
+</div>
+
+<script type="text/javascript" src="../js/docs.js"></script>
+
+</body>
+</html>
