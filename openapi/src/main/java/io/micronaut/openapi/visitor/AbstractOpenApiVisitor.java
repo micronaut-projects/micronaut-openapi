@@ -415,7 +415,7 @@ abstract class AbstractOpenApiVisitor  {
     protected void processSchemaProperty(VisitorContext context, Element element, ClassElement elementType, Schema parentSchema, Schema propertySchema) {
         if (propertySchema != null) {
             propertySchema = bindSchemaForElement(context, element, elementType, propertySchema);
-            parentSchema.addProperties(element.getName(), propertySchema);
+            parentSchema.addProperties(Optional.ofNullable(propertySchema.getName()).orElse(element.getName()), propertySchema);
         }
     }
 
@@ -432,6 +432,10 @@ abstract class AbstractOpenApiVisitor  {
         AnnotationValue<io.swagger.v3.oas.annotations.media.Schema> schemaAnn = element.getAnnotation(io.swagger.v3.oas.annotations.media.Schema.class);
         if (schemaAnn != null) {
             schemaToBind = bindSchemaAnnotationValue(context, element, schemaToBind, schemaAnn);
+            Optional<String> schemaName = schemaAnn.get("name", String.class);
+            if (schemaName.isPresent()) {
+                schemaToBind.setName(schemaName.get());
+            }
         }
 
         Schema finalSchemaToBind = schemaToBind;
