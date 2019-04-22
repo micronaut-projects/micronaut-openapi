@@ -1,7 +1,6 @@
-Often times you might want to generate OpenAPI(Swagger) YAML for built-in endpoints or paths from some other modules, such as `security`. In order to generate YAML including all those paths Micronaut supports merging of multiple OpenAPI YAML files. So, you can create OpenAPI YAML files manually at some predefined path from there the information will then be merged into the final YAML file.
+Often times you might want to generate OpenAPI (Swagger) YAML for built-in endpoints or paths from some other modules, such as `security`. In order to generate YAML including all that information, Micronaut supports merging of multiple OpenAPI YAML files. So, you can create OpenAPI YAML files manually at some predefined path from where the information will then be merged into the final YAML file.
 
 To configure the path for additional swagger files you need to set `System` property `micronaut.openapi.additional.files`. For example:
-
 ```bash
 micronaut.openapi.additional.files={project.home}/src/test/resources/swagger
 ```
