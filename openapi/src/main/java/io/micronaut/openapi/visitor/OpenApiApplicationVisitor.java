@@ -150,10 +150,6 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                                     context.warn("Unable to read file " + path.getFileName() + ": " + e.getMessage() , classElement);
                                 }
                                 if (parsedOpenApi != null) {
-                                    if (!parsedOpenApi.getOpenapi().equals(openAPI.getOpenapi())) {
-                                        context.warn("The OpenAPI version " + parsedOpenApi.getOpenapi() + " in the file doesn't match the OpenAPI version " + openAPI.getOpenapi() + " of application", element);
-                                        return;
-                                    }
                                     Optional.ofNullable(parsedOpenApi.getServers()).ifPresent(servers -> servers.forEach(openAPI::addServersItem));
                                     Optional.ofNullable(parsedOpenApi.getPaths()).ifPresent(paths -> paths.forEach(openAPI::path));
                                     Optional.ofNullable(parsedOpenApi.getComponents()).ifPresent(components -> {
