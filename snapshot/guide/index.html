@@ -59,6 +59,8 @@
                                 
                                 <div class="toc-item" style="margin-left:0"><a href="#schemasAndGenerics"><strong>8</strong><span>Schemas and Generics</span></a></div>
                                 
+                                <div class="toc-item" style="margin-left:0"><a href="#mergingSchemas"><strong>9</strong><span>Merging Schemas</span></a></div>
+                                
                             </div>
                         </div>
                     </li>
@@ -98,6 +100,8 @@
         <div class="toc-item" style="margin-left:0px" id="toc-item-schemasAndMetaAnnotations"><a href="#schemasAndMetaAnnotations"><strong>7</strong><span>Schemas and Meta Annotations</span></a></div>
         
         <div class="toc-item" style="margin-left:0px" id="toc-item-schemasAndGenerics"><a href="#schemasAndGenerics"><strong>8</strong><span>Schemas and Generics</span></a></div>
+        
+        <div class="toc-item" style="margin-left:0px" id="toc-item-mergingSchemas"><a href="#mergingSchemas"><strong>9</strong><span>Merging Schemas</span></a></div>
         
         </div>
     </div>
@@ -758,6 +762,28 @@ public Response&lt;Pet&gt; updatePet(Pet pet) {
 </div>
 <div class="paragraph">
 <p>In the above case the generated schema will be named <code>#/components/schemas/ResponseOfPet</code>.</p>
+</div>
+
+
+<h1 id="mergingSchemas">9 Merging Schemas</h1>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/mergingSchemas.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>Often times you might want to generate OpenAPI (Swagger) YAML for built-in endpoints or paths from some other modules, such as <code>security</code>. In order to generate YAML including all that information, Micronaut supports merging of multiple OpenAPI YAML files. So, you can create OpenAPI YAML files manually at some predefined path from where the information will then be merged into the final YAML file.</p>
+</div>
+<div class="paragraph">
+<p>To configure the path for additional swagger files you need to set <code>System</code> property <code>micronaut.openapi.additional.files</code>. For example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">micronaut.openapi.additional.files={project.home}/src/test/resources/swagger</code></pre>
+</div>
 </div>
 
     </div>
