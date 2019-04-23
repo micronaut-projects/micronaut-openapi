@@ -62,12 +62,18 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         OpenAPI openAPI = readOpenAPI(element, context);
         if (attr.isPresent()) {
             OpenAPI existing = attr.get();
-            existing.setInfo(openAPI.getInfo());
-            existing.setTags(openAPI.getTags());
-            existing.setServers(openAPI.getServers());
-            existing.setSecurity(openAPI.getSecurity());
-            existing.setExternalDocs(openAPI.getExternalDocs());
-            existing.setExtensions(openAPI.getExtensions());
+            Optional.ofNullable(openAPI.getInfo())
+                    .ifPresent(existing::setInfo);
+            Optional.ofNullable(openAPI.getTags())
+                    .ifPresent(existing::setTags);
+            Optional.ofNullable(openAPI.getServers())
+                    .ifPresent(existing::setServers);
+            Optional.ofNullable(openAPI.getSecurity())
+                    .ifPresent(existing::setSecurity);
+            Optional.ofNullable(openAPI.getExternalDocs())
+                    .ifPresent(existing::setExternalDocs);
+            Optional.ofNullable(openAPI.getExtensions())
+                    .ifPresent(existing::setExtensions);
 
         } else {
             context.put(ATTR_OPENAPI, openAPI);
