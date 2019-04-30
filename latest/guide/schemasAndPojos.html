@@ -1,0 +1,193 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+    <title>6 Schemas and POJOs 1.1.0</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" href="../css/main.css" type="text/css" media="screen, print" title="Style" charset="utf-8"/>
+    <link rel="stylesheet" href="../css/pdf.css" type="text/css" media="print" title="PDF" charset="utf-8"/>
+    <script type="text/javascript">
+function addJsClass() {
+    var classes = document.body.className.split(" ");
+    classes.push("js");
+    document.body.className = classes.join(" ");
+}
+    </script>
+</head>
+
+<body class="body" onload="addJsClass();">
+<div id="navigation">
+    <div class="navTitle">
+        
+        OpenAPI/Swagger Support
+    </div>
+    <div class="navLinks">
+        <ul>
+            <li>
+                <div id="nav-summary" onmouseover="toggleNavSummary(false)" onmouseout="toggleNavSummary(true)">
+                    <a href="../guide/index.html" class="button">Table of contents</a>
+
+                    <div id="nav-summary-childs" style="display:none;">
+
+                        <div class="toc-item" style="margin-left:0"><a href="../guide/introduction.html"><strong>1</strong><span>Introduction</span></a>
+                        </div>
+
+                        <div class="toc-item" style="margin-left:0"><a href="../guide/gettingStarted.html"><strong>2</strong><span>Getting Started with Swagger</span></a>
+                        </div>
+
+                        <div class="toc-item" style="margin-left:0"><a href="../guide/exposingSwaggerOutput.html"><strong>3</strong><span>Exposing Swagger Output</span></a>
+                        </div>
+
+                        <div class="toc-item" style="margin-left:0"><a href="../guide/controllersAndSwaggerAnnotations.html"><strong>4</strong><span>Controllers and Swagger Annotations</span></a>
+                        </div>
+
+                        <div class="toc-item" style="margin-left:0"><a href="../guide/schemasAndPojos.html"><strong>5</strong><span>Schemas and POJOs</span></a>
+                        </div>
+
+                        <div class="toc-item" style="margin-left:0"><a href="../guide/schemasAndMetaAnnotations.html"><strong>6</strong><span>Schemas and Meta Annotations</span></a>
+                        </div>
+
+                        <div class="toc-item" style="margin-left:0"><a href="../guide/schemasAndGenerics.html"><strong>7</strong><span>Schemas and Generics</span></a>
+                        </div>
+                        
+                    </div>
+                </div>
+            </li>
+            <li class="separator selected">
+                <a id="ref-button" onclick="localToggle(); return false;" href="#">Quick Reference</a>
+            </li>
+        </ul>
+    </div>
+
+
+</div>
+
+<table id="colset" border="0" cellpadding="0" cellspacing="0">
+    <tr>
+        <td id="col1">
+            <div id="main" class="corner-all">
+
+                
+                    <div class="toc-item prev-left"><a href="../guide/controllersAndSwaggerAnnotations.html">&lt;&lt; <strong>4</strong><span>Controllers and Swagger Annotations</span></a></div>
+                
+
+                <span id='toggle-col1' class="toggle">(<a href="#" onclick="localToggle(); return false;">Quick Reference</a>)</span>
+
+                
+                    <div class="toc-item next-right"><a href="../guide/schemasAndMetaAnnotations.html"><strong>6</strong><span>Schemas and Meta Annotations</span> >></a></div>
+                
+
+
+                <div class="project">
+                    <h1>5 Schemas and POJOs</h1>
+
+                    <p><strong>Version:</strong> 1.1.0</p>
+                </div>
+
+                
+
+                
+
+<h1 id="schemasAndPojos">5 Schemas and POJOs</h1>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/1.1.x/src/main/docs/guide/schemasAndPojos.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>If you return types are not simple strings and primitive types then Micronaut will attempt to generate a Schema definition. You can customize the
+generation of the Schema by using the <code>@Schema</code> annotation on your POJO. For example:</p>
+</div>
+<div class="listingblock">
+<div class="title">Using the @Schema Annotation</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Schema(name="MyPet", description="Pet description") <i class="conum" data-value="1"></i><b>(1)</b>
+class Pet {
+    private PetType type;
+    private int age;
+    private String name;
+
+    public void setAge(int a) {
+        age = a;
+    }
+
+    /**
+     * The age
+     */
+    @Schema(description="Pet age", maximum="20") <i class="conum" data-value="2"></i><b>(2)</b>
+    public int getAge() {
+        return age;
+    }
+
+    public void setName(String n) {
+        name = n;
+    }
+
+    @Schema(description="Pet name", maxLength=20)
+    public String getName() {
+        return name;
+    }
+
+    public void setType(PetType t) {
+        type = t;
+    }
+
+    public PetType getType() {
+        return type;
+    }
+}
+
+enum PetType {
+    DOG, CAT;
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>The <code>@Schema</code> annotation is used to customize the name of the schema</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Properties can be customized too.</td>
+</tr>
+</table>
+</div>
+
+
+                <div style="clear:both;margin-top:15px;"></div>
+                
+                    <div class="toc-item prev-left"><a href="../guide/controllersAndSwaggerAnnotations.html">&lt;&lt; <strong>4</strong><span>Controllers and Swagger Annotations</span></a></div>
+                
+                    <div class="toc-item next-right"><a href="../guide/schemasAndMetaAnnotations.html"><strong>6</strong><span>Schemas and Meta Annotations</span> >></a></div>
+                
+                <div style="clear:both"></div>
+            </div>
+        </td>
+        <td id="col2">
+            <div class="local clearfix">
+                <div class="local-title">
+                    <a href="../guide/index.html" target="mainFrame">Quick Reference</a>
+                    <span class="toggle">(<a href="#" onclick="localToggle(); return false;">hide</a>)</span>
+                </div>
+                <div class="menu">
+                    
+                </div>
+            </div>
+        </td>
+    </tr>
+</table>
+
+<div id="footer">
+    
+    
+</div>
+
+<script type="text/javascript" src="../js/docs.js"></script>
+
+</body>
+</html>
