@@ -407,7 +407,7 @@ public class OpenApiControllerVisitor extends AbstractOpenApiVisitor implements 
 
                     RequestBody requestBody = new RequestBody();
                     final Content content = new Content();
-                    consumesMediaTypes = consumesMediaTypes.isEmpty() ? OptionalValues.of(List.class, Collections.singletonMap("value", MediaType.APPLICATION_JSON)): consumesMediaTypes;
+                    consumesMediaTypes = consumesMediaTypes.isEmpty() ? OptionalValues.of(List.class, Collections.singletonMap("value", MediaType.APPLICATION_JSON)) : consumesMediaTypes;
                     consumesMediaTypes.forEach((key, mediaTypeList) -> {
                         for (Object mediaType: mediaTypeList) {
                             io.swagger.v3.oas.models.media.MediaType mt = new io.swagger.v3.oas.models.media.MediaType();

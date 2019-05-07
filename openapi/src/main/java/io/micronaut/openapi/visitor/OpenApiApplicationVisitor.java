@@ -174,7 +174,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                                 }
                             });
                 } catch (IOException e) {
-                    context.warn("Unable to read  file from "+ directory.getFileName() + ": " + e.getMessage() , classElement);
+                    context.warn("Unable to read  file from " + directory.getFileName() + ": " + e.getMessage() , classElement);
                 }
             }
         }
