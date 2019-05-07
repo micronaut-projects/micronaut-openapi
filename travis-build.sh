@@ -2,18 +2,18 @@
 set -e
 EXIT_STATUS=0
 
-if [ "${TRAVIS_JDK_VERSION}" == "openjdk11" ] ; then
+if [[ "${TRAVIS_JDK_VERSION}" == "openjdk11" ]] ; then
     echo "Check for branch $TRAVIS_BRANCH JDK: $TRAVIS_JDK_VERSION"
     ./gradlew testClasses --no-daemon || EXIT_STATUS=$?
 
-    if [ $EXIT_STATUS -ne 0 ]; then
+    if [[ $EXIT_STATUS -ne 0 ]]; then
        exit $EXIT_STATUS
     fi
 
     ./gradlew --stop
     ./gradlew check --no-daemon || EXIT_STATUS=$?
 
-    if [ $EXIT_STATUS -ne 0 ]; then
+    if [[ $EXIT_STATUS -ne 0 ]]; then
        exit $EXIT_STATUS
     fi
 
@@ -37,21 +37,19 @@ if [[ $EXIT_STATUS -eq 0 ]]; then
         ./gradlew testClasses --no-daemon || EXIT_STATUS=$?
 
         ./gradlew --stop
+        killall -9 java
         ./gradlew check --no-daemon || EXIT_STATUS=$?
     fi
 fi
 
 if [[ $EXIT_STATUS -eq 0 ]]; then
     echo "Publishing archives for branch $TRAVIS_BRANCH"
-    if [[ -n $TRAVIS_TAG ]] || [[ $TRAVIS_BRANCH =~ ^master$ && $TRAVIS_PULL_REQUEST == 'false' ]]; then
+    if [[ -n $TRAVIS_TAG ]] || [[ $TRAVIS_BRANCH =~ ^master|[12]\..\.x$ && $TRAVIS_PULL_REQUEST == 'false' ]]; then
 
       echo "Publishing archives"
       ./gradlew --stop
       if [[ -n $TRAVIS_TAG ]]; then
           ./gradlew bintrayUpload --no-daemon --stacktrace || EXIT_STATUS=$?
-#          if [[ $EXIT_STATUS -eq 0 ]]; then
-#            ./gradlew synchronizeWithMavenCentral --no-daemon
-#          fi
       else
           ./gradlew publish --no-daemon --stacktrace || EXIT_STATUS=$?
       fi
@@ -67,7 +65,6 @@ if [[ $EXIT_STATUS -eq 0 ]]; then
         if [[ $TRAVIS_BRANCH =~ ^master|[12]\..\.x$ ]]; then
            mkdir -p snapshot
            cp -r ../build/docs/. ./snapshot/
-
            git add snapshot/*
         fi
 

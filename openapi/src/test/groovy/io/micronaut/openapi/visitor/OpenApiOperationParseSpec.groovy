@@ -18,10 +18,81 @@ package io.micronaut.openapi.visitor
 import io.micronaut.annotation.processing.test.AbstractTypeElementSpec
 import io.swagger.v3.oas.models.Operation
 import io.swagger.v3.oas.models.media.ArraySchema
+import io.swagger.v3.oas.models.media.ObjectSchema
 
 class OpenApiOperationParseSpec extends AbstractTypeElementSpec {
     def setup() {
         System.setProperty(AbstractOpenApiVisitor.ATTR_TEST_MODE, "true")
+    }
+
+    void "test parse the OpenAPI @ApiResponse Content with @Schema annotation with custom fieldname"() {
+        given:
+        buildBeanDefinition('test.MyBean','''
+package test;
+
+import io.micronaut.http.HttpResponse;
+import io.micronaut.http.annotation.Body;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Post;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+
+@Schema(description = "Represents a pet")
+class Pet {
+    @Schema(name="pet-name", description = "The pet name")
+    private String name;
+    private Integer age;
+
+    @Schema(name="pet-name", description = "The pet name")
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+    
+    @Schema(name="pet-age", description = "The pet age")
+    public Integer getAge() {
+        return age;
+    }
+}
+
+@Controller("/pet")
+interface PetOperations {
+    @Operation(summary = "Save Pet",
+            description = "Save Pet",
+            tags = "save-pet",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Save Pet",
+                            content = @Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = Pet.class))),
+                    @ApiResponse(
+                            responseCode = "404",
+                            description = "Page Not Found"
+                    )})
+    @Post
+    HttpResponse<Pet> save(@Body Pet pet);
+}
+
+
+@javax.inject.Singleton
+class MyBean {}
+''')
+
+        ObjectSchema petSchema = (ObjectSchema) AbstractOpenApiVisitor.testReference.getComponents().getSchemas().get("Pet")
+
+        expect:
+        petSchema
+        petSchema.properties
+        petSchema.properties.size() == 2
+        petSchema.properties.containsKey("pet-name")
+        petSchema.properties.containsKey("pet-age")
+
     }
 
     void "test parse the OpenAPI @ApiResponse Content with @ArraySchema annotation"() {
