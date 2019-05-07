@@ -18,6 +18,7 @@ package io.micronaut.openapi.visitor
 import io.micronaut.annotation.processing.test.AbstractTypeElementSpec
 import io.swagger.v3.oas.annotations.enums.ParameterIn
 import io.swagger.v3.oas.models.OpenAPI
+import io.swagger.v3.oas.models.Operation
 import io.swagger.v3.oas.models.PathItem
 import io.swagger.v3.oas.models.media.ArraySchema
 import io.swagger.v3.oas.models.media.MapSchema
@@ -923,5 +924,101 @@ class MyBean {}
         pathItem.post.requestBody.content['application/json'].schema.properties.size() == 2
         pathItem.post.requestBody.content['application/json'].schema.properties['name'].type == 'string'
         !pathItem.post.requestBody.content['application/json'].schema.properties['name'].nullable
+    }
+
+
+    void "test build OpenAPI for response with multiple content types"() {
+        given: "An API definition"
+        when:
+        buildBeanDefinition('test.MyBean','''
+package test;
+
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.micronaut.http.MediaType;
+import io.micronaut.http.annotation.Produces;
+
+import java.util.List;
+
+@Controller("/pets")
+interface PetOperations<T extends Pet> {
+
+    /**
+     * Find a pet by a slug
+     *
+     * @param slug The slug name
+     * @return A pet or 404
+     */
+    @Produces({MediaType.APPLICATION_FORM_URLENCODED, MediaType.APPLICATION_JSON})
+    @Get("/{slug}")
+    T find(String slug);
+}
+
+class Pet {
+    private int age;
+    private String name;
+    private List<String> tags;
+
+    public void setAge(int a) {
+        age = a;
+    }
+
+    /**
+     * The Pet Age
+     *
+     * @return The Pet Age
+     */
+    public int getAge() {
+        return age;
+    }
+
+    public void setName(String n) {
+        name = n;
+    }
+
+    /**
+     * The Pet Name
+     *
+     * @return The Pet Name
+     */
+    public String getName() {
+        return name;
+    }
+
+
+    /**
+     * The Pet Tags
+     *  
+     * @return The Tag
+     */
+    public List<String> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<String> tags) {
+        this.tags = tags;
+    }
+}
+
+@javax.inject.Singleton
+class MyBean {}
+''')
+        then:"The state is correct"
+        AbstractOpenApiVisitor.testReference != null
+
+        when:"The OpenAPI is retrieved"
+        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+
+        then:"The operation has only one path"
+        openAPI.paths.size() == 1
+
+        when: "The GET /pets/{slug} operation is retrieved"
+        Operation operation = openAPI.paths?.get("/pets/{slug}")?.get
+
+        then: "The response has multiple content types"
+        operation.responses.size() == 1
+        operation.responses.default.content.size() == 2
+        operation.responses.default.content['application/json'].schema
+        operation.responses.default.content['application/x-www-form-urlencoded'].schema
     }
 }
