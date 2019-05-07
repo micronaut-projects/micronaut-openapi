@@ -155,6 +155,7 @@ public class OpenApiControllerVisitor extends AbstractOpenApiVisitor implements 
 
             if (javadocDescription != null && StringUtils.isEmpty(swaggerOperation.getDescription())) {
                 swaggerOperation.setDescription(javadocDescription.getMethodDescription());
+                swaggerOperation.setSummary(javadocDescription.getMethodDescription());
             }
 
             setOperationOnPathItem(pathItem, swaggerOperation, httpMethod);
