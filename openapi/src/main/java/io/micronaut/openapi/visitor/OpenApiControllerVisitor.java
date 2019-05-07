@@ -28,6 +28,7 @@ import io.micronaut.core.convert.DefaultConversionService;
 import io.micronaut.core.naming.NameUtils;
 import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.core.util.StringUtils;
+import io.micronaut.core.value.OptionalValues;
 import io.micronaut.core.value.PropertyResolver;
 import io.micronaut.http.HttpMethod;
 import io.micronaut.http.HttpResponse;
@@ -176,6 +177,7 @@ public class OpenApiControllerVisitor extends AbstractOpenApiVisitor implements 
                 pathVariables.put(variable.getName(), variable);
             }
 
+            OptionalValues<List> consumesMediaTypes = element.getValues(Consumes.class, List.class);
             String consumesMediaType = element.getValue(Consumes.class, String.class).orElse(MediaType.APPLICATION_JSON);
             ApiResponses responses = swaggerOperation.getResponses();
             if (responses == null) {
@@ -196,8 +198,13 @@ public class OpenApiControllerVisitor extends AbstractOpenApiVisitor implements 
                     returnType = returnType.getFirstTypeArgument().orElse(returnType);
                 }
                 if (returnType != null) {
-                    String mediaType = element.getValue(Produces.class, String.class).orElse(MediaType.APPLICATION_JSON);
-                    Content content = buildContent(element, returnType, mediaType, openAPI, context);
+                    OptionalValues<List> mediaTypes = element.getValues(Produces.class, List.class);
+                    Content content;
+                    if (mediaTypes.isEmpty()) {
+                        content = buildContent(element, returnType, MediaType.APPLICATION_JSON, openAPI, context);
+                    } else {
+                        content = buildContent(element, returnType, mediaTypes, openAPI, context);
+                    }
                     okResponse.setContent(content);
                 }
                 responses.put(ApiResponses.DEFAULT, okResponse);
@@ -237,12 +244,22 @@ public class OpenApiControllerVisitor extends AbstractOpenApiVisitor implements 
                         }
                         requestBody.setRequired(!parameter.isAnnotationPresent(Nullable.class) && !parameterType.isAssignable(Optional.class));
 
-                        Content content = buildContent(
-                                parameter,
-                                parameterType,
-                                consumesMediaType,
-                                openAPI, context
-                        );
+                        Content content;
+                        if (consumesMediaTypes.isEmpty()) {
+                            content = buildContent(
+                                    parameter,
+                                    parameterType,
+                                    MediaType.APPLICATION_JSON,
+                                    openAPI, context
+                            );
+                        } else {
+                            content = buildContent(
+                                    parameter,
+                                    parameterType,
+                                    consumesMediaTypes,
+                                    openAPI, context
+                            );
+                        }
                         requestBody.setContent(content);
                         swaggerOperation.setRequestBody(requestBody);
                     }
@@ -389,36 +406,39 @@ public class OpenApiControllerVisitor extends AbstractOpenApiVisitor implements 
                 if (!bodyParameters.isEmpty()) {
 
                     RequestBody requestBody = new RequestBody();
-                    Content content = new Content();
-                    io.swagger.v3.oas.models.media.MediaType mt = new io.swagger.v3.oas.models.media.MediaType();
-                    ObjectSchema schema = new ObjectSchema();
-                    for (ParameterElement parameter : bodyParameters) {
-                        if (parameter.isAnnotationPresent(JsonIgnore.class) ||
-                                parameter.isAnnotationPresent(Hidden.class) ||
-                                parameter.getValue(io.swagger.v3.oas.annotations.Parameter.class, "hidden", Boolean.class).orElse(false) ||
-                                isIgnoredParameterType(parameter.getType())) {
-                            continue;
-                        }
-
-
-
-                        Schema propertySchema = resolveSchema(openAPI, parameter, parameter.getType(), context, consumesMediaType);
-                        if (propertySchema != null) {
-
-                            processSchemaProperty(context, parameter, parameter.getType(), schema, propertySchema);
-
-                            propertySchema.setNullable(parameter.isAnnotationPresent(Nullable.class));
-                            if (javadocDescription != null && StringUtils.isEmpty(propertySchema.getDescription())) {
-                                CharSequence doc = javadocDescription.getParameters().get(parameter.getName());
-                                if (doc != null) {
-                                    propertySchema.setDescription(doc.toString());
+                    final Content content = new Content();
+                    consumesMediaTypes = consumesMediaTypes.isEmpty() ? OptionalValues.of(List.class, Collections.singletonMap("value", MediaType.APPLICATION_JSON)): consumesMediaTypes;
+                    consumesMediaTypes.forEach((key, mediaTypeList) -> {
+                        for (Object mediaType: mediaTypeList) {
+                            io.swagger.v3.oas.models.media.MediaType mt = new io.swagger.v3.oas.models.media.MediaType();
+                            ObjectSchema schema = new ObjectSchema();
+                            for (ParameterElement parameter : bodyParameters) {
+                                if (parameter.isAnnotationPresent(JsonIgnore.class) ||
+                                        parameter.isAnnotationPresent(Hidden.class) ||
+                                        parameter.getValue(io.swagger.v3.oas.annotations.Parameter.class, "hidden", Boolean.class).orElse(false) ||
+                                        isIgnoredParameterType(parameter.getType())) {
+                                    continue;
                                 }
-                            }
-                        }
 
-                    }
-                    mt.setSchema(schema);
-                    content.addMediaType(consumesMediaType, mt);
+                                Schema propertySchema = resolveSchema(openAPI, parameter, parameter.getType(), context, mediaType.toString());
+                                if (propertySchema != null) {
+
+                                    processSchemaProperty(context, parameter, parameter.getType(), schema, propertySchema);
+
+                                    propertySchema.setNullable(parameter.isAnnotationPresent(Nullable.class));
+                                    if (javadocDescription != null && StringUtils.isEmpty(propertySchema.getDescription())) {
+                                        CharSequence doc = javadocDescription.getParameters().get(parameter.getName());
+                                        if (doc != null) {
+                                            propertySchema.setDescription(doc.toString());
+                                        }
+                                    }
+                                }
+
+                            }
+                            mt.setSchema(schema);
+                            content.addMediaType(mediaType.toString(), mt);
+                        }
+                    });
 
                     requestBody.setContent(content);
                     requestBody.setRequired(true);
@@ -599,6 +619,19 @@ public class OpenApiControllerVisitor extends AbstractOpenApiVisitor implements 
         io.swagger.v3.oas.models.media.MediaType mt = new io.swagger.v3.oas.models.media.MediaType();
         mt.setSchema(resolveSchema(openAPI, definingElement, type, context, mediaType));
         content.addMediaType(mediaType, mt);
+        return content;
+    }
+
+    private Content buildContent(Element definingElement, ClassElement type, OptionalValues<List> mediaTypes, OpenAPI openAPI, VisitorContext context) {
+        Content content = new Content();
+        mediaTypes.forEach((key, mediaTypesList) ->  {
+            for (Object mediaType: mediaTypesList) {
+                io.swagger.v3.oas.models.media.MediaType mt = new io.swagger.v3.oas.models.media.MediaType();
+                mt.setSchema(resolveSchema(openAPI, definingElement, type, context, mediaType.toString()));
+                content.addMediaType(mediaType.toString(), mt);
+            }
+
+        });
         return content;
     }
 
