@@ -103,7 +103,8 @@ class MyBean {}
 
         then:
         openAPI.getSecurity().size() == 1
-        openAPI.getSecurity().get(0).get("name")
+        openAPI.getSecurity().get(0).containsKey("X-API-Key")
+        openAPI.getSecurity().get(0).get("X-API-Key") == []
 
         when:
         Operation operation = openAPI.getPaths().get("/pets/{name}").get
@@ -164,8 +165,8 @@ class MyBean {}
         expect:
         operation
         operation.security.size() == 1
-        operation.security.first().name == ['myOauth2Security']
-        operation.security.first().scopes == ['write: read']
+        operation.security.get(0).containsKey('myOauth2Security')
+        operation.security.get(0).get('myOauth2Security') == ['write: read']
         openAPI.components.securitySchemes.size() == 1
         openAPI.components.securitySchemes['myOauth2Security'].type == SecurityScheme.Type.APIKEY
         openAPI.components.securitySchemes['myOauth2Security'].in == SecurityScheme.In.HEADER
@@ -220,8 +221,8 @@ class MyBean {}
         expect:
         operation
         operation.security.size() == 1
-        operation.security.first().name == ['myOauth2Security']
-        operation.security.first().scopes == ['write: read']
+        operation.security.get(0).containsKey('myOauth2Security')
+        operation.security.get(0).get('myOauth2Security') == ['write: read']
         openAPI.components.securitySchemes.size() == 1
         openAPI.components.securitySchemes['myOauth2Security'].type == SecurityScheme.Type.OAUTH2
         openAPI.components.securitySchemes['myOauth2Security'].flows
