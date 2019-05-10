@@ -42,10 +42,7 @@ import java.lang.annotation.Annotation;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -201,7 +198,14 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
 
             }
             for (AnnotationValue<A> tag : annotations) {
-                JsonNode jsonNode = toJson(tag.getValues(), context);
+                JsonNode jsonNode;
+                if (tag.getAnnotationName().equals(SecurityRequirement.class.getName()) && tag.getValues().size() > 0) {
+                    Object name = tag.getValues().get("name");
+                    Object scopes = Optional.ofNullable(tag.getValues().get("scopes")).orElse(new ArrayList<String>());
+                    jsonNode = toJson(Collections.singletonMap((CharSequence) name, scopes), context);
+                } else {
+                    jsonNode = toJson(tag.getValues(), context);
+                }
                 try {
                     T t = jsonMapper.treeToValue(jsonNode, modelType);
                     if (t != null) {
