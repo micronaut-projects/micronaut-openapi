@@ -42,10 +42,8 @@ import java.lang.annotation.Annotation;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Visits the application class.
@@ -69,27 +67,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
     @Override
     public void visitClass(ClassElement element, VisitorContext context) {
         context.info("Generating OpenAPI Documentation");
-        Optional<OpenAPI> attr = context.get(ATTR_OPENAPI, OpenAPI.class);
         OpenAPI openAPI = readOpenAPI(element, context);
-        if (attr.isPresent()) {
-            OpenAPI existing = attr.get();
-            Optional.ofNullable(openAPI.getInfo())
-                    .ifPresent(existing::setInfo);
-            Optional.ofNullable(openAPI.getTags())
-                    .ifPresent(existing::setTags);
-            Optional.ofNullable(openAPI.getServers())
-                    .ifPresent(existing::setServers);
-            Optional.ofNullable(openAPI.getSecurity())
-                    .ifPresent(existing::setSecurity);
-            Optional.ofNullable(openAPI.getExternalDocs())
-                    .ifPresent(existing::setExternalDocs);
-            Optional.ofNullable(openAPI.getExtensions())
-                    .ifPresent(existing::setExtensions);
-
-        } else {
-            context.put(ATTR_OPENAPI, openAPI);
-        }
-
         mergeAdditionalSwaggerFiles(element, context, openAPI);
         // handle type level tags
         List<io.swagger.v3.oas.models.tags.Tag> tagList = processOpenApiAnnotation(
@@ -109,6 +87,17 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                 io.swagger.v3.oas.models.security.SecurityRequirement.class,
                 openAPI.getSecurity()
         );
+        if (securityRequirements != null) {
+            securityRequirements = securityRequirements.stream()
+                    .peek(securityRequirement -> {
+                        for (Map.Entry<String, List<String>> entry : securityRequirement.entrySet()) {
+                            if (entry.getValue() == null) {
+                                entry.setValue(new ArrayList<>());
+                            }
+                        }
+                    }).collect(Collectors.toList());
+        }
+
         openAPI.setSecurity(securityRequirements);
 
         // handle type level servers
@@ -124,8 +113,18 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         // Handle Application security schemes
         processSecuritySchemes(element, context);
 
+        Optional<OpenAPI> attr = context.get(ATTR_OPENAPI, OpenAPI.class);
+        if (attr.isPresent()) {
+            OpenAPI existing = attr.get();
+            Optional.ofNullable(openAPI.getInfo())
+                    .ifPresent(existing::setInfo);
+            copyOpenAPI(existing, openAPI);
+        } else {
+            context.put(ATTR_OPENAPI, openAPI);
+        }
+
         if (Boolean.getBoolean(ATTR_TEST_MODE)) {
-            testReference = openAPI;
+            testReference = resolveOpenAPI(context);
         }
 
         this.classElement = element;
@@ -155,28 +154,39 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                                 } catch (IOException e) {
                                     context.warn("Unable to read file " + path.getFileName() + ": " + e.getMessage() , classElement);
                                 }
-                                if (parsedOpenApi != null) {
-                                    Optional.ofNullable(parsedOpenApi.getServers()).ifPresent(servers -> servers.forEach(openAPI::addServersItem));
-                                    Optional.ofNullable(parsedOpenApi.getPaths()).ifPresent(paths -> paths.forEach(openAPI::path));
-                                    Optional.ofNullable(parsedOpenApi.getComponents()).ifPresent(components -> {
-                                        Map<String, Schema> schemas = components.getSchemas();
-                                        if (schemas != null && !schemas.isEmpty()) {
-                                            schemas.forEach(openAPI::schema);
-                                        }
-                                        Map<String, SecurityScheme> securitySchemes = components.getSecuritySchemes();
-                                        if (securitySchemes != null && !securitySchemes.isEmpty()) {
-                                            securitySchemes.forEach(openAPI::schemaRequirement);
-                                        }
-                                    });
-                                    Optional.ofNullable(parsedOpenApi.getSecurity()).ifPresent(securityRequirements -> securityRequirements.forEach(openAPI::addSecurityItem));
-                                    Optional.ofNullable(parsedOpenApi.getTags()).ifPresent(tags -> tags.forEach(openAPI::addTagsItem));
-                                    Optional.ofNullable(parsedOpenApi.getExtensions()).ifPresent(extensions -> extensions.forEach(openAPI::addExtension));
-                                }
+                                copyOpenAPI(openAPI, parsedOpenApi);
                             });
                 } catch (IOException e) {
                     context.warn("Unable to read  file from " + directory.getFileName() + ": " + e.getMessage() , classElement);
                 }
             }
+        }
+    }
+
+    /**
+     * Copy information from one {@link OpenAPI} object to another.
+     *
+     * @param to The {@link OpenAPI} object to copy to
+     * @param from The {@link OpenAPI} object to copy from
+     */
+    private void copyOpenAPI(OpenAPI to, OpenAPI from) {
+        if (to != null && from != null) {
+            Optional.ofNullable(from.getTags()).ifPresent(tags -> tags.forEach(to::addTagsItem));
+            Optional.ofNullable(from.getServers()).ifPresent(servers -> servers.forEach(to::addServersItem));
+            Optional.ofNullable(from.getSecurity()).ifPresent(securityRequirements -> securityRequirements.forEach(to::addSecurityItem));
+            Optional.ofNullable(from.getPaths()).ifPresent(paths -> paths.forEach(to::path));
+            Optional.ofNullable(from.getComponents()).ifPresent(components -> {
+                Map<String, Schema> schemas = components.getSchemas();
+                if (schemas != null && !schemas.isEmpty()) {
+                    schemas.forEach(to::schema);
+                }
+                Map<String, SecurityScheme> securitySchemes = components.getSecuritySchemes();
+                if (securitySchemes != null && !securitySchemes.isEmpty()) {
+                    securitySchemes.forEach(to::schemaRequirement);
+                }
+            });
+            Optional.ofNullable(from.getExternalDocs()).ifPresent(to::externalDocs);
+            Optional.ofNullable(from.getExtensions()).ifPresent(extensions -> extensions.forEach(to::addExtension));
         }
     }
 
@@ -188,7 +198,14 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
 
             }
             for (AnnotationValue<A> tag : annotations) {
-                JsonNode jsonNode = toJson(tag.getValues(), context);
+                JsonNode jsonNode;
+                if (tag.getAnnotationName().equals(SecurityRequirement.class.getName()) && tag.getValues().size() > 0) {
+                    Object name = tag.getValues().get("name");
+                    Object scopes = Optional.ofNullable(tag.getValues().get("scopes")).orElse(new ArrayList<String>());
+                    jsonNode = toJson(Collections.singletonMap((CharSequence) name, scopes), context);
+                } else {
+                    jsonNode = toJson(tag.getValues(), context);
+                }
                 try {
                     T t = jsonMapper.treeToValue(jsonNode, modelType);
                     if (t != null) {

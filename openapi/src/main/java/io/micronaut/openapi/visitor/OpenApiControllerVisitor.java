@@ -515,7 +515,9 @@ public class OpenApiControllerVisitor extends AbstractOpenApiVisitor implements 
         List<AnnotationValue<io.swagger.v3.oas.annotations.security.SecurityRequirement>> securityAnnotations = element.getAnnotationValuesByType(io.swagger.v3.oas.annotations.security.SecurityRequirement.class);
         if (CollectionUtils.isNotEmpty(securityAnnotations)) {
             for (AnnotationValue<io.swagger.v3.oas.annotations.security.SecurityRequirement> r : securityAnnotations) {
-                JsonNode jn = toJson(r.getValues(), context);
+                Object name = r.getValues().get("name");
+                Object scopes = Optional.ofNullable(r.getValues().get("scopes")).orElse(new ArrayList<String>());
+                JsonNode jn  = toJson(Collections.singletonMap((CharSequence) name, scopes), context);
                 try {
                     Optional<SecurityRequirement> newRequirement = Optional.of(jsonMapper.treeToValue(jn, SecurityRequirement.class));
                     newRequirement.ifPresent(swaggerOperation::addSecurityItem);
