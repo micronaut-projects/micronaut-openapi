@@ -8,3 +8,5 @@ This is a configuration for using OpenAPI in Micronaut applications.
 ## Documentation ##
 
 See the [Documentation](https://micronaut-projects.github.io/micronaut-openapi/latest/guide/index.html) for more information.
+
+[Snapshot Documentation](https://micronaut-projects.github.io/micronaut-openapi/snapshot/guide/index.html)
