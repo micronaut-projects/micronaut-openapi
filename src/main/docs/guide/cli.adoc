@@ -5,3 +5,5 @@ $ mn create-app my-openapi-app --features swagger-java
 ----
 
 This will create a project with the minimum necessary configuration for OpenAPI.
+
+If you have already created a Micronaut project and will like to add Swagger support, you can simply follow instructions in subsequent sections.
