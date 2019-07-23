@@ -11,4 +11,4 @@ micronaut:
                 mapping: /swagger/**
 ----
 
-With the above configuration in place when you run your application you can access your Swagger documentation at `http://localhost:8080/swagger/the-title-0.0.yml`.
+With the above configuration in place when you run your application you can access your Swagger documentation at `http://localhost:8080/swagger/hello-world-0.0.yml`.
