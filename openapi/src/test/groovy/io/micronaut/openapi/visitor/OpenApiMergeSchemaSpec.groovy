@@ -83,7 +83,8 @@ class MyBean {}
         openAPI.tags.first().description == 'desc 1'
         openAPI.externalDocs.description == 'definition docs desc'
         openAPI.security.size() == 2
-        openAPI.security.first().name[0] == 'req 1'
+        openAPI.security[0] == ["req 1":["a", "b"]]
+        openAPI.security[1] == ["req 2":["b", "c"]]
         openAPI.servers.size() == 2
         openAPI.servers[0].description == 'server 1'
         openAPI.servers[0].url == 'http://foo'

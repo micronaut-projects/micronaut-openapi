@@ -72,8 +72,7 @@ class MyBean {}
         expect:
         operation
         operation.security.size() == 1
-        operation.security.first().name == ['myOauth2Security']
-        operation.security.first().scopes == ['write: read']
+        operation.security[0]['myOauth2Security'] == ['write: read']
         openAPI.components.securitySchemes.size() == 1
         openAPI.components.securitySchemes['myOauth2Security'].type == SecurityScheme.Type.APIKEY
         openAPI.components.securitySchemes['myOauth2Security'].in == SecurityScheme.In.HEADER
@@ -128,8 +127,7 @@ class MyBean {}
         expect:
         operation
         operation.security.size() == 1
-        operation.security.first().name == ['myOauth2Security']
-        operation.security.first().scopes == ['write: read']
+        operation.security[0]['myOauth2Security'] == ['write: read']
         openAPI.components.securitySchemes.size() == 1
         openAPI.components.securitySchemes['myOauth2Security'].type == SecurityScheme.Type.OAUTH2
         openAPI.components.securitySchemes['myOauth2Security'].flows

@@ -46,6 +46,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Visits the application class.
@@ -102,13 +103,13 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         openAPI.setTags(tagList);
 
         // handle type level security requirements
-        List<io.swagger.v3.oas.models.security.SecurityRequirement> securityRequirements = processOpenApiAnnotation(
-                element,
-                context,
-                SecurityRequirement.class,
-                io.swagger.v3.oas.models.security.SecurityRequirement.class,
-                openAPI.getSecurity()
-        );
+        List<io.swagger.v3.oas.models.security.SecurityRequirement> securityRequirements = element.getAnnotationValuesByType(SecurityRequirement.class)
+                .stream()
+                .map(this::mapToSecurityRequirement)
+                .collect(Collectors.toList());
+        if (openAPI.getSecurity() != null) {
+            securityRequirements.addAll(openAPI.getSecurity());
+        }
         openAPI.setSecurity(securityRequirements);
 
         // handle type level servers
@@ -121,7 +122,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         );
         openAPI.setServers(servers);
 
-        // Handle Application security schemes
+        // Handle Application securityRequirements schemes
         processSecuritySchemes(element, context);
 
         if (Boolean.getBoolean(ATTR_TEST_MODE)) {
@@ -207,7 +208,16 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                     JsonNode jsonNode = toJson(o.getValues(), context);
 
                     try {
-                        return Optional.of(jsonMapper.treeToValue(jsonNode, OpenAPI.class));
+                        Optional<OpenAPI> result = Optional.of(jsonMapper.treeToValue(jsonNode, OpenAPI.class));
+                        result.ifPresent(openAPI -> {
+                            List<io.swagger.v3.oas.models.security.SecurityRequirement> securityRequirements =
+                                    o.getAnnotations("security", io.swagger.v3.oas.annotations.security.SecurityRequirement.class)
+                                    .stream()
+                                    .map(this::mapToSecurityRequirement)
+                                    .collect(Collectors.toList());
+                            openAPI.setSecurity(securityRequirements);
+                        });
+                        return result;
                     } catch (JsonProcessingException e) {
                         context.warn("Error reading Swagger OpenAPI for element [" + element + "]: " + e.getMessage(), element);
                         return Optional.empty();
