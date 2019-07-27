@@ -292,6 +292,7 @@ public class OpenApiControllerVisitor extends AbstractOpenApiVisitor implements 
                     }
                     newParameter = new Parameter();
                     newParameter.setIn(ParameterIn.PATH.toString());
+                    newParameter.setName(paramName);
                     final boolean exploded = var.isExploded();
                     if (exploded) {
                         newParameter.setExplode(exploded);
