@@ -121,6 +121,9 @@ interface PetOperations<T extends String> {
      */
     @Get("/{slug}")
     HttpResponse<T> find(String slug, HttpRequest request);
+    
+    @Get("/extras/{extraId}")
+    HttpResponse<T> findExtras(@PathVariable String extraId, HttpRequest request);
 }
 
 
@@ -154,6 +157,20 @@ class MyBean {}
         pathItem.get.parameters[0].required
         pathItem.get.parameters[0].schema
         pathItem.get.parameters[0].description == 'The slug name'
+        pathItem.get.parameters[0].schema.type == 'string'
+        pathItem.get.responses.size() == 1
+        pathItem.get.responses['default'] != null
+        pathItem.get.responses['default'].content['application/json'].schema.type == 'string'
+
+        when:"the /extras/{extraId} path is retrieved"
+        pathItem = openAPI.paths.get("/pets/extras/{extraId}")
+
+        then:"it is included in the OpenAPI doc"
+        pathItem.get.parameters.size() == 1
+        pathItem.get.parameters[0].name == 'extraId'
+        pathItem.get.parameters[0].in == ParameterIn.PATH.toString()
+        pathItem.get.parameters[0].required
+        pathItem.get.parameters[0].schema
         pathItem.get.parameters[0].schema.type == 'string'
         pathItem.get.responses.size() == 1
         pathItem.get.responses['default'] != null
