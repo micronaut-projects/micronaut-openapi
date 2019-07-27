@@ -55,6 +55,7 @@ import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.PathItem;
 import io.swagger.v3.oas.models.Paths;
 import io.swagger.v3.oas.models.media.*;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.reactivestreams.Publisher;
 
@@ -900,5 +901,22 @@ abstract class AbstractOpenApiVisitor  {
             }
 
         }
+    }
+
+    /**
+     * Maps annotation value to {@link io.swagger.v3.oas.annotations.security.SecurityRequirement}.
+     * Correct format is:
+     *  custom_name:
+     *    - custom_scope1
+     *    - custom_scope2
+     * @param r The value of {@link SecurityRequirement}.
+     * @return converted object.
+     */
+    protected SecurityRequirement mapToSecurityRequirement(AnnotationValue<io.swagger.v3.oas.annotations.security.SecurityRequirement> r) {
+        String name = r.getRequiredValue("name", String.class);
+        List<String> scopes = r.get("scopes", String[].class).map(Arrays::asList).orElse(Collections.EMPTY_LIST);
+        SecurityRequirement securityRequirement = new SecurityRequirement();
+        securityRequirement.addList(name, scopes);
+        return securityRequirement;
     }
 }

@@ -17,7 +17,6 @@ package io.micronaut.openapi.visitor
 
 import io.micronaut.inject.BeanDefinition
 import io.micronaut.annotation.processing.test.AbstractTypeElementSpec
-import io.swagger.v3.oas.annotations.enums.SecuritySchemeType
 import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.security.SecurityScheme
 
@@ -97,7 +96,8 @@ class MyBean {}
         openAPI.tags.first().description == 'desc 1'
         openAPI.externalDocs.description == 'definition docs desc'
         openAPI.security.size() == 2
-        openAPI.security.first().name[0] == 'req 1'
+        openAPI.security[0] == ["req 1":["a", "b"]]
+        openAPI.security[1] == ["req 2":["b", "c"]]
         openAPI.servers.size() == 1
         openAPI.servers[0].description == 'server 1'
         openAPI.servers[0].url == 'http://foo'
@@ -176,8 +176,8 @@ class MyBean {}
         openAPI.tags.first().name == 'Tag 1'
         openAPI.tags.first().description == 'desc 1'
         openAPI.externalDocs.description == 'definition docs desc'
-        openAPI.security.size() == 2
-        openAPI.security.first().name[0] == 'req 1'
+            openAPI.security[0] == ["req 1":["a", "b"]]
+            openAPI.security[1] == ["req 2":["b", "c"]]
         openAPI.servers.size() == 1
         openAPI.servers[0].description == 'server 1'
         openAPI.servers[0].url == 'http://foo'

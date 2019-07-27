@@ -66,7 +66,6 @@ import io.swagger.v3.oas.models.parameters.Parameter;
 import io.swagger.v3.oas.models.parameters.RequestBody;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.responses.ApiResponses;
-import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.servers.Server;
 
 import javax.annotation.Nonnull;
@@ -515,10 +514,8 @@ public class OpenApiControllerVisitor extends AbstractOpenApiVisitor implements 
         List<AnnotationValue<io.swagger.v3.oas.annotations.security.SecurityRequirement>> securityAnnotations = element.getAnnotationValuesByType(io.swagger.v3.oas.annotations.security.SecurityRequirement.class);
         if (CollectionUtils.isNotEmpty(securityAnnotations)) {
             for (AnnotationValue<io.swagger.v3.oas.annotations.security.SecurityRequirement> r : securityAnnotations) {
-                JsonNode jn = toJson(r.getValues(), context);
                 try {
-                    Optional<SecurityRequirement> newRequirement = Optional.of(jsonMapper.treeToValue(jn, SecurityRequirement.class));
-                    newRequirement.ifPresent(swaggerOperation::addSecurityItem);
+                    swaggerOperation.addSecurityItem(mapToSecurityRequirement(r));
                 } catch (Exception e) {
                     context.warn("Error reading Swagger SecurityRequirement for element [" + element + "]: " + e.getMessage(), element);
                 }
