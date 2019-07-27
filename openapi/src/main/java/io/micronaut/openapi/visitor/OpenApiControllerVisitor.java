@@ -39,6 +39,7 @@ import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.CookieValue;
 import io.micronaut.http.annotation.Header;
 import io.micronaut.http.annotation.HttpMethodMapping;
+import io.micronaut.http.annotation.PathVariable;
 import io.micronaut.http.annotation.Produces;
 import io.micronaut.http.annotation.QueryValue;
 import io.micronaut.http.uri.UriMatchTemplate;
@@ -278,6 +279,19 @@ public class OpenApiControllerVisitor extends AbstractOpenApiVisitor implements 
                     newParameter = new Parameter();
 
                     newParameter.setIn(var.isQuery() ? ParameterIn.QUERY.toString() : ParameterIn.PATH.toString());
+                    final boolean exploded = var.isExploded();
+                    if (exploded) {
+                        newParameter.setExplode(exploded);
+                    }
+                } else if (parameter.isAnnotationPresent(PathVariable.class)) {
+                    String paramName = parameter.getValue(PathVariable.class, String.class).orElse(parameterName);
+                    UriMatchVariable var = pathVariables.get(paramName);
+                    if (var == null) {
+                        context.fail("Path variable name: '" + paramName  + "' not found in path.", parameter);
+                        continue;
+                    }
+                    newParameter = new Parameter();
+                    newParameter.setIn(ParameterIn.PATH.toString());
                     final boolean exploded = var.isExploded();
                     if (exploded) {
                         newParameter.setExplode(exploded);
