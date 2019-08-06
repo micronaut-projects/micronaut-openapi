@@ -351,11 +351,15 @@ abstract class AbstractOpenApiVisitor  {
                         schema.setAdditionalProperties(true);
                     } else {
                         Element valueType = type.getTypeArguments().get("V");
-                        Schema additionalPropertiesSchema = getPrimitiveType(valueType.getName());
-                        if (additionalPropertiesSchema == null) {
-                            additionalPropertiesSchema = getSchemaDefinition(mediaType, openAPI, context, valueType, definingElement);
+                        if (valueType.getName().equals(Object.class.getName())) {
+                            schema.setAdditionalProperties(true);
+                        } else {
+                            Schema additionalPropertiesSchema = getPrimitiveType(valueType.getName());
+                            if (additionalPropertiesSchema == null) {
+                                additionalPropertiesSchema = getSchemaDefinition(mediaType, openAPI, context, valueType, definingElement);
+                            }
+                            schema.setAdditionalProperties(additionalPropertiesSchema);
                         }
-                        schema.setAdditionalProperties(additionalPropertiesSchema);
                     }
                 } else if (type.isIterable()) {
                     Optional<ClassElement> componentType = type.getFirstTypeArgument();
