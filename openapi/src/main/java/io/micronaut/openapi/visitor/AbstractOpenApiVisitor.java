@@ -731,11 +731,12 @@ abstract class AbstractOpenApiVisitor  {
 
     private String computeNameWithGenerics(ClassElement classElement) {
         StringBuilder builder = new StringBuilder(classElement.getSimpleName());
-        computeNameWithGenerics(classElement, builder);
+        computeNameWithGenerics(classElement, builder, new HashSet<>());
         return builder.toString();
     }
 
-    private void computeNameWithGenerics(ClassElement classElement, StringBuilder builder) {
+    private void computeNameWithGenerics(ClassElement classElement, StringBuilder builder, Set<String> computed) {
+        computed.add(classElement.getName());
         final Map<String, ClassElement> typeArguments = classElement.getTypeArguments();
         final Iterator<ClassElement> i = typeArguments.values().iterator();
         if (i.hasNext()) {
@@ -744,7 +745,9 @@ abstract class AbstractOpenApiVisitor  {
             while (i.hasNext()) {
                 final ClassElement ce = i.next();
                 builder.append(ce.getSimpleName());
-                computeNameWithGenerics(ce, builder);
+                if (!computed.contains(ce.getName())) {
+                    computeNameWithGenerics(ce, builder, computed);
+                }
                 if (i.hasNext()) {
                     builder.append(",");
                 }

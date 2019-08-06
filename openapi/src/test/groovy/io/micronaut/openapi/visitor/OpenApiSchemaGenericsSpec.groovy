@@ -24,6 +24,66 @@ class OpenApiSchemaGenericsSpec extends AbstractTypeElementSpec {
         System.setProperty(AbstractOpenApiVisitor.ATTR_TEST_MODE, "true")
     }
 
+    void "test parse OpenAPI with recursive generics"() {
+        given:
+        buildBeanDefinition('test.MyBean', '''
+
+package test;
+
+import io.swagger.v3.oas.annotations.*;
+import io.swagger.v3.oas.annotations.parameters.*;
+import io.swagger.v3.oas.annotations.responses.*;
+import io.swagger.v3.oas.annotations.security.*;
+import io.swagger.v3.oas.annotations.media.*;
+import io.swagger.v3.oas.annotations.enums.*;
+import io.swagger.v3.oas.annotations.links.*;
+import io.micronaut.http.annotation.*;
+import java.util.List;
+
+@Controller("/")
+class MyController {
+
+    @Put("/")
+    public Pet updatePet(Pet pet) {
+        return null;
+    }
+}
+
+class Pet implements java.util.function.Consumer<Pet> {
+    private PetType type;
+
+    
+    public void setType(PetType type) {
+        this.type = type;
+    }
+    
+    /**
+     * The age
+     */
+    public PetType getType() {
+        return this.type;
+    }
+    
+    public void accept(Pet pet) {}
+}
+
+enum PetType {
+    DOG, CAT;
+}
+
+@javax.inject.Singleton
+class MyBean {}
+''')
+
+        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        Operation operation = openAPI.paths?.get("/")?.put
+
+        expect:
+        operation
+        operation.responses.size() == 1
+        openAPI.components.schemas['Pet']
+    }
+
     void "test parse the OpenAPI with response that contains generic types"() {
         given:
         buildBeanDefinition('test.MyBean', '''
