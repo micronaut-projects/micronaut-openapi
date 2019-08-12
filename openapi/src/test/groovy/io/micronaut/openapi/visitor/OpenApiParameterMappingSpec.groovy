@@ -303,6 +303,47 @@ class MyBean {}
         pathItem.post.requestBody.content['application/json'].schema.properties.size() == 1
         pathItem.post.requestBody.content['application/json'].schema.properties['name']
     }
+
+    void "test body is not included"() {
+
+        given:"An API definition"
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.http.annotation.*;
+import io.micronaut.http.*;
+import io.swagger.v3.oas.annotations.*;
+import io.swagger.v3.oas.annotations.parameters.*;
+/**
+ * @author HoaBo
+ * @since 1.0
+ */
+
+@Controller("/networks")
+interface NetworkOperations {
+
+    @Get
+    public HttpResponse getNetworks(
+            java.security.Principal auth,
+            @Parameter(hidden=true) String fooBar
+    );
+}
+@javax.inject.Singleton
+class MyBean {}
+''')
+        then:"the state is correct"
+        AbstractOpenApiVisitor.testReference != null
+
+        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+
+        when:"the /pets path is retrieved"
+        PathItem pathItem = openAPI.paths.get("/networks")
+
+        then:"it is included in the OpenAPI doc"
+        pathItem.get.operationId == 'getNetworks'
+        pathItem.get.parameters.empty
+    }
 }
 
 

@@ -417,9 +417,17 @@ public class OpenApiControllerVisitor extends AbstractOpenApiVisitor implements 
             }
 
             if (HttpMethod.requiresRequestBody(httpMethod) && swaggerOperation.getRequestBody() == null) {
-                List<ParameterElement> bodyParameters = Arrays.stream(element.getParameters()).filter(p -> !pathVariables.containsKey(p.getName()) && !p.isAnnotationPresent(Bindable.class)).collect(Collectors.toList());
-                if (!bodyParameters.isEmpty()) {
+                List<ParameterElement> bodyParameters = Arrays.stream(element.getParameters())
+                  .filter(p -> !pathVariables.containsKey(p.getName())
+                    && !p.isAnnotationPresent(Bindable.class)
+                    && !p.isAnnotationPresent(JsonIgnore.class)
+                    && !p.isAnnotationPresent(Hidden.class)
+                    && !p.getValue(io.swagger.v3.oas.annotations.Parameter.class, "hidden", Boolean.class).orElse(false)
+                    && !isIgnoredParameterType(p.getType())
+                  )
+                  .collect(Collectors.toList());
 
+                if (!bodyParameters.isEmpty()) {
                     RequestBody requestBody = new RequestBody();
                     final Content content = new Content();
                     consumesMediaTypes = consumesMediaTypes.isEmpty() ? OptionalValues.of(List.class, Collections.singletonMap("value", MediaType.APPLICATION_JSON)) : consumesMediaTypes;
@@ -428,13 +436,6 @@ public class OpenApiControllerVisitor extends AbstractOpenApiVisitor implements 
                             io.swagger.v3.oas.models.media.MediaType mt = new io.swagger.v3.oas.models.media.MediaType();
                             ObjectSchema schema = new ObjectSchema();
                             for (ParameterElement parameter : bodyParameters) {
-                                if (parameter.isAnnotationPresent(JsonIgnore.class) ||
-                                        parameter.isAnnotationPresent(Hidden.class) ||
-                                        parameter.getValue(io.swagger.v3.oas.annotations.Parameter.class, "hidden", Boolean.class).orElse(false) ||
-                                        isIgnoredParameterType(parameter.getType())) {
-                                    continue;
-                                }
-
                                 Schema propertySchema = resolveSchema(openAPI, parameter, parameter.getType(), context, mediaType.toString());
                                 if (propertySchema != null) {
 
