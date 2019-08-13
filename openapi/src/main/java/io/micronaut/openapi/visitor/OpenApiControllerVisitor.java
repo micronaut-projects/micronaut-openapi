@@ -195,6 +195,10 @@ public class OpenApiControllerVisitor extends AbstractOpenApiVisitor implements 
                 }
 
                 ClassElement returnType = element.getReturnType();
+
+                if (returnType != null && returnType.isAssignable("io.reactivex.Completable")) {
+                  returnType = null;
+                }
                 if (returnType != null && isResponseType(returnType)) {
                     returnType = returnType.getFirstTypeArgument().orElse(returnType);
                 }

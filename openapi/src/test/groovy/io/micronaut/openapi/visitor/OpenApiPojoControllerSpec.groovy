@@ -585,6 +585,9 @@ interface PetOperations<T extends Pet> {
 
     @Post("/")
     Single<T> save(@Body T pet);
+    
+    @Post("/completable")
+    Completable completable(@Body T pet);
 }
 
 //@Schema
@@ -674,6 +677,16 @@ class MyBean {}
         pathItem.get.responses['default'].content['application/json'].schema
         pathItem.get.responses['default'].content['application/json'].schema.type == 'array'
         pathItem.get.responses['default'].content['application/json'].schema.items.$ref == '#/components/schemas/Pet'
+
+        when:"A completable is returned"
+        pathItem = openAPI.paths.get("/pets/completable")
+
+        then:
+        pathItem.post.operationId == 'completable'
+        pathItem.post.responses['default'] != null
+        pathItem.post.responses['default'].description == null
+        pathItem.post.responses['default'].content == null
+
     }
 
 
