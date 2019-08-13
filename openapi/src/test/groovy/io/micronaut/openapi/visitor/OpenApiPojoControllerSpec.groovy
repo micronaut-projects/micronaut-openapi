@@ -568,6 +568,14 @@ interface PetOperations<T extends Pet> {
     @Get("/flowable")
     Flowable<T> flowable();
     
+    /**
+     * List the pets
+     *
+     * @return a list of pet names
+     */
+    @Get("/observable")
+    Observable<T> observable();
+    
     @Get("/random")
     Maybe<T> random();
 
@@ -687,6 +695,16 @@ class MyBean {}
         pathItem.post.responses['default'].description == null
         pathItem.post.responses['default'].content == null
 
+        when:"An obsevable is returned"
+        pathItem = openAPI.paths.get("/pets/observable")
+
+        then:
+        pathItem.get.operationId == 'observable'
+        pathItem.get.responses['default']
+        pathItem.get.responses['default'].description == 'a list of pet names'
+        pathItem.get.responses['default'].content['application/json'].schema
+        pathItem.get.responses['default'].content['application/json'].schema.type == 'array'
+        pathItem.get.responses['default'].content['application/json'].schema.items.$ref == '#/components/schemas/Pet'
     }
 
 
