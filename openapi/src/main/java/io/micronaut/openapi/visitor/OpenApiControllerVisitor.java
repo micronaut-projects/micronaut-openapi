@@ -196,12 +196,17 @@ public class OpenApiControllerVisitor extends AbstractOpenApiVisitor implements 
 
                 ClassElement returnType = element.getReturnType();
 
-                if (returnType != null && returnType.isAssignable("io.reactivex.Completable")) {
-                  returnType = null;
+                if (returnType != null) {
+                    if (returnType.isAssignable("io.reactivex.Completable")) {
+                        returnType = null;
+                    } else if (isResponseType(returnType)) {
+                        returnType = returnType.getFirstTypeArgument().orElse(returnType);
+                    } else if (isSingleResponseType(returnType)) {
+                        returnType = returnType.getFirstTypeArgument().get();
+                        returnType = returnType.getFirstTypeArgument().orElse(returnType);
+                    }
                 }
-                if (returnType != null && isResponseType(returnType)) {
-                    returnType = returnType.getFirstTypeArgument().orElse(returnType);
-                }
+
                 if (returnType != null) {
                     OptionalValues<List> mediaTypes = element.getValues(Produces.class, List.class);
                     Content content;
@@ -476,6 +481,12 @@ public class OpenApiControllerVisitor extends AbstractOpenApiVisitor implements 
 
     private boolean isResponseType(ClassElement returnType) {
         return returnType.isAssignable(HttpResponse.class) || returnType.isAssignable("org.springframework.http.HttpEntity");
+    }
+
+    private boolean isSingleResponseType(ClassElement returnType) {
+        return returnType.isAssignable("io.reactivex.Single")
+          && returnType.getFirstTypeArgument().isPresent()
+          && isResponseType(returnType.getFirstTypeArgument().get());
     }
 
     private void setOperationOnPathItem(PathItem pathItem, io.swagger.v3.oas.models.Operation swaggerOperation, HttpMethod httpMethod) {
