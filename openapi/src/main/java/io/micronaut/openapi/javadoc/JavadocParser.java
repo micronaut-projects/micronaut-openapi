@@ -63,17 +63,13 @@ public class JavadocParser {
             for (char c : chars) {
                 switch (state) {
                     case RETURN_DESC:
-                        if (c == '\n') {
-                            state = TEXT;
-                            previousState = TEXT;
-                            javadocDescription.setReturnDescription(currentDescription.toString());
-                            currentDescription = description;
-                        }
+                        javadocDescription.setReturnDescription(currentDescription.toString().trim());
+                        // Notice pass through in case
                     case PARAM_DESC:
                         if (state == PARAM_DESC) {
                             javadocDescription.getParameters().put(currentParam.toString(), currentDescription.toString().trim());
                         }
-
+                        // Notice pass through in case
                     case TEXT:
                         if (c == '{' || c == '@') {
                             currentDoclet.delete(0, currentDoclet.length());
