@@ -540,6 +540,7 @@ class MyBean {}
 package test;
 
 import io.reactivex.*;
+import io.micronaut.http.HttpResponse;
 import io.micronaut.http.annotation.*;
 import java.util.List;
 import io.swagger.v3.oas.annotations.media.*;
@@ -596,6 +597,9 @@ interface PetOperations<T extends Pet> {
     
     @Post("/completable")
     Completable completable(@Body T pet);
+    
+    @Get("/singleHttpResponse")
+    Single<HttpResponse<T>> singleHttpResponse();
 }
 
 //@Schema
@@ -695,6 +699,7 @@ class MyBean {}
         pathItem.post.responses['default'].description == null
         pathItem.post.responses['default'].content == null
 
+
         when:"An obsevable is returned"
         pathItem = openAPI.paths.get("/pets/observable")
 
@@ -705,6 +710,15 @@ class MyBean {}
         pathItem.get.responses['default'].content['application/json'].schema
         pathItem.get.responses['default'].content['application/json'].schema.type == 'array'
         pathItem.get.responses['default'].content['application/json'].schema.items.$ref == '#/components/schemas/Pet'
+      
+        when:"A Single<HttpResponse<T>> is returned"
+        pathItem = openAPI.paths.get("/pets/singleHttpResponse")
+
+        then:
+        pathItem.get.operationId == 'singleHttpResponse'
+        pathItem.get.responses['default']
+        pathItem.get.responses['default'].content['application/json'].schema
+        pathItem.get.responses['default'].content['application/json'].schema.$ref == '#/components/schemas/Pet'
     }
 
 
