@@ -343,6 +343,7 @@ class MyBean {}
         then:"it is included in the OpenAPI doc"
         pathItem.get.operationId == 'getNetworks'
         pathItem.get.parameters.empty
+        pathItem.get.requestBody == null
     }
 }
 

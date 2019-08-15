@@ -124,6 +124,9 @@ interface PetOperations<T extends String> {
     
     @Get("/extras/{extraId}")
     HttpResponse<T> findExtras(@PathVariable String extraId, HttpRequest request);
+    
+    @Get("/random")
+    HttpResponse<T> getRandomPet();
 }
 
 
@@ -176,6 +179,13 @@ class MyBean {}
         pathItem.get.responses['default'] != null
         pathItem.get.responses['default'].content['application/json'].schema.type == 'string'
 
+        when:"the /getSomething path is retrieved"
+        pathItem = openAPI.paths.get("/pets/random")
+
+        then:"default response has default description"
+        pathItem.get.operationId == 'getRandomPet'
+        pathItem.get.responses['default'].description == 'getRandomPet default response'
+        pathItem.get.responses['default'].content['application/json'].schema.type == 'string'
 
     }
 
