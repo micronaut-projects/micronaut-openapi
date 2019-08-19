@@ -189,9 +189,10 @@ public class OpenApiControllerVisitor extends AbstractOpenApiVisitor implements 
                 ApiResponse okResponse = new ApiResponse();
 
                 if (javadocDescription != null) {
-
                     String returnDescription = javadocDescription.getReturnDescription();
                     okResponse.setDescription(returnDescription);
+                } else {
+                    okResponse.setDescription(swaggerOperation.getOperationId() + " default response");
                 }
 
                 ClassElement returnType = element.getReturnType();

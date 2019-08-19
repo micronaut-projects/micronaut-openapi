@@ -695,8 +695,8 @@ class MyBean {}
 
         then:
         pathItem.post.operationId == 'completable'
-        pathItem.post.responses['default'] != null
-        pathItem.post.responses['default'].description == null
+        pathItem.post.responses['default']
+        pathItem.post.responses['default'].description == 'completable default response'
         pathItem.post.responses['default'].content == null
 
 
