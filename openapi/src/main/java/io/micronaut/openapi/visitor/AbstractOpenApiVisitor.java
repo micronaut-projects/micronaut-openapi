@@ -331,9 +331,11 @@ abstract class AbstractOpenApiVisitor  {
         } else {
 
             boolean isPublisher = false;
+            boolean isObservable = false;
 
             if (isContainerType(type)) {
                 isPublisher = type.isAssignable(Publisher.class.getName()) && !type.isAssignable("reactor.core.publisher.Mono");
+                isObservable = type.isAssignable("io.reactivex.Observable") && !type.isAssignable("reactor.core.publisher.Mono");
                 type = type.getFirstTypeArgument().orElse(null);
             }
 
@@ -386,7 +388,7 @@ abstract class AbstractOpenApiVisitor  {
 
             if (schema != null) {
                 boolean isStream = MediaType.TEXT_EVENT_STREAM.equals(mediaType) || MediaType.APPLICATION_JSON_STREAM.equals(mediaType);
-                if ((!isStream && isPublisher)) {
+                if (!isStream && (isPublisher || isObservable)) {
                     schema = arraySchema(schema);
                 }
             }
