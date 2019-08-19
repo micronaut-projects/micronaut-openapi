@@ -88,6 +88,7 @@ class MyBean {}
         petSchema.type == 'object'
         petSchema.properties.size() == 1
         petSchema.properties['age'].type == 'integer'
+        petSchema.required == ['age']
 
         when:"the /pets path is retrieved"
         PathItem pathItem = openAPI.paths.get("/pets")

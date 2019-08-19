@@ -422,7 +422,13 @@ abstract class AbstractOpenApiVisitor  {
     protected void processSchemaProperty(VisitorContext context, Element element, ClassElement elementType, Schema parentSchema, Schema propertySchema) {
         if (propertySchema != null) {
             propertySchema = bindSchemaForElement(context, element, elementType, propertySchema);
-            parentSchema.addProperties(Optional.ofNullable(propertySchema.getName()).orElse(element.getName()), propertySchema);
+            String propertyName = Optional.ofNullable(propertySchema.getName()).orElse(element.getName());
+
+            parentSchema.addProperties(propertyName, propertySchema);
+
+            if (!element.isAnnotationPresent(Nullable.class)) {
+                parentSchema.addRequiredItem(propertyName);
+            }
         }
     }
 
