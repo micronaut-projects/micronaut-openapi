@@ -17,6 +17,7 @@ package io.micronaut.openapi.visitor;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+
 import io.micronaut.context.env.Environment;
 import io.micronaut.core.annotation.AnnotationValue;
 import io.micronaut.core.annotation.Experimental;
@@ -26,6 +27,7 @@ import io.micronaut.inject.ast.ClassElement;
 import io.micronaut.inject.visitor.TypeElementVisitor;
 import io.micronaut.inject.visitor.VisitorContext;
 import io.micronaut.inject.writer.GeneratedFile;
+import io.micronaut.openapi.view.OpenApiViewConfig;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.servers.Server;
@@ -39,6 +41,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
 import java.lang.annotation.Annotation;
+import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -56,6 +59,10 @@ import java.util.stream.Collectors;
  */
 @Experimental
 public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements TypeElementVisitor<OpenAPIDefinition, Object> {
+    /**
+     * System property for views specification.
+     */
+    public static final String MICRONAUT_OPENAPI_VIEWS_SPEC = "micronaut.openapi.views.spec";
     /**
      * System property that enables setting the target file to write to.
      */
@@ -225,43 +232,59 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                 }).orElse(new OpenAPI());
     }
 
+    private void renderViews(String title, String specFile, Path destinationDir, VisitorContext visitorContext) throws IOException {
+        String viewSpecification = System.getProperty(MICRONAUT_OPENAPI_VIEWS_SPEC);
+        if (viewSpecification != null) {
+            OpenApiViewConfig cfg = OpenApiViewConfig.fromSpecification(viewSpecification);
+            if (cfg.isEnabled()) {
+                cfg.setTitle(title);
+                cfg.setSpecFile(specFile);
+                cfg.render(destinationDir.resolve("views"), visitorContext);
+            }
+        }
+    }
+
     @Override
     public void finish(VisitorContext visitorContext) {
-
         if (classElement != null) {
 
             Optional<OpenAPI> attr = visitorContext.get(ATTR_OPENAPI, OpenAPI.class);
 
             attr.ifPresent(openAPI -> {
                 String property = System.getProperty(MICRONAUT_OPENAPI_TARGET_FILE);
+                String fileName = "swagger.yml";
+                String documentTitle = "OpenAPI";
+
+                Info info = openAPI.getInfo();
+                if (info != null) {
+                    documentTitle = Optional.ofNullable(info.getTitle()).orElse(Environment.DEFAULT_NAME);
+                    documentTitle = documentTitle.toLowerCase().replace(' ', '-');
+                    String version = info.getVersion();
+                    if (version != null) {
+                        documentTitle = documentTitle + '-' + version;
+                    }
+                    fileName = documentTitle + ".yml";
+                }
                 if (StringUtils.isNotEmpty(property)) {
                     File f = new File(property);
                     visitorContext.info("Writing OpenAPI YAML to destination: " + f);
                     try {
                         f.getParentFile().mkdirs();
                         yamlMapper.writeValue(f, openAPI);
+                        fileName = f.getName();
+                        renderViews(documentTitle, fileName, f.toPath().getParent(), visitorContext);
                     } catch (Exception e) {
                         visitorContext.warn("Unable to generate swagger.yml: " + e.getMessage() , classElement);
                     }
                 } else {
-
-                    String fileName = "swagger.yml";
-                    Info info = openAPI.getInfo();
-                    if (info != null) {
-                        String title = Optional.ofNullable(info.getTitle()).orElse(Environment.DEFAULT_NAME);
-                        title = title.toLowerCase().replace(' ', '-');
-                        String version = info.getVersion();
-                        if (version != null) {
-                            fileName = title + "-" + version + ".yml";
-                        }
-                    }
                     Optional<GeneratedFile> generatedFile = visitorContext.visitMetaInfFile("swagger/" + fileName);
                     if (generatedFile.isPresent()) {
                         GeneratedFile f = generatedFile.get();
-                        try {
-                            visitorContext.info("Writing OpenAPI YAML to destination: " + f.toURI());
-                            Writer writer = f.openWriter();
+                        try (Writer writer = f.openWriter()) {
+                            URI uri = f.toURI();
+                            visitorContext.info("Writing OpenAPI YAML to destination: " + uri);
                             yamlMapper.writeValue(writer, openAPI);
+                            renderViews(documentTitle, fileName, Paths.get(uri).getParent(), visitorContext);
                         } catch (Exception e) {
                             visitorContext.warn("Unable to generate swagger.yml: " + e.getMessage() , classElement);
                         }

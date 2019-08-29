@@ -1,0 +1,102 @@
+Micronaut can generate views for your generated OpenApi specification. Currently https://github.com/swagger-api/swagger-ui[swagger-ui], https://github.com/Rebilly/ReDoc[redoc] and https://github.com/mrin9/RapiDoc[rapidoc] are supported.
+
+The resources needed to render the views (javascript, css, ...) are loaded from CDNs: https://unpkg.com[unpkg.com] and https://fonts.googleapis.com/[fonts.googleapis.com].
+
+By default the generation of views is disabled. To turn it on you have to set the following system property `micronaut.openapi.views.spec`.
+The string syntax is a series of comma-separated key-value pairs, to enable and configure the views. 
+
+.System Property
+[source]
+----
+micronaut.openapi.views.spec=redoc.enabled=true,rapidoc.enabled=true,swagger-ui.enabled=true,swagger-ui.theme=flattop
+----
+
+For instance in gradle:
+
+.Gradle
+[source,groovy]
+----
+tasks.withType(JavaCompile) {
+    options.fork = true
+    options.forkOptions.jvmArgs << '-Dmicronaut.openapi.views.spec=rapidoc.enabled=true,swagger-ui.enabled=true,swagger-ui.theme=flattop'
+
+    ...
+}
+----
+
+or in maven:
+
+.Maven
+[source,xml]
+----
+<build>
+    <plugins>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <configuration>
+                <fork>true</fork>
+                <compilerArgs>
+                    <arg>-Dmicronaut.openapi.views.spec=rapidoc.enabled=true,swagger-ui.enabled=true,swagger-ui.theme=flattop</arg>
+                    ...
+                </compilerArgs>
+            </configuration>
+        </plugin>
+    </plugins>
+</build>
+----
+
+The views will be generated to the `META-INF/swagger/views/[swagger-ui | redoc | rapidoc]` directory of your project’s class output.
+
+The following properties are supported:
+
+ * `mapping.path=[string]`: The path from where the swagger specification will be served by the http server. Default is `swagger`.
+ * `redoc.enabled=[true | false]`: When 'true' the redoc view is generated.
+ * `rapidoc.enabled=[true | false]`: When 'true' the rapidoc view is generated.
+ * `swagger-ui.enabled=[true | false]`: When 'true' the swagger-ui view is generated.
+ * `redoc.version=[string]`: The version of redoc to use. Default is to use the latest available.
+ * `rapidoc.version=[string]`: The version of rapidoc to use. Default is to use the latest available.
+ * `rapidoc.layout=[row | column]`: The layout of rapidoc to use. These are case insensitive. Default is `row`.
+ * `rapidoc.theme=[dark | light]`: The theme of rapidoc to use. These are case insensitive. Default is `dark`.
+ * `swagger-ui.version=[string]`: The version of swagger-ui to use. Default is to use the latest available.
+ * `swagger-ui.layout=[string]`: The layout of swagger-ui to use. Defaults is `StandaloneLayout`.
+ * `swagger-ui.theme=[DEFAULT | MATERIAL | FEELING_BLUE | FLATTOP | MONOKAI | MUTED | NEWSPAPER | OUTLINE]`: The theme of swagger-ui to use. These are case insensitive. Default is `DEFAULT`.
+ * `swagger-ui.deep-linking=[true | false]`: The deep-linking flag of swagger-ui to use. Default is `true`.
+ 
+To expose the views, you also must expose the generated `yaml`:
+
+.Exposing Swagger YAML And Views
+[source,yaml]
+----
+micronaut:
+    router:
+        static-resources:
+            swagger:
+                paths: classpath:META-INF/swagger
+                mapping: /swagger/**
+            redoc:
+                paths: classpath:META-INF/swagger/views/redoc
+                mapping: /redoc/**
+            rapidoc:
+                paths: classpath:META-INF/swagger/views/rapidoc
+                mapping: /rapidoc/**
+            swagger-ui:
+                paths: classpath:META-INF/swagger/views/swagger-ui
+                mapping: /swagger-ui/**
+----
+
+With the above configuration in place when you run your application you can access your Swagger documentation at +http://localhost:8080/[redoc|rapidoc|swagger-ui]+.
+By default the views expect to find the `yaml` under `/swagger`, if you change this mapping to something else:
+
+.Exposing Swagger YAML
+[source,yaml]
+----
+micronaut:
+    router:
+        static-resources:
+            swagger:
+                paths: classpath:META-INF/swagger
+                mapping: /swaggerYAML/**
+....
+----
+You will need to set the `mapping.path` property accordingly: `micronaut.openapi.views.spec=mapping.path=swaggerYAML...`.

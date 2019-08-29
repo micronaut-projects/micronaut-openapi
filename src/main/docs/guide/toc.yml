@@ -2,6 +2,7 @@ introduction: Introduction
 cli: Using the Micronaut CLI
 gettingStarted: Getting Started with Swagger
 exposingSwaggerOutput: Exposing Swagger Output
+openApiViews: Generating OpenAPI Views
 controllersAndSwaggerAnnotations: Controllers and Swagger Annotations
 schemasAndPojos: Schemas and POJOs
 schemasAndMetaAnnotations: Schemas and Meta Annotations
