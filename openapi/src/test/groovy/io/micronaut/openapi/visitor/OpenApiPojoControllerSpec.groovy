@@ -830,6 +830,7 @@ class MyBean {}
         then:"the components are valid"
         petSchema.type == 'object'
         petSchema.description == "Pet description"
+        petSchema.required == ['age', 'name', 'type']
         petSchema.properties.size() == 3
         petSchema.properties['age'].type == 'integer'
         petSchema.properties['age'].description == 'Pet age'

@@ -70,6 +70,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static java.util.stream.Collectors.toMap;
+
 /**
  * Abstract base class for OpenAPI visitors.
  *
@@ -629,7 +631,11 @@ abstract class AbstractOpenApiVisitor  {
             schema = schemas.get(schemaName);
             if (schema == null) {
                 inProgressSchemas.add(schemaName);
-                JsonNode schemaJson = toJson(schemaValue.getValues(), context);
+                Map<CharSequence, Object> values = schemaValue.getValues()
+                        .entrySet()
+                        .stream()
+                        .collect(toMap(e -> e.getKey().equals("requiredProperties") ? "required" : e.getKey(), Map.Entry::getValue));
+                JsonNode schemaJson = toJson(values, context);
                 try {
                     schema = jsonMapper.treeToValue(schemaJson, Schema.class);
 
