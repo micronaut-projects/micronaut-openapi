@@ -197,6 +197,7 @@ import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Post;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 
@@ -224,7 +225,10 @@ interface PetOperations {
                             responseCode = "200",
                             description = "Save Pet",
                             content = @Content(mediaType = "application/json",
-                                    schema = @Schema(implementation = Pet.class))),
+                                    schema = @Schema(implementation = Pet.class),
+                                    examples = {
+                    @ExampleObject(name = "example-1", value = "{\\"name\\":\\"Charlie\\"}")
+                })),
                     @ApiResponse(
                             responseCode = "404",
                             description = "Page Not Found"
@@ -250,6 +254,10 @@ class MyBean {}
         operation.responses.'200'.content['application/json']
         operation.responses.'200'.content['application/json'].schema
         operation.responses.'200'.content['application/json'].schema.$ref == "#/components/schemas/Pet"
+        operation.responses.'200'.content['application/json'].examples
+        operation.responses.'200'.content['application/json'].examples.'example-1'
+        operation.responses.'200'.content['application/json'].examples.'example-1'.value
+        operation.responses.'200'.content['application/json'].examples.'example-1'.value.name == 'Charlie'
     }
 
     void "test parse the OpenAPI @Operation annotation"() {

@@ -47,6 +47,7 @@ import io.swagger.v3.oas.annotations.headers.Header;
 import io.swagger.v3.oas.annotations.links.Link;
 import io.swagger.v3.oas.annotations.links.LinkParameter;
 import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.OAuthScope;
 import io.swagger.v3.oas.annotations.servers.ServerVariable;
@@ -213,6 +214,15 @@ abstract class AbstractOpenApiVisitor  {
                                     responses.put(name, map);
                                 }
                                 newValues.put(key, responses);
+                            } else if (ExampleObject.class.getName().equals(annotationName)) {
+                                Map examples = new LinkedHashMap();
+                                for (Object o : a) {
+                                    AnnotationValue<ExampleObject> sv = (AnnotationValue<ExampleObject>) o;
+                                    String name = sv.get("name", String.class).orElse("example");
+                                    Map<CharSequence, Object> map = toValueMap(sv.getValues(), context);
+                                    examples.put(name, map);
+                                }
+                                newValues.put(key, examples);
                             } else if (ServerVariable.class.getName().equals(annotationName)) {
                                 Map variables = new LinkedHashMap();
                                 for (Object o : a) {
@@ -253,11 +263,23 @@ abstract class AbstractOpenApiVisitor  {
                         }
                     }
                 } else {
-                    newValues.put(key, value);
+                    newValues.put(key, parseJsonString(value).orElse(value));
                 }
             }
         }
         return newValues;
+    }
+
+    private Optional<Object> parseJsonString(Object object) {
+        if (object instanceof String) {
+            String string = (String) object;
+            try {
+                return Optional.of(jsonMapper.readValue(string, Map.class));
+            } catch (IOException e) {
+                return Optional.empty();
+            }
+        }
+        return Optional.empty();
     }
 
     private Map<CharSequence, Object> resolveArraySchemaAnnotationValues(VisitorContext context, AnnotationValue<?> av) {

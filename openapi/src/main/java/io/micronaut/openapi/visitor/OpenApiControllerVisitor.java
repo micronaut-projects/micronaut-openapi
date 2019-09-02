@@ -229,7 +229,6 @@ public class OpenApiControllerVisitor extends AbstractOpenApiVisitor implements 
             }
 
 
-
             for (ParameterElement parameter : element.getParameters()) {
 
                 ClassElement parameterType = parameter.getType();
@@ -240,6 +239,10 @@ public class OpenApiControllerVisitor extends AbstractOpenApiVisitor implements 
 
                 if (isIgnoredParameterType(parameterType)) {
                     continue;
+                }
+
+                if (permitsRequestBody && swaggerOperation.getRequestBody() == null) {
+                    readSwaggerRequestBody(parameter, context, swaggerOperation);
                 }
 
                 if (parameter.isAnnotationPresent(Body.class)) {
@@ -540,6 +543,21 @@ public class OpenApiControllerVisitor extends AbstractOpenApiVisitor implements 
             }
             swaggerOperation.setResponses(apiResponses);
         }
+    }
+
+    private void readSwaggerRequestBody(ParameterElement element, VisitorContext context, io.swagger.v3.oas.models.Operation swaggerOperation) {
+        element.findAnnotation(io.swagger.v3.oas.annotations.parameters.RequestBody.class)
+                .flatMap(annotation -> {
+                    JsonNode jn = toJson(annotation.getValues(), context);
+                    try {
+                        return Optional.of(jsonMapper.treeToValue(jn, RequestBody.class));
+                    } catch (Exception e) {
+                        context.warn("Error reading Swagger ResponseBody for element [" + element + "]: " + e.getMessage(), element);
+                        return Optional.empty();
+                    }
+
+                })
+                .ifPresent(swaggerOperation::setRequestBody);
     }
 
     private void readSecurityRequirements(MethodElement element, VisitorContext context, io.swagger.v3.oas.models.Operation swaggerOperation) {

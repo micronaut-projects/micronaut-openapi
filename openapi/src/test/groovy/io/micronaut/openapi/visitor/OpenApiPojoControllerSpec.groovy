@@ -1163,6 +1163,102 @@ class MyBean {}
         operation.requestBody.content['application/x-www-form-urlencoded'].schema
     }
 
+    void "test build OpenAPI for body tagged with Swagger @RequestBody"() {
+        given: "An API definition"
+        when:
+        buildBeanDefinition('test.MyBean','''
+package test;
+
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Post;
+import io.micronaut.http.MediaType;
+import io.micronaut.http.annotation.Consumes;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
+
+import java.util.List;
+
+@Controller("/pets")
+interface PetOperations<T extends Pet> {
+
+    /**
+     * Saves a Pet
+     *
+     * @param pet The Pet details
+     * @return A pet or 404
+     */
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Post("/")
+    T save(
+    @RequestBody(description = "A pet", required = false, content = {
+        @Content(mediaType = "application/json",
+                 schema = @Schema(implementation = Pet.class),
+                 examples = {
+                    @ExampleObject(name = "example-1", value = "{\\"name\\":\\"Charlie\\"}")})}) T pet);
+  
+}
+
+class Pet {
+    private int age;
+    private String name;
+
+    public void setAge(int a) {
+        age = a;
+    }
+
+    /**
+     * The Pet Age
+     *
+     * @return The Pet Age
+     */
+    public int getAge() {
+        return age;
+    }
+
+    public void setName(String n) {
+        name = n;
+    }
+
+    /**
+     * The Pet Name
+     *
+     * @return The Pet Name
+     */
+    public String getName() {
+        return name;
+    }
+}
+
+@javax.inject.Singleton
+class MyBean {}
+''')
+        then:"The state is correct"
+        AbstractOpenApiVisitor.testReference != null
+
+        when:"The OpenAPI is retrieved"
+        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+
+        then:"The operation has only one path"
+        openAPI.paths.size() == 1
+
+        when: "The POST /pets operation is retrieved"
+        Operation operation = openAPI.paths?.get("/pets")?.post
+
+        then: "The body has specified attributes"
+        operation.requestBody
+        operation.requestBody.description == 'A pet'
+        !operation.requestBody.required
+        operation.requestBody.content.size() == 1
+        operation.requestBody.content['application/json'].schema
+        operation.requestBody.content['application/json'].schema.$ref == '#/components/schemas/Pet'
+        operation.requestBody.content['application/json'].examples
+        operation.requestBody.content['application/json'].examples.'example-1'
+        operation.requestBody.content['application/json'].examples.'example-1'.value
+        operation.requestBody.content['application/json'].examples.'example-1'.value.name == 'Charlie'
+    }
+
     void "test build OpenAPI for multiple content types and parameters"() {
         given: "An API definition"
         when:
