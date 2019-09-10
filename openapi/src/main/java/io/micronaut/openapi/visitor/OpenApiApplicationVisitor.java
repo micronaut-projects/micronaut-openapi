@@ -48,6 +48,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import javax.annotation.processing.SupportedOptions;
+
 /**
  * Visits the application class.
  *
@@ -55,6 +57,7 @@ import java.util.stream.Collectors;
  * @since 1.0
  */
 @Experimental
+@SupportedOptions({OpenApiApplicationVisitor.MICRONAUT_OPENAPI_ADDITIONAL_FILES, OpenApiApplicationVisitor.MICRONAUT_OPENAPI_TARGET_FILE})
 public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements TypeElementVisitor<OpenAPIDefinition, Object> {
     /**
      * System property that enables setting the target file to write to.
