@@ -31,6 +31,7 @@ class OpenApiOperationLinkSpec extends AbstractTypeElementSpec {
 package test;
 
 import io.swagger.v3.oas.annotations.*;
+import io.swagger.v3.oas.annotations.extensions.*;
 import io.swagger.v3.oas.annotations.parameters.*;
 import io.swagger.v3.oas.annotations.responses.*;
 import io.swagger.v3.oas.annotations.security.*;
@@ -55,7 +56,13 @@ class MyController {
                                         operationId = "getAddress",
                                         parameters = @LinkParameter(
                                                 name = "userId",
-                                                expression = "$request.query.userId"))
+                                                expression = "$request.query.userId"),
+                                        extensions = @Extension(
+            name = "custom",
+            properties = {
+                    @ExtensionProperty(name = "prop1", value = "prop1Val"),
+                    @ExtensionProperty(name = "prop1", value = "prop1Val")
+             }))
                         })}
     )
     public Response updatePet(
@@ -84,5 +91,7 @@ class MyBean {}
         operation.responses.default.links.address.operationId == 'getAddress'
         operation.responses.default.links.address.parameters.size() == 1
         operation.responses.default.links.address.parameters['userId'] == '$request.query.userId'
+        operation.responses.default.links.address.extensions.'x-custom'.prop1 == "prop1Val"
+
     }
 }

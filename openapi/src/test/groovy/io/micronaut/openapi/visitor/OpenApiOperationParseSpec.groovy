@@ -402,6 +402,7 @@ class MyBean {}
 package test;
 
 import io.swagger.v3.oas.annotations.*;
+import io.swagger.v3.oas.annotations.extensions.*;
 import io.swagger.v3.oas.annotations.parameters.*;
 import io.swagger.v3.oas.annotations.responses.*;
 import io.swagger.v3.oas.annotations.security.*;
@@ -423,7 +424,14 @@ class MyController {
     )
     @ApiResponse(
                      content = @Content(mediaType = "application/json",
-                             schema = @Schema(implementation = Pet.class)))
+                             schema = @Schema(implementation = Pet.class)),
+        extensions = @Extension(
+            name = "custom",
+            properties = {
+                    @ExtensionProperty(name = "prop1", value = "prop1Val"),
+                    @ExtensionProperty(name = "prop1", value = "prop1Val")
+             }
+        ))
       @ApiResponse(responseCode = "400", description = "Invalid ID supplied")
       @ApiResponse(responseCode = "404", description = "Pet not found")
       @ApiResponse(responseCode = "405", description = "Validation exception")    
@@ -457,6 +465,7 @@ class MyBean {}
         operation.responses.default.content.size() == 1
         operation.responses.default.content['application/json']
         operation.responses.default.content['application/json'].schema
+        operation.responses.default.extensions.'x-custom'.prop1 == "prop1Val"
         operation.responses.'400'.description == 'Invalid ID supplied'
 
     }

@@ -191,7 +191,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             for (AnnotationValue<A> tag : annotations) {
                 JsonNode jsonNode = toJson(tag.getValues(), context);
                 try {
-                    T t = jsonMapper.treeToValue(jsonNode, modelType);
+                    T t = treeToValue(jsonNode, modelType);
                     if (t != null) {
                         tagList.add(t);
                     }
@@ -208,7 +208,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                     JsonNode jsonNode = toJson(o.getValues(), context);
 
                     try {
-                        Optional<OpenAPI> result = Optional.of(jsonMapper.treeToValue(jsonNode, OpenAPI.class));
+                        Optional<OpenAPI> result = Optional.of(treeToValue(jsonNode, OpenAPI.class));
                         result.ifPresent(openAPI -> {
                             List<io.swagger.v3.oas.models.security.SecurityRequirement> securityRequirements =
                                     o.getAnnotations("security", io.swagger.v3.oas.annotations.security.SecurityRequirement.class)

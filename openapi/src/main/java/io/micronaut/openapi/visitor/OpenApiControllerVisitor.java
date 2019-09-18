@@ -134,7 +134,7 @@ public class OpenApiControllerVisitor extends AbstractOpenApiVisitor implements 
                 JsonNode jsonNode = toJson(o.getValues(), context);
 
                 try {
-                    return Optional.of(jsonMapper.treeToValue(jsonNode, io.swagger.v3.oas.models.Operation.class));
+                    return Optional.of(treeToValue(jsonNode, io.swagger.v3.oas.models.Operation.class));
                 } catch (Exception e) {
                     context.warn("Error reading Swagger Operation for element [" + element + "]: " + e.getMessage(), element);
                     return Optional.empty();
@@ -355,13 +355,13 @@ public class OpenApiControllerVisitor extends AbstractOpenApiVisitor implements 
 
                         if (newParameter == null) {
                             try {
-                                newParameter = jsonMapper.treeToValue(jsonNode, Parameter.class);
+                                newParameter = treeToValue(jsonNode, Parameter.class);
                             } catch (Exception e) {
                                 context.warn("Error reading Swagger Parameter for element [" + parameter + "]: " + e.getMessage(), parameter);
                             }
                         } else {
                             try {
-                                Parameter v = jsonMapper.treeToValue(jsonNode, Parameter.class);
+                                Parameter v = treeToValue(jsonNode, Parameter.class);
                                 if (v != null) {
                                     // horrible hack because Swagger ParameterDeserializer breaks updating existing objects
                                     BeanMap<Parameter> beanMap = BeanMap.of(v);
@@ -532,7 +532,7 @@ public class OpenApiControllerVisitor extends AbstractOpenApiVisitor implements 
 
                 JsonNode jn = toJson(r.getValues(), context);
                 try {
-                    Optional<ApiResponse> newResponse = Optional.of(jsonMapper.treeToValue(jn, ApiResponse.class));
+                    Optional<ApiResponse> newResponse = Optional.of(treeToValue(jn, ApiResponse.class));
                     newResponse.ifPresent(apiResponse -> {
                         String name = r.get("responseCode", String.class).orElse("default");
                         apiResponses.put(name, apiResponse);
@@ -550,7 +550,7 @@ public class OpenApiControllerVisitor extends AbstractOpenApiVisitor implements 
                 .flatMap(annotation -> {
                     JsonNode jn = toJson(annotation.getValues(), context);
                     try {
-                        return Optional.of(jsonMapper.treeToValue(jn, RequestBody.class));
+                        return Optional.of(treeToValue(jn, RequestBody.class));
                     } catch (Exception e) {
                         context.warn("Error reading Swagger ResponseBody for element [" + element + "]: " + e.getMessage(), element);
                         return Optional.empty();
@@ -579,7 +579,7 @@ public class OpenApiControllerVisitor extends AbstractOpenApiVisitor implements 
             for (AnnotationValue<io.swagger.v3.oas.annotations.servers.Server> r : serverAnnotations) {
                 JsonNode jn = toJson(r.getValues(), context);
                 try {
-                    Optional<Server> newRequirement = Optional.of(jsonMapper.treeToValue(jn, Server.class));
+                    Optional<Server> newRequirement = Optional.of(treeToValue(jn, Server.class));
                     newRequirement.ifPresent(swaggerOperation::addServersItem);
                 } catch (Exception e) {
                     context.warn("Error reading Swagger Server for element [" + element + "]: " + e.getMessage(), element);
@@ -614,7 +614,7 @@ public class OpenApiControllerVisitor extends AbstractOpenApiVisitor implements 
                                     JsonNode jsonNode = toJson(operation.getValues(), context);
 
                                     try {
-                                        final Optional<io.swagger.v3.oas.models.Operation> op = Optional.of(jsonMapper.treeToValue(jsonNode, io.swagger.v3.oas.models.Operation.class));
+                                        final Optional<io.swagger.v3.oas.models.Operation> op = Optional.of(treeToValue(jsonNode, io.swagger.v3.oas.models.Operation.class));
                                         op.ifPresent(operation1 -> setOperationOnPathItem(pathItem, operation1, httpMethod));
                                     } catch (Exception e) {
                                         context.warn("Error reading Swagger Operation for element [" + element + "]: " + e.getMessage(), element);
