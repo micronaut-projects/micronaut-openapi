@@ -451,7 +451,11 @@ abstract class AbstractOpenApiVisitor  {
             parentSchema.addProperties(propertyName, propertySchema);
 
             if (!element.isAnnotationPresent(Nullable.class)) {
-                parentSchema.addRequiredItem(propertyName);
+                List<String> requiredList = parentSchema.getRequired();
+                // Check for duplicates
+                if (requiredList == null || !requiredList.contains(propertyName)) {
+                    parentSchema.addRequiredItem(propertyName);
+                }
             }
         }
     }
