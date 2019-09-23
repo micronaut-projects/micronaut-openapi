@@ -51,15 +51,17 @@
                                 
                                 <div class="toc-item" style="margin-left:0"><a href="#exposingSwaggerOutput"><strong>4</strong><span>Exposing Swagger Output</span></a></div>
                                 
-                                <div class="toc-item" style="margin-left:0"><a href="#controllersAndSwaggerAnnotations"><strong>5</strong><span>Controllers and Swagger Annotations</span></a></div>
+                                <div class="toc-item" style="margin-left:0"><a href="#openApiViews"><strong>5</strong><span>Generating OpenAPI Views</span></a></div>
                                 
-                                <div class="toc-item" style="margin-left:0"><a href="#schemasAndPojos"><strong>6</strong><span>Schemas and POJOs</span></a></div>
+                                <div class="toc-item" style="margin-left:0"><a href="#controllersAndSwaggerAnnotations"><strong>6</strong><span>Controllers and Swagger Annotations</span></a></div>
                                 
-                                <div class="toc-item" style="margin-left:0"><a href="#schemasAndMetaAnnotations"><strong>7</strong><span>Schemas and Meta Annotations</span></a></div>
+                                <div class="toc-item" style="margin-left:0"><a href="#schemasAndPojos"><strong>7</strong><span>Schemas and POJOs</span></a></div>
                                 
-                                <div class="toc-item" style="margin-left:0"><a href="#schemasAndGenerics"><strong>8</strong><span>Schemas and Generics</span></a></div>
+                                <div class="toc-item" style="margin-left:0"><a href="#schemasAndMetaAnnotations"><strong>8</strong><span>Schemas and Meta Annotations</span></a></div>
                                 
-                                <div class="toc-item" style="margin-left:0"><a href="#mergingSchemas"><strong>9</strong><span>Merging Schemas</span></a></div>
+                                <div class="toc-item" style="margin-left:0"><a href="#schemasAndGenerics"><strong>9</strong><span>Schemas and Generics</span></a></div>
+                                
+                                <div class="toc-item" style="margin-left:0"><a href="#mergingSchemas"><strong>10</strong><span>Merging Schemas</span></a></div>
                                 
                             </div>
                         </div>
@@ -93,15 +95,17 @@
         
         <div class="toc-item" style="margin-left:0px" id="toc-item-exposingSwaggerOutput"><a href="#exposingSwaggerOutput"><strong>4</strong><span>Exposing Swagger Output</span></a></div>
         
-        <div class="toc-item" style="margin-left:0px" id="toc-item-controllersAndSwaggerAnnotations"><a href="#controllersAndSwaggerAnnotations"><strong>5</strong><span>Controllers and Swagger Annotations</span></a></div>
+        <div class="toc-item" style="margin-left:0px" id="toc-item-openApiViews"><a href="#openApiViews"><strong>5</strong><span>Generating OpenAPI Views</span></a></div>
         
-        <div class="toc-item" style="margin-left:0px" id="toc-item-schemasAndPojos"><a href="#schemasAndPojos"><strong>6</strong><span>Schemas and POJOs</span></a></div>
+        <div class="toc-item" style="margin-left:0px" id="toc-item-controllersAndSwaggerAnnotations"><a href="#controllersAndSwaggerAnnotations"><strong>6</strong><span>Controllers and Swagger Annotations</span></a></div>
         
-        <div class="toc-item" style="margin-left:0px" id="toc-item-schemasAndMetaAnnotations"><a href="#schemasAndMetaAnnotations"><strong>7</strong><span>Schemas and Meta Annotations</span></a></div>
+        <div class="toc-item" style="margin-left:0px" id="toc-item-schemasAndPojos"><a href="#schemasAndPojos"><strong>7</strong><span>Schemas and POJOs</span></a></div>
         
-        <div class="toc-item" style="margin-left:0px" id="toc-item-schemasAndGenerics"><a href="#schemasAndGenerics"><strong>8</strong><span>Schemas and Generics</span></a></div>
+        <div class="toc-item" style="margin-left:0px" id="toc-item-schemasAndMetaAnnotations"><a href="#schemasAndMetaAnnotations"><strong>8</strong><span>Schemas and Meta Annotations</span></a></div>
         
-        <div class="toc-item" style="margin-left:0px" id="toc-item-mergingSchemas"><a href="#mergingSchemas"><strong>9</strong><span>Merging Schemas</span></a></div>
+        <div class="toc-item" style="margin-left:0px" id="toc-item-schemasAndGenerics"><a href="#schemasAndGenerics"><strong>9</strong><span>Schemas and Generics</span></a></div>
+        
+        <div class="toc-item" style="margin-left:0px" id="toc-item-mergingSchemas"><a href="#mergingSchemas"><strong>10</strong><span>Merging Schemas</span></a></div>
         
         </div>
     </div>
@@ -111,7 +115,7 @@
         <h1>OpenAPI/Swagger Support</h1>
         <p></p>
         <p>Configuration to integrate Micronaut and OpenAPI/Swagger</p>
-        <p><strong>Version:</strong> 1.2.2.BUILD-SNAPSHOT</p>
+        <p><strong>Version:</strong> 1.3.0.BUILD-SNAPSHOT</p>
     </div>
     
 
@@ -334,7 +338,159 @@ info:
 </div>
 
 
-<h1 id="controllersAndSwaggerAnnotations">5 Controllers and Swagger Annotations</h1>
+<h1 id="openApiViews">5 Generating OpenAPI Views</h1>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/openApiViews.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>Micronaut can generate views for your generated OpenApi specification. Currently <a href="https://github.com/swagger-api/swagger-ui">swagger-ui</a>, <a href="https://github.com/Rebilly/ReDoc">redoc</a> and <a href="https://github.com/mrin9/RapiDoc">rapidoc</a> are supported.</p>
+</div>
+<div class="paragraph">
+<p>The resources needed to render the views (javascript, css, &#8230;&#8203;) are loaded from CDNs: <a href="https://unpkg.com">unpkg.com</a> and <a href="https://fonts.googleapis.com/">fonts.googleapis.com</a>.</p>
+</div>
+<div class="paragraph">
+<p>By default the generation of views is disabled. To turn it on you have to set the following system property <code>micronaut.openapi.views.spec</code>.
+The string syntax is a series of comma-separated key-value pairs, to enable and configure the views.</p>
+</div>
+<div class="listingblock">
+<div class="title">System Property</div>
+<div class="content">
+<pre class="highlightjs highlight"><code>micronaut.openapi.views.spec=redoc.enabled=true,rapidoc.enabled=true,swagger-ui.enabled=true,swagger-ui.theme=flattop</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>For instance in gradle:</p>
+</div>
+<div class="listingblock">
+<div class="title">Gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">tasks.withType(JavaCompile) {
+    options.fork = true
+    options.forkOptions.jvmArgs &lt;&lt; '-Dmicronaut.openapi.views.spec=rapidoc.enabled=true,swagger-ui.enabled=true,swagger-ui.theme=flattop'
+
+    ...
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>or in maven:</p>
+</div>
+<div class="listingblock">
+<div class="title">Maven</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;build&gt;
+    &lt;plugins&gt;
+        &lt;plugin&gt;
+            &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;
+            &lt;artifactId&gt;maven-compiler-plugin&lt;/artifactId&gt;
+            &lt;configuration&gt;
+                &lt;fork&gt;true&lt;/fork&gt;
+                &lt;compilerArgs&gt;
+                    &lt;arg&gt;-Dmicronaut.openapi.views.spec=rapidoc.enabled=true,swagger-ui.enabled=true,swagger-ui.theme=flattop&lt;/arg&gt;
+                    ...
+                &lt;/compilerArgs&gt;
+            &lt;/configuration&gt;
+        &lt;/plugin&gt;
+    &lt;/plugins&gt;
+&lt;/build&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The views will be generated to the <code>META-INF/swagger/views/[swagger-ui | redoc | rapidoc]</code> directory of your project’s class output.</p>
+</div>
+<div class="paragraph">
+<p>The following properties are supported:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>mapping.path=[string]</code>: The path from where the swagger specification will be served by the http server. Default is <code>swagger</code>.</p>
+</li>
+<li>
+<p><code>redoc.enabled=[true | false]</code>: When 'true' the redoc view is generated.</p>
+</li>
+<li>
+<p><code>rapidoc.enabled=[true | false]</code>: When 'true' the rapidoc view is generated.</p>
+</li>
+<li>
+<p><code>swagger-ui.enabled=[true | false]</code>: When 'true' the swagger-ui view is generated.</p>
+</li>
+<li>
+<p><code>redoc.version=[string]</code>: The version of redoc to use. Default is to use the latest available.</p>
+</li>
+<li>
+<p><code>rapidoc.version=[string]</code>: The version of rapidoc to use. Default is to use the latest available.</p>
+</li>
+<li>
+<p><code>rapidoc.layout=[row | column]</code>: The layout of rapidoc to use. These are case insensitive. Default is <code>row</code>.</p>
+</li>
+<li>
+<p><code>rapidoc.theme=[dark | light]</code>: The theme of rapidoc to use. These are case insensitive. Default is <code>dark</code>.</p>
+</li>
+<li>
+<p><code>swagger-ui.version=[string]</code>: The version of swagger-ui to use. Default is to use the latest available.</p>
+</li>
+<li>
+<p><code>swagger-ui.layout=[string]</code>: The layout of swagger-ui to use. Defaults is <code>StandaloneLayout</code>.</p>
+</li>
+<li>
+<p><code>swagger-ui.theme=[DEFAULT | MATERIAL | FEELING_BLUE | FLATTOP | MONOKAI | MUTED | NEWSPAPER | OUTLINE]</code>: The theme of swagger-ui to use. These are case insensitive. Default is <code>DEFAULT</code>.</p>
+</li>
+<li>
+<p><code>swagger-ui.deep-linking=[true | false]</code>: The deep-linking flag of swagger-ui to use. Default is <code>true</code>.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>To expose the views, you also must expose the generated <code>yaml</code>:</p>
+</div>
+<div class="listingblock">
+<div class="title">Exposing Swagger YAML And Views</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">micronaut:
+    router:
+        static-resources:
+            swagger:
+                paths: classpath:META-INF/swagger
+                mapping: /swagger/**
+            redoc:
+                paths: classpath:META-INF/swagger/views/redoc
+                mapping: /redoc/**
+            rapidoc:
+                paths: classpath:META-INF/swagger/views/rapidoc
+                mapping: /rapidoc/**
+            swagger-ui:
+                paths: classpath:META-INF/swagger/views/swagger-ui
+                mapping: /swagger-ui/**</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>With the above configuration in place when you run your application you can access your Swagger documentation at http://localhost:8080/[redoc|rapidoc|swagger-ui].
+By default the views expect to find the <code>yaml</code> under <code>/swagger</code>, if you change this mapping to something else:</p>
+</div>
+<div class="listingblock">
+<div class="title">Exposing Swagger YAML</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">micronaut:
+    router:
+        static-resources:
+            swagger:
+                paths: classpath:META-INF/swagger
+                mapping: /swaggerYAML/**
+....</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You will need to set the <code>mapping.path</code> property accordingly: <code>micronaut.openapi.views.spec=mapping.path=swaggerYAML&#8230;&#8203;</code>.</p>
+</div>
+
+
+<h1 id="controllersAndSwaggerAnnotations">6 Controllers and Swagger Annotations</h1>
 
 <div class='contribute-btn'>
     <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/controllersAndSwaggerAnnotations.adoc"'>
@@ -616,7 +772,7 @@ paths:
 </div>
 
 
-<h1 id="schemasAndPojos">6 Schemas and POJOs</h1>
+<h1 id="schemasAndPojos">7 Schemas and POJOs</h1>
 
 <div class='contribute-btn'>
     <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/schemasAndPojos.adoc"'>
@@ -687,7 +843,7 @@ enum PetType {
 </div>
 
 
-<h1 id="schemasAndMetaAnnotations">7 Schemas and Meta Annotations</h1>
+<h1 id="schemasAndMetaAnnotations">8 Schemas and Meta Annotations</h1>
 
 <div class='contribute-btn'>
     <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/schemasAndMetaAnnotations.adoc"'>
@@ -718,7 +874,7 @@ enum PetType {
 </div>
 
 
-<h1 id="schemasAndGenerics">8 Schemas and Generics</h1>
+<h1 id="schemasAndGenerics">9 Schemas and Generics</h1>
 
 <div class='contribute-btn'>
     <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/schemasAndGenerics.adoc"'>
@@ -768,7 +924,7 @@ public Response&lt;Pet&gt; updatePet(Pet pet) {
 </div>
 
 
-<h1 id="mergingSchemas">9 Merging Schemas</h1>
+<h1 id="mergingSchemas">10 Merging Schemas</h1>
 
 <div class='contribute-btn'>
     <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/mergingSchemas.adoc"'>
