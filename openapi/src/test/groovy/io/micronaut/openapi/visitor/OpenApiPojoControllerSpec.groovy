@@ -23,6 +23,7 @@ import io.swagger.v3.oas.models.PathItem
 import io.swagger.v3.oas.models.media.ArraySchema
 import io.swagger.v3.oas.models.media.MapSchema
 import io.swagger.v3.oas.models.media.Schema
+import spock.lang.PendingFeature
 
 class OpenApiPojoControllerSpec extends AbstractTypeElementSpec {
     def setup() {
@@ -532,6 +533,7 @@ class MyBean {}
 
     }
 
+    @PendingFeature(reason = "Requires upstream fix in Micronaut core")
     void "test build OpenAPI doc for POJO type with generics"() {
 
         given:"An API definition"
@@ -721,7 +723,7 @@ class MyBean {}
         pathItem.get.responses['default'].content['application/json'].schema.$ref == '#/components/schemas/Pet'
     }
 
-
+    @PendingFeature(reason = "Requires upstream fix in Micronaut core")
     void "test build OpenAPI doc for POJO with custom Schema"() {
 
         given:"An API definition"

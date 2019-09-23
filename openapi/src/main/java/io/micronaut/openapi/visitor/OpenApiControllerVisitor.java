@@ -179,7 +179,7 @@ public class OpenApiControllerVisitor extends AbstractOpenApiVisitor implements 
             }
 
             OptionalValues<List> consumesMediaTypes = element.getValues(Consumes.class, List.class);
-            String consumesMediaType = element.getValue(Consumes.class, String.class).orElse(MediaType.APPLICATION_JSON);
+            String consumesMediaType = element.stringValue(Consumes.class).orElse(MediaType.APPLICATION_JSON);
             ApiResponses responses = swaggerOperation.getResponses();
             if (responses == null) {
                 responses = new ApiResponses();
@@ -197,15 +197,13 @@ public class OpenApiControllerVisitor extends AbstractOpenApiVisitor implements 
 
                 ClassElement returnType = element.getReturnType();
 
-                if (returnType != null) {
-                    if (returnType.isAssignable("io.reactivex.Completable")) {
-                        returnType = null;
-                    } else if (isResponseType(returnType)) {
-                        returnType = returnType.getFirstTypeArgument().orElse(returnType);
-                    } else if (isSingleResponseType(returnType)) {
-                        returnType = returnType.getFirstTypeArgument().get();
-                        returnType = returnType.getFirstTypeArgument().orElse(returnType);
-                    }
+                if (returnType.isAssignable("io.reactivex.Completable")) {
+                    returnType = null;
+                } else if (isResponseType(returnType)) {
+                    returnType = returnType.getFirstTypeArgument().orElse(returnType);
+                } else if (isSingleResponseType(returnType)) {
+                    returnType = returnType.getFirstTypeArgument().get();
+                    returnType = returnType.getFirstTypeArgument().orElse(returnType);
                 }
 
                 if (returnType != null) {
@@ -233,9 +231,6 @@ public class OpenApiControllerVisitor extends AbstractOpenApiVisitor implements 
 
                 ClassElement parameterType = parameter.getType();
                 String parameterName = parameter.getName();
-                if (parameterType == null) {
-                    continue;
-                }
 
                 if (isIgnoredParameterType(parameterType)) {
                     continue;
