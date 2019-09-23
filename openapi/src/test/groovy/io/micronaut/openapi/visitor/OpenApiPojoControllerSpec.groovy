@@ -777,7 +777,7 @@ interface PetOperations<T extends Pet> {
     Single<T> save(@Body T pet);
 }
 
-@Schema(name="MyPet", description="Pet description")
+@Schema(name="MyPet", description="Pet description", requiredProperties={"type", "age", "name"})
 class Pet {
     private PetType type;
     private int age;
