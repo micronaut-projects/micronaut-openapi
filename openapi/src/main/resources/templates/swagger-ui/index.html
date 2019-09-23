@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang='en'>
+
+<head>
+    <meta charset='UTF-8' />
+    <title>{{title}}</title>
+    <link rel='icon' type='image/png' href='https://unpkg.com/swagger-ui-dist{{swagger-ui.version}}/favicon-32x32.png' sizes='32x32' />
+    <link rel='icon' type='image/png' href='https://unpkg.com/swagger-ui-dist{{swagger-ui.version}}/favicon-16x16.png' sizes='16x16' />
+    <script src='https://unpkg.com/swagger-ui-dist{{swagger-ui.version}}/swagger-ui-bundle.js'></script>
+    <script src='https://unpkg.com/swagger-ui-dist{{swagger-ui.version}}/swagger-ui-standalone-preset.js'></script>
+    <link rel='stylesheet' type='text/css' href='https://unpkg.com/swagger-ui-dist{{swagger-ui.version}}/swagger-ui.css' />
+    {{swagger-ui.theme}}
+</head>
+
+<body>
+    <div id='swagger-ui'></div>
+
+    <script>
+        window.onload = function() {
+            var ui = SwaggerUIBundle({
+                url: '{{specURL}}',
+                dom_id: '#swagger-ui',
+                deepLinking: {{swagger-ui.deep-linking}},
+                validatorUrl: null,
+                presets: [
+                    SwaggerUIBundle.presets.apis,
+                    SwaggerUIStandalonePreset
+                ],
+                plugins: [
+                    SwaggerUIBundle.plugins.DownloadUrl
+                ],
+                layout: '{{swagger-ui.layout}}'
+            });
+            window.ui = ui;
+        }
+    </script>
+</body>
+
+</html>
