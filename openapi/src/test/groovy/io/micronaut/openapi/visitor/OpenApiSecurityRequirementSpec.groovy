@@ -86,6 +86,7 @@ class MyBean {}
 package test;
 
 import io.swagger.v3.oas.annotations.*;
+import io.swagger.v3.oas.annotations.extensions.*;
 import io.swagger.v3.oas.annotations.parameters.*;
 import io.swagger.v3.oas.annotations.responses.*;
 import io.swagger.v3.oas.annotations.security.*;
@@ -99,7 +100,15 @@ import java.util.List;
         type = SecuritySchemeType.OAUTH2,
         flows = @OAuthFlows(
                 implicit = @OAuthFlow(authorizationUrl = "http://url.com/auth",
-                        scopes = @OAuthScope(name = "write:pets", description = "modify pets in your account"))))
+                        scopes = @OAuthScope(name = "write:pets", description = "modify pets in your account"))),
+        extensions = @Extension(
+            name = "custom",
+            properties = {
+                    @ExtensionProperty(name = "prop1", value = "prop1Val"),
+                    @ExtensionProperty(name = "prop1", value = "prop1Val"),
+             }
+        )
+)
 class MyController {
 
     @Put("/")
@@ -134,7 +143,8 @@ class MyBean {}
         openAPI.components.securitySchemes['myOauth2Security'].flows.implicit
         openAPI.components.securitySchemes['myOauth2Security'].flows.implicit.authorizationUrl == 'http://url.com/auth'
         openAPI.components.securitySchemes['myOauth2Security'].flows.implicit.scopes
-        openAPI.components.securitySchemes['myOauth2Security'].flows.implicit.scopes.size() == 1
+        openAPI.components.securitySchemes['myOauth2Security'].extensions
+        openAPI.components.securitySchemes['myOauth2Security'].extensions.'x-custom'.prop1 == "prop1Val"
 
     }
 }

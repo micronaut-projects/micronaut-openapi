@@ -43,6 +43,8 @@ import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.enums.ParameterStyle;
+import io.swagger.v3.oas.annotations.extensions.Extension;
+import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
 import io.swagger.v3.oas.annotations.headers.Header;
 import io.swagger.v3.oas.annotations.links.Link;
 import io.swagger.v3.oas.annotations.links.LinkParameter;
@@ -154,6 +156,22 @@ abstract class AbstractOpenApiVisitor  {
     }
 
     /**
+     * Converts Json node into a class' instance or throws 'com.fasterxml.jackson.core.JsonProcessingException', adds extensions if present.
+     * @param jn The json node
+     * @param clazz The output class instance
+     * @param <T> The output class type
+     * @return The converted instance
+     * @throws com.fasterxml.jackson.core.JsonProcessingException
+     */
+    protected <T> T treeToValue(JsonNode jn, Class<T> clazz) throws com.fasterxml.jackson.core.JsonProcessingException {
+        T value = jsonMapper.treeToValue(jn, clazz);
+        if (value != null) {
+            resolveExtensions(jn).ifPresent(extensions -> BeanMap.of(value).put("extensions", extensions));
+        }
+        return value;
+    }
+
+    /**
      * Convert the values to a map.
      * @param values The values
      * @param context The visitor context
@@ -195,7 +213,13 @@ abstract class AbstractOpenApiVisitor  {
                             newValues.put(key, classes);
                         } else if (areAnnotationValues) {
                             String annotationName = ((AnnotationValue) first).getAnnotationName();
-                            if (Content.class.getName().equals(annotationName)) {
+                            if (Extension.class.getName().equals(annotationName)) {
+                                Map<CharSequence, Object> extensions = new HashMap<>();
+                                for (Object o : a) {
+                                    processExtensions(extensions, (AnnotationValue<Extension>) o);
+                                }
+                                newValues.put("extensions", extensions);
+                            } else if (Content.class.getName().equals(annotationName)) {
                                 Map mediaTypes = annotationValueArrayToSubmap(a, "mediaType", context);
                                 newValues.put(key, mediaTypes);
                             } else if (Link.class.getName().equals(annotationName) || Header.class.getName().equals(annotationName)) {
@@ -270,6 +294,49 @@ abstract class AbstractOpenApiVisitor  {
             }
         }
         return newValues;
+    }
+
+    // Copy of io.swagger.v3.core.util.AnnotationsUtils.getExtensions
+    private void processExtensions(Map<CharSequence, Object> map, AnnotationValue<Extension> extension) {
+        String name = extension.getRequiredValue("name", String.class);
+        final String key = name.length() > 0 ? org.apache.commons.lang3.StringUtils.prependIfMissing(name, "x-") : name;
+        for (AnnotationValue<ExtensionProperty> prop : extension.getAnnotations("properties", ExtensionProperty.class)) {
+            final String propertyName = prop.getRequiredValue("name", String.class);
+            final String propertyValue = prop.getRequiredValue(String.class);
+            JsonNode processedValue = null;
+            final boolean propertyAsJson = prop.get("parseValue", boolean.class, false);
+            if (org.apache.commons.lang3.StringUtils.isNotBlank(propertyName) && org.apache.commons.lang3.StringUtils.isNotBlank(propertyValue)) {
+                if (key.isEmpty()) {
+                    if (propertyAsJson) {
+                        try {
+                            processedValue = Json.mapper().readTree(propertyValue);
+                            map.put(org.apache.commons.lang3.StringUtils.prependIfMissing(propertyName, "x-"), processedValue);
+                        } catch (Exception e) {
+                            map.put(org.apache.commons.lang3.StringUtils.prependIfMissing(propertyName, "x-"), propertyValue);
+                        }
+                    } else {
+                        map.put(org.apache.commons.lang3.StringUtils.prependIfMissing(propertyName, "x-"), propertyValue);
+                    }
+                } else {
+                    Object value = map.get(key);
+                    if (value == null || !(value instanceof Map)) {
+                        value = new LinkedHashMap<>();
+                        map.put(key, value);
+                    }
+                    @SuppressWarnings("unchecked") final Map<String, Object> mapValue = (Map<String, Object>) value;
+                    if (propertyAsJson) {
+                        try {
+                            processedValue = Json.mapper().readTree(propertyValue);
+                            mapValue.put(propertyName, processedValue);
+                        } catch (Exception e) {
+                            mapValue.put(propertyName, propertyValue);
+                        }
+                    } else {
+                        mapValue.put(propertyName, propertyValue);
+                    }
+                }
+            }
+        }
     }
 
     private Optional<Object> parseJsonString(Object object) {
@@ -567,6 +634,18 @@ abstract class AbstractOpenApiVisitor  {
             context.warn("Error reading Swagger Schema for element [" + element + "]: " + e.getMessage(), element);
         }
         return schemaToBind;
+    }
+
+    private Optional<Map<String, Object>> resolveExtensions(JsonNode jn) {
+        try {
+            JsonNode extensionsNode = jn.get("extensions");
+            if (extensionsNode != null) {
+                return Optional.ofNullable(jsonMapper.treeToValue(extensionsNode, Map.class));
+            }
+        } catch (JsonProcessingException e) {
+            // Ignore
+        }
+        return Optional.empty();
     }
 
     private Map annotationValueArrayToSubmap(Object[] a, String classifier, VisitorContext context) {
@@ -905,7 +984,7 @@ abstract class AbstractOpenApiVisitor  {
                 ));
                 final JsonNode jsonNode = toJson(map, context);
                 try {
-                    final Optional<SecurityScheme> securityRequirement = Optional.of(jsonMapper.treeToValue(jsonNode, SecurityScheme.class));
+                    final Optional<SecurityScheme> securityRequirement = Optional.of(treeToValue(jsonNode, SecurityScheme.class));
                     securityRequirement.ifPresent(securityScheme -> {
 
                         try {
