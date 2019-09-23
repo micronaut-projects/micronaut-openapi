@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10,"i9":10,"i10":10};
+var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10,"i9":10,"i10":10,"i11":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -266,6 +266,13 @@ implements io.micronaut.inject.visitor.TypeElementVisitor&lt;io.swagger.v3.oas.a
 </td>
 </tr>
 <tr id="i10" class="altColor">
+<td class="colFirst"><code>protected &lt;T&gt;&nbsp;T</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/openapi/visitor/OpenApiApplicationVisitor.html#treeToValue-com.fasterxml.jackson.databind.JsonNode-java.lang.Class-">treeToValue</a></span>(com.fasterxml.jackson.databind.JsonNode&nbsp;jn,
+           <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;T&gt;&nbsp;clazz)</code>
+<div class="block">Converts Json node into a class' instance or throws 'com.fasterxml.jackson.core.JsonProcessingException', adds extensions if present.</div>
+</td>
+</tr>
+<tr id="i11" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/openapi/visitor/OpenApiApplicationVisitor.html#visitClass-io.micronaut.inject.ast.ClassElement-io.micronaut.inject.visitor.VisitorContext-">visitClass</a></span>(io.micronaut.inject.ast.ClassElement&nbsp;element,
           io.micronaut.inject.visitor.VisitorContext&nbsp;context)</code>&nbsp;</td>
@@ -383,6 +390,29 @@ implements io.micronaut.inject.visitor.TypeElementVisitor&lt;io.swagger.v3.oas.a
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
 <dd><code>finish</code>&nbsp;in interface&nbsp;<code>io.micronaut.inject.visitor.TypeElementVisitor&lt;io.swagger.v3.oas.annotations.OpenAPIDefinition,<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&gt;</code></dd>
+</dl>
+</li>
+</ul>
+<a name="treeToValue-com.fasterxml.jackson.databind.JsonNode-java.lang.Class-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>treeToValue</h4>
+<pre>protected&nbsp;&lt;T&gt;&nbsp;T&nbsp;treeToValue(com.fasterxml.jackson.databind.JsonNode&nbsp;jn,
+                            <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;T&gt;&nbsp;clazz)
+                     throws com.fasterxml.jackson.core.JsonProcessingException</pre>
+<div class="block">Converts Json node into a class' instance or throws 'com.fasterxml.jackson.core.JsonProcessingException', adds extensions if present.</div>
+<dl>
+<dt><span class="paramLabel">Type Parameters:</span></dt>
+<dd><code>T</code> - The output class type</dd>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>jn</code> - The json node</dd>
+<dd><code>clazz</code> - The output class instance</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>The converted instance</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code>com.fasterxml.jackson.core.JsonProcessingException</code></dd>
 </dl>
 </li>
 </ul>
