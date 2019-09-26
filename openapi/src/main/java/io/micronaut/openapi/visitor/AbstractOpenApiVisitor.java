@@ -983,6 +983,11 @@ abstract class AbstractOpenApiVisitor  {
             n.ifPresent(name -> {
 
                 final Map<CharSequence, Object> map = toValueMap(securityRequirementAnnotationValue.getValues(), context);
+                if (map.containsKey("paramName")) {
+                    map.put("name", map.remove("paramName"));
+                } else {
+                    map.remove("name");
+                }
                 normalizeEnumValues(map, CollectionUtils.mapOf(
                         "type", SecurityScheme.Type.class, "in", SecurityScheme.In.class
                 ));
