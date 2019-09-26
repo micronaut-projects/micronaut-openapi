@@ -214,6 +214,8 @@ import io.swagger.v3.oas.annotations.enums.*;
            flows = @OAuthFlows(
                    implicit = @OAuthFlow(authorizationUrl = "http://url.com/auth",
                            scopes = @OAuthScope(name = "write:pets", description = "modify pets in your account"))))
+@SecurityScheme(name = "myOauth3Security", type = SecuritySchemeType.OAUTH2)                           
+@SecurityScheme(name = "myOauth4Security", type = SecuritySchemeType.APIKEY, paramName = "JWT")                           
 class Application {
 
 }
@@ -232,6 +234,7 @@ class MyBean {}
         openAPI != null
         openAPI.components.securitySchemes['myOauth2Security']
         openAPI.components.securitySchemes['myOauth2Security'].type == SecurityScheme.Type.OAUTH2
+        openAPI.components.securitySchemes['myOauth2Security'].name == null
         openAPI.components.securitySchemes['myOauth2Security'].flows
         openAPI.components.securitySchemes['myOauth2Security'].flows.implicit
         openAPI.components.securitySchemes['myOauth2Security'].flows.implicit.authorizationUrl == 'http://url.com/auth'
@@ -240,5 +243,7 @@ class MyBean {}
         openAPI.components.securitySchemes['myOauth2Security'].flows.implicit.scopes.get("write:pets")
         openAPI.components.securitySchemes['myOauth2Security'].flows.implicit.scopes.get("write:pets") == 'modify pets in your account'
         openAPI.components.securitySchemes['myOauth2Security'].in == SecurityScheme.In.HEADER
+        openAPI.components.securitySchemes['myOauth3Security'].name == null
+        openAPI.components.securitySchemes['myOauth4Security'].name == "JWT"
     }
 }
