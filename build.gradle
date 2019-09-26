@@ -80,6 +80,7 @@ subprojects { Project subproject ->
         }
 
         checkstyleTest.enabled = false
+        bintray.publish = true
     }
 
     jar {
@@ -89,8 +90,6 @@ subprojects { Project subproject ->
             attributes('Implementation-Title': 'Micronaut OpenAPI Configuration')
         }
     }
-
-    bintray.publish = true
 
     tasks.withType(Test) {
         jvmArgs '-Duser.country=US'
