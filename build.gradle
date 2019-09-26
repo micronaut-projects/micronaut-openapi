@@ -62,7 +62,25 @@ subprojects { Project subproject ->
 
     sourceCompatibility = "1.8"
     targetCompatibility = "1.8"
-    apply from:'https://raw.githubusercontent.com/micronaut-projects/micronaut-core/01e2b1ef1255b584e9e5c1965d334e1190e2ade5/gradle/publishing.gradle'
+
+    if (!subproject.name.startsWith('docs-')) {
+
+        apply from:'https://raw.githubusercontent.com/micronaut-projects/micronaut-core/01e2b1ef1255b584e9e5c1965d334e1190e2ade5/gradle/publishing.gradle'
+        apply plugin: "checkstyle"
+
+        checkstyle {
+            toolVersion = 8.10
+            configFile = rootProject.file('config/checkstyle/checkstyle.xml')
+
+            // Per submodule
+            maxErrors = 1
+            maxWarnings = 10
+
+            showViolations = true
+        }
+
+        checkstyleTest.enabled = false
+    }
 
     jar {
         manifest {
@@ -124,21 +142,6 @@ subprojects { Project subproject ->
     }
 
     task allDeps(type: DependencyReportTask) {}
-
-    apply plugin: "checkstyle"
-
-    checkstyle {
-        toolVersion = 8.10
-        configFile = rootProject.file('config/checkstyle/checkstyle.xml')
-
-        // Per submodule
-        maxErrors = 1
-        maxWarnings = 10
-
-        showViolations = true
-    }
-
-    checkstyleTest.enabled = false
 
 }
 
