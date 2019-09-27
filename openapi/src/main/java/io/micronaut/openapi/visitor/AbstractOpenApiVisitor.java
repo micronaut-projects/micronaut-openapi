@@ -657,6 +657,9 @@ abstract class AbstractOpenApiVisitor  {
         for (Object o : a) {
             AnnotationValue<?> sv = (AnnotationValue<?>) o;
             String name = sv.get(classifier, String.class).orElse(null);
+            if (name == null && classifier.equals("mediaType")) {
+                name = MediaType.APPLICATION_JSON;
+            }
             if (name != null) {
                 Map<CharSequence, Object> map = toValueMap(sv.getValues(), context);
                 mediaTypes.put(name, map);

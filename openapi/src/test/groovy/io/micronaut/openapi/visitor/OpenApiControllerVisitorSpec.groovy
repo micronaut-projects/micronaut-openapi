@@ -86,6 +86,80 @@ class MyBean {}
         parameter.schema.maxItems == 20
     }
 
+    void "test build OpenAPI doc with @Content without mediaType information"() {
+
+        given:"An API definition"
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.reactivex.*;
+import io.micronaut.http.annotation.*;
+import java.util.List;
+import io.micronaut.http.*;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+
+/**
+ * @author graemerocher
+ * @since 1.0
+ */
+
+@Controller("/pets")
+interface PetOperations<T extends Pet> {
+
+    /**
+     * Find a pet by a slug
+     *
+     * @param slug The slug name
+     * @return A pet or 404
+     */
+    @ApiResponse(
+        responseCode = "200",
+        description = "Get Pet",
+        content = @Content(schema = @Schema(implementation = Pet.class))
+    )
+    @Get("/{slug}")
+    HttpResponse<T> find(String slug, HttpRequest request);
+}
+
+class Pet {
+    private String name;
+    
+    public String getName() { return this.name; }
+    
+    public void setName(String name) { this.name = name; }
+}
+
+
+@javax.inject.Singleton
+class MyBean {}
+''')
+        then:"the state is correct"
+        AbstractOpenApiVisitor.testReference != null
+
+        when:"the /pets path is retrieved"
+        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+
+        and:"the /{slug} path is retrieved"
+        PathItem pathItem = openAPI.paths.get("/pets/{slug}")
+
+        then:"it is included in the OpenAPI doc"
+        pathItem.get.description == 'Find a pet by a slug'
+        pathItem.get.operationId == 'find'
+        pathItem.get.parameters.size() == 1
+        pathItem.get.parameters[0].name == 'slug'
+        pathItem.get.parameters[0].in == ParameterIn.PATH.toString()
+        pathItem.get.parameters[0].required
+        pathItem.get.parameters[0].schema
+        pathItem.get.parameters[0].description == 'The slug name'
+        pathItem.get.parameters[0].schema.type == 'string'
+        pathItem.get.responses.size() == 1
+        pathItem.get.responses['200'] != null
+        pathItem.get.responses['200'].content['application/json'].schema.$ref == '#/components/schemas/Pet'
+    }
+
     void "test build OpenAPI doc with request and response"() {
 
         given:"An API definition"
