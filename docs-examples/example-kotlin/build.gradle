@@ -16,6 +16,7 @@ dependencies {
     kapt "io.micronaut:micronaut-validation"
     kaptTest "io.micronaut:micronaut-inject-java"
     testCompile "io.swagger.core.v3:swagger-annotations"
+    testCompile "io.micronaut:micronaut-runtime"
     testCompile "io.micronaut.configuration:micronaut-hibernate-validator"
     testRuntime "ch.qos.logback:logback-classic:1.2.3"
     testCompile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"

@@ -11,6 +11,7 @@ dependencyManagement {
 
 dependencies {
     testCompile project(":openapi")
+    testCompile "io.micronaut:micronaut-runtime"
     testCompile "io.micronaut:micronaut-inject-java"
     testCompile "io.micronaut:micronaut-validation"
     testCompile "io.swagger.core.v3:swagger-annotations"
