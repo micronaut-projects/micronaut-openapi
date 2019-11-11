@@ -517,7 +517,10 @@ abstract class AbstractOpenApiVisitor  {
 
             parentSchema.addProperties(propertyName, propertySchema);
 
-            if (!element.isAnnotationPresent(Nullable.class)) {
+            if (element.isAnnotationPresent(NotNull.class)
+                    || element.isAnnotationPresent(NotBlank.class)
+                    || element.isAnnotationPresent(NotEmpty.class)) {
+
                 List<String> requiredList = parentSchema.getRequired();
                 // Check for duplicates
                 if (requiredList == null || !requiredList.contains(propertyName)) {

@@ -892,6 +892,87 @@ class MyBean {}
     }
 
 
+    void "test build OpenAPI doc for POJO with properties not required as default"() {
+
+        given:"An API definition"
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.reactivex.*;
+import io.micronaut.http.annotation.*;
+import java.util.List;
+import io.swagger.v3.oas.annotations.media.*;
+
+@Controller("/pets")
+interface PetOperations<T extends Pet> {
+
+    @Post("/")
+    Single<T> save(@Body T pet);
+}
+
+@Schema(name="MyPet", description="Pet description")
+class Pet {
+    private int age;
+    private String name;
+    
+    public void setAge(int a) {
+        age = a;
+    }
+    
+    /**
+     * The age
+     */
+    @Schema(description="Pet age", maximum="20")
+    public int getAge() {
+        return age;
+    }
+    
+    public void setName(String n) {
+        name = n;
+    }
+
+    @Schema(description="Pet name", maxLength=20)    
+    public String getName() {
+        return name;
+    }
+}
+
+@javax.inject.Singleton
+class MyBean {}
+''')
+        then:"the state is correct"
+        AbstractOpenApiVisitor.testReference != null
+
+        when:"The OpenAPI is retrieved"
+        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        Schema petSchema = openAPI.components.schemas['MyPet']
+
+        then:"the components are valid"
+        petSchema.type == 'object'
+        petSchema.description == "Pet description"
+        !petSchema.required
+        petSchema.properties.size() == 2
+        petSchema.properties['age'].type == 'integer'
+        petSchema.properties['age'].description == 'Pet age'
+        petSchema.properties['age'].maximum == 20
+        petSchema.properties['name'].type == 'string'
+        petSchema.properties['name'].description == 'Pet name'
+        petSchema.properties['name'].maxLength == 20
+
+        when:"the /pets path is retrieved"
+        PathItem pathItem = openAPI.paths.get("/pets")
+
+        then:"it is included in the OpenAPI doc"
+        pathItem.post.operationId == 'save'
+        pathItem.post.requestBody
+        pathItem.post.requestBody.required
+        pathItem.post.requestBody.content
+        pathItem.post.requestBody.content.size() == 1
+
+    }
+
+
     void "test build OpenAPI doc when no Body tag specified in POST"() {
 
         given:"An API definition"
