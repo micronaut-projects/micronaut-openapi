@@ -141,6 +141,7 @@ public class OpenApiControllerVisitor extends AbstractOpenApiVisitor implements 
                 }
             }).orElse(new io.swagger.v3.oas.models.Operation());
 
+            readRequestBody(element, context, openAPI, swaggerOperation);
 
             readTags(element, swaggerOperation);
 
@@ -470,6 +471,37 @@ public class OpenApiControllerVisitor extends AbstractOpenApiVisitor implements 
                 }
             }
         });
+    }
+
+    private void readRequestBody(MethodElement element, VisitorContext context, OpenAPI openAPI, io.swagger.v3.oas.models.Operation swaggerOperation) {
+        AnnotationValue<io.swagger.v3.oas.annotations.parameters.RequestBody> requestBodyAnnotation
+                = element.findAnnotation(io.swagger.v3.oas.annotations.parameters.RequestBody.class).orElse(null);
+        if (requestBodyAnnotation == null) {
+            return;
+        }
+        RequestBody requestBody;
+        try {
+            JsonNode jsonNode = toJson(requestBodyAnnotation.getValues(), context);
+            requestBody = treeToValue(jsonNode, RequestBody.class);
+        } catch (Exception e) {
+            context.warn("Error reading RequestBody for element [" + element + "]: " + e.getMessage(), element);
+            return;
+        }
+        Content content = new Content();
+        for (AnnotationValue<io.swagger.v3.oas.annotations.media.Content> contentAnnotation : requestBodyAnnotation.getAnnotations("content", io.swagger.v3.oas.annotations.media.Content.class)) {
+            String mediaType = contentAnnotation.get("mediaType", String.class).orElse(MediaType.APPLICATION_JSON);
+            AnnotationValue<io.swagger.v3.oas.annotations.media.Schema> schemaAnnotation = contentAnnotation.getAnnotation("schema", io.swagger.v3.oas.annotations.media.Schema.class).get();
+            io.swagger.v3.oas.models.media.MediaType mt = new io.swagger.v3.oas.models.media.MediaType();
+            try {
+                Schema schema = readSchema(schemaAnnotation, openAPI, context, mediaType, null);
+                mt.schema(schema);
+            } catch (Exception e) {
+                context.warn("Error reading Swagger Parameter for element [" + contentAnnotation + "]: " + e.getMessage(), element);
+            }
+            content.addMediaType(mediaType, mt);
+        }
+        requestBody.setContent(content);
+        swaggerOperation.setRequestBody(requestBody);
     }
 
     private boolean isIgnoredParameterType(ClassElement parameterType) {
