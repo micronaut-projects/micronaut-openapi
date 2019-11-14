@@ -331,13 +331,14 @@ class MyBean {}
         catSchema instanceof ComposedSchema
         dogSchema instanceof ComposedSchema
         catSchema.type == 'object'
-        catSchema.properties.size() == 1
-        catSchema.properties['clawSize'].type == 'integer'
+        catSchema.properties == null
+        //catSchema.properties['clawSize'].type == 'integer'
         petSchema.type == 'object'
         petSchema.properties.size() == 2
 
-        ((ComposedSchema)catSchema).allOf.size() == 1
+        ((ComposedSchema)catSchema).allOf.size() == 2
         ((ComposedSchema)catSchema).allOf[0].$ref == '#/components/schemas/Pet'
+        ((ComposedSchema)catSchema).allOf[1].properties['clawSize'].type == 'integer'
     }
 
 
@@ -455,16 +456,18 @@ class MyBean {}
         catSchema instanceof ComposedSchema
         dogSchema instanceof ComposedSchema
         catSchema.type == 'object'
-        catSchema.properties.size() == 1
-        catSchema.properties['clawSize'].type == 'integer'
+        catSchema.properties == null
         petSchema.description == 'Pet Desc'
         petSchema.type == 'object'
         petSchema.properties.size() == 2
 
-        ((ComposedSchema)catSchema).allOf.size() == 1
+        ((ComposedSchema)catSchema).allOf.size() == 2
         ((ComposedSchema)catSchema).allOf[0].$ref == '#/components/schemas/Pet'
-        ((ComposedSchema)dogSchema).allOf.size() == 1
+        ((ComposedSchema)catSchema).allOf[1].properties.size() == 1
+        ((ComposedSchema)catSchema).allOf[1].properties['clawSize'].type == 'integer'
+        ((ComposedSchema)dogSchema).allOf.size() == 2
         ((ComposedSchema)dogSchema).allOf[0].$ref == '#/components/schemas/Pet'
+        ((ComposedSchema)dogSchema).allOf[1].properties.size() == 1
     }
 
 
