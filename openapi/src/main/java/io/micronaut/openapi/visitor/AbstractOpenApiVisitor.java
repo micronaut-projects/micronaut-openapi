@@ -699,6 +699,23 @@ abstract class AbstractOpenApiVisitor  {
         }
     }
 
+    private void checkAllOf(ComposedSchema composedSchema) {
+        if (composedSchema != null && composedSchema.getAllOf() != null && !composedSchema.getAllOf().isEmpty()) {
+            if (composedSchema.getProperties() != null && !composedSchema.getProperties().isEmpty()) {
+                // put all properties as siblings of allOf
+                ObjectSchema propSchema = new ObjectSchema();
+                propSchema.properties(composedSchema.getProperties());
+                propSchema.setDescription(composedSchema.getDescription());
+                propSchema.setRequired(composedSchema.getRequired());
+                composedSchema.setProperties(null);
+                composedSchema.setDescription(null);
+                composedSchema.setRequired(null);
+                composedSchema.setType(null);
+                composedSchema.addAllOfItem(propSchema);
+            }
+        }
+    }
+
     private Schema getSchemaDefinition(
             @Nullable String mediaType,
             OpenAPI openAPI,
@@ -729,27 +746,34 @@ abstract class AbstractOpenApiVisitor  {
                     schema = jsonMapper.treeToValue(schemaJson, Schema.class);
 
                     if (schema != null) {
+                        ComposedSchema composedSchema = null;
                         if (schema instanceof ComposedSchema) {
+                            composedSchema = (ComposedSchema) schema;
                             final Optional<String[]> allOf = schemaValue.get("allOf", String[].class);
                             if (allOf.isPresent() && allOf.get().length > 0) {
                                 final String[] names = allOf.get();
                                 List<Schema> schemaList = namesToSchemas(mediaType, openAPI, context, names);
-
-                                ((ComposedSchema) schema).allOf(schemaList);
+                                for (Schema s: schemaList) {
+                                    composedSchema.addAllOfItem(s);
+                                }
                             }
 
                             final Optional<String[]> anyOf = schemaValue.get("anyOf", String[].class);
                             if (anyOf.isPresent() && anyOf.get().length > 0) {
                                 final String[] names = anyOf.get();
                                 List<Schema> schemaList = namesToSchemas(mediaType, openAPI, context, names);
-                                ((ComposedSchema) schema).anyOf(schemaList);
+                                for (Schema s: schemaList) {
+                                    composedSchema.addAnyOfItem(s);
+                                }
                             }
 
                             final Optional<String[]> oneof = schemaValue.get("oneOf", String[].class);
                             if (oneof.isPresent() && oneof.get().length > 0) {
                                 final String[] names = oneof.get();
                                 List<Schema> schemaList = namesToSchemas(mediaType, openAPI, context, names);
-                                ((ComposedSchema) schema).oneOf(schemaList);
+                                for (Schema s: schemaList) {
+                                    composedSchema.addOneOfItem(s);
+                                }
                             }
 
                             schema.setType("object");
@@ -757,8 +781,9 @@ abstract class AbstractOpenApiVisitor  {
                         if (type instanceof EnumElement) {
                             schema.setType("string");
                             schema.setEnum(((EnumElement) type).values());
-                        } else if (schema instanceof ObjectSchema || schema instanceof ComposedSchema) {
+                        } else if (schema instanceof ObjectSchema || composedSchema != null) {
                             populateSchemaProperties(mediaType, openAPI, context, type, schema);
+                            checkAllOf(composedSchema);
                         }
                         schema.setName(schemaName);
                         schemas.put(schemaName, schema);
@@ -804,7 +829,7 @@ abstract class AbstractOpenApiVisitor  {
 
                                     final Schema parentSchema = getSchemaDefinition(mediaType, openAPI, context, superElement, null);
                                     if (parentSchema != null) {
-                                        ((ComposedSchema) schema).allOf(Collections.singletonList(parentSchema));
+                                        ((ComposedSchema) schema).addAllOfItem(parentSchema);
                                     }
                                     superType = superElement.getSuperType();
                                 }
@@ -817,6 +842,9 @@ abstract class AbstractOpenApiVisitor  {
                         schemas.put(schemaName, schema);
 
                         populateSchemaProperties(mediaType, openAPI, context, type, schema);
+                        if (schema instanceof ComposedSchema) {
+                            checkAllOf((ComposedSchema) schema);
+                        }
                     }
                 }
             }
