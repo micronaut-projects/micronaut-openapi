@@ -534,14 +534,15 @@ class MyBean {}
         !(petSchema instanceof ComposedSchema)
         catSchema instanceof ComposedSchema
         dogSchema instanceof ComposedSchema
-        catSchema.type == 'object'
-        catSchema.properties.size() == 1
-        catSchema.properties['clawSize'].type == 'integer'
+        catSchema.type == null
+        catSchema.properties == null
         petSchema.type == 'object'
         petSchema.properties.size() == 2
 
-        ((ComposedSchema)catSchema).allOf.size() == 1
+        ((ComposedSchema)catSchema).allOf.size() == 2
         ((ComposedSchema)catSchema).allOf[0].$ref == '#/components/schemas/Pet'
+        ((ComposedSchema)catSchema).allOf[1].type == 'object'
+        ((ComposedSchema)catSchema).allOf[1].properties['clawSize'].type == 'integer'
     }
 
 
@@ -658,17 +659,20 @@ class MyBean {}
         !(petSchema instanceof ComposedSchema)
         catSchema instanceof ComposedSchema
         dogSchema instanceof ComposedSchema
-        catSchema.type == 'object'
-        catSchema.properties.size() == 1
-        catSchema.properties['clawSize'].type == 'integer'
+        catSchema.type == null
+        catSchema.properties == null
         petSchema.description == 'Pet Desc'
         petSchema.type == 'object'
         petSchema.properties.size() == 2
 
-        ((ComposedSchema)catSchema).allOf.size() == 1
+        ((ComposedSchema)catSchema).allOf.size() == 2
         ((ComposedSchema)catSchema).allOf[0].$ref == '#/components/schemas/Pet'
-        ((ComposedSchema)dogSchema).allOf.size() == 1
+        ((ComposedSchema)catSchema).allOf[1].type == 'object'
+        ((ComposedSchema)catSchema).allOf[1].properties.size() == 1
+        ((ComposedSchema)catSchema).allOf[1].properties['clawSize'].type == 'integer'
+        ((ComposedSchema)dogSchema).allOf.size() == 2
         ((ComposedSchema)dogSchema).allOf[0].$ref == '#/components/schemas/Pet'
+        ((ComposedSchema)dogSchema).allOf[1].properties.size() == 1
     }
 
     void "test build OpenAPI doc for POJO with Inheritance and response discriminator mapping"() {
