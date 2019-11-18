@@ -27,6 +27,7 @@ import io.micronaut.core.bind.annotation.Bindable;
 import io.micronaut.core.naming.NameUtils;
 import io.micronaut.core.reflect.ClassUtils;
 import io.micronaut.core.reflect.ReflectionUtils;
+import io.micronaut.core.type.Argument;
 import io.micronaut.core.util.ArrayUtils;
 import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.core.util.StringUtils;
@@ -49,6 +50,7 @@ import io.swagger.v3.oas.annotations.headers.Header;
 import io.swagger.v3.oas.annotations.links.Link;
 import io.swagger.v3.oas.annotations.links.LinkParameter;
 import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.DiscriminatorMapping;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.OAuthScope;
@@ -264,6 +266,16 @@ abstract class AbstractOpenApiVisitor  {
                                     });
                                 }
                                 newValues.put(key, variables);
+                            } else if (DiscriminatorMapping.class.getName().equals(annotationName)) {
+                                final Map<String, String> mappings = new HashMap<>();
+                                for (Object o : a) {
+                                    final AnnotationValue<DiscriminatorMapping> dv = (AnnotationValue<DiscriminatorMapping>) o;
+                                    final Map<CharSequence, Object> valueMap = resolveAnnotationValues(context, dv);
+                                    mappings.put(valueMap.get("value").toString(), valueMap.get("$ref").toString());
+                                }
+                                final Map<String, Object> discriminatorMap = getDiscriminatorMap(newValues);
+                                discriminatorMap.put("mapping", mappings);
+                                newValues.put("discriminator", discriminatorMap);
                             } else {
                                 if (a.length == 1) {
                                     final AnnotationValue<?> av = (AnnotationValue<?>) a[0];
@@ -288,12 +300,20 @@ abstract class AbstractOpenApiVisitor  {
                             newValues.put(key, value);
                         }
                     }
+                } else if (key.equals("discriminatorProperty")) {
+                    final Map<String, Object> discriminatorMap = getDiscriminatorMap(newValues);
+                    discriminatorMap.put("propertyName", parseJsonString(value).orElse(value));
+                    newValues.put("discriminator", discriminatorMap);
                 } else {
                     newValues.put(key, parseJsonString(value).orElse(value));
                 }
             }
         }
         return newValues;
+    }
+
+    private Map<String, Object> getDiscriminatorMap(Map<CharSequence, Object> newValues) {
+        return newValues.containsKey("discriminator") ? (Map<String, Object>) newValues.get("discriminator") : new HashMap<>();
     }
 
     // Copy of io.swagger.v3.core.util.AnnotationsUtils.getExtensions
@@ -688,14 +708,45 @@ abstract class AbstractOpenApiVisitor  {
 
     private void bindSchemaIfNeccessary(VisitorContext context, AnnotationValue<?> av, Map<CharSequence, Object> valueMap) {
         final Optional<String> impl = av.get("implementation", String.class);
+        final Optional<String> schema = av.get("schema", String.class);
+        final Optional<String[]> anyOf = av.get("anyOf", Argument.of(String[].class));
+        final Optional<String[]> oneOf = av.get("oneOf", Argument.of(String[].class));
+        final Optional<String[]> allOf = av.get("allOf", Argument.of(String[].class));
         if (io.swagger.v3.oas.annotations.media.Schema.class.getName().equals(av.getAnnotationName()) && impl.isPresent()) {
             final String className = impl.get();
+            bindSchemaForClassName(context, valueMap, className);
+        }
+        if (io.swagger.v3.oas.annotations.media.DiscriminatorMapping.class.getName().equals(av.getAnnotationName()) && schema.isPresent()) {
+            final String className = schema.get();
+            bindSchemaForClassName(context, valueMap, className);
+        }
+        if (io.swagger.v3.oas.annotations.media.Schema.class.getName().equals(av.getAnnotationName()) && (anyOf.isPresent() || oneOf.isPresent() || allOf.isPresent())) {
+            anyOf.ifPresent(anyOfList -> bindSchemaForComposite(context, valueMap, anyOfList, "anyOf"));
+            oneOf.ifPresent(oneOfList -> bindSchemaForComposite(context, valueMap, oneOfList, "oneOf"));
+            allOf.ifPresent(allOfList -> bindSchemaForComposite(context, valueMap, allOfList, "allOf"));
+        }
+    }
+
+    private void bindSchemaForComposite(VisitorContext context, Map<CharSequence, Object> valueMap, String[] classNames, String key) {
+        final List<Map<CharSequence, Object>> namesToSchemas = Arrays.stream(classNames).map(className -> {
             final Optional<ClassElement> classElement = context.getClassElement(className);
             final OpenAPI openAPI = resolveOpenAPI(context);
+            Map<CharSequence, Object> schemaMap = new HashMap<>();
             if (classElement.isPresent()) {
                 final Schema schema = resolveSchema(openAPI, null, classElement.get(), context, null);
-                schemaToValueMap(valueMap, schema);
+                schemaToValueMap(schemaMap, schema);
             }
+            return schemaMap;
+        }).collect(Collectors.toList());
+        valueMap.put(key, namesToSchemas);
+    }
+
+    private void bindSchemaForClassName(VisitorContext context, Map<CharSequence, Object> valueMap, String className) {
+        final Optional<ClassElement> classElement = context.getClassElement(className.toString());
+        final OpenAPI openAPI = resolveOpenAPI(context);
+        if (classElement.isPresent()) {
+            final Schema schema = resolveSchema(openAPI, null, classElement.get(), context, null);
+            schemaToValueMap(valueMap, schema);
         }
     }
 
