@@ -910,20 +910,22 @@ class MyBean {}
         catSchema instanceof ComposedSchema
         dogSchema instanceof ComposedSchema
 
-        catSchema.type == 'object'
-        catSchema.properties.size() == 1
-        catSchema.properties['breed'] instanceof Schema
-
-        ((Schema) catSchema.properties['breed']).get$ref() == "#/components/schemas/CatBreed"
-
         petSchema.type == 'object'
         petSchema.properties.size() == 3
 
-        ((ComposedSchema) dogSchema).allOf.size() == 1
-        ((ComposedSchema) dogSchema).allOf[0].$ref == '#/components/schemas/Pet'
+        ((ComposedSchema) catSchema).allOf.size() == 2
+        ((ComposedSchema) catSchema).allOf[0].get$ref() == "#/components/schemas/Pet"
+        ((ComposedSchema) catSchema).allOf[1].properties.size() == 1
+        ((ComposedSchema) catSchema).allOf[1].type == "object"
+        ((ComposedSchema) catSchema).allOf[1].properties.get("breed") instanceof Schema
+        ((ComposedSchema) catSchema).allOf[1].properties.get("breed").get$ref() == "#/components/schemas/CatBreed"
 
-        ((ComposedSchema) catSchema).allOf.size() == 1
-        ((ComposedSchema) catSchema).allOf[0].$ref == '#/components/schemas/Pet'
+        ((ComposedSchema) dogSchema).allOf.size() == 2
+        ((ComposedSchema) dogSchema).allOf[0].$ref == '#/components/schemas/Pet'
+        ((ComposedSchema) dogSchema).allOf[1].properties.size() == 1
+        ((ComposedSchema) dogSchema).allOf[1].type == "object"
+        ((ComposedSchema) dogSchema).allOf[1].properties.get("breed") instanceof Schema
+        ((ComposedSchema) dogSchema).allOf[1].properties.get("breed").get$ref() == "#/components/schemas/DogBreed"
 
         when:
         Operation operation = openAPI.paths.get("/pets").post
