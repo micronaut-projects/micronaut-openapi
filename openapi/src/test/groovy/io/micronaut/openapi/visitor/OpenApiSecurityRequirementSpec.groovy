@@ -25,6 +25,99 @@ class OpenApiSecurityRequirementSpec extends AbstractTypeElementSpec {
         System.setProperty(AbstractOpenApiVisitor.ATTR_TEST_MODE, "true")
     }
 
+    void "test parse the OpenAPI global @SecurityRequirement"() {
+        given:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.runtime.Micronaut;
+import io.micronaut.http.HttpResponse;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeIn;
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
+import io.swagger.v3.oas.annotations.info.Info;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.security.SecurityScheme;
+
+@Controller("/pets")
+class PetController {
+
+    @ApiResponse(
+            responseCode = "200",
+            description = "Returns a Pet information",
+            content = @Content(schema = @Schema(implementation = Pet.class)))
+    @Get("/{name}")
+    public HttpResponse<Pet> get(String name) {
+        return null;
+    }
+    
+}
+
+@OpenAPIDefinition(
+        info = @Info(
+                title = "openapi-demo",
+                version = "0.1"
+        )
+)
+@SecurityScheme(name = "X-API-Key",
+        type = SecuritySchemeType.APIKEY,
+        in = SecuritySchemeIn.HEADER
+)
+@SecurityRequirement(name = "X-API-Key")
+class Application {
+}
+
+class Pet {
+    private String name;
+    private int age;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+}
+
+@javax.inject.Singleton
+class MyBean {}
+''')
+
+        when:
+        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+
+        then:
+        openAPI.getSecurity().size() == 1
+        openAPI.getSecurity().get(0).containsKey("X-API-Key")
+        openAPI.getSecurity().get(0).get("X-API-Key") == []
+
+        when:
+        Operation operation = openAPI.getPaths().get("/pets/{name}").get
+
+        then:
+        operation
+        operation.responses.size() == 1
+        operation.responses.'200'.content.size() == 1
+        operation.responses.'200'.content['application/json'].schema
+        operation.responses.'200'.content['application/json'].schema.$ref == "#/components/schemas/Pet"
+
+    }
+
     void "test parse the OpenAPI @Operation annotation with @SecurityScheme for APIKEY"() {
         given:
         buildBeanDefinition('test.MyBean', '''
@@ -72,7 +165,8 @@ class MyBean {}
         expect:
         operation
         operation.security.size() == 1
-        operation.security[0]['myOauth2Security'] == ['write: read']
+        operation.security.get(0).containsKey('myOauth2Security')
+        operation.security.get(0).get('myOauth2Security') == ['write: read']
         openAPI.components.securitySchemes.size() == 1
         openAPI.components.securitySchemes['myOauth2Security'].type == SecurityScheme.Type.APIKEY
         openAPI.components.securitySchemes['myOauth2Security'].in == SecurityScheme.In.HEADER
@@ -136,7 +230,8 @@ class MyBean {}
         expect:
         operation
         operation.security.size() == 1
-        operation.security[0]['myOauth2Security'] == ['write: read']
+        operation.security.get(0).containsKey('myOauth2Security')
+        operation.security.get(0).get('myOauth2Security') == ['write: read']
         openAPI.components.securitySchemes.size() == 1
         openAPI.components.securitySchemes['myOauth2Security'].type == SecurityScheme.Type.OAUTH2
         openAPI.components.securitySchemes['myOauth2Security'].flows

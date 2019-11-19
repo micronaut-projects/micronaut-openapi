@@ -174,10 +174,14 @@ class MyBean {}
         openAPI.info.contact.name == 'Fred'
         openAPI.tags.size() == 3
         openAPI.tags.first().name == 'Tag 1'
+        openAPI.tags.first().name == 'Tag 1'
         openAPI.tags.first().description == 'desc 1'
         openAPI.externalDocs.description == 'definition docs desc'
-            openAPI.security[0] == ["req 1":["a", "b"]]
-            openAPI.security[1] == ["req 2":["b", "c"]]
+        openAPI.security.size() == 2
+        openAPI.security.get(0).containsKey('req 1')
+        openAPI.security.get(0).get('req 1') == ["a", "b"]
+        openAPI.security.get(1).containsKey('req 2')
+        openAPI.security.get(1).get('req 2') == ["b", "c"]
         openAPI.servers.size() == 1
         openAPI.servers[0].description == 'server 1'
         openAPI.servers[0].url == 'http://foo'

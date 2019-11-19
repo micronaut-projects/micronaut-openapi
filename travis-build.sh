@@ -62,7 +62,7 @@ if [[ $EXIT_STATUS -eq 0 ]]; then
         cd gh-pages
 
         # If this is the master branch then update the snapshot
-        if [[ $TRAVIS_BRANCH =~ ^master|[123]\..\.x$ ]]; then
+        if [[ $TRAVIS_BRANCH =~ ^master$ ]]; then
            mkdir -p snapshot
            cp -r ../build/docs/. ./snapshot/
            git add snapshot/*

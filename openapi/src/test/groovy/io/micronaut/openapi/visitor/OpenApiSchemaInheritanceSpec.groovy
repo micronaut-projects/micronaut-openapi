@@ -18,6 +18,8 @@ package io.micronaut.openapi.visitor
 import io.micronaut.annotation.processing.test.AbstractTypeElementSpec
 import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.Operation
+import io.swagger.v3.oas.models.media.ComposedSchema
+import io.swagger.v3.oas.models.media.Schema
 import io.swagger.v3.oas.models.parameters.RequestBody
 
 class OpenApiSchemaInheritanceSpec extends AbstractTypeElementSpec {
@@ -103,24 +105,34 @@ class MyBean {}
 
         OpenAPI openAPI = AbstractOpenApiVisitor.testReference
         Operation operation = openAPI.paths?.get("/")?.put
-        def requestBody = operation.requestBody
-        def schema = requestBody.content['application/json'].schema
+        RequestBody requestBody = operation.requestBody
         requestBody.required
-        schema.oneOf[0].$ref == '#/components/schemas/A'
-        schema.oneOf[1].$ref == '#/components/schemas/B'
-        schema.type == 'object'
-        schema.discriminator.propertyName == 'type'
-        schema.discriminator.mapping['A'] == '#/components/schemas/A'
-        schema.discriminator.mapping['B'] == '#/components/schemas/B'
+        Schema schema = requestBody.content['application/json'].schema
+        schema instanceof ComposedSchema
+        ((ComposedSchema) schema).oneOf[0].$ref == '#/components/schemas/A'
+        ((ComposedSchema) schema).oneOf[1].$ref == '#/components/schemas/B'
+        ((ComposedSchema) schema).type == 'object'
+        ((ComposedSchema) schema).discriminator.propertyName == 'type'
+        ((ComposedSchema) schema).discriminator.mapping['A'] == '#/components/schemas/A'
+        ((ComposedSchema) schema).discriminator.mapping['B'] == '#/components/schemas/B'
 
         expect:
         operation
         operation.responses.size() == 1
-        openAPI.components.schemas['A'].properties['age1'].type == 'integer'
-        openAPI.components.schemas['A'].allOf[0].$ref == '#/components/schemas/Base'
-        openAPI.components.schemas['B'].properties['age2'].type == 'integer'
-        openAPI.components.schemas['B'].allOf[0].$ref == '#/components/schemas/Base'
+
         openAPI.components.schemas['Base'].properties['money'].type == 'integer'
+
+        openAPI.components.schemas['A'] instanceof ComposedSchema
+        ((ComposedSchema) openAPI.components.schemas['A']).allOf.size() == 2
+        ((ComposedSchema) openAPI.components.schemas['A']).allOf[0].get$ref() == "#/components/schemas/Base"
+        ((ComposedSchema) openAPI.components.schemas['A']).allOf[1].properties.size() == 1
+        ((ComposedSchema) openAPI.components.schemas['A']).allOf[1].properties['age1'].type == "integer"
+
+        openAPI.components.schemas['B'] instanceof ComposedSchema
+        ((ComposedSchema) openAPI.components.schemas['B']).allOf.size() == 2
+        ((ComposedSchema) openAPI.components.schemas['B']).allOf[0].get$ref() == "#/components/schemas/Base"
+        ((ComposedSchema) openAPI.components.schemas['B']).allOf[1].properties.size() == 1
+        ((ComposedSchema) openAPI.components.schemas['B']).allOf[1].properties["age2"].type == "integer"
     }
 
 }
