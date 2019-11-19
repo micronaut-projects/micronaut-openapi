@@ -20,7 +20,6 @@ plugins {
 }
 
 repositories {
-    mavenLocal()
     mavenCentral()
     maven { url "https://repo.grails.org/grails/core" }
 }
@@ -45,7 +44,6 @@ subprojects { Project subproject ->
     }
 
     repositories {
-        mavenLocal()
         maven { url "https://repo.grails.org/grails/core" }
         maven { url "http://oss.sonatype.org/content/repositories/snapshots/" }
     }
