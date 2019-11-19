@@ -27,12 +27,20 @@ import io.micronaut.core.bind.annotation.Bindable;
 import io.micronaut.core.naming.NameUtils;
 import io.micronaut.core.reflect.ClassUtils;
 import io.micronaut.core.reflect.ReflectionUtils;
+import io.micronaut.core.type.Argument;
 import io.micronaut.core.util.ArrayUtils;
 import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.core.util.StringUtils;
 import io.micronaut.http.MediaType;
 import io.micronaut.http.uri.UriMatchTemplate;
-import io.micronaut.inject.ast.*;
+import io.micronaut.inject.ast.ClassElement;
+import io.micronaut.inject.ast.Element;
+import io.micronaut.inject.ast.ElementModifier;
+import io.micronaut.inject.ast.EnumElement;
+import io.micronaut.inject.ast.FieldElement;
+import io.micronaut.inject.ast.MemberElement;
+import io.micronaut.inject.ast.PropertyElement;
+import io.micronaut.inject.ast.TypedElement;
 import io.micronaut.inject.visitor.VisitorContext;
 import io.micronaut.openapi.javadoc.JavadocDescription;
 import io.micronaut.openapi.javadoc.JavadocParser;
@@ -49,8 +57,8 @@ import io.swagger.v3.oas.annotations.headers.Header;
 import io.swagger.v3.oas.annotations.links.Link;
 import io.swagger.v3.oas.annotations.links.LinkParameter;
 import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.DiscriminatorMapping;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.OAuthScope;
 import io.swagger.v3.oas.annotations.servers.ServerVariable;
@@ -58,16 +66,44 @@ import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.PathItem;
 import io.swagger.v3.oas.models.Paths;
-import io.swagger.v3.oas.models.media.*;
+import io.swagger.v3.oas.models.media.ArraySchema;
+import io.swagger.v3.oas.models.media.ComposedSchema;
+import io.swagger.v3.oas.models.media.MapSchema;
+import io.swagger.v3.oas.models.media.ObjectSchema;
+import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.reactivestreams.Publisher;
 
 import javax.annotation.Nullable;
-import javax.validation.constraints.*;
+import javax.validation.constraints.DecimalMax;
+import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.Negative;
+import javax.validation.constraints.NegativeOrZero;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
+import javax.validation.constraints.Size;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.Future;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -265,6 +301,16 @@ abstract class AbstractOpenApiVisitor  {
                                     });
                                 }
                                 newValues.put(key, variables);
+                            } else if (DiscriminatorMapping.class.getName().equals(annotationName)) {
+                                final Map<String, String> mappings = new HashMap<>();
+                                for (Object o : a) {
+                                    final AnnotationValue<DiscriminatorMapping> dv = (AnnotationValue<DiscriminatorMapping>) o;
+                                    final Map<CharSequence, Object> valueMap = resolveAnnotationValues(context, dv);
+                                    mappings.put(valueMap.get("value").toString(), valueMap.get("$ref").toString());
+                                }
+                                final Map<String, Object> discriminatorMap = getDiscriminatorMap(newValues);
+                                discriminatorMap.put("mapping", mappings);
+                                newValues.put("discriminator", discriminatorMap);
                             } else {
                                 if (a.length == 1) {
                                     final AnnotationValue<?> av = (AnnotationValue<?>) a[0];
@@ -289,12 +335,20 @@ abstract class AbstractOpenApiVisitor  {
                             newValues.put(key, value);
                         }
                     }
+                } else if (key.equals("discriminatorProperty")) {
+                    final Map<String, Object> discriminatorMap = getDiscriminatorMap(newValues);
+                    discriminatorMap.put("propertyName", parseJsonString(value).orElse(value));
+                    newValues.put("discriminator", discriminatorMap);
                 } else {
                     newValues.put(key, parseJsonString(value).orElse(value));
                 }
             }
         }
         return newValues;
+    }
+
+    private Map<String, Object> getDiscriminatorMap(Map<CharSequence, Object> newValues) {
+        return newValues.containsKey("discriminator") ? (Map<String, Object>) newValues.get("discriminator") : new HashMap<>();
     }
 
     // Copy of io.swagger.v3.core.util.AnnotationsUtils.getExtensions
@@ -518,7 +572,10 @@ abstract class AbstractOpenApiVisitor  {
 
             parentSchema.addProperties(propertyName, propertySchema);
 
-            if (!element.isAnnotationPresent(Nullable.class)) {
+            if (element.isAnnotationPresent(NotNull.class)
+                    || element.isAnnotationPresent(NotBlank.class)
+                    || element.isAnnotationPresent(NotEmpty.class)) {
+
                 List<String> requiredList = parentSchema.getRequired();
                 // Check for duplicates
                 if (requiredList == null || !requiredList.contains(propertyName)) {
@@ -658,6 +715,9 @@ abstract class AbstractOpenApiVisitor  {
         for (Object o : a) {
             AnnotationValue<?> sv = (AnnotationValue<?>) o;
             String name = sv.get(classifier, String.class).orElse(null);
+            if (name == null && classifier.equals("mediaType")) {
+                name = MediaType.APPLICATION_JSON;
+            }
             if (name != null) {
                 Map<CharSequence, Object> map = toValueMap(sv.getValues(), context);
                 mediaTypes.put(name, map);
@@ -683,13 +743,61 @@ abstract class AbstractOpenApiVisitor  {
 
     private void bindSchemaIfNeccessary(VisitorContext context, AnnotationValue<?> av, Map<CharSequence, Object> valueMap) {
         final Optional<String> impl = av.get("implementation", String.class);
+        final Optional<String> schema = av.get("schema", String.class);
+        final Optional<String[]> anyOf = av.get("anyOf", Argument.of(String[].class));
+        final Optional<String[]> oneOf = av.get("oneOf", Argument.of(String[].class));
+        final Optional<String[]> allOf = av.get("allOf", Argument.of(String[].class));
         if (io.swagger.v3.oas.annotations.media.Schema.class.getName().equals(av.getAnnotationName()) && impl.isPresent()) {
             final String className = impl.get();
+            bindSchemaForClassName(context, valueMap, className);
+        }
+        if (io.swagger.v3.oas.annotations.media.DiscriminatorMapping.class.getName().equals(av.getAnnotationName()) && schema.isPresent()) {
+            final String className = schema.get();
+            bindSchemaForClassName(context, valueMap, className);
+        }
+        if (io.swagger.v3.oas.annotations.media.Schema.class.getName().equals(av.getAnnotationName()) && (anyOf.isPresent() || oneOf.isPresent() || allOf.isPresent())) {
+            anyOf.ifPresent(anyOfList -> bindSchemaForComposite(context, valueMap, anyOfList, "anyOf"));
+            oneOf.ifPresent(oneOfList -> bindSchemaForComposite(context, valueMap, oneOfList, "oneOf"));
+            allOf.ifPresent(allOfList -> bindSchemaForComposite(context, valueMap, allOfList, "allOf"));
+        }
+    }
+
+    private void bindSchemaForComposite(VisitorContext context, Map<CharSequence, Object> valueMap, String[] classNames, String key) {
+        final List<Map<CharSequence, Object>> namesToSchemas = Arrays.stream(classNames).map(className -> {
             final Optional<ClassElement> classElement = context.getClassElement(className);
             final OpenAPI openAPI = resolveOpenAPI(context);
+            Map<CharSequence, Object> schemaMap = new HashMap<>();
             if (classElement.isPresent()) {
                 final Schema schema = resolveSchema(openAPI, null, classElement.get(), context, null);
-                schemaToValueMap(valueMap, schema);
+                schemaToValueMap(schemaMap, schema);
+            }
+            return schemaMap;
+        }).collect(Collectors.toList());
+        valueMap.put(key, namesToSchemas);
+    }
+
+    private void bindSchemaForClassName(VisitorContext context, Map<CharSequence, Object> valueMap, String className) {
+        final Optional<ClassElement> classElement = context.getClassElement(className.toString());
+        final OpenAPI openAPI = resolveOpenAPI(context);
+        if (classElement.isPresent()) {
+            final Schema schema = resolveSchema(openAPI, null, classElement.get(), context, null);
+            schemaToValueMap(valueMap, schema);
+        }
+    }
+
+    private void checkAllOf(ComposedSchema composedSchema) {
+        if (composedSchema != null && composedSchema.getAllOf() != null && !composedSchema.getAllOf().isEmpty()) {
+            if (composedSchema.getProperties() != null && !composedSchema.getProperties().isEmpty()) {
+                // put all properties as siblings of allOf
+                ObjectSchema propSchema = new ObjectSchema();
+                propSchema.properties(composedSchema.getProperties());
+                propSchema.setDescription(composedSchema.getDescription());
+                propSchema.setRequired(composedSchema.getRequired());
+                composedSchema.setProperties(null);
+                composedSchema.setDescription(null);
+                composedSchema.setRequired(null);
+                composedSchema.setType(null);
+                composedSchema.addAllOfItem(propSchema);
             }
         }
     }
@@ -762,9 +870,9 @@ abstract class AbstractOpenApiVisitor  {
                                     String parentSchemaName = computeDefaultSchemaName(definingElement, superElement);
                                     if (schemas.get(parentSchemaName) != null
                                             || getSchemaDefinition(mediaType, openAPI, context, superElement, null) != null) {
-                                        Schema parentSchemaRef = new Schema();
-                                        parentSchemaRef.set$ref(schemaRef(parentSchemaName));
-                                        ((ComposedSchema) schema).allOf(Collections.singletonList(parentSchemaRef));
+                                        Schema parentSchema = new Schema();
+                                        parentSchema.set$ref(schemaRef(parentSchemaName));
+                                        ((ComposedSchema) schema).addAllOfItem(parentSchema);
                                     }
                                     superType = superElement.getSuperType();
                                 }
@@ -777,6 +885,9 @@ abstract class AbstractOpenApiVisitor  {
                         schemas.put(schemaName, schema);
 
                         populateSchemaProperties(mediaType, openAPI, context, type, schema);
+                        if (schema instanceof ComposedSchema) {
+                            checkAllOf((ComposedSchema) schema);
+                        }
                     }
                 }
             }
@@ -791,11 +902,12 @@ abstract class AbstractOpenApiVisitor  {
 
     /**
      * Reads schema.
+     *
      * @param schemaValue annotation value
-     * @param openAPI The OpenApi
-     * @param context The VisitorContext
-     * @param mediaType The media type of schema
-     * @param type The element
+     * @param openAPI     The OpenApi
+     * @param context     The VisitorContext
+     * @param mediaType   The media type of schema
+     * @param type        The element
      * @return New schema instance
      * @throws JsonProcessingException when Json parsing fails
      */
@@ -809,27 +921,34 @@ abstract class AbstractOpenApiVisitor  {
         if (schema == null) {
             return null;
         }
+        ComposedSchema composedSchema = null;
         if (schema instanceof ComposedSchema) {
+            composedSchema = (ComposedSchema) schema;
             final Optional<String[]> allOf = schemaValue.get("allOf", String[].class);
             if (allOf.isPresent() && allOf.get().length > 0) {
                 final String[] names = allOf.get();
                 List<Schema> schemaList = namesToSchemas(mediaType, openAPI, context, names);
-
-                ((ComposedSchema) schema).allOf(schemaList);
+                for (Schema s: schemaList) {
+                    composedSchema.addAllOfItem(s);
+                }
             }
 
             final Optional<String[]> anyOf = schemaValue.get("anyOf", String[].class);
             if (anyOf.isPresent() && anyOf.get().length > 0) {
                 final String[] names = anyOf.get();
                 List<Schema> schemaList = namesToSchemas(mediaType, openAPI, context, names);
-                ((ComposedSchema) schema).anyOf(schemaList);
+                for (Schema s: schemaList) {
+                    composedSchema.addAnyOfItem(s);
+                }
             }
 
             final Optional<String[]> oneof = schemaValue.get("oneOf", String[].class);
             if (oneof.isPresent() && oneof.get().length > 0) {
                 final String[] names = oneof.get();
                 List<Schema> schemaList = namesToSchemas(mediaType, openAPI, context, names);
-                ((ComposedSchema) schema).oneOf(schemaList);
+                for (Schema s: schemaList) {
+                    composedSchema.addOneOfItem(s);
+                }
             }
 
             schema.setType("object");
@@ -837,26 +956,9 @@ abstract class AbstractOpenApiVisitor  {
         if (type instanceof EnumElement) {
             schema.setType("string");
             schema.setEnum(((EnumElement) type).values());
-        } else if (schema instanceof ObjectSchema || schema instanceof ComposedSchema) {
+        } else if (schema instanceof ObjectSchema || composedSchema != null) {
             populateSchemaProperties(mediaType, openAPI, context, type, schema);
-        }
-        String discriminatorProperty = schemaValue.get("discriminatorProperty", String.class, null);
-        if (StringUtils.isNotEmpty(discriminatorProperty)) {
-            Discriminator discriminator = new Discriminator();
-            discriminator.setPropertyName(discriminatorProperty);
-            Map<String, String> mapping = new LinkedHashMap<>();
-            for (AnnotationValue<DiscriminatorMapping> dm : schemaValue.getAnnotations("discriminatorMapping", DiscriminatorMapping.class)) {
-                context.getClassElement(dm.getRequiredValue("schema", String.class)).ifPresent(classElement -> {
-
-                    final Schema schemaDefinition = getSchemaDefinition(mediaType, openAPI, context, classElement, null);
-                    if (schemaDefinition != null) {
-                        String discriminatorValue = dm.getRequiredValue("value", String.class);
-                        mapping.put(discriminatorValue, schemaDefinition.get$ref());
-                    }
-                });
-            }
-            discriminator.setMapping(mapping);
-            schema.setDiscriminator(discriminator);
+            checkAllOf(composedSchema);
         }
         return schema;
     }
