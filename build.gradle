@@ -61,7 +61,7 @@ subprojects { Project subproject ->
 
     if (!subproject.name.startsWith('docs-')) {
 
-        apply from:"https://raw.githubusercontent.com/micronaut-projects/micronaut-build/02a1aab7ec29ae19e6c9464ee9ea9676ea697a21/publishing.gradle"
+        apply from:"https://raw.githubusercontent.com/micronaut-projects/micronaut-build/3ca806eb776b72483a4c0fda5ff1a5caebe0c281/publishing.gradle"
         apply plugin: "checkstyle"
 
         checkstyle {
