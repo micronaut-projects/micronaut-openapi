@@ -1,0 +1,292 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script src="/cdn-cgi/apps/head/3cOPSgo5Omz84ycX7CvigfX4cpw.js"></script><script async src="https://www.googletagmanager.com/gtag/js?id=UA-82213539-2"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'UA-82213539-2');
+    </script>
+    <title>5 Generating OpenAPI Views 1.3.0</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" href="../css/main.css" type="text/css" media="screen, print" title="Style" charset="utf-8"/>
+    <link rel="stylesheet" href="../css/pdf.css" type="text/css" media="print" title="PDF" charset="utf-8"/>
+    <script type="text/javascript">
+function addJsClass() {
+    var classes = document.body.className.split(" ");
+    classes.push("js");
+    document.body.className = classes.join(" ");
+}
+    </script>
+</head>
+
+<body class="body" onload="addJsClass();">
+<div id="navigation">
+    <div class="navTitle">
+        
+        OpenAPI/Swagger Support
+    </div>
+    <div class="navLinks">
+        <ul>
+            <li>
+                <div id="nav-summary" onmouseover="toggleNavSummary(false)" onmouseout="toggleNavSummary(true)">
+                    <a href="../guide/index.html" class="button">Table of contents</a>
+
+                    <div id="nav-summary-childs" style="display:none;">
+                        
+                        <div class="toc-item" style="margin-left:0"><a href="../guide/introduction.html"><strong>1</strong><span>Introduction</span></a>
+                        </div>
+                        
+                        <div class="toc-item" style="margin-left:0"><a href="../guide/cli.html"><strong>2</strong><span>Using the Micronaut CLI</span></a>
+                        </div>
+                        
+                        <div class="toc-item" style="margin-left:0"><a href="../guide/gettingStarted.html"><strong>3</strong><span>Getting Started with Swagger</span></a>
+                        </div>
+                        
+                        <div class="toc-item" style="margin-left:0"><a href="../guide/exposingSwaggerOutput.html"><strong>4</strong><span>Exposing Swagger Output</span></a>
+                        </div>
+                        
+                        <div class="toc-item" style="margin-left:0"><a href="../guide/openApiViews.html"><strong>5</strong><span>Generating OpenAPI Views</span></a>
+                        </div>
+                        
+                        <div class="toc-item" style="margin-left:0"><a href="../guide/controllersAndSwaggerAnnotations.html"><strong>6</strong><span>Controllers and Swagger Annotations</span></a>
+                        </div>
+                        
+                        <div class="toc-item" style="margin-left:0"><a href="../guide/schemasAndPojos.html"><strong>7</strong><span>Schemas and POJOs</span></a>
+                        </div>
+                        
+                        <div class="toc-item" style="margin-left:0"><a href="../guide/schemasAndMetaAnnotations.html"><strong>8</strong><span>Schemas and Meta Annotations</span></a>
+                        </div>
+                        
+                        <div class="toc-item" style="margin-left:0"><a href="../guide/schemasAndGenerics.html"><strong>9</strong><span>Schemas and Generics</span></a>
+                        </div>
+                        
+                        <div class="toc-item" style="margin-left:0"><a href="../guide/mergingSchemas.html"><strong>10</strong><span>Merging Schemas</span></a>
+                        </div>
+                        
+                    </div>
+                </div>
+            </li>
+            <li class="separator selected">
+                <a id="ref-button" onclick="localToggle(); return false;" href="#">Quick Reference</a>
+            </li>
+        </ul>
+    </div>
+
+
+</div>
+
+<table id="colset" border="0" cellpadding="0" cellspacing="0">
+    <tr>
+        <td id="col1">
+            <div id="main" class="corner-all">
+
+                
+                    <div class="toc-item prev-left"><a href="../guide/exposingSwaggerOutput.html">&lt;&lt; <strong>4</strong><span>Exposing Swagger Output</span></a></div>
+                
+
+                <span id='toggle-col1' class="toggle">(<a href="#" onclick="localToggle(); return false;">Quick Reference</a>)</span>
+
+                
+                    <div class="toc-item next-right"><a href="../guide/controllersAndSwaggerAnnotations.html"><strong>6</strong><span>Controllers and Swagger Annotations</span> >></a></div>
+                
+
+
+                <div class="project">
+                    <h1>5 Generating OpenAPI Views</h1>
+
+                    <p><strong>Version:</strong> 1.3.0</p>
+                </div>
+
+                
+
+                
+
+<h1 id="openApiViews">5 Generating OpenAPI Views</h1>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/openApiViews.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>Micronaut can generate views for your generated OpenApi specification. Currently <a href="https://github.com/swagger-api/swagger-ui">swagger-ui</a>, <a href="https://github.com/Rebilly/ReDoc">redoc</a> and <a href="https://github.com/mrin9/RapiDoc">rapidoc</a> are supported.</p>
+</div>
+<div class="paragraph">
+<p>The resources needed to render the views (javascript, css, &#8230;&#8203;) are loaded from CDNs: <a href="https://unpkg.com">unpkg.com</a> and <a href="https://fonts.googleapis.com/">fonts.googleapis.com</a>.</p>
+</div>
+<div class="paragraph">
+<p>By default the generation of views is disabled. To turn it on you have to set the following system property <code>micronaut.openapi.views.spec</code>.
+The string syntax is a series of comma-separated key-value pairs, to enable and configure the views.</p>
+</div>
+<div class="listingblock">
+<div class="title">System Property</div>
+<div class="content">
+<pre class="highlightjs highlight"><code>micronaut.openapi.views.spec=redoc.enabled=true,rapidoc.enabled=true,swagger-ui.enabled=true,swagger-ui.theme=flattop</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>For instance in gradle:</p>
+</div>
+<div class="listingblock">
+<div class="title">Gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">tasks.withType(JavaCompile) {
+    options.fork = true
+    options.forkOptions.jvmArgs &lt;&lt; '-Dmicronaut.openapi.views.spec=rapidoc.enabled=true,swagger-ui.enabled=true,swagger-ui.theme=flattop'
+
+    ...
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>or in maven:</p>
+</div>
+<div class="listingblock">
+<div class="title">Maven</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;build&gt;
+    &lt;plugins&gt;
+        &lt;plugin&gt;
+            &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;
+            &lt;artifactId&gt;maven-compiler-plugin&lt;/artifactId&gt;
+            &lt;configuration&gt;
+                &lt;fork&gt;true&lt;/fork&gt;
+                &lt;compilerArgs&gt;
+                    &lt;arg&gt;-Dmicronaut.openapi.views.spec=rapidoc.enabled=true,swagger-ui.enabled=true,swagger-ui.theme=flattop&lt;/arg&gt;
+                    ...
+                &lt;/compilerArgs&gt;
+            &lt;/configuration&gt;
+        &lt;/plugin&gt;
+    &lt;/plugins&gt;
+&lt;/build&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The views will be generated to the <code>META-INF/swagger/views/[swagger-ui | redoc | rapidoc]</code> directory of your project’s class output.</p>
+</div>
+<div class="paragraph">
+<p>The following properties are supported:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>mapping.path=[string]</code>: The path from where the swagger specification will be served by the http server. Default is <code>swagger</code>.</p>
+</li>
+<li>
+<p><code>redoc.enabled=[true | false]</code>: When 'true' the redoc view is generated.</p>
+</li>
+<li>
+<p><code>rapidoc.enabled=[true | false]</code>: When 'true' the rapidoc view is generated.</p>
+</li>
+<li>
+<p><code>swagger-ui.enabled=[true | false]</code>: When 'true' the swagger-ui view is generated.</p>
+</li>
+<li>
+<p><code>redoc.version=[string]</code>: The version of redoc to use. Default is to use the latest available.</p>
+</li>
+<li>
+<p><code>rapidoc.version=[string]</code>: The version of rapidoc to use. Default is to use the latest available.</p>
+</li>
+<li>
+<p><code>rapidoc.layout=[row | column]</code>: The layout of rapidoc to use. These are case insensitive. Default is <code>row</code>.</p>
+</li>
+<li>
+<p><code>rapidoc.theme=[dark | light]</code>: The theme of rapidoc to use. These are case insensitive. Default is <code>dark</code>.</p>
+</li>
+<li>
+<p><code>swagger-ui.version=[string]</code>: The version of swagger-ui to use. Default is to use the latest available.</p>
+</li>
+<li>
+<p><code>swagger-ui.layout=[string]</code>: The layout of swagger-ui to use. Defaults is <code>StandaloneLayout</code>.</p>
+</li>
+<li>
+<p><code>swagger-ui.theme=[DEFAULT | MATERIAL | FEELING_BLUE | FLATTOP | MONOKAI | MUTED | NEWSPAPER | OUTLINE]</code>: The theme of swagger-ui to use. These are case insensitive. Default is <code>DEFAULT</code>.</p>
+</li>
+<li>
+<p><code>swagger-ui.deep-linking=[true | false]</code>: The deep-linking flag of swagger-ui to use. Default is <code>true</code>.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>To expose the views, you also must expose the generated <code>yaml</code>:</p>
+</div>
+<div class="listingblock">
+<div class="title">Exposing Swagger YAML And Views</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">micronaut:
+    router:
+        static-resources:
+            swagger:
+                paths: classpath:META-INF/swagger
+                mapping: /swagger/**
+            redoc:
+                paths: classpath:META-INF/swagger/views/redoc
+                mapping: /redoc/**
+            rapidoc:
+                paths: classpath:META-INF/swagger/views/rapidoc
+                mapping: /rapidoc/**
+            swagger-ui:
+                paths: classpath:META-INF/swagger/views/swagger-ui
+                mapping: /swagger-ui/**</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>With the above configuration in place when you run your application you can access your Swagger documentation at http://localhost:8080/[redoc|rapidoc|swagger-ui].
+By default the views expect to find the <code>yaml</code> under <code>/swagger</code>, if you change this mapping to something else:</p>
+</div>
+<div class="listingblock">
+<div class="title">Exposing Swagger YAML</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">micronaut:
+    router:
+        static-resources:
+            swagger:
+                paths: classpath:META-INF/swagger
+                mapping: /swaggerYAML/**
+....</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You will need to set the <code>mapping.path</code> property accordingly: <code>micronaut.openapi.views.spec=mapping.path=swaggerYAML&#8230;&#8203;</code>.</p>
+</div>
+
+
+                <div style="clear:both;margin-top:15px;"></div>
+                
+                    <div class="toc-item prev-left"><a href="../guide/exposingSwaggerOutput.html">&lt;&lt; <strong>4</strong><span>Exposing Swagger Output</span></a></div>
+                
+                    <div class="toc-item next-right"><a href="../guide/controllersAndSwaggerAnnotations.html"><strong>6</strong><span>Controllers and Swagger Annotations</span> >></a></div>
+                
+                <div style="clear:both"></div>
+            </div>
+        </td>
+        <td id="col2">
+            <div class="local clearfix">
+                <div class="local-title">
+                    <a href="../guide/index.html" target="mainFrame">Quick Reference</a>
+                    <span class="toggle">(<a href="#" onclick="localToggle(); return false;">hide</a>)</span>
+                </div>
+                <div class="menu">
+                    
+                </div>
+            </div>
+        </td>
+    </tr>
+</table>
+
+<div id="footer">
+    
+    
+</div>
+
+<script type="text/javascript" src="../js/docs.js"></script>
+
+</body>
+</html>
