@@ -1248,7 +1248,7 @@ class MyBean {}
     }
 
     void "test build OpenAPI for body tagged with Swagger @RequestBody"() {
-        given: "An API definition"
+
         when:
         buildBeanDefinition('test.MyBean','''
 package test;
