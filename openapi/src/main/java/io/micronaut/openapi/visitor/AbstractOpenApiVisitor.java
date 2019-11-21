@@ -591,13 +591,13 @@ abstract class AbstractOpenApiVisitor  {
                 finalSchemaToBind.setMaximum(new BigDecimal(0));
             }
             if (element.isAnnotationPresent(NegativeOrZero.class)) {
-                finalSchemaToBind.setMaximum(new BigDecimal(1));
+                finalSchemaToBind.setMaximum(new BigDecimal(0));
             }
             if (element.isAnnotationPresent(Positive.class)) {
                 finalSchemaToBind.setMinimum(new BigDecimal(0));
             }
             if (element.isAnnotationPresent(PositiveOrZero.class)) {
-                finalSchemaToBind.setMinimum(new BigDecimal(1));
+                finalSchemaToBind.setMinimum(new BigDecimal(0));
             }
             element.getValue(Max.class, BigDecimal.class).ifPresent(finalSchemaToBind::setMaximum);
             element.getValue(Min.class, BigDecimal.class).ifPresent(finalSchemaToBind::setMinimum);
@@ -609,8 +609,6 @@ abstract class AbstractOpenApiVisitor  {
 
             element.findAnnotation(Pattern.class).flatMap((p) -> p.get("regexp", String.class)).ifPresent(finalSchemaToBind::setFormat);
         }
-
-
 
         Optional<String> documentation = element.getDocumentation();
         if (StringUtils.isEmpty(schemaToBind.getDescription())) {

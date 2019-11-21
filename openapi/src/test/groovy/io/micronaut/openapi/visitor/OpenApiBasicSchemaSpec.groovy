@@ -136,10 +136,11 @@ public class MyBean {}
 
         openAPI.components.schemas["Person"].properties["debtValue"].type == "integer"
         openAPI.components.schemas["Person"].properties["debtValue"].maximum == 0
+        !openAPI.components.schemas["Person"].properties["debtValue"].exclusiveMaximum
         openAPI.components.schemas["Person"].properties["debtValue"].description == "The total debt amount."
 
         openAPI.components.schemas["Person"].properties["totalGoals"].type == "integer"
-        openAPI.components.schemas["Person"].properties["totalGoals"].minimum == 0
+        !openAPI.components.schemas["Person"].properties["totalGoals"].exclusiveMinimum
         openAPI.components.schemas["Person"].properties["totalGoals"].description == "The total number of person's goals."
     }
 }
