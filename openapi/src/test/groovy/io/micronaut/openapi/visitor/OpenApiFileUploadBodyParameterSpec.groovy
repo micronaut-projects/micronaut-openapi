@@ -52,7 +52,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Singleton
 @Controller("/")
 @Tag(name = "UploadOpenApi")
-class UploadOpenApiController2 {
+class UploadOpenApiController {
 
     @Post(value = "/receive-flow-control", consumes = MediaType.MULTIPART_FORM_DATA, produces = MediaType.TEXT_PLAIN)
     Single<String> partData(

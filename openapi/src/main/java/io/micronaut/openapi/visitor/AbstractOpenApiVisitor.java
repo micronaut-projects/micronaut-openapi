@@ -470,7 +470,7 @@ abstract class AbstractOpenApiVisitor  {
                     "io.micronaut.http.multipart.CompletedFileUpload".equals(typeName) ||
                     "io.micronaut.http.multipart.CompletedPart".equals(typeName) ||
                     "io.micronaut.http.multipart.PartData".equals(typeName)) {
-                  isPublisher = isPublisher && ! "io.micronaut.http.multipart.PartData".equals(typeName);
+                    isPublisher = isPublisher && ! "io.micronaut.http.multipart.PartData".equals(typeName);
                     // For file upload, we use PrimitiveType.BINARY
                     typeName = PrimitiveType.BINARY.name();
                 }
