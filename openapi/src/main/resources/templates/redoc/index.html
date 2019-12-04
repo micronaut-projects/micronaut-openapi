@@ -1,19 +1,36 @@
 <!doctype html>
 <html>
-	<head>
-	    <title>{{title}}</title>
-	    <meta charset='UTF-8' />
-	    <meta name='viewport' content='width=device-width, initial-scale=1' />
-	    <link href='https://fonts.googleapis.com/css?family=Montserrat:300,400,700|Roboto:300,400,700' rel='stylesheet' />
-	    <style>
-	      body {
-	        margin: 0;
-	        padding: 0;
-	      }
-	    </style>
-	</head>
-	<body>
-	    <redoc spec-url='{{specURL}}'></redoc>
-	    <script src='https://unpkg.com/redoc{{redoc.version}}/bundles/redoc.standalone.js'></script>
-	</body>
+    <head>
+        <title>{{title}}</title>
+        <meta charset='UTF-8' />
+        <meta name='viewport' content='width=device-width, initial-scale=1' />
+        <link href='https://fonts.googleapis.com/css?family=Montserrat:300,400,700|Roboto:300,400,700' rel='stylesheet' />
+        <style>
+          body {
+            margin: 0;
+            padding: 0;
+          }
+        </style>
+    </head>
+    <body>
+        <redoc></redoc>
+        <script src='https://unpkg.com/redoc{{redoc.version}}/bundles/redoc.standalone.js'></script>
+        <script>
+            var d = decodeURIComponent,
+                contextPath = d(document.cookie.replace(/(?:(?:^|.*;\s*)contextPath\s*\=\s*([^;]*).*$)|^.*$/, "$1"));
+            if (contextPath === '') {
+                const params = (function() {
+                  var query = {},
+                      a = window.location.search.substring(1).split('&'), pair;
+                  for (var i = a.length - 1; i >= 0; i--) {
+                      pair = a[i].split('=');
+                      query[d(pair[0])] = d(pair[1] || '');
+                  }
+                  return query;
+                })();
+                contextPath = (params.contextPath && params.contextPath !== '' ? params.contextPath : '');
+            }
+            Redoc.init(contextPath + '{{specURL}}');
+         </script>
+    </body>
 </html>
