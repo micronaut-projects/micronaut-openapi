@@ -452,6 +452,10 @@ public class OpenApiControllerVisitor extends AbstractOpenApiVisitor implements 
                                 Schema propertySchema = resolveSchema(openAPI, parameter, parameter.getType(), context, mediaType.toString());
                                 if (propertySchema != null) {
 
+                                    Optional<String> description = parameter.getValue(io.swagger.v3.oas.annotations.Parameter.class, "description", String.class);
+                                    if (description.isPresent()) {
+                                        propertySchema.setDescription(description.get());
+                                    }
                                     processSchemaProperty(context, parameter, parameter.getType(), schema, propertySchema);
 
                                     propertySchema.setNullable(parameter.isAnnotationPresent(Nullable.class));
