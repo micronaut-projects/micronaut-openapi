@@ -17,6 +17,8 @@ package io.micronaut.openapi.visitor;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.fasterxml.jackson.databind.PropertyNamingStrategy.PropertyNamingStrategyBase;
 
 import io.micronaut.context.env.Environment;
 import io.micronaut.core.annotation.AnnotationValue;
@@ -56,6 +58,10 @@ import java.util.stream.Collectors;
  */
 @Experimental
 public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements TypeElementVisitor<OpenAPIDefinition, Object> {
+    /**
+     * System property for naming strategy. One jackson PropertyNamingStrategy.
+     */
+    public static final String MICRONAUT_OPENAPI_PROPERTY_NAMING_STRATEGY = "micronaut.openapi.property.naming.strategy";
     /**
      * System property for views specification.
      */
@@ -250,6 +256,20 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         }
     }
 
+    private static PropertyNamingStrategyBase fromName(String name) {
+        if (name == null) {
+            return null;
+        }
+        switch (name.toUpperCase()) {
+        case "SNAKE_CASE": return (PropertyNamingStrategyBase) PropertyNamingStrategy.SNAKE_CASE;
+        case "UPPER_CAMEL_CASE":  return (PropertyNamingStrategyBase) PropertyNamingStrategy.UPPER_CAMEL_CASE;
+        case "LOWER_CAMEL_CASE":  return (PropertyNamingStrategyBase) PropertyNamingStrategy.LOWER_CAMEL_CASE;
+        case "LOWER_CASE":  return (PropertyNamingStrategyBase) PropertyNamingStrategy.LOWER_CASE;
+        case "KEBAB_CASE":  return (PropertyNamingStrategyBase) PropertyNamingStrategy.KEBAB_CASE;
+        default: return  null;
+        }
+    }
+
     @Override
     public void finish(VisitorContext visitorContext) {
         if (classElement != null) {
@@ -257,6 +277,21 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             Optional<OpenAPI> attr = visitorContext.get(ATTR_OPENAPI, OpenAPI.class);
 
             attr.ifPresent(openAPI -> {
+                final String namingStrategyName = System.getProperty(MICRONAUT_OPENAPI_PROPERTY_NAMING_STRATEGY);
+                final PropertyNamingStrategyBase propertyNamingStrategy = fromName(namingStrategyName);
+                if (propertyNamingStrategy != null) {
+                    visitorContext.info("Using " + namingStrategyName + " property naming strategy.");
+                    openAPI.getComponents().getSchemas().values().forEach(model -> {
+                        Map<String, Schema> properties = model.getProperties();
+                        if (properties == null) {
+                            return;
+                        }
+                        Map<String, Schema> newProperties = properties.entrySet().stream().collect(Collectors.toMap(entry -> propertyNamingStrategy.translate(entry.getKey()), Map.Entry::getValue, (prop1, prop2) -> prop1,
+                                    LinkedHashMap::new));
+                        model.getProperties().clear();
+                        model.setProperties(newProperties);
+                    });
+                }
                 String property = System.getProperty(MICRONAUT_OPENAPI_TARGET_FILE);
                 String fileName = "swagger.yml";
                 String documentTitle = "OpenAPI";

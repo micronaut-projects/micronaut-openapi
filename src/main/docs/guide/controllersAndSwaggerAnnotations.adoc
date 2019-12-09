@@ -91,3 +91,46 @@ paths:
         404:
           description: Person not found
 ----
+
+You can control how the Schema property names are dumped by setting the `micronaut.openapi.property.naming.strategy` system property. It accepts one of
+the following *jackson*'s `PropertyNamingStrategy`:
+- *SNAKE_CASE*,
+- *UPPER_CAMEL_CASE*,
+- *LOWER_CAMEL_CASE*,
+- *LOWER_CASE* and
+- *KEBAB_CASE*.
+
+For instance in gradle:
+
+.Gradle
+[source,groovy]
+----
+tasks.withType(JavaCompile) {
+    options.fork = true
+    options.forkOptions.jvmArgs << '-Dmicronaut.openapi.property.naming.strategy=SNAKE_CASE'
+
+    ...
+}
+----
+
+or in maven:
+
+.Maven
+[source,xml]
+----
+<build>
+    <plugins>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <configuration>
+                <fork>true</fork>
+                <compilerArgs>
+                    <arg>-J-Dmicronaut.openapi.property.naming.strategy=SNAKE_CASE</arg>
+                    ...
+                </compilerArgs>
+            </configuration>
+        </plugin>
+    </plugins>
+</build>
+----
