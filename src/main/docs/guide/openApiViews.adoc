@@ -100,3 +100,58 @@ micronaut:
 ....
 ----
 You will need to set the `mapping.path` property accordingly: `micronaut.openapi.views.spec=mapping.path=swaggerYAML...`.
+
+== Server Context Path
+
+In micronaut configuration file you can define a server context path (with `micronaut.server.context-path`) which serves has a base path for all routes.
+Since the yaml specification file and the views are generated at compile time, these resources are not aware of this runtime setting.
+
+It is still possible for the views to work in case a context path is defined:
+* Use a `HttpServerFilter` that will add a cookie, or
+* Add a parameter to the url.
+
+The view will first look for the cookie and if not present for the parameter.
+
+=== HttpServerFilter
+
+Create a `HttpServerFilter` that will add a cookie with name `contextPath`.
+
+.HttpServerFilter for context-path
+[source,java]
+----
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+
+import org.reactivestreams.Publisher;
+
+import io.micronaut.context.annotation.Requires;
+import io.micronaut.context.annotation.Value;
+import io.micronaut.core.async.publisher.Publishers;
+import io.micronaut.http.HttpMethod;
+import io.micronaut.http.HttpRequest;
+import io.micronaut.http.MutableHttpResponse;
+import io.micronaut.http.annotation.Filter;
+import io.micronaut.http.cookie.Cookie;
+import io.micronaut.http.filter.HttpServerFilter;
+import io.micronaut.http.filter.ServerFilterChain;
+
+@Requires(property = "micronaut.server.context-path")
+@Filter(methods = {HttpMethod.GET, HttpMethod.HEAD}, patterns = {"/**/rapidoc*", "/**/redoc*", "/**/swagger-ui*"})
+public class OpenApiViewCookieContextPathFilter implements HttpServerFilter {
+    private final Cookie contextPathCookie;
+
+    OpenApiViewCookieContextPathFilter(@Value("${micronaut.server.context-path}") String contextPath) {
+        this.contextPathCookie = Cookie.of("contextPath", URLEncoder.encode(contextPath, StandardCharsets.UTF_8) + ";max-age=2;samesite");
+    }
+
+    @Override
+    public Publisher<MutableHttpResponse<?>> doFilter(HttpRequest<?> request, ServerFilterChain chain) {
+        return Publishers.map(chain.proceed(request), response -> response.cookie(contextPathCookie));
+    }
+
+}
+----
+
+=== URL Parameter
+
+Just add a parameter to the view url. For instance if the context path is set to `/context/path` you will access your view with `http://localhost:8080/context/path/swagger-ui?contextPath=%2Fcontext%2Fpath`.
