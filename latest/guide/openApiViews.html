@@ -11,7 +11,7 @@
 
         gtag('config', 'UA-82213539-2');
     </script>
-    <title>5 Generating OpenAPI Views 1.3.0</title>
+    <title>5 Generating OpenAPI Views 1.3.3</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <link rel="stylesheet" href="../css/main.css" type="text/css" media="screen, print" title="Style" charset="utf-8"/>
     <link rel="stylesheet" href="../css/pdf.css" type="text/css" media="print" title="PDF" charset="utf-8"/>
@@ -99,7 +99,7 @@ function addJsClass() {
                 <div class="project">
                     <h1>5 Generating OpenAPI Views</h1>
 
-                    <p><strong>Version:</strong> 1.3.0</p>
+                    <p><strong>Version:</strong> 1.3.3</p>
                 </div>
 
                 
@@ -159,7 +159,7 @@ The string syntax is a series of comma-separated key-value pairs, to enable and 
             &lt;configuration&gt;
                 &lt;fork&gt;true&lt;/fork&gt;
                 &lt;compilerArgs&gt;
-                    &lt;arg&gt;-Dmicronaut.openapi.views.spec=rapidoc.enabled=true,swagger-ui.enabled=true,swagger-ui.theme=flattop&lt;/arg&gt;
+                    &lt;arg&gt;-J-Dmicronaut.openapi.views.spec=rapidoc.enabled=true,swagger-ui.enabled=true,swagger-ui.theme=flattop&lt;/arg&gt;
                     ...
                 &lt;/compilerArgs&gt;
             &lt;/configuration&gt;
@@ -255,6 +255,71 @@ By default the views expect to find the <code>yaml</code> under <code>/swagger</
 </div>
 <div class="paragraph">
 <p>You will need to set the <code>mapping.path</code> property accordingly: <code>micronaut.openapi.views.spec=mapping.path=swaggerYAML&#8230;&#8203;</code>.</p>
+</div>
+<div class="sect1">
+<h2 id="_server_context_path">Server Context Path</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In micronaut configuration file you can define a server context path (with <code>micronaut.server.context-path</code>) which serves has a base path for all routes.
+Since the yaml specification file and the views are generated at compile time, these resources are not aware of this runtime setting.</p>
+</div>
+<div class="paragraph">
+<p>It is still possible for the views to work in case a context path is defined:
+* Use a <code>HttpServerFilter</code> that will add a cookie, or
+* Add a parameter to the url.</p>
+</div>
+<div class="paragraph">
+<p>The view will first look for the cookie and if not present for the parameter.</p>
+</div>
+<div class="sect2">
+<h3 id="_httpserverfilter">HttpServerFilter</h3>
+<div class="paragraph">
+<p>Create a <code>HttpServerFilter</code> that will add a cookie with name <code>contextPath</code>.</p>
+</div>
+<div class="listingblock">
+<div class="title">HttpServerFilter for context-path</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+
+import org.reactivestreams.Publisher;
+
+import io.micronaut.context.annotation.Requires;
+import io.micronaut.context.annotation.Value;
+import io.micronaut.core.async.publisher.Publishers;
+import io.micronaut.http.HttpMethod;
+import io.micronaut.http.HttpRequest;
+import io.micronaut.http.MutableHttpResponse;
+import io.micronaut.http.annotation.Filter;
+import io.micronaut.http.cookie.Cookie;
+import io.micronaut.http.filter.HttpServerFilter;
+import io.micronaut.http.filter.ServerFilterChain;
+
+@Requires(property = "micronaut.server.context-path")
+@Filter(methods = {HttpMethod.GET, HttpMethod.HEAD}, patterns = {"/**/rapidoc*", "/**/redoc*", "/**/swagger-ui*"})
+public class OpenApiViewCookieContextPathFilter implements HttpServerFilter {
+    private final Cookie contextPathCookie;
+
+    OpenApiViewCookieContextPathFilter(@Value("${micronaut.server.context-path}") String contextPath) {
+        this.contextPathCookie = Cookie.of("contextPath", URLEncoder.encode(contextPath, StandardCharsets.UTF_8) + ";max-age=2;samesite");
+    }
+
+    @Override
+    public Publisher&lt;MutableHttpResponse&lt;?&gt;&gt; doFilter(HttpRequest&lt;?&gt; request, ServerFilterChain chain) {
+        return Publishers.map(chain.proceed(request), response -&gt; response.cookie(contextPathCookie));
+    }
+
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_url_parameter">URL Parameter</h3>
+<div class="paragraph">
+<p>Just add a parameter to the view url. For instance if the context path is set to <code>/context/path</code> you will access your view with <code><a href="http://localhost:8080/context/path/swagger-ui?contextPath=%2Fcontext%2Fpath" class="bare">http://localhost:8080/context/path/swagger-ui?contextPath=%2Fcontext%2Fpath</a></code>.</p>
+</div>
+</div>
+</div>
 </div>
 
 
