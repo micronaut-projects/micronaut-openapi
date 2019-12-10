@@ -835,6 +835,52 @@ paths:
           description: Person not found</code></pre>
 </div>
 </div>
+<div class="paragraph">
+<p>You can control how the Schema property names are dumped by setting the <code>micronaut.openapi.property.naming.strategy</code> system property. It accepts one of
+the following <strong>jackson</strong>'s <code>PropertyNamingStrategy</code>:
+- <strong>SNAKE_CASE</strong>,
+- <strong>UPPER_CAMEL_CASE</strong>,
+- <strong>LOWER_CAMEL_CASE</strong>,
+- <strong>LOWER_CASE</strong> and
+- <strong>KEBAB_CASE</strong>.</p>
+</div>
+<div class="paragraph">
+<p>For instance in gradle:</p>
+</div>
+<div class="listingblock">
+<div class="title">Gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">tasks.withType(JavaCompile) {
+    options.fork = true
+    options.forkOptions.jvmArgs &lt;&lt; '-Dmicronaut.openapi.property.naming.strategy=SNAKE_CASE'
+
+    ...
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>or in maven:</p>
+</div>
+<div class="listingblock">
+<div class="title">Maven</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;build&gt;
+    &lt;plugins&gt;
+        &lt;plugin&gt;
+            &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;
+            &lt;artifactId&gt;maven-compiler-plugin&lt;/artifactId&gt;
+            &lt;configuration&gt;
+                &lt;fork&gt;true&lt;/fork&gt;
+                &lt;compilerArgs&gt;
+                    &lt;arg&gt;-J-Dmicronaut.openapi.property.naming.strategy=SNAKE_CASE&lt;/arg&gt;
+                    ...
+                &lt;/compilerArgs&gt;
+            &lt;/configuration&gt;
+        &lt;/plugin&gt;
+    &lt;/plugins&gt;
+&lt;/build&gt;</code></pre>
+</div>
+</div>
 
 
 <h1 id="schemasAndPojos">7 Schemas and POJOs</h1>
