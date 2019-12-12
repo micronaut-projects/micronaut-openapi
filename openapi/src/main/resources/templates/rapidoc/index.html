@@ -11,28 +11,17 @@
     <body>
         <rapi-doc id='rapidoc' show-header='false' theme='{{rapidoc.theme}}' layout='{{rapidoc.layout}}'></rapi-doc>
         <script>
-            var d = decodeURIComponent,
-                contextPath = d(document.cookie.replace(/(?:(?:^|.*;\s*)contextPath\s*\=\s*([^;]*).*$)|^.*$/, "$1")),
+            const extract = function(v) {
+                    return decodeURIComponent(v.replace(/(?:(?:^|.*;\s*)contextPath\s*\=\s*([^;]*).*$)|^.*$/, "$1"));
+                },
+                cookie = extract(document.cookie),
+                contextPath = cookie === '' ? extract(window.location.search.substring(1)) : cookie,
                 rapidoc = document.getElementById('rapidoc');
-            if (contextPath === '') {
-                const params = (function() {
-                  var query = {},
-                      a = window.location.search.substring(1).split('&'), pair;
-                  for (var i = a.length - 1; i >= 0; i--) {
-                      pair = a[i].split('=');
-                      query[d(pair[0])] = d(pair[1] || '');
-                  }
-                  return query;
-                })();
-                contextPath = (params.contextPath && params.contextPath !== '' ? params.contextPath : '');
-            }
             rapidoc.setAttribute('spec-url', contextPath + '{{specURL}}');
             if (contextPath !== '') {
-                rapidoc.setAttribute('server-url', window.location.origin + contextPath);
-                rapidoc.selectedServer = { 'url': window.location.origin + contextPath, 'computedUrl': window.location.origin + contextPath };
                 setTimeout(function() {
                     if (rapidoc.resolvedSpec) {
-                        rapidoc.resolvedSpec.servers = [];
+                        rapidoc.resolvedSpec.tags.forEach(tag => tag.paths.forEach(path => path.path = contextPath + path.path));
                         rapidoc.requestUpdate();
                     } else {
                         setTimeout(this, 200);
