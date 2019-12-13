@@ -250,7 +250,13 @@ abstract class AbstractOpenApiVisitor  {
                             newValues.put(key, classes);
                         } else if (areAnnotationValues) {
                             String annotationName = ((AnnotationValue) first).getAnnotationName();
-                            if (Extension.class.getName().equals(annotationName)) {
+                            if (io.swagger.v3.oas.annotations.security.SecurityRequirement.class.getName().equals(annotationName)) {
+                                List<SecurityRequirement> securityRequirements = new ArrayList<>(a.length);
+                                for (Object o : a) {
+                                    securityRequirements.add(mapToSecurityRequirement((AnnotationValue<io.swagger.v3.oas.annotations.security.SecurityRequirement>) o));
+                                }
+                                newValues.put(key, securityRequirements);
+                            } else if (Extension.class.getName().equals(annotationName)) {
                                 Map<CharSequence, Object> extensions = new HashMap<>();
                                 for (Object o : a) {
                                     processExtensions(extensions, (AnnotationValue<Extension>) o);
