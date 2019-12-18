@@ -776,10 +776,8 @@ abstract class AbstractOpenApiVisitor  {
                 ObjectSchema propSchema = new ObjectSchema();
                 propSchema.properties(composedSchema.getProperties());
                 propSchema.setDescription(composedSchema.getDescription());
-                propSchema.setRequired(composedSchema.getRequired());
                 composedSchema.setProperties(null);
                 composedSchema.setDescription(null);
-                composedSchema.setRequired(null);
                 composedSchema.setType(null);
                 composedSchema.addAllOfItem(propSchema);
             }

@@ -19,6 +19,7 @@ import io.micronaut.annotation.processing.test.AbstractTypeElementSpec
 import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.Operation
 import io.swagger.v3.oas.models.media.ComposedSchema
+import io.swagger.v3.oas.models.media.ObjectSchema
 import io.swagger.v3.oas.models.media.Schema
 
 class OpenApiInheritedPojoControllerSpec extends AbstractTypeElementSpec {
@@ -459,12 +460,13 @@ interface PetOperations {
     Dog getDog(String name);
 }
 
+@Schema(requiredProperties = "breed")
 class Dog extends Pet {
 
     private String breed;
 
     public void setBreed(String breed) {
-        breed = breed;
+        this.breed = breed;
     }
 
     public String getBreed() {
@@ -477,7 +479,7 @@ class Cat extends Pet {
     private int clawSize;
 
     public void setClawSize(int clawSize) {
-        clawSize = clawSize;
+        this.clawSize = clawSize;
     }
 
     public int getClawSize() {
@@ -533,11 +535,15 @@ class MyBean {}
         catSchema != null
         !(petSchema instanceof ComposedSchema)
         catSchema instanceof ComposedSchema
-        dogSchema instanceof ComposedSchema
+        dogSchema instanceof ObjectSchema
+        dogSchema.required != null
+        ! dogSchema.required.empty
+        dogSchema.required.contains("breed")
         catSchema.type == null
         catSchema.properties == null
         petSchema.type == 'object'
         petSchema.properties.size() == 2
+        petSchema.required == null
 
         ((ComposedSchema)catSchema).allOf.size() == 2
         ((ComposedSchema)catSchema).allOf[0].$ref == '#/components/schemas/Pet'
