@@ -250,7 +250,13 @@ abstract class AbstractOpenApiVisitor  {
                             newValues.put(key, classes);
                         } else if (areAnnotationValues) {
                             String annotationName = ((AnnotationValue) first).getAnnotationName();
-                            if (Extension.class.getName().equals(annotationName)) {
+                            if (io.swagger.v3.oas.annotations.security.SecurityRequirement.class.getName().equals(annotationName)) {
+                                List<SecurityRequirement> securityRequirements = new ArrayList<>(a.length);
+                                for (Object o : a) {
+                                    securityRequirements.add(mapToSecurityRequirement((AnnotationValue<io.swagger.v3.oas.annotations.security.SecurityRequirement>) o));
+                                }
+                                newValues.put(key, securityRequirements);
+                            } else if (Extension.class.getName().equals(annotationName)) {
                                 Map<CharSequence, Object> extensions = new HashMap<>();
                                 for (Object o : a) {
                                     processExtensions(extensions, (AnnotationValue<Extension>) o);
@@ -411,11 +417,14 @@ abstract class AbstractOpenApiVisitor  {
         av.get("schema", AnnotationValue.class).ifPresent(annotationValue -> {
             Optional<String> impl = ((AnnotationValue<?>) annotationValue).get("implementation", String.class);
             Optional<String> type = ((AnnotationValue<?>) annotationValue).get("type", String.class);
+            Optional<String> format = ((AnnotationValue<?>) annotationValue).get("format", String.class);
             Optional<ClassElement> classElement = Optional.empty();
+            PrimitiveType primitiveType = null;
             if (impl.isPresent()) {
                 classElement = context.getClassElement(impl.get());
             } else if (type.isPresent()) {
-                PrimitiveType primitiveType = PrimitiveType.fromName(type.get());
+                // if format is "binary", we want PrimitiveType.BINARY
+                primitiveType = PrimitiveType.fromName(format.isPresent() && format.get().equals("binary") ? format.get() : type.get());
                 if (primitiveType != null) {
                     classElement = context.getClassElement(primitiveType.getKeyClass());
                 } else {
@@ -423,9 +432,17 @@ abstract class AbstractOpenApiVisitor  {
                 }
             }
             if (classElement.isPresent()) {
-                final OpenAPI openAPI = resolveOpenAPI(context);
-                final ArraySchema schema = arraySchema(resolveSchema(openAPI, null, classElement.get(), context, null));
-                schemaToValueMap(arraySchemaMap, schema);
+                if (primitiveType == null) {
+                    final OpenAPI openAPI = resolveOpenAPI(context);
+                    final ArraySchema schema = arraySchema(resolveSchema(openAPI, null, classElement.get(), context, null));
+                    schemaToValueMap(arraySchemaMap, schema);
+                } else {
+                    // For primitive type, just copy description field is present.
+                    final Schema items = primitiveType.createProperty();
+                    items.setDescription((String) annotationValue.get("description", String.class).orElse(null));
+                    final ArraySchema schema = arraySchema(items);
+                    schemaToValueMap(arraySchemaMap, schema);
+                }
             } else {
                 arraySchemaMap.putAll(resolveAnnotationValues(context, av));
             }
@@ -479,7 +496,8 @@ abstract class AbstractOpenApiVisitor  {
             boolean isPublisher = false;
             boolean isObservable = false;
 
-            if (isContainerType(type)) {
+            // StreamingFileUpload implements Publisher, but it should be not considered as a Publisher in the spec file
+            if (!type.isAssignable("io.micronaut.http.multipart.StreamingFileUpload") && isContainerType(type)) {
                 isPublisher = type.isAssignable(Publisher.class.getName()) && !type.isAssignable("reactor.core.publisher.Mono");
                 isObservable = type.isAssignable("io.reactivex.Observable") && !type.isAssignable("reactor.core.publisher.Mono");
                 type = type.getFirstTypeArgument().orElse(null);
@@ -488,6 +506,15 @@ abstract class AbstractOpenApiVisitor  {
             if (type != null) {
 
                 String typeName = type.getName();
+                // File upload case
+                if ("io.micronaut.http.multipart.StreamingFileUpload".equals(typeName) ||
+                    "io.micronaut.http.multipart.CompletedFileUpload".equals(typeName) ||
+                    "io.micronaut.http.multipart.CompletedPart".equals(typeName) ||
+                    "io.micronaut.http.multipart.PartData".equals(typeName)) {
+                    isPublisher = isPublisher && ! "io.micronaut.http.multipart.PartData".equals(typeName);
+                    // For file upload, we use PrimitiveType.BINARY
+                    typeName = PrimitiveType.BINARY.name();
+                }
                 PrimitiveType primitiveType = PrimitiveType.fromName(typeName);
                 if (ClassUtils.isJavaLangType(typeName)) {
                     schema = getPrimitiveType(typeName);

@@ -317,8 +317,8 @@ class MyBean {}
         operation.tags.size() == 1
         operation.tags == ['pets']
         operation.security.size() == 1
-        operation.security.first().name == ['petstore-auth']
-        operation.security.first().scopes == ['write:pets']
+        operation.security.get(0).containsKey('petstore-auth')
+        operation.security.get(0).get('petstore-auth') == ['write:pets']
         operation.responses.size() == 4
         operation.responses.default.content.size() == 1
         operation.responses.default.content['application/json']
@@ -460,8 +460,8 @@ class MyBean {}
         operation.tags.size() == 1
         operation.tags == ['pets']
         operation.security.size() == 1
-        operation.security.first().name == ['petstore-auth']
-        operation.security.first().scopes == ['write:pets']
+        operation.security.get(0).containsKey('petstore-auth')
+        operation.security.get(0).get('petstore-auth') == ['write:pets']
         operation.responses.size() == 4
         operation.responses.default.content.size() == 1
         operation.responses.default.content['application/json']
