@@ -269,9 +269,8 @@ class MyBean {}
         ((ArraySchema) operation.responses."200".content["application/json"].schema).type == "array"
         ((ArraySchema) operation.responses."200".content["application/json"].schema).items instanceof ComposedSchema
         ((ComposedSchema) ((ArraySchema) operation.responses."200".content["application/json"].schema).items).oneOf.size() == 2
-        ((ComposedSchema) ((ArraySchema) operation.responses."200".content["application/json"].schema).items).oneOf[1].$ref == 2
-        ((ComposedSchema) ((ArraySchema) operation.responses."200".content["application/json"].schema).items).oneOf.any {it.$ref == "#/components/schemas/Cat"}
-        ((ComposedSchema) ((ArraySchema) operation.responses."200".content["application/json"].schema).items).oneOf.any {it.$ref == "#/components/schemas/Dog"}
+        ((ComposedSchema) ((ArraySchema) operation.responses."200".content["application/json"].schema).items).oneOf.any {it.get$ref() == "#/components/schemas/Cat"}
+        ((ComposedSchema) ((ArraySchema) operation.responses."200".content["application/json"].schema).items).oneOf.any {it.get$ref() == "#/components/schemas/Dog"}
     }
 
     void "test parse the OpenAPI @ApiResponse Content with @Schema annotation"() {
