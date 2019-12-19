@@ -64,6 +64,7 @@ import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.reactivestreams.Publisher;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.validation.constraints.*;
 import java.io.IOException;
@@ -383,6 +384,9 @@ abstract class AbstractOpenApiVisitor  {
             Optional<String> impl = ((AnnotationValue<?>) annotationValue).get("implementation", String.class);
             Optional<String> type = ((AnnotationValue<?>) annotationValue).get("type", String.class);
             Optional<String> format = ((AnnotationValue<?>) annotationValue).get("format", String.class);
+            final Optional<String[]> anyOf = annotationValue.get("anyOf", Argument.of(String[].class));
+            final Optional<String[]> oneOf = annotationValue.get("oneOf", Argument.of(String[].class));
+            final Optional<String[]> allOf = annotationValue.get("allOf", Argument.of(String[].class));
             Optional<ClassElement> classElement = Optional.empty();
             PrimitiveType primitiveType = null;
             if (impl.isPresent()) {
@@ -398,9 +402,7 @@ abstract class AbstractOpenApiVisitor  {
             }
             if (classElement.isPresent()) {
                 if (primitiveType == null) {
-                    final OpenAPI openAPI = resolveOpenAPI(context);
-                    final ArraySchema schema = arraySchema(resolveSchema(openAPI, null, classElement.get(), context, null));
-                    schemaToValueMap(arraySchemaMap, schema);
+                    classElement.ifPresent(element -> bindSchemaForClassElement(context, arraySchemaMap, element, true));
                 } else {
                     // For primitive type, just copy description field is present.
                     final Schema items = primitiveType.createProperty();
@@ -408,6 +410,10 @@ abstract class AbstractOpenApiVisitor  {
                     final ArraySchema schema = arraySchema(items);
                     schemaToValueMap(arraySchemaMap, schema);
                 }
+            } else if (io.swagger.v3.oas.annotations.media.ArraySchema.class.getName().equals(av.getAnnotationName()) && (anyOf.isPresent() || oneOf.isPresent() || allOf.isPresent())) {
+                anyOf.ifPresent(anyOfList -> bindSchemaForComposite(context, arraySchemaMap, anyOfList, "anyOf", true));
+                oneOf.ifPresent(oneOfList -> bindSchemaForComposite(context, arraySchemaMap, oneOfList, "oneOf", true));
+                allOf.ifPresent(allOfList -> bindSchemaForComposite(context, arraySchemaMap, allOfList, "allOf", true));
             } else {
                 arraySchemaMap.putAll(resolveAnnotationValues(context, av));
             }
@@ -739,11 +745,13 @@ abstract class AbstractOpenApiVisitor  {
         final Optional<String[]> allOf = av.get("allOf", Argument.of(String[].class));
         if (io.swagger.v3.oas.annotations.media.Schema.class.getName().equals(av.getAnnotationName()) && impl.isPresent()) {
             final String className = impl.get();
-            bindSchemaForClassName(context, valueMap, className);
+            final Optional<ClassElement> classElement = context.getClassElement(className);
+            classElement.ifPresent(element -> bindSchemaForClassElement(context, valueMap, element, false));
         }
         if (io.swagger.v3.oas.annotations.media.DiscriminatorMapping.class.getName().equals(av.getAnnotationName()) && schema.isPresent()) {
             final String className = schema.get();
-            bindSchemaForClassName(context, valueMap, className);
+            final Optional<ClassElement> classElement = context.getClassElement(className);
+            classElement.ifPresent(element -> bindSchemaForClassElement(context, valueMap, element, false));
         }
         if (io.swagger.v3.oas.annotations.media.Schema.class.getName().equals(av.getAnnotationName()) && (anyOf.isPresent() || oneOf.isPresent() || allOf.isPresent())) {
             anyOf.ifPresent(anyOfList -> bindSchemaForComposite(context, valueMap, anyOfList, "anyOf"));
@@ -753,17 +761,31 @@ abstract class AbstractOpenApiVisitor  {
     }
 
     private void bindSchemaForComposite(VisitorContext context, Map<CharSequence, Object> valueMap, String[] classNames, String key) {
-        final List<Map<CharSequence, Object>> namesToSchemas = Arrays.stream(classNames).map(className -> {
-            final Optional<ClassElement> classElement = context.getClassElement(className);
-            final OpenAPI openAPI = resolveOpenAPI(context);
-            Map<CharSequence, Object> schemaMap = new HashMap<>();
-            if (classElement.isPresent()) {
-                final Schema schema = resolveSchema(openAPI, null, classElement.get(), context, null);
-                schemaToValueMap(schemaMap, schema);
-            }
-            return schemaMap;
-        }).collect(Collectors.toList());
-        valueMap.put(key, namesToSchemas);
+        bindSchemaForComposite(context, valueMap, classNames, key, false);
+    }
+
+    private void bindSchemaForComposite(VisitorContext context, Map<CharSequence, Object> valueMap, String[] classNames, String key, boolean isArraySchema) {
+        final List<Schema> namesToSchemas = Arrays.stream(classNames)
+                .map(className -> {
+                    final Optional<ClassElement> classElement = context.getClassElement(className);
+                    final OpenAPI openAPI = resolveOpenAPI(context);
+                    return classElement.map(element -> resolveSchema(openAPI, null, element, context, null)).orElse(null);
+                })
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+        final ComposedSchema composedSchema = new ComposedSchema();
+        if (key.equals("oneOf")) {
+            composedSchema.oneOf(namesToSchemas);
+        } else if (key.equals("anyOf")) {
+            composedSchema.anyOf(namesToSchemas);
+        } else if (key.equals("allOf")) {
+            composedSchema.allOf(namesToSchemas);
+        }
+        if (isArraySchema) {
+            schemaToValueMap(valueMap, arraySchema(composedSchema));
+        } else {
+            schemaToValueMap(valueMap, composedSchema);
+        }
     }
 
     private void bindSchemaForClassName(VisitorContext context, Map<CharSequence, Object> valueMap, String className) {
@@ -771,6 +793,16 @@ abstract class AbstractOpenApiVisitor  {
         final OpenAPI openAPI = resolveOpenAPI(context);
         if (classElement.isPresent()) {
             final Schema schema = resolveSchema(openAPI, null, classElement.get(), context, null);
+            schemaToValueMap(valueMap, schema);
+        }
+    }
+
+    private void bindSchemaForClassElement(VisitorContext context, Map<CharSequence, Object> valueMap, @Nonnull ClassElement classElement, boolean isArraySchema) {
+        final OpenAPI openAPI = resolveOpenAPI(context);
+        final Schema schema = resolveSchema(openAPI, null, classElement, context, null);
+        if (isArraySchema) {
+            schemaToValueMap(valueMap, arraySchema(schema));
+        } else {
             schemaToValueMap(valueMap, schema);
         }
     }

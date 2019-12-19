@@ -18,6 +18,7 @@ package io.micronaut.openapi.visitor
 import io.micronaut.annotation.processing.test.AbstractTypeElementSpec
 import io.swagger.v3.oas.models.Operation
 import io.swagger.v3.oas.models.media.ArraySchema
+import io.swagger.v3.oas.models.media.ComposedSchema
 import io.swagger.v3.oas.models.media.ObjectSchema
 
 class OpenApiOperationParseSpec extends AbstractTypeElementSpec {
@@ -182,8 +183,94 @@ class MyBean {}
         operationNames.responses.'200'.content.size() == 1
         operationNames.responses.'200'.content['application/json']
         operationNames.responses.'200'.content['application/json'].schema
+        operationNames.responses."200".content["application/json"].schema instanceof ArraySchema
         operationNames.responses.'200'.content['application/json'].schema.type == "array"
         ((ArraySchema) operationNames.responses.'200'.content['application/json'].schema).items.type == "string"
+    }
+
+    void "test parse the OpenAPI @ApiResponse Content with mixed type Arrays"() {
+
+        given:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.http.MediaType;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+
+import java.util.List;
+
+class Pet {
+
+    private String name;
+
+    public Pet(String name) {
+        this.name = name;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+}
+
+class Dog extends Pet {
+
+    public Dog(String name) {
+        super(name);
+    }
+}
+
+class Cat extends Pet {
+
+    public Cat(String name) {
+        super(name);
+    }
+}
+
+@Controller("/pet")
+interface PetOperations {
+
+    @Operation(summary = "Get a list of pets",
+            description = "Get a list of pets registered in the system",
+            responses = {@ApiResponse(responseCode = "200",
+                    description = "The response for the pet request",
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON,
+                            array = @ArraySchema(schema = @Schema(oneOf = {Cat.class, Dog.class}))
+                    )
+            )}
+    )
+    @Get
+    List<? extends Pet> list();
+}
+
+
+@javax.inject.Singleton
+class MyBean {}
+''')
+
+        Operation operation = AbstractOpenApiVisitor.testReference?.paths?.get("/pet")?.get
+
+        expect:
+        operation
+        operation.summary == "Get a list of pets"
+        operation.responses.size() == 1
+        operation.responses."200".content.size() == 1
+        operation.responses."200".content["application/json"]
+        operation.responses."200".content["application/json"].schema instanceof ArraySchema
+        ((ArraySchema) operation.responses."200".content["application/json"].schema).type == "array"
+        ((ArraySchema) operation.responses."200".content["application/json"].schema).items instanceof ComposedSchema
+        ((ComposedSchema) ((ArraySchema) operation.responses."200".content["application/json"].schema).items).oneOf.size() == 2
+        ((ComposedSchema) ((ArraySchema) operation.responses."200".content["application/json"].schema).items).oneOf.any {it.get$ref() == "#/components/schemas/Cat"}
+        ((ComposedSchema) ((ArraySchema) operation.responses."200".content["application/json"].schema).items).oneOf.any {it.get$ref() == "#/components/schemas/Dog"}
     }
 
     void "test parse the OpenAPI @ApiResponse Content with @Schema annotation"() {
