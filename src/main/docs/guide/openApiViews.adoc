@@ -103,7 +103,7 @@ You will need to set the `mapping.path` property accordingly: `micronaut.openapi
 
 == Server Context Path
 
-In micronaut configuration file you can define a server context path (with `micronaut.server.context-path`) which serves has a base path for all routes.
+In micronaut configuration file you can define a server context path (with `micronaut.server.context-path`) which serves as a base path for all routes.
 Since the yaml specification file and the views are generated at compile time, these resources are not aware of this runtime setting.
 
 It is still possible for the views to work in case a context path is defined:
