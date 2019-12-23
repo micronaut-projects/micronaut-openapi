@@ -11,7 +11,16 @@ The string syntax is a series of comma-separated key-value pairs, to enable and 
 micronaut.openapi.views.spec=redoc.enabled=true,rapidoc.enabled=true,swagger-ui.enabled=true,swagger-ui.theme=flattop
 ----
 
-For instance in gradle:
+For instance in Gradle for Kotlin projects:
+
+.Gradle
+[source,shell]
+----
+    JAVA_TOOL_OPTIONS=-Dmicronaut.openapi.views.spec=redoc.enabled=true,rapidoc.enabled=true,swagger-ui.enabled=true,swagger-ui.theme=flattop \
+        ./gradlew --no-daemon clean assemble
+----
+
+or in Gradle for Java projects:
 
 .Gradle
 [source,groovy]
@@ -24,7 +33,7 @@ tasks.withType(JavaCompile) {
 }
 ----
 
-or in maven:
+or in Maven:
 
 .Maven
 [source,xml]
