@@ -364,7 +364,17 @@ The string syntax is a series of comma-separated key-value pairs, to enable and 
 </div>
 </div>
 <div class="paragraph">
-<p>For instance in gradle:</p>
+<p>For instance in Gradle for Kotlin projects:</p>
+</div>
+<div class="listingblock">
+<div class="title">Gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">    JAVA_TOOL_OPTIONS=-Dmicronaut.openapi.views.spec=redoc.enabled=true,rapidoc.enabled=true,swagger-ui.enabled=true,swagger-ui.theme=flattop \
+        ./gradlew --no-daemon clean assemble</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>or in Gradle for Java projects:</p>
 </div>
 <div class="listingblock">
 <div class="title">Gradle</div>
@@ -378,7 +388,7 @@ The string syntax is a series of comma-separated key-value pairs, to enable and 
 </div>
 </div>
 <div class="paragraph">
-<p>or in maven:</p>
+<p>or in Maven:</p>
 </div>
 <div class="listingblock">
 <div class="title">Maven</div>
