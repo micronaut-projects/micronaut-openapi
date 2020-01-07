@@ -16,7 +16,7 @@ dependencies {
     testCompile "io.micronaut:micronaut-validation"
     testCompile "io.swagger.core.v3:swagger-annotations"
     testCompile "io.micronaut.configuration:micronaut-hibernate-validator"
-    testCompile 'org.awaitility:awaitility:4.0.1'
+    testCompile 'org.awaitility:awaitility:4.0.2'
     testCompile "org.junit.jupiter:junit-jupiter-api:$junitVersion"
     testCompileOnly "io.micronaut:micronaut-inject-java"
     testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$junitVersion"
