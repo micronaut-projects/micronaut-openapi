@@ -55,6 +55,37 @@ or in Maven:
 </build>
 ----
 
+or in Maven with Groovy:
+
+.Maven + Groovy
+[source,xml]
+----
+<build>
+    <plugins>
+        <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>properties-maven-plugin</artifactId>
+        <version>1.0.0</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>set-system-properties</goal>
+            </goals>
+            <configuration>
+              <properties>
+                <property>
+                  <name>micronaut.openapi.views.spec</name>
+                  <value>rapidoc.enabled=true,swagger-ui.enabled=true,swagger-ui.theme=flattop</value>
+                </property>
+              </properties>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+</build>
+----
+
 The views will be generated to the `META-INF/swagger/views/[swagger-ui | redoc | rapidoc]` directory of your project’s class output.
 
 The following properties are supported:
