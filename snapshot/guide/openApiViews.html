@@ -179,6 +179,38 @@ The string syntax is a series of comma-separated key-value pairs, to enable and 
 </div>
 </div>
 <div class="paragraph">
+<p>or in Maven with Groovy:</p>
+</div>
+<div class="listingblock">
+<div class="title">Maven + Groovy</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;build&gt;
+    &lt;plugins&gt;
+        &lt;plugin&gt;
+        &lt;groupId&gt;org.codehaus.mojo&lt;/groupId&gt;
+        &lt;artifactId&gt;properties-maven-plugin&lt;/artifactId&gt;
+        &lt;version&gt;1.0.0&lt;/version&gt;
+        &lt;executions&gt;
+          &lt;execution&gt;
+            &lt;goals&gt;
+              &lt;goal&gt;set-system-properties&lt;/goal&gt;
+            &lt;/goals&gt;
+            &lt;configuration&gt;
+              &lt;properties&gt;
+                &lt;property&gt;
+                  &lt;name&gt;micronaut.openapi.views.spec&lt;/name&gt;
+                  &lt;value&gt;rapidoc.enabled=true,swagger-ui.enabled=true,swagger-ui.theme=flattop&lt;/value&gt;
+                &lt;/property&gt;
+              &lt;/properties&gt;
+            &lt;/configuration&gt;
+          &lt;/execution&gt;
+        &lt;/executions&gt;
+      &lt;/plugin&gt;
+    &lt;/plugins&gt;
+&lt;/build&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
 <p>The views will be generated to the <code>META-INF/swagger/views/[swagger-ui | redoc | rapidoc]</code> directory of your project’s class output.</p>
 </div>
 <div class="paragraph">
