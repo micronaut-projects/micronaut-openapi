@@ -39,7 +39,6 @@ import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
 import java.lang.annotation.Annotation;
@@ -47,6 +46,7 @@ import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -76,6 +76,8 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
     public static final String MICRONAUT_OPENAPI_ADDITIONAL_FILES = "micronaut.openapi.additional.files";
 
     private ClassElement classElement;
+
+    private Path projectDirectory;
 
     @Override
     public void visitClass(ClassElement element, VisitorContext context) {
@@ -143,9 +145,9 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
     private void mergeAdditionalSwaggerFiles(ClassElement element, VisitorContext context, OpenAPI openAPI) {
         String additionalSwaggerFiles = System.getProperty(MICRONAUT_OPENAPI_ADDITIONAL_FILES);
         if (StringUtils.isNotEmpty(additionalSwaggerFiles)) {
-            Path directory = Paths.get(additionalSwaggerFiles);
+            Path directory = resolve(context, Paths.get(additionalSwaggerFiles));
             if (Files.isDirectory(directory)) {
-                context.info("Merging Swagger OpenAPI YAML files from location :" + additionalSwaggerFiles);
+                context.info("Merging Swagger OpenAPI YAML files from location :" + directory);
                 try {
                     Files.newDirectoryStream(directory,
                             path -> path.toString().endsWith(".yml"))
@@ -160,10 +162,22 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                                 copyOpenAPI(openAPI, parsedOpenApi);
                             });
                 } catch (IOException e) {
-                    context.warn("Unable to read  file from " + directory.getFileName() + ": " + e.getMessage() , classElement);
+                    context.warn("Unable to read  file from " + directory + ": " + e.getMessage() , classElement);
                 }
+            } else {
+                context.warn(directory + " does not exist or is not a directory", classElement);
             }
         }
+    }
+
+    private Path resolve(VisitorContext context, Path directory) {
+        if (!directory.isAbsolute()) {
+            Path projectDir = projectDir(context);
+            if (projectDir != null) {
+                directory = projectDir.resolve(directory);
+            }
+        }
+        return directory;
     }
 
     /**
@@ -270,68 +284,121 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         }
     }
 
+    private Optional<Path> openApiSpecFile(String fileName, VisitorContext visitorContext) {
+        Optional<Path> path = userDefinedSpecFile(visitorContext);
+        if (path.isPresent()) {
+            return path;
+        }
+        // default location
+        Optional<GeneratedFile> generatedFile = visitorContext.visitMetaInfFile("swagger/" + fileName);
+        if (generatedFile.isPresent()) {
+            URI uri = generatedFile.get().toURI();
+            // happens in tests 'mem:///CLASS_OUTPUT/META-INF/swagger/swagger.yml'
+            if (uri.getScheme() != null && !uri.getScheme().equals("mem")) {
+                Path specPath = Paths.get(uri);
+                createDirectories(specPath, visitorContext);
+                return Optional.of(specPath);
+            }
+        }
+        visitorContext.warn("Unable to get swagger/" + fileName + " file.", null);
+        return Optional.empty();
+    }
+
+    private Path projectDir(VisitorContext visitorContext) {
+        if (projectDirectory != null) {
+            return projectDirectory;
+        }
+        // let's find the projectDir
+        Optional<GeneratedFile> dummyFile = visitorContext.visitGeneratedFile("dummy");
+        if (dummyFile.isPresent()) {
+            URI uri = dummyFile.get().toURI();
+            // happens in tests 'mem:///CLASS_OUTPUT/META-INF/swagger/swagger.yml'
+            if (uri.getScheme() != null && !uri.getScheme().equals("mem")) {
+                // assume files are generated in 'build' dir
+                Path dummy = Paths.get(uri).normalize();
+                while (dummy != null) {
+                    Path dummyFileName = dummy.getFileName();
+                    if (dummyFileName != null && "build".equals(dummyFileName.toString())) {
+                        projectDirectory = dummy.getParent();
+                        break;
+                    }
+                    dummy = dummy.getParent();
+                }
+            }
+        }
+        return projectDirectory;
+    }
+
+    private Optional<Path> userDefinedSpecFile(VisitorContext visitorContext) {
+        String targetFile = System.getProperty(MICRONAUT_OPENAPI_TARGET_FILE);
+        if (StringUtils.isEmpty(targetFile)) {
+            return Optional.empty();
+        }
+        Path specFile = resolve(visitorContext, Paths.get(targetFile));
+        createDirectories(specFile, visitorContext);
+        return Optional.of(specFile);
+    }
+
+    private static void createDirectories(Path f, VisitorContext visitorContext) {
+        if (f.getParent() != null) {
+            try {
+                Files.createDirectories(f.getParent());
+            } catch (IOException e) {
+                visitorContext.warn("Fail to create directories for" + f + ": " + e.getMessage(), null);
+            }
+        }
+    }
+
     @Override
     public void finish(VisitorContext visitorContext) {
-        if (classElement != null) {
-
-            Optional<OpenAPI> attr = visitorContext.get(ATTR_OPENAPI, OpenAPI.class);
-
-            attr.ifPresent(openAPI -> {
-                final String namingStrategyName = System.getProperty(MICRONAUT_OPENAPI_PROPERTY_NAMING_STRATEGY);
-                final PropertyNamingStrategyBase propertyNamingStrategy = fromName(namingStrategyName);
-                if (propertyNamingStrategy != null) {
-                    visitorContext.info("Using " + namingStrategyName + " property naming strategy.");
-                    openAPI.getComponents().getSchemas().values().forEach(model -> {
-                        Map<String, Schema> properties = model.getProperties();
-                        if (properties == null) {
-                            return;
-                        }
-                        Map<String, Schema> newProperties = properties.entrySet().stream().collect(Collectors.toMap(entry -> propertyNamingStrategy.translate(entry.getKey()), Map.Entry::getValue, (prop1, prop2) -> prop1,
-                                    LinkedHashMap::new));
-                        model.getProperties().clear();
-                        model.setProperties(newProperties);
-                    });
-                }
-                String property = System.getProperty(MICRONAUT_OPENAPI_TARGET_FILE);
-                String fileName = "swagger.yml";
-                String documentTitle = "OpenAPI";
-
-                Info info = openAPI.getInfo();
-                if (info != null) {
-                    documentTitle = Optional.ofNullable(info.getTitle()).orElse(Environment.DEFAULT_NAME);
-                    documentTitle = documentTitle.toLowerCase().replace(' ', '-');
-                    String version = info.getVersion();
-                    if (version != null) {
-                        documentTitle = documentTitle + '-' + version;
-                    }
-                    fileName = documentTitle + ".yml";
-                }
-                if (StringUtils.isNotEmpty(property)) {
-                    File f = new File(property);
-                    visitorContext.info("Writing OpenAPI YAML to destination: " + f);
-                    try {
-                        f.getParentFile().mkdirs();
-                        yamlMapper.writeValue(f, openAPI);
-                        fileName = f.getName();
-                        renderViews(documentTitle, fileName, f.toPath().getParent(), visitorContext);
-                    } catch (Exception e) {
-                        visitorContext.warn("Unable to generate swagger.yml: " + e.getMessage() , classElement);
-                    }
-                } else {
-                    Optional<GeneratedFile> generatedFile = visitorContext.visitMetaInfFile("swagger/" + fileName);
-                    if (generatedFile.isPresent()) {
-                        GeneratedFile f = generatedFile.get();
-                        try (Writer writer = f.openWriter()) {
-                            URI uri = f.toURI();
-                            visitorContext.info("Writing OpenAPI YAML to destination: " + uri);
-                            yamlMapper.writeValue(writer, openAPI);
-                            renderViews(documentTitle, fileName, Paths.get(uri).getParent(), visitorContext);
-                        } catch (Exception e) {
-                            visitorContext.warn("Unable to generate swagger.yml: " + e.getMessage() , classElement);
-                        }
-                    }
-                }
-            });
+        if (classElement == null) {
+            return;
         }
+
+        Optional<OpenAPI> attr = visitorContext.get(ATTR_OPENAPI, OpenAPI.class);
+
+        attr.ifPresent(openAPI -> {
+            final String namingStrategyName = System.getProperty(MICRONAUT_OPENAPI_PROPERTY_NAMING_STRATEGY);
+            final PropertyNamingStrategyBase propertyNamingStrategy = fromName(namingStrategyName);
+            if (propertyNamingStrategy != null) {
+                visitorContext.info("Using " + namingStrategyName + " property naming strategy.");
+                openAPI.getComponents().getSchemas().values().forEach(model -> {
+                    Map<String, Schema> properties = model.getProperties();
+                    if (properties == null) {
+                        return;
+                    }
+                    Map<String, Schema> newProperties = properties.entrySet().stream()
+                            .collect(Collectors.toMap(entry -> propertyNamingStrategy.translate(entry.getKey()),
+                                    Map.Entry::getValue, (prop1, prop2) -> prop1, LinkedHashMap::new));
+                    model.getProperties().clear();
+                    model.setProperties(newProperties);
+                });
+            }
+            String fileName = "swagger.yml";
+            String documentTitle = "OpenAPI";
+
+            Info info = openAPI.getInfo();
+            if (info != null) {
+                documentTitle = Optional.ofNullable(info.getTitle()).orElse(Environment.DEFAULT_NAME);
+                documentTitle = documentTitle.toLowerCase().replace(' ', '-');
+                String version = info.getVersion();
+                if (version != null) {
+                    documentTitle = documentTitle + '-' + version;
+                }
+                fileName = documentTitle + ".yml";
+            }
+            Optional<Path> specFile = openApiSpecFile(fileName, visitorContext);
+            if (specFile.isPresent()) {
+                Path specPath = specFile.get();
+                try (Writer writer = Files.newBufferedWriter(specPath, StandardOpenOption.TRUNCATE_EXISTING,
+                        StandardOpenOption.CREATE)) {
+                    visitorContext.info("Writing OpenAPI YAML to destination: " + specPath);
+                    yamlMapper.writeValue(writer, openAPI);
+                    renderViews(documentTitle, fileName, specPath.getParent(), visitorContext);
+                } catch (Exception e) {
+                    visitorContext.warn("Unable to generate swagger.yml: " + specPath + " - " + e.getMessage(), classElement);
+                }
+            }
+        });
     }
 }
