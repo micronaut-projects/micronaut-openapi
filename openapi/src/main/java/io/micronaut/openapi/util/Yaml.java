@@ -25,6 +25,8 @@ import com.fasterxml.jackson.databind.SerializationConfig;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.BeanSerializerModifier;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+
 import io.micronaut.core.annotation.Internal;
 import io.swagger.v3.core.jackson.SchemaSerializer;
 import io.swagger.v3.core.jackson.mixin.ExtensionsMixin;
@@ -95,10 +97,7 @@ public final class Yaml {
                     }
                 });
             }
-        });
-
-        Module deserializerModule = new DeserializationModule();
-        mapper.registerModule(deserializerModule);
+        }).registerModule(new DeserializationModule()).registerModule(new JavaTimeModule());
 
         List<Class<?>> mixinTargets = Arrays.asList(
                 ApiResponse.class,
