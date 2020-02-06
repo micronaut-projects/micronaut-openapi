@@ -16,8 +16,12 @@
 package io.micronaut.openapi.visitor
 
 import io.micronaut.annotation.processing.test.AbstractTypeElementSpec
+import io.micronaut.http.annotation.Header
+import io.micronaut.http.annotation.Post
+import io.swagger.v3.oas.annotations.enums.ParameterIn
 import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.Operation
+import io.swagger.v3.oas.models.parameters.RequestBody
 
 class OpenApiOperationHeadersSpec extends AbstractTypeElementSpec {
     def setup() {
@@ -84,5 +88,49 @@ class MyBean {}
         operation.responses.default.headers['X-Rate-Limit-Limit'].schema
         operation.responses.default.headers['X-Rate-Limit-Limit'].schema.type == 'integer'
     }
+
+    void "test parse the micronaut @Header annotation and body"() {
+        given:
+        buildBeanDefinition('test.MyBean', '''
+
+package test;
+
+import io.micronaut.http.annotation.*;
+import java.util.List;
+
+@Controller("/")
+class MyController {
+
+    @Post("/create2")
+    public String create2(@Header("X-Session-Id") String sessionId, String phone, String name) {
+        return name;
+    }
 }
 
+
+@javax.inject.Singleton
+class MyBean {}
+''')
+
+        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        Operation operation = openAPI.paths?.get("/create2")?.post
+        System.out.println(operation)
+        RequestBody requestBody = operation.requestBody
+        System.out.println(requestBody)
+
+        expect:
+        operation
+        operation.parameters.size() == 1
+        operation.parameters[0].name == 'X-Session-Id'
+        operation.parameters[0].in == ParameterIn.HEADER.toString()
+
+        requestBody
+        requestBody.content
+        requestBody.content.size() == 1
+        requestBody.content["application/json"].schema
+        requestBody.content["application/json"].schema.properties
+        requestBody.content["application/json"].schema.properties.size() == 2
+        requestBody.content["application/json"].schema.properties["phone"]
+        requestBody.content["application/json"].schema.properties["name"]
+    }
+}
