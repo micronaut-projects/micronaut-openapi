@@ -345,6 +345,100 @@ class MyBean {}
         pathItem.get.parameters.empty
         pathItem.get.requestBody == null
     }
+
+    void "test parameter with no bindable annotations or reserved types"() {
+
+        given:"An API definition"
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import java.security.Principal;
+import io.micronaut.http.annotation.*;
+import io.micronaut.http.*;
+import io.swagger.v3.oas.annotations.*;
+import io.swagger.v3.oas.annotations.parameters.*;
+import io.swagger.v3.oas.annotations.responses.*;
+import io.swagger.v3.oas.annotations.security.*;
+import io.swagger.v3.oas.annotations.media.*;
+import io.swagger.v3.oas.annotations.enums.*;
+/**
+ * @author graemerocher
+ * @since 1.0
+ */
+
+@Controller("/")
+interface Test {
+
+    @Get("/test1")
+    public String test1(String name);
+
+    @Post("/test2")
+    public String test2(String name);
+
+    @Get("/test3")
+    public String test3(Principal principal);
+
+    @Get("/test4")
+    public String test4(HttpRequest req);
+
+    @Get("/test5")
+    public String test5(HttpRequest req, Principal principal, String name, Greeting greeting);
+}
+
+class Greeting {
+    public String message;
+}
+
+@javax.inject.Singleton
+class MyBean {}
+''')
+        then:"the state is correct"
+        AbstractOpenApiVisitor.testReference != null
+
+        when:"The OpenAPI is retrieved"
+        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        PathItem pathItem = openAPI.paths.get("/test1")
+
+        then:
+        pathItem.get.operationId == 'test1'
+        pathItem.get.parameters.size() == 1
+        pathItem.get.parameters[0].name == 'name'
+        pathItem.get.parameters[0].in == 'path'
+
+        when:
+        pathItem = openAPI.paths.get("/test2")
+
+        then:
+        pathItem.post.operationId == 'test2'
+        pathItem.post.parameters.size() == 0
+
+        when:
+        pathItem = openAPI.paths.get("/test3")
+
+        then:
+        pathItem.get.operationId == 'test3'
+        pathItem.get.parameters.size() == 0
+
+        when:
+        pathItem = openAPI.paths.get("/test4")
+
+        then:
+        pathItem.get.operationId == 'test4'
+        pathItem.get.parameters.size() == 0
+
+        when:
+        pathItem = openAPI.paths.get("/test5")
+
+        then:
+        pathItem.get.operationId == 'test5'
+        pathItem.get.parameters.size() == 2
+        pathItem.get.parameters[0].name == 'name'
+        pathItem.get.parameters[0].in == 'path'
+        pathItem.get.parameters[1].name == 'greeting'
+        pathItem.get.parameters[1].in == 'path'
+        pathItem.get.parameters[1].schema.$ref == '#/components/schemas/Greeting'
+    }
 }
 
 

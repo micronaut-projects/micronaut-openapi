@@ -31,6 +31,7 @@ import io.micronaut.core.util.StringUtils;
 import io.micronaut.core.value.OptionalValues;
 import io.micronaut.core.value.PropertyResolver;
 import io.micronaut.http.HttpMethod;
+import io.micronaut.http.HttpRequest;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.MediaType;
 import io.micronaut.http.annotation.Body;
@@ -39,6 +40,7 @@ import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.CookieValue;
 import io.micronaut.http.annotation.Header;
 import io.micronaut.http.annotation.HttpMethodMapping;
+import io.micronaut.http.annotation.Part;
 import io.micronaut.http.annotation.PathVariable;
 import io.micronaut.http.annotation.Produces;
 import io.micronaut.http.annotation.QueryValue;
@@ -100,13 +102,31 @@ public class OpenApiControllerVisitor extends AbstractOpenApiVisitor implements 
         processSecuritySchemes(element, context);
     }
 
+    private boolean hasNoBindingAnnotationOrType(ParameterElement parameter) {
+        return !parameter.isAnnotationPresent(io.swagger.v3.oas.annotations.Parameter.class) &&
+               !parameter.isAnnotationPresent(io.swagger.v3.oas.annotations.parameters.RequestBody.class) &&
+               !parameter.isAnnotationPresent(Hidden.class) &&
+
+               !parameter.isAnnotationPresent(QueryValue.class) &&
+               !parameter.isAnnotationPresent(PathVariable.class) &&
+               !parameter.isAnnotationPresent(Body.class) &&
+               !parameter.isAnnotationPresent(Part.class) &&
+               !parameter.isAnnotationPresent(CookieValue.class) &&
+               !parameter.isAnnotationPresent(Header.class) &&
+
+               !isIgnoredParameterType(parameter.getType()) &&
+               !isResponseType(parameter.getType()) &&
+               !parameter.getType().isAssignable(HttpRequest.class) &&
+               !parameter.getType().isAssignable("io.micronaut.http.BasicAuth");
+    }
+
     @Override
     public void visitMethod(MethodElement element, VisitorContext context) {
-        Optional<Class<? extends Annotation>> httpMethodOpt = element.getAnnotationTypeByStereotype(HttpMethodMapping.class);
-
         if (element.isAnnotationPresent(Hidden.class)) {
             return;
         }
+
+        Optional<Class<? extends Annotation>> httpMethodOpt = element.getAnnotationTypeByStereotype(HttpMethodMapping.class);
 
         httpMethodOpt.ifPresent(httpMethodClass -> {
             HttpMethod httpMethod = null;
@@ -322,6 +342,11 @@ public class OpenApiControllerVisitor extends AbstractOpenApiVisitor implements 
                     newParameter = new Parameter();
                     newParameter.setIn(ParameterIn.QUERY.toString());
                     newParameter.setName(queryVar);
+                } else if (! permitsRequestBody && hasNoBindingAnnotationOrType(parameter)) {
+                    // default to PathVariable - https://github.com/micronaut-projects/micronaut-openapi/issues/130
+                    newParameter = new Parameter();
+                    newParameter.setIn(ParameterIn.PATH.toString());
+                    newParameter.setName(parameterName);
                 }
 
                 if (parameter.isAnnotationPresent(io.swagger.v3.oas.annotations.Parameter.class)) {
