@@ -4,7 +4,7 @@
 [![Build Status](https://github.com/micronaut-projects/micronaut-openapi/workflows/Java%20CI/badge.svg)](https://github.com/micronaut-projects/micronaut-openapi/actions)
 [![Download](https://api.bintray.com/packages/micronaut/core-releases-local/openapi/images/download.svg)](https://bintray.com/micronaut/core-releases-local/openapi/_latestVersion)
 
-This is a configuration for using OpenAPI in Micronaut applications.
+This project allows generating OpenAPI 3.x (Swagger) specifications for a Micronaut application at compilation time. By moving the generation of OpenAPI specs into the compiler this project allows Micronaut applications to save on memory and avoid the need for costly computation at runtime unlike most implementations of OpenAPI which rely on processing to occur on the server.
   
 ## Documentation ##
 
