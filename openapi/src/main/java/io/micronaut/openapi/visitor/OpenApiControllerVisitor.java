@@ -343,9 +343,9 @@ public class OpenApiControllerVisitor extends AbstractOpenApiVisitor implements 
                     newParameter.setIn(ParameterIn.QUERY.toString());
                     newParameter.setName(queryVar);
                 } else if (! permitsRequestBody && hasNoBindingAnnotationOrType(parameter)) {
-                    // default to PathVariable - https://github.com/micronaut-projects/micronaut-openapi/issues/130
+                    // default to QueryValue - https://github.com/micronaut-projects/micronaut-openapi/issues/130
                     newParameter = new Parameter();
-                    newParameter.setIn(ParameterIn.PATH.toString());
+                    newParameter.setIn(ParameterIn.QUERY.toString());
                     newParameter.setName(parameterName);
                 }
 
