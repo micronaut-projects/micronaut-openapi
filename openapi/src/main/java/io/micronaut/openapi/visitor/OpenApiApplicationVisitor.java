@@ -50,6 +50,8 @@ import java.nio.file.StandardOpenOption;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import javax.annotation.processing.SupportedOptions;
+
 /**
  * Visits the application class.
  *
@@ -57,6 +59,13 @@ import java.util.stream.Collectors;
  * @since 1.0
  */
 @Experimental
+@SupportedOptions({
+    OpenApiApplicationVisitor.MICRONAUT_OPENAPI_PROPERTY_NAMING_STRATEGY,
+    OpenApiApplicationVisitor.MICRONAUT_OPENAPI_VIEWS_SPEC,
+    OpenApiApplicationVisitor.MICRONAUT_OPENAPI_TARGET_FILE,
+    OpenApiApplicationVisitor.MICRONAUT_OPENAPI_ADDITIONAL_FILES
+    
+})
 public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements TypeElementVisitor<OpenAPIDefinition, Object> {
     /**
      * System property for naming strategy. One jackson PropertyNamingStrategy.
