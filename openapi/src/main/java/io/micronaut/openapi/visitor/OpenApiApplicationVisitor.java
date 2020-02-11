@@ -40,6 +40,7 @@ import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 
 import java.io.IOException;
+import java.io.Reader;
 import java.io.Writer;
 import java.lang.annotation.Annotation;
 import java.net.URI;
@@ -63,10 +64,15 @@ import javax.annotation.processing.SupportedOptions;
     OpenApiApplicationVisitor.MICRONAUT_OPENAPI_PROPERTY_NAMING_STRATEGY,
     OpenApiApplicationVisitor.MICRONAUT_OPENAPI_VIEWS_SPEC,
     OpenApiApplicationVisitor.MICRONAUT_OPENAPI_TARGET_FILE,
-    OpenApiApplicationVisitor.MICRONAUT_OPENAPI_ADDITIONAL_FILES
+    OpenApiApplicationVisitor.MICRONAUT_OPENAPI_ADDITIONAL_FILES,
+    OpenApiApplicationVisitor.MICRONAUT_OPENAPI_CONFIG_FILE,
     
 })
 public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements TypeElementVisitor<OpenAPIDefinition, Object> {
+    /**
+     * System property that enables setting the open api config file.
+     */
+    public static final String MICRONAUT_OPENAPI_CONFIG_FILE = "micronaut.openapi.config.file";
     /**
      * System property for naming strategy. One jackson PropertyNamingStrategy.
      */
@@ -84,13 +90,24 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
      */
     public static final String MICRONAUT_OPENAPI_ADDITIONAL_FILES = "micronaut.openapi.additional.files";
 
+    /**
+     * Default openapi config file.
+     */
+    public static final String OPENAPI_CONFIG_FILE = "openapi.properties";
+
     private ClassElement classElement;
 
     private Path projectDirectory;
+    private Properties openApiProperties = new Properties();
 
     @Override
     public void visitClass(ClassElement element, VisitorContext context) {
         context.info("Generating OpenAPI Documentation");
+        try {
+            readOpenApiConfigFile(context);
+        } catch (IOException e) {
+            context.warn("Fail to read OpenAPI configuration file: " + e.getMessage(), null);
+        }
         OpenAPI openAPI = readOpenAPI(element, context);
         mergeAdditionalSwaggerFiles(element, context, openAPI);
         // handle type level tags
@@ -144,6 +161,10 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         this.classElement = element;
     }
 
+    private String getConfigurationProperty(String key) {
+        return System.getProperty(key, openApiProperties.getProperty(key));
+    }
+
     /**
      * Merge the OpenAPI YAML files into one single file.
      *
@@ -152,7 +173,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
      * @param openAPI The {@link OpenAPI} object for the application
      */
     private void mergeAdditionalSwaggerFiles(ClassElement element, VisitorContext context, OpenAPI openAPI) {
-        String additionalSwaggerFiles = System.getProperty(MICRONAUT_OPENAPI_ADDITIONAL_FILES);
+        String additionalSwaggerFiles = getConfigurationProperty(MICRONAUT_OPENAPI_ADDITIONAL_FILES);
         if (StringUtils.isNotEmpty(additionalSwaggerFiles)) {
             Path directory = resolve(context, Paths.get(additionalSwaggerFiles));
             if (Files.isDirectory(directory)) {
@@ -179,14 +200,28 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         }
     }
 
-    private Path resolve(VisitorContext context, Path directory) {
-        if (!directory.isAbsolute()) {
+    private Path resolve(VisitorContext context, Path path) {
+        if (!path.isAbsolute()) {
             Path projectDir = projectDir(context);
             if (projectDir != null) {
-                directory = projectDir.resolve(directory);
+                path = projectDir.resolve(path);
             }
         }
-        return directory;
+        return path;
+    }
+
+    private void readOpenApiConfigFile(VisitorContext context) throws IOException {
+        String cfgFile = System.getProperty(MICRONAUT_OPENAPI_CONFIG_FILE, OPENAPI_CONFIG_FILE);
+        if (StringUtils.isNotEmpty(cfgFile)) {
+            Path cfg = resolve(context, Paths.get(cfgFile));
+            if (Files.isReadable(cfg)) {
+                try (Reader reader = Files.newBufferedReader(cfg)) {
+                    openApiProperties.load(reader);
+                }
+            } else if (Files.exists(cfg)) {
+                context.warn("Can not read configuration file: " + cfg, null);
+            }
+        }
     }
 
     /**
@@ -270,7 +305,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
     private void renderViews(String title, String specFile, Path destinationDir, VisitorContext visitorContext) throws IOException {
         String viewSpecification = System.getProperty(MICRONAUT_OPENAPI_VIEWS_SPEC);
         if (viewSpecification != null) {
-            OpenApiViewConfig cfg = OpenApiViewConfig.fromSpecification(viewSpecification);
+            OpenApiViewConfig cfg = OpenApiViewConfig.fromSpecification(viewSpecification, openApiProperties);
             if (cfg.isEnabled()) {
                 cfg.setTitle(title);
                 cfg.setSpecFile(specFile);
@@ -339,7 +374,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
     }
 
     private Optional<Path> userDefinedSpecFile(VisitorContext visitorContext) {
-        String targetFile = System.getProperty(MICRONAUT_OPENAPI_TARGET_FILE);
+        String targetFile = getConfigurationProperty(MICRONAUT_OPENAPI_TARGET_FILE);
         if (StringUtils.isEmpty(targetFile)) {
             return Optional.empty();
         }
@@ -367,7 +402,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         Optional<OpenAPI> attr = visitorContext.get(ATTR_OPENAPI, OpenAPI.class);
 
         attr.ifPresent(openAPI -> {
-            final String namingStrategyName = System.getProperty(MICRONAUT_OPENAPI_PROPERTY_NAMING_STRATEGY);
+            final String namingStrategyName = getConfigurationProperty(MICRONAUT_OPENAPI_PROPERTY_NAMING_STRATEGY);
             final PropertyNamingStrategyBase propertyNamingStrategy = fromName(namingStrategyName);
             if (propertyNamingStrategy != null) {
                 visitorContext.info("Using " + namingStrategyName + " property naming strategy.");

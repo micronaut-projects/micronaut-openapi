@@ -13,7 +13,7 @@
         </style>
     </head>
     <body>
-        <redoc id='redoc'></redoc>
+        <redoc id='redoc' {{redoc.attributes}}></redoc>
         <script src='https://unpkg.com/redoc{{redoc.version}}/bundles/redoc.standalone.js'></script>
         <script>
             const extract = function(v) {
