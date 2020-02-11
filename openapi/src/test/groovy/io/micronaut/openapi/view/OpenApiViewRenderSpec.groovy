@@ -20,8 +20,6 @@ import java.nio.file.Path
 import java.nio.file.Paths
 
 import io.micronaut.openapi.view.OpenApiViewConfig
-import io.micronaut.openapi.view.OpenApiViewConfig.RapidocConfig
-import io.micronaut.openapi.view.OpenApiViewConfig.SwaggerUIConfig
 import spock.lang.Specification
 
 class OpenApiOperationViewRenderSpec extends Specification {
@@ -33,7 +31,7 @@ class OpenApiOperationViewRenderSpec extends Specification {
     void "test render OpenApiView specification"() {
         given:
         String spec = "mapping.path=somewhere,redoc.enabled=true,rapidoc.enabled=true,swagger-ui.enabled=true"
-        OpenApiViewConfig cfg = OpenApiViewConfig.fromSpecification(spec)
+        OpenApiViewConfig cfg = OpenApiViewConfig.fromSpecification(spec, new Properties())
         Path outputDir = Paths.get("output")
         cfg.title = "OpenAPI documentation"
         cfg.specFile = "swagger.yml"

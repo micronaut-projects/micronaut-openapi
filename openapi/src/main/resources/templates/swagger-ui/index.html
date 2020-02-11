@@ -43,8 +43,6 @@
                 ui = SwaggerUIBundle({
                     url: contextPath + '{{specURL}}',
                     dom_id: '#swagger-ui',
-                    deepLinking: {{swagger-ui.deep-linking}},
-                    validatorUrl: null,
                     presets: [
                         SwaggerUIBundle.presets.apis,
                         SwaggerUIStandalonePreset
@@ -53,7 +51,7 @@
                         SwaggerUIBundle.plugins.DownloadUrl,
                         f
                     ],
-                    layout: '{{swagger-ui.layout}}'
+                    {{swagger-ui.attributes}}
                 });
             window.ui = ui;
         };

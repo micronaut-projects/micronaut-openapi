@@ -114,9 +114,7 @@ class MyBean {}
 
         OpenAPI openAPI = AbstractOpenApiVisitor.testReference
         Operation operation = openAPI.paths?.get("/create2")?.post
-        System.out.println(operation)
         RequestBody requestBody = operation.requestBody
-        System.out.println(requestBody)
 
         expect:
         operation

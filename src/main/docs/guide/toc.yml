@@ -1,4 +1,5 @@
 introduction: Introduction
+systemProperties: Open API Processing Options
 cli: Using the Micronaut CLI
 gettingStarted: Getting Started with Swagger
 exposingSwaggerOutput: Exposing Swagger Output

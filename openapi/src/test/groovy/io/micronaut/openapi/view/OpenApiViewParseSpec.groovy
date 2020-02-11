@@ -16,8 +16,6 @@
 package io.micronaut.openapi.view
 
 import io.micronaut.openapi.view.OpenApiViewConfig
-import io.micronaut.openapi.view.OpenApiViewConfig.RapidocConfig
-import io.micronaut.openapi.view.OpenApiViewConfig.SwaggerUIConfig
 import spock.lang.Specification
 
 class OpenApiOperationViewParseSpec extends Specification {
@@ -25,7 +23,7 @@ class OpenApiOperationViewParseSpec extends Specification {
     void "test parse empty OpenApiView specification"() {
         given:
         String spec = ""
-        OpenApiViewConfig cfg = OpenApiViewConfig.fromSpecification(spec)
+        OpenApiViewConfig cfg = OpenApiViewConfig.fromSpecification(spec, new Properties())
 
         expect:
         cfg.enabled == false
@@ -34,7 +32,7 @@ class OpenApiOperationViewParseSpec extends Specification {
     void "test parse OpenApiView specification, views enabled"() {
         given:
         String spec = "mapping.path=somewhere,redoc.enabled=true,rapidoc.enabled=true,swagger-ui.enabled=true"
-        OpenApiViewConfig cfg = OpenApiViewConfig.fromSpecification(spec)
+        OpenApiViewConfig cfg = OpenApiViewConfig.fromSpecification(spec, new Properties())
 
         expect:
         cfg.enabled == true
@@ -47,7 +45,7 @@ class OpenApiOperationViewParseSpec extends Specification {
     void "test parse OpenApiView specification, redoc enabled"() {
         given:
         String spec = "redoc.enabled=true,redoc.version=version123"
-        OpenApiViewConfig cfg = OpenApiViewConfig.fromSpecification(spec)
+        OpenApiViewConfig cfg = OpenApiViewConfig.fromSpecification(spec, new Properties())
 
         expect:
         cfg.enabled == true
@@ -61,7 +59,7 @@ class OpenApiOperationViewParseSpec extends Specification {
     void "test parse OpenApiView specification, rapidoc enabled"() {
         given:
         String spec = "rapidoc.enabled=true,rapidoc.version=version123,rapidoc.layout=row,rapidoc.theme=light"
-        OpenApiViewConfig cfg = OpenApiViewConfig.fromSpecification(spec)
+        OpenApiViewConfig cfg = OpenApiViewConfig.fromSpecification(spec, new Properties())
 
         expect:
         cfg.enabled == true
@@ -70,14 +68,14 @@ class OpenApiOperationViewParseSpec extends Specification {
         cfg.swaggerUi == null
         cfg.rapidoc != null
         cfg.rapidoc.version == "version123"
-        cfg.rapidoc.theme == RapidocConfig.Theme.LIGHT
-        cfg.rapidoc.layout == RapidocConfig.Layout.ROW
+        cfg.rapidoc.options['theme'] == RapidocConfig.Theme.LIGHT
+        cfg.rapidoc.options['layout'] == RapidocConfig.Layout.ROW
     }
     
     void "test parse OpenApiView specification, swagger-ui enabled"() {
         given:
-        String spec = "swagger-ui.enabled=true,swagger-ui.version=version123,swagger-ui.theme=flattop,swagger-ui.deep-linking=false"
-        OpenApiViewConfig cfg = OpenApiViewConfig.fromSpecification(spec)
+        String spec = "swagger-ui.enabled=true,swagger-ui.version=version123,swagger-ui.theme=flattop,swagger-ui.deepLinking=false"
+        OpenApiViewConfig cfg = OpenApiViewConfig.fromSpecification(spec, new Properties())
 
         expect:
         cfg.enabled == true
@@ -87,6 +85,6 @@ class OpenApiOperationViewParseSpec extends Specification {
         cfg.swaggerUi != null
         cfg.swaggerUi.version == "version123"
         cfg.swaggerUi.theme == SwaggerUIConfig.Theme.FLATTOP
-        cfg.swaggerUi.deepLinking == false
+        cfg.swaggerUi.options['deepLinking'] == false
     }
 }

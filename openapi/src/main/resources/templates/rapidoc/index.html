@@ -9,7 +9,7 @@
         <script src='https://unpkg.com/rapidoc{{rapidoc.version}}/dist/rapidoc-min.js'></script>
     </head>
     <body>
-        <rapi-doc id='rapidoc' show-header='false' theme='{{rapidoc.theme}}' layout='{{rapidoc.layout}}'></rapi-doc>
+        <rapi-doc id='rapidoc' {{rapidoc.attributes}}></rapi-doc>
         <script>
             const extract = function(v) {
                     return decodeURIComponent(v.replace(/(?:(?:^|.*;\s*)contextPath\s*\=\s*([^;]*).*$)|^.*$/, "$1"));
@@ -17,17 +17,13 @@
                 cookie = extract(document.cookie),
                 contextPath = cookie === '' ? extract(window.location.search.substring(1)) : cookie,
                 rapidoc = document.getElementById('rapidoc');
-            rapidoc.setAttribute('spec-url', contextPath + '{{specURL}}');
             if (contextPath !== '') {
-                setTimeout(function() {
-                    if (rapidoc.resolvedSpec) {
-                        rapidoc.resolvedSpec.tags.forEach(tag => tag.paths.forEach(path => path.path = contextPath + path.path));
-                        rapidoc.requestUpdate();
-                    } else {
-                        setTimeout(this, 200);
-                    }
-                }, 200);
+                rapidoc.addEventListener('spec-loaded', e => {
+                    e.detail.tags.forEach(tag => tag.paths.forEach(path => path.path = contextPath + path.path));
+                    rapidoc.requestUpdate();
+                });
             }
+            rapidoc.setAttribute('spec-url', contextPath + '{{specURL}}');
         </script>
     </body>
 </html>

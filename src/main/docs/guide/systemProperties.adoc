@@ -1,0 +1,22 @@
+In the following chapters you will see it is possible to tweaks the open api processing via system properties. It is also possible to specify these options in
+a file located at the root level of your project directory. The expected filename is `openapi.properties`.
+
+It is possible to specify a different location and filename with the `micronaut.openapi.config.file` System property.
+
+Options specified with System properties have priority over the one defined in the `openapi.properties` file.
+
+.openapi.properties Example
+[source]
+----
+micronaut.openapi.property.naming.strategy=KEBAB_CASE
+micronaut.openapi.target.file=myspecfile.yml
+
+swagger-ui.enabled=true
+
+redoc.enabled=true
+
+rapidoc.enabled=true
+rapidoc.bg-color=#14191f
+rapidoc.text-color=#aec2e0
+rapidoc.sort-endpoints-by=method
+----
