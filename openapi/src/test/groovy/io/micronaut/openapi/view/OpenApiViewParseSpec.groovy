@@ -37,9 +37,9 @@ class OpenApiOperationViewParseSpec extends Specification {
         expect:
         cfg.enabled == true
         cfg.mappingPath == "somewhere"
-        cfg.rapidoc != null
-        cfg.redoc != null
-        cfg.swaggerUi != null
+        cfg.rapidocConfig != null
+        cfg.redocConfig != null
+        cfg.swaggerUIConfig != null
     }
     
     void "test parse OpenApiView specification, redoc enabled"() {
@@ -50,10 +50,10 @@ class OpenApiOperationViewParseSpec extends Specification {
         expect:
         cfg.enabled == true
         cfg.mappingPath == "swagger"
-        cfg.rapidoc == null
-        cfg.swaggerUi == null
-        cfg.redoc != null
-        cfg.redoc.version == "version123"
+        cfg.rapidocConfig == null
+        cfg.swaggerUIConfig == null
+        cfg.redocConfig != null
+        cfg.redocConfig.version == "version123"
     }
     
     void "test parse OpenApiView specification, rapidoc enabled"() {
@@ -64,12 +64,12 @@ class OpenApiOperationViewParseSpec extends Specification {
         expect:
         cfg.enabled == true
         cfg.mappingPath == "swagger"
-        cfg.redoc == null
-        cfg.swaggerUi == null
-        cfg.rapidoc != null
-        cfg.rapidoc.version == "version123"
-        cfg.rapidoc.options['theme'] == RapidocConfig.Theme.LIGHT
-        cfg.rapidoc.options['layout'] == RapidocConfig.Layout.ROW
+        cfg.redocConfig == null
+        cfg.swaggerUIConfig == null
+        cfg.rapidocConfig != null
+        cfg.rapidocConfig.version == "version123"
+        cfg.rapidocConfig.options['theme'] == RapidocConfig.Theme.LIGHT
+        cfg.rapidocConfig.options['layout'] == RapidocConfig.Layout.ROW
     }
     
     void "test parse OpenApiView specification, swagger-ui enabled"() {
@@ -80,11 +80,11 @@ class OpenApiOperationViewParseSpec extends Specification {
         expect:
         cfg.enabled == true
         cfg.mappingPath == "swagger"
-        cfg.redoc == null
-        cfg.rapidoc == null
-        cfg.swaggerUi != null
-        cfg.swaggerUi.version == "version123"
-        cfg.swaggerUi.theme == SwaggerUIConfig.Theme.FLATTOP
-        cfg.swaggerUi.options['deepLinking'] == false
+        cfg.redocConfig == null
+        cfg.rapidocConfig == null
+        cfg.swaggerUIConfig != null
+        cfg.swaggerUIConfig.version == "version123"
+        cfg.swaggerUIConfig.theme == SwaggerUIConfig.Theme.FLATTOP
+        cfg.swaggerUIConfig.options['deepLinking'] == false
     }
 }

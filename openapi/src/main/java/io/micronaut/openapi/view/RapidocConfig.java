@@ -164,6 +164,8 @@ public final class RapidocConfig extends AbstractViewConfig implements Renderer 
         }
     }
 
+    private RapiPDFConfig rapiPDFConfig;
+
     private RapidocConfig() {
         super("rapidoc.");
     }
@@ -174,11 +176,14 @@ public final class RapidocConfig extends AbstractViewConfig implements Renderer 
      * @return A RapidocConfig.
      */
     static RapidocConfig fromProperties(Map<String, String> properties) {
-        return AbstractViewConfig.fromProperties(new RapidocConfig(), DEFAULT_OPTIONS, properties);
+        RapidocConfig cfg = new RapidocConfig();
+        cfg.rapiPDFConfig = RapiPDFConfig.fromProperties(properties);
+        return AbstractViewConfig.fromProperties(cfg, DEFAULT_OPTIONS, properties);
     }
 
     @Override
     public String render(String template) {
+        template = rapiPDFConfig.render(template);
         template = OpenApiViewConfig.replacePlaceHolder(template, "rapidoc.version", version, "@");
         return OpenApiViewConfig.replacePlaceHolder(template, "rapidoc.attributes", toHtmlAttributes(), "");
     }

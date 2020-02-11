@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 
 /**
  * Swagger-ui configuration.
- * https://github.com/ostranme/swagger-ui-themes/tree/develop/themes/3.x
+ *
  * @author croudet
  */
 public final class SwaggerUIConfig extends AbstractViewConfig implements Renderer {
@@ -114,14 +114,6 @@ public final class SwaggerUIConfig extends AbstractViewConfig implements Rendere
             template = template.replace("{{swagger-ui.theme}}", "");
         }
         return template;
-    }
-
-    /**
-     * Returns the version of swagger-ui to use.
-     * @return The version.
-     */
-    public String getVersion() {
-        return version;
     }
 
     @Override
