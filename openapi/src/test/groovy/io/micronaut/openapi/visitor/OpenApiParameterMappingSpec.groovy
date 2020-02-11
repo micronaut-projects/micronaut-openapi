@@ -353,6 +353,7 @@ class MyBean {}
         buildBeanDefinition('test.MyBean', '''
 package test;
 
+import javax.annotation.Nullable;
 import java.security.Principal;
 import io.micronaut.http.annotation.*;
 import io.micronaut.http.*;
@@ -383,7 +384,10 @@ interface Test {
     public String test4(HttpRequest req);
 
     @Get("/test5")
-    public String test5(HttpRequest req, Principal principal, String name, Greeting greeting);
+    public String test5(HttpRequest req, Principal principal, String name, String greeting);
+
+    @Get("/test6{?bar}")
+    public String test6(@Nullable String bar, String name);
 }
 
 class Greeting {
@@ -404,7 +408,7 @@ class MyBean {}
         pathItem.get.operationId == 'test1'
         pathItem.get.parameters.size() == 1
         pathItem.get.parameters[0].name == 'name'
-        pathItem.get.parameters[0].in == 'path'
+        pathItem.get.parameters[0].in == 'query'
 
         when:
         pathItem = openAPI.paths.get("/test2")
@@ -434,10 +438,20 @@ class MyBean {}
         pathItem.get.operationId == 'test5'
         pathItem.get.parameters.size() == 2
         pathItem.get.parameters[0].name == 'name'
-        pathItem.get.parameters[0].in == 'path'
+        pathItem.get.parameters[0].in == 'query'
         pathItem.get.parameters[1].name == 'greeting'
-        pathItem.get.parameters[1].in == 'path'
-        pathItem.get.parameters[1].schema.$ref == '#/components/schemas/Greeting'
+        pathItem.get.parameters[1].in == 'query'
+
+        when:
+        pathItem = openAPI.paths.get("/test6")
+
+        then:
+        pathItem.get.operationId == 'test6'
+        pathItem.get.parameters.size() == 2
+        pathItem.get.parameters[0].name == 'bar'
+        pathItem.get.parameters[0].in == 'query'
+        pathItem.get.parameters[1].name == 'name'
+        pathItem.get.parameters[1].in == 'query'
     }
 }
 
