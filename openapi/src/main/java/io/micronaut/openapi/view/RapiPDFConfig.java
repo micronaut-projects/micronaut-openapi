@@ -36,7 +36,6 @@ public final class RapiPDFConfig extends AbstractViewConfig implements Renderer 
 
     static {
         VALID_OPTIONS.put("style", AbstractViewConfig::asString);
-        VALID_OPTIONS.put("spec-url", AbstractViewConfig::asString);
         VALID_OPTIONS.put("button-label", AbstractViewConfig::asString);
         VALID_OPTIONS.put("button-bg", AbstractViewConfig::asString);
         VALID_OPTIONS.put("button-color", AbstractViewConfig::asString);

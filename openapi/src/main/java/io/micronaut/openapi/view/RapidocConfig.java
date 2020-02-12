@@ -34,6 +34,7 @@ public final class RapidocConfig extends AbstractViewConfig implements Renderer 
     private static final Map<String, Function<String, Object>> VALID_OPTIONS = new HashMap<>(45);
 
     static {
+        VALID_OPTIONS.put("style", AbstractViewConfig::asString);
         VALID_OPTIONS.put("sort-tags", AbstractViewConfig::asBoolean);
         VALID_OPTIONS.put("sort-endpoints-by", new EnumConverter<>(EndPoint.class));
         VALID_OPTIONS.put("heading-text", AbstractViewConfig::asString);
