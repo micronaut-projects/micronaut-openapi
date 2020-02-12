@@ -7,9 +7,10 @@
         <meta charset='utf-8' />
         <meta name='viewport' content='width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes' />
         <script src='https://unpkg.com/rapidoc{{rapidoc.version}}/dist/rapidoc-min.js'></script>
+        {{rapipdf.script}}
     </head>
     <body>
-        <rapi-doc id='rapidoc' {{rapidoc.attributes}}></rapi-doc>
+        <rapi-doc id='rapidoc' {{rapidoc.attributes}}>{{rapipdf.tag}}</rapi-doc>
         <script>
             const extract = function(v) {
                     return decodeURIComponent(v.replace(/(?:(?:^|.*;\s*)contextPath\s*\=\s*([^;]*).*$)|^.*$/, "$1"));
@@ -24,6 +25,7 @@
                 });
             }
             rapidoc.setAttribute('spec-url', contextPath + '{{specURL}}');
+            {{rapipdf.specurl}}
         </script>
     </body>
 </html>

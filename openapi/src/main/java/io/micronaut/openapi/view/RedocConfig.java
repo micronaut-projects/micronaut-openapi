@@ -23,8 +23,6 @@ import java.util.function.Function;
 /**
  * ReDoc configuration.
  *
- * Currently only the version can be set.
- *
  * @author croudet
  */
 public final class RedocConfig extends AbstractViewConfig implements Renderer {

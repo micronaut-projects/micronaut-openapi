@@ -40,9 +40,9 @@ class OpenApiOperationViewRenderSpec extends Specification {
         expect:
         cfg.enabled == true
         cfg.mappingPath == "somewhere"
-        cfg.rapidoc != null
-        cfg.redoc != null
-        cfg.swaggerUi != null
+        cfg.rapidocConfig != null
+        cfg.redocConfig != null
+        cfg.swaggerUIConfig != null
         cfg.title == "OpenAPI documentation"
         cfg.specFile == "swagger.yml"
         cfg.specURL == "/somewhere/swagger.yml"

@@ -136,9 +136,9 @@ public final class OpenApiViewConfig {
 
     private void render(Renderer renderer, Path outputDir, String templateName, VisitorContext visitorContext) throws IOException {
         String template = readTemplateFromClasspath(templateName);
+        template = renderer.render(template);
         template = replacePlaceHolder(template, "specURL", getSpecURL(), "");
         template = replacePlaceHolder(template, "title", getTitle(), "");
-        template = renderer.render(template);
         if (!Files.exists(outputDir)) {
             Files.createDirectories(outputDir);
         }
@@ -182,30 +182,6 @@ public final class OpenApiViewConfig {
      */
     public void setSpecFile(String specFile) {
         this.specFile = specFile;
-    }
-
-    /**
-     * Returns the rapidoc config.
-     * @return A RapidocConfig.
-     */
-    public RapidocConfig getRapidoc() {
-        return rapidocConfig;
-    }
-
-    /**
-     * Returns the redoc config.
-     * @return A RedocConfig.
-     */
-    public RedocConfig getRedoc() {
-        return redocConfig;
-    }
-
-    /**
-     * Returns the swagger-ui config.
-     * @return A SwaggerUIConfig.
-     */
-    public SwaggerUIConfig getSwaggerUi() {
-        return swaggerUIConfig;
     }
 
     @Override
