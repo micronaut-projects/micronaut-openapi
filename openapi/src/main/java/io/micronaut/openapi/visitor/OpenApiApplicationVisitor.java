@@ -187,15 +187,15 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                                 try {
                                     parsedOpenApi = yamlMapper.readValue(path.toFile(), OpenAPI.class);
                                 } catch (IOException e) {
-                                    context.warn("Unable to read file " + path.getFileName() + ": " + e.getMessage() , classElement);
+                                    context.warn("Unable to read file " + path.getFileName() + ": " + e.getMessage() , element);
                                 }
                                 copyOpenAPI(openAPI, parsedOpenApi);
                             });
                 } catch (IOException e) {
-                    context.warn("Unable to read  file from " + directory + ": " + e.getMessage() , classElement);
+                    context.warn("Unable to read  file from " + directory + ": " + e.getMessage() , element);
                 }
             } else {
-                context.warn(directory + " does not exist or is not a directory", classElement);
+                context.warn(directory + " does not exist or is not a directory", element);
             }
         }
     }
@@ -318,7 +318,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         if (name == null) {
             return null;
         }
-        switch (name.toUpperCase()) {
+        switch (name.toUpperCase(Locale.US)) {
         case "SNAKE_CASE": return (PropertyNamingStrategyBase) PropertyNamingStrategy.SNAKE_CASE;
         case "UPPER_CAMEL_CASE":  return (PropertyNamingStrategyBase) PropertyNamingStrategy.UPPER_CAMEL_CASE;
         case "LOWER_CAMEL_CASE":  return (PropertyNamingStrategyBase) PropertyNamingStrategy.LOWER_CAMEL_CASE;
@@ -424,7 +424,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             Info info = openAPI.getInfo();
             if (info != null) {
                 documentTitle = Optional.ofNullable(info.getTitle()).orElse(Environment.DEFAULT_NAME);
-                documentTitle = documentTitle.toLowerCase().replace(' ', '-');
+                documentTitle = documentTitle.toLowerCase(Locale.US).replace(' ', '-');
                 String version = info.getVersion();
                 if (version != null) {
                     documentTitle = documentTitle + '-' + version;

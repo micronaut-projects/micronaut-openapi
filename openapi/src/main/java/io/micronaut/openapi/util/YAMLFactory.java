@@ -87,8 +87,6 @@ class YAMLFactory extends JsonFactory {
 
     private DumperOptions.Version _version;
 
-    private final Charset UTF8 = Charset.forName("UTF-8");
-
     /**
      * Default constructor used to create factory instances.
      * Creation of a factory instance is a light-weight operation,

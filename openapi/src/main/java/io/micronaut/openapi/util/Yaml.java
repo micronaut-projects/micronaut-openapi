@@ -82,6 +82,8 @@ public final class Yaml {
 
         // handle ref schema serialization skipping all other props
         mapper.registerModule(new SimpleModule() {
+            private static final long serialVersionUID = 2141981054802490457L;
+
             @Override
             public void setupModule(SetupContext context) {
                 super.setupModule(context);

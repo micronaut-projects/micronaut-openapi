@@ -650,16 +650,16 @@ abstract class AbstractOpenApiVisitor  {
             }
 
             if (element.isAnnotationPresent(Negative.class)) {
-                finalSchemaToBind.setMaximum(new BigDecimal(0));
+                finalSchemaToBind.setMaximum(BigDecimal.ZERO);
             }
             if (element.isAnnotationPresent(NegativeOrZero.class)) {
-                finalSchemaToBind.setMaximum(new BigDecimal(0));
+                finalSchemaToBind.setMaximum(BigDecimal.ZERO);
             }
             if (element.isAnnotationPresent(Positive.class)) {
-                finalSchemaToBind.setMinimum(new BigDecimal(0));
+                finalSchemaToBind.setMinimum(BigDecimal.ZERO);
             }
             if (element.isAnnotationPresent(PositiveOrZero.class)) {
-                finalSchemaToBind.setMinimum(new BigDecimal(0));
+                finalSchemaToBind.setMinimum(BigDecimal.ZERO);
             }
             element.getValue(Max.class, BigDecimal.class).ifPresent(finalSchemaToBind::setMaximum);
             element.getValue(Min.class, BigDecimal.class).ifPresent(finalSchemaToBind::setMinimum);
@@ -802,7 +802,7 @@ abstract class AbstractOpenApiVisitor  {
     }
 
     private void bindSchemaForClassName(VisitorContext context, Map<CharSequence, Object> valueMap, String className) {
-        final Optional<ClassElement> classElement = context.getClassElement(className.toString());
+        final Optional<ClassElement> classElement = context.getClassElement(className);
         final OpenAPI openAPI = resolveOpenAPI(context);
         if (classElement.isPresent()) {
             final Schema schema = resolveSchema(openAPI, null, classElement.get(), context, null);
@@ -1041,7 +1041,7 @@ abstract class AbstractOpenApiVisitor  {
                     computeNameWithGenerics(ce, builder, computed);
                 }
                 if (i.hasNext()) {
-                    builder.append(",");
+                    builder.append(',');
                 }
             }
 
