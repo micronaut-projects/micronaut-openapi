@@ -10,9 +10,11 @@
     <script src='https://unpkg.com/swagger-ui-dist{{swagger-ui.version}}/swagger-ui-standalone-preset.js'></script>
     <link rel='stylesheet' type='text/css' href='https://unpkg.com/swagger-ui-dist{{swagger-ui.version}}/swagger-ui.css' />
     {{swagger-ui.theme}}
+    {{rapipdf.script}}
 </head>
 
 <body>
+    {{rapipdf.tag}}
     <div id='swagger-ui'></div>
     <script>
         window.onload = function() {
@@ -54,6 +56,7 @@
                     {{swagger-ui.attributes}}
                 });
             window.ui = ui;
+            {{rapipdf.specurl}}
         };
     </script>
 </body>

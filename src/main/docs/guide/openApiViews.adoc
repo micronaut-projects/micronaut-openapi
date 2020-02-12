@@ -1,4 +1,5 @@
-Micronaut can generate views for your generated OpenApi specification. Currently https://github.com/swagger-api/swagger-ui[Swagger-ui], https://github.com/Rebilly/ReDoc[Redoc] and https://github.com/mrin9/RapiDoc[RapiDoc] are supported. With _RapiDoc_ you can also use https://mrin9.github.io/RapiPdf/[RapiPdf] to generate a PDF from your spec file.
+Micronaut can generate views for your generated OpenApi specification. Currently https://github.com/swagger-api/swagger-ui[Swagger-ui], https://github.com/Rebilly/ReDoc[Redoc] and https://github.com/mrin9/RapiDoc[RapiDoc] are supported.
+You can also use https://mrin9.github.io/RapiPdf/[RapiPdf] to generate a PDF from your spec file.
 
 The resources needed to render the views (javascript, css, ...) are loaded from CDNs: https://unpkg.com[unpkg.com] and https://fonts.googleapis.com/[fonts.googleapis.com].
 
@@ -102,10 +103,10 @@ The following properties are supported:
  * `swagger-ui.[displayOperationId, oauth2RedirectUrl, showMutatedRequest, deepLinking, supportedSubmitMethods, defaultModelsExpandDepth, layout, defaultModelRendering, docExpansion, filter, validatorUrl, showCommonExtensions, maxDisplayedTags, withCredentials, displayRequestDuration, showExtensions]`. See https://github.com/swagger-api/swagger-ui/blob/HEAD/docs/usage/configuration.md[Swagger UI Configuration] for a description.
  * `swagger-ui.theme=[DEFAULT | MATERIAL | FEELING_BLUE | FLATTOP | MONOKAI | MUTED | NEWSPAPER | OUTLINE]`: The theme of swagger-ui to use. These are case insensitive. Default is `DEFAULT`. See https://github.com/ostranme/swagger-ui-themes[Swagger UI Themes].
  
-RapiDoc also supports RapiPdf, to enable it use `rapipdf.enabled=true`.
+Views also supports RapiPdf, to enable it use `rapipdf.enabled=true`.
 It will add a button to the view to generate a PDF from the spec file.
 
-RapiDdf supports the following options:
+RapiPdf supports the following options:
 
  * `rapipdf.[include-api-details, pdf-title, include-api-list, include-security, input-bg, hide-input, pdf-footer-text, button-bg, pdf-primary-color, pdf-schema-style, button-label, pdf-alternate-color, include-info, include-toc, button-color, style, input-color]`. See https://mrin9.github.io/RapiPdf/[RapiPdf Attributes] for a description.
 

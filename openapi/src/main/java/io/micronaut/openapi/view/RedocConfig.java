@@ -20,12 +20,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
+import io.micronaut.openapi.view.OpenApiViewConfig.RendererType;
+
 /**
  * ReDoc configuration.
  *
  * @author croudet
  */
-public final class RedocConfig extends AbstractViewConfig implements Renderer {
+final class RedocConfig extends AbstractViewConfig implements Renderer {
     private static final Map<String, Object> DEFAULT_OPTIONS = Collections.emptyMap();
 
     // https://github.com/Redocly/redoc#redoc-options-object
@@ -55,6 +57,8 @@ public final class RedocConfig extends AbstractViewConfig implements Renderer {
         VALID_OPTIONS.put("untrusted-spec", AbstractViewConfig::asBoolean);
     }
 
+    RapiPDFConfig rapiPDFConfig;
+
     private RedocConfig() {
         super("redoc.");
     }
@@ -71,6 +75,7 @@ public final class RedocConfig extends AbstractViewConfig implements Renderer {
 
     @Override
     public String render(String template) {
+        template = rapiPDFConfig.render(template, RendererType.REDOC);
         template = OpenApiViewConfig.replacePlaceHolder(template, "redoc.version", version, "@");
         return OpenApiViewConfig.replacePlaceHolder(template, "redoc.attributes", toHtmlAttributes(), "");
     }

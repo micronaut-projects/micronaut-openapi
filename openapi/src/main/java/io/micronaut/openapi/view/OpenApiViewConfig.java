@@ -51,6 +51,13 @@ public final class OpenApiViewConfig {
     private RedocConfig redocConfig;
     private RapidocConfig rapidocConfig;
 
+    /**
+     * The Renderer types.
+     */
+    enum RendererType {
+        SWAGGER_UI, REDOC, RAPIDOC;
+    }
+
     private OpenApiViewConfig() {
     }
 
@@ -80,14 +87,18 @@ public final class OpenApiViewConfig {
         openApiProperties.forEach((key, value) -> openApiMap.put((String) key, (String) value));
         openApiMap.putAll(parse(specification));
         OpenApiViewConfig cfg = new OpenApiViewConfig();
+        RapiPDFConfig rapiPDFConfig = RapiPDFConfig.fromProperties(openApiMap);
         if ("true".equals(openApiMap.getOrDefault("redoc.enabled", Boolean.FALSE.toString()))) {
             cfg.redocConfig = RedocConfig.fromProperties(openApiMap);
+            cfg.redocConfig.rapiPDFConfig = rapiPDFConfig;
         }
         if ("true".equals(openApiMap.getOrDefault("rapidoc.enabled", Boolean.FALSE.toString()))) {
             cfg.rapidocConfig = RapidocConfig.fromProperties(openApiMap);
+            cfg.rapidocConfig.rapiPDFConfig = rapiPDFConfig;
         }
         if ("true".equals(openApiMap.getOrDefault("swagger-ui.enabled", Boolean.FALSE.toString()))) {
             cfg.swaggerUIConfig = SwaggerUIConfig.fromProperties(openApiMap);
+            cfg.swaggerUIConfig.rapiPDFConfig = rapiPDFConfig;
         }
         cfg.mappingPath = openApiMap.getOrDefault("mapping.path", "swagger");
         return cfg;

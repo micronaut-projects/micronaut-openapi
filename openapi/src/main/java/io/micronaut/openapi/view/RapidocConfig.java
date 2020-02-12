@@ -20,14 +20,14 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.function.Function;
 
+import io.micronaut.openapi.view.OpenApiViewConfig.RendererType;
+
 /**
  * RapiDoc configuration.
  *
- * Currently only the version, layout and theme can be set.
- *
  * @author croudet
  */
-public final class RapidocConfig extends AbstractViewConfig implements Renderer {
+final class RapidocConfig extends AbstractViewConfig implements Renderer {
     private static final Map<String, Object> DEFAULT_OPTIONS = new HashMap<>();
 
     // https://mrin9.github.io/RapiDoc/api.html
@@ -165,7 +165,7 @@ public final class RapidocConfig extends AbstractViewConfig implements Renderer 
         }
     }
 
-    private RapiPDFConfig rapiPDFConfig;
+    RapiPDFConfig rapiPDFConfig;
 
     private RapidocConfig() {
         super("rapidoc.");
@@ -177,14 +177,12 @@ public final class RapidocConfig extends AbstractViewConfig implements Renderer 
      * @return A RapidocConfig.
      */
     static RapidocConfig fromProperties(Map<String, String> properties) {
-        RapidocConfig cfg = new RapidocConfig();
-        cfg.rapiPDFConfig = RapiPDFConfig.fromProperties(properties);
-        return AbstractViewConfig.fromProperties(cfg, DEFAULT_OPTIONS, properties);
+        return AbstractViewConfig.fromProperties(new RapidocConfig(), DEFAULT_OPTIONS, properties);
     }
 
     @Override
     public String render(String template) {
-        template = rapiPDFConfig.render(template);
+        template = rapiPDFConfig.render(template, RendererType.RAPIDOC);
         template = OpenApiViewConfig.replacePlaceHolder(template, "rapidoc.version", version, "@");
         return OpenApiViewConfig.replacePlaceHolder(template, "rapidoc.attributes", toHtmlAttributes(), "");
     }

@@ -11,8 +11,10 @@
             padding: 0;
           }
         </style>
+        {{rapipdf.script}}
     </head>
     <body>
+        {{rapipdf.tag}}
         <redoc id='redoc' {{redoc.attributes}}></redoc>
         <script src='https://unpkg.com/redoc{{redoc.version}}/bundles/redoc.standalone.js'></script>
         <script>
@@ -22,6 +24,7 @@
                 cookie = extract(document.cookie),
                 contextPath = cookie === '' ? extract(window.location.search.substring(1)) : cookie;
             Redoc.init(contextPath + '{{specURL}}');
+            {{rapipdf.specurl}}
          </script>
     </body>
 </html>
