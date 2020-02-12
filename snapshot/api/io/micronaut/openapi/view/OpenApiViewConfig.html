@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":9,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10,"i9":10,"i10":10};
+var methods = {"i0":9,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10};
 var tabs = {65535:["t0","All Methods"],1:["t1","Static Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -145,61 +145,43 @@ extends <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html
 </td>
 </tr>
 <tr id="i1" class="rowColor">
-<td class="colFirst"><code><a href="../../../../io/micronaut/openapi/view/RapidocConfig.html" title="class in io.micronaut.openapi.view">RapidocConfig</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/openapi/view/OpenApiViewConfig.html#getRapidoc--">getRapidoc</a></span>()</code>
-<div class="block">Returns the rapidoc config.</div>
-</td>
-</tr>
-<tr id="i2" class="altColor">
-<td class="colFirst"><code><a href="../../../../io/micronaut/openapi/view/RedocConfig.html" title="class in io.micronaut.openapi.view">RedocConfig</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/openapi/view/OpenApiViewConfig.html#getRedoc--">getRedoc</a></span>()</code>
-<div class="block">Returns the redoc config.</div>
-</td>
-</tr>
-<tr id="i3" class="rowColor">
 <td class="colFirst"><code><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/openapi/view/OpenApiViewConfig.html#getSpecURL--">getSpecURL</a></span>()</code>
 <div class="block">Returns the relative openApi specification url path.</div>
 </td>
 </tr>
-<tr id="i4" class="altColor">
-<td class="colFirst"><code><a href="../../../../io/micronaut/openapi/view/SwaggerUIConfig.html" title="class in io.micronaut.openapi.view">SwaggerUIConfig</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/openapi/view/OpenApiViewConfig.html#getSwaggerUi--">getSwaggerUi</a></span>()</code>
-<div class="block">Returns the swagger-ui config.</div>
-</td>
-</tr>
-<tr id="i5" class="rowColor">
+<tr id="i2" class="altColor">
 <td class="colFirst"><code><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/openapi/view/OpenApiViewConfig.html#getTitle--">getTitle</a></span>()</code>
 <div class="block">Returns the title for the generated views.</div>
 </td>
 </tr>
-<tr id="i6" class="altColor">
+<tr id="i3" class="rowColor">
 <td class="colFirst"><code>boolean</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/openapi/view/OpenApiViewConfig.html#isEnabled--">isEnabled</a></span>()</code>
 <div class="block">Returns true when the generation of views is enabled.</div>
 </td>
 </tr>
-<tr id="i7" class="rowColor">
+<tr id="i4" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/openapi/view/OpenApiViewConfig.html#render-java.nio.file.Path-io.micronaut.inject.visitor.VisitorContext-">render</a></span>(<a href="https://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html?is-external=true" title="class or interface in java.nio.file">Path</a>&nbsp;outputDir,
       io.micronaut.inject.visitor.VisitorContext&nbsp;visitorContext)</code>
 <div class="block">Generates the views given this configuration.</div>
 </td>
 </tr>
-<tr id="i8" class="altColor">
+<tr id="i5" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/openapi/view/OpenApiViewConfig.html#setSpecFile-java.lang.String-">setSpecFile</a></span>(<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;specFile)</code>
 <div class="block">Sets the generated openApi specification file name.</div>
 </td>
 </tr>
-<tr id="i9" class="rowColor">
+<tr id="i6" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/openapi/view/OpenApiViewConfig.html#setTitle-java.lang.String-">setTitle</a></span>(<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;title)</code>
 <div class="block">Sets the title for the generated views.</div>
 </td>
 </tr>
-<tr id="i10" class="altColor">
+<tr id="i7" class="rowColor">
 <td class="colFirst"><code><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/openapi/view/OpenApiViewConfig.html#toString--">toString</a></span>()</code>&nbsp;</td>
 </tr>
@@ -329,48 +311,6 @@ extends <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>specFile</code> - The openApi specification file name.</dd>
-</dl>
-</li>
-</ul>
-<a name="getRapidoc--">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>getRapidoc</h4>
-<pre>public&nbsp;<a href="../../../../io/micronaut/openapi/view/RapidocConfig.html" title="class in io.micronaut.openapi.view">RapidocConfig</a>&nbsp;getRapidoc()</pre>
-<div class="block">Returns the rapidoc config.</div>
-<dl>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>A RapidocConfig.</dd>
-</dl>
-</li>
-</ul>
-<a name="getRedoc--">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>getRedoc</h4>
-<pre>public&nbsp;<a href="../../../../io/micronaut/openapi/view/RedocConfig.html" title="class in io.micronaut.openapi.view">RedocConfig</a>&nbsp;getRedoc()</pre>
-<div class="block">Returns the redoc config.</div>
-<dl>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>A RedocConfig.</dd>
-</dl>
-</li>
-</ul>
-<a name="getSwaggerUi--">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>getSwaggerUi</h4>
-<pre>public&nbsp;<a href="../../../../io/micronaut/openapi/view/SwaggerUIConfig.html" title="class in io.micronaut.openapi.view">SwaggerUIConfig</a>&nbsp;getSwaggerUi()</pre>
-<div class="block">Returns the swagger-ui config.</div>
-<dl>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>A SwaggerUIConfig.</dd>
 </dl>
 </li>
 </ul>
