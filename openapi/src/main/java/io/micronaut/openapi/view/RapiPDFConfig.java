@@ -33,8 +33,8 @@ final class RapiPDFConfig extends AbstractViewConfig {
     private static final String SPEC = "document.getElementById('rapi-pdf').setAttribute('spec-url', contextPath + '{{specURL}}');";
     private static final Map<String, Object> DEFAULT_OPTIONS = new HashMap<>(6);
 
-    private static final String DEFAULT_RAPIDOC_STYLE = "width: 122px;height: 25px;font-size: 15px;display: inline-block;padding-bottom: 5px;padding-top: 5px;padding-left: 12px;margin-left: 12px";
-    private static final String DEFAULT_REDOC_STYLE = "width: 122px;height: 25px;font-size: 15px;display: inline-block;padding-bottom: 5px;padding-top: 5px;margin-left: 2px";
+    private static final String DEFAULT_RAPIDOC_STYLE = "width: 122px;height: 26px;font-size: 15px;padding-bottom: 0px;padding-top: 5px;padding-left: 12px;margin-left: 12px";
+    private static final String DEFAULT_REDOC_STYLE = "width: 122px;height: 26px;font-size: 15px;padding-bottom: 5px;padding-top: 5px;margin-left: 2px";
     private static final String DEFAULT_SWAGGER_UI_STYLE = DEFAULT_REDOC_STYLE;
 
     // https://mrin9.github.io/RapiPdf/
