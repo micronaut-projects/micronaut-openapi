@@ -119,7 +119,8 @@ function addJsClass() {
 
 
 <div class="paragraph">
-<p>Micronaut can generate views for your generated OpenApi specification. Currently <a href="https://github.com/swagger-api/swagger-ui">swagger-ui</a>, <a href="https://github.com/Rebilly/ReDoc">redoc</a> and <a href="https://github.com/mrin9/RapiDoc">rapidoc</a> are supported. With <em>rapidoc</em> you can also use <a href="https://mrin9.github.io/RapiPdf/">rapipdf</a> to generate a PDF from your spec file.</p>
+<p>Micronaut can generate views for your generated OpenApi specification. Currently <a href="https://github.com/swagger-api/swagger-ui">Swagger-ui</a>, <a href="https://github.com/Rebilly/ReDoc">Redoc</a> and <a href="https://github.com/mrin9/RapiDoc">RapiDoc</a> are supported.
+You can also use <a href="https://mrin9.github.io/RapiPdf/">RapiPdf</a> to generate a PDF from your spec file.</p>
 </div>
 <div class="paragraph">
 <p>The resources needed to render the views (javascript, css, &#8230;&#8203;) are loaded from CDNs: <a href="https://unpkg.com">unpkg.com</a> and <a href="https://fonts.googleapis.com/">fonts.googleapis.com</a>.</p>
@@ -140,7 +141,7 @@ The string syntax is a series of comma-separated key-value pairs, to enable and 
 <div class="listingblock">
 <div class="title">Gradle</div>
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">    JAVA_TOOL_OPTIONS=-Dmicronaut.openapi.views.spec=redoc.enabled=true,rapidoc.enabled=true,swagger-ui.enabled=true,swagger-ui.theme=flattop \
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">JAVA_TOOL_OPTIONS=-Dmicronaut.openapi.views.spec=redoc.enabled=true,rapidoc.enabled=true,swagger-ui.enabled=true,swagger-ui.theme=flattop \
         ./gradlew --no-daemon clean assemble</code></pre>
 </div>
 </div>
@@ -225,48 +226,48 @@ The string syntax is a series of comma-separated key-value pairs, to enable and 
 <p><code>mapping.path=[string]</code>: The path from where the swagger specification will be served by the http server. Default is <code>swagger</code>.</p>
 </li>
 <li>
-<p><code>redoc.enabled=[true | false]</code>: When 'true' the redoc view is generated.</p>
+<p><code>redoc.enabled=[true | false]</code>: When 'true' the Redoc view is generated.</p>
 </li>
 <li>
-<p><code>rapidoc.enabled=[true | false]</code>: When 'true' the rapidoc view is generated.</p>
+<p><code>rapidoc.enabled=[true | false]</code>: When 'true' the RapiDoc view is generated.</p>
 </li>
 <li>
-<p><code>swagger-ui.enabled=[true | false]</code>: When 'true' the swagger-ui view is generated.</p>
+<p><code>swagger-ui.enabled=[true | false]</code>: When 'true' the Swagger-ui view is generated.</p>
 </li>
 <li>
-<p><code>redoc.version=[string]</code>: The version of redoc to use. Default is to use the latest available.</p>
+<p><code>redoc.version=[string]</code>: The version of Redoc to use. Default is to use the latest available.</p>
 </li>
 <li>
-<p><code>redoc.[expand-default-server-variables, menu-toggle, only-required-in-samples, payload-sample-idx, sort-props-alphabetically, untrusted-spec, expand-responses, show-extensions, native-scrollbars, path-in-middle-panel, suppress-warnings, hide-hostname, disable-search, json-sample-expand-level, scroll-y-offset, hide-download-button, no-auto-auth, theme, hide-single-request-sample-tab, required-props-first, hide-loading]</code>. See <a href="https://github.com/Redocly/redoc#redoc-options-object" class="bare">https://github.com/Redocly/redoc#redoc-options-object</a> for a description.</p>
+<p><code>redoc.[expand-default-server-variables, menu-toggle, only-required-in-samples, payload-sample-idx, sort-props-alphabetically, untrusted-spec, expand-responses, show-extensions, native-scrollbars, path-in-middle-panel, suppress-warnings, hide-hostname, disable-search, json-sample-expand-level, scroll-y-offset, hide-download-button, no-auto-auth, theme, hide-single-request-sample-tab, required-props-first, hide-loading]</code>. See <a href="https://github.com/Redocly/redoc#redoc-options-object">Redoc Options</a> for a description.</p>
 </li>
 <li>
-<p><code>rapidoc.version=[string]</code>: The version of rapidoc to use. Default is to use the latest available.</p>
+<p><code>rapidoc.version=[string]</code>: The version of RapiDoc to use. Default is to use the latest available.</p>
 </li>
 <li>
-<p><code>rapidoc.[schema-style, allow-api-list-style-selection, nav-accent-color, show-header, schema-expand-level, response-area-height, allow-authentication, default-api-server, match-paths, allow-server-selection, api-key-name, nav-hover-bg-color, goto-path, theme, text-color, bg-color, api-key-value, header-color, primary-color, sort-tags, nav-bg-color, render-style, heading-text, allow-try, layout, sort-endpoints-by, allow-spec-url-load, nav-text-color, nav-hover-text-color, show-info, regular-font, allow-spec-file-load, server-url, schema-description-expanded, allow-search, api-key-location, mono-font, default-schema-tab]</code>. See <a href="https://mrin9.github.io/RapiDoc/api.html" class="bare">https://mrin9.github.io/RapiDoc/api.html</a> for a description.</p>
+<p><code>rapidoc.[style, schema-style, allow-api-list-style-selection, nav-accent-color, show-header, schema-expand-level, response-area-height, allow-authentication, default-api-server, match-paths, allow-server-selection, api-key-name, nav-hover-bg-color, goto-path, theme, text-color, bg-color, api-key-value, header-color, primary-color, sort-tags, nav-bg-color, render-style, heading-text, allow-try, layout, sort-endpoints-by, allow-spec-url-load, nav-text-color, nav-hover-text-color, show-info, regular-font, allow-spec-file-load, server-url, schema-description-expanded, allow-search, api-key-location, mono-font, default-schema-tab]</code>. See <a href="https://mrin9.github.io/RapiDoc/api.html">RapiDoc Options</a> for a description.</p>
 </li>
 <li>
-<p><code>swagger-ui.version=[string]</code>: The version of swagger-ui to use. Default is to use the latest available.</p>
+<p><code>swagger-ui.version=[string]</code>: The version of Swagger-ui to use. Default is to use the latest available.</p>
 </li>
 <li>
-<p><code>swagger-ui.[displayOperationId, oauth2RedirectUrl, showMutatedRequest, deepLinking, supportedSubmitMethods, defaultModelsExpandDepth, layout, defaultModelRendering, docExpansion, filter, validatorUrl, showCommonExtensions, maxDisplayedTags, withCredentials, displayRequestDuration, showExtensions]</code>. See <a href="https://github.com/swagger-api/swagger-ui/blob/HEAD/docs/usage/configuration.md" class="bare">https://github.com/swagger-api/swagger-ui/blob/HEAD/docs/usage/configuration.md</a> for a description.</p>
+<p><code>swagger-ui.[displayOperationId, oauth2RedirectUrl, showMutatedRequest, deepLinking, supportedSubmitMethods, defaultModelsExpandDepth, layout, defaultModelRendering, docExpansion, filter, validatorUrl, showCommonExtensions, maxDisplayedTags, withCredentials, displayRequestDuration, showExtensions]</code>. See <a href="https://github.com/swagger-api/swagger-ui/blob/HEAD/docs/usage/configuration.md">Swagger UI Configuration</a> for a description.</p>
 </li>
 <li>
-<p><code>swagger-ui.theme=[DEFAULT | MATERIAL | FEELING_BLUE | FLATTOP | MONOKAI | MUTED | NEWSPAPER | OUTLINE]</code>: The theme of swagger-ui to use. These are case insensitive. Default is <code>DEFAULT</code>. See <a href="https://github.com/ostranme/swagger-ui-themes" class="bare">https://github.com/ostranme/swagger-ui-themes</a></p>
+<p><code>swagger-ui.theme=[DEFAULT | MATERIAL | FEELING_BLUE | FLATTOP | MONOKAI | MUTED | NEWSPAPER | OUTLINE]</code>: The theme of swagger-ui to use. These are case insensitive. Default is <code>DEFAULT</code>. See <a href="https://github.com/ostranme/swagger-ui-themes">Swagger UI Themes</a>.</p>
 </li>
 </ul>
 </div>
 <div class="paragraph">
-<p>Rapidoc also supports RapiPDF, to enable it use <code>rapipdf.enabled=true</code>.
+<p>Views also supports RapiPdf, to enable it use <code>rapipdf.enabled=true</code>.
 It will add a button to the view to generate a PDF from the spec file.</p>
 </div>
 <div class="paragraph">
-<p>Rapipdf supports the following options:</p>
+<p>RapiPdf supports the following options:</p>
 </div>
 <div class="ulist">
 <ul>
 <li>
-<p><code>rapipdf.[include-api-details, pdf-title, include-api-list, include-security, input-bg, hide-input, pdf-footer-text, button-bg, pdf-primary-color, pdf-schema-style, button-label, pdf-alternate-color, include-info, include-toc, button-color, style, input-color, spec-url]</code>. See <a href="https://mrin9.github.io/RapiPdf/" class="bare">https://mrin9.github.io/RapiPdf/</a> for a description.</p>
+<p><code>rapipdf.[include-api-details, pdf-title, include-api-list, include-security, input-bg, hide-input, pdf-footer-text, button-bg, pdf-primary-color, pdf-schema-style, button-label, pdf-alternate-color, include-info, include-toc, button-color, style, input-color]</code>. See <a href="https://mrin9.github.io/RapiPdf/">RapiPdf Attributes</a> for a description.</p>
 </li>
 </ul>
 </div>
