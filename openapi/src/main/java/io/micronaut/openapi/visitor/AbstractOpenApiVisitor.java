@@ -20,6 +20,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import io.micronaut.core.annotation.AnnotationClassValue;
 import io.micronaut.core.annotation.AnnotationValue;
 import io.micronaut.core.beans.BeanMap;
@@ -516,9 +518,9 @@ abstract class AbstractOpenApiVisitor  {
                     typeName = PrimitiveType.BINARY.name();
                 }
                 PrimitiveType primitiveType = PrimitiveType.fromName(typeName);
-                if (ClassUtils.isJavaLangType(typeName)) {
+                if (!type.isArray() && ClassUtils.isJavaLangType(typeName)) {
                     schema = getPrimitiveType(typeName);
-                } else if (primitiveType != null) {
+                } else if (!type.isArray() && primitiveType != null) {
                     schema = primitiveType.createProperty();
                 } else if (type.isAssignable(Map.class.getName())) {
                     schema = new MapSchema();
@@ -537,19 +539,22 @@ abstract class AbstractOpenApiVisitor  {
                         }
                     }
                 } else if (type.isIterable()) {
-                    Optional<ClassElement> componentType = type.getFirstTypeArgument();
-                    if (componentType.isPresent()) {
-                        schema = getPrimitiveType(componentType.get().getName());
+                    if (primitiveType != null) {
+                        schema = getPrimitiveType(typeName);
                     } else {
-                        schema = getPrimitiveType(Object.class.getName());
-                    }
+                        Optional<ClassElement> componentType = type.getFirstTypeArgument();
+                        if (componentType.isPresent()) {
+                            schema = getPrimitiveType(componentType.get().getName());
+                        } else {
+                            schema = getPrimitiveType(Object.class.getName());
+                        }
 
-                    if (schema == null && componentType.isPresent()) {
-                        ClassElement componentElement = componentType.get();
-                        // we must have a POJO so let's create a component
-                        schema = getSchemaDefinition(mediaType, openAPI, context, componentElement, definingElement);
+                        if (schema == null && componentType.isPresent()) {
+                            ClassElement componentElement = componentType.get();
+                            // we must have a POJO so let's create a component
+                            schema = getSchemaDefinition(mediaType, openAPI, context, componentElement, definingElement);
+                        }
                     }
-
                     if (schema != null) {
                         schema = arraySchema(schema);
                     }
@@ -630,6 +635,14 @@ abstract class AbstractOpenApiVisitor  {
                 schemaToBind.setName(schemaName.get());
             }
         }
+        AnnotationValue<io.swagger.v3.oas.annotations.media.ArraySchema> arraySchemaAnn = element.getAnnotation(io.swagger.v3.oas.annotations.media.ArraySchema.class);
+        if (arraySchemaAnn != null) {
+            schemaToBind = bindArraySchemaAnnotationValue(context, element, schemaToBind, arraySchemaAnn);
+            Optional<String> schemaName = arraySchemaAnn.get("name", String.class);
+            if (schemaName.isPresent()) {
+                schemaToBind.setName(schemaName.get());
+            }
+        }
 
         Schema finalSchemaToBind = schemaToBind;
         final boolean isIterableOrMap = elementType.isIterable() || elementType.isAssignable(Map.class);
@@ -650,16 +663,16 @@ abstract class AbstractOpenApiVisitor  {
             }
 
             if (element.isAnnotationPresent(Negative.class)) {
-                finalSchemaToBind.setMaximum(new BigDecimal(0));
+                finalSchemaToBind.setMaximum(BigDecimal.ZERO);
             }
             if (element.isAnnotationPresent(NegativeOrZero.class)) {
-                finalSchemaToBind.setMaximum(new BigDecimal(0));
+                finalSchemaToBind.setMaximum(BigDecimal.ZERO);
             }
             if (element.isAnnotationPresent(Positive.class)) {
-                finalSchemaToBind.setMinimum(new BigDecimal(0));
+                finalSchemaToBind.setMinimum(BigDecimal.ZERO);
             }
             if (element.isAnnotationPresent(PositiveOrZero.class)) {
-                finalSchemaToBind.setMinimum(new BigDecimal(0));
+                finalSchemaToBind.setMinimum(BigDecimal.ZERO);
             }
             element.getValue(Max.class, BigDecimal.class).ifPresent(finalSchemaToBind::setMaximum);
             element.getValue(Min.class, BigDecimal.class).ifPresent(finalSchemaToBind::setMinimum);
@@ -705,13 +718,17 @@ abstract class AbstractOpenApiVisitor  {
      */
     protected Schema bindSchemaAnnotationValue(VisitorContext context, Element element, Schema schemaToBind, AnnotationValue<io.swagger.v3.oas.annotations.media.Schema> schemaAnn) {
         JsonNode schemaJson = toJson(schemaAnn.getValues(), context);
+        return doBbindSchemaAnnotationValue(context, element, schemaToBind, schemaJson, schemaAnn.get("defaultValue", String.class).orElse(null),
+                schemaAnn.get("allowableValues", String[].class).orElse(null));
+    }
+
+    private Schema doBbindSchemaAnnotationValue(VisitorContext context, Element element, Schema schemaToBind,
+            JsonNode schemaJson, String defaultValue, String[] allowableValues) {
         try {
             schemaToBind = jsonMapper.readerForUpdating(schemaToBind).readValue(schemaJson);
-            final String defaultValue = schemaAnn.get("defaultValue", String.class).orElse(null);
             if (StringUtils.isNotEmpty(defaultValue)) {
                 schemaToBind.setDefault(defaultValue);
             }
-            final String[] allowableValues = schemaAnn.get("allowableValues", String[].class).orElse(null);
             if (ArrayUtils.isNotEmpty(allowableValues)) {
                 for (String allowableValue : allowableValues) {
                     schemaToBind.addEnumItemObject(allowableValue);
@@ -721,6 +738,42 @@ abstract class AbstractOpenApiVisitor  {
             context.warn("Error reading Swagger Schema for element [" + element + "]: " + e.getMessage(), element);
         }
         return schemaToBind;
+    }
+
+    /**
+     * Binds the array schema for the given element.
+     *
+     * @param context The context
+     * @param element The element
+     * @param schemaToBind The schema to bind
+     * @param schemaAnn The schema annotation
+     * @return The bound schema
+     */
+    protected Schema bindArraySchemaAnnotationValue(VisitorContext context, Element element, Schema schemaToBind, AnnotationValue<io.swagger.v3.oas.annotations.media.ArraySchema> schemaAnn) {
+        JsonNode schemaJson = toJson(schemaAnn.getValues(), context);
+        if (schemaJson.isObject()) {
+            ObjectNode objNode = (ObjectNode) schemaJson;
+            JsonNode arraySchema = objNode.remove("arraySchema");
+            // flatten
+            if (arraySchema != null && arraySchema.isObject()) {
+                ((ObjectNode) arraySchema).remove("implementation");
+                objNode.setAll((ObjectNode) arraySchema);
+            }
+            // remove schema that maps to 'items'
+            JsonNode items = objNode.remove("schema");
+            if (items != null && schemaToBind instanceof ArraySchema && ((ArraySchema) schemaToBind).getItems() != null) {
+                ArraySchema arrSchemaToBind = (ArraySchema) schemaToBind;
+                // if it has no $ref add properties, otherwise we are good
+                if (arrSchemaToBind.getItems().get$ref() == null) {
+                    try {
+                        arrSchemaToBind.items(jsonMapper.readerForUpdating(arrSchemaToBind.getItems()).readValue(items));
+                    } catch (IOException e) {
+                        context.warn("Error reading Swagger Schema for element [" + element + "]: " + e.getMessage(), element);
+                    }
+                }
+            }
+        }
+        return doBbindSchemaAnnotationValue(context, element, schemaToBind, schemaJson, null, null);
     }
 
     private Optional<Map<String, Object>> resolveExtensions(JsonNode jn) {
@@ -802,7 +855,7 @@ abstract class AbstractOpenApiVisitor  {
     }
 
     private void bindSchemaForClassName(VisitorContext context, Map<CharSequence, Object> valueMap, String className) {
-        final Optional<ClassElement> classElement = context.getClassElement(className.toString());
+        final Optional<ClassElement> classElement = context.getClassElement(className);
         final OpenAPI openAPI = resolveOpenAPI(context);
         if (classElement.isPresent()) {
             final Schema schema = resolveSchema(openAPI, null, classElement.get(), context, null);
@@ -1041,7 +1094,7 @@ abstract class AbstractOpenApiVisitor  {
                     computeNameWithGenerics(ce, builder, computed);
                 }
                 if (i.hasNext()) {
-                    builder.append(",");
+                    builder.append(',');
                 }
             }
 

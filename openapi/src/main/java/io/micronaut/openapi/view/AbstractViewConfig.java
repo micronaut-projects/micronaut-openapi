@@ -118,7 +118,7 @@ abstract class AbstractViewConfig {
      * @param <T> An Enum class.
      */
     static class EnumConverter<T extends Enum<T>> implements Function<String, Object> {
-        private Class<T> type;
+        private final Class<T> type;
 
         /**
          * EnumConverter.

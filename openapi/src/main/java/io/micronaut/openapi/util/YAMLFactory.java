@@ -38,7 +38,6 @@ import org.yaml.snakeyaml.DumperOptions;
 
 import java.io.*;
 import java.net.URL;
-import java.nio.charset.Charset;
 import java.nio.file.Files;
 
 /**
@@ -86,8 +85,6 @@ class YAMLFactory extends JsonFactory {
      */
 
     private DumperOptions.Version _version;
-
-    private final Charset UTF8 = Charset.forName("UTF-8");
 
     /**
      * Default constructor used to create factory instances.

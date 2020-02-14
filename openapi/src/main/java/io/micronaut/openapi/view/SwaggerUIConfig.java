@@ -21,12 +21,14 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import io.micronaut.openapi.view.OpenApiViewConfig.RendererType;
+
 /**
  * Swagger-ui configuration.
  *
  * @author croudet
  */
-public final class SwaggerUIConfig extends AbstractViewConfig implements Renderer {
+final class SwaggerUIConfig extends AbstractViewConfig implements Renderer {
     private static final Map<String, Object> DEFAULT_OPTIONS = new HashMap<>(4);
 
     // https://github.com/swagger-api/swagger-ui/blob/HEAD/docs/usage/configuration.md
@@ -55,6 +57,7 @@ public final class SwaggerUIConfig extends AbstractViewConfig implements Rendere
         DEFAULT_OPTIONS.put("validatorUrl", null);
     }
 
+    RapiPDFConfig rapiPDFConfig;
     private SwaggerUIConfig.Theme theme = Theme.DEFAULT;
 
     /**
@@ -106,12 +109,13 @@ public final class SwaggerUIConfig extends AbstractViewConfig implements Rendere
 
     @Override
     public String render(String template) {
+        template = rapiPDFConfig.render(template, RendererType.SWAGGER_UI);
         template = OpenApiViewConfig.replacePlaceHolder(template, "swagger-ui.version", version, "@");
         template = OpenApiViewConfig.replacePlaceHolder(template, "swagger-ui.attributes", toOptions(), "");
-        if (theme != null && !Theme.DEFAULT.equals(theme)) {
-            template = template.replace("{{swagger-ui.theme}}", "<link rel='stylesheet' type='text/css' href='https://unpkg.com/swagger-ui-themes@3.0.0/themes/3.x/" + theme.css + ".css' />");
-        } else {
+        if (theme == null || Theme.DEFAULT.equals(theme)) {
             template = template.replace("{{swagger-ui.theme}}", "");
+        } else {
+            template = template.replace("{{swagger-ui.theme}}", "<link rel='stylesheet' type='text/css' href='https://unpkg.com/swagger-ui-themes@3.0.0/themes/3.x/" + theme.getCss() + ".css' />");
         }
         return template;
     }
