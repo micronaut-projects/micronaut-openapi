@@ -414,8 +414,29 @@ abstract class AbstractOpenApiVisitor  {
         return Optional.empty();
     }
 
+    private <T extends Schema> void processAnnotationValue(VisitorContext context, AnnotationValue<?> annotationValue, Map<CharSequence, Object> arraySchemaMap, List<String> filters, Class<T> type) {
+        Map<CharSequence, Object> values = annotationValue.getValues().entrySet().stream()
+            .filter(entry -> filters == null || ! filters.contains(entry.getKey()))
+            .collect(toMap(
+                 e -> e.getKey().equals("requiredProperties") ? "required" : e.getKey(), Map.Entry::getValue));
+        JsonNode schemaJson = toJson(values, context);
+        try {
+            T schema = treeToValue(schemaJson, type);
+            if (schema != null) {
+                schemaToValueMap(arraySchemaMap, schema);
+            }
+        } catch (JsonProcessingException e) {
+            context.warn("Error reading Swagger Schema: " + e.getMessage(), null);
+        }
+    }
+
     private Map<CharSequence, Object> resolveArraySchemaAnnotationValues(VisitorContext context, AnnotationValue<?> av) {
         final Map<CharSequence, Object> arraySchemaMap = new HashMap<>(10);
+        // properties
+        av.get("arraySchema", AnnotationValue.class).ifPresent(annotationValue -> {
+            processAnnotationValue(context, (AnnotationValue<?>) annotationValue, arraySchemaMap, Arrays.asList("ref", "implementation"), Schema.class);
+        });
+        // items
         av.get("schema", AnnotationValue.class).ifPresent(annotationValue -> {
             Optional<String> impl = ((AnnotationValue<?>) annotationValue).get("implementation", String.class);
             Optional<String> type = ((AnnotationValue<?>) annotationValue).get("type", String.class);
@@ -446,9 +467,11 @@ abstract class AbstractOpenApiVisitor  {
                     schemaToValueMap(arraySchemaMap, schema);
                 }
             } else {
-                arraySchemaMap.putAll(resolveAnnotationValues(context, av));
+                arraySchemaMap.putAll(resolveAnnotationValues(context, annotationValue));
             }
         });
+        // other properties (minItems,...)
+        processAnnotationValue(context, av, arraySchemaMap, Arrays.asList("schema", "arraySchema"), ArraySchema.class);
         return arraySchemaMap;
     }
 
