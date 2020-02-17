@@ -89,7 +89,6 @@ with more return description
 as it is multiline
 ''')
 
-
         expect:
         desc.methodDescription
         desc.returnDescription
@@ -104,5 +103,28 @@ with more return description
 
 as it is multiline'''
 
+    }
+
+    void 'test parse multiline javadoc param'() {
+
+        given:
+        JavadocParser parser = new JavadocParser()
+        JavadocDescription desc = parser.parse('''
+Check if the given user has access to RabbitMQ.
+
+@param username
+                   The username to check.
+@param password
+                   The password to check.
+@return 'allow' or 'deny' and user tags.
+
+''')
+
+        expect:
+        desc.methodDescription
+        desc.returnDescription
+        desc.parameters.size() == 2
+        desc.parameters['username'] == 'The username to check.'
+        desc.parameters['password'] == 'The password to check.'
     }
 }
