@@ -66,7 +66,6 @@ final class RapidocConfig extends AbstractViewConfig implements Renderer {
         VALID_OPTIONS.put("allow-search", AbstractViewConfig::asBoolean);
         VALID_OPTIONS.put("allow-try", AbstractViewConfig::asBoolean);
         VALID_OPTIONS.put("allow-server-selection", AbstractViewConfig::asBoolean);
-        VALID_OPTIONS.put("allow-api-list-style-selection", AbstractViewConfig::asBoolean);
         VALID_OPTIONS.put("api-key-name", AbstractViewConfig::asString);
         VALID_OPTIONS.put("api-key-value", AbstractViewConfig::asString);
         VALID_OPTIONS.put("api-key-location",  new EnumConverter<>(ApiKeyLocation.class));
