@@ -44,6 +44,7 @@ import io.micronaut.http.annotation.Part;
 import io.micronaut.http.annotation.PathVariable;
 import io.micronaut.http.annotation.Produces;
 import io.micronaut.http.annotation.QueryValue;
+import io.micronaut.http.annotation.UriMapping;
 import io.micronaut.http.uri.UriMatchTemplate;
 import io.micronaut.http.uri.UriMatchVariable;
 import io.micronaut.inject.ast.ClassElement;
@@ -139,7 +140,7 @@ public class OpenApiControllerVisitor extends AbstractOpenApiVisitor implements 
                 return;
             }
 
-            String controllerValue = element.getValue(Controller.class, String.class).orElse("/");
+            String controllerValue = element.getDeclaringType().getValue(UriMapping.class, String.class).orElse("/");
             controllerValue = getPropertyPlaceholderResolver().resolvePlaceholders(controllerValue).orElse(controllerValue);
             UriMatchTemplate matchTemplate = UriMatchTemplate.of(controllerValue);
             String methodValue = element.getValue(HttpMethodMapping.class, String.class).orElse("/");
