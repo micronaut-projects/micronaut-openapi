@@ -10,7 +10,7 @@ This project allows generating OpenAPI 3.x (Swagger) specifications for a Micron
 
 See the [Documentation](https://micronaut-projects.github.io/micronaut-openapi/latest/guide/index.html) for more information.
 
-[Snapshot Documentation](https://micronaut-projects.github.io/micronaut-openapi/snapshot/guide/index.html)
+See the [Snapshot Documentation](https://micronaut-projects.github.io/micronaut-openapi/snapshot/guide/index.html) for the latest development version documentation.
 
 ## Snapshots and Releases
 
