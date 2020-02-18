@@ -238,6 +238,13 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             Optional.ofNullable(from.getPaths()).ifPresent(paths -> paths.forEach(to::path));
             Optional.ofNullable(from.getComponents()).ifPresent(components -> {
                 Map<String, Schema> schemas = components.getSchemas();
+
+                schemas.forEach((k, v) -> {
+                  if (v.getName() == null) {
+                    v.setName(k); 
+                  }
+                });
+                
                 if (schemas != null && !schemas.isEmpty()) {
                     schemas.forEach(to::schema);
                 }
