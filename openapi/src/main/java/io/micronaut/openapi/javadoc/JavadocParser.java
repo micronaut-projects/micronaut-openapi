@@ -112,7 +112,7 @@ public class JavadocParser {
                             currentDescription = new StringBuilder();
                             state = PARAM_DESC;
                             previousState = PARAM_DESC;
-                        } else {
+                        } else if (c != '\n') {
                             currentParam.append(c);
                         }
                     continue;
