@@ -108,8 +108,7 @@ function addJsClass() {
                 
 
                 
-
-<h1 id="gettingStarted">4 Getting Started with Swagger</h1>
+<h1 id="gettingStarted"><a class="anchor" href="#gettingStarted"></a>4 Getting Started with Swagger</h1>
 
 <div class='contribute-btn'>
     <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/gettingStarted.adoc"'>
@@ -123,18 +122,21 @@ function addJsClass() {
 </div>
 <div class="paragraph">
 <p>        <div class="listingblock multi-language-sample">
+<div class="title"></div>
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="gradle">annotationProcessor <span class="hljs-string">'io.micronaut.configuration:micronaut-openapi:1.4.0.BUILD-SNAPSHOT'</span></code></pre>
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="gradle">annotationProcessor(<span class="hljs-string">"io.micronaut.configuration:micronaut-openapi:1.4.0.BUILD-SNAPSHOT")</span></code></pre>
 </div>
 </div>
 <div class="listingblock multi-language-sample">
+<div class="title"></div>
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="maven">&lt;dependency&gt;
-    &lt;groupId&gt;io.micronaut.configuration&lt;/groupId&gt;
-    &lt;artifactId&gt;micronaut-openapi&lt;/artifactId&gt;
-    &lt;version&gt;1.4.0.BUILD-SNAPSHOT&lt;/version&gt;
-    &lt;scope&gt;annotationProcessor&lt;/scope&gt;
-&lt;/dependency&gt;</code></pre>
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="maven">&lt;annotationProcessorPaths&gt;
+    &lt;path&gt;
+        &lt;groupId&gt;io.micronaut.configuration&lt;/groupId&gt;
+        &lt;artifactId&gt;micronaut-openapi&lt;/artifactId&gt;
+        &lt;version&gt;1.4.0.BUILD-SNAPSHOT&lt;/version&gt;
+    &lt;/path&gt;
+&lt;/annotationProcessorPaths&gt;</code></pre>
 </div>
 </div>
 </p>
@@ -144,8 +146,9 @@ function addJsClass() {
 </div>
 <div class="paragraph">
 <p>        <div class="listingblock multi-language-sample">
+<div class="title"></div>
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="gradle">implementation <span class="hljs-string">'io.swagger.core.v3:swagger-annotations:1.4.0.BUILD-SNAPSHOT'</span></code></pre>
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="gradle">implementation(<span class="hljs-string">"io.swagger.core.v3:swagger-annotations:1.4.0.BUILD-SNAPSHOT")</span></code></pre>
 </div>
 </div>
 <div class="listingblock multi-language-sample">
