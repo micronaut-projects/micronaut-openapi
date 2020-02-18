@@ -11,7 +11,7 @@
 
         gtag('config', 'UA-82213539-2');
     </script>
-    <title>8 Schemas and POJOs 1.4.0.BUILD-SNAPSHOT</title>
+    <title>4 Open API Processing Options 1.4.0.BUILD-SNAPSHOT</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <link rel="stylesheet" href="../css/main.css" type="text/css" media="screen, print" title="Style" charset="utf-8"/>
     <link rel="stylesheet" href="../css/pdf.css" type="text/css" media="print" title="PDF" charset="utf-8"/>
@@ -89,18 +89,18 @@ function addJsClass() {
             <div id="main" class="corner-all">
 
                 
-                    <div class="toc-item prev-left"><a href="../guide/controllersAndSwaggerAnnotations.html">&lt;&lt; <strong>7</strong><span>Controllers and Swagger Annotations</span></a></div>
+                    <div class="toc-item prev-left"><a href="../guide/gettingStarted.html">&lt;&lt; <strong>3</strong><span>Getting Started with Swagger</span></a></div>
                 
 
                 <span id='toggle-col1' class="toggle">(<a href="#" onclick="localToggle(); return false;">Quick Reference</a>)</span>
 
                 
-                    <div class="toc-item next-right"><a href="../guide/schemasAndMetaAnnotations.html"><strong>9</strong><span>Schemas and Meta Annotations</span> >></a></div>
+                    <div class="toc-item next-right"><a href="../guide/exposingSwaggerOutput.html"><strong>5</strong><span>Exposing Swagger Output</span> >></a></div>
                 
 
 
                 <div class="project">
-                    <h1>8 Schemas and POJOs</h1>
+                    <h1>4 Open API Processing Options</h1>
 
                     <p><strong>Version:</strong> 1.4.0.BUILD-SNAPSHOT</p>
                 </div>
@@ -108,82 +108,48 @@ function addJsClass() {
                 
 
                 
-<h1 id="schemasAndPojos"><a class="anchor" href="#schemasAndPojos"></a>8 Schemas and POJOs</h1>
+<h1 id="configuration"><a class="anchor" href="#configuration"></a>4 Open API Processing Options</h1>
 
 <div class='contribute-btn'>
-    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/schemasAndPojos.adoc"'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/configuration.adoc"'>
         <i class='fa fa-pencil-square-o'></i> Improve this doc
     </button>
 </div>
 
 
 <div class="paragraph">
-<p>If you return types are not simple strings and primitive types then Micronaut will attempt to generate a Schema definition. You can customize the
-generation of the Schema by using the <code>@Schema</code> annotation on your POJO. For example:</p>
+<p>In the following chapters you will see it is possible to tweaks the open api processing via system properties. It is also possible to specify these options in
+a file located at the root level of your project directory. The expected filename is <code>openapi.properties</code>.</p>
+</div>
+<div class="paragraph">
+<p>It is possible to specify a different location and filename with the <code>micronaut.openapi.config.file</code> System property.</p>
+</div>
+<div class="paragraph">
+<p>Options specified with System properties have priority over the one defined in the <code>openapi.properties</code> file.</p>
 </div>
 <div class="listingblock">
-<div class="title">Using the @Schema Annotation</div>
+<div class="title">openapi.properties Example</div>
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Schema(name="MyPet", description="Pet description") <i class="conum" data-value="1"></i><b>(1)</b>
-class Pet {
-    private PetType type;
-    private int age;
-    private String name;
+<pre class="highlightjs highlight"><code>micronaut.openapi.property.naming.strategy=KEBAB_CASE
+micronaut.openapi.target.file=myspecfile.yml
 
-    public void setAge(int a) {
-        age = a;
-    }
+swagger-ui.enabled=true
 
-    /**
-     * The age
-     */
-    @Schema(description="Pet age", maximum="20") <i class="conum" data-value="2"></i><b>(2)</b>
-    public int getAge() {
-        return age;
-    }
+redoc.enabled=true
 
-    public void setName(String n) {
-        name = n;
-    }
-
-    @Schema(description="Pet name", maxLength=20)
-    public String getName() {
-        return name;
-    }
-
-    public void setType(PetType t) {
-        type = t;
-    }
-
-    public PetType getType() {
-        return type;
-    }
-}
-
-enum PetType {
-    DOG, CAT;
-}</code></pre>
+rapidoc.enabled=true
+rapidoc.bg-color=#14191f
+rapidoc.text-color=#aec2e0
+rapidoc.sort-endpoints-by=method</code></pre>
 </div>
-</div>
-<div class="colist arabic">
-<table>
-<tr>
-<td><i class="conum" data-value="1"></i><b>1</b></td>
-<td>The <code>@Schema</code> annotation is used to customize the name of the schema</td>
-</tr>
-<tr>
-<td><i class="conum" data-value="2"></i><b>2</b></td>
-<td>Properties can be customized too.</td>
-</tr>
-</table>
 </div>
 
 
                 <div style="clear:both;margin-top:15px;"></div>
                 
-                    <div class="toc-item prev-left"><a href="../guide/controllersAndSwaggerAnnotations.html">&lt;&lt; <strong>7</strong><span>Controllers and Swagger Annotations</span></a></div>
+                    <div class="toc-item prev-left"><a href="../guide/gettingStarted.html">&lt;&lt; <strong>3</strong><span>Getting Started with Swagger</span></a></div>
                 
-                    <div class="toc-item next-right"><a href="../guide/schemasAndMetaAnnotations.html"><strong>9</strong><span>Schemas and Meta Annotations</span> >></a></div>
+                    <div class="toc-item next-right"><a href="../guide/exposingSwaggerOutput.html"><strong>5</strong><span>Exposing Swagger Output</span> >></a></div>
                 
                 <div style="clear:both"></div>
             </div>

@@ -45,11 +45,11 @@
                                 
                                 <div class="toc-item" style="margin-left:0"><a href="#introduction"><strong>1</strong><span>Introduction</span></a></div>
                                 
-                                <div class="toc-item" style="margin-left:0"><a href="#systemProperties"><strong>2</strong><span>Open API Processing Options</span></a></div>
+                                <div class="toc-item" style="margin-left:0"><a href="#cli"><strong>2</strong><span>Using the Micronaut CLI</span></a></div>
                                 
-                                <div class="toc-item" style="margin-left:0"><a href="#cli"><strong>3</strong><span>Using the Micronaut CLI</span></a></div>
+                                <div class="toc-item" style="margin-left:0"><a href="#gettingStarted"><strong>3</strong><span>Getting Started with Swagger</span></a></div>
                                 
-                                <div class="toc-item" style="margin-left:0"><a href="#gettingStarted"><strong>4</strong><span>Getting Started with Swagger</span></a></div>
+                                <div class="toc-item" style="margin-left:0"><a href="#configuration"><strong>4</strong><span>Open API Processing Options</span></a></div>
                                 
                                 <div class="toc-item" style="margin-left:0"><a href="#exposingSwaggerOutput"><strong>5</strong><span>Exposing Swagger Output</span></a></div>
                                 
@@ -96,11 +96,11 @@
         
         <div class="toc-item" style="margin-left:0px" id="toc-item-introduction"><a href="#introduction"><strong>1</strong><span>Introduction</span></a></div>
         
-        <div class="toc-item" style="margin-left:0px" id="toc-item-systemProperties"><a href="#systemProperties"><strong>2</strong><span>Open API Processing Options</span></a></div>
+        <div class="toc-item" style="margin-left:0px" id="toc-item-cli"><a href="#cli"><strong>2</strong><span>Using the Micronaut CLI</span></a></div>
         
-        <div class="toc-item" style="margin-left:0px" id="toc-item-cli"><a href="#cli"><strong>3</strong><span>Using the Micronaut CLI</span></a></div>
+        <div class="toc-item" style="margin-left:0px" id="toc-item-gettingStarted"><a href="#gettingStarted"><strong>3</strong><span>Getting Started with Swagger</span></a></div>
         
-        <div class="toc-item" style="margin-left:0px" id="toc-item-gettingStarted"><a href="#gettingStarted"><strong>4</strong><span>Getting Started with Swagger</span></a></div>
+        <div class="toc-item" style="margin-left:0px" id="toc-item-configuration"><a href="#configuration"><strong>4</strong><span>Open API Processing Options</span></a></div>
         
         <div class="toc-item" style="margin-left:0px" id="toc-item-exposingSwaggerOutput"><a href="#exposingSwaggerOutput"><strong>5</strong><span>Exposing Swagger Output</span></a></div>
         
@@ -143,43 +143,7 @@
 <p>You can customize the generated Swagger using the standard <a href="https://github.com/swagger-api/swagger-core/wiki/Swagger-3.X---Annotations">Swagger Annotations</a>.</p>
 </div>
 
-<h1 id="systemProperties"><a class="anchor" href="#systemProperties"></a>2 Open API Processing Options</h1>
-
-<div class='contribute-btn'>
-    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/systemProperties.adoc"'>
-        <i class='fa fa-pencil-square-o'></i> Improve this doc
-    </button>
-</div>
-
-
-<div class="paragraph">
-<p>In the following chapters you will see it is possible to tweaks the open api processing via system properties. It is also possible to specify these options in
-a file located at the root level of your project directory. The expected filename is <code>openapi.properties</code>.</p>
-</div>
-<div class="paragraph">
-<p>It is possible to specify a different location and filename with the <code>micronaut.openapi.config.file</code> System property.</p>
-</div>
-<div class="paragraph">
-<p>Options specified with System properties have priority over the one defined in the <code>openapi.properties</code> file.</p>
-</div>
-<div class="listingblock">
-<div class="title">openapi.properties Example</div>
-<div class="content">
-<pre class="highlightjs highlight"><code>micronaut.openapi.property.naming.strategy=KEBAB_CASE
-micronaut.openapi.target.file=myspecfile.yml
-
-swagger-ui.enabled=true
-
-redoc.enabled=true
-
-rapidoc.enabled=true
-rapidoc.bg-color=#14191f
-rapidoc.text-color=#aec2e0
-rapidoc.sort-endpoints-by=method</code></pre>
-</div>
-</div>
-
-<h1 id="cli"><a class="anchor" href="#cli"></a>3 Using the Micronaut CLI</h1>
+<h1 id="cli"><a class="anchor" href="#cli"></a>2 Using the Micronaut CLI</h1>
 
 <div class='contribute-btn'>
     <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/cli.adoc"'>
@@ -203,7 +167,7 @@ rapidoc.sort-endpoints-by=method</code></pre>
 <p>If you have already created a Micronaut project and will like to add Swagger support, you can simply follow instructions in subsequent sections.</p>
 </div>
 
-<h1 id="gettingStarted"><a class="anchor" href="#gettingStarted"></a>4 Getting Started with Swagger</h1>
+<h1 id="gettingStarted"><a class="anchor" href="#gettingStarted"></a>3 Getting Started with Swagger</h1>
 
 <div class='contribute-btn'>
     <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/gettingStarted.adoc"'>
@@ -383,6 +347,42 @@ info:
     name: Apache 2.0
     url: http://foo.bar
   version: "0.0"</code></pre>
+</div>
+</div>
+
+<h1 id="configuration"><a class="anchor" href="#configuration"></a>4 Open API Processing Options</h1>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/configuration.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>In the following chapters you will see it is possible to tweaks the open api processing via system properties. It is also possible to specify these options in
+a file located at the root level of your project directory. The expected filename is <code>openapi.properties</code>.</p>
+</div>
+<div class="paragraph">
+<p>It is possible to specify a different location and filename with the <code>micronaut.openapi.config.file</code> System property.</p>
+</div>
+<div class="paragraph">
+<p>Options specified with System properties have priority over the one defined in the <code>openapi.properties</code> file.</p>
+</div>
+<div class="listingblock">
+<div class="title">openapi.properties Example</div>
+<div class="content">
+<pre class="highlightjs highlight"><code>micronaut.openapi.property.naming.strategy=KEBAB_CASE
+micronaut.openapi.target.file=myspecfile.yml
+
+swagger-ui.enabled=true
+
+redoc.enabled=true
+
+rapidoc.enabled=true
+rapidoc.bg-color=#14191f
+rapidoc.text-color=#aec2e0
+rapidoc.sort-endpoints-by=method</code></pre>
 </div>
 </div>
 
