@@ -311,13 +311,11 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
 
     private void renderViews(String title, String specFile, Path destinationDir, VisitorContext visitorContext) throws IOException {
         String viewSpecification = System.getProperty(MICRONAUT_OPENAPI_VIEWS_SPEC);
-        if (viewSpecification != null) {
-            OpenApiViewConfig cfg = OpenApiViewConfig.fromSpecification(viewSpecification, openApiProperties);
-            if (cfg.isEnabled()) {
-                cfg.setTitle(title);
-                cfg.setSpecFile(specFile);
-                cfg.render(destinationDir.resolve("views"), visitorContext);
-            }
+        OpenApiViewConfig cfg = OpenApiViewConfig.fromSpecification(viewSpecification, openApiProperties);
+        if (cfg.isEnabled()) {
+            cfg.setTitle(title);
+            cfg.setSpecFile(specFile);
+            cfg.render(destinationDir.resolve("views"), visitorContext);
         }
     }
 
