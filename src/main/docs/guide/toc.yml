@@ -1,7 +1,7 @@
 introduction: Introduction
-systemProperties: Open API Processing Options
 cli: Using the Micronaut CLI
 gettingStarted: Getting Started with Swagger
+configuration: Open API Processing Options
 exposingSwaggerOutput: Exposing Swagger Output
 openApiViews: Generating OpenAPI Views
 controllersAndSwaggerAnnotations: Controllers and Swagger Annotations

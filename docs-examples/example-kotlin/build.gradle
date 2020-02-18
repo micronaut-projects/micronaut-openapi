@@ -44,3 +44,4 @@ compileTestKotlin {
         javaParameters = true
     }
 }
+ext.skipDocumentation=true

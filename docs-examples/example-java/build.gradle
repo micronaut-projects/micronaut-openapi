@@ -39,3 +39,4 @@ test {
     }
     failFast = true
 }
+ext.skipDocumentation=true
