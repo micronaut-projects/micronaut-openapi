@@ -741,11 +741,11 @@ abstract class AbstractOpenApiVisitor  {
      */
     protected Schema bindSchemaAnnotationValue(VisitorContext context, Element element, Schema schemaToBind, AnnotationValue<io.swagger.v3.oas.annotations.media.Schema> schemaAnn) {
         JsonNode schemaJson = toJson(schemaAnn.getValues(), context);
-        return doBbindSchemaAnnotationValue(context, element, schemaToBind, schemaJson, schemaAnn.get("defaultValue", String.class).orElse(null),
+        return doBindSchemaAnnotationValue(context, element, schemaToBind, schemaJson, schemaAnn.get("defaultValue", String.class).orElse(null),
                 schemaAnn.get("allowableValues", String[].class).orElse(null));
     }
 
-    private Schema doBbindSchemaAnnotationValue(VisitorContext context, Element element, Schema schemaToBind,
+    private Schema doBindSchemaAnnotationValue(VisitorContext context, Element element, Schema schemaToBind,
             JsonNode schemaJson, String defaultValue, String[] allowableValues) {
         try {
             schemaToBind = jsonMapper.readerForUpdating(schemaToBind).readValue(schemaJson);
@@ -754,7 +754,9 @@ abstract class AbstractOpenApiVisitor  {
             }
             if (ArrayUtils.isNotEmpty(allowableValues)) {
                 for (String allowableValue : allowableValues) {
-                    schemaToBind.addEnumItemObject(allowableValue);
+                    if (!schemaToBind.getEnum().contains(allowableValue)) {
+                        schemaToBind.addEnumItemObject(allowableValue);
+                    }
                 }
             }
         } catch (IOException e) {
@@ -796,7 +798,7 @@ abstract class AbstractOpenApiVisitor  {
                 }
             }
         }
-        return doBbindSchemaAnnotationValue(context, element, schemaToBind, schemaJson, null, null);
+        return doBindSchemaAnnotationValue(context, element, schemaToBind, schemaJson, null, null);
     }
 
     private Optional<Map<String, Object>> resolveExtensions(JsonNode jn) {
@@ -848,7 +850,17 @@ abstract class AbstractOpenApiVisitor  {
         final Optional<String[]> anyOf = av.get("anyOf", Argument.of(String[].class));
         final Optional<String[]> oneOf = av.get("oneOf", Argument.of(String[].class));
         final Optional<String[]> allOf = av.get("allOf", Argument.of(String[].class));
-        if (io.swagger.v3.oas.annotations.media.Schema.class.getName().equals(av.getAnnotationName()) && impl.isPresent()) {
+        // remap keys.
+        Object o = valueMap.remove("defaultValue");
+        if (o != null) {
+            valueMap.put("default", o);
+        }
+        o = valueMap.remove("allowableValues");
+        if (o != null) {
+            valueMap.put("enum", o);
+        }
+        boolean isSchema = io.swagger.v3.oas.annotations.media.Schema.class.getName().equals(av.getAnnotationName());
+        if (isSchema && impl.isPresent()) {
             final String className = impl.get();
             bindSchemaForClassName(context, valueMap, className);
         }
@@ -856,7 +868,7 @@ abstract class AbstractOpenApiVisitor  {
             final String className = schema.get();
             bindSchemaForClassName(context, valueMap, className);
         }
-        if (io.swagger.v3.oas.annotations.media.Schema.class.getName().equals(av.getAnnotationName()) && (anyOf.isPresent() || oneOf.isPresent() || allOf.isPresent())) {
+        if (isSchema && (anyOf.isPresent() || oneOf.isPresent() || allOf.isPresent())) {
             anyOf.ifPresent(anyOfList -> bindSchemaForComposite(context, valueMap, anyOfList, "anyOf"));
             oneOf.ifPresent(oneOfList -> bindSchemaForComposite(context, valueMap, oneOfList, "oneOf"));
             allOf.ifPresent(allOfList -> bindSchemaForComposite(context, valueMap, allOfList, "allOf"));
