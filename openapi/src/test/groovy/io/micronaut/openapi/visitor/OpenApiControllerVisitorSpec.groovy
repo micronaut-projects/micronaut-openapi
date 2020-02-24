@@ -28,6 +28,74 @@ class OpenApiControllerVisitorSpec extends AbstractTypeElementSpec {
         System.setProperty(AbstractOpenApiVisitor.ATTR_TEST_MODE, "true")
     }
 
+    void "test Inherited Annotations - Issue #157"() {
+
+        given:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.swagger.v3.oas.annotations.*;
+import io.swagger.v3.oas.annotations.media.*;
+import io.swagger.v3.oas.annotations.enums.*;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.micronaut.http.annotation.*;
+import io.micronaut.http.*;
+import com.fasterxml.jackson.core.*;
+import io.micronaut.http.hateoas.*;
+import java.util.List;
+import javax.validation.constraints.*;
+
+class Pet {
+    private String name;
+
+    public String getName() { return this.name; }
+
+    public void setName(String name) { this.name = name; }
+}
+
+interface PetOperations {
+ @Post
+    @Operation(summary = "This method creates a new Pet. " +
+            " A successful request returns the response code 200." )
+    @Tag(name = "Pet Operations")
+    @RequestBody(description = "A Pet as Json")
+    @ApiResponse(content = @Content(mediaType = MediaType.APPLICATION_JSON,
+            schema = @Schema(implementation = Pet.class)))
+    HttpResponse<Pet> createPet(@Body Pet pet);
+}
+
+@Controller("/api/pet")
+class PetController implements PetOperations {
+    @Override
+    public HttpResponse<Pet> createPet(final Pet pet) {
+        return null;
+    }
+}
+
+@javax.inject.Singleton
+class MyBean {}
+''')
+        when:
+        Operation operation = AbstractOpenApiVisitor.testReference?.paths?.get("/api/pet")?.post
+
+        then:
+        operation != null
+        operation.operationId == 'createPet'
+        operation.parameters.size() == 0
+        operation.requestBody
+
+        when:
+        def requestBody = operation.requestBody
+
+        then:
+        requestBody.description == 'A Pet as Json'
+        requestBody.required == true
+        requestBody.content['application/json']
+        requestBody.content['application/json'].schema.$ref == '#/components/schemas/Pet'
+    }
+
     void "test build OpenAPI doc with @Error"() {
 
         // TODO: currently the @Error is just ignored, consider adding to OpenApi.components.responses in the future
@@ -73,7 +141,6 @@ class MyBean {}
         operation != null
         operation.operationId == 'getSubscription'
         operation.parameters.size() == 1
-
 
         when:
         def parameter = operation.parameters[0]
