@@ -264,35 +264,38 @@ public class OpenApiControllerVisitor extends AbstractOpenApiVisitor implements 
 
                 if (parameter.isAnnotationPresent(Body.class)) {
 
-                    if (permitsRequestBody && swaggerOperation.getRequestBody() == null) {
-                        RequestBody requestBody = new RequestBody();
-                        if (javadocDescription != null) {
-
+                    if (permitsRequestBody) {
+                        RequestBody requestBody = swaggerOperation.getRequestBody();
+                        if (requestBody == null) {
+                            requestBody = new RequestBody();
+                            swaggerOperation.setRequestBody(requestBody);
+                        }
+                        if (requestBody.getDescription() == null && javadocDescription != null) {
                             CharSequence desc = javadocDescription.getParameters().get(parameterName);
                             if (desc != null) {
                                 requestBody.setDescription(desc.toString());
                             }
                         }
-                        requestBody.setRequired(!parameter.isAnnotationPresent(Nullable.class) && !parameterType.isAssignable(Optional.class));
-
-                        Content content;
-                        if (consumesMediaTypes.isEmpty()) {
-                            content = buildContent(
-                                    parameter,
-                                    parameterType,
-                                    MediaType.APPLICATION_JSON,
-                                    openAPI, context
-                            );
-                        } else {
-                            content = buildContent(
-                                    parameter,
-                                    parameterType,
-                                    consumesMediaTypes,
-                                    openAPI, context
-                            );
+                        if (requestBody.getRequired() == null) {
+                            requestBody.setRequired(!parameter.isAnnotationPresent(Nullable.class) && !parameterType.isAssignable(Optional.class));
                         }
-                        requestBody.setContent(content);
-                        swaggerOperation.setRequestBody(requestBody);
+                        if (requestBody.getContent() == null) {
+                            Content content;
+                            if (consumesMediaTypes.isEmpty()) {
+                                content = buildContent(
+                                        parameter,
+                                        parameterType,
+                                        MediaType.APPLICATION_JSON,
+                                        openAPI, context);
+                            } else {
+                                content = buildContent(
+                                        parameter,
+                                        parameterType,
+                                        consumesMediaTypes,
+                                        openAPI, context);
+                            }
+                            requestBody.setContent(content);
+                        }
                     }
                     continue;
                 }
