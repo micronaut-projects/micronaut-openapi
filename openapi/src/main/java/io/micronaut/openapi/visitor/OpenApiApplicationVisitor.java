@@ -177,7 +177,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         if (StringUtils.isNotEmpty(additionalSwaggerFiles)) {
             Path directory = resolve(context, Paths.get(additionalSwaggerFiles));
             if (Files.isDirectory(directory)) {
-                context.info("Merging Swagger OpenAPI YAML files from location :" + directory);
+                context.info("Merging Swagger OpenAPI YAML files from location: " + directory);
                 try {
                     Files.newDirectoryStream(directory,
                             path -> path.toString().endsWith(".yml"))
@@ -207,7 +207,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                 path = projectDir.resolve(path);
             }
         }
-        return path;
+        return path.toAbsolutePath();
     }
 
     private void readOpenApiConfigFile(VisitorContext context) throws IOException {
