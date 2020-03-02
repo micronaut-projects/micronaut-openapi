@@ -6,7 +6,9 @@ plugins {
 
 dependencyManagement {
     imports {
-        mavenBom "io.micronaut:micronaut-bom:$micronautVersion"
+        mavenBom("io.micronaut:micronaut-bom:$micronautVersion") {
+            bomProperty 'swagger.version', swaggerVersion
+        }
     }
 }
 
