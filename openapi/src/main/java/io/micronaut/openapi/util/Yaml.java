@@ -28,7 +28,11 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import io.micronaut.core.annotation.Internal;
 import io.swagger.v3.core.jackson.SchemaSerializer;
+import io.swagger.v3.core.jackson.mixin.ComponentsMixin;
+import io.swagger.v3.core.jackson.mixin.DateSchemaMixin;
 import io.swagger.v3.core.jackson.mixin.ExtensionsMixin;
+import io.swagger.v3.core.jackson.mixin.OpenAPIMixin;
+import io.swagger.v3.core.jackson.mixin.OperationMixin;
 import io.swagger.v3.core.util.DeserializationModule;
 import io.swagger.v3.oas.models.*;
 import io.swagger.v3.oas.models.callbacks.Callback;
@@ -43,6 +47,7 @@ import io.swagger.v3.oas.models.media.*;
 import io.swagger.v3.oas.models.parameters.Parameter;
 import io.swagger.v3.oas.models.parameters.RequestBody;
 import io.swagger.v3.oas.models.responses.ApiResponse;
+import io.swagger.v3.oas.models.responses.ApiResponses;
 import io.swagger.v3.oas.models.security.OAuthFlow;
 import io.swagger.v3.oas.models.security.OAuthFlows;
 import io.swagger.v3.oas.models.security.Scopes;
@@ -52,10 +57,8 @@ import io.swagger.v3.oas.models.servers.ServerVariable;
 import io.swagger.v3.oas.models.servers.ServerVariables;
 import io.swagger.v3.oas.models.tags.Tag;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.function.Function;
-import java.util.stream.Collectors;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * Helper class for generating Swagger YAML.
@@ -100,40 +103,42 @@ public final class Yaml {
             }
         }).registerModule(new DeserializationModule()).registerModule(new JavaTimeModule());
 
-        List<Class<?>> mixinTargets = Arrays.asList(
-                ApiResponse.class,
-                Callback.class,
-                Components.class,
-                Contact.class,
-                Encoding.class,
-                EncodingProperty.class,
-                Example.class,
-                ExternalDocumentation.class,
-                Header.class,
-                Info.class,
-                License.class,
-                Link.class,
-                LinkParameter.class,
-                MediaType.class,
-                OAuthFlow.class,
-                OAuthFlows.class,
-                OpenAPI.class,
-                Operation.class,
-                Parameter.class,
-                PathItem.class,
-                Paths.class,
-                RequestBody.class,
-                Scopes.class,
-                SecurityScheme.class,
-                Server.class,
-                ServerVariable.class,
-                ServerVariables.class,
-                Tag.class,
-                XML.class,
-                Schema.class
-        );
-        mapper.setMixIns(mixinTargets.stream().collect(Collectors.toMap(Function.identity(), c -> ExtensionsMixin.class)));
+        Map<Class<?>, Class<?>> sourceMixins = new LinkedHashMap<>(40);
 
+        sourceMixins.put(ApiResponses.class, ExtensionsMixin.class);
+        sourceMixins.put(ApiResponse.class, ExtensionsMixin.class);
+        sourceMixins.put(Callback.class, ExtensionsMixin.class);
+        sourceMixins.put(Components.class, ComponentsMixin.class);
+        sourceMixins.put(Contact.class, ExtensionsMixin.class);
+        sourceMixins.put(Encoding.class, ExtensionsMixin.class);
+        sourceMixins.put(EncodingProperty.class, ExtensionsMixin.class);
+        sourceMixins.put(Example.class, ExtensionsMixin.class);
+        sourceMixins.put(ExternalDocumentation.class, ExtensionsMixin.class);
+        sourceMixins.put(Header.class, ExtensionsMixin.class);
+        sourceMixins.put(Info.class, ExtensionsMixin.class);
+        sourceMixins.put(License.class, ExtensionsMixin.class);
+        sourceMixins.put(Link.class, ExtensionsMixin.class);
+        sourceMixins.put(LinkParameter.class, ExtensionsMixin.class);
+        sourceMixins.put(MediaType.class, ExtensionsMixin.class);
+        sourceMixins.put(OAuthFlow.class, ExtensionsMixin.class);
+        sourceMixins.put(OAuthFlows.class, ExtensionsMixin.class);
+        sourceMixins.put(OpenAPI.class, OpenAPIMixin.class);
+        sourceMixins.put(Operation.class, OperationMixin.class);
+        sourceMixins.put(Parameter.class, ExtensionsMixin.class);
+        sourceMixins.put(PathItem.class, ExtensionsMixin.class);
+        sourceMixins.put(Paths.class, ExtensionsMixin.class);
+        sourceMixins.put(RequestBody.class, ExtensionsMixin.class);
+        sourceMixins.put(Scopes.class, ExtensionsMixin.class);
+        sourceMixins.put(SecurityScheme.class, ExtensionsMixin.class);
+        sourceMixins.put(Server.class, ExtensionsMixin.class);
+        sourceMixins.put(ServerVariable.class, ExtensionsMixin.class);
+        sourceMixins.put(ServerVariables.class, ExtensionsMixin.class);
+        sourceMixins.put(Tag.class, ExtensionsMixin.class);
+        sourceMixins.put(XML.class, ExtensionsMixin.class);
+        sourceMixins.put(Schema.class, ExtensionsMixin.class);
+        sourceMixins.put(DateSchema.class, DateSchemaMixin.class);
+
+        mapper.setMixIns(sourceMixins);
         mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
         mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
         mapper.configure(SerializationFeature.WRITE_ENUMS_USING_TO_STRING, true);
