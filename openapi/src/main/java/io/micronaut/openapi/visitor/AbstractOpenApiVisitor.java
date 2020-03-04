@@ -754,7 +754,7 @@ abstract class AbstractOpenApiVisitor  {
             }
             if (ArrayUtils.isNotEmpty(allowableValues)) {
                 for (String allowableValue : allowableValues) {
-                    if (!schemaToBind.getEnum().contains(allowableValue)) {
+                    if (schemaToBind.getEnum() == null || !schemaToBind.getEnum().contains(allowableValue)) {
                         schemaToBind.addEnumItemObject(allowableValue);
                     }
                 }
