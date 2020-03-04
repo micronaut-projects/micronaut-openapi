@@ -58,6 +58,7 @@ import io.micronaut.openapi.javadoc.JavadocParser;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.callbacks.Callback;
+import io.swagger.v3.oas.annotations.enums.Explode;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.models.Components;
@@ -374,7 +375,7 @@ public class OpenApiControllerVisitor extends AbstractOpenApiVisitor implements 
                         } else if (parameter.isAnnotationPresent(QueryValue.class)) {
                             paramValues.put("in", ParameterIn.QUERY.toString());
                         }
-
+                        processExplode(paramAnn, paramValues);
 
                         JsonNode jsonNode = jsonMapper.valueToTree(paramValues);
 
@@ -507,6 +508,40 @@ public class OpenApiControllerVisitor extends AbstractOpenApiVisitor implements 
                 }
             }
         });
+    }
+
+    private void processExplode(AnnotationValue<io.swagger.v3.oas.annotations.Parameter> paramAnn, Map<CharSequence, Object> paramValues) {
+        Optional<Explode> explode = paramAnn.enumValue("explode", Explode.class);
+        if (explode.isPresent()) {
+            Explode ex = explode.get();
+            switch (ex) {
+                case TRUE:
+                    paramValues.put("explode", Boolean.TRUE);
+                    break;
+                case FALSE:
+                    paramValues.put("explode", Boolean.FALSE);
+                    break;
+                case DEFAULT:
+                default:
+                    String in = (String) paramValues.get("in");
+                    if (in == null || in.isEmpty()) {
+                        in = "DEFAULT";
+                    }
+                    switch (ParameterIn.valueOf(in.toUpperCase(Locale.US))) {
+                    case COOKIE:
+                    case QUERY:
+                        paramValues.put("explode", Boolean.TRUE);
+                        break;
+                    case DEFAULT:
+                    case HEADER:
+                    case PATH:
+                    default:
+                        paramValues.put("explode", Boolean.FALSE);
+                        break;
+                    }
+                    break;
+            }
+        }
     }
 
     private boolean isIgnoredParameterType(ClassElement parameterType) {
