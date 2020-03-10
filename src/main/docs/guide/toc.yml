@@ -9,3 +9,4 @@ schemasAndPojos: Schemas and POJOs
 schemasAndMetaAnnotations: Schemas and Meta Annotations
 schemasAndGenerics: Schemas and Generics
 mergingSchemas: Merging Schemas
+repository: Repository
