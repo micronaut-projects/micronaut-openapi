@@ -20,3 +20,53 @@ rapidoc.bg-color=#14191f
 rapidoc.text-color=#aec2e0
 rapidoc.sort-endpoints-by=method
 ----
+
+Properties prefixed with `micronaut.openapi.expand` will be expanded at compile time, for instance with:
+
+.openapi.properties Property Resolution
+[source]
+----
+micronaut.openapi.expand.api.version=v1.1
+micronaut.openapi.expand.openapi.description=A nice API
+----
+
+And:
+
+.Application Simple Application
+[source,java]
+----
+@OpenAPIDefinition(
+        info = @Info(
+                title = "Hello World",
+                version = "${api.version}",
+                description = "${openapi.description}",
+                license = @License(name = "Apache 2.0", url = "http://foo.bar"),
+                contact = @Contact(url = "http://gigantic-server.com", name = "Fred", email = "Fred@gigagantic-server.com")
+        )
+)
+public class Application {
+
+    public static void main(String[] args) {
+        Micronaut.run(Application.class);
+    }
+}
+----
+
+The generated specification file will looks like:
+
+.Generated Swagger YAML
+[source,yaml]
+----
+openapi: 3.0.1
+info:
+  title: the title
+  description: A nice API
+  contact:
+    name: Fred
+    url: http://gigantic-server.com
+    email: Fred@gigagantic-server.com
+  license:
+    name: Apache 2.0
+    url: http://foo.bar
+  version: "v1.1"
+----
