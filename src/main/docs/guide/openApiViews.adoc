@@ -166,8 +166,7 @@ Create a `HttpServerFilter` that will add a cookie with name `contextPath`.
 .HttpServerFilter for context-path
 [source,java]
 ----
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 
 import org.reactivestreams.Publisher;
 
@@ -188,7 +187,7 @@ public class OpenApiViewCookieContextPathFilter implements HttpServerFilter {
     private final Cookie contextPathCookie;
 
     OpenApiViewCookieContextPathFilter(@Value("${micronaut.server.context-path}") String contextPath) {
-        this.contextPathCookie = Cookie.of("contextPath", URLEncoder.encode(contextPath, StandardCharsets.UTF_8) + ";max-age=2;samesite");
+        this.contextPathCookie = Cookie.of("contextPath", contextPath).maxAge(Duration.ofMinutes(2L));
     }
 
     @Override
