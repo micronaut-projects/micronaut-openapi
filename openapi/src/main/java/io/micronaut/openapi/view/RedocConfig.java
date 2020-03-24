@@ -36,11 +36,12 @@ final class RedocConfig extends AbstractViewConfig implements Renderer {
     static {
         VALID_OPTIONS.put("disable-search", AbstractViewConfig::asBoolean);
         VALID_OPTIONS.put("expand-default-server-variables", AbstractViewConfig::asBoolean);
+        VALID_OPTIONS.put("expand-responses", AbstractViewConfig::asString);
         VALID_OPTIONS.put("hide-download-button", AbstractViewConfig::asBoolean);
         VALID_OPTIONS.put("hide-hostname", AbstractViewConfig::asBoolean);
         VALID_OPTIONS.put("hide-loading", AbstractViewConfig::asBoolean);
         VALID_OPTIONS.put("hide-single-request-sample-tab", AbstractViewConfig::asBoolean);
-        VALID_OPTIONS.put("expand-responses", AbstractViewConfig::asString);
+        VALID_OPTIONS.put("expand-single-schema-field", AbstractViewConfig::asBoolean);
         VALID_OPTIONS.put("json-sample-expand-level", AbstractViewConfig::asString);
         VALID_OPTIONS.put("menu-toggle", AbstractViewConfig::asBoolean);
         VALID_OPTIONS.put("native-scrollbars", AbstractViewConfig::asBoolean);
