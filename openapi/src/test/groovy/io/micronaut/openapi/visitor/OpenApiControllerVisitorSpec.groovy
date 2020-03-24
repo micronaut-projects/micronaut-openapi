@@ -28,6 +28,53 @@ class OpenApiControllerVisitorSpec extends AbstractTypeElementSpec {
         System.setProperty(AbstractOpenApiVisitor.ATTR_TEST_MODE, "true")
     }
 
+    void "test Inherited Controller Annotations - Issue #157"() {
+
+        given:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.swagger.v3.oas.annotations.*;
+import io.swagger.v3.oas.annotations.media.*;
+import io.swagger.v3.oas.annotations.enums.*;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.micronaut.http.annotation.*;
+import io.micronaut.http.*;
+import java.util.List;
+
+@Tag(name = "HelloWorld")
+interface HelloWorldApi {
+ @Get("/")
+    @Produces(MediaType.TEXT_PLAIN)
+    @Operation(summary = "Get a message", description = "Returns a simple hello world.")
+    @ApiResponse(responseCode = "200", description = "All good.")
+    HttpResponse<String> helloWorld();
+}
+
+@Controller("/hello")
+class HelloWorldController  implements HelloWorldApi {
+    @Override
+    public HttpResponse<String> helloWorld() {
+        return null;
+    }
+}
+
+@javax.inject.Singleton
+class MyBean {}
+''')
+        when:
+        Operation operation = AbstractOpenApiVisitor.testReference?.paths?.get("/hello")?.get
+
+        then:
+        operation != null
+        operation.operationId == 'helloWorld'
+        operation.parameters.size() == 0
+        operation.tags
+        !operation.tags.isEmpty()
+        operation.tags.contains("HelloWorld")
+    }
+
     void "test Inherited Annotations - Issue #157"() {
 
         given:
