@@ -16,6 +16,7 @@
 package io.micronaut.openapi.visitor;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import io.micronaut.context.env.DefaultPropertyPlaceholderResolver;
 import io.micronaut.context.env.PropertyPlaceholderResolver;
@@ -96,12 +97,14 @@ import java.util.stream.Collectors;
  */
 @Experimental
 public class OpenApiControllerVisitor extends AbstractOpenApiVisitor implements TypeElementVisitor<Controller, HttpMethodMapping> {
+    private static final String CLASS_TAGS = "CLASS_TAGS";
 
     private PropertyPlaceholderResolver propertyPlaceholderResolver;
 
     @Override
     public void visitClass(ClassElement element, VisitorContext context) {
         processSecuritySchemes(element, context);
+        context.put(CLASS_TAGS, readTags(element, context));
     }
 
     private boolean hasNoBindingAnnotationOrType(ParameterElement parameter) {
@@ -122,6 +125,7 @@ public class OpenApiControllerVisitor extends AbstractOpenApiVisitor implements 
                !parameter.getType().isAssignable("io.micronaut.http.BasicAuth");
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void visitMethod(MethodElement element, VisitorContext context) {
         if (element.isAnnotationPresent(Hidden.class)) {
@@ -162,9 +166,7 @@ public class OpenApiControllerVisitor extends AbstractOpenApiVisitor implements 
                     return Optional.empty();
                 }
             }).orElse(new io.swagger.v3.oas.models.Operation());
-
-            readTags(element, swaggerOperation);
-
+            readTags(element, swaggerOperation, (List<io.swagger.v3.oas.models.tags.Tag>) context.get(CLASS_TAGS, List.class, Collections.emptyList()));
             readSecurityRequirements(element, context, swaggerOperation);
 
             readApiResponses(element, context, swaggerOperation);
@@ -720,13 +722,44 @@ public class OpenApiControllerVisitor extends AbstractOpenApiVisitor implements 
         return callbacks;
     }
 
-    private void readTags(MethodElement element, io.swagger.v3.oas.models.Operation swaggerOperation) {
+    private void readTags(MethodElement element, io.swagger.v3.oas.models.Operation swaggerOperation, List<io.swagger.v3.oas.models.tags.Tag> classTags) {
         List<AnnotationValue<Tag>> tagAnnotations = element.getAnnotationValuesByType(Tag.class);
         if (CollectionUtils.isNotEmpty(tagAnnotations)) {
             for (AnnotationValue<Tag> r : tagAnnotations) {
                 r.get("name", String.class).ifPresent(swaggerOperation::addTagsItem);
             }
         }
+        if (!classTags.isEmpty()) {
+            List<String> operationTags = swaggerOperation.getTags();
+            if (operationTags == null) {
+                operationTags = new ArrayList<>(classTags.size());
+                swaggerOperation.setTags(operationTags);
+            }
+            for (io.swagger.v3.oas.models.tags.Tag tag : classTags) {
+                if (!operationTags.contains(tag.getName())) {
+                    operationTags.add(tag.getName());
+                }
+            }
+        }
+    }
+
+    private List<io.swagger.v3.oas.models.tags.Tag> readTags(ClassElement element, VisitorContext context) {
+        List<io.swagger.v3.oas.models.tags.Tag> tagList = new ArrayList<>();
+        List<AnnotationValue<Tag>> tagAnnotations = element.getAnnotationValuesByType(Tag.class);
+        if (CollectionUtils.isNotEmpty(tagAnnotations)) {
+            for (AnnotationValue<Tag> tag : tagAnnotations) {
+                JsonNode jsonNode = toJson(tag.getValues(), context);
+                try {
+                    io.swagger.v3.oas.models.tags.Tag t = treeToValue(jsonNode, io.swagger.v3.oas.models.tags.Tag.class);
+                    if (t != null) {
+                        tagList.add(t);
+                    }
+                } catch (JsonProcessingException e) {
+                    context.warn("Error reading OpenAPI" + Tag.class + " annotation", element);
+                }
+            }
+        }
+        return tagList;
     }
 
     private Content buildContent(Element definingElement, ClassElement type, String mediaType, OpenAPI openAPI, VisitorContext context) {
