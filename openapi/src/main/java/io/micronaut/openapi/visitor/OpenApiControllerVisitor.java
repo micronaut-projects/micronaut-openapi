@@ -16,7 +16,6 @@
 package io.micronaut.openapi.visitor;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import io.micronaut.context.env.DefaultPropertyPlaceholderResolver;
 import io.micronaut.context.env.PropertyPlaceholderResolver;
@@ -156,16 +155,8 @@ public class OpenApiControllerVisitor extends AbstractOpenApiVisitor implements 
             OpenAPI openAPI = resolveOpenAPI(context);
 
             final Optional<AnnotationValue<Operation>> operationAnnotation = element.findAnnotation(Operation.class);
-            io.swagger.v3.oas.models.Operation swaggerOperation = operationAnnotation.flatMap(o -> {
-                JsonNode jsonNode = toJson(o.getValues(), context);
-
-                try {
-                    return Optional.of(treeToValue(jsonNode, io.swagger.v3.oas.models.Operation.class));
-                } catch (Exception e) {
-                    context.warn("Error reading Swagger Operation for element [" + element + "]: " + e.getMessage(), element);
-                    return Optional.empty();
-                }
-            }).orElse(new io.swagger.v3.oas.models.Operation());
+            io.swagger.v3.oas.models.Operation swaggerOperation = operationAnnotation.flatMap(o -> 
+                toValue(o.getValues(), context, io.swagger.v3.oas.models.Operation.class)).orElse(new io.swagger.v3.oas.models.Operation());
             readTags(element, swaggerOperation, (List<io.swagger.v3.oas.models.tags.Tag>) context.get(CLASS_TAGS, List.class, Collections.emptyList()));
             readSecurityRequirements(element, context, swaggerOperation);
 
@@ -598,17 +589,9 @@ public class OpenApiControllerVisitor extends AbstractOpenApiVisitor implements 
         if (CollectionUtils.isNotEmpty(responseAnnotations)) {
             ApiResponses apiResponses = new ApiResponses();
             for (AnnotationValue<io.swagger.v3.oas.annotations.responses.ApiResponse> r : responseAnnotations) {
-
-                JsonNode jn = toJson(r.getValues(), context);
-                try {
-                    Optional<ApiResponse> newResponse = Optional.of(treeToValue(jn, ApiResponse.class));
-                    newResponse.ifPresent(apiResponse -> {
-                        String name = r.get("responseCode", String.class).orElse("default");
-                        apiResponses.put(name, apiResponse);
-                    });
-                } catch (Exception e) {
-                    context.warn("Error reading Swagger ApiResponses for element [" + element + "]: " + e.getMessage(), element);
-                }
+                Optional<ApiResponse> newResponse = toValue(r.getValues(), context, ApiResponse.class);
+                newResponse.ifPresent(apiResponse ->
+                        apiResponses.put(r.get("responseCode", String.class).orElse("default"), apiResponse));
             }
             swaggerOperation.setResponses(apiResponses);
         }
@@ -616,16 +599,7 @@ public class OpenApiControllerVisitor extends AbstractOpenApiVisitor implements 
 
     private void readSwaggerRequestBody(Element element, VisitorContext context, io.swagger.v3.oas.models.Operation swaggerOperation) {
         element.findAnnotation(io.swagger.v3.oas.annotations.parameters.RequestBody.class)
-                .flatMap(annotation -> {
-                    JsonNode jn = toJson(annotation.getValues(), context);
-                    try {
-                        return Optional.of(treeToValue(jn, RequestBody.class));
-                    } catch (Exception e) {
-                        context.warn("Error reading Swagger ResponseBody for element [" + element + "]: " + e.getMessage(), element);
-                        return Optional.empty();
-                    }
-
-                })
+                .flatMap(annotation -> toValue(annotation.getValues(), context, RequestBody.class))
                 .ifPresent(swaggerOperation::setRequestBody);
     }
 
@@ -646,13 +620,7 @@ public class OpenApiControllerVisitor extends AbstractOpenApiVisitor implements 
         List<AnnotationValue<io.swagger.v3.oas.annotations.servers.Server>> serverAnnotations = element.getAnnotationValuesByType(io.swagger.v3.oas.annotations.servers.Server.class);
         if (CollectionUtils.isNotEmpty(serverAnnotations)) {
             for (AnnotationValue<io.swagger.v3.oas.annotations.servers.Server> r : serverAnnotations) {
-                JsonNode jn = toJson(r.getValues(), context);
-                try {
-                    Optional<Server> newRequirement = Optional.of(treeToValue(jn, Server.class));
-                    newRequirement.ifPresent(swaggerOperation::addServersItem);
-                } catch (Exception e) {
-                    context.warn("Error reading Swagger Server for element [" + element + "]: " + e.getMessage(), element);
-                }
+                toValue(r.getValues(), context, Server.class).ifPresent(swaggerOperation::addServersItem);
             }
         }
     }
@@ -679,16 +647,8 @@ public class OpenApiControllerVisitor extends AbstractOpenApiVisitor implements 
                             final PathItem pathItem = new PathItem();
                             for (AnnotationValue<Operation> operation : operations) {
                                 final Optional<HttpMethod> operationMethod = operation.get("method", HttpMethod.class);
-                                operationMethod.ifPresent(httpMethod -> {
-                                    JsonNode jsonNode = toJson(operation.getValues(), context);
-
-                                    try {
-                                        final Optional<io.swagger.v3.oas.models.Operation> op = Optional.of(treeToValue(jsonNode, io.swagger.v3.oas.models.Operation.class));
-                                        op.ifPresent(operation1 -> setOperationOnPathItem(pathItem, operation1, httpMethod));
-                                    } catch (Exception e) {
-                                        context.warn("Error reading Swagger Operation for element [" + element + "]: " + e.getMessage(), element);
-                                    }
-                                });
+                                operationMethod.ifPresent(httpMethod ->
+                                    toValue(operation.getValues(), context, io.swagger.v3.oas.models.Operation.class).ifPresent(op -> setOperationOnPathItem(pathItem, op, httpMethod)));
                             }
                             Map<String, io.swagger.v3.oas.models.callbacks.Callback> callbacks = initCallbacks(swaggerOperation);
                             final io.swagger.v3.oas.models.callbacks.Callback c = new io.swagger.v3.oas.models.callbacks.Callback();
@@ -748,15 +708,7 @@ public class OpenApiControllerVisitor extends AbstractOpenApiVisitor implements 
         List<AnnotationValue<Tag>> tagAnnotations = element.getAnnotationValuesByType(Tag.class);
         if (CollectionUtils.isNotEmpty(tagAnnotations)) {
             for (AnnotationValue<Tag> tag : tagAnnotations) {
-                JsonNode jsonNode = toJson(tag.getValues(), context);
-                try {
-                    io.swagger.v3.oas.models.tags.Tag t = treeToValue(jsonNode, io.swagger.v3.oas.models.tags.Tag.class);
-                    if (t != null) {
-                        tagList.add(t);
-                    }
-                } catch (JsonProcessingException e) {
-                    context.warn("Error reading OpenAPI" + Tag.class + " annotation", element);
-                }
+                toValue(tag.getValues(), context, io.swagger.v3.oas.models.tags.Tag.class).ifPresent(tagList::add);
             }
         }
         return tagList;
