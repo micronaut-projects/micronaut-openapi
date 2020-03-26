@@ -19,6 +19,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy.PropertyNamingStrategyBase;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.TextNode;
 
 import io.micronaut.context.env.Environment;
 import io.micronaut.core.annotation.AnnotationValue;
@@ -30,11 +33,13 @@ import io.micronaut.inject.visitor.TypeElementVisitor;
 import io.micronaut.inject.visitor.VisitorContext;
 import io.micronaut.inject.writer.GeneratedFile;
 import io.micronaut.openapi.view.OpenApiViewConfig;
+import io.swagger.v3.core.util.Yaml;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.servers.Server;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.PathItem;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.security.SecurityScheme;
@@ -44,11 +49,13 @@ import java.io.Reader;
 import java.io.Writer;
 import java.lang.annotation.Annotation;
 import java.net.URI;
+import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.*;
+import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 
 import javax.annotation.processing.SupportedOptions;
@@ -61,6 +68,7 @@ import javax.annotation.processing.SupportedOptions;
  */
 @Experimental
 @SupportedOptions({
+    OpenApiApplicationVisitor.MICRONAUT_OPENAPI_CONTEXT_SERVER_PATH,
     OpenApiApplicationVisitor.MICRONAUT_OPENAPI_PROPERTY_NAMING_STRATEGY,
     OpenApiApplicationVisitor.MICRONAUT_OPENAPI_VIEWS_SPEC,
     OpenApiApplicationVisitor.MICRONAUT_OPENAPI_TARGET_FILE,
@@ -73,6 +81,14 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
      * System property that enables setting the open api config file.
      */
     public static final String MICRONAUT_OPENAPI_CONFIG_FILE = "micronaut.openapi.config.file";
+    /**
+     * Prefix for expandable properties.
+     */
+    public static final String MICRONAUT_OPENAPI_EXPAND_PREFIX = "micronaut.openapi.expand.";
+    /**
+     * System property for server context path.
+     */
+    public static final String MICRONAUT_OPENAPI_CONTEXT_SERVER_PATH = "micronaut.openapi.server.context-path";
     /**
      * System property for naming strategy. One jackson PropertyNamingStrategy.
      */
@@ -178,21 +194,19 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             Path directory = resolve(context, Paths.get(additionalSwaggerFiles));
             if (Files.isDirectory(directory)) {
                 context.info("Merging Swagger OpenAPI YAML files from location: " + directory);
-                try {
-                    Files.newDirectoryStream(directory,
-                            path -> path.toString().endsWith(".yml"))
-                            .forEach(path -> {
-                                context.info("Reading Swagger OpenAPI YAML file " + path.getFileName());
-                                OpenAPI parsedOpenApi = null;
-                                try {
-                                    parsedOpenApi = yamlMapper.readValue(path.toFile(), OpenAPI.class);
-                                } catch (IOException e) {
-                                    context.warn("Unable to read file " + path.getFileName() + ": " + e.getMessage() , element);
-                                }
-                                copyOpenAPI(openAPI, parsedOpenApi);
-                            });
+                try (DirectoryStream<Path> stream = Files.newDirectoryStream(directory, path -> path.toString().endsWith(".yml"))) {
+                    stream.forEach(path -> {
+                        context.info("Reading Swagger OpenAPI YAML file " + path.getFileName());
+                        OpenAPI parsedOpenApi = null;
+                        try {
+                            parsedOpenApi = yamlMapper.readValue(path.toFile(), OpenAPI.class);
+                        } catch (IOException e) {
+                            context.warn("Unable to read file " + path.getFileName() + ": " + e.getMessage(), element);
+                        }
+                        copyOpenAPI(openAPI, parsedOpenApi);
+                    });
                 } catch (IOException e) {
-                    context.warn("Unable to read  file from " + directory + ": " + e.getMessage() , element);
+                    context.warn("Unable to read  file from " + directory + ": " + e.getMessage(), element);
                 }
             } else {
                 context.warn(directory + " does not exist or is not a directory", element);
@@ -263,7 +277,6 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         if (CollectionUtils.isNotEmpty(annotations)) {
             if (CollectionUtils.isEmpty(tagList)) {
                 tagList = new ArrayList<>();
-
             }
             for (AnnotationValue<A> tag : annotations) {
                 JsonNode jsonNode;
@@ -398,6 +411,103 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         }
     }
 
+    @SuppressWarnings("unchecked")
+    private void applyPropertyNamingStrategy(OpenAPI openAPI, VisitorContext visitorContext) {
+        final String namingStrategyName = getConfigurationProperty(MICRONAUT_OPENAPI_PROPERTY_NAMING_STRATEGY);
+        final PropertyNamingStrategyBase propertyNamingStrategy = fromName(namingStrategyName);
+        if (propertyNamingStrategy != null) {
+            visitorContext.info("Using " + namingStrategyName + " property naming strategy.");
+            openAPI.getComponents().getSchemas().values().forEach(model -> {
+                Map<String, Schema> properties = model.getProperties();
+                if (properties == null) {
+                    return;
+                }
+                Map<String, Schema> newProperties = properties.entrySet().stream()
+                        .collect(Collectors.toMap(entry -> propertyNamingStrategy.translate(entry.getKey()),
+                                Map.Entry::getValue, (prop1, prop2) -> prop1, LinkedHashMap::new));
+                model.getProperties().clear();
+                model.setProperties(newProperties);
+            });
+        }
+    }
+
+    private void applyPropertyServerContextPath(OpenAPI openAPI, VisitorContext visitorContext) {
+        final String serverContextPath = getConfigurationProperty(MICRONAUT_OPENAPI_CONTEXT_SERVER_PATH);
+        if (serverContextPath == null || serverContextPath.isEmpty()) {
+            return;
+        }
+        visitorContext.info("Applying server context path: " + serverContextPath + " to Paths.");
+        io.swagger.v3.oas.models.Paths paths = openAPI.getPaths();
+        if (paths == null || paths.isEmpty()) {
+            return;
+        }
+        final io.swagger.v3.oas.models.Paths newPaths = new io.swagger.v3.oas.models.Paths();
+        for (Map.Entry<String, PathItem> path: paths.entrySet()) {
+            final String mapping = path.getKey();
+            newPaths.addPathItem(mapping.startsWith(serverContextPath) ? mapping : StringUtils.prependUri(serverContextPath, mapping), path.getValue());
+        }
+        openAPI.setPaths(newPaths);
+    }
+
+    private JsonNode resolvePlaceholders(ArrayNode anode, UnaryOperator<String> propertyExpander) {
+        for (int i = 0 ; i < anode.size(); ++i) {
+            anode.set(i, resolvePlaceholders(anode.get(i), propertyExpander));
+        }
+        return anode;
+    }
+
+    private JsonNode resolvePlaceholders(ObjectNode onode, UnaryOperator<String> propertyExpander) {
+        if (onode.size() == 0) {
+            return onode;
+        }
+        final ObjectNode newNode = onode.objectNode();
+        for (Iterator<Map.Entry<String, JsonNode>> i = onode.fields(); i.hasNext();) {
+            final Map.Entry<String, JsonNode> entry = i.next();
+            newNode.set(propertyExpander.apply(entry.getKey()), resolvePlaceholders(entry.getValue(), propertyExpander));
+        }
+        return newNode;
+    }
+
+    private JsonNode resolvePlaceholders(JsonNode node, UnaryOperator<String> propertyExpander) {
+        if  (node.isTextual()) {
+            final String text = node.textValue();
+            if (text == null || text.trim().isEmpty()) {
+                return node;
+            }
+            final String newText = propertyExpander.apply(text);
+            return text.equals(newText) ? node : TextNode.valueOf(newText);
+        } else if (node.isArray()) {
+            return resolvePlaceholders((ArrayNode) node, propertyExpander);
+        } else if (node.isObject()) {
+            return resolvePlaceholders((ObjectNode) node, propertyExpander);
+        } else {
+            return node;
+        }
+    }
+
+    private String expandProperties(String s, List<Map.Entry<String, String>> properties) {
+        if (s == null || s.isEmpty()) {
+            return s;
+        }
+        for (Map.Entry<String, String> entry: properties) {
+            s = s.replace(entry.getKey(), entry.getValue());
+        }
+        return s;
+    }
+
+    private OpenAPI resolvePropertyPlaceHolders(OpenAPI openAPI, VisitorContext visitorContext) {
+        List<Map.Entry<String, String>> expandableProperties = openApiProperties.entrySet()
+            .stream()
+            .filter(entry -> entry.getKey().toString().startsWith(MICRONAUT_OPENAPI_EXPAND_PREFIX))
+            .map(entry -> new AbstractMap.SimpleImmutableEntry<>("${" + entry.getKey().toString().substring(MICRONAUT_OPENAPI_EXPAND_PREFIX.length()) + '}', entry.getValue().toString())).collect(Collectors.toList());
+        if (expandableProperties.isEmpty()) {
+            return openAPI;
+        }
+        visitorContext.info("Expanding properties: " + expandableProperties);
+        JsonNode root = resolvePlaceholders(Yaml.mapper().convertValue(openAPI, ObjectNode.class), s -> expandProperties(s, expandableProperties));
+        return Yaml.mapper().convertValue(root, OpenAPI.class);
+    }
+
     @Override
     public void finish(VisitorContext visitorContext) {
         if (classElement == null) {
@@ -405,24 +515,10 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         }
 
         Optional<OpenAPI> attr = visitorContext.get(ATTR_OPENAPI, OpenAPI.class);
-
         attr.ifPresent(openAPI -> {
-            final String namingStrategyName = getConfigurationProperty(MICRONAUT_OPENAPI_PROPERTY_NAMING_STRATEGY);
-            final PropertyNamingStrategyBase propertyNamingStrategy = fromName(namingStrategyName);
-            if (propertyNamingStrategy != null) {
-                visitorContext.info("Using " + namingStrategyName + " property naming strategy.");
-                openAPI.getComponents().getSchemas().values().forEach(model -> {
-                    Map<String, Schema> properties = model.getProperties();
-                    if (properties == null) {
-                        return;
-                    }
-                    Map<String, Schema> newProperties = properties.entrySet().stream()
-                            .collect(Collectors.toMap(entry -> propertyNamingStrategy.translate(entry.getKey()),
-                                    Map.Entry::getValue, (prop1, prop2) -> prop1, LinkedHashMap::new));
-                    model.getProperties().clear();
-                    model.setProperties(newProperties);
-                });
-            }
+            applyPropertyNamingStrategy(openAPI, visitorContext);
+            applyPropertyServerContextPath(openAPI, visitorContext);
+            openAPI = resolvePropertyPlaceHolders(openAPI, visitorContext);
             String fileName = "swagger.yml";
             String documentTitle = "OpenAPI";
 
