@@ -324,11 +324,22 @@ Since the yaml specification file and the views are generated at compile time, t
 </div>
 <div class="paragraph">
 <p>It is still possible for the views to work in case a context path is defined:
+* Set <code>micronaut.openapi.server.context-path</code> property for compile time resolution,
 * Use a <code>HttpServerFilter</code> that will add a cookie, or
 * Add a parameter to the url.</p>
 </div>
 <div class="paragraph">
 <p>The view will first look for the cookie and if not present for the parameter.</p>
+</div>
+<div class="sect2">
+<h3 id="_compile_time_resolution">Compile Time Resolution</h3>
+<div class="paragraph">
+<p>Either set <code>micronaut.openapi.server.context-path</code> as a System Property or in <code>openapi.properties</code>, then all paths will be prepend with the
+specified value at compile time.</p>
+</div>
+<div class="paragraph">
+<p>If you want the resolution of the context path at runtime use one of the following methods:</p>
+</div>
 </div>
 <div class="sect2">
 <h3 id="_httpserverfilter">HttpServerFilter</h3>

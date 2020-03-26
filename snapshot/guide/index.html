@@ -388,6 +388,59 @@ rapidoc.text-color=#aec2e0
 rapidoc.sort-endpoints-by=method</code></pre>
 </div>
 </div>
+<div class="paragraph">
+<p>Properties prefixed with <code>micronaut.openapi.expand</code> will be expanded at compile time, for instance with:</p>
+</div>
+<div class="listingblock">
+<div class="title">openapi.properties Property Resolution</div>
+<div class="content">
+<pre class="highlightjs highlight"><code>micronaut.openapi.expand.api.version=v1.1
+micronaut.openapi.expand.openapi.description=A nice API</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>And:</p>
+</div>
+<div class="listingblock">
+<div class="title">Application Simple Application</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@OpenAPIDefinition(
+        info = @Info(
+                title = "Hello World",
+                version = "${api.version}",
+                description = "${openapi.description}",
+                license = @License(name = "Apache 2.0", url = "http://foo.bar"),
+                contact = @Contact(url = "http://gigantic-server.com", name = "Fred", email = "Fred@gigagantic-server.com")
+        )
+)
+public class Application {
+
+    public static void main(String[] args) {
+        Micronaut.run(Application.class);
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The generated specification file will looks like:</p>
+</div>
+<div class="listingblock">
+<div class="title">Generated Swagger YAML</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">openapi: 3.0.1
+info:
+  title: the title
+  description: A nice API
+  contact:
+    name: Fred
+    url: http://gigantic-server.com
+    email: Fred@gigagantic-server.com
+  license:
+    name: Apache 2.0
+    url: http://foo.bar
+  version: "v1.1"</code></pre>
+</div>
+</div>
 
 <h1 id="exposingSwaggerOutput"><a class="anchor" href="#exposingSwaggerOutput"></a>5 Exposing Swagger Output</h1>
 
@@ -629,11 +682,22 @@ Since the yaml specification file and the views are generated at compile time, t
 </div>
 <div class="paragraph">
 <p>It is still possible for the views to work in case a context path is defined:
+* Set <code>micronaut.openapi.server.context-path</code> property for compile time resolution,
 * Use a <code>HttpServerFilter</code> that will add a cookie, or
 * Add a parameter to the url.</p>
 </div>
 <div class="paragraph">
 <p>The view will first look for the cookie and if not present for the parameter.</p>
+</div>
+<div class="sect2">
+<h3 id="_compile_time_resolution">Compile Time Resolution</h3>
+<div class="paragraph">
+<p>Either set <code>micronaut.openapi.server.context-path</code> as a System Property or in <code>openapi.properties</code>, then all paths will be prepend with the
+specified value at compile time.</p>
+</div>
+<div class="paragraph">
+<p>If you want the resolution of the context path at runtime use one of the following methods:</p>
+</div>
 </div>
 <div class="sect2">
 <h3 id="_httpserverfilter">HttpServerFilter</h3>
