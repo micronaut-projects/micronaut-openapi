@@ -152,6 +152,24 @@ abstract class AbstractOpenApiVisitor  {
     }
 
     /**
+     * Convert the given Map to a JSON node and then to the specified type.
+     * @param <T> The output class type
+     * @param values The values
+     * @param context The visitor context
+     * @param type The class
+     * @return The converted instance
+     */
+    <T> Optional<T> toValue(Map<CharSequence, Object> values, VisitorContext context, Class<T> type) {
+        JsonNode node = toJson(values, context);
+        try {
+            return Optional.of(treeToValue(node, type));
+        } catch (JsonProcessingException e) {
+            context.warn("Error converting  [" + node + "]: to " + type + ": " + e.getMessage(), null);
+        }
+        return Optional.empty();
+    }
+
+    /**
      * Resolve the PathItem for the given {@link UriMatchTemplate}.
      *
      * @param context The context
@@ -419,15 +437,8 @@ abstract class AbstractOpenApiVisitor  {
             .filter(entry -> filters == null || ! filters.contains(entry.getKey()))
             .collect(toMap(
                  e -> e.getKey().equals("requiredProperties") ? "required" : e.getKey(), Map.Entry::getValue));
-        JsonNode schemaJson = toJson(values, context);
-        try {
-            T schema = treeToValue(schemaJson, type);
-            if (schema != null) {
-                schemaToValueMap(arraySchemaMap, schema);
-            }
-        } catch (JsonProcessingException e) {
-            context.warn("Error reading Swagger Schema: " + e.getMessage(), null);
-        }
+        Optional<T> schema = toValue(values, context, type);
+        schema.ifPresent(s -> schemaToValueMap(arraySchemaMap, s));
     }
 
     private Map<CharSequence, Object> resolveArraySchemaAnnotationValues(VisitorContext context, AnnotationValue<?> av) {
@@ -1029,11 +1040,11 @@ abstract class AbstractOpenApiVisitor  {
                 .entrySet()
                 .stream()
                 .collect(toMap(e -> e.getKey().equals("requiredProperties") ? "required" : e.getKey(), Map.Entry::getValue));
-        JsonNode schemaJson = toJson(values, context);
-        Schema schema = treeToValue(schemaJson, Schema.class);
-        if (schema == null) {
+        Optional<Schema> schemaOpt = toValue(values, context, Schema.class);
+        if (!schemaOpt.isPresent()) {
             return null;
         }
+        Schema schema = schemaOpt.get();
         ComposedSchema composedSchema = null;
         if (schema instanceof ComposedSchema) {
             composedSchema = (ComposedSchema) schema;
@@ -1226,13 +1237,15 @@ abstract class AbstractOpenApiVisitor  {
     }
 
     /**
-     * Processes {@link io.swagger.v3.oas.annotations.security.SecurityScheme} annotations.
+     * Processes {@link io.swagger.v3.oas.annotations.security.SecurityScheme}
+     * annotations.
      *
      * @param element The element
      * @param context The visitor context
      */
     protected void processSecuritySchemes(ClassElement element, VisitorContext context) {
-        final List<AnnotationValue<io.swagger.v3.oas.annotations.security.SecurityScheme>> values = element.getAnnotationValuesByType(io.swagger.v3.oas.annotations.security.SecurityScheme.class);
+        final List<AnnotationValue<io.swagger.v3.oas.annotations.security.SecurityScheme>> values = element
+                .getAnnotationValuesByType(io.swagger.v3.oas.annotations.security.SecurityScheme.class);
         final OpenAPI openAPI = resolveOpenAPI(context);
         for (AnnotationValue<io.swagger.v3.oas.annotations.security.SecurityScheme> securityRequirementAnnotationValue : values) {
 
@@ -1245,25 +1258,17 @@ abstract class AbstractOpenApiVisitor  {
                 } else {
                     map.remove("name");
                 }
-                normalizeEnumValues(map, CollectionUtils.mapOf(
-                        "type", SecurityScheme.Type.class, "in", SecurityScheme.In.class
-                ));
-                final JsonNode jsonNode = toJson(map, context);
-                try {
-                    final Optional<SecurityScheme> securityRequirement = Optional.of(treeToValue(jsonNode, SecurityScheme.class));
-                    securityRequirement.ifPresent(securityScheme -> {
+                normalizeEnumValues(map, CollectionUtils.mapOf("type", SecurityScheme.Type.class, "in", SecurityScheme.In.class));
+                Optional<SecurityScheme> securityRequirement = toValue(map, context, SecurityScheme.class);
+                securityRequirement.ifPresent(securityScheme -> {
 
-                        try {
-                            securityScheme.setIn(Enum.valueOf(SecurityScheme.In.class, map.get("in").toString().toUpperCase(Locale.ENGLISH)));
-                        } catch (Exception e) {
-                            // ignore
-                        }
-                        resolveComponents(openAPI).addSecuritySchemes(name, securityScheme);
-                            }
-                    );
-                } catch (JsonProcessingException e) {
-                    context.warn("Error reading Swagger SecurityRequirement for element [" + element + "]: " + e.getMessage(), element);
-                }
+                    try {
+                        securityScheme.setIn(Enum.valueOf(SecurityScheme.In.class, map.get("in").toString().toUpperCase(Locale.ENGLISH)));
+                    } catch (Exception e) {
+                        // ignore
+                    }
+                    resolveComponents(openAPI).addSecuritySchemes(name, securityScheme);
+                });
             });
         }
     }

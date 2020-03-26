@@ -15,8 +15,6 @@
  */
 package io.micronaut.openapi.visitor;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy.PropertyNamingStrategyBase;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -279,22 +277,15 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                 tagList = new ArrayList<>();
             }
             for (AnnotationValue<A> tag : annotations) {
-                JsonNode jsonNode;
+                Map<CharSequence, Object> values;
                 if (tag.getAnnotationName().equals(SecurityRequirement.class.getName()) && tag.getValues().size() > 0) {
                     Object name = tag.getValues().get("name");
                     Object scopes = Optional.ofNullable(tag.getValues().get("scopes")).orElse(new ArrayList<String>());
-                    jsonNode = toJson(Collections.singletonMap((CharSequence) name, scopes), context);
+                    values = Collections.singletonMap((CharSequence) name, scopes);
                 } else {
-                    jsonNode = toJson(tag.getValues(), context);
+                    values = tag.getValues();
                 }
-                try {
-                    T t = treeToValue(jsonNode, modelType);
-                    if (t != null) {
-                        tagList.add(t);
-                    }
-                } catch (JsonProcessingException e) {
-                    context.warn("Error reading OpenAPI" + annotationType + " annotation", element);
-                }
+                toValue(values, context, modelType).ifPresent(tagList::add);
             }
         }
         return tagList;
@@ -302,23 +293,16 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
 
     private OpenAPI readOpenAPI(ClassElement element, VisitorContext context) {
         return element.findAnnotation(OpenAPIDefinition.class).flatMap(o -> {
-                    JsonNode jsonNode = toJson(o.getValues(), context);
-
-                    try {
-                        Optional<OpenAPI> result = Optional.of(treeToValue(jsonNode, OpenAPI.class));
-                        result.ifPresent(openAPI -> {
-                            List<io.swagger.v3.oas.models.security.SecurityRequirement> securityRequirements =
-                                    o.getAnnotations("security", io.swagger.v3.oas.annotations.security.SecurityRequirement.class)
-                                    .stream()
-                                    .map(this::mapToSecurityRequirement)
-                                    .collect(Collectors.toList());
-                            openAPI.setSecurity(securityRequirements);
-                        });
-                        return result;
-                    } catch (JsonProcessingException e) {
-                        context.warn("Error reading Swagger OpenAPI for element [" + element + "]: " + e.getMessage(), element);
-                        return Optional.empty();
-                    }
+                    Optional<OpenAPI> result = toValue(o.getValues(), context, OpenAPI.class);
+                    result.ifPresent(openAPI -> {
+                        List<io.swagger.v3.oas.models.security.SecurityRequirement> securityRequirements =
+                                o.getAnnotations("security", io.swagger.v3.oas.annotations.security.SecurityRequirement.class)
+                                .stream()
+                                .map(this::mapToSecurityRequirement)
+                                .collect(Collectors.toList());
+                        openAPI.setSecurity(securityRequirements);
+                    });
+                    return result;
                 }).orElse(new OpenAPI());
     }
 
