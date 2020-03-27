@@ -23,7 +23,7 @@
                 },
                 cookie = extract(document.cookie),
                 contextPath = cookie === '' ? extract(window.location.search.substring(1)) : cookie;
-            Redoc.init(contextPath + '{{specURL}}');
+            Redoc.init('{{specURL}}');
             {{rapipdf.specurl}}
          </script>
     </body>

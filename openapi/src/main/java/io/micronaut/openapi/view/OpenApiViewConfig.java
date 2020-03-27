@@ -184,7 +184,7 @@ public final class OpenApiViewConfig {
      * @return A path.
      */
     public String getSpecURL() {
-        return '/' + mappingPath + '/' + specFile;
+        return  mappingPath + '/' + specFile;
     }
 
     /**

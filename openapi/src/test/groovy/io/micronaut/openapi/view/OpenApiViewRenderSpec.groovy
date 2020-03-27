@@ -45,10 +45,9 @@ class OpenApiOperationViewRenderSpec extends Specification {
         cfg.swaggerUIConfig != null
         cfg.title == "OpenAPI documentation"
         cfg.specFile == "swagger.yml"
-        cfg.specURL == "/somewhere/swagger.yml"
+        cfg.specURL == "somewhere/swagger.yml"
         Files.exists(outputDir.resolve("redoc").resolve("index.html"))
         Files.exists(outputDir.resolve("rapidoc").resolve("index.html"))
         Files.exists(outputDir.resolve("swagger-ui").resolve("index.html"))
     }
-
 }

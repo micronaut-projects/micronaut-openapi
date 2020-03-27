@@ -30,7 +30,7 @@ import io.micronaut.openapi.view.OpenApiViewConfig.RendererType;
 final class RapiPDFConfig extends AbstractViewConfig {
     private static final String LINK = "<script src='https://unpkg.com/rapipdf{{rapipdf.version}}/dist/rapipdf-min.js'></script>";
     private static final String TAG = "<rapi-pdf id='rapi-pdf' {{rapipdf.attributes}}></rapi-pdf>";
-    private static final String SPEC = "document.getElementById('rapi-pdf').setAttribute('spec-url', contextPath + '{{specURL}}');";
+    private static final String SPEC = "document.getElementById('rapi-pdf').setAttribute('spec-url', '{{specURL}}');";
     private static final Map<String, Object> DEFAULT_OPTIONS = new HashMap<>(6);
 
     private static final String DEFAULT_RAPIDOC_STYLE = "width: 122px;height: 26px;font-size: 15px;padding-bottom: 0px;padding-top: 5px;padding-left: 12px;margin-left: 12px";
