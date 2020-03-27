@@ -8,6 +8,7 @@ dependencies {
     compile "io.swagger.core.v3:swagger-models:$swaggerVersion"
     compile "io.swagger.core.v3:swagger-annotations:$swaggerVersion"
 
+    testCompile "io.micronaut:micronaut-http-server-netty"
     testCompile "io.micronaut:micronaut-runtime"
     testCompile "io.micronaut:micronaut-security"
     testCompile "io.micronaut:micronaut-inject-groovy"

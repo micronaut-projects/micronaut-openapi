@@ -1,0 +1,18 @@
+micronaut:
+  application:
+    name: hello-world
+
+  router:
+    static-resources:
+      openApiSpecs:
+        paths: file:src/test/resources/swagger
+        mapping: /swagger/**
+      redoc:
+        paths: file:output/redoc
+        mapping: /redoc/**
+      rapidoc:
+        paths: file:output/rapidoc
+        mapping: /rapidoc/**
+      swagger-ui:
+        paths: file:output/swagger-ui
+        mapping: /swagger-ui/**
