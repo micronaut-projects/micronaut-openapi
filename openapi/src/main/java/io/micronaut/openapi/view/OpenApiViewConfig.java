@@ -31,6 +31,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
+import io.micronaut.core.util.StringUtils;
 import io.micronaut.inject.visitor.VisitorContext;
 
 /**
@@ -47,6 +48,7 @@ public final class OpenApiViewConfig {
     private String mappingPath;
     private String title;
     private String specFile;
+    private String serverContextPath = "";
     private SwaggerUIConfig swaggerUIConfig;
     private RedocConfig redocConfig;
     private RapidocConfig rapidocConfig;
@@ -164,6 +166,14 @@ public final class OpenApiViewConfig {
     }
 
     /**
+     * Sets the server context path.
+     * @param contextPath The server context path.
+     */
+    public void setServerContextPath(String contextPath) {
+        this.serverContextPath = contextPath == null ? "" : contextPath;
+    }
+
+    /**
      * Returns the title for the generated views.
      * @return A title.
      */
@@ -184,7 +194,7 @@ public final class OpenApiViewConfig {
      * @return A path.
      */
     public String getSpecURL() {
-        return '/' + mappingPath + '/' + specFile;
+        return StringUtils.prependUri(serverContextPath, StringUtils.prependUri(mappingPath, specFile));
     }
 
     /**

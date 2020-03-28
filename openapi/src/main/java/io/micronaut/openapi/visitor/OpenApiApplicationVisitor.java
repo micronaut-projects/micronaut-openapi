@@ -313,6 +313,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         if (cfg.isEnabled()) {
             cfg.setTitle(title);
             cfg.setSpecFile(specFile);
+            cfg.setServerContextPath(getConfigurationProperty(MICRONAUT_OPENAPI_CONTEXT_SERVER_PATH));
             cfg.render(destinationDir.resolve("views"), visitorContext);
         }
     }
