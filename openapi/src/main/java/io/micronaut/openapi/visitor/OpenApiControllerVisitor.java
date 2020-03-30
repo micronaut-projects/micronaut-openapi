@@ -71,6 +71,7 @@ import io.swagger.v3.oas.models.parameters.Parameter;
 import io.swagger.v3.oas.models.parameters.RequestBody;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.responses.ApiResponses;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.servers.Server;
 
 import javax.annotation.Nonnull;
@@ -158,7 +159,9 @@ public class OpenApiControllerVisitor extends AbstractOpenApiVisitor implements 
             io.swagger.v3.oas.models.Operation swaggerOperation = operationAnnotation.flatMap(o -> 
                 toValue(o.getValues(), context, io.swagger.v3.oas.models.Operation.class)).orElse(new io.swagger.v3.oas.models.Operation());
             readTags(element, swaggerOperation, (List<io.swagger.v3.oas.models.tags.Tag>) context.get(CLASS_TAGS, List.class, Collections.emptyList()));
-            readSecurityRequirements(element, context, swaggerOperation);
+            for (SecurityRequirement securityItem: readSecurityRequirements(element)) {
+                swaggerOperation.addSecurityItem(securityItem);
+            }
 
             readApiResponses(element, context, swaggerOperation);
 
@@ -200,11 +203,10 @@ public class OpenApiControllerVisitor extends AbstractOpenApiVisitor implements 
 
                 ApiResponse okResponse = new ApiResponse();
 
-                if (javadocDescription != null) {
-                    String returnDescription = javadocDescription.getReturnDescription();
-                    okResponse.setDescription(returnDescription);
-                } else {
+                if (javadocDescription == null) {
                     okResponse.setDescription(swaggerOperation.getOperationId() + " default response");
+                } else {
+                    okResponse.setDescription(javadocDescription.getReturnDescription());
                 }
 
                 ClassElement returnType = element.getReturnType();
@@ -603,25 +605,16 @@ public class OpenApiControllerVisitor extends AbstractOpenApiVisitor implements 
                 .ifPresent(swaggerOperation::setRequestBody);
     }
 
-    private void readSecurityRequirements(MethodElement element, VisitorContext context, io.swagger.v3.oas.models.Operation swaggerOperation) {
-        List<AnnotationValue<io.swagger.v3.oas.annotations.security.SecurityRequirement>> securityAnnotations = element.getAnnotationValuesByType(io.swagger.v3.oas.annotations.security.SecurityRequirement.class);
-        if (CollectionUtils.isNotEmpty(securityAnnotations)) {
-            for (AnnotationValue<io.swagger.v3.oas.annotations.security.SecurityRequirement> r : securityAnnotations) {
-                try {
-                    swaggerOperation.addSecurityItem(mapToSecurityRequirement(r));
-                } catch (Exception e) {
-                    context.warn("Error reading Swagger SecurityRequirement for element [" + element + "]: " + e.getMessage(), element);
-                }
-            }
-        }
-    }
-
     private void readServers(MethodElement element, VisitorContext context, io.swagger.v3.oas.models.Operation swaggerOperation) {
-        List<AnnotationValue<io.swagger.v3.oas.annotations.servers.Server>> serverAnnotations = element.getAnnotationValuesByType(io.swagger.v3.oas.annotations.servers.Server.class);
-        if (CollectionUtils.isNotEmpty(serverAnnotations)) {
-            for (AnnotationValue<io.swagger.v3.oas.annotations.servers.Server> r : serverAnnotations) {
-                toValue(r.getValues(), context, Server.class).ifPresent(swaggerOperation::addServersItem);
-            }
+        List<io.swagger.v3.oas.models.servers.Server> servers = processOpenApiAnnotation(
+                element,
+                context,
+                io.swagger.v3.oas.annotations.servers.Server.class,
+                io.swagger.v3.oas.models.servers.Server.class,
+                Collections.emptyList()
+        );
+        for (Server server: servers) {
+            swaggerOperation.addServersItem(server);
         }
     }
 
