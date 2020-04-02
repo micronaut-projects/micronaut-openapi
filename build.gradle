@@ -52,7 +52,12 @@ subprojects { Project subproject ->
 
     dependencyManagement {
         imports {
-            mavenBom "io.micronaut:micronaut-bom:$micronautVersion"
+            mavenBom("io.micronaut:micronaut-bom:$micronautVersion") {
+              bomProperty 'jackson.version', jacksonVersion
+              bomProperty 'jackson.databind.version', jacksonVersion
+              bomProperty 'jackson.modules.version', jacksonVersion
+              bomProperty 'jackson.datatype.version', jacksonVersion
+            }
         }
     }
 
