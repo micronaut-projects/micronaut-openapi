@@ -1,3 +1,4 @@
+io.micronaut.annotation.processing.visitor
 io.micronaut.openapi.javadoc
 io.micronaut.openapi.util
 io.micronaut.openapi.view
