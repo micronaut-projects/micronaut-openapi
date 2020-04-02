@@ -309,11 +309,11 @@ public class OpenApiControllerVisitor extends AbstractOpenApiVisitor implements 
                 if (!parameter.hasStereotype(Bindable.class) && pathVariables.containsKey(parameterName)) {
                     UriMatchVariable var = pathVariables.get(parameterName);
                     newParameter = var.isQuery() ? new QueryParameter() : new PathParameter();
+                    newParameter.setName(parameterName);
                     final boolean exploded = var.isExploded();
                     if (exploded) {
                         newParameter.setExplode(exploded);
                     }
-                    newParameter.setName(parameterName);
                 } else if (parameter.isAnnotationPresent(PathVariable.class)) {
                     String paramName = parameter.getValue(PathVariable.class, String.class).orElse(parameterName);
                     UriMatchVariable var = pathVariables.get(paramName);
