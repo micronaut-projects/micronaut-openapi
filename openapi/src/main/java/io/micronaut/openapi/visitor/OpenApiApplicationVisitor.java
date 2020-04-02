@@ -23,9 +23,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 
 import io.micronaut.context.env.Environment;
-import io.micronaut.core.annotation.AnnotationValue;
 import io.micronaut.core.annotation.Experimental;
-import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.core.util.StringUtils;
 import io.micronaut.inject.ast.ClassElement;
 import io.micronaut.inject.visitor.TypeElementVisitor;
@@ -34,7 +32,6 @@ import io.micronaut.inject.writer.GeneratedFile;
 import io.micronaut.openapi.view.OpenApiViewConfig;
 import io.swagger.v3.core.util.Yaml;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.servers.Server;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.models.OpenAPI;
@@ -46,7 +43,6 @@ import io.swagger.v3.oas.models.security.SecurityScheme;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
-import java.lang.annotation.Annotation;
 import java.net.URI;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
@@ -136,10 +132,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         openAPI.setTags(tagList);
 
         // handle type level security requirements
-        List<io.swagger.v3.oas.models.security.SecurityRequirement> securityRequirements = element.getAnnotationValuesByType(SecurityRequirement.class)
-                .stream()
-                .map(this::mapToSecurityRequirement)
-                .collect(Collectors.toList());
+        List<io.swagger.v3.oas.models.security.SecurityRequirement> securityRequirements = readSecurityRequirements(element);
         if (openAPI.getSecurity() != null) {
             securityRequirements.addAll(openAPI.getSecurity());
         }
@@ -269,27 +262,6 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             Optional.ofNullable(from.getExternalDocs()).ifPresent(to::externalDocs);
             Optional.ofNullable(from.getExtensions()).ifPresent(extensions -> extensions.forEach(to::addExtension));
         }
-    }
-
-    private <T, A extends Annotation> List<T> processOpenApiAnnotation(ClassElement element, VisitorContext context, Class<A> annotationType, Class<T> modelType, List<T> tagList) {
-        List<AnnotationValue<A>> annotations = element.getAnnotationValuesByType(annotationType);
-        if (CollectionUtils.isNotEmpty(annotations)) {
-            if (CollectionUtils.isEmpty(tagList)) {
-                tagList = new ArrayList<>();
-            }
-            for (AnnotationValue<A> tag : annotations) {
-                Map<CharSequence, Object> values;
-                if (tag.getAnnotationName().equals(SecurityRequirement.class.getName()) && tag.getValues().size() > 0) {
-                    Object name = tag.getValues().get("name");
-                    Object scopes = Optional.ofNullable(tag.getValues().get("scopes")).orElse(new ArrayList<String>());
-                    values = Collections.singletonMap((CharSequence) name, scopes);
-                } else {
-                    values = tag.getValues();
-                }
-                toValue(values, context, modelType).ifPresent(tagList::add);
-            }
-        }
-        return tagList;
     }
 
     private OpenAPI readOpenAPI(ClassElement element, VisitorContext context) {

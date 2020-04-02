@@ -78,6 +78,7 @@ import io.swagger.v3.oas.models.media.ObjectSchema;
 import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
+
 import org.reactivestreams.Publisher;
 
 import javax.annotation.Nullable;
@@ -96,6 +97,7 @@ import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 import javax.validation.constraints.Size;
 import java.io.IOException;
+import java.lang.annotation.Annotation;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -173,6 +175,18 @@ abstract class AbstractOpenApiVisitor  {
     }
 
     /**
+     * Reads the security requirements annotation of the specified element.
+     * @param element The Element to process.
+     * @return A list of SecurityRequirement
+     */
+    List<SecurityRequirement> readSecurityRequirements(Element element) {
+        return element.getAnnotationValuesByType(io.swagger.v3.oas.annotations.security.SecurityRequirement.class)
+                .stream()
+                .map(this::mapToSecurityRequirement)
+                .collect(Collectors.toList());
+    }
+
+    /**
      * Resolve the PathItem for the given {@link UriMatchTemplate}.
      *
      * @param context The context
@@ -187,14 +201,8 @@ abstract class AbstractOpenApiVisitor  {
             openAPI.setPaths(paths);
         }
 
-
         final String pathString = matchTemplate.toPathString();
-        PathItem pathItem = paths.get(pathString);
-        if (pathItem == null) {
-            pathItem = new PathItem();
-            paths.put(pathString, pathItem);
-        }
-        return pathItem;
+        return paths.computeIfAbsent(pathString, key -> new PathItem());
     }
 
     /**
@@ -403,7 +411,7 @@ abstract class AbstractOpenApiVisitor  {
                     }
                 } else {
                     Object value = map.get(key);
-                    if (value == null || !(value instanceof Map)) {
+                    if (!(value instanceof Map)) {
                         value = new LinkedHashMap<>();
                         map.put(key, value);
                     }
@@ -447,14 +455,14 @@ abstract class AbstractOpenApiVisitor  {
     private Map<CharSequence, Object> resolveArraySchemaAnnotationValues(VisitorContext context, AnnotationValue<?> av) {
         final Map<CharSequence, Object> arraySchemaMap = new HashMap<>(10);
         // properties
-        av.get("arraySchema", AnnotationValue.class).ifPresent(annotationValue -> {
-            processAnnotationValue(context, (AnnotationValue<?>) annotationValue, arraySchemaMap, Arrays.asList("ref", "implementation"), Schema.class);
-        });
+        av.get("arraySchema", AnnotationValue.class).ifPresent(annotationValue -> 
+            processAnnotationValue(context, (AnnotationValue<?>) annotationValue, arraySchemaMap, Arrays.asList("ref", "implementation"), Schema.class)
+        );
         // items
         av.get("schema", AnnotationValue.class).ifPresent(annotationValue -> {
-            Optional<String> impl = ((AnnotationValue<?>) annotationValue).get("implementation", String.class);
-            Optional<String> type = ((AnnotationValue<?>) annotationValue).get("type", String.class);
-            Optional<String> format = ((AnnotationValue<?>) annotationValue).get("format", String.class);
+            Optional<String> impl = annotationValue.get("implementation", String.class);
+            Optional<String> type = annotationValue.get("type", String.class);
+            Optional<String> format = annotationValue.get("format", String.class);
             Optional<ClassElement> classElement = Optional.empty();
             PrimitiveType primitiveType = null;
             if (impl.isPresent()) {
@@ -719,7 +727,7 @@ abstract class AbstractOpenApiVisitor  {
                 finalSchemaToBind.setFormat("email");
             }
 
-            element.findAnnotation(Pattern.class).flatMap((p) -> p.get("regexp", String.class)).ifPresent(finalSchemaToBind::setFormat);
+            element.findAnnotation(Pattern.class).flatMap(p -> p.get("regexp", String.class)).ifPresent(finalSchemaToBind::setFormat);
         }
 
         Optional<String> documentation = element.getDocumentation();
@@ -913,19 +921,18 @@ abstract class AbstractOpenApiVisitor  {
     }
 
     private void checkAllOf(ComposedSchema composedSchema) {
-        if (composedSchema != null && composedSchema.getAllOf() != null && !composedSchema.getAllOf().isEmpty()) {
-            if (composedSchema.getProperties() != null && !composedSchema.getProperties().isEmpty()) {
-                // put all properties as siblings of allOf
-                ObjectSchema propSchema = new ObjectSchema();
-                propSchema.properties(composedSchema.getProperties());
-                propSchema.setDescription(composedSchema.getDescription());
-                propSchema.setRequired(composedSchema.getRequired());
-                composedSchema.setProperties(null);
-                composedSchema.setDescription(null);
-                composedSchema.setRequired(null);
-                composedSchema.setType(null);
-                composedSchema.addAllOfItem(propSchema);
-            }
+        if (composedSchema != null && composedSchema.getAllOf() != null && !composedSchema.getAllOf().isEmpty() && composedSchema.getProperties() != null
+                && !composedSchema.getProperties().isEmpty()) {
+            // put all properties as siblings of allOf
+            ObjectSchema propSchema = new ObjectSchema();
+            propSchema.properties(composedSchema.getProperties());
+            propSchema.setDescription(composedSchema.getDescription());
+            propSchema.setRequired(composedSchema.getRequired());
+            composedSchema.setProperties(null);
+            composedSchema.setDescription(null);
+            composedSchema.setRequired(null);
+            composedSchema.setType(null);
+            composedSchema.addAllOfItem(propSchema);
         }
     }
 
@@ -1114,11 +1121,7 @@ abstract class AbstractOpenApiVisitor  {
             return NameUtils.getSimpleName(metaAnnName);
         }
         if (type instanceof TypedElement) {
-            ClassElement classElement = ((TypedElement) type).getType();
-            if (classElement != null) {
-                return computeNameWithGenerics(classElement);
-            }
-
+            return computeNameWithGenerics(((TypedElement) type).getType());
         }
         return type.getSimpleName();
     }
@@ -1314,9 +1317,42 @@ abstract class AbstractOpenApiVisitor  {
      */
     protected SecurityRequirement mapToSecurityRequirement(AnnotationValue<io.swagger.v3.oas.annotations.security.SecurityRequirement> r) {
         String name = r.getRequiredValue("name", String.class);
-        List<String> scopes = r.get("scopes", String[].class).map(Arrays::asList).orElse(Collections.EMPTY_LIST);
+        List<String> scopes = r.get("scopes", String[].class).map(Arrays::asList).orElse(Collections.emptyList());
         SecurityRequirement securityRequirement = new SecurityRequirement();
         securityRequirement.addList(name, scopes);
         return securityRequirement;
     }
+
+    /**
+     * Converts annotation to model.
+     * @param <T> The model type.
+     * @param <A> The annotation type.
+     * @param element The element to process.
+     * @param context The context.
+     * @param annotationType The annotation type.
+     * @param modelType The model type.
+     * @param tagList The initial list of models.
+     * @return A list of model objects.
+     */
+    <T, A extends Annotation> List<T> processOpenApiAnnotation(Element element, VisitorContext context, Class<A> annotationType, Class<T> modelType, List<T> tagList) {
+        List<AnnotationValue<A>> annotations = element.getAnnotationValuesByType(annotationType);
+        if (CollectionUtils.isNotEmpty(annotations)) {
+            if (CollectionUtils.isEmpty(tagList)) {
+                tagList = new ArrayList<>();
+            }
+            for (AnnotationValue<A> tag : annotations) {
+                Map<CharSequence, Object> values;
+                if (tag.getAnnotationName().equals(SecurityRequirement.class.getName()) && tag.getValues().size() > 0) {
+                    Object name = tag.getValues().get("name");
+                    Object scopes = Optional.ofNullable(tag.getValues().get("scopes")).orElse(new ArrayList<String>());
+                    values = Collections.singletonMap((CharSequence) name, scopes);
+                } else {
+                    values = tag.getValues();
+                }
+                toValue(values, context, modelType).ifPresent(tagList::add);
+            }
+        }
+        return tagList;
+    }
+
 }
