@@ -36,6 +36,7 @@ import io.micronaut.core.annotation.Internal;
 import io.micronaut.inject.ast.ClassElement;
 import io.micronaut.inject.ast.MethodElement;
 import io.micronaut.inject.ast.PropertyElement;
+import io.micronaut.inject.visitor.VisitorContext;
 
 /**
  * A class element returning data from a {@link TypeElement}.
@@ -53,10 +54,18 @@ public class JavaClassElementExt extends JavaClassElement {
     private Map<String, Map<String, TypeMirror>> genericTypeInfo;
 
     /**
+     * @param ce       The {@link ClassElement}
+     * @param visitorContext     The visitor context
+     */
+    public JavaClassElementExt(ClassElement ce, VisitorContext visitorContext) {
+        this((JavaClassElement) ce, (JavaVisitorContext) visitorContext);
+    }
+
+    /**
      * @param jce       The {@link TypeElement}
      * @param visitorContext     The visitor context
      */
-    public JavaClassElementExt(JavaClassElement jce, JavaVisitorContext visitorContext) {
+    private JavaClassElementExt(JavaClassElement jce, JavaVisitorContext visitorContext) {
         super((TypeElement) jce.getNativeType(), jce.getAnnotationMetadata(), visitorContext);
         this.javaClassElement = jce;
         this.classElement = (TypeElement) jce.getNativeType();
@@ -106,7 +115,7 @@ public class JavaClassElementExt extends JavaClassElement {
                 props.add(bpd);
                 return bpd;
             }
-            
+
             @Override
             protected void accept(DeclaredType declaringType, javax.lang.model.element.Element element, Object o) {
                 if (element instanceof VariableElement) {
