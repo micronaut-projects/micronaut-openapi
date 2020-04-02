@@ -51,6 +51,7 @@ final class RapidocConfig extends AbstractViewConfig implements Renderer {
         VALID_OPTIONS.put("nav-hover-bg-color", RapidocConfig::asString);
         VALID_OPTIONS.put("nav-hover-text-color", AbstractViewConfig::asString);
         VALID_OPTIONS.put("nav-accent-color", AbstractViewConfig::asString);
+        VALID_OPTIONS.put("nav-item-spacing", new EnumConverter<>(NavItemSpacing.class));
         VALID_OPTIONS.put("layout",  new EnumConverter<>(Layout.class));
         VALID_OPTIONS.put("render-style",  new EnumConverter<>(RenderStyle.class));
         VALID_OPTIONS.put("schema-style",  new EnumConverter<>(SchemaStyle.class));
@@ -78,6 +79,18 @@ final class RapidocConfig extends AbstractViewConfig implements Renderer {
         DEFAULT_OPTIONS.put("layout", Layout.ROW);
         DEFAULT_OPTIONS.put("sort-tags", Boolean.TRUE);
         DEFAULT_OPTIONS.put("sort-endpoints-by", EndPoint.METHOD);
+    }
+
+    /**
+     * Rapidoc nav-item-spacing.
+     */
+    enum NavItemSpacing {
+        DEFAULT, COMPACT, RELAXED;
+
+        @Override
+        public String toString() {
+            return this.name().toLowerCase(Locale.US);
+        }
     }
 
     /**
