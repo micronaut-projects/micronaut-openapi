@@ -22,6 +22,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import io.micronaut.annotation.processing.visitor.JavaClassElement;
+import io.micronaut.annotation.processing.visitor.JavaClassElementExt;
+import io.micronaut.annotation.processing.visitor.JavaVisitorContext;
 import io.micronaut.core.annotation.AnnotationClassValue;
 import io.micronaut.core.annotation.AnnotationValue;
 import io.micronaut.core.beans.BeanMap;
@@ -1159,6 +1162,10 @@ abstract class AbstractOpenApiVisitor  {
         if (classElement != null) {
             List<PropertyElement> beanProperties = classElement.getBeanProperties();
             processPropertyElements(mediaType, openAPI, context, type, schema, beanProperties);
+            if (classElement instanceof JavaClassElement && context instanceof JavaVisitorContext) {
+                List<PropertyElement> fluentMethodsProperties = new JavaClassElementExt((JavaClassElement) classElement, (JavaVisitorContext) context).getFluentBeanProperties();
+                processPropertyElements(mediaType, openAPI, context, type, schema, fluentMethodsProperties);
+            }
 
             final List<FieldElement> publicFields = classElement.getFields(mods -> mods.contains(ElementModifier.PUBLIC) && mods.size() == 1);
 
