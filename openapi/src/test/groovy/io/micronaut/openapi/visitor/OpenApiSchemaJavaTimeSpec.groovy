@@ -96,8 +96,8 @@ class MyBean {}
         openAPI.components.schemas['Pet'].properties['offset'].format == 'date-time'
         openAPI.components.schemas['Pet'].properties['zoned'].type == 'string'
         openAPI.components.schemas['Pet'].properties['zoned'].format == 'date-time'
-        openAPI.components.schemas['Pet'].properties['instant'].type == 'integer'
-        openAPI.components.schemas['Pet'].properties['instant'].format == 'int64'
+        openAPI.components.schemas['Pet'].properties['instant'].type == 'string'
+        openAPI.components.schemas['Pet'].properties['instant'].format == 'date-time'
         openAPI.components.schemas['Response<Pet>'].properties['result'].$ref == '#/components/schemas/Pet'
     }
 
