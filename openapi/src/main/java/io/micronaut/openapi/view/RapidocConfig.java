@@ -60,6 +60,8 @@ final class RapidocConfig extends AbstractViewConfig implements Renderer {
         VALID_OPTIONS.put("default-schema-tab", new EnumConverter<>(DefaultSchemaTab.class));
         VALID_OPTIONS.put("response-area-height", AbstractViewConfig::asString);
         VALID_OPTIONS.put("show-info", AbstractViewConfig::asBoolean);
+        VALID_OPTIONS.put("add-info-headings-to-navbar", AbstractViewConfig::asBoolean);
+        VALID_OPTIONS.put("show-components", AbstractViewConfig::asBoolean);
         VALID_OPTIONS.put("show-header", AbstractViewConfig::asBoolean);
         VALID_OPTIONS.put("allow-authentication", AbstractViewConfig::asBoolean);
         VALID_OPTIONS.put("allow-spec-url-load", AbstractViewConfig::asBoolean);
