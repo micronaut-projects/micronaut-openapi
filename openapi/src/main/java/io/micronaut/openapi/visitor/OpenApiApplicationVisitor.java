@@ -69,7 +69,7 @@ import javax.annotation.processing.SupportedOptions;
     OpenApiApplicationVisitor.MICRONAUT_OPENAPI_TARGET_FILE,
     OpenApiApplicationVisitor.MICRONAUT_OPENAPI_ADDITIONAL_FILES,
     OpenApiApplicationVisitor.MICRONAUT_OPENAPI_CONFIG_FILE,
-    
+
 })
 public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements TypeElementVisitor<OpenAPIDefinition, Object> {
     /**
@@ -245,13 +245,12 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             Optional.ofNullable(from.getComponents()).ifPresent(components -> {
                 Map<String, Schema> schemas = components.getSchemas();
 
-                schemas.forEach((k, v) -> {
-                  if (v.getName() == null) {
-                    v.setName(k); 
-                  }
-                });
-                
                 if (schemas != null && !schemas.isEmpty()) {
+                    schemas.forEach((k, v) -> {
+                        if (v.getName() == null) {
+                            v.setName(k);
+                        }
+                    });
                     schemas.forEach(to::schema);
                 }
                 Map<String, SecurityScheme> securitySchemes = components.getSecuritySchemes();

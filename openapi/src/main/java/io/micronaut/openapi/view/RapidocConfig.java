@@ -48,7 +48,7 @@ final class RapidocConfig extends AbstractViewConfig implements Renderer {
         VALID_OPTIONS.put("mono-font", AbstractViewConfig::asString);
         VALID_OPTIONS.put("nav-bg-color", AbstractViewConfig::asString);
         VALID_OPTIONS.put("nav-text-color", AbstractViewConfig::asString);
-        VALID_OPTIONS.put("nav-hover-bg-color", RapidocConfig::asString);
+        VALID_OPTIONS.put("nav-hover-bg-color", AbstractViewConfig::asString);
         VALID_OPTIONS.put("nav-hover-text-color", AbstractViewConfig::asString);
         VALID_OPTIONS.put("nav-accent-color", AbstractViewConfig::asString);
         VALID_OPTIONS.put("nav-item-spacing", new EnumConverter<>(NavItemSpacing.class));
