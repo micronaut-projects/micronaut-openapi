@@ -22,9 +22,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import io.micronaut.annotation.processing.visitor.JavaClassElement;
 import io.micronaut.annotation.processing.visitor.JavaClassElementExt;
-import io.micronaut.annotation.processing.visitor.JavaVisitorContext;
 import io.micronaut.core.annotation.AnnotationClassValue;
 import io.micronaut.core.annotation.AnnotationValue;
 import io.micronaut.core.beans.BeanMap;
@@ -455,7 +453,7 @@ abstract class AbstractOpenApiVisitor  {
     private Map<CharSequence, Object> resolveArraySchemaAnnotationValues(VisitorContext context, AnnotationValue<?> av) {
         final Map<CharSequence, Object> arraySchemaMap = new HashMap<>(10);
         // properties
-        av.get("arraySchema", AnnotationValue.class).ifPresent(annotationValue -> 
+        av.get("arraySchema", AnnotationValue.class).ifPresent(annotationValue ->
             processAnnotationValue(context, (AnnotationValue<?>) annotationValue, arraySchemaMap, Arrays.asList("ref", "implementation"), Schema.class)
         );
         // items
@@ -1163,10 +1161,10 @@ abstract class AbstractOpenApiVisitor  {
         }
 
         if (classElement != null) {
-            List<PropertyElement> beanProperties = classElement.getBeanProperties();
+            List<PropertyElement> beanProperties = classElement.getBeanProperties().stream().filter(p -> ! "groovy.lang.MetaClass".equals(p.getType().getName())).collect(Collectors.toList());
             processPropertyElements(mediaType, openAPI, context, type, schema, beanProperties);
-            if (classElement instanceof JavaClassElement && context instanceof JavaVisitorContext) {
-                List<PropertyElement> fluentMethodsProperties = new JavaClassElementExt((JavaClassElement) classElement, (JavaVisitorContext) context).getFluentBeanProperties();
+            if ("io.micronaut.annotation.processing.visitor.JavaClassElement".equals(classElement.getClass().getName()) && "io.micronaut.annotation.processing.visitor.JavaVisitorContext".equals(context.getClass().getName())) {
+                List<PropertyElement> fluentMethodsProperties = new JavaClassElementExt(classElement, context).getFluentBeanProperties();
                 processPropertyElements(mediaType, openAPI, context, type, schema, fluentMethodsProperties);
             }
 

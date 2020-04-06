@@ -67,7 +67,11 @@ import io.swagger.v3.oas.models.PathItem;
 import io.swagger.v3.oas.models.media.Content;
 import io.swagger.v3.oas.models.media.ObjectSchema;
 import io.swagger.v3.oas.models.media.Schema;
+import io.swagger.v3.oas.models.parameters.CookieParameter;
+import io.swagger.v3.oas.models.parameters.HeaderParameter;
 import io.swagger.v3.oas.models.parameters.Parameter;
+import io.swagger.v3.oas.models.parameters.PathParameter;
+import io.swagger.v3.oas.models.parameters.QueryParameter;
 import io.swagger.v3.oas.models.parameters.RequestBody;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.responses.ApiResponses;
@@ -156,9 +160,9 @@ public class OpenApiControllerVisitor extends AbstractOpenApiVisitor implements 
             OpenAPI openAPI = resolveOpenAPI(context);
 
             final Optional<AnnotationValue<Operation>> operationAnnotation = element.findAnnotation(Operation.class);
-            io.swagger.v3.oas.models.Operation swaggerOperation = operationAnnotation.flatMap(o -> 
+            io.swagger.v3.oas.models.Operation swaggerOperation = operationAnnotation.flatMap(o ->
                 toValue(o.getValues(), context, io.swagger.v3.oas.models.Operation.class)).orElse(new io.swagger.v3.oas.models.Operation());
-            readTags(element, swaggerOperation, (List<io.swagger.v3.oas.models.tags.Tag>) context.get(CLASS_TAGS, List.class, Collections.emptyList()));
+            readTags(element, swaggerOperation, context.get(CLASS_TAGS, List.class, Collections.emptyList()));
             for (SecurityRequirement securityItem: readSecurityRequirements(element)) {
                 swaggerOperation.addSecurityItem(securityItem);
             }
@@ -304,9 +308,8 @@ public class OpenApiControllerVisitor extends AbstractOpenApiVisitor implements 
 
                 if (!parameter.hasStereotype(Bindable.class) && pathVariables.containsKey(parameterName)) {
                     UriMatchVariable var = pathVariables.get(parameterName);
-                    newParameter = new Parameter();
-
-                    newParameter.setIn(var.isQuery() ? ParameterIn.QUERY.toString() : ParameterIn.PATH.toString());
+                    newParameter = var.isQuery() ? new QueryParameter() : new PathParameter();
+                    newParameter.setName(parameterName);
                     final boolean exploded = var.isExploded();
                     if (exploded) {
                         newParameter.setExplode(exploded);
@@ -318,8 +321,7 @@ public class OpenApiControllerVisitor extends AbstractOpenApiVisitor implements 
                         context.fail("Path variable name: '" + paramName  + "' not found in path.", parameter);
                         continue;
                     }
-                    newParameter = new Parameter();
-                    newParameter.setIn(ParameterIn.PATH.toString());
+                    newParameter = new PathParameter();
                     newParameter.setName(paramName);
                     final boolean exploded = var.isExploded();
                     if (exploded) {
@@ -329,23 +331,19 @@ public class OpenApiControllerVisitor extends AbstractOpenApiVisitor implements 
                     String headerName = parameter.getValue(Header.class, "name", String.class)
                                                  .orElse(parameter.getValue(Header.class, String.class)
                                                  .orElseGet(() -> NameUtils.hyphenate(parameterName)));
-                    newParameter = new Parameter();
-                    newParameter.setIn(ParameterIn.HEADER.toString());
+                    newParameter = new HeaderParameter();
                     newParameter.setName(headerName);
                 } else if (parameter.isAnnotationPresent(CookieValue.class)) {
                     String cookieName = parameter.getValue(CookieValue.class, String.class).orElse(parameterName);
-                    newParameter = new Parameter();
-                    newParameter.setIn(ParameterIn.COOKIE.toString());
+                    newParameter = new CookieParameter();
                     newParameter.setName(cookieName);
                 } else if (parameter.isAnnotationPresent(QueryValue.class)) {
                     String queryVar = parameter.getValue(QueryValue.class, String.class).orElse(parameterName);
-                    newParameter = new Parameter();
-                    newParameter.setIn(ParameterIn.QUERY.toString());
+                    newParameter = new QueryParameter();
                     newParameter.setName(queryVar);
                 } else if (! permitsRequestBody && hasNoBindingAnnotationOrType(parameter)) {
                     // default to QueryValue - https://github.com/micronaut-projects/micronaut-openapi/issues/130
-                    newParameter = new Parameter();
-                    newParameter.setIn(ParameterIn.QUERY.toString());
+                    newParameter = new QueryParameter();
                     newParameter.setName(parameterName);
                 }
 
