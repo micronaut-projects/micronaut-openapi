@@ -3,7 +3,6 @@ dependencies {
     compileOnly "io.micronaut:micronaut-inject-java"
     annotationProcessor "io.micronaut.docs:micronaut-docs-asciidoc-config-props:$micronautDocsVersion"
     compile "io.micronaut:micronaut-http"
-    compile "io.micronaut:micronaut-validation"
     compile "io.swagger.core.v3:swagger-core:$swaggerVersion"
     compile "io.swagger.core.v3:swagger-models:$swaggerVersion"
     compile "io.swagger.core.v3:swagger-annotations:$swaggerVersion"
