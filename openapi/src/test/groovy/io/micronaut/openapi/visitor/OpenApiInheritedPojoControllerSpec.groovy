@@ -16,14 +16,127 @@
 package io.micronaut.openapi.visitor
 
 import io.micronaut.annotation.processing.test.AbstractTypeElementSpec
+import io.micronaut.http.annotation.Controller
+import io.micronaut.http.annotation.Get
 import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.Operation
 import io.swagger.v3.oas.models.media.ComposedSchema
 import io.swagger.v3.oas.models.media.Schema
+import spock.lang.Ignore
 
 class OpenApiInheritedPojoControllerSpec extends AbstractTypeElementSpec {
     def setup() {
         System.setProperty(AbstractOpenApiVisitor.ATTR_TEST_MODE, "true")
+    }
+
+    @Ignore
+    void "test controller inheritance with generics - Issue #193"() {
+        given: "An API definition"
+
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+
+class BaseObject {
+    private int a;
+
+    public int getA() {
+        return a;
+    }
+
+    public void setA(int a) {
+        this.a = a;
+    }
+}
+
+class B extends BaseObject {
+    private int b;
+
+    public int getB() {
+        return b;
+    }
+
+    public void setB(int b) {
+        this.b = b;
+    }
+}
+
+@Controller("/fromTestOperations")
+class TestOperations extends BaseTestOperations<B> {
+
+    @Get("/fromBaseNoGet")
+    @Override
+    public B getFromBaseNoGet() {
+        return null;
+    }
+
+    @Get("/getOnlyFromB")
+    public B getOnlyFromB() {
+        return null;
+    }
+}
+
+abstract class BaseTestOperations<T extends BaseObject> {
+
+    @Get("/fromBaseOnly")
+    public T getFromBase() {
+        return null;
+    }
+
+    public T getFromBaseNoGet() {
+        return null;
+    }
+
+    @Get("/fromBaseOnlyNoOverride")
+    public T getFromBaseNoOverride() {
+        return null;
+    }
+}
+@javax.inject.Singleton
+class MyBean {}
+''')
+        then: "the state is correct"
+        AbstractOpenApiVisitor.testReference != null
+
+        when: "The OpenAPI is retrieved"
+        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        Schema baseSchema = openAPI.components.schemas['BaseObject']
+        Schema bSchema = openAPI.components.schemas['B']
+
+        then: "the components are valid"
+        baseSchema != null
+        bSchema != null
+
+        when:
+        Operation fromBaseOnlyOperation = openAPI.paths.get("/fromTestOperations/fromBaseOnly").get
+
+        then:
+        fromBaseOnlyOperation
+        fromBaseOnlyOperation.responses
+        fromBaseOnlyOperation.responses.size() == 1
+        fromBaseOnlyOperation.responses."default"
+        fromBaseOnlyOperation.responses."default".content
+        fromBaseOnlyOperation.responses."default".content."application/json"
+        fromBaseOnlyOperation.responses."default".content."application/json".schema
+        fromBaseOnlyOperation.responses."default".content."application/json".schema.$ref
+        fromBaseOnlyOperation.responses."default".content."application/json".schema.$ref == '#/components/schemas/BaseObject'
+
+        when:
+        Operation fromBaseNoGetOperation = openAPI.paths.get("/fromTestOperations/fromBaseNoGet").get
+
+        then:
+        fromBaseNoGetOperation
+        fromBaseNoGetOperation.responses
+        fromBaseNoGetOperation.responses.size() == 1
+        fromBaseNoGetOperation.responses."default"
+        fromBaseNoGetOperation.responses."default".content
+        fromBaseNoGetOperation.responses."default".content."application/json"
+        fromBaseNoGetOperation.responses."default".content."application/json".schema
+        fromBaseNoGetOperation.responses."default".content."application/json".schema.$ref
+        fromBaseNoGetOperation.responses."default".content."application/json".schema.$ref == '#/components/schemas/B'
     }
 
     void "test build OpenAPI doc for POJO with Inheritance and discriminator field"() {
@@ -301,11 +414,11 @@ enum PetType {
     CAT
 }
 
-@Schema(discriminatorProperty = "type", 
+@Schema(discriminatorProperty = "type",
         discriminatorMapping = {
             @DiscriminatorMapping(value = "DOG", schema = Dog.class),
             @DiscriminatorMapping(value = "CAT", schema = Cat.class)
-        }, 
+        },
         oneOf = {Dog.class, Cat.class})
 class Pet {
 
@@ -450,7 +563,7 @@ interface PetOperations {
      */
     @Get(uri = "/cases/{name}", produces = MediaType.TEXT_PLAIN)
     Cat getCat(String name);
-    
+
         /**
      * @param name The person's name
      * @return The greeting
@@ -572,13 +685,13 @@ interface PetOperations {
      */
     @Get(uri = "/cases/{name}", produces = MediaType.TEXT_PLAIN)
     Cat getCat(String name);
-    
+
     /**
      * @param name The person's name
      * @return The greeting
      */
     @Get(uri = "/dogs/{name}", produces = MediaType.TEXT_PLAIN)
-    Dog getDog(String name);    
+    Dog getDog(String name);
 }
 
 @Schema(description = "Dog", allOf = { Pet.class })
