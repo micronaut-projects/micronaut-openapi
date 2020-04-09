@@ -17,6 +17,7 @@ package io.micronaut.openapi.visitor;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.JsonNode;
+
 import io.micronaut.context.env.DefaultPropertyPlaceholderResolver;
 import io.micronaut.context.env.PropertyPlaceholderResolver;
 import io.micronaut.core.annotation.AnnotationValue;
@@ -101,7 +102,7 @@ import java.util.stream.Collectors;
  */
 @Experimental
 public class OpenApiControllerVisitor extends AbstractOpenApiVisitor implements TypeElementVisitor<Controller, HttpMethodMapping> {
-    private static final String CLASS_TAGS = "CLASS_TAGS";
+    private static final String CLASS_TAGS = "MICRONAUT_OPENAPI_CLASS_TAGS";
 
     private PropertyPlaceholderResolver propertyPlaceholderResolver;
 
@@ -129,6 +130,20 @@ public class OpenApiControllerVisitor extends AbstractOpenApiVisitor implements 
                !parameter.getType().isAssignable("io.micronaut.http.BasicAuth");
     }
 
+    private HttpMethod httpMethod(MethodElement element) {
+        Optional<Class<? extends Annotation>> httpMethodOpt = element
+                .getAnnotationTypeByStereotype(HttpMethodMapping.class);
+        if (!httpMethodOpt.isPresent()) {
+            return null;
+        }
+        try {
+            return HttpMethod.valueOf(httpMethodOpt.get().getSimpleName().toUpperCase(Locale.ENGLISH));
+        } catch (IllegalArgumentException e) {
+            // ignore
+        }
+        return null;
+    }
+
     @SuppressWarnings("unchecked")
     @Override
     public void visitMethod(MethodElement element, VisitorContext context) {
@@ -136,371 +151,362 @@ public class OpenApiControllerVisitor extends AbstractOpenApiVisitor implements 
             return;
         }
 
-        Optional<Class<? extends Annotation>> httpMethodOpt = element.getAnnotationTypeByStereotype(HttpMethodMapping.class);
+        HttpMethod httpMethod = httpMethod(element);
+        if (httpMethod == null) {
+            return;
+        }
+        String controllerValue = element.getDeclaringType().getValue(UriMapping.class, String.class).orElse("/");
+        controllerValue = getPropertyPlaceholderResolver().resolvePlaceholders(controllerValue).orElse(controllerValue);
+        UriMatchTemplate matchTemplate = UriMatchTemplate.of(controllerValue);
+        String methodValue = element.getValue(HttpMethodMapping.class, String.class).orElse("/");
+        methodValue = getPropertyPlaceholderResolver().resolvePlaceholders(methodValue).orElse(methodValue);
+        matchTemplate = matchTemplate.nest(methodValue);
 
-        httpMethodOpt.ifPresent(httpMethodClass -> {
-            HttpMethod httpMethod = null;
-            try {
-                httpMethod = HttpMethod.valueOf(httpMethodClass.getSimpleName().toUpperCase(Locale.ENGLISH));
-            } catch (IllegalArgumentException e) {
-                // ignore
+        PathItem pathItem = resolvePathItem(context, matchTemplate);
+        OpenAPI openAPI = resolveOpenAPI(context);
+
+        final Optional<AnnotationValue<Operation>> operationAnnotation = element.findAnnotation(Operation.class);
+        io.swagger.v3.oas.models.Operation swaggerOperation = operationAnnotation
+                .flatMap(o -> toValue(o.getValues(), context, io.swagger.v3.oas.models.Operation.class))
+                .orElse(new io.swagger.v3.oas.models.Operation());
+
+        if (StringUtils.isEmpty(swaggerOperation.getOperationId())) {
+            swaggerOperation.setOperationId(element.getName());
+        }
+        readTags(element, swaggerOperation, context.get(CLASS_TAGS, List.class, Collections.emptyList()));
+        for (SecurityRequirement securityItem : readSecurityRequirements(element)) {
+            swaggerOperation.addSecurityItem(securityItem);
+        }
+
+        readApiResponses(element, context, swaggerOperation);
+
+        readServers(element, context, swaggerOperation);
+
+        readCallbacks(element, context, swaggerOperation);
+
+        JavadocDescription javadocDescription = element.getDocumentation().map(s -> new JavadocParser().parse(s))
+                .orElse(null);
+
+        if (javadocDescription != null && StringUtils.isEmpty(swaggerOperation.getDescription())) {
+            swaggerOperation.setDescription(javadocDescription.getMethodDescription());
+            swaggerOperation.setSummary(javadocDescription.getMethodDescription());
+        }
+
+        setOperationOnPathItem(pathItem, swaggerOperation, httpMethod);
+
+        if (element.isAnnotationPresent(Deprecated.class)) {
+            swaggerOperation.setDeprecated(true);
+        }
+
+        List<Parameter> swaggerParameters = swaggerOperation.getParameters();
+        List<UriMatchVariable> pv = matchTemplate.getVariables();
+        Map<String, UriMatchVariable> pathVariables = new LinkedHashMap<>(pv.size());
+        for (UriMatchVariable variable : pv) {
+            pathVariables.put(variable.getName(), variable);
+        }
+        OptionalValues<List> consumesMediaTypes = element.getValues(Consumes.class, List.class);
+        String consumesMediaType = element.stringValue(Consumes.class).orElse(MediaType.APPLICATION_JSON);
+        ApiResponses responses = swaggerOperation.getResponses();
+        if (responses == null) {
+            responses = new ApiResponses();
+
+            swaggerOperation.setResponses(responses);
+
+            ApiResponse okResponse = new ApiResponse();
+
+            if (javadocDescription == null) {
+                okResponse.setDescription(swaggerOperation.getOperationId() + " default response");
+            } else {
+                okResponse.setDescription(javadocDescription.getReturnDescription());
             }
-            if (httpMethod == null) {
-                return;
+
+            ClassElement returnType = element.getReturnType();
+            if (returnType.isAssignable("io.reactivex.Completable")) {
+                returnType = null;
+            } else if (isResponseType(returnType)) {
+                returnType = returnType.getFirstTypeArgument().orElse(returnType);
+            } else if (isSingleResponseType(returnType)) {
+                returnType = returnType.getFirstTypeArgument().get();
+                returnType = returnType.getFirstTypeArgument().orElse(returnType);
             }
 
-            String controllerValue = element.getDeclaringType().getValue(UriMapping.class, String.class).orElse("/");
-            controllerValue = getPropertyPlaceholderResolver().resolvePlaceholders(controllerValue).orElse(controllerValue);
-            UriMatchTemplate matchTemplate = UriMatchTemplate.of(controllerValue);
-            String methodValue = element.getValue(HttpMethodMapping.class, String.class).orElse("/");
-            methodValue = getPropertyPlaceholderResolver().resolvePlaceholders(methodValue).orElse(methodValue);
-            matchTemplate = matchTemplate.nest(methodValue);
-
-            PathItem pathItem = resolvePathItem(context, matchTemplate);
-            OpenAPI openAPI = resolveOpenAPI(context);
-
-            final Optional<AnnotationValue<Operation>> operationAnnotation = element.findAnnotation(Operation.class);
-            io.swagger.v3.oas.models.Operation swaggerOperation = operationAnnotation.flatMap(o ->
-                toValue(o.getValues(), context, io.swagger.v3.oas.models.Operation.class)).orElse(new io.swagger.v3.oas.models.Operation());
-            readTags(element, swaggerOperation, context.get(CLASS_TAGS, List.class, Collections.emptyList()));
-            for (SecurityRequirement securityItem: readSecurityRequirements(element)) {
-                swaggerOperation.addSecurityItem(securityItem);
-            }
-
-            readApiResponses(element, context, swaggerOperation);
-
-            readServers(element, context, swaggerOperation);
-
-            readCallbacks(element, context, swaggerOperation);
-
-            JavadocDescription javadocDescription = element.getDocumentation().map(s -> new JavadocParser().parse(s)).orElse(null);
-
-            if (javadocDescription != null && StringUtils.isEmpty(swaggerOperation.getDescription())) {
-                swaggerOperation.setDescription(javadocDescription.getMethodDescription());
-                swaggerOperation.setSummary(javadocDescription.getMethodDescription());
-            }
-
-            setOperationOnPathItem(pathItem, swaggerOperation, httpMethod);
-
-            if (element.isAnnotationPresent(Deprecated.class)) {
-                swaggerOperation.setDeprecated(true);
-            }
-
-            if (StringUtils.isEmpty(swaggerOperation.getOperationId())) {
-                swaggerOperation.setOperationId(element.getName());
-            }
-
-            List<Parameter> swaggerParameters = swaggerOperation.getParameters();
-            List<UriMatchVariable> pv = matchTemplate.getVariables();
-            Map<String, UriMatchVariable> pathVariables = new LinkedHashMap<>(pv.size()) ;
-            for (UriMatchVariable variable : pv) {
-                pathVariables.put(variable.getName(), variable);
-            }
-
-            OptionalValues<List> consumesMediaTypes = element.getValues(Consumes.class, List.class);
-            String consumesMediaType = element.stringValue(Consumes.class).orElse(MediaType.APPLICATION_JSON);
-            ApiResponses responses = swaggerOperation.getResponses();
-            if (responses == null) {
-                responses = new ApiResponses();
-
-                swaggerOperation.setResponses(responses);
-
-                ApiResponse okResponse = new ApiResponse();
-
-                if (javadocDescription == null) {
-                    okResponse.setDescription(swaggerOperation.getOperationId() + " default response");
+            if (returnType != null) {
+                OptionalValues<List> mediaTypes = element.getValues(Produces.class, List.class);
+                Content content;
+                if (mediaTypes.isEmpty()) {
+                    content = buildContent(element, returnType, MediaType.APPLICATION_JSON, openAPI, context);
                 } else {
-                    okResponse.setDescription(javadocDescription.getReturnDescription());
+                    content = buildContent(element, returnType, mediaTypes, openAPI, context);
                 }
+                okResponse.setContent(content);
+            }
+            responses.put(ApiResponses.DEFAULT, okResponse);
+        }
 
-                ClassElement returnType = element.getReturnType();
+        boolean permitsRequestBody = HttpMethod.permitsRequestBody(httpMethod);
 
-                if (returnType.isAssignable("io.reactivex.Completable")) {
-                    returnType = null;
-                } else if (isResponseType(returnType)) {
-                    returnType = returnType.getFirstTypeArgument().orElse(returnType);
-                } else if (isSingleResponseType(returnType)) {
-                    returnType = returnType.getFirstTypeArgument().get();
-                    returnType = returnType.getFirstTypeArgument().orElse(returnType);
-                }
+        if (permitsRequestBody) {
+            readSwaggerRequestBody(element, context, swaggerOperation);
+        }
 
-                if (returnType != null) {
-                    OptionalValues<List> mediaTypes = element.getValues(Produces.class, List.class);
-                    Content content;
-                    if (mediaTypes.isEmpty()) {
-                        content = buildContent(element, returnType, MediaType.APPLICATION_JSON, openAPI, context);
-                    } else {
-                        content = buildContent(element, returnType, mediaTypes, openAPI, context);
-                    }
-                    okResponse.setContent(content);
-                }
-                responses.put(ApiResponses.DEFAULT, okResponse);
+        boolean hasExistingParameters = CollectionUtils.isNotEmpty(swaggerParameters);
+        if (!hasExistingParameters) {
+            swaggerParameters = new ArrayList<>();
+            swaggerOperation.setParameters(swaggerParameters);
+        }
+
+        for (ParameterElement parameter : element.getParameters()) {
+
+            ClassElement parameterType = parameter.getType();
+            String parameterName = parameter.getName();
+
+            if (isIgnoredParameterType(parameterType)) {
+                continue;
             }
 
-            boolean permitsRequestBody = HttpMethod.permitsRequestBody(httpMethod);
-
-            if (permitsRequestBody) {
-                readSwaggerRequestBody(element, context, swaggerOperation);
+            if (permitsRequestBody && swaggerOperation.getRequestBody() == null) {
+                readSwaggerRequestBody(parameter, context, swaggerOperation);
             }
 
-            boolean hasExistingParameters = CollectionUtils.isNotEmpty(swaggerParameters);
-            if (!hasExistingParameters) {
-                swaggerParameters = new ArrayList<>();
-                swaggerOperation.setParameters(swaggerParameters);
-            }
+            if (parameter.isAnnotationPresent(Body.class)) {
 
-            for (ParameterElement parameter : element.getParameters()) {
-
-                ClassElement parameterType = parameter.getType();
-                String parameterName = parameter.getName();
-
-                if (isIgnoredParameterType(parameterType)) {
-                    continue;
-                }
-
-                if (permitsRequestBody && swaggerOperation.getRequestBody() == null) {
-                    readSwaggerRequestBody(parameter, context, swaggerOperation);
-                }
-
-                if (parameter.isAnnotationPresent(Body.class)) {
-
-                    if (permitsRequestBody) {
-                        RequestBody requestBody = swaggerOperation.getRequestBody();
-                        if (requestBody == null) {
-                            requestBody = new RequestBody();
-                            swaggerOperation.setRequestBody(requestBody);
-                        }
-                        if (requestBody.getDescription() == null && javadocDescription != null) {
-                            CharSequence desc = javadocDescription.getParameters().get(parameterName);
-                            if (desc != null) {
-                                requestBody.setDescription(desc.toString());
-                            }
-                        }
-                        if (requestBody.getRequired() == null) {
-                            requestBody.setRequired(!parameter.isAnnotationPresent(Nullable.class) && !parameterType.isAssignable(Optional.class));
-                        }
-                        if (requestBody.getContent() == null) {
-                            Content content;
-                            if (consumesMediaTypes.isEmpty()) {
-                                content = buildContent(
-                                        parameter,
-                                        parameterType,
-                                        MediaType.APPLICATION_JSON,
-                                        openAPI, context);
-                            } else {
-                                content = buildContent(
-                                        parameter,
-                                        parameterType,
-                                        consumesMediaTypes,
-                                        openAPI, context);
-                            }
-                            requestBody.setContent(content);
-                        }
+                if (permitsRequestBody) {
+                    RequestBody requestBody = swaggerOperation.getRequestBody();
+                    if (requestBody == null) {
+                        requestBody = new RequestBody();
+                        swaggerOperation.setRequestBody(requestBody);
                     }
-                    continue;
-                }
-
-                if (hasExistingParameters) {
-                    continue;
-                }
-
-                Parameter newParameter = null;
-
-                if (!parameter.hasStereotype(Bindable.class) && pathVariables.containsKey(parameterName)) {
-                    UriMatchVariable var = pathVariables.get(parameterName);
-                    newParameter = var.isQuery() ? new QueryParameter() : new PathParameter();
-                    newParameter.setName(parameterName);
-                    final boolean exploded = var.isExploded();
-                    if (exploded) {
-                        newParameter.setExplode(exploded);
-                    }
-                } else if (parameter.isAnnotationPresent(PathVariable.class)) {
-                    String paramName = parameter.getValue(PathVariable.class, String.class).orElse(parameterName);
-                    UriMatchVariable var = pathVariables.get(paramName);
-                    if (var == null) {
-                        context.fail("Path variable name: '" + paramName  + "' not found in path.", parameter);
-                        continue;
-                    }
-                    newParameter = new PathParameter();
-                    newParameter.setName(paramName);
-                    final boolean exploded = var.isExploded();
-                    if (exploded) {
-                        newParameter.setExplode(exploded);
-                    }
-                } else if (parameter.isAnnotationPresent(Header.class)) {
-                    String headerName = parameter.getValue(Header.class, "name", String.class)
-                                                 .orElse(parameter.getValue(Header.class, String.class)
-                                                 .orElseGet(() -> NameUtils.hyphenate(parameterName)));
-                    newParameter = new HeaderParameter();
-                    newParameter.setName(headerName);
-                } else if (parameter.isAnnotationPresent(CookieValue.class)) {
-                    String cookieName = parameter.getValue(CookieValue.class, String.class).orElse(parameterName);
-                    newParameter = new CookieParameter();
-                    newParameter.setName(cookieName);
-                } else if (parameter.isAnnotationPresent(QueryValue.class)) {
-                    String queryVar = parameter.getValue(QueryValue.class, String.class).orElse(parameterName);
-                    newParameter = new QueryParameter();
-                    newParameter.setName(queryVar);
-                } else if (! permitsRequestBody && hasNoBindingAnnotationOrType(parameter)) {
-                    // default to QueryValue - https://github.com/micronaut-projects/micronaut-openapi/issues/130
-                    newParameter = new QueryParameter();
-                    newParameter.setName(parameterName);
-                }
-
-                if (parameter.isAnnotationPresent(io.swagger.v3.oas.annotations.Parameter.class)) {
-                    AnnotationValue<io.swagger.v3.oas.annotations.Parameter> paramAnn = parameter.findAnnotation(io.swagger.v3.oas.annotations.Parameter.class).orElse(null);
-
-                    if (paramAnn != null) {
-
-                        if (paramAnn.get("hidden", Boolean.class, false)) {
-                            // ignore hidden parameters
-                            continue;
-                        }
-
-                        Map<CharSequence, Object> paramValues = toValueMap(paramAnn.getValues(), context);
-                        normalizeEnumValues(paramValues, Collections.singletonMap(
-                                "in", ParameterIn.class
-                        ));
-                        if (parameter.isAnnotationPresent(Header.class)) {
-                            paramValues.put("in", ParameterIn.HEADER.toString());
-                        } else if (parameter.isAnnotationPresent(CookieValue.class)) {
-                            paramValues.put("in", ParameterIn.COOKIE.toString());
-                        } else if (parameter.isAnnotationPresent(QueryValue.class)) {
-                            paramValues.put("in", ParameterIn.QUERY.toString());
-                        }
-                        processExplode(paramAnn, paramValues);
-
-                        JsonNode jsonNode = jsonMapper.valueToTree(paramValues);
-
-                        if (newParameter == null) {
-                            try {
-                                newParameter = treeToValue(jsonNode, Parameter.class);
-                            } catch (Exception e) {
-                                context.warn("Error reading Swagger Parameter for element [" + parameter + "]: " + e.getMessage(), parameter);
-                            }
-                        } else {
-                            try {
-                                Parameter v = treeToValue(jsonNode, Parameter.class);
-                                if (v != null) {
-                                    // horrible hack because Swagger ParameterDeserializer breaks updating existing objects
-                                    BeanMap<Parameter> beanMap = BeanMap.of(v);
-                                    BeanMap<Parameter> target = BeanMap.of(newParameter);
-                                    for (CharSequence name : paramValues.keySet()) {
-                                        Object o = beanMap.get(name.toString());
-                                        target.put(name.toString(), o);
-                                    }
-                                } else {
-                                    BeanMap<Parameter> target = BeanMap.of(newParameter);
-                                    for (CharSequence name : paramValues.keySet()) {
-                                        Object o = paramValues.get(name.toString());
-                                        try {
-                                            target.put(name.toString(), o);
-                                        } catch (Exception e) {
-                                            // ignore
-                                        }
-                                    }
-                                }
-                            } catch (IOException e) {
-                                context.warn("Error reading Swagger Parameter for element [" + parameter + "]: " + e.getMessage(), parameter);
-                            }
-                        }
-
-                        if (newParameter != null) {
-                            final Schema parameterSchema = newParameter.getSchema();
-                            if (paramAnn.contains("schema") && parameterSchema != null) {
-                                final AnnotationValue schemaAnn = paramAnn.get("schema", AnnotationValue.class).orElse(null);
-                                if (schemaAnn != null) {
-                                    bindSchemaAnnotationValue(context, parameter, parameterSchema, schemaAnn);
-                                }
-                            }
-                        }
-                    }
-                }
-
-                if (newParameter != null) {
-
-                    if (StringUtils.isEmpty(newParameter.getName())) {
-                        newParameter.setName(parameterName);
-                    }
-
-                    if (newParameter.getRequired() == null) {
-                        newParameter.setRequired(!parameter.isAnnotationPresent(Nullable.class));
-                    }
-                    // calc newParameter.setExplode();
-                    if (javadocDescription != null && StringUtils.isEmpty(newParameter.getDescription())) {
-
+                    if (requestBody.getDescription() == null && javadocDescription != null) {
                         CharSequence desc = javadocDescription.getParameters().get(parameterName);
                         if (desc != null) {
-                            newParameter.setDescription(desc.toString());
+                            requestBody.setDescription(desc.toString());
                         }
                     }
-                    swaggerParameters.add(newParameter);
-
-                    Schema schema = newParameter.getSchema();
-                    if (schema == null) {
-                        schema = resolveSchema(openAPI, parameter, parameterType, context, consumesMediaType);
+                    if (requestBody.getRequired() == null) {
+                        requestBody.setRequired(!parameter.isAnnotationPresent(Nullable.class)
+                                && !parameterType.isAssignable(Optional.class));
                     }
-
-                    if (schema != null) {
-                        bindSchemaForElement(context, parameter, parameter.getType(), schema);
-                        newParameter.setSchema(schema);
+                    if (requestBody.getContent() == null) {
+                        Content content;
+                        if (consumesMediaTypes.isEmpty()) {
+                            content = buildContent(parameter, parameterType, MediaType.APPLICATION_JSON, openAPI,
+                                    context);
+                        } else {
+                            content = buildContent(parameter, parameterType, consumesMediaTypes, openAPI, context);
+                        }
+                        requestBody.setContent(content);
                     }
                 }
+                continue;
             }
 
-            if (HttpMethod.requiresRequestBody(httpMethod) && swaggerOperation.getRequestBody() == null) {
-                List<ParameterElement> bodyParameters = Arrays.stream(element.getParameters())
-                  .filter(p -> !pathVariables.containsKey(p.getName())
-                    && !p.isAnnotationPresent(Bindable.class)
-                    && !p.isAnnotationPresent(JsonIgnore.class)
-                    && !p.isAnnotationPresent(Hidden.class)
-                    && !p.isAnnotationPresent(Header.class)
-                    && !p.isAnnotationPresent(QueryValue.class)
-                    && !p.getValue(io.swagger.v3.oas.annotations.Parameter.class, "in", ParameterIn.class).isPresent()
-                    && !p.getValue(io.swagger.v3.oas.annotations.Parameter.class, "hidden", Boolean.class).orElse(false)
-                    && !isIgnoredParameterType(p.getType())
-                  )
-                  .collect(Collectors.toList());
+            if (hasExistingParameters) {
+                continue;
+            }
 
-                if (!bodyParameters.isEmpty()) {
-                    RequestBody requestBody = new RequestBody();
-                    final Content content = new Content();
-                    consumesMediaTypes = consumesMediaTypes.isEmpty() ? OptionalValues.of(List.class, Collections.singletonMap("value", MediaType.APPLICATION_JSON)) : consumesMediaTypes;
-                    consumesMediaTypes.forEach((key, mediaTypeList) -> {
-                        for (Object mediaType: mediaTypeList) {
-                            io.swagger.v3.oas.models.media.MediaType mt = new io.swagger.v3.oas.models.media.MediaType();
-                            ObjectSchema schema = new ObjectSchema();
-                            for (ParameterElement parameter : bodyParameters) {
-                                Schema propertySchema = resolveSchema(openAPI, parameter, parameter.getType(), context, mediaType.toString());
-                                if (propertySchema != null) {
+            Parameter newParameter = null;
 
-                                    Optional<String> description = parameter.getValue(io.swagger.v3.oas.annotations.Parameter.class, "description", String.class);
-                                    if (description.isPresent()) {
-                                        propertySchema.setDescription(description.get());
-                                    }
-                                    processSchemaProperty(context, parameter, parameter.getType(), schema, propertySchema);
+            if (!parameter.hasStereotype(Bindable.class) && pathVariables.containsKey(parameterName)) {
+                UriMatchVariable var = pathVariables.get(parameterName);
+                newParameter = var.isQuery() ? new QueryParameter() : new PathParameter();
+                newParameter.setName(parameterName);
+                final boolean exploded = var.isExploded();
+                if (exploded) {
+                    newParameter.setExplode(exploded);
+                }
+            } else if (parameter.isAnnotationPresent(PathVariable.class)) {
+                String paramName = parameter.getValue(PathVariable.class, String.class).orElse(parameterName);
+                UriMatchVariable var = pathVariables.get(paramName);
+                if (var == null) {
+                    context.fail("Path variable name: '" + paramName + "' not found in path.", parameter);
+                    continue;
+                }
+                newParameter = new PathParameter();
+                newParameter.setName(paramName);
+                final boolean exploded = var.isExploded();
+                if (exploded) {
+                    newParameter.setExplode(exploded);
+                }
+            } else if (parameter.isAnnotationPresent(Header.class)) {
+                String headerName = parameter.getValue(Header.class, "name", String.class).orElse(parameter
+                        .getValue(Header.class, String.class).orElseGet(() -> NameUtils.hyphenate(parameterName)));
+                newParameter = new HeaderParameter();
+                newParameter.setName(headerName);
+            } else if (parameter.isAnnotationPresent(CookieValue.class)) {
+                String cookieName = parameter.getValue(CookieValue.class, String.class).orElse(parameterName);
+                newParameter = new CookieParameter();
+                newParameter.setName(cookieName);
+            } else if (parameter.isAnnotationPresent(QueryValue.class)) {
+                String queryVar = parameter.getValue(QueryValue.class, String.class).orElse(parameterName);
+                newParameter = new QueryParameter();
+                newParameter.setName(queryVar);
+            } else if (!permitsRequestBody && hasNoBindingAnnotationOrType(parameter)) {
+                // default to QueryValue -
+                // https://github.com/micronaut-projects/micronaut-openapi/issues/130
+                newParameter = new QueryParameter();
+                newParameter.setName(parameterName);
+            }
 
-                                    propertySchema.setNullable(parameter.isAnnotationPresent(Nullable.class));
-                                    if (javadocDescription != null && StringUtils.isEmpty(propertySchema.getDescription())) {
-                                        CharSequence doc = javadocDescription.getParameters().get(parameter.getName());
-                                        if (doc != null) {
-                                            propertySchema.setDescription(doc.toString());
-                                        }
+            if (parameter.isAnnotationPresent(io.swagger.v3.oas.annotations.Parameter.class)) {
+                AnnotationValue<io.swagger.v3.oas.annotations.Parameter> paramAnn = parameter
+                        .findAnnotation(io.swagger.v3.oas.annotations.Parameter.class).orElse(null);
+
+                if (paramAnn != null) {
+
+                    if (paramAnn.get("hidden", Boolean.class, false)) {
+                        // ignore hidden parameters
+                        continue;
+                    }
+
+                    Map<CharSequence, Object> paramValues = toValueMap(paramAnn.getValues(), context);
+                    normalizeEnumValues(paramValues, Collections.singletonMap("in", ParameterIn.class));
+                    if (parameter.isAnnotationPresent(Header.class)) {
+                        paramValues.put("in", ParameterIn.HEADER.toString());
+                    } else if (parameter.isAnnotationPresent(CookieValue.class)) {
+                        paramValues.put("in", ParameterIn.COOKIE.toString());
+                    } else if (parameter.isAnnotationPresent(QueryValue.class)) {
+                        paramValues.put("in", ParameterIn.QUERY.toString());
+                    }
+                    processExplode(paramAnn, paramValues);
+
+                    JsonNode jsonNode = jsonMapper.valueToTree(paramValues);
+
+                    if (newParameter == null) {
+                        try {
+                            newParameter = treeToValue(jsonNode, Parameter.class);
+                        } catch (Exception e) {
+                            context.warn("Error reading Swagger Parameter for element [" + parameter + "]: "
+                                    + e.getMessage(), parameter);
+                        }
+                    } else {
+                        try {
+                            Parameter v = treeToValue(jsonNode, Parameter.class);
+                            if (v != null) {
+                                // horrible hack because Swagger
+                                // ParameterDeserializer breaks updating
+                                // existing objects
+                                BeanMap<Parameter> beanMap = BeanMap.of(v);
+                                BeanMap<Parameter> target = BeanMap.of(newParameter);
+                                for (CharSequence name : paramValues.keySet()) {
+                                    Object o = beanMap.get(name.toString());
+                                    target.put(name.toString(), o);
+                                }
+                            } else {
+                                BeanMap<Parameter> target = BeanMap.of(newParameter);
+                                for (CharSequence name : paramValues.keySet()) {
+                                    Object o = paramValues.get(name.toString());
+                                    try {
+                                        target.put(name.toString(), o);
+                                    } catch (Exception e) {
+                                        // ignore
                                     }
                                 }
-
                             }
-                            mt.setSchema(schema);
-                            content.addMediaType(mediaType.toString(), mt);
+                        } catch (IOException e) {
+                            context.warn("Error reading Swagger Parameter for element [" + parameter + "]: "
+                                    + e.getMessage(), parameter);
                         }
-                    });
+                    }
 
-                    requestBody.setContent(content);
-                    requestBody.setRequired(true);
-                    swaggerOperation.setRequestBody(requestBody);
+                    if (newParameter != null) {
+                        final Schema parameterSchema = newParameter.getSchema();
+                        if (paramAnn.contains("schema") && parameterSchema != null) {
+                            final AnnotationValue schemaAnn = paramAnn.get("schema", AnnotationValue.class)
+                                    .orElse(null);
+                            if (schemaAnn != null) {
+                                bindSchemaAnnotationValue(context, parameter, parameterSchema, schemaAnn);
+                            }
+                        }
+                    }
                 }
             }
-        });
+
+            if (newParameter != null) {
+
+                if (StringUtils.isEmpty(newParameter.getName())) {
+                    newParameter.setName(parameterName);
+                }
+
+                if (newParameter.getRequired() == null) {
+                    newParameter.setRequired(!parameter.isAnnotationPresent(Nullable.class));
+                }
+                // calc newParameter.setExplode();
+                if (javadocDescription != null && StringUtils.isEmpty(newParameter.getDescription())) {
+
+                    CharSequence desc = javadocDescription.getParameters().get(parameterName);
+                    if (desc != null) {
+                        newParameter.setDescription(desc.toString());
+                    }
+                }
+                swaggerParameters.add(newParameter);
+
+                Schema schema = newParameter.getSchema();
+                if (schema == null) {
+                    schema = resolveSchema(openAPI, parameter, parameterType, context, consumesMediaType);
+                }
+
+                if (schema != null) {
+                    bindSchemaForElement(context, parameter, parameter.getType(), schema);
+                    newParameter.setSchema(schema);
+                }
+            }
+        }
+
+        if (HttpMethod.requiresRequestBody(httpMethod) && swaggerOperation.getRequestBody() == null) {
+            List<ParameterElement> bodyParameters = Arrays.stream(element.getParameters())
+                    .filter(p -> !pathVariables.containsKey(p.getName()) && !p.isAnnotationPresent(Bindable.class)
+                            && !p.isAnnotationPresent(JsonIgnore.class) && !p.isAnnotationPresent(Hidden.class)
+                            && !p.isAnnotationPresent(Header.class) && !p.isAnnotationPresent(QueryValue.class)
+                            && !p.getValue(io.swagger.v3.oas.annotations.Parameter.class, "in", ParameterIn.class)
+                                    .isPresent()
+                            && !p.getValue(io.swagger.v3.oas.annotations.Parameter.class, "hidden", Boolean.class)
+                                    .orElse(false)
+                            && !isIgnoredParameterType(p.getType()))
+                    .collect(Collectors.toList());
+
+            if (!bodyParameters.isEmpty()) {
+                RequestBody requestBody = new RequestBody();
+                final Content content = new Content();
+                consumesMediaTypes = consumesMediaTypes.isEmpty()
+                        ? OptionalValues.of(List.class, Collections.singletonMap("value", MediaType.APPLICATION_JSON))
+                        : consumesMediaTypes;
+                consumesMediaTypes.forEach((key, mediaTypeList) -> {
+                    for (Object mediaType : mediaTypeList) {
+                        io.swagger.v3.oas.models.media.MediaType mt = new io.swagger.v3.oas.models.media.MediaType();
+                        ObjectSchema schema = new ObjectSchema();
+                        for (ParameterElement parameter : bodyParameters) {
+                            Schema propertySchema = resolveSchema(openAPI, parameter, parameter.getType(), context,
+                                    mediaType.toString());
+                            if (propertySchema != null) {
+
+                                Optional<String> description = parameter.getValue(
+                                        io.swagger.v3.oas.annotations.Parameter.class, "description", String.class);
+                                if (description.isPresent()) {
+                                    propertySchema.setDescription(description.get());
+                                }
+                                processSchemaProperty(context, parameter, parameter.getType(), schema, propertySchema);
+
+                                propertySchema.setNullable(parameter.isAnnotationPresent(Nullable.class));
+                                if (javadocDescription != null
+                                        && StringUtils.isEmpty(propertySchema.getDescription())) {
+                                    CharSequence doc = javadocDescription.getParameters().get(parameter.getName());
+                                    if (doc != null) {
+                                        propertySchema.setDescription(doc.toString());
+                                    }
+                                }
+                            }
+
+                        }
+                        mt.setSchema(schema);
+                        content.addMediaType(mediaType.toString(), mt);
+                    }
+                });
+
+                requestBody.setContent(content);
+                requestBody.setRequired(true);
+                swaggerOperation.setRequestBody(requestBody);
+            }
+        }
     }
 
     private void processExplode(AnnotationValue<io.swagger.v3.oas.annotations.Parameter> paramAnn, Map<CharSequence, Object> paramValues) {
