@@ -18,6 +18,9 @@ package io.micronaut.openapi.visitor;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.JsonNode;
 
+import io.micronaut.annotation.processing.AnnotationUtils;
+import io.micronaut.annotation.processing.GenericUtils;
+import io.micronaut.annotation.processing.visitor.JavaClassElementExt;
 import io.micronaut.context.env.DefaultPropertyPlaceholderResolver;
 import io.micronaut.context.env.PropertyPlaceholderResolver;
 import io.micronaut.core.annotation.AnnotationValue;
@@ -45,7 +48,6 @@ import io.micronaut.http.annotation.Part;
 import io.micronaut.http.annotation.PathVariable;
 import io.micronaut.http.annotation.Produces;
 import io.micronaut.http.annotation.QueryValue;
-import io.micronaut.http.annotation.UriMapping;
 import io.micronaut.http.uri.UriMatchTemplate;
 import io.micronaut.http.uri.UriMatchVariable;
 import io.micronaut.inject.ast.ClassElement;
@@ -81,6 +83,9 @@ import io.swagger.v3.oas.models.servers.Server;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.TypeElement;
+import javax.lang.model.type.TypeMirror;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.security.Principal;
@@ -106,13 +111,48 @@ public class OpenApiControllerVisitor extends AbstractOpenApiVisitor implements 
 
     private PropertyPlaceholderResolver propertyPlaceholderResolver;
 
-    @Override
-    public void visitClass(ClassElement element, VisitorContext context) {
-        processSecuritySchemes(element, context);
-        context.put(CLASS_TAGS, readTags(element, context));
+    private static boolean isGeneric(Map<String, Map<String, TypeMirror>> typeArguments, TypeMirror tm) {
+        for (Map<String, TypeMirror> m: typeArguments.values()) {
+            for (String typeMirror: m.keySet()) {
+                if (tm.toString().equals(typeMirror)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
-    private boolean hasNoBindingAnnotationOrType(ParameterElement parameter) {
+    @Override
+    public void visitClass(ClassElement element, VisitorContext context) {
+        if (!element.hasAnnotation(Controller.class)) {
+            return;
+        }
+        processSecuritySchemes(element, context);
+        context.put(CLASS_TAGS, readTags(element, context));
+        if (!"io.micronaut.annotation.processing.visitor.JavaClassElement".equals(element.getClass().getName()) ||
+            !"io.micronaut.annotation.processing.visitor.JavaVisitorContext".equals(context.getClass().getName())) {
+            return;
+        }
+        // Issue #193 - Inherited methods are not processed
+        GenericUtils generics = JavaClassElementExt.getGenericUtils(context);
+        TypeElement t = (TypeElement) element.getNativeType();
+        Map<String, Map<String, TypeMirror>> typeArguments = generics.buildGenericTypeArgumentElementInfo(t);
+        AnnotationUtils annotationUtils = JavaClassElementExt.getAnnotationUtils(context);
+        List<MethodElement> methodElements = new JavaClassElementExt(element, context).getMethods();
+        for (MethodElement methodElement: methodElements) {
+            ExecutableElement method = (ExecutableElement) methodElement.getNativeType();
+            Optional<AnnotationValue<HttpMethodMapping>> mapping = annotationUtils.getAnnotationMetadata(method)
+                    .findAnnotation(HttpMethodMapping.class);
+            if (!mapping.isPresent()) {
+                continue;
+            }
+            boolean hasGenerics = isGeneric(typeArguments, method.getReturnType())
+                    || method.getParameters().stream().anyMatch(v -> isGeneric(typeArguments, v.asType()));
+            visitMethod(methodElement, context, hasGenerics);
+        }
+    }
+
+    private boolean hasNoBindingAnnotationOrType(ParameterElement parameter, ClassElement parameterType) {
         return !parameter.isAnnotationPresent(io.swagger.v3.oas.annotations.Parameter.class) &&
                !parameter.isAnnotationPresent(io.swagger.v3.oas.annotations.parameters.RequestBody.class) &&
                !parameter.isAnnotationPresent(Hidden.class) &&
@@ -124,10 +164,10 @@ public class OpenApiControllerVisitor extends AbstractOpenApiVisitor implements 
                !parameter.isAnnotationPresent(CookieValue.class) &&
                !parameter.isAnnotationPresent(Header.class) &&
 
-               !isIgnoredParameterType(parameter.getType()) &&
-               !isResponseType(parameter.getType()) &&
-               !parameter.getType().isAssignable(HttpRequest.class) &&
-               !parameter.getType().isAssignable("io.micronaut.http.BasicAuth");
+               !isIgnoredParameterType(parameterType) &&
+               !isResponseType(parameterType) &&
+               !parameterType.isAssignable(HttpRequest.class) &&
+               !parameterType.isAssignable("io.micronaut.http.BasicAuth");
     }
 
     private HttpMethod httpMethod(MethodElement element) {
@@ -144,9 +184,12 @@ public class OpenApiControllerVisitor extends AbstractOpenApiVisitor implements 
         return null;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public void visitMethod(MethodElement element, VisitorContext context) {
+        // Issue #193 - Inherited methods are not processed
+    }
+
+    private void visitMethod(MethodElement element, VisitorContext context, boolean useGenericType) {
         if (element.isAnnotationPresent(Hidden.class)) {
             return;
         }
@@ -155,7 +198,18 @@ public class OpenApiControllerVisitor extends AbstractOpenApiVisitor implements 
         if (httpMethod == null) {
             return;
         }
-        String controllerValue = element.getDeclaringType().getValue(UriMapping.class, String.class).orElse("/");
+        String controllerValue;
+        Optional<String> cv = element.getDeclaringType().getValue(Controller.class, String.class);
+        if (cv.isPresent()) {
+            controllerValue = cv.get();
+        } else {
+            cv = element.getOwningType().getValue(Controller.class, String.class);
+            if (cv.isPresent()) {
+                controllerValue = cv.get();
+            } else {
+                return;
+            }
+        }
         controllerValue = getPropertyPlaceholderResolver().resolvePlaceholders(controllerValue).orElse(controllerValue);
         UriMatchTemplate matchTemplate = UriMatchTemplate.of(controllerValue);
         String methodValue = element.getValue(HttpMethodMapping.class, String.class).orElse("/");
@@ -220,7 +274,7 @@ public class OpenApiControllerVisitor extends AbstractOpenApiVisitor implements 
                 okResponse.setDescription(javadocDescription.getReturnDescription());
             }
 
-            ClassElement returnType = element.getReturnType();
+            ClassElement returnType = useGenericType ? element.getGenericReturnType() : element.getReturnType();
             if (returnType.isAssignable("io.reactivex.Completable")) {
                 returnType = null;
             } else if (isResponseType(returnType)) {
@@ -257,7 +311,7 @@ public class OpenApiControllerVisitor extends AbstractOpenApiVisitor implements 
 
         for (ParameterElement parameter : element.getParameters()) {
 
-            ClassElement parameterType = parameter.getType();
+            ClassElement parameterType = useGenericType ? parameter.getGenericType() : parameter.getType();
             String parameterName = parameter.getName();
 
             if (isIgnoredParameterType(parameterType)) {
@@ -340,7 +394,7 @@ public class OpenApiControllerVisitor extends AbstractOpenApiVisitor implements 
                 String queryVar = parameter.getValue(QueryValue.class, String.class).orElse(parameterName);
                 newParameter = new QueryParameter();
                 newParameter.setName(queryVar);
-            } else if (!permitsRequestBody && hasNoBindingAnnotationOrType(parameter)) {
+            } else if (!permitsRequestBody && hasNoBindingAnnotationOrType(parameter, parameterType)) {
                 // default to QueryValue -
                 // https://github.com/micronaut-projects/micronaut-openapi/issues/130
                 newParameter = new QueryParameter();
@@ -446,7 +500,7 @@ public class OpenApiControllerVisitor extends AbstractOpenApiVisitor implements 
                 }
 
                 if (schema != null) {
-                    bindSchemaForElement(context, parameter, parameter.getType(), schema);
+                    bindSchemaForElement(context, parameter, parameterType, schema);
                     newParameter.setSchema(schema);
                 }
             }

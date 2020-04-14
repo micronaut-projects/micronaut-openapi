@@ -23,13 +23,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-
 import javax.lang.model.element.*;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.type.TypeVariable;
 import javax.lang.model.util.Elements;
 
+import io.micronaut.annotation.processing.AnnotationUtils;
+import io.micronaut.annotation.processing.GenericUtils;
 import io.micronaut.annotation.processing.PublicMethodVisitor;
 import io.micronaut.core.annotation.AnnotationMetadata;
 import io.micronaut.core.annotation.Internal;
@@ -71,6 +72,65 @@ public class JavaClassElementExt extends JavaClassElement {
         this.classElement = (TypeElement) jce.getNativeType();
         this.visitorContext = visitorContext;
         this.genericTypeInfo = jce.getGenericTypeInfo();
+    }
+
+    /**
+     * Returns the GenericUtils.
+     * @param context The VisitorContext.
+     * @return The GenericUtils.
+     */
+    public static GenericUtils getGenericUtils(VisitorContext context) {
+        return ((JavaVisitorContext) context).getGenericUtils();
+    }
+
+    /**
+     * Returns the AnnotationUtils.
+     * @param context The VisitorContext.
+     * @return The AnnotationUtils.
+     */
+    public static AnnotationUtils getAnnotationUtils(VisitorContext context) {
+        return ((JavaVisitorContext) context).getAnnotationUtils();
+    }
+
+    /**
+     * Returns the methods of this class.
+     * @return A list of methods.
+     */
+    public List<MethodElement> getMethods() {
+        List<MethodElement> fields = new ArrayList<>();
+        classElement.asType().accept(new PublicMethodVisitor<Object, Object>(visitorContext.getTypes()) {
+            List<ExecutableElement> methods = new ArrayList<>();
+            @Override
+            protected boolean isAcceptable(javax.lang.model.element.Element element) {
+                boolean isMethod = element.getKind() == ElementKind.METHOD && element instanceof ExecutableElement;
+                if (isMethod) {
+                    ExecutableElement ex = (ExecutableElement) element;
+                    methods.add(ex);
+                }
+                return isMethod;
+            }
+
+            @Override
+            protected void accept(DeclaredType type, Element element, Object o) {
+                ExecutableElement ex = (ExecutableElement) element;
+                Elements elements = visitorContext.getElements();
+                boolean overriden = false;
+                for (ExecutableElement method: methods) {
+                    if (method.equals(ex)) {
+                        continue;
+                    }
+                    overriden = elements.overrides(method, ex, (TypeElement) method.getEnclosingElement());
+                    if (overriden) {
+                        return;
+                    }
+                }
+                final AnnotationMetadata fieldMetadata = visitorContext.getAnnotationUtils().getAnnotationMetadata(element);
+                fields.add(new JavaMethodElement(JavaClassElementExt.this.javaClassElement, (ExecutableElement) element, fieldMetadata, visitorContext));
+            }
+
+        }, null);
+
+        return Collections.unmodifiableList(fields);
     }
 
     /**
