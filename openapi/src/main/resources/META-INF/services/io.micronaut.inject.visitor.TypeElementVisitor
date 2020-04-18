@@ -1,2 +1,3 @@
 io.micronaut.openapi.visitor.OpenApiApplicationVisitor
 io.micronaut.openapi.visitor.OpenApiControllerVisitor
+io.micronaut.openapi.visitor.OpenApiEndpointVisitor

@@ -4,6 +4,7 @@ gettingStarted: Getting Started with Swagger
 configuration: Open API Processing Options
 exposingSwaggerOutput: Exposing Swagger Output
 openApiViews: Generating OpenAPI Views
+endpoints: Exposing Endpoints
 controllersAndSwaggerAnnotations: Controllers and Swagger Annotations
 schemasAndPojos: Schemas and POJOs
 schemasAndMetaAnnotations: Schemas and Meta Annotations

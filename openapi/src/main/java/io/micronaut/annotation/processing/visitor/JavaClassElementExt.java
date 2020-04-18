@@ -74,7 +74,59 @@ public class JavaClassElementExt extends JavaClassElement {
     }
 
     /**
+     * Returns the methods of this class.
+     *
+     * @return A list of methods.
+     */
+    public List<MethodElement> getMethods() {
+        List<MethodElement> fields = new ArrayList<>();
+        classElement.asType().accept(new PublicMethodVisitor<Object, Object>(visitorContext.getTypes()) {
+            private List<ExecutableElement> methods = new ArrayList<>();
+
+            @Override
+            protected boolean isAcceptable(Element element) {
+                boolean isMethod = element.getKind() == ElementKind.METHOD && element instanceof ExecutableElement;
+                if (isMethod) {
+                    Set<Modifier> modifiers = element.getModifiers();
+                    if (modifiers.contains(Modifier.PUBLIC) && !modifiers.contains(Modifier.STATIC)
+                            && !modifiers.contains(Modifier.ABSTRACT)) {
+                        ExecutableElement executableElement = (ExecutableElement) element;
+                        String methodName = executableElement.getSimpleName().toString();
+                        if (methodName.contains("$")) {
+                            return false;
+                        }
+                        methods.add(executableElement);
+                    }
+                }
+                return isMethod;
+            }
+
+            @Override
+            protected void accept(DeclaredType type, Element element, Object o) {
+                ExecutableElement executableElement = (ExecutableElement) element;
+                Elements elements = visitorContext.getElements();
+                for (ExecutableElement method : methods) {
+                    if (method.equals(executableElement)) {
+                        continue;
+                    }
+                    if (elements.overrides(method, executableElement, (TypeElement) method.getEnclosingElement())) {
+                        return;
+                    }
+                }
+                final AnnotationMetadata fieldMetadata = visitorContext.getAnnotationUtils()
+                        .getAnnotationMetadata(element);
+                fields.add(new JavaMethodElement(JavaClassElementExt.this.javaClassElement, executableElement,
+                        fieldMetadata, visitorContext));
+            }
+
+        }, null);
+
+        return Collections.unmodifiableList(fields);
+    }
+
+    /**
      * Returns fluent accessor methods.
+     *
      * @return fluent accessor methods
      */
     public List<PropertyElement> getFluentBeanProperties() {
@@ -85,28 +137,30 @@ public class JavaClassElementExt extends JavaClassElement {
         classElement.asType().accept(new PublicMethodVisitor<Object, Object>(visitorContext.getTypes()) {
 
             @Override
-            protected boolean isAcceptable(javax.lang.model.element.Element element) {
+            protected boolean isAcceptable(Element element) {
                 if (element.getKind() == ElementKind.FIELD) {
                     fieldNames.add(element.getSimpleName().toString());
                     return true;
                 }
                 if (element.getKind() == ElementKind.METHOD && element instanceof ExecutableElement) {
                     Set<Modifier> modifiers = element.getModifiers();
-                    if (modifiers.contains(Modifier.PUBLIC) && !modifiers.contains(Modifier.STATIC) && !modifiers.contains(Modifier.ABSTRACT)) {
+                    if (modifiers.contains(Modifier.PUBLIC) && !modifiers.contains(Modifier.STATIC)
+                            && !modifiers.contains(Modifier.ABSTRACT)) {
                         ExecutableElement executableElement = (ExecutableElement) element;
                         String methodName = executableElement.getSimpleName().toString();
                         if (methodName.contains("$")) {
                             return false;
                         }
 
-                        return executableElement.getParameters().isEmpty() || executableElement.getParameters().size() == 1;
+                        return executableElement.getParameters().isEmpty()
+                                || executableElement.getParameters().size() == 1;
                     }
                 }
                 return false;
             }
 
             private BeanPropertyData computeIfAbsent(String propertyName) {
-                for (BeanPropertyData bpd: props) {
+                for (BeanPropertyData bpd : props) {
                     if (propertyName.equals(bpd.propertyName)) {
                         return bpd;
                     }
@@ -117,7 +171,7 @@ public class JavaClassElementExt extends JavaClassElement {
             }
 
             @Override
-            protected void accept(DeclaredType declaringType, javax.lang.model.element.Element element, Object o) {
+            protected void accept(DeclaredType declaringType, Element element, Object o) {
                 if (element instanceof VariableElement) {
                     fields.put(element.getSimpleName().toString(), (VariableElement) element);
                     return;
@@ -138,13 +192,15 @@ public class JavaClassElementExt extends JavaClassElement {
                         TypeVariable tv = (TypeVariable) returnType;
                         final String tvn = tv.toString();
                         final ClassElement clElement = getTypeArguments().get(tvn);
-                        if (clElement != null) {
-                            getterReturnType = clElement;
+                        if (clElement == null) {
+                            getterReturnType = mirrorToClassElement(returnType, visitorContext,
+                                    JavaClassElementExt.this.genericTypeInfo);
                         } else {
-                            getterReturnType = mirrorToClassElement(returnType, visitorContext, JavaClassElementExt.this.genericTypeInfo);
+                            getterReturnType = clElement;
                         }
                     } else {
-                        getterReturnType = mirrorToClassElement(returnType, visitorContext, JavaClassElementExt.this.genericTypeInfo);
+                        getterReturnType = mirrorToClassElement(returnType, visitorContext,
+                                JavaClassElementExt.this.genericTypeInfo);
                     }
 
                     BeanPropertyData beanPropertyData = computeIfAbsent(propertyName);
@@ -153,15 +209,18 @@ public class JavaClassElementExt extends JavaClassElement {
                     beanPropertyData.getter = executableElement;
                     if (beanPropertyData.setter != null) {
                         TypeMirror typeMirror = beanPropertyData.setter.getParameters().get(0).asType();
-                        ClassElement setterParameterType = mirrorToClassElement(typeMirror, visitorContext, JavaClassElementExt.this.genericTypeInfo);
+                        ClassElement setterParameterType = mirrorToClassElement(typeMirror, visitorContext,
+                                JavaClassElementExt.this.genericTypeInfo);
                         if (!setterParameterType.getName().equals(getterReturnType.getName())) {
-                            beanPropertyData.setter = null; // not a compatible setter
+                            beanPropertyData.setter = null; // not a compatible
+                                                            // setter
                         }
                     }
                 } else if (executableElement.getParameters().size() == 1) {
                     String propertyName = methodName;
                     TypeMirror typeMirror = executableElement.getParameters().get(0).asType();
-                    ClassElement setterParameterType = mirrorToClassElement(typeMirror, visitorContext, JavaClassElementExt.this.genericTypeInfo);
+                    ClassElement setterParameterType = mirrorToClassElement(typeMirror, visitorContext,
+                            JavaClassElementExt.this.genericTypeInfo);
                     BeanPropertyData beanPropertyData = computeIfAbsent(propertyName);
                     configureDeclaringType(declaringTypeElement, beanPropertyData);
                     ClassElement propertyType = beanPropertyData.type;
@@ -177,75 +236,60 @@ public class JavaClassElementExt extends JavaClassElement {
 
             private void configureDeclaringType(TypeElement declaringTypeElement, BeanPropertyData beanPropertyData) {
                 if (beanPropertyData.declaringType == null && !classElement.equals(declaringTypeElement)) {
-                    beanPropertyData.declaringType = mirrorToClassElement(
-                            declaringTypeElement.asType(),
-                            visitorContext,
-                            genericTypeInfo
-                    );
+                    beanPropertyData.declaringType = mirrorToClassElement(declaringTypeElement.asType(), visitorContext,
+                            genericTypeInfo);
                 }
             }
         }, null);
-        if (!props.isEmpty()) {
-            List<PropertyElement> propertyElements = new ArrayList<>();
-            for (BeanPropertyData value : props) {
-                String propertyName = value.propertyName;
-
-                if (value.getter != null) {
-                    final AnnotationMetadata annotationMetadata;
-                    final VariableElement fieldElement = fields.get(propertyName);
-                    if (fieldElement != null) {
-                        annotationMetadata = visitorContext.getAnnotationUtils().getAnnotationMetadata(fieldElement, value.getter);
-                    } else {
-                        annotationMetadata = visitorContext
-                                .getAnnotationUtils()
-                                .newAnnotationBuilder().buildForMethod(value.getter);
-                    }
-
-                    JavaPropertyElement propertyElement = new JavaPropertyElement(
-                            value.declaringType == null ? this.javaClassElement : value.declaringType,
-                            value.getter,
-                            annotationMetadata,
-                            propertyName,
-                            value.type,
-                            value.setter == null,
-                            visitorContext) {
-                        @Override
-                        public Optional<String> getDocumentation() {
-                            Elements elements = visitorContext.getElements();
-                            String docComment = elements.getDocComment(value.getter);
-                            return Optional.ofNullable(docComment);
-                        }
-
-                        @Override
-                        public Optional<MethodElement> getWriteMethod() {
-                            if (value.setter != null) {
-                                return Optional.of(new JavaMethodElement(
-                                        JavaClassElementExt.this.javaClassElement,
-                                        value.setter,
-                                        visitorContext.getAnnotationUtils().newAnnotationBuilder().buildForMethod(value.setter),
-                                        visitorContext
-                                ));
-                            }
-                            return Optional.empty();
-                        }
-
-                        @Override
-                        public Optional<MethodElement> getReadMethod() {
-                            return Optional.of(new JavaMethodElement(
-                                    JavaClassElementExt.this.javaClassElement,
-                                    value.getter,
-                                    annotationMetadata,
-                                    visitorContext
-                            ));
-                        }
-                    };
-                    propertyElements.add(propertyElement);
-                }
-            }
-            return Collections.unmodifiableList(propertyElements);
-        } else {
+        if (props.isEmpty()) {
             return Collections.emptyList();
         }
+        List<PropertyElement> propertyElements = new ArrayList<>();
+        for (BeanPropertyData value : props) {
+            String propertyName = value.propertyName;
+
+            if (value.getter != null) {
+                final AnnotationMetadata annotationMetadata;
+                final VariableElement fieldElement = fields.get(propertyName);
+                if (fieldElement == null) {
+                    annotationMetadata = visitorContext.getAnnotationUtils().newAnnotationBuilder()
+                            .buildForMethod(value.getter);
+                } else {
+                    annotationMetadata = visitorContext.getAnnotationUtils().getAnnotationMetadata(fieldElement,
+                            value.getter);
+                }
+
+                JavaPropertyElement propertyElement = new JavaPropertyElement(
+                        value.declaringType == null ? this.javaClassElement : value.declaringType, value.getter,
+                        annotationMetadata, propertyName, value.type, value.setter == null, visitorContext) {
+                    @Override
+                    public Optional<String> getDocumentation() {
+                        Elements elements = visitorContext.getElements();
+                        String docComment = elements.getDocComment(value.getter);
+                        return Optional.ofNullable(docComment);
+                    }
+
+                    @Override
+                    public Optional<MethodElement> getWriteMethod() {
+                        if (value.setter != null) {
+                            return Optional.of(new JavaMethodElement(
+                                    JavaClassElementExt.this.javaClassElement, value.setter, visitorContext
+                                            .getAnnotationUtils().newAnnotationBuilder().buildForMethod(value.setter),
+                                    visitorContext));
+                        }
+                        return Optional.empty();
+                    }
+
+                    @Override
+                    public Optional<MethodElement> getReadMethod() {
+                        return Optional.of(new JavaMethodElement(JavaClassElementExt.this.javaClassElement,
+                                value.getter, annotationMetadata, visitorContext));
+                    }
+                };
+                propertyElements.add(propertyElement);
+            }
+        }
+        return Collections.unmodifiableList(propertyElements);
 
     }
 
@@ -259,7 +303,7 @@ public class JavaClassElementExt extends JavaClassElement {
         ExecutableElement setter;
         final String propertyName;
 
-        public BeanPropertyData(String propertyName) {
+        BeanPropertyData(String propertyName) {
             this.propertyName = propertyName;
         }
     }
