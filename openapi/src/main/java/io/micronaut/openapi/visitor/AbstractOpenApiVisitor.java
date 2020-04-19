@@ -230,9 +230,9 @@ abstract class AbstractOpenApiVisitor  {
      * @param clazz The output class instance
      * @param <T> The output class type
      * @return The converted instance
-     * @throws com.fasterxml.jackson.core.JsonProcessingException if error
+     * @throws JsonProcessingException if error
      */
-    protected <T> T treeToValue(JsonNode jn, Class<T> clazz) throws com.fasterxml.jackson.core.JsonProcessingException {
+    protected <T> T treeToValue(JsonNode jn, Class<T> clazz) throws JsonProcessingException {
         T value = jsonMapper.treeToValue(jn, clazz);
         if (value != null) {
             resolveExtensions(jn).ifPresent(extensions -> BeanMap.of(value).put("extensions", extensions));
@@ -471,10 +471,10 @@ abstract class AbstractOpenApiVisitor  {
             } else if (type.isPresent()) {
                 // if format is "binary", we want PrimitiveType.BINARY
                 primitiveType = PrimitiveType.fromName(format.isPresent() && format.get().equals("binary") ? format.get() : type.get());
-                if (primitiveType != null) {
-                    classElement = context.getClassElement(primitiveType.getKeyClass());
-                } else {
+                if (primitiveType == null) {
                     classElement = context.getClassElement(type.get());
+                } else {
+                    classElement = context.getClassElement(primitiveType.getKeyClass());
                 }
             }
             if (classElement.isPresent()) {
@@ -585,9 +585,7 @@ abstract class AbstractOpenApiVisitor  {
                         }
                     }
                 } else if (type.isIterable()) {
-                    if (primitiveType != null) {
-                        schema = getPrimitiveType(typeName);
-                    } else {
+                    if (primitiveType == null) {
                         Optional<ClassElement> componentType = type.getFirstTypeArgument();
                         if (componentType.isPresent()) {
                             schema = getPrimitiveType(componentType.get().getName());
@@ -600,6 +598,8 @@ abstract class AbstractOpenApiVisitor  {
                             // we must have a POJO so let's create a component
                             schema = getSchemaDefinition(openAPI, context, componentElement, definingElement, mediaTypes);
                         }
+                    } else {
+                        schema = getPrimitiveType(typeName);
                     }
                     if (schema != null) {
                         schema = arraySchema(schema);
@@ -931,7 +931,7 @@ abstract class AbstractOpenApiVisitor  {
             final String className = impl.get();
             bindSchemaForClassName(context, valueMap, className);
         }
-        if (io.swagger.v3.oas.annotations.media.DiscriminatorMapping.class.getName().equals(av.getAnnotationName()) && schema.isPresent()) {
+        if (DiscriminatorMapping.class.getName().equals(av.getAnnotationName()) && schema.isPresent()) {
             final String className = schema.get();
             bindSchemaForClassName(context, valueMap, className);
         }
@@ -991,30 +991,13 @@ abstract class AbstractOpenApiVisitor  {
         if (inProgressSchemas.contains(type.getSimpleName())) {
             return null;
         }
-        AnnotationValue<io.swagger.v3.oas.annotations.media.Schema> schemaValue = definingElement != null ? definingElement.getDeclaredAnnotation(io.swagger.v3.oas.annotations.media.Schema.class) : null;
+        AnnotationValue<io.swagger.v3.oas.annotations.media.Schema> schemaValue = definingElement == null ? null : definingElement.getDeclaredAnnotation(io.swagger.v3.oas.annotations.media.Schema.class);
         if (schemaValue == null) {
             schemaValue = type.getDeclaredAnnotation(io.swagger.v3.oas.annotations.media.Schema.class);
         }
         Schema schema;
         Map<String, Schema> schemas = resolveSchemas(openAPI);
-        if (schemaValue != null) {
-            String schemaName = schemaValue.get("name", String.class).orElse(computeDefaultSchemaName(definingElement, type));
-            schema = schemas.get(schemaName);
-            if (schema == null) {
-                inProgressSchemas.add(schemaName);
-                try {
-                    schema = readSchema(schemaValue, openAPI, context, type, mediaTypes);
-                    if (schema != null) {
-                        schema.setName(schemaName);
-                        schemas.put(schemaName, schema);
-                    }
-                } catch (JsonProcessingException e) {
-                    context.warn("Error reading Swagger Parameter for element [" + type + "]: " + e.getMessage(), type);
-                } finally {
-                    inProgressSchemas.remove(schemaName);
-                }
-            }
-        } else {
+        if (schemaValue == null) {
             final boolean isBasicType = ClassUtils.isJavaBasicType(type.getName());
             final PrimitiveType primitiveType;
             if (isBasicType) {
@@ -1022,9 +1005,7 @@ abstract class AbstractOpenApiVisitor  {
             } else {
                 primitiveType = null;
             }
-            if (primitiveType != null) {
-                return primitiveType.createProperty();
-            } else {
+            if (primitiveType == null) {
                 String schemaName = computeDefaultSchemaName(definingElement, type);
                 schema = schemas.get(schemaName);
                 if (schema == null) {
@@ -1039,10 +1020,8 @@ abstract class AbstractOpenApiVisitor  {
                     } else {
                         if (type instanceof TypedElement) {
                             ClassElement classElement = ((TypedElement) type).getType();
-                            Optional<ClassElement> superType = classElement != null ? classElement.getSuperType() : Optional.empty();
-                            if (!superType.isPresent()) {
-                                schema = new Schema();
-                            } else {
+                            Optional<ClassElement> superType = classElement == null ? Optional.empty() : classElement.getSuperType();
+                            if (superType.isPresent()) {
                                 schema = new ComposedSchema();
                                 while (superType.isPresent()) {
                                     final ClassElement superElement = superType.get();
@@ -1055,6 +1034,8 @@ abstract class AbstractOpenApiVisitor  {
                                     }
                                     superType = superElement.getSuperType();
                                 }
+                            } else {
+                                schema = new Schema();
                             }
                         } else {
                             schema = new Schema();
@@ -1068,6 +1049,25 @@ abstract class AbstractOpenApiVisitor  {
                             checkAllOf((ComposedSchema) schema);
                         }
                     }
+                }
+            } else {
+                return primitiveType.createProperty();
+            }
+        } else {
+            String schemaName = schemaValue.get("name", String.class).orElse(computeDefaultSchemaName(definingElement, type));
+            schema = schemas.get(schemaName);
+            if (schema == null) {
+                inProgressSchemas.add(schemaName);
+                try {
+                    schema = readSchema(schemaValue, openAPI, context, type, mediaTypes);
+                    if (schema != null) {
+                        schema.setName(schemaName);
+                        schemas.put(schemaName, schema);
+                    }
+                } catch (JsonProcessingException e) {
+                    context.warn("Error reading Swagger Parameter for element [" + type + "]: " + e.getMessage(), type);
+                } finally {
+                    inProgressSchemas.remove(schemaName);
                 }
             }
         }
@@ -1161,7 +1161,7 @@ abstract class AbstractOpenApiVisitor  {
     }
 
     private String computeDefaultSchemaName(Element definingElement, Element type) {
-        final String metaAnnName = definingElement != null ? definingElement.getAnnotationNameByStereotype(io.swagger.v3.oas.annotations.media.Schema.class).orElse(null) : null;
+        final String metaAnnName = definingElement == null ? null : definingElement.getAnnotationNameByStereotype(io.swagger.v3.oas.annotations.media.Schema.class).orElse(null);
         if (metaAnnName != null && !io.swagger.v3.oas.annotations.media.Schema.class.getName().equals(metaAnnName)) {
             return NameUtils.getSimpleName(metaAnnName);
         }

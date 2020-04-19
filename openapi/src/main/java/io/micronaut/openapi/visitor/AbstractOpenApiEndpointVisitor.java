@@ -439,17 +439,7 @@ public abstract class AbstractOpenApiEndpointVisitor<C, E> extends AbstractOpenA
                     } else {
                         try {
                             Parameter v = treeToValue(jsonNode, Parameter.class);
-                            if (v != null) {
-                                // horrible hack because Swagger
-                                // ParameterDeserializer breaks updating
-                                // existing objects
-                                BeanMap<Parameter> beanMap = BeanMap.of(v);
-                                BeanMap<Parameter> target = BeanMap.of(newParameter);
-                                for (CharSequence name : paramValues.keySet()) {
-                                    Object o = beanMap.get(name.toString());
-                                    target.put(name.toString(), o);
-                                }
-                            } else {
+                            if (v == null) {
                                 BeanMap<Parameter> target = BeanMap.of(newParameter);
                                 for (CharSequence name : paramValues.keySet()) {
                                     Object o = paramValues.get(name.toString());
@@ -458,6 +448,16 @@ public abstract class AbstractOpenApiEndpointVisitor<C, E> extends AbstractOpenA
                                     } catch (Exception e) {
                                         // ignore
                                     }
+                                }
+                            } else {
+                                // horrible hack because Swagger
+                                // ParameterDeserializer breaks updating
+                                // existing objects
+                                BeanMap<Parameter> beanMap = BeanMap.of(v);
+                                BeanMap<Parameter> target = BeanMap.of(newParameter);
+                                for (CharSequence name : paramValues.keySet()) {
+                                    Object o = beanMap.get(name.toString());
+                                    target.put(name.toString(), o);
                                 }
                             }
                         } catch (IOException e) {
@@ -665,7 +665,7 @@ public abstract class AbstractOpenApiEndpointVisitor<C, E> extends AbstractOpenA
     }
 
     private void readServers(MethodElement element, VisitorContext context, io.swagger.v3.oas.models.Operation swaggerOperation) {
-        List<io.swagger.v3.oas.models.servers.Server> servers = processOpenApiAnnotation(
+        List<Server> servers = processOpenApiAnnotation(
                 element,
                 context,
                 io.swagger.v3.oas.annotations.servers.Server.class,

@@ -89,7 +89,7 @@ class EndpointsConfiguration {
         return path;
     }
 
-    private static List<Tag> parseTags(String[] stringTags) {
+    private static List<Tag> parseTags(String... stringTags) {
         if (stringTags.length == 0) {
             return Collections.emptyList();
         }

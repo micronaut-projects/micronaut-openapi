@@ -54,7 +54,7 @@ public class OpenApiEndpointVisitor extends AbstractOpenApiEndpointVisitor<Endpo
         implements TypeElementVisitor<Endpoint, Object> {
     private String id;
     private boolean skip;
-    private MethodDesciption methodDescription;
+    private HttpMethodDesciption methodDescription;
 
     @Override
     protected boolean ignore(ClassElement element, VisitorContext context) {
@@ -110,20 +110,13 @@ public class OpenApiEndpointVisitor extends AbstractOpenApiEndpointVisitor<Endpo
         return mediaTypes(methodDescription.produces);
     }
 
-    private List<MediaType> mediaTypes(String[] arr) {
-        if (arr == null || arr.length == 0) {
-            return Collections.singletonList(MediaType.APPLICATION_JSON_TYPE);
-        }
-        return Arrays.stream(arr).map(MediaType::of).collect(Collectors.toList());
-    }
-
     @Override
     protected String description(MethodElement element) {
         return methodDescription.description;
     }
 
     @Override
-    protected List<io.swagger.v3.oas.models.tags.Tag> classTags(ClassElement element, VisitorContext context) {
+    protected List<Tag> classTags(ClassElement element, VisitorContext context) {
         EndpointsConfiguration cfg = OpenApiApplicationVisitor.endPointsConfiguration(context);
         List<Tag> allTags = new ArrayList<>(cfg.getTags());
         allTags.addAll(context.get(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_ENDPOINT_CLASS_TAGS, List.class,
@@ -131,24 +124,31 @@ public class OpenApiEndpointVisitor extends AbstractOpenApiEndpointVisitor<Endpo
         return allTags;
     }
 
-    private MethodDesciption httpMethodDescription(MethodElement element) {
-        Optional<Class<? extends Annotation>> httpMethodOpt = element.getAnnotationTypeByStereotype(Write.class);
-        if (httpMethodOpt.isPresent()) {
-            AnnotationValue<Write> ann = element.getAnnotation(Write.class);
-            return new MethodDesciption(HttpMethod.POST, ann.stringValue("description").orElse(null),
-                    ann.stringValues("produces"), ann.stringValues("consumes"));
+    private static List<MediaType> mediaTypes(String... arr) {
+        if (arr == null || arr.length == 0) {
+            return Collections.singletonList(MediaType.APPLICATION_JSON_TYPE);
         }
-        httpMethodOpt = element.getAnnotationTypeByStereotype(Read.class);
-        if (httpMethodOpt.isPresent()) {
-            AnnotationValue<Read> ann = element.getAnnotation(Read.class);
-            return new MethodDesciption(HttpMethod.GET, ann.stringValue("description").orElse(null),
-                    ann.stringValues("produces"), new String[0]);
+        return Arrays.stream(arr).map(MediaType::of).collect(Collectors.toList());
+    }
+
+    private static HttpMethodDesciption httpMethodDescription(MethodElement element) {
+        HttpMethodDesciption httpMethodDescription = methodDescription(element, Write.class, HttpMethod.POST);
+        if (httpMethodDescription != null) {
+            return httpMethodDescription;
         }
-        httpMethodOpt = element.getAnnotationTypeByStereotype(Delete.class);
+        httpMethodDescription = methodDescription(element, Read.class, HttpMethod.GET);
+        if (httpMethodDescription != null) {
+            return httpMethodDescription;
+        }
+        return methodDescription(element, Delete.class, HttpMethod.DELETE);
+    }
+
+    private static HttpMethodDesciption methodDescription(MethodElement element, Class<? extends Annotation> ann, HttpMethod httpMethod) {
+        Optional<Class<? extends Annotation>> httpMethodOpt = element.getAnnotationTypeByStereotype(ann);
         if (httpMethodOpt.isPresent()) {
-            AnnotationValue<Delete> ann = element.getAnnotation(Delete.class);
-            return new MethodDesciption(HttpMethod.DELETE, ann.stringValue("description").orElse(null),
-                    ann.stringValues("produces"), new String[0]);
+            AnnotationValue<?> annotation = element.getAnnotation(ann);
+            return new HttpMethodDesciption(httpMethod, annotation.stringValue("description").orElse(null),
+                    annotation.stringValues("produces"), annotation.stringValues("consumes"));
         }
         return null;
     }
@@ -158,13 +158,13 @@ public class OpenApiEndpointVisitor extends AbstractOpenApiEndpointVisitor<Endpo
      *
      * @author croudet
      */
-    private static class MethodDesciption {
+    private static class HttpMethodDesciption {
         HttpMethod httpMethod;
         String description;
         String[] produces;
         String[] consumes;
 
-        MethodDesciption(HttpMethod httpMethod, String description, String[] produces, String[] consumes) {
+        HttpMethodDesciption(HttpMethod httpMethod, String description, String[] produces, String[] consumes) {
             this.httpMethod = httpMethod;
             this.description = description;
             this.produces = produces;
@@ -173,7 +173,7 @@ public class OpenApiEndpointVisitor extends AbstractOpenApiEndpointVisitor<Endpo
 
         @Override
         public String toString() {
-            return "MethodDesciption [httpMethod=" + httpMethod + ", description=" + description + ", produces="
+            return "HttpMethodDesciption [httpMethod=" + httpMethod + ", description=" + description + ", produces="
                     + Arrays.toString(produces) + ", consumes=" + Arrays.toString(consumes) + "]";
         }
     }

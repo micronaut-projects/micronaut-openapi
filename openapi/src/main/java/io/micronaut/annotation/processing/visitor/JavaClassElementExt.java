@@ -224,12 +224,12 @@ public class JavaClassElementExt extends JavaClassElement {
                     BeanPropertyData beanPropertyData = computeIfAbsent(propertyName);
                     configureDeclaringType(declaringTypeElement, beanPropertyData);
                     ClassElement propertyType = beanPropertyData.type;
-                    if (propertyType != null) {
+                    if (propertyType == null) {
+                        beanPropertyData.setter = executableElement;
+                    } else {
                         if (propertyType.getName().equals(setterParameterType.getName())) {
                             beanPropertyData.setter = executableElement;
                         }
-                    } else {
-                        beanPropertyData.setter = executableElement;
                     }
                 }
             }
