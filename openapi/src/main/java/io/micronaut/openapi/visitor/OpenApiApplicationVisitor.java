@@ -83,7 +83,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
     /**
      * System property for server context path.
      */
-    public static final String MICRONAUT_OPENAPI_CONTEXT_SERVER_PATH = "micronaut.openapi.server.context-path";
+    public static final String MICRONAUT_OPENAPI_CONTEXT_SERVER_PATH = "micronaut.openapi.server.context.path";
     /**
      * System property for naming strategy. One jackson PropertyNamingStrategy.
      */
