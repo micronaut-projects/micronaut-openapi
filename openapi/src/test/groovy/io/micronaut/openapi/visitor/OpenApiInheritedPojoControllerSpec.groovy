@@ -122,7 +122,7 @@ class MyBean {}
         fromBaseOnlyOperation.responses."default".content."application/json"
         fromBaseOnlyOperation.responses."default".content."application/json".schema
         fromBaseOnlyOperation.responses."default".content."application/json".schema.$ref
-        fromBaseOnlyOperation.responses."default".content."application/json".schema.$ref == '#/components/schemas/BaseObject'
+        fromBaseOnlyOperation.responses."default".content."application/json".schema.$ref == '#/components/schemas/B'
 
         when:
         Operation fromBaseNoGetOperation = openAPI.paths.get("/fromTestOperations/fromBaseNoGet").get

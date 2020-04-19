@@ -59,7 +59,7 @@ class Times {
     public void setOffsetDateTime(OffsetDateTime time) {
         offsetDateTime = time;
     }
- 
+
     @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd'T'HH:mm:ssXXX", timezone = "Z")
     @Schema(description = "zonedDateTime", example = "2020-07-21T17:32:28Z", type = "string", format = "date-time")
     public ZonedDateTime getZonedDateTime() {

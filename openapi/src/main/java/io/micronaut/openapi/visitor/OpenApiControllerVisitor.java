@@ -95,7 +95,7 @@ public class OpenApiControllerVisitor extends AbstractOpenApiEndpointVisitor<Con
 
     @Override
     protected UriMatchTemplate uriMatchTemplate(MethodElement element) {
-        String controllerValue = element.getDeclaringType().getValue(UriMapping.class, String.class).orElse("/");
+        String controllerValue = element.getOwningType().getValue(UriMapping.class, String.class).orElse(element.getDeclaringType().getValue(UriMapping.class, String.class).orElse("/"));
         controllerValue = getPropertyPlaceholderResolver().resolvePlaceholders(controllerValue).orElse(controllerValue);
         UriMatchTemplate matchTemplate = UriMatchTemplate.of(controllerValue);
         String methodValue = element.getValue(HttpMethodMapping.class, String.class).orElse("/");

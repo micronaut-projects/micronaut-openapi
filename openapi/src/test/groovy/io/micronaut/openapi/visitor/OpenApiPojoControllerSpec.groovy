@@ -88,7 +88,7 @@ class Pet {
 
     /**
      * The Pet Tags
-     *  
+     *
      * @return The Tag
      */
     public List<String> getTags() {
@@ -146,7 +146,7 @@ interface PetOperations<T extends Pet> {
      */
     @Get("/")
     List<T> list();
-    
+
     @Get("/random")
     T random();
 
@@ -179,7 +179,7 @@ class Pet {
 
     /**
      * The Pet Age
-     * 
+     *
      * @return The Pet Age
      */
     public int getAge() {
@@ -192,7 +192,7 @@ class Pet {
 
     /**
      * The Pet Name
-     * 
+     *
      * @return The Pet Name
      */
     public String getName() {
@@ -201,7 +201,7 @@ class Pet {
 
     /**
      * A free-form object
-     * 
+     *
      * @return A free-form object
      */
     public Map getFreeForm() {
@@ -214,7 +214,7 @@ class Pet {
 
     /**
      * A string-to-string dictionary
-     * 
+     *
      * @return A string-to-string dictionary
      */
     public Map<String, String> getDictionariesPlain() {
@@ -227,7 +227,7 @@ class Pet {
 
     /**
      * A string-to-object dictionary
-     * 
+     *
      * @return A string-to-object dictionary
      */
     public Map<String, Tag> getTags() {
@@ -250,7 +250,7 @@ class Tag {
 
     /**
      * The Tag Name
-     * 
+     *
      * @return The Tag Name
      */
     public String getName() {
@@ -263,7 +263,7 @@ class Tag {
 
     /**
      * The Tag Description
-     * 
+     *
      * @return The Tag Description
      */
     public String getDescription() {
@@ -340,7 +340,7 @@ interface PetOperations<T extends Pet> {
      */
     @Get("/")
     List<T> list();
-    
+
     @Get("/random")
     T random();
 
@@ -364,24 +364,24 @@ interface PetOperations<T extends Pet> {
 class Pet {
     @javax.validation.constraints.Min(18)
     private int age;
-    
+
     private String name;
-    
+
     public void setAge(int a) {
         age = a;
     }
-    
+
     /**
      * The age
      */
     public int getAge() {
         return age;
     }
-    
+
     public void setName(String n) {
         name = n;
     }
-    
+
     @javax.validation.constraints.Size(max=30)
     public String getName() {
         return name;
@@ -434,7 +434,7 @@ interface PetOperations<T extends Pet> {
      */
     @Get("/")
     List<T> list();
-    
+
     @Get("/random")
     T random();
 
@@ -458,22 +458,22 @@ interface PetOperations<T extends Pet> {
 class Pet {
     private int age;
     private String name;
-    
+
     public void setAge(int a) {
         age = a;
     }
-    
+
     /**
      * The age
      */
     public int getAge() {
         return age;
     }
-    
+
     public void setName(String n) {
         name = n;
     }
-    
+
     public String getName() {
         return name;
     }
@@ -570,7 +570,7 @@ interface PetOperations<T extends Pet> {
      */
     @Get("/flowable")
     Flowable<T> flowable();
-    
+
     /**
      * List the pets
      *
@@ -578,7 +578,7 @@ interface PetOperations<T extends Pet> {
      */
     @Get("/observable")
     Observable<T> observable();
-    
+
     @Get("/random")
     Maybe<T> random();
 
@@ -596,10 +596,10 @@ interface PetOperations<T extends Pet> {
 
     @Post("/")
     Single<T> save(@Body T pet);
-    
+
     @Post("/completable")
     Completable completable(@Body T pet);
-    
+
     @Get("/singleHttpResponse")
     Single<HttpResponse<T>> singleHttpResponse();
 }
@@ -608,22 +608,22 @@ interface PetOperations<T extends Pet> {
 class Pet {
     private int age;
     private String name;
-    
+
     public void setAge(int a) {
         age = a;
     }
-    
+
     /**
      * The age
      */
     public int getAge() {
         return age;
     }
-    
+
     public void setName(String n) {
         name = n;
     }
-    
+
     public String getName() {
         return name;
     }
@@ -712,7 +712,7 @@ class MyBean {}
         pathItem.get.responses['default'].content['application/json'].schema
         pathItem.get.responses['default'].content['application/json'].schema.type == 'array'
         pathItem.get.responses['default'].content['application/json'].schema.items.$ref == '#/components/schemas/Pet'
-      
+
         when:"A Single<HttpResponse<T>> is returned"
         pathItem = openAPI.paths.get("/pets/singleHttpResponse")
 
@@ -759,7 +759,7 @@ interface PetOperations<T extends Pet> {
      */
     @Get("/flowable")
     Flowable<T> flowable();
-    
+
     @Get("/random")
     Maybe<T> random();
 
@@ -784,11 +784,11 @@ class Pet {
     private PetType type;
     private int age;
     private String name;
-    
+
     public void setAge(int a) {
         age = a;
     }
-    
+
     /**
      * The age
      */
@@ -796,20 +796,20 @@ class Pet {
     public int getAge() {
         return age;
     }
-    
+
     public void setName(String n) {
         name = n;
     }
 
-    @Schema(description="Pet name", maxLength=20)    
+    @Schema(description="Pet name", maxLength=20)
     public String getName() {
         return name;
     }
-    
+
     public void setType(PetType t) {
         type = t;
     }
-    
+
     public PetType getType() {
         return type;
     }
@@ -917,11 +917,11 @@ interface PetOperations<T extends Pet> {
 class Pet {
     private int age;
     private String name;
-    
+
     public void setAge(int a) {
         age = a;
     }
-    
+
     /**
      * The age
      */
@@ -929,12 +929,12 @@ class Pet {
     public int getAge() {
         return age;
     }
-    
+
     public void setName(String n) {
         name = n;
     }
 
-    @Schema(description="Pet name", maxLength=20)    
+    @Schema(description="Pet name", maxLength=20)
     public String getName() {
         return name;
     }
@@ -1002,22 +1002,22 @@ interface PetOperations<T extends Pet> {
 class Pet {
     private int age;
     private String name;
-    
+
     public void setAge(int a) {
         age = a;
     }
-    
+
     /**
      * The age
      */
     public int getAge() {
         return age;
     }
-    
+
     public void setName(String n) {
         name = n;
     }
-    
+
     public String getName() {
         return name;
     }
@@ -1116,7 +1116,7 @@ class Pet {
 
     /**
      * The Pet Tags
-     *  
+     *
      * @return The Tag
      */
     public List<String> getTags() {
@@ -1176,7 +1176,7 @@ interface PetOperations<T extends Pet> {
     @Consumes({MediaType.APPLICATION_FORM_URLENCODED, MediaType.APPLICATION_JSON})
     @Post("/")
     T save(@Body T pet);
-  
+
 }
 
 class Pet {
@@ -1213,7 +1213,7 @@ class Pet {
 
     /**
      * The Pet Tags
-     *  
+     *
      * @return The Tag
      */
     public List<String> getTags() {
@@ -1281,7 +1281,7 @@ interface PetOperations<T extends Pet> {
                  schema = @Schema(implementation = Pet.class),
                  examples = {
                     @ExampleObject(name = "example-1", value = "{\\"name\\":\\"Charlie\\"}")})}) T pet);
-  
+
 }
 
 class Pet {
@@ -1406,7 +1406,7 @@ class Pet {
 
     /**
      * The Pet Tags
-     *  
+     *
      * @return The Tag
      */
     public List<String> getTags() {
@@ -1512,7 +1512,7 @@ class Pet {
 
     /**
      * The Pet Tags
-     *  
+     *
      * @return The Tag
      */
     public List<String> getTags() {

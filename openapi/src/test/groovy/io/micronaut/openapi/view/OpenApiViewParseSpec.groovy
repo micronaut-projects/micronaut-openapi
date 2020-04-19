@@ -41,7 +41,7 @@ class OpenApiOperationViewParseSpec extends Specification {
         cfg.redocConfig != null
         cfg.swaggerUIConfig != null
     }
-    
+
     void "test parse OpenApiView specification, redoc enabled"() {
         given:
         String spec = "redoc.enabled=true,redoc.version=version123"
@@ -55,7 +55,7 @@ class OpenApiOperationViewParseSpec extends Specification {
         cfg.redocConfig != null
         cfg.redocConfig.version == "version123"
     }
-    
+
     void "test parse OpenApiView specification, rapidoc enabled"() {
         given:
         String spec = "rapidoc.enabled=true,rapidoc.version=version123,rapidoc.layout=row,rapidoc.theme=light"
@@ -71,7 +71,7 @@ class OpenApiOperationViewParseSpec extends Specification {
         cfg.rapidocConfig.options['theme'] == RapidocConfig.Theme.LIGHT
         cfg.rapidocConfig.options['layout'] == RapidocConfig.Layout.ROW
     }
-    
+
     void "test parse OpenApiView specification, swagger-ui enabled"() {
         given:
         String spec = "swagger-ui.enabled=true,swagger-ui.version=version123,swagger-ui.theme=flattop,swagger-ui.deepLinking=false"

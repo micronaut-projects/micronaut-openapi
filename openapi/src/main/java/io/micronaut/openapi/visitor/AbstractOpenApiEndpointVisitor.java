@@ -275,7 +275,7 @@ public abstract class AbstractOpenApiEndpointVisitor<C, E> extends AbstractOpenA
                 okResponse.setDescription(javadocDescription.getReturnDescription());
             }
 
-            ClassElement returnType = element.getReturnType();
+            ClassElement returnType = element.getGenericReturnType();
             if (returnType.isAssignable("io.reactivex.Completable")) {
                 returnType = null;
             } else if (isResponseType(returnType)) {
@@ -312,7 +312,7 @@ public abstract class AbstractOpenApiEndpointVisitor<C, E> extends AbstractOpenA
 
         for (ParameterElement parameter : element.getParameters()) {
 
-            ClassElement parameterType = parameter.getType();
+            ClassElement parameterType = parameter.getGenericType();
             String parameterName = parameter.getName();
 
             if (isIgnoredParameterType(parameterType)) {

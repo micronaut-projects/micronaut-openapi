@@ -24,7 +24,7 @@ class JavadocParserSpec extends Specification {
         given:
         JavadocParser parser = new JavadocParser()
         JavadocDescription desc = parser.parse('''
-This is a description with <b>bold</b> and {@code some code} 
+This is a description with <b>bold</b> and {@code some code}
 
 @since 1.0
 @param foo The foo param
