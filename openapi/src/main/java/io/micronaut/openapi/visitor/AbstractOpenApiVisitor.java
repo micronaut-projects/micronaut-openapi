@@ -479,8 +479,7 @@ abstract class AbstractOpenApiVisitor  {
             }
             if (classElement.isPresent()) {
                 if (primitiveType == null) {
-                    final OpenAPI openAPI = resolveOpenAPI(context);
-                    final ArraySchema schema = arraySchema(resolveSchema(openAPI, null, classElement.get(), context, Collections.emptyList()));
+                    final ArraySchema schema = arraySchema(resolveSchema(null, classElement.get(), context, Collections.emptyList()));
                     schemaToValueMap(arraySchemaMap, schema);
                 } else {
                     // For primitive type, just copy description field is present.
@@ -522,6 +521,19 @@ abstract class AbstractOpenApiVisitor  {
             }
         }
         return params;
+    }
+
+    /**
+     * Resolves the schema for the given type element.
+     *
+     * @param definingElement The defining element
+     * @param type The type element
+     * @param context The context
+     * @param mediaTypes An optional media type
+     * @return The schema or null if it cannot be resolved
+     */
+    protected @Nullable Schema resolveSchema(@Nullable Element definingElement, ClassElement type, VisitorContext context, List<MediaType> mediaTypes) {
+        return resolveSchema(resolveOpenAPI(context), definingElement, type, context, mediaTypes);
     }
 
     /**
@@ -947,8 +959,7 @@ abstract class AbstractOpenApiVisitor  {
             final Optional<ClassElement> classElement = context.getClassElement(className);
             Map<CharSequence, Object> schemaMap = new HashMap<>();
             if (classElement.isPresent()) {
-                final OpenAPI openAPI = resolveOpenAPI(context);
-                final Schema schema = resolveSchema(openAPI, null, classElement.get(), context, Collections.emptyList());
+                final Schema schema = resolveSchema(null, classElement.get(), context, Collections.emptyList());
                 schemaToValueMap(schemaMap, schema);
             }
             return schemaMap;
@@ -959,8 +970,7 @@ abstract class AbstractOpenApiVisitor  {
     private void bindSchemaForClassName(VisitorContext context, Map<CharSequence, Object> valueMap, String className) {
         final Optional<ClassElement> classElement = context.getClassElement(className);
         if (classElement.isPresent()) {
-            final OpenAPI openAPI = resolveOpenAPI(context);
-            final Schema schema = resolveSchema(openAPI, null, classElement.get(), context, Collections.emptyList());
+            final Schema schema = resolveSchema(null, classElement.get(), context, Collections.emptyList());
             schemaToValueMap(valueMap, schema);
         }
     }

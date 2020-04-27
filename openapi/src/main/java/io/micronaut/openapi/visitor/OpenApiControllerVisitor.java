@@ -82,12 +82,12 @@ public class OpenApiControllerVisitor extends AbstractOpenApiEndpointVisitor<Con
     }
 
     private List<MediaType> mediaTypes(MethodElement element, Class<? extends Annotation> ann) {
-        OptionalValues<List> consumesMediaTypes = element.getValues(ann, List.class);
-        if (consumesMediaTypes.isEmpty()) {
+        OptionalValues<List> mts = element.getValues(ann, List.class);
+        if (mts.isEmpty()) {
             return Collections.singletonList(MediaType.APPLICATION_JSON_TYPE);
         } else {
             List<MediaType> mediaTypes = new ArrayList<>();
-            consumesMediaTypes.forEach((key, list) ->
+            mts.forEach((key, list) ->
                 list.stream().map(mt -> MediaType.of(mt.toString())).forEach(mt -> mediaTypes.add((MediaType) mt)));
             return mediaTypes;
         }
