@@ -126,15 +126,15 @@ subprojects { Project subproject ->
         documentation "org.codehaus.groovy:groovy-templates:$groovyVersion"
         documentation "org.codehaus.groovy:groovy-dateutil:$groovyVersion"
 
-        testCompile "cglib:cglib-nodep:3.3.0"
-        testCompile "org.objenesis:objenesis:3.1"
+        testImplementation "cglib:cglib-nodep:3.3.0"
+        testImplementation "org.objenesis:objenesis:3.1"
 
-        testCompile("org.spockframework:spock-core:${spockVersion}") {
+        testImplementation("org.spockframework:spock-core:${spockVersion}") {
             exclude module:'groovy-all'
         }
-        testCompile "io.micronaut.test:micronaut-test-spock:$micronautTestVersion"
-        testRuntime "ch.qos.logback:logback-classic:1.2.3"
-        testCompile "org.codehaus.groovy:groovy-test:$groovyVersion"
+        testImplementation "io.micronaut.test:micronaut-test-spock:$micronautTestVersion"
+        testRuntimeOnly "ch.qos.logback:logback-classic:1.2.3"
+        testImplementation "org.codehaus.groovy:groovy-test:$groovyVersion"
     }
 
     groovydoc {

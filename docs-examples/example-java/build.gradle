@@ -16,14 +16,14 @@ dependencyManagement {
 }
 
 dependencies {
-    testCompile project(":openapi")
-    testCompile "io.micronaut:micronaut-runtime"
-    testCompile "io.micronaut:micronaut-inject-java"
-    testCompile "io.micronaut:micronaut-validation"
-    testCompile "io.swagger.core.v3:swagger-annotations"
-    testCompile "io.micronaut.configuration:micronaut-hibernate-validator"
-    testCompile 'org.awaitility:awaitility:4.0.2'
-    testCompile "org.junit.jupiter:junit-jupiter-api:$junitVersion"
+    testImplementation project(":openapi")
+    testImplementation "io.micronaut:micronaut-runtime"
+    testImplementation "io.micronaut:micronaut-inject-java"
+    testImplementation "io.micronaut:micronaut-validation"
+    testImplementation "io.swagger.core.v3:swagger-annotations"
+    testImplementation "io.micronaut.configuration:micronaut-hibernate-validator"
+    testImplementation 'org.awaitility:awaitility:4.0.2'
+    testImplementation "org.junit.jupiter:junit-jupiter-api:$junitVersion"
     testCompileOnly "io.micronaut:micronaut-inject-java"
     testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$junitVersion"
     testRuntime "ch.qos.logback:logback-classic:1.2.3"

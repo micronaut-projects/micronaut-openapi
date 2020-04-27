@@ -21,13 +21,13 @@ dependencies {
     kapt "io.micronaut:micronaut-inject-java"
     kapt "io.micronaut:micronaut-validation"
     kaptTest "io.micronaut:micronaut-inject-java"
-    testCompile "io.swagger.core.v3:swagger-annotations"
-    testCompile "io.micronaut:micronaut-runtime"
-    testCompile "io.micronaut.configuration:micronaut-hibernate-validator"
-    testRuntime "ch.qos.logback:logback-classic:1.2.3"
-    testCompile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
-    testCompile "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
-    testCompile 'io.kotlintest:kotlintest-runner-junit5:3.4.2'
+    testImplementation "io.swagger.core.v3:swagger-annotations"
+    testImplementation "io.micronaut:micronaut-runtime"
+    testImplementation "io.micronaut.configuration:micronaut-hibernate-validator"
+    testRuntimeOnly "ch.qos.logback:logback-classic:1.2.3"
+    testImplementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
+    testImplementation "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
+    testImplementation 'io.kotlintest:kotlintest-runner-junit5:3.4.2'
 }
 
 licenseTest.enabled = false
