@@ -16,18 +16,18 @@ dependencyManagement {
 }
 
 dependencies {
-    testCompile project(":openapi")
-    testCompile "io.micronaut:micronaut-runtime"
-    testCompile "io.micronaut:micronaut-runtime-groovy"
-    testCompile "io.micronaut:micronaut-validation"
-    testCompile "io.swagger.core.v3:swagger-annotations"
-    testCompile "io.micronaut.configuration:micronaut-hibernate-validator"
+    testImplementation project(":openapi")
+    testImplementation "io.micronaut:micronaut-runtime"
+    testImplementation "io.micronaut:micronaut-runtime-groovy"
+    testImplementation "io.micronaut:micronaut-validation"
+    testImplementation "io.swagger.core.v3:swagger-annotations"
+    testImplementation "io.micronaut.configuration:micronaut-hibernate-validator"
     testCompileOnly "io.micronaut:micronaut-inject-groovy"
-    testCompile "org.testcontainers:spock:1.14.0"
-    testCompile("org.spockframework:spock-core") {
+    testImplementation "org.testcontainers:spock:1.14.1"
+    testImplementation("org.spockframework:spock-core") {
         exclude group: "org.codehaus.groovy", module: "groovy-all"
     }
-    testRuntime "ch.qos.logback:logback-classic:1.2.3"
+    testRuntimeOnly "ch.qos.logback:logback-classic:1.2.3"
 }
 
 licenseTest.enabled = false
