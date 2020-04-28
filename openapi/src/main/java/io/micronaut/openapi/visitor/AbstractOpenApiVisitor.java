@@ -16,6 +16,7 @@
 package io.micronaut.openapi.visitor;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -97,6 +98,7 @@ import javax.validation.constraints.Size;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.math.BigDecimal;
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -107,6 +109,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Future;
@@ -476,8 +479,7 @@ abstract class AbstractOpenApiVisitor  {
             }
             if (classElement.isPresent()) {
                 if (primitiveType == null) {
-                    final OpenAPI openAPI = resolveOpenAPI(context);
-                    final ArraySchema schema = arraySchema(resolveSchema(openAPI, null, classElement.get(), context, null));
+                    final ArraySchema schema = arraySchema(resolveSchema(null, classElement.get(), context, null));
                     schemaToValueMap(arraySchemaMap, schema);
                 } else {
                     // For primitive type, just copy description field is present.
@@ -519,6 +521,19 @@ abstract class AbstractOpenApiVisitor  {
             }
         }
         return params;
+    }
+
+    /**
+     * Resolves the schema for the given type element.
+     *
+     * @param definingElement The defining element
+     * @param type The type element
+     * @param context The context
+     * @param mediaType An optional media type
+     * @return The schema or null if it cannot be resolved
+     */
+    protected @Nullable Schema resolveSchema(@Nullable Element definingElement, ClassElement type, VisitorContext context, @Nullable String mediaType) {
+        return resolveSchema(resolveOpenAPI(context), definingElement, type, context, mediaType);
     }
 
     /**
@@ -631,6 +646,34 @@ abstract class AbstractOpenApiVisitor  {
         return components;
     }
 
+    private List<Entry<String, Schema>> handleUnwrapped(Schema innerModel, String prefix, String suffix,
+            VisitorContext context) {
+        Map properties = innerModel.getProperties();
+        if (properties == null) {
+            return Collections.emptyList();
+        }
+        List<Entry<String, Schema>> props = new ArrayList<>(properties.size());
+        if (StringUtils.isEmpty(suffix) && StringUtils.isEmpty(prefix)) {
+            props.addAll(properties.entrySet());
+        } else {
+            if (prefix == null) {
+                prefix = "";
+            }
+            if (suffix == null) {
+                suffix = "";
+            }
+            for (Entry<String, Schema> prop : (Set<Map.Entry<String, Schema>>) properties.entrySet()) {
+                try {
+                    Schema clonedProp = jsonMapper.readValue(Json.pretty(prop.getValue()), Schema.class);
+                    clonedProp.setName(prefix + prop.getKey() + suffix);
+                    props.add(new AbstractMap.SimpleEntry<>(clonedProp.getName(), clonedProp));
+                } catch (IOException e) {
+                    context.warn("Exception cloning property " + e.getMessage(), null);
+                }
+            }
+        }
+        return props;
+    }
 
     /**
      * Processes a schema property.
@@ -642,19 +685,29 @@ abstract class AbstractOpenApiVisitor  {
      */
     protected void processSchemaProperty(VisitorContext context, Element element, ClassElement elementType, Schema parentSchema, Schema propertySchema) {
         if (propertySchema != null) {
-            propertySchema = bindSchemaForElement(context, element, elementType, propertySchema);
-            String propertyName = Optional.ofNullable(propertySchema.getName()).orElse(element.getName());
-
-            parentSchema.addProperties(propertyName, propertySchema);
-
-            if (element.isAnnotationPresent(NotNull.class)
+            List<Entry<String, Schema>> props;
+            AnnotationValue<JsonUnwrapped> uw = element.getAnnotation(JsonUnwrapped.class);
+            if (uw != null && uw.booleanValue("enabled").orElse(Boolean.TRUE)) {
+                Map<String, Schema> schemas = resolveSchemas(resolveOpenAPI(context));
+                String schemaName = element.stringValue(io.swagger.v3.oas.annotations.media.Schema.class, "name").orElse(computeDefaultSchemaName(null, elementType));
+                propertySchema = schemas.get(schemaName);
+                props = handleUnwrapped(propertySchema, uw.stringValue("prefix").orElse(null), uw.stringValue("suffix").orElse(null), context);
+            } else {
+                propertySchema = bindSchemaForElement(context, element, elementType, propertySchema);
+                String propertyName = Optional.ofNullable(propertySchema.getName()).orElse(element.getName());
+                props = Collections.singletonList(new AbstractMap.SimpleEntry<>(propertyName, propertySchema));
+            }
+            final boolean required = element.isAnnotationPresent(NotNull.class)
                     || element.isAnnotationPresent(NotBlank.class)
-                    || element.isAnnotationPresent(NotEmpty.class)) {
-
-                List<String> requiredList = parentSchema.getRequired();
-                // Check for duplicates
-                if (requiredList == null || !requiredList.contains(propertyName)) {
-                    parentSchema.addRequiredItem(propertyName);
+                    || element.isAnnotationPresent(NotEmpty.class);
+            for (Entry<String, Schema> prop: props) {
+                parentSchema.addProperties(prop.getKey(), prop.getValue());
+                if (required) {
+                    List<String> requiredList = parentSchema.getRequired();
+                    // Check for duplicates
+                    if (requiredList == null || !requiredList.contains(prop.getKey())) {
+                        parentSchema.addRequiredItem(prop.getKey());
+                    }
                 }
             }
         }
@@ -898,10 +951,9 @@ abstract class AbstractOpenApiVisitor  {
     private void bindSchemaForComposite(VisitorContext context, Map<CharSequence, Object> valueMap, String[] classNames, String key) {
         final List<Map<CharSequence, Object>> namesToSchemas = Arrays.stream(classNames).map(className -> {
             final Optional<ClassElement> classElement = context.getClassElement(className);
-            final OpenAPI openAPI = resolveOpenAPI(context);
             Map<CharSequence, Object> schemaMap = new HashMap<>();
             if (classElement.isPresent()) {
-                final Schema schema = resolveSchema(openAPI, null, classElement.get(), context, null);
+                final Schema schema = resolveSchema(null, classElement.get(), context, null);
                 schemaToValueMap(schemaMap, schema);
             }
             return schemaMap;
@@ -911,9 +963,8 @@ abstract class AbstractOpenApiVisitor  {
 
     private void bindSchemaForClassName(VisitorContext context, Map<CharSequence, Object> valueMap, String className) {
         final Optional<ClassElement> classElement = context.getClassElement(className);
-        final OpenAPI openAPI = resolveOpenAPI(context);
         if (classElement.isPresent()) {
-            final Schema schema = resolveSchema(openAPI, null, classElement.get(), context, null);
+            final Schema schema = resolveSchema(null, classElement.get(), context, null);
             schemaToValueMap(valueMap, schema);
         }
     }
