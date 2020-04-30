@@ -677,9 +677,9 @@ abstract class AbstractOpenApiVisitor  {
 
     /**
      * Processes a schema property.
-     *  @param context The visitor context
+     * @param context The visitor context
      * @param element The element
-     * @param elementType The elemen type
+     * @param elementType The element type
      * @param parentSchema The parent schema
      * @param propertySchema The property schema
      */
