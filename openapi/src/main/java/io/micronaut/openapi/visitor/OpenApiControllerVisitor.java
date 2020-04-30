@@ -546,7 +546,8 @@ public class OpenApiControllerVisitor extends AbstractOpenApiVisitor implements 
     private boolean isIgnoredParameterType(ClassElement parameterType) {
         return parameterType == null ||
                 parameterType.isAssignable(Principal.class) ||
-            parameterType.isAssignable("io.micronaut.security.authentication.Authentication");
+            parameterType.isAssignable("io.micronaut.security.authentication.Authentication") ||
+            parameterType.isAssignable("kotlin.coroutines.Continuation");
     }
 
     private boolean isResponseType(ClassElement returnType) {
