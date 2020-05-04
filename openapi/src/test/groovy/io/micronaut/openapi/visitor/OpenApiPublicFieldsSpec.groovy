@@ -57,20 +57,20 @@ interface PetOperations<T extends Pet> {
 
 class Pet {
     public int age;
-    
+
     // ignored by json
     @JsonIgnore
     public int ignored;
     // hidden by swagger
     @Hidden
     public int hidden;
-    
+
     // private should not be included
     private String name;
-    
+
     // protected should not be included
     protected String protectme;
-    
+
     // static should not be included
     public static String CONST;
 }

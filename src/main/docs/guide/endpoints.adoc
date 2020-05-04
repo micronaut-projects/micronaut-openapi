@@ -1,0 +1,43 @@
+It is possible to expose management Endpoints in the openapi specification file.
+You need to exposed `micronaut-management` as annotation processor and runtime dependency:
+
+dependency:micronaut-management[scope="annotationProcessor", version="{version}", groupId="io.micronaut"]
+dependency:micronaut-management[scope="implementation", version="{version}", groupId="io.micronaut"]
+
+== User Defined Endpoints
+
+To process user defined endpoints simply add:
+----
+endpoints.enabled=true
+----
+
+in the `openapi.properties` file.
+
+You can also provide some tags with the `endpoints.tags=<comma separated list of tags>` flag, for instance:
+----
+endpoints.tags=Management Enpoints
+----
+
+If you are using a custom path the your endpoints use `endpoints.path` to set it:
+----
+endpoints.path=/endpoints
+
+----
+
+== Micronaut Built-In Endpoints
+
+To enable the processing of built-in endpoints (https://docs.micronaut.io/latest/guide/index.html#providedEndpoints), you have to declare them in the
+`openapi.properties` file:
+
+----
+endpoints.enabled=true
+endpoints.tags=Managemenent Endpoints
+endpoints.routes.class=io.micronaut.management.endpoint.routes.RoutesEndpoint
+endpoints.beans.class=io.micronaut.management.endpoint.beans.BeansEndpoint
+endpoints.health.class=io.micronaut.management.endpoint.health.HealthEndpoint
+endpoints.loggers.class=io.micronaut.management.endpoint.loggers.LoggersEndpoint
+endpoints.refresh.class=io.micronaut.management.endpoint.refresh.RefreshEndpoint
+----
+
+The syntax is the following: `endpoints.<name>.class=<full class name of the endpoint>` where `name` is an arbitrary name.
+You can also add some tags to each endpoint: `endpoints.<name>.tags=<<comma separated list of tags>`.

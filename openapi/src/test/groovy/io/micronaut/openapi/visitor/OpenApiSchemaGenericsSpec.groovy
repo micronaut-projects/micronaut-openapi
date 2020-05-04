@@ -52,18 +52,18 @@ class MyController {
 class Pet implements java.util.function.Consumer<Pet> {
     private PetType type;
 
-    
+
     public void setType(PetType type) {
         this.type = type;
     }
-    
+
     /**
      * The age
      */
     public PetType getType() {
         return this.type;
     }
-    
+
     public void accept(Pet pet) {}
 }
 
@@ -113,11 +113,11 @@ class Pet {
     @javax.validation.constraints.Min(18)
     private int age;
 
-    
+
     public void setAge(int a) {
         age = a;
     }
-    
+
     /**
      * The age
      */
@@ -178,11 +178,11 @@ class Pet {
     @javax.validation.constraints.Min(18)
     private int age;
 
-    
+
     public void setAge(int a) {
         age = a;
     }
-    
+
     /**
      * The age
      */
@@ -243,11 +243,11 @@ class Pet {
     @javax.validation.constraints.Min(18)
     private int age;
 
-    
+
     public void setAge(int a) {
         age = a;
     }
-    
+
     /**
      * The age
      */

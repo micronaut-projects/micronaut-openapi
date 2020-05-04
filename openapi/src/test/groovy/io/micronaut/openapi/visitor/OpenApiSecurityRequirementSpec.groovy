@@ -56,7 +56,7 @@ class PetController {
     public HttpResponse<Pet> get(String name) {
         return null;
     }
-    
+
 }
 
 @OpenAPIDefinition(
