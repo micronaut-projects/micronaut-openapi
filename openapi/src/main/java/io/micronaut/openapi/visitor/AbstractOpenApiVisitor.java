@@ -372,6 +372,8 @@ abstract class AbstractOpenApiVisitor  {
                         } else {
                             newValues.put(key, value);
                         }
+                    } else {
+                    	newValues.put(key, new Object[0]);
                     }
                 } else if (key.equals("discriminatorProperty")) {
                     final Map<String, Object> discriminatorMap = getDiscriminatorMap(newValues);
@@ -683,9 +685,9 @@ abstract class AbstractOpenApiVisitor  {
 
     /**
      * Processes a schema property.
-     *  @param context The visitor context
+     * @param context The visitor context
      * @param element The element
-     * @param elementType The elemen type
+     * @param elementType The element type
      * @param parentSchema The parent schema
      * @param propertySchema The property schema
      */
