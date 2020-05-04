@@ -55,17 +55,19 @@
                                 
                                 <div class="toc-item" style="margin-left:0"><a href="#openApiViews"><strong>6</strong><span>Generating OpenAPI Views</span></a></div>
                                 
-                                <div class="toc-item" style="margin-left:0"><a href="#controllersAndSwaggerAnnotations"><strong>7</strong><span>Controllers and Swagger Annotations</span></a></div>
+                                <div class="toc-item" style="margin-left:0"><a href="#endpoints"><strong>7</strong><span>Exposing Endpoints</span></a></div>
                                 
-                                <div class="toc-item" style="margin-left:0"><a href="#schemasAndPojos"><strong>8</strong><span>Schemas and POJOs</span></a></div>
+                                <div class="toc-item" style="margin-left:0"><a href="#controllersAndSwaggerAnnotations"><strong>8</strong><span>Controllers and Swagger Annotations</span></a></div>
                                 
-                                <div class="toc-item" style="margin-left:0"><a href="#schemasAndMetaAnnotations"><strong>9</strong><span>Schemas and Meta Annotations</span></a></div>
+                                <div class="toc-item" style="margin-left:0"><a href="#schemasAndPojos"><strong>9</strong><span>Schemas and POJOs</span></a></div>
                                 
-                                <div class="toc-item" style="margin-left:0"><a href="#schemasAndGenerics"><strong>10</strong><span>Schemas and Generics</span></a></div>
+                                <div class="toc-item" style="margin-left:0"><a href="#schemasAndMetaAnnotations"><strong>10</strong><span>Schemas and Meta Annotations</span></a></div>
                                 
-                                <div class="toc-item" style="margin-left:0"><a href="#mergingSchemas"><strong>11</strong><span>Merging Schemas</span></a></div>
+                                <div class="toc-item" style="margin-left:0"><a href="#schemasAndGenerics"><strong>11</strong><span>Schemas and Generics</span></a></div>
                                 
-                                <div class="toc-item" style="margin-left:0"><a href="#repository"><strong>12</strong><span>Repository</span></a></div>
+                                <div class="toc-item" style="margin-left:0"><a href="#mergingSchemas"><strong>12</strong><span>Merging Schemas</span></a></div>
+                                
+                                <div class="toc-item" style="margin-left:0"><a href="#repository"><strong>13</strong><span>Repository</span></a></div>
                                 
                             </div>
                         </div>
@@ -108,17 +110,19 @@
         
         <div class="toc-item" style="margin-left:0px" id="toc-item-openApiViews"><a href="#openApiViews"><strong>6</strong><span>Generating OpenAPI Views</span></a></div>
         
-        <div class="toc-item" style="margin-left:0px" id="toc-item-controllersAndSwaggerAnnotations"><a href="#controllersAndSwaggerAnnotations"><strong>7</strong><span>Controllers and Swagger Annotations</span></a></div>
+        <div class="toc-item" style="margin-left:0px" id="toc-item-endpoints"><a href="#endpoints"><strong>7</strong><span>Exposing Endpoints</span></a></div>
         
-        <div class="toc-item" style="margin-left:0px" id="toc-item-schemasAndPojos"><a href="#schemasAndPojos"><strong>8</strong><span>Schemas and POJOs</span></a></div>
+        <div class="toc-item" style="margin-left:0px" id="toc-item-controllersAndSwaggerAnnotations"><a href="#controllersAndSwaggerAnnotations"><strong>8</strong><span>Controllers and Swagger Annotations</span></a></div>
         
-        <div class="toc-item" style="margin-left:0px" id="toc-item-schemasAndMetaAnnotations"><a href="#schemasAndMetaAnnotations"><strong>9</strong><span>Schemas and Meta Annotations</span></a></div>
+        <div class="toc-item" style="margin-left:0px" id="toc-item-schemasAndPojos"><a href="#schemasAndPojos"><strong>9</strong><span>Schemas and POJOs</span></a></div>
         
-        <div class="toc-item" style="margin-left:0px" id="toc-item-schemasAndGenerics"><a href="#schemasAndGenerics"><strong>10</strong><span>Schemas and Generics</span></a></div>
+        <div class="toc-item" style="margin-left:0px" id="toc-item-schemasAndMetaAnnotations"><a href="#schemasAndMetaAnnotations"><strong>10</strong><span>Schemas and Meta Annotations</span></a></div>
         
-        <div class="toc-item" style="margin-left:0px" id="toc-item-mergingSchemas"><a href="#mergingSchemas"><strong>11</strong><span>Merging Schemas</span></a></div>
+        <div class="toc-item" style="margin-left:0px" id="toc-item-schemasAndGenerics"><a href="#schemasAndGenerics"><strong>11</strong><span>Schemas and Generics</span></a></div>
         
-        <div class="toc-item" style="margin-left:0px" id="toc-item-repository"><a href="#repository"><strong>12</strong><span>Repository</span></a></div>
+        <div class="toc-item" style="margin-left:0px" id="toc-item-mergingSchemas"><a href="#mergingSchemas"><strong>12</strong><span>Merging Schemas</span></a></div>
+        
+        <div class="toc-item" style="margin-left:0px" id="toc-item-repository"><a href="#repository"><strong>13</strong><span>Repository</span></a></div>
         
         </div>
     </div>
@@ -749,7 +753,114 @@ public class OpenApiViewCookieContextPathFilter implements HttpServerFilter {
 </div>
 </div>
 
-<h1 id="controllersAndSwaggerAnnotations"><a class="anchor" href="#controllersAndSwaggerAnnotations"></a>7 Controllers and Swagger Annotations</h1>
+<h1 id="endpoints"><a class="anchor" href="#endpoints"></a>7 Exposing Endpoints</h1>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/endpoints.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>It is possible to expose management Endpoints in the openapi specification file.
+You need to exposed <code>micronaut-management</code> as annotation processor and runtime dependency:</p>
+</div>
+<div class="paragraph">
+<p>        <div class="listingblock multi-language-sample">
+<div class="title"></div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="gradle">annotationProcessor(<span class="hljs-string">"io.micronaut:micronaut-management:1.4.6.BUILD-SNAPSHOT")</span></code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="title"></div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="maven">&lt;annotationProcessorPaths&gt;
+    &lt;path&gt;
+        &lt;groupId&gt;io.micronaut&lt;/groupId&gt;
+        &lt;artifactId&gt;micronaut-management&lt;/artifactId&gt;
+        &lt;version&gt;1.4.6.BUILD-SNAPSHOT&lt;/version&gt;
+    &lt;/path&gt;
+&lt;/annotationProcessorPaths&gt;</code></pre>
+</div>
+</div>
+
+        <div class="listingblock multi-language-sample">
+<div class="title"></div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="gradle">implementation(<span class="hljs-string">"io.micronaut:micronaut-management:1.4.6.BUILD-SNAPSHOT")</span></code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="maven">&lt;dependency&gt;
+    &lt;groupId&gt;io.micronaut&lt;/groupId&gt;
+    &lt;artifactId&gt;micronaut-management&lt;/artifactId&gt;
+    &lt;version&gt;1.4.6.BUILD-SNAPSHOT&lt;/version&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+</p>
+</div>
+<div class="sect1">
+<h2 id="_user_defined_endpoints">User Defined Endpoints</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To process user defined endpoints simply add:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>endpoints.enabled=true</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>in the <code>openapi.properties</code> file.</p>
+</div>
+<div class="paragraph">
+<p>You can also provide some tags with the <code>endpoints.tags=&lt;comma separated list of tags&gt;</code> flag, for instance:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>endpoints.tags=Management Enpoints</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>If you are using a custom path the your endpoints use <code>endpoints.path</code> to set it:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>endpoints.path=/endpoints</pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_micronaut_built_in_endpoints">Micronaut Built-In Endpoints</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To enable the processing of built-in endpoints (<a href="https://docs.micronaut.io/latest/guide/index.html#providedEndpoints" class="bare">https://docs.micronaut.io/latest/guide/index.html#providedEndpoints</a>), you have to declare them in the
+<code>openapi.properties</code> file:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>endpoints.enabled=true
+endpoints.tags=Managemenent Endpoints
+endpoints.routes.class=io.micronaut.management.endpoint.routes.RoutesEndpoint
+endpoints.beans.class=io.micronaut.management.endpoint.beans.BeansEndpoint
+endpoints.health.class=io.micronaut.management.endpoint.health.HealthEndpoint
+endpoints.loggers.class=io.micronaut.management.endpoint.loggers.LoggersEndpoint
+endpoints.refresh.class=io.micronaut.management.endpoint.refresh.RefreshEndpoint</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The syntax is the following: <code>endpoints.&lt;name&gt;.class=&lt;full class name of the endpoint&gt;</code> where <code>name</code> is an arbitrary name.
+You can also add some tags to each endpoint: <code>endpoints.&lt;name&gt;.tags=&lt;&lt;comma separated list of tags&gt;</code>.</p>
+</div>
+</div>
+</div>
+
+<h1 id="controllersAndSwaggerAnnotations"><a class="anchor" href="#controllersAndSwaggerAnnotations"></a>8 Controllers and Swagger Annotations</h1>
 
 <div class='contribute-btn'>
     <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/controllersAndSwaggerAnnotations.adoc"'>
@@ -1076,7 +1187,7 @@ the following <strong>jackson</strong>'s <code>PropertyNamingStrategy</code>:
 </div>
 </div>
 
-<h1 id="schemasAndPojos"><a class="anchor" href="#schemasAndPojos"></a>8 Schemas and POJOs</h1>
+<h1 id="schemasAndPojos"><a class="anchor" href="#schemasAndPojos"></a>9 Schemas and POJOs</h1>
 
 <div class='contribute-btn'>
     <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/schemasAndPojos.adoc"'>
@@ -1146,7 +1257,7 @@ enum PetType {
 </table>
 </div>
 
-<h1 id="schemasAndMetaAnnotations"><a class="anchor" href="#schemasAndMetaAnnotations"></a>9 Schemas and Meta Annotations</h1>
+<h1 id="schemasAndMetaAnnotations"><a class="anchor" href="#schemasAndMetaAnnotations"></a>10 Schemas and Meta Annotations</h1>
 
 <div class='contribute-btn'>
     <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/schemasAndMetaAnnotations.adoc"'>
@@ -1176,7 +1287,7 @@ enum PetType {
 <p>Then whenever <code>Pet</code> is used as a parameter you can annotate the parameter with <code>@MyAnn</code>.</p>
 </div>
 
-<h1 id="schemasAndGenerics"><a class="anchor" href="#schemasAndGenerics"></a>10 Schemas and Generics</h1>
+<h1 id="schemasAndGenerics"><a class="anchor" href="#schemasAndGenerics"></a>11 Schemas and Generics</h1>
 
 <div class='contribute-btn'>
     <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/schemasAndGenerics.adoc"'>
@@ -1225,7 +1336,7 @@ public Response&lt;Pet&gt; updatePet(Pet pet) {
 <p>In the above case the generated schema will be named <code>#/components/schemas/ResponseOfPet</code>.</p>
 </div>
 
-<h1 id="mergingSchemas"><a class="anchor" href="#mergingSchemas"></a>11 Merging Schemas</h1>
+<h1 id="mergingSchemas"><a class="anchor" href="#mergingSchemas"></a>12 Merging Schemas</h1>
 
 <div class='contribute-btn'>
     <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/mergingSchemas.adoc"'>
@@ -1246,7 +1357,7 @@ public Response&lt;Pet&gt; updatePet(Pet pet) {
 </div>
 </div>
 
-<h1 id="repository"><a class="anchor" href="#repository"></a>12 Repository</h1>
+<h1 id="repository"><a class="anchor" href="#repository"></a>13 Repository</h1>
 
 <div class='contribute-btn'>
     <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/repository.adoc"'>

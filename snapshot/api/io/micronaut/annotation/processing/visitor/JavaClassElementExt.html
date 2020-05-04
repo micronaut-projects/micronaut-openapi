@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10};
+var methods = {"i0":10,"i1":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -117,7 +117,7 @@ var activeTableTab = "activeTableTab";
 <li class="blockList">
 <dl>
 <dt>All Implemented Interfaces:</dt>
-<dd>io.micronaut.core.annotation.AnnotationMetadata, io.micronaut.core.annotation.AnnotationMetadataDelegate, io.micronaut.core.annotation.AnnotationMetadataProvider, io.micronaut.core.annotation.AnnotationSource, io.micronaut.inject.ast.ClassElement, io.micronaut.inject.ast.Element, io.micronaut.inject.ast.TypedElement</dd>
+<dd>io.micronaut.core.annotation.AnnotatedElement, io.micronaut.core.annotation.AnnotationMetadata, io.micronaut.core.annotation.AnnotationMetadataDelegate, io.micronaut.core.annotation.AnnotationMetadataProvider, io.micronaut.core.annotation.AnnotationSource, io.micronaut.core.naming.Named, io.micronaut.inject.ast.ClassElement, io.micronaut.inject.ast.Element, io.micronaut.inject.ast.TypedElement</dd>
 </dl>
 <hr>
 <br>
@@ -195,13 +195,19 @@ extends io.micronaut.annotation.processing.visitor.JavaClassElement</pre>
 <div class="block">Returns fluent accessor methods.</div>
 </td>
 </tr>
+<tr id="i1" class="rowColor">
+<td class="colFirst"><code><a href="https://docs.oracle.com/javase/8/docs/api/java/util/List.html?is-external=true" title="class or interface in java.util">List</a>&lt;io.micronaut.inject.ast.MethodElement&gt;</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../io/micronaut/annotation/processing/visitor/JavaClassElementExt.html#getMethods--">getMethods</a></span>()</code>
+<div class="block">Returns the methods of this class.</div>
+</td>
+</tr>
 </table>
 <ul class="blockList">
 <li class="blockList"><a name="methods.inherited.from.class.io.micronaut.annotation.processing.visitor.JavaClassElement">
 <!--   -->
 </a>
 <h3>Methods inherited from class&nbsp;io.micronaut.annotation.processing.visitor.JavaClassElement</h3>
-<code>getAnnotationMetadata, getBeanProperties, getFields, getName, getPrimaryConstructor, getSuperType, getTypeArguments, getTypeArguments, isAbstract, isArray, isAssignable, isInterface, isPrimitive</code></li>
+<code>getAnnotationMetadata, getBeanProperties, getDefaultConstructor, getFields, getName, getPrimaryConstructor, getSuperType, getTypeArguments, getTypeArguments, isAbstract, isArray, isAssignable, isInterface, isPrimitive</code></li>
 </ul>
 <ul class="blockList">
 <li class="blockList"><a name="methods.inherited.from.class.io.micronaut.annotation.processing.visitor.AbstractJavaElement">
@@ -243,7 +249,14 @@ extends io.micronaut.annotation.processing.visitor.JavaClassElement</pre>
 <!--   -->
 </a>
 <h3>Methods inherited from interface&nbsp;io.micronaut.core.annotation.AnnotationMetadataDelegate</h3>
-<code>booleanValue, booleanValue, booleanValue, booleanValue, classValue, classValue, classValue, classValue, classValues, classValues, classValues, classValues, doubleValue, doubleValue, doubleValue, enumValue, enumValue, enumValue, enumValue, findAnnotation, findAnnotation, findDeclaredAnnotation, findDeclaredAnnotation, getAnnotation, getAnnotation, getAnnotationNameByStereotype, getAnnotationNameByStereotype, getAnnotationNames, getAnnotationNamesByStereotype, getAnnotationNamesByStereotype, getAnnotationType, getAnnotationTypeByStereotype, getAnnotationTypeByStereotype, getAnnotationTypesByStereotype, getAnnotationValuesByType, getDeclaredAnnotation, getDeclaredAnnotation, getDeclaredAnnotationNameByStereotype, getDeclaredAnnotationNames, getDeclaredAnnotationNamesByStereotype, getDeclaredAnnotationTypeByStereotype, getDeclaredAnnotationTypeByStereotype, getDeclaredAnnotationValuesByType, getDefaultValue, getDefaultValue, getDefaultValue, getDefaultValue, getValue, getValue, getValue, getValue, getValue, getValue, getValue, getValue, getValue, getValue, getValue, getValue, getValues, getValues, hasAnnotation, hasAnnotation, hasDeclaredAnnotation, hasDeclaredAnnotation, hasDeclaredStereotype, hasDeclaredStereotype, hasDeclaredStereotype, hasStereotype, hasStereotype, hasStereotype, hasStereotype, intValue, intValue, intValue, isAnnotationPresent, isDeclaredAnnotationPresent, isEmpty, isFalse, isFalse, isPresent, isPresent, isTrue, isTrue, longValue, longValue, stringValue, stringValue, stringValue, stringValue, stringValues, stringValues, synthesize, synthesizeAll, synthesizeAnnotationsByType, synthesizeDeclared, synthesizeDeclared, synthesizeDeclaredAnnotationsByType</code></li>
+<code>booleanValue, booleanValue, booleanValue, booleanValue, classValue, classValue, classValue, classValue, classValues, classValues, classValues, classValues, doubleValue, doubleValue, doubleValue, enumValue, enumValue, enumValue, enumValue, enumValues, enumValues, enumValues, enumValues, findAnnotation, findAnnotation, findDeclaredAnnotation, findDeclaredAnnotation, getAnnotation, getAnnotation, getAnnotationNameByStereotype, getAnnotationNameByStereotype, getAnnotationNames, getAnnotationNamesByStereotype, getAnnotationNamesByStereotype, getAnnotationType, getAnnotationTypeByStereotype, getAnnotationTypeByStereotype, getAnnotationTypesByStereotype, getAnnotationValuesByType, getDeclaredAnnotation, getDeclaredAnnotation, getDeclaredAnnotationNameByStereotype, getDeclaredAnnotationNames, getDeclaredAnnotationNamesByStereotype, getDeclaredAnnotationTypeByStereotype, getDeclaredAnnotationTypeByStereotype, getDeclaredAnnotationValuesByType, getDefaultValue, getDefaultValue, getDefaultValue, getDefaultValue, getDefaultValues, getValue, getValue, getValue, getValue, getValue, getValue, getValue, getValue, getValue, getValue, getValue, getValue, getValues, getValues, hasAnnotation, hasAnnotation, hasDeclaredAnnotation, hasDeclaredAnnotation, hasDeclaredStereotype, hasDeclaredStereotype, hasDeclaredStereotype, hasSimpleAnnotation, hasSimpleDeclaredAnnotation, hasStereotype, hasStereotype, hasStereotype, hasStereotype, intValue, intValue, intValue, isAnnotationPresent, isDeclaredAnnotationPresent, isEmpty, isFalse, isFalse, isPresent, isPresent, isTrue, isTrue, longValue, longValue, stringValue, stringValue, stringValue, stringValue, stringValues, stringValues, synthesize, synthesizeAll, synthesizeAnnotationsByType, synthesizeDeclared, synthesizeDeclared, synthesizeDeclaredAnnotationsByType</code></li>
+</ul>
+<ul class="blockList">
+<li class="blockList"><a name="methods.inherited.from.class.io.micronaut.core.annotation.AnnotatedElement">
+<!--   -->
+</a>
+<h3>Methods inherited from interface&nbsp;io.micronaut.core.annotation.AnnotatedElement</h3>
+<code>isDeclaredNullable, isNullable</code></li>
 </ul>
 </li>
 </ul>
@@ -282,6 +295,20 @@ extends io.micronaut.annotation.processing.visitor.JavaClassElement</pre>
 <!--   -->
 </a>
 <h3>Method Detail</h3>
+<a name="getMethods--">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getMethods</h4>
+<pre>public&nbsp;<a href="https://docs.oracle.com/javase/8/docs/api/java/util/List.html?is-external=true" title="class or interface in java.util">List</a>&lt;io.micronaut.inject.ast.MethodElement&gt;&nbsp;getMethods()</pre>
+<div class="block">Returns the methods of this class.</div>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>A list of methods.</dd>
+</dl>
+</li>
+</ul>
 <a name="getFluentBeanProperties--">
 <!--   -->
 </a>
