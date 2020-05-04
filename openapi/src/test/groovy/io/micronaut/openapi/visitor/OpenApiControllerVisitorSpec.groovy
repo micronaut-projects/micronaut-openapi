@@ -572,7 +572,7 @@ class MyBean {}
         parameter.in == 'path'
         parameter.schema.maxLength == 20
         parameter.schema.minLength == 10
-        parameter.schema.format == 'xxxxx'
+        parameter.schema.pattern == 'xxxxx'
         parameter.schema.maximum == 10
         parameter.schema.minimum == 5
 
