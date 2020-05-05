@@ -373,7 +373,7 @@ abstract class AbstractOpenApiVisitor  {
                             newValues.put(key, value);
                         }
                     } else {
-                    	newValues.put(key, a);
+                        newValues.put(key, a);
                     }
                 } else if (key.equals("discriminatorProperty")) {
                     final Map<String, Object> discriminatorMap = getDiscriminatorMap(newValues);

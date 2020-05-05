@@ -102,14 +102,14 @@ public class OpenApiControllerVisitor extends AbstractOpenApiEndpointVisitor<Con
         // check if we have multiple uris
         String[] uris = element.stringValues(HttpMethodMapping.class, "uris");
         if (uris.length != 0) {
-        	for (String methodValue: uris) {
-        		methodValue = getPropertyPlaceholderResolver().resolvePlaceholders(methodValue).orElse(methodValue);
-            	matchTemplates.add(matchTemplate.nest(methodValue));
-        	}
+            for (String methodValue: uris) {
+                methodValue = getPropertyPlaceholderResolver().resolvePlaceholders(methodValue).orElse(methodValue);
+                matchTemplates.add(matchTemplate.nest(methodValue));
+            }
         } else {
-        	String methodValue = element.getValue(HttpMethodMapping.class, String.class).orElse("/");
-        	methodValue = getPropertyPlaceholderResolver().resolvePlaceholders(methodValue).orElse(methodValue);
-        	matchTemplates.add(matchTemplate.nest(methodValue));
+            String methodValue = element.getValue(HttpMethodMapping.class, String.class).orElse("/");
+            methodValue = getPropertyPlaceholderResolver().resolvePlaceholders(methodValue).orElse(methodValue);
+            matchTemplates.add(matchTemplate.nest(methodValue));
         }
         return matchTemplates;
     }

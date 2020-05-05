@@ -216,7 +216,7 @@ public abstract class AbstractOpenApiEndpointVisitor<C, E> extends AbstractOpenA
         io.swagger.v3.oas.models.Operation swaggerOperation;
         Iterator<UriMatchTemplate> matchTemplates = uriMatchTemplates(element).iterator();
         if (! matchTemplates.hasNext()) {
-        	return;
+            return;
         }
         UriMatchTemplate matchTemplate = matchTemplates.next();
         PathItem pathItem = resolvePathItem(context, matchTemplate);
