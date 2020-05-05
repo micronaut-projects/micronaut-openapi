@@ -90,14 +90,14 @@ public class OpenApiEndpointVisitor extends AbstractOpenApiEndpointVisitor<Endpo
     }
 
     @Override
-    protected UriMatchTemplate uriMatchTemplate(MethodElement element) {
+    protected List<UriMatchTemplate> uriMatchTemplates(MethodElement element) {
         UriMatchTemplate uriTemplate = UriMatchTemplate.of(id);
         for (ParameterElement param : element.getParameters()) {
             if (param.hasAnnotation(Selector.class)) {
                 uriTemplate = uriTemplate.nest("/{" + param.getName() + "}");
             }
         }
-        return uriTemplate;
+        return Collections.singletonList(uriTemplate);
     }
 
     @Override

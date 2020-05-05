@@ -501,9 +501,9 @@ class MyController {
     @Get("/subscription/{subscriptionId}")
     public String getSubscription(
                @Parameter(in = ParameterIn.PATH, name = "subscriptionId",
-               \t\t\trequired = true, description = "parameter description",
-               \t\t\tallowEmptyValue = true, allowReserved = true,
-               \t\t\tschema = @Schema(
+               required = true, description = "parameter description",
+               allowEmptyValue = true, allowReserved = true,
+               schema = @Schema(
                                     type = "string",
                                     format = "uuid",
                                     description = "the generated UUID")) String subscriptionId) {
@@ -700,7 +700,6 @@ class MyBean {}
         operation.operationId == 'getSubscription'
         operation.parameters.size() == 1
 
-
         when:
         def parameter = operation.parameters[0]
 
@@ -797,5 +796,67 @@ class MyBean {}
         !operation.parameters[1].required
         operation.parameters[1].in == 'query'
 
+    }
+
+    void "test operation with multiple uris - Issue #220"() {
+        given:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.swagger.v3.oas.annotations.*;
+import io.swagger.v3.oas.annotations.media.*;
+import io.swagger.v3.oas.annotations.enums.*;
+import io.micronaut.http.annotation.*;
+import java.util.List;
+import javax.validation.constraints.*;
+
+@Controller("/")
+class MyController {
+
+    @Get(uris = {"/subscription/{subscriptionId}", "/subs/{subscriptionId}"})
+    public String getSubscription(String[] subscriptionId) {
+        return null;
+     }
+}
+
+@javax.inject.Singleton
+class MyBean {}
+''')
+        when:
+		OpenAPI api =  AbstractOpenApiVisitor.testReference
+
+        then:
+        api.paths.size() == 2
+
+        when:
+        Operation operation = api.paths?.get("/subscription/{subscriptionId}")?.get
+
+        then:
+        operation != null
+        operation.operationId == 'getSubscription'
+        operation.parameters.size() == 1
+
+        when:
+        def parameter = operation.parameters[0]
+
+        then:
+        parameter.in == 'path'
+
+		when:
+		operation = api.paths?.get("/subs/{subscriptionId}")?.get
+
+	    then:
+		parameter.in == 'path'
+
+        then:
+        operation != null
+        operation.operationId == 'getSubscription'
+        operation.parameters.size() == 1
+
+        when:
+        parameter = operation.parameters[0]
+
+        then:
+        parameter.in == 'path'
     }
 }

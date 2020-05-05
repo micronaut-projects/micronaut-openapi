@@ -81,6 +81,7 @@ import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -157,11 +158,11 @@ public abstract class AbstractOpenApiEndpointVisitor<C, E> extends AbstractOpenA
     protected abstract HttpMethod httpMethod(MethodElement element);
 
     /**
-     * Returns the uri path of the element.
+     * Returns the uri paths of the element.
      * @param element The MethodElement.
-     * @return The uri path of the element.
+     * @return The uri paths of the element.
      */
-    protected abstract UriMatchTemplate uriMatchTemplate(MethodElement element);
+    protected abstract List<UriMatchTemplate> uriMatchTemplates(MethodElement element);
 
     /**
      * Returns the consumes media types.
@@ -212,14 +213,17 @@ public abstract class AbstractOpenApiEndpointVisitor<C, E> extends AbstractOpenA
         if (httpMethod == null) {
             return;
         }
-
-        UriMatchTemplate matchTemplate = uriMatchTemplate(element);
-
+        io.swagger.v3.oas.models.Operation swaggerOperation;
+        Iterator<UriMatchTemplate> matchTemplates = uriMatchTemplates(element).iterator();
+        if (! matchTemplates.hasNext()) {
+        	return;
+        }
+        UriMatchTemplate matchTemplate = matchTemplates.next();
         PathItem pathItem = resolvePathItem(context, matchTemplate);
         OpenAPI openAPI = resolveOpenAPI(context);
 
         final Optional<AnnotationValue<Operation>> operationAnnotation = element.findAnnotation(Operation.class);
-        io.swagger.v3.oas.models.Operation swaggerOperation = operationAnnotation
+        swaggerOperation = operationAnnotation
                 .flatMap(o -> toValue(o.getValues(), context, io.swagger.v3.oas.models.Operation.class))
                 .orElse(new io.swagger.v3.oas.models.Operation());
 
@@ -562,6 +566,11 @@ public abstract class AbstractOpenApiEndpointVisitor<C, E> extends AbstractOpenA
                 requestBody.setRequired(true);
                 swaggerOperation.setRequestBody(requestBody);
             }
+        }
+        // if we have multiple uris, process them
+        while (matchTemplates.hasNext()) {
+            pathItem = resolvePathItem(context, matchTemplates.next());
+            setOperationOnPathItem(pathItem, swaggerOperation, httpMethod);
         }
     }
 
