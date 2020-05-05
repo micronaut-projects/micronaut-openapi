@@ -98,20 +98,20 @@ public class OpenApiControllerVisitor extends AbstractOpenApiEndpointVisitor<Con
         String controllerValue = element.getOwningType().getValue(UriMapping.class, String.class).orElse(element.getDeclaringType().getValue(UriMapping.class, String.class).orElse("/"));
         controllerValue = getPropertyPlaceholderResolver().resolvePlaceholders(controllerValue).orElse(controllerValue);
         UriMatchTemplate matchTemplate = UriMatchTemplate.of(controllerValue);
-        List<UriMatchTemplate> matchTemplates = new ArrayList<>(4);
         // check if we have multiple uris
         String[] uris = element.stringValues(HttpMethodMapping.class, "uris");
         if (uris.length != 0) {
+            List<UriMatchTemplate> matchTemplates = new ArrayList<>(uris.length);
             for (String methodValue: uris) {
                 methodValue = getPropertyPlaceholderResolver().resolvePlaceholders(methodValue).orElse(methodValue);
                 matchTemplates.add(matchTemplate.nest(methodValue));
             }
+            return matchTemplates;
         } else {
             String methodValue = element.getValue(HttpMethodMapping.class, String.class).orElse("/");
             methodValue = getPropertyPlaceholderResolver().resolvePlaceholders(methodValue).orElse(methodValue);
-            matchTemplates.add(matchTemplate.nest(methodValue));
+            return Collections.singletonList(matchTemplate.nest(methodValue));
         }
-        return matchTemplates;
     }
 
     @Override

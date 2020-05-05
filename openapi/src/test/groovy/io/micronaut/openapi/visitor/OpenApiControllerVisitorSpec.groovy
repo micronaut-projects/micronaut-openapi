@@ -823,7 +823,7 @@ class MyController {
 class MyBean {}
 ''')
         when:
-		OpenAPI api =  AbstractOpenApiVisitor.testReference
+        OpenAPI api =  AbstractOpenApiVisitor.testReference
 
         then:
         api.paths.size() == 2
@@ -842,11 +842,11 @@ class MyBean {}
         then:
         parameter.in == 'path'
 
-		when:
-		operation = api.paths?.get("/subs/{subscriptionId}")?.get
+        when:
+        operation = api.paths?.get("/subs/{subscriptionId}")?.get
 
-	    then:
-		parameter.in == 'path'
+        then:
+        parameter.in == 'path'
 
         then:
         operation != null
