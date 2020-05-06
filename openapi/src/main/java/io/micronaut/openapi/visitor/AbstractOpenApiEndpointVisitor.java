@@ -213,7 +213,6 @@ public abstract class AbstractOpenApiEndpointVisitor<C, E> extends AbstractOpenA
         if (httpMethod == null) {
             return;
         }
-        io.swagger.v3.oas.models.Operation swaggerOperation;
         Iterator<UriMatchTemplate> matchTemplates = uriMatchTemplates(element).iterator();
         if (! matchTemplates.hasNext()) {
             return;
@@ -223,7 +222,7 @@ public abstract class AbstractOpenApiEndpointVisitor<C, E> extends AbstractOpenA
         OpenAPI openAPI = resolveOpenAPI(context);
 
         final Optional<AnnotationValue<Operation>> operationAnnotation = element.findAnnotation(Operation.class);
-        swaggerOperation = operationAnnotation
+        io.swagger.v3.oas.models.Operation swaggerOperation = operationAnnotation
                 .flatMap(o -> toValue(o.getValues(), context, io.swagger.v3.oas.models.Operation.class))
                 .orElse(new io.swagger.v3.oas.models.Operation());
 
@@ -318,7 +317,6 @@ public abstract class AbstractOpenApiEndpointVisitor<C, E> extends AbstractOpenA
         for (ParameterElement parameter : element.getParameters()) {
 
             ClassElement parameterType = parameter.getGenericType();
-            String parameterName = parameter.getName();
 
             if (isIgnoredParameterType(parameterType)) {
                 continue;
@@ -328,6 +326,7 @@ public abstract class AbstractOpenApiEndpointVisitor<C, E> extends AbstractOpenA
                 readSwaggerRequestBody(parameter, context, swaggerOperation);
             }
 
+            String parameterName = parameter.getName();
             if (parameter.isAnnotationPresent(Body.class)) {
 
                 if (permitsRequestBody) {
