@@ -94,13 +94,24 @@ public class OpenApiControllerVisitor extends AbstractOpenApiEndpointVisitor<Con
     }
 
     @Override
-    protected UriMatchTemplate uriMatchTemplate(MethodElement element) {
+    protected List<UriMatchTemplate> uriMatchTemplates(MethodElement element) {
         String controllerValue = element.getOwningType().getValue(UriMapping.class, String.class).orElse(element.getDeclaringType().getValue(UriMapping.class, String.class).orElse("/"));
         controllerValue = getPropertyPlaceholderResolver().resolvePlaceholders(controllerValue).orElse(controllerValue);
         UriMatchTemplate matchTemplate = UriMatchTemplate.of(controllerValue);
-        String methodValue = element.getValue(HttpMethodMapping.class, String.class).orElse("/");
-        methodValue = getPropertyPlaceholderResolver().resolvePlaceholders(methodValue).orElse(methodValue);
-        return matchTemplate.nest(methodValue);
+        // check if we have multiple uris
+        String[] uris = element.stringValues(HttpMethodMapping.class, "uris");
+        if (uris.length != 0) {
+            List<UriMatchTemplate> matchTemplates = new ArrayList<>(uris.length);
+            for (String methodValue: uris) {
+                methodValue = getPropertyPlaceholderResolver().resolvePlaceholders(methodValue).orElse(methodValue);
+                matchTemplates.add(matchTemplate.nest(methodValue));
+            }
+            return matchTemplates;
+        } else {
+            String methodValue = element.getValue(HttpMethodMapping.class, String.class).orElse("/");
+            methodValue = getPropertyPlaceholderResolver().resolvePlaceholders(methodValue).orElse(methodValue);
+            return Collections.singletonList(matchTemplate.nest(methodValue));
+        }
     }
 
     @Override
