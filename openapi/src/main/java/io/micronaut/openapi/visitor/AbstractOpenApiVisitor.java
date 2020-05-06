@@ -786,7 +786,7 @@ abstract class AbstractOpenApiVisitor  {
                 finalSchemaToBind.setFormat("email");
             }
 
-            element.findAnnotation(Pattern.class).flatMap(p -> p.get("regexp", String.class)).ifPresent(finalSchemaToBind::setFormat);
+            element.findAnnotation(Pattern.class).flatMap(p -> p.get("regexp", String.class)).ifPresent(finalSchemaToBind::setPattern);
         }
 
         Optional<String> documentation = element.getDocumentation();
