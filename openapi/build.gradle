@@ -8,7 +8,7 @@ dependencies {
     implementation "io.swagger.core.v3:swagger-annotations:$swaggerVersion"
 
     testImplementation "io.micronaut:micronaut-runtime"
-    testImplementation "io.micronaut:micronaut-security"
+    testImplementation "io.micronaut:micronaut-security:2.0.0.M2"
     testImplementation "io.micronaut:micronaut-inject-groovy"
     testImplementation "io.micronaut:micronaut-inject-java"
     testImplementation "io.micronaut:micronaut-inject-java-test"
