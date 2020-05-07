@@ -65,11 +65,11 @@ class MyController {
 
 abstract class Base {
     private int money;
-    
+
     public void setMoney(int a) {
         money = a;
     }
-    
+
     public int getMoney() {
         return money;
     }
@@ -77,11 +77,11 @@ abstract class Base {
 
 class A extends Base {
     private int age1;
-    
+
     public void setAge1(int a) {
         age1 = a;
     }
-    
+
     public int getAge1() {
         return age1;
     }
@@ -89,11 +89,11 @@ class A extends Base {
 
 class B extends Base {
     private int age2;
-    
+
     public void setAge2(int a) {
         age2 = a;
     }
-    
+
     public int getAge2() {
         return age2;
     }

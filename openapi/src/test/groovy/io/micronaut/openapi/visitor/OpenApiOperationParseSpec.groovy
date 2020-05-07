@@ -53,7 +53,7 @@ class Pet {
     public void setName(String name) {
         this.name = name;
     }
-    
+
     @Schema(name="pet-age", description = "The pet age")
     public Integer getAge() {
         return age;
@@ -125,7 +125,7 @@ interface PetOperations {
             })
     @Get
     HttpResponse<List<Pet>> list();
-    
+
     @Operation(summary = "List Pet Names",
             description = "List Pet Names",
             tags = "pet-name",
@@ -435,7 +435,7 @@ class MyController {
         ))
       @ApiResponse(responseCode = "400", description = "Invalid ID supplied")
       @ApiResponse(responseCode = "404", description = "Pet not found")
-      @ApiResponse(responseCode = "405", description = "Validation exception")    
+      @ApiResponse(responseCode = "405", description = "Validation exception")
     public Response updatePet(
       @RequestBody(description = "Pet object that needs to be added to the store", required = true,
                               content = @Content(

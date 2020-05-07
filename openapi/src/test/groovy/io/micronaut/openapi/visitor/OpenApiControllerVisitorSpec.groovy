@@ -53,7 +53,7 @@ interface HelloWorldApi {
 }
 
 @Controller("/hello")
-class HelloWorldController  implements HelloWorldApi {
+class HelloWorldController implements HelloWorldApi {
     @Override
     public HttpResponse<String> helloWorld() {
         return null;
@@ -164,18 +164,18 @@ import javax.validation.constraints.*;
 class MyController {
 
     @Get("/subscription/{subscriptionId}")
-    public String getSubscription( @Size(min=10, max=20) java.util.List<String> subscriptionId) { 
-        return null;                               
+    public String getSubscription( @Size(min=10, max=20) java.util.List<String> subscriptionId) {
+        return null;
      }
-     
+
     @io.micronaut.http.annotation.Error
-    public HttpResponse<JsonError> jsonError(HttpRequest request, JsonParseException jsonParseException) { 
-        JsonError error = new JsonError("Invalid JSON: " + jsonParseException.getMessage()) 
+    public HttpResponse<JsonError> jsonError(HttpRequest request, JsonParseException jsonParseException) {
+        JsonError error = new JsonError("Invalid JSON: " + jsonParseException.getMessage())
                 .link(Link.SELF, Link.of(request.getUri()));
-    
+
         return HttpResponse.<JsonError>status(HttpStatus.BAD_REQUEST, "Fix Your JSON")
-                .body(error); 
-    }     
+                .body(error);
+    }
 }
 
 @javax.inject.Singleton
@@ -240,9 +240,9 @@ interface PetOperations<T extends Pet> {
 
 class Pet {
     private String name;
-    
+
     public String getName() { return this.name; }
-    
+
     public void setName(String name) { this.name = name; }
 }
 
@@ -309,10 +309,10 @@ interface PetOperations<T extends String> {
      */
     @Get("/{slug}")
     HttpResponse<T> find(String slug, HttpRequest request);
-    
+
     @Get("/extras/{extraId}")
     HttpResponse<T> findExtras(@PathVariable String extraId, HttpRequest request);
-    
+
     @Get("/random")
     HttpResponse<T> getRandomPet();
 }
@@ -411,7 +411,7 @@ interface PetOperations<T extends String> {
      */
     @Get("/flowable")
     Flowable<T> flowable();
-    
+
     @Get("/random")
     Maybe<T> random();
 
@@ -501,13 +501,13 @@ class MyController {
     @Get("/subscription/{subscriptionId}")
     public String getSubscription(
                @Parameter(in = ParameterIn.PATH, name = "subscriptionId",
-               \t\t\trequired = true, description = "parameter description",
-               \t\t\tallowEmptyValue = true, allowReserved = true,
-               \t\t\tschema = @Schema(
+               required = true, description = "parameter description",
+               allowEmptyValue = true, allowReserved = true,
+               schema = @Schema(
                                     type = "string",
                                     format = "uuid",
-                                    description = "the generated UUID")) String subscriptionId) { 
-        return null;                               
+                                    description = "the generated UUID")) String subscriptionId) {
+        return null;
      }
 }
 
@@ -548,8 +548,8 @@ import javax.validation.constraints.*;
 class MyController {
 
     @Get("/subscription/{subscriptionId}")
-    public String getSubscription( @NotBlank @Max(10) @Min(5) @Pattern(regexp="xxxxx") @Size(min=10, max=20) String subscriptionId) { 
-        return null;                               
+    public String getSubscription( @NotBlank @Max(10) @Min(5) @Pattern(regexp="xxxxx") @Size(min=10, max=20) String subscriptionId) {
+        return null;
      }
 }
 
@@ -572,7 +572,7 @@ class MyBean {}
         parameter.in == 'path'
         parameter.schema.maxLength == 20
         parameter.schema.minLength == 10
-        parameter.schema.format == 'xxxxx'
+        parameter.schema.pattern == 'xxxxx'
         parameter.schema.maximum == 10
         parameter.schema.minimum == 5
 
@@ -594,8 +594,8 @@ import javax.validation.constraints.*;
 class MyController {
 
     @Get("/subscription/{subscriptionId}")
-    public String getSubscription( @Size(min=10, max=20) String[] subscriptionId) { 
-        return null;                               
+    public String getSubscription( @Size(min=10, max=20) String[] subscriptionId) {
+        return null;
      }
 }
 
@@ -639,8 +639,8 @@ import javax.validation.constraints.*;
 class MyController {
 
     @Get("/subscription/{subscriptionId}")
-    public String getSubscription( @Size(min=10, max=20) java.util.List<String> subscriptionId) { 
-        return null;                               
+    public String getSubscription( @Size(min=10, max=20) java.util.List<String> subscriptionId) {
+        return null;
      }
 }
 
@@ -684,8 +684,8 @@ import javax.validation.constraints.*;
 class MyController {
 
     @Get("/subscription/{subscriptionId}")
-    public String getSubscription( @NotEmpty java.util.List<String> subscriptionId) { 
-        return null;                               
+    public String getSubscription( @NotEmpty java.util.List<String> subscriptionId) {
+        return null;
      }
 }
 
@@ -699,7 +699,6 @@ class MyBean {}
         operation != null
         operation.operationId == 'getSubscription'
         operation.parameters.size() == 1
-
 
         when:
         def parameter = operation.parameters[0]
@@ -726,8 +725,8 @@ import javax.annotation.Nullable;
 class MyController {
 
     @Get("/subscription/{subscriptionId}")
-    public String getSubscription(@Parameter(description="foo") @CookieValue String subscriptionId, @QueryValue String q, @Header String contentType, @Nullable @Header(name = "Bundle-ID") String bundleId, @Header("X-API-Version") String apiVersion) { 
-        return null;                               
+    public String getSubscription(@Parameter(description="foo") @CookieValue String subscriptionId, @QueryValue String q, @Header String contentType, @Nullable @Header(name = "Bundle-ID") String bundleId, @Header("X-API-Version") String apiVersion) {
+        return null;
      }
 }
 
@@ -775,8 +774,8 @@ import javax.annotation.*;
 class MyController {
 
     @Get("${mymethod.path:/hello}{?foo,bar}")
-    public String query(@Nullable String foo, @Nullable String bar) { 
-        return null;                               
+    public String query(@Nullable String foo, @Nullable String bar) {
+        return null;
      }
 }
 
@@ -797,5 +796,67 @@ class MyBean {}
         !operation.parameters[1].required
         operation.parameters[1].in == 'query'
 
+    }
+
+    void "test operation with multiple uris - Issue #220"() {
+        given:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.swagger.v3.oas.annotations.*;
+import io.swagger.v3.oas.annotations.media.*;
+import io.swagger.v3.oas.annotations.enums.*;
+import io.micronaut.http.annotation.*;
+import java.util.List;
+import javax.validation.constraints.*;
+
+@Controller("/")
+class MyController {
+
+    @Get(uris = {"/subscription/{subscriptionId}", "/subs/{subscriptionId}"})
+    public String getSubscription(String[] subscriptionId) {
+        return null;
+     }
+}
+
+@javax.inject.Singleton
+class MyBean {}
+''')
+        when:
+        OpenAPI api =  AbstractOpenApiVisitor.testReference
+
+        then:
+        api.paths.size() == 2
+
+        when:
+        Operation operation = api.paths?.get("/subscription/{subscriptionId}")?.get
+
+        then:
+        operation != null
+        operation.operationId == 'getSubscription'
+        operation.parameters.size() == 1
+
+        when:
+        def parameter = operation.parameters[0]
+
+        then:
+        parameter.in == 'path'
+
+        when:
+        operation = api.paths?.get("/subs/{subscriptionId}")?.get
+
+        then:
+        parameter.in == 'path'
+
+        then:
+        operation != null
+        operation.operationId == 'getSubscription'
+        operation.parameters.size() == 1
+
+        when:
+        parameter = operation.parameters[0]
+
+        then:
+        parameter.in == 'path'
     }
 }
