@@ -18,6 +18,7 @@ package io.micronaut.openapi.visitor;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.JsonNode;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
 import io.micronaut.context.env.DefaultPropertyPlaceholderResolver;
 import io.micronaut.context.env.PropertyPlaceholderResolver;
 import io.micronaut.core.annotation.AnnotationValue;
@@ -78,15 +79,7 @@ import javax.annotation.Nullable;
 
 import java.io.IOException;
 import java.security.Principal;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -814,6 +807,12 @@ public abstract class AbstractOpenApiEndpointVisitor<C, E> extends AbstractOpenA
                 @Override
                 public <T> Optional<T> getProperty(@Nonnull String name, @Nonnull ArgumentConversionContext<T> conversionContext) {
                     return Optional.empty();
+                }
+
+                @NonNull
+                @Override
+                public Collection<String> getPropertyEntries(@NonNull String name) {
+                    return null;
                 }
             }, new DefaultConversionService());
         }
