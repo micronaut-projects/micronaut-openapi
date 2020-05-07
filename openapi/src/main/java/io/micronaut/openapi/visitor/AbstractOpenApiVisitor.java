@@ -827,7 +827,7 @@ abstract class AbstractOpenApiVisitor  {
     }
 
     private Schema doBindSchemaAnnotationValue(VisitorContext context, Element element, Schema schemaToBind,
-            JsonNode schemaJson, String defaultValue, String[] allowableValues) {
+            JsonNode schemaJson, String defaultValue, String... allowableValues) {
         try {
             schemaToBind = jsonMapper.readerForUpdating(schemaToBind).readValue(schemaJson);
             if (StringUtils.isNotEmpty(defaultValue)) {
@@ -879,7 +879,7 @@ abstract class AbstractOpenApiVisitor  {
                 }
             }
         }
-        return doBindSchemaAnnotationValue(context, element, schemaToBind, schemaJson, null, null);
+        return doBindSchemaAnnotationValue(context, element, schemaToBind, schemaJson, null);
     }
 
     private Optional<Map<String, Object>> resolveExtensions(JsonNode jn) {

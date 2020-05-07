@@ -38,7 +38,7 @@ class EndpointsConfiguration {
     public static final String ENDPOINTS_TAGS = ENDPOINTS_PREFIX + "tags";
     public static final String ENDPOINTS_PATH = ENDPOINTS_PREFIX + "path";
 
-    private boolean enabled;
+    private final boolean enabled;
     private String path;
     private List<Tag> tags;
     private Map<String, Endpoint> endpoints;
