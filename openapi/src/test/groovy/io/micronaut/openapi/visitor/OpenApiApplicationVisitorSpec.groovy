@@ -156,20 +156,66 @@ class MyBean {}
         then:"User defined end point is processed"
         openAPI.paths['/message']
         openAPI.paths['/message'].delete
+        openAPI.paths['/message'].delete.servers.size() == 1
+        openAPI.paths['/message'].delete.servers[0].url == 'https://{username}.gigantic-server.com:{port}/{basePath}'
+        openAPI.paths['/message'].delete.servers[0].description == 'The production API server'
+        openAPI.paths['/message'].delete.servers[0].variables
+        openAPI.paths['/message'].delete.servers[0].variables.size() == 3
+        openAPI.paths['/message'].delete.security.size() == 1
+        openAPI.paths['/message'].delete.security[0].size() == 1
+        openAPI.paths['/message'].delete.security[0].get('api_key') == []
         openAPI.paths['/message/{message}']
         openAPI.paths['/message/{message}'].post
         openAPI.paths['/message/{message}'].post.parameters.size() == 1
         openAPI.paths['/message/{message}'].post.parameters[0].name == 'message'
+        openAPI.paths['/message/{message}'].post.servers.size() == 1
+        openAPI.paths['/message/{message}'].post.servers[0].url == 'https://{username}.gigantic-server.com:{port}/{basePath}'
+        openAPI.paths['/message/{message}'].post.servers[0].description == 'The production API server'
+        openAPI.paths['/message/{message}'].post.servers[0].variables
+        openAPI.paths['/message/{message}'].post.servers[0].variables.size() == 3
+        openAPI.paths['/message/{message}'].post.security.size() == 1
+        openAPI.paths['/message/{message}'].post.security[0].size() == 1
+        openAPI.paths['/message/{message}'].post.security[0].get('api_key') == []
 
         then:"Built-in end point are processed"
         openAPI.paths['/routes']
         openAPI.paths['/routes'].get
-        openAPI.paths['/refresh']
-        openAPI.paths['/refresh'].post
+        openAPI.paths['/routes'].get.servers.size() == 1
+        openAPI.paths['/routes'].get.servers[0].url == 'https://{username}.gigantic-server.com:{port}/{basePath}'
+        openAPI.paths['/routes'].get.servers[0].description == 'The production API server'
+        openAPI.paths['/routes'].get.servers[0].variables
+        openAPI.paths['/routes'].get.servers[0].variables.size() == 3
+        openAPI.paths['/routes'].get.security.size() == 1
+        openAPI.paths['/routes'].get.security[0].size() == 1
+        openAPI.paths['/routes'].get.security[0].get('api_key') == []
         openAPI.paths['/beans']
         openAPI.paths['/beans'].get
+        openAPI.paths['/beans'].get.servers.size() == 1
+        openAPI.paths['/beans'].get.servers[0].url == 'https://{username}.gigantic-server.com:{port}/{basePath}'
+        openAPI.paths['/beans'].get.servers[0].description == 'The production API server'
+        openAPI.paths['/beans'].get.servers[0].variables
+        openAPI.paths['/beans'].get.servers[0].variables.size() == 3
+        openAPI.paths['/beans'].get.security.size() == 1
+        openAPI.paths['/beans'].get.security[0].size() == 1
+        openAPI.paths['/beans'].get.security[0].get('api_key') == []
         openAPI.paths['/loggers']
         openAPI.paths['/loggers'].get
+        openAPI.paths['/loggers'].get.servers.size() == 1
+        openAPI.paths['/loggers'].get.servers[0].url == 'https://{username}.gigantic-server.com:{port}/{basePath}'
+        openAPI.paths['/loggers'].get.servers[0].description == 'The production API server'
+        openAPI.paths['/loggers'].get.servers[0].variables
+        openAPI.paths['/loggers'].get.servers[0].variables.size() == 3
+        openAPI.paths['/loggers'].get.security.size() == 1
+        openAPI.paths['/loggers'].get.security[0].size() == 1
+        openAPI.paths['/loggers'].get.security[0].get('api_key') == []
+        openAPI.paths['/refresh']
+        openAPI.paths['/refresh'].post
+        openAPI.paths['/refresh'].post.servers.size() == 2
+        openAPI.paths['/refresh'].post.security.size() == 2
+        openAPI.paths['/refresh'].post.security[0].size() == 1
+        openAPI.paths['/refresh'].post.security[0].get('api_key') == []
+        openAPI.paths['/refresh'].post.security[1].size() == 1
+        openAPI.paths['/refresh'].post.security[1].get('petstore_auth') == ['write:pets', 'read:pets']
 
         when:"Loggers end point param name"
         // with jdk8 the argument name is not preserved
