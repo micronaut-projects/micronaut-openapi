@@ -74,7 +74,6 @@ final class RapidocConfig extends AbstractViewConfig implements Renderer {
         VALID_OPTIONS.put("api-key-location",  new EnumConverter<>(ApiKeyLocation.class));
         VALID_OPTIONS.put("server-url", AbstractViewConfig::asString);
         VALID_OPTIONS.put("default-api-server", AbstractViewConfig::asString);
-        VALID_OPTIONS.put("match-paths", AbstractViewConfig::asString);
 
         DEFAULT_OPTIONS.put("show-header", Boolean.FALSE);
         DEFAULT_OPTIONS.put("theme", Theme.DARK);
