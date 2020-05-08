@@ -112,6 +112,16 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
      */
     public static final String MICRONAUT_OPENAPI_ENDPOINT_CLASS_TAGS = "micronaut.openapi.endpoint.class.tags";
 
+    /**
+     * The name of the entry for Endpoint servers in the context.
+     */
+    public static final String MICRONAUT_OPENAPI_ENDPOINT_SERVERS = "micronaut.openapi.endpoint.servers";
+
+    /**
+     * The name of the entry for Endpoint security requirements in the context.
+     */
+    public static final String MICRONAUT_OPENAPI_ENDPOINT_SECURITY_REQUIREMENTS = "micronaut.openapi.endpoint.security.requirements";
+
     private static final String MICRONAUT_OPENAPI_PROJECT_DIR = "micronaut.openapi.project.dir";
     private static final String MICRONAUT_OPENAPI_PROPERTIES = "micronaut.openapi.properties";
     private static final String MICRONAUT_OPENAPI_ENDPOINTS = "micronaut.openapi.endpoints";
@@ -548,6 +558,8 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                 Endpoint endpoint = entry.getValue();
                 ClassElement element = endpoint.getClassElement().get();
                 visitorContext.put(MICRONAUT_OPENAPI_ENDPOINT_CLASS_TAGS, endpoint.getTags());
+                visitorContext.put(MICRONAUT_OPENAPI_ENDPOINT_SERVERS, endpoint.getServers());
+                visitorContext.put(MICRONAUT_OPENAPI_ENDPOINT_SECURITY_REQUIREMENTS, endpoint.getSecurityRequirements());
                 visitor.visitClass(element, visitorContext);
                 JavaClassElementExt javaClassElement = new JavaClassElementExt(element, visitorContext);
                 javaClassElement.getMethods().forEach(method -> visitor.visitMethod(method, visitorContext));

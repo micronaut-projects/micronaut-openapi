@@ -30,6 +30,9 @@ import io.micronaut.inject.ast.MethodElement;
 import io.micronaut.inject.visitor.TypeElementVisitor;
 import io.micronaut.inject.visitor.VisitorContext;
 import io.swagger.v3.oas.annotations.Hidden;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
+import io.swagger.v3.oas.models.servers.Server;
+
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -122,5 +125,21 @@ public class OpenApiControllerVisitor extends AbstractOpenApiEndpointVisitor<Con
     @Override
     protected List<io.swagger.v3.oas.models.tags.Tag> classTags(ClassElement element, VisitorContext context) {
         return Collections.emptyList();
+    }
+
+    @Override
+    protected List<Server> methodServers(MethodElement element, VisitorContext context) {
+        return processOpenApiAnnotation(
+                element,
+                context,
+                io.swagger.v3.oas.annotations.servers.Server.class,
+                io.swagger.v3.oas.models.servers.Server.class,
+                Collections.emptyList()
+        );
+    }
+
+    @Override
+    protected List<SecurityRequirement> methodSecurityRequirements(MethodElement element, VisitorContext context) {
+        return readSecurityRequirements(element);
     }
 }
