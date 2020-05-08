@@ -48,19 +48,7 @@ subprojects { Project subproject ->
     }
 
     apply plugin: "groovy"
-    apply plugin: "java"
-    apply plugin: "io.spring.dependency-management"
-
-    dependencyManagement {
-        imports {
-            mavenBom("io.micronaut:micronaut-bom:$micronautVersion") {
-              bomProperty 'jackson.version', jacksonVersion
-              bomProperty 'jackson.databind.version', jacksonVersion
-              bomProperty 'jackson.modules.version', jacksonVersion
-              bomProperty 'jackson.datatype.version', jacksonVersion
-            }
-        }
-    }
+    apply plugin: "java-library"
 
     sourceCompatibility = "1.8"
     targetCompatibility = "1.8"
@@ -118,11 +106,18 @@ subprojects { Project subproject ->
                 if(group == 'org.ow2.asm') {
                     details.useVersion(asmVersion)
                 }
+                if (group.startsWith("com.fasterxml.jackson.")) {
+                    details.useVersion(jacksonVersion)   
+                }
             }
         }
     }
 
     dependencies {
+        annotationProcessor platform("io.micronaut:micronaut-bom:$micronautVersion")
+        testAnnotationProcessor platform("io.micronaut:micronaut-bom:$micronautVersion")
+        implementation platform("io.micronaut:micronaut-bom:$micronautVersion")
+
         documentation "org.codehaus.groovy:groovy-templates:$groovyVersion"
         documentation "org.codehaus.groovy:groovy-dateutil:$groovyVersion"
 

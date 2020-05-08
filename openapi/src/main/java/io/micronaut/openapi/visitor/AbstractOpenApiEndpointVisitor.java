@@ -589,7 +589,7 @@ public abstract class AbstractOpenApiEndpointVisitor<C, E> extends AbstractOpenA
     }
 
     private void readSecurityRequirements(MethodElement element, VisitorContext context, io.swagger.v3.oas.models.Operation swaggerOperation) {
-    	for (SecurityRequirement securityItem : methodSecurityRequirements(element, context)) {
+        for (SecurityRequirement securityItem : methodSecurityRequirements(element, context)) {
             swaggerOperation.addSecurityItem(securityItem);
         }
     }

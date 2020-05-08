@@ -6,9 +6,9 @@ dependencies {
     compileOnly "io.micronaut:micronaut-inject-java"
 
     implementation "io.micronaut:micronaut-http"
-    implementation "io.swagger.core.v3:swagger-core:$swaggerVersion"
-    implementation "io.swagger.core.v3:swagger-models:$swaggerVersion"
-    implementation "io.swagger.core.v3:swagger-annotations:$swaggerVersion"
+    api "io.swagger.core.v3:swagger-core:$swaggerVersion"
+    api "io.swagger.core.v3:swagger-models:$swaggerVersion"
+    api "io.swagger.core.v3:swagger-annotations:$swaggerVersion"
 
     testImplementation "io.micronaut:micronaut-runtime"
     testImplementation "io.micronaut:micronaut-security"
