@@ -1,0 +1,315 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script src="/cdn-cgi/apps/head/3cOPSgo5Omz84ycX7CvigfX4cpw.js"></script><script async src="https://www.googletagmanager.com/gtag/js?id=UA-82213539-2"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'UA-82213539-2');
+    </script>
+    <title>7 Exposing Endpoints 1.5.0</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" href="../css/main.css" type="text/css" media="screen, print" title="Style" charset="utf-8"/>
+    <link rel="stylesheet" href="../css/pdf.css" type="text/css" media="print" title="PDF" charset="utf-8"/>
+    <script type="text/javascript">
+function addJsClass() {
+    var classes = document.body.className.split(" ");
+    classes.push("js");
+    document.body.className = classes.join(" ");
+}
+    </script>
+</head>
+
+<body class="body" onload="addJsClass();">
+<div id="navigation">
+    <div class="navTitle">
+        
+        OpenAPI/Swagger Support
+    </div>
+    <div class="navLinks">
+        <ul>
+            <li>
+                <div id="nav-summary" onmouseover="toggleNavSummary(false)" onmouseout="toggleNavSummary(true)">
+                    <a href="../guide/index.html" class="button">Table of contents</a>
+
+                    <div id="nav-summary-childs" style="display:none;">
+                        
+                        <div class="toc-item" style="margin-left:0"><a href="../guide/introduction.html"><strong>1</strong><span>Introduction</span></a>
+                        </div>
+                        
+                        <div class="toc-item" style="margin-left:0"><a href="../guide/cli.html"><strong>2</strong><span>Using the Micronaut CLI</span></a>
+                        </div>
+                        
+                        <div class="toc-item" style="margin-left:0"><a href="../guide/gettingStarted.html"><strong>3</strong><span>Getting Started with Swagger</span></a>
+                        </div>
+                        
+                        <div class="toc-item" style="margin-left:0"><a href="../guide/configuration.html"><strong>4</strong><span>Open API Processing Options</span></a>
+                        </div>
+                        
+                        <div class="toc-item" style="margin-left:0"><a href="../guide/exposingSwaggerOutput.html"><strong>5</strong><span>Exposing Swagger Output</span></a>
+                        </div>
+                        
+                        <div class="toc-item" style="margin-left:0"><a href="../guide/openApiViews.html"><strong>6</strong><span>Generating OpenAPI Views</span></a>
+                        </div>
+                        
+                        <div class="toc-item" style="margin-left:0"><a href="../guide/endpoints.html"><strong>7</strong><span>Exposing Endpoints</span></a>
+                        </div>
+                        
+                        <div class="toc-item" style="margin-left:0"><a href="../guide/controllersAndSwaggerAnnotations.html"><strong>8</strong><span>Controllers and Swagger Annotations</span></a>
+                        </div>
+                        
+                        <div class="toc-item" style="margin-left:0"><a href="../guide/schemasAndPojos.html"><strong>9</strong><span>Schemas and POJOs</span></a>
+                        </div>
+                        
+                        <div class="toc-item" style="margin-left:0"><a href="../guide/schemasAndMetaAnnotations.html"><strong>10</strong><span>Schemas and Meta Annotations</span></a>
+                        </div>
+                        
+                        <div class="toc-item" style="margin-left:0"><a href="../guide/schemasAndGenerics.html"><strong>11</strong><span>Schemas and Generics</span></a>
+                        </div>
+                        
+                        <div class="toc-item" style="margin-left:0"><a href="../guide/mergingSchemas.html"><strong>12</strong><span>Merging Schemas</span></a>
+                        </div>
+                        
+                        <div class="toc-item" style="margin-left:0"><a href="../guide/repository.html"><strong>13</strong><span>Repository</span></a>
+                        </div>
+                        
+                    </div>
+                </div>
+            </li>
+            <li class="separator selected">
+                <a id="ref-button" onclick="localToggle(); return false;" href="#">Quick Reference</a>
+            </li>
+        </ul>
+    </div>
+
+
+</div>
+
+<table id="colset" border="0" cellpadding="0" cellspacing="0">
+    <tr>
+        <td id="col1">
+            <div id="main" class="corner-all">
+
+                
+                    <div class="toc-item prev-left"><a href="../guide/openApiViews.html">&lt;&lt; <strong>6</strong><span>Generating OpenAPI Views</span></a></div>
+                
+
+                <span id='toggle-col1' class="toggle">(<a href="#" onclick="localToggle(); return false;">Quick Reference</a>)</span>
+
+                
+                    <div class="toc-item next-right"><a href="../guide/controllersAndSwaggerAnnotations.html"><strong>8</strong><span>Controllers and Swagger Annotations</span> >></a></div>
+                
+
+
+                <div class="project">
+                    <h1>7 Exposing Endpoints</h1>
+
+                    <p><strong>Version:</strong> 1.5.0</p>
+                </div>
+
+                
+
+                
+<h1 id="endpoints"><a class="anchor" href="#endpoints"></a>7 Exposing Endpoints</h1>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/endpoints.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>It is possible to expose management Endpoints in the openapi specification file.
+You need to exposed <code>micronaut-management</code> as annotation processor and runtime dependency:</p>
+</div>
+<div class="paragraph">
+<p>        <div class="listingblock multi-language-sample">
+<div class="title"></div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="gradle">annotationProcessor(<span class="hljs-string">"io.micronaut:micronaut-management:1.5.0")</span></code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="title"></div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="maven">&lt;annotationProcessorPaths&gt;
+    &lt;path&gt;
+        &lt;groupId&gt;io.micronaut&lt;/groupId&gt;
+        &lt;artifactId&gt;micronaut-management&lt;/artifactId&gt;
+        &lt;version&gt;1.5.0&lt;/version&gt;
+    &lt;/path&gt;
+&lt;/annotationProcessorPaths&gt;</code></pre>
+</div>
+</div>
+
+        <div class="listingblock multi-language-sample">
+<div class="title"></div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="gradle">implementation(<span class="hljs-string">"io.micronaut:micronaut-management:1.5.0")</span></code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="maven">&lt;dependency&gt;
+    &lt;groupId&gt;io.micronaut&lt;/groupId&gt;
+    &lt;artifactId&gt;micronaut-management&lt;/artifactId&gt;
+    &lt;version&gt;1.5.0&lt;/version&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+</p>
+</div>
+<div class="sect1">
+<h2 id="_user_defined_endpoints">User Defined Endpoints</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To process user defined endpoints simply add:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>endpoints.enabled=true</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>in the <code>openapi.properties</code> file.</p>
+</div>
+<div class="sect2">
+<h3 id="_tags">Tags</h3>
+<div class="paragraph">
+<p>You can also provide some tags for all endpoints with the <code>endpoints.tags=&lt;comma separated list of tags&gt;</code> flag, for instance:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>endpoints.tags=Management Enpoints</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_servers">Servers</h3>
+<div class="paragraph">
+<p>You can also provide some servers for all endpoints with the <code>endpoints.server=&lt;json array of io.swagger.v3.oas.models.servers.Server&gt;</code> flag, for instance:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>endpoints.servers=[ \
+    { \
+      "url": "https://{username}.gigantic-server.com:{port}/{basePath}", \
+      "description": "The production API server", \
+      "variables": { \
+        "username": { \
+          "default": "demo", \
+          "description": "this value is assigned by the service provider, in this example `gigantic-server.com`" \
+        }, \
+        "port": { \
+          "enum": [ \
+            "8443", \
+            "443" \
+          ], \
+          "default": "8443" \
+        }, \
+        "basePath": { \
+          "default": "v2" \
+        } \
+      } \
+    } \
+  ]</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_security_requirements">Security Requirements</h3>
+<div class="paragraph">
+<p>You can also provide some security requirements for all endpoints with the <code>endpoints.security-requirements=&lt;json array of io.swagger.v3.oas.models.security.SecurityRequirement&gt;</code> flag, for instance:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>endpoints.security-requirements=[{"api_key": []}]</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Don&#8217;t forget to declare the referenced <code>SecurityScheme</code>.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_path">Path</h3>
+<div class="paragraph">
+<p>If you are using a custom path for your endpoints use <code>endpoints.path</code> to set it:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>endpoints.path=/endpoints</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_micronaut_built_in_endpoints">Micronaut Built-In Endpoints</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To enable the processing of built-in endpoints (<a href="https://docs.micronaut.io/latest/guide/index.html#providedEndpoints" class="bare">https://docs.micronaut.io/latest/guide/index.html#providedEndpoints</a>), you have to declare them in the
+<code>openapi.properties</code> file:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>endpoints.enabled=true
+endpoints.tags=Managemenent Endpoints
+endpoints.routes.class=io.micronaut.management.endpoint.routes.RoutesEndpoint
+endpoints.beans.class=io.micronaut.management.endpoint.beans.BeansEndpoint
+endpoints.health.class=io.micronaut.management.endpoint.health.HealthEndpoint
+endpoints.loggers.class=io.micronaut.management.endpoint.loggers.LoggersEndpoint
+endpoints.refresh.class=io.micronaut.management.endpoint.refresh.RefreshEndpoint</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The syntax is the following: <code>endpoints.&lt;name&gt;.class=&lt;full class name of the endpoint&gt;</code> where <code>name</code> is an arbitrary name.
+You can also add some tags, servers and security requirements to each endpoint:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>endpoints.refresh.class=io.micronaut.management.endpoint.refresh.RefreshEndpoint
+endpoints.refresh.servers=[{"url": "https://staging.gigantic-server.com/v1", "description": "Staging server"}]
+endpoints.refresh.security-requirements=[{"petstore_auth": ["write:pets", "read:pets"]}]</pre>
+</div>
+</div>
+</div>
+</div>
+
+
+                <div style="clear:both;margin-top:15px;"></div>
+                
+                    <div class="toc-item prev-left"><a href="../guide/openApiViews.html">&lt;&lt; <strong>6</strong><span>Generating OpenAPI Views</span></a></div>
+                
+                    <div class="toc-item next-right"><a href="../guide/controllersAndSwaggerAnnotations.html"><strong>8</strong><span>Controllers and Swagger Annotations</span> >></a></div>
+                
+                <div style="clear:both"></div>
+            </div>
+        </td>
+        <td id="col2">
+            <div class="local clearfix">
+                <div class="local-title">
+                    <a href="../guide/index.html" target="mainFrame">Quick Reference</a>
+                    <span class="toggle">(<a href="#" onclick="localToggle(); return false;">hide</a>)</span>
+                </div>
+                <div class="menu">
+                    
+                </div>
+            </div>
+        </td>
+    </tr>
+</table>
+
+<div id="footer">
+    
+    
+</div>
+
+<script type="text/javascript" src="../js/docs.js"></script>
+
+</body>
+</html>
