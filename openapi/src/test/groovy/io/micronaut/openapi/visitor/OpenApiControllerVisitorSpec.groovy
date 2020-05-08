@@ -21,6 +21,7 @@ import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.Operation
 import io.swagger.v3.oas.models.PathItem
 import io.swagger.v3.oas.models.parameters.Parameter
+import spock.lang.Ignore
 
 class OpenApiControllerVisitorSpec extends AbstractTypeElementSpec {
 
@@ -798,6 +799,8 @@ class MyBean {}
 
     }
 
+	// 'uris' not available in micronaut-core 1.1.4
+	@Ignore
     void "test operation with multiple uris - Issue #220"() {
         given:
         buildBeanDefinition('test.MyBean', '''

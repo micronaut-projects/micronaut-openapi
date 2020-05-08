@@ -15,11 +15,13 @@
  */
 package io.micronaut.openapi.visitor;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 import io.micronaut.inject.ast.ClassElement;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
+import io.swagger.v3.oas.models.servers.Server;
 import io.swagger.v3.oas.models.tags.Tag;
 
 /**
@@ -29,7 +31,9 @@ import io.swagger.v3.oas.models.tags.Tag;
  */
 class Endpoint {
     private Optional<ClassElement> element;
-    private List<Tag> tags = new ArrayList<>(2);
+    private List<Tag> tags = Collections.emptyList();
+    private List<Server> servers = Collections.emptyList();
+    private List<SecurityRequirement> securityRequirements = Collections.emptyList();
 
     /**
      * Sets the ClassElement of the endpoint.
@@ -63,9 +67,42 @@ class Endpoint {
         return tags;
     }
 
+    /**
+     * Returns the servers to add to the Endpoint entry in the spec file.
+     * @return The servers to add to the Endpoint entry in the spec file.
+     */
+    public List<Server> getServers() {
+        return servers;
+    }
+
+    /**
+     * Sets the servers to add to the Endpoint entry in the spec file.
+     * @param servers A list of servers.
+     */
+    public void setServers(List<Server> servers) {
+        this.servers = servers;
+    }
+
+    /**
+     * Returns the securityRequirements to add to the Endpoint entry in the spec file.
+     * @return The securityRequirements to add to the Endpoint entry in the spec file.
+     */
+    public List<SecurityRequirement> getSecurityRequirements() {
+        return securityRequirements;
+    }
+
+    /**
+     * Sets the securityRequirements to add to the Endpoint entry in the spec file.
+     * @param securityRequirements A list of securityRequirements.
+     */
+    public void setSecurityRequirements(List<SecurityRequirement> securityRequirements) {
+        this.securityRequirements = securityRequirements;
+    }
+
     @Override
     public String toString() {
-        return "Endpoint [classElement=" + element + ", tags=" + tags + "]";
+        return "Endpoint [element=" + element + ", tags=" + tags + ", servers=" + servers + ", securityRequirements="
+                + securityRequirements + "]";
     }
 
 }

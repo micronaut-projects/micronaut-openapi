@@ -127,6 +127,22 @@ public abstract class AbstractOpenApiEndpointVisitor<C, E> extends AbstractOpenA
     }
 
     /**
+     * Returns the security requirements at method level.
+     * @param element The MethodElement.
+     * @param context The context.
+     * @return The security requirements.
+     */
+    protected abstract List<SecurityRequirement> methodSecurityRequirements(MethodElement element, VisitorContext context);
+
+    /**
+     * Returns the servers at method level.
+     * @param element The MethodElement.
+     * @param context The context.
+     * @return The servers.
+     */
+    protected abstract List<io.swagger.v3.oas.models.servers.Server> methodServers(MethodElement element, VisitorContext context);
+
+    /**
      * Returns the class tags.
      * @param element The ClassElement.
      * @param context The context.
@@ -230,9 +246,8 @@ public abstract class AbstractOpenApiEndpointVisitor<C, E> extends AbstractOpenA
             swaggerOperation.setOperationId(element.getName());
         }
         readTags(element, swaggerOperation, classTags == null ? Collections.emptyList() : classTags);
-        for (SecurityRequirement securityItem : readSecurityRequirements(element)) {
-            swaggerOperation.addSecurityItem(securityItem);
-        }
+
+        readSecurityRequirements(element, context, swaggerOperation);
 
         readApiResponses(element, context, swaggerOperation);
 
@@ -573,6 +588,12 @@ public abstract class AbstractOpenApiEndpointVisitor<C, E> extends AbstractOpenA
         }
     }
 
+    private void readSecurityRequirements(MethodElement element, VisitorContext context, io.swagger.v3.oas.models.Operation swaggerOperation) {
+    	for (SecurityRequirement securityItem : methodSecurityRequirements(element, context)) {
+            swaggerOperation.addSecurityItem(securityItem);
+        }
+    }
+
     private void processExplode(AnnotationValue<io.swagger.v3.oas.annotations.Parameter> paramAnn, Map<CharSequence, Object> paramValues) {
         Optional<Explode> explode = paramAnn.enumValue("explode", Explode.class);
         if (explode.isPresent()) {
@@ -675,14 +696,7 @@ public abstract class AbstractOpenApiEndpointVisitor<C, E> extends AbstractOpenA
     }
 
     private void readServers(MethodElement element, VisitorContext context, io.swagger.v3.oas.models.Operation swaggerOperation) {
-        List<Server> servers = processOpenApiAnnotation(
-                element,
-                context,
-                io.swagger.v3.oas.annotations.servers.Server.class,
-                io.swagger.v3.oas.models.servers.Server.class,
-                Collections.emptyList()
-        );
-        for (Server server: servers) {
+        for (Server server: methodServers(element, context)) {
             swaggerOperation.addServersItem(server);
         }
     }
