@@ -1,11 +1,11 @@
 name: Release Notes
 on:
   pull_request:
-    types: [closed]
+    types: [closed,labeled]
     branches:
       - master
   issues:
-    types: [closed,reopened]
+    types: [closed,reopened,labeled]
   push:
     branches:
       - master
