@@ -11,18 +11,11 @@ on:
       - master
     paths:
       - ".github/workflows/release-notes.yml"
+      - ".github/release-drafter.yml"
 jobs:
-  release_notes:
+  update_release_draft:
     runs-on: ubuntu-latest
     steps:
-      - uses: micronaut-projects/github-actions/release-notes@master
-        id: release_notes
-      - uses: ncipollo/release-action@v1
-        with:
-          allowUpdates: true
-          commit: master
-          draft: true
-          name: Micronaut OpenAPI ${{ steps.release_notes.outputs.next_version }}
-          tag: v${{ steps.release_notes.outputs.next_version }}
-          bodyFile: CHANGELOG.md
-          token: ${{ secrets.GITHUB_TOKEN }}
+      - uses: release-drafter/release-drafter@v5
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
