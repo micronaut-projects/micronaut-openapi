@@ -66,7 +66,7 @@ subprojects { Project subproject ->
     targetCompatibility = "1.8"
 
     if (!subproject.name.contains('example')) {
-        apply from:"https://raw.githubusercontent.com/micronaut-projects/micronaut-build/3ca806eb776b72483a4c0fda5ff1a5caebe0c281/publishing.gradle"
+        apply from:"https://raw.githubusercontent.com/micronaut-projects/micronaut-build/${micronautBuildVersion}/publishing.gradle"
         apply plugin: "checkstyle"
 
         checkstyle {
