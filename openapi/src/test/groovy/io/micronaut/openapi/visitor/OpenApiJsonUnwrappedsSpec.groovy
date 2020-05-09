@@ -97,6 +97,7 @@ class Test {
     @JsonUnwrapped(prefix = "aaa", suffix = "zzz")
     public Pet petRenamed;
 }
+
 @javax.inject.Singleton
 class MyBean {}
 ''')

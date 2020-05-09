@@ -135,7 +135,6 @@ import io.swagger.v3.oas.annotations.media.*;
  * @author graemerocher
  * @since 1.0
  */
-
 @Controller("/pets")
 interface PetOperations<T extends Pet> {
 
@@ -329,7 +328,6 @@ import io.swagger.v3.oas.annotations.media.*;
  * @author graemerocher
  * @since 1.0
  */
-
 @Controller("/pets")
 interface PetOperations<T extends Pet> {
 
@@ -387,6 +385,7 @@ class Pet {
         return name;
     }
 }
+
 @javax.inject.Singleton
 class MyBean {}
 ''')
@@ -423,7 +422,6 @@ import io.swagger.v3.oas.annotations.media.*;
  * @author graemerocher
  * @since 1.0
  */
-
 @Controller("/pets")
 interface PetOperations<T extends Pet> {
 
@@ -478,6 +476,7 @@ class Pet {
         return name;
     }
 }
+
 @javax.inject.Singleton
 class MyBean {}
 ''')
@@ -551,7 +550,6 @@ import io.swagger.v3.oas.annotations.media.*;
  * @author graemerocher
  * @since 1.0
  */
-
 @Controller("/pets")
 interface PetOperations<T extends Pet> {
 
@@ -628,6 +626,7 @@ class Pet {
         return name;
     }
 }
+
 @javax.inject.Singleton
 class MyBean {}
 ''')
@@ -740,7 +739,6 @@ import io.swagger.v3.oas.annotations.media.*;
  * @author graemerocher
  * @since 1.0
  */
-
 @Controller("/pets")
 interface PetOperations<T extends Pet> {
 
@@ -818,6 +816,7 @@ class Pet {
 enum PetType {
     DOG, CAT;
 }
+
 @javax.inject.Singleton
 class MyBean {}
 ''')
@@ -991,7 +990,6 @@ import io.swagger.v3.oas.annotations.media.*;
  * @author graemerocher
  * @since 1.0
  */
-
 @Controller("/pets")
 interface PetOperations<T extends Pet> {
 
@@ -1022,6 +1020,7 @@ class Pet {
         return name;
     }
 }
+
 @javax.inject.Singleton
 class MyBean {}
 ''')
@@ -1209,7 +1208,6 @@ class Pet {
     public String getName() {
         return name;
     }
-
 
     /**
      * The Pet Tags

@@ -50,11 +50,11 @@ import io.swagger.v3.oas.annotations.security.*;
 import io.swagger.v3.oas.annotations.media.*;
 import io.swagger.v3.oas.annotations.enums.*;
 import com.fasterxml.jackson.annotation.*;
+
 /**
  * @author graemerocher
  * @since 1.0
  */
-
 @Controller("/networks")
 interface NetworkOperations {
 
@@ -94,6 +94,7 @@ interface NetworkOperations {
 class Greeting {
     public String message;
 }
+
 @javax.inject.Singleton
 class MyBean {}
 ''')
@@ -142,11 +143,11 @@ import io.swagger.v3.oas.annotations.security.*;
 import io.swagger.v3.oas.annotations.media.*;
 import io.swagger.v3.oas.annotations.enums.*;
 import com.fasterxml.jackson.annotation.*;
+
 /**
  * @author graemerocher
  * @since 1.0
  */
-
 @Controller("/networks")
 interface NetworkOperations {
 
@@ -160,6 +161,7 @@ interface NetworkOperations {
 class Greeting {
     public String message;
 }
+
 @javax.inject.Singleton
 class MyBean {}
 ''')
@@ -202,11 +204,11 @@ import io.swagger.v3.oas.annotations.security.*;
 import io.swagger.v3.oas.annotations.media.*;
 import io.swagger.v3.oas.annotations.enums.*;
 import com.fasterxml.jackson.annotation.*;
+
 /**
  * @author graemerocher
  * @since 1.0
  */
-
 @Controller("/networks")
 interface NetworkOperations {
 
@@ -220,6 +222,7 @@ interface NetworkOperations {
 class Greeting {
     public String message;
 }
+
 @javax.inject.Singleton
 class MyBean {}
 ''')
@@ -262,11 +265,11 @@ import io.swagger.v3.oas.annotations.security.*;
 import io.swagger.v3.oas.annotations.media.*;
 import io.swagger.v3.oas.annotations.enums.*;
 import com.fasterxml.jackson.annotation.*;
+
 /**
  * @author graemerocher
  * @since 1.0
  */
-
 @Controller("/networks")
 interface NetworkOperations {
 
@@ -280,6 +283,7 @@ interface NetworkOperations {
 class Greeting {
     public String message;
 }
+
 @javax.inject.Singleton
 class MyBean {}
 ''')
@@ -317,11 +321,11 @@ import io.micronaut.http.annotation.*;
 import io.micronaut.http.*;
 import io.swagger.v3.oas.annotations.*;
 import io.swagger.v3.oas.annotations.parameters.*;
+
 /**
  * @author HoaBo
  * @since 1.0
  */
-
 @Controller("/networks")
 interface NetworkOperations {
 
@@ -331,6 +335,7 @@ interface NetworkOperations {
             @Parameter(hidden=true) String fooBar
     );
 }
+
 @javax.inject.Singleton
 class MyBean {}
 ''')
@@ -365,11 +370,11 @@ import io.swagger.v3.oas.annotations.responses.*;
 import io.swagger.v3.oas.annotations.security.*;
 import io.swagger.v3.oas.annotations.media.*;
 import io.swagger.v3.oas.annotations.enums.*;
+
 /**
  * @author graemerocher
  * @since 1.0
  */
-
 @Controller("/")
 interface Test {
 
@@ -474,11 +479,11 @@ import io.swagger.v3.oas.annotations.security.*;
 import io.swagger.v3.oas.annotations.media.*;
 import io.swagger.v3.oas.annotations.enums.*;
 import com.fasterxml.jackson.annotation.*;
+
 /**
  * @author graemerocher
  * @since 1.0
  */
-
 @Controller("/networks")
 interface NetworkOperations {
 
@@ -517,6 +522,7 @@ interface NetworkOperations {
 class Greeting {
     public String message;
 }
+
 @javax.inject.Singleton
 class MyBean {}
 ''')

@@ -43,11 +43,11 @@ import java.util.List;
 import io.swagger.v3.oas.annotations.media.*;
 import io.swagger.v3.oas.annotations.*;
 import com.fasterxml.jackson.annotation.*;
+
 /**
  * @author graemerocher
  * @since 1.0
  */
-
 @Controller("/pets")
 interface PetOperations<T extends Pet> {
 
@@ -74,6 +74,7 @@ class Pet {
     // static should not be included
     public static String CONST;
 }
+
 @javax.inject.Singleton
 class MyBean {}
 ''')

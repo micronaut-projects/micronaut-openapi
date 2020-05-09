@@ -79,7 +79,6 @@ interface PetOperations {
     HttpResponse<Pet> save(@Body Pet pet);
 }
 
-
 @javax.inject.Singleton
 class MyBean {}
 ''')
@@ -236,7 +235,6 @@ interface PetOperations {
     @Post
     HttpResponse<Pet> save(@Body Pet pet);
 }
-
 
 @javax.inject.Singleton
 class MyBean {}

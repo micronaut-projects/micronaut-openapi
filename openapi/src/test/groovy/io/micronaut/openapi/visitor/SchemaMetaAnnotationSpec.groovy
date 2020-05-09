@@ -52,7 +52,6 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * @author graemerocher
  * @since 1.0
  */
-
 @Controller("/pets")
 interface MyOps {
 
@@ -106,7 +105,6 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * @author graemerocher
  * @since 1.0
  */
-
 @Controller("/pets")
 interface MyOps {
 
@@ -121,6 +119,7 @@ interface MyOps {
 @interface MyAnn {
 
 }
+
 @javax.inject.Singleton
 class MyBean {}
 ''')
@@ -172,7 +171,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
  * @author graemerocher
  * @since 1.0
  */
-
 @Controller("/pets")
 interface MyOps {
 
@@ -189,6 +187,7 @@ interface MyOps {
 @interface MyAnn {
 
 }
+
 @javax.inject.Singleton
 class MyBean {}
 ''')
