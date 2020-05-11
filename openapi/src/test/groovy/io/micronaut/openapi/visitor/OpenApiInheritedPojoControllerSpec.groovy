@@ -565,8 +565,6 @@ import io.swagger.v3.oas.annotations.media.*;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.micronaut.http.MediaType;
 
-
-
 @Controller("/pets")
 interface PetOperations {
 
@@ -686,8 +684,6 @@ import java.util.List;
 import io.swagger.v3.oas.annotations.media.*;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.micronaut.http.MediaType;
-
-
 
 @Controller("/pets")
 interface PetOperations {

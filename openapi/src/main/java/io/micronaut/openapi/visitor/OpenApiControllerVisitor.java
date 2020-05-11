@@ -56,7 +56,7 @@ public class OpenApiControllerVisitor extends AbstractOpenApiEndpointVisitor<Con
 
     @Override
     protected boolean ignore(MethodElement element, VisitorContext context) {
-        return element.isAnnotationPresent(Hidden.class);
+        return element.isPrivate() || element.isStatic() || element.isAnnotationPresent(Hidden.class);
     }
 
     @Override

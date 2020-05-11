@@ -56,6 +56,7 @@ import io.swagger.v3.oas.annotations.callbacks.Callback;
 import io.swagger.v3.oas.annotations.enums.Explode;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.tags.Tags;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.PathItem;
@@ -763,36 +764,25 @@ public abstract class AbstractOpenApiEndpointVisitor<C, E> extends AbstractOpenA
         return callbacks;
     }
 
-    private void readTags(MethodElement element, io.swagger.v3.oas.models.Operation swaggerOperation, List<io.swagger.v3.oas.models.tags.Tag> classTags) {
-        List<AnnotationValue<Tag>> tagAnnotations = element.getAnnotationValuesByType(Tag.class);
-        if (CollectionUtils.isNotEmpty(tagAnnotations)) {
-            for (AnnotationValue<Tag> r : tagAnnotations) {
-                r.get("name", String.class).ifPresent(swaggerOperation::addTagsItem);
-            }
-        }
-        if (!classTags.isEmpty()) {
-            List<String> operationTags = swaggerOperation.getTags();
-            if (operationTags == null) {
-                operationTags = new ArrayList<>(classTags.size());
-                swaggerOperation.setTags(operationTags);
-            }
-            for (io.swagger.v3.oas.models.tags.Tag tag : classTags) {
-                if (!operationTags.contains(tag.getName())) {
-                    operationTags.add(tag.getName());
-                }
-            }
+    private void addTagIfNotPresent(String tag, io.swagger.v3.oas.models.Operation swaggerOperation) {
+        List<String> tags = swaggerOperation.getTags();
+        if (tags == null || ! tags.contains(tag)) {
+            swaggerOperation.addTagsItem(tag);
         }
     }
 
+    private void readTags(MethodElement element, io.swagger.v3.oas.models.Operation swaggerOperation, List<io.swagger.v3.oas.models.tags.Tag> classTags) {
+        element.getAnnotationValuesByType(Tag.class).forEach(av -> av.get("name", String.class).ifPresent(swaggerOperation::addTagsItem));
+        // only way to get inherited tags
+        element.getValues(Tags.class, AnnotationValue.class).forEach((k, v) -> v.get("name", String.class).ifPresent(name -> addTagIfNotPresent((String) name, swaggerOperation)));
+
+        classTags.forEach(tag -> addTagIfNotPresent(tag.getName(), swaggerOperation));
+    }
+
     private List<io.swagger.v3.oas.models.tags.Tag> readTags(ClassElement element, VisitorContext context) {
-        List<io.swagger.v3.oas.models.tags.Tag> tagList = new ArrayList<>();
-        List<AnnotationValue<Tag>> tagAnnotations = element.getAnnotationValuesByType(Tag.class);
-        if (CollectionUtils.isNotEmpty(tagAnnotations)) {
-            for (AnnotationValue<Tag> tag : tagAnnotations) {
-                toValue(tag.getValues(), context, io.swagger.v3.oas.models.tags.Tag.class).ifPresent(tagList::add);
-            }
-        }
-        return tagList;
+        return element.getAnnotationValuesByType(Tag.class).stream()
+                .map(av -> toValue(av.getValues(), context, io.swagger.v3.oas.models.tags.Tag.class))
+                .filter(Optional::isPresent).map(Optional::get).collect(Collectors.toList());
     }
 
     private Content buildContent(Element definingElement, ClassElement type, List<MediaType> mediaTypes, OpenAPI openAPI, VisitorContext context) {
