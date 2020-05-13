@@ -551,18 +551,17 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                 && endpointsCfg.isEnabled()
                 && ! endpointsCfg.getEndpoints().isEmpty()) {
             OpenApiEndpointVisitor visitor = new OpenApiEndpointVisitor();
-            endpointsCfg.getEndpoints().entrySet().stream()
-            .filter(entry -> entry.getValue().getClassElement().isPresent()
-                    && "io.micronaut.annotation.processing.visitor.JavaClassElement".equals(entry.getValue().getClassElement().get().getClass().getName()))
-            .forEach(entry -> {
-                Endpoint endpoint = entry.getValue();
+            endpointsCfg.getEndpoints().values().stream()
+            .filter(endpoint -> endpoint.getClassElement().isPresent()
+                    && "io.micronaut.annotation.processing.visitor.JavaClassElement".equals(endpoint.getClassElement().get().getClass().getName()))
+            .forEach(endpoint -> {
                 ClassElement element = endpoint.getClassElement().get();
                 visitorContext.put(MICRONAUT_OPENAPI_ENDPOINT_CLASS_TAGS, endpoint.getTags());
                 visitorContext.put(MICRONAUT_OPENAPI_ENDPOINT_SERVERS, endpoint.getServers());
                 visitorContext.put(MICRONAUT_OPENAPI_ENDPOINT_SECURITY_REQUIREMENTS, endpoint.getSecurityRequirements());
                 visitor.visitClass(element, visitorContext);
                 JavaClassElementExt javaClassElement = new JavaClassElementExt(element, visitorContext);
-                javaClassElement.getMethods().forEach(method -> visitor.visitMethod(method, visitorContext));
+                javaClassElement.getCandidateMethods().forEach(method -> visitor.visitMethod(method, visitorContext));
             });
         }
     }

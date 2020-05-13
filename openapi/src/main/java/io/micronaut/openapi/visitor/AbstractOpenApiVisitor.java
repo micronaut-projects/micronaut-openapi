@@ -1211,6 +1211,16 @@ abstract class AbstractOpenApiVisitor  {
         }
     }
 
+    /**
+     * Returns true if classElement is a JavaClassElement.
+     * @param classElement A ClassElement.
+     * @param context The context.
+     * @return true if classElement is a JavaClassElement.
+     */
+    static boolean isJavaElement(ClassElement classElement, VisitorContext context) {
+        return "io.micronaut.annotation.processing.visitor.JavaClassElement".equals(classElement.getClass().getName()) && "io.micronaut.annotation.processing.visitor.JavaVisitorContext".equals(context.getClass().getName());
+    }
+
     private void populateSchemaProperties(OpenAPI openAPI, VisitorContext context, Element type, Schema schema, List<MediaType> mediaTypes) {
         ClassElement classElement = null;
         if (type instanceof ClassElement) {
@@ -1222,7 +1232,7 @@ abstract class AbstractOpenApiVisitor  {
         if (classElement != null) {
             List<PropertyElement> beanProperties = classElement.getBeanProperties().stream().filter(p -> ! "groovy.lang.MetaClass".equals(p.getType().getName())).collect(Collectors.toList());
             processPropertyElements(openAPI, context, type, schema, beanProperties, mediaTypes);
-            if ("io.micronaut.annotation.processing.visitor.JavaClassElement".equals(classElement.getClass().getName()) && "io.micronaut.annotation.processing.visitor.JavaVisitorContext".equals(context.getClass().getName())) {
+            if (isJavaElement(classElement, context)) {
                 List<PropertyElement> fluentMethodsProperties = new JavaClassElementExt(classElement, context).getFluentBeanProperties();
                 processPropertyElements(openAPI, context, type, schema, fluentMethodsProperties, mediaTypes);
             }
