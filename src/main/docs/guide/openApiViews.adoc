@@ -21,6 +21,16 @@ JAVA_TOOL_OPTIONS=-Dmicronaut.openapi.views.spec=redoc.enabled=true,rapidoc.enab
         ./gradlew --no-daemon clean assemble
 ----
 
+or in build.gradle as well:
+[source,kotlin]
+----
+kapt {
+    arguments {
+        arg("micronaut.openapi.views.spec", "redoc.enabled=true,rapidoc.enabled=true,swagger-ui.enabled=true,swagger-ui.theme=flattop")
+    }
+}
+
+----
 or in Gradle for Java projects:
 
 .Gradle
