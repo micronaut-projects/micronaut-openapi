@@ -538,7 +538,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                     StandardOpenOption.CREATE)) {
                 visitorContext.info("Writing OpenAPI YAML to destination: " + specPath);
                 yamlMapper.writeValue(writer, openAPI);
-                renderViews(documentTitle, fileName, specPath.getParent(), visitorContext);
+                renderViews(documentTitle, specPath.getFileName().toString(), specPath.getParent(), visitorContext);
             } catch (Exception e) {
                 visitorContext.warn("Unable to generate swagger.yml: " + specPath + " - " + e.getMessage(),
                         classElement);
