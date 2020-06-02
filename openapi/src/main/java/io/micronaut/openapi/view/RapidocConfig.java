@@ -134,7 +134,7 @@ final class RapidocConfig extends AbstractViewConfig implements Renderer {
      * Rapidoc render styles.
      */
     enum RenderStyle {
-        READ, VIEW;
+        READ, VIEW, FOCUSED;
 
         @Override
         public String toString() {
