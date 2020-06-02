@@ -27,7 +27,7 @@ import spock.lang.Specification
 class OpenApiOperationViewRenderSpec extends Specification {
     def cleanup() {
         def outputDir = new File("output")
-        outputDir.deleteDir()
+        //outputDir.deleteDir()
     }
 
     void "test render OpenApiView specification"() {
@@ -135,4 +135,5 @@ class OpenApiOperationViewRenderSpec extends Specification {
         outputDir.resolve("rapidoc").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains(cfg.getSpecURL())
         outputDir.resolve("swagger-ui").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains(cfg.getSpecURL())
     }
+
 }

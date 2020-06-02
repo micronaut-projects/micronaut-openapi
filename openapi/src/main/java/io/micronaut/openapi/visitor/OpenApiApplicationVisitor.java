@@ -332,7 +332,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         switch (name.toUpperCase(Locale.US)) {
         case "SNAKE_CASE": return (PropertyNamingStrategyBase) PropertyNamingStrategy.SNAKE_CASE;
         case "UPPER_CAMEL_CASE":  return (PropertyNamingStrategyBase) PropertyNamingStrategy.UPPER_CAMEL_CASE;
-        case "LOWER_CAMEL_CASE":  return (PropertyNamingStrategyBase) PropertyNamingStrategy.LOWER_CAMEL_CASE;
+        case "LOWER_CAMEL_CASE":  return new LowerCamelCasePropertyNamingStrategy();
         case "LOWER_CASE":  return (PropertyNamingStrategyBase) PropertyNamingStrategy.LOWER_CASE;
         case "KEBAB_CASE":  return (PropertyNamingStrategyBase) PropertyNamingStrategy.KEBAB_CASE;
         default: return  null;
@@ -413,14 +413,19 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             visitorContext.info("Using " + namingStrategyName + " property naming strategy.");
             openAPI.getComponents().getSchemas().values().forEach(model -> {
                 Map<String, Schema> properties = model.getProperties();
-                if (properties == null) {
-                    return;
+                if (properties != null) {
+                    Map<String, Schema> newProperties = properties.entrySet().stream()
+                            .collect(Collectors.toMap(entry -> propertyNamingStrategy.translate(entry.getKey()),
+                                    Map.Entry::getValue, (prop1, prop2) -> prop1, LinkedHashMap::new));
+                    model.getProperties().clear();
+                    model.setProperties(newProperties);
                 }
-                Map<String, Schema> newProperties = properties.entrySet().stream()
-                        .collect(Collectors.toMap(entry -> propertyNamingStrategy.translate(entry.getKey()),
-                                Map.Entry::getValue, (prop1, prop2) -> prop1, LinkedHashMap::new));
-                model.getProperties().clear();
-                model.setProperties(newProperties);
+                List<String> required = model.getRequired();
+                if (required != null) {
+                    List<String> updatedRequired = required.stream().map(propertyNamingStrategy::translate).collect(Collectors.toList());
+                    required.clear();
+                    required.addAll(updatedRequired);
+                }
             });
         }
     }
@@ -504,10 +509,6 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
 
     @Override
     public void finish(VisitorContext visitorContext) {
-        if (classElement == null) {
-            return;
-        }
-
         Optional<OpenAPI> attr = visitorContext.get(ATTR_OPENAPI, OpenAPI.class);
         if (!attr.isPresent()) {
             return;
@@ -565,4 +566,14 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             });
         }
     }
+
+    static class LowerCamelCasePropertyNamingStrategy extends PropertyNamingStrategyBase {
+
+        @Override
+        public String translate(String propertyName) {
+            return propertyName;
+        }
+
+    }
+
 }
