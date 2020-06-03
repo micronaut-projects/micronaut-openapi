@@ -151,6 +151,18 @@ The string syntax is a series of comma-separated key-value pairs, to enable and 
 </div>
 </div>
 <div class="paragraph">
+<p>or in build.gradle as well:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">kapt {
+    arguments {
+        arg("micronaut.openapi.views.spec", "redoc.enabled=true,rapidoc.enabled=true,swagger-ui.enabled=true,swagger-ui.theme=flattop")
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
 <p>or in Gradle for Java projects:</p>
 </div>
 <div class="listingblock">
