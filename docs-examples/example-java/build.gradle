@@ -16,7 +16,6 @@ dependencies {
     testRuntime "ch.qos.logback:logback-classic:1.2.3"
 }
 
-licenseTest.enabled = false
 
 compileJava.options.compilerArgs += '-parameters'
 compileTestJava.options.compilerArgs += '-parameters'

@@ -18,8 +18,6 @@ dependencies {
     testImplementation 'io.kotlintest:kotlintest-runner-junit5:3.4.2'
 }
 
-licenseTest.enabled = false
-
 test {
     useJUnitPlatform()
 
