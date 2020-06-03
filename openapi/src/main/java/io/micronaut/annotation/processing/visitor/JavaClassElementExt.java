@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ * https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -32,6 +32,7 @@ import javax.lang.model.element.*;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.type.TypeVariable;
+import javax.lang.model.type.WildcardType;
 import javax.lang.model.util.ElementFilter;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
@@ -42,6 +43,7 @@ import io.micronaut.core.annotation.AnnotationMetadata;
 import io.micronaut.core.annotation.Internal;
 import io.micronaut.inject.ast.ClassElement;
 import io.micronaut.inject.ast.MethodElement;
+import io.micronaut.inject.ast.ParameterElement;
 import io.micronaut.inject.ast.PropertyElement;
 import io.micronaut.inject.visitor.VisitorContext;
 
@@ -78,6 +80,57 @@ public class JavaClassElementExt extends JavaClassElement {
         this.classElement = (TypeElement) jce.getNativeType();
         this.visitorContext = visitorContext;
         this.genericTypeInfo = jce.getGenericTypeInfo();
+    }
+
+    private static boolean sameType(String type, DeclaredType dt) {
+        Element elt = dt.asElement();
+        return (elt instanceof TypeElement) && type.equals(((TypeElement) elt).getQualifiedName().toString());
+    }
+
+    /**
+     * Returns the return type of the method. Takes care of kotlin Continuation.
+     *
+     * @param method method.
+     * @param visitorContext The visitor context.
+     * @return A ClassElement.
+     */
+    public static ClassElement getReturnType(MethodElement method, VisitorContext visitorContext) {
+        ParameterElement[] parameters = method.getParameters();
+        boolean isSuspend = parameters.length > 0 && parameters[parameters.length - 1].getGenericType().isAssignable("kotlin.coroutines.Continuation");
+        if (isSuspend) {
+            return continuationReturnType(parameters[parameters.length - 1], visitorContext, Collections.emptyMap());
+        }
+        return method.getReturnType();
+    }
+
+    /**
+     * Returns the return type of the method. Takes care of kotlin Continuation.
+     *
+     * @param method method.
+     * @param visitorContext The visitor context.
+     * @return A ClassElement.
+     */
+    public static ClassElement getGenericReturnType(MethodElement method, VisitorContext visitorContext) {
+        ParameterElement[] parameters = method.getParameters();
+        boolean isSuspend = parameters.length > 0 && parameters[parameters.length - 1].getGenericType().isAssignable("kotlin.coroutines.Continuation");
+        if (isSuspend) {
+            return continuationReturnType(parameters[parameters.length - 1], visitorContext, ((JavaClassElement) method.getOwningType()).getGenericTypeInfo());
+        }
+        return method.getGenericReturnType();
+    }
+
+    private static ClassElement continuationReturnType(ParameterElement parameter, VisitorContext visitorContext, Map<String, Map<String, TypeMirror>> info) {
+        JavaVisitorContext jcontext = (JavaVisitorContext) visitorContext;
+        VariableElement varElement = (VariableElement) parameter.getNativeType();
+        DeclaredType dType = (DeclaredType) varElement.asType();
+        WildcardType wType = (WildcardType) dType.getTypeArguments().iterator().next();
+        TypeMirror tm = wType.getSuperBound();
+        // check for Void
+        if ((tm instanceof DeclaredType) && sameType("kotlin.Unit", (DeclaredType) tm)) {
+            return new JavaVoidElement();
+        } else {
+            return ((JavaParameterElement) parameter).parameterizedClassElement(tm, jcontext, info);
+        }
     }
 
     private static String findDocumentation(Set<TypeMirror> superTypes, ExecutableElement method, Elements elements, Types types) {

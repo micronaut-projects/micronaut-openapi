@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ * https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -538,7 +538,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                     StandardOpenOption.CREATE)) {
                 visitorContext.info("Writing OpenAPI YAML to destination: " + specPath);
                 yamlMapper.writeValue(writer, openAPI);
-                renderViews(documentTitle, fileName, specPath.getParent(), visitorContext);
+                renderViews(documentTitle, specPath.getFileName().toString(), specPath.getParent(), visitorContext);
             } catch (Exception e) {
                 visitorContext.warn("Unable to generate swagger.yml: " + specPath + " - " + e.getMessage(),
                         classElement);

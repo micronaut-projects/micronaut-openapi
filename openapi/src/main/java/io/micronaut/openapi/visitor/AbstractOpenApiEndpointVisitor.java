@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ * https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,6 +18,7 @@ package io.micronaut.openapi.visitor;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.JsonNode;
 
+import io.micronaut.annotation.processing.visitor.JavaClassElementExt;
 import io.micronaut.context.env.DefaultPropertyPlaceholderResolver;
 import io.micronaut.context.env.PropertyPlaceholderResolver;
 import io.micronaut.core.annotation.AnnotationValue;
@@ -76,7 +77,6 @@ import io.swagger.v3.oas.models.servers.Server;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-
 import java.io.IOException;
 import java.security.Principal;
 import java.util.ArrayList;
@@ -587,16 +587,7 @@ public abstract class AbstractOpenApiEndpointVisitor<C, E> extends AbstractOpenA
             } else {
                 okResponse.setDescription(javadocDescription.getReturnDescription());
             }
-
-            ClassElement returnType = element.getGenericReturnType();
-            if (returnType.isAssignable("io.reactivex.Completable")) {
-                returnType = null;
-            } else if (isResponseType(returnType)) {
-                returnType = returnType.getFirstTypeArgument().orElse(returnType);
-            } else if (isSingleResponseType(returnType)) {
-                returnType = returnType.getFirstTypeArgument().get();
-                returnType = returnType.getFirstTypeArgument().orElse(returnType);
-            }
+            ClassElement returnType = returnType(element, context);
 
             if (returnType != null) {
                 List<MediaType> producesMediaTypes = producesMediaTypes(element);
@@ -610,6 +601,20 @@ public abstract class AbstractOpenApiEndpointVisitor<C, E> extends AbstractOpenA
             }
             responses.put(ApiResponses.DEFAULT, okResponse);
         }
+    }
+
+    private ClassElement returnType(MethodElement element, VisitorContext context) {
+        ClassElement returnType = element.getOwningType().isAssignable("io.micronaut.annotation.processing.visitor.JavaClassElement") ? JavaClassElementExt.getGenericReturnType(element, context)
+                : element.getGenericReturnType();
+        if (returnType.isAssignable("io.reactivex.Completable")) {
+            returnType = null;
+        } else if (isResponseType(returnType)) {
+            returnType = returnType.getFirstTypeArgument().orElse(returnType);
+        } else if (isSingleResponseType(returnType)) {
+            returnType = returnType.getFirstTypeArgument().get();
+            returnType = returnType.getFirstTypeArgument().orElse(returnType);
+        }
+        return returnType;
     }
 
     private Map<String, UriMatchVariable> pathVariables(UriMatchTemplate matchTemplate) {
