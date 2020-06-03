@@ -39,12 +39,6 @@
         <property name="basedir" value="${basedir}"/>
     -->
 
-    <module name="RegexpHeader">
-        <!-- Requires a licence copyright notice in each file. -->
-        <property name="headerFile"
-                  value="${config_loc}/HEADER"/>
-    </module>
-
     <property name="fileExtensions" value="java, properties, xml"/>
 
     <!-- Checks that a package-info.java file exists for each package.     -->
@@ -83,15 +77,12 @@
     <module name="SuppressWarningsFilter"/>
 
     <!-- See http://checkstyle.sourceforge.net/config_filters.html#SuppressionFilter -->
-
     <module name="SuppressionFilter">
         <property name="file" value="${config_loc}/suppressions.xml"/>
         <property name="optional" value="false"/>
     </module>
 
     <module name="TreeWalker">
-
-        <module name="SuppressionCommentFilter"/>
 
         <!-- Needed for SuppressWarningsFilter -->
         <module name="SuppressWarningsHolder"/>
@@ -171,8 +162,8 @@
         <module name="IllegalInstantiation"/>
         <module name="InnerAssignment"/>
         <!--<module name="MagicNumber">-->
-        <!--<property name="ignoreFieldDeclaration" value="true"/>-->
-        <!--<property name="ignoreHashCodeMethod" value="true"/>-->
+            <!--<property name="ignoreFieldDeclaration" value="true"/>-->
+            <!--<property name="ignoreHashCodeMethod" value="true"/>-->
         <!--</module>-->
         <module name="MissingSwitchDefault"/>
         <module name="SimplifyBooleanExpression"/>
