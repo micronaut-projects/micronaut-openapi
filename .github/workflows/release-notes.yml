@@ -35,7 +35,7 @@ jobs:
           has_changelog=$([ -f CHANGELOG.md ] && echo "true" || echo "false")
           echo ::set-output name=changelog::${has_changelog}
       - uses: ncipollo/release-action@v1
-        if: steps.check_changelog.outputs.changelog == "true"
+        if: steps.check_changelog.outputs.changelog == 'true'
         with:
           allowUpdates: true
           commit: ${{ env.githubBranch }}
@@ -45,6 +45,6 @@ jobs:
           bodyFile: CHANGELOG.md
           token: ${{ secrets.GITHUB_TOKEN }}
       - uses: release-drafter/release-drafter@v5
-        if: steps.check_changelog.outputs.changelog == "false"
+        if: steps.check_changelog.outputs.changelog == 'false'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
