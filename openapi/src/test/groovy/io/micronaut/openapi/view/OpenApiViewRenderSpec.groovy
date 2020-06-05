@@ -12,7 +12,7 @@ import spock.lang.Specification
 class OpenApiOperationViewRenderSpec extends Specification {
     def cleanup() {
         def outputDir = new File("output")
-        outputDir.deleteDir()
+        //outputDir.deleteDir()
     }
 
     void "test render OpenApiView specification"() {

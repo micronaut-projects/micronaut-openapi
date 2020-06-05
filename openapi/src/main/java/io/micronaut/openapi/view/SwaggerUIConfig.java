@@ -44,8 +44,10 @@ final class SwaggerUIConfig extends AbstractViewConfig implements Renderer {
         VALID_OPTIONS.put("docExpansion", AbstractViewConfig::asQuotedString);
         VALID_OPTIONS.put("filter", AbstractViewConfig::asBoolean);
         VALID_OPTIONS.put("maxDisplayedTags", AbstractViewConfig::asString);
+        VALID_OPTIONS.put("operationsSorter", AbstractViewConfig::asString);
         VALID_OPTIONS.put("showExtensions", AbstractViewConfig::asBoolean);
         VALID_OPTIONS.put("showCommonExtensions", AbstractViewConfig::asBoolean);
+        VALID_OPTIONS.put("tagsSorter", AbstractViewConfig::asString);
         VALID_OPTIONS.put("oauth2RedirectUrl", AbstractViewConfig::asQuotedString);
         VALID_OPTIONS.put("showMutatedRequest", AbstractViewConfig::asBoolean);
         VALID_OPTIONS.put("supportedSubmitMethods", AbstractViewConfig::asString);
