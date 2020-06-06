@@ -92,17 +92,21 @@ import java.util.stream.Collectors;
 
 /**
  * A {@link TypeElementVisitor} the builds the Swagger model from Micronaut controllers at compile time.
- * @param <C> The annotation required on the class. Use {@link Object} for all classes.
- * @param <E> The annotation required on the element. Use {@link Object} for all elements.
+ *
  * @author graemerocher
  * @since 1.0
  */
 @Experimental
-public abstract class AbstractOpenApiEndpointVisitor<C, E> extends AbstractOpenApiVisitor implements TypeElementVisitor<C, E> {
+abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
     protected List<io.swagger.v3.oas.models.tags.Tag> classTags;
     protected PropertyPlaceholderResolver propertyPlaceholderResolver;
 
-    @Override
+    /**
+     * Executed when a class is encountered that matches the <C> generic.
+     *
+     * @param element The element
+     * @param context The visitor context
+     */
     public void visitClass(ClassElement element, VisitorContext context) {
         if (ignore(element, context)) {
             return;
@@ -222,7 +226,12 @@ public abstract class AbstractOpenApiEndpointVisitor<C, E> extends AbstractOpenA
                !parameter.getType().isAssignable("io.micronaut.http.BasicAuth");
     }
 
-    @Override
+    /**
+     * Executed when a method is encountered that matches the <E> generic.
+     *
+     * @param element The element
+     * @param context The visitor context
+     */
     public void visitMethod(MethodElement element, VisitorContext context) {
         if (ignore(element, context)) {
             return;

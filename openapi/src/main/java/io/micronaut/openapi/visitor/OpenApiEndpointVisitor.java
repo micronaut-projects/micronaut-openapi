@@ -52,8 +52,7 @@ import java.util.stream.Collectors;
  * @since 1.4
  */
 @Experimental
-public class OpenApiEndpointVisitor extends AbstractOpenApiEndpointVisitor<Endpoint, Object>
-        implements TypeElementVisitor<Endpoint, Object> {
+public class OpenApiEndpointVisitor extends AbstractOpenApiEndpointVisitor implements TypeElementVisitor<Endpoint, Object> {
     private String id;
     private boolean skip;
     private HttpMethodDesciption methodDescription;
