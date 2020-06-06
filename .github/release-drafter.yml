@@ -6,7 +6,9 @@ categories:
   - title: 🐛 Bug Fixes
     label: "type: bug"
   - title: 🛠 Dependency upgrades
-    label: "type: dependencies"
+    label: "type: dependency-upgrade"
+  - title: ❌ Breaking Changes
+    label: "type: breaking"    
 change-template: '- $TITLE @$AUTHOR (#$NUMBER)'
 template: |
   ## Changes
