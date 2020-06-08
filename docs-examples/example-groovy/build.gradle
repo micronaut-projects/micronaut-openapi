@@ -6,10 +6,10 @@ plugins {
 dependencies {
     testImplementation project(":openapi")
     testImplementation "io.micronaut:micronaut-runtime"
-    testImplementation "io.micronaut:micronaut-runtime-groovy"
+    testImplementation "io.micronaut.groovy:micronaut-runtime-groovy"
     testImplementation "io.micronaut:micronaut-validation"
     testImplementation "io.swagger.core.v3:swagger-annotations"
-    testImplementation "io.micronaut.configuration:micronaut-hibernate-validator"
+    testImplementation "io.micronaut.beanvalidation:micronaut-hibernate-validator"
     testCompileOnly "io.micronaut:micronaut-inject-groovy"
     testImplementation "org.testcontainers:spock:1.14.3"
     testImplementation("org.spockframework:spock-core") {

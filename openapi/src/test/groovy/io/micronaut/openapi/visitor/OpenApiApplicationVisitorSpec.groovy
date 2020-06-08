@@ -102,6 +102,7 @@ interface HelloWorldApi {
 }
 
 @Controller("/hello")
+@Tag(name = "HelloWorldController")
 class HelloWorldController implements HelloWorldApi {
     @Override
     public HttpResponse<String> helloWorld() {

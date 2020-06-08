@@ -3,7 +3,6 @@ plugins {
     id "org.jetbrains.kotlin.kapt" version "1.3.72"
 }
 
-
 dependencies {
     kapt project(":openapi")
     kapt "io.micronaut:micronaut-inject-java"
@@ -11,7 +10,8 @@ dependencies {
     kaptTest "io.micronaut:micronaut-inject-java"
     testImplementation "io.swagger.core.v3:swagger-annotations"
     testImplementation "io.micronaut:micronaut-runtime"
-    testImplementation "io.micronaut.configuration:micronaut-hibernate-validator"
+    testImplementation "io.micronaut:micronaut-validation"
+    testImplementation "io.micronaut.beanvalidation:micronaut-hibernate-validator"
     testRuntimeOnly "ch.qos.logback:logback-classic:1.2.3"
     testImplementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
     testImplementation "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
