@@ -568,6 +568,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
     }
 
     static class LowerCamelCasePropertyNamingStrategy extends PropertyNamingStrategyBase {
+        private static final long serialVersionUID = -2750503285679998670L;
 
         @Override
         public String translate(String propertyName) {

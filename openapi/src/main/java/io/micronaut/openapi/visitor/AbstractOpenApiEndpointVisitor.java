@@ -604,7 +604,7 @@ public abstract class AbstractOpenApiEndpointVisitor<C, E> extends AbstractOpenA
     }
 
     private ClassElement returnType(MethodElement element, VisitorContext context) {
-        ClassElement returnType = element.getOwningType().isAssignable("io.micronaut.annotation.processing.visitor.JavaClassElement") ? JavaClassElementExt.getGenericReturnType(element, context)
+        ClassElement returnType = isJavaElement(element.getOwningType(), context) ? JavaClassElementExt.getGenericReturnType(element, context)
                 : element.getGenericReturnType();
         if (returnType.isAssignable("io.reactivex.Completable")) {
             returnType = null;
