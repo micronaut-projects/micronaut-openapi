@@ -47,7 +47,7 @@ import java.util.Optional;
  * @since 1.0
  */
 @Experimental
-public class OpenApiControllerVisitor extends AbstractOpenApiEndpointVisitor<Controller, HttpMethodMapping> implements TypeElementVisitor<Controller, HttpMethodMapping> {
+public class OpenApiControllerVisitor extends AbstractOpenApiEndpointVisitor implements TypeElementVisitor<Controller, HttpMethodMapping> {
 
     @Override
     protected boolean ignore(ClassElement element, VisitorContext context) {
