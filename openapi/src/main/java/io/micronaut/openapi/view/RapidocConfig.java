@@ -46,6 +46,7 @@ final class RapidocConfig extends AbstractViewConfig implements Renderer {
         VALID_OPTIONS.put("primary-color", AbstractViewConfig::asString);
         VALID_OPTIONS.put("regular-font", AbstractViewConfig::asString);
         VALID_OPTIONS.put("mono-font", AbstractViewConfig::asString);
+        VALID_OPTIONS.put("font-size", new EnumConverter<>(FontSize.class));
         VALID_OPTIONS.put("nav-bg-color", AbstractViewConfig::asString);
         VALID_OPTIONS.put("nav-text-color", AbstractViewConfig::asString);
         VALID_OPTIONS.put("nav-hover-bg-color", AbstractViewConfig::asString);
@@ -80,6 +81,18 @@ final class RapidocConfig extends AbstractViewConfig implements Renderer {
         DEFAULT_OPTIONS.put("layout", Layout.ROW);
         DEFAULT_OPTIONS.put("sort-tags", Boolean.TRUE);
         DEFAULT_OPTIONS.put("sort-endpoints-by", EndPoint.METHOD);
+    }
+
+    /**
+     * Rapidoc font-size.
+     */
+    enum FontSize {
+        DEFAULT, LARGE, LARGEST;
+
+        @Override
+        public String toString() {
+            return this.name().toLowerCase(Locale.US);
+        }
     }
 
     /**
