@@ -75,7 +75,7 @@ public class JavaClassElementExt extends JavaClassElement {
      * @param visitorContext     The visitor context
      */
     private JavaClassElementExt(JavaClassElement jce, JavaVisitorContext visitorContext) {
-        super((TypeElement) jce.getNativeType(), jce.getAnnotationMetadata(), visitorContext);
+        super((TypeElement) jce.getNativeType(), jce.getAnnotationMetadata(), visitorContext, jce.getGenericTypeInfo());
         this.javaClassElement = jce;
         this.classElement = (TypeElement) jce.getNativeType();
         this.visitorContext = visitorContext;
@@ -85,6 +85,18 @@ public class JavaClassElementExt extends JavaClassElement {
     private static boolean sameType(String type, DeclaredType dt) {
         Element elt = dt.asElement();
         return (elt instanceof TypeElement) && type.equals(((TypeElement) elt).getQualifiedName().toString());
+    }
+
+    @Override
+    public Optional<ClassElement> getSuperType() {
+        TypeElement te = (TypeElement) getNativeType();
+        TypeMirror dt = te.getSuperclass();
+        // if super type has type arguments, then build a parameterized ClassElement
+        if (dt instanceof DeclaredType && !((DeclaredType) dt).getTypeArguments().isEmpty()) {
+            ClassElement sup = parameterizedClassElement(dt, visitorContext, visitorContext.getGenericUtils().buildGenericTypeArgumentElementInfo(te));
+            return Optional.of(new JavaClassElementExt(sup, visitorContext));
+        }
+        return super.getSuperType();
     }
 
     /**

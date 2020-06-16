@@ -554,7 +554,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             OpenApiEndpointVisitor visitor = new OpenApiEndpointVisitor();
             endpointsCfg.getEndpoints().values().stream()
             .filter(endpoint -> endpoint.getClassElement().isPresent()
-                    && "io.micronaut.annotation.processing.visitor.JavaClassElement".equals(endpoint.getClassElement().get().getClass().getName()))
+                    && isJavaElement(endpoint.getClassElement().get(), visitorContext))
             .forEach(endpoint -> {
                 ClassElement element = endpoint.getClassElement().get();
                 visitorContext.put(MICRONAUT_OPENAPI_ENDPOINT_CLASS_TAGS, endpoint.getTags());

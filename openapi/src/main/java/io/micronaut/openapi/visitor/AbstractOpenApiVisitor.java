@@ -564,7 +564,6 @@ abstract class AbstractOpenApiVisitor  {
                 isObservable = type.isAssignable("io.reactivex.Observable") && !type.isAssignable("reactor.core.publisher.Mono");
                 type = type.getFirstTypeArgument().orElse(null);
             }
-
             if (type != null) {
 
                 String typeName = type.getName();
@@ -1218,7 +1217,8 @@ abstract class AbstractOpenApiVisitor  {
      * @return true if classElement is a JavaClassElement.
      */
     static boolean isJavaElement(ClassElement classElement, VisitorContext context) {
-        return "io.micronaut.annotation.processing.visitor.JavaClassElement".equals(classElement.getClass().getName()) && "io.micronaut.annotation.processing.visitor.JavaVisitorContext".equals(context.getClass().getName());
+        return ("io.micronaut.annotation.processing.visitor.JavaClassElement".equals(classElement.getClass().getName())
+                || "io.micronaut.annotation.processing.visitor.JavaClassElementExt".equals(classElement.getClass().getName())) && "io.micronaut.annotation.processing.visitor.JavaVisitorContext".equals(context.getClass().getName());
     }
 
     private void populateSchemaProperties(OpenAPI openAPI, VisitorContext context, Element type, Schema schema, List<MediaType> mediaTypes) {
