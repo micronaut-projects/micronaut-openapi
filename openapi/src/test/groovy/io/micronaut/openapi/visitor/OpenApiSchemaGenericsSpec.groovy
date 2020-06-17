@@ -130,7 +130,7 @@ class MyBean {}
         operation
         operation.responses.size() == 1
         openAPI.components.schemas['Pet'].properties['age'].type == 'integer'
-        openAPI.components.schemas['Response<Pet>'].properties['result'].$ref == '#/components/schemas/Pet'
+        openAPI.components.schemas['Response_Pet_'].properties['result'].$ref == '#/components/schemas/Pet'
     }
 
 
@@ -195,8 +195,8 @@ class MyBean {}
         operation
         operation.responses.size() == 1
         openAPI.components.schemas['Pet'].properties['age'].type == 'integer'
-        openAPI.components.schemas['Response<List<Pet>>'].properties['result'].type == 'array'
-        openAPI.components.schemas['Response<List<Pet>>'].properties['result'].items.$ref == '#/components/schemas/Pet'
+        openAPI.components.schemas['Response_List_Pet__'].properties['result'].type == 'array'
+        openAPI.components.schemas['Response_List_Pet__'].properties['result'].items.$ref == '#/components/schemas/Pet'
     }
 
     void "test parse the OpenAPI with response that contains generic types and custom schema name"() {
