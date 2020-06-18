@@ -1195,7 +1195,7 @@ abstract class AbstractOpenApiVisitor  {
         final Iterator<ClassElement> i = typeArguments.values().iterator();
         if (i.hasNext()) {
 
-            builder.append('<');
+            builder.append('_');
             while (i.hasNext()) {
                 final ClassElement ce = i.next();
                 builder.append(ce.getSimpleName());
@@ -1203,11 +1203,11 @@ abstract class AbstractOpenApiVisitor  {
                     computeNameWithGenerics(ce, builder, computed);
                 }
                 if (i.hasNext()) {
-                    builder.append(',');
+                    builder.append('.');
                 }
             }
 
-            builder.append('>');
+            builder.append('_');
         }
     }
 

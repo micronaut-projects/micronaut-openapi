@@ -84,7 +84,7 @@ class MyBean {}
         openAPI.components.schemas['Pet'].properties['zoned'].format == 'date-time'
         openAPI.components.schemas['Pet'].properties['instant'].type == 'string'
         openAPI.components.schemas['Pet'].properties['instant'].format == 'date-time'
-        openAPI.components.schemas['Response<Pet>'].properties['result'].$ref == '#/components/schemas/Pet'
+        openAPI.components.schemas['Response_Pet_'].properties['result'].$ref == '#/components/schemas/Pet'
     }
 
     void "test parse the OpenAPI with response that contains Java 8 date types"() {
@@ -140,7 +140,7 @@ class MyBean {}
         operation.responses.size() == 1
         openAPI.components.schemas['Pet'].properties['local'].type == 'string'
         openAPI.components.schemas['Pet'].properties['local'].format == 'date'
-        openAPI.components.schemas['Response<Pet>'].properties['result'].$ref == '#/components/schemas/Pet'
+        openAPI.components.schemas['Response_Pet_'].properties['result'].$ref == '#/components/schemas/Pet'
     }
 
 }
