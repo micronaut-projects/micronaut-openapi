@@ -404,9 +404,9 @@ class MyBean {}
         operation
         operation.responses.size() == 1
         operation.responses.default.content['application/json'].schema.$ref == '#/components/schemas/Time'
-        openAPI.components.schemas['Quantity<Time,TimeUnit>'].type == 'object'
-        openAPI.components.schemas['Quantity<Time,TimeUnit>'].properties['amount'].type == 'number'
-        openAPI.components.schemas['Quantity<Time,TimeUnit>'].properties['unit'].$ref == '#/components/schemas/TimeUnit'
+        openAPI.components.schemas['Quantity_Time.TimeUnit_'].type == 'object'
+        openAPI.components.schemas['Quantity_Time.TimeUnit_'].properties['amount'].type == 'number'
+        openAPI.components.schemas['Quantity_Time.TimeUnit_'].properties['unit'].$ref == '#/components/schemas/TimeUnit'
         openAPI.components.schemas['TimeUnit'].type == 'string'
         openAPI.components.schemas['TimeUnit'].enum.size() == 6
         openAPI.components.schemas['TimeUnit'].enum[0] == 'Millisecond'
@@ -415,6 +415,6 @@ class MyBean {}
         openAPI.components.schemas['TimeUnit'].enum[3] == 'Hour'
         openAPI.components.schemas['TimeUnit'].enum[4] == 'Day'
         openAPI.components.schemas['TimeUnit'].enum[5] == 'Week'
-        openAPI.components.schemas['Time'].allOf[0].$ref == '#/components/schemas/Quantity<Time,TimeUnit>'
+        openAPI.components.schemas['Time'].allOf[0].$ref == '#/components/schemas/Quantity_Time.TimeUnit_'
     }
 }
