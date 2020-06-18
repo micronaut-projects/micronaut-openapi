@@ -47,7 +47,6 @@ import io.micronaut.inject.ast.ClassElement;
 import io.micronaut.inject.ast.Element;
 import io.micronaut.inject.ast.MethodElement;
 import io.micronaut.inject.ast.ParameterElement;
-import io.micronaut.inject.visitor.TypeElementVisitor;
 import io.micronaut.inject.visitor.VisitorContext;
 import io.micronaut.openapi.javadoc.JavadocDescription;
 import io.micronaut.openapi.javadoc.JavadocParser;
@@ -318,7 +317,9 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
         if (isIgnoredParameterType(parameterType)) {
             return;
         }
-
+        if (isJavaElement(parameterType, context)) {
+            parameterType = new JavaClassElementExt(parameterType, context);
+        }
         if (permitsRequestBody && swaggerOperation.getRequestBody() == null) {
             readSwaggerRequestBody(parameter, context).ifPresent(swaggerOperation::setRequestBody);
         }
@@ -597,7 +598,6 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
                 okResponse.setDescription(javadocDescription.getReturnDescription());
             }
             ClassElement returnType = returnType(element, context);
-
             if (returnType != null) {
                 List<MediaType> producesMediaTypes = producesMediaTypes(element);
                 Content content;
@@ -622,6 +622,9 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
         } else if (isSingleResponseType(returnType)) {
             returnType = returnType.getFirstTypeArgument().get();
             returnType = returnType.getFirstTypeArgument().orElse(returnType);
+        }
+        if (isJavaElement(returnType, context)) {
+            returnType = new JavaClassElementExt(returnType, context);
         }
         return returnType;
     }
