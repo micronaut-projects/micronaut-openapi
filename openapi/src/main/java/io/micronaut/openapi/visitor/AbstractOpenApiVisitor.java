@@ -788,14 +788,7 @@ abstract class AbstractOpenApiVisitor  {
             element.findAnnotation(Pattern.class).flatMap(p -> p.get("regexp", String.class)).ifPresent(finalSchemaToBind::setPattern);
         }
 
-        Optional<String> documentation = element.getDocumentation();
-        if (StringUtils.isEmpty(schemaToBind.getDescription())) {
-            String doc = documentation.orElse(null);
-            if (doc != null) {
-                JavadocDescription desc = new JavadocParser().parse(doc);
-                schemaToBind.setDescription(desc.getMethodDescription());
-            }
-        }
+        setSchemaDocumentation(element, schemaToBind);
         if (element.isAnnotationPresent(Deprecated.class)) {
             schemaToBind.setDeprecated(true);
         }
@@ -808,6 +801,17 @@ abstract class AbstractOpenApiVisitor  {
             schemaToBind.setNullable(true);
         }
         return schemaToBind;
+    }
+
+    private void setSchemaDocumentation(Element element, Schema schemaToBind) {
+        if (StringUtils.isEmpty(schemaToBind.getDescription())) {
+            Optional<String> documentation = element.getDocumentation();
+            String doc = documentation.orElse(null);
+            if (doc != null) {
+                JavadocDescription desc = new JavadocParser().parse(doc);
+                schemaToBind.setDescription(desc.getMethodDescription());
+            }
+        }
     }
 
     /**
@@ -1083,8 +1087,10 @@ abstract class AbstractOpenApiVisitor  {
             }
         }
         if (schema != null) {
+            setSchemaDocumentation(type, schema);
             Schema schemaRef = new Schema();
             schemaRef.set$ref(schemaRef(schema.getName()));
+            schemaRef.setDescription(schema.getDescription());
             return schemaRef;
         }
         return null;
