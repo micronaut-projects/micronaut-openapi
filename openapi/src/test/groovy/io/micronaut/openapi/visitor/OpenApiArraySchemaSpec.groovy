@@ -73,7 +73,7 @@ class MyBean {}
         openAPI.components.schemas['Pets'].properties['pets'].description == 'a list of Pets'
         openAPI.components.schemas['Pets'].properties['pets'].minItems == 2
         openAPI.components.schemas['Pets'].properties['pets'].items.$ref == '#/components/schemas/Pet'
-        openAPI.components.schemas['Pets'].properties['pets'].items.description == null
+        openAPI.components.schemas['Pets'].properties['pets'].items.description == 'Pet'
         openAPI.components.schemas['Pets'].properties['pets'].items.nullable == null
 
         openAPI.components.schemas['Pets'].properties['ids'].nullable == false

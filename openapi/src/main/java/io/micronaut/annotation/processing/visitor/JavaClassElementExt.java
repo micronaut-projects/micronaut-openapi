@@ -83,8 +83,13 @@ public class JavaClassElementExt extends JavaClassElement {
     }
 
     private static boolean sameType(String type, DeclaredType dt) {
-        Element elt = dt.asElement();
-        return (elt instanceof TypeElement) && type.equals(((TypeElement) elt).getQualifiedName().toString());
+        final Element elt = dt.asElement();
+        return elt instanceof TypeElement && type.equals(((TypeElement) elt).getQualifiedName().toString());
+    }
+
+    @Override
+    public Optional<String> getDocumentation() {
+        return Optional.ofNullable(visitorContext.getElements().getDocComment(classElement));
     }
 
     @Override
@@ -138,7 +143,7 @@ public class JavaClassElementExt extends JavaClassElement {
         WildcardType wType = (WildcardType) dType.getTypeArguments().iterator().next();
         TypeMirror tm = wType.getSuperBound();
         // check for Void
-        if ((tm instanceof DeclaredType) && sameType("kotlin.Unit", (DeclaredType) tm)) {
+        if (tm instanceof DeclaredType && sameType("kotlin.Unit", (DeclaredType) tm)) {
             return new JavaVoidElement();
         } else {
             return ((JavaParameterElement) parameter).parameterizedClassElement(tm, jcontext, info);

@@ -641,12 +641,12 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
     private JavadocDescription getMethodDescription(MethodElement element,
             io.swagger.v3.oas.models.Operation swaggerOperation) {
         String descr = description(element);
-        JavadocDescription javadocDescription = element.getDocumentation().map(s -> new JavadocParser().parse(s))
-                .orElse(null);
         if (StringUtils.isNotEmpty(descr) && StringUtils.isEmpty(swaggerOperation.getDescription())) {
             swaggerOperation.setDescription(descr);
             swaggerOperation.setSummary(descr);
         }
+        JavadocDescription javadocDescription = element.getDocumentation().map(s -> new JavadocParser().parse(s))
+                .orElse(null);
         if (javadocDescription != null && StringUtils.isEmpty(swaggerOperation.getDescription())) {
             swaggerOperation.setDescription(javadocDescription.getMethodDescription());
             swaggerOperation.setSummary(javadocDescription.getMethodDescription());
