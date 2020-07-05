@@ -110,6 +110,7 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
         if (ignore(element, context)) {
             return;
         }
+        incrementVisitedElements(context);
         processSecuritySchemes(element, context);
         processTags(element, context);
     }
@@ -235,7 +236,6 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
         if (ignore(element, context)) {
             return;
         }
-
         HttpMethod httpMethod = httpMethod(element);
         if (httpMethod == null) {
             return;
@@ -244,6 +244,7 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
         if (!matchTemplates.hasNext()) {
             return;
         }
+        incrementVisitedElements(context);
         UriMatchTemplate matchTemplate = matchTemplates.next();
         PathItem pathItem = resolvePathItem(context, matchTemplate);
         OpenAPI openAPI = resolveOpenAPI(context);
