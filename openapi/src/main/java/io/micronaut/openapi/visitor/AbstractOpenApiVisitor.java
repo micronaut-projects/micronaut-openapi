@@ -113,6 +113,8 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Future;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -126,10 +128,12 @@ import static java.util.stream.Collectors.toMap;
  * @since 1.0
  */
 abstract class AbstractOpenApiVisitor  {
-
     static final String ATTR_TEST_MODE = "io.micronaut.OPENAPI_TEST";
     static final String ATTR_OPENAPI = "io.micronaut.OPENAPI";
     static OpenAPI testReference;
+
+    private static final Lock VISITED_ELEMENTS_LOCK = new ReentrantLock();
+    private static final String ATTR_VISITED_ELEMENTS = "io.micronaut.OPENAPI.visited.elements";
 
     /**
      * The JSON mapper.
@@ -144,6 +148,43 @@ abstract class AbstractOpenApiVisitor  {
      * Stores the current in progress type.
      */
     private List<String> inProgressSchemas = new ArrayList<>(10);
+
+    /**
+     * Increments the number of visited elements.
+     * @param context The context
+     */
+    void incrementVisitedElements(VisitorContext context) {
+        VISITED_ELEMENTS_LOCK.lock();
+        try {
+            context.put(ATTR_VISITED_ELEMENTS, Integer.valueOf(getVisitedElements(context).intValue() + 1));
+        } finally {
+            VISITED_ELEMENTS_LOCK.unlock();
+        }
+
+    }
+
+    /**
+     * Returns the number of visited elements.
+     * @param context The context.
+     * @return The number of visited elements.
+     */
+    int visitedElements(VisitorContext context) {
+        VISITED_ELEMENTS_LOCK.lock();
+        try {
+            return getVisitedElements(context);
+        } finally {
+            VISITED_ELEMENTS_LOCK.unlock();
+        }
+    }
+
+    private static Integer getVisitedElements(VisitorContext context) {
+        Integer visitedElements = context.get(ATTR_VISITED_ELEMENTS, Integer.class).orElse(null);
+        if (visitedElements == null) {
+            visitedElements = Integer.valueOf(0);
+            context.put(ATTR_VISITED_ELEMENTS, visitedElements);
+        }
+        return visitedElements;
+    }
 
     /**
      * Convert the given map to a JSON node.
