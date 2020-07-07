@@ -177,6 +177,19 @@ The string syntax is a series of comma-separated key-value pairs, to enable and 
 </div>
 </div>
 <div class="paragraph">
+<p>or in Gradle for Groovy projects:</p>
+</div>
+<div class="listingblock">
+<div class="title">Gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">tasks.withType(GroovyCompile) {
+    groovyOptions.forkOptions.jvmArgs.add('-Dgroovy.parameters=true')
+    groovyOptions.forkOptions.jvmArgs.add('-Dmicronaut.openapi.views.spec=rapidoc.enabled=true,swagger-ui.enabled=true,swagger-ui.theme=flattop')
+    ...
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
 <p>or in Maven:</p>
 </div>
 <div class="listingblock">
