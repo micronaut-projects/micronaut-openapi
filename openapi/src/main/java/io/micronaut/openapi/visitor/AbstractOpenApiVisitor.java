@@ -1277,10 +1277,18 @@ abstract class AbstractOpenApiVisitor  {
         }
 
         if (classElement != null) {
-            List<PropertyElement> beanProperties = classElement.getBeanProperties().stream().filter(p -> ! "groovy.lang.MetaClass".equals(p.getType().getName())).collect(Collectors.toList());
+            List<PropertyElement> beanProperties;
+            final boolean isJavaElement = isJavaElement(classElement, context);
+            JavaClassElementExt jce = null;
+            if (isJavaElement) {
+                jce = new JavaClassElementExt(classElement, context);
+                beanProperties = jce.beanProperties();
+            } else {
+                beanProperties = classElement.getBeanProperties().stream().filter(p -> ! "groovy.lang.MetaClass".equals(p.getType().getName())).collect(Collectors.toList());
+            }
             processPropertyElements(openAPI, context, type, schema, beanProperties, mediaTypes);
-            if (isJavaElement(classElement, context)) {
-                List<PropertyElement> fluentMethodsProperties = new JavaClassElementExt(classElement, context).getFluentBeanProperties();
+            if (isJavaElement) {
+                List<PropertyElement> fluentMethodsProperties = jce.fluentBeanProperties();
                 processPropertyElements(openAPI, context, type, schema, fluentMethodsProperties, mediaTypes);
             }
 

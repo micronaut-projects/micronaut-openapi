@@ -19,7 +19,6 @@ import static javax.lang.model.type.TypeKind.NONE;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -38,9 +37,9 @@ import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 
 import io.micronaut.annotation.processing.AnnotationUtils;
-import io.micronaut.annotation.processing.PublicMethodVisitor;
 import io.micronaut.core.annotation.AnnotationMetadata;
 import io.micronaut.core.annotation.Internal;
+import io.micronaut.core.naming.NameUtils;
 import io.micronaut.inject.ast.ClassElement;
 import io.micronaut.inject.ast.MethodElement;
 import io.micronaut.inject.ast.ParameterElement;
@@ -102,6 +101,19 @@ public class JavaClassElementExt extends JavaClassElement {
             return Optional.of(new JavaClassElementExt(sup, visitorContext));
         }
         return super.getSuperType();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof JavaClassElementExt) {
+            return javaClassElement.equals(((JavaClassElementExt) o).javaClassElement);
+        }
+        return javaClassElement.equals(o);
+    }
+
+    @Override
+    public int hashCode() {
+        return javaClassElement.hashCode();
     }
 
     /**
@@ -200,6 +212,36 @@ public class JavaClassElementExt extends JavaClassElement {
                 && !method.getSimpleName().toString().contains("$");
     }
 
+    private static boolean isCandidateBeanMethod(ExecutableElement method) {
+        Set<Modifier> modifiers = method.getModifiers();
+        boolean ok = modifiers.contains(Modifier.PUBLIC) && ! modifiers.contains(Modifier.ABSTRACT) && !modifiers.contains(Modifier.STATIC) && !modifiers.contains(Modifier.PRIVATE)
+                && !method.getSimpleName().toString().contains("$");
+        if (! ok) {
+             return false;
+        }
+        String methodName = method.getSimpleName().toString();
+        if (methodName.contains("$")) {
+            return false;
+        }
+
+        if (NameUtils.isGetterName(methodName) && method.getParameters().isEmpty()) {
+            return true;
+        } else {
+            return NameUtils.isSetterName(methodName) && method.getParameters().size() == 1;
+        }
+    }
+
+    private static boolean isCandidateFluentBeanMethod(ExecutableElement method, Set<String> fieldNames) {
+        Set<Modifier> modifiers = method.getModifiers();
+        boolean ok = modifiers.contains(Modifier.PUBLIC) && ! modifiers.contains(Modifier.ABSTRACT) && !modifiers.contains(Modifier.STATIC) && !modifiers.contains(Modifier.PRIVATE)
+                && !method.getSimpleName().toString().contains("$");
+        if (! ok) {
+             return false;
+        }
+        String methodName = method.getSimpleName().toString();
+        return fieldNames.contains(methodName)  && (method.getParameters().isEmpty() || method.getParameters().size() == 1);
+    }
+
     /**
      * Returns the methods of this class.
      *
@@ -220,203 +262,183 @@ public class JavaClassElementExt extends JavaClassElement {
     }
 
     /**
+     * Returns the bean properties.
+     *
+     * @return The bean properties.
+     */
+    public List<PropertyElement> beanProperties() {
+        Map<String, BeanPropertyData> props = new LinkedHashMap<>();
+        Map<String, VariableElement> fields = new LinkedHashMap<>();
+        Elements elements = visitorContext.getElements();
+        ElementFilter.fieldsIn(elements.getAllMembers(classElement)).forEach(v -> fields.put(v.getSimpleName().toString(), v));
+        ElementFilter.methodsIn(elements.getAllMembers(classElement)).stream()
+                // skip java.lang.Object methods
+                .filter(method -> !isObjectClassMethod(method, elements))
+                .filter(JavaClassElementExt::isCandidateBeanMethod)
+                .forEach(executableElement -> beanProperty(props, executableElement));
+        return processPropertyElements(props, fields);
+    }
+
+    /**
      * Returns fluent accessor methods.
      *
      * @return fluent accessor methods
      */
-    public List<PropertyElement> getFluentBeanProperties() {
-        List<BeanPropertyData> props = new ArrayList<>();
+    public List<PropertyElement> fluentBeanProperties() {
+        Map<String, BeanPropertyData> props = new LinkedHashMap<>();
         Map<String, VariableElement> fields = new LinkedHashMap<>();
-        Set<String> fieldNames = new HashSet<>();
-
-        classElement.asType().accept(new FluentBeanPropertiesVisitor(visitorContext.getTypes(), fieldNames, props, fields), null);
-        return processFields(props, fields);
-
+        Elements elements = visitorContext.getElements();
+        ElementFilter.fieldsIn(elements.getAllMembers(classElement)).forEach(v -> fields.put(v.getSimpleName().toString(), v));
+        Set<String> fieldNames = fields.keySet();
+        ElementFilter.methodsIn(elements.getAllMembers(classElement)).stream()
+                // skip java.lang.Object methods
+                .filter(method -> !isObjectClassMethod(method, elements))
+                .filter(method -> isCandidateFluentBeanMethod(method, fieldNames))
+                .forEach(executableElement -> fluentBeanProperty(props, executableElement));
+        return processPropertyElements(props, fields);
     }
 
-    private List<PropertyElement> processFields(List<BeanPropertyData> props, Map<String, VariableElement> fields) {
+    private List<PropertyElement> processPropertyElements(Map<String, BeanPropertyData> props, Map<String, VariableElement> fields) {
         if (props.isEmpty()) {
             return Collections.emptyList();
         }
         List<PropertyElement> propertyElements = new ArrayList<>();
-        for (BeanPropertyData value : props) {
-            String propertyName = value.propertyName;
-
+        for (Map.Entry<String, BeanPropertyData> entry : props.entrySet()) {
+            String propertyName = entry.getKey();
+            BeanPropertyData value = entry.getValue();
+            final VariableElement fieldElement = fields.get(propertyName);
             if (value.getter != null) {
                 final AnnotationMetadata annotationMetadata;
-                final VariableElement fieldElement = fields.get(propertyName);
                 if (fieldElement == null) {
-                    annotationMetadata = visitorContext.getAnnotationUtils().newAnnotationBuilder()
-                            .buildForMethod(value.getter);
+                    annotationMetadata = visitorContext
+                            .getAnnotationUtils()
+                            .newAnnotationBuilder().buildForMethod(value.getter);
                 } else {
-                    annotationMetadata = visitorContext.getAnnotationUtils().getAnnotationMetadata(fieldElement,
-                            value.getter);
+                    annotationMetadata = visitorContext.getAnnotationUtils().getAnnotationMetadata(fieldElement, value.getter);
                 }
-
-                JavaPropertyElement propertyElement = new JavaPropertyElement(
-                        value.declaringType == null ? this.javaClassElement : value.declaringType, value.getter,
-                        annotationMetadata, propertyName, value.type, value.setter == null, visitorContext) {
-                    @Override
-                    public Optional<String> getDocumentation() {
-                        Elements elements = visitorContext.getElements();
-                        String docComment = elements.getDocComment(value.getter);
-                        return Optional.ofNullable(docComment);
-                    }
-
-                    @Override
-                    public Optional<MethodElement> getWriteMethod() {
-                        if (value.setter != null) {
-                            return Optional.of(new JavaMethodElement(
-                                    JavaClassElementExt.this.javaClassElement, value.setter, visitorContext
-                                            .getAnnotationUtils().newAnnotationBuilder().buildForMethod(value.setter),
-                                    visitorContext));
-                        }
-                        return Optional.empty();
-                    }
-
-                    @Override
-                    public Optional<MethodElement> getReadMethod() {
-                        return Optional.of(new JavaMethodElement(JavaClassElementExt.this.javaClassElement,
-                                value.getter, annotationMetadata, visitorContext));
-                    }
-                };
-                propertyElements.add(propertyElement);
+                propertyElements.add(toPropertyElement(propertyName, value, annotationMetadata));
             }
         }
         return Collections.unmodifiableList(propertyElements);
     }
 
-    /**
-     * Find fluent bean properties.
-     * @author croudet
-     * @since 1.5.1
-     */
-    private final class FluentBeanPropertiesVisitor extends PublicMethodVisitor<Object, Object> {
-        private final Set<String> fieldNames;
-        private final List<BeanPropertyData> props;
-        private final Map<String, VariableElement> fields;
-
-        private FluentBeanPropertiesVisitor(Types types, Set<String> fieldNames, List<BeanPropertyData> props,
-                Map<String, VariableElement> fields) {
-            super(types);
-            this.fieldNames = fieldNames;
-            this.props = props;
-            this.fields = fields;
-        }
-
-        @Override
-        protected boolean isAcceptable(Element element) {
-            if (element.getKind() == ElementKind.FIELD) {
-                fieldNames.add(element.getSimpleName().toString());
-                return true;
+    private JavaPropertyElement toPropertyElement(String propertyName, BeanPropertyData value, final AnnotationMetadata annotationMetadata) {
+        return new JavaPropertyElement(
+                value.declaringType == null ? this : value.declaringType,
+                value.getter,
+                annotationMetadata,
+                propertyName,
+                value.type,
+                value.setter == null,
+                visitorContext) {
+            @Override
+            public Optional<String> getDocumentation() {
+                Elements elements = visitorContext.getElements();
+                String docComment = elements.getDocComment(value.getter);
+                return Optional.ofNullable(docComment);
             }
-            if (element.getKind() == ElementKind.METHOD && element instanceof ExecutableElement) {
-                Set<Modifier> modifiers = element.getModifiers();
-                if (modifiers.contains(Modifier.PUBLIC) && !modifiers.contains(Modifier.STATIC)
-                        && !modifiers.contains(Modifier.ABSTRACT)) {
-                    ExecutableElement executableElement = (ExecutableElement) element;
-                    String methodName = executableElement.getSimpleName().toString();
-                    if (methodName.contains("$")) {
-                        return false;
-                    }
 
-                    return executableElement.getParameters().isEmpty()
-                            || executableElement.getParameters().size() == 1;
+            @Override
+            public Optional<MethodElement> getWriteMethod() {
+                if (value.setter != null) {
+                    return Optional.of(new JavaMethodElement(
+                            JavaClassElementExt.this,
+                            value.setter,
+                            visitorContext.getAnnotationUtils().newAnnotationBuilder().buildForMethod(value.setter),
+                            visitorContext
+                    ));
                 }
+                return Optional.empty();
             }
-            return false;
+
+            @Override
+            public Optional<MethodElement> getReadMethod() {
+                return Optional.of(new JavaMethodElement(
+                        JavaClassElementExt.this,
+                        value.getter,
+                        annotationMetadata,
+                        visitorContext
+                ));
+            }
+        };
+    }
+
+    private void beanProperty(Map<String, BeanPropertyData> props, ExecutableElement executableElement) {
+        String methodName = executableElement.getSimpleName().toString();
+        final TypeElement declaringTypeElement = (TypeElement) executableElement.getEnclosingElement();
+
+        if (NameUtils.isGetterName(methodName) && executableElement.getParameters().isEmpty()) {
+            getterBeanProperty(props, executableElement, methodName, declaringTypeElement);
+        } else if (NameUtils.isSetterName(methodName) && executableElement.getParameters().size() == 1) {
+            setterBeanProperty(props, executableElement, methodName, declaringTypeElement);
+        }
+    }
+
+    private void fluentBeanProperty(Map<String, BeanPropertyData> props, ExecutableElement executableElement) {
+        String methodName = executableElement.getSimpleName().toString();
+        final TypeElement declaringTypeElement = (TypeElement) executableElement.getEnclosingElement();
+
+        if (executableElement.getParameters().isEmpty()) {
+            getterBeanProperty(props, executableElement, methodName, declaringTypeElement);
+        } else if (executableElement.getParameters().size() == 1) {
+            setterBeanProperty(props, executableElement, methodName, declaringTypeElement);
+        }
+    }
+
+    private void getterBeanProperty(Map<String, BeanPropertyData> props, ExecutableElement executableElement, String methodName, final TypeElement declaringTypeElement) {
+        String propertyName = NameUtils.getPropertyNameForGetter(methodName);
+        TypeMirror returnType = executableElement.getReturnType();
+        ClassElement getterReturnType;
+        if (returnType instanceof TypeVariable) {
+            TypeVariable tv = (TypeVariable) returnType;
+            final String tvn = tv.toString();
+            final ClassElement ce = getTypeArguments().get(tvn);
+            if (ce == null) {
+                getterReturnType = mirrorToClassElement(returnType, visitorContext, this.genericTypeInfo);
+            } else {
+                getterReturnType = ce;
+            }
+        } else {
+            getterReturnType = mirrorToClassElement(returnType, visitorContext, this.genericTypeInfo);
         }
 
-        private BeanPropertyData computeIfAbsent(String propertyName) {
-            for (BeanPropertyData bpd : props) {
-                if (propertyName.equals(bpd.propertyName)) {
-                    return bpd;
-                }
-            }
-            BeanPropertyData bpd = new BeanPropertyData(propertyName);
-            props.add(bpd);
-            return bpd;
-        }
-
-        @Override
-        protected void accept(DeclaredType declaringType, Element element, Object o) {
-            if (element instanceof VariableElement) {
-                fields.put(element.getSimpleName().toString(), (VariableElement) element);
-                return;
-            }
-
-            String methodName = element.getSimpleName().toString();
-            if (!fieldNames.contains(methodName)) {
-                return;
-            }
-            ExecutableElement executableElement = (ExecutableElement) element;
-            final TypeElement declaringTypeElement = (TypeElement) executableElement.getEnclosingElement();
-
-            if (executableElement.getParameters().isEmpty()) {
-                processGetter(methodName, executableElement, declaringTypeElement);
-            } else if (executableElement.getParameters().size() == 1) {
-                processSetter(methodName, executableElement, declaringTypeElement);
+        BeanPropertyData beanPropertyData = props.computeIfAbsent(propertyName, BeanPropertyData::new);
+        configureDeclaringType(declaringTypeElement, beanPropertyData);
+        beanPropertyData.type = getterReturnType;
+        beanPropertyData.getter = executableElement;
+        if (beanPropertyData.setter != null) {
+            TypeMirror typeMirror = beanPropertyData.setter.getParameters().get(0).asType();
+            ClassElement setterParameterType = mirrorToClassElement(typeMirror, visitorContext, this.genericTypeInfo);
+            if (!setterParameterType.getName().equals(getterReturnType.getName())) {
+                beanPropertyData.setter = null; // not a compatible setter
             }
         }
+    }
 
-        private void processSetter(String methodName, ExecutableElement executableElement,
-                final TypeElement declaringTypeElement) {
-            String propertyName = methodName;
-            TypeMirror typeMirror = executableElement.getParameters().get(0).asType();
-            ClassElement setterParameterType = mirrorToClassElement(typeMirror, visitorContext,
-                    JavaClassElementExt.this.genericTypeInfo);
-            BeanPropertyData beanPropertyData = computeIfAbsent(propertyName);
-            configureDeclaringType(declaringTypeElement, beanPropertyData);
-            ClassElement propertyType = beanPropertyData.type;
-            if (propertyType == null) {
+    private void setterBeanProperty(Map<String, BeanPropertyData> props, ExecutableElement executableElement, String methodName, final TypeElement declaringTypeElement) {
+        String propertyName = NameUtils.getPropertyNameForSetter(methodName);
+        TypeMirror typeMirror = executableElement.getParameters().get(0).asType();
+        ClassElement setterParameterType = mirrorToClassElement(typeMirror, visitorContext, this.genericTypeInfo);
+
+        BeanPropertyData beanPropertyData = props.computeIfAbsent(propertyName, BeanPropertyData::new);
+        configureDeclaringType(declaringTypeElement, beanPropertyData);
+        ClassElement propertyType = beanPropertyData.type;
+        if (propertyType == null) {
+            beanPropertyData.setter = executableElement;
+        } else {
+            if (propertyType.getName().equals(setterParameterType.getName())) {
                 beanPropertyData.setter = executableElement;
-            } else {
-                if (propertyType.getName().equals(setterParameterType.getName())) {
-                    beanPropertyData.setter = executableElement;
-                }
             }
         }
+    }
 
-        private void processGetter(String methodName, ExecutableElement executableElement,
-                final TypeElement declaringTypeElement) {
-            String propertyName = methodName;
-            TypeMirror returnType = executableElement.getReturnType();
-            ClassElement getterReturnType;
-            if (returnType instanceof TypeVariable) {
-                TypeVariable tv = (TypeVariable) returnType;
-                final String tvn = tv.toString();
-                final ClassElement clElement = getTypeArguments().get(tvn);
-                if (clElement == null) {
-                    getterReturnType = mirrorToClassElement(returnType, visitorContext,
-                            JavaClassElementExt.this.genericTypeInfo);
-                } else {
-                    getterReturnType = clElement;
-                }
-            } else {
-                getterReturnType = mirrorToClassElement(returnType, visitorContext,
-                        JavaClassElementExt.this.genericTypeInfo);
-            }
-
-            BeanPropertyData beanPropertyData = computeIfAbsent(propertyName);
-            configureDeclaringType(declaringTypeElement, beanPropertyData);
-            beanPropertyData.type = getterReturnType;
-            beanPropertyData.getter = executableElement;
-            if (beanPropertyData.setter != null) {
-                TypeMirror typeMirror = beanPropertyData.setter.getParameters().get(0).asType();
-                ClassElement setterParameterType = mirrorToClassElement(typeMirror, visitorContext,
-                        JavaClassElementExt.this.genericTypeInfo);
-                if (!setterParameterType.getName().equals(getterReturnType.getName())) {
-                    beanPropertyData.setter = null; // not a compatible
-                                                    // setter
-                }
-            }
-        }
-
-        private void configureDeclaringType(TypeElement declaringTypeElement, BeanPropertyData beanPropertyData) {
-            if (beanPropertyData.declaringType == null && !classElement.equals(declaringTypeElement)) {
-                beanPropertyData.declaringType = mirrorToClassElement(declaringTypeElement.asType(), visitorContext,
-                        genericTypeInfo);
-            }
+    private void configureDeclaringType(TypeElement declaringTypeElement, BeanPropertyData beanPropertyData) {
+        if (beanPropertyData.declaringType == null && !classElement.equals(declaringTypeElement)) {
+            beanPropertyData.declaringType = mirrorToClassElement(
+                    declaringTypeElement.asType(),
+                    visitorContext,
+                    genericTypeInfo
+            );
         }
     }
 
