@@ -43,6 +43,17 @@ tasks.withType(JavaCompile) {
     ...
 }
 ----
+or in Gradle for Groovy projects:
+
+.Gradle
+[source,groovy]
+----
+tasks.withType(GroovyCompile) {
+    groovyOptions.forkOptions.jvmArgs.add('-Dgroovy.parameters=true')
+    groovyOptions.forkOptions.jvmArgs.add('-Dmicronaut.openapi.views.spec=rapidoc.enabled=true,swagger-ui.enabled=true,swagger-ui.theme=flattop')
+    ...
+}
+----
 
 or in Maven:
 
