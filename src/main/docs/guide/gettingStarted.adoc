@@ -2,13 +2,11 @@ To enable this support you should add the following dependencies to your build c
 
 dependency:micronaut-openapi[scope="annotationProcessor", version="{version}", groupId="io.micronaut.configuration"]
 for Groovy:
-dependency:micronaut-openapi[scope="compile", version="{version}", groupId="io.micronaut.configuration"]
+dependency:micronaut-openapi[scope="compileOnly", version="{version}", groupId="io.micronaut.configuration"]
 
 Then the following compile time dependency:
 
 dependency:swagger-annotations[scope="implementation", groupId="io.swagger.core.v3"]
-for Groovy:
-dependency:swagger-annotations[scope="compile", groupId="io.swagger.core.v3"]
 
 <1> The `openapi` configuration gets added into the annotation processor scope
 <2> The https://github.com/swagger-api/swagger-core/wiki/Swagger-2.X---Annotations[Swagger Annotations] are added to the compile classpath
