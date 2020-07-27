@@ -127,9 +127,11 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
     private static final String MICRONAUT_OPENAPI_ENDPOINTS = "micronaut.openapi.endpoints";
 
     private ClassElement classElement;
+    private int visitedElements = -1;
 
     @Override
     public void visitClass(ClassElement element, VisitorContext context) {
+        incrementVisitedElements(context);
         context.info("Generating OpenAPI Documentation");
         OpenAPI openAPI = readOpenAPI(element, context);
         mergeAdditionalSwaggerFiles(element, context, openAPI);
@@ -509,6 +511,10 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
 
     @Override
     public void finish(VisitorContext visitorContext) {
+        if (visitedElements == visitedElements(visitorContext)) {
+            // nothing new visited, avoid rewriting the files.
+            return;
+        }
         Optional<OpenAPI> attr = visitorContext.get(ATTR_OPENAPI, OpenAPI.class);
         if (!attr.isPresent()) {
             return;
@@ -544,6 +550,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                         classElement);
             }
         }
+        visitedElements = visitedElements(visitorContext);
     }
 
     private void processEndpoints(VisitorContext visitorContext) {

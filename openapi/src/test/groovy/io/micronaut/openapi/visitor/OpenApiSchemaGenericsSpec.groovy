@@ -10,6 +10,77 @@ class OpenApiSchemaGenericsSpec extends AbstractTypeElementSpec {
         System.setProperty(AbstractOpenApiVisitor.ATTR_TEST_MODE, "true")
     }
 
+    void "Issue #279 - test parse OpenAPI with generics in interface"() {
+        given:
+        buildBeanDefinition('test.MyBean', '''
+
+package test;
+
+import io.micronaut.http.annotation.*;
+import java.util.List;
+import java.time.Instant;
+
+@Controller("/")
+class MyController {
+
+    @Get("/")
+    public MyDtoImpl doSomeStuff() {
+        return new MyDtoImpl();
+    }
+}
+
+interface MyDto<ID> {
+
+    ID getId();
+    void setId(ID id);
+
+    Instant getVersion();
+    void setVersion(Instant version);
+}
+
+class MyDtoImpl implements MyDto<Long> {
+
+    private Long id;
+    private Instant version;
+
+    @Override
+    public Long getId() {
+        return id;
+    }
+
+    @Override
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    @Override
+    public Instant getVersion() {
+        return version;
+    }
+
+    public void setVersion(Instant version) {
+        this.version = version;
+    }
+}
+
+@javax.inject.Singleton
+class MyBean {}
+''')
+
+        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        Operation operation = openAPI.paths?.get("/")?.get
+
+        expect:
+        operation
+        operation.responses.size() == 1
+        openAPI.components.schemas['MyDtoImpl']
+        openAPI.components.schemas['MyDtoImpl'].properties.size() == 2
+        openAPI.components.schemas['MyDtoImpl'].properties['id'].type == 'integer'
+        openAPI.components.schemas['MyDtoImpl'].properties['id'].format == 'int64'
+        openAPI.components.schemas['MyDtoImpl'].properties['version'].type == 'string'
+        openAPI.components.schemas['MyDtoImpl'].properties['version'].format == 'date-time'
+    }
+
     void "test parse OpenAPI with recursive generics"() {
         given:
         buildBeanDefinition('test.MyBean', '''
