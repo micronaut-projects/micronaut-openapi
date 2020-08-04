@@ -211,19 +211,13 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
     private boolean hasNoBindingAnnotationOrType(ParameterElement parameter) {
         return !parameter.isAnnotationPresent(io.swagger.v3.oas.annotations.Parameter.class) &&
                !parameter.isAnnotationPresent(io.swagger.v3.oas.annotations.parameters.RequestBody.class) &&
-               !parameter.isAnnotationPresent(Hidden.class) &&
-
                !parameter.isAnnotationPresent(QueryValue.class) &&
                !parameter.isAnnotationPresent(PathVariable.class) &&
                !parameter.isAnnotationPresent(Body.class) &&
                !parameter.isAnnotationPresent(Part.class) &&
                !parameter.isAnnotationPresent(CookieValue.class) &&
                !parameter.isAnnotationPresent(Header.class) &&
-
-               !isIgnoredParameterType(parameter.getType()) &&
-               !isResponseType(parameter.getType()) &&
-               !parameter.getType().isAssignable(HttpRequest.class) &&
-               !parameter.getType().isAssignable("io.micronaut.http.BasicAuth");
+               !isResponseType(parameter.getType());
     }
 
     /**
@@ -315,7 +309,7 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
             List<Parameter> swaggerParameters, boolean hasExistingParameters, ParameterElement parameter) {
         ClassElement parameterType = parameter.getGenericType();
 
-        if (isIgnoredParameterType(parameterType)) {
+        if (ignoreParameter(parameter)) {
             return;
         }
         if (isJavaElement(parameterType, context)) {
@@ -366,6 +360,10 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
         }
     }
 
+    private static boolean isAnnotationPresent(Element element, String className) {
+        return element.findAnnotation(className).isPresent();
+    }
+
     private void processBodyParameters(MethodElement element, VisitorContext context, OpenAPI openAPI,
             io.swagger.v3.oas.models.Operation swaggerOperation, JavadocDescription javadocDescription,
             Map<String, UriMatchVariable> pathVariables, List<MediaType> consumesMediaTypes) {
@@ -373,6 +371,7 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
                 .filter(p -> !pathVariables.containsKey(p.getName()) && !p.isAnnotationPresent(Bindable.class)
                         && !p.isAnnotationPresent(JsonIgnore.class) && !p.isAnnotationPresent(Hidden.class)
                         && !p.isAnnotationPresent(Header.class) && !p.isAnnotationPresent(QueryValue.class)
+                        && !isAnnotationPresent(p, "io.micronaut.session.annotation.SessionValue")
                         && !p.getValue(io.swagger.v3.oas.annotations.Parameter.class, "in", ParameterIn.class)
                                 .isPresent()
                         && !p.getValue(io.swagger.v3.oas.annotations.Parameter.class, "hidden", Boolean.class)
@@ -707,11 +706,23 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
         }
     }
 
+    private boolean ignoreParameter(ParameterElement parameter) {
+        return parameter.isAnnotationPresent(Hidden.class) ||
+               parameter.isAnnotationPresent(JsonIgnore.class) ||
+               parameter.getValue(io.swagger.v3.oas.annotations.Parameter.class, "hidden", Boolean.class)
+                        .orElse(false) ||
+               isAnnotationPresent(parameter, "io.micronaut.session.annotation.SessionValue") ||
+               isIgnoredParameterType(parameter.getType());
+    }
+
     private boolean isIgnoredParameterType(ClassElement parameterType) {
         return parameterType == null ||
-                parameterType.isAssignable(Principal.class) ||
+            parameterType.isAssignable(Principal.class) ||
+            parameterType.isAssignable("io.micronaut.session.Session") ||
             parameterType.isAssignable("io.micronaut.security.authentication.Authentication") ||
-            parameterType.isAssignable("kotlin.coroutines.Continuation");
+            parameterType.isAssignable("kotlin.coroutines.Continuation") ||
+            parameterType.isAssignable(HttpRequest.class) ||
+            parameterType.isAssignable("io.micronaut.http.BasicAuth");
     }
 
     private boolean isResponseType(ClassElement returnType) {
