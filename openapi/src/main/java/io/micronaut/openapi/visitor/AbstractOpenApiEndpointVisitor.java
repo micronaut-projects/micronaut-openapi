@@ -17,7 +17,6 @@ package io.micronaut.openapi.visitor;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.JsonNode;
-
 import io.micronaut.annotation.processing.visitor.JavaClassElementExt;
 import io.micronaut.context.env.DefaultPropertyPlaceholderResolver;
 import io.micronaut.context.env.PropertyPlaceholderResolver;
@@ -35,12 +34,7 @@ import io.micronaut.http.HttpMethod;
 import io.micronaut.http.HttpRequest;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.MediaType;
-import io.micronaut.http.annotation.Body;
-import io.micronaut.http.annotation.CookieValue;
-import io.micronaut.http.annotation.Header;
-import io.micronaut.http.annotation.Part;
-import io.micronaut.http.annotation.PathVariable;
-import io.micronaut.http.annotation.QueryValue;
+import io.micronaut.http.annotation.*;
 import io.micronaut.http.uri.UriMatchTemplate;
 import io.micronaut.http.uri.UriMatchVariable;
 import io.micronaut.inject.ast.ClassElement;
@@ -63,12 +57,7 @@ import io.swagger.v3.oas.models.PathItem;
 import io.swagger.v3.oas.models.media.Content;
 import io.swagger.v3.oas.models.media.ObjectSchema;
 import io.swagger.v3.oas.models.media.Schema;
-import io.swagger.v3.oas.models.parameters.CookieParameter;
-import io.swagger.v3.oas.models.parameters.HeaderParameter;
-import io.swagger.v3.oas.models.parameters.Parameter;
-import io.swagger.v3.oas.models.parameters.PathParameter;
-import io.swagger.v3.oas.models.parameters.QueryParameter;
-import io.swagger.v3.oas.models.parameters.RequestBody;
+import io.swagger.v3.oas.models.parameters.*;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.responses.ApiResponses;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
@@ -78,15 +67,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.IOException;
 import java.security.Principal;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -99,6 +80,10 @@ import java.util.stream.Collectors;
 abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
     protected List<io.swagger.v3.oas.models.tags.Tag> classTags;
     protected PropertyPlaceholderResolver propertyPlaceholderResolver;
+
+    private static boolean isAnnotationPresent(Element element, String className) {
+        return element.findAnnotation(className).isPresent();
+    }
 
     /**
      * Executed when a class is encountered that matches the <C> generic.
@@ -135,6 +120,7 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
 
     /**
      * Returns the security requirements at method level.
+     *
      * @param element The MethodElement.
      * @param context The context.
      * @return The security requirements.
@@ -143,6 +129,7 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
 
     /**
      * Returns the servers at method level.
+     *
      * @param element The MethodElement.
      * @param context The context.
      * @return The servers.
@@ -151,6 +138,7 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
 
     /**
      * Returns the class tags.
+     *
      * @param element The ClassElement.
      * @param context The context.
      * @return The class tags.
@@ -159,6 +147,7 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
 
     /**
      * Returns true if the specified element should not be processed.
+     *
      * @param element The ClassElement.
      * @param context The context.
      * @return true if the specified element should not be processed.
@@ -167,6 +156,7 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
 
     /**
      * Returns true if the specified element should not be processed.
+     *
      * @param element The ClassElement.
      * @param context The context.
      * @return true if the specified element should not be processed.
@@ -175,6 +165,7 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
 
     /**
      * Returns the HttpMethod of the element.
+     *
      * @param element The MethodElement.
      * @return The HttpMethod of the element.
      */
@@ -182,6 +173,7 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
 
     /**
      * Returns the uri paths of the element.
+     *
      * @param element The MethodElement.
      * @return The uri paths of the element.
      */
@@ -189,6 +181,7 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
 
     /**
      * Returns the consumes media types.
+     *
      * @param element The MethodElement.
      * @return The consumes media types.
      */
@@ -196,6 +189,7 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
 
     /**
      * Returns the produces media types.
+     *
      * @param element The MethodElement.
      * @return The produces media types.
      */
@@ -203,6 +197,7 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
 
     /**
      * Returns the description for the element.
+     *
      * @param element The MethodElement.
      * @return The description for the element.
      */
@@ -210,20 +205,14 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
 
     private boolean hasNoBindingAnnotationOrType(ParameterElement parameter) {
         return !parameter.isAnnotationPresent(io.swagger.v3.oas.annotations.Parameter.class) &&
-               !parameter.isAnnotationPresent(io.swagger.v3.oas.annotations.parameters.RequestBody.class) &&
-               !parameter.isAnnotationPresent(Hidden.class) &&
-
-               !parameter.isAnnotationPresent(QueryValue.class) &&
-               !parameter.isAnnotationPresent(PathVariable.class) &&
-               !parameter.isAnnotationPresent(Body.class) &&
-               !parameter.isAnnotationPresent(Part.class) &&
-               !parameter.isAnnotationPresent(CookieValue.class) &&
-               !parameter.isAnnotationPresent(Header.class) &&
-
-               !isIgnoredParameterType(parameter.getType()) &&
-               !isResponseType(parameter.getType()) &&
-               !parameter.getType().isAssignable(HttpRequest.class) &&
-               !parameter.getType().isAssignable("io.micronaut.http.BasicAuth");
+                !parameter.isAnnotationPresent(io.swagger.v3.oas.annotations.parameters.RequestBody.class) &&
+                !parameter.isAnnotationPresent(QueryValue.class) &&
+                !parameter.isAnnotationPresent(PathVariable.class) &&
+                !parameter.isAnnotationPresent(Body.class) &&
+                !parameter.isAnnotationPresent(Part.class) &&
+                !parameter.isAnnotationPresent(CookieValue.class) &&
+                !parameter.isAnnotationPresent(Header.class) &&
+                !isResponseType(parameter.getType());
     }
 
     /**
@@ -294,9 +283,9 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
     }
 
     private void processParameters(MethodElement element, VisitorContext context, OpenAPI openAPI,
-            io.swagger.v3.oas.models.Operation swaggerOperation, JavadocDescription javadocDescription,
-            boolean permitsRequestBody,
-            Map<String, UriMatchVariable> pathVariables, List<MediaType> consumesMediaTypes) {
+                                   io.swagger.v3.oas.models.Operation swaggerOperation, JavadocDescription javadocDescription,
+                                   boolean permitsRequestBody,
+                                   Map<String, UriMatchVariable> pathVariables, List<MediaType> consumesMediaTypes) {
         List<Parameter> swaggerParameters = swaggerOperation.getParameters();
         boolean hasExistingParameters = CollectionUtils.isNotEmpty(swaggerParameters);
         if (!hasExistingParameters) {
@@ -310,12 +299,12 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
     }
 
     private void processParameter(VisitorContext context, OpenAPI openAPI,
-            io.swagger.v3.oas.models.Operation swaggerOperation, JavadocDescription javadocDescription,
-            boolean permitsRequestBody, Map<String, UriMatchVariable> pathVariables, List<MediaType> consumesMediaTypes,
-            List<Parameter> swaggerParameters, boolean hasExistingParameters, ParameterElement parameter) {
+                                  io.swagger.v3.oas.models.Operation swaggerOperation, JavadocDescription javadocDescription,
+                                  boolean permitsRequestBody, Map<String, UriMatchVariable> pathVariables, List<MediaType> consumesMediaTypes,
+                                  List<Parameter> swaggerParameters, boolean hasExistingParameters, ParameterElement parameter) {
         ClassElement parameterType = parameter.getGenericType();
 
-        if (isIgnoredParameterType(parameterType)) {
+        if (ignoreParameter(parameter)) {
             return;
         }
         if (isJavaElement(parameterType, context)) {
@@ -367,16 +356,17 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
     }
 
     private void processBodyParameters(MethodElement element, VisitorContext context, OpenAPI openAPI,
-            io.swagger.v3.oas.models.Operation swaggerOperation, JavadocDescription javadocDescription,
-            Map<String, UriMatchVariable> pathVariables, List<MediaType> consumesMediaTypes) {
+                                       io.swagger.v3.oas.models.Operation swaggerOperation, JavadocDescription javadocDescription,
+                                       Map<String, UriMatchVariable> pathVariables, List<MediaType> consumesMediaTypes) {
         List<ParameterElement> bodyParameters = Arrays.stream(element.getParameters())
                 .filter(p -> !pathVariables.containsKey(p.getName()) && !p.isAnnotationPresent(Bindable.class)
                         && !p.isAnnotationPresent(JsonIgnore.class) && !p.isAnnotationPresent(Hidden.class)
                         && !p.isAnnotationPresent(Header.class) && !p.isAnnotationPresent(QueryValue.class)
+                        && !isAnnotationPresent(p, "io.micronaut.session.annotation.SessionValue")
                         && !p.getValue(io.swagger.v3.oas.annotations.Parameter.class, "in", ParameterIn.class)
-                                .isPresent()
+                        .isPresent()
                         && !p.getValue(io.swagger.v3.oas.annotations.Parameter.class, "hidden", Boolean.class)
-                                .orElse(false)
+                        .orElse(false)
                         && !isIgnoredParameterType(p.getType()))
                 .collect(Collectors.toList());
 
@@ -403,7 +393,7 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
     }
 
     private void processBodyParameter(VisitorContext context, OpenAPI openAPI, JavadocDescription javadocDescription,
-            MediaType mediaType, ObjectSchema schema, ParameterElement parameter) {
+                                      MediaType mediaType, ObjectSchema schema, ParameterElement parameter) {
         Schema propertySchema = resolveSchema(openAPI, parameter, parameter.getType(), context,
                 Collections.singletonList(mediaType));
         if (propertySchema != null) {
@@ -426,7 +416,7 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
     }
 
     private Parameter processMethodParameterAnnotation(VisitorContext context, boolean permitsRequestBody,
-            Map<String, UriMatchVariable> pathVariables, ParameterElement parameter) {
+                                                       Map<String, UriMatchVariable> pathVariables, ParameterElement parameter) {
         Parameter newParameter = null;
         String parameterName = parameter.getName();
         if (!parameter.hasStereotype(Bindable.class) && pathVariables.containsKey(parameterName)) {
@@ -550,9 +540,9 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
     }
 
     private void processBody(VisitorContext context, OpenAPI openAPI,
-            io.swagger.v3.oas.models.Operation swaggerOperation, JavadocDescription javadocDescription,
-            boolean permitsRequestBody, List<MediaType> consumesMediaTypes, ParameterElement parameter,
-            ClassElement parameterType) {
+                             io.swagger.v3.oas.models.Operation swaggerOperation, JavadocDescription javadocDescription,
+                             boolean permitsRequestBody, List<MediaType> consumesMediaTypes, ParameterElement parameter,
+                             ClassElement parameterType) {
         if (!permitsRequestBody) {
             return;
         }
@@ -584,7 +574,7 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
     }
 
     private void readResponse(MethodElement element, VisitorContext context, OpenAPI openAPI,
-            io.swagger.v3.oas.models.Operation swaggerOperation, JavadocDescription javadocDescription) {
+                              io.swagger.v3.oas.models.Operation swaggerOperation, JavadocDescription javadocDescription) {
         ApiResponses responses = swaggerOperation.getResponses();
         if (responses == null) {
             responses = new ApiResponses();
@@ -640,7 +630,7 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
     }
 
     private JavadocDescription getMethodDescription(MethodElement element,
-            io.swagger.v3.oas.models.Operation swaggerOperation) {
+                                                    io.swagger.v3.oas.models.Operation swaggerOperation) {
         String descr = description(element);
         if (StringUtils.isNotEmpty(descr) && StringUtils.isEmpty(swaggerOperation.getDescription())) {
             swaggerOperation.setDescription(descr);
@@ -691,27 +681,39 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
                         in = "DEFAULT";
                     }
                     switch (ParameterIn.valueOf(in.toUpperCase(Locale.US))) {
-                    case COOKIE:
-                    case QUERY:
-                        paramValues.put("explode", Boolean.TRUE);
-                        break;
-                    case DEFAULT:
-                    case HEADER:
-                    case PATH:
-                    default:
-                        paramValues.put("explode", Boolean.FALSE);
-                        break;
+                        case COOKIE:
+                        case QUERY:
+                            paramValues.put("explode", Boolean.TRUE);
+                            break;
+                        case DEFAULT:
+                        case HEADER:
+                        case PATH:
+                        default:
+                            paramValues.put("explode", Boolean.FALSE);
+                            break;
                     }
                     break;
             }
         }
     }
 
+    private boolean ignoreParameter(ParameterElement parameter) {
+        return parameter.isAnnotationPresent(Hidden.class) ||
+                parameter.isAnnotationPresent(JsonIgnore.class) ||
+                parameter.getValue(io.swagger.v3.oas.annotations.Parameter.class, "hidden", Boolean.class)
+                        .orElse(false) ||
+                isAnnotationPresent(parameter, "io.micronaut.session.annotation.SessionValue") ||
+                isIgnoredParameterType(parameter.getType());
+    }
+
     private boolean isIgnoredParameterType(ClassElement parameterType) {
         return parameterType == null ||
                 parameterType.isAssignable(Principal.class) ||
-            parameterType.isAssignable("io.micronaut.security.authentication.Authentication") ||
-            parameterType.isAssignable("kotlin.coroutines.Continuation");
+                parameterType.isAssignable("io.micronaut.session.Session") ||
+                parameterType.isAssignable("io.micronaut.security.authentication.Authentication") ||
+                parameterType.isAssignable("kotlin.coroutines.Continuation") ||
+                parameterType.isAssignable(HttpRequest.class) ||
+                parameterType.isAssignable("io.micronaut.http.BasicAuth");
     }
 
     private boolean isResponseType(ClassElement returnType) {
@@ -720,36 +722,36 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
 
     private boolean isSingleResponseType(ClassElement returnType) {
         return returnType.isAssignable("io.reactivex.Single")
-          && returnType.getFirstTypeArgument().isPresent()
-          && isResponseType(returnType.getFirstTypeArgument().get());
+                && returnType.getFirstTypeArgument().isPresent()
+                && isResponseType(returnType.getFirstTypeArgument().get());
     }
 
     private void setOperationOnPathItem(PathItem pathItem, io.swagger.v3.oas.models.Operation swaggerOperation, HttpMethod httpMethod) {
         switch (httpMethod) {
             case GET:
                 pathItem.get(swaggerOperation);
-            break;
+                break;
             case POST:
                 pathItem.post(swaggerOperation);
-            break;
+                break;
             case PUT:
                 pathItem.put(swaggerOperation);
-            break;
+                break;
             case PATCH:
                 pathItem.patch(swaggerOperation);
-            break;
+                break;
             case DELETE:
                 pathItem.delete(swaggerOperation);
-            break;
+                break;
             case HEAD:
                 pathItem.head(swaggerOperation);
-            break;
+                break;
             case OPTIONS:
                 pathItem.options(swaggerOperation);
-            break;
+                break;
             case TRACE:
                 pathItem.trace(swaggerOperation);
-            break;
+                break;
             default:
                 // unprocessable
         }
@@ -774,13 +776,13 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
     }
 
     private void readServers(MethodElement element, VisitorContext context, io.swagger.v3.oas.models.Operation swaggerOperation) {
-        for (Server server: methodServers(element, context)) {
+        for (Server server : methodServers(element, context)) {
             swaggerOperation.addServersItem(server);
         }
     }
 
     private void readCallbacks(MethodElement element, VisitorContext context,
-            io.swagger.v3.oas.models.Operation swaggerOperation) {
+                               io.swagger.v3.oas.models.Operation swaggerOperation) {
         List<AnnotationValue<Callback>> callbackAnnotations = element.getAnnotationValuesByType(Callback.class);
         if (CollectionUtils.isEmpty(callbackAnnotations)) {
             return;
@@ -801,7 +803,7 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
     }
 
     private void processCallbackReference(VisitorContext context, io.swagger.v3.oas.models.Operation swaggerOperation,
-            String callbackName) {
+                                          String callbackName) {
         final Components components = resolveComponents(resolveOpenAPI(context));
         final Map<String, io.swagger.v3.oas.models.callbacks.Callback> callbackComponents = components
                 .getCallbacks();
@@ -815,8 +817,8 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
     }
 
     private void processUrlCallbackExpression(VisitorContext context,
-            io.swagger.v3.oas.models.Operation swaggerOperation, AnnotationValue<Callback> callbackAnn,
-            String callbackName, final String callbackUrl) {
+                                              io.swagger.v3.oas.models.Operation swaggerOperation, AnnotationValue<Callback> callbackAnn,
+                                              String callbackName, final String callbackUrl) {
         final List<AnnotationValue<Operation>> operations = callbackAnn.getAnnotations("operation",
                 Operation.class);
         if (CollectionUtils.isEmpty(operations)) {
@@ -831,7 +833,7 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
                 final Optional<HttpMethod> operationMethod = operation.get("method", HttpMethod.class);
                 operationMethod.ifPresent(httpMethod -> toValue(operation.getValues(), context,
                         io.swagger.v3.oas.models.Operation.class)
-                                .ifPresent(op -> setOperationOnPathItem(pathItem, op, httpMethod)));
+                        .ifPresent(op -> setOperationOnPathItem(pathItem, op, httpMethod)));
             }
             Map<String, io.swagger.v3.oas.models.callbacks.Callback> callbacks = initCallbacks(
                     swaggerOperation);
@@ -852,7 +854,7 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
 
     private void addTagIfNotPresent(String tag, io.swagger.v3.oas.models.Operation swaggerOperation) {
         List<String> tags = swaggerOperation.getTags();
-        if (tags == null || ! tags.contains(tag)) {
+        if (tags == null || !tags.contains(tag)) {
             swaggerOperation.addTagsItem(tag);
         }
     }
@@ -873,17 +875,16 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
 
     private Content buildContent(Element definingElement, ClassElement type, List<MediaType> mediaTypes, OpenAPI openAPI, VisitorContext context) {
         Content content = new Content();
-        mediaTypes.forEach(mediaType ->  {
-                io.swagger.v3.oas.models.media.MediaType mt = new io.swagger.v3.oas.models.media.MediaType();
-                mt.setSchema(resolveSchema(openAPI, definingElement, type, context, Collections.singletonList(mediaType)));
-                content.addMediaType(mediaType.toString(), mt);
+        mediaTypes.forEach(mediaType -> {
+            io.swagger.v3.oas.models.media.MediaType mt = new io.swagger.v3.oas.models.media.MediaType();
+            mt.setSchema(resolveSchema(openAPI, definingElement, type, context, Collections.singletonList(mediaType)));
+            content.addMediaType(mediaType.toString(), mt);
 
         });
         return content;
     }
 
     /**
-     *
      * @return An Instance of {@link PropertyPlaceholderResolver} to resolve placeholders.
      */
     PropertyPlaceholderResolver getPropertyPlaceholderResolver() {
