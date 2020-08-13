@@ -85,6 +85,31 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
         return element.findAnnotation(className).isPresent();
     }
 
+    private static RequestBody mergeRequestBody(RequestBody rq1, RequestBody rq2) {
+        if (rq1.getRequired() == null) {
+            rq1.setRequired(rq2.getRequired());
+        }
+        if (rq1.get$ref() == null) {
+            rq1.set$ref(rq2.get$ref());
+        }
+        if (rq1.getDescription() == null) {
+            rq1.setDescription(rq2.getDescription());
+        }
+        if (rq1.getExtensions() == null) {
+            rq1.setExtensions(rq2.getExtensions());
+        } else if (rq2.getExtensions() != null) {
+            rq1.getExtensions().forEach((key, value) -> rq1.getExtensions().putIfAbsent(key, value));
+        }
+        if (rq1.getContent() == null) {
+            rq1.setContent(rq2.getContent());
+        } else if (rq2.getContent() != null) {
+            Content c1 = rq1.getContent();
+            Content c2 = rq2.getContent();
+            c2.forEach((key, value) -> c1.putIfAbsent(key, value));
+        }
+        return rq1;
+    }
+
     /**
      * Executed when a class is encountered that matches the <C> generic.
      *
@@ -252,7 +277,7 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
 
         JavadocDescription javadocDescription = getMethodDescription(element, swaggerOperation);
 
-        setOperationOnPathItem(pathItem, swaggerOperation, httpMethod);
+        swaggerOperation = setOperationOnPathItem(pathItem, swaggerOperation, httpMethod);
 
         if (element.isAnnotationPresent(Deprecated.class)) {
             swaggerOperation.setDeprecated(true);
@@ -261,9 +286,16 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
         readResponse(element, context, openAPI, swaggerOperation, javadocDescription);
 
         boolean permitsRequestBody = HttpMethod.permitsRequestBody(httpMethod);
-
         if (permitsRequestBody) {
-            readSwaggerRequestBody(element, context).ifPresent(swaggerOperation::setRequestBody);
+            Optional<RequestBody> requestBody = readSwaggerRequestBody(element, context);
+            if (requestBody.isPresent()) {
+                RequestBody currentRequestBody = swaggerOperation.getRequestBody();
+                if (currentRequestBody != null) {
+                    swaggerOperation.setRequestBody(mergeRequestBody(currentRequestBody, requestBody.get()));
+                } else {
+                    swaggerOperation.setRequestBody(requestBody.get());
+                }
+            }
         }
 
 
@@ -278,7 +310,7 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
         // if we have multiple uris, process them
         while (matchTemplates.hasNext()) {
             pathItem = resolvePathItem(context, matchTemplates.next());
-            setOperationOnPathItem(pathItem, swaggerOperation, httpMethod);
+            swaggerOperation = setOperationOnPathItem(pathItem, swaggerOperation, httpMethod);
         }
     }
 
@@ -373,11 +405,17 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
         if (bodyParameters.isEmpty()) {
             return;
         }
-        RequestBody requestBody = new RequestBody();
-        final Content content = new Content();
-        requestBody.setContent(content);
-        requestBody.setRequired(true);
-        swaggerOperation.setRequestBody(requestBody);
+        RequestBody requestBody = swaggerOperation.getRequestBody();
+        final Content content;
+        if (requestBody == null) {
+            requestBody = new RequestBody();
+            content = new Content();
+            requestBody.setContent(content);
+            requestBody.setRequired(true);
+            swaggerOperation.setRequestBody(requestBody);
+        } else {
+            content = requestBody.getContent();
+        }
         consumesMediaTypes = consumesMediaTypes.isEmpty() ? Collections.singletonList(MediaType.APPLICATION_JSON_TYPE)
                 : consumesMediaTypes;
         consumesMediaTypes.forEach(mediaType -> {
@@ -561,15 +599,19 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
             requestBody.setRequired(
                     !parameter.isAnnotationPresent(Nullable.class) && !parameterType.isAssignable(Optional.class));
         }
+
+        final Content content;
+        if (consumesMediaTypes.isEmpty()) {
+            content = buildContent(parameter, parameterType,
+                    Collections.singletonList(MediaType.APPLICATION_JSON_TYPE), openAPI, context);
+        } else {
+            content = buildContent(parameter, parameterType, consumesMediaTypes, openAPI, context);
+        }
         if (requestBody.getContent() == null) {
-            Content content;
-            if (consumesMediaTypes.isEmpty()) {
-                content = buildContent(parameter, parameterType,
-                        Collections.singletonList(MediaType.APPLICATION_JSON_TYPE), openAPI, context);
-            } else {
-                content = buildContent(parameter, parameterType, consumesMediaTypes, openAPI, context);
-            }
             requestBody.setContent(content);
+        } else {
+            final Content currentContent = requestBody.getContent();
+            content.forEach((key, value) -> currentContent.putIfAbsent(key, value));
         }
     }
 
@@ -726,35 +768,70 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
                 && isResponseType(returnType.getFirstTypeArgument().get());
     }
 
-    private void setOperationOnPathItem(PathItem pathItem, io.swagger.v3.oas.models.Operation swaggerOperation, HttpMethod httpMethod) {
+    private io.swagger.v3.oas.models.Operation setOperationOnPathItem(PathItem pathItem, io.swagger.v3.oas.models.Operation swaggerOperation, HttpMethod httpMethod) {
+        io.swagger.v3.oas.models.Operation operation = swaggerOperation;
         switch (httpMethod) {
             case GET:
-                pathItem.get(swaggerOperation);
+                if (pathItem.getGet() != null) {
+                    operation = pathItem.getGet();
+                } else {
+                    pathItem.get(swaggerOperation);
+                }
                 break;
             case POST:
-                pathItem.post(swaggerOperation);
+                if (pathItem.getPost() != null) {
+                    operation = pathItem.getPost();
+                } else {
+                    pathItem.post(swaggerOperation);
+                }
                 break;
             case PUT:
-                pathItem.put(swaggerOperation);
+                if (pathItem.getPut() != null) {
+                    operation = pathItem.getPut();
+                } else {
+                    pathItem.put(swaggerOperation);
+                }
                 break;
             case PATCH:
-                pathItem.patch(swaggerOperation);
+                if (pathItem.getPatch() != null) {
+                    operation = pathItem.getPatch();
+                } else {
+                    pathItem.patch(swaggerOperation);
+                }
                 break;
             case DELETE:
-                pathItem.delete(swaggerOperation);
+                if (pathItem.getDelete() != null) {
+                    operation = pathItem.getDelete();
+                } else {
+                    pathItem.delete(swaggerOperation);
+                }
                 break;
             case HEAD:
-                pathItem.head(swaggerOperation);
+                if (pathItem.getHead() != null) {
+                    operation = pathItem.getHead();
+                } else {
+                    pathItem.head(swaggerOperation);
+                }
                 break;
             case OPTIONS:
-                pathItem.options(swaggerOperation);
+                if (pathItem.getOptions() != null) {
+                    operation = pathItem.getOptions();
+                } else {
+                    pathItem.options(swaggerOperation);
+                }
                 break;
             case TRACE:
-                pathItem.trace(swaggerOperation);
+                if (pathItem.getTrace() != null) {
+                    operation = pathItem.getTrace();
+                } else {
+                    pathItem.trace(swaggerOperation);
+                }
                 break;
             default:
+                operation = swaggerOperation;
                 // unprocessable
         }
+        return operation;
     }
 
     private void readApiResponses(MethodElement element, VisitorContext context, io.swagger.v3.oas.models.Operation swaggerOperation) {
