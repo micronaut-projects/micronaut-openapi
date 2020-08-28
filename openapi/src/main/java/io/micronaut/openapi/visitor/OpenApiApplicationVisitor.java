@@ -1,11 +1,11 @@
 /*
- * Copyright 2017-2019 original authors
+ * Copyright 2017-2020 original authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ * https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -112,14 +112,26 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
      */
     public static final String MICRONAUT_OPENAPI_ENDPOINT_CLASS_TAGS = "micronaut.openapi.endpoint.class.tags";
 
+    /**
+     * The name of the entry for Endpoint servers in the context.
+     */
+    public static final String MICRONAUT_OPENAPI_ENDPOINT_SERVERS = "micronaut.openapi.endpoint.servers";
+
+    /**
+     * The name of the entry for Endpoint security requirements in the context.
+     */
+    public static final String MICRONAUT_OPENAPI_ENDPOINT_SECURITY_REQUIREMENTS = "micronaut.openapi.endpoint.security.requirements";
+
     private static final String MICRONAUT_OPENAPI_PROJECT_DIR = "micronaut.openapi.project.dir";
     private static final String MICRONAUT_OPENAPI_PROPERTIES = "micronaut.openapi.properties";
     private static final String MICRONAUT_OPENAPI_ENDPOINTS = "micronaut.openapi.endpoints";
 
     private ClassElement classElement;
+    private int visitedElements = -1;
 
     @Override
     public void visitClass(ClassElement element, VisitorContext context) {
+        incrementVisitedElements(context);
         context.info("Generating OpenAPI Documentation");
         OpenAPI openAPI = readOpenAPI(element, context);
         mergeAdditionalSwaggerFiles(element, context, openAPI);
@@ -322,7 +334,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         switch (name.toUpperCase(Locale.US)) {
         case "SNAKE_CASE": return (PropertyNamingStrategyBase) PropertyNamingStrategy.SNAKE_CASE;
         case "UPPER_CAMEL_CASE":  return (PropertyNamingStrategyBase) PropertyNamingStrategy.UPPER_CAMEL_CASE;
-        case "LOWER_CAMEL_CASE":  return (PropertyNamingStrategyBase) PropertyNamingStrategy.LOWER_CAMEL_CASE;
+        case "LOWER_CAMEL_CASE":  return new LowerCamelCasePropertyNamingStrategy();
         case "LOWER_CASE":  return (PropertyNamingStrategyBase) PropertyNamingStrategy.LOWER_CASE;
         case "KEBAB_CASE":  return (PropertyNamingStrategyBase) PropertyNamingStrategy.KEBAB_CASE;
         default: return  null;
@@ -403,14 +415,19 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             visitorContext.info("Using " + namingStrategyName + " property naming strategy.");
             openAPI.getComponents().getSchemas().values().forEach(model -> {
                 Map<String, Schema> properties = model.getProperties();
-                if (properties == null) {
-                    return;
+                if (properties != null) {
+                    Map<String, Schema> newProperties = properties.entrySet().stream()
+                            .collect(Collectors.toMap(entry -> propertyNamingStrategy.translate(entry.getKey()),
+                                    Map.Entry::getValue, (prop1, prop2) -> prop1, LinkedHashMap::new));
+                    model.getProperties().clear();
+                    model.setProperties(newProperties);
                 }
-                Map<String, Schema> newProperties = properties.entrySet().stream()
-                        .collect(Collectors.toMap(entry -> propertyNamingStrategy.translate(entry.getKey()),
-                                Map.Entry::getValue, (prop1, prop2) -> prop1, LinkedHashMap::new));
-                model.getProperties().clear();
-                model.setProperties(newProperties);
+                List<String> required = model.getRequired();
+                if (required != null) {
+                    List<String> updatedRequired = required.stream().map(propertyNamingStrategy::translate).collect(Collectors.toList());
+                    required.clear();
+                    required.addAll(updatedRequired);
+                }
             });
         }
     }
@@ -494,10 +511,10 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
 
     @Override
     public void finish(VisitorContext visitorContext) {
-        if (classElement == null) {
+        if (visitedElements == visitedElements(visitorContext)) {
+            // nothing new visited, avoid rewriting the files.
             return;
         }
-
         Optional<OpenAPI> attr = visitorContext.get(ATTR_OPENAPI, OpenAPI.class);
         if (!attr.isPresent()) {
             return;
@@ -527,12 +544,13 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                     StandardOpenOption.CREATE)) {
                 visitorContext.info("Writing OpenAPI YAML to destination: " + specPath);
                 yamlMapper.writeValue(writer, openAPI);
-                renderViews(documentTitle, fileName, specPath.getParent(), visitorContext);
+                renderViews(documentTitle, specPath.getFileName().toString(), specPath.getParent(), visitorContext);
             } catch (Exception e) {
                 visitorContext.warn("Unable to generate swagger.yml: " + specPath + " - " + e.getMessage(),
                         classElement);
             }
         }
+        visitedElements = visitedElements(visitorContext);
     }
 
     private void processEndpoints(VisitorContext visitorContext) {
@@ -541,17 +559,29 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                 && endpointsCfg.isEnabled()
                 && ! endpointsCfg.getEndpoints().isEmpty()) {
             OpenApiEndpointVisitor visitor = new OpenApiEndpointVisitor();
-            endpointsCfg.getEndpoints().entrySet().stream()
-            .filter(entry -> entry.getValue().getClassElement().isPresent()
-                    && "io.micronaut.annotation.processing.visitor.JavaClassElement".equals(entry.getValue().getClassElement().get().getClass().getName()))
-            .forEach(entry -> {
-                Endpoint endpoint = entry.getValue();
+            endpointsCfg.getEndpoints().values().stream()
+            .filter(endpoint -> endpoint.getClassElement().isPresent()
+                    && isJavaElement(endpoint.getClassElement().get(), visitorContext))
+            .forEach(endpoint -> {
                 ClassElement element = endpoint.getClassElement().get();
                 visitorContext.put(MICRONAUT_OPENAPI_ENDPOINT_CLASS_TAGS, endpoint.getTags());
+                visitorContext.put(MICRONAUT_OPENAPI_ENDPOINT_SERVERS, endpoint.getServers());
+                visitorContext.put(MICRONAUT_OPENAPI_ENDPOINT_SECURITY_REQUIREMENTS, endpoint.getSecurityRequirements());
                 visitor.visitClass(element, visitorContext);
                 JavaClassElementExt javaClassElement = new JavaClassElementExt(element, visitorContext);
-                javaClassElement.getMethods().forEach(method -> visitor.visitMethod(method, visitorContext));
+                javaClassElement.getCandidateMethods().forEach(method -> visitor.visitMethod(method, visitorContext));
             });
         }
     }
+
+    static class LowerCamelCasePropertyNamingStrategy extends PropertyNamingStrategyBase {
+        private static final long serialVersionUID = -2750503285679998670L;
+
+        @Override
+        public String translate(String propertyName) {
+            return propertyName;
+        }
+
+    }
+
 }

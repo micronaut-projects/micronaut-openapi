@@ -1,3 +1,4 @@
+
 package io.micronaut.openapi.visitor
 
 import io.micronaut.annotation.processing.test.AbstractTypeElementSpec

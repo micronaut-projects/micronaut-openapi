@@ -1,18 +1,3 @@
-/*
- * Copyright 2017-2019 original authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package io.micronaut.openapi.visitor
 
 import io.micronaut.annotation.processing.test.AbstractTypeElementSpec
@@ -21,6 +6,7 @@ import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.Operation
 import io.swagger.v3.oas.models.PathItem
 import io.swagger.v3.oas.models.parameters.Parameter
+import spock.lang.Ignore
 
 class OpenApiControllerVisitorSpec extends AbstractTypeElementSpec {
 
@@ -45,8 +31,9 @@ import java.util.List;
 
 @Tag(name = "HelloWorld")
 interface HelloWorldApi {
- @Get("/")
+    @Get("/")
     @Produces(MediaType.TEXT_PLAIN)
+    @Tag(name = "Article Operations")
     @Operation(summary = "Get a message", description = "Returns a simple hello world.")
     @ApiResponse(responseCode = "200", description = "All good.")
     HttpResponse<String> helloWorld();
@@ -71,8 +58,9 @@ class MyBean {}
         operation.operationId == 'helloWorld'
         operation.parameters.size() == 0
         operation.tags
-        !operation.tags.isEmpty()
+        operation.tags.size() == 2
         operation.tags.contains("HelloWorld")
+        operation.tags.contains("Article Operations")
     }
 
     void "test Inherited Annotations - Issue #157"() {
@@ -285,11 +273,11 @@ import io.reactivex.*;
 import io.micronaut.http.annotation.*;
 import java.util.List;
 import io.micronaut.http.*;
+
 /**
  * @author graemerocher
  * @since 1.0
  */
-
 @Controller("/pets")
 interface PetOperations<T extends String> {
 
@@ -316,7 +304,6 @@ interface PetOperations<T extends String> {
     @Get("/random")
     HttpResponse<T> getRandomPet();
 }
-
 
 @javax.inject.Singleton
 class MyBean {}
@@ -392,7 +379,6 @@ import java.util.List;
  * @author graemerocher
  * @since 1.0
  */
-
 @Controller("/pets")
 interface PetOperations<T extends String> {
 
@@ -430,7 +416,6 @@ interface PetOperations<T extends String> {
     @Post("/")
     Single<T> save(@Body T pet);
 }
-
 
 @javax.inject.Singleton
 class MyBean {}
@@ -798,6 +783,8 @@ class MyBean {}
 
     }
 
+    // 'uris' not available in micronaut-core 1.1.4
+    @Ignore
     void "test operation with multiple uris - Issue #220"() {
         given:
         buildBeanDefinition('test.MyBean', '''

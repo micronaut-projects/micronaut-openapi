@@ -1,15 +1,17 @@
 dependencies {
     annotationProcessor "io.micronaut:micronaut-inject-java"
-    compileOnly "io.micronaut:micronaut-inject-java"
-    compileOnly "io.micronaut:micronaut-management"
     annotationProcessor "io.micronaut.docs:micronaut-docs-asciidoc-config-props:$micronautDocsVersion"
+    
+    compileOnly "io.micronaut:micronaut-management"
+    compileOnly "io.micronaut:micronaut-inject-java"
+
     implementation "io.micronaut:micronaut-http"
-    compile "io.swagger.core.v3:swagger-core:$swaggerVersion"
-    compile "io.swagger.core.v3:swagger-models:$swaggerVersion"
-    implementation "io.swagger.core.v3:swagger-annotations:$swaggerVersion"
+    api "io.swagger.core.v3:swagger-core:$swaggerVersion"
+    api "io.swagger.core.v3:swagger-models:$swaggerVersion"
+    api "io.swagger.core.v3:swagger-annotations:$swaggerVersion"
 
     testImplementation "io.micronaut:micronaut-runtime"
-    testImplementation "io.micronaut:micronaut-security:2.0.0.M2"
+    testImplementation "io.micronaut:micronaut-security"
     testImplementation "io.micronaut:micronaut-inject-groovy"
     testImplementation "io.micronaut:micronaut-inject-java"
     testImplementation "io.micronaut:micronaut-inject-java-test"

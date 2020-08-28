@@ -1,18 +1,6 @@
 plugins {
     id "groovy"
-    id "io.spring.dependency-management"
-}
-
-dependencyManagement {
-    imports {
-        mavenBom("io.micronaut:micronaut-bom:$micronautVersion") {
-            bomProperty 'swagger.version', swaggerVersion
-            bomProperty 'jackson.version', jacksonVersion
-            bomProperty 'jackson.databind.version', jacksonVersion
-            bomProperty 'jackson.modules.version', jacksonVersion
-            bomProperty 'jackson.datatype.version', jacksonVersion
-        }
-    }
+    
 }
 
 dependencies {
@@ -23,14 +11,13 @@ dependencies {
     testImplementation "io.swagger.core.v3:swagger-annotations"
     testImplementation "io.micronaut.configuration:micronaut-hibernate-validator"
     testCompileOnly "io.micronaut:micronaut-inject-groovy"
-    testImplementation "org.testcontainers:spock:1.14.1"
+    testImplementation "org.testcontainers:spock:1.14.3"
     testImplementation("org.spockframework:spock-core") {
         exclude group: "org.codehaus.groovy", module: "groovy-all"
     }
     testRuntimeOnly "ch.qos.logback:logback-classic:1.2.3"
 }
 
-licenseTest.enabled = false
 
 test {
     jvmArgs '-Duser.country=US'

@@ -1,11 +1,11 @@
 /*
- * Copyright 2017-2019 original authors
+ * Copyright 2017-2020 original authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ * https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -30,6 +30,9 @@ import io.micronaut.inject.ast.MethodElement;
 import io.micronaut.inject.visitor.TypeElementVisitor;
 import io.micronaut.inject.visitor.VisitorContext;
 import io.swagger.v3.oas.annotations.Hidden;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
+import io.swagger.v3.oas.models.servers.Server;
+
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -44,7 +47,7 @@ import java.util.Optional;
  * @since 1.0
  */
 @Experimental
-public class OpenApiControllerVisitor extends AbstractOpenApiEndpointVisitor<Controller, HttpMethodMapping> implements TypeElementVisitor<Controller, HttpMethodMapping> {
+public class OpenApiControllerVisitor extends AbstractOpenApiEndpointVisitor implements TypeElementVisitor<Controller, HttpMethodMapping> {
 
     @Override
     protected boolean ignore(ClassElement element, VisitorContext context) {
@@ -53,7 +56,7 @@ public class OpenApiControllerVisitor extends AbstractOpenApiEndpointVisitor<Con
 
     @Override
     protected boolean ignore(MethodElement element, VisitorContext context) {
-        return element.isAnnotationPresent(Hidden.class);
+        return element.isPrivate() || element.isStatic() || element.isAnnotationPresent(Hidden.class);
     }
 
     @Override
@@ -100,17 +103,17 @@ public class OpenApiControllerVisitor extends AbstractOpenApiEndpointVisitor<Con
         UriMatchTemplate matchTemplate = UriMatchTemplate.of(controllerValue);
         // check if we have multiple uris
         String[] uris = element.stringValues(HttpMethodMapping.class, "uris");
-        if (uris.length != 0) {
+        if (uris.length == 0) {
+            String methodValue = element.getValue(HttpMethodMapping.class, String.class).orElse("/");
+            methodValue = getPropertyPlaceholderResolver().resolvePlaceholders(methodValue).orElse(methodValue);
+            return Collections.singletonList(matchTemplate.nest(methodValue));
+        } else {
             List<UriMatchTemplate> matchTemplates = new ArrayList<>(uris.length);
             for (String methodValue: uris) {
                 methodValue = getPropertyPlaceholderResolver().resolvePlaceholders(methodValue).orElse(methodValue);
                 matchTemplates.add(matchTemplate.nest(methodValue));
             }
             return matchTemplates;
-        } else {
-            String methodValue = element.getValue(HttpMethodMapping.class, String.class).orElse("/");
-            methodValue = getPropertyPlaceholderResolver().resolvePlaceholders(methodValue).orElse(methodValue);
-            return Collections.singletonList(matchTemplate.nest(methodValue));
         }
     }
 
@@ -122,5 +125,21 @@ public class OpenApiControllerVisitor extends AbstractOpenApiEndpointVisitor<Con
     @Override
     protected List<io.swagger.v3.oas.models.tags.Tag> classTags(ClassElement element, VisitorContext context) {
         return Collections.emptyList();
+    }
+
+    @Override
+    protected List<Server> methodServers(MethodElement element, VisitorContext context) {
+        return processOpenApiAnnotation(
+                element,
+                context,
+                io.swagger.v3.oas.annotations.servers.Server.class,
+                io.swagger.v3.oas.models.servers.Server.class,
+                Collections.emptyList()
+        );
+    }
+
+    @Override
+    protected List<SecurityRequirement> methodSecurityRequirements(MethodElement element, VisitorContext context) {
+        return readSecurityRequirements(element);
     }
 }

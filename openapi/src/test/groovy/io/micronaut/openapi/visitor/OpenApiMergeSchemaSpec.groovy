@@ -1,3 +1,4 @@
+
 package io.micronaut.openapi.visitor
 
 import io.micronaut.annotation.processing.test.AbstractTypeElementSpec
@@ -34,8 +35,8 @@ import io.swagger.v3.oas.annotations.security.*;
                 title = "the title",
                 version = "0.0",
                 description = "My API",
-                license = @License(name = "Apache 2.0", url = "http://foo.bar"),
-                contact = @Contact(url = "http://gigantic-server.com", name = "Fred", email = "Fred@gigagantic-server.com")
+                license = @License(name = "Apache 2.0", url = "https://foo.bar"),
+                contact = @Contact(url = "https://gigantic-server.com", name = "Fred", email = "Fred@gigagantic-server.com")
         ),
         tags = {
                 @Tag(name = "Tag 1", description = "desc 1", externalDocs = @ExternalDocumentation(description = "docs desc")),
@@ -50,7 +51,7 @@ import io.swagger.v3.oas.annotations.security.*;
         servers = {
                 @Server(
                         description = "server 1",
-                        url = "http://foo",
+                        url = "https://foo",
                         variables = {
                                 @ServerVariable(name = "var1", description = "var 1", defaultValue = "1", allowableValues = {"1", "2"}),
                                 @ServerVariable(name = "var2", description = "var 2", defaultValue = "1", allowableValues = {"1", "2"})
@@ -87,11 +88,11 @@ class MyBean {}
         openAPI.security[1] == ["req 2":["b", "c"]]
         openAPI.servers.size() == 2
         openAPI.servers[0].description == 'server 1'
-        openAPI.servers[0].url == 'http://foo'
+        openAPI.servers[0].url == 'https://foo'
         openAPI.servers[0].variables.size() == 2
         openAPI.servers[0].variables.var1.description == 'var 1'
         openAPI.servers[0].variables.var1.default == '1'
-        openAPI.servers[1].url == 'http://petstore.swagger.io/v1'
+        openAPI.servers[1].url == 'https://petstore.swagger.io/v1'
         openAPI.paths.size() == 2
 
         when:

@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ * https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -32,6 +32,8 @@ import io.micronaut.management.endpoint.annotation.Read;
 import io.micronaut.management.endpoint.annotation.Selector;
 import io.micronaut.management.endpoint.annotation.Write;
 import io.swagger.v3.oas.annotations.Hidden;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
+import io.swagger.v3.oas.models.servers.Server;
 import io.swagger.v3.oas.models.tags.Tag;
 
 import java.lang.annotation.Annotation;
@@ -50,8 +52,7 @@ import java.util.stream.Collectors;
  * @since 1.4
  */
 @Experimental
-public class OpenApiEndpointVisitor extends AbstractOpenApiEndpointVisitor<Endpoint, Object>
-        implements TypeElementVisitor<Endpoint, Object> {
+public class OpenApiEndpointVisitor extends AbstractOpenApiEndpointVisitor implements TypeElementVisitor<Endpoint, Object> {
     private String id;
     private boolean skip;
     private HttpMethodDesciption methodDescription;
@@ -124,6 +125,24 @@ public class OpenApiEndpointVisitor extends AbstractOpenApiEndpointVisitor<Endpo
         return allTags;
     }
 
+    @Override
+    protected List<Server> methodServers(MethodElement element, VisitorContext context) {
+        EndpointsConfiguration cfg = OpenApiApplicationVisitor.endPointsConfiguration(context);
+        List<Server> servers = new ArrayList<>(cfg.getServers());
+        servers.addAll(context.get(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_ENDPOINT_SERVERS, List.class,
+                Collections.emptyList()));
+        return servers;
+    }
+
+    @Override
+    protected List<SecurityRequirement> methodSecurityRequirements(MethodElement element, VisitorContext context) {
+        EndpointsConfiguration cfg = OpenApiApplicationVisitor.endPointsConfiguration(context);
+        List<SecurityRequirement> securityRequirements = new ArrayList<>(cfg.getSecurityRequirements());
+        securityRequirements.addAll(context.get(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_ENDPOINT_SECURITY_REQUIREMENTS, List.class,
+                Collections.emptyList()));
+        return securityRequirements;
+    }
+
     private static List<MediaType> mediaTypes(String... arr) {
         if (arr == null || arr.length == 0) {
             return Collections.singletonList(MediaType.APPLICATION_JSON_TYPE);
@@ -177,4 +196,5 @@ public class OpenApiEndpointVisitor extends AbstractOpenApiEndpointVisitor<Endpo
                     + Arrays.toString(produces) + ", consumes=" + Arrays.toString(consumes) + "]";
         }
     }
+
 }

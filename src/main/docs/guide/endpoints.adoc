@@ -13,12 +13,53 @@ endpoints.enabled=true
 
 in the `openapi.properties` file.
 
-You can also provide some tags with the `endpoints.tags=<comma separated list of tags>` flag, for instance:
+=== Tags
+
+You can also provide some tags for all endpoints with the `endpoints.tags=<comma separated list of tags>` flag, for instance:
 ----
 endpoints.tags=Management Enpoints
 ----
 
-If you are using a custom path the your endpoints use `endpoints.path` to set it:
+=== Servers
+
+You can also provide some servers for all endpoints with the `endpoints.server=<json array of io.swagger.v3.oas.models.servers.Server>` flag, for instance:
+----
+endpoints.servers=[ \
+    { \
+      "url": "https://{username}.gigantic-server.com:{port}/{basePath}", \
+      "description": "The production API server", \
+      "variables": { \
+        "username": { \
+          "default": "demo", \
+          "description": "this value is assigned by the service provider, in this example `gigantic-server.com`" \
+        }, \
+        "port": { \
+          "enum": [ \
+            "8443", \
+            "443" \
+          ], \
+          "default": "8443" \
+        }, \
+        "basePath": { \
+          "default": "v2" \
+        } \
+      } \
+    } \
+  ]
+----
+
+=== Security Requirements
+
+You can also provide some security requirements for all endpoints with the `endpoints.security-requirements=<json array of io.swagger.v3.oas.models.security.SecurityRequirement>` flag, for instance:
+----
+endpoints.security-requirements=[{"api_key": []}]
+----
+
+Don't forget to declare the referenced `SecurityScheme`.
+
+=== Path
+
+If you are using a custom path for your endpoints use `endpoints.path` to set it:
 ----
 endpoints.path=/endpoints
 
@@ -31,7 +72,7 @@ To enable the processing of built-in endpoints (https://docs.micronaut.io/latest
 
 ----
 endpoints.enabled=true
-endpoints.tags=Managemenent Endpoints
+endpoints.tags=Management Endpoints
 endpoints.routes.class=io.micronaut.management.endpoint.routes.RoutesEndpoint
 endpoints.beans.class=io.micronaut.management.endpoint.beans.BeansEndpoint
 endpoints.health.class=io.micronaut.management.endpoint.health.HealthEndpoint
@@ -40,4 +81,11 @@ endpoints.refresh.class=io.micronaut.management.endpoint.refresh.RefreshEndpoint
 ----
 
 The syntax is the following: `endpoints.<name>.class=<full class name of the endpoint>` where `name` is an arbitrary name.
-You can also add some tags to each endpoint: `endpoints.<name>.tags=<<comma separated list of tags>`.
+You can also add some tags, servers and security requirements to each endpoint:
+
+----
+endpoints.refresh.class=io.micronaut.management.endpoint.refresh.RefreshEndpoint
+endpoints.refresh.servers=[{"url": "https://staging.gigantic-server.com/v1", "description": "Staging server"}]
+endpoints.refresh.security-requirements=[{"petstore_auth": ["write:pets", "read:pets"]}]
+
+----

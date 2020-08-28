@@ -1,18 +1,4 @@
-/*
- * Copyright 2017-2019 original authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+
 package io.micronaut.openapi.visitor
 
 import io.micronaut.annotation.processing.test.AbstractTypeElementSpec
@@ -278,7 +264,7 @@ import java.util.List;
 @SecurityScheme(name = "myOauth2Security",
         type = SecuritySchemeType.OAUTH2,
         flows = @OAuthFlows(
-                implicit = @OAuthFlow(authorizationUrl = "http://url.com/auth",
+                implicit = @OAuthFlow(authorizationUrl = "https://url.com/auth",
                         scopes = @OAuthScope(name = "write:pets", description = "modify pets in your account"))),
         extensions = @Extension(
             name = "custom",
@@ -321,7 +307,7 @@ class MyBean {}
         openAPI.components.securitySchemes['myOauth2Security'].type == SecurityScheme.Type.OAUTH2
         openAPI.components.securitySchemes['myOauth2Security'].flows
         openAPI.components.securitySchemes['myOauth2Security'].flows.implicit
-        openAPI.components.securitySchemes['myOauth2Security'].flows.implicit.authorizationUrl == 'http://url.com/auth'
+        openAPI.components.securitySchemes['myOauth2Security'].flows.implicit.authorizationUrl == 'https://url.com/auth'
         openAPI.components.securitySchemes['myOauth2Security'].flows.implicit.scopes
         openAPI.components.securitySchemes['myOauth2Security'].extensions
         openAPI.components.securitySchemes['myOauth2Security'].extensions.'x-custom'.prop1 == "prop1Val"

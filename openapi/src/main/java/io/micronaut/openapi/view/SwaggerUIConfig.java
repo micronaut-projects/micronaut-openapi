@@ -1,11 +1,11 @@
 /*
- * Copyright 2017-2019 original authors
+ * Copyright 2017-2020 original authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ * https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -44,8 +44,10 @@ final class SwaggerUIConfig extends AbstractViewConfig implements Renderer {
         VALID_OPTIONS.put("docExpansion", AbstractViewConfig::asQuotedString);
         VALID_OPTIONS.put("filter", AbstractViewConfig::asBoolean);
         VALID_OPTIONS.put("maxDisplayedTags", AbstractViewConfig::asString);
+        VALID_OPTIONS.put("operationsSorter", AbstractViewConfig::asString);
         VALID_OPTIONS.put("showExtensions", AbstractViewConfig::asBoolean);
         VALID_OPTIONS.put("showCommonExtensions", AbstractViewConfig::asBoolean);
+        VALID_OPTIONS.put("tagsSorter", AbstractViewConfig::asString);
         VALID_OPTIONS.put("oauth2RedirectUrl", AbstractViewConfig::asQuotedString);
         VALID_OPTIONS.put("showMutatedRequest", AbstractViewConfig::asBoolean);
         VALID_OPTIONS.put("supportedSubmitMethods", AbstractViewConfig::asString);

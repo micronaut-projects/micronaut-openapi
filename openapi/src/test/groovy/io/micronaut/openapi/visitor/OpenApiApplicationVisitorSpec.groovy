@@ -1,18 +1,3 @@
-/*
- * Copyright 2017-2019 original authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package io.micronaut.openapi.visitor
 
 import io.micronaut.inject.BeanDefinition
@@ -59,8 +44,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
                 title = "the title",
                 version = "0.0",
                 description = "My API",
-                license = @License(name = "Apache 2.0", url = "http://foo.bar"),
-                contact = @Contact(url = "http://gigantic-server.com", name = "Fred", email = "Fred@gigagantic-server.com")
+                license = @License(name = "Apache 2.0", url = "https://foo.bar"),
+                contact = @Contact(url = "https://gigantic-server.com", name = "Fred", email = "Fred@gigagantic-server.com")
         ),
         tags = {
                 @Tag(name = "Tag 1", description = "desc 1", externalDocs = @ExternalDocumentation(description = "docs desc")),
@@ -75,7 +60,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
         servers = {
                 @Server(
                         description = "server 1",
-                        url = "http://foo",
+                        url = "https://foo",
                         variables = {
                                 @ServerVariable(name = "var1", description = "var 1", defaultValue = "1", allowableValues = {"1", "2"}),
                                 @ServerVariable(name = "var2", description = "var 2", defaultValue = "1", allowableValues = {"1", "2"})
@@ -148,7 +133,7 @@ class MyBean {}
         openAPI.security[1] == ["req 2":["b", "c"]]
         openAPI.servers.size() == 1
         openAPI.servers[0].description == 'server 1'
-        openAPI.servers[0].url == 'http://foo'
+        openAPI.servers[0].url == 'https://foo'
         openAPI.servers[0].variables.size() == 2
         openAPI.servers[0].variables.var1.description == 'var 1'
         openAPI.servers[0].variables.var1.default == '1'
@@ -156,20 +141,66 @@ class MyBean {}
         then:"User defined end point is processed"
         openAPI.paths['/message']
         openAPI.paths['/message'].delete
+        openAPI.paths['/message'].delete.servers.size() == 1
+        openAPI.paths['/message'].delete.servers[0].url == 'https://{username}.gigantic-server.com:{port}/{basePath}'
+        openAPI.paths['/message'].delete.servers[0].description == 'The production API server'
+        openAPI.paths['/message'].delete.servers[0].variables
+        openAPI.paths['/message'].delete.servers[0].variables.size() == 3
+        openAPI.paths['/message'].delete.security.size() == 1
+        openAPI.paths['/message'].delete.security[0].size() == 1
+        openAPI.paths['/message'].delete.security[0].get('api_key') == []
         openAPI.paths['/message/{message}']
         openAPI.paths['/message/{message}'].post
         openAPI.paths['/message/{message}'].post.parameters.size() == 1
         openAPI.paths['/message/{message}'].post.parameters[0].name == 'message'
+        openAPI.paths['/message/{message}'].post.servers.size() == 1
+        openAPI.paths['/message/{message}'].post.servers[0].url == 'https://{username}.gigantic-server.com:{port}/{basePath}'
+        openAPI.paths['/message/{message}'].post.servers[0].description == 'The production API server'
+        openAPI.paths['/message/{message}'].post.servers[0].variables
+        openAPI.paths['/message/{message}'].post.servers[0].variables.size() == 3
+        openAPI.paths['/message/{message}'].post.security.size() == 1
+        openAPI.paths['/message/{message}'].post.security[0].size() == 1
+        openAPI.paths['/message/{message}'].post.security[0].get('api_key') == []
 
         then:"Built-in end point are processed"
         openAPI.paths['/routes']
         openAPI.paths['/routes'].get
-        openAPI.paths['/refresh']
-        openAPI.paths['/refresh'].post
+        openAPI.paths['/routes'].get.servers.size() == 1
+        openAPI.paths['/routes'].get.servers[0].url == 'https://{username}.gigantic-server.com:{port}/{basePath}'
+        openAPI.paths['/routes'].get.servers[0].description == 'The production API server'
+        openAPI.paths['/routes'].get.servers[0].variables
+        openAPI.paths['/routes'].get.servers[0].variables.size() == 3
+        openAPI.paths['/routes'].get.security.size() == 1
+        openAPI.paths['/routes'].get.security[0].size() == 1
+        openAPI.paths['/routes'].get.security[0].get('api_key') == []
         openAPI.paths['/beans']
         openAPI.paths['/beans'].get
+        openAPI.paths['/beans'].get.servers.size() == 1
+        openAPI.paths['/beans'].get.servers[0].url == 'https://{username}.gigantic-server.com:{port}/{basePath}'
+        openAPI.paths['/beans'].get.servers[0].description == 'The production API server'
+        openAPI.paths['/beans'].get.servers[0].variables
+        openAPI.paths['/beans'].get.servers[0].variables.size() == 3
+        openAPI.paths['/beans'].get.security.size() == 1
+        openAPI.paths['/beans'].get.security[0].size() == 1
+        openAPI.paths['/beans'].get.security[0].get('api_key') == []
         openAPI.paths['/loggers']
         openAPI.paths['/loggers'].get
+        openAPI.paths['/loggers'].get.servers.size() == 1
+        openAPI.paths['/loggers'].get.servers[0].url == 'https://{username}.gigantic-server.com:{port}/{basePath}'
+        openAPI.paths['/loggers'].get.servers[0].description == 'The production API server'
+        openAPI.paths['/loggers'].get.servers[0].variables
+        openAPI.paths['/loggers'].get.servers[0].variables.size() == 3
+        openAPI.paths['/loggers'].get.security.size() == 1
+        openAPI.paths['/loggers'].get.security[0].size() == 1
+        openAPI.paths['/loggers'].get.security[0].get('api_key') == []
+        openAPI.paths['/refresh']
+        openAPI.paths['/refresh'].post
+        openAPI.paths['/refresh'].post.servers.size() == 2
+        openAPI.paths['/refresh'].post.security.size() == 2
+        openAPI.paths['/refresh'].post.security[0].size() == 1
+        openAPI.paths['/refresh'].post.security[0].get('api_key') == []
+        openAPI.paths['/refresh'].post.security[1].size() == 1
+        openAPI.paths['/refresh'].post.security[1].get('petstore_auth') == ['write:pets', 'read:pets']
 
         when:"Loggers end point param name"
         // with jdk8 the argument name is not preserved
@@ -211,8 +242,8 @@ import io.swagger.v3.oas.annotations.security.*;
                 title = "the title",
                 version = "0.0",
                 description = "My API",
-                license = @License(name = "Apache 2.0", url = "http://foo.bar"),
-                contact = @Contact(url = "http://gigantic-server.com", name = "Fred", email = "Fred@gigagantic-server.com")
+                license = @License(name = "Apache 2.0", url = "https://foo.bar"),
+                contact = @Contact(url = "https://gigantic-server.com", name = "Fred", email = "Fred@gigagantic-server.com")
         ),
         tags = {
                 @Tag(name = "Tag 1", description = "desc 1", externalDocs = @ExternalDocumentation(description = "docs desc")),
@@ -227,7 +258,7 @@ import io.swagger.v3.oas.annotations.security.*;
         servers = {
                 @Server(
                         description = "server 1",
-                        url = "http://foo",
+                        url = "https://foo",
                         variables = {
                                 @ServerVariable(name = "var1", description = "var 1", defaultValue = "1", allowableValues = {"1", "2"}),
                                 @ServerVariable(name = "var2", description = "var 2", defaultValue = "1", allowableValues = {"1", "2"})
@@ -264,7 +295,7 @@ class MyBean {}
         openAPI.security[1] == ["req 2":["b", "c"]]
         openAPI.servers.size() == 1
         openAPI.servers[0].description == 'server 1'
-        openAPI.servers[0].url == 'http://foo'
+        openAPI.servers[0].url == 'https://foo'
         openAPI.servers[0].variables.size() == 2
         openAPI.servers[0].variables.var1.description == 'var 1'
         openAPI.servers[0].variables.var1.default == '1'
@@ -295,8 +326,8 @@ import io.swagger.v3.oas.annotations.security.*;
                 title = "the title",
                 version = "0.0",
                 description = "My API",
-                license = @License(name = "Apache 2.0", url = "http://foo.bar"),
-                contact = @Contact(url = "http://gigantic-server.com", name = "Fred", email = "Fred@gigagantic-server.com")
+                license = @License(name = "Apache 2.0", url = "https://foo.bar"),
+                contact = @Contact(url = "https://gigantic-server.com", name = "Fred", email = "Fred@gigagantic-server.com")
         ),
 
         externalDocs = @ExternalDocumentation(description = "definition docs desc")
@@ -306,7 +337,7 @@ import io.swagger.v3.oas.annotations.security.*;
 @Tag(name = "Tag 3")
 @Server(
         description = "server 1",
-        url = "http://foo",
+        url = "https://foo",
         variables = {
                 @ServerVariable(name = "var1", description = "var 1", defaultValue = "1", allowableValues = {"1", "2"}),
                 @ServerVariable(name = "var2", description = "var 2", defaultValue = "1", allowableValues = {"1", "2"})
@@ -346,7 +377,7 @@ class MyBean {}
         openAPI.security.get(1).get('req 2') == ["b", "c"]
         openAPI.servers.size() == 1
         openAPI.servers[0].description == 'server 1'
-        openAPI.servers[0].url == 'http://foo'
+        openAPI.servers[0].url == 'https://foo'
         openAPI.servers[0].variables.size() == 2
         openAPI.servers[0].variables.var1.description == 'var 1'
         openAPI.servers[0].variables.var1.default == '1'
@@ -378,7 +409,7 @@ import io.swagger.v3.oas.annotations.enums.*;
            type = SecuritySchemeType.OAUTH2,
            in = SecuritySchemeIn.HEADER,
            flows = @OAuthFlows(
-                   implicit = @OAuthFlow(authorizationUrl = "http://url.com/auth",
+                   implicit = @OAuthFlow(authorizationUrl = "https://url.com/auth",
                            scopes = @OAuthScope(name = "write:pets", description = "modify pets in your account"))))
 @SecurityScheme(name = "myOauth3Security", type = SecuritySchemeType.OAUTH2)
 @SecurityScheme(name = "myOauth4Security", type = SecuritySchemeType.APIKEY, paramName = "JWT")
@@ -403,7 +434,7 @@ class MyBean {}
         openAPI.components.securitySchemes['myOauth2Security'].name == null
         openAPI.components.securitySchemes['myOauth2Security'].flows
         openAPI.components.securitySchemes['myOauth2Security'].flows.implicit
-        openAPI.components.securitySchemes['myOauth2Security'].flows.implicit.authorizationUrl == 'http://url.com/auth'
+        openAPI.components.securitySchemes['myOauth2Security'].flows.implicit.authorizationUrl == 'https://url.com/auth'
         openAPI.components.securitySchemes['myOauth2Security'].flows.implicit.scopes
         openAPI.components.securitySchemes['myOauth2Security'].flows.implicit.scopes.size() == 1
         openAPI.components.securitySchemes['myOauth2Security'].flows.implicit.scopes.get("write:pets")

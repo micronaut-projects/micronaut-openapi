@@ -1,18 +1,4 @@
-/*
- * Copyright 2017-2019 original authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+
 package io.micronaut.openapi.visitor
 
 import io.micronaut.annotation.processing.test.AbstractTypeElementSpec
@@ -50,11 +36,11 @@ import io.swagger.v3.oas.annotations.security.*;
 import io.swagger.v3.oas.annotations.media.*;
 import io.swagger.v3.oas.annotations.enums.*;
 import com.fasterxml.jackson.annotation.*;
+
 /**
  * @author graemerocher
  * @since 1.0
  */
-
 @Controller("/networks")
 interface NetworkOperations {
 
@@ -94,6 +80,7 @@ interface NetworkOperations {
 class Greeting {
     public String message;
 }
+
 @javax.inject.Singleton
 class MyBean {}
 ''')
@@ -142,11 +129,11 @@ import io.swagger.v3.oas.annotations.security.*;
 import io.swagger.v3.oas.annotations.media.*;
 import io.swagger.v3.oas.annotations.enums.*;
 import com.fasterxml.jackson.annotation.*;
+
 /**
  * @author graemerocher
  * @since 1.0
  */
-
 @Controller("/networks")
 interface NetworkOperations {
 
@@ -160,6 +147,7 @@ interface NetworkOperations {
 class Greeting {
     public String message;
 }
+
 @javax.inject.Singleton
 class MyBean {}
 ''')
@@ -202,11 +190,11 @@ import io.swagger.v3.oas.annotations.security.*;
 import io.swagger.v3.oas.annotations.media.*;
 import io.swagger.v3.oas.annotations.enums.*;
 import com.fasterxml.jackson.annotation.*;
+
 /**
  * @author graemerocher
  * @since 1.0
  */
-
 @Controller("/networks")
 interface NetworkOperations {
 
@@ -220,6 +208,7 @@ interface NetworkOperations {
 class Greeting {
     public String message;
 }
+
 @javax.inject.Singleton
 class MyBean {}
 ''')
@@ -262,11 +251,11 @@ import io.swagger.v3.oas.annotations.security.*;
 import io.swagger.v3.oas.annotations.media.*;
 import io.swagger.v3.oas.annotations.enums.*;
 import com.fasterxml.jackson.annotation.*;
+
 /**
  * @author graemerocher
  * @since 1.0
  */
-
 @Controller("/networks")
 interface NetworkOperations {
 
@@ -280,6 +269,7 @@ interface NetworkOperations {
 class Greeting {
     public String message;
 }
+
 @javax.inject.Singleton
 class MyBean {}
 ''')
@@ -317,11 +307,11 @@ import io.micronaut.http.annotation.*;
 import io.micronaut.http.*;
 import io.swagger.v3.oas.annotations.*;
 import io.swagger.v3.oas.annotations.parameters.*;
+
 /**
  * @author HoaBo
  * @since 1.0
  */
-
 @Controller("/networks")
 interface NetworkOperations {
 
@@ -331,6 +321,7 @@ interface NetworkOperations {
             @Parameter(hidden=true) String fooBar
     );
 }
+
 @javax.inject.Singleton
 class MyBean {}
 ''')
@@ -365,11 +356,11 @@ import io.swagger.v3.oas.annotations.responses.*;
 import io.swagger.v3.oas.annotations.security.*;
 import io.swagger.v3.oas.annotations.media.*;
 import io.swagger.v3.oas.annotations.enums.*;
+
 /**
  * @author graemerocher
  * @since 1.0
  */
-
 @Controller("/")
 interface Test {
 
@@ -474,11 +465,11 @@ import io.swagger.v3.oas.annotations.security.*;
 import io.swagger.v3.oas.annotations.media.*;
 import io.swagger.v3.oas.annotations.enums.*;
 import com.fasterxml.jackson.annotation.*;
+
 /**
  * @author graemerocher
  * @since 1.0
  */
-
 @Controller("/networks")
 interface NetworkOperations {
 
@@ -517,6 +508,7 @@ interface NetworkOperations {
 class Greeting {
     public String message;
 }
+
 @javax.inject.Singleton
 class MyBean {}
 ''')

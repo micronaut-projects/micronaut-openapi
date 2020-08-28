@@ -1,11 +1,11 @@
 /*
- * Copyright 2017-2019 original authors
+ * Copyright 2017-2020 original authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ * https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -46,6 +46,7 @@ final class RapidocConfig extends AbstractViewConfig implements Renderer {
         VALID_OPTIONS.put("primary-color", AbstractViewConfig::asString);
         VALID_OPTIONS.put("regular-font", AbstractViewConfig::asString);
         VALID_OPTIONS.put("mono-font", AbstractViewConfig::asString);
+        VALID_OPTIONS.put("font-size", new EnumConverter<>(FontSize.class));
         VALID_OPTIONS.put("nav-bg-color", AbstractViewConfig::asString);
         VALID_OPTIONS.put("nav-text-color", AbstractViewConfig::asString);
         VALID_OPTIONS.put("nav-hover-bg-color", AbstractViewConfig::asString);
@@ -74,13 +75,24 @@ final class RapidocConfig extends AbstractViewConfig implements Renderer {
         VALID_OPTIONS.put("api-key-location",  new EnumConverter<>(ApiKeyLocation.class));
         VALID_OPTIONS.put("server-url", AbstractViewConfig::asString);
         VALID_OPTIONS.put("default-api-server", AbstractViewConfig::asString);
-        VALID_OPTIONS.put("match-paths", AbstractViewConfig::asString);
 
         DEFAULT_OPTIONS.put("show-header", Boolean.FALSE);
         DEFAULT_OPTIONS.put("theme", Theme.DARK);
         DEFAULT_OPTIONS.put("layout", Layout.ROW);
         DEFAULT_OPTIONS.put("sort-tags", Boolean.TRUE);
         DEFAULT_OPTIONS.put("sort-endpoints-by", EndPoint.METHOD);
+    }
+
+    /**
+     * Rapidoc font-size.
+     */
+    enum FontSize {
+        DEFAULT, LARGE, LARGEST;
+
+        @Override
+        public String toString() {
+            return this.name().toLowerCase(Locale.US);
+        }
     }
 
     /**
@@ -135,7 +147,7 @@ final class RapidocConfig extends AbstractViewConfig implements Renderer {
      * Rapidoc render styles.
      */
     enum RenderStyle {
-        READ, VIEW;
+        READ, VIEW, FOCUSED;
 
         @Override
         public String toString() {

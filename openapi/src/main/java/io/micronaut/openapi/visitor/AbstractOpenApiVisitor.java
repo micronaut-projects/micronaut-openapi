@@ -1,11 +1,11 @@
 /*
- * Copyright 2017-2019 original authors
+ * Copyright 2017-2020 original authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ * https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -113,6 +113,8 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Future;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -126,10 +128,12 @@ import static java.util.stream.Collectors.toMap;
  * @since 1.0
  */
 abstract class AbstractOpenApiVisitor  {
-
     static final String ATTR_TEST_MODE = "io.micronaut.OPENAPI_TEST";
     static final String ATTR_OPENAPI = "io.micronaut.OPENAPI";
     static OpenAPI testReference;
+
+    private static final Lock VISITED_ELEMENTS_LOCK = new ReentrantLock();
+    private static final String ATTR_VISITED_ELEMENTS = "io.micronaut.OPENAPI.visited.elements";
 
     /**
      * The JSON mapper.
@@ -144,6 +148,43 @@ abstract class AbstractOpenApiVisitor  {
      * Stores the current in progress type.
      */
     private List<String> inProgressSchemas = new ArrayList<>(10);
+
+    /**
+     * Increments the number of visited elements.
+     * @param context The context
+     */
+    void incrementVisitedElements(VisitorContext context) {
+        VISITED_ELEMENTS_LOCK.lock();
+        try {
+            context.put(ATTR_VISITED_ELEMENTS, Integer.valueOf(getVisitedElements(context).intValue() + 1));
+        } finally {
+            VISITED_ELEMENTS_LOCK.unlock();
+        }
+
+    }
+
+    /**
+     * Returns the number of visited elements.
+     * @param context The context.
+     * @return The number of visited elements.
+     */
+    int visitedElements(VisitorContext context) {
+        VISITED_ELEMENTS_LOCK.lock();
+        try {
+            return getVisitedElements(context);
+        } finally {
+            VISITED_ELEMENTS_LOCK.unlock();
+        }
+    }
+
+    private static Integer getVisitedElements(VisitorContext context) {
+        Integer visitedElements = context.get(ATTR_VISITED_ELEMENTS, Integer.class).orElse(null);
+        if (visitedElements == null) {
+            visitedElements = Integer.valueOf(0);
+            context.put(ATTR_VISITED_ELEMENTS, visitedElements);
+        }
+        return visitedElements;
+    }
 
     /**
      * Convert the given map to a JSON node.
@@ -564,7 +605,6 @@ abstract class AbstractOpenApiVisitor  {
                 isObservable = type.isAssignable("io.reactivex.Observable") && !type.isAssignable("reactor.core.publisher.Mono");
                 type = type.getFirstTypeArgument().orElse(null);
             }
-
             if (type != null) {
 
                 String typeName = type.getName();
@@ -789,14 +829,7 @@ abstract class AbstractOpenApiVisitor  {
             element.findAnnotation(Pattern.class).flatMap(p -> p.get("regexp", String.class)).ifPresent(finalSchemaToBind::setPattern);
         }
 
-        Optional<String> documentation = element.getDocumentation();
-        if (StringUtils.isEmpty(schemaToBind.getDescription())) {
-            String doc = documentation.orElse(null);
-            if (doc != null) {
-                JavadocDescription desc = new JavadocParser().parse(doc);
-                schemaToBind.setDescription(desc.getMethodDescription());
-            }
-        }
+        setSchemaDocumentation(element, schemaToBind);
         if (element.isAnnotationPresent(Deprecated.class)) {
             schemaToBind.setDeprecated(true);
         }
@@ -809,6 +842,17 @@ abstract class AbstractOpenApiVisitor  {
             schemaToBind.setNullable(true);
         }
         return schemaToBind;
+    }
+
+    private void setSchemaDocumentation(Element element, Schema schemaToBind) {
+        if (StringUtils.isEmpty(schemaToBind.getDescription())) {
+            Optional<String> documentation = element.getDocumentation();
+            String doc = documentation.orElse(null);
+            if (doc != null) {
+                JavadocDescription desc = new JavadocParser().parse(doc);
+                schemaToBind.setDescription(desc.getMethodDescription());
+            }
+        }
     }
 
     /**
@@ -827,7 +871,7 @@ abstract class AbstractOpenApiVisitor  {
     }
 
     private Schema doBindSchemaAnnotationValue(VisitorContext context, Element element, Schema schemaToBind,
-            JsonNode schemaJson, String defaultValue, String[] allowableValues) {
+            JsonNode schemaJson, String defaultValue, String... allowableValues) {
         try {
             schemaToBind = jsonMapper.readerForUpdating(schemaToBind).readValue(schemaJson);
             if (StringUtils.isNotEmpty(defaultValue)) {
@@ -879,7 +923,7 @@ abstract class AbstractOpenApiVisitor  {
                 }
             }
         }
-        return doBindSchemaAnnotationValue(context, element, schemaToBind, schemaJson, null, null);
+        return doBindSchemaAnnotationValue(context, element, schemaToBind, schemaJson, null);
     }
 
     private Optional<Map<String, Object>> resolveExtensions(JsonNode jn) {
@@ -1084,8 +1128,10 @@ abstract class AbstractOpenApiVisitor  {
             }
         }
         if (schema != null) {
+            setSchemaDocumentation(type, schema);
             Schema schemaRef = new Schema();
             schemaRef.set$ref(schemaRef(schema.getName()));
+            schemaRef.setDescription(schema.getDescription());
             return schemaRef;
         }
         return null;
@@ -1195,7 +1241,7 @@ abstract class AbstractOpenApiVisitor  {
         final Iterator<ClassElement> i = typeArguments.values().iterator();
         if (i.hasNext()) {
 
-            builder.append('<');
+            builder.append('_');
             while (i.hasNext()) {
                 final ClassElement ce = i.next();
                 builder.append(ce.getSimpleName());
@@ -1203,12 +1249,23 @@ abstract class AbstractOpenApiVisitor  {
                     computeNameWithGenerics(ce, builder, computed);
                 }
                 if (i.hasNext()) {
-                    builder.append(',');
+                    builder.append('.');
                 }
             }
 
-            builder.append('>');
+            builder.append('_');
         }
+    }
+
+    /**
+     * Returns true if classElement is a JavaClassElement.
+     * @param classElement A ClassElement.
+     * @param context The context.
+     * @return true if classElement is a JavaClassElement.
+     */
+    static boolean isJavaElement(ClassElement classElement, VisitorContext context) {
+        return classElement != null && (("io.micronaut.annotation.processing.visitor.JavaClassElement".equals(classElement.getClass().getName())
+                || "io.micronaut.annotation.processing.visitor.JavaClassElementExt".equals(classElement.getClass().getName())) && "io.micronaut.annotation.processing.visitor.JavaVisitorContext".equals(context.getClass().getName()));
     }
 
     private void populateSchemaProperties(OpenAPI openAPI, VisitorContext context, Element type, Schema schema, List<MediaType> mediaTypes) {
@@ -1220,10 +1277,18 @@ abstract class AbstractOpenApiVisitor  {
         }
 
         if (classElement != null) {
-            List<PropertyElement> beanProperties = classElement.getBeanProperties().stream().filter(p -> ! "groovy.lang.MetaClass".equals(p.getType().getName())).collect(Collectors.toList());
+            List<PropertyElement> beanProperties;
+            final boolean isJavaElement = isJavaElement(classElement, context);
+            JavaClassElementExt jce = null;
+            if (isJavaElement) {
+                jce = new JavaClassElementExt(classElement, context);
+                beanProperties = jce.beanProperties();
+            } else {
+                beanProperties = classElement.getBeanProperties().stream().filter(p -> ! "groovy.lang.MetaClass".equals(p.getType().getName())).collect(Collectors.toList());
+            }
             processPropertyElements(openAPI, context, type, schema, beanProperties, mediaTypes);
-            if ("io.micronaut.annotation.processing.visitor.JavaClassElement".equals(classElement.getClass().getName()) && "io.micronaut.annotation.processing.visitor.JavaVisitorContext".equals(context.getClass().getName())) {
-                List<PropertyElement> fluentMethodsProperties = new JavaClassElementExt(classElement, context).getFluentBeanProperties();
+            if (isJavaElement) {
+                List<PropertyElement> fluentMethodsProperties = jce.fluentBeanProperties();
                 processPropertyElements(openAPI, context, type, schema, fluentMethodsProperties, mediaTypes);
             }
 
