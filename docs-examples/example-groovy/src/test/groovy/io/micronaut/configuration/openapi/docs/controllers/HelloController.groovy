@@ -1,15 +1,13 @@
 package io.micronaut.configuration.openapi.docs.controllers
 
-// tag::imports[]
 import io.micronaut.http.MediaType
+
+// tag::imports[]
 import io.micronaut.http.annotation.Controller
 import io.micronaut.http.annotation.Get
-import io.micronaut.validation.Validated
 import io.reactivex.Single
-
 // end::imports[]
 // tag::clazz[]
-@Validated
 @Controller("/")
 class HelloController {
 
