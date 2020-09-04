@@ -4,7 +4,6 @@ package io.micronaut.configuration.openapi.docs.controllers.annotations
 import io.micronaut.http.MediaType
 import io.micronaut.http.annotation.Controller
 import io.micronaut.http.annotation.Get
-import io.micronaut.validation.Validated
 import io.reactivex.Single
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
@@ -16,7 +15,6 @@ import io.swagger.v3.oas.annotations.tags.Tag
 // end::imports[]
 // tag::clazz[]
 @Controller("/")
-@Validated
 open class HelloController {
 
     /**

@@ -31,7 +31,7 @@ final class RedocConfig extends AbstractViewConfig implements Renderer {
     private static final Map<String, Object> DEFAULT_OPTIONS = Collections.emptyMap();
 
     // https://github.com/Redocly/redoc#redoc-options-object
-    private static final Map<String, Function<String, Object>> VALID_OPTIONS = new HashMap<>(22);
+    private static final Map<String, Function<String, Object>> VALID_OPTIONS = new HashMap<>(24);
 
     static {
         VALID_OPTIONS.put("disable-search", AbstractViewConfig::asBoolean);
@@ -40,6 +40,7 @@ final class RedocConfig extends AbstractViewConfig implements Renderer {
         VALID_OPTIONS.put("hide-download-button", AbstractViewConfig::asBoolean);
         VALID_OPTIONS.put("hide-hostname", AbstractViewConfig::asBoolean);
         VALID_OPTIONS.put("hide-loading", AbstractViewConfig::asBoolean);
+        VALID_OPTIONS.put("hide-schema-titles", AbstractViewConfig::asBoolean);
         VALID_OPTIONS.put("hide-single-request-sample-tab", AbstractViewConfig::asBoolean);
         VALID_OPTIONS.put("expand-single-schema-field", AbstractViewConfig::asBoolean);
         VALID_OPTIONS.put("json-sample-expand-level", AbstractViewConfig::asString);
@@ -50,6 +51,7 @@ final class RedocConfig extends AbstractViewConfig implements Renderer {
         VALID_OPTIONS.put("path-in-middle-panel", AbstractViewConfig::asBoolean);
         VALID_OPTIONS.put("required-props-first", AbstractViewConfig::asBoolean);
         VALID_OPTIONS.put("scroll-y-offset", AbstractViewConfig::asString);
+        VALID_OPTIONS.put("simple-one-of-type-label", AbstractViewConfig::asBoolean);
         VALID_OPTIONS.put("show-extensions", AbstractViewConfig::asBoolean);
         VALID_OPTIONS.put("sort-props-alphabetically", AbstractViewConfig::asBoolean);
         VALID_OPTIONS.put("suppress-warnings", AbstractViewConfig::asBoolean);
@@ -66,7 +68,7 @@ final class RedocConfig extends AbstractViewConfig implements Renderer {
 
     /**
      * Builds a RedocConfig given a set of properties.
-     * 
+     *
      * @param properties A set of properties.
      * @return A RedocConfig.
      */

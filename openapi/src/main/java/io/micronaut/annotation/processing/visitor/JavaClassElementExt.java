@@ -213,11 +213,8 @@ public class JavaClassElementExt extends JavaClassElement {
     }
 
     private static boolean isCandidateBeanMethod(ExecutableElement method) {
-        Set<Modifier> modifiers = method.getModifiers();
-        boolean ok = modifiers.contains(Modifier.PUBLIC) && ! modifiers.contains(Modifier.ABSTRACT) && !modifiers.contains(Modifier.STATIC) && !modifiers.contains(Modifier.PRIVATE)
-                && !method.getSimpleName().toString().contains("$");
-        if (! ok) {
-             return false;
+        if (!checkModifiers(method)) {
+            return false;
         }
         String methodName = method.getSimpleName().toString();
         if (methodName.contains("$")) {
@@ -231,12 +228,15 @@ public class JavaClassElementExt extends JavaClassElement {
         }
     }
 
-    private static boolean isCandidateFluentBeanMethod(ExecutableElement method, Set<String> fieldNames) {
-        Set<Modifier> modifiers = method.getModifiers();
-        boolean ok = modifiers.contains(Modifier.PUBLIC) && ! modifiers.contains(Modifier.ABSTRACT) && !modifiers.contains(Modifier.STATIC) && !modifiers.contains(Modifier.PRIVATE)
+    private static boolean checkModifiers(ExecutableElement method) {
+        final Set<Modifier> modifiers = method.getModifiers();
+        return method.getModifiers().contains(Modifier.PUBLIC) && !modifiers.contains(Modifier.ABSTRACT) && !modifiers.contains(Modifier.STATIC) && !modifiers.contains(Modifier.PRIVATE)
                 && !method.getSimpleName().toString().contains("$");
-        if (! ok) {
-             return false;
+    }
+
+    private static boolean isCandidateFluentBeanMethod(ExecutableElement method, Set<String> fieldNames) {
+        if (!checkModifiers(method)) {
+            return false;
         }
         String methodName = method.getSimpleName().toString();
         return fieldNames.contains(methodName)  && (method.getParameters().isEmpty() || method.getParameters().size() == 1);

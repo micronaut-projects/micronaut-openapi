@@ -4,12 +4,10 @@ package io.micronaut.configuration.openapi.docs.controllers;
 import io.micronaut.http.MediaType;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
-import io.micronaut.validation.Validated;
 import io.reactivex.Single;
 
 // end::imports[]
 // tag::clazz[]
-@Validated
 @Controller("/")
 public class HelloController {
 
