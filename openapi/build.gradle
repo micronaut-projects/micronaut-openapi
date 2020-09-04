@@ -10,7 +10,7 @@ dependencies {
     api "io.swagger.core.v3:swagger-models:$swaggerVersion"
     api "io.swagger.core.v3:swagger-annotations:$swaggerVersion"
 
-    testImplementation 'org.spockframework:spock-core:2.0-M3-groovy-3.0'
+    testImplementation "org.spockframework:spock-core:$spockVersion"
     testImplementation "io.micronaut:micronaut-runtime"
     testImplementation "io.micronaut.security:micronaut-security"
     testImplementation "io.micronaut:micronaut-inject-groovy"
