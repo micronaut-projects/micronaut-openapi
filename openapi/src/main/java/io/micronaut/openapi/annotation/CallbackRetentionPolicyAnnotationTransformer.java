@@ -20,7 +20,7 @@ import io.swagger.v3.oas.annotations.callbacks.Callback;
 /**
  * Changes the Retention Policy of the annotation to SOURCE.
  *
- * @since 2.0
+ * @since 2.1
  * @author croudet
  */
 public class CallbackRetentionPolicyAnnotationTransformer extends AbstractRetentionPolicyAnnotationTransformer<Callback> {

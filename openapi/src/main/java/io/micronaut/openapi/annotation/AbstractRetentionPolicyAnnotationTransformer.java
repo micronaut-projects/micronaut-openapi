@@ -28,7 +28,7 @@ import io.micronaut.inject.visitor.VisitorContext;
  * Changes the Retention Policy of the annotation to SOURCE.
  *
  * @param <T> The annotation type.
- * @since 2.0
+ * @since 2.1
  * @author croudet
  */
 abstract class AbstractRetentionPolicyAnnotationTransformer<T extends Annotation> implements TypedAnnotationTransformer<T> {

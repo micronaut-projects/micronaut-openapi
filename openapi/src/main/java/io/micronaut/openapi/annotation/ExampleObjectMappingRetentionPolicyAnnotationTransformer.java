@@ -20,7 +20,7 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 /**
  * Changes the Retention Policy of the annotation to SOURCE.
  *
- * @since 2.0
+ * @since 2.1
  * @author croudet
  */
 public class ExampleObjectMappingRetentionPolicyAnnotationTransformer extends AbstractRetentionPolicyAnnotationTransformer<ExampleObject> {

@@ -20,7 +20,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 /**
  * Changes the Retention Policy of the annotation to SOURCE.
  *
- * @since 2.0
+ * @since 2.1
  * @author croudet
  */
 public class ApiResponseRetentionPolicyAnnotationTransformer extends AbstractRetentionPolicyAnnotationTransformer<ApiResponse> {
