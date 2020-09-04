@@ -17,6 +17,8 @@ package io.micronaut.openapi.visitor;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.JsonNode;
+
+import edu.umd.cs.findbugs.annotations.NonNull;
 import io.micronaut.annotation.processing.visitor.JavaClassElementExt;
 import io.micronaut.context.env.DefaultPropertyPlaceholderResolver;
 import io.micronaut.context.env.PropertyPlaceholderResolver;
@@ -981,6 +983,12 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
                 @Override
                 public <T> Optional<T> getProperty(@Nonnull String name, @Nonnull ArgumentConversionContext<T> conversionContext) {
                     return Optional.empty();
+                }
+
+                @NonNull
+                @Override
+                public Collection<String> getPropertyEntries(@NonNull String name) {
+                    return null;
                 }
             }, new DefaultConversionService());
         }

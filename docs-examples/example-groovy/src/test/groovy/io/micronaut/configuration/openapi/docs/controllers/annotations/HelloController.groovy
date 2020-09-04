@@ -1,10 +1,10 @@
 package io.micronaut.configuration.openapi.docs.controllers.annotations
 
-// tags::imports[]
 import io.micronaut.http.MediaType
+
+// tags::imports[]
 import io.micronaut.http.annotation.Controller
 import io.micronaut.http.annotation.Get
-import io.micronaut.validation.Validated
 import io.reactivex.Single
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
@@ -14,11 +14,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.tags.Tag
 
 import javax.validation.constraints.NotBlank
-
 // end::imports
 // tag::clazz[]
 @Controller("/")
-@Validated
 class HelloController {
 
     /**

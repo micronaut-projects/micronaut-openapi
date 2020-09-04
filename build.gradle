@@ -10,7 +10,7 @@ buildscript {
 }
 
 subprojects { Project subproject ->
-    group "io.micronaut.configuration"
+    group "io.micronaut.openapi"
 
     apply plugin: "io.micronaut.build.common"
     apply plugin: "io.micronaut.build.dependency-updates"
