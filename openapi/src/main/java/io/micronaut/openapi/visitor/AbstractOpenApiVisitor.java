@@ -80,6 +80,7 @@ import io.swagger.v3.oas.models.security.SecurityScheme;
 
 import org.reactivestreams.Publisher;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.DecimalMin;
@@ -747,7 +748,8 @@ abstract class AbstractOpenApiVisitor  {
             }
             final boolean required = element.isAnnotationPresent(NotNull.class)
                     || element.isAnnotationPresent(NotBlank.class)
-                    || element.isAnnotationPresent(NotEmpty.class);
+                    || element.isAnnotationPresent(NotEmpty.class)
+                    || element.isAnnotationPresent(Nonnull.class);
             for (Entry<String, Schema> prop: props) {
                 parentSchema.addProperties(prop.getKey(), prop.getValue());
                 if (required) {
