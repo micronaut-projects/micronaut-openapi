@@ -443,7 +443,7 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
             if (description.isPresent()) {
                 propertySchema.setDescription(description.get());
             }
-            processSchemaProperty(context, parameter, parameter.getType(), schema, propertySchema);
+            processSchemaProperty(context, parameter, parameter.getType(), null, schema, propertySchema);
 
             propertySchema.setNullable(parameter.isAnnotationPresent(Nullable.class));
             if (javadocDescription != null && StringUtils.isEmpty(propertySchema.getDescription())) {

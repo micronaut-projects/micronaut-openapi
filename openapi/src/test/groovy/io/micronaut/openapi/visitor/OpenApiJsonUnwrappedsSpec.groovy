@@ -29,6 +29,8 @@ import java.util.List;
 import io.swagger.v3.oas.annotations.media.*;
 import io.swagger.v3.oas.annotations.*;
 import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
 @Controller("/test")
 interface TestOperations {
@@ -37,16 +39,18 @@ interface TestOperations {
     Single<Test> save(String name, int age);
 }
 
-@Schema
 class Dummy {
     public int aa;
+    @JsonProperty(value = "cc", required = true)
     public String bb;
 }
 
 @Schema(description = "Represents a pet")
+@JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 class Pet {
     @Schema(name="pet-name", description = "The pet name")
     private String name;
+    private String lastName;
     private Integer age;
 
     @Schema(name="pet-name", description = "The pet name")
@@ -62,6 +66,15 @@ class Pet {
     public Integer getAge() {
         return age;
     }
+    
+    public String getLastName() {
+        return lastName;
+    }
+    
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+    
 }
 
 @Schema
@@ -93,20 +106,31 @@ class MyBean {}
         when:"The OpenAPI is retrieved"
         OpenAPI openAPI = AbstractOpenApiVisitor.testReference
         Schema schema = openAPI.components.schemas['Test']
+        Schema dummySchema = openAPI.components.schemas['Dummy']
+        Schema petSchema = openAPI.components.schemas['Pet']
 
         then:"the components are valid"
         schema.type == 'object'
-        schema.properties.size() == 10
+        schema.properties.size() == 12
         schema.properties['plain'].$ref == '#/components/schemas/Dummy'
         schema.properties['unwrappedDisabled'].$ref == '#/components/schemas/Dummy'
         schema.properties['aa'].type == 'integer'
-        schema.properties['bb'].type == 'string'
+        schema.properties['bb'] == null
+        schema.properties['cc'].type == 'string'
         schema.properties['aaaaazzz'].type == 'integer'
-        schema.properties['aaabbzzz'].type == 'string'
+        schema.properties['aaabbzzz'] == null
+        schema.properties['aaacczzz'].type == 'string'
         schema.properties['pet-name'].type == 'string'
         schema.properties['pet-age'].type == 'integer'
+        schema.properties['last_name'].type == 'string'
         schema.properties['aaapet-namezzz'].type == 'string'
         schema.properties['aaapet-agezzz'].type == 'integer'
-        !schema.required
+        schema.properties['aaalast_namezzz'].type == 'string'
+        schema.required == ['aaacczzz', 'cc']
+        dummySchema.properties['bb'] == null
+        dummySchema.properties['cc'].type == 'string'
+        dummySchema.required == ['cc']
+        petSchema.properties['last_name'].type == 'string'
+        petSchema.required == null
     }
 }
