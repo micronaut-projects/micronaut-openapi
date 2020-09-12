@@ -734,6 +734,7 @@ abstract class AbstractOpenApiVisitor  {
      * @param context The visitor context
      * @param element The element
      * @param elementType The element type
+     * @param classElement The class element
      * @param parentSchema The parent schema
      * @param propertySchema The property schema
      */
