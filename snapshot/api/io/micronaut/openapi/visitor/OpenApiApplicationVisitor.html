@@ -306,9 +306,10 @@ implements io.micronaut.inject.visitor.TypeElementVisitor&lt;io.swagger.v3.oas.a
 </tr>
 <tr id="i6" class="altColor">
 <td class="colFirst"><code>protected void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/openapi/visitor/OpenApiApplicationVisitor.html#processSchemaProperty-io.micronaut.inject.visitor.VisitorContext-io.micronaut.inject.ast.Element-io.micronaut.inject.ast.ClassElement-io.swagger.v3.oas.models.media.Schema-io.swagger.v3.oas.models.media.Schema-">processSchemaProperty</a></span>(io.micronaut.inject.visitor.VisitorContext&nbsp;context,
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/openapi/visitor/OpenApiApplicationVisitor.html#processSchemaProperty-io.micronaut.inject.visitor.VisitorContext-io.micronaut.inject.ast.Element-io.micronaut.inject.ast.ClassElement-io.micronaut.inject.ast.Element-io.swagger.v3.oas.models.media.Schema-io.swagger.v3.oas.models.media.Schema-">processSchemaProperty</a></span>(io.micronaut.inject.visitor.VisitorContext&nbsp;context,
                      io.micronaut.inject.ast.Element&nbsp;element,
                      io.micronaut.inject.ast.ClassElement&nbsp;elementType,
+                     io.micronaut.inject.ast.Element&nbsp;classElement,
                      io.swagger.v3.oas.models.media.Schema&nbsp;parentSchema,
                      io.swagger.v3.oas.models.media.Schema&nbsp;propertySchema)</code>
 <div class="block">Processes a schema property.</div>
@@ -725,7 +726,7 @@ protected&nbsp;io.swagger.v3.oas.models.media.Schema&nbsp;resolveSchema(io.swagg
 </dl>
 </li>
 </ul>
-<a name="processSchemaProperty-io.micronaut.inject.visitor.VisitorContext-io.micronaut.inject.ast.Element-io.micronaut.inject.ast.ClassElement-io.swagger.v3.oas.models.media.Schema-io.swagger.v3.oas.models.media.Schema-">
+<a name="processSchemaProperty-io.micronaut.inject.visitor.VisitorContext-io.micronaut.inject.ast.Element-io.micronaut.inject.ast.ClassElement-io.micronaut.inject.ast.Element-io.swagger.v3.oas.models.media.Schema-io.swagger.v3.oas.models.media.Schema-">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -734,6 +735,8 @@ protected&nbsp;io.swagger.v3.oas.models.media.Schema&nbsp;resolveSchema(io.swagg
 <pre>protected&nbsp;void&nbsp;processSchemaProperty(io.micronaut.inject.visitor.VisitorContext&nbsp;context,
                                      io.micronaut.inject.ast.Element&nbsp;element,
                                      io.micronaut.inject.ast.ClassElement&nbsp;elementType,
+                                     @Nullable
+                                     io.micronaut.inject.ast.Element&nbsp;classElement,
                                      io.swagger.v3.oas.models.media.Schema&nbsp;parentSchema,
                                      io.swagger.v3.oas.models.media.Schema&nbsp;propertySchema)</pre>
 <div class="block">Processes a schema property.</div>
