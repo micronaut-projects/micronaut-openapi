@@ -1256,10 +1256,13 @@ abstract class AbstractOpenApiVisitor  {
         if (metaAnnName != null && !io.swagger.v3.oas.annotations.media.Schema.class.getName().equals(metaAnnName)) {
             return NameUtils.getSimpleName(metaAnnName);
         }
+        String javaName;
         if (type instanceof TypedElement) {
-            return computeNameWithGenerics(((TypedElement) type).getType());
+            javaName = computeNameWithGenerics(((TypedElement) type).getType());
+        } else {
+            javaName = type.getSimpleName();
         }
-        return type.getSimpleName();
+        return javaName.replace("$", ".");
     }
 
     private String computeNameWithGenerics(ClassElement classElement) {

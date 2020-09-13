@@ -44,6 +44,7 @@ class Pet {
     private int age;
     private String name;
     private List<String> tags;
+    public InnerBean inner;
 
     public void setAge(int a) {
         age = a;
@@ -84,6 +85,10 @@ class Pet {
     public void setTags(List<String> tags) {
         this.tags = tags;
     }
+    
+    public static class InnerBean {
+        public String xyz;
+    }
 }
 
 @javax.inject.Singleton
@@ -95,10 +100,12 @@ class MyBean {}
         when:"The OpenAPI is retrieved"
         OpenAPI openAPI = AbstractOpenApiVisitor.testReference
         Schema petSchema = openAPI.components.schemas['Pet']
+        Schema petInnerBeanSchema = openAPI.components.schemas['Pet.InnerBean']
 
         then:"the components are valid"
+        petInnerBeanSchema
         petSchema.type == 'object'
-        petSchema.properties.size() == 3
+        petSchema.properties.size() == 4
 
         petSchema.properties["tags"].type == "array"
         petSchema.properties["tags"].description == "The Pet Tags"
