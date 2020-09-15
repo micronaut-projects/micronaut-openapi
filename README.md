@@ -1,6 +1,6 @@
 # Micronaut OpenAPI #
 
-[![Maven Central](https://img.shields.io/maven-central/v/io.micronaut.configuration/micronaut-openapi.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22io.micronaut.configuration%22%20AND%20a:%22micronaut-openapi%22)
+[![Maven Central](https://img.shields.io/maven-central/v/io.micronaut.openapi/micronaut-openapi.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22io.micronaut.openapi%22%20AND%20a:%22micronaut-openapi%22)
 [![Build Status](https://github.com/micronaut-projects/micronaut-openapi/workflows/Java%20CI/badge.svg)](https://github.com/micronaut-projects/micronaut-openapi/actions)
 [![Download](https://api.bintray.com/packages/micronaut/core-releases-local/openapi/images/download.svg)](https://bintray.com/micronaut/core-releases-local/openapi/_latestVersion)
 
