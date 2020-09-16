@@ -2,7 +2,6 @@
 package io.micronaut.openapi.visitor
 
 import io.micronaut.annotation.processing.test.AbstractTypeElementSpec
-import io.swagger.v3.oas.annotations.enums.ParameterIn
 import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.PathItem
 import io.swagger.v3.oas.models.media.Schema
@@ -381,6 +380,9 @@ interface Test {
 
     @Get("/test6{?bar}")
     public String test6(@Nullable String bar, String name);
+    
+    @Post("/test7")
+    public String test7(String someId, @Nullable String someNotRequired, java.util.Optional<String> someNotRequired2, HttpRequest req, Principal principal, @Body Greeting myBody);
 }
 
 class Greeting {
@@ -409,6 +411,9 @@ class MyBean {}
         then:
         pathItem.post.operationId == 'test2'
         pathItem.post.parameters.size() == 0
+        pathItem.post.requestBody.content['application/json'].schema
+        pathItem.post.requestBody.content['application/json'].schema.properties.size() == 1
+        pathItem.post.requestBody.content['application/json'].schema.properties['name']
 
         when:
         pathItem = openAPI.paths.get("/test3")
@@ -445,6 +450,23 @@ class MyBean {}
         pathItem.get.parameters[0].in == 'query'
         pathItem.get.parameters[1].name == 'name'
         pathItem.get.parameters[1].in == 'query'
+
+        when:
+        pathItem = openAPI.paths.get("/test7")
+
+        then:
+        pathItem.post.operationId == 'test7'
+        pathItem.post.parameters.size() == 0
+        pathItem.post.requestBody.required
+        pathItem.post.requestBody.content['application/json'].schema
+        pathItem.post.requestBody.content['application/json'].schema.allOf[0].$ref == "#/components/schemas/Greeting"
+        pathItem.post.requestBody.content['application/json'].schema.allOf[1].properties.size() == 3
+        pathItem.post.requestBody.content['application/json'].schema.allOf[1].properties['someId']
+        pathItem.post.requestBody.content['application/json'].schema.allOf[1].properties['someId'].nullable == null
+        pathItem.post.requestBody.content['application/json'].schema.allOf[1].properties['someNotRequired']
+        pathItem.post.requestBody.content['application/json'].schema.allOf[1].properties['someNotRequired'].nullable == true
+        pathItem.post.requestBody.content['application/json'].schema.allOf[1].properties['someNotRequired2']
+        pathItem.post.requestBody.content['application/json'].schema.allOf[1].properties['someNotRequired2'].nullable == true
     }
 
     void "test @Parameter in header and explode is true"() {
