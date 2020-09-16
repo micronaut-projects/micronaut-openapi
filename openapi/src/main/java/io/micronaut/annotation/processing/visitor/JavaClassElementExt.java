@@ -212,7 +212,8 @@ public class JavaClassElementExt extends JavaClassElement {
                 && !method.getSimpleName().toString().contains("$");
     }
 
-    private static boolean isCandidateBeanMethod(ExecutableElement method) {
+    private boolean isCandidateBeanMethod(ExecutableElement method) {
+
         if (!checkModifiers(method)) {
             return false;
         }
@@ -228,13 +229,13 @@ public class JavaClassElementExt extends JavaClassElement {
         }
     }
 
-    private static boolean checkModifiers(ExecutableElement method) {
+    private boolean checkModifiers(ExecutableElement method) {
         final Set<Modifier> modifiers = method.getModifiers();
-        return method.getModifiers().contains(Modifier.PUBLIC) && !modifiers.contains(Modifier.ABSTRACT) && !modifiers.contains(Modifier.STATIC) && !modifiers.contains(Modifier.PRIVATE)
+        return method.getModifiers().contains(Modifier.PUBLIC) && !modifiers.contains(Modifier.STATIC) && !modifiers.contains(Modifier.PRIVATE)
                 && !method.getSimpleName().toString().contains("$");
     }
 
-    private static boolean isCandidateFluentBeanMethod(ExecutableElement method, Set<String> fieldNames) {
+    private boolean isCandidateFluentBeanMethod(ExecutableElement method, Set<String> fieldNames) {
         if (!checkModifiers(method)) {
             return false;
         }
@@ -274,7 +275,7 @@ public class JavaClassElementExt extends JavaClassElement {
         ElementFilter.methodsIn(elements.getAllMembers(classElement)).stream()
                 // skip java.lang.Object methods
                 .filter(method -> !isObjectClassMethod(method, elements))
-                .filter(JavaClassElementExt::isCandidateBeanMethod)
+                .filter(this::isCandidateBeanMethod)
                 .forEach(executableElement -> beanProperty(props, executableElement));
         return processPropertyElements(props, fields);
     }
