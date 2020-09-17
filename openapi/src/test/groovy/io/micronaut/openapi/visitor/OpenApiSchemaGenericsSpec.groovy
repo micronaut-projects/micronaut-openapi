@@ -328,7 +328,7 @@ class MyBean {}
         expect:
         operation
         operation.responses.size() == 1
-        operation.responses.default.content['application/json'].schema.$ref == '#/components/schemas/ResponseOfPet'
+        operation.responses['200'].content['application/json'].schema.$ref == '#/components/schemas/ResponseOfPet'
         operation.requestBody.content['application/json'].schema.$ref == '#/components/schemas/RequestOfPet'
         openAPI.components.schemas['Pet'].properties['age'].type == 'integer'
         openAPI.components.schemas['ResponseOfPet'].properties['result'].$ref == '#/components/schemas/Pet'
@@ -474,7 +474,7 @@ class MyBean {}
         expect:
         operation
         operation.responses.size() == 1
-        operation.responses.default.content['application/json'].schema.$ref == '#/components/schemas/Time'
+        operation.responses['200'].content['application/json'].schema.$ref == '#/components/schemas/Time'
         openAPI.components.schemas['Quantity_Time.TimeUnit_'].type == 'object'
         openAPI.components.schemas['Quantity_Time.TimeUnit_'].properties['amount'].type == 'number'
         openAPI.components.schemas['Quantity_Time.TimeUnit_'].properties['unit'].$ref == '#/components/schemas/TimeUnit'

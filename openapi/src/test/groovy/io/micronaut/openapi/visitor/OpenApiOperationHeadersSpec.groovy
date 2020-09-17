@@ -69,10 +69,10 @@ class MyBean {}
         expect:
         operation
         operation.responses.size() == 1
-        operation.responses.default.headers.size() == 1
-        operation.responses.default.headers['X-Rate-Limit-Limit'].description == 'The number of allowed requests in the current period'
-        operation.responses.default.headers['X-Rate-Limit-Limit'].schema
-        operation.responses.default.headers['X-Rate-Limit-Limit'].schema.type == 'integer'
+        operation.responses['200'].headers.size() == 1
+        operation.responses['200'].headers['X-Rate-Limit-Limit'].description == 'The number of allowed requests in the current period'
+        operation.responses['200'].headers['X-Rate-Limit-Limit'].schema
+        operation.responses['200'].headers['X-Rate-Limit-Limit'].schema.type == 'integer'
     }
 
     void "test parse the micronaut @Header annotation and body"() {

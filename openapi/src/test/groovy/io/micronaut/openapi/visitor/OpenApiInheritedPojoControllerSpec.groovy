@@ -325,11 +325,11 @@ class MyBean {}
         operation
         operation.responses
         operation.responses.size() == 1
-        operation.responses."default"
-        operation.responses."default".content
-        operation.responses."default".content."application/json"
-        operation.responses."default".content."application/json".schema
-        operation.responses."default".content."application/json".schema.$ref
+        operation.responses."200"
+        operation.responses."200".content
+        operation.responses."200".content."application/json"
+        operation.responses."200".content."application/json".schema
+        operation.responses."200".content."application/json".schema.$ref
     }
 
     void "test build OpenAPI doc for POJO with Inheritance and discriminator mapping"() {
@@ -529,11 +529,11 @@ class MyBean {}
         operation
         operation.responses
         operation.responses.size() == 1
-        operation.responses."default"
-        operation.responses."default".content
-        operation.responses."default".content."application/json"
-        operation.responses."default".content."application/json".schema
-        operation.responses."default".content."application/json".schema.$ref
+        operation.responses."200"
+        operation.responses."200".content
+        operation.responses."200".content."application/json"
+        operation.responses."200".content."application/json".schema
+        operation.responses."200".content."application/json".schema.$ref
     }
 
     void "test build OpenAPI doc for POJO with inheritance"() {

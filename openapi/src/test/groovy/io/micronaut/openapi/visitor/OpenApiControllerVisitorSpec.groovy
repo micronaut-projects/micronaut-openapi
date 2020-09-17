@@ -318,10 +318,10 @@ class MyBean {}
         then:"it is included in the OpenAPI doc"
         pathItem.get.operationId == 'list'
         pathItem.get.description == 'List the pets'
-        pathItem.get.responses['default']
-        pathItem.get.responses['default'].description == 'a list of pet names'
-        pathItem.get.responses['default'].content['application/json'].schema
-        pathItem.get.responses['default'].content['application/json'].schema.type == 'array'
+        pathItem.get.responses['200']
+        pathItem.get.responses['200'].description == 'a list of pet names'
+        pathItem.get.responses['200'].content['application/json'].schema
+        pathItem.get.responses['200'].content['application/json'].schema.type == 'array'
 
         when:"the /{slug} path is retrieved"
         pathItem = openAPI.paths.get("/pets/{slug}")
@@ -337,8 +337,8 @@ class MyBean {}
         pathItem.get.parameters[0].description == 'The slug name'
         pathItem.get.parameters[0].schema.type == 'string'
         pathItem.get.responses.size() == 1
-        pathItem.get.responses['default'] != null
-        pathItem.get.responses['default'].content['application/json'].schema.type == 'string'
+        pathItem.get.responses['200'] != null
+        pathItem.get.responses['200'].content['application/json'].schema.type == 'string'
 
         when:"the /extras/{extraId} path is retrieved"
         pathItem = openAPI.paths.get("/pets/extras/{extraId}")
@@ -351,16 +351,16 @@ class MyBean {}
         pathItem.get.parameters[0].schema
         pathItem.get.parameters[0].schema.type == 'string'
         pathItem.get.responses.size() == 1
-        pathItem.get.responses['default'] != null
-        pathItem.get.responses['default'].content['application/json'].schema.type == 'string'
+        pathItem.get.responses['200'] != null
+        pathItem.get.responses['200'].content['application/json'].schema.type == 'string'
 
         when:"the /getSomething path is retrieved"
         pathItem = openAPI.paths.get("/pets/random")
 
         then:"default response has default description"
         pathItem.get.operationId == 'getRandomPet'
-        pathItem.get.responses['default'].description == 'getRandomPet default response'
-        pathItem.get.responses['default'].content['application/json'].schema.type == 'string'
+        pathItem.get.responses['200'].description == 'getRandomPet 200 response'
+        pathItem.get.responses['200'].content['application/json'].schema.type == 'string'
 
     }
 
@@ -430,10 +430,10 @@ class MyBean {}
         then:"it is included in the OpenAPI doc"
         pathItem.get.operationId == 'list'
         pathItem.get.description == 'List the pets'
-        pathItem.get.responses['default']
-        pathItem.get.responses['default'].description == 'a list of pet names'
-        pathItem.get.responses['default'].content['application/json'].schema
-        pathItem.get.responses['default'].content['application/json'].schema.type == 'array'
+        pathItem.get.responses['200']
+        pathItem.get.responses['200'].description == 'a list of pet names'
+        pathItem.get.responses['200'].content['application/json'].schema
+        pathItem.get.responses['200'].content['application/json'].schema.type == 'array'
         pathItem.post.operationId == 'save'
         pathItem.post.requestBody
         pathItem.post.requestBody.required
@@ -455,18 +455,18 @@ class MyBean {}
         pathItem.get.parameters[0].description == 'The slug name'
         pathItem.get.parameters[0].schema.type == 'string'
         pathItem.get.responses.size() == 1
-        pathItem.get.responses['default'] != null
-        pathItem.get.responses['default'].content['application/json'].schema.type == 'string'
+        pathItem.get.responses['200'] != null
+        pathItem.get.responses['200'].content['application/json'].schema.type == 'string'
 
         when:"A flowable is returned"
         pathItem = openAPI.paths.get("/pets/flowable")
 
         then:
         pathItem.get.operationId == 'flowable'
-        pathItem.get.responses['default']
-        pathItem.get.responses['default'].description == 'a list of pet names'
-        pathItem.get.responses['default'].content['application/json'].schema
-        pathItem.get.responses['default'].content['application/json'].schema.type == 'array'
+        pathItem.get.responses['200']
+        pathItem.get.responses['200'].description == 'a list of pet names'
+        pathItem.get.responses['200'].content['application/json'].schema
+        pathItem.get.responses['200'].content['application/json'].schema.type == 'array'
     }
 
     void "test parse custom parameter data"() {

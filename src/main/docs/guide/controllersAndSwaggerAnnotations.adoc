@@ -33,7 +33,7 @@ paths:
         schema:
           type: string
       responses:
-        default:
+        200:
           description: The greeting
           content:
             text/plain:
@@ -81,7 +81,7 @@ paths:
           minLength: 1
           type: string
       responses:
-        default:
+        200:
           content:
             text/plain:
               schema:

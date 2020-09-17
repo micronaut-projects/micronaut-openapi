@@ -73,11 +73,11 @@ class MyBean {}
         expect:
         operation
         operation.responses.size() == 1
-        operation.responses.default.links.size() == 1
-        operation.responses.default.links.address.operationId == 'getAddress'
-        operation.responses.default.links.address.parameters.size() == 1
-        operation.responses.default.links.address.parameters['userId'] == '$request.query.userId'
-        operation.responses.default.links.address.extensions.'x-custom'.prop1 == "prop1Val"
+        operation.responses['200'].links.size() == 1
+        operation.responses['200'].links.address.operationId == 'getAddress'
+        operation.responses['200'].links.address.parameters.size() == 1
+        operation.responses['200'].links.address.parameters['userId'] == '$request.query.userId'
+        operation.responses['200'].links.address.extensions.'x-custom'.prop1 == "prop1Val"
 
     }
 }
