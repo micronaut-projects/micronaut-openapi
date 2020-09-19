@@ -16,7 +16,6 @@
 package io.micronaut.openapi.visitor;
 
 import io.micronaut.core.annotation.Experimental;
-import io.micronaut.core.value.OptionalValues;
 import io.micronaut.http.HttpMethod;
 import io.micronaut.http.MediaType;
 import io.micronaut.http.annotation.Consumes;
@@ -35,10 +34,12 @@ import io.swagger.v3.oas.models.servers.Server;
 
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * A {@link TypeElementVisitor} the builds the Swagger model from Micronaut controllers at compile time.
@@ -85,14 +86,11 @@ public class OpenApiControllerVisitor extends AbstractOpenApiEndpointVisitor imp
     }
 
     private List<MediaType> mediaTypes(MethodElement element, Class<? extends Annotation> ann) {
-        OptionalValues<List> mts = element.getValues(ann, List.class);
-        if (mts.isEmpty()) {
+        String[] values = element.stringValues(ann);
+        if (values.length == 0) {
             return Collections.singletonList(MediaType.APPLICATION_JSON_TYPE);
         } else {
-            List<MediaType> mediaTypes = new ArrayList<>();
-            mts.forEach((key, list) ->
-                list.stream().map(mt -> MediaType.of(mt.toString())).forEach(mt -> mediaTypes.add((MediaType) mt)));
-            return mediaTypes;
+            return Arrays.stream(values).map(MediaType::of).distinct().collect(Collectors.toList());
         }
     }
 
