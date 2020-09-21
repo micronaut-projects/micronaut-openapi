@@ -731,6 +731,10 @@ class Person {
 
     @PositiveOrZero
     private Integer totalGoals;
+    
+    @Email
+    @io.swagger.v3.oas.annotations.media.Schema(name = "xyz", implementation = String.class)
+    public java.util.Map<String, java.util.List<Integer>> mapValue;
 
     public Person(@NotBlank String name,
                   @NegativeOrZero Integer debtValue,
@@ -794,7 +798,7 @@ public class MyBean {}
         openAPI.components.schemas["Person"].type == "object"
 
         openAPI.components.schemas["Person"].properties
-        openAPI.components.schemas["Person"].properties.size() == 3
+        openAPI.components.schemas["Person"].properties.size() == 4
 
         openAPI.components.schemas["Person"].properties["name"]
         openAPI.components.schemas["Person"].properties["debt_value"]
@@ -811,6 +815,10 @@ public class MyBean {}
         openAPI.components.schemas["Person"].properties["total_goals"].type == "integer"
         !openAPI.components.schemas["Person"].properties["total_goals"].exclusiveMinimum
         openAPI.components.schemas["Person"].properties["total_goals"].description == "The total number of person's goals."
+
+        openAPI.components.schemas["Person"].properties["xyz"].type == "string"
+        openAPI.components.schemas["Person"].properties["xyz"].additionalProperties == null
+        openAPI.components.schemas["Person"].properties["xyz"].format == "email"
 
         openAPI.components.schemas["Person"].required.size() == 2
         openAPI.components.schemas["Person"].required.contains("name")
