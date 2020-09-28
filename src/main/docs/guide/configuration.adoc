@@ -1,4 +1,4 @@
-In the following chapters you will see it is possible to tweaks the open api processing via system properties. It is also possible to specify these options in
+In the following chapters you will see it is possible to tweak the open api processing via system properties. It is also possible to specify these options in
 a file located at the root level of your project directory. The expected filename is `openapi.properties`.
 
 It is possible to specify a different location and filename with the `micronaut.openapi.config.file` System property.
@@ -52,14 +52,14 @@ public class Application {
 }
 ----
 
-The generated specification file will looks like:
+The generated specification file will look like:
 
 .Generated Swagger YAML
 [source,yaml]
 ----
 openapi: 3.0.1
 info:
-  title: the title
+  title: Hello World
   description: A nice API
   contact:
     name: Fred

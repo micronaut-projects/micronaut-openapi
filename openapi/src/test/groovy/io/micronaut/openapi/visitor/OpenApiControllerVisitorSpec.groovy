@@ -371,6 +371,7 @@ class MyBean {}
         buildBeanDefinition('test.MyBean', '''
 package test;
 
+import io.micronaut.http.MediaType;
 import io.reactivex.*;
 import io.micronaut.http.annotation.*;
 import java.util.List;
@@ -387,7 +388,7 @@ interface PetOperations<T extends String> {
      *
      * @return a list of pet names
      */
-    @Get("/")
+    @Get(value = "/", produces = MediaType.APPLICATION_JSON, single = true)
     Single<List<T>> list();
 
     /**

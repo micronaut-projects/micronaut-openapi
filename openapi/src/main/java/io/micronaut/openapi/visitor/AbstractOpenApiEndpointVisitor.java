@@ -56,6 +56,7 @@ import io.swagger.v3.oas.annotations.tags.Tags;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.PathItem;
+import io.swagger.v3.oas.models.media.ComposedSchema;
 import io.swagger.v3.oas.models.media.Content;
 import io.swagger.v3.oas.models.media.ObjectSchema;
 import io.swagger.v3.oas.models.media.Schema;
@@ -231,8 +232,7 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
     protected abstract String description(MethodElement element);
 
     private boolean hasNoBindingAnnotationOrType(ParameterElement parameter) {
-        return !parameter.isAnnotationPresent(io.swagger.v3.oas.annotations.Parameter.class) &&
-                !parameter.isAnnotationPresent(io.swagger.v3.oas.annotations.parameters.RequestBody.class) &&
+        return !parameter.isAnnotationPresent(io.swagger.v3.oas.annotations.parameters.RequestBody.class) &&
                 !parameter.isAnnotationPresent(QueryValue.class) &&
                 !parameter.isAnnotationPresent(PathVariable.class) &&
                 !parameter.isAnnotationPresent(Body.class) &&
@@ -303,12 +303,11 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
 
         Map<String, UriMatchVariable> pathVariables = pathVariables(matchTemplate);
         List<MediaType> consumesMediaTypes = consumesMediaTypes(element);
-        processParameters(element, context, openAPI, swaggerOperation, javadocDescription, permitsRequestBody, pathVariables, consumesMediaTypes);
+        List<ParameterElement> extraBodyParameters = new ArrayList<>();
+        processParameters(element, context, openAPI, swaggerOperation, javadocDescription, permitsRequestBody, pathVariables, consumesMediaTypes, extraBodyParameters);
 
-        if (HttpMethod.requiresRequestBody(httpMethod) && swaggerOperation.getRequestBody() == null) {
-            processBodyParameters(element, context, openAPI, swaggerOperation, javadocDescription, pathVariables,
-                    consumesMediaTypes);
-        }
+        processExtraBodyParameters(context, httpMethod, openAPI, swaggerOperation, javadocDescription, consumesMediaTypes, extraBodyParameters);
+
         // if we have multiple uris, process them
         while (matchTemplates.hasNext()) {
             pathItem = resolvePathItem(context, matchTemplates.next());
@@ -316,10 +315,53 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
         }
     }
 
+    private void processExtraBodyParameters(VisitorContext context, HttpMethod httpMethod, OpenAPI openAPI,
+                                            io.swagger.v3.oas.models.Operation swaggerOperation,
+                                            JavadocDescription javadocDescription,
+                                            List<MediaType> consumesMediaTypes,
+                                            List<ParameterElement> extraBodyParameters) {
+        RequestBody requestBody = swaggerOperation.getRequestBody();
+        if (HttpMethod.requiresRequestBody(httpMethod) || HttpMethod.permitsRequestBody(httpMethod) && !extraBodyParameters.isEmpty()) {
+            if (requestBody == null) {
+                requestBody = new RequestBody();
+                Content content = new Content();
+                requestBody.setContent(content);
+                requestBody.setRequired(true);
+                swaggerOperation.setRequestBody(requestBody);
+
+                consumesMediaTypes = consumesMediaTypes.isEmpty() ? Collections.singletonList(MediaType.APPLICATION_JSON_TYPE) : consumesMediaTypes;
+                consumesMediaTypes.forEach(mediaType -> {
+                    io.swagger.v3.oas.models.media.MediaType mt = new io.swagger.v3.oas.models.media.MediaType();
+                    mt.setSchema(new ObjectSchema());
+                    content.addMediaType(mediaType.toString(), mt);
+                });
+            }
+        }
+        if (requestBody != null && !extraBodyParameters.isEmpty()) {
+            requestBody.getContent().forEach((mediaTypeName, mediaType) -> {
+                Schema schema = mediaType.getSchema();
+                if (schema.get$ref() != null) {
+                    ComposedSchema composedSchema = new ComposedSchema();
+                    Schema extraBodyParametersSchema = new Schema();
+                    // Composition of existing + a new schema where extra body parameters are going to be added
+                    composedSchema.addAllOfItem(schema);
+                    composedSchema.addAllOfItem(extraBodyParametersSchema);
+                    schema = extraBodyParametersSchema;
+                    mediaType.setSchema(composedSchema);
+                }
+                for (ParameterElement parameter : extraBodyParameters) {
+                    processBodyParameter(context, openAPI, javadocDescription, MediaType.of(mediaTypeName), schema, parameter);
+                }
+            });
+        }
+    }
+
     private void processParameters(MethodElement element, VisitorContext context, OpenAPI openAPI,
                                    io.swagger.v3.oas.models.Operation swaggerOperation, JavadocDescription javadocDescription,
                                    boolean permitsRequestBody,
-                                   Map<String, UriMatchVariable> pathVariables, List<MediaType> consumesMediaTypes) {
+                                   Map<String, UriMatchVariable> pathVariables,
+                                   List<MediaType> consumesMediaTypes,
+                                   List<ParameterElement> extraBodyParameters) {
         List<Parameter> swaggerParameters = swaggerOperation.getParameters();
         boolean hasExistingParameters = CollectionUtils.isNotEmpty(swaggerParameters);
         if (!hasExistingParameters) {
@@ -328,14 +370,15 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
         }
         for (ParameterElement parameter : element.getParameters()) {
             processParameter(context, openAPI, swaggerOperation, javadocDescription, permitsRequestBody, pathVariables,
-                    consumesMediaTypes, swaggerParameters, hasExistingParameters, parameter);
+                    consumesMediaTypes, swaggerParameters, hasExistingParameters, parameter, extraBodyParameters);
         }
     }
 
     private void processParameter(VisitorContext context, OpenAPI openAPI,
                                   io.swagger.v3.oas.models.Operation swaggerOperation, JavadocDescription javadocDescription,
                                   boolean permitsRequestBody, Map<String, UriMatchVariable> pathVariables, List<MediaType> consumesMediaTypes,
-                                  List<Parameter> swaggerParameters, boolean hasExistingParameters, ParameterElement parameter) {
+                                  List<Parameter> swaggerParameters, boolean hasExistingParameters, ParameterElement parameter,
+                                  List<ParameterElement> extraBodyParameters) {
         ClassElement parameterType = parameter.getGenericType();
 
         if (ignoreParameter(parameter)) {
@@ -359,7 +402,7 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
         }
 
         Parameter newParameter = processMethodParameterAnnotation(context, permitsRequestBody, pathVariables,
-                parameter);
+                parameter, extraBodyParameters);
         if (newParameter == null) {
             return;
         }
@@ -389,51 +432,8 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
         }
     }
 
-    private void processBodyParameters(MethodElement element, VisitorContext context, OpenAPI openAPI,
-                                       io.swagger.v3.oas.models.Operation swaggerOperation, JavadocDescription javadocDescription,
-                                       Map<String, UriMatchVariable> pathVariables, List<MediaType> consumesMediaTypes) {
-        List<ParameterElement> bodyParameters = Arrays.stream(element.getParameters())
-                .filter(p -> !pathVariables.containsKey(p.getName()) && !p.isAnnotationPresent(Bindable.class)
-                        && !p.isAnnotationPresent(JsonIgnore.class) && !p.isAnnotationPresent(Hidden.class)
-                        && !p.isAnnotationPresent(Header.class) && !p.isAnnotationPresent(QueryValue.class)
-                        && !isAnnotationPresent(p, "io.micronaut.session.annotation.SessionValue")
-                        && !p.getValue(io.swagger.v3.oas.annotations.Parameter.class, "in", ParameterIn.class)
-                        .isPresent()
-                        && !p.getValue(io.swagger.v3.oas.annotations.Parameter.class, "hidden", Boolean.class)
-                        .orElse(false)
-                        && !isIgnoredParameterType(p.getType()))
-                .collect(Collectors.toList());
-
-        if (bodyParameters.isEmpty()) {
-            return;
-        }
-        RequestBody requestBody = swaggerOperation.getRequestBody();
-        final Content content;
-        if (requestBody == null) {
-            requestBody = new RequestBody();
-            content = new Content();
-            requestBody.setContent(content);
-            requestBody.setRequired(true);
-            swaggerOperation.setRequestBody(requestBody);
-        } else {
-            content = requestBody.getContent();
-        }
-        consumesMediaTypes = consumesMediaTypes.isEmpty() ? Collections.singletonList(MediaType.APPLICATION_JSON_TYPE)
-                : consumesMediaTypes;
-        consumesMediaTypes.forEach(mediaType -> {
-            io.swagger.v3.oas.models.media.MediaType mt = new io.swagger.v3.oas.models.media.MediaType();
-            ObjectSchema schema = new ObjectSchema();
-            for (ParameterElement parameter : bodyParameters) {
-                processBodyParameter(context, openAPI, javadocDescription, mediaType, schema, parameter);
-            }
-            mt.setSchema(schema);
-            content.addMediaType(mediaType.toString(), mt);
-        });
-
-    }
-
     private void processBodyParameter(VisitorContext context, OpenAPI openAPI, JavadocDescription javadocDescription,
-                                      MediaType mediaType, ObjectSchema schema, ParameterElement parameter) {
+                                      MediaType mediaType, Schema schema, ParameterElement parameter) {
         Schema propertySchema = resolveSchema(openAPI, parameter, parameter.getType(), context,
                 Collections.singletonList(mediaType));
         if (propertySchema != null) {
@@ -443,9 +443,11 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
             if (description.isPresent()) {
                 propertySchema.setDescription(description.get());
             }
-            processSchemaProperty(context, parameter, parameter.getType(), schema, propertySchema);
-
-            propertySchema.setNullable(parameter.isAnnotationPresent(Nullable.class));
+            processSchemaProperty(context, parameter, parameter.getType(), null, schema, propertySchema);
+            if (parameter.isAnnotationPresent(Nullable.class) || parameter.getType().isAssignable(Optional.class)) {
+                // Keep null if not
+                propertySchema.setNullable(true);
+            }
             if (javadocDescription != null && StringUtils.isEmpty(propertySchema.getDescription())) {
                 CharSequence doc = javadocDescription.getParameters().get(parameter.getName());
                 if (doc != null) {
@@ -456,7 +458,8 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
     }
 
     private Parameter processMethodParameterAnnotation(VisitorContext context, boolean permitsRequestBody,
-                                                       Map<String, UriMatchVariable> pathVariables, ParameterElement parameter) {
+                                                       Map<String, UriMatchVariable> pathVariables, ParameterElement parameter,
+                                                       List<ParameterElement> extraBodyParameters) {
         Parameter newParameter = null;
         String parameterName = parameter.getName();
         if (!parameter.hasStereotype(Bindable.class) && pathVariables.containsKey(parameterName)) {
@@ -496,11 +499,20 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
         } else if (parameter.hasAnnotation("io.micronaut.management.endpoint.annotation.Selector")) {
             newParameter = new PathParameter();
             newParameter.setName(parameterName);
-        } else if (!permitsRequestBody && hasNoBindingAnnotationOrType(parameter)) {
-            // default to QueryValue -
-            // https://github.com/micronaut-projects/micronaut-openapi/issues/130
-            newParameter = new QueryParameter();
-            newParameter.setName(parameterName);
+        } else if (hasNoBindingAnnotationOrType(parameter)) {
+            AnnotationValue<io.swagger.v3.oas.annotations.Parameter> parameterAnnotation = parameter.getAnnotation(io.swagger.v3.oas.annotations.Parameter.class);
+            // Skip recognizing parameter if it's manually defined by "in"
+            if (parameterAnnotation == null || !parameterAnnotation.booleanValue("hidden").orElse(false)
+                    && !parameterAnnotation.stringValue("in").isPresent()) {
+                if (permitsRequestBody) {
+                    extraBodyParameters.add(parameter);
+                } else {
+                    // default to QueryValue -
+                    // https://github.com/micronaut-projects/micronaut-openapi/issues/130
+                    newParameter = new QueryParameter();
+                    newParameter.setName(parameterName);
+                }
+            }
         }
 
         if (parameter.isAnnotationPresent(io.swagger.v3.oas.annotations.Parameter.class)) {
@@ -509,7 +521,7 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
 
             if (paramAnn != null) {
 
-                if (paramAnn.get("hidden", Boolean.class, false).booleanValue()) {
+                if (paramAnn.get("hidden", Boolean.class, false)) {
                     // ignore hidden parameters
                     return null;
                 }

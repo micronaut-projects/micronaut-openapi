@@ -1,6 +1,6 @@
 To enable this support you should add the following dependencies to your build configuration:
 
-dependency:micronaut-openapi[scope="annotationProcessor", version="{version}", groupId="io.micronaut.configuration"]
+dependency:micronaut-openapi[scope="annotationProcessor", version="{version}", groupId="io.micronaut.openapi"]
 
 Then the following compile time dependency:
 

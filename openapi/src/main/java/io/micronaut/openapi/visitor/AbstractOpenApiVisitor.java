@@ -16,11 +16,14 @@
 package io.micronaut.openapi.visitor;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import io.micronaut.annotation.processing.visitor.JavaClassElementExt;
@@ -99,7 +102,6 @@ import javax.validation.constraints.Size;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.math.BigDecimal;
-import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -149,6 +151,12 @@ abstract class AbstractOpenApiVisitor  {
      * Stores the current in progress type.
      */
     private List<String> inProgressSchemas = new ArrayList<>(10);
+
+    /**
+     * {@link PropertyNamingStrategy} instances cache.
+     */
+    private Map<String, PropertyNamingStrategy> propertyNamingStrategyInstances = new HashMap<>();
+
 
     /**
      * Increments the number of visited elements.
@@ -695,33 +703,31 @@ abstract class AbstractOpenApiVisitor  {
         return components;
     }
 
-    private List<Entry<String, Schema>> handleUnwrapped(Schema innerModel, String prefix, String suffix,
-            VisitorContext context) {
-        Map properties = innerModel.getProperties();
-        if (properties == null) {
-            return Collections.emptyList();
+    private void handleUnwrapped(VisitorContext context, Element element, ClassElement elementType, Schema parentSchema, AnnotationValue<JsonUnwrapped> uw) {
+        Map<String, Schema> schemas = resolveSchemas(resolveOpenAPI(context));
+        String schemaName = element.stringValue(io.swagger.v3.oas.annotations.media.Schema.class, "name").orElse(computeDefaultSchemaName(null, elementType));
+        Schema wrappedPropertySchema = schemas.get(schemaName);
+        Map properties = wrappedPropertySchema.getProperties();
+        if (properties == null || properties.isEmpty()) {
+            return;
         }
-        List<Entry<String, Schema>> props = new ArrayList<>(properties.size());
-        if (StringUtils.isEmpty(suffix) && StringUtils.isEmpty(prefix)) {
-            props.addAll(properties.entrySet());
-        } else {
-            if (prefix == null) {
-                prefix = "";
-            }
-            if (suffix == null) {
-                suffix = "";
-            }
-            for (Entry<String, Schema> prop : (Set<Map.Entry<String, Schema>>) properties.entrySet()) {
-                try {
-                    Schema clonedProp = jsonMapper.readValue(Json.pretty(prop.getValue()), Schema.class);
-                    clonedProp.setName(prefix + prop.getKey() + suffix);
-                    props.add(new AbstractMap.SimpleEntry<>(clonedProp.getName(), clonedProp));
-                } catch (IOException e) {
-                    context.warn("Exception cloning property " + e.getMessage(), null);
+        String prefix = uw.stringValue("prefix").orElse("");
+        String suffix = uw.stringValue("suffix").orElse("");
+        for (Entry<String, Schema> prop : (Set<Map.Entry<String, Schema>>) properties.entrySet()) {
+            try {
+                String propertyName = prop.getKey();
+                Schema propertySchema = prop.getValue();
+                boolean isRequired = wrappedPropertySchema.getRequired() != null && wrappedPropertySchema.getRequired().contains(propertyName);
+                if (StringUtils.isNotEmpty(suffix) || StringUtils.isNotEmpty(prefix)) {
+                    propertyName = prefix + propertyName + suffix;
+                    propertySchema = jsonMapper.readValue(Json.pretty(prop.getValue()), Schema.class);
+                    propertySchema.setName(propertyName);
                 }
+                addProperty(parentSchema, propertyName, propertySchema, isRequired);
+            } catch (IOException e) {
+                context.warn("Exception cloning property " + e.getMessage(), null);
             }
         }
-        return props;
     }
 
     /**
@@ -729,38 +735,63 @@ abstract class AbstractOpenApiVisitor  {
      * @param context The visitor context
      * @param element The element
      * @param elementType The element type
+     * @param classElement The class element
      * @param parentSchema The parent schema
      * @param propertySchema The property schema
      */
-    protected void processSchemaProperty(VisitorContext context, Element element, ClassElement elementType, Schema parentSchema, Schema propertySchema) {
+    protected void processSchemaProperty(VisitorContext context, Element element, ClassElement elementType, @Nullable Element classElement, Schema parentSchema, Schema propertySchema) {
         if (propertySchema != null) {
-            List<Entry<String, Schema>> props;
             AnnotationValue<JsonUnwrapped> uw = element.getAnnotation(JsonUnwrapped.class);
             if (uw != null && uw.booleanValue("enabled").orElse(Boolean.TRUE)) {
-                Map<String, Schema> schemas = resolveSchemas(resolveOpenAPI(context));
-                String schemaName = element.stringValue(io.swagger.v3.oas.annotations.media.Schema.class, "name").orElse(computeDefaultSchemaName(null, elementType));
-                propertySchema = schemas.get(schemaName);
-                props = handleUnwrapped(propertySchema, uw.stringValue("prefix").orElse(null), uw.stringValue("suffix").orElse(null), context);
+                handleUnwrapped(context, element, elementType, parentSchema, uw);
             } else {
+                final boolean required = element.isAnnotationPresent(NotNull.class)
+                        || element.isAnnotationPresent(NotBlank.class)
+                        || element.isAnnotationPresent(NotEmpty.class)
+                        || element.isAnnotationPresent(Nonnull.class)
+                        || element.booleanValue(JsonProperty.class, "required").orElse(false);
                 propertySchema = bindSchemaForElement(context, element, elementType, propertySchema);
-                String propertyName = Optional.ofNullable(propertySchema.getName()).orElse(element.getName());
-                props = Collections.singletonList(new AbstractMap.SimpleEntry<>(propertyName, propertySchema));
-            }
-            final boolean required = element.isAnnotationPresent(NotNull.class)
-                    || element.isAnnotationPresent(NotBlank.class)
-                    || element.isAnnotationPresent(NotEmpty.class)
-                    || element.isAnnotationPresent(Nonnull.class);
-            for (Entry<String, Schema> prop: props) {
-                parentSchema.addProperties(prop.getKey(), prop.getValue());
-                if (required) {
-                    List<String> requiredList = parentSchema.getRequired();
-                    // Check for duplicates
-                    if (requiredList == null || !requiredList.contains(prop.getKey())) {
-                        parentSchema.addRequiredItem(prop.getKey());
-                    }
-                }
+                String propertyName = resolvePropertyName(element, classElement, propertySchema);
+                addProperty(parentSchema, propertyName, propertySchema, required);
             }
         }
+    }
+
+    private void addProperty(Schema parentSchema, String name, Schema propertySchema, boolean required) {
+        parentSchema.addProperties(name, propertySchema);
+        if (required) {
+            List<String> requiredList = parentSchema.getRequired();
+            // Check for duplicates
+            if (requiredList == null || !requiredList.contains(name)) {
+                parentSchema.addRequiredItem(name);
+            }
+        }
+    }
+
+    private String resolvePropertyName(Element element, Element classElement,  Schema propertySchema) {
+        String name = Optional.ofNullable(propertySchema.getName()).orElse(element.getName());
+
+        if (element.hasAnnotation(JsonProperty.class)) {
+            return element.stringValue(JsonProperty.class, "value").orElse(name);
+        }
+        if (classElement != null && classElement.hasAnnotation(JsonNaming.class)) {
+            // INVESTIGATE: "classValue" doesn't work in this case
+            Optional<String> propertyNamingStrategyClass = classElement.stringValue(JsonNaming.class);
+            if (!propertyNamingStrategyClass.isPresent()) {
+                return name;
+            }
+            PropertyNamingStrategy strategy = propertyNamingStrategyInstances.computeIfAbsent(propertyNamingStrategyClass.get(), clazz -> {
+                try {
+                    return (PropertyNamingStrategy) Class.forName(propertyNamingStrategyClass.get()).getConstructor().newInstance();
+                } catch (Exception e) {
+                    throw new RuntimeException("Cannot instantiate: " + clazz);
+                }
+            });
+            if (strategy instanceof PropertyNamingStrategy.PropertyNamingStrategyBase) {
+                return ((PropertyNamingStrategy.PropertyNamingStrategyBase) strategy).translate(name);
+            }
+        }
+        return name;
     }
 
     /**
@@ -835,13 +866,16 @@ abstract class AbstractOpenApiVisitor  {
         if (element.isAnnotationPresent(Deprecated.class)) {
             schemaToBind.setDeprecated(true);
         }
-
         final String defaultValue = element.getValue(Bindable.class, "defaultValue", String.class).orElse(null);
         if (defaultValue != null && schemaToBind.getDefault() == null) {
             schemaToBind.setDefault(defaultValue);
         }
         if (element.isAnnotationPresent(Nullable.class)) {
             schemaToBind.setNullable(true);
+        }
+        final String defaultJacksonValue = element.stringValue(JsonProperty.class, "defaultValue").orElse(null);
+        if (defaultJacksonValue != null && schemaToBind.getDefault() == null) {
+            schemaToBind.setDefault(defaultJacksonValue);
         }
         return schemaToBind;
     }
@@ -1225,10 +1259,13 @@ abstract class AbstractOpenApiVisitor  {
         if (metaAnnName != null && !io.swagger.v3.oas.annotations.media.Schema.class.getName().equals(metaAnnName)) {
             return NameUtils.getSimpleName(metaAnnName);
         }
+        String javaName;
         if (type instanceof TypedElement) {
-            return computeNameWithGenerics(((TypedElement) type).getType());
+            javaName = computeNameWithGenerics(((TypedElement) type).getType());
+        } else {
+            javaName = type.getSimpleName();
         }
-        return type.getSimpleName();
+        return javaName.replace("$", ".");
     }
 
     private String computeNameWithGenerics(ClassElement classElement) {
@@ -1314,6 +1351,7 @@ abstract class AbstractOpenApiVisitor  {
                         context,
                         publicField,
                         publicField.getType(),
+                        type,
                         schema,
                         propertySchema
                 );
