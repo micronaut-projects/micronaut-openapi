@@ -601,6 +601,20 @@ abstract class AbstractOpenApiVisitor  {
     protected @Nullable Schema resolveSchema(OpenAPI openAPI, @Nullable Element definingElement, ClassElement type, VisitorContext context, List<MediaType> mediaTypes) {
         Schema schema = null;
 
+        AnnotationValue<io.swagger.v3.oas.annotations.media.Schema> schemaAnnotationValue = null;
+        if (definingElement != null) {
+            schemaAnnotationValue  = definingElement.getAnnotation(io.swagger.v3.oas.annotations.media.Schema.class);
+        }
+        if (type != null && schemaAnnotationValue == null) {
+            schemaAnnotationValue  = type.getAnnotation(io.swagger.v3.oas.annotations.media.Schema.class);
+        }
+        if (schemaAnnotationValue != null) {
+            type = schemaAnnotationValue
+                    .stringValue("implementation")
+                    .flatMap(context::getClassElement)
+                    .orElse(type);
+        }
+
         if (type instanceof EnumElement) {
             schema = getSchemaDefinition(openAPI, context, type, definingElement, mediaTypes);
         } else {
@@ -811,6 +825,10 @@ abstract class AbstractOpenApiVisitor  {
             if (schemaName.isPresent()) {
                 schemaToBind.setName(schemaName.get());
             }
+            elementType = schemaAnn
+                    .stringValue("implementation")
+                    .flatMap(context::getClassElement)
+                    .orElse(elementType);
         }
         AnnotationValue<io.swagger.v3.oas.annotations.media.ArraySchema> arraySchemaAnn = element.getAnnotation(io.swagger.v3.oas.annotations.media.ArraySchema.class);
         if (arraySchemaAnn != null) {
@@ -1345,7 +1363,7 @@ abstract class AbstractOpenApiVisitor  {
 
             if (publicField instanceof MemberElement && ((MemberElement) publicField).getDeclaringType().equals(type)) {
 
-                Schema propertySchema = resolveSchema(openAPI, null, publicField.getType(), context, mediaTypes);
+                Schema propertySchema = resolveSchema(openAPI, publicField, publicField.getType(), context, mediaTypes);
 
                 processSchemaProperty(
                         context,
