@@ -15,18 +15,14 @@
  */
 package io.micronaut.annotation.processing.visitor;
 
-import static javax.lang.model.type.TypeKind.NONE;
+import io.micronaut.annotation.processing.AnnotationUtils;
+import io.micronaut.core.annotation.AnnotationMetadata;
+import io.micronaut.core.annotation.Internal;
+import io.micronaut.core.naming.NameUtils;
+import io.micronaut.inject.ast.*;
+import io.micronaut.inject.visitor.VisitorContext;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
-
+import javax.lang.model.element.Element;
 import javax.lang.model.element.*;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
@@ -35,19 +31,17 @@ import javax.lang.model.type.WildcardType;
 import javax.lang.model.util.ElementFilter;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
+import java.util.*;
+import java.util.stream.Collectors;
 
-import io.micronaut.annotation.processing.AnnotationUtils;
-import io.micronaut.core.annotation.AnnotationMetadata;
-import io.micronaut.core.annotation.Internal;
-import io.micronaut.core.naming.NameUtils;
-import io.micronaut.inject.ast.ClassElement;
-import io.micronaut.inject.ast.MethodElement;
-import io.micronaut.inject.ast.ParameterElement;
-import io.micronaut.inject.ast.PropertyElement;
-import io.micronaut.inject.visitor.VisitorContext;
+import static javax.lang.model.type.TypeKind.NONE;
 
 /**
  * A class element returning data from a {@link TypeElement}.
+ *
+ * Implementation note: [smell] this class needs to track changes to {@link JavaClassElement}.
+ * For example: {@link JavaClassElement} introduced {@link JavaClassElement#arrayDimensions}
+ * resulting in a processing bug in this library when this class didn't account for it in the constructor.
  *
  * @author James Kleeh
  * @author graemerocher
@@ -59,7 +53,7 @@ public class JavaClassElementExt extends JavaClassElement {
     private final JavaClassElement javaClassElement;
     private final TypeElement classElement;
     private final JavaVisitorContext visitorContext;
-    private Map<String, Map<String, TypeMirror>> genericTypeInfo;
+    private final Map<String, Map<String, TypeMirror>> genericTypeInfo;
 
     /**
      * @param ce       The {@link ClassElement}
@@ -74,7 +68,8 @@ public class JavaClassElementExt extends JavaClassElement {
      * @param visitorContext     The visitor context
      */
     private JavaClassElementExt(JavaClassElement jce, JavaVisitorContext visitorContext) {
-        super((TypeElement) jce.getNativeType(), jce.getAnnotationMetadata(), visitorContext, jce.getGenericTypeInfo());
+        super((TypeElement) jce.getNativeType(), jce.getAnnotationMetadata(), visitorContext, jce.getGenericTypeInfo(),
+            jce.getArrayDimensions());
         this.javaClassElement = jce;
         this.classElement = (TypeElement) jce.getNativeType();
         this.visitorContext = visitorContext;
@@ -156,7 +151,7 @@ public class JavaClassElementExt extends JavaClassElement {
         TypeMirror tm = wType.getSuperBound();
         // check for Void
         if (tm instanceof DeclaredType && sameType("kotlin.Unit", (DeclaredType) tm)) {
-            return new JavaVoidElement();
+            return PrimitiveElement.VOID;
         } else {
             return ((JavaParameterElement) parameter).parameterizedClassElement(tm, jcontext, info);
         }

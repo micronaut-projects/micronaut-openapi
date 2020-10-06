@@ -21,7 +21,6 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategy.PropertyNamingStrat
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
-
 import io.micronaut.annotation.processing.visitor.JavaClassElementExt;
 import io.micronaut.context.env.Environment;
 import io.micronaut.core.annotation.Experimental;
@@ -41,20 +40,15 @@ import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 
+import javax.annotation.processing.SupportedOptions;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 import java.net.URI;
-import java.nio.file.DirectoryStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
+import java.nio.file.*;
 import java.util.*;
 import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
-
-import javax.annotation.processing.SupportedOptions;
 
 /**
  * Visits the application class.
@@ -122,7 +116,6 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
      */
     public static final String MICRONAUT_OPENAPI_ENDPOINT_SECURITY_REQUIREMENTS = "micronaut.openapi.endpoint.security.requirements";
 
-    private static final String MICRONAUT_OPENAPI_PROJECT_DIR = "micronaut.openapi.project.dir";
     private static final String MICRONAUT_OPENAPI_PROPERTIES = "micronaut.openapi.properties";
     private static final String MICRONAUT_OPENAPI_ENDPOINTS = "micronaut.openapi.endpoints";
 
@@ -222,9 +215,9 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
 
     private static Path resolve(VisitorContext context, Path path) {
         if (!path.isAbsolute()) {
-            Path projectDir = projectDir(context);
-            if (projectDir != null) {
-                path = projectDir.resolve(path);
+            Optional<Path> projectDir = context.getProjectDir();
+            if (projectDir.isPresent()) {
+                path = projectDir.get().resolve(path);
             }
         }
         return path.toAbsolutePath();
@@ -359,33 +352,6 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         }
         visitorContext.warn("Unable to get swagger/" + fileName + " file.", null);
         return Optional.empty();
-    }
-
-    private static Path projectDir(VisitorContext visitorContext) {
-        Optional<Path> projectDir = visitorContext.get(MICRONAUT_OPENAPI_PROJECT_DIR, Path.class);
-        if (projectDir.isPresent()) {
-            return projectDir.get();
-        }
-        // let's find the projectDir
-        Optional<GeneratedFile> dummyFile = visitorContext.visitGeneratedFile("dummy");
-        if (dummyFile.isPresent()) {
-            URI uri = dummyFile.get().toURI();
-            // happens in tests 'mem:///CLASS_OUTPUT/META-INF/swagger/swagger.yml'
-            if (uri.getScheme() != null && !uri.getScheme().equals("mem")) {
-                // assume files are generated in 'build' dir
-                Path dummy = Paths.get(uri).normalize();
-                while (dummy != null) {
-                    Path dummyFileName = dummy.getFileName();
-                    if (dummyFileName != null && "build".equals(dummyFileName.toString())) {
-                        projectDir = Optional.ofNullable(dummy.getParent());
-                        visitorContext.put(MICRONAUT_OPENAPI_PROJECT_DIR, dummy.getParent());
-                        break;
-                    }
-                    dummy = dummy.getParent();
-                }
-            }
-        }
-        return projectDir.isPresent() ? projectDir.get() : null;
     }
 
     private Optional<Path> userDefinedSpecFile(VisitorContext visitorContext) {
@@ -544,6 +510,12 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                     StandardOpenOption.CREATE)) {
                 visitorContext.info("Writing OpenAPI YAML to destination: " + specPath);
                 yamlMapper.writeValue(writer, openAPI);
+                visitorContext.getClassesOutputPath().ifPresent(path -> {
+                    // add relative paths for the specPath, and its parent META-INF/swagger
+                    // so that micronaut-graal visitor knows about them
+                    visitorContext.addGeneratedResource(path.relativize(specPath).toString());
+                    visitorContext.addGeneratedResource(path.relativize(specPath.getParent()).toString());
+                });
                 renderViews(documentTitle, specPath.getFileName().toString(), specPath.getParent(), visitorContext);
             } catch (Exception e) {
                 visitorContext.warn("Unable to generate swagger.yml: " + specPath + " - " + e.getMessage(),
