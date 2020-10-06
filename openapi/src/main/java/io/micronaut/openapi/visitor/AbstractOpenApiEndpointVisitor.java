@@ -35,6 +35,7 @@ import io.micronaut.core.value.PropertyResolver;
 import io.micronaut.http.HttpMethod;
 import io.micronaut.http.HttpRequest;
 import io.micronaut.http.HttpResponse;
+import io.micronaut.http.HttpStatus;
 import io.micronaut.http.MediaType;
 import io.micronaut.http.annotation.*;
 import io.micronaut.http.uri.UriMatchTemplate;
@@ -631,38 +632,54 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
 
     private void readResponse(MethodElement element, VisitorContext context, OpenAPI openAPI,
                               io.swagger.v3.oas.models.Operation swaggerOperation, JavadocDescription javadocDescription) {
+        HttpStatus methodResponseStatus = element.enumValue(Status.class, HttpStatus.class).orElse(HttpStatus.OK);
+        String responseCode = String.valueOf(methodResponseStatus.getCode());
         ApiResponses responses = swaggerOperation.getResponses();
+        ApiResponse response = null;
+
         if (responses == null) {
             responses = new ApiResponses();
-
             swaggerOperation.setResponses(responses);
-
-            ApiResponse okResponse = new ApiResponse();
-
+        } else {
+            ApiResponse defaultResponse = responses.remove("default");
+            response = responses.get(responseCode);
+            if (response == null && defaultResponse != null) {
+                response = defaultResponse;
+                responses.put(responseCode, response);
+            }
+        }
+        if (response == null) {
+            response = new ApiResponse();
             if (javadocDescription == null) {
-                okResponse.setDescription(swaggerOperation.getOperationId() + " default response");
+                response.setDescription(swaggerOperation.getOperationId() + " " + responseCode + " response");
             } else {
-                okResponse.setDescription(javadocDescription.getReturnDescription());
+                response.setDescription(javadocDescription.getReturnDescription());
             }
-            ClassElement returnType = returnType(element, context);
-            if (returnType != null) {
-                List<MediaType> producesMediaTypes = producesMediaTypes(element);
-                Content content;
-                if (producesMediaTypes.isEmpty()) {
-                    content = buildContent(element, returnType, Collections.singletonList(MediaType.APPLICATION_JSON_TYPE), openAPI, context);
-                } else {
-                    content = buildContent(element, returnType, producesMediaTypes, openAPI, context);
-                }
-                okResponse.setContent(content);
+            addResponseContent(element, context, openAPI, response);
+            responses.put(responseCode, response);
+        } else if (response.getContent() == null) {
+            addResponseContent(element, context, openAPI, response);
+        }
+    }
+
+    private void addResponseContent(MethodElement element, VisitorContext context, OpenAPI openAPI, ApiResponse response) {
+        ClassElement returnType = returnType(element, context);
+        if (returnType != null) {
+            List<MediaType> producesMediaTypes = producesMediaTypes(element);
+            Content content;
+            if (producesMediaTypes.isEmpty()) {
+                content = buildContent(element, returnType, Collections.singletonList(MediaType.APPLICATION_JSON_TYPE), openAPI, context);
+            } else {
+                content = buildContent(element, returnType, producesMediaTypes, openAPI, context);
             }
-            responses.put(ApiResponses.DEFAULT, okResponse);
+            response.setContent(content);
         }
     }
 
     private ClassElement returnType(MethodElement element, VisitorContext context) {
         ClassElement returnType = isJavaElement(element.getOwningType(), context) ? JavaClassElementExt.getGenericReturnType(element, context)
                 : element.getGenericReturnType();
-        if (returnType.isAssignable("io.reactivex.Completable")) {
+        if (returnType.isAssignable(void.class) || returnType.isAssignable("io.reactivex.Completable")) {
             returnType = null;
         } else if (isResponseType(returnType)) {
             returnType = returnType.getFirstTypeArgument().orElse(returnType);

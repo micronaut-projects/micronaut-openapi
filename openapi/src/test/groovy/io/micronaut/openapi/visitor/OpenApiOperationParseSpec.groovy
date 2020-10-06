@@ -304,9 +304,9 @@ class MyBean {}
         operation.security.get(0).containsKey('petstore-auth')
         operation.security.get(0).get('petstore-auth') == ['write:pets']
         operation.responses.size() == 4
-        operation.responses.default.content.size() == 1
-        operation.responses.default.content['application/json']
-        operation.responses.default.content['application/json'].schema
+        operation.responses.'200'.content.size() == 1
+        operation.responses.'200'.content['application/json']
+        operation.responses.'200'.content['application/json'].schema
         operation.responses.'400'.description == 'Invalid ID supplied'
 
     }
@@ -373,9 +373,9 @@ class MyBean {}
         operation.security.get(0).containsKey('petstore-auth')
         operation.security.get(0).get('petstore-auth') == ['write:pets']
         operation.responses.size() == 4
-        operation.responses.default.content.size() == 1
-        operation.responses.default.content['application/json']
-        operation.responses.default.content['application/json'].schema
+        operation.responses.'200'.content.size() == 1
+        operation.responses.'200'.content['application/json']
+        operation.responses.'200'.content['application/json'].schema
         operation.responses.'400'.description == 'Invalid ID supplied'
 
     }
@@ -447,10 +447,10 @@ class MyBean {}
         operation.security.get(0).containsKey('petstore-auth')
         operation.security.get(0).get('petstore-auth') == ['write:pets']
         operation.responses.size() == 4
-        operation.responses.default.content.size() == 1
-        operation.responses.default.content['application/json']
-        operation.responses.default.content['application/json'].schema
-        operation.responses.default.extensions.'x-custom'.prop1 == "prop1Val"
+        operation.responses.'200'.content.size() == 1
+        operation.responses.'200'.content['application/json']
+        operation.responses.'200'.content['application/json'].schema
+        operation.responses.'200'.extensions.'x-custom'.prop1 == "prop1Val"
         operation.responses.'400'.description == 'Invalid ID supplied'
 
     }

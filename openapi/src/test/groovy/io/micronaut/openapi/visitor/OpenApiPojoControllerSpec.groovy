@@ -24,6 +24,9 @@ package test;
 
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
+import io.micronaut.http.annotation.Put;
+import io.micronaut.http.annotation.Post;
+import io.micronaut.http.annotation.Status;
 
 import java.util.List;
 
@@ -38,6 +41,28 @@ interface PetOperations<T extends Pet> {
      */
     @Get("/{slug}")
     T find(String slug);
+    
+    
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "Invalid Name Supplied")
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "Person not found")
+    @Post("/xyz1")
+    T xyzPost(String slug);
+    
+    @io.swagger.v3.oas.annotations.responses.ApiResponses({
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Custom desc"),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "Invalid Name Supplied"),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "Person not found")
+    })
+    @Put("/xyz1")
+    T xyzPut(String slug);
+    
+    @io.swagger.v3.oas.annotations.Operation(description = "Do the post")
+    @Status(io.micronaut.http.HttpStatus.CREATED)
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "201", description = "Custom desc 2")
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "Invalid Name Supplied")
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "Person not found")
+    @Post("/xyz2")
+    T xyzPost2(String slug);
 }
 
 class Pet {
@@ -110,6 +135,52 @@ class MyBean {}
         petSchema.properties["tags"].type == "array"
         petSchema.properties["tags"].description == "The Pet Tags"
         ((ArraySchema) petSchema.properties["tags"]).items.type == "string"
+
+        when:
+            PathItem xyz1 = openAPI.paths.get("/pets/xyz1")
+            PathItem xyz2 = openAPI.paths.get("/pets/xyz2")
+
+        then:
+            xyz1.post.operationId == 'xyzPost'
+            xyz1.post.responses.size() == 3
+            xyz1.post.responses['200']
+            xyz1.post.responses['200'].description == 'xyzPost 200 response'
+            xyz1.post.responses['200'].content['application/json'].schema
+            xyz1.post.responses['200'].content['application/json'].schema.$ref == '#/components/schemas/Pet'
+            xyz1.post.responses['400']
+            xyz1.post.responses['400'].description == 'Invalid Name Supplied'
+            xyz1.post.responses['400'].content == null
+            xyz1.post.responses['404']
+            xyz1.post.responses['404'].description == 'Person not found'
+            xyz1.post.responses['404'].content == null
+
+            xyz1.put.operationId == 'xyzPut'
+            xyz1.put.description == null
+            xyz1.put.responses.size() == 3
+            xyz1.put.responses['200']
+            xyz1.put.responses['200'].description == 'Custom desc'
+            xyz1.put.responses['200'].content['application/json'].schema
+            xyz1.put.responses['200'].content['application/json'].schema.$ref == '#/components/schemas/Pet'
+            xyz1.put.responses['400']
+            xyz1.put.responses['400'].description == 'Invalid Name Supplied'
+            xyz1.put.responses['400'].content == null
+            xyz1.put.responses['404']
+            xyz1.put.responses['404'].description == 'Person not found'
+            xyz1.put.responses['404'].content == null
+
+            xyz2.post.operationId == 'xyzPost2'
+            xyz2.post.description == "Do the post"
+            xyz2.post.responses.size() == 3
+            xyz2.post.responses['201']
+            xyz2.post.responses['201'].description == 'Custom desc 2'
+            xyz2.post.responses['201'].content['application/json'].schema
+            xyz2.post.responses['201'].content['application/json'].schema.$ref == '#/components/schemas/Pet'
+            xyz2.post.responses['400']
+            xyz2.post.responses['400'].description == 'Invalid Name Supplied'
+            xyz2.post.responses['400'].content == null
+            xyz2.post.responses['404']
+            xyz2.post.responses['404'].description == 'Person not found'
+            xyz2.post.responses['404'].content == null
     }
 
     void "test build OpenAPI for Dictionaries, HashMaps and Associative Arrays" () {
@@ -493,11 +564,11 @@ class MyBean {}
         then:"it is included in the OpenAPI doc"
         pathItem.get.operationId == 'list'
         pathItem.get.description == 'List the pets'
-        pathItem.get.responses['default']
-        pathItem.get.responses['default'].description == 'a list of pet names'
-        pathItem.get.responses['default'].content['application/json'].schema
-        pathItem.get.responses['default'].content['application/json'].schema.type == 'array'
-        pathItem.get.responses['default'].content['application/json'].schema.items.$ref == '#/components/schemas/Pet'
+        pathItem.get.responses['200']
+        pathItem.get.responses['200'].description == 'a list of pet names'
+        pathItem.get.responses['200'].content['application/json'].schema
+        pathItem.get.responses['200'].content['application/json'].schema.type == 'array'
+        pathItem.get.responses['200'].content['application/json'].schema.items.$ref == '#/components/schemas/Pet'
         pathItem.post.operationId == 'save'
         pathItem.post.requestBody
         pathItem.post.requestBody.required
@@ -519,9 +590,9 @@ class MyBean {}
         pathItem.get.parameters[0].description == 'The slug name'
         pathItem.get.parameters[0].schema.type == 'string'
         pathItem.get.responses.size() == 1
-        pathItem.get.responses['default'] != null
-        pathItem.get.responses['default'].content['application/json'].schema
-        pathItem.get.responses['default'].content['application/json'].schema.$ref == '#/components/schemas/Pet'
+        pathItem.get.responses['200'] != null
+        pathItem.get.responses['200'].content['application/json'].schema
+        pathItem.get.responses['200'].content['application/json'].schema.$ref == '#/components/schemas/Pet'
 
     }
 
@@ -643,11 +714,11 @@ class MyBean {}
         then:"it is included in the OpenAPI doc"
         pathItem.get.operationId == 'list'
         pathItem.get.description == 'List the pets'
-        pathItem.get.responses['default']
-        pathItem.get.responses['default'].description == 'a list of pet names'
-        pathItem.get.responses['default'].content['application/json'].schema
-        pathItem.get.responses['default'].content['application/json'].schema.type == 'array'
-        pathItem.get.responses['default'].content['application/json'].schema.items.$ref == '#/components/schemas/Pet'
+        pathItem.get.responses['200']
+        pathItem.get.responses['200'].description == 'a list of pet names'
+        pathItem.get.responses['200'].content['application/json'].schema
+        pathItem.get.responses['200'].content['application/json'].schema.type == 'array'
+        pathItem.get.responses['200'].content['application/json'].schema.items.$ref == '#/components/schemas/Pet'
         pathItem.post.operationId == 'save'
         pathItem.post.requestBody
         pathItem.post.requestBody.required
@@ -669,29 +740,29 @@ class MyBean {}
         pathItem.get.parameters[0].description == 'The slug name'
         pathItem.get.parameters[0].schema.type == 'string'
         pathItem.get.responses.size() == 1
-        pathItem.get.responses['default'] != null
-        pathItem.get.responses['default'].content['application/json'].schema
-        pathItem.get.responses['default'].content['application/json'].schema.$ref == '#/components/schemas/Pet'
+        pathItem.get.responses['200'] != null
+        pathItem.get.responses['200'].content['application/json'].schema
+        pathItem.get.responses['200'].content['application/json'].schema.$ref == '#/components/schemas/Pet'
 
         when:"A flowable is returned"
         pathItem = openAPI.paths.get("/pets/flowable")
 
         then:
         pathItem.get.operationId == 'flowable'
-        pathItem.get.responses['default']
-        pathItem.get.responses['default'].description == 'a list of pet names'
-        pathItem.get.responses['default'].content['application/json'].schema
-        pathItem.get.responses['default'].content['application/json'].schema.type == 'array'
-        pathItem.get.responses['default'].content['application/json'].schema.items.$ref == '#/components/schemas/Pet'
+        pathItem.get.responses['200']
+        pathItem.get.responses['200'].description == 'a list of pet names'
+        pathItem.get.responses['200'].content['application/json'].schema
+        pathItem.get.responses['200'].content['application/json'].schema.type == 'array'
+        pathItem.get.responses['200'].content['application/json'].schema.items.$ref == '#/components/schemas/Pet'
 
         when:"A completable is returned"
         pathItem = openAPI.paths.get("/pets/completable")
 
         then:
         pathItem.post.operationId == 'completable'
-        pathItem.post.responses['default']
-        pathItem.post.responses['default'].description == 'completable default response'
-        pathItem.post.responses['default'].content == null
+        pathItem.post.responses['200']
+        pathItem.post.responses['200'].description == 'completable default response'
+        pathItem.post.responses['200'].content == null
 
 
         when:"An obsevable is returned"
@@ -699,20 +770,20 @@ class MyBean {}
 
         then:
         pathItem.get.operationId == 'observable'
-        pathItem.get.responses['default']
-        pathItem.get.responses['default'].description == 'a list of pet names'
-        pathItem.get.responses['default'].content['application/json'].schema
-        pathItem.get.responses['default'].content['application/json'].schema.type == 'array'
-        pathItem.get.responses['default'].content['application/json'].schema.items.$ref == '#/components/schemas/Pet'
+        pathItem.get.responses['200']
+        pathItem.get.responses['200'].description == 'a list of pet names'
+        pathItem.get.responses['200'].content['application/json'].schema
+        pathItem.get.responses['200'].content['application/json'].schema.type == 'array'
+        pathItem.get.responses['200'].content['application/json'].schema.items.$ref == '#/components/schemas/Pet'
 
         when:"A Single<HttpResponse<T>> is returned"
         pathItem = openAPI.paths.get("/pets/singleHttpResponse")
 
         then:
         pathItem.get.operationId == 'singleHttpResponse'
-        pathItem.get.responses['default']
-        pathItem.get.responses['default'].content['application/json'].schema
-        pathItem.get.responses['default'].content['application/json'].schema.$ref == '#/components/schemas/Pet'
+        pathItem.get.responses['200']
+        pathItem.get.responses['200'].content['application/json'].schema
+        pathItem.get.responses['200'].content['application/json'].schema.$ref == '#/components/schemas/Pet'
     }
 
     @PendingFeature(reason = "Requires upstream fix in Micronaut core")
@@ -843,11 +914,11 @@ class MyBean {}
         then:"it is included in the OpenAPI doc"
         pathItem.get.operationId == 'list'
         pathItem.get.description == 'List the pets'
-        pathItem.get.responses['default']
-        pathItem.get.responses['default'].description == 'a list of pet names'
-        pathItem.get.responses['default'].content['application/json'].schema
-        pathItem.get.responses['default'].content['application/json'].schema.type == 'array'
-        pathItem.get.responses['default'].content['application/json'].schema.items.$ref == '#/components/schemas/MyPet'
+        pathItem.get.responses['200']
+        pathItem.get.responses['200'].description == 'a list of pet names'
+        pathItem.get.responses['200'].content['application/json'].schema
+        pathItem.get.responses['200'].content['application/json'].schema.type == 'array'
+        pathItem.get.responses['200'].content['application/json'].schema.items.$ref == '#/components/schemas/MyPet'
         pathItem.post.operationId == 'save'
         pathItem.post.requestBody
         pathItem.post.requestBody.required
@@ -869,20 +940,20 @@ class MyBean {}
         pathItem.get.parameters[0].description == 'The slug name'
         pathItem.get.parameters[0].schema.type == 'string'
         pathItem.get.responses.size() == 1
-        pathItem.get.responses['default'] != null
-        pathItem.get.responses['default'].content['application/json'].schema
-        pathItem.get.responses['default'].content['application/json'].schema.$ref == '#/components/schemas/MyPet'
+        pathItem.get.responses['200'] != null
+        pathItem.get.responses['200'].content['application/json'].schema
+        pathItem.get.responses['200'].content['application/json'].schema.$ref == '#/components/schemas/MyPet'
 
         when:"A flowable is returned"
         pathItem = openAPI.paths.get("/pets/flowable")
 
         then:
         pathItem.get.operationId == 'flowable'
-        pathItem.get.responses['default']
-        pathItem.get.responses['default'].description == 'a list of pet names'
-        pathItem.get.responses['default'].content['application/json'].schema
-        pathItem.get.responses['default'].content['application/json'].schema.type == 'array'
-        pathItem.get.responses['default'].content['application/json'].schema.items.$ref == '#/components/schemas/MyPet'
+        pathItem.get.responses['200']
+        pathItem.get.responses['200'].description == 'a list of pet names'
+        pathItem.get.responses['200'].content['application/json'].schema
+        pathItem.get.responses['200'].content['application/json'].schema.type == 'array'
+        pathItem.get.responses['200'].content['application/json'].schema.items.$ref == '#/components/schemas/MyPet'
     }
 
 
@@ -1057,6 +1128,7 @@ import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
 import io.micronaut.http.MediaType;
 import io.micronaut.http.annotation.Produces;
+import io.micronaut.http.annotation.Status;
 
 import java.util.List;
 
@@ -1069,6 +1141,7 @@ interface PetOperations<T extends Pet> {
      * @param slug The slug name
      * @return A pet or 404
      */
+    @Status(io.micronaut.http.HttpStatus.ALREADY_IMPORTED)
     @Produces({MediaType.APPLICATION_FORM_URLENCODED, MediaType.APPLICATION_JSON})
     @Get("/{slug}")
     T find(String slug);
@@ -1137,9 +1210,9 @@ class MyBean {}
 
         then: "The response has multiple content types"
         operation.responses.size() == 1
-        operation.responses.default.content.size() == 2
-        operation.responses.default.content['application/json'].schema
-        operation.responses.default.content['application/x-www-form-urlencoded'].schema
+        operation.responses."208".content.size() == 2
+        operation.responses."208".content['application/json'].schema
+        operation.responses."208".content['application/x-www-form-urlencoded'].schema
     }
 
     void "test build OpenAPI for body with multiple content types"() {
