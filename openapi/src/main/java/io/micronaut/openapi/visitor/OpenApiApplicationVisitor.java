@@ -557,8 +557,8 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         EndpointsConfiguration endpointsCfg = endPointsConfiguration(visitorContext);
         if ("io.micronaut.annotation.processing.visitor.JavaVisitorContext".equals(visitorContext.getClass().getName())
                 && endpointsCfg.isEnabled()
-                && ! endpointsCfg.getEndpoints().isEmpty()) {
-            OpenApiEndpointVisitor visitor = new OpenApiEndpointVisitor();
+                && !endpointsCfg.getEndpoints().isEmpty()) {
+            OpenApiEndpointVisitor visitor = new OpenApiEndpointVisitor(true);
             endpointsCfg.getEndpoints().values().stream()
             .filter(endpoint -> endpoint.getClassElement().isPresent()
                     && isJavaElement(endpoint.getClassElement().get(), visitorContext))

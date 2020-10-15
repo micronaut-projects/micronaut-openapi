@@ -231,7 +231,11 @@ abstract class AbstractOpenApiVisitor  {
      * @return A list of SecurityRequirement
      */
     List<SecurityRequirement> readSecurityRequirements(Element element) {
-        return element.getAnnotationValuesByType(io.swagger.v3.oas.annotations.security.SecurityRequirement.class)
+        return readSecurityRequirements(element.getAnnotationValuesByType(io.swagger.v3.oas.annotations.security.SecurityRequirement.class));
+    }
+
+    List<SecurityRequirement> readSecurityRequirements(List<AnnotationValue<io.swagger.v3.oas.annotations.security.SecurityRequirement>> annotations) {
+        return annotations
                 .stream()
                 .map(this::mapToSecurityRequirement)
                 .collect(Collectors.toList());

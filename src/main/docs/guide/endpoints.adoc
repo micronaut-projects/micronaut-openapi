@@ -89,3 +89,41 @@ endpoints.refresh.servers=[{"url": "https://staging.gigantic-server.com/v1", "de
 endpoints.refresh.security-requirements=[{"petstore_auth": ["write:pets", "read:pets"]}]
 
 ----
+
+== Annotation configuration
+
+You can use `@io.micronaut.openapi.annotation.OpenAPIInclude` to include additional `io.micronaut.http.annotation.Controller` or
+`io.micronaut.management.endpoint.annotation.Endpoint` already compiled classes:
+
+[source,java]
+----
+@OpenAPIDefinition(
+        info = @Info(
+                title = "Hello World",
+                version = "${api.version}",
+                description = "${openapi.description}",
+                license = @License(name = "Apache 2.0", url = "https://foo.bar"),
+                contact = @Contact(url = "https://gigantic-server.com", name = "Fred", email = "Fred@gigagantic-server.com")
+        )
+)
+@OpenAPIInclude(
+        classes = { io.micronaut.security.endpoints.LoginController.class, io.micronaut.security.endpoints.LogoutController.class },
+        tags = @Tag(name = "Security")
+)
+@OpenAPIInclude(
+        classes = io.micronaut.management.endpoint.env.EnvironmentEndpoint.class,
+        tags = @Tag(name = "Management"),
+        security = @SecurityRequirement(name = "BEARER", scopes = {"ADMIN"})
+)
+public class Application {
+
+    public static void main(String[] args) {
+        Micronaut.run(Application.class);
+    }
+}
+----
+
+Additional annotations available to include all Micronaut build-in endpoints:
+
+- `io.micronaut.openapi.annotation.OpenAPISecurity` - adds security endpoints
+- `io.micronaut.openapi.annotation.OpenAPIManagement` - adds management endpoints
