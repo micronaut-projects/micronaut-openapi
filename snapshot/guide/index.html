@@ -211,7 +211,7 @@
 <p>        <div class="listingblock multi-language-sample">
 <div class="title"></div>
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="gradle">annotationProcessor(<span class="hljs-string">"io.micronaut.openapi:micronaut-openapi:2.1.2.BUILD-SNAPSHOT")</span></code></pre>
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="gradle">annotationProcessor(<span class="hljs-string">"io.micronaut.openapi:micronaut-openapi:2.1.1.BUILD-SNAPSHOT")</span></code></pre>
 </div>
 </div>
 <div class="listingblock multi-language-sample">
@@ -221,7 +221,7 @@
     &lt;path&gt;
         &lt;groupId&gt;io.micronaut.openapi&lt;/groupId&gt;
         &lt;artifactId&gt;micronaut-openapi&lt;/artifactId&gt;
-        &lt;version&gt;2.1.2.BUILD-SNAPSHOT&lt;/version&gt;
+        &lt;version&gt;2.1.1.BUILD-SNAPSHOT&lt;/version&gt;
     &lt;/path&gt;
 &lt;/annotationProcessorPaths&gt;</code></pre>
 </div>
@@ -823,7 +823,7 @@ You need to exposed <code>micronaut-management</code> as annotation processor an
 <p>        <div class="listingblock multi-language-sample">
 <div class="title"></div>
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="gradle">annotationProcessor(<span class="hljs-string">"io.micronaut:micronaut-management:2.1.2.BUILD-SNAPSHOT")</span></code></pre>
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="gradle">annotationProcessor(<span class="hljs-string">"io.micronaut:micronaut-management:2.1.1.BUILD-SNAPSHOT")</span></code></pre>
 </div>
 </div>
 <div class="listingblock multi-language-sample">
@@ -833,7 +833,7 @@ You need to exposed <code>micronaut-management</code> as annotation processor an
     &lt;path&gt;
         &lt;groupId&gt;io.micronaut&lt;/groupId&gt;
         &lt;artifactId&gt;micronaut-management&lt;/artifactId&gt;
-        &lt;version&gt;2.1.2.BUILD-SNAPSHOT&lt;/version&gt;
+        &lt;version&gt;2.1.1.BUILD-SNAPSHOT&lt;/version&gt;
     &lt;/path&gt;
 &lt;/annotationProcessorPaths&gt;</code></pre>
 </div>
@@ -842,7 +842,7 @@ You need to exposed <code>micronaut-management</code> as annotation processor an
         <div class="listingblock multi-language-sample">
 <div class="title"></div>
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="gradle">implementation(<span class="hljs-string">"io.micronaut:micronaut-management:2.1.2.BUILD-SNAPSHOT")</span></code></pre>
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="gradle">implementation(<span class="hljs-string">"io.micronaut:micronaut-management:2.1.1.BUILD-SNAPSHOT")</span></code></pre>
 </div>
 </div>
 <div class="listingblock multi-language-sample">
@@ -850,7 +850,7 @@ You need to exposed <code>micronaut-management</code> as annotation processor an
 <pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="maven">&lt;dependency&gt;
     &lt;groupId&gt;io.micronaut&lt;/groupId&gt;
     &lt;artifactId&gt;micronaut-management&lt;/artifactId&gt;
-    &lt;version&gt;2.1.2.BUILD-SNAPSHOT&lt;/version&gt;
+    &lt;version&gt;2.1.1.BUILD-SNAPSHOT&lt;/version&gt;
 &lt;/dependency&gt;</code></pre>
 </div>
 </div>
@@ -1079,7 +1079,7 @@ paths:
         schema:
           type: string
       responses:
-        default:
+        200:
           description: The greeting
           content:
             text/plain:
@@ -1228,7 +1228,7 @@ paths:
           minLength: 1
           type: string
       responses:
-        default:
+        200:
           content:
             text/plain:
               schema:
