@@ -971,6 +971,56 @@ endpoints.refresh.security-requirements=[{"petstore_auth": ["write:pets", "read:
 </div>
 </div>
 </div>
+<div class="sect1">
+<h2 id="_annotation_configuration">Annotation configuration</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>You can use <code>@io.micronaut.openapi.annotation.OpenAPIInclude</code> to include additional <code>io.micronaut.http.annotation.Controller</code> or
+<code>io.micronaut.management.endpoint.annotation.Endpoint</code> already compiled classes:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@OpenAPIDefinition(
+        info = @Info(
+                title = "Hello World",
+                version = "${api.version}",
+                description = "${openapi.description}",
+                license = @License(name = "Apache 2.0", url = "https://foo.bar"),
+                contact = @Contact(url = "https://gigantic-server.com", name = "Fred", email = "Fred@gigagantic-server.com")
+        )
+)
+@OpenAPIInclude(
+        classes = { io.micronaut.security.endpoints.LoginController.class, io.micronaut.security.endpoints.LogoutController.class },
+        tags = @Tag(name = "Security")
+)
+@OpenAPIInclude(
+        classes = io.micronaut.management.endpoint.env.EnvironmentEndpoint.class,
+        tags = @Tag(name = "Management"),
+        security = @SecurityRequirement(name = "BEARER", scopes = {"ADMIN"})
+)
+public class Application {
+
+    public static void main(String[] args) {
+        Micronaut.run(Application.class);
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Additional annotations available to include all Micronaut build-in endpoints:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>io.micronaut.openapi.annotation.OpenAPISecurity</code> - adds security endpoints</p>
+</li>
+<li>
+<p><code>io.micronaut.openapi.annotation.OpenAPIManagement</code> - adds management endpoints</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
 
 <h1 id="controllersAndSwaggerAnnotations"><a class="anchor" href="#controllersAndSwaggerAnnotations"></a>9 Controllers and Swagger Annotations</h1>
 
