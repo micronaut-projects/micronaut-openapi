@@ -998,7 +998,11 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
     }
 
     private List<io.swagger.v3.oas.models.tags.Tag> readTags(ClassElement element, VisitorContext context) {
-        return element.getAnnotationValuesByType(Tag.class).stream()
+        return readTags(element.getAnnotationValuesByType(Tag.class), context);
+    }
+
+    List<io.swagger.v3.oas.models.tags.Tag> readTags(List<AnnotationValue<Tag>> annotations, VisitorContext context) {
+        return annotations.stream()
                 .map(av -> toValue(av.getValues(), context, io.swagger.v3.oas.models.tags.Tag.class))
                 .filter(Optional::isPresent).map(Optional::get).collect(Collectors.toList());
     }

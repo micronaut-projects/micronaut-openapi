@@ -15,6 +15,7 @@
  */
 package io.micronaut.openapi.visitor;
 
+import io.micronaut.core.annotation.AnnotationValue;
 import io.micronaut.core.annotation.Experimental;
 import io.micronaut.http.HttpMethod;
 import io.micronaut.http.MediaType;
@@ -29,6 +30,7 @@ import io.micronaut.inject.ast.MethodElement;
 import io.micronaut.inject.visitor.TypeElementVisitor;
 import io.micronaut.inject.visitor.VisitorContext;
 import io.swagger.v3.oas.annotations.Hidden;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.servers.Server;
 
@@ -49,6 +51,20 @@ import java.util.stream.Collectors;
  */
 @Experimental
 public class OpenApiControllerVisitor extends AbstractOpenApiEndpointVisitor implements TypeElementVisitor<Controller, HttpMethodMapping> {
+
+    private final List<AnnotationValue<Tag>> additionalTags;
+    private final List<AnnotationValue<io.swagger.v3.oas.annotations.security.SecurityRequirement>> additionalSecurityRequirements;
+
+    public OpenApiControllerVisitor() {
+        this.additionalTags = Collections.emptyList();
+        this.additionalSecurityRequirements = Collections.emptyList();
+    }
+
+    public OpenApiControllerVisitor(List<AnnotationValue<Tag>> additionalTags,
+                                    List<AnnotationValue<io.swagger.v3.oas.annotations.security.SecurityRequirement>> additionalSecurityRequirements) {
+        this.additionalTags = additionalTags;
+        this.additionalSecurityRequirements = additionalSecurityRequirements;
+    }
 
     @Override
     protected boolean ignore(ClassElement element, VisitorContext context) {
@@ -122,7 +138,7 @@ public class OpenApiControllerVisitor extends AbstractOpenApiEndpointVisitor imp
 
     @Override
     protected List<io.swagger.v3.oas.models.tags.Tag> classTags(ClassElement element, VisitorContext context) {
-        return Collections.emptyList();
+        return readTags(additionalTags, context);
     }
 
     @Override
@@ -138,6 +154,11 @@ public class OpenApiControllerVisitor extends AbstractOpenApiEndpointVisitor imp
 
     @Override
     protected List<SecurityRequirement> methodSecurityRequirements(MethodElement element, VisitorContext context) {
-        return readSecurityRequirements(element);
+        List<SecurityRequirement> securityRequirements = readSecurityRequirements(element);
+        if (!additionalSecurityRequirements.isEmpty()) {
+            securityRequirements = new ArrayList<>(securityRequirements);
+            securityRequirements.addAll(readSecurityRequirements(additionalSecurityRequirements));
+        }
+        return securityRequirements;
     }
 }
