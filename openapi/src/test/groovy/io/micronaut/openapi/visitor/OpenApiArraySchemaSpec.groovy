@@ -50,6 +50,24 @@ class Pets {
 
     @ArraySchema(arraySchema = @Schema(description = "a list of primitive Ids", nullable = false), minItems = 2, schema = @Schema(description = "Yes", nullable = true))
     public long[] primitiveIds;
+
+    @ArraySchema(arraySchema = @Schema(description = "a nested array of primitive Ids"))
+    public long[][] nestedPrimitiveIds;
+
+    @ArraySchema(arraySchema = @Schema(description = "a nested list of Pets"))
+    public List<List<Pet>> nestedPetList;
+
+    @ArraySchema(arraySchema = @Schema(description = "a nested array of Pets"))
+    public Pet[][] nestedPetArray;
+
+    @ArraySchema(arraySchema = @Schema(description = "a nested array of Ids"))
+    public Long[][] nestedIdArray;
+
+    @ArraySchema(arraySchema = @Schema(description = "a list of nested Ids"))
+    public List<Long[]> idArrayList;
+
+    @ArraySchema(arraySchema = @Schema(description = "an array of nested Ids"))
+    public List<Long>[] idListArray;
 }
 
 @Schema(description = "Pet")
@@ -89,6 +107,24 @@ class MyBean {}
         openAPI.components.schemas['Pets'].properties['primitiveIds'].items.format == 'int64'
         openAPI.components.schemas['Pets'].properties['primitiveIds'].items.description == 'Yes'
         openAPI.components.schemas['Pets'].properties['primitiveIds'].items.nullable == true
+
+        openAPI.components.schemas['Pets'].properties['nestedPrimitiveIds'].description == 'a nested array of primitive Ids'
+        openAPI.components.schemas['Pets'].properties['nestedPrimitiveIds'].items.items.format == 'int64'
+
+        openAPI.components.schemas['Pets'].properties['nestedPetList'].description == 'a nested list of Pets'
+        openAPI.components.schemas['Pets'].properties['nestedPetList'].items.items.$ref == '#/components/schemas/Pet'
+
+        openAPI.components.schemas['Pets'].properties['nestedPetArray'].description == 'a nested array of Pets'
+        openAPI.components.schemas['Pets'].properties['nestedPetArray'].items.items.$ref == '#/components/schemas/Pet'
+
+        openAPI.components.schemas['Pets'].properties['nestedIdArray'].description == 'a nested array of Ids'
+        openAPI.components.schemas['Pets'].properties['nestedIdArray'].items.items.format == 'int64'
+
+        openAPI.components.schemas['Pets'].properties['idArrayList'].description == 'a list of nested Ids'
+        openAPI.components.schemas['Pets'].properties['idArrayList'].items.items.format == 'int64'
+
+        openAPI.components.schemas['Pets'].properties['idListArray'].description == 'an array of nested Ids'
+        openAPI.components.schemas['Pets'].properties['idListArray'].items.items.format == 'int64'
     }
 
     void "test ArraySchema with arraySchema field in Controller ApiResponse"() {

@@ -43,6 +43,7 @@ import io.micronaut.core.naming.NameUtils;
 import io.micronaut.inject.ast.ClassElement;
 import io.micronaut.inject.ast.MethodElement;
 import io.micronaut.inject.ast.ParameterElement;
+import io.micronaut.inject.ast.PrimitiveElement;
 import io.micronaut.inject.ast.PropertyElement;
 import io.micronaut.inject.visitor.VisitorContext;
 
@@ -74,7 +75,7 @@ public class JavaClassElementExt extends JavaClassElement {
      * @param visitorContext     The visitor context
      */
     private JavaClassElementExt(JavaClassElement jce, JavaVisitorContext visitorContext) {
-        super((TypeElement) jce.getNativeType(), jce.getAnnotationMetadata(), visitorContext, jce.getGenericTypeInfo());
+        super((TypeElement) jce.getNativeType(), jce.getAnnotationMetadata(), visitorContext, jce.getGenericTypeInfo(), jce.arrayDimensions);
         this.javaClassElement = jce;
         this.classElement = (TypeElement) jce.getNativeType();
         this.visitorContext = visitorContext;
@@ -156,7 +157,7 @@ public class JavaClassElementExt extends JavaClassElement {
         TypeMirror tm = wType.getSuperBound();
         // check for Void
         if (tm instanceof DeclaredType && sameType("kotlin.Unit", (DeclaredType) tm)) {
-            return new JavaVoidElement();
+            return PrimitiveElement.VOID;
         } else {
             return ((JavaParameterElement) parameter).parameterizedClassElement(tm, jcontext, info);
         }
