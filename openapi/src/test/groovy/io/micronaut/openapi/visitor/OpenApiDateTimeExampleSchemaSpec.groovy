@@ -21,6 +21,7 @@ class OpenApiDateTimeExampleSchemaSpec extends AbstractTypeElementSpec {
 package test;
 
 import java.time.*;
+import java.util.Optional;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
@@ -32,6 +33,8 @@ import io.micronaut.http.annotation.*;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 
+import io.swagger.v3.oas.annotations.Parameter;
+
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 
 @Controller
@@ -39,7 +42,7 @@ class TimesController {
 
     @Get("/times")
     @ApiResponse(responseCode = "200", description = "Times.", content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = Times.class)))
-    HttpResponse<Times> get() {
+    HttpResponse<Times> get(@QueryValue @Parameter(example="2020-11-03T20:12:00Z") Optional<ZonedDateTime> query) {
         return HttpResponse.ok();
     }
 }
@@ -78,6 +81,13 @@ public class MyBean {}
 
         then:
         OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+
+        openAPI.paths.get("/times").get.parameters.size() == 1
+        openAPI.paths.get("/times").get.parameters[0].name =='query'
+        !openAPI.paths.get("/times").get.parameters[0].required
+        openAPI.paths.get("/times").get.parameters[0].schema.type == 'string'
+        openAPI.paths.get("/times").get.parameters[0].example == "2020-11-03T20:12:00Z"
+
         openAPI.components.schemas["Times"]
         openAPI.components.schemas["Times"].type == "object"
 
