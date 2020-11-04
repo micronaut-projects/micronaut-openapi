@@ -423,7 +423,8 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
         }
 
         if (newParameter.getRequired() == null) {
-            newParameter.setRequired(!parameter.isAnnotationPresent(Nullable.class));
+            newParameter.setRequired(!parameter.isAnnotationPresent(Nullable.class) &&
+                    !parameter.getType().isAssignable(Optional.class));
         }
         if (javadocDescription != null && StringUtils.isEmpty(newParameter.getDescription())) {
             CharSequence desc = javadocDescription.getParameters().get(parameter.getName());
