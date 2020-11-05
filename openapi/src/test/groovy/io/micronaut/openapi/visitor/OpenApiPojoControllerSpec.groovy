@@ -235,6 +235,7 @@ class Pet {
     private Map freeForm;
     private Map<String, String> dictionariesPlain;
     private Map<String, Tag> tags;
+    private Map<String, List<Tag>> tagArrays;
 
     public void setAge(int a) {
         age = a;
@@ -300,6 +301,19 @@ class Pet {
     public void setTags(Map<String, Tag> tags) {
         this.tags = tags;
     }
+
+    /**
+     * A string-to-array dictionary
+     *
+     * @return A string-to-array dictionary
+     */
+    public Map<String, List<Tag>> getTagArrays() {
+        return tagArrays;
+    }
+
+    public void setTagArrays(Map<String, List<Tag>> tagArrays) {
+        this.tagArrays = tagArrays;
+    }
 }
 
 class Tag {
@@ -351,7 +365,7 @@ class MyBean {}
 
         then:"the components are valid"
         petSchema.type == 'object'
-        petSchema.properties.size() == 5
+        petSchema.properties.size() == 6
 
         petSchema.properties['age'].type == 'integer'
         petSchema.properties['age'].description == 'The Pet Age'
@@ -374,6 +388,11 @@ class MyBean {}
         tagSchema.properties['name'].type == "string"
         tagSchema.properties['name'].description == "The Tag Name"
         tagSchema.properties['description'].type == "string"
+
+        ((MapSchema) petSchema.properties['tagArrays']).type == "object"
+        ((MapSchema) petSchema.properties['tagArrays']).description == "A string-to-array dictionary"
+        ((ArraySchema)((MapSchema) petSchema.properties['tagArrays']).getAdditionalProperties()).getType() == "array"
+        ((ArraySchema)((MapSchema) petSchema.properties['tagArrays']).getAdditionalProperties()).getItems().$ref == "#/components/schemas/Tag"
     }
 
     void "test build OpenAPI doc for POJO type with javax.constraints"() {

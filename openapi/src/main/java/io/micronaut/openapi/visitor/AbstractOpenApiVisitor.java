@@ -669,24 +669,20 @@ abstract class AbstractOpenApiVisitor  {
                     if (type.getTypeArguments().isEmpty()) {
                         schema.setAdditionalProperties(true);
                     } else {
-                        Element valueType = type.getTypeArguments().get("V");
+                        ClassElement valueType = type.getTypeArguments().get("V");
                         if (valueType.getName().equals(Object.class.getName())) {
                             schema.setAdditionalProperties(true);
                         } else {
-                            Schema additionalPropertiesSchema = getPrimitiveType(valueType.getName());
-                            if (additionalPropertiesSchema == null) {
-                                additionalPropertiesSchema = getSchemaDefinition(openAPI, context, valueType, definingElement, mediaTypes);
-                            }
-                            schema.setAdditionalProperties(additionalPropertiesSchema);
+                            schema.setAdditionalProperties(resolveSchema(openAPI, type, valueType, context, mediaTypes));
                         }
                     }
                 } else if (typeHelper.isIterable(type)) {
                     if (typeHelper.isArray(type)) {
-                        schema = resolveSchema(openAPI, definingElement, type, new ArrayTypeHelper(typeHelper.depth + 1), context, mediaTypes);
+                        schema = resolveSchema(openAPI, type, type, new ArrayTypeHelper(typeHelper.depth + 1), context, mediaTypes);
                     } else {
                         Optional<ClassElement> componentType = type.getFirstTypeArgument();
                         if (componentType.isPresent()) {
-                            schema = resolveSchema(openAPI, definingElement, componentType.get(), context, mediaTypes);
+                            schema = resolveSchema(openAPI, type, componentType.get(), context, mediaTypes);
                         } else {
                             schema = getPrimitiveType(Object.class.getName());
                         }
