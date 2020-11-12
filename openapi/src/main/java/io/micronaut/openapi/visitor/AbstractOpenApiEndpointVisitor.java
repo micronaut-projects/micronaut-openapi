@@ -42,8 +42,10 @@ import io.micronaut.http.uri.UriMatchTemplate;
 import io.micronaut.http.uri.UriMatchVariable;
 import io.micronaut.inject.ast.ClassElement;
 import io.micronaut.inject.ast.Element;
+import io.micronaut.inject.ast.FieldElement;
 import io.micronaut.inject.ast.MethodElement;
 import io.micronaut.inject.ast.ParameterElement;
+import io.micronaut.inject.ast.TypedElement;
 import io.micronaut.inject.visitor.VisitorContext;
 import io.micronaut.openapi.javadoc.JavadocDescription;
 import io.micronaut.openapi.javadoc.JavadocParser;
@@ -69,6 +71,7 @@ import io.swagger.v3.oas.models.servers.Server;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+
 import java.io.IOException;
 import java.security.Principal;
 import java.util.*;
@@ -232,7 +235,7 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
      */
     protected abstract String description(MethodElement element);
 
-    private boolean hasNoBindingAnnotationOrType(ParameterElement parameter) {
+    private boolean hasNoBindingAnnotationOrType(TypedElement parameter) {
         return !parameter.isAnnotationPresent(io.swagger.v3.oas.annotations.parameters.RequestBody.class) &&
                 !parameter.isAnnotationPresent(QueryValue.class) &&
                 !parameter.isAnnotationPresent(PathVariable.class) &&
@@ -240,6 +243,7 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
                 !parameter.isAnnotationPresent(Part.class) &&
                 !parameter.isAnnotationPresent(CookieValue.class) &&
                 !parameter.isAnnotationPresent(Header.class) &&
+                !parameter.isAnnotationPresent(RequestBean.class) &&
                 !isResponseType(parameter.getType());
     }
 
@@ -304,7 +308,7 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
 
         Map<String, UriMatchVariable> pathVariables = pathVariables(matchTemplate);
         List<MediaType> consumesMediaTypes = consumesMediaTypes(element);
-        List<ParameterElement> extraBodyParameters = new ArrayList<>();
+        List<TypedElement> extraBodyParameters = new ArrayList<>();
         processParameters(element, context, openAPI, swaggerOperation, javadocDescription, permitsRequestBody, pathVariables, consumesMediaTypes, extraBodyParameters);
 
         processExtraBodyParameters(context, httpMethod, openAPI, swaggerOperation, javadocDescription, consumesMediaTypes, extraBodyParameters);
@@ -320,7 +324,7 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
                                             io.swagger.v3.oas.models.Operation swaggerOperation,
                                             JavadocDescription javadocDescription,
                                             List<MediaType> consumesMediaTypes,
-                                            List<ParameterElement> extraBodyParameters) {
+                                            List<TypedElement> extraBodyParameters) {
         RequestBody requestBody = swaggerOperation.getRequestBody();
         if (HttpMethod.requiresRequestBody(httpMethod) || HttpMethod.permitsRequestBody(httpMethod) && !extraBodyParameters.isEmpty()) {
             if (requestBody == null) {
@@ -350,7 +354,7 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
                     schema = extraBodyParametersSchema;
                     mediaType.setSchema(composedSchema);
                 }
-                for (ParameterElement parameter : extraBodyParameters) {
+                for (TypedElement parameter : extraBodyParameters) {
                     processBodyParameter(context, openAPI, javadocDescription, MediaType.of(mediaTypeName), schema, parameter);
                 }
             });
@@ -362,7 +366,7 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
                                    boolean permitsRequestBody,
                                    Map<String, UriMatchVariable> pathVariables,
                                    List<MediaType> consumesMediaTypes,
-                                   List<ParameterElement> extraBodyParameters) {
+                                   List<TypedElement> extraBodyParameters) {
         List<Parameter> swaggerParameters = swaggerOperation.getParameters();
         boolean hasExistingParameters = CollectionUtils.isNotEmpty(swaggerParameters);
         if (!hasExistingParameters) {
@@ -378,8 +382,8 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
     private void processParameter(VisitorContext context, OpenAPI openAPI,
                                   io.swagger.v3.oas.models.Operation swaggerOperation, JavadocDescription javadocDescription,
                                   boolean permitsRequestBody, Map<String, UriMatchVariable> pathVariables, List<MediaType> consumesMediaTypes,
-                                  List<Parameter> swaggerParameters, boolean hasExistingParameters, ParameterElement parameter,
-                                  List<ParameterElement> extraBodyParameters) {
+                                  List<Parameter> swaggerParameters, boolean hasExistingParameters, TypedElement parameter,
+                                  List<TypedElement> extraBodyParameters) {
         ClassElement parameterType = parameter.getGenericType();
 
         if (ignoreParameter(parameter)) {
@@ -398,6 +402,12 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
             return;
         }
 
+        if (parameter.isAnnotationPresent(RequestBean.class)) {
+            processRequestBean(context, openAPI, swaggerOperation, javadocDescription, permitsRequestBody, pathVariables,
+                    consumesMediaTypes, swaggerParameters, hasExistingParameters, parameter, extraBodyParameters);
+            return;
+        }
+
         if (hasExistingParameters) {
             return;
         }
@@ -412,7 +422,8 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
         }
 
         if (newParameter.getRequired() == null) {
-            newParameter.setRequired(!parameter.isAnnotationPresent(Nullable.class));
+            newParameter.setRequired(!parameter.isAnnotationPresent(Nullable.class) &&
+                    !parameter.getType().isAssignable(Optional.class));
         }
         if (javadocDescription != null && StringUtils.isEmpty(newParameter.getDescription())) {
             CharSequence desc = javadocDescription.getParameters().get(parameter.getName());
@@ -434,7 +445,7 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
     }
 
     private void processBodyParameter(VisitorContext context, OpenAPI openAPI, JavadocDescription javadocDescription,
-                                      MediaType mediaType, Schema schema, ParameterElement parameter) {
+                                      MediaType mediaType, Schema schema, TypedElement parameter) {
         Schema propertySchema = resolveSchema(openAPI, parameter, parameter.getType(), context,
                 Collections.singletonList(mediaType));
         if (propertySchema != null) {
@@ -459,8 +470,8 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
     }
 
     private Parameter processMethodParameterAnnotation(VisitorContext context, boolean permitsRequestBody,
-                                                       Map<String, UriMatchVariable> pathVariables, ParameterElement parameter,
-                                                       List<ParameterElement> extraBodyParameters) {
+                                                       Map<String, UriMatchVariable> pathVariables, TypedElement parameter,
+                                                       List<TypedElement> extraBodyParameters) {
         Parameter newParameter = null;
         String parameterName = parameter.getName();
         if (!parameter.hasStereotype(Bindable.class) && pathVariables.containsKey(parameterName)) {
@@ -594,7 +605,7 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
 
     private void processBody(VisitorContext context, OpenAPI openAPI,
                              io.swagger.v3.oas.models.Operation swaggerOperation, JavadocDescription javadocDescription,
-                             boolean permitsRequestBody, List<MediaType> consumesMediaTypes, ParameterElement parameter,
+                             boolean permitsRequestBody, List<MediaType> consumesMediaTypes, TypedElement parameter,
                              ClassElement parameterType) {
         if (!permitsRequestBody) {
             return;
@@ -627,6 +638,17 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
         } else {
             final Content currentContent = requestBody.getContent();
             content.forEach((key, value) -> currentContent.putIfAbsent(key, value));
+        }
+    }
+
+    private void processRequestBean(VisitorContext context, OpenAPI openAPI,
+            io.swagger.v3.oas.models.Operation swaggerOperation, JavadocDescription javadocDescription,
+            boolean permitsRequestBody, Map<String, UriMatchVariable> pathVariables, List<MediaType> consumesMediaTypes,
+            List<Parameter> swaggerParameters, boolean hasExistingParameters, TypedElement parameter,
+            List<TypedElement> extraBodyParameters) {
+        for (FieldElement field : parameter.getType().getFields()) {
+            processParameter(context, openAPI, swaggerOperation, javadocDescription, permitsRequestBody, pathVariables,
+                    consumesMediaTypes, swaggerParameters, hasExistingParameters, field, extraBodyParameters);
         }
     }
 
@@ -770,7 +792,7 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
         }
     }
 
-    private boolean ignoreParameter(ParameterElement parameter) {
+    private boolean ignoreParameter(TypedElement parameter) {
         return parameter.isAnnotationPresent(Hidden.class) ||
                 parameter.isAnnotationPresent(JsonIgnore.class) ||
                 parameter.getValue(io.swagger.v3.oas.annotations.Parameter.class, "hidden", Boolean.class)
@@ -976,7 +998,11 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
     }
 
     private List<io.swagger.v3.oas.models.tags.Tag> readTags(ClassElement element, VisitorContext context) {
-        return element.getAnnotationValuesByType(Tag.class).stream()
+        return readTags(element.getAnnotationValuesByType(Tag.class), context);
+    }
+
+    List<io.swagger.v3.oas.models.tags.Tag> readTags(List<AnnotationValue<Tag>> annotations, VisitorContext context) {
+        return annotations.stream()
                 .map(av -> toValue(av.getValues(), context, io.swagger.v3.oas.models.tags.Tag.class))
                 .filter(Optional::isPresent).map(Optional::get).collect(Collectors.toList());
     }

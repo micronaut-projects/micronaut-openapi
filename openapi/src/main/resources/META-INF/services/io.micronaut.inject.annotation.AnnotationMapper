@@ -1,0 +1,2 @@
+io.micronaut.openapi.annotation.mappers.OpenAPIManagementAnnotationMapper
+io.micronaut.openapi.annotation.mappers.OpenAPISecurityAnnotationMapper

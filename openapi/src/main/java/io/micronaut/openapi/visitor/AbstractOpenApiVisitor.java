@@ -231,7 +231,11 @@ abstract class AbstractOpenApiVisitor  {
      * @return A list of SecurityRequirement
      */
     List<SecurityRequirement> readSecurityRequirements(Element element) {
-        return element.getAnnotationValuesByType(io.swagger.v3.oas.annotations.security.SecurityRequirement.class)
+        return readSecurityRequirements(element.getAnnotationValuesByType(io.swagger.v3.oas.annotations.security.SecurityRequirement.class));
+    }
+
+    List<SecurityRequirement> readSecurityRequirements(List<AnnotationValue<io.swagger.v3.oas.annotations.security.SecurityRequirement>> annotations) {
+        return annotations
                 .stream()
                 .map(this::mapToSecurityRequirement)
                 .collect(Collectors.toList());
@@ -599,6 +603,21 @@ abstract class AbstractOpenApiVisitor  {
      * @return The schema or null if it cannot be resolved
      */
     protected @Nullable Schema resolveSchema(OpenAPI openAPI, @Nullable Element definingElement, ClassElement type, VisitorContext context, List<MediaType> mediaTypes) {
+        return resolveSchema(openAPI, definingElement, type, new ArrayTypeHelper(0), context, mediaTypes);
+    }
+
+    /**
+     * Resolves the schema for the given type element.
+     *
+     * @param openAPI The OpenAPI object
+     * @param definingElement The defining element
+     * @param type The type element
+     * @param typeHelper The helper to recursively resolve an array type down to its element type
+     * @param context The context
+     * @param mediaTypes An optional media type
+     * @return The schema or null if it cannot be resolved
+     */
+    private @Nullable Schema resolveSchema(OpenAPI openAPI, @Nullable Element definingElement, ClassElement type, ArrayTypeHelper typeHelper, VisitorContext context, List<MediaType> mediaTypes) {
         Schema schema = null;
 
         AnnotationValue<io.swagger.v3.oas.annotations.media.Schema> schemaAnnotationValue = null;
@@ -641,42 +660,32 @@ abstract class AbstractOpenApiVisitor  {
                     typeName = PrimitiveType.BINARY.name();
                 }
                 PrimitiveType primitiveType = PrimitiveType.fromName(typeName);
-                if (!type.isArray() && ClassUtils.isJavaLangType(typeName)) {
+                if (!typeHelper.isArray(type) && ClassUtils.isJavaLangType(typeName)) {
                     schema = getPrimitiveType(typeName);
-                } else if (!type.isArray() && primitiveType != null) {
+                } else if (!typeHelper.isArray(type) && primitiveType != null) {
                     schema = primitiveType.createProperty();
                 } else if (type.isAssignable(Map.class.getName())) {
                     schema = new MapSchema();
                     if (type.getTypeArguments().isEmpty()) {
                         schema.setAdditionalProperties(true);
                     } else {
-                        Element valueType = type.getTypeArguments().get("V");
+                        ClassElement valueType = type.getTypeArguments().get("V");
                         if (valueType.getName().equals(Object.class.getName())) {
                             schema.setAdditionalProperties(true);
                         } else {
-                            Schema additionalPropertiesSchema = getPrimitiveType(valueType.getName());
-                            if (additionalPropertiesSchema == null) {
-                                additionalPropertiesSchema = getSchemaDefinition(openAPI, context, valueType, definingElement, mediaTypes);
-                            }
-                            schema.setAdditionalProperties(additionalPropertiesSchema);
+                            schema.setAdditionalProperties(resolveSchema(openAPI, type, valueType, context, mediaTypes));
                         }
                     }
-                } else if (type.isIterable()) {
-                    if (primitiveType == null) {
+                } else if (typeHelper.isIterable(type)) {
+                    if (typeHelper.isArray(type)) {
+                        schema = resolveSchema(openAPI, type, type, new ArrayTypeHelper(typeHelper.depth + 1), context, mediaTypes);
+                    } else {
                         Optional<ClassElement> componentType = type.getFirstTypeArgument();
                         if (componentType.isPresent()) {
-                            schema = getPrimitiveType(componentType.get().getName());
+                            schema = resolveSchema(openAPI, type, componentType.get(), context, mediaTypes);
                         } else {
                             schema = getPrimitiveType(Object.class.getName());
                         }
-
-                        if (schema == null && componentType.isPresent()) {
-                            ClassElement componentElement = componentType.get();
-                            // we must have a POJO so let's create a component
-                            schema = getSchemaDefinition(openAPI, context, componentElement, definingElement, mediaTypes);
-                        }
-                    } else {
-                        schema = getPrimitiveType(typeName);
                     }
                     if (schema != null) {
                         schema = arraySchema(schema);
@@ -1535,4 +1544,26 @@ abstract class AbstractOpenApiVisitor  {
         return tagList;
     }
 
+    /**
+     * A helper class to recursively resolve a class element denoting an array type down to its element type.
+     * This is to circumvent the fact that {@link ClassElement} doesn't yet expose a counterpart to
+     * {@link ClassElement#toArray}.
+     *
+     * @see ClassElement#toArray
+     */
+    private static final class ArrayTypeHelper {
+        private final int depth;
+
+        private ArrayTypeHelper(final int depth) {
+            this.depth = depth;
+        }
+
+        private boolean isArray(final ClassElement type) {
+            return type.getArrayDimensions() > depth;
+        }
+
+        private boolean isIterable(final ClassElement type) {
+            return isArray(type) || type.isAssignable(Iterable.class);
+        }
+    }
 }

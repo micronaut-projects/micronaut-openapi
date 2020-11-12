@@ -54,31 +54,101 @@ import java.util.stream.Collectors;
 @Experimental
 public class OpenApiEndpointVisitor extends AbstractOpenApiEndpointVisitor implements TypeElementVisitor<Endpoint, Object> {
     private String id;
-    private boolean skip;
     private HttpMethodDesciption methodDescription;
+
+    private Boolean enabled;
+    private String path;
+    private List<Server> servers;
+    private List<Tag> tags;
+    private List<SecurityRequirement> securityRequirements;
+
+    private List<AnnotationValue<io.swagger.v3.oas.annotations.tags.Tag>> additionalTags;
+    private List<AnnotationValue<io.swagger.v3.oas.annotations.security.SecurityRequirement>> additionalSecurityRequirements;
+
+    public OpenApiEndpointVisitor() {
+    }
+
+    public OpenApiEndpointVisitor(boolean enabled) {
+        this.enabled = enabled;
+    }
+
+    public OpenApiEndpointVisitor(boolean enabled,
+                                  List<AnnotationValue<io.swagger.v3.oas.annotations.tags.Tag>> additionalTags,
+                                  List<AnnotationValue<io.swagger.v3.oas.annotations.security.SecurityRequirement>> additionalSecurityRequirements) {
+        this.enabled = enabled;
+        this.additionalTags = additionalTags;
+        this.additionalSecurityRequirements = additionalSecurityRequirements;
+    }
+
+    @Override
+    public void visitClass(ClassElement element, VisitorContext context) {
+        EndpointsConfiguration cfg = OpenApiApplicationVisitor.endPointsConfiguration(context);
+        if (enabled == null) {
+            enabled = cfg.isEnabled();
+        }
+        if (path == null) {
+            path = cfg.getPath();
+            if (path == null) {
+                path = "/";
+            }
+        }
+        if (servers == null) {
+            servers = cfg.getServers();
+            if (servers == null) {
+                servers = Collections.emptyList();
+            }
+        }
+        if (tags == null) {
+            tags = cfg.getTags();
+            if (tags == null) {
+                tags = Collections.emptyList();
+            }
+        }
+        if (securityRequirements == null) {
+            securityRequirements = cfg.getSecurityRequirements();
+            if (securityRequirements == null) {
+                securityRequirements = Collections.emptyList();
+            }
+        }
+        if (additionalTags != null) {
+            if (tags == null) {
+                tags = readTags(additionalTags, context);
+            } else {
+                tags = new ArrayList<>(tags);
+                tags.addAll(readTags(additionalTags, context));
+            }
+        }
+        if (additionalSecurityRequirements != null) {
+            if (securityRequirements == null) {
+                securityRequirements = readSecurityRequirements(additionalSecurityRequirements);
+            } else {
+                securityRequirements = new ArrayList<>(securityRequirements);
+                securityRequirements.addAll(readSecurityRequirements(additionalSecurityRequirements));
+            }
+        }
+        super.visitClass(element, context);
+    }
 
     @Override
     protected boolean ignore(ClassElement element, VisitorContext context) {
-        EndpointsConfiguration cfg = OpenApiApplicationVisitor.endPointsConfiguration(context);
-        if (!cfg.isEnabled()) {
-            skip = true;
-            return skip;
+        if (!enabled) {
+            return true;
         }
         boolean endpoint = element.isAnnotationPresent(Endpoint.class);
         if (endpoint) {
             AnnotationValue<Endpoint> ann = element.getAnnotation(Endpoint.class);
-            id = cfg.getPath() + ann.stringValue("id").orElse(NameUtils.hyphenate(element.getSimpleName()));
+            id = path + ann.stringValue("id").orElse(NameUtils.hyphenate(element.getSimpleName()));
             if (id.charAt(0) != '/') {
                 id = '/' + id;
             }
+            return false;
         }
-        skip = !endpoint;
-        return skip;
+        return true;
     }
 
     @Override
     protected boolean ignore(MethodElement element, VisitorContext context) {
-        if (skip || element.isAnnotationPresent(Hidden.class)) {
+        if (!enabled || element.isAnnotationPresent(Hidden.class)) {
             return true;
         }
         methodDescription = httpMethodDescription(element);
@@ -118,8 +188,7 @@ public class OpenApiEndpointVisitor extends AbstractOpenApiEndpointVisitor imple
 
     @Override
     protected List<Tag> classTags(ClassElement element, VisitorContext context) {
-        EndpointsConfiguration cfg = OpenApiApplicationVisitor.endPointsConfiguration(context);
-        List<Tag> allTags = new ArrayList<>(cfg.getTags());
+        List<Tag> allTags = new ArrayList<>(this.tags);
         allTags.addAll(context.get(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_ENDPOINT_CLASS_TAGS, List.class,
                 Collections.emptyList()));
         return allTags;
@@ -127,8 +196,7 @@ public class OpenApiEndpointVisitor extends AbstractOpenApiEndpointVisitor imple
 
     @Override
     protected List<Server> methodServers(MethodElement element, VisitorContext context) {
-        EndpointsConfiguration cfg = OpenApiApplicationVisitor.endPointsConfiguration(context);
-        List<Server> servers = new ArrayList<>(cfg.getServers());
+        List<Server> servers = new ArrayList<>(this.servers);
         servers.addAll(context.get(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_ENDPOINT_SERVERS, List.class,
                 Collections.emptyList()));
         return servers;
@@ -136,8 +204,7 @@ public class OpenApiEndpointVisitor extends AbstractOpenApiEndpointVisitor imple
 
     @Override
     protected List<SecurityRequirement> methodSecurityRequirements(MethodElement element, VisitorContext context) {
-        EndpointsConfiguration cfg = OpenApiApplicationVisitor.endPointsConfiguration(context);
-        List<SecurityRequirement> securityRequirements = new ArrayList<>(cfg.getSecurityRequirements());
+        List<SecurityRequirement> securityRequirements = new ArrayList<>(this.securityRequirements);
         securityRequirements.addAll(context.get(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_ENDPOINT_SECURITY_REQUIREMENTS, List.class,
                 Collections.emptyList()));
         return securityRequirements;
