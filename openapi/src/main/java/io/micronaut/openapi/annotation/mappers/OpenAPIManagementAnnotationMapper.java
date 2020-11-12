@@ -33,6 +33,9 @@ import io.micronaut.openapi.annotation.OpenAPIManagement;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Mapper for management endpoints.
+ */
 public class OpenAPIManagementAnnotationMapper implements TypedAnnotationMapper<OpenAPIManagement> {
 
     @Override

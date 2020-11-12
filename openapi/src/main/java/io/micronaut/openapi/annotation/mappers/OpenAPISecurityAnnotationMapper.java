@@ -24,6 +24,9 @@ import io.micronaut.openapi.annotation.OpenAPISecurity;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Mapper for security endpoints.
+ */
 public class OpenAPISecurityAnnotationMapper implements TypedAnnotationMapper<OpenAPISecurity> {
 
     @Override
