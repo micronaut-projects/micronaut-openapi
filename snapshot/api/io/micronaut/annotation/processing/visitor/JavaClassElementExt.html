@@ -124,7 +124,11 @@ var activeTableTab = "activeTableTab";
 <pre>@Internal
 public class <span class="typeNameLabel">JavaClassElementExt</span>
 extends io.micronaut.annotation.processing.visitor.JavaClassElement</pre>
-<div class="block">A class element returning data from a <code>TypeElement</code>.</div>
+<div class="block">A class element returning data from a <code>TypeElement</code>.
+
+ Implementation note: [smell] this class needs to track changes to <code>JavaClassElement</code>.
+ For example: <code>JavaClassElement</code> introduced <code>JavaClassElement.arrayDimensions</code>
+ resulting in a processing bug in this library when this class didn't account for it in the constructor.</div>
 <dl>
 <dt><span class="simpleTagLabel">Since:</span></dt>
 <dd>1.0</dd>
@@ -149,6 +153,13 @@ extends io.micronaut.annotation.processing.visitor.JavaClassElement</pre>
 </a>
 <h3>Fields inherited from class&nbsp;io.micronaut.annotation.processing.visitor.JavaClassElement</h3>
 <code>arrayDimensions</code></li>
+</ul>
+<ul class="blockList">
+<li class="blockList"><a name="fields.inherited.from.class.io.micronaut.inject.ast.Element">
+<!--   -->
+</a>
+<h3>Fields inherited from interface&nbsp;io.micronaut.inject.ast.Element</h3>
+<code>EMPTY_ELEMENT_ARRAY</code></li>
 </ul>
 <ul class="blockList">
 <li class="blockList"><a name="fields.inherited.from.class.io.micronaut.core.annotation.AnnotationMetadata">
@@ -250,7 +261,7 @@ extends io.micronaut.annotation.processing.visitor.JavaClassElement</pre>
 <!--   -->
 </a>
 <h3>Methods inherited from class&nbsp;io.micronaut.annotation.processing.visitor.JavaClassElement</h3>
-<code>getArrayDimensions, getBeanProperties, getDefaultConstructor, getFields, getName, getPrimaryConstructor, getTypeArguments, getTypeArguments, isAbstract, isArray, isAssignable, isInterface, isPrimitive, toArray</code></li>
+<code>getArrayDimensions, getBeanProperties, getDefaultConstructor, getFields, getName, getPrimaryConstructor, getTypeArguments, getTypeArguments, isAbstract, isArray, isAssignable, isInner, isInterface, isPrimitive, isRecord, toArray</code></li>
 </ul>
 <ul class="blockList">
 <li class="blockList"><a name="methods.inherited.from.class.io.micronaut.annotation.processing.visitor.AbstractJavaElement">
