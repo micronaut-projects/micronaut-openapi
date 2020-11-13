@@ -15,24 +15,16 @@
  */
 package io.micronaut.openapi.view;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import io.micronaut.core.util.StringUtils;
+import io.micronaut.inject.visitor.VisitorContext;
+
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 import java.util.stream.Collectors;
-
-import io.micronaut.core.util.StringUtils;
-import io.micronaut.inject.visitor.VisitorContext;
 
 /**
  * OpenApi view configuration for Swagger-ui, ReDoc and RapiDoc.
@@ -57,7 +49,7 @@ public final class OpenApiViewConfig {
      * The Renderer types.
      */
     enum RendererType {
-        SWAGGER_UI, REDOC, RAPIDOC;
+        SWAGGER_UI, REDOC, RAPIDOC
     }
 
     private OpenApiViewConfig() {
@@ -157,7 +149,10 @@ public final class OpenApiViewConfig {
         }
         Path file = outputDir.resolve("index.html");
         if (visitorContext != null) {
-          visitorContext.info("Writing OpenAPI View to destination: " + file);
+            visitorContext.info("Writing OpenAPI View to destination: " + file);
+            visitorContext.getClassesOutputPath().ifPresent(path ->
+                // add relative path for the file, so that the micronaut-graal visitor knows about it
+                visitorContext.addGeneratedResource(path.relativize(file).toString()));
         }
         try (BufferedWriter writer = Files.newBufferedWriter(file, StandardCharsets.UTF_8,
                 StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING)) {
