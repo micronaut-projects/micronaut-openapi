@@ -211,7 +211,7 @@
 <p>        <div class="listingblock multi-language-sample">
 <div class="title"></div>
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="gradle">annotationProcessor(<span class="hljs-string">"io.micronaut.openapi:micronaut-openapi:2.2.1.BUILD-SNAPSHOT")</span></code></pre>
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="gradle">annotationProcessor(<span class="hljs-string">"io.micronaut.openapi:micronaut-openapi:2.1.2.BUILD-SNAPSHOT")</span></code></pre>
 </div>
 </div>
 <div class="listingblock multi-language-sample">
@@ -221,7 +221,7 @@
     &lt;path&gt;
         &lt;groupId&gt;io.micronaut.openapi&lt;/groupId&gt;
         &lt;artifactId&gt;micronaut-openapi&lt;/artifactId&gt;
-        &lt;version&gt;2.2.1.BUILD-SNAPSHOT&lt;/version&gt;
+        &lt;version&gt;2.1.2.BUILD-SNAPSHOT&lt;/version&gt;
     &lt;/path&gt;
 &lt;/annotationProcessorPaths&gt;</code></pre>
 </div>
@@ -823,7 +823,7 @@ You need to exposed <code>micronaut-management</code> as annotation processor an
 <p>        <div class="listingblock multi-language-sample">
 <div class="title"></div>
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="gradle">annotationProcessor(<span class="hljs-string">"io.micronaut:micronaut-management:2.2.1.BUILD-SNAPSHOT")</span></code></pre>
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="gradle">annotationProcessor(<span class="hljs-string">"io.micronaut:micronaut-management:2.1.2.BUILD-SNAPSHOT")</span></code></pre>
 </div>
 </div>
 <div class="listingblock multi-language-sample">
@@ -833,7 +833,7 @@ You need to exposed <code>micronaut-management</code> as annotation processor an
     &lt;path&gt;
         &lt;groupId&gt;io.micronaut&lt;/groupId&gt;
         &lt;artifactId&gt;micronaut-management&lt;/artifactId&gt;
-        &lt;version&gt;2.2.1.BUILD-SNAPSHOT&lt;/version&gt;
+        &lt;version&gt;2.1.2.BUILD-SNAPSHOT&lt;/version&gt;
     &lt;/path&gt;
 &lt;/annotationProcessorPaths&gt;</code></pre>
 </div>
@@ -842,7 +842,7 @@ You need to exposed <code>micronaut-management</code> as annotation processor an
         <div class="listingblock multi-language-sample">
 <div class="title"></div>
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="gradle">implementation(<span class="hljs-string">"io.micronaut:micronaut-management:2.2.1.BUILD-SNAPSHOT")</span></code></pre>
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="gradle">implementation(<span class="hljs-string">"io.micronaut:micronaut-management:2.1.2.BUILD-SNAPSHOT")</span></code></pre>
 </div>
 </div>
 <div class="listingblock multi-language-sample">
@@ -850,7 +850,7 @@ You need to exposed <code>micronaut-management</code> as annotation processor an
 <pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="maven">&lt;dependency&gt;
     &lt;groupId&gt;io.micronaut&lt;/groupId&gt;
     &lt;artifactId&gt;micronaut-management&lt;/artifactId&gt;
-    &lt;version&gt;2.2.1.BUILD-SNAPSHOT&lt;/version&gt;
+    &lt;version&gt;2.1.2.BUILD-SNAPSHOT&lt;/version&gt;
 &lt;/dependency&gt;</code></pre>
 </div>
 </div>
@@ -971,56 +971,6 @@ endpoints.refresh.security-requirements=[{"petstore_auth": ["write:pets", "read:
 </div>
 </div>
 </div>
-<div class="sect1">
-<h2 id="_annotation_configuration">Annotation configuration</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>You can use <code>@io.micronaut.openapi.annotation.OpenAPIInclude</code> to include additional <code>io.micronaut.http.annotation.Controller</code> or
-<code>io.micronaut.management.endpoint.annotation.Endpoint</code> already compiled classes:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@OpenAPIDefinition(
-        info = @Info(
-                title = "Hello World",
-                version = "${api.version}",
-                description = "${openapi.description}",
-                license = @License(name = "Apache 2.0", url = "https://foo.bar"),
-                contact = @Contact(url = "https://gigantic-server.com", name = "Fred", email = "Fred@gigagantic-server.com")
-        )
-)
-@OpenAPIInclude(
-        classes = { io.micronaut.security.endpoints.LoginController.class, io.micronaut.security.endpoints.LogoutController.class },
-        tags = @Tag(name = "Security")
-)
-@OpenAPIInclude(
-        classes = io.micronaut.management.endpoint.env.EnvironmentEndpoint.class,
-        tags = @Tag(name = "Management"),
-        security = @SecurityRequirement(name = "BEARER", scopes = {"ADMIN"})
-)
-public class Application {
-
-    public static void main(String[] args) {
-        Micronaut.run(Application.class);
-    }
-}</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Additional annotations available to include all Micronaut build-in endpoints:</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p><code>io.micronaut.openapi.annotation.OpenAPISecurity</code> - adds security endpoints</p>
-</li>
-<li>
-<p><code>io.micronaut.openapi.annotation.OpenAPIManagement</code> - adds management endpoints</p>
-</li>
-</ul>
-</div>
-</div>
-</div>
 
 <h1 id="controllersAndSwaggerAnnotations"><a class="anchor" href="#controllersAndSwaggerAnnotations"></a>9 Controllers and Swagger Annotations</h1>
 
@@ -1129,7 +1079,7 @@ paths:
         schema:
           type: string
       responses:
-        200:
+        default:
           description: The greeting
           content:
             text/plain:
@@ -1278,7 +1228,7 @@ paths:
           minLength: 1
           type: string
       responses:
-        200:
+        default:
           content:
             text/plain:
               schema:
