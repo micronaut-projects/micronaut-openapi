@@ -23,13 +23,19 @@ import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.PathItem;
 import io.swagger.v3.oas.models.Paths;
 
+/**
+ * OpenApi introspection configuration for Swagger-model.
+ * Adds introspection of the io.swagger.v3.oas.models.models package
+ *
+ * @author Henrique Mota
+ */
 @Introspected(classes = {
-		Components.class,
-		ExternalDocumentation.class,
-		OpenAPI.class,
-		Operation.class,
-		PathItem.class,
-		Paths.class,
+    Components.class,
+    ExternalDocumentation.class,
+    OpenAPI.class,
+    Operation.class,
+    PathItem.class,
+    Paths.class,
 })
 public class ModelConfiguration {
 }

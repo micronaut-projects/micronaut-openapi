@@ -18,8 +18,14 @@ package io.micronaut.openapi.introspections;
 import io.micronaut.core.annotation.Introspected;
 import io.swagger.v3.oas.models.examples.Example;
 
+/**
+ * OpenApi introspection configuration for Swagger-model.
+ * Adds introspection of the io.swagger.v3.oas.models.examples package
+ *
+ * @author Henrique Mota
+ */
 @Introspected(classes = {
-		Example.class,
+    Example.class,
 })
 public class ExampleConfiguration {
 }

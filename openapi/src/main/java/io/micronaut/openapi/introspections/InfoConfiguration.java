@@ -20,10 +20,16 @@ import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.info.License;
 
+/**
+ * OpenApi introspection configuration for Swagger-model.
+ * Adds introspection of the io.swagger.v3.oas.models.info package
+ *
+ * @author Henrique Mota
+ */
 @Introspected(classes = {
-		Contact.class,
-		Info.class,
-		License.class,
+    Contact.class,
+    Info.class,
+    License.class,
 })
 public class InfoConfiguration {
 }

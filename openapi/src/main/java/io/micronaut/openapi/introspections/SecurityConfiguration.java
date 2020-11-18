@@ -24,12 +24,18 @@ import io.swagger.v3.oas.models.security.Scopes;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 
+/**
+ * OpenApi introspection configuration for Swagger-model.
+ * Adds introspection of the io.swagger.v3.oas.models.security package
+ *
+ * @author Henrique Mota
+ */
 @Introspected(classes = {
-		OAuthFlow.class,
-		OAuthFlows.class,
-		Scopes.class,
-		SecurityRequirement.class,
-		SecurityScheme.class,
+    OAuthFlow.class,
+    OAuthFlows.class,
+    Scopes.class,
+    SecurityRequirement.class,
+    SecurityScheme.class,
 })
 public class SecurityConfiguration {
 }

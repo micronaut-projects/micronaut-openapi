@@ -20,10 +20,16 @@ import io.swagger.v3.oas.models.servers.Server;
 import io.swagger.v3.oas.models.servers.ServerVariable;
 import io.swagger.v3.oas.models.servers.ServerVariables;
 
+/**
+ * OpenApi introspection configuration for Swagger-model.
+ * Adds introspection of the io.swagger.v3.oas.models.servers package
+ *
+ * @author Henrique Mota
+ */
 @Introspected(classes = {
-		Server.class,
-		ServerVariable.class,
-		ServerVariables.class,
+    Server.class,
+    ServerVariable.class,
+    ServerVariables.class,
 })
 public class ServerConfiguration {
 }

@@ -41,30 +41,36 @@ import io.swagger.v3.oas.models.media.StringSchema;
 import io.swagger.v3.oas.models.media.UUIDSchema;
 import io.swagger.v3.oas.models.media.XML;
 
+/**
+ * OpenApi introspection configuration for Swagger-model.
+ * Adds introspection of the io.swagger.v3.oas.models.media package
+ *
+ * @author Henrique Mota
+ */
 @Introspected(classes = {
-		ArraySchema.class,
-		BinarySchema.class,
-		BooleanSchema.class,
-		ByteArraySchema.class,
-		ComposedSchema.class,
-		Content.class,
-		DateSchema.class,
-		DateTimeSchema.class,
-		Discriminator.class,
-		EmailSchema.class,
-		Encoding.class,
-		EncodingProperty.class,
-		FileSchema.class,
-		IntegerSchema.class,
-		MapSchema.class,
-		MediaType.class,
-		NumberSchema.class,
-		ObjectSchema.class,
-		PasswordSchema.class,
-		Schema.class,
-		StringSchema.class,
-		UUIDSchema.class,
-		XML.class,
+    ArraySchema.class,
+    BinarySchema.class,
+    BooleanSchema.class,
+    ByteArraySchema.class,
+    ComposedSchema.class,
+    Content.class,
+    DateSchema.class,
+    DateTimeSchema.class,
+    Discriminator.class,
+    EmailSchema.class,
+    Encoding.class,
+    EncodingProperty.class,
+    FileSchema.class,
+    IntegerSchema.class,
+    MapSchema.class,
+    MediaType.class,
+    NumberSchema.class,
+    ObjectSchema.class,
+    PasswordSchema.class,
+    Schema.class,
+    StringSchema.class,
+    UUIDSchema.class,
+    XML.class,
 })
 public class MediaConfiguration {
 }

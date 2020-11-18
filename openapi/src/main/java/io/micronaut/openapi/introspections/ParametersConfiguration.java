@@ -24,13 +24,19 @@ import io.swagger.v3.oas.models.parameters.PathParameter;
 import io.swagger.v3.oas.models.parameters.QueryParameter;
 import io.swagger.v3.oas.models.parameters.RequestBody;
 
+/**
+ * OpenApi introspection configuration for Swagger-model.
+ * Adds introspection of the io.swagger.v3.oas.models.parameters package
+ *
+ * @author Henrique Mota
+ */
 @Introspected(classes = {
-		CookieParameter.class,
-		HeaderParameter.class,
-		Parameter.class,
-		PathParameter.class,
-		QueryParameter.class,
-		RequestBody.class,
+    CookieParameter.class,
+    HeaderParameter.class,
+    Parameter.class,
+    PathParameter.class,
+    QueryParameter.class,
+    RequestBody.class,
 })
 public class ParametersConfiguration {
 }

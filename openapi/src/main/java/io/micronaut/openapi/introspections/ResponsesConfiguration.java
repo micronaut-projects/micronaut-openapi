@@ -19,9 +19,15 @@ import io.micronaut.core.annotation.Introspected;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.responses.ApiResponses;
 
+/**
+ * OpenApi introspection configuration for Swagger-model.
+ * Adds introspection of the io.swagger.v3.oas.models.responses package
+ *
+ * @author Henrique Mota
+ */
 @Introspected(classes = {
-		ApiResponse.class,
-		ApiResponses.class,
+    ApiResponse.class,
+    ApiResponses.class,
 })
 public class ResponsesConfiguration {
 }

@@ -18,8 +18,14 @@ package io.micronaut.openapi.introspections;
 import io.micronaut.core.annotation.Introspected;
 import io.swagger.v3.oas.models.tags.Tag;
 
+/**
+ * OpenApi introspection configuration for Swagger-model.
+ * Adds introspection of the io.swagger.v3.oas.models.tags package
+ *
+ * @author Henrique Mota
+ */
 @Introspected(classes = {
-		Tag.class,
+    Tag.class,
 })
 public class TagsConfiguration {
 }

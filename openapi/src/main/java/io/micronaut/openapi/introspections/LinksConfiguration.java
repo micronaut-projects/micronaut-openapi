@@ -19,9 +19,15 @@ import io.micronaut.core.annotation.Introspected;
 import io.swagger.v3.oas.models.links.Link;
 import io.swagger.v3.oas.models.links.LinkParameter;
 
+/**
+ * OpenApi introspection configuration for Swagger-model.
+ * Adds introspection of the io.swagger.v3.oas.models.links package
+ *
+ * @author Henrique Mota
+ */
 @Introspected(classes = {
-		Link.class,
-		LinkParameter.class,
+    Link.class,
+    LinkParameter.class,
 })
 public class LinksConfiguration {
 }
