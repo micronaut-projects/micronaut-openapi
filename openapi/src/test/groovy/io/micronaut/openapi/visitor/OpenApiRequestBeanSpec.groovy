@@ -41,6 +41,8 @@ class MyController {
 @Introspected
 class MyRequestBean {
 
+    public static final String HEADER_CONTENT_TYPE = "Content-type";
+    
     HttpRequest<?> httpRequest;
    
     @PathVariable("pV")
@@ -53,7 +55,7 @@ class MyRequestBean {
     
     @Nullable
     @Parameter(description="Any content type")
-    @Header("Content-type")
+    @Header(HEADER_CONTENT_TYPE)
     private String contentType;
     
     public MyRequestBean(HttpRequest<?> httpRequest, String pathVariable, String queryValue, String contentType) {
