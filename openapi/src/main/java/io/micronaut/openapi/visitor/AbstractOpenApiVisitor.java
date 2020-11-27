@@ -1350,7 +1350,12 @@ abstract class AbstractOpenApiVisitor  {
                 jce = new JavaClassElementExt(classElement, context);
                 beanProperties = jce.beanProperties();
             } else {
-                beanProperties = classElement.getBeanProperties().stream().filter(p -> ! "groovy.lang.MetaClass".equals(p.getType().getName())).collect(Collectors.toList());
+                try {
+                    beanProperties = classElement.getBeanProperties().stream().filter(p -> !"groovy.lang.MetaClass".equals(p.getType().getName())).collect(Collectors.toList());
+                } catch (Exception e) {
+                    //Workaround for https://github.com/micronaut-projects/micronaut-openapi/issues/313
+                    beanProperties = Collections.emptyList();
+                }
             }
             processPropertyElements(openAPI, context, type, schema, beanProperties, mediaTypes);
             if (isJavaElement) {
