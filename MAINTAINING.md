@@ -98,6 +98,12 @@ All Micronaut repos have 2 dependency upgrade checking mechanism:
    [Gradle Use Latest Versions Plugin](https://github.com/patrikerdes/gradle-use-latest-versions-plugin). It runs daily
    during weekdays.
    
+The consequence of having both approaches in place is that we get multiple dependency upgrade PRs: one created by
+`micronaut-build` via our automation, and one or many (one per dependency) created by Dependabot. When merging those, it
+is better to prefer the `micronaut-build` ones, if possible, for 2 reasons: a) they attempt to upgrade multiple dependencies 
+in a single PR, which creates less noise in the Git history; b) Once you merge that, Dependabot will react and automatically
+close its own PRs if the dependecy is up-to-date.
+   
 When an upgrade to a new version arrives, we need to be careful when merging, so that we don't introduce an
 unnecessary upgrade burden on our users. Read the
 [Module Upgrade Strategy](https://github.com/micronaut-projects/micronaut-core/wiki/Module-Upgrade-Strategy) for more
@@ -173,7 +179,7 @@ will kick off, performing the following steps:
 * Generates documentation guide and publishes it to the `gh-pages` branch.
 * Sends a pull request to Core to update the BOM.
 * Post-release: 
-  * Determines the next patch version, and sets it as a `BUILD-SNAPSHOT` version.
+  * Determines the next patch version, and sets it as a `SNAPSHOT` version.
   * Closes the milestone that matches the release version, and creates a new one for the next patch.
 
 Note that there are repos (like Core, that has a lot of modules) where uploading and publishing in the same Gradle execution 
@@ -200,13 +206,13 @@ Micronaut `2.2.0` BOM. If the next version you want to publish is:
 * A new patch release (`1.0.1`): simply publish the existing draft release.
 * A new minor release (`1.1.0`): 
   * Before the release, push a `1.0.x` branch off `master`.
-  * Bump the version in master to `1.1.0.BUILD-SNAPSHOT`.
+  * Bump the version in master to `1.1.0-SNAPSHOT`.
   * Set the `githubCoreBranch` property to `2.3.x` (or `3.0.x` if it will be the next one).
   * Edit the draft release setting the version to `1.1.0` in the release title, body, tag, etc.
   * Publish the release.
 * A new major release (`2.0.0`): 
   * Before the release, push a `1.0.x` branch off `master`.
-  * Bump the version in master to `2.0.0.BUILD-SNAPSHOT`.
+  * Bump the version in master to `2.0.0-SNAPSHOT`.
   * Set the `githubCoreBranch` property to `3.0.x` (or `2.3.x` if this new major version doesn't introduce breaking changes).
   * Edit the draft release setting the version to `2.0.0` in the release title, body, tag, etc.
   * Publish the release.  
