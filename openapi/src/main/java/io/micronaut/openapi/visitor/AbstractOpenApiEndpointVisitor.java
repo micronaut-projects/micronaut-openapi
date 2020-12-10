@@ -17,7 +17,6 @@ package io.micronaut.openapi.visitor;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.JsonNode;
-
 import edu.umd.cs.findbugs.annotations.NonNull;
 import io.micronaut.annotation.processing.visitor.JavaClassElementExt;
 import io.micronaut.context.env.DefaultPropertyPlaceholderResolver;
@@ -71,7 +70,6 @@ import io.swagger.v3.oas.models.servers.Server;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-
 import java.io.IOException;
 import java.security.Principal;
 import java.util.*;
@@ -647,6 +645,9 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
             List<Parameter> swaggerParameters, boolean hasExistingParameters, TypedElement parameter,
             List<TypedElement> extraBodyParameters) {
         for (FieldElement field : parameter.getType().getFields()) {
+            if (field.isStatic()) {
+                continue;
+            }
             processParameter(context, openAPI, swaggerOperation, javadocDescription, permitsRequestBody, pathVariables,
                     consumesMediaTypes, swaggerParameters, hasExistingParameters, field, extraBodyParameters);
         }
