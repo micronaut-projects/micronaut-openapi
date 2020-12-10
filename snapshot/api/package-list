@@ -2,6 +2,7 @@ io.micronaut.annotation.processing.visitor
 io.micronaut.openapi.annotation
 io.micronaut.openapi.annotation.mappers
 io.micronaut.openapi.annotation.transformers
+io.micronaut.openapi.introspections
 io.micronaut.openapi.javadoc
 io.micronaut.openapi.view
 io.micronaut.openapi.visitor
