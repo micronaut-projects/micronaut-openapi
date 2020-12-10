@@ -5,8 +5,8 @@ plugins {
 
 dependencies {
     kapt project(":openapi")
-    kapt "io.micronaut:micronaut-inject-java"
-    kapt "io.micronaut:micronaut-validation"
+    kapt "io.micronaut:micronaut-inject-java:$micronautVersion"
+    kapt "io.micronaut:micronaut-validation:$micronautVersion"
     kaptTest "io.micronaut:micronaut-inject-java"
     testImplementation "io.swagger.core.v3:swagger-annotations"
     testImplementation "io.micronaut:micronaut-runtime"
