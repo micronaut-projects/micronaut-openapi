@@ -113,6 +113,11 @@ tasks.withType(JavaCompile) {
 }
 ----
 
+or in gradle.properties 
+----
+org.gradle.jvmargs=-Dmicronaut.openapi.property.naming.strategy=SNAKE_CASE
+----
+
 or in maven:
 
 .Maven
