@@ -51,9 +51,6 @@ import static javax.lang.model.type.TypeKind.NONE;
 @Internal
 public class JavaClassElementExt extends JavaClassElement {
     private final JavaClassElement javaClassElement;
-    private final TypeElement classElement;
-    private final JavaVisitorContext visitorContext;
-    private final Map<String, Map<String, TypeMirror>> genericTypeInfo;
 
     /**
      * @param ce       The {@link ClassElement}
@@ -71,9 +68,6 @@ public class JavaClassElementExt extends JavaClassElement {
         super((TypeElement) jce.getNativeType(), jce.getAnnotationMetadata(), visitorContext, jce.getGenericTypeInfo(),
             jce.getArrayDimensions());
         this.javaClassElement = jce;
-        this.classElement = (TypeElement) jce.getNativeType();
-        this.visitorContext = visitorContext;
-        this.genericTypeInfo = jce.getGenericTypeInfo();
     }
 
     @Override
@@ -395,12 +389,12 @@ public class JavaClassElementExt extends JavaClassElement {
             final String tvn = tv.toString();
             final ClassElement ce = getTypeArguments().get(tvn);
             if (ce == null) {
-                getterReturnType = mirrorToClassElement(returnType, visitorContext, this.genericTypeInfo);
+                getterReturnType = mirrorToClassElement(returnType, visitorContext, getGenericTypeInfo());
             } else {
                 getterReturnType = ce;
             }
         } else {
-            getterReturnType = mirrorToClassElement(returnType, visitorContext, this.genericTypeInfo);
+            getterReturnType = mirrorToClassElement(returnType, visitorContext, getGenericTypeInfo());
         }
 
         BeanPropertyData beanPropertyData = props.computeIfAbsent(propertyName, BeanPropertyData::new);
@@ -409,7 +403,7 @@ public class JavaClassElementExt extends JavaClassElement {
         beanPropertyData.getter = executableElement;
         if (beanPropertyData.setter != null) {
             TypeMirror typeMirror = beanPropertyData.setter.getParameters().get(0).asType();
-            ClassElement setterParameterType = mirrorToClassElement(typeMirror, visitorContext, this.genericTypeInfo);
+            ClassElement setterParameterType = mirrorToClassElement(typeMirror, visitorContext, getGenericTypeInfo());
             if (!setterParameterType.getName().equals(getterReturnType.getName())) {
                 beanPropertyData.setter = null; // not a compatible setter
             }
@@ -419,7 +413,7 @@ public class JavaClassElementExt extends JavaClassElement {
     private void setterBeanProperty(Map<String, BeanPropertyData> props, ExecutableElement executableElement, String methodName, final TypeElement declaringTypeElement) {
         String propertyName = NameUtils.getPropertyNameForSetter(methodName);
         TypeMirror typeMirror = executableElement.getParameters().get(0).asType();
-        ClassElement setterParameterType = mirrorToClassElement(typeMirror, visitorContext, this.genericTypeInfo);
+        ClassElement setterParameterType = mirrorToClassElement(typeMirror, visitorContext, getGenericTypeInfo());
 
         BeanPropertyData beanPropertyData = props.computeIfAbsent(propertyName, BeanPropertyData::new);
         configureDeclaringType(declaringTypeElement, beanPropertyData);
@@ -438,7 +432,7 @@ public class JavaClassElementExt extends JavaClassElement {
             beanPropertyData.declaringType = mirrorToClassElement(
                     declaringTypeElement.asType(),
                     visitorContext,
-                    genericTypeInfo
+                    getGenericTypeInfo()
             );
         }
     }
