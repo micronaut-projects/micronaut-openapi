@@ -76,6 +76,11 @@ public class JavaClassElementExt extends JavaClassElement {
         this.genericTypeInfo = jce.getGenericTypeInfo();
     }
 
+    @Override
+    public ClassElement withArrayDimensions(int arrayDimensions) {
+        return new JavaClassElementExt(javaClassElement.withArrayDimensions(arrayDimensions), visitorContext);
+    }
+
     private static boolean sameType(String type, DeclaredType dt) {
         final Element elt = dt.asElement();
         return elt instanceof TypeElement && type.equals(((TypeElement) elt).getQualifiedName().toString());
