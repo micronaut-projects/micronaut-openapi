@@ -709,10 +709,11 @@ abstract class AbstractOpenApiVisitor  {
                         break;
                     }
                 }
+                
                 if (!isStream && (isPublisher || isObservable)) {
                     schema = arraySchema(schema);
                 } else if (isNullable) {
-                    schema = schema.setNullable(true);
+                    schema.setNullable(true);
                 }
             }
         }
