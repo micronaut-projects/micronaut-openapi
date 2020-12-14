@@ -608,21 +608,6 @@ abstract class AbstractOpenApiVisitor  {
      * @return The schema or null if it cannot be resolved
      */
     protected @Nullable Schema resolveSchema(OpenAPI openAPI, @Nullable Element definingElement, ClassElement type, VisitorContext context, List<MediaType> mediaTypes) {
-        return resolveSchema(openAPI, definingElement, type, new ArrayTypeHelper(0), context, mediaTypes);
-    }
-
-    /**
-     * Resolves the schema for the given type element.
-     *
-     * @param openAPI The OpenAPI object
-     * @param definingElement The defining element
-     * @param type The type element
-     * @param typeHelper The helper to recursively resolve an array type down to its element type
-     * @param context The context
-     * @param mediaTypes An optional media type
-     * @return The schema or null if it cannot be resolved
-     */
-    private @Nullable Schema resolveSchema(OpenAPI openAPI, @Nullable Element definingElement, ClassElement type, ArrayTypeHelper typeHelper, VisitorContext context, List<MediaType> mediaTypes) {
         Schema schema = null;
 
         AnnotationValue<io.swagger.v3.oas.annotations.media.Schema> schemaAnnotationValue = null;
