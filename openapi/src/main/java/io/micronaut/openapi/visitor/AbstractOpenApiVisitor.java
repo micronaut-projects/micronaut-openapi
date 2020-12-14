@@ -669,9 +669,9 @@ abstract class AbstractOpenApiVisitor  {
                     typeName = PrimitiveType.BINARY.name();
                 }
                 PrimitiveType primitiveType = PrimitiveType.fromName(typeName);
-                if (!typeHelper.isArray(type) && ClassUtils.isJavaLangType(typeName)) {
+                if (!type.isArray() && ClassUtils.isJavaLangType(typeName)) {
                     schema = getPrimitiveType(typeName);
-                } else if (!typeHelper.isArray(type) && primitiveType != null) {
+                } else if (!type.isArray() && primitiveType != null) {
                     schema = primitiveType.createProperty();
                 } else if (type.isAssignable(Map.class.getName())) {
                     schema = new MapSchema();
@@ -685,9 +685,9 @@ abstract class AbstractOpenApiVisitor  {
                             schema.setAdditionalProperties(resolveSchema(openAPI, type, valueType, context, mediaTypes));
                         }
                     }
-                } else if (typeHelper.isIterable(type)) {
-                    if (typeHelper.isArray(type)) {
-                        schema = resolveSchema(openAPI, type, type, new ArrayTypeHelper(typeHelper.depth + 1), context, mediaTypes);
+                } else if (type.isIterable()) {
+                    if (type.isArray()) {
+                        schema = resolveSchema(openAPI, type, type.fromArray(), context, mediaTypes);
                     } else {
                         Optional<ClassElement> componentType = type.getFirstTypeArgument();
                         if (componentType.isPresent()) {
@@ -1559,28 +1559,5 @@ abstract class AbstractOpenApiVisitor  {
             }
         }
         return tagList;
-    }
-
-    /**
-     * A helper class to recursively resolve a class element denoting an array type down to its element type.
-     * This is to circumvent the fact that {@link ClassElement} doesn't yet expose a counterpart to
-     * {@link ClassElement#toArray}.
-     *
-     * @see ClassElement#toArray
-     */
-    private static final class ArrayTypeHelper {
-        private final int depth;
-
-        private ArrayTypeHelper(final int depth) {
-            this.depth = depth;
-        }
-
-        private boolean isArray(final ClassElement type) {
-            return type.getArrayDimensions() > depth;
-        }
-
-        private boolean isIterable(final ClassElement type) {
-            return isArray(type) || type.isAssignable(Iterable.class);
-        }
     }
 }
