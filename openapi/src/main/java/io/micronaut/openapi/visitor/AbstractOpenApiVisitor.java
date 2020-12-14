@@ -606,6 +606,10 @@ abstract class AbstractOpenApiVisitor  {
         return resolveSchema(openAPI, definingElement, type, new ArrayTypeHelper(0), context, mediaTypes);
     }
 
+    private boolean isTypeNullable(ClassElement type) {
+        return type.isAssignable("java.util.Optional");
+    }
+
     /**
      * Resolves the schema for the given type element.
      *
@@ -647,7 +651,7 @@ abstract class AbstractOpenApiVisitor  {
                 isPublisher = type.isAssignable(Publisher.class.getName()) && !type.isAssignable("reactor.core.publisher.Mono");
                 isObservable = type.isAssignable("io.reactivex.Observable") && !type.isAssignable("reactor.core.publisher.Mono");
                 type = type.getFirstTypeArgument().orElse(null);
-            } else if (type.isAssignable("java.util.Optional") || type.isAssignable("com.google.common.base")) {
+            } else if (isTypeNullable(type)) {
                isNullable = true;
                type = type.getFirstTypeArgument().orElse(null);
             }
