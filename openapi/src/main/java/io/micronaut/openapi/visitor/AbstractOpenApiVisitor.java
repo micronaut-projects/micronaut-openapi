@@ -579,6 +579,11 @@ abstract class AbstractOpenApiVisitor  {
         return params;
     }
 
+    private boolean isTypeNullable(ClassElement type) {
+        return type.isAssignable("java.util.Optional");
+    }
+
+
     /**
      * Resolves the schema for the given type element.
      *
@@ -604,10 +609,6 @@ abstract class AbstractOpenApiVisitor  {
      */
     protected @Nullable Schema resolveSchema(OpenAPI openAPI, @Nullable Element definingElement, ClassElement type, VisitorContext context, List<MediaType> mediaTypes) {
         return resolveSchema(openAPI, definingElement, type, new ArrayTypeHelper(0), context, mediaTypes);
-    }
-
-    private boolean isTypeNullable(ClassElement type) {
-        return type.isAssignable("java.util.Optional");
     }
 
     /**
