@@ -579,6 +579,11 @@ abstract class AbstractOpenApiVisitor  {
         return params;
     }
 
+    private boolean isTypeNullable(ClassElement type) {
+        return type.isAssignable("java.util.Optional");
+    }
+
+
     /**
      * Resolves the schema for the given type element.
      *
@@ -625,13 +630,18 @@ abstract class AbstractOpenApiVisitor  {
 
             boolean isPublisher = false;
             boolean isObservable = false;
+            boolean isNullable = false;
 
             // StreamingFileUpload implements Publisher, but it should be not considered as a Publisher in the spec file
             if (!type.isAssignable("io.micronaut.http.multipart.StreamingFileUpload") && isContainerType(type)) {
                 isPublisher = type.isAssignable(Publisher.class.getName()) && !type.isAssignable("reactor.core.publisher.Mono");
                 isObservable = type.isAssignable("io.reactivex.Observable") && !type.isAssignable("reactor.core.publisher.Mono");
                 type = type.getFirstTypeArgument().orElse(null);
+            } else if (isTypeNullable(type)) {
+               isNullable = true;
+               type = type.getFirstTypeArgument().orElse(null);
             }
+            
             if (type != null) {
 
                 String typeName = type.getName();
@@ -689,8 +699,11 @@ abstract class AbstractOpenApiVisitor  {
                         break;
                     }
                 }
+                
                 if (!isStream && (isPublisher || isObservable)) {
                     schema = arraySchema(schema);
+                } else if (isNullable) {
+                    schema.setNullable(true);
                 }
             }
         }
