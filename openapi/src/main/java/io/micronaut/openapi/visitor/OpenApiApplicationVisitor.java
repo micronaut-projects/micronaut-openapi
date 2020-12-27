@@ -41,8 +41,10 @@ import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 
 import javax.annotation.processing.SupportedOptions;
+
 import java.io.IOException;
 import java.io.Reader;
+import java.io.StringWriter;
 import java.io.Writer;
 import java.net.URI;
 import java.nio.file.*;
@@ -169,7 +171,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             context.put(ATTR_OPENAPI, openAPI);
         }
 
-        if (Boolean.getBoolean(ATTR_TEST_MODE)) {
+        if (isTestMode()) {
             resolveOpenAPI(context);
         }
 
@@ -503,13 +505,20 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             }
             fileName = documentTitle + ".yml";
         }
+        writeYamlToFile(openAPI, fileName, documentTitle, visitorContext);
+        visitedElements = visitedElements(visitorContext);
+    }
+
+    private void writeYamlToFile(OpenAPI openAPI, String fileName, String documentTitle, VisitorContext visitorContext) {
         Optional<Path> specFile = openApiSpecFile(fileName, visitorContext);
-        if (specFile.isPresent()) {
-            Path specPath = specFile.get();
-            try (Writer writer = Files.newBufferedWriter(specPath, StandardOpenOption.TRUNCATE_EXISTING,
-                    StandardOpenOption.CREATE)) {
+        try (Writer writer = getYamlWriter(specFile)) {
+            yamlMapper.writeValue(writer, openAPI);
+            if (isTestMode()) {
+                AbstractOpenApiVisitor.testYamlReference = writer.toString();
+            } else {
+                @SuppressWarnings("OptionalGetWithoutIsPresent")
+                Path specPath = specFile.get();
                 visitorContext.info("Writing OpenAPI YAML to destination: " + specPath);
-                yamlMapper.writeValue(writer, openAPI);
                 visitorContext.getClassesOutputPath().ifPresent(path -> {
                     // add relative paths for the specPath, and its parent META-INF/swagger
                     // so that micronaut-graal visitor knows about them
@@ -517,12 +526,20 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                     visitorContext.addGeneratedResource(path.relativize(specPath.getParent()).toString());
                 });
                 renderViews(documentTitle, specPath.getFileName().toString(), specPath.getParent(), visitorContext);
-            } catch (Exception e) {
-                visitorContext.warn("Unable to generate swagger.yml: " + specPath + " - " + e.getMessage(),
-                        classElement);
             }
+        } catch (Exception e) {
+            visitorContext.warn("Unable to generate swagger.yml: " + specFile.orElse(null) + " - " + e.getMessage(), classElement);
         }
-        visitedElements = visitedElements(visitorContext);
+    }
+
+    private Writer getYamlWriter(Optional<Path> specFile) throws IOException {
+        if (isTestMode()) {
+            return new StringWriter();
+        } else if (specFile.isPresent()) {
+            return Files.newBufferedWriter(specFile.get(), StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
+        } else {
+            throw new IOException("Swagger spec file location is not present");
+        }
     }
 
     private void processEndpoints(VisitorContext visitorContext) {

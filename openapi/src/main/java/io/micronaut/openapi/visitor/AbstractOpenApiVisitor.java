@@ -23,6 +23,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -131,10 +132,11 @@ import static java.util.stream.Collectors.toMap;
  * @since 1.0
  */
 abstract class AbstractOpenApiVisitor  {
-    static final String ATTR_TEST_MODE = "io.micronaut.OPENAPI_TEST";
     static final String ATTR_OPENAPI = "io.micronaut.OPENAPI";
     static OpenAPI testReference;
+    static String testYamlReference;
 
+    private static final String ATTR_TEST_MODE = "io.micronaut.OPENAPI_TEST";
     private static final Lock VISITED_ELEMENTS_LOCK = new ReentrantLock();
     private static final String ATTR_VISITED_ELEMENTS = "io.micronaut.OPENAPI.visited.elements";
 
@@ -145,7 +147,7 @@ abstract class AbstractOpenApiVisitor  {
     /**
      * The YAML mapper.
      */
-    ObjectMapper yamlMapper = Yaml.mapper();
+    ObjectMapper yamlMapper = Yaml.mapper().enable(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS);
 
     /**
      * Stores the current in progress type.
@@ -271,7 +273,7 @@ abstract class AbstractOpenApiVisitor  {
         if (openAPI == null) {
             openAPI = new OpenAPI();
             context.put(ATTR_OPENAPI, openAPI);
-            if (Boolean.getBoolean(ATTR_TEST_MODE)) {
+            if (isTestMode()) {
                 testReference = openAPI;
             }
         }
@@ -1546,4 +1548,9 @@ abstract class AbstractOpenApiVisitor  {
         }
         return tagList;
     }
+
+    boolean isTestMode() {
+        return Boolean.getBoolean(ATTR_TEST_MODE);
+    }
+
 }
