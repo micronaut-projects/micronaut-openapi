@@ -449,7 +449,7 @@ abstract class AbstractOpenApiVisitor  {
 
     // Copy of io.swagger.v3.core.util.AnnotationsUtils.getExtensions
     private void processExtensions(Map<CharSequence, Object> map, AnnotationValue<Extension> extension) {
-        String name = extension.getRequiredValue("name", String.class);
+        String name = extension.stringValue("name").orElse(StringUtils.EMPTY_STRING);
         final String key = name.length() > 0 ? org.apache.commons.lang3.StringUtils.prependIfMissing(name, "x-") : name;
         for (AnnotationValue<ExtensionProperty> prop : extension.getAnnotations("properties", ExtensionProperty.class)) {
             final String propertyName = prop.getRequiredValue("name", String.class);
