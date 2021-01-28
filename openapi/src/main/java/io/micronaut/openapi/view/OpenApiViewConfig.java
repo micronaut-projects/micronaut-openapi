@@ -120,7 +120,11 @@ public final class OpenApiViewConfig {
             render(rapidocConfig, outputDir.resolve("rapidoc"), "templates/rapidoc/index.html", visitorContext);
         }
         if (swaggerUIConfig != null) {
-            render(swaggerUIConfig, outputDir.resolve("swagger-ui"), "templates/swagger-ui/index.html", visitorContext);
+            Path dir = outputDir.resolve("swagger-ui");
+            render(swaggerUIConfig, dir, "templates/swagger-ui/index.html", visitorContext);
+            if (SwaggerUIConfig.hasOauth2Option(swaggerUIConfig.options)) {
+                render(swaggerUIConfig, dir, "templates/swagger-ui/oauth2-redirect.html", visitorContext);
+            }
         }
     }
 
@@ -147,7 +151,8 @@ public final class OpenApiViewConfig {
         if (!Files.exists(outputDir)) {
             Files.createDirectories(outputDir);
         }
-        Path file = outputDir.resolve("index.html");
+        String fileName = templateName.substring(templateName.lastIndexOf("/") + 1);
+        Path file = outputDir.resolve(fileName);
         if (visitorContext != null) {
             visitorContext.info("Writing OpenAPI View to destination: " + file);
             visitorContext.getClassesOutputPath().ifPresent(path ->
