@@ -585,7 +585,6 @@ abstract class AbstractOpenApiVisitor  {
         return type.isAssignable("java.util.Optional");
     }
 
-
     /**
      * Resolves the schema for the given type element.
      *

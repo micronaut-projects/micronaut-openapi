@@ -15,7 +15,6 @@
  */
 package io.micronaut.openapi.view;
 
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
