@@ -162,11 +162,8 @@ final class SwaggerUIConfig extends AbstractViewConfig implements Renderer {
         template = rapiPDFConfig.render(template, RendererType.SWAGGER_UI);
         template = OpenApiViewConfig.replacePlaceHolder(template, PREFIX_SWAGGER_UI + ".version", version, "@");
         template = OpenApiViewConfig.replacePlaceHolder(template, PREFIX_SWAGGER_UI + ".attributes", toOptions(), "");
-        if (theme == null || Theme.DEFAULT.equals(theme)) {
-            template = template.replace("{{" + PREFIX_SWAGGER_UI + ".theme}}", "");
-        } else {
-            template = template.replace("{{" + PREFIX_SWAGGER_UI + ".theme}}", "<link rel='stylesheet' type='text/css' href='https://unpkg.com/" + PREFIX_SWAGGER_UI + "-themes@3.0.0/themes/3.x/" + theme.getCss() + ".css' />");
-        }
+        template = template.replace("{{" + PREFIX_SWAGGER_UI + ".theme}}", theme == null || Theme.DEFAULT.equals(theme) ? "" :
+                "<link rel='stylesheet' type='text/css' href='https://unpkg.com/" + PREFIX_SWAGGER_UI + "-themes@3.0.0/themes/3.x/" + theme.getCss() + ".css' />");
         template = template.replace("{{" + PREFIX_SWAGGER_UI + ".oauth2}}", hasOauth2Option(options) ? toOauth2Options() : "");
         return template;
     }
