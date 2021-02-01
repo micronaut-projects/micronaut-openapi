@@ -21,6 +21,8 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import io.micronaut.core.util.StringUtils;
 import io.micronaut.openapi.view.OpenApiViewConfig.RendererType;
 
@@ -34,12 +36,15 @@ final class SwaggerUIConfig extends AbstractViewConfig implements Renderer {
     private static final String OPTION_OAUTH2 = "oauth2";
     private static final String DOT = ".";
     private static final String PREFIX_SWAGGER_UI = "swagger-ui";
+    private static final String KEY_VALUE_SEPARATOR = ": ";
+    private static final String COMMNA_NEW_LINE = ",\n";
     
     // https://github.com/swagger-api/swagger-ui/blob/HEAD/docs/usage/configuration.md
     private static final Map<String, Function<String, Object>> VALID_OPTIONS = new HashMap<>(16);
 
     // https://github.com/swagger-api/swagger-ui/blob/master/docs/usage/oauth2.md
     private static final Map<String, Function<String, Object>> VALID_OAUTH2_OPTIONS = new HashMap<>(9);
+
 
     static {
         VALID_OPTIONS.put("layout", AbstractViewConfig::asQuotedString);
@@ -109,25 +114,27 @@ final class SwaggerUIConfig extends AbstractViewConfig implements Renderer {
         super(PREFIX_SWAGGER_UI + DOT);
     }
 
+    @NonNull
     private String toOptions() {
+        return toOptions(VALID_OPTIONS, null);
+    }
+
+    private String toOptions(@NonNull Map<String, Function<String, Object>> validOptions,
+                             @Nullable String keyPrefix) {
         return options
                 .entrySet()
                 .stream()
-                .filter(e -> VALID_OPTIONS.containsKey(e.getKey()))
+                .filter(e -> validOptions.containsKey(e.getKey()))
                 .sorted(Map.Entry.comparingByKey())
-                .map(e -> e.getKey() + ": " + e.getValue())
-                .collect(Collectors.joining(",\n"));
+                .map(e -> ((keyPrefix != null && e.getKey().startsWith(keyPrefix)) ? e.getKey().substring(keyPrefix.length()) : e.getKey())
+                    + KEY_VALUE_SEPARATOR + e.getValue())
+                .collect(Collectors.joining(COMMNA_NEW_LINE));
     }
 
+    @NonNull
     private String toOauth2Options() {
-        String properties = options
-                .entrySet()
-                .stream()
-                .filter(e -> VALID_OAUTH2_OPTIONS.containsKey(e.getKey()))
-                .sorted(Map.Entry.comparingByKey())
-                .map(e -> e.getKey().substring((OPTION_OAUTH2 + DOT).length()) + ": " + e.getValue())
-                .collect(Collectors.joining(",\n"));
-        if (StringUtils.hasText(properties)) {
+        String properties = toOptions(VALID_OAUTH2_OPTIONS, OPTION_OAUTH2 + DOT);
+         if (StringUtils.hasText(properties)) {
             return "ui.initOAuth({\n" + properties + "\n});";
         } else {
             return "";
