@@ -159,11 +159,7 @@ final class SwaggerUIConfig extends AbstractViewConfig implements Renderer {
         } else {
             template = template.replace("{{swagger-ui.theme}}", "<link rel='stylesheet' type='text/css' href='https://unpkg.com/swagger-ui-themes@3.0.0/themes/3.x/" + theme.getCss() + ".css' />");
         }
-        if (hasOauth2Option(options)) {
-            template = template.replace("{{swagger-ui.oauth2}}", toOauth2Options());
-        } else {
-            template = template.replace("{{swagger-ui.oauth2}}", "");
-        }
+        template = template.replace("{{swagger-ui.oauth2}}", hasOauth2Option(options) ? toOauth2Options() : "");
         return template;
     }
 
