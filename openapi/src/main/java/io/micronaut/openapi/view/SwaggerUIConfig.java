@@ -31,14 +31,15 @@ import io.micronaut.openapi.view.OpenApiViewConfig.RendererType;
  */
 final class SwaggerUIConfig extends AbstractViewConfig implements Renderer {
     private static final Map<String, Object> DEFAULT_OPTIONS = new HashMap<>(4);
-
+    private static final String OPTION_OAUTH2 = "oauth2";
+    private static final String DOT = ".";
+    private static final String PREFIX_SWAGGER_UI = "swagger-ui";
+    
     // https://github.com/swagger-api/swagger-ui/blob/HEAD/docs/usage/configuration.md
     private static final Map<String, Function<String, Object>> VALID_OPTIONS = new HashMap<>(16);
 
     // https://github.com/swagger-api/swagger-ui/blob/master/docs/usage/oauth2.md
     private static final Map<String, Function<String, Object>> VALID_OAUTH2_OPTIONS = new HashMap<>(9);
-
-    private static final String OPTION_OAUTH2 = "oauth2";
 
     static {
         VALID_OPTIONS.put("layout", AbstractViewConfig::asQuotedString);
@@ -105,7 +106,7 @@ final class SwaggerUIConfig extends AbstractViewConfig implements Renderer {
     }
 
     private SwaggerUIConfig() {
-        super("swagger-ui.");
+        super(PREFIX_SWAGGER_UI + DOT);
     }
 
     private String toOptions() {
@@ -124,7 +125,7 @@ final class SwaggerUIConfig extends AbstractViewConfig implements Renderer {
                 .stream()
                 .filter(e -> VALID_OAUTH2_OPTIONS.containsKey(e.getKey()))
                 .sorted(Map.Entry.comparingByKey())
-                .map(e -> e.getKey().substring((OPTION_OAUTH2 + ".").length()) + ": " + e.getValue())
+                .map(e -> e.getKey().substring((OPTION_OAUTH2 + DOT).length()) + ": " + e.getValue())
                 .collect(Collectors.joining(",\n"));
         if (StringUtils.hasText(properties)) {
             return "ui.initOAuth({\n" + properties + "\n});";
@@ -145,21 +146,21 @@ final class SwaggerUIConfig extends AbstractViewConfig implements Renderer {
     static SwaggerUIConfig fromProperties(Map<String, String> properties) {
         SwaggerUIConfig cfg = new SwaggerUIConfig();
         cfg.theme = Theme
-                .valueOf(properties.getOrDefault("swagger-ui.theme", cfg.theme.name()).toUpperCase(Locale.US));
+                .valueOf(properties.getOrDefault(PREFIX_SWAGGER_UI + ".theme", cfg.theme.name()).toUpperCase(Locale.US));
         return AbstractViewConfig.fromProperties(cfg, DEFAULT_OPTIONS, properties);
     }
 
     @Override
     public String render(String template) {
         template = rapiPDFConfig.render(template, RendererType.SWAGGER_UI);
-        template = OpenApiViewConfig.replacePlaceHolder(template, "swagger-ui.version", version, "@");
-        template = OpenApiViewConfig.replacePlaceHolder(template, "swagger-ui.attributes", toOptions(), "");
+        template = OpenApiViewConfig.replacePlaceHolder(template, PREFIX_SWAGGER_UI + ".version", version, "@");
+        template = OpenApiViewConfig.replacePlaceHolder(template, PREFIX_SWAGGER_UI + ".attributes", toOptions(), "");
         if (theme == null || Theme.DEFAULT.equals(theme)) {
-            template = template.replace("{{swagger-ui.theme}}", "");
+            template = template.replace("{{" + PREFIX_SWAGGER_UI + ".theme}}", "");
         } else {
-            template = template.replace("{{swagger-ui.theme}}", "<link rel='stylesheet' type='text/css' href='https://unpkg.com/swagger-ui-themes@3.0.0/themes/3.x/" + theme.getCss() + ".css' />");
+            template = template.replace("{{" + PREFIX_SWAGGER_UI + ".theme}}", "<link rel='stylesheet' type='text/css' href='https://unpkg.com/" + PREFIX_SWAGGER_UI + "-themes@3.0.0/themes/3.x/" + theme.getCss() + ".css' />");
         }
-        template = template.replace("{{swagger-ui.oauth2}}", hasOauth2Option(options) ? toOauth2Options() : "");
+        template = template.replace("{{" + PREFIX_SWAGGER_UI + ".oauth2}}", hasOauth2Option(options) ? toOauth2Options() : "");
         return template;
     }
 
