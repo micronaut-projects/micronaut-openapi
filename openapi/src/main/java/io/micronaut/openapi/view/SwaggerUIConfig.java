@@ -167,11 +167,6 @@ final class SwaggerUIConfig extends AbstractViewConfig implements Renderer {
 
     @Override
     protected Function<String, Object> getConverter(String key) {
-        if (VALID_OPTIONS.containsKey(key)) {
-            return VALID_OPTIONS.get(key);
-        } else {
-            return VALID_OAUTH2_OPTIONS.get(key);
-        }
+        return (VALID_OPTIONS.containsKey(key) ? VALID_OPTIONS : VALID_OAUTH2_OPTIONS).get(key);
     }
-
 }
