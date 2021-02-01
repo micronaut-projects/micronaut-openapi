@@ -38,6 +38,8 @@ final class SwaggerUIConfig extends AbstractViewConfig implements Renderer {
     // https://github.com/swagger-api/swagger-ui/blob/master/docs/usage/oauth2.md
     private static final Map<String, Function<String, Object>> VALID_OAUTH2_OPTIONS = new HashMap<>(9);
 
+    private static final String OPTION_OAUTH2 = "oauth2";
+
     static {
         VALID_OPTIONS.put("layout", AbstractViewConfig::asQuotedString);
         VALID_OPTIONS.put("deepLinking", AbstractViewConfig::asBoolean);
@@ -58,15 +60,15 @@ final class SwaggerUIConfig extends AbstractViewConfig implements Renderer {
         VALID_OPTIONS.put("validatorUrl", AbstractViewConfig::asQuotedString);
         VALID_OPTIONS.put("withCredentials", AbstractViewConfig::asBoolean);
 
-        VALID_OAUTH2_OPTIONS.put("oauth2.clientId", AbstractViewConfig::asQuotedString);
-        VALID_OAUTH2_OPTIONS.put("oauth2.clientSecret", AbstractViewConfig::asQuotedString);
-        VALID_OAUTH2_OPTIONS.put("oauth2.realm", AbstractViewConfig::asQuotedString);
-        VALID_OAUTH2_OPTIONS.put("oauth2.appName", AbstractViewConfig::asQuotedString);
-        VALID_OAUTH2_OPTIONS.put("oauth2.scopeSeparator", AbstractViewConfig::asQuotedString);
-        VALID_OAUTH2_OPTIONS.put("oauth2.scopes", AbstractViewConfig::asQuotedString);
-        VALID_OAUTH2_OPTIONS.put("oauth2.additionalQueryStringParams", AbstractViewConfig::asString);
-        VALID_OAUTH2_OPTIONS.put("oauth2.useBasicAuthenticationWithAccessCodeGrant", AbstractViewConfig::asBoolean);
-        VALID_OAUTH2_OPTIONS.put("oauth2.usePkceWithAuthorizationCodeGrant", AbstractViewConfig::asBoolean);
+        VALID_OAUTH2_OPTIONS.put(OPTION_OAUTH2 + ".clientId", AbstractViewConfig::asQuotedString);
+        VALID_OAUTH2_OPTIONS.put(OPTION_OAUTH2 + ".clientSecret", AbstractViewConfig::asQuotedString);
+        VALID_OAUTH2_OPTIONS.put(OPTION_OAUTH2 + ".realm", AbstractViewConfig::asQuotedString);
+        VALID_OAUTH2_OPTIONS.put(OPTION_OAUTH2 + ".appName", AbstractViewConfig::asQuotedString);
+        VALID_OAUTH2_OPTIONS.put(OPTION_OAUTH2 + ".scopeSeparator", AbstractViewConfig::asQuotedString);
+        VALID_OAUTH2_OPTIONS.put(OPTION_OAUTH2 + ".scopes", AbstractViewConfig::asQuotedString);
+        VALID_OAUTH2_OPTIONS.put(OPTION_OAUTH2 + ".additionalQueryStringParams", AbstractViewConfig::asString);
+        VALID_OAUTH2_OPTIONS.put(OPTION_OAUTH2 + ".useBasicAuthenticationWithAccessCodeGrant", AbstractViewConfig::asBoolean);
+        VALID_OAUTH2_OPTIONS.put(OPTION_OAUTH2 + ".usePkceWithAuthorizationCodeGrant", AbstractViewConfig::asBoolean);
 
         DEFAULT_OPTIONS.put("layout", "\"StandaloneLayout\"");
         DEFAULT_OPTIONS.put("deepLinking", Boolean.TRUE);
@@ -122,7 +124,7 @@ final class SwaggerUIConfig extends AbstractViewConfig implements Renderer {
                 .stream()
                 .filter(e -> VALID_OAUTH2_OPTIONS.containsKey(e.getKey()))
                 .sorted(Map.Entry.comparingByKey())
-                .map(e -> e.getKey().substring("oauth2.".length()) + ": " + e.getValue())
+                .map(e -> e.getKey().substring((OPTION_OAUTH2 + ".").length()) + ": " + e.getValue())
                 .collect(Collectors.joining(",\n"));
         if (StringUtils.hasText(properties)) {
             return "ui.initOAuth({\n" + properties + "\n});";
