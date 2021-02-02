@@ -47,7 +47,7 @@ public final class OpenApiViewConfig {
     private static final String RAPIDOC = "rapidoc";
     private static final String SWAGGER_UI = "swagger-ui";
     private static final String TEMPLATE_OAUTH_2_REDIRECT_HTML = "oauth2-redirect.html";
-    public static final String SLASH = "/";
+    private static final String SLASH = "/";
 
     private String mappingPath;
     private String title;
@@ -56,6 +56,7 @@ public final class OpenApiViewConfig {
     private SwaggerUIConfig swaggerUIConfig;
     private RedocConfig redocConfig;
     private RapidocConfig rapidocConfig;
+
     /**
      * The Renderer types.
      */
