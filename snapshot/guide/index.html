@@ -69,7 +69,9 @@
                                 
                                 <div class="toc-item" style="margin-left:0"><a href="#mergingSchemas"><strong>13</strong><span>Merging Schemas</span></a></div>
                                 
-                                <div class="toc-item" style="margin-left:0"><a href="#repository"><strong>14</strong><span>Repository</span></a></div>
+                                <div class="toc-item" style="margin-left:0"><a href="#oauth2"><strong>14</strong><span>Swagger UI - OAuth 2.0 configuration</span></a></div>
+                                
+                                <div class="toc-item" style="margin-left:0"><a href="#repository"><strong>15</strong><span>Repository</span></a></div>
                                 
                             </div>
                         </div>
@@ -126,7 +128,9 @@
         
         <div class="toc-item" style="margin-left:0px" id="toc-item-mergingSchemas"><a href="#mergingSchemas"><strong>13</strong><span>Merging Schemas</span></a></div>
         
-        <div class="toc-item" style="margin-left:0px" id="toc-item-repository"><a href="#repository"><strong>14</strong><span>Repository</span></a></div>
+        <div class="toc-item" style="margin-left:0px" id="toc-item-oauth2"><a href="#oauth2"><strong>14</strong><span>Swagger UI - OAuth 2.0 configuration</span></a></div>
+        
+        <div class="toc-item" style="margin-left:0px" id="toc-item-repository"><a href="#repository"><strong>15</strong><span>Repository</span></a></div>
         
         </div>
     </div>
@@ -678,6 +682,9 @@ The string syntax is a series of comma-separated key-value pairs, to enable and 
 </li>
 <li>
 <p><code>swagger-ui.theme=[DEFAULT | MATERIAL | FEELING_BLUE | FLATTOP | MONOKAI | MUTED | NEWSPAPER | OUTLINE]</code>: The theme of swagger-ui to use. These are case insensitive. Default is <code>DEFAULT</code>. See <a href="https://github.com/ostranme/swagger-ui-themes">Swagger UI Themes</a>.</p>
+</li>
+<li>
+<p><code>swagger-ui.oauth2.[clientId, clientSecret, realm, appName, scopeSeparator, scopes, additionalQueryStringParams, useBasicAuthenticationWithAccessCodeGrant, usePkceWithAuthorizationCodeGrant]</code>. See <a href="https://github.com/swagger-api/swagger-ui/blob/HEAD/docs/usage/oauth2.md">Swagger UI OAuth 2.0 configuration</a> for more information.</p>
 </li>
 </ul>
 </div>
@@ -1527,7 +1534,168 @@ public Response&lt;Pet&gt; updatePet(Pet pet) {
 </div>
 </div>
 
-<h1 id="repository"><a class="anchor" href="#repository"></a>14 Repository</h1>
+<h1 id="oauth2"><a class="anchor" href="#oauth2"></a>14 Swagger UI - OAuth 2.0 configuration</h1>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master
+/src/main/docs/guide/oauth2.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p><a href="https://swagger.io/docs/open-source-tools/swagger-ui/usage/oauth2/">Swagger UI OAuth 2.0</a> integration allows you to obtain a token from an authorization server directly from Swagger UI. Then, when you use the <code>Try This</code> button
+in the Swagger UI, the requests issued incorporate a valid token.</p>
+</div>
+<div class="paragraph">
+<p>You can configure it by setting the following properties:</p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 100%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>swagger-ui.oauth2RedirectUrl</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>swagger-ui.oauth2.clientId</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>swagger-ui.oauth2.clientSecret</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>swagger-ui.oauth2.realm</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>swagger-ui.oauth2.appName</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>swagger-ui.oauth2.scopeSeparator</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>swagger-ui.oauth2.scopes</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>swagger-ui.oauth2.additionalQueryStringParams</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>swagger-ui.oauth2.useBasicAuthenticationWithAccessCodeGrant</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>swagger-ui.oauth2.usePkceWithAuthorizationCodeGrant</code></p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>When setting any of those properties, Micronaut will generate not only a <code>swagger-ui/index.html</code> file, but also a
+<code>swagger-ui/oauth2-redirect.html</code> one. <strong>You will need to configure that endpoint as a callback URL in your OAuth 2 Authorization Server</strong>.</p>
+</div>
+<div class="paragraph">
+<p>An example configuration could be:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>micronaut.openapi.views.spec=swagger-ui.enabled=true,swagger-ui.theme=flattop,swagger-ui.oauth2RedirectUrl=http://localhost:8080/swagger-ui/oauth2-redirect.html,swagger-ui.oauth2.clientId=myClientId,swagger-ui.oauth2.scopes=openid,swagger-ui.oauth2.usePkceWithAuthorizationCodeGrant=true</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Then, you configure the <code>@SecurityScheme</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@SecurityScheme(name = "openid",
+        type = SecuritySchemeType.OAUTH2,
+        scheme = "bearer",
+        bearerFormat = "jwt",
+        flows = @OAuthFlows(
+                authorizationCode = @OAuthFlow(
+                        authorizationUrl = "https://mycompany.okta.com/oauth2/default/v1/authorize",
+                        tokenUrl = "https://mycompany.okta.com/oauth2/default/v1/token",
+                        refreshUrl = "",
+                        scopes = @OAuthScope(name = "openid", description = "OpenID role")
+                )
+        )
+)
+@OpenAPIDefinition(
+        info = @Info(
+                title = "API service",
+                version = "0.0",
+                description = "My API",
+                license = @License(name = "Apache 2.0", url = "https://foo.bar"),
+                contact = @Contact(url = "https://gigantic-server.com", name = "Fred", email = "Fred@gigagantic-server.com")
+        )
+)
+public class Application {
+    public static void main(String[] args) {
+        Micronaut.run(Application.class, args);
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>And the appropriate <code>@SecurityRequirement</code> on controllers,. eg:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.micronaut.security.annotation.Secured;
+import io.micronaut.security.rules.SecurityRule;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+
+@Controller
+@Secured(SecurityRule.IS_AUTHENTICATED)
+public class OrderController {
+
+    @Get
+    @SecurityRequirement(name = "openid", scopes = "openid")
+    public String index() {
+        return "Example Response";
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Do not forget to configure Micronaut Security accordingly:</p>
+</div>
+<div class="listingblock">
+<div class="title"><code>application.yml</code></div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">micronaut:
+  security:
+    enabled: true
+    token:
+      jwt:
+        enabled: true
+        signatures:
+          jwks:
+            okta:
+              url: 'https://mycompany.okta.com/oauth2/default/v1/keys'
+    intercept-url-map:
+      - pattern: /swagger-ui/**
+        httpMethod: GET
+        access:
+          - isAnonymous()
+      - pattern: /swagger/**
+        access:
+          - isAnonymous()
+  router:
+    static-resources:
+      swagger:
+        paths: classpath:META-INF/swagger
+        mapping: /swagger/**
+      swagger-ui:
+        paths: classpath:META-INF/swagger/views/swagger-ui
+        mapping: /swagger-ui/**</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The previous sample uses a remote <a href="https://micronaut-projects.github.io/micronaut-security/latest/guide/index.html#jwks">Json Web Key Set</a> to validate the token issued by the authorization server. If you use <a href="https://micronaut-projects.github.io/micronaut-security/latest/guide/index.html#openid">Micronaut Security OpenID Connect support</a> with a server compatible with <a href="https://openid.net/specs/openid-connect-discovery-1_0.html">OpenID Connect Discovery</a>, the JWKS of the authorization server is automatically configured.</p>
+</div>
+
+<h1 id="repository"><a class="anchor" href="#repository"></a>15 Repository</h1>
 
 <div class='contribute-btn'>
     <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master
