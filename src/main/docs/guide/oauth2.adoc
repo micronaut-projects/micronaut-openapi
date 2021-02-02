@@ -110,3 +110,5 @@ micronaut:
         paths: classpath:META-INF/swagger/views/swagger-ui
         mapping: /swagger-ui/**
 ----
+
+The previous sample uses a remote https://micronaut-projects.github.io/micronaut-security/latest/guide/index.html#jwks[Json Web Key Set] to validate the token issued by the authorization server. If you use https://micronaut-projects.github.io/micronaut-security/latest/guide/index.html#openid[Micronaut Security OpenID Connect support] with a server compatible with https://openid.net/specs/openid-connect-discovery-1_0.html[OpenID Connect Discovery], the JWKS of the authorization server is automatically configured.
