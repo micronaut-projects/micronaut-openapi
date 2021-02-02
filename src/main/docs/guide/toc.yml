@@ -2,6 +2,7 @@ introduction: Introduction
 releaseHistory: Release History
 cli: Using the Micronaut CLI
 gettingStarted: Getting Started with Swagger
+openApiDefinition: OpenAPI Definition
 configuration: Open API Processing Options
 exposingSwaggerOutput: Exposing Swagger Output
 openApiViews: Generating OpenAPI Views
