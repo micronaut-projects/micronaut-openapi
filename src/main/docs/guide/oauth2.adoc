@@ -1,7 +1,18 @@
 You can configure OAuth 2.0 authorization by setting the following properties:
 
-* `swagger-ui.oauth2RedirectUrl`.
-* `swagger-ui.oauth2.[clientId, clientSecret, realm, appName, scopeSeparator, scopes, additionalQueryStringParams, useBasicAuthenticationWithAccessCodeGrant, usePkceWithAuthorizationCodeGrant]`.
+|===
+| `swagger-ui.oauth2RedirectUrl`
+| `swagger-ui.oauth2.clientId`
+| `swagger-ui.oauth2.clientSecret`
+| `swagger-ui.oauth2.realm`
+| `swagger-ui.oauth2.appName`
+| `swagger-ui.oauth2.scopeSeparator`
+| `swagger-ui.oauth2.scopes`
+| `swagger-ui.oauth2.additionalQueryStringParams`
+| `swagger-ui.oauth2.useBasicAuthenticationWithAccessCodeGrant`
+| `swagger-ui.oauth2.usePkceWithAuthorizationCodeGrant`
+|===
+
 
 When setting any of those properties, Micronaut will generate not only a `swagger-ui/index.html` file, but also a
 `swagger-ui/oauth2-redirect.html` one, that can be configured as a callback URL in your OAuth 2 Authorization Server.
