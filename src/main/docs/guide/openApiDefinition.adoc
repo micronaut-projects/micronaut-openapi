@@ -1,0 +1,28 @@
+Once dependencies have been configured a minimum requirement is to add a `@OpenAPIDefinition` annotation to your `Application` class:
+
+.Example @OpenAPIDefinition usage
+snippet::io.micronaut.configuration.openapi.docs.Application[tags="imports,clazz", project-base="docs-examples/example"]
+
+With that in place, you compile your project and a Swagger YAML file will be generated to the `META-INF/swagger` directory of your project's class output. For example, the above configuration generates:
+
+* For Java `build/classes/java/main/META-INF/swagger/hello-world-0.0.yml`
+* For Kotlin `build/tmp/kapt3/classes/main/META-INF/swagger/hello-world-0.0.yml`
+
+The previously defined annotations will produce YAML like the following:
+
+.Generated Swagger YAML
+[source,yaml]
+----
+openapi: 3.0.1
+info:
+  title: the title
+  description: My API
+  contact:
+    name: Fred
+    url: https://gigantic-server.com
+    email: Fred@gigagantic-server.com
+  license:
+    name: Apache 2.0
+    url: https://foo.bar
+  version: "0.0"
+----
