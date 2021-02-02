@@ -37,6 +37,18 @@ import java.util.stream.Collectors;
  * @author croudet
  */
 public final class OpenApiViewConfig {
+
+    private static final String TEMPLATES = "templates";
+    private static final String TEMPLATES_SWAGGER_UI = "swagger-ui";
+    private static final String TEMPLATES_REDOC = "redoc";
+    private static final String TEMPLATES_RAPIDOC = "rapidoc";
+    private static final String TEMPLATE_INDEX_HTML = "index.html";
+    private static final String REDOC = "redoc";
+    private static final String RAPIDOC = "rapidoc";
+    private static final String SWAGGER_UI = "swagger-ui";
+    private static final String TEMPLATE_OAUTH_2_REDIRECT_HTML = "oauth2-redirect.html";
+    private static final String SLASH = "/";
+
     private String mappingPath;
     private String title;
     private String specFile;
@@ -114,16 +126,20 @@ public final class OpenApiViewConfig {
      */
     public void render(Path outputDir, VisitorContext visitorContext) throws IOException {
         if (redocConfig != null) {
-            render(redocConfig, outputDir.resolve("redoc"), "templates/redoc/index.html", visitorContext);
+            render(redocConfig, outputDir.resolve(REDOC), TEMPLATES + SLASH + TEMPLATES_REDOC + SLASH + TEMPLATE_INDEX_HTML, visitorContext);
         }
         if (rapidocConfig != null) {
-            render(rapidocConfig, outputDir.resolve("rapidoc"), "templates/rapidoc/index.html", visitorContext);
+            render(rapidocConfig, outputDir.resolve(RAPIDOC), TEMPLATES + SLASH + TEMPLATES_RAPIDOC + SLASH + TEMPLATE_INDEX_HTML, visitorContext);
         }
         if (swaggerUIConfig != null) {
-            render(swaggerUIConfig, outputDir.resolve("swagger-ui"), "templates/swagger-ui/index.html", visitorContext);
+            Path dir = outputDir.resolve(SWAGGER_UI);
+            render(swaggerUIConfig, dir, TEMPLATES + SLASH + TEMPLATES_SWAGGER_UI + SLASH + TEMPLATE_INDEX_HTML, visitorContext);
+            if (SwaggerUIConfig.hasOauth2Option(swaggerUIConfig.options)) {
+                render(swaggerUIConfig, dir, TEMPLATES + SLASH + TEMPLATES_SWAGGER_UI + SLASH + TEMPLATE_OAUTH_2_REDIRECT_HTML, visitorContext);
+            }
         }
     }
-
+    
     private String readTemplateFromClasspath(String templateName) throws IOException {
         StringBuilder buf = new StringBuilder(1024);
         ClassLoader classLoader = getClass().getClassLoader();
@@ -147,7 +163,8 @@ public final class OpenApiViewConfig {
         if (!Files.exists(outputDir)) {
             Files.createDirectories(outputDir);
         }
-        Path file = outputDir.resolve("index.html");
+        String fileName = templateName.substring(templateName.lastIndexOf(SLASH) + 1);
+        Path file = outputDir.resolve(fileName);
         if (visitorContext != null) {
             visitorContext.info("Writing OpenAPI View to destination: " + file);
             visitorContext.getClassesOutputPath().ifPresent(path ->

@@ -116,9 +116,40 @@ class OpenApiOperationViewRenderSpec extends Specification {
         Files.exists(outputDir.resolve("redoc").resolve("index.html"))
         Files.exists(outputDir.resolve("rapidoc").resolve("index.html"))
         Files.exists(outputDir.resolve("swagger-ui").resolve("index.html"))
+        Files.notExists(outputDir.resolve("swagger-ui").resolve("oauth2-redirect.html"))
         outputDir.resolve("redoc").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains(cfg.getSpecURL())
         outputDir.resolve("rapidoc").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains(cfg.getSpecURL())
         outputDir.resolve("swagger-ui").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains(cfg.getSpecURL())
+        !outputDir.resolve("swagger-ui").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains("ui.initOAuth({")
+    }
+
+    void "test generates oauth2-redirect.html"() {
+        given:
+        String spec = "swagger-ui.enabled=true,swagger-ui.oauth2RedirectUrl=http://localhost:8080/foo/bar,swagger-ui.oauth2.clientId=foo,swagger-ui.oauth2.clientSecret=bar"
+        OpenApiViewConfig cfg = OpenApiViewConfig.fromSpecification(spec, new Properties())
+        Path outputDir = Paths.get("output")
+        cfg.title = "OpenAPI documentation"
+        cfg.specFile = "swagger.yml"
+        cfg.render(outputDir, null)
+
+        expect:
+        cfg.enabled == true
+        cfg.swaggerUIConfig != null
+        cfg.title == "OpenAPI documentation"
+        cfg.specFile == "swagger.yml"
+
+        and:
+        Path index = outputDir.resolve("swagger-ui").resolve("index.html")
+        Path oauth2Redirect = outputDir.resolve("swagger-ui").resolve("oauth2-redirect.html")
+        Files.exists(index)
+        Files.exists(oauth2Redirect)
+
+        and:
+        String indexHtml = index.toFile().getText(StandardCharsets.UTF_8.name())
+        indexHtml.contains(cfg.getSpecURL())
+        indexHtml.contains("ui.initOAuth({")
+        indexHtml.contains('clientId: "foo"')
+        indexHtml.contains('clientSecret: "bar"')
     }
 
 }

@@ -1,0 +1,117 @@
+https://swagger.io/docs/open-source-tools/swagger-ui/usage/oauth2/[Swagger UI OAuth 2.0] integration allows you to obtain a token from an authorization server directly from Swagger UI. Then, when you use the `Try This` button
+in the Swagger UI, the requests issued incorporate a valid token.
+
+You can configure it by setting the following properties:
+
+|===
+| `swagger-ui.oauth2RedirectUrl`
+| `swagger-ui.oauth2.clientId`
+| `swagger-ui.oauth2.clientSecret`
+| `swagger-ui.oauth2.realm`
+| `swagger-ui.oauth2.appName`
+| `swagger-ui.oauth2.scopeSeparator`
+| `swagger-ui.oauth2.scopes`
+| `swagger-ui.oauth2.additionalQueryStringParams`
+| `swagger-ui.oauth2.useBasicAuthenticationWithAccessCodeGrant`
+| `swagger-ui.oauth2.usePkceWithAuthorizationCodeGrant`
+|===
+
+
+When setting any of those properties, Micronaut will generate not only a `swagger-ui/index.html` file, but also a
+`swagger-ui/oauth2-redirect.html` one. **You will need to configure that endpoint as a callback URL in your OAuth 2 Authorization Server**.
+
+An example configuration could be:
+
+----
+micronaut.openapi.views.spec=swagger-ui.enabled=true,swagger-ui.theme=flattop,swagger-ui.oauth2RedirectUrl=http://localhost:8080/swagger-ui/oauth2-redirect.html,swagger-ui.oauth2.clientId=myClientId,swagger-ui.oauth2.scopes=openid,swagger-ui.oauth2.usePkceWithAuthorizationCodeGrant=true
+----
+
+Then, you configure the `@SecurityScheme`:
+
+[source, java]
+----
+@SecurityScheme(name = "openid",
+        type = SecuritySchemeType.OAUTH2,
+        scheme = "bearer",
+        bearerFormat = "jwt",
+        flows = @OAuthFlows(
+                authorizationCode = @OAuthFlow(
+                        authorizationUrl = "https://mycompany.okta.com/oauth2/default/v1/authorize",
+                        tokenUrl = "https://mycompany.okta.com/oauth2/default/v1/token",
+                        refreshUrl = "",
+                        scopes = @OAuthScope(name = "openid", description = "OpenID role")
+                )
+        )
+)
+@OpenAPIDefinition(
+        info = @Info(
+                title = "API service",
+                version = "0.0",
+                description = "My API",
+                license = @License(name = "Apache 2.0", url = "https://foo.bar"),
+                contact = @Contact(url = "https://gigantic-server.com", name = "Fred", email = "Fred@gigagantic-server.com")
+        )
+)
+public class Application {
+    public static void main(String[] args) {
+        Micronaut.run(Application.class, args);
+    }
+}
+----
+
+And the appropriate `@SecurityRequirement` on controllers,. eg:
+
+[source,java]
+----
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.micronaut.security.annotation.Secured;
+import io.micronaut.security.rules.SecurityRule;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+
+@Controller
+@Secured(SecurityRule.IS_AUTHENTICATED)
+public class OrderController {
+
+    @Get
+    @SecurityRequirement(name = "openid", scopes = "openid")
+    public String index() {
+        return "Example Response";
+    }
+}
+----
+
+Do not forget to configure Micronaut Security accordingly:
+
+.`application.yml`
+[source,yaml]
+----
+micronaut:
+  security:
+    enabled: true
+    token:
+      jwt:
+        enabled: true
+        signatures:
+          jwks:
+            okta:
+              url: 'https://mycompany.okta.com/oauth2/default/v1/keys'
+    intercept-url-map:
+      - pattern: /swagger-ui/**
+        httpMethod: GET
+        access:
+          - isAnonymous()
+      - pattern: /swagger/**
+        access:
+          - isAnonymous()
+  router:
+    static-resources:
+      swagger:
+        paths: classpath:META-INF/swagger
+        mapping: /swagger/**
+      swagger-ui:
+        paths: classpath:META-INF/swagger/views/swagger-ui
+        mapping: /swagger-ui/**
+----
+
+The previous sample uses a remote https://micronaut-projects.github.io/micronaut-security/latest/guide/index.html#jwks[Json Web Key Set] to validate the token issued by the authorization server. If you use https://micronaut-projects.github.io/micronaut-security/latest/guide/index.html#openid[Micronaut Security OpenID Connect support] with a server compatible with https://openid.net/specs/openid-connect-discovery-1_0.html[OpenID Connect Discovery], the JWKS of the authorization server is automatically configured.

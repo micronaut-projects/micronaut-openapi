@@ -129,6 +129,7 @@ The following properties are supported:
  * `swagger-ui.version=[string]`: The version of Swagger-ui to use. Default is to use the latest available.
  * `swagger-ui.[displayOperationId, oauth2RedirectUrl, showMutatedRequest, deepLinking, supportedSubmitMethods, defaultModelsExpandDepth, layout, defaultModelRendering, docExpansion, filter, validatorUrl, showCommonExtensions, maxDisplayedTags, withCredentials, displayRequestDuration, showExtensions, operationsSorter, tagsSorter]`. See https://github.com/swagger-api/swagger-ui/blob/HEAD/docs/usage/configuration.md[Swagger UI Configuration] for a description.
  * `swagger-ui.theme=[DEFAULT | MATERIAL | FEELING_BLUE | FLATTOP | MONOKAI | MUTED | NEWSPAPER | OUTLINE]`: The theme of swagger-ui to use. These are case insensitive. Default is `DEFAULT`. See https://github.com/ostranme/swagger-ui-themes[Swagger UI Themes].
+ * `swagger-ui.oauth2.[clientId, clientSecret, realm, appName, scopeSeparator, scopes, additionalQueryStringParams, useBasicAuthenticationWithAccessCodeGrant, usePkceWithAuthorizationCodeGrant]`. See https://github.com/swagger-api/swagger-ui/blob/HEAD/docs/usage/oauth2.md[Swagger UI OAuth 2.0 configuration] for more information.
  
 Views also supports RapiPdf, to enable it use `rapipdf.enabled=true`.
 It will add a button to the view to generate a PDF from the spec file.
