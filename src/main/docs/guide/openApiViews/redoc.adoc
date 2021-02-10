@@ -1,0 +1,50 @@
+Views supports https://github.com/Rebilly/ReDoc[Redoc], to enable it use `redoc.enabled=true`.
+
+The views will be generated to the `META-INF/swagger/views/redoc` directory of your project’s class output.
+
+|===
+|`redoc.enabled` | `true` or `false`  When 'true' the Redoc view is generated.
+| `redoc.version` | `String` - The version of Redoc to use. Default is to use the latest available.
+| `redoc.expand-single-schema-field` |
+| `redoc.expand-default-server-variables` |
+| `redoc.menu-toggle` |
+| `redoc.only-required-in-samples` |
+| `redoc.payload-sample-idx` |
+| `redoc.sort-props-alphabetically` |
+| `redoc.untrusted-spec` |
+| `redoc.expand-responses` |
+| `redoc.show-extensions` |
+| `redoc.native-scrollbars` |
+| `redoc.path-in-middle-panel` |
+| `redoc.suppress-warnings` |
+| `redoc.hide-hostname` |
+| `redoc.disable-search` |
+| `redoc.json-sample-expand-level` |
+| `redoc.scroll-y-offset` |
+| `redoc.hide-download-button` |
+| `redoc.no-auto-auth` |
+| `redoc.theme` |
+| `redoc.hide-single-request-sample-tab` |
+| `redoc.required-props-first` |
+| `redoc.hide-loading` |
+|===
+
+See https://github.com/Redocly/redoc#redoc-options-object[Redoc Options] for a description of the above properites.
+
+To expose the the `redoc` views, you also must expose the generated `yaml`:
+
+.Exposing Swagger YAML And Redoc Views
+[source,yaml]
+----
+micronaut:
+    router:
+        static-resources:
+            swagger:
+                paths: classpath:META-INF/swagger
+                mapping: /swagger/**
+            redoc:
+                paths: classpath:META-INF/swagger/views/redoc
+                mapping: /redoc/**
+----
+
+With the above configuration in place when you run your application you can access your Swagger documentation at +http://localhost:8080/redoc+.

@@ -1,0 +1,51 @@
+Views supports https://swagger.io/tools/swagger-ui/[Swagger UI], to enable it use `swagger-ui.enabled=true`.
+
+The views will be generated to the `META-INF/swagger/views/swagger-ui` directory of your project’s class output.
+
+|===
+| `swagger-ui.enabled` | `true` or `false` When 'true' the Swagger-ui view is generated.
+| `swagger-ui.version` | String - The version of Swagger-ui to use. Default is to use the latest available.
+| `swagger-ui.theme` | `DEFAULT` or `MATERIAL` or `FEELING_BLUE` `FLATTOP` `MONOKAI` `MUTED` `NEWSPAPER` `OUTLINE`. The theme of swagger-ui to use. These are case insensitive. Default is `DEFAULT`. See https://github.com/ostranme/swagger-ui-themes[Swagger UI Themes].
+| `swagger-ui.displayOperationId` |
+| `swagger-ui.oauth2RedirectUrl` |
+| `swagger-ui.showMutatedRequest` |
+| `swagger-ui.deepLinking` |
+| `swagger-ui.supportedSubmitMethods` |
+| `swagger-ui.defaultModelsExpandDepth` |
+| `swagger-ui.layout` |
+| `swagger-ui.defaultModelRendering` |
+| `swagger-ui.docExpansion` |
+| `swagger-ui.filter` |
+| `swagger-ui.validatorUrl` |
+| `swagger-ui.showCommonExtensions` |
+| `swagger-ui.maxDisplayedTags` |
+| `swagger-ui.withCredentials` |
+| `swagger-ui.displayRequestDuration` |
+| `swagger-ui.showExtensions` |
+| `swagger-ui.operationsSorter` |
+| `swagger-ui.tagsSorter` |
+|===
+
+
+See https://github.com/swagger-api/swagger-ui/blob/HEAD/docs/usage/configuration.md[Swagger UI Configuration] for a description.
+
+
+
+
+To expose the the `swagger-ui` views, you also must expose the generated `yaml`:
+
+.Exposing Swagger YAML and Swagger UI Views
+[source,yaml]
+----
+micronaut:
+    router:
+        static-resources:
+            swagger:
+                paths: classpath:META-INF/swagger
+                mapping: /swagger/**
+            swagger-ui:
+                paths: classpath:META-INF/swagger/views/swagger-ui
+                mapping: /swagger-ui/**
+----
+
+With the above configuration in place when you run your application you can access your Swagger documentation at +http://localhost:8080/swagger-ui+.

@@ -1,0 +1,25 @@
+You can also provide some servers for all endpoints with the `endpoints.server=<json array of io.swagger.v3.oas.models.servers.Server>` flag, for instance:
+----
+endpoints.servers=[ \
+    { \
+      "url": "https://{username}.gigantic-server.com:{port}/{basePath}", \
+      "description": "The production API server", \
+      "variables": { \
+        "username": { \
+          "default": "demo", \
+          "description": "this value is assigned by the service provider, in this example `gigantic-server.com`" \
+        }, \
+        "port": { \
+          "enum": [ \
+            "8443", \
+            "443" \
+          ], \
+          "default": "8443" \
+        }, \
+        "basePath": { \
+          "default": "v2" \
+        } \
+      } \
+    } \
+  ]
+----

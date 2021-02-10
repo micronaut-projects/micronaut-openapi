@@ -16,7 +16,6 @@ You can configure it by setting the following properties:
 | `swagger-ui.oauth2.usePkceWithAuthorizationCodeGrant`
 |===
 
-
 When setting any of those properties, Micronaut will generate not only a `swagger-ui/index.html` file, but also a
 `swagger-ui/oauth2-redirect.html` one. **You will need to configure that endpoint as a callback URL in your OAuth 2 Authorization Server**.
 

@@ -1,0 +1,27 @@
+Views also supports https://mrin9.github.io/RapiPdf/[RapiPdf], to enable it use `rapipdf.enabled=true`.
+
+RapiPdf supports the following options:
+
+|===
+| `rapipdf.enabled` | `true` or `false`
+| `rapipdf.include-api-details`
+| `rapipdf.pdf-title`
+| `rapipdf.include-api-list`
+| `rapipdf.include-security`
+| `rapipdf.input-bg`
+| `rapipdf.hide-input`
+| `rapipdf.pdf-footer-text`
+| `rapipdf.pdf-primary-color`
+| `rapipdf.pdf-schema-style`
+| `rapipdf.button-label`
+| `rapipdf.pdf-alternate-color`
+| `rapipdf.include-info`
+| `rapipdf.include-toc`
+| `rapipdf.button-color`
+| `rapipdf.style`
+| `rapipdf.input-color`
+|===
+
+See https://mrin9.github.io/RapiPdf/[RapiPdf Attributes] for a description.
+
+It will add a button to the view to generate a PDF from the spec file.

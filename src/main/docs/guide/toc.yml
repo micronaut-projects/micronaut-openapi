@@ -1,16 +1,45 @@
 introduction: Introduction
 releaseHistory: Release History
 cli: Using the Micronaut CLI
-gettingStarted: Getting Started with Swagger
+gettingStarted: Dependencies
 openApiDefinition: OpenAPI Definition
-configuration: Open API Processing Options
+configuration: 
+  title: OpenAPI Processing Options
+  propertiesFileConfiguration: Configuring OpenAPI Processing with a properties file
+  systemPropertyConfiguration: Configuring OpenAPI Processing with system properties
 exposingSwaggerOutput: Exposing Swagger Output
-openApiViews: Generating OpenAPI Views
-endpoints: Exposing Endpoints
-controllersAndSwaggerAnnotations: Controllers and Swagger Annotations
-schemasAndPojos: Schemas and POJOs
-schemasAndMetaAnnotations: Schemas and Meta Annotations
-schemasAndGenerics: Schemas and Generics
+controllers: OpenAPI Generation for Controllers
+namingstrategy: Naming Strategy
+swaggerAnnotations: 
+  title: Swagger Annotations
+  schemasAndPojos: Schemas and POJOs
+  schemasAndMetaAnnotations: Schemas and Meta Annotations
+  schemasAndGenerics: Schemas and Generics
+endpoints: 
+  title: Exposing Endpoints
+  enableendpoints: Enable Endpoints
+  endpointstags: Endpoints Tags
+  micronautendpoints: Micronaut Built-In Endpoints
+  endpointservers: Endpoints Servers 
+  endpointssecurityrequirements: Endpoints Security Requirements
+  endpointspath: Endpoints Path
+annotationConfiguration:
+  title: Annotation Configuration
+  openapiinclude: '@OpenAPIInclude'
+  openapimanagement: '@OpenAPIManagement'
+  openapisecurity: '@OpenAPISecurity'  
 mergingSchemas: Merging Schemas
-oauth2: Swagger UI - OAuth 2.0 configuration
+openApiViews:
+  title: Generating OpenAPI Views
+  mappingPath: Mapping Path
+  viewsGenerationWithPropertiesFile: Enable Views Generation with a properties file
+  viewsGenerationWithSystemProperties: Enable Views Generation with system properties
+  swaggerui:
+    title: Swagger-UI
+    oauth2: Swagger UI - OAuth 2.0 configuration
+  redoc: Redoc
+  rapidoc: RapiDoc
+  rapipdf: RapiPdf
+serverContext: Server Context
+
 repository: Repository

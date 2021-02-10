@@ -1,3 +1,3 @@
-Micronaut includes support for producing OpenAPI (Swagger) YAML at compilation time. Micronaut will at compile time produce a Swagger 3.x compliant YAML file just based on the regular Micronaut annotations and the javadoc comments within your code.
+Micronaut includes support for producing https://www.openapis.org[OpenAPI] (Swagger) YAML at compilation time. Micronaut will at compile time produce a OpenAPI 3.x compliant YAML file just based on the regular Micronaut annotations and the javadoc comments within your code.
 
-You can customize the generated Swagger using the standard https://github.com/swagger-api/swagger-core/wiki/Swagger-3.X---Annotations[Swagger Annotations].
+You can customize the generated Swagger using the standard <<swaggerAnnotations, Swagger Annotations>>.

@@ -4,6 +4,8 @@ generation of the Schema by using the `@Schema` annotation on your POJO. For exa
 .Using the @Schema Annotation
 [source,java]
 ----
+import io.swagger.v3.oas.annotations.media.Schema;
+
 @Schema(name="MyPet", description="Pet description") // <1>
 class Pet {
     private PetType type;

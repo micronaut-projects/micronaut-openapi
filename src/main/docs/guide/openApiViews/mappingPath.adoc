@@ -1,0 +1,18 @@
+The path from where the swagger specification will be served by the http server defaults to `swagger`. You can change it via the `mapping.path` property.
+
+Thus, by default, the views expect to find the `yaml` under `/swagger`. 
+
+If you change this mapping to something else:
+
+.Exposing Swagger YAML
+[source,yaml]
+----
+micronaut:
+    router:
+        static-resources:
+            swagger:
+                paths: classpath:META-INF/swagger
+                mapping: /swaggerYAML/**
+....
+----
+You will need to set the `mapping.path` property accordingly: `micronaut.openapi.views.spec=mapping.path=swaggerYAML...`.
