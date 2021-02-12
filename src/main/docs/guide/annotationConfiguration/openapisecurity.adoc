@@ -2,8 +2,9 @@ api:openapi.annotation.OpenAPISecurity[] adds security endpoints.
 
 It is mapped to: 
 
-```java
+[source,java]
+----
 @OpenAPIInclude(
 classes = { io.micronaut.security.endpoints.LoginController.class, io.micronaut.security.endpoints.LogoutController.class }
 )
-```
+----
