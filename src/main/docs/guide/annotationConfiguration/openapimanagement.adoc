@@ -2,7 +2,8 @@ api:openapi.annotation.OpenAPIManagement[] adds management endpoints.
 
 api:openapi.annotation.OpenAPIManagement[] is mapped to: 
 
-```java
+[source,java]
+----
 @OpenAPIInclude(
 classes = { io.micronaut.management.endpoint.beans.BeansEndpoint.class, io.micronaut.management.endpoint.env.EnvironmentEndpoint.class, 
 io.micronaut.management.endpoint.health.HealthEndpoint.class,
@@ -13,7 +14,7 @@ io.micronaut.management.endpoint.routes.RoutesEndpoint.class,
 io.micronaut.management.endpoint.stop.ServerStopEndpoint.class,
 io.micronaut.management.endpoint.threads.ThreadDumpEndpoint }
 )
-```
+----
 
 
 
