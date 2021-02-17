@@ -73,24 +73,24 @@ class FirstEndpointController {
 @Controller("/endpoint2")
 class SecondEndpointController {
     @Get("/path2")
-    public HttpResponse<String> path2() {
+    public HttpResponse<Person2> path2() {
         return null;
     }
     @Get("/path1")
-    public HttpResponse<String> path1() {
+    public HttpResponse<Person1> path1() {
         return null;
     }
     @Get("/")
-    public HttpResponse<Person> path() {
+    public HttpResponse<Person3> path() {
         return null;
     }
 }
 @Introspected
-class Person {
+class Person1 {
     private String name;
     private Integer debtValue;
     private Integer totalGoals;
-    public Person(String name,
+    public Person1(String name,
                   Integer debtValue,
                   Integer totalGoals) {
         this.name = name;
@@ -106,14 +106,25 @@ class Person {
     public Integer getTotalGoals() {
         return totalGoals;
     }
-    public void setName(String name) {
+}
+@Introspected
+class Person2 {
+    private String name;
+    public Person2(String name) {
         this.name = name;
     }
-    public void setDebtValue(Integer debtValue) {
-        this.debtValue = debtValue;
+    public String getName() {
+        return name;
     }
-    public void setTotalGoals(Integer totalGoals) {
-        this.totalGoals = totalGoals;
+}
+@Introspected
+class Person3 {
+    private String name;
+    public Person3(String name) {
+        this.name = name;
+    }
+    public String getName() {
+        return name;
     }
 }
 @javax.inject.Singleton
@@ -168,7 +179,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Person\'
+                $ref: '#/components/schemas/Person3\'
   /endpoint2/path1:
     get:
       operationId: path1
@@ -179,7 +190,7 @@ paths:
           content:
             application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/Person1\'
   /endpoint2/path2:
     get:
       operationId: path2
@@ -190,7 +201,7 @@ paths:
           content:
             application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/Person2\'
   /endpoint3:
     get:
       operationId: path
@@ -226,17 +237,27 @@ paths:
                 type: string
 components:
   schemas:
-    Person:
+    Person1:
       type: object
       properties:
+        name:
+          type: string
         debtValue:
           type: integer
           format: int32
-        name:
-          type: string
         totalGoals:
           type: integer
-          format: int32''')
+          format: int32
+    Person2:
+      type: object
+      properties:
+        name:
+          type: string
+    Person3:
+      type: object
+      properties:
+        name:
+          type: string''')
     }
 
 }
