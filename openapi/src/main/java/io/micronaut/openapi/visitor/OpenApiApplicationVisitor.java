@@ -34,6 +34,7 @@ import io.swagger.v3.core.util.Yaml;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.servers.Server;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.PathItem;
 import io.swagger.v3.oas.models.info.Info;
@@ -49,6 +50,8 @@ import java.io.Writer;
 import java.net.URI;
 import java.nio.file.*;
 import java.util.*;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
 import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 
@@ -492,6 +495,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         applyPropertyNamingStrategy(openAPI, visitorContext);
         applyPropertyServerContextPath(openAPI, visitorContext);
         openAPI = resolvePropertyPlaceHolders(openAPI, visitorContext);
+        sortOpenAPI(openAPI);
         String fileName = "swagger.yml";
         String documentTitle = "OpenAPI";
 
@@ -507,6 +511,37 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         }
         writeYamlToFile(openAPI, fileName, documentTitle, visitorContext);
         visitedElements = visitedElements(visitorContext);
+    }
+
+    private void sortOpenAPI(OpenAPI openAPI) {
+        // Sort paths
+        if (openAPI.getPaths() != null) {
+            io.swagger.v3.oas.models.Paths sortedPaths = new io.swagger.v3.oas.models.Paths();
+            new TreeMap<>(openAPI.getPaths()).forEach(sortedPaths::addPathItem);
+            if (openAPI.getPaths().getExtensions() != null) {
+                sortedPaths.setExtensions(new TreeMap<>(openAPI.getPaths().getExtensions()));
+            }
+            openAPI.setPaths(sortedPaths);
+        }
+
+        // Sort all reusable Components
+        Components components = openAPI.getComponents();
+        sortComponent(components, Components::getSchemas, Components::setSchemas);
+        sortComponent(components, Components::getResponses, Components::setResponses);
+        sortComponent(components, Components::getParameters, Components::setParameters);
+        sortComponent(components, Components::getExamples, Components::setExamples);
+        sortComponent(components, Components::getRequestBodies, Components::setRequestBodies);
+        sortComponent(components, Components::getHeaders, Components::setHeaders);
+        sortComponent(components, Components::getSecuritySchemes, Components::setSecuritySchemes);
+        sortComponent(components, Components::getLinks, Components::setLinks);
+        sortComponent(components, Components::getCallbacks, Components::setCallbacks);
+    }
+
+    private <T> void sortComponent(Components components, Function<Components, Map<String, T>> getter, BiConsumer<Components, Map<String, T>> setter) {
+        if (components != null && getter.apply(components) != null) {
+            Map<String, T> component = getter.apply(components);
+            setter.accept(components, new TreeMap<>(component));
+        }
     }
 
     private void writeYamlToFile(OpenAPI openAPI, String fileName, String documentTitle, VisitorContext visitorContext) {
