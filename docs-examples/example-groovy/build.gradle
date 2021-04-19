@@ -11,7 +11,7 @@ dependencies {
     testImplementation "io.swagger.core.v3:swagger-annotations"
     testImplementation "io.micronaut.beanvalidation:micronaut-hibernate-validator"
     testCompileOnly "io.micronaut:micronaut-inject-groovy"
-    testImplementation "org.testcontainers:spock:1.15.2"
+    testImplementation "org.testcontainers:spock:1.15.3"
     testImplementation("org.spockframework:spock-core") {
         exclude group: "org.codehaus.groovy", module: "groovy-all"
     }
