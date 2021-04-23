@@ -1,0 +1,68 @@
+The views will be generated to the `META-INF/swagger/views/rapidoc` directory of your project’s class output.
+
+
+
+|===
+| `rapidoc.enabled` | `true` or `false` When 'true' the RapiDoc view is generated.
+| `rapidoc.version` |  The version of RapiDoc to use. Default is to use the latest available.
+| `rapidoc.style` | 
+| `rapidoc.sort-tags` | 
+| `rapidoc.sort-endpoints-by` | 
+| `rapidoc.heading-text` | 
+| `rapidoc.goto-path` | 
+| `rapidoc.theme` | 
+| `rapidoc.bg-color` | 
+| `rapidoc.text-color` | 
+| `rapidoc.header-color` | 
+| `rapidoc.regular-font`| 
+| `rapidoc.mono-font`| 
+| `rapidoc.font-size`| 
+| `rapidoc.nav-bg-color`| 
+| `rapidoc.nav-text-color`| 
+| `rapidoc.nav-hover-bg-color`| 
+| `rapidoc.nav-hover-text-color`| 
+| `rapidoc.nav-accent-color`| 
+| `rapidoc.nav-item-spacing`| 
+| `rapidoc.layout`| 
+| `rapidoc.render-style`| 
+| `rapidoc.schema-style`| 
+| `rapidoc.schema-expand-level`| 
+| `rapidoc.schema-description-expanded`| 
+| `rapidoc.default-schema-tab`| 
+| `rapidoc.response-area-height`| 
+| `rapidoc.show-info`| 
+| `rapidoc.info-description-headings-in-navbar`| 
+| `rapidoc.show-components`| 
+| `rapidoc.show-header`| 
+| `rapidoc.allow-authentication`| 
+| `rapidoc.allow-spec-url-load`| 
+| `rapidoc.allow-spec-file-load`| 
+| `rapidoc.allow-search`| 
+| `rapidoc.allow-try`| 
+| `rapidoc.allow-server-selection`| 
+| `rapidoc.api-key-name`| 
+| `rapidoc.api-key-value`| 
+| `rapidoc.api-key-location`| 
+| `rapidoc.server-url`| 
+| `rapidoc.default-api-server`|
+|===
+
+See https://mrin9.github.io/RapiDoc/api.html[RapiDoc Options] for a description.
+
+To expose the the `rapidoc` views, you also must expose the generated `yaml`:
+
+.Exposing Swagger YAML And Rapidoc Views
+[source,yaml]
+----
+micronaut:
+    router:
+        static-resources:
+            swagger:
+                paths: classpath:META-INF/swagger
+                mapping: /swagger/**
+            rapidoc:
+                paths: classpath:META-INF/swagger/views/rapidoc
+                mapping: /rapidoc/**
+----
+
+With the above configuration in place when you run your application you can access your Swagger documentation at +http://localhost:8080/rapidoc+.

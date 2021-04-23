@@ -1,8 +1,146 @@
 Often times you might want to generate OpenAPI (Swagger) YAML for built-in endpoints or paths from some other modules, such as `security`. In order to generate YAML including all that information, Micronaut supports merging of multiple OpenAPI YAML files. So, you can create OpenAPI YAML files manually at some predefined path from where the information will then be merged into the final YAML file.
 
-To configure the path for additional swagger files you need to set `System` property `micronaut.openapi.additional.files`. For example:
+For example, if you are using https://micronaut-projects.github.io/micronaut-security/latest/guide/index.html#openid[Micronaut's Security OpenID Connect] with https://aws.amazon.com/cognito/[Amazon Cognito] your application exposes several endpoints which you could define in an external OpenAPI YAML file such as:
+
+[source,yaml]
+.openapi/oauth.yml
+----
+openapi: 3.0.1
+info:
+  title: OAuth
+  description: Endpoints related to the integration with Amazon Cognito
+  version: "1.0"
+paths:
+  /logout:
+    get:
+      tags:
+      - security
+      description: deletes the JWT cookie and redirects to /oauth/login/cognito
+      operationId: logout
+      parameters: []
+      responses:
+        "200":
+          description: logout 200 response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Object'
+        "302":
+          links:
+            oauth-login-cognito:
+              operationId: oauth-login-cognito
+  /oauth/callback/cognito:
+    get:
+      tags:
+      - security
+      description: receives a callback from the authorization server with a code to
+        exchange it for an access and id token
+      externalDocs:
+        description: Amazon Cognito Token Endpoint documentation
+        url: https://docs.aws.amazon.com/cognito/latest/developerguide/token-endpoint.html
+      operationId: oauth-callback-cognito
+      parameters:
+      - name: authorizationResponse
+        in: query
+        required: true
+        explode: true
+        schema:
+          $ref: '#/components/schemas/AuthorizationResponse'
+      responses:
+        "303":
+          description: redirects to home page upon successful completion of the authorization
+            code grant flow
+          headers:
+            Set-Cookie:
+              description: Cookied named JWT with the id token obtained from the authorization
+                server as the value
+  /oauth/login/cognito:
+    get:
+      tags:
+      - security
+      description: redirects to authorization server sign in page
+      externalDocs:
+        description: Amazon Cognito Authorization Endpoint documentation
+        url: https://docs.aws.amazon.com/cognito/latest/developerguide/authorization-endpoint.html
+      operationId: oauth-login-cognito
+      parameters: []
+      responses:
+        "302":
+          description: redirects to authorization server sign in page
+  /oauth/logout:
+    get:
+      tags:
+      - security
+      description: ends the session in the authorization server and the redirects
+        to /logout
+      externalDocs:
+        description: Amazon Cognito Logout Endpoint documentation
+        url: https://docs.aws.amazon.com/cognito/latest/developerguide/logout-endpoint.html
+      operationId: oauth-logout
+      parameters: []
+      responses:
+        "302":
+          links:
+            logout:
+              operationId: logout
+components:
+  schemas:
+    AuthorizationResponse:
+      required:
+      - code
+      - state
+      type: object
+      properties:
+        code:
+          required:
+          - "true"
+          type: string
+          description: an authorization code which the OAuth 2.0 client can exchange
+            for an access token
+        nonce:
+          required:
+          - "false"
+          type: string
+          nullable: true
+        state:
+          required:
+          - "true"
+          type: string    
+----
+
+You could also have a yaml file describing the endpoint which exposes the generated OpenAPI YAML file:
+
+[source,yaml]
+.openapi/swagger.yml
+----
+openapi: 3.0.1
+info:
+  title: swagger
+  version: "1.0"
+paths:
+  /swagger/demo-0.0.yml:
+    get:
+      tags:
+        - openapi
+      description: returns the OpenAPI YAML file describing the API
+      operationId: swagger
+      parameters: []
+      responses:
+        "200":
+          description: OpenAPI YAML file describing the API
+          content:
+            text/plain: {}
+----
+
+To merge both files with the generated OpenAPI definition point Micronaut to look for additional OpenAPI yaml files in the `openapi` folder. You need to set the property `micronaut.openapi.additional.files`. 
 
 [source,bash]
+.openapi.properties
 ----
-micronaut.openapi.additional.files={project.home}/src/test/resources/swagger
+micronaut.openapi.additional.files=openapi
+...
+..
+.
 ----
+
+Micronaut will include the endpoints defined in those files in the generated output. 

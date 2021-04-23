@@ -1,0 +1,45 @@
+By default Micronaut will automatically at compile time build out the Swagger YAML definition from your defined controllers and methods. For example given the following class:
+
+.Hello World Example
+snippet::io.micronaut.configuration.openapi.docs.controllers.HelloController[tags="imports,clazz", project-base="docs-examples/example]
+
+The resulting output will be:
+
+.Example Generated Swagger Output
+[source,yaml]
+----
+openapi: 3.0.1
+info:
+  title: Hello World
+  description: My API
+  contact:
+    name: Fred
+    url: https://gigantic-server.com
+    email: Fred@gigagantic-server.com
+  license:
+    name: Apache 2.0
+    url: https://foo.bar
+  version: "0.0"
+paths:
+  /hello/{name}:
+    get:
+      description: ""
+      operationId: index
+      parameters:
+      - name: name
+        in: path
+        description: The person's name
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: The greeting
+          content:
+            text/plain:
+              schema:
+                type: string
+
+----
+
+Notice how the javadoc comments are used to fill out the description of the API.

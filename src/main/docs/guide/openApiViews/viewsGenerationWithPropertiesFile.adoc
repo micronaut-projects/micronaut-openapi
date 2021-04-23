@@ -1,0 +1,16 @@
+By default the generation of views is disabled. You can enable views generation with a <<propertiesFileConfiguration, configuration properties file>>.
+
+.openapi.properties Example Views Generation Swagger-UI Redoc, Rapidoc
+[source]
+----
+swagger-ui.enabled=true
+redoc.enabled=true
+rapidoc.enabled=true
+rapidoc.bg-color=#14191f
+rapidoc.text-color=#aec2e0
+rapidoc.sort-endpoints-by=method
+...
+..
+.
+----
+

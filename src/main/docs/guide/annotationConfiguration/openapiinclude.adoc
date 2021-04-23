@@ -1,0 +1,31 @@
+You can use api:openapi.annotation.OpenAPIInclude[] you can include additional api:http.annotation.Controller[] or
+api:management.endpoint.annotation.Endpoint[] already compiled 
+classes in the OpenAPI processing. 
+
+[source,java]
+----
+@OpenAPIDefinition(
+        info = @Info(
+                title = "Hello World",
+                version = "${api.version}",
+                description = "${openapi.description}",
+                license = @License(name = "Apache 2.0", url = "https://foo.bar"),
+                contact = @Contact(url = "https://gigantic-server.com", name = "Fred", email = "Fred@gigagantic-server.com")
+        )
+)
+@OpenAPIInclude(
+        classes = { io.micronaut.security.endpoints.LoginController.class, io.micronaut.security.endpoints.LogoutController.class },
+        tags = @Tag(name = "Security")
+)
+@OpenAPIInclude(
+        classes = io.micronaut.management.endpoint.env.EnvironmentEndpoint.class,
+        tags = @Tag(name = "Management"),
+        security = @SecurityRequirement(name = "BEARER", scopes = {"ADMIN"})
+)
+public class Application {
+
+    public static void main(String[] args) {
+        Micronaut.run(Application.class);
+    }
+}
+----

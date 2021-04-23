@@ -1,0 +1,27 @@
+To enable the processing of built-in endpoints (https://docs.micronaut.io/latest/guide/index.html#providedEndpoints), you have to expose `micronaut-management` as annotation processor and runtime dependency:
+
+dependency:micronaut-management[scope="annotationProcessor", version="{version}", groupId="io.micronaut"]
+
+dependency:micronaut-management[scope="implementation", version="{version}", groupId="io.micronaut"]
+
+and declare them in the <<propertiesFileConfiguration, openapi.properties>> file:
+
+----
+endpoints.enabled=true
+endpoints.tags=Management Endpoints
+endpoints.routes.class=io.micronaut.management.endpoint.routes.RoutesEndpoint
+endpoints.beans.class=io.micronaut.management.endpoint.beans.BeansEndpoint
+endpoints.health.class=io.micronaut.management.endpoint.health.HealthEndpoint
+endpoints.loggers.class=io.micronaut.management.endpoint.loggers.LoggersEndpoint
+endpoints.refresh.class=io.micronaut.management.endpoint.refresh.RefreshEndpoint
+----
+
+The syntax is the following: `endpoints.<name>.class=<full class name of the endpoint>` where `name` is an arbitrary name.
+You can also add some tags, servers and security requirements to each endpoint:
+
+----
+endpoints.refresh.class=io.micronaut.management.endpoint.refresh.RefreshEndpoint
+endpoints.refresh.servers=[{"url": "https://staging.gigantic-server.com/v1", "description": "Staging server"}]
+endpoints.refresh.security-requirements=[{"petstore_auth": ["write:pets", "read:pets"]}]
+
+----

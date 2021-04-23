@@ -1,6 +1,6 @@
-If you wish to expose the generated Swagger output from your running application you can simply add the necessary static resource configuration to src/main/resources/application.yml. For example:
+If you wish to expose the generated OpenAPI yaml output from your running application you can simply add the necessary static resource configuration to `src/main/resources/application.yml`. For example:
 
-.Exposing Swagger YAML
+.Exposing OpenAPI YAML
 [source,yaml]
 ----
 micronaut:
