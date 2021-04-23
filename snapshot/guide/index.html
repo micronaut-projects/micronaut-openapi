@@ -49,29 +49,29 @@
                                 
                                 <div class="toc-item" style="margin-left:0"><a href="#cli"><strong>3</strong><span>Using the Micronaut CLI</span></a></div>
                                 
-                                <div class="toc-item" style="margin-left:0"><a href="#gettingStarted"><strong>4</strong><span>Getting Started with Swagger</span></a></div>
+                                <div class="toc-item" style="margin-left:0"><a href="#gettingStarted"><strong>4</strong><span>Dependencies</span></a></div>
                                 
                                 <div class="toc-item" style="margin-left:0"><a href="#openApiDefinition"><strong>5</strong><span>OpenAPI Definition</span></a></div>
                                 
-                                <div class="toc-item" style="margin-left:0"><a href="#configuration"><strong>6</strong><span>Open API Processing Options</span></a></div>
+                                <div class="toc-item" style="margin-left:0"><a href="#configuration"><strong>6</strong><span>OpenAPI Processing Options</span></a></div>
                                 
                                 <div class="toc-item" style="margin-left:0"><a href="#exposingSwaggerOutput"><strong>7</strong><span>Exposing Swagger Output</span></a></div>
                                 
-                                <div class="toc-item" style="margin-left:0"><a href="#openApiViews"><strong>8</strong><span>Generating OpenAPI Views</span></a></div>
+                                <div class="toc-item" style="margin-left:0"><a href="#controllers"><strong>8</strong><span>OpenAPI Generation for Controllers</span></a></div>
                                 
-                                <div class="toc-item" style="margin-left:0"><a href="#endpoints"><strong>9</strong><span>Exposing Endpoints</span></a></div>
+                                <div class="toc-item" style="margin-left:0"><a href="#namingstrategy"><strong>9</strong><span>Naming Strategy</span></a></div>
                                 
-                                <div class="toc-item" style="margin-left:0"><a href="#controllersAndSwaggerAnnotations"><strong>10</strong><span>Controllers and Swagger Annotations</span></a></div>
+                                <div class="toc-item" style="margin-left:0"><a href="#swaggerAnnotations"><strong>10</strong><span>Swagger Annotations</span></a></div>
                                 
-                                <div class="toc-item" style="margin-left:0"><a href="#schemasAndPojos"><strong>11</strong><span>Schemas and POJOs</span></a></div>
+                                <div class="toc-item" style="margin-left:0"><a href="#endpoints"><strong>11</strong><span>Exposing Endpoints</span></a></div>
                                 
-                                <div class="toc-item" style="margin-left:0"><a href="#schemasAndMetaAnnotations"><strong>12</strong><span>Schemas and Meta Annotations</span></a></div>
+                                <div class="toc-item" style="margin-left:0"><a href="#annotationConfiguration"><strong>12</strong><span>Annotation Configuration</span></a></div>
                                 
-                                <div class="toc-item" style="margin-left:0"><a href="#schemasAndGenerics"><strong>13</strong><span>Schemas and Generics</span></a></div>
+                                <div class="toc-item" style="margin-left:0"><a href="#mergingSchemas"><strong>13</strong><span>Merging Schemas</span></a></div>
                                 
-                                <div class="toc-item" style="margin-left:0"><a href="#mergingSchemas"><strong>14</strong><span>Merging Schemas</span></a></div>
+                                <div class="toc-item" style="margin-left:0"><a href="#openApiViews"><strong>14</strong><span>Generating OpenAPI Views</span></a></div>
                                 
-                                <div class="toc-item" style="margin-left:0"><a href="#oauth2"><strong>15</strong><span>Swagger UI - OAuth 2.0 configuration</span></a></div>
+                                <div class="toc-item" style="margin-left:0"><a href="#serverContext"><strong>15</strong><span>Server Context</span></a></div>
                                 
                                 <div class="toc-item" style="margin-left:0"><a href="#repository"><strong>16</strong><span>Repository</span></a></div>
                                 
@@ -110,29 +110,73 @@
         
         <div class="toc-item" style="margin-left:0px" id="toc-item-cli"><a href="#cli"><strong>3</strong><span>Using the Micronaut CLI</span></a></div>
         
-        <div class="toc-item" style="margin-left:0px" id="toc-item-gettingStarted"><a href="#gettingStarted"><strong>4</strong><span>Getting Started with Swagger</span></a></div>
+        <div class="toc-item" style="margin-left:0px" id="toc-item-gettingStarted"><a href="#gettingStarted"><strong>4</strong><span>Dependencies</span></a></div>
         
         <div class="toc-item" style="margin-left:0px" id="toc-item-openApiDefinition"><a href="#openApiDefinition"><strong>5</strong><span>OpenAPI Definition</span></a></div>
         
-        <div class="toc-item" style="margin-left:0px" id="toc-item-configuration"><a href="#configuration"><strong>6</strong><span>Open API Processing Options</span></a></div>
+        <div class="toc-item" style="margin-left:0px" id="toc-item-configuration"><a href="#configuration"><strong>6</strong><span>OpenAPI Processing Options</span></a></div>
+        
+        <div class="toc-item" style="margin-left:10px" id="toc-item-propertiesFileConfiguration"><a href="#propertiesFileConfiguration"><strong>6.1</strong><span>Configuring OpenAPI Processing with a properties file</span></a></div>
+        
+        <div class="toc-item" style="margin-left:10px" id="toc-item-systemPropertyConfiguration"><a href="#systemPropertyConfiguration"><strong>6.2</strong><span>Configuring OpenAPI Processing with system properties</span></a></div>
         
         <div class="toc-item" style="margin-left:0px" id="toc-item-exposingSwaggerOutput"><a href="#exposingSwaggerOutput"><strong>7</strong><span>Exposing Swagger Output</span></a></div>
         
-        <div class="toc-item" style="margin-left:0px" id="toc-item-openApiViews"><a href="#openApiViews"><strong>8</strong><span>Generating OpenAPI Views</span></a></div>
+        <div class="toc-item" style="margin-left:0px" id="toc-item-controllers"><a href="#controllers"><strong>8</strong><span>OpenAPI Generation for Controllers</span></a></div>
         
-        <div class="toc-item" style="margin-left:0px" id="toc-item-endpoints"><a href="#endpoints"><strong>9</strong><span>Exposing Endpoints</span></a></div>
+        <div class="toc-item" style="margin-left:0px" id="toc-item-namingstrategy"><a href="#namingstrategy"><strong>9</strong><span>Naming Strategy</span></a></div>
         
-        <div class="toc-item" style="margin-left:0px" id="toc-item-controllersAndSwaggerAnnotations"><a href="#controllersAndSwaggerAnnotations"><strong>10</strong><span>Controllers and Swagger Annotations</span></a></div>
+        <div class="toc-item" style="margin-left:0px" id="toc-item-swaggerAnnotations"><a href="#swaggerAnnotations"><strong>10</strong><span>Swagger Annotations</span></a></div>
         
-        <div class="toc-item" style="margin-left:0px" id="toc-item-schemasAndPojos"><a href="#schemasAndPojos"><strong>11</strong><span>Schemas and POJOs</span></a></div>
+        <div class="toc-item" style="margin-left:10px" id="toc-item-schemasAndPojos"><a href="#schemasAndPojos"><strong>10.1</strong><span>Schemas and POJOs</span></a></div>
         
-        <div class="toc-item" style="margin-left:0px" id="toc-item-schemasAndMetaAnnotations"><a href="#schemasAndMetaAnnotations"><strong>12</strong><span>Schemas and Meta Annotations</span></a></div>
+        <div class="toc-item" style="margin-left:10px" id="toc-item-schemasAndMetaAnnotations"><a href="#schemasAndMetaAnnotations"><strong>10.2</strong><span>Schemas and Meta Annotations</span></a></div>
         
-        <div class="toc-item" style="margin-left:0px" id="toc-item-schemasAndGenerics"><a href="#schemasAndGenerics"><strong>13</strong><span>Schemas and Generics</span></a></div>
+        <div class="toc-item" style="margin-left:10px" id="toc-item-schemasAndGenerics"><a href="#schemasAndGenerics"><strong>10.3</strong><span>Schemas and Generics</span></a></div>
         
-        <div class="toc-item" style="margin-left:0px" id="toc-item-mergingSchemas"><a href="#mergingSchemas"><strong>14</strong><span>Merging Schemas</span></a></div>
+        <div class="toc-item" style="margin-left:0px" id="toc-item-endpoints"><a href="#endpoints"><strong>11</strong><span>Exposing Endpoints</span></a></div>
         
-        <div class="toc-item" style="margin-left:0px" id="toc-item-oauth2"><a href="#oauth2"><strong>15</strong><span>Swagger UI - OAuth 2.0 configuration</span></a></div>
+        <div class="toc-item" style="margin-left:10px" id="toc-item-enableendpoints"><a href="#enableendpoints"><strong>11.1</strong><span>Enable Endpoints</span></a></div>
+        
+        <div class="toc-item" style="margin-left:10px" id="toc-item-endpointstags"><a href="#endpointstags"><strong>11.2</strong><span>Endpoints Tags</span></a></div>
+        
+        <div class="toc-item" style="margin-left:10px" id="toc-item-micronautendpoints"><a href="#micronautendpoints"><strong>11.3</strong><span>Micronaut Built-In Endpoints</span></a></div>
+        
+        <div class="toc-item" style="margin-left:10px" id="toc-item-endpointservers"><a href="#endpointservers"><strong>11.4</strong><span>Endpoints Servers</span></a></div>
+        
+        <div class="toc-item" style="margin-left:10px" id="toc-item-endpointssecurityrequirements"><a href="#endpointssecurityrequirements"><strong>11.5</strong><span>Endpoints Security Requirements</span></a></div>
+        
+        <div class="toc-item" style="margin-left:10px" id="toc-item-endpointspath"><a href="#endpointspath"><strong>11.6</strong><span>Endpoints Path</span></a></div>
+        
+        <div class="toc-item" style="margin-left:0px" id="toc-item-annotationConfiguration"><a href="#annotationConfiguration"><strong>12</strong><span>Annotation Configuration</span></a></div>
+        
+        <div class="toc-item" style="margin-left:10px" id="toc-item-openapiinclude"><a href="#openapiinclude"><strong>12.1</strong><span>@OpenAPIInclude</span></a></div>
+        
+        <div class="toc-item" style="margin-left:10px" id="toc-item-openapimanagement"><a href="#openapimanagement"><strong>12.2</strong><span>@OpenAPIManagement</span></a></div>
+        
+        <div class="toc-item" style="margin-left:10px" id="toc-item-openapisecurity"><a href="#openapisecurity"><strong>12.3</strong><span>@OpenAPISecurity</span></a></div>
+        
+        <div class="toc-item" style="margin-left:0px" id="toc-item-mergingSchemas"><a href="#mergingSchemas"><strong>13</strong><span>Merging Schemas</span></a></div>
+        
+        <div class="toc-item" style="margin-left:0px" id="toc-item-openApiViews"><a href="#openApiViews"><strong>14</strong><span>Generating OpenAPI Views</span></a></div>
+        
+        <div class="toc-item" style="margin-left:10px" id="toc-item-mappingPath"><a href="#mappingPath"><strong>14.1</strong><span>Mapping Path</span></a></div>
+        
+        <div class="toc-item" style="margin-left:10px" id="toc-item-viewsGenerationWithPropertiesFile"><a href="#viewsGenerationWithPropertiesFile"><strong>14.2</strong><span>Enable Views Generation with a properties file</span></a></div>
+        
+        <div class="toc-item" style="margin-left:10px" id="toc-item-viewsGenerationWithSystemProperties"><a href="#viewsGenerationWithSystemProperties"><strong>14.3</strong><span>Enable Views Generation with system properties</span></a></div>
+        
+        <div class="toc-item" style="margin-left:10px" id="toc-item-swaggerui"><a href="#swaggerui"><strong>14.4</strong><span>Swagger-UI</span></a></div>
+        
+        <div class="toc-item" style="margin-left:20px" id="toc-item-oauth2"><a href="#oauth2"><strong>14.4.1</strong><span>Swagger UI - OAuth 2.0 configuration</span></a></div>
+        
+        <div class="toc-item" style="margin-left:10px" id="toc-item-redoc"><a href="#redoc"><strong>14.5</strong><span>Redoc</span></a></div>
+        
+        <div class="toc-item" style="margin-left:10px" id="toc-item-rapidoc"><a href="#rapidoc"><strong>14.6</strong><span>RapiDoc</span></a></div>
+        
+        <div class="toc-item" style="margin-left:10px" id="toc-item-rapipdf"><a href="#rapipdf"><strong>14.7</strong><span>RapiPdf</span></a></div>
+        
+        <div class="toc-item" style="margin-left:0px" id="toc-item-serverContext"><a href="#serverContext"><strong>15</strong><span>Server Context</span></a></div>
         
         <div class="toc-item" style="margin-left:0px" id="toc-item-repository"><a href="#repository"><strong>16</strong><span>Repository</span></a></div>
         
@@ -158,10 +202,10 @@
 
 
 <div class="paragraph">
-<p>Micronaut includes support for producing OpenAPI (Swagger) YAML at compilation time. Micronaut will at compile time produce a Swagger 3.x compliant YAML file just based on the regular Micronaut annotations and the javadoc comments within your code.</p>
+<p>Micronaut includes support for producing <a href="https://www.openapis.org">OpenAPI</a> (Swagger) YAML at compilation time. Micronaut will at compile time produce a OpenAPI 3.x compliant YAML file just based on the regular Micronaut annotations and the javadoc comments within your code.</p>
 </div>
 <div class="paragraph">
-<p>You can customize the generated Swagger using the standard <a href="https://github.com/swagger-api/swagger-core/wiki/Swagger-3.X---Annotations">Swagger Annotations</a>.</p>
+<p>You can customize the generated Swagger using the standard <a href="#swaggerAnnotations">Swagger Annotations</a>.</p>
 </div>
 
 <h1 id="releaseHistory"><a class="anchor" href="#releaseHistory"></a>2 Release History</h1>
@@ -206,7 +250,7 @@
 <p>If you have already created a Micronaut project and will like to add Swagger support, you can simply follow instructions in subsequent sections.</p>
 </div>
 
-<h1 id="gettingStarted"><a class="anchor" href="#gettingStarted"></a>4 Getting Started with Swagger</h1>
+<h1 id="gettingStarted"><a class="anchor" href="#gettingStarted"></a>4 Dependencies</h1>
 
 <div class='contribute-btn'>
     <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master
@@ -217,7 +261,7 @@
 
 
 <div class="paragraph">
-<p>To enable this support you should add the following dependencies to your build configuration:</p>
+<p>To get started add Micronaut&#8217;s <code>openapi</code> to the annotation processor scope of your build configuration:</p>
 </div>
 <div class="paragraph">
 <p>        <div class="listingblock multi-language-sample">
@@ -240,38 +284,6 @@
 </div>
 </p>
 </div>
-<div class="paragraph">
-<p>Then the following compile time dependency:</p>
-</div>
-<div class="paragraph">
-<p>        <div class="listingblock multi-language-sample">
-<div class="title"></div>
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="gradle">implementation(<span class="hljs-string">"io.swagger.core.v3:swagger-annotations")</span></code></pre>
-</div>
-</div>
-<div class="listingblock multi-language-sample">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="maven">&lt;dependency&gt;
-    &lt;groupId&gt;io.swagger.core.v3&lt;/groupId&gt;
-    &lt;artifactId&gt;swagger-annotations&lt;/artifactId&gt;
-&lt;/dependency&gt;</code></pre>
-</div>
-</div>
-</p>
-</div>
-<div class="colist arabic">
-<table>
-<tr>
-<td><i class="conum" data-value="1"></i><b>1</b></td>
-<td>The <code>openapi</code> configuration gets added into the annotation processor scope</td>
-</tr>
-<tr>
-<td><i class="conum" data-value="2"></i><b>2</b></td>
-<td>The <a href="https://github.com/swagger-api/swagger-core/wiki/Swagger-2.X---Annotations">Swagger Annotations</a> are added to the compile classpath</td>
-</tr>
-</table>
-</div>
 <div class="admonitionblock note">
 <table>
 <tr>
@@ -283,6 +295,27 @@ For Kotlin the <code>openapi</code> dependency should be in the <code>kapt</code
 </td>
 </tr>
 </table>
+</div>
+<div class="paragraph">
+<p>To use the <a href="https://github.com/swagger-api/swagger-core/wiki/Swagger-2.X---Annotations">Swagger Annotations</a> add them to the compile classpath</p>
+</div>
+<div class="paragraph">
+<p>        <div class="listingblock multi-language-sample">
+<div class="title"></div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="gradle">implementation(<span class="hljs-string">"io.swagger.core.v3:swagger-annotations:2.4.0-SNAPSHOT")</span></code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="maven">&lt;dependency&gt;
+    &lt;groupId&gt;io.swagger.core.v3&lt;/groupId&gt;
+    &lt;artifactId&gt;swagger-annotations&lt;/artifactId&gt;
+    &lt;version&gt;2.4.0-SNAPSHOT&lt;/version&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+</p>
 </div>
 
 <h1 id="openApiDefinition"><a class="anchor" href="#openApiDefinition"></a>5 OpenAPI Definition</h1>
@@ -377,7 +410,7 @@ object Application {
 </div>
 </div>
 <div class="paragraph">
-<p>With that in place, you compile your project and a Swagger YAML file will be generated to the <code>META-INF/swagger</code> directory of your project&#8217;s class output. For example, the above configuration generates:</p>
+<p>With that in place, you compile your project and a OpenAPI YAML file will be generated to the <code>META-INF/swagger</code> directory of your project&#8217;s class output. For example, the above configuration generates:</p>
 </div>
 <div class="ulist">
 <ul>
@@ -393,7 +426,7 @@ object Application {
 <p>The previously defined annotations will produce YAML like the following:</p>
 </div>
 <div class="listingblock">
-<div class="title">Generated Swagger YAML</div>
+<div class="title">Generated OpenAPI YAML</div>
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">openapi: 3.0.1
 info:
@@ -410,7 +443,7 @@ info:
 </div>
 </div>
 
-<h1 id="configuration"><a class="anchor" href="#configuration"></a>6 Open API Processing Options</h1>
+<h1 id="configuration"><a class="anchor" href="#configuration"></a>6 OpenAPI Processing Options</h1>
 
 <div class='contribute-btn'>
     <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master
@@ -421,29 +454,33 @@ info:
 
 
 <div class="paragraph">
-<p>In the following chapters you will see it is possible to tweak the open api processing via system properties. It is also possible to specify these options in
-a file located at the root level of your project directory. The expected filename is <code>openapi.properties</code>.</p>
+<p>It is possible to tweak the OpenAPI processing with system properties or with a properties file. Options specified with system properties have priority over those defined in the <code>openapi.properties</code> file.</p>
+</div>
+
+<h2 id="propertiesFileConfiguration"><a class="anchor" href="#propertiesFileConfiguration"></a>6.1 Configuring OpenAPI Processing with a properties file</h2>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master
+/src/main/docs/guide/configuration/propertiesFileConfiguration.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>You can specify OpenAPI processing configuration in a file located at the root level of your project directory. The expected filename is <code>openapi.properties</code>.</p>
 </div>
 <div class="paragraph">
 <p>It is possible to specify a different location and filename with the <code>micronaut.openapi.config.file</code> System property.</p>
-</div>
-<div class="paragraph">
-<p>Options specified with System properties have priority over the one defined in the <code>openapi.properties</code> file.</p>
 </div>
 <div class="listingblock">
 <div class="title">openapi.properties Example</div>
 <div class="content">
 <pre class="highlightjs highlight"><code>micronaut.openapi.property.naming.strategy=KEBAB_CASE
 micronaut.openapi.target.file=myspecfile.yml
-
-swagger-ui.enabled=true
-
-redoc.enabled=true
-
-rapidoc.enabled=true
-rapidoc.bg-color=#14191f
-rapidoc.text-color=#aec2e0
-rapidoc.sort-endpoints-by=method</code></pre>
+...
+..
+.</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -457,7 +494,7 @@ micronaut.openapi.expand.openapi.description=A nice API</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>And:</p>
+<p>The following example shows how to use the previous <code>micronaut.openapi.exapand</code> properties:</p>
 </div>
 <div class="listingblock">
 <div class="title">Application Simple Application</div>
@@ -500,6 +537,65 @@ info:
 </div>
 </div>
 
+<h2 id="systemPropertyConfiguration"><a class="anchor" href="#systemPropertyConfiguration"></a>6.2 Configuring OpenAPI Processing with system properties</h2>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master
+/src/main/docs/guide/configuration/systemPropertyConfiguration.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>It is possible to tweak the OpenAPI processing via system properties.</p>
+</div>
+<div class="paragraph">
+<p>For instance in gradle:</p>
+</div>
+<div class="listingblock">
+<div class="title">Gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">tasks.withType(JavaCompile) {
+    options.fork = true
+    options.forkOptions.jvmArgs &lt;&lt; '-Dmicronaut.openapi.property.naming.strategy=SNAKE_CASE'
+
+    ...
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>or in gradle.properties</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>org.gradle.jvmargs=-Dmicronaut.openapi.property.naming.strategy=SNAKE_CASE</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>or in maven:</p>
+</div>
+<div class="listingblock">
+<div class="title">Maven</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;build&gt;
+    &lt;plugins&gt;
+        &lt;plugin&gt;
+            &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;
+            &lt;artifactId&gt;maven-compiler-plugin&lt;/artifactId&gt;
+            &lt;configuration&gt;
+                &lt;fork&gt;true&lt;/fork&gt;
+                &lt;compilerArgs&gt;
+                    &lt;arg&gt;-J-Dmicronaut.openapi.property.naming.strategy=SNAKE_CASE&lt;/arg&gt;
+                    ...
+                &lt;/compilerArgs&gt;
+            &lt;/configuration&gt;
+        &lt;/plugin&gt;
+    &lt;/plugins&gt;
+&lt;/build&gt;</code></pre>
+</div>
+</div>
+
 <h1 id="exposingSwaggerOutput"><a class="anchor" href="#exposingSwaggerOutput"></a>7 Exposing Swagger Output</h1>
 
 <div class='contribute-btn'>
@@ -511,10 +607,10 @@ info:
 
 
 <div class="paragraph">
-<p>If you wish to expose the generated Swagger output from your running application you can simply add the necessary static resource configuration to src/main/resources/application.yml. For example:</p>
+<p>If you wish to expose the generated OpenAPI yaml output from your running application you can simply add the necessary static resource configuration to <code>src/main/resources/application.yml</code>. For example:</p>
 </div>
 <div class="listingblock">
-<div class="title">Exposing Swagger YAML</div>
+<div class="title">Exposing OpenAPI YAML</div>
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">micronaut:
     router:
@@ -528,545 +624,11 @@ info:
 <p>With the above configuration in place when you run your application you can access your Swagger documentation at <code><a href="http://localhost:8080/swagger/hello-world-0.0.yml" class="bare">http://localhost:8080/swagger/hello-world-0.0.yml</a></code>.</p>
 </div>
 
-<h1 id="openApiViews"><a class="anchor" href="#openApiViews"></a>8 Generating OpenAPI Views</h1>
+<h1 id="controllers"><a class="anchor" href="#controllers"></a>8 OpenAPI Generation for Controllers</h1>
 
 <div class='contribute-btn'>
     <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master
-/src/main/docs/guide/openApiViews.adoc"'>
-        <i class='fa fa-pencil-square-o'></i> Improve this doc
-    </button>
-</div>
-
-
-<div class="paragraph">
-<p>Micronaut can generate views for your generated OpenApi specification. Currently <a href="https://github.com/swagger-api/swagger-ui">Swagger-ui</a>, <a href="https://github.com/Rebilly/ReDoc">Redoc</a> and <a href="https://github.com/mrin9/RapiDoc">RapiDoc</a> are supported.
-You can also use <a href="https://mrin9.github.io/RapiPdf/">RapiPdf</a> to generate a PDF from your spec file.</p>
-</div>
-<div class="paragraph">
-<p>The resources needed to render the views (javascript, css, &#8230;&#8203;) are loaded from CDNs: <a href="https://unpkg.com">unpkg.com</a> and <a href="https://fonts.googleapis.com/">fonts.googleapis.com</a>.</p>
-</div>
-<div class="paragraph">
-<p>By default the generation of views is disabled. To turn it on you have to set the following system property <code>micronaut.openapi.views.spec</code>.
-The string syntax is a series of comma-separated key-value pairs, to enable and configure the views.</p>
-</div>
-<div class="listingblock">
-<div class="title">System Property</div>
-<div class="content">
-<pre class="highlightjs highlight"><code>micronaut.openapi.views.spec=redoc.enabled=true,rapidoc.enabled=true,swagger-ui.enabled=true,swagger-ui.theme=flattop</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>For instance in Gradle for Kotlin projects:</p>
-</div>
-<div class="listingblock">
-<div class="title">Gradle</div>
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">JAVA_TOOL_OPTIONS=-Dmicronaut.openapi.views.spec=redoc.enabled=true,rapidoc.enabled=true,swagger-ui.enabled=true,swagger-ui.theme=flattop \
-        ./gradlew --no-daemon clean assemble</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>or in gradle.properties:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">org.gradle.jvmargs=-Dmicronaut.openapi.views.spec=redoc.enabled=true,rapidoc.enabled=true,swagger-ui.enabled=true,swagger-ui.theme=flattop</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>or in build.gradle as well:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">kapt {
-    arguments {
-        arg("micronaut.openapi.views.spec", "redoc.enabled=true,rapidoc.enabled=true,swagger-ui.enabled=true,swagger-ui.theme=flattop")
-    }
-}</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>or in Gradle for Java projects:</p>
-</div>
-<div class="listingblock">
-<div class="title">Gradle</div>
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">tasks.withType(JavaCompile) {
-    options.fork = true
-    options.forkOptions.jvmArgs &lt;&lt; '-Dmicronaut.openapi.views.spec=rapidoc.enabled=true,swagger-ui.enabled=true,swagger-ui.theme=flattop'
-
-    ...
-}</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>or in Gradle for Groovy projects:</p>
-</div>
-<div class="listingblock">
-<div class="title">Gradle</div>
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">tasks.withType(GroovyCompile) {
-    groovyOptions.forkOptions.jvmArgs.add('-Dgroovy.parameters=true')
-    groovyOptions.forkOptions.jvmArgs.add('-Dmicronaut.openapi.views.spec=rapidoc.enabled=true,swagger-ui.enabled=true,swagger-ui.theme=flattop')
-    ...
-}</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>or in Maven:</p>
-</div>
-<div class="listingblock">
-<div class="title">Maven</div>
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;build&gt;
-    &lt;plugins&gt;
-        &lt;plugin&gt;
-            &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;
-            &lt;artifactId&gt;maven-compiler-plugin&lt;/artifactId&gt;
-            &lt;configuration&gt;
-                &lt;fork&gt;true&lt;/fork&gt;
-                &lt;compilerArgs&gt;
-                    &lt;arg&gt;-J-Dmicronaut.openapi.views.spec=rapidoc.enabled=true,swagger-ui.enabled=true,swagger-ui.theme=flattop&lt;/arg&gt;
-                    ...
-                &lt;/compilerArgs&gt;
-            &lt;/configuration&gt;
-        &lt;/plugin&gt;
-    &lt;/plugins&gt;
-&lt;/build&gt;</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>or in Maven with Groovy:</p>
-</div>
-<div class="listingblock">
-<div class="title">Maven + Groovy</div>
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;build&gt;
-    &lt;plugins&gt;
-        &lt;plugin&gt;
-        &lt;groupId&gt;org.codehaus.mojo&lt;/groupId&gt;
-        &lt;artifactId&gt;properties-maven-plugin&lt;/artifactId&gt;
-        &lt;version&gt;1.0.0&lt;/version&gt;
-        &lt;executions&gt;
-          &lt;execution&gt;
-            &lt;goals&gt;
-              &lt;goal&gt;set-system-properties&lt;/goal&gt;
-            &lt;/goals&gt;
-            &lt;configuration&gt;
-              &lt;properties&gt;
-                &lt;property&gt;
-                  &lt;name&gt;micronaut.openapi.views.spec&lt;/name&gt;
-                  &lt;value&gt;rapidoc.enabled=true,swagger-ui.enabled=true,swagger-ui.theme=flattop&lt;/value&gt;
-                &lt;/property&gt;
-              &lt;/properties&gt;
-            &lt;/configuration&gt;
-          &lt;/execution&gt;
-        &lt;/executions&gt;
-      &lt;/plugin&gt;
-    &lt;/plugins&gt;
-&lt;/build&gt;</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>The views will be generated to the <code>META-INF/swagger/views/[swagger-ui | redoc | rapidoc]</code> directory of your project’s class output.</p>
-</div>
-<div class="paragraph">
-<p>The following properties are supported:</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p><code>mapping.path=[string]</code>: The path from where the swagger specification will be served by the http server. Default is <code>swagger</code>.</p>
-</li>
-<li>
-<p><code>redoc.enabled=[true | false]</code>: When 'true' the Redoc view is generated.</p>
-</li>
-<li>
-<p><code>rapidoc.enabled=[true | false]</code>: When 'true' the RapiDoc view is generated.</p>
-</li>
-<li>
-<p><code>swagger-ui.enabled=[true | false]</code>: When 'true' the Swagger-ui view is generated.</p>
-</li>
-<li>
-<p><code>redoc.version=[string]</code>: The version of Redoc to use. Default is to use the latest available.</p>
-</li>
-<li>
-<p><code>redoc.[expand-single-schema-field, expand-default-server-variables, menu-toggle, only-required-in-samples, payload-sample-idx, sort-props-alphabetically, untrusted-spec, expand-responses, show-extensions, native-scrollbars, path-in-middle-panel, suppress-warnings, hide-hostname, disable-search, json-sample-expand-level, scroll-y-offset, hide-download-button, no-auto-auth, theme, hide-single-request-sample-tab, required-props-first, hide-loading]</code>. See <a href="https://github.com/Redocly/redoc#redoc-options-object">Redoc Options</a> for a description.</p>
-</li>
-<li>
-<p><code>rapidoc.version=[string]</code>: The version of RapiDoc to use. Default is to use the latest available.</p>
-</li>
-<li>
-<p><code>rapidoc.[style, sort-tags, sort-endpoints-by, heading-text, goto-path, theme, bg-color, text-color, header-color, primary-color, regular-font, mono-font, font-size, nav-bg-color, nav-text-color, nav-hover-bg-color, nav-hover-text-color, nav-accent-color, nav-item-spacing, layout, render-style, schema-style, schema-expand-level, schema-description-expanded, default-schema-tab, response-area-height, show-info, info-description-headings-in-navbar, show-components, show-header, allow-authentication, allow-spec-url-load, allow-spec-file-load, allow-search, allow-try,  allow-server-selection, api-key-name, api-key-value, api-key-location, server-url, default-api-server]</code>. See <a href="https://mrin9.github.io/RapiDoc/api.html">RapiDoc Options</a> for a description.</p>
-</li>
-<li>
-<p><code>swagger-ui.version=[string]</code>: The version of Swagger-ui to use. Default is to use the latest available.</p>
-</li>
-<li>
-<p><code>swagger-ui.[displayOperationId, oauth2RedirectUrl, showMutatedRequest, deepLinking, supportedSubmitMethods, defaultModelsExpandDepth, layout, defaultModelRendering, docExpansion, filter, validatorUrl, showCommonExtensions, maxDisplayedTags, withCredentials, displayRequestDuration, showExtensions, operationsSorter, tagsSorter]</code>. See <a href="https://github.com/swagger-api/swagger-ui/blob/HEAD/docs/usage/configuration.md">Swagger UI Configuration</a> for a description.</p>
-</li>
-<li>
-<p><code>swagger-ui.theme=[DEFAULT | MATERIAL | FEELING_BLUE | FLATTOP | MONOKAI | MUTED | NEWSPAPER | OUTLINE]</code>: The theme of swagger-ui to use. These are case insensitive. Default is <code>DEFAULT</code>. See <a href="https://github.com/ostranme/swagger-ui-themes">Swagger UI Themes</a>.</p>
-</li>
-<li>
-<p><code>swagger-ui.oauth2.[clientId, clientSecret, realm, appName, scopeSeparator, scopes, additionalQueryStringParams, useBasicAuthenticationWithAccessCodeGrant, usePkceWithAuthorizationCodeGrant]</code>. See <a href="https://github.com/swagger-api/swagger-ui/blob/HEAD/docs/usage/oauth2.md">Swagger UI OAuth 2.0 configuration</a> for more information.</p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p>Views also supports RapiPdf, to enable it use <code>rapipdf.enabled=true</code>.
-It will add a button to the view to generate a PDF from the spec file.</p>
-</div>
-<div class="paragraph">
-<p>RapiPdf supports the following options:</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p><code>rapipdf.[include-api-details, pdf-title, include-api-list, include-security, input-bg, hide-input, pdf-footer-text, button-bg, pdf-primary-color, pdf-schema-style, button-label, pdf-alternate-color, include-info, include-toc, button-color, style, input-color]</code>. See <a href="https://mrin9.github.io/RapiPdf/">RapiPdf Attributes</a> for a description.</p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p>To expose the views, you also must expose the generated <code>yaml</code>:</p>
-</div>
-<div class="listingblock">
-<div class="title">Exposing Swagger YAML And Views</div>
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">micronaut:
-    router:
-        static-resources:
-            swagger:
-                paths: classpath:META-INF/swagger
-                mapping: /swagger/**
-            redoc:
-                paths: classpath:META-INF/swagger/views/redoc
-                mapping: /redoc/**
-            rapidoc:
-                paths: classpath:META-INF/swagger/views/rapidoc
-                mapping: /rapidoc/**
-            swagger-ui:
-                paths: classpath:META-INF/swagger/views/swagger-ui
-                mapping: /swagger-ui/**</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>With the above configuration in place when you run your application you can access your Swagger documentation at http://localhost:8080/[redoc|rapidoc|swagger-ui].
-By default the views expect to find the <code>yaml</code> under <code>/swagger</code>, if you change this mapping to something else:</p>
-</div>
-<div class="listingblock">
-<div class="title">Exposing Swagger YAML</div>
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">micronaut:
-    router:
-        static-resources:
-            swagger:
-                paths: classpath:META-INF/swagger
-                mapping: /swaggerYAML/**
-....</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>You will need to set the <code>mapping.path</code> property accordingly: <code>micronaut.openapi.views.spec=mapping.path=swaggerYAML&#8230;&#8203;</code>.</p>
-</div>
-<div class="sect1">
-<h2 id="_server_context_path">Server Context Path</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>In micronaut configuration file you can define a server context path (with <code>micronaut.server.context-path</code>) which serves as a base path for all routes.
-Since the yaml specification file and the views are generated at compile time, these resources are not aware of this runtime setting.</p>
-</div>
-<div class="paragraph">
-<p>It is still possible for the views to work in case a context path is defined:
-* Set <code>micronaut.openapi.server.context.path</code> property for compile time resolution,
-* Use a <code>HttpServerFilter</code> that will add a cookie, or
-* Add a parameter to the url.</p>
-</div>
-<div class="paragraph">
-<p>The view will first look for the cookie and if not present for the parameter.</p>
-</div>
-<div class="sect2">
-<h3 id="_compile_time_resolution">Compile Time Resolution</h3>
-<div class="paragraph">
-<p>Either set <code>micronaut.openapi.server.context.path</code> as a System Property or in <code>openapi.properties</code>, then all paths will be prepend with the
-specified value at compile time.</p>
-</div>
-<div class="paragraph">
-<p>If you want the resolution of the context path at runtime use one of the following methods:</p>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_httpserverfilter">HttpServerFilter</h3>
-<div class="paragraph">
-<p>Create a <code>HttpServerFilter</code> that will add a cookie with name <code>contextPath</code>.</p>
-</div>
-<div class="listingblock">
-<div class="title">HttpServerFilter for context-path</div>
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import java.time.Duration;
-
-import org.reactivestreams.Publisher;
-
-import io.micronaut.context.annotation.Requires;
-import io.micronaut.context.annotation.Value;
-import io.micronaut.core.async.publisher.Publishers;
-import io.micronaut.http.HttpMethod;
-import io.micronaut.http.HttpRequest;
-import io.micronaut.http.MutableHttpResponse;
-import io.micronaut.http.annotation.Filter;
-import io.micronaut.http.cookie.Cookie;
-import io.micronaut.http.filter.HttpServerFilter;
-import io.micronaut.http.filter.ServerFilterChain;
-
-@Requires(property = "micronaut.server.context-path")
-@Filter(methods = {HttpMethod.GET, HttpMethod.HEAD}, patterns = {"/**/rapidoc*", "/**/redoc*", "/**/swagger-ui*"})
-public class OpenApiViewCookieContextPathFilter implements HttpServerFilter {
-    private final Cookie contextPathCookie;
-
-    OpenApiViewCookieContextPathFilter(@Value("${micronaut.server.context-path}") String contextPath) {
-        this.contextPathCookie = Cookie.of("contextPath", contextPath).maxAge(Duration.ofMinutes(2L));
-    }
-
-    @Override
-    public Publisher&lt;MutableHttpResponse&lt;?&gt;&gt; doFilter(HttpRequest&lt;?&gt; request, ServerFilterChain chain) {
-        return Publishers.map(chain.proceed(request), response -&gt; response.cookie(contextPathCookie));
-    }
-
-}</code></pre>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_url_parameter">URL Parameter</h3>
-<div class="paragraph">
-<p>Just add a parameter to the view url. For instance if the context path is set to <code>/context/path</code> you will access your view with <code><a href="http://localhost:8080/context/path/swagger-ui?contextPath=%2Fcontext%2Fpath" class="bare">http://localhost:8080/context/path/swagger-ui?contextPath=%2Fcontext%2Fpath</a></code>.</p>
-</div>
-</div>
-</div>
-</div>
-
-<h1 id="endpoints"><a class="anchor" href="#endpoints"></a>9 Exposing Endpoints</h1>
-
-<div class='contribute-btn'>
-    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master
-/src/main/docs/guide/endpoints.adoc"'>
-        <i class='fa fa-pencil-square-o'></i> Improve this doc
-    </button>
-</div>
-
-
-<div class="paragraph">
-<p>It is possible to expose management Endpoints in the openapi specification file.
-You need to exposed <code>micronaut-management</code> as annotation processor and runtime dependency:</p>
-</div>
-<div class="paragraph">
-<p>        <div class="listingblock multi-language-sample">
-<div class="title"></div>
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="gradle">annotationProcessor(<span class="hljs-string">"io.micronaut:micronaut-management:2.4.0-SNAPSHOT")</span></code></pre>
-</div>
-</div>
-<div class="listingblock multi-language-sample">
-<div class="title"></div>
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="maven">&lt;annotationProcessorPaths&gt;
-    &lt;path&gt;
-        &lt;groupId&gt;io.micronaut&lt;/groupId&gt;
-        &lt;artifactId&gt;micronaut-management&lt;/artifactId&gt;
-        &lt;version&gt;2.4.0-SNAPSHOT&lt;/version&gt;
-    &lt;/path&gt;
-&lt;/annotationProcessorPaths&gt;</code></pre>
-</div>
-</div>
-
-        <div class="listingblock multi-language-sample">
-<div class="title"></div>
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="gradle">implementation(<span class="hljs-string">"io.micronaut:micronaut-management:2.4.0-SNAPSHOT")</span></code></pre>
-</div>
-</div>
-<div class="listingblock multi-language-sample">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="maven">&lt;dependency&gt;
-    &lt;groupId&gt;io.micronaut&lt;/groupId&gt;
-    &lt;artifactId&gt;micronaut-management&lt;/artifactId&gt;
-    &lt;version&gt;2.4.0-SNAPSHOT&lt;/version&gt;
-&lt;/dependency&gt;</code></pre>
-</div>
-</div>
-</p>
-</div>
-<div class="sect1">
-<h2 id="_user_defined_endpoints">User Defined Endpoints</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>To process user defined endpoints simply add:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>endpoints.enabled=true</pre>
-</div>
-</div>
-<div class="paragraph">
-<p>in the <code>openapi.properties</code> file.</p>
-</div>
-<div class="sect2">
-<h3 id="_tags">Tags</h3>
-<div class="paragraph">
-<p>You can also provide some tags for all endpoints with the <code>endpoints.tags=&lt;comma separated list of tags&gt;</code> flag, for instance:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>endpoints.tags=Management Enpoints</pre>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_servers">Servers</h3>
-<div class="paragraph">
-<p>You can also provide some servers for all endpoints with the <code>endpoints.server=&lt;json array of io.swagger.v3.oas.models.servers.Server&gt;</code> flag, for instance:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>endpoints.servers=[ \
-    { \
-      "url": "https://{username}.gigantic-server.com:{port}/{basePath}", \
-      "description": "The production API server", \
-      "variables": { \
-        "username": { \
-          "default": "demo", \
-          "description": "this value is assigned by the service provider, in this example `gigantic-server.com`" \
-        }, \
-        "port": { \
-          "enum": [ \
-            "8443", \
-            "443" \
-          ], \
-          "default": "8443" \
-        }, \
-        "basePath": { \
-          "default": "v2" \
-        } \
-      } \
-    } \
-  ]</pre>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_security_requirements">Security Requirements</h3>
-<div class="paragraph">
-<p>You can also provide some security requirements for all endpoints with the <code>endpoints.security-requirements=&lt;json array of io.swagger.v3.oas.models.security.SecurityRequirement&gt;</code> flag, for instance:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>endpoints.security-requirements=[{"api_key": []}]</pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Don&#8217;t forget to declare the referenced <code>SecurityScheme</code>.</p>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_path">Path</h3>
-<div class="paragraph">
-<p>If you are using a custom path for your endpoints use <code>endpoints.path</code> to set it:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>endpoints.path=/endpoints</pre>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_micronaut_built_in_endpoints">Micronaut Built-In Endpoints</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>To enable the processing of built-in endpoints (<a href="https://docs.micronaut.io/latest/guide/index.html#providedEndpoints" class="bare">https://docs.micronaut.io/latest/guide/index.html#providedEndpoints</a>), you have to declare them in the
-<code>openapi.properties</code> file:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>endpoints.enabled=true
-endpoints.tags=Management Endpoints
-endpoints.routes.class=io.micronaut.management.endpoint.routes.RoutesEndpoint
-endpoints.beans.class=io.micronaut.management.endpoint.beans.BeansEndpoint
-endpoints.health.class=io.micronaut.management.endpoint.health.HealthEndpoint
-endpoints.loggers.class=io.micronaut.management.endpoint.loggers.LoggersEndpoint
-endpoints.refresh.class=io.micronaut.management.endpoint.refresh.RefreshEndpoint</pre>
-</div>
-</div>
-<div class="paragraph">
-<p>The syntax is the following: <code>endpoints.&lt;name&gt;.class=&lt;full class name of the endpoint&gt;</code> where <code>name</code> is an arbitrary name.
-You can also add some tags, servers and security requirements to each endpoint:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>endpoints.refresh.class=io.micronaut.management.endpoint.refresh.RefreshEndpoint
-endpoints.refresh.servers=[{"url": "https://staging.gigantic-server.com/v1", "description": "Staging server"}]
-endpoints.refresh.security-requirements=[{"petstore_auth": ["write:pets", "read:pets"]}]</pre>
-</div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_annotation_configuration">Annotation configuration</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>You can use <code>@io.micronaut.openapi.annotation.OpenAPIInclude</code> to include additional <code>io.micronaut.http.annotation.Controller</code> or
-<code>io.micronaut.management.endpoint.annotation.Endpoint</code> already compiled classes:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@OpenAPIDefinition(
-        info = @Info(
-                title = "Hello World",
-                version = "${api.version}",
-                description = "${openapi.description}",
-                license = @License(name = "Apache 2.0", url = "https://foo.bar"),
-                contact = @Contact(url = "https://gigantic-server.com", name = "Fred", email = "Fred@gigagantic-server.com")
-        )
-)
-@OpenAPIInclude(
-        classes = { io.micronaut.security.endpoints.LoginController.class, io.micronaut.security.endpoints.LogoutController.class },
-        tags = @Tag(name = "Security")
-)
-@OpenAPIInclude(
-        classes = io.micronaut.management.endpoint.env.EnvironmentEndpoint.class,
-        tags = @Tag(name = "Management"),
-        security = @SecurityRequirement(name = "BEARER", scopes = {"ADMIN"})
-)
-public class Application {
-
-    public static void main(String[] args) {
-        Micronaut.run(Application.class);
-    }
-}</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Additional annotations available to include all Micronaut build-in endpoints:</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p><code>io.micronaut.openapi.annotation.OpenAPISecurity</code> - adds security endpoints</p>
-</li>
-<li>
-<p><code>io.micronaut.openapi.annotation.OpenAPIManagement</code> - adds management endpoints</p>
-</li>
-</ul>
-</div>
-</div>
-</div>
-
-<h1 id="controllersAndSwaggerAnnotations"><a class="anchor" href="#controllersAndSwaggerAnnotations"></a>10 Controllers and Swagger Annotations</h1>
-
-<div class='contribute-btn'>
-    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master
-/src/main/docs/guide/controllersAndSwaggerAnnotations.adoc"'>
+/src/main/docs/guide/controllers.adoc"'>
         <i class='fa fa-pencil-square-o'></i> Improve this doc
     </button>
 </div>
@@ -1179,7 +741,79 @@ paths:
 </div>
 </div>
 <div class="paragraph">
-<p>Notice how the javadoc comments are used to fill out the description of the API. If this is not desirable then you can take full control by augmenting your definition with Swagger annotations:</p>
+<p>Notice how the javadoc comments are used to fill out the description of the API.</p>
+</div>
+
+<h1 id="namingstrategy"><a class="anchor" href="#namingstrategy"></a>9 Naming Strategy</h1>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master
+/src/main/docs/guide/namingstrategy.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>You can control how the Schema property names are dumped by setting the <code>micronaut.openapi.property.naming.strategy</code> system property. It accepts one of
+the following <strong>jackson</strong>'s <code>PropertyNamingStrategy</code>:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>SNAKE_CASE</strong></p>
+</li>
+<li>
+<p><strong>UPPER_CAMEL_CASE</strong></p>
+</li>
+<li>
+<p><strong>LOWER_CAMEL_CASE</strong></p>
+</li>
+<li>
+<p><strong>LOWER_CASE</strong></p>
+</li>
+<li>
+<p><strong>KEBAB_CASE</strong>.</p>
+</li>
+</ul>
+</div>
+
+<h1 id="swaggerAnnotations"><a class="anchor" href="#swaggerAnnotations"></a>10 Swagger Annotations</h1>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master
+/src/main/docs/guide/swaggerAnnotations.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>You can take full control by augmenting your definition with <a href="https://github.com/swagger-api/swagger-core/wiki/Swagger-2.X---Annotations">Swagger Annotations</a>. <strong>Swagger annotations take precedence over javadoc</strong>.</p>
+</div>
+<div class="paragraph">
+<p>Add the Swagger annotations to the compile classpath</p>
+</div>
+<div class="paragraph">
+<p>        <div class="listingblock multi-language-sample">
+<div class="title"></div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="gradle">implementation(<span class="hljs-string">"io.swagger.core.v3:swagger-annotations:2.4.0-SNAPSHOT")</span></code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="maven">&lt;dependency&gt;
+    &lt;groupId&gt;io.swagger.core.v3&lt;/groupId&gt;
+    &lt;artifactId&gt;swagger-annotations&lt;/artifactId&gt;
+    &lt;version&gt;2.4.0-SNAPSHOT&lt;/version&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+</p>
+</div>
+<div class="paragraph">
+<p>and then annotate your controllers:</p>
 </div>
 <div class="listingblock multi-language-sample">
 <div class="content">
@@ -1330,66 +964,12 @@ paths:
           description: Person not found</code></pre>
 </div>
 </div>
-<div class="paragraph">
-<p>You can control how the Schema property names are dumped by setting the <code>micronaut.openapi.property.naming.strategy</code> system property. It accepts one of
-the following <strong>jackson</strong>'s <code>PropertyNamingStrategy</code>:
-- <strong>SNAKE_CASE</strong>,
-- <strong>UPPER_CAMEL_CASE</strong>,
-- <strong>LOWER_CAMEL_CASE</strong>,
-- <strong>LOWER_CASE</strong> and
-- <strong>KEBAB_CASE</strong>.</p>
-</div>
-<div class="paragraph">
-<p>For instance in gradle:</p>
-</div>
-<div class="listingblock">
-<div class="title">Gradle</div>
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">tasks.withType(JavaCompile) {
-    options.fork = true
-    options.forkOptions.jvmArgs &lt;&lt; '-Dmicronaut.openapi.property.naming.strategy=SNAKE_CASE'
 
-    ...
-}</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>or in gradle.properties</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>org.gradle.jvmargs=-Dmicronaut.openapi.property.naming.strategy=SNAKE_CASE</pre>
-</div>
-</div>
-<div class="paragraph">
-<p>or in maven:</p>
-</div>
-<div class="listingblock">
-<div class="title">Maven</div>
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;build&gt;
-    &lt;plugins&gt;
-        &lt;plugin&gt;
-            &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;
-            &lt;artifactId&gt;maven-compiler-plugin&lt;/artifactId&gt;
-            &lt;configuration&gt;
-                &lt;fork&gt;true&lt;/fork&gt;
-                &lt;compilerArgs&gt;
-                    &lt;arg&gt;-J-Dmicronaut.openapi.property.naming.strategy=SNAKE_CASE&lt;/arg&gt;
-                    ...
-                &lt;/compilerArgs&gt;
-            &lt;/configuration&gt;
-        &lt;/plugin&gt;
-    &lt;/plugins&gt;
-&lt;/build&gt;</code></pre>
-</div>
-</div>
-
-<h1 id="schemasAndPojos"><a class="anchor" href="#schemasAndPojos"></a>11 Schemas and POJOs</h1>
+<h2 id="schemasAndPojos"><a class="anchor" href="#schemasAndPojos"></a>10.1 Schemas and POJOs</h2>
 
 <div class='contribute-btn'>
     <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master
-/src/main/docs/guide/schemasAndPojos.adoc"'>
+/src/main/docs/guide/swaggerAnnotations/schemasAndPojos.adoc"'>
         <i class='fa fa-pencil-square-o'></i> Improve this doc
     </button>
 </div>
@@ -1402,7 +982,9 @@ generation of the Schema by using the <code>@Schema</code> annotation on your PO
 <div class="listingblock">
 <div class="title">Using the @Schema Annotation</div>
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Schema(name="MyPet", description="Pet description") <i class="conum" data-value="1"></i><b>(1)</b>
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import io.swagger.v3.oas.annotations.media.Schema;
+
+@Schema(name="MyPet", description="Pet description") <i class="conum" data-value="1"></i><b>(1)</b>
 class Pet {
     private PetType type;
     private int age;
@@ -1456,11 +1038,11 @@ enum PetType {
 </table>
 </div>
 
-<h1 id="schemasAndMetaAnnotations"><a class="anchor" href="#schemasAndMetaAnnotations"></a>12 Schemas and Meta Annotations</h1>
+<h2 id="schemasAndMetaAnnotations"><a class="anchor" href="#schemasAndMetaAnnotations"></a>10.2 Schemas and Meta Annotations</h2>
 
 <div class='contribute-btn'>
     <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master
-/src/main/docs/guide/schemasAndMetaAnnotations.adoc"'>
+/src/main/docs/guide/swaggerAnnotations/schemasAndMetaAnnotations.adoc"'>
         <i class='fa fa-pencil-square-o'></i> Improve this doc
     </button>
 </div>
@@ -1487,11 +1069,11 @@ enum PetType {
 <p>Then whenever <code>Pet</code> is used as a parameter you can annotate the parameter with <code>@MyAnn</code>.</p>
 </div>
 
-<h1 id="schemasAndGenerics"><a class="anchor" href="#schemasAndGenerics"></a>13 Schemas and Generics</h1>
+<h2 id="schemasAndGenerics"><a class="anchor" href="#schemasAndGenerics"></a>10.3 Schemas and Generics</h2>
 
 <div class='contribute-btn'>
     <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master
-/src/main/docs/guide/schemasAndGenerics.adoc"'>
+/src/main/docs/guide/swaggerAnnotations/schemasAndGenerics.adoc"'>
         <i class='fa fa-pencil-square-o'></i> Improve this doc
     </button>
 </div>
@@ -1537,7 +1119,365 @@ public Response&lt;Pet&gt; updatePet(Pet pet) {
 <p>In the above case the generated schema will be named <code>#/components/schemas/ResponseOfPet</code>.</p>
 </div>
 
-<h1 id="mergingSchemas"><a class="anchor" href="#mergingSchemas"></a>14 Merging Schemas</h1>
+<h1 id="endpoints"><a class="anchor" href="#endpoints"></a>11 Exposing Endpoints</h1>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master
+/src/main/docs/guide/endpoints.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>It is possible to expose management Endpoints in the openapi specification file.</p>
+</div>
+
+<h2 id="enableendpoints"><a class="anchor" href="#enableendpoints"></a>11.1 Enable Endpoints</h2>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master
+/src/main/docs/guide/endpoints/enableendpoints.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>To process user defined endpoints simply add:</p>
+</div>
+<div class="listingblock">
+<div class="title">openapi.properties</div>
+<div class="content">
+<pre>endpoints.enabled=true
+...
+..
+.</pre>
+</div>
+</div>
+
+<h2 id="endpointstags"><a class="anchor" href="#endpointstags"></a>11.2 Endpoints Tags</h2>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master
+/src/main/docs/guide/endpoints/endpointstags.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>You can also provide some tags for all endpoints with the <code>endpoints.tags=&lt;comma separated list of tags&gt;</code> flag, for instance:</p>
+</div>
+<div class="listingblock">
+<div class="title">openapi.properties</div>
+<div class="content">
+<pre>endpoints.tags=Management Enpoints</pre>
+</div>
+</div>
+
+<h2 id="micronautendpoints"><a class="anchor" href="#micronautendpoints"></a>11.3 Micronaut Built-In Endpoints</h2>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master
+/src/main/docs/guide/endpoints/micronautendpoints.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>To enable the processing of built-in endpoints (<a href="https://docs.micronaut.io/latest/guide/index.html#providedEndpoints" class="bare">https://docs.micronaut.io/latest/guide/index.html#providedEndpoints</a>), you have to expose <code>micronaut-management</code> as annotation processor and runtime dependency:</p>
+</div>
+<div class="paragraph">
+<p>        <div class="listingblock multi-language-sample">
+<div class="title"></div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="gradle">annotationProcessor(<span class="hljs-string">"io.micronaut:micronaut-management:2.4.0-SNAPSHOT")</span></code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="title"></div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="maven">&lt;annotationProcessorPaths&gt;
+    &lt;path&gt;
+        &lt;groupId&gt;io.micronaut&lt;/groupId&gt;
+        &lt;artifactId&gt;micronaut-management&lt;/artifactId&gt;
+        &lt;version&gt;2.4.0-SNAPSHOT&lt;/version&gt;
+    &lt;/path&gt;
+&lt;/annotationProcessorPaths&gt;</code></pre>
+</div>
+</div>
+</p>
+</div>
+<div class="paragraph">
+<p>        <div class="listingblock multi-language-sample">
+<div class="title"></div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="gradle">implementation(<span class="hljs-string">"io.micronaut:micronaut-management:2.4.0-SNAPSHOT")</span></code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="maven">&lt;dependency&gt;
+    &lt;groupId&gt;io.micronaut&lt;/groupId&gt;
+    &lt;artifactId&gt;micronaut-management&lt;/artifactId&gt;
+    &lt;version&gt;2.4.0-SNAPSHOT&lt;/version&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+</p>
+</div>
+<div class="paragraph">
+<p>and declare them in the <a href="#propertiesFileConfiguration">openapi.properties</a> file:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>endpoints.enabled=true
+endpoints.tags=Management Endpoints
+endpoints.routes.class=io.micronaut.management.endpoint.routes.RoutesEndpoint
+endpoints.beans.class=io.micronaut.management.endpoint.beans.BeansEndpoint
+endpoints.health.class=io.micronaut.management.endpoint.health.HealthEndpoint
+endpoints.loggers.class=io.micronaut.management.endpoint.loggers.LoggersEndpoint
+endpoints.refresh.class=io.micronaut.management.endpoint.refresh.RefreshEndpoint</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The syntax is the following: <code>endpoints.&lt;name&gt;.class=&lt;full class name of the endpoint&gt;</code> where <code>name</code> is an arbitrary name.
+You can also add some tags, servers and security requirements to each endpoint:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>endpoints.refresh.class=io.micronaut.management.endpoint.refresh.RefreshEndpoint
+endpoints.refresh.servers=[{"url": "https://staging.gigantic-server.com/v1", "description": "Staging server"}]
+endpoints.refresh.security-requirements=[{"petstore_auth": ["write:pets", "read:pets"]}]</pre>
+</div>
+</div>
+
+<h2 id="endpointservers"><a class="anchor" href="#endpointservers"></a>11.4 Endpoints Servers</h2>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master
+/src/main/docs/guide/endpoints/endpointservers.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>You can also provide some servers for all endpoints with the <code>endpoints.server=&lt;json array of io.swagger.v3.oas.models.servers.Server&gt;</code> flag, for instance:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>endpoints.servers=[ \
+    { \
+      "url": "https://{username}.gigantic-server.com:{port}/{basePath}", \
+      "description": "The production API server", \
+      "variables": { \
+        "username": { \
+          "default": "demo", \
+          "description": "this value is assigned by the service provider, in this example `gigantic-server.com`" \
+        }, \
+        "port": { \
+          "enum": [ \
+            "8443", \
+            "443" \
+          ], \
+          "default": "8443" \
+        }, \
+        "basePath": { \
+          "default": "v2" \
+        } \
+      } \
+    } \
+  ]</pre>
+</div>
+</div>
+
+<h2 id="endpointssecurityrequirements"><a class="anchor" href="#endpointssecurityrequirements"></a>11.5 Endpoints Security Requirements</h2>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master
+/src/main/docs/guide/endpoints/endpointssecurityrequirements.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>You can also provide some security requirements for all endpoints with the <code>endpoints.security-requirements=&lt;json array of io.swagger.v3.oas.models.security.SecurityRequirement&gt;</code> flag, for instance:</p>
+</div>
+<div class="listingblock">
+<div class="title">openapi.properties endpoints.security-requirement property</div>
+<div class="content">
+<pre>endpoints.security-requirements=[{"api_key": []}]
+...
+..
+.</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Don&#8217;t forget to declare the referenced <code>SecurityScheme</code>.</p>
+</div>
+
+<h2 id="endpointspath"><a class="anchor" href="#endpointspath"></a>11.6 Endpoints Path</h2>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master
+/src/main/docs/guide/endpoints/endpointspath.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>If you are using a custom path for your endpoints use <code>endpoints.path</code> to set it:</p>
+</div>
+<div class="listingblock">
+<div class="title">openapi.properties endpoints.path property</div>
+<div class="content">
+<pre>endpoints.path=/endpoints
+...
+..
+.</pre>
+</div>
+</div>
+
+<h1 id="annotationConfiguration"><a class="anchor" href="#annotationConfiguration"></a>12 Annotation Configuration</h1>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master
+/src/main/docs/guide/annotationConfiguration.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>Serveral annotations (<a href="../api/io/micronaut/openapi/annotation/OpenAPIInclude.html">OpenAPIInclude</a> <a href="../api/io/micronaut/openapi/annotation/OpenAPISecurity.html">OpenAPISecurity</a> <a href="../api/io/micronaut/openapi/annotation/OpenAPIManagement.html">OpenAPIManagement</a>) are available to enhance the generated OpenAPI.</p>
+</div>
+<div class="paragraph">
+<p>To use them add Micronaut&#8217;s <code>openapi</code> to the compile classpath of your application:</p>
+</div>
+<div class="paragraph">
+<p>        <div class="listingblock multi-language-sample">
+<div class="title"></div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="gradle">implementation(<span class="hljs-string">"io.micronaut.openapi:micronaut-openapi:2.4.0-SNAPSHOT")</span></code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="maven">&lt;dependency&gt;
+    &lt;groupId&gt;io.micronaut.openapi&lt;/groupId&gt;
+    &lt;artifactId&gt;micronaut-openapi&lt;/artifactId&gt;
+    &lt;version&gt;2.4.0-SNAPSHOT&lt;/version&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+</p>
+</div>
+
+<h2 id="openapiinclude"><a class="anchor" href="#openapiinclude"></a>12.1 @OpenAPIInclude</h2>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master
+/src/main/docs/guide/annotationConfiguration/openapiinclude.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>You can use <a href="../api/io/micronaut/openapi/annotation/OpenAPIInclude.html">OpenAPIInclude</a> you can include additional <a href="../api/io/micronaut/http/annotation/Controller.html">Controller</a> or
+<a href="../api/io/micronaut/management/endpoint/annotation/Endpoint.html">Endpoint</a> already compiled
+classes in the OpenAPI processing.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@OpenAPIDefinition(
+        info = @Info(
+                title = "Hello World",
+                version = "${api.version}",
+                description = "${openapi.description}",
+                license = @License(name = "Apache 2.0", url = "https://foo.bar"),
+                contact = @Contact(url = "https://gigantic-server.com", name = "Fred", email = "Fred@gigagantic-server.com")
+        )
+)
+@OpenAPIInclude(
+        classes = { io.micronaut.security.endpoints.LoginController.class, io.micronaut.security.endpoints.LogoutController.class },
+        tags = @Tag(name = "Security")
+)
+@OpenAPIInclude(
+        classes = io.micronaut.management.endpoint.env.EnvironmentEndpoint.class,
+        tags = @Tag(name = "Management"),
+        security = @SecurityRequirement(name = "BEARER", scopes = {"ADMIN"})
+)
+public class Application {
+
+    public static void main(String[] args) {
+        Micronaut.run(Application.class);
+    }
+}</code></pre>
+</div>
+</div>
+
+<h2 id="openapimanagement"><a class="anchor" href="#openapimanagement"></a>12.2 @OpenAPIManagement</h2>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master
+/src/main/docs/guide/annotationConfiguration/openapimanagement.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p><a href="../api/io/micronaut/openapi/annotation/OpenAPIManagement.html">OpenAPIManagement</a> adds management endpoints.</p>
+</div>
+<div class="paragraph">
+<p><a href="../api/io/micronaut/openapi/annotation/OpenAPIManagement.html">OpenAPIManagement</a> is mapped to:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@OpenAPIInclude(
+classes = { io.micronaut.management.endpoint.beans.BeansEndpoint.class, io.micronaut.management.endpoint.env.EnvironmentEndpoint.class,
+io.micronaut.management.endpoint.health.HealthEndpoint.class,
+io.micronaut.management.endpoint.info.InfoEndpoint.class,
+io.micronaut.management.endpoint.loggers.LoggersEndpoint.class,
+io.micronaut.management.endpoint.refresh.RefreshEndpoint.class,
+io.micronaut.management.endpoint.routes.RoutesEndpoint.class,
+io.micronaut.management.endpoint.stop.ServerStopEndpoint.class,
+io.micronaut.management.endpoint.threads.ThreadDumpEndpoint }
+)</code></pre>
+</div>
+</div>
+
+<h2 id="openapisecurity"><a class="anchor" href="#openapisecurity"></a>12.3 @OpenAPISecurity</h2>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master
+/src/main/docs/guide/annotationConfiguration/openapisecurity.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p><a href="../api/io/micronaut/openapi/annotation/OpenAPISecurity.html">OpenAPISecurity</a> adds security endpoints.</p>
+</div>
+<div class="paragraph">
+<p>It is mapped to:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@OpenAPIInclude(
+classes = { io.micronaut.security.endpoints.LoginController.class, io.micronaut.security.endpoints.LogoutController.class }
+)</code></pre>
+</div>
+</div>
+
+<h1 id="mergingSchemas"><a class="anchor" href="#mergingSchemas"></a>13 Merging Schemas</h1>
 
 <div class='contribute-btn'>
     <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master
@@ -1551,19 +1491,514 @@ public Response&lt;Pet&gt; updatePet(Pet pet) {
 <p>Often times you might want to generate OpenAPI (Swagger) YAML for built-in endpoints or paths from some other modules, such as <code>security</code>. In order to generate YAML including all that information, Micronaut supports merging of multiple OpenAPI YAML files. So, you can create OpenAPI YAML files manually at some predefined path from where the information will then be merged into the final YAML file.</p>
 </div>
 <div class="paragraph">
-<p>To configure the path for additional swagger files you need to set <code>System</code> property <code>micronaut.openapi.additional.files</code>. For example:</p>
+<p>For example, if you are using <a href="https://micronaut-projects.github.io/micronaut-security/latest/guide/index.html#openid">Micronaut&#8217;s Security OpenID Connect</a> with <a href="https://aws.amazon.com/cognito/">Amazon Cognito</a> your application exposes several endpoints which you could define in an external OpenAPI YAML file such as:</p>
 </div>
 <div class="listingblock">
+<div class="title">openapi/oauth.yml</div>
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">micronaut.openapi.additional.files={project.home}/src/test/resources/swagger</code></pre>
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">openapi: 3.0.1
+info:
+  title: OAuth
+  description: Endpoints related to the integration with Amazon Cognito
+  version: "1.0"
+paths:
+  /logout:
+    get:
+      tags:
+      - security
+      description: deletes the JWT cookie and redirects to /oauth/login/cognito
+      operationId: logout
+      parameters: []
+      responses:
+        "200":
+          description: logout 200 response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Object'
+        "302":
+          links:
+            oauth-login-cognito:
+              operationId: oauth-login-cognito
+  /oauth/callback/cognito:
+    get:
+      tags:
+      - security
+      description: receives a callback from the authorization server with a code to
+        exchange it for an access and id token
+      externalDocs:
+        description: Amazon Cognito Token Endpoint documentation
+        url: https://docs.aws.amazon.com/cognito/latest/developerguide/token-endpoint.html
+      operationId: oauth-callback-cognito
+      parameters:
+      - name: authorizationResponse
+        in: query
+        required: true
+        explode: true
+        schema:
+          $ref: '#/components/schemas/AuthorizationResponse'
+      responses:
+        "303":
+          description: redirects to home page upon successful completion of the authorization
+            code grant flow
+          headers:
+            Set-Cookie:
+              description: Cookied named JWT with the id token obtained from the authorization
+                server as the value
+  /oauth/login/cognito:
+    get:
+      tags:
+      - security
+      description: redirects to authorization server sign in page
+      externalDocs:
+        description: Amazon Cognito Authorization Endpoint documentation
+        url: https://docs.aws.amazon.com/cognito/latest/developerguide/authorization-endpoint.html
+      operationId: oauth-login-cognito
+      parameters: []
+      responses:
+        "302":
+          description: redirects to authorization server sign in page
+  /oauth/logout:
+    get:
+      tags:
+      - security
+      description: ends the session in the authorization server and the redirects
+        to /logout
+      externalDocs:
+        description: Amazon Cognito Logout Endpoint documentation
+        url: https://docs.aws.amazon.com/cognito/latest/developerguide/logout-endpoint.html
+      operationId: oauth-logout
+      parameters: []
+      responses:
+        "302":
+          links:
+            logout:
+              operationId: logout
+components:
+  schemas:
+    AuthorizationResponse:
+      required:
+      - code
+      - state
+      type: object
+      properties:
+        code:
+          required:
+          - "true"
+          type: string
+          description: an authorization code which the OAuth 2.0 client can exchange
+            for an access token
+        nonce:
+          required:
+          - "false"
+          type: string
+          nullable: true
+        state:
+          required:
+          - "true"
+          type: string</code></pre>
 </div>
+</div>
+<div class="paragraph">
+<p>You could also have a yaml file describing the endpoint which exposes the generated OpenAPI YAML file:</p>
+</div>
+<div class="listingblock">
+<div class="title">openapi/swagger.yml</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">openapi: 3.0.1
+info:
+  title: swagger
+  version: "1.0"
+paths:
+  /swagger/demo-0.0.yml:
+    get:
+      tags:
+        - openapi
+      description: returns the OpenAPI YAML file describing the API
+      operationId: swagger
+      parameters: []
+      responses:
+        "200":
+          description: OpenAPI YAML file describing the API
+          content:
+            text/plain: {}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>To merge both files with the generated OpenAPI definition point Micronaut to look for additional OpenAPI yaml files in the <code>openapi</code> folder. You need to set the property <code>micronaut.openapi.additional.files</code>.</p>
+</div>
+<div class="listingblock">
+<div class="title">openapi.properties</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">micronaut.openapi.additional.files=openapi
+...
+..
+.</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Micronaut will include the endpoints defined in those files in the generated output.</p>
 </div>
 
-<h1 id="oauth2"><a class="anchor" href="#oauth2"></a>15 Swagger UI - OAuth 2.0 configuration</h1>
+<h1 id="openApiViews"><a class="anchor" href="#openApiViews"></a>14 Generating OpenAPI Views</h1>
 
 <div class='contribute-btn'>
     <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master
-/src/main/docs/guide/oauth2.adoc"'>
+/src/main/docs/guide/openApiViews.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>Micronaut can generate views for your generated OpenApi specification. Currently <a href="https://github.com/swagger-api/swagger-ui">Swagger-ui</a>, <a href="https://github.com/Rebilly/ReDoc">Redoc</a> and <a href="https://github.com/mrin9/RapiDoc">RapiDoc</a> are supported.
+You can also use <a href="https://mrin9.github.io/RapiPdf/">RapiPdf</a> to generate a PDF from your spec file.</p>
+</div>
+<div class="paragraph">
+<p>You can enable multiple views generation in a single application.</p>
+</div>
+<div class="paragraph">
+<p>The resources needed to render the views (javascript, css, &#8230;&#8203;) are loaded from CDNs: <a href="https://unpkg.com">unpkg.com</a> and <a href="https://fonts.googleapis.com/">fonts.googleapis.com</a>.</p>
+</div>
+
+<h2 id="mappingPath"><a class="anchor" href="#mappingPath"></a>14.1 Mapping Path</h2>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master
+/src/main/docs/guide/openApiViews/mappingPath.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>The path from where the swagger specification will be served by the http server defaults to <code>swagger</code>. You can change it via the <code>mapping.path</code> property.</p>
+</div>
+<div class="paragraph">
+<p>Thus, by default, the views expect to find the <code>yaml</code> under <code>/swagger</code>.</p>
+</div>
+<div class="paragraph">
+<p>If you change this mapping to something else:</p>
+</div>
+<div class="listingblock">
+<div class="title">Exposing Swagger YAML</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">micronaut:
+    router:
+        static-resources:
+            swagger:
+                paths: classpath:META-INF/swagger
+                mapping: /swaggerYAML/**
+....</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You will need to set the <code>mapping.path</code> property accordingly: <code>micronaut.openapi.views.spec=mapping.path=swaggerYAML&#8230;&#8203;</code>.</p>
+</div>
+
+<h2 id="viewsGenerationWithPropertiesFile"><a class="anchor" href="#viewsGenerationWithPropertiesFile"></a>14.2 Enable Views Generation with a properties file</h2>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master
+/src/main/docs/guide/openApiViews/viewsGenerationWithPropertiesFile.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>By default the generation of views is disabled. You can enable views generation with a <a href="#propertiesFileConfiguration">configuration properties file</a>.</p>
+</div>
+<div class="listingblock">
+<div class="title">openapi.properties Example Views Generation Swagger-UI Redoc, Rapidoc</div>
+<div class="content">
+<pre class="highlightjs highlight"><code>swagger-ui.enabled=true
+redoc.enabled=true
+rapidoc.enabled=true
+rapidoc.bg-color=#14191f
+rapidoc.text-color=#aec2e0
+rapidoc.sort-endpoints-by=method
+...
+..
+.</code></pre>
+</div>
+</div>
+
+<h2 id="viewsGenerationWithSystemProperties"><a class="anchor" href="#viewsGenerationWithSystemProperties"></a>14.3 Enable Views Generation with system properties</h2>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master
+/src/main/docs/guide/openApiViews/viewsGenerationWithSystemProperties.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>By default the generation of views is disabled.</p>
+</div>
+<div class="paragraph">
+<p>To turn it on you have to set the following system property <code>micronaut.openapi.views.spec</code>.</p>
+</div>
+<div class="paragraph">
+<p>The string syntax is a series of comma-separated key-value pairs, to enable and configure the views.</p>
+</div>
+<div class="listingblock">
+<div class="title">System Property</div>
+<div class="content">
+<pre class="highlightjs highlight"><code>micronaut.openapi.views.spec=redoc.enabled=true,rapidoc.enabled=true,swagger-ui.enabled=true,swagger-ui.theme=flattop</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>For instance in Gradle for Kotlin projects:</p>
+</div>
+<div class="listingblock">
+<div class="title">Gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">JAVA_TOOL_OPTIONS=-Dmicronaut.openapi.views.spec=redoc.enabled=true,rapidoc.enabled=true,swagger-ui.enabled=true,swagger-ui.theme=flattop \
+        ./gradlew --no-daemon clean assemble</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>or in gradle.properties:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">org.gradle.jvmargs=-Dmicronaut.openapi.views.spec=redoc.enabled=true,rapidoc.enabled=true,swagger-ui.enabled=true,swagger-ui.theme=flattop</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>or in build.gradle as well:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">kapt {
+    arguments {
+        arg("micronaut.openapi.views.spec", "redoc.enabled=true,rapidoc.enabled=true,swagger-ui.enabled=true,swagger-ui.theme=flattop")
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>or in Gradle for Java projects:</p>
+</div>
+<div class="listingblock">
+<div class="title">Gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">tasks.withType(JavaCompile) {
+    options.fork = true
+    options.forkOptions.jvmArgs &lt;&lt; '-Dmicronaut.openapi.views.spec=rapidoc.enabled=true,swagger-ui.enabled=true,swagger-ui.theme=flattop'
+
+    ...
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>or in Gradle for Groovy projects:</p>
+</div>
+<div class="listingblock">
+<div class="title">Gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">tasks.withType(GroovyCompile) {
+    groovyOptions.forkOptions.jvmArgs.add('-Dgroovy.parameters=true')
+    groovyOptions.forkOptions.jvmArgs.add('-Dmicronaut.openapi.views.spec=rapidoc.enabled=true,swagger-ui.enabled=true,swagger-ui.theme=flattop')
+    ...
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>or in Maven:</p>
+</div>
+<div class="listingblock">
+<div class="title">Maven</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;build&gt;
+    &lt;plugins&gt;
+        &lt;plugin&gt;
+            &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;
+            &lt;artifactId&gt;maven-compiler-plugin&lt;/artifactId&gt;
+            &lt;configuration&gt;
+                &lt;fork&gt;true&lt;/fork&gt;
+                &lt;compilerArgs&gt;
+                    &lt;arg&gt;-J-Dmicronaut.openapi.views.spec=rapidoc.enabled=true,swagger-ui.enabled=true,swagger-ui.theme=flattop&lt;/arg&gt;
+                    ...
+                &lt;/compilerArgs&gt;
+            &lt;/configuration&gt;
+        &lt;/plugin&gt;
+    &lt;/plugins&gt;
+&lt;/build&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>or in Maven with Groovy:</p>
+</div>
+<div class="listingblock">
+<div class="title">Maven + Groovy</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;build&gt;
+    &lt;plugins&gt;
+        &lt;plugin&gt;
+        &lt;groupId&gt;org.codehaus.mojo&lt;/groupId&gt;
+        &lt;artifactId&gt;properties-maven-plugin&lt;/artifactId&gt;
+        &lt;version&gt;1.0.0&lt;/version&gt;
+        &lt;executions&gt;
+          &lt;execution&gt;
+            &lt;goals&gt;
+              &lt;goal&gt;set-system-properties&lt;/goal&gt;
+            &lt;/goals&gt;
+            &lt;configuration&gt;
+              &lt;properties&gt;
+                &lt;property&gt;
+                  &lt;name&gt;micronaut.openapi.views.spec&lt;/name&gt;
+                  &lt;value&gt;rapidoc.enabled=true,swagger-ui.enabled=true,swagger-ui.theme=flattop&lt;/value&gt;
+                &lt;/property&gt;
+              &lt;/properties&gt;
+            &lt;/configuration&gt;
+          &lt;/execution&gt;
+        &lt;/executions&gt;
+      &lt;/plugin&gt;
+    &lt;/plugins&gt;
+&lt;/build&gt;</code></pre>
+</div>
+</div>
+
+<h2 id="swaggerui"><a class="anchor" href="#swaggerui"></a>14.4 Swagger-UI</h2>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master
+/src/main/docs/guide/openApiViews/swaggerui.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>Views supports <a href="https://swagger.io/tools/swagger-ui/">Swagger UI</a>, to enable it use <code>swagger-ui.enabled=true</code>.</p>
+</div>
+<div class="paragraph">
+<p>The views will be generated to the <code>META-INF/swagger/views/swagger-ui</code> directory of your project’s class output.</p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>swagger-ui.enabled</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>true</code> or <code>false</code> When 'true' the Swagger-ui view is generated.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>swagger-ui.version</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">String - The version of Swagger-ui to use. Default is to use the latest available.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>swagger-ui.theme</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>DEFAULT</code> or <code>MATERIAL</code> or <code>FEELING_BLUE</code> <code>FLATTOP</code> <code>MONOKAI</code> <code>MUTED</code> <code>NEWSPAPER</code> <code>OUTLINE</code>. The theme of swagger-ui to use. These are case insensitive. Default is <code>DEFAULT</code>. See <a href="https://github.com/ostranme/swagger-ui-themes">Swagger UI Themes</a>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>swagger-ui.displayOperationId</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>swagger-ui.oauth2RedirectUrl</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>swagger-ui.showMutatedRequest</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>swagger-ui.deepLinking</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>swagger-ui.supportedSubmitMethods</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>swagger-ui.defaultModelsExpandDepth</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>swagger-ui.layout</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>swagger-ui.defaultModelRendering</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>swagger-ui.docExpansion</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>swagger-ui.filter</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>swagger-ui.validatorUrl</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>swagger-ui.showCommonExtensions</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>swagger-ui.maxDisplayedTags</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>swagger-ui.withCredentials</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>swagger-ui.displayRequestDuration</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>swagger-ui.showExtensions</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>swagger-ui.operationsSorter</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>swagger-ui.tagsSorter</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>See <a href="https://github.com/swagger-api/swagger-ui/blob/HEAD/docs/usage/configuration.md">Swagger UI Configuration</a> for a description.</p>
+</div>
+<div class="paragraph">
+<p>To expose the the <code>swagger-ui</code> views, you also must expose the generated <code>yaml</code>:</p>
+</div>
+<div class="listingblock">
+<div class="title">Exposing Swagger YAML and Swagger UI Views</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">micronaut:
+    router:
+        static-resources:
+            swagger:
+                paths: classpath:META-INF/swagger
+                mapping: /swagger/**
+            swagger-ui:
+                paths: classpath:META-INF/swagger/views/swagger-ui
+                mapping: /swagger-ui/**</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>With the above configuration in place when you run your application you can access your Swagger documentation at http://localhost:8080/swagger-ui.</p>
+</div>
+
+<h2 id="oauth2"><a class="anchor" href="#oauth2"></a>14.4.1 Swagger UI - OAuth 2.0 configuration</h2>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master
+/src/main/docs/guide/openApiViews/swaggerui/oauth2.adoc"'>
         <i class='fa fa-pencil-square-o'></i> Improve this doc
     </button>
 </div>
@@ -1718,6 +2153,521 @@ public class OrderController {
 </div>
 <div class="paragraph">
 <p>The previous sample uses a remote <a href="https://micronaut-projects.github.io/micronaut-security/latest/guide/index.html#jwks">Json Web Key Set</a> to validate the token issued by the authorization server. If you use <a href="https://micronaut-projects.github.io/micronaut-security/latest/guide/index.html#openid">Micronaut Security OpenID Connect support</a> with a server compatible with <a href="https://openid.net/specs/openid-connect-discovery-1_0.html">OpenID Connect Discovery</a>, the JWKS of the authorization server is automatically configured.</p>
+</div>
+
+<h2 id="redoc"><a class="anchor" href="#redoc"></a>14.5 Redoc</h2>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master
+/src/main/docs/guide/openApiViews/redoc.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>Views supports <a href="https://github.com/Rebilly/ReDoc">Redoc</a>, to enable it use <code>redoc.enabled=true</code>.</p>
+</div>
+<div class="paragraph">
+<p>The views will be generated to the <code>META-INF/swagger/views/redoc</code> directory of your project’s class output.</p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>redoc.enabled</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>true</code> or <code>false</code>  When 'true' the Redoc view is generated.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>redoc.version</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code> - The version of Redoc to use. Default is to use the latest available.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>redoc.expand-single-schema-field</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>redoc.expand-default-server-variables</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>redoc.menu-toggle</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>redoc.only-required-in-samples</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>redoc.payload-sample-idx</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>redoc.sort-props-alphabetically</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>redoc.untrusted-spec</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>redoc.expand-responses</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>redoc.show-extensions</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>redoc.native-scrollbars</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>redoc.path-in-middle-panel</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>redoc.suppress-warnings</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>redoc.hide-hostname</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>redoc.disable-search</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>redoc.json-sample-expand-level</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>redoc.scroll-y-offset</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>redoc.hide-download-button</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>redoc.no-auto-auth</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>redoc.theme</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>redoc.hide-single-request-sample-tab</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>redoc.required-props-first</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>redoc.hide-loading</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>See <a href="https://github.com/Redocly/redoc#redoc-options-object">Redoc Options</a> for a description of the above properites.</p>
+</div>
+<div class="paragraph">
+<p>To expose the the <code>redoc</code> views, you also must expose the generated <code>yaml</code>:</p>
+</div>
+<div class="listingblock">
+<div class="title">Exposing Swagger YAML And Redoc Views</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">micronaut:
+    router:
+        static-resources:
+            swagger:
+                paths: classpath:META-INF/swagger
+                mapping: /swagger/**
+            redoc:
+                paths: classpath:META-INF/swagger/views/redoc
+                mapping: /redoc/**</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>With the above configuration in place when you run your application you can access your Swagger documentation at http://localhost:8080/redoc.</p>
+</div>
+
+<h2 id="rapidoc"><a class="anchor" href="#rapidoc"></a>14.6 RapiDoc</h2>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master
+/src/main/docs/guide/openApiViews/rapidoc.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>The views will be generated to the <code>META-INF/swagger/views/rapidoc</code> directory of your project’s class output.</p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapidoc.enabled</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>true</code> or <code>false</code> When 'true' the RapiDoc view is generated.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapidoc.version</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The version of RapiDoc to use. Default is to use the latest available.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapidoc.style</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapidoc.sort-tags</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapidoc.sort-endpoints-by</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapidoc.heading-text</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapidoc.goto-path</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapidoc.theme</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapidoc.bg-color</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapidoc.text-color</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapidoc.header-color</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapidoc.regular-font</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapidoc.mono-font</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapidoc.font-size</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapidoc.nav-bg-color</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapidoc.nav-text-color</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapidoc.nav-hover-bg-color</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapidoc.nav-hover-text-color</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapidoc.nav-accent-color</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapidoc.nav-item-spacing</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapidoc.layout</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapidoc.render-style</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapidoc.schema-style</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapidoc.schema-expand-level</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapidoc.schema-description-expanded</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapidoc.default-schema-tab</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapidoc.response-area-height</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapidoc.show-info</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapidoc.info-description-headings-in-navbar</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapidoc.show-components</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapidoc.show-header</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapidoc.allow-authentication</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapidoc.allow-spec-url-load</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapidoc.allow-spec-file-load</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapidoc.allow-search</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapidoc.allow-try</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapidoc.allow-server-selection</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapidoc.api-key-name</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapidoc.api-key-value</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapidoc.api-key-location</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapidoc.server-url</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapidoc.default-api-server</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>See <a href="https://mrin9.github.io/RapiDoc/api.html">RapiDoc Options</a> for a description.</p>
+</div>
+<div class="paragraph">
+<p>To expose the the <code>rapidoc</code> views, you also must expose the generated <code>yaml</code>:</p>
+</div>
+<div class="listingblock">
+<div class="title">Exposing Swagger YAML And Rapidoc Views</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">micronaut:
+    router:
+        static-resources:
+            swagger:
+                paths: classpath:META-INF/swagger
+                mapping: /swagger/**
+            rapidoc:
+                paths: classpath:META-INF/swagger/views/rapidoc
+                mapping: /rapidoc/**</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>With the above configuration in place when you run your application you can access your Swagger documentation at http://localhost:8080/rapidoc.</p>
+</div>
+
+<h2 id="rapipdf"><a class="anchor" href="#rapipdf"></a>14.7 RapiPdf</h2>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master
+/src/main/docs/guide/openApiViews/rapipdf.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>Views also supports <a href="https://mrin9.github.io/RapiPdf/">RapiPdf</a>, to enable it use <code>rapipdf.enabled=true</code>.</p>
+</div>
+<div class="paragraph">
+<p>RapiPdf supports the following options:</p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapipdf.enabled</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>true</code> or <code>false</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapipdf.include-api-details</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapipdf.pdf-title</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapipdf.include-api-list</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapipdf.include-security</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapipdf.input-bg</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapipdf.hide-input</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapipdf.pdf-footer-text</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapipdf.pdf-primary-color</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapipdf.pdf-schema-style</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapipdf.button-label</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapipdf.pdf-alternate-color</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapipdf.include-info</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapipdf.include-toc</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapipdf.button-color</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapipdf.style</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapipdf.input-color</code></p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>See <a href="https://mrin9.github.io/RapiPdf/">RapiPdf Attributes</a> for a description.</p>
+</div>
+<div class="paragraph">
+<p>It will add a button to the view to generate a PDF from the spec file.</p>
+</div>
+
+<h1 id="serverContext"><a class="anchor" href="#serverContext"></a>15 Server Context</h1>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master
+/src/main/docs/guide/serverContext.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>In micronaut configuration file you can define a server context path (with <code>micronaut.server.context-path</code>) which serves as a base path for all routes.
+Since the yaml specification file and the views are generated at compile time, these resources are not aware of this runtime setting.</p>
+</div>
+<div class="paragraph">
+<p>It is still possible for the views to work in case a context path is defined:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Set <code>micronaut.openapi.server.context.path</code> property for compile time resolution.</p>
+</li>
+<li>
+<p>Use a <code>HttpServerFilter</code> that will add a cookie, or</p>
+</li>
+<li>
+<p>Add a parameter to the url.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The view will first look for the cookie and if not present for the parameter.</p>
+</div>
+<div class="sect2">
+<h3 id="_compile_time_resolution">Compile Time Resolution</h3>
+<div class="paragraph">
+<p>Either set <code>micronaut.openapi.server.context.path</code> as a System Property or in <code>openapi.properties</code>, then all paths will be prepend with the
+specified value at compile time.</p>
+</div>
+<div class="paragraph">
+<p>If you want the resolution of the context path at runtime use one of the following methods:</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_httpserverfilter">HttpServerFilter</h3>
+<div class="paragraph">
+<p>Create a <code>HttpServerFilter</code> that will add a cookie with name <code>contextPath</code>.</p>
+</div>
+<div class="listingblock">
+<div class="title">HttpServerFilter for context-path</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import java.time.Duration;
+
+import org.reactivestreams.Publisher;
+
+import io.micronaut.context.annotation.Requires;
+import io.micronaut.context.annotation.Value;
+import io.micronaut.core.async.publisher.Publishers;
+import io.micronaut.http.HttpMethod;
+import io.micronaut.http.HttpRequest;
+import io.micronaut.http.MutableHttpResponse;
+import io.micronaut.http.annotation.Filter;
+import io.micronaut.http.cookie.Cookie;
+import io.micronaut.http.filter.HttpServerFilter;
+import io.micronaut.http.filter.ServerFilterChain;
+
+@Requires(property = "micronaut.server.context-path")
+@Filter(methods = {HttpMethod.GET, HttpMethod.HEAD}, patterns = {"/**/rapidoc*", "/**/redoc*", "/**/swagger-ui*"})
+public class OpenApiViewCookieContextPathFilter implements HttpServerFilter {
+    private final Cookie contextPathCookie;
+
+    OpenApiViewCookieContextPathFilter(@Value("${micronaut.server.context-path}") String contextPath) {
+        this.contextPathCookie = Cookie.of("contextPath", contextPath).maxAge(Duration.ofMinutes(2L));
+    }
+
+    @Override
+    public Publisher&lt;MutableHttpResponse&lt;?&gt;&gt; doFilter(HttpRequest&lt;?&gt; request, ServerFilterChain chain) {
+        return Publishers.map(chain.proceed(request), response -&gt; response.cookie(contextPathCookie));
+    }
+
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_url_parameter">URL Parameter</h3>
+<div class="paragraph">
+<p>Just add a parameter to the view url. For instance if the context path is set to <code>/context/path</code> you will access your view with <code><a href="http://localhost:8080/context/path/swagger-ui?contextPath=%2Fcontext%2Fpath" class="bare">http://localhost:8080/context/path/swagger-ui?contextPath=%2Fcontext%2Fpath</a></code>.</p>
+</div>
 </div>
 
 <h1 id="repository"><a class="anchor" href="#repository"></a>16 Repository</h1>
