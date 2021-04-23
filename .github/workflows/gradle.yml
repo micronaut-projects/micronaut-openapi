@@ -21,30 +21,38 @@ jobs:
       matrix:
         java: ['8', '11', '15']
     steps:
+       # https://github.com/actions/virtual-environments/issues/709
+      - name: Free disk space
+        run: |
+         sudo rm -rf "/usr/local/share/boost"
+         sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+         sudo apt-get clean
+         df -h
       - uses: actions/checkout@v2
-      - uses: actions/cache@v2
+      - uses: actions/cache@v2.1.5
         with:
           path: ~/.gradle/caches
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
       - name: Set up JDK
-        uses: actions/setup-java@v1
+        uses: actions/setup-java@v2
         with:
+          distribution: 'adopt'
           java-version: ${{ matrix.java }}
       - name: Optional setup step
         run: |
           [ -f ./setup.sh ] && ./setup.sh || true
       - name: Build with Gradle
-        run: ./gradlew dependencyUpdates check --parallel --continue
+        run: ./gradlew dependencyUpdates check --no-daemon --parallel --continue
         env:
-          TESTCONTAINERS_RYUK_DISABLED: true
-      - name: Publish to JFrog OSS
+           TESTCONTAINERS_RYUK_DISABLED: true        
+      - name: Publish to Sonatype Snapshots
         if: success() && github.event_name == 'push' && matrix.java == '8'
         env:
-          BINTRAY_USER: ${{ secrets.BINTRAY_USER }}
-          BINTRAY_KEY: ${{ secrets.BINTRAY_KEY }}
-        run: ./gradlew publish docs --no-daemon
+          SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
+          SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
+        run: ./gradlew publishToSonatype docs --no-daemon
       - name: Determine docs target repository
         uses: haya14busa/action-cond@v1
         id: docs_target

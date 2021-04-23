@@ -147,7 +147,7 @@ abstract class AbstractOpenApiVisitor  {
     /**
      * The YAML mapper.
      */
-    ObjectMapper yamlMapper = Yaml.mapper().enable(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS);
+    ObjectMapper yamlMapper = Yaml.mapper();
 
     /**
      * Stores the current in progress type.
