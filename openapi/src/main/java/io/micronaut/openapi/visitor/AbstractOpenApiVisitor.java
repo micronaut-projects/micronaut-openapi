@@ -23,7 +23,6 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -139,6 +138,7 @@ abstract class AbstractOpenApiVisitor  {
     private static final String ATTR_TEST_MODE = "io.micronaut.OPENAPI_TEST";
     private static final Lock VISITED_ELEMENTS_LOCK = new ReentrantLock();
     private static final String ATTR_VISITED_ELEMENTS = "io.micronaut.OPENAPI.visited.elements";
+    private static final Schema<?> EMPTY_SCHEMA = new Schema<>();
 
     /**
      * The JSON mapper.
@@ -827,7 +827,13 @@ abstract class AbstractOpenApiVisitor  {
      */
     protected Schema bindSchemaForElement(VisitorContext context, Element element, ClassElement elementType, Schema schemaToBind) {
         AnnotationValue<io.swagger.v3.oas.annotations.media.Schema> schemaAnn = element.getAnnotation(io.swagger.v3.oas.annotations.media.Schema.class);
-        if (schemaAnn != null) {
+        Schema originalSchema = schemaToBind;
+        if (originalSchema.get$ref() != null) {
+            schemaToBind = new Schema();
+        }
+        if (originalSchema.get$ref() == null && schemaAnn != null) {
+            // Apply @Schema annotation only if not $ref since for $ref schemas
+            // we already populated values from right @Schema annotation in previous steps
             schemaToBind = bindSchemaAnnotationValue(context, element, schemaToBind, schemaAnn);
             Optional<String> schemaName = schemaAnn.get("name", String.class);
             if (schemaName.isPresent()) {
@@ -896,14 +902,18 @@ abstract class AbstractOpenApiVisitor  {
         if (defaultValue != null && schemaToBind.getDefault() == null) {
             schemaToBind.setDefault(defaultValue);
         }
-        if (element.isAnnotationPresent(Nullable.class)) {
+        if (element.isAnnotationPresent(Nullable.class)
+                || element.isAnnotationPresent(javax.annotation.Nullable.class)
+                || element.isAnnotationPresent(io.micronaut.core.annotation.Nullable.class)) {
             schemaToBind.setNullable(true);
         }
         final String defaultJacksonValue = element.stringValue(JsonProperty.class, "defaultValue").orElse(null);
         if (defaultJacksonValue != null && schemaToBind.getDefault() == null) {
             schemaToBind.setDefault(defaultJacksonValue);
         }
-        return schemaToBind;
+        return originalSchema.get$ref() != null && !schemaToBind.equals(EMPTY_SCHEMA)
+                ? new ComposedSchema().addAllOfItem(originalSchema).addAllOfItem(schemaToBind)
+                : originalSchema;
     }
 
     private void setSchemaDocumentation(Element element, Schema schemaToBind) {
@@ -1102,13 +1112,9 @@ abstract class AbstractOpenApiVisitor  {
     private Schema getSchemaDefinition(
             OpenAPI openAPI,
             VisitorContext context,
-            Element type,
+            ClassElement type,
             @Nullable Element definingElement,
             List<MediaType> mediaTypes) {
-        // To break the recursion
-        if (inProgressSchemas.contains(type.getSimpleName())) {
-            return null;
-        }
         AnnotationValue<io.swagger.v3.oas.annotations.media.Schema> schemaValue = definingElement == null ? null : definingElement.getDeclaredAnnotation(io.swagger.v3.oas.annotations.media.Schema.class);
         if (schemaValue == null) {
             schemaValue = type.getDeclaredAnnotation(io.swagger.v3.oas.annotations.media.Schema.class);
@@ -1175,6 +1181,10 @@ abstract class AbstractOpenApiVisitor  {
             String schemaName = schemaValue.get("name", String.class).orElse(computeDefaultSchemaName(definingElement, type));
             schema = schemas.get(schemaName);
             if (schema == null) {
+                if (inProgressSchemas.contains(schemaName)) {
+                    // Break recursion
+                    return new Schema<>().$ref(schemaRef(schemaName));
+                }
                 inProgressSchemas.add(schemaName);
                 try {
                     schema = readSchema(schemaValue, openAPI, context, type, mediaTypes);

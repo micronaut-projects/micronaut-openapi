@@ -15,6 +15,8 @@ swaggerAnnotations:
   schemasAndPojos: Schemas and POJOs
   schemasAndMetaAnnotations: Schemas and Meta Annotations
   schemasAndGenerics: Schemas and Generics
+  schemasNaming: Schemas naming
+  schemasAnnotationResolution: Schemas Annotation resolution
 endpoints: 
   title: Exposing Endpoints
   enableendpoints: Enable Endpoints

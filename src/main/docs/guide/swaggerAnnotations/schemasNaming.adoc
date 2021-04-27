@@ -1,0 +1,41 @@
+By default Micronaut uses Class simple name for Custom type schemas. Micronaut use simple name no matter if `@Schema`
+annotation is defined on type or on property (getter). That means that if you have two properties of same type with `@Schema`
+annotation without `name` set, Micronaut will accidentally override one definition with another. So in that case you should
+set `name` on `@Schema` annotation.
+
+.Schema name resolution
+[source,java]
+----
+import io.swagger.v3.oas.annotations.media.Schema;
+
+@Schema(description="A pet") // <1>
+class Pet {
+}
+
+class Owner {
+    private Pet bird;
+    private Pet cat;
+    private Pet dog;
+
+
+    @Schema(description="Pet that is a a bird") // <2>
+    public Pet getBird() {
+        return bird;
+    }
+
+    @Schema(description="Pet that is a cat") // <3>
+    public Pet getCat() {
+        return cat;
+    }
+
+    @Schema(name="Dog", description="Pet that is a dog") // <4>
+    public Pet getDog() {
+        return cat;
+    }
+}
+----
+
+<1> Micronaut will generate schema with name `Pet`
+<2> Micronaut will generate schema with name `Pet` since name is not set, this will conflict with <1> and <3>, final Pet schema might be incorrect
+<3> Micronaut will generate schema with name `Pet` since name is not set, this will conflict with <1> and <2>, final Pet schema might be incorrect
+<4> Micronaut will generate schema with unique name `Dog` since name is set, there is no conflict, schema is correctly generated

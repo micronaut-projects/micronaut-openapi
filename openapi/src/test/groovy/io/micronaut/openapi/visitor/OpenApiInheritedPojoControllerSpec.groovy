@@ -307,9 +307,10 @@ class MyBean {}
         petSchema instanceof ComposedSchema
         catSchema instanceof ComposedSchema
         dogSchema instanceof ComposedSchema
-        catSchema.type == 'object'
-        catSchema.properties.size() == 1
-        catSchema.properties['clawSize'].type == 'integer'
+        ((ComposedSchema) catSchema).allOf[0].$ref == '#/components/schemas/Pet'
+        ((ComposedSchema) catSchema).allOf[1].type == 'object'
+        ((ComposedSchema) catSchema).allOf[1].properties.size() == 1
+        ((ComposedSchema) catSchema).allOf[1].properties['clawSize'].type == 'integer'
         petSchema.type == 'object'
         petSchema.properties.size() == 3
         petSchema.discriminator.propertyName == "type"
@@ -491,7 +492,6 @@ class CatController implements PetOperations {
 @javax.inject.Singleton
 class MyBean {}
 ''')
-        then:
         then: "the state is correct"
         AbstractOpenApiVisitor.testReference != null
 
@@ -508,9 +508,10 @@ class MyBean {}
         petSchema instanceof ComposedSchema
         catSchema instanceof ComposedSchema
         dogSchema instanceof ComposedSchema
-        catSchema.type == 'object'
-        catSchema.properties.size() == 1
-        catSchema.properties['clawSize'].type == 'integer'
+        ((ComposedSchema) catSchema).allOf[0].$ref == '#/components/schemas/Pet'
+        ((ComposedSchema) catSchema).allOf[1].type == 'object'
+        ((ComposedSchema) catSchema).allOf[1].properties.size() == 1
+        ((ComposedSchema) catSchema).allOf[1].properties['clawSize'].type == 'integer'
         petSchema.type == 'object'
         petSchema.properties.size() == 3
         petSchema.discriminator.propertyName == "type"

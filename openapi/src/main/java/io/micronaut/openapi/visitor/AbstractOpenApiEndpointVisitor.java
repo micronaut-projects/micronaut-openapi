@@ -437,7 +437,7 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
         }
 
         if (schema != null) {
-            bindSchemaForElement(context, parameter, parameterType, schema);
+            schema = bindSchemaForElement(context, parameter, parameterType, schema);
             newParameter.setSchema(schema);
         }
     }
