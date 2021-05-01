@@ -29,6 +29,7 @@ import io.micronaut.inject.ast.ClassElement;
 import io.micronaut.inject.visitor.TypeElementVisitor;
 import io.micronaut.inject.visitor.VisitorContext;
 import io.micronaut.inject.writer.GeneratedFile;
+import io.micronaut.openapi.postprocessors.OpenApiOperationsPostProcessor;
 import io.micronaut.openapi.view.OpenApiViewConfig;
 import io.swagger.v3.core.util.Yaml;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
@@ -496,6 +497,8 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         applyPropertyServerContextPath(openAPI, visitorContext);
         openAPI = resolvePropertyPlaceHolders(openAPI, visitorContext);
         sortOpenAPI(openAPI);
+        // Process after sorting so order is stable
+        new OpenApiOperationsPostProcessor().processOperations(openAPI, visitorContext, classElement);
         String fileName = "swagger.yml";
         String documentTitle = "OpenAPI";
 

@@ -101,7 +101,7 @@ class MyBean {}
 
         then:
             helloPathItem
-            loginPathItem.post.operationId == 'login'
+            loginPathItem.post.operationId == 'loginPost'
             loginPathItem.post.tags[0] == "Tag 4"
             loginPathItem.post.security[0]["req 3"]
             loginPathItem.post.requestBody
