@@ -23,7 +23,6 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -435,6 +434,12 @@ abstract class AbstractOpenApiVisitor  {
                     final Map<String, Object> discriminatorMap = getDiscriminatorMap(newValues);
                     discriminatorMap.put("propertyName", parseJsonString(value).orElse(value));
                     newValues.put("discriminator", discriminatorMap);
+                } else if (key.equals("accessMode")) {
+                    if(io.swagger.v3.oas.annotations.media.Schema.AccessMode.READ_ONLY.toString().equals(value)) {
+                        newValues.put("readOnly", Boolean.TRUE);
+                    } else if (io.swagger.v3.oas.annotations.media.Schema.AccessMode.WRITE_ONLY.toString().equals(value)) {
+                        newValues.put("writeOnly", Boolean.TRUE);
+                    }
                 } else {
                     newValues.put(key, parseJsonString(value).orElse(value));
                 }
