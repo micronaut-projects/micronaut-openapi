@@ -9,7 +9,7 @@ dependencies {
     testImplementation "io.micronaut:micronaut-validation"
     testImplementation "io.swagger.core.v3:swagger-annotations"
     testImplementation "io.micronaut.beanvalidation:micronaut-hibernate-validator"
-    testImplementation 'org.awaitility:awaitility:4.0.3'
+    testImplementation 'org.awaitility:awaitility:4.1.0'
     testImplementation "org.junit.jupiter:junit-jupiter-api:$junitVersion"
     testCompileOnly "io.micronaut:micronaut-inject-java"
     testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$junitVersion"
