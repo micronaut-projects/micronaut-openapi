@@ -55,7 +55,7 @@ class MyBean {}
 
         then:
         operation != null
-        operation.operationId == 'helloWorld'
+        operation.operationId == 'helloWorldGet'
         operation.parameters.size() == 0
         operation.tags
         operation.tags.size() == 2
@@ -117,7 +117,7 @@ class MyBean {}
 
         then:
         operation != null
-        operation.operationId == 'createPet'
+        operation.operationId == 'createPetPost'
         operation.parameters.size() == 0
         operation.requestBody
 
@@ -174,7 +174,7 @@ class MyBean {}
 
         then:
         operation != null
-        operation.operationId == 'getSubscription'
+        operation.operationId == 'getSubscriptionGet'
         operation.parameters.size() == 1
 
         when:
@@ -249,7 +249,7 @@ class MyBean {}
 
         then:"it is included in the OpenAPI doc"
         pathItem.get.description == 'Find a pet by a slug'
-        pathItem.get.operationId == 'find'
+        pathItem.get.operationId == 'findGet'
         pathItem.get.parameters.size() == 1
         pathItem.get.parameters[0].name == 'slug'
         pathItem.get.parameters[0].in == ParameterIn.PATH.toString()
@@ -316,7 +316,7 @@ class MyBean {}
         PathItem pathItem = openAPI.paths.get("/pets")
 
         then:"it is included in the OpenAPI doc"
-        pathItem.get.operationId == 'list'
+        pathItem.get.operationId == 'listGet'
         pathItem.get.description == 'List the pets'
         pathItem.get.responses['200']
         pathItem.get.responses['200'].description == 'a list of pet names'
@@ -328,7 +328,7 @@ class MyBean {}
 
         then:"it is included in the OpenAPI doc"
         pathItem.get.description == 'Find a pet by a slug'
-        pathItem.get.operationId == 'find'
+        pathItem.get.operationId == 'findGet'
         pathItem.get.parameters.size() == 1
         pathItem.get.parameters[0].name == 'slug'
         pathItem.get.parameters[0].in == ParameterIn.PATH.toString()
@@ -358,8 +358,8 @@ class MyBean {}
         pathItem = openAPI.paths.get("/pets/random")
 
         then:"default response has default description"
-        pathItem.get.operationId == 'getRandomPet'
-        pathItem.get.responses['200'].description == 'getRandomPet 200 response'
+        pathItem.get.operationId == 'getRandomPetGet'
+        pathItem.get.responses['200'].description == 'getRandomPetGet 200 response'
         pathItem.get.responses['200'].content['application/json'].schema.type == 'string'
 
     }
@@ -429,13 +429,13 @@ class MyBean {}
         PathItem pathItem = openAPI.paths.get("/pets")
 
         then:"it is included in the OpenAPI doc"
-        pathItem.get.operationId == 'list'
+        pathItem.get.operationId == 'listGet'
         pathItem.get.description == 'List the pets'
         pathItem.get.responses['200']
         pathItem.get.responses['200'].description == 'a list of pet names'
         pathItem.get.responses['200'].content['application/json'].schema
         pathItem.get.responses['200'].content['application/json'].schema.type == 'array'
-        pathItem.post.operationId == 'save'
+        pathItem.post.operationId == 'savePost'
         pathItem.post.requestBody
         pathItem.post.requestBody.required
         pathItem.post.requestBody.content
@@ -447,7 +447,7 @@ class MyBean {}
 
         then:"it is included in the OpenAPI doc"
         pathItem.get.description == 'Find a pet by a slug'
-        pathItem.get.operationId == 'find'
+        pathItem.get.operationId == 'findGet'
         pathItem.get.parameters.size() == 1
         pathItem.get.parameters[0].name == 'slug'
         pathItem.get.parameters[0].in == ParameterIn.PATH.toString()
@@ -463,7 +463,7 @@ class MyBean {}
         pathItem = openAPI.paths.get("/pets/flowable")
 
         then:
-        pathItem.get.operationId == 'flowable'
+        pathItem.get.operationId == 'flowableGet'
         pathItem.get.responses['200']
         pathItem.get.responses['200'].description == 'a list of pet names'
         pathItem.get.responses['200'].content['application/json'].schema
@@ -504,7 +504,7 @@ class MyBean {}
 
         expect:
         operation != null
-        operation.operationId == 'getSubscription'
+        operation.operationId == 'getSubscriptionGet'
         operation.parameters.size() == 1
         operation.parameters[0].in == 'path'
         operation.parameters[0].name == 'subscriptionId'
@@ -547,7 +547,7 @@ class MyBean {}
 
         then:
         operation != null
-        operation.operationId == 'getSubscription'
+        operation.operationId == 'getSubscriptionGet'
         operation.parameters.size() == 1
 
 
@@ -593,7 +593,7 @@ class MyBean {}
 
         then:
         operation != null
-        operation.operationId == 'getSubscription'
+        operation.operationId == 'getSubscriptionGet'
         operation.parameters.size() == 1
 
 
@@ -638,7 +638,7 @@ class MyBean {}
 
         then:
         operation != null
-        operation.operationId == 'getSubscription'
+        operation.operationId == 'getSubscriptionGet'
         operation.parameters.size() == 1
 
 
@@ -683,7 +683,7 @@ class MyBean {}
 
         then:
         operation != null
-        operation.operationId == 'getSubscription'
+        operation.operationId == 'getSubscriptionGet'
         operation.parameters.size() == 1
 
         when:
@@ -723,7 +723,7 @@ class MyBean {}
 
         expect:
         operation != null
-        operation.operationId == 'getSubscription'
+        operation.operationId == 'getSubscriptionGet'
         operation.parameters.size() == 5
         operation.parameters[0].in == 'cookie'
         operation.parameters[0].name == 'subscriptionId'
@@ -773,7 +773,7 @@ class MyBean {}
 
         then:
         operation != null
-        operation.operationId == 'query'
+        operation.operationId == 'queryGet'
         operation.parameters.size() == 2
         operation.parameters[0].name == 'foo'
         !operation.parameters[0].required
@@ -821,7 +821,7 @@ class MyBean {}
 
         then:
         operation != null
-        operation.operationId == 'getSubscription'
+        operation.operationId == 'getSubscriptionGet'
         operation.parameters.size() == 1
 
         when:
@@ -838,7 +838,7 @@ class MyBean {}
 
         then:
         operation != null
-        operation.operationId == 'getSubscription'
+        operation.operationId == 'getSubscriptionGet'
         operation.parameters.size() == 1
 
         when:

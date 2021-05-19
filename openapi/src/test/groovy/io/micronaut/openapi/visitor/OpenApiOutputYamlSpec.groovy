@@ -132,105 +132,106 @@ class MyBean {}
 ''')
         then:"the yaml is written"
             AbstractOpenApiVisitor.testYamlReference != null
+        println(AbstractOpenApiVisitor.testYamlReference)
 
         then:"paths are sorted and schemas are sorted"
             AbstractOpenApiEndpointVisitor.testYamlReference.contains('''\
 paths:
   /endpoint1:
     get:
-      operationId: getPath
+      operationId: getPathGet
       parameters: []
       responses:
         "200":
-          description: getPath 200 response
+          description: getPathGet 200 response
           content:
             application/json:
               schema:
                 type: string
   /endpoint1/path1:
     get:
-      operationId: path1
+      operationId: path1Get1
       parameters: []
       responses:
         "200":
-          description: path1 200 response
+          description: path1Get1 200 response
           content:
             application/json:
               schema:
                 type: string
   /endpoint1/path2:
     get:
-      operationId: path2
+      operationId: path2Get1
       parameters: []
       responses:
         "200":
-          description: path2 200 response
+          description: path2Get1 200 response
           content:
             application/json:
               schema:
                 type: string
   /endpoint2:
     get:
-      operationId: path
+      operationId: pathGet1
       parameters: []
       responses:
         "200":
-          description: path 200 response
+          description: pathGet1 200 response
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Person3\'
   /endpoint2/path1:
     get:
-      operationId: path1
+      operationId: path1Get2
       parameters: []
       responses:
         "200":
-          description: path1 200 response
+          description: path1Get2 200 response
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Person1\'
   /endpoint2/path2:
     get:
-      operationId: path2
+      operationId: path2Get2
       parameters: []
       responses:
         "200":
-          description: path2 200 response
+          description: path2Get2 200 response
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Person2\'
   /endpoint3:
     get:
-      operationId: path
+      operationId: pathGet2
       parameters: []
       responses:
         "200":
-          description: path 200 response
+          description: pathGet2 200 response
           content:
             application/json:
               schema:
                 type: string
   /endpoint3/path1:
     get:
-      operationId: path1
+      operationId: path1Get3
       parameters: []
       responses:
         "200":
-          description: path1 200 response
+          description: path1Get3 200 response
           content:
             application/json:
               schema:
                 type: string
   /endpoint3/path2:
     get:
-      operationId: path2
+      operationId: path2Get3
       parameters: []
       responses:
         "200":
-          description: path2 200 response
+          description: path2Get3 200 response
           content:
             application/json:
               schema:

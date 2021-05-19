@@ -99,7 +99,7 @@ class MyBean {}
         PathItem pathItem = openAPI.paths.get("/networks")
 
         then:"it is included in the OpenAPI doc"
-        pathItem.get.operationId == 'getNetworks'
+        pathItem.get.operationId == 'getNetworksGet'
         pathItem.get.parameters.size() == 1
         pathItem.get.parameters[0].name =='fooBar'
         pathItem.get.parameters[0].description == 'NA/true/false (case insensitive)'
@@ -166,7 +166,7 @@ class MyBean {}
         PathItem pathItem = openAPI.paths.get("/networks")
 
         then:"it is included in the OpenAPI doc"
-        pathItem.get.operationId == 'getNetworks'
+        pathItem.get.operationId == 'getNetworksGet'
         pathItem.get.parameters.size() == 1
         pathItem.get.parameters[0].name =='fooBar'
     }
@@ -227,7 +227,7 @@ class MyBean {}
         PathItem pathItem = openAPI.paths.get("/networks")
 
         then:"it is included in the OpenAPI doc"
-        pathItem.post.operationId == 'getNetworks'
+        pathItem.post.operationId == 'getNetworksPost'
         pathItem.post.parameters.size() == 1
         pathItem.post.parameters[0].name =='fooBar'
     }
@@ -288,7 +288,7 @@ class MyBean {}
         PathItem pathItem = openAPI.paths.get("/networks")
 
         then:"it is included in the OpenAPI doc"
-        pathItem.post.operationId == 'saveNetwork'
+        pathItem.post.operationId == 'saveNetworkPost'
         pathItem.post.parameters.size() == 0
         pathItem.post.requestBody.content['application/json'].schema
         pathItem.post.requestBody.content['application/json'].schema.properties.size() == 1
@@ -333,7 +333,7 @@ class MyBean {}
         PathItem pathItem = openAPI.paths.get("/networks")
 
         then:"it is included in the OpenAPI doc"
-        pathItem.get.operationId == 'getNetworks'
+        pathItem.get.operationId == 'getNetworksGet'
         pathItem.get.parameters.empty
         pathItem.get.requestBody == null
     }
@@ -400,7 +400,7 @@ class MyBean {}
         PathItem pathItem = openAPI.paths.get("/test1")
 
         then:
-        pathItem.get.operationId == 'test1'
+        pathItem.get.operationId == 'test1Get'
         pathItem.get.parameters.size() == 1
         pathItem.get.parameters[0].name == 'name'
         pathItem.get.parameters[0].in == 'query'
@@ -409,7 +409,7 @@ class MyBean {}
         pathItem = openAPI.paths.get("/test2")
 
         then:
-        pathItem.post.operationId == 'test2'
+        pathItem.post.operationId == 'test2Post'
         pathItem.post.parameters.size() == 0
         pathItem.post.requestBody.content['application/json'].schema
         pathItem.post.requestBody.content['application/json'].schema.properties.size() == 1
@@ -419,21 +419,21 @@ class MyBean {}
         pathItem = openAPI.paths.get("/test3")
 
         then:
-        pathItem.get.operationId == 'test3'
+        pathItem.get.operationId == 'test3Get'
         pathItem.get.parameters.size() == 0
 
         when:
         pathItem = openAPI.paths.get("/test4")
 
         then:
-        pathItem.get.operationId == 'test4'
+        pathItem.get.operationId == 'test4Get'
         pathItem.get.parameters.size() == 0
 
         when:
         pathItem = openAPI.paths.get("/test5")
 
         then:
-        pathItem.get.operationId == 'test5'
+        pathItem.get.operationId == 'test5Get'
         pathItem.get.parameters.size() == 2
         pathItem.get.parameters[0].name == 'name'
         pathItem.get.parameters[0].in == 'query'
@@ -444,7 +444,7 @@ class MyBean {}
         pathItem = openAPI.paths.get("/test6")
 
         then:
-        pathItem.get.operationId == 'test6'
+        pathItem.get.operationId == 'test6Get'
         pathItem.get.parameters.size() == 2
         pathItem.get.parameters[0].name == 'bar'
         pathItem.get.parameters[0].in == 'query'
@@ -455,7 +455,7 @@ class MyBean {}
         pathItem = openAPI.paths.get("/test7")
 
         then:
-        pathItem.post.operationId == 'test7'
+        pathItem.post.operationId == 'test7Post'
         pathItem.post.parameters.size() == 0
         pathItem.post.requestBody.required
         pathItem.post.requestBody.content['application/json'].schema
@@ -550,7 +550,7 @@ class MyBean {}
         PathItem pathItem = openAPI.paths.get("/networks")
 
         then:"it is included in the OpenAPI doc"
-        pathItem.get.operationId == 'getNetworks'
+        pathItem.get.operationId == 'getNetworksGet'
         pathItem.get.parameters.size() == 1
         pathItem.get.parameters[0].name =='fooBar'
         pathItem.get.parameters[0].class == HeaderParameter
