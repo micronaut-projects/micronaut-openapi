@@ -376,7 +376,6 @@ public class MyBean {}
 
         then:
         OpenAPI openAPI = AbstractOpenApiVisitor.testReference
-        System.out.println(openAPI)
         openAPI?.paths?.get("/person/{name}")?.get
         openAPI.components.schemas["Person"]
         openAPI.components.schemas["Person"].type == "object"

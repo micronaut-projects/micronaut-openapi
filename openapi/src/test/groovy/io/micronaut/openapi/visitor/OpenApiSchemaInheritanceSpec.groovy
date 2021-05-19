@@ -123,4 +123,317 @@ class MyBean {}
         ((ComposedSchema) openAPI.components.schemas['B']).allOf[1].properties["age2"].type == "integer"
     }
 
+    void "test OpenAPI with body that contains nested inheritance schemas when annotation is on type"() {
+        given:
+            buildBeanDefinition('test.MyBean', '''
+
+package test;
+
+import io.swagger.v3.oas.annotations.*;
+import com.fasterxml.jackson.annotation.*;
+import io.swagger.v3.oas.annotations.parameters.*;
+import io.swagger.v3.oas.annotations.responses.*;
+import io.swagger.v3.oas.annotations.security.*;
+import io.swagger.v3.oas.annotations.media.*;
+import io.swagger.v3.oas.annotations.enums.*;
+import io.swagger.v3.oas.annotations.links.*;
+import io.micronaut.http.annotation.*;
+import io.micronaut.core.annotation.*;
+import java.util.List;
+
+@Controller("/")
+class MyController {
+
+    @Post("/")
+    public void updateOwner(@Body Owner owner) {
+    }
+}
+
+@Introspected
+@Schema(description = "Represents a person that owns a car or a bike")
+class Owner {
+
+    private Vehicle vehicle;
+
+    public Vehicle getVehicle() {
+        return vehicle;
+    }
+
+    public void setVehicle(Vehicle vehicle) {
+        this.vehicle = vehicle;
+    }
+}
+
+@Introspected
+@Schema(description = "Vehicle of the owner. Here a car or bike with a name", oneOf = { Car.class, Bike.class })
+abstract class Vehicle {
+}
+
+@Introspected
+@Schema(description = "Bike of an owner with an own name")
+class Bike extends Vehicle {
+}
+
+@Introspected
+@Schema(description = "Car of an owner with an own name")
+class Car extends Vehicle {
+}
+
+@javax.inject.Singleton
+class MyBean {}
+''')
+
+            OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+            Operation operation = openAPI.paths?.get("/")?.post
+            RequestBody requestBody = operation.requestBody
+            requestBody.required
+            Map<String, Schema> schemas = openAPI.getComponents().getSchemas()
+            Schema owner = schemas["Owner"]
+            Schema vehicle = schemas["Vehicle"]
+
+        expect:
+            Schema vehicleRef = owner.getProperties()["vehicle"]
+            !(vehicleRef instanceof ComposedSchema)
+            vehicleRef.$ref == "#/components/schemas/Vehicle"
+            vehicle instanceof ComposedSchema
+            ((ComposedSchema) vehicle).oneOf[0].$ref == '#/components/schemas/Car'
+            ((ComposedSchema) vehicle).oneOf[1].$ref == '#/components/schemas/Bike'
+    }
+
+    void "test OpenAPI with body that contains nested inheritance schemas when annotation is on property"() {
+        given:
+            buildBeanDefinition('test.MyBean', '''
+
+package test;
+
+import io.swagger.v3.oas.annotations.*;
+import io.swagger.v3.oas.annotations.parameters.*;
+import io.swagger.v3.oas.annotations.responses.*;
+import io.swagger.v3.oas.annotations.security.*;
+import io.swagger.v3.oas.annotations.media.*;
+import io.swagger.v3.oas.annotations.enums.*;
+import io.swagger.v3.oas.annotations.links.*;
+import io.micronaut.http.annotation.*;
+import io.micronaut.core.annotation.*;
+import java.util.List;
+
+@Controller("/")
+class MyController {
+
+    @Post("/")
+    public void updateOwner(@Body Owner owner) {
+    }
+}
+
+@Introspected
+@Schema(description = "Represents a person that owns a car or a bike")
+class Owner {
+
+    private Vehicle vehicle;
+
+    @Schema(description = "Vehicle of the owner. Here a car or bike with a name", oneOf = { Car.class, Bike.class })
+    public Vehicle getVehicle() {
+        return vehicle;
+    }
+
+    public void setVehicle(Vehicle vehicle) {
+        this.vehicle = vehicle;
+    }
+}
+
+@Introspected
+abstract class Vehicle {
+}
+
+@Introspected
+@Schema(description = "Bike of an owner with an own name")
+class Bike extends Vehicle {
+}
+
+@Introspected
+@Schema(description = "Car of an owner with an own name")
+class Car extends Vehicle {
+}
+
+@javax.inject.Singleton
+class MyBean {}
+''')
+
+            OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+            Operation operation = openAPI.paths?.get("/")?.post
+            RequestBody requestBody = operation.requestBody
+            requestBody.required
+            Map<String, Schema> schemas = openAPI.getComponents().getSchemas()
+
+        expect:
+            Schema owner = schemas["Owner"]
+            Schema vehicleRef = owner.getProperties()["vehicle"]
+            !(vehicleRef instanceof ComposedSchema)
+            vehicleRef.$ref == "#/components/schemas/Vehicle"
+            Schema vehicle = schemas["Vehicle"]
+            vehicle instanceof ComposedSchema
+            ((ComposedSchema) vehicle).oneOf[0].$ref == '#/components/schemas/Car'
+            ((ComposedSchema) vehicle).oneOf[1].$ref == '#/components/schemas/Bike'
+    }
+
+    void "test OpenAPI that on nested inheritance property annotation is preferred over type annotation"() {
+        given:
+            buildBeanDefinition('test.MyBean', '''
+
+package test;
+
+import io.swagger.v3.oas.annotations.*;
+import io.swagger.v3.oas.annotations.parameters.*;
+import io.swagger.v3.oas.annotations.responses.*;
+import io.swagger.v3.oas.annotations.security.*;
+import io.swagger.v3.oas.annotations.media.*;
+import io.swagger.v3.oas.annotations.enums.*;
+import io.swagger.v3.oas.annotations.links.*;
+import io.micronaut.http.annotation.*;
+import io.micronaut.core.annotation.*;
+import java.util.List;
+
+@Controller("/")
+class MyController {
+
+    @Post("/")
+    public void updateOwner(@Body Owner owner) {
+    }
+}
+
+@Introspected
+@Schema(description = "Represents a person that owns a car or a bike")
+class Owner {
+
+    private Vehicle vehicle;
+
+    @Schema(name = "Owner.Vehicle", description = "Vehicle of the owner. Here a car or bike with a name", oneOf = { Car.class, Bike.class })
+    public Vehicle getVehicle() {
+        return vehicle;
+    }
+
+    public void setVehicle(Vehicle vehicle) {
+        this.vehicle = vehicle;
+    }
+}
+
+@Introspected
+@Schema(description = "Vehicle of the owner.")
+abstract class Vehicle {
+}
+
+@Introspected
+@Schema(description = "Bike of an owner with an own name")
+class Bike extends Vehicle {
+}
+
+@Introspected
+@Schema(description = "Car of an owner with an own name")
+class Car extends Vehicle {
+}
+
+@javax.inject.Singleton
+class MyBean {}
+''')
+
+            OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+            Operation operation = openAPI.paths?.get("/")?.post
+            RequestBody requestBody = operation.requestBody
+            requestBody.required
+            Map<String, Schema> schemas = openAPI.getComponents().getSchemas()
+
+        expect:
+            Schema owner = schemas["Owner"]
+            Schema vehicleRef = owner.getProperties()["vehicle"]
+            !(vehicleRef instanceof ComposedSchema)
+            vehicleRef.$ref == "#/components/schemas/Owner.Vehicle"
+            Schema ownerVehicle = schemas["Owner.Vehicle"]
+            ((ComposedSchema) ownerVehicle).oneOf[0].$ref == '#/components/schemas/Car'
+            ((ComposedSchema) ownerVehicle).oneOf[1].$ref == '#/components/schemas/Bike'
+    }
+
+    void "test OpenAPI with body that contains nested inheritance schemas apply additional information to schema"() {
+        given:
+            buildBeanDefinition('test.MyBean', '''
+
+package test;
+
+import io.swagger.v3.oas.annotations.*;
+import io.swagger.v3.oas.annotations.parameters.*;
+import io.swagger.v3.oas.annotations.responses.*;
+import io.swagger.v3.oas.annotations.security.*;
+import io.swagger.v3.oas.annotations.media.*;
+import io.swagger.v3.oas.annotations.enums.*;
+import io.swagger.v3.oas.annotations.links.*;
+import io.micronaut.http.annotation.*;
+import io.micronaut.core.annotation.*;
+import java.util.List;
+
+@Controller("/")
+class MyController {
+
+    @Post("/")
+    public void updateOwner(@Body Owner owner) {
+    }
+}
+
+@Introspected
+@Schema(description = "Represents a person that owns a car or a bike")
+class Owner {
+
+    private Vehicle vehicle;
+
+    /**
+     * Some docs
+     */
+    @Nullable
+    @Deprecated
+    public Vehicle getVehicle() {
+        return vehicle;
+    }
+
+    public void setVehicle(Vehicle vehicle) {
+        this.vehicle = vehicle;
+    }
+}
+
+@Introspected
+@Schema(description = "Base vehicle", oneOf = { Car.class, Bike.class })
+abstract class Vehicle {
+}
+
+@Introspected
+@Schema(description = "Bike of an owner with an own name")
+class Bike extends Vehicle {
+}
+
+@Introspected
+@Schema(description = "Car")
+class Car extends Vehicle {
+}
+
+@javax.inject.Singleton
+class MyBean {}
+''')
+
+            OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+            Operation operation = openAPI.paths?.get("/")?.post
+            RequestBody requestBody = operation.requestBody
+            requestBody.required
+            Map<String, Schema> schemas = openAPI.getComponents().getSchemas()
+
+        expect:
+            Schema owner = schemas["Owner"]
+            Schema vehicleProperty = owner.getProperties()["vehicle"]
+            vehicleProperty instanceof ComposedSchema
+            ((ComposedSchema) vehicleProperty).allOf[0].$ref == "#/components/schemas/Vehicle"
+            ((ComposedSchema) vehicleProperty).allOf[1].deprecated
+            ((ComposedSchema) vehicleProperty).allOf[1].description == "Some docs"
+            ((ComposedSchema) vehicleProperty).allOf[1].nullable
+            Schema vehicle = schemas["Vehicle"]
+            vehicle instanceof ComposedSchema
+            ((ComposedSchema) vehicle).oneOf[0].$ref == '#/components/schemas/Car'
+            ((ComposedSchema) vehicle).oneOf[1].$ref == '#/components/schemas/Bike'
+    }
+
 }

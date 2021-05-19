@@ -1,0 +1,31 @@
+You can apply `@Schema` annotation to type or property. But it's important to note, that Micronaut will prioritize `@Schema` on property over `@Schema` on type.
+
+.Schema annotation resolution
+[source,java]
+----
+import io.swagger.v3.oas.annotations.media.Schema;
+
+@Schema(description="Pet") // <1>
+class Pet {
+}
+
+class Owner {
+
+    private Pet cat;
+    private Pet dog;
+
+    public Pet getCat() { // <2>
+        return cat;
+    }
+
+    @Schema(name="MyPet", description="This is my pet") // <3>
+    public Pet getDog() {
+        return dog;
+    }
+
+}
+----
+
+<1> Micronaut will detect this annotation
+<2> Micronaut will use annotation <1> from type since there is none on property
+<3> Micronaut will use this annotation even if there exists one on Pet type
