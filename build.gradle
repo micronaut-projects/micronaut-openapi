@@ -16,7 +16,7 @@ subprojects { Project subproject ->
     apply plugin: "io.micronaut.build.internal.publishing"
 
     tasks.withType(Test) {
-        if (JavaVersion.current().isCompatibleWith(JavaVersion.VERSION_16)) {
+        if (JavaVersion.current().isCompatibleWith(JavaVersion.VERSION_15)) {
             jvmArgs "--enable-preview"
         }
     }
