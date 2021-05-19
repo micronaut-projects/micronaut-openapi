@@ -21,7 +21,7 @@ micronaut.openapi.expand.api.version=v1.1
 micronaut.openapi.expand.openapi.description=A nice API
 ----
 
-The following example shows how to use the previous `micronaut.openapi.exapand` properties:
+The following example shows how to use the previous `micronaut.openapi.expand` properties:
 
 .Application Simple Application
 [source,java]
