@@ -1,9 +1,12 @@
 package io.micronaut.configuration.openapi.docs
-// tag::imports[]
+
 import io.micronaut.runtime.Micronaut
-import groovy.transform.CompileStatic
-import io.swagger.v3.oas.annotations.*
-import io.swagger.v3.oas.annotations.info.*
+// tag::imports[]
+
+import io.swagger.v3.oas.annotations.OpenAPIDefinition
+import io.swagger.v3.oas.annotations.info.Contact
+import io.swagger.v3.oas.annotations.info.Info
+import io.swagger.v3.oas.annotations.info.License
 
 // end::imports[]
 // tag::clazz[]
@@ -16,7 +19,6 @@ import io.swagger.v3.oas.annotations.info.*
                 contact = @Contact(url = "https://gigantic-server.com", name = "Fred", email = "Fred@gigagantic-server.com")
         )
 )
-@CompileStatic
 class Application {
     static void main(String[] args) {
         Micronaut.run(Application)
