@@ -134,6 +134,10 @@
         
         <div class="toc-item" style="margin-left:10px" id="toc-item-schemasAndGenerics"><a href="#schemasAndGenerics"><strong>10.3</strong><span>Schemas and Generics</span></a></div>
         
+        <div class="toc-item" style="margin-left:10px" id="toc-item-schemasNaming"><a href="#schemasNaming"><strong>10.4</strong><span>Schemas naming</span></a></div>
+        
+        <div class="toc-item" style="margin-left:10px" id="toc-item-schemasAnnotationResolution"><a href="#schemasAnnotationResolution"><strong>10.5</strong><span>Schemas Annotation resolution</span></a></div>
+        
         <div class="toc-item" style="margin-left:0px" id="toc-item-endpoints"><a href="#endpoints"><strong>11</strong><span>Exposing Endpoints</span></a></div>
         
         <div class="toc-item" style="margin-left:10px" id="toc-item-enableendpoints"><a href="#enableendpoints"><strong>11.1</strong><span>Enable Endpoints</span></a></div>
@@ -1102,6 +1106,129 @@ public Response&lt;Pet&gt; updatePet(Pet pet) {
 </div>
 <div class="paragraph">
 <p>In the above case the generated schema will be named <code>#/components/schemas/ResponseOfPet</code>.</p>
+</div>
+
+<h2 id="schemasNaming"><a class="anchor" href="#schemasNaming"></a>10.4 Schemas naming</h2>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/swaggerAnnotations/schemasNaming.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>By default Micronaut uses Class simple name for Custom type schemas. Micronaut use simple name no matter if <code>@Schema</code>
+annotation is defined on type or on property (getter). That means that if you have two properties of same type with <code>@Schema</code>
+annotation without <code>name</code> set, Micronaut will accidentally override one definition with another. So in that case you should
+set <code>name</code> on <code>@Schema</code> annotation.</p>
+</div>
+<div class="listingblock">
+<div class="title">Schema name resolution</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import io.swagger.v3.oas.annotations.media.Schema;
+
+@Schema(description="A pet") <i class="conum" data-value="1"></i><b>(1)</b>
+class Pet {
+}
+
+class Owner {
+    private Pet bird;
+    private Pet cat;
+    private Pet dog;
+
+
+    @Schema(description="Pet that is a a bird") <i class="conum" data-value="2"></i><b>(2)</b>
+    public Pet getBird() {
+        return bird;
+    }
+
+    @Schema(description="Pet that is a cat") <i class="conum" data-value="3"></i><b>(3)</b>
+    public Pet getCat() {
+        return cat;
+    }
+
+    @Schema(name="Dog", description="Pet that is a dog") <i class="conum" data-value="4"></i><b>(4)</b>
+    public Pet getDog() {
+        return cat;
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Micronaut will generate schema with name <code>Pet</code></td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Micronaut will generate schema with name <code>Pet</code> since name is not set, this will conflict with &lt;1&gt; and &lt;3&gt;, final Pet schema might be incorrect</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Micronaut will generate schema with name <code>Pet</code> since name is not set, this will conflict with &lt;1&gt; and &lt;2&gt;, final Pet schema might be incorrect</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Micronaut will generate schema with unique name <code>Dog</code> since name is set, there is no conflict, schema is correctly generated</td>
+</tr>
+</table>
+</div>
+
+<h2 id="schemasAnnotationResolution"><a class="anchor" href="#schemasAnnotationResolution"></a>10.5 Schemas Annotation resolution</h2>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/swaggerAnnotations/schemasAnnotationResolution.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>You can apply <code>@Schema</code> annotation to type or property. But it&#8217;s important to note, that Micronaut will prioritize <code>@Schema</code> on property over <code>@Schema</code> on type.</p>
+</div>
+<div class="listingblock">
+<div class="title">Schema annotation resolution</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import io.swagger.v3.oas.annotations.media.Schema;
+
+@Schema(description="Pet") <i class="conum" data-value="1"></i><b>(1)</b>
+class Pet {
+}
+
+class Owner {
+
+    private Pet cat;
+    private Pet dog;
+
+    public Pet getCat() { <i class="conum" data-value="2"></i><b>(2)</b>
+        return cat;
+    }
+
+    @Schema(name="MyPet", description="This is my pet") <i class="conum" data-value="3"></i><b>(3)</b>
+    public Pet getDog() {
+        return dog;
+    }
+
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Micronaut will detect this annotation</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Micronaut will use annotation &lt;1&gt; from type since there is none on property</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Micronaut will use this annotation even if there exists one on Pet type</td>
+</tr>
+</table>
 </div>
 
 <h1 id="endpoints"><a class="anchor" href="#endpoints"></a>11 Exposing Endpoints</h1>
