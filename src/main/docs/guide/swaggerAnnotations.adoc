@@ -2,7 +2,7 @@ You can take full control by augmenting your definition with https://github.com/
 
 Add the Swagger annotations to the compile classpath
 
-dependency:swagger-annotations[scope="implementation", version="{version}", groupId="io.swagger.core.v3"]
+dependency:swagger-annotations[scope="implementation", groupId="io.swagger.core.v3"]
 
 and then annotate your controllers:
 
