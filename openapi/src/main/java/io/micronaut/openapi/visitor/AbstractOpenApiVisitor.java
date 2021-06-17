@@ -44,6 +44,7 @@ import io.micronaut.http.uri.UriMatchTemplate;
 import io.micronaut.inject.ast.ClassElement;
 import io.micronaut.inject.ast.Element;
 import io.micronaut.inject.ast.ElementModifier;
+import io.micronaut.inject.ast.ElementQuery;
 import io.micronaut.inject.ast.EnumElement;
 import io.micronaut.inject.ast.FieldElement;
 import io.micronaut.inject.ast.MemberElement;
@@ -648,7 +649,7 @@ abstract class AbstractOpenApiVisitor  {
                isNullable = true;
                type = type.getFirstTypeArgument().orElse(null);
             }
-            
+
             if (type != null) {
 
                 String typeName = type.getName();
@@ -706,7 +707,7 @@ abstract class AbstractOpenApiVisitor  {
                         break;
                     }
                 }
-                
+
                 if (!isStream && (isPublisher || isObservable)) {
                     schema = arraySchema(schema);
                 } else if (isNullable) {
@@ -1378,7 +1379,7 @@ abstract class AbstractOpenApiVisitor  {
                 processPropertyElements(openAPI, context, type, schema, fluentMethodsProperties, mediaTypes);
             }
 
-            final List<FieldElement> publicFields = classElement.getFields(mods -> mods.contains(ElementModifier.PUBLIC) && mods.size() == 1);
+            final List<FieldElement> publicFields = classElement.getEnclosedElements(ElementQuery.ALL_FIELDS.modifiers(mods -> mods.contains(ElementModifier.PUBLIC) && mods.size() == 1));
 
             processPropertyElements(openAPI, context, type, schema, publicFields, mediaTypes);
         }

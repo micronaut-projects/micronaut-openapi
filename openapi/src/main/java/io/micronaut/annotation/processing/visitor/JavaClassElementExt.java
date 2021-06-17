@@ -320,7 +320,7 @@ public class JavaClassElementExt extends JavaClassElement {
     private JavaPropertyElement toPropertyElement(String propertyName, BeanPropertyData value, final AnnotationMetadata annotationMetadata) {
         return new JavaPropertyElement(
                 value.declaringType == null ? this : value.declaringType,
-                value.getter,
+                (Element) value.getter,
                 annotationMetadata,
                 propertyName,
                 value.type,
