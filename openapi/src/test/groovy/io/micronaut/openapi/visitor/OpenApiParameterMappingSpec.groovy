@@ -345,7 +345,7 @@ class MyBean {}
         buildBeanDefinition('test.MyBean', '''
 package test;
 
-import javax.annotation.Nullable;
+import io.micronaut.core.annotation.Nullable;
 import java.security.Principal;
 import io.micronaut.http.annotation.*;
 import io.micronaut.http.*;

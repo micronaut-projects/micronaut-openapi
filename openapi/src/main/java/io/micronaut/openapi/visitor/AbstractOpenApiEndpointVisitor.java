@@ -21,12 +21,13 @@ import static io.micronaut.openapi.postprocessors.OpenApiOperationsPostProcessor
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.JsonNode;
 
-import edu.umd.cs.findbugs.annotations.NonNull;
 import io.micronaut.annotation.processing.visitor.JavaClassElementExt;
 import io.micronaut.context.env.DefaultPropertyPlaceholderResolver;
 import io.micronaut.context.env.PropertyPlaceholderResolver;
 import io.micronaut.core.annotation.AnnotationValue;
 import io.micronaut.core.annotation.Experimental;
+import io.micronaut.core.annotation.NonNull;
+import io.micronaut.core.annotation.Nullable;
 import io.micronaut.core.beans.BeanMap;
 import io.micronaut.core.bind.annotation.Bindable;
 import io.micronaut.core.convert.ArgumentConversionContext;
@@ -72,15 +73,13 @@ import io.swagger.v3.oas.models.responses.ApiResponses;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.servers.Server;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.io.IOException;
 import java.security.Principal;
 import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * A {@link TypeElementVisitor} the builds the Swagger model from Micronaut controllers at compile time.
+ * A {@link io.micronaut.inject.visitor.TypeElementVisitor} the builds the Swagger model from Micronaut controllers at compile time.
  *
  * @author graemerocher
  * @since 1.0
@@ -1031,18 +1030,18 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
         if (this.propertyPlaceholderResolver == null) {
             this.propertyPlaceholderResolver = new DefaultPropertyPlaceholderResolver(new PropertyResolver() {
                 @Override
-                public boolean containsProperty(@Nonnull String name) {
+                public boolean containsProperty(@NonNull String name) {
                     return false;
                 }
 
                 @Override
-                public boolean containsProperties(@Nonnull String name) {
+                public boolean containsProperties(@NonNull String name) {
                     return false;
                 }
 
-                @Nonnull
+                @NonNull
                 @Override
-                public <T> Optional<T> getProperty(@Nonnull String name, @Nonnull ArgumentConversionContext<T> conversionContext) {
+                public <T> Optional<T> getProperty(@NonNull String name, @NonNull ArgumentConversionContext<T> conversionContext) {
                     return Optional.empty();
                 }
 

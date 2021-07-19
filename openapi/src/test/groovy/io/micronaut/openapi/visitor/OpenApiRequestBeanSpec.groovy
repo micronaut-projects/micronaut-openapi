@@ -19,7 +19,7 @@ package test;
 import io.micronaut.http.HttpRequest;
 import io.micronaut.http.annotation.*;
 import io.micronaut.core.annotation.*;
-import edu.umd.cs.findbugs.annotations.Nullable;
+import io.micronaut.core.annotation.Nullable;
 import io.swagger.v3.oas.annotations.*;
 import io.swagger.v3.oas.annotations.parameters.*;
 import io.swagger.v3.oas.annotations.responses.*;

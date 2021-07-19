@@ -25,10 +25,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import io.micronaut.annotation.processing.visitor.JavaClassElementExt;
 import io.micronaut.core.annotation.AnnotationClassValue;
 import io.micronaut.core.annotation.AnnotationValue;
+import io.micronaut.core.annotation.NonNull;
 import io.micronaut.core.annotation.Nullable;
 import io.micronaut.core.beans.BeanMap;
 import io.micronaut.core.bind.annotation.Bindable;
@@ -81,10 +81,8 @@ import io.swagger.v3.oas.models.media.ObjectSchema;
 import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
-
 import org.reactivestreams.Publisher;
 
-import javax.annotation.Nonnull;
 import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.Email;
@@ -436,7 +434,7 @@ abstract class AbstractOpenApiVisitor  {
                     discriminatorMap.put("propertyName", parseJsonString(value).orElse(value));
                     newValues.put("discriminator", discriminatorMap);
                 } else if (key.equals("accessMode")) {
-                    if(io.swagger.v3.oas.annotations.media.Schema.AccessMode.READ_ONLY.toString().equals(value)) {
+                    if (io.swagger.v3.oas.annotations.media.Schema.AccessMode.READ_ONLY.toString().equals(value)) {
                         newValues.put("readOnly", Boolean.TRUE);
                     } else if (io.swagger.v3.oas.annotations.media.Schema.AccessMode.WRITE_ONLY.toString().equals(value)) {
                         newValues.put("writeOnly", Boolean.TRUE);
@@ -776,7 +774,7 @@ abstract class AbstractOpenApiVisitor  {
                 final boolean required = element.isAnnotationPresent(NotNull.class)
                         || element.isAnnotationPresent(NotBlank.class)
                         || element.isAnnotationPresent(NotEmpty.class)
-                        || element.isAnnotationPresent(Nonnull.class)
+                        || element.isAnnotationPresent(NonNull.class)
                         || element.booleanValue(JsonProperty.class, "required").orElse(false);
                 propertySchema = bindSchemaForElement(context, element, elementType, propertySchema);
                 String propertyName = resolvePropertyName(element, classElement, propertySchema);

@@ -705,7 +705,7 @@ import io.swagger.v3.oas.annotations.media.*;
 import io.swagger.v3.oas.annotations.enums.*;
 import io.micronaut.http.annotation.*;
 import java.util.List;
-import javax.annotation.Nullable;
+import io.micronaut.core.annotation.Nullable;
 
 @Controller("/")
 class MyController {
@@ -752,6 +752,7 @@ import io.swagger.v3.oas.annotations.*;
 import io.swagger.v3.oas.annotations.media.*;
 import io.swagger.v3.oas.annotations.enums.*;
 import io.micronaut.http.annotation.*;
+import io.micronaut.core.annotation.Nullable;
 import java.util.List;
 import javax.validation.constraints.*;
 import javax.annotation.*;
