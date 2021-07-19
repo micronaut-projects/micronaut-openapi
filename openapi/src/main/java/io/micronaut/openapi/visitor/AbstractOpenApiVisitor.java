@@ -906,9 +906,7 @@ abstract class AbstractOpenApiVisitor  {
         if (defaultValue != null && schemaToBind.getDefault() == null) {
             schemaToBind.setDefault(defaultValue);
         }
-        if (element.isAnnotationPresent(Nullable.class)
-                || element.isAnnotationPresent(javax.annotation.Nullable.class)
-                || element.isAnnotationPresent(io.micronaut.core.annotation.Nullable.class)) {
+        if (element.isNullable()) {
             schemaToBind.setNullable(true);
         }
         final String defaultJacksonValue = element.stringValue(JsonProperty.class, "defaultValue").orElse(null);

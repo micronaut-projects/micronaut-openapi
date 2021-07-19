@@ -27,7 +27,6 @@ import io.micronaut.context.env.PropertyPlaceholderResolver;
 import io.micronaut.core.annotation.AnnotationValue;
 import io.micronaut.core.annotation.Experimental;
 import io.micronaut.core.annotation.NonNull;
-import io.micronaut.core.annotation.Nullable;
 import io.micronaut.core.beans.BeanMap;
 import io.micronaut.core.bind.annotation.Bindable;
 import io.micronaut.core.convert.ArgumentConversionContext;
@@ -424,8 +423,7 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
         }
 
         if (newParameter.getRequired() == null) {
-            newParameter.setRequired(!parameter.isAnnotationPresent(Nullable.class) &&
-                    !parameter.getType().isAssignable(Optional.class));
+            newParameter.setRequired(!parameter.isNullable() && !parameter.getType().isOptional());
         }
         if (javadocDescription != null && StringUtils.isEmpty(newParameter.getDescription())) {
             CharSequence desc = javadocDescription.getParameters().get(parameter.getName());
@@ -458,7 +456,7 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
                 propertySchema.setDescription(description.get());
             }
             processSchemaProperty(context, parameter, parameter.getType(), null, schema, propertySchema);
-            if (parameter.isAnnotationPresent(Nullable.class) || parameter.getType().isAssignable(Optional.class)) {
+            if (parameter.isNullable() || parameter.getType().isOptional()) {
                 // Keep null if not
                 propertySchema.setNullable(true);
             }
@@ -624,8 +622,7 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
             }
         }
         if (requestBody.getRequired() == null) {
-            requestBody.setRequired(
-                    !parameter.isAnnotationPresent(Nullable.class) && !parameterType.isAssignable(Optional.class));
+            requestBody.setRequired(!parameter.isNullable() && !parameterType.isOptional());
         }
 
         final Content content;
