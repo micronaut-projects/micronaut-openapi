@@ -80,7 +80,7 @@ class Greeting {
     public String message;
 }
 
-@javax.inject.Singleton
+@jakarta.inject.Singleton
 class MyBean {}
 ''')
         then:"the state is correct"
@@ -147,7 +147,7 @@ class Greeting {
     public String message;
 }
 
-@javax.inject.Singleton
+@jakarta.inject.Singleton
 class MyBean {}
 ''')
         then:"the state is correct"
@@ -208,7 +208,7 @@ class Greeting {
     public String message;
 }
 
-@javax.inject.Singleton
+@jakarta.inject.Singleton
 class MyBean {}
 ''')
         then:"the state is correct"
@@ -269,7 +269,7 @@ class Greeting {
     public String message;
 }
 
-@javax.inject.Singleton
+@jakarta.inject.Singleton
 class MyBean {}
 ''')
         then:"the state is correct"
@@ -321,7 +321,7 @@ interface NetworkOperations {
     );
 }
 
-@javax.inject.Singleton
+@jakarta.inject.Singleton
 class MyBean {}
 ''')
         then:"the state is correct"
@@ -389,7 +389,7 @@ class Greeting {
     public String message;
 }
 
-@javax.inject.Singleton
+@jakarta.inject.Singleton
 class MyBean {}
 ''')
         then:"the state is correct"
@@ -531,7 +531,7 @@ class Greeting {
     public String message;
 }
 
-@javax.inject.Singleton
+@jakarta.inject.Singleton
 class MyBean {}
 ''')
         then:"the state is correct"

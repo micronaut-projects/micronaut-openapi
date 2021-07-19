@@ -127,7 +127,7 @@ class Person3 {
         return name;
     }
 }
-@javax.inject.Singleton
+@jakarta.inject.Singleton
 class MyBean {}
 ''')
         then:"the yaml is written"

@@ -44,7 +44,7 @@ class MyController {
     }
 }
 
-@javax.inject.Singleton
+@jakarta.inject.Singleton
 class MyBean {}
 ''')
 

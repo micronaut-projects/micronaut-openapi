@@ -33,7 +33,7 @@ class TestController2 {
     }
 }
 
-@javax.inject.Singleton
+@jakarta.inject.Singleton
 class MyBean {}
 ''')
 
@@ -72,7 +72,7 @@ class TestController2 {
     }
 }
 
-@javax.inject.Singleton
+@jakarta.inject.Singleton
 class MyBean {}
 ''')
 
@@ -113,7 +113,7 @@ class TestController2 {
     }
 }
 
-@javax.inject.Singleton
+@jakarta.inject.Singleton
 class MyBean {}
 ''')
 
@@ -163,7 +163,7 @@ class TestController3 {
     }
 }
 
-@javax.inject.Singleton
+@jakarta.inject.Singleton
 class MyBean {}
 ''')
 
@@ -208,7 +208,7 @@ class TestController2 {
     }
 }
 
-@javax.inject.Singleton
+@jakarta.inject.Singleton
 class MyBean {}
 ''')
 

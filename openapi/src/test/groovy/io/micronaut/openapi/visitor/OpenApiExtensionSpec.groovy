@@ -64,7 +64,7 @@ class Pet {}
 
 class Response {}
 
-@javax.inject.Singleton
+@jakarta.inject.Singleton
 class MyBean {}
 ''')
 

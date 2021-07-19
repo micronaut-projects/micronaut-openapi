@@ -47,7 +47,7 @@ class HelloWorldController implements HelloWorldApi {
     }
 }
 
-@javax.inject.Singleton
+@jakarta.inject.Singleton
 class MyBean {}
 ''')
         when:
@@ -109,7 +109,7 @@ class PetController implements PetOperations {
     }
 }
 
-@javax.inject.Singleton
+@jakarta.inject.Singleton
 class MyBean {}
 ''')
         when:
@@ -166,7 +166,7 @@ class MyController {
     }
 }
 
-@javax.inject.Singleton
+@jakarta.inject.Singleton
 class MyBean {}
 ''')
         when:
@@ -235,7 +235,7 @@ class Pet {
 }
 
 
-@javax.inject.Singleton
+@jakarta.inject.Singleton
 class MyBean {}
 ''')
         then:"the state is correct"
@@ -305,7 +305,7 @@ interface PetOperations<T extends String> {
     HttpResponse<T> getRandomPet();
 }
 
-@javax.inject.Singleton
+@jakarta.inject.Singleton
 class MyBean {}
 ''')
         then:"the state is correct"
@@ -418,7 +418,7 @@ interface PetOperations<T extends String> {
     Single<T> save(@Body T pet);
 }
 
-@javax.inject.Singleton
+@jakarta.inject.Singleton
 class MyBean {}
 ''')
         then:"the state is correct"
@@ -497,7 +497,7 @@ class MyController {
      }
 }
 
-@javax.inject.Singleton
+@jakarta.inject.Singleton
 class MyBean {}
 ''')
         Operation operation = AbstractOpenApiVisitor.testReference?.paths?.get("/subscription/{subscriptionId}")?.get
@@ -539,7 +539,7 @@ class MyController {
      }
 }
 
-@javax.inject.Singleton
+@jakarta.inject.Singleton
 class MyBean {}
 ''')
         when:
@@ -585,7 +585,7 @@ class MyController {
      }
 }
 
-@javax.inject.Singleton
+@jakarta.inject.Singleton
 class MyBean {}
 ''')
         when:
@@ -630,7 +630,7 @@ class MyController {
      }
 }
 
-@javax.inject.Singleton
+@jakarta.inject.Singleton
 class MyBean {}
 ''')
         when:
@@ -675,7 +675,7 @@ class MyController {
      }
 }
 
-@javax.inject.Singleton
+@jakarta.inject.Singleton
 class MyBean {}
 ''')
         when:
@@ -716,7 +716,7 @@ class MyController {
      }
 }
 
-@javax.inject.Singleton
+@jakarta.inject.Singleton
 class MyBean {}
 ''')
         Operation operation = AbstractOpenApiVisitor.testReference?.paths?.get("/subscription/{subscriptionId}")?.get
@@ -766,7 +766,7 @@ class MyController {
      }
 }
 
-@javax.inject.Singleton
+@jakarta.inject.Singleton
 class MyBean {}
 ''')
         when:
@@ -808,7 +808,7 @@ class MyController {
      }
 }
 
-@javax.inject.Singleton
+@jakarta.inject.Singleton
 class MyBean {}
 ''')
         when:

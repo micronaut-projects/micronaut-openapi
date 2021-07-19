@@ -66,7 +66,7 @@ class Response<T> {
     };
 }
 
-@javax.inject.Singleton
+@jakarta.inject.Singleton
 class MyBean {}
 ''')
 
@@ -128,7 +128,7 @@ class Response<T> {
     };
 }
 
-@javax.inject.Singleton
+@jakarta.inject.Singleton
 class MyBean {}
 ''')
 

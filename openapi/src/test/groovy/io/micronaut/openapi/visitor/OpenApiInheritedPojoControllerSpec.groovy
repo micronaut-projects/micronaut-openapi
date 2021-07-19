@@ -93,7 +93,7 @@ abstract class BaseTestOperations<T extends BaseObject> {
         return null;
     }
 }
-@javax.inject.Singleton
+@jakarta.inject.Singleton
 class MyBean {}
 ''')
         then: "the state is correct"
@@ -288,7 +288,7 @@ class CatController implements PetOperations {
     }
 }
 
-@javax.inject.Singleton
+@jakarta.inject.Singleton
 class MyBean {}
 ''')
         then: "the state is correct"
@@ -489,7 +489,7 @@ class CatController implements PetOperations {
     }
 }
 
-@javax.inject.Singleton
+@jakarta.inject.Singleton
 class MyBean {}
 ''')
         then: "the state is correct"
@@ -626,7 +626,7 @@ class Pet {
     }
 }
 
-@javax.inject.Singleton
+@jakarta.inject.Singleton
 class MyBean {}
 ''')
         then: "the state is correct"
@@ -749,7 +749,7 @@ class Pet {
     }
 }
 
-@javax.inject.Singleton
+@jakarta.inject.Singleton
 class MyBean {}
 ''')
         then: "the state is correct"
@@ -998,7 +998,7 @@ class PetController {
     }
 }
 
-@javax.inject.Singleton
+@jakarta.inject.Singleton
 class MyBean {}
 ''')
         then: "the state is correct"
