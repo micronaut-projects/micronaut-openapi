@@ -97,7 +97,7 @@ class Test {
     public Pet petRenamed;
 }
 
-@javax.inject.Singleton
+@jakarta.inject.Singleton
 class MyBean {}
 ''')
         then:"the state is correct"

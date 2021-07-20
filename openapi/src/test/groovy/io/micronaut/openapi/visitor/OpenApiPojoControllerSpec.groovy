@@ -115,7 +115,7 @@ class Pet {
     }
 }
 
-@javax.inject.Singleton
+@jakarta.inject.Singleton
 class MyBean {}
 ''')
         then:"the state is correct"
@@ -351,7 +351,7 @@ class Tag {
     }
 }
 
-@javax.inject.Singleton
+@jakarta.inject.Singleton
 class MyBean {}
 ''')
         then:"the state is correct"
@@ -468,7 +468,7 @@ class Pet {
     }
 }
 
-@javax.inject.Singleton
+@jakarta.inject.Singleton
 class MyBean {}
 ''')
         then:"the state is correct"
@@ -559,7 +559,7 @@ class Pet {
     }
 }
 
-@javax.inject.Singleton
+@jakarta.inject.Singleton
 class MyBean {}
 ''')
         then:"the state is correct"
@@ -708,7 +708,7 @@ class Pet {
     }
 }
 
-@javax.inject.Singleton
+@jakarta.inject.Singleton
 class MyBean {}
 ''')
         then:"the state is correct"
@@ -897,7 +897,7 @@ enum PetType {
     DOG, CAT;
 }
 
-@javax.inject.Singleton
+@jakarta.inject.Singleton
 class MyBean {}
 ''')
         then:"the state is correct"
@@ -972,7 +972,6 @@ class MyBean {}
         pathItem.get.responses['200'].content['application/json'].schema.items.$ref == '#/components/schemas/MyPet'
     }
 
-
     void "test build OpenAPI doc for POJO with properties not required as default"() {
 
         given:"An API definition"
@@ -1019,7 +1018,7 @@ class Pet {
     }
 }
 
-@javax.inject.Singleton
+@jakarta.inject.Singleton
 class MyBean {}
 ''')
         then:"the state is correct"
@@ -1052,7 +1051,6 @@ class MyBean {}
         pathItem.post.requestBody.content.size() == 1
 
     }
-
 
     void "test build OpenAPI doc when no Body tag specified in POST"() {
 
@@ -1101,7 +1099,7 @@ class Pet {
     }
 }
 
-@javax.inject.Singleton
+@jakarta.inject.Singleton
 class MyBean {}
 ''')
         then:"the state is correct"
@@ -1209,7 +1207,7 @@ class Pet {
     }
 }
 
-@javax.inject.Singleton
+@jakarta.inject.Singleton
 class MyBean {}
 ''')
         then:"The state is correct"
@@ -1305,7 +1303,7 @@ class Pet {
     }
 }
 
-@javax.inject.Singleton
+@jakarta.inject.Singleton
 class MyBean {}
 ''')
         then:"The state is correct"
@@ -1395,7 +1393,7 @@ class Pet {
     }
 }
 
-@javax.inject.Singleton
+@jakarta.inject.Singleton
 class MyBean {}
 ''')
         then:"The state is correct"
@@ -1498,7 +1496,7 @@ class Pet {
     }
 }
 
-@javax.inject.Singleton
+@jakarta.inject.Singleton
 class MyBean {}
 ''')
         then:"The state is correct"
@@ -1604,7 +1602,7 @@ class Pet {
     }
 }
 
-@javax.inject.Singleton
+@jakarta.inject.Singleton
 class MyBean {}
 ''')
         then:"The state is correct"

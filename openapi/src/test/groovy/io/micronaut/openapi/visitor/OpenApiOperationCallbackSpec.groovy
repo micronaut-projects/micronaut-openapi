@@ -82,7 +82,7 @@ class SubscriptionResponse {
         private String subscriptionUuid;
 }
 
-@javax.inject.Singleton
+@jakarta.inject.Singleton
 class MyBean {}
 ''')
 

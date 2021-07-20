@@ -83,7 +83,7 @@ class HelloWorldController implements HelloWorldApi {
     }
 }
 
-@javax.inject.Singleton
+@jakarta.inject.Singleton
 class MyBean {}
 ''')
         then:
@@ -222,7 +222,7 @@ class HelloWorldController implements HelloWorldApi {
         return null;
     }
 }
-@javax.inject.Singleton
+@jakarta.inject.Singleton
 class MyBean {}
 ''')
         then:
@@ -281,7 +281,7 @@ package test;
 @io.micronaut.openapi.annotation.OpenAPIManagement(tags = @io.swagger.v3.oas.annotations.tags.Tag(name = "Micronaut Management"))
 class Application {
 }
-@javax.inject.Singleton
+@jakarta.inject.Singleton
 class MyBean {}
 ''')
         then:
@@ -314,7 +314,7 @@ package test;
 @io.micronaut.openapi.annotation.OpenAPISecurity(tags = @io.swagger.v3.oas.annotations.tags.Tag(name = "Micronaut Security"))
 class Application {
 }
-@javax.inject.Singleton
+@jakarta.inject.Singleton
 class MyBean {}
 ''')
         then:

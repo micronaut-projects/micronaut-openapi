@@ -85,7 +85,7 @@ class B extends Base {
     }
 }
 
-@javax.inject.Singleton
+@jakarta.inject.Singleton
 class MyBean {}
 ''')
 
@@ -179,7 +179,7 @@ class Bike extends Vehicle {
 class Car extends Vehicle {
 }
 
-@javax.inject.Singleton
+@jakarta.inject.Singleton
 class MyBean {}
 ''')
 
@@ -255,7 +255,7 @@ class Bike extends Vehicle {
 class Car extends Vehicle {
 }
 
-@javax.inject.Singleton
+@jakarta.inject.Singleton
 class MyBean {}
 ''')
 
@@ -332,7 +332,7 @@ class Bike extends Vehicle {
 class Car extends Vehicle {
 }
 
-@javax.inject.Singleton
+@jakarta.inject.Singleton
 class MyBean {}
 ''')
 
@@ -412,7 +412,7 @@ class Bike extends Vehicle {
 class Car extends Vehicle {
 }
 
-@javax.inject.Singleton
+@jakarta.inject.Singleton
 class MyBean {}
 ''')
 

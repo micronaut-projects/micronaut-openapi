@@ -117,7 +117,7 @@ class Person {
     }
 }
 
-@javax.inject.Singleton
+@jakarta.inject.Singleton
 public class MyBean {}
 
 ''')
@@ -252,7 +252,7 @@ class Person {
     }
 }
 
-@javax.inject.Singleton
+@jakarta.inject.Singleton
 public class MyBean {}
 
 ''')
@@ -370,7 +370,7 @@ class Person {
         this.totalGoals = totalGoals;
     }
 }
-@javax.inject.Singleton
+@jakarta.inject.Singleton
 public class MyBean {}
 ''')
 
@@ -507,7 +507,7 @@ class Person {
     }
 }
 
-@javax.inject.Singleton
+@jakarta.inject.Singleton
 public class MyBean {}
 
 ''')
@@ -643,7 +643,7 @@ class Person {
     }
 }
 
-@javax.inject.Singleton
+@jakarta.inject.Singleton
 public class MyBean {}
 
 ''')
@@ -785,7 +785,7 @@ class Person {
     }
 }
 
-@javax.inject.Singleton
+@jakarta.inject.Singleton
 public class MyBean {}
 
 ''')
@@ -946,7 +946,7 @@ class Person {
     }
 }
 
-@javax.inject.Singleton
+@jakarta.inject.Singleton
 public class MyBean {}
 
 ''')
@@ -1105,7 +1105,7 @@ class Person {
     }
 }
 
-@javax.inject.Singleton
+@jakarta.inject.Singleton
 public class MyBean {}
 
 ''')

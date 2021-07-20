@@ -45,7 +45,7 @@ interface MyOps {
     String save(java.util.UUID uuid);
 }
 
-@javax.inject.Singleton
+@jakarta.inject.Singleton
 class MyBean {}
 ''')
         then:"the state is correct"
@@ -106,7 +106,7 @@ interface MyOps {
 
 }
 
-@javax.inject.Singleton
+@jakarta.inject.Singleton
 class MyBean {}
 ''')
         then:"the state is correct"
@@ -174,7 +174,7 @@ interface MyOps {
 
 }
 
-@javax.inject.Singleton
+@jakarta.inject.Singleton
 class MyBean {}
 ''')
         then:"the state is correct"

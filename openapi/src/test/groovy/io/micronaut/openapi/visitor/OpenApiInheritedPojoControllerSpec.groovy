@@ -23,7 +23,7 @@ class OpenApiInheritedPojoControllerSpec extends AbstractTypeElementSpec {
         buildBeanDefinition('test.MyBean', '''
 package test;
 
-import javax.annotation.Nullable;
+import io.micronaut.core.annotation.Nullable;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
@@ -93,7 +93,7 @@ abstract class BaseTestOperations<T extends BaseObject> {
         return null;
     }
 }
-@javax.inject.Singleton
+@jakarta.inject.Singleton
 class MyBean {}
 ''')
         then: "the state is correct"
@@ -288,7 +288,7 @@ class CatController implements PetOperations {
     }
 }
 
-@javax.inject.Singleton
+@jakarta.inject.Singleton
 class MyBean {}
 ''')
         then: "the state is correct"
@@ -489,7 +489,7 @@ class CatController implements PetOperations {
     }
 }
 
-@javax.inject.Singleton
+@jakarta.inject.Singleton
 class MyBean {}
 ''')
         then: "the state is correct"
@@ -626,7 +626,7 @@ class Pet {
     }
 }
 
-@javax.inject.Singleton
+@jakarta.inject.Singleton
 class MyBean {}
 ''')
         then: "the state is correct"
@@ -749,7 +749,7 @@ class Pet {
     }
 }
 
-@javax.inject.Singleton
+@jakarta.inject.Singleton
 class MyBean {}
 ''')
         then: "the state is correct"
@@ -807,7 +807,7 @@ import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
-import javax.annotation.Nullable;
+import io.micronaut.core.annotation.Nullable;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -998,7 +998,7 @@ class PetController {
     }
 }
 
-@javax.inject.Singleton
+@jakarta.inject.Singleton
 class MyBean {}
 ''')
         then: "the state is correct"

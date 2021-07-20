@@ -109,7 +109,7 @@ class HelloWorldController implements HelloWorldApi {
         return null;
     }
 }
-@javax.inject.Singleton
+@jakarta.inject.Singleton
 class MyBean {}
 ''')
         then:"the state is correct"
@@ -271,7 +271,7 @@ class Application {
 }
 
 
-@javax.inject.Singleton
+@jakarta.inject.Singleton
 class MyBean {}
 ''')
         then:"the state is correct"
@@ -350,7 +350,7 @@ class Application {
 }
 
 
-@javax.inject.Singleton
+@jakarta.inject.Singleton
 class MyBean {}
 ''')
         then:"the state is correct"
@@ -419,7 +419,7 @@ class Application {
 }
 
 
-@javax.inject.Singleton
+@jakarta.inject.Singleton
 class MyBean {}
 ''')
         then:"the state is correct"

@@ -74,7 +74,7 @@ class Times {
     }
 }
 
-@javax.inject.Singleton
+@jakarta.inject.Singleton
 public class MyBean {}
 
 ''')

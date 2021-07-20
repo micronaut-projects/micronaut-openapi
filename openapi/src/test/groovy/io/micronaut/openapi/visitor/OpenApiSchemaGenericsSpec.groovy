@@ -63,7 +63,7 @@ class MyDtoImpl implements MyDto<Long> {
     }
 }
 
-@javax.inject.Singleton
+@jakarta.inject.Singleton
 class MyBean {}
 ''')
 
@@ -128,7 +128,7 @@ enum PetType {
     DOG, CAT;
 }
 
-@javax.inject.Singleton
+@jakarta.inject.Singleton
 class MyBean {}
 ''')
 
@@ -190,7 +190,7 @@ class Response<T> {
     };
 }
 
-@javax.inject.Singleton
+@jakarta.inject.Singleton
 class MyBean {}
 ''')
 
@@ -253,7 +253,7 @@ class Response<T> {
     };
 }
 
-@javax.inject.Singleton
+@jakarta.inject.Singleton
 class MyBean {}
 ''')
 
@@ -318,7 +318,7 @@ class Response<T> {
     };
 }
 
-@javax.inject.Singleton
+@jakarta.inject.Singleton
 class MyBean {}
 ''')
 
@@ -464,7 +464,7 @@ class Quantity<Q extends Quantity, U extends Unit> implements Serializable {
     }
 }
 
-@javax.inject.Singleton
+@jakarta.inject.Singleton
 class MyBean {}
 ''')
 

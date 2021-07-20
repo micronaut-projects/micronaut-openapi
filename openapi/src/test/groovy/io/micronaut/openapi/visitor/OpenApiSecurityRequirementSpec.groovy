@@ -70,7 +70,7 @@ class Pet {
         this.age = age;
     }
 }
-@javax.inject.Singleton
+@jakarta.inject.Singleton
 class MyBean {}
 ''')
 
@@ -165,7 +165,7 @@ class Pet {
     }
 }
 
-@javax.inject.Singleton
+@jakarta.inject.Singleton
 class MyBean {}
 ''')
 
@@ -226,7 +226,7 @@ class Pet {}
 
 class Response {}
 
-@javax.inject.Singleton
+@jakarta.inject.Singleton
 class MyBean {}
 ''')
 
@@ -291,7 +291,7 @@ class Pet {}
 
 class Response {}
 
-@javax.inject.Singleton
+@jakarta.inject.Singleton
 class MyBean {}
 ''')
 

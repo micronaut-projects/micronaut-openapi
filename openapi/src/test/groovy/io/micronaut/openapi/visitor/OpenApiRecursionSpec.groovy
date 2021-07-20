@@ -62,7 +62,7 @@ class TestImpl2 implements TestInterface {
     }
 }
 
-@javax.inject.Singleton
+@jakarta.inject.Singleton
 class MyBean {}
 ''')
 
@@ -107,7 +107,7 @@ class TestRecursion {
     }
 }
 
-@javax.inject.Singleton
+@jakarta.inject.Singleton
 class MyBean {}
 ''')
 
@@ -171,7 +171,7 @@ class TestImpl2 implements TestInterface {
     }
 }
 
-@javax.inject.Singleton
+@jakarta.inject.Singleton
 class MyBean {}
 ''')
 
@@ -242,7 +242,7 @@ class TestImpl2 implements TestInterface {
     }
 }
 
-@javax.inject.Singleton
+@jakarta.inject.Singleton
 class MyBean {}
 ''')
 

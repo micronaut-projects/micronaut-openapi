@@ -19,7 +19,7 @@ class OpenApiFileUploadSpec extends AbstractTypeElementSpec {
         buildBeanDefinition('test.MyBean', '''
 package test;
 
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
 
 import io.micronaut.http.MediaType;
 import io.micronaut.http.annotation.Controller;
@@ -88,7 +88,7 @@ class UploadController {
     }
 }
 
-@javax.inject.Singleton
+@jakarta.inject.Singleton
 class MyBean {}
 ''')
 
@@ -262,7 +262,7 @@ class Pet {
         this.tags = tags;
     }
 }
-@javax.inject.Singleton
+@jakarta.inject.Singleton
 class MyBean {}
 ''')
         then: "The state is correct"

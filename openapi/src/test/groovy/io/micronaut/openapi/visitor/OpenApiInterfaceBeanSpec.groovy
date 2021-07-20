@@ -43,7 +43,7 @@ interface IPet {
     boolean isAlive();
 }
 
-@javax.inject.Singleton
+@jakarta.inject.Singleton
 class MyBean {}
 ''')
         then:"the state is correct"

@@ -20,7 +20,7 @@ class OpenApiFileUploadBodyParameterSpec extends AbstractTypeElementSpec {
         buildBeanDefinition('test.MyBean', '''
 package test;
 
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
 
 import io.micronaut.http.MediaType;
 import io.micronaut.http.annotation.Controller;
@@ -79,7 +79,7 @@ class UploadOpenApiController {
 
 }
 
-@javax.inject.Singleton
+@jakarta.inject.Singleton
 class MyBean {}
 ''')
 

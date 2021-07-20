@@ -54,7 +54,7 @@ class Pet {
     public String name;
 }
 
-@javax.inject.Singleton
+@jakarta.inject.Singleton
 class MyBean {}
 ''')
 

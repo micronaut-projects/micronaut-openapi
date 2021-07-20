@@ -61,7 +61,7 @@ class Pet {
     public static String CONST;
 }
 
-@javax.inject.Singleton
+@jakarta.inject.Singleton
 class MyBean {}
 ''')
         then:"the state is correct"
