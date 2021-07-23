@@ -66,7 +66,7 @@ public class JavaClassElementExt extends JavaClassElement {
      */
     private JavaClassElementExt(JavaClassElement jce, JavaVisitorContext visitorContext) {
         super((TypeElement) jce.getNativeType(), jce.getAnnotationMetadata(), visitorContext, jce.getGenericTypeInfo(),
-            jce.getArrayDimensions());
+            jce.getArrayDimensions(), false);
         this.javaClassElement = jce;
     }
 
