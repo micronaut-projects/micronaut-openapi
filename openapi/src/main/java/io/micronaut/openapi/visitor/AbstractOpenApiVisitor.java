@@ -40,6 +40,7 @@ import io.micronaut.core.util.ArrayUtils;
 import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.core.util.StringUtils;
 import io.micronaut.http.MediaType;
+import io.micronaut.http.server.types.files.FileCustomizableResponseType;
 import io.micronaut.http.uri.UriMatchTemplate;
 import io.micronaut.inject.ast.ClassElement;
 import io.micronaut.inject.ast.Element;
@@ -79,6 +80,7 @@ import io.swagger.v3.oas.models.media.ComposedSchema;
 import io.swagger.v3.oas.models.media.MapSchema;
 import io.swagger.v3.oas.models.media.ObjectSchema;
 import io.swagger.v3.oas.models.media.Schema;
+import io.swagger.v3.oas.models.media.StringSchema;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.reactivestreams.Publisher;
@@ -690,6 +692,9 @@ abstract class AbstractOpenApiVisitor  {
                     if (schema != null) {
                         schema = arraySchema(schema);
                     }
+                } else if (type.isAssignable(FileCustomizableResponseType.class)) {
+                    schema = new StringSchema();
+                    schema.setFormat("binary");
                 } else {
                     schema = getSchemaDefinition(openAPI, context, type, definingElement, mediaTypes);
                 }
