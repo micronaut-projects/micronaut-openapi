@@ -15,9 +15,6 @@
  */
 package io.micronaut.openapi.visitor;
 
-import static io.micronaut.core.naming.NameUtils.capitalize;
-import static io.micronaut.openapi.postprocessors.OpenApiOperationsPostProcessor.AUTO_GENERATED_OPERATION_PREFIX;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -749,7 +746,7 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
                 .orElse(new io.swagger.v3.oas.models.Operation());
 
         if (StringUtils.isEmpty(swaggerOperation.getOperationId())) {
-            swaggerOperation.setOperationId(AUTO_GENERATED_OPERATION_PREFIX + element.getName() + capitalize(httpMethod.name().toLowerCase()));
+            swaggerOperation.setOperationId(element.getName());
         }
         return swaggerOperation;
     }
