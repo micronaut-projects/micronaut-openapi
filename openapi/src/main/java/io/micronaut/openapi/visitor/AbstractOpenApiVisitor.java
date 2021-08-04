@@ -99,9 +99,12 @@ import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 import javax.validation.constraints.Size;
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.math.BigDecimal;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -692,7 +695,7 @@ abstract class AbstractOpenApiVisitor  {
                     if (schema != null) {
                         schema = arraySchema(schema);
                     }
-                } else if (type.isAssignable(FileCustomizableResponseType.class)) {
+                } else if (isReturnTypeFile(type)) {
                     schema = new StringSchema();
                     schema.setFormat("binary");
                 } else {
@@ -1453,6 +1456,15 @@ abstract class AbstractOpenApiVisitor  {
                 "io.reactivex.Single",
                 "io.reactivex.Observable",
                 "io.reactivex.Maybe"
+        ).stream().anyMatch(type::isAssignable);
+    }
+
+    private boolean isReturnTypeFile(ClassElement type) {
+        return CollectionUtils.setOf(
+                FileCustomizableResponseType.class.getName(),
+                File.class.getName(),
+                InputStream.class.getName(),
+                ByteBuffer.class.getName()
         ).stream().anyMatch(type::isAssignable);
     }
 

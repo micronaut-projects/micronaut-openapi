@@ -18,6 +18,8 @@ import io.micronaut.http.HttpResponse;
 import io.micronaut.http.annotation.*;
 import io.micronaut.http.server.types.files.*;
 
+import java.io.*;
+import java.nio.*;
 import java.util.UUID;
 
 @Controller("/upload")
@@ -28,22 +30,40 @@ class FooController {
     public HttpResponse<StreamedFile> action1(UUID documentId) {
         return null;
     }
-    
+
     @Produces("application/pdf")
     @Get("/response-system-file/{documentId}")
     public HttpResponse<SystemFile> action2(UUID documentId) {
         return null;
     }
-    
+
     @Produces("application/pdf")
     @Get("/streamed-file/{documentId}")
     public StreamedFile action3(UUID documentId) {
         return null;
     }
-    
+
     @Produces("application/pdf")
     @Get("/system-file/{documentId}")
     public SystemFile action4(UUID documentId) {
+        return null;
+    }
+
+    @Produces("application/pdf")
+    @Get("/file/{documentId}")
+    public File action5(UUID documentId) {
+        return null;
+    }
+
+    @Produces("application/pdf")
+    @Get("/input-stream/{documentId}")
+    public InputStream action6(UUID documentId) {
+        return null;
+    }
+
+    @Produces("application/pdf")
+    @Get("/byte-buffer/{documentId}")
+    public ByteBuffer action7(UUID documentId) {
         return null;
     }
 }
@@ -56,7 +76,7 @@ class MyBean {}
 
         then:
         openAPI
-        openAPI.paths.size() == 4
+        openAPI.paths.size() == 7
         openAPI.paths.each {
             assert it.value.get.responses.size() == 1
             assert it.value.get.responses['200'].content['application/pdf'].schema.type == 'string'
