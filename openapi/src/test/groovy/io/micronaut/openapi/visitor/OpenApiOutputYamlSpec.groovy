@@ -1,16 +1,15 @@
 package io.micronaut.openapi.visitor
 
 import io.micronaut.annotation.processing.test.AbstractTypeElementSpec
-import io.micronaut.inject.BeanDefinition
 
 class OpenApiOutputYamlSpec extends AbstractTypeElementSpec {
 
     void "test paths and schemas for OpenAPI are sorted"() {
         given:"An API definition"
-            System.setProperty(AbstractOpenApiVisitor.ATTR_TEST_MODE, "true")
+        System.setProperty(AbstractOpenApiVisitor.ATTR_TEST_MODE, "true")
 
         when:
-            BeanDefinition beanDefinition = buildBeanDefinition('test.MyBean', '''
+        buildBeanDefinition('test.MyBean', '''
 package test;
 
 import io.micronaut.management.endpoint.annotation.Endpoint;
@@ -131,11 +130,10 @@ class Person3 {
 class MyBean {}
 ''')
         then:"the yaml is written"
-            AbstractOpenApiVisitor.testYamlReference != null
-        println(AbstractOpenApiVisitor.testYamlReference)
+        AbstractOpenApiVisitor.testYamlReference != null
 
         then:"paths are sorted and schemas are sorted"
-            AbstractOpenApiEndpointVisitor.testYamlReference.contains('''\
+        AbstractOpenApiEndpointVisitor.testYamlReference.contains('''\
 paths:
   /endpoint1:
     get:
@@ -239,6 +237,10 @@ paths:
 components:
   schemas:
     Person1:
+      required:
+      - debtValue
+      - name
+      - totalGoals
       type: object
       properties:
         name:
@@ -250,11 +252,15 @@ components:
           type: integer
           format: int32
     Person2:
+      required:
+      - name
       type: object
       properties:
         name:
           type: string
     Person3:
+      required:
+      - name
       type: object
       properties:
         name:

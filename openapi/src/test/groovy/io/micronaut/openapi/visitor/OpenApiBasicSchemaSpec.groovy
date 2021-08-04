@@ -819,9 +819,10 @@ public class MyBean {}
         openAPI.components.schemas["Person"].properties["xyz"].additionalProperties == null
         openAPI.components.schemas["Person"].properties["xyz"].format == "email"
 
-        openAPI.components.schemas["Person"].required.size() == 2
+        openAPI.components.schemas["Person"].required.size() == 3
         openAPI.components.schemas["Person"].required.contains("name")
         openAPI.components.schemas["Person"].required.contains("debt_value")
+        openAPI.components.schemas["Person"].required.contains("total_goals")
     }
 
     void "test READ_ONLY accessMode correctly results in setting readOnly to true"() {

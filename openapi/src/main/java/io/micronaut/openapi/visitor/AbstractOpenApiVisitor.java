@@ -25,10 +25,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.micronaut.annotation.processing.visitor.JavaClassElement;
 import io.micronaut.annotation.processing.visitor.JavaClassElementExt;
 import io.micronaut.core.annotation.AnnotationClassValue;
 import io.micronaut.core.annotation.AnnotationValue;
-import io.micronaut.core.annotation.NonNull;
 import io.micronaut.core.annotation.Nullable;
 import io.micronaut.core.beans.BeanMap;
 import io.micronaut.core.bind.annotation.Bindable;
@@ -47,6 +47,7 @@ import io.micronaut.inject.ast.ElementModifier;
 import io.micronaut.inject.ast.EnumElement;
 import io.micronaut.inject.ast.FieldElement;
 import io.micronaut.inject.ast.MemberElement;
+import io.micronaut.inject.ast.MethodElement;
 import io.micronaut.inject.ast.PropertyElement;
 import io.micronaut.inject.ast.TypedElement;
 import io.micronaut.inject.visitor.VisitorContext;
@@ -771,16 +772,49 @@ abstract class AbstractOpenApiVisitor  {
             if (uw != null && uw.booleanValue("enabled").orElse(Boolean.TRUE)) {
                 handleUnwrapped(context, element, elementType, parentSchema, uw);
             } else {
-                final boolean required = element.isAnnotationPresent(NotNull.class)
-                        || element.isAnnotationPresent(NotBlank.class)
-                        || element.isAnnotationPresent(NotEmpty.class)
-                        || element.isAnnotationPresent(NonNull.class)
-                        || element.booleanValue(JsonProperty.class, "required").orElse(false);
+                final boolean required = hasElementSchemaRequired(element).orElseGet(() -> isElementNotNullable(element, classElement));
                 propertySchema = bindSchemaForElement(context, element, elementType, propertySchema);
                 String propertyName = resolvePropertyName(element, classElement, propertySchema);
                 addProperty(parentSchema, propertyName, propertySchema, required);
             }
         }
+    }
+
+    private Optional<Boolean> hasElementSchemaRequired(Element element) {
+        AnnotationValue<io.swagger.v3.oas.annotations.media.Schema> schemaAnnotationValue = element.getAnnotation(io.swagger.v3.oas.annotations.media.Schema.class);
+        if (schemaAnnotationValue != null) {
+            return schemaAnnotationValue.booleanValue("required");
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    private boolean isElementNotNullable(Element element, @Nullable Element classElement) {
+        return element.isAnnotationPresent(NotNull.class)
+                || element.isAnnotationPresent(NotBlank.class)
+                || element.isAnnotationPresent(NotEmpty.class)
+                || element.isNonNull()
+                || doesParamExistsMandatoryInConstructor(element, classElement)
+                || element.booleanValue(JsonProperty.class, "required").orElse(false);
+    }
+
+    private boolean doesParamExistsMandatoryInConstructor(Element element, @Nullable Element classElement) {
+        MethodElement methodElement = null;
+        if (classElement instanceof JavaClassElementExt && ((JavaClassElementExt) classElement).getPrimaryConstructor().isPresent()) {
+            methodElement = ((JavaClassElementExt) classElement).getPrimaryConstructor().get();
+        } else if (classElement instanceof JavaClassElement && ((JavaClassElement) classElement).getPrimaryConstructor().isPresent()) {
+            methodElement = ((JavaClassElement) classElement).getPrimaryConstructor().get();
+        }
+
+        if (methodElement != null) {
+            return Arrays.stream(methodElement.getParameters())
+                    .filter(parameterElement -> parameterElement.getName().equals(element.getName()))
+                    .map(parameterElement -> !parameterElement.isNullable())
+                    .findFirst()
+                    .orElse(false);
+        }
+
+        return false;
     }
 
     private void addProperty(Schema parentSchema, String name, Schema propertySchema, boolean required) {
@@ -1117,7 +1151,7 @@ abstract class AbstractOpenApiVisitor  {
             ClassElement type,
             @Nullable Element definingElement,
             List<MediaType> mediaTypes) {
-        AnnotationValue<io.swagger.v3.oas.annotations.media.Schema> schemaValue = definingElement == null ? null : definingElement.getDeclaredAnnotation(io.swagger.v3.oas.annotations.media.Schema.class);
+        AnnotationValue<io.swagger.v3.oas.annotations.media.Schema> schemaValue = definingElement == null ? null : definingElement.getAnnotation(io.swagger.v3.oas.annotations.media.Schema.class);
         if (schemaValue == null) {
             schemaValue = type.getDeclaredAnnotation(io.swagger.v3.oas.annotations.media.Schema.class);
         }
