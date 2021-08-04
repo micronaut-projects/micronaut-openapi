@@ -1,20 +1,10 @@
-
 package io.micronaut.openapi.visitor
 
-import io.micronaut.annotation.processing.test.AbstractTypeElementSpec
+import io.micronaut.openapi.AbstractOpenApiTypeElementSpec
 import io.swagger.v3.oas.models.OpenAPI
-import io.swagger.v3.oas.models.PathItem
 import io.swagger.v3.oas.models.media.Schema
-import spock.lang.Specification
 
-class OpenApiJsonUnwrappedsSpec extends AbstractTypeElementSpec {
-    def setup() {
-        System.setProperty(AbstractOpenApiVisitor.ATTR_TEST_MODE, "true")
-    }
-
-    def cleanup() {
-        System.setProperty(AbstractOpenApiVisitor.ATTR_TEST_MODE, "")
-    }
+class OpenApiJsonUnwrappedsSpec extends AbstractOpenApiTypeElementSpec {
 
     void "test JsonUnwrapped annotation"() {
 

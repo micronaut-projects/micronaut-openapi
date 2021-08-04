@@ -1,23 +1,17 @@
 package io.micronaut.openapi.visitor
 
-import io.micronaut.inject.BeanDefinition
-import io.micronaut.annotation.processing.test.AbstractTypeElementSpec
+import io.micronaut.openapi.AbstractOpenApiTypeElementSpec
 import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.security.SecurityScheme
 
-class OpenApiApplicationVisitorSpec extends AbstractTypeElementSpec {
-
-    def cleanup() {
-        System.setProperty(AbstractOpenApiVisitor.ATTR_TEST_MODE, "")
-        System.setProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_CONFIG_FILE, "")
-    }
+class OpenApiApplicationVisitorSpec extends AbstractOpenApiTypeElementSpec {
 
     void "test build OpenAPI doc for simple endpoint"() {
         given:"An API definition"
         System.setProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_CONFIG_FILE, "openapi-endpoints.properties")
-        System.setProperty(AbstractOpenApiVisitor.ATTR_TEST_MODE, "true")
+
         when:
-        BeanDefinition beanDefinition = buildBeanDefinition('test.MyBean', '''
+        buildBeanDefinition('test.MyBean', '''
 package test;
 
 import io.micronaut.management.endpoint.annotation.Endpoint;
@@ -112,6 +106,7 @@ class HelloWorldController implements HelloWorldApi {
 @jakarta.inject.Singleton
 class MyBean {}
 ''')
+
         then:"the state is correct"
         AbstractOpenApiVisitor.testReference != null
 
@@ -216,13 +211,14 @@ class MyBean {}
         openAPI.paths[uri].post.parameters.size() == 1
         openAPI.paths[uri].post.parameters[0].name ==~ /arg0|name/
         openAPI.paths[uri].post.requestBody
+
+        cleanup:
+        System.setProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_CONFIG_FILE, "")
     }
 
     void "test build OpenAPI doc for simple type with generics"() {
-        given:"An API definition"
-        System.setProperty(AbstractOpenApiVisitor.ATTR_TEST_MODE, "true")
         when:
-        BeanDefinition beanDefinition = buildBeanDefinition('test.MyBean', '''
+        buildBeanDefinition('test.MyBean', '''
 package test;
 
 import io.reactivex.Maybe;
@@ -303,10 +299,8 @@ class MyBean {}
     }
 
     void "test build OpenAPI doc tags, servers and security at class level"() {
-        given:"An API definition"
-        System.setProperty(AbstractOpenApiVisitor.ATTR_TEST_MODE, "true")
         when:
-        BeanDefinition beanDefinition = buildBeanDefinition('test.MyBean', '''
+        buildBeanDefinition('test.MyBean', '''
 package test;
 
 import io.reactivex.Maybe;
@@ -385,10 +379,8 @@ class MyBean {}
     }
 
     void "test build OpenAPI security schemes"() {
-        given:"An API definition"
-        System.setProperty(AbstractOpenApiVisitor.ATTR_TEST_MODE, "true")
         when:
-        BeanDefinition beanDefinition = buildBeanDefinition('test.MyBean', '''
+        buildBeanDefinition('test.MyBean', '''
 package test;
 
 import io.reactivex.Maybe;

@@ -1,16 +1,13 @@
 package io.micronaut.openapi.visitor
 
-import io.micronaut.annotation.processing.test.AbstractTypeElementSpec
-import io.micronaut.inject.BeanDefinition
+import io.micronaut.openapi.AbstractOpenApiTypeElementSpec
 
-class OpenApiOutputYamlSpec extends AbstractTypeElementSpec {
+class OpenApiOutputYamlSpec extends AbstractOpenApiTypeElementSpec {
 
     void "test paths and schemas for OpenAPI are sorted"() {
-        given:"An API definition"
-            System.setProperty(AbstractOpenApiVisitor.ATTR_TEST_MODE, "true")
 
         when:
-            BeanDefinition beanDefinition = buildBeanDefinition('test.MyBean', '''
+        buildBeanDefinition('test.MyBean', '''
 package test;
 
 import io.micronaut.management.endpoint.annotation.Endpoint;
@@ -131,11 +128,10 @@ class Person3 {
 class MyBean {}
 ''')
         then:"the yaml is written"
-            AbstractOpenApiVisitor.testYamlReference != null
-        println(AbstractOpenApiVisitor.testYamlReference)
+        AbstractOpenApiVisitor.testYamlReference != null
 
         then:"paths are sorted and schemas are sorted"
-            AbstractOpenApiEndpointVisitor.testYamlReference.contains('''\
+        AbstractOpenApiEndpointVisitor.testYamlReference.contains('''\
 paths:
   /endpoint1:
     get:

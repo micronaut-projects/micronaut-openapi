@@ -1,14 +1,10 @@
-
 package io.micronaut.openapi.visitor
 
-import io.micronaut.annotation.processing.test.AbstractTypeElementSpec
+import io.micronaut.openapi.AbstractOpenApiTypeElementSpec
 import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.Operation
 
-class OpenApiSchemaJavaTimeSpec extends AbstractTypeElementSpec {
-    def setup() {
-        System.setProperty(AbstractOpenApiVisitor.ATTR_TEST_MODE, "true")
-    }
+class OpenApiSchemaJavaTimeSpec extends AbstractOpenApiTypeElementSpec {
 
     void "test parse the OpenAPI with response that contains Java 8 date-time types"() {
         given:

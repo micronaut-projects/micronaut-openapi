@@ -5,8 +5,6 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
 
-import io.micronaut.openapi.view.OpenApiViewConfig
-import io.micronaut.openapi.visitor.OpenApiApplicationVisitor
 import spock.lang.Specification
 
 class OpenApiOperationViewRenderSpec extends Specification {

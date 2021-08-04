@@ -1,12 +1,9 @@
 package io.micronaut.openapi.visitor
 
-import io.micronaut.annotation.processing.test.AbstractTypeElementSpec
+import io.micronaut.openapi.AbstractOpenApiTypeElementSpec
 import io.swagger.v3.oas.models.Operation
 
-class OpenApiOperationUniqueSpec extends AbstractTypeElementSpec {
-    def setup() {
-        System.setProperty(AbstractOpenApiVisitor.ATTR_TEST_MODE, "true")
-    }
+class OpenApiOperationUniqueSpec extends AbstractOpenApiTypeElementSpec {
 
     void "test OpenAPI does not append number if all operations are unique"() {
         given:
