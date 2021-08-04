@@ -1,6 +1,6 @@
 package io.micronaut.openapi.visitor
 
-import io.micronaut.annotation.processing.test.AbstractTypeElementSpec
+import io.micronaut.openapi.AbstractOpenApiTypeElementSpec
 
 class OpenApiOutputYamlSpec extends AbstractOpenApiTypeElementSpec {
 
