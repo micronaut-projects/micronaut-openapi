@@ -1,15 +1,12 @@
 package io.micronaut.openapi.visitor
 
-import io.micronaut.annotation.processing.test.AbstractTypeElementSpec
+import io.micronaut.openapi.AbstractOpenApiTypeElementSpec
 import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.Operation
 import io.swagger.v3.oas.models.media.ArraySchema
 import io.swagger.v3.oas.models.parameters.RequestBody
 
-class OpenApiRequestBodyArraySchemaSpec extends AbstractTypeElementSpec {
-    def setup() {
-        System.setProperty(AbstractOpenApiVisitor.ATTR_TEST_MODE, "true")
-    }
+class OpenApiRequestBodyArraySchemaSpec extends AbstractOpenApiTypeElementSpec {
 
     void "test parse the OpenAPI with ArraySchema in RequestBody"() {
 

@@ -1,17 +1,12 @@
-
 package io.micronaut.openapi.visitor
 
-import io.micronaut.annotation.processing.test.AbstractTypeElementSpec
+import io.micronaut.openapi.AbstractOpenApiTypeElementSpec
 import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.Operation
 import io.swagger.v3.oas.models.media.ComposedSchema
 import io.swagger.v3.oas.models.media.Schema
 
-class OpenApiComplexSchemaSpec extends AbstractTypeElementSpec {
-
-    def setup() {
-        System.setProperty(AbstractOpenApiVisitor.ATTR_TEST_MODE, "true")
-    }
+class OpenApiComplexSchemaSpec extends AbstractOpenApiTypeElementSpec {
 
     void "test build OpenAPI doc for oneOf, allOf and anyOf keyword"() {
 

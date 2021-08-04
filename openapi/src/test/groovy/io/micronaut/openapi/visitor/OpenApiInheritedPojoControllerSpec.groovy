@@ -1,19 +1,13 @@
-
 package io.micronaut.openapi.visitor
 
-import io.micronaut.annotation.processing.test.AbstractTypeElementSpec
-import io.micronaut.http.annotation.Controller
-import io.micronaut.http.annotation.Get
+import io.micronaut.openapi.AbstractOpenApiTypeElementSpec
 import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.Operation
 import io.swagger.v3.oas.models.media.ComposedSchema
 import io.swagger.v3.oas.models.media.Schema
 import spock.lang.Ignore
 
-class OpenApiInheritedPojoControllerSpec extends AbstractTypeElementSpec {
-    def setup() {
-        System.setProperty(AbstractOpenApiVisitor.ATTR_TEST_MODE, "true")
-    }
+class OpenApiInheritedPojoControllerSpec extends AbstractOpenApiTypeElementSpec {
 
     @Ignore
     void "test controller inheritance with generics - Issue #193"() {

@@ -1,17 +1,9 @@
 package io.micronaut.openapi.visitor
 
-import io.micronaut.annotation.processing.test.AbstractTypeElementSpec
+import io.micronaut.openapi.AbstractOpenApiTypeElementSpec
 import io.swagger.v3.oas.models.OpenAPI
 
-class OpenApiBasicSchemaSpec extends AbstractTypeElementSpec {
-
-    def setup() {
-        System.setProperty(AbstractOpenApiVisitor.ATTR_TEST_MODE, "true")
-    }
-
-    def cleanup() {
-        System.setProperty("micronaut.openapi.property.naming.strategy", "")
-    }
+class OpenApiBasicSchemaSpec extends AbstractOpenApiTypeElementSpec {
 
     void "test @PositiveOrZero and @NegativeOrZero correctly results in minimum 0 and maximum 0"() {
 
@@ -403,9 +395,10 @@ public class MyBean {}
     }
 
     void "test render OpenApiView specification with custom property naming strategy"() {
+        given:
+        System.setProperty("micronaut.openapi.property.naming.strategy", "SNAKE_CASE")
 
         when:
-        System.setProperty("micronaut.openapi.property.naming.strategy", "SNAKE_CASE")
         buildBeanDefinition("test.MyBean", '''
 package test;
 
@@ -536,12 +529,16 @@ public class MyBean {}
         openAPI.components.schemas["Person"].properties["total_goals"].type == "integer"
         !openAPI.components.schemas["Person"].properties["total_goals"].exclusiveMinimum
         openAPI.components.schemas["Person"].properties["total_goals"].description == "The total number of person's goals."
+
+        cleanup:
+        System.setProperty("micronaut.openapi.property.naming.strategy", "")
     }
 
     void "test render OpenApiView specification with LOWER_CAMEL_CASE property naming strategy - Issue #241"() {
+        given:
+        System.setProperty("micronaut.openapi.property.naming.strategy", "LOWER_CAMEL_CASE")
 
         when:
-        System.setProperty("micronaut.openapi.property.naming.strategy", "LOWER_CAMEL_CASE")
         buildBeanDefinition("test.MyBean", '''
 package test;
 
@@ -672,12 +669,16 @@ public class MyBean {}
         openAPI.components.schemas["Person"].properties["totalGoals"].type == "integer"
         !openAPI.components.schemas["Person"].properties["totalGoals"].exclusiveMinimum
         openAPI.components.schemas["Person"].properties["totalGoals"].description == "The total number of person's goals."
+
+        cleanup:
+        System.setProperty("micronaut.openapi.property.naming.strategy", "")
     }
 
     void "test render OpenApiView specification with custom property naming strategy and required properties - Issue #240"() {
+        given:
+        System.setProperty("micronaut.openapi.property.naming.strategy", "SNAKE_CASE")
 
         when:
-        System.setProperty("micronaut.openapi.property.naming.strategy", "SNAKE_CASE")
         buildBeanDefinition("test.MyBean", '''
 package test;
 
@@ -822,6 +823,9 @@ public class MyBean {}
         openAPI.components.schemas["Person"].required.size() == 2
         openAPI.components.schemas["Person"].required.contains("name")
         openAPI.components.schemas["Person"].required.contains("debt_value")
+
+        cleanup:
+        System.setProperty("micronaut.openapi.property.naming.strategy", "")
     }
 
     void "test READ_ONLY accessMode correctly results in setting readOnly to true"() {
@@ -984,7 +988,6 @@ public class MyBean {}
     }
 
     void "test WRITE_ONLY accessMode correctly results in setting writeOnly to true"() {
-
         when:
         buildBeanDefinition("test.MyBean", '''
 package test;

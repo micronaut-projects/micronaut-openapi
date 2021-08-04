@@ -1,18 +1,9 @@
 package io.micronaut.openapi.visitor
 
-import io.micronaut.annotation.processing.test.AbstractTypeElementSpec
-import io.micronaut.http.MediaType
-import io.swagger.v3.oas.annotations.media.ArraySchema
-import io.swagger.v3.oas.annotations.media.Content
-import io.swagger.v3.oas.annotations.media.Schema
-import io.swagger.v3.oas.annotations.responses.ApiResponse
+import io.micronaut.openapi.AbstractOpenApiTypeElementSpec
 import io.swagger.v3.oas.models.OpenAPI
 
-class OpenApiDateTimeExampleSchemaSpec extends AbstractTypeElementSpec {
-
-    def setup() {
-        System.setProperty(AbstractOpenApiVisitor.ATTR_TEST_MODE, "true")
-    }
+class OpenApiDateTimeExampleSchemaSpec extends AbstractOpenApiTypeElementSpec {
 
     void "test jdk8 date time example"() {
 

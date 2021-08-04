@@ -1,14 +1,10 @@
-
 package io.micronaut.openapi.visitor
 
-import io.micronaut.annotation.processing.test.AbstractTypeElementSpec
+import io.micronaut.openapi.AbstractOpenApiTypeElementSpec
 import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.Operation
 
-class OpenApiOperationLinkSpec extends AbstractTypeElementSpec {
-    def setup() {
-        System.setProperty(AbstractOpenApiVisitor.ATTR_TEST_MODE, "true")
-    }
+class OpenApiOperationLinkSpec extends AbstractOpenApiTypeElementSpec {
 
     void "test parse the OpenAPI @Operation annotation"() {
         given:

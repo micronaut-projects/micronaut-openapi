@@ -1,18 +1,16 @@
-
 package io.micronaut.openapi.visitor
 
-import io.micronaut.annotation.processing.test.AbstractTypeElementSpec
+import io.micronaut.openapi.AbstractOpenApiTypeElementSpec
 import io.swagger.v3.oas.models.Components
 import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.Operation
 import spock.util.environment.RestoreSystemProperties
 
-class OpenApiMergeSchemaSpec extends AbstractTypeElementSpec {
+class OpenApiMergeSchemaSpec extends AbstractOpenApiTypeElementSpec {
 
     @RestoreSystemProperties
     void "test merging of additional OpenAPI schema"() {
-        given:"An API definition"
-        System.setProperty(AbstractOpenApiVisitor.ATTR_TEST_MODE, "true")
+        given:
         String additionalSwaggerFilesDir= new File("src/test/resources/swagger").absolutePath
         System.setProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_ADDITIONAL_FILES, additionalSwaggerFilesDir)
 
@@ -124,5 +122,8 @@ class MyBean {}
 
         then:
         components.schemas.size() == 3
+
+        cleanup:
+        System.setProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_ADDITIONAL_FILES, "")
     }
 }
