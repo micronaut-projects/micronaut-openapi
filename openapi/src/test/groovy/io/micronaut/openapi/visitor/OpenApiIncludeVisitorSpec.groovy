@@ -1,22 +1,14 @@
 package io.micronaut.openapi.visitor
 
-import io.micronaut.annotation.processing.test.AbstractTypeElementSpec
-import io.micronaut.inject.BeanDefinition
+import io.micronaut.openapi.AbstractOpenApiTypeElementSpec
 import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.PathItem
 
-class OpenApiIncludeVisitorSpec extends AbstractTypeElementSpec {
-
-    def cleanup() {
-        System.setProperty(AbstractOpenApiVisitor.ATTR_TEST_MODE, "")
-        System.setProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_CONFIG_FILE, "")
-    }
+class OpenApiIncludeVisitorSpec extends AbstractOpenApiTypeElementSpec {
 
     void "test build OpenAPI doc for security Login controller"() {
-        given: "An API definition"
-            System.setProperty(AbstractOpenApiVisitor.ATTR_TEST_MODE, "true")
         when:
-            BeanDefinition beanDefinition = buildBeanDefinition('test.MyBean', '''
+            buildBeanDefinition('test.MyBean', '''
 package test;
 
 import io.micronaut.http.annotation.*;
@@ -115,16 +107,13 @@ class MyBean {}
             loginPathItem.post.responses['200'].content['application/json'].schema['$ref'] == '#/components/schemas/Object'
             openAPI.components.schemas['UsernamePasswordCredentials']
             openAPI.components.schemas['UsernamePasswordCredentials'].required.size() == 2
-            openAPI.components.schemas['UsernamePasswordCredentials'].required.size() == 2
             openAPI.components.schemas['UsernamePasswordCredentials'].properties['username']
             openAPI.components.schemas['UsernamePasswordCredentials'].properties['password']
     }
 
     void "test build OpenAPI doc for simple endpoint"() {
-        given: "An API definition"
-            System.setProperty(AbstractOpenApiVisitor.ATTR_TEST_MODE, "true")
         when:
-            BeanDefinition beanDefinition = buildBeanDefinition('test.MyBean', '''
+            buildBeanDefinition('test.MyBean', '''
 package test;
 
 import io.micronaut.management.endpoint.annotation.Endpoint;
@@ -271,10 +260,8 @@ class MyBean {}
     }
 
     void "test build OpenAPI for management endpoints"() {
-        given: "An API definition"
-            System.setProperty(AbstractOpenApiVisitor.ATTR_TEST_MODE, "true")
         when:
-            BeanDefinition beanDefinition = buildBeanDefinition('test.MyBean', '''
+            buildBeanDefinition('test.MyBean', '''
 package test;
 
 @io.swagger.v3.oas.annotations.OpenAPIDefinition
@@ -304,10 +291,8 @@ class MyBean {}
     }
 
     void "test build OpenAPI for security endpoints"() {
-        given: "An API definition"
-            System.setProperty(AbstractOpenApiVisitor.ATTR_TEST_MODE, "true")
         when:
-            BeanDefinition beanDefinition = buildBeanDefinition('test.MyBean', '''
+            buildBeanDefinition('test.MyBean', '''
 package test;
 
 @io.swagger.v3.oas.annotations.OpenAPIDefinition

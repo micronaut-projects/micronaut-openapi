@@ -1,24 +1,17 @@
 package io.micronaut.openapi.visitor
 
-import io.micronaut.annotation.processing.test.AbstractTypeElementSpec
 import io.micronaut.http.annotation.Controller
 import io.micronaut.http.annotation.Get
+import io.micronaut.openapi.AbstractOpenApiTypeElementSpec
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.tags.Tags
 import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.Operation
 import io.swagger.v3.oas.models.tags.Tag
 
-class AnnotationRetentionPolicyTransformerSpec extends AbstractTypeElementSpec {
-
-    def cleanup() {
-        System.setProperty(AbstractOpenApiVisitor.ATTR_TEST_MODE, "")
-    }
+class AnnotationRetentionPolicyTransformerSpec extends AbstractOpenApiTypeElementSpec {
 
     void "test transform annotation metadata"() {
-            given:
-            System.setProperty(AbstractOpenApiVisitor.ATTR_TEST_MODE, "true")
-
             when:
             def definition = buildBeanDefinition('test.HelloWorldController', '''
 package test;

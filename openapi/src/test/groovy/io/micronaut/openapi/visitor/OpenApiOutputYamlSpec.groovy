@@ -2,12 +2,9 @@ package io.micronaut.openapi.visitor
 
 import io.micronaut.annotation.processing.test.AbstractTypeElementSpec
 
-class OpenApiOutputYamlSpec extends AbstractTypeElementSpec {
+class OpenApiOutputYamlSpec extends AbstractOpenApiTypeElementSpec {
 
     void "test paths and schemas for OpenAPI are sorted"() {
-        given:"An API definition"
-        System.setProperty(AbstractOpenApiVisitor.ATTR_TEST_MODE, "true")
-
         when:
         buildBeanDefinition('test.MyBean', '''
 package test;

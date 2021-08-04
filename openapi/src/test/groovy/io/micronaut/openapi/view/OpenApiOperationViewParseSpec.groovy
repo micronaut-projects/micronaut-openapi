@@ -1,6 +1,5 @@
 package io.micronaut.openapi.view
 
-import io.micronaut.openapi.view.OpenApiViewConfig
 import spock.lang.Specification
 
 class OpenApiOperationViewParseSpec extends Specification {

@@ -1,24 +1,13 @@
-
 package io.micronaut.openapi.visitor
 
-import io.micronaut.annotation.processing.test.AbstractTypeElementSpec
+import io.micronaut.openapi.AbstractOpenApiTypeElementSpec
 import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.PathItem
-import io.swagger.v3.oas.models.media.Schema
 import io.swagger.v3.oas.models.media.UUIDSchema
-import spock.lang.Specification
 
-class SchemaMetaAnnotationSpec extends AbstractTypeElementSpec {
-    def setup() {
-        System.setProperty(AbstractOpenApiVisitor.ATTR_TEST_MODE, "true")
-    }
-
-    def cleanup() {
-        System.setProperty(AbstractOpenApiVisitor.ATTR_TEST_MODE, "")
-    }
+class SchemaMetaAnnotationSpec extends AbstractOpenApiTypeElementSpec {
 
     void "test default UUID handling"() {
-
 
         given:"An API definition"
         when:

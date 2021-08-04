@@ -1,20 +1,10 @@
 package io.micronaut.openapi.visitor
 
-import io.micronaut.annotation.processing.test.AbstractTypeElementSpec
-import io.micronaut.http.MediaType
-import io.swagger.v3.oas.annotations.Parameter
-import io.swagger.v3.oas.annotations.enums.ParameterIn
-import io.swagger.v3.oas.annotations.media.ArraySchema
-import io.swagger.v3.oas.annotations.media.Content
-import io.swagger.v3.oas.annotations.media.Schema
-import io.swagger.v3.oas.annotations.responses.ApiResponse
+import io.micronaut.openapi.AbstractOpenApiTypeElementSpec
 import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.Operation
 
-class OpenApiArraySchemaSpec extends AbstractTypeElementSpec {
-    def setup() {
-        System.setProperty(AbstractOpenApiVisitor.ATTR_TEST_MODE, "true")
-    }
+class OpenApiArraySchemaSpec extends AbstractOpenApiTypeElementSpec {
 
     void "test ArraySchema with arraySchema field in class"() {
         given:
