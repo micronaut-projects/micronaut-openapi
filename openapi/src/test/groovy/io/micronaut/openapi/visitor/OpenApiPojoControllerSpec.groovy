@@ -141,10 +141,10 @@ class MyBean {}
             PathItem xyz2 = openAPI.paths.get("/pets/xyz2")
 
         then:
-            xyz1.post.operationId == 'xyzPostPost'
+            xyz1.post.operationId == 'xyzPost'
             xyz1.post.responses.size() == 3
             xyz1.post.responses['200']
-            xyz1.post.responses['200'].description == 'xyzPostPost 200 response'
+            xyz1.post.responses['200'].description == 'xyzPost 200 response'
             xyz1.post.responses['200'].content['application/json'].schema
             xyz1.post.responses['200'].content['application/json'].schema.$ref == '#/components/schemas/Pet'
             xyz1.post.responses['400']
@@ -154,7 +154,7 @@ class MyBean {}
             xyz1.post.responses['404'].description == 'Person not found'
             xyz1.post.responses['404'].content == null
 
-            xyz1.put.operationId == 'xyzPutPut'
+            xyz1.put.operationId == 'xyzPut'
             xyz1.put.description == null
             xyz1.put.responses.size() == 3
             xyz1.put.responses['200']
@@ -168,7 +168,7 @@ class MyBean {}
             xyz1.put.responses['404'].description == 'Person not found'
             xyz1.put.responses['404'].content == null
 
-            xyz2.post.operationId == 'xyzPost2Post'
+            xyz2.post.operationId == 'xyzPost2'
             xyz2.post.description == "Do the post"
             xyz2.post.responses.size() == 3
             xyz2.post.responses['201']
@@ -581,14 +581,14 @@ class MyBean {}
         PathItem pathItem = openAPI.paths.get("/pets")
 
         then:"it is included in the OpenAPI doc"
-        pathItem.get.operationId == 'listGet'
+        pathItem.get.operationId == 'list'
         pathItem.get.description == 'List the pets'
         pathItem.get.responses['200']
         pathItem.get.responses['200'].description == 'a list of pet names'
         pathItem.get.responses['200'].content['application/json'].schema
         pathItem.get.responses['200'].content['application/json'].schema.type == 'array'
         pathItem.get.responses['200'].content['application/json'].schema.items.$ref == '#/components/schemas/Pet'
-        pathItem.post.operationId == 'savePost'
+        pathItem.post.operationId == 'save'
         pathItem.post.requestBody
         pathItem.post.requestBody.required
         pathItem.post.requestBody.content
@@ -600,7 +600,7 @@ class MyBean {}
 
         then:"it is included in the OpenAPI doc"
         pathItem.get.description == 'Find a pet by a slug'
-        pathItem.get.operationId == 'findGet'
+        pathItem.get.operationId == 'find'
         pathItem.get.parameters.size() == 1
         pathItem.get.parameters[0].name == 'slug'
         pathItem.get.parameters[0].in == ParameterIn.PATH.toString()
@@ -730,14 +730,14 @@ class MyBean {}
         PathItem pathItem = openAPI.paths.get("/pets")
 
         then:"it is included in the OpenAPI doc"
-        pathItem.get.operationId == 'listGet'
+        pathItem.get.operationId == 'list'
         pathItem.get.description == 'List the pets'
         pathItem.get.responses['200']
         pathItem.get.responses['200'].description == 'a list of pet names'
         pathItem.get.responses['200'].content['application/json'].schema
         pathItem.get.responses['200'].content['application/json'].schema.type == 'array'
         pathItem.get.responses['200'].content['application/json'].schema.items.$ref == '#/components/schemas/Pet'
-        pathItem.post.operationId == 'savePost'
+        pathItem.post.operationId == 'save'
         pathItem.post.requestBody
         pathItem.post.requestBody.required
         pathItem.post.requestBody.content
@@ -749,7 +749,7 @@ class MyBean {}
 
         then:"it is included in the OpenAPI doc"
         pathItem.get.description == 'Find a pet by a slug'
-        pathItem.get.operationId == 'findGet'
+        pathItem.get.operationId == 'find'
         pathItem.get.parameters.size() == 1
         pathItem.get.parameters[0].name == 'slug'
         pathItem.get.parameters[0].in == ParameterIn.PATH.toString()
@@ -766,7 +766,7 @@ class MyBean {}
         pathItem = openAPI.paths.get("/pets/flowable")
 
         then:
-        pathItem.get.operationId == 'flowableGet'
+        pathItem.get.operationId == 'flowable'
         pathItem.get.responses['200']
         pathItem.get.responses['200'].description == 'a list of pet names'
         pathItem.get.responses['200'].content['application/json'].schema
@@ -777,9 +777,9 @@ class MyBean {}
         pathItem = openAPI.paths.get("/pets/completable")
 
         then:
-        pathItem.post.operationId == 'completablePost'
+        pathItem.post.operationId == 'completable'
         pathItem.post.responses['200']
-        pathItem.post.responses['200'].description == 'completablePost 200 response'
+        pathItem.post.responses['200'].description == 'completable 200 response'
         pathItem.post.responses['200'].content == null
 
 
@@ -787,7 +787,7 @@ class MyBean {}
         pathItem = openAPI.paths.get("/pets/observable")
 
         then:
-        pathItem.get.operationId == 'observableGet'
+        pathItem.get.operationId == 'observable'
         pathItem.get.responses['200']
         pathItem.get.responses['200'].description == 'a list of pet names'
         pathItem.get.responses['200'].content['application/json'].schema
@@ -798,7 +798,7 @@ class MyBean {}
         pathItem = openAPI.paths.get("/pets/singleHttpResponse")
 
         then:
-        pathItem.get.operationId == 'singleHttpResponseGet'
+        pathItem.get.operationId == 'singleHttpResponse'
         pathItem.get.responses['200']
         pathItem.get.responses['200'].content['application/json'].schema
         pathItem.get.responses['200'].content['application/json'].schema.$ref == '#/components/schemas/Pet'
@@ -929,14 +929,14 @@ class MyBean {}
         PathItem pathItem = openAPI.paths.get("/pets")
 
         then:"it is included in the OpenAPI doc"
-        pathItem.get.operationId == 'listGet'
+        pathItem.get.operationId == 'list'
         pathItem.get.description == 'List the pets'
         pathItem.get.responses['200']
         pathItem.get.responses['200'].description == 'a list of pet names'
         pathItem.get.responses['200'].content['application/json'].schema
         pathItem.get.responses['200'].content['application/json'].schema.type == 'array'
         pathItem.get.responses['200'].content['application/json'].schema.items.$ref == '#/components/schemas/MyPet'
-        pathItem.post.operationId == 'savePost'
+        pathItem.post.operationId == 'save'
         pathItem.post.requestBody
         pathItem.post.requestBody.required
         pathItem.post.requestBody.content
@@ -948,7 +948,7 @@ class MyBean {}
 
         then:"it is included in the OpenAPI doc"
         pathItem.get.description == 'Find a pet by a slug'
-        pathItem.get.operationId == 'findGet'
+        pathItem.get.operationId == 'find'
         pathItem.get.parameters.size() == 1
         pathItem.get.parameters[0].name == 'slug'
         pathItem.get.parameters[0].in == ParameterIn.PATH.toString()
@@ -965,7 +965,7 @@ class MyBean {}
         pathItem = openAPI.paths.get("/pets/flowable")
 
         then:
-        pathItem.get.operationId == 'flowableGet'
+        pathItem.get.operationId == 'flowable'
         pathItem.get.responses['200']
         pathItem.get.responses['200'].description == 'a list of pet names'
         pathItem.get.responses['200'].content['application/json'].schema
@@ -1045,7 +1045,7 @@ class MyBean {}
         PathItem pathItem = openAPI.paths.get("/pets")
 
         then:"it is included in the OpenAPI doc"
-        pathItem.post.operationId == 'savePost'
+        pathItem.post.operationId == 'save'
         pathItem.post.requestBody
         pathItem.post.requestBody.required
         pathItem.post.requestBody.content
@@ -1121,7 +1121,7 @@ class MyBean {}
         PathItem pathItem = openAPI.paths.get("/pets")
 
         then:"it is included in the OpenAPI doc"
-        pathItem.post.operationId == 'savePost'
+        pathItem.post.operationId == 'save'
         pathItem.post.requestBody
         pathItem.post.requestBody.required
         pathItem.post.requestBody.content

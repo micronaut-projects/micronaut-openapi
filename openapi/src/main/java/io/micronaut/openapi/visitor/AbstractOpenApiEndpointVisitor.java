@@ -15,9 +15,6 @@
  */
 package io.micronaut.openapi.visitor;
 
-import static io.micronaut.core.naming.NameUtils.capitalize;
-import static io.micronaut.openapi.postprocessors.OpenApiOperationsPostProcessor.AUTO_GENERATED_OPERATION_PREFIX;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -271,7 +268,7 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
         PathItem pathItem = resolvePathItem(context, matchTemplate);
         OpenAPI openAPI = resolveOpenAPI(context);
 
-        io.swagger.v3.oas.models.Operation swaggerOperation = readOperation(httpMethod, element, context);
+        io.swagger.v3.oas.models.Operation swaggerOperation = readOperation(element, context);
 
         readTags(element, swaggerOperation, classTags == null ? Collections.emptyList() : classTags);
 
@@ -742,14 +739,14 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
         return javadocDescription;
     }
 
-    private io.swagger.v3.oas.models.Operation readOperation(HttpMethod httpMethod, MethodElement element, VisitorContext context) {
+    private io.swagger.v3.oas.models.Operation readOperation(MethodElement element, VisitorContext context) {
         final Optional<AnnotationValue<Operation>> operationAnnotation = element.findAnnotation(Operation.class);
         io.swagger.v3.oas.models.Operation swaggerOperation = operationAnnotation
                 .flatMap(o -> toValue(o.getValues(), context, io.swagger.v3.oas.models.Operation.class))
                 .orElse(new io.swagger.v3.oas.models.Operation());
 
         if (StringUtils.isEmpty(swaggerOperation.getOperationId())) {
-            swaggerOperation.setOperationId(AUTO_GENERATED_OPERATION_PREFIX + element.getName() + capitalize(httpMethod.name().toLowerCase()));
+            swaggerOperation.setOperationId(element.getName());
         }
         return swaggerOperation;
     }

@@ -101,7 +101,7 @@ class MyBean {}
         expect:
         operation
         operation.responses.size() == 1
-        operation.responses["200"].description == "updatePetPut 200 response"
+        operation.responses["200"].description == "updatePet 200 response"
         operation.responses["200"].content == null
 
         openAPI.components.schemas['Base'].properties['money'].type == 'integer'

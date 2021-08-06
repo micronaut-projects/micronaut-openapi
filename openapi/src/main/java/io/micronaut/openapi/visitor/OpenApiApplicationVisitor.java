@@ -498,7 +498,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         openAPI = resolvePropertyPlaceHolders(openAPI, visitorContext);
         sortOpenAPI(openAPI);
         // Process after sorting so order is stable
-        new OpenApiOperationsPostProcessor().processOperations(openAPI, visitorContext, classElement);
+        new OpenApiOperationsPostProcessor().processOperations(openAPI);
         String fileName = "swagger.yml";
         String documentTitle = "OpenAPI";
 
