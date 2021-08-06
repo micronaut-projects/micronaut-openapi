@@ -40,6 +40,7 @@ import io.micronaut.core.util.ArrayUtils;
 import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.core.util.StringUtils;
 import io.micronaut.http.MediaType;
+import io.micronaut.http.server.types.files.FileCustomizableResponseType;
 import io.micronaut.http.uri.UriMatchTemplate;
 import io.micronaut.inject.ast.ClassElement;
 import io.micronaut.inject.ast.Element;
@@ -79,6 +80,7 @@ import io.swagger.v3.oas.models.media.ComposedSchema;
 import io.swagger.v3.oas.models.media.MapSchema;
 import io.swagger.v3.oas.models.media.ObjectSchema;
 import io.swagger.v3.oas.models.media.Schema;
+import io.swagger.v3.oas.models.media.StringSchema;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.reactivestreams.Publisher;
@@ -97,9 +99,12 @@ import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 import javax.validation.constraints.Size;
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.math.BigDecimal;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -690,6 +695,9 @@ abstract class AbstractOpenApiVisitor  {
                     if (schema != null) {
                         schema = arraySchema(schema);
                     }
+                } else if (isReturnTypeFile(type)) {
+                    schema = new StringSchema();
+                    schema.setFormat("binary");
                 } else {
                     schema = getSchemaDefinition(openAPI, context, type, definingElement, mediaTypes);
                 }
@@ -1448,6 +1456,15 @@ abstract class AbstractOpenApiVisitor  {
                 "io.reactivex.Single",
                 "io.reactivex.Observable",
                 "io.reactivex.Maybe"
+        ).stream().anyMatch(type::isAssignable);
+    }
+
+    private boolean isReturnTypeFile(ClassElement type) {
+        return CollectionUtils.setOf(
+                FileCustomizableResponseType.class.getName(),
+                File.class.getName(),
+                InputStream.class.getName(),
+                ByteBuffer.class.getName()
         ).stream().anyMatch(type::isAssignable);
     }
 
