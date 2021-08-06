@@ -12,7 +12,7 @@ dependencies {
     testImplementation "io.micronaut:micronaut-runtime"
     testImplementation "io.micronaut:micronaut-validation"
     testImplementation "io.micronaut.beanvalidation:micronaut-hibernate-validator"
-    testRuntimeOnly "ch.qos.logback:logback-classic:1.2.3"
+    testRuntimeOnly "ch.qos.logback:logback-classic:1.2.5"
     testImplementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
     testImplementation "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
     testImplementation 'io.kotlintest:kotlintest-runner-junit5:3.4.2'
