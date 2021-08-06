@@ -135,99 +135,99 @@ class MyBean {}
 paths:
   /endpoint1:
     get:
-      operationId: getPathGet
+      operationId: getPath
       parameters: []
       responses:
         "200":
-          description: getPathGet 200 response
+          description: getPath 200 response
           content:
             application/json:
               schema:
                 type: string
   /endpoint1/path1:
     get:
-      operationId: path1Get1
+      operationId: path1
       parameters: []
       responses:
         "200":
-          description: path1Get1 200 response
+          description: path1 200 response
           content:
             application/json:
               schema:
                 type: string
   /endpoint1/path2:
     get:
-      operationId: path2Get1
+      operationId: path2
       parameters: []
       responses:
         "200":
-          description: path2Get1 200 response
+          description: path2 200 response
           content:
             application/json:
               schema:
                 type: string
   /endpoint2:
     get:
-      operationId: pathGet1
+      operationId: path
       parameters: []
       responses:
         "200":
-          description: pathGet1 200 response
+          description: path 200 response
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Person3\'
   /endpoint2/path1:
     get:
-      operationId: path1Get2
+      operationId: path1_1
       parameters: []
       responses:
         "200":
-          description: path1Get2 200 response
+          description: path1_1 200 response
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Person1\'
   /endpoint2/path2:
     get:
-      operationId: path2Get2
+      operationId: path2_1
       parameters: []
       responses:
         "200":
-          description: path2Get2 200 response
+          description: path2_1 200 response
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Person2\'
   /endpoint3:
     get:
-      operationId: pathGet2
+      operationId: path_1
       parameters: []
       responses:
         "200":
-          description: pathGet2 200 response
+          description: path_1 200 response
           content:
             application/json:
               schema:
                 type: string
   /endpoint3/path1:
     get:
-      operationId: path1Get3
+      operationId: path1_2
       parameters: []
       responses:
         "200":
-          description: path1Get3 200 response
+          description: path1_2 200 response
           content:
             application/json:
               schema:
                 type: string
   /endpoint3/path2:
     get:
-      operationId: path2Get3
+      operationId: path2_2
       parameters: []
       responses:
         "200":
-          description: path2Get3 200 response
+          description: path2_2 200 response
           content:
             application/json:
               schema:

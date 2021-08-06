@@ -72,7 +72,7 @@ class MyBean {}
         PathItem pathItem = openAPI.paths.get("/pets")
 
         then:"it is included in the OpenAPI doc"
-        pathItem.post.operationId == 'savePost'
+        pathItem.post.operationId == 'save'
         pathItem.post.requestBody
         pathItem.post.requestBody.required
         pathItem.post.requestBody.content
