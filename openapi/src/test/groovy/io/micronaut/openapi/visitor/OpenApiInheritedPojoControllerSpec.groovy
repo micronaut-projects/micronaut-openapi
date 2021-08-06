@@ -636,7 +636,7 @@ class MyBean {}
         petSchema != null
         dogSchema != null
         catSchema != null
-        !(petSchema instanceof ComposedSchema)
+        petSchema instanceof ComposedSchema
         catSchema instanceof ComposedSchema
         dogSchema instanceof ComposedSchema
         catSchema.type == null
