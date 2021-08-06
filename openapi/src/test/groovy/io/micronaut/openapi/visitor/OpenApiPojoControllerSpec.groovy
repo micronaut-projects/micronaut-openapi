@@ -8,8 +8,13 @@ import io.swagger.v3.oas.models.PathItem
 import io.swagger.v3.oas.models.media.ArraySchema
 import io.swagger.v3.oas.models.media.MapSchema
 import io.swagger.v3.oas.models.media.Schema
+import spock.lang.Issue
 
 class OpenApiPojoControllerSpec extends AbstractOpenApiTypeElementSpec {
+
+    def cleanup() {
+        System.setProperty(AbstractOpenApiVisitor.ATTR_TEST_MODE, "")
+    }
 
     void "test build OpenAPI for List"() {
         given: "An API definition"
@@ -1618,5 +1623,111 @@ class MyBean {}
         operation.requestBody.content.size() == 2
         operation.requestBody.content['application/json'].schema
         operation.requestBody.content['application/x-www-form-urlencoded'].schema
+    }
+
+    @Issue("https://github.com/micronaut-projects/micronaut-openapi/issues/490")
+    void "test build OpenAPI for Controller with POJO with mandatory/optional fields"() {
+        given:"An API definition"
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.reactivex.*;
+import io.micronaut.core.annotation.*;
+import io.micronaut.http.annotation.*;
+import io.swagger.v3.oas.annotations.media.*;
+
+import java.util.List;
+
+@Controller("/example")
+class ExampleController {
+
+    @Get("/")
+    ExampleData getExampleData() {
+        return new ExampleData("name", true, new ExampleAdditionalData("hello"), 2, 0.456f, 1.2F);
+    }
+}
+
+class ExampleData {
+    private String name;
+    @Schema(required = false)
+    private Boolean active;
+    private ExampleAdditionalData additionalData;
+    private Integer age;
+    private Float battingAverage;
+    private float anotherFloat;
+
+    ExampleData(String name, Boolean active, ExampleAdditionalData additionalData, Integer age, @Nullable Float battingAverage, float anotherFloat) {
+        this.name = name;
+        this.active = active;
+        this.additionalData = additionalData;
+        this.age = age;
+        this.battingAverage = battingAverage;
+        this.anotherFloat = anotherFloat;
+    }
+
+    public String getName() {
+        return this.name;
+    }
+
+    public Boolean isActive() {
+        return this.active;
+    }
+
+    public ExampleAdditionalData getAdditionalData() {
+        return this.additionalData;
+    }
+
+    public Integer getAge() {
+        return this.age;
+    }
+
+    public Float getBattingAverage() {
+        return this.battingAverage;
+    }
+
+    public float getAnotherFloat() {
+        return this.anotherFloat;
+    }
+}
+
+class ExampleAdditionalData {
+    private String something;
+
+    ExampleAdditionalData(String something) {
+        this.something = something;
+    }
+
+    String getSomething() {
+        return this.something;
+    }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        then: "the state is correct"
+        AbstractOpenApiVisitor.testReference != null
+
+        when: "The OpenAPI is retrieved"
+        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        Schema schema = openAPI.components.schemas['ExampleData']
+
+        then: "the components are valid"
+        schema.properties.size() == 6
+        schema.type == 'object'
+        schema.required
+
+        and: 'all params without annotations are required'
+        schema.required.contains('name')
+        schema.required.contains('additionalData')
+        schema.required.contains('age')
+        schema.required.contains('anotherFloat')
+
+        and: 'active is not required because it is annotated with @Schema(required = false)'
+        !schema.required.contains('active')
+
+        and: 'battingAverage is not required because it is annotated with @Nullable in the constructor'
+        !schema.required.contains('battingAverage')
     }
 }

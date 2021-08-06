@@ -5,7 +5,6 @@ import io.micronaut.openapi.AbstractOpenApiTypeElementSpec
 class OpenApiOutputYamlSpec extends AbstractOpenApiTypeElementSpec {
 
     void "test paths and schemas for OpenAPI are sorted"() {
-
         when:
         buildBeanDefinition('test.MyBean', '''
 package test;
@@ -235,6 +234,10 @@ paths:
 components:
   schemas:
     Person1:
+      required:
+      - debtValue
+      - name
+      - totalGoals
       type: object
       properties:
         name:
@@ -246,11 +249,15 @@ components:
           type: integer
           format: int32
     Person2:
+      required:
+      - name
       type: object
       properties:
         name:
           type: string
     Person3:
+      required:
+      - name
       type: object
       properties:
         name:
