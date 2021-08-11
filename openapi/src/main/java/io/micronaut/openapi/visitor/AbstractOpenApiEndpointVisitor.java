@@ -17,7 +17,6 @@ package io.micronaut.openapi.visitor;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.JsonNode;
-
 import io.micronaut.annotation.processing.visitor.JavaClassElementExt;
 import io.micronaut.context.env.DefaultPropertyPlaceholderResolver;
 import io.micronaut.context.env.PropertyPlaceholderResolver;
@@ -37,7 +36,14 @@ import io.micronaut.http.HttpRequest;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.HttpStatus;
 import io.micronaut.http.MediaType;
-import io.micronaut.http.annotation.*;
+import io.micronaut.http.annotation.Body;
+import io.micronaut.http.annotation.CookieValue;
+import io.micronaut.http.annotation.Header;
+import io.micronaut.http.annotation.Part;
+import io.micronaut.http.annotation.PathVariable;
+import io.micronaut.http.annotation.QueryValue;
+import io.micronaut.http.annotation.RequestBean;
+import io.micronaut.http.annotation.Status;
 import io.micronaut.http.uri.UriMatchTemplate;
 import io.micronaut.http.uri.UriMatchVariable;
 import io.micronaut.inject.ast.ClassElement;
@@ -63,7 +69,12 @@ import io.swagger.v3.oas.models.media.ComposedSchema;
 import io.swagger.v3.oas.models.media.Content;
 import io.swagger.v3.oas.models.media.ObjectSchema;
 import io.swagger.v3.oas.models.media.Schema;
-import io.swagger.v3.oas.models.parameters.*;
+import io.swagger.v3.oas.models.parameters.CookieParameter;
+import io.swagger.v3.oas.models.parameters.HeaderParameter;
+import io.swagger.v3.oas.models.parameters.Parameter;
+import io.swagger.v3.oas.models.parameters.PathParameter;
+import io.swagger.v3.oas.models.parameters.QueryParameter;
+import io.swagger.v3.oas.models.parameters.RequestBody;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.responses.ApiResponses;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
@@ -71,7 +82,15 @@ import io.swagger.v3.oas.models.servers.Server;
 
 import java.io.IOException;
 import java.security.Principal;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -303,13 +322,13 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
             }
         }
 
-
         Map<String, UriMatchVariable> pathVariables = pathVariables(matchTemplate);
         List<MediaType> consumesMediaTypes = consumesMediaTypes(element);
         List<TypedElement> extraBodyParameters = new ArrayList<>();
         processParameters(element, context, openAPI, swaggerOperation, javadocDescription, permitsRequestBody, pathVariables, consumesMediaTypes, extraBodyParameters);
-
         processExtraBodyParameters(context, httpMethod, openAPI, swaggerOperation, javadocDescription, consumesMediaTypes, extraBodyParameters);
+
+        processParameterAnnotationInMethod(element, openAPI, matchTemplate, httpMethod);
 
         // if we have multiple uris, process them
         while (matchTemplates.hasNext()) {
@@ -374,6 +393,53 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
         for (ParameterElement parameter : element.getParameters()) {
             processParameter(context, openAPI, swaggerOperation, javadocDescription, permitsRequestBody, pathVariables,
                     consumesMediaTypes, swaggerParameters, hasExistingParameters, parameter, extraBodyParameters);
+        }
+    }
+
+    private void processParameterAnnotationInMethod(MethodElement element,
+                                                    OpenAPI openAPI,
+                                                    UriMatchTemplate matchTemplate,
+                                                    HttpMethod httpMethod) {
+
+        List<AnnotationValue<io.swagger.v3.oas.annotations.Parameter>> parameterAnnotations = element
+                .getDeclaredAnnotationValuesByType(io.swagger.v3.oas.annotations.Parameter.class);
+
+        for (AnnotationValue<io.swagger.v3.oas.annotations.Parameter> paramAnn : parameterAnnotations) {
+            if (paramAnn.get("hidden", Boolean.class, false)) {
+                continue;
+            }
+
+            Parameter parameter = new Parameter();
+            parameter.schema(new Schema());
+
+            paramAnn.stringValue("name").ifPresent(parameter::name);
+            paramAnn.enumValue("in", ParameterIn.class).ifPresent(in -> parameter.in(in.toString()));
+            paramAnn.stringValue("description").ifPresent(parameter::description);
+            paramAnn.booleanValue("required").ifPresent(parameter::required);
+            paramAnn.booleanValue("deprecated").ifPresent(parameter::deprecated);
+            paramAnn.booleanValue("allowEmptyValue").ifPresent(parameter::allowEmptyValue);
+            paramAnn.booleanValue("allowReserved").ifPresent(parameter::allowReserved);
+            paramAnn.stringValue("example").ifPresent(parameter::example);
+            paramAnn.stringValue("ref").ifPresent(parameter::$ref);
+
+            PathItem pathItem = openAPI.getPaths().get(matchTemplate.toPathString());
+            switch (httpMethod) {
+                case GET:
+                    pathItem.getGet().addParametersItem(parameter);
+                    break;
+                case POST:
+                    pathItem.getPost().addParametersItem(parameter);
+                    break;
+                case PUT:
+                    pathItem.getPut().addParametersItem(parameter);
+                    break;
+                case DELETE:
+                    pathItem.getDelete().addParametersItem(parameter);
+                    break;
+                case PATCH:
+                    pathItem.getPatch().addParametersItem(parameter);
+                    break;
+            }
         }
     }
 

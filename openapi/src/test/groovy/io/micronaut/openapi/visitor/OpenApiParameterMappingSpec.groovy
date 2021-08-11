@@ -5,6 +5,7 @@ import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.PathItem
 import io.swagger.v3.oas.models.media.Schema
 import io.swagger.v3.oas.models.parameters.HeaderParameter
+import spock.lang.Issue
 
 class OpenApiParameterMappingSpec extends AbstractOpenApiTypeElementSpec {
 
@@ -550,4 +551,83 @@ class MyBean {}
         !pathItem.get.parameters[0].required
         pathItem.get.parameters[0].schema.$ref == '#/components/schemas/Greeting'
     }
+
+    @Issue("https://github.com/micronaut-projects/micronaut-openapi/issues/416")
+    void "test that @Parameter can be applied to a method"() {
+
+        given: "An API definition"
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.core.annotation.*;
+import io.micronaut.http.annotation.*;
+import io.swagger.v3.oas.annotations.*;
+import io.swagger.v3.oas.annotations.enums.*;
+
+import java.lang.annotation.*;
+
+@Controller("/")
+class ParameterController {
+
+    @Get("/page-params")
+    @PageParam
+    public String paginationParams(@Parameter(hidden = true) Page page) {
+        return null;
+    }
+}
+
+@Target({ElementType.METHOD, ElementType.ANNOTATION_TYPE})
+@Retention(RetentionPolicy.RUNTIME)
+@Parameter(name = "page", in = ParameterIn.QUERY, description = "The page number", required = true, example = "1")
+@Parameter(name = "pageSize", in = ParameterIn.QUERY)
+@interface PageParam {
+}
+
+@Introspected
+class Page {
+    private String page;
+    private String pageSize;
+
+    public Page() {
+    }
+    public String getPage() {
+        return page;
+    }
+    public void setPage(String page) {
+        this.page = page;
+    }
+    public String getPageSize() {
+        return pageSize;
+    }
+    public void setPageSize(String pageSize) {
+        this.pageSize = pageSize;
+    }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+
+        then: 'the state is correct'
+        AbstractOpenApiVisitor.testReference != null
+
+        when:
+        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        PathItem pathItem = openAPI.paths.get("/page-params")
+
+        then:
+        pathItem.get.operationId == 'paginationParams'
+        pathItem.get.parameters.size() == 2
+        pathItem.get.parameters[0].name == 'page'
+        pathItem.get.parameters[0].in == 'query'
+        pathItem.get.parameters[0].description == 'The page number'
+        pathItem.get.parameters[0].required
+        pathItem.get.parameters[0].example == '1'
+        pathItem.get.parameters[0].schema != null
+        pathItem.get.parameters[1].name == 'pageSize'
+        pathItem.get.parameters[1].in == 'query'
+        pathItem.get.parameters[1].schema != null
+    }
+
 }
