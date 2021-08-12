@@ -630,4 +630,54 @@ class MyBean {}
         pathItem.get.parameters[1].schema != null
     }
 
+    @Issue("https://github.com/micronaut-projects/micronaut-openapi/issues/416")
+    void "do not duplicate parameters if defined as method arguments and also in @Parameter at method level"() {
+
+        given: "An API definition"
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.core.annotation.*;
+import io.micronaut.http.annotation.*;
+import io.swagger.v3.oas.annotations.*;
+import io.swagger.v3.oas.annotations.enums.*;
+
+import java.lang.annotation.*;
+
+@Controller("/")
+class ParameterController {
+
+    @Get("/{apiVersion}")
+    @Parameters(value = {
+            @Parameter(required = true, in = ParameterIn.PATH, name = "apiVersion"),
+            @Parameter(in = ParameterIn.QUERY, name = "text")
+    })
+    public void search(String apiVersion, @Nullable String text, @Nullable Integer page) {
+    }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+
+        then: 'the state is correct'
+        AbstractOpenApiVisitor.testReference != null
+
+        when:
+        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        PathItem pathItem = openAPI.paths.get("/{apiVersion}")
+
+        then:
+        pathItem.get.operationId == 'search'
+        pathItem.get.parameters.size() == 3
+        pathItem.get.parameters[0].name == 'apiVersion'
+        pathItem.get.parameters[0].in == 'path'
+        pathItem.get.parameters[0].required
+        pathItem.get.parameters[1].name == 'text'
+        pathItem.get.parameters[1].in == 'query'
+        pathItem.get.parameters[2].name == 'page'
+        pathItem.get.parameters[2].in == 'query'
+    }
+
 }
