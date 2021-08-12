@@ -447,6 +447,9 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
                 case PATCH:
                     pathItem.getPatch().addParametersItem(parameter);
                     break;
+                default:
+                    // do nothing
+                    break;
             }
         }
     }
