@@ -325,10 +325,11 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
         Map<String, UriMatchVariable> pathVariables = pathVariables(matchTemplate);
         List<MediaType> consumesMediaTypes = consumesMediaTypes(element);
         List<TypedElement> extraBodyParameters = new ArrayList<>();
+
+        // @Parameters declared at method level take precedence over the declared as method arguments, so we process them first
+        processParameterAnnotationInMethod(element, openAPI, matchTemplate, httpMethod);
         processParameters(element, context, openAPI, swaggerOperation, javadocDescription, permitsRequestBody, pathVariables, consumesMediaTypes, extraBodyParameters);
         processExtraBodyParameters(context, httpMethod, openAPI, swaggerOperation, javadocDescription, consumesMediaTypes, extraBodyParameters);
-
-        processParameterAnnotationInMethod(element, openAPI, matchTemplate, httpMethod);
 
         // if we have multiple uris, process them
         while (matchTemplates.hasNext()) {
@@ -385,15 +386,22 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
                                    List<MediaType> consumesMediaTypes,
                                    List<TypedElement> extraBodyParameters) {
         List<Parameter> swaggerParameters = swaggerOperation.getParameters();
-        boolean hasExistingParameters = CollectionUtils.isNotEmpty(swaggerParameters);
-        if (!hasExistingParameters) {
+        if (CollectionUtils.isEmpty(swaggerParameters)) {
             swaggerParameters = new ArrayList<>();
             swaggerOperation.setParameters(swaggerParameters);
         }
+
         for (ParameterElement parameter : element.getParameters()) {
-            processParameter(context, openAPI, swaggerOperation, javadocDescription, permitsRequestBody, pathVariables,
-                    consumesMediaTypes, swaggerParameters, hasExistingParameters, parameter, extraBodyParameters);
+            if (!alreadyProcessedParameter(swaggerParameters, parameter)) {
+                processParameter(context, openAPI, swaggerOperation, javadocDescription, permitsRequestBody, pathVariables,
+                        consumesMediaTypes, swaggerParameters, parameter, extraBodyParameters);
+            }
         }
+    }
+
+    private boolean alreadyProcessedParameter(List<Parameter> swaggerParameters, ParameterElement parameter) {
+        return swaggerParameters.stream()
+                .anyMatch(p -> p.getName().equals(parameter.getName()));
     }
 
     private void processParameterAnnotationInMethod(MethodElement element,
@@ -446,7 +454,7 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
     private void processParameter(VisitorContext context, OpenAPI openAPI,
                                   io.swagger.v3.oas.models.Operation swaggerOperation, JavadocDescription javadocDescription,
                                   boolean permitsRequestBody, Map<String, UriMatchVariable> pathVariables, List<MediaType> consumesMediaTypes,
-                                  List<Parameter> swaggerParameters, boolean hasExistingParameters, TypedElement parameter,
+                                  List<Parameter> swaggerParameters, TypedElement parameter,
                                   List<TypedElement> extraBodyParameters) {
         ClassElement parameterType = parameter.getGenericType();
 
@@ -468,11 +476,7 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
 
         if (parameter.isAnnotationPresent(RequestBean.class)) {
             processRequestBean(context, openAPI, swaggerOperation, javadocDescription, permitsRequestBody, pathVariables,
-                    consumesMediaTypes, swaggerParameters, hasExistingParameters, parameter, extraBodyParameters);
-            return;
-        }
-
-        if (hasExistingParameters) {
+                    consumesMediaTypes, swaggerParameters, parameter, extraBodyParameters);
             return;
         }
 
@@ -706,14 +710,14 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
     private void processRequestBean(VisitorContext context, OpenAPI openAPI,
             io.swagger.v3.oas.models.Operation swaggerOperation, JavadocDescription javadocDescription,
             boolean permitsRequestBody, Map<String, UriMatchVariable> pathVariables, List<MediaType> consumesMediaTypes,
-            List<Parameter> swaggerParameters, boolean hasExistingParameters, TypedElement parameter,
+            List<Parameter> swaggerParameters, TypedElement parameter,
             List<TypedElement> extraBodyParameters) {
         for (FieldElement field : parameter.getType().getFields()) {
             if (field.isStatic()) {
                 continue;
             }
             processParameter(context, openAPI, swaggerOperation, javadocDescription, permitsRequestBody, pathVariables,
-                    consumesMediaTypes, swaggerParameters, hasExistingParameters, field, extraBodyParameters);
+                    consumesMediaTypes, swaggerParameters, field, extraBodyParameters);
         }
     }
 
