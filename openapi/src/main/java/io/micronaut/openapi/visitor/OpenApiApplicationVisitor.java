@@ -26,6 +26,7 @@ import io.micronaut.context.env.Environment;
 import io.micronaut.core.annotation.Experimental;
 import io.micronaut.core.util.StringUtils;
 import io.micronaut.inject.ast.ClassElement;
+import io.micronaut.inject.ast.Element;
 import io.micronaut.inject.visitor.TypeElementVisitor;
 import io.micronaut.inject.visitor.VisitorContext;
 import io.micronaut.inject.writer.GeneratedFile;
@@ -347,7 +348,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             return path;
         }
         // default location
-        Optional<GeneratedFile> generatedFile = visitorContext.visitMetaInfFile("swagger/" + fileName);
+        Optional<GeneratedFile> generatedFile = visitorContext.visitMetaInfFile("swagger/" + fileName, Element.EMPTY_ELEMENT_ARRAY);
         if (generatedFile.isPresent()) {
             URI uri = generatedFile.get().toURI();
             // happens in tests 'mem:///CLASS_OUTPUT/META-INF/swagger/swagger.yml'
