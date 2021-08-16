@@ -1730,4 +1730,94 @@ class MyBean {}
         and: 'battingAverage is not required because it is annotated with @Nullable in the constructor'
         !schema.required.contains('battingAverage')
     }
+
+    @Issue("https://github.com/micronaut-projects/micronaut-openapi/issues/548")
+    void "test build OpenAPI for Controller with POJO with UUID fields"() {
+        given:
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.core.annotation.*;
+import io.micronaut.http.annotation.*;
+import io.swagger.v3.oas.annotations.media.*;
+import io.swagger.v3.oas.annotations.media.Schema;
+import java.util.UUID;
+import javax.validation.Valid;
+
+@Controller("/")
+class UuidController {
+
+    @Post("/uuid")
+    public void sendGreeting(@Valid @Body Greeting greeting) {
+    }
+}
+
+@Schema(description = "Represent a greeting between a sender and a receiver")
+class Greeting {
+
+    @Schema(description = "Greeting message the receiver will get")
+    private String message;
+
+    @Schema(description = "ID of the sender")
+    private UUID senderId;
+
+    private UUID receiverId;
+
+    public Greeting() {
+    }
+
+    public Greeting(String message, UUID senderId, UUID receiverId) {
+        this.message = message;
+        this.senderId = senderId;
+        this.receiverId = receiverId;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public UUID getSenderId() {
+        return senderId;
+    }
+    public void setSenderId(UUID senderId) {
+        this.senderId = senderId;
+    }
+
+    @Schema(description = "ID of the receiver")
+    public UUID getReceiverId() {
+        return receiverId;
+    }
+    public void setReceiverId(UUID receiverId) {
+        this.receiverId = receiverId;
+    }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        then:
+        AbstractOpenApiVisitor.testReference != null
+
+        when:
+        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+
+        then:
+        openAPI.components.schemas.size() == 1
+        openAPI.components.schemas['Greeting'].name == 'Greeting'
+        openAPI.components.schemas['Greeting'].description == 'Represent a greeting between a sender and a receiver'
+        openAPI.components.schemas['Greeting'].type == 'object'
+        openAPI.components.schemas['Greeting'].properties.size() == 3
+        openAPI.components.schemas['Greeting'].properties['message'].type == 'string'
+        openAPI.components.schemas['Greeting'].properties['message'].description == 'Greeting message the receiver will get'
+        openAPI.components.schemas['Greeting'].properties['senderId'].type == 'string'
+        openAPI.components.schemas['Greeting'].properties['senderId'].description == 'ID of the sender'
+        openAPI.components.schemas['Greeting'].properties['senderId'].format == 'uuid'
+        openAPI.components.schemas['Greeting'].properties['receiverId'].type == 'string'
+        openAPI.components.schemas['Greeting'].properties['receiverId'].description == 'ID of the receiver'
+        openAPI.components.schemas['Greeting'].properties['receiverId'].format == 'uuid'
+    }
 }
