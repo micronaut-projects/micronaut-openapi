@@ -782,7 +782,7 @@ abstract class AbstractOpenApiVisitor  {
                 final boolean required = element.isAnnotationPresent(NotNull.class)
                         || element.isAnnotationPresent(NotBlank.class)
                         || element.isAnnotationPresent(NotEmpty.class)
-                        || element.isAnnotationPresent(NonNull.class)
+                        || element.isNonNull()
                         || element.booleanValue(JsonProperty.class, "required").orElse(false);
                 propertySchema = bindSchemaForElement(context, element, elementType, propertySchema);
                 String propertyName = resolvePropertyName(element, classElement, propertySchema);
