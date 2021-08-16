@@ -3,6 +3,8 @@ package io.micronaut.openapi.visitor
 import io.micronaut.openapi.AbstractOpenApiTypeElementSpec
 import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.PathItem
+import io.swagger.v3.oas.models.servers.Server
+import spock.lang.Issue
 
 class OpenApiIncludeVisitorSpec extends AbstractOpenApiTypeElementSpec {
 
@@ -29,24 +31,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
                 license = @License(name = "Apache 2.0", url = "https://foo.bar"),
                 contact = @Contact(url = "https://gigantic-server.com", name = "Fred", email = "Fred@gigagantic-server.com")
         ),
-        tags = {
-                @Tag(name = "Tag 1", description = "desc 1", externalDocs = @ExternalDocumentation(description = "docs desc")),
-                @Tag(name = "Tag 2", description = "desc 2", externalDocs = @ExternalDocumentation(description = "docs desc 2")),
-                @Tag(name = "Tag 3")
-        },
         externalDocs = @ExternalDocumentation(description = "definition docs desc"),
         security = {
                 @SecurityRequirement(name = "req 1", scopes = {"a", "b"}),
                 @SecurityRequirement(name = "req 2", scopes = {"b", "c"})
-        },
-        servers = {
-                @Server(
-                        description = "server 1",
-                        url = "https://foo",
-                        variables = {
-                                @ServerVariable(name = "var1", description = "var 1", defaultValue = "1", allowableValues = {"1", "2"}),
-                                @ServerVariable(name = "var2", description = "var 2", defaultValue = "1", allowableValues = {"1", "2"})
-                        })
         }
 )
 @io.micronaut.openapi.annotation.OpenAPIInclude(value = io.micronaut.security.endpoints.LoginController.class, 
@@ -240,6 +228,7 @@ class MyBean {}
             openAPI.servers[0].variables.size() == 2
             openAPI.servers[0].variables.var1.description == 'var 1'
             openAPI.servers[0].variables.var1.default == '1'
+            openAPI.servers[0].variables.var1.enum == ['1', '2']
 
         then:
             openAPI.paths['/message']
@@ -314,5 +303,92 @@ class MyBean {}
             openAPI.paths['/logout']
             openAPI.paths['/logout'].post.tags[0] == "Micronaut Security"
             openAPI.paths['/logout'].get.tags[0] == "Micronaut Security"
+    }
+
+    @Issue("https://github.com/micronaut-projects/micronaut-openapi/issues/522")
+    void "test @Server annotation works and it includes allowableValues"() {
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.http.annotation.*;
+import io.micronaut.http.*;
+import io.swagger.v3.oas.annotations.*;
+import io.swagger.v3.oas.annotations.info.*;
+import io.swagger.v3.oas.annotations.media.*;
+import io.swagger.v3.oas.annotations.tags.*;
+import io.swagger.v3.oas.annotations.servers.*;
+import io.swagger.v3.oas.annotations.security.*;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+
+@OpenAPIDefinition(
+    info = @Info(
+        title = "the title",
+        version = "0.0"
+    ),
+    servers = {
+        @Server(
+            description = "server 1",
+            url = "https://foo",
+            variables = {
+                @ServerVariable(name = "var1", description = "var 1", defaultValue = "1", allowableValues = {"1", "2"}),
+                @ServerVariable(name = "var2", description = "var 2", defaultValue = "2", allowableValues = {"1", "2"})
+            }
+        ),
+        @Server(
+            description = "server 2",
+            url = "https://bar",
+            variables = {
+                @ServerVariable(name = "varA", description = "var A", defaultValue = "A", allowableValues = {"A", "B"}),
+                @ServerVariable(name = "varB", description = "var B", defaultValue = "B", allowableValues = {"A", "B"})
+            }
+        )
+    }
+)
+class Application {
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        then:
+        AbstractOpenApiVisitor.testReference != null
+
+        when:
+        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+
+        then:
+        openAPI.info != null
+        openAPI.servers.size() == 2
+
+        when:
+        Server server = openAPI.servers[0]
+
+        then:
+        server.url == 'https://foo'
+        server.description == 'server 1'
+        server.variables
+        server.variables.size() == 2
+        server.variables.get('var1').description == 'var 1'
+        server.variables.get('var1').default == '1'
+        server.variables.get('var1').enum == ['1', '2']
+        server.variables.get('var2').description == 'var 2'
+        server.variables.get('var2').default == '2'
+        server.variables.get('var2').enum == ['1', '2']
+
+        when:
+        Server server2 = openAPI.servers[1]
+
+        then:
+        server2.url == 'https://bar'
+        server2.description == 'server 2'
+        server2.variables
+        server2.variables.size() == 2
+        server2.variables.get('varA').description == 'var A'
+        server2.variables.get('varA').default == 'A'
+        server2.variables.get('varA').enum == ['A', 'B']
+        server2.variables.get('varB').description == 'var B'
+        server2.variables.get('varB').default == 'B'
+        server2.variables.get('varB').enum == ['A', 'B']
     }
 }

@@ -71,6 +71,7 @@ import io.swagger.v3.oas.annotations.media.DiscriminatorMapping;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.OAuthScope;
+import io.swagger.v3.oas.annotations.servers.Server;
 import io.swagger.v3.oas.annotations.servers.ServerVariable;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
@@ -384,6 +385,15 @@ abstract class AbstractOpenApiVisitor  {
                                     examples.put(name, map);
                                 }
                                 newValues.put(key, examples);
+                            } else if (Server.class.getName().equals(annotationName)) {
+                                List<Map> servers = new ArrayList<>();
+                                for (Object o : a) {
+                                    Map variables = new LinkedHashMap();
+                                    AnnotationValue<ServerVariable> sv = (AnnotationValue<ServerVariable>) o;
+                                    variables.putAll(toValueMap(sv.getValues(), context));
+                                    servers.add(variables);
+                                }
+                                newValues.put(key, servers);
                             } else if (ServerVariable.class.getName().equals(annotationName)) {
                                 Map variables = new LinkedHashMap();
                                 for (Object o : a) {
@@ -394,6 +404,10 @@ abstract class AbstractOpenApiVisitor  {
                                         Object dv = map.get("defaultValue");
                                         if (dv != null) {
                                             map.put("default", dv);
+                                        }
+                                        if (map.containsKey("allowableValues")) {
+                                            // The key in the generated openapi needs to be "enum"
+                                            map.put("enum", map.remove("allowableValues"));
                                         }
                                         variables.put(name, map);
                                     });

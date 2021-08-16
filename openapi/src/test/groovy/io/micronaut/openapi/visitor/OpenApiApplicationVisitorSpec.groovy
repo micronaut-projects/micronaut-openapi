@@ -133,6 +133,7 @@ class MyBean {}
         openAPI.servers[0].variables.size() == 2
         openAPI.servers[0].variables.var1.description == 'var 1'
         openAPI.servers[0].variables.var1.default == '1'
+        openAPI.servers[0].variables.var1.enum == ['1', '2']
 
         then:"User defined end point is processed"
         openAPI.paths['/message']
@@ -296,6 +297,7 @@ class MyBean {}
         openAPI.servers[0].variables.size() == 2
         openAPI.servers[0].variables.var1.description == 'var 1'
         openAPI.servers[0].variables.var1.default == '1'
+        openAPI.servers[0].variables.var1.enum == ['1', '2']
     }
 
     void "test build OpenAPI doc tags, servers and security at class level"() {
@@ -376,6 +378,7 @@ class MyBean {}
         openAPI.servers[0].variables.size() == 2
         openAPI.servers[0].variables.var1.description == 'var 1'
         openAPI.servers[0].variables.var1.default == '1'
+        openAPI.servers[0].variables.var1.enum == ['1', '2']
     }
 
     void "test build OpenAPI security schemes"() {

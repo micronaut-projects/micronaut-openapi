@@ -90,6 +90,7 @@ class MyBean {}
         openAPI.servers[0].variables.size() == 2
         openAPI.servers[0].variables.var1.description == 'var 1'
         openAPI.servers[0].variables.var1.default == '1'
+        openAPI.servers[0].variables.var1.enum == ['1', '2']
         openAPI.servers[1].url == 'https://petstore.swagger.io/v1'
         openAPI.paths.size() == 2
 
