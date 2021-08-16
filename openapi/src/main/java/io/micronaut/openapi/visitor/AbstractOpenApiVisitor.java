@@ -82,6 +82,7 @@ import io.swagger.v3.oas.models.media.MapSchema;
 import io.swagger.v3.oas.models.media.ObjectSchema;
 import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.media.StringSchema;
+import io.swagger.v3.oas.models.media.UUIDSchema;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.reactivestreams.Publisher;
@@ -119,6 +120,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.Future;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -699,10 +701,11 @@ abstract class AbstractOpenApiVisitor  {
                 } else if (isReturnTypeFile(type)) {
                     schema = new StringSchema();
                     schema.setFormat("binary");
+                } else if (type.isAssignable(UUID.class)) {
+                    schema = new UUIDSchema();
                 } else {
                     schema = getSchemaDefinition(openAPI, context, type, definingElement, mediaTypes);
                 }
-
             }
 
             if (schema != null) {
