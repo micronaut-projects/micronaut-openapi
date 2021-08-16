@@ -8,6 +8,7 @@ import io.swagger.v3.oas.models.PathItem
 import io.swagger.v3.oas.models.media.ArraySchema
 import io.swagger.v3.oas.models.media.MapSchema
 import io.swagger.v3.oas.models.media.Schema
+import spock.lang.Issue
 
 class OpenApiPojoControllerSpec extends AbstractOpenApiTypeElementSpec {
 
@@ -1618,5 +1619,57 @@ class MyBean {}
         operation.requestBody.content.size() == 2
         operation.requestBody.content['application/json'].schema
         operation.requestBody.content['application/x-www-form-urlencoded'].schema
+    }
+
+    @Issue("https://github.com/micronaut-projects/micronaut-openapi/issues/550")
+    void "test build OpenAPI for Controller with POJO with mandatory field"() {
+        given: "An API definition"
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.reactivex.*;
+import io.micronaut.core.annotation.*;
+import io.micronaut.http.annotation.*;
+
+import java.util.List;
+
+@Controller("/v1/things")
+class ThingsController {
+
+    @Get("/")
+    Thing getThing() {
+        return null;
+    }
+}
+
+class Thing {
+    @org.jetbrains.annotations.NotNull()
+    private String thingName;
+
+    public Thing(@org.jetbrains.annotations.NotNull() String thingName) {
+    }
+
+    @org.jetbrains.annotations.NotNull()
+    public String getThingName() {
+        return this.thingName;
+    }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        then: "the state is correct"
+        AbstractOpenApiVisitor.testReference != null
+
+        when: "The OpenAPI is retrieved"
+        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        Schema schema = openAPI.components.schemas['Thing']
+
+        then: "the property is required"
+        schema.properties.size() == 1
+        schema.type == 'object'
+        schema.required
+        schema.required.contains('thingName')
     }
 }
