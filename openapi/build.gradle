@@ -27,7 +27,7 @@ dependencies {
     }
 }
 
-compileJava.options.compilerArgs += '-deprecation'
+//compileJava.options.compilerArgs += '-deprecation'
 
 test {
     useJUnitPlatform()
