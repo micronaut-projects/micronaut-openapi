@@ -25,7 +25,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import io.micronaut.annotation.processing.visitor.JavaClassElement;
 import io.micronaut.annotation.processing.visitor.JavaClassElementExt;
 import io.micronaut.core.annotation.AnnotationClassValue;
 import io.micronaut.core.annotation.AnnotationValue;
@@ -49,7 +48,6 @@ import io.micronaut.inject.ast.ElementQuery;
 import io.micronaut.inject.ast.EnumElement;
 import io.micronaut.inject.ast.FieldElement;
 import io.micronaut.inject.ast.MemberElement;
-import io.micronaut.inject.ast.MethodElement;
 import io.micronaut.inject.ast.PropertyElement;
 import io.micronaut.inject.ast.TypedElement;
 import io.micronaut.inject.visitor.VisitorContext;
@@ -825,18 +823,11 @@ abstract class AbstractOpenApiVisitor  {
     }
 
     private boolean doesParamExistsMandatoryInConstructor(Element element, @Nullable Element classElement) {
-        MethodElement methodElement = null;
-        if (classElement instanceof JavaClassElementExt && ((JavaClassElementExt) classElement).getPrimaryConstructor().isPresent()) {
-            methodElement = ((JavaClassElementExt) classElement).getPrimaryConstructor().get();
-        } else if (classElement instanceof JavaClassElement && ((JavaClassElement) classElement).getPrimaryConstructor().isPresent()) {
-            methodElement = ((JavaClassElement) classElement).getPrimaryConstructor().get();
-        }
-
-        if (methodElement != null) {
-            return Arrays.stream(methodElement.getParameters())
-                    .filter(parameterElement -> parameterElement.getName().equals(element.getName()))
-                    .map(parameterElement -> !parameterElement.isNullable())
-                    .findFirst()
+        if (classElement instanceof ClassElement) {
+            return ((ClassElement) classElement).getPrimaryConstructor().flatMap(methodElement -> Arrays.stream(methodElement.getParameters())
+                            .filter(parameterElement -> parameterElement.getName().equals(element.getName()))
+                            .map(parameterElement -> !parameterElement.isNullable())
+                            .findFirst())
                     .orElse(false);
         }
 
