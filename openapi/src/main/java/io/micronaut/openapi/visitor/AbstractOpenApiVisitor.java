@@ -1168,7 +1168,7 @@ abstract class AbstractOpenApiVisitor  {
             ClassElement type,
             @Nullable Element definingElement,
             List<MediaType> mediaTypes) {
-        AnnotationValue<io.swagger.v3.oas.annotations.media.Schema> schemaValue = definingElement == null ? null : definingElement.getAnnotation(io.swagger.v3.oas.annotations.media.Schema.class);
+        AnnotationValue<io.swagger.v3.oas.annotations.media.Schema> schemaValue = definingElement == null ? null : definingElement.getDeclaredAnnotation(io.swagger.v3.oas.annotations.media.Schema.class);
         if (schemaValue == null) {
             schemaValue = type.getDeclaredAnnotation(io.swagger.v3.oas.annotations.media.Schema.class);
         }

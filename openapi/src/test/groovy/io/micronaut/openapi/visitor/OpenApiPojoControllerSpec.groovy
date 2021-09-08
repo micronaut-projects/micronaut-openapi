@@ -1820,4 +1820,68 @@ class MyBean {}
         openAPI.components.schemas['Greeting'].properties['receiverId'].description == 'ID of the receiver'
         openAPI.components.schemas['Greeting'].properties['receiverId'].format == 'uuid'
     }
+
+    @Issue("https://github.com/micronaut-projects/micronaut-openapi/issues/555")
+    @Issue("https://github.com/micronaut-projects/micronaut-openapi/issues/564")
+    void "test build OpenAPI for Controller with POJO with BigDecimal field"() {
+        given:
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.core.annotation.*;
+import io.micronaut.http.annotation.*;
+import io.swagger.v3.oas.annotations.media.*;
+import io.swagger.v3.oas.annotations.media.Schema;
+
+import java.math.BigDecimal;
+
+@Controller("/")
+class UuidController {
+
+    @Post("/big-decimal")
+    public void sendGreeting(@Body MyDTO myDto) {
+    }
+}
+
+class MyDTO {
+
+    @Schema(description = "Should become a number in the spec")
+    private final BigDecimal shouldBeNumber;
+
+    @Schema(type = "string")
+    private final BigDecimal shouldBeString;
+
+    public MyDTO(BigDecimal shouldBeNumber, BigDecimal shouldBeString) {
+        this.shouldBeNumber = shouldBeNumber;
+        this.shouldBeString = shouldBeString;
+    }
+
+    public BigDecimal getShouldBeNumber() {
+        return shouldBeNumber;
+    }
+
+    public BigDecimal getShouldBeString() {
+        return shouldBeString;
+    }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        then:
+        AbstractOpenApiVisitor.testReference != null
+
+        when:
+        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+
+        then:
+        openAPI.components.schemas.size() == 1
+        openAPI.components.schemas['MyDTO'].name == 'MyDTO'
+        openAPI.components.schemas['MyDTO'].type == 'object'
+        openAPI.components.schemas['MyDTO'].properties.size() == 2
+        openAPI.components.schemas['MyDTO'].properties['shouldBeNumber'].type == 'number'
+        openAPI.components.schemas['MyDTO'].properties['shouldBeNumber'].description == 'Should become a number in the spec'
+        openAPI.components.schemas['MyDTO'].properties['shouldBeString'].type == 'string'
+    }
 }
