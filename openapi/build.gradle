@@ -16,6 +16,7 @@ dependencies {
     testImplementation "io.micronaut:micronaut-runtime"
     testImplementation "io.micronaut.security:micronaut-security"
     testImplementation "io.micronaut:micronaut-inject-groovy"
+    testImplementation "io.micronaut:micronaut-inject-groovy-test"
     testImplementation "io.micronaut:micronaut-inject-java"
     testImplementation "io.micronaut:micronaut-inject-java-test"
     testImplementation "io.micronaut.beanvalidation:micronaut-hibernate-validator"
