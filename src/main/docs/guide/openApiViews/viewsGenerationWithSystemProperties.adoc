@@ -72,7 +72,7 @@ or in Maven:
             <configuration>
                 <fork>true</fork>
                 <compilerArgs>
-                    <arg>-J-Dmicronaut.openapi.views.spec=rapidoc.enabled=true,swagger-ui.enabled=true,swagger-ui.theme=flattop</arg>
+                    <arg>-Amicronaut.openapi.views.spec=rapidoc.enabled=true,swagger-ui.enabled=true,swagger-ui.theme=flattop</arg>
                     ...
                 </compilerArgs>
             </configuration>
