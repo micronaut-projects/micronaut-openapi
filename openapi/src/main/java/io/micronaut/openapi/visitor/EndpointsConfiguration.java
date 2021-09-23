@@ -15,6 +15,15 @@
  */
 package io.micronaut.openapi.visitor;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.micronaut.core.util.StringUtils;
+import io.micronaut.inject.visitor.VisitorContext;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
+import io.swagger.v3.oas.models.servers.Server;
+import io.swagger.v3.oas.models.tags.Tag;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -22,15 +31,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import io.micronaut.inject.visitor.VisitorContext;
-import io.swagger.v3.oas.models.security.SecurityRequirement;
-import io.swagger.v3.oas.models.servers.Server;
-import io.swagger.v3.oas.models.tags.Tag;
 
 /**
  * Endpoints configuration.
@@ -64,7 +64,7 @@ class EndpointsConfiguration {
         if (!enabled) {
             return;
         }
-        path = properties.getProperty(ENDPOINTS_PATH, "");
+        path = parsePath(properties.getProperty(ENDPOINTS_PATH, ""));
         tags = parseTags(properties.getProperty(ENDPOINTS_TAGS, "").split(","));
         servers = parseServers(properties.getProperty(ENDPOINTS_SERVERS, ""), context);
         securityRequirements = parseSecurityRequirements(properties.getProperty(ENDPOINTS_SECURITY_REQUIREMENTS, ""), context);
@@ -178,7 +178,8 @@ class EndpointsConfiguration {
         && !entry.getKey().equals(ENDPOINTS_ENABLED)
         && !entry.getKey().equals(ENDPOINTS_TAGS)
         && !entry.getKey().equals(ENDPOINTS_SERVERS)
-        && !entry.getKey().equals(ENDPOINTS_SECURITY_REQUIREMENTS);
+        && !entry.getKey().equals(ENDPOINTS_SECURITY_REQUIREMENTS)
+        && !entry.getKey().equals(ENDPOINTS_PATH);
     }
 
     private static List<Tag> parseTags(String... stringTags) {
@@ -195,6 +196,14 @@ class EndpointsConfiguration {
             tags.add(tag);
         }
         return tags;
+    }
+
+    private static String parsePath(String path) {
+        if (StringUtils.isNotEmpty(path) && !path.endsWith("/")) {
+            return path + "/";
+        } else {
+            return path;
+        }
     }
 
 }
