@@ -4,7 +4,7 @@ package io.micronaut.configuration.openapi.docs.controllers.annotations
 import io.micronaut.http.MediaType
 import io.micronaut.http.annotation.Controller
 import io.micronaut.http.annotation.Get
-import io.reactivex.Single
+import reactor.core.publisher.Mono
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
@@ -31,8 +31,8 @@ open class HelloController {
             ApiResponse(responseCode = "404", description = "Person not found")
     )
     @Tag(name = "greeting")
-    open fun greetings(name: String): Single<String> {
-        return Single.just("Hello $name, how are you doing?")
+    open fun greetings(name: String): Mono<String> {
+        return Mono.just("Hello $name, how are you doing?")
     }
 }
 // end::clazz[]

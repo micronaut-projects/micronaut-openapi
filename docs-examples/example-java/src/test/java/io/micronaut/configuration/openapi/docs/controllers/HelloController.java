@@ -4,7 +4,7 @@ package io.micronaut.configuration.openapi.docs.controllers;
 import io.micronaut.http.MediaType;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
-import io.reactivex.Single;
+import reactor.core.publisher.Mono;
 
 // end::imports[]
 // tag::clazz[]
@@ -16,8 +16,8 @@ public class HelloController {
      * @return The greeting
      */
     @Get(uri = "/hello/{name}", produces = MediaType.TEXT_PLAIN)
-    public Single<String> index(String name) {
-        return Single.just("Hello " + name + "!");
+    public Mono<String> index(String name) {
+        return Mono.just("Hello " + name + "!");
     }
 }
 // end::clazz[]

@@ -773,7 +773,10 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
     private ClassElement returnType(MethodElement element, VisitorContext context) {
         ClassElement returnType = isJavaElement(element.getOwningType(), context) ? JavaClassElementExt.getGenericReturnType(element, context)
                 : element.getGenericReturnType();
-        if (returnType.isAssignable(void.class) || returnType.isAssignable("io.reactivex.Completable")) {
+        if (returnType.isAssignable(void.class) || returnType.isAssignable("io.reactivex.Completable")
+            || (returnType.isAssignable("reactor.core.publisher.Mono")
+                && returnType.getFirstTypeArgument().isPresent()
+                && isVoid(returnType.getFirstTypeArgument().get()))) {
             returnType = null;
         } else if (isResponseType(returnType)) {
             returnType = returnType.getFirstTypeArgument().orElse(returnType);
@@ -888,9 +891,15 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
     }
 
     private boolean isSingleResponseType(ClassElement returnType) {
-        return returnType.isAssignable("io.reactivex.Single")
-                && returnType.getFirstTypeArgument().isPresent()
-                && isResponseType(returnType.getFirstTypeArgument().get());
+        boolean assignable = returnType.isAssignable("io.reactivex.Single") ||
+                             returnType.isAssignable("org.reactivestreams.Publisher");
+        return assignable
+               && returnType.getFirstTypeArgument().isPresent()
+               && isResponseType(returnType.getFirstTypeArgument().get());
+    }
+
+    private boolean isVoid(ClassElement returnType) {
+        return returnType.isAssignable("java.lang.Void");
     }
 
     private io.swagger.v3.oas.models.Operation setOperationOnPathItem(PathItem pathItem, io.swagger.v3.oas.models.Operation swaggerOperation, HttpMethod httpMethod) {
