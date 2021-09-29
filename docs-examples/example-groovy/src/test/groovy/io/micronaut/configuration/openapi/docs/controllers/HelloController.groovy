@@ -5,7 +5,8 @@ import io.micronaut.http.MediaType
 // tag::imports[]
 import io.micronaut.http.annotation.Controller
 import io.micronaut.http.annotation.Get
-import io.reactivex.Single
+import reactor.core.publisher.Mono
+
 // end::imports[]
 // tag::clazz[]
 @Controller("/")
@@ -16,7 +17,7 @@ class HelloController {
      * @return The greeting
      */
     @Get(uri = "/hello/{name}", produces = MediaType.TEXT_PLAIN)
-    Single<String> index(String name) {
+    Mono<String> index(String name) {
         return Single.just("Hello $name!")
     }
 }

@@ -7,6 +7,7 @@ dependencies {
 
     implementation "io.micronaut:micronaut-http"
     implementation "io.micronaut:micronaut-http-server"
+    implementation 'io.projectreactor:reactor-core'
 
     api "io.swagger.core.v3:swagger-core:$swaggerVersion"
     api "io.swagger.core.v3:swagger-models:$swaggerVersion"
