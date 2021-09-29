@@ -634,7 +634,7 @@ info:
 <pre class="highlight"><code class="language-java" data-lang="java">import io.micronaut.http.MediaType;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
-import io.reactivex.Single;
+import reactor.core.publisher.Mono;
 
 
 @Controller("/")
@@ -645,8 +645,8 @@ public class HelloController {
      * @return The greeting
      */
     @Get(uri = "/hello/{name}", produces = MediaType.TEXT_PLAIN)
-    public Single&lt;String&gt; index(String name) {
-        return Single.just("Hello " + name + "!");
+    public Mono&lt;String&gt; index(String name) {
+        return Mono.just("Hello " + name + "!");
     }
 }</code></pre>
 </div>
@@ -655,7 +655,8 @@ public class HelloController {
 <div class="content">
 <pre class="highlight"><code class="language-groovy" data-lang="groovy">import io.micronaut.http.annotation.Controller
 import io.micronaut.http.annotation.Get
-import io.reactivex.Single
+import reactor.core.publisher.Mono
+
 
 @Controller("/")
 class HelloController {
@@ -665,7 +666,7 @@ class HelloController {
      * @return The greeting
      */
     @Get(uri = "/hello/{name}", produces = MediaType.TEXT_PLAIN)
-    Single&lt;String&gt; index(String name) {
+    Mono&lt;String&gt; index(String name) {
         return Single.just("Hello $name!")
     }
 }</code></pre>
@@ -676,7 +677,7 @@ class HelloController {
 <pre class="highlight"><code class="language-kotlin" data-lang="kotlin">import io.micronaut.http.MediaType
 import io.micronaut.http.annotation.Controller
 import io.micronaut.http.annotation.Get
-import io.reactivex.Single
+import reactor.core.publisher.Mono
 
 
 @Controller("/")
@@ -687,8 +688,8 @@ open class HelloController {
      * @return The greeting
      */
     @Get(uri = "/hello/{name}", produces = [MediaType.TEXT_PLAIN])
-    open fun index(name: String): Single&lt;String&gt; {
-        return Single.just("Hello $name!")
+    open fun index(name: String): Mono&lt;String&gt; {
+        return Mono.just("Hello $name!")
     }
 }</code></pre>
 </div>
@@ -809,7 +810,6 @@ the following <strong>jackson</strong>'s <code>PropertyNamingStrategy</code>:</p
 <pre class="highlight"><code class="language-java" data-lang="java">import io.micronaut.http.MediaType;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
-import io.reactivex.Single;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -818,6 +818,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import javax.validation.constraints.NotBlank;
+import reactor.core.publisher.Mono;
 
 
 @Controller("/")
@@ -838,8 +839,8 @@ public class HelloController {
     @ApiResponse(responseCode = "400", description = "Invalid Name Supplied")
     @ApiResponse(responseCode = "404", description = "Person not found")
     @Tag(name = "greeting")
-    public Single&lt;String&gt; greetings(@Parameter(description="The name of the person") @NotBlank String name) {
-        return Single.just("Hello " + name + ", How are you doing?");
+    public Mono&lt;String&gt; greetings(@Parameter(description="The name of the person") @NotBlank String name) {
+        return Mono.just("Hello " + name + ", How are you doing?");
     }
 }</code></pre>
 </div>
@@ -864,7 +865,7 @@ class HelloController {
     @ApiResponse(responseCode = "400", description = "Invalid Name Supplied")
     @ApiResponse(responseCode = "404", description = "Person not found")
     @Tag(name = "greeting")
-    Single&lt;String&gt; greetings(@Parameter(description="The name of the person") @NotBlank String name) {
+    Mono&lt;String&gt; greetings(@Parameter(description="The name of the person") @NotBlank String name) {
         return Single.just("Hello $name, How are you doing?")
     }
 }</code></pre>
@@ -875,7 +876,7 @@ class HelloController {
 <pre class="highlight"><code class="language-kotlin" data-lang="kotlin">import io.micronaut.http.MediaType
 import io.micronaut.http.annotation.Controller
 import io.micronaut.http.annotation.Get
-import io.reactivex.Single
+import reactor.core.publisher.Mono
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
@@ -901,8 +902,8 @@ open class HelloController {
             ApiResponse(responseCode = "404", description = "Person not found")
     )
     @Tag(name = "greeting")
-    open fun greetings(name: String): Single&lt;String&gt; {
-        return Single.just("Hello $name, how are you doing?")
+    open fun greetings(name: String): Mono&lt;String&gt; {
+        return Mono.just("Hello $name, how are you doing?")
     }
 }</code></pre>
 </div>
