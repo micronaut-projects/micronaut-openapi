@@ -1443,7 +1443,7 @@ interface PetOperations<T extends Pet> {
      * Saves a Pet
      *
      * @param name The Pet name
-     * @param aget The Pet age
+     * @param age The Pet age
      * @return A pet or 404
      */
     @Consumes({MediaType.APPLICATION_FORM_URLENCODED, MediaType.APPLICATION_JSON})
@@ -1543,7 +1543,7 @@ interface PetOperations<T extends Pet> {
      * Saves a Pet
      *
      * @param name The Pet name
-     * @param aget The Pet age
+     * @param age The Pet age
      * @return A pet or 404
      */
     @Consumes({MediaType.APPLICATION_FORM_URLENCODED, MediaType.APPLICATION_JSON})
@@ -1883,5 +1883,94 @@ class MyBean {}
         openAPI.components.schemas['MyDTO'].properties['shouldBeNumber'].type == 'number'
         openAPI.components.schemas['MyDTO'].properties['shouldBeNumber'].description == 'Should become a number in the spec'
         openAPI.components.schemas['MyDTO'].properties['shouldBeString'].type == 'string'
+    }
+
+    @Issue("https://github.com/micronaut-projects/micronaut-openapi/issues/402")
+    void "test build OpenAPI for Controller with Path parameter"() {
+        given:
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.http.annotation.*;
+import io.swagger.v3.oas.annotations.*;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+
+@Controller
+class UploadController {
+
+    @Post("/upload/{id}")
+    void upload(String id) {
+    }
+
+    @Post("/upload2/{id}")
+    void upload2(@Parameter(in = ParameterIn.PATH) String id) {
+    }
+
+    @Post("/upload3/{id}")
+    void upload3(String id, @Body User user) {
+    }
+
+}
+
+class User {
+    private final String name;
+    private final String lastName;
+
+    public User(String name, String lastName) {
+        this.name = name;
+        this.lastName = lastName;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        then:
+        AbstractOpenApiVisitor.testReference != null
+
+        when:
+        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+
+        then:
+        openAPI.paths.size() == 3
+        openAPI.paths.get("/upload/{id}")
+        openAPI.paths.get("/upload/{id}").post
+        !openAPI.paths.get("/upload/{id}").post.requestBody
+        openAPI.paths.get("/upload/{id}").post.parameters.size() == 1
+        openAPI.paths.get("/upload/{id}").post.parameters[0].in == "path"
+        openAPI.paths.get("/upload/{id}").post.parameters[0].name == "id"
+        openAPI.paths.get("/upload/{id}").post.parameters[0].required
+
+        and:
+        openAPI.paths.get("/upload2/{id}")
+        openAPI.paths.get("/upload2/{id}").post
+        !openAPI.paths.get("/upload2/{id}").post.requestBody
+        openAPI.paths.get("/upload2/{id}").post.parameters.size() == 1
+        openAPI.paths.get("/upload2/{id}").post.parameters[0].in == "path"
+        openAPI.paths.get("/upload2/{id}").post.parameters[0].name == "id"
+        openAPI.paths.get("/upload2/{id}").post.parameters[0].required
+
+        and:
+        openAPI.paths.get("/upload3/{id}")
+        openAPI.paths.get("/upload3/{id}").post
+        openAPI.paths.get("/upload3/{id}").post.requestBody
+        openAPI.paths.get("/upload3/{id}").post.requestBody.required
+        openAPI.paths.get("/upload3/{id}").post.requestBody.content
+        openAPI.paths.get("/upload3/{id}").post.requestBody.content.size() == 1
+        openAPI.paths.get("/upload3/{id}").post.requestBody.content['application/json'].schema
+        openAPI.paths.get("/upload3/{id}").post.requestBody.content['application/json'].schema.$ref == '#/components/schemas/User'
+        openAPI.paths.get("/upload3/{id}").post.parameters.size() == 1
+        openAPI.paths.get("/upload3/{id}").post.parameters[0].in == "path"
+        openAPI.paths.get("/upload3/{id}").post.parameters[0].name == "id"
+        openAPI.paths.get("/upload3/{id}").post.parameters[0].required
     }
 }
