@@ -344,7 +344,7 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
                                             List<MediaType> consumesMediaTypes,
                                             List<TypedElement> extraBodyParameters) {
         RequestBody requestBody = swaggerOperation.getRequestBody();
-        if (HttpMethod.requiresRequestBody(httpMethod) || HttpMethod.permitsRequestBody(httpMethod) && !extraBodyParameters.isEmpty()) {
+        if (HttpMethod.permitsRequestBody(httpMethod) && !extraBodyParameters.isEmpty()) {
             if (requestBody == null) {
                 requestBody = new RequestBody();
                 Content content = new Content();
