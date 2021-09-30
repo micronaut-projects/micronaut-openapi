@@ -85,6 +85,7 @@ import io.swagger.v3.oas.models.media.StringSchema;
 import io.swagger.v3.oas.models.media.UUIDSchema;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
+import java.util.function.Consumer;
 import org.reactivestreams.Publisher;
 
 import javax.validation.constraints.DecimalMax;
@@ -1197,24 +1198,29 @@ abstract class AbstractOpenApiVisitor  {
                     } else {
                         if (type instanceof TypedElement) {
                             ClassElement classElement = ((TypedElement) type).getType();
-                            Optional<ClassElement> superType;
+
+                            List<ClassElement> superTypes = new ArrayList<>();
                             if (classElement.isInterface() && !classElement.getInterfaces().isEmpty()) {
-                                superType = classElement.getInterfaces().stream().findFirst();
+                                superTypes.addAll(classElement.getInterfaces());
                             } else {
-                                superType = classElement.getSuperType();
+                                classElement.getSuperType().ifPresent(superTypes::add);
                             }
-                            if (superType.isPresent()) {
-                                schema = new ComposedSchema();
-                                while (superType.isPresent()) {
-                                    final ClassElement superElement = superType.get();
-                                    String parentSchemaName = computeDefaultSchemaName(definingElement, superElement);
-                                    if (schemas.get(parentSchemaName) != null
+
+                            if (!superTypes.isEmpty()) {
+                                for (ClassElement sType : superTypes) {
+                                    schema = new ComposedSchema();
+                                    Optional<ClassElement> superType = Optional.ofNullable(sType);
+                                    while (superType.isPresent()) {
+                                        final ClassElement superElement = superType.get();
+                                        String parentSchemaName = computeDefaultSchemaName(definingElement, superElement);
+                                        if (schemas.get(parentSchemaName) != null
                                             || getSchemaDefinition(openAPI, context, superElement, null, mediaTypes) != null) {
-                                        Schema parentSchema = new Schema();
-                                        parentSchema.set$ref(schemaRef(parentSchemaName));
-                                        ((ComposedSchema) schema).addAllOfItem(parentSchema);
+                                            Schema parentSchema = new Schema();
+                                            parentSchema.set$ref(schemaRef(parentSchemaName));
+                                            ((ComposedSchema) schema).addAllOfItem(parentSchema);
+                                        }
+                                        superType = superElement.getSuperType();
                                     }
-                                    superType = superElement.getSuperType();
                                 }
                             } else {
                                 schema = new Schema();
