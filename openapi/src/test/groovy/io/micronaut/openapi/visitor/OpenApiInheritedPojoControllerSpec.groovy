@@ -1343,4 +1343,103 @@ class MyBean {}
         ((ComposedSchema) petSchema).allOf[1].$ref == '#/components/schemas/Animal'
     }
 
+  void "test build OpenAPI doc for interface POJO with multiple and multi leveled inheritance"() {
+
+    given: "An API definition"
+    when:
+    buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.reactivex.*;
+import io.micronaut.http.annotation.*;
+import com.fasterxml.jackson.annotation.*;
+import java.util.List;
+import io.swagger.v3.oas.annotations.media.*;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.micronaut.http.MediaType;
+
+@Controller("/pets")
+interface PetOperations {
+
+    /**
+     * @param name The person's name
+     * @return The greeting
+     */
+    @Get(uri = "/cases/{name}", produces = MediaType.TEXT_PLAIN)
+    Cat getCat(String name);
+    
+}
+
+interface Cat extends Pet,Sleeper {    
+
+    public int getClawSize();
+}
+
+@JsonTypeInfo(include = JsonTypeInfo.As.PROPERTY, use = JsonTypeInfo.Id.NAME, property = "type", visible = true)
+@JsonSubTypes({ @JsonSubTypes.Type(value = Cat.class, name = "Cat") })
+interface Pet extends Animal {  
+  
+    public int getAge();
+
+    public String getName();
+}
+
+@JsonTypeInfo(include = JsonTypeInfo.As.PROPERTY, use = JsonTypeInfo.Id.NAME, property = "type", visible = true)
+@JsonSubTypes({ @JsonSubTypes.Type(value = Pet.class, name = "Pet") })
+interface Animal {  
+  
+    public double getWeight();    
+}
+
+interface Sleeper {    
+
+    public double sleepDuration();
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+    then: "the state is correct"
+    AbstractOpenApiVisitor.testReference != null
+
+    when: "The OpenAPI is retrieved"
+    OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+    Schema petSchema = openAPI.components.schemas['Pet']
+    Schema animalSchema = openAPI.components.schemas['Animal']
+    Schema sleeperSchema = openAPI.components.schemas['Sleeper']
+    Schema catSchema = openAPI.components.schemas['Cat']
+
+
+    then: "the components are valid"
+    petSchema != null
+    animalSchema != null
+    sleeperSchema != null
+    catSchema != null
+
+    petSchema instanceof ComposedSchema
+    animalSchema instanceof ComposedSchema
+    sleeperSchema instanceof ComposedSchema
+    catSchema instanceof ComposedSchema
+
+    petSchema.type == null
+    petSchema.properties == null
+    animalSchema.type == 'object'
+    animalSchema.properties.size() == 1
+    sleeperSchema.type == 'object'
+    sleeperSchema.properties.size() == 1
+    catSchema.type == null
+    catSchema.properties == null
+
+    ((ComposedSchema)catSchema).allOf.size() == 3
+    ((ComposedSchema)catSchema).allOf[0].$ref == '#/components/schemas/Sleeper'
+    ((ComposedSchema)catSchema).allOf[1].$ref == '#/components/schemas/Pet'
+    ((ComposedSchema)catSchema).allOf[2].type == 'object'
+    ((ComposedSchema)catSchema).allOf[2].properties['clawSize'].type == 'integer'
+
+    ((ComposedSchema)petSchema).allOf.size() == 2
+    ((ComposedSchema)petSchema).allOf[0].$ref == '#/components/schemas/Animal'
+    ((ComposedSchema)petSchema).allOf[1].type == 'object'
+    ((ComposedSchema)petSchema).allOf[1].properties.size() == 2
+  }
+
 }
