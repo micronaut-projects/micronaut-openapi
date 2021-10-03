@@ -807,7 +807,7 @@ abstract class AbstractOpenApiVisitor  {
     private Optional<Boolean> hasElementSchemaRequired(Element element) {
         AnnotationValue<io.swagger.v3.oas.annotations.media.Schema> schemaAnnotationValue = element.getAnnotation(io.swagger.v3.oas.annotations.media.Schema.class);
         if (schemaAnnotationValue != null) {
-            return schemaAnnotationValue.booleanValue("required");
+            return schemaAnnotationValue.get("required", Argument.of(Boolean.TYPE));
         } else {
             return Optional.empty();
         }
