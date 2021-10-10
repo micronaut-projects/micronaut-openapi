@@ -1299,7 +1299,9 @@ public class MyBean {}
 
         openAPI.components.schemas["Person"].properties["totalGoals"].type == "integer"
         openAPI.components.schemas["Person"].properties["totalGoals"].required == null
-        openAPI.components.schemas["Person"].required.containsAll("debtValue")
+
+        openAPI.components.schemas["Person"].required.size() == 1
+        openAPI.components.schemas["Person"].required.toSet() == ["debtValue"].toSet()
     }
 
 }
