@@ -12,10 +12,6 @@ import spock.lang.Issue
 
 class OpenApiPojoControllerSpec extends AbstractOpenApiTypeElementSpec {
 
-    def cleanup() {
-        System.setProperty(AbstractOpenApiVisitor.ATTR_TEST_MODE, "")
-    }
-
     void "test build OpenAPI for List"() {
         given: "An API definition"
         when:

@@ -92,6 +92,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * A {@link io.micronaut.inject.visitor.TypeElementVisitor} the builds the Swagger model from Micronaut controllers at compile time.
@@ -771,12 +772,11 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
     }
 
     private ClassElement returnType(MethodElement element, VisitorContext context) {
-        ClassElement returnType = isJavaElement(element.getOwningType(), context) ? JavaClassElementExt.getGenericReturnType(element, context)
-                : element.getGenericReturnType();
-        if (returnType.isAssignable(void.class) || returnType.isAssignable("io.reactivex.Completable")
-            || (returnType.isAssignable("reactor.core.publisher.Mono")
-                && returnType.getFirstTypeArgument().isPresent()
-                && isVoid(returnType.getFirstTypeArgument().get()))) {
+        ClassElement returnType = isJavaElement(element.getOwningType(), context) ?
+                JavaClassElementExt.getGenericReturnType(element, context) :
+                element.getGenericReturnType();
+
+        if (isVoid(returnType) || isReactiveAndVoid(returnType)) {
             returnType = null;
         } else if (isResponseType(returnType)) {
             returnType = returnType.getFirstTypeArgument().orElse(returnType);
@@ -899,7 +899,13 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
     }
 
     private boolean isVoid(ClassElement returnType) {
-        return returnType.isAssignable("java.lang.Void");
+        return returnType.isAssignable(void.class) || returnType.isAssignable("java.lang.Void");
+    }
+
+    private boolean isReactiveAndVoid(ClassElement returnType) {
+        return returnType.isAssignable("io.reactivex.Completable") ||
+                Stream.of("reactor.core.publisher.Mono", "reactor.core.publisher.Flux", "io.reactivex.Flowable", "io.reactivex.Maybe")
+                        .anyMatch(t -> returnType.isAssignable(t) && returnType.getFirstTypeArgument().isPresent() && isVoid(returnType.getFirstTypeArgument().get()));
     }
 
     private io.swagger.v3.oas.models.Operation setOperationOnPathItem(PathItem pathItem, io.swagger.v3.oas.models.Operation swaggerOperation, HttpMethod httpMethod) {
