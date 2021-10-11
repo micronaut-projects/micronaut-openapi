@@ -1727,6 +1727,121 @@ class MyBean {}
         !schema.required.contains('battingAverage')
     }
 
+    @Issue("https://github.com/micronaut-projects/micronaut-openapi/issues/587")
+    void "test @Schema on fields take precedence on constructors for mandatory/optional params"() {
+        given:
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.http.annotation.*;
+import io.micronaut.core.annotation.*;
+import io.swagger.v3.oas.annotations.media.*;
+
+@Controller
+class FooController {
+
+    @Get("/person")
+    public Person getPerson() {
+        return new Person("John", 42, new Address("SomeCity", "SomeCountry", "12345", "my street"));
+    }
+}
+
+class Address {
+    @Schema(description = "city")
+    private final String city;
+
+    @Schema(description = "country", required = false)
+    private final String country;
+
+    @Schema(description = "zip", required = true)
+    private final String zip;
+
+    private final String street;
+
+    public Address(String city, String country, String zip, String street) {
+        this.city = city;
+        this.country = country;
+        this.zip = zip;
+        this.street = street;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public String getCountry() {
+        return country;
+    }
+
+    public String getZip() {
+        return zip;
+    }
+
+    public String getStreet() {
+        return street;
+    }
+}
+
+class Person {
+    @Schema(description = "name of the person")
+    private final String name;
+
+    @Schema(description = "age of the person", required = false)
+    private final int age;
+
+    @Schema(description = "address of the person", implementation = Address.class)
+    private final Address address;
+
+    public Person(String name, int age, Address address) {
+        this.name = name;
+        this.age = age;
+        this.address = address;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public Address getAddress() {
+        return address;
+    }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        then:
+        AbstractOpenApiVisitor.testReference != null
+
+        when:
+        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+
+        then:
+        openAPI.components.schemas.size() == 2
+
+        when:
+        Schema address = openAPI.components.schemas['Address']
+
+        then: 'zip and street are required and city and country are not required because of @Schema(required = false)'
+        address.required
+        address.required.size() == 2
+        address.required.contains('zip')
+        address.required.contains('street')
+        address.properties.size() == 4
+
+        when:
+        Schema person = openAPI.components.schemas['Person']
+
+        then: 'no required properties because @Schema(required = false)'
+        !person.required
+        person.properties.size() == 3
+    }
+
     @Issue("https://github.com/micronaut-projects/micronaut-openapi/issues/548")
     void "test build OpenAPI for Controller with POJO with UUID fields"() {
         given:
