@@ -1198,7 +1198,7 @@ abstract class AbstractOpenApiVisitor  {
                         if (type instanceof TypedElement) {
                             ClassElement classElement = ((TypedElement) type).getType();
                             Optional<ClassElement> superType = classElement == null ? Optional.empty() : classElement.getSuperType();
-                            if (superType.isPresent()) {
+                            if (superType.isPresent() && !type.isRecord()) {
                                 schema = new ComposedSchema();
                                 while (superType.isPresent()) {
                                     final ClassElement superElement = superType.get();
