@@ -899,7 +899,7 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
     }
 
     private boolean isVoid(ClassElement returnType) {
-        return returnType.isAssignable(void.class) || returnType.isAssignable("java.lang.Void");
+        return returnType.isAssignable(void.class) || returnType.isAssignable("java.lang.Void") || returnType.isAssignable("kotlin.Unit");
     }
 
     private boolean isReactiveAndVoid(ClassElement returnType) {
