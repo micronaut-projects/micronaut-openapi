@@ -978,7 +978,7 @@ abstract class AbstractOpenApiVisitor  {
         }
         // @Schema annotation takes priority over nullability annotations
         Boolean isSchemaNullable = element.booleanValue(io.swagger.v3.oas.annotations.media.Schema.class, "nullable").orElse(null);
-        boolean isNullable = (isSchemaNullable == null && element.isNullable())
+        boolean isNullable = (isSchemaNullable == null && (element.isNullable() || isTypeNullable(elementType)))
             || Boolean.TRUE.equals(isSchemaNullable);
         if (isNullable) {
             topLevelSchema.setNullable(true);

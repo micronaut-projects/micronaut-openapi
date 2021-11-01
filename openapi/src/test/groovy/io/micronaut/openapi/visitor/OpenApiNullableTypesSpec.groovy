@@ -79,7 +79,9 @@ class PetController {
         petSchema.properties.size() == 2
 
         petSchema.properties["age"].type == "integer"
+        petSchema.properties["age"].nullable
         petSchema.properties["name"].type == "string"
+        petSchema.properties["name"].nullable
     }
 
 
