@@ -21,12 +21,12 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategy.PropertyNamingStrat
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
-import io.micronaut.annotation.processing.visitor.JavaClassElementExt;
 import io.micronaut.context.env.Environment;
 import io.micronaut.core.annotation.Experimental;
 import io.micronaut.core.util.StringUtils;
 import io.micronaut.inject.ast.ClassElement;
 import io.micronaut.inject.ast.Element;
+import io.micronaut.inject.ast.ElementQuery;
 import io.micronaut.inject.visitor.TypeElementVisitor;
 import io.micronaut.inject.visitor.VisitorContext;
 import io.micronaut.inject.writer.GeneratedFile;
@@ -590,16 +590,14 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                 && !endpointsCfg.getEndpoints().isEmpty()) {
             OpenApiEndpointVisitor visitor = new OpenApiEndpointVisitor(true);
             endpointsCfg.getEndpoints().values().stream()
-            .filter(endpoint -> endpoint.getClassElement().isPresent()
-                    && isJavaElement(endpoint.getClassElement().get(), visitorContext))
+            .filter(endpoint -> endpoint.getClassElement().isPresent())
             .forEach(endpoint -> {
                 ClassElement element = endpoint.getClassElement().get();
                 visitorContext.put(MICRONAUT_OPENAPI_ENDPOINT_CLASS_TAGS, endpoint.getTags());
                 visitorContext.put(MICRONAUT_OPENAPI_ENDPOINT_SERVERS, endpoint.getServers());
                 visitorContext.put(MICRONAUT_OPENAPI_ENDPOINT_SECURITY_REQUIREMENTS, endpoint.getSecurityRequirements());
                 visitor.visitClass(element, visitorContext);
-                JavaClassElementExt javaClassElement = new JavaClassElementExt(element, visitorContext);
-                javaClassElement.getCandidateMethods().forEach(method -> visitor.visitMethod(method, visitorContext));
+                element.getEnclosedElements(ElementQuery.ALL_METHODS).forEach(method -> visitor.visitMethod(method, visitorContext));
             });
         }
     }

@@ -15,12 +15,12 @@
  */
 package io.micronaut.openapi.visitor;
 
-import io.micronaut.annotation.processing.visitor.JavaClassElementExt;
 import io.micronaut.core.annotation.AnnotationValue;
 import io.micronaut.core.annotation.Experimental;
 import io.micronaut.core.util.ArrayUtils;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.inject.ast.ClassElement;
+import io.micronaut.inject.ast.ElementQuery;
 import io.micronaut.inject.visitor.TypeElementVisitor;
 import io.micronaut.inject.visitor.VisitorContext;
 import io.micronaut.management.endpoint.annotation.Endpoint;
@@ -54,7 +54,6 @@ public class OpenApiIncludeVisitor implements TypeElementVisitor<OpenAPIIncludes
                 OpenApiEndpointVisitor endpointVisitor = new OpenApiEndpointVisitor(true, tags.isEmpty() ? null : tags, security.isEmpty() ? null : security);
                 for (String className : classes) {
                     visitorContext.getClassElement(className)
-                            .filter(ce -> AbstractOpenApiVisitor.isJavaElement(ce, visitorContext))
                             .ifPresent(ce -> {
                                 if (ce.isAnnotationPresent(Controller.class)) {
                                     visit(controllerVisitor, visitorContext, ce);
@@ -67,9 +66,8 @@ public class OpenApiIncludeVisitor implements TypeElementVisitor<OpenAPIIncludes
         }
     }
 
-    private void visit(TypeElementVisitor visitor, VisitorContext visitorContext, ClassElement ce) {
+    private void visit(TypeElementVisitor<?, ?> visitor, VisitorContext visitorContext, ClassElement ce) {
         visitor.visitClass(ce, visitorContext);
-        JavaClassElementExt javaClassElement = new JavaClassElementExt(ce, visitorContext);
-        javaClassElement.getCandidateMethods().forEach(method -> visitor.visitMethod(method, visitorContext));
+        ce.getEnclosedElements(ElementQuery.ALL_METHODS).forEach(method -> visitor.visitMethod(method, visitorContext));
     }
 }

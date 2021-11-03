@@ -1392,8 +1392,9 @@ abstract class AbstractOpenApiVisitor  {
      * @return true if classElement is a JavaClassElement.
      */
     static boolean isJavaElement(ClassElement classElement, VisitorContext context) {
-        return classElement != null && (("io.micronaut.annotation.processing.visitor.JavaClassElement".equals(classElement.getClass().getName())
-                || "io.micronaut.annotation.processing.visitor.JavaClassElementExt".equals(classElement.getClass().getName())) && "io.micronaut.annotation.processing.visitor.JavaVisitorContext".equals(context.getClass().getName()));
+        return classElement != null &&
+                "io.micronaut.annotation.processing.visitor.JavaClassElement".equals(classElement.getClass().getName()) &&
+                "io.micronaut.annotation.processing.visitor.JavaVisitorContext".equals(context.getClass().getName());
     }
 
     private void populateSchemaProperties(OpenAPI openAPI, VisitorContext context, Element type, Schema schema, List<MediaType> mediaTypes) {
@@ -1406,21 +1407,17 @@ abstract class AbstractOpenApiVisitor  {
 
         if (classElement != null) {
             List<PropertyElement> beanProperties;
-            final boolean isJavaElement = isJavaElement(classElement, context);
-            JavaClassElementExt jce = null;
-            if (isJavaElement) {
-                jce = new JavaClassElementExt(classElement, context);
-                beanProperties = jce.beanProperties();
-            } else {
-                try {
-                    beanProperties = classElement.getBeanProperties().stream().filter(p -> !"groovy.lang.MetaClass".equals(p.getType().getName())).collect(Collectors.toList());
-                } catch (Exception e) {
-                    //Workaround for https://github.com/micronaut-projects/micronaut-openapi/issues/313
-                    beanProperties = Collections.emptyList();
-                }
+            try {
+                beanProperties = classElement.getBeanProperties().stream().filter(p -> !"groovy.lang.MetaClass".equals(p.getType().getName())).collect(Collectors.toList());
+            } catch (Exception e) {
+                // Workaround for https://github.com/micronaut-projects/micronaut-openapi/issues/313
+                beanProperties = Collections.emptyList();
             }
             processPropertyElements(openAPI, context, type, schema, beanProperties, mediaTypes);
-            if (isJavaElement) {
+
+            if (isJavaElement(classElement, context)) {
+                // TODO: This is the only place left in which we use `JavaClassElementExt`
+                JavaClassElementExt jce = new JavaClassElementExt(classElement, context);
                 List<PropertyElement> fluentMethodsProperties = jce.fluentBeanProperties();
                 processPropertyElements(openAPI, context, type, schema, fluentMethodsProperties, mediaTypes);
             }
@@ -1437,7 +1434,7 @@ abstract class AbstractOpenApiVisitor  {
                 continue;
             }
 
-            if (publicField instanceof MemberElement && ((MemberElement) publicField).getDeclaringType().equals(type)) {
+            if (publicField instanceof MemberElement && ((MemberElement) publicField).getDeclaringType().getType().getName().equals(type.getName().toString())) {
 
                 Schema propertySchema = resolveSchema(openAPI, publicField, publicField.getType(), context, mediaTypes);
 
