@@ -17,7 +17,6 @@ package io.micronaut.openapi.visitor;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.JsonNode;
-import io.micronaut.annotation.processing.visitor.JavaClassElementExt;
 import io.micronaut.context.env.DefaultPropertyPlaceholderResolver;
 import io.micronaut.context.env.PropertyPlaceholderResolver;
 import io.micronaut.core.annotation.AnnotationValue;
@@ -465,9 +464,6 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
         if (ignoreParameter(parameter)) {
             return;
         }
-        if (isJavaElement(parameterType, context)) {
-            parameterType = new JavaClassElementExt(parameterType, context);
-        }
         if (permitsRequestBody && swaggerOperation.getRequestBody() == null) {
             readSwaggerRequestBody(parameter, context).ifPresent(swaggerOperation::setRequestBody);
         }
@@ -772,9 +768,7 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
     }
 
     private ClassElement returnType(MethodElement element, VisitorContext context) {
-        ClassElement returnType = isJavaElement(element.getOwningType(), context) ?
-                JavaClassElementExt.getGenericReturnType(element, context) :
-                element.getGenericReturnType();
+        ClassElement returnType = element.getGenericReturnType();
 
         if (isVoid(returnType) || isReactiveAndVoid(returnType)) {
             returnType = null;
@@ -784,9 +778,7 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
             returnType = returnType.getFirstTypeArgument().get();
             returnType = returnType.getFirstTypeArgument().orElse(returnType);
         }
-        if (isJavaElement(returnType, context)) {
-            returnType = new JavaClassElementExt(returnType, context);
-        }
+
         return returnType;
     }
 
