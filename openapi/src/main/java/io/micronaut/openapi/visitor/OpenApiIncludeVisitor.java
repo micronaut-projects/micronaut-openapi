@@ -22,7 +22,6 @@ import io.micronaut.http.annotation.Controller;
 import io.micronaut.inject.ast.ClassElement;
 import io.micronaut.inject.ast.ElementModifier;
 import io.micronaut.inject.ast.ElementQuery;
-import io.micronaut.inject.ast.MethodElement;
 import io.micronaut.inject.visitor.TypeElementVisitor;
 import io.micronaut.inject.visitor.VisitorContext;
 import io.micronaut.management.endpoint.annotation.Endpoint;
@@ -31,9 +30,7 @@ import io.micronaut.openapi.annotation.OpenAPIIncludes;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
-import javax.lang.model.element.Modifier;
 import java.util.List;
-import java.util.Set;
 
 /**
  * A {@link TypeElementVisitor} that builds the Swagger model from Micronaut controllers included by @{@link OpenAPIInclude} at the compile time.
@@ -72,15 +69,10 @@ public class OpenApiIncludeVisitor implements TypeElementVisitor<OpenAPIIncludes
 
     private void visit(TypeElementVisitor<?, ?> visitor, VisitorContext visitorContext, ClassElement ce) {
         visitor.visitClass(ce, visitorContext);
-        ce.getEnclosedElements(ElementQuery.ALL_METHODS).stream()
-                .filter(OpenApiIncludeVisitor::isCandidateMethod)
+        ce.getEnclosedElements(ElementQuery.ALL_METHODS
+                        .modifiers(mods -> !mods.contains(ElementModifier.STATIC) && !mods.contains(ElementModifier.PRIVATE))
+                        .named(name -> !name.contains("$"))
+                )
                 .forEach(method -> visitor.visitMethod(method, visitorContext));
-    }
-
-    private static boolean isCandidateMethod(MethodElement method) {
-        Set<ElementModifier> modifiers = method.getModifiers();
-        return !modifiers.contains(Modifier.STATIC) && !modifiers.contains(Modifier.PRIVATE)
-                && !method.getSimpleName().contains("$");
-
     }
 }

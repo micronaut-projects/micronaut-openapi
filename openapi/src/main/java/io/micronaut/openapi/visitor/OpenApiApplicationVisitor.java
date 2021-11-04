@@ -28,7 +28,6 @@ import io.micronaut.inject.ast.ClassElement;
 import io.micronaut.inject.ast.Element;
 import io.micronaut.inject.ast.ElementModifier;
 import io.micronaut.inject.ast.ElementQuery;
-import io.micronaut.inject.ast.MethodElement;
 import io.micronaut.inject.visitor.TypeElementVisitor;
 import io.micronaut.inject.visitor.VisitorContext;
 import io.micronaut.inject.writer.GeneratedFile;
@@ -47,7 +46,6 @@ import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 
 import javax.annotation.processing.SupportedOptions;
-import javax.lang.model.element.Modifier;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -600,18 +598,13 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                 visitorContext.put(MICRONAUT_OPENAPI_ENDPOINT_SERVERS, endpoint.getServers());
                 visitorContext.put(MICRONAUT_OPENAPI_ENDPOINT_SECURITY_REQUIREMENTS, endpoint.getSecurityRequirements());
                 visitor.visitClass(element, visitorContext);
-                element.getEnclosedElements(ElementQuery.ALL_METHODS).stream()
-                        .filter(OpenApiApplicationVisitor::isCandidateMethod)
+                element.getEnclosedElements(ElementQuery.ALL_METHODS
+                                .modifiers(mods -> !mods.contains(ElementModifier.STATIC) && !mods.contains(ElementModifier.PRIVATE))
+                                .named(name -> !name.contains("$"))
+                        )
                         .forEach(method -> visitor.visitMethod(method, visitorContext));
             });
         }
-    }
-
-    private static boolean isCandidateMethod(MethodElement method) {
-        Set<ElementModifier> modifiers = method.getModifiers();
-        return !modifiers.contains(Modifier.STATIC) && !modifiers.contains(Modifier.PRIVATE)
-                && !method.getSimpleName().contains("$");
-
     }
 
     static class LowerCamelCasePropertyNamingStrategy extends PropertyNamingStrategyBase {
