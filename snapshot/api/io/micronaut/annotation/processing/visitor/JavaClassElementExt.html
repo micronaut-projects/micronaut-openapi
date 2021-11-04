@@ -17,8 +17,8 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":9,"i6":9,"i7":10,"i8":10,"i9":10};
-var tabs = {65535:["t0","All Methods"],1:["t1","Static Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
+var methods = {"i0":10};
+var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
 var tableTab = "tableTab";
@@ -48,7 +48,7 @@ var activeTableTab = "activeTableTab";
 <div class="subNav">
 <ul class="navList">
 <li>Prev&nbsp;Class</li>
-<li><a href="../../../../../io/micronaut/annotation/processing/visitor/JavaMethodElementExt.html" title="class in io.micronaut.annotation.processing.visitor"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
+<li>Next&nbsp;Class</li>
 </ul>
 <ul class="navList">
 <li><a href="../../../../../index.html?io/micronaut/annotation/processing/visitor/JavaClassElementExt.html" target="_top">Frames</a></li>
@@ -73,7 +73,7 @@ var activeTableTab = "activeTableTab";
 <ul class="subNavList">
 <li>Summary:&nbsp;</li>
 <li>Nested&nbsp;|&nbsp;</li>
-<li><a href="#fields.inherited.from.class.io.micronaut.annotation.processing.visitor.JavaClassElement">Field</a>&nbsp;|&nbsp;</li>
+<li>Field&nbsp;|&nbsp;</li>
 <li><a href="#constructor.summary">Constr</a>&nbsp;|&nbsp;</li>
 <li><a href="#method.summary">Method</a></li>
 </ul>
@@ -98,85 +98,26 @@ var activeTableTab = "activeTableTab";
 <li>java.lang.Object</li>
 <li>
 <ul class="inheritance">
-<li>io.micronaut.annotation.processing.visitor.AbstractJavaElement</li>
-<li>
-<ul class="inheritance">
-<li>io.micronaut.annotation.processing.visitor.JavaClassElement</li>
-<li>
-<ul class="inheritance">
 <li>io.micronaut.annotation.processing.visitor.JavaClassElementExt</li>
-</ul>
-</li>
-</ul>
-</li>
 </ul>
 </li>
 </ul>
 <div class="description">
 <ul class="blockList">
 <li class="blockList">
-<dl>
-<dt>All Implemented Interfaces:</dt>
-<dd>io.micronaut.core.annotation.AnnotatedElement, io.micronaut.core.annotation.AnnotationMetadata, io.micronaut.core.annotation.AnnotationMetadataDelegate, io.micronaut.core.annotation.AnnotationMetadataProvider, io.micronaut.core.annotation.AnnotationSource, io.micronaut.core.naming.Described, io.micronaut.core.naming.Named, io.micronaut.inject.ast.ArrayableClassElement, io.micronaut.inject.ast.ClassElement, io.micronaut.inject.ast.Element, io.micronaut.inject.ast.TypedElement</dd>
-</dl>
 <hr>
 <br>
 <pre>@Internal
 public class <span class="typeNameLabel">JavaClassElementExt</span>
-extends io.micronaut.annotation.processing.visitor.JavaClassElement</pre>
-<div class="block">A class element returning data from a <code>TypeElement</code>.
-
- Implementation note: [smell] this class needs to track changes to <code>JavaClassElement</code>.
- For example: <code>JavaClassElement</code> introduced <code>JavaClassElement.arrayDimensions</code>
- resulting in a processing bug in this library when this class didn't account for it in the constructor.</div>
-<dl>
-<dt><span class="simpleTagLabel">Since:</span></dt>
-<dd>1.0</dd>
-<dt><span class="simpleTagLabel">Author:</span></dt>
-<dd>James Kleeh, graemerocher, croudet</dd>
-</dl>
+extends java.lang.Object</pre>
+<div class="block">Internal class that copies private methods from <code>JavaClassElement</code> and it is used to get the right getters
+ and setter when using Lombok.</div>
 </li>
 </ul>
 </div>
 <div class="summary">
 <ul class="blockList">
 <li class="blockList">
-<!-- =========== FIELD SUMMARY =========== -->
-<ul class="blockList">
-<li class="blockList"><a name="field.summary">
-<!--   -->
-</a>
-<h3>Field Summary</h3>
-<ul class="blockList">
-<li class="blockList"><a name="fields.inherited.from.class.io.micronaut.annotation.processing.visitor.JavaClassElement">
-<!--   -->
-</a>
-<h3>Fields inherited from class&nbsp;io.micronaut.annotation.processing.visitor.JavaClassElement</h3>
-<code>classElement, visitorContext</code></li>
-</ul>
-<ul class="blockList">
-<li class="blockList"><a name="fields.inherited.from.class.io.micronaut.inject.ast.Element">
-<!--   -->
-</a>
-<h3>Fields inherited from interface&nbsp;io.micronaut.inject.ast.Element</h3>
-<code>EMPTY_ELEMENT_ARRAY</code></li>
-</ul>
-<ul class="blockList">
-<li class="blockList"><a name="fields.inherited.from.class.io.micronaut.core.annotation.AnnotationMetadata">
-<!--   -->
-</a>
-<h3>Fields inherited from interface&nbsp;io.micronaut.core.annotation.AnnotationMetadata</h3>
-<code>CLASS_NAME_SUFFIX, EMPTY_METADATA, VALUE_MEMBER</code></li>
-</ul>
-<ul class="blockList">
-<li class="blockList"><a name="fields.inherited.from.class.io.micronaut.core.annotation.AnnotationSource">
-<!--   -->
-</a>
-<h3>Fields inherited from interface&nbsp;io.micronaut.core.annotation.AnnotationSource</h3>
-<code>EMPTY</code></li>
-</ul>
-</li>
-</ul>
 <!-- ======== CONSTRUCTOR SUMMARY ======== -->
 <ul class="blockList">
 <li class="blockList"><a name="constructor.summary">
@@ -189,8 +130,10 @@ extends io.micronaut.annotation.processing.visitor.JavaClassElement</pre>
 <th class="colOne" scope="col">Constructor and Description</th>
 </tr>
 <tr class="altColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../io/micronaut/annotation/processing/visitor/JavaClassElementExt.html#JavaClassElementExt-io.micronaut.inject.ast.ClassElement-io.micronaut.inject.visitor.VisitorContext-">JavaClassElementExt</a></span>(io.micronaut.inject.ast.ClassElement&nbsp;ce,
-                   io.micronaut.inject.visitor.VisitorContext&nbsp;visitorContext)</code>&nbsp;</td>
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../io/micronaut/annotation/processing/visitor/JavaClassElementExt.html#JavaClassElementExt-io.micronaut.inject.ast.ClassElement-io.micronaut.inject.visitor.VisitorContext-">JavaClassElementExt</a></span>(io.micronaut.inject.ast.ClassElement&nbsp;javaClassElement,
+                   io.micronaut.inject.visitor.VisitorContext&nbsp;javaVisitorContext)</code>
+<div class="block">Constructor.</div>
+</td>
 </tr>
 </table>
 </li>
@@ -202,140 +145,24 @@ extends io.micronaut.annotation.processing.visitor.JavaClassElement</pre>
 </a>
 <h3>Method Summary</h3>
 <table class="memberSummary" border="0" cellpadding="3" cellspacing="0" summary="Method Summary table, listing methods, and an explanation">
-<caption><span id="t0" class="activeTableTab"><span>All Methods</span><span class="tabEnd">&nbsp;</span></span><span id="t1" class="tableTab"><span><a href="javascript:show(1);">Static Methods</a></span><span class="tabEnd">&nbsp;</span></span><span id="t2" class="tableTab"><span><a href="javascript:show(2);">Instance Methods</a></span><span class="tabEnd">&nbsp;</span></span><span id="t4" class="tableTab"><span><a href="javascript:show(8);">Concrete Methods</a></span><span class="tabEnd">&nbsp;</span></span></caption>
+<caption><span id="t0" class="activeTableTab"><span>All Methods</span><span class="tabEnd">&nbsp;</span></span><span id="t2" class="tableTab"><span><a href="javascript:show(2);">Instance Methods</a></span><span class="tabEnd">&nbsp;</span></span><span id="t4" class="tableTab"><span><a href="javascript:show(8);">Concrete Methods</a></span><span class="tabEnd">&nbsp;</span></span></caption>
 <tr>
 <th class="colFirst" scope="col">Modifier and Type</th>
 <th class="colLast" scope="col">Method and Description</th>
 </tr>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code>java.util.List&lt;io.micronaut.inject.ast.PropertyElement&gt;</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../io/micronaut/annotation/processing/visitor/JavaClassElementExt.html#beanProperties--">beanProperties</a></span>()</code>
-<div class="block">Returns the bean properties.</div>
-</td>
-</tr>
-<tr id="i1" class="rowColor">
-<td class="colFirst"><code>boolean</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../io/micronaut/annotation/processing/visitor/JavaClassElementExt.html#equals-java.lang.Object-">equals</a></span>(java.lang.Object&nbsp;o)</code>&nbsp;</td>
-</tr>
-<tr id="i2" class="altColor">
-<td class="colFirst"><code>java.util.List&lt;io.micronaut.inject.ast.PropertyElement&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../io/micronaut/annotation/processing/visitor/JavaClassElementExt.html#fluentBeanProperties--">fluentBeanProperties</a></span>()</code>
 <div class="block">Returns fluent accessor methods.</div>
 </td>
 </tr>
-<tr id="i3" class="rowColor">
-<td class="colFirst"><code>java.util.List&lt;io.micronaut.inject.ast.MethodElement&gt;</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../io/micronaut/annotation/processing/visitor/JavaClassElementExt.html#getCandidateMethods--">getCandidateMethods</a></span>()</code>
-<div class="block">Returns the methods of this class.</div>
-</td>
-</tr>
-<tr id="i4" class="altColor">
-<td class="colFirst"><code>java.util.Optional&lt;java.lang.String&gt;</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../io/micronaut/annotation/processing/visitor/JavaClassElementExt.html#getDocumentation--">getDocumentation</a></span>()</code>&nbsp;</td>
-</tr>
-<tr id="i5" class="rowColor">
-<td class="colFirst"><code>static io.micronaut.inject.ast.ClassElement</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../io/micronaut/annotation/processing/visitor/JavaClassElementExt.html#getGenericReturnType-io.micronaut.inject.ast.MethodElement-io.micronaut.inject.visitor.VisitorContext-">getGenericReturnType</a></span>(io.micronaut.inject.ast.MethodElement&nbsp;method,
-                    io.micronaut.inject.visitor.VisitorContext&nbsp;visitorContext)</code>
-<div class="block">Returns the return type of the method.</div>
-</td>
-</tr>
-<tr id="i6" class="altColor">
-<td class="colFirst"><code>static io.micronaut.inject.ast.ClassElement</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../io/micronaut/annotation/processing/visitor/JavaClassElementExt.html#getReturnType-io.micronaut.inject.ast.MethodElement-io.micronaut.inject.visitor.VisitorContext-">getReturnType</a></span>(io.micronaut.inject.ast.MethodElement&nbsp;method,
-             io.micronaut.inject.visitor.VisitorContext&nbsp;visitorContext)</code>
-<div class="block">Returns the return type of the method.</div>
-</td>
-</tr>
-<tr id="i7" class="rowColor">
-<td class="colFirst"><code>java.util.Optional&lt;io.micronaut.inject.ast.ClassElement&gt;</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../io/micronaut/annotation/processing/visitor/JavaClassElementExt.html#getSuperType--">getSuperType</a></span>()</code>&nbsp;</td>
-</tr>
-<tr id="i8" class="altColor">
-<td class="colFirst"><code>int</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../io/micronaut/annotation/processing/visitor/JavaClassElementExt.html#hashCode--">hashCode</a></span>()</code>&nbsp;</td>
-</tr>
-<tr id="i9" class="rowColor">
-<td class="colFirst"><code>io.micronaut.inject.ast.ClassElement</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../io/micronaut/annotation/processing/visitor/JavaClassElementExt.html#withArrayDimensions-int-">withArrayDimensions</a></span>(int&nbsp;arrayDimensions)</code>&nbsp;</td>
-</tr>
 </table>
-<ul class="blockList">
-<li class="blockList"><a name="methods.inherited.from.class.io.micronaut.annotation.processing.visitor.JavaClassElement">
-<!--   -->
-</a>
-<h3>Methods inherited from class&nbsp;io.micronaut.annotation.processing.visitor.JavaClassElement</h3>
-<code>getAllTypeArguments, getArrayDimensions, getBeanProperties, getDefaultConstructor, getEnclosedElements, getEnclosingType, getInterfaces, getName, getPackage, getPackageName, getPrimaryConstructor, getSimpleName, getTypeArguments, getTypeArguments, isAbstract, isArray, isAssignable, isAssignable, isInner, isInterface, isPrimitive, isRecord, isTypeVariable, toString</code></li>
-</ul>
-<ul class="blockList">
-<li class="blockList"><a name="methods.inherited.from.class.io.micronaut.annotation.processing.visitor.AbstractJavaElement">
-<!--   -->
-</a>
-<h3>Methods inherited from class&nbsp;io.micronaut.annotation.processing.visitor.AbstractJavaElement</h3>
-<code>annotate, annotate, getAnnotationMetadata, getModifiers, getNativeType, isFinal, isPackagePrivate, isPrivate, isProtected, isPublic, isStatic, mirrorToClassElement, mirrorToClassElement, mirrorToClassElement, mirrorToClassElement, parameterizedClassElement, removeAnnotation, removeAnnotationIf, removeStereotype</code></li>
-</ul>
 <ul class="blockList">
 <li class="blockList"><a name="methods.inherited.from.class.java.lang.Object">
 <!--   -->
 </a>
 <h3>Methods inherited from class&nbsp;java.lang.Object</h3>
-<code>clone, finalize, getClass, notify, notifyAll, wait, wait, wait</code></li>
-</ul>
-<ul class="blockList">
-<li class="blockList"><a name="methods.inherited.from.class.io.micronaut.inject.ast.ArrayableClassElement">
-<!--   -->
-</a>
-<h3>Methods inherited from interface&nbsp;io.micronaut.inject.ast.ArrayableClassElement</h3>
-<code>fromArray, toArray</code></li>
-</ul>
-<ul class="blockList">
-<li class="blockList"><a name="methods.inherited.from.class.io.micronaut.inject.ast.ClassElement">
-<!--   -->
-</a>
-<h3>Methods inherited from interface&nbsp;io.micronaut.inject.ast.ClassElement</h3>
-<code>addAssociatedBean, getCanonicalName, getEnclosedElement, getFields, getFields, getFirstTypeArgument, getType, getTypeArguments, isAssignable, isEnum, isIterable, isOptional, isProxy, of, of, of, of, of</code></li>
-</ul>
-<ul class="blockList">
-<li class="blockList"><a name="methods.inherited.from.class.io.micronaut.inject.ast.TypedElement">
-<!--   -->
-</a>
-<h3>Methods inherited from interface&nbsp;io.micronaut.inject.ast.TypedElement</h3>
-<code>getGenericType</code></li>
-</ul>
-<ul class="blockList">
-<li class="blockList"><a name="methods.inherited.from.class.io.micronaut.inject.ast.Element">
-<!--   -->
-</a>
-<h3>Methods inherited from interface&nbsp;io.micronaut.inject.ast.Element</h3>
-<code>annotate, annotate, annotate, annotate, annotate, getDescription, getDescription, getModifiers, getNativeType, isFinal, isPackagePrivate, isPrivate, isProtected, isPublic, isStatic, removeAnnotation, removeAnnotation, removeAnnotationIf, removeStereotype, removeStereotype</code></li>
-</ul>
-<ul class="blockList">
-<li class="blockList"><a name="methods.inherited.from.class.io.micronaut.core.annotation.AnnotationMetadataDelegate">
-<!--   -->
-</a>
-<h3>Methods inherited from interface&nbsp;io.micronaut.core.annotation.AnnotationMetadataDelegate</h3>
-<code>booleanValue, booleanValue, booleanValue, booleanValue, classValue, classValue, classValue, classValue, classValues, classValues, classValues, classValues, doubleValue, doubleValue, doubleValue, enumValue, enumValue, enumValue, enumValue, enumValues, enumValues, enumValues, enumValues, findAnnotation, findAnnotation, findDeclaredAnnotation, findDeclaredAnnotation, getAnnotation, getAnnotation, getAnnotationNameByStereotype, getAnnotationNameByStereotype, getAnnotationNames, getAnnotationNamesByStereotype, getAnnotationNamesByStereotype, getAnnotationType, getAnnotationType, getAnnotationTypeByStereotype, getAnnotationTypeByStereotype, getAnnotationTypesByStereotype, getAnnotationTypesByStereotype, getAnnotationTypesByStereotype, getAnnotationValuesByType, getDeclaredAnnotation, getDeclaredAnnotation, getDeclaredAnnotationNameByStereotype, getDeclaredAnnotationNames, getDeclaredAnnotationNamesByStereotype, getDeclaredAnnotationTypeByStereotype, getDeclaredAnnotationTypeByStereotype, getDeclaredAnnotationValuesByType, getDeclaredMetadata, getDefaultValue, getDefaultValue, getDefaultValue, getDefaultValue, getDefaultValues, getValue, getValue, getValue, getValue, getValue, getValue, getValue, getValue, getValue, getValue, getValue, getValue, getValues, getValues, hasAnnotation, hasAnnotation, hasDeclaredAnnotation, hasDeclaredAnnotation, hasDeclaredStereotype, hasDeclaredStereotype, hasDeclaredStereotype, hasPropertyExpressions, hasSimpleAnnotation, hasSimpleDeclaredAnnotation, hasStereotype, hasStereotype, hasStereotype, hasStereotype, intValue, intValue, intValue, isAnnotationPresent, isDeclaredAnnotationPresent, isEmpty, isFalse, isFalse, isPresent, isPresent, isTrue, isTrue, longValue, longValue, stringValue, stringValue, stringValue, stringValue, stringValues, stringValues, stringValues, stringValues, synthesize, synthesize, synthesizeAll, synthesizeAnnotationsByType, synthesizeDeclared, synthesizeDeclared, synthesizeDeclared, synthesizeDeclaredAnnotationsByType</code></li>
-</ul>
-<ul class="blockList">
-<li class="blockList"><a name="methods.inherited.from.class.io.micronaut.core.annotation.AnnotationMetadata">
-<!--   -->
-</a>
-<h3>Methods inherited from interface&nbsp;io.micronaut.core.annotation.AnnotationMetadata</h3>
-<code>getValues, hasDeclaredStereotype, isAnnotationPresent, isDeclaredAnnotationPresent</code></li>
-</ul>
-<ul class="blockList">
-<li class="blockList"><a name="methods.inherited.from.class.io.micronaut.core.annotation.AnnotatedElement">
-<!--   -->
-</a>
-<h3>Methods inherited from interface&nbsp;io.micronaut.core.annotation.AnnotatedElement</h3>
-<code>isDeclaredNonNull, isDeclaredNullable, isNonNull, isNullable</code></li>
-</ul>
-<ul class="blockList">
-<li class="blockList"><a name="methods.inherited.from.class.io.micronaut.core.annotation.AnnotationMetadataProvider">
-<!--   -->
-</a>
-<h3>Methods inherited from interface&nbsp;io.micronaut.core.annotation.AnnotationMetadataProvider</h3>
-<code>getAnnotationMetadata</code></li>
+<code>clone, equals, finalize, getClass, hashCode, notify, notifyAll, toString, wait, wait, wait</code></li>
 </ul>
 </li>
 </ul>
@@ -357,12 +184,13 @@ extends io.micronaut.annotation.processing.visitor.JavaClassElement</pre>
 <ul class="blockListLast">
 <li class="blockList">
 <h4>JavaClassElementExt</h4>
-<pre>public&nbsp;JavaClassElementExt(io.micronaut.inject.ast.ClassElement&nbsp;ce,
-                           io.micronaut.inject.visitor.VisitorContext&nbsp;visitorContext)</pre>
+<pre>public&nbsp;JavaClassElementExt(io.micronaut.inject.ast.ClassElement&nbsp;javaClassElement,
+                           io.micronaut.inject.visitor.VisitorContext&nbsp;javaVisitorContext)</pre>
+<div class="block">Constructor.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>ce</code> - The <code>ClassElement</code></dd>
-<dd><code>visitorContext</code> - The visitor context</dd>
+<dd><code>javaClassElement</code> - The <code>JavaClassElement</code></dd>
+<dd><code>javaVisitorContext</code> - The <code>JavaVisitorContext</code></dd>
 </dl>
 </li>
 </ul>
@@ -374,135 +202,6 @@ extends io.micronaut.annotation.processing.visitor.JavaClassElement</pre>
 <!--   -->
 </a>
 <h3>Method Detail</h3>
-<a name="withArrayDimensions-int-">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>withArrayDimensions</h4>
-<pre>public&nbsp;io.micronaut.inject.ast.ClassElement&nbsp;withArrayDimensions(int&nbsp;arrayDimensions)</pre>
-<dl>
-<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code>withArrayDimensions</code>&nbsp;in interface&nbsp;<code>io.micronaut.inject.ast.ArrayableClassElement</code></dd>
-<dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
-<dd><code>withArrayDimensions</code>&nbsp;in class&nbsp;<code>io.micronaut.annotation.processing.visitor.JavaClassElement</code></dd>
-</dl>
-</li>
-</ul>
-<a name="getDocumentation--">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>getDocumentation</h4>
-<pre>public&nbsp;java.util.Optional&lt;java.lang.String&gt;&nbsp;getDocumentation()</pre>
-</li>
-</ul>
-<a name="getSuperType--">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>getSuperType</h4>
-<pre>public&nbsp;java.util.Optional&lt;io.micronaut.inject.ast.ClassElement&gt;&nbsp;getSuperType()</pre>
-<dl>
-<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code>getSuperType</code>&nbsp;in interface&nbsp;<code>io.micronaut.inject.ast.ClassElement</code></dd>
-<dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
-<dd><code>getSuperType</code>&nbsp;in class&nbsp;<code>io.micronaut.annotation.processing.visitor.JavaClassElement</code></dd>
-</dl>
-</li>
-</ul>
-<a name="equals-java.lang.Object-">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>equals</h4>
-<pre>public&nbsp;boolean&nbsp;equals(java.lang.Object&nbsp;o)</pre>
-<dl>
-<dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
-<dd><code>equals</code>&nbsp;in class&nbsp;<code>io.micronaut.annotation.processing.visitor.AbstractJavaElement</code></dd>
-</dl>
-</li>
-</ul>
-<a name="hashCode--">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>hashCode</h4>
-<pre>public&nbsp;int&nbsp;hashCode()</pre>
-<dl>
-<dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
-<dd><code>hashCode</code>&nbsp;in class&nbsp;<code>io.micronaut.annotation.processing.visitor.AbstractJavaElement</code></dd>
-</dl>
-</li>
-</ul>
-<a name="getReturnType-io.micronaut.inject.ast.MethodElement-io.micronaut.inject.visitor.VisitorContext-">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>getReturnType</h4>
-<pre>public static&nbsp;io.micronaut.inject.ast.ClassElement&nbsp;getReturnType(io.micronaut.inject.ast.MethodElement&nbsp;method,
-                                                                 io.micronaut.inject.visitor.VisitorContext&nbsp;visitorContext)</pre>
-<div class="block">Returns the return type of the method. Takes care of kotlin Continuation.</div>
-<dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>method</code> - method.</dd>
-<dd><code>visitorContext</code> - The visitor context.</dd>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>A ClassElement.</dd>
-</dl>
-</li>
-</ul>
-<a name="getGenericReturnType-io.micronaut.inject.ast.MethodElement-io.micronaut.inject.visitor.VisitorContext-">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>getGenericReturnType</h4>
-<pre>public static&nbsp;io.micronaut.inject.ast.ClassElement&nbsp;getGenericReturnType(io.micronaut.inject.ast.MethodElement&nbsp;method,
-                                                                        io.micronaut.inject.visitor.VisitorContext&nbsp;visitorContext)</pre>
-<div class="block">Returns the return type of the method. Takes care of kotlin Continuation.</div>
-<dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>method</code> - method.</dd>
-<dd><code>visitorContext</code> - The visitor context.</dd>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>A ClassElement.</dd>
-</dl>
-</li>
-</ul>
-<a name="getCandidateMethods--">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>getCandidateMethods</h4>
-<pre>public&nbsp;java.util.List&lt;io.micronaut.inject.ast.MethodElement&gt;&nbsp;getCandidateMethods()</pre>
-<div class="block">Returns the methods of this class.</div>
-<dl>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>A list of methods.</dd>
-</dl>
-</li>
-</ul>
-<a name="beanProperties--">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>beanProperties</h4>
-<pre>public&nbsp;java.util.List&lt;io.micronaut.inject.ast.PropertyElement&gt;&nbsp;beanProperties()</pre>
-<div class="block">Returns the bean properties.</div>
-<dl>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>The bean properties.</dd>
-</dl>
-</li>
-</ul>
 <a name="fluentBeanProperties--">
 <!--   -->
 </a>
@@ -545,7 +244,7 @@ extends io.micronaut.annotation.processing.visitor.JavaClassElement</pre>
 <div class="subNav">
 <ul class="navList">
 <li>Prev&nbsp;Class</li>
-<li><a href="../../../../../io/micronaut/annotation/processing/visitor/JavaMethodElementExt.html" title="class in io.micronaut.annotation.processing.visitor"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
+<li>Next&nbsp;Class</li>
 </ul>
 <ul class="navList">
 <li><a href="../../../../../index.html?io/micronaut/annotation/processing/visitor/JavaClassElementExt.html" target="_top">Frames</a></li>
@@ -570,7 +269,7 @@ extends io.micronaut.annotation.processing.visitor.JavaClassElement</pre>
 <ul class="subNavList">
 <li>Summary:&nbsp;</li>
 <li>Nested&nbsp;|&nbsp;</li>
-<li><a href="#fields.inherited.from.class.io.micronaut.annotation.processing.visitor.JavaClassElement">Field</a>&nbsp;|&nbsp;</li>
+<li>Field&nbsp;|&nbsp;</li>
 <li><a href="#constructor.summary">Constr</a>&nbsp;|&nbsp;</li>
 <li><a href="#method.summary">Method</a></li>
 </ul>
