@@ -1,6 +1,6 @@
 plugins {
     id "org.jetbrains.kotlin.jvm" version "1.6.0"
-    id "org.jetbrains.kotlin.kapt" version "1.5.31"
+    id "org.jetbrains.kotlin.kapt" version "1.6.0"
 }
 
 dependencies {
@@ -13,7 +13,7 @@ dependencies {
     testImplementation "io.micronaut:micronaut-runtime"
     testImplementation "io.micronaut:micronaut-validation"
     testImplementation "io.micronaut.beanvalidation:micronaut-hibernate-validator"
-    testRuntimeOnly "ch.qos.logback:logback-classic:1.2.6"
+    testRuntimeOnly "ch.qos.logback:logback-classic:1.2.7"
     testImplementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
     testImplementation "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
     testImplementation 'io.kotlintest:kotlintest-runner-junit5:3.4.2'
