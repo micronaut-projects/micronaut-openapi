@@ -3,11 +3,16 @@ plugins {
     id "org.jetbrains.kotlin.kapt" version "1.6.0"
 }
 
+repositories {
+    mavenCentral()
+}
+
 dependencies {
     kapt project(":openapi")
     kapt "io.micronaut:micronaut-inject-java:$micronautVersion"
     kapt "io.micronaut:micronaut-validation:$micronautVersion"
     kaptTest "io.micronaut:micronaut-inject-java"
+    testImplementation platform("io.micronaut:micronaut-bom:$micronautVersion")
     testImplementation "io.swagger.core.v3:swagger-annotations"
     testImplementation 'io.projectreactor:reactor-core'
     testImplementation "io.micronaut:micronaut-runtime"

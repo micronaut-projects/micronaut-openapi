@@ -6,10 +6,10 @@ pluginManagement {
 }
 
 plugins {
-    id("io.micronaut.build.shared.settings") version "4.2.6"
+    id 'io.micronaut.build.shared.settings' version '5.0.3'
 }
 
-rootProject.name="openapi-root"
+rootProject.name="openapi-parent"
 
 include "openapi"
 include 'docs-examples:example-groovy'

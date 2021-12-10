@@ -1,5 +1,6 @@
 package io.micronaut.configuration.openapi.docs.controllers
 
+// tag::imports[]
 import io.micronaut.http.MediaType
 
 // tag::imports[]
