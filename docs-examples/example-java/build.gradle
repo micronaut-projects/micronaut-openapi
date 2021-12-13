@@ -2,8 +2,13 @@ plugins {
     id "java"
 }
 
+repositories {
+    mavenCentral()
+}
+
 dependencies {
     testImplementation project(":openapi")
+    testImplementation platform("io.micronaut:micronaut-bom:$micronautVersion")
     testImplementation "io.micronaut:micronaut-runtime"
     testImplementation "io.micronaut:micronaut-inject-java"
     testImplementation "io.micronaut:micronaut-validation"

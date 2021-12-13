@@ -2,8 +2,13 @@ plugins {
     id "groovy"
 }
 
+repositories {
+    mavenCentral()
+}
+
 dependencies {
     testImplementation project(":openapi")
+    testImplementation platform("io.micronaut:micronaut-bom:$micronautVersion")
     testImplementation "io.micronaut:micronaut-runtime"
     testImplementation "io.micronaut.groovy:micronaut-runtime-groovy"
     testImplementation "io.micronaut:micronaut-validation"
