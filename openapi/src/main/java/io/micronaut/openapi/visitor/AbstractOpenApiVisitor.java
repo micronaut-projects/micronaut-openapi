@@ -957,7 +957,9 @@ abstract class AbstractOpenApiVisitor  {
         if (defaultValue != null && schemaToBind.getDefault() == null) {
             schemaToBind.setDefault(defaultValue);
         }
-        if (element.isNullable()) {
+        // @Schema annotation takes priority over nullability annotations
+        Boolean isSchemaNullable = element.booleanValue(io.swagger.v3.oas.annotations.media.Schema.class, "nullable").orElse(null);
+        if ((isSchemaNullable == null && element.isNullable()) || (Boolean.TRUE.equals(isSchemaNullable) && element.isNullable())) {
             schemaToBind.setNullable(true);
         }
         final String defaultJacksonValue = element.stringValue(JsonProperty.class, "defaultValue").orElse(null);
