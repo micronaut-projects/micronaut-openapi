@@ -29,7 +29,8 @@ annotationConfiguration:
   title: Annotation Configuration
   openapiinclude: '@OpenAPIInclude'
   openapimanagement: '@OpenAPIManagement'
-  openapisecurity: '@OpenAPISecurity'  
+  openapisecurity: '@OpenAPISecurity'
+  accessorsStyle: '@AccessorsStyle'
 mergingSchemas: Merging Schemas
 openApiViews:
   title: Generating OpenAPI Views

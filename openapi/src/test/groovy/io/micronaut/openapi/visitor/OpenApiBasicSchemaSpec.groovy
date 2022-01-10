@@ -146,6 +146,7 @@ public class MyBean {}
         buildBeanDefinition("test.MyBean", '''
 package test;
 
+import io.micronaut.core.annotation.AccessorsStyle;
 import io.micronaut.core.annotation.Introspected;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.MediaType;
@@ -184,6 +185,7 @@ class PersonController {
  * The person information.
  */
 @Introspected
+@AccessorsStyle(readPrefixes = "", writePrefixes = "")
 class Person {
 
     @NotBlank

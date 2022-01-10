@@ -25,7 +25,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import io.micronaut.annotation.processing.visitor.JavaClassElementExt;
 import io.micronaut.core.annotation.AnnotationClassValue;
 import io.micronaut.core.annotation.AnnotationValue;
 import io.micronaut.core.annotation.Nullable;
@@ -1416,13 +1415,6 @@ abstract class AbstractOpenApiVisitor  {
                 beanProperties = Collections.emptyList();
             }
             processPropertyElements(openAPI, context, type, schema, beanProperties, mediaTypes);
-
-            if (isJavaElement(classElement, context)) {
-                // TODO: This is the only place left in which we use `JavaClassElementExt`
-                JavaClassElementExt jce = new JavaClassElementExt(classElement, context);
-                List<PropertyElement> fluentMethodsProperties = jce.fluentBeanProperties();
-                processPropertyElements(openAPI, context, type, schema, fluentMethodsProperties, mediaTypes);
-            }
 
             final List<FieldElement> publicFields = classElement.getEnclosedElements(ElementQuery.ALL_FIELDS.modifiers(mods -> mods.contains(ElementModifier.PUBLIC) && mods.size() == 1));
 

@@ -1,0 +1,49 @@
+You can use https://docs.micronaut.io/latest/api/io/micronaut/core/annotation/AccessorsStyle.html[@AccessorsStyle] to define your custom getters and setters if they are not the default `get` and `set`.
+
+This is useful when defining getters and setters in a "fluent" way or when using Lombok for that:
+
+[source,java]
+----
+@Introspected
+@AccessorsStyle(readPrefixes = "", writePrefixes = "") // <1>
+class Person {
+
+    private String name;
+    private Integer debtValue;
+    private Integer totalGoals;
+
+    public Person(String name, Integer debtValue, Integer totalGoals) {
+        this.name = name;
+        this.debtValue = debtValue;
+        this.totalGoals = totalGoals;
+    }
+
+    public String name() { // <2>
+        return name;
+    }
+
+    public Integer debtValue() {
+        return debtValue;
+    }
+
+    public Integer totalGoals() {
+        return totalGoals;
+    }
+
+    public void name(String name) { // <2>
+        this.name = name;
+    }
+
+    public void debtValue(Integer debtValue) {
+        this.debtValue = debtValue;
+    }
+
+    public void totalGoals(Integer totalGoals) {
+        this.totalGoals = totalGoals;
+    }
+}
+----
+<1> Use `@AccessorsStyle` to configure the custom prefixes. In this case no prefix.
+<2> Define getters and setters without prefixes.
+
+Using `@AccessorsStyle` will tell Micronaut how to access getters and setters and will also generate the appropriate Open API spec.
