@@ -2084,4 +2084,89 @@ class MyBean {}
         openAPI.paths.get("/upload3/{id}").post.parameters[0].name == "id"
         openAPI.paths.get("/upload3/{id}").post.parameters[0].required
     }
+
+    @Issue("https://github.com/micronaut-projects/micronaut-openapi/issues/611")
+    @Issue("https://github.com/micronaut-projects/micronaut-openapi/issues/632")
+    void "test @Schema(nullable = false, required = true) takes priority for Kotlin data classes"() {
+        given:"An API definition"
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.core.annotation.*;
+import io.micronaut.http.annotation.*;
+import io.micronaut.validation.Validated;
+import io.micronaut.http.HttpStatus;
+import io.swagger.v3.oas.annotations.media.*;
+
+import javax.validation.Valid;
+import javax.validation.constraints.*;
+
+import java.util.List;
+
+@Controller(value = "/v1/customers")
+@Validated
+class CustomersController {
+
+    @org.jetbrains.annotations.NotNull()
+    @Status(value = HttpStatus.CREATED)
+    @Post
+    public String createCustomer(@org.jetbrains.annotations.NotNull() @Body @Valid() CreateCustomerRequest request) {
+        return null;
+    }
+}
+
+@io.micronaut.core.annotation.Introspected()
+class CreateCustomerRequest {
+
+    @org.jetbrains.annotations.Nullable()
+    @javax.validation.constraints.NotNull()
+    @io.swagger.v3.oas.annotations.media.Schema(nullable = false, required = true)
+    private final java.lang.String customerName = null;
+
+    @org.jetbrains.annotations.Nullable()
+    @javax.validation.constraints.PastOrPresent()
+    @javax.validation.constraints.NotNull()
+    @io.swagger.v3.oas.annotations.media.Schema(nullable = false, required = true)
+    private final java.time.LocalDate birthDate = null;
+
+    public CreateCustomerRequest(
+            @org.jetbrains.annotations.Nullable() java.lang.String customerName,
+            @org.jetbrains.annotations.Nullable() java.time.LocalDate birthDate) {
+        super();
+    }
+
+    @org.jetbrains.annotations.Nullable()
+    public final java.lang.String getCustomerName() {
+        return null;
+    }
+
+    @org.jetbrains.annotations.Nullable()
+    public final java.time.LocalDate getBirthDate() {
+        return null;
+    }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        then: "the state is correct"
+        AbstractOpenApiVisitor.testReference != null
+
+        when: "The OpenAPI is retrieved"
+        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        Schema schema = openAPI.components.schemas['CreateCustomerRequest']
+
+        then: "the components are valid"
+        schema.properties.size() == 2
+        schema.type == 'object'
+        schema.required
+
+        and:
+        schema.required.contains('customerName')
+        schema.required.contains('birthDate')
+
+        !schema.properties['customerName'].nullable
+        !schema.properties['birthDate'].nullable
+    }
 }
