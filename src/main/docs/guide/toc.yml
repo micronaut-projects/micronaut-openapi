@@ -43,5 +43,5 @@ openApiViews:
   rapidoc: RapiDoc
   rapipdf: RapiPdf
 serverContext: Server Context
-
 repository: Repository
+breaks: Breaking Changes

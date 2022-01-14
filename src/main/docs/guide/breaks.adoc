@@ -1,0 +1,5 @@
+This section documents breaking changes between Micronaut OpenAPI versions:
+
+== Micronaut OpenAPI 4.0.0
+
+Micronaut OpenAPI no longer generates `200` or `default` HTTP status code responses when using `@ApiResponse` annotation. It's up to the user to define all the appropriate status codes.

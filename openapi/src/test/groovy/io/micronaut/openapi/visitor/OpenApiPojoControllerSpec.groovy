@@ -18,11 +18,10 @@ class OpenApiPojoControllerSpec extends AbstractOpenApiTypeElementSpec {
         buildBeanDefinition('test.MyBean','''
 package test;
 
-import io.micronaut.http.annotation.Controller;
-import io.micronaut.http.annotation.Get;
-import io.micronaut.http.annotation.Put;
-import io.micronaut.http.annotation.Post;
-import io.micronaut.http.annotation.Status;
+import io.micronaut.http.annotation.*;
+import io.swagger.v3.oas.annotations.*;
+import io.swagger.v3.oas.annotations.media.*;
+import io.swagger.v3.oas.annotations.responses.*;
 
 import java.util.List;
 
@@ -37,26 +36,28 @@ interface PetOperations<T extends Pet> {
      */
     @Get("/{slug}")
     T find(String slug);
-    
-    
-    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "Invalid Name Supplied")
-    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "Person not found")
+
+    @ApiResponse(
+            responseCode = "201", description = "Person created",
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = Pet.class)))
+    @ApiResponse(responseCode = "400", description = "Invalid Name Supplied")
+    @ApiResponse(responseCode = "404", description = "Person not found")
     @Post("/xyz1")
     T xyzPost(String slug);
     
-    @io.swagger.v3.oas.annotations.responses.ApiResponses({
-        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Custom desc"),
-        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "Invalid Name Supplied"),
-        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "Person not found")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Custom desc"),
+        @ApiResponse(responseCode = "400", description = "Invalid Name Supplied"),
+        @ApiResponse(responseCode = "404", description = "Person not found")
     })
     @Put("/xyz1")
     T xyzPut(String slug);
     
-    @io.swagger.v3.oas.annotations.Operation(description = "Do the post")
     @Status(io.micronaut.http.HttpStatus.CREATED)
-    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "201", description = "Custom desc 2")
-    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "Invalid Name Supplied")
-    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "Person not found")
+    @Operation(description = "Do the post")
+    @ApiResponse(responseCode = "201", description = "Custom desc 2")
+    @ApiResponse(responseCode = "400", description = "Invalid Name Supplied")
+    @ApiResponse(responseCode = "404", description = "Person not found")
     @Post("/xyz2")
     T xyzPost2(String slug);
 }
@@ -139,10 +140,10 @@ class MyBean {}
         then:
             xyz1.post.operationId == 'xyzPost'
             xyz1.post.responses.size() == 3
-            xyz1.post.responses['200']
-            xyz1.post.responses['200'].description == 'xyzPost 200 response'
-            xyz1.post.responses['200'].content['application/json'].schema
-            xyz1.post.responses['200'].content['application/json'].schema.$ref == '#/components/schemas/Pet'
+            xyz1.post.responses['201']
+            xyz1.post.responses['201'].description == 'Person created'
+            xyz1.post.responses['201'].content['application/json'].schema
+            xyz1.post.responses['201'].content['application/json'].schema.$ref == '#/components/schemas/Pet'
             xyz1.post.responses['400']
             xyz1.post.responses['400'].description == 'Invalid Name Supplied'
             xyz1.post.responses['400'].content == null
@@ -155,8 +156,6 @@ class MyBean {}
             xyz1.put.responses.size() == 3
             xyz1.put.responses['200']
             xyz1.put.responses['200'].description == 'Custom desc'
-            xyz1.put.responses['200'].content['application/json'].schema
-            xyz1.put.responses['200'].content['application/json'].schema.$ref == '#/components/schemas/Pet'
             xyz1.put.responses['400']
             xyz1.put.responses['400'].description == 'Invalid Name Supplied'
             xyz1.put.responses['400'].content == null
@@ -169,8 +168,6 @@ class MyBean {}
             xyz2.post.responses.size() == 3
             xyz2.post.responses['201']
             xyz2.post.responses['201'].description == 'Custom desc 2'
-            xyz2.post.responses['201'].content['application/json'].schema
-            xyz2.post.responses['201'].content['application/json'].schema.$ref == '#/components/schemas/Pet'
             xyz2.post.responses['400']
             xyz2.post.responses['400'].description == 'Invalid Name Supplied'
             xyz2.post.responses['400'].content == null
@@ -2168,5 +2165,67 @@ class MyBean {}
 
         !schema.properties['customerName'].nullable
         !schema.properties['birthDate'].nullable
+    }
+
+    @Issue("https://github.com/micronaut-projects/micronaut-openapi/issues/617")
+    void "@ApiResponse takes priority over default Http status code"() {
+        given:
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.http.*;
+import io.micronaut.http.annotation.*;
+import io.swagger.v3.oas.annotations.*;
+import io.swagger.v3.oas.annotations.responses.*;
+import java.net.URI;
+
+@Controller
+class RootController {
+
+    @Operation(operationId = "home")
+    @ApiResponse(responseCode = "303", description = "redirects to /hello/world")
+    @Get
+    HttpResponse<?> index() {
+        return HttpResponse.seeOther(URI.create("/hello/world"));
+    }
+}
+
+@Controller("/hello")
+class HelloWorldController {
+    @Get(value = "/world", produces = MediaType.TEXT_PLAIN)
+    String index() {
+        return "Hello World";
+    }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        then:
+        AbstractOpenApiVisitor.testReference != null
+
+        when:
+        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+
+        then: 'only 303 response because @ApiResponse is used.'
+        openAPI.paths.size() == 2
+        PathItem root = openAPI.paths.get('/')
+        root.get.operationId == 'home'
+        root.get.responses.size() == 1
+        root.get.responses['303']
+        root.get.responses['303'].description == 'redirects to /hello/world'
+
+        and: 'no content because it is not defined in @ApiResponse'
+        root.get.responses['303'].content == null
+
+        and:
+        PathItem helloWorld = openAPI.paths.get('/hello/world')
+        helloWorld.get.operationId == 'index'
+        helloWorld.get.responses.size() == 1
+        helloWorld.get.responses['200']
+        helloWorld.get.responses['200'].description == 'index 200 response'
+        helloWorld.get.responses['200'].content['text/plain'].schema
+        helloWorld.get.responses['200'].content['text/plain'].schema.type == 'string'
     }
 }
