@@ -1525,12 +1525,11 @@ abstract class AbstractOpenApiVisitor  {
 
             final Optional<String> n = securityRequirementAnnotationValue.get("name", String.class);
             n.ifPresent(name -> {
-
                 final Map<CharSequence, Object> map = toValueMap(securityRequirementAnnotationValue.getValues(), context);
                 if (map.containsKey("paramName")) {
                     map.put("name", map.remove("paramName"));
                 } else {
-                    map.remove("name");
+                    map.putIfAbsent("name", name);
                 }
                 normalizeEnumValues(map, CollectionUtils.mapOf("type", SecurityScheme.Type.class, "in", SecurityScheme.In.class));
                 Optional<SecurityScheme> securityRequirement = toValue(map, context, SecurityScheme.class);

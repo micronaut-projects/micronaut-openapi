@@ -4,6 +4,7 @@ import io.micronaut.openapi.AbstractOpenApiTypeElementSpec
 import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.Operation
 import io.swagger.v3.oas.models.security.SecurityScheme
+import spock.lang.Issue
 
 class OpenApiSecurityRequirementSpec extends AbstractOpenApiTypeElementSpec {
 
@@ -308,5 +309,44 @@ class MyBean {}
         openAPI.components.securitySchemes['myOauth2Security'].extensions
         openAPI.components.securitySchemes['myOauth2Security'].extensions.'x-custom'.prop1 == "prop1Val"
 
+    }
+
+    @Issue("https://github.com/micronaut-projects/micronaut-openapi/issues/633")
+    void "test @SecurityScheme always sets 'name' property"() {
+        given:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.runtime.Micronaut;
+import io.swagger.v3.oas.annotations.*;
+import io.swagger.v3.oas.annotations.enums.*;
+import io.swagger.v3.oas.annotations.info.*;
+import io.swagger.v3.oas.annotations.security.*;
+
+@OpenAPIDefinition(
+        info = @Info(
+                title = "openapi-demo",
+                version = "0.1"
+        )
+)
+@SecurityScheme(
+        type = SecuritySchemeType.APIKEY,
+        name = "MyScheme",
+        in = SecuritySchemeIn.HEADER
+)
+class Application {
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+
+        when:
+        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+
+        then:
+        openAPI.components.securitySchemes.size() == 1
+        openAPI.components.securitySchemes['MyScheme']
+        openAPI.components.securitySchemes['MyScheme'].name == 'MyScheme'
     }
 }
