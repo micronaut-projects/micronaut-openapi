@@ -6,6 +6,7 @@ import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.Operation
 import io.swagger.v3.oas.models.PathItem
 import spock.lang.Ignore
+import spock.lang.Issue
 
 class OpenApiControllerVisitorSpec extends AbstractOpenApiTypeElementSpec {
 
@@ -842,5 +843,53 @@ class MyBean {}
 
         then:
         parameter.in == 'path'
+    }
+
+    @Issue("https://github.com/micronaut-projects/micronaut-openapi/issues/440")
+    void "test return RxJava3 Single"() {
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.http.annotation.*;
+import io.reactivex.rxjava3.core.Single;
+
+@Controller("/testing")
+class TestController {
+    @Get
+    public Single<TestPojo> get() {
+        return Single.just(new TestPojo("testing123"));
+    }
+}
+
+class TestPojo {
+    private final String testString;
+
+    public TestPojo(String testString) {
+        this.testString = testString;
+    }
+
+    public String getTestString() {
+        return testString;
+    }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        then:
+        AbstractOpenApiVisitor.testReference != null
+
+        when:
+        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+
+        then:
+        openAPI.components.schemas.size() == 1
+        openAPI.components.schemas['TestPojo'].name == 'TestPojo'
+        openAPI.components.schemas['TestPojo'].type == 'object'
+        openAPI.components.schemas['TestPojo'].properties.size() == 1
+        openAPI.components.schemas['TestPojo'].properties['testString'].type == 'string'
+        openAPI.components.schemas['TestPojo'].required.size() == 1
+        openAPI.components.schemas['TestPojo'].required.contains('testString')
     }
 }

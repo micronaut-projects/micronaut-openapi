@@ -1497,7 +1497,10 @@ abstract class AbstractOpenApiVisitor  {
                 Publisher.class.getName(),
                 "io.reactivex.Single",
                 "io.reactivex.Observable",
-                "io.reactivex.Maybe"
+                "io.reactivex.Maybe",
+                "io.reactivex.rxjava3.core.Single",
+                "io.reactivex.rxjava3.core.Observable",
+                "io.reactivex.rxjava3.core.Maybe"
         ).stream().anyMatch(type::isAssignable);
     }
 
