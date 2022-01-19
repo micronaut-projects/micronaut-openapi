@@ -135,7 +135,7 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
     }
 
     /**
-     * Executed when a class is encountered that matches the <C> generic.
+     * Executed when a class is encountered that matches the generic class.
      *
      * @param element The element
      * @param context The visitor context
@@ -265,7 +265,7 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
     }
 
     /**
-     * Executed when a method is encountered that matches the <E> generic.
+     * Executed when a method is encountered that matches the generic element.
      *
      * @param element The element
      * @param context The visitor context

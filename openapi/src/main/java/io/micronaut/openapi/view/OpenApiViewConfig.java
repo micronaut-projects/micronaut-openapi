@@ -18,12 +18,20 @@ package io.micronaut.openapi.view;
 import io.micronaut.core.util.StringUtils;
 import io.micronaut.inject.visitor.VisitorContext;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
 import java.util.stream.Collectors;
 
 /**
@@ -84,7 +92,8 @@ public final class OpenApiViewConfig {
 
     /**
      * Creates an OpenApiViewConfig form a String representation.
-     * @param specification A String representation of an OpenApiViewConfig.
+     *
+     * @param specification     A String representation of an OpenApiViewConfig.
      * @param openApiProperties The open api properties.
      * @return An OpenApiViewConfig.
      */
@@ -120,8 +129,9 @@ public final class OpenApiViewConfig {
 
     /**
      * Generates the views given this configuration.
-     * @param outputDir The destination directory of the generated views.
-     * @param visitorContext 
+     *
+     * @param outputDir      The destination directory of the generated views.
+     * @param visitorContext The visitor context
      * @throws IOException When the generation fails.
      */
     public void render(Path outputDir, VisitorContext visitorContext) throws IOException {
