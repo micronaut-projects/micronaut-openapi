@@ -1,4 +1,3 @@
-io.micronaut.annotation.processing.visitor
 io.micronaut.openapi.annotation
 io.micronaut.openapi.annotation.mappers
 io.micronaut.openapi.annotation.transformers

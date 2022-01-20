@@ -162,6 +162,8 @@
         
         <div class="toc-item" style="margin-left:10px" id="toc-item-openapisecurity"><a href="#openapisecurity"><strong>12.3</strong><span>@OpenAPISecurity</span></a></div>
         
+        <div class="toc-item" style="margin-left:10px" id="toc-item-accessorsStyle"><a href="#accessorsStyle"><strong>12.4</strong><span>@AccessorsStyle</span></a></div>
+        
         <div class="toc-item" style="margin-left:0px" id="toc-item-mergingSchemas"><a href="#mergingSchemas"><strong>13</strong><span>Merging Schemas</span></a></div>
         
         <div class="toc-item" style="margin-left:0px" id="toc-item-openApiViews"><a href="#openApiViews"><strong>14</strong><span>Generating OpenAPI Views</span></a></div>
@@ -1592,6 +1594,79 @@ io.micronaut.management.endpoint.threads.ThreadDumpEndpoint }
 classes = { io.micronaut.security.endpoints.LoginController.class, io.micronaut.security.endpoints.LogoutController.class }
 )</code></pre>
 </div>
+</div>
+
+<h2 id="accessorsStyle"><a class="anchor" href="#accessorsStyle"></a>12.4 @AccessorsStyle</h2>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/annotationConfiguration/accessorsStyle.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>You can use <a href="https://docs.micronaut.io/latest/api/io/micronaut/core/annotation/AccessorsStyle.html">@AccessorsStyle</a> to define your custom getters and setters if they are not the default <code>get</code> and <code>set</code>.</p>
+</div>
+<div class="paragraph">
+<p>This is useful when defining getters and setters in a "fluent" way or when using Lombok for that:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Introspected
+@AccessorsStyle(readPrefixes = "", writePrefixes = "") <i class="conum" data-value="1"></i><b>(1)</b>
+class Person {
+
+    private String name;
+    private Integer debtValue;
+    private Integer totalGoals;
+
+    public Person(String name, Integer debtValue, Integer totalGoals) {
+        this.name = name;
+        this.debtValue = debtValue;
+        this.totalGoals = totalGoals;
+    }
+
+    public String name() { <i class="conum" data-value="2"></i><b>(2)</b>
+        return name;
+    }
+
+    public Integer debtValue() {
+        return debtValue;
+    }
+
+    public Integer totalGoals() {
+        return totalGoals;
+    }
+
+    public void name(String name) { <i class="conum" data-value="2"></i><b>(2)</b>
+        this.name = name;
+    }
+
+    public void debtValue(Integer debtValue) {
+        this.debtValue = debtValue;
+    }
+
+    public void totalGoals(Integer totalGoals) {
+        this.totalGoals = totalGoals;
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Use <code>@AccessorsStyle</code> to configure the custom prefixes. In this case no prefix.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Define getters and setters without prefixes.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Using <code>@AccessorsStyle</code> will tell Micronaut how to access getters and setters and will also generate the appropriate Open API spec.</p>
 </div>
 
 <h1 id="mergingSchemas"><a class="anchor" href="#mergingSchemas"></a>13 Merging Schemas</h1>
