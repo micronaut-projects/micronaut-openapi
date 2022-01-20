@@ -723,33 +723,36 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
 
     private void readResponse(MethodElement element, VisitorContext context, OpenAPI openAPI,
                               io.swagger.v3.oas.models.Operation swaggerOperation, JavadocDescription javadocDescription) {
-        HttpStatus methodResponseStatus = element.enumValue(Status.class, HttpStatus.class).orElse(HttpStatus.OK);
-        String responseCode = String.valueOf(methodResponseStatus.getCode());
-        ApiResponses responses = swaggerOperation.getResponses();
-        ApiResponse response = null;
+        // @ApiResponse takes precedence
+        if (swaggerOperation.getResponses() == null) {
+            HttpStatus methodResponseStatus = element.enumValue(Status.class, HttpStatus.class).orElse(HttpStatus.OK);
+            String responseCode = String.valueOf(methodResponseStatus.getCode());
+            ApiResponses responses = swaggerOperation.getResponses();
+            ApiResponse response = null;
 
-        if (responses == null) {
-            responses = new ApiResponses();
-            swaggerOperation.setResponses(responses);
-        } else {
-            ApiResponse defaultResponse = responses.remove("default");
-            response = responses.get(responseCode);
-            if (response == null && defaultResponse != null) {
-                response = defaultResponse;
-                responses.put(responseCode, response);
-            }
-        }
-        if (response == null) {
-            response = new ApiResponse();
-            if (javadocDescription == null) {
-                response.setDescription(swaggerOperation.getOperationId() + " " + responseCode + " response");
+            if (responses == null) {
+                responses = new ApiResponses();
+                swaggerOperation.setResponses(responses);
             } else {
-                response.setDescription(javadocDescription.getReturnDescription());
+                ApiResponse defaultResponse = responses.remove("default");
+                response = responses.get(responseCode);
+                if (response == null && defaultResponse != null) {
+                    response = defaultResponse;
+                    responses.put(responseCode, response);
+                }
             }
-            addResponseContent(element, context, openAPI, response);
-            responses.put(responseCode, response);
-        } else if (response.getContent() == null) {
-            addResponseContent(element, context, openAPI, response);
+            if (response == null) {
+                response = new ApiResponse();
+                if (javadocDescription == null) {
+                    response.setDescription(swaggerOperation.getOperationId() + " " + responseCode + " response");
+                } else {
+                    response.setDescription(javadocDescription.getReturnDescription());
+                }
+                addResponseContent(element, context, openAPI, response);
+                responses.put(responseCode, response);
+            } else if (response.getContent() == null) {
+                addResponseContent(element, context, openAPI, response);
+            }
         }
     }
 
@@ -973,7 +976,7 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
             for (AnnotationValue<io.swagger.v3.oas.annotations.responses.ApiResponse> r : responseAnnotations) {
                 Optional<ApiResponse> newResponse = toValue(r.getValues(), context, ApiResponse.class);
                 newResponse.ifPresent(apiResponse ->
-                        apiResponses.put(r.get("responseCode", String.class).orElse("default"), apiResponse));
+                        apiResponses.put(r.get("responseCode", String.class).orElse("200"), apiResponse));
             }
             swaggerOperation.setResponses(apiResponses);
         }

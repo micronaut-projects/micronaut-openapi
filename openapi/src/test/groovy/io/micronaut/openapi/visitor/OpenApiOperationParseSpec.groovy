@@ -307,7 +307,6 @@ class MyBean {}
 
     }
 
-
     void "test parse the OpenAPI @Operation annotation with tags and security defined as annotations"() {
         given:
         buildBeanDefinition('test.MyBean', '''
@@ -382,44 +381,38 @@ class MyBean {}
 
 package test;
 
+import io.micronaut.http.annotation.*;
 import io.swagger.v3.oas.annotations.*;
 import io.swagger.v3.oas.annotations.extensions.*;
+import io.swagger.v3.oas.annotations.media.*;
 import io.swagger.v3.oas.annotations.parameters.*;
 import io.swagger.v3.oas.annotations.responses.*;
 import io.swagger.v3.oas.annotations.security.*;
-import io.swagger.v3.oas.annotations.media.*;
-import io.swagger.v3.oas.annotations.enums.*;
-import io.micronaut.http.annotation.*;
-import java.util.List;
 
 @Controller("/")
 class MyController {
 
-  @Put
-  @Consumes("application/json")
-  @Operation(summary = "Update an existing pet",
-          tags = {"pets"},
-          security = @SecurityRequirement(
-                                  name = "petstore-auth",
-                                  scopes = "write:pets")
+    @Put
+    @Consumes("application/json")
+    @Operation(summary = "Update an existing pet",
+            tags = {"pets"},
+            security = @SecurityRequirement(name = "petstore-auth", scopes = "write:pets")
     )
     @ApiResponse(
-                     content = @Content(mediaType = "application/json",
-                             schema = @Schema(implementation = Pet.class)),
-        extensions = @Extension(
-            name = "custom",
-            properties = {
-                    @ExtensionProperty(name = "prop1", value = "prop1Val"),
-                    @ExtensionProperty(name = "prop1", value = "prop1Val")
-             }
-        ))
-      @ApiResponse(responseCode = "400", description = "Invalid ID supplied")
-      @ApiResponse(responseCode = "404", description = "Pet not found")
-      @ApiResponse(responseCode = "405", description = "Validation exception")
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = Pet.class)),
+            extensions = @Extension(
+                    name = "custom",
+                    properties = {
+                            @ExtensionProperty(name = "prop1", value = "prop1Val"),
+                            @ExtensionProperty(name = "prop1", value = "prop1Val")
+                    }
+            ))
+    @ApiResponse(responseCode = "400", description = "Invalid ID supplied")
+    @ApiResponse(responseCode = "404", description = "Pet not found")
+    @ApiResponse(responseCode = "405", description = "Validation exception")
     public Response updatePet(
-      @RequestBody(description = "Pet object that needs to be added to the store", required = true,
-                              content = @Content(
-                                      schema = @Schema(implementation = Pet.class))) Pet pet) {
+            @RequestBody(description = "Pet object that needs to be added to the store", required = true,
+                    content = @Content( schema = @Schema(implementation = Pet.class))) Pet pet) {
         return null;
     }
 }
