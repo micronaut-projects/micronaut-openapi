@@ -7,11 +7,11 @@ import io.swagger.v3.oas.models.media.ArraySchema
 import io.swagger.v3.oas.models.media.BinarySchema
 import io.swagger.v3.oas.models.media.ObjectSchema
 import io.swagger.v3.oas.models.parameters.RequestBody
+import spock.lang.Issue
 
 class OpenApiFileUploadBodyParameterSpec extends AbstractOpenApiTypeElementSpec {
 
     void "test parse the OpenAPI for file upload"() {
-
         when:
         buildBeanDefinition('test.MyBean', '''
 package test;
@@ -173,11 +173,60 @@ class MyBean {}
         requestBody.content['multipart/form-data'].schema.properties['files']
         requestBody.content['multipart/form-data'].schema.properties['files'] instanceof ArraySchema
         requestBody.content['multipart/form-data'].schema.properties['files'].description == 'List of Files.'
-        requestBody.content['multipart/form-data'].schema.properties['files'].items  instanceof BinarySchema
+        requestBody.content['multipart/form-data'].schema.properties['files'].items instanceof BinarySchema
 
         expect:
         operation
         operation.responses.size() == 1
+    }
+
+    @Issue("https://github.com/micronaut-projects/micronaut-openapi/issues/443")
+    void "test multipart upload with @Part and CompletedFileUpload"() {
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import jakarta.inject.Singleton;
+
+import io.micronaut.http.*;
+import io.micronaut.http.annotation.*;
+import io.micronaut.http.multipart.*;
+
+@Controller("/docs")
+class DocTestController {
+
+    @Post(consumes = MediaType.MULTIPART_FORM_DATA)
+    public HttpResponse<String> postMultipartForm(@Part("part") CompletedFileUpload completedFileUpload) {
+        return HttpResponse.created("You did it!");
+    }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+
+        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+
+        then:
+        openAPI
+        openAPI.paths.size() == 1
+
+        when:
+        Operation operation = openAPI.paths?.get("/docs")?.post
+        RequestBody requestBody = operation.requestBody
+
+        then:
+        requestBody.required
+        requestBody.content
+        requestBody.content.size() == 1
+        requestBody.content['multipart/form-data'].schema
+        requestBody.content['multipart/form-data'].schema instanceof ObjectSchema
+
+        and: 'the  @Part value is used instead of the parameter name'
+        requestBody.content['multipart/form-data'].schema.properties['part']
+        requestBody.content['multipart/form-data'].schema.properties['part'] instanceof BinarySchema
+        requestBody.content['multipart/form-data'].schema.properties['part'].type == 'string'
+        requestBody.content['multipart/form-data'].schema.properties['part'].format == 'binary'
     }
 
 }

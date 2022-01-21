@@ -575,6 +575,8 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
             String queryVar = parameter.getValue(QueryValue.class, String.class).orElse(parameterName);
             newParameter = new QueryParameter();
             newParameter.setName(queryVar);
+        } else if (parameter.isAnnotationPresent(Part.class) && permitsRequestBody) {
+            extraBodyParameters.add(parameter);
         } else if (parameter.hasAnnotation("io.micronaut.management.endpoint.annotation.Selector")) {
             newParameter = new PathParameter();
             newParameter.setName(parameterName);
