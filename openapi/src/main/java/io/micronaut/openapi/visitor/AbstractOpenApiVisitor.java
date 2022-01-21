@@ -38,6 +38,7 @@ import io.micronaut.core.util.ArrayUtils;
 import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.core.util.StringUtils;
 import io.micronaut.http.MediaType;
+import io.micronaut.http.annotation.Part;
 import io.micronaut.http.server.types.files.FileCustomizableResponseType;
 import io.micronaut.http.uri.UriMatchTemplate;
 import io.micronaut.inject.ast.ClassElement;
@@ -946,6 +947,7 @@ abstract class AbstractOpenApiVisitor  {
             }
 
             element.findAnnotation(Pattern.class).flatMap(p -> p.get("regexp", String.class)).ifPresent(finalSchemaToBind::setPattern);
+            element.getValue(Part.class, String.class).ifPresent(finalSchemaToBind::setName);
         }
 
         setSchemaDocumentation(element, schemaToBind);
