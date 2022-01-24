@@ -16,7 +16,7 @@ dependencies {
     testImplementation 'io.projectreactor:reactor-core'
     testImplementation "io.micronaut.beanvalidation:micronaut-hibernate-validator"
     testCompileOnly "io.micronaut:micronaut-inject-groovy"
-    testImplementation "org.testcontainers:spock:1.16.2"
+    testImplementation "org.testcontainers:spock:1.16.3"
     testImplementation("org.spockframework:spock-core") {
         exclude group: "org.codehaus.groovy", module: "groovy-all"
     }
