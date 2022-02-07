@@ -725,8 +725,7 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
 
     private void readResponse(MethodElement element, VisitorContext context, OpenAPI openAPI,
                               io.swagger.v3.oas.models.Operation swaggerOperation, JavadocDescription javadocDescription) {
-        // @ApiResponse takes precedence
-        if (swaggerOperation.getResponses() == null) {
+
             HttpStatus methodResponseStatus = element.enumValue(Status.class, HttpStatus.class).orElse(HttpStatus.OK);
             String responseCode = String.valueOf(methodResponseStatus.getCode());
             ApiResponses responses = swaggerOperation.getResponses();
@@ -743,7 +742,7 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
                     responses.put(responseCode, response);
                 }
             }
-            if (response == null) {
+            if (response == null && responses.isEmpty()) {
                 response = new ApiResponse();
                 if (javadocDescription == null) {
                     response.setDescription(swaggerOperation.getOperationId() + " " + responseCode + " response");
@@ -752,10 +751,9 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
                 }
                 addResponseContent(element, context, openAPI, response);
                 responses.put(responseCode, response);
-            } else if (response.getContent() == null) {
+            } else if (response != null && response.getContent() == null) {
                 addResponseContent(element, context, openAPI, response);
             }
-        }
     }
 
     private void addResponseContent(MethodElement element, VisitorContext context, OpenAPI openAPI, ApiResponse response) {
@@ -978,7 +976,7 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
             for (AnnotationValue<io.swagger.v3.oas.annotations.responses.ApiResponse> r : responseAnnotations) {
                 Optional<ApiResponse> newResponse = toValue(r.getValues(), context, ApiResponse.class);
                 newResponse.ifPresent(apiResponse ->
-                        apiResponses.put(r.get("responseCode", String.class).orElse("200"), apiResponse));
+                        apiResponses.put(r.get("responseCode", String.class).orElse("default"), apiResponse));
             }
             swaggerOperation.setResponses(apiResponses);
         }
