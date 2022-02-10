@@ -175,8 +175,10 @@ class MyBean {}
         expect:
             Schema testImpl1 = schemas.get("TestImpl1")
             Schema woopsieRef = testImpl1.getProperties()["woopsie"]
-            woopsieRef
-            woopsieRef.$ref == "#/components/schemas/woopsie-id"
+
+            woopsieRef instanceof ComposedSchema
+            ((ComposedSchema) woopsieRef).allOf[0].$ref == "#/components/schemas/woopsie-id"
+            ((ComposedSchema) woopsieRef).allOf[1].description == "woopsie doopsie"
             Schema woopsie = schemas.get("woopsie-id")
             woopsie.description == "woopsie doopsie"
     }

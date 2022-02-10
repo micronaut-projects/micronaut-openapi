@@ -799,6 +799,7 @@ abstract class AbstractOpenApiVisitor  {
                 final boolean required = hasElementSchemaRequired(element).orElseGet(() -> isElementNotNullable(element, classElement));
                 propertySchema = bindSchemaForElement(context, element, elementType, propertySchema);
                 String propertyName = resolvePropertyName(element, classElement, propertySchema);
+                propertySchema.setRequired(null);
                 addProperty(parentSchema, propertyName, propertySchema, required);
             }
         }
@@ -885,6 +886,12 @@ abstract class AbstractOpenApiVisitor  {
         Schema originalSchema = schemaToBind;
         if (originalSchema.get$ref() != null) {
             schemaToBind = new Schema();
+            if (schemaAnn != null) {
+                Optional<String> schemaDescription = schemaAnn.get("description", String.class);
+                if (schemaDescription.isPresent()) {
+                    schemaToBind.setDescription(schemaDescription.get());
+                }
+            }
         }
         if (originalSchema.get$ref() == null && schemaAnn != null) {
             // Apply @Schema annotation only if not $ref since for $ref schemas
@@ -960,7 +967,7 @@ abstract class AbstractOpenApiVisitor  {
         }
         // @Schema annotation takes priority over nullability annotations
         Boolean isSchemaNullable = element.booleanValue(io.swagger.v3.oas.annotations.media.Schema.class, "nullable").orElse(null);
-        if ((isSchemaNullable == null && element.isNullable()) || (Boolean.TRUE.equals(isSchemaNullable) && element.isNullable())) {
+        if ((isSchemaNullable == null && element.isNullable()) || Boolean.TRUE.equals(isSchemaNullable)) {
             schemaToBind.setNullable(true);
         }
         final String defaultJacksonValue = element.stringValue(JsonProperty.class, "defaultValue").orElse(null);
@@ -1244,6 +1251,17 @@ abstract class AbstractOpenApiVisitor  {
                 inProgressSchemas.add(schemaName);
                 try {
                     schema = readSchema(schemaValue, openAPI, context, type, mediaTypes);
+                    AnnotationValue<io.swagger.v3.oas.annotations.media.Schema> typeSchema = type.getDeclaredAnnotation(io.swagger.v3.oas.annotations.media.Schema.class);
+                    if (typeSchema != null) {
+                        Schema originalTypeSchema = readSchema(typeSchema, openAPI, context, type, mediaTypes);
+
+                        if (originalTypeSchema.getDescription() != null && !originalTypeSchema.getDescription().isEmpty()) {
+                            schema.setDescription(originalTypeSchema.getDescription());
+                        }
+                        schema.setNullable(originalTypeSchema.getNullable());
+                        schema.setRequired(originalTypeSchema.getRequired());
+                    }
+
                     if (schema != null) {
                         schema.setName(schemaName);
                         schemas.put(schemaName, schema);
