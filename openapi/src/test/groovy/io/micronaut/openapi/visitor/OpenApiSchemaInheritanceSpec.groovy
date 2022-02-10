@@ -6,6 +6,7 @@ import io.swagger.v3.oas.models.Operation
 import io.swagger.v3.oas.models.media.ComposedSchema
 import io.swagger.v3.oas.models.media.Schema
 import io.swagger.v3.oas.models.parameters.RequestBody
+import spock.lang.IgnoreIf
 import spock.lang.Issue
 
 class OpenApiSchemaInheritanceSpec extends AbstractOpenApiTypeElementSpec {
@@ -435,6 +436,7 @@ class MyBean {}
             ((ComposedSchema) vehicle).oneOf[1].$ref == '#/components/schemas/Bike'
     }
 
+    @IgnoreIf({ !jvm.isJava16Compatible() })
     @Issue("https://github.com/micronaut-projects/micronaut-openapi/issues/659")
     void "test OpenAPI proper inheritance of nullable, description and required attributes"() {
         given:
