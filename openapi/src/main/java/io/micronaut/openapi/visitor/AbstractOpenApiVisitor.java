@@ -372,7 +372,7 @@ abstract class AbstractOpenApiVisitor  {
                                 Map responses = new LinkedHashMap();
                                 for (Object o : a) {
                                     AnnotationValue<ApiResponse> sv = (AnnotationValue<ApiResponse>) o;
-                                    String name = sv.get("responseCode", String.class).orElse("200");
+                                    String name = sv.get("responseCode", String.class).orElse("default");
                                     Map<CharSequence, Object> map = toValueMap(sv.getValues(), context);
                                     responses.put(name, map);
                                 }

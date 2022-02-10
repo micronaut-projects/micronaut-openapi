@@ -2228,4 +2228,66 @@ class MyBean {}
         helloWorld.get.responses['200'].content['text/plain'].schema
         helloWorld.get.responses['200'].content['text/plain'].schema.type == 'string'
     }
+
+    @Issue("https://github.com/micronaut-projects/micronaut-openapi/issues/656")
+    void "@ApiResponse status 200 properly display content with multiple annotations"() {
+        given:
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.http.*;
+import io.micronaut.http.annotation.*;
+import io.swagger.v3.oas.annotations.*;
+import io.swagger.v3.oas.annotations.responses.*;
+import java.net.URI;
+
+@Controller
+class RootController {
+
+    @Get
+    @ApiResponse(responseCode = "200", description = "A friendly greeting")
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+    public Greeting home() {
+        return new Greeting("A friendly greeting!");
+    }
 }
+
+class Greeting {
+    private final String content;
+
+    public Greeting(String content) {
+        this.content = content;
+    }
+
+    public String getContent() {
+        return content;
+    }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        then:
+        AbstractOpenApiVisitor.testReference != null
+
+        when:
+        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+
+        then: 'both 200 and 500 response because both have @ApiResponse'
+        openAPI.paths.size() == 1
+        PathItem root = openAPI.paths.get('/')
+        root.get.operationId == 'home'
+        root.get.responses.size() == 2
+        root.get.responses['200']
+        root.get.responses['200'].description == 'A friendly greeting'
+        root.get.responses['200'].content['application/json'].schema
+        root.get.responses['200'].content['application/json'].schema.$ref == '#/components/schemas/Greeting'
+
+        root.get.responses['500']
+        root.get.responses['500'].description == 'Internal server error'
+        root.get.responses['500'].content == null
+    }
+
+}
+
