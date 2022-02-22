@@ -287,8 +287,7 @@
     &lt;/path&gt;
 &lt;/annotationProcessorPaths&gt;</code></pre>
 </div>
-</div>
-</p>
+</div></p>
 </div>
 <div class="admonitionblock note">
 <table>
@@ -319,8 +318,7 @@ For Kotlin the <code>openapi</code> dependency should be in the <code>kapt</code
     &lt;artifactId&gt;swagger-annotations&lt;/artifactId&gt;
 &lt;/dependency&gt;</code></pre>
 </div>
-</div>
-</p>
+</div></p>
 </div>
 
 <h1 id="openApiDefinition"><a class="anchor" href="#openApiDefinition"></a>5 OpenAPI Definition</h1>
@@ -336,8 +334,9 @@ For Kotlin the <code>openapi</code> dependency should be in the <code>kapt</code
 <p>Once dependencies have been configured a minimum requirement is to add a <code>@OpenAPIDefinition</code> annotation to your <code>Application</code> class:</p>
 </div>
 <div class="listingblock multi-language-sample">
+<div class="title">Example @OpenAPIDefinition usage</div>
 <div class="content">
-<pre class="highlight"><code class="language-java" data-lang="java">import io.micronaut.runtime.Micronaut;
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import io.micronaut.runtime.Micronaut;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.info.Contact;
 import io.swagger.v3.oas.annotations.info.Info;
@@ -362,8 +361,9 @@ public class Application {
 </div>
 </div>
 <div class="listingblock multi-language-sample">
+<div class="title">Example @OpenAPIDefinition usage</div>
 <div class="content">
-<pre class="highlight"><code class="language-groovy" data-lang="groovy">import io.swagger.v3.oas.annotations.OpenAPIDefinition
+<pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">import io.swagger.v3.oas.annotations.OpenAPIDefinition
 import io.swagger.v3.oas.annotations.info.Contact
 import io.swagger.v3.oas.annotations.info.Info
 import io.swagger.v3.oas.annotations.info.License
@@ -386,8 +386,9 @@ class Application {
 </div>
 </div>
 <div class="listingblock multi-language-sample">
+<div class="title">Example @OpenAPIDefinition usage</div>
 <div class="content">
-<pre class="highlight"><code class="language-kotlin" data-lang="kotlin">import io.micronaut.runtime.Micronaut
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">import io.micronaut.runtime.Micronaut
 import io.swagger.v3.oas.annotations.OpenAPIDefinition
 import io.swagger.v3.oas.annotations.info.Contact
 import io.swagger.v3.oas.annotations.info.Info
@@ -477,7 +478,7 @@ info:
 <div class="listingblock">
 <div class="title">openapi.properties Example</div>
 <div class="content">
-<pre class="highlightjs highlight"><code>micronaut.openapi.property.naming.strategy=KEBAB_CASE
+<pre class="highlightjs highlight"><code class="language-none hljs">micronaut.openapi.property.naming.strategy=KEBAB_CASE
 micronaut.openapi.target.file=myspecfile.yml
 ...
 ..
@@ -490,7 +491,7 @@ micronaut.openapi.target.file=myspecfile.yml
 <div class="listingblock">
 <div class="title">openapi.properties Property Resolution</div>
 <div class="content">
-<pre class="highlightjs highlight"><code>micronaut.openapi.expand.api.version=v1.1
+<pre class="highlightjs highlight"><code class="language-none hljs">micronaut.openapi.expand.api.version=v1.1
 micronaut.openapi.expand.openapi.description=A nice API</code></pre>
 </div>
 </div>
@@ -635,85 +636,7 @@ info:
 <div class="paragraph">
 <p>By default Micronaut will automatically at compile time build out the Swagger YAML definition from your defined controllers and methods. For example given the following class:</p>
 </div>
-<div class="listingblock multi-language-sample">
-<div class="content">
-<pre class="highlight"><code class="language-java" data-lang="java">import io.micronaut.http.MediaType;
-import io.micronaut.http.annotation.Controller;
-import io.micronaut.http.annotation.Get;
-import reactor.core.publisher.Mono;
 
-
-@Controller("/")
-public class HelloController {
-
-    /**
-     * @param name The person's name
-     * @return The greeting
-     */
-    @Get(uri = "/hello/{name}", produces = MediaType.TEXT_PLAIN)
-    public Mono&lt;String&gt; index(String name) {
-        return Mono.just("Hello " + name + "!");
-    }
-}</code></pre>
-</div>
-</div>
-<div class="listingblock multi-language-sample">
-<div class="content">
-<pre class="highlight"><code class="language-groovy" data-lang="groovy">import io.micronaut.http.MediaType
-
-import io.micronaut.http.annotation.Controller
-import io.micronaut.http.annotation.Get
-import reactor.core.publisher.Mono
-
-@Controller("/")
-class HelloController {
-
-    /**
-     * @param name The person's name
-     * @return The greeting
-     */
-    @Get(uri = "/hello/{name}", produces = MediaType.TEXT_PLAIN)
-    Mono&lt;String&gt; index(String name) {
-        return Single.just("Hello $name!")
-    }
-}
-
-@Controller("/")
-class HelloController {
-
-    /**
-     * @param name The person's name
-     * @return The greeting
-     */
-    @Get(uri = "/hello/{name}", produces = MediaType.TEXT_PLAIN)
-    Mono&lt;String&gt; index(String name) {
-        return Single.just("Hello $name!")
-    }
-}</code></pre>
-</div>
-</div>
-<div class="listingblock multi-language-sample">
-<div class="content">
-<pre class="highlight"><code class="language-kotlin" data-lang="kotlin">import io.micronaut.http.MediaType
-import io.micronaut.http.annotation.Controller
-import io.micronaut.http.annotation.Get
-import reactor.core.publisher.Mono
-
-
-@Controller("/")
-open class HelloController {
-
-    /**
-     * @param name The person's name
-     * @return The greeting
-     */
-    @Get(uri = "/hello/{name}", produces = [MediaType.TEXT_PLAIN])
-    open fun index(name: String): Mono&lt;String&gt; {
-        return Mono.just("Hello $name!")
-    }
-}</code></pre>
-</div>
-</div>
 <div class="paragraph">
 <p>The resulting output will be:</p>
 </div>
@@ -819,115 +742,12 @@ the following <strong>jackson</strong>'s <code>PropertyNamingStrategy</code>:</p
     &lt;artifactId&gt;swagger-annotations&lt;/artifactId&gt;
 &lt;/dependency&gt;</code></pre>
 </div>
-</div>
-</p>
+</div></p>
 </div>
 <div class="paragraph">
 <p>and then annotate your controllers:</p>
 </div>
-<div class="listingblock multi-language-sample">
-<div class="content">
-<pre class="highlight"><code class="language-java" data-lang="java">import io.micronaut.http.MediaType;
-import io.micronaut.http.annotation.Controller;
-import io.micronaut.http.annotation.Get;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.tags.Tag;
 
-import javax.validation.constraints.NotBlank;
-import reactor.core.publisher.Mono;
-
-
-@Controller("/")
-public class HelloController {
-
-    /**
-     * @param name The person's name
-     * @return The greeting message
-     */
-    @Get(uri="/greetings/{name}", produces= MediaType.TEXT_PLAIN)
-    @Operation(summary = "Greets a person",
-            description = "A friendly greeting is returned"
-    )
-    @ApiResponse(
-            content = @Content(mediaType = "text/plain",
-                    schema = @Schema(type="string"))
-    )
-    @ApiResponse(responseCode = "400", description = "Invalid Name Supplied")
-    @ApiResponse(responseCode = "404", description = "Person not found")
-    @Tag(name = "greeting")
-    public Mono&lt;String&gt; greetings(@Parameter(description="The name of the person") @NotBlank String name) {
-        return Mono.just("Hello " + name + ", How are you doing?");
-    }
-}</code></pre>
-</div>
-</div>
-<div class="listingblock multi-language-sample">
-<div class="content">
-<pre class="highlight"><code class="language-groovy" data-lang="groovy">@Controller("/")
-class HelloController {
-
-    /**
-     * @param name The person's name
-     * @return The greeting message
-     */
-    @Get(uri="/greetings/{name}", produces= MediaType.TEXT_PLAIN)
-    @Operation(summary = "Greets a person",
-            description = "A friendly greeting is returned"
-    )
-    @ApiResponse(
-            content = @Content(mediaType = "text/plain",
-                    schema = @Schema(type="string"))
-    )
-    @ApiResponse(responseCode = "400", description = "Invalid Name Supplied")
-    @ApiResponse(responseCode = "404", description = "Person not found")
-    @Tag(name = "greeting")
-    Mono&lt;String&gt; greetings(@Parameter(description="The name of the person") @NotBlank String name) {
-        return Single.just("Hello $name, How are you doing?")
-    }
-}</code></pre>
-</div>
-</div>
-<div class="listingblock multi-language-sample">
-<div class="content">
-<pre class="highlight"><code class="language-kotlin" data-lang="kotlin">import io.micronaut.http.MediaType
-import io.micronaut.http.annotation.Controller
-import io.micronaut.http.annotation.Get
-import reactor.core.publisher.Mono
-import io.swagger.v3.oas.annotations.Operation
-import io.swagger.v3.oas.annotations.media.Content
-import io.swagger.v3.oas.annotations.media.Schema
-import io.swagger.v3.oas.annotations.responses.ApiResponse
-import io.swagger.v3.oas.annotations.responses.ApiResponses
-import io.swagger.v3.oas.annotations.tags.Tag
-
-
-@Controller("/")
-open class HelloController {
-
-    /**
-     * @param name The person's name
-     * @return The greeting message
-     */
-    @Get(uri = "/greetings/{name}", produces = [MediaType.TEXT_PLAIN])
-    @Operation(summary = "Greets a person", description = "A friendly greeting is returned")
-    // Please Note: Repeatable Annotations with non-SOURCE retentions are not yet supported with Kotlin so we are using `@ApiResponses`
-    // instead of `@ApiResponse`, see https://youtrack.jetbrains.com/issue/KT-12794
-    @ApiResponses(
-            ApiResponse(content = [Content(mediaType = "text/plain", schema = Schema(type = "string"))]),
-            ApiResponse(responseCode = "400", description = "Invalid Name Supplied"),
-            ApiResponse(responseCode = "404", description = "Person not found")
-    )
-    @Tag(name = "greeting")
-    open fun greetings(name: String): Mono&lt;String&gt; {
-        return Mono.just("Hello $name, how are you doing?")
-    }
-}</code></pre>
-</div>
-</div>
 <div class="paragraph">
 <p>The resulting output will be:</p>
 </div>
@@ -1333,8 +1153,7 @@ class Owner {
     &lt;/path&gt;
 &lt;/annotationProcessorPaths&gt;</code></pre>
 </div>
-</div>
-</p>
+</div></p>
 </div>
 <div class="paragraph">
 <p>        <div class="listingblock multi-language-sample">
@@ -1351,8 +1170,7 @@ class Owner {
     &lt;version&gt;4.0.1-SNAPSHOT&lt;/version&gt;
 &lt;/dependency&gt;</code></pre>
 </div>
-</div>
-</p>
+</div></p>
 </div>
 <div class="paragraph">
 <p>and declare them in the <a href="#propertiesFileConfiguration">openapi.properties</a> file:</p>
@@ -1496,8 +1314,7 @@ endpoints.refresh.security-requirements=[{"petstore_auth": ["write:pets", "read:
     &lt;version&gt;4.0.1-SNAPSHOT&lt;/version&gt;
 &lt;/dependency&gt;</code></pre>
 </div>
-</div>
-</p>
+</div></p>
 </div>
 
 <h2 id="openapiinclude"><a class="anchor" href="#openapiinclude"></a>12.1 @OpenAPIInclude</h2>
@@ -1900,7 +1717,7 @@ You can also use <a href="https://mrin9.github.io/RapiPdf/">RapiPdf</a> to gener
 <div class="listingblock">
 <div class="title">openapi.properties Example Views Generation Swagger-UI Redoc, Rapidoc</div>
 <div class="content">
-<pre class="highlightjs highlight"><code>swagger-ui.enabled=true
+<pre class="highlightjs highlight"><code class="language-none hljs">swagger-ui.enabled=true
 redoc.enabled=true
 rapidoc.enabled=true
 rapidoc.bg-color=#14191f
@@ -1933,7 +1750,7 @@ rapidoc.sort-endpoints-by=method
 <div class="listingblock">
 <div class="title">System Property</div>
 <div class="content">
-<pre class="highlightjs highlight"><code>micronaut.openapi.views.spec=redoc.enabled=true,rapidoc.enabled=true,swagger-ui.enabled=true,swagger-ui.theme=flattop</code></pre>
+<pre class="highlightjs highlight"><code class="language-none hljs">micronaut.openapi.views.spec=redoc.enabled=true,rapidoc.enabled=true,swagger-ui.enabled=true,swagger-ui.theme=flattop</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -2064,7 +1881,7 @@ rapidoc.sort-endpoints-by=method
 <div class="paragraph">
 <p>The views will be generated to the <code>META-INF/swagger/views/swagger-ui</code> directory of your project’s class output.</p>
 </div>
-<table class="tableblock frame-all grid-all spread">
+<table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 50%;">
 <col style="width: 50%;">
@@ -2196,7 +2013,7 @@ in the Swagger UI, the requests issued incorporate a valid token.</p>
 <div class="paragraph">
 <p>You can configure it by setting the following properties:</p>
 </div>
-<table class="tableblock frame-all grid-all spread">
+<table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 100%;">
 </colgroup>
@@ -2355,7 +2172,7 @@ public class OrderController {
 <div class="paragraph">
 <p>The views will be generated to the <code>META-INF/swagger/views/redoc</code> directory of your project’s class output.</p>
 </div>
-<table class="tableblock frame-all grid-all spread">
+<table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 50%;">
 <col style="width: 50%;">
@@ -2495,7 +2312,7 @@ public class OrderController {
 <div class="paragraph">
 <p>The views will be generated to the <code>META-INF/swagger/views/rapidoc</code> directory of your project’s class output.</p>
 </div>
-<table class="tableblock frame-all grid-all spread">
+<table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 50%;">
 <col style="width: 50%;">
@@ -2710,7 +2527,7 @@ public class OrderController {
 <div class="paragraph">
 <p>RapiPdf supports the following options:</p>
 </div>
-<table class="tableblock frame-all grid-all spread">
+<table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 50%;">
 <col style="width: 50%;">
