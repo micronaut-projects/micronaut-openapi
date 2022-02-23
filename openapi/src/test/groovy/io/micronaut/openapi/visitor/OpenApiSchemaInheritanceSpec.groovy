@@ -6,6 +6,8 @@ import io.swagger.v3.oas.models.Operation
 import io.swagger.v3.oas.models.media.ComposedSchema
 import io.swagger.v3.oas.models.media.Schema
 import io.swagger.v3.oas.models.parameters.RequestBody
+import spock.lang.IgnoreIf
+import spock.lang.Issue
 
 class OpenApiSchemaInheritanceSpec extends AbstractOpenApiTypeElementSpec {
 
@@ -264,8 +266,9 @@ class MyBean {}
         expect:
             Schema owner = schemas["Owner"]
             Schema vehicleRef = owner.getProperties()["vehicle"]
-            !(vehicleRef instanceof ComposedSchema)
-            vehicleRef.$ref == "#/components/schemas/Vehicle"
+            vehicleRef instanceof ComposedSchema
+            ((ComposedSchema) vehicleRef).allOf[0].$ref == "#/components/schemas/Vehicle"
+            ((ComposedSchema) vehicleRef).allOf[1].description == "Vehicle of the owner. Here a car or bike with a name"
             Schema vehicle = schemas["Vehicle"]
             vehicle instanceof ComposedSchema
             ((ComposedSchema) vehicle).oneOf[0].$ref == '#/components/schemas/Car'
@@ -341,8 +344,9 @@ class MyBean {}
         expect:
             Schema owner = schemas["Owner"]
             Schema vehicleRef = owner.getProperties()["vehicle"]
-            !(vehicleRef instanceof ComposedSchema)
-            vehicleRef.$ref == "#/components/schemas/Owner.Vehicle"
+            vehicleRef instanceof ComposedSchema
+            ((ComposedSchema) vehicleRef).allOf[0].$ref == "#/components/schemas/Owner.Vehicle"
+            ((ComposedSchema) vehicleRef).allOf[1].description == "Vehicle of the owner. Here a car or bike with a name"
             Schema ownerVehicle = schemas["Owner.Vehicle"]
             ((ComposedSchema) ownerVehicle).oneOf[0].$ref == '#/components/schemas/Car'
             ((ComposedSchema) ownerVehicle).oneOf[1].$ref == '#/components/schemas/Bike'
@@ -430,6 +434,129 @@ class MyBean {}
             vehicle instanceof ComposedSchema
             ((ComposedSchema) vehicle).oneOf[0].$ref == '#/components/schemas/Car'
             ((ComposedSchema) vehicle).oneOf[1].$ref == '#/components/schemas/Bike'
+    }
+
+    @IgnoreIf({ !jvm.isJava16Compatible() })
+    @Issue("https://github.com/micronaut-projects/micronaut-openapi/issues/659")
+    void "test OpenAPI proper inheritance of nullable, description and required attributes"() {
+        given:
+        buildBeanDefinition('test.MyBean', '''
+
+package test;
+
+import io.swagger.v3.oas.annotations.*;
+import io.swagger.v3.oas.annotations.parameters.*;
+import io.swagger.v3.oas.annotations.responses.*;
+import io.swagger.v3.oas.annotations.security.*;
+import io.swagger.v3.oas.annotations.media.*;
+import io.swagger.v3.oas.annotations.enums.*;
+import io.swagger.v3.oas.annotations.links.*;
+import io.micronaut.http.annotation.*;
+import io.micronaut.core.annotation.*;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.List;
+
+@Introspected
+@Schema(description = "Schema that represents the possible email protocols for sending emails")
+enum EmailSendProtocolDto {
+    SMTP,
+    SMTP_SSL,
+    SMTP_STARTTLS
+}
+
+@Introspected
+@Schema(description = "Schema that represents the current email settings")
+record ReadEmailSettingsDto(
+
+        @Schema(description = "Flag that indicates whether the email sending is active or not. If set to false, all other values are null", required = true)
+        Boolean active,
+
+        @Schema(description = "Hostname or IP of the email server or null if email sending is disabled", required = true, nullable = true)
+        String hostname,
+
+        @Schema(description = "Port of the email server or null if email sending is disabled", required = true, nullable = true)
+        Integer port,
+
+        @Schema(description = "Protocol used for the connection or null if email sending is disabled", required = true, nullable = true)
+        EmailSendProtocolDto protocol,
+
+        @Schema(description = "Email username to login or null if email sending is disabled", required = true, nullable = true)
+        String username,
+
+        @Schema(description = "Plaintext password for the email user to login in or null if email sending is disabled", required = true, nullable = true)
+        String plaintextPassword,
+
+        @Schema(description = "Sender email address that is used to send emails or null if email sending is disabled", required = true, nullable = true)
+        String senderEmail
+) {
+}
+
+@Introspected
+@Schema(description = "Schema that represents an existing email output location")
+record ReadEmailOutputLocationDto(
+
+        // Snipped a lot of attributes. Class doesn't make any sense for outstanders
+
+        @Schema(description = "Protocol used for the connection", required = true)
+        EmailSendProtocolDto protocol
+) {
+}
+
+@Controller("/api")
+class EmailController {
+
+    /**
+     * Get the email settings.
+     *
+     * @return Email settings
+     * @throws Exception Exception in case of invalid data or an issue with reading the settings
+     */
+    @Get("/email/settings")
+    public ReadEmailSettingsDto getEmailSettings(){
+        return null;
+    }
+
+    /**
+     * Get the email output location.
+     *
+     * @return Email output location
+     * @throws Exception Exception in case of invalid data or an issue with reading the settings
+     */
+    @Get("/email/output")
+    public ReadEmailOutputLocationDto getEmailOutputLocation() {
+        return null;
+    }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+
+        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        Map<String, Schema> schemas = openAPI.getComponents().getSchemas()
+
+        expect:
+        Schema EmailSendProtocolDtoSchema = schemas["EmailSendProtocolDto"]
+
+        EmailSendProtocolDtoSchema.description == "Schema that represents the possible email protocols for sending emails"
+        !EmailSendProtocolDtoSchema.nullable
+        !EmailSendProtocolDtoSchema.required
+
+        schemas["ReadEmailOutputLocationDto"].required.containsAll(["protocol"])
+        Schema emailSendProtocolDtoSchemaFromReadEmailOutputLocationDto = schemas["ReadEmailOutputLocationDto"].getProperties()["protocol"]
+        emailSendProtocolDtoSchemaFromReadEmailOutputLocationDto instanceof ComposedSchema
+        ((ComposedSchema) emailSendProtocolDtoSchemaFromReadEmailOutputLocationDto).allOf[0].$ref == "#/components/schemas/EmailSendProtocolDto"
+        ((ComposedSchema) emailSendProtocolDtoSchemaFromReadEmailOutputLocationDto).allOf[1].description == "Protocol used for the connection"
+        !((ComposedSchema) emailSendProtocolDtoSchemaFromReadEmailOutputLocationDto).allOf[1].nullable
+        !((ComposedSchema) emailSendProtocolDtoSchemaFromReadEmailOutputLocationDto).allOf[1].required
+
+        schemas["ReadEmailSettingsDto"].required.containsAll(["protocol", "active", "hostname", "port", "senderEmail", "username", "plaintextPassword"])
+        Schema emailSendProtocolDtoSchemaFromReadEmailSettingsDto = schemas["ReadEmailSettingsDto"].getProperties()["protocol"]
+        emailSendProtocolDtoSchemaFromReadEmailSettingsDto instanceof ComposedSchema
+        ((ComposedSchema) emailSendProtocolDtoSchemaFromReadEmailSettingsDto).allOf[0].$ref == "#/components/schemas/EmailSendProtocolDto"
+        ((ComposedSchema) emailSendProtocolDtoSchemaFromReadEmailSettingsDto).allOf[1].description == "Protocol used for the connection or null if email sending is disabled"
+        ((ComposedSchema) emailSendProtocolDtoSchemaFromReadEmailSettingsDto).allOf[1].nullable
+        !((ComposedSchema) emailSendProtocolDtoSchemaFromReadEmailSettingsDto).allOf[1].required
     }
 
 }
