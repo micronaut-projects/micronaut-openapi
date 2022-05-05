@@ -1,0 +1,47 @@
+[versions]
+awaitility = "4.1.1"
+jakarta-inject-api = "2.0.1"
+junit = "5.7.2"
+kotlintest-runner-junit5 = "3.4.2"
+spock = "2.0-groovy-3.0"
+swagger = "2.1.13"
+rxjava2 = "2.2.21"
+rxjava3 = "3.1.3"
+
+# Micronaut
+micronaut = "3.4.3"
+micronaut-docs = "2.0.0"
+
+
+[libraries]
+# BOMs
+boms-micronaut = { module = "io.micronaut:micronaut-bom", version.ref = "micronaut" }
+
+# Micronaut
+micronaut-docs-asciidoc-config-props = { module = "io.micronaut.docs:micronaut-docs-asciidoc-config-props", version.ref = "micronaut-docs" }
+micronaut-hibernate-validator = { module = "io.micronaut.beanvalidation:micronaut-hibernate-validator" }
+micronaut-http = { module = "io.micronaut:micronaut-http" }
+micronaut-http-server = { module = "io.micronaut:micronaut-http-server" }
+micronaut-inject-groovy = { module = "io.micronaut:micronaut-inject-groovy" }
+micronaut-inject-groovy-test = { module = "io.micronaut:micronaut-inject-groovy-test" }
+micronaut-inject-java = { module = "io.micronaut:micronaut-inject-java" }
+micronaut-inject-java-test = { module = "io.micronaut:micronaut-inject-java-test" }
+micronaut-management = { module = "io.micronaut:micronaut-management" }
+micronaut-runtime = { module = "io.micronaut:micronaut-runtime" }
+micronaut-runtime-groovy = { module = "io.micronaut.groovy:micronaut-runtime-groovy" }
+micronaut-security = { module = "io.micronaut.security:micronaut-security" }
+micronaut-validation = { module = "io.micronaut:micronaut-validation" }
+
+awaitility = { module = "org.awaitility:awaitility", version.ref = "awaitility" }
+jakarta-inject-api = { module = "jakarta.inject:jakarta.inject-api", version.ref = "jakarta-inject-api" }
+junit-jupiter-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit" }
+junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit" }
+kotlintest-runner-junit5 = { module = "io.kotlintest:kotlintest-runner-junit5", version.ref = "kotlintest-runner-junit5" }
+logback-classic = { module = "ch.qos.logback:logback-classic" }
+reactor-core = { module = "io.projectreactor:reactor-core" }
+spock-core = { module = "org.spockframework:spock-core", version.ref = "spock" }
+swagger-annotations = { module = "io.swagger.core.v3:swagger-annotations", version.ref = "swagger" }
+swagger-core = { module = "io.swagger.core.v3:swagger-core", version.ref = "swagger" }
+swagger-models = { module = "io.swagger.core.v3:swagger-models", version.ref = "swagger" }
+rxjava2 = { module = "io.reactivex.rxjava2:rxjava", version.ref = "rxjava2" }
+rxjava3 = { module = "io.reactivex.rxjava3:rxjava", version.ref = "rxjava3" }

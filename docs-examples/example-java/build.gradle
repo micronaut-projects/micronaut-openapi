@@ -8,18 +8,18 @@ repositories {
 
 dependencies {
     testImplementation project(":openapi")
-    testImplementation platform("io.micronaut:micronaut-bom:$micronautVersion")
-    testImplementation "io.micronaut:micronaut-runtime"
-    testImplementation "io.micronaut:micronaut-inject-java"
-    testImplementation "io.micronaut:micronaut-validation"
-    testImplementation "io.swagger.core.v3:swagger-annotations"
-    testImplementation 'io.projectreactor:reactor-core'
-    testImplementation "io.micronaut.beanvalidation:micronaut-hibernate-validator"
-    testImplementation 'org.awaitility:awaitility:4.1.1'
-    testImplementation "org.junit.jupiter:junit-jupiter-api:$junitVersion"
-    testCompileOnly "io.micronaut:micronaut-inject-java"
-    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$junitVersion"
-    testRuntimeOnly "ch.qos.logback:logback-classic"
+    testImplementation(platform(libs.boms.micronaut))
+    testImplementation(libs.micronaut.runtime)
+    testImplementation(libs.micronaut.inject.java)
+    testImplementation(libs.micronaut.validation)
+    testImplementation(libs.swagger.annotations)
+    testImplementation(libs.reactor.core)
+    testImplementation(libs.micronaut.hibernate.validator)
+    testImplementation(libs.awaitility)
+    testImplementation(libs.junit.jupiter.api)
+    testCompileOnly(libs.micronaut.inject.java)
+    testRuntimeOnly(libs.junit.jupiter.engine)
+    testRuntimeOnly(libs.logback.classic)
 }
 
 

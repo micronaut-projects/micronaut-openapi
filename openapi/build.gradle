@@ -3,32 +3,32 @@ plugins {
 }
 
 dependencies {
-    annotationProcessor "io.micronaut:micronaut-inject-java"
-    annotationProcessor "io.micronaut.docs:micronaut-docs-asciidoc-config-props:$micronautDocsVersion"
+    annotationProcessor(libs.micronaut.inject.java)
+    annotationProcessor(libs.micronaut.docs.asciidoc.config.props)
 
-    compileOnly "io.micronaut:micronaut-management"
-    compileOnly "io.micronaut:micronaut-inject-java"
+    compileOnly(libs.micronaut.management)
+    compileOnly(libs.micronaut.inject.java)
 
-    implementation "io.micronaut:micronaut-http"
-    implementation "io.micronaut:micronaut-http-server"
-    implementation 'io.projectreactor:reactor-core'
+    implementation(libs.micronaut.http)
+    implementation(libs.micronaut.http.server)
+    implementation(libs.reactor.core)
 
-    api "io.swagger.core.v3:swagger-core:$swaggerVersion"
-    api "io.swagger.core.v3:swagger-models:$swaggerVersion"
-    api "io.swagger.core.v3:swagger-annotations:$swaggerVersion"
+    api(libs.swagger.core)
+    api(libs.swagger.models)
+    api(libs.swagger.annotations)
 
-    testImplementation "org.spockframework:spock-core:$spockVersion"
-    testImplementation "io.micronaut:micronaut-runtime"
-    testImplementation "io.micronaut.security:micronaut-security"
-    testImplementation "io.micronaut:micronaut-inject-groovy"
-    testImplementation "io.micronaut:micronaut-inject-groovy-test"
-    testImplementation "io.micronaut:micronaut-inject-java"
-    testImplementation "io.micronaut:micronaut-inject-java-test"
-    testImplementation "io.micronaut.beanvalidation:micronaut-hibernate-validator"
-    testImplementation "io.reactivex.rxjava2:rxjava:$rxJava2Version"
-    testImplementation "io.reactivex.rxjava3:rxjava:$rxJava3Version"
-    testImplementation "io.micronaut:micronaut-management"
-    testImplementation 'jakarta.inject:jakarta.inject-api:2.0.1'
+    testImplementation(libs.spock.core)
+    testImplementation(libs.micronaut.runtime)
+    testImplementation(libs.micronaut.security)
+    testImplementation(libs.micronaut.inject.groovy)
+    testImplementation(libs.micronaut.inject.groovy.test)
+    testImplementation(libs.micronaut.inject.java)
+    testImplementation(libs.micronaut.inject.java.test)
+    testImplementation(libs.micronaut.hibernate.validator)
+    testImplementation(libs.rxjava2)
+    testImplementation(libs.rxjava3)
+    testImplementation(libs.micronaut.management)
+    testImplementation(libs.jakarta.inject.api)
     if (org.gradle.internal.jvm.Jvm.current().getJavaVersion().isJava8()) {
         testImplementation files(org.gradle.internal.jvm.Jvm.current().toolsJar)
     }
