@@ -19,8 +19,8 @@ dependencies {
     testImplementation(libs.micronaut.validation)
     testImplementation(libs.micronaut.hibernate.validator)
     testRuntimeOnly(libs.logback.classic)
-    testImplementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
-    testImplementation "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
+    testImplementation(libs.kotlin.stdlib.jdk8)
+    testImplementation(libs.kotlin.reflect)
     testImplementation(libs.kotlintest.runner.junit5)
 }
 
