@@ -1,7 +1,7 @@
 By default Micronaut will automatically at compile time build out the Swagger YAML definition from your defined controllers and methods. For example given the following class:
 
 .Hello World Example
-snippet::io.micronaut.configuration.openapi.docs.controllers.HelloController[tags="imports,clazz", project-base="docs-examples/example]
+snippet::io.micronaut.configuration.openapi.docs.controllers.HelloController[tags="imports,clazz", project-base="docs-examples/example"]
 
 The resulting output will be:
 
