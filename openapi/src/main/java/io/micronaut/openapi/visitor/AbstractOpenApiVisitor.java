@@ -67,6 +67,7 @@ import io.swagger.v3.oas.annotations.links.Link;
 import io.swagger.v3.oas.annotations.links.LinkParameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.DiscriminatorMapping;
+import io.swagger.v3.oas.annotations.media.Encoding;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.OAuthScope;
@@ -356,6 +357,9 @@ abstract class AbstractOpenApiVisitor  {
                                     processExtensions(extensions, (AnnotationValue<Extension>) o);
                                 }
                                 newValues.put("extensions", extensions);
+                            } else if (Encoding.class.getName().equals(annotationName)) {
+                                Map encodings = annotationValueArrayToSubmap(a, "name", context);
+                                newValues.put(key, encodings);
                             } else if (Content.class.getName().equals(annotationName)) {
                                 Map mediaTypes = annotationValueArrayToSubmap(a, "mediaType", context);
                                 newValues.put(key, mediaTypes);

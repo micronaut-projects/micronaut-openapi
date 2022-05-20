@@ -28,7 +28,6 @@ dependencies {
     testImplementation "io.reactivex.rxjava2:rxjava:$rxJava2Version"
     testImplementation "io.reactivex.rxjava3:rxjava:$rxJava3Version"
     testImplementation "io.micronaut:micronaut-management"
-    testImplementation 'jakarta.inject:jakarta.inject-api:2.0.1'
     if (org.gradle.internal.jvm.Jvm.current().getJavaVersion().isJava8()) {
         testImplementation files(org.gradle.internal.jvm.Jvm.current().toolsJar)
     }

@@ -13,7 +13,7 @@ dependencies {
     kapt "io.micronaut:micronaut-validation:$micronautVersion"
     kaptTest "io.micronaut:micronaut-inject-java"
     testImplementation platform("io.micronaut:micronaut-bom:$micronautVersion")
-    testImplementation "io.swagger.core.v3:swagger-annotations"
+    testImplementation "io.swagger.core.v3:swagger-annotations:$swaggerVersion"
     testImplementation 'io.projectreactor:reactor-core'
     testImplementation "io.micronaut:micronaut-runtime"
     testImplementation "io.micronaut:micronaut-validation"
