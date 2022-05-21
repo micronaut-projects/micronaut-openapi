@@ -801,7 +801,11 @@ abstract class AbstractOpenApiVisitor  {
             if (uw != null && uw.booleanValue("enabled").orElse(Boolean.TRUE)) {
                 handleUnwrapped(context, element, elementType, parentSchema, uw);
             } else {
-                final boolean required = hasElementSchemaRequired(element).orElseGet(() -> isElementNotNullable(element, classElement));
+                boolean isNotNullable = isElementNotNullable(element, classElement);
+                boolean required = hasElementSchemaRequired(element).orElse(isNotNullable);
+                if (!required && isNotNullable) {
+                    required = isNotNullable;
+                }
                 propertySchema = bindSchemaForElement(context, element, elementType, propertySchema);
                 String propertyName = resolvePropertyName(element, classElement, propertySchema);
                 propertySchema.setRequired(null);
