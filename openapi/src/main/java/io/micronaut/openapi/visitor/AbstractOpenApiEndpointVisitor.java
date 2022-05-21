@@ -758,7 +758,7 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
 
     private void addResponseContent(MethodElement element, VisitorContext context, OpenAPI openAPI, ApiResponse response) {
         ClassElement returnType = returnType(element, context);
-        if (returnType != null) {
+        if (returnType != null && !returnType.getCanonicalName().equals("java.lang.Void")) {
             List<MediaType> producesMediaTypes = producesMediaTypes(element);
             Content content;
             if (producesMediaTypes.isEmpty()) {
