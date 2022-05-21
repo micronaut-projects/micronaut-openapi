@@ -16,6 +16,7 @@
 package io.micronaut.openapi.visitor;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import io.micronaut.context.env.DefaultPropertyPlaceholderResolver;
 import io.micronaut.context.env.PropertyPlaceholderResolver;
@@ -101,6 +102,9 @@ import java.util.stream.Stream;
  */
 @Experimental
 abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
+
+    private static final TypeReference<Map<CharSequence, Object>> MAP_TYPE = new TypeReference<Map<CharSequence, Object>>() {
+    };
 
     protected List<io.swagger.v3.oas.models.tags.Tag> classTags;
     protected PropertyPlaceholderResolver propertyPlaceholderResolver;
@@ -631,15 +635,12 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
                     try {
                         Parameter v = treeToValue(jsonNode, Parameter.class);
                         if (v == null) {
-                            BeanMap<Parameter> target = BeanMap.of(newParameter);
+                            Map<CharSequence, Object> target = jsonMapper.convertValue(newParameter, MAP_TYPE);
                             for (CharSequence name : paramValues.keySet()) {
                                 Object o = paramValues.get(name.toString());
-                                try {
-                                    target.put(name.toString(), o);
-                                } catch (Exception e) {
-                                    // ignore
-                                }
+                                target.put(name.toString(), o);
                             }
+                            newParameter = jsonMapper.convertValue(target, Parameter.class);
                         } else {
                             // horrible hack because Swagger
                             // ParameterDeserializer breaks updating
