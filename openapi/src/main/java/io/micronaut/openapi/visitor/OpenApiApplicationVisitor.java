@@ -16,8 +16,7 @@
 package io.micronaut.openapi.visitor;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
-import com.fasterxml.jackson.databind.PropertyNamingStrategy.PropertyNamingStrategyBase;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
@@ -329,16 +328,16 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         }
     }
 
-    private static PropertyNamingStrategyBase fromName(String name) {
+    private static PropertyNamingStrategies.NamingBase fromName(String name) {
         if (name == null) {
             return null;
         }
         switch (name.toUpperCase(Locale.US)) {
-        case "SNAKE_CASE": return (PropertyNamingStrategyBase) PropertyNamingStrategy.SNAKE_CASE;
-        case "UPPER_CAMEL_CASE":  return (PropertyNamingStrategyBase) PropertyNamingStrategy.UPPER_CAMEL_CASE;
+        case "SNAKE_CASE": return (PropertyNamingStrategies.NamingBase) PropertyNamingStrategies.SNAKE_CASE;
+        case "UPPER_CAMEL_CASE":  return (PropertyNamingStrategies.NamingBase) PropertyNamingStrategies.UPPER_CAMEL_CASE;
         case "LOWER_CAMEL_CASE":  return new LowerCamelCasePropertyNamingStrategy();
-        case "LOWER_CASE":  return (PropertyNamingStrategyBase) PropertyNamingStrategy.LOWER_CASE;
-        case "KEBAB_CASE":  return (PropertyNamingStrategyBase) PropertyNamingStrategy.KEBAB_CASE;
+        case "LOWER_CASE":  return (PropertyNamingStrategies.NamingBase) PropertyNamingStrategies.LOWER_CASE;
+        case "KEBAB_CASE":  return (PropertyNamingStrategies.NamingBase) PropertyNamingStrategies.KEBAB_CASE;
         default: return  null;
         }
     }
@@ -385,7 +384,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
 
     private void applyPropertyNamingStrategy(OpenAPI openAPI, VisitorContext visitorContext) {
         final String namingStrategyName = getConfigurationProperty(MICRONAUT_OPENAPI_PROPERTY_NAMING_STRATEGY, visitorContext);
-        final PropertyNamingStrategyBase propertyNamingStrategy = fromName(namingStrategyName);
+        final PropertyNamingStrategies.NamingBase propertyNamingStrategy = fromName(namingStrategyName);
         if (propertyNamingStrategy != null) {
             visitorContext.info("Using " + namingStrategyName + " property naming strategy.");
             openAPI.getComponents().getSchemas().values().forEach(model -> {
@@ -607,7 +606,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         }
     }
 
-    static class LowerCamelCasePropertyNamingStrategy extends PropertyNamingStrategyBase {
+    static class LowerCamelCasePropertyNamingStrategy extends PropertyNamingStrategies.NamingBase {
         private static final long serialVersionUID = -2750503285679998670L;
 
         @Override

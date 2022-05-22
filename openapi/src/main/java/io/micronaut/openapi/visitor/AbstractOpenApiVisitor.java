@@ -22,6 +22,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -174,7 +175,7 @@ abstract class AbstractOpenApiVisitor  {
     void incrementVisitedElements(VisitorContext context) {
         VISITED_ELEMENTS_LOCK.lock();
         try {
-            context.put(ATTR_VISITED_ELEMENTS, Integer.valueOf(getVisitedElements(context).intValue() + 1));
+            context.put(ATTR_VISITED_ELEMENTS, getVisitedElements(context) + 1);
         } finally {
             VISITED_ELEMENTS_LOCK.unlock();
         }
@@ -198,7 +199,7 @@ abstract class AbstractOpenApiVisitor  {
     private static Integer getVisitedElements(VisitorContext context) {
         Integer visitedElements = context.get(ATTR_VISITED_ELEMENTS, Integer.class).orElse(null);
         if (visitedElements == null) {
-            visitedElements = Integer.valueOf(0);
+            visitedElements = 0;
             context.put(ATTR_VISITED_ELEMENTS, visitedElements);
         }
         return visitedElements;
@@ -393,9 +394,8 @@ abstract class AbstractOpenApiVisitor  {
                             } else if (Server.class.getName().equals(annotationName)) {
                                 List<Map> servers = new ArrayList<>();
                                 for (Object o : a) {
-                                    Map variables = new LinkedHashMap();
                                     AnnotationValue<ServerVariable> sv = (AnnotationValue<ServerVariable>) o;
-                                    variables.putAll(toValueMap(sv.getValues(), context));
+                                    Map variables = new LinkedHashMap(toValueMap(sv.getValues(), context));
                                     servers.add(variables);
                                 }
                                 newValues.put(key, servers);
@@ -483,7 +483,7 @@ abstract class AbstractOpenApiVisitor  {
         for (AnnotationValue<ExtensionProperty> prop : extension.getAnnotations("properties", ExtensionProperty.class)) {
             final String propertyName = prop.getRequiredValue("name", String.class);
             final String propertyValue = prop.getRequiredValue(String.class);
-            JsonNode processedValue = null;
+            JsonNode processedValue;
             final boolean propertyAsJson = prop.get("parseValue", boolean.class, false);
             if (org.apache.commons.lang3.StringUtils.isNotBlank(propertyName) && org.apache.commons.lang3.StringUtils.isNotBlank(propertyValue)) {
                 if (key.isEmpty()) {
@@ -869,8 +869,8 @@ abstract class AbstractOpenApiVisitor  {
                     throw new RuntimeException("Cannot instantiate: " + clazz);
                 }
             });
-            if (strategy instanceof PropertyNamingStrategy.PropertyNamingStrategyBase) {
-                return ((PropertyNamingStrategy.PropertyNamingStrategyBase) strategy).translate(name);
+            if (strategy instanceof PropertyNamingStrategies.NamingBase) {
+                return ((PropertyNamingStrategies.NamingBase) strategy).translate(name);
             }
         }
         return name;
@@ -1452,7 +1452,7 @@ abstract class AbstractOpenApiVisitor  {
                 continue;
             }
 
-            if (publicField instanceof MemberElement && ((MemberElement) publicField).getDeclaringType().getType().getName().equals(type.getName().toString())) {
+            if (publicField instanceof MemberElement && ((MemberElement) publicField).getDeclaringType().getType().getName().equals(type.getName())) {
 
                 Schema propertySchema = resolveSchema(openAPI, publicField, publicField.getType(), context, mediaTypes);
 

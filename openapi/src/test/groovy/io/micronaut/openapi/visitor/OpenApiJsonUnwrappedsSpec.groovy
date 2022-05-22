@@ -19,7 +19,7 @@ import java.util.List;
 import io.swagger.v3.oas.annotations.media.*;
 import io.swagger.v3.oas.annotations.*;
 import com.fasterxml.jackson.annotation.*;
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
 @Controller("/test")
@@ -36,7 +36,7 @@ class Dummy {
 }
 
 @Schema(description = "Represents a pet")
-@JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 class Pet {
     @Schema(name="pet-name", description = "The pet name")
     private String name;
