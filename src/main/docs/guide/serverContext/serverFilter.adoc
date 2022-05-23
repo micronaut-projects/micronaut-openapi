@@ -1,0 +1,94 @@
+Use a `HttpServerFilter` to add a cookie which contains the context-path. This can be done in two ways:
+
+* Set the context-path from a static property (has to be set during compile time), or
+* Parse the context path from the request headers. This is particularly useful if your application runs behind a reverse proxy, which strips the context-path before forwarding the request to the application. Most reverse proxies should provide the possibility to set the stripped context-path as a header (e.g. X-Forwarded-Prefix in the case of traefik).
+
+=== Static Property
+
+Create a `HttpServerFilter` that will add a cookie with name `contextPath`.
+
+.HttpServerFilter for static context-path
+[source,java]
+----
+import java.time.Duration;
+
+import org.reactivestreams.Publisher;
+
+import io.micronaut.context.annotation.Requires;
+import io.micronaut.context.annotation.Value;
+import io.micronaut.core.async.publisher.Publishers;
+import io.micronaut.http.HttpMethod;
+import io.micronaut.http.HttpRequest;
+import io.micronaut.http.MutableHttpResponse;
+import io.micronaut.http.annotation.Filter;
+import io.micronaut.http.cookie.Cookie;
+import io.micronaut.http.filter.HttpServerFilter;
+import io.micronaut.http.filter.ServerFilterChain;
+
+@Requires(property = "micronaut.server.context-path")
+@Filter(methods = {HttpMethod.GET, HttpMethod.HEAD}, patterns = {"/**/rapidoc*", "/**/redoc*", "/**/swagger-ui*"})
+public class OpenApiViewCookieContextPathFilter implements HttpServerFilter {
+    private final Cookie contextPathCookie;
+
+    OpenApiViewCookieContextPathFilter(@Value("${micronaut.server.context-path}") String contextPath) {
+        this.contextPathCookie = Cookie.of("contextPath", contextPath).maxAge(Duration.ofMinutes(2L));
+    }
+
+    @Override
+    public Publisher<MutableHttpResponse<?>> doFilter(HttpRequest<?> request, ServerFilterChain chain) {
+        return Publishers.map(chain.proceed(request), response -> response.cookie(contextPathCookie));
+    }
+
+}
+----
+
+=== From HTTP Header
+
+The `HttpServerFilter` looks very similar to the one above. The main difference is that it parses the `context-path` value from the request headers.
+
+.HttpServerFilter from request headers
+[source,java]
+----
+import java.time.Duration;
+
+import org.reactivestreams.Publisher;
+
+import io.micronaut.context.annotation.Requires;
+import io.micronaut.context.annotation.Value;
+import io.micronaut.core.async.publisher.Publishers;
+import io.micronaut.http.HttpMethod;
+import io.micronaut.http.HttpRequest;
+import io.micronaut.http.MutableHttpResponse;
+import io.micronaut.http.annotation.Filter;
+import io.micronaut.http.cookie.Cookie;
+import io.micronaut.http.filter.HttpServerFilter;
+import io.micronaut.http.filter.ServerFilterChain;
+
+
+@Filter(
+	methods = {HttpMethod.GET, HttpMethod.HEAD},
+	patterns = {"/**/rapidoc*", "/**/redoc*", "/**/swagger-ui*"}
+)
+@Requires(property = "micronaut.server.context-path-header")
+public class OpenApiContextPathFilter implements HttpServerFilter {
+
+	private final String contextPathHeader;
+
+	OpenApiContextPathFilter(@Value("${micronaut.server.context-path-header}") String contextPathHeader) {
+		this.contextPathHeader = contextPathHeader;
+	}
+
+	@Override
+	public Publisher<MutableHttpResponse<?>> doFilter(HttpRequest<?> request, ServerFilterChain chain) {
+		final String contextPath = request.getHeaders().get(contextPathHeader);
+
+		if (contextPath != null) {
+			Cookie contextPathCookie = Cookie.of("contextPath", contextPath).maxAge(Duration.ofMinutes(2L));
+			return Publishers.map(chain.proceed(request), response -> response.cookie(contextPathCookie));
+		} else {
+			return chain.proceed(request);
+		}
+	}
+
+}
+----
