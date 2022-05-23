@@ -801,11 +801,25 @@ abstract class AbstractOpenApiVisitor  {
             if (uw != null && uw.booleanValue("enabled").orElse(Boolean.TRUE)) {
                 handleUnwrapped(context, element, elementType, parentSchema, uw);
             } else {
-                boolean isNotNullable = isElementNotNullable(element, classElement);
-                boolean required = hasElementSchemaRequired(element).orElse(isNotNullable);
-                if (!required && isNotNullable) {
-                    required = isNotNullable;
+                // check schema required flag
+                AnnotationValue<io.swagger.v3.oas.annotations.media.Schema> schemaAnnotationValue = element.getAnnotation(io.swagger.v3.oas.annotations.media.Schema.class);
+                Optional<Boolean> elementSchemaRequired = Optional.empty();
+                boolean isRequiredDefaultValueSet = false;
+                if (schemaAnnotationValue != null) {
+                    elementSchemaRequired = schemaAnnotationValue.get("required", Argument.of(Boolean.TYPE));
+                    isRequiredDefaultValueSet = !schemaAnnotationValue.contains("required");
                 }
+
+                // check field annotaions (@NonNull, @Nullable, etc.)
+                boolean isNotNullable = isElementNotNullable(element, classElement);
+                // check as mandatory in constructor
+                boolean isMandatoryInConstructor = doesParamExistsMandatoryInConstructor(element, classElement);
+                boolean required = elementSchemaRequired.orElse(isNotNullable || isMandatoryInConstructor);
+
+                if (isRequiredDefaultValueSet && isNotNullable) {
+                    required = true;
+                }
+
                 propertySchema = bindSchemaForElement(context, element, elementType, propertySchema);
                 String propertyName = resolvePropertyName(element, classElement, propertySchema);
                 propertySchema.setRequired(null);
@@ -814,21 +828,11 @@ abstract class AbstractOpenApiVisitor  {
         }
     }
 
-    private Optional<Boolean> hasElementSchemaRequired(Element element) {
-        AnnotationValue<io.swagger.v3.oas.annotations.media.Schema> schemaAnnotationValue = element.getAnnotation(io.swagger.v3.oas.annotations.media.Schema.class);
-        if (schemaAnnotationValue != null) {
-            return schemaAnnotationValue.get("required", Argument.of(Boolean.TYPE));
-        } else {
-            return Optional.empty();
-        }
-    }
-
     private boolean isElementNotNullable(Element element, @Nullable Element classElement) {
         return element.isAnnotationPresent(NotNull.class)
                 || element.isAnnotationPresent(NotBlank.class)
                 || element.isAnnotationPresent(NotEmpty.class)
                 || element.isNonNull()
-                || doesParamExistsMandatoryInConstructor(element, classElement)
                 || element.booleanValue(JsonProperty.class, "required").orElse(false);
     }
 
@@ -845,7 +849,7 @@ abstract class AbstractOpenApiVisitor  {
     }
 
     private void addProperty(Schema parentSchema, String name, Schema propertySchema, boolean required) {
-        parentSchema.addProperties(name, propertySchema);
+        parentSchema.addProperty(name, propertySchema);
         if (required) {
             List<String> requiredList = parentSchema.getRequired();
             // Check for duplicates
