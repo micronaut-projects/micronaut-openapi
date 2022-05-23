@@ -1,0 +1,1 @@
+Just add a parameter to the view url. For instance if the context path is set to `/context/path` you will access your view with `http://localhost:8080/context/path/swagger-ui?contextPath=%2Fcontext%2Fpath`.

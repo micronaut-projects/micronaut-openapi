@@ -43,6 +43,10 @@ openApiViews:
   redoc: Redoc
   rapidoc: RapiDoc
   rapipdf: RapiPdf
-serverContext: Server Context
+serverContext:
+  title: Server Context
+  compileResolution: Compile Time Resolution
+  serverFilter: HttpServerFilter
+  urlParameter: URL Parameter
 repository: Repository
 breaks: Breaking Changes
