@@ -1,6 +1,6 @@
 plugins {
-    id "org.jetbrains.kotlin.jvm" version "1.6.21"
-    id "org.jetbrains.kotlin.kapt" version "1.6.21"
+    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.kotlin.kapt)
 }
 
 repositories {
@@ -9,19 +9,19 @@ repositories {
 
 dependencies {
     kapt project(":openapi")
-    kapt "io.micronaut:micronaut-inject-java:$micronautVersion"
-    kapt "io.micronaut:micronaut-validation:$micronautVersion"
-    kaptTest "io.micronaut:micronaut-inject-java"
-    testImplementation platform("io.micronaut:micronaut-bom:$micronautVersion")
-    testImplementation "io.swagger.core.v3:swagger-annotations"
-    testImplementation 'io.projectreactor:reactor-core'
-    testImplementation "io.micronaut:micronaut-runtime"
-    testImplementation "io.micronaut:micronaut-validation"
-    testImplementation "io.micronaut.beanvalidation:micronaut-hibernate-validator"
-    testRuntimeOnly "ch.qos.logback:logback-classic"
-    testImplementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
-    testImplementation "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
-    testImplementation 'io.kotlintest:kotlintest-runner-junit5:3.4.2'
+    kapt(libs.micronaut.inject.java)
+    kapt(libs.micronaut.validation)
+    kaptTest(libs.micronaut.inject.java)
+    testImplementation(platform(libs.boms.micronaut))
+    testImplementation(libs.swagger.annotations)
+    testImplementation(libs.reactor.core)
+    testImplementation(libs.micronaut.runtime)
+    testImplementation(libs.micronaut.validation)
+    testImplementation(libs.micronaut.hibernate.validator)
+    testRuntimeOnly(libs.logback.classic)
+    testImplementation(libs.kotlin.stdlib.jdk8)
+    testImplementation(libs.kotlin.reflect)
+    testImplementation(libs.kotlintest.runner.junit5)
 }
 
 test {

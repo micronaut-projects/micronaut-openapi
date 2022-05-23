@@ -8,19 +8,19 @@ repositories {
 
 dependencies {
     testImplementation project(":openapi")
-    testImplementation platform("io.micronaut:micronaut-bom:$micronautVersion")
-    testImplementation "io.micronaut:micronaut-runtime"
-    testImplementation "io.micronaut.groovy:micronaut-runtime-groovy"
-    testImplementation "io.micronaut:micronaut-validation"
-    testImplementation "io.swagger.core.v3:swagger-annotations"
-    testImplementation 'io.projectreactor:reactor-core'
-    testImplementation "io.micronaut.beanvalidation:micronaut-hibernate-validator"
-    testCompileOnly "io.micronaut:micronaut-inject-groovy"
-    testImplementation "org.testcontainers:spock:1.17.2"
-    testImplementation("org.spockframework:spock-core") {
+    testImplementation(platform(libs.boms.micronaut))
+    testImplementation(libs.micronaut.runtime)
+    testImplementation(libs.micronaut.runtime.groovy)
+    testImplementation(libs.micronaut.validation)
+    testImplementation(libs.swagger.annotations)
+    testImplementation(libs.reactor.core)
+    testImplementation(libs.micronaut.hibernate.validator)
+    testCompileOnly(libs.micronaut.inject.groovy)
+    testImplementation(libs.testcontainers.spock)
+    testImplementation(libs.spock.core) {
         exclude group: "org.codehaus.groovy", module: "groovy-all"
     }
-    testRuntimeOnly "ch.qos.logback:logback-classic"
+    testRuntimeOnly(libs.logback.classic)
 }
 
 
