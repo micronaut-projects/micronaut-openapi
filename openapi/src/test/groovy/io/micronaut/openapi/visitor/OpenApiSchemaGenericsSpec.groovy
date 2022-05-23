@@ -54,6 +54,7 @@ class MyDtoImpl implements MyDto<Long> {
         return version;
     }
 
+    @Override
     public void setVersion(Instant version) {
         this.version = version;
     }
@@ -117,6 +118,7 @@ class Pet implements java.util.function.Consumer<Pet> {
         return this.type;
     }
 
+    @Override
     public void accept(Pet pet) {}
 }
 
