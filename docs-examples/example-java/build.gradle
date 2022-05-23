@@ -15,7 +15,6 @@ dependencies {
     testImplementation(libs.swagger.annotations)
     testImplementation(libs.reactor.core)
     testImplementation(libs.micronaut.hibernate.validator)
-    testImplementation(libs.awaitility)
     testImplementation(libs.junit.jupiter.api)
     testCompileOnly(libs.micronaut.inject.java)
     testRuntimeOnly(libs.junit.jupiter.engine)
