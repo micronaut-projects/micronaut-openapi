@@ -249,10 +249,10 @@ class MyBean {}
             Schema testImpl1 = schemas.get("TestImpl1")
             Schema woopsieProperty = testImpl1.getProperties()["woopsie"]
             woopsieProperty instanceof ComposedSchema
-            ((ComposedSchema) woopsieProperty).allOf[0].$ref == "#/components/schemas/TestInterface"
-            ((ComposedSchema) woopsieProperty).allOf[1].deprecated
-            ((ComposedSchema) woopsieProperty).allOf[1].description == "Some docs"
-            ((ComposedSchema) woopsieProperty).allOf[1].nullable
+            ((ComposedSchema) woopsieProperty).deprecated
+            ((ComposedSchema) woopsieProperty).description == "Some docs"
+            ((ComposedSchema) woopsieProperty).nullable
+            ((ComposedSchema) woopsieProperty).oneOf[0].$ref == "#/components/schemas/TestInterface"
     }
 
 }

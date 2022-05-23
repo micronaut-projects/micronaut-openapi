@@ -147,6 +147,7 @@ abstract class AbstractOpenApiVisitor  {
     private static final Lock VISITED_ELEMENTS_LOCK = new ReentrantLock();
     private static final String ATTR_VISITED_ELEMENTS = "io.micronaut.OPENAPI.visited.elements";
     private static final Schema<?> EMPTY_SCHEMA = new Schema<>();
+    private static final ComposedSchema EMPTY_COMPOSED_SCHEMA = new ComposedSchema();
 
     /**
      * The JSON mapper.
@@ -961,26 +962,54 @@ abstract class AbstractOpenApiVisitor  {
             element.getValue(Part.class, String.class).ifPresent(finalSchemaToBind::setName);
         }
 
-        setSchemaDocumentation(element, schemaToBind);
+        final ComposedSchema composedSchema;
+        final Schema<?> topLevelSchema;
+        if (originalSchema.get$ref() != null) {
+            composedSchema = new ComposedSchema();
+            topLevelSchema = composedSchema;
+        } else {
+            composedSchema = null;
+            topLevelSchema = schemaToBind;
+        }
+
+        setSchemaDocumentation(element, topLevelSchema);
         if (element.isAnnotationPresent(Deprecated.class)) {
-            schemaToBind.setDeprecated(true);
+            topLevelSchema.setDeprecated(true);
         }
         final String defaultValue = element.getValue(Bindable.class, "defaultValue", String.class).orElse(null);
         if (defaultValue != null && schemaToBind.getDefault() == null) {
-            schemaToBind.setDefault(defaultValue);
+            topLevelSchema.setDefault(defaultValue);
         }
         // @Schema annotation takes priority over nullability annotations
         Boolean isSchemaNullable = element.booleanValue(io.swagger.v3.oas.annotations.media.Schema.class, "nullable").orElse(null);
-        if ((isSchemaNullable == null && element.isNullable()) || Boolean.TRUE.equals(isSchemaNullable)) {
-            schemaToBind.setNullable(true);
+        boolean isNullable = (isSchemaNullable == null && (element.isNullable() || isTypeNullable(elementType)))
+            || Boolean.TRUE.equals(isSchemaNullable);
+        if (isNullable) {
+            topLevelSchema.setNullable(true);
         }
         final String defaultJacksonValue = element.stringValue(JsonProperty.class, "defaultValue").orElse(null);
         if (defaultJacksonValue != null && schemaToBind.getDefault() == null) {
-            schemaToBind.setDefault(defaultJacksonValue);
+            topLevelSchema.setDefault(defaultJacksonValue);
         }
-        return originalSchema.get$ref() != null && !schemaToBind.equals(EMPTY_SCHEMA)
-                ? new ComposedSchema().addAllOfItem(originalSchema).addAllOfItem(schemaToBind)
-                : originalSchema;
+
+        if (composedSchema != null) {
+            boolean addSchemaToBind = !schemaToBind.equals(EMPTY_SCHEMA);
+
+            if (addSchemaToBind) {
+                composedSchema.addAllOfItem(originalSchema);
+            } else if (isNullable && (composedSchema.getAllOf() == null || composedSchema.getAllOf().isEmpty())) {
+                composedSchema.addOneOfItem(originalSchema);
+            }
+            if (addSchemaToBind) {
+                composedSchema.addAllOfItem(schemaToBind);
+            }
+
+            if (!composedSchema.equals(EMPTY_COMPOSED_SCHEMA)) {
+                return composedSchema;
+            }
+        }
+
+        return originalSchema;
     }
 
     private void setSchemaDocumentation(Element element, Schema schemaToBind) {

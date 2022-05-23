@@ -426,10 +426,10 @@ class MyBean {}
             Schema owner = schemas["Owner"]
             Schema vehicleProperty = owner.getProperties()["vehicle"]
             vehicleProperty instanceof ComposedSchema
-            ((ComposedSchema) vehicleProperty).allOf[0].$ref == "#/components/schemas/Vehicle"
-            ((ComposedSchema) vehicleProperty).allOf[1].deprecated
-            ((ComposedSchema) vehicleProperty).allOf[1].description == "Some docs"
-            ((ComposedSchema) vehicleProperty).allOf[1].nullable
+            ((ComposedSchema) vehicleProperty).deprecated
+            ((ComposedSchema) vehicleProperty).description == "Some docs"
+            ((ComposedSchema) vehicleProperty).nullable
+            ((ComposedSchema) vehicleProperty).oneOf[0].$ref == "#/components/schemas/Vehicle"
             Schema vehicle = schemas["Vehicle"]
             vehicle instanceof ComposedSchema
             ((ComposedSchema) vehicle).oneOf[0].$ref == '#/components/schemas/Car'
@@ -547,16 +547,16 @@ class MyBean {}
         emailSendProtocolDtoSchemaFromReadEmailOutputLocationDto instanceof ComposedSchema
         ((ComposedSchema) emailSendProtocolDtoSchemaFromReadEmailOutputLocationDto).allOf[0].$ref == "#/components/schemas/EmailSendProtocolDto"
         ((ComposedSchema) emailSendProtocolDtoSchemaFromReadEmailOutputLocationDto).allOf[1].description == "Protocol used for the connection"
-        !((ComposedSchema) emailSendProtocolDtoSchemaFromReadEmailOutputLocationDto).allOf[1].nullable
-        !((ComposedSchema) emailSendProtocolDtoSchemaFromReadEmailOutputLocationDto).allOf[1].required
+        !((ComposedSchema) emailSendProtocolDtoSchemaFromReadEmailOutputLocationDto).nullable
+        !((ComposedSchema) emailSendProtocolDtoSchemaFromReadEmailOutputLocationDto).required
 
         schemas["ReadEmailSettingsDto"].required.containsAll(["protocol", "active", "hostname", "port", "senderEmail", "username", "plaintextPassword"])
         Schema emailSendProtocolDtoSchemaFromReadEmailSettingsDto = schemas["ReadEmailSettingsDto"].getProperties()["protocol"]
         emailSendProtocolDtoSchemaFromReadEmailSettingsDto instanceof ComposedSchema
         ((ComposedSchema) emailSendProtocolDtoSchemaFromReadEmailSettingsDto).allOf[0].$ref == "#/components/schemas/EmailSendProtocolDto"
         ((ComposedSchema) emailSendProtocolDtoSchemaFromReadEmailSettingsDto).allOf[1].description == "Protocol used for the connection or null if email sending is disabled"
-        ((ComposedSchema) emailSendProtocolDtoSchemaFromReadEmailSettingsDto).allOf[1].nullable
-        !((ComposedSchema) emailSendProtocolDtoSchemaFromReadEmailSettingsDto).allOf[1].required
+        ((ComposedSchema) emailSendProtocolDtoSchemaFromReadEmailSettingsDto).nullable
+        !((ComposedSchema) emailSendProtocolDtoSchemaFromReadEmailSettingsDto).required
     }
 
 }
