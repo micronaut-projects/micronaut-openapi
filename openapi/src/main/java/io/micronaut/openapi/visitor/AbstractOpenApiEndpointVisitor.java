@@ -775,11 +775,11 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
 
         if (isVoid(returnType) || isReactiveAndVoid(returnType)) {
             returnType = null;
-        } else if (isResponseType(returnType)) {
-            returnType = returnType.getFirstTypeArgument().orElse(returnType);
-        } else if (isSingleResponseType(returnType)) {
-            returnType = returnType.getFirstTypeArgument().get();
-            returnType = returnType.getFirstTypeArgument().orElse(returnType);
+        } else {
+            Optional<ClassElement> firstTypeArgument = returnType.getFirstTypeArgument();
+            if (isResponseType(returnType) || isSingleResponseType(returnType)) {
+                returnType = firstTypeArgument.orElse(returnType);
+            }
         }
 
         return returnType;
@@ -889,9 +889,10 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
     private boolean isSingleResponseType(ClassElement returnType) {
         boolean assignable = returnType.isAssignable("io.reactivex.Single") ||
                              returnType.isAssignable("org.reactivestreams.Publisher");
+        Optional<ClassElement> firstTypeArgument = returnType.getFirstTypeArgument();
         return assignable
-               && returnType.getFirstTypeArgument().isPresent()
-               && isResponseType(returnType.getFirstTypeArgument().get());
+               && firstTypeArgument.isPresent()
+               && isResponseType(firstTypeArgument.get());
     }
 
     private boolean isVoid(ClassElement returnType) {

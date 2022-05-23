@@ -556,8 +556,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             yamlMapper.writeValue(writer, openAPI);
             if (isTestMode()) {
                 AbstractOpenApiVisitor.testYamlReference = writer.toString();
-            } else {
-                @SuppressWarnings("OptionalGetWithoutIsPresent")
+            } else if (specFile.isPresent()) {
                 Path specPath = specFile.get();
                 visitorContext.info("Writing OpenAPI YAML to destination: " + specPath);
                 visitorContext.getClassesOutputPath().ifPresent(path -> {
@@ -583,6 +582,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         }
     }
 
+    @SuppressWarnings("java:S1872")
     private void processEndpoints(VisitorContext visitorContext) {
         EndpointsConfiguration endpointsCfg = endPointsConfiguration(visitorContext);
         if ("io.micronaut.annotation.processing.visitor.JavaVisitorContext".equals(visitorContext.getClass().getName())

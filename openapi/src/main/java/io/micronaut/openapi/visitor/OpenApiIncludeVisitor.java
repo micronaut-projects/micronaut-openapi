@@ -41,6 +41,7 @@ import java.util.List;
 public class OpenApiIncludeVisitor implements TypeElementVisitor<OpenAPIIncludes, Object> {
 
     @Override
+    @SuppressWarnings("java:S1872")
     public void visitClass(ClassElement element, VisitorContext visitorContext) {
         if (!"io.micronaut.annotation.processing.visitor.JavaVisitorContext".equals(visitorContext.getClass().getName())) {
             return;

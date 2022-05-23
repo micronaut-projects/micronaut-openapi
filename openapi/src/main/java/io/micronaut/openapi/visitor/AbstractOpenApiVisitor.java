@@ -1439,18 +1439,6 @@ abstract class AbstractOpenApiVisitor  {
         }
     }
 
-    /**
-     * Returns true if classElement is a JavaClassElement.
-     * @param classElement A ClassElement.
-     * @param context The context.
-     * @return true if classElement is a JavaClassElement.
-     */
-    static boolean isJavaElement(ClassElement classElement, VisitorContext context) {
-        return classElement != null &&
-                "io.micronaut.annotation.processing.visitor.JavaClassElement".equals(classElement.getClass().getName()) &&
-                "io.micronaut.annotation.processing.visitor.JavaVisitorContext".equals(context.getClass().getName());
-    }
-
     private void populateSchemaProperties(OpenAPI openAPI, VisitorContext context, Element type, Schema schema, List<MediaType> mediaTypes) {
         ClassElement classElement = null;
         if (type instanceof ClassElement) {
