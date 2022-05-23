@@ -186,6 +186,12 @@
         
         <div class="toc-item" style="margin-left:0px" id="toc-item-serverContext"><a href="#serverContext"><strong>15</strong><span>Server Context</span></a></div>
         
+        <div class="toc-item" style="margin-left:10px" id="toc-item-compileResolution"><a href="#compileResolution"><strong>15.1</strong><span>Compile Time Resolution</span></a></div>
+        
+        <div class="toc-item" style="margin-left:10px" id="toc-item-serverFilter"><a href="#serverFilter"><strong>15.2</strong><span>HttpServerFilter</span></a></div>
+        
+        <div class="toc-item" style="margin-left:10px" id="toc-item-urlParameter"><a href="#urlParameter"><strong>15.3</strong><span>URL Parameter</span></a></div>
+        
         <div class="toc-item" style="margin-left:0px" id="toc-item-repository"><a href="#repository"><strong>16</strong><span>Repository</span></a></div>
         
         <div class="toc-item" style="margin-left:0px" id="toc-item-breaks"><a href="#breaks"><strong>17</strong><span>Breaking Changes</span></a></div>
@@ -2588,8 +2594,8 @@ public class OrderController {
 
 
 <div class="paragraph">
-<p>In micronaut configuration file you can define a server context path (with <code>micronaut.server.context-path</code>) which serves as a base path for all routes.
-Since the yaml specification file and the views are generated at compile time, these resources are not aware of this runtime setting.</p>
+<p>In the micronaut configuration file you can define a server context path (with <code>micronaut.server.context-path</code>) which serves as a base path for all routes.
+Since the yaml specification file and the views are generated at compile time, these resources are not aware of changes during runtime (e.g. context-path is determined by a reverse proxy).</p>
 </div>
 <div class="paragraph">
 <p>It is still possible for the views to work in case a context path is defined:</p>
@@ -2597,7 +2603,7 @@ Since the yaml specification file and the views are generated at compile time, t
 <div class="ulist">
 <ul>
 <li>
-<p>Set <code>micronaut.openapi.server.context.path</code> property for compile time resolution.</p>
+<p>Set <code>micronaut.openapi.server.context.path</code> property for compile time resolution, or</p>
 </li>
 <li>
 <p>Use a <code>HttpServerFilter</code> that will add a cookie, or</p>
@@ -2610,23 +2616,52 @@ Since the yaml specification file and the views are generated at compile time, t
 <div class="paragraph">
 <p>The view will first look for the cookie and if not present for the parameter.</p>
 </div>
-<div class="sect2">
-<h3 id="_compile_time_resolution">Compile Time Resolution</h3>
+
+<h2 id="compileResolution"><a class="anchor" href="#compileResolution"></a>15.1 Compile Time Resolution</h2>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/serverContext/compileResolution.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
 <div class="paragraph">
-<p>Either set <code>micronaut.openapi.server.context.path</code> as a System Property or in <code>openapi.properties</code>, then all paths will be prepend with the
-specified value at compile time.</p>
+<p>Either set <code>micronaut.openapi.server.context.path</code> as a System Property or in <code>openapi.properties</code>, then all paths will be prepend with the specified value at compile time.</p>
 </div>
 <div class="paragraph">
 <p>If you want the resolution of the context path at runtime use one of the following methods:</p>
 </div>
+
+<h2 id="serverFilter"><a class="anchor" href="#serverFilter"></a>15.2 HttpServerFilter</h2>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/serverContext/serverFilter.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>Use a <code>HttpServerFilter</code> to add a cookie which contains the context-path. This can be done in two ways:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Set the context-path from a static property (has to be set during compile time), or</p>
+</li>
+<li>
+<p>Parse the context path from the request headers. This is particularly useful if your application runs behind a reverse proxy, which strips the context-path before forwarding the request to the application. Most reverse proxies should provide the possibility to set the stripped context-path as a header (e.g. X-Forwarded-Prefix in the case of traefik).</p>
+</li>
+</ul>
 </div>
 <div class="sect2">
-<h3 id="_httpserverfilter">HttpServerFilter</h3>
+<h3 id="_static_property">Static Property</h3>
 <div class="paragraph">
 <p>Create a <code>HttpServerFilter</code> that will add a cookie with name <code>contextPath</code>.</p>
 </div>
 <div class="listingblock">
-<div class="title">HttpServerFilter for context-path</div>
+<div class="title">HttpServerFilter for static context-path</div>
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import java.time.Duration;
 
@@ -2662,10 +2697,70 @@ public class OpenApiViewCookieContextPathFilter implements HttpServerFilter {
 </div>
 </div>
 <div class="sect2">
-<h3 id="_url_parameter">URL Parameter</h3>
+<h3 id="_from_http_header">From HTTP Header</h3>
+<div class="paragraph">
+<p>The <code>HttpServerFilter</code> looks very similar to the one above. The main difference is that it parses the <code>context-path</code> value from the request headers.</p>
+</div>
+<div class="listingblock">
+<div class="title">HttpServerFilter from request headers</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import java.time.Duration;
+
+import org.reactivestreams.Publisher;
+
+import io.micronaut.context.annotation.Requires;
+import io.micronaut.context.annotation.Value;
+import io.micronaut.core.async.publisher.Publishers;
+import io.micronaut.http.HttpMethod;
+import io.micronaut.http.HttpRequest;
+import io.micronaut.http.MutableHttpResponse;
+import io.micronaut.http.annotation.Filter;
+import io.micronaut.http.cookie.Cookie;
+import io.micronaut.http.filter.HttpServerFilter;
+import io.micronaut.http.filter.ServerFilterChain;
+
+
+@Filter(
+	methods = {HttpMethod.GET, HttpMethod.HEAD},
+	patterns = {"/**/rapidoc*", "/**/redoc*", "/**/swagger-ui*"}
+)
+@Requires(property = "micronaut.server.context-path-header")
+public class OpenApiContextPathFilter implements HttpServerFilter {
+
+	private final String contextPathHeader;
+
+	OpenApiContextPathFilter(@Value("${micronaut.server.context-path-header}") String contextPathHeader) {
+		this.contextPathHeader = contextPathHeader;
+	}
+
+	@Override
+	public Publisher&lt;MutableHttpResponse&lt;?&gt;&gt; doFilter(HttpRequest&lt;?&gt; request, ServerFilterChain chain) {
+		final String contextPath = request.getHeaders().get(contextPathHeader);
+
+		if (contextPath != null) {
+			Cookie contextPathCookie = Cookie.of("contextPath", contextPath).maxAge(Duration.ofMinutes(2L));
+			return Publishers.map(chain.proceed(request), response -&gt; response.cookie(contextPathCookie));
+		} else {
+			return chain.proceed(request);
+		}
+	}
+
+}</code></pre>
+</div>
+</div>
+</div>
+
+<h2 id="urlParameter"><a class="anchor" href="#urlParameter"></a>15.3 URL Parameter</h2>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/serverContext/urlParameter.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
 <div class="paragraph">
 <p>Just add a parameter to the view url. For instance if the context path is set to <code>/context/path</code> you will access your view with <code><a href="http://localhost:8080/context/path/swagger-ui?contextPath=%2Fcontext%2Fpath" class="bare">http://localhost:8080/context/path/swagger-ui?contextPath=%2Fcontext%2Fpath</a></code>.</p>
-</div>
 </div>
 
 <h1 id="repository"><a class="anchor" href="#repository"></a>16 Repository</h1>
