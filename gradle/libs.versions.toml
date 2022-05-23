@@ -1,14 +1,7 @@
 [versions]
-awaitility = "4.1.1"
-jakarta-inject-api = "2.0.1"
-junit = "5.7.2"
-kotlintest-runner-junit5 = "3.4.2"
-spock = "2.0-groovy-3.0"
 swagger = "2.2.0"
-rxjava2 = "2.2.21"
-rxjava3 = "3.1.3"
-testcontainers = "1.17.1"
-kotlin = "1.6.10"
+kotlintest-runner-junit5 = "3.4.2"
+kotlin = "1.6.21"
 
 # Micronaut
 micronaut = "3.4.4"
@@ -34,20 +27,20 @@ micronaut-runtime-groovy = { module = "io.micronaut.groovy:micronaut-runtime-gro
 micronaut-security = { module = "io.micronaut.security:micronaut-security" }
 micronaut-validation = { module = "io.micronaut:micronaut-validation" }
 
-awaitility = { module = "org.awaitility:awaitility", version.ref = "awaitility" }
-jakarta-inject-api = { module = "jakarta.inject:jakarta.inject-api", version.ref = "jakarta-inject-api" }
-junit-jupiter-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit" }
-junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit" }
-kotlintest-runner-junit5 = { module = "io.kotlintest:kotlintest-runner-junit5", version.ref = "kotlintest-runner-junit5" }
+# Versions from BOM
+junit-jupiter-api = { module = "org.junit.jupiter:junit-jupiter-api" }
+junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine" }
 logback-classic = { module = "ch.qos.logback:logback-classic" }
 reactor-core = { module = "io.projectreactor:reactor-core" }
-spock-core = { module = "org.spockframework:spock-core", version.ref = "spock" }
+spock-core = { module = "org.spockframework:spock-core" }
+rxjava2 = { module = "io.reactivex.rxjava2:rxjava" }
+rxjava3 = { module = "io.reactivex.rxjava3:rxjava" }
+testcontainers-spock = { module = "org.testcontainers:spock" }
+
+kotlintest-runner-junit5 = { module = "io.kotlintest:kotlintest-runner-junit5", version.ref = "kotlintest-runner-junit5" }
 swagger-annotations = { module = "io.swagger.core.v3:swagger-annotations", version.ref = "swagger" }
 swagger-core = { module = "io.swagger.core.v3:swagger-core", version.ref = "swagger" }
 swagger-models = { module = "io.swagger.core.v3:swagger-models", version.ref = "swagger" }
-rxjava2 = { module = "io.reactivex.rxjava2:rxjava", version.ref = "rxjava2" }
-rxjava3 = { module = "io.reactivex.rxjava3:rxjava", version.ref = "rxjava3" }
-testcontainers-spock = { module = "org.testcontainers:spock", version.ref = "testcontainers" }
 kotlin-stdlib-jdk8 = { module = "org.jetbrains.kotlin:kotlin-stdlib-jdk8", version.ref = "kotlin" }
 kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
 

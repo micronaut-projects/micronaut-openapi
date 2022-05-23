@@ -28,7 +28,6 @@ dependencies {
     testImplementation(libs.rxjava2)
     testImplementation(libs.rxjava3)
     testImplementation(libs.micronaut.management)
-    testImplementation(libs.jakarta.inject.api)
     if (org.gradle.internal.jvm.Jvm.current().getJavaVersion().isJava8()) {
         testImplementation files(org.gradle.internal.jvm.Jvm.current().toolsJar)
     }
