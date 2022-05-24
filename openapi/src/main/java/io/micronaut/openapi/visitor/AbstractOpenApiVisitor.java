@@ -26,6 +26,7 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import io.micronaut.core.annotation.AnnotationClassValue;
 import io.micronaut.core.annotation.AnnotationValue;
 import io.micronaut.core.annotation.Nullable;
@@ -89,6 +90,7 @@ import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.reactivestreams.Publisher;
 
+import javax.lang.model.element.ElementKind;
 import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.Email;
@@ -1288,7 +1290,7 @@ abstract class AbstractOpenApiVisitor  {
                         schemas.put(schemaName, schema);
 
                         schema.setType("string");
-                        schema.setEnum(((EnumElement) type).values());
+                        schema.setEnum(getEnumValues((EnumElement) type));
                     } else {
                         if (type instanceof TypedElement) {
                             ClassElement classElement = ((TypedElement) type).getType();
@@ -1302,7 +1304,7 @@ abstract class AbstractOpenApiVisitor  {
                                             || getSchemaDefinition(openAPI, context, superElement, null, mediaTypes) != null) {
                                         Schema parentSchema = new Schema();
                                         parentSchema.set$ref(schemaRef(parentSchemaName));
-                                        ((ComposedSchema) schema).addAllOfItem(parentSchema);
+                                        schema.addAllOfItem(parentSchema);
                                     }
                                     superType = superElement.getSuperType();
                                 }
@@ -1368,6 +1370,22 @@ abstract class AbstractOpenApiVisitor  {
         return null;
     }
 
+    private List<String> getEnumValues(EnumElement type) {
+        List<String> enumValues = new ArrayList<>();
+        javax.lang.model.element.Element nativeType = (javax.lang.model.element.Element) type.getNativeType();
+        for (javax.lang.model.element.Element element : nativeType.getEnclosedElements()) {
+            if (element.getKind() == ElementKind.ENUM_CONSTANT) {
+                JsonProperty jsonproperty = element.getAnnotation(JsonProperty.class);
+                if (jsonproperty != null && StringUtils.hasText(jsonproperty.value())) {
+                    enumValues.add(jsonproperty.value());
+                } else {
+                    enumValues.add(element.getSimpleName().toString());
+                }
+            }
+        }
+        return enumValues;
+    }
+
     /**
      * Reads schema.
      *
@@ -1389,6 +1407,15 @@ abstract class AbstractOpenApiVisitor  {
             return null;
         }
         Schema schema = schemaOpt.get();
+        if (values.containsKey("allowableValues")) {
+            String[] allowableValues = (String[]) values.get("allowableValues");
+            if (allowableValues != null) {
+                schema.setEnum(Arrays.asList(allowableValues));
+            }
+        }
+        String defaultValue = schemaValue.get("defaultValue", String.class).orElse(null);
+        schema.setDefault(defaultValue);
+
         ComposedSchema composedSchema = null;
         if (schema instanceof ComposedSchema) {
             composedSchema = (ComposedSchema) schema;
@@ -1422,8 +1449,12 @@ abstract class AbstractOpenApiVisitor  {
             schema.setType("object");
         }
         if (type instanceof EnumElement) {
-            schema.setType("string");
-            schema.setEnum(((EnumElement) type).values());
+            if (schema.getType() == null) {
+                schema.setType("string");
+            }
+            if (CollectionUtils.isEmpty(schema.getEnum())) {
+                schema.setEnum(getEnumValues((EnumElement) type));
+            }
         } else if (schema instanceof ObjectSchema || composedSchema != null) {
             populateSchemaProperties(openAPI, context, type, schema, mediaTypes);
             checkAllOf(composedSchema);
