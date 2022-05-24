@@ -333,12 +333,14 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             return null;
         }
         switch (name.toUpperCase(Locale.US)) {
-        case "SNAKE_CASE": return (PropertyNamingStrategies.NamingBase) PropertyNamingStrategies.SNAKE_CASE;
-        case "UPPER_CAMEL_CASE":  return (PropertyNamingStrategies.NamingBase) PropertyNamingStrategies.UPPER_CAMEL_CASE;
-        case "LOWER_CAMEL_CASE":  return new LowerCamelCasePropertyNamingStrategy();
-        case "LOWER_CASE":  return (PropertyNamingStrategies.NamingBase) PropertyNamingStrategies.LOWER_CASE;
-        case "KEBAB_CASE":  return (PropertyNamingStrategies.NamingBase) PropertyNamingStrategies.KEBAB_CASE;
-        default: return  null;
+            case "LOWER_CAMEL_CASE":  return new LowerCamelCasePropertyNamingStrategy();
+            case "UPPER_CAMEL_CASE":  return (PropertyNamingStrategies.NamingBase) PropertyNamingStrategies.UPPER_CAMEL_CASE;
+            case "SNAKE_CASE": return (PropertyNamingStrategies.NamingBase) PropertyNamingStrategies.SNAKE_CASE;
+            case "UPPER_SNAKE_CASE": return (PropertyNamingStrategies.NamingBase) PropertyNamingStrategies.UPPER_SNAKE_CASE;
+            case "LOWER_CASE":  return (PropertyNamingStrategies.NamingBase) PropertyNamingStrategies.LOWER_CASE;
+            case "KEBAB_CASE":  return (PropertyNamingStrategies.NamingBase) PropertyNamingStrategies.KEBAB_CASE;
+            case "LOWER_DOT_CASE":  return (PropertyNamingStrategies.NamingBase) PropertyNamingStrategies.LOWER_DOT_CASE;
+            default: return  null;
         }
     }
 

@@ -55,7 +55,7 @@ public class JacksonDiscriminatorPostProcessor {
         for (String s : schemasToUpdate) {
             Schema<?> schema = openAPI.getComponents().getSchemas().get(extractComponentSchemaName(s));
             if (schema.getProperties() != null && !schema.getProperties().containsKey(discriminatorProperty)) {
-                schema.addProperties(discriminatorProperty, new StringSchema());
+                schema.addProperty(discriminatorProperty, new StringSchema());
             }
         }
     }

@@ -50,7 +50,7 @@ import java.util.stream.Collectors;
  * @since 1.0
  */
 @Experimental
-public class OpenApiControllerVisitor extends AbstractOpenApiEndpointVisitor implements TypeElementVisitor<Controller, HttpMethodMapping> {
+public class OpenApiControllerVisitor extends AbstractOpenApiEndpointVisitor implements TypeElementVisitor<Object, HttpMethodMapping> {
 
     private final List<AnnotationValue<Tag>> additionalTags;
     private final List<AnnotationValue<io.swagger.v3.oas.annotations.security.SecurityRequirement>> additionalSecurityRequirements;
@@ -73,7 +73,7 @@ public class OpenApiControllerVisitor extends AbstractOpenApiEndpointVisitor imp
 
     @Override
     protected boolean ignore(MethodElement element, VisitorContext context) {
-        return element.isPrivate() || element.isStatic() || element.isAnnotationPresent(Hidden.class);
+        return ignore(element.getDeclaringType(), context) || element.isPrivate() || element.isStatic() || element.isAnnotationPresent(Hidden.class);
     }
 
     @Override
