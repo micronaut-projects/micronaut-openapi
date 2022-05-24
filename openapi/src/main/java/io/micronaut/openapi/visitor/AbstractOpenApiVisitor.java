@@ -267,8 +267,52 @@ abstract class AbstractOpenApiVisitor  {
             openAPI.setPaths(paths);
         }
 
+        StringBuilder result = new StringBuilder();
+        boolean varProcess = false;
+        boolean valueProcess = false;
+        boolean isFirstVarChar = true;
+        boolean needToSkip = false;
         final String pathString = matchTemplate.toPathString();
-        return paths.computeIfAbsent(pathString, key -> new PathItem());
+        for (char c : pathString.toCharArray()) {
+            if (varProcess) {
+                if (isFirstVarChar) {
+                    isFirstVarChar = false;
+                    if (c == '?' || c == '.') {
+                        needToSkip = true;
+                        result.deleteCharAt(result.length() - 1);
+                        continue;
+                    } else if (c == '+' || c == '0') {
+                        continue;
+                    } else if (c == '/') {
+                        result.deleteCharAt(result.length() - 1).append(c).append('{');
+                        continue;
+                    }
+                }
+                if (c == ':') {
+                    valueProcess = true;
+                    continue;
+                }
+                if (c == '}') {
+                    varProcess = false;
+                    valueProcess = false;
+                    if (!needToSkip) {
+                        result.append('}');
+                    }
+                    needToSkip = false;
+                    continue;
+                }
+                if (valueProcess || needToSkip) {
+                    continue;
+                }
+            }
+            if (c == '{') {
+                varProcess = true;
+                isFirstVarChar = true;
+            }
+            result.append(c);
+        }
+
+        return paths.computeIfAbsent(result.toString(), key -> new PathItem());
     }
 
     /**
