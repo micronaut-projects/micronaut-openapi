@@ -6,12 +6,17 @@ pluginManagement {
 }
 
 plugins {
-    id("io.micronaut.build.shared.settings") version "5.3.4"
+    id("io.micronaut.build.shared.settings") version "5.3.9"
 }
 
 rootProject.name="openapi-parent"
 
 include "openapi"
+include "openapi-bom"
 include 'docs-examples:example-groovy'
 include 'docs-examples:example-java'
 include 'docs-examples:example-kotlin'
+
+micronautBuild {
+    importMicronautCatalog()
+}
