@@ -4,7 +4,7 @@ kotlintest-runner-junit5 = "3.4.2"
 kotlin = "1.6.21"
 
 # Micronaut
-micronaut = "3.4.4"
+micronaut = "3.5.0"
 micronaut-docs = "2.0.0"
 
 
