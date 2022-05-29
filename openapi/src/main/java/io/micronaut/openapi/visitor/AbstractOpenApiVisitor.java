@@ -15,17 +15,47 @@
  */
 package io.micronaut.openapi.visitor;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonUnwrapped;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.PropertyNamingStrategies;
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.lang.annotation.Annotation;
+import java.math.BigDecimal;
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.Future;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import javax.validation.constraints.DecimalMax;
+import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.Negative;
+import javax.validation.constraints.NegativeOrZero;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
+import javax.validation.constraints.Size;
+
 import io.micronaut.core.annotation.AnnotationClassValue;
 import io.micronaut.core.annotation.AnnotationValue;
 import io.micronaut.core.annotation.Nullable;
@@ -55,6 +85,7 @@ import io.micronaut.inject.visitor.VisitorContext;
 import io.micronaut.openapi.javadoc.JavadocDescription;
 import io.micronaut.openapi.javadoc.JavadocParser;
 import io.swagger.v3.core.util.Json;
+import io.swagger.v3.core.util.ObjectMapperFactory;
 import io.swagger.v3.core.util.PrimitiveType;
 import io.swagger.v3.core.util.Yaml;
 import io.swagger.v3.oas.annotations.Hidden;
@@ -91,46 +122,18 @@ import io.swagger.v3.oas.models.tags.Tag;
 
 import org.reactivestreams.Publisher;
 
-import javax.validation.constraints.DecimalMax;
-import javax.validation.constraints.DecimalMin;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.Negative;
-import javax.validation.constraints.NegativeOrZero;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Positive;
-import javax.validation.constraints.PositiveOrZero;
-import javax.validation.constraints.Size;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.lang.annotation.Annotation;
-import java.math.BigDecimal;
-import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.Future;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import static java.util.stream.Collectors.toMap;
 
@@ -140,7 +143,8 @@ import static java.util.stream.Collectors.toMap;
  * @author graemerocher
  * @since 1.0
  */
-abstract class AbstractOpenApiVisitor  {
+abstract class AbstractOpenApiVisitor {
+
     static final String ATTR_OPENAPI = "io.micronaut.OPENAPI";
     static OpenAPI testReference;
     static String testYamlReference;
@@ -154,7 +158,16 @@ abstract class AbstractOpenApiVisitor  {
     /**
      * The JSON mapper.
      */
-    ObjectMapper jsonMapper = Json.mapper().enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
+    ObjectMapper jsonMapper = Json.mapper()
+            .enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
+    /**
+     * The JSON mapper for security scheme.
+     */
+    ObjectMapper jsonMapperForSecurityScheme = ObjectMapperFactory.buildStrictGenericObjectMapper()
+            .enable(SerializationFeature.WRITE_ENUMS_USING_TO_STRING)
+            .disable(SerializationFeature.FAIL_ON_EMPTY_BEANS, SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+            .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+            .enable(DeserializationFeature.READ_ENUMS_USING_TO_STRING, DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
     /**
      * The YAML mapper.
      */
@@ -173,6 +186,7 @@ abstract class AbstractOpenApiVisitor  {
 
     /**
      * Increments the number of visited elements.
+     *
      * @param context The context
      */
     void incrementVisitedElements(VisitorContext context) {
@@ -187,7 +201,9 @@ abstract class AbstractOpenApiVisitor  {
 
     /**
      * Returns the number of visited elements.
+     *
      * @param context The context.
+     *
      * @return The number of visited elements.
      */
     int visitedElements(VisitorContext context) {
@@ -213,6 +229,7 @@ abstract class AbstractOpenApiVisitor  {
      *
      * @param values The values
      * @param context The visitor context
+     *
      * @return The node
      */
     JsonNode toJson(Map<CharSequence, Object> values, VisitorContext context) {
@@ -222,10 +239,12 @@ abstract class AbstractOpenApiVisitor  {
 
     /**
      * Convert the given Map to a JSON node and then to the specified type.
+     *
      * @param <T> The output class type
      * @param values The values
      * @param context The visitor context
      * @param type The class
+     *
      * @return The converted instance
      */
     <T> Optional<T> toValue(Map<CharSequence, Object> values, VisitorContext context, Class<T> type) {
@@ -240,7 +259,9 @@ abstract class AbstractOpenApiVisitor  {
 
     /**
      * Reads the security requirements annotation of the specified element.
+     *
      * @param element The Element to process.
+     *
      * @return A list of SecurityRequirement
      */
     List<SecurityRequirement> readSecurityRequirements(Element element) {
@@ -259,6 +280,7 @@ abstract class AbstractOpenApiVisitor  {
      *
      * @param context The context
      * @param matchTemplate The match template
+     *
      * @return The {@link PathItem}
      */
     PathItem resolvePathItem(VisitorContext context, UriMatchTemplate matchTemplate) {
@@ -321,6 +343,7 @@ abstract class AbstractOpenApiVisitor  {
      * Resolve the {@link OpenAPI} instance.
      *
      * @param context The context
+     *
      * @return The {@link OpenAPI} instance
      */
     OpenAPI resolveOpenAPI(VisitorContext context) {
@@ -337,10 +360,13 @@ abstract class AbstractOpenApiVisitor  {
 
     /**
      * Converts Json node into a class' instance or throws 'com.fasterxml.jackson.core.JsonProcessingException', adds extensions if present.
+     *
      * @param jn The json node
      * @param clazz The output class instance
      * @param <T> The output class type
+     *
      * @return The converted instance
+     *
      * @throws JsonProcessingException if error
      */
     protected <T> T treeToValue(JsonNode jn, Class<T> clazz) throws JsonProcessingException {
@@ -353,8 +379,10 @@ abstract class AbstractOpenApiVisitor  {
 
     /**
      * Convert the values to a map.
+     *
      * @param values The values
      * @param context The visitor context
+     *
      * @return The map
      */
     protected Map<CharSequence, Object> toValueMap(Map<CharSequence, Object> values, VisitorContext context) {
@@ -415,10 +443,10 @@ abstract class AbstractOpenApiVisitor  {
                                 Map<String, Object> links = annotationValueArrayToSubmap(a, "name", context);
                                 newValues.put(key, links);
                             } else if (LinkParameter.class.getName().equals(annotationName)) {
-                                Map params = toTupleSubMap(a, "name",  "expression");
+                                Map params = toTupleSubMap(a, "name", "expression");
                                 newValues.put(key, params);
                             } else if (OAuthScope.class.getName().equals(annotationName)) {
-                                Map params = toTupleSubMap(a, "name",  "description");
+                                Map params = toTupleSubMap(a, "name", "description");
                                 newValues.put(key, params);
                             } else if (ApiResponse.class.getName().equals(annotationName)) {
                                 Map responses = new LinkedHashMap();
@@ -582,9 +610,9 @@ abstract class AbstractOpenApiVisitor  {
 
     private <T extends Schema> void processAnnotationValue(VisitorContext context, AnnotationValue<?> annotationValue, Map<CharSequence, Object> arraySchemaMap, List<String> filters, Class<T> type) {
         Map<CharSequence, Object> values = annotationValue.getValues().entrySet().stream()
-            .filter(entry -> filters == null || ! filters.contains(entry.getKey()))
-            .collect(toMap(
-                 e -> e.getKey().equals("requiredProperties") ? "required" : e.getKey(), Map.Entry::getValue));
+                .filter(entry -> filters == null || !filters.contains(entry.getKey()))
+                .collect(toMap(
+                        e -> e.getKey().equals("requiredProperties") ? "required" : e.getKey(), Map.Entry::getValue));
         Optional<T> schema = toValue(values, context, type);
         schema.ifPresent(s -> schemaToValueMap(arraySchemaMap, s));
     }
@@ -593,7 +621,7 @@ abstract class AbstractOpenApiVisitor  {
         final Map<CharSequence, Object> arraySchemaMap = new HashMap<>(10);
         // properties
         av.get("arraySchema", AnnotationValue.class).ifPresent(annotationValue ->
-            processAnnotationValue(context, (AnnotationValue<?>) annotationValue, arraySchemaMap, Arrays.asList("ref", "implementation"), Schema.class)
+                processAnnotationValue(context, (AnnotationValue<?>) annotationValue, arraySchemaMap, Arrays.asList("ref", "implementation"), Schema.class)
         );
         // items
         av.get("schema", AnnotationValue.class).ifPresent(annotationValue -> {
@@ -670,6 +698,7 @@ abstract class AbstractOpenApiVisitor  {
      * @param type The type element
      * @param context The context
      * @param mediaTypes An optional media type
+     *
      * @return The schema or null if it cannot be resolved
      */
     protected @Nullable Schema resolveSchema(@Nullable Element definingElement, ClassElement type, VisitorContext context, List<MediaType> mediaTypes) {
@@ -684,6 +713,7 @@ abstract class AbstractOpenApiVisitor  {
      * @param type The type element
      * @param context The context
      * @param mediaTypes An optional media type
+     *
      * @return The schema or null if it cannot be resolved
      */
     protected @Nullable Schema resolveSchema(OpenAPI openAPI, @Nullable Element definingElement, ClassElement type, VisitorContext context, List<MediaType> mediaTypes) {
@@ -691,10 +721,10 @@ abstract class AbstractOpenApiVisitor  {
 
         AnnotationValue<io.swagger.v3.oas.annotations.media.Schema> schemaAnnotationValue = null;
         if (definingElement != null) {
-            schemaAnnotationValue  = definingElement.getAnnotation(io.swagger.v3.oas.annotations.media.Schema.class);
+            schemaAnnotationValue = definingElement.getAnnotation(io.swagger.v3.oas.annotations.media.Schema.class);
         }
         if (type != null && schemaAnnotationValue == null) {
-            schemaAnnotationValue  = type.getAnnotation(io.swagger.v3.oas.annotations.media.Schema.class);
+            schemaAnnotationValue = type.getAnnotation(io.swagger.v3.oas.annotations.media.Schema.class);
         }
         if (schemaAnnotationValue != null) {
             type = schemaAnnotationValue
@@ -717,8 +747,8 @@ abstract class AbstractOpenApiVisitor  {
                 isObservable = type.isAssignable("io.reactivex.Observable") && !type.isAssignable("reactor.core.publisher.Mono");
                 type = type.getFirstTypeArgument().orElse(null);
             } else if (isTypeNullable(type)) {
-               isNullable = true;
-               type = type.getFirstTypeArgument().orElse(null);
+                isNullable = true;
+                type = type.getFirstTypeArgument().orElse(null);
             }
 
             if (type != null) {
@@ -726,10 +756,10 @@ abstract class AbstractOpenApiVisitor  {
                 String typeName = type.getName();
                 // File upload case
                 if ("io.micronaut.http.multipart.StreamingFileUpload".equals(typeName) ||
-                    "io.micronaut.http.multipart.CompletedFileUpload".equals(typeName) ||
-                    "io.micronaut.http.multipart.CompletedPart".equals(typeName) ||
-                    "io.micronaut.http.multipart.PartData".equals(typeName)) {
-                    isPublisher = isPublisher && ! "io.micronaut.http.multipart.PartData".equals(typeName);
+                        "io.micronaut.http.multipart.CompletedFileUpload".equals(typeName) ||
+                        "io.micronaut.http.multipart.CompletedPart".equals(typeName) ||
+                        "io.micronaut.http.multipart.PartData".equals(typeName)) {
+                    isPublisher = isPublisher && !"io.micronaut.http.multipart.PartData".equals(typeName);
                     // For file upload, we use PrimitiveType.BINARY
                     typeName = PrimitiveType.BINARY.name();
                 }
@@ -776,7 +806,7 @@ abstract class AbstractOpenApiVisitor  {
 
             if (schema != null) {
                 boolean isStream = false;
-                for (MediaType mediaType: mediaTypes) {
+                for (MediaType mediaType : mediaTypes) {
                     if (MediaType.TEXT_EVENT_STREAM_TYPE.equals(mediaType) || MediaType.APPLICATION_JSON_STREAM_TYPE.equals(mediaType)) {
                         isStream = true;
                         break;
@@ -795,7 +825,9 @@ abstract class AbstractOpenApiVisitor  {
 
     /**
      * Resolve the components.
+     *
      * @param openAPI The open API
+     *
      * @return The components
      */
     protected Components resolveComponents(OpenAPI openAPI) {
@@ -836,6 +868,7 @@ abstract class AbstractOpenApiVisitor  {
 
     /**
      * Processes a schema property.
+     *
      * @param context The visitor context
      * @param element The element
      * @param elementType The element type
@@ -872,6 +905,10 @@ abstract class AbstractOpenApiVisitor  {
                 String propertyName = resolvePropertyName(element, classElement, propertySchema);
                 propertySchema.setRequired(null);
                 addProperty(parentSchema, propertyName, propertySchema, required);
+                if (schemaAnnotationValue != null) {
+                    schemaAnnotationValue.get("defaultValue", String.class)
+                            .ifPresent(parentSchema::setDefault);
+                }
             }
         }
     }
@@ -907,7 +944,7 @@ abstract class AbstractOpenApiVisitor  {
         }
     }
 
-    private String resolvePropertyName(Element element, Element classElement,  Schema propertySchema) {
+    private String resolvePropertyName(Element element, Element classElement, Schema propertySchema) {
         String name = Optional.ofNullable(propertySchema.getName()).orElse(element.getName());
 
         if (element.hasAnnotation(JsonProperty.class)) {
@@ -940,6 +977,7 @@ abstract class AbstractOpenApiVisitor  {
      * @param element The element
      * @param elementType The element type
      * @param schemaToBind The schema to bind
+     *
      * @return The bound schema
      */
     protected Schema bindSchemaForElement(VisitorContext context, Element element, ClassElement elementType, Schema schemaToBind) {
@@ -1039,7 +1077,7 @@ abstract class AbstractOpenApiVisitor  {
         // @Schema annotation takes priority over nullability annotations
         Boolean isSchemaNullable = element.booleanValue(io.swagger.v3.oas.annotations.media.Schema.class, "nullable").orElse(null);
         boolean isNullable = (isSchemaNullable == null && (element.isNullable() || isTypeNullable(elementType)))
-            || Boolean.TRUE.equals(isSchemaNullable);
+                || Boolean.TRUE.equals(isSchemaNullable);
         if (isNullable) {
             topLevelSchema.setNullable(true);
         }
@@ -1086,6 +1124,7 @@ abstract class AbstractOpenApiVisitor  {
      * @param element The element
      * @param schemaToBind The schema to bind
      * @param schemaAnn The schema annotation
+     *
      * @return The bound schema
      */
     protected Schema bindSchemaAnnotationValue(VisitorContext context, Element element, Schema schemaToBind, AnnotationValue<io.swagger.v3.oas.annotations.media.Schema> schemaAnn) {
@@ -1095,7 +1134,7 @@ abstract class AbstractOpenApiVisitor  {
     }
 
     private Schema doBindSchemaAnnotationValue(VisitorContext context, Element element, Schema schemaToBind,
-            JsonNode schemaJson, String defaultValue, String... allowableValues) {
+                                               JsonNode schemaJson, String defaultValue, String... allowableValues) {
         try {
             schemaToBind = jsonMapper.readerForUpdating(schemaToBind).readValue(schemaJson);
             if (StringUtils.isNotEmpty(defaultValue)) {
@@ -1121,6 +1160,7 @@ abstract class AbstractOpenApiVisitor  {
      * @param element The element
      * @param schemaToBind The schema to bind
      * @param schemaAnn The schema annotation
+     *
      * @return The bound schema
      */
     protected Schema bindArraySchemaAnnotationValue(VisitorContext context, Element element, Schema schemaToBind, AnnotationValue<io.swagger.v3.oas.annotations.media.ArraySchema> schemaAnn) {
@@ -1376,11 +1416,13 @@ abstract class AbstractOpenApiVisitor  {
      * Reads schema.
      *
      * @param schemaValue annotation value
-     * @param openAPI     The OpenApi
-     * @param context     The VisitorContext
-     * @param type        The element
-     * @param mediaTypes   The media types of schema
+     * @param openAPI The OpenApi
+     * @param context The VisitorContext
+     * @param type The element
+     * @param mediaTypes The media types of schema
+     *
      * @return New schema instance
+     *
      * @throws JsonProcessingException when Json parsing fails
      */
     protected Schema readSchema(AnnotationValue<io.swagger.v3.oas.annotations.media.Schema> schemaValue, OpenAPI openAPI, VisitorContext context, @Nullable Element type, List<MediaType> mediaTypes) throws JsonProcessingException {
@@ -1400,7 +1442,7 @@ abstract class AbstractOpenApiVisitor  {
             if (allOf.isPresent() && allOf.get().length > 0) {
                 final String[] names = allOf.get();
                 List<Schema> schemaList = namesToSchemas(openAPI, context, names, mediaTypes);
-                for (Schema s: schemaList) {
+                for (Schema s : schemaList) {
                     composedSchema.addAllOfItem(s);
                 }
             }
@@ -1409,7 +1451,7 @@ abstract class AbstractOpenApiVisitor  {
             if (anyOf.isPresent() && anyOf.get().length > 0) {
                 final String[] names = anyOf.get();
                 List<Schema> schemaList = namesToSchemas(openAPI, context, names, mediaTypes);
-                for (Schema s: schemaList) {
+                for (Schema s : schemaList) {
                     composedSchema.addAnyOfItem(s);
                 }
             }
@@ -1418,7 +1460,7 @@ abstract class AbstractOpenApiVisitor  {
             if (oneof.isPresent() && oneof.get().length > 0) {
                 final String[] names = oneof.get();
                 List<Schema> schemaList = namesToSchemas(openAPI, context, names, mediaTypes);
-                for (Schema s: schemaList) {
+                for (Schema s : schemaList) {
                     composedSchema.addOneOfItem(s);
                 }
             }
@@ -1437,16 +1479,16 @@ abstract class AbstractOpenApiVisitor  {
 
     private List<Schema> namesToSchemas(OpenAPI openAPI, VisitorContext context, String[] names, List<MediaType> mediaTypes) {
         return Arrays.stream(names).flatMap((Function<String, Stream<Schema>>) className -> {
-                                        final Optional<ClassElement> classElement = context.getClassElement(className);
-                                        if (classElement.isPresent()) {
-                                            final Schema schemaDefinition = getSchemaDefinition(openAPI, context, classElement.get(), null, mediaTypes);
-                                            if (schemaDefinition != null) {
-                                                return Stream.of(schemaDefinition);
-                                            }
-                                        }
+            final Optional<ClassElement> classElement = context.getClassElement(className);
+            if (classElement.isPresent()) {
+                final Schema schemaDefinition = getSchemaDefinition(openAPI, context, classElement.get(), null, mediaTypes);
+                if (schemaDefinition != null) {
+                    return Stream.of(schemaDefinition);
+                }
+            }
 
-                                        return Stream.empty();
-                                    }).collect(Collectors.toList());
+            return Stream.empty();
+        }).collect(Collectors.toList());
     }
 
     private String schemaRef(String schemaName) {
@@ -1497,8 +1539,10 @@ abstract class AbstractOpenApiVisitor  {
 
     /**
      * Returns true if classElement is a JavaClassElement.
+     *
      * @param classElement A ClassElement.
      * @param context The context.
+     *
      * @return true if classElement is a JavaClassElement.
      */
     static boolean isJavaElement(ClassElement classElement, VisitorContext context) {
@@ -1636,16 +1680,17 @@ abstract class AbstractOpenApiVisitor  {
                     map.putIfAbsent("name", name);
                 }
                 normalizeEnumValues(map, CollectionUtils.mapOf("type", SecurityScheme.Type.class, "in", SecurityScheme.In.class));
-                Optional<SecurityScheme> securityRequirement = toValue(map, context, SecurityScheme.class);
-                securityRequirement.ifPresent(securityScheme -> {
 
-                    try {
-                        securityScheme.setIn(Enum.valueOf(SecurityScheme.In.class, map.get("in").toString().toUpperCase(Locale.ENGLISH)));
-                    } catch (Exception e) {
-                        // ignore
+                try {
+                    JsonNode node = toJson(map, context);
+                    SecurityScheme securityScheme = jsonMapperForSecurityScheme.treeToValue(node, SecurityScheme.class);
+                    if (securityScheme != null) {
+                        resolveExtensions(node).ifPresent(extensions -> BeanMap.of(securityScheme).put("extensions", extensions));
+                        resolveComponents(openAPI).addSecuritySchemes(name, securityScheme);
                     }
-                    resolveComponents(openAPI).addSecuritySchemes(name, securityScheme);
-                });
+                } catch (JsonProcessingException e) {
+                    // ignore
+                }
             });
         }
     }
@@ -1676,10 +1721,12 @@ abstract class AbstractOpenApiVisitor  {
     /**
      * Maps annotation value to {@link io.swagger.v3.oas.annotations.security.SecurityRequirement}.
      * Correct format is:
-     *  custom_name:
-     *    - custom_scope1
-     *    - custom_scope2
+     * custom_name:
+     * - custom_scope1
+     * - custom_scope2
+     *
      * @param r The value of {@link SecurityRequirement}.
+     *
      * @return converted object.
      */
     protected SecurityRequirement mapToSecurityRequirement(AnnotationValue<io.swagger.v3.oas.annotations.security.SecurityRequirement> r) {
@@ -1692,6 +1739,7 @@ abstract class AbstractOpenApiVisitor  {
 
     /**
      * Converts annotation to model.
+     *
      * @param <T> The model type.
      * @param <A> The annotation type.
      * @param element The element to process.
@@ -1699,6 +1747,7 @@ abstract class AbstractOpenApiVisitor  {
      * @param annotationType The annotation type.
      * @param modelType The model type.
      * @param tagList The initial list of models.
+     *
      * @return A list of model objects.
      */
     protected <T, A extends Annotation> List<T> processOpenApiAnnotation(Element element, VisitorContext context, Class<A> annotationType, Class<T> modelType, List<T> tagList) {

@@ -5,10 +5,54 @@ import io.swagger.v3.oas.annotations.enums.ParameterIn
 import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.Operation
 import io.swagger.v3.oas.models.PathItem
+import io.swagger.v3.oas.models.Paths
 import spock.lang.Ignore
 import spock.lang.Issue
 
 class OpenApiControllerVisitorSpec extends AbstractOpenApiTypeElementSpec {
+
+    void "test hidden endpoint"() {
+
+        given:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.swagger.v3.oas.annotations.*;
+import io.swagger.v3.oas.annotations.media.*;
+import io.swagger.v3.oas.annotations.enums.*;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.micronaut.http.annotation.*;
+import io.micronaut.http.*;
+import java.util.List;
+
+@Controller
+class HelloWorldController {
+
+    @Post("/public")
+    public HttpResponse<String> publicEnpoint() {
+        return null;
+    }
+
+    @Hidden
+    @Post("/private")
+    public HttpResponse<String> internalEnpoint() {
+        return null;
+    }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        when:
+        Paths paths = AbstractOpenApiVisitor.testReference?.paths
+
+        then:
+        paths != null
+        paths.size() == 1
+        paths.containsKey("/public")
+        !paths.containsKey("/private")
+    }
 
     void "test Inherited Controller Annotations - Issue #157"() {
 
