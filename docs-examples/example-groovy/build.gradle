@@ -7,19 +7,21 @@ repositories {
 }
 
 dependencies {
+    testCompileOnly(mn.micronaut.inject.groovy)
+
+    testImplementation(platform(mn.micronaut.bom))
     testImplementation project(":openapi")
-    testImplementation(platform(libs.boms.micronaut))
-    testImplementation(libs.micronaut.runtime)
-    testImplementation(libs.micronaut.runtime.groovy)
-    testImplementation(libs.micronaut.validation)
-    testImplementation(libs.swagger.annotations)
+    testImplementation(mn.micronaut.runtime)
+    testImplementation(mn.micronaut.runtime.groovy)
+    testImplementation(mn.micronaut.validation)
+    testImplementation(libs.managed.swagger.annotations)
     testImplementation(libs.reactor.core)
-    testImplementation(libs.micronaut.hibernate.validator)
-    testCompileOnly(libs.micronaut.inject.groovy)
+    testImplementation(mn.micronaut.hibernate.validator)
     testImplementation(libs.testcontainers.spock)
     testImplementation(libs.spock.core) {
         exclude group: "org.codehaus.groovy", module: "groovy-all"
     }
+
     testRuntimeOnly(libs.logback.classic)
 }
 

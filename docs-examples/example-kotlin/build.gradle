@@ -9,19 +9,22 @@ repositories {
 
 dependencies {
     kapt project(":openapi")
-    kapt(libs.micronaut.inject.java)
-    kapt(libs.micronaut.validation)
-    kaptTest(libs.micronaut.inject.java)
-    testImplementation(platform(libs.boms.micronaut))
-    testImplementation(libs.swagger.annotations)
+    kapt(mn.micronaut.inject.java)
+    kapt(mn.micronaut.validation)
+
+    kaptTest(mn.micronaut.inject.java)
+
+    testImplementation(platform(mn.micronaut.bom))
+    testImplementation(libs.managed.swagger.annotations)
     testImplementation(libs.reactor.core)
-    testImplementation(libs.micronaut.runtime)
-    testImplementation(libs.micronaut.validation)
-    testImplementation(libs.micronaut.hibernate.validator)
-    testRuntimeOnly(libs.logback.classic)
+    testImplementation(mn.micronaut.runtime)
+    testImplementation(mn.micronaut.validation)
+    testImplementation(mn.micronaut.hibernate.validator)
     testImplementation(libs.kotlin.stdlib.jdk8)
     testImplementation(libs.kotlin.reflect)
     testImplementation(libs.kotlintest.runner.junit5)
+
+    testRuntimeOnly(libs.logback.classic)
 }
 
 test {
