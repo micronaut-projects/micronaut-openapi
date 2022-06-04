@@ -121,7 +121,7 @@ class HelloWorldController implements HelloWorldApi {
         then:
         operation != null
         operation.operationId == 'helloWorld'
-        operation.parameters.size() == 0
+        !operation.parameters
         operation.tags
         operation.tags.size() == 3
         operation.tags.contains("Controller")

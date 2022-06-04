@@ -28,6 +28,7 @@ import io.micronaut.core.bind.annotation.Bindable;
 import io.micronaut.core.convert.ArgumentConversionContext;
 import io.micronaut.core.convert.DefaultConversionService;
 import io.micronaut.core.naming.NameUtils;
+import io.micronaut.core.util.ArrayUtils;
 import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.core.util.StringUtils;
 import io.micronaut.core.value.PropertyResolver;
@@ -389,6 +390,9 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
                                    Map<String, UriMatchVariable> pathVariables,
                                    List<MediaType> consumesMediaTypes,
                                    List<TypedElement> extraBodyParameters) {
+        if (ArrayUtils.isEmpty(element.getParameters())) {
+            return;
+        }
         List<Parameter> swaggerParameters = swaggerOperation.getParameters();
         if (CollectionUtils.isEmpty(swaggerParameters)) {
             swaggerParameters = new ArrayList<>();

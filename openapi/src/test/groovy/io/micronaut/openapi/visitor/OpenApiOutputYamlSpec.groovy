@@ -135,7 +135,6 @@ paths:
   /endpoint1:
     get:
       operationId: getPath
-      parameters: []
       responses:
         "200":
           description: getPath 200 response
@@ -146,7 +145,6 @@ paths:
   /endpoint1/path1:
     get:
       operationId: path1
-      parameters: []
       responses:
         "200":
           description: path1 200 response
@@ -157,7 +155,6 @@ paths:
   /endpoint1/path2:
     get:
       operationId: path2
-      parameters: []
       responses:
         "200":
           description: path2 200 response
@@ -168,7 +165,6 @@ paths:
   /endpoint2:
     get:
       operationId: path
-      parameters: []
       responses:
         "200":
           description: path 200 response
@@ -179,7 +175,6 @@ paths:
   /endpoint2/path1:
     get:
       operationId: path1_1
-      parameters: []
       responses:
         "200":
           description: path1_1 200 response
@@ -190,7 +185,6 @@ paths:
   /endpoint2/path2:
     get:
       operationId: path2_1
-      parameters: []
       responses:
         "200":
           description: path2_1 200 response
@@ -201,7 +195,6 @@ paths:
   /endpoint3:
     get:
       operationId: path_1
-      parameters: []
       responses:
         "200":
           description: path_1 200 response
@@ -212,7 +205,6 @@ paths:
   /endpoint3/path1:
     get:
       operationId: path1_2
-      parameters: []
       responses:
         "200":
           description: path1_2 200 response
@@ -223,7 +215,6 @@ paths:
   /endpoint3/path2:
     get:
       operationId: path2_2
-      parameters: []
       responses:
         "200":
           description: path2_2 200 response
