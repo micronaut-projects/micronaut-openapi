@@ -111,5 +111,8 @@ class MyBean {}
 
         dtoSchema.properties.parameters.get$ref() == "#/components/schemas/Parameters"
         openAPI.components.schemas."Parameters".example
+        openAPI.components.schemas."Parameters".example.properties.stampWidth == 220
+        openAPI.components.schemas."Parameters".example.properties.stampHeight == 85
+        openAPI.components.schemas."Parameters".example.properties.pageNumber == 1
     }
 }
