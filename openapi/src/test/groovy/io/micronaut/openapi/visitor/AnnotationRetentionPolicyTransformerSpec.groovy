@@ -101,8 +101,9 @@ class HelloWorldController implements HelloWorldApi {
         openAPI.info.license.name == 'Apache 2.0'
         openAPI.info.contact.name == 'Fred'
         openAPI.tags.size() == 3
-        openAPI.tags.first().name == 'Tag 1'
-        openAPI.tags.first().description == 'desc 1'
+        Tag tag = openAPI.tags.find { it -> (it.name == 'Tag 1') }
+        tag
+        tag.description == 'desc 1'
         openAPI.externalDocs.description == 'definition docs desc'
         openAPI.security.size() == 2
         openAPI.security[0] == ["req 1":["a", "b"]]
