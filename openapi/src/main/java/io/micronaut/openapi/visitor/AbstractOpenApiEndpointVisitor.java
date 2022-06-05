@@ -706,7 +706,29 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
             requestBody.setContent(content);
         } else {
             final Content currentContent = requestBody.getContent();
-            content.forEach((key, value) -> currentContent.putIfAbsent(key, value));
+            for (Map.Entry<String, io.swagger.v3.oas.models.media.MediaType> entry : content.entrySet()) {
+                io.swagger.v3.oas.models.media.MediaType mediaType = entry.getValue();
+                io.swagger.v3.oas.models.media.MediaType existedMediaType = currentContent.get(entry.getKey());
+                if (existedMediaType == null) {
+                    currentContent.put(entry.getKey(), mediaType);
+                    continue;
+                }
+                if (existedMediaType.getSchema() == null) {
+                    existedMediaType.setSchema(mediaType.getSchema());
+                }
+                if (existedMediaType.getEncoding() == null) {
+                    existedMediaType.setEncoding(mediaType.getEncoding());
+                }
+                if (existedMediaType.getExtensions() == null) {
+                    existedMediaType.setExtensions(mediaType.getExtensions());
+                }
+                if (existedMediaType.getExamples() == null) {
+                    existedMediaType.setExamples(mediaType.getExamples());
+                }
+                if (existedMediaType.getExample() == null) {
+                    existedMediaType.setExample(mediaType.getExample());
+                }
+            }
         }
     }
 

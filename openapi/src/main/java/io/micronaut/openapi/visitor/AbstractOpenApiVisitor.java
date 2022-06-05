@@ -404,13 +404,13 @@ abstract class AbstractOpenApiVisitor  {
                                 }
                                 newValues.put("extensions", extensions);
                             } else if (Encoding.class.getName().equals(annotationName)) {
-                                Map encodings = annotationValueArrayToSubmap(a, "name", context);
+                                Map<String, Object> encodings = annotationValueArrayToSubmap(a, "name", context);
                                 newValues.put(key, encodings);
                             } else if (Content.class.getName().equals(annotationName)) {
-                                Map mediaTypes = annotationValueArrayToSubmap(a, "mediaType", context);
+                                Map<String, Object> mediaTypes = annotationValueArrayToSubmap(a, "mediaType", context);
                                 newValues.put(key, mediaTypes);
                             } else if (Link.class.getName().equals(annotationName) || Header.class.getName().equals(annotationName)) {
-                                Map links = annotationValueArrayToSubmap(a, "name", context);
+                                Map<String, Object> links = annotationValueArrayToSubmap(a, "name", context);
                                 newValues.put(key, links);
                             } else if (LinkParameter.class.getName().equals(annotationName)) {
                                 Map params = toTupleSubMap(a, "name",  "expression");
@@ -503,6 +503,8 @@ abstract class AbstractOpenApiVisitor  {
                     final Map<String, Object> discriminatorMap = getDiscriminatorMap(newValues);
                     discriminatorMap.put("propertyName", parseJsonString(value).orElse(value));
                     newValues.put("discriminator", discriminatorMap);
+                } else if (key.equals("style")) {
+                    newValues.put(key, io.swagger.v3.oas.models.media.Encoding.StyleEnum.valueOf((String) value).toString());
                 } else if (key.equals("accessMode")) {
                     if (io.swagger.v3.oas.annotations.media.Schema.AccessMode.READ_ONLY.toString().equals(value)) {
                         newValues.put("readOnly", Boolean.TRUE);
@@ -524,7 +526,7 @@ abstract class AbstractOpenApiVisitor  {
     // Copy of io.swagger.v3.core.util.AnnotationsUtils.getExtensions
     private void processExtensions(Map<CharSequence, Object> map, AnnotationValue<Extension> extension) {
         String name = extension.stringValue("name").orElse(StringUtils.EMPTY_STRING);
-        final String key = name.length() > 0 ? org.apache.commons.lang3.StringUtils.prependIfMissing(name, "x-") : name;
+        final String key = !name.isEmpty() ? org.apache.commons.lang3.StringUtils.prependIfMissing(name, "x-") : name;
         for (AnnotationValue<ExtensionProperty> prop : extension.getAnnotations("properties", ExtensionProperty.class)) {
             final String propertyName = prop.getRequiredValue("name", String.class);
             final String propertyValue = prop.getRequiredValue(String.class);
@@ -1158,8 +1160,8 @@ abstract class AbstractOpenApiVisitor  {
         return Optional.empty();
     }
 
-    private Map annotationValueArrayToSubmap(Object[] a, String classifier, VisitorContext context) {
-        Map mediaTypes = new LinkedHashMap();
+    private Map<String, Object> annotationValueArrayToSubmap(Object[] a, String classifier, VisitorContext context) {
+        Map<String, Object> mediaTypes = new LinkedHashMap<>();
         for (Object o : a) {
             AnnotationValue<?> sv = (AnnotationValue<?>) o;
             String name = sv.get(classifier, String.class).orElse(null);
