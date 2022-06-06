@@ -429,7 +429,7 @@ class MyBean {}
         openAPI != null
         openAPI.components.securitySchemes['myOauth2Security']
         openAPI.components.securitySchemes['myOauth2Security'].type == SecurityScheme.Type.OAUTH2
-        openAPI.components.securitySchemes['myOauth2Security'].name == null
+        openAPI.components.securitySchemes['myOauth2Security'].name == 'myOauth2Security'
         openAPI.components.securitySchemes['myOauth2Security'].flows
         openAPI.components.securitySchemes['myOauth2Security'].flows.implicit
         openAPI.components.securitySchemes['myOauth2Security'].flows.implicit.authorizationUrl == 'https://url.com/auth'
@@ -438,7 +438,7 @@ class MyBean {}
         openAPI.components.securitySchemes['myOauth2Security'].flows.implicit.scopes.get("write:pets")
         openAPI.components.securitySchemes['myOauth2Security'].flows.implicit.scopes.get("write:pets") == 'modify pets in your account'
         openAPI.components.securitySchemes['myOauth2Security'].in == SecurityScheme.In.HEADER
-        openAPI.components.securitySchemes['myOauth3Security'].name == null
+        openAPI.components.securitySchemes['myOauth3Security'].name == 'myOauth3Security'
         openAPI.components.securitySchemes['myOauth4Security'].name == "JWT"
     }
 }
