@@ -87,6 +87,8 @@ import io.swagger.v3.oas.models.media.StringSchema;
 import io.swagger.v3.oas.models.media.UUIDSchema;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
+import io.swagger.v3.oas.models.tags.Tag;
+
 import org.reactivestreams.Publisher;
 
 import javax.validation.constraints.DecimalMax;
@@ -1697,7 +1699,7 @@ abstract class AbstractOpenApiVisitor  {
      * @param tagList The initial list of models.
      * @return A list of model objects.
      */
-    <T, A extends Annotation> List<T> processOpenApiAnnotation(Element element, VisitorContext context, Class<A> annotationType, Class<T> modelType, List<T> tagList) {
+    protected <T, A extends Annotation> List<T> processOpenApiAnnotation(Element element, VisitorContext context, Class<A> annotationType, Class<T> modelType, List<T> tagList) {
         List<AnnotationValue<A>> annotations = element.getAnnotationValuesByType(annotationType);
         if (CollectionUtils.isNotEmpty(annotations)) {
             if (CollectionUtils.isEmpty(tagList)) {
@@ -1705,14 +1707,30 @@ abstract class AbstractOpenApiVisitor  {
             }
             for (AnnotationValue<A> tag : annotations) {
                 Map<CharSequence, Object> values;
-                if (tag.getAnnotationName().equals(SecurityRequirement.class.getName()) && tag.getValues().size() > 0) {
+                if (tag.getAnnotationName().equals(io.swagger.v3.oas.annotations.security.SecurityRequirement.class.getName()) && !tag.getValues().isEmpty()) {
                     Object name = tag.getValues().get("name");
                     Object scopes = Optional.ofNullable(tag.getValues().get("scopes")).orElse(new ArrayList<String>());
                     values = Collections.singletonMap((CharSequence) name, scopes);
                 } else {
                     values = tag.getValues();
                 }
-                toValue(values, context, modelType).ifPresent(tagList::add);
+                Optional<T> tagOpt = toValue(values, context, modelType);
+                if (tagOpt.isPresent()) {
+                    T tagObj = tagOpt.get();
+                    // skip all existed tags
+                    boolean alreadyExists = false;
+                    if (CollectionUtils.isNotEmpty(tagList) && tag.getAnnotationName().equals(io.swagger.v3.oas.annotations.tags.Tag.class.getName())) {
+                        for (T existedTag : tagList) {
+                            if (((Tag) existedTag).getName().equals(((Tag) tagObj).getName())) {
+                                alreadyExists = true;
+                                break;
+                            }
+                        }
+                    }
+                    if (!alreadyExists) {
+                        tagList.add(tagObj);
+                    }
+                }
             }
         }
         return tagList;

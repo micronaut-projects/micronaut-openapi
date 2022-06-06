@@ -294,7 +294,7 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
 
         io.swagger.v3.oas.models.Operation swaggerOperation = readOperation(element, context);
 
-        readTags(element, swaggerOperation, classTags == null ? Collections.emptyList() : classTags);
+        readTags(element, context, swaggerOperation, classTags == null ? Collections.emptyList() : classTags, openAPI);
 
         readSecurityRequirements(element, context, swaggerOperation);
 
@@ -1077,8 +1077,42 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
         }
     }
 
-    private void readTags(MethodElement element, io.swagger.v3.oas.models.Operation swaggerOperation, List<io.swagger.v3.oas.models.tags.Tag> classTags) {
+    private void readTags(MethodElement element, VisitorContext context, io.swagger.v3.oas.models.Operation swaggerOperation, List<io.swagger.v3.oas.models.tags.Tag> classTags, OpenAPI openAPI) {
         element.getAnnotationValuesByType(Tag.class).forEach(av -> av.get("name", String.class).ifPresent(swaggerOperation::addTagsItem));
+
+        List<io.swagger.v3.oas.models.tags.Tag> operationTags = processOpenApiAnnotation(element, context, Tag.class, io.swagger.v3.oas.models.tags.Tag.class, openAPI.getTags());
+        // find not simple tags (tags with description or other information), such fields need to be described at the openAPI level.
+        List<io.swagger.v3.oas.models.tags.Tag> complexTags = null;
+        if (CollectionUtils.isNotEmpty(operationTags)) {
+            complexTags = new ArrayList<>();
+            for (io.swagger.v3.oas.models.tags.Tag operationTag : operationTags) {
+                if (StringUtils.hasText(operationTag.getDescription())
+                        || CollectionUtils.isNotEmpty(operationTag.getExtensions())
+                        || operationTag.getExternalDocs() != null) {
+                    complexTags.add(operationTag);
+                }
+            }
+        }
+        if (CollectionUtils.isNotEmpty(complexTags)) {
+            if (CollectionUtils.isEmpty(openAPI.getTags())) {
+                openAPI.setTags(complexTags);
+            } else {
+                for (io.swagger.v3.oas.models.tags.Tag operationTag : complexTags) {
+                    // skip all existed tags
+                    boolean alreadyExists = false;
+                    for (io.swagger.v3.oas.models.tags.Tag apiTag : openAPI.getTags()) {
+                        if (apiTag.getName().equals(operationTag.getName())) {
+                            alreadyExists = true;
+                            break;
+                        }
+                    }
+                    if (!alreadyExists) {
+                        openAPI.getTags().add(operationTag);
+                    }
+                }
+            }
+        }
+
         // only way to get inherited tags
         element.getValues(Tags.class, AnnotationValue.class).forEach((k, v) -> v.get("name", String.class).ifPresent(name -> addTagIfNotPresent((String) name, swaggerOperation)));
 
