@@ -401,7 +401,7 @@ abstract class AbstractOpenApiVisitor {
                     newValues.put(key, valueMap);
                 }
             } else if (value instanceof AnnotationClassValue) {
-                AnnotationClassValue<?> acv = (AnnotationClassValue) value;
+                AnnotationClassValue<?> acv = (AnnotationClassValue<?>) value;
                 final Optional<? extends Class<?>> type = acv.getType();
                 type.ifPresent(aClass -> newValues.put(key, aClass));
             } else if (value != null) {
@@ -413,14 +413,14 @@ abstract class AbstractOpenApiVisitor {
                         boolean areClassValues = first instanceof AnnotationClassValue;
 
                         if (areClassValues) {
-                            List<Class> classes = new ArrayList<>(a.length);
+                            List<Class<?>> classes = new ArrayList<>(a.length);
                             for (Object o : a) {
-                                AnnotationClassValue<?> acv = (AnnotationClassValue) o;
+                                AnnotationClassValue<?> acv = (AnnotationClassValue<?>) o;
                                 acv.getType().ifPresent(classes::add);
                             }
                             newValues.put(key, classes);
                         } else if (areAnnotationValues) {
-                            String annotationName = ((AnnotationValue) first).getAnnotationName();
+                            String annotationName = ((AnnotationValue<?>) first).getAnnotationName();
                             if (io.swagger.v3.oas.annotations.security.SecurityRequirement.class.getName().equals(annotationName)) {
                                 List<SecurityRequirement> securityRequirements = new ArrayList<>(a.length);
                                 for (Object o : a) {
@@ -443,13 +443,13 @@ abstract class AbstractOpenApiVisitor {
                                 Map<String, Object> links = annotationValueArrayToSubmap(a, "name", context);
                                 newValues.put(key, links);
                             } else if (LinkParameter.class.getName().equals(annotationName)) {
-                                Map params = toTupleSubMap(a, "name", "expression");
+                                Map<String, String> params = toTupleSubMap(a, "name", "expression");
                                 newValues.put(key, params);
                             } else if (OAuthScope.class.getName().equals(annotationName)) {
-                                Map params = toTupleSubMap(a, "name", "description");
+                                Map<String, String> params = toTupleSubMap(a, "name", "description");
                                 newValues.put(key, params);
                             } else if (ApiResponse.class.getName().equals(annotationName)) {
-                                Map responses = new LinkedHashMap();
+                                Map<String, Map<CharSequence, Object>> responses = new LinkedHashMap<>();
                                 for (Object o : a) {
                                     AnnotationValue<ApiResponse> sv = (AnnotationValue<ApiResponse>) o;
                                     String name = sv.get("responseCode", String.class).orElse("default");
@@ -458,7 +458,7 @@ abstract class AbstractOpenApiVisitor {
                                 }
                                 newValues.put(key, responses);
                             } else if (ExampleObject.class.getName().equals(annotationName)) {
-                                Map examples = new LinkedHashMap();
+                                Map<String, Map<CharSequence, Object>> examples = new LinkedHashMap<>();
                                 for (Object o : a) {
                                     AnnotationValue<ExampleObject> sv = (AnnotationValue<ExampleObject>) o;
                                     String name = sv.get("name", String.class).orElse("example");
@@ -467,15 +467,15 @@ abstract class AbstractOpenApiVisitor {
                                 }
                                 newValues.put(key, examples);
                             } else if (Server.class.getName().equals(annotationName)) {
-                                List<Map> servers = new ArrayList<>();
+                                List<Map<CharSequence, Object>> servers = new ArrayList<>();
                                 for (Object o : a) {
                                     AnnotationValue<ServerVariable> sv = (AnnotationValue<ServerVariable>) o;
-                                    Map variables = new LinkedHashMap(toValueMap(sv.getValues(), context));
+                                    Map<CharSequence, Object> variables = new LinkedHashMap<>(toValueMap(sv.getValues(), context));
                                     servers.add(variables);
                                 }
                                 newValues.put(key, servers);
                             } else if (ServerVariable.class.getName().equals(annotationName)) {
-                                Map variables = new LinkedHashMap();
+                                Map<String, Map<CharSequence, Object>> variables = new LinkedHashMap<>();
                                 for (Object o : a) {
                                     AnnotationValue<ServerVariable> sv = (AnnotationValue<ServerVariable>) o;
                                     Optional<String> n = sv.get("name", String.class);
@@ -510,7 +510,7 @@ abstract class AbstractOpenApiVisitor {
                                     newValues.put(key, toValueMap(valueMap, context));
                                 } else {
 
-                                    List list = new ArrayList();
+                                    List<Object> list = new ArrayList<>();
                                     for (Object o : a) {
                                         if (o instanceof AnnotationValue) {
                                             final AnnotationValue<?> av = (AnnotationValue<?>) o;
@@ -610,7 +610,7 @@ abstract class AbstractOpenApiVisitor {
 
     private <T extends Schema> void processAnnotationValue(VisitorContext context, AnnotationValue<?> annotationValue, Map<CharSequence, Object> arraySchemaMap, List<String> filters, Class<T> type) {
         Map<CharSequence, Object> values = annotationValue.getValues().entrySet().stream()
-                .filter(entry -> filters == null || !filters.contains(entry.getKey()))
+                .filter(entry -> filters == null || !filters.contains((String) entry.getKey()))
                 .collect(toMap(
                         e -> e.getKey().equals("requiredProperties") ? "required" : e.getKey(), Map.Entry::getValue));
         Optional<T> schema = toValue(values, context, type);
@@ -674,8 +674,8 @@ abstract class AbstractOpenApiVisitor {
         return valueMap;
     }
 
-    private Map toTupleSubMap(Object[] a, String entryKey, String entryValue) {
-        Map params = new LinkedHashMap();
+    private Map<String, String> toTupleSubMap(Object[] a, String entryKey, String entryValue) {
+        Map<String, String> params = new LinkedHashMap<>();
         for (Object o : a) {
             AnnotationValue<?> sv = (AnnotationValue<?>) o;
             final Optional<String> n = sv.get(entryKey, String.class);
@@ -843,13 +843,13 @@ abstract class AbstractOpenApiVisitor {
         Map<String, Schema> schemas = resolveSchemas(resolveOpenAPI(context));
         String schemaName = element.stringValue(io.swagger.v3.oas.annotations.media.Schema.class, "name").orElse(computeDefaultSchemaName(null, elementType));
         Schema wrappedPropertySchema = schemas.get(schemaName);
-        Map properties = wrappedPropertySchema.getProperties();
+        Map<String, Schema> properties = wrappedPropertySchema.getProperties();
         if (properties == null || properties.isEmpty()) {
             return;
         }
         String prefix = uw.stringValue("prefix").orElse("");
         String suffix = uw.stringValue("suffix").orElse("");
-        for (Entry<String, Schema> prop : (Set<Map.Entry<String, Schema>>) properties.entrySet()) {
+        for (Entry<String, Schema> prop : properties.entrySet()) {
             try {
                 String propertyName = prop.getKey();
                 Schema propertySchema = prop.getValue();
