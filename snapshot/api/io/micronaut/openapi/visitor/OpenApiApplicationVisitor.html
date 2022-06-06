@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10,"i9":10,"i10":10,"i11":10,"i12":10,"i13":10,"i14":10};
+var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10,"i9":10,"i10":10,"i11":10,"i12":10,"i13":10,"i14":10,"i15":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -305,6 +305,16 @@ implements io.micronaut.inject.visitor.TypeElementVisitor&lt;io.swagger.v3.oas.a
 </td>
 </tr>
 <tr id="i6" class="altColor">
+<td class="colFirst"><code>protected &lt;T,A extends java.lang.annotation.Annotation&gt;<br>java.util.List&lt;T&gt;</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/openapi/visitor/OpenApiApplicationVisitor.html#processOpenApiAnnotation-io.micronaut.inject.ast.Element-io.micronaut.inject.visitor.VisitorContext-java.lang.Class-java.lang.Class-java.util.List-">processOpenApiAnnotation</a></span>(io.micronaut.inject.ast.Element&nbsp;element,
+                        io.micronaut.inject.visitor.VisitorContext&nbsp;context,
+                        java.lang.Class&lt;A&gt;&nbsp;annotationType,
+                        java.lang.Class&lt;T&gt;&nbsp;modelType,
+                        java.util.List&lt;T&gt;&nbsp;tagList)</code>
+<div class="block">Converts annotation to model.</div>
+</td>
+</tr>
+<tr id="i7" class="rowColor">
 <td class="colFirst"><code>protected void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/openapi/visitor/OpenApiApplicationVisitor.html#processSchemaProperty-io.micronaut.inject.visitor.VisitorContext-io.micronaut.inject.ast.Element-io.micronaut.inject.ast.ClassElement-io.micronaut.inject.ast.Element-io.swagger.v3.oas.models.media.Schema-io.swagger.v3.oas.models.media.Schema-">processSchemaProperty</a></span>(io.micronaut.inject.visitor.VisitorContext&nbsp;context,
                      io.micronaut.inject.ast.Element&nbsp;element,
@@ -315,7 +325,7 @@ implements io.micronaut.inject.visitor.TypeElementVisitor&lt;io.swagger.v3.oas.a
 <div class="block">Processes a schema property.</div>
 </td>
 </tr>
-<tr id="i7" class="rowColor">
+<tr id="i8" class="altColor">
 <td class="colFirst"><code>protected void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/openapi/visitor/OpenApiApplicationVisitor.html#processSecuritySchemes-io.micronaut.inject.ast.ClassElement-io.micronaut.inject.visitor.VisitorContext-">processSecuritySchemes</a></span>(io.micronaut.inject.ast.ClassElement&nbsp;element,
                       io.micronaut.inject.visitor.VisitorContext&nbsp;context)</code>
@@ -323,7 +333,7 @@ implements io.micronaut.inject.visitor.TypeElementVisitor&lt;io.swagger.v3.oas.a
  annotations.</div>
 </td>
 </tr>
-<tr id="i8" class="altColor">
+<tr id="i9" class="rowColor">
 <td class="colFirst"><code>protected io.swagger.v3.oas.models.media.Schema</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/openapi/visitor/OpenApiApplicationVisitor.html#readSchema-io.micronaut.core.annotation.AnnotationValue-io.swagger.v3.oas.models.OpenAPI-io.micronaut.inject.visitor.VisitorContext-io.micronaut.inject.ast.Element-java.util.List-">readSchema</a></span>(io.micronaut.core.annotation.AnnotationValue&lt;io.swagger.v3.oas.annotations.media.Schema&gt;&nbsp;schemaValue,
           io.swagger.v3.oas.models.OpenAPI&nbsp;openAPI,
@@ -333,13 +343,13 @@ implements io.micronaut.inject.visitor.TypeElementVisitor&lt;io.swagger.v3.oas.a
 <div class="block">Reads schema.</div>
 </td>
 </tr>
-<tr id="i9" class="rowColor">
+<tr id="i10" class="altColor">
 <td class="colFirst"><code>protected io.swagger.v3.oas.models.Components</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/openapi/visitor/OpenApiApplicationVisitor.html#resolveComponents-io.swagger.v3.oas.models.OpenAPI-">resolveComponents</a></span>(io.swagger.v3.oas.models.OpenAPI&nbsp;openAPI)</code>
 <div class="block">Resolve the components.</div>
 </td>
 </tr>
-<tr id="i10" class="altColor">
+<tr id="i11" class="rowColor">
 <td class="colFirst"><code>protected io.swagger.v3.oas.models.media.Schema</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/openapi/visitor/OpenApiApplicationVisitor.html#resolveSchema-io.micronaut.inject.ast.Element-io.micronaut.inject.ast.ClassElement-io.micronaut.inject.visitor.VisitorContext-java.util.List-">resolveSchema</a></span>(io.micronaut.inject.ast.Element&nbsp;definingElement,
              io.micronaut.inject.ast.ClassElement&nbsp;type,
@@ -348,7 +358,7 @@ implements io.micronaut.inject.visitor.TypeElementVisitor&lt;io.swagger.v3.oas.a
 <div class="block">Resolves the schema for the given type element.</div>
 </td>
 </tr>
-<tr id="i11" class="rowColor">
+<tr id="i12" class="altColor">
 <td class="colFirst"><code>protected io.swagger.v3.oas.models.media.Schema</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/openapi/visitor/OpenApiApplicationVisitor.html#resolveSchema-io.swagger.v3.oas.models.OpenAPI-io.micronaut.inject.ast.Element-io.micronaut.inject.ast.ClassElement-io.micronaut.inject.visitor.VisitorContext-java.util.List-">resolveSchema</a></span>(io.swagger.v3.oas.models.OpenAPI&nbsp;openAPI,
              io.micronaut.inject.ast.Element&nbsp;definingElement,
@@ -358,21 +368,21 @@ implements io.micronaut.inject.visitor.TypeElementVisitor&lt;io.swagger.v3.oas.a
 <div class="block">Resolves the schema for the given type element.</div>
 </td>
 </tr>
-<tr id="i12" class="altColor">
+<tr id="i13" class="rowColor">
 <td class="colFirst"><code>protected java.util.Map&lt;java.lang.CharSequence,java.lang.Object&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/openapi/visitor/OpenApiApplicationVisitor.html#toValueMap-java.util.Map-io.micronaut.inject.visitor.VisitorContext-">toValueMap</a></span>(java.util.Map&lt;java.lang.CharSequence,java.lang.Object&gt;&nbsp;values,
           io.micronaut.inject.visitor.VisitorContext&nbsp;context)</code>
 <div class="block">Convert the values to a map.</div>
 </td>
 </tr>
-<tr id="i13" class="rowColor">
+<tr id="i14" class="altColor">
 <td class="colFirst"><code>protected &lt;T&gt;&nbsp;T</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/openapi/visitor/OpenApiApplicationVisitor.html#treeToValue-com.fasterxml.jackson.databind.JsonNode-java.lang.Class-">treeToValue</a></span>(com.fasterxml.jackson.databind.JsonNode&nbsp;jn,
            java.lang.Class&lt;T&gt;&nbsp;clazz)</code>
 <div class="block">Converts Json node into a class' instance or throws 'com.fasterxml.jackson.core.JsonProcessingException', adds extensions if present.</div>
 </td>
 </tr>
-<tr id="i14" class="altColor">
+<tr id="i15" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/openapi/visitor/OpenApiApplicationVisitor.html#visitClass-io.micronaut.inject.ast.ClassElement-io.micronaut.inject.visitor.VisitorContext-">visitClass</a></span>(io.micronaut.inject.ast.ClassElement&nbsp;element,
           io.micronaut.inject.visitor.VisitorContext&nbsp;context)</code>&nbsp;</td>
@@ -888,7 +898,7 @@ protected&nbsp;io.swagger.v3.oas.models.media.Schema&nbsp;resolveSchema(io.swagg
 <a name="mapToSecurityRequirement-io.micronaut.core.annotation.AnnotationValue-">
 <!--   -->
 </a>
-<ul class="blockListLast">
+<ul class="blockList">
 <li class="blockList">
 <h4>mapToSecurityRequirement</h4>
 <pre>protected&nbsp;io.swagger.v3.oas.models.security.SecurityRequirement&nbsp;mapToSecurityRequirement(io.micronaut.core.annotation.AnnotationValue&lt;io.swagger.v3.oas.annotations.security.SecurityRequirement&gt;&nbsp;r)</pre>
@@ -902,6 +912,33 @@ protected&nbsp;io.swagger.v3.oas.models.media.Schema&nbsp;resolveSchema(io.swagg
 <dd><code>r</code> - The value of <code>SecurityRequirement</code>.</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>converted object.</dd>
+</dl>
+</li>
+</ul>
+<a name="processOpenApiAnnotation-io.micronaut.inject.ast.Element-io.micronaut.inject.visitor.VisitorContext-java.lang.Class-java.lang.Class-java.util.List-">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>processOpenApiAnnotation</h4>
+<pre>protected&nbsp;&lt;T,A extends java.lang.annotation.Annotation&gt;&nbsp;java.util.List&lt;T&gt;&nbsp;processOpenApiAnnotation(io.micronaut.inject.ast.Element&nbsp;element,
+                                                                                                   io.micronaut.inject.visitor.VisitorContext&nbsp;context,
+                                                                                                   java.lang.Class&lt;A&gt;&nbsp;annotationType,
+                                                                                                   java.lang.Class&lt;T&gt;&nbsp;modelType,
+                                                                                                   java.util.List&lt;T&gt;&nbsp;tagList)</pre>
+<div class="block">Converts annotation to model.</div>
+<dl>
+<dt><span class="paramLabel">Type Parameters:</span></dt>
+<dd><code>T</code> - The model type.</dd>
+<dd><code>A</code> - The annotation type.</dd>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>element</code> - The element to process.</dd>
+<dd><code>context</code> - The context.</dd>
+<dd><code>annotationType</code> - The annotation type.</dd>
+<dd><code>modelType</code> - The model type.</dd>
+<dd><code>tagList</code> - The initial list of models.</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>A list of model objects.</dd>
 </dl>
 </li>
 </ul>
