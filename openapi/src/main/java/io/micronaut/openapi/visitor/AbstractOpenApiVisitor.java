@@ -374,6 +374,10 @@ abstract class AbstractOpenApiVisitor {
         T value = jsonMapper.treeToValue(jn, clazz);
         if (value != null) {
             resolveExtensions(jn).ifPresent(extensions -> BeanMap.of(value).put("extensions", extensions));
+            // fix for default value
+            if (jn.has("defaultValue")) {
+                BeanMap.of(value).put("default", jsonMapper.treeToValue(jn.get("defaultValue"), Map.class));
+            }
         }
         return value;
     }
