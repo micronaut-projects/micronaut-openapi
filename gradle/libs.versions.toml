@@ -2,7 +2,7 @@
 managed-swagger = "2.2.0"
 
 kotlintest-runner-junit5 = "3.4.2"
-kotlin = "1.6.21"
+kotlin = "1.7.0"
 
 [libraries]
 managed-swagger-annotations = { module = "io.swagger.core.v3:swagger-annotations", version.ref = "managed-swagger" }
