@@ -343,7 +343,7 @@ class MyBean {}
 
         expect:
             Schema owner = schemas["Owner"]
-            Schema vehicleRef = owner.getProperties()["vehicle"]
+            Schema vehicleRef = owner.getProperties()["Owner.Vehicle"]
             vehicleRef instanceof ComposedSchema
             ((ComposedSchema) vehicleRef).allOf[0].$ref == "#/components/schemas/Owner.Vehicle"
             ((ComposedSchema) vehicleRef).allOf[1].description == "Vehicle of the owner. Here a car or bike with a name"
