@@ -17,6 +17,7 @@ class OpenApiControllerVisitorSpec extends AbstractOpenApiTypeElementSpec {
         buildBeanDefinition('test.MyBean', '''
 package test;
 
+import io.micronaut.context.annotation.Parameter;
 import io.swagger.v3.oas.annotations.*;
 import io.swagger.v3.oas.annotations.media.*;
 import io.swagger.v3.oas.annotations.enums.*;
@@ -39,6 +40,17 @@ class HelloWorldController {
     public HttpResponse<String> internalEnpoint() {
         return null;
     }
+
+    @Operation(hidden = true)
+    @Post("/private-operation")
+    public HttpResponse<String> internalEnpoint2() {
+        return null;
+    }
+
+    @Post("/public2")
+    public HttpResponse<String> endpointWithHiddenParam(@io.swagger.v3.oas.annotations.Parameter(hidden = true) @Parameter String param1) {
+        return null;
+    }
 }
 
 @jakarta.inject.Singleton
@@ -49,9 +61,14 @@ class MyBean {}
 
         then:
         paths != null
-        paths.size() == 1
+        paths.size() == 2
         paths.containsKey("/public")
         !paths.containsKey("/private")
+        !paths.containsKey("/private-operation")
+
+        paths.containsKey("/public2")
+        !paths."/public2".parameters
+        !paths."/public2".post.parameters
     }
 
     void "test Inherited Controller Annotations - Issue #157"() {

@@ -890,7 +890,12 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
     }
 
     private boolean ignoreParameter(TypedElement parameter) {
-        return parameter.isAnnotationPresent(Hidden.class) ||
+
+        AnnotationValue<io.swagger.v3.oas.annotations.media.Schema> schemaAnn = parameter.getAnnotation(io.swagger.v3.oas.annotations.media.Schema.class);
+        boolean isHidden = schemaAnn != null && schemaAnn.get("hidden", Boolean.class).orElse(false);
+
+        return isHidden ||
+                parameter.isAnnotationPresent(Hidden.class) ||
                 parameter.isAnnotationPresent(JsonIgnore.class) ||
                 parameter.getValue(io.swagger.v3.oas.annotations.Parameter.class, "hidden", Boolean.class)
                         .orElse(false) ||
