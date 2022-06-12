@@ -62,7 +62,7 @@ class UploadPrint {
     private Object template;
     @Schema(implementation = PrintParameters.class)
     private Map<String, Object> parameters;
-    
+
     UploadPrint(Object template, Map<String, Object> parameters) {
         this.template = template;
         this.parameters = parameters;
@@ -109,7 +109,7 @@ class ErrorResponse {
 
     private String code;
     private String message;
-    
+
     ErrorResponse(String code, String message) {
         this.code = code;
         this.message = message;
@@ -181,7 +181,9 @@ import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
 import io.swagger.v3.oas.annotations.headers.Header;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Encoding;
-import io.swagger.v3.oas.annotations.media.Schema;import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 
 @Controller
 class MyController2 {
@@ -354,6 +356,54 @@ class MyController2 {
                                             }
                                     ),
                             },
+                            examples = {
+                                    @ExampleObject(
+                                        name = "Example1",
+                                        summary = "Sum Example1",
+                                        description = "Desc Example1",
+                                        externalValue = "http://example1",
+                                        value = "{\\"prop1\\":\\"val1\\"}",
+                                        extensions = {
+                                            @Extension(
+                                                    name = "contentExt1",
+                                                    properties = {
+                                                            @ExtensionProperty(name = "prop1", value = "prop1Val"),
+                                                            @ExtensionProperty(name = "prop2", value = "prop2Val"),
+                                                    }
+                                            ),
+                                            @Extension(
+                                                    name = "contentExt2",
+                                                    properties = {
+                                                            @ExtensionProperty(name = "prop1", value = "prop1Val1"),
+                                                            @ExtensionProperty(name = "prop2", value = "prop2Val2"),
+                                                    }
+                                            ),
+                                        }
+                                    ),
+                                    @ExampleObject(
+                                        name = "Example2",
+                                        summary = "Sum Example2",
+                                        description = "Desc Example2",
+                                        externalValue = "http://example2",
+                                        value = "{\\"prop2\\":\\"val2\\"}",
+                                        extensions = {
+                                            @Extension(
+                                                    name = "contExt1",
+                                                    properties = {
+                                                            @ExtensionProperty(name = "prop1", value = "prop1Val"),
+                                                            @ExtensionProperty(name = "prop2", value = "prop2Val"),
+                                                    }
+                                            ),
+                                            @Extension(
+                                                    name = "contExt2",
+                                                    properties = {
+                                                            @ExtensionProperty(name = "prop1", value = "prop1Val1"),
+                                                            @ExtensionProperty(name = "prop2", value = "prop2Val2"),
+                                                    }
+                                            ),
+                                        }
+                                    ),
+                            },
                             extensions = {
                                     @Extension(
                                             name = "contentExt1",
@@ -460,6 +510,28 @@ class MyBean {}
         operation.requestBody.content."multipart/mixed2"
         operation.requestBody.content."multipart/mixed2".schema
         operation.requestBody.content."multipart/mixed2".schema.$ref == '#/components/schemas/MyController2.Pet'
+
+        operation.requestBody.content."multipart/mixed2".examples.Example1.summary == "Sum Example1"
+        operation.requestBody.content."multipart/mixed2".examples.Example1.description == "Desc Example1"
+        operation.requestBody.content."multipart/mixed2".examples.Example1.externalValue == "http://example1"
+        operation.requestBody.content."multipart/mixed2".examples.Example1.value
+        operation.requestBody.content."multipart/mixed2".examples.Example1.value.prop1 == "val1"
+        operation.requestBody.content."multipart/mixed2".examples.Example1.extensions.size() == 2
+        operation.requestBody.content."multipart/mixed2".examples.Example1.extensions.'x-contentExt1'.prop1 == "prop1Val"
+        operation.requestBody.content."multipart/mixed2".examples.Example1.extensions.'x-contentExt1'.prop2 == "prop2Val"
+        operation.requestBody.content."multipart/mixed2".examples.Example1.extensions.'x-contentExt2'.prop1 == "prop1Val1"
+        operation.requestBody.content."multipart/mixed2".examples.Example1.extensions.'x-contentExt2'.prop2 == "prop2Val2"
+
+        operation.requestBody.content."multipart/mixed2".examples.Example2.summary == "Sum Example2"
+        operation.requestBody.content."multipart/mixed2".examples.Example2.description == "Desc Example2"
+        operation.requestBody.content."multipart/mixed2".examples.Example2.externalValue == "http://example2"
+        operation.requestBody.content."multipart/mixed2".examples.Example2.value
+        operation.requestBody.content."multipart/mixed2".examples.Example2.value.prop2 == "val2"
+        operation.requestBody.content."multipart/mixed2".examples.Example2.extensions.size() == 2
+        operation.requestBody.content."multipart/mixed2".examples.Example2.extensions.'x-contExt1'.prop1 == "prop1Val"
+        operation.requestBody.content."multipart/mixed2".examples.Example2.extensions.'x-contExt1'.prop2 == "prop2Val"
+        operation.requestBody.content."multipart/mixed2".examples.Example2.extensions.'x-contExt2'.prop1 == "prop1Val1"
+        operation.requestBody.content."multipart/mixed2".examples.Example2.extensions.'x-contExt2'.prop2 == "prop2Val2"
 
         operation.requestBody.content."multipart/mixed2".encoding.firstOject.contentType == "application/xml; charset=utf-8"
         operation.requestBody.content."multipart/mixed2".encoding.firstOject.style == Encoding.StyleEnum.DEEP_OBJECT
