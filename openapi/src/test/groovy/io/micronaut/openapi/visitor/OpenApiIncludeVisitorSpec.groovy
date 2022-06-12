@@ -38,7 +38,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
                 @SecurityRequirement(name = "req 2", scopes = {"b", "c"})
         }
 )
-@io.micronaut.openapi.annotation.OpenAPIInclude(value = io.micronaut.security.endpoints.LoginController.class, 
+@io.micronaut.openapi.annotation.OpenAPIInclude(value = io.micronaut.security.endpoints.LoginController.class,
     tags = @Tag(name = "Tag 4"),
     security = @SecurityRequirement(name = "req 3", scopes = {"b", "c"})
 )
@@ -98,6 +98,212 @@ class MyBean {}
             openAPI.components.schemas['UsernamePasswordCredentials'].required.size() == 2
             openAPI.components.schemas['UsernamePasswordCredentials'].properties['username']
             openAPI.components.schemas['UsernamePasswordCredentials'].properties['password']
+    }
+
+    void "test build OpenAPI doc for security Login controller with custom uris"() {
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.http.annotation.*;
+import io.micronaut.http.*;
+import io.swagger.v3.oas.annotations.*;
+import io.swagger.v3.oas.annotations.info.*;
+import io.swagger.v3.oas.annotations.media.*;
+import io.swagger.v3.oas.annotations.tags.*;
+import io.swagger.v3.oas.annotations.servers.*;
+import io.swagger.v3.oas.annotations.security.*;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+
+@OpenAPIDefinition(
+        info = @Info(
+                title = "the title",
+                version = "0.0",
+                description = "My API",
+                license = @License(name = "Apache 2.0", url = "https://foo.bar"),
+                contact = @Contact(url = "https://gigantic-server.com", name = "Fred", email = "Fred@gigagantic-server.com")
+        ),
+        externalDocs = @ExternalDocumentation(description = "definition docs desc"),
+        security = {
+                @SecurityRequirement(name = "req 1", scopes = {"a", "b"}),
+                @SecurityRequirement(name = "req 2", scopes = {"b", "c"})
+        }
+)
+@io.micronaut.openapi.annotation.OpenAPIInclude(value = io.micronaut.security.endpoints.LoginController.class,
+    uri = "/myLogin",
+    tags = @Tag(name = "Tag 4"),
+    security = @SecurityRequirement(name = "req 3", scopes = {"b", "c"})
+)
+class Application {
+
+}
+
+@Tag(name = "HelloWorld")
+interface HelloWorldApi {
+ @Get("/")
+    @Produces(MediaType.TEXT_PLAIN)
+    @Operation(summary = "Get a message", description = "Returns a simple hello world.")
+    @ApiResponse(responseCode = "200", description = "All good.")
+    HttpResponse<String> helloWorld();
+}
+
+@Controller("/hello")
+@Tag(name = "HelloWorldController")
+class HelloWorldController implements HelloWorldApi {
+    @Override
+    public HttpResponse<String> helloWorld() {
+        return null;
+    }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        then:
+        AbstractOpenApiVisitor.testReference != null
+
+        when:
+        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+
+        then:
+        openAPI.info != null
+        when:
+
+        PathItem helloPathItem = openAPI.paths.get("/hello")
+        PathItem loginPathItem = openAPI.paths.get("/myLogin")
+
+        then:
+        helloPathItem
+        loginPathItem.post.operationId == 'login'
+        loginPathItem.post.tags[0] == "Tag 4"
+        loginPathItem.post.security[0]["req 3"]
+        loginPathItem.post.requestBody
+        loginPathItem.post.requestBody.required
+        loginPathItem.post.requestBody.content
+        loginPathItem.post.requestBody.content.size() == 2
+        loginPathItem.post.requestBody.content['application/x-www-form-urlencoded'].schema
+        loginPathItem.post.requestBody.content['application/x-www-form-urlencoded'].schema['$ref'] == '#/components/schemas/UsernamePasswordCredentials'
+        loginPathItem.post.requestBody.content['application/json'].schema
+        loginPathItem.post.requestBody.content['application/json'].schema['$ref'] == '#/components/schemas/UsernamePasswordCredentials'
+        loginPathItem.post.responses['200'].content['application/json'].schema['$ref'] == '#/components/schemas/Object'
+
+        openAPI.components.schemas['UsernamePasswordCredentials']
+        openAPI.components.schemas['UsernamePasswordCredentials'].required.size() == 2
+        openAPI.components.schemas['UsernamePasswordCredentials'].properties['username']
+        openAPI.components.schemas['UsernamePasswordCredentials'].properties['password']
+    }
+
+    void "test build OpenAPI doc for security Login controller with custom uris and placeholder"() {
+
+        given:
+        System.setProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_CONFIG_FILE, "openapi-controller-cutom-uri.properties")
+
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.http.annotation.*;
+import io.micronaut.http.*;
+import io.swagger.v3.oas.annotations.*;
+import io.swagger.v3.oas.annotations.info.*;
+import io.swagger.v3.oas.annotations.media.*;
+import io.swagger.v3.oas.annotations.tags.*;
+import io.swagger.v3.oas.annotations.servers.*;
+import io.swagger.v3.oas.annotations.security.*;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+
+@OpenAPIDefinition(
+        info = @Info(
+                title = "the title",
+                version = "0.0",
+                description = "My API",
+                license = @License(name = "Apache 2.0", url = "https://foo.bar"),
+                contact = @Contact(url = "https://gigantic-server.com", name = "Fred", email = "Fred@gigagantic-server.com")
+        ),
+        externalDocs = @ExternalDocumentation(description = "definition docs desc"),
+        security = {
+                @SecurityRequirement(name = "req 1", scopes = {"a", "b"}),
+                @SecurityRequirement(name = "req 2", scopes = {"b", "c"})
+        }
+)
+@io.micronaut.openapi.annotation.OpenAPIInclude(value = io.micronaut.security.endpoints.LoginController.class,
+    uri = "${login.placeholder}",
+    tags = @Tag(name = "Tag 4"),
+    security = @SecurityRequirement(name = "req 3", scopes = {"b", "c"})
+)
+@io.micronaut.openapi.annotation.OpenAPIInclude(value = io.micronaut.security.endpoints.LogoutController.class,
+    uri = "${logout.placeholder}",
+    tags = @Tag(name = "Tag 5"),
+    security = @SecurityRequirement(name = "req 3", scopes = {"b", "c"})
+)
+class Application {
+
+}
+
+@Tag(name = "HelloWorld")
+interface HelloWorldApi {
+ @Get("/")
+    @Produces(MediaType.TEXT_PLAIN)
+    @Operation(summary = "Get a message", description = "Returns a simple hello world.")
+    @ApiResponse(responseCode = "200", description = "All good.")
+    HttpResponse<String> helloWorld();
+}
+
+@Controller("/hello")
+@Tag(name = "HelloWorldController")
+class HelloWorldController implements HelloWorldApi {
+    @Override
+    public HttpResponse<String> helloWorld() {
+        return null;
+    }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        then:
+        AbstractOpenApiVisitor.testReferenceAfterPlaceholders != null
+
+        when:
+        OpenAPI openAPI = AbstractOpenApiVisitor.testReferenceAfterPlaceholders
+
+        then:
+        openAPI.info != null
+        when:
+
+        PathItem helloPathItem = openAPI.paths.get("/hello")
+        PathItem loginPathItem = openAPI.paths.get("/myLoginUrl")
+        PathItem logoutPathItem = openAPI.paths.get("/myLogoutUrl")
+
+        then:
+        helloPathItem
+        loginPathItem.post.operationId == 'login'
+        loginPathItem.post.tags[0] == "Tag 4"
+        loginPathItem.post.security[0]["req 3"]
+        loginPathItem.post.requestBody
+        loginPathItem.post.requestBody.required
+        loginPathItem.post.requestBody.content
+        loginPathItem.post.requestBody.content.size() == 2
+        loginPathItem.post.requestBody.content['application/x-www-form-urlencoded'].schema
+        loginPathItem.post.requestBody.content['application/x-www-form-urlencoded'].schema['$ref'] == '#/components/schemas/UsernamePasswordCredentials'
+        loginPathItem.post.requestBody.content['application/json'].schema
+        loginPathItem.post.requestBody.content['application/json'].schema['$ref'] == '#/components/schemas/UsernamePasswordCredentials'
+        loginPathItem.post.responses['200'].content['application/json'].schema['$ref'] == '#/components/schemas/Object'
+
+        logoutPathItem.post.operationId == 'index'
+        logoutPathItem.post.tags[0] == "Tag 5"
+        logoutPathItem.post.security[0]["req 3"]
+        logoutPathItem.post.responses['200'].content['application/json'].schema['$ref'] == '#/components/schemas/Object'
+
+        logoutPathItem.get.operationId == 'indexGet'
+        logoutPathItem.get.tags[0] == "Tag 5"
+        logoutPathItem.get.security[0]["req 3"]
+        logoutPathItem.get.responses['200'].content['application/json'].schema['$ref'] == '#/components/schemas/Object'
+
+        openAPI.components.schemas['UsernamePasswordCredentials']
+        openAPI.components.schemas['UsernamePasswordCredentials'].required.size() == 2
+        openAPI.components.schemas['UsernamePasswordCredentials'].properties['username']
+        openAPI.components.schemas['UsernamePasswordCredentials'].properties['password']
     }
 
     void "test build OpenAPI doc for simple endpoint"() {

@@ -17,6 +17,7 @@ package io.micronaut.openapi.visitor;
 
 import io.micronaut.core.annotation.AnnotationValue;
 import io.micronaut.core.annotation.Experimental;
+import io.micronaut.core.util.StringUtils;
 import io.micronaut.http.HttpMethod;
 import io.micronaut.http.MediaType;
 import io.micronaut.http.annotation.Consumes;
@@ -53,18 +54,22 @@ import java.util.stream.Collectors;
 @Experimental
 public class OpenApiControllerVisitor extends AbstractOpenApiEndpointVisitor implements TypeElementVisitor<Object, HttpMethodMapping> {
 
+    private final String customUri;
     private final List<AnnotationValue<Tag>> additionalTags;
     private final List<AnnotationValue<io.swagger.v3.oas.annotations.security.SecurityRequirement>> additionalSecurityRequirements;
 
     public OpenApiControllerVisitor() {
         this.additionalTags = Collections.emptyList();
         this.additionalSecurityRequirements = Collections.emptyList();
+        this.customUri = null;
     }
 
     public OpenApiControllerVisitor(List<AnnotationValue<Tag>> additionalTags,
-                                    List<AnnotationValue<io.swagger.v3.oas.annotations.security.SecurityRequirement>> additionalSecurityRequirements) {
+                                    List<AnnotationValue<io.swagger.v3.oas.annotations.security.SecurityRequirement>> additionalSecurityRequirements,
+                                    String customUri) {
         this.additionalTags = additionalTags;
         this.additionalSecurityRequirements = additionalSecurityRequirements;
+        this.customUri = customUri;
     }
 
     @Override
@@ -122,6 +127,9 @@ public class OpenApiControllerVisitor extends AbstractOpenApiEndpointVisitor imp
     @Override
     protected List<UriMatchTemplate> uriMatchTemplates(MethodElement element) {
         String controllerValue = element.getOwningType().getValue(UriMapping.class, String.class).orElse(element.getDeclaringType().getValue(UriMapping.class, String.class).orElse("/"));
+        if (StringUtils.isNotEmpty(customUri)) {
+            controllerValue = customUri;
+        }
         controllerValue = getPropertyPlaceholderResolver().resolvePlaceholders(controllerValue).orElse(controllerValue);
         UriMatchTemplate matchTemplate = UriMatchTemplate.of(controllerValue);
         // check if we have multiple uris
@@ -132,7 +140,7 @@ public class OpenApiControllerVisitor extends AbstractOpenApiEndpointVisitor imp
             return Collections.singletonList(matchTemplate.nest(methodValue));
         } else {
             List<UriMatchTemplate> matchTemplates = new ArrayList<>(uris.length);
-            for (String methodValue: uris) {
+            for (String methodValue : uris) {
                 methodValue = getPropertyPlaceholderResolver().resolvePlaceholders(methodValue).orElse(methodValue);
                 matchTemplates.add(matchTemplate.nest(methodValue));
             }

@@ -58,6 +58,13 @@ public @interface OpenAPIInclude {
     String[] classNames() default {};
 
     /**
+     * @return Custom URI for controller
+     *
+     * @since 4.4.0
+     */
+    String uri() default "";
+
+    /**
      * A list of tags used by the specification with additional metadata.
      * The order of the tags can be used to reflect on their order by the parsing tools.
      *

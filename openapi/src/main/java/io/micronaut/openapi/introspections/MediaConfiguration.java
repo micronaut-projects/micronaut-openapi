@@ -31,6 +31,7 @@ import io.swagger.v3.oas.models.media.Encoding;
 import io.swagger.v3.oas.models.media.EncodingProperty;
 import io.swagger.v3.oas.models.media.FileSchema;
 import io.swagger.v3.oas.models.media.IntegerSchema;
+import io.swagger.v3.oas.models.media.JsonSchema;
 import io.swagger.v3.oas.models.media.MapSchema;
 import io.swagger.v3.oas.models.media.MediaType;
 import io.swagger.v3.oas.models.media.NumberSchema;
@@ -62,6 +63,7 @@ import io.swagger.v3.oas.models.media.XML;
     EncodingProperty.class,
     FileSchema.class,
     IntegerSchema.class,
+    JsonSchema.class,
     MapSchema.class,
     MediaType.class,
     NumberSchema.class,
