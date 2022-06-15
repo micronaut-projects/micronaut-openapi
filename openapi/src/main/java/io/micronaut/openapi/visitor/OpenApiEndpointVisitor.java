@@ -32,6 +32,7 @@ import io.micronaut.management.endpoint.annotation.Read;
 import io.micronaut.management.endpoint.annotation.Selector;
 import io.micronaut.management.endpoint.annotation.Write;
 import io.swagger.v3.oas.annotations.Hidden;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.servers.Server;
 import io.swagger.v3.oas.models.tags.Tag;
@@ -148,7 +149,14 @@ public class OpenApiEndpointVisitor extends AbstractOpenApiEndpointVisitor imple
 
     @Override
     protected boolean ignore(MethodElement element, VisitorContext context) {
-        if (!enabled || element.isAnnotationPresent(Hidden.class)) {
+        if (!enabled) {
+            return true;
+        }
+
+        AnnotationValue<Operation> operationAnn = element.getAnnotation(Operation.class);
+        boolean isHidden = operationAnn != null && operationAnn.get("hidden", Boolean.class).orElse(false);
+
+        if (isHidden || element.isAnnotationPresent(Hidden.class)) {
             return true;
         }
         methodDescription = httpMethodDescription(element);

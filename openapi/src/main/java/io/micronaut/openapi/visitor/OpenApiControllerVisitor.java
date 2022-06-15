@@ -30,6 +30,7 @@ import io.micronaut.inject.ast.MethodElement;
 import io.micronaut.inject.visitor.TypeElementVisitor;
 import io.micronaut.inject.visitor.VisitorContext;
 import io.swagger.v3.oas.annotations.Hidden;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.servers.Server;
@@ -73,7 +74,15 @@ public class OpenApiControllerVisitor extends AbstractOpenApiEndpointVisitor imp
 
     @Override
     protected boolean ignore(MethodElement element, VisitorContext context) {
-        return ignore(element.getDeclaringType(), context) || element.isPrivate() || element.isStatic() || element.isAnnotationPresent(Hidden.class);
+
+        AnnotationValue<Operation> operationAnn = element.getAnnotation(Operation.class);
+        boolean isHidden = operationAnn != null && operationAnn.get("hidden", Boolean.class).orElse(false);
+
+        return isHidden
+            || ignore(element.getDeclaringType(), context)
+            || element.isPrivate()
+            || element.isStatic()
+            || element.isAnnotationPresent(Hidden.class);
     }
 
     @Override
