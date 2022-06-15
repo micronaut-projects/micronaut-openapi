@@ -56,6 +56,7 @@ import io.micronaut.inject.ast.TypedElement;
 import io.micronaut.inject.visitor.VisitorContext;
 import io.micronaut.openapi.javadoc.JavadocDescription;
 import io.micronaut.openapi.javadoc.JavadocParser;
+import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.callbacks.Callback;
@@ -108,6 +109,7 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
     };
 
     protected List<io.swagger.v3.oas.models.tags.Tag> classTags;
+    protected io.swagger.v3.oas.models.ExternalDocumentation classExternalDocs;
     protected PropertyPlaceholderResolver propertyPlaceholderResolver;
 
     private static boolean isAnnotationPresent(Element element, String className) {
@@ -152,6 +154,7 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
         incrementVisitedElements(context);
         processSecuritySchemes(element, context);
         processTags(element, context);
+        processExternalDocs(element, context);
     }
 
     private void processTags(ClassElement element, VisitorContext context) {
@@ -166,6 +169,13 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
                 }
             }
         }
+    }
+
+    private void processExternalDocs(ClassElement element, VisitorContext context) {
+        final Optional<AnnotationValue<ExternalDocumentation>> externalDocsAnn = element.findAnnotation(ExternalDocumentation.class);
+        classExternalDocs = externalDocsAnn
+            .flatMap(o -> toValue(o.getValues(), context, io.swagger.v3.oas.models.ExternalDocumentation.class))
+            .orElse(null);
     }
 
     private boolean containsTag(String name, List<io.swagger.v3.oas.models.tags.Tag> tags) {
@@ -293,6 +303,14 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
         OpenAPI openAPI = resolveOpenAPI(context);
 
         io.swagger.v3.oas.models.Operation swaggerOperation = readOperation(element, context);
+
+        io.swagger.v3.oas.models.ExternalDocumentation externalDocs = readExternalDocs(element, context);
+        if (externalDocs == null) {
+            externalDocs = classExternalDocs;
+        }
+        if (externalDocs != null) {
+            swaggerOperation.setExternalDocs(externalDocs);
+        }
 
         readTags(element, context, swaggerOperation, classTags == null ? Collections.emptyList() : classTags, openAPI);
 
@@ -847,6 +865,15 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
             swaggerOperation.setOperationId(element.getName());
         }
         return swaggerOperation;
+    }
+
+    private io.swagger.v3.oas.models.ExternalDocumentation readExternalDocs(MethodElement element, VisitorContext context) {
+        final Optional<AnnotationValue<ExternalDocumentation>> externalDocsAnn = element.findAnnotation(ExternalDocumentation.class);
+        io.swagger.v3.oas.models.ExternalDocumentation externalDocs = externalDocsAnn
+            .flatMap(o -> toValue(o.getValues(), context, io.swagger.v3.oas.models.ExternalDocumentation.class))
+            .orElse(null);
+
+        return externalDocs;
     }
 
     private void readSecurityRequirements(MethodElement element, VisitorContext context, io.swagger.v3.oas.models.Operation swaggerOperation) {

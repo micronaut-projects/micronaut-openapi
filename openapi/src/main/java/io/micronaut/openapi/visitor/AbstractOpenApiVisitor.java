@@ -106,6 +106,7 @@ import io.swagger.v3.oas.annotations.security.OAuthScope;
 import io.swagger.v3.oas.annotations.servers.Server;
 import io.swagger.v3.oas.annotations.servers.ServerVariable;
 import io.swagger.v3.oas.models.Components;
+import io.swagger.v3.oas.models.ExternalDocumentation;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.PathItem;
 import io.swagger.v3.oas.models.Paths;
@@ -1346,7 +1347,7 @@ abstract class AbstractOpenApiVisitor {
                                             || getSchemaDefinition(openAPI, context, superElement, null, mediaTypes) != null) {
                                         Schema parentSchema = new Schema();
                                         parentSchema.set$ref(schemaRef(parentSchemaName));
-                                        ((ComposedSchema) schema).addAllOfItem(parentSchema);
+                                        schema.addAllOfItem(parentSchema);
                                     }
                                     superType = superElement.getSuperType();
                                 }
@@ -1403,6 +1404,14 @@ abstract class AbstractOpenApiVisitor {
             }
         }
         if (schema != null) {
+            AnnotationValue<io.swagger.v3.oas.annotations.ExternalDocumentation> externalDocsValue = type.getDeclaredAnnotation(io.swagger.v3.oas.annotations.ExternalDocumentation.class);
+            ExternalDocumentation externalDocs = null;
+            if (externalDocsValue != null) {
+                externalDocs = toValue(externalDocsValue.getValues(), context, ExternalDocumentation.class).orElse(null);
+            }
+            if (externalDocs != null) {
+                schema.setExternalDocs(externalDocs);
+            }
             setSchemaDocumentation(type, schema);
             Schema schemaRef = new Schema();
             schemaRef.set$ref(schemaRef(schema.getName()));
