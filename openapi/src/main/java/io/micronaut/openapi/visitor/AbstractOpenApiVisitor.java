@@ -121,7 +121,6 @@ import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import io.swagger.v3.oas.models.tags.Tag;
 
-import java.util.function.Consumer;
 import org.reactivestreams.Publisher;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -1202,9 +1201,6 @@ abstract class AbstractOpenApiVisitor {
             } else if (isNullable && (composedSchema.getAllOf() == null || composedSchema.getAllOf().isEmpty())) {
                 composedSchema.addOneOfItem(originalSchema);
             }
-            if (addSchemaToBind) {
-                composedSchema.addAllOfItem(schemaToBind);
-            }
 
             if (!composedSchema.equals(EMPTY_COMPOSED_SCHEMA)) {
                 return composedSchema;
@@ -1452,22 +1448,11 @@ abstract class AbstractOpenApiVisitor {
                                 classElement.getSuperType().ifPresent(superTypes::add);
                             }
 
-                            if (!superTypes.isEmpty()) {
+                            if (!type.isRecord() && !superTypes.isEmpty()) {
+                                schema = new ComposedSchema();
                                 for (ClassElement sType : superTypes) {
                                     if (!type.isRecord()) {
-                                        schema = new ComposedSchema();
-                                        Optional<ClassElement> superType = Optional.ofNullable(sType);
-                                        while (superType.isPresent()) {
-                                            final ClassElement superElement = superType.get();
-                                            String parentSchemaName = computeDefaultSchemaName(definingElement, superElement);
-                                            if (schemas.get(parentSchemaName) != null
-                                                    || getSchemaDefinition(openAPI, context, superElement, null, mediaTypes) != null) {
-                                                Schema parentSchema = new Schema();
-                                                parentSchema.set$ref(schemaRef(parentSchemaName));
-                                                ((ComposedSchema) schema).addAllOfItem(parentSchema);
-                                            }
-                                            superType = superElement.getSuperType();
-                                        }
+                                        readAllInterfaces2(openAPI, context, definingElement, mediaTypes, schema, sType, schemas);
                                     }
                                 }
                             } else {
@@ -1512,6 +1497,28 @@ abstract class AbstractOpenApiVisitor {
                     }
 
                     if (schema != null) {
+
+                        if (type instanceof TypedElement) {
+                            ClassElement classElement = ((TypedElement) type).getType();
+                            List<ClassElement> superTypes = new ArrayList<>();
+                            if (classElement.isInterface() && !classElement.getInterfaces().isEmpty()) {
+                                superTypes.addAll(classElement.getInterfaces());
+                            }
+                            if (!superTypes.isEmpty()) {
+                                ComposedSchema schema1 = new ComposedSchema();
+                                schema1.addAllOfItem(schema);
+
+                                for (ClassElement sType : superTypes) {
+                                    String schemaName2 = computeDefaultSchemaName(definingElement, sType);
+                                    Schema parentSchema = new Schema();
+                                    parentSchema.set$ref(schemaRef(schemaName2));
+                                    schema1.addAllOfItem(parentSchema);
+                                }
+
+                                schema = schema1;
+                            }
+                        }
+
                         schema.setName(schemaName);
                         schemas.put(schemaName, schema);
                     }
@@ -1538,6 +1545,24 @@ abstract class AbstractOpenApiVisitor {
             return schemaRef;
         }
         return null;
+    }
+
+    private void readAllInterfaces2(OpenAPI openAPI, VisitorContext context, @Nullable Element definingElement, List<MediaType> mediaTypes,
+                                    Schema schema, ClassElement superType, Map<String, Schema> schemas) {
+        String parentSchemaName = computeDefaultSchemaName(definingElement, superType);
+        if (schemas.get(parentSchemaName) != null
+                || getSchemaDefinition(openAPI, context, superType, null, mediaTypes) != null) {
+            Schema parentSchema = new Schema();
+            parentSchema.set$ref(schemaRef(parentSchemaName));
+            schema.addAllOfItem(parentSchema);
+        }
+        if (superType.isInterface()) {
+            for (ClassElement interfaceElement : superType.getInterfaces()) {
+                readAllInterfaces2(openAPI, context, definingElement, mediaTypes, schema, interfaceElement, schemas);
+            }
+        } else if (superType.getSuperType().isPresent()) {
+            readAllInterfaces2(openAPI, context, definingElement, mediaTypes, schema, superType.getSuperType().get(), schemas);
+        }
     }
 
     /**
