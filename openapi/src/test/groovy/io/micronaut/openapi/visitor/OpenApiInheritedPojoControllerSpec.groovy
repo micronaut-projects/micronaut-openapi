@@ -1188,7 +1188,7 @@ interface Animal {
 
 interface Sleeper {
 
-    double sleepDuration();
+    double getSleepDuration();
 }
 
 @jakarta.inject.Singleton
@@ -1211,10 +1211,10 @@ class MyBean {}
         sleeperSchema != null
         catSchema != null
 
-        petSchema instanceof ComposedSchema
-        animalSchema instanceof ComposedSchema
-        sleeperSchema instanceof ComposedSchema
-        catSchema instanceof ComposedSchema
+    petSchema instanceof ComposedSchema
+    animalSchema instanceof ComposedSchema
+    catSchema instanceof ComposedSchema
+    sleeperSchema instanceof Schema
 
         petSchema.type == null
         petSchema.properties == null
@@ -1225,15 +1225,17 @@ class MyBean {}
         catSchema.type == null
         catSchema.properties == null
 
-        ((ComposedSchema) catSchema).allOf.size() == 3
-        ((ComposedSchema) catSchema).allOf[0].$ref == '#/components/schemas/Sleeper'
-        ((ComposedSchema) catSchema).allOf[1].$ref == '#/components/schemas/Pet'
-        ((ComposedSchema) catSchema).allOf[2].type == 'object'
-        ((ComposedSchema) catSchema).allOf[2].properties['clawSize'].type == 'integer'
+    ((ComposedSchema)catSchema).allOf.size() == 4
+    ((ComposedSchema)catSchema).allOf[0].$ref == '#/components/schemas/Pet'
+    ((ComposedSchema)catSchema).allOf[1].$ref == '#/components/schemas/Animal'
+    ((ComposedSchema)catSchema).allOf[2].$ref == '#/components/schemas/Sleeper'
+    ((ComposedSchema)catSchema).allOf[3].type == 'object'
+    ((ComposedSchema)catSchema).allOf[3].properties['clawSize'].type == 'integer'
 
-        ((ComposedSchema) petSchema).allOf.size() == 2
-        ((ComposedSchema) petSchema).allOf[0].$ref == '#/components/schemas/Animal'
-        ((ComposedSchema) petSchema).allOf[1].type == 'object'
-        ((ComposedSchema) petSchema).allOf[1].properties.size() == 2
-    }
+    ((ComposedSchema)petSchema).allOf.size() == 2
+    ((ComposedSchema)petSchema).allOf[0].type == 'object'
+    ((ComposedSchema)petSchema).allOf[0].properties.size() == 2
+    ((ComposedSchema)petSchema).allOf[1].$ref == '#/components/schemas/Animal'
+  }
+
 }

@@ -122,7 +122,6 @@ import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import io.swagger.v3.oas.models.tags.Tag;
 
-import java.util.function.Consumer;
 import org.reactivestreams.Publisher;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
