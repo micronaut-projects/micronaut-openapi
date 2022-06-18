@@ -22,6 +22,9 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import io.micronaut.context.env.Environment;
 import io.micronaut.core.annotation.Experimental;
+import io.micronaut.core.type.Argument;
+import io.micronaut.core.type.GenericArgument;
+import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.core.util.StringUtils;
 import io.micronaut.inject.ast.ClassElement;
 import io.micronaut.inject.ast.Element;
@@ -132,6 +135,16 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
 
     private static final String MICRONAUT_OPENAPI_PROPERTIES = "micronaut.openapi.properties";
     private static final String MICRONAUT_OPENAPI_ENDPOINTS = "micronaut.openapi.endpoints";
+    /**
+     * Loaded expandable properties. Need to save them to reuse in diffferent places
+     */
+    private static final String MICRONAUT_INTERNAL_EXPANDBLE_PROPERTIES = "micronaut.internal.expandable.props";
+    /**
+     * Flag that shows that the expandable properties are already loaded into the context.
+     */
+    private static final String MICRONAUT_INTERNAL_EXPANDBLE_PROPERTIES_LOADED = "micronaut.internal.expandable.props.loaded";
+
+    private static final Argument<List<Map.Entry<String, String>>> EXPANDABLE_PROPERTIES_ARGUMENT = new GenericArgument<List<Map.Entry<String, String>>>() { };
 
     private ClassElement classElement;
     private int visitedElements = -1;
@@ -253,7 +266,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         return conf;
     }
 
-    private static Properties readOpenApiConfigFile(VisitorContext context) {
+    public static Properties readOpenApiConfigFile(VisitorContext context) {
         Optional<Properties> props = context.get(MICRONAUT_OPENAPI_PROPERTIES, Properties.class);
         if (props.isPresent()) {
             return props.get();
@@ -433,14 +446,14 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         openAPI.setPaths(newPaths);
     }
 
-    private JsonNode resolvePlaceholders(ArrayNode anode, UnaryOperator<String> propertyExpander) {
+    public static JsonNode resolvePlaceholders(ArrayNode anode, UnaryOperator<String> propertyExpander) {
         for (int i = 0; i < anode.size(); ++i) {
             anode.set(i, resolvePlaceholders(anode.get(i), propertyExpander));
         }
         return anode;
     }
 
-    private JsonNode resolvePlaceholders(ObjectNode onode, UnaryOperator<String> propertyExpander) {
+    public static JsonNode resolvePlaceholders(ObjectNode onode, UnaryOperator<String> propertyExpander) {
         if (onode.isEmpty()) {
             return onode;
         }
@@ -452,7 +465,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         return newNode;
     }
 
-    private JsonNode resolvePlaceholders(JsonNode node, UnaryOperator<String> propertyExpander) {
+    public static JsonNode resolvePlaceholders(JsonNode node, UnaryOperator<String> propertyExpander) {
         if (node.isTextual()) {
             final String text = node.textValue();
             if (text == null || text.trim().isEmpty()) {
@@ -469,8 +482,8 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         }
     }
 
-    private String expandProperties(String s, List<Map.Entry<String, String>> properties) {
-        if (s == null || s.isEmpty()) {
+    public static String expandProperties(String s, List<Map.Entry<String, String>> properties) {
+        if (StringUtils.isEmpty(s) || CollectionUtils.isEmpty(properties)) {
             return s;
         }
         for (Map.Entry<String, String> entry : properties) {
@@ -479,12 +492,29 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         return s;
     }
 
-    private OpenAPI resolvePropertyPlaceHolders(OpenAPI openAPI, VisitorContext visitorContext) {
-        List<Map.Entry<String, String>> expandableProperties = readOpenApiConfigFile(visitorContext).entrySet()
-            .stream()
-            .filter(entry -> entry.getKey().toString().startsWith(MICRONAUT_OPENAPI_EXPAND_PREFIX))
-            .map(entry -> new AbstractMap.SimpleImmutableEntry<>("${" + entry.getKey().toString().substring(MICRONAUT_OPENAPI_EXPAND_PREFIX.length()) + '}', entry.getValue().toString())).collect(Collectors.toList());
-        if (expandableProperties.isEmpty()) {
+    public static List<Map.Entry<String, String>> getExpandableProperties(VisitorContext context) {
+        List<Map.Entry<String, String>> expandableProperties;
+        Optional<Boolean> propertiesLoaded = context.get(MICRONAUT_INTERNAL_EXPANDBLE_PROPERTIES_LOADED, Boolean.class);
+        if (!propertiesLoaded.orElse(false)) {
+
+            expandableProperties = readOpenApiConfigFile(context).entrySet()
+                .stream()
+                .filter(entry -> entry.getKey().toString().startsWith(MICRONAUT_OPENAPI_EXPAND_PREFIX))
+                .map(entry -> new AbstractMap.SimpleImmutableEntry<>("${" + entry.getKey().toString().substring(MICRONAUT_OPENAPI_EXPAND_PREFIX.length()) + '}', entry.getValue().toString()))
+                .collect(Collectors.toList());
+
+            context.put(MICRONAUT_INTERNAL_EXPANDBLE_PROPERTIES, expandableProperties);
+            context.put(MICRONAUT_INTERNAL_EXPANDBLE_PROPERTIES_LOADED, true);
+        } else {
+            expandableProperties = context.get(MICRONAUT_INTERNAL_EXPANDBLE_PROPERTIES, EXPANDABLE_PROPERTIES_ARGUMENT).orElse(null);
+        }
+
+        return expandableProperties;
+    }
+
+    private static OpenAPI resolvePropertyPlaceHolders(OpenAPI openAPI, VisitorContext visitorContext) {
+        List<Map.Entry<String, String>> expandableProperties = getExpandableProperties(visitorContext);
+        if (CollectionUtils.isEmpty(expandableProperties)) {
             return openAPI;
         }
         visitorContext.info("Expanding properties: " + expandableProperties);
