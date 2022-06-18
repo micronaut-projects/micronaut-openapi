@@ -1,5 +1,5 @@
 [versions]
-managed-swagger = "2.2.0"
+managed-swagger = "2.2.1"
 
 kotlintest-runner-junit5 = "3.4.2"
 kotlin = "1.6.21"
