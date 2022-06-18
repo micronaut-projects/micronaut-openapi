@@ -136,6 +136,9 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.expandProperties;
+import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.getExpandableProperties;
+import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.resolvePlaceholders;
 import static java.util.stream.Collectors.toMap;
 
 /**
@@ -1240,6 +1243,8 @@ abstract class AbstractOpenApiVisitor {
     private Schema doBindSchemaAnnotationValue(VisitorContext context, Element element, Schema schemaToBind,
                                                JsonNode schemaJson, String defaultValue, String... allowableValues) {
         try {
+            // need to set placeholders to set correct values to example field
+            schemaJson = resolvePlaceholders(schemaJson, s -> expandProperties(s, getExpandableProperties(context)));
             schemaToBind = jsonMapper.readerForUpdating(schemaToBind).readValue(schemaJson);
             if (StringUtils.isNotEmpty(defaultValue)) {
                 schemaToBind.setDefault(defaultValue);
