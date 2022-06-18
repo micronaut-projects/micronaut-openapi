@@ -1367,33 +1367,33 @@ interface PetOperations {
      */
     @Get(uri = "/cases/{name}", produces = MediaType.TEXT_PLAIN)
     Cat getCat(String name);
-    
+
 }
 
-interface Cat extends Pet,Sleeper {    
+interface Cat extends Pet,Sleeper {
 
-    public int getClawSize();
+    int getClawSize();
 }
 
-@JsonTypeInfo(include = JsonTypeInfo.As.PROPERTY, use = JsonTypeInfo.Id.NAME, property = "type", visible = true)
-@JsonSubTypes({ @JsonSubTypes.Type(value = Cat.class, name = "Cat") })
-interface Pet extends Animal {  
-  
-    public int getAge();
+@JsonTypeInfo( use = JsonTypeInfo.Id.NAME, property = "type", visible = true)
+@JsonSubTypes(@JsonSubTypes.Type(value = Cat.class, name = "Cat"))
+interface Pet extends Animal {
 
-    public String getName();
+    int getAge();
+
+    String getName();
 }
 
-@JsonTypeInfo(include = JsonTypeInfo.As.PROPERTY, use = JsonTypeInfo.Id.NAME, property = "type", visible = true)
-@JsonSubTypes({ @JsonSubTypes.Type(value = Pet.class, name = "Pet") })
-interface Animal {  
-  
-    public double getWeight();    
+@JsonTypeInfo( use = JsonTypeInfo.Id.NAME, property = "type", visible = true)
+@JsonSubTypes(@JsonSubTypes.Type(value = Pet.class, name = "Pet"))
+interface Animal {
+
+    double getWeight();
 }
 
-interface Sleeper {    
+interface Sleeper {
 
-    public double sleepDuration();
+    double getSleepDuration();
 }
 
 @jakarta.inject.Singleton
@@ -1418,8 +1418,8 @@ class MyBean {}
 
     petSchema instanceof ComposedSchema
     animalSchema instanceof ComposedSchema
-    sleeperSchema instanceof ComposedSchema
     catSchema instanceof ComposedSchema
+    sleeperSchema instanceof Schema
 
     petSchema.type == null
     petSchema.properties == null
@@ -1430,16 +1430,17 @@ class MyBean {}
     catSchema.type == null
     catSchema.properties == null
 
-    ((ComposedSchema)catSchema).allOf.size() == 3
-    ((ComposedSchema)catSchema).allOf[0].$ref == '#/components/schemas/Sleeper'
-    ((ComposedSchema)catSchema).allOf[1].$ref == '#/components/schemas/Pet'
-    ((ComposedSchema)catSchema).allOf[2].type == 'object'
-    ((ComposedSchema)catSchema).allOf[2].properties['clawSize'].type == 'integer'
+    ((ComposedSchema)catSchema).allOf.size() == 4
+    ((ComposedSchema)catSchema).allOf[0].$ref == '#/components/schemas/Pet'
+    ((ComposedSchema)catSchema).allOf[1].$ref == '#/components/schemas/Animal'
+    ((ComposedSchema)catSchema).allOf[2].$ref == '#/components/schemas/Sleeper'
+    ((ComposedSchema)catSchema).allOf[3].type == 'object'
+    ((ComposedSchema)catSchema).allOf[3].properties['clawSize'].type == 'integer'
 
     ((ComposedSchema)petSchema).allOf.size() == 2
-    ((ComposedSchema)petSchema).allOf[0].$ref == '#/components/schemas/Animal'
-    ((ComposedSchema)petSchema).allOf[1].type == 'object'
-    ((ComposedSchema)petSchema).allOf[1].properties.size() == 2
+    ((ComposedSchema)petSchema).allOf[0].type == 'object'
+    ((ComposedSchema)petSchema).allOf[0].properties.size() == 2
+    ((ComposedSchema)petSchema).allOf[1].$ref == '#/components/schemas/Animal'
   }
 
 }
