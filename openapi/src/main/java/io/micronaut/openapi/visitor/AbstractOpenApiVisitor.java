@@ -122,7 +122,6 @@ import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import io.swagger.v3.oas.models.tags.Tag;
 
-import java.util.function.Consumer;
 import org.reactivestreams.Publisher;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -1239,9 +1238,6 @@ abstract class AbstractOpenApiVisitor {
                 composedSchema.addAllOfItem(originalSchema);
             } else if (isNullable && (composedSchema.getAllOf() == null || composedSchema.getAllOf().isEmpty())) {
                 composedSchema.addOneOfItem(originalSchema);
-            }
-            if (addSchemaToBind) {
-                composedSchema.addAllOfItem(schemaToBind);
             }
 
             if (!composedSchema.equals(EMPTY_COMPOSED_SCHEMA)) {
