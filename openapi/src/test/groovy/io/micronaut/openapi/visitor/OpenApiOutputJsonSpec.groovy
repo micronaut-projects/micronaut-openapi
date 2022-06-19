@@ -2,9 +2,13 @@ package io.micronaut.openapi.visitor
 
 import io.micronaut.openapi.AbstractOpenApiTypeElementSpec
 
-class OpenApiOutputYamlSpec extends AbstractOpenApiTypeElementSpec {
+class OpenApiOutputJsonSpec extends AbstractOpenApiTypeElementSpec {
 
     def setup() {
+        System.setProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_JSON_FORMAT, "true")
+    }
+
+    def cleanup() {
         System.clearProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_JSON_FORMAT)
     }
 
@@ -130,133 +134,25 @@ class Person3 {
 @jakarta.inject.Singleton
 class MyBean {}
 ''')
-        then: "the yaml is written"
-        AbstractOpenApiVisitor.testYamlReference != null
+        then: "the json is written"
+        AbstractOpenApiVisitor.testJsonReference != null
 
         then: "paths are sorted and schemas are sorted"
-        AbstractOpenApiEndpointVisitor.testYamlReference.contains('''\
-paths:
-  /endpoint1:
-    get:
-      operationId: getPath
-      responses:
-        "200":
-          description: getPath 200 response
-          content:
-            application/json:
-              schema:
-                type: string
-  /endpoint1/path1:
-    get:
-      operationId: path1
-      responses:
-        "200":
-          description: path1 200 response
-          content:
-            application/json:
-              schema:
-                type: string
-  /endpoint1/path2:
-    get:
-      operationId: path2
-      responses:
-        "200":
-          description: path2 200 response
-          content:
-            application/json:
-              schema:
-                type: string
-  /endpoint2:
-    get:
-      operationId: path
-      responses:
-        "200":
-          description: path 200 response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Person3\'
-  /endpoint2/path1:
-    get:
-      operationId: path1_1
-      responses:
-        "200":
-          description: path1_1 200 response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Person1\'
-  /endpoint2/path2:
-    get:
-      operationId: path2_1
-      responses:
-        "200":
-          description: path2_1 200 response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Person2\'
-  /endpoint3:
-    get:
-      operationId: path_1
-      responses:
-        "200":
-          description: path_1 200 response
-          content:
-            application/json:
-              schema:
-                type: string
-  /endpoint3/path1:
-    get:
-      operationId: path1_2
-      responses:
-        "200":
-          description: path1_2 200 response
-          content:
-            application/json:
-              schema:
-                type: string
-  /endpoint3/path2:
-    get:
-      operationId: path2_2
-      responses:
-        "200":
-          description: path2_2 200 response
-          content:
-            application/json:
-              schema:
-                type: string
-components:
-  schemas:
-    Person1:
-      required:
-      - debtValue
-      - name
-      - totalGoals
-      type: object
-      properties:
-        name:
-          type: string
-        debtValue:
-          type: integer
-          format: int32
-        totalGoals:
-          type: integer
-          format: int32
-    Person2:
-      required:
-      - name
-      type: object
-      properties:
-        name:
-          type: string
-    Person3:
-      required:
-      - name
-      type: object
-      properties:
-        name:
-          type: string''')
+        AbstractOpenApiEndpointVisitor.testJsonReference.contains('''\
+"paths":{\
+"/endpoint1":{"get":{"operationId":"getPath","responses":{"200":{"description":"getPath 200 response","content":{"application/json":{"schema":{"type":"string"}}}}}}},\
+"/endpoint1/path1":{"get":{"operationId":"path1","responses":{"200":{"description":"path1 200 response","content":{"application/json":{"schema":{"type":"string"}}}}}}},\
+"/endpoint1/path2":{"get":{"operationId":"path2","responses":{"200":{"description":"path2 200 response","content":{"application/json":{"schema":{"type":"string"}}}}}}},\
+"/endpoint2":{"get":{"operationId":"path","responses":{"200":{"description":"path 200 response","content":{"application/json":{"schema":{"$ref":"#/components/schemas/Person3"}}}}}}},\
+"/endpoint2/path1":{"get":{"operationId":"path1_1","responses":{"200":{"description":"path1_1 200 response","content":{"application/json":{"schema":{"$ref":"#/components/schemas/Person1"}}}}}}},\
+"/endpoint2/path2":{"get":{"operationId":"path2_1","responses":{"200":{"description":"path2_1 200 response","content":{"application/json":{"schema":{"$ref":"#/components/schemas/Person2"}}}}}}},\
+"/endpoint3":{"get":{"operationId":"path_1","responses":{"200":{"description":"path_1 200 response","content":{"application/json":{"schema":{"type":"string"}}}}}}},\
+"/endpoint3/path1":{"get":{"operationId":"path1_2","responses":{"200":{"description":"path1_2 200 response","content":{"application/json":{"schema":{"type":"string"}}}}}}},\
+"/endpoint3/path2":{"get":{"operationId":"path2_2","responses":{"200":{"description":"path2_2 200 response","content":{"application/json":{"schema":{"type":"string"}}}}}}}},\
+"components":{"schemas":{\
+"Person1":{"required":["debtValue","name","totalGoals"],"type":"object","properties":{"name":{"type":"string"},"debtValue":{"type":"integer","format":"int32"},"totalGoals":{"type":"integer","format":"int32"}}},\
+"Person2":{"required":["name"],"type":"object","properties":{"name":{"type":"string"}}},\
+"Person3":{"required":["name"],"type":"object","properties":{"name":{"type":"string"}}}}}}''')
     }
 
 }
