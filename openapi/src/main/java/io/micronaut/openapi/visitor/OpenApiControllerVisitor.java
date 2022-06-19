@@ -15,8 +15,12 @@
  */
 package io.micronaut.openapi.visitor;
 
+import io.micronaut.context.RequiresCondition;
+import io.micronaut.context.annotation.Requires;
 import io.micronaut.core.annotation.AnnotationValue;
 import io.micronaut.core.annotation.Experimental;
+import io.micronaut.core.type.Argument;
+import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.core.util.StringUtils;
 import io.micronaut.http.HttpMethod;
 import io.micronaut.http.MediaType;
@@ -27,6 +31,7 @@ import io.micronaut.http.annotation.Produces;
 import io.micronaut.http.annotation.UriMapping;
 import io.micronaut.http.uri.UriMatchTemplate;
 import io.micronaut.inject.ast.ClassElement;
+import io.micronaut.inject.ast.Element;
 import io.micronaut.inject.ast.MethodElement;
 import io.micronaut.inject.visitor.TypeElementVisitor;
 import io.micronaut.inject.visitor.VisitorContext;
@@ -44,6 +49,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.MICRONAUT_OPENAPI_ENVIRONMENTS;
+import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.readOpenApiConfigFile;
 
 /**
  * A {@link TypeElementVisitor} the builds the Swagger model from Micronaut controllers at compile time.
@@ -72,9 +81,60 @@ public class OpenApiControllerVisitor extends AbstractOpenApiEndpointVisitor imp
         this.customUri = customUri;
     }
 
+    private List<String> getActiveEnvironments(VisitorContext context) {
+        Optional<List<String>> activeEnvsOpt = context.get(MICRONAUT_OPENAPI_ENVIRONMENTS, Argument.LIST_OF_STRING);
+        if (activeEnvsOpt.isPresent()) {
+            return activeEnvsOpt.get();
+        }
+        String activeEnv = getConfigurationProperty(MICRONAUT_OPENAPI_ENVIRONMENTS, context);
+        List<String> activeEnvs;
+        if (StringUtils.isNotEmpty(activeEnv)) {
+            activeEnvs = Stream.of(activeEnv)
+                .filter(StringUtils::isNotEmpty)
+                .flatMap(s -> Arrays.stream(s.split(",")))
+                .map(String::trim)
+                .collect(Collectors.toList());
+        } else {
+            activeEnvs = new ArrayList<>();
+        }
+        context.put(MICRONAUT_OPENAPI_ENVIRONMENTS, activeEnvs);
+        return activeEnvs;
+    }
+
+    private boolean ignoreByRequires(Element element, VisitorContext context) {
+        List<AnnotationValue<Requires>> requiresAnnotations = element.getDeclaredAnnotationValuesByType(Requires.class);
+        if (CollectionUtils.isEmpty(requiresAnnotations)) {
+            return false;
+        }
+        List<String> activeEnvs = getActiveEnvironments(context);
+        if (activeEnvs.isEmpty()) {
+            return false;
+        }
+
+        // check env and notEnv
+        for (AnnotationValue<Requires> requiresAnn : requiresAnnotations) {
+            Optional<String[]> reqEnvs = requiresAnn.get(RequiresCondition.MEMBER_ENV, String[].class);
+            if (reqEnvs.isPresent()) {
+                boolean result = Arrays.stream(reqEnvs.get()).anyMatch(activeEnvs::contains);
+                if (!result) {
+                    return true;
+                }
+            }
+            Optional<String[]> reqNotEnvs = requiresAnn.get(RequiresCondition.MEMBER_NOT_ENV, String[].class);
+            if (reqNotEnvs.isPresent()) {
+                boolean result = Arrays.stream(reqNotEnvs.get()).noneMatch(activeEnvs::contains);
+                if (!result) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     @Override
     protected boolean ignore(ClassElement element, VisitorContext context) {
-        return !element.isAnnotationPresent(Controller.class);
+        return !element.isAnnotationPresent(Controller.class)
+            || ignoreByRequires(element, context);
     }
 
     @Override
@@ -87,7 +147,12 @@ public class OpenApiControllerVisitor extends AbstractOpenApiEndpointVisitor imp
             || ignore(element.getDeclaringType(), context)
             || element.isPrivate()
             || element.isStatic()
-            || element.isAnnotationPresent(Hidden.class);
+            || element.isAnnotationPresent(Hidden.class)
+            || ignoreByRequires(element, context);
+    }
+
+    private String getConfigurationProperty(String key, VisitorContext context) {
+        return System.getProperty(key, readOpenApiConfigFile(context).getProperty(key));
     }
 
     @Override

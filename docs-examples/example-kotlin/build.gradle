@@ -22,9 +22,9 @@ dependencies {
     testImplementation(mn.micronaut.hibernate.validator)
     testImplementation(libs.kotlin.stdlib.jdk8)
     testImplementation(libs.kotlin.reflect)
-    testImplementation(libs.kotlintest.runner.junit5)
 
     testRuntimeOnly(libs.logback.classic)
+    testRuntimeOnly(libs.junit.jupiter.engine)
 }
 
 test {

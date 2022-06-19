@@ -74,6 +74,7 @@ import java.util.stream.Collectors;
     OpenApiApplicationVisitor.MICRONAUT_OPENAPI_PROPERTY_NAMING_STRATEGY,
     OpenApiApplicationVisitor.MICRONAUT_OPENAPI_VIEWS_SPEC,
     OpenApiApplicationVisitor.MICRONAUT_OPENAPI_JSON_FORMAT,
+    OpenApiApplicationVisitor.MICRONAUT_OPENAPI_ENVIRONMENTS,
     OpenApiApplicationVisitor.MICRONAUT_OPENAPI_TARGET_FILE,
     OpenApiApplicationVisitor.MICRONAUT_OPENAPI_ADDITIONAL_FILES,
     OpenApiApplicationVisitor.MICRONAUT_OPENAPI_CONFIG_FILE,
@@ -108,22 +109,18 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
      * System property that specifies the location of additional swagger YAML and JSON files to read from.
      */
     public static final String MICRONAUT_OPENAPI_ADDITIONAL_FILES = "micronaut.openapi.additional.files";
-
     /**
      * Default openapi config file.
      */
     public static final String OPENAPI_CONFIG_FILE = "openapi.properties";
-
     /**
      * The name of the entry for Endpoint class tags in the context.
      */
     public static final String MICRONAUT_OPENAPI_ENDPOINT_CLASS_TAGS = "micronaut.openapi.endpoint.class.tags";
-
     /**
      * The name of the entry for Endpoint servers in the context.
      */
     public static final String MICRONAUT_OPENAPI_ENDPOINT_SERVERS = "micronaut.openapi.endpoint.servers";
-
     /**
      * The name of the entry for Endpoint security requirements in the context.
      */
@@ -132,6 +129,10 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
      * Is this property true, output file format will be JSON, otherwise YAML.
      */
     public static final String MICRONAUT_OPENAPI_JSON_FORMAT = "micronaut.openapi.json.format";
+    /**
+     * Active micronaut environments which will be used for @Requires annotations.
+     */
+    public static final String MICRONAUT_OPENAPI_ENVIRONMENTS = "micronaut.openapi.environments";
 
     private static final String MICRONAUT_OPENAPI_PROPERTIES = "micronaut.openapi.properties";
     private static final String MICRONAUT_OPENAPI_ENDPOINTS = "micronaut.openapi.endpoints";
