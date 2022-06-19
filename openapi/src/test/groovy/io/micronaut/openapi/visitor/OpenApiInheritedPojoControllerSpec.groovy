@@ -1238,11 +1238,11 @@ class MyBean {}
         ((ComposedSchema) petSchema).allOf[1].$ref == '#/components/schemas/Animal'
     }
 
-  void "test build OpenAPI doc for interface POJO with multiple and multi leveled inheritance"() {
+    void "test build OpenAPI doc for interface POJO with multiple and multi leveled inheritance"() {
 
-    given: "An API definition"
-    when:
-    buildBeanDefinition('test.MyBean', '''
+        given: "An API definition"
+        when:
+        buildBeanDefinition('test.MyBean', '''
 package test;
 
 import io.reactivex.*;
@@ -1294,48 +1294,48 @@ interface Sleeper {
 @jakarta.inject.Singleton
 class MyBean {}
 ''')
-    then: "the state is correct"
-    AbstractOpenApiVisitor.testReference != null
+        then: "the state is correct"
+        AbstractOpenApiVisitor.testReference != null
 
-    when: "The OpenAPI is retrieved"
-    OpenAPI openAPI = AbstractOpenApiVisitor.testReference
-    Schema petSchema = openAPI.components.schemas['Pet']
-    Schema animalSchema = openAPI.components.schemas['Animal']
-    Schema sleeperSchema = openAPI.components.schemas['Sleeper']
-    Schema catSchema = openAPI.components.schemas['Cat']
+        when: "The OpenAPI is retrieved"
+        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        Schema petSchema = openAPI.components.schemas['Pet']
+        Schema animalSchema = openAPI.components.schemas['Animal']
+        Schema sleeperSchema = openAPI.components.schemas['Sleeper']
+        Schema catSchema = openAPI.components.schemas['Cat']
 
 
-    then: "the components are valid"
-    petSchema != null
-    animalSchema != null
-    sleeperSchema != null
-    catSchema != null
+        then: "the components are valid"
+        petSchema != null
+        animalSchema != null
+        sleeperSchema != null
+        catSchema != null
 
-    petSchema instanceof ComposedSchema
-    animalSchema instanceof ComposedSchema
-    catSchema instanceof ComposedSchema
-    sleeperSchema instanceof Schema
+        petSchema instanceof ComposedSchema
+        animalSchema instanceof ComposedSchema
+        catSchema instanceof ComposedSchema
+        sleeperSchema instanceof Schema
 
-    petSchema.type == null
-    petSchema.properties == null
-    animalSchema.type == 'object'
-    animalSchema.properties.size() == 1
-    sleeperSchema.type == 'object'
-    sleeperSchema.properties.size() == 1
-    catSchema.type == null
-    catSchema.properties == null
+        petSchema.type == null
+        petSchema.properties == null
+        animalSchema.type == 'object'
+        animalSchema.properties.size() == 1
+        sleeperSchema.type == 'object'
+        sleeperSchema.properties.size() == 1
+        catSchema.type == null
+        catSchema.properties == null
 
-    ((ComposedSchema)catSchema).allOf.size() == 4
-    ((ComposedSchema)catSchema).allOf[0].$ref == '#/components/schemas/Pet'
-    ((ComposedSchema)catSchema).allOf[1].$ref == '#/components/schemas/Animal'
-    ((ComposedSchema)catSchema).allOf[2].$ref == '#/components/schemas/Sleeper'
-    ((ComposedSchema)catSchema).allOf[3].type == 'object'
-    ((ComposedSchema)catSchema).allOf[3].properties['clawSize'].type == 'integer'
+        ((ComposedSchema) catSchema).allOf.size() == 4
+        ((ComposedSchema) catSchema).allOf[0].$ref == '#/components/schemas/Pet'
+        ((ComposedSchema) catSchema).allOf[1].$ref == '#/components/schemas/Animal'
+        ((ComposedSchema) catSchema).allOf[2].$ref == '#/components/schemas/Sleeper'
+        ((ComposedSchema) catSchema).allOf[3].type == 'object'
+        ((ComposedSchema) catSchema).allOf[3].properties['clawSize'].type == 'integer'
 
-    ((ComposedSchema)petSchema).allOf.size() == 2
-    ((ComposedSchema)petSchema).allOf[0].type == 'object'
-    ((ComposedSchema)petSchema).allOf[0].properties.size() == 2
-    ((ComposedSchema)petSchema).allOf[1].$ref == '#/components/schemas/Animal'
-  }
+        ((ComposedSchema) petSchema).allOf.size() == 2
+        ((ComposedSchema) petSchema).allOf[0].type == 'object'
+        ((ComposedSchema) petSchema).allOf[0].properties.size() == 2
+        ((ComposedSchema) petSchema).allOf[1].$ref == '#/components/schemas/Animal'
+    }
 
 }
