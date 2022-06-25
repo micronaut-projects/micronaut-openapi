@@ -835,6 +835,9 @@ abstract class AbstractOpenApiVisitor {
                 } else if (type.isIterable()) {
                     if (type.isArray()) {
                         schema = resolveSchema(openAPI, type, type.fromArray(), context, mediaTypes);
+                        if (schema != null) {
+                            schema = arraySchema(schema);
+                        }
                     } else {
                         Optional<ClassElement> componentType = type.getFirstTypeArgument();
                         if (componentType.isPresent()) {
@@ -842,12 +845,12 @@ abstract class AbstractOpenApiVisitor {
                         } else {
                             schema = getPrimitiveType(Object.class.getName());
                         }
-                    }
-                    List<FieldElement> fields =  type.getFields();
-                    if (schema != null && fields.isEmpty()) {
-                        schema = arraySchema(schema);
-                    } else {
-                        schema = getSchemaDefinition(openAPI, context, type, definingElement, mediaTypes);
+                        List<FieldElement> fields =  type.getFields();
+                        if (schema != null && fields.isEmpty()) {
+                            schema = arraySchema(schema);
+                        } else {
+                            schema = getSchemaDefinition(openAPI, context, type, definingElement, mediaTypes);
+                        }
                     }
                 } else if (isReturnTypeFile(type)) {
                     schema = new StringSchema();
@@ -1481,22 +1484,21 @@ abstract class AbstractOpenApiVisitor {
                         schema.setType("string");
                         schema.setEnum(((EnumElement) type).values());
                     } else {
-                        if (type instanceof TypedElement) {
-                            ClassElement classElement = ((TypedElement) type).getType();
+                        ClassElement classElement = ((TypedElement) type).getType();
 
-                            List<ClassElement> superTypes = new ArrayList<>();
-                            Collection<ClassElement> parentInterfaces = classElement.getInterfaces();
-                            if (classElement.isInterface() && !parentInterfaces.isEmpty()) {
-                                for (ClassElement parentInterface : parentInterfaces) {
-                                    if (ClassUtils.isJavaLangType(parentInterface.getName())
-                                        || parentInterface.getBeanProperties().isEmpty()) {
-                                        continue;
-                                    }
-                                    superTypes.add(parentInterface);
+                        List<ClassElement> superTypes = new ArrayList<>();
+                        Collection<ClassElement> parentInterfaces = classElement.getInterfaces();
+                        if (classElement.isInterface() && !parentInterfaces.isEmpty()) {
+                            for (ClassElement parentInterface : parentInterfaces) {
+                                if (ClassUtils.isJavaLangType(parentInterface.getName())
+                                    || parentInterface.getBeanProperties().isEmpty()) {
+                                    continue;
                                 }
-                            } else {
-                                classElement.getSuperType().ifPresent(superTypes::add);
+                                superTypes.add(parentInterface);
                             }
+                        } else {
+                            classElement.getSuperType().ifPresent(superTypes::add);
+                        }
 
                             if (!type.isRecord() && !superTypes.isEmpty()) {
                                 schema = new ComposedSchema();
@@ -1505,8 +1507,6 @@ abstract class AbstractOpenApiVisitor {
                                         readAllInterfaces(openAPI, context, definingElement, mediaTypes, schema, sType, schemas);
                                     }
                                 }
-                            } else {
-                                schema = new Schema();
                             }
                         } else {
                             schema = new Schema();
