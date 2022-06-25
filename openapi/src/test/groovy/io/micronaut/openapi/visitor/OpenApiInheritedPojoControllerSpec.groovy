@@ -1252,6 +1252,11 @@ import java.util.List;
 import io.swagger.v3.oas.annotations.media.*;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.micronaut.http.MediaType;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 @Controller("/pets")
 interface PetOperations {
@@ -1286,7 +1291,7 @@ interface Animal {
     double getWeight();
 }
 
-interface Sleeper {
+interface Sleeper extends Serializable, Readable {
 
     double getSleepDuration();
 }
