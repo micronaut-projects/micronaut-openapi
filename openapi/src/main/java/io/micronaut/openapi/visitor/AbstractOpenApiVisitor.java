@@ -843,8 +843,11 @@ abstract class AbstractOpenApiVisitor {
                             schema = getPrimitiveType(Object.class.getName());
                         }
                     }
-                    if (schema != null) {
+                    List<FieldElement> fields =  type.getFields();
+                    if (schema != null && fields.isEmpty()) {
                         schema = arraySchema(schema);
+                    } else {
+                        schema = getSchemaDefinition(openAPI, context, type, definingElement, mediaTypes);
                     }
                 } else if (isReturnTypeFile(type)) {
                     schema = new StringSchema();
@@ -1786,7 +1789,11 @@ abstract class AbstractOpenApiVisitor {
 
     private void processPropertyElements(OpenAPI openAPI, VisitorContext context, Element type, Schema schema, List<? extends TypedElement> publicFields, List<MediaType> mediaTypes) {
         for (TypedElement publicField : publicFields) {
-            if (publicField.isAnnotationPresent(JsonIgnore.class) || publicField.isAnnotationPresent(Hidden.class)) {
+            AnnotationValue<io.swagger.v3.oas.annotations.media.Schema> fieldSchemaAnn = publicField.getAnnotation(io.swagger.v3.oas.annotations.media.Schema.class);
+            boolean isHidden = fieldSchemaAnn != null && fieldSchemaAnn.get("hidden", Boolean.class).orElse(false);
+            if (publicField.isAnnotationPresent(JsonIgnore.class)
+                || publicField.isAnnotationPresent(Hidden.class)
+                || isHidden) {
                 continue;
             }
 
