@@ -1245,6 +1245,9 @@ abstract class AbstractOpenApiVisitor {
             } else if (isNullable && (composedSchema.getAllOf() == null || composedSchema.getAllOf().isEmpty())) {
                 composedSchema.addOneOfItem(originalSchema);
             }
+            if (addSchemaToBind) {
+                composedSchema.addAllOfItem(schemaToBind);
+            }
 
             if (!composedSchema.equals(EMPTY_COMPOSED_SCHEMA)) {
                 return composedSchema;
@@ -1486,25 +1489,26 @@ abstract class AbstractOpenApiVisitor {
                     } else {
                         ClassElement classElement = ((TypedElement) type).getType();
 
-                        List<ClassElement> superTypes = new ArrayList<>();
-                        Collection<ClassElement> parentInterfaces = classElement.getInterfaces();
-                        if (classElement.isInterface() && !parentInterfaces.isEmpty()) {
-                            for (ClassElement parentInterface : parentInterfaces) {
-                                if (ClassUtils.isJavaLangType(parentInterface.getName())
-                                    || parentInterface.getBeanProperties().isEmpty()) {
-                                    continue;
+                            List<ClassElement> superTypes = new ArrayList<>();
+                            Collection<ClassElement> parentInterfaces = classElement.getInterfaces();
+                            if (classElement.isInterface() && !parentInterfaces.isEmpty()) {
+                                for (ClassElement parentInterface : parentInterfaces) {
+                                    if (ClassUtils.isJavaLangType(parentInterface.getName())
+                                        || parentInterface.getBeanProperties().isEmpty()) {
+                                        continue;
+                                    }
+                                    superTypes.add(parentInterface);
                                 }
-                                superTypes.add(parentInterface);
+                            } else {
+                                classElement.getSuperType().ifPresent(superTypes::add);
                             }
-                        } else {
-                            classElement.getSuperType().ifPresent(superTypes::add);
-                        }
 
-                        if (!type.isRecord() && !superTypes.isEmpty()) {
-                            schema = new ComposedSchema();
-                            for (ClassElement sType : superTypes) {
-                                if (!type.isRecord()) {
-                                    readAllInterfaces(openAPI, context, definingElement, mediaTypes, schema, sType, schemas);
+                            if (!type.isRecord() && !superTypes.isEmpty()) {
+                                schema = new ComposedSchema();
+                                for (ClassElement sType : superTypes) {
+                                    if (!type.isRecord()) {
+                                        readAllInterfaces(openAPI, context, definingElement, mediaTypes, schema, sType, schemas);
+                                    }
                                 }
                             }
                         } else {
