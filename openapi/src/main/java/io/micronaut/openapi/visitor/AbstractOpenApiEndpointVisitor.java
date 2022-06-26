@@ -60,6 +60,7 @@ import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.callbacks.Callback;
+import io.swagger.v3.oas.annotations.callbacks.Callbacks;
 import io.swagger.v3.oas.annotations.enums.Explode;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -103,7 +104,9 @@ import java.util.stream.Stream;
  * @since 1.0
  */
 @Experimental
-abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
+public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
+
+    public static final String COMPONENTS_CALLBACKS_PREFIX = "#/components/callbacks/";
 
     private static final TypeReference<Map<CharSequence, Object>> MAP_TYPE = new TypeReference<Map<CharSequence, Object>>() {
     };
@@ -672,6 +675,15 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
                 if (newParameter == null) {
                     try {
                         newParameter = treeToValue(jsonNode, Parameter.class);
+                        if (jsonNode.has("schema")) {
+                            JsonNode schemaNode = jsonNode.get("schema");
+                            if (schemaNode.has("$ref")) {
+                                if (newParameter == null) {
+                                    newParameter = new Parameter();
+                                }
+                                newParameter.schema(new Schema().$ref(schemaNode.get("$ref").asText()));
+                            }
+                        }
                     } catch (Exception e) {
                         context.warn("Error reading Swagger Parameter for element [" + parameter + "]: "
                                 + e.getMessage(), parameter);
@@ -1078,7 +1090,13 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
 
     private void readCallbacks(MethodElement element, VisitorContext context,
                                io.swagger.v3.oas.models.Operation swaggerOperation) {
-        List<AnnotationValue<Callback>> callbackAnnotations = element.getAnnotationValuesByType(Callback.class);
+        AnnotationValue<Callbacks> callbacksAnnotation = element.getAnnotation(Callbacks.class);
+        List<AnnotationValue<Callback>> callbackAnnotations;
+        if (callbacksAnnotation != null) {
+            callbackAnnotations = callbacksAnnotation.getAnnotations("value");
+        } else {
+            callbackAnnotations = element.getAnnotationValuesByType(Callback.class);
+        }
         if (CollectionUtils.isEmpty(callbackAnnotations)) {
             return;
         }
@@ -1088,27 +1106,32 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
                 continue;
             }
             String callbackName = name.get();
+            final Optional<String> ref = callbackAnn.get("ref", String.class);
+            if (ref.isPresent()) {
+                String refCallback = ref.get().substring(COMPONENTS_CALLBACKS_PREFIX.length());
+                processCallbackReference(context, swaggerOperation, callbackName, refCallback);
+                continue;
+            }
             final Optional<String> expr = callbackAnn.get("callbackUrlExpression", String.class);
             if (expr.isPresent()) {
                 processUrlCallbackExpression(context, swaggerOperation, callbackAnn, callbackName, expr.get());
             } else {
-                processCallbackReference(context, swaggerOperation, callbackName);
+                processCallbackReference(context, swaggerOperation, callbackName, null);
             }
         }
     }
 
     private void processCallbackReference(VisitorContext context, io.swagger.v3.oas.models.Operation swaggerOperation,
-                                          String callbackName) {
+                                          String callbackName, String refCallback) {
         final Components components = resolveComponents(resolveOpenAPI(context));
-        final Map<String, io.swagger.v3.oas.models.callbacks.Callback> callbackComponents = components
-                .getCallbacks();
-        if (callbackComponents != null && callbackComponents.containsKey(callbackName)) {
-            Map<String, io.swagger.v3.oas.models.callbacks.Callback> callbacks = initCallbacks(
-                    swaggerOperation);
-            final io.swagger.v3.oas.models.callbacks.Callback callbackRef = new io.swagger.v3.oas.models.callbacks.Callback();
-            callbackRef.set$ref("#/components/callbacks/" + callbackName);
-            callbacks.put(callbackName, callbackRef);
+        Map<String, io.swagger.v3.oas.models.callbacks.Callback> callbacks = initCallbacks(swaggerOperation);
+        final io.swagger.v3.oas.models.callbacks.Callback callbackRef = new io.swagger.v3.oas.models.callbacks.Callback();
+        if (refCallback != null) {
+            callbackRef.set$ref(refCallback);
+        } else {
+            callbackRef.set$ref(COMPONENTS_CALLBACKS_PREFIX + callbackName);
         }
+        callbacks.put(callbackName, callbackRef);
     }
 
     private void processUrlCallbackExpression(VisitorContext context,
@@ -1200,7 +1223,7 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
         return readTags(element.getAnnotationValuesByType(Tag.class), context);
     }
 
-    List<io.swagger.v3.oas.models.tags.Tag> readTags(List<AnnotationValue<Tag>> annotations, VisitorContext context) {
+    final List<io.swagger.v3.oas.models.tags.Tag> readTags(List<AnnotationValue<Tag>> annotations, VisitorContext context) {
         return annotations.stream()
                 .map(av -> toValue(av.getValues(), context, io.swagger.v3.oas.models.tags.Tag.class))
                 .filter(Optional::isPresent).map(Optional::get).collect(Collectors.toList());
