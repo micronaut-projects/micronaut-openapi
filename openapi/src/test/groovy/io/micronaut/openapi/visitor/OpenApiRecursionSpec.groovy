@@ -174,7 +174,7 @@ class MyBean {}
 
         expect:
             Schema testImpl1 = schemas.get("TestImpl1")
-            Schema woopsieRef = testImpl1.getProperties()["woopsie"]
+            Schema woopsieRef = testImpl1.getProperties()["woopsie-id"]
 
             woopsieRef instanceof ComposedSchema
             ((ComposedSchema) woopsieRef).allOf[0].$ref == "#/components/schemas/woopsie-id"
@@ -216,7 +216,7 @@ class TestImpl1 implements TestInterface {
     public String getType() {
         return null;
     }
-    
+
     /**
      * Some docs
      */

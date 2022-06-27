@@ -375,6 +375,10 @@ abstract class AbstractOpenApiVisitor {
         T value = jsonMapper.treeToValue(jn, clazz);
         if (value != null) {
             resolveExtensions(jn).ifPresent(extensions -> BeanMap.of(value).put("extensions", extensions));
+            // fix for default value
+            if (jn.has("defaultValue")) {
+                BeanMap.of(value).put("default", jsonMapper.treeToValue(jn.get("defaultValue"), Map.class));
+            }
         }
         return value;
     }
@@ -949,6 +953,9 @@ abstract class AbstractOpenApiVisitor {
     private String resolvePropertyName(Element element, Element classElement, Schema propertySchema) {
         String name = Optional.ofNullable(propertySchema.getName()).orElse(element.getName());
 
+        if (element.hasAnnotation(io.swagger.v3.oas.annotations.media.Schema.class)) {
+            return element.stringValue(io.swagger.v3.oas.annotations.media.Schema.class, "name").orElse(name);
+        }
         if (element.hasAnnotation(JsonProperty.class)) {
             return element.stringValue(JsonProperty.class, "value").orElse(name);
         }
@@ -991,6 +998,96 @@ abstract class AbstractOpenApiVisitor {
                 Optional<String> schemaDescription = schemaAnn.get("description", String.class);
                 if (schemaDescription.isPresent()) {
                     schemaToBind.setDescription(schemaDescription.get());
+                }
+                Optional<String> schemaFormat = schemaAnn.get("format", String.class);
+                if (schemaFormat.isPresent()) {
+                    schemaToBind.setFormat(schemaFormat.get());
+                }
+                Optional<String> schemaTitle = schemaAnn.get("title", String.class);
+                if (schemaTitle.isPresent()) {
+                    schemaToBind.setTitle(schemaTitle.get());
+                }
+                Optional<BigDecimal> schemaMinimum = schemaAnn.get("minimum", BigDecimal.class);
+                if (schemaMinimum.isPresent()) {
+                    schemaToBind.setMinimum(schemaMinimum.get());
+                }
+                Optional<BigDecimal> schemaMaximum = schemaAnn.get("maximum", BigDecimal.class);
+                if (schemaMaximum.isPresent()) {
+                    schemaToBind.setMaximum(schemaMaximum.get());
+                }
+                Optional<Boolean> schemaExclusiveMinimum = schemaAnn.get("exclusiveMinimum", Boolean.class);
+                if (schemaExclusiveMinimum.isPresent()) {
+                    schemaToBind.setExclusiveMinimum(schemaExclusiveMinimum.get());
+                }
+                Optional<Boolean> schemaExclusiveMaximum = schemaAnn.get("exclusiveMaximum", Boolean.class);
+                if (schemaExclusiveMaximum.isPresent()) {
+                    schemaToBind.setExclusiveMaximum(schemaExclusiveMaximum.get());
+                }
+                Optional<Integer> schemaMinLength = schemaAnn.get("minLength", Integer.class);
+                if (schemaMinLength.isPresent()) {
+                    schemaToBind.setMinLength(schemaMinLength.get());
+                }
+                Optional<Integer> schemaMaxLength = schemaAnn.get("maxLength", Integer.class);
+                if (schemaMaxLength.isPresent()) {
+                    schemaToBind.setMaxLength(schemaMaxLength.get());
+                }
+                Optional<Integer> schemaMinProperties = schemaAnn.get("minProperties", Integer.class);
+                if (schemaMinProperties.isPresent()) {
+                    schemaToBind.setMinProperties(schemaMinProperties.get());
+                }
+                Optional<Integer> schemaMaxProperties = schemaAnn.get("maxProperties", Integer.class);
+                if (schemaMaxProperties.isPresent()) {
+                    schemaToBind.setMaxProperties(schemaMaxProperties.get());
+                }
+                Optional<BigDecimal> schemaMultipleOf = schemaAnn.get("multipleOf", BigDecimal.class);
+                if (schemaMultipleOf.isPresent()) {
+                    schemaToBind.setMultipleOf(schemaMultipleOf.get());
+                }
+                Optional<String> schemaPattern = schemaAnn.get("pattern", String.class);
+                if (schemaPattern.isPresent()) {
+                    schemaToBind.setPattern(schemaPattern.get());
+                }
+
+                Optional<AnnotationValue<io.swagger.v3.oas.annotations.ExternalDocumentation>> schemaExtDocs = schemaAnn.getAnnotation("externalDocs", io.swagger.v3.oas.annotations.ExternalDocumentation.class);
+                ExternalDocumentation externalDocs = null;
+                if (schemaExtDocs.isPresent()) {
+                    externalDocs = toValue(schemaExtDocs.get().getValues(), context, ExternalDocumentation.class).orElse(null);
+                }
+                if (externalDocs != null) {
+                    schemaToBind.setExternalDocs(externalDocs);
+                }
+                Optional<String> schemaDefaultValue = schemaAnn.get("defaultValue", String.class);
+                if (schemaDefaultValue.isPresent()) {
+                    try {
+                        schemaToBind.setDefault(jsonMapper.readValue(schemaDefaultValue.get(), Map.class));
+                    } catch (JsonProcessingException e) {
+                        schemaToBind.setDefault(schemaDefaultValue.get());
+                    }
+                }
+                Optional<String> schemaExample = schemaAnn.get("example", String.class);
+                if (schemaExample.isPresent()) {
+                    try {
+                        schemaToBind.setExample(jsonMapper.readValue(schemaExample.get(), Map.class));
+                    } catch (JsonProcessingException e) {
+                        schemaToBind.setExample(schemaExample.get());
+                    }
+                }
+                Optional<Boolean> schemaDeprecated = schemaAnn.get("deprecated", Boolean.class);
+                if (schemaDeprecated.isPresent()) {
+                    schemaToBind.setDeprecated(schemaDeprecated.get());
+                }
+                Optional<io.swagger.v3.oas.annotations.media.Schema.AccessMode> schemaAccessMode = schemaAnn.get("accessMode", io.swagger.v3.oas.annotations.media.Schema.AccessMode.class);
+                if (schemaAccessMode.isPresent()) {
+                    if (schemaAccessMode.get() == io.swagger.v3.oas.annotations.media.Schema.AccessMode.READ_ONLY) {
+                        schemaToBind.setReadOnly(true);
+                        schemaToBind.setWriteOnly(null);
+                    } else if (schemaAccessMode.get() == io.swagger.v3.oas.annotations.media.Schema.AccessMode.WRITE_ONLY) {
+                        schemaToBind.setReadOnly(false);
+                        schemaToBind.setWriteOnly(null);
+                    } else if (schemaAccessMode.get() == io.swagger.v3.oas.annotations.media.Schema.AccessMode.READ_WRITE) {
+                        schemaToBind.setReadOnly(null);
+                        schemaToBind.setWriteOnly(null);
+                    }
                 }
             }
         }

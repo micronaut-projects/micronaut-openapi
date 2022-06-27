@@ -15,20 +15,28 @@ class OpenApiApplicationVisitorSpec extends AbstractOpenApiTypeElementSpec {
         buildBeanDefinition('test.MyBean', '''
 package test;
 
-import io.micronaut.management.endpoint.annotation.Endpoint;
+import io.micronaut.http.HttpResponse;
+import io.micronaut.http.MediaType;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.micronaut.http.annotation.Produces;
 import io.micronaut.management.endpoint.annotation.Delete;
-import io.micronaut.management.endpoint.annotation.Write;
+import io.micronaut.management.endpoint.annotation.Endpoint;
 import io.micronaut.management.endpoint.annotation.Selector;
-
-import io.micronaut.http.annotation.*;
-import io.micronaut.http.*;
-import io.swagger.v3.oas.annotations.*;
-import io.swagger.v3.oas.annotations.info.*;
-import io.swagger.v3.oas.annotations.media.*;
-import io.swagger.v3.oas.annotations.tags.*;
-import io.swagger.v3.oas.annotations.servers.*;
-import io.swagger.v3.oas.annotations.security.*;
+import io.micronaut.management.endpoint.annotation.Write;
+import io.swagger.v3.oas.annotations.ExternalDocumentation;
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.extensions.Extension;
+import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
+import io.swagger.v3.oas.annotations.info.Contact;
+import io.swagger.v3.oas.annotations.info.Info;
+import io.swagger.v3.oas.annotations.info.License;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.servers.Server;
+import io.swagger.v3.oas.annotations.servers.ServerVariable;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * @author graemerocher
@@ -39,15 +47,130 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
                 title = "the title",
                 version = "0.0",
                 description = "My API",
-                license = @License(name = "Apache 2.0", url = "https://foo.bar"),
-                contact = @Contact(url = "https://gigantic-server.com", name = "Fred", email = "Fred@gigagantic-server.com")
+                termsOfService = "There are terms of service",
+                license = @License(
+                        name = "Apache 2.0",
+                        url = "https://foo.bar",
+                        extensions = {
+                                @Extension(
+                                        name = "license.custom1",
+                                        properties = {
+                                                @ExtensionProperty(name = "prop11", value = "prop11Val"),
+                                                @ExtensionProperty(name = "prop12", value = "prop12Val"),
+                                        }
+                                ),
+                                @Extension(
+                                        name = "license.custom2",
+                                        properties = {
+                                                @ExtensionProperty(name = "prop21", value = "prop21Val"),
+                                                @ExtensionProperty(name = "prop22", value = "prop22Val"),
+                                        }
+                                )
+                        }
+                ),
+                contact = @Contact(
+                        name = "Fred",
+                        url = "https://gigantic-server.com",
+                        email = "Fred@gigagantic-server.com",
+                        extensions = {
+                                @Extension(
+                                        name = "contact.custom1",
+                                        properties = {
+                                                @ExtensionProperty(name = "prop11", value = "prop11Val"),
+                                                @ExtensionProperty(name = "prop12", value = "prop12Val"),
+                                        }
+                                ),
+                                @Extension(
+                                        name = "contact.custom2",
+                                        properties = {
+                                                @ExtensionProperty(name = "prop21", value = "prop21Val"),
+                                                @ExtensionProperty(name = "prop22", value = "prop22Val"),
+                                        }
+                                )
+                        }
+                ),
+                extensions = {
+                        @Extension(
+                                name = "info.custom1",
+                                properties = {
+                                        @ExtensionProperty(name = "prop11", value = "prop11Val"),
+                                        @ExtensionProperty(name = "prop12", value = "prop12Val"),
+                                }
+                        ),
+                        @Extension(
+                                name = "info.custom2",
+                                properties = {
+                                        @ExtensionProperty(name = "prop21", value = "prop21Val"),
+                                        @ExtensionProperty(name = "prop22", value = "prop22Val"),
+                                }
+                        )
+                }
         ),
         tags = {
+                @Tag(
+                        name = "Tag 0",
+                        description = "desc 0",
+                        externalDocs = @ExternalDocumentation(
+                                description = "docs desc0",
+                                url = "http://externaldoc.com",
+                                extensions = {
+                                        @Extension(
+                                                name = "extdocs.custom1",
+                                                properties = {
+                                                        @ExtensionProperty(name = "prop11", value = "prop11Val"),
+                                                        @ExtensionProperty(name = "prop12", value = "prop12Val"),
+                                                }
+                                        ),
+                                        @Extension(
+                                                name = "extdocs.custom2",
+                                                properties = {
+                                                        @ExtensionProperty(name = "prop21", value = "prop21Val"),
+                                                        @ExtensionProperty(name = "prop22", value = "prop22Val"),
+                                                }
+                                        )
+                                }
+                        ),
+                        extensions = {
+                                @Extension(
+                                        name = "tag.custom1",
+                                        properties = {
+                                                @ExtensionProperty(name = "prop11", value = "prop11Val"),
+                                                @ExtensionProperty(name = "prop12", value = "prop12Val"),
+                                        }
+                                ),
+                                @Extension(
+                                        name = "tag.custom2",
+                                        properties = {
+                                                @ExtensionProperty(name = "prop21", value = "prop21Val"),
+                                                @ExtensionProperty(name = "prop22", value = "prop22Val"),
+                                        }
+                                )
+                        }
+                ),
                 @Tag(name = "Tag 1", description = "desc 1", externalDocs = @ExternalDocumentation(description = "docs desc")),
                 @Tag(name = "Tag 2", description = "desc 2", externalDocs = @ExternalDocumentation(description = "docs desc 2")),
                 @Tag(name = "Tag 3")
         },
-        externalDocs = @ExternalDocumentation(description = "definition docs desc"),
+        externalDocs = @ExternalDocumentation(
+                description = "definition docs desc",
+                url = "http://externaldoc.com",
+                extensions = {
+                        @Extension(
+                                name = "extdocs.custom1",
+                                properties = {
+                                        @ExtensionProperty(name = "prop11", value = "prop11Val"),
+                                        @ExtensionProperty(name = "prop12", value = "prop12Val"),
+                                }
+                        ),
+                        @Extension(
+                                name = "extdocs.custom2",
+                                properties = {
+                                        @ExtensionProperty(name = "prop21", value = "prop21Val"),
+                                        @ExtensionProperty(name = "prop22", value = "prop22Val"),
+                                }
+                        )
+                }
+        ),
         security = {
                 @SecurityRequirement(name = "req 1", scopes = {"a", "b"}),
                 @SecurityRequirement(name = "req 2", scopes = {"b", "c"})
@@ -59,7 +182,32 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
                         variables = {
                                 @ServerVariable(name = "var1", description = "var 1", defaultValue = "1", allowableValues = {"1", "2"}),
                                 @ServerVariable(name = "var2", description = "var 2", defaultValue = "1", allowableValues = {"1", "2"})
-                        })
+                        },
+                        extensions = {
+                                @Extension(
+                                        name = "server.custom1",
+                                        properties = {
+                                                @ExtensionProperty(name = "prop11", value = "prop11Val"),
+                                                @ExtensionProperty(name = "prop12", value = "prop12Val"),
+                                        }
+                                ),
+                                @Extension(
+                                        name = "server.custom2",
+                                        properties = {
+                                                @ExtensionProperty(name = "prop21", value = "prop21Val"),
+                                                @ExtensionProperty(name = "prop22", value = "prop22Val"),
+                                        }
+                                )
+                        }
+                ),
+                @Server(
+                        description = "server 2",
+                        url = "https://bar",
+                        variables = {
+                                @ServerVariable(name = "var1", description = "var 1", defaultValue = "1", allowableValues = {"1", "2"}),
+                                @ServerVariable(name = "var2", description = "var 2", defaultValue = "1", allowableValues = {"1", "2"})
+                        }
+                ),
         }
 )
 class Application {
@@ -119,23 +267,95 @@ class MyBean {}
         openAPI.info.title == 'the title'
         openAPI.info.version == '0.0'
         openAPI.info.description == 'My API'
+        openAPI.info.termsOfService == 'There are terms of service'
+
         openAPI.info.license.name == 'Apache 2.0'
+        openAPI.info.license.url == 'https://foo.bar'
+        openAPI.info.license.extensions.size() == 2
+        openAPI.info.license.extensions.'x-license.custom1'.prop11 == 'prop11Val'
+        openAPI.info.license.extensions.'x-license.custom1'.prop12 == 'prop12Val'
+        openAPI.info.license.extensions.'x-license.custom2'.prop21 == 'prop21Val'
+        openAPI.info.license.extensions.'x-license.custom2'.prop22 == 'prop22Val'
+
         openAPI.info.contact.name == 'Fred'
-        openAPI.tags.size() == 3
-        Tag tag = openAPI.tags.find { it -> (it.name == 'Tag 1') }
-        tag
-        tag.description == 'desc 1'
+        openAPI.info.contact.url == 'https://gigantic-server.com'
+        openAPI.info.contact.email == 'Fred@gigagantic-server.com'
+        openAPI.info.contact.extensions.size() == 2
+        openAPI.info.contact.extensions.'x-contact.custom1'.prop11 == 'prop11Val'
+        openAPI.info.contact.extensions.'x-contact.custom1'.prop12 == 'prop12Val'
+        openAPI.info.contact.extensions.'x-contact.custom2'.prop21 == 'prop21Val'
+        openAPI.info.contact.extensions.'x-contact.custom2'.prop22 == 'prop22Val'
+
+        openAPI.info.extensions.size() == 2
+        openAPI.info.extensions.'x-info.custom1'.prop11 == 'prop11Val'
+        openAPI.info.extensions.'x-info.custom1'.prop12 == 'prop12Val'
+        openAPI.info.extensions.'x-info.custom2'.prop21 == 'prop21Val'
+        openAPI.info.extensions.'x-info.custom2'.prop22 == 'prop22Val'
+
+        openAPI.tags.size() == 4
+
+        openAPI.tags.get(0).name == 'Tag 0'
+        openAPI.tags.get(0).description == 'desc 0'
+        openAPI.tags.get(0).externalDocs.description == 'docs desc0'
+        openAPI.tags.get(0).externalDocs.url == 'http://externaldoc.com'
+        openAPI.tags.get(0).externalDocs.extensions.size() == 2
+        openAPI.tags.get(0).externalDocs.extensions.'x-extdocs.custom1'.prop11 == 'prop11Val'
+        openAPI.tags.get(0).externalDocs.extensions.'x-extdocs.custom1'.prop12 == 'prop12Val'
+        openAPI.tags.get(0).externalDocs.extensions.'x-extdocs.custom2'.prop21 == 'prop21Val'
+        openAPI.tags.get(0).externalDocs.extensions.'x-extdocs.custom2'.prop22 == 'prop22Val'
+        openAPI.tags.get(0).extensions.size() == 2
+        openAPI.tags.get(0).extensions.'x-tag.custom1'.prop11 == 'prop11Val'
+        openAPI.tags.get(0).extensions.'x-tag.custom1'.prop12 == 'prop12Val'
+        openAPI.tags.get(0).extensions.'x-tag.custom2'.prop21 == 'prop21Val'
+        openAPI.tags.get(0).extensions.'x-tag.custom2'.prop22 == 'prop22Val'
+
+        openAPI.tags.get(1).name == 'Tag 1'
+        openAPI.tags.get(1).description == 'desc 1'
+        openAPI.tags.get(1).externalDocs.description == 'docs desc'
+
+        openAPI.tags.get(2).name == 'Tag 2'
+        openAPI.tags.get(2).description == 'desc 2'
+        openAPI.tags.get(2).externalDocs.description == 'docs desc 2'
+
+        openAPI.tags.get(3).name == 'Tag 3'
+
         openAPI.externalDocs.description == 'definition docs desc'
+        openAPI.externalDocs.url == 'http://externaldoc.com'
+        openAPI.externalDocs.extensions.size() == 2
+        openAPI.externalDocs.extensions.'x-extdocs.custom1'.prop11 == 'prop11Val'
+        openAPI.externalDocs.extensions.'x-extdocs.custom1'.prop12 == 'prop12Val'
+        openAPI.externalDocs.extensions.'x-extdocs.custom2'.prop21 == 'prop21Val'
+        openAPI.externalDocs.extensions.'x-extdocs.custom2'.prop22 == 'prop22Val'
+
         openAPI.security.size() == 2
-        openAPI.security[0] == ["req 1":["a", "b"]]
+        openAPI.security[0] == ["req 1": ["a", "b"]]
         openAPI.security[1] == ["req 2":["b", "c"]]
-        openAPI.servers.size() == 1
+
+        openAPI.servers.size() == 2
         openAPI.servers[0].description == 'server 1'
         openAPI.servers[0].url == 'https://foo'
         openAPI.servers[0].variables.size() == 2
         openAPI.servers[0].variables.var1.description == 'var 1'
         openAPI.servers[0].variables.var1.default == '1'
         openAPI.servers[0].variables.var1.enum == ['1', '2']
+        openAPI.servers[0].variables.var2.description == 'var 2'
+        openAPI.servers[0].variables.var2.default == '1'
+        openAPI.servers[0].variables.var2.enum == ['1', '2']
+        openAPI.servers[0].extensions.size() == 2
+        openAPI.servers[0].extensions.'x-server.custom1'.prop11 == 'prop11Val'
+        openAPI.servers[0].extensions.'x-server.custom1'.prop12 == 'prop12Val'
+        openAPI.servers[0].extensions.'x-server.custom2'.prop21 == 'prop21Val'
+        openAPI.servers[0].extensions.'x-server.custom2'.prop22 == 'prop22Val'
+
+        openAPI.servers[1].description == 'server 2'
+        openAPI.servers[1].url == 'https://bar'
+        openAPI.servers[1].variables.size() == 2
+        openAPI.servers[1].variables.var1.description == 'var 1'
+        openAPI.servers[1].variables.var1.default == '1'
+        openAPI.servers[1].variables.var1.enum == ['1', '2']
+        openAPI.servers[1].variables.var2.description == 'var 2'
+        openAPI.servers[1].variables.var2.default == '1'
+        openAPI.servers[1].variables.var2.enum == ['1', '2']
 
         then:"User defined end point is processed"
         openAPI.paths['/message']
