@@ -149,6 +149,7 @@ abstract class AbstractOpenApiVisitor {
     static final String ATTR_OPENAPI = "io.micronaut.OPENAPI";
     static OpenAPI testReference;
     static String testYamlReference;
+    static String testJsonReference;
 
     private static final String ATTR_TEST_MODE = "io.micronaut.OPENAPI_TEST";
     private static final Lock VISITED_ELEMENTS_LOCK = new ReentrantLock();

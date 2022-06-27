@@ -69,6 +69,7 @@ import java.util.stream.Collectors;
     OpenApiApplicationVisitor.MICRONAUT_OPENAPI_CONTEXT_SERVER_PATH,
     OpenApiApplicationVisitor.MICRONAUT_OPENAPI_PROPERTY_NAMING_STRATEGY,
     OpenApiApplicationVisitor.MICRONAUT_OPENAPI_VIEWS_SPEC,
+    OpenApiApplicationVisitor.MICRONAUT_OPENAPI_JSON_FORMAT,
     OpenApiApplicationVisitor.MICRONAUT_OPENAPI_TARGET_FILE,
     OpenApiApplicationVisitor.MICRONAUT_OPENAPI_ADDITIONAL_FILES,
     OpenApiApplicationVisitor.MICRONAUT_OPENAPI_CONFIG_FILE,
@@ -100,7 +101,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
      */
     public static final String MICRONAUT_OPENAPI_TARGET_FILE = "micronaut.openapi.target.file";
     /**
-     * System property that specifies the location of additional swagger YAML files to read from.
+     * System property that specifies the location of additional swagger YAML and JSON files to read from.
      */
     public static final String MICRONAUT_OPENAPI_ADDITIONAL_FILES = "micronaut.openapi.additional.files";
 
@@ -123,6 +124,10 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
      * The name of the entry for Endpoint security requirements in the context.
      */
     public static final String MICRONAUT_OPENAPI_ENDPOINT_SECURITY_REQUIREMENTS = "micronaut.openapi.endpoint.security.requirements";
+    /**
+     * Is this property true, output file format will be JSON, otherwise YAML.
+     */
+    public static final String MICRONAUT_OPENAPI_JSON_FORMAT = "micronaut.openapi.json.format";
 
     private static final String MICRONAUT_OPENAPI_PROPERTIES = "micronaut.openapi.properties";
     private static final String MICRONAUT_OPENAPI_ENDPOINTS = "micronaut.openapi.endpoints";
@@ -189,7 +194,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
     }
 
     /**
-     * Merge the OpenAPI YAML files into one single file.
+     * Merge the OpenAPI YAML and JSON files into one single file.
      *
      * @param element The element
      * @param context The visitor context
@@ -200,13 +205,14 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         if (StringUtils.isNotEmpty(additionalSwaggerFiles)) {
             Path directory = resolve(context, Paths.get(additionalSwaggerFiles));
             if (Files.isDirectory(directory)) {
-                context.info("Merging Swagger OpenAPI YAML files from location: " + directory);
-                try (DirectoryStream<Path> stream = Files.newDirectoryStream(directory, path -> path.toString().endsWith(".yml"))) {
+                context.info("Merging Swagger OpenAPI YAML and JSON files from location: " + directory);
+                try (DirectoryStream<Path> stream = Files.newDirectoryStream(directory, path -> path.toString().endsWith(".yml") || path.toString().endsWith(".json"))) {
                     stream.forEach(path -> {
-                        context.info("Reading Swagger OpenAPI YAML file " + path.getFileName());
+                        boolean isYaml = path.toString().endsWith(".yml");
+                        context.info("Reading Swagger OpenAPI " + (isYaml ? "YAML" : "JSON") + " file " + path.getFileName());
                         OpenAPI parsedOpenApi = null;
                         try {
-                            parsedOpenApi = yamlMapper.readValue(path.toFile(), OpenAPI.class);
+                            parsedOpenApi = (isYaml ? yamlMapper : jsonMapper).readValue(path.toFile(), OpenAPI.class);
                         } catch (IOException e) {
                             context.warn("Unable to read file " + path.getFileName() + ": " + e.getMessage(), element);
                         }
@@ -504,7 +510,12 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         // Process after sorting so order is stable
         new JacksonDiscriminatorPostProcessor().addMissingDiscriminatorType(openAPI);
         new OpenApiOperationsPostProcessor().processOperations(openAPI);
-        String fileName = "swagger.yml";
+
+        String isJson = getConfigurationProperty(MICRONAUT_OPENAPI_JSON_FORMAT, visitorContext);
+        boolean isYaml = !(StringUtils.isNotEmpty(isJson) && isJson.equals(StringUtils.TRUE));
+
+        String ext = isYaml ? ".yml" : ".json";
+        String fileName = "swagger" + ext;
         String documentTitle = "OpenAPI";
 
         Info info = openAPI.getInfo();
@@ -515,9 +526,9 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             if (version != null) {
                 documentTitle = documentTitle + '-' + version;
             }
-            fileName = documentTitle + ".yml";
+            fileName = documentTitle + ext;
         }
-        writeYamlToFile(openAPI, fileName, documentTitle, visitorContext);
+        writeYamlToFile(openAPI, fileName, documentTitle, visitorContext, isYaml);
         visitedElements = visitedElements(visitorContext);
     }
 
@@ -552,16 +563,20 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         }
     }
 
-    private void writeYamlToFile(OpenAPI openAPI, String fileName, String documentTitle, VisitorContext visitorContext) {
+    private void writeYamlToFile(OpenAPI openAPI, String fileName, String documentTitle, VisitorContext visitorContext, boolean isYaml) {
         Optional<Path> specFile = openApiSpecFile(fileName, visitorContext);
-        try (Writer writer = getYamlWriter(specFile)) {
-            yamlMapper.writeValue(writer, openAPI);
+        try (Writer writer = getFileWriter(specFile)) {
+            (isYaml ? yamlMapper : jsonMapper).writeValue(writer, openAPI);
             if (isTestMode()) {
-                AbstractOpenApiVisitor.testYamlReference = writer.toString();
+                if (isYaml) {
+                    AbstractOpenApiVisitor.testYamlReference = writer.toString();
+                } else {
+                    AbstractOpenApiVisitor.testJsonReference = writer.toString();
+                }
             } else {
                 @SuppressWarnings("OptionalGetWithoutIsPresent")
                 Path specPath = specFile.get();
-                visitorContext.info("Writing OpenAPI YAML to destination: " + specPath);
+                visitorContext.info("Writing OpenAPI file to destination: " + specPath);
                 visitorContext.getClassesOutputPath().ifPresent(path -> {
                     // add relative paths for the specPath, and its parent META-INF/swagger
                     // so that micronaut-graal visitor knows about them
@@ -571,11 +586,11 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                 renderViews(documentTitle, specPath.getFileName().toString(), specPath.getParent(), visitorContext);
             }
         } catch (Exception e) {
-            visitorContext.warn("Unable to generate swagger.yml: " + specFile.orElse(null) + " - " + e.getMessage(), classElement);
+            visitorContext.warn("Unable to generate swagger." + (isYaml ? "yml" : "json") + ": " + specFile.orElse(null) + " - " + e.getMessage(), classElement);
         }
     }
 
-    private Writer getYamlWriter(Optional<Path> specFile) throws IOException {
+    private Writer getFileWriter(Optional<Path> specFile) throws IOException {
         if (isTestMode()) {
             return new StringWriter();
         } else if (specFile.isPresent()) {
