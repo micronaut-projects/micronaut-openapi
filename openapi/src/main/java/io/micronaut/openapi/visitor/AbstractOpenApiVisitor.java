@@ -1500,12 +1500,11 @@ abstract class AbstractOpenApiVisitor {
                             classElement.getSuperType().ifPresent(superTypes::add);
                         }
 
-                            if (!type.isRecord() && !superTypes.isEmpty()) {
-                                schema = new ComposedSchema();
-                                for (ClassElement sType : superTypes) {
-                                    if (!type.isRecord()) {
-                                        readAllInterfaces(openAPI, context, definingElement, mediaTypes, schema, sType, schemas);
-                                    }
+                        if (!type.isRecord() && !superTypes.isEmpty()) {
+                            schema = new ComposedSchema();
+                            for (ClassElement sType : superTypes) {
+                                if (!type.isRecord()) {
+                                    readAllInterfaces(openAPI, context, definingElement, mediaTypes, schema, sType, schemas);
                                 }
                             }
                         } else {
