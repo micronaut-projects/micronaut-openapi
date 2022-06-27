@@ -35,6 +35,7 @@ import io.micronaut.openapi.postprocessors.OpenApiOperationsPostProcessor;
 import io.micronaut.openapi.view.OpenApiViewConfig;
 import io.swagger.v3.core.util.Yaml;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.servers.Server;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.models.Components;
@@ -313,7 +314,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                     Optional<OpenAPI> result = toValue(o.getValues(), context, OpenAPI.class);
                     result.ifPresent(openAPI -> {
                         List<io.swagger.v3.oas.models.security.SecurityRequirement> securityRequirements =
-                                o.getAnnotations("security", io.swagger.v3.oas.annotations.security.SecurityRequirement.class)
+                                o.getAnnotations("security", SecurityRequirement.class)
                                 .stream()
                                 .map(this::mapToSecurityRequirement)
                                 .collect(Collectors.toList());
@@ -425,7 +426,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             return;
         }
         final io.swagger.v3.oas.models.Paths newPaths = new io.swagger.v3.oas.models.Paths();
-        for (Map.Entry<String, PathItem> path: paths.entrySet()) {
+        for (Map.Entry<String, PathItem> path : paths.entrySet()) {
             final String mapping = path.getKey();
             newPaths.addPathItem(mapping.startsWith(serverContextPath) ? mapping : StringUtils.prependUri(serverContextPath, mapping), path.getValue());
         }
@@ -433,18 +434,18 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
     }
 
     private JsonNode resolvePlaceholders(ArrayNode anode, UnaryOperator<String> propertyExpander) {
-        for (int i = 0 ; i < anode.size(); ++i) {
+        for (int i = 0; i < anode.size(); ++i) {
             anode.set(i, resolvePlaceholders(anode.get(i), propertyExpander));
         }
         return anode;
     }
 
     private JsonNode resolvePlaceholders(ObjectNode onode, UnaryOperator<String> propertyExpander) {
-        if (onode.size() == 0) {
+        if (onode.isEmpty()) {
             return onode;
         }
         final ObjectNode newNode = onode.objectNode();
-        for (Iterator<Map.Entry<String, JsonNode>> i = onode.fields(); i.hasNext();) {
+        for (Iterator<Map.Entry<String, JsonNode>> i = onode.fields(); i.hasNext(); ) {
             final Map.Entry<String, JsonNode> entry = i.next();
             newNode.set(propertyExpander.apply(entry.getKey()), resolvePlaceholders(entry.getValue(), propertyExpander));
         }
@@ -452,7 +453,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
     }
 
     private JsonNode resolvePlaceholders(JsonNode node, UnaryOperator<String> propertyExpander) {
-        if  (node.isTextual()) {
+        if (node.isTextual()) {
             final String text = node.textValue();
             if (text == null || text.trim().isEmpty()) {
                 return node;
@@ -472,7 +473,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         if (s == null || s.isEmpty()) {
             return s;
         }
-        for (Map.Entry<String, String> entry: properties) {
+        for (Map.Entry<String, String> entry : properties) {
             s = s.replace(entry.getKey(), entry.getValue());
         }
         return s;
@@ -510,6 +511,10 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         // Process after sorting so order is stable
         new JacksonDiscriminatorPostProcessor().addMissingDiscriminatorType(openAPI);
         new OpenApiOperationsPostProcessor().processOperations(openAPI);
+        // need to replace openAPI after property placeholders resolved
+        if (isTestMode()) {
+            testReferenceAfterPlaceholders = openAPI;
+        }
 
         String isJson = getConfigurationProperty(MICRONAUT_OPENAPI_JSON_FORMAT, visitorContext);
         boolean isYaml = !(StringUtils.isNotEmpty(isJson) && isJson.equals(StringUtils.TRUE));

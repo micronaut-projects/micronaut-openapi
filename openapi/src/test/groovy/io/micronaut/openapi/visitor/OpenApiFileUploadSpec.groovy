@@ -209,8 +209,7 @@ interface PetOperations<T extends Pet> {
     /**
      * Saves a Pet
      *
-     * @param name The Pet name
-     * @param aget The Pet age
+     * @param pet pet
      * @return A pet or 404
      */
     @Consumes(MediaType.APPLICATION_JSON)

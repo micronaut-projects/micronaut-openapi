@@ -842,8 +842,6 @@ class MyBean {}
 
     }
 
-    // 'uris' not available in micronaut-core 1.1.4
-    @Ignore
     void "test operation with multiple uris - Issue #220"() {
         given:
         buildBeanDefinition('test.MyBean', '''
@@ -879,7 +877,7 @@ class MyBean {}
 
         then:
         operation != null
-        operation.operationId == 'getSubscription'
+        operation.operationId == 'getSubscription_1'
         operation.parameters.size() == 1
 
         when:

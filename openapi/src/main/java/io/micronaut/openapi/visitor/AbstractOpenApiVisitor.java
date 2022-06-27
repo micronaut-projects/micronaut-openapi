@@ -148,6 +148,7 @@ abstract class AbstractOpenApiVisitor {
 
     static final String ATTR_OPENAPI = "io.micronaut.OPENAPI";
     static OpenAPI testReference;
+    static OpenAPI testReferenceAfterPlaceholders;
     static String testYamlReference;
     static String testJsonReference;
 
@@ -281,11 +282,11 @@ abstract class AbstractOpenApiVisitor {
      * Resolve the PathItem for the given {@link UriMatchTemplate}.
      *
      * @param context The context
-     * @param matchTemplate The match template
+     * @param matchTemplates The match templates
      *
      * @return The {@link PathItem}
      */
-    PathItem resolvePathItem(VisitorContext context, UriMatchTemplate matchTemplate) {
+    List<PathItem> resolvePathItems(VisitorContext context, List<UriMatchTemplate> matchTemplates) {
         OpenAPI openAPI = resolveOpenAPI(context);
         Paths paths = openAPI.getPaths();
         if (paths == null) {
@@ -293,52 +294,59 @@ abstract class AbstractOpenApiVisitor {
             openAPI.setPaths(paths);
         }
 
-        StringBuilder result = new StringBuilder();
-        boolean varProcess = false;
-        boolean valueProcess = false;
-        boolean isFirstVarChar = true;
-        boolean needToSkip = false;
-        final String pathString = matchTemplate.toPathString();
-        for (char c : pathString.toCharArray()) {
-            if (varProcess) {
-                if (isFirstVarChar) {
-                    isFirstVarChar = false;
-                    if (c == '?' || c == '.') {
-                        needToSkip = true;
-                        result.deleteCharAt(result.length() - 1);
+        List<PathItem> resultPaths = new ArrayList<>();
+
+        for (UriMatchTemplate matchTemplate : matchTemplates) {
+
+            StringBuilder result = new StringBuilder();
+
+            boolean varProcess = false;
+            boolean valueProcess = false;
+            boolean isFirstVarChar = true;
+            boolean needToSkip = false;
+            final String pathString = matchTemplate.toPathString();
+            for (char c : pathString.toCharArray()) {
+                if (varProcess) {
+                    if (isFirstVarChar) {
+                        isFirstVarChar = false;
+                        if (c == '?' || c == '.') {
+                            needToSkip = true;
+                            result.deleteCharAt(result.length() - 1);
+                            continue;
+                        } else if (c == '+' || c == '0') {
+                            continue;
+                        } else if (c == '/') {
+                            result.deleteCharAt(result.length() - 1).append(c).append('{');
+                            continue;
+                        }
+                    }
+                    if (c == ':') {
+                        valueProcess = true;
                         continue;
-                    } else if (c == '+' || c == '0') {
+                    }
+                    if (c == '}') {
+                        varProcess = false;
+                        valueProcess = false;
+                        if (!needToSkip) {
+                            result.append('}');
+                        }
+                        needToSkip = false;
                         continue;
-                    } else if (c == '/') {
-                        result.deleteCharAt(result.length() - 1).append(c).append('{');
+                    }
+                    if (valueProcess || needToSkip) {
                         continue;
                     }
                 }
-                if (c == ':') {
-                    valueProcess = true;
-                    continue;
+                if (c == '{') {
+                    varProcess = true;
+                    isFirstVarChar = true;
                 }
-                if (c == '}') {
-                    varProcess = false;
-                    valueProcess = false;
-                    if (!needToSkip) {
-                        result.append('}');
-                    }
-                    needToSkip = false;
-                    continue;
-                }
-                if (valueProcess || needToSkip) {
-                    continue;
-                }
+                result.append(c);
             }
-            if (c == '{') {
-                varProcess = true;
-                isFirstVarChar = true;
-            }
-            result.append(c);
+            resultPaths.add(paths.computeIfAbsent(result.toString(), key -> new PathItem()));
         }
 
-        return paths.computeIfAbsent(result.toString(), key -> new PathItem());
+        return resultPaths;
     }
 
     /**

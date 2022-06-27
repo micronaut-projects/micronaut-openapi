@@ -87,7 +87,7 @@ import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -293,13 +293,12 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
         if (httpMethod == null) {
             return;
         }
-        Iterator<UriMatchTemplate> matchTemplates = uriMatchTemplates(element).iterator();
-        if (!matchTemplates.hasNext()) {
+        List<UriMatchTemplate> matchTemplates = uriMatchTemplates(element);
+        if (CollectionUtils.isEmpty(matchTemplates)) {
             return;
         }
         incrementVisitedElements(context);
-        UriMatchTemplate matchTemplate = matchTemplates.next();
-        PathItem pathItem = resolvePathItem(context, matchTemplate);
+        List<PathItem> pathItems = resolvePathItems(context, matchTemplates);
         OpenAPI openAPI = resolveOpenAPI(context);
 
         io.swagger.v3.oas.models.Operation swaggerOperation = readOperation(element, context);
@@ -324,8 +323,6 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
 
         JavadocDescription javadocDescription = getMethodDescription(element, swaggerOperation);
 
-        swaggerOperation = setOperationOnPathItem(pathItem, swaggerOperation, httpMethod);
-
         if (element.isAnnotationPresent(Deprecated.class)) {
             swaggerOperation.setDeprecated(true);
         }
@@ -345,19 +342,45 @@ abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
             }
         }
 
-        Map<String, UriMatchVariable> pathVariables = pathVariables(matchTemplate);
+        List<io.swagger.v3.oas.models.Operation> swaggerOperations = new ArrayList<>(pathItems.size());
+        int i = 0;
+        for (PathItem pathItem : pathItems) {
+            if (i == 0) {
+                swaggerOperation = setOperationOnPathItem(pathItem, swaggerOperation, httpMethod);
+                swaggerOperations.add(swaggerOperation);
+            } else {
+                io.swagger.v3.oas.models.Operation copyOperation = new io.swagger.v3.oas.models.Operation();
+                copyOperation.setTags(swaggerOperation.getTags());
+                copyOperation.setSummary(swaggerOperation.getSummary());
+                copyOperation.setDescription(swaggerOperation.getDescription());
+                copyOperation.setExternalDocs(swaggerOperation.getExternalDocs());
+                copyOperation.setOperationId(swaggerOperation.getOperationId());
+                copyOperation.setParameters(swaggerOperation.getParameters());
+                copyOperation.setRequestBody(swaggerOperation.getRequestBody());
+                copyOperation.setResponses(swaggerOperation.getResponses());
+                copyOperation.setCallbacks(swaggerOperation.getCallbacks());
+                copyOperation.setDeprecated(swaggerOperation.getDeprecated());
+                copyOperation.setSecurity(swaggerOperation.getSecurity());
+                copyOperation.setServers(swaggerOperation.getServers());
+                copyOperation.setExtensions(swaggerOperation.getExtensions());
+
+                copyOperation = setOperationOnPathItem(pathItem, copyOperation, httpMethod);
+                swaggerOperations.add(copyOperation);
+            }
+            i++;
+        }
+
+        Map<String, UriMatchVariable> pathVariables = new HashMap<>();
+        for (UriMatchTemplate matchTemplate : matchTemplates) {
+            pathVariables.putAll(pathVariables(matchTemplate));
+            // @Parameters declared at method level take precedence over the declared as method arguments, so we process them first
+            processParameterAnnotationInMethod(element, openAPI, matchTemplate, httpMethod);
+        }
         List<MediaType> consumesMediaTypes = consumesMediaTypes(element);
         List<TypedElement> extraBodyParameters = new ArrayList<>();
-
-        // @Parameters declared at method level take precedence over the declared as method arguments, so we process them first
-        processParameterAnnotationInMethod(element, openAPI, matchTemplate, httpMethod);
-        processParameters(element, context, openAPI, swaggerOperation, javadocDescription, permitsRequestBody, pathVariables, consumesMediaTypes, extraBodyParameters);
-        processExtraBodyParameters(context, httpMethod, openAPI, swaggerOperation, javadocDescription, consumesMediaTypes, extraBodyParameters);
-
-        // if we have multiple uris, process them
-        while (matchTemplates.hasNext()) {
-            pathItem = resolvePathItem(context, matchTemplates.next());
-            swaggerOperation = setOperationOnPathItem(pathItem, swaggerOperation, httpMethod);
+        for (io.swagger.v3.oas.models.Operation operation : swaggerOperations) {
+            processParameters(element, context, openAPI, operation, javadocDescription, permitsRequestBody, pathVariables, consumesMediaTypes, extraBodyParameters);
+            processExtraBodyParameters(context, httpMethod, openAPI, operation, javadocDescription, consumesMediaTypes, extraBodyParameters);
         }
     }
 
