@@ -23,6 +23,7 @@ import java.math.BigDecimal;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -1448,19 +1449,27 @@ abstract class AbstractOpenApiVisitor {
                     } else {
                         if (type instanceof TypedElement) {
                             ClassElement classElement = ((TypedElement) type).getType();
-                            Optional<ClassElement> superType = classElement == null ? Optional.empty() : classElement.getSuperType();
-                            if (superType.isPresent() && !type.isRecord()) {
-                                schema = new ComposedSchema();
-                                while (superType.isPresent()) {
-                                    final ClassElement superElement = superType.get();
-                                    String parentSchemaName = computeDefaultSchemaName(definingElement, superElement);
-                                    if (schemas.get(parentSchemaName) != null
-                                            || getSchemaDefinition(openAPI, context, superElement, null, mediaTypes) != null) {
-                                        Schema parentSchema = new Schema();
-                                        parentSchema.set$ref(schemaRef(parentSchemaName));
-                                        schema.addAllOfItem(parentSchema);
+
+                            List<ClassElement> superTypes = new ArrayList<>();
+                            Collection<ClassElement> parentInterfaces = classElement.getInterfaces();
+                            if (classElement.isInterface() && !parentInterfaces.isEmpty()) {
+                                for (ClassElement parentInterface : parentInterfaces) {
+                                    if (ClassUtils.isJavaLangType(parentInterface.getName())
+                                        || parentInterface.getBeanProperties().isEmpty()) {
+                                        continue;
                                     }
-                                    superType = superElement.getSuperType();
+                                    superTypes.add(parentInterface);
+                                }
+                            } else {
+                                classElement.getSuperType().ifPresent(superTypes::add);
+                            }
+
+                            if (!type.isRecord() && !superTypes.isEmpty()) {
+                                schema = new ComposedSchema();
+                                for (ClassElement sType : superTypes) {
+                                    if (!type.isRecord()) {
+                                        readAllInterfaces(openAPI, context, definingElement, mediaTypes, schema, sType, schemas);
+                                    }
                                 }
                             } else {
                                 schema = new Schema();
@@ -1504,6 +1513,33 @@ abstract class AbstractOpenApiVisitor {
                     }
 
                     if (schema != null) {
+
+                        ClassElement classElement = ((TypedElement) type).getType();
+                        List<ClassElement> superTypes = new ArrayList<>();
+                        Collection<ClassElement> parentInterfaces = classElement.getInterfaces();
+                        if (classElement.isInterface() && !parentInterfaces.isEmpty()) {
+                            for (ClassElement parentInterface : parentInterfaces) {
+                                if (ClassUtils.isJavaLangType(parentInterface.getName())
+                                    || parentInterface.getBeanProperties().isEmpty()) {
+                                    continue;
+                                }
+                                superTypes.add(parentInterface);
+                            }
+                        }
+                        if (!superTypes.isEmpty()) {
+                            ComposedSchema schema1 = new ComposedSchema();
+                            schema1.addAllOfItem(schema);
+
+                            for (ClassElement sType : superTypes) {
+                                String schemaName2 = computeDefaultSchemaName(definingElement, sType);
+                                Schema parentSchema = new Schema();
+                                parentSchema.set$ref(schemaRef(schemaName2));
+                                schema1.addAllOfItem(parentSchema);
+                            }
+
+                            schema = schema1;
+                        }
+
                         schema.setName(schemaName);
                         schemas.put(schemaName, schema);
                     }
@@ -1530,6 +1566,28 @@ abstract class AbstractOpenApiVisitor {
             return schemaRef;
         }
         return null;
+    }
+
+    private void readAllInterfaces(OpenAPI openAPI, VisitorContext context, @Nullable Element definingElement, List<MediaType> mediaTypes,
+                                    Schema schema, ClassElement superType, Map<String, Schema> schemas) {
+        String parentSchemaName = computeDefaultSchemaName(definingElement, superType);
+        if (schemas.get(parentSchemaName) != null
+                || getSchemaDefinition(openAPI, context, superType, null, mediaTypes) != null) {
+            Schema parentSchema = new Schema();
+            parentSchema.set$ref(schemaRef(parentSchemaName));
+            schema.addAllOfItem(parentSchema);
+        }
+        if (superType.isInterface()) {
+            for (ClassElement interfaceElement : superType.getInterfaces()) {
+                if (ClassUtils.isJavaLangType(interfaceElement.getName())
+                    || interfaceElement.getBeanProperties().isEmpty()) {
+                    continue;
+                }
+                readAllInterfaces(openAPI, context, definingElement, mediaTypes, schema, interfaceElement, schemas);
+            }
+        } else if (superType.getSuperType().isPresent()) {
+            readAllInterfaces(openAPI, context, definingElement, mediaTypes, schema, superType.getSuperType().get(), schemas);
+        }
     }
 
     /**
