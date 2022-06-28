@@ -84,7 +84,7 @@ class Dog implements Pet {
 class MyBean {}
 ''')
 
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = AbstractOpenApiVisitor.testReferenceAfterPlaceholders
 
         expect:
         openAPI
@@ -93,7 +93,6 @@ class MyBean {}
         and:
         Schema catSchema = openAPI.components.schemas['Cat']
         catSchema instanceof Schema
-        catSchema.name == 'Cat'
         catSchema.type == 'object'
         catSchema.properties.size() == 3
         catSchema.properties['id'].type == 'integer'
@@ -102,8 +101,7 @@ class MyBean {}
 
         and:
         Schema dogSchema = openAPI.components.schemas['Dog']
-        catSchema instanceof Schema
-        dogSchema.name == 'Dog'
+        dogSchema instanceof Schema
         dogSchema.type == 'object'
         dogSchema.properties.size() == 3
         dogSchema.properties['id'].type == 'integer'
@@ -115,7 +113,6 @@ class MyBean {}
         petSchema instanceof ComposedSchema
         ComposedSchema composedPetSchema = (ComposedSchema) openAPI.components.schemas['Pet']
 
-        composedPetSchema.name == 'Pet'
         composedPetSchema.type == 'object'
         composedPetSchema.properties.size() == 1
         composedPetSchema.properties['id'].type == 'integer'
