@@ -309,9 +309,9 @@ class MyBean {}
         petSchema.properties.size() == 3
         petSchema.discriminator.propertyName == "type"
 
-        ((ComposedSchema)petSchema).oneOf.size() == 2
-        ((ComposedSchema)petSchema).oneOf[0].$ref == '#/components/schemas/Dog'
-        ((ComposedSchema)petSchema).oneOf[1].$ref == '#/components/schemas/Cat'
+        ((ComposedSchema) petSchema).oneOf.size() == 2
+        ((ComposedSchema) petSchema).oneOf[0].$ref == '#/components/schemas/Dog'
+        ((ComposedSchema) petSchema).oneOf[1].$ref == '#/components/schemas/Cat'
 
         when:
         Operation operation = openAPI.paths.get("/pet/cat/claw/{size}").get
@@ -513,9 +513,9 @@ class MyBean {}
         petSchema.discriminator.mapping["DOG"] == "#/components/schemas/Dog"
         petSchema.discriminator.mapping["CAT"] == "#/components/schemas/Cat"
 
-        ((ComposedSchema)petSchema).oneOf.size() == 2
-        ((ComposedSchema)petSchema).oneOf[0].$ref == '#/components/schemas/Dog'
-        ((ComposedSchema)petSchema).oneOf[1].$ref == '#/components/schemas/Cat'
+        ((ComposedSchema) petSchema).oneOf.size() == 2
+        ((ComposedSchema) petSchema).oneOf[0].$ref == '#/components/schemas/Dog'
+        ((ComposedSchema) petSchema).oneOf[1].$ref == '#/components/schemas/Cat'
 
         when:
         Operation operation = openAPI.paths.get("/pet/cat/claw/{size}").get
@@ -644,10 +644,10 @@ class MyBean {}
         petSchema.type == 'object'
         petSchema.properties.size() == 2
 
-        ((ComposedSchema)catSchema).allOf.size() == 2
-        ((ComposedSchema)catSchema).allOf[0].$ref == '#/components/schemas/Pet'
-        ((ComposedSchema)catSchema).allOf[1].type == 'object'
-        ((ComposedSchema)catSchema).allOf[1].properties['clawSize'].type == 'integer'
+        ((ComposedSchema) catSchema).allOf.size() == 2
+        ((ComposedSchema) catSchema).allOf[0].$ref == '#/components/schemas/Pet'
+        ((ComposedSchema) catSchema).allOf[1].type == 'object'
+        ((ComposedSchema) catSchema).allOf[1].properties['clawSize'].type == 'integer'
     }
 
 
@@ -768,14 +768,14 @@ class MyBean {}
         petSchema.type == 'object'
         petSchema.properties.size() == 2
 
-        ((ComposedSchema)catSchema).allOf.size() == 2
-        ((ComposedSchema)catSchema).allOf[0].$ref == '#/components/schemas/Pet'
-        ((ComposedSchema)catSchema).allOf[1].type == 'object'
-        ((ComposedSchema)catSchema).allOf[1].properties.size() == 1
-        ((ComposedSchema)catSchema).allOf[1].properties['clawSize'].type == 'integer'
-        ((ComposedSchema)dogSchema).allOf.size() == 2
-        ((ComposedSchema)dogSchema).allOf[0].$ref == '#/components/schemas/Pet'
-        ((ComposedSchema)dogSchema).allOf[1].properties.size() == 1
+        ((ComposedSchema) catSchema).allOf.size() == 2
+        ((ComposedSchema) catSchema).allOf[0].$ref == '#/components/schemas/Pet'
+        ((ComposedSchema) catSchema).allOf[1].type == 'object'
+        ((ComposedSchema) catSchema).allOf[1].properties.size() == 1
+        ((ComposedSchema) catSchema).allOf[1].properties['clawSize'].type == 'integer'
+        ((ComposedSchema) dogSchema).allOf.size() == 2
+        ((ComposedSchema) dogSchema).allOf[0].$ref == '#/components/schemas/Pet'
+        ((ComposedSchema) dogSchema).allOf[1].properties.size() == 1
     }
 
     void "test build OpenAPI doc for POJO with Inheritance and response discriminator mapping"() {
@@ -1052,6 +1052,190 @@ class MyBean {}
         ((ComposedSchema) operation.responses."200".content."application/json".schema).oneOf.size() == 2
         ((ComposedSchema) operation.responses."200".content."application/json".schema).oneOf[0].get$ref() == "#/components/schemas/Dog"
         ((ComposedSchema) operation.responses."200".content."application/json".schema).oneOf[1].get$ref() == "#/components/schemas/Cat"
+    }
+
+    void "test build OpenAPI doc for interface POJO with inheritance"() {
+
+        given: "An API definition"
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.reactivex.*;
+import io.micronaut.http.annotation.*;
+import com.fasterxml.jackson.annotation.*;
+import java.util.List;
+import io.swagger.v3.oas.annotations.media.*;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.micronaut.http.MediaType;
+
+@Controller("/pets")
+interface PetOperations {
+
+    /**
+     * @param name The person's name
+     * @return The greeting
+     */
+    @Get(uri = "/cases/{name}", produces = MediaType.TEXT_PLAIN)
+    Cat getCat(String name);
+
+        /**
+     * @param name The person's name
+     * @return The greeting
+     */
+    @Get(uri = "/dogs/{name}", produces = MediaType.TEXT_PLAIN)
+    Dog getDog(String name);
+}
+
+interface Dog extends Pet {
+
+    String getBreed();
+}
+
+interface Cat extends Pet {
+
+    int getClawSize();
+}
+
+@JsonTypeInfo( use = JsonTypeInfo.Id.NAME, property = "type", visible = true)
+@JsonSubTypes({ @JsonSubTypes.Type(value = Cat.class, name = "Cat"),
+        @JsonSubTypes.Type(value = Dog.class, name = "Dog") })
+interface Pet {
+
+    int getAge();
+
+    String getName();
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        then: "the state is correct"
+        AbstractOpenApiVisitor.testReference != null
+
+        when: "The OpenAPI is retrieved"
+        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        Schema petSchema = openAPI.components.schemas['Pet']
+        Schema catSchema = openAPI.components.schemas['Cat']
+        Schema dogSchema = openAPI.components.schemas['Dog']
+
+        then: "the components are valid"
+        petSchema != null
+        dogSchema != null
+        catSchema != null
+        petSchema instanceof ComposedSchema
+        catSchema instanceof ComposedSchema
+        dogSchema instanceof ComposedSchema
+        catSchema.type == null
+        catSchema.properties == null
+        petSchema.type == 'object'
+        petSchema.properties.size() == 2
+
+        ((ComposedSchema) catSchema).allOf.size() == 2
+        ((ComposedSchema) catSchema).allOf[0].$ref == '#/components/schemas/Pet'
+        ((ComposedSchema) catSchema).allOf[1].type == 'object'
+        ((ComposedSchema) catSchema).allOf[1].properties['clawSize'].type == 'integer'
+    }
+
+    void "test build OpenAPI doc for interface POJO with multiple and multi leveled inheritance"() {
+
+        given: "An API definition"
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import java.io.Serializable;
+
+import io.micronaut.http.MediaType;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+
+@Controller("/pets")
+interface PetOperations {
+
+    /**
+     * @param name The person's name
+     * @return The greeting
+     */
+    @Get(uri = "/cases/{name}", produces = MediaType.TEXT_PLAIN)
+    Cat getCat(String name);
+
+}
+
+interface Cat extends Pet,Sleeper {
+
+    int getClawSize();
+}
+
+@JsonTypeInfo( use = JsonTypeInfo.Id.NAME, property = "type", visible = true)
+@JsonSubTypes(@JsonSubTypes.Type(value = Cat.class, name = "Cat"))
+interface Pet extends Animal {
+
+    int getAge();
+
+    String getName();
+}
+
+@JsonTypeInfo( use = JsonTypeInfo.Id.NAME, property = "type", visible = true)
+@JsonSubTypes(@JsonSubTypes.Type(value = Pet.class, name = "Pet"))
+interface Animal {
+
+    double getWeight();
+}
+
+interface Sleeper extends Serializable, Readable {
+
+    double getSleepDuration();
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        then: "the state is correct"
+        AbstractOpenApiVisitor.testReference != null
+
+        when: "The OpenAPI is retrieved"
+        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        Schema petSchema = openAPI.components.schemas['Pet']
+        Schema animalSchema = openAPI.components.schemas['Animal']
+        Schema sleeperSchema = openAPI.components.schemas['Sleeper']
+        Schema catSchema = openAPI.components.schemas['Cat']
+
+
+        then: "the components are valid"
+        petSchema != null
+        animalSchema != null
+        sleeperSchema != null
+        catSchema != null
+
+        petSchema instanceof ComposedSchema
+        animalSchema instanceof ComposedSchema
+        catSchema instanceof ComposedSchema
+        sleeperSchema instanceof Schema
+
+        petSchema.type == null
+        petSchema.properties == null
+        animalSchema.type == 'object'
+        animalSchema.properties.size() == 1
+        sleeperSchema.type == 'object'
+        sleeperSchema.properties.size() == 1
+        catSchema.type == null
+        catSchema.properties == null
+
+        ((ComposedSchema) catSchema).allOf.size() == 4
+        ((ComposedSchema) catSchema).allOf[0].$ref == '#/components/schemas/Pet'
+        ((ComposedSchema) catSchema).allOf[1].$ref == '#/components/schemas/Animal'
+        ((ComposedSchema) catSchema).allOf[2].$ref == '#/components/schemas/Sleeper'
+        ((ComposedSchema) catSchema).allOf[3].type == 'object'
+        ((ComposedSchema) catSchema).allOf[3].properties['clawSize'].type == 'integer'
+
+        ((ComposedSchema) petSchema).allOf.size() == 2
+        ((ComposedSchema) petSchema).allOf[0].type == 'object'
+        ((ComposedSchema) petSchema).allOf[0].properties.size() == 2
+        ((ComposedSchema) petSchema).allOf[1].$ref == '#/components/schemas/Animal'
     }
 
 }
