@@ -19,7 +19,8 @@ import java.time.Instant;
 import io.micronaut.http.annotation.Body;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Post;
-import io.swagger.v3.oas.annotations.ExternalDocumentation;import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.ExternalDocumentation;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 @Controller
 class OpenApiController {
