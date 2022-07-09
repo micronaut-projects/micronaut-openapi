@@ -15,11 +15,18 @@
  */
 package io.micronaut.openapi.javadoc;
 
-import io.micronaut.core.annotation.Experimental;
-import io.micronaut.core.util.CollectionUtils;
-import io.micronaut.core.util.StringUtils;
-
 import java.util.Set;
+
+import io.micronaut.core.util.CollectionUtils;
+
+import com.github.chhorz.javadoc.JavaDoc;
+import com.github.chhorz.javadoc.JavaDocParser;
+import com.github.chhorz.javadoc.JavaDocParserBuilder;
+import com.github.chhorz.javadoc.OutputType;
+import com.github.chhorz.javadoc.tags.ParamTag;
+import com.github.chhorz.javadoc.tags.ReturnTag;
+import com.github.chhorz.javadoc.tags.Tag;
+import com.vladsch.flexmark.html2md.converter.FlexmarkHtmlConverter;
 
 /**
  * Very simple javadoc parser that can used to parse out the first paragraph description and parameter / return descriptions.
@@ -28,107 +35,51 @@ import java.util.Set;
  * @author graemerocher
  * @since 1.0
  */
-@Experimental
 public class JavadocParser {
 
-    private static final Set<String> IGNORED = CollectionUtils.setOf("see", "since", "author", "version", "deprecated", "throws");
-    private static final int TEXT = 1;
-    private static final int TAG_START = 2;
-    private static final int DOCLET_START = 4;
-    private static final int PARAM_NAME = 6;
-    private static final int PARAM_DESC = 7;
-    private static final int RETURN_DESC = 8;
-    private static final int IGNORE = 9;
-
-    private int previousState = TEXT;
+    private static final Set<String> IGNORED = CollectionUtils.setOf("see", "since", "author", "version", "deprecated", "throws", "exception", "category");
 
     /**
      * Parse the javadoc in a {@link JavadocDescription}.
      *
      * @param text The text
+     *
      * @return The description
      */
     public JavadocDescription parse(String text) {
-        StringBuilder description = new StringBuilder();
-        int state = TEXT;
-        JavadocDescription javadocDescription = new JavadocDescription();
 
-        if (StringUtils.isNotEmpty(text)) {
-
-            char[] chars = text.toCharArray();
-            StringBuilder currentParam = new StringBuilder();
-            StringBuilder currentDoclet = new StringBuilder();
-            StringBuilder currentDescription = description;
-
-            for (char c : chars) {
-                switch (state) {
-                    case RETURN_DESC:
-                        javadocDescription.setReturnDescription(currentDescription.toString().trim());
-                        // Notice pass through in case
-                    case PARAM_DESC:
-                        if (state == PARAM_DESC) {
-                            javadocDescription.getParameters().put(currentParam.toString(), currentDescription.toString().trim());
-                        }
-                        // Notice pass through in case
-                    case TEXT:
-                        if (c == '{' || c == '@') {
-                            currentDoclet.delete(0, currentDoclet.length());
-                            state = DOCLET_START;
-                        } else if (c == '<') {
-                            state = TAG_START;
-                        } else if (c != '}' && c != '>') {
-                            currentDescription.append(c);
-                        }
-                    continue;
-                    case IGNORE:
-                        if (c == '\n') {
-                            state = previousState;
-                            currentDescription = description;
-                        }
-                    continue;
-                    case DOCLET_START:
-                        if (c == ' ') {
-                            state = previousState;
-                            String docletName = currentDoclet.toString();
-                            if (IGNORED.contains(docletName)) {
-                                state = IGNORE;
-                            } else {
-                                if (docletName.equals("param")) {
-                                    currentParam.delete(0, currentParam.length());
-                                    state = PARAM_NAME;
-                                }
-                                if (docletName.equals("return")) {
-                                    currentDescription = new StringBuilder();
-                                    state = RETURN_DESC;
-                                    previousState = RETURN_DESC;
-                                }
-                            }
-                        } else {
-                            currentDoclet.append(c);
-                        }
-                        continue;
-                    case PARAM_NAME:
-                        if (c == ' ') {
-                            currentDescription = new StringBuilder();
-                            state = PARAM_DESC;
-                            previousState = PARAM_DESC;
-                        } else if (c != '\n') {
-                            currentParam.append(c);
-                        }
-                    continue;
-                    case TAG_START:
-                        if (c == '>') {
-                            state = TEXT;
-                        }
-                    default:
-
-                }
-            }
-
+        if (text == null) {
+            return null;
         }
 
+        JavaDocParser javaDocParser = JavaDocParserBuilder
+            .withBasicTags()
+            .withOutputType(OutputType.HTML)
+            .build();
 
-        javadocDescription.setMethodDescription(description.toString().trim());
+        FlexmarkHtmlConverter htmlToMarkdownConverter = FlexmarkHtmlConverter.builder().build();
+
+        JavaDoc javaDoc = javaDocParser.parse(text.trim());
+
+        JavadocDescription javadocDescription = new JavadocDescription();
+        javadocDescription.setMethodSummary(htmlToMarkdownConverter.convert(javaDoc.getSummary()).trim());
+        javadocDescription.setMethodDescription(htmlToMarkdownConverter.convert(javaDoc.getDescription()).trim());
+
+        if (CollectionUtils.isNotEmpty(javaDoc.getTags())) {
+            for (Tag tag : javaDoc.getTags()) {
+                if (IGNORED.contains(tag.getTagName())) {
+                    continue;
+                }
+                if (tag instanceof ReturnTag) {
+                    javadocDescription.setReturnDescription(htmlToMarkdownConverter.convert(((ReturnTag) tag).getDescription()).trim());
+                } else if (tag instanceof ParamTag) {
+                    ParamTag paramTag = (ParamTag) tag;
+                    String paramDesc = htmlToMarkdownConverter.convert(paramTag.getParamDescription()).trim();
+                    javadocDescription.getParameters().put(paramTag.getParamName(), paramDesc);
+                }
+            }
+        }
+
         return javadocDescription;
     }
 }

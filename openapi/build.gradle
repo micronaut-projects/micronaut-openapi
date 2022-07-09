@@ -9,6 +9,8 @@ dependencies {
     implementation(mn.micronaut.http)
     implementation(mn.micronaut.http.server)
     implementation(libs.reactor.core)
+    implementation(libs.javadoc.parser)
+    implementation(libs.html2md.converter)
 
     api(libs.managed.swagger.core)
     api(libs.managed.swagger.models)

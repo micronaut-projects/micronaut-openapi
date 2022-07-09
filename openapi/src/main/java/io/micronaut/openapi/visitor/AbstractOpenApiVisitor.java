@@ -163,6 +163,7 @@ abstract class AbstractOpenApiVisitor {
     private static final Schema<?> EMPTY_SCHEMA = new Schema<>();
     private static final ComposedSchema EMPTY_COMPOSED_SCHEMA = new ComposedSchema();
 
+    JavadocParser javadocParser = new JavadocParser();
     /**
      * The JSON mapper.
      */
@@ -180,17 +181,14 @@ abstract class AbstractOpenApiVisitor {
      * The YAML mapper.
      */
     ObjectMapper yamlMapper = Yaml.mapper();
-
     /**
      * Stores the current in progress type.
      */
     private List<String> inProgressSchemas = new ArrayList<>(10);
-
     /**
      * {@link PropertyNamingStrategy} instances cache.
      */
     private Map<String, PropertyNamingStrategy> propertyNamingStrategyInstances = new HashMap<>();
-
 
     /**
      * Increments the number of visited elements.
@@ -204,7 +202,6 @@ abstract class AbstractOpenApiVisitor {
         } finally {
             VISITED_ELEMENTS_LOCK.unlock();
         }
-
     }
 
     /**
@@ -279,7 +276,7 @@ abstract class AbstractOpenApiVisitor {
     List<SecurityRequirement> readSecurityRequirements(List<AnnotationValue<io.swagger.v3.oas.annotations.security.SecurityRequirement>> annotations) {
         return annotations
                 .stream()
-                .map(this::mapToSecurityRequirement)
+                .map(Utils::mapToSecurityRequirement)
                 .collect(Collectors.toList());
     }
 
@@ -443,7 +440,7 @@ abstract class AbstractOpenApiVisitor {
                             if (io.swagger.v3.oas.annotations.security.SecurityRequirement.class.getName().equals(annotationName)) {
                                 List<SecurityRequirement> securityRequirements = new ArrayList<>(a.length);
                                 for (Object o : a) {
-                                    securityRequirements.add(mapToSecurityRequirement((AnnotationValue<io.swagger.v3.oas.annotations.security.SecurityRequirement>) o));
+                                    securityRequirements.add(Utils.mapToSecurityRequirement((AnnotationValue<io.swagger.v3.oas.annotations.security.SecurityRequirement>) o));
                                 }
                                 newValues.put(key, securityRequirements);
                             } else if (Extension.class.getName().equals(annotationName)) {
@@ -584,7 +581,39 @@ abstract class AbstractOpenApiVisitor {
                     discriminatorMap.put("propertyName", parseJsonString(value).orElse(value));
                     newValues.put("discriminator", discriminatorMap);
                 } else if (key.equals("style")) {
-                    newValues.put(key, io.swagger.v3.oas.models.media.Encoding.StyleEnum.valueOf((String) value).toString());
+                    io.swagger.v3.oas.models.parameters.Parameter.StyleEnum paramStyle = null;
+                    try {
+                        paramStyle = io.swagger.v3.oas.models.parameters.Parameter.StyleEnum.valueOf((String) value);
+                    } catch (Exception e) { }
+                    if (paramStyle == null) {
+                        for (io.swagger.v3.oas.models.parameters.Parameter.StyleEnum styleValue : io.swagger.v3.oas.models.parameters.Parameter.StyleEnum.values()) {
+                            if (styleValue.toString().equals(value)) {
+                                paramStyle = styleValue;
+                                newValues.put(key, styleValue.toString());
+                                break;
+                            }
+                        }
+                    } else {
+                        newValues.put(key, paramStyle.toString());
+                    }
+
+                    if (paramStyle == null) {
+                        io.swagger.v3.oas.models.media.Encoding.StyleEnum encodingStyle = null;
+                        try {
+                            encodingStyle = io.swagger.v3.oas.models.media.Encoding.StyleEnum.valueOf((String) value);
+                        } catch (Exception e) { }
+                        if (encodingStyle == null) {
+                            for (io.swagger.v3.oas.models.media.Encoding.StyleEnum styleValue : io.swagger.v3.oas.models.media.Encoding.StyleEnum.values()) {
+                                if (styleValue.toString().equals(value)) {
+                                    encodingStyle = styleValue;
+                                    newValues.put(key, styleValue.toString());
+                                    break;
+                                }
+                            }
+                        } else {
+                            newValues.put(key, encodingStyle.toString());
+                        }
+                    }
                 } else if (key.equals("ref")) {
                     newValues.put("$ref", value);
                 } else if (key.equals("accessMode")) {
@@ -718,9 +747,9 @@ abstract class AbstractOpenApiVisitor {
         bindSchemaIfNeccessary(context, av, valueMap);
         final String annotationName = av.getAnnotationName();
         if (Parameter.class.getName().equals(annotationName)) {
-            normalizeEnumValues(valueMap, CollectionUtils.mapOf(
+            Utils.normalizeEnumValues(valueMap, CollectionUtils.mapOf(
                     "in", ParameterIn.class,
-                    "style", ParameterStyle.class
+                           "style", ParameterStyle.class
             ));
         }
         return valueMap;
@@ -754,7 +783,7 @@ abstract class AbstractOpenApiVisitor {
      * @return The schema or null if it cannot be resolved
      */
     protected @Nullable Schema resolveSchema(@Nullable Element definingElement, ClassElement type, VisitorContext context, List<MediaType> mediaTypes) {
-        return resolveSchema(resolveOpenAPI(context), definingElement, type, context, mediaTypes);
+        return resolveSchema(resolveOpenAPI(context), definingElement, type, context, mediaTypes, null);
     }
 
     /**
@@ -765,10 +794,11 @@ abstract class AbstractOpenApiVisitor {
      * @param type The type element
      * @param context The context
      * @param mediaTypes An optional media type
+     * @param classJavadoc Class-level java doc
      *
      * @return The schema or null if it cannot be resolved
      */
-    protected @Nullable Schema resolveSchema(OpenAPI openAPI, @Nullable Element definingElement, ClassElement type, VisitorContext context, List<MediaType> mediaTypes) {
+    protected @Nullable Schema resolveSchema(OpenAPI openAPI, @Nullable Element definingElement, ClassElement type, VisitorContext context, List<MediaType> mediaTypes, JavadocDescription classJavadoc) {
         Schema schema = null;
 
         AnnotationValue<io.swagger.v3.oas.annotations.media.Schema> schemaAnnotationValue = null;
@@ -829,19 +859,19 @@ abstract class AbstractOpenApiVisitor {
                         if (valueType.getName().equals(Object.class.getName())) {
                             schema.setAdditionalProperties(true);
                         } else {
-                            schema.setAdditionalProperties(resolveSchema(openAPI, type, valueType, context, mediaTypes));
+                            schema.setAdditionalProperties(resolveSchema(openAPI, type, valueType, context, mediaTypes, classJavadoc));
                         }
                     }
                 } else if (type.isIterable()) {
                     if (type.isArray()) {
-                        schema = resolveSchema(openAPI, type, type.fromArray(), context, mediaTypes);
+                        schema = resolveSchema(openAPI, type, type.fromArray(), context, mediaTypes, classJavadoc);
                         if (schema != null) {
                             schema = arraySchema(schema);
                         }
                     } else {
                         Optional<ClassElement> componentType = type.getFirstTypeArgument();
                         if (componentType.isPresent()) {
-                            schema = resolveSchema(openAPI, type, componentType.get(), context, mediaTypes);
+                            schema = resolveSchema(openAPI, type, componentType.get(), context, mediaTypes, classJavadoc);
                         } else {
                             schema = getPrimitiveType(Object.class.getName());
                         }
@@ -863,6 +893,15 @@ abstract class AbstractOpenApiVisitor {
             }
 
             if (schema != null) {
+
+                if (definingElement != null && StringUtils.isEmpty(schema.getDescription())) {
+                    if (definingElement.getDocumentation().isPresent()) {
+                        schema.setDescription(definingElement.getDocumentation().get());
+                    } else if (classJavadoc != null) {
+                        schema.setDescription(classJavadoc.getParameters().get(definingElement.getName()));
+                    }
+                }
+
                 boolean isStream = false;
                 for (MediaType mediaType : mediaTypes) {
                     if (MediaType.TEXT_EVENT_STREAM_TYPE.equals(mediaType) || MediaType.APPLICATION_JSON_STREAM_TYPE.equals(mediaType)) {
@@ -1262,7 +1301,7 @@ abstract class AbstractOpenApiVisitor {
             Optional<String> documentation = element.getDocumentation();
             String doc = documentation.orElse(null);
             if (doc != null) {
-                JavadocDescription desc = new JavadocParser().parse(doc);
+                JavadocDescription desc = javadocParser.parse(doc);
                 schemaToBind.setDescription(desc.getMethodDescription());
             }
         }
@@ -1477,13 +1516,16 @@ abstract class AbstractOpenApiVisitor {
             if (primitiveType == null) {
                 String schemaName = computeDefaultSchemaName(definingElement, type);
                 schema = schemas.get(schemaName);
+                JavadocDescription javadoc = javadocParser.parse(type.getDocumentation().orElse(null));
                 if (schema == null) {
 
                     if (type instanceof EnumElement) {
                         schema = new Schema();
                         schema.setName(schemaName);
+                        if (javadoc != null) {
+                            schema.setDescription(javadoc.getMethodDescription());
+                        }
                         schemas.put(schemaName, schema);
-
                         schema.setType("string");
                         schema.setEnum(((EnumElement) type).values());
                     } else {
@@ -1519,9 +1561,12 @@ abstract class AbstractOpenApiVisitor {
                         }
                         schema.setType("object");
                         schema.setName(schemaName);
+                        if (javadoc != null) {
+                            schema.setDescription(javadoc.getMethodDescription());
+                        }
                         schemas.put(schemaName, schema);
 
-                        populateSchemaProperties(openAPI, context, type, schema, mediaTypes);
+                        populateSchemaProperties(openAPI, context, type, schema, mediaTypes, javadoc);
                         if (schema instanceof ComposedSchema) {
                             checkAllOf((ComposedSchema) schema);
                         }
@@ -1689,7 +1734,8 @@ abstract class AbstractOpenApiVisitor {
             schema.setType("string");
             schema.setEnum(((EnumElement) type).values());
         } else if (schema instanceof ObjectSchema || composedSchema != null) {
-            populateSchemaProperties(openAPI, context, type, schema, mediaTypes);
+            JavadocDescription javadoc = javadocParser.parse(type.getDescription());
+            populateSchemaProperties(openAPI, context, type, schema, mediaTypes, javadoc);
             checkAllOf(composedSchema);
         }
         return schema;
@@ -1750,7 +1796,6 @@ abstract class AbstractOpenApiVisitor {
                     builder.append('.');
                 }
             }
-
             builder.append('_');
         }
     }
@@ -1769,7 +1814,7 @@ abstract class AbstractOpenApiVisitor {
                 "io.micronaut.annotation.processing.visitor.JavaVisitorContext".equals(context.getClass().getName());
     }
 
-    private void populateSchemaProperties(OpenAPI openAPI, VisitorContext context, Element type, Schema schema, List<MediaType> mediaTypes) {
+    private void populateSchemaProperties(OpenAPI openAPI, VisitorContext context, Element type, Schema schema, List<MediaType> mediaTypes, JavadocDescription classJavadoc) {
         ClassElement classElement = null;
         if (type instanceof ClassElement) {
             classElement = (ClassElement) type;
@@ -1785,15 +1830,16 @@ abstract class AbstractOpenApiVisitor {
                 // Workaround for https://github.com/micronaut-projects/micronaut-openapi/issues/313
                 beanProperties = Collections.emptyList();
             }
-            processPropertyElements(openAPI, context, type, schema, beanProperties, mediaTypes);
+            processPropertyElements(openAPI, context, type, schema, beanProperties, mediaTypes, classJavadoc);
 
             final List<FieldElement> publicFields = classElement.getEnclosedElements(ElementQuery.ALL_FIELDS.modifiers(mods -> mods.contains(ElementModifier.PUBLIC) && mods.size() == 1));
 
-            processPropertyElements(openAPI, context, type, schema, publicFields, mediaTypes);
+            processPropertyElements(openAPI, context, type, schema, publicFields, mediaTypes, classJavadoc);
         }
     }
 
-    private void processPropertyElements(OpenAPI openAPI, VisitorContext context, Element type, Schema schema, List<? extends TypedElement> publicFields, List<MediaType> mediaTypes) {
+    private void processPropertyElements(OpenAPI openAPI, VisitorContext context, Element type, Schema schema, List<? extends TypedElement> publicFields, List<MediaType> mediaTypes, JavadocDescription classJavadoc) {
+
         for (TypedElement publicField : publicFields) {
             boolean isHidden = publicField.getAnnotationMetadata().booleanValue(io.swagger.v3.oas.annotations.media.Schema.class, "hidden").orElse(false);
             if (publicField.isAnnotationPresent(JsonIgnore.class)
@@ -1804,7 +1850,7 @@ abstract class AbstractOpenApiVisitor {
 
             if (publicField instanceof MemberElement && ((MemberElement) publicField).getDeclaringType().getType().getName().equals(type.getName())) {
 
-                Schema propertySchema = resolveSchema(openAPI, publicField, publicField.getType(), context, mediaTypes);
+                Schema propertySchema = resolveSchema(openAPI, publicField, publicField.getType(), context, mediaTypes, classJavadoc);
 
                 processSchemaProperty(
                         context,
@@ -1900,11 +1946,10 @@ abstract class AbstractOpenApiVisitor {
                 } else {
                     map.putIfAbsent("name", name);
                 }
+                Utils.normalizeEnumValues(map, CollectionUtils.mapOf("type", SecurityScheme.Type.class, "in", SecurityScheme.In.class));
                 if (map.containsKey("ref")) {
                     map.put("$ref", map.remove("ref"));
                 }
-
-                normalizeEnumValues(map, CollectionUtils.mapOf("type", SecurityScheme.Type.class, "in", SecurityScheme.In.class));
 
                 try {
                     JsonNode node = toJson(map, context);
@@ -1918,48 +1963,6 @@ abstract class AbstractOpenApiVisitor {
                 }
             });
         }
-    }
-
-    /**
-     * Normalizes enum values stored in the map.
-     *
-     * @param paramValues The values
-     * @param enumTypes The enum types.
-     */
-    protected void normalizeEnumValues(Map<CharSequence, Object> paramValues, Map<String, Class<? extends Enum>> enumTypes) {
-        for (Map.Entry<String, Class<? extends Enum>> entry : enumTypes.entrySet()) {
-            final String name = entry.getKey();
-            final Class<? extends Enum> enumType = entry.getValue();
-            Object in = paramValues.get(name);
-            if (in != null) {
-                try {
-                    final Enum enumInstance = Enum.valueOf(enumType, in.toString());
-                    paramValues.put(name, enumInstance.toString());
-                } catch (Exception e) {
-                    // ignore
-                }
-            }
-
-        }
-    }
-
-    /**
-     * Maps annotation value to {@link io.swagger.v3.oas.annotations.security.SecurityRequirement}.
-     * Correct format is:
-     * custom_name:
-     * - custom_scope1
-     * - custom_scope2
-     *
-     * @param r The value of {@link SecurityRequirement}.
-     *
-     * @return converted object.
-     */
-    protected SecurityRequirement mapToSecurityRequirement(AnnotationValue<io.swagger.v3.oas.annotations.security.SecurityRequirement> r) {
-        String name = r.getRequiredValue("name", String.class);
-        List<String> scopes = r.get("scopes", String[].class).map(Arrays::asList).orElse(Collections.emptyList());
-        SecurityRequirement securityRequirement = new SecurityRequirement();
-        securityRequirement.addList(name, scopes);
-        return securityRequirement;
     }
 
     /**
@@ -2015,5 +2018,4 @@ abstract class AbstractOpenApiVisitor {
     boolean isTestMode() {
         return Boolean.getBoolean(ATTR_TEST_MODE);
     }
-
 }

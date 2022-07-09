@@ -330,7 +330,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                         List<io.swagger.v3.oas.models.security.SecurityRequirement> securityRequirements =
                                 o.getAnnotations("security", SecurityRequirement.class)
                                 .stream()
-                                .map(this::mapToSecurityRequirement)
+                                .map(Utils::mapToSecurityRequirement)
                                 .collect(Collectors.toList());
                         openAPI.setSecurity(securityRequirements);
                     });
