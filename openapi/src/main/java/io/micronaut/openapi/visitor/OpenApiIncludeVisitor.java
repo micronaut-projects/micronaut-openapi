@@ -43,9 +43,6 @@ public class OpenApiIncludeVisitor implements TypeElementVisitor<OpenAPIIncludes
 
     @Override
     public void visitClass(ClassElement element, VisitorContext visitorContext) {
-        if (!"io.micronaut.annotation.processing.visitor.JavaVisitorContext".equals(visitorContext.getClass().getName())) {
-            return;
-        }
         for (AnnotationValue<OpenAPIInclude> includeAnnotation : element.getAnnotationValuesByType(OpenAPIInclude.class)) {
             String[] classes = includeAnnotation.stringValues();
             if (ArrayUtils.isNotEmpty(classes)) {
