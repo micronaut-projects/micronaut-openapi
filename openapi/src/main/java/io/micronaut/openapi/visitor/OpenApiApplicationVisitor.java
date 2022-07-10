@@ -409,22 +409,24 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         final PropertyNamingStrategies.NamingBase propertyNamingStrategy = fromName(namingStrategyName);
         if (propertyNamingStrategy != null) {
             visitorContext.info("Using " + namingStrategyName + " property naming strategy.");
-            openAPI.getComponents().getSchemas().values().forEach(model -> {
-                Map<String, Schema> properties = model.getProperties();
-                if (properties != null) {
-                    Map<String, Schema> newProperties = properties.entrySet().stream()
+            if (openAPI.getComponents() != null && CollectionUtils.isNotEmpty(openAPI.getComponents().getSchemas())) {
+                openAPI.getComponents().getSchemas().values().forEach(model -> {
+                    Map<String, Schema> properties = model.getProperties();
+                    if (properties != null) {
+                        Map<String, Schema> newProperties = properties.entrySet().stream()
                             .collect(Collectors.toMap(entry -> propertyNamingStrategy.translate(entry.getKey()),
-                                    Map.Entry::getValue, (prop1, prop2) -> prop1, LinkedHashMap::new));
-                    model.getProperties().clear();
-                    model.setProperties(newProperties);
-                }
-                List<String> required = model.getRequired();
-                if (required != null) {
-                    List<String> updatedRequired = required.stream().map(propertyNamingStrategy::translate).collect(Collectors.toList());
-                    required.clear();
-                    required.addAll(updatedRequired);
-                }
-            });
+                                Map.Entry::getValue, (prop1, prop2) -> prop1, LinkedHashMap::new));
+                        model.getProperties().clear();
+                        model.setProperties(newProperties);
+                    }
+                    List<String> required = model.getRequired();
+                    if (required != null) {
+                        List<String> updatedRequired = required.stream().map(propertyNamingStrategy::translate).collect(Collectors.toList());
+                        required.clear();
+                        required.addAll(updatedRequired);
+                    }
+                });
+            }
         }
     }
 
