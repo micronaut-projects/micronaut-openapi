@@ -642,7 +642,88 @@ info:
 <div class="paragraph">
 <p>By default Micronaut will automatically at compile time build out the Swagger YAML definition from your defined controllers and methods. For example given the following class:</p>
 </div>
+<div class="listingblock multi-language-sample">
+<div class="title">Hello World Example</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import io.micronaut.http.MediaType;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import reactor.core.publisher.Mono;
 
+
+@Controller("/")
+public class HelloController {
+
+    /**
+     * @param name The person's name
+     * @return The greeting
+     */
+    @Get(uri = "/hello/{name}", produces = MediaType.TEXT_PLAIN)
+    public Mono&lt;String&gt; index(String name) {
+        return Mono.just("Hello " + name + "!");
+    }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="title">Hello World Example</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">import io.micronaut.http.MediaType
+
+import io.micronaut.http.annotation.Controller
+import io.micronaut.http.annotation.Get
+import reactor.core.publisher.Mono
+
+@Controller("/")
+class HelloController {
+
+    /**
+     * @param name The person's name
+     * @return The greeting
+     */
+    @Get(uri = "/hello/{name}", produces = MediaType.TEXT_PLAIN)
+    Mono&lt;String&gt; index(String name) {
+        return Single.just("Hello $name!")
+    }
+}
+
+@Controller("/")
+class HelloController {
+
+    /**
+     * @param name The person's name
+     * @return The greeting
+     */
+    @Get(uri = "/hello/{name}", produces = MediaType.TEXT_PLAIN)
+    Mono&lt;String&gt; index(String name) {
+        return Single.just("Hello $name!")
+    }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="title">Hello World Example</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">import io.micronaut.http.MediaType
+import io.micronaut.http.annotation.Controller
+import io.micronaut.http.annotation.Get
+import reactor.core.publisher.Mono
+
+
+@Controller("/")
+open class HelloController {
+
+    /**
+     * @param name The person's name
+     * @return The greeting
+     */
+    @Get(uri = "/hello/{name}", produces = [MediaType.TEXT_PLAIN])
+    open fun index(name: String): Mono&lt;String&gt; {
+        return Mono.just("Hello $name!")
+    }
+}</code></pre>
+</div>
+</div>
 <div class="paragraph">
 <p>The resulting output will be:</p>
 </div>
@@ -759,7 +840,112 @@ the following <strong>jackson</strong>'s <code>PropertyNamingStrategy</code>:</p
 <div class="paragraph">
 <p>and then annotate your controllers:</p>
 </div>
+<div class="listingblock multi-language-sample">
+<div class="title">Using Swagger Annotations</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import io.micronaut.http.MediaType;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
+import javax.validation.constraints.NotBlank;
+import reactor.core.publisher.Mono;
+
+
+@Controller("/")
+public class HelloController {
+
+    /**
+     * @param name The person's name
+     * @return The greeting message
+     */
+    @Get(uri="/greetings/{name}", produces= MediaType.TEXT_PLAIN)
+    @Operation(summary = "Greets a person",
+            description = "A friendly greeting is returned"
+    )
+    @ApiResponse(
+            content = @Content(mediaType = "text/plain",
+                    schema = @Schema(type="string"))
+    )
+    @ApiResponse(responseCode = "400", description = "Invalid Name Supplied")
+    @ApiResponse(responseCode = "404", description = "Person not found")
+    @Tag(name = "greeting")
+    public Mono&lt;String&gt; greetings(@Parameter(description="The name of the person") @NotBlank String name) {
+        return Mono.just("Hello " + name + ", How are you doing?");
+    }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="title">Using Swagger Annotations</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">@Controller("/")
+class HelloController {
+
+    /**
+     * @param name The person's name
+     * @return The greeting message
+     */
+    @Get(uri="/greetings/{name}", produces= MediaType.TEXT_PLAIN)
+    @Operation(summary = "Greets a person",
+            description = "A friendly greeting is returned"
+    )
+    @ApiResponse(
+            content = @Content(mediaType = "text/plain",
+                    schema = @Schema(type="string"))
+    )
+    @ApiResponse(responseCode = "400", description = "Invalid Name Supplied")
+    @ApiResponse(responseCode = "404", description = "Person not found")
+    @Tag(name = "greeting")
+    Mono&lt;String&gt; greetings(@Parameter(description="The name of the person") @NotBlank String name) {
+        return Single.just("Hello $name, How are you doing?")
+    }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="title">Using Swagger Annotations</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">import io.micronaut.http.MediaType
+import io.micronaut.http.annotation.Controller
+import io.micronaut.http.annotation.Get
+import reactor.core.publisher.Mono
+import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.media.Content
+import io.swagger.v3.oas.annotations.media.Schema
+import io.swagger.v3.oas.annotations.responses.ApiResponse
+import io.swagger.v3.oas.annotations.responses.ApiResponses
+import io.swagger.v3.oas.annotations.tags.Tag
+
+
+@Controller("/")
+open class HelloController {
+
+    /**
+     * @param name The person's name
+     * @return The greeting message
+     */
+    @Get(uri = "/greetings/{name}", produces = [MediaType.TEXT_PLAIN])
+    @Operation(summary = "Greets a person", description = "A friendly greeting is returned")
+    // Please Note: Repeatable Annotations with non-SOURCE retentions are not yet supported with Kotlin so we are using `@ApiResponses`
+    // instead of `@ApiResponse`, see https://youtrack.jetbrains.com/issue/KT-12794
+    @ApiResponses(
+            ApiResponse(content = [Content(mediaType = "text/plain", schema = Schema(type = "string"))]),
+            ApiResponse(responseCode = "400", description = "Invalid Name Supplied"),
+            ApiResponse(responseCode = "404", description = "Person not found")
+    )
+    @Tag(name = "greeting")
+    open fun greetings(name: String): Mono&lt;String&gt; {
+        return Mono.just("Hello $name, how are you doing?")
+    }
+}</code></pre>
+</div>
+</div>
 <div class="paragraph">
 <p>The resulting output will be:</p>
 </div>
