@@ -35,8 +35,13 @@ import org.reactivestreams.Publisher;
 
 /**
  * Some util methods.
+ *
+ * @since 4.4.0
  */
-public class Utils {
+public final class Utils {
+
+    private Utils() {
+    }
 
     public static boolean isContainerType(ClassElement type) {
         return CollectionUtils.setOf(
