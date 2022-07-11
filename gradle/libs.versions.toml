@@ -1,10 +1,15 @@
 [versions]
 managed-swagger = "2.2.1"
+# Required to keep catalog compatibility with 3.4.x.  Can be removed for 4.0.0
+managed-swagger-compat = "2.2.1"
 
 kotlintest-runner-junit5 = "3.4.2"
 kotlin = "1.7.0"
 
 [libraries]
+# Duplicated to keep catalog compatibility with 3.4.x.  Can be removed for 4.0.0
+managed-swagger = { module = "io.swagger.core.v3:swagger-core", version.ref = "managed-swagger-compat" }
+
 managed-swagger-annotations = { module = "io.swagger.core.v3:swagger-annotations", version.ref = "managed-swagger" }
 managed-swagger-core = { module = "io.swagger.core.v3:swagger-core", version.ref = "managed-swagger" }
 managed-swagger-models = { module = "io.swagger.core.v3:swagger-models", version.ref = "managed-swagger" }
