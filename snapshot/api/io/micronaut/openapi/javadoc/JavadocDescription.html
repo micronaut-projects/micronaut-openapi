@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10};
+var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -156,22 +156,32 @@ extends java.lang.Object</pre>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/openapi/javadoc/JavadocDescription.html#getMethodDescription--">getMethodDescription</a></span>()</code>&nbsp;</td>
 </tr>
 <tr id="i1" class="rowColor">
-<td class="colFirst"><code>java.util.Map&lt;java.lang.CharSequence,java.lang.CharSequence&gt;</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/openapi/javadoc/JavadocDescription.html#getParameters--">getParameters</a></span>()</code>&nbsp;</td>
+<td class="colFirst"><code>java.lang.String</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/openapi/javadoc/JavadocDescription.html#getMethodSummary--">getMethodSummary</a></span>()</code>&nbsp;</td>
 </tr>
 <tr id="i2" class="altColor">
+<td class="colFirst"><code>java.util.Map&lt;java.lang.String,java.lang.String&gt;</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/openapi/javadoc/JavadocDescription.html#getParameters--">getParameters</a></span>()</code>&nbsp;</td>
+</tr>
+<tr id="i3" class="rowColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/openapi/javadoc/JavadocDescription.html#getReturnDescription--">getReturnDescription</a></span>()</code>
 <div class="block">The return description.</div>
 </td>
 </tr>
-<tr id="i3" class="rowColor">
+<tr id="i4" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/openapi/javadoc/JavadocDescription.html#setMethodDescription-java.lang.String-">setMethodDescription</a></span>(java.lang.String&nbsp;methodDescription)</code>
 <div class="block">Sets the method description.</div>
 </td>
 </tr>
-<tr id="i4" class="altColor">
+<tr id="i5" class="rowColor">
+<td class="colFirst"><code>void</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/openapi/javadoc/JavadocDescription.html#setMethodSummary-java.lang.String-">setMethodSummary</a></span>(java.lang.String&nbsp;methodSummary)</code>
+<div class="block">Sets the method summary.</div>
+</td>
+</tr>
+<tr id="i6" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/openapi/javadoc/JavadocDescription.html#setReturnDescription-java.lang.String-">setReturnDescription</a></span>(java.lang.String&nbsp;returnDescription)</code>
 <div class="block">Sets the return description.</div>
@@ -216,6 +226,33 @@ extends java.lang.Object</pre>
 <!--   -->
 </a>
 <h3>Method Detail</h3>
+<a name="getMethodSummary--">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getMethodSummary</h4>
+<pre>public&nbsp;java.lang.String&nbsp;getMethodSummary()</pre>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>method summary</dd>
+</dl>
+</li>
+</ul>
+<a name="setMethodSummary-java.lang.String-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>setMethodSummary</h4>
+<pre>public&nbsp;void&nbsp;setMethodSummary(java.lang.String&nbsp;methodSummary)</pre>
+<div class="block">Sets the method summary.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>methodSummary</code> - The method summary</dd>
+</dl>
+</li>
+</ul>
 <a name="getMethodDescription--">
 <!--   -->
 </a>
@@ -250,7 +287,7 @@ public&nbsp;java.lang.String&nbsp;getMethodDescription()</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>getParameters</h4>
-<pre>public&nbsp;java.util.Map&lt;java.lang.CharSequence,java.lang.CharSequence&gt;&nbsp;getParameters()</pre>
+<pre>public&nbsp;java.util.Map&lt;java.lang.String,java.lang.String&gt;&nbsp;getParameters()</pre>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>The parameter descriptions</dd>
