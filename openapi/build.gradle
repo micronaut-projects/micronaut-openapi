@@ -21,10 +21,11 @@ dependencies {
     testImplementation(mn.micronaut.inject.java)
     testImplementation(mn.micronaut.inject.java.test)
     testImplementation(mn.micronaut.hibernate.validator)
+    testImplementation(mn.micronaut.data.jdbc)
     testImplementation(libs.rxjava2)
     testImplementation(libs.rxjava3)
     testImplementation(mn.micronaut.management)
-    
+
     if (org.gradle.internal.jvm.Jvm.current().getJavaVersion().isJava8()) {
         testImplementation files(org.gradle.internal.jvm.Jvm.current().toolsJar)
     }

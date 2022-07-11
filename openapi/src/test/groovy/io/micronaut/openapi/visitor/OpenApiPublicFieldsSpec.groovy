@@ -41,6 +41,9 @@ class Pet {
     // hidden by swagger
     @Hidden
     public int hidden;
+    // hidden by swagger
+    @Schema(hidden = true)
+    public int hidden2;
 
     // private should not be included
     private String name;

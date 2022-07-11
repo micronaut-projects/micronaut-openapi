@@ -835,6 +835,9 @@ abstract class AbstractOpenApiVisitor {
                 } else if (type.isIterable()) {
                     if (type.isArray()) {
                         schema = resolveSchema(openAPI, type, type.fromArray(), context, mediaTypes);
+                        if (schema != null) {
+                            schema = arraySchema(schema);
+                        }
                     } else {
                         Optional<ClassElement> componentType = type.getFirstTypeArgument();
                         if (componentType.isPresent()) {
@@ -842,9 +845,12 @@ abstract class AbstractOpenApiVisitor {
                         } else {
                             schema = getPrimitiveType(Object.class.getName());
                         }
-                    }
-                    if (schema != null) {
-                        schema = arraySchema(schema);
+                        List<FieldElement> fields =  type.getFields();
+                        if (schema != null && fields.isEmpty()) {
+                            schema = arraySchema(schema);
+                        } else {
+                            schema = getSchemaDefinition(openAPI, context, type, definingElement, mediaTypes);
+                        }
                     }
                 } else if (isReturnTypeFile(type)) {
                     schema = new StringSchema();
@@ -1789,7 +1795,10 @@ abstract class AbstractOpenApiVisitor {
 
     private void processPropertyElements(OpenAPI openAPI, VisitorContext context, Element type, Schema schema, List<? extends TypedElement> publicFields, List<MediaType> mediaTypes) {
         for (TypedElement publicField : publicFields) {
-            if (publicField.isAnnotationPresent(JsonIgnore.class) || publicField.isAnnotationPresent(Hidden.class)) {
+            boolean isHidden = publicField.getAnnotationMetadata().booleanValue(io.swagger.v3.oas.annotations.media.Schema.class, "hidden").orElse(false);
+            if (publicField.isAnnotationPresent(JsonIgnore.class)
+                || publicField.isAnnotationPresent(Hidden.class)
+                || isHidden) {
                 continue;
             }
 
