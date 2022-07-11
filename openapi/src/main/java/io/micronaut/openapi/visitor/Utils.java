@@ -15,18 +15,51 @@
  */
 package io.micronaut.openapi.visitor;
 
+import java.io.File;
+import java.io.InputStream;
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.Future;
 
 import io.micronaut.core.annotation.AnnotationValue;
+import io.micronaut.core.util.CollectionUtils;
+import io.micronaut.http.server.types.files.FileCustomizableResponseType;
+import io.micronaut.inject.ast.ClassElement;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 
+import org.reactivestreams.Publisher;
+
 /**
- * Some util methods
+ * Some util methods.
  */
 public class Utils {
+
+    public static boolean isContainerType(ClassElement type) {
+        return CollectionUtils.setOf(
+            Optional.class.getName(),
+            Future.class.getName(),
+            Publisher.class.getName(),
+            "io.reactivex.Single",
+            "io.reactivex.Observable",
+            "io.reactivex.Maybe",
+            "io.reactivex.rxjava3.core.Single",
+            "io.reactivex.rxjava3.core.Observable",
+            "io.reactivex.rxjava3.core.Maybe"
+        ).stream().anyMatch(type::isAssignable);
+    }
+
+    public static boolean isReturnTypeFile(ClassElement type) {
+        return CollectionUtils.setOf(
+            FileCustomizableResponseType.class.getName(),
+            File.class.getName(),
+            InputStream.class.getName(),
+            ByteBuffer.class.getName()
+        ).stream().anyMatch(type::isAssignable);
+    }
 
     /**
      * Normalizes enum values stored in the map.

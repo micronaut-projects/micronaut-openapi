@@ -15,12 +15,9 @@
  */
 package io.micronaut.openapi.visitor;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.math.BigDecimal;
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -35,7 +32,6 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.Future;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Function;
@@ -71,7 +67,6 @@ import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.core.util.StringUtils;
 import io.micronaut.http.MediaType;
 import io.micronaut.http.annotation.Part;
-import io.micronaut.http.server.types.files.FileCustomizableResponseType;
 import io.micronaut.http.uri.UriMatchTemplate;
 import io.micronaut.inject.ast.ClassElement;
 import io.micronaut.inject.ast.Element;
@@ -137,10 +132,10 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import static io.swagger.v3.oas.models.Components.COMPONENTS_SCHEMAS_REF;
 import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.expandProperties;
 import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.getExpandableProperties;
 import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.resolvePlaceholders;
+import static io.swagger.v3.oas.models.Components.COMPONENTS_SCHEMAS_REF;
 import static java.util.stream.Collectors.toMap;
 
 /**
@@ -824,7 +819,7 @@ abstract class AbstractOpenApiVisitor {
             boolean isNullable = false;
 
             // StreamingFileUpload implements Publisher, but it should be not considered as a Publisher in the spec file
-            if (!type.isAssignable("io.micronaut.http.multipart.StreamingFileUpload") && isContainerType(type)) {
+            if (!type.isAssignable("io.micronaut.http.multipart.StreamingFileUpload") && Utils.isContainerType(type)) {
                 isPublisher = type.isAssignable(Publisher.class.getName()) && !type.isAssignable("reactor.core.publisher.Mono");
                 isObservable = type.isAssignable("io.reactivex.Observable") && !type.isAssignable("reactor.core.publisher.Mono");
                 type = type.getFirstTypeArgument().orElse(null);
@@ -882,7 +877,7 @@ abstract class AbstractOpenApiVisitor {
                             schema = getSchemaDefinition(openAPI, context, type, definingElement, mediaTypes);
                         }
                     }
-                } else if (isReturnTypeFile(type)) {
+                } else if (Utils.isReturnTypeFile(type)) {
                     schema = new StringSchema();
                     schema.setFormat("binary");
                 } else if (type.isAssignable(UUID.class)) {
@@ -896,7 +891,7 @@ abstract class AbstractOpenApiVisitor {
 
                 if (definingElement != null && StringUtils.isEmpty(schema.getDescription())) {
                     if (definingElement.getDocumentation().isPresent()) {
-                        schema.setDescription(definingElement.getDocumentation().get());
+                        schema.setDescription(javadocParser.parse(definingElement.getDocumentation().get()).getMethodDescription());
                     } else if (classJavadoc != null) {
                         schema.setDescription(classJavadoc.getParameters().get(definingElement.getName()));
                     }
@@ -1900,29 +1895,6 @@ abstract class AbstractOpenApiVisitor {
             }
         }
         return schema;
-    }
-
-    private boolean isContainerType(ClassElement type) {
-        return CollectionUtils.setOf(
-                Optional.class.getName(),
-                Future.class.getName(),
-                Publisher.class.getName(),
-                "io.reactivex.Single",
-                "io.reactivex.Observable",
-                "io.reactivex.Maybe",
-                "io.reactivex.rxjava3.core.Single",
-                "io.reactivex.rxjava3.core.Observable",
-                "io.reactivex.rxjava3.core.Maybe"
-        ).stream().anyMatch(type::isAssignable);
-    }
-
-    private boolean isReturnTypeFile(ClassElement type) {
-        return CollectionUtils.setOf(
-                FileCustomizableResponseType.class.getName(),
-                File.class.getName(),
-                InputStream.class.getName(),
-                ByteBuffer.class.getName()
-        ).stream().anyMatch(type::isAssignable);
     }
 
     /**

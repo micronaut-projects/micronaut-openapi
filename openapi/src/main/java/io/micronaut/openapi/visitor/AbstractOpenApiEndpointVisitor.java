@@ -587,9 +587,9 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                 propertySchema.setNullable(true);
             }
             if (javadocDescription != null && StringUtils.isEmpty(propertySchema.getDescription())) {
-                CharSequence doc = javadocDescription.getParameters().get(parameter.getName());
+                String doc = javadocDescription.getParameters().get(parameter.getName());
                 if (doc != null) {
-                    propertySchema.setDescription(doc.toString());
+                    propertySchema.setDescription(doc);
                 }
             }
         }
