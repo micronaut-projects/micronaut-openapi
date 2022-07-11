@@ -4,7 +4,7 @@ managed-swagger = "2.2.1"
 managed-swagger-compat = "2.2.1"
 
 kotlintest-runner-junit5 = "3.4.2"
-kotlin = "1.7.0"
+kotlin = "1.7.10"
 
 [libraries]
 # Duplicated to keep catalog compatibility with 3.4.x.  Can be removed for 4.0.0
