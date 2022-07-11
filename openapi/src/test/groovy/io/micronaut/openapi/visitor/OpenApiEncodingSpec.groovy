@@ -28,7 +28,8 @@ import io.swagger.v3.oas.annotations.media.Encoding;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import jakarta.inject.Singleton;import reactor.core.publisher.Flux;
+import jakarta.inject.Singleton;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import javax.validation.constraints.NotNull;
@@ -176,6 +177,7 @@ package test;
 import io.micronaut.http.annotation.Body;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Put;
+import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.extensions.Extension;
 import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
 import io.swagger.v3.oas.annotations.headers.Header;
@@ -212,6 +214,50 @@ class MyController2 {
                                                     @Header(
                                                             name = "MyHeader2",
                                                             description = "Header 2 description"
+                                                    ),
+                                                    @Header(
+                                                            name = "MyHeader3",
+                                                            ref = "#/components/headers/Head3"
+                                                    ),
+                                                    @Header(
+                                                            name = "MyHeader4",
+                                                            schema = @Schema(
+                                                                name = "test",
+                                                                description = "this is description",
+                                                                defaultValue = "{\\"stampWidth\\": 100}",
+                                                                format = "binary",
+                                                                ref = "#/components/schemas/Head4Schema"
+                                                            )
+                                                    ),
+                                                    @Header(
+                                                            name = "MyHeader5",
+                                                            schema = @Schema(
+                                                                name = "test",
+                                                                description = "this is description",
+                                                                nullable = true,
+                                                                deprecated = true,
+                                                                accessMode = Schema.AccessMode.READ_ONLY,
+                                                                defaultValue = "{\\"stampWidth\\": 100}",
+                                                                required = true,
+                                                                format = "binary",
+                                                                title = "the title",
+                                                                minimum = "10",
+                                                                maximum = "100",
+                                                                exclusiveMinimum = true,
+                                                                exclusiveMaximum = true,
+                                                                minLength = 10,
+                                                                maxLength = 100,
+                                                                minProperties = 10,
+                                                                maxProperties = 100,
+                                                                multipleOf = 1.5,
+                                                                pattern = "ppp",
+                                                                externalDocs = @ExternalDocumentation(description = "external docs"),
+                                                                example = "{\\n" +
+                                                                        "  \\"stampWidth\\": 220,\\n" +
+                                                                        "  \\"stampHeight\\": 85,\\n" +
+                                                                        "  \\"pageNumber\\": 1\\n" +
+                                                                        "}"
+                                                        )
                                                     ),
                                             },
                                             extensions = {
@@ -475,13 +521,44 @@ class MyBean {}
         operation.requestBody.content."multipart/mixed".encoding.firstOject.style == Encoding.StyleEnum.DEEP_OBJECT
         operation.requestBody.content."multipart/mixed".encoding.firstOject.explode
         operation.requestBody.content."multipart/mixed".encoding.firstOject.allowReserved
-        operation.requestBody.content."multipart/mixed".encoding.firstOject.headers.size() == 2
+        operation.requestBody.content."multipart/mixed".encoding.firstOject.headers.size() == 5
         operation.requestBody.content."multipart/mixed".encoding.firstOject.headers.MyHeader1.description == "Header 1 description"
         operation.requestBody.content."multipart/mixed".encoding.firstOject.headers.MyHeader1.required
         operation.requestBody.content."multipart/mixed".encoding.firstOject.headers.MyHeader1.deprecated
         operation.requestBody.content."multipart/mixed".encoding.firstOject.headers.MyHeader2.description == "Header 2 description"
         !operation.requestBody.content."multipart/mixed".encoding.firstOject.headers.MyHeader2.required
         !operation.requestBody.content."multipart/mixed".encoding.firstOject.headers.MyHeader2.deprecated
+        operation.requestBody.content."multipart/mixed".encoding.firstOject.headers.MyHeader3.get$ref() == '#/components/headers/Head3'
+        operation.requestBody.content."multipart/mixed".encoding.firstOject.headers.MyHeader4.schema.get$ref() == '#/components/schemas/Head4Schema'
+        !operation.requestBody.content."multipart/mixed".encoding.firstOject.headers.MyHeader4.schema.description
+        !operation.requestBody.content."multipart/mixed".encoding.firstOject.headers.MyHeader4.schema.default
+        !operation.requestBody.content."multipart/mixed".encoding.firstOject.headers.MyHeader4.schema.format
+
+        !operation.requestBody.content."multipart/mixed".encoding.firstOject.headers.MyHeader5.schema.get$ref()
+        operation.requestBody.content."multipart/mixed".encoding.firstOject.headers.MyHeader5.schema.description == 'this is description'
+        operation.requestBody.content."multipart/mixed".encoding.firstOject.headers.MyHeader5.schema.default
+        operation.requestBody.content."multipart/mixed".encoding.firstOject.headers.MyHeader5.schema.default.stampWidth == 100
+        operation.requestBody.content."multipart/mixed".encoding.firstOject.headers.MyHeader5.schema.example
+        operation.requestBody.content."multipart/mixed".encoding.firstOject.headers.MyHeader5.schema.example.stampWidth == 220
+        operation.requestBody.content."multipart/mixed".encoding.firstOject.headers.MyHeader5.schema.example.stampHeight == 85
+        operation.requestBody.content."multipart/mixed".encoding.firstOject.headers.MyHeader5.schema.example.pageNumber == 1
+        operation.requestBody.content."multipart/mixed".encoding.firstOject.headers.MyHeader5.schema.deprecated
+        operation.requestBody.content."multipart/mixed".encoding.firstOject.headers.MyHeader5.schema.readOnly
+        operation.requestBody.content."multipart/mixed".encoding.firstOject.headers.MyHeader5.schema.format == 'binary'
+        operation.requestBody.content."multipart/mixed".encoding.firstOject.headers.MyHeader5.schema.externalDocs.description == 'external docs'
+        operation.requestBody.content."multipart/mixed".encoding.firstOject.headers.MyHeader5.schema.title == 'the title'
+        operation.requestBody.content."multipart/mixed".encoding.firstOject.headers.MyHeader5.schema.exclusiveMinimum
+        operation.requestBody.content."multipart/mixed".encoding.firstOject.headers.MyHeader5.schema.exclusiveMaximum
+        operation.requestBody.content."multipart/mixed".encoding.firstOject.headers.MyHeader5.schema.maximum == 100
+        operation.requestBody.content."multipart/mixed".encoding.firstOject.headers.MyHeader5.schema.minimum == 10
+        operation.requestBody.content."multipart/mixed".encoding.firstOject.headers.MyHeader5.schema.maximum == 100
+        operation.requestBody.content."multipart/mixed".encoding.firstOject.headers.MyHeader5.schema.minLength == 10
+        operation.requestBody.content."multipart/mixed".encoding.firstOject.headers.MyHeader5.schema.maxLength == 100
+        operation.requestBody.content."multipart/mixed".encoding.firstOject.headers.MyHeader5.schema.minProperties == 10
+        operation.requestBody.content."multipart/mixed".encoding.firstOject.headers.MyHeader5.schema.maxProperties == 100
+        operation.requestBody.content."multipart/mixed".encoding.firstOject.headers.MyHeader5.schema.multipleOf == 1.5
+        operation.requestBody.content."multipart/mixed".encoding.firstOject.headers.MyHeader5.schema.pattern == "ppp"
+
         operation.requestBody.content."multipart/mixed".encoding.firstOject.extensions.size() == 2
         operation.requestBody.content."multipart/mixed".encoding.firstOject.extensions."x-myExt1".prop1 == "prop1Val"
         operation.requestBody.content."multipart/mixed".encoding.firstOject.extensions."x-myExt1".prop1 == "prop1Val"

@@ -137,6 +137,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import static io.swagger.v3.oas.models.Components.COMPONENTS_SCHEMAS_REF;
 import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.expandProperties;
 import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.getExpandableProperties;
 import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.resolvePlaceholders;
@@ -458,8 +459,29 @@ abstract class AbstractOpenApiVisitor {
                                 Map<String, Object> mediaTypes = annotationValueArrayToSubmap(a, "mediaType", context);
                                 newValues.put(key, mediaTypes);
                             } else if (Link.class.getName().equals(annotationName) || Header.class.getName().equals(annotationName)) {
-                                Map<String, Object> links = annotationValueArrayToSubmap(a, "name", context);
-                                newValues.put(key, links);
+                                Map<String, Object> linksOrHeaders = annotationValueArrayToSubmap(a, "name", context);
+                                for (Object linkOrHeader : linksOrHeaders.values()) {
+                                    Map<String, Object> linkOrHeaderMap = (Map<String, Object>) linkOrHeader;
+                                    if (linkOrHeaderMap.containsKey("ref")) {
+                                        linkOrHeaderMap.put("$ref", linkOrHeaderMap.remove("ref"));
+                                    }
+                                    if (linkOrHeaderMap.containsKey("schema")) {
+                                        Map<String, Object> schemaMap = (Map<String, Object>) linkOrHeaderMap.get("schema");
+                                        if (schemaMap.containsKey("ref")) {
+                                            Object ref = schemaMap.get("ref");
+                                            schemaMap.clear();
+                                            schemaMap.put("$ref", ref);
+                                        }
+                                        if (schemaMap.containsKey("defaultValue")) {
+                                            schemaMap.put("default", schemaMap.remove("defaultValue"));
+                                        }
+                                        if (schemaMap.containsKey("allowableValues")) {
+                                            // The key in the generated openapi needs to be "enum"
+                                            schemaMap.put("enum", schemaMap.remove("allowableValues"));
+                                        }
+                                    }
+                                }
+                                newValues.put(key, linksOrHeaders);
                             } else if (LinkParameter.class.getName().equals(annotationName)) {
                                 Map<String, String> params = toTupleSubMap(a, "name", "expression");
                                 newValues.put(key, params);
@@ -472,6 +494,11 @@ abstract class AbstractOpenApiVisitor {
                                     AnnotationValue<ApiResponse> sv = (AnnotationValue<ApiResponse>) o;
                                     String name = sv.get("responseCode", String.class).orElse("default");
                                     Map<CharSequence, Object> map = toValueMap(sv.getValues(), context);
+                                    if (map.containsKey("ref")) {
+                                        Object ref = map.get("ref");
+                                        map.clear();
+                                        map.put("$ref", ref);
+                                    }
                                     responses.put(name, map);
                                 }
                                 newValues.put(key, responses);
@@ -481,6 +508,11 @@ abstract class AbstractOpenApiVisitor {
                                     AnnotationValue<ExampleObject> sv = (AnnotationValue<ExampleObject>) o;
                                     String name = sv.get("name", String.class).orElse("example");
                                     Map<CharSequence, Object> map = toValueMap(sv.getValues(), context);
+                                    if (map.containsKey("ref")) {
+                                        Object ref = map.get("ref");
+                                        map.clear();
+                                        map.put("$ref", ref);
+                                    }
                                     examples.put(name, map);
                                 }
                                 newValues.put(key, examples);
@@ -553,6 +585,8 @@ abstract class AbstractOpenApiVisitor {
                     newValues.put("discriminator", discriminatorMap);
                 } else if (key.equals("style")) {
                     newValues.put(key, io.swagger.v3.oas.models.media.Encoding.StyleEnum.valueOf((String) value).toString());
+                } else if (key.equals("ref")) {
+                    newValues.put("$ref", value);
                 } else if (key.equals("accessMode")) {
                     if (io.swagger.v3.oas.annotations.media.Schema.AccessMode.READ_ONLY.toString().equals(value)) {
                         newValues.put("readOnly", Boolean.TRUE);
@@ -1303,7 +1337,7 @@ abstract class AbstractOpenApiVisitor {
         return doBindSchemaAnnotationValue(context, element, schemaToBind, schemaJson, null);
     }
 
-    private Optional<Map<String, Object>> resolveExtensions(JsonNode jn) {
+    protected Optional<Map<String, Object>> resolveExtensions(JsonNode jn) {
         try {
             JsonNode extensionsNode = jn.get("extensions");
             if (extensionsNode != null) {
@@ -1670,7 +1704,7 @@ abstract class AbstractOpenApiVisitor {
     }
 
     private String schemaRef(String schemaName) {
-        return "#/components/schemas/" + schemaName;
+        return COMPONENTS_SCHEMAS_REF + schemaName;
     }
 
     private String computeDefaultSchemaName(Element definingElement, Element type) {
@@ -1857,6 +1891,10 @@ abstract class AbstractOpenApiVisitor {
                 } else {
                     map.putIfAbsent("name", name);
                 }
+                if (map.containsKey("ref")) {
+                    map.put("$ref", map.remove("ref"));
+                }
+
                 normalizeEnumValues(map, CollectionUtils.mapOf("type", SecurityScheme.Type.class, "in", SecurityScheme.In.class));
 
                 try {

@@ -46,7 +46,7 @@ public class OpenApiOperationsPostProcessor {
                     if (operationIdsIndex.containsKey(operationId)) {
                         int nextValue = operationIdsIndex.get(operationId);
 
-                        String newOperationId = operationId + "_" + nextValue;
+                        String newOperationId = operationId + '_' + nextValue;
                         operation.setOperationId(newOperationId);
                         updateResponseDescription(operation, operationId, newOperationId);
 

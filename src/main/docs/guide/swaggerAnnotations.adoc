@@ -7,7 +7,7 @@ dependency:swagger-annotations[scope="implementation", groupId="io.swagger.core.
 and then annotate your controllers:
 
 .Using Swagger Annotations
-snippet::io.micronaut.configuration.openapi.docs.controllers.annotations.HelloController[tags="imports,clazz", project-base="docs-examples/example]
+snippet::io.micronaut.configuration.openapi.docs.controllers.annotations.HelloController[tags="imports,clazz", project-base="docs-examples/example"]
 
 The resulting output will be:
 

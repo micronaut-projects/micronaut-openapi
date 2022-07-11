@@ -15,6 +15,8 @@ package test;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
+import io.micronaut.http.annotation.Post;
+import io.micronaut.http.annotation.Put;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -29,6 +31,18 @@ class OpenApiController {
             @Parameter(schema = @Schema(implementation = String.class)) Optional<Period> period) {
         return HttpResponse.ok();
     }
+
+    @Post
+    public HttpResponse<String> processSync2(
+            @Parameter(ref = "#/components/parameters/MyParam") Optional<Period> period) {
+        return HttpResponse.ok();
+    }
+
+    @Put
+    public HttpResponse<String> processSync3(
+            @Parameter(schema = @Schema(ref = "#/components/schemas/MyParamSchema")) Optional<Period> period) {
+        return HttpResponse.ok();
+    }
 }
 
 @jakarta.inject.Singleton
@@ -40,6 +54,8 @@ class MyBean {}
         when: "The OpenAPI is retrieved"
         OpenAPI openAPI = AbstractOpenApiVisitor.testReference
         Operation operation = openAPI.paths."/path".get
+        Operation operationPost = openAPI.paths."/path".post
+        Operation operationPut = openAPI.paths."/path".put
 
         then:
         operation
@@ -49,5 +65,9 @@ class MyBean {}
         operation.parameters[0].in == "query"
         operation.parameters[0].schema
         operation.parameters[0].schema.type == "string"
+
+        operationPost.parameters[0].get$ref() == "#/components/parameters/MyParam"
+
+        operationPut.parameters[0].schema.oneOf.get(0).get$ref() == "#/components/schemas/MyParamSchema"
     }
 }

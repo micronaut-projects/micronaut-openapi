@@ -867,7 +867,7 @@ class MyController {
 class MyBean {}
 ''')
         when:
-        OpenAPI api =  AbstractOpenApiVisitor.testReference
+        OpenAPI api =  AbstractOpenApiVisitor.testReferenceAfterPlaceholders
 
         then:
         api.paths.size() == 2

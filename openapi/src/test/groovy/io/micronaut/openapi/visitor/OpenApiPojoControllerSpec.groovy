@@ -44,7 +44,7 @@ interface PetOperations<T extends Pet> {
     @ApiResponse(responseCode = "404", description = "Person not found")
     @Post("/xyz1")
     T xyzPost(String slug);
-    
+
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Custom desc"),
         @ApiResponse(responseCode = "400", description = "Invalid Name Supplied"),
@@ -52,7 +52,7 @@ interface PetOperations<T extends Pet> {
     })
     @Put("/xyz1")
     T xyzPut(String slug);
-    
+
     @Status(io.micronaut.http.HttpStatus.CREATED)
     @Operation(description = "Do the post")
     @ApiResponse(responseCode = "201", description = "Custom desc 2")
@@ -107,7 +107,7 @@ class Pet {
     public void setTags(List<String> tags) {
         this.tags = tags;
     }
-    
+
     public static class InnerBean {
         public String xyz;
     }
@@ -1336,7 +1336,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.List;
 
-@Controller("/pets")
+@Controller("/")
 interface PetOperations<T extends Pet> {
 
     /**
@@ -1346,14 +1346,28 @@ interface PetOperations<T extends Pet> {
      * @return A pet or 404
      */
     @Consumes(MediaType.APPLICATION_JSON)
-    @Post("/")
+    @Post("pets")
     T save(
     @RequestBody(description = "A pet", required = false, content = {
         @Content(mediaType = "application/json",
                  schema = @Schema(implementation = Pet.class),
                  examples = {
-                    @ExampleObject(name = "example-1", value = "{\\"name\\":\\"Charlie\\"}")})}) T pet);
+                    @ExampleObject(name = "example-1", value = "{\\"name\\":\\"Charlie\\"}"),
+                    @ExampleObject(name = "example-2", value = "{\\"name\\":\\"Charlie\\"}", ref = "#/components/examples/MyExample2"),
+        })}) T pet);
 
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Post("save")
+    T save1(
+    @RequestBody(
+        ref = "#/components/requestBodies/MyRequestBody",
+        content = {
+        @Content(mediaType = "application/json",
+                 schema = @Schema(implementation = Pet.class),
+                 examples = {
+                    @ExampleObject(name = "example-1", value = "{\\"name\\":\\"Charlie\\"}"),
+                    @ExampleObject(name = "example-2", value = "{\\"name\\":\\"Charlie\\"}", ref = "#/components/examples/MyExample2"),
+        })}) T pet);
 }
 
 class Pet {
@@ -1397,10 +1411,11 @@ class MyBean {}
         OpenAPI openAPI = AbstractOpenApiVisitor.testReference
 
         then:"The operation has only one path"
-        openAPI.paths.size() == 1
+        openAPI.paths.size() == 2
 
         when: "The POST /pets operation is retrieved"
         Operation operation = openAPI.paths?.get("/pets")?.post
+        Operation operationSave = openAPI.paths?.get("/save")?.post
 
         then: "The body has specified attributes"
         operation.requestBody
@@ -1413,6 +1428,10 @@ class MyBean {}
         operation.requestBody.content['application/json'].examples.'example-1'
         operation.requestBody.content['application/json'].examples.'example-1'.value
         operation.requestBody.content['application/json'].examples.'example-1'.value.name == 'Charlie'
+        operation.requestBody.content['application/json'].examples.'example-2'
+        operation.requestBody.content['application/json'].examples.'example-2'.get$ref() == '#/components/examples/MyExample2'
+
+        operationSave.requestBody.get$ref() == '#/components/requestBodies/MyRequestBody'
     }
 
     void "test build OpenAPI for multiple content types and parameters"() {

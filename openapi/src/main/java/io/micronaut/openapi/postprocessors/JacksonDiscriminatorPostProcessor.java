@@ -15,13 +15,16 @@
  */
 package io.micronaut.openapi.postprocessors;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import io.micronaut.core.annotation.NonNull;
+import io.micronaut.core.util.StringUtils;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.media.StringSchema;
 
-import java.util.ArrayList;
-import java.util.List;
+import static io.swagger.v3.oas.models.Components.COMPONENTS_SCHEMAS_REF;
 
 /**
  * Utility class to add missing "discriminator" property when using Jackson {@link com.fasterxml.jackson.annotation.JsonTypeInfo}
@@ -61,6 +64,6 @@ public class JacksonDiscriminatorPostProcessor {
     }
 
     private String extractComponentSchemaName(@NonNull String mapping) {
-        return mapping.replace("#/components/schemas/", "");
+        return mapping.replace(COMPONENTS_SCHEMAS_REF, StringUtils.EMPTY_STRING);
     }
 }
