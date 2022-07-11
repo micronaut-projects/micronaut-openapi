@@ -3,7 +3,8 @@ managed-swagger = "2.2.1"
 # Required to keep catalog compatibility with 3.4.x.  Can be removed for 4.0.0
 managed-swagger-compat = "2.2.1"
 
-kotlintest-runner-junit5 = "3.4.2"
+javadoc-parser = "0.2.0"
+html2md-converter = "0.62.2"
 kotlin = "1.7.10"
 
 [libraries]
@@ -13,6 +14,9 @@ managed-swagger = { module = "io.swagger.core.v3:swagger-core", version.ref = "m
 managed-swagger-annotations = { module = "io.swagger.core.v3:swagger-annotations", version.ref = "managed-swagger" }
 managed-swagger-core = { module = "io.swagger.core.v3:swagger-core", version.ref = "managed-swagger" }
 managed-swagger-models = { module = "io.swagger.core.v3:swagger-models", version.ref = "managed-swagger" }
+
+javadoc-parser = { module = "com.github.chhorz:javadoc-parser", version.ref = "javadoc-parser" }
+html2md-converter = {module = "com.vladsch.flexmark:flexmark-html2md-converter", version.ref = "html2md-converter" }
 
 # Versions from BOM
 junit-jupiter-api = { module = "org.junit.jupiter:junit-jupiter-api" }

@@ -28,14 +28,32 @@ import java.util.Map;
  */
 public class JavadocDescription {
 
+    private String methodSummary;
     private String methodDescription;
-    private Map<CharSequence, CharSequence> parameters = new HashMap<>(4);
+    private Map<String, String> parameters = new HashMap<>(4);
     private String returnDescription;
+
+    /**
+     * @return method summary
+     */
+    public String getMethodSummary() {
+        return methodSummary;
+    }
+
+    /**
+     * Sets the method summary.
+     *
+     * @param methodSummary The method summary
+     */
+    public void setMethodSummary(String methodSummary) {
+        this.methodSummary = methodSummary;
+    }
 
     /**
      * @return The description
      */
-    @Nullable public String getMethodDescription() {
+    @Nullable
+    public String getMethodDescription() {
         return methodDescription;
     }
 
@@ -51,7 +69,7 @@ public class JavadocDescription {
     /**
      * @return The parameter descriptions
      */
-    public Map<CharSequence, CharSequence> getParameters() {
+    public Map<String, String> getParameters() {
         return parameters;
     }
 
@@ -59,7 +77,8 @@ public class JavadocDescription {
      * The return description.
      * @return The return description
      */
-    @Nullable public String getReturnDescription() {
+    @Nullable
+    public String getReturnDescription() {
         return returnDescription;
     }
 

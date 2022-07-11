@@ -15,9 +15,22 @@
  */
 package io.micronaut.openapi.visitor;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
+import java.io.IOException;
+import java.security.Principal;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import io.micronaut.context.env.DefaultPropertyPlaceholderResolver;
 import io.micronaut.context.env.PropertyPlaceholderResolver;
 import io.micronaut.core.annotation.AnnotationValue;
@@ -28,6 +41,7 @@ import io.micronaut.core.bind.annotation.Bindable;
 import io.micronaut.core.convert.ArgumentConversionContext;
 import io.micronaut.core.convert.DefaultConversionService;
 import io.micronaut.core.naming.NameUtils;
+import io.micronaut.core.type.Argument;
 import io.micronaut.core.util.ArrayUtils;
 import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.core.util.StringUtils;
@@ -55,7 +69,6 @@ import io.micronaut.inject.ast.ParameterElement;
 import io.micronaut.inject.ast.TypedElement;
 import io.micronaut.inject.visitor.VisitorContext;
 import io.micronaut.openapi.javadoc.JavadocDescription;
-import io.micronaut.openapi.javadoc.JavadocParser;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
@@ -63,6 +76,7 @@ import io.swagger.v3.oas.annotations.callbacks.Callback;
 import io.swagger.v3.oas.annotations.callbacks.Callbacks;
 import io.swagger.v3.oas.annotations.enums.Explode;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.enums.ParameterStyle;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.tags.Tags;
 import io.swagger.v3.oas.models.Components;
@@ -83,19 +97,9 @@ import io.swagger.v3.oas.models.responses.ApiResponses;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.servers.Server;
 
-import java.io.IOException;
-import java.security.Principal;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * A {@link io.micronaut.inject.visitor.TypeElementVisitor} the builds the Swagger model from Micronaut controllers at compile time.
@@ -110,6 +114,8 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
 
     private static final TypeReference<Map<CharSequence, Object>> MAP_TYPE = new TypeReference<Map<CharSequence, Object>>() {
     };
+    private static final int MAX_SUMMARY_LENGTH = 200;
+    private static final String THREE_DOTS = "...";
 
     protected List<io.swagger.v3.oas.models.tags.Tag> classTags;
     protected io.swagger.v3.oas.models.ExternalDocumentation classExternalDocs;
@@ -481,6 +487,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             paramAnn.booleanValue("allowReserved").ifPresent(parameter::allowReserved);
             paramAnn.stringValue("example").ifPresent(parameter::example);
             paramAnn.stringValue("ref").ifPresent(parameter::$ref);
+            paramAnn.enumValue("style", ParameterStyle.class).ifPresent(style -> parameter.setStyle(paramStyle(style)));
 
             PathItem pathItem = openAPI.getPaths().get(matchTemplate.toPathString());
             switch (httpMethod) {
@@ -554,7 +561,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
 
         Schema schema = newParameter.getSchema();
         if (schema == null) {
-            schema = resolveSchema(openAPI, parameter, parameterType, context, consumesMediaTypes);
+            schema = resolveSchema(openAPI, parameter, parameterType, context, consumesMediaTypes, null);
         }
 
         if (schema != null) {
@@ -566,7 +573,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
     private void processBodyParameter(VisitorContext context, OpenAPI openAPI, JavadocDescription javadocDescription,
                                       MediaType mediaType, Schema schema, TypedElement parameter) {
         Schema propertySchema = resolveSchema(openAPI, parameter, parameter.getType(), context,
-                Collections.singletonList(mediaType));
+                Collections.singletonList(mediaType), null);
         if (propertySchema != null) {
 
             Optional<String> description = parameter.getValue(io.swagger.v3.oas.annotations.Parameter.class,
@@ -580,9 +587,9 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                 propertySchema.setNullable(true);
             }
             if (javadocDescription != null && StringUtils.isEmpty(propertySchema.getDescription())) {
-                CharSequence doc = javadocDescription.getParameters().get(parameter.getName());
+                String doc = javadocDescription.getParameters().get(parameter.getName());
                 if (doc != null) {
-                    propertySchema.setDescription(doc.toString());
+                    propertySchema.setDescription(doc);
                 }
             }
         }
@@ -660,7 +667,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                 }
 
                 Map<CharSequence, Object> paramValues = toValueMap(paramAnn.getValues(), context);
-                normalizeEnumValues(paramValues, Collections.singletonMap("in", ParameterIn.class));
+                Utils.normalizeEnumValues(paramValues, Collections.singletonMap("in", ParameterIn.class));
                 if (parameter.isAnnotationPresent(Header.class)) {
                     paramValues.put("in", ParameterIn.HEADER.toString());
                 } else if (parameter.isAnnotationPresent(CookieValue.class)) {
@@ -879,13 +886,23 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         String descr = description(element);
         if (StringUtils.isNotEmpty(descr) && StringUtils.isEmpty(swaggerOperation.getDescription())) {
             swaggerOperation.setDescription(descr);
-            swaggerOperation.setSummary(descr);
+            String summary = descr.substring(0, descr.indexOf('.') + 1);
+            if (summary.length() > MAX_SUMMARY_LENGTH) {
+                summary = summary.substring(0, MAX_SUMMARY_LENGTH) + THREE_DOTS;
+            }
+            swaggerOperation.setSummary(summary);
         }
-        JavadocDescription javadocDescription = element.getDocumentation().map(s -> new JavadocParser().parse(s))
+        JavadocDescription javadocDescription = element.getDocumentation()
+                .map(javadocParser::parse)
                 .orElse(null);
-        if (javadocDescription != null && StringUtils.isEmpty(swaggerOperation.getDescription())) {
-            swaggerOperation.setDescription(javadocDescription.getMethodDescription());
-            swaggerOperation.setSummary(javadocDescription.getMethodDescription());
+
+        if (javadocDescription != null) {
+            if (StringUtils.isEmpty(swaggerOperation.getDescription())) {
+                swaggerOperation.setDescription(javadocDescription.getMethodDescription());
+            }
+            if (StringUtils.isEmpty(swaggerOperation.getSummary())) {
+                swaggerOperation.setSummary(javadocDescription.getMethodSummary());
+            }
         }
         return javadocDescription;
     }
@@ -896,10 +913,103 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                 .flatMap(o -> toValue(o.getValues(), context, io.swagger.v3.oas.models.Operation.class))
                 .orElse(new io.swagger.v3.oas.models.Operation());
 
+        if (CollectionUtils.isNotEmpty(swaggerOperation.getParameters())) {
+            swaggerOperation.getParameters().removeIf(Objects::isNull);
+        }
+
+        ParameterElement[] methodParams = element.getParameters();
+        if (ArrayUtils.isNotEmpty(methodParams) && operationAnnotation.isPresent()) {
+            Optional<List<io.swagger.v3.oas.annotations.Parameter>> params = operationAnnotation.get().get("parameters", Argument.listOf(io.swagger.v3.oas.annotations.Parameter.class));
+            if (params.isPresent()) {
+                for (ParameterElement methodParam : methodParams) {
+                    io.swagger.v3.oas.annotations.Parameter paramAnn = null;
+                    for (io.swagger.v3.oas.annotations.Parameter param : params.get()) {
+                        if (methodParam.getName().equals(param.name())) {
+                            paramAnn = param;
+                            break;
+                        }
+                    }
+                    if (paramAnn != null && !paramAnn.hidden()) {
+                        Parameter swaggerParam = null;
+                        if (CollectionUtils.isNotEmpty(swaggerOperation.getParameters())) {
+                            for (Parameter createdParameter : swaggerOperation.getParameters()) {
+                                if (createdParameter.getName().equals(paramAnn.name())) {
+                                    swaggerParam = createdParameter;
+                                    break;
+                                }
+                            }
+                        }
+                        if (swaggerParam == null) {
+                            if (swaggerOperation.getParameters() == null) {
+                                swaggerOperation.setParameters(new ArrayList<>());
+                            }
+                            swaggerParam = new Parameter();
+                            swaggerOperation.getParameters().add(swaggerParam);
+                        }
+                        swaggerParam.setName(paramAnn.name());
+                        swaggerParam.setDescription(paramAnn.description());
+                        swaggerParam.setRequired(paramAnn.required());
+                        swaggerParam.setDeprecated(paramAnn.deprecated());
+                        swaggerParam.setAllowEmptyValue(paramAnn.allowEmptyValue());
+                        swaggerParam.setAllowReserved(paramAnn.allowReserved());
+                        swaggerParam.setExample(paramAnn.example());
+                        swaggerParam.setStyle(paramStyle(paramAnn.style()));
+                        swaggerParam.$ref(paramAnn.ref());
+                        if (paramAnn.in() == null || paramAnn.in() == ParameterIn.DEFAULT) {
+                            swaggerParam.setIn(calcIn(methodParam));
+                        } else {
+                            swaggerParam.setIn(paramAnn.in().toString());
+                        }
+                    }
+                }
+            }
+        }
+
         if (StringUtils.isEmpty(swaggerOperation.getOperationId())) {
             swaggerOperation.setOperationId(element.getName());
         }
         return swaggerOperation;
+    }
+
+    private String calcIn(ParameterElement methodParam) {
+        Set<String> paramAnnNames = methodParam.getAnnotationNames();
+        if (CollectionUtils.isNotEmpty(paramAnnNames)) {
+            if (paramAnnNames.contains(QueryValue.class.getName())) {
+                return ParameterIn.QUERY.toString();
+            } else if (paramAnnNames.contains(PathVariable.class.getName())) {
+                return ParameterIn.PATH.toString();
+            } else if (paramAnnNames.contains(Header.class.getName())) {
+                return ParameterIn.HEADER.toString();
+            } else if (paramAnnNames.contains(CookieValue.class.getName())) {
+                return ParameterIn.COOKIE.toString();
+            }
+        }
+        return null;
+    }
+
+    private Parameter.StyleEnum paramStyle(ParameterStyle paramAnnStyle) {
+        if (paramAnnStyle == null) {
+            return null;
+        }
+        switch (paramAnnStyle) {
+            case MATRIX:
+                return Parameter.StyleEnum.MATRIX;
+            case LABEL:
+                return Parameter.StyleEnum.LABEL;
+            case FORM:
+                return Parameter.StyleEnum.FORM;
+            case SPACEDELIMITED:
+                return Parameter.StyleEnum.SPACEDELIMITED;
+            case PIPEDELIMITED:
+                return Parameter.StyleEnum.PIPEDELIMITED;
+            case DEEPOBJECT:
+                return Parameter.StyleEnum.DEEPOBJECT;
+            case SIMPLE:
+                return Parameter.StyleEnum.SIMPLE;
+            case DEFAULT:
+            default:
+                return null;
+        }
     }
 
     private io.swagger.v3.oas.models.ExternalDocumentation readExternalDocs(MethodElement element, VisitorContext context) {
@@ -1233,7 +1343,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         Content content = new Content();
         mediaTypes.forEach(mediaType -> {
             io.swagger.v3.oas.models.media.MediaType mt = new io.swagger.v3.oas.models.media.MediaType();
-            mt.setSchema(resolveSchema(openAPI, definingElement, type, context, Collections.singletonList(mediaType)));
+            mt.setSchema(resolveSchema(openAPI, definingElement, type, context, Collections.singletonList(mediaType), null));
             content.addMediaType(mediaType.toString(), mt);
 
         });
