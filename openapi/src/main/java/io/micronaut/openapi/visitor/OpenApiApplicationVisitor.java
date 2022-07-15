@@ -204,7 +204,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         this.classElement = element;
     }
 
-    private String getConfigurationProperty(String key, VisitorContext context) {
+    private static String getConfigurationProperty(String key, VisitorContext context) {
         return System.getProperty(key, readOpenApiConfigFile(context).getProperty(key));
     }
 
@@ -499,8 +499,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         List<Map.Entry<String, String>> expandableProperties;
         Optional<Boolean> propertiesLoaded = context.get(MICRONAUT_INTERNAL_EXPANDBLE_PROPERTIES_LOADED, Boolean.class);
         if (!propertiesLoaded.orElse(false)) {
-
-            expandableProperties = readOpenApiConfigFile(context).entrySet()
+            expandableProperties = combineProperties(context).entrySet()
                 .stream()
                 .filter(entry -> entry.getKey().toString().startsWith(MICRONAUT_OPENAPI_EXPAND_PREFIX))
                 .map(entry -> new AbstractMap.SimpleImmutableEntry<>("${" + entry.getKey().toString().substring(MICRONAUT_OPENAPI_EXPAND_PREFIX.length()) + '}', entry.getValue().toString()))
@@ -513,6 +512,16 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         }
 
         return expandableProperties;
+    }
+
+    private static Properties combineProperties(VisitorContext context) {
+        Set<Object> allPropertyKeys = new HashSet<>();
+        allPropertyKeys.addAll(readOpenApiConfigFile(context).keySet());
+        allPropertyKeys.addAll(System.getProperties().keySet());
+        Properties combinedEntries = new Properties();
+        allPropertyKeys.stream()
+            .forEach(k -> combinedEntries.put(k, getConfigurationProperty((String) k, context)));
+        return combinedEntries;
     }
 
     private static OpenAPI resolvePropertyPlaceHolders(OpenAPI openAPI, VisitorContext visitorContext) {
