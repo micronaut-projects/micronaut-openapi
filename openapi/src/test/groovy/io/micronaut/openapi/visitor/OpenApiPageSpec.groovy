@@ -45,10 +45,10 @@ class MyDto {
 class MyBean {}
 ''')
         then:
-        AbstractOpenApiVisitor.testReference != null
+        Utils.testReference != null
 
         when:
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
         Schema myDtoSchema = openAPI.components.schemas['MyDto']
         Schema pageMyDtoSchema = openAPI.components.schemas['Page_MyDto_']
         Schema sliceMyDtoSchema = openAPI.components.schemas['Slice_MyDto_']

@@ -68,10 +68,10 @@ class HelloWorldController implements HelloWorldApi {
 class MyBean {}
 ''')
         then:
-            AbstractOpenApiVisitor.testReference != null
+            Utils.testReference != null
 
         when:
-            OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+            OpenAPI openAPI = Utils.testReference
 
         then:
             openAPI.info != null
@@ -160,10 +160,10 @@ class HelloWorldController implements HelloWorldApi {
 class MyBean {}
 ''')
         then:
-        AbstractOpenApiVisitor.testReference != null
+        Utils.testReference != null
 
         when:
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
 
         then:
         openAPI.info != null
@@ -262,10 +262,10 @@ class HelloWorldController implements HelloWorldApi {
 class MyBean {}
 ''')
         then:
-        AbstractOpenApiVisitor.testReferenceAfterPlaceholders != null
+        Utils.testReferenceAfterPlaceholders != null
 
         when:
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReferenceAfterPlaceholders
+        OpenAPI openAPI = Utils.testReferenceAfterPlaceholders
 
         then:
         openAPI.info != null
@@ -410,10 +410,10 @@ class HelloWorldController implements HelloWorldApi {
 class MyBean {}
 ''')
         then:
-            AbstractOpenApiVisitor.testReference != null
+            Utils.testReference != null
 
         when:
-            OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+            OpenAPI openAPI = Utils.testReference
 
         then:
             openAPI.info != null
@@ -469,10 +469,10 @@ class Application {
 class MyBean {}
 ''')
         then:
-            AbstractOpenApiVisitor.testReference != null
+            Utils.testReference != null
 
         when:
-            OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+            OpenAPI openAPI = Utils.testReference
 
         then:
             openAPI.paths['/health']
@@ -500,10 +500,10 @@ class Application {
 class MyBean {}
 ''')
         then:
-            AbstractOpenApiVisitor.testReference != null
+            Utils.testReference != null
 
         when:
-            OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+            OpenAPI openAPI = Utils.testReference
 
         then: "User defined end point is processed"
             openAPI.paths['/login']
@@ -560,10 +560,10 @@ class Application {
 class MyBean {}
 ''')
         then:
-        AbstractOpenApiVisitor.testReference != null
+        Utils.testReference != null
 
         when:
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
 
         then:
         openAPI.info != null

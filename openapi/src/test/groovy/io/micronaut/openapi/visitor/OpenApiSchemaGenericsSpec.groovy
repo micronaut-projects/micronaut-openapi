@@ -64,7 +64,7 @@ class MyDtoImpl implements MyDto<Long> {
 class MyBean {}
 ''')
 
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
         Operation operation = openAPI.paths?.get("/")?.get
 
         expect:
@@ -130,7 +130,7 @@ enum PetType {
 class MyBean {}
 ''')
 
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
         Operation operation = openAPI.paths?.get("/")?.put
 
         expect:
@@ -192,7 +192,7 @@ class Response<T> {
 class MyBean {}
 ''')
 
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
         Operation operation = openAPI.paths?.get("/")?.put
 
         expect:
@@ -255,7 +255,7 @@ class Response<T> {
 class MyBean {}
 ''')
 
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
         Operation operation = openAPI.paths?.get("/")?.put
 
         expect:
@@ -320,7 +320,7 @@ class Response<T> {
 class MyBean {}
 ''')
 
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
         Operation operation = openAPI.paths?.get("/")?.put
 
         expect:
@@ -466,7 +466,7 @@ class Quantity<Q extends Quantity, U extends Unit> implements Serializable {
 class MyBean {}
 ''')
 
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
         Operation operation = openAPI.paths?.get("/time")?.get
 
         expect:

@@ -135,10 +135,10 @@ class Person3 {
 class MyBean {}
 ''')
         then: "the json is written"
-        AbstractOpenApiVisitor.testJsonReference != null
+        Utils.testJsonReference != null
 
         then: "paths are sorted and schemas are sorted"
-        AbstractOpenApiEndpointVisitor.testJsonReference.contains('''\
+        Utils.testJsonReference.contains('''\
 "paths":{\
 "/endpoint1":{"get":{"operationId":"getPath","responses":{"200":{"description":"getPath 200 response","content":{"application/json":{"schema":{"type":"string"}}}}}}},\
 "/endpoint1/path1":{"get":{"operationId":"path1","responses":{"200":{"description":"path1 200 response","content":{"application/json":{"schema":{"type":"string"}}}}}}},\

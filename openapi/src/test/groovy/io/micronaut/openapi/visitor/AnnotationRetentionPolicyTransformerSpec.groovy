@@ -88,10 +88,10 @@ class HelloWorldController implements HelloWorldApi {
 }
 ''')
         then:"the state is correct"
-        AbstractOpenApiVisitor.testReference != null
+        Utils.testReference != null
 
         when:"the /pets path is retrieved"
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
 
         then:"it is included in the OpenAPI doc"
         openAPI.info != null
@@ -117,7 +117,7 @@ class HelloWorldController implements HelloWorldApi {
         openAPI.servers[0].variables.var1.enum == ['1', '2']
 
         when:
-        Operation operation = AbstractOpenApiVisitor.testReference?.paths?.get("/hello")?.get
+        Operation operation = Utils.testReference?.paths?.get("/hello")?.get
 
         then:
         operation != null

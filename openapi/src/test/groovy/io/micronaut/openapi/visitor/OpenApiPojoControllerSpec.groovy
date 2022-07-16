@@ -117,10 +117,10 @@ class Pet {
 class MyBean {}
 ''')
         then:"the state is correct"
-        AbstractOpenApiVisitor.testReference != null
+        Utils.testReference != null
 
         when:"The OpenAPI is retrieved"
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
         Schema petSchema = openAPI.components.schemas['Pet']
         Schema petInnerBeanSchema = openAPI.components.schemas['Pet.InnerBean']
 
@@ -349,10 +349,10 @@ class Tag {
 class MyBean {}
 ''')
         then:"the state is correct"
-        AbstractOpenApiVisitor.testReference != null
+        Utils.testReference != null
 
         when:"The OpenAPI is retrieved"
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
         Schema petSchema = openAPI.components.schemas['Pet']
         Schema tagSchema = openAPI.components.schemas['Tag']
 
@@ -466,10 +466,10 @@ class Pet {
 class MyBean {}
 ''')
         then:"the state is correct"
-        AbstractOpenApiVisitor.testReference != null
+        Utils.testReference != null
 
         when:"The OpenAPI is retrieved"
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
         Schema petSchema = openAPI.components.schemas['Pet']
 
         then:"the components are valid"
@@ -557,10 +557,10 @@ class Pet {
 class MyBean {}
 ''')
         then:"the state is correct"
-        AbstractOpenApiVisitor.testReference != null
+        Utils.testReference != null
 
         when:"The OpenAPI is retrieved"
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
         Schema petSchema = openAPI.components.schemas['Pet']
 
         then:"the components are valid"
@@ -706,10 +706,10 @@ class Pet {
 class MyBean {}
 ''')
         then:"the state is correct"
-        AbstractOpenApiVisitor.testReference != null
+        Utils.testReference != null
 
         when:"The OpenAPI is retrieved"
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
         Schema petSchema = openAPI.components.schemas['Pet']
 
         then:"the components are valid"
@@ -895,10 +895,10 @@ enum PetType {
 class MyBean {}
 ''')
         then:"the state is correct"
-        AbstractOpenApiVisitor.testReference != null
+        Utils.testReference != null
 
         when:"The OpenAPI is retrieved"
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
         Schema petSchema = openAPI.components.schemas['MyPet']
         Schema petType = openAPI.components.schemas['PetType']
 
@@ -1016,10 +1016,10 @@ class Pet {
 class MyBean {}
 ''')
         then:"the state is correct"
-        AbstractOpenApiVisitor.testReference != null
+        Utils.testReference != null
 
         when:"The OpenAPI is retrieved"
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
         Schema petSchema = openAPI.components.schemas['MyPet']
 
         then:"the components are valid"
@@ -1097,10 +1097,10 @@ class Pet {
 class MyBean {}
 ''')
         then:"the state is correct"
-        AbstractOpenApiVisitor.testReference != null
+        Utils.testReference != null
 
         when:"The OpenAPI is retrieved"
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
         Schema petSchema = openAPI.components.schemas['Pet']
 
         then:"the components are valid"
@@ -1205,10 +1205,10 @@ class Pet {
 class MyBean {}
 ''')
         then:"The state is correct"
-        AbstractOpenApiVisitor.testReference != null
+        Utils.testReference != null
 
         when:"The OpenAPI is retrieved"
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
 
         then:"The operation has only one path"
         openAPI.paths.size() == 1
@@ -1301,10 +1301,10 @@ class Pet {
 class MyBean {}
 ''')
         then:"The state is correct"
-        AbstractOpenApiVisitor.testReference != null
+        Utils.testReference != null
 
         when:"The OpenAPI is retrieved"
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
 
         then:"The operation has only one path"
         openAPI.paths.size() == 1
@@ -1405,10 +1405,10 @@ class Pet {
 class MyBean {}
 ''')
         then:"The state is correct"
-        AbstractOpenApiVisitor.testReference != null
+        Utils.testReference != null
 
         when:"The OpenAPI is retrieved"
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
 
         then:"The operation has only one path"
         openAPI.paths.size() == 2
@@ -1513,10 +1513,10 @@ class Pet {
 class MyBean {}
 ''')
         then:"The state is correct"
-        AbstractOpenApiVisitor.testReference != null
+        Utils.testReference != null
 
         when:"The OpenAPI is retrieved"
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
 
         then:"The operation has only one path"
         openAPI.paths.size() == 1
@@ -1619,10 +1619,10 @@ class Pet {
 class MyBean {}
 ''')
         then:"The state is correct"
-        AbstractOpenApiVisitor.testReference != null
+        Utils.testReference != null
 
         when:"The OpenAPI is retrieved"
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
 
         then:"The operation has only one path"
         openAPI.paths.size() == 1
@@ -1719,10 +1719,10 @@ class ExampleAdditionalData {
 class MyBean {}
 ''')
         then: "the state is correct"
-        AbstractOpenApiVisitor.testReference != null
+        Utils.testReference != null
 
         when: "The OpenAPI is retrieved"
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
         Schema schema = openAPI.components.schemas['ExampleData']
 
         then: "the components are valid"
@@ -1832,10 +1832,10 @@ class Person {
 class MyBean {}
 ''')
         then:
-        AbstractOpenApiVisitor.testReference != null
+        Utils.testReference != null
 
         when:
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
 
         then:
         openAPI.components.schemas.size() == 2
@@ -1927,10 +1927,10 @@ class Greeting {
 class MyBean {}
 ''')
         then:
-        AbstractOpenApiVisitor.testReference != null
+        Utils.testReference != null
 
         when:
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
 
         then:
         openAPI.components.schemas.size() == 1
@@ -1997,10 +1997,10 @@ class MyDTO {
 class MyBean {}
 ''')
         then:
-        AbstractOpenApiVisitor.testReference != null
+        Utils.testReference != null
 
         when:
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
 
         then:
         openAPI.components.schemas.size() == 1
@@ -2062,10 +2062,10 @@ class User {
 class MyBean {}
 ''')
         then:
-        AbstractOpenApiVisitor.testReference != null
+        Utils.testReference != null
 
         when:
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
 
         then:
         openAPI.paths.size() == 3
@@ -2167,10 +2167,10 @@ class CreateCustomerRequest {
 class MyBean {}
 ''')
         then: "the state is correct"
-        AbstractOpenApiVisitor.testReference != null
+        Utils.testReference != null
 
         when: "The OpenAPI is retrieved"
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
         Schema schema = openAPI.components.schemas['CreateCustomerRequest']
 
         then: "the components are valid"
@@ -2222,10 +2222,10 @@ class HelloWorldController {
 class MyBean {}
 ''')
         then:
-        AbstractOpenApiVisitor.testReference != null
+        Utils.testReference != null
 
         when:
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
 
         then: 'only 303 response because @ApiResponse is used.'
         openAPI.paths.size() == 2
@@ -2288,10 +2288,10 @@ class Greeting {
 class MyBean {}
 ''')
         then:
-        AbstractOpenApiVisitor.testReference != null
+        Utils.testReference != null
 
         when:
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
 
         then: 'both 200 and 500 response because both have @ApiResponse'
         openAPI.paths.size() == 1

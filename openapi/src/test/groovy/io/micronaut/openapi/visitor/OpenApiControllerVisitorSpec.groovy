@@ -57,7 +57,7 @@ class HelloWorldController {
 class MyBean {}
 ''')
         when:
-        Paths paths = AbstractOpenApiVisitor.testReference?.paths
+        Paths paths = Utils.testReference?.paths
 
         then:
         paths != null
@@ -108,7 +108,7 @@ class HelloWorldController implements HelloWorldApi {
 class MyBean {}
 ''')
         when:
-        Operation operation = AbstractOpenApiVisitor.testReference?.paths?.get("/hello")?.get
+        Operation operation = Utils.testReference?.paths?.get("/hello")?.get
 
         then:
         operation != null
@@ -170,12 +170,12 @@ class PetController implements PetOperations {
 class MyBean {}
 ''')
         when:
-        Operation operation = AbstractOpenApiVisitor.testReference?.paths?.get("/api/pet")?.post
+        Operation operation = Utils.testReference?.paths?.get("/api/pet")?.post
 
         then:
         operation != null
         operation.operationId == 'createPet'
-        operation.parameters.size() == 0
+        !operation.parameters
         operation.requestBody
 
         when:
@@ -227,7 +227,7 @@ class MyController {
 class MyBean {}
 ''')
         when:
-        Operation operation = AbstractOpenApiVisitor.testReference?.paths?.get("/subscription/{subscriptionId}")?.get
+        Operation operation = Utils.testReference?.paths?.get("/subscription/{subscriptionId}")?.get
 
         then:
         operation != null
@@ -296,10 +296,10 @@ class Pet {
 class MyBean {}
 ''')
         then:"the state is correct"
-        AbstractOpenApiVisitor.testReference != null
+        Utils.testReference != null
 
         when:"the /pets path is retrieved"
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
 
         and:"the /{slug} path is retrieved"
         PathItem pathItem = openAPI.paths.get("/pets/{slug}")
@@ -366,10 +366,10 @@ interface PetOperations<T extends String> {
 class MyBean {}
 ''')
         then:"the state is correct"
-        AbstractOpenApiVisitor.testReference != null
+        Utils.testReference != null
 
         when:"the /pets path is retrieved"
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
         PathItem pathItem = openAPI.paths.get("/pets")
 
         then:"it is included in the OpenAPI doc"
@@ -479,10 +479,10 @@ interface PetOperations<T extends String> {
 class MyBean {}
 ''')
         then:"the state is correct"
-        AbstractOpenApiVisitor.testReference != null
+        Utils.testReference != null
 
         when:"the /pets path is retrieved"
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
         PathItem pathItem = openAPI.paths.get("/pets")
 
         then:"it is included in the OpenAPI doc"
@@ -557,7 +557,7 @@ class MyController {
 @jakarta.inject.Singleton
 class MyBean {}
 ''')
-        Operation operation = AbstractOpenApiVisitor.testReference?.paths?.get("/subscription/{subscriptionId}")?.get
+        Operation operation = Utils.testReference?.paths?.get("/subscription/{subscriptionId}")?.get
 
         expect:
         operation != null
@@ -600,7 +600,7 @@ class MyController {
 class MyBean {}
 ''')
         when:
-        Operation operation = AbstractOpenApiVisitor.testReference?.paths?.get("/subscription/{subscriptionId}")?.get
+        Operation operation = Utils.testReference?.paths?.get("/subscription/{subscriptionId}")?.get
 
         then:
         operation != null
@@ -646,7 +646,7 @@ class MyController {
 class MyBean {}
 ''')
         when:
-        Operation operation = AbstractOpenApiVisitor.testReference?.paths?.get("/subscription/{subscriptionId}")?.get
+        Operation operation = Utils.testReference?.paths?.get("/subscription/{subscriptionId}")?.get
 
         then:
         operation != null
@@ -691,7 +691,7 @@ class MyController {
 class MyBean {}
 ''')
         when:
-        Operation operation = AbstractOpenApiVisitor.testReference?.paths?.get("/subscription/{subscriptionId}")?.get
+        Operation operation = Utils.testReference?.paths?.get("/subscription/{subscriptionId}")?.get
 
         then:
         operation != null
@@ -736,7 +736,7 @@ class MyController {
 class MyBean {}
 ''')
         when:
-        Operation operation = AbstractOpenApiVisitor.testReference?.paths?.get("/subscription/{subscriptionId}")?.get
+        Operation operation = Utils.testReference?.paths?.get("/subscription/{subscriptionId}")?.get
 
         then:
         operation != null
@@ -776,7 +776,7 @@ class MyController {
 @jakarta.inject.Singleton
 class MyBean {}
 ''')
-        Operation operation = AbstractOpenApiVisitor.testReference?.paths?.get("/subscription/{subscriptionId}")?.get
+        Operation operation = Utils.testReference?.paths?.get("/subscription/{subscriptionId}")?.get
 
         expect:
         operation != null
@@ -827,7 +827,7 @@ class MyController {
 class MyBean {}
 ''')
         when:
-        Operation operation = AbstractOpenApiVisitor.testReference?.paths?.get("/hello")?.get
+        Operation operation = Utils.testReference?.paths?.get("/hello")?.get
 
         then:
         operation != null
@@ -867,7 +867,7 @@ class MyController {
 class MyBean {}
 ''')
         when:
-        OpenAPI api =  AbstractOpenApiVisitor.testReferenceAfterPlaceholders
+        OpenAPI api =  Utils.testReferenceAfterPlaceholders
 
         then:
         api.paths.size() == 2
@@ -937,10 +937,10 @@ class TestPojo {
 class MyBean {}
 ''')
         then:
-        AbstractOpenApiVisitor.testReference != null
+        Utils.testReference != null
 
         when:
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
 
         then:
         openAPI.components.schemas.size() == 1

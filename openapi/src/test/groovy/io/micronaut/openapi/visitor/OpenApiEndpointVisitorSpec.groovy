@@ -31,10 +31,10 @@ class MyBean {}
 ''')
 
         then: 'the state is correct'
-        AbstractOpenApiVisitor.testReference != null
+        Utils.testReference != null
 
         when:
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
 
         then: 'it is included in the OpenAPI doc'
         openAPI.info != null

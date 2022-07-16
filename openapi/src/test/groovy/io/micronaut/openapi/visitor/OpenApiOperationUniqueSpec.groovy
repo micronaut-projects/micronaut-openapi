@@ -34,8 +34,8 @@ class TestController2 {
 class MyBean {}
 ''')
 
-        Operation firstOperation = AbstractOpenApiVisitor.testReference?.paths?.get("/test1")?.get
-        Operation secondOperation = AbstractOpenApiVisitor.testReference?.paths?.get("/test2")?.get
+        Operation firstOperation = Utils.testReference?.paths?.get("/test1")?.get
+        Operation secondOperation = Utils.testReference?.paths?.get("/test2")?.get
 
         expect:
         firstOperation.getOperationId() == "index"
@@ -73,8 +73,8 @@ class TestController2 {
 class MyBean {}
 ''')
 
-        Operation firstOperation = AbstractOpenApiVisitor.testReferenceAfterPlaceholders?.paths?.get("/test1")?.get
-        Operation secondOperation = AbstractOpenApiVisitor.testReferenceAfterPlaceholders?.paths?.get("/test2")?.get
+        Operation firstOperation = Utils.testReferenceAfterPlaceholders?.paths?.get("/test1")?.get
+        Operation secondOperation = Utils.testReferenceAfterPlaceholders?.paths?.get("/test2")?.get
 
         expect:
         firstOperation.getOperationId() == "index"
@@ -114,8 +114,8 @@ class TestController2 {
 class MyBean {}
 ''')
 
-        Operation operationWithGeneratedId = AbstractOpenApiVisitor.testReference?.paths?.get("/test1")?.get
-        Operation operationWithUserId = AbstractOpenApiVisitor.testReference?.paths?.get("/test2")?.get
+        Operation operationWithGeneratedId = Utils.testReference?.paths?.get("/test1")?.get
+        Operation operationWithUserId = Utils.testReference?.paths?.get("/test2")?.get
 
         expect:
         operationWithGeneratedId.getOperationId() == "index"
@@ -163,9 +163,9 @@ class TestController3 {
 class MyBean {}
 ''')
 
-        Operation firstGenerated = AbstractOpenApiVisitor.testReferenceAfterPlaceholders?.paths?.get("/test1")?.get
-        Operation operationWithId = AbstractOpenApiVisitor.testReferenceAfterPlaceholders?.paths?.get("/test2")?.get
-        Operation secondGenerated = AbstractOpenApiVisitor.testReferenceAfterPlaceholders?.paths?.get("/test3")?.get
+        Operation firstGenerated = Utils.testReferenceAfterPlaceholders?.paths?.get("/test1")?.get
+        Operation operationWithId = Utils.testReferenceAfterPlaceholders?.paths?.get("/test2")?.get
+        Operation secondGenerated = Utils.testReferenceAfterPlaceholders?.paths?.get("/test3")?.get
 
         expect:
         firstGenerated.getOperationId() == "index"
@@ -208,8 +208,8 @@ class TestController2 {
 class MyBean {}
 ''')
 
-        Operation firstOperation = AbstractOpenApiVisitor.testReferenceAfterPlaceholders?.paths?.get("/test1")?.get
-        Operation secondOperation = AbstractOpenApiVisitor.testReferenceAfterPlaceholders?.paths?.get("/test2")?.get
+        Operation firstOperation = Utils.testReferenceAfterPlaceholders?.paths?.get("/test1")?.get
+        Operation secondOperation = Utils.testReferenceAfterPlaceholders?.paths?.get("/test2")?.get
 
         expect:
         firstOperation.getOperationId() == "myIndex"

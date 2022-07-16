@@ -48,10 +48,10 @@ class MyDto {
 class MyBean {}
 ''')
         then: "the state is correct"
-        AbstractOpenApiVisitor.testReferenceAfterPlaceholders != null
+        Utils.testReferenceAfterPlaceholders != null
 
         when: "The OpenAPI is retrieved"
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReferenceAfterPlaceholders
+        OpenAPI openAPI = Utils.testReferenceAfterPlaceholders
         Schema dtoSchema = openAPI.components.schemas['MyDto']
 
         then: "the components are valid"

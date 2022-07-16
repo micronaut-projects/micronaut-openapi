@@ -31,7 +31,7 @@ interface PetOperations {
 // @JsonDeserialize(as = Pet.class)
 interface IPet {
     String getName();
-    
+
     boolean isAlive();
 }
 
@@ -39,10 +39,10 @@ interface IPet {
 class MyBean {}
 ''')
         then:"the state is correct"
-        AbstractOpenApiVisitor.testReference != null
+        Utils.testReference != null
 
         when:"The OpenAPI is retrieved"
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
         Schema petSchema = openAPI.components.schemas['IPet']
         then:
         petSchema.type == 'object'

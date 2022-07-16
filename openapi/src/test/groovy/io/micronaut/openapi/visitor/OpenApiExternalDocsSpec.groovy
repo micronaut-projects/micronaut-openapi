@@ -98,7 +98,7 @@ class Parameters {
 class MyBean {}
 ''')
 
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
         Operation operation = openAPI.paths?.get("/path")?.post
 
         expect:
@@ -206,7 +206,7 @@ class Parameters {
 class MyBean {}
 ''')
 
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
         Operation operation1 = openAPI.paths?.get("/path1")?.post
         Operation operation2 = openAPI.paths?.get("/path2")?.post
 
@@ -321,7 +321,7 @@ class Parameters {
 class MyBean {}
 ''')
 
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
         Schema schema = openAPI.components?.schemas?.MyDto
 
         expect:

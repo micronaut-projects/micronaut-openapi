@@ -73,7 +73,7 @@ class MyBean {}
 ''')
 
         when:
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
 
         then:
         openAPI.getSecurity().size() == 1
@@ -168,7 +168,7 @@ class MyBean {}
 ''')
 
         when:
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
 
         then:
         openAPI.getSecurity().size() == 1
@@ -228,7 +228,7 @@ class Response {}
 class MyBean {}
 ''')
 
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
         Operation operation = openAPI.paths?.get("/")?.put
 
         expect:
@@ -431,7 +431,7 @@ class Response {}
 class MyBean {}
 ''')
 
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
         Operation operation = openAPI.paths?.get("/")?.put
 
         expect:
@@ -561,7 +561,7 @@ class MyBean {}
 ''')
 
         when:
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
 
         then:
         openAPI.components.securitySchemes.size() == 1

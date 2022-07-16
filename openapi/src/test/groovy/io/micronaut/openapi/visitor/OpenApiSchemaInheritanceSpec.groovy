@@ -87,18 +87,17 @@ class B extends Base {
 class MyBean {}
 ''')
 
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
         Operation operation = openAPI.paths?.get("/")?.put
         RequestBody requestBody = operation.requestBody
         requestBody.required
         Schema schema = requestBody.content['application/json'].schema
-        schema instanceof ComposedSchema
-        ((ComposedSchema) schema).oneOf[0].$ref == '#/components/schemas/A'
-        ((ComposedSchema) schema).oneOf[1].$ref == '#/components/schemas/B'
-        ((ComposedSchema) schema).type == 'object'
-        ((ComposedSchema) schema).discriminator.propertyName == 'type'
-        ((ComposedSchema) schema).discriminator.mapping['A'] == '#/components/schemas/A'
-        ((ComposedSchema) schema).discriminator.mapping['B'] == '#/components/schemas/B'
+        schema.oneOf[0].$ref == '#/components/schemas/A'
+        schema.oneOf[1].$ref == '#/components/schemas/B'
+        schema.type == 'object'
+        schema.discriminator.propertyName == 'type'
+        schema.discriminator.mapping['A'] == '#/components/schemas/A'
+        schema.discriminator.mapping['B'] == '#/components/schemas/B'
 
         expect:
         operation
@@ -108,17 +107,15 @@ class MyBean {}
 
         openAPI.components.schemas['Base'].properties['money'].type == 'integer'
 
-        openAPI.components.schemas['A'] instanceof ComposedSchema
-        ((ComposedSchema) openAPI.components.schemas['A']).allOf.size() == 2
-        ((ComposedSchema) openAPI.components.schemas['A']).allOf[0].get$ref() == "#/components/schemas/Base"
-        ((ComposedSchema) openAPI.components.schemas['A']).allOf[1].properties.size() == 1
-        ((ComposedSchema) openAPI.components.schemas['A']).allOf[1].properties['age1'].type == "integer"
+        openAPI.components.schemas['A'].allOf.size() == 2
+        openAPI.components.schemas['A'].allOf[0].get$ref() == "#/components/schemas/Base"
+        openAPI.components.schemas['A'].allOf[1].properties.size() == 1
+        openAPI.components.schemas['A'].allOf[1].properties['age1'].type == "integer"
 
-        openAPI.components.schemas['B'] instanceof ComposedSchema
-        ((ComposedSchema) openAPI.components.schemas['B']).allOf.size() == 2
-        ((ComposedSchema) openAPI.components.schemas['B']).allOf[0].get$ref() == "#/components/schemas/Base"
-        ((ComposedSchema) openAPI.components.schemas['B']).allOf[1].properties.size() == 1
-        ((ComposedSchema) openAPI.components.schemas['B']).allOf[1].properties["age2"].type == "integer"
+        openAPI.components.schemas['B'].allOf.size() == 2
+        openAPI.components.schemas['B'].allOf[0].get$ref() == "#/components/schemas/Base"
+        openAPI.components.schemas['B'].allOf[1].properties.size() == 1
+        openAPI.components.schemas['B'].allOf[1].properties["age2"].type == "integer"
     }
 
     void "test OpenAPI with body that contains nested inheritance schemas when annotation is on type"() {
@@ -181,7 +178,7 @@ class Car extends Vehicle {
 class MyBean {}
 ''')
 
-            OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+            OpenAPI openAPI = Utils.testReference
             Operation operation = openAPI.paths?.get("/")?.post
             RequestBody requestBody = operation.requestBody
             requestBody.required
@@ -191,11 +188,9 @@ class MyBean {}
 
         expect:
             Schema vehicleRef = owner.getProperties()["vehicle"]
-            !(vehicleRef instanceof ComposedSchema)
             vehicleRef.$ref == "#/components/schemas/Vehicle"
-            vehicle instanceof ComposedSchema
-            ((ComposedSchema) vehicle).oneOf[0].$ref == '#/components/schemas/Car'
-            ((ComposedSchema) vehicle).oneOf[1].$ref == '#/components/schemas/Bike'
+            vehicle.oneOf[0].$ref == '#/components/schemas/Car'
+            vehicle.oneOf[1].$ref == '#/components/schemas/Bike'
     }
 
     void "test OpenAPI with body that contains nested inheritance schemas when annotation is on property"() {
@@ -257,7 +252,7 @@ class Car extends Vehicle {
 class MyBean {}
 ''')
 
-            OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+            OpenAPI openAPI = Utils.testReference
             Operation operation = openAPI.paths?.get("/")?.post
             RequestBody requestBody = operation.requestBody
             requestBody.required
@@ -266,13 +261,11 @@ class MyBean {}
         expect:
             Schema owner = schemas["Owner"]
             Schema vehicleRef = owner.getProperties()["vehicle"]
-            vehicleRef instanceof ComposedSchema
-            ((ComposedSchema) vehicleRef).allOf[0].$ref == "#/components/schemas/Vehicle"
-            ((ComposedSchema) vehicleRef).allOf[1].description == "Vehicle of the owner. Here a car or bike with a name"
+            vehicleRef.allOf[0].$ref == "#/components/schemas/Vehicle"
+            vehicleRef.allOf[1].description == "Vehicle of the owner. Here a car or bike with a name"
             Schema vehicle = schemas["Vehicle"]
-            vehicle instanceof ComposedSchema
-            ((ComposedSchema) vehicle).oneOf[0].$ref == '#/components/schemas/Car'
-            ((ComposedSchema) vehicle).oneOf[1].$ref == '#/components/schemas/Bike'
+            vehicle.oneOf[0].$ref == '#/components/schemas/Car'
+            vehicle.oneOf[1].$ref == '#/components/schemas/Bike'
     }
 
     void "test OpenAPI that on nested inheritance property annotation is preferred over type annotation"() {
@@ -335,7 +328,7 @@ class Car extends Vehicle {
 class MyBean {}
 ''')
 
-            OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+            OpenAPI openAPI = Utils.testReference
             Operation operation = openAPI.paths?.get("/")?.post
             RequestBody requestBody = operation.requestBody
             requestBody.required
@@ -344,12 +337,11 @@ class MyBean {}
         expect:
             Schema owner = schemas["Owner"]
             Schema vehicleRef = owner.getProperties()["Owner.Vehicle"]
-            vehicleRef instanceof ComposedSchema
-            ((ComposedSchema) vehicleRef).allOf[0].$ref == "#/components/schemas/Owner.Vehicle"
-            ((ComposedSchema) vehicleRef).allOf[1].description == "Vehicle of the owner. Here a car or bike with a name"
+            vehicleRef.allOf[0].$ref == "#/components/schemas/Owner.Vehicle"
+            vehicleRef.allOf[1].description == "Vehicle of the owner. Here a car or bike with a name"
             Schema ownerVehicle = schemas["Owner.Vehicle"]
-            ((ComposedSchema) ownerVehicle).oneOf[0].$ref == '#/components/schemas/Car'
-            ((ComposedSchema) ownerVehicle).oneOf[1].$ref == '#/components/schemas/Bike'
+            ownerVehicle.oneOf[0].$ref == '#/components/schemas/Car'
+            ownerVehicle.oneOf[1].$ref == '#/components/schemas/Bike'
     }
 
     void "test OpenAPI with body that contains nested inheritance schemas apply additional information to schema"() {
@@ -416,7 +408,7 @@ class Car extends Vehicle {
 class MyBean {}
 ''')
 
-            OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+            OpenAPI openAPI = Utils.testReference
             Operation operation = openAPI.paths?.get("/")?.post
             RequestBody requestBody = operation.requestBody
             requestBody.required
@@ -425,15 +417,13 @@ class MyBean {}
         expect:
             Schema owner = schemas["Owner"]
             Schema vehicleProperty = owner.getProperties()["vehicle"]
-            vehicleProperty instanceof ComposedSchema
-            ((ComposedSchema) vehicleProperty).deprecated
-            ((ComposedSchema) vehicleProperty).description == "Some docs"
-            ((ComposedSchema) vehicleProperty).nullable
-            ((ComposedSchema) vehicleProperty).oneOf[0].$ref == "#/components/schemas/Vehicle"
+            vehicleProperty.deprecated
+            vehicleProperty.description == "Some docs"
+            vehicleProperty.nullable
+            vehicleProperty.oneOf[0].$ref == "#/components/schemas/Vehicle"
             Schema vehicle = schemas["Vehicle"]
-            vehicle instanceof ComposedSchema
-            ((ComposedSchema) vehicle).oneOf[0].$ref == '#/components/schemas/Car'
-            ((ComposedSchema) vehicle).oneOf[1].$ref == '#/components/schemas/Bike'
+            vehicle.oneOf[0].$ref == '#/components/schemas/Car'
+            vehicle.oneOf[1].$ref == '#/components/schemas/Bike'
     }
 
     @IgnoreIf({ !jvm.isJava16Compatible() })
@@ -532,7 +522,7 @@ class EmailController {
 class MyBean {}
 ''')
 
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
         Map<String, Schema> schemas = openAPI.getComponents().getSchemas()
 
         expect:
@@ -544,19 +534,17 @@ class MyBean {}
 
         schemas["ReadEmailOutputLocationDto"].required.containsAll(["protocol"])
         Schema emailSendProtocolDtoSchemaFromReadEmailOutputLocationDto = schemas["ReadEmailOutputLocationDto"].getProperties()["protocol"]
-        emailSendProtocolDtoSchemaFromReadEmailOutputLocationDto instanceof ComposedSchema
-        ((ComposedSchema) emailSendProtocolDtoSchemaFromReadEmailOutputLocationDto).allOf[0].$ref == "#/components/schemas/EmailSendProtocolDto"
-        ((ComposedSchema) emailSendProtocolDtoSchemaFromReadEmailOutputLocationDto).allOf[1].description == "Protocol used for the connection"
-        !((ComposedSchema) emailSendProtocolDtoSchemaFromReadEmailOutputLocationDto).nullable
-        !((ComposedSchema) emailSendProtocolDtoSchemaFromReadEmailOutputLocationDto).required
+        emailSendProtocolDtoSchemaFromReadEmailOutputLocationDto.allOf[0].$ref == "#/components/schemas/EmailSendProtocolDto"
+        emailSendProtocolDtoSchemaFromReadEmailOutputLocationDto.allOf[1].description == "Protocol used for the connection"
+        !emailSendProtocolDtoSchemaFromReadEmailOutputLocationDto.nullable
+        !emailSendProtocolDtoSchemaFromReadEmailOutputLocationDto.required
 
         schemas["ReadEmailSettingsDto"].required.containsAll(["protocol", "active", "hostname", "port", "senderEmail", "username", "plaintextPassword"])
         Schema emailSendProtocolDtoSchemaFromReadEmailSettingsDto = schemas["ReadEmailSettingsDto"].getProperties()["protocol"]
-        emailSendProtocolDtoSchemaFromReadEmailSettingsDto instanceof ComposedSchema
-        ((ComposedSchema) emailSendProtocolDtoSchemaFromReadEmailSettingsDto).allOf[0].$ref == "#/components/schemas/EmailSendProtocolDto"
-        ((ComposedSchema) emailSendProtocolDtoSchemaFromReadEmailSettingsDto).allOf[1].description == "Protocol used for the connection or null if email sending is disabled"
-        ((ComposedSchema) emailSendProtocolDtoSchemaFromReadEmailSettingsDto).nullable
-        !((ComposedSchema) emailSendProtocolDtoSchemaFromReadEmailSettingsDto).required
+        emailSendProtocolDtoSchemaFromReadEmailSettingsDto.allOf[0].$ref == "#/components/schemas/EmailSendProtocolDto"
+        emailSendProtocolDtoSchemaFromReadEmailSettingsDto.allOf[1].description == "Protocol used for the connection or null if email sending is disabled"
+        emailSendProtocolDtoSchemaFromReadEmailSettingsDto.nullable
+        !emailSendProtocolDtoSchemaFromReadEmailSettingsDto.required
     }
 
 }

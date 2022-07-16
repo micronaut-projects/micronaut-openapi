@@ -47,7 +47,7 @@ class Controller2 {
 class MyBean {}
 ''')
         when:
-        Paths paths = AbstractOpenApiVisitor.testReference?.paths
+        Paths paths = Utils.testReference?.paths
 
         then:
         paths
@@ -100,7 +100,7 @@ class Controller2 {
 class MyBean {}
 ''')
         when:
-        Paths paths = AbstractOpenApiVisitor.testReference?.paths
+        Paths paths = Utils.testReference?.paths
 
         then:
         paths
@@ -153,7 +153,7 @@ class Controller2 {
 class MyBean {}
 ''')
         when:
-        Paths paths = AbstractOpenApiVisitor.testReference?.paths
+        Paths paths = Utils.testReference?.paths
 
         then:
         paths
@@ -216,7 +216,7 @@ class Controller3 {
 class MyBean {}
 ''')
         when:
-        Paths paths = AbstractOpenApiVisitor.testReference?.paths
+        Paths paths = Utils.testReference?.paths
 
         then:
         paths
@@ -270,7 +270,7 @@ class Controller2 {
 class MyBean {}
 ''')
         when:
-        Paths paths = AbstractOpenApiVisitor.testReference?.paths
+        Paths paths = Utils.testReference?.paths
 
         then:
         paths
@@ -337,7 +337,7 @@ class Controller3 {
 class MyBean {}
 ''')
         when:
-        Paths paths = AbstractOpenApiVisitor.testReference?.paths
+        Paths paths = Utils.testReference?.paths
 
         then:
         paths

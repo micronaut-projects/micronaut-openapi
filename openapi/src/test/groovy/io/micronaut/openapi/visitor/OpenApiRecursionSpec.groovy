@@ -60,7 +60,7 @@ class TestImpl2 implements TestInterface {
 class MyBean {}
 ''')
 
-            OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+            OpenAPI openAPI = Utils.testReference
             Map<String, Schema> schemas = openAPI.getComponents().getSchemas()
 
         expect:
@@ -105,7 +105,7 @@ class TestRecursion {
 class MyBean {}
 ''')
 
-            OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+            OpenAPI openAPI = Utils.testReference
             Map<String, Schema> schemas = openAPI.getComponents().getSchemas()
 
         expect:
@@ -169,7 +169,7 @@ class TestImpl2 implements TestInterface {
 class MyBean {}
 ''')
 
-            OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+            OpenAPI openAPI = Utils.testReference
             Map<String, Schema> schemas = openAPI.getComponents().getSchemas()
 
         expect:
@@ -242,7 +242,7 @@ class TestImpl2 implements TestInterface {
 class MyBean {}
 ''')
 
-            OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+            OpenAPI openAPI = Utils.testReference
             Map<String, Schema> schemas = openAPI.getComponents().getSchemas()
 
         expect:

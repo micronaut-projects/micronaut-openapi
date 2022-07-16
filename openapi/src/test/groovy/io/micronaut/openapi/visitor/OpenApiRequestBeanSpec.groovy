@@ -38,22 +38,22 @@ class MyController {
 class MyRequestBean {
 
     public static final String HEADER_CONTENT_TYPE = "Content-type";
-    
+
     HttpRequest<?> httpRequest;
-   
+
     @PathVariable("pV")
     @Parameter(description="Any path variable")
     private String pathVariable;
-    
+
     @QueryValue("qV")
     @Parameter(description="Any query value")
     private String queryValue;
-    
+
     @Nullable
     @Parameter(description="Any content type")
     @Header(HEADER_CONTENT_TYPE)
     private String contentType;
-    
+
     public MyRequestBean(HttpRequest<?> httpRequest, String pathVariable, String queryValue, String contentType) {
         this.httpRequest = httpRequest;
         this.pathVariable = pathVariable;
@@ -64,19 +64,19 @@ class MyRequestBean {
     public HttpRequest<?> getHttpRequest() {
         return httpRequest;
     }
-    
+
     public String getPathVariable() {
         return pathVariable;
     }
-    
+
     public String getQueryValue() {
         return queryValue;
     }
-    
+
     public String getContentType() {
         return contentType;
     }
- 
+
 }
 
 class Response {}
@@ -86,7 +86,7 @@ class MyBean {}
 
 ''')
 
-            OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+            OpenAPI openAPI = Utils.testReference
             Operation operation = openAPI.paths?.get("/{pV}")?.get
 
         expect:

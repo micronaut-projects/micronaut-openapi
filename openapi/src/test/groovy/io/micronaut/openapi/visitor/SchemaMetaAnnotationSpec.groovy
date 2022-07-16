@@ -38,10 +38,10 @@ interface MyOps {
 class MyBean {}
 ''')
         then:"the state is correct"
-        AbstractOpenApiVisitor.testReference != null
+        Utils.testReference != null
 
         when:"The OpenAPI is retrieved"
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
         PathItem pathItem = openAPI.paths.get("/pets")
 
         then:"it is included in the OpenAPI doc"
@@ -99,10 +99,10 @@ interface MyOps {
 class MyBean {}
 ''')
         then:"the state is correct"
-        AbstractOpenApiVisitor.testReference != null
+        Utils.testReference != null
 
         when:"The OpenAPI is retrieved"
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
         PathItem pathItem = openAPI.paths.get("/pets")
 
         then:"it is included in the OpenAPI doc"
@@ -166,10 +166,10 @@ interface MyOps {
 class MyBean {}
 ''')
         then:"the state is correct"
-        AbstractOpenApiVisitor.testReference != null
+        Utils.testReference != null
 
         when:"The OpenAPI is retrieved"
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
         PathItem pathItem = openAPI.paths.get("/pets")
 
         then:"it is included in the OpenAPI doc"
