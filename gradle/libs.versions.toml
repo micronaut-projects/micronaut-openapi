@@ -4,7 +4,7 @@ managed-swagger = "2.2.1"
 managed-swagger-compat = "2.2.1"
 
 javadoc-parser = "0.2.0"
-html2md-converter = "0.62.2"
+html2md-converter = "0.64.0"
 kotlin = "1.7.10"
 
 [libraries]
