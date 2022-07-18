@@ -217,10 +217,10 @@ class PetController {
 class MyBean {}
 ''')
         then: "the state is correct"
-        AbstractOpenApiVisitor.testReference != null
+        Utils.testReference != null
 
         when: "The OpenAPI is retrieved"
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
         Schema petSchema = openAPI.components.schemas['Pet']
         Schema catSchema = openAPI.components.schemas['Cat']
         Schema dogSchema = openAPI.components.schemas['Dog']
@@ -262,11 +262,10 @@ class MyBean {}
         operation.requestBody.content.size() == 1
         operation.requestBody.content."application/json"
         operation.requestBody.content."application/json".schema
-        operation.requestBody.content."application/json".schema instanceof ComposedSchema
-        ((ComposedSchema) operation.requestBody.content."application/json".schema).oneOf
-        ((ComposedSchema) operation.requestBody.content."application/json".schema).oneOf.size() == 2
-        ((ComposedSchema) operation.requestBody.content."application/json".schema).oneOf[0].get$ref() == "#/components/schemas/Dog"
-        ((ComposedSchema) operation.requestBody.content."application/json".schema).oneOf[1].get$ref() == "#/components/schemas/Cat"
+        operation.requestBody.content."application/json".schema.oneOf
+        operation.requestBody.content."application/json".schema.oneOf.size() == 2
+        operation.requestBody.content."application/json".schema.oneOf[0].get$ref() == "#/components/schemas/Dog"
+        operation.requestBody.content."application/json".schema.oneOf[1].get$ref() == "#/components/schemas/Cat"
 
         and:
         operation.responses
@@ -276,11 +275,9 @@ class MyBean {}
         operation.responses."200".content."application/json"
         operation.responses."200".content."application/json".schema
 
-        operation.responses."200".content."application/json".schema instanceof ComposedSchema
-
-        ((ComposedSchema) operation.responses."200".content."application/json".schema).anyOf
-        ((ComposedSchema) operation.responses."200".content."application/json".schema).anyOf.size() == 2
-        ((ComposedSchema) operation.responses."200".content."application/json".schema).anyOf[0].get$ref() == "#/components/schemas/Dog"
-        ((ComposedSchema) operation.responses."200".content."application/json".schema).anyOf[1].get$ref() == "#/components/schemas/Cat"
+        operation.responses."200".content."application/json".schema.anyOf
+        operation.responses."200".content."application/json".schema.anyOf.size() == 2
+        operation.responses."200".content."application/json".schema.anyOf[0].get$ref() == "#/components/schemas/Dog"
+        operation.responses."200".content."application/json".schema.anyOf[1].get$ref() == "#/components/schemas/Cat"
     }
 }

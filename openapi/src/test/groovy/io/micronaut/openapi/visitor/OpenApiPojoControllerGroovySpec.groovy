@@ -8,11 +8,11 @@ import spock.lang.Issue
 class OpenApiPojoControllerGroovySpec extends AbstractBeanDefinitionSpec {
 
     def setup() {
-        System.setProperty(AbstractOpenApiVisitor.ATTR_TEST_MODE, "true")
+        System.setProperty(Utils.ATTR_TEST_MODE, "true")
     }
 
     def cleanup() {
-        System.setProperty(AbstractOpenApiVisitor.ATTR_TEST_MODE, "")
+        System.setProperty(Utils.ATTR_TEST_MODE, "")
     }
 
     @Issue("https://github.com/micronaut-projects/micronaut-openapi/issues/561")
@@ -63,10 +63,10 @@ class ExampleAdditionalData {
 class MyBean {}
 ''')
         then: "the state is correct"
-        AbstractOpenApiVisitor.testReference != null
+        Utils.testReference != null
 
         when: "The OpenAPI is retrieved"
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
         Schema schema = openAPI.components.schemas['ExampleData']
 
         then: "the components are valid"

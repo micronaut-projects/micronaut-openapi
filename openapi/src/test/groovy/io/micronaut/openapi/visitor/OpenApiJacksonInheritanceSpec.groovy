@@ -84,7 +84,7 @@ class Dog implements Pet {
 class MyBean {}
 ''')
 
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReferenceAfterPlaceholders
+        OpenAPI openAPI = Utils.testReferenceAfterPlaceholders
 
         expect:
         openAPI
@@ -110,17 +110,15 @@ class MyBean {}
 
         and:
         Schema petSchema = openAPI.components.schemas['Pet']
-        petSchema instanceof ComposedSchema
-        ComposedSchema composedPetSchema = (ComposedSchema) openAPI.components.schemas['Pet']
 
-        composedPetSchema.type == 'object'
-        composedPetSchema.properties.size() == 1
-        composedPetSchema.properties['id'].type == 'integer'
-        composedPetSchema.oneOf.size() == 2
-        composedPetSchema.oneOf[0].$ref == '#/components/schemas/Cat'
-        composedPetSchema.oneOf[1].$ref == '#/components/schemas/Dog'
-        composedPetSchema.discriminator.propertyName == 'type'
-        composedPetSchema.discriminator.mapping['CAT'] == '#/components/schemas/Cat'
-        composedPetSchema.discriminator.mapping['DOG'] == '#/components/schemas/Dog'
+        petSchema.type == 'object'
+        petSchema.properties.size() == 1
+        petSchema.properties['id'].type == 'integer'
+        petSchema.oneOf.size() == 2
+        petSchema.oneOf[0].$ref == '#/components/schemas/Cat'
+        petSchema.oneOf[1].$ref == '#/components/schemas/Dog'
+        petSchema.discriminator.propertyName == 'type'
+        petSchema.discriminator.mapping['CAT'] == '#/components/schemas/Cat'
+        petSchema.discriminator.mapping['DOG'] == '#/components/schemas/Dog'
     }
 }

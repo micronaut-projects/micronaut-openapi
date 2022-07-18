@@ -36,10 +36,10 @@ class OpenApiController {
 class MyBean {}
 ''')
         then: "the state is correct"
-        AbstractOpenApiVisitor.testReference != null
+        Utils.testReference != null
 
         when: "The OpenAPI is retrieved"
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
         Operation operation = openAPI.paths.get("/path/200").get
 
         then:
@@ -80,10 +80,10 @@ class OpenApiController {
 class MyBean {}
 ''')
         then: "the state is correct"
-        AbstractOpenApiVisitor.testReference != null
+        Utils.testReference != null
 
         when: "The OpenAPI is retrieved"
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
         Operation operation = openAPI.paths.get("/path/200").get
 
         then:

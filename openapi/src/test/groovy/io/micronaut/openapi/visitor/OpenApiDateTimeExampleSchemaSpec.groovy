@@ -71,7 +71,7 @@ public class MyBean {}
 ''')
 
         then:
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
 
         openAPI.paths.get("/times").get.parameters.size() == 1
         openAPI.paths.get("/times").get.parameters[0].name =='query'

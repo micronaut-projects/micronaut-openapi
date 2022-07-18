@@ -56,15 +56,15 @@ class Pet {
     public Integer getAge() {
         return age;
     }
-    
+
     public String getLastName() {
         return lastName;
     }
-    
+
     public void setLastName(String lastName) {
         this.lastName = lastName;
     }
-    
+
 }
 
 @Schema
@@ -91,10 +91,10 @@ class Test {
 class MyBean {}
 ''')
         then:"the state is correct"
-        AbstractOpenApiVisitor.testReference != null
+        Utils.testReference != null
 
         when:"The OpenAPI is retrieved"
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
         Schema schema = openAPI.components.schemas['Test']
         Schema dummySchema = openAPI.components.schemas['Dummy']
         Schema petSchema = openAPI.components.schemas['Pet']

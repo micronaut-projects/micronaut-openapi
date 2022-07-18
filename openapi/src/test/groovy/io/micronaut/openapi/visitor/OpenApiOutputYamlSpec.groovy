@@ -131,10 +131,10 @@ class Person3 {
 class MyBean {}
 ''')
         then: "the yaml is written"
-        AbstractOpenApiVisitor.testYamlReference != null
+        Utils.testYamlReference != null
 
         then: "paths are sorted and schemas are sorted"
-        AbstractOpenApiEndpointVisitor.testYamlReference.contains('''\
+        Utils.testYamlReference.contains('''\
 paths:
   /endpoint1:
     get:

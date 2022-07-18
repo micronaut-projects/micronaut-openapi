@@ -91,10 +91,10 @@ abstract class BaseTestOperations<T extends BaseObject> {
 class MyBean {}
 ''')
         then: "the state is correct"
-        AbstractOpenApiVisitor.testReference != null
+        Utils.testReference != null
 
         when: "The OpenAPI is retrieved"
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
         Schema baseSchema = openAPI.components.schemas['BaseObject']
         Schema bSchema = openAPI.components.schemas['B']
 
@@ -286,10 +286,10 @@ class CatController implements PetOperations {
 class MyBean {}
 ''')
         then: "the state is correct"
-        AbstractOpenApiVisitor.testReference != null
+        Utils.testReference != null
 
         when: "The OpenAPI is retrieved"
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
         Schema petSchema = openAPI.components.schemas['Pet']
         Schema catSchema = openAPI.components.schemas['Cat']
         Schema dogSchema = openAPI.components.schemas['Dog']
@@ -298,20 +298,17 @@ class MyBean {}
         petSchema != null
         dogSchema != null
         catSchema != null
-        petSchema instanceof ComposedSchema
-        catSchema instanceof ComposedSchema
-        dogSchema instanceof ComposedSchema
-        ((ComposedSchema) catSchema).allOf[0].$ref == '#/components/schemas/Pet'
-        ((ComposedSchema) catSchema).allOf[1].type == 'object'
-        ((ComposedSchema) catSchema).allOf[1].properties.size() == 1
-        ((ComposedSchema) catSchema).allOf[1].properties['clawSize'].type == 'integer'
+        catSchema.allOf[0].$ref == '#/components/schemas/Pet'
+        catSchema.allOf[1].type == 'object'
+        catSchema.allOf[1].properties.size() == 1
+        catSchema.allOf[1].properties['clawSize'].type == 'integer'
         petSchema.type == 'object'
         petSchema.properties.size() == 3
         petSchema.discriminator.propertyName == "type"
 
-        ((ComposedSchema) petSchema).oneOf.size() == 2
-        ((ComposedSchema) petSchema).oneOf[0].$ref == '#/components/schemas/Dog'
-        ((ComposedSchema) petSchema).oneOf[1].$ref == '#/components/schemas/Cat'
+        petSchema.oneOf.size() == 2
+        petSchema.oneOf[0].$ref == '#/components/schemas/Dog'
+        petSchema.oneOf[1].$ref == '#/components/schemas/Cat'
 
         when:
         Operation operation = openAPI.paths.get("/pet/cat/claw/{size}").get
@@ -487,10 +484,10 @@ class CatController implements PetOperations {
 class MyBean {}
 ''')
         then: "the state is correct"
-        AbstractOpenApiVisitor.testReference != null
+        Utils.testReference != null
 
         when: "The OpenAPI is retrieved"
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
         Schema petSchema = openAPI.components.schemas['Pet']
         Schema catSchema = openAPI.components.schemas['Cat']
         Schema dogSchema = openAPI.components.schemas['Dog']
@@ -499,13 +496,10 @@ class MyBean {}
         petSchema != null
         dogSchema != null
         catSchema != null
-        petSchema instanceof ComposedSchema
-        catSchema instanceof ComposedSchema
-        dogSchema instanceof ComposedSchema
-        ((ComposedSchema) catSchema).allOf[0].$ref == '#/components/schemas/Pet'
-        ((ComposedSchema) catSchema).allOf[1].type == 'object'
-        ((ComposedSchema) catSchema).allOf[1].properties.size() == 1
-        ((ComposedSchema) catSchema).allOf[1].properties['clawSize'].type == 'integer'
+        catSchema.allOf[0].$ref == '#/components/schemas/Pet'
+        catSchema.allOf[1].type == 'object'
+        catSchema.allOf[1].properties.size() == 1
+        catSchema.allOf[1].properties['clawSize'].type == 'integer'
         petSchema.type == 'object'
         petSchema.properties.size() == 3
         petSchema.discriminator.propertyName == "type"
@@ -513,9 +507,9 @@ class MyBean {}
         petSchema.discriminator.mapping["DOG"] == "#/components/schemas/Dog"
         petSchema.discriminator.mapping["CAT"] == "#/components/schemas/Cat"
 
-        ((ComposedSchema) petSchema).oneOf.size() == 2
-        ((ComposedSchema) petSchema).oneOf[0].$ref == '#/components/schemas/Dog'
-        ((ComposedSchema) petSchema).oneOf[1].$ref == '#/components/schemas/Cat'
+        petSchema.oneOf.size() == 2
+        petSchema.oneOf[0].$ref == '#/components/schemas/Dog'
+        petSchema.oneOf[1].$ref == '#/components/schemas/Cat'
 
         when:
         Operation operation = openAPI.paths.get("/pet/cat/claw/{size}").get
@@ -624,10 +618,10 @@ class Pet {
 class MyBean {}
 ''')
         then: "the state is correct"
-        AbstractOpenApiVisitor.testReference != null
+        Utils.testReference != null
 
         when: "The OpenAPI is retrieved"
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
         Schema petSchema = openAPI.components.schemas['Pet']
         Schema catSchema = openAPI.components.schemas['Cat']
         Schema dogSchema = openAPI.components.schemas['Dog']
@@ -636,18 +630,15 @@ class MyBean {}
         petSchema != null
         dogSchema != null
         catSchema != null
-        petSchema instanceof ComposedSchema
-        catSchema instanceof ComposedSchema
-        dogSchema instanceof ComposedSchema
         catSchema.type == null
         catSchema.properties == null
         petSchema.type == 'object'
         petSchema.properties.size() == 2
 
-        ((ComposedSchema) catSchema).allOf.size() == 2
-        ((ComposedSchema) catSchema).allOf[0].$ref == '#/components/schemas/Pet'
-        ((ComposedSchema) catSchema).allOf[1].type == 'object'
-        ((ComposedSchema) catSchema).allOf[1].properties['clawSize'].type == 'integer'
+        catSchema.allOf.size() == 2
+        catSchema.allOf[0].$ref == '#/components/schemas/Pet'
+        catSchema.allOf[1].type == 'object'
+        catSchema.allOf[1].properties['clawSize'].type == 'integer'
     }
 
 
@@ -747,10 +738,10 @@ class Pet {
 class MyBean {}
 ''')
         then: "the state is correct"
-        AbstractOpenApiVisitor.testReference != null
+        Utils.testReference != null
 
         when: "The OpenAPI is retrieved"
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
         Schema petSchema = openAPI.components.schemas['Pet']
         Schema catSchema = openAPI.components.schemas['Cat']
         Schema dogSchema = openAPI.components.schemas['Dog']
@@ -759,23 +750,20 @@ class MyBean {}
         petSchema != null
         dogSchema != null
         catSchema != null
-        !(petSchema instanceof ComposedSchema)
-        catSchema instanceof ComposedSchema
-        dogSchema instanceof ComposedSchema
         catSchema.type == null
         catSchema.properties == null
         petSchema.description == 'Pet Desc'
         petSchema.type == 'object'
         petSchema.properties.size() == 2
 
-        ((ComposedSchema) catSchema).allOf.size() == 2
-        ((ComposedSchema) catSchema).allOf[0].$ref == '#/components/schemas/Pet'
-        ((ComposedSchema) catSchema).allOf[1].type == 'object'
-        ((ComposedSchema) catSchema).allOf[1].properties.size() == 1
-        ((ComposedSchema) catSchema).allOf[1].properties['clawSize'].type == 'integer'
-        ((ComposedSchema) dogSchema).allOf.size() == 2
-        ((ComposedSchema) dogSchema).allOf[0].$ref == '#/components/schemas/Pet'
-        ((ComposedSchema) dogSchema).allOf[1].properties.size() == 1
+        catSchema.allOf.size() == 2
+        catSchema.allOf[0].$ref == '#/components/schemas/Pet'
+        catSchema.allOf[1].type == 'object'
+        catSchema.allOf[1].properties.size() == 1
+        catSchema.allOf[1].properties['clawSize'].type == 'integer'
+        dogSchema.allOf.size() == 2
+        dogSchema.allOf[0].$ref == '#/components/schemas/Pet'
+        dogSchema.allOf[1].properties.size() == 1
     }
 
     void "test build OpenAPI doc for POJO with Inheritance and response discriminator mapping"() {
@@ -996,10 +984,10 @@ class PetController {
 class MyBean {}
 ''')
         then: "the state is correct"
-        AbstractOpenApiVisitor.testReference != null
+        Utils.testReference != null
 
         when: "The OpenAPI is retrieved"
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
         Schema petSchema = openAPI.components.schemas['Pet']
         Schema catSchema = openAPI.components.schemas['Cat']
         Schema dogSchema = openAPI.components.schemas['Dog']
@@ -1008,10 +996,6 @@ class MyBean {}
         petSchema != null
         dogSchema != null
         catSchema != null
-
-        petSchema instanceof Schema
-        catSchema instanceof ComposedSchema
-        dogSchema instanceof ComposedSchema
 
         petSchema.type == 'object'
         petSchema.properties.size() == 3
@@ -1042,16 +1026,15 @@ class MyBean {}
         operation.responses."200".content."application/json"
         operation.responses."200".content."application/json".schema
 
-        operation.responses."200".content."application/json".schema instanceof ComposedSchema
-        ((ComposedSchema) operation.responses."200".content."application/json".schema).discriminator
-        ((ComposedSchema) operation.responses."200".content."application/json".schema).discriminator.mapping.size() == 2
-        ((ComposedSchema) operation.responses."200".content."application/json".schema).discriminator.mapping["CAT"] == "#/components/schemas/Cat"
-        ((ComposedSchema) operation.responses."200".content."application/json".schema).discriminator.mapping["DOG"] == "#/components/schemas/Dog"
+        operation.responses."200".content."application/json".schema.discriminator
+        operation.responses."200".content."application/json".schema.discriminator.mapping.size() == 2
+        operation.responses."200".content."application/json".schema.discriminator.mapping["CAT"] == "#/components/schemas/Cat"
+        operation.responses."200".content."application/json".schema.discriminator.mapping["DOG"] == "#/components/schemas/Dog"
 
-        ((ComposedSchema) operation.responses."200".content."application/json".schema).oneOf
-        ((ComposedSchema) operation.responses."200".content."application/json".schema).oneOf.size() == 2
-        ((ComposedSchema) operation.responses."200".content."application/json".schema).oneOf[0].get$ref() == "#/components/schemas/Dog"
-        ((ComposedSchema) operation.responses."200".content."application/json".schema).oneOf[1].get$ref() == "#/components/schemas/Cat"
+        operation.responses."200".content."application/json".schema.oneOf
+        operation.responses."200".content."application/json".schema.oneOf.size() == 2
+        operation.responses."200".content."application/json".schema.oneOf[0].get$ref() == "#/components/schemas/Dog"
+        operation.responses."200".content."application/json".schema.oneOf[1].get$ref() == "#/components/schemas/Cat"
     }
 
     void "test build OpenAPI doc for interface POJO with inheritance"() {
@@ -1111,10 +1094,10 @@ interface Pet {
 class MyBean {}
 ''')
         then: "the state is correct"
-        AbstractOpenApiVisitor.testReference != null
+        Utils.testReference != null
 
         when: "The OpenAPI is retrieved"
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
         Schema petSchema = openAPI.components.schemas['Pet']
         Schema catSchema = openAPI.components.schemas['Cat']
         Schema dogSchema = openAPI.components.schemas['Dog']
@@ -1123,18 +1106,15 @@ class MyBean {}
         petSchema != null
         dogSchema != null
         catSchema != null
-        petSchema instanceof ComposedSchema
-        catSchema instanceof ComposedSchema
-        dogSchema instanceof ComposedSchema
         catSchema.type == null
         catSchema.properties == null
         petSchema.type == 'object'
         petSchema.properties.size() == 2
 
-        ((ComposedSchema) catSchema).allOf.size() == 2
-        ((ComposedSchema) catSchema).allOf[0].$ref == '#/components/schemas/Pet'
-        ((ComposedSchema) catSchema).allOf[1].type == 'object'
-        ((ComposedSchema) catSchema).allOf[1].properties['clawSize'].type == 'integer'
+        catSchema.allOf.size() == 2
+        catSchema.allOf[0].$ref == '#/components/schemas/Pet'
+        catSchema.allOf[1].type == 'object'
+        catSchema.allOf[1].properties['clawSize'].type == 'integer'
     }
 
     void "test build OpenAPI doc for interface POJO with multiple and multi leveled inheritance"() {
@@ -1195,10 +1175,10 @@ interface Sleeper extends Serializable, Readable {
 class MyBean {}
 ''')
         then: "the state is correct"
-        AbstractOpenApiVisitor.testReference != null
+        Utils.testReference != null
 
         when: "The OpenAPI is retrieved"
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
         Schema petSchema = openAPI.components.schemas['Pet']
         Schema animalSchema = openAPI.components.schemas['Animal']
         Schema sleeperSchema = openAPI.components.schemas['Sleeper']
@@ -1211,11 +1191,6 @@ class MyBean {}
         sleeperSchema != null
         catSchema != null
 
-        petSchema instanceof ComposedSchema
-        animalSchema instanceof ComposedSchema
-        catSchema instanceof ComposedSchema
-        sleeperSchema instanceof Schema
-
         petSchema.type == null
         petSchema.properties == null
         animalSchema.type == 'object'
@@ -1225,17 +1200,17 @@ class MyBean {}
         catSchema.type == null
         catSchema.properties == null
 
-        ((ComposedSchema) catSchema).allOf.size() == 4
-        ((ComposedSchema) catSchema).allOf[0].$ref == '#/components/schemas/Pet'
-        ((ComposedSchema) catSchema).allOf[1].$ref == '#/components/schemas/Animal'
-        ((ComposedSchema) catSchema).allOf[2].$ref == '#/components/schemas/Sleeper'
-        ((ComposedSchema) catSchema).allOf[3].type == 'object'
-        ((ComposedSchema) catSchema).allOf[3].properties['clawSize'].type == 'integer'
+        catSchema.allOf.size() == 4
+        catSchema.allOf[0].$ref == '#/components/schemas/Pet'
+        catSchema.allOf[1].$ref == '#/components/schemas/Animal'
+        catSchema.allOf[2].$ref == '#/components/schemas/Sleeper'
+        catSchema.allOf[3].type == 'object'
+        catSchema.allOf[3].properties['clawSize'].type == 'integer'
 
-        ((ComposedSchema) petSchema).allOf.size() == 2
-        ((ComposedSchema) petSchema).allOf[0].type == 'object'
-        ((ComposedSchema) petSchema).allOf[0].properties.size() == 2
-        ((ComposedSchema) petSchema).allOf[1].$ref == '#/components/schemas/Animal'
+        petSchema.allOf.size() == 2
+        petSchema.allOf[0].type == 'object'
+        petSchema.allOf[0].properties.size() == 2
+        petSchema.allOf[1].$ref == '#/components/schemas/Animal'
     }
 
 }

@@ -76,10 +76,10 @@ class Greeting {
 class MyBean {}
 ''')
         then:"the state is correct"
-        AbstractOpenApiVisitor.testReference != null
+        Utils.testReference != null
 
         when:"The OpenAPI is retrieved"
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
         Schema greetingSchema = openAPI.components.schemas['Greeting']
 
         then:"the components are valid"
@@ -143,10 +143,10 @@ class Greeting {
 class MyBean {}
 ''')
         then:"the state is correct"
-        AbstractOpenApiVisitor.testReference != null
+        Utils.testReference != null
 
         when:"The OpenAPI is retrieved"
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
         Schema greetingSchema = openAPI.components.schemas['Greeting']
 
         then:"the components are valid"
@@ -204,10 +204,10 @@ class Greeting {
 class MyBean {}
 ''')
         then:"the state is correct"
-        AbstractOpenApiVisitor.testReference != null
+        Utils.testReference != null
 
         when:"The OpenAPI is retrieved"
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
         Schema greetingSchema = openAPI.components.schemas['Greeting']
 
         then:"the components are valid"
@@ -265,10 +265,10 @@ class Greeting {
 class MyBean {}
 ''')
         then:"the state is correct"
-        AbstractOpenApiVisitor.testReference != null
+        Utils.testReference != null
 
         when:"The OpenAPI is retrieved"
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
         Schema greetingSchema = openAPI.components.schemas['Greeting']
 
         then:"the components are valid"
@@ -281,7 +281,7 @@ class MyBean {}
 
         then:"it is included in the OpenAPI doc"
         pathItem.post.operationId == 'saveNetwork'
-        pathItem.post.parameters.size() == 0
+        !pathItem.post.parameters
         pathItem.post.requestBody.content['application/json'].schema
         pathItem.post.requestBody.content['application/json'].schema.properties.size() == 1
         pathItem.post.requestBody.content['application/json'].schema.properties['name']
@@ -317,16 +317,16 @@ interface NetworkOperations {
 class MyBean {}
 ''')
         then:"the state is correct"
-        AbstractOpenApiVisitor.testReference != null
+        Utils.testReference != null
 
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
 
         when:"the /pets path is retrieved"
         PathItem pathItem = openAPI.paths.get("/networks")
 
         then:"it is included in the OpenAPI doc"
         pathItem.get.operationId == 'getNetworks'
-        pathItem.get.parameters.empty
+        !pathItem.get.parameters
         pathItem.get.requestBody == null
     }
 
@@ -372,7 +372,7 @@ interface Test {
 
     @Get("/test6{?bar}")
     public String test6(@Nullable String bar, String name);
-    
+
     @Post("/test7")
     public String test7(String someId, @Nullable String someNotRequired, java.util.Optional<String> someNotRequired2, HttpRequest req, Principal principal, @Body Greeting myBody);
 }
@@ -385,10 +385,10 @@ class Greeting {
 class MyBean {}
 ''')
         then:"the state is correct"
-        AbstractOpenApiVisitor.testReference != null
+        Utils.testReference != null
 
         when:"The OpenAPI is retrieved"
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
         PathItem pathItem = openAPI.paths.get("/test1")
 
         then:
@@ -402,7 +402,7 @@ class MyBean {}
 
         then:
         pathItem.post.operationId == 'test2'
-        pathItem.post.parameters.size() == 0
+        !pathItem.post.parameters
         pathItem.post.requestBody.content['application/json'].schema
         pathItem.post.requestBody.content['application/json'].schema.properties.size() == 1
         pathItem.post.requestBody.content['application/json'].schema.properties['name']
@@ -412,14 +412,14 @@ class MyBean {}
 
         then:
         pathItem.get.operationId == 'test3'
-        pathItem.get.parameters.size() == 0
+        !pathItem.get.parameters
 
         when:
         pathItem = openAPI.paths.get("/test4")
 
         then:
         pathItem.get.operationId == 'test4'
-        pathItem.get.parameters.size() == 0
+        !pathItem.get.parameters
 
         when:
         pathItem = openAPI.paths.get("/test5")
@@ -448,7 +448,7 @@ class MyBean {}
 
         then:
         pathItem.post.operationId == 'test7'
-        pathItem.post.parameters.size() == 0
+        !pathItem.post.parameters
         pathItem.post.requestBody.required
         pathItem.post.requestBody.content['application/json'].schema
         pathItem.post.requestBody.content['application/json'].schema.allOf[0].$ref == "#/components/schemas/Greeting"
@@ -527,10 +527,10 @@ class Greeting {
 class MyBean {}
 ''')
         then:"the state is correct"
-        AbstractOpenApiVisitor.testReference != null
+        Utils.testReference != null
 
         when:"The OpenAPI is retrieved"
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
         Schema greetingSchema = openAPI.components.schemas['Greeting']
 
         then:"the components are valid"
@@ -545,7 +545,7 @@ class MyBean {}
         pathItem.get.operationId == 'getNetworks'
         pathItem.get.parameters.size() == 1
         pathItem.get.parameters[0].name =='fooBar'
-        pathItem.get.parameters[0].class == HeaderParameter
+        pathItem.get.parameters[0].in == 'header'
         pathItem.get.parameters[0].explode
         pathItem.get.parameters[0].description == 'NA/true/false (case insensitive)'
         !pathItem.get.parameters[0].required
@@ -610,10 +610,10 @@ class MyBean {}
 ''')
 
         then: 'the state is correct'
-        AbstractOpenApiVisitor.testReference != null
+        Utils.testReference != null
 
         when:
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
         PathItem pathItem = openAPI.paths.get("/page-params")
 
         then:
@@ -662,10 +662,10 @@ class MyBean {}
 ''')
 
         then: 'the state is correct'
-        AbstractOpenApiVisitor.testReference != null
+        Utils.testReference != null
 
         when:
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
         PathItem pathItem = openAPI.paths.get("/{apiVersion}")
 
         then:

@@ -18,18 +18,17 @@ package io.micronaut.openapi.visitor;
 import java.io.File;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.Future;
 
-import io.micronaut.core.annotation.AnnotationValue;
 import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.http.server.types.files.FileCustomizableResponseType;
 import io.micronaut.inject.ast.ClassElement;
-import io.swagger.v3.oas.models.security.SecurityRequirement;
+import io.micronaut.inject.visitor.VisitorContext;
+import io.micronaut.openapi.javadoc.JavadocParser;
+import io.swagger.v3.oas.models.Components;
+import io.swagger.v3.oas.models.OpenAPI;
 
 import org.reactivestreams.Publisher;
 
@@ -39,6 +38,17 @@ import org.reactivestreams.Publisher;
  * @since 4.4.0
  */
 public final class Utils {
+
+    public static final String ATTR_OPENAPI = "io.micronaut.OPENAPI";
+    public static final String ATTR_TEST_MODE = "io.micronaut.OPENAPI_TEST";
+    public static final String ATTR_VISITED_ELEMENTS = "io.micronaut.OPENAPI.visited.elements";
+
+    private static OpenAPI testReference;
+    private static OpenAPI testReferenceAfterPlaceholders;
+    private static String testYamlReference;
+    private static String testJsonReference;
+
+    private static JavadocParser javadocParser = new JavadocParser();
 
     private Utils() {
     }
@@ -90,21 +100,81 @@ public final class Utils {
     }
 
     /**
-     * Maps annotation value to {@link io.swagger.v3.oas.annotations.security.SecurityRequirement}.
-     * Correct format is:
-     * custom_name:
-     * - custom_scope1
-     * - custom_scope2
+     * Resolve the components.
      *
-     * @param r The value of {@link SecurityRequirement}.
+     * @param openAPI The open API
      *
-     * @return converted object.
+     * @return The components
      */
-    public static SecurityRequirement mapToSecurityRequirement(AnnotationValue<io.swagger.v3.oas.annotations.security.SecurityRequirement> r) {
-        String name = r.getRequiredValue("name", String.class);
-        List<String> scopes = r.get("scopes", String[].class).map(Arrays::asList).orElse(Collections.emptyList());
-        SecurityRequirement securityRequirement = new SecurityRequirement();
-        securityRequirement.addList(name, scopes);
-        return securityRequirement;
+    public static Components resolveComponents(OpenAPI openAPI) {
+        Components components = openAPI.getComponents();
+        if (components == null) {
+            components = new Components();
+            openAPI.setComponents(components);
+        }
+        return components;
+    }
+
+    /**
+     * Resolve the {@link OpenAPI} instance.
+     *
+     * @param context The context
+     *
+     * @return The {@link OpenAPI} instance
+     */
+    public static OpenAPI resolveOpenAPI(VisitorContext context) {
+        OpenAPI openAPI = context.get(ATTR_OPENAPI, OpenAPI.class).orElse(null);
+        if (openAPI == null) {
+            openAPI = new OpenAPI();
+            context.put(ATTR_OPENAPI, openAPI);
+            if (isTestMode()) {
+                setTestReference(openAPI);
+            }
+        }
+        return openAPI;
+    }
+
+    public static boolean isTestMode() {
+        return Boolean.getBoolean(ATTR_TEST_MODE);
+    }
+
+    public static OpenAPI getTestReference() {
+        return testReference;
+    }
+
+    public static void setTestReference(OpenAPI testReference) {
+        Utils.testReference = testReference;
+    }
+
+    public static OpenAPI getTestReferenceAfterPlaceholders() {
+        return testReferenceAfterPlaceholders;
+    }
+
+    public static void setTestReferenceAfterPlaceholders(OpenAPI testReferenceAfterPlaceholders) {
+        Utils.testReferenceAfterPlaceholders = testReferenceAfterPlaceholders;
+    }
+
+    public static String getTestYamlReference() {
+        return testYamlReference;
+    }
+
+    public static void setTestYamlReference(String testYamlReference) {
+        Utils.testYamlReference = testYamlReference;
+    }
+
+    public static String getTestJsonReference() {
+        return testJsonReference;
+    }
+
+    public static void setTestJsonReference(String testJsonReference) {
+        Utils.testJsonReference = testJsonReference;
+    }
+
+    public static JavadocParser getJavadocParser() {
+        return javadocParser;
+    }
+
+    public static void setJavadocParser(JavadocParser javadocParser) {
+        Utils.javadocParser = javadocParser;
     }
 }

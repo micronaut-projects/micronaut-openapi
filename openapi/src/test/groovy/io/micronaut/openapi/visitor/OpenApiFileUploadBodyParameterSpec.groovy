@@ -79,7 +79,7 @@ class UploadOpenApiController {
 class MyBean {}
 ''')
 
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
 
         then:
         openAPI
@@ -205,7 +205,7 @@ class DocTestController {
 class MyBean {}
 ''')
 
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
 
         then:
         openAPI

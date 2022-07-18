@@ -87,10 +87,10 @@ class Message {
 class MyBean {}
 ''')
         then:
-        AbstractOpenApiVisitor.testReference != null
+        Utils.testReference != null
 
         when:
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
 
         then:
         openAPI.components.schemas.size() == 1

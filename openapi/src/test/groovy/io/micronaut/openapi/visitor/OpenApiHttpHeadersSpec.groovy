@@ -20,7 +20,7 @@ import io.micronaut.http.annotation.Get;
 
 @Controller("/path")
 class OpenApiController {
-    
+
     @Get
     public HttpResponse<String> processSync(HttpHeaders headers) {
         return HttpResponse.ok("");
@@ -31,10 +31,10 @@ class OpenApiController {
 class MyBean {}
 ''')
         then: "the state is correct"
-        AbstractOpenApiVisitor.testReference != null
+        Utils.testReference != null
 
         when: "The OpenAPI is retrieved"
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
         Operation operation = openAPI.paths."/path".get
 
         then:
@@ -57,7 +57,7 @@ import io.micronaut.http.annotation.Post;
 
 @Controller("/path")
 class OpenApiController {
-    
+
     @Post
     public HttpResponse<String> processSync(HttpHeaders headers) {
         return HttpResponse.ok("");
@@ -68,10 +68,10 @@ class OpenApiController {
 class MyBean {}
 ''')
         then: "the state is correct"
-        AbstractOpenApiVisitor.testReference != null
+        Utils.testReference != null
 
         when: "The OpenAPI is retrieved"
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
         Operation operation = openAPI.paths."/path".post
 
         then:

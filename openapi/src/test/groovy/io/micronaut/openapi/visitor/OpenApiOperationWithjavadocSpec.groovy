@@ -37,7 +37,7 @@ class MyController {
 class MyBean {}
 ''')
 
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
         Operation operation = openAPI.paths?.get("/")?.delete
 
         expect:
@@ -81,7 +81,7 @@ class MyController {
 class MyBean {}
 ''')
 
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
         Operation operation = openAPI.paths?.get("/")?.delete
 
         expect:
@@ -139,7 +139,7 @@ class MyController {
 class MyBean {}
 ''')
 
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
         Operation operation = openAPI.paths?.get("/")?.delete
         Operation operation2 = openAPI.paths?.get("/del2")?.delete
 
@@ -217,10 +217,10 @@ class Person {
 class MyBean {}
 ''')
         then:
-        AbstractOpenApiVisitor.testReference != null
+        Utils.testReference != null
 
         when:
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
 
         then:
         openAPI.components.schemas

@@ -57,7 +57,7 @@ class Response {}
 class MyBean {}
 ''')
 
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
         Operation operation = openAPI.paths?.get("/")?.put
 
         expect:
@@ -92,7 +92,7 @@ class MyController {
 class MyBean {}
 ''')
 
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
         Operation operation = openAPI.paths?.get("/create2")?.post
         RequestBody requestBody = operation.requestBody
 

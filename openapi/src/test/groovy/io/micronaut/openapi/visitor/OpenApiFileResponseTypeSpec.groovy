@@ -6,7 +6,7 @@ import io.swagger.v3.oas.models.Operation
 
 class OpenApiFileResponseTypeSpec extends AbstractTypeElementSpec {
     def setup() {
-        System.setProperty(AbstractOpenApiVisitor.ATTR_TEST_MODE, "true")
+        System.setProperty(Utils.ATTR_TEST_MODE, "true")
     }
 
     void "test build the OpenAPI for returning files"() {
@@ -72,7 +72,7 @@ class FooController {
 class MyBean {}
 ''')
 
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
 
         then:
         openAPI
@@ -113,7 +113,7 @@ class FooController {
 class MyBean {}
 ''')
 
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
 
         then: 'The content is the one defined in the @Content annotation'
         openAPI

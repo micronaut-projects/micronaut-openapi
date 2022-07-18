@@ -137,10 +137,10 @@ class ErrorResponse {
 class MyBean {}
 ''')
         then: "the state is correct"
-        AbstractOpenApiVisitor.testReference != null
+        Utils.testReference != null
 
         when: "The OpenAPI is retrieved"
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
         Schema uploadPrintSchema = openAPI.components.schemas['UploadPrint']
         Schema printParametersSchema = openAPI.components.schemas['PrintParameters']
 
@@ -499,10 +499,10 @@ class MyController2 {
 class MyBean {}
 ''')
         then: "the state is correct"
-        AbstractOpenApiVisitor.testReference != null
+        Utils.testReference != null
 
         when: "The OpenAPI is retrieved"
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
         Operation operation = openAPI.paths.get("/").put
 
         then:
@@ -530,9 +530,9 @@ class MyBean {}
         !operation.requestBody.content."multipart/mixed".encoding.firstOject.headers.MyHeader2.deprecated
         operation.requestBody.content."multipart/mixed".encoding.firstOject.headers.MyHeader3.get$ref() == '#/components/headers/Head3'
         operation.requestBody.content."multipart/mixed".encoding.firstOject.headers.MyHeader4.schema.get$ref() == '#/components/schemas/Head4Schema'
-        !operation.requestBody.content."multipart/mixed".encoding.firstOject.headers.MyHeader4.schema.description
-        !operation.requestBody.content."multipart/mixed".encoding.firstOject.headers.MyHeader4.schema.default
-        !operation.requestBody.content."multipart/mixed".encoding.firstOject.headers.MyHeader4.schema.format
+        operation.requestBody.content."multipart/mixed".encoding.firstOject.headers.MyHeader4.schema.description == 'this is description'
+        operation.requestBody.content."multipart/mixed".encoding.firstOject.headers.MyHeader4.schema.default
+        operation.requestBody.content."multipart/mixed".encoding.firstOject.headers.MyHeader4.schema.format == 'binary'
 
         !operation.requestBody.content."multipart/mixed".encoding.firstOject.headers.MyHeader5.schema.get$ref()
         operation.requestBody.content."multipart/mixed".encoding.firstOject.headers.MyHeader5.schema.description == 'this is description'

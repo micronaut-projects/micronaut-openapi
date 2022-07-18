@@ -64,7 +64,7 @@ class Response {}
 class MyBean {}
 ''')
 
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
         Operation operation = openAPI.paths?.get("/")?.put
 
         expect:

@@ -45,7 +45,7 @@ class MyController {
 class MyBean {}
 ''')
 
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
 
         then:
         openAPI
@@ -63,7 +63,7 @@ class MyBean {}
         requestBody.content
         requestBody.content.size() == 1
         requestBody.content['application/json'].schema
-        requestBody.content['application/json'].schema instanceof ArraySchema
+        requestBody.content['application/json'].schema.type == 'array'
 
         expect:
         operation

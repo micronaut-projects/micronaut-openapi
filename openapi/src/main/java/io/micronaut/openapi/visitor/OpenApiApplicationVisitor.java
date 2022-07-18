@@ -187,18 +187,18 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         // Handle Application securityRequirements schemes
         processSecuritySchemes(element, context);
 
-        Optional<OpenAPI> attr = context.get(ATTR_OPENAPI, OpenAPI.class);
+        Optional<OpenAPI> attr = context.get(Utils.ATTR_OPENAPI, OpenAPI.class);
         if (attr.isPresent()) {
             OpenAPI existing = attr.get();
             Optional.ofNullable(openAPI.getInfo())
                     .ifPresent(existing::setInfo);
             copyOpenAPI(existing, openAPI);
         } else {
-            context.put(ATTR_OPENAPI, openAPI);
+            context.put(Utils.ATTR_OPENAPI, openAPI);
         }
 
-        if (isTestMode()) {
-            resolveOpenAPI(context);
+        if (Utils.isTestMode()) {
+            Utils.resolveOpenAPI(context);
         }
 
         this.classElement = element;
@@ -227,7 +227,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                         context.info("Reading Swagger OpenAPI " + (isYaml ? "YAML" : "JSON") + " file " + path.getFileName());
                         OpenAPI parsedOpenApi = null;
                         try {
-                            parsedOpenApi = (isYaml ? yamlMapper : jsonMapper).readValue(path.toFile(), OpenAPI.class);
+                            parsedOpenApi = (isYaml ? ConvertUtils.getYamlMapper() : ConvertUtils.getJsonMapper()).readValue(path.toFile(), OpenAPI.class);
                         } catch (IOException e) {
                             context.warn("Unable to read file " + path.getFileName() + ": " + e.getMessage(), element);
                         }
@@ -330,7 +330,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                         List<io.swagger.v3.oas.models.security.SecurityRequirement> securityRequirements =
                                 o.getAnnotations("security", SecurityRequirement.class)
                                 .stream()
-                                .map(Utils::mapToSecurityRequirement)
+                                .map(ConvertUtils::mapToSecurityRequirement)
                                 .collect(Collectors.toList());
                         openAPI.setSecurity(securityRequirements);
                     });
@@ -531,7 +531,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             // nothing new visited, avoid rewriting the files.
             return;
         }
-        Optional<OpenAPI> attr = visitorContext.get(ATTR_OPENAPI, OpenAPI.class);
+        Optional<OpenAPI> attr = visitorContext.get(Utils.ATTR_OPENAPI, OpenAPI.class);
         if (!attr.isPresent()) {
             return;
         }
@@ -545,8 +545,8 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         new JacksonDiscriminatorPostProcessor().addMissingDiscriminatorType(openAPI);
         new OpenApiOperationsPostProcessor().processOperations(openAPI);
         // need to replace openAPI after property placeholders resolved
-        if (isTestMode()) {
-            testReferenceAfterPlaceholders = openAPI;
+        if (Utils.isTestMode()) {
+            Utils.setTestReferenceAfterPlaceholders(openAPI);
         }
 
         String isJson = getConfigurationProperty(MICRONAUT_OPENAPI_JSON_FORMAT, visitorContext);
@@ -604,12 +604,12 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
     private void writeYamlToFile(OpenAPI openAPI, String fileName, String documentTitle, VisitorContext visitorContext, boolean isYaml) {
         Optional<Path> specFile = openApiSpecFile(fileName, visitorContext);
         try (Writer writer = getFileWriter(specFile)) {
-            (isYaml ? yamlMapper : jsonMapper).writeValue(writer, openAPI);
-            if (isTestMode()) {
+            (isYaml ? ConvertUtils.getYamlMapper() : ConvertUtils.getJsonMapper()).writeValue(writer, openAPI);
+            if (Utils.isTestMode()) {
                 if (isYaml) {
-                    AbstractOpenApiVisitor.testYamlReference = writer.toString();
+                    Utils.setTestYamlReference(writer.toString());
                 } else {
-                    AbstractOpenApiVisitor.testJsonReference = writer.toString();
+                    Utils.setTestJsonReference(writer.toString());
                 }
             } else {
                 @SuppressWarnings("OptionalGetWithoutIsPresent")
@@ -629,7 +629,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
     }
 
     private Writer getFileWriter(Optional<Path> specFile) throws IOException {
-        if (isTestMode()) {
+        if (Utils.isTestMode()) {
             return new StringWriter();
         } else if (specFile.isPresent()) {
             return Files.newBufferedWriter(specFile.get(), StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);

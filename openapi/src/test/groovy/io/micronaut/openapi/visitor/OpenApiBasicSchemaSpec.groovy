@@ -2,6 +2,7 @@ package io.micronaut.openapi.visitor
 
 import io.micronaut.openapi.AbstractOpenApiTypeElementSpec
 import io.swagger.v3.oas.models.OpenAPI
+import io.swagger.v3.oas.models.media.Schema
 
 class OpenApiBasicSchemaSpec extends AbstractOpenApiTypeElementSpec {
 
@@ -115,7 +116,7 @@ public class MyBean {}
 ''')
 
         then:
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
         openAPI?.paths?.get("/person/{name}")?.get
         openAPI.components.schemas["Person"]
         openAPI.components.schemas["Person"].type == "object"
@@ -252,7 +253,7 @@ public class MyBean {}
 ''')
 
         then:
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
         openAPI?.paths?.get("/person/{name}")?.get
         openAPI.components.schemas["Person"]
         openAPI.components.schemas["Person"].type == "object"
@@ -369,7 +370,7 @@ public class MyBean {}
 ''')
 
         then:
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
         openAPI?.paths?.get("/person/{name}")?.get
         openAPI.components.schemas["Person"]
         openAPI.components.schemas["Person"].type == "object"
@@ -508,7 +509,7 @@ public class MyBean {}
 ''')
 
         then:
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
         openAPI?.paths?.get("/person/{name}")?.get
         openAPI.components.schemas["Person"]
         openAPI.components.schemas["Person"].type == "object"
@@ -648,7 +649,7 @@ public class MyBean {}
 ''')
 
         then:
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
         openAPI?.paths?.get("/person/{name}")?.get
         openAPI.components.schemas["Person"]
         openAPI.components.schemas["Person"].type == "object"
@@ -733,7 +734,7 @@ class Person {
 
     @PositiveOrZero
     private Integer totalGoals;
-    
+
     @Email
     @io.swagger.v3.oas.annotations.media.Schema(name = "xyz", implementation = String.class)
     public java.util.Map<String, java.util.List<Integer>> mapValue;
@@ -794,38 +795,40 @@ public class MyBean {}
 ''')
 
         then:
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
         openAPI?.paths?.get("/person/{name}")?.get
-        openAPI.components.schemas["Person"]
-        openAPI.components.schemas["Person"].type == "object"
+        Schema personSchema = openAPI.components.schemas.Person
 
-        openAPI.components.schemas["Person"].properties
-        openAPI.components.schemas["Person"].properties.size() == 4
+        personSchema
+        personSchema.type == "object"
 
-        openAPI.components.schemas["Person"].properties["name"]
-        openAPI.components.schemas["Person"].properties["debt_value"]
-        openAPI.components.schemas["Person"].properties["total_goals"]
+        personSchema.properties
+        personSchema.properties.size() == 4
 
-        openAPI.components.schemas["Person"].properties["name"].type == "string"
-        openAPI.components.schemas["Person"].properties["name"].description == "The person full name."
+        personSchema.properties["name"]
+        personSchema.properties["debt_value"]
+        personSchema.properties["total_goals"]
 
-        openAPI.components.schemas["Person"].properties["debt_value"].type == "integer"
-        openAPI.components.schemas["Person"].properties["debt_value"].maximum == 0
-        !openAPI.components.schemas["Person"].properties["debt_value"].exclusiveMaximum
-        openAPI.components.schemas["Person"].properties["debt_value"].description == "The total debt amount."
+        personSchema.properties["name"].type == "string"
+        personSchema.properties["name"].description == "The person full name."
 
-        openAPI.components.schemas["Person"].properties["total_goals"].type == "integer"
-        !openAPI.components.schemas["Person"].properties["total_goals"].exclusiveMinimum
-        openAPI.components.schemas["Person"].properties["total_goals"].description == "The total number of person's goals."
+        personSchema.properties["debt_value"].type == "integer"
+        personSchema.properties["debt_value"].maximum == 0
+        !personSchema.properties["debt_value"].exclusiveMaximum
+        personSchema.properties["debt_value"].description == "The total debt amount."
 
-        openAPI.components.schemas["Person"].properties["xyz"].type == "string"
-        openAPI.components.schemas["Person"].properties["xyz"].additionalProperties == null
-        openAPI.components.schemas["Person"].properties["xyz"].format == "email"
+        personSchema.properties["total_goals"].type == "integer"
+        !personSchema.properties["total_goals"].exclusiveMinimum
+        personSchema.properties["total_goals"].description == "The total number of person's goals."
 
-        openAPI.components.schemas["Person"].required.size() == 3
-        openAPI.components.schemas["Person"].required.contains("name")
-        openAPI.components.schemas["Person"].required.contains("debt_value")
-        openAPI.components.schemas["Person"].required.contains("total_goals")
+        personSchema.properties["xyz"].type == "string"
+        personSchema.properties["xyz"].additionalProperties == null
+        personSchema.properties["xyz"].format == "email"
+
+        personSchema.required.size() == 3
+        personSchema.required.contains("name")
+        personSchema.required.contains("debt_value")
+        personSchema.required.contains("total_goals")
 
         cleanup:
         System.setProperty("micronaut.openapi.property.naming.strategy", "")
@@ -899,7 +902,7 @@ class Person {
         this.debtValue = debtValue;
         this.totalGoals = totalGoals;
     }
-    
+
     /**
      * The person's generated id.
      *
@@ -935,7 +938,7 @@ class Person {
     public Integer getTotalGoals() {
         return totalGoals;
     }
-    
+
     public void setId(Integer id) {
         this.id = id;
     }
@@ -959,7 +962,7 @@ public class MyBean {}
 ''')
 
         then:
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
         openAPI?.paths?.get("/person/{name}")?.get
         openAPI.components.schemas["Person"]
         openAPI.components.schemas["Person"].type == "object"
@@ -1057,7 +1060,7 @@ class Person {
         this.debtValue = debtValue;
         this.totalGoals = totalGoals;
     }
-    
+
     /**
      * The person's generated id.
      *
@@ -1093,7 +1096,7 @@ class Person {
     public Integer getTotalGoals() {
         return totalGoals;
     }
-    
+
     public void setId(Integer id) {
         this.id = id;
     }
@@ -1117,7 +1120,7 @@ public class MyBean {}
 ''')
 
         then:
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
         openAPI?.paths?.get("/person/{name}")?.get
         openAPI.components.schemas["Person"]
         openAPI.components.schemas["Person"].type == "object"

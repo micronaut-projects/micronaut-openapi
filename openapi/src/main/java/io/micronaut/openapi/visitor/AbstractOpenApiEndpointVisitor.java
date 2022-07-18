@@ -308,7 +308,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         }
         incrementVisitedElements(context);
         List<PathItem> pathItems = resolvePathItems(context, matchTemplates);
-        OpenAPI openAPI = resolveOpenAPI(context);
+        OpenAPI openAPI = Utils.resolveOpenAPI(context);
 
         io.swagger.v3.oas.models.Operation swaggerOperation = readOperation(element, context);
 
@@ -446,7 +446,6 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         List<Parameter> swaggerParameters = swaggerOperation.getParameters();
         if (CollectionUtils.isEmpty(swaggerParameters)) {
             swaggerParameters = new ArrayList<>();
-            swaggerOperation.setParameters(swaggerParameters);
         }
 
         for (ParameterElement parameter : element.getParameters()) {
@@ -454,6 +453,9 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                 processParameter(context, openAPI, swaggerOperation, javadocDescription, permitsRequestBody, pathVariables,
                         consumesMediaTypes, swaggerParameters, parameter, extraBodyParameters);
             }
+        }
+        if (CollectionUtils.isNotEmpty(swaggerParameters)) {
+            swaggerOperation.setParameters(swaggerParameters);
         }
     }
 
@@ -677,11 +679,11 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                 }
                 processExplode(paramAnn, paramValues);
 
-                JsonNode jsonNode = jsonMapper.valueToTree(paramValues);
+                JsonNode jsonNode = ConvertUtils.getJsonMapper().valueToTree(paramValues);
 
                 if (newParameter == null) {
                     try {
-                        newParameter = treeToValue(jsonNode, Parameter.class);
+                        newParameter = ConvertUtils.treeToValue(jsonNode, Parameter.class);
                         if (jsonNode.has("schema")) {
                             JsonNode schemaNode = jsonNode.get("schema");
                             if (schemaNode.has("$ref")) {
@@ -697,14 +699,14 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                     }
                 } else {
                     try {
-                        Parameter v = treeToValue(jsonNode, Parameter.class);
+                        Parameter v = ConvertUtils.treeToValue(jsonNode, Parameter.class);
                         if (v == null) {
-                            Map<CharSequence, Object> target = jsonMapper.convertValue(newParameter, MAP_TYPE);
+                            Map<CharSequence, Object> target = ConvertUtils.getConvertJsonMapper().convertValue(newParameter, MAP_TYPE);
                             for (CharSequence name : paramValues.keySet()) {
                                 Object o = paramValues.get(name.toString());
                                 target.put(name.toString(), o);
                             }
-                            newParameter = jsonMapper.convertValue(target, Parameter.class);
+                            newParameter = ConvertUtils.getConvertJsonMapper().convertValue(target, Parameter.class);
                         } else {
                             // horrible hack because Swagger
                             // ParameterDeserializer breaks updating
@@ -893,7 +895,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             swaggerOperation.setSummary(summary);
         }
         JavadocDescription javadocDescription = element.getDocumentation()
-                .map(javadocParser::parse)
+                .map(Utils.getJavadocParser()::parse)
                 .orElse(null);
 
         if (javadocDescription != null) {
@@ -909,6 +911,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
 
     private io.swagger.v3.oas.models.Operation readOperation(MethodElement element, VisitorContext context) {
         final Optional<AnnotationValue<Operation>> operationAnnotation = element.findAnnotation(Operation.class);
+
         io.swagger.v3.oas.models.Operation swaggerOperation = operationAnnotation
                 .flatMap(o -> toValue(o.getValues(), context, io.swagger.v3.oas.models.Operation.class))
                 .orElse(new io.swagger.v3.oas.models.Operation());
@@ -1233,7 +1236,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
 
     private void processCallbackReference(VisitorContext context, io.swagger.v3.oas.models.Operation swaggerOperation,
                                           String callbackName, String refCallback) {
-        final Components components = resolveComponents(resolveOpenAPI(context));
+        final Components components = Utils.resolveComponents(Utils.resolveOpenAPI(context));
         Map<String, io.swagger.v3.oas.models.callbacks.Callback> callbacks = initCallbacks(swaggerOperation);
         final io.swagger.v3.oas.models.callbacks.Callback callbackRef = new io.swagger.v3.oas.models.callbacks.Callback();
         if (refCallback != null) {
@@ -1259,8 +1262,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             final PathItem pathItem = new PathItem();
             for (AnnotationValue<Operation> operation : operations) {
                 final Optional<HttpMethod> operationMethod = operation.get("method", HttpMethod.class);
-                operationMethod.ifPresent(httpMethod -> toValue(operation.getValues(), context,
-                        io.swagger.v3.oas.models.Operation.class)
+                operationMethod.ifPresent(httpMethod -> toValue(operation.getValues(), context, io.swagger.v3.oas.models.Operation.class)
                         .ifPresent(op -> setOperationOnPathItem(pathItem, op, httpMethod)));
             }
             Map<String, io.swagger.v3.oas.models.callbacks.Callback> callbacks = initCallbacks(

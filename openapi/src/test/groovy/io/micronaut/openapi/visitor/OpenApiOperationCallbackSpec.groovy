@@ -81,7 +81,7 @@ class SubscriptionResponse {
 class MyBean {}
 ''')
 
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
         Operation operation = openAPI.paths?.get("/test")?.post
 
         expect:
@@ -187,7 +187,7 @@ class SubscriptionResponse {
 class MyBean {}
 ''')
 
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
         Operation operation = openAPI.paths?.get("/test")?.post
 
         expect:
@@ -262,7 +262,7 @@ class SubscriptionResponse {
 class MyBean {}
 ''')
 
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
         Operation operation = openAPI.paths?.get("/test")?.post
 
         expect:

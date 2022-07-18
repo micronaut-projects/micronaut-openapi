@@ -89,7 +89,7 @@ class UploadController {
 class MyBean {}
 ''')
 
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
 
         then:
         openAPI
@@ -262,10 +262,10 @@ class Pet {
 class MyBean {}
 ''')
         then: "The state is correct"
-        AbstractOpenApiVisitor.testReference != null
+        Utils.testReference != null
 
         when: "The OpenAPI is retrieved"
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
 
         then: "The operation has only one path"
         openAPI.paths.size() == 1

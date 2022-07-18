@@ -59,7 +59,7 @@ class PetController {
     HttpResponse<Pet> get(String name) {
         return HttpResponse.ok();
     }
-    
+
     @Post("/pet/")
     HttpResponse<Pet> post(Pet p) {
        return HttpResponse.ok();
@@ -68,10 +68,10 @@ class PetController {
 
 ''')
         then:"the state is correct"
-        AbstractOpenApiVisitor.testReference != null
+        Utils.testReference != null
 
         when:"The OpenAPI is retrieved"
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
         Schema petSchema = openAPI.components.schemas['Pet']
 
         then:"the components are valid"
@@ -141,7 +141,7 @@ class PetController {
     HttpResponse<Pet> get(String name) {
         return HttpResponse.ok();
     }
-    
+
     @Post("/pet/")
     HttpResponse<Pet> post(Pet p) {
        return HttpResponse.ok();
@@ -150,10 +150,10 @@ class PetController {
 
 ''')
         then:"the state is correct"
-        AbstractOpenApiVisitor.testReference != null
+        Utils.testReference != null
 
         when:"The OpenAPI is retrieved"
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
         Schema petSchema = openAPI.components.schemas['Pet']
 
         then:"the components are valid"

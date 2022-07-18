@@ -70,7 +70,7 @@ class Pet {
 class MyBean {}
 ''')
 
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
         Operation operation = openAPI.paths?.get("/")?.get
 
         expect:
@@ -154,7 +154,7 @@ class Pet {
 class MyBean {}
 ''')
 
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
         Operation operation = openAPI.paths?.get("/")?.get
 
         expect:
@@ -203,7 +203,7 @@ class Pet {
 class MyBean {}
 ''')
 
-        OpenAPI openAPI = AbstractOpenApiVisitor.testReference
+        OpenAPI openAPI = Utils.testReference
         Operation operation = openAPI.paths?.get("/")?.get
 
         expect:

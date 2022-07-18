@@ -4,6 +4,7 @@ import io.micronaut.openapi.AbstractOpenApiTypeElementSpec
 import io.swagger.v3.oas.models.Operation
 import io.swagger.v3.oas.models.media.ArraySchema
 import io.swagger.v3.oas.models.media.ObjectSchema
+import io.swagger.v3.oas.models.media.Schema
 
 class OpenApiOperationParseSpec extends AbstractOpenApiTypeElementSpec {
 
@@ -65,10 +66,11 @@ interface PetOperations {
 class MyBean {}
 ''')
 
-        ObjectSchema petSchema = (ObjectSchema) AbstractOpenApiVisitor.testReference.getComponents().getSchemas().get("Pet")
+        Schema petSchema = (Schema) Utils.testReference.getComponents().getSchemas().get("Pet")
 
         expect:
         petSchema
+        petSchema.type == 'object'
         petSchema.properties
         petSchema.properties.size() == 2
         petSchema.properties.containsKey("pet-name")
@@ -138,7 +140,7 @@ class Pet {
 class MyBean {}
 ''')
 
-        Operation operation = AbstractOpenApiVisitor.testReference?.paths?.get("/pet")?.get
+        Operation operation = Utils.testReference?.paths?.get("/pet")?.get
 
         expect:
         operation
@@ -150,10 +152,10 @@ class MyBean {}
         operation.responses.'200'.content['application/json']
         operation.responses.'200'.content['application/json'].schema
         operation.responses.'200'.content['application/json'].schema.type == "array"
-        ((ArraySchema) operation.responses.'200'.content['application/json'].schema).items.$ref == "#/components/schemas/Pet"
+        operation.responses.'200'.content['application/json'].schema.items.$ref == "#/components/schemas/Pet"
 
         when:
-        Operation operationNames = AbstractOpenApiVisitor.testReference?.paths?.get("/pet/names")?.get
+        Operation operationNames = Utils.testReference?.paths?.get("/pet/names")?.get
 
         then:
         operationNames
@@ -164,7 +166,7 @@ class MyBean {}
         operationNames.responses.'200'.content['application/json']
         operationNames.responses.'200'.content['application/json'].schema
         operationNames.responses.'200'.content['application/json'].schema.type == "array"
-        ((ArraySchema) operationNames.responses.'200'.content['application/json'].schema).items.type == "string"
+        operationNames.responses.'200'.content['application/json'].schema.items.type == "string"
     }
 
     void "test parse the OpenAPI @ApiResponse Content with @Schema annotation"() {
@@ -222,7 +224,7 @@ interface PetOperations {
 class MyBean {}
 ''')
 
-        Operation operation = AbstractOpenApiVisitor.testReference?.paths?.get("/pet")?.post
+        Operation operation = Utils.testReference?.paths?.get("/pet")?.post
 
         expect:
         operation
@@ -289,7 +291,7 @@ class Response {}
 class MyBean {}
 ''')
 
-        Operation operation = AbstractOpenApiVisitor.testReference?.paths?.get("/")?.put
+        Operation operation = Utils.testReference?.paths?.get("/")?.put
 
         expect:
         operation
@@ -357,7 +359,7 @@ class Response {}
 class MyBean {}
 ''')
 
-        Operation operation = AbstractOpenApiVisitor.testReference?.paths?.get("/")?.put
+        Operation operation = Utils.testReference?.paths?.get("/")?.put
 
         expect:
         operation
@@ -425,7 +427,7 @@ class Response {}
 class MyBean {}
 ''')
 
-        Operation operation = AbstractOpenApiVisitor.testReference?.paths?.get("/")?.put
+        Operation operation = Utils.testReference?.paths?.get("/")?.put
 
         expect:
         operation
