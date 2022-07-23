@@ -4,14 +4,13 @@ import io.micronaut.openapi.AbstractOpenApiTypeElementSpec
 import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.PathItem
 import io.swagger.v3.oas.models.media.Schema
-import io.swagger.v3.oas.models.parameters.HeaderParameter
 import spock.lang.Issue
 
 class OpenApiParameterMappingSpec extends AbstractOpenApiTypeElementSpec {
 
     void "test that @Parameter propagates correctly"() {
 
-        given:"An API definition"
+        given: "An API definition"
         when:
         buildBeanDefinition('test.MyBean', '''
 package test;
@@ -75,25 +74,25 @@ class Greeting {
 @jakarta.inject.Singleton
 class MyBean {}
 ''')
-        then:"the state is correct"
+        then: "the state is correct"
         Utils.testReference != null
 
-        when:"The OpenAPI is retrieved"
+        when: "The OpenAPI is retrieved"
         OpenAPI openAPI = Utils.testReference
         Schema greetingSchema = openAPI.components.schemas['Greeting']
 
-        then:"the components are valid"
+        then: "the components are valid"
         greetingSchema.type == 'object'
         greetingSchema.properties.size() == 1
         greetingSchema.properties['message'].type == 'string'
 
-        when:"the /pets path is retrieved"
+        when: "the /pets path is retrieved"
         PathItem pathItem = openAPI.paths.get("/networks")
 
-        then:"it is included in the OpenAPI doc"
+        then: "it is included in the OpenAPI doc"
         pathItem.get.operationId == 'getNetworks'
         pathItem.get.parameters.size() == 1
-        pathItem.get.parameters[0].name =='fooBar'
+        pathItem.get.parameters[0].name == 'fooBar'
         pathItem.get.parameters[0].description == 'NA/true/false (case insensitive)'
         !pathItem.get.parameters[0].required
         pathItem.get.parameters[0].schema.type == 'string'
@@ -104,7 +103,7 @@ class MyBean {}
 
     void "test that @Parameter elements can be hidden on interface"() {
 
-        given:"An API definition"
+        given: "An API definition"
         when:
         buildBeanDefinition('test.MyBean', '''
 package test;
@@ -142,30 +141,30 @@ class Greeting {
 @jakarta.inject.Singleton
 class MyBean {}
 ''')
-        then:"the state is correct"
+        then: "the state is correct"
         Utils.testReference != null
 
-        when:"The OpenAPI is retrieved"
+        when: "The OpenAPI is retrieved"
         OpenAPI openAPI = Utils.testReference
         Schema greetingSchema = openAPI.components.schemas['Greeting']
 
-        then:"the components are valid"
+        then: "the components are valid"
         greetingSchema.type == 'object'
         greetingSchema.properties.size() == 1
         greetingSchema.properties['message'].type == 'string'
 
-        when:"the /pets path is retrieved"
+        when: "the /pets path is retrieved"
         PathItem pathItem = openAPI.paths.get("/networks")
 
-        then:"it is included in the OpenAPI doc"
+        then: "it is included in the OpenAPI doc"
         pathItem.get.operationId == 'getNetworks'
         pathItem.get.parameters.size() == 1
-        pathItem.get.parameters[0].name =='fooBar'
+        pathItem.get.parameters[0].name == 'fooBar'
     }
 
     void "test that @Parameter elements can be hidden on type"() {
 
-        given:"An API definition"
+        given: "An API definition"
         when:
         buildBeanDefinition('test.MyBean', '''
 package test;
@@ -203,30 +202,30 @@ class Greeting {
 @jakarta.inject.Singleton
 class MyBean {}
 ''')
-        then:"the state is correct"
+        then: "the state is correct"
         Utils.testReference != null
 
-        when:"The OpenAPI is retrieved"
+        when: "The OpenAPI is retrieved"
         OpenAPI openAPI = Utils.testReference
         Schema greetingSchema = openAPI.components.schemas['Greeting']
 
-        then:"the components are valid"
+        then: "the components are valid"
         greetingSchema.type == 'object'
         greetingSchema.properties.size() == 1
         greetingSchema.properties['message'].type == 'string'
 
-        when:"the /pets path is retrieved"
+        when: "the /pets path is retrieved"
         PathItem pathItem = openAPI.paths.get("/networks")
 
-        then:"it is included in the OpenAPI doc"
+        then: "it is included in the OpenAPI doc"
         pathItem.post.operationId == 'getNetworks'
         pathItem.post.parameters.size() == 1
-        pathItem.post.parameters[0].name =='fooBar'
+        pathItem.post.parameters[0].name == 'fooBar'
     }
 
     void "test prinicipal is not included"() {
 
-        given:"An API definition"
+        given: "An API definition"
         when:
         buildBeanDefinition('test.MyBean', '''
 package test;
@@ -264,22 +263,22 @@ class Greeting {
 @jakarta.inject.Singleton
 class MyBean {}
 ''')
-        then:"the state is correct"
+        then: "the state is correct"
         Utils.testReference != null
 
-        when:"The OpenAPI is retrieved"
+        when: "The OpenAPI is retrieved"
         OpenAPI openAPI = Utils.testReference
         Schema greetingSchema = openAPI.components.schemas['Greeting']
 
-        then:"the components are valid"
+        then: "the components are valid"
         greetingSchema.type == 'object'
         greetingSchema.properties.size() == 1
         greetingSchema.properties['message'].type == 'string'
 
-        when:"the /pets path is retrieved"
+        when: "the /pets path is retrieved"
         PathItem pathItem = openAPI.paths.get("/networks")
 
-        then:"it is included in the OpenAPI doc"
+        then: "it is included in the OpenAPI doc"
         pathItem.post.operationId == 'saveNetwork'
         !pathItem.post.parameters
         pathItem.post.requestBody.content['application/json'].schema
@@ -289,7 +288,7 @@ class MyBean {}
 
     void "test body is not included"() {
 
-        given:"An API definition"
+        given: "An API definition"
         when:
         buildBeanDefinition('test.MyBean', '''
 package test;
@@ -316,15 +315,15 @@ interface NetworkOperations {
 @jakarta.inject.Singleton
 class MyBean {}
 ''')
-        then:"the state is correct"
+        then: "the state is correct"
         Utils.testReference != null
 
         OpenAPI openAPI = Utils.testReference
 
-        when:"the /pets path is retrieved"
+        when: "the /pets path is retrieved"
         PathItem pathItem = openAPI.paths.get("/networks")
 
-        then:"it is included in the OpenAPI doc"
+        then: "it is included in the OpenAPI doc"
         pathItem.get.operationId == 'getNetworks'
         !pathItem.get.parameters
         pathItem.get.requestBody == null
@@ -332,7 +331,7 @@ class MyBean {}
 
     void "test parameter with no bindable annotations or reserved types"() {
 
-        given:"An API definition"
+        given: "An API definition"
         when:
         buildBeanDefinition('test.MyBean', '''
 package test;
@@ -384,10 +383,10 @@ class Greeting {
 @jakarta.inject.Singleton
 class MyBean {}
 ''')
-        then:"the state is correct"
+        then: "the state is correct"
         Utils.testReference != null
 
-        when:"The OpenAPI is retrieved"
+        when: "The OpenAPI is retrieved"
         OpenAPI openAPI = Utils.testReference
         PathItem pathItem = openAPI.paths.get("/test1")
 
@@ -463,7 +462,7 @@ class MyBean {}
 
     void "test @Parameter in header and explode is true"() {
 
-        given:"An API definition"
+        given: "An API definition"
         when:
         buildBeanDefinition('test.MyBean', '''
 package test;
@@ -526,25 +525,25 @@ class Greeting {
 @jakarta.inject.Singleton
 class MyBean {}
 ''')
-        then:"the state is correct"
+        then: "the state is correct"
         Utils.testReference != null
 
-        when:"The OpenAPI is retrieved"
+        when: "The OpenAPI is retrieved"
         OpenAPI openAPI = Utils.testReference
         Schema greetingSchema = openAPI.components.schemas['Greeting']
 
-        then:"the components are valid"
+        then: "the components are valid"
         greetingSchema.type == 'object'
         greetingSchema.properties.size() == 1
         greetingSchema.properties['message'].type == 'string'
 
-        when:"the /pets path is retrieved"
+        when: "the /pets path is retrieved"
         PathItem pathItem = openAPI.paths.get("/networks")
 
-        then:"it is included in the OpenAPI doc"
+        then: "it is included in the OpenAPI doc"
         pathItem.get.operationId == 'getNetworks'
         pathItem.get.parameters.size() == 1
-        pathItem.get.parameters[0].name =='fooBar'
+        pathItem.get.parameters[0].name == 'fooBar'
         pathItem.get.parameters[0].in == 'header'
         pathItem.get.parameters[0].explode
         pathItem.get.parameters[0].description == 'NA/true/false (case insensitive)'
@@ -678,6 +677,178 @@ class MyBean {}
         pathItem.get.parameters[1].in == 'query'
         pathItem.get.parameters[2].name == 'page'
         pathItem.get.parameters[2].in == 'query'
+    }
+
+    void "test @Body with member value"() {
+
+        given: "An API definition"
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+
+import io.micronaut.http.HttpResponse;
+import io.micronaut.http.annotation.Body;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Post;
+import io.swagger.v3.oas.annotations.media.Schema;
+
+@Controller
+class ParameterController {
+
+    @Post("wrapper")
+    public HttpResponse<Object> save(@Body("name") @NotBlank @Size(min = 10, max = 20) String name) {
+        return HttpResponse.ok();
+    }
+
+    @Post("wrapperObject")
+    public HttpResponse<Object> save2(@Body("name2") @NotNull MyClass name) {
+        return HttpResponse.ok();
+    }
+
+    @Post("withoutWrapper")
+    public HttpResponse<Object> save3(@Body @NotBlank @Size(min = 10, max = 20) String name) {
+        return HttpResponse.ok();
+    }
+}
+
+class MyClass {
+
+    @Size(min = 10, max = 20)
+    private String field1;
+    @Schema(description = "this is description")
+    private String field2;
+
+    public String getField1() {
+        return field1;
+    }
+
+    public void setField1(String field1) {
+        this.field1 = field1;
+    }
+
+    public String getField2() {
+        return field2;
+    }
+
+    public void setField2(String field2) {
+        this.field2 = field2;
+    }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+
+        then: 'the state is correct'
+        Utils.testReference != null
+
+        when:
+        OpenAPI openAPI = Utils.testReference
+        PathItem wrapperPathItem = openAPI.paths."/wrapper"
+        PathItem wrapperObjectPathItem = openAPI.paths."/wrapperObject"
+        PathItem withoutWrapperPathItem = openAPI.paths."/withoutWrapper"
+
+        then:
+        wrapperPathItem.post.operationId == 'save'
+        !wrapperPathItem.post.parameters
+        wrapperPathItem.post.requestBody
+        wrapperPathItem.post.requestBody.content
+        wrapperPathItem.post.requestBody.content."application/json"
+
+        Schema wrapperSchema = wrapperPathItem.post.requestBody.content."application/json".schema
+        wrapperSchema
+        wrapperSchema.type == 'object'
+        wrapperSchema.required
+        wrapperSchema.required.get(0) == 'name'
+        wrapperSchema.properties.name
+        wrapperSchema.properties.name.type == 'string'
+        wrapperSchema.properties.name.minLength == 10
+        wrapperSchema.properties.name.maxLength == 20
+
+        wrapperObjectPathItem.post.operationId == 'save2'
+        !wrapperObjectPathItem.post.parameters
+        wrapperObjectPathItem.post.requestBody
+        wrapperObjectPathItem.post.requestBody.content
+        wrapperObjectPathItem.post.requestBody.content."application/json"
+
+        Schema wrapperObjectSchema = wrapperObjectPathItem.post.requestBody.content."application/json".schema
+        wrapperObjectSchema
+        wrapperObjectSchema.type == 'object'
+        wrapperObjectSchema.required
+        wrapperObjectSchema.required.get(0) == 'name2'
+        wrapperObjectSchema.properties.name2
+        wrapperObjectSchema.properties.name2.$ref == '#/components/schemas/MyClass'
+
+        Schema myClassSchema = openAPI.components.schemas."MyClass"
+        myClassSchema.type == 'object'
+        myClassSchema.properties.field1.minLength == 10
+        myClassSchema.properties.field1.maxLength == 20
+        myClassSchema.properties.field2.description == 'this is description'
+
+        withoutWrapperPathItem.post.operationId == 'save3'
+        !withoutWrapperPathItem.post.parameters
+        withoutWrapperPathItem.post.requestBody
+        withoutWrapperPathItem.post.requestBody.content
+        withoutWrapperPathItem.post.requestBody.content."application/json"
+
+        Schema withoutWrapperSchema = withoutWrapperPathItem.post.requestBody.content."application/json".schema
+        withoutWrapperSchema.type == 'string'
+        withoutWrapperSchema.minLength == 10
+        withoutWrapperSchema.maxLength == 20
+    }
+
+    void "test @Body with multiple media types"() {
+
+        given: "An API definition"
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import javax.validation.constraints.NotBlank;
+
+import io.micronaut.http.HttpResponse;
+import io.micronaut.http.MediaType;
+import io.micronaut.http.annotation.Body;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Post;
+
+@Controller
+class ParameterController {
+
+    @Post(value = "path", consumes = {MediaType.APPLICATION_ATOM_XML, MediaType.APPLICATION_FORM_URLENCODED})
+    public HttpResponse<Object> save(@Body("name") @NotBlank String name) {
+        return HttpResponse.ok();
+    }
+
+    @Post(value = "path", consumes = {MediaType.APPLICATION_PDF})
+    public HttpResponse<Object> save2(@Body("name2") @NotBlank String name) {
+        return HttpResponse.ok();
+    }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+
+        then: 'the state is correct'
+        Utils.testReference != null
+
+        when:
+        OpenAPI openAPI = Utils.testReference
+        PathItem pathItem = openAPI.paths."/path"
+
+        then:
+        pathItem.post.operationId == 'save'
+        !pathItem.post.parameters
+        pathItem.post.requestBody
+        pathItem.post.requestBody.content
+        pathItem.post.requestBody.content."application/atom+xml"
+        pathItem.post.requestBody.content."application/x-www-form-urlencoded"
+        pathItem.post.requestBody.content."application/pdf"
     }
 
 }

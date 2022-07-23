@@ -18,6 +18,7 @@ package io.micronaut.openapi.visitor;
 import io.micronaut.core.annotation.AnnotationValue;
 import io.micronaut.core.annotation.Experimental;
 import io.micronaut.core.naming.NameUtils;
+import io.micronaut.core.util.ArrayUtils;
 import io.micronaut.http.HttpMethod;
 import io.micronaut.http.MediaType;
 import io.micronaut.http.uri.UriMatchTemplate;
@@ -44,6 +45,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static io.micronaut.openapi.visitor.Utils.DEFAULT_MEDIA_TYPES;
 
 /**
  * A {@link TypeElementVisitor} the builds the Swagger model from Micronaut
@@ -219,8 +222,8 @@ public class OpenApiEndpointVisitor extends AbstractOpenApiEndpointVisitor imple
     }
 
     private static List<MediaType> mediaTypes(String... arr) {
-        if (arr == null || arr.length == 0) {
-            return Collections.singletonList(MediaType.APPLICATION_JSON_TYPE);
+        if (ArrayUtils.isEmpty(arr)) {
+            return DEFAULT_MEDIA_TYPES;
         }
         return Arrays.stream(arr).map(MediaType::of).collect(Collectors.toList());
     }

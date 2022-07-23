@@ -101,6 +101,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 
+import static io.micronaut.openapi.visitor.Utils.DEFAULT_MEDIA_TYPES;
+
 /**
  * A {@link io.micronaut.inject.visitor.TypeElementVisitor} the builds the Swagger model from Micronaut controllers at compile time.
  *
@@ -407,7 +409,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                 requestBody.setRequired(true);
                 swaggerOperation.setRequestBody(requestBody);
 
-                consumesMediaTypes = consumesMediaTypes.isEmpty() ? Collections.singletonList(MediaType.APPLICATION_JSON_TYPE) : consumesMediaTypes;
+                consumesMediaTypes = consumesMediaTypes.isEmpty() ? DEFAULT_MEDIA_TYPES : consumesMediaTypes;
                 consumesMediaTypes.forEach(mediaType -> {
                     io.swagger.v3.oas.models.media.MediaType mt = new io.swagger.v3.oas.models.media.MediaType();
                     mt.setSchema(new ObjectSchema());
@@ -529,9 +531,42 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             readSwaggerRequestBody(parameter, context).ifPresent(swaggerOperation::setRequestBody);
         }
 
+        consumesMediaTypes = CollectionUtils.isNotEmpty(consumesMediaTypes) ? consumesMediaTypes : DEFAULT_MEDIA_TYPES;
+
         if (parameter.isAnnotationPresent(Body.class)) {
             processBody(context, openAPI, swaggerOperation, javadocDescription, permitsRequestBody,
                     consumesMediaTypes, parameter, parameterType);
+
+            RequestBody requestBody = swaggerOperation.getRequestBody();
+            if (requestBody != null && requestBody.getContent() != null) {
+                for (Map.Entry<String, io.swagger.v3.oas.models.media.MediaType> entry : requestBody.getContent().entrySet()) {
+                    boolean found = false;
+                    for (MediaType mediaType : consumesMediaTypes) {
+                        if (entry.getKey().equals(mediaType.getName())) {
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found) {
+                        continue;
+                    }
+
+                    io.swagger.v3.oas.models.media.MediaType mediaType = entry.getValue();
+
+                    Schema propertySchema = bindSchemaForElement(context, parameter, parameterType, mediaType.getSchema());
+
+                    String bodyAnnValue = parameter.getAnnotation(Body.class).getValue(String.class).orElse(null);
+                    if (StringUtils.isNotEmpty(bodyAnnValue)) {
+                        Schema wrapperSchema = new ObjectSchema();
+                        if (isElementNotNullable(parameter, parameterType)) {
+                            wrapperSchema.addRequiredItem(bodyAnnValue);
+                        }
+                        wrapperSchema.addProperty(bodyAnnValue, propertySchema);
+                        mediaType.setSchema(wrapperSchema);
+                    }
+                }
+            }
+
             return;
         }
 
@@ -761,13 +796,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             requestBody.setRequired(!parameter.isNullable() && !parameterType.isOptional());
         }
 
-        final Content content;
-        if (consumesMediaTypes.isEmpty()) {
-            content = buildContent(parameter, parameterType,
-                    Collections.singletonList(MediaType.APPLICATION_JSON_TYPE), openAPI, context);
-        } else {
-            content = buildContent(parameter, parameterType, consumesMediaTypes, openAPI, context);
-        }
+        final Content content = buildContent(parameter, parameterType, consumesMediaTypes, openAPI, context);
         if (requestBody.getContent() == null) {
             requestBody.setContent(content);
         } else {
@@ -847,11 +876,11 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
 
     private void addResponseContent(MethodElement element, VisitorContext context, OpenAPI openAPI, ApiResponse response) {
         ClassElement returnType = returnType(element, context);
-        if (returnType != null && !returnType.getCanonicalName().equals("java.lang.Void")) {
+        if (returnType != null && !returnType.getCanonicalName().equals(Void.class.getName())) {
             List<MediaType> producesMediaTypes = producesMediaTypes(element);
             Content content;
             if (producesMediaTypes.isEmpty()) {
-                content = buildContent(element, returnType, Collections.singletonList(MediaType.APPLICATION_JSON_TYPE), openAPI, context);
+                content = buildContent(element, returnType, DEFAULT_MEDIA_TYPES, openAPI, context);
             } else {
                 content = buildContent(element, returnType, producesMediaTypes, openAPI, context);
             }
@@ -1102,7 +1131,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
     }
 
     private boolean isVoid(ClassElement returnType) {
-        return returnType.isAssignable(void.class) || returnType.isAssignable("java.lang.Void") || returnType.isAssignable("kotlin.Unit");
+        return returnType.isAssignable(void.class) || returnType.isAssignable(Void.class) || returnType.isAssignable("kotlin.Unit");
     }
 
     private boolean isReactiveAndVoid(ClassElement returnType) {
@@ -1347,7 +1376,6 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             io.swagger.v3.oas.models.media.MediaType mt = new io.swagger.v3.oas.models.media.MediaType();
             mt.setSchema(resolveSchema(openAPI, definingElement, type, context, Collections.singletonList(mediaType), null));
             content.addMediaType(mediaType.toString(), mt);
-
         });
         return content;
     }

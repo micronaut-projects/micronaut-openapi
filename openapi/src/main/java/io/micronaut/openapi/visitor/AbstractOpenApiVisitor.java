@@ -643,7 +643,7 @@ abstract class AbstractOpenApiVisitor {
                 classElement = context.getClassElement(impl.get());
             } else if (type.isPresent()) {
                 // if format is "binary", we want PrimitiveType.BINARY
-                primitiveType = PrimitiveType.fromName(format.isPresent() && format.get().equals("binary") ? format.get() : type.get());
+                primitiveType = PrimitiveType.fromName(format.isPresent() && format.get().equals(PrimitiveType.BINARY.getCommonName()) ? format.get() : type.get());
                 if (primitiveType == null) {
                     classElement = context.getClassElement(type.get());
                 } else {
@@ -697,7 +697,7 @@ abstract class AbstractOpenApiVisitor {
     }
 
     private boolean isTypeNullable(ClassElement type) {
-        return type.isAssignable("java.util.Optional");
+        return type.isAssignable(Optional.class);
     }
 
     /**
@@ -812,7 +812,7 @@ abstract class AbstractOpenApiVisitor {
                     }
                 } else if (Utils.isReturnTypeFile(type)) {
                     schema = new StringSchema();
-                    schema.setFormat("binary");
+                    schema.setFormat(PrimitiveType.BINARY.getCommonName());
                 } else if (type.isAssignable(UUID.class)) {
                     schema = new UUIDSchema();
                 } else {
@@ -922,7 +922,7 @@ abstract class AbstractOpenApiVisitor {
         }
     }
 
-    private boolean isElementNotNullable(Element element, @Nullable Element classElement) {
+    protected boolean isElementNotNullable(Element element, @Nullable Element classElement) {
         return element.isAnnotationPresent(NotNull.class)
                 || element.isAnnotationPresent(NotBlank.class)
                 || element.isAnnotationPresent(NotEmpty.class)
@@ -1022,46 +1022,7 @@ abstract class AbstractOpenApiVisitor {
         }
 
         Schema finalSchemaToBind = schemaToBind;
-        final boolean isIterableOrMap = elementType.isIterable() || elementType.isAssignable(Map.class);
-
-        if (isIterableOrMap) {
-            if (element.isAnnotationPresent(NotEmpty.class)) {
-                finalSchemaToBind.setMinItems(1);
-            }
-            element.getValue(Size.class, "min", Integer.class).ifPresent(finalSchemaToBind::setMinItems);
-            element.getValue(Size.class, "max", Integer.class).ifPresent(finalSchemaToBind::setMaxItems);
-        } else {
-            if ("string".equals(finalSchemaToBind.getType())) {
-                if (element.isAnnotationPresent(NotEmpty.class) || element.isAnnotationPresent(NotBlank.class)) {
-                    finalSchemaToBind.setMinLength(1);
-                }
-                element.getValue(Size.class, "min", Integer.class).ifPresent(finalSchemaToBind::setMinLength);
-                element.getValue(Size.class, "max", Integer.class).ifPresent(finalSchemaToBind::setMaxLength);
-            }
-
-            if (element.isAnnotationPresent(Negative.class)) {
-                finalSchemaToBind.setMaximum(BigDecimal.ZERO);
-            }
-            if (element.isAnnotationPresent(NegativeOrZero.class)) {
-                finalSchemaToBind.setMaximum(BigDecimal.ZERO);
-            }
-            if (element.isAnnotationPresent(Positive.class)) {
-                finalSchemaToBind.setMinimum(BigDecimal.ZERO);
-            }
-            if (element.isAnnotationPresent(PositiveOrZero.class)) {
-                finalSchemaToBind.setMinimum(BigDecimal.ZERO);
-            }
-            element.getValue(Max.class, BigDecimal.class).ifPresent(finalSchemaToBind::setMaximum);
-            element.getValue(Min.class, BigDecimal.class).ifPresent(finalSchemaToBind::setMinimum);
-            element.getValue(DecimalMax.class, BigDecimal.class).ifPresent(finalSchemaToBind::setMaximum);
-            element.getValue(DecimalMin.class, BigDecimal.class).ifPresent(finalSchemaToBind::setMinimum);
-            if (element.isAnnotationPresent(Email.class)) {
-                finalSchemaToBind.setFormat("email");
-            }
-
-            element.findAnnotation(Pattern.class).flatMap(p -> p.get("regexp", String.class)).ifPresent(finalSchemaToBind::setPattern);
-            element.getValue(Part.class, String.class).ifPresent(finalSchemaToBind::setName);
-        }
+        processJavaxValidationAnnotations(element, elementType, finalSchemaToBind);
 
         final ComposedSchema composedSchema;
         final Schema<?> topLevelSchema;
@@ -1111,6 +1072,50 @@ abstract class AbstractOpenApiVisitor {
         }
 
         return originalSchema;
+    }
+
+    protected void processJavaxValidationAnnotations(Element element, ClassElement elementType, Schema schemaToBind) {
+
+        final boolean isIterableOrMap = elementType.isIterable() || elementType.isAssignable(Map.class);
+
+        if (isIterableOrMap) {
+            if (element.isAnnotationPresent(NotEmpty.class)) {
+                schemaToBind.setMinItems(1);
+            }
+            element.getValue(Size.class, "min", Integer.class).ifPresent(schemaToBind::setMinItems);
+            element.getValue(Size.class, "max", Integer.class).ifPresent(schemaToBind::setMaxItems);
+        } else {
+            if (PrimitiveType.STRING.getCommonName().equals(schemaToBind.getType())) {
+                if (element.isAnnotationPresent(NotEmpty.class) || element.isAnnotationPresent(NotBlank.class)) {
+                    schemaToBind.setMinLength(1);
+                }
+                element.getValue(Size.class, "min", Integer.class).ifPresent(schemaToBind::setMinLength);
+                element.getValue(Size.class, "max", Integer.class).ifPresent(schemaToBind::setMaxLength);
+            }
+
+            if (element.isAnnotationPresent(Negative.class)) {
+                schemaToBind.setMaximum(BigDecimal.ZERO);
+            }
+            if (element.isAnnotationPresent(NegativeOrZero.class)) {
+                schemaToBind.setMaximum(BigDecimal.ZERO);
+            }
+            if (element.isAnnotationPresent(Positive.class)) {
+                schemaToBind.setMinimum(BigDecimal.ZERO);
+            }
+            if (element.isAnnotationPresent(PositiveOrZero.class)) {
+                schemaToBind.setMinimum(BigDecimal.ZERO);
+            }
+            element.getValue(Max.class, BigDecimal.class).ifPresent(schemaToBind::setMaximum);
+            element.getValue(Min.class, BigDecimal.class).ifPresent(schemaToBind::setMinimum);
+            element.getValue(DecimalMax.class, BigDecimal.class).ifPresent(schemaToBind::setMaximum);
+            element.getValue(DecimalMin.class, BigDecimal.class).ifPresent(schemaToBind::setMinimum);
+            if (element.isAnnotationPresent(Email.class)) {
+                schemaToBind.setFormat(PrimitiveType.EMAIL.getCommonName());
+            }
+
+            element.findAnnotation(Pattern.class).flatMap(p -> p.get("regexp", String.class)).ifPresent(schemaToBind::setPattern);
+            element.getValue(Part.class, String.class).ifPresent(schemaToBind::setName);
+        }
     }
 
     Schema shemaFromAnnotation(VisitorContext context, Element element, AnnotationValue<io.swagger.v3.oas.annotations.media.Schema> schemaAnn) {

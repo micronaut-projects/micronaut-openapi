@@ -18,11 +18,14 @@ package io.micronaut.openapi.visitor;
 import java.io.File;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.Future;
 
 import io.micronaut.core.util.CollectionUtils;
+import io.micronaut.http.MediaType;
 import io.micronaut.http.server.types.files.FileCustomizableResponseType;
 import io.micronaut.inject.ast.ClassElement;
 import io.micronaut.inject.visitor.VisitorContext;
@@ -42,6 +45,8 @@ public final class Utils {
     public static final String ATTR_OPENAPI = "io.micronaut.OPENAPI";
     public static final String ATTR_TEST_MODE = "io.micronaut.OPENAPI_TEST";
     public static final String ATTR_VISITED_ELEMENTS = "io.micronaut.OPENAPI.visited.elements";
+
+    public static final List<MediaType> DEFAULT_MEDIA_TYPES = Collections.singletonList(MediaType.APPLICATION_JSON_TYPE);
 
     private static OpenAPI testReference;
     private static OpenAPI testReferenceAfterPlaceholders;
