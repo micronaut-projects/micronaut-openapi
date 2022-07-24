@@ -28,6 +28,7 @@ import io.micronaut.openapi.view.OpenApiViewConfig.RendererType;
  * @author croudet
  */
 final class RapiPDFConfig extends AbstractViewConfig {
+
     private static final String LINK = "<script src='https://unpkg.com/rapipdf{{rapipdf.version}}/dist/rapipdf-min.js'></script>";
     private static final String TAG = "<rapi-pdf id='rapi-pdf' {{rapipdf.attributes}}></rapi-pdf>";
     private static final String SPEC = "document.getElementById('rapi-pdf').setAttribute('spec-url', contextPath + '{{specURL}}');";
@@ -38,15 +39,15 @@ final class RapiPDFConfig extends AbstractViewConfig {
     private static final String DEFAULT_SWAGGER_UI_STYLE = DEFAULT_REDOC_STYLE;
 
     // https://mrin9.github.io/RapiPdf/
-    private static final Map<String, Function<String, Object>> VALID_OPTIONS = new HashMap<>(20);
+    private static final Map<String, Function<String, Object>> VALID_OPTIONS = new HashMap<>(18);
 
     static {
         VALID_OPTIONS.put("style", AbstractViewConfig::asString);
         VALID_OPTIONS.put("button-label", AbstractViewConfig::asString);
         VALID_OPTIONS.put("button-bg", AbstractViewConfig::asString);
         VALID_OPTIONS.put("button-color", AbstractViewConfig::asString);
-        VALID_OPTIONS.put("input-bg",  AbstractViewConfig::asString);
-        VALID_OPTIONS.put("input-color",  AbstractViewConfig::asString);
+        VALID_OPTIONS.put("input-bg", AbstractViewConfig::asString);
+        VALID_OPTIONS.put("input-color", AbstractViewConfig::asString);
         VALID_OPTIONS.put("hide-input", AbstractViewConfig::asBoolean);
         VALID_OPTIONS.put("pdf-primary-color", AbstractViewConfig::asString);
         VALID_OPTIONS.put("pdf-alternate-color", AbstractViewConfig::asString);
@@ -58,7 +59,8 @@ final class RapiPDFConfig extends AbstractViewConfig {
         VALID_OPTIONS.put("include-security", AbstractViewConfig::asBoolean);
         VALID_OPTIONS.put("include-api-details", AbstractViewConfig::asBoolean);
         VALID_OPTIONS.put("include-api-list", AbstractViewConfig::asBoolean);
-        
+        VALID_OPTIONS.put("include-example", AbstractViewConfig::asBoolean);
+
         DEFAULT_OPTIONS.put("hide-input", Boolean.TRUE);
         DEFAULT_OPTIONS.put("button-bg", "#b44646");
         DEFAULT_OPTIONS.put("pdf-title", "{{title}}");
@@ -75,7 +77,7 @@ final class RapiPDFConfig extends AbstractViewConfig {
             return this.name().toLowerCase(Locale.US);
         }
     }
-    
+
     private boolean enabled; //false
 
     private RapiPDFConfig() {
@@ -84,7 +86,9 @@ final class RapiPDFConfig extends AbstractViewConfig {
 
     /**
      * Builds a RapiPDFConfig given a set of properties.
+     *
      * @param properties A set of properties.
+     *
      * @return A RapipdfConfig.
      */
     static RapiPDFConfig fromProperties(Map<String, String> properties) {
@@ -98,6 +102,7 @@ final class RapiPDFConfig extends AbstractViewConfig {
      *
      * @param template A template.
      * @param rendererType The renderer type.
+     *
      * @return The template with placeholders replaced.
      */
     String render(String template, RendererType rendererType) {

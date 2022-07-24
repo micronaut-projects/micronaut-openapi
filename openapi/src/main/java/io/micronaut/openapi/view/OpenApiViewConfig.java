@@ -15,9 +15,6 @@
  */
 package io.micronaut.openapi.view;
 
-import io.micronaut.core.util.StringUtils;
-import io.micronaut.inject.visitor.VisitorContext;
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -34,15 +31,17 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
+import io.micronaut.core.util.StringUtils;
+import io.micronaut.inject.visitor.VisitorContext;
+
 /**
  * OpenApi view configuration for Swagger-ui, ReDoc and RapiDoc.
  * By default no views are enabled.
  *
+ * @author croudet
  * @see <a href="https://github.com/swagger-api/swagger-ui">Swagger-ui</a>
  * @see <a href="https://github.com/Rebilly/ReDoc">ReDoc</a>
  * @see <a href="https://github.com/mrin9/RapiDoc">RapiDoc</a>
- *
- * @author croudet
  */
 public final class OpenApiViewConfig {
 
@@ -83,18 +82,19 @@ public final class OpenApiViewConfig {
             return Collections.emptyMap();
         }
         return Arrays.stream(specification.split(",")).map(String::trim).filter(s -> !s.isEmpty())
-                .map(s -> s.split("=")).filter(keyValue -> keyValue.length == 2).peek(keyValue -> {
-                    keyValue[0] = keyValue[0].trim();
-                    keyValue[1] = keyValue[1].trim();
-                }).filter(keyValue -> !keyValue[0].isEmpty() && !keyValue[1].isEmpty())
-                .collect(Collectors.toMap(keyValue -> keyValue[0], keyValue -> keyValue[1]));
+            .map(s -> s.split("=")).filter(keyValue -> keyValue.length == 2).peek(keyValue -> {
+                keyValue[0] = keyValue[0].trim();
+                keyValue[1] = keyValue[1].trim();
+            }).filter(keyValue -> !keyValue[0].isEmpty() && !keyValue[1].isEmpty())
+            .collect(Collectors.toMap(keyValue -> keyValue[0], keyValue -> keyValue[1]));
     }
 
     /**
      * Creates an OpenApiViewConfig form a String representation.
      *
-     * @param specification     A String representation of an OpenApiViewConfig.
+     * @param specification A String representation of an OpenApiViewConfig.
      * @param openApiProperties The open api properties.
+     *
      * @return An OpenApiViewConfig.
      */
     public static OpenApiViewConfig fromSpecification(String specification, Properties openApiProperties) {
@@ -121,6 +121,7 @@ public final class OpenApiViewConfig {
 
     /**
      * Returns true when the generation of views is enabled.
+     *
      * @return true when the generation of views is enabled.
      */
     public boolean isEnabled() {
@@ -130,8 +131,9 @@ public final class OpenApiViewConfig {
     /**
      * Generates the views given this configuration.
      *
-     * @param outputDir      The destination directory of the generated views.
+     * @param outputDir The destination directory of the generated views.
      * @param visitorContext The visitor context
+     *
      * @throws IOException When the generation fails.
      */
     public void render(Path outputDir, VisitorContext visitorContext) throws IOException {
@@ -149,12 +151,13 @@ public final class OpenApiViewConfig {
             }
         }
     }
-    
+
     private String readTemplateFromClasspath(String templateName) throws IOException {
         StringBuilder buf = new StringBuilder(1024);
         ClassLoader classLoader = getClass().getClassLoader();
         try (InputStream in = classLoader.getResourceAsStream(templateName);
-             BufferedReader r = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8))) {
+             BufferedReader r = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8))
+        ) {
             String line;
             while ((line = r.readLine()) != null) {
                 buf.append(line).append('\n');
@@ -182,13 +185,15 @@ public final class OpenApiViewConfig {
                 visitorContext.addGeneratedResource(path.relativize(file).toString()));
         }
         try (BufferedWriter writer = Files.newBufferedWriter(file, StandardCharsets.UTF_8,
-                StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING)) {
+            StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING)
+        ) {
             writer.write(template);
         }
     }
 
     /**
      * Sets the server context path.
+     *
      * @param contextPath The server context path.
      */
     public void setServerContextPath(String contextPath) {
@@ -197,6 +202,7 @@ public final class OpenApiViewConfig {
 
     /**
      * Returns the title for the generated views.
+     *
      * @return A title.
      */
     public String getTitle() {
@@ -205,6 +211,7 @@ public final class OpenApiViewConfig {
 
     /**
      * Sets the title for the generated views.
+     *
      * @param title A title.
      */
     public void setTitle(String title) {
@@ -213,6 +220,7 @@ public final class OpenApiViewConfig {
 
     /**
      * Returns the relative openApi specification url path.
+     *
      * @return A path.
      */
     public String getSpecURL() {
@@ -221,6 +229,7 @@ public final class OpenApiViewConfig {
 
     /**
      * Sets the generated openApi specification file name.
+     *
      * @param specFile The openApi specification file name.
      */
     public void setSpecFile(String specFile) {
@@ -230,16 +239,18 @@ public final class OpenApiViewConfig {
     @Override
     public String toString() {
         return new StringBuilder(100).append("OpenApiConfig [swaggerUIConfig=").append(swaggerUIConfig)
-                .append(", reDocConfig=").append(redocConfig).append(", rapiDocConfig=").append(rapidocConfig)
-                .append(']').toString();
+            .append(", reDocConfig=").append(redocConfig).append(", rapiDocConfig=").append(rapidocConfig)
+            .append(']').toString();
     }
 
     /**
      * Replaces placeholders in the template.
+     *
      * @param template A template.
      * @param placeHolder The placeholder to replace.
      * @param value The value that will replace the placeholder.
      * @param valuePrefix A prefix.
+     *
      * @return The updated template.
      */
     static String replacePlaceHolder(String template, String placeHolder, String value, String valuePrefix) {
