@@ -53,6 +53,7 @@ import java.util.stream.Stream;
 
 import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.MICRONAUT_OPENAPI_ENVIRONMENTS;
 import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.readOpenApiConfigFile;
+import static io.micronaut.openapi.visitor.Utils.DEFAULT_MEDIA_TYPES;
 
 /**
  * A {@link TypeElementVisitor} the builds the Swagger model from Micronaut controllers at compile time.
@@ -183,7 +184,7 @@ public class OpenApiControllerVisitor extends AbstractOpenApiEndpointVisitor imp
     private List<MediaType> mediaTypes(MethodElement element, Class<? extends Annotation> ann) {
         String[] values = element.stringValues(ann);
         if (values.length == 0) {
-            return Collections.singletonList(MediaType.APPLICATION_JSON_TYPE);
+            return DEFAULT_MEDIA_TYPES;
         } else {
             return Arrays.stream(values).map(MediaType::of).distinct().collect(Collectors.toList());
         }
@@ -229,7 +230,7 @@ public class OpenApiControllerVisitor extends AbstractOpenApiEndpointVisitor imp
                 element,
                 context,
                 io.swagger.v3.oas.annotations.servers.Server.class,
-                io.swagger.v3.oas.models.servers.Server.class,
+                Server.class,
                 Collections.emptyList()
         );
     }
