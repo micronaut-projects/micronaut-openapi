@@ -15,6 +15,7 @@
  */
 package io.micronaut.openapi.view;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -32,25 +33,25 @@ import io.micronaut.openapi.view.OpenApiViewConfig.RendererType;
  * @author croudet
  */
 final class SwaggerUIConfig extends AbstractViewConfig implements Renderer {
+
     private static final Map<String, Object> DEFAULT_OPTIONS = new HashMap<>(4);
     private static final String OPTION_OAUTH2 = "oauth2";
     private static final String DOT = ".";
     private static final String PREFIX_SWAGGER_UI = "swagger-ui";
     private static final String KEY_VALUE_SEPARATOR = ": ";
     private static final String COMMNA_NEW_LINE = ",\n";
-    
-    // https://github.com/swagger-api/swagger-ui/blob/HEAD/docs/usage/configuration.md
-    private static final Map<String, Function<String, Object>> VALID_OPTIONS = new HashMap<>(16);
 
+    // https://github.com/swagger-api/swagger-ui/blob/HEAD/docs/usage/configuration.md
+    private static final Map<String, Function<String, Object>> VALID_OPTIONS = new HashMap<>(29);
     // https://github.com/swagger-api/swagger-ui/blob/master/docs/usage/oauth2.md
     private static final Map<String, Function<String, Object>> VALID_OAUTH2_OPTIONS = new HashMap<>(9);
-
 
     static {
         VALID_OPTIONS.put("layout", AbstractViewConfig::asQuotedString);
         VALID_OPTIONS.put("deepLinking", AbstractViewConfig::asBoolean);
         VALID_OPTIONS.put("displayOperationId", AbstractViewConfig::asBoolean);
         VALID_OPTIONS.put("defaultModelsExpandDepth", AbstractViewConfig::asString);
+        VALID_OPTIONS.put("defaultModelExpandDepth", AbstractViewConfig::asString);
         VALID_OPTIONS.put("defaultModelRendering", AbstractViewConfig::asQuotedString);
         VALID_OPTIONS.put("displayRequestDuration", AbstractViewConfig::asBoolean);
         VALID_OPTIONS.put("docExpansion", AbstractViewConfig::asQuotedString);
@@ -60,7 +61,17 @@ final class SwaggerUIConfig extends AbstractViewConfig implements Renderer {
         VALID_OPTIONS.put("showExtensions", AbstractViewConfig::asBoolean);
         VALID_OPTIONS.put("showCommonExtensions", AbstractViewConfig::asBoolean);
         VALID_OPTIONS.put("tagsSorter", AbstractViewConfig::asQuotedString);
+        VALID_OPTIONS.put("onComplete", AbstractViewConfig::asQuotedString);
+        VALID_OPTIONS.put("syntaxHighlight", AbstractViewConfig::asBoolean);
+        VALID_OPTIONS.put("syntaxHighlight.activate", AbstractViewConfig::asBoolean);
+        VALID_OPTIONS.put("syntaxHighlight.theme", SyntaxHighlightTheme::byCode);
+        VALID_OPTIONS.put("tryItOutEnabled", AbstractViewConfig::asBoolean);
+        VALID_OPTIONS.put("requestSnippetsEnabled", AbstractViewConfig::asBoolean);
+        VALID_OPTIONS.put("requestSnippets", AbstractViewConfig::asQuotedString);
         VALID_OPTIONS.put("oauth2RedirectUrl", AbstractViewConfig::asQuotedString);
+        VALID_OPTIONS.put("requestInterceptor", AbstractViewConfig::asQuotedString);
+        VALID_OPTIONS.put("request.curlOptions", AbstractViewConfig::asString);
+        VALID_OPTIONS.put("responseInterceptor", AbstractViewConfig::asQuotedString);
         VALID_OPTIONS.put("showMutatedRequest", AbstractViewConfig::asBoolean);
         VALID_OPTIONS.put("supportedSubmitMethods", AbstractViewConfig::asString);
         VALID_OPTIONS.put("validatorUrl", AbstractViewConfig::asQuotedString);
@@ -82,19 +93,63 @@ final class SwaggerUIConfig extends AbstractViewConfig implements Renderer {
     }
 
     RapiPDFConfig rapiPDFConfig;
-    private SwaggerUIConfig.Theme theme = Theme.DEFAULT;
+    private SwaggerUIConfig.Theme theme = Theme.CLASSIC;
+
+    enum SyntaxHighlightTheme {
+        AGATE("agate"),
+        ARTA("arta"),
+        MONOKAI("monokai"),
+        NORD("nord"),
+        OBSIDIAN("obsidian"),
+        TOMORROW_NIGHT("tomorrow-night"),
+        ;
+
+        private static final Map<String, SyntaxHighlightTheme> BY_CODE;
+
+        static {
+            Map<String, SyntaxHighlightTheme> byCode = new HashMap<>(SyntaxHighlightTheme.values().length);
+            for (SyntaxHighlightTheme navTagClick : values()) {
+                byCode.put(navTagClick.code, navTagClick);
+            }
+            BY_CODE = Collections.unmodifiableMap(byCode);
+        }
+
+        private final String code;
+
+        SyntaxHighlightTheme(String code) {
+            this.code = code;
+        }
+
+        @Override
+        public String toString() {
+            return code;
+        }
+
+        public static SyntaxHighlightTheme byCode(String code) {
+            return BY_CODE.get(code.toLowerCase());
+        }
+    }
 
     /**
-     * Swagger-ui themes.
-     * https://github.com/ostranme/swagger-ui-themes
+     * Swagger-ui themes. <a href="https://github.com/ilyamixaltik/swagger-themes">link</a>
      */
     enum Theme {
-        DEFAULT(null), MATERIAL("theme-material"), FEELING_BLUE("theme-feeling-blue"), FLATTOP("theme-flattop"),
-        MONOKAI("theme-monokai"), MUTED("theme-muted"), NEWSPAPER("theme-newspaper"), OUTLINE("theme-outline");
-        private String css;
+        CLASSIC("classic"),
+        DARK("dark"),
+        FEELING_BLUE("feeling-blue"),
+        FLATTOP("flattop"),
+        MATERIAL("material"),
+        MONOKAI("monokai"),
+        MUTED("muted"),
+        NEWSPAPER("newspaper"),
+        OUTLINE("toutline"),
+        ;
+
+        private final String css;
 
         /**
          * Creates a Theme with the given css.
+         *
          * @param css A css.
          */
         Theme(String css) {
@@ -103,6 +158,7 @@ final class SwaggerUIConfig extends AbstractViewConfig implements Renderer {
 
         /**
          * Return the css of the theme.
+         *
          * @return A css name.
          */
         public String getCss() {
@@ -134,7 +190,7 @@ final class SwaggerUIConfig extends AbstractViewConfig implements Renderer {
     @NonNull
     private String toOauth2Options() {
         String properties = toOptions(VALID_OAUTH2_OPTIONS, OPTION_OAUTH2 + DOT);
-         if (StringUtils.hasText(properties)) {
+        if (StringUtils.hasText(properties)) {
             return "ui.initOAuth({\n" + properties + "\n});";
         } else {
             return "";
@@ -147,13 +203,15 @@ final class SwaggerUIConfig extends AbstractViewConfig implements Renderer {
 
     /**
      * Builds a SwaggerUIConfig given a set of properties.
+     *
      * @param properties A set of properties.
+     *
      * @return A SwaggerUIConfig.
      */
     static SwaggerUIConfig fromProperties(Map<String, String> properties) {
         SwaggerUIConfig cfg = new SwaggerUIConfig();
         cfg.theme = Theme
-                .valueOf(properties.getOrDefault(PREFIX_SWAGGER_UI + ".theme", cfg.theme.name()).toUpperCase(Locale.US));
+            .valueOf(properties.getOrDefault(PREFIX_SWAGGER_UI + ".theme", cfg.theme.name()).toUpperCase(Locale.US));
         return AbstractViewConfig.fromProperties(cfg, DEFAULT_OPTIONS, properties);
     }
 
@@ -162,8 +220,8 @@ final class SwaggerUIConfig extends AbstractViewConfig implements Renderer {
         template = rapiPDFConfig.render(template, RendererType.SWAGGER_UI);
         template = OpenApiViewConfig.replacePlaceHolder(template, PREFIX_SWAGGER_UI + ".version", version, "@");
         template = OpenApiViewConfig.replacePlaceHolder(template, PREFIX_SWAGGER_UI + ".attributes", toOptions(), "");
-        template = template.replace("{{" + PREFIX_SWAGGER_UI + ".theme}}", theme == null || Theme.DEFAULT.equals(theme) ? "" :
-                "<link rel='stylesheet' type='text/css' href='https://unpkg.com/" + PREFIX_SWAGGER_UI + "-themes@3.0.0/themes/3.x/" + theme.getCss() + ".css' />");
+        template = template.replace("{{" + PREFIX_SWAGGER_UI + ".theme}}", theme == null || Theme.CLASSIC == theme ? "" :
+            "<link rel='stylesheet' type='text/css' href='https://unpkg.com/swagger-themes/themes/v3/" + theme.getCss() + ".css' />");
         template = template.replace("{{" + PREFIX_SWAGGER_UI + DOT + OPTION_OAUTH2 + "}}", hasOauth2Option(options) ? toOauth2Options() : "");
         return template;
     }

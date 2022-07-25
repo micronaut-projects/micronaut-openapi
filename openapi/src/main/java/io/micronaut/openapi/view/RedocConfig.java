@@ -28,36 +28,86 @@ import io.micronaut.openapi.view.OpenApiViewConfig.RendererType;
  * @author croudet
  */
 final class RedocConfig extends AbstractViewConfig implements Renderer {
+
     private static final Map<String, Object> DEFAULT_OPTIONS = Collections.emptyMap();
 
     // https://github.com/Redocly/redoc#redoc-options-object
-    private static final Map<String, Function<String, Object>> VALID_OPTIONS = new HashMap<>(24);
+    private static final Map<String, Function<String, Object>> VALID_OPTIONS = new HashMap<>(38);
 
     static {
         VALID_OPTIONS.put("disable-search", AbstractViewConfig::asBoolean);
+        VALID_OPTIONS.put("min-character-length-to-init-search", AbstractViewConfig::asInt);
         VALID_OPTIONS.put("expand-default-server-variables", AbstractViewConfig::asBoolean);
         VALID_OPTIONS.put("expand-responses", AbstractViewConfig::asString);
+        VALID_OPTIONS.put("generated-payload-samples-max-depth", AbstractViewConfig::asInt);
+        VALID_OPTIONS.put("max-displayed-enum-values", AbstractViewConfig::asInt);
         VALID_OPTIONS.put("hide-download-button", AbstractViewConfig::asBoolean);
+        VALID_OPTIONS.put("download-file-name", AbstractViewConfig::asString);
+        VALID_OPTIONS.put("download-definition-url", AbstractViewConfig::asString);
         VALID_OPTIONS.put("hide-hostname", AbstractViewConfig::asBoolean);
         VALID_OPTIONS.put("hide-loading", AbstractViewConfig::asBoolean);
-        VALID_OPTIONS.put("hide-schema-titles", AbstractViewConfig::asBoolean);
+        VALID_OPTIONS.put("hide-fab", AbstractViewConfig::asBoolean);
+        VALID_OPTIONS.put("hide-schema-pattern", AbstractViewConfig::asBoolean);
         VALID_OPTIONS.put("hide-single-request-sample-tab", AbstractViewConfig::asBoolean);
+        VALID_OPTIONS.put("show-object-schema-examples", AbstractViewConfig::asBoolean);
         VALID_OPTIONS.put("expand-single-schema-field", AbstractViewConfig::asBoolean);
+        VALID_OPTIONS.put("schema-expansion-level", AbstractViewConfig::asString);
         VALID_OPTIONS.put("json-sample-expand-level", AbstractViewConfig::asString);
+        VALID_OPTIONS.put("hide-schema-titles", AbstractViewConfig::asBoolean);
+        VALID_OPTIONS.put("simple-one-of-type-label", AbstractViewConfig::asBoolean);
+        VALID_OPTIONS.put("sort-enum-values-alphabetically", AbstractViewConfig::asBoolean);
+        VALID_OPTIONS.put("sort-operations-alphabetically", AbstractViewConfig::asBoolean);
+        VALID_OPTIONS.put("sort-tags-alphabetically", AbstractViewConfig::asBoolean);
+        VALID_OPTIONS.put("lazy-rendering", AbstractViewConfig::asBoolean);
         VALID_OPTIONS.put("menu-toggle", AbstractViewConfig::asBoolean);
         VALID_OPTIONS.put("native-scrollbars", AbstractViewConfig::asBoolean);
-        VALID_OPTIONS.put("no-auto-auth", AbstractViewConfig::asBoolean);
         VALID_OPTIONS.put("only-required-in-samples", AbstractViewConfig::asBoolean);
         VALID_OPTIONS.put("path-in-middle-panel", AbstractViewConfig::asBoolean);
         VALID_OPTIONS.put("required-props-first", AbstractViewConfig::asBoolean);
         VALID_OPTIONS.put("scroll-y-offset", AbstractViewConfig::asString);
-        VALID_OPTIONS.put("simple-one-of-type-label", AbstractViewConfig::asBoolean);
-        VALID_OPTIONS.put("show-extensions", AbstractViewConfig::asBoolean);
+        VALID_OPTIONS.put("show-extensions", AbstractViewConfig::asString);
         VALID_OPTIONS.put("sort-props-alphabetically", AbstractViewConfig::asBoolean);
-        VALID_OPTIONS.put("suppress-warnings", AbstractViewConfig::asBoolean);
         VALID_OPTIONS.put("payload-sample-idx", AbstractViewConfig::asString);
         VALID_OPTIONS.put("theme", AbstractViewConfig::asString);
         VALID_OPTIONS.put("untrusted-spec", AbstractViewConfig::asBoolean);
+        VALID_OPTIONS.put("nonce", AbstractViewConfig::asString);
+        VALID_OPTIONS.put("side-nav-style", SideNavStyle::byCode);
+        VALID_OPTIONS.put("show-webhook-verb", AbstractViewConfig::asBoolean);
+    }
+
+    /**
+     * Redoc side-nav-style.
+     */
+    enum SideNavStyle {
+        SUMMARY_ONLY("summary-only"),
+        PATH_ONLY("path-only"),
+        ID_ONLY("id-only"),
+        ;
+
+        private static final Map<String, SideNavStyle> BY_CODE;
+
+        static {
+            Map<String, SideNavStyle> byCode = new HashMap<>(SideNavStyle.values().length);
+            for (SideNavStyle navTagClick : values()) {
+                byCode.put(navTagClick.code, navTagClick);
+            }
+            BY_CODE = Collections.unmodifiableMap(byCode);
+        }
+
+        private final String code;
+
+        SideNavStyle(String code) {
+            this.code = code;
+        }
+
+        @Override
+        public String toString() {
+            return code;
+        }
+
+        public static SideNavStyle byCode(String code) {
+            return BY_CODE.get(code.toLowerCase());
+        }
     }
 
     RapiPDFConfig rapiPDFConfig;
@@ -70,6 +120,7 @@ final class RedocConfig extends AbstractViewConfig implements Renderer {
      * Builds a RedocConfig given a set of properties.
      *
      * @param properties A set of properties.
+     *
      * @return A RedocConfig.
      */
     static RedocConfig fromProperties(Map<String, String> properties) {

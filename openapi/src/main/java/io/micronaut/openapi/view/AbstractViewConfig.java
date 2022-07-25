@@ -27,12 +27,14 @@ import java.util.stream.Collectors;
  * @author croudet
  */
 abstract class AbstractViewConfig {
+
     protected String prefix;
     protected String version = "";
     protected Map<String, Object> options = new HashMap<>();
 
     /**
      * An AbstractViewConfig.
+     *
      * @param prefix The configuration key prefix.
      */
     protected AbstractViewConfig(String prefix) {
@@ -41,13 +43,16 @@ abstract class AbstractViewConfig {
 
     /**
      * Returns the converter associated with the key.
+     *
      * @param key A key.
+     *
      * @return A converter or null.
      */
     protected abstract Function<String, Object> getConverter(String key);
 
     /**
      * Adds an option.
+     *
      * @param entry The user specified entry.
      */
     protected void addAttribute(Map.Entry<String, String> entry) {
@@ -60,19 +65,22 @@ abstract class AbstractViewConfig {
 
     /**
      * Converts to html attributes.
+     *
      * @return A String.
      */
     protected String toHtmlAttributes() {
         return options.entrySet().stream().map(e -> e.getKey() + "=\"" + e.getValue() + '"')
-                .collect(Collectors.joining(" "));
+            .collect(Collectors.joining(" "));
     }
 
     /**
      * Builds and parse a View Config.
+     *
      * @param <T> A View config type.
      * @param cfg A View config.
      * @param defaultOptions The default options.
      * @param properties The options to parse.
+     *
      * @return A View config.
      */
     static <T extends AbstractViewConfig> T fromProperties(T cfg, Map<String, Object> defaultOptions, Map<String, String> properties) {
@@ -85,7 +93,9 @@ abstract class AbstractViewConfig {
 
     /**
      * Converts to a Boolean.
+     *
      * @param v The input.
+     *
      * @return A Boolean.
      */
     static Object asBoolean(String v) {
@@ -93,8 +103,21 @@ abstract class AbstractViewConfig {
     }
 
     /**
-     * Converts to a String.
+     * Converts to an Integer.
+     *
      * @param v The input.
+     *
+     * @return An Integer.
+     */
+    static Object asInt(String v) {
+        return Integer.valueOf(v);
+    }
+
+    /**
+     * Converts to a String.
+     *
+     * @param v The input.
+     *
      * @return A String.
      */
     static Object asString(String v) {
@@ -103,7 +126,9 @@ abstract class AbstractViewConfig {
 
     /**
      * Converts to a quoted String.
+     *
      * @param v The input.
+     *
      * @return A quoted String.
      */
     static Object asQuotedString(String v) {
@@ -113,18 +138,20 @@ abstract class AbstractViewConfig {
     /**
      * Converts to an enum.
      *
-     * @author croudet
-     *
      * @param <T> An Enum class.
+     *
+     * @author croudet
      */
     static class EnumConverter<T extends Enum<T>> implements Function<String, Object> {
+
         private final Class<T> type;
 
         /**
          * EnumConverter.
+         *
          * @param type An Enum type.
          */
-        public EnumConverter(Class<T> type) {
+        EnumConverter(Class<T> type) {
             this.type = type;
         }
 
@@ -135,6 +162,5 @@ abstract class AbstractViewConfig {
         public Object apply(String v) {
             return v == null ? null : Enum.valueOf(type, v.toUpperCase(Locale.US));
         }
-
     }
 }
