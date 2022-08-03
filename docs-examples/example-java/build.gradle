@@ -4,6 +4,7 @@ plugins {
 
 repositories {
     mavenCentral()
+    maven { url "https://s01.oss.sonatype.org/content/repositories/snapshots/" }
 }
 
 dependencies {
@@ -30,7 +31,7 @@ compileTestJava.options.compilerArgs += '-parameters'
 
 test {
     useJUnitPlatform()
-    
+
     jvmArgs '-Duser.country=US'
     jvmArgs '-Duser.language=en'
     testLogging {
