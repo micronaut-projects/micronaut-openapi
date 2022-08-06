@@ -15,6 +15,7 @@
  */
 package io.micronaut.openapi.visitor;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -23,6 +24,7 @@ import java.util.Optional;
 
 import io.micronaut.core.annotation.AnnotationValue;
 import io.micronaut.core.beans.BeanMap;
+import io.micronaut.core.util.ArrayUtils;
 import io.swagger.v3.core.util.Json;
 import io.swagger.v3.core.util.ObjectMapperFactory;
 import io.swagger.v3.core.util.Yaml;
@@ -80,15 +82,70 @@ public final class ConvertUtils {
     public static <T> T treeToValue(JsonNode jn, Class<T> clazz) throws JsonProcessingException {
         T value = convertJsonMapper.treeToValue(jn, clazz);
 
-        if (value != null) {
-            resolveExtensions(jn).ifPresent(extensions -> BeanMap.of(value).put("extensions", extensions));
-            // fix for default value
-            if (jn.has("defaultValue")) {
-                BeanMap.of(value).put("default", convertJsonMapper.treeToValue(jn.get("defaultValue"), Map.class));
+        if (value == null) {
+            return null;
+        }
+
+        resolveExtensions(jn).ifPresent(extensions -> BeanMap.of(value).put("extensions", extensions));
+        String elType = jn.has("type") ? jn.get("type").textValue() : null;
+        JsonNode defaultValueNode = jn.get("defaultValue");
+        JsonNode allowableValuesNode = jn.get("allowableValues");
+        // fix for default value
+        Object defaultValue = convertJsonNodeValue(defaultValueNode, elType);
+        BeanMap<T> beanMap = BeanMap.of(value);
+        if (defaultValue != null) {
+            beanMap.put("default", defaultValue);
+        }
+        if (allowableValuesNode != null && allowableValuesNode.isArray()) {
+            List<Object> allowableValues = new ArrayList<>(allowableValuesNode.size());
+            for (JsonNode allowableValueNode : allowableValuesNode) {
+                allowableValues.add(convertJsonNodeValue(allowableValueNode, elType));
             }
+            beanMap.put("allowableValues", allowableValues);
         }
 
         return value;
+    }
+
+    private static Object convertJsonNodeValue(JsonNode node, String type) throws JsonProcessingException {
+        if (node == null) {
+            return null;
+        }
+        return normalizeValue(node.textValue(), type);
+    }
+
+    public static List<Object> normalizeValues(String[] valuesStr, String type) throws JsonProcessingException {
+        if (ArrayUtils.isEmpty(valuesStr)) {
+            return null;
+        }
+        List<Object> values = new ArrayList<>(valuesStr.length);
+        for (String valueStr : valuesStr) {
+            Object normalizedValue = normalizeValue(valueStr, type);
+            if (normalizedValue != null) {
+                values.add(normalizeValue(valueStr, type));
+            }
+        }
+        return values;
+    }
+
+    public static Object normalizeValue(String valueStr, String type) throws JsonProcessingException {
+        if (valueStr == null) {
+            return null;
+        }
+        if (type == null || type.equals("object")) {
+            return convertJsonMapper.readValue(valueStr, Map.class);
+        }
+        switch (type) {
+            case "integer":
+                return Long.parseLong(valueStr);
+            case "boolean":
+                return Boolean.parseBoolean(valueStr);
+            case "number":
+                return Double.parseDouble(valueStr);
+            case "string":
+            default:
+                return valueStr;
+        }
     }
 
     public static Optional<Map<String, Object>> resolveExtensions(JsonNode jn) {

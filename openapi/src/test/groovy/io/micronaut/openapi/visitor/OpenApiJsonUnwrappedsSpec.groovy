@@ -123,4 +123,55 @@ class MyBean {}
         petSchema.properties['last_name'].type == 'string'
         petSchema.required == null
     }
+
+    void "test build OpenAPI with JsonProperty and Schema"() {
+        given:
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.core.annotation.Introspected;
+import io.micronaut.core.annotation.Nullable;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.swagger.v3.oas.annotations.media.Schema;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+@Controller("/api/example")
+class ExampleController {
+    @Get
+    public ExampleModel getExample() {
+        return new ExampleModel();
+    }
+}
+
+@Introspected
+class ExampleModel {
+    @JsonProperty("nameInJson")
+    @Schema(description = "example field")
+    private String nameInPojo;
+
+    public String getNameInPojo() {
+        return nameInPojo;
+    }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        then:
+        Utils.testReference != null
+
+        when:
+        OpenAPI openAPI = Utils.testReference
+
+        then:
+        openAPI.components.schemas
+        openAPI.components.schemas.size() == 1
+        Schema exampleSchema = openAPI.components.schemas.ExampleModel
+        exampleSchema.type == 'object'
+        !exampleSchema.properties.nameInPojo
+        exampleSchema.properties.nameInJson.type == 'string'
+        exampleSchema.properties.nameInJson.description == 'example field'
+    }
 }

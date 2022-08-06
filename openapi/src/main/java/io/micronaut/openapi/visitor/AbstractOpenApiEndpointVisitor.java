@@ -485,10 +485,26 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             paramAnn.stringValue("name").ifPresent(parameter::name);
             paramAnn.enumValue("in", ParameterIn.class).ifPresent(in -> parameter.in(in.toString()));
             paramAnn.stringValue("description").ifPresent(parameter::description);
-            paramAnn.booleanValue("required").ifPresent(parameter::required);
-            paramAnn.booleanValue("deprecated").ifPresent(parameter::deprecated);
-            paramAnn.booleanValue("allowEmptyValue").ifPresent(parameter::allowEmptyValue);
-            paramAnn.booleanValue("allowReserved").ifPresent(parameter::allowReserved);
+            paramAnn.booleanValue("required").ifPresent(value -> {
+                if (value) {
+                    parameter.setRequired(true);
+                }
+            });
+            paramAnn.booleanValue("deprecated").ifPresent(value -> {
+                if (value) {
+                    parameter.setDeprecated(true);
+                }
+            });
+            paramAnn.booleanValue("allowEmptyValue").ifPresent(value -> {
+                if (value) {
+                    parameter.setAllowEmptyValue(true);
+                }
+            });
+            paramAnn.booleanValue("allowReserved").ifPresent(value -> {
+                if (value) {
+                    parameter.setAllowReserved(true);
+                }
+            });
             paramAnn.stringValue("example").ifPresent(parameter::example);
             paramAnn.stringValue("ref").ifPresent(parameter::$ref);
             paramAnn.enumValue("style", ParameterStyle.class).ifPresent(style -> parameter.setStyle(paramStyle(style)));
@@ -585,8 +601,8 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             newParameter.setName(parameter.getName());
         }
 
-        if (newParameter.getRequired() == null) {
-            newParameter.setRequired(!parameter.isNullable() && !parameter.getType().isOptional());
+        if (newParameter.getRequired() == null && !parameter.isNullable() && !parameter.getType().isOptional()) {
+            newParameter.setRequired(true);
         }
         if (javadocDescription != null && StringUtils.isEmpty(newParameter.getDescription())) {
             CharSequence desc = javadocDescription.getParameters().get(parameter.getName());
@@ -598,7 +614,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
 
         Schema schema = newParameter.getSchema();
         if (schema == null) {
-            schema = resolveSchema(openAPI, parameter, parameterType, context, consumesMediaTypes, null);
+            schema = resolveSchema(openAPI, parameter, parameterType, context, consumesMediaTypes, null, null);
         }
 
         if (schema != null) {
@@ -610,14 +626,11 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
     private void processBodyParameter(VisitorContext context, OpenAPI openAPI, JavadocDescription javadocDescription,
                                       MediaType mediaType, Schema schema, TypedElement parameter) {
         Schema propertySchema = resolveSchema(openAPI, parameter, parameter.getType(), context,
-                Collections.singletonList(mediaType), null);
+                Collections.singletonList(mediaType), null, null);
         if (propertySchema != null) {
 
-            Optional<String> description = parameter.getValue(io.swagger.v3.oas.annotations.Parameter.class,
-                    "description", String.class);
-            if (description.isPresent()) {
-                propertySchema.setDescription(description.get());
-            }
+            Optional<String> description = parameter.getValue(io.swagger.v3.oas.annotations.Parameter.class, "description", String.class);
+            description.ifPresent(propertySchema::setDescription);
             processSchemaProperty(context, parameter, parameter.getType(), null, schema, propertySchema);
             if (parameter.isNullable() || parameter.getType().isOptional()) {
                 // Keep null if not
@@ -820,7 +833,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                 if (existedMediaType.getExamples() == null) {
                     existedMediaType.setExamples(mediaType.getExamples());
                 }
-                if (existedMediaType.getExample() == null) {
+                if (existedMediaType.getExample() == null && mediaType.getExampleSetFlag()) {
                     existedMediaType.setExample(mediaType.getExample());
                 }
             }
@@ -980,10 +993,18 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                         }
                         swaggerParam.setName(paramAnn.name());
                         swaggerParam.setDescription(paramAnn.description());
-                        swaggerParam.setRequired(paramAnn.required());
-                        swaggerParam.setDeprecated(paramAnn.deprecated());
-                        swaggerParam.setAllowEmptyValue(paramAnn.allowEmptyValue());
-                        swaggerParam.setAllowReserved(paramAnn.allowReserved());
+                        if (paramAnn.required()) {
+                            swaggerParam.setRequired(true);
+                        }
+                        if (paramAnn.deprecated()) {
+                            swaggerParam.setDeprecated(true);
+                        }
+                        if (paramAnn.allowEmptyValue()) {
+                            swaggerParam.setAllowEmptyValue(true);
+                        }
+                        if (paramAnn.allowReserved()) {
+                            swaggerParam.setAllowReserved(true);
+                        }
                         swaggerParam.setExample(paramAnn.example());
                         swaggerParam.setStyle(paramStyle(paramAnn.style()));
                         swaggerParam.$ref(paramAnn.ref());
@@ -1321,7 +1342,8 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
     private void readTags(MethodElement element, VisitorContext context, io.swagger.v3.oas.models.Operation swaggerOperation, List<io.swagger.v3.oas.models.tags.Tag> classTags, OpenAPI openAPI) {
         element.getAnnotationValuesByType(Tag.class).forEach(av -> av.get("name", String.class).ifPresent(swaggerOperation::addTagsItem));
 
-        List<io.swagger.v3.oas.models.tags.Tag> operationTags = processOpenApiAnnotation(element, context, Tag.class, io.swagger.v3.oas.models.tags.Tag.class, openAPI.getTags());
+        List<io.swagger.v3.oas.models.tags.Tag> copyTags = openAPI.getTags() != null ? new ArrayList<>(openAPI.getTags()) : null;
+        List<io.swagger.v3.oas.models.tags.Tag> operationTags = processOpenApiAnnotation(element, context, Tag.class, io.swagger.v3.oas.models.tags.Tag.class, copyTags);
         // find not simple tags (tags with description or other information), such fields need to be described at the openAPI level.
         List<io.swagger.v3.oas.models.tags.Tag> complexTags = null;
         if (CollectionUtils.isNotEmpty(operationTags)) {
@@ -1338,17 +1360,17 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             if (CollectionUtils.isEmpty(openAPI.getTags())) {
                 openAPI.setTags(complexTags);
             } else {
-                for (io.swagger.v3.oas.models.tags.Tag operationTag : complexTags) {
+                for (io.swagger.v3.oas.models.tags.Tag complexTag : complexTags) {
                     // skip all existed tags
                     boolean alreadyExists = false;
                     for (io.swagger.v3.oas.models.tags.Tag apiTag : openAPI.getTags()) {
-                        if (apiTag.getName().equals(operationTag.getName())) {
+                        if (apiTag.getName().equals(complexTag.getName())) {
                             alreadyExists = true;
                             break;
                         }
                     }
                     if (!alreadyExists) {
-                        openAPI.getTags().add(operationTag);
+                        openAPI.getTags().add(complexTag);
                     }
                 }
             }
@@ -1367,14 +1389,16 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
     final List<io.swagger.v3.oas.models.tags.Tag> readTags(List<AnnotationValue<Tag>> annotations, VisitorContext context) {
         return annotations.stream()
                 .map(av -> toValue(av.getValues(), context, io.swagger.v3.oas.models.tags.Tag.class))
-                .filter(Optional::isPresent).map(Optional::get).collect(Collectors.toList());
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toList());
     }
 
     private Content buildContent(Element definingElement, ClassElement type, List<MediaType> mediaTypes, OpenAPI openAPI, VisitorContext context) {
         Content content = new Content();
         mediaTypes.forEach(mediaType -> {
             io.swagger.v3.oas.models.media.MediaType mt = new io.swagger.v3.oas.models.media.MediaType();
-            mt.setSchema(resolveSchema(openAPI, definingElement, type, context, Collections.singletonList(mediaType), null));
+            mt.setSchema(resolveSchema(openAPI, definingElement, type, context, Collections.singletonList(mediaType), null, null));
             content.addMediaType(mediaType.toString(), mt);
         });
         return content;
