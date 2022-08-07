@@ -29,7 +29,8 @@ import java.util.stream.Collectors;
 abstract class AbstractViewConfig {
 
     protected String prefix;
-    protected String version = "";
+    protected String jsUrl = "";
+    protected boolean isDefaultJsUrl = true;
     protected Map<String, Object> options = new HashMap<>();
 
     /**
@@ -84,7 +85,7 @@ abstract class AbstractViewConfig {
      * @return A View config.
      */
     static <T extends AbstractViewConfig> T fromProperties(T cfg, Map<String, Object> defaultOptions, Map<String, String> properties) {
-        cfg.version = properties.getOrDefault(cfg.prefix + "version", cfg.version);
+        cfg.jsUrl = properties.getOrDefault(cfg.prefix + "js.url", cfg.jsUrl);
         cfg.options.putAll(defaultOptions);
         properties.entrySet().stream().filter(entry -> entry.getKey().startsWith(cfg.prefix))
             .forEach(cfg::addAttribute);

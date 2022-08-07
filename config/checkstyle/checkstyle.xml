@@ -75,6 +75,10 @@
             <property name="message" value="Line has trailing spaces."/>
         </module> -->
 
+    <module name="io.spring.nohttp.checkstyle.check.NoHttpCheck">
+        <property name="allowlistFileName" value="${config_loc}/allowlist.lines"/>
+    </module>
+
     <!-- Be able to ignore violations with @SuppressWarnings -->
     <!-- See https://checkstyle.org/config_filters.html#SuppressWarningsFilter -->
     <module name="SuppressWarningsFilter"/>
@@ -209,6 +213,7 @@
         <module name="TodoComment">
             <property name="severity" value="warning"/>
         </module>
+
     </module>
 
 </module>

@@ -28,7 +28,7 @@ class OpenApiOperationViewParseSpec extends Specification {
 
     void "test parse OpenApiView specification, redoc enabled"() {
         given:
-        String spec = "redoc.enabled=true,redoc.version=version123"
+        String spec = "redoc.enabled=true,redoc.js.url=version123"
         OpenApiViewConfig cfg = OpenApiViewConfig.fromSpecification(spec, new Properties())
 
         expect:
@@ -37,12 +37,12 @@ class OpenApiOperationViewParseSpec extends Specification {
         cfg.rapidocConfig == null
         cfg.swaggerUIConfig == null
         cfg.redocConfig != null
-        cfg.redocConfig.version == "version123"
+        cfg.redocConfig.jsUrl == "version123"
     }
 
     void "test parse OpenApiView specification, rapidoc enabled"() {
         given:
-        String spec = "rapidoc.enabled=true,rapidoc.version=version123,rapidoc.layout=row,rapidoc.theme=light"
+        String spec = "rapidoc.enabled=true,rapidoc.js.url=version123,rapidoc.layout=row,rapidoc.theme=light"
         OpenApiViewConfig cfg = OpenApiViewConfig.fromSpecification(spec, new Properties())
 
         expect:
@@ -51,14 +51,14 @@ class OpenApiOperationViewParseSpec extends Specification {
         cfg.redocConfig == null
         cfg.swaggerUIConfig == null
         cfg.rapidocConfig != null
-        cfg.rapidocConfig.version == "version123"
+        cfg.rapidocConfig.jsUrl == "version123"
         cfg.rapidocConfig.options['theme'] == RapidocConfig.Theme.LIGHT
         cfg.rapidocConfig.options['layout'] == RapidocConfig.Layout.ROW
     }
 
     void "test parse OpenApiView specification, swagger-ui enabled"() {
         given:
-        String spec = "swagger-ui.enabled=true,swagger-ui.version=version123,swagger-ui.theme=flattop,swagger-ui.deepLinking=false"
+        String spec = "swagger-ui.enabled=true,swagger-ui.js.url=version123,swagger-ui.theme=flattop,swagger-ui.deepLinking=false"
         OpenApiViewConfig cfg = OpenApiViewConfig.fromSpecification(spec, new Properties())
 
         expect:
@@ -67,7 +67,7 @@ class OpenApiOperationViewParseSpec extends Specification {
         cfg.redocConfig == null
         cfg.rapidocConfig == null
         cfg.swaggerUIConfig != null
-        cfg.swaggerUIConfig.version == "version123"
+        cfg.swaggerUIConfig.jsUrl == "version123"
         cfg.swaggerUIConfig.theme == SwaggerUIConfig.Theme.FLATTOP
         cfg.swaggerUIConfig.options['deepLinking'] == false
     }
