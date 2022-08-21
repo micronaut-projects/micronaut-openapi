@@ -51,6 +51,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.fasterxml.jackson.annotation.JsonAnySetter;
+
 import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.MICRONAUT_OPENAPI_ENVIRONMENTS;
 import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.readOpenApiConfigFile;
 import static io.micronaut.openapi.visitor.Utils.DEFAULT_MEDIA_TYPES;
@@ -143,12 +145,14 @@ public class OpenApiControllerVisitor extends AbstractOpenApiEndpointVisitor imp
 
         AnnotationValue<Operation> operationAnn = element.getAnnotation(Operation.class);
         boolean isHidden = operationAnn != null && operationAnn.get("hidden", Boolean.class).orElse(false);
+        AnnotationValue<JsonAnySetter> jsonAnySetterAnn = element.getAnnotation(JsonAnySetter.class);
 
         return isHidden
             || ignore(element.getDeclaringType(), context)
             || element.isPrivate()
             || element.isStatic()
             || element.isAnnotationPresent(Hidden.class)
+            || (jsonAnySetterAnn != null && jsonAnySetterAnn.get("enabled", Boolean.class).orElse(true))
             || ignoreByRequires(element, context);
     }
 

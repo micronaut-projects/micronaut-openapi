@@ -121,6 +121,7 @@ import io.swagger.v3.oas.models.tags.Tag;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.reactivestreams.Publisher;
 
+import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
@@ -1886,8 +1887,10 @@ abstract class AbstractOpenApiVisitor {
 
         for (TypedElement publicField : publicFields) {
             boolean isHidden = publicField.getAnnotationMetadata().booleanValue(io.swagger.v3.oas.annotations.media.Schema.class, "hidden").orElse(false);
+            AnnotationValue<JsonAnySetter> jsonAnySetterAnn = publicField.getAnnotation(JsonAnySetter.class);
             if (publicField.isAnnotationPresent(JsonIgnore.class)
                 || publicField.isAnnotationPresent(Hidden.class)
+                || (jsonAnySetterAnn != null && jsonAnySetterAnn.get("enabled", Boolean.class).orElse(true))
                 || isHidden) {
                 continue;
             }
