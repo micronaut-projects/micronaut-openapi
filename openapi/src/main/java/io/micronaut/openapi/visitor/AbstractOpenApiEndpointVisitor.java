@@ -18,7 +18,6 @@ package io.micronaut.openapi.visitor;
 import java.io.IOException;
 import java.security.Principal;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -31,21 +30,15 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import io.micronaut.context.env.DefaultPropertyPlaceholderResolver;
-import io.micronaut.context.env.PropertyPlaceholderResolver;
 import io.micronaut.core.annotation.AnnotationValue;
 import io.micronaut.core.annotation.Experimental;
-import io.micronaut.core.annotation.NonNull;
 import io.micronaut.core.beans.BeanMap;
 import io.micronaut.core.bind.annotation.Bindable;
-import io.micronaut.core.convert.ArgumentConversionContext;
-import io.micronaut.core.convert.DefaultConversionService;
 import io.micronaut.core.naming.NameUtils;
 import io.micronaut.core.type.Argument;
 import io.micronaut.core.util.ArrayUtils;
 import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.core.util.StringUtils;
-import io.micronaut.core.value.PropertyResolver;
 import io.micronaut.http.HttpMethod;
 import io.micronaut.http.HttpRequest;
 import io.micronaut.http.HttpResponse;
@@ -121,7 +114,6 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
 
     protected List<io.swagger.v3.oas.models.tags.Tag> classTags;
     protected io.swagger.v3.oas.models.ExternalDocumentation classExternalDocs;
-    protected PropertyPlaceholderResolver propertyPlaceholderResolver;
 
     private static boolean isAnnotationPresent(Element element, String className) {
         return element.findAnnotation(className).isPresent();
@@ -147,7 +139,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         } else if (rq2.getContent() != null) {
             Content c1 = rq1.getContent();
             Content c2 = rq2.getContent();
-            c2.forEach((key, value) -> c1.putIfAbsent(key, value));
+            c2.forEach(c1::putIfAbsent);
         }
         return rq1;
     }
@@ -250,9 +242,10 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
      * Returns the uri paths of the element.
      *
      * @param element The MethodElement.
+     * @param context The context
      * @return The uri paths of the element.
      */
-    protected abstract List<UriMatchTemplate> uriMatchTemplates(MethodElement element);
+    protected abstract List<UriMatchTemplate> uriMatchTemplates(MethodElement element, VisitorContext context);
 
     /**
      * Returns the consumes media types.
@@ -304,7 +297,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         if (httpMethod == null) {
             return;
         }
-        List<UriMatchTemplate> matchTemplates = uriMatchTemplates(element);
+        List<UriMatchTemplate> matchTemplates = uriMatchTemplates(element, context);
         if (CollectionUtils.isEmpty(matchTemplates)) {
             return;
         }
@@ -1404,35 +1397,4 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         return content;
     }
 
-    /**
-     * @return An Instance of {@link PropertyPlaceholderResolver} to resolve placeholders.
-     */
-    PropertyPlaceholderResolver getPropertyPlaceholderResolver() {
-        if (this.propertyPlaceholderResolver == null) {
-            this.propertyPlaceholderResolver = new DefaultPropertyPlaceholderResolver(new PropertyResolver() {
-                @Override
-                public boolean containsProperty(@NonNull String name) {
-                    return false;
-                }
-
-                @Override
-                public boolean containsProperties(@NonNull String name) {
-                    return false;
-                }
-
-                @NonNull
-                @Override
-                public <T> Optional<T> getProperty(@NonNull String name, @NonNull ArgumentConversionContext<T> conversionContext) {
-                    return Optional.empty();
-                }
-
-                @NonNull
-                @Override
-                public Collection<String> getPropertyEntries(@NonNull String name) {
-                    return null;
-                }
-            }, new DefaultConversionService());
-        }
-        return this.propertyPlaceholderResolver;
-    }
 }

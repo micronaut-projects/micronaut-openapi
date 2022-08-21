@@ -29,7 +29,7 @@ import static io.swagger.v3.oas.models.Components.COMPONENTS_SCHEMAS_REF;
 /**
  * Some schema util methods.
  *
- * @since 4.4.4
+ * @since 4.5.0
  */
 public final class SchemaUtils {
 

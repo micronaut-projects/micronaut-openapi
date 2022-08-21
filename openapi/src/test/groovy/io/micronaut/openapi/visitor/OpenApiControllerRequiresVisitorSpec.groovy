@@ -1,5 +1,6 @@
 package io.micronaut.openapi.visitor
 
+import io.micronaut.context.env.Environment
 import io.micronaut.openapi.AbstractOpenApiTypeElementSpec
 import io.swagger.v3.oas.models.Paths
 
@@ -8,7 +9,7 @@ class OpenApiControllerRequiresVisitorSpec extends AbstractOpenApiTypeElementSpe
     void "test requires env for controller"() {
 
         given:
-        System.setProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_ENVIRONMENTS, "env1,env2")
+        System.setProperty(Environment.ENVIRONMENTS_PROPERTY, "env1,env2")
 
         buildBeanDefinition('test.MyBean', '''
 package test;
@@ -55,26 +56,21 @@ class MyBean {}
         paths."/c2"
 
         cleanup:
-        System.clearProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_ENVIRONMENTS)
+        System.clearProperty(Environment.ENVIRONMENTS_PROPERTY)
     }
 
     void "test requires not env for controller"() {
 
         given:
-        System.setProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_ENVIRONMENTS, "env1,env2")
+        System.setProperty(Environment.ENVIRONMENTS_PROPERTY, "env1,env2")
 
         buildBeanDefinition('test.MyBean', '''
 package test;
 
-import io.micronaut.context.annotation.Parameter;
-import io.micronaut.context.annotation.Requires;import io.swagger.v3.oas.annotations.*;
-import io.swagger.v3.oas.annotations.media.*;
-import io.swagger.v3.oas.annotations.enums.*;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import io.micronaut.http.annotation.*;
-import io.micronaut.http.*;
-import java.util.List;
+import io.micronaut.context.annotation.Requires;
+import io.micronaut.http.HttpResponse;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Post;
 
 @Requires(notEnv="env3")
 @Controller
@@ -108,13 +104,13 @@ class MyBean {}
         paths."/c1"
 
         cleanup:
-        System.clearProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_ENVIRONMENTS)
+        System.clearProperty(Environment.ENVIRONMENTS_PROPERTY)
     }
 
     void "test requires not env and env for controller"() {
 
         given:
-        System.setProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_ENVIRONMENTS, "env1,env2")
+        System.setProperty(Environment.ENVIRONMENTS_PROPERTY, "env1,env2")
 
         buildBeanDefinition('test.MyBean', '''
 package test;
@@ -161,13 +157,13 @@ class MyBean {}
         paths."/c1"
 
         cleanup:
-        System.clearProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_ENVIRONMENTS)
+        System.clearProperty(Environment.ENVIRONMENTS_PROPERTY)
     }
 
     void "test requires multiple env for controller"() {
 
         given:
-        System.setProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_ENVIRONMENTS, "env1,env2")
+        System.setProperty(Environment.ENVIRONMENTS_PROPERTY, "env1,env2")
 
         buildBeanDefinition('test.MyBean', '''
 package test;
@@ -225,13 +221,13 @@ class MyBean {}
         paths."/c2"
 
         cleanup:
-        System.clearProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_ENVIRONMENTS)
+        System.clearProperty(Environment.ENVIRONMENTS_PROPERTY)
     }
 
     void "test requires multiple notenv for controller"() {
 
         given:
-        System.setProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_ENVIRONMENTS, "env1,env2")
+        System.setProperty(Environment.ENVIRONMENTS_PROPERTY, "env1,env2")
 
         buildBeanDefinition('test.MyBean', '''
 package test;
@@ -278,13 +274,13 @@ class MyBean {}
         paths."/c2"
 
         cleanup:
-        System.clearProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_ENVIRONMENTS)
+        System.clearProperty(Environment.ENVIRONMENTS_PROPERTY)
     }
 
     void "test requires multiple annotations with env for controller"() {
 
         given:
-        System.setProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_ENVIRONMENTS, "env1,env2")
+        System.setProperty(Environment.ENVIRONMENTS_PROPERTY, "env1,env2")
 
         buildBeanDefinition('test.MyBean', '''
 package test;
@@ -345,6 +341,6 @@ class MyBean {}
         paths."/c2"
 
         cleanup:
-        System.clearProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_ENVIRONMENTS)
+        System.clearProperty(Environment.ENVIRONMENTS_PROPERTY)
     }
 }

@@ -24,7 +24,13 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.Future;
 
+import io.micronaut.context.env.DefaultPropertyPlaceholderResolver;
+import io.micronaut.context.env.PropertyPlaceholderResolver;
+import io.micronaut.core.annotation.NonNull;
+import io.micronaut.core.convert.ArgumentConversionContext;
+import io.micronaut.core.convert.DefaultConversionService;
 import io.micronaut.core.util.CollectionUtils;
+import io.micronaut.core.value.PropertyResolver;
 import io.micronaut.http.MediaType;
 import io.micronaut.http.server.types.files.FileCustomizableResponseType;
 import io.micronaut.inject.ast.ClassElement;
@@ -48,6 +54,7 @@ public final class Utils {
 
     public static final List<MediaType> DEFAULT_MEDIA_TYPES = Collections.singletonList(MediaType.APPLICATION_JSON_TYPE);
 
+    private static PropertyPlaceholderResolver propertyPlaceholderResolver;
     private static OpenAPI testReference;
     private static OpenAPI testReferenceAfterPlaceholders;
     private static String testYamlReference;
@@ -56,6 +63,32 @@ public final class Utils {
     private static JavadocParser javadocParser = new JavadocParser();
 
     private Utils() {
+    }
+
+    /**
+     * @return An Instance of sdefault {@link PropertyPlaceholderResolver} to resolve placeholders.
+     */
+    public static PropertyPlaceholderResolver getPropertyPlaceholderResolver() {
+        if (propertyPlaceholderResolver == null) {
+            propertyPlaceholderResolver = new DefaultPropertyPlaceholderResolver(new PropertyResolver() {
+                @Override
+                public boolean containsProperty(@NonNull String name) {
+                    return false;
+                }
+
+                @Override
+                public boolean containsProperties(@NonNull String name) {
+                    return false;
+                }
+
+                @NonNull
+                @Override
+                public <T> Optional<T> getProperty(@NonNull String name, @NonNull ArgumentConversionContext<T> conversionContext) {
+                    return Optional.empty();
+                }
+            }, new DefaultConversionService());
+        }
+        return propertyPlaceholderResolver;
     }
 
     public static boolean isContainerType(ClassElement type) {
@@ -86,21 +119,21 @@ public final class Utils {
      *
      * @param paramValues The values
      * @param enumTypes The enum types.
+     * @param <T> enum class
      */
-    public static void normalizeEnumValues(Map<CharSequence, Object> paramValues, Map<String, Class<? extends Enum>> enumTypes) {
-        for (Map.Entry<String, Class<? extends Enum>> entry : enumTypes.entrySet()) {
+    public static <T extends Enum<T>> void normalizeEnumValues(Map<CharSequence, Object> paramValues, Map<String, Class<T>> enumTypes) {
+        for (Map.Entry<String, Class<T>> entry : enumTypes.entrySet()) {
             final String name = entry.getKey();
-            final Class<? extends Enum> enumType = entry.getValue();
+            final Class<T> enumType = entry.getValue();
             Object in = paramValues.get(name);
             if (in != null) {
                 try {
-                    final Enum enumInstance = Enum.valueOf(enumType, in.toString());
+                    final Enum<T> enumInstance = Enum.valueOf(enumType, in.toString());
                     paramValues.put(name, enumInstance.toString());
                 } catch (Exception e) {
                     // ignore
                 }
             }
-
         }
     }
 

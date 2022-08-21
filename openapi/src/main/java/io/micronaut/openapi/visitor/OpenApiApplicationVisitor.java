@@ -15,13 +15,42 @@
  */
 package io.micronaut.openapi.visitor;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.PropertyNamingStrategies;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.node.TextNode;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.StringWriter;
+import java.io.Writer;
+import java.net.URI;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.util.AbstractMap;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Properties;
+import java.util.TreeMap;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
+import java.util.function.UnaryOperator;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import javax.annotation.processing.SupportedOptions;
+
+import io.micronaut.context.ApplicationContextConfiguration;
+import io.micronaut.context.DefaultApplicationContextBuilder;
+import io.micronaut.context.env.DefaultEnvironment;
 import io.micronaut.context.env.Environment;
 import io.micronaut.core.annotation.Experimental;
+import io.micronaut.core.annotation.NonNull;
+import io.micronaut.core.annotation.Nullable;
 import io.micronaut.core.type.Argument;
 import io.micronaut.core.type.GenericArgument;
 import io.micronaut.core.util.CollectionUtils;
@@ -48,19 +77,11 @@ import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 
-import javax.annotation.processing.SupportedOptions;
-
-import java.io.IOException;
-import java.io.Reader;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.net.URI;
-import java.nio.file.*;
-import java.util.*;
-import java.util.function.BiConsumer;
-import java.util.function.Function;
-import java.util.function.UnaryOperator;
-import java.util.stream.Collectors;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.TextNode;
 
 /**
  * Visits the application class.
@@ -75,6 +96,7 @@ import java.util.stream.Collectors;
     OpenApiApplicationVisitor.MICRONAUT_OPENAPI_VIEWS_SPEC,
     OpenApiApplicationVisitor.MICRONAUT_OPENAPI_JSON_FORMAT,
     OpenApiApplicationVisitor.MICRONAUT_OPENAPI_ENVIRONMENTS,
+    OpenApiApplicationVisitor.MICRONAUT_ENVIRONMENT_ENABLED,
     OpenApiApplicationVisitor.MICRONAUT_OPENAPI_TARGET_FILE,
     OpenApiApplicationVisitor.MICRONAUT_OPENAPI_ADDITIONAL_FILES,
     OpenApiApplicationVisitor.MICRONAUT_OPENAPI_CONFIG_FILE,
@@ -133,11 +155,23 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
      * Active micronaut environments which will be used for @Requires annotations.
      */
     public static final String MICRONAUT_OPENAPI_ENVIRONMENTS = "micronaut.openapi.environments";
+    /**
+     * Is this property true, properties wll be loaded in the standard way from application.yml.
+     * Also, environments from "micronaut.openapi.environments" property will set as additional environments,
+     * if you want to set specific environment name for openAPI generator.
+     * <br>
+     * Default value is "true".
+     */
+    public static final String MICRONAUT_ENVIRONMENT_ENABLED = "micronaut.environment.enabled";
 
+    /**
+     * Loaded micronaut environment.
+     */
+    private static final String MICRONAUT_ENVIRONMENT = "micronaut.environment";
     private static final String MICRONAUT_OPENAPI_PROPERTIES = "micronaut.openapi.properties";
     private static final String MICRONAUT_OPENAPI_ENDPOINTS = "micronaut.openapi.endpoints";
     /**
-     * Loaded expandable properties. Need to save them to reuse in diffferent places
+     * Loaded expandable properties. Need to save them to reuse in diffferent places.
      */
     private static final String MICRONAUT_INTERNAL_EXPANDBLE_PROPERTIES = "micronaut.internal.expandable.props";
     /**
@@ -201,11 +235,73 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             Utils.resolveOpenAPI(context);
         }
 
-        this.classElement = element;
+        classElement = element;
     }
 
-    private String getConfigurationProperty(String key, VisitorContext context) {
-        return System.getProperty(key, readOpenApiConfigFile(context).getProperty(key));
+    public static String getConfigurationProperty(String key, VisitorContext context) {
+        Environment environment = getEnvironment(context);
+        Properties propsFromFile = readOpenApiConfigFile(context);
+        String value = propsFromFile.getProperty(key);
+        return value != null ? value : environment != null ? environment.get(key, String.class).orElse(null) : null;
+    }
+
+    @Nullable
+    public static Environment getEnvironment(VisitorContext context) {
+        String isEnabledStr = System.getProperty(MICRONAUT_ENVIRONMENT_ENABLED, readOpenApiConfigFile(context).getProperty(MICRONAUT_ENVIRONMENT_ENABLED));
+        boolean isEnabled = true;
+        if (StringUtils.isNotEmpty(isEnabledStr)) {
+            isEnabled = Boolean.parseBoolean(isEnabledStr);
+        }
+        if (!isEnabled) {
+            return null;
+        }
+        Environment existedEnvironment = context.get(MICRONAUT_ENVIRONMENT, Environment.class).orElse(null);
+        if (existedEnvironment != null) {
+            return existedEnvironment;
+        }
+
+        Environment environment = createEnv(context);
+        context.put(MICRONAUT_ENVIRONMENT, environment);
+
+        return environment;
+    }
+
+    public static List<String> getActiveEnvs(VisitorContext context) {
+        String activeEnvStr = System.getProperty(MICRONAUT_OPENAPI_ENVIRONMENTS, readOpenApiConfigFile(context).getProperty(MICRONAUT_OPENAPI_ENVIRONMENTS));
+        List<String> activeEnvs;
+        if (StringUtils.isNotEmpty(activeEnvStr)) {
+            activeEnvs = Stream.of(activeEnvStr)
+                .filter(StringUtils::isNotEmpty)
+                .flatMap(s -> Arrays.stream(s.split(",")))
+                .map(String::trim)
+                .collect(Collectors.toList());
+        } else {
+            activeEnvs = new ArrayList<>();
+        }
+        return activeEnvs;
+    }
+
+    private static Environment createEnv(VisitorContext context) {
+
+        ApplicationContextConfiguration configuration = new ApplicationContextConfiguration() {
+            @Override
+            @NonNull
+            public List<String> getEnvironments() {
+                return getActiveEnvs(context);
+            }
+        };
+
+        Environment environment = new DefaultEnvironment(configuration);
+        environment.start();
+        return environment;
+    }
+
+    private ClassLoader resolveClassLoader() {
+        final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+        if (contextClassLoader != null) {
+            return contextClassLoader;
+        }
+        return DefaultApplicationContextBuilder.class.getClassLoader();
     }
 
     /**
@@ -485,14 +581,17 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         }
     }
 
-    public static String expandProperties(String s, List<Map.Entry<String, String>> properties) {
-        if (StringUtils.isEmpty(s) || CollectionUtils.isEmpty(properties)) {
+    public static String expandProperties(String s, List<Map.Entry<String, String>> properties, VisitorContext context) {
+        if (StringUtils.isEmpty(s)) {
             return s;
         }
-        for (Map.Entry<String, String> entry : properties) {
-            s = s.replace(entry.getKey(), entry.getValue());
+        if (CollectionUtils.isNotEmpty(properties)) {
+            for (Map.Entry<String, String> entry : properties) {
+                s = s.replace(entry.getKey(), entry.getValue());
+            }
         }
-        return s;
+        Environment environment = getEnvironment(context);
+        return environment != null ? environment.getPlaceholderResolver().resolvePlaceholders(s).orElse(s) : s;
     }
 
     public static List<Map.Entry<String, String>> getExpandableProperties(VisitorContext context) {
@@ -521,7 +620,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             return openAPI;
         }
         visitorContext.info("Expanding properties: " + expandableProperties);
-        JsonNode root = resolvePlaceholders(Yaml.mapper().convertValue(openAPI, ObjectNode.class), s -> expandProperties(s, expandableProperties));
+        JsonNode root = resolvePlaceholders(Yaml.mapper().convertValue(openAPI, ObjectNode.class), s -> expandProperties(s, expandableProperties, visitorContext));
         return Yaml.mapper().convertValue(root, OpenAPI.class);
     }
 

@@ -140,8 +140,7 @@ public class OpenApiEndpointVisitor extends AbstractOpenApiEndpointVisitor imple
         if (!enabled) {
             return true;
         }
-        boolean endpoint = element.isAnnotationPresent(Endpoint.class);
-        if (endpoint) {
+        if (element.isAnnotationPresent(Endpoint.class)) {
             AnnotationValue<Endpoint> ann = element.getAnnotation(Endpoint.class);
             id = path + ann.stringValue("id").orElse(NameUtils.hyphenate(element.getSimpleName()));
             if (id.charAt(0) != '/') {
@@ -176,7 +175,7 @@ public class OpenApiEndpointVisitor extends AbstractOpenApiEndpointVisitor imple
     }
 
     @Override
-    protected List<UriMatchTemplate> uriMatchTemplates(MethodElement element) {
+    protected List<UriMatchTemplate> uriMatchTemplates(MethodElement element, VisitorContext context) {
         UriMatchTemplate uriTemplate = UriMatchTemplate.of(id);
         for (ParameterElement param : element.getParameters()) {
             if (param.hasAnnotation(Selector.class)) {
@@ -203,7 +202,7 @@ public class OpenApiEndpointVisitor extends AbstractOpenApiEndpointVisitor imple
 
     @Override
     protected List<Tag> classTags(ClassElement element, VisitorContext context) {
-        List<Tag> allTags = new ArrayList<>(this.tags);
+        List<Tag> allTags = new ArrayList<>(tags);
         allTags.addAll(context.get(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_ENDPOINT_CLASS_TAGS, List.class,
                 Collections.emptyList()));
         return allTags;
