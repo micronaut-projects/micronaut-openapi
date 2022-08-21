@@ -17,6 +17,8 @@ package io.micronaut.openapi.visitor;
 
 import java.io.IOException;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -76,6 +78,7 @@ import io.micronaut.inject.ast.EnumConstantElement;
 import io.micronaut.inject.ast.EnumElement;
 import io.micronaut.inject.ast.FieldElement;
 import io.micronaut.inject.ast.MemberElement;
+import io.micronaut.inject.ast.MethodElement;
 import io.micronaut.inject.ast.PropertyElement;
 import io.micronaut.inject.ast.TypedElement;
 import io.micronaut.inject.visitor.VisitorContext;
@@ -121,6 +124,7 @@ import org.reactivestreams.Publisher;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
+import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
@@ -1735,14 +1739,38 @@ abstract class AbstractOpenApiVisitor {
     }
 
     private List<Object> getEnumValues(EnumElement type, String schemaType, VisitorContext context) {
+
+        // find @JsonValue method
+        List<MethodElement> jsonValueMethods = type.getEnclosedElements(ElementQuery.of(MethodElement.class)
+            .annotated(am -> am.hasStereotype(JsonValue.class)));
+        Class<? extends Enum> enumClass = null;
+        Method jsonValueJavaMethod = null;
+        if (CollectionUtils.isNotEmpty(jsonValueMethods)) {
+            try {
+                enumClass = (Class<? extends Enum>) Class.forName(type.getName());
+                jsonValueJavaMethod = ReflectionUtils.findMethod(enumClass, jsonValueMethods.get(0).getName()).orElse(null);
+            } catch (ClassNotFoundException e) {
+                context.warn("Can't find enum class " + type.getName(), type);
+            }
+        }
+
         List<Object> enumValues = new ArrayList<>();
         for (EnumConstantElement element : type.elements()) {
             AnnotationValue<JsonProperty> jsonProperty = element.getAnnotation(JsonProperty.class);
             String jacksonValue = jsonProperty != null ? jsonProperty.get("value", String.class).get() : null;
+            boolean valueFromJsonValue = false;
+            if (!StringUtils.hasText(jacksonValue) && jsonValueJavaMethod != null) {
+                try {
+                    enumValues.add(jsonValueJavaMethod.invoke(Enum.valueOf(enumClass, element.getName())));
+                    valueFromJsonValue = true;
+                } catch (IllegalAccessException | InvocationTargetException e) {
+                    context.warn("Can't invoke JsonValue-method " + jsonValueJavaMethod.getName() + ": " + e.getMessage(), element);
+                }
+            }
             try {
                 if (StringUtils.hasText(jacksonValue)) {
                     enumValues.add(ConvertUtils.normalizeValue(jacksonValue, schemaType));
-                } else {
+                } else if (!valueFromJsonValue) {
                     enumValues.add(element.getSimpleName());
                 }
             } catch (JsonProcessingException e) {
