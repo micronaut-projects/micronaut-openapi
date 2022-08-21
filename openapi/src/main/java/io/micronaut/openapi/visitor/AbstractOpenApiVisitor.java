@@ -740,10 +740,18 @@ abstract class AbstractOpenApiVisitor {
             schemaAnnotationValue = type.getAnnotation(io.swagger.v3.oas.annotations.media.Schema.class);
         }
         if (schemaAnnotationValue != null) {
-            type = schemaAnnotationValue
-                    .stringValue("implementation")
-                    .flatMap(context::getClassElement)
-                    .orElse(type);
+            String impl = schemaAnnotationValue.stringValue("implementation").orElse(null);
+            if (StringUtils.isNotEmpty(impl)) {
+                type = context.getClassElement(impl).orElse(type);
+            } else {
+                String schemaType = schemaAnnotationValue.stringValue("type").orElse(null);
+                if (StringUtils.isNotEmpty(schemaType) && !(type instanceof EnumElement)) {
+                    PrimitiveType primitiveType = PrimitiveType.fromName(schemaType);
+                    if (primitiveType != null && primitiveType != PrimitiveType.OBJECT) {
+                        type = context.getClassElement(primitiveType.getKeyClass()).orElse(type);
+                    }
+                }
+            }
         }
 
         if (type instanceof EnumElement) {

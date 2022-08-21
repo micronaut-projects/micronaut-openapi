@@ -15,6 +15,8 @@
  */
 package io.micronaut.openapi.visitor;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -27,6 +29,7 @@ import io.micronaut.core.beans.BeanMap;
 import io.micronaut.core.util.ArrayUtils;
 import io.swagger.v3.core.util.Json;
 import io.swagger.v3.core.util.ObjectMapperFactory;
+import io.swagger.v3.core.util.PrimitiveType;
 import io.swagger.v3.core.util.Yaml;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 
@@ -135,14 +138,23 @@ public final class ConvertUtils {
         if (type == null || type.equals("object")) {
             return convertJsonMapper.readValue(valueStr, Map.class);
         }
-        switch (type) {
-            case "integer":
+        PrimitiveType primitiveType = PrimitiveType.fromName(type);
+        switch (primitiveType) {
+            case INT:
+                return Integer.parseInt(valueStr);
+            case LONG:
                 return Long.parseLong(valueStr);
-            case "boolean":
-                return Boolean.parseBoolean(valueStr);
-            case "number":
+            case FLOAT:
+                return Float.parseFloat(valueStr);
+            case DOUBLE:
                 return Double.parseDouble(valueStr);
-            case "string":
+            case DECIMAL:
+            case NUMBER:
+                return new BigDecimal(valueStr);
+            case INTEGER:
+                return new BigInteger(valueStr);
+            case BOOLEAN:
+                return Boolean.parseBoolean(valueStr);
             default:
                 return valueStr;
         }
