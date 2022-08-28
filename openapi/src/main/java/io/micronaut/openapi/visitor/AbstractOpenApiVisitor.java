@@ -1631,7 +1631,9 @@ abstract class AbstractOpenApiVisitor {
             setSchemaDocumentation(type, schema);
             Schema schemaRef = new Schema();
             schemaRef.set$ref(SchemaUtils.schemaRef(schema.getName()));
-            schemaRef.setDescription(schema.getDescription());
+            if (definingElement instanceof ClassElement && ((ClassElement) definingElement).isIterable()) {
+                schemaRef.setDescription(schema.getDescription());
+            }
             return schemaRef;
         }
         return null;

@@ -240,4 +240,89 @@ class MyBean {}
         schema.enum.get(0) == 1
         schema.enum.get(1) == 2
     }
+
+    void "test build OpenAPI enum Schema annotation"() {
+
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.core.annotation.Introspected;import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.micronaut.validation.Validated;import io.swagger.v3.oas.annotations.media.Schema;
+
+@Controller
+class OpenApiController {
+
+    @Get("/{myEnum}")
+    public void postRaw(MyEnum myEnum) {
+    }
+}
+
+@Schema(implementation = MyEnum.class,
+defaultValue = "AWS",
+example = "AWS",
+description = "Cloud Provider." +
+    "\\n- AWS" +
+    "<br />Amazon Web Services. " +
+    "\\n- AZURE" +
+    "<br />Microsoft Azure cloud." +
+    "\\n- GCP" +
+    "<br />Google Cloud Platform." +
+    "\\n- NA" +
+    "<br />Not applicable (Self hosting site)."
+)
+@Validated
+@Introspected
+enum MyEnum  {
+
+    AWS("Amazon Web Services"),
+    AZURE("Microsoft Azure"),
+    GCP("Google Cloud Platform"),
+    NA("Not applicable");
+
+    private String cloudProvider;
+
+    MyEnum(String cloudProvider) {
+        this.cloudProvider = cloudProvider;
+    }
+
+    public String getCloudProvider() {
+        return cloudProvider;
+    }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        then: "the state is correct"
+        Utils.testReference != null
+
+        when: "The OpenAPI is retrieved"
+        OpenAPI openAPI = Utils.testReference
+        Schema schema = openAPI.components.schemas['MyEnum']
+        Operation operation = openAPI.paths."/{myEnum}".get
+
+        then: "the components are valid"
+
+        schema
+        operation
+        schema.default == 'AWS'
+        schema.example == 'AWS'
+        schema.enum
+        schema.enum.size() == 4
+        schema.enum.get(0) == 'AWS'
+        schema.enum.get(1) == 'AZURE'
+        schema.enum.get(2) == 'GCP'
+        schema.enum.get(3) == 'NA'
+        schema.description == "Cloud Provider." +
+                "\n- AWS" +
+                "<br />Amazon Web Services. " +
+                "\n- AZURE" +
+                "<br />Microsoft Azure cloud." +
+                "\n- GCP" +
+                "<br />Google Cloud Platform." +
+                "\n- NA" +
+                "<br />Not applicable (Self hosting site)."
+    }
 }

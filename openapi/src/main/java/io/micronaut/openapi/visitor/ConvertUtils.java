@@ -135,28 +135,32 @@ public final class ConvertUtils {
         if (valueStr == null) {
             return null;
         }
-        if (type == null || type.equals("object")) {
-            return convertJsonMapper.readValue(valueStr, Map.class);
-        }
-        PrimitiveType primitiveType = PrimitiveType.fromName(type);
-        switch (primitiveType) {
-            case INT:
-                return Integer.parseInt(valueStr);
-            case LONG:
-                return Long.parseLong(valueStr);
-            case FLOAT:
-                return Float.parseFloat(valueStr);
-            case DOUBLE:
-                return Double.parseDouble(valueStr);
-            case DECIMAL:
-            case NUMBER:
-                return new BigDecimal(valueStr);
-            case INTEGER:
-                return new BigInteger(valueStr);
-            case BOOLEAN:
-                return Boolean.parseBoolean(valueStr);
-            default:
-                return valueStr;
+        try {
+            if (type == null || type.equals("object")) {
+                return convertJsonMapper.readValue(valueStr, Map.class);
+            }
+            PrimitiveType primitiveType = PrimitiveType.fromName(type);
+            switch (primitiveType) {
+                case INT:
+                    return Integer.parseInt(valueStr);
+                case LONG:
+                    return Long.parseLong(valueStr);
+                case FLOAT:
+                    return Float.parseFloat(valueStr);
+                case DOUBLE:
+                    return Double.parseDouble(valueStr);
+                case DECIMAL:
+                case NUMBER:
+                    return new BigDecimal(valueStr);
+                case INTEGER:
+                    return new BigInteger(valueStr);
+                case BOOLEAN:
+                    return Boolean.parseBoolean(valueStr);
+                default:
+                    return valueStr;
+            }
+        } catch (Throwable t) {
+            return valueStr;
         }
     }
 
