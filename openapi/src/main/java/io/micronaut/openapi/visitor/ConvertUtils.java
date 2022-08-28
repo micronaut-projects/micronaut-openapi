@@ -15,6 +15,7 @@
  */
 package io.micronaut.openapi.visitor;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -26,7 +27,6 @@ import java.util.Optional;
 
 import io.micronaut.core.annotation.AnnotationValue;
 import io.micronaut.core.beans.BeanMap;
-import io.micronaut.core.util.ArrayUtils;
 import io.swagger.v3.core.util.Json;
 import io.swagger.v3.core.util.ObjectMapperFactory;
 import io.swagger.v3.core.util.PrimitiveType;
@@ -94,7 +94,13 @@ public final class ConvertUtils {
         JsonNode defaultValueNode = jn.get("defaultValue");
         JsonNode allowableValuesNode = jn.get("allowableValues");
         // fix for default value
-        Object defaultValue = convertJsonNodeValue(defaultValueNode, elType);
+        Object defaultValue;
+        try {
+            defaultValue = ConvertUtils.normalizeValue(defaultValueNode != null ? defaultValueNode.textValue() : null, elType);
+        } catch (JsonProcessingException e) {
+            defaultValue = defaultValueNode != null ? defaultValueNode.textValue() : null;
+        }
+
         BeanMap<T> beanMap = BeanMap.of(value);
         if (defaultValue != null) {
             beanMap.put("default", defaultValue);
@@ -102,7 +108,14 @@ public final class ConvertUtils {
         if (allowableValuesNode != null && allowableValuesNode.isArray()) {
             List<Object> allowableValues = new ArrayList<>(allowableValuesNode.size());
             for (JsonNode allowableValueNode : allowableValuesNode) {
-                allowableValues.add(convertJsonNodeValue(allowableValueNode, elType));
+                if (allowableValueNode == null) {
+                    continue;
+                }
+                try {
+                    allowableValues.add(ConvertUtils.normalizeValue(allowableValueNode.textValue(), elType));
+                } catch (IOException e) {
+                    allowableValues.add(allowableValueNode.textValue());
+                }
             }
             beanMap.put("allowableValues", allowableValues);
         }
@@ -117,50 +130,32 @@ public final class ConvertUtils {
         return normalizeValue(node.textValue(), type);
     }
 
-    public static List<Object> normalizeValues(String[] valuesStr, String type) throws JsonProcessingException {
-        if (ArrayUtils.isEmpty(valuesStr)) {
-            return null;
-        }
-        List<Object> values = new ArrayList<>(valuesStr.length);
-        for (String valueStr : valuesStr) {
-            Object normalizedValue = normalizeValue(valueStr, type);
-            if (normalizedValue != null) {
-                values.add(normalizeValue(valueStr, type));
-            }
-        }
-        return values;
-    }
-
     public static Object normalizeValue(String valueStr, String type) throws JsonProcessingException {
         if (valueStr == null) {
             return null;
         }
-        try {
-            if (type == null || type.equals("object")) {
-                return convertJsonMapper.readValue(valueStr, Map.class);
-            }
-            PrimitiveType primitiveType = PrimitiveType.fromName(type);
-            switch (primitiveType) {
-                case INT:
-                    return Integer.parseInt(valueStr);
-                case LONG:
-                    return Long.parseLong(valueStr);
-                case FLOAT:
-                    return Float.parseFloat(valueStr);
-                case DOUBLE:
-                    return Double.parseDouble(valueStr);
-                case DECIMAL:
-                case NUMBER:
-                    return new BigDecimal(valueStr);
-                case INTEGER:
-                    return new BigInteger(valueStr);
-                case BOOLEAN:
-                    return Boolean.parseBoolean(valueStr);
-                default:
-                    return valueStr;
-            }
-        } catch (Throwable t) {
-            return valueStr;
+        if (type == null || type.equals("object")) {
+            return convertJsonMapper.readValue(valueStr, Map.class);
+        }
+        PrimitiveType primitiveType = PrimitiveType.fromName(type);
+        switch (primitiveType) {
+            case INT:
+                return Integer.parseInt(valueStr);
+            case LONG:
+                return Long.parseLong(valueStr);
+            case FLOAT:
+                return Float.parseFloat(valueStr);
+            case DOUBLE:
+                return Double.parseDouble(valueStr);
+            case DECIMAL:
+            case NUMBER:
+                return new BigDecimal(valueStr);
+            case INTEGER:
+                return new BigInteger(valueStr);
+            case BOOLEAN:
+                return Boolean.parseBoolean(valueStr);
+            default:
+                return valueStr;
         }
     }
 

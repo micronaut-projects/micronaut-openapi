@@ -201,46 +201,6 @@ class MyBean {}
         schema.enum.get(1) == 2
     }
 
-    void "test build OpenAPI custom enum with @JsonValue"() {
-
-        when:
-        buildBeanDefinition('test.MyBean', '''
-package test;
-
-import io.micronaut.http.annotation.Controller;
-import io.micronaut.http.annotation.Get;
-import io.micronaut.openapi.MyEnumForJsonValue;
-
-@Controller
-class OpenApiController {
-
-    @Get("/{myEnum}")
-    public void postRaw(MyEnumForJsonValue myEnum) {
-    }
-}
-
-@jakarta.inject.Singleton
-class MyBean {}
-''')
-        then: "the state is correct"
-        Utils.testReference != null
-
-        when: "The OpenAPI is retrieved"
-        OpenAPI openAPI = Utils.testReference
-        Schema schema = openAPI.components.schemas['MyEnumForJsonValue']
-        Operation operation = openAPI.paths."/{myEnum}".get
-
-        then: "the components are valid"
-
-        schema
-        operation
-        schema.default == 1
-        schema.enum
-        schema.enum.size() == 2
-        schema.enum.get(0) == 1
-        schema.enum.get(1) == 2
-    }
-
     void "test build OpenAPI enum Schema annotation"() {
 
         when:
