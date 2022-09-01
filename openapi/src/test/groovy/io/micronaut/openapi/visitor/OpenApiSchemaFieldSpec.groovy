@@ -859,4 +859,77 @@ class MyBean {}
         localParamsSchema.allOf.get(1).properties.stampWidth.type == 'integer'
         localParamsSchema.allOf.get(1).properties.stampWidth.format == 'int32'
     }
+
+    void "test schema on property level with type"() {
+        when:
+        buildBeanDefinition('test.MyBean', '''
+
+package test;
+
+import java.time.ZoneId;
+
+import io.micronaut.http.annotation.Body;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Post;
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.info.Contact;
+import io.swagger.v3.oas.annotations.info.Info;
+import io.swagger.v3.oas.annotations.info.License;
+import io.swagger.v3.oas.annotations.media.Schema;
+
+@OpenAPIDefinition(
+        info = @Info(
+                title = "Hello World",
+                version = "42",
+                description = "This is it. The answer to life , the universe and everyting",
+                license = @License(name = "Apache 2.0", url = "https://foo.bar"),
+                contact = @Contact(url = "https://gigantic-server.com", name = "Fred", email = "Fred@gigagantic-server.com")
+        )
+)
+@Controller("/exemplars")
+class StampSyncController {
+    @Post
+    Exemplar create(@Body Exemplar toBeCreated) {
+        return new Exemplar(ZoneId.of("America/New_York"));
+    }
+}
+
+@Schema(name = "exemplar")
+class Exemplar {
+    @Schema(name = "zone_id", type = "string")
+    private ZoneId zoneId;
+
+    Exemplar(ZoneId zoneId) {
+        this.zoneId = zoneId;
+    }
+
+    public ZoneId getZoneId() {
+        return zoneId;
+    }
+
+    public void setZoneId(ZoneId zoneId) {
+        this.zoneId = zoneId;
+    }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        then: "the state is correct"
+        Utils.testReference != null
+
+        when: "The OpenAPI is retrieved"
+        OpenAPI openAPI = Utils.testReference
+        then:
+        openAPI.components.schemas
+        openAPI.components.schemas.size() == 1
+
+        when:
+        Schema dtoSchema = openAPI.components.schemas.exemplar
+
+        then: "the components are valid"
+        dtoSchema
+        dtoSchema.properties.zone_id.type == 'string'
+    }
+
 }

@@ -115,7 +115,6 @@ class MyBean {}
         pathItem.post.requestBody.content['application/json'].schema.type == 'object'
         pathItem.post.requestBody.content['application/json'].schema.properties.size() == 1
         pathItem.post.requestBody.content['application/json'].schema.properties['uuid']
-        pathItem.post.requestBody.content['application/json'].schema.properties['uuid'] instanceof UUIDSchema
         pathItem.post.requestBody.content['application/json'].schema.properties['uuid'].type == 'string'
         pathItem.post.requestBody.content['application/json'].schema.properties['uuid'].format == 'uuid'
         !openAPI.components

@@ -15,6 +15,10 @@
  */
 package io.micronaut.openapi.visitor;
 
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -25,6 +29,7 @@ import io.micronaut.core.annotation.AnnotationValue;
 import io.micronaut.core.beans.BeanMap;
 import io.swagger.v3.core.util.Json;
 import io.swagger.v3.core.util.ObjectMapperFactory;
+import io.swagger.v3.core.util.PrimitiveType;
 import io.swagger.v3.core.util.Yaml;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 
@@ -80,15 +85,78 @@ public final class ConvertUtils {
     public static <T> T treeToValue(JsonNode jn, Class<T> clazz) throws JsonProcessingException {
         T value = convertJsonMapper.treeToValue(jn, clazz);
 
-        if (value != null) {
-            resolveExtensions(jn).ifPresent(extensions -> BeanMap.of(value).put("extensions", extensions));
-            // fix for default value
-            if (jn.has("defaultValue")) {
-                BeanMap.of(value).put("default", convertJsonMapper.treeToValue(jn.get("defaultValue"), Map.class));
+        if (value == null) {
+            return null;
+        }
+
+        resolveExtensions(jn).ifPresent(extensions -> BeanMap.of(value).put("extensions", extensions));
+        String elType = jn.has("type") ? jn.get("type").textValue() : null;
+        JsonNode defaultValueNode = jn.get("defaultValue");
+        JsonNode allowableValuesNode = jn.get("allowableValues");
+        // fix for default value
+        Object defaultValue;
+        try {
+            defaultValue = ConvertUtils.normalizeValue(defaultValueNode != null ? defaultValueNode.textValue() : null, elType);
+        } catch (JsonProcessingException e) {
+            defaultValue = defaultValueNode != null ? defaultValueNode.textValue() : null;
+        }
+
+        BeanMap<T> beanMap = BeanMap.of(value);
+        if (defaultValue != null) {
+            beanMap.put("default", defaultValue);
+        }
+        if (allowableValuesNode != null && allowableValuesNode.isArray()) {
+            List<Object> allowableValues = new ArrayList<>(allowableValuesNode.size());
+            for (JsonNode allowableValueNode : allowableValuesNode) {
+                if (allowableValueNode == null) {
+                    continue;
+                }
+                try {
+                    allowableValues.add(ConvertUtils.normalizeValue(allowableValueNode.textValue(), elType));
+                } catch (IOException e) {
+                    allowableValues.add(allowableValueNode.textValue());
+                }
             }
+            beanMap.put("allowableValues", allowableValues);
         }
 
         return value;
+    }
+
+    private static Object convertJsonNodeValue(JsonNode node, String type) throws JsonProcessingException {
+        if (node == null) {
+            return null;
+        }
+        return normalizeValue(node.textValue(), type);
+    }
+
+    public static Object normalizeValue(String valueStr, String type) throws JsonProcessingException {
+        if (valueStr == null) {
+            return null;
+        }
+        if (type == null || type.equals("object")) {
+            return convertJsonMapper.readValue(valueStr, Map.class);
+        }
+        PrimitiveType primitiveType = PrimitiveType.fromName(type);
+        switch (primitiveType) {
+            case INT:
+                return Integer.parseInt(valueStr);
+            case LONG:
+                return Long.parseLong(valueStr);
+            case FLOAT:
+                return Float.parseFloat(valueStr);
+            case DOUBLE:
+                return Double.parseDouble(valueStr);
+            case DECIMAL:
+            case NUMBER:
+                return new BigDecimal(valueStr);
+            case INTEGER:
+                return new BigInteger(valueStr);
+            case BOOLEAN:
+                return Boolean.parseBoolean(valueStr);
+            default:
+                return valueStr;
+        }
     }
 
     public static Optional<Map<String, Object>> resolveExtensions(JsonNode jn) {

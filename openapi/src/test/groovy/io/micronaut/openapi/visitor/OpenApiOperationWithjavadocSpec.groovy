@@ -5,7 +5,6 @@ import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.Operation
 import io.swagger.v3.oas.models.media.Schema
 import io.swagger.v3.oas.models.parameters.Parameter
-import spock.lang.Ignore
 
 class OpenApiOperationWithjavadocSpec extends AbstractOpenApiTypeElementSpec {
 
@@ -18,7 +17,8 @@ import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Delete;
 import io.micronaut.http.annotation.QueryValue;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;import io.swagger.v3.oas.annotations.enums.ParameterStyle;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterStyle;
 
 @Controller
 class MyController {
@@ -60,7 +60,8 @@ import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Delete;
 import io.micronaut.http.annotation.QueryValue;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;import io.swagger.v3.oas.annotations.enums.ParameterStyle;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterStyle;
 
 @Controller
 class MyController {
@@ -108,7 +109,8 @@ import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Delete;
 import io.micronaut.http.annotation.QueryValue;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;import io.swagger.v3.oas.annotations.enums.ParameterStyle;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterStyle;
 
 @Controller
 class MyController {
@@ -163,15 +165,16 @@ class MyBean {}
         operation2.parameters[0].description == 'UUID of test'
     }
 
-    @Ignore("Need to fix problem with reading javadoc from class level (see this: https://github.com/micronaut-projects/micronaut-core/pull/7662)")
-    void "test read javadoc from class level for records"() {
+//    @Ignore("Need to fix problem with reading javadoc from class level (see this: https://github.com/micronaut-projects/micronaut-core/pull/7662)")
+    void "test read javadoc from class level and attribute level"() {
         given:
         when:
         buildBeanDefinition('test.MyBean', '''
 package test;
 
-import io.micronaut.core.annotation.*;
-import io.micronaut.http.annotation.*;
+import io.micronaut.core.annotation.Nullable;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
 
 @Controller
 class PersonController {
