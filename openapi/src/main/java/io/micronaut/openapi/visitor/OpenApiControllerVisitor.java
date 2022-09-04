@@ -89,7 +89,7 @@ public class OpenApiControllerVisitor extends AbstractOpenApiEndpointVisitor imp
         if (CollectionUtils.isEmpty(requiresAnnotations)) {
             return false;
         }
-        Environment environment = OpenApiApplicationVisitor.getEnvironment(context);
+        Environment environment = OpenApiApplicationVisitor.getEnv(context);
         Set<String> activeEnvs;
         if (environment != null) {
             activeEnvs = environment.getActiveNames();
@@ -183,7 +183,7 @@ public class OpenApiControllerVisitor extends AbstractOpenApiEndpointVisitor imp
             controllerValue = customUri;
         }
 
-        Environment environment = OpenApiApplicationVisitor.getEnvironment(context);
+        Environment environment = OpenApiApplicationVisitor.getEnv(context);
         PropertyPlaceholderResolver propertyPlaceholderResolver = environment != null ? environment.getPlaceholderResolver() : Utils.getPropertyPlaceholderResolver();
         controllerValue = propertyPlaceholderResolver.resolvePlaceholders(controllerValue).orElse(controllerValue);
 

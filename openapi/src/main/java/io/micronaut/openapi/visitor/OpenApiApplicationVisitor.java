@@ -46,7 +46,6 @@ import javax.annotation.processing.SupportedOptions;
 
 import io.micronaut.context.ApplicationContextConfiguration;
 import io.micronaut.context.DefaultApplicationContextBuilder;
-import io.micronaut.context.env.DefaultEnvironment;
 import io.micronaut.context.env.Environment;
 import io.micronaut.core.annotation.Experimental;
 import io.micronaut.core.annotation.NonNull;
@@ -97,6 +96,7 @@ import com.fasterxml.jackson.databind.node.TextNode;
     OpenApiApplicationVisitor.MICRONAUT_OPENAPI_JSON_FORMAT,
     OpenApiApplicationVisitor.MICRONAUT_OPENAPI_ENVIRONMENTS,
     OpenApiApplicationVisitor.MICRONAUT_ENVIRONMENT_ENABLED,
+    OpenApiApplicationVisitor.MICRONAUT_CONFIG_FILE_LOCATIONS,
     OpenApiApplicationVisitor.MICRONAUT_OPENAPI_TARGET_FILE,
     OpenApiApplicationVisitor.MICRONAUT_OPENAPI_ADDITIONAL_FILES,
     OpenApiApplicationVisitor.MICRONAUT_OPENAPI_CONFIG_FILE,
@@ -163,11 +163,21 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
      * Default value is "true".
      */
     public static final String MICRONAUT_ENVIRONMENT_ENABLED = "micronaut.environment.enabled";
+    /**
+     * Config file locations. By default, micronaut-openapi search config in standard path:
+     * &lt;project_path&gt;/src/main/resources/
+     * <p>
+     * You can set your custom paths separated by ','. To set absolute paths use prefix 'file:',
+     * classpath paths use prefix 'classpath:' or use prefix 'project:' to set paths from project
+     * directory.
+     */
+    public static final String MICRONAUT_CONFIG_FILE_LOCATIONS = "micronaut.openapi.config.file.locations";
 
     /**
      * Loaded micronaut environment.
      */
     private static final String MICRONAUT_ENVIRONMENT = "micronaut.environment";
+    private static final String MICRONAUT_ENVIRONMENT_CREATED = "micronaut.environment.created";
     private static final String MICRONAUT_OPENAPI_PROPERTIES = "micronaut.openapi.properties";
     private static final String MICRONAUT_OPENAPI_ENDPOINTS = "micronaut.openapi.endpoints";
     /**
@@ -239,14 +249,17 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
     }
 
     public static String getConfigurationProperty(String key, VisitorContext context) {
-        Environment environment = getEnvironment(context);
         Properties propsFromFile = readOpenApiConfigFile(context);
         String value = propsFromFile.getProperty(key);
-        return value != null ? value : environment != null ? environment.get(key, String.class).orElse(null) : null;
+        if (value != null) {
+            return value;
+        }
+        Environment environment = getEnv(context);
+        return environment != null ? environment.get(key, String.class).orElse(null) : null;
     }
 
     @Nullable
-    public static Environment getEnvironment(VisitorContext context) {
+    public static Environment getEnv(VisitorContext context) {
         String isEnabledStr = System.getProperty(MICRONAUT_ENVIRONMENT_ENABLED, readOpenApiConfigFile(context).getProperty(MICRONAUT_ENVIRONMENT_ENABLED));
         boolean isEnabled = true;
         if (StringUtils.isNotEmpty(isEnabledStr)) {
@@ -256,12 +269,14 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             return null;
         }
         Environment existedEnvironment = context.get(MICRONAUT_ENVIRONMENT, Environment.class).orElse(null);
-        if (existedEnvironment != null) {
+        Boolean envCreated = context.get(MICRONAUT_ENVIRONMENT_CREATED, Boolean.class).orElse(null);
+        if (envCreated != null && envCreated) {
             return existedEnvironment;
         }
 
         Environment environment = createEnv(context);
         context.put(MICRONAUT_ENVIRONMENT, environment);
+        context.put(MICRONAUT_ENVIRONMENT_CREATED, true);
 
         return environment;
     }
@@ -291,8 +306,14 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             }
         };
 
-        Environment environment = new DefaultEnvironment(configuration);
-        environment.start();
+        Environment environment = null;
+        try {
+            environment = new AnnProcessorEnvironment(configuration, context);
+            environment.start();
+        return environment;
+        } catch (Exception e) {
+            context.warn("Can't create environment: " + e.getMessage(), null);
+        }
         return environment;
     }
 
@@ -590,7 +611,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                 s = s.replace(entry.getKey(), entry.getValue());
             }
         }
-        Environment environment = getEnvironment(context);
+        Environment environment = getEnv(context);
         return environment != null ? environment.getPlaceholderResolver().resolvePlaceholders(s).orElse(s) : s;
     }
 

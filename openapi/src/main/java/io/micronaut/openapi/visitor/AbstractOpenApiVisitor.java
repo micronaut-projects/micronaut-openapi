@@ -307,7 +307,7 @@ abstract class AbstractOpenApiVisitor {
             }
 
             String pathBeforeReplace = result.toString();
-            Environment environment = OpenApiApplicationVisitor.getEnvironment(context);
+            Environment environment = OpenApiApplicationVisitor.getEnv(context);
             if (environment != null) {
                 resultPaths.add(paths.computeIfAbsent(environment.getPlaceholderResolver().resolvePlaceholders(pathBeforeReplace).orElse(pathBeforeReplace), key -> new PathItem()));
             } else {
