@@ -58,9 +58,7 @@
 
     <!-- Checks for Size Violations.                    -->
     <!-- See https://checkstyle.org/config_sizes.html -->
-    <module name="FileLength">
-        <property name="max" value="3000"/>
-    </module>
+    <module name="FileLength"/>
 
     <!-- Checks for whitespace                               -->
     <!-- See https://checkstyle.org/config_whitespace.html -->
