@@ -924,16 +924,17 @@ abstract class AbstractOpenApiVisitor {
                 propertySchema = bindSchemaForElement(context, element, elementType, propertySchema);
                 String propertyName = resolvePropertyName(element, classElement, propertySchema);
                 propertySchema.setRequired(null);
+                Schema propertySchemaFinal = propertySchema;
                 addProperty(parentSchema, propertyName, propertySchema, required);
                 if (schemaAnnotationValue != null) {
                     schemaAnnotationValue.get("defaultValue", String.class)
                         .ifPresent(value -> {
                             String elType = schemaAnnotationValue.get("type", String.class).orElse(null);
                             try {
-                                parentSchema.setDefault(ConvertUtils.normalizeValue(value, elType));
+                                propertySchemaFinal.setDefault(ConvertUtils.normalizeValue(value, elType));
                             } catch (JsonProcessingException e) {
                                 context.warn("Can't parse value " + value + " to " + elType + ": " + e.getMessage(), element);
-                                parentSchema.setDefault(value);
+                                propertySchemaFinal.setDefault(value);
                             }
                         });
                 }

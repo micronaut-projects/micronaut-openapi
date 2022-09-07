@@ -35,7 +35,6 @@ import io.micronaut.core.annotation.Experimental;
 import io.micronaut.core.beans.BeanMap;
 import io.micronaut.core.bind.annotation.Bindable;
 import io.micronaut.core.naming.NameUtils;
-import io.micronaut.core.type.Argument;
 import io.micronaut.core.util.ArrayUtils;
 import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.core.util.StringUtils;
@@ -957,23 +956,28 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
 
         ParameterElement[] methodParams = element.getParameters();
         if (ArrayUtils.isNotEmpty(methodParams) && operationAnnotation.isPresent()) {
-            Optional<List<io.swagger.v3.oas.annotations.Parameter>> params = operationAnnotation.get().get("parameters", Argument.listOf(io.swagger.v3.oas.annotations.Parameter.class));
-            if (params.isPresent()) {
+            List<AnnotationValue<io.swagger.v3.oas.annotations.Parameter>> params = operationAnnotation.get().getAnnotations("parameters", io.swagger.v3.oas.annotations.Parameter.class);
+            if (CollectionUtils.isNotEmpty(params)) {
                 for (ParameterElement methodParam : methodParams) {
-                    io.swagger.v3.oas.annotations.Parameter paramAnn = null;
-                    for (io.swagger.v3.oas.annotations.Parameter param : params.get()) {
-                        if (methodParam.getName().equals(param.name())) {
+                    AnnotationValue<io.swagger.v3.oas.annotations.Parameter> paramAnn = null;
+                    for (AnnotationValue<io.swagger.v3.oas.annotations.Parameter> param : params) {
+                        String paramName = param.stringValue("name").orElse(null);
+                        if (methodParam.getName().equals(paramName)) {
                             paramAnn = param;
                             break;
                         }
                     }
-                    if (paramAnn != null && !paramAnn.hidden()) {
+
+                    if (paramAnn != null && !paramAnn.booleanValue("hidden").orElse(false)) {
                         Parameter swaggerParam = null;
-                        if (CollectionUtils.isNotEmpty(swaggerOperation.getParameters())) {
-                            for (Parameter createdParameter : swaggerOperation.getParameters()) {
-                                if (createdParameter.getName().equals(paramAnn.name())) {
-                                    swaggerParam = createdParameter;
-                                    break;
+                        String paramName = paramAnn.stringValue("name").orElse(null);
+                        if (paramName != null) {
+                            if (CollectionUtils.isNotEmpty(swaggerOperation.getParameters())) {
+                                for (Parameter createdParameter : swaggerOperation.getParameters()) {
+                                    if (createdParameter.getName().equals(paramName)) {
+                                        swaggerParam = createdParameter;
+                                        break;
+                                    }
                                 }
                             }
                         }
@@ -984,27 +988,39 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                             swaggerParam = new Parameter();
                             swaggerOperation.getParameters().add(swaggerParam);
                         }
-                        swaggerParam.setName(paramAnn.name());
-                        swaggerParam.setDescription(paramAnn.description());
-                        if (paramAnn.required()) {
+                        if (paramName != null) {
+                            swaggerParam.setName(paramName);
+                        }
+                        paramAnn.stringValue("description").ifPresent(swaggerParam::setDescription);
+                        Optional<Boolean> required = paramAnn.booleanValue("required");
+                        if (required.isPresent() && required.get()) {
                             swaggerParam.setRequired(true);
                         }
-                        if (paramAnn.deprecated()) {
+                        Optional<Boolean> deprecated = paramAnn.booleanValue("deprecated");
+                        if (deprecated.isPresent() && deprecated.get()) {
                             swaggerParam.setDeprecated(true);
                         }
-                        if (paramAnn.allowEmptyValue()) {
+                        Optional<Boolean> allowEmptyValue = paramAnn.booleanValue("allowEmptyValue");
+                        if (allowEmptyValue.isPresent() && allowEmptyValue.get()) {
                             swaggerParam.setAllowEmptyValue(true);
                         }
-                        if (paramAnn.allowReserved()) {
+                        Optional<Boolean> allowReserved = paramAnn.booleanValue("allowReserved");
+                        if (allowReserved.isPresent() && allowReserved.get()) {
                             swaggerParam.setAllowReserved(true);
                         }
-                        swaggerParam.setExample(paramAnn.example());
-                        swaggerParam.setStyle(paramStyle(paramAnn.style()));
-                        swaggerParam.$ref(paramAnn.ref());
-                        if (paramAnn.in() == null || paramAnn.in() == ParameterIn.DEFAULT) {
-                            swaggerParam.setIn(calcIn(methodParam));
-                        } else {
-                            swaggerParam.setIn(paramAnn.in().toString());
+                        paramAnn.stringValue("example").ifPresent(swaggerParam::setExample);
+                        Optional<ParameterStyle> style = paramAnn.get("style", ParameterStyle.class);
+                        if (style.isPresent()) {
+                            swaggerParam.setStyle(paramStyle(style.get()));
+                        }
+                        paramAnn.stringValue("ref").ifPresent(swaggerParam::set$ref);
+                        Optional<ParameterIn> in = paramAnn.get("in", ParameterIn.class);
+                        if (in.isPresent()) {
+                            if (in.get() == ParameterIn.DEFAULT) {
+                                swaggerParam.setIn(calcIn(methodParam));
+                            } else {
+                                swaggerParam.setIn(in.get().toString());
+                            }
                         }
                     }
                 }
