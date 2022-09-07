@@ -86,6 +86,14 @@
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="io/micronaut/openapi/annotation/mappers/OpenAPISecurityAnnotationMapper.html#annotationType--">annotationType()</a></span> - Method in class io.micronaut.openapi.annotation.mappers.<a href="io/micronaut/openapi/annotation/mappers/OpenAPISecurityAnnotationMapper.html" title="class in io.micronaut.openapi.annotation.mappers">OpenAPISecurityAnnotationMapper</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/visitor/AnnProcessorEnvironment.html" title="class in io.micronaut.openapi.visitor"><span class="typeNameLink">AnnProcessorEnvironment</span></a> - Class in <a href="io/micronaut/openapi/visitor/package-summary.html">io.micronaut.openapi.visitor</a></dt>
+<dd>
+<div class="block">Specific environment for annotation processing level.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="io/micronaut/openapi/visitor/AnnProcessorEnvironment.html#AnnProcessorEnvironment-io.micronaut.context.ApplicationContextConfiguration-io.micronaut.inject.visitor.VisitorContext-">AnnProcessorEnvironment(ApplicationContextConfiguration, VisitorContext)</a></span> - Constructor for class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/AnnProcessorEnvironment.html" title="class in io.micronaut.openapi.visitor">AnnProcessorEnvironment</a></dt>
+<dd>
+<div class="block">Construct a new environment for the given configuration.</div>
+</dd>
 <dt><a href="io/micronaut/openapi/annotation/transformers/ApiResponseRetentionPolicyAnnotationTransformer.html" title="class in io.micronaut.openapi.annotation.transformers"><span class="typeNameLink">ApiResponseRetentionPolicyAnnotationTransformer</span></a> - Class in <a href="io/micronaut/openapi/annotation/transformers/package-summary.html">io.micronaut.openapi.annotation.transformers</a></dt>
 <dd>
 <div class="block">Changes the Retention Policy of the annotation to SOURCE.</div>
@@ -184,6 +192,10 @@
 <dd>
 <div class="block">Changes the Retention Policy of the annotation to SOURCE.</div>
 </dd>
+<dt><a href="io/micronaut/openapi/visitor/ContextUtils.html" title="class in io.micronaut.openapi.visitor"><span class="typeNameLink">ContextUtils</span></a> - Class in <a href="io/micronaut/openapi/visitor/package-summary.html">io.micronaut.openapi.visitor</a></dt>
+<dd>
+<div class="block">Convert utilities methods.</div>
+</dd>
 <dt><a href="io/micronaut/openapi/visitor/ConvertUtils.html" title="class in io.micronaut.openapi.visitor"><span class="typeNameLink">ConvertUtils</span></a> - Class in <a href="io/micronaut/openapi/visitor/package-summary.html">io.micronaut.openapi.visitor</a></dt>
 <dd>
 <div class="block">Convert utilities methods.</div>
@@ -240,7 +252,7 @@
 <dd>
 <div class="block">Changes the Retention Policy of the annotation to SOURCE.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="io/micronaut/openapi/visitor/OpenApiApplicationVisitor.html#expandProperties-java.lang.String-java.util.List-">expandProperties(String, List&lt;Map.Entry&lt;String, String&gt;&gt;)</a></span> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/OpenApiApplicationVisitor.html" title="class in io.micronaut.openapi.visitor">OpenApiApplicationVisitor</a></dt>
+<dt><span class="memberNameLink"><a href="io/micronaut/openapi/visitor/OpenApiApplicationVisitor.html#expandProperties-java.lang.String-java.util.List-io.micronaut.inject.visitor.VisitorContext-">expandProperties(String, List&lt;Map.Entry&lt;String, String&gt;&gt;, VisitorContext)</a></span> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/OpenApiApplicationVisitor.html" title="class in io.micronaut.openapi.visitor">OpenApiApplicationVisitor</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/annotation/transformers/ExtensionPropertyRetentionPolicyAnnotationTransformer.html" title="class in io.micronaut.openapi.annotation.transformers"><span class="typeNameLink">ExtensionPropertyRetentionPolicyAnnotationTransformer</span></a> - Class in <a href="io/micronaut/openapi/annotation/transformers/package-summary.html">io.micronaut.openapi.annotation.transformers</a></dt>
 <dd>
@@ -292,7 +304,13 @@
 </a>
 <h2 class="title">G</h2>
 <dl>
+<dt><span class="memberNameLink"><a href="io/micronaut/openapi/visitor/OpenApiApplicationVisitor.html#getActiveEnvs-io.micronaut.inject.visitor.VisitorContext-">getActiveEnvs(VisitorContext)</a></span> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/OpenApiApplicationVisitor.html" title="class in io.micronaut.openapi.visitor">OpenApiApplicationVisitor</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="io/micronaut/openapi/visitor/OpenApiApplicationVisitor.html#getConfigurationProperty-java.lang.String-io.micronaut.inject.visitor.VisitorContext-">getConfigurationProperty(String, VisitorContext)</a></span> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/OpenApiApplicationVisitor.html" title="class in io.micronaut.openapi.visitor">OpenApiApplicationVisitor</a></dt>
+<dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="io/micronaut/openapi/visitor/ConvertUtils.html#getConvertJsonMapper--">getConvertJsonMapper()</a></span> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/ConvertUtils.html" title="class in io.micronaut.openapi.visitor">ConvertUtils</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="io/micronaut/openapi/visitor/OpenApiApplicationVisitor.html#getEnv-io.micronaut.inject.visitor.VisitorContext-">getEnv(VisitorContext)</a></span> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/OpenApiApplicationVisitor.html" title="class in io.micronaut.openapi.visitor">OpenApiApplicationVisitor</a></dt>
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="io/micronaut/openapi/visitor/OpenApiApplicationVisitor.html#getExpandableProperties-io.micronaut.inject.visitor.VisitorContext-">getExpandableProperties(VisitorContext)</a></span> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/OpenApiApplicationVisitor.html" title="class in io.micronaut.openapi.visitor">OpenApiApplicationVisitor</a></dt>
 <dd>&nbsp;</dd>
@@ -307,6 +325,8 @@
 <dt><span class="memberNameLink"><a href="io/micronaut/openapi/visitor/OpenApiJacksonVisitor.html#getOrder--">getOrder()</a></span> - Method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/OpenApiJacksonVisitor.html" title="class in io.micronaut.openapi.visitor">OpenApiJacksonVisitor</a></dt>
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="io/micronaut/openapi/javadoc/JavadocDescription.html#getParameters--">getParameters()</a></span> - Method in class io.micronaut.openapi.javadoc.<a href="io/micronaut/openapi/javadoc/JavadocDescription.html" title="class in io.micronaut.openapi.javadoc">JavadocDescription</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="io/micronaut/openapi/visitor/Utils.html#getPropertyPlaceholderResolver--">getPropertyPlaceholderResolver()</a></span> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/Utils.html" title="class in io.micronaut.openapi.visitor">Utils</a></dt>
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="io/micronaut/openapi/javadoc/JavadocDescription.html#getReturnDescription--">getReturnDescription()</a></span> - Method in class io.micronaut.openapi.javadoc.<a href="io/micronaut/openapi/javadoc/JavadocDescription.html" title="class in io.micronaut.openapi.javadoc">JavadocDescription</a></dt>
 <dd>
@@ -330,6 +350,8 @@
 <dd>
 <div class="block">Returns the title for the generated views.</div>
 </dd>
+<dt><span class="memberNameLink"><a href="io/micronaut/openapi/visitor/ContextUtils.html#getVisitedElements-io.micronaut.inject.visitor.VisitorContext-">getVisitedElements(VisitorContext)</a></span> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/ContextUtils.html" title="class in io.micronaut.openapi.visitor">ContextUtils</a></dt>
+<dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="io/micronaut/openapi/visitor/OpenApiJacksonVisitor.html#getVisitorKind--">getVisitorKind()</a></span> - Method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/OpenApiJacksonVisitor.html" title="class in io.micronaut.openapi.visitor">OpenApiJacksonVisitor</a></dt>
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="io/micronaut/openapi/visitor/ConvertUtils.html#getYamlMapper--">getYamlMapper()</a></span> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/ConvertUtils.html" title="class in io.micronaut.openapi.visitor">ConvertUtils</a></dt>
@@ -529,6 +551,14 @@
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="io/micronaut/openapi/visitor/OpenApiEndpointVisitor.html#methodServers-io.micronaut.inject.ast.MethodElement-io.micronaut.inject.visitor.VisitorContext-">methodServers(MethodElement, VisitorContext)</a></span> - Method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/OpenApiEndpointVisitor.html" title="class in io.micronaut.openapi.visitor">OpenApiEndpointVisitor</a></dt>
 <dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="io/micronaut/openapi/visitor/OpenApiApplicationVisitor.html#MICRONAUT_CONFIG_FILE_LOCATIONS">MICRONAUT_CONFIG_FILE_LOCATIONS</a></span> - Static variable in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/OpenApiApplicationVisitor.html" title="class in io.micronaut.openapi.visitor">OpenApiApplicationVisitor</a></dt>
+<dd>
+<div class="block">Config file locations.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="io/micronaut/openapi/visitor/OpenApiApplicationVisitor.html#MICRONAUT_ENVIRONMENT_ENABLED">MICRONAUT_ENVIRONMENT_ENABLED</a></span> - Static variable in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/OpenApiApplicationVisitor.html" title="class in io.micronaut.openapi.visitor">OpenApiApplicationVisitor</a></dt>
+<dd>
+<div class="block">Is this property true, properties wll be loaded in the standard way from application.yml.</div>
+</dd>
 <dt><span class="memberNameLink"><a href="io/micronaut/openapi/visitor/OpenApiApplicationVisitor.html#MICRONAUT_OPENAPI_ADDITIONAL_FILES">MICRONAUT_OPENAPI_ADDITIONAL_FILES</a></span> - Static variable in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/OpenApiApplicationVisitor.html" title="class in io.micronaut.openapi.visitor">OpenApiApplicationVisitor</a></dt>
 <dd>
 <div class="block">System property that specifies the location of additional swagger YAML and JSON files to read from.</div>
@@ -589,7 +619,7 @@
 </a>
 <h2 class="title">N</h2>
 <dl>
-<dt><span class="memberNameLink"><a href="io/micronaut/openapi/visitor/Utils.html#normalizeEnumValues-java.util.Map-java.util.Map-">normalizeEnumValues(Map&lt;CharSequence, Object&gt;, Map&lt;String, Class&lt;? extends Enum&gt;&gt;)</a></span> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/Utils.html" title="class in io.micronaut.openapi.visitor">Utils</a></dt>
+<dt><span class="memberNameLink"><a href="io/micronaut/openapi/visitor/Utils.html#normalizeEnumValues-java.util.Map-java.util.Map-">normalizeEnumValues(Map&lt;CharSequence, Object&gt;, Map&lt;String, Class&lt;T&gt;&gt;)</a></span> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/Utils.html" title="class in io.micronaut.openapi.visitor">Utils</a></dt>
 <dd>
 <div class="block">Normalizes enum values stored in the map.</div>
 </dd>
@@ -766,8 +796,6 @@
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="io/micronaut/openapi/visitor/OpenApiEndpointVisitor.html#producesMediaTypes-io.micronaut.inject.ast.MethodElement-">producesMediaTypes(MethodElement)</a></span> - Method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/OpenApiEndpointVisitor.html" title="class in io.micronaut.openapi.visitor">OpenApiEndpointVisitor</a></dt>
 <dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="io/micronaut/openapi/visitor/AbstractOpenApiEndpointVisitor.html#propertyPlaceholderResolver">propertyPlaceholderResolver</a></span> - Variable in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/AbstractOpenApiEndpointVisitor.html" title="class in io.micronaut.openapi.visitor">AbstractOpenApiEndpointVisitor</a></dt>
-<dd>&nbsp;</dd>
 </dl>
 <a name="I:R">
 <!--   -->
@@ -775,6 +803,10 @@
 <h2 class="title">R</h2>
 <dl>
 <dt><span class="memberNameLink"><a href="io/micronaut/openapi/visitor/OpenApiApplicationVisitor.html#readOpenApiConfigFile-io.micronaut.inject.visitor.VisitorContext-">readOpenApiConfigFile(VisitorContext)</a></span> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/OpenApiApplicationVisitor.html" title="class in io.micronaut.openapi.visitor">OpenApiApplicationVisitor</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="io/micronaut/openapi/visitor/AnnProcessorEnvironment.html#readPropertySourceList-java.lang.String-">readPropertySourceList(String)</a></span> - Method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/AnnProcessorEnvironment.html" title="class in io.micronaut.openapi.visitor">AnnProcessorEnvironment</a></dt>
+<dd>&nbsp;</dd>
+<dt><span class="memberNameLink"><a href="io/micronaut/openapi/visitor/AnnProcessorEnvironment.html#readPropertySources-java.lang.String-">readPropertySources(String)</a></span> - Method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/AnnProcessorEnvironment.html" title="class in io.micronaut.openapi.visitor">AnnProcessorEnvironment</a></dt>
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="io/micronaut/openapi/view/OpenApiViewConfig.html#render-java.nio.file.Path-io.micronaut.inject.visitor.VisitorContext-">render(Path, VisitorContext)</a></span> - Method in class io.micronaut.openapi.view.<a href="io/micronaut/openapi/view/OpenApiViewConfig.html" title="class in io.micronaut.openapi.view">OpenApiViewConfig</a></dt>
 <dd>
@@ -974,13 +1006,13 @@
 </a>
 <h2 class="title">U</h2>
 <dl>
-<dt><span class="memberNameLink"><a href="io/micronaut/openapi/visitor/AbstractOpenApiEndpointVisitor.html#uriMatchTemplates-io.micronaut.inject.ast.MethodElement-">uriMatchTemplates(MethodElement)</a></span> - Method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/AbstractOpenApiEndpointVisitor.html" title="class in io.micronaut.openapi.visitor">AbstractOpenApiEndpointVisitor</a></dt>
+<dt><span class="memberNameLink"><a href="io/micronaut/openapi/visitor/AbstractOpenApiEndpointVisitor.html#uriMatchTemplates-io.micronaut.inject.ast.MethodElement-io.micronaut.inject.visitor.VisitorContext-">uriMatchTemplates(MethodElement, VisitorContext)</a></span> - Method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/AbstractOpenApiEndpointVisitor.html" title="class in io.micronaut.openapi.visitor">AbstractOpenApiEndpointVisitor</a></dt>
 <dd>
 <div class="block">Returns the uri paths of the element.</div>
 </dd>
-<dt><span class="memberNameLink"><a href="io/micronaut/openapi/visitor/OpenApiControllerVisitor.html#uriMatchTemplates-io.micronaut.inject.ast.MethodElement-">uriMatchTemplates(MethodElement)</a></span> - Method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/OpenApiControllerVisitor.html" title="class in io.micronaut.openapi.visitor">OpenApiControllerVisitor</a></dt>
+<dt><span class="memberNameLink"><a href="io/micronaut/openapi/visitor/OpenApiControllerVisitor.html#uriMatchTemplates-io.micronaut.inject.ast.MethodElement-io.micronaut.inject.visitor.VisitorContext-">uriMatchTemplates(MethodElement, VisitorContext)</a></span> - Method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/OpenApiControllerVisitor.html" title="class in io.micronaut.openapi.visitor">OpenApiControllerVisitor</a></dt>
 <dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="io/micronaut/openapi/visitor/OpenApiEndpointVisitor.html#uriMatchTemplates-io.micronaut.inject.ast.MethodElement-">uriMatchTemplates(MethodElement)</a></span> - Method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/OpenApiEndpointVisitor.html" title="class in io.micronaut.openapi.visitor">OpenApiEndpointVisitor</a></dt>
+<dt><span class="memberNameLink"><a href="io/micronaut/openapi/visitor/OpenApiEndpointVisitor.html#uriMatchTemplates-io.micronaut.inject.ast.MethodElement-io.micronaut.inject.visitor.VisitorContext-">uriMatchTemplates(MethodElement, VisitorContext)</a></span> - Method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/OpenApiEndpointVisitor.html" title="class in io.micronaut.openapi.visitor">OpenApiEndpointVisitor</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/visitor/Utils.html" title="class in io.micronaut.openapi.visitor"><span class="typeNameLink">Utils</span></a> - Class in <a href="io/micronaut/openapi/visitor/package-summary.html">io.micronaut.openapi.visitor</a></dt>
 <dd>

@@ -159,7 +159,7 @@ implements io.micronaut.inject.visitor.TypeElementVisitor&lt;io.micronaut.manage
 <!--   -->
 </a>
 <h3>Fields inherited from class&nbsp;io.micronaut.openapi.visitor.<a href="../../../../io/micronaut/openapi/visitor/AbstractOpenApiEndpointVisitor.html" title="class in io.micronaut.openapi.visitor">AbstractOpenApiEndpointVisitor</a></h3>
-<code><a href="../../../../io/micronaut/openapi/visitor/AbstractOpenApiEndpointVisitor.html#classExternalDocs">classExternalDocs</a>, <a href="../../../../io/micronaut/openapi/visitor/AbstractOpenApiEndpointVisitor.html#classTags">classTags</a>, <a href="../../../../io/micronaut/openapi/visitor/AbstractOpenApiEndpointVisitor.html#COMPONENTS_CALLBACKS_PREFIX">COMPONENTS_CALLBACKS_PREFIX</a>, <a href="../../../../io/micronaut/openapi/visitor/AbstractOpenApiEndpointVisitor.html#propertyPlaceholderResolver">propertyPlaceholderResolver</a></code></li>
+<code><a href="../../../../io/micronaut/openapi/visitor/AbstractOpenApiEndpointVisitor.html#classExternalDocs">classExternalDocs</a>, <a href="../../../../io/micronaut/openapi/visitor/AbstractOpenApiEndpointVisitor.html#classTags">classTags</a>, <a href="../../../../io/micronaut/openapi/visitor/AbstractOpenApiEndpointVisitor.html#COMPONENTS_CALLBACKS_PREFIX">COMPONENTS_CALLBACKS_PREFIX</a></code></li>
 </ul>
 <ul class="blockList">
 <li class="blockList"><a name="fields.inherited.from.class.io.micronaut.core.order.Ordered">
@@ -373,7 +373,8 @@ implements io.micronaut.inject.visitor.TypeElementVisitor&lt;io.micronaut.manage
 </tr>
 <tr id="i21" class="rowColor">
 <td class="colFirst"><code>protected java.util.List&lt;io.micronaut.http.uri.UriMatchTemplate&gt;</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/openapi/visitor/OpenApiEndpointVisitor.html#uriMatchTemplates-io.micronaut.inject.ast.MethodElement-">uriMatchTemplates</a></span>(io.micronaut.inject.ast.MethodElement&nbsp;element)</code>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/openapi/visitor/OpenApiEndpointVisitor.html#uriMatchTemplates-io.micronaut.inject.ast.MethodElement-io.micronaut.inject.visitor.VisitorContext-">uriMatchTemplates</a></span>(io.micronaut.inject.ast.MethodElement&nbsp;element,
+                 io.micronaut.inject.visitor.VisitorContext&nbsp;context)</code>
 <div class="block">Returns the uri paths of the element.</div>
 </td>
 </tr>
@@ -553,20 +554,22 @@ implements io.micronaut.inject.visitor.TypeElementVisitor&lt;io.micronaut.manage
 </dl>
 </li>
 </ul>
-<a name="uriMatchTemplates-io.micronaut.inject.ast.MethodElement-">
+<a name="uriMatchTemplates-io.micronaut.inject.ast.MethodElement-io.micronaut.inject.visitor.VisitorContext-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>uriMatchTemplates</h4>
-<pre>protected&nbsp;java.util.List&lt;io.micronaut.http.uri.UriMatchTemplate&gt;&nbsp;uriMatchTemplates(io.micronaut.inject.ast.MethodElement&nbsp;element)</pre>
-<div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../../../io/micronaut/openapi/visitor/AbstractOpenApiEndpointVisitor.html#uriMatchTemplates-io.micronaut.inject.ast.MethodElement-">AbstractOpenApiEndpointVisitor</a></code></span></div>
+<pre>protected&nbsp;java.util.List&lt;io.micronaut.http.uri.UriMatchTemplate&gt;&nbsp;uriMatchTemplates(io.micronaut.inject.ast.MethodElement&nbsp;element,
+                                                                                   io.micronaut.inject.visitor.VisitorContext&nbsp;context)</pre>
+<div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../../../io/micronaut/openapi/visitor/AbstractOpenApiEndpointVisitor.html#uriMatchTemplates-io.micronaut.inject.ast.MethodElement-io.micronaut.inject.visitor.VisitorContext-">AbstractOpenApiEndpointVisitor</a></code></span></div>
 <div class="block">Returns the uri paths of the element.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../../../../io/micronaut/openapi/visitor/AbstractOpenApiEndpointVisitor.html#uriMatchTemplates-io.micronaut.inject.ast.MethodElement-">uriMatchTemplates</a></code>&nbsp;in class&nbsp;<code><a href="../../../../io/micronaut/openapi/visitor/AbstractOpenApiEndpointVisitor.html" title="class in io.micronaut.openapi.visitor">AbstractOpenApiEndpointVisitor</a></code></dd>
+<dd><code><a href="../../../../io/micronaut/openapi/visitor/AbstractOpenApiEndpointVisitor.html#uriMatchTemplates-io.micronaut.inject.ast.MethodElement-io.micronaut.inject.visitor.VisitorContext-">uriMatchTemplates</a></code>&nbsp;in class&nbsp;<code><a href="../../../../io/micronaut/openapi/visitor/AbstractOpenApiEndpointVisitor.html" title="class in io.micronaut.openapi.visitor">AbstractOpenApiEndpointVisitor</a></code></dd>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>element</code> - The MethodElement.</dd>
+<dd><code>context</code> - The context</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>The uri paths of the element.</dd>
 </dl>
