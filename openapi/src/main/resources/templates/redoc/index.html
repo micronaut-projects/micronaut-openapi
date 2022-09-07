@@ -16,7 +16,7 @@
     <body>
         {{rapipdf.tag}}
         <redoc id='redoc' {{redoc.attributes}}></redoc>
-        <script src='https://unpkg.com/redoc{{redoc.version}}/bundles/redoc.standalone.js'></script>
+        <script src='{{redoc.js.url}}'></script>
         <script>
             const extract = function(v) {
                     return decodeURIComponent(v.replace(/(?:(?:^|.*;\s*)contextPath\s*\=\s*([^;]*).*$)|^.*$/, "$1"));

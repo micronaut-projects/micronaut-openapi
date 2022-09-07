@@ -30,7 +30,7 @@ compileTestJava.options.compilerArgs += '-parameters'
 
 test {
     useJUnitPlatform()
-    
+
     jvmArgs '-Duser.country=US'
     jvmArgs '-Duser.language=en'
     testLogging {

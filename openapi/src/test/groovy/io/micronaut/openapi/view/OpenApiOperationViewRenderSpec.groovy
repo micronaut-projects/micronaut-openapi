@@ -15,7 +15,7 @@ class OpenApiOperationViewRenderSpec extends Specification {
 
     void "test render OpenApiView specification"() {
         given:
-        String spec = "redoc.enabled=true,rapidoc.enabled=true,swagger-ui.enabled=true"
+        String spec = "redoc.enabled=true,rapidoc.enabled=true,swagger-ui.enabled=true,rapipdf.enabled=true,swagger-ui.theme=flattop,redoc.js.url=https://cdn.redoc.ly/redoc/latest/bundles/redoc.standalone.js"
         OpenApiViewConfig cfg = OpenApiViewConfig.fromSpecification(spec, new Properties())
         Path outputDir = Paths.get("output")
         cfg.title = "OpenAPI documentation"
@@ -23,7 +23,7 @@ class OpenApiOperationViewRenderSpec extends Specification {
         cfg.render(outputDir, null)
 
         expect:
-        cfg.enabled == true
+        cfg.enabled
         cfg.mappingPath == "swagger"
         cfg.rapidocConfig != null
         cfg.redocConfig != null
@@ -32,8 +32,22 @@ class OpenApiOperationViewRenderSpec extends Specification {
         cfg.specFile == "swagger.yml"
         cfg.specURL == "/swagger/swagger.yml"
         Files.exists(outputDir.resolve("redoc").resolve("index.html"))
+        Files.exists(outputDir.resolve("redoc").resolve("res").resolve("redoc.standalone.js"))
+        Files.exists(outputDir.resolve("redoc").resolve("res").resolve("rapipdf-min.js"))
         Files.exists(outputDir.resolve("rapidoc").resolve("index.html"))
+        Files.exists(outputDir.resolve("rapidoc").resolve("res").resolve("rapidoc-min.js"))
+        Files.exists(outputDir.resolve("rapidoc").resolve("res").resolve("rapipdf-min.js"))
         Files.exists(outputDir.resolve("swagger-ui").resolve("index.html"))
+        Files.exists(outputDir.resolve("swagger-ui").resolve("res").resolve("swagger-ui.css"))
+        Files.exists(outputDir.resolve("swagger-ui").resolve("res").resolve("favicon-16x16.png"))
+        Files.exists(outputDir.resolve("swagger-ui").resolve("res").resolve("favicon-32x32.png"))
+        Files.exists(outputDir.resolve("swagger-ui").resolve("res").resolve("swagger-ui-bundle.js"))
+        Files.exists(outputDir.resolve("swagger-ui").resolve("res").resolve("swagger-ui-standalone-preset.js"))
+        Files.exists(outputDir.resolve("swagger-ui").resolve("res").resolve("rapipdf-min.js"))
+        Files.exists(outputDir.resolve("swagger-ui").resolve("theme").resolve("flattop.css"))
+
+        outputDir.resolve("redoc").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains("https://cdn.redoc.ly/redoc/latest/bundles/redoc.standalone.js")
+
         outputDir.resolve("redoc").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains(cfg.getSpecURL())
         outputDir.resolve("rapidoc").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains(cfg.getSpecURL())
         outputDir.resolve("swagger-ui").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains(cfg.getSpecURL())
@@ -50,7 +64,7 @@ class OpenApiOperationViewRenderSpec extends Specification {
         cfg.render(outputDir, null)
 
         expect:
-        cfg.enabled == true
+        cfg.enabled
         cfg.mappingPath == "swagger"
         cfg.rapidocConfig != null
         cfg.redocConfig != null
@@ -76,7 +90,7 @@ class OpenApiOperationViewRenderSpec extends Specification {
         cfg.render(outputDir, null)
 
         expect:
-        cfg.enabled == true
+        cfg.enabled
         cfg.mappingPath == "somewhere"
         cfg.rapidocConfig != null
         cfg.redocConfig != null
@@ -103,7 +117,7 @@ class OpenApiOperationViewRenderSpec extends Specification {
         cfg.render(outputDir, null)
 
         expect:
-        cfg.enabled == true
+        cfg.enabled
         cfg.mappingPath == "somewhere"
         cfg.rapidocConfig != null
         cfg.redocConfig != null
@@ -131,7 +145,7 @@ class OpenApiOperationViewRenderSpec extends Specification {
         cfg.render(outputDir, null)
 
         expect:
-        cfg.enabled == true
+        cfg.enabled
         cfg.swaggerUIConfig != null
         cfg.title == "OpenAPI documentation"
         cfg.specFile == "swagger.yml"

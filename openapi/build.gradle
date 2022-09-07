@@ -38,3 +38,6 @@ dependencies {
 test {
     useJUnitPlatform()
 }
+
+// conflicts with OpenAPI definitions and is not needed
+checkstyleNohttp.enabled = false

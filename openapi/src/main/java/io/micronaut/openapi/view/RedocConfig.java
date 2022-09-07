@@ -29,6 +29,8 @@ import io.micronaut.openapi.view.OpenApiViewConfig.RendererType;
  */
 final class RedocConfig extends AbstractViewConfig implements Renderer {
 
+    private static final String DEFAULT_REDOC_JS_PATH = OpenApiViewConfig.RESOURCE_DIR + "/redoc.standalone.js";
+
     private static final Map<String, Object> DEFAULT_OPTIONS = Collections.emptyMap();
 
     // https://github.com/Redocly/redoc#redoc-options-object
@@ -106,7 +108,11 @@ final class RedocConfig extends AbstractViewConfig implements Renderer {
         }
 
         public static SideNavStyle byCode(String code) {
-            return BY_CODE.get(code.toLowerCase());
+            SideNavStyle value = BY_CODE.get(code.toLowerCase());
+            if (value == null) {
+                throw new IllegalArgumentException("Unknown value " + code);
+            }
+            return value;
         }
     }
 
@@ -114,6 +120,7 @@ final class RedocConfig extends AbstractViewConfig implements Renderer {
 
     private RedocConfig() {
         super("redoc.");
+        jsUrl = DEFAULT_REDOC_JS_PATH;
     }
 
     /**
@@ -124,13 +131,17 @@ final class RedocConfig extends AbstractViewConfig implements Renderer {
      * @return A RedocConfig.
      */
     static RedocConfig fromProperties(Map<String, String> properties) {
-        return AbstractViewConfig.fromProperties(new RedocConfig(), DEFAULT_OPTIONS, properties);
+        RedocConfig cfg = AbstractViewConfig.fromProperties(new RedocConfig(), DEFAULT_OPTIONS, properties);
+        if (DEFAULT_REDOC_JS_PATH.equals(cfg.jsUrl)) {
+            cfg.isDefaultJsUrl = true;
+        }
+        return cfg;
     }
 
     @Override
     public String render(String template) {
         template = rapiPDFConfig.render(template, RendererType.REDOC);
-        template = OpenApiViewConfig.replacePlaceHolder(template, "redoc.version", version, "@");
+        template = OpenApiViewConfig.replacePlaceHolder(template, "redoc.js.url", jsUrl, "");
         return OpenApiViewConfig.replacePlaceHolder(template, "redoc.attributes", toHtmlAttributes(), "");
     }
 
