@@ -5,13 +5,6 @@
         "https://checkstyle.org/dtds/suppressions_1_2.dtd">
 
 <suppressions>
-    <!-- <suppress checks="FileLength" -->
-              <!-- files="DefaultBeanContext.java|BeanDefinitionWriter.java|DefaultHttpClient.java"/> -->
+     <suppress checks="FileLength" files=".*"/>
 
-    <suppress checks="MissingJavadocType" files=".*doc-examples.*" />
-    <suppress checks="NoHttpCheck" files="rapidoc-min.js" />
-    <suppress checks="NoHttpCheck" files="rapipdf-min.js" />
-    <suppress checks="NoHttpCheck" files="redoc.standalone.js" />
-    <suppress checks="NoHttpCheck" files="swagger-ui-bundle.js" />
-    <suppress checks="NoHttpCheck" files="swagger-ui-standalone-preset.js" />
 </suppressions>

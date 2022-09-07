@@ -1,10 +1,10 @@
 # Auto detect text files and perform LF normalization
 *        text=auto
 
-*.java   text
+*.java   text eol=lf
 *.html   text
-*.kt     text
-*.kts    text
+*.kt     text eol=lf
+*.kts    text eol=lf
 *.md     text diff=markdown
 *.py     text diff=python executable
 *.pl     text diff=perl executable
