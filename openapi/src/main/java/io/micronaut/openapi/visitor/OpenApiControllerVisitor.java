@@ -15,11 +15,23 @@
  */
 package io.micronaut.openapi.visitor;
 
+import java.lang.annotation.Annotation;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import io.micronaut.context.RequiresCondition;
 import io.micronaut.context.annotation.Requires;
+import io.micronaut.context.env.Environment;
+import io.micronaut.context.env.PropertyPlaceholderResolver;
 import io.micronaut.core.annotation.AnnotationValue;
 import io.micronaut.core.annotation.Experimental;
-import io.micronaut.core.type.Argument;
 import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.core.util.StringUtils;
 import io.micronaut.http.HttpMethod;
@@ -41,20 +53,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.servers.Server;
 
-import java.lang.annotation.Annotation;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 
-import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.MICRONAUT_OPENAPI_ENVIRONMENTS;
-import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.readOpenApiConfigFile;
 import static io.micronaut.openapi.visitor.Utils.DEFAULT_MEDIA_TYPES;
 
 /**
@@ -71,9 +71,9 @@ public class OpenApiControllerVisitor extends AbstractOpenApiEndpointVisitor imp
     private final List<AnnotationValue<io.swagger.v3.oas.annotations.security.SecurityRequirement>> additionalSecurityRequirements;
 
     public OpenApiControllerVisitor() {
-        this.additionalTags = Collections.emptyList();
-        this.additionalSecurityRequirements = Collections.emptyList();
-        this.customUri = null;
+        additionalTags = Collections.emptyList();
+        additionalSecurityRequirements = Collections.emptyList();
+        customUri = null;
     }
 
     public OpenApiControllerVisitor(List<AnnotationValue<Tag>> additionalTags,
@@ -84,33 +84,19 @@ public class OpenApiControllerVisitor extends AbstractOpenApiEndpointVisitor imp
         this.customUri = customUri;
     }
 
-    private List<String> getActiveEnvironments(VisitorContext context) {
-        Optional<List<String>> activeEnvsOpt = context.get(MICRONAUT_OPENAPI_ENVIRONMENTS, Argument.LIST_OF_STRING);
-        if (activeEnvsOpt.isPresent()) {
-            return activeEnvsOpt.get();
-        }
-        String activeEnv = getConfigurationProperty(MICRONAUT_OPENAPI_ENVIRONMENTS, context);
-        List<String> activeEnvs;
-        if (StringUtils.isNotEmpty(activeEnv)) {
-            activeEnvs = Stream.of(activeEnv)
-                .filter(StringUtils::isNotEmpty)
-                .flatMap(s -> Arrays.stream(s.split(",")))
-                .map(String::trim)
-                .collect(Collectors.toList());
-        } else {
-            activeEnvs = new ArrayList<>();
-        }
-        context.put(MICRONAUT_OPENAPI_ENVIRONMENTS, activeEnvs);
-        return activeEnvs;
-    }
-
     private boolean ignoreByRequires(Element element, VisitorContext context) {
         List<AnnotationValue<Requires>> requiresAnnotations = element.getDeclaredAnnotationValuesByType(Requires.class);
         if (CollectionUtils.isEmpty(requiresAnnotations)) {
             return false;
         }
-        List<String> activeEnvs = getActiveEnvironments(context);
-        if (activeEnvs.isEmpty()) {
+        Environment environment = OpenApiApplicationVisitor.getEnv(context);
+        Set<String> activeEnvs;
+        if (environment != null) {
+            activeEnvs = environment.getActiveNames();
+        } else {
+            activeEnvs = new HashSet<>(OpenApiApplicationVisitor.getActiveEnvs(context));
+        }
+        if (CollectionUtils.isEmpty(activeEnvs)) {
             return false;
         }
 
@@ -156,10 +142,6 @@ public class OpenApiControllerVisitor extends AbstractOpenApiEndpointVisitor imp
             || ignoreByRequires(element, context);
     }
 
-    private String getConfigurationProperty(String key, VisitorContext context) {
-        return System.getProperty(key, readOpenApiConfigFile(context).getProperty(key));
-    }
-
     @Override
     protected HttpMethod httpMethod(MethodElement element) {
         Optional<Class<? extends Annotation>> httpMethodOpt = element
@@ -195,23 +177,27 @@ public class OpenApiControllerVisitor extends AbstractOpenApiEndpointVisitor imp
     }
 
     @Override
-    protected List<UriMatchTemplate> uriMatchTemplates(MethodElement element) {
+    protected List<UriMatchTemplate> uriMatchTemplates(MethodElement element, VisitorContext context) {
         String controllerValue = element.getOwningType().getValue(UriMapping.class, String.class).orElse(element.getDeclaringType().getValue(UriMapping.class, String.class).orElse("/"));
         if (StringUtils.isNotEmpty(customUri)) {
             controllerValue = customUri;
         }
-        controllerValue = getPropertyPlaceholderResolver().resolvePlaceholders(controllerValue).orElse(controllerValue);
+
+        Environment environment = OpenApiApplicationVisitor.getEnv(context);
+        PropertyPlaceholderResolver propertyPlaceholderResolver = environment != null ? environment.getPlaceholderResolver() : Utils.getPropertyPlaceholderResolver();
+        controllerValue = propertyPlaceholderResolver.resolvePlaceholders(controllerValue).orElse(controllerValue);
+
         UriMatchTemplate matchTemplate = UriMatchTemplate.of(controllerValue);
         // check if we have multiple uris
         String[] uris = element.stringValues(HttpMethodMapping.class, "uris");
         if (uris.length == 0) {
             String methodValue = element.getValue(HttpMethodMapping.class, String.class).orElse("/");
-            methodValue = getPropertyPlaceholderResolver().resolvePlaceholders(methodValue).orElse(methodValue);
+            methodValue = propertyPlaceholderResolver.resolvePlaceholders(methodValue).orElse(methodValue);
             return Collections.singletonList(matchTemplate.nest(methodValue));
         } else {
             List<UriMatchTemplate> matchTemplates = new ArrayList<>(uris.length);
             for (String methodValue : uris) {
-                methodValue = getPropertyPlaceholderResolver().resolvePlaceholders(methodValue).orElse(methodValue);
+                methodValue = propertyPlaceholderResolver.resolvePlaceholders(methodValue).orElse(methodValue);
                 matchTemplates.add(matchTemplate.nest(methodValue));
             }
             return matchTemplates;

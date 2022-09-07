@@ -92,8 +92,6 @@ class EndpointsConfiguration {
                     } else if ("class".equals(entryType)) {
                         Endpoint endpoint = endpoints.computeIfAbsent(name, key -> new Endpoint());
                         endpoint.setClassElement(context.getClassElement(entry.getValue()));
-                    } else {
-                        return;
                     }
                 });
     }

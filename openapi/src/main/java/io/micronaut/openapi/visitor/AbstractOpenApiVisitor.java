@@ -53,6 +53,7 @@ import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 import javax.validation.constraints.Size;
 
+import io.micronaut.context.env.Environment;
 import io.micronaut.core.annotation.AnnotationClassValue;
 import io.micronaut.core.annotation.AnnotationValue;
 import io.micronaut.core.annotation.Nullable;
@@ -165,7 +166,7 @@ abstract class AbstractOpenApiVisitor {
     void incrementVisitedElements(VisitorContext context) {
         VISITED_ELEMENTS_LOCK.lock();
         try {
-            context.put(Utils.ATTR_VISITED_ELEMENTS, getVisitedElements(context) + 1);
+            context.put(Utils.ATTR_VISITED_ELEMENTS, ContextUtils.getVisitedElements(context) + 1);
         } finally {
             VISITED_ELEMENTS_LOCK.unlock();
         }
@@ -181,19 +182,10 @@ abstract class AbstractOpenApiVisitor {
     int visitedElements(VisitorContext context) {
         VISITED_ELEMENTS_LOCK.lock();
         try {
-            return getVisitedElements(context);
+            return ContextUtils.getVisitedElements(context);
         } finally {
             VISITED_ELEMENTS_LOCK.unlock();
         }
-    }
-
-    private static Integer getVisitedElements(VisitorContext context) {
-        Integer visitedElements = context.get(Utils.ATTR_VISITED_ELEMENTS, Integer.class).orElse(null);
-        if (visitedElements == null) {
-            visitedElements = 0;
-            context.put(Utils.ATTR_VISITED_ELEMENTS, visitedElements);
-        }
-        return visitedElements;
     }
 
     /**
@@ -313,7 +305,14 @@ abstract class AbstractOpenApiVisitor {
                 }
                 result.append(c);
             }
-            resultPaths.add(paths.computeIfAbsent(result.toString(), key -> new PathItem()));
+
+            String pathBeforeReplace = result.toString();
+            Environment environment = OpenApiApplicationVisitor.getEnv(context);
+            if (environment != null) {
+                resultPaths.add(paths.computeIfAbsent(environment.getPlaceholderResolver().resolvePlaceholders(pathBeforeReplace).orElse(pathBeforeReplace), key -> new PathItem()));
+            } else {
+                resultPaths.add(paths.computeIfAbsent(pathBeforeReplace, key -> new PathItem()));
+            }
         }
 
         return resultPaths;
@@ -1312,7 +1311,7 @@ abstract class AbstractOpenApiVisitor {
     private Schema doBindSchemaAnnotationValue(VisitorContext context, Element element, Schema schemaToBind,
                                                JsonNode schemaJson, String elType, String defaultValue, String... allowableValues) {
         // need to set placeholders to set correct values to example field
-        schemaJson = resolvePlaceholders(schemaJson, s -> expandProperties(s, getExpandableProperties(context)));
+        schemaJson = resolvePlaceholders(schemaJson, s -> expandProperties(s, getExpandableProperties(context), context));
         try {
             schemaToBind = ConvertUtils.getJsonMapper().readerForUpdating(schemaToBind).readValue(schemaJson);
         } catch (IOException e) {

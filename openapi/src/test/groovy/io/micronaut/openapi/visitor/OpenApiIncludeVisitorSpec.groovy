@@ -11,18 +11,27 @@ class OpenApiIncludeVisitorSpec extends AbstractOpenApiTypeElementSpec {
 
     void "test build OpenAPI doc for security Login controller"() {
         when:
-            buildBeanDefinition('test.MyBean', '''
+        buildBeanDefinition('test.MyBean', '''
 package test;
 
-import io.micronaut.http.annotation.*;
-import io.micronaut.http.*;
-import io.swagger.v3.oas.annotations.*;
-import io.swagger.v3.oas.annotations.info.*;
-import io.swagger.v3.oas.annotations.media.*;
-import io.swagger.v3.oas.annotations.tags.*;
-import io.swagger.v3.oas.annotations.servers.*;
-import io.swagger.v3.oas.annotations.security.*;
+import io.micronaut.http.HttpResponse;
+import io.micronaut.http.MediaType;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.micronaut.http.annotation.Produces;
+import io.micronaut.openapi.annotation.OpenAPIInclude;
+import io.micronaut.security.endpoints.LoginController;
+import io.swagger.v3.oas.annotations.ExternalDocumentation;
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.info.Contact;
+import io.swagger.v3.oas.annotations.info.Info;
+import io.swagger.v3.oas.annotations.info.License;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
+import jakarta.inject.Singleton;
 
 @OpenAPIDefinition(
         info = @Info(
@@ -38,7 +47,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
                 @SecurityRequirement(name = "req 2", scopes = {"b", "c"})
         }
 )
-@io.micronaut.openapi.annotation.OpenAPIInclude(value = io.micronaut.security.endpoints.LoginController.class,
+@OpenAPIInclude(value = LoginController.class,
     tags = @Tag(name = "Tag 4"),
     security = @SecurityRequirement(name = "req 3", scopes = {"b", "c"})
 )
@@ -48,7 +57,7 @@ class Application {
 
 @Tag(name = "HelloWorld")
 interface HelloWorldApi {
- @Get("/")
+    @Get("/")
     @Produces(MediaType.TEXT_PLAIN)
     @Operation(summary = "Get a message", description = "Returns a simple hello world.")
     @ApiResponse(responseCode = "200", description = "All good.")
@@ -64,40 +73,40 @@ class HelloWorldController implements HelloWorldApi {
     }
 }
 
-@jakarta.inject.Singleton
+@Singleton
 class MyBean {}
 ''')
         then:
-            Utils.testReference != null
+        Utils.testReference != null
 
         when:
-            OpenAPI openAPI = Utils.testReference
+        OpenAPI openAPI = Utils.testReference
 
         then:
-            openAPI.info != null
+        openAPI.info != null
         when:
 
-            PathItem helloPathItem = openAPI.paths.get("/hello")
-            PathItem loginPathItem = openAPI.paths.get("/login")
+        PathItem helloPathItem = openAPI.paths.get("/hello")
+        PathItem loginPathItem = openAPI.paths.get("/login")
 
         then:
-            helloPathItem
-            loginPathItem.post.operationId == 'login'
-            loginPathItem.post.tags[0] == "Tag 4"
-            loginPathItem.post.security[0]["req 3"]
-            loginPathItem.post.requestBody
-            loginPathItem.post.requestBody.required
-            loginPathItem.post.requestBody.content
-            loginPathItem.post.requestBody.content.size() == 2
-            loginPathItem.post.requestBody.content['application/x-www-form-urlencoded'].schema
-            loginPathItem.post.requestBody.content['application/x-www-form-urlencoded'].schema['$ref'] == '#/components/schemas/UsernamePasswordCredentials'
-            loginPathItem.post.requestBody.content['application/json'].schema
-            loginPathItem.post.requestBody.content['application/json'].schema['$ref'] == '#/components/schemas/UsernamePasswordCredentials'
-            loginPathItem.post.responses['200'].content['application/json'].schema['$ref'] == '#/components/schemas/Object'
-            openAPI.components.schemas['UsernamePasswordCredentials']
-            openAPI.components.schemas['UsernamePasswordCredentials'].required.size() == 2
-            openAPI.components.schemas['UsernamePasswordCredentials'].properties['username']
-            openAPI.components.schemas['UsernamePasswordCredentials'].properties['password']
+        helloPathItem
+        loginPathItem.post.operationId == 'login'
+        loginPathItem.post.tags[0] == "Tag 4"
+        loginPathItem.post.security[0]["req 3"]
+        loginPathItem.post.requestBody
+        loginPathItem.post.requestBody.required
+        loginPathItem.post.requestBody.content
+        loginPathItem.post.requestBody.content.size() == 2
+        loginPathItem.post.requestBody.content['application/x-www-form-urlencoded'].schema
+        loginPathItem.post.requestBody.content['application/x-www-form-urlencoded'].schema['$ref'] == '#/components/schemas/UsernamePasswordCredentials'
+        loginPathItem.post.requestBody.content['application/json'].schema
+        loginPathItem.post.requestBody.content['application/json'].schema['$ref'] == '#/components/schemas/UsernamePasswordCredentials'
+        loginPathItem.post.responses['200'].content['application/json'].schema['$ref'] == '#/components/schemas/Object'
+        openAPI.components.schemas['UsernamePasswordCredentials']
+        openAPI.components.schemas['UsernamePasswordCredentials'].required.size() == 2
+        openAPI.components.schemas['UsernamePasswordCredentials'].properties['username']
+        openAPI.components.schemas['UsernamePasswordCredentials'].properties['password']
     }
 
     void "test build OpenAPI doc for security Login controller with custom uris"() {
@@ -105,15 +114,23 @@ class MyBean {}
         buildBeanDefinition('test.MyBean', '''
 package test;
 
-import io.micronaut.http.annotation.*;
-import io.micronaut.http.*;
-import io.swagger.v3.oas.annotations.*;
-import io.swagger.v3.oas.annotations.info.*;
-import io.swagger.v3.oas.annotations.media.*;
-import io.swagger.v3.oas.annotations.tags.*;
-import io.swagger.v3.oas.annotations.servers.*;
-import io.swagger.v3.oas.annotations.security.*;
+import io.micronaut.http.HttpResponse;
+import io.micronaut.http.MediaType;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.micronaut.http.annotation.Produces;
+import io.micronaut.openapi.annotation.OpenAPIInclude;
+import io.micronaut.security.endpoints.LoginController;
+import io.swagger.v3.oas.annotations.ExternalDocumentation;
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.info.Contact;
+import io.swagger.v3.oas.annotations.info.Info;
+import io.swagger.v3.oas.annotations.info.License;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;import io.swagger.v3.oas.annotations.tags.Tag;
+
+import jakarta.inject.Singleton;
 
 @OpenAPIDefinition(
         info = @Info(
@@ -129,7 +146,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
                 @SecurityRequirement(name = "req 2", scopes = {"b", "c"})
         }
 )
-@io.micronaut.openapi.annotation.OpenAPIInclude(value = io.micronaut.security.endpoints.LoginController.class,
+@OpenAPIInclude(value = LoginController.class,
     uri = "/myLogin",
     tags = @Tag(name = "Tag 4"),
     security = @SecurityRequirement(name = "req 3", scopes = {"b", "c"})
@@ -140,7 +157,7 @@ class Application {
 
 @Tag(name = "HelloWorld")
 interface HelloWorldApi {
- @Get("/")
+    @Get("/")
     @Produces(MediaType.TEXT_PLAIN)
     @Operation(summary = "Get a message", description = "Returns a simple hello world.")
     @ApiResponse(responseCode = "200", description = "All good.")
@@ -156,7 +173,7 @@ class HelloWorldController implements HelloWorldApi {
     }
 }
 
-@jakarta.inject.Singleton
+@Singleton
 class MyBean {}
 ''')
         then:
@@ -202,15 +219,25 @@ class MyBean {}
         buildBeanDefinition('test.MyBean', '''
 package test;
 
-import io.micronaut.http.annotation.*;
-import io.micronaut.http.*;
-import io.swagger.v3.oas.annotations.*;
-import io.swagger.v3.oas.annotations.info.*;
-import io.swagger.v3.oas.annotations.media.*;
-import io.swagger.v3.oas.annotations.tags.*;
-import io.swagger.v3.oas.annotations.servers.*;
-import io.swagger.v3.oas.annotations.security.*;
+import io.micronaut.http.HttpResponse;
+import io.micronaut.http.MediaType;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.micronaut.http.annotation.Produces;
+import io.micronaut.openapi.annotation.OpenAPIInclude;
+import io.micronaut.security.endpoints.LoginController;
+import io.micronaut.security.endpoints.LogoutController;
+import io.swagger.v3.oas.annotations.ExternalDocumentation;
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.info.Contact;
+import io.swagger.v3.oas.annotations.info.Info;
+import io.swagger.v3.oas.annotations.info.License;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
+import jakarta.inject.Singleton;
 
 @OpenAPIDefinition(
         info = @Info(
@@ -226,12 +253,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
                 @SecurityRequirement(name = "req 2", scopes = {"b", "c"})
         }
 )
-@io.micronaut.openapi.annotation.OpenAPIInclude(value = io.micronaut.security.endpoints.LoginController.class,
+@OpenAPIInclude(value = LoginController.class,
     uri = "${login.placeholder}",
     tags = @Tag(name = "Tag 4"),
     security = @SecurityRequirement(name = "req 3", scopes = {"b", "c"})
 )
-@io.micronaut.openapi.annotation.OpenAPIInclude(value = io.micronaut.security.endpoints.LogoutController.class,
+@OpenAPIInclude(value = LogoutController.class,
     uri = "${logout.placeholder}",
     tags = @Tag(name = "Tag 5"),
     security = @SecurityRequirement(name = "req 3", scopes = {"b", "c"})
@@ -242,7 +269,7 @@ class Application {
 
 @Tag(name = "HelloWorld")
 interface HelloWorldApi {
- @Get("/")
+    @Get("/")
     @Produces(MediaType.TEXT_PLAIN)
     @Operation(summary = "Get a message", description = "Returns a simple hello world.")
     @ApiResponse(responseCode = "200", description = "All good.")
@@ -258,7 +285,7 @@ class HelloWorldController implements HelloWorldApi {
     }
 }
 
-@jakarta.inject.Singleton
+@Singleton
 class MyBean {}
 ''')
         then:
@@ -308,23 +335,33 @@ class MyBean {}
 
     void "test build OpenAPI doc for simple endpoint"() {
         when:
-            buildBeanDefinition('test.MyBean', '''
+        buildBeanDefinition('test.MyBean', '''
 package test;
 
-import io.micronaut.management.endpoint.annotation.Endpoint;
+import io.micronaut.http.HttpResponse;
+import io.micronaut.http.MediaType;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.micronaut.http.annotation.Produces;
 import io.micronaut.management.endpoint.annotation.Delete;
-import io.micronaut.management.endpoint.annotation.Write;
+import io.micronaut.management.endpoint.annotation.Endpoint;
 import io.micronaut.management.endpoint.annotation.Selector;
-
-import io.micronaut.http.annotation.*;
-import io.micronaut.http.*;
-import io.swagger.v3.oas.annotations.*;
-import io.swagger.v3.oas.annotations.info.*;
-import io.swagger.v3.oas.annotations.media.*;
-import io.swagger.v3.oas.annotations.tags.*;
-import io.swagger.v3.oas.annotations.servers.*;
-import io.swagger.v3.oas.annotations.security.*;
+import io.micronaut.management.endpoint.annotation.Write;
+import io.micronaut.management.endpoint.routes.RoutesEndpoint;
+import io.micronaut.openapi.annotation.OpenAPIInclude;
+import io.swagger.v3.oas.annotations.ExternalDocumentation;
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.info.Contact;
+import io.swagger.v3.oas.annotations.info.Info;
+import io.swagger.v3.oas.annotations.info.License;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.servers.Server;
+import io.swagger.v3.oas.annotations.servers.ServerVariable;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
+import jakarta.inject.Singleton;
 
 @OpenAPIDefinition(
         info = @Info(
@@ -354,12 +391,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
                         })
         }
 )
-@io.micronaut.openapi.annotation.OpenAPIInclude(
-    classes = io.micronaut.management.endpoint.routes.RoutesEndpoint.class,
+@OpenAPIInclude(
+    classes = RoutesEndpoint.class,
     tags = @Tag(name = "Tag 4"),
     security = @SecurityRequirement(name = "req 3", scopes = {"b", "c"})
 )
-@io.micronaut.openapi.annotation.OpenAPIInclude(
+@OpenAPIInclude(
     value = test.MessageEndpoint.class,
     tags = @Tag(name = "Tag 4"),
     security = @SecurityRequirement(name = "req 3", scopes = {"b", "c"})
@@ -391,7 +428,7 @@ class MessageEndpoint {
 }
 @Tag(name = "HelloWorld")
 interface HelloWorldApi {
- @Get("/")
+    @Get("/")
     @Produces(MediaType.TEXT_PLAIN)
     @Operation(summary = "Get a message", description = "Returns a simple hello world.")
     @ApiResponse(responseCode = "200", description = "All good.")
@@ -406,111 +443,125 @@ class HelloWorldController implements HelloWorldApi {
         return null;
     }
 }
-@jakarta.inject.Singleton
+@Singleton
 class MyBean {}
 ''')
         then:
-            Utils.testReference != null
+        Utils.testReference != null
 
         when:
-            OpenAPI openAPI = Utils.testReference
+        OpenAPI openAPI = Utils.testReference
 
         then:
-            openAPI.info != null
-            openAPI.info.title == 'the title'
-            openAPI.info.version == '0.0'
-            openAPI.info.description == 'My API'
-            openAPI.info.license.name == 'Apache 2.0'
-            openAPI.info.contact.name == 'Fred'
-            openAPI.tags.size() == 3
-            Tag tag = openAPI.tags.find { it -> (it.name == 'Tag 1') }
-            tag
-            tag.description == 'desc 1'
-            openAPI.externalDocs.description == 'definition docs desc'
-            openAPI.security.size() == 2
-            openAPI.security[0] == ["req 1": ["a", "b"]]
-            openAPI.security[1] == ["req 2": ["b", "c"]]
-            openAPI.servers.size() == 1
-            openAPI.servers[0].description == 'server 1'
-            openAPI.servers[0].url == 'https://foo'
-            openAPI.servers[0].variables.size() == 2
-            openAPI.servers[0].variables.var1.description == 'var 1'
-            openAPI.servers[0].variables.var1.default == '1'
-            openAPI.servers[0].variables.var1.enum == ['1', '2']
+        openAPI.info != null
+        openAPI.info.title == 'the title'
+        openAPI.info.version == '0.0'
+        openAPI.info.description == 'My API'
+        openAPI.info.license.name == 'Apache 2.0'
+        openAPI.info.contact.name == 'Fred'
+        openAPI.tags.size() == 3
+        Tag tag = openAPI.tags.find { it -> (it.name == 'Tag 1') }
+        tag
+        tag.description == 'desc 1'
+        openAPI.externalDocs.description == 'definition docs desc'
+        openAPI.security.size() == 2
+        openAPI.security[0] == ["req 1": ["a", "b"]]
+        openAPI.security[1] == ["req 2": ["b", "c"]]
+        openAPI.servers.size() == 1
+        openAPI.servers[0].description == 'server 1'
+        openAPI.servers[0].url == 'https://foo'
+        openAPI.servers[0].variables.size() == 2
+        openAPI.servers[0].variables.var1.description == 'var 1'
+        openAPI.servers[0].variables.var1.default == '1'
+        openAPI.servers[0].variables.var1.enum == ['1', '2']
 
         then:
-            openAPI.paths['/message']
-            openAPI.paths['/message'].delete
-            openAPI.paths['/message'].delete.tags[0] == "Tag 4"
-            openAPI.paths['/message'].delete.security[0]["req 3"]
-            openAPI.paths['/message/{message}']
-            openAPI.paths['/message/{message}'].post
-            openAPI.paths['/message/{message}'].post.parameters.size() == 1
-            openAPI.paths['/message/{message}'].post.parameters[0].name == 'message'
-            openAPI.paths['/message/{message}'].post.tags[0] == "Tag 4"
-            openAPI.paths['/message/{message}'].post.security[0]["req 3"]
+        openAPI.paths['/message']
+        openAPI.paths['/message'].delete
+        openAPI.paths['/message'].delete.tags[0] == "Tag 4"
+        openAPI.paths['/message'].delete.security[0]["req 3"]
+        openAPI.paths['/message/{message}']
+        openAPI.paths['/message/{message}'].post
+        openAPI.paths['/message/{message}'].post.parameters.size() == 1
+        openAPI.paths['/message/{message}'].post.parameters[0].name == 'message'
+        openAPI.paths['/message/{message}'].post.tags[0] == "Tag 4"
+        openAPI.paths['/message/{message}'].post.security[0]["req 3"]
 
         then:
-            openAPI.paths['/routes']
-            openAPI.paths['/routes'].get.tags[0] == "Tag 4"
-            openAPI.paths['/routes'].get.security[0]["req 3"]
+        openAPI.paths['/routes']
+        openAPI.paths['/routes'].get.tags[0] == "Tag 4"
+        openAPI.paths['/routes'].get.security[0]["req 3"]
     }
 
     void "test build OpenAPI for management endpoints"() {
         when:
-            buildBeanDefinition('test.MyBean', '''
+        buildBeanDefinition('test.MyBean', '''
 package test;
 
-@io.swagger.v3.oas.annotations.OpenAPIDefinition
-@io.micronaut.openapi.annotation.OpenAPIManagement(tags = @io.swagger.v3.oas.annotations.tags.Tag(name = "Micronaut Management"))
+import io.micronaut.openapi.annotation.OpenAPIManagement;
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
+import jakarta.inject.Singleton;
+
+@OpenAPIDefinition
+@OpenAPIManagement(tags = @Tag(name = "Micronaut Management"))
 class Application {
 }
-@jakarta.inject.Singleton
+
+@Singleton
 class MyBean {}
 ''')
         then:
-            Utils.testReference != null
+        Utils.testReference != null
 
         when:
-            OpenAPI openAPI = Utils.testReference
+        OpenAPI openAPI = Utils.testReference
 
         then:
-            openAPI.paths['/health']
-            openAPI.paths['/health'].get.tags[0] == "Micronaut Management"
-            openAPI.paths['/beans']
-            openAPI.paths['/env']
-            openAPI.paths['/info']
-            openAPI.paths['/loggers']
-            openAPI.paths['/refresh']
-            openAPI.paths['/routes']
-            openAPI.paths['/stop']
-            openAPI.paths['/threaddump']
+        openAPI.paths['/health']
+        openAPI.paths['/health'].get.tags[0] == "Micronaut Management"
+        openAPI.paths['/beans']
+        openAPI.paths['/env']
+        openAPI.paths['/info']
+        openAPI.paths['/loggers']
+        openAPI.paths['/refresh']
+        openAPI.paths['/routes']
+        openAPI.paths['/stop']
+        openAPI.paths['/threaddump']
     }
 
     void "test build OpenAPI for security endpoints"() {
         when:
-            buildBeanDefinition('test.MyBean', '''
+        buildBeanDefinition('test.MyBean', '''
 package test;
 
-@io.swagger.v3.oas.annotations.OpenAPIDefinition
-@io.micronaut.openapi.annotation.OpenAPISecurity(tags = @io.swagger.v3.oas.annotations.tags.Tag(name = "Micronaut Security"))
+import io.micronaut.openapi.annotation.OpenAPISecurity;
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
+import jakarta.inject.Singleton;
+
+@OpenAPIDefinition
+@OpenAPISecurity(tags = @Tag(name = "Micronaut Security"))
 class Application {
 }
-@jakarta.inject.Singleton
+
+@Singleton
 class MyBean {}
 ''')
         then:
-            Utils.testReference != null
+        Utils.testReference != null
 
         when:
-            OpenAPI openAPI = Utils.testReference
+        OpenAPI openAPI = Utils.testReference
 
         then: "User defined end point is processed"
-            openAPI.paths['/login']
-            openAPI.paths['/login'].post.tags[0] == "Micronaut Security"
-            openAPI.paths['/logout']
-            openAPI.paths['/logout'].post.tags[0] == "Micronaut Security"
-            openAPI.paths['/logout'].get.tags[0] == "Micronaut Security"
+        openAPI.paths['/login']
+        openAPI.paths['/login'].post.tags[0] == "Micronaut Security"
+        openAPI.paths['/logout']
+        openAPI.paths['/logout'].post.tags[0] == "Micronaut Security"
+        openAPI.paths['/logout'].get.tags[0] == "Micronaut Security"
     }
 
     @Issue("https://github.com/micronaut-projects/micronaut-openapi/issues/522")
@@ -519,15 +570,10 @@ class MyBean {}
         buildBeanDefinition('test.MyBean', '''
 package test;
 
-import io.micronaut.http.annotation.*;
-import io.micronaut.http.*;
-import io.swagger.v3.oas.annotations.*;
-import io.swagger.v3.oas.annotations.info.*;
-import io.swagger.v3.oas.annotations.media.*;
-import io.swagger.v3.oas.annotations.tags.*;
-import io.swagger.v3.oas.annotations.servers.*;
-import io.swagger.v3.oas.annotations.security.*;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.info.Info;
+import io.swagger.v3.oas.annotations.servers.Server;
+import io.swagger.v3.oas.annotations.servers.ServerVariable;
 
 @OpenAPIDefinition(
     info = @Info(
