@@ -32,6 +32,7 @@ import java.util.stream.Stream;
 
 import io.micronaut.core.annotation.AnnotationValue;
 import io.micronaut.core.annotation.Experimental;
+import io.micronaut.core.annotation.Nullable;
 import io.micronaut.core.beans.BeanMap;
 import io.micronaut.core.bind.annotation.Bindable;
 import io.micronaut.core.naming.NameUtils;
@@ -487,26 +488,10 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             paramAnn.stringValue("name").ifPresent(parameter::name);
             paramAnn.enumValue("in", ParameterIn.class).ifPresent(in -> parameter.in(in.toString()));
             paramAnn.stringValue("description").ifPresent(parameter::description);
-            paramAnn.booleanValue("required").ifPresent(value -> {
-                if (value) {
-                    parameter.setRequired(true);
-                }
-            });
-            paramAnn.booleanValue("deprecated").ifPresent(value -> {
-                if (value) {
-                    parameter.setDeprecated(true);
-                }
-            });
-            paramAnn.booleanValue("allowEmptyValue").ifPresent(value -> {
-                if (value) {
-                    parameter.setAllowEmptyValue(true);
-                }
-            });
-            paramAnn.booleanValue("allowReserved").ifPresent(value -> {
-                if (value) {
-                    parameter.setAllowReserved(true);
-                }
-            });
+            paramAnn.booleanValue("required").ifPresent(value -> parameter.setRequired(value ? true : null));
+            paramAnn.booleanValue("deprecated").ifPresent(value -> parameter.setDeprecated(value ? true : null));
+            paramAnn.booleanValue("allowEmptyValue").ifPresent(value -> parameter.setAllowEmptyValue(value ? true : null));
+            paramAnn.booleanValue("allowReserved").ifPresent(value -> parameter.setAllowReserved(value ? true : null));
             paramAnn.stringValue("example").ifPresent(parameter::example);
             paramAnn.stringValue("ref").ifPresent(parameter::$ref);
             paramAnn.enumValue("style", ParameterStyle.class).ifPresent(style -> parameter.setStyle(paramStyle(style)));
@@ -594,8 +579,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             return;
         }
 
-        Parameter newParameter = processMethodParameterAnnotation(context, permitsRequestBody, pathVariables,
-            parameter, extraBodyParameters);
+        Parameter newParameter = processMethodParameterAnnotation(context, permitsRequestBody, pathVariables, parameter, extraBodyParameters);
         if (newParameter == null) {
             return;
         }
@@ -603,7 +587,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             newParameter.setName(parameter.getName());
         }
 
-        if (newParameter.getRequired() == null && !parameter.isNullable() && !parameter.getType().isOptional()) {
+        if (newParameter.getRequired() == null && !isNullable(parameter)) {
             newParameter.setRequired(true);
         }
         if (javadocDescription != null && StringUtils.isEmpty(newParameter.getDescription())) {
@@ -634,7 +618,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             Optional<String> description = parameter.getValue(io.swagger.v3.oas.annotations.Parameter.class, "description", String.class);
             description.ifPresent(propertySchema::setDescription);
             processSchemaProperty(context, parameter, parameter.getType(), null, schema, propertySchema);
-            if (parameter.isNullable() || parameter.getType().isOptional()) {
+            if (isNullable(parameter)) {
                 // Keep null if not
                 propertySchema.setNullable(true);
             }
@@ -653,10 +637,10 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         Parameter newParameter = null;
         String parameterName = parameter.getName();
         if (!parameter.hasStereotype(Bindable.class) && pathVariables.containsKey(parameterName)) {
-            UriMatchVariable var = pathVariables.get(parameterName);
-            newParameter = var.isQuery() ? new QueryParameter() : new PathParameter();
+            UriMatchVariable urlVar = pathVariables.get(parameterName);
+            newParameter = urlVar.isQuery() ? new QueryParameter() : new PathParameter();
             newParameter.setName(parameterName);
-            final boolean exploded = var.isExploded();
+            final boolean exploded = urlVar.isExploded();
             if (exploded) {
                 newParameter.setExplode(exploded);
             }
@@ -784,7 +768,20 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                 }
             }
         }
+
+        if (newParameter != null && isNullable(parameter)) {
+            newParameter.setRequired(null);
+        }
+
         return newParameter;
+    }
+
+    public boolean isNullable(TypedElement element) {
+        return element.isNullable()
+            || element.getType().isOptional()
+            || element.hasStereotype(Nullable.class)
+            || element.hasStereotype(jakarta.annotation.Nullable.class)
+            || element.hasStereotype(org.jetbrains.annotations.Nullable.class);
     }
 
     private void processBody(VisitorContext context, OpenAPI openAPI,
@@ -805,8 +802,8 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                 requestBody.setDescription(desc.toString());
             }
         }
-        if (requestBody.getRequired() == null) {
-            requestBody.setRequired(!parameter.isNullable() && !parameterType.isOptional());
+        if (requestBody.getRequired() == null && !isNullable(parameterType)) {
+            requestBody.setRequired(true);
         }
 
         final Content content = buildContent(parameter, parameterType, consumesMediaTypes, openAPI, context);
@@ -1004,20 +1001,20 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                         }
                         paramAnn.stringValue("description").ifPresent(swaggerParam::setDescription);
                         Optional<Boolean> required = paramAnn.booleanValue("required");
-                        if (required.isPresent() && required.get()) {
-                            swaggerParam.setRequired(true);
+                        if (required.isPresent()) {
+                            swaggerParam.setRequired(required.get() ? true : null);
                         }
                         Optional<Boolean> deprecated = paramAnn.booleanValue("deprecated");
-                        if (deprecated.isPresent() && deprecated.get()) {
-                            swaggerParam.setDeprecated(true);
+                        if (deprecated.isPresent()) {
+                            swaggerParam.setDeprecated(deprecated.get() ? true : null);
                         }
                         Optional<Boolean> allowEmptyValue = paramAnn.booleanValue("allowEmptyValue");
-                        if (allowEmptyValue.isPresent() && allowEmptyValue.get()) {
-                            swaggerParam.setAllowEmptyValue(true);
+                        if (allowEmptyValue.isPresent()) {
+                            swaggerParam.setAllowEmptyValue(allowEmptyValue.get() ? true : null);
                         }
                         Optional<Boolean> allowReserved = paramAnn.booleanValue("allowReserved");
-                        if (allowReserved.isPresent() && allowReserved.get()) {
-                            swaggerParam.setAllowReserved(true);
+                        if (allowReserved.isPresent()) {
+                            swaggerParam.setAllowReserved(allowReserved.get() ? true : null);
                         }
                         paramAnn.stringValue("example").ifPresent(swaggerParam::setExample);
                         Optional<ParameterStyle> style = paramAnn.get("style", ParameterStyle.class);
@@ -1371,7 +1368,9 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
     }
 
     private void readTags(MethodElement element, VisitorContext context, io.swagger.v3.oas.models.Operation swaggerOperation, List<io.swagger.v3.oas.models.tags.Tag> classTags, OpenAPI openAPI) {
-        element.getAnnotationValuesByType(Tag.class).forEach(av -> av.get("name", String.class).ifPresent(swaggerOperation::addTagsItem));
+        element.getAnnotationValuesByType(Tag.class)
+            .forEach(av -> av.get("name", String.class)
+                .ifPresent(swaggerOperation::addTagsItem));
 
         List<io.swagger.v3.oas.models.tags.Tag> copyTags = openAPI.getTags() != null ? new ArrayList<>(openAPI.getTags()) : null;
         List<io.swagger.v3.oas.models.tags.Tag> operationTags = processOpenApiAnnotation(element, context, Tag.class, io.swagger.v3.oas.models.tags.Tag.class, copyTags);
