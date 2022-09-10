@@ -768,7 +768,11 @@ import io.micronaut.core.annotation.Nullable;
 class MyController {
 
     @Get("/subscription/{subscriptionId}")
-    public String getSubscription(@Parameter(description="foo") @CookieValue String subscriptionId, @QueryValue String q, @Header String contentType, @Nullable @Header(name = "Bundle-ID") String bundleId, @Header("X-API-Version") String apiVersion) {
+    public String getSubscription(@Parameter(description="foo") @CookieValue String subscriptionId,
+            @QueryValue String q,
+            @Header String contentType,
+            @Nullable @Header(name = "Bundle-ID") String bundleId,
+            @Header("X-API-Version") String apiVersion) {
         return null;
      }
 }

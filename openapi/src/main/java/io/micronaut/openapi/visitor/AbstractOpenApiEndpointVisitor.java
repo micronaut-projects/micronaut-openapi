@@ -18,6 +18,7 @@ package io.micronaut.openapi.visitor;
 import java.io.IOException;
 import java.security.Principal;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -36,6 +37,7 @@ import io.micronaut.core.annotation.Nullable;
 import io.micronaut.core.beans.BeanMap;
 import io.micronaut.core.bind.annotation.Bindable;
 import io.micronaut.core.naming.NameUtils;
+import io.micronaut.core.reflect.ClassUtils;
 import io.micronaut.core.util.ArrayUtils;
 import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.core.util.StringUtils;
@@ -45,6 +47,7 @@ import io.micronaut.http.HttpResponse;
 import io.micronaut.http.HttpStatus;
 import io.micronaut.http.MediaType;
 import io.micronaut.http.annotation.Body;
+import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.CookieValue;
 import io.micronaut.http.annotation.Header;
 import io.micronaut.http.annotation.Part;
@@ -52,10 +55,12 @@ import io.micronaut.http.annotation.PathVariable;
 import io.micronaut.http.annotation.QueryValue;
 import io.micronaut.http.annotation.RequestBean;
 import io.micronaut.http.annotation.Status;
+import io.micronaut.http.annotation.UriMapping;
 import io.micronaut.http.uri.UriMatchTemplate;
 import io.micronaut.http.uri.UriMatchVariable;
 import io.micronaut.inject.ast.ClassElement;
 import io.micronaut.inject.ast.Element;
+import io.micronaut.inject.ast.ElementQuery;
 import io.micronaut.inject.ast.FieldElement;
 import io.micronaut.inject.ast.MethodElement;
 import io.micronaut.inject.ast.ParameterElement;
@@ -106,6 +111,9 @@ import static io.micronaut.openapi.visitor.Utils.DEFAULT_MEDIA_TYPES;
 public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
 
     public static final String COMPONENTS_CALLBACKS_PREFIX = "#/components/callbacks/";
+
+    protected static final String CONTEXT_CHILD_PATH = "internal.child.path";
+    protected static final String IS_PROCESS_PARENT_CLASS = "internal.is.process.parent";
 
     private static final TypeReference<Map<CharSequence, Object>> MAP_TYPE = new TypeReference<Map<CharSequence, Object>>() {
     };
@@ -158,6 +166,37 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         processSecuritySchemes(element, context);
         processTags(element, context);
         processExternalDocs(element, context);
+        context.remove(CONTEXT_CHILD_PATH);
+
+        if (element.isAnnotationPresent(Controller.class)) {
+
+            String url = element.stringValue(UriMapping.class).orElse(null);
+            if (url != null) {
+                context.put(CONTEXT_CHILD_PATH, url);
+            }
+
+            List<ClassElement> superTypes = new ArrayList<>();
+            Collection<ClassElement> parentInterfaces = element.getInterfaces();
+            if (element.isInterface() && !parentInterfaces.isEmpty()) {
+                for (ClassElement parentInterface : parentInterfaces) {
+                    if (ClassUtils.isJavaLangType(parentInterface.getName())) {
+                        continue;
+                    }
+                    superTypes.add(parentInterface);
+                }
+            } else {
+                element.getSuperType().ifPresent(superTypes::add);
+            }
+
+            if (CollectionUtils.isNotEmpty(superTypes)) {
+                context.put(IS_PROCESS_PARENT_CLASS, true);
+                List<MethodElement> methods = element.getEnclosedElements(ElementQuery.ALL_METHODS);
+                for (MethodElement method : methods) {
+                    visitMethod(method, context);
+                }
+                context.remove(IS_PROCESS_PARENT_CLASS);
+            }
+        }
     }
 
     private void processTags(ClassElement element, VisitorContext context) {
@@ -776,7 +815,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         return newParameter;
     }
 
-    public boolean isNullable(TypedElement element) {
+    private boolean isNullable(TypedElement element) {
         return element.isNullable()
             || element.getType().isOptional()
             || element.hasStereotype(Nullable.class)

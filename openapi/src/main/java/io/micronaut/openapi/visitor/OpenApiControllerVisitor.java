@@ -122,7 +122,9 @@ public class OpenApiControllerVisitor extends AbstractOpenApiEndpointVisitor imp
 
     @Override
     protected boolean ignore(ClassElement element, VisitorContext context) {
-        return !element.isAnnotationPresent(Controller.class)
+        boolean isParentClass = context.get(IS_PROCESS_PARENT_CLASS, Boolean.class).orElse(false);
+
+        return (!isParentClass && !element.isAnnotationPresent(Controller.class))
             || ignoreByRequires(element, context);
     }
 
@@ -179,6 +181,10 @@ public class OpenApiControllerVisitor extends AbstractOpenApiEndpointVisitor imp
     @Override
     protected List<UriMatchTemplate> uriMatchTemplates(MethodElement element, VisitorContext context) {
         String controllerValue = element.getOwningType().getValue(UriMapping.class, String.class).orElse(element.getDeclaringType().getValue(UriMapping.class, String.class).orElse("/"));
+        String childClassPath = context.get(CONTEXT_CHILD_PATH, String.class).orElse(null);
+        if (childClassPath != null) {
+            controllerValue = childClassPath;
+        }
         if (StringUtils.isNotEmpty(customUri)) {
             controllerValue = customUri;
         }

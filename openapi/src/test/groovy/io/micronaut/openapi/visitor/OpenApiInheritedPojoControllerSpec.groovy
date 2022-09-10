@@ -5,11 +5,9 @@ import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.Operation
 import io.swagger.v3.oas.models.media.ComposedSchema
 import io.swagger.v3.oas.models.media.Schema
-import spock.lang.Ignore
 
 class OpenApiInheritedPojoControllerSpec extends AbstractOpenApiTypeElementSpec {
 
-    @Ignore
     void "test controller inheritance with generics - Issue #193"() {
         given: "An API definition"
 
@@ -19,74 +17,95 @@ package test;
 
 import io.micronaut.core.annotation.Nullable;
 import io.micronaut.http.HttpResponse;
+import io.micronaut.http.annotation.Body;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
 import io.micronaut.http.annotation.Post;
-import io.micronaut.http.annotation.Body;
 import io.micronaut.http.annotation.QueryValue;
+
 class BaseObject {
+
     private int a;
+
     public int getA() {
         return a;
     }
+
     public void setA(int a) {
         this.a = a;
     }
 }
+
 class B extends BaseObject {
+
     private int b;
+
     public int getB() {
         return b;
     }
+
     public void setB(int b) {
         this.b = b;
     }
 }
+
 @Controller("/fromTestOperations")
 class TestOperations extends BaseTestOperations<B> {
+
     @Get("/fromBaseNoGet")
     @Override
     public B getFromBaseNoAnnot() {
         return null;
     }
+
     @Get("/getOnlyFromB")
     public B getOnlyFromB() {
         return null;
     }
+
     @Override
     @Get("/fromBaseWithAnnotOverrideB")
     public B getFromBaseWithAnnotOverride() {
         return null;
     }
+
     @Override
     public B getFromBaseWithNoAnnotOverride() {
         return null;
     }
 }
+
 abstract class BaseTestOperations<T extends BaseObject> {
+
     @Get("/fromBaseOnly")
     public T getFromBaseWithAnnot() {
         return null;
     }
+
     @Post("/postFromBaseOnly{?foo}")
     public HttpResponse<T> postFromBaseWithAnnot(@Body T value, @QueryValue @Nullable String foo) {
         return null;
     }
+
     public T getFromBaseNoAnnot() {
         return null;
     }
+
     public T getFromBaseNoAnnotNoOverride() {
         return null;
     }
+
     @Get("/fromBaseWithAnnotOverride")
     public T getFromBaseWithAnnotOverride() {
         return null;
     }
+
     @Get("/fromBaseWithNoAnnotOverride")
     public T getFromBaseWithNoAnnotOverride() {
         return null;
     }
 }
+
 @jakarta.inject.Singleton
 class MyBean {}
 ''')
@@ -110,12 +129,12 @@ class MyBean {}
         fromBaseOnlyOperation
         fromBaseOnlyOperation.responses
         fromBaseOnlyOperation.responses.size() == 1
-        fromBaseOnlyOperation.responses."default"
-        fromBaseOnlyOperation.responses."default".content
-        fromBaseOnlyOperation.responses."default".content."application/json"
-        fromBaseOnlyOperation.responses."default".content."application/json".schema
-        fromBaseOnlyOperation.responses."default".content."application/json".schema.$ref
-        fromBaseOnlyOperation.responses."default".content."application/json".schema.$ref == '#/components/schemas/B'
+        fromBaseOnlyOperation.responses."200"
+        fromBaseOnlyOperation.responses."200".content
+        fromBaseOnlyOperation.responses."200".content."application/json"
+        fromBaseOnlyOperation.responses."200".content."application/json".schema
+        fromBaseOnlyOperation.responses."200".content."application/json".schema.$ref
+        fromBaseOnlyOperation.responses."200".content."application/json".schema.$ref == '#/components/schemas/B'
 
         when:
         Operation fromBaseNoGetOperation = openAPI.paths.get("/fromTestOperations/fromBaseNoGet").get
@@ -124,12 +143,12 @@ class MyBean {}
         fromBaseNoGetOperation
         fromBaseNoGetOperation.responses
         fromBaseNoGetOperation.responses.size() == 1
-        fromBaseNoGetOperation.responses."default"
-        fromBaseNoGetOperation.responses."default".content
-        fromBaseNoGetOperation.responses."default".content."application/json"
-        fromBaseNoGetOperation.responses."default".content."application/json".schema
-        fromBaseNoGetOperation.responses."default".content."application/json".schema.$ref
-        fromBaseNoGetOperation.responses."default".content."application/json".schema.$ref == '#/components/schemas/B'
+        fromBaseNoGetOperation.responses."200"
+        fromBaseNoGetOperation.responses."200".content
+        fromBaseNoGetOperation.responses."200".content."application/json"
+        fromBaseNoGetOperation.responses."200".content."application/json".schema
+        fromBaseNoGetOperation.responses."200".content."application/json".schema.$ref
+        fromBaseNoGetOperation.responses."200".content."application/json".schema.$ref == '#/components/schemas/B'
     }
 
     void "test build OpenAPI doc for POJO with Inheritance and discriminator field"() {
@@ -177,7 +196,7 @@ class Dog extends Pet {
     private String breed;
 
     public void setBreed(String breed) {
-        breed = breed;
+        this.breed = breed;
     }
 
     /**
@@ -193,7 +212,7 @@ class Cat extends Pet {
     private int clawSize;
 
     public void setClawSize(int clawSize) {
-        clawSize = clawSize;
+        this.clawSize = clawSize;
     }
 
     /**
@@ -370,7 +389,7 @@ class Dog extends Pet {
     private String breed;
 
     public void setBreed(String breed) {
-        breed = breed;
+        this.breed = breed;
     }
 
     /**
@@ -386,7 +405,7 @@ class Cat extends Pet {
     private int clawSize;
 
     public void setClawSize(int clawSize) {
-        clawSize = clawSize;
+        this.clawSize = clawSize;
     }
 
     /**
@@ -563,7 +582,7 @@ class Dog extends Pet {
     private String breed;
 
     public void setBreed(String breed) {
-        breed = breed;
+        this.breed = breed;
     }
 
     public String getBreed() {
@@ -576,7 +595,7 @@ class Cat extends Pet {
     private int clawSize;
 
     public void setClawSize(int clawSize) {
-        clawSize = clawSize;
+        this.clawSize = clawSize;
     }
 
     public int getClawSize() {
@@ -681,7 +700,7 @@ class Dog extends Pet {
     private String breed;
 
     public void setBreed(String breed) {
-        breed = breed;
+        this.breed = breed;
     }
 
     public String getBreed() {
@@ -695,7 +714,7 @@ class Cat extends Pet {
     private int clawSize;
 
     public void setClawSize(int clawSize) {
-        clawSize = clawSize;
+        this.clawSize = clawSize;
     }
 
     public int getClawSize() {
@@ -843,7 +862,7 @@ abstract class Pet {
         this.type = type;
     }
 
-    public Pet() {
+    Pet() {
     }
 
     @NotBlank
@@ -883,7 +902,7 @@ class Dog extends Pet {
     @NotNull
     private DogBreed breed;
 
-    public Dog(@NotBlank String name,
+    Dog(@NotBlank String name,
                @Nullable Integer age,
                @NotNull PetType type,
                @NotNull DogBreed breed) {
@@ -892,8 +911,7 @@ class Dog extends Pet {
         this.breed = breed;
     }
 
-    public Dog() {
-        super();
+    Dog() {
     }
 
     @NotNull
@@ -920,7 +938,7 @@ class Cat extends Pet {
     @NotNull
     private CatBreed breed;
 
-    public Cat(@NotBlank String name,
+    Cat(@NotBlank String name,
                @Nullable Integer age,
                @NotNull PetType type,
                @NotNull CatBreed breed) {
@@ -929,8 +947,7 @@ class Cat extends Pet {
         this.breed = breed;
     }
 
-    public Cat() {
-        super();
+    Cat() {
     }
 
     @NotNull
@@ -1211,6 +1228,217 @@ class MyBean {}
         petSchema.allOf[0].type == 'object'
         petSchema.allOf[0].properties.size() == 2
         petSchema.allOf[1].$ref == '#/components/schemas/Animal'
+    }
+
+    void "test build OpenAPI for interface inheritance with generics"() {
+
+        given: "An API definition"
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import java.io.Serializable;
+
+import io.micronaut.http.MediaType;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;import io.micronaut.http.annotation.Post;
+
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+
+@Controller("/pets")
+interface MyOperations extends Api<MyRequest, MyResponse>, SecApi {
+}
+
+interface SecApi {
+
+    @Post("/api/sec/request")
+    String getRequestSec();
+}
+
+interface Api<T, R> extends ParentApi<ParentRequest> {
+
+    @Get("/api/request")
+    T getRequest();
+
+    @Get("/api/response")
+    R getResponse();
+
+    String otherMethod();
+}
+
+interface ParentApi<P> {
+
+    @Get("/api/parentRequest")
+    P getParentRequest();
+}
+
+class MyRequest {
+
+    private String prop1;
+
+    public String getProp1() {
+        return prop1;
+    }
+
+    public void setProp1(String prop1) {
+        this.prop1 = prop1;
+    }
+}
+
+class ParentRequest {
+
+    private String prop3;
+
+    public String getProp3() {
+        return prop3;
+    }
+
+    public void setProp3(String prop3) {
+        this.prop3 = prop3;
+    }
+}
+
+class MyResponse {
+
+    private String prop2;
+
+    public String getProp2() {
+        return prop2;
+    }
+
+    public void setProp2(String prop2) {
+        this.prop2 = prop2;
+    }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        then: "the state is correct"
+        Utils.testReference != null
+
+        when: "The OpenAPI is retrieved"
+        OpenAPI openAPI = Utils.testReference
+
+        then:
+        openAPI.paths.size() == 4
+        Operation opRequest = openAPI.paths."/pets/api/request".get
+        Operation opResponse = openAPI.paths."/pets/api/response".get
+        Operation opParentResponse = openAPI.paths."/pets/api/parentRequest".get
+        Operation opSecResponse = openAPI.paths."/pets/api/sec/request".post
+
+        then:
+        opRequest
+        opResponse
+        opParentResponse
+        opSecResponse
+    }
+
+    void "test build OpenAPI for class inheritance with generics"() {
+
+        given: "An API definition"
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import java.io.Serializable;
+
+import io.micronaut.http.MediaType;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+
+@Controller("/pets")
+class MyOperations extends Api<MyRequest, MyResponse> {
+}
+
+abstract class Api<T, R> extends ParentApi<ParentRequest> {
+
+    @Get("/api/request")
+    T getRequest() {
+        return null;
+    }
+
+    @Get("/api/response")
+    R getResponse() {
+        return null;
+    }
+
+    String otherMethod() {
+        return null;
+    }
+}
+
+abstract class ParentApi<P> {
+
+    @Get("/api/parentRequest")
+    P getParentRequest() {
+        return null;
+    }
+}
+
+class MyRequest {
+
+    private String prop1;
+
+    public String getProp1() {
+        return prop1;
+    }
+
+    public void setProp1(String prop1) {
+        this.prop1 = prop1;
+    }
+}
+
+class ParentRequest {
+
+    private String prop3;
+
+    public String getProp3() {
+        return prop3;
+    }
+
+    public void setProp3(String prop3) {
+        this.prop3 = prop3;
+    }
+}
+
+class MyResponse {
+
+    private String prop2;
+
+    public String getProp2() {
+        return prop2;
+    }
+
+    public void setProp2(String prop2) {
+        this.prop2 = prop2;
+    }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        then: "the state is correct"
+        Utils.testReference != null
+
+        when: "The OpenAPI is retrieved"
+        OpenAPI openAPI = Utils.testReference
+
+        then:
+        openAPI.paths.size() == 3
+
+        Operation opRequest = openAPI.paths."/pets/api/request".get
+        Operation opResponse = openAPI.paths."/pets/api/response".get
+        Operation opParentRequest = openAPI.paths."/pets/api/parentRequest".get
+
+        then:
+        opRequest
+        opResponse
+        opParentRequest
     }
 
 }
