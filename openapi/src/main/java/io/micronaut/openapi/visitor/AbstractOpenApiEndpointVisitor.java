@@ -1286,21 +1286,25 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
     private void readApiResponses(MethodElement element, VisitorContext context, io.swagger.v3.oas.models.Operation swaggerOperation) {
         List<AnnotationValue<io.swagger.v3.oas.annotations.responses.ApiResponse>> classResponseAnnotations = element.getDeclaringType().getDeclaredAnnotationValuesByType(io.swagger.v3.oas.annotations.responses.ApiResponse.class);
         List<AnnotationValue<io.swagger.v3.oas.annotations.responses.ApiResponse>> methodResponseAnnotations = element.getDeclaredAnnotationValuesByType(io.swagger.v3.oas.annotations.responses.ApiResponse.class);
-        processResponses(swaggerOperation, classResponseAnnotations, context);
-        processResponses(swaggerOperation, methodResponseAnnotations, context);
+        processResponses(swaggerOperation, classResponseAnnotations, element, context);
+        processResponses(swaggerOperation, methodResponseAnnotations, element, context);
     }
 
-    private void processResponses(io.swagger.v3.oas.models.Operation operation, List<AnnotationValue<io.swagger.v3.oas.annotations.responses.ApiResponse>> responseAnnotations, VisitorContext context) {
+    private void processResponses(io.swagger.v3.oas.models.Operation operation, List<AnnotationValue<io.swagger.v3.oas.annotations.responses.ApiResponse>> responseAnnotations, MethodElement element, VisitorContext context) {
         ApiResponses apiResponses = operation.getResponses();
         if (apiResponses == null) {
             apiResponses = new ApiResponses();
             operation.setResponses(apiResponses);
         }
         if (CollectionUtils.isNotEmpty(responseAnnotations)) {
-            for (AnnotationValue<io.swagger.v3.oas.annotations.responses.ApiResponse> r : responseAnnotations) {
-                Optional<ApiResponse> newResponse = toValue(r.getValues(), context, ApiResponse.class);
+            for (AnnotationValue<io.swagger.v3.oas.annotations.responses.ApiResponse> response : responseAnnotations) {
+                Optional<ApiResponse> newResponse = toValue(response.getValues(), context, ApiResponse.class);
                 if (newResponse.isPresent()) {
-                    apiResponses.put(r.get("responseCode", String.class).orElse("default"), newResponse.get());
+                    ApiResponse newApiResponse = newResponse.get();
+                    if (response.get("useReturnTypeSchema", Boolean.class).orElse(false) && element != null) {
+                        addResponseContent(element, context, Utils.resolveOpenAPI(context), newApiResponse);
+                    }
+                    apiResponses.put(response.get("responseCode", String.class).orElse("default"), newApiResponse);
                 }
             }
             operation.setResponses(apiResponses);
