@@ -1237,14 +1237,9 @@ class MyBean {}
         buildBeanDefinition('test.MyBean', '''
 package test;
 
-import java.io.Serializable;
-
-import io.micronaut.http.MediaType;
 import io.micronaut.http.annotation.Controller;
-import io.micronaut.http.annotation.Get;import io.micronaut.http.annotation.Post;
-
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import io.micronaut.http.annotation.Get;
+import io.micronaut.http.annotation.Post;
 
 @Controller("/pets")
 interface MyOperations extends Api<MyRequest, MyResponse>, SecApi {
@@ -1342,14 +1337,8 @@ class MyBean {}
         buildBeanDefinition('test.MyBean', '''
 package test;
 
-import java.io.Serializable;
-
-import io.micronaut.http.MediaType;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
-
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 @Controller("/pets")
 class MyOperations extends Api<MyRequest, MyResponse> {

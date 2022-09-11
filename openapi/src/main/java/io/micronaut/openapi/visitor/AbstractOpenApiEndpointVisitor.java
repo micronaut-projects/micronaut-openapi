@@ -66,6 +66,7 @@ import io.micronaut.inject.ast.MethodElement;
 import io.micronaut.inject.ast.ParameterElement;
 import io.micronaut.inject.ast.TypedElement;
 import io.micronaut.inject.visitor.VisitorContext;
+import io.micronaut.openapi.annotation.OpenAPIDecorator;
 import io.micronaut.openapi.javadoc.JavadocDescription;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Hidden;
@@ -113,6 +114,9 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
     public static final String COMPONENTS_CALLBACKS_PREFIX = "#/components/callbacks/";
 
     protected static final String CONTEXT_CHILD_PATH = "internal.child.path";
+    protected static final String CONTEXT_CHILD_OP_ID_PREFIX = "internal.opId.prefix";
+    protected static final String CONTEXT_CHILD_OP_ID_SUFFIX = "internal.opId.suffix";
+    protected static final String CONTEXT_CHILD_OP_ID_SUFFIX_ADD_ALWAYS = "internal.opId.suffixes.add.always";
     protected static final String IS_PROCESS_PARENT_CLASS = "internal.is.process.parent";
 
     private static final TypeReference<Map<CharSequence, Object>> MAP_TYPE = new TypeReference<Map<CharSequence, Object>>() {
@@ -174,6 +178,18 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             if (url != null) {
                 context.put(CONTEXT_CHILD_PATH, url);
             }
+            String prefix = "";
+            String suffix = "";
+            boolean addAlways = true;
+            AnnotationValue<OpenAPIDecorator> apiDecorator = element.getDeclaredAnnotation(OpenAPIDecorator.class);
+            if (apiDecorator != null) {
+                prefix = apiDecorator.getValue(String.class).orElse("");
+                suffix = apiDecorator.get("opIdSuffix", String.class).orElse("");
+                addAlways = apiDecorator.get("addAlways", Boolean.class).orElse(true);
+            }
+            context.put(CONTEXT_CHILD_OP_ID_PREFIX, prefix);
+            context.put(CONTEXT_CHILD_OP_ID_SUFFIX, suffix);
+            context.put(CONTEXT_CHILD_OP_ID_SUFFIX_ADD_ALWAYS, addAlways);
 
             List<ClassElement> superTypes = new ArrayList<>();
             Collection<ClassElement> parentInterfaces = element.getInterfaces();
@@ -196,6 +212,10 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                 }
                 context.remove(IS_PROCESS_PARENT_CLASS);
             }
+
+            context.remove(CONTEXT_CHILD_OP_ID_PREFIX);
+            context.remove(CONTEXT_CHILD_OP_ID_SUFFIX);
+            context.remove(CONTEXT_CHILD_OP_ID_SUFFIX_ADD_ALWAYS);
         }
     }
 
@@ -1074,8 +1094,24 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             }
         }
 
+        String prefix;
+        String suffix;
+        boolean addAlways;
+        AnnotationValue<OpenAPIDecorator> apiDecorator = element.getDeclaredAnnotation(OpenAPIDecorator.class);
+        if (apiDecorator != null) {
+            prefix = apiDecorator.getValue(String.class).orElse("");
+            suffix = apiDecorator.get("opIdSuffix", String.class).orElse("");
+            addAlways = apiDecorator.get("addAlways", Boolean.class).orElse(true);
+        } else {
+            prefix = context.get(CONTEXT_CHILD_OP_ID_PREFIX, String.class).orElse("");
+            suffix = context.get(CONTEXT_CHILD_OP_ID_SUFFIX, String.class).orElse("");
+            addAlways = context.get(CONTEXT_CHILD_OP_ID_SUFFIX_ADD_ALWAYS, Boolean.class).orElse(true);
+        }
+
         if (StringUtils.isEmpty(swaggerOperation.getOperationId())) {
-            swaggerOperation.setOperationId(element.getName());
+            swaggerOperation.setOperationId(prefix + element.getName() + suffix);
+        } else if (addAlways) {
+            swaggerOperation.setOperationId(prefix + swaggerOperation.getOperationId() + suffix);
         }
         return swaggerOperation;
     }

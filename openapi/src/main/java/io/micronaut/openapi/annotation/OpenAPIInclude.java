@@ -28,7 +28,7 @@ import java.lang.annotation.Target;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * The annotation can used to include additional @{@link io.micronaut.http.annotation.Controller} or
+ * The annotation can be used to include additional @{@link io.micronaut.http.annotation.Controller} or
  * {@link io.micronaut.management.endpoint.annotation.Endpoint} classes to be processed for OpenAPI definition.
  * This is useful in cases where you cannot alter the source code and wish to generate Open API for already compiled classes.
  *
