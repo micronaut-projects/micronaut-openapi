@@ -7,4 +7,5 @@
 <suppressions>
      <suppress checks="FileLength" files=".*"/>
 
+    <suppress checks="MissingJavadocType" files=".*doc-examples.*" />
 </suppressions>

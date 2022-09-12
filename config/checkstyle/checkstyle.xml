@@ -207,7 +207,6 @@
         <module name="TodoComment">
             <property name="severity" value="warning"/>
         </module>
-
     </module>
 
 </module>
