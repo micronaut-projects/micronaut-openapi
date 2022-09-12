@@ -6,7 +6,6 @@ import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.Operation
 import io.swagger.v3.oas.models.PathItem
 import io.swagger.v3.oas.models.Paths
-import spock.lang.Ignore
 import spock.lang.Issue
 
 class OpenApiControllerVisitorSpec extends AbstractOpenApiTypeElementSpec {
@@ -247,7 +246,7 @@ class MyBean {}
 
     void "test build OpenAPI doc with @Content without mediaType information"() {
 
-        given:"An API definition"
+        given: "An API definition"
         when:
         buildBeanDefinition('test.MyBean', '''
 package test;
@@ -295,16 +294,16 @@ class Pet {
 @jakarta.inject.Singleton
 class MyBean {}
 ''')
-        then:"the state is correct"
+        then: "the state is correct"
         Utils.testReference != null
 
-        when:"the /pets path is retrieved"
+        when: "the /pets path is retrieved"
         OpenAPI openAPI = Utils.testReference
 
-        and:"the /{slug} path is retrieved"
+        and: "the /{slug} path is retrieved"
         PathItem pathItem = openAPI.paths.get("/pets/{slug}")
 
-        then:"it is included in the OpenAPI doc"
+        then: "it is included in the OpenAPI doc"
         pathItem.get.description == 'Find a pet by a slug'
         pathItem.get.operationId == 'find'
         pathItem.get.parameters.size() == 1
@@ -321,7 +320,7 @@ class MyBean {}
 
     void "test build OpenAPI doc with request and response"() {
 
-        given:"An API definition"
+        given: "An API definition"
         when:
         buildBeanDefinition('test.MyBean', '''
 package test;
@@ -365,14 +364,14 @@ interface PetOperations<T extends String> {
 @jakarta.inject.Singleton
 class MyBean {}
 ''')
-        then:"the state is correct"
+        then: "the state is correct"
         Utils.testReference != null
 
-        when:"the /pets path is retrieved"
+        when: "the /pets path is retrieved"
         OpenAPI openAPI = Utils.testReference
         PathItem pathItem = openAPI.paths.get("/pets")
 
-        then:"it is included in the OpenAPI doc"
+        then: "it is included in the OpenAPI doc"
         pathItem.get.operationId == 'list'
         pathItem.get.description == 'List the pets'
         pathItem.get.responses['200']
@@ -380,10 +379,10 @@ class MyBean {}
         pathItem.get.responses['200'].content['application/json'].schema
         pathItem.get.responses['200'].content['application/json'].schema.type == 'array'
 
-        when:"the /{slug} path is retrieved"
+        when: "the /{slug} path is retrieved"
         pathItem = openAPI.paths.get("/pets/{slug}")
 
-        then:"it is included in the OpenAPI doc"
+        then: "it is included in the OpenAPI doc"
         pathItem.get.description == 'Find a pet by a slug'
         pathItem.get.operationId == 'find'
         pathItem.get.parameters.size() == 1
@@ -397,10 +396,10 @@ class MyBean {}
         pathItem.get.responses['200'] != null
         pathItem.get.responses['200'].content['application/json'].schema.type == 'string'
 
-        when:"the /extras/{extraId} path is retrieved"
+        when: "the /extras/{extraId} path is retrieved"
         pathItem = openAPI.paths.get("/pets/extras/{extraId}")
 
-        then:"it is included in the OpenAPI doc"
+        then: "it is included in the OpenAPI doc"
         pathItem.get.parameters.size() == 1
         pathItem.get.parameters[0].name == 'extraId'
         pathItem.get.parameters[0].in == ParameterIn.PATH.toString()
@@ -411,10 +410,10 @@ class MyBean {}
         pathItem.get.responses['200'] != null
         pathItem.get.responses['200'].content['application/json'].schema.type == 'string'
 
-        when:"the /getSomething path is retrieved"
+        when: "the /getSomething path is retrieved"
         pathItem = openAPI.paths.get("/pets/random")
 
-        then:"default response has default description"
+        then: "default response has default description"
         pathItem.get.operationId == 'getRandomPet'
         pathItem.get.responses['200'].description == 'getRandomPet 200 response'
         pathItem.get.responses['200'].content['application/json'].schema.type == 'string'
@@ -423,7 +422,7 @@ class MyBean {}
 
     void "test build OpenAPI doc for simple type with generics"() {
 
-        given:"An API definition"
+        given: "An API definition"
         when:
         buildBeanDefinition('test.MyBean', '''
 package test;
@@ -478,14 +477,14 @@ interface PetOperations<T extends String> {
 @jakarta.inject.Singleton
 class MyBean {}
 ''')
-        then:"the state is correct"
+        then: "the state is correct"
         Utils.testReference != null
 
-        when:"the /pets path is retrieved"
+        when: "the /pets path is retrieved"
         OpenAPI openAPI = Utils.testReference
         PathItem pathItem = openAPI.paths.get("/pets")
 
-        then:"it is included in the OpenAPI doc"
+        then: "it is included in the OpenAPI doc"
         pathItem.get.operationId == 'list'
         pathItem.get.description == 'List the pets'
         pathItem.get.responses['200']
@@ -499,10 +498,10 @@ class MyBean {}
         pathItem.post.requestBody.content.size() == 1
 
 
-        when:"the /{slug} path is retrieved"
+        when: "the /{slug} path is retrieved"
         pathItem = openAPI.paths.get("/pets/{slug}")
 
-        then:"it is included in the OpenAPI doc"
+        then: "it is included in the OpenAPI doc"
         pathItem.get.description == 'Find a pet by a slug'
         pathItem.get.operationId == 'find'
         pathItem.get.parameters.size() == 1
@@ -516,7 +515,7 @@ class MyBean {}
         pathItem.get.responses['200'] != null
         pathItem.get.responses['200'].content['application/json'].schema.type == 'string'
 
-        when:"A flowable is returned"
+        when: "A flowable is returned"
         pathItem = openAPI.paths.get("/pets/flowable")
 
         then:
@@ -768,7 +767,11 @@ import io.micronaut.core.annotation.Nullable;
 class MyController {
 
     @Get("/subscription/{subscriptionId}")
-    public String getSubscription(@Parameter(description="foo") @CookieValue String subscriptionId, @QueryValue String q, @Header String contentType, @Nullable @Header(name = "Bundle-ID") String bundleId, @Header("X-API-Version") String apiVersion) {
+    public String getSubscription(@Parameter(description="foo") @CookieValue String subscriptionId,
+            @QueryValue String q,
+            @Header String contentType,
+            @Nullable @Header(name = "Bundle-ID") String bundleId,
+            @Header("X-API-Version") String apiVersion) {
         return null;
      }
 }
@@ -867,7 +870,7 @@ class MyController {
 class MyBean {}
 ''')
         when:
-        OpenAPI api =  Utils.testReferenceAfterPlaceholders
+        OpenAPI api = Utils.testReferenceAfterPlaceholders
 
         then:
         api.paths.size() == 2
@@ -950,5 +953,215 @@ class MyBean {}
         openAPI.components.schemas['TestPojo'].properties['testString'].type == 'string'
         openAPI.components.schemas['TestPojo'].required.size() == 1
         openAPI.components.schemas['TestPojo'].required.contains('testString')
+    }
+
+    void "test ApiResponse with useReturnTypeSchema"() {
+
+        given:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.http.HttpResponse;
+import io.micronaut.http.MediaType;import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+
+@Controller
+interface HelloWorldApi {
+    @Get
+    @ApiResponse(responseCode = "200", useReturnTypeSchema = true)
+    @ApiResponse(responseCode = "500", useReturnTypeSchema = true)
+    @ApiResponse(responseCode = "201", content = @Content(mediaType = MediaType.APPLICATION_XML, schema = @Schema(implementation = String.class)))
+    HttpResponse<TestPojo> helloWorld();
+}
+
+class TestPojo {
+
+    private String testString;
+
+    public String getTestString() {
+        return testString;
+    }
+
+    public void setTestString(String testString) {
+        this.testString = testString;
+    }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        when:
+        Operation operation = Utils.testReference?.paths?."/"?.get
+
+        then:
+        operation != null
+        operation.operationId == 'helloWorld'
+        operation.responses.size() == 3
+        operation.responses."200".content."application/json".schema.$ref == '#/components/schemas/TestPojo'
+        operation.responses."500".content."application/json".schema.$ref == '#/components/schemas/TestPojo'
+        operation.responses."201".content."application/xml".schema.type == 'string'
+    }
+
+    void "test ApiResponse with useReturnTypeSchema on class"() {
+
+        given:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.http.HttpResponse;
+import io.micronaut.http.MediaType;import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+
+@ApiResponse(responseCode = "200", useReturnTypeSchema = true)
+@ApiResponse(responseCode = "500", useReturnTypeSchema = true)
+@Controller
+interface HelloWorldApi {
+    @Get
+    @ApiResponse(responseCode = "201", content = @Content(mediaType = MediaType.APPLICATION_XML, schema = @Schema(implementation = String.class)))
+    HttpResponse<TestPojo> helloWorld();
+}
+
+class TestPojo {
+
+    private String testString;
+
+    public String getTestString() {
+        return testString;
+    }
+
+    public void setTestString(String testString) {
+        this.testString = testString;
+    }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        when:
+        Operation operation = Utils.testReference?.paths?."/"?.get
+
+        then:
+        operation != null
+        operation.operationId == 'helloWorld'
+        operation.responses.size() == 3
+        operation.responses."200".content."application/json".schema.$ref == '#/components/schemas/TestPojo'
+        operation.responses."500".content."application/json".schema.$ref == '#/components/schemas/TestPojo'
+        operation.responses."201".content."application/xml".schema.type == 'string'
+    }
+
+    void "test ApiResponse with useReturnTypeSchema on class2"() {
+
+        given:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.http.HttpResponse;
+import io.micronaut.http.MediaType;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+
+@ApiResponses({
+    @ApiResponse(responseCode = "200", useReturnTypeSchema = true),
+    @ApiResponse(responseCode = "500", useReturnTypeSchema = true)
+})
+@Controller
+interface HelloWorldApi {
+    @Get
+    @ApiResponses({
+        @ApiResponse(responseCode = "201", content = @Content(mediaType = MediaType.APPLICATION_XML, schema = @Schema(implementation = String.class)))
+    })
+    HttpResponse<TestPojo> helloWorld();
+}
+
+class TestPojo {
+
+    private String testString;
+
+    public String getTestString() {
+        return testString;
+    }
+
+    public void setTestString(String testString) {
+        this.testString = testString;
+    }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        when:
+        Operation operation = Utils.testReference?.paths?."/"?.get
+
+        then:
+        operation != null
+        operation.operationId == 'helloWorld'
+        operation.responses.size() == 3
+        operation.responses."200".content."application/json".schema.$ref == '#/components/schemas/TestPojo'
+        operation.responses."500".content."application/json".schema.$ref == '#/components/schemas/TestPojo'
+        operation.responses."201".content."application/xml".schema.type == 'string'
+    }
+
+    void "test ApiResponse with useReturnTypeSchema2"() {
+
+        given:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.http.HttpResponse;
+import io.micronaut.http.MediaType;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+
+@Controller
+interface HelloWorldApi {
+    @Get
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", useReturnTypeSchema = true),
+        @ApiResponse(responseCode = "500", useReturnTypeSchema = true),
+        @ApiResponse(responseCode = "201", content = @Content(mediaType = MediaType.APPLICATION_XML, schema = @Schema(implementation = String.class)))
+    })
+    HttpResponse<TestPojo> helloWorld();
+}
+
+class TestPojo {
+
+    private String testString;
+
+    public String getTestString() {
+        return testString;
+    }
+
+    public void setTestString(String testString) {
+        this.testString = testString;
+    }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        when:
+        Operation operation = Utils.testReference?.paths?."/"?.get
+
+        then:
+        operation != null
+        operation.operationId == 'helloWorld'
+        operation.responses.size() == 3
+        operation.responses."200".content."application/json".schema.$ref == '#/components/schemas/TestPojo'
+        operation.responses."500".content."application/json".schema.$ref == '#/components/schemas/TestPojo'
+        operation.responses."201".content."application/xml".schema.type == 'string'
     }
 }

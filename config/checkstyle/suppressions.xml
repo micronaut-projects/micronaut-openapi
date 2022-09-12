@@ -5,8 +5,7 @@
         "https://checkstyle.org/dtds/suppressions_1_2.dtd">
 
 <suppressions>
-    <!-- <suppress checks="FileLength" -->
-              <!-- files="DefaultBeanContext.java|BeanDefinitionWriter.java|DefaultHttpClient.java"/> -->
+     <suppress checks="FileLength" files=".*"/>
 
     <suppress checks="MissingJavadocType" files=".*doc-examples.*" />
 </suppressions>
