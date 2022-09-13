@@ -17,6 +17,7 @@ package io.micronaut.openapi.view;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -30,6 +31,10 @@ import io.micronaut.openapi.view.OpenApiViewConfig.RendererType;
 final class RedocConfig extends AbstractViewConfig implements Renderer {
 
     private static final String DEFAULT_REDOC_JS_PATH = OpenApiViewConfig.RESOURCE_DIR + "/redoc.standalone.js";
+
+    private static final List<String> RESOURCE_FILES = Collections.singletonList(
+        DEFAULT_REDOC_JS_PATH
+    );
 
     private static final Map<String, Object> DEFAULT_OPTIONS = Collections.emptyMap();
 
@@ -148,5 +153,10 @@ final class RedocConfig extends AbstractViewConfig implements Renderer {
     @Override
     protected Function<String, Object> getConverter(String key) {
         return VALID_OPTIONS.get(key);
+    }
+
+    @Override
+    protected List<String> getResources() {
+        return RESOURCE_FILES;
     }
 }

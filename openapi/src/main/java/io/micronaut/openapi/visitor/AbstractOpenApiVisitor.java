@@ -835,9 +835,14 @@ abstract class AbstractOpenApiVisitor {
 
                 if (definingElement != null && StringUtils.isEmpty(schema.getDescription())) {
                     if (fieldJavadoc != null) {
-                        schema.setDescription(fieldJavadoc.getMethodDescription());
+                        if (StringUtils.hasText(fieldJavadoc.getMethodDescription())) {
+                            schema.setDescription(fieldJavadoc.getMethodDescription());
+                        }
                     } else if (classJavadoc != null) {
-                        schema.setDescription(classJavadoc.getParameters().get(definingElement.getName()));
+                        String paramJavadoc = classJavadoc.getParameters().get(definingElement.getName());
+                        if (StringUtils.hasText(paramJavadoc)) {
+                            schema.setDescription(paramJavadoc);
+                        }
                     }
                 }
 
@@ -1158,15 +1163,33 @@ abstract class AbstractOpenApiVisitor {
         }
 
         Map<CharSequence, Object> annValues = schemaAnn.getValues();
-        schemaToBind.setDescription((String) annValues.get("description"));
-        schemaToBind.setType((String) annValues.get("type"));
-        schemaToBind.setFormat((String) annValues.get("format"));
-        schemaToBind.setTitle((String) annValues.get("title"));
-        schemaToBind.setMinLength((Integer) annValues.get("minLength"));
-        schemaToBind.setMaxLength((Integer) annValues.get("maxLength"));
-        schemaToBind.setMinProperties((Integer) annValues.get("minProperties"));
-        schemaToBind.setMaxProperties((Integer) annValues.get("maxProperties"));
-        schemaToBind.setPattern((String) annValues.get("pattern"));
+        if (annValues.containsKey("description")) {
+            schemaToBind.setDescription((String) annValues.get("description"));
+        }
+        if (annValues.containsKey("type")) {
+            schemaToBind.setType((String) annValues.get("type"));
+        }
+        if (annValues.containsKey("format")) {
+            schemaToBind.setFormat((String) annValues.get("format"));
+        }
+        if (annValues.containsKey("title")) {
+            schemaToBind.setTitle((String) annValues.get("title"));
+        }
+        if (annValues.containsKey("minLength")) {
+            schemaToBind.setMinLength((Integer) annValues.get("minLength"));
+        }
+        if (annValues.containsKey("maxLength")) {
+            schemaToBind.setMaxLength((Integer) annValues.get("maxLength"));
+        }
+        if (annValues.containsKey("minProperties")) {
+            schemaToBind.setMinProperties((Integer) annValues.get("minProperties"));
+        }
+        if (annValues.containsKey("maxProperties")) {
+            schemaToBind.setMaxProperties((Integer) annValues.get("maxProperties"));
+        }
+        if (annValues.containsKey("pattern")) {
+            schemaToBind.setPattern((String) annValues.get("pattern"));
+        }
 
         String schemaMinimum = (String) annValues.get("minimum");
         if (NumberUtils.isCreatable(schemaMinimum)) {
@@ -1286,7 +1309,9 @@ abstract class AbstractOpenApiVisitor {
             String doc = documentation.orElse(null);
             if (doc != null) {
                 JavadocDescription desc = Utils.getJavadocParser().parse(doc);
-                schemaToBind.setDescription(desc.getMethodDescription());
+                if (StringUtils.hasText(desc.getMethodDescription())) {
+                    schemaToBind.setDescription(desc.getMethodDescription());
+                }
             }
         }
     }
@@ -1513,12 +1538,12 @@ abstract class AbstractOpenApiVisitor {
                     if (type instanceof EnumElement) {
                         schema = new Schema();
                         schema.setName(schemaName);
-                        if (javadoc != null) {
+                        if (javadoc != null && StringUtils.hasText(javadoc.getMethodDescription())) {
                             schema.setDescription(javadoc.getMethodDescription());
                         }
                         schemas.put(schemaName, schema);
                         if (schema.getType() == null) {
-                            schema.setType("string");
+                            schema.setType(PrimitiveType.STRING.getCommonName());
                         }
                         if (CollectionUtils.isEmpty(schema.getEnum())) {
                             schema.setEnum(getEnumValues((EnumElement) type, schema.getType(), context));
@@ -1556,7 +1581,7 @@ abstract class AbstractOpenApiVisitor {
                         }
                         schema.setType("object");
                         schema.setName(schemaName);
-                        if (javadoc != null) {
+                        if (javadoc != null && StringUtils.hasText(javadoc.getMethodDescription())) {
                             schema.setDescription(javadoc.getMethodDescription());
                         }
                         schemas.put(schemaName, schema);
@@ -1752,7 +1777,7 @@ abstract class AbstractOpenApiVisitor {
             schema.setType("object");
         }
         if (type instanceof EnumElement) {
-            elType = elType != null ? elType : "string";
+            elType = elType != null ? elType : PrimitiveType.STRING.getCommonName();
             schema.setType(elType);
             if (CollectionUtils.isEmpty(schema.getEnum())) {
                 schema.setEnum(getEnumValues((EnumElement) type, elType, context));

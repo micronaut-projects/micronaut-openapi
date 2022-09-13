@@ -1,11 +1,12 @@
 package io.micronaut.openapi.view
 
+
+import spock.lang.Specification
+
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
-
-import spock.lang.Specification
 
 class OpenApiOperationViewRenderSpec extends Specification {
     def cleanup() {
@@ -32,7 +33,7 @@ class OpenApiOperationViewRenderSpec extends Specification {
         cfg.specFile == "swagger.yml"
         cfg.specURL == "/swagger/swagger.yml"
         Files.exists(outputDir.resolve("redoc").resolve("index.html"))
-        Files.exists(outputDir.resolve("redoc").resolve("res").resolve("redoc.standalone.js"))
+        !Files.exists(outputDir.resolve("redoc").resolve("res").resolve("redoc.standalone.js"))
         Files.exists(outputDir.resolve("redoc").resolve("res").resolve("rapipdf-min.js"))
         Files.exists(outputDir.resolve("rapidoc").resolve("index.html"))
         Files.exists(outputDir.resolve("rapidoc").resolve("res").resolve("rapidoc-min.js"))
