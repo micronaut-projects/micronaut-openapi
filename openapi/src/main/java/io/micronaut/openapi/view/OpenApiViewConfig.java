@@ -218,7 +218,7 @@ public final class OpenApiViewConfig {
             for (String resource : resources) {
                 Path destination = Paths.get(outputDir.toString(), resource);
                 try {
-                    Path is = Paths.get(classLoader.getResource(TEMPLATES + SLASH + templateDir + SLASH + resource).toURI());
+                    InputStream is = classLoader.getResourceAsStream(TEMPLATES + SLASH + templateDir + SLASH + resource);
                     Files.copy(is, destination, StandardCopyOption.REPLACE_EXISTING);
                     Path file = outputResDir.resolve(resource);
 
