@@ -560,7 +560,11 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         final io.swagger.v3.oas.models.Paths newPaths = new io.swagger.v3.oas.models.Paths();
         for (Map.Entry<String, PathItem> path : paths.entrySet()) {
             final String mapping = path.getKey();
-            newPaths.addPathItem(mapping.startsWith(serverContextPath) ? mapping : StringUtils.prependUri(serverContextPath, mapping), path.getValue());
+            String newPath = mapping.startsWith(serverContextPath) ? mapping : StringUtils.prependUri(serverContextPath, mapping);
+            if (!newPath.startsWith("/") && !newPath.startsWith("$")) {
+                newPath = "/" + newPath;
+            }
+            newPaths.addPathItem(newPath, path.getValue());
         }
         openAPI.setPaths(newPaths);
     }

@@ -306,13 +306,15 @@ abstract class AbstractOpenApiVisitor {
                 result.append(c);
             }
 
-            String pathBeforeReplace = result.toString();
+            String resultPath = result.toString();
             Environment environment = OpenApiApplicationVisitor.getEnv(context);
             if (environment != null) {
-                resultPaths.add(paths.computeIfAbsent(environment.getPlaceholderResolver().resolvePlaceholders(pathBeforeReplace).orElse(pathBeforeReplace), key -> new PathItem()));
-            } else {
-                resultPaths.add(paths.computeIfAbsent(pathBeforeReplace, key -> new PathItem()));
+                resultPath = environment.getPlaceholderResolver().resolvePlaceholders(resultPath).orElse(resultPath);
             }
+            if (!resultPath.startsWith("/") && !resultPath.startsWith("$")) {
+                resultPath = "/" + resultPath;
+            }
+            resultPaths.add(paths.computeIfAbsent(resultPath, key -> new PathItem()));
         }
 
         return resultPaths;
@@ -1025,7 +1027,10 @@ abstract class AbstractOpenApiVisitor {
         Schema originalSchema = schemaToBind;
 
         if (originalSchema.get$ref() != null) {
-            schemaToBind = shemaFromAnnotation(context, element, schemaAnn);
+            Schema schemaFromAnn = shemaFromAnnotation(context, element, schemaAnn);
+            if (schemaFromAnn != null) {
+                schemaToBind = schemaFromAnn;
+            }
         }
         if (originalSchema.get$ref() == null && schemaAnn != null) {
             // Apply @Schema annotation only if not $ref since for $ref schemas
@@ -1062,9 +1067,14 @@ abstract class AbstractOpenApiVisitor {
             topLevelSchema = schemaToBind;
         }
 
+        boolean notOnlyRef = false;
         setSchemaDocumentation(element, topLevelSchema);
+        if (StringUtils.isNotEmpty(topLevelSchema.getDescription())) {
+            notOnlyRef = true;
+        }
         if (element.isAnnotationPresent(Deprecated.class)) {
             topLevelSchema.setDeprecated(true);
+            notOnlyRef = true;
         }
         final String defaultValue = element.getValue(Bindable.class, "defaultValue", String.class).orElse(null);
         if (defaultValue != null && schemaToBind.getDefault() == null) {
@@ -1074,6 +1084,7 @@ abstract class AbstractOpenApiVisitor {
                 context.warn("Can't convert " + defaultValue + " to " + schemaToBind.getType() + ": " + e.getMessage(), element);
                 topLevelSchema.setDefault(defaultValue);
             }
+            notOnlyRef = true;
         }
         // @Schema annotation takes priority over nullability annotations
         Boolean isSchemaNullable = element.booleanValue(io.swagger.v3.oas.annotations.media.Schema.class, "nullable").orElse(null);
@@ -1081,6 +1092,7 @@ abstract class AbstractOpenApiVisitor {
             || Boolean.TRUE.equals(isSchemaNullable);
         if (isNullable) {
             topLevelSchema.setNullable(true);
+            notOnlyRef = true;
         }
         final String defaultJacksonValue = element.stringValue(JsonProperty.class, "defaultValue").orElse(null);
         if (defaultJacksonValue != null && schemaToBind.getDefault() == null) {
@@ -1090,6 +1102,7 @@ abstract class AbstractOpenApiVisitor {
                 context.warn("Can't convert " + defaultJacksonValue + " to " + schemaToBind.getType() + ": " + e.getMessage(), element);
                 topLevelSchema.setDefault(defaultJacksonValue);
             }
+            notOnlyRef = true;
         }
 
         if (composedSchema != null) {
@@ -1097,14 +1110,17 @@ abstract class AbstractOpenApiVisitor {
 
             if (addSchemaToBind) {
                 composedSchema.addAllOfItem(originalSchema);
-            } else if (isNullable && (composedSchema.getAllOf() == null || composedSchema.getAllOf().isEmpty())) {
+            } else if (isNullable && CollectionUtils.isEmpty(composedSchema.getAllOf())) {
                 composedSchema.addOneOfItem(originalSchema);
             }
-            if (addSchemaToBind) {
+            if (addSchemaToBind && !schemaToBind.equals(originalSchema)) {
                 composedSchema.addAllOfItem(schemaToBind);
             }
 
-            if (!composedSchema.equals(EMPTY_COMPOSED_SCHEMA)) {
+            if (!composedSchema.equals(EMPTY_COMPOSED_SCHEMA)
+                && ((CollectionUtils.isNotEmpty(composedSchema.getAllOf()) && composedSchema.getAllOf().size() > 1)
+                || CollectionUtils.isNotEmpty(composedSchema.getOneOf())
+                || notOnlyRef)) {
                 return composedSchema;
             }
         }
@@ -1157,10 +1173,11 @@ abstract class AbstractOpenApiVisitor {
     }
 
     Schema shemaFromAnnotation(VisitorContext context, Element element, AnnotationValue<io.swagger.v3.oas.annotations.media.Schema> schemaAnn) {
-        Schema schemaToBind = new Schema();
         if (schemaAnn == null) {
-            return schemaToBind;
+            return null;
         }
+
+        Schema schemaToBind = new Schema();
 
         Map<CharSequence, Object> annValues = schemaAnn.getValues();
         if (annValues.containsKey("description")) {
@@ -1305,8 +1322,22 @@ abstract class AbstractOpenApiVisitor {
 
     private void setSchemaDocumentation(Element element, Schema schemaToBind) {
         if (StringUtils.isEmpty(schemaToBind.getDescription())) {
-            Optional<String> documentation = element.getDocumentation();
-            String doc = documentation.orElse(null);
+            // First, find getter method javadoc
+            String doc = element.getDocumentation().orElse(null);
+            if (StringUtils.isEmpty(doc)) {
+                // next, find field javadoc
+                if (element instanceof MemberElement) {
+                    List<FieldElement> fields = ((MemberElement) element).getDeclaringType().getFields();
+                    if (CollectionUtils.isNotEmpty(fields)) {
+                        for (FieldElement field : fields) {
+                            if (field.getName().equals(element.getName())) {
+                                doc = field.getDocumentation().orElse(null);
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
             if (doc != null) {
                 JavadocDescription desc = Utils.getJavadocParser().parse(doc);
                 if (StringUtils.hasText(desc.getMethodDescription())) {
