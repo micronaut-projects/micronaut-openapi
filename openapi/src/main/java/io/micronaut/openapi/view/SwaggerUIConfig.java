@@ -15,8 +15,10 @@
  */
 package io.micronaut.openapi.view;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.function.Function;
@@ -35,6 +37,14 @@ import io.micronaut.openapi.view.OpenApiViewConfig.RendererType;
 final class SwaggerUIConfig extends AbstractViewConfig implements Renderer {
 
     private static final String DEFAULT_SWAGGER_JS_PATH = OpenApiViewConfig.RESOURCE_DIR + "/";
+
+    private static final List<String> RESOURCE_FILES = Arrays.asList(
+        DEFAULT_SWAGGER_JS_PATH + "swagger-ui.css",
+        DEFAULT_SWAGGER_JS_PATH + "favicon-16x16.png",
+        DEFAULT_SWAGGER_JS_PATH + "favicon-32x32.png",
+        DEFAULT_SWAGGER_JS_PATH + "swagger-ui-bundle.js",
+        DEFAULT_SWAGGER_JS_PATH + "swagger-ui-standalone-preset.js"
+    );
 
     private static final Map<String, Object> DEFAULT_OPTIONS = new HashMap<>(4);
     private static final String OPTION_OAUTH2 = "oauth2";
@@ -239,5 +249,10 @@ final class SwaggerUIConfig extends AbstractViewConfig implements Renderer {
     @Override
     protected Function<String, Object> getConverter(String key) {
         return (VALID_OPTIONS.containsKey(key) ? VALID_OPTIONS : VALID_OAUTH2_OPTIONS).get(key);
+    }
+
+    @Override
+    protected List<String> getResources() {
+        return RESOURCE_FILES;
     }
 }

@@ -249,8 +249,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
     }
 
     public static String getConfigurationProperty(String key, VisitorContext context) {
-        Properties propsFromFile = readOpenApiConfigFile(context);
-        String value = propsFromFile.getProperty(key);
+        String value = System.getProperty(key, readOpenApiConfigFile(context).getProperty(key));
         if (value != null) {
             return value;
         }
@@ -310,7 +309,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         try {
             environment = new AnnProcessorEnvironment(configuration, context);
             environment.start();
-        return environment;
+            return environment;
         } catch (Exception e) {
             context.warn("Can't create environment: " + e.getMessage(), null);
         }
@@ -455,14 +454,14 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                 }).orElse(new OpenAPI());
     }
 
-    private void renderViews(String title, String specFile, Path destinationDir, VisitorContext visitorContext) throws IOException {
-        String viewSpecification = System.getProperty(MICRONAUT_OPENAPI_VIEWS_SPEC);
-        OpenApiViewConfig cfg = OpenApiViewConfig.fromSpecification(viewSpecification, readOpenApiConfigFile(visitorContext));
+    private void renderViews(String title, String specFile, Path destinationDir, VisitorContext context) throws IOException {
+        String viewSpecification = OpenApiApplicationVisitor.getConfigurationProperty(MICRONAUT_OPENAPI_VIEWS_SPEC, context);
+        OpenApiViewConfig cfg = OpenApiViewConfig.fromSpecification(viewSpecification, readOpenApiConfigFile(context));
         if (cfg.isEnabled()) {
             cfg.setTitle(title);
             cfg.setSpecFile(specFile);
-            cfg.setServerContextPath(getConfigurationProperty(MICRONAUT_OPENAPI_CONTEXT_SERVER_PATH, visitorContext));
-            cfg.render(destinationDir.resolve("views"), visitorContext);
+            cfg.setServerContextPath(getConfigurationProperty(MICRONAUT_OPENAPI_CONTEXT_SERVER_PATH, context));
+            cfg.render(destinationDir.resolve("views"), context);
         }
     }
 

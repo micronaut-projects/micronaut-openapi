@@ -15,7 +15,9 @@
  */
 package io.micronaut.openapi.view;
 
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.function.Function;
@@ -30,6 +32,11 @@ import io.micronaut.openapi.view.OpenApiViewConfig.RendererType;
 final class RapiPDFConfig extends AbstractViewConfig {
 
     private static final String DEFAULT_RAPIPDF_JS_PATH = OpenApiViewConfig.RESOURCE_DIR + "/rapipdf-min.js";
+
+    private static final List<String> RESOURCE_FILES = Collections.singletonList(
+        DEFAULT_RAPIPDF_JS_PATH
+    );
+
     private static final String LINK = "<script src='{{rapipdf.js.url}}'></script>";
     private static final String TAG = "<rapi-pdf id='rapi-pdf' {{rapipdf.attributes}}></rapi-pdf>";
     private static final String SPEC = "document.getElementById('rapi-pdf').setAttribute('spec-url', contextPath + '{{specURL}}');";
@@ -144,5 +151,10 @@ final class RapiPDFConfig extends AbstractViewConfig {
     @Override
     protected Function<String, Object> getConverter(String key) {
         return VALID_OPTIONS.get(key);
+    }
+
+    @Override
+    protected List<String> getResources() {
+        return RESOURCE_FILES;
     }
 }

@@ -17,6 +17,7 @@ package io.micronaut.openapi.view;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.function.Function;
@@ -32,6 +33,10 @@ final class RapidocConfig extends AbstractViewConfig implements Renderer {
 
     public static final String RAPIDOC_PREFIX = "rapidoc.";
     private static final String DEFAULT_RAPIDOC_JS_PATH = OpenApiViewConfig.RESOURCE_DIR + "/rapidoc-min.js";
+
+    private static final List<String> RESOURCE_FILES = Collections.singletonList(
+        DEFAULT_RAPIDOC_JS_PATH
+    );
 
     private static final Map<String, Object> DEFAULT_OPTIONS = new HashMap<>();
 
@@ -399,5 +404,10 @@ final class RapidocConfig extends AbstractViewConfig implements Renderer {
     @Override
     protected Function<String, Object> getConverter(String key) {
         return VALID_OPTIONS.get(key);
+    }
+
+    @Override
+    protected List<String> getResources() {
+        return RESOURCE_FILES;
     }
 }

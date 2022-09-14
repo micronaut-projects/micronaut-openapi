@@ -67,7 +67,7 @@ public class AnnProcessorEnvironment extends DefaultEnvironment {
         Path projectPath = context.getProjectDir().orElse(Utils.isTestMode() ? Paths.get(System.getProperty("user.dir")) : null);
         if (projectPath != null) {
             projectDir = "file:" + projectPath.toString().replaceAll("\\\\", "/");
-            projectResourcesPath = projectDir + "src/main/resources/";
+            projectResourcesPath = projectDir + (projectDir.endsWith("/") ? StringUtils.EMPTY_STRING : "/") + "src/main/resources/";
         } else {
             context.warn("Can't identificate projectPath", null);
         }
