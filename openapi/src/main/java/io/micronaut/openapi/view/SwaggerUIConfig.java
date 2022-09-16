@@ -241,7 +241,7 @@ final class SwaggerUIConfig extends AbstractViewConfig implements Renderer {
         template = OpenApiViewConfig.replacePlaceHolder(template, PREFIX_SWAGGER_UI + ".js.url", jsUrl, "");
         template = OpenApiViewConfig.replacePlaceHolder(template, PREFIX_SWAGGER_UI + ".attributes", toOptions(), "");
         template = template.replace("{{" + PREFIX_SWAGGER_UI + ".theme}}", theme == null || Theme.CLASSIC == theme ? "" :
-            "<link rel='stylesheet' type='text/css' href='" + OpenApiViewConfig.THEMES_DIR + '/' + theme.getCss() + ".css' />");
+            "<link rel='stylesheet' type='text/css' href='" + OpenApiViewConfig.RESOURCE_DIR + '/' + theme.getCss() + ".css' />");
         template = template.replace("{{" + PREFIX_SWAGGER_UI + DOT + OPTION_OAUTH2 + "}}", hasOauth2Option(options) ? toOauth2Options() : "");
         return template;
     }

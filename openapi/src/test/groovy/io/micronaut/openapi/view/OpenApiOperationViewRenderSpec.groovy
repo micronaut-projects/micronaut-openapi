@@ -45,7 +45,7 @@ class OpenApiOperationViewRenderSpec extends Specification {
         Files.exists(outputDir.resolve("swagger-ui").resolve("res").resolve("swagger-ui-bundle.js"))
         Files.exists(outputDir.resolve("swagger-ui").resolve("res").resolve("swagger-ui-standalone-preset.js"))
         Files.exists(outputDir.resolve("swagger-ui").resolve("res").resolve("rapipdf-min.js"))
-        Files.exists(outputDir.resolve("swagger-ui").resolve("theme").resolve("flattop.css"))
+        Files.exists(outputDir.resolve("swagger-ui").resolve("res").resolve("flattop.css"))
 
         outputDir.resolve("redoc").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains("https://cdn.redoc.ly/redoc/latest/bundles/redoc.standalone.js")
 
