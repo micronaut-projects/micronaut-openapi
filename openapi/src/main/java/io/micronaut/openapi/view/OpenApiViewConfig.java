@@ -20,7 +20,6 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -176,29 +175,31 @@ public final class OpenApiViewConfig {
         }
     }
 
-    private void copySwaggerUiTheme(String themeFileName, Path outputDir, String templatesDir, VisitorContext visitorContext) throws IOException {
+    private void copySwaggerUiTheme(String themeFileName, Path outputDir, String templatesDir, VisitorContext context) throws IOException {
 
-        Path resDir = outputDir.resolve(THEMES_DIR);
+        Path resDir = outputDir.resolve(RESOURCE_DIR);
         if (!Files.exists(resDir)) {
             Files.createDirectories(resDir);
         }
 
         ClassLoader classLoader = getClass().getClassLoader();
-        Path origPath;
         try {
-            origPath = Paths.get(classLoader.getResource(TEMPLATES + SLASH + templatesDir + SLASH + THEMES_DIR + SLASH + themeFileName).toURI());
-        } catch (URISyntaxException e) {
-            throw new RuntimeException(e);
-        }
+            InputStream is = classLoader.getResourceAsStream(TEMPLATES + SLASH + templatesDir + SLASH + THEMES_DIR + SLASH + themeFileName);
 
-        Files.copy(origPath, Paths.get(resDir.toString(), themeFileName), StandardCopyOption.REPLACE_EXISTING);
-        Path file = resDir.resolve(themeFileName);
-        if (visitorContext != null) {
-            visitorContext.info("Writing OpenAPI View Resources to destination: " + file);
-            visitorContext.getClassesOutputPath().ifPresent(path -> {
-                // add relative path for the file, so that the micronaut-graal visitor knows about it
-                visitorContext.addGeneratedResource(path.relativize(file).toString());
-            });
+            Files.copy(is, Paths.get(resDir.toString(), themeFileName), StandardCopyOption.REPLACE_EXISTING);
+            Path file = resDir.resolve(themeFileName);
+            if (context != null) {
+                context.info("Writing OpenAPI View Resources to destination: " + file);
+                context.getClassesOutputPath().ifPresent(path -> {
+                    // add relative path for the file, so that the micronaut-graal visitor knows about it
+                    context.addGeneratedResource(path.relativize(file).toString());
+                });
+            }
+        } catch (Exception e) {
+            if (context != null) {
+                context.warn("Can't copy resource: " + themeFileName, null);
+            }
+            throw new RuntimeException(e);
         }
     }
 
@@ -216,10 +217,9 @@ public final class OpenApiViewConfig {
 
         if (CollectionUtils.isNotEmpty(resources)) {
             for (String resource : resources) {
-                Path destination = Paths.get(outputDir.toString(), resource);
                 try {
                     InputStream is = classLoader.getResourceAsStream(TEMPLATES + SLASH + templateDir + SLASH + resource);
-                    Files.copy(is, destination, StandardCopyOption.REPLACE_EXISTING);
+                    Files.copy(is, Paths.get(outputDir.toString(), resource), StandardCopyOption.REPLACE_EXISTING);
                     Path file = outputResDir.resolve(resource);
 
                     if (context != null) {
