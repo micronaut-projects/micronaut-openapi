@@ -932,7 +932,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         }
         if (response == null && !withMethodResponses) {
             response = new ApiResponse();
-            if (javadocDescription == null) {
+            if (javadocDescription == null || StringUtils.isEmpty(javadocDescription.getReturnDescription())) {
                 response.setDescription(swaggerOperation.getOperationId() + " " + responseCode + " response");
             } else {
                 response.setDescription(javadocDescription.getReturnDescription());
@@ -998,10 +998,10 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             .orElse(null);
 
         if (javadocDescription != null) {
-            if (StringUtils.isEmpty(swaggerOperation.getDescription())) {
+            if (StringUtils.isEmpty(swaggerOperation.getDescription()) && StringUtils.hasText(javadocDescription.getMethodDescription())) {
                 swaggerOperation.setDescription(javadocDescription.getMethodDescription());
             }
-            if (StringUtils.isEmpty(swaggerOperation.getSummary())) {
+            if (StringUtils.isEmpty(swaggerOperation.getSummary()) && StringUtils.hasText(javadocDescription.getMethodSummary())) {
                 swaggerOperation.setSummary(javadocDescription.getMethodSummary());
             }
         }
@@ -1110,6 +1110,10 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             swaggerOperation.setOperationId(prefix + element.getName() + suffix);
         } else if (addAlways) {
             swaggerOperation.setOperationId(prefix + swaggerOperation.getOperationId() + suffix);
+        }
+
+        if (swaggerOperation.getDescription() != null && swaggerOperation.getDescription().isEmpty()) {
+            swaggerOperation.setDescription(null);
         }
         return swaggerOperation;
     }

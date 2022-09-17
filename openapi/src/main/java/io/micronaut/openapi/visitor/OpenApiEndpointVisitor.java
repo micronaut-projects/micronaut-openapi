@@ -15,12 +15,10 @@
  */
 package io.micronaut.openapi.visitor;
 
-import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import io.micronaut.core.annotation.AnnotationValue;
@@ -136,9 +134,13 @@ public class OpenApiEndpointVisitor extends AbstractOpenApiEndpointVisitor imple
         }
         if (element.isAnnotationPresent("io.micronaut.management.endpoint.annotation.Endpoint")) {
             AnnotationValue<?> ann = element.getAnnotation("io.micronaut.management.endpoint.annotation.Endpoint");
-            id = path + ann.stringValue("id").orElse(NameUtils.hyphenate(element.getSimpleName()));
-            if (id.charAt(0) != '/') {
-                id = '/' + id;
+            String idAnn = ann.stringValue("id").orElse(NameUtils.hyphenate(element.getSimpleName()));
+            if (idAnn.isEmpty()) {
+                idAnn = ann.stringValue("value").orElse(idAnn);
+            }
+            id = path + idAnn;
+            if (id.isEmpty() || id.charAt(0) != '/') {
+                id = "/" + id;
             }
             return false;
         }
@@ -238,8 +240,7 @@ public class OpenApiEndpointVisitor extends AbstractOpenApiEndpointVisitor imple
     }
 
     private static HttpMethodDesciption methodDescription(MethodElement element, String endpointManagementAnnName, HttpMethod httpMethod) {
-        Optional<Class<? extends Annotation>> httpMethodOpt = element.getAnnotationTypeByStereotype(endpointManagementAnnName);
-        if (httpMethodOpt.isPresent()) {
+        if (element.isAnnotationPresent(endpointManagementAnnName)) {
             AnnotationValue<?> annotation = element.getAnnotation(endpointManagementAnnName);
             return new HttpMethodDesciption(httpMethod, annotation.stringValue("description").orElse(null),
                 annotation.stringValues("produces"), annotation.stringValues("consumes"));

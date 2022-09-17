@@ -28,8 +28,26 @@ class MyController {
      * @param id UUID of test
      */
     @Delete("/")
-    public void deleteObj(@QueryValue int id) {
+    public MyDto deleteObj(@QueryValue int id) {
+        return null;
+    }
+}
 
+/**
+* My dto description
+*
+* @property test property desc
+*/
+class MyDto {
+
+    private String test;
+
+    public String getTest() {
+        return test;
+    }
+
+    public void setTest(String test) {
+        this.test = test;
     }
 }
 
@@ -39,6 +57,7 @@ class MyBean {}
 
         OpenAPI openAPI = Utils.testReference
         Operation operation = openAPI.paths?.get("/")?.delete
+        Schema schema = openAPI.components.schemas.MyDto
 
         expect:
         operation
@@ -49,6 +68,11 @@ class MyBean {}
         operation.parameters.size() == 1
         operation.parameters[0].name == 'id'
         operation.parameters[0].description == 'UUID of test'
+
+        schema
+        schema.properties.test
+        schema.properties.test.description == 'property desc'
+
     }
 
     void "test Operation description, summary and parameters"() {
@@ -148,7 +172,7 @@ class MyBean {}
         expect:
         operation
         operation.summary == 'Delete a thing'
-        operation.description == ''
+        operation.description == null
 
         operation.parameters
         operation.parameters.size() == 1
@@ -157,7 +181,7 @@ class MyBean {}
 
         operation2
         operation2.summary == 'Delete a thing'
-        operation2.description == ''
+        operation2.description == null
 
         operation2.parameters
         operation2.parameters.size() == 1
