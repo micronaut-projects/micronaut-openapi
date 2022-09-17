@@ -32,7 +32,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import io.micronaut.core.annotation.AnnotationValue;
-import io.micronaut.core.annotation.Experimental;
 import io.micronaut.core.annotation.Nullable;
 import io.micronaut.core.beans.BeanMap;
 import io.micronaut.core.bind.annotation.Bindable;
@@ -108,7 +107,6 @@ import static io.micronaut.openapi.visitor.Utils.DEFAULT_MEDIA_TYPES;
  * @author graemerocher
  * @since 1.0
  */
-@Experimental
 public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
 
     public static final String COMPONENTS_CALLBACKS_PREFIX = "#/components/callbacks/";
@@ -839,8 +837,8 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         return element.isNullable()
             || element.getType().isOptional()
             || element.hasStereotype(Nullable.class)
-            || element.hasStereotype(jakarta.annotation.Nullable.class)
-            || element.hasStereotype(org.jetbrains.annotations.Nullable.class);
+            || element.hasStereotype("jakarta.annotation.Nullable")
+            || element.hasStereotype("org.jetbrains.annotations.Nullable");
     }
 
     private void processBody(VisitorContext context, OpenAPI openAPI,

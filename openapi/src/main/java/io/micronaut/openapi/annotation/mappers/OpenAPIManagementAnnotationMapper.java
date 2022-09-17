@@ -15,23 +15,14 @@
  */
 package io.micronaut.openapi.annotation.mappers;
 
+import java.util.Collections;
+import java.util.List;
+
 import io.micronaut.core.annotation.AnnotationValue;
 import io.micronaut.inject.annotation.TypedAnnotationMapper;
 import io.micronaut.inject.visitor.VisitorContext;
-import io.micronaut.management.endpoint.beans.BeansEndpoint;
-import io.micronaut.management.endpoint.env.EnvironmentEndpoint;
-import io.micronaut.management.endpoint.health.HealthEndpoint;
-import io.micronaut.management.endpoint.info.InfoEndpoint;
-import io.micronaut.management.endpoint.loggers.LoggersEndpoint;
-import io.micronaut.management.endpoint.refresh.RefreshEndpoint;
-import io.micronaut.management.endpoint.routes.RoutesEndpoint;
-import io.micronaut.management.endpoint.stop.ServerStopEndpoint;
-import io.micronaut.management.endpoint.threads.ThreadDumpEndpoint;
 import io.micronaut.openapi.annotation.OpenAPIInclude;
 import io.micronaut.openapi.annotation.OpenAPIManagement;
-
-import java.util.Collections;
-import java.util.List;
 
 /**
  * Mapper for management endpoints.
@@ -46,22 +37,21 @@ public class OpenAPIManagementAnnotationMapper implements TypedAnnotationMapper<
     @Override
     public List<AnnotationValue<?>> map(AnnotationValue<OpenAPIManagement> annotation, VisitorContext visitorContext) {
         return Collections.singletonList(
-                AnnotationValue
-                        .builder(OpenAPIInclude.class)
-                        .values(
-                                HealthEndpoint.class,
-                                BeansEndpoint.class,
-                                EnvironmentEndpoint.class,
-                                InfoEndpoint.class,
-                                LoggersEndpoint.class,
-                                RefreshEndpoint.class,
-                                RoutesEndpoint.class,
-                                ServerStopEndpoint.class,
-                                ThreadDumpEndpoint.class
-                        )
-                        .member("tags", annotation.getAnnotations("tags").toArray(new AnnotationValue[0]))
-                        .member("security", annotation.getAnnotations("security").toArray(new AnnotationValue[0]))
-                        .build()
+            AnnotationValue.builder(OpenAPIInclude.class)
+                .values(
+                    "io.micronaut.management.endpoint.beans.BeansEndpoint",
+                    "io.micronaut.management.endpoint.env.EnvironmentEndpoint",
+                    "io.micronaut.management.endpoint.health.HealthEndpoint",
+                    "io.micronaut.management.endpoint.info.InfoEndpoint",
+                    "io.micronaut.management.endpoint.loggers.LoggersEndpoint",
+                    "io.micronaut.management.endpoint.refresh.RefreshEndpoint",
+                    "io.micronaut.management.endpoint.routes.RoutesEndpoint",
+                    "io.micronaut.management.endpoint.stop.ServerStopEndpoint",
+                    "io.micronaut.management.endpoint.threads.ThreadDumpEndpoint"
+                )
+                .member("tags", annotation.getAnnotations("tags").toArray(new AnnotationValue[0]))
+                .member("security", annotation.getAnnotations("security").toArray(new AnnotationValue[0]))
+                .build()
         );
     }
 }

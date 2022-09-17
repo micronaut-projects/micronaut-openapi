@@ -47,7 +47,6 @@ import javax.annotation.processing.SupportedOptions;
 import io.micronaut.context.ApplicationContextConfiguration;
 import io.micronaut.context.DefaultApplicationContextBuilder;
 import io.micronaut.context.env.Environment;
-import io.micronaut.core.annotation.Experimental;
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.core.annotation.Nullable;
 import io.micronaut.core.type.Argument;
@@ -88,7 +87,6 @@ import com.fasterxml.jackson.databind.node.TextNode;
  * @author graemerocher
  * @since 1.0
  */
-@Experimental
 @SupportedOptions({
     OpenApiApplicationVisitor.MICRONAUT_OPENAPI_CONTEXT_SERVER_PATH,
     OpenApiApplicationVisitor.MICRONAUT_OPENAPI_PROPERTY_NAMING_STRATEGY,
