@@ -66,6 +66,7 @@ class MyBean {}
         given:
         System.setProperty(OpenApiApplicationVisitor.MICRONAUT_ENVIRONMENT_ENABLED, "false")
         System.setProperty(Environment.ENVIRONMENTS_PROPERTY, "local")
+        System.setProperty("props-from-env-test.paths.my-controller.get", "myGet")
 
         buildBeanDefinition('test.MyBean', '''
 package test;
@@ -105,12 +106,14 @@ class MyBean {}
         paths.size() == 3
         paths.'/${props-from-env-test.paths.my-controller.post}'
         paths.'/${props-from-env-test.paths.my-controller.post}'.post
-        paths.'/${props-from-env-test.paths.my-controller.get}'
-        paths.'/${props-from-env-test.paths.my-controller.get}'.get
+        !paths.'/${props-from-env-test.paths.my-controller.get}'
+        paths.'/myGet'
+        paths.'/myGet'.get
         paths.'/${props-from-env-test.paths.my-controller.put}'
         paths.'/${props-from-env-test.paths.my-controller.put}'.put
 
         cleanup:
+        System.clearProperty("props-from-env-test.paths.my-controller.get")
         System.clearProperty(Environment.ENVIRONMENTS_PROPERTY)
         System.clearProperty(OpenApiApplicationVisitor.MICRONAUT_ENVIRONMENT_ENABLED)
     }

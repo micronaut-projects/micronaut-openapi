@@ -28,6 +28,7 @@ import java.nio.file.StandardOpenOption;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -47,7 +48,6 @@ import javax.annotation.processing.SupportedOptions;
 import io.micronaut.context.ApplicationContextConfiguration;
 import io.micronaut.context.DefaultApplicationContextBuilder;
 import io.micronaut.context.env.Environment;
-import io.micronaut.core.annotation.Experimental;
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.core.annotation.Nullable;
 import io.micronaut.core.type.Argument;
@@ -88,7 +88,6 @@ import com.fasterxml.jackson.databind.node.TextNode;
  * @author graemerocher
  * @since 1.0
  */
-@Experimental
 @SupportedOptions({
     OpenApiApplicationVisitor.MICRONAUT_OPENAPI_CONTEXT_SERVER_PATH,
     OpenApiApplicationVisitor.MICRONAUT_OPENAPI_PROPERTY_NAMING_STRATEGY,
@@ -103,6 +102,7 @@ import com.fasterxml.jackson.databind.node.TextNode;
 
 })
 public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements TypeElementVisitor<OpenAPIDefinition, Object> {
+
     /**
      * System property that enables setting the open api config file.
      */
@@ -259,14 +259,6 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
 
     @Nullable
     public static Environment getEnv(VisitorContext context) {
-        String isEnabledStr = System.getProperty(MICRONAUT_ENVIRONMENT_ENABLED, readOpenApiConfigFile(context).getProperty(MICRONAUT_ENVIRONMENT_ENABLED));
-        boolean isEnabled = true;
-        if (StringUtils.isNotEmpty(isEnabledStr)) {
-            isEnabled = Boolean.parseBoolean(isEnabledStr);
-        }
-        if (!isEnabled) {
-            return null;
-        }
         Environment existedEnvironment = context.get(MICRONAUT_ENVIRONMENT, Environment.class).orElse(null);
         Boolean envCreated = context.get(MICRONAUT_ENVIRONMENT_CREATED, Boolean.class).orElse(null);
         if (envCreated != null && envCreated) {
@@ -281,6 +273,17 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
     }
 
     public static List<String> getActiveEnvs(VisitorContext context) {
+
+        String isEnabledStr = System.getProperty(MICRONAUT_ENVIRONMENT_ENABLED, readOpenApiConfigFile(context).getProperty(MICRONAUT_ENVIRONMENT_ENABLED));
+        boolean isEnabled = true;
+        if (StringUtils.isNotEmpty(isEnabledStr)) {
+            isEnabled = Boolean.parseBoolean(isEnabledStr);
+        }
+        context.put(MICRONAUT_ENVIRONMENT_ENABLED, isEnabled);
+        if (!isEnabled) {
+            return Collections.emptyList();
+        }
+
         String activeEnvStr = System.getProperty(MICRONAUT_OPENAPI_ENVIRONMENTS, readOpenApiConfigFile(context).getProperty(MICRONAUT_OPENAPI_ENVIRONMENTS));
         List<String> activeEnvs;
         if (StringUtils.isNotEmpty(activeEnvStr)) {
@@ -370,7 +373,9 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
 
     /**
      * Returns the EndpointsConfiguration.
+     *
      * @param context The context.
+     *
      * @return The EndpointsConfiguration.
      */
     static EndpointsConfiguration endPointsConfiguration(VisitorContext context) {
@@ -763,9 +768,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
 
     private void processEndpoints(VisitorContext visitorContext) {
         EndpointsConfiguration endpointsCfg = endPointsConfiguration(visitorContext);
-        if ("io.micronaut.annotation.processing.visitor.JavaVisitorContext".equals(visitorContext.getClass().getName())
-                && endpointsCfg.isEnabled()
-                && !endpointsCfg.getEndpoints().isEmpty()) {
+        if (endpointsCfg.isEnabled() && !endpointsCfg.getEndpoints().isEmpty()) {
             OpenApiEndpointVisitor visitor = new OpenApiEndpointVisitor(true);
             endpointsCfg.getEndpoints().values().stream()
             .filter(endpoint -> endpoint.getClassElement().isPresent())
@@ -785,6 +788,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
     }
 
     static class LowerCamelCasePropertyNamingStrategy extends PropertyNamingStrategies.NamingBase {
+
         private static final long serialVersionUID = -2750503285679998670L;
 
         @Override
@@ -793,5 +797,4 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         }
 
     }
-
 }

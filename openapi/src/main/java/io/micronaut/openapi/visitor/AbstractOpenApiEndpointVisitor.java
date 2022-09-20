@@ -32,7 +32,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import io.micronaut.core.annotation.AnnotationValue;
-import io.micronaut.core.annotation.Experimental;
 import io.micronaut.core.annotation.Nullable;
 import io.micronaut.core.beans.BeanMap;
 import io.micronaut.core.bind.annotation.Bindable;
@@ -108,7 +107,6 @@ import static io.micronaut.openapi.visitor.Utils.DEFAULT_MEDIA_TYPES;
  * @author graemerocher
  * @since 1.0
  */
-@Experimental
 public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
 
     public static final String COMPONENTS_CALLBACKS_PREFIX = "#/components/callbacks/";
@@ -839,8 +837,8 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         return element.isNullable()
             || element.getType().isOptional()
             || element.hasStereotype(Nullable.class)
-            || element.hasStereotype(jakarta.annotation.Nullable.class)
-            || element.hasStereotype(org.jetbrains.annotations.Nullable.class);
+            || element.hasStereotype("jakarta.annotation.Nullable")
+            || element.hasStereotype("org.jetbrains.annotations.Nullable");
     }
 
     private void processBody(VisitorContext context, OpenAPI openAPI,
@@ -934,7 +932,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         }
         if (response == null && !withMethodResponses) {
             response = new ApiResponse();
-            if (javadocDescription == null) {
+            if (javadocDescription == null || StringUtils.isEmpty(javadocDescription.getReturnDescription())) {
                 response.setDescription(swaggerOperation.getOperationId() + " " + responseCode + " response");
             } else {
                 response.setDescription(javadocDescription.getReturnDescription());
@@ -1000,10 +998,10 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             .orElse(null);
 
         if (javadocDescription != null) {
-            if (StringUtils.isEmpty(swaggerOperation.getDescription())) {
+            if (StringUtils.isEmpty(swaggerOperation.getDescription()) && StringUtils.hasText(javadocDescription.getMethodDescription())) {
                 swaggerOperation.setDescription(javadocDescription.getMethodDescription());
             }
-            if (StringUtils.isEmpty(swaggerOperation.getSummary())) {
+            if (StringUtils.isEmpty(swaggerOperation.getSummary()) && StringUtils.hasText(javadocDescription.getMethodSummary())) {
                 swaggerOperation.setSummary(javadocDescription.getMethodSummary());
             }
         }
@@ -1112,6 +1110,10 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             swaggerOperation.setOperationId(prefix + element.getName() + suffix);
         } else if (addAlways) {
             swaggerOperation.setOperationId(prefix + swaggerOperation.getOperationId() + suffix);
+        }
+
+        if (swaggerOperation.getDescription() != null && swaggerOperation.getDescription().isEmpty()) {
+            swaggerOperation.setDescription(null);
         }
         return swaggerOperation;
     }

@@ -42,6 +42,7 @@ import io.micronaut.core.util.StringUtils;
 import io.micronaut.inject.visitor.VisitorContext;
 
 import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.MICRONAUT_CONFIG_FILE_LOCATIONS;
+import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.MICRONAUT_ENVIRONMENT_ENABLED;
 
 /**
  * Specific environment for annotation processing level. Solve problem with access to resources
@@ -64,27 +65,31 @@ public class AnnProcessorEnvironment extends DefaultEnvironment {
     public AnnProcessorEnvironment(ApplicationContextConfiguration configuration, VisitorContext context) {
         super(configuration);
 
-        Path projectPath = context.getProjectDir().orElse(Utils.isTestMode() ? Paths.get(System.getProperty("user.dir")) : null);
-        if (projectPath != null) {
-            projectDir = "file:" + projectPath.toString().replaceAll("\\\\", "/");
-            projectResourcesPath = projectDir + (projectDir.endsWith("/") ? StringUtils.EMPTY_STRING : "/") + "src/main/resources/";
-        } else {
-            context.warn("Can't identificate projectPath", null);
-        }
-
-        String configFileLocations = System.getProperty(MICRONAUT_CONFIG_FILE_LOCATIONS);
         annotationProcessingConfigLocations = new ArrayList<>();
-        if (projectResourcesPath != null && StringUtils.isEmpty(configFileLocations)) {
-            annotationProcessingConfigLocations.add(projectResourcesPath);
-        } else {
-            for (String configFileLocation : configFileLocations.split(",")) {
-                if (!configFileLocation.startsWith("classpath") && !configFileLocation.startsWith("file") && !configFileLocation.startsWith("project")) {
-                    throw new ConfigurationException("Unsupported config location format: " + configFileLocation);
+
+        boolean isEnabled = context.get(MICRONAUT_ENVIRONMENT_ENABLED, Boolean.class).orElse(false);
+        if (isEnabled) {
+            Path projectPath = context.getProjectDir().orElse(Utils.isTestMode() ? Paths.get(System.getProperty("user.dir")) : null);
+            if (projectPath != null) {
+                projectDir = "file:" + projectPath.toString().replaceAll("\\\\", "/");
+                projectResourcesPath = projectDir + (projectDir.endsWith("/") ? StringUtils.EMPTY_STRING : "/") + "src/main/resources/";
+            } else {
+                context.warn("Can't identificate projectPath", null);
+            }
+
+            String configFileLocations = System.getProperty(MICRONAUT_CONFIG_FILE_LOCATIONS);
+            if (projectResourcesPath != null && StringUtils.isEmpty(configFileLocations)) {
+                annotationProcessingConfigLocations.add(projectResourcesPath);
+            } else if (StringUtils.isNotEmpty(configFileLocations)) {
+                for (String configFileLocation : configFileLocations.split(",")) {
+                    if (!configFileLocation.startsWith("classpath") && !configFileLocation.startsWith("file") && !configFileLocation.startsWith("project")) {
+                        throw new ConfigurationException("Unsupported config location format: " + configFileLocation);
+                    }
+                    if (configFileLocation.startsWith("project")) {
+                        configFileLocation = configFileLocation.replace("project:", projectDir);
+                    }
+                    annotationProcessingConfigLocations.add(configFileLocation);
                 }
-                if (configFileLocation.startsWith("project")) {
-                    configFileLocation = configFileLocation.replace("project:", projectDir);
-                }
-                annotationProcessingConfigLocations.add(configFileLocation);
             }
         }
     }
