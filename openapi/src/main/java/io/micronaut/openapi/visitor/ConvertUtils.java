@@ -15,23 +15,40 @@
  */
 package io.micronaut.openapi.visitor;
 
+import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.net.URI;
+import java.net.URL;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.OffsetDateTime;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
+
+import javax.xml.datatype.XMLGregorianCalendar;
 
 import io.micronaut.core.annotation.AnnotationValue;
 import io.micronaut.core.beans.BeanMap;
+import io.micronaut.inject.visitor.VisitorContext;
 import io.swagger.v3.core.util.Json;
 import io.swagger.v3.core.util.ObjectMapperFactory;
-import io.swagger.v3.core.util.PrimitiveType;
 import io.swagger.v3.core.util.Yaml;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -77,12 +94,13 @@ public final class ConvertUtils {
      * @param jn The json node
      * @param clazz The output class instance
      * @param <T> The output class type
+     * @param context visitor context
      *
      * @return The converted instance
      *
      * @throws JsonProcessingException if error
      */
-    public static <T> T treeToValue(JsonNode jn, Class<T> clazz) throws JsonProcessingException {
+    public static <T> T treeToValue(JsonNode jn, Class<T> clazz, VisitorContext context) throws JsonProcessingException {
         T value = convertJsonMapper.treeToValue(jn, clazz);
 
         if (value == null) {
@@ -91,12 +109,12 @@ public final class ConvertUtils {
 
         resolveExtensions(jn).ifPresent(extensions -> BeanMap.of(value).put("extensions", extensions));
         String elType = jn.has("type") ? jn.get("type").textValue() : null;
+        String elFormat = jn.has("format") ? jn.get("format").textValue() : null;
         JsonNode defaultValueNode = jn.get("defaultValue");
-        JsonNode allowableValuesNode = jn.get("allowableValues");
         // fix for default value
         Object defaultValue;
         try {
-            defaultValue = ConvertUtils.normalizeValue(defaultValueNode != null ? defaultValueNode.textValue() : null, elType);
+            defaultValue = ConvertUtils.normalizeValue(defaultValueNode != null ? defaultValueNode.textValue() : null, elType, elFormat, context);
         } catch (JsonProcessingException e) {
             defaultValue = defaultValueNode != null ? defaultValueNode.textValue() : null;
         }
@@ -105,6 +123,8 @@ public final class ConvertUtils {
         if (defaultValue != null) {
             beanMap.put("default", defaultValue);
         }
+
+        JsonNode allowableValuesNode = jn.get("allowableValues");
         if (allowableValuesNode != null && allowableValuesNode.isArray()) {
             List<Object> allowableValues = new ArrayList<>(allowableValuesNode.size());
             for (JsonNode allowableValueNode : allowableValuesNode) {
@@ -112,7 +132,7 @@ public final class ConvertUtils {
                     continue;
                 }
                 try {
-                    allowableValues.add(ConvertUtils.normalizeValue(allowableValueNode.textValue(), elType));
+                    allowableValues.add(ConvertUtils.normalizeValue(allowableValueNode.textValue(), elType, elFormat, context));
                 } catch (IOException e) {
                     allowableValues.add(allowableValueNode.textValue());
                 }
@@ -123,40 +143,14 @@ public final class ConvertUtils {
         return value;
     }
 
-    private static Object convertJsonNodeValue(JsonNode node, String type) throws JsonProcessingException {
-        if (node == null) {
-            return null;
-        }
-        return normalizeValue(node.textValue(), type);
-    }
-
-    public static Object normalizeValue(String valueStr, String type) throws JsonProcessingException {
+    public static Object normalizeValue(String valueStr, String type, String format, VisitorContext context) throws JsonProcessingException {
         if (valueStr == null) {
             return null;
         }
         if (type == null || type.equals("object")) {
             return convertJsonMapper.readValue(valueStr, Map.class);
         }
-        PrimitiveType primitiveType = PrimitiveType.fromName(type);
-        switch (primitiveType) {
-            case INT:
-                return Integer.parseInt(valueStr);
-            case LONG:
-                return Long.parseLong(valueStr);
-            case FLOAT:
-                return Float.parseFloat(valueStr);
-            case DOUBLE:
-                return Double.parseDouble(valueStr);
-            case DECIMAL:
-            case NUMBER:
-                return new BigDecimal(valueStr);
-            case INTEGER:
-                return new BigInteger(valueStr);
-            case BOOLEAN:
-                return Boolean.parseBoolean(valueStr);
-            default:
-                return valueStr;
-        }
+        return parseByTypeAndFormat(valueStr, type, format, context);
     }
 
     public static Optional<Map<String, Object>> resolveExtensions(JsonNode jn) {
@@ -188,6 +182,125 @@ public final class ConvertUtils {
         SecurityRequirement securityRequirement = new SecurityRequirement();
         securityRequirement.addList(name, scopes);
         return securityRequirement;
+    }
+
+    /**
+     * Detect openapi type nd format by java class name.
+     *
+     * @param className java class name
+     *
+     * @return pair with openapi type and format
+     */
+    public static Pair<String, String> getTypeAndFormatByClass(String className) {
+        if (className == null) {
+            return Pair.of("object", null);
+        }
+
+        if (String.class.getName().equals(className)
+            || char.class.getName().equals(className)
+            || Character.class.getName().equals(className)) {
+            return Pair.of("string", null);
+        } else if (Boolean.class.getName().equals(className)
+            || boolean.class.getName().equals(className)) {
+            return Pair.of("boolean", null);
+        } else if (Integer.class.getName().equals(className)
+            || int.class.getName().equals(className)
+            || Short.class.getName().equals(className)
+            || short.class.getName().equals(className)) {
+            return Pair.of("integer", "int32");
+        } else if (BigInteger.class.getName().equals(className)) {
+            return Pair.of("integer", null);
+        } else if (Long.class.getName().equals(className)
+            || long.class.getName().equals(className)) {
+            return Pair.of("integer", "int64");
+        } else if (Float.class.getName().equals(className)
+            || float.class.getName().equals(className)) {
+            return Pair.of("number", "float");
+        } else if (Double.class.getName().equals(className)
+            || double.class.getName().equals(className)) {
+            return Pair.of("number", "double");
+        } else if (Byte.class.getName().equals(className)
+            || byte.class.getName().equals(className)) {
+            return Pair.of("string", "byte");
+        } else if (BigDecimal.class.getName().equals(className)) {
+            return Pair.of("number", null);
+        } else if (URI.class.getName().equals(className)) {
+            return Pair.of("string", "uri");
+        } else if (URL.class.getName().equals(className)) {
+            return Pair.of("string", "url");
+        } else if (UUID.class.getName().equals(className)) {
+            return Pair.of("string", "uuid");
+        } else if (Number.class.getName().equals(className)) {
+            return Pair.of("number", null);
+        } else if (File.class.getName().equals(className)) {
+            return Pair.of("string", "binary");
+        } else if (LocalDate.class.getName().equals(className)) {
+            return Pair.of("string", "date");
+        } else if (Date.class.getName().equals(className)
+            || Calendar.class.getName().equals(className)
+            || Instant.class.getName().equals(className)
+            || LocalDateTime.class.getName().equals(className)
+            || OffsetDateTime.class.getName().equals(className)
+            || XMLGregorianCalendar.class.getName().equals(className)
+            || ZonedDateTime.class.getName().equals(className)
+        ) {
+            return Pair.of("string", "date-time");
+        } else if (LocalTime.class.getName().equals(className)) {
+            return Pair.of("string", "partial-time");
+        } else {
+            return Pair.of("object", null);
+        }
+    }
+
+    /**
+     * Parse value by openapi type and format.
+     *
+     * @param valueStr string value for parse
+     * @param type openapi type
+     * @param format openapi value
+     * @param context visitor context
+     *
+     * @return parsed value
+     */
+    public static Object parseByTypeAndFormat(String valueStr, String type, String format, VisitorContext context) {
+        if (StringUtils.isEmpty(valueStr)) {
+            return null;
+        }
+        try {
+            if ("string".equals(type)) {
+                if ("uri".equals(format)) {
+                    return new URI(valueStr);
+                } else if ("url".equals(format)) {
+                    return new URL(valueStr);
+                } else if ("uuid".equals(format)) {
+                    return UUID.fromString(valueStr);
+                } else if (format == null) {
+                    return valueStr;
+                }
+            } else if ("boolean".equals(type)) {
+                return Boolean.parseBoolean(valueStr);
+            } else if ("integer".equals(type)) {
+                if ("int32".equals(format)) {
+                    return Integer.parseInt(valueStr);
+                } else if ("int64".equals(format)) {
+                    return Long.parseLong(valueStr);
+                } else {
+                    return new BigInteger(valueStr);
+                }
+            } else if ("number".equals(type)) {
+                if ("float".equals(format)) {
+                    return Float.parseFloat(valueStr);
+                } else if ("double".equals(format)) {
+                    return Double.parseDouble(valueStr);
+                } else {
+                    return new BigDecimal(valueStr);
+                }
+            }
+        } catch (Exception e) {
+            context.warn("Can't parse value " + valueStr + " with type " + type + " and format " + format, null);
+        }
+
+        return valueStr;
     }
 
     public static ObjectMapper getJsonMapper() {

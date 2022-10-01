@@ -18,10 +18,21 @@ package io.micronaut.openapi.visitor;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.net.URI;
+import java.net.URL;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.OffsetDateTime;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -52,6 +63,7 @@ import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 import javax.validation.constraints.Size;
+import javax.xml.datatype.XMLGregorianCalendar;
 
 import io.micronaut.context.env.Environment;
 import io.micronaut.core.annotation.AnnotationClassValue;
@@ -111,12 +123,12 @@ import io.swagger.v3.oas.models.media.MapSchema;
 import io.swagger.v3.oas.models.media.ObjectSchema;
 import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.media.StringSchema;
-import io.swagger.v3.oas.models.media.UUIDSchema;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import io.swagger.v3.oas.models.tags.Tag;
 
 import org.apache.commons.lang3.math.NumberUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.reactivestreams.Publisher;
 
 import com.fasterxml.jackson.annotation.JsonAnySetter;
@@ -214,7 +226,7 @@ abstract class AbstractOpenApiVisitor {
     <T> Optional<T> toValue(Map<CharSequence, Object> values, VisitorContext context, Class<T> type) {
         JsonNode node = toJson(values, context);
         try {
-            return Optional.ofNullable(ConvertUtils.treeToValue(node, type));
+            return Optional.ofNullable(ConvertUtils.treeToValue(node, type, context));
         } catch (JsonProcessingException e) {
             context.warn("Error converting  [" + node + "]: to " + type + ": " + e.getMessage(), null);
         }
@@ -824,10 +836,46 @@ abstract class AbstractOpenApiVisitor {
                         }
                     }
                 } else if (Utils.isReturnTypeFile(type)) {
-                    schema = new StringSchema();
-                    schema.setFormat(PrimitiveType.BINARY.getCommonName());
+                    schema = PrimitiveType.FILE.createProperty();
+                } else if (type.isAssignable(Boolean.class) || type.isAssignable(boolean.class)) {
+                    schema = PrimitiveType.BOOLEAN.createProperty();
+                } else if (type.isAssignable(Byte.class) || type.isAssignable(byte.class)) {
+                    schema = PrimitiveType.BYTE.createProperty();
                 } else if (type.isAssignable(UUID.class)) {
-                    schema = new UUIDSchema();
+                    schema = PrimitiveType.UUID.createProperty();
+                } else if (type.isAssignable(URL.class)) {
+                    schema = PrimitiveType.URL.createProperty();
+                } else if (type.isAssignable(URI.class)) {
+                    schema = PrimitiveType.URI.createProperty();
+                } else if (type.isAssignable(Character.class) || type.isAssignable(char.class)) {
+                    schema = PrimitiveType.STRING.createProperty();
+                } else if (type.isAssignable(Integer.class) || type.isAssignable(int.class)
+                    || type.isAssignable(Short.class) || type.isAssignable(short.class)) {
+                    schema = PrimitiveType.INT.createProperty();
+                } else if (type.isAssignable(Long.class) || type.isAssignable(long.class)) {
+                    schema = PrimitiveType.LONG.createProperty();
+                } else if (type.isAssignable(Float.class) || type.isAssignable(float.class)) {
+                    schema = PrimitiveType.FLOAT.createProperty();
+                } else if (type.isAssignable(Double.class) || type.isAssignable(double.class)) {
+                    schema = PrimitiveType.DOUBLE.createProperty();
+                } else if (type.isAssignable(BigInteger.class)) {
+                    schema = PrimitiveType.INTEGER.createProperty();
+                } else if (type.isAssignable(BigDecimal.class)) {
+                    schema = PrimitiveType.DECIMAL.createProperty();
+                } else if (type.isAssignable(Date.class)
+                    || type.isAssignable(Calendar.class)
+                    || type.isAssignable(LocalDateTime.class)
+                    || type.isAssignable(ZonedDateTime.class)
+                    || type.isAssignable(OffsetDateTime.class)
+                    || type.isAssignable(Instant.class)
+                    || type.isAssignable(XMLGregorianCalendar.class)) {
+                    schema = new StringSchema().format("date-time");
+                } else if (type.isAssignable(LocalDate.class)) {
+                    schema = new StringSchema().format("date");
+                } else if (type.isAssignable(LocalTime.class)) {
+                    schema = new StringSchema().format("partial-time");
+                } else if (type.isAssignable(Number.class)) {
+                    schema = PrimitiveType.NUMBER.createProperty();
                 } else {
                     schema = getSchemaDefinition(openAPI, context, type, definingElement, mediaTypes);
                 }
@@ -937,8 +985,16 @@ abstract class AbstractOpenApiVisitor {
                     schemaAnnotationValue.get("defaultValue", String.class)
                         .ifPresent(value -> {
                             String elType = schemaAnnotationValue.get("type", String.class).orElse(null);
+                            String elFormat = schemaAnnotationValue.get("format", String.class).orElse(null);
+                            if (elType == null && elementType != null) {
+                                Pair<String, String> typeAndFormat = ConvertUtils.getTypeAndFormatByClass(elementType.getName());
+                                elType = typeAndFormat.getLeft();
+                                if (elFormat == null) {
+                                    elFormat = typeAndFormat.getRight();
+                                }
+                            }
                             try {
-                                propertySchemaFinal.setDefault(ConvertUtils.normalizeValue(value, elType));
+                                propertySchemaFinal.setDefault(ConvertUtils.normalizeValue(value, elType, elFormat, context));
                             } catch (JsonProcessingException e) {
                                 context.warn("Can't parse value " + value + " to " + elType + ": " + e.getMessage(), element);
                                 propertySchemaFinal.setDefault(value);
@@ -1079,7 +1135,7 @@ abstract class AbstractOpenApiVisitor {
         final String defaultValue = element.getValue(Bindable.class, "defaultValue", String.class).orElse(null);
         if (defaultValue != null && schemaToBind.getDefault() == null) {
             try {
-                topLevelSchema.setDefault(ConvertUtils.normalizeValue(defaultValue, schemaToBind.getType()));
+                topLevelSchema.setDefault(ConvertUtils.normalizeValue(defaultValue, schemaToBind.getType(), schemaToBind.getFormat(), context));
             } catch (JsonProcessingException e) {
                 context.warn("Can't convert " + defaultValue + " to " + schemaToBind.getType() + ": " + e.getMessage(), element);
                 topLevelSchema.setDefault(defaultValue);
@@ -1097,7 +1153,7 @@ abstract class AbstractOpenApiVisitor {
         final String defaultJacksonValue = element.stringValue(JsonProperty.class, "defaultValue").orElse(null);
         if (defaultJacksonValue != null && schemaToBind.getDefault() == null) {
             try {
-                topLevelSchema.setDefault(ConvertUtils.normalizeValue(defaultJacksonValue, schemaToBind.getType()));
+                topLevelSchema.setDefault(ConvertUtils.normalizeValue(defaultJacksonValue, schemaToBind.getType(), schemaToBind.getFormat(), context));
             } catch (JsonProcessingException e) {
                 context.warn("Can't convert " + defaultJacksonValue + " to " + schemaToBind.getType() + ": " + e.getMessage(), element);
                 topLevelSchema.setDefault(defaultJacksonValue);
@@ -1241,7 +1297,7 @@ abstract class AbstractOpenApiVisitor {
         String schemaDefaultValue = (String) annValues.get("defaultValue");
         if (schemaDefaultValue != null) {
             try {
-                schemaToBind.setDefault(ConvertUtils.normalizeValue(schemaDefaultValue, schemaToBind.getType()));
+                schemaToBind.setDefault(ConvertUtils.normalizeValue(schemaDefaultValue, schemaToBind.getType(), schemaToBind.getFormat(), context));
             } catch (JsonProcessingException e) {
                 context.warn("Can't convert " + schemaDefaultValue + " to " + schemaToBind.getType() + ": " + e.getMessage(), element);
                 schemaToBind.setDefault(schemaDefaultValue);
@@ -1361,12 +1417,13 @@ abstract class AbstractOpenApiVisitor {
         JsonNode schemaJson = toJson(schemaAnn.getValues(), context);
         return doBindSchemaAnnotationValue(context, element, schemaToBind, schemaJson,
             schemaAnn.get("type", String.class).orElse(null),
+            schemaAnn.get("format", String.class).orElse(null),
             schemaAnn.get("defaultValue", String.class).orElse(null),
             schemaAnn.get("allowableValues", String[].class).orElse(null));
     }
 
     private Schema doBindSchemaAnnotationValue(VisitorContext context, Element element, Schema schemaToBind,
-                                               JsonNode schemaJson, String elType, String defaultValue, String... allowableValues) {
+                                               JsonNode schemaJson, String elType, String elFormat, String defaultValue, String... allowableValues) {
         // need to set placeholders to set correct values to example field
         schemaJson = resolvePlaceholders(schemaJson, s -> expandProperties(s, getExpandableProperties(context), context));
         try {
@@ -1374,11 +1431,20 @@ abstract class AbstractOpenApiVisitor {
         } catch (IOException e) {
             context.warn("Error reading Swagger Schema for element [" + element + "]: " + e.getMessage(), element);
         }
+
+        if (elType == null && element != null) {
+            Pair<String, String> typeAndFormat = ConvertUtils.getTypeAndFormatByClass(((TypedElement) element).getType().getName());
+            elType = typeAndFormat.getLeft();
+            if (elFormat == null) {
+                elFormat = typeAndFormat.getRight();
+            }
+        }
+
         if (StringUtils.isNotEmpty(defaultValue)) {
             try {
-                schemaToBind.setDefault(ConvertUtils.normalizeValue(defaultValue, elType));
+                schemaToBind.setDefault(ConvertUtils.normalizeValue(defaultValue, elType, elFormat, context));
             } catch (IOException e) {
-                context.warn("Can't convert " + defaultValue + " to " + elType + ": " + e.getMessage(), element);
+                context.warn("Can't convert " + defaultValue + " to " + elType + ", format: " + elFormat + ": " + e.getMessage(), element);
                 schemaToBind.setDefault(defaultValue);
             }
         }
@@ -1386,9 +1452,9 @@ abstract class AbstractOpenApiVisitor {
             for (String allowableValue : allowableValues) {
                 if (schemaToBind.getEnum() == null || !schemaToBind.getEnum().contains(allowableValue)) {
                     try {
-                        schemaToBind.addEnumItemObject(ConvertUtils.normalizeValue(allowableValue, elType));
+                        schemaToBind.addEnumItemObject(ConvertUtils.normalizeValue(allowableValue, elType, elFormat, context));
                     } catch (IOException e) {
-                        context.warn("Can't convert " + allowableValue + " to " + elType + ": " + e.getMessage(), element);
+                        context.warn("Can't convert " + allowableValue + " to " + elType + ", format: " + elFormat + ": " + e.getMessage(), element);
                         schemaToBind.addEnumItemObject(allowableValue);
                     }
                 }
@@ -1431,7 +1497,8 @@ abstract class AbstractOpenApiVisitor {
             }
         }
         String elType = schemaJson.has("type") ? schemaJson.get("type").textValue() : null;
-        return doBindSchemaAnnotationValue(context, element, schemaToBind, schemaJson, elType, null);
+        String elFormat = schemaJson.has("format") ? schemaJson.get("format").textValue() : null;
+        return doBindSchemaAnnotationValue(context, element, schemaToBind, schemaJson, elType, elFormat, null);
     }
 
     private Map<String, Object> annotationValueArrayToSubmap(Object[] a, String classifier, VisitorContext context) {
@@ -1577,7 +1644,7 @@ abstract class AbstractOpenApiVisitor {
                             schema.setType(PrimitiveType.STRING.getCommonName());
                         }
                         if (CollectionUtils.isEmpty(schema.getEnum())) {
-                            schema.setEnum(getEnumValues((EnumElement) type, schema.getType(), context));
+                            schema.setEnum(getEnumValues((EnumElement) type, schema.getType(), schema.getFormat(), context));
                         }
                     } else {
                         if (type instanceof TypedElement) {
@@ -1752,6 +1819,14 @@ abstract class AbstractOpenApiVisitor {
         Schema schema = schemaOpt.get();
 
         String elType = (String) values.get("type");
+        String elFormat = (String) values.get("format");
+        if (elType == null && type != null) {
+            Pair<String, String> typeAndFormat = ConvertUtils.getTypeAndFormatByClass(type.getName());
+            elType = typeAndFormat.getLeft();
+            if (elFormat == null) {
+                elFormat = typeAndFormat.getRight();
+            }
+        }
 
         if (values.containsKey("allowableValues")) {
             String[] allowableValues = (String[]) values.get("allowableValues");
@@ -1759,7 +1834,7 @@ abstract class AbstractOpenApiVisitor {
                 for (String allowableValue : allowableValues) {
                     if (schema.getEnum() == null || !schema.getEnum().contains(allowableValue)) {
                         try {
-                            schema.addEnumItemObject(ConvertUtils.normalizeValue(allowableValue, elType));
+                            schema.addEnumItemObject(ConvertUtils.normalizeValue(allowableValue, elType, elFormat, context));
                         } catch (IOException e) {
                             context.warn("Can't convert " + allowableValue + " to " + elType + ": " + e.getMessage(), type);
                             schema.addEnumItemObject(allowableValue);
@@ -1770,7 +1845,7 @@ abstract class AbstractOpenApiVisitor {
         }
         String defaultValue = schemaValue.get("defaultValue", String.class).orElse(null);
         try {
-            schema.setDefault(ConvertUtils.normalizeValue(defaultValue, elType));
+            schema.setDefault(ConvertUtils.normalizeValue(defaultValue, elType, elFormat, context));
         } catch (IOException e) {
             context.warn("Can't convert " + defaultValue + " to " + elType + ": " + e.getMessage(), type);
             schema.setDefault(defaultValue);
@@ -1811,7 +1886,7 @@ abstract class AbstractOpenApiVisitor {
             elType = elType != null ? elType : PrimitiveType.STRING.getCommonName();
             schema.setType(elType);
             if (CollectionUtils.isEmpty(schema.getEnum())) {
-                schema.setEnum(getEnumValues((EnumElement) type, elType, context));
+                schema.setEnum(getEnumValues((EnumElement) type, elType, elFormat, context));
             }
         } else {
             JavadocDescription javadoc = Utils.getJavadocParser().parse(type.getDescription());
@@ -1821,14 +1896,14 @@ abstract class AbstractOpenApiVisitor {
         return schema;
     }
 
-    private List<Object> getEnumValues(EnumElement type, String schemaType, VisitorContext context) {
+    private List<Object> getEnumValues(EnumElement type, String schemaType, String schemaFormat, VisitorContext context) {
         List<Object> enumValues = new ArrayList<>();
         for (EnumConstantElement element : type.elements()) {
             AnnotationValue<JsonProperty> jsonProperty = element.getAnnotation(JsonProperty.class);
             String jacksonValue = jsonProperty != null ? jsonProperty.get("value", String.class).get() : null;
             if (StringUtils.hasText(jacksonValue)) {
                 try {
-                    enumValues.add(ConvertUtils.normalizeValue(jacksonValue, schemaType));
+                    enumValues.add(ConvertUtils.normalizeValue(jacksonValue, schemaType, schemaFormat, context));
                 } catch (JsonProcessingException e) {
                     context.warn("Error converting jacksonValue " + jacksonValue + " : to " + type + ": " + e.getMessage(), element);
                     enumValues.add(element.getSimpleName());
@@ -2027,7 +2102,7 @@ abstract class AbstractOpenApiVisitor {
 
                 try {
                     JsonNode node = toJson(map, context);
-                    SecurityScheme securityScheme = ConvertUtils.treeToValue(node, SecurityScheme.class);
+                    SecurityScheme securityScheme = ConvertUtils.treeToValue(node, SecurityScheme.class, context);
                     if (securityScheme != null) {
                         resolveExtensions(node).ifPresent(extensions -> BeanMap.of(securityScheme).put("extensions", extensions));
                         resolveComponents(openAPI).addSecuritySchemes(name, securityScheme);
