@@ -1282,4 +1282,158 @@ public class MyBean {}
         schema.properties.state.default == false
         schema.default == null
     }
+
+    @Issue("https://github.com/micronaut-projects/micronaut-openapi/issues/809")
+    void "test dto schema with defaultValue"() {
+        when:
+        buildBeanDefinition("test.MyBean", '''
+package test;
+
+import java.net.URL;
+import java.util.Date;
+import java.util.UUID;
+
+import io.micronaut.core.annotation.Introspected;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.swagger.v3.oas.annotations.media.Schema;
+
+@Controller
+class TestController {
+
+    @Get("testRest")
+    String test(DemoData demoInput) {
+        return null;
+    }
+
+}
+
+@Introspected
+class DemoData {
+
+    @Schema(defaultValue = "myDefault")
+    private String name;
+    @Schema(defaultValue = "10")
+    private Integer propInt;
+    @Schema(defaultValue = "100")
+    private int propInt2;
+    @Schema(defaultValue = "https://example.com")
+    private URL url;
+    @Schema(defaultValue = "274191c9-c176-4b1c-8263-1b658cbdc7fc")
+    private UUID uuid;
+    @Schema(defaultValue = "Jan 12, 1952")
+    private Date date;
+    @Schema(defaultValue = "myDefault3")
+    private MySubObject mySubObject;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Integer getPropInt() {
+        return propInt;
+    }
+
+    public void setPropInt(Integer propInt) {
+        this.propInt = propInt;
+    }
+
+    public int getPropInt2() {
+        return propInt2;
+    }
+
+    public void setPropInt2(int propInt2) {
+        this.propInt2 = propInt2;
+    }
+
+    public URL getUrl() {
+        return url;
+    }
+
+    public void setUrl(URL url) {
+        this.url = url;
+    }
+
+    public UUID getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(UUID uuid) {
+        this.uuid = uuid;
+    }
+
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
+    }
+
+    public MySubObject getMySubObject() {
+        return mySubObject;
+    }
+
+    public void setMySubObject(MySubObject mySubObject) {
+        this.mySubObject = mySubObject;
+    }
+}
+
+@Introspected
+class MySubObject {
+
+    private String prop1;
+
+    public String getProp1() {
+        return prop1;
+    }
+
+    public void setProp1(String prop1) {
+        this.prop1 = prop1;
+    }
+}
+
+
+@jakarta.inject.Singleton
+public class MyBean {}
+
+''')
+
+        then:
+        OpenAPI openAPI = Utils.testReference
+        Schema schema = openAPI.components.schemas.DemoData
+        schema
+
+        schema.properties.name.default == 'myDefault'
+        schema.properties.name.type == 'string'
+        schema.properties.name.format == null
+
+        schema.properties.propInt.default == 10
+        schema.properties.propInt.type == 'integer'
+        schema.properties.propInt.format == 'int32'
+
+        schema.properties.propInt2.default == 100
+        schema.properties.propInt2.type == 'integer'
+        schema.properties.propInt2.format == 'int32'
+
+        schema.properties.url.default == 'https://example.com'
+        schema.properties.url.type == 'string'
+        schema.properties.url.format == 'url'
+
+        schema.properties.uuid.default.toString() == '274191c9-c176-4b1c-8263-1b658cbdc7fc'
+        schema.properties.uuid.type == 'string'
+        schema.properties.uuid.format == 'uuid'
+
+        schema.properties.date.default == 'Jan 12, 1952'
+        schema.properties.date.type == 'string'
+        schema.properties.date.format == 'date-time'
+
+        schema.properties.mySubObject.default == 'myDefault3'
+        schema.properties.mySubObject.type == null
+        schema.properties.mySubObject.format == null
+    }
 }

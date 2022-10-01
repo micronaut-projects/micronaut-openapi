@@ -774,7 +774,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
 
                 if (newParameter == null) {
                     try {
-                        newParameter = ConvertUtils.treeToValue(jsonNode, Parameter.class);
+                        newParameter = ConvertUtils.treeToValue(jsonNode, Parameter.class, context);
                         if (jsonNode.has("schema")) {
                             JsonNode schemaNode = jsonNode.get("schema");
                             if (schemaNode.has("$ref")) {
@@ -789,7 +789,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                     }
                 } else {
                     try {
-                        Parameter v = ConvertUtils.treeToValue(jsonNode, Parameter.class);
+                        Parameter v = ConvertUtils.treeToValue(jsonNode, Parameter.class, context);
                         if (v == null) {
                             Map<CharSequence, Object> target = ConvertUtils.getConvertJsonMapper().convertValue(newParameter, MAP_TYPE);
                             for (CharSequence name : paramValues.keySet()) {
