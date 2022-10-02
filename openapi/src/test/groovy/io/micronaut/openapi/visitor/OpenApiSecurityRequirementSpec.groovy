@@ -442,11 +442,11 @@ class MyBean {}
         openAPI.components.securitySchemes.size() == 1
         def securityScheme = openAPI.components.securitySchemes['myOauth2Security']
         securityScheme.type == SecurityScheme.Type.OAUTH2
-        securityScheme.scheme == 'bearer'
-        securityScheme.openIdConnectUrl == "https://openid.com/connect"
-        securityScheme.bearerFormat == 'JWT'
+        securityScheme.scheme == null
+        securityScheme.openIdConnectUrl == null
+        securityScheme.bearerFormat == null
         securityScheme.description == 'Security scheme description'
-        securityScheme.in == SecurityScheme.In.HEADER
+        securityScheme.in == null
 
         securityScheme.extensions
         securityScheme.extensions.size() == 2
