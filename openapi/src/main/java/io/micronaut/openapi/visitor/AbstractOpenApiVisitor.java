@@ -2087,31 +2087,68 @@ abstract class AbstractOpenApiVisitor {
         final OpenAPI openAPI = Utils.resolveOpenAPI(context);
         for (AnnotationValue<io.swagger.v3.oas.annotations.security.SecurityScheme> securityRequirementAnnotationValue : values) {
 
-            final Optional<String> n = securityRequirementAnnotationValue.get("name", String.class);
-            n.ifPresent(name -> {
-                final Map<CharSequence, Object> map = toValueMap(securityRequirementAnnotationValue.getValues(), context);
-                if (map.containsKey("paramName")) {
-                    map.put("name", map.remove("paramName"));
-                } else {
-                    map.putIfAbsent("name", name);
-                }
-                Utils.normalizeEnumValues(map, CollectionUtils.mapOf("type", SecurityScheme.Type.class, "in", SecurityScheme.In.class));
-                if (map.containsKey("ref")) {
-                    map.put("$ref", map.remove("ref"));
-                }
+            final Map<CharSequence, Object> map = toValueMap(securityRequirementAnnotationValue.getValues(), context);
 
-                try {
-                    JsonNode node = toJson(map, context);
-                    SecurityScheme securityScheme = ConvertUtils.treeToValue(node, SecurityScheme.class, context);
-                    if (securityScheme != null) {
-                        resolveExtensions(node).ifPresent(extensions -> BeanMap.of(securityScheme).put("extensions", extensions));
-                        resolveComponents(openAPI).addSecuritySchemes(name, securityScheme);
+            securityRequirementAnnotationValue.get("name", String.class)
+                .ifPresent(name -> {
+                    if (map.containsKey("paramName")) {
+                        map.put("name", map.remove("paramName"));
                     }
-                } catch (JsonProcessingException e) {
-                    // ignore
-                }
-            });
+
+                    Utils.normalizeEnumValues(map, CollectionUtils.mapOf("type", SecurityScheme.Type.class, "in", SecurityScheme.In.class));
+
+                    String type = (String) map.get("type");
+                    if (!SecurityScheme.Type.APIKEY.toString().equals(type)) {
+                        removeAndWarnSecSchemeProp(map, "name", context);
+                        removeAndWarnSecSchemeProp(map, "in", context);
+                    }
+                    if (!SecurityScheme.Type.OAUTH2.toString().equals(type)) {
+                        removeAndWarnSecSchemeProp(map, "flows", context);
+                    }
+                    if (!SecurityScheme.Type.OPENIDCONNECT.toString().equals(type)) {
+                        removeAndWarnSecSchemeProp(map, "openIdConnectUrl", context);
+                    }
+                    if (!SecurityScheme.Type.HTTP.toString().equals(type)) {
+                        removeAndWarnSecSchemeProp(map, "scheme", context);
+                        removeAndWarnSecSchemeProp(map, "bearerFormat", context);
+                    }
+
+                    if (SecurityScheme.Type.HTTP.toString().equals(type)) {
+                        if (!map.containsKey("scheme")) {
+                            context.warn("Can't use http security scheme without 'scheme' property", null);
+                        } else if (!map.get("scheme").equals("bearer") && map.containsKey("bearerFormat")) {
+                            context.warn("Should NOT have a `bearerFormat` property without `scheme: bearer` being set", null);
+                        }
+                    }
+
+                    if (map.containsKey("ref") || map.containsKey("$ref")) {
+                        Object ref = map.get("ref");
+                        if (ref == null) {
+                            ref = map.get("$ref");
+                        }
+                        map.clear();
+                        map.put("$ref", ref);
+                    }
+
+                    try {
+                        JsonNode node = toJson(map, context);
+                        SecurityScheme securityScheme = ConvertUtils.treeToValue(node, SecurityScheme.class, context);
+                        if (securityScheme != null) {
+                            resolveExtensions(node).ifPresent(extensions -> BeanMap.of(securityScheme).put("extensions", extensions));
+                            resolveComponents(openAPI).addSecuritySchemes(name, securityScheme);
+                        }
+                    } catch (JsonProcessingException e) {
+                        // ignore
+                    }
+                });
         }
+    }
+
+    private void removeAndWarnSecSchemeProp(Map<CharSequence, Object> map, String prop, VisitorContext context) {
+        if (map.containsKey(prop)) {
+            context.warn("'" + prop + "' property can't set for securityScheme with type " + map.get("type") + ". Skip it", null);
+        }
+        map.remove(prop);
     }
 
     /**
