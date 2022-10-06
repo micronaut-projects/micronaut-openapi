@@ -3,6 +3,7 @@ managed-swagger = "2.2.3"
 # Required to keep catalog compatibility with 3.4.x.  Can be removed for 4.0.0
 managed-swagger-compat = "2.2.3"
 managed-javadoc-parser = "0.3.1"
+managed-jsoup = "1.15.3"
 
 # Versions beyond 0.62.2 require Java 11
 managed-html2md-converter = "0.62.2"
@@ -12,13 +13,14 @@ kotlin = "1.7.10"
 [libraries]
 # Duplicated to keep catalog compatibility with 3.4.x.  Can be removed for 4.0.0
 managed-swagger = { module = "io.swagger.core.v3:swagger-core", version.ref = "managed-swagger-compat" }
+managed-swagger-core = { module = "io.swagger.core.v3:swagger-core", version.ref = "managed-swagger" }
 
 managed-swagger-annotations = { module = "io.swagger.core.v3:swagger-annotations", version.ref = "managed-swagger" }
-managed-swagger-core = { module = "io.swagger.core.v3:swagger-core", version.ref = "managed-swagger" }
 managed-swagger-models = { module = "io.swagger.core.v3:swagger-models", version.ref = "managed-swagger" }
 
 managed-javadoc-parser = { module = "com.github.chhorz:javadoc-parser", version.ref = "managed-javadoc-parser" }
-managed-html2md-converter = {module = "com.vladsch.flexmark:flexmark-html2md-converter", version.ref = "managed-html2md-converter" }
+managed-html2md-converter = { module = "com.vladsch.flexmark:flexmark-html2md-converter", version.ref = "managed-html2md-converter" }
+managed-jsoup = { module = "org.jsoup:jsoup", version.ref = "managed-jsoup" }
 
 # Versions from BOM
 junit-jupiter-api = { module = "org.junit.jupiter:junit-jupiter-api" }
@@ -28,6 +30,10 @@ reactor-core = { module = "io.projectreactor:reactor-core" }
 spock-core = { module = "org.spockframework:spock-core" }
 rxjava2 = { module = "io.reactivex.rxjava2:rxjava" }
 rxjava3 = { module = "io.reactivex.rxjava3:rxjava" }
+jackson-databind = { module = "com.fasterxml.jackson.core:jackson-databind" }
+jackson-datatype-jsr310 = { module = "com.fasterxml.jackson.datatype:jackson-datatype-jsr310" }
+jackson-dataformat-yaml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml" }
+
 testcontainers-spock = { module = "org.testcontainers:spock" }
 
 kotlin-stdlib-jdk8 = { module = "org.jetbrains.kotlin:kotlin-stdlib-jdk8", version.ref = "kotlin" }

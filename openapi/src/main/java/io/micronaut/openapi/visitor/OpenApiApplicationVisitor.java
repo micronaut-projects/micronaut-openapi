@@ -64,7 +64,6 @@ import io.micronaut.inject.writer.GeneratedFile;
 import io.micronaut.openapi.postprocessors.JacksonDiscriminatorPostProcessor;
 import io.micronaut.openapi.postprocessors.OpenApiOperationsPostProcessor;
 import io.micronaut.openapi.view.OpenApiViewConfig;
-import io.swagger.v3.core.util.Yaml;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.servers.Server;
@@ -649,8 +648,8 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             return openAPI;
         }
         visitorContext.info("Expanding properties: " + expandableProperties);
-        JsonNode root = resolvePlaceholders(Yaml.mapper().convertValue(openAPI, ObjectNode.class), s -> expandProperties(s, expandableProperties, visitorContext));
-        return Yaml.mapper().convertValue(root, OpenAPI.class);
+        JsonNode root = resolvePlaceholders(ConvertUtils.getYamlMapper().convertValue(openAPI, ObjectNode.class), s -> expandProperties(s, expandableProperties, visitorContext));
+        return ConvertUtils.getYamlMapper().convertValue(root, OpenAPI.class);
     }
 
     @Override
