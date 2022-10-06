@@ -551,13 +551,18 @@ class MyBean {}
         buildBeanDefinition('test.MyBean', '''
 package test;
 
-import io.reactivex.*;
-import io.micronaut.http.annotation.*;
-import com.fasterxml.jackson.annotation.*;
-import java.util.List;
-import io.swagger.v3.oas.annotations.media.*;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Positive;import javax.validation.constraints.PositiveOrZero;import javax.validation.constraints.Size;
+
 import io.micronaut.http.MediaType;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+
+import jakarta.inject.Singleton;
+
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 @Controller("/pets")
 interface PetOperations {
@@ -607,7 +612,9 @@ class Cat extends Pet {
 @JsonSubTypes({ @JsonSubTypes.Type(value = Cat.class, name = "Cat"),
         @JsonSubTypes.Type(value = Dog.class, name = "Dog") })
 class Pet {
-    @javax.validation.constraints.Min(18)
+    @Min(18)
+    @Positive
+    @PositiveOrZero
     private int age;
 
     private String name;
@@ -627,13 +634,15 @@ class Pet {
         name = n;
     }
 
-    @javax.validation.constraints.Size(max = 30)
+    @NotEmpty
+    @Size(max = 30)
+    @Size(min = 20)
     public String getName() {
         return name;
     }
 }
 
-@jakarta.inject.Singleton
+@Singleton
 class MyBean {}
 ''')
         then: "the state is correct"
@@ -653,6 +662,8 @@ class MyBean {}
         catSchema.properties == null
         petSchema.type == 'object'
         petSchema.properties.size() == 2
+        petSchema.properties['name'].minLength == 20
+        petSchema.properties['name'].maxLength == 30
 
         catSchema.allOf.size() == 2
         catSchema.allOf[0].$ref == '#/components/schemas/Pet'

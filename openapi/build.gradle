@@ -3,21 +3,28 @@ plugins {
 }
 
 dependencies {
-    compileOnly(mn.micronaut.management)
     compileOnly(mn.micronaut.inject.java)
 
     implementation(mn.micronaut.http)
     implementation(mn.micronaut.http.server)
     implementation(mn.reactor)
 
-    api(libs.managed.swagger.core)
+    api(libs.jackson.databind)
+    api(libs.jackson.dataformat.yaml)
+    api(libs.jackson.datatype.jsr310)
     api(libs.managed.swagger.models)
     api(libs.managed.swagger.annotations)
     api(libs.managed.javadoc.parser)
-    api(libs.managed.html2md.converter)
+    api(libs.managed.html2md.converter) {
+        exclude group: "org.jetbrains", module: "annotations"
+    }
+    // this dependency need to update jsoup version, which is used by html2md
+    api(libs.managed.jsoup)
 
+    implementation(mn.micronaut.http)
     testImplementation(mn.micronaut.runtime)
     testImplementation(mn.micronaut.security)
+    testImplementation(mn.micronaut.serde.jackson)
     testImplementation(mn.micronaut.inject.groovy)
     testImplementation(mn.micronaut.inject.groovy.test)
     testImplementation(mn.micronaut.inject.java)
@@ -28,6 +35,7 @@ dependencies {
     testImplementation(mn.rxjava3)
     testImplementation(mn.micronaut.management)
     testImplementation(mn.snakeyaml)
+    testImplementation(libs.managed.html2md.converter)
 
 }
 

@@ -147,4 +147,61 @@ class MyBean {}
         personSchema.required.size() == 1
         personSchema.required.contains('age')
     }
+
+    void "test read javadoc from class level for records - 2"() {
+        given:
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
+
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.micronaut.serde.annotation.Serdeable;
+
+@Controller
+class PetController {
+
+    @Get("/pet")
+    Pet getPet() {
+        return new Pet("John");
+    }
+}
+
+/**
+ *
+ * @param name The name of the pet
+ * @author gkrocher
+ */
+@Serdeable
+record Pet(
+        @NotBlank
+    @Size(max = 200)
+    String name) {}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        then:
+        Utils.testReference != null
+
+        when:
+        OpenAPI openAPI = Utils.testReference
+
+        then:
+        openAPI.components.schemas
+        openAPI.components.schemas.size() == 1
+
+        Schema petchema = openAPI.components.schemas['Pet']
+        petchema.name == 'Pet'
+        petchema.type == 'object'
+        petchema.description == null
+        petchema.properties.name.type == 'string'
+        petchema.properties.name.description == 'The name of the pet'
+        petchema.required
+        petchema.required.size() == 1
+        petchema.required.contains('name')
+    }
 }

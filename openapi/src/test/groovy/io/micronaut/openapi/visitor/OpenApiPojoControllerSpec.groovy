@@ -395,10 +395,14 @@ class MyBean {}
         buildBeanDefinition('test.MyBean', '''
 package test;
 
-import io.reactivex.*;
-import io.micronaut.http.annotation.*;
 import java.util.List;
-import io.swagger.v3.oas.annotations.media.*;
+
+import javax.validation.constraints.Min;import javax.validation.constraints.Size;
+
+import io.micronaut.http.annotation.Body;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.micronaut.http.annotation.Post;
 
 /**
  * @author graemerocher
@@ -436,7 +440,7 @@ interface PetOperations<T extends Pet> {
 
 //@Schema
 class Pet {
-    @javax.validation.constraints.Min(18)
+    @Min(18)
     private int age;
 
     private String name;
@@ -456,7 +460,7 @@ class Pet {
         name = n;
     }
 
-    @javax.validation.constraints.Size(max=30)
+    @Size(max=30)
     public String getName() {
         return name;
     }
