@@ -15,13 +15,13 @@ dependencies {
     api(libs.managed.swagger.models)
     api(libs.managed.swagger.annotations)
     api(libs.managed.javadoc.parser)
+    api(libs.managed.slf4j.nop)
     api(libs.managed.html2md.converter) {
         exclude group: "org.jetbrains", module: "annotations"
     }
-    // this dependency need to update jsoup version, which is used by html2md
+    // this dependency needs to be updated manually. It's used by html2md
     api(libs.managed.jsoup)
 
-    implementation(mn.micronaut.http)
     testImplementation(mn.micronaut.runtime)
     testImplementation(mn.micronaut.security)
     testImplementation(mn.micronaut.serde.jackson)
@@ -29,18 +29,20 @@ dependencies {
     testImplementation(mn.micronaut.inject.groovy.test)
     testImplementation(mn.micronaut.inject.java)
     testImplementation(mn.micronaut.inject.java.test)
-    testImplementation(mn.micronaut.hibernate.validator)
     testImplementation(mn.micronaut.data.jdbc)
     testImplementation(mn.rxjava2)
     testImplementation(mn.rxjava3)
     testImplementation(mn.micronaut.management)
     testImplementation(mn.snakeyaml)
     testImplementation(libs.managed.html2md.converter)
+    testImplementation(libs.javax.validation.api)
+    testImplementation(libs.jakarta.validation.api)
 
 }
 
-//compileJava.options.compilerArgs += '-deprecation'
-//compileJava.options.compilerArgs += '-add-exports java.base/com.sun.tools.javac.processing=ALL_UNNAMED'
+configurations.all {
+    all*.exclude group: "ch.qos.logback"
+}
 
 test {
     useJUnitPlatform()

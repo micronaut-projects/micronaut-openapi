@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
+import io.micronaut.core.annotation.Internal;
 import io.swagger.v3.oas.models.media.EncodingProperty;
 
 import com.fasterxml.jackson.core.JsonParser;
@@ -26,6 +27,12 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
 
+/**
+ * This class is copied from swagger-core library.
+ *
+ * @since 4.6.0
+ */
+@Internal
 public class EncodingPropertyStyleEnumDeserializer extends JsonDeserializer<EncodingProperty.StyleEnum> {
 
     @Override

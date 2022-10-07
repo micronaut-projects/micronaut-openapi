@@ -17,6 +17,7 @@ package io.micronaut.openapi.swagger.jackson.util;
 
 import java.io.IOException;
 
+import io.micronaut.core.annotation.Internal;
 import io.micronaut.openapi.visitor.ConvertUtils;
 import io.swagger.v3.oas.models.parameters.CookieParameter;
 import io.swagger.v3.oas.models.parameters.HeaderParameter;
@@ -32,6 +33,12 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 
+/**
+ * This class is copied from swagger-core library.
+ *
+ * @since 4.6.0
+ */
+@Internal
 public class ParameterDeserializer extends JsonDeserializer<Parameter> {
 
     protected boolean openapi31;
