@@ -42,9 +42,7 @@ public class SchemaSerializer extends JsonSerializer<Schema> implements Resolvab
     }
 
     @Override
-    public void serialize(
-        Schema value, JsonGenerator jgen, SerializerProvider provider)
-        throws IOException {
+    public void serialize(Schema value, JsonGenerator jgen, SerializerProvider provider) throws IOException {
 
         if (!StringUtils.hasText(value.get$ref())) {
 

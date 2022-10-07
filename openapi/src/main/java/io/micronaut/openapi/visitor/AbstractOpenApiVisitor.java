@@ -1308,10 +1308,22 @@ abstract class AbstractOpenApiVisitor {
                     }
                 });
 
-            if (element.isAnnotationPresent("javax.validation.constraints.Email$List")
-                || element.isAnnotationPresent("jakarta.validation.constraints.Email$List")) {
-                schemaToBind.setFormat(PrimitiveType.EMAIL.getCommonName());
-            }
+            element.findAnnotation("javax.validation.constraints.Email$List")
+                .ifPresent(listAnn -> {
+                    schemaToBind.setFormat(PrimitiveType.EMAIL.getCommonName());
+                    for (AnnotationValue ann : (Set<AnnotationValue>) listAnn.getValues().get("value")) {
+                        ((Optional<String>) ann.get("regexp", String.class))
+                            .ifPresent(schemaToBind::setPattern);
+                    }
+                });
+            element.findAnnotation("jakarta.validation.constraints.Email$List")
+                .ifPresent(listAnn -> {
+                    schemaToBind.setFormat(PrimitiveType.EMAIL.getCommonName());
+                    for (AnnotationValue ann : (Set<AnnotationValue>) listAnn.getValues().get("value")) {
+                        ((Optional<String>) ann.get("regexp", String.class))
+                            .ifPresent(schemaToBind::setPattern);
+                    }
+                });
 
             element.findAnnotation("javax.validation.constraints.Pattern$List")
                 .ifPresent(listAnn -> {

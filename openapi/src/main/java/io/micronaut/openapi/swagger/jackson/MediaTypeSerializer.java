@@ -41,9 +41,7 @@ public class MediaTypeSerializer extends JsonSerializer<MediaType> implements Re
     }
 
     @Override
-    public void serialize(
-        MediaType value, JsonGenerator jgen, SerializerProvider provider)
-        throws IOException {
+    public void serialize(MediaType value, JsonGenerator jgen, SerializerProvider provider) throws IOException {
 
         if (value.getExampleSetFlag() && value.getExample() == null) {
             jgen.writeStartObject();

@@ -28,9 +28,7 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 public class PathsSerializer extends JsonSerializer<Paths> {
 
     @Override
-    public void serialize(
-        Paths value, JsonGenerator jgen, SerializerProvider provider)
-        throws IOException {
+    public void serialize(Paths value, JsonGenerator jgen, SerializerProvider provider) throws IOException {
 
         if (value != null && value.getExtensions() != null && !value.getExtensions().isEmpty()) {
             jgen.writeStartObject();

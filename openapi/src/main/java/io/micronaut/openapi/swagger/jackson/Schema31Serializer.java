@@ -41,9 +41,7 @@ public class Schema31Serializer extends JsonSerializer<Schema> implements Resolv
     }
 
     @Override
-    public void serialize(
-        Schema value, JsonGenerator jgen, SerializerProvider provider)
-        throws IOException {
+    public void serialize(Schema value, JsonGenerator jgen, SerializerProvider provider) throws IOException {
 
         if (value.getBooleanSchemaValue() != null) {
             jgen.writeBoolean(value.getBooleanSchemaValue());

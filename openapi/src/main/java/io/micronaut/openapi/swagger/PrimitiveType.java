@@ -15,8 +15,14 @@
  */
 package io.micronaut.openapi.swagger;
 
+import java.io.File;
 import java.lang.reflect.Type;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.time.LocalTime;
+import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -115,13 +121,13 @@ public enum PrimitiveType {
             return new NumberSchema().format("double");
         }
     },
-    INTEGER(java.math.BigInteger.class) {
+    INTEGER(BigInteger.class) {
         @Override
         public Schema createProperty() {
             return new IntegerSchema().format(null);
         }
     },
-    DECIMAL(java.math.BigDecimal.class, "number") {
+    DECIMAL(BigDecimal.class, "number") {
         @Override
         public Schema createProperty() {
             return new NumberSchema();
@@ -139,19 +145,19 @@ public enum PrimitiveType {
             return new DateSchema();
         }
     },
-    DATE_TIME(java.util.Date.class, "date-time") {
+    DATE_TIME(Date.class, "date-time") {
         @Override
         public DateTimeSchema createProperty() {
             return new DateTimeSchema();
         }
     },
-    PARTIAL_TIME(java.time.LocalTime.class, "partial-time") {
+    PARTIAL_TIME(LocalTime.class, "partial-time") {
         @Override
         public Schema createProperty() {
             return new StringSchema().format("partial-time");
         }
     },
-    FILE(java.io.File.class, "file") {
+    FILE(File.class, "file") {
         @Override
         public FileSchema createProperty() {
             return new FileSchema();
@@ -249,17 +255,17 @@ public enum PrimitiveType {
         addKeys(keyClasses, LONG, Long.class, Long.TYPE);
         addKeys(keyClasses, FLOAT, Float.class, Float.TYPE);
         addKeys(keyClasses, DOUBLE, Double.class, Double.TYPE);
-        addKeys(keyClasses, INTEGER, java.math.BigInteger.class);
-        addKeys(keyClasses, DECIMAL, java.math.BigDecimal.class);
+        addKeys(keyClasses, INTEGER, BigInteger.class);
+        addKeys(keyClasses, DECIMAL, BigDecimal.class);
         addKeys(keyClasses, NUMBER, Number.class);
         addKeys(keyClasses, DATE, DateStub.class);
-        addKeys(keyClasses, DATE_TIME, java.util.Date.class);
-        addKeys(keyClasses, FILE, java.io.File.class);
+        addKeys(keyClasses, DATE_TIME, Date.class);
+        addKeys(keyClasses, FILE, File.class);
         addKeys(keyClasses, OBJECT, Object.class);
         KEY_CLASSES = Collections.unmodifiableMap(keyClasses);
 
         final Map<Class<?>, PrimitiveType> baseClasses = new HashMap<>();
-        addKeys(baseClasses, DATE_TIME, java.util.Date.class, java.util.Calendar.class);
+        addKeys(baseClasses, DATE_TIME, Date.class, Calendar.class);
         BASE_CLASSES = Collections.unmodifiableMap(baseClasses);
 
         final Map<String, PrimitiveType> externalClasses = new HashMap<>();
@@ -438,6 +444,7 @@ public enum PrimitiveType {
 
     public abstract Schema createProperty();
 
+    @SafeVarargs
     private static <K> void addKeys(Map<K, PrimitiveType> map, PrimitiveType type, K... keys) {
         for (K key : keys) {
             map.put(key, type);

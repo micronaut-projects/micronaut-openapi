@@ -29,9 +29,7 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 public class CallbackSerializer extends JsonSerializer<Callback> {
 
     @Override
-    public void serialize(
-        Callback value, JsonGenerator jgen, SerializerProvider provider)
-        throws IOException {
+    public void serialize(Callback value, JsonGenerator jgen, SerializerProvider provider) throws IOException {
 
         // has extensions
         if (value != null && value.getExtensions() != null && !value.getExtensions().isEmpty()) {

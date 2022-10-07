@@ -62,19 +62,16 @@ public final class ConvertUtils {
 
     private static final TypeReference<Map<String, Object>> MAP_TYPE_REFERENCE = new TypeReference<Map<String, Object>>() {
     };
-
     /**
      * The JSON mapper.
      */
     private static final ObjectMapper JSON_MAPPER = ObjectMapperFactory.createJson()
         .enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
-
     /**
      * The JSON 3.1 mapper.
      */
     private static final ObjectMapper JSON_MAPPER_31 = ObjectMapperFactory.createJson31()
         .enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
-
     /**
      * The JSON mapper for security scheme.
      */
@@ -86,7 +83,7 @@ public final class ConvertUtils {
     /**
      * The YAML mapper.
      */
-    private static final ObjectMapper yamlMapper = ObjectMapperFactory.createYaml();
+    private static final ObjectMapper YAML_MAPPER = ObjectMapperFactory.createYaml();
 
     private ConvertUtils() {
     }
@@ -319,6 +316,6 @@ public final class ConvertUtils {
     }
 
     public static ObjectMapper getYamlMapper() {
-        return yamlMapper;
+        return YAML_MAPPER;
     }
 }

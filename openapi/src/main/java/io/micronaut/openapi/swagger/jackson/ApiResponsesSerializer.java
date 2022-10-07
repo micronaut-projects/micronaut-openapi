@@ -18,6 +18,7 @@ package io.micronaut.openapi.swagger.jackson;
 import java.io.IOException;
 import java.util.Map.Entry;
 
+import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.responses.ApiResponses;
 
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -27,15 +28,13 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 public class ApiResponsesSerializer extends JsonSerializer<ApiResponses> {
 
     @Override
-    public void serialize(
-        ApiResponses value, JsonGenerator jgen, SerializerProvider provider)
-        throws IOException {
+    public void serialize(ApiResponses value, JsonGenerator jgen, SerializerProvider provider) throws IOException {
 
         if (value != null && value.getExtensions() != null && !value.getExtensions().isEmpty()) {
             jgen.writeStartObject();
 
             if (!value.isEmpty()) {
-                for (Entry<String, io.swagger.v3.oas.models.responses.ApiResponse> entry : value.entrySet()) {
+                for (Entry<String, ApiResponse> entry : value.entrySet()) {
                     jgen.writeObjectField(entry.getKey(), entry.getValue());
                 }
             }

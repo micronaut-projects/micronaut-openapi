@@ -15,7 +15,7 @@ class OpenApiPojoControllerSpec extends AbstractOpenApiTypeElementSpec {
     void "test build OpenAPI for List"() {
         given: "An API definition"
         when:
-        buildBeanDefinition('test.MyBean','''
+        buildBeanDefinition('test.MyBean', '''
 package test;
 
 import io.micronaut.http.annotation.*;
@@ -116,15 +116,15 @@ class Pet {
 @jakarta.inject.Singleton
 class MyBean {}
 ''')
-        then:"the state is correct"
+        then: "the state is correct"
         Utils.testReference != null
 
-        when:"The OpenAPI is retrieved"
+        when: "The OpenAPI is retrieved"
         OpenAPI openAPI = Utils.testReference
         Schema petSchema = openAPI.components.schemas['Pet']
         Schema petInnerBeanSchema = openAPI.components.schemas['Pet.InnerBean']
 
-        then:"the components are valid"
+        then: "the components are valid"
         petInnerBeanSchema
         petSchema.type == 'object'
         petSchema.properties.size() == 4
@@ -134,50 +134,50 @@ class MyBean {}
         ((ArraySchema) petSchema.properties["tags"]).items.type == "string"
 
         when:
-            PathItem xyz1 = openAPI.paths.get("/pets/xyz1")
-            PathItem xyz2 = openAPI.paths.get("/pets/xyz2")
+        PathItem xyz1 = openAPI.paths.get("/pets/xyz1")
+        PathItem xyz2 = openAPI.paths.get("/pets/xyz2")
 
         then:
-            xyz1.post.operationId == 'xyzPost'
-            xyz1.post.responses.size() == 3
-            xyz1.post.responses['201']
-            xyz1.post.responses['201'].description == 'Person created'
-            xyz1.post.responses['201'].content['application/json'].schema
-            xyz1.post.responses['201'].content['application/json'].schema.$ref == '#/components/schemas/Pet'
-            xyz1.post.responses['400']
-            xyz1.post.responses['400'].description == 'Invalid Name Supplied'
-            xyz1.post.responses['400'].content == null
-            xyz1.post.responses['404']
-            xyz1.post.responses['404'].description == 'Person not found'
-            xyz1.post.responses['404'].content == null
+        xyz1.post.operationId == 'xyzPost'
+        xyz1.post.responses.size() == 3
+        xyz1.post.responses['201']
+        xyz1.post.responses['201'].description == 'Person created'
+        xyz1.post.responses['201'].content['application/json'].schema
+        xyz1.post.responses['201'].content['application/json'].schema.$ref == '#/components/schemas/Pet'
+        xyz1.post.responses['400']
+        xyz1.post.responses['400'].description == 'Invalid Name Supplied'
+        xyz1.post.responses['400'].content == null
+        xyz1.post.responses['404']
+        xyz1.post.responses['404'].description == 'Person not found'
+        xyz1.post.responses['404'].content == null
 
-            xyz1.put.operationId == 'xyzPut'
-            xyz1.put.description == null
-            xyz1.put.responses.size() == 3
-            xyz1.put.responses['200']
-            xyz1.put.responses['200'].description == 'Custom desc'
-            xyz1.put.responses['400']
-            xyz1.put.responses['400'].description == 'Invalid Name Supplied'
-            xyz1.put.responses['400'].content == null
-            xyz1.put.responses['404']
-            xyz1.put.responses['404'].description == 'Person not found'
-            xyz1.put.responses['404'].content == null
+        xyz1.put.operationId == 'xyzPut'
+        xyz1.put.description == null
+        xyz1.put.responses.size() == 3
+        xyz1.put.responses['200']
+        xyz1.put.responses['200'].description == 'Custom desc'
+        xyz1.put.responses['400']
+        xyz1.put.responses['400'].description == 'Invalid Name Supplied'
+        xyz1.put.responses['400'].content == null
+        xyz1.put.responses['404']
+        xyz1.put.responses['404'].description == 'Person not found'
+        xyz1.put.responses['404'].content == null
 
-            xyz2.post.operationId == 'xyzPost2'
-            xyz2.post.description == "Do the post"
-            xyz2.post.responses.size() == 3
-            xyz2.post.responses['201']
-            xyz2.post.responses['201'].description == 'Custom desc 2'
-            xyz2.post.responses['400']
-            xyz2.post.responses['400'].description == 'Invalid Name Supplied'
-            xyz2.post.responses['400'].content == null
-            xyz2.post.responses['404']
-            xyz2.post.responses['404'].description == 'Person not found'
-            xyz2.post.responses['404'].content == null
+        xyz2.post.operationId == 'xyzPost2'
+        xyz2.post.description == "Do the post"
+        xyz2.post.responses.size() == 3
+        xyz2.post.responses['201']
+        xyz2.post.responses['201'].description == 'Custom desc 2'
+        xyz2.post.responses['400']
+        xyz2.post.responses['400'].description == 'Invalid Name Supplied'
+        xyz2.post.responses['400'].content == null
+        xyz2.post.responses['404']
+        xyz2.post.responses['404'].description == 'Person not found'
+        xyz2.post.responses['404'].content == null
     }
 
-    void "test build OpenAPI for Dictionaries, HashMaps and Associative Arrays" () {
-        given:"An API definition"
+    void "test build OpenAPI for Dictionaries, HashMaps and Associative Arrays"() {
+        given: "An API definition"
         when:
         buildBeanDefinition('test.MyBean', '''
 package test;
@@ -348,15 +348,15 @@ class Tag {
 @jakarta.inject.Singleton
 class MyBean {}
 ''')
-        then:"the state is correct"
+        then: "the state is correct"
         Utils.testReference != null
 
-        when:"The OpenAPI is retrieved"
+        when: "The OpenAPI is retrieved"
         OpenAPI openAPI = Utils.testReference
         Schema petSchema = openAPI.components.schemas['Pet']
         Schema tagSchema = openAPI.components.schemas['Tag']
 
-        then:"the components are valid"
+        then: "the components are valid"
         petSchema.type == 'object'
         petSchema.properties.size() == 6
 
@@ -366,17 +366,17 @@ class MyBean {}
         petSchema.properties['name'].type == 'string'
         petSchema.properties['name'].description == 'The Pet Name'
 
-        ((MapSchema)petSchema.properties['freeForm']).type == "object"
-        ((MapSchema)petSchema.properties['freeForm']).description == "A free-form object"
+        ((MapSchema) petSchema.properties['freeForm']).type == "object"
+        ((MapSchema) petSchema.properties['freeForm']).description == "A free-form object"
         ((MapSchema) petSchema.properties['freeForm']).getAdditionalProperties() == true
 
         ((MapSchema) petSchema.properties['dictionariesPlain']).type == "object"
         ((MapSchema) petSchema.properties['dictionariesPlain']).description == "A string-to-string dictionary"
-        ((Schema)((MapSchema) petSchema.properties['dictionariesPlain']).getAdditionalProperties()).getType() == "string"
+        ((Schema) ((MapSchema) petSchema.properties['dictionariesPlain']).getAdditionalProperties()).getType() == "string"
 
         ((MapSchema) petSchema.properties['tags']).type == "object"
         ((MapSchema) petSchema.properties['tags']).description == "A string-to-object dictionary"
-        ((Schema)((MapSchema) petSchema.properties['tags']).getAdditionalProperties()).$ref == "#/components/schemas/Tag"
+        ((Schema) ((MapSchema) petSchema.properties['tags']).getAdditionalProperties()).$ref == "#/components/schemas/Tag"
 
         tagSchema.properties['name'].type == "string"
         tagSchema.properties['name'].description == "The Tag Name"
@@ -384,25 +384,38 @@ class MyBean {}
 
         ((MapSchema) petSchema.properties['tagArrays']).type == "object"
         ((MapSchema) petSchema.properties['tagArrays']).description == "A string-to-array dictionary"
-        ((ArraySchema)((MapSchema) petSchema.properties['tagArrays']).getAdditionalProperties()).getType() == "array"
-        ((ArraySchema)((MapSchema) petSchema.properties['tagArrays']).getAdditionalProperties()).getItems().$ref == "#/components/schemas/Tag"
+        ((ArraySchema) ((MapSchema) petSchema.properties['tagArrays']).getAdditionalProperties()).getType() == "array"
+        ((ArraySchema) ((MapSchema) petSchema.properties['tagArrays']).getAdditionalProperties()).getItems().$ref == "#/components/schemas/Tag"
     }
 
     void "test build OpenAPI doc for POJO type with javax.constraints"() {
 
-        given:"An API definition"
+        given: "An API definition"
         when:
         buildBeanDefinition('test.MyBean', '''
 package test;
 
 import java.util.List;
 
-import javax.validation.constraints.Min;import javax.validation.constraints.Size;
-
 import io.micronaut.http.annotation.Body;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
 import io.micronaut.http.annotation.Post;
+
+import javax.validation.constraints.DecimalMax;
+import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.Negative;
+import javax.validation.constraints.NegativeOrZero;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
+import javax.validation.constraints.Size;
 
 /**
  * @author graemerocher
@@ -438,15 +451,40 @@ interface PetOperations<T extends Pet> {
     T save(@Body T pet);
 }
 
-//@Schema
 class Pet {
+    @Max(35)
     @Min(18)
     private int age;
+    @DecimalMax("35.89")
+    @DecimalMin("18.23")
+    private double weight;
+    @Email(regexp = ".*@.*")
+    private String contact;
+    @Pattern(regexp = ".")
+    private String num;
+    @NotEmpty
+    private String prop1;
+    @NotBlank
+    private String prop2;
+    @NotNull
+    private String prop3;
+    @Size(min = 10, max = 20)
+    private List<String> props;
+    @NotEmpty
+    private List<String> props2;
+    @Negative
+    private int neg;
+    @NegativeOrZero
+    private int negOrZero;
+    @Positive
+    private int pos;
+    @PositiveOrZero
+    private int posOrZero;
 
     private String name;
 
-    public void setAge(int a) {
-        age = a;
+    public void setAge(int age) {
+        this.age = age;
     }
 
     /**
@@ -456,39 +494,417 @@ class Pet {
         return age;
     }
 
-    public void setName(String n) {
-        name = n;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    @Size(max=30)
+    @Size(min = 10, max = 30)
     public String getName() {
         return name;
+    }
+
+    public double getWeight() {
+        return weight;
+    }
+
+    public void setWeight(double weight) {
+        this.weight = weight;
+    }
+
+    public String getContact() {
+        return contact;
+    }
+
+    public void setContact(String contact) {
+        this.contact = contact;
+    }
+
+    public String getNum() {
+        return num;
+    }
+
+    public void setNum(String num) {
+        this.num = num;
+    }
+
+    public String getProp1() {
+        return prop2;
+    }
+
+    public void setProp1(String prop1) {
+        this.prop1 = prop1;
+    }
+
+    public String getProp2() {
+        return prop2;
+    }
+
+    public void setProp2(String prop2) {
+        this.prop2 = prop2;
+    }
+
+    public String getProp3() {
+        return prop3;
+    }
+
+    public void setProp3(String prop3) {
+        this.prop3 = prop3;
+    }
+
+    public List<String> getProps() {
+        return props;
+    }
+
+    public void setProps(List<String> props) {
+        this.props = props;
+    }
+
+    public List<String> getProps2() {
+        return props2;
+    }
+
+    public void setProps2(List<String> props2) {
+        this.props2 = props2;
+    }
+
+    public int getNeg() {
+        return neg;
+    }
+
+    public void setNeg(int neg) {
+        this.neg = neg;
+    }
+
+    public int getNegOrZero() {
+        return negOrZero;
+    }
+
+    public void setNegOrZero(int negOrZero) {
+        this.negOrZero = negOrZero;
+    }
+
+    public int getPos() {
+        return pos;
+    }
+
+    public void setPos(int pos) {
+        this.pos = pos;
+    }
+
+    public int getPosOrZero() {
+        return posOrZero;
+    }
+
+    public void setPosOrZero(int posOrZero) {
+        this.posOrZero = posOrZero;
     }
 }
 
 @jakarta.inject.Singleton
 class MyBean {}
 ''')
-        then:"the state is correct"
+        then: "the state is correct"
         Utils.testReference != null
 
-        when:"The OpenAPI is retrieved"
+        when: "The OpenAPI is retrieved"
         OpenAPI openAPI = Utils.testReference
         Schema petSchema = openAPI.components.schemas['Pet']
 
-        then:"the components are valid"
+        then: "the components are valid"
         petSchema.type == 'object'
-        petSchema.properties.size() == 2
-        petSchema.properties['age'].type == 'integer'
-        petSchema.properties['age'].description == 'The age'
-        petSchema.properties['age'].minimum == 18
-        petSchema.properties['name'].type == 'string'
-        petSchema.properties['name'].maxLength == 30
+        petSchema.properties.size() == 14
+
+        petSchema.properties.age.type == 'integer'
+        petSchema.properties.age.description == 'The age'
+        petSchema.properties.age.minimum == 18
+        petSchema.properties.age.maximum == 35
+
+        petSchema.properties.weight.type == 'number'
+        petSchema.properties.weight.format == 'double'
+        petSchema.properties.weight.minimum == 18.23
+        petSchema.properties.weight.maximum == 35.89
+
+        petSchema.properties.name.type == 'string'
+        petSchema.properties.name.maxLength == 30
+        petSchema.properties.name.minLength == 10
+
+        petSchema.properties.prop1.minLength == 1
+
+        petSchema.properties.prop2.minLength == 1
+
+        petSchema.properties.prop3.nullable == null
+
+        petSchema.properties.props.minItems == 10
+        petSchema.properties.props.maxItems == 20
+
+        petSchema.properties.props2.minItems == 1
+
+        petSchema.properties.contact.type == 'string'
+        petSchema.properties.contact.format == 'email'
+        petSchema.properties.contact.pattern == '.*@.*'
+        petSchema.properties.num.pattern == '.'
+    }
+
+    void "test build OpenAPI doc for POJO type with jakarta.constraints"() {
+
+        given: "An API definition"
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import java.util.List;
+
+import io.micronaut.http.annotation.Body;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.micronaut.http.annotation.Post;
+
+import jakarta.validation.constraints.DecimalMax;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Negative;
+import jakarta.validation.constraints.NegativeOrZero;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
+import jakarta.validation.constraints.Size;
+
+/**
+ * @author graemerocher
+ * @since 1.0
+ */
+@Controller("/pets")
+interface PetOperations<T extends Pet> {
+
+    /**
+     * List the pets
+     *
+     * @return a list of pet names
+     */
+    @Get("/")
+    List<T> list();
+
+    @Get("/random")
+    T random();
+
+    @Get("/vendor/{name}")
+    List<T> byVendor(String name);
+
+    /**
+     * Find a pet by a slug
+     *
+     * @param slug The slug name
+     * @return A pet or 404
+     */
+    @Get("/{slug}")
+    T find(String slug);
+
+    @Post("/")
+    T save(@Body T pet);
+}
+
+class Pet {
+    @Max(35)
+    @Min(18)
+    private int age;
+    @DecimalMax("35.89")
+    @DecimalMin("18.23")
+    private double weight;
+    @Email(regexp = ".*@.*")
+    private String contact;
+    @Pattern(regexp = ".")
+    private String num;
+    @NotEmpty
+    private String prop1;
+    @NotBlank
+    private String prop2;
+    @NotNull
+    private String prop3;
+    @Size(min = 10, max = 20)
+    private List<String> props;
+    @NotEmpty
+    private List<String> props2;
+    @Negative
+    private int neg;
+    @NegativeOrZero
+    private int negOrZero;
+    @Positive
+    private int pos;
+    @PositiveOrZero
+    private int posOrZero;
+
+    private String name;
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
+    /**
+     * The age
+     */
+    public int getAge() {
+        return age;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    @Size(min = 10, max = 30)
+    public String getName() {
+        return name;
+    }
+
+    public double getWeight() {
+        return weight;
+    }
+
+    public void setWeight(double weight) {
+        this.weight = weight;
+    }
+
+    public String getContact() {
+        return contact;
+    }
+
+    public void setContact(String contact) {
+        this.contact = contact;
+    }
+
+    public String getNum() {
+        return num;
+    }
+
+    public void setNum(String num) {
+        this.num = num;
+    }
+
+    public String getProp1() {
+        return prop2;
+    }
+
+    public void setProp1(String prop1) {
+        this.prop1 = prop1;
+    }
+
+    public String getProp2() {
+        return prop2;
+    }
+
+    public void setProp2(String prop2) {
+        this.prop2 = prop2;
+    }
+
+    public String getProp3() {
+        return prop3;
+    }
+
+    public void setProp3(String prop3) {
+        this.prop3 = prop3;
+    }
+
+    public List<String> getProps() {
+        return props;
+    }
+
+    public void setProps(List<String> props) {
+        this.props = props;
+    }
+
+    public List<String> getProps2() {
+        return props2;
+    }
+
+    public void setProps2(List<String> props2) {
+        this.props2 = props2;
+    }
+
+    public int getNeg() {
+        return neg;
+    }
+
+    public void setNeg(int neg) {
+        this.neg = neg;
+    }
+
+    public int getNegOrZero() {
+        return negOrZero;
+    }
+
+    public void setNegOrZero(int negOrZero) {
+        this.negOrZero = negOrZero;
+    }
+
+    public int getPos() {
+        return pos;
+    }
+
+    public void setPos(int pos) {
+        this.pos = pos;
+    }
+
+    public int getPosOrZero() {
+        return posOrZero;
+    }
+
+    public void setPosOrZero(int posOrZero) {
+        this.posOrZero = posOrZero;
+    }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        then: "the state is correct"
+        Utils.testReference != null
+
+        when: "The OpenAPI is retrieved"
+        OpenAPI openAPI = Utils.testReference
+        Schema petSchema = openAPI.components.schemas['Pet']
+
+        then: "the components are valid"
+        petSchema.type == 'object'
+        petSchema.properties.size() == 14
+
+        petSchema.properties.age.type == 'integer'
+        petSchema.properties.age.description == 'The age'
+        petSchema.properties.age.minimum == 18
+        petSchema.properties.age.maximum == 35
+
+        petSchema.properties.weight.type == 'number'
+        petSchema.properties.weight.format == 'double'
+        petSchema.properties.weight.minimum == 18.23
+        petSchema.properties.weight.maximum == 35.89
+
+        petSchema.properties.name.type == 'string'
+        petSchema.properties.name.maxLength == 30
+        petSchema.properties.name.minLength == 10
+
+        petSchema.properties.prop1.minLength == 1
+
+        petSchema.properties.prop2.minLength == 1
+
+        petSchema.properties.prop3.nullable == null
+
+        petSchema.properties.props.minItems == 10
+        petSchema.properties.props.maxItems == 20
+
+        petSchema.properties.props2.minItems == 1
+
+        petSchema.properties.contact.type == 'string'
+        petSchema.properties.contact.format == 'email'
+        petSchema.properties.contact.pattern == '.*@.*'
+        petSchema.properties.num.pattern == '.'
     }
 
     void "test build OpenAPI doc for POJO type with generics non-reactive"() {
 
-        given:"An API definition"
+        given: "An API definition"
         when:
         buildBeanDefinition('test.MyBean', '''
 package test;
@@ -560,24 +976,24 @@ class Pet {
 @jakarta.inject.Singleton
 class MyBean {}
 ''')
-        then:"the state is correct"
+        then: "the state is correct"
         Utils.testReference != null
 
-        when:"The OpenAPI is retrieved"
+        when: "The OpenAPI is retrieved"
         OpenAPI openAPI = Utils.testReference
         Schema petSchema = openAPI.components.schemas['Pet']
 
-        then:"the components are valid"
+        then: "the components are valid"
         petSchema.type == 'object'
         petSchema.properties.size() == 2
         petSchema.properties['age'].type == 'integer'
         petSchema.properties['age'].description == 'The age'
         petSchema.properties['name'].type == 'string'
 
-        when:"the /pets path is retrieved"
+        when: "the /pets path is retrieved"
         PathItem pathItem = openAPI.paths.get("/pets")
 
-        then:"it is included in the OpenAPI doc"
+        then: "it is included in the OpenAPI doc"
         pathItem.get.operationId == 'list'
         pathItem.get.description == 'List the pets'
         pathItem.get.responses['200']
@@ -592,10 +1008,10 @@ class MyBean {}
         pathItem.post.requestBody.content.size() == 1
 
 
-        when:"the /{slug} path is retrieved"
+        when: "the /{slug} path is retrieved"
         pathItem = openAPI.paths.get("/pets/{slug}")
 
-        then:"it is included in the OpenAPI doc"
+        then: "it is included in the OpenAPI doc"
         pathItem.get.description == 'Find a pet by a slug'
         pathItem.get.operationId == 'find'
         pathItem.get.parameters.size() == 1
@@ -614,7 +1030,7 @@ class MyBean {}
 
     void "test build OpenAPI doc for POJO type with generics"() {
 
-        given:"An API definition"
+        given: "An API definition"
         when:
         buildBeanDefinition('test.MyBean', '''
 package test;
@@ -709,24 +1125,24 @@ class Pet {
 @jakarta.inject.Singleton
 class MyBean {}
 ''')
-        then:"the state is correct"
+        then: "the state is correct"
         Utils.testReference != null
 
-        when:"The OpenAPI is retrieved"
+        when: "The OpenAPI is retrieved"
         OpenAPI openAPI = Utils.testReference
         Schema petSchema = openAPI.components.schemas['Pet']
 
-        then:"the components are valid"
+        then: "the components are valid"
         petSchema.type == 'object'
         petSchema.properties.size() == 2
         petSchema.properties['age'].type == 'integer'
         petSchema.properties['age'].description == 'The age'
         petSchema.properties['name'].type == 'string'
 
-        when:"the /pets path is retrieved"
+        when: "the /pets path is retrieved"
         PathItem pathItem = openAPI.paths.get("/pets")
 
-        then:"it is included in the OpenAPI doc"
+        then: "it is included in the OpenAPI doc"
         pathItem.get.operationId == 'list'
         pathItem.get.description == 'List the pets'
         pathItem.get.responses['200']
@@ -741,10 +1157,10 @@ class MyBean {}
         pathItem.post.requestBody.content.size() == 1
 
 
-        when:"the /{slug} path is retrieved"
+        when: "the /{slug} path is retrieved"
         pathItem = openAPI.paths.get("/pets/{slug}")
 
-        then:"it is included in the OpenAPI doc"
+        then: "it is included in the OpenAPI doc"
         pathItem.get.description == 'Find a pet by a slug'
         pathItem.get.operationId == 'find'
         pathItem.get.parameters.size() == 1
@@ -759,7 +1175,7 @@ class MyBean {}
         pathItem.get.responses['200'].content['application/json'].schema
         pathItem.get.responses['200'].content['application/json'].schema.$ref == '#/components/schemas/Pet'
 
-        when:"A flowable is returned"
+        when: "A flowable is returned"
         pathItem = openAPI.paths.get("/pets/flowable")
 
         then:
@@ -770,7 +1186,7 @@ class MyBean {}
         pathItem.get.responses['200'].content['application/json'].schema.type == 'array'
         pathItem.get.responses['200'].content['application/json'].schema.items.$ref == '#/components/schemas/Pet'
 
-        when:"A completable is returned"
+        when: "A completable is returned"
         pathItem = openAPI.paths.get("/pets/completable")
 
         then:
@@ -780,7 +1196,7 @@ class MyBean {}
         pathItem.post.responses['200'].content == null
 
 
-        when:"An obsevable is returned"
+        when: "An obsevable is returned"
         pathItem = openAPI.paths.get("/pets/observable")
 
         then:
@@ -791,7 +1207,7 @@ class MyBean {}
         pathItem.get.responses['200'].content['application/json'].schema.type == 'array'
         pathItem.get.responses['200'].content['application/json'].schema.items.$ref == '#/components/schemas/Pet'
 
-        when:"A Single<HttpResponse<T>> is returned"
+        when: "A Single<HttpResponse<T>> is returned"
         pathItem = openAPI.paths.get("/pets/singleHttpResponse")
 
         then:
@@ -803,7 +1219,7 @@ class MyBean {}
 
     void "test build OpenAPI doc for POJO with custom Schema"() {
 
-        given:"An API definition"
+        given: "An API definition"
         when:
         buildBeanDefinition('test.MyBean', '''
 package test;
@@ -898,15 +1314,15 @@ enum PetType {
 @jakarta.inject.Singleton
 class MyBean {}
 ''')
-        then:"the state is correct"
+        then: "the state is correct"
         Utils.testReference != null
 
-        when:"The OpenAPI is retrieved"
+        when: "The OpenAPI is retrieved"
         OpenAPI openAPI = Utils.testReference
         Schema petSchema = openAPI.components.schemas['MyPet']
         Schema petType = openAPI.components.schemas['PetType']
 
-        then:"the components are valid"
+        then: "the components are valid"
         petSchema.type == 'object'
         petSchema.description == "Pet description"
         petSchema.required == ['age', 'name', 'type']
@@ -922,10 +1338,10 @@ class MyBean {}
         petType.enum.contains('DOG')
         petType.enum.contains('CAT')
 
-        when:"the /pets path is retrieved"
+        when: "the /pets path is retrieved"
         PathItem pathItem = openAPI.paths.get("/pets")
 
-        then:"it is included in the OpenAPI doc"
+        then: "it is included in the OpenAPI doc"
         pathItem.get.operationId == 'list'
         pathItem.get.description == 'List the pets'
         pathItem.get.responses['200']
@@ -940,10 +1356,10 @@ class MyBean {}
         pathItem.post.requestBody.content.size() == 1
 
 
-        when:"the /{slug} path is retrieved"
+        when: "the /{slug} path is retrieved"
         pathItem = openAPI.paths.get("/pets/{slug}")
 
-        then:"it is included in the OpenAPI doc"
+        then: "it is included in the OpenAPI doc"
         pathItem.get.description == 'Find a pet by a slug'
         pathItem.get.operationId == 'find'
         pathItem.get.parameters.size() == 1
@@ -958,7 +1374,7 @@ class MyBean {}
         pathItem.get.responses['200'].content['application/json'].schema
         pathItem.get.responses['200'].content['application/json'].schema.$ref == '#/components/schemas/MyPet'
 
-        when:"A flowable is returned"
+        when: "A flowable is returned"
         pathItem = openAPI.paths.get("/pets/flowable")
 
         then:
@@ -972,7 +1388,7 @@ class MyBean {}
 
     void "test build OpenAPI doc for POJO with properties not required as default"() {
 
-        given:"An API definition"
+        given: "An API definition"
         when:
         buildBeanDefinition('test.MyBean', '''
 package test;
@@ -1019,14 +1435,14 @@ class Pet {
 @jakarta.inject.Singleton
 class MyBean {}
 ''')
-        then:"the state is correct"
+        then: "the state is correct"
         Utils.testReference != null
 
-        when:"The OpenAPI is retrieved"
+        when: "The OpenAPI is retrieved"
         OpenAPI openAPI = Utils.testReference
         Schema petSchema = openAPI.components.schemas['MyPet']
 
-        then:"the components are valid"
+        then: "the components are valid"
         petSchema.type == 'object'
         petSchema.description == "Pet description"
         !petSchema.required
@@ -1038,10 +1454,10 @@ class MyBean {}
         petSchema.properties['name'].description == 'Pet name'
         petSchema.properties['name'].maxLength == 20
 
-        when:"the /pets path is retrieved"
+        when: "the /pets path is retrieved"
         PathItem pathItem = openAPI.paths.get("/pets")
 
-        then:"it is included in the OpenAPI doc"
+        then: "it is included in the OpenAPI doc"
         pathItem.post.operationId == 'save'
         pathItem.post.requestBody
         pathItem.post.requestBody.required
@@ -1052,7 +1468,7 @@ class MyBean {}
 
     void "test build OpenAPI doc when no Body tag specified in POST"() {
 
-        given:"An API definition"
+        given: "An API definition"
         when:
         buildBeanDefinition('test.MyBean', '''
 package test;
@@ -1100,24 +1516,24 @@ class Pet {
 @jakarta.inject.Singleton
 class MyBean {}
 ''')
-        then:"the state is correct"
+        then: "the state is correct"
         Utils.testReference != null
 
-        when:"The OpenAPI is retrieved"
+        when: "The OpenAPI is retrieved"
         OpenAPI openAPI = Utils.testReference
         Schema petSchema = openAPI.components.schemas['Pet']
 
-        then:"the components are valid"
+        then: "the components are valid"
         petSchema.type == 'object'
         petSchema.properties.size() == 2
         petSchema.properties['age'].type == 'integer'
         petSchema.properties['age'].description == 'The age'
         petSchema.properties['name'].type == 'string'
 
-        when:"the /pets path is retrieved"
+        when: "the /pets path is retrieved"
         PathItem pathItem = openAPI.paths.get("/pets")
 
-        then:"it is included in the OpenAPI doc"
+        then: "it is included in the OpenAPI doc"
         pathItem.post.operationId == 'save'
         pathItem.post.requestBody
         pathItem.post.requestBody.required
@@ -1133,7 +1549,7 @@ class MyBean {}
     void "test build OpenAPI for response with multiple content types"() {
         given: "An API definition"
         when:
-        buildBeanDefinition('test.MyBean','''
+        buildBeanDefinition('test.MyBean', '''
 package test;
 
 import io.micronaut.http.annotation.Controller;
@@ -1208,13 +1624,13 @@ class Pet {
 @jakarta.inject.Singleton
 class MyBean {}
 ''')
-        then:"The state is correct"
+        then: "The state is correct"
         Utils.testReference != null
 
-        when:"The OpenAPI is retrieved"
+        when: "The OpenAPI is retrieved"
         OpenAPI openAPI = Utils.testReference
 
-        then:"The operation has only one path"
+        then: "The operation has only one path"
         openAPI.paths.size() == 1
 
         when: "The GET /pets/{slug} operation is retrieved"
@@ -1230,7 +1646,7 @@ class MyBean {}
     void "test build OpenAPI for body with multiple content types"() {
         given: "An API definition"
         when:
-        buildBeanDefinition('test.MyBean','''
+        buildBeanDefinition('test.MyBean', '''
 package test;
 
 import io.micronaut.http.annotation.Controller;
@@ -1304,13 +1720,13 @@ class Pet {
 @jakarta.inject.Singleton
 class MyBean {}
 ''')
-        then:"The state is correct"
+        then: "The state is correct"
         Utils.testReference != null
 
-        when:"The OpenAPI is retrieved"
+        when: "The OpenAPI is retrieved"
         OpenAPI openAPI = Utils.testReference
 
-        then:"The operation has only one path"
+        then: "The operation has only one path"
         openAPI.paths.size() == 1
 
         when: "The POST /pets operation is retrieved"
@@ -1326,7 +1742,7 @@ class MyBean {}
     void "test build OpenAPI for body tagged with Swagger @RequestBody"() {
 
         when:
-        buildBeanDefinition('test.MyBean','''
+        buildBeanDefinition('test.MyBean', '''
 package test;
 
 import io.micronaut.http.annotation.Controller;
@@ -1408,13 +1824,13 @@ class Pet {
 @jakarta.inject.Singleton
 class MyBean {}
 ''')
-        then:"The state is correct"
+        then: "The state is correct"
         Utils.testReference != null
 
-        when:"The OpenAPI is retrieved"
+        when: "The OpenAPI is retrieved"
         OpenAPI openAPI = Utils.testReference
 
-        then:"The operation has only one path"
+        then: "The operation has only one path"
         openAPI.paths.size() == 2
 
         when: "The POST /pets operation is retrieved"
@@ -1441,7 +1857,7 @@ class MyBean {}
     void "test build OpenAPI for multiple content types and parameters"() {
         given: "An API definition"
         when:
-        buildBeanDefinition('test.MyBean','''
+        buildBeanDefinition('test.MyBean', '''
 package test;
 
 import io.micronaut.http.annotation.Controller;
@@ -1516,13 +1932,13 @@ class Pet {
 @jakarta.inject.Singleton
 class MyBean {}
 ''')
-        then:"The state is correct"
+        then: "The state is correct"
         Utils.testReference != null
 
-        when:"The OpenAPI is retrieved"
+        when: "The OpenAPI is retrieved"
         OpenAPI openAPI = Utils.testReference
 
-        then:"The operation has only one path"
+        then: "The operation has only one path"
         openAPI.paths.size() == 1
 
         when: "The POST /pets operation is retrieved"
@@ -1538,7 +1954,7 @@ class MyBean {}
     void "test build OpenAPI for multiple content types and @Parameter"() {
         given: "An API definition"
         when:
-        buildBeanDefinition('test.MyBean','''
+        buildBeanDefinition('test.MyBean', '''
 package test;
 
 import io.micronaut.http.annotation.Controller;
@@ -1622,13 +2038,13 @@ class Pet {
 @jakarta.inject.Singleton
 class MyBean {}
 ''')
-        then:"The state is correct"
+        then: "The state is correct"
         Utils.testReference != null
 
-        when:"The OpenAPI is retrieved"
+        when: "The OpenAPI is retrieved"
         OpenAPI openAPI = Utils.testReference
 
-        then:"The operation has only one path"
+        then: "The operation has only one path"
         openAPI.paths.size() == 1
 
         when: "The POST /pets operation is retrieved"
@@ -1643,7 +2059,7 @@ class MyBean {}
 
     @Issue("https://github.com/micronaut-projects/micronaut-openapi/issues/490")
     void "test build OpenAPI for Controller with POJO with mandatory/optional fields"() {
-        given:"An API definition"
+        given: "An API definition"
         when:
         buildBeanDefinition('test.MyBean', '''
 package test;
@@ -2108,7 +2524,7 @@ class MyBean {}
     @Issue("https://github.com/micronaut-projects/micronaut-openapi/issues/611")
     @Issue("https://github.com/micronaut-projects/micronaut-openapi/issues/632")
     void "test @Schema(nullable = false, required = true) takes priority for Kotlin data classes"() {
-        given:"An API definition"
+        given: "An API definition"
         when:
         buildBeanDefinition('test.MyBean', '''
 package test;

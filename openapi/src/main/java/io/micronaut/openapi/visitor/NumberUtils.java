@@ -17,6 +17,9 @@ package io.micronaut.openapi.visitor;
 
 import io.micronaut.core.util.StringUtils;
 
+/**
+ * Number utils.
+ */
 public class NumberUtils {
 
     /**

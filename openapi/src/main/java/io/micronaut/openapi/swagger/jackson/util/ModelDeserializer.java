@@ -17,6 +17,7 @@ package io.micronaut.openapi.swagger.jackson.util;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -40,9 +41,6 @@ import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.media.StringSchema;
 import io.swagger.v3.oas.models.media.UUIDSchema;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
@@ -53,8 +51,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 
 public class ModelDeserializer extends JsonDeserializer<Schema> {
-
-    private final Logger LOGGER = LoggerFactory.getLogger(getClass());
 
     protected boolean openapi31;
 
@@ -147,7 +143,8 @@ public class ModelDeserializer extends JsonDeserializer<Schema> {
             try {
                 schema.jsonSchema(ConvertUtils.getJsonMapper31().readValue(ConvertUtils.getJsonMapper31().writeValueAsString(node), Map.class));
             } catch (JsonProcessingException e) {
-                LOGGER.error("Exception converting jsonSchema to Map", e);
+                System.err.println("Exception converting jsonSchema to Map " + e.getMessage());
+                e.printStackTrace();
             }
         }
         return schema;
@@ -159,7 +156,7 @@ public class ModelDeserializer extends JsonDeserializer<Schema> {
         }
         JsonNode additionalProperties = node.get("additionalProperties");
         JsonNode type = node.get("type");
-        Schema schema = null;
+        Schema schema;
 
         if (type != null || additionalProperties != null) {
             if (type != null) {
@@ -170,7 +167,7 @@ public class ModelDeserializer extends JsonDeserializer<Schema> {
             }
             schema = ConvertUtils.getJsonMapper31().convertValue(node, JsonSchema.class);
             if (type instanceof TextNode) {
-                schema.types(new LinkedHashSet<>(Arrays.asList(type.textValue())));
+                schema.types(new LinkedHashSet<>(Collections.singletonList(type.textValue())));
             } else if (type instanceof ArrayNode) {
                 Set<String> types = new LinkedHashSet<>();
                 type.elements().forEachRemaining(n -> {
