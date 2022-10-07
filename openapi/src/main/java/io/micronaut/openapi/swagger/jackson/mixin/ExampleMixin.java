@@ -17,12 +17,20 @@ package io.micronaut.openapi.swagger.jackson.mixin;
 
 import java.util.Map;
 
+import io.micronaut.core.annotation.Internal;
+
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
+/**
+ * This class is copied from swagger-core library.
+ *
+ * @since 4.6.0
+ */
+@Internal
 public abstract class ExampleMixin {
 
     @JsonAnyGetter

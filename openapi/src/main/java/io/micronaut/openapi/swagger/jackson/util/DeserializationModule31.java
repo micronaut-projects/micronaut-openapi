@@ -15,6 +15,7 @@
  */
 package io.micronaut.openapi.swagger.jackson.util;
 
+import io.micronaut.core.annotation.Internal;
 import io.swagger.v3.oas.models.Paths;
 import io.swagger.v3.oas.models.callbacks.Callback;
 import io.swagger.v3.oas.models.headers.Header;
@@ -27,20 +28,26 @@ import io.swagger.v3.oas.models.security.SecurityScheme;
 
 import com.fasterxml.jackson.databind.module.SimpleModule;
 
+/**
+ * This class is copied from swagger-core library.
+ *
+ * @since 4.6.0
+ */
+@Internal
 public class DeserializationModule31 extends SimpleModule {
 
     public DeserializationModule31() {
 
-        this.addDeserializer(Schema.class, new Model31Deserializer());
-        this.addDeserializer(Parameter.class, new Parameter31Deserializer());
-        this.addDeserializer(Header.StyleEnum.class, new HeaderStyleEnumDeserializer());
-        this.addDeserializer(Encoding.StyleEnum.class, new EncodingStyleEnumDeserializer());
-        this.addDeserializer(EncodingProperty.StyleEnum.class, new EncodingPropertyStyleEnumDeserializer());
+        addDeserializer(Schema.class, new Model31Deserializer());
+        addDeserializer(Parameter.class, new Parameter31Deserializer());
+        addDeserializer(Header.StyleEnum.class, new HeaderStyleEnumDeserializer());
+        addDeserializer(Encoding.StyleEnum.class, new EncodingStyleEnumDeserializer());
+        addDeserializer(EncodingProperty.StyleEnum.class, new EncodingPropertyStyleEnumDeserializer());
 
-        this.addDeserializer(SecurityScheme.class, new SecurityScheme31Deserializer());
+        addDeserializer(SecurityScheme.class, new SecurityScheme31Deserializer());
 
-        this.addDeserializer(ApiResponses.class, new ApiResponses31Deserializer());
-        this.addDeserializer(Paths.class, new Paths31Deserializer());
-        this.addDeserializer(Callback.class, new Callback31Deserializer());
+        addDeserializer(ApiResponses.class, new ApiResponses31Deserializer());
+        addDeserializer(Paths.class, new Paths31Deserializer());
+        addDeserializer(Callback.class, new Callback31Deserializer());
     }
 }

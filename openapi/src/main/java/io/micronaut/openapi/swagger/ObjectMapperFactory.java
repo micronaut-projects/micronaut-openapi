@@ -18,6 +18,7 @@ package io.micronaut.openapi.swagger;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import io.micronaut.core.annotation.Internal;
 import io.micronaut.openapi.swagger.jackson.MediaTypeSerializer;
 import io.micronaut.openapi.swagger.jackson.Schema31Serializer;
 import io.micronaut.openapi.swagger.jackson.SchemaSerializer;
@@ -87,6 +88,12 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator.Feature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
+/**
+ * This class is copied from swagger-core library.
+ *
+ * @since 4.6.0
+ */
+@Internal
 public class ObjectMapperFactory {
 
     public static ObjectMapper createJson() {
@@ -115,6 +122,7 @@ public class ObjectMapperFactory {
         return createYaml(true);
     }
 
+    @SuppressWarnings("deprecation")
     private static ObjectMapper create(JsonFactory jsonFactory, boolean openapi31) {
         ObjectMapper mapper = jsonFactory == null ? new ObjectMapper() : new ObjectMapper(jsonFactory);
 
@@ -226,6 +234,7 @@ public class ObjectMapperFactory {
         return mapper;
     }
 
+    @SuppressWarnings("deprecation")
     public static ObjectMapper buildStrictGenericObjectMapper() {
         ObjectMapper mapper = new ObjectMapper();
         mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
@@ -233,11 +242,7 @@ public class ObjectMapperFactory {
         mapper.configure(SerializationFeature.WRITE_ENUMS_USING_TO_STRING, true);
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         mapper.configure(SerializationFeature.WRITE_NULL_MAP_VALUES, false);
-        try {
-            mapper.configure(DeserializationFeature.valueOf("FAIL_ON_TRAILING_TOKENS"), true);
-        } catch (Throwable e) {
-            // add only if supported by Jackson version 2.9+
-        }
+        mapper.configure(DeserializationFeature.FAIL_ON_TRAILING_TOKENS, true);
         mapper.setSerializationInclusion(Include.NON_NULL);
         return mapper;
     }

@@ -17,8 +17,16 @@ package io.micronaut.openapi.swagger.jackson.mixin;
 
 import java.util.Map;
 
+import io.micronaut.core.annotation.Internal;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+/**
+ * This class is copied from swagger-core library.
+ *
+ * @since 4.6.0
+ */
+@Internal
 public abstract class DiscriminatorMixin {
 
     @JsonIgnore

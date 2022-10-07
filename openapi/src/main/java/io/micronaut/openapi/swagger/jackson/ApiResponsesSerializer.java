@@ -18,24 +18,30 @@ package io.micronaut.openapi.swagger.jackson;
 import java.io.IOException;
 import java.util.Map.Entry;
 
+import io.micronaut.core.annotation.Internal;
+import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.responses.ApiResponses;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 
+/**
+ * This class is copied from swagger-core library.
+ *
+ * @since 4.6.0
+ */
+@Internal
 public class ApiResponsesSerializer extends JsonSerializer<ApiResponses> {
 
     @Override
-    public void serialize(
-        ApiResponses value, JsonGenerator jgen, SerializerProvider provider)
-        throws IOException {
+    public void serialize(ApiResponses value, JsonGenerator jgen, SerializerProvider provider) throws IOException {
 
         if (value != null && value.getExtensions() != null && !value.getExtensions().isEmpty()) {
             jgen.writeStartObject();
 
             if (!value.isEmpty()) {
-                for (Entry<String, io.swagger.v3.oas.models.responses.ApiResponse> entry : value.entrySet()) {
+                for (Entry<String, ApiResponse> entry : value.entrySet()) {
                     jgen.writeObjectField(entry.getKey(), entry.getValue());
                 }
             }

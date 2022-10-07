@@ -20,6 +20,12 @@ import java.util.Objects;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
+/**
+ * Helper class for handling two values.
+ *
+ * @param <S> first object
+ * @param <T> second object
+ */
 public final class Pair<S, T> {
 
     private final S first;
