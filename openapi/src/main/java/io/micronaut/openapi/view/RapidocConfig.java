@@ -22,6 +22,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.function.Function;
 
+import io.micronaut.inject.visitor.VisitorContext;
 import io.micronaut.openapi.view.OpenApiViewConfig.RendererType;
 
 /**
@@ -395,9 +396,9 @@ final class RapidocConfig extends AbstractViewConfig implements Renderer {
     }
 
     @Override
-    public String render(String template) {
-        template = rapiPDFConfig.render(template, RendererType.RAPIDOC);
-        template = OpenApiViewConfig.replacePlaceHolder(template, "rapidoc.js.url", jsUrl, "");
+    public String render(String template, VisitorContext context) {
+        template = rapiPDFConfig.render(template, RendererType.RAPIDOC, context);
+        template = OpenApiViewConfig.replacePlaceHolder(template, "rapidoc.js.url", getFinalUrl(context), "");
         return OpenApiViewConfig.replacePlaceHolder(template, "rapidoc.attributes", toHtmlAttributes(), "");
     }
 
