@@ -37,10 +37,11 @@ import java.util.stream.Collectors;
 import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.core.util.StringUtils;
 import io.micronaut.inject.visitor.VisitorContext;
+import io.micronaut.openapi.visitor.OpenApiApplicationVisitor;
 
 /**
  * OpenApi view configuration for Swagger-ui, ReDoc and RapiDoc.
- * By default no views are enabled.
+ * By default, no views are enabled.
  *
  * @author croudet
  * @see <a href="https://github.com/swagger-api/swagger-ui">Swagger-ui</a>
@@ -255,21 +256,21 @@ public final class OpenApiViewConfig {
         }
     }
 
-    private void render(Renderer renderer, Path outputDir, String templateName, VisitorContext visitorContext) throws IOException {
+    private void render(Renderer renderer, Path outputDir, String templateName, VisitorContext context) throws IOException {
         String template = readTemplateFromClasspath(templateName);
-        template = renderer.render(template);
-        template = replacePlaceHolder(template, "specURL", getSpecURL(), "");
+        template = renderer.render(template, context);
+        template = replacePlaceHolder(template, "specURL", getSpecURL(context), "");
         template = replacePlaceHolder(template, "title", getTitle(), "");
         if (!Files.exists(outputDir)) {
             Files.createDirectories(outputDir);
         }
         String fileName = templateName.substring(templateName.lastIndexOf(SLASH) + 1);
         Path file = outputDir.resolve(fileName);
-        if (visitorContext != null) {
-            visitorContext.info("Writing OpenAPI View to destination: " + file);
-            visitorContext.getClassesOutputPath().ifPresent(path -> {
+        if (context != null) {
+            context.info("Writing OpenAPI View to destination: " + file);
+            context.getClassesOutputPath().ifPresent(path -> {
                 // add relative path for the file, so that the micronaut-graal visitor knows about it
-                visitorContext.addGeneratedResource(path.relativize(file).toString());
+                context.addGeneratedResource(path.relativize(file).toString());
             });
         }
         try (BufferedWriter writer = Files.newBufferedWriter(file, StandardCharsets.UTF_8,
@@ -309,10 +310,31 @@ public final class OpenApiViewConfig {
     /**
      * Returns the relative openApi specification url path.
      *
+     * @param context Visitor context.
+     *
      * @return A path.
      */
-    public String getSpecURL() {
-        return StringUtils.prependUri(serverContextPath, StringUtils.prependUri(mappingPath, specFile));
+    public String getSpecURL(VisitorContext context) {
+        String specUrl = StringUtils.prependUri(serverContextPath, StringUtils.prependUri(mappingPath, specFile));
+        if (StringUtils.isEmpty(serverContextPath)) {
+            String contextPath = OpenApiApplicationVisitor.getConfigurationProperty("micronaut.server.context-path", context);
+            if (contextPath == null) {
+                contextPath = StringUtils.EMPTY_STRING;
+            }
+            if (!contextPath.startsWith("/") && !contextPath.startsWith("$")) {
+                contextPath = "/" + contextPath;
+            }
+            if (!contextPath.endsWith("/")) {
+                contextPath += "/";
+            }
+            if (specUrl.startsWith("/")) {
+                specUrl = specUrl.substring(1);
+            }
+
+            specUrl = contextPath + specUrl;
+        }
+
+        return specUrl;
     }
 
     /**

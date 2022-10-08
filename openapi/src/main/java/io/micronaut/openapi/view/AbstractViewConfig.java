@@ -23,6 +23,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import io.micronaut.core.util.StringUtils;
+import io.micronaut.inject.visitor.VisitorContext;
+import io.micronaut.openapi.visitor.OpenApiApplicationVisitor;
 
 /**
  * Abstract View Config.
@@ -33,6 +35,7 @@ abstract class AbstractViewConfig {
 
     protected String prefix;
     protected String jsUrl = "";
+    protected String resourcesContextPath = "/res";
     protected boolean isDefaultJsUrl = true;
     protected Map<String, Object> options = new HashMap<>();
 
@@ -79,6 +82,23 @@ abstract class AbstractViewConfig {
             .collect(Collectors.joining(" "));
     }
 
+    protected String getFinalUrl(VisitorContext context) {
+        if (isDefaultJsUrl) {
+            String contextPath = OpenApiApplicationVisitor.getConfigurationProperty("micronaut.server.context-path", context);
+            if (contextPath == null) {
+                contextPath = StringUtils.EMPTY_STRING;
+            }
+            String finalUrl = contextPath + (contextPath.endsWith("/") ? resourcesContextPath.substring(1) : resourcesContextPath);
+            if (!finalUrl.endsWith("/")) {
+                finalUrl += "/";
+            }
+
+            return finalUrl;
+        }
+
+        return jsUrl;
+    }
+
     /**
      * Builds and parse a View Config.
      *
@@ -94,7 +114,13 @@ abstract class AbstractViewConfig {
         if (StringUtils.isNotEmpty(jsUrl)) {
             cfg.jsUrl = jsUrl;
             cfg.isDefaultJsUrl = false;
+        } else {
+            String resourcesContextPath = properties.get(cfg.prefix + "resources.context.path");
+            if (StringUtils.isNotEmpty(resourcesContextPath)) {
+                cfg.resourcesContextPath = resourcesContextPath.startsWith("/") ? resourcesContextPath : "/" + resourcesContextPath;
+            }
         }
+
         cfg.options.putAll(defaultOptions);
         properties.entrySet().stream().filter(entry -> entry.getKey().startsWith(cfg.prefix))
             .forEach(cfg::addAttribute);
