@@ -259,15 +259,17 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
 
     @Nullable
     public static Environment getEnv(VisitorContext context) {
-        Environment existedEnvironment = context.get(MICRONAUT_ENVIRONMENT, Environment.class).orElse(null);
-        Boolean envCreated = context.get(MICRONAUT_ENVIRONMENT_CREATED, Boolean.class).orElse(null);
+        Environment existedEnvironment = context != null ? context.get(MICRONAUT_ENVIRONMENT, Environment.class).orElse(null) : null;
+        Boolean envCreated = context != null ? context.get(MICRONAUT_ENVIRONMENT_CREATED, Boolean.class).orElse(null) : null;
         if (envCreated != null && envCreated) {
             return existedEnvironment;
         }
 
         Environment environment = createEnv(context);
-        context.put(MICRONAUT_ENVIRONMENT, environment);
-        context.put(MICRONAUT_ENVIRONMENT_CREATED, true);
+        if (context != null) {
+            context.put(MICRONAUT_ENVIRONMENT, environment);
+            context.put(MICRONAUT_ENVIRONMENT_CREATED, true);
+        }
 
         return environment;
     }
@@ -279,7 +281,9 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         if (StringUtils.isNotEmpty(isEnabledStr)) {
             isEnabled = Boolean.parseBoolean(isEnabledStr);
         }
-        context.put(MICRONAUT_ENVIRONMENT_ENABLED, isEnabled);
+        if (context != null) {
+            context.put(MICRONAUT_ENVIRONMENT_ENABLED, isEnabled);
+        }
         if (!isEnabled) {
             return Collections.emptyList();
         }
@@ -314,7 +318,9 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             environment.start();
             return environment;
         } catch (Exception e) {
-            context.warn("Can't create environment: " + e.getMessage(), null);
+            if (context != null) {
+                context.warn("Can't create environment: " + e.getMessage(), null);
+            }
         }
         return environment;
     }
@@ -362,7 +368,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
     }
 
     private static Path resolve(VisitorContext context, Path path) {
-        if (!path.isAbsolute()) {
+        if (!path.isAbsolute() && context != null) {
             Optional<Path> projectDir = context.getProjectDir();
             if (projectDir.isPresent()) {
                 path = projectDir.get().resolve(path);
@@ -389,7 +395,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
     }
 
     public static Properties readOpenApiConfigFile(VisitorContext context) {
-        Optional<Properties> props = context.get(MICRONAUT_OPENAPI_PROPERTIES, Properties.class);
+        Optional<Properties> props = context != null ? context.get(MICRONAUT_OPENAPI_PROPERTIES, Properties.class) : Optional.empty();
         if (props.isPresent()) {
             return props.get();
         }
@@ -401,13 +407,19 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                 try (Reader reader = Files.newBufferedReader(cfg)) {
                     openApiProperties.load(reader);
                 } catch (IOException e) {
-                    context.warn("Fail to read OpenAPI configuration file: " + e.getMessage(), null);
+                    if (context != null) {
+                        context.warn("Fail to read OpenAPI configuration file: " + e.getMessage(), null);
+                    }
                 }
             } else if (Files.exists(cfg)) {
-                context.warn("Can not read configuration file: " + cfg, null);
+                if (context != null) {
+                    context.warn("Can not read configuration file: " + cfg, null);
+                }
             }
         }
-        context.put(MICRONAUT_OPENAPI_PROPERTIES, openApiProperties);
+        if (context != null) {
+            context.put(MICRONAUT_OPENAPI_PROPERTIES, openApiProperties);
+        }
         return openApiProperties;
     }
 

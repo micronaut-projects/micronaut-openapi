@@ -15,16 +15,22 @@
  */
 package io.micronaut.openapi.view;
 
+import io.micronaut.inject.visitor.VisitorContext;
+
 /**
  * Basic interface to replace placeHolder with values.
+ *
  * @author croudet
  */
 interface Renderer {
 
     /**
      * Replaces placeHolder in template with values.
+     *
      * @param template The template to process.
+     * @param context Visitor context.
+     *
      * @return A template.
      */
-    String render(String template);
+    String render(String template, VisitorContext context);
 }

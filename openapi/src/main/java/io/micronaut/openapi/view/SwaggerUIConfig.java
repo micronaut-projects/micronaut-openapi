@@ -27,6 +27,7 @@ import java.util.stream.Collectors;
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.core.annotation.Nullable;
 import io.micronaut.core.util.StringUtils;
+import io.micronaut.inject.visitor.VisitorContext;
 import io.micronaut.openapi.view.OpenApiViewConfig.RendererType;
 
 /**
@@ -236,12 +237,15 @@ final class SwaggerUIConfig extends AbstractViewConfig implements Renderer {
     }
 
     @Override
-    public String render(String template) {
-        template = rapiPDFConfig.render(template, RendererType.SWAGGER_UI);
-        template = OpenApiViewConfig.replacePlaceHolder(template, PREFIX_SWAGGER_UI + ".js.url", jsUrl, "");
+    public String render(String template, VisitorContext context) {
+
+        String finalUrl = getFinalUrl(context);
+
+        template = rapiPDFConfig.render(template, RendererType.SWAGGER_UI, context);
+        template = OpenApiViewConfig.replacePlaceHolder(template, PREFIX_SWAGGER_UI + ".js.url", finalUrl, "");
         template = OpenApiViewConfig.replacePlaceHolder(template, PREFIX_SWAGGER_UI + ".attributes", toOptions(), "");
         template = template.replace("{{" + PREFIX_SWAGGER_UI + ".theme}}", theme == null || Theme.CLASSIC == theme ? "" :
-            "<link rel='stylesheet' type='text/css' href='" + OpenApiViewConfig.RESOURCE_DIR + '/' + theme.getCss() + ".css' />");
+            "<link rel='stylesheet' type='text/css' href='" + finalUrl + theme.getCss() + ".css' />");
         template = template.replace("{{" + PREFIX_SWAGGER_UI + DOT + OPTION_OAUTH2 + "}}", hasOauth2Option(options) ? toOauth2Options() : "");
         return template;
     }
