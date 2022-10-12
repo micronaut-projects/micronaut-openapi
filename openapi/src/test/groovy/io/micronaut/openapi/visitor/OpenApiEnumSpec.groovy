@@ -207,9 +207,11 @@ class MyBean {}
         buildBeanDefinition('test.MyBean', '''
 package test;
 
-import io.micronaut.core.annotation.Introspected;import io.micronaut.http.annotation.Controller;
+import io.micronaut.core.annotation.Introspected;
+import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
-import io.micronaut.validation.Validated;import io.swagger.v3.oas.annotations.media.Schema;
+import io.micronaut.validation.Validated;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 @Controller
 class OpenApiController {
@@ -284,5 +286,130 @@ class MyBean {}
                 "<br />Google Cloud Platform." +
                 "\n- NA" +
                 "<br />Not applicable (Self hosting site)."
+    }
+
+    void "test build OpenAPI enum Schema annotation with hidden values"() {
+
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.core.annotation.Introspected;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.swagger.v3.oas.annotations.Hidden;import io.swagger.v3.oas.annotations.media.Schema;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+@Controller
+class OpenApiController {
+
+    @Get("/{myEnum}")
+    public void postRaw(MyEnum myEnum) {
+    }
+}
+
+@Introspected
+enum MyEnum  {
+
+    @Hidden
+    AWS("Amazon Web Services"),
+    @JsonIgnore
+    AZURE("Microsoft Azure"),
+    @Schema(hidden = true)
+    GCP("Google Cloud Platform"),
+    NA("Not applicable");
+
+    private final String cloudProvider;
+
+    MyEnum(String cloudProvider) {
+        this.cloudProvider = cloudProvider;
+    }
+
+    public String getCloudProvider() {
+        return cloudProvider;
+    }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        then: "the state is correct"
+        Utils.testReference != null
+
+        when: "The OpenAPI is retrieved"
+        OpenAPI openAPI = Utils.testReference
+        Schema schema = openAPI.components.schemas['MyEnum']
+        Operation operation = openAPI.paths."/{myEnum}".get
+
+        then: "the components are valid"
+
+        schema
+        operation
+        schema.enum
+        schema.enum.size() == 1
+        schema.enum.get(0) == 'NA'
+    }
+
+    void "test build OpenAPI enum Schema annotation with allowableValues"() {
+
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.core.annotation.Introspected;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.swagger.v3.oas.annotations.Hidden;import io.swagger.v3.oas.annotations.media.Schema;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+@Controller
+class OpenApiController {
+
+    @Get("/{myEnum}")
+    public void postRaw(MyEnum myEnum) {
+    }
+}
+
+@Schema(allowableValues = {"AWS", "AZURE"})
+@Introspected
+enum MyEnum  {
+
+    AWS("Amazon Web Services"),
+    AZURE("Microsoft Azure"),
+    GCP("Google Cloud Platform"),
+    NA("Not applicable");
+
+    private final String cloudProvider;
+
+    MyEnum(String cloudProvider) {
+        this.cloudProvider = cloudProvider;
+    }
+
+    public String getCloudProvider() {
+        return cloudProvider;
+    }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        then: "the state is correct"
+        Utils.testReference != null
+
+        when: "The OpenAPI is retrieved"
+        OpenAPI openAPI = Utils.testReference
+        Schema schema = openAPI.components.schemas['MyEnum']
+        Operation operation = openAPI.paths."/{myEnum}".get
+
+        then: "the components are valid"
+
+        schema
+        operation
+        schema.enum
+        schema.enum.size() == 2
+        schema.enum.get(0) == 'AWS'
+        schema.enum.get(1) == 'AZURE'
     }
 }

@@ -378,10 +378,8 @@ public enum PrimitiveType {
     public static PrimitiveType fromType(Type type) {
         final Class<?> raw = TypeFactory.defaultInstance().constructType(type).getRawClass();
         final PrimitiveType key = KEY_CLASSES.get(raw);
-        if (key != null) {
-            if (!customExcludedClasses.contains(raw.getName())) {
-                return key;
-            }
+        if (key != null && !customExcludedClasses.contains(raw.getName())) {
+            return key;
         }
 
         final PrimitiveType custom = customClasses.get(raw.getName());
@@ -390,11 +388,8 @@ public enum PrimitiveType {
         }
 
         final PrimitiveType external = EXTERNAL_CLASSES.get(raw.getName());
-        if (external != null) {
-            if (!customExcludedExternalClasses().contains(raw.getName())) {
-                return external;
-            }
-
+        if (external != null && !customExcludedExternalClasses().contains(raw.getName())) {
+            return external;
         }
 
         for (Map.Entry<Class<?>, PrimitiveType> entry : BASE_CLASSES.entrySet()) {
@@ -459,8 +454,6 @@ public enum PrimitiveType {
 
     private static class DateStub {
 
-        private DateStub() {
-        }
     }
 
     /**
