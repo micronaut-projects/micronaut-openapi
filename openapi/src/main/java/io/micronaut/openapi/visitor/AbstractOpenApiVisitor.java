@@ -1899,6 +1899,15 @@ abstract class AbstractOpenApiVisitor {
     private List<Object> getEnumValues(EnumElement type, String schemaType, String schemaFormat, VisitorContext context) {
         List<Object> enumValues = new ArrayList<>();
         for (EnumConstantElement element : type.elements()) {
+
+            AnnotationValue<io.swagger.v3.oas.annotations.media.Schema> schemaAnn = element.getAnnotation(io.swagger.v3.oas.annotations.media.Schema.class);
+            boolean isHidden = schemaAnn != null && schemaAnn.get("hidden", Boolean.class).orElse(false);
+
+            if (isHidden
+                || element.isAnnotationPresent(Hidden.class)
+                || element.isAnnotationPresent(JsonIgnore.class)) {
+                continue;
+            }
             AnnotationValue<JsonProperty> jsonProperty = element.getAnnotation(JsonProperty.class);
             String jacksonValue = jsonProperty != null ? jsonProperty.get("value", String.class).get() : null;
             if (StringUtils.hasText(jacksonValue)) {
