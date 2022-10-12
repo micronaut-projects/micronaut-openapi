@@ -154,11 +154,11 @@ public class OpenApiEndpointVisitor extends AbstractOpenApiEndpointVisitor imple
         }
 
         AnnotationValue<Operation> operationAnn = element.getAnnotation(Operation.class);
-        boolean isHidden = operationAnn != null && operationAnn.get("hidden", Boolean.class).orElse(false);
+        boolean isHidden = operationAnn != null && operationAnn.booleanValue("hidden").orElse(false);
         AnnotationValue<JsonAnySetter> jsonAnySetterAnn = element.getAnnotation(JsonAnySetter.class);
 
         if (isHidden || element.isAnnotationPresent(Hidden.class)
-            || (jsonAnySetterAnn != null && jsonAnySetterAnn.get("enabled", Boolean.class).orElse(true))) {
+            || (jsonAnySetterAnn != null && jsonAnySetterAnn.booleanValue("enabled").orElse(true))) {
             return true;
         }
         methodDescription = httpMethodDescription(element);

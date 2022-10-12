@@ -151,7 +151,6 @@ public class ModelDeserializer extends JsonDeserializer<Schema> {
                 schema.jsonSchema(ConvertUtils.getJsonMapper31().readValue(ConvertUtils.getJsonMapper31().writeValueAsString(node), Map.class));
             } catch (JsonProcessingException e) {
                 System.err.println("Exception converting jsonSchema to Map " + e.getMessage());
-                e.printStackTrace();
             }
         }
         return schema;

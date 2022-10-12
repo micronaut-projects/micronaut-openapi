@@ -130,7 +130,7 @@ public class OpenApiControllerVisitor extends AbstractOpenApiEndpointVisitor imp
     protected boolean ignore(MethodElement element, VisitorContext context) {
 
         AnnotationValue<Operation> operationAnn = element.getAnnotation(Operation.class);
-        boolean isHidden = operationAnn != null && operationAnn.get("hidden", Boolean.class).orElse(false);
+        boolean isHidden = operationAnn != null && operationAnn.booleanValue("hidden").orElse(false);
         AnnotationValue<JsonAnySetter> jsonAnySetterAnn = element.getAnnotation(JsonAnySetter.class);
 
         return isHidden
@@ -138,7 +138,7 @@ public class OpenApiControllerVisitor extends AbstractOpenApiEndpointVisitor imp
             || element.isPrivate()
             || element.isStatic()
             || element.isAnnotationPresent(Hidden.class)
-            || (jsonAnySetterAnn != null && jsonAnySetterAnn.get("enabled", Boolean.class).orElse(true))
+            || (jsonAnySetterAnn != null && jsonAnySetterAnn.booleanValue("enabled").orElse(true))
             || ignoreByRequires(element, context);
     }
 
