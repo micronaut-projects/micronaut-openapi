@@ -808,14 +808,9 @@ class MyBean {}
         buildBeanDefinition('test.MyBean', '''
 package test;
 
-import io.swagger.v3.oas.annotations.*;
-import io.swagger.v3.oas.annotations.media.*;
-import io.swagger.v3.oas.annotations.enums.*;
-import io.micronaut.http.annotation.*;
 import io.micronaut.core.annotation.Nullable;
-import java.util.List;
-import javax.validation.constraints.*;
-import javax.annotation.*;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
 
 @Controller("${mycontroller.path:/}")
 class MyController {

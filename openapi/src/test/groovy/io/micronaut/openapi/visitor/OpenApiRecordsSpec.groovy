@@ -3,10 +3,8 @@ package io.micronaut.openapi.visitor
 import io.micronaut.openapi.AbstractOpenApiTypeElementSpec
 import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.media.Schema
-import spock.lang.IgnoreIf
 import spock.lang.Issue
 
-@IgnoreIf({ !jvm.isJava16Compatible() })
 class OpenApiRecordsSpec extends AbstractOpenApiTypeElementSpec {
 
     @Issue("https://github.com/micronaut-projects/micronaut-openapi/issues/594")

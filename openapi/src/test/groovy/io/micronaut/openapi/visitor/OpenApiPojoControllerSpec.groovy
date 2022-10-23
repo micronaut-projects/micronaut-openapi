@@ -1443,6 +1443,7 @@ class MyBean {}
         Schema petSchema = openAPI.components.schemas['MyPet']
 
         then: "the components are valid"
+        petSchema
         petSchema.type == 'object'
         petSchema.description == "Pet description"
         !petSchema.required

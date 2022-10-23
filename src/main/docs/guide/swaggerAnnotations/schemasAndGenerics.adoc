@@ -7,7 +7,7 @@ class Response<T> {
     private T r;
     public T getResult() {
         return r;
-    };
+    }
 }
 
 @Controller("/")

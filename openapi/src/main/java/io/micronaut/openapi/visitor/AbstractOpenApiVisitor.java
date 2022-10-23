@@ -92,6 +92,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.DiscriminatorMapping;
 import io.swagger.v3.oas.annotations.media.Encoding;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema.AdditionalPropertiesValue;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.OAuthScope;
 import io.swagger.v3.oas.annotations.servers.Server;
@@ -505,6 +506,12 @@ abstract class AbstractOpenApiVisitor {
                         }
                     } else {
                         newValues.put(key, a);
+                    }
+                } else if (key.equals("additionalProperties")) {
+                    if (AdditionalPropertiesValue.TRUE.toString().equals(value.toString())) {
+                        newValues.put("additionalProperties", true);
+                        // TODO
+//                    } else if (AdditionalPropertiesValue.USE_ADDITIONAL_PROPERTIES_ANNOTATION.toString().equals(value.toString())) {
                     }
                 } else if (key.equals("discriminatorProperty")) {
                     final Map<String, Object> discriminatorMap = getDiscriminatorMap(newValues);
@@ -950,55 +957,56 @@ abstract class AbstractOpenApiVisitor {
      * @param propertySchema The property schema
      */
     protected void processSchemaProperty(VisitorContext context, Element element, ClassElement elementType, @Nullable Element classElement, Schema parentSchema, Schema propertySchema) {
-        if (propertySchema != null) {
-            AnnotationValue<JsonUnwrapped> uw = element.getAnnotation(JsonUnwrapped.class);
-            if (uw != null && uw.booleanValue("enabled").orElse(Boolean.TRUE)) {
-                handleUnwrapped(context, element, elementType, parentSchema, uw);
-            } else {
-                // check schema required flag
-                AnnotationValue<io.swagger.v3.oas.annotations.media.Schema> schemaAnnotationValue = element.getAnnotation(io.swagger.v3.oas.annotations.media.Schema.class);
-                Optional<Boolean> elementSchemaRequired = Optional.empty();
-                boolean isRequiredDefaultValueSet = false;
-                if (schemaAnnotationValue != null) {
-                    elementSchemaRequired = schemaAnnotationValue.get("required", Argument.of(Boolean.TYPE));
-                    isRequiredDefaultValueSet = !schemaAnnotationValue.contains("required");
-                }
+        if (propertySchema == null) {
+            return;
+        }
+        AnnotationValue<JsonUnwrapped> uw = element.getAnnotation(JsonUnwrapped.class);
+        if (uw != null && uw.booleanValue("enabled").orElse(Boolean.TRUE)) {
+            handleUnwrapped(context, element, elementType, parentSchema, uw);
+        } else {
+            // check schema required flag
+            AnnotationValue<io.swagger.v3.oas.annotations.media.Schema> schemaAnnotationValue = element.getAnnotation(io.swagger.v3.oas.annotations.media.Schema.class);
+            Optional<Boolean> elementSchemaRequired = Optional.empty();
+            boolean isRequiredDefaultValueSet = false;
+            if (schemaAnnotationValue != null) {
+                elementSchemaRequired = schemaAnnotationValue.get("required", Argument.of(Boolean.TYPE));
+                isRequiredDefaultValueSet = !schemaAnnotationValue.contains("required");
+            }
 
-                // check field annotaions (@NonNull, @Nullable, etc.)
-                boolean isNotNullable = isElementNotNullable(element, classElement);
-                // check as mandatory in constructor
-                boolean isMandatoryInConstructor = doesParamExistsMandatoryInConstructor(element, classElement);
-                boolean required = elementSchemaRequired.orElse(isNotNullable || isMandatoryInConstructor);
+            // check field annotaions (@NonNull, @Nullable, etc.)
+            boolean isNotNullable = isElementNotNullable(element, classElement);
+            // check as mandatory in constructor
+            boolean isMandatoryInConstructor = doesParamExistsMandatoryInConstructor(element, classElement);
+            boolean required = elementSchemaRequired.orElse(isNotNullable || isMandatoryInConstructor);
 
-                if (isRequiredDefaultValueSet && isNotNullable) {
-                    required = true;
-                }
+            if (isRequiredDefaultValueSet && isNotNullable) {
+                required = true;
+            }
 
-                propertySchema = bindSchemaForElement(context, element, elementType, propertySchema);
-                String propertyName = resolvePropertyName(element, classElement, propertySchema);
-                propertySchema.setRequired(null);
-                Schema propertySchemaFinal = propertySchema;
-                addProperty(parentSchema, propertyName, propertySchema, required);
-                if (schemaAnnotationValue != null) {
-                    schemaAnnotationValue.get("defaultValue", String.class)
-                        .ifPresent(value -> {
-                            String elType = schemaAnnotationValue.get("type", String.class).orElse(null);
-                            String elFormat = schemaAnnotationValue.get("format", String.class).orElse(null);
-                            if (elType == null && elementType != null) {
-                                Pair<String, String> typeAndFormat = ConvertUtils.getTypeAndFormatByClass(elementType.getName());
-                                elType = typeAndFormat.getFirst();
-                                if (elFormat == null) {
-                                    elFormat = typeAndFormat.getSecond();
-                                }
+            propertySchema = bindSchemaForElement(context, element, elementType, propertySchema);
+            String propertyName = resolvePropertyName(element, classElement, propertySchema);
+            propertySchema.setRequired(null);
+            Schema propertySchemaFinal = propertySchema;
+            addProperty(parentSchema, propertyName, propertySchema, required);
+            if (schemaAnnotationValue != null) {
+                schemaAnnotationValue.get("defaultValue", String.class)
+                    .ifPresent(value -> {
+                        String elType = schemaAnnotationValue.get("type", String.class).orElse(null);
+                        String elFormat = schemaAnnotationValue.get("format", String.class).orElse(null);
+                        if (elType == null && elementType != null) {
+                            Pair<String, String> typeAndFormat = ConvertUtils.getTypeAndFormatByClass(elementType.getName());
+                            elType = typeAndFormat.getFirst();
+                            if (elFormat == null) {
+                                elFormat = typeAndFormat.getSecond();
                             }
-                            try {
-                                propertySchemaFinal.setDefault(ConvertUtils.normalizeValue(value, elType, elFormat, context));
-                            } catch (JsonProcessingException e) {
-                                context.warn("Can't parse value " + value + " to " + elType + ": " + e.getMessage(), element);
-                                propertySchemaFinal.setDefault(value);
-                            }
-                        });
-                }
+                        }
+                        try {
+                            propertySchemaFinal.setDefault(ConvertUtils.normalizeValue(value, elType, elFormat, context));
+                        } catch (JsonProcessingException e) {
+                            context.warn("Can't parse value " + value + " to " + elType + ": " + e.getMessage(), element);
+                            propertySchemaFinal.setDefault(value);
+                        }
+                    });
             }
         }
     }
@@ -1740,10 +1748,9 @@ abstract class AbstractOpenApiVisitor {
         ClassElement type,
         @Nullable Element definingElement,
         List<MediaType> mediaTypes) {
-        AnnotationValue<io.swagger.v3.oas.annotations.media.Schema> schemaValue = definingElement == null ? null : definingElement.getDeclaredAnnotation(io.swagger.v3.oas.annotations.media.Schema.class);
-        if (schemaValue == null) {
-            schemaValue = type.getDeclaredAnnotation(io.swagger.v3.oas.annotations.media.Schema.class);
-        }
+
+        AnnotationValue<io.swagger.v3.oas.annotations.media.Schema> schemaValue = type.getDeclaredAnnotation(io.swagger.v3.oas.annotations.media.Schema.class);
+
         Schema schema;
         Map<String, Schema> schemas = SchemaUtils.resolveSchemas(openAPI);
         if (schemaValue == null) {
@@ -2153,7 +2160,6 @@ abstract class AbstractOpenApiVisitor {
         } else if (type instanceof TypedElement) {
             classElement = ((TypedElement) type).getType();
         }
-
 
         for (TypedElement publicField : publicFields) {
             boolean isHidden = publicField.getAnnotationMetadata().booleanValue(io.swagger.v3.oas.annotations.media.Schema.class, "hidden").orElse(false);

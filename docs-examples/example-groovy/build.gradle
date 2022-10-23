@@ -11,18 +11,16 @@ dependencies {
 
     testImplementation(platform(mn.micronaut.bom))
     testImplementation project(":openapi")
+    testImplementation(mn.snakeyaml)
     testImplementation(mn.micronaut.runtime)
     testImplementation(mn.micronaut.runtime.groovy)
     testImplementation(mn.micronaut.validation)
     testImplementation(libs.managed.swagger.annotations)
-    testImplementation(libs.reactor.core)
-    testImplementation(mn.micronaut.hibernate.validator)
+    testImplementation(mn.reactor)
     testImplementation(libs.testcontainers.spock)
-    testImplementation(libs.spock.core) {
-        exclude group: "org.codehaus.groovy", module: "groovy-all"
-    }
+    testImplementation(mn.spock)
 
-    testRuntimeOnly(libs.logback.classic)
+    testRuntimeOnly(mn.logback)
 }
 
 

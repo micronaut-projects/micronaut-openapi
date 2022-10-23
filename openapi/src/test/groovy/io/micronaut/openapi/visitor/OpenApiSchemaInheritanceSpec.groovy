@@ -3,10 +3,8 @@ package io.micronaut.openapi.visitor
 import io.micronaut.openapi.AbstractOpenApiTypeElementSpec
 import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.Operation
-import io.swagger.v3.oas.models.media.ComposedSchema
 import io.swagger.v3.oas.models.media.Schema
 import io.swagger.v3.oas.models.parameters.RequestBody
-import spock.lang.IgnoreIf
 import spock.lang.Issue
 
 class OpenApiSchemaInheritanceSpec extends AbstractOpenApiTypeElementSpec {
@@ -120,7 +118,7 @@ class MyBean {}
 
     void "test OpenAPI with body that contains nested inheritance schemas when annotation is on type"() {
         given:
-            buildBeanDefinition('test.MyBean', '''
+        buildBeanDefinition('test.MyBean', '''
 
 package test;
 
@@ -178,24 +176,26 @@ class Car extends Vehicle {
 class MyBean {}
 ''')
 
-            OpenAPI openAPI = Utils.testReference
-            Operation operation = openAPI.paths?.get("/")?.post
-            RequestBody requestBody = operation.requestBody
-            requestBody.required
-            Map<String, Schema> schemas = openAPI.getComponents().getSchemas()
-            Schema owner = schemas["Owner"]
-            Schema vehicle = schemas["Vehicle"]
+        OpenAPI openAPI = Utils.testReference
+        Operation operation = openAPI.paths?.get("/")?.post
+        RequestBody requestBody = operation.requestBody
+        requestBody.required
+        Map<String, Schema> schemas = openAPI.getComponents().getSchemas()
+        Schema owner = schemas["Owner"]
+        Schema vehicle = schemas["Vehicle"]
 
         expect:
-            Schema vehicleRef = owner.getProperties()["vehicle"]
-            vehicleRef.$ref == "#/components/schemas/Vehicle"
-            vehicle.oneOf[0].$ref == '#/components/schemas/Car'
-            vehicle.oneOf[1].$ref == '#/components/schemas/Bike'
+        Schema vehicleRef = owner.getProperties()["vehicle"]
+        vehicleRef.$ref == "#/components/schemas/Vehicle"
+        vehicle
+        vehicle.oneOf
+        vehicle.oneOf[0].$ref == '#/components/schemas/Car'
+        vehicle.oneOf[1].$ref == '#/components/schemas/Bike'
     }
 
     void "test OpenAPI with body that contains nested inheritance schemas when annotation is on property"() {
         given:
-            buildBeanDefinition('test.MyBean', '''
+        buildBeanDefinition('test.MyBean', '''
 
 package test;
 
@@ -252,25 +252,25 @@ class Car extends Vehicle {
 class MyBean {}
 ''')
 
-            OpenAPI openAPI = Utils.testReference
-            Operation operation = openAPI.paths?.get("/")?.post
-            RequestBody requestBody = operation.requestBody
-            requestBody.required
-            Map<String, Schema> schemas = openAPI.getComponents().getSchemas()
+        OpenAPI openAPI = Utils.testReference
+        Operation operation = openAPI.paths?.get("/")?.post
+        RequestBody requestBody = operation.requestBody
+        requestBody.required
+        Map<String, Schema> schemas = openAPI.getComponents().getSchemas()
 
         expect:
-            Schema owner = schemas["Owner"]
-            Schema vehicleRef = owner.getProperties()["vehicle"]
-            vehicleRef.allOf[0].$ref == "#/components/schemas/Vehicle"
-            vehicleRef.allOf[1].description == "Vehicle of the owner. Here a car or bike with a name"
-            Schema vehicle = schemas["Vehicle"]
-            vehicle.oneOf[0].$ref == '#/components/schemas/Car'
-            vehicle.oneOf[1].$ref == '#/components/schemas/Bike'
+        Schema owner = schemas["Owner"]
+        Schema vehicleRef = owner.getProperties()["vehicle"]
+        vehicleRef.allOf[0].$ref == "#/components/schemas/Vehicle"
+        vehicleRef.allOf[1].description == "Vehicle of the owner. Here a car or bike with a name"
+        Schema vehicle = schemas["Vehicle"]
+        vehicle.oneOf[0].$ref == '#/components/schemas/Car'
+        vehicle.oneOf[1].$ref == '#/components/schemas/Bike'
     }
 
     void "test OpenAPI that on nested inheritance property annotation is preferred over type annotation"() {
         given:
-            buildBeanDefinition('test.MyBean', '''
+        buildBeanDefinition('test.MyBean', '''
 
 package test;
 
@@ -328,25 +328,25 @@ class Car extends Vehicle {
 class MyBean {}
 ''')
 
-            OpenAPI openAPI = Utils.testReference
-            Operation operation = openAPI.paths?.get("/")?.post
-            RequestBody requestBody = operation.requestBody
-            requestBody.required
-            Map<String, Schema> schemas = openAPI.getComponents().getSchemas()
+        OpenAPI openAPI = Utils.testReference
+        Operation operation = openAPI.paths?.get("/")?.post
+        RequestBody requestBody = operation.requestBody
+        requestBody.required
+        Map<String, Schema> schemas = openAPI.getComponents().getSchemas()
 
         expect:
-            Schema owner = schemas["Owner"]
-            Schema vehicleRef = owner.getProperties()["Owner.Vehicle"]
-            vehicleRef.allOf[0].$ref == "#/components/schemas/Owner.Vehicle"
-            vehicleRef.allOf[1].description == "Vehicle of the owner. Here a car or bike with a name"
-            Schema ownerVehicle = schemas["Owner.Vehicle"]
-            ownerVehicle.oneOf[0].$ref == '#/components/schemas/Car'
-            ownerVehicle.oneOf[1].$ref == '#/components/schemas/Bike'
+        Schema owner = schemas["Owner"]
+        Schema vehicleRef = owner.getProperties()["Owner.Vehicle"]
+        vehicleRef.allOf[0].$ref == "#/components/schemas/Owner.Vehicle"
+        vehicleRef.allOf[1].description == "Vehicle of the owner. Here a car or bike with a name"
+        Schema ownerVehicle = schemas["Owner.Vehicle"]
+        ownerVehicle.oneOf[0].$ref == '#/components/schemas/Car'
+        ownerVehicle.oneOf[1].$ref == '#/components/schemas/Bike'
     }
 
     void "test OpenAPI with body that contains nested inheritance schemas apply additional information to schema"() {
         given:
-            buildBeanDefinition('test.MyBean', '''
+        buildBeanDefinition('test.MyBean', '''
 
 package test;
 
@@ -408,25 +408,24 @@ class Car extends Vehicle {
 class MyBean {}
 ''')
 
-            OpenAPI openAPI = Utils.testReference
-            Operation operation = openAPI.paths?.get("/")?.post
-            RequestBody requestBody = operation.requestBody
-            requestBody.required
-            Map<String, Schema> schemas = openAPI.getComponents().getSchemas()
+        OpenAPI openAPI = Utils.testReference
+        Operation operation = openAPI.paths?.get("/")?.post
+        RequestBody requestBody = operation.requestBody
+        requestBody.required
+        Map<String, Schema> schemas = openAPI.getComponents().getSchemas()
 
         expect:
-            Schema owner = schemas["Owner"]
-            Schema vehicleProperty = owner.getProperties()["vehicle"]
-            vehicleProperty.deprecated
-            vehicleProperty.description == "Some docs"
-            vehicleProperty.nullable
-            vehicleProperty.allOf[0].$ref == "#/components/schemas/Vehicle"
-            Schema vehicle = schemas["Vehicle"]
-            vehicle.oneOf[0].$ref == '#/components/schemas/Car'
-            vehicle.oneOf[1].$ref == '#/components/schemas/Bike'
+        Schema owner = schemas["Owner"]
+        Schema vehicleProperty = owner.getProperties()["vehicle"]
+        vehicleProperty.deprecated
+        vehicleProperty.description == "Some docs"
+        vehicleProperty.nullable
+        vehicleProperty.allOf[0].$ref == "#/components/schemas/Vehicle"
+        Schema vehicle = schemas["Vehicle"]
+        vehicle.oneOf[0].$ref == '#/components/schemas/Car'
+        vehicle.oneOf[1].$ref == '#/components/schemas/Bike'
     }
 
-    @IgnoreIf({ !jvm.isJava16Compatible() })
     @Issue("https://github.com/micronaut-projects/micronaut-openapi/issues/659")
     void "test OpenAPI proper inheritance of nullable, description and required attributes"() {
         given:
@@ -434,17 +433,10 @@ class MyBean {}
 
 package test;
 
-import io.swagger.v3.oas.annotations.*;
-import io.swagger.v3.oas.annotations.parameters.*;
-import io.swagger.v3.oas.annotations.responses.*;
-import io.swagger.v3.oas.annotations.security.*;
-import io.swagger.v3.oas.annotations.media.*;
-import io.swagger.v3.oas.annotations.enums.*;
-import io.swagger.v3.oas.annotations.links.*;
-import io.micronaut.http.annotation.*;
-import io.micronaut.core.annotation.*;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import java.util.List;
+import io.micronaut.core.annotation.Introspected;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 @Introspected
 @Schema(description = "Schema that represents the possible email protocols for sending emails")
