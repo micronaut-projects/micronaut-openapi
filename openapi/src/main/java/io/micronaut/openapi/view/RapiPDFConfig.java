@@ -135,7 +135,7 @@ final class RapiPDFConfig extends AbstractViewConfig {
                     options.put("style", DEFAULT_RAPIDOC_STYLE);
                 }
             }
-            String script = OpenApiViewConfig.replacePlaceHolder(LINK, "rapipdf.js.url", getFinalUrl(context), "");
+            String script = OpenApiViewConfig.replacePlaceHolder(LINK, "rapipdf.js.url", rendererType.getTemplatePath() + OpenApiViewConfig.SLASH + getFinalUrl(context), "");
             String rapipdfTag = OpenApiViewConfig.replacePlaceHolder(TAG, "rapipdf.attributes", toHtmlAttributes(), "");
             if (styleUpdated) {
                 options.remove("style");

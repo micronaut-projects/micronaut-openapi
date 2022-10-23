@@ -77,7 +77,20 @@ public final class OpenApiViewConfig {
      * The Renderer types.
      */
     enum RendererType {
-        SWAGGER_UI, REDOC, RAPIDOC
+
+        SWAGGER_UI(TEMPLATES_SWAGGER_UI),
+        REDOC(TEMPLATES_REDOC),
+        RAPIDOC(TEMPLATES_RAPIDOC);
+
+        private final String templatePath;
+
+        RendererType(String templatePath) {
+            this.templatePath = templatePath;
+        }
+
+        public String getTemplatePath() {
+            return templatePath;
+        }
     }
 
     private OpenApiViewConfig() {
