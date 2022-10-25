@@ -3,7 +3,6 @@ package io.micronaut.openapi.visitor
 import io.micronaut.openapi.AbstractOpenApiTypeElementSpec
 import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.media.Schema
-import spock.lang.Ignore
 import spock.lang.IgnoreIf
 import spock.lang.Issue
 
@@ -94,15 +93,15 @@ class MyBean {}
         openAPI.components.schemas['Person'].required.contains('age')
     }
 
-    @Ignore("Need to fix problem with reading javadoc from class level (see this: https://github.com/micronaut-projects/micronaut-core/pull/7662)")
     void "test read javadoc from class level for records"() {
         given:
         when:
         buildBeanDefinition('test.MyBean', '''
 package test;
 
-import io.micronaut.core.annotation.*;
-import io.micronaut.http.annotation.*;
+import io.micronaut.core.annotation.Nullable;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
 
 @Controller
 class PersonController {

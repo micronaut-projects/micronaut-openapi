@@ -15,15 +15,6 @@
  */
 package io.micronaut.openapi.visitor;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import io.micronaut.core.util.StringUtils;
-import io.micronaut.inject.visitor.VisitorContext;
-import io.swagger.v3.oas.models.security.SecurityRequirement;
-import io.swagger.v3.oas.models.servers.Server;
-import io.swagger.v3.oas.models.tags.Tag;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -31,6 +22,15 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+
+import io.micronaut.core.util.StringUtils;
+import io.micronaut.inject.visitor.VisitorContext;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
+import io.swagger.v3.oas.models.servers.Server;
+import io.swagger.v3.oas.models.tags.Tag;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 
 /**
  * Endpoints configuration.
@@ -60,14 +60,15 @@ class EndpointsConfiguration {
      * @param properties The properties to process.
      */
     EndpointsConfiguration(VisitorContext context, Properties properties) {
-        enabled = Boolean.parseBoolean(properties.getProperty(ENDPOINTS_ENABLED, Boolean.FALSE.toString()));
+        String enabledStr = OpenApiApplicationVisitor.getConfigurationProperty(ENDPOINTS_ENABLED, context);
+        enabled = StringUtils.hasText(enabledStr) && Boolean.parseBoolean(enabledStr);
         if (!enabled) {
             return;
         }
-        path = parsePath(properties.getProperty(ENDPOINTS_PATH, ""));
-        tags = parseTags(properties.getProperty(ENDPOINTS_TAGS, "").split(","));
-        servers = parseServers(properties.getProperty(ENDPOINTS_SERVERS, ""), context);
-        securityRequirements = parseSecurityRequirements(properties.getProperty(ENDPOINTS_SECURITY_REQUIREMENTS, ""), context);
+        path = parsePath(OpenApiApplicationVisitor.getConfigurationProperty(ENDPOINTS_PATH, context));
+        tags = parseTags(OpenApiApplicationVisitor.getConfigurationProperty(ENDPOINTS_TAGS, context));
+        servers = parseServers(OpenApiApplicationVisitor.getConfigurationProperty(ENDPOINTS_SERVERS, context), context);
+        securityRequirements = parseSecurityRequirements(OpenApiApplicationVisitor.getConfigurationProperty(ENDPOINTS_SECURITY_REQUIREMENTS, context), context);
         endpoints = new LinkedHashMap<>();
         Map<String, String> map = new HashMap<>(properties.size());
         properties.forEach((key, value) -> map.put((String) key, (String) value));
@@ -75,7 +76,7 @@ class EndpointsConfiguration {
                 .filter(EndpointsConfiguration::validEntry)
                 .forEach(entry -> {
                     int idx = entry.getKey().lastIndexOf('.');
-                    if (idx <= 0 || idx == entry.getKey().length() || entry.getValue() == null) {
+                    if (idx <= 0 || idx == entry.getKey().length() - 1 || entry.getValue() == null) {
                         return;
                     }
                     String entryType = entry.getKey().substring(idx + 1);
@@ -88,12 +89,10 @@ class EndpointsConfiguration {
                         endpoint.setServers(parseServers(entry.getValue(), context));
                     } else if ("tags".equals(entryType)) {
                         Endpoint endpoint = endpoints.computeIfAbsent(name, key -> new Endpoint());
-                        endpoint.setTags(parseTags(entry.getValue().split(",")));
+                        endpoint.setTags(parseTags(entry.getValue()));
                     } else if ("class".equals(entryType)) {
                         Endpoint endpoint = endpoints.computeIfAbsent(name, key -> new Endpoint());
                         endpoint.setClassElement(context.getClassElement(entry.getValue()));
-                    } else {
-                        return;
                     }
                 });
     }
@@ -161,12 +160,11 @@ class EndpointsConfiguration {
     }
 
     private static <T> List<T> parseModel(String s, VisitorContext context, TypeReference<List<T>> typeReference)  {
-        if (s == null || s.isEmpty() || (! s.startsWith("[") && ! s.endsWith("]"))) {
+        if (StringUtils.isEmpty(s) || (!s.startsWith("[") && !s.endsWith("]"))) {
             return Collections.emptyList();
         }
-        ObjectMapper mapper = new ObjectMapper();
         try {
-            return mapper.readValue(s, typeReference);
+            return ConvertUtils.getConvertJsonMapper().readValue(s, typeReference);
         } catch (JsonProcessingException e) {
             context.warn("Fail to parse " + typeReference.getType().toString() + ": " + s + " - " + e.getMessage(), null);
         }
@@ -182,7 +180,12 @@ class EndpointsConfiguration {
         && !entry.getKey().equals(ENDPOINTS_PATH);
     }
 
-    private static List<Tag> parseTags(String... stringTags) {
+    private static List<Tag> parseTags(String stringTagsStr) {
+
+        if (StringUtils.isEmpty(stringTagsStr)) {
+            return Collections.emptyList();
+        }
+        String[] stringTags = stringTagsStr.split(",");
         if (stringTags.length == 0) {
             return Collections.emptyList();
         }

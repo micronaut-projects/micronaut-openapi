@@ -252,7 +252,7 @@ class MyBean {}
             ((ComposedSchema) woopsieProperty).deprecated
             ((ComposedSchema) woopsieProperty).description == "Some docs"
             ((ComposedSchema) woopsieProperty).nullable
-            ((ComposedSchema) woopsieProperty).oneOf[0].$ref == "#/components/schemas/TestInterface"
+            ((ComposedSchema) woopsieProperty).allOf[0].$ref == "#/components/schemas/TestInterface"
     }
 
 }

@@ -24,6 +24,7 @@ import com.github.chhorz.javadoc.JavaDocParser;
 import com.github.chhorz.javadoc.JavaDocParserBuilder;
 import com.github.chhorz.javadoc.OutputType;
 import com.github.chhorz.javadoc.tags.ParamTag;
+import com.github.chhorz.javadoc.tags.PropertyTag;
 import com.github.chhorz.javadoc.tags.ReturnTag;
 import com.github.chhorz.javadoc.tags.Tag;
 import com.vladsch.flexmark.html2md.converter.FlexmarkHtmlConverter;
@@ -53,7 +54,7 @@ public class JavadocParser {
         }
 
         JavaDocParser javaDocParser = JavaDocParserBuilder
-            .withBasicTags()
+            .withAllKnownTags()
             .withOutputType(OutputType.HTML)
             .build();
 
@@ -76,6 +77,10 @@ public class JavadocParser {
                     ParamTag paramTag = (ParamTag) tag;
                     String paramDesc = htmlToMarkdownConverter.convert(paramTag.getParamDescription()).trim();
                     javadocDescription.getParameters().put(paramTag.getParamName(), paramDesc);
+                } else if (tag instanceof PropertyTag) {
+                    PropertyTag propertyTag = (PropertyTag) tag;
+                    String paramDesc = htmlToMarkdownConverter.convert(propertyTag.getParamDescription()).trim();
+                    javadocDescription.getParameters().put(propertyTag.getPropertyName(), paramDesc);
                 }
             }
         }

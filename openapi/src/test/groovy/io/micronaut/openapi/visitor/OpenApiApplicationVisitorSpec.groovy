@@ -3,7 +3,6 @@ package io.micronaut.openapi.visitor
 import io.micronaut.openapi.AbstractOpenApiTypeElementSpec
 import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.security.SecurityScheme
-import io.swagger.v3.oas.models.tags.Tag
 
 class OpenApiApplicationVisitorSpec extends AbstractOpenApiTypeElementSpec {
 
@@ -608,33 +607,103 @@ class MyBean {}
         buildBeanDefinition('test.MyBean', '''
 package test;
 
-import io.reactivex.Maybe;
-import io.reactivex.Single;
-import io.micronaut.http.annotation.*;
-import java.util.List;
-import io.swagger.v3.oas.annotations.*;
-import io.swagger.v3.oas.annotations.info.*;
-import io.swagger.v3.oas.annotations.tags.*;
-import io.swagger.v3.oas.annotations.servers.*;
-import io.swagger.v3.oas.annotations.security.*;
-import io.swagger.v3.oas.annotations.enums.*;
-/**
- * @author graemerocher
- * @since 1.0
- */
-@OpenAPIDefinition()
-@SecurityScheme(name = "myOauth2Security",
-           type = SecuritySchemeType.OAUTH2,
-           in = SecuritySchemeIn.HEADER,
-           flows = @OAuthFlows(
-                   implicit = @OAuthFlow(authorizationUrl = "https://url.com/auth",
-                           scopes = @OAuthScope(name = "write:pets", description = "modify pets in your account"))))
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeIn;
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
+import io.swagger.v3.oas.annotations.info.Info;
+import io.swagger.v3.oas.annotations.security.OAuthFlow;
+import io.swagger.v3.oas.annotations.security.OAuthFlows;
+import io.swagger.v3.oas.annotations.security.OAuthScope;
+import io.swagger.v3.oas.annotations.security.SecurityScheme;
+
+@OpenAPIDefinition(
+        info = @Info(
+                title = "the title",
+                version = "0.0",
+                description = "My API"
+        )
+)
+@SecurityScheme(
+    name = "myOauth2Security",
+    type = SecuritySchemeType.OAUTH2,
+    in = SecuritySchemeIn.HEADER,
+    paramName = "myHeader",
+    flows = @OAuthFlows(
+            implicit = @OAuthFlow(authorizationUrl = "https://url.com/auth",
+                       scopes = @OAuthScope(name = "write:pets", description = "modify pets in your account")))
+)
 @SecurityScheme(name = "myOauth3Security", type = SecuritySchemeType.OAUTH2)
-@SecurityScheme(name = "myOauth4Security", type = SecuritySchemeType.APIKEY, paramName = "JWT")
+@SecurityScheme(
+    name = "myOauth4Security",
+    type = SecuritySchemeType.APIKEY,
+    in = SecuritySchemeIn.COOKIE,
+    paramName = "JWT",
+    openIdConnectUrl = "https://sdsd.sdsd.com",
+    bearerFormat = "sdsdd",
+    flows = @OAuthFlows(
+            implicit = @OAuthFlow(authorizationUrl = "https://url.com/auth",
+                       scopes = @OAuthScope(name = "write:pets", description = "modify pets in your account"))),
+    description = "ssssss"
+)
+@SecurityScheme(
+    name = "testApiKey",
+    type = SecuritySchemeType.APIKEY,
+    in = SecuritySchemeIn.COOKIE,
+    scheme = "basic",
+    paramName = "JWT",
+    openIdConnectUrl = "https://sdsd.sdsd.com",
+    bearerFormat = "sdsdd",
+    flows = @OAuthFlows(
+            implicit = @OAuthFlow(authorizationUrl = "https://url.com/auth",
+                       scopes = @OAuthScope(name = "write:pets", description = "modify pets in your account"))),
+    description = "ssssss"
+)
+@SecurityScheme(
+    name = "testHttp",
+    type = SecuritySchemeType.HTTP,
+    in = SecuritySchemeIn.COOKIE,
+    scheme = "bearer",
+    paramName = "JWT",
+    openIdConnectUrl = "https://sdsd.sdsd.com",
+    bearerFormat = "sdsdd",
+    flows = @OAuthFlows(
+            implicit = @OAuthFlow(authorizationUrl = "https://url.com/auth",
+                       scopes = @OAuthScope(name = "write:pets", description = "modify pets in your account"))),
+    description = "ssssss"
+)
+@SecurityScheme(
+    name = "testOpenIdConnect",
+    type = SecuritySchemeType.OPENIDCONNECT,
+    in = SecuritySchemeIn.COOKIE,
+    scheme = "basic",
+    paramName = "JWT",
+    openIdConnectUrl = "https://sdsd.sdsd.com",
+    bearerFormat = "sdsdd",
+    flows = @OAuthFlows(
+            implicit = @OAuthFlow(authorizationUrl = "https://url.com/auth",
+                       scopes = @OAuthScope(name = "write:pets", description = "modify pets in your account"))),
+    description = "ssssss"
+)
+@SecurityScheme(
+    name = "testOauth2",
+    type = SecuritySchemeType.OAUTH2,
+    in = SecuritySchemeIn.COOKIE,
+    scheme = "basic",
+    paramName = "JWT",
+    openIdConnectUrl = "https://sdsd.sdsd.com",
+    bearerFormat = "sdsdd",
+    flows = @OAuthFlows(
+            implicit = @OAuthFlow(authorizationUrl = "https://url.com/auth",
+                       scopes = @OAuthScope(name = "write:pets", description = "modify pets in your account"))),
+    description = "ssssss"
+)
+@SecurityScheme(
+    name = "schemeWithRef",
+    type = SecuritySchemeType.DEFAULT,
+    ref = "#/components/securitySchemes/foo"
+)
 class Application {
-
 }
-
 
 @jakarta.inject.Singleton
 class MyBean {}
@@ -649,7 +718,8 @@ class MyBean {}
         openAPI != null
         openAPI.components.securitySchemes['myOauth2Security']
         openAPI.components.securitySchemes['myOauth2Security'].type == SecurityScheme.Type.OAUTH2
-        openAPI.components.securitySchemes['myOauth2Security'].name == 'myOauth2Security'
+        openAPI.components.securitySchemes['myOauth2Security'].name == null
+        openAPI.components.securitySchemes['myOauth2Security'].in == null
         openAPI.components.securitySchemes['myOauth2Security'].flows
         openAPI.components.securitySchemes['myOauth2Security'].flows.implicit
         openAPI.components.securitySchemes['myOauth2Security'].flows.implicit.authorizationUrl == 'https://url.com/auth'
@@ -657,8 +727,63 @@ class MyBean {}
         openAPI.components.securitySchemes['myOauth2Security'].flows.implicit.scopes.size() == 1
         openAPI.components.securitySchemes['myOauth2Security'].flows.implicit.scopes.get("write:pets")
         openAPI.components.securitySchemes['myOauth2Security'].flows.implicit.scopes.get("write:pets") == 'modify pets in your account'
-        openAPI.components.securitySchemes['myOauth2Security'].in == SecurityScheme.In.HEADER
-        openAPI.components.securitySchemes['myOauth3Security'].name == 'myOauth3Security'
+
+        openAPI.components.securitySchemes['myOauth3Security'].name == null
+
         openAPI.components.securitySchemes['myOauth4Security'].name == "JWT"
+        openAPI.components.securitySchemes['myOauth4Security'].in == SecurityScheme.In.COOKIE
+        openAPI.components.securitySchemes['myOauth4Security'].type == SecurityScheme.Type.APIKEY
+
+        def apiKey = openAPI.components.securitySchemes['testApiKey']
+        apiKey.type == SecurityScheme.Type.APIKEY
+        apiKey.in == SecurityScheme.In.COOKIE
+        apiKey.name == 'JWT'
+        apiKey.description == 'ssssss'
+        apiKey.openIdConnectUrl == null
+        apiKey.bearerFormat == null
+        apiKey.flows == null
+        apiKey.scheme == null
+
+        def http = openAPI.components.securitySchemes['testHttp']
+        http.type == SecurityScheme.Type.HTTP
+        http.in == null
+        http.name == null
+        http.description == 'ssssss'
+        http.openIdConnectUrl == null
+        http.bearerFormat == 'sdsdd'
+        http.flows == null
+        http.scheme == 'bearer'
+
+        def openIdConnect = openAPI.components.securitySchemes['testOpenIdConnect']
+        openIdConnect.type == SecurityScheme.Type.OPENIDCONNECT
+        openIdConnect.in == null
+        openIdConnect.name == null
+        openIdConnect.description == 'ssssss'
+        openIdConnect.openIdConnectUrl == 'https://sdsd.sdsd.com'
+        openIdConnect.bearerFormat == null
+        openIdConnect.flows == null
+        openIdConnect.scheme == null
+
+        def oauth2 = openAPI.components.securitySchemes['testOauth2']
+        oauth2.type == SecurityScheme.Type.OAUTH2
+        oauth2.in == null
+        oauth2.name == null
+        oauth2.description == 'ssssss'
+        oauth2.openIdConnectUrl == null
+        oauth2.bearerFormat == null
+        oauth2.flows
+        oauth2.flows.implicit
+        oauth2.scheme == null
+
+        def withRef = openAPI.components.securitySchemes['schemeWithRef']
+        withRef.type == null
+        withRef.in == null
+        withRef.name == null
+        withRef.description == null
+        withRef.openIdConnectUrl == null
+        withRef.bearerFormat == null
+        withRef.flows == null
+        withRef.scheme == null
+        withRef.$ref == '#/components/securitySchemes/foo'
     }
 }

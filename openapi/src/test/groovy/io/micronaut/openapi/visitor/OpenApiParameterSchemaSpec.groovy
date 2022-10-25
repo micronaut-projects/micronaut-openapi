@@ -69,7 +69,7 @@ class MyBean {}
 
         operationPost.parameters[0].get$ref() == "#/components/parameters/MyParam"
 
-        operationPut.parameters[0].schema.oneOf.get(0).get$ref() == "#/components/schemas/MyParamSchema"
+        operationPut.parameters[0].schema.allOf.get(0).get$ref() == "#/components/schemas/MyParamSchema"
     }
 
     void "test parameter with schema with attributes"() {

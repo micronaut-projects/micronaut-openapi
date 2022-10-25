@@ -23,14 +23,18 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
+import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.core.util.StringUtils;
 import io.micronaut.inject.visitor.VisitorContext;
 
@@ -45,16 +49,20 @@ import io.micronaut.inject.visitor.VisitorContext;
  */
 public final class OpenApiViewConfig {
 
-    private static final String TEMPLATES = "templates";
-    private static final String TEMPLATES_SWAGGER_UI = "swagger-ui";
-    private static final String TEMPLATES_REDOC = "redoc";
-    private static final String TEMPLATES_RAPIDOC = "rapidoc";
+    public static final String RESOURCE_DIR = "res";
+    public static final String THEMES_DIR = "theme";
+    public static final String TEMPLATES = "templates";
+    public static final String TEMPLATES_RAPIPDF = "rapipdf";
+    public static final String TEMPLATES_SWAGGER_UI = "swagger-ui";
+    public static final String TEMPLATES_REDOC = "redoc";
+    public static final String TEMPLATES_RAPIDOC = "rapidoc";
+    public static final String SLASH = "/";
+
     private static final String TEMPLATE_INDEX_HTML = "index.html";
     private static final String REDOC = "redoc";
     private static final String RAPIDOC = "rapidoc";
     private static final String SWAGGER_UI = "swagger-ui";
     private static final String TEMPLATE_OAUTH_2_REDIRECT_HTML = "oauth2-redirect.html";
-    private static final String SLASH = "/";
 
     private String mappingPath;
     private String title;
@@ -138,16 +146,95 @@ public final class OpenApiViewConfig {
      */
     public void render(Path outputDir, VisitorContext visitorContext) throws IOException {
         if (redocConfig != null) {
-            render(redocConfig, outputDir.resolve(REDOC), TEMPLATES + SLASH + TEMPLATES_REDOC + SLASH + TEMPLATE_INDEX_HTML, visitorContext);
+            Path redocDir = outputDir.resolve(REDOC);
+            render(redocConfig, redocDir, TEMPLATES + SLASH + TEMPLATES_REDOC + SLASH + TEMPLATE_INDEX_HTML, visitorContext);
+            copyResources(redocConfig, redocDir, TEMPLATES_REDOC, redocConfig.getResources(), visitorContext);
+            if (redocConfig.rapiPDFConfig.enabled) {
+                copyResources(redocConfig.rapiPDFConfig, redocDir, TEMPLATES_RAPIPDF, redocConfig.rapiPDFConfig.getResources(), visitorContext);
+            }
         }
         if (rapidocConfig != null) {
-            render(rapidocConfig, outputDir.resolve(RAPIDOC), TEMPLATES + SLASH + TEMPLATES_RAPIDOC + SLASH + TEMPLATE_INDEX_HTML, visitorContext);
+            Path rapidocDir = outputDir.resolve(RAPIDOC);
+            render(rapidocConfig, rapidocDir, TEMPLATES + SLASH + TEMPLATES_RAPIDOC + SLASH + TEMPLATE_INDEX_HTML, visitorContext);
+            copyResources(rapidocConfig, rapidocDir, TEMPLATES_RAPIDOC, rapidocConfig.getResources(), visitorContext);
+            if (rapidocConfig.rapiPDFConfig.enabled) {
+                copyResources(rapidocConfig.rapiPDFConfig, rapidocDir, TEMPLATES_RAPIPDF, redocConfig.rapiPDFConfig.getResources(), visitorContext);
+            }
         }
         if (swaggerUIConfig != null) {
-            Path dir = outputDir.resolve(SWAGGER_UI);
-            render(swaggerUIConfig, dir, TEMPLATES + SLASH + TEMPLATES_SWAGGER_UI + SLASH + TEMPLATE_INDEX_HTML, visitorContext);
+            Path swaggerUiDir = outputDir.resolve(SWAGGER_UI);
+            render(swaggerUIConfig, swaggerUiDir, TEMPLATES + SLASH + TEMPLATES_SWAGGER_UI + SLASH + TEMPLATE_INDEX_HTML, visitorContext);
             if (SwaggerUIConfig.hasOauth2Option(swaggerUIConfig.options)) {
-                render(swaggerUIConfig, dir, TEMPLATES + SLASH + TEMPLATES_SWAGGER_UI + SLASH + TEMPLATE_OAUTH_2_REDIRECT_HTML, visitorContext);
+                render(swaggerUIConfig, swaggerUiDir, TEMPLATES + SLASH + TEMPLATES_SWAGGER_UI + SLASH + TEMPLATE_OAUTH_2_REDIRECT_HTML, visitorContext);
+            }
+            copyResources(swaggerUIConfig, swaggerUiDir, TEMPLATES_SWAGGER_UI, swaggerUIConfig.getResources(), visitorContext);
+            if (swaggerUIConfig.rapiPDFConfig.enabled) {
+                copyResources(swaggerUIConfig.rapiPDFConfig, swaggerUiDir, TEMPLATES_RAPIPDF, redocConfig.rapiPDFConfig.getResources(), visitorContext);
+            }
+            copySwaggerUiTheme(swaggerUIConfig.theme.getCss() + ".css", swaggerUiDir, TEMPLATES_SWAGGER_UI, visitorContext);
+        }
+    }
+
+    private void copySwaggerUiTheme(String themeFileName, Path outputDir, String templatesDir, VisitorContext context) throws IOException {
+
+        Path resDir = outputDir.resolve(RESOURCE_DIR);
+        if (!Files.exists(resDir)) {
+            Files.createDirectories(resDir);
+        }
+
+        ClassLoader classLoader = getClass().getClassLoader();
+        try {
+            InputStream is = classLoader.getResourceAsStream(TEMPLATES + SLASH + templatesDir + SLASH + THEMES_DIR + SLASH + themeFileName);
+
+            Files.copy(is, Paths.get(resDir.toString(), themeFileName), StandardCopyOption.REPLACE_EXISTING);
+            Path file = resDir.resolve(themeFileName);
+            if (context != null) {
+                context.info("Writing OpenAPI View Resources to destination: " + file);
+                context.getClassesOutputPath().ifPresent(path -> {
+                    // add relative path for the file, so that the micronaut-graal visitor knows about it
+                    context.addGeneratedResource(path.relativize(file).toString());
+                });
+            }
+        } catch (Exception e) {
+            if (context != null) {
+                context.warn("Can't copy resource: " + themeFileName, null);
+            }
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void copyResources(AbstractViewConfig cfg, Path outputDir, String templateDir, List<String> resources, VisitorContext context) throws IOException {
+        if (!cfg.isDefaultJsUrl) {
+            return;
+        }
+
+        ClassLoader classLoader = getClass().getClassLoader();
+
+        Path outputResDir = outputDir.resolve(RESOURCE_DIR);
+        if (!Files.exists(outputResDir)) {
+            Files.createDirectories(outputResDir);
+        }
+
+        if (CollectionUtils.isNotEmpty(resources)) {
+            for (String resource : resources) {
+                try {
+                    InputStream is = classLoader.getResourceAsStream(TEMPLATES + SLASH + templateDir + SLASH + resource);
+                    Files.copy(is, Paths.get(outputDir.toString(), resource), StandardCopyOption.REPLACE_EXISTING);
+                    Path file = outputResDir.resolve(resource);
+
+                    if (context != null) {
+                        context.info("Writing OpenAPI View Resources to destination: " + file);
+                        context.getClassesOutputPath().ifPresent(path -> {
+                            // add relative path for the file, so that the micronaut-graal visitor knows about it
+                            context.addGeneratedResource(path.relativize(file).toString());
+                        });
+                    }
+                } catch (Exception e) {
+                    if (context != null) {
+                        context.warn("Can't copy resource: " + resource, null);
+                    }
+                    throw new RuntimeException(e);
+                }
             }
         }
     }
@@ -180,9 +267,10 @@ public final class OpenApiViewConfig {
         Path file = outputDir.resolve(fileName);
         if (visitorContext != null) {
             visitorContext.info("Writing OpenAPI View to destination: " + file);
-            visitorContext.getClassesOutputPath().ifPresent(path ->
+            visitorContext.getClassesOutputPath().ifPresent(path -> {
                 // add relative path for the file, so that the micronaut-graal visitor knows about it
-                visitorContext.addGeneratedResource(path.relativize(file).toString()));
+                visitorContext.addGeneratedResource(path.relativize(file).toString());
+            });
         }
         try (BufferedWriter writer = Files.newBufferedWriter(file, StandardCharsets.UTF_8,
             StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING)
@@ -197,7 +285,7 @@ public final class OpenApiViewConfig {
      * @param contextPath The server context path.
      */
     public void setServerContextPath(String contextPath) {
-        this.serverContextPath = contextPath == null ? "" : contextPath;
+        serverContextPath = contextPath == null ? StringUtils.EMPTY_STRING : contextPath;
     }
 
     /**
@@ -234,13 +322,6 @@ public final class OpenApiViewConfig {
      */
     public void setSpecFile(String specFile) {
         this.specFile = specFile;
-    }
-
-    @Override
-    public String toString() {
-        return new StringBuilder(100).append("OpenApiConfig [swaggerUIConfig=").append(swaggerUIConfig)
-            .append(", reDocConfig=").append(redocConfig).append(", rapiDocConfig=").append(rapidocConfig)
-            .append(']').toString();
     }
 
     /**

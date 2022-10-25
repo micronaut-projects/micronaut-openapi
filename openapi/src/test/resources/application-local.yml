@@ -1,0 +1,5 @@
+props-from-env-test:
+  paths:
+    my-controller:
+      get: this/is/path/from/local/env
+      put: this/is/path/from/local/env

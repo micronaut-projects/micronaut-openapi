@@ -13,7 +13,6 @@ dependencies {
 
     implementation(mn.micronaut.http)
     implementation(mn.micronaut.http.server)
-    implementation(libs.reactor.core)
 
     api(libs.managed.swagger.core)
     api(libs.managed.swagger.models)
@@ -39,7 +38,11 @@ dependencies {
 }
 
 //compileJava.options.compilerArgs += '-deprecation'
+//compileJava.options.compilerArgs += '-add-exports java.base/com.sun.tools.javac.processing=ALL_UNNAMED'
 
 test {
     useJUnitPlatform()
 }
+
+// conflicts with OpenAPI definitions and is not needed
+checkstyleNohttp.enabled = false

@@ -15,8 +15,10 @@
  */
 package io.micronaut.openapi.visitor;
 
+import java.util.List;
+import java.util.Optional;
+
 import io.micronaut.core.annotation.AnnotationValue;
-import io.micronaut.core.annotation.Experimental;
 import io.micronaut.core.util.ArrayUtils;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.inject.ast.ClassElement;
@@ -24,21 +26,16 @@ import io.micronaut.inject.ast.ElementModifier;
 import io.micronaut.inject.ast.ElementQuery;
 import io.micronaut.inject.visitor.TypeElementVisitor;
 import io.micronaut.inject.visitor.VisitorContext;
-import io.micronaut.management.endpoint.annotation.Endpoint;
 import io.micronaut.openapi.annotation.OpenAPIInclude;
 import io.micronaut.openapi.annotation.OpenAPIIncludes;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-
-import java.util.List;
-import java.util.Optional;
 
 /**
  * A {@link TypeElementVisitor} that builds the Swagger model from Micronaut controllers included by @{@link OpenAPIInclude} at the compile time.
  *
  * @author Denis Stepanov
  */
-@Experimental
 public class OpenApiIncludeVisitor implements TypeElementVisitor<OpenAPIIncludes, Object> {
 
     @Override
@@ -57,7 +54,7 @@ public class OpenApiIncludeVisitor implements TypeElementVisitor<OpenAPIIncludes
                             .ifPresent(ce -> {
                                 if (ce.isAnnotationPresent(Controller.class)) {
                                     visit(controllerVisitor, visitorContext, ce);
-                                } else if (ce.isAnnotationPresent(Endpoint.class)) {
+                                } else if (ce.isAnnotationPresent("io.micronaut.management.endpoint.annotation.Endpoint")) {
                                     visit(endpointVisitor, visitorContext, ce);
                                 }
                             });

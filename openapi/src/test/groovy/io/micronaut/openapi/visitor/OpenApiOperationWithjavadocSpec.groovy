@@ -5,7 +5,6 @@ import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.Operation
 import io.swagger.v3.oas.models.media.Schema
 import io.swagger.v3.oas.models.parameters.Parameter
-import spock.lang.Ignore
 
 class OpenApiOperationWithjavadocSpec extends AbstractOpenApiTypeElementSpec {
 
@@ -18,7 +17,8 @@ import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Delete;
 import io.micronaut.http.annotation.QueryValue;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;import io.swagger.v3.oas.annotations.enums.ParameterStyle;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterStyle;
 
 @Controller
 class MyController {
@@ -28,8 +28,26 @@ class MyController {
      * @param id UUID of test
      */
     @Delete("/")
-    public void deleteObj(@QueryValue int id) {
+    public MyDto deleteObj(@QueryValue int id) {
+        return null;
+    }
+}
 
+/**
+* My dto description
+*
+* @property test property desc
+*/
+class MyDto {
+
+    private String test;
+
+    public String getTest() {
+        return test;
+    }
+
+    public void setTest(String test) {
+        this.test = test;
     }
 }
 
@@ -39,6 +57,7 @@ class MyBean {}
 
         OpenAPI openAPI = Utils.testReference
         Operation operation = openAPI.paths?.get("/")?.delete
+        Schema schema = openAPI.components.schemas.MyDto
 
         expect:
         operation
@@ -49,6 +68,11 @@ class MyBean {}
         operation.parameters.size() == 1
         operation.parameters[0].name == 'id'
         operation.parameters[0].description == 'UUID of test'
+
+        schema
+        schema.properties.test
+        schema.properties.test.description == 'property desc'
+
     }
 
     void "test Operation description, summary and parameters"() {
@@ -60,7 +84,8 @@ import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Delete;
 import io.micronaut.http.annotation.QueryValue;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;import io.swagger.v3.oas.annotations.enums.ParameterStyle;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterStyle;
 
 @Controller
 class MyController {
@@ -108,7 +133,8 @@ import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Delete;
 import io.micronaut.http.annotation.QueryValue;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;import io.swagger.v3.oas.annotations.enums.ParameterStyle;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterStyle;
 
 @Controller
 class MyController {
@@ -146,7 +172,7 @@ class MyBean {}
         expect:
         operation
         operation.summary == 'Delete a thing'
-        operation.description == ''
+        operation.description == null
 
         operation.parameters
         operation.parameters.size() == 1
@@ -155,7 +181,7 @@ class MyBean {}
 
         operation2
         operation2.summary == 'Delete a thing'
-        operation2.description == ''
+        operation2.description == null
 
         operation2.parameters
         operation2.parameters.size() == 1
@@ -163,15 +189,15 @@ class MyBean {}
         operation2.parameters[0].description == 'UUID of test'
     }
 
-    @Ignore("Need to fix problem with reading javadoc from class level (see this: https://github.com/micronaut-projects/micronaut-core/pull/7662)")
-    void "test read javadoc from class level for records"() {
+    void "test read javadoc from class level and attribute level"() {
         given:
         when:
         buildBeanDefinition('test.MyBean', '''
 package test;
 
-import io.micronaut.core.annotation.*;
-import io.micronaut.http.annotation.*;
+import io.micronaut.core.annotation.Nullable;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
 
 @Controller
 class PersonController {
@@ -234,6 +260,110 @@ class MyBean {}
         personSchema.properties.name.description == 'This is name description'
         personSchema.properties.age.type == 'integer'
         personSchema.properties.age.description == 'This is age description'
+    }
+
+    void "test javadoc return tag"() {
+        given:
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.core.annotation.Nullable;
+import io.micronaut.http.HttpStatus;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.micronaut.http.annotation.Post;
+import io.micronaut.http.annotation.Status;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+
+@ApiResponse(responseCode = "200", description = "Desc10")
+@ApiResponse(responseCode = "404", description = "Desc1")
+@ApiResponse(responseCode = "400", description = "Desc2")
+@ApiResponse(responseCode = "500", description = "Desc3")
+@Controller
+class PersonController {
+
+    /**
+     * This is description.
+     *
+     * @return Returns the Person
+     */
+    @ApiResponse(responseCode = "200", description = "Desc4")
+    @Get("/person")
+    Person getPerson() {
+        return new Person();
+    }
+
+    /**
+     * This is description.
+     *
+     * @return Returns the Person
+     */
+    @Status(HttpStatus.SEE_OTHER)
+    @Post("/person")
+    Person postPerson() {
+        return new Person();
+    }
+}
+
+/**
+ * The Person class description
+*/
+class Person {
+    /**
+     * This is name description
+     */
+    @Nullable
+    private String name;
+    /**
+     * This is age description
+     */
+    private Integer age;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Integer getAge() {
+        return age;
+    }
+
+    public void setAge(Integer age) {
+        this.age = age;
+    }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        then:
+        Utils.testReference != null
+
+        when:
+        OpenAPI openAPI = Utils.testReference
+
+        then:
+        Operation get = openAPI.paths."/person".get
+        get
+        get.description == 'This is description.'
+        get.responses.size() == 4
+        get.responses."404".description == 'Desc1'
+        get.responses."400".description == 'Desc2'
+        get.responses."500".description == 'Desc3'
+        get.responses."200".description == 'Desc4'
+
+        Operation post = openAPI.paths."/person".post
+        post.description == 'This is description.'
+        post.responses.size() == 5
+        post.responses."200".description == 'Desc10'
+        post.responses."404".description == 'Desc1'
+        post.responses."400".description == 'Desc2'
+        post.responses."500".description == 'Desc3'
+        post.responses."303".description == 'Returns the Person'
     }
 
 }

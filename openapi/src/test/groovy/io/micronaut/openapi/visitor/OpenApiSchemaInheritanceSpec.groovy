@@ -420,7 +420,7 @@ class MyBean {}
             vehicleProperty.deprecated
             vehicleProperty.description == "Some docs"
             vehicleProperty.nullable
-            vehicleProperty.oneOf[0].$ref == "#/components/schemas/Vehicle"
+            vehicleProperty.allOf[0].$ref == "#/components/schemas/Vehicle"
             Schema vehicle = schemas["Vehicle"]
             vehicle.oneOf[0].$ref == '#/components/schemas/Car'
             vehicle.oneOf[1].$ref == '#/components/schemas/Bike'

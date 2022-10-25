@@ -16,10 +16,13 @@
 package io.micronaut.openapi.view;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import io.micronaut.core.util.StringUtils;
 
 /**
  * Abstract View Config.
@@ -29,7 +32,8 @@ import java.util.stream.Collectors;
 abstract class AbstractViewConfig {
 
     protected String prefix;
-    protected String version = "";
+    protected String jsUrl = "";
+    protected boolean isDefaultJsUrl = true;
     protected Map<String, Object> options = new HashMap<>();
 
     /**
@@ -49,6 +53,8 @@ abstract class AbstractViewConfig {
      * @return A converter or null.
      */
     protected abstract Function<String, Object> getConverter(String key);
+
+    protected abstract List<String> getResources();
 
     /**
      * Adds an option.
@@ -84,7 +90,11 @@ abstract class AbstractViewConfig {
      * @return A View config.
      */
     static <T extends AbstractViewConfig> T fromProperties(T cfg, Map<String, Object> defaultOptions, Map<String, String> properties) {
-        cfg.version = properties.getOrDefault(cfg.prefix + "version", cfg.version);
+        String jsUrl = properties.get(cfg.prefix + "js.url");
+        if (StringUtils.isNotEmpty(jsUrl)) {
+            cfg.jsUrl = jsUrl;
+            cfg.isDefaultJsUrl = false;
+        }
         cfg.options.putAll(defaultOptions);
         properties.entrySet().stream().filter(entry -> entry.getKey().startsWith(cfg.prefix))
             .forEach(cfg::addAttribute);

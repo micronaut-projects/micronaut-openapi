@@ -2,7 +2,9 @@ package io.micronaut.openapi.visitor
 
 import io.micronaut.openapi.AbstractOpenApiTypeElementSpec
 import io.swagger.v3.oas.models.OpenAPI
+import io.swagger.v3.oas.models.Operation
 import io.swagger.v3.oas.models.media.Schema
+import spock.lang.Issue
 
 class OpenApiBasicSchemaSpec extends AbstractOpenApiTypeElementSpec {
 
@@ -1050,7 +1052,7 @@ class Person {
     @PositiveOrZero
     private Integer totalGoals;
 
-    public Person(Integer id,
+    Person(Integer id,
                   @NotBlank String name,
                   @NegativeOrZero Integer debtValue,
                   @PositiveOrZero Integer totalGoals) {
@@ -1151,4 +1153,287 @@ public class MyBean {}
         openAPI.components.schemas["Person"].properties["totalGoals"].description == "The total number of person's goals."
     }
 
+    @Issue("https://github.com/micronaut-projects/micronaut-openapi/issues/798")
+    void "test Parameter inside Operation"() {
+        when:
+        buildBeanDefinition("test.MyBean", '''
+package test;
+
+import javax.validation.constraints.NegativeOrZero;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.PositiveOrZero;
+
+import io.micronaut.core.annotation.Introspected;
+import io.micronaut.http.HttpResponse;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
+
+@Controller
+class PersonController {
+
+    @Get("/{uuid}/users/{userUuid}/services/{serviceCode}")
+    @Operation(
+        summary = "get user service",
+        operationId = "getServiceForUser",
+        parameters = {
+            @Parameter(
+                name = "uuid",
+                description = "The identifier",
+                schema = @Schema(implementation = String.class),
+                in = ParameterIn.PATH
+            ),
+            @Parameter(
+                name = "userUuid",
+                description = "The user identifier",
+                schema = @Schema(implementation = String.class),
+                in = ParameterIn.PATH
+            ),
+            @Parameter(
+                name = "serviceCode",
+                description = "The service code",
+                schema = @Schema(implementation = String.class),
+                in = ParameterIn.PATH
+            )
+        }
+    )
+    HttpResponse<Object> get(@NotBlank String uuid, @NotBlank String userUuid, @NotBlank String serviceCode) {
+        return HttpResponse.ok();
+    }
+}
+
+@jakarta.inject.Singleton
+public class MyBean {}
+
+''')
+
+        then:
+        OpenAPI openAPI = Utils.testReference
+        openAPI?.paths?.get("/{uuid}/users/{userUuid}/services/{serviceCode}")?.get
+        Operation op = openAPI?.paths?.get("/{uuid}/users/{userUuid}/services/{serviceCode}")?.get
+        op.parameters.size() == 3
+        op.parameters.get(0).name == 'uuid'
+        op.parameters.get(0).schema.type == 'string'
+        op.parameters.get(0).in == 'path'
+        op.parameters.get(0).description == 'The identifier'
+        op.parameters.get(0).example == null
+        op.parameters.get(0).$ref == null
+
+        op.parameters.get(1).name == 'userUuid'
+        op.parameters.get(1).schema.type == 'string'
+        op.parameters.get(1).in == 'path'
+        op.parameters.get(1).description == 'The user identifier'
+        op.parameters.get(1).example == null
+        op.parameters.get(1).$ref == null
+
+        op.parameters.get(2).name == 'serviceCode'
+        op.parameters.get(2).schema.type == 'string'
+        op.parameters.get(2).in == 'path'
+        op.parameters.get(2).description == 'The service code'
+        op.parameters.get(2).example == null
+        op.parameters.get(2).$ref == null
+    }
+
+    @Issue("https://github.com/micronaut-projects/micronaut-openapi/issues/800")
+    void "test dto field schema"() {
+        when:
+        buildBeanDefinition("test.MyBean", '''
+package test;
+
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.swagger.v3.oas.annotations.media.Schema;
+
+@Controller
+class PersonController {
+
+    @Get
+    TestDTO get() {
+        return new TestDTO();
+    }
+}
+
+class TestDTO {
+
+    @Schema(defaultValue = "false")
+    private Boolean state;
+
+    public Boolean getState() {
+        return state;
+    }
+
+    public void setState(Boolean state) {
+        this.state = state;
+    }
+}
+
+@jakarta.inject.Singleton
+public class MyBean {}
+
+''')
+
+        then:
+        OpenAPI openAPI = Utils.testReference
+        Schema schema = openAPI.components.schemas.TestDTO
+        schema
+        schema.properties.state.default == false
+        schema.default == null
+    }
+
+    @Issue("https://github.com/micronaut-projects/micronaut-openapi/issues/809")
+    void "test dto schema with defaultValue"() {
+        when:
+        buildBeanDefinition("test.MyBean", '''
+package test;
+
+import java.net.URL;
+import java.util.Date;
+import java.util.UUID;
+
+import io.micronaut.core.annotation.Introspected;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.swagger.v3.oas.annotations.media.Schema;
+
+@Controller
+class TestController {
+
+    @Get("testRest")
+    String test(DemoData demoInput) {
+        return null;
+    }
+
+}
+
+@Introspected
+class DemoData {
+
+    @Schema(defaultValue = "myDefault")
+    private String name;
+    @Schema(defaultValue = "10")
+    private Integer propInt;
+    @Schema(defaultValue = "100")
+    private int propInt2;
+    @Schema(defaultValue = "https://example.com")
+    private URL url;
+    @Schema(defaultValue = "274191c9-c176-4b1c-8263-1b658cbdc7fc")
+    private UUID uuid;
+    @Schema(defaultValue = "Jan 12, 1952")
+    private Date date;
+    @Schema(defaultValue = "myDefault3")
+    private MySubObject mySubObject;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Integer getPropInt() {
+        return propInt;
+    }
+
+    public void setPropInt(Integer propInt) {
+        this.propInt = propInt;
+    }
+
+    public int getPropInt2() {
+        return propInt2;
+    }
+
+    public void setPropInt2(int propInt2) {
+        this.propInt2 = propInt2;
+    }
+
+    public URL getUrl() {
+        return url;
+    }
+
+    public void setUrl(URL url) {
+        this.url = url;
+    }
+
+    public UUID getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(UUID uuid) {
+        this.uuid = uuid;
+    }
+
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
+    }
+
+    public MySubObject getMySubObject() {
+        return mySubObject;
+    }
+
+    public void setMySubObject(MySubObject mySubObject) {
+        this.mySubObject = mySubObject;
+    }
+}
+
+@Introspected
+class MySubObject {
+
+    private String prop1;
+
+    public String getProp1() {
+        return prop1;
+    }
+
+    public void setProp1(String prop1) {
+        this.prop1 = prop1;
+    }
+}
+
+
+@jakarta.inject.Singleton
+public class MyBean {}
+
+''')
+
+        then:
+        OpenAPI openAPI = Utils.testReference
+        Schema schema = openAPI.components.schemas.DemoData
+        schema
+
+        schema.properties.name.default == 'myDefault'
+        schema.properties.name.type == 'string'
+        schema.properties.name.format == null
+
+        schema.properties.propInt.default == 10
+        schema.properties.propInt.type == 'integer'
+        schema.properties.propInt.format == 'int32'
+
+        schema.properties.propInt2.default == 100
+        schema.properties.propInt2.type == 'integer'
+        schema.properties.propInt2.format == 'int32'
+
+        schema.properties.url.default == 'https://example.com'
+        schema.properties.url.type == 'string'
+        schema.properties.url.format == 'url'
+
+        schema.properties.uuid.default.toString() == '274191c9-c176-4b1c-8263-1b658cbdc7fc'
+        schema.properties.uuid.type == 'string'
+        schema.properties.uuid.format == 'uuid'
+
+        schema.properties.date.default == 'Jan 12, 1952'
+        schema.properties.date.type == 'string'
+        schema.properties.date.format == 'date-time'
+
+        schema.properties.mySubObject.default == 'myDefault3'
+        schema.properties.mySubObject.type == null
+        schema.properties.mySubObject.format == null
+    }
 }

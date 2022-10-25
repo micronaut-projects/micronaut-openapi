@@ -15,8 +15,13 @@
  */
 package io.micronaut.openapi.visitor;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import io.micronaut.core.annotation.AnnotationValue;
-import io.micronaut.core.annotation.Experimental;
 import io.micronaut.core.naming.NameUtils;
 import io.micronaut.core.util.ArrayUtils;
 import io.micronaut.http.HttpMethod;
@@ -27,24 +32,13 @@ import io.micronaut.inject.ast.MethodElement;
 import io.micronaut.inject.ast.ParameterElement;
 import io.micronaut.inject.visitor.TypeElementVisitor;
 import io.micronaut.inject.visitor.VisitorContext;
-import io.micronaut.management.endpoint.annotation.Delete;
-import io.micronaut.management.endpoint.annotation.Endpoint;
-import io.micronaut.management.endpoint.annotation.Read;
-import io.micronaut.management.endpoint.annotation.Selector;
-import io.micronaut.management.endpoint.annotation.Write;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.servers.Server;
 import io.swagger.v3.oas.models.tags.Tag;
 
-import java.lang.annotation.Annotation;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
 
 import static io.micronaut.openapi.visitor.Utils.DEFAULT_MEDIA_TYPES;
 
@@ -55,8 +49,8 @@ import static io.micronaut.openapi.visitor.Utils.DEFAULT_MEDIA_TYPES;
  * @author croudet
  * @since 1.4
  */
-@Experimental
-public class OpenApiEndpointVisitor extends AbstractOpenApiEndpointVisitor implements TypeElementVisitor<Endpoint, Object> {
+public class OpenApiEndpointVisitor extends AbstractOpenApiEndpointVisitor implements TypeElementVisitor<Object, Object> {
+
     private String id;
     private HttpMethodDesciption methodDescription;
 
@@ -138,12 +132,15 @@ public class OpenApiEndpointVisitor extends AbstractOpenApiEndpointVisitor imple
         if (!enabled) {
             return true;
         }
-        boolean endpoint = element.isAnnotationPresent(Endpoint.class);
-        if (endpoint) {
-            AnnotationValue<Endpoint> ann = element.getAnnotation(Endpoint.class);
-            id = path + ann.stringValue("id").orElse(NameUtils.hyphenate(element.getSimpleName()));
-            if (id.charAt(0) != '/') {
-                id = '/' + id;
+        if (element.isAnnotationPresent("io.micronaut.management.endpoint.annotation.Endpoint")) {
+            AnnotationValue<?> ann = element.getAnnotation("io.micronaut.management.endpoint.annotation.Endpoint");
+            String idAnn = ann.stringValue("id").orElse(NameUtils.hyphenate(element.getSimpleName()));
+            if (idAnn.isEmpty()) {
+                idAnn = ann.stringValue("value").orElse(idAnn);
+            }
+            id = path + idAnn;
+            if (id.isEmpty() || id.charAt(0) != '/') {
+                id = "/" + id;
             }
             return false;
         }
@@ -158,8 +155,10 @@ public class OpenApiEndpointVisitor extends AbstractOpenApiEndpointVisitor imple
 
         AnnotationValue<Operation> operationAnn = element.getAnnotation(Operation.class);
         boolean isHidden = operationAnn != null && operationAnn.get("hidden", Boolean.class).orElse(false);
+        AnnotationValue<JsonAnySetter> jsonAnySetterAnn = element.getAnnotation(JsonAnySetter.class);
 
-        if (isHidden || element.isAnnotationPresent(Hidden.class)) {
+        if (isHidden || element.isAnnotationPresent(Hidden.class)
+            || (jsonAnySetterAnn != null && jsonAnySetterAnn.get("enabled", Boolean.class).orElse(true))) {
             return true;
         }
         methodDescription = httpMethodDescription(element);
@@ -172,10 +171,10 @@ public class OpenApiEndpointVisitor extends AbstractOpenApiEndpointVisitor imple
     }
 
     @Override
-    protected List<UriMatchTemplate> uriMatchTemplates(MethodElement element) {
+    protected List<UriMatchTemplate> uriMatchTemplates(MethodElement element, VisitorContext context) {
         UriMatchTemplate uriTemplate = UriMatchTemplate.of(id);
         for (ParameterElement param : element.getParameters()) {
-            if (param.hasAnnotation(Selector.class)) {
+            if (param.hasAnnotation("io.micronaut.management.endpoint.annotation.Selector")) {
                 uriTemplate = uriTemplate.nest("/{" + param.getName() + "}");
             }
         }
@@ -199,9 +198,9 @@ public class OpenApiEndpointVisitor extends AbstractOpenApiEndpointVisitor imple
 
     @Override
     protected List<Tag> classTags(ClassElement element, VisitorContext context) {
-        List<Tag> allTags = new ArrayList<>(this.tags);
+        List<Tag> allTags = new ArrayList<>(tags);
         allTags.addAll(context.get(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_ENDPOINT_CLASS_TAGS, List.class,
-                Collections.emptyList()));
+            Collections.emptyList()));
         return allTags;
     }
 
@@ -209,7 +208,7 @@ public class OpenApiEndpointVisitor extends AbstractOpenApiEndpointVisitor imple
     protected List<Server> methodServers(MethodElement element, VisitorContext context) {
         List<Server> servers = new ArrayList<>(this.servers);
         servers.addAll(context.get(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_ENDPOINT_SERVERS, List.class,
-                Collections.emptyList()));
+            Collections.emptyList()));
         return servers;
     }
 
@@ -217,7 +216,7 @@ public class OpenApiEndpointVisitor extends AbstractOpenApiEndpointVisitor imple
     protected List<SecurityRequirement> methodSecurityRequirements(MethodElement element, VisitorContext context) {
         List<SecurityRequirement> securityRequirements = new ArrayList<>(this.securityRequirements);
         securityRequirements.addAll(context.get(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_ENDPOINT_SECURITY_REQUIREMENTS, List.class,
-                Collections.emptyList()));
+            Collections.emptyList()));
         return securityRequirements;
     }
 
@@ -229,23 +228,22 @@ public class OpenApiEndpointVisitor extends AbstractOpenApiEndpointVisitor imple
     }
 
     private static HttpMethodDesciption httpMethodDescription(MethodElement element) {
-        HttpMethodDesciption httpMethodDescription = methodDescription(element, Write.class, HttpMethod.POST);
+        HttpMethodDesciption httpMethodDescription = methodDescription(element, "io.micronaut.management.endpoint.annotation.Write", HttpMethod.POST);
         if (httpMethodDescription != null) {
             return httpMethodDescription;
         }
-        httpMethodDescription = methodDescription(element, Read.class, HttpMethod.GET);
+        httpMethodDescription = methodDescription(element, "io.micronaut.management.endpoint.annotation.Read", HttpMethod.GET);
         if (httpMethodDescription != null) {
             return httpMethodDescription;
         }
-        return methodDescription(element, Delete.class, HttpMethod.DELETE);
+        return methodDescription(element, "io.micronaut.management.endpoint.annotation.Delete", HttpMethod.DELETE);
     }
 
-    private static HttpMethodDesciption methodDescription(MethodElement element, Class<? extends Annotation> ann, HttpMethod httpMethod) {
-        Optional<Class<? extends Annotation>> httpMethodOpt = element.getAnnotationTypeByStereotype(ann);
-        if (httpMethodOpt.isPresent()) {
-            AnnotationValue<?> annotation = element.getAnnotation(ann);
+    private static HttpMethodDesciption methodDescription(MethodElement element, String endpointManagementAnnName, HttpMethod httpMethod) {
+        if (element.isAnnotationPresent(endpointManagementAnnName)) {
+            AnnotationValue<?> annotation = element.getAnnotation(endpointManagementAnnName);
             return new HttpMethodDesciption(httpMethod, annotation.stringValue("description").orElse(null),
-                    annotation.stringValues("produces"), annotation.stringValues("consumes"));
+                annotation.stringValues("produces"), annotation.stringValues("consumes"));
         }
         return null;
     }
@@ -256,6 +254,7 @@ public class OpenApiEndpointVisitor extends AbstractOpenApiEndpointVisitor imple
      * @author croudet
      */
     private static class HttpMethodDesciption {
+
         HttpMethod httpMethod;
         String description;
         String[] produces;
@@ -271,7 +270,7 @@ public class OpenApiEndpointVisitor extends AbstractOpenApiEndpointVisitor imple
         @Override
         public String toString() {
             return "HttpMethodDesciption [httpMethod=" + httpMethod + ", description=" + description + ", produces="
-                    + Arrays.toString(produces) + ", consumes=" + Arrays.toString(consumes) + "]";
+                + Arrays.toString(produces) + ", consumes=" + Arrays.toString(consumes) + "]";
         }
     }
 

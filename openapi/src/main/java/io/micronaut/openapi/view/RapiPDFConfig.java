@@ -15,7 +15,9 @@
  */
 package io.micronaut.openapi.view;
 
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.function.Function;
@@ -29,7 +31,13 @@ import io.micronaut.openapi.view.OpenApiViewConfig.RendererType;
  */
 final class RapiPDFConfig extends AbstractViewConfig {
 
-    private static final String LINK = "<script src='https://unpkg.com/rapipdf{{rapipdf.version}}/dist/rapipdf-min.js'></script>";
+    private static final String DEFAULT_RAPIPDF_JS_PATH = OpenApiViewConfig.RESOURCE_DIR + "/rapipdf-min.js";
+
+    private static final List<String> RESOURCE_FILES = Collections.singletonList(
+        DEFAULT_RAPIPDF_JS_PATH
+    );
+
+    private static final String LINK = "<script src='{{rapipdf.js.url}}'></script>";
     private static final String TAG = "<rapi-pdf id='rapi-pdf' {{rapipdf.attributes}}></rapi-pdf>";
     private static final String SPEC = "document.getElementById('rapi-pdf').setAttribute('spec-url', contextPath + '{{specURL}}');";
     private static final Map<String, Object> DEFAULT_OPTIONS = new HashMap<>(6);
@@ -74,14 +82,15 @@ final class RapiPDFConfig extends AbstractViewConfig {
 
         @Override
         public String toString() {
-            return this.name().toLowerCase(Locale.US);
+            return name().toLowerCase(Locale.US);
         }
     }
 
-    private boolean enabled; //false
+    boolean enabled; //false
 
     private RapiPDFConfig() {
         super("rapipdf.");
+        jsUrl = DEFAULT_RAPIPDF_JS_PATH;
     }
 
     /**
@@ -94,7 +103,11 @@ final class RapiPDFConfig extends AbstractViewConfig {
     static RapiPDFConfig fromProperties(Map<String, String> properties) {
         RapiPDFConfig cfg = new RapiPDFConfig();
         cfg.enabled = "true".equals(properties.getOrDefault("rapipdf.enabled", Boolean.FALSE.toString()));
-        return AbstractViewConfig.fromProperties(cfg, DEFAULT_OPTIONS, properties);
+        AbstractViewConfig.fromProperties(cfg, DEFAULT_OPTIONS, properties);
+        if (DEFAULT_RAPIPDF_JS_PATH.equals(cfg.jsUrl)) {
+            cfg.isDefaultJsUrl = true;
+        }
+        return cfg;
     }
 
     /**
@@ -112,15 +125,15 @@ final class RapiPDFConfig extends AbstractViewConfig {
             if (style == null || style.trim().isEmpty()) {
                 styleUpdated = true;
                 // set default style
-                if (RendererType.REDOC.equals(rendererType)) {
+                if (RendererType.REDOC == rendererType) {
                     options.put("style", DEFAULT_REDOC_STYLE);
-                } else if (RendererType.SWAGGER_UI.equals(rendererType)) {
+                } else if (RendererType.SWAGGER_UI == rendererType) {
                     options.put("style", DEFAULT_SWAGGER_UI_STYLE);
                 } else {
                     options.put("style", DEFAULT_RAPIDOC_STYLE);
                 }
             }
-            String script = OpenApiViewConfig.replacePlaceHolder(LINK, "rapipdf.version", version, "@");
+            String script = OpenApiViewConfig.replacePlaceHolder(LINK, "rapipdf.js.url", jsUrl, "");
             String rapipdfTag = OpenApiViewConfig.replacePlaceHolder(TAG, "rapipdf.attributes", toHtmlAttributes(), "");
             if (styleUpdated) {
                 options.remove("style");
@@ -138,5 +151,10 @@ final class RapiPDFConfig extends AbstractViewConfig {
     @Override
     protected Function<String, Object> getConverter(String key) {
         return VALID_OPTIONS.get(key);
+    }
+
+    @Override
+    protected List<String> getResources() {
+        return RESOURCE_FILES;
     }
 }

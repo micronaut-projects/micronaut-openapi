@@ -15,8 +15,10 @@
  */
 package io.micronaut.openapi.view;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.function.Function;
@@ -33,6 +35,16 @@ import io.micronaut.openapi.view.OpenApiViewConfig.RendererType;
  * @author croudet
  */
 final class SwaggerUIConfig extends AbstractViewConfig implements Renderer {
+
+    private static final String DEFAULT_SWAGGER_JS_PATH = OpenApiViewConfig.RESOURCE_DIR + "/";
+
+    private static final List<String> RESOURCE_FILES = Arrays.asList(
+        DEFAULT_SWAGGER_JS_PATH + "swagger-ui.css",
+        DEFAULT_SWAGGER_JS_PATH + "favicon-16x16.png",
+        DEFAULT_SWAGGER_JS_PATH + "favicon-32x32.png",
+        DEFAULT_SWAGGER_JS_PATH + "swagger-ui-bundle.js",
+        DEFAULT_SWAGGER_JS_PATH + "swagger-ui-standalone-preset.js"
+    );
 
     private static final Map<String, Object> DEFAULT_OPTIONS = new HashMap<>(4);
     private static final String OPTION_OAUTH2 = "oauth2";
@@ -93,7 +105,7 @@ final class SwaggerUIConfig extends AbstractViewConfig implements Renderer {
     }
 
     RapiPDFConfig rapiPDFConfig;
-    private SwaggerUIConfig.Theme theme = Theme.CLASSIC;
+    SwaggerUIConfig.Theme theme = Theme.CLASSIC;
 
     enum SyntaxHighlightTheme {
         AGATE("agate"),
@@ -126,7 +138,11 @@ final class SwaggerUIConfig extends AbstractViewConfig implements Renderer {
         }
 
         public static SyntaxHighlightTheme byCode(String code) {
-            return BY_CODE.get(code.toLowerCase());
+            SyntaxHighlightTheme value = BY_CODE.get(code.toLowerCase());
+            if (value == null) {
+                throw new IllegalArgumentException("Unknown value " + code);
+            }
+            return value;
         }
     }
 
@@ -168,6 +184,7 @@ final class SwaggerUIConfig extends AbstractViewConfig implements Renderer {
 
     private SwaggerUIConfig() {
         super(PREFIX_SWAGGER_UI + DOT);
+        jsUrl = DEFAULT_SWAGGER_JS_PATH;
     }
 
     @NonNull
@@ -210,18 +227,21 @@ final class SwaggerUIConfig extends AbstractViewConfig implements Renderer {
      */
     static SwaggerUIConfig fromProperties(Map<String, String> properties) {
         SwaggerUIConfig cfg = new SwaggerUIConfig();
-        cfg.theme = Theme
-            .valueOf(properties.getOrDefault(PREFIX_SWAGGER_UI + ".theme", cfg.theme.name()).toUpperCase(Locale.US));
-        return AbstractViewConfig.fromProperties(cfg, DEFAULT_OPTIONS, properties);
+        cfg.theme = Theme.valueOf(properties.getOrDefault(PREFIX_SWAGGER_UI + ".theme", cfg.theme.name()).toUpperCase(Locale.US));
+        AbstractViewConfig.fromProperties(cfg, DEFAULT_OPTIONS, properties);
+        if (DEFAULT_SWAGGER_JS_PATH.equals(cfg.jsUrl)) {
+            cfg.isDefaultJsUrl = true;
+        }
+        return cfg;
     }
 
     @Override
     public String render(String template) {
         template = rapiPDFConfig.render(template, RendererType.SWAGGER_UI);
-        template = OpenApiViewConfig.replacePlaceHolder(template, PREFIX_SWAGGER_UI + ".version", version, "@");
+        template = OpenApiViewConfig.replacePlaceHolder(template, PREFIX_SWAGGER_UI + ".js.url", jsUrl, "");
         template = OpenApiViewConfig.replacePlaceHolder(template, PREFIX_SWAGGER_UI + ".attributes", toOptions(), "");
         template = template.replace("{{" + PREFIX_SWAGGER_UI + ".theme}}", theme == null || Theme.CLASSIC == theme ? "" :
-            "<link rel='stylesheet' type='text/css' href='https://unpkg.com/swagger-themes/themes/v3/" + theme.getCss() + ".css' />");
+            "<link rel='stylesheet' type='text/css' href='" + OpenApiViewConfig.RESOURCE_DIR + '/' + theme.getCss() + ".css' />");
         template = template.replace("{{" + PREFIX_SWAGGER_UI + DOT + OPTION_OAUTH2 + "}}", hasOauth2Option(options) ? toOauth2Options() : "");
         return template;
     }
@@ -229,5 +249,10 @@ final class SwaggerUIConfig extends AbstractViewConfig implements Renderer {
     @Override
     protected Function<String, Object> getConverter(String key) {
         return (VALID_OPTIONS.containsKey(key) ? VALID_OPTIONS : VALID_OAUTH2_OPTIONS).get(key);
+    }
+
+    @Override
+    protected List<String> getResources() {
+        return RESOURCE_FILES;
     }
 }

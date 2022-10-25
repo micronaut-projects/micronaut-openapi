@@ -17,6 +17,7 @@ package io.micronaut.openapi.view;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.function.Function;
@@ -29,6 +30,13 @@ import io.micronaut.openapi.view.OpenApiViewConfig.RendererType;
  * @author croudet
  */
 final class RapidocConfig extends AbstractViewConfig implements Renderer {
+
+    public static final String RAPIDOC_PREFIX = "rapidoc.";
+    private static final String DEFAULT_RAPIDOC_JS_PATH = OpenApiViewConfig.RESOURCE_DIR + "/rapidoc-min.js";
+
+    private static final List<String> RESOURCE_FILES = Collections.singletonList(
+        DEFAULT_RAPIDOC_JS_PATH
+    );
 
     private static final Map<String, Object> DEFAULT_OPTIONS = new HashMap<>();
 
@@ -169,7 +177,11 @@ final class RapidocConfig extends AbstractViewConfig implements Renderer {
         }
 
         public static NavTagClick byCode(String code) {
-            return BY_CODE.get(code.toLowerCase());
+            NavTagClick value = BY_CODE.get(code.toLowerCase());
+            if (value == null) {
+                throw new IllegalArgumentException("Unknown value " + code);
+            }
+            return value;
         }
     }
 
@@ -204,7 +216,11 @@ final class RapidocConfig extends AbstractViewConfig implements Renderer {
         }
 
         public static FetchCredentials byCode(String code) {
-            return BY_CODE.get(code.toLowerCase());
+            FetchCredentials value = BY_CODE.get(code.toLowerCase());
+            if (value == null) {
+                throw new IllegalArgumentException("Unknown value " + code);
+            }
+            return value;
         }
     }
 
@@ -240,7 +256,11 @@ final class RapidocConfig extends AbstractViewConfig implements Renderer {
         }
 
         public static ShowMethodInNavBar byCode(String code) {
-            return BY_CODE.get(code.toLowerCase());
+            ShowMethodInNavBar value = BY_CODE.get(code.toLowerCase());
+            if (value == null) {
+                throw new IllegalArgumentException("Unknown value " + code);
+            }
+            return value;
         }
     }
 
@@ -355,7 +375,8 @@ final class RapidocConfig extends AbstractViewConfig implements Renderer {
     RapiPDFConfig rapiPDFConfig;
 
     private RapidocConfig() {
-        super("rapidoc.");
+        super(RAPIDOC_PREFIX);
+        jsUrl = DEFAULT_RAPIDOC_JS_PATH;
     }
 
     /**
@@ -366,18 +387,27 @@ final class RapidocConfig extends AbstractViewConfig implements Renderer {
      * @return A RapidocConfig.
      */
     static RapidocConfig fromProperties(Map<String, String> properties) {
-        return AbstractViewConfig.fromProperties(new RapidocConfig(), DEFAULT_OPTIONS, properties);
+        RapidocConfig cfg = AbstractViewConfig.fromProperties(new RapidocConfig(), DEFAULT_OPTIONS, properties);
+        if (DEFAULT_RAPIDOC_JS_PATH.equals(cfg.jsUrl)) {
+            cfg.isDefaultJsUrl = true;
+        }
+        return cfg;
     }
 
     @Override
     public String render(String template) {
         template = rapiPDFConfig.render(template, RendererType.RAPIDOC);
-        template = OpenApiViewConfig.replacePlaceHolder(template, "rapidoc.version", version, "@");
+        template = OpenApiViewConfig.replacePlaceHolder(template, "rapidoc.js.url", jsUrl, "");
         return OpenApiViewConfig.replacePlaceHolder(template, "rapidoc.attributes", toHtmlAttributes(), "");
     }
 
     @Override
     protected Function<String, Object> getConverter(String key) {
         return VALID_OPTIONS.get(key);
+    }
+
+    @Override
+    protected List<String> getResources() {
+        return RESOURCE_FILES;
     }
 }

@@ -15,11 +15,13 @@
  */
 package io.micronaut.openapi.visitor;
 
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import java.lang.annotation.Annotation;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
 import io.micronaut.core.annotation.AnnotationClassValue;
 import io.micronaut.core.annotation.AnnotationValue;
-import io.micronaut.core.annotation.Experimental;
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.inject.ast.ClassElement;
@@ -28,10 +30,8 @@ import io.micronaut.inject.visitor.VisitorContext;
 import io.swagger.v3.oas.annotations.media.DiscriminatorMapping;
 import io.swagger.v3.oas.annotations.media.Schema;
 
-import java.lang.annotation.Annotation;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 /**
  * A {@link TypeElementVisitor} that builds appropriate {@link Schema} annotation for the parent class of a hierarchy
@@ -40,7 +40,6 @@ import java.util.Set;
  * @author Iván López
  * @since 3.0.0
  */
-@Experimental
 public class OpenApiJacksonVisitor implements TypeElementVisitor<Object, Object> {
 
     @Override
