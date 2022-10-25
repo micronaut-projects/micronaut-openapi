@@ -1,29 +1,23 @@
 plugins {
+    id "io.micronaut.build.internal.openapi-base"
     id "groovy"
-}
-
-repositories {
-    mavenCentral()
-    maven { url "https://s01.oss.sonatype.org/content/repositories/snapshots/" }
 }
 
 dependencies {
     testCompileOnly(mn.micronaut.inject.groovy)
 
     testImplementation(platform(mn.micronaut.bom))
-    testImplementation project(":openapi")
+    testImplementation projects.openapi
     testImplementation(mn.micronaut.runtime)
     testImplementation(mn.micronaut.runtime.groovy)
     testImplementation(mn.micronaut.validation)
     testImplementation(libs.managed.swagger.annotations)
-    testImplementation(libs.reactor.core)
+    testImplementation(mn.reactor)
     testImplementation(mn.micronaut.hibernate.validator)
     testImplementation(libs.testcontainers.spock)
-    testImplementation(libs.spock.core) {
-        exclude group: "org.codehaus.groovy", module: "groovy-all"
-    }
+    testImplementation(mn.spock)
 
-    testRuntimeOnly(libs.logback.classic)
+    testRuntimeOnly(mn.logback)
 }
 
 

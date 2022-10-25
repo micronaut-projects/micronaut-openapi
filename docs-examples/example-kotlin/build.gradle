@@ -1,15 +1,11 @@
 plugins {
+    id "io.micronaut.build.internal.openapi-base"
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.kotlin.kapt)
 }
 
-repositories {
-    mavenCentral()
-    maven { url "https://s01.oss.sonatype.org/content/repositories/snapshots/" }
-}
-
 dependencies {
-    kapt project(":openapi")
+    kapt projects.openapi
     kapt(mn.micronaut.inject.java)
     kapt(mn.micronaut.validation)
 
@@ -17,14 +13,14 @@ dependencies {
 
     testImplementation(platform(mn.micronaut.bom))
     testImplementation(libs.managed.swagger.annotations)
-    testImplementation(libs.reactor.core)
+    testImplementation(mn.reactor)
     testImplementation(mn.micronaut.runtime)
     testImplementation(mn.micronaut.validation)
     testImplementation(mn.micronaut.hibernate.validator)
     testImplementation(libs.kotlin.stdlib.jdk8)
     testImplementation(libs.kotlin.reflect)
 
-    testRuntimeOnly(libs.logback.classic)
+    testRuntimeOnly(mn.logback)
     testRuntimeOnly(libs.junit.jupiter.engine)
 }
 
@@ -42,7 +38,7 @@ test {
 
 compileTestKotlin {
     kotlinOptions {
-        jvmTarget = '1.8'
+        jvmTarget = '17'
         javaParameters = true
     }
 }

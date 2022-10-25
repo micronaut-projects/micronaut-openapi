@@ -2,17 +2,13 @@ plugins {
     id 'io.micronaut.build.internal.openapi-module'
 }
 
-repositories {
-    mavenCentral()
-    maven { url "https://s01.oss.sonatype.org/content/repositories/snapshots/" }
-}
-
 dependencies {
     compileOnly(mn.micronaut.management)
     compileOnly(mn.micronaut.inject.java)
 
     implementation(mn.micronaut.http)
     implementation(mn.micronaut.http.server)
+    implementation(mn.reactor)
 
     api(libs.managed.swagger.core)
     api(libs.managed.swagger.models)
@@ -28,13 +24,11 @@ dependencies {
     testImplementation(mn.micronaut.inject.java.test)
     testImplementation(mn.micronaut.hibernate.validator)
     testImplementation(mn.micronaut.data.jdbc)
-    testImplementation(libs.rxjava2)
-    testImplementation(libs.rxjava3)
+    testImplementation(mn.rxjava2)
+    testImplementation(mn.rxjava3)
     testImplementation(mn.micronaut.management)
+    testImplementation(mn.snakeyaml)
 
-    if (org.gradle.internal.jvm.Jvm.current().getJavaVersion().isJava8()) {
-        testImplementation files(org.gradle.internal.jvm.Jvm.current().toolsJar)
-    }
 }
 
 //compileJava.options.compilerArgs += '-deprecation'
