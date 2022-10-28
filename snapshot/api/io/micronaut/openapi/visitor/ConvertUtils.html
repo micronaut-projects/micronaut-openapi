@@ -17,7 +17,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":9,"i1":9,"i2":9,"i3":9,"i4":9,"i5":9,"i6":9,"i7":9,"i8":9};
+var methods = {"i0":9,"i1":9,"i2":9,"i3":9,"i4":9,"i5":9,"i6":9,"i7":9,"i8":9,"i9":9};
 var tabs = {65535:["t0","All Methods"],1:["t1","Static Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -48,7 +48,7 @@ var activeTableTab = "activeTableTab";
 <div class="subNav">
 <ul class="navList">
 <li><a href="../../../../io/micronaut/openapi/visitor/ContextUtils.html" title="class in io.micronaut.openapi.visitor"><span class="typeNameLink">Prev&nbsp;Class</span></a></li>
-<li><a href="../../../../io/micronaut/openapi/visitor/OpenApiApplicationVisitor.html" title="class in io.micronaut.openapi.visitor"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
+<li><a href="../../../../io/micronaut/openapi/visitor/NumberUtils.html" title="class in io.micronaut.openapi.visitor"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
 </ul>
 <ul class="navList">
 <li><a href="../../../../index.html?io/micronaut/openapi/visitor/ConvertUtils.html" target="_top">Frames</a></li>
@@ -141,29 +141,33 @@ extends java.lang.Object</pre>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/openapi/visitor/ConvertUtils.html#getJsonMapper--">getJsonMapper</a></span>()</code>&nbsp;</td>
 </tr>
 <tr id="i2" class="altColor">
-<td class="colFirst"><code>static org.apache.commons.lang3.tuple.Pair&lt;java.lang.String,java.lang.String&gt;</code></td>
+<td class="colFirst"><code>static com.fasterxml.jackson.databind.ObjectMapper</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/openapi/visitor/ConvertUtils.html#getJsonMapper31--">getJsonMapper31</a></span>()</code>&nbsp;</td>
+</tr>
+<tr id="i3" class="rowColor">
+<td class="colFirst"><code>static <a href="../../../../io/micronaut/openapi/visitor/Pair.html" title="class in io.micronaut.openapi.visitor">Pair</a>&lt;java.lang.String,java.lang.String&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/openapi/visitor/ConvertUtils.html#getTypeAndFormatByClass-java.lang.String-">getTypeAndFormatByClass</a></span>(java.lang.String&nbsp;className)</code>
 <div class="block">Detect openapi type nd format by java class name.</div>
 </td>
 </tr>
-<tr id="i3" class="rowColor">
+<tr id="i4" class="altColor">
 <td class="colFirst"><code>static com.fasterxml.jackson.databind.ObjectMapper</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/openapi/visitor/ConvertUtils.html#getYamlMapper--">getYamlMapper</a></span>()</code>&nbsp;</td>
 </tr>
-<tr id="i4" class="altColor">
+<tr id="i5" class="rowColor">
 <td class="colFirst"><code>static io.swagger.v3.oas.models.security.SecurityRequirement</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/openapi/visitor/ConvertUtils.html#mapToSecurityRequirement-io.micronaut.core.annotation.AnnotationValue-">mapToSecurityRequirement</a></span>(io.micronaut.core.annotation.AnnotationValue&lt;io.swagger.v3.oas.annotations.security.SecurityRequirement&gt;&nbsp;r)</code>
 <div class="block">Maps annotation value to <code>SecurityRequirement</code>.</div>
 </td>
 </tr>
-<tr id="i5" class="rowColor">
+<tr id="i6" class="altColor">
 <td class="colFirst"><code>static java.lang.Object</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/openapi/visitor/ConvertUtils.html#normalizeValue-java.lang.String-java.lang.String-java.lang.String-io.micronaut.inject.visitor.VisitorContext-">normalizeValue</a></span>(java.lang.String&nbsp;valueStr,
               java.lang.String&nbsp;type,
               java.lang.String&nbsp;format,
               io.micronaut.inject.visitor.VisitorContext&nbsp;context)</code>&nbsp;</td>
 </tr>
-<tr id="i6" class="altColor">
+<tr id="i7" class="rowColor">
 <td class="colFirst"><code>static java.lang.Object</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/openapi/visitor/ConvertUtils.html#parseByTypeAndFormat-java.lang.String-java.lang.String-java.lang.String-io.micronaut.inject.visitor.VisitorContext-">parseByTypeAndFormat</a></span>(java.lang.String&nbsp;valueStr,
                     java.lang.String&nbsp;type,
@@ -172,11 +176,11 @@ extends java.lang.Object</pre>
 <div class="block">Parse value by openapi type and format.</div>
 </td>
 </tr>
-<tr id="i7" class="rowColor">
+<tr id="i8" class="altColor">
 <td class="colFirst"><code>static java.util.Optional&lt;java.util.Map&lt;java.lang.String,java.lang.Object&gt;&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/openapi/visitor/ConvertUtils.html#resolveExtensions-com.fasterxml.jackson.databind.JsonNode-">resolveExtensions</a></span>(com.fasterxml.jackson.databind.JsonNode&nbsp;jn)</code>&nbsp;</td>
 </tr>
-<tr id="i8" class="altColor">
+<tr id="i9" class="rowColor">
 <td class="colFirst"><code>static &lt;T&gt;&nbsp;T</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/openapi/visitor/ConvertUtils.html#treeToValue-com.fasterxml.jackson.databind.JsonNode-java.lang.Class-io.micronaut.inject.visitor.VisitorContext-">treeToValue</a></span>(com.fasterxml.jackson.databind.JsonNode&nbsp;jn,
            java.lang.Class&lt;T&gt;&nbsp;clazz,
@@ -283,7 +287,7 @@ extends java.lang.Object</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>getTypeAndFormatByClass</h4>
-<pre>public static&nbsp;org.apache.commons.lang3.tuple.Pair&lt;java.lang.String,java.lang.String&gt;&nbsp;getTypeAndFormatByClass(java.lang.String&nbsp;className)</pre>
+<pre>public static&nbsp;<a href="../../../../io/micronaut/openapi/visitor/Pair.html" title="class in io.micronaut.openapi.visitor">Pair</a>&lt;java.lang.String,java.lang.String&gt;&nbsp;getTypeAndFormatByClass(java.lang.String&nbsp;className)</pre>
 <div class="block">Detect openapi type nd format by java class name.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
@@ -322,6 +326,15 @@ extends java.lang.Object</pre>
 <li class="blockList">
 <h4>getJsonMapper</h4>
 <pre>public static&nbsp;com.fasterxml.jackson.databind.ObjectMapper&nbsp;getJsonMapper()</pre>
+</li>
+</ul>
+<a name="getJsonMapper31--">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getJsonMapper31</h4>
+<pre>public static&nbsp;com.fasterxml.jackson.databind.ObjectMapper&nbsp;getJsonMapper31()</pre>
 </li>
 </ul>
 <a name="getConvertJsonMapper--">
@@ -370,7 +383,7 @@ extends java.lang.Object</pre>
 <div class="subNav">
 <ul class="navList">
 <li><a href="../../../../io/micronaut/openapi/visitor/ContextUtils.html" title="class in io.micronaut.openapi.visitor"><span class="typeNameLink">Prev&nbsp;Class</span></a></li>
-<li><a href="../../../../io/micronaut/openapi/visitor/OpenApiApplicationVisitor.html" title="class in io.micronaut.openapi.visitor"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
+<li><a href="../../../../io/micronaut/openapi/visitor/NumberUtils.html" title="class in io.micronaut.openapi.visitor"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
 </ul>
 <ul class="navList">
 <li><a href="../../../../index.html?io/micronaut/openapi/visitor/ConvertUtils.html" target="_top">Frames</a></li>
