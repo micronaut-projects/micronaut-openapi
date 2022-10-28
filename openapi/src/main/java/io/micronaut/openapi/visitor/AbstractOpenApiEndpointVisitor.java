@@ -181,9 +181,9 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             boolean addAlways = true;
             AnnotationValue<OpenAPIDecorator> apiDecorator = element.getDeclaredAnnotation(OpenAPIDecorator.class);
             if (apiDecorator != null) {
-                prefix = apiDecorator.getValue(String.class).orElse("");
-                suffix = apiDecorator.get("opIdSuffix", String.class).orElse("");
-                addAlways = apiDecorator.get("addAlways", Boolean.class).orElse(true);
+                prefix = apiDecorator.stringValue().orElse("");
+                suffix = apiDecorator.stringValue("opIdSuffix").orElse("");
+                addAlways = apiDecorator.booleanValue("addAlways").orElse(true);
             }
             context.put(CONTEXT_CHILD_OP_ID_PREFIX, prefix);
             context.put(CONTEXT_CHILD_OP_ID_SUFFIX, suffix);
@@ -1097,9 +1097,9 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         boolean addAlways;
         AnnotationValue<OpenAPIDecorator> apiDecorator = element.getDeclaredAnnotation(OpenAPIDecorator.class);
         if (apiDecorator != null) {
-            prefix = apiDecorator.getValue(String.class).orElse("");
-            suffix = apiDecorator.get("opIdSuffix", String.class).orElse("");
-            addAlways = apiDecorator.get("addAlways", Boolean.class).orElse(true);
+            prefix = apiDecorator.stringValue().orElse("");
+            suffix = apiDecorator.stringValue("opIdSuffix").orElse("");
+            addAlways = apiDecorator.booleanValue("addAlways").orElse(true);
         } else {
             prefix = context.get(CONTEXT_CHILD_OP_ID_PREFIX, String.class).orElse("");
             suffix = context.get(CONTEXT_CHILD_OP_ID_SUFFIX, String.class).orElse("");
@@ -1211,12 +1211,12 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
     private boolean ignoreParameter(TypedElement parameter) {
 
         AnnotationValue<io.swagger.v3.oas.annotations.media.Schema> schemaAnn = parameter.getAnnotation(io.swagger.v3.oas.annotations.media.Schema.class);
-        boolean isHidden = schemaAnn != null && schemaAnn.get("hidden", Boolean.class).orElse(false);
+        boolean isHidden = schemaAnn != null && schemaAnn.booleanValue("hidden").orElse(false);
 
         return isHidden ||
             parameter.isAnnotationPresent(Hidden.class) ||
             parameter.isAnnotationPresent(JsonIgnore.class) ||
-            parameter.getValue(io.swagger.v3.oas.annotations.Parameter.class, "hidden", Boolean.class)
+            parameter.booleanValue(io.swagger.v3.oas.annotations.Parameter.class, "hidden")
                 .orElse(false) ||
             isAnnotationPresent(parameter, "io.micronaut.session.annotation.SessionValue") ||
             isIgnoredParameterType(parameter.getType());
@@ -1339,7 +1339,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                 Optional<ApiResponse> newResponse = toValue(response.getValues(), context, ApiResponse.class);
                 if (newResponse.isPresent()) {
                     ApiResponse newApiResponse = newResponse.get();
-                    if (response.get("useReturnTypeSchema", Boolean.class).orElse(false) && element != null) {
+                    if (response.booleanValue("useReturnTypeSchema").orElse(false) && element != null) {
                         addResponseContent(element, context, Utils.resolveOpenAPI(context), newApiResponse);
                     }
                     apiResponses.put(response.get("responseCode", String.class).orElse("default"), newApiResponse);
@@ -1373,18 +1373,18 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             return;
         }
         for (AnnotationValue<Callback> callbackAnn : callbackAnnotations) {
-            final Optional<String> name = callbackAnn.get("name", String.class);
+            final Optional<String> name = callbackAnn.stringValue("name");
             if (!name.isPresent()) {
                 continue;
             }
             String callbackName = name.get();
-            final Optional<String> ref = callbackAnn.get("ref", String.class);
+            final Optional<String> ref = callbackAnn.stringValue("ref");
             if (ref.isPresent()) {
                 String refCallback = ref.get().substring(COMPONENTS_CALLBACKS_PREFIX.length());
                 processCallbackReference(context, swaggerOperation, callbackName, refCallback);
                 continue;
             }
-            final Optional<String> expr = callbackAnn.get("callbackUrlExpression", String.class);
+            final Optional<String> expr = callbackAnn.stringValue("callbackUrlExpression");
             if (expr.isPresent()) {
                 processUrlCallbackExpression(context, swaggerOperation, callbackAnn, callbackName, expr.get());
             } else {
@@ -1450,7 +1450,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
 
     private void readTags(MethodElement element, VisitorContext context, io.swagger.v3.oas.models.Operation swaggerOperation, List<io.swagger.v3.oas.models.tags.Tag> classTags, OpenAPI openAPI) {
         element.getAnnotationValuesByType(Tag.class)
-            .forEach(av -> av.get("name", String.class)
+            .forEach(av -> av.stringValue("name")
                 .ifPresent(swaggerOperation::addTagsItem));
 
         List<io.swagger.v3.oas.models.tags.Tag> copyTags = openAPI.getTags() != null ? new ArrayList<>(openAPI.getTags()) : null;
@@ -1488,7 +1488,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         }
 
         // only way to get inherited tags
-        element.getValues(Tags.class, AnnotationValue.class).forEach((k, v) -> v.get("name", String.class).ifPresent(name -> addTagIfNotPresent((String) name, swaggerOperation)));
+        element.getValues(Tags.class, AnnotationValue.class).forEach((k, v) -> v.stringValue("name").ifPresent(name -> addTagIfNotPresent((String) name, swaggerOperation)));
 
         classTags.forEach(tag -> addTagIfNotPresent(tag.getName(), swaggerOperation));
     }

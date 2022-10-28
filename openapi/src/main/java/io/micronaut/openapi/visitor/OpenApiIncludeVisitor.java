@@ -45,7 +45,7 @@ public class OpenApiIncludeVisitor implements TypeElementVisitor<OpenAPIIncludes
             if (ArrayUtils.isNotEmpty(classes)) {
                 List<AnnotationValue<Tag>> tags = includeAnnotation.getAnnotations("tags", Tag.class);
                 List<AnnotationValue<SecurityRequirement>> security = includeAnnotation.getAnnotations("security", SecurityRequirement.class);
-                Optional<String> customUri = includeAnnotation.get("uri", String.class);
+                Optional<String> customUri = includeAnnotation.stringValue("uri");
 
                 OpenApiControllerVisitor controllerVisitor = new OpenApiControllerVisitor(tags, security, customUri.orElse(null));
                 OpenApiEndpointVisitor endpointVisitor = new OpenApiEndpointVisitor(true, tags.isEmpty() ? null : tags, security.isEmpty() ? null : security);
