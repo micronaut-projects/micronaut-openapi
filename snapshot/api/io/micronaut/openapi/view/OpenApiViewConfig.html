@@ -110,7 +110,7 @@ var activeTableTab = "activeTableTab";
 <pre>public final class <span class="typeNameLabel">OpenApiViewConfig</span>
 extends java.lang.Object</pre>
 <div class="block">OpenApi view configuration for Swagger-ui, ReDoc and RapiDoc.
- By default no views are enabled.</div>
+ By default, no views are enabled.</div>
 <dl>
 <dt><span class="simpleTagLabel">Author:</span></dt>
 <dd>croudet</dd>
@@ -193,7 +193,7 @@ extends java.lang.Object</pre>
 </tr>
 <tr id="i1" class="rowColor">
 <td class="colFirst"><code>java.lang.String</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/openapi/view/OpenApiViewConfig.html#getSpecURL--">getSpecURL</a></span>()</code>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/openapi/view/OpenApiViewConfig.html#getSpecURL-io.micronaut.inject.visitor.VisitorContext-">getSpecURL</a></span>(io.micronaut.inject.visitor.VisitorContext&nbsp;context)</code>
 <div class="block">Returns the relative openApi specification url path.</div>
 </td>
 </tr>
@@ -461,15 +461,17 @@ extends java.lang.Object</pre>
 </dl>
 </li>
 </ul>
-<a name="getSpecURL--">
+<a name="getSpecURL-io.micronaut.inject.visitor.VisitorContext-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>getSpecURL</h4>
-<pre>public&nbsp;java.lang.String&nbsp;getSpecURL()</pre>
+<pre>public&nbsp;java.lang.String&nbsp;getSpecURL(io.micronaut.inject.visitor.VisitorContext&nbsp;context)</pre>
 <div class="block">Returns the relative openApi specification url path.</div>
 <dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>context</code> - Visitor context.</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>A path.</dd>
 </dl>
