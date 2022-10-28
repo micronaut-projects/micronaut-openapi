@@ -35,6 +35,8 @@ dependencies {
     testImplementation(libs.managed.html2md.converter)
     testImplementation(libs.javax.validation.api)
     testImplementation(libs.jakarta.validation.api)
+    testImplementation(libs.javax.validation.api)
+    testImplementation(libs.jakarta.validation.api)
 }
 
 configurations.all {

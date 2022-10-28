@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import io.micronaut.core.annotation.Internal;
 import io.micronaut.core.util.StringUtils;
 import io.micronaut.openapi.visitor.ConvertUtils;
 import io.swagger.v3.oas.models.media.ArraySchema;
@@ -50,6 +51,12 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 
+/**
+ * This class is copied from swagger-core library.
+ *
+ * @since 4.6.0
+ */
+@Internal
 public class ModelDeserializer extends JsonDeserializer<Schema> {
 
     protected boolean openapi31;
@@ -117,7 +124,7 @@ public class ModelDeserializer extends JsonDeserializer<Schema> {
 
     private Schema deserializeObjectSchema(JsonNode node) {
         JsonNode additionalProperties = node.get("additionalProperties");
-        Schema schema = null;
+        Schema schema;
         if (additionalProperties != null) {
             // try first to convert to Schema, if it fails it must be a boolean
             try {

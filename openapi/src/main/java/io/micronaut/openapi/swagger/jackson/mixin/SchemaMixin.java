@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import io.micronaut.core.annotation.Internal;
 import io.swagger.v3.oas.models.media.Schema;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
@@ -28,6 +29,12 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
+/**
+ * This class is copied from swagger-core library.
+ *
+ * @since 4.6.0
+ */
+@Internal
 public abstract class SchemaMixin {
 
     @JsonAnyGetter

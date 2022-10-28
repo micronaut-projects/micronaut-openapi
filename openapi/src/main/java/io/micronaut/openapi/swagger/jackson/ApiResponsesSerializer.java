@@ -18,6 +18,7 @@ package io.micronaut.openapi.swagger.jackson;
 import java.io.IOException;
 import java.util.Map.Entry;
 
+import io.micronaut.core.annotation.Internal;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.responses.ApiResponses;
 
@@ -25,6 +26,12 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 
+/**
+ * This class is copied from swagger-core library.
+ *
+ * @since 4.6.0
+ */
+@Internal
 public class ApiResponsesSerializer extends JsonSerializer<ApiResponses> {
 
     @Override

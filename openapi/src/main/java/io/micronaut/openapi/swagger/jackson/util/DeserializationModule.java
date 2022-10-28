@@ -15,6 +15,7 @@
  */
 package io.micronaut.openapi.swagger.jackson.util;
 
+import io.micronaut.core.annotation.Internal;
 import io.swagger.v3.oas.models.Paths;
 import io.swagger.v3.oas.models.callbacks.Callback;
 import io.swagger.v3.oas.models.headers.Header;
@@ -27,20 +28,26 @@ import io.swagger.v3.oas.models.security.SecurityScheme;
 
 import com.fasterxml.jackson.databind.module.SimpleModule;
 
+/**
+ * This class is copied from swagger-core library.
+ *
+ * @since 4.6.0
+ */
+@Internal
 public class DeserializationModule extends SimpleModule {
 
     public DeserializationModule() {
 
-        this.addDeserializer(Schema.class, new ModelDeserializer());
-        this.addDeserializer(Parameter.class, new ParameterDeserializer());
-        this.addDeserializer(Header.StyleEnum.class, new HeaderStyleEnumDeserializer());
-        this.addDeserializer(Encoding.StyleEnum.class, new EncodingStyleEnumDeserializer());
-        this.addDeserializer(EncodingProperty.StyleEnum.class, new EncodingPropertyStyleEnumDeserializer());
+        addDeserializer(Schema.class, new ModelDeserializer());
+        addDeserializer(Parameter.class, new ParameterDeserializer());
+        addDeserializer(Header.StyleEnum.class, new HeaderStyleEnumDeserializer());
+        addDeserializer(Encoding.StyleEnum.class, new EncodingStyleEnumDeserializer());
+        addDeserializer(EncodingProperty.StyleEnum.class, new EncodingPropertyStyleEnumDeserializer());
 
-        this.addDeserializer(SecurityScheme.class, new SecuritySchemeDeserializer());
+        addDeserializer(SecurityScheme.class, new SecuritySchemeDeserializer());
 
-        this.addDeserializer(ApiResponses.class, new ApiResponsesDeserializer());
-        this.addDeserializer(Paths.class, new PathsDeserializer());
-        this.addDeserializer(Callback.class, new CallbackDeserializer());
+        addDeserializer(ApiResponses.class, new ApiResponsesDeserializer());
+        addDeserializer(Paths.class, new PathsDeserializer());
+        addDeserializer(Callback.class, new CallbackDeserializer());
     }
 }

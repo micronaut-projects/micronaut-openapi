@@ -17,6 +17,7 @@ package io.micronaut.openapi.swagger.jackson;
 
 import java.io.IOException;
 
+import io.micronaut.core.annotation.Internal;
 import io.swagger.v3.oas.models.media.MediaType;
 
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -25,6 +26,12 @@ import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.ResolvableSerializer;
 
+/**
+ * This class is copied from swagger-core library.
+ *
+ * @since 4.6.0
+ */
+@Internal
 public class MediaTypeSerializer extends JsonSerializer<MediaType> implements ResolvableSerializer {
 
     private JsonSerializer<Object> defaultSerializer;

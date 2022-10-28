@@ -29,6 +29,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 
+import io.micronaut.core.annotation.Internal;
 import io.micronaut.core.util.StringUtils;
 import io.swagger.v3.oas.models.media.BinarySchema;
 import io.swagger.v3.oas.models.media.BooleanSchema;
@@ -47,7 +48,12 @@ import com.fasterxml.jackson.databind.type.TypeFactory;
 /**
  * The {@code PrimitiveType} enumeration defines a mapping of limited set
  * of classes into Swagger primitive types.
+ * <p>
+ * This class is copied from swagger-core library.
+ *
+ * @since 4.6.0
  */
+@Internal
 public enum PrimitiveType {
     STRING(String.class, "string") {
         @Override
@@ -431,7 +437,7 @@ public enum PrimitiveType {
 
     public static String getCommonName(Type type) {
         final PrimitiveType item = fromType(type);
-        return item == null ? null : item.getCommonName();
+        return item == null ? null : item.commonName;
     }
 
     public Class<?> getKeyClass() {
@@ -459,7 +465,7 @@ public enum PrimitiveType {
 
     /**
      * Convenience method to map LocalTime to string primitive with rfc3339 format partial-time.
-     * See https://xml2rfc.tools.ietf.org/public/rfc/html/rfc3339.html#anchor14
+     * See <a href="https://xml2rfc.tools.ietf.org/public/rfc/html/rfc3339.html#anchor14">link</a>
      *
      * @since 2.0.6
      */

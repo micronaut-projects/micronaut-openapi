@@ -34,3 +34,4 @@ dependencyResolutionManagement {
 micronautBuild {
     importMicronautCatalog()
 }
+

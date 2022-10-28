@@ -18,6 +18,7 @@ package io.micronaut.openapi.swagger;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import io.micronaut.core.annotation.Internal;
 import io.micronaut.openapi.swagger.jackson.MediaTypeSerializer;
 import io.micronaut.openapi.swagger.jackson.Schema31Serializer;
 import io.micronaut.openapi.swagger.jackson.SchemaSerializer;
@@ -87,6 +88,12 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator.Feature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
+/**
+ * This class is copied from swagger-core library.
+ *
+ * @since 4.6.0
+ */
+@Internal
 public class ObjectMapperFactory {
 
     public static ObjectMapper createJson() {

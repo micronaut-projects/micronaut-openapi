@@ -15,9 +15,17 @@
  */
 package io.micronaut.openapi.swagger.jackson.util;
 
+import io.micronaut.core.annotation.Internal;
+
+/**
+ * This class is copied from swagger-core library.
+ *
+ * @since 4.6.0
+ */
+@Internal
 public class Parameter31Deserializer extends ParameterDeserializer {
 
     public Parameter31Deserializer() {
-        this.openapi31 = true;
+        openapi31 = true;
     }
 }
