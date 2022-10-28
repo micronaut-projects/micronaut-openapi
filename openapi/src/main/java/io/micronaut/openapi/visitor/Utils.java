@@ -32,14 +32,11 @@ import io.micronaut.core.convert.DefaultConversionService;
 import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.core.value.PropertyResolver;
 import io.micronaut.http.MediaType;
-import io.micronaut.http.server.types.files.FileCustomizableResponseType;
 import io.micronaut.inject.ast.ClassElement;
 import io.micronaut.inject.visitor.VisitorContext;
 import io.micronaut.openapi.javadoc.JavadocParser;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
-
-import org.reactivestreams.Publisher;
 
 /**
  * Some util methods.
@@ -95,7 +92,7 @@ public final class Utils {
         return CollectionUtils.setOf(
             Optional.class.getName(),
             Future.class.getName(),
-            Publisher.class.getName(),
+            "org.reactivestreams.Publisher",
             "io.reactivex.Single",
             "io.reactivex.Observable",
             "io.reactivex.Maybe",
@@ -107,7 +104,8 @@ public final class Utils {
 
     public static boolean isReturnTypeFile(ClassElement type) {
         return CollectionUtils.setOf(
-            FileCustomizableResponseType.class.getName(),
+            // this class from micronaut-http-server
+            "io.micronaut.http.server.types.files.FileCustomizableResponseType",
             File.class.getName(),
             InputStream.class.getName(),
             ByteBuffer.class.getName()

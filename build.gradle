@@ -3,3 +3,9 @@ plugins {
     id "io.micronaut.build.internal.dependency-updates"
     id "io.micronaut.build.internal.quality-reporting"
 }
+
+allprojects {
+    configurations.all {
+        all*.exclude group: "io.spring.nohttp"
+    }
+}

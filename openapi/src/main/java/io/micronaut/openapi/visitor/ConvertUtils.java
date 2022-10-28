@@ -41,14 +41,10 @@ import javax.xml.datatype.XMLGregorianCalendar;
 
 import io.micronaut.core.annotation.AnnotationValue;
 import io.micronaut.core.beans.BeanMap;
+import io.micronaut.core.util.StringUtils;
 import io.micronaut.inject.visitor.VisitorContext;
-import io.swagger.v3.core.util.Json;
-import io.swagger.v3.core.util.ObjectMapperFactory;
-import io.swagger.v3.core.util.Yaml;
+import io.micronaut.openapi.swagger.ObjectMapperFactory;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
-
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -66,16 +62,20 @@ public final class ConvertUtils {
 
     private static final TypeReference<Map<String, Object>> MAP_TYPE_REFERENCE = new TypeReference<Map<String, Object>>() {
     };
-
     /**
      * The JSON mapper.
      */
-    private static ObjectMapper jsonMapper = Json.mapper()
+    private static final ObjectMapper JSON_MAPPER = ObjectMapperFactory.createJson()
+        .enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
+    /**
+     * The JSON 3.1 mapper.
+     */
+    private static final ObjectMapper JSON_MAPPER_31 = ObjectMapperFactory.createJson31()
         .enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
     /**
      * The JSON mapper for security scheme.
      */
-    private static ObjectMapper convertJsonMapper = ObjectMapperFactory.buildStrictGenericObjectMapper()
+    private static final ObjectMapper CONVERT_JSON_MAPPER = ObjectMapperFactory.buildStrictGenericObjectMapper()
         .enable(SerializationFeature.WRITE_ENUMS_USING_TO_STRING)
         .disable(SerializationFeature.FAIL_ON_EMPTY_BEANS, SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
         .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
@@ -83,7 +83,7 @@ public final class ConvertUtils {
     /**
      * The YAML mapper.
      */
-    private static ObjectMapper yamlMapper = Yaml.mapper();
+    private static final ObjectMapper YAML_MAPPER = ObjectMapperFactory.createYaml();
 
     private ConvertUtils() {
     }
@@ -101,7 +101,7 @@ public final class ConvertUtils {
      * @throws JsonProcessingException if error
      */
     public static <T> T treeToValue(JsonNode jn, Class<T> clazz, VisitorContext context) throws JsonProcessingException {
-        T value = convertJsonMapper.treeToValue(jn, clazz);
+        T value = CONVERT_JSON_MAPPER.treeToValue(jn, clazz);
 
         if (value == null) {
             return null;
@@ -148,7 +148,7 @@ public final class ConvertUtils {
             return null;
         }
         if (type == null || type.equals("object")) {
-            return convertJsonMapper.readValue(valueStr, Map.class);
+            return CONVERT_JSON_MAPPER.readValue(valueStr, Map.class);
         }
         return parseByTypeAndFormat(valueStr, type, format, context);
     }
@@ -157,7 +157,7 @@ public final class ConvertUtils {
         try {
             JsonNode extensionsNode = jn.get("extensions");
             if (extensionsNode != null) {
-                return Optional.ofNullable(convertJsonMapper.convertValue(extensionsNode, MAP_TYPE_REFERENCE));
+                return Optional.ofNullable(CONVERT_JSON_MAPPER.convertValue(extensionsNode, MAP_TYPE_REFERENCE));
             }
         } catch (IllegalArgumentException e) {
             // Ignore
@@ -304,14 +304,18 @@ public final class ConvertUtils {
     }
 
     public static ObjectMapper getJsonMapper() {
-        return jsonMapper;
+        return JSON_MAPPER;
+    }
+
+    public static ObjectMapper getJsonMapper31() {
+        return JSON_MAPPER_31;
     }
 
     public static ObjectMapper getConvertJsonMapper() {
-        return convertJsonMapper;
+        return CONVERT_JSON_MAPPER;
     }
 
     public static ObjectMapper getYamlMapper() {
-        return yamlMapper;
+        return YAML_MAPPER;
     }
 }
