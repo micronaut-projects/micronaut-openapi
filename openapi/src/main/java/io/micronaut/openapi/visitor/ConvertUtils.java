@@ -144,6 +144,10 @@ public final class ConvertUtils {
     }
 
     public static Object normalizeValue(String valueStr, String type, String format, VisitorContext context) throws JsonProcessingException {
+        return normalizeValue(valueStr, type, format, context, false);
+    }
+
+    public static Object normalizeValue(String valueStr, String type, String format, VisitorContext context, boolean isMicronautFormat) throws JsonProcessingException {
         if (valueStr == null) {
             return null;
         }
@@ -263,9 +267,19 @@ public final class ConvertUtils {
      * @return parsed value
      */
     public static Object parseByTypeAndFormat(String valueStr, String type, String format, VisitorContext context) {
-        if (StringUtils.isEmpty(valueStr)) {
+        if (valueStr == null) {
             return null;
         }
+
+        // @QueryValue(defaultValue = "")
+        if ("array".equals(type)) {
+            return valueStr.split(",");
+        }
+
+        if (valueStr.isEmpty()) {
+            return null;
+        }
+
         try {
             if ("string".equals(type)) {
                 if ("uri".equals(format)) {
@@ -279,6 +293,8 @@ public final class ConvertUtils {
                 }
             } else if ("boolean".equals(type)) {
                 return Boolean.parseBoolean(valueStr);
+            } else if ("array".equals(type)) {
+                return JSON_MAPPER.readValue(valueStr, List.class);
             } else if ("integer".equals(type)) {
                 if ("int32".equals(format)) {
                     return Integer.parseInt(valueStr);
