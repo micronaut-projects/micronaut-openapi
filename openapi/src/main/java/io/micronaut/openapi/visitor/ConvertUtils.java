@@ -41,7 +41,6 @@ import javax.xml.datatype.XMLGregorianCalendar;
 
 import io.micronaut.core.annotation.AnnotationValue;
 import io.micronaut.core.beans.BeanMap;
-import io.micronaut.core.util.StringUtils;
 import io.micronaut.inject.visitor.VisitorContext;
 import io.micronaut.openapi.swagger.ObjectMapperFactory;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
@@ -154,7 +153,7 @@ public final class ConvertUtils {
         if (type == null || type.equals("object")) {
             return CONVERT_JSON_MAPPER.readValue(valueStr, Map.class);
         }
-        return parseByTypeAndFormat(valueStr, type, format, context);
+        return parseByTypeAndFormat(valueStr, type, format, context, isMicronautFormat);
     }
 
     public static Optional<Map<String, Object>> resolveExtensions(JsonNode jn) {
@@ -263,16 +262,17 @@ public final class ConvertUtils {
      * @param type openapi type
      * @param format openapi value
      * @param context visitor context
+     * @param isMicronautFormat is it micronaut format for arrays
      *
      * @return parsed value
      */
-    public static Object parseByTypeAndFormat(String valueStr, String type, String format, VisitorContext context) {
+    public static Object parseByTypeAndFormat(String valueStr, String type, String format, VisitorContext context, boolean isMicronautFormat) {
         if (valueStr == null) {
             return null;
         }
 
         // @QueryValue(defaultValue = "")
-        if ("array".equals(type)) {
+        if ("array".equals(type) && isMicronautFormat) {
             return valueStr.split(",");
         }
 
