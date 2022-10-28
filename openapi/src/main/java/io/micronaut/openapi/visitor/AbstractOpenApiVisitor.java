@@ -1136,7 +1136,7 @@ abstract class AbstractOpenApiVisitor {
         final String defaultValue = element.getValue(Bindable.class, "defaultValue", String.class).orElse(null);
         if (defaultValue != null && schemaToBind.getDefault() == null) {
             try {
-                topLevelSchema.setDefault(ConvertUtils.normalizeValue(defaultValue, schemaToBind.getType(), schemaToBind.getFormat(), context));
+                topLevelSchema.setDefault(ConvertUtils.normalizeValue(defaultValue, schemaToBind.getType(), schemaToBind.getFormat(), context, true));
             } catch (JsonProcessingException e) {
                 context.warn("Can't convert " + defaultValue + " to " + schemaToBind.getType() + ": " + e.getMessage(), element);
                 topLevelSchema.setDefault(defaultValue);
