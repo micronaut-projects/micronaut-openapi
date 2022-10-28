@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
+import io.micronaut.inject.visitor.VisitorContext;
 import io.micronaut.openapi.view.OpenApiViewConfig.RendererType;
 
 /**
@@ -144,9 +145,9 @@ final class RedocConfig extends AbstractViewConfig implements Renderer {
     }
 
     @Override
-    public String render(String template) {
-        template = rapiPDFConfig.render(template, RendererType.REDOC);
-        template = OpenApiViewConfig.replacePlaceHolder(template, "redoc.js.url", jsUrl, "");
+    public String render(String template, VisitorContext context) {
+        template = rapiPDFConfig.render(template, RendererType.REDOC, context);
+        template = OpenApiViewConfig.replacePlaceHolder(template, "redoc.js.url", getFinalUrl(context), "");
         return OpenApiViewConfig.replacePlaceHolder(template, "redoc.attributes", toHtmlAttributes(), "");
     }
 

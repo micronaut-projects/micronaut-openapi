@@ -22,6 +22,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.function.Function;
 
+import io.micronaut.inject.visitor.VisitorContext;
 import io.micronaut.openapi.view.OpenApiViewConfig.RendererType;
 
 /**
@@ -115,10 +116,11 @@ final class RapiPDFConfig extends AbstractViewConfig {
      *
      * @param template A template.
      * @param rendererType The renderer type.
+     * @param context Visitor context.
      *
      * @return The template with placeholders replaced.
      */
-    String render(String template, RendererType rendererType) {
+    String render(String template, RendererType rendererType, VisitorContext context) {
         if (enabled) {
             String style = (String) options.get("style");
             boolean styleUpdated = false;
@@ -133,7 +135,7 @@ final class RapiPDFConfig extends AbstractViewConfig {
                     options.put("style", DEFAULT_RAPIDOC_STYLE);
                 }
             }
-            String script = OpenApiViewConfig.replacePlaceHolder(LINK, "rapipdf.js.url", jsUrl, "");
+            String script = OpenApiViewConfig.replacePlaceHolder(LINK, "rapipdf.js.url", getFinalUrl(context), "");
             String rapipdfTag = OpenApiViewConfig.replacePlaceHolder(TAG, "rapipdf.attributes", toHtmlAttributes(), "");
             if (styleUpdated) {
                 options.remove("style");

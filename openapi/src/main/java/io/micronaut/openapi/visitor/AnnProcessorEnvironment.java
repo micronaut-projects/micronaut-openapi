@@ -67,7 +67,7 @@ public class AnnProcessorEnvironment extends DefaultEnvironment {
 
         annotationProcessingConfigLocations = new ArrayList<>();
 
-        boolean isEnabled = context.get(MICRONAUT_ENVIRONMENT_ENABLED, Boolean.class).orElse(false);
+        boolean isEnabled = context != null ? context.get(MICRONAUT_ENVIRONMENT_ENABLED, Boolean.class).orElse(false) : false;
         if (isEnabled) {
             Path projectPath = context.getProjectDir().orElse(Utils.isTestMode() ? Paths.get(System.getProperty("user.dir")) : null);
             if (projectPath != null) {

@@ -1,6 +1,5 @@
 package io.micronaut.openapi.view
 
-
 import spock.lang.Specification
 
 import java.nio.charset.StandardCharsets
@@ -31,7 +30,7 @@ class OpenApiOperationViewRenderSpec extends Specification {
         cfg.swaggerUIConfig != null
         cfg.title == "OpenAPI documentation"
         cfg.specFile == "swagger.yml"
-        cfg.specURL == "/swagger/swagger.yml"
+        cfg.getSpecURL() == "/swagger/swagger.yml"
         Files.exists(outputDir.resolve("redoc").resolve("index.html"))
         !Files.exists(outputDir.resolve("redoc").resolve("res").resolve("redoc.standalone.js"))
         Files.exists(outputDir.resolve("redoc").resolve("res").resolve("rapipdf-min.js"))
@@ -72,7 +71,7 @@ class OpenApiOperationViewRenderSpec extends Specification {
         cfg.swaggerUIConfig != null
         cfg.title == "OpenAPI documentation"
         cfg.specFile == "swagger.yml"
-        cfg.specURL == "/context-path/swagger/swagger.yml"
+        cfg.getSpecURL() == "/context-path/swagger/swagger.yml"
         Files.exists(outputDir.resolve("redoc").resolve("index.html"))
         Files.exists(outputDir.resolve("rapidoc").resolve("index.html"))
         Files.exists(outputDir.resolve("swagger-ui").resolve("index.html"))
@@ -98,7 +97,7 @@ class OpenApiOperationViewRenderSpec extends Specification {
         cfg.swaggerUIConfig != null
         cfg.title == "OpenAPI documentation"
         cfg.specFile == "swagger.yml"
-        cfg.specURL == "/somewhere/swagger.yml"
+        cfg.getSpecURL() == "/somewhere/swagger.yml"
         Files.exists(outputDir.resolve("redoc").resolve("index.html"))
         Files.exists(outputDir.resolve("rapidoc").resolve("index.html"))
         Files.exists(outputDir.resolve("swagger-ui").resolve("index.html"))
@@ -125,7 +124,7 @@ class OpenApiOperationViewRenderSpec extends Specification {
         cfg.swaggerUIConfig != null
         cfg.title == "OpenAPI documentation"
         cfg.specFile == "swagger.yml"
-        cfg.specURL == "/context-path/somewhere/swagger.yml"
+        cfg.getSpecURL() == "/context-path/somewhere/swagger.yml"
         Files.exists(outputDir.resolve("redoc").resolve("index.html"))
         Files.exists(outputDir.resolve("rapidoc").resolve("index.html"))
         Files.exists(outputDir.resolve("swagger-ui").resolve("index.html"))
