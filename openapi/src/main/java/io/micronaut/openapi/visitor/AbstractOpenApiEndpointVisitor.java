@@ -1341,6 +1341,36 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                     ApiResponse newApiResponse = newResponse.get();
                     if (response.booleanValue("useReturnTypeSchema").orElse(false) && element != null) {
                         addResponseContent(element, context, Utils.resolveOpenAPI(context), newApiResponse);
+                    } else {
+
+                        List<MediaType> producesMediaTypes = producesMediaTypes(element);
+
+                        io.swagger.v3.oas.annotations.media.Content[] contentAnns = response.get("content", io.swagger.v3.oas.annotations.media.Content[].class).orElse(null);
+                        List<String> mediaTypes = new ArrayList<>();
+                        if (ArrayUtils.isNotEmpty(contentAnns)) {
+                            for (io.swagger.v3.oas.annotations.media.Content contentAnn : contentAnns) {
+                                if (StringUtils.isNotEmpty(contentAnn.mediaType())) {
+                                    mediaTypes.add(contentAnn.mediaType());
+                                } else {
+                                    mediaTypes.add(MediaType.APPLICATION_JSON);
+                                }
+                            }
+                        }
+                        Content newContent = newApiResponse.getContent();
+                        if (newContent != null) {
+                            io.swagger.v3.oas.models.media.MediaType defaultMediaType = newContent.get(MediaType.APPLICATION_JSON);
+                            Content contentFromProduces = new Content();
+                            for (String mt : mediaTypes) {
+                                if (mt.equals(MediaType.APPLICATION_JSON)) {
+                                    for (MediaType mediaType : producesMediaTypes) {
+                                        contentFromProduces.put(mediaType.toString(), defaultMediaType);
+                                    }
+                                } else {
+                                    contentFromProduces.put(mt, newContent.get(mt));
+                                }
+                            }
+                            newApiResponse.setContent(contentFromProduces);
+                        }
                     }
                     apiResponses.put(response.get("responseCode", String.class).orElse("default"), newApiResponse);
                 }
