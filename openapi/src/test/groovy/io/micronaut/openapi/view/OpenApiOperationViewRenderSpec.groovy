@@ -15,7 +15,7 @@ class OpenApiOperationViewRenderSpec extends Specification {
 
     void "test render OpenApiView specification"() {
         given:
-        String spec = "redoc.enabled=true,rapidoc.enabled=true,swagger-ui.enabled=true,rapipdf.enabled=true,swagger-ui.theme=flattop,redoc.js.url=https://cdn.redoc.ly/redoc/latest/bundles/redoc.standalone.js"
+        String spec = "redoc.enabled=true,rapidoc.enabled=true,swagger-ui.enabled=true,rapipdf.enabled=true,swagger-ui.theme=flattop"
         OpenApiViewConfig cfg = OpenApiViewConfig.fromSpecification(spec, new Properties())
         Path outputDir = Paths.get("output")
         cfg.title = "OpenAPI documentation"
@@ -32,7 +32,7 @@ class OpenApiOperationViewRenderSpec extends Specification {
         cfg.specFile == "swagger.yml"
         cfg.getSpecURL() == "/swagger/swagger.yml"
         Files.exists(outputDir.resolve("redoc").resolve("index.html"))
-        !Files.exists(outputDir.resolve("redoc").resolve("res").resolve("redoc.standalone.js"))
+        Files.exists(outputDir.resolve("redoc").resolve("res").resolve("redoc.standalone.js"))
         Files.exists(outputDir.resolve("redoc").resolve("res").resolve("rapipdf-min.js"))
         Files.exists(outputDir.resolve("rapidoc").resolve("index.html"))
         Files.exists(outputDir.resolve("rapidoc").resolve("res").resolve("rapidoc-min.js"))
@@ -46,11 +46,78 @@ class OpenApiOperationViewRenderSpec extends Specification {
         Files.exists(outputDir.resolve("swagger-ui").resolve("res").resolve("rapipdf-min.js"))
         Files.exists(outputDir.resolve("swagger-ui").resolve("res").resolve("flattop.css"))
 
-        outputDir.resolve("redoc").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains("https://cdn.redoc.ly/redoc/latest/bundles/redoc.standalone.js")
-
+        outputDir.resolve("redoc").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains("redoc/res/redoc.standalone.js")
         outputDir.resolve("redoc").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains(cfg.getSpecURL())
+        outputDir.resolve("redoc").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains("redoc/res/rapipdf-min.js")
+        outputDir.resolve("rapidoc").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains("rapidoc/res/rapidoc-min.js")
         outputDir.resolve("rapidoc").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains(cfg.getSpecURL())
+        outputDir.resolve("rapidoc").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains("rapidoc/res/rapipdf-min.js")
+        outputDir.resolve("swagger-ui").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains("swagger-ui/res/swagger-ui-bundle.js")
+        outputDir.resolve("swagger-ui").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains("swagger-ui/res/swagger-ui-standalone-preset.js")
+        outputDir.resolve("swagger-ui").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains("swagger-ui/res/swagger-ui.css")
+        outputDir.resolve("swagger-ui").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains("swagger-ui/res/favicon-32x32.png")
+        outputDir.resolve("swagger-ui").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains("swagger-ui/res/favicon-16x16.png")
         outputDir.resolve("swagger-ui").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains(cfg.getSpecURL())
+        outputDir.resolve("swagger-ui").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains("swagger-ui/res/rapipdf-min.js")
+    }
+
+    void "test render OpenApiView specification with custom redoc js url"() {
+        given:
+        String spec = "redoc.enabled=true,rapipdf.enabled=true,redoc.js.url=https://cdn.redoc.ly/redoc/latest/bundles/"
+        OpenApiViewConfig cfg = OpenApiViewConfig.fromSpecification(spec, new Properties())
+        Path outputDir = Paths.get("output")
+        cfg.title = "OpenAPI documentation"
+        cfg.specFile = "swagger.yml"
+        cfg.render(outputDir, null)
+
+        expect:
+        cfg.enabled
+        cfg.mappingPath == "swagger"
+        cfg.rapidocConfig == null
+        cfg.redocConfig != null
+        cfg.swaggerUIConfig == null
+        cfg.title == "OpenAPI documentation"
+        cfg.specFile == "swagger.yml"
+        cfg.getSpecURL() == "/swagger/swagger.yml"
+        Files.exists(outputDir.resolve("redoc").resolve("index.html"))
+        !Files.exists(outputDir.resolve("redoc").resolve("res").resolve("redoc.standalone.js"))
+        Files.exists(outputDir.resolve("redoc").resolve("res").resolve("rapipdf-min.js"))
+
+        outputDir.resolve("redoc").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains("<script src='https://cdn.redoc.ly/redoc/latest/bundles/redoc.standalone.js'></script>")
+        outputDir.resolve("redoc").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains(cfg.getSpecURL())
+    }
+
+    void "test render OpenApiView specification with custom swagger js and css urls"() {
+        given:
+        String spec = "swagger-ui.enabled=true,rapipdf.enabled=true,swagger-ui.theme=flattop,swagger-ui.js.url=https://unpkg.com/swagger-ui-dist/"
+        OpenApiViewConfig cfg = OpenApiViewConfig.fromSpecification(spec, new Properties())
+        Path outputDir = Paths.get("output")
+        cfg.title = "OpenAPI documentation"
+        cfg.specFile = "swagger.yml"
+        cfg.render(outputDir, null)
+
+        expect:
+        cfg.enabled
+        cfg.mappingPath == "swagger"
+        cfg.rapidocConfig == null
+        cfg.redocConfig == null
+        cfg.swaggerUIConfig != null
+        cfg.title == "OpenAPI documentation"
+        cfg.specFile == "swagger.yml"
+        cfg.getSpecURL() == "/swagger/swagger.yml"
+        Files.exists(outputDir.resolve("swagger-ui").resolve("index.html"))
+        !Files.exists(outputDir.resolve("swagger-ui").resolve("res").resolve("swagger-ui.css"))
+        !Files.exists(outputDir.resolve("swagger-ui").resolve("res").resolve("favicon-16x16.png"))
+        !Files.exists(outputDir.resolve("swagger-ui").resolve("res").resolve("favicon-32x32.png"))
+        !Files.exists(outputDir.resolve("swagger-ui").resolve("res").resolve("swagger-ui-bundle.js"))
+        !Files.exists(outputDir.resolve("swagger-ui").resolve("res").resolve("swagger-ui-standalone-preset.js"))
+        Files.exists(outputDir.resolve("swagger-ui").resolve("res").resolve("flattop.css"))
+        Files.exists(outputDir.resolve("swagger-ui").resolve("res").resolve("rapipdf-min.js"))
+
+        outputDir.resolve("swagger-ui").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains(cfg.getSpecURL())
+        outputDir.resolve("swagger-ui").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains("<script src='https://unpkg.com/swagger-ui-dist/swagger-ui-standalone-preset.js'></script>")
+        outputDir.resolve("swagger-ui").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains("<script src='https://unpkg.com/swagger-ui-dist/swagger-ui-bundle.js'></script>")
+        outputDir.resolve("swagger-ui").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains("<link rel='stylesheet' type='text/css' href='https://unpkg.com/swagger-ui-dist/swagger-ui.css' />")
     }
 
     void "test render OpenApiView specification with server context path"() {
