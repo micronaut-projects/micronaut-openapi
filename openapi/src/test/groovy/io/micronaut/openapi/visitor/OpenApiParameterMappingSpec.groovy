@@ -20,6 +20,7 @@ import java.util.List;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
 import io.micronaut.http.annotation.QueryValue;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 @Controller
 class NetworkOperations {
@@ -31,6 +32,11 @@ class NetworkOperations {
 
     @Get("/sec")
     String method2(@QueryValue(value = "test", defaultValue = "a1,a2,a3") List<String> items) {
+        return "";
+    }
+
+    @Get("/third")
+    String method3(@Schema(defaultValue = "[]") @QueryValue("test") List<String> items) {
         return "";
     }
 }
@@ -45,6 +51,7 @@ class MyBean {}
         OpenAPI openAPI = Utils.testReference
         PathItem pathItem = openAPI.paths.get("/")
         PathItem pathItemSec = openAPI.paths.get("/sec")
+        PathItem pathItemThird = openAPI.paths.get("/third")
 
         then: "it is included in the OpenAPI doc"
         pathItem.get.parameters.size() == 1
@@ -62,6 +69,13 @@ class MyBean {}
         pathItemSec.get.parameters[0].schema.default[0] == 'a1'
         pathItemSec.get.parameters[0].schema.default[1] == 'a2'
         pathItemSec.get.parameters[0].schema.default[2] == 'a3'
+
+        pathItemThird.get.parameters.size() == 1
+        pathItemThird.get.parameters[0].name == 'test'
+        pathItemThird.get.parameters[0].schema
+        pathItemThird.get.parameters[0].schema.type == 'array'
+        pathItemThird.get.parameters[0].schema.default != null
+        pathItemThird.get.parameters[0].schema.default.size() == 0
     }
 
     void "test that @Parameter propagates correctly"() {
