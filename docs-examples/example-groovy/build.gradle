@@ -10,7 +10,7 @@ dependencies {
     testCompileOnly(mn.micronaut.inject.groovy)
 
     testImplementation(platform(mn.micronaut.bom))
-    testImplementation project(":openapi")
+    testImplementation projects.openapi
     testImplementation(mn.snakeyaml)
     testImplementation(mn.micronaut.runtime)
     testImplementation(mn.micronaut.runtime.groovy)

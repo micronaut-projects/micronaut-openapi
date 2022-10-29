@@ -10,7 +10,7 @@ repositories {
 
 dependencies {
     kapt(platform(mn.micronaut.bom))
-    kapt project(":openapi")
+    kapt projects.openapi
     kapt(mn.micronaut.inject.java)
     kapt(mn.micronaut.validation)
 
