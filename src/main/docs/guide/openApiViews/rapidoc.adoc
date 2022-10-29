@@ -4,46 +4,46 @@ The views will be generated to the `META-INF/swagger/views/rapidoc` directory of
 
 |===
 | `rapidoc.enabled` | `true` or `false` When 'true' the RapiDoc view is generated.
-| `rapidoc.version` |  The version of RapiDoc to use. Default is to use the latest available.
-| `rapidoc.style` | 
-| `rapidoc.sort-tags` | 
-| `rapidoc.sort-endpoints-by` | 
-| `rapidoc.heading-text` | 
-| `rapidoc.goto-path` | 
-| `rapidoc.theme` | 
-| `rapidoc.bg-color` | 
-| `rapidoc.text-color` | 
-| `rapidoc.header-color` | 
-| `rapidoc.regular-font`| 
-| `rapidoc.mono-font`| 
-| `rapidoc.font-size`| 
-| `rapidoc.nav-bg-color`| 
-| `rapidoc.nav-text-color`| 
-| `rapidoc.nav-hover-bg-color`| 
-| `rapidoc.nav-hover-text-color`| 
-| `rapidoc.nav-accent-color`| 
-| `rapidoc.nav-item-spacing`| 
-| `rapidoc.layout`| 
-| `rapidoc.render-style`| 
-| `rapidoc.schema-style`| 
-| `rapidoc.schema-expand-level`| 
-| `rapidoc.schema-description-expanded`| 
-| `rapidoc.default-schema-tab`| 
-| `rapidoc.response-area-height`| 
-| `rapidoc.show-info`| 
-| `rapidoc.info-description-headings-in-navbar`| 
-| `rapidoc.show-components`| 
-| `rapidoc.show-header`| 
-| `rapidoc.allow-authentication`| 
-| `rapidoc.allow-spec-url-load`| 
-| `rapidoc.allow-spec-file-load`| 
-| `rapidoc.allow-search`| 
-| `rapidoc.allow-try`| 
-| `rapidoc.allow-server-selection`| 
-| `rapidoc.api-key-name`| 
-| `rapidoc.api-key-value`| 
-| `rapidoc.api-key-location`| 
-| `rapidoc.server-url`| 
+| `rapidoc.js.url` | Override path to use to find the js file. Path must contain a file named rapidoc-min.js. The value can be a URL path like: "https://unpkg.com/rapidoc/dist/". Must contain trailing slash.,
+| `rapidoc.style` |
+| `rapidoc.sort-tags` |
+| `rapidoc.sort-endpoints-by` |
+| `rapidoc.heading-text` |
+| `rapidoc.goto-path` |
+| `rapidoc.theme` |
+| `rapidoc.bg-color` |
+| `rapidoc.text-color` |
+| `rapidoc.header-color` |
+| `rapidoc.regular-font`|
+| `rapidoc.mono-font`|
+| `rapidoc.font-size`|
+| `rapidoc.nav-bg-color`|
+| `rapidoc.nav-text-color`|
+| `rapidoc.nav-hover-bg-color`|
+| `rapidoc.nav-hover-text-color`|
+| `rapidoc.nav-accent-color`|
+| `rapidoc.nav-item-spacing`|
+| `rapidoc.layout`|
+| `rapidoc.render-style`|
+| `rapidoc.schema-style`|
+| `rapidoc.schema-expand-level`|
+| `rapidoc.schema-description-expanded`|
+| `rapidoc.default-schema-tab`|
+| `rapidoc.response-area-height`|
+| `rapidoc.show-info`|
+| `rapidoc.info-description-headings-in-navbar`|
+| `rapidoc.show-components`|
+| `rapidoc.show-header`|
+| `rapidoc.allow-authentication`|
+| `rapidoc.allow-spec-url-load`|
+| `rapidoc.allow-spec-file-load`|
+| `rapidoc.allow-search`|
+| `rapidoc.allow-try`|
+| `rapidoc.allow-server-selection`|
+| `rapidoc.api-key-name`|
+| `rapidoc.api-key-value`|
+| `rapidoc.api-key-location`|
+| `rapidoc.server-url`|
 | `rapidoc.default-api-server`|
 |===
 
