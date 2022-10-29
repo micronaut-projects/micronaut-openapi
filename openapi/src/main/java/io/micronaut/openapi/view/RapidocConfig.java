@@ -398,7 +398,7 @@ final class RapidocConfig extends AbstractViewConfig implements Renderer {
     @Override
     public String render(String template, VisitorContext context) {
         template = rapiPDFConfig.render(template, RendererType.RAPIDOC, context);
-        template = OpenApiViewConfig.replacePlaceHolder(template, "rapidoc.js.url", OpenApiViewConfig.TEMPLATES_RAPIDOC + OpenApiViewConfig.SLASH + getFinalUrl(context), "");
+        template = OpenApiViewConfig.replacePlaceHolder(template, "rapidoc.js.url.prefix", isDefaultJsUrl ? getFinalUrlPrefix(RendererType.RAPIDOC, context) : jsUrl, "");
         return OpenApiViewConfig.replacePlaceHolder(template, "rapidoc.attributes", toHtmlAttributes(), "");
     }
 

@@ -147,7 +147,7 @@ final class RedocConfig extends AbstractViewConfig implements Renderer {
     @Override
     public String render(String template, VisitorContext context) {
         template = rapiPDFConfig.render(template, RendererType.REDOC, context);
-        template = OpenApiViewConfig.replacePlaceHolder(template, "redoc.js.url", OpenApiViewConfig.TEMPLATES_REDOC + OpenApiViewConfig.SLASH + getFinalUrl(context), "");
+        template = OpenApiViewConfig.replacePlaceHolder(template, "redoc.js.url.prefix", isDefaultJsUrl ? getFinalUrlPrefix(RendererType.REDOC, context) : jsUrl, "");
         return OpenApiViewConfig.replacePlaceHolder(template, "redoc.attributes", toHtmlAttributes(), "");
     }
 
