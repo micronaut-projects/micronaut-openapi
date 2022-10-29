@@ -172,7 +172,7 @@ public final class OpenApiViewConfig {
             render(rapidocConfig, rapidocDir, TEMPLATES + SLASH + TEMPLATES_RAPIDOC + SLASH + TEMPLATE_INDEX_HTML, visitorContext);
             copyResources(rapidocConfig, rapidocDir, TEMPLATES_RAPIDOC, rapidocConfig.getResources(), visitorContext);
             if (rapidocConfig.rapiPDFConfig.enabled) {
-                copyResources(rapidocConfig.rapiPDFConfig, rapidocDir, TEMPLATES_RAPIPDF, redocConfig.rapiPDFConfig.getResources(), visitorContext);
+                copyResources(rapidocConfig.rapiPDFConfig, rapidocDir, TEMPLATES_RAPIPDF, rapidocConfig.rapiPDFConfig.getResources(), visitorContext);
             }
         }
         if (swaggerUIConfig != null) {
@@ -183,7 +183,7 @@ public final class OpenApiViewConfig {
             }
             copyResources(swaggerUIConfig, swaggerUiDir, TEMPLATES_SWAGGER_UI, swaggerUIConfig.getResources(), visitorContext);
             if (swaggerUIConfig.rapiPDFConfig.enabled) {
-                copyResources(swaggerUIConfig.rapiPDFConfig, swaggerUiDir, TEMPLATES_RAPIPDF, redocConfig.rapiPDFConfig.getResources(), visitorContext);
+                copyResources(swaggerUIConfig.rapiPDFConfig, swaggerUiDir, TEMPLATES_RAPIPDF, swaggerUIConfig.rapiPDFConfig.getResources(), visitorContext);
             }
             copySwaggerUiTheme(swaggerUIConfig.theme.getCss() + ".css", swaggerUiDir, TEMPLATES_SWAGGER_UI, visitorContext);
         }
