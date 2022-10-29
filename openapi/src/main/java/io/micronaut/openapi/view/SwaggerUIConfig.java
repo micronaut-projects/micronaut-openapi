@@ -239,13 +239,13 @@ final class SwaggerUIConfig extends AbstractViewConfig implements Renderer {
     @Override
     public String render(String template, VisitorContext context) {
 
-        String finalUrl = getFinalUrl(context);
+        String finalUrlPrefix = getFinalUrlPrefix(RendererType.SWAGGER_UI, context);
 
         template = rapiPDFConfig.render(template, RendererType.SWAGGER_UI, context);
-        template = OpenApiViewConfig.replacePlaceHolder(template, PREFIX_SWAGGER_UI + ".js.url", OpenApiViewConfig.TEMPLATES_SWAGGER_UI + OpenApiViewConfig.SLASH + finalUrl, "");
+        template = OpenApiViewConfig.replacePlaceHolder(template, PREFIX_SWAGGER_UI + ".js.url.prefix", isDefaultJsUrl ? finalUrlPrefix : jsUrl, "");
         template = OpenApiViewConfig.replacePlaceHolder(template, PREFIX_SWAGGER_UI + ".attributes", toOptions(), "");
         template = template.replace("{{" + PREFIX_SWAGGER_UI + ".theme}}", theme == null || Theme.CLASSIC == theme ? "" :
-            "<link rel='stylesheet' type='text/css' href='" + finalUrl + theme.getCss() + ".css' />");
+            "<link rel='stylesheet' type='text/css' href='" + finalUrlPrefix + theme.getCss() + ".css' />");
         template = template.replace("{{" + PREFIX_SWAGGER_UI + DOT + OPTION_OAUTH2 + "}}", hasOauth2Option(options) ? toOauth2Options() : "");
         return template;
     }
