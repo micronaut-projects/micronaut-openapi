@@ -420,7 +420,7 @@ abstract class AbstractOpenApiVisitor {
                                 Map<String, Map<CharSequence, Object>> responses = new LinkedHashMap<>();
                                 for (Object o : a) {
                                     AnnotationValue<ApiResponse> sv = (AnnotationValue<ApiResponse>) o;
-                                    String name = sv.get("responseCode", String.class).orElse("default");
+                                    String name = sv.stringValue("responseCode").orElse("default");
                                     Map<CharSequence, Object> map = toValueMap(sv.getValues(), context);
                                     if (map.containsKey("ref")) {
                                         Object ref = map.get("ref");
@@ -434,7 +434,7 @@ abstract class AbstractOpenApiVisitor {
                                 Map<String, Map<CharSequence, Object>> examples = new LinkedHashMap<>();
                                 for (Object o : a) {
                                     AnnotationValue<ExampleObject> sv = (AnnotationValue<ExampleObject>) o;
-                                    String name = sv.get("name", String.class).orElse("example");
+                                    String name = sv.stringValue("name").orElse("example");
                                     Map<CharSequence, Object> map = toValueMap(sv.getValues(), context);
                                     if (map.containsKey("ref")) {
                                         Object ref = map.get("ref");
@@ -456,7 +456,7 @@ abstract class AbstractOpenApiVisitor {
                                 Map<String, Map<CharSequence, Object>> variables = new LinkedHashMap<>();
                                 for (Object o : a) {
                                     AnnotationValue<ServerVariable> sv = (AnnotationValue<ServerVariable>) o;
-                                    Optional<String> n = sv.get("name", String.class);
+                                    Optional<String> n = sv.stringValue("name");
                                     n.ifPresent(name -> {
                                         Map<CharSequence, Object> map = toValueMap(sv.getValues(), context);
                                         Object dv = map.get("defaultValue");
@@ -653,9 +653,9 @@ abstract class AbstractOpenApiVisitor {
         );
         // items
         av.get("schema", AnnotationValue.class).ifPresent(annotationValue -> {
-            Optional<String> impl = annotationValue.get("implementation", String.class);
-            Optional<String> type = annotationValue.get("type", String.class);
-            Optional<String> format = annotationValue.get("format", String.class);
+            Optional<String> impl = annotationValue.stringValue("implementation");
+            Optional<String> type = annotationValue.stringValue("type");
+            Optional<String> format = annotationValue.stringValue("format");
             Optional<ClassElement> classElement = Optional.empty();
             PrimitiveType primitiveType = null;
             if (impl.isPresent()) {
@@ -676,7 +676,7 @@ abstract class AbstractOpenApiVisitor {
                 } else {
                     // For primitive type, just copy description field is present.
                     final Schema items = primitiveType.createProperty();
-                    items.setDescription((String) annotationValue.get("description", String.class).orElse(null));
+                    items.setDescription((String) annotationValue.stringValue("description").orElse(null));
                     final ArraySchema schema = SchemaUtils.arraySchema(items);
                     schemaToValueMap(arraySchemaMap, schema);
                 }
@@ -706,8 +706,8 @@ abstract class AbstractOpenApiVisitor {
         Map<String, String> params = new LinkedHashMap<>();
         for (Object o : a) {
             AnnotationValue<?> sv = (AnnotationValue<?>) o;
-            final Optional<String> n = sv.get(entryKey, String.class);
-            final Optional<String> expr = sv.get(entryValue, String.class);
+            final Optional<String> n = sv.stringValue(entryKey);
+            final Optional<String> expr = sv.stringValue(entryValue);
             if (n.isPresent() && expr.isPresent()) {
                 params.put(n.get(), expr.get());
             }
@@ -989,10 +989,10 @@ abstract class AbstractOpenApiVisitor {
             Schema propertySchemaFinal = propertySchema;
             addProperty(parentSchema, propertyName, propertySchema, required);
             if (schemaAnnotationValue != null) {
-                schemaAnnotationValue.get("defaultValue", String.class)
+                schemaAnnotationValue.stringValue("defaultValue")
                     .ifPresent(value -> {
-                        String elType = schemaAnnotationValue.get("type", String.class).orElse(null);
-                        String elFormat = schemaAnnotationValue.get("format", String.class).orElse(null);
+                        String elType = schemaAnnotationValue.stringValue("type").orElse(null);
+                        String elFormat = schemaAnnotationValue.stringValue("format").orElse(null);
                         if (elType == null && elementType != null) {
                             Pair<String, String> typeAndFormat = ConvertUtils.getTypeAndFormatByClass(elementType.getName());
                             elType = typeAndFormat.getFirst();
@@ -1101,7 +1101,7 @@ abstract class AbstractOpenApiVisitor {
             // Apply @Schema annotation only if not $ref since for $ref schemas
             // we already populated values from right @Schema annotation in previous steps
             schemaToBind = bindSchemaAnnotationValue(context, element, schemaToBind, schemaAnn);
-            Optional<String> schemaName = schemaAnn.get("name", String.class);
+            Optional<String> schemaName = schemaAnn.stringValue("name");
             if (schemaName.isPresent()) {
                 schemaToBind.setName(schemaName.get());
             }
@@ -1113,7 +1113,7 @@ abstract class AbstractOpenApiVisitor {
         AnnotationValue<io.swagger.v3.oas.annotations.media.ArraySchema> arraySchemaAnn = element.getAnnotation(io.swagger.v3.oas.annotations.media.ArraySchema.class);
         if (arraySchemaAnn != null) {
             schemaToBind = bindArraySchemaAnnotationValue(context, element, schemaToBind, arraySchemaAnn);
-            Optional<String> schemaName = arraySchemaAnn.get("name", String.class);
+            Optional<String> schemaName = arraySchemaAnn.stringValue("name");
             if (schemaName.isPresent()) {
                 schemaToBind.setName(schemaName.get());
             }
@@ -1331,7 +1331,7 @@ abstract class AbstractOpenApiVisitor {
                 .ifPresent(listAnn -> {
                     schemaToBind.setFormat(PrimitiveType.EMAIL.getCommonName());
                     for (AnnotationValue ann : (Set<AnnotationValue>) listAnn.getValues().get("value")) {
-                        ((Optional<String>) ann.get("regexp", String.class))
+                        ((Optional<String>) ann.stringValue("regexp"))
                             .ifPresent(schemaToBind::setPattern);
                     }
                 });
@@ -1339,7 +1339,7 @@ abstract class AbstractOpenApiVisitor {
                 .ifPresent(listAnn -> {
                     schemaToBind.setFormat(PrimitiveType.EMAIL.getCommonName());
                     for (AnnotationValue ann : (Set<AnnotationValue>) listAnn.getValues().get("value")) {
-                        ((Optional<String>) ann.get("regexp", String.class))
+                        ((Optional<String>) ann.stringValue("regexp"))
                             .ifPresent(schemaToBind::setPattern);
                     }
                 });
@@ -1347,14 +1347,14 @@ abstract class AbstractOpenApiVisitor {
             element.findAnnotation("javax.validation.constraints.Pattern$List")
                 .ifPresent(listAnn -> {
                     for (AnnotationValue ann : (Set<AnnotationValue>) listAnn.getValues().get("value")) {
-                        ((Optional<String>) ann.get("regexp", String.class))
+                        ((Optional<String>) ann.stringValue("regexp"))
                             .ifPresent(schemaToBind::setPattern);
                     }
                 });
             element.findAnnotation("jakarta.validation.constraints.Pattern$List")
                 .ifPresent(listAnn -> {
                     for (AnnotationValue ann : (Set<AnnotationValue>) listAnn.getValues().get("value")) {
-                        ((Optional<String>) ann.get("regexp", String.class))
+                        ((Optional<String>) ann.stringValue("regexp"))
                             .ifPresent(schemaToBind::setPattern);
                     }
                 });
@@ -1551,9 +1551,9 @@ abstract class AbstractOpenApiVisitor {
     protected Schema bindSchemaAnnotationValue(VisitorContext context, Element element, Schema schemaToBind, AnnotationValue<io.swagger.v3.oas.annotations.media.Schema> schemaAnn) {
         JsonNode schemaJson = toJson(schemaAnn.getValues(), context);
         return doBindSchemaAnnotationValue(context, element, schemaToBind, schemaJson,
-            schemaAnn.get("type", String.class).orElse(null),
-            schemaAnn.get("format", String.class).orElse(null),
-            schemaAnn.get("defaultValue", String.class).orElse(null),
+            schemaAnn.stringValue("type").orElse(null),
+            schemaAnn.stringValue("format").orElse(null),
+            schemaAnn.stringValue("defaultValue").orElse(null),
             schemaAnn.get("allowableValues", String[].class).orElse(null));
     }
 
@@ -1640,7 +1640,7 @@ abstract class AbstractOpenApiVisitor {
         Map<String, Object> mediaTypes = new LinkedHashMap<>();
         for (Object o : a) {
             AnnotationValue<?> sv = (AnnotationValue<?>) o;
-            String name = sv.get(classifier, String.class).orElse(null);
+            String name = sv.stringValue(classifier).orElse(null);
             if (name == null && classifier.equals("mediaType")) {
                 name = MediaType.APPLICATION_JSON;
             }
@@ -1668,9 +1668,9 @@ abstract class AbstractOpenApiVisitor {
     }
 
     private void bindSchemaIfNeccessary(VisitorContext context, AnnotationValue<?> av, Map<CharSequence, Object> valueMap) {
-        final Optional<String> impl = av.get("implementation", String.class);
-        final Optional<String> not = av.get("not", String.class);
-        final Optional<String> schema = av.get("schema", String.class);
+        final Optional<String> impl = av.stringValue("implementation");
+        final Optional<String> not = av.stringValue("not");
+        final Optional<String> schema = av.stringValue("schema");
         final Optional<String[]> anyOf = av.get("anyOf", Argument.of(String[].class));
         final Optional<String[]> oneOf = av.get("oneOf", Argument.of(String[].class));
         final Optional<String[]> allOf = av.get("allOf", Argument.of(String[].class));
@@ -1826,7 +1826,7 @@ abstract class AbstractOpenApiVisitor {
                 return primitiveType.createProperty();
             }
         } else {
-            String schemaName = schemaValue.get("name", String.class).orElse(computeDefaultSchemaName(definingElement, type));
+            String schemaName = schemaValue.stringValue("name").orElse(computeDefaultSchemaName(definingElement, type));
             schema = schemas.get(schemaName);
             if (schema == null) {
                 if (inProgressSchemas.contains(schemaName)) {
@@ -1977,7 +1977,7 @@ abstract class AbstractOpenApiVisitor {
                 }
             }
         }
-        String defaultValue = schemaValue.get("defaultValue", String.class).orElse(null);
+        String defaultValue = schemaValue.stringValue("defaultValue").orElse(null);
         try {
             schema.setDefault(ConvertUtils.normalizeValue(defaultValue, elType, elFormat, context));
         } catch (IOException e) {
@@ -2035,7 +2035,7 @@ abstract class AbstractOpenApiVisitor {
         for (EnumConstantElement element : type.elements()) {
 
             AnnotationValue<io.swagger.v3.oas.annotations.media.Schema> schemaAnn = element.getAnnotation(io.swagger.v3.oas.annotations.media.Schema.class);
-            boolean isHidden = schemaAnn != null && schemaAnn.get("hidden", Boolean.class).orElse(false);
+            boolean isHidden = schemaAnn != null && schemaAnn.booleanValue("hidden").orElse(false);
 
             if (isHidden
                 || element.isAnnotationPresent(Hidden.class)
@@ -2043,7 +2043,7 @@ abstract class AbstractOpenApiVisitor {
                 continue;
             }
             AnnotationValue<JsonProperty> jsonProperty = element.getAnnotation(JsonProperty.class);
-            String jacksonValue = jsonProperty != null ? jsonProperty.get("value", String.class).get() : null;
+            String jacksonValue = jsonProperty != null ? jsonProperty.stringValue("value").get() : null;
             if (StringUtils.hasText(jacksonValue)) {
                 try {
                     enumValues.add(ConvertUtils.normalizeValue(jacksonValue, schemaType, schemaFormat, context));
@@ -2166,7 +2166,7 @@ abstract class AbstractOpenApiVisitor {
             AnnotationValue<JsonAnySetter> jsonAnySetterAnn = publicField.getAnnotation(JsonAnySetter.class);
             if (publicField.isAnnotationPresent(JsonIgnore.class)
                 || publicField.isAnnotationPresent(Hidden.class)
-                || (jsonAnySetterAnn != null && jsonAnySetterAnn.get("enabled", Boolean.class).orElse(true))
+                || (jsonAnySetterAnn != null && jsonAnySetterAnn.booleanValue("enabled").orElse(true))
                 || isHidden) {
                 continue;
             }
@@ -2231,7 +2231,7 @@ abstract class AbstractOpenApiVisitor {
 
             final Map<CharSequence, Object> map = toValueMap(securityRequirementAnnotationValue.getValues(), context);
 
-            securityRequirementAnnotationValue.get("name", String.class)
+            securityRequirementAnnotationValue.stringValue("name")
                 .ifPresent(name -> {
                     if (map.containsKey("paramName")) {
                         map.put("name", map.remove("paramName"));
