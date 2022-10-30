@@ -8,7 +8,7 @@ managed-jakarta-validation-api = "3.0.2"
 managed-slf4j = "1.7.36"
 
 # Versions beyond 0.62.2 require Java 11
-managed-html2md-converter = "0.62.2"
+managed-html2md-converter = "0.64.0"
 
 kotlin = "1.7.10"
 
