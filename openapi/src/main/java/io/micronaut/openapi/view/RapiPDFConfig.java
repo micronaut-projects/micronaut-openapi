@@ -32,13 +32,13 @@ import io.micronaut.openapi.view.OpenApiViewConfig.RendererType;
  */
 final class RapiPDFConfig extends AbstractViewConfig {
 
-    private static final String DEFAULT_RAPIPDF_JS_PATH = OpenApiViewConfig.RESOURCE_DIR + "/rapipdf-min.js";
+    private static final String DEFAULT_RAPIPDF_JS_PATH = OpenApiViewConfig.RESOURCE_DIR + "/";
 
     private static final List<String> RESOURCE_FILES = Collections.singletonList(
-        DEFAULT_RAPIPDF_JS_PATH
+        DEFAULT_RAPIPDF_JS_PATH + "rapipdf-min.js"
     );
 
-    private static final String LINK = "<script src='{{rapipdf.js.url}}'></script>";
+    private static final String LINK = "<script src='{{rapipdf.js.url.prefix}}rapipdf-min.js'></script>";
     private static final String TAG = "<rapi-pdf id='rapi-pdf' {{rapipdf.attributes}}></rapi-pdf>";
     private static final String SPEC = "document.getElementById('rapi-pdf').setAttribute('spec-url', contextPath + '{{specURL}}');";
     private static final Map<String, Object> DEFAULT_OPTIONS = new HashMap<>(6);
@@ -135,7 +135,7 @@ final class RapiPDFConfig extends AbstractViewConfig {
                     options.put("style", DEFAULT_RAPIDOC_STYLE);
                 }
             }
-            String script = OpenApiViewConfig.replacePlaceHolder(LINK, "rapipdf.js.url", getFinalUrl(context), "");
+            String script = OpenApiViewConfig.replacePlaceHolder(LINK, "rapipdf.js.url.prefix", isDefaultJsUrl ? getFinalUrlPrefix(rendererType, context) : jsUrl, "");
             String rapipdfTag = OpenApiViewConfig.replacePlaceHolder(TAG, "rapipdf.attributes", toHtmlAttributes(), "");
             if (styleUpdated) {
                 options.remove("style");

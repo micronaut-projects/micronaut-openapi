@@ -4,7 +4,7 @@ The views will be generated to the `META-INF/swagger/views/rapidoc` directory of
 
 |===
 | `rapidoc.enabled` | `true` or `false` When 'true' the RapiDoc view is generated.
-| `rapidoc.version` |  The version of RapiDoc to use. Default is to use the latest available.
+| `rapidoc.js.url` | Override path to use to find the js file. Path must contain a file named rapidoc-min.js. The value can be a URL path like: "https://unpkg.com/rapidoc/dist/". Must contain trailing slash.,
 | `rapidoc.style` |
 | `rapidoc.sort-tags` |
 | `rapidoc.sort-endpoints-by` |

@@ -1,14 +1,22 @@
 <!doctype html>
 <!-- Important: must specify, else rendering will be effected -->
-<html>
+<html lang="en">
     <head>
         <title>{{title}}</title>
         <!-- Important: The Custom element uses utf8 characters -->
         <meta charset='utf-8' />
-        <meta name='viewport' content='width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes' />
-        <script src='{{rapidoc.js.url}}'></script>
+        <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1,user-scalable=yes">
+        <script defer="defer" src='{{rapidoc.js.url.prefix}}rapidoc-min.js'></script>
         {{rapipdf.script}}
     </head>
+    <script>
+        window.addEventListener('DOMContentLoaded', (event) => {
+            const docEl = document.getElementById('rapidoc');
+            docEl.addEventListener('before-try', (e) => {
+                e.detail.request.headers.append('AAA-BBB', 'CCC DDDD');
+            });
+        });
+    </script>
     <body>
         <rapi-doc id='rapidoc' {{rapidoc.attributes}}>{{rapipdf.tag}}</rapi-doc>
         <script>
@@ -26,6 +34,16 @@
             }
             rapidoc.setAttribute('spec-url', contextPath + '{{specURL}}');
             {{rapipdf.specurl}}
+            document.addEventListener('DOMContentLoaded', (event) => {
+                let docEl = document.getElementById("rapidoc");
+
+                // 2. before-try (Aborts all post calls)
+                docEl.addEventListener('before-try', (e) => {
+                    if (e.detail.request.method === 'POST') {
+                        e.detail.controller.abort();
+                    }
+                });
+            })
         </script>
     </body>
 </html>

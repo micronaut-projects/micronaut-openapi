@@ -82,21 +82,17 @@ abstract class AbstractViewConfig {
             .collect(Collectors.joining(" "));
     }
 
-    protected String getFinalUrl(VisitorContext context) {
-        if (isDefaultJsUrl) {
-            String contextPath = OpenApiApplicationVisitor.getConfigurationProperty("micronaut.server.context-path", context);
-            if (contextPath == null) {
-                contextPath = StringUtils.EMPTY_STRING;
-            }
-            String finalUrl = contextPath + (contextPath.endsWith("/") ? resourcesContextPath.substring(1) : resourcesContextPath);
-            if (!finalUrl.endsWith("/")) {
-                finalUrl += "/";
-            }
-
-            return finalUrl;
+    protected String getFinalUrlPrefix(OpenApiViewConfig.RendererType rendererType, VisitorContext context) {
+        String contextPath = OpenApiApplicationVisitor.getConfigurationProperty("micronaut.server.context-path", context);
+        if (contextPath == null) {
+            contextPath = StringUtils.EMPTY_STRING;
+        }
+        String finalUrl = contextPath + (contextPath.endsWith("/") ? resourcesContextPath.substring(1) : resourcesContextPath);
+        if (!finalUrl.endsWith("/")) {
+            finalUrl += "/";
         }
 
-        return jsUrl;
+        return rendererType.getTemplatePath() + finalUrl;
     }
 
     /**
