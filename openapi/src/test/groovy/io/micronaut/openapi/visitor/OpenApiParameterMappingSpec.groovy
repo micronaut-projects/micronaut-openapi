@@ -8,6 +8,76 @@ import spock.lang.Issue
 
 class OpenApiParameterMappingSpec extends AbstractOpenApiTypeElementSpec {
 
+    void "test @QueryValue list with defaultValue"() {
+
+        given: "An API definition"
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import java.util.List;
+
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.micronaut.http.annotation.QueryValue;
+import io.swagger.v3.oas.annotations.media.Schema;
+
+@Controller
+class NetworkOperations {
+
+    @Get
+    String method(@QueryValue(value = "test", defaultValue = "") List<String> items) {
+        return "";
+    }
+
+    @Get("/sec")
+    String method2(@QueryValue(value = "test", defaultValue = "a1,a2,a3") List<String> items) {
+        return "";
+    }
+
+    @Get("/third")
+    String method3(@Schema(defaultValue = "[]") @QueryValue("test") List<String> items) {
+        return "";
+    }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        then: "the state is correct"
+        Utils.testReference != null
+
+        when: "The OpenAPI is retrieved"
+        OpenAPI openAPI = Utils.testReference
+        PathItem pathItem = openAPI.paths.get("/")
+        PathItem pathItemSec = openAPI.paths.get("/sec")
+        PathItem pathItemThird = openAPI.paths.get("/third")
+
+        then: "it is included in the OpenAPI doc"
+        pathItem.get.parameters.size() == 1
+        pathItem.get.parameters[0].name == 'test'
+        pathItem.get.parameters[0].schema
+        pathItem.get.parameters[0].schema.type == 'array'
+        pathItem.get.parameters[0].schema.default
+        pathItem.get.parameters[0].schema.default[0] == ''
+
+        pathItemSec.get.parameters.size() == 1
+        pathItemSec.get.parameters[0].name == 'test'
+        pathItemSec.get.parameters[0].schema
+        pathItemSec.get.parameters[0].schema.type == 'array'
+        pathItemSec.get.parameters[0].schema.default
+        pathItemSec.get.parameters[0].schema.default[0] == 'a1'
+        pathItemSec.get.parameters[0].schema.default[1] == 'a2'
+        pathItemSec.get.parameters[0].schema.default[2] == 'a3'
+
+        pathItemThird.get.parameters.size() == 1
+        pathItemThird.get.parameters[0].name == 'test'
+        pathItemThird.get.parameters[0].schema
+        pathItemThird.get.parameters[0].schema.type == 'array'
+        pathItemThird.get.parameters[0].schema.default != null
+        pathItemThird.get.parameters[0].schema.default.size() == 0
+    }
+
     void "test that @Parameter propagates correctly"() {
 
         given: "An API definition"
@@ -15,17 +85,15 @@ class OpenApiParameterMappingSpec extends AbstractOpenApiTypeElementSpec {
         buildBeanDefinition('test.MyBean', '''
 package test;
 
-import io.reactivex.*;
-import io.micronaut.http.annotation.*;
-import io.micronaut.http.*;
-import java.util.List;
-import io.swagger.v3.oas.annotations.*;
-import io.swagger.v3.oas.annotations.parameters.*;
-import io.swagger.v3.oas.annotations.responses.*;
-import io.swagger.v3.oas.annotations.security.*;
-import io.swagger.v3.oas.annotations.media.*;
-import io.swagger.v3.oas.annotations.enums.*;
-import com.fasterxml.jackson.annotation.*;
+import io.micronaut.http.HttpResponse;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.micronaut.http.annotation.QueryValue;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 
 /**
  * @author graemerocher
@@ -51,7 +119,7 @@ interface NetworkOperations {
                     )
             })
     @Get
-    public HttpResponse<Greeting> getNetworks(
+    HttpResponse<Greeting> getNetworks(
             @Parameter(
                     name = "fooBar",
                     description = "NA/true/false (case insensitive)",
