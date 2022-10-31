@@ -2728,5 +2728,107 @@ class MyBean {}
         root.get.responses['500'].content == null
     }
 
+    void "@ApiResponse set mediaType"() {
+        given:
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.http.MediaType;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+
+@Controller
+class RootController {
+
+    @Get(produces = {"application/json;charset=UTF-8", "application/xml;charset=UTF-8"})
+    @ApiResponse(responseCode = "200", description = "A friendly greeting", useReturnTypeSchema = true)
+    @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(schema = @Schema(implementation = Error.class)))
+    @ApiResponse(responseCode = "404", content = {
+            @Content(schema = @Schema(implementation = Error.class)),
+            @Content(mediaType = MediaType.APPLICATION_XML, schema = @Schema(implementation = Error.class)),
+            @Content(mediaType = MediaType.APPLICATION_PDF)
+    })
+    public Greeting home() {
+        return new Greeting("A friendly greeting!");
+    }
 }
 
+class Greeting {
+    private final String content;
+
+    public Greeting(String content) {
+        this.content = content;
+    }
+
+    public String getContent() {
+        return content;
+    }
+}
+
+class Error {
+    private String code;
+    private String message;
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        then:
+        Utils.testReference != null
+
+        when:
+        OpenAPI openAPI = Utils.testReference
+
+        then: 'both 200 and 500 response because both have @ApiResponse'
+        openAPI.paths.size() == 1
+        PathItem root = openAPI.paths.get('/')
+        root.get.operationId == 'home'
+        root.get.responses.size() == 3
+        root.get.responses['200']
+        root.get.responses['200'].description == 'A friendly greeting'
+        root.get.responses['200'].content['application/json;charset=UTF-8'].schema
+        root.get.responses['200'].content['application/json;charset=UTF-8'].schema.$ref == '#/components/schemas/Greeting'
+
+        root.get.responses['500']
+        root.get.responses['500'].description == 'Internal server error'
+        root.get.responses['500'].content['application/json;charset=UTF-8']
+        root.get.responses['500'].content['application/json;charset=UTF-8'].schema
+        root.get.responses['500'].content['application/json;charset=UTF-8'].schema.$ref == '#/components/schemas/Error'
+
+        root.get.responses['404']
+        root.get.responses['404'].content['application/xml']
+        root.get.responses['404'].content['application/xml'].schema
+        root.get.responses['404'].content['application/xml'].schema.$ref == '#/components/schemas/Error'
+
+        root.get.responses['404'].content['application/json;charset=UTF-8']
+        root.get.responses['404'].content['application/json;charset=UTF-8'].schema
+        root.get.responses['404'].content['application/json;charset=UTF-8'].schema.$ref == '#/components/schemas/Error'
+
+        root.get.responses['404'].content['application/xml;charset=UTF-8']
+        root.get.responses['404'].content['application/xml;charset=UTF-8'].schema
+        root.get.responses['404'].content['application/xml;charset=UTF-8'].schema.$ref == '#/components/schemas/Error'
+
+        root.get.responses['404'].content['application/pdf']
+    }
+
+}
