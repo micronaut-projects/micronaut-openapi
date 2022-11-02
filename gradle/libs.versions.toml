@@ -1,5 +1,5 @@
 [versions]
-managed-swagger = "2.2.4"
+managed-swagger = "2.2.6"
 # Required to keep catalog compatibility with 3.4.x.  Can be removed for 4.0.0
 managed-swagger-compat = "2.2.4"
 managed-javadoc-parser = "0.3.1"
