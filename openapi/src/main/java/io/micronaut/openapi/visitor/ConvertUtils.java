@@ -43,7 +43,7 @@ import io.micronaut.core.annotation.AnnotationValue;
 import io.micronaut.core.beans.BeanMap;
 import io.micronaut.core.util.StringUtils;
 import io.micronaut.inject.visitor.VisitorContext;
-import io.micronaut.openapi.swagger.ObjectMapperFactory;
+import io.micronaut.openapi.swagger.core.util.ObjectMapperFactory;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 
 import com.fasterxml.jackson.core.JsonProcessingException;

@@ -3,26 +3,26 @@ releaseHistory: Release History
 cli: Using the Micronaut CLI
 gettingStarted: Dependencies
 openApiDefinition: OpenAPI Definition
-configuration: 
+configuration:
   title: OpenAPI Processing Options
   propertiesFileConfiguration: Configuring OpenAPI Processing with a properties file
   systemPropertyConfiguration: Configuring OpenAPI Processing with system properties
 exposingSwaggerOutput: Exposing Swagger Output
 controllers: OpenAPI Generation for Controllers
 namingstrategy: Naming Strategy
-swaggerAnnotations: 
+swaggerAnnotations:
   title: Swagger Annotations
   schemasAndPojos: Schemas and POJOs
   schemasAndMetaAnnotations: Schemas and Meta Annotations
   schemasAndGenerics: Schemas and Generics
   schemasNaming: Schemas naming
   schemasAnnotationResolution: Schemas Annotation resolution
-endpoints: 
+endpoints:
   title: Exposing Endpoints
   enableendpoints: Enable Endpoints
   endpointstags: Endpoints Tags
   micronautendpoints: Micronaut Built-In Endpoints
-  endpointservers: Endpoints Servers 
+  endpointservers: Endpoints Servers
   endpointssecurityrequirements: Endpoints Security Requirements
   endpointspath: Endpoints Path
 annotationConfiguration:

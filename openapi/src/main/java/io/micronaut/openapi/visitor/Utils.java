@@ -28,7 +28,7 @@ import io.micronaut.context.env.DefaultPropertyPlaceholderResolver;
 import io.micronaut.context.env.PropertyPlaceholderResolver;
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.core.convert.ArgumentConversionContext;
-import io.micronaut.core.convert.DefaultConversionService;
+import io.micronaut.core.convert.DefaultMutableConversionService;
 import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.core.value.PropertyResolver;
 import io.micronaut.http.MediaType;
@@ -83,7 +83,7 @@ public final class Utils {
                 public <T> Optional<T> getProperty(@NonNull String name, @NonNull ArgumentConversionContext<T> conversionContext) {
                     return Optional.empty();
                 }
-            }, new DefaultConversionService());
+            }, new DefaultMutableConversionService());
         }
         return propertyPlaceholderResolver;
     }

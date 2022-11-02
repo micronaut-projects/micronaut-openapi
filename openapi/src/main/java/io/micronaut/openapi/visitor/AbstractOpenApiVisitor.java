@@ -78,7 +78,7 @@ import io.micronaut.inject.ast.PropertyElement;
 import io.micronaut.inject.ast.TypedElement;
 import io.micronaut.inject.visitor.VisitorContext;
 import io.micronaut.openapi.javadoc.JavadocDescription;
-import io.micronaut.openapi.swagger.PrimitiveType;
+import io.micronaut.openapi.swagger.core.util.PrimitiveType;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -1749,7 +1749,10 @@ abstract class AbstractOpenApiVisitor {
         @Nullable Element definingElement,
         List<MediaType> mediaTypes) {
 
-        AnnotationValue<io.swagger.v3.oas.annotations.media.Schema> schemaValue = type.getDeclaredAnnotation(io.swagger.v3.oas.annotations.media.Schema.class);
+        AnnotationValue<io.swagger.v3.oas.annotations.media.Schema> schemaValue = definingElement == null ? null : definingElement.getDeclaredAnnotation(io.swagger.v3.oas.annotations.media.Schema.class);
+        if (schemaValue == null) {
+            schemaValue = type.getDeclaredAnnotation(io.swagger.v3.oas.annotations.media.Schema.class);
+        }
 
         Schema schema;
         Map<String, Schema> schemas = SchemaUtils.resolveSchemas(openAPI);
