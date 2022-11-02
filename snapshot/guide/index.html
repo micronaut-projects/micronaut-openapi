@@ -2093,8 +2093,8 @@ rapidoc.sort-endpoints-by=method
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>true</code> or <code>false</code> When 'true' the Swagger-ui view is generated.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>swagger-ui.version</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">String - The version of Swagger-ui to use. Default is to use the latest available.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>swagger-ui.js.url</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Override path to use to find the js file. Path must contain a files named swagger-ui.css, swagger-ui-bundle.js, swagger-ui-standalone-present.js. The value can be a URL path like: "https://unpkg.com/swagger-ui-dist/". Must contain trailing slash.,</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>swagger-ui.theme</code></p></td>
@@ -2384,8 +2384,8 @@ public class OrderController {
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>true</code> or <code>false</code>  When 'true' the Redoc view is generated.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>redoc.version</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code> - The version of Redoc to use. Default is to use the latest available.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>redoc.js.url</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Override path to use to find the js file. Path must contain a file named redoc.standalone.js. The value can be a URL path like: "https://unpkg.com/redoc/bundles/". Must contain trailing slash.,</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>redoc.expand-single-schema-field</code></p></td>
@@ -2524,8 +2524,8 @@ public class OrderController {
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>true</code> or <code>false</code> When 'true' the RapiDoc view is generated.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapidoc.version</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The version of RapiDoc to use. Default is to use the latest available.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapidoc.js.url</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Override path to use to find the js file. Path must contain a file named rapidoc-min.js. The value can be a URL path like: "https://unpkg.com/rapidoc/dist/". Must contain trailing slash.,</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapidoc.style</code></p></td>
@@ -2736,7 +2736,11 @@ public class OrderController {
 <tbody>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapipdf.enabled</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>true</code> or <code>false</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>true</code> or <code>false</code>,</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapipdf.js.url</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Override path to use to find the js file. Path must contain a file named rapdipdf-min.js.  The value can be a URL path like: "https://unpkg.com/rapipdf/dist/". Must contain trailing slash.,</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapipdf.include-api-details</code></p></td>
