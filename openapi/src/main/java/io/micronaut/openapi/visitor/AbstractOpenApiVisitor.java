@@ -123,6 +123,7 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import static io.micronaut.openapi.visitor.ConvertUtils.normalizeValue;
 import static io.micronaut.openapi.visitor.ConvertUtils.resolveExtensions;
 import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.expandProperties;
 import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.getExpandableProperties;
@@ -749,7 +750,6 @@ abstract class AbstractOpenApiVisitor {
     @Nullable
     protected Schema resolveSchema(OpenAPI openAPI, @Nullable Element definingElement, ClassElement type, VisitorContext context,
                                    List<MediaType> mediaTypes, JavadocDescription fieldJavadoc, JavadocDescription classJavadoc) {
-        Schema schema = null;
 
         AnnotationValue<io.swagger.v3.oas.annotations.media.Schema> schemaAnnotationValue = null;
         if (definingElement != null) {
@@ -772,6 +772,8 @@ abstract class AbstractOpenApiVisitor {
                 }
             }
         }
+
+        Schema schema = null;
 
         if (type instanceof EnumElement) {
             schema = getSchemaDefinition(openAPI, context, type, definingElement, mediaTypes);
@@ -1144,7 +1146,7 @@ abstract class AbstractOpenApiVisitor {
         final String defaultValue = element.getValue(Bindable.class, "defaultValue", String.class).orElse(null);
         if (defaultValue != null && schemaToBind.getDefault() == null) {
             try {
-                topLevelSchema.setDefault(ConvertUtils.normalizeValue(defaultValue, schemaToBind.getType(), schemaToBind.getFormat(), context));
+                topLevelSchema.setDefault(ConvertUtils.normalizeValue(defaultValue, schemaToBind.getType(), schemaToBind.getFormat(), context, true));
             } catch (JsonProcessingException e) {
                 context.warn("Can't convert " + defaultValue + " to " + schemaToBind.getType() + ": " + e.getMessage(), element);
                 topLevelSchema.setDefault(defaultValue);
@@ -1549,10 +1551,14 @@ abstract class AbstractOpenApiVisitor {
      * @return The bound schema
      */
     protected Schema bindSchemaAnnotationValue(VisitorContext context, Element element, Schema schemaToBind, AnnotationValue<io.swagger.v3.oas.annotations.media.Schema> schemaAnn) {
+
+        ClassElement classElement = ((TypedElement) element).getType();
+        Pair<String, String> typeAndFormat = classElement.isIterable() ? Pair.of("array", null) : ConvertUtils.getTypeAndFormatByClass(classElement.getName());
+
         JsonNode schemaJson = toJson(schemaAnn.getValues(), context);
         return doBindSchemaAnnotationValue(context, element, schemaToBind, schemaJson,
-            schemaAnn.stringValue("type").orElse(null),
-            schemaAnn.stringValue("format").orElse(null),
+            schemaAnn.stringValue("type").orElse(typeAndFormat.getFirst()),
+            schemaAnn.stringValue("format").orElse(typeAndFormat.getSecond()),
             schemaAnn.stringValue("defaultValue").orElse(null),
             schemaAnn.get("allowableValues", String[].class).orElse(null));
     }
