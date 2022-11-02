@@ -33,10 +33,10 @@ import io.micronaut.openapi.view.OpenApiViewConfig.RendererType;
 final class RapidocConfig extends AbstractViewConfig implements Renderer {
 
     public static final String RAPIDOC_PREFIX = "rapidoc.";
-    private static final String DEFAULT_RAPIDOC_JS_PATH = OpenApiViewConfig.RESOURCE_DIR + "/rapidoc-min.js";
+    private static final String DEFAULT_RAPIDOC_JS_PATH = OpenApiViewConfig.RESOURCE_DIR + "/";
 
     private static final List<String> RESOURCE_FILES = Collections.singletonList(
-        DEFAULT_RAPIDOC_JS_PATH
+        DEFAULT_RAPIDOC_JS_PATH + "rapidoc-min.js"
     );
 
     private static final Map<String, Object> DEFAULT_OPTIONS = new HashMap<>();
@@ -398,7 +398,7 @@ final class RapidocConfig extends AbstractViewConfig implements Renderer {
     @Override
     public String render(String template, VisitorContext context) {
         template = rapiPDFConfig.render(template, RendererType.RAPIDOC, context);
-        template = OpenApiViewConfig.replacePlaceHolder(template, "rapidoc.js.url", getFinalUrl(context), "");
+        template = OpenApiViewConfig.replacePlaceHolder(template, "rapidoc.js.url.prefix", isDefaultJsUrl ? getFinalUrlPrefix(RendererType.RAPIDOC, context) : jsUrl, "");
         return OpenApiViewConfig.replacePlaceHolder(template, "rapidoc.attributes", toHtmlAttributes(), "");
     }
 

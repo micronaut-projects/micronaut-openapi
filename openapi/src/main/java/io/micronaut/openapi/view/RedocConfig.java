@@ -31,10 +31,10 @@ import io.micronaut.openapi.view.OpenApiViewConfig.RendererType;
  */
 final class RedocConfig extends AbstractViewConfig implements Renderer {
 
-    private static final String DEFAULT_REDOC_JS_PATH = OpenApiViewConfig.RESOURCE_DIR + "/redoc.standalone.js";
+    private static final String DEFAULT_REDOC_JS_PATH = OpenApiViewConfig.RESOURCE_DIR + "/";
 
     private static final List<String> RESOURCE_FILES = Collections.singletonList(
-        DEFAULT_REDOC_JS_PATH
+        DEFAULT_REDOC_JS_PATH + "redoc.standalone.js"
     );
 
     private static final Map<String, Object> DEFAULT_OPTIONS = Collections.emptyMap();
@@ -147,7 +147,7 @@ final class RedocConfig extends AbstractViewConfig implements Renderer {
     @Override
     public String render(String template, VisitorContext context) {
         template = rapiPDFConfig.render(template, RendererType.REDOC, context);
-        template = OpenApiViewConfig.replacePlaceHolder(template, "redoc.js.url", getFinalUrl(context), "");
+        template = OpenApiViewConfig.replacePlaceHolder(template, "redoc.js.url.prefix", isDefaultJsUrl ? getFinalUrlPrefix(RendererType.REDOC, context) : jsUrl, "");
         return OpenApiViewConfig.replacePlaceHolder(template, "redoc.attributes", toHtmlAttributes(), "");
     }
 
