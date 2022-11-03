@@ -123,7 +123,6 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import static io.micronaut.openapi.visitor.ConvertUtils.normalizeValue;
 import static io.micronaut.openapi.visitor.ConvertUtils.resolveExtensions;
 import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.expandProperties;
 import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.getExpandableProperties;
@@ -2208,14 +2207,13 @@ abstract class AbstractOpenApiVisitor {
 
     private Schema getPrimitiveType(String typeName) {
         Schema schema = null;
-        Optional<Class> aClass = ClassUtils.getPrimitiveType(typeName);
-        if (!aClass.isPresent()) {
-            aClass = ClassUtils.forName(typeName, getClass().getClassLoader());
+        Class<?> aClass = ClassUtils.getPrimitiveType(typeName).orElse(null);
+        if (aClass == null) {
+            aClass = ClassUtils.forName(typeName, getClass().getClassLoader()).orElse(null);
         }
 
-        if (aClass.isPresent()) {
-            Class concreteType = aClass.get();
-            Class wrapperType = ReflectionUtils.getWrapperType(concreteType);
+        if (aClass != null) {
+            Class wrapperType = ReflectionUtils.getWrapperType(aClass);
 
             PrimitiveType primitiveType = PrimitiveType.fromType(wrapperType);
             if (primitiveType != null) {

@@ -18,12 +18,18 @@ class OpenApiPojoControllerSpec extends AbstractOpenApiTypeElementSpec {
         buildBeanDefinition('test.MyBean', '''
 package test;
 
-import io.micronaut.http.annotation.*;
-import io.swagger.v3.oas.annotations.*;
-import io.swagger.v3.oas.annotations.media.*;
-import io.swagger.v3.oas.annotations.responses.*;
-
 import java.util.List;
+
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.micronaut.http.annotation.Post;
+import io.micronaut.http.annotation.Put;
+import io.micronaut.http.annotation.Status;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
 @Controller("/pets")
 interface PetOperations<T extends Pet> {
@@ -182,11 +188,13 @@ class MyBean {}
         buildBeanDefinition('test.MyBean', '''
 package test;
 
-import io.reactivex.*;
-import io.micronaut.http.annotation.*;
 import java.util.List;
 import java.util.Map;
-import io.swagger.v3.oas.annotations.media.*;
+
+import io.micronaut.http.annotation.Body;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.micronaut.http.annotation.Post;
 
 /**
  * @author graemerocher
@@ -397,11 +405,6 @@ package test;
 
 import java.util.List;
 
-import io.micronaut.http.annotation.Body;
-import io.micronaut.http.annotation.Controller;
-import io.micronaut.http.annotation.Get;
-import io.micronaut.http.annotation.Post;
-
 import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.Email;
@@ -416,6 +419,11 @@ import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 import javax.validation.constraints.Size;
+
+import io.micronaut.http.annotation.Body;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.micronaut.http.annotation.Post;
 
 /**
  * @author graemerocher
@@ -653,6 +661,11 @@ class MyBean {}
 package test;
 
 import java.util.List;
+
+import io.micronaut.http.annotation.Body;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.micronaut.http.annotation.Post;
 
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
@@ -904,10 +917,12 @@ class MyBean {}
         buildBeanDefinition('test.MyBean', '''
 package test;
 
-import io.reactivex.*;
-import io.micronaut.http.annotation.*;
 import java.util.List;
-import io.swagger.v3.oas.annotations.media.*;
+
+import io.micronaut.http.annotation.Body;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.micronaut.http.annotation.Post;
 
 /**
  * @author graemerocher
@@ -1030,11 +1045,18 @@ class MyBean {}
         buildBeanDefinition('test.MyBean', '''
 package test;
 
-import io.reactivex.*;
-import io.micronaut.http.HttpResponse;
-import io.micronaut.http.annotation.*;
 import java.util.List;
-import io.swagger.v3.oas.annotations.media.*;
+
+import io.micronaut.http.HttpResponse;
+import io.micronaut.http.annotation.Body;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.micronaut.http.annotation.Post;
+import io.reactivex.Completable;
+import io.reactivex.Flowable;
+import io.reactivex.Maybe;
+import io.reactivex.Observable;
+import io.reactivex.Single;
 
 /**
  * @author graemerocher
@@ -1219,10 +1241,16 @@ class MyBean {}
         buildBeanDefinition('test.MyBean', '''
 package test;
 
-import io.reactivex.*;
-import io.micronaut.http.annotation.*;
 import java.util.List;
-import io.swagger.v3.oas.annotations.media.*;
+
+import io.micronaut.http.annotation.Body;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.micronaut.http.annotation.Post;
+import io.reactivex.Flowable;
+import io.reactivex.Maybe;
+import io.reactivex.Single;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * @author graemerocher
@@ -1388,10 +1416,11 @@ class MyBean {}
         buildBeanDefinition('test.MyBean', '''
 package test;
 
-import io.reactivex.*;
-import io.micronaut.http.annotation.*;
-import java.util.List;
-import io.swagger.v3.oas.annotations.media.*;
+import io.micronaut.http.annotation.Body;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Post;
+import io.reactivex.Single;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 @Controller("/pets")
 interface PetOperations<T extends Pet> {
@@ -1469,10 +1498,9 @@ class MyBean {}
         buildBeanDefinition('test.MyBean', '''
 package test;
 
-import io.reactivex.*;
-import io.micronaut.http.annotation.*;
-import java.util.List;
-import io.swagger.v3.oas.annotations.media.*;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Post;
+import io.reactivex.Single;
 
 /**
  * @author graemerocher
@@ -1548,13 +1576,13 @@ class MyBean {}
         buildBeanDefinition('test.MyBean', '''
 package test;
 
+import java.util.List;
+
+import io.micronaut.http.MediaType;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
-import io.micronaut.http.MediaType;
 import io.micronaut.http.annotation.Produces;
 import io.micronaut.http.annotation.Status;
-
-import java.util.List;
 
 @Controller("/pets")
 interface PetOperations<T extends Pet> {
@@ -1645,13 +1673,13 @@ class MyBean {}
         buildBeanDefinition('test.MyBean', '''
 package test;
 
+import java.util.List;
+
+import io.micronaut.http.MediaType;
+import io.micronaut.http.annotation.Body;
+import io.micronaut.http.annotation.Consumes;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Post;
-import io.micronaut.http.annotation.Body;
-import io.micronaut.http.MediaType;
-import io.micronaut.http.annotation.Consumes;
-
-import java.util.List;
 
 @Controller("/pets")
 interface PetOperations<T extends Pet> {
@@ -1741,16 +1769,14 @@ class MyBean {}
         buildBeanDefinition('test.MyBean', '''
 package test;
 
-import io.micronaut.http.annotation.Controller;
-import io.micronaut.http.annotation.Post;
 import io.micronaut.http.MediaType;
 import io.micronaut.http.annotation.Consumes;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Post;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
-
-import java.util.List;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 
 @Controller("/")
 interface PetOperations<T extends Pet> {
@@ -1856,13 +1882,12 @@ class MyBean {}
         buildBeanDefinition('test.MyBean', '''
 package test;
 
-import io.micronaut.http.annotation.Controller;
-import io.micronaut.http.annotation.Post;
-import io.micronaut.http.annotation.Body;
+import java.util.List;
+
 import io.micronaut.http.MediaType;
 import io.micronaut.http.annotation.Consumes;
-
-import java.util.List;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Post;
 
 @Controller("/pets")
 interface PetOperations<T extends Pet> {
@@ -1953,16 +1978,15 @@ class MyBean {}
         buildBeanDefinition('test.MyBean', '''
 package test;
 
-import io.micronaut.http.annotation.Controller;
-import io.micronaut.http.annotation.Post;
-import io.micronaut.http.annotation.Body;
+import java.util.List;
+
 import io.micronaut.http.MediaType;
 import io.micronaut.http.annotation.Consumes;
-import io.swagger.v3.oas.annotations.media.Schema;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Post;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
-
-import java.util.List;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 @Controller("/pets")
 interface PetOperations<T extends Pet> {
@@ -2166,9 +2190,9 @@ class MyBean {}
         buildBeanDefinition('test.MyBean', '''
 package test;
 
-import io.micronaut.http.annotation.*;
-import io.micronaut.core.annotation.*;
-import io.swagger.v3.oas.annotations.media.*;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 @Controller
 class FooController {
@@ -2191,7 +2215,7 @@ class Address {
 
     private final String street;
 
-    public Address(String city, String country, String zip, String street) {
+    Address(String city, String country, String zip, String street) {
         this.city = city;
         this.country = country;
         this.zip = zip;
@@ -2225,7 +2249,7 @@ class Person {
     @Schema(description = "address of the person", implementation = Address.class)
     private final Address address;
 
-    public Person(String name, int age, Address address) {
+    Person(String name, int age, Address address) {
         this.name = name;
         this.age = age;
         this.address = address;
@@ -2281,12 +2305,14 @@ class MyBean {}
         buildBeanDefinition('test.MyBean', '''
 package test;
 
-import io.micronaut.core.annotation.*;
-import io.micronaut.http.annotation.*;
-import io.swagger.v3.oas.annotations.media.*;
-import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.UUID;
+
 import javax.validation.Valid;
+
+import io.micronaut.http.annotation.Body;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Post;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 @Controller("/")
 class UuidController {
@@ -2307,10 +2333,10 @@ class Greeting {
 
     private UUID receiverId;
 
-    public Greeting() {
+    Greeting() {
     }
 
-    public Greeting(String message, UUID senderId, UUID receiverId) {
+    Greeting(String message, UUID senderId, UUID receiverId) {
         this.message = message;
         this.senderId = senderId;
         this.receiverId = receiverId;
@@ -2372,12 +2398,12 @@ class MyBean {}
         buildBeanDefinition('test.MyBean', '''
 package test;
 
-import io.micronaut.core.annotation.*;
-import io.micronaut.http.annotation.*;
-import io.swagger.v3.oas.annotations.media.*;
-import io.swagger.v3.oas.annotations.media.Schema;
-
 import java.math.BigDecimal;
+
+import io.micronaut.http.annotation.Body;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Post;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 @Controller("/")
 class UuidController {
@@ -2395,7 +2421,7 @@ class MyDTO {
     @Schema(type = "string")
     private final BigDecimal shouldBeString;
 
-    public MyDTO(BigDecimal shouldBeNumber, BigDecimal shouldBeString) {
+    MyDTO(BigDecimal shouldBeNumber, BigDecimal shouldBeString) {
         this.shouldBeNumber = shouldBeNumber;
         this.shouldBeString = shouldBeString;
     }
@@ -2435,8 +2461,10 @@ class MyBean {}
         buildBeanDefinition('test.MyBean', '''
 package test;
 
-import io.micronaut.http.annotation.*;
-import io.swagger.v3.oas.annotations.*;
+import io.micronaut.http.annotation.Body;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Post;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 
 @Controller
@@ -2460,7 +2488,7 @@ class User {
     private final String name;
     private final String lastName;
 
-    public User(String name, String lastName) {
+    User(String name, String lastName) {
         this.name = name;
         this.lastName = lastName;
     }
@@ -2525,23 +2553,21 @@ class MyBean {}
         buildBeanDefinition('test.MyBean', '''
 package test;
 
-import io.micronaut.core.annotation.*;
-import io.micronaut.http.annotation.*;
-import io.micronaut.validation.Validated;
-import io.micronaut.http.HttpStatus;
-import io.swagger.v3.oas.annotations.media.*;
-
 import javax.validation.Valid;
-import javax.validation.constraints.*;
 
-import java.util.List;
+import io.micronaut.http.HttpStatus;
+import io.micronaut.http.annotation.Body;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Post;
+import io.micronaut.http.annotation.Status;
+import io.micronaut.validation.Validated;
 
 @Controller(value = "/v1/customers")
 @Validated
 class CustomersController {
 
     @org.jetbrains.annotations.NotNull()
-    @Status(value = HttpStatus.CREATED)
+    @Status(HttpStatus.CREATED)
     @Post
     public String createCustomer(@org.jetbrains.annotations.NotNull() @Body @Valid() CreateCustomerRequest request) {
         return null;
