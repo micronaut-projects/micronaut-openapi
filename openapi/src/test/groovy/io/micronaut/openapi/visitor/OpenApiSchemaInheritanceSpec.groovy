@@ -263,9 +263,10 @@ class MyBean {}
         Schema vehicleRef = owner.getProperties()["vehicle"]
         vehicleRef.allOf[0].$ref == "#/components/schemas/Vehicle"
         vehicleRef.allOf[1].description == "Vehicle of the owner. Here a car or bike with a name"
+        vehicleRef.allOf[1].oneOf[0].$ref == '#/components/schemas/Car'
+        vehicleRef.allOf[1].oneOf[1].$ref == '#/components/schemas/Bike'
         Schema vehicle = schemas["Vehicle"]
-        vehicle.oneOf[0].$ref == '#/components/schemas/Car'
-        vehicle.oneOf[1].$ref == '#/components/schemas/Bike'
+        vehicle.type == 'object'
     }
 
     void "test OpenAPI that on nested inheritance property annotation is preferred over type annotation"() {

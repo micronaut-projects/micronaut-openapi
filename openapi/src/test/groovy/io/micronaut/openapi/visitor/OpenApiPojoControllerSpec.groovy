@@ -1409,6 +1409,116 @@ class MyBean {}
         pathItem.get.responses['200'].content['application/json'].schema.items.$ref == '#/components/schemas/MyPet'
     }
 
+    void "test for generics type attributes schema"() {
+
+        given: "An API definition"
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.reactivex.rxjava3.core.Flowable;
+import io.swagger.v3.oas.annotations.media.Schema;
+
+@Controller("/pets")
+interface PetOperations<T extends Pet> {
+
+    /**
+     * List the pets
+     *
+     * @return a list of pet names
+     */
+    @Get("/flowable")
+    Flowable<T> flowable();
+}
+
+@Schema(name="MyPet", description="Pet description", requiredProperties={"type"})
+class Pet {
+    private PetType type;
+
+    public void setType(PetType t) {
+        type = t;
+    }
+
+    public PetType getType() {
+        return type;
+    }
+}
+
+enum PetType {
+    DOG, CAT
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        then: "the state is correct"
+        Utils.testReference != null
+
+        when: "The OpenAPI is retrieved"
+        OpenAPI openAPI = Utils.testReference
+        Schema petSchema = openAPI.components.schemas['MyPet']
+        Schema petType = openAPI.components.schemas['PetType']
+
+        then: "the components are valid"
+        petSchema.type == 'object'
+        petSchema.description == "Pet description"
+        petSchema.required == ['type']
+        petSchema.properties.size() == 1
+        petSchema.properties['type'].$ref == '#/components/schemas/PetType'
+        petType.type == 'string'
+        petType.enum.contains('DOG')
+        petType.enum.contains('CAT')
+
+        when: "the /pets path is retrieved"
+        PathItem pathItem = openAPI.paths.get("/pets")
+
+        then: "it is included in the OpenAPI doc"
+        pathItem.get.operationId == 'list'
+        pathItem.get.description == 'List the pets'
+        pathItem.get.responses['200']
+        pathItem.get.responses['200'].description == 'a list of pet names'
+        pathItem.get.responses['200'].content['application/json'].schema
+        pathItem.get.responses['200'].content['application/json'].schema.type == 'array'
+        pathItem.get.responses['200'].content['application/json'].schema.items.$ref == '#/components/schemas/MyPet'
+        pathItem.post.operationId == 'save'
+        pathItem.post.requestBody
+        pathItem.post.requestBody.required
+        pathItem.post.requestBody.content
+        pathItem.post.requestBody.content.size() == 1
+
+
+        when: "the /{slug} path is retrieved"
+        pathItem = openAPI.paths.get("/pets/{slug}")
+
+        then: "it is included in the OpenAPI doc"
+        pathItem.get.description == 'Find a pet by a slug'
+        pathItem.get.operationId == 'find'
+        pathItem.get.parameters.size() == 1
+        pathItem.get.parameters[0].name == 'slug'
+        pathItem.get.parameters[0].in == ParameterIn.PATH.toString()
+        pathItem.get.parameters[0].required
+        pathItem.get.parameters[0].schema
+        pathItem.get.parameters[0].description == 'The slug name'
+        pathItem.get.parameters[0].schema.type == 'string'
+        pathItem.get.responses.size() == 1
+        pathItem.get.responses['200'] != null
+        pathItem.get.responses['200'].content['application/json'].schema
+        pathItem.get.responses['200'].content['application/json'].schema.$ref == '#/components/schemas/MyPet'
+
+        when: "A flowable is returned"
+        pathItem = openAPI.paths.get("/pets/flowable")
+
+        then:
+        pathItem.get.operationId == 'flowable'
+        pathItem.get.responses['200']
+        pathItem.get.responses['200'].description == 'a list of pet names'
+        pathItem.get.responses['200'].content['application/json'].schema
+        pathItem.get.responses['200'].content['application/json'].schema.type == 'array'
+        pathItem.get.responses['200'].content['application/json'].schema.items.$ref == '#/components/schemas/MyPet'
+    }
+
     void "test build OpenAPI doc for POJO with properties not required as default"() {
 
         given: "An API definition"
