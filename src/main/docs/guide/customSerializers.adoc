@@ -1,0 +1,85 @@
+You can set custom classes to create different open api schemas for selected classes:
+
+```yaml
+micronaut:
+  openapi:
+  schema:
+    org.somepackage.MyComplexType: java.lang.String
+    org.somepackage.MyComplexType2: java.lang.Integer
+```
+
+or by system properties:
+
+```
+-Dmicronaut.opemapi.schema.org.somepackage.MyComplexType=java.lang.String -Dmicronaut.opemapi.schema.org.somepackage.MyComplexType2=java.lang.Integer
+```
+
+or by openapi.properties
+
+```properties
+micronaut.opemapi.schema.org.somepackage.MyComplexType=java.lang.String
+micronaut.opemapi.schema.org.somepackage.MyComplexType2=java.lang.Integer
+```
+
+Also, it can be used for replace classes schema with generics, for example, if you use jaxb generated classes and have custom serializer for JAXBElement class.
+And you can set cutom schemas for different type args.
+For example if you have this classes structure:
+
+```java
+package test.mypackage;
+
+class MyDto {
+
+    public JAXBElement<? extends XmlElement> xmlElement;
+    public JAXBElement<? extends XmlElement2> xmlElement2;
+    public JAXBElement<? extends XmlElement3> xmlElement3;
+}
+
+class XmlElement {
+    public String propStr;
+}
+
+class XmlElement2 {
+    public String propStr2;
+}
+
+class XmlElement3 {
+    public String propStr3;
+}
+```
+
+You can customize classes structure for openapi schema:
+
+```java
+package io.micronaut.openapi;
+
+// if you want to use generic from fields with type JAXBElement<T>
+class MyJaxbElement<T> {
+    public String type;
+    public T value;
+}
+
+class MyJaxbElement2 {
+    public String type;
+    public List<String> values;
+}
+
+class MyJaxbElement3 {
+    public String type;
+    public String value;
+}
+```
+
+And set openapi properties to map classes to custom openapi schema classes:
+
+```yaml
+micronaut:
+  openapi:
+    schema:
+      io.micronaut.openapi.JAXBElement: io.micronaut.openapi.MyJaxbElement
+      io.micronaut.openapi.JAXBElement<test.mypackage.XmlElement2>: io.micronaut.openapi.MyJaxbElement2
+      io.micronaut.openapi.JAXBElement<test.mypackage.XmlElement3>: io.micronaut.openapi.MyJaxbElement3
+```
+
+NOTE: Important!
+After changing these settings, a complete recompilation of the project is necessary to ensure that the new settings are applied correctly.
