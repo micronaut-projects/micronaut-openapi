@@ -92,7 +92,7 @@ abstract class AbstractViewConfig {
             finalUrl += "/";
         }
 
-        return rendererType.getTemplatePath() + finalUrl;
+        return finalUrl;
     }
 
     /**
