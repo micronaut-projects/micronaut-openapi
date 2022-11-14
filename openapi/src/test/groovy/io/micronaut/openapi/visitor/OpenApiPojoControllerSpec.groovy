@@ -1471,44 +1471,8 @@ class MyBean {}
         petType.enum.contains('DOG')
         petType.enum.contains('CAT')
 
-        when: "the /pets path is retrieved"
-        PathItem pathItem = openAPI.paths.get("/pets")
-
-        then: "it is included in the OpenAPI doc"
-        pathItem.get.operationId == 'list'
-        pathItem.get.description == 'List the pets'
-        pathItem.get.responses['200']
-        pathItem.get.responses['200'].description == 'a list of pet names'
-        pathItem.get.responses['200'].content['application/json'].schema
-        pathItem.get.responses['200'].content['application/json'].schema.type == 'array'
-        pathItem.get.responses['200'].content['application/json'].schema.items.$ref == '#/components/schemas/MyPet'
-        pathItem.post.operationId == 'save'
-        pathItem.post.requestBody
-        pathItem.post.requestBody.required
-        pathItem.post.requestBody.content
-        pathItem.post.requestBody.content.size() == 1
-
-
-        when: "the /{slug} path is retrieved"
-        pathItem = openAPI.paths.get("/pets/{slug}")
-
-        then: "it is included in the OpenAPI doc"
-        pathItem.get.description == 'Find a pet by a slug'
-        pathItem.get.operationId == 'find'
-        pathItem.get.parameters.size() == 1
-        pathItem.get.parameters[0].name == 'slug'
-        pathItem.get.parameters[0].in == ParameterIn.PATH.toString()
-        pathItem.get.parameters[0].required
-        pathItem.get.parameters[0].schema
-        pathItem.get.parameters[0].description == 'The slug name'
-        pathItem.get.parameters[0].schema.type == 'string'
-        pathItem.get.responses.size() == 1
-        pathItem.get.responses['200'] != null
-        pathItem.get.responses['200'].content['application/json'].schema
-        pathItem.get.responses['200'].content['application/json'].schema.$ref == '#/components/schemas/MyPet'
-
         when: "A flowable is returned"
-        pathItem = openAPI.paths.get("/pets/flowable")
+        PathItem pathItem = openAPI.paths.get("/pets/flowable")
 
         then:
         pathItem.get.operationId == 'flowable'

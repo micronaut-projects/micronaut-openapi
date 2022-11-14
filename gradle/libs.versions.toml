@@ -5,7 +5,7 @@ managed-jsoup = "1.15.3"
 managed-slf4j = "1.7.36"
 managed-html2md-converter = "0.64.0"
 
-kotlin = "1.7.20"
+kotlin = "1.7.21"
 jakarta-validation-api = "3.0.2"
 
 [libraries]
