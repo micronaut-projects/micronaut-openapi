@@ -1754,7 +1754,25 @@ abstract class AbstractOpenApiVisitor {
         @Nullable Element definingElement,
         List<MediaType> mediaTypes) {
 
-        AnnotationValue<io.swagger.v3.oas.annotations.media.Schema> schemaValue = definingElement == null ? null : definingElement.getDeclaredAnnotation(io.swagger.v3.oas.annotations.media.Schema.class);
+        // Here we need to skip Schema nnotation on field level, because with micronaut 3.x method getDeclaredAnnotation
+        // returned always null and found Schema annotation only on getters and setters
+        AnnotationValue<io.swagger.v3.oas.annotations.media.Schema> schemaValue = null;
+        if (definingElement != null) {
+            if (definingElement instanceof PropertyElement) {
+                var getterOpt = ((PropertyElement) definingElement).getReadMethod();
+                if (getterOpt.isPresent()) {
+                    schemaValue = getterOpt.get().getDeclaredAnnotation(io.swagger.v3.oas.annotations.media.Schema.class);
+                }
+                if (schemaValue == null) {
+                    var setterOpt = ((PropertyElement) definingElement).getWriteMethod();
+                    if (setterOpt.isPresent()) {
+                        schemaValue = setterOpt.get().getDeclaredAnnotation(io.swagger.v3.oas.annotations.media.Schema.class);
+                    }
+                }
+            } else {
+                schemaValue = definingElement.getDeclaredAnnotation(io.swagger.v3.oas.annotations.media.Schema.class);
+            }
+        }
         if (schemaValue == null) {
             schemaValue = type.getDeclaredAnnotation(io.swagger.v3.oas.annotations.media.Schema.class);
         }

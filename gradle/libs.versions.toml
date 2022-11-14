@@ -1,14 +1,18 @@
 [versions]
 managed-swagger = "2.2.6"
+# Required to keep catalog compatibility with 3.4.x.  Can be removed for 4.0.0
+managed-swagger-compat = "2.2.6"
 managed-javadoc-parser = "0.3.1"
 managed-jsoup = "1.15.3"
 managed-slf4j = "1.7.36"
 managed-html2md-converter = "0.64.0"
+managed-jakarta-validation-api = "3.0.2"
 
 kotlin = "1.7.21"
-jakarta-validation-api = "3.0.2"
 
 [libraries]
+# Duplicated to keep catalog compatibility with 3.4.x.  Can be removed for 4.0.0
+managed-swagger = { module = "io.swagger.core.v3:swagger-core", version.ref = "managed-swagger-compat" }
 managed-swagger-core = { module = "io.swagger.core.v3:swagger-core", version.ref = "managed-swagger" }
 managed-swagger-annotations = { module = "io.swagger.core.v3:swagger-annotations", version.ref = "managed-swagger" }
 managed-swagger-models = { module = "io.swagger.core.v3:swagger-models", version.ref = "managed-swagger" }
@@ -30,7 +34,7 @@ jackson-databind = { module = "com.fasterxml.jackson.core:jackson-databind" }
 jackson-datatype-jsr310 = { module = "com.fasterxml.jackson.datatype:jackson-datatype-jsr310" }
 jackson-dataformat-yaml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml" }
 javax-validation-api = { module = "javax.validation:validation-api" }
-jakarta-validation-api = { module = "jakarta.validation:jakarta.validation-api", version.ref = "jakarta-validation-api" }
+jakarta-validation-api = { module = "jakarta.validation:jakarta.validation-api", version.ref = "managed-jakarta-validation-api" }
 
 testcontainers-spock = { module = "org.testcontainers:spock" }
 
