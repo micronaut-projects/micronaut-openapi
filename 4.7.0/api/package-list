@@ -1,0 +1,12 @@
+io.micronaut.openapi.annotation
+io.micronaut.openapi.annotation.mappers
+io.micronaut.openapi.annotation.transformers
+io.micronaut.openapi.introspections
+io.micronaut.openapi.javadoc
+io.micronaut.openapi.postprocessors
+io.micronaut.openapi.swagger
+io.micronaut.openapi.swagger.jackson
+io.micronaut.openapi.swagger.jackson.mixin
+io.micronaut.openapi.swagger.jackson.util
+io.micronaut.openapi.view
+io.micronaut.openapi.visitor
