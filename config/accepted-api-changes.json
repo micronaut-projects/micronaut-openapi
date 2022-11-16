@@ -1,0 +1,7 @@
+[
+	{
+    "type": "io.micronaut.openapi.visitor.AbstractOpenApiEndpointVisitor",
+    "member": "Field propertyPlaceholderResolver",
+    "reason": "Internal non-public API class"
+	}
+]
