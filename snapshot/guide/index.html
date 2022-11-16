@@ -61,21 +61,23 @@
                                 
                                 <div class="toc-item" style="margin-left:0"><a href="#namingstrategy"><strong>9</strong><span>Naming Strategy</span></a></div>
                                 
-                                <div class="toc-item" style="margin-left:0"><a href="#swaggerAnnotations"><strong>10</strong><span>Swagger Annotations</span></a></div>
+                                <div class="toc-item" style="margin-left:0"><a href="#customSerializers"><strong>10</strong><span>Custom serializers</span></a></div>
                                 
-                                <div class="toc-item" style="margin-left:0"><a href="#endpoints"><strong>11</strong><span>Exposing Endpoints</span></a></div>
+                                <div class="toc-item" style="margin-left:0"><a href="#swaggerAnnotations"><strong>11</strong><span>Swagger Annotations</span></a></div>
                                 
-                                <div class="toc-item" style="margin-left:0"><a href="#annotationConfiguration"><strong>12</strong><span>Annotation Configuration</span></a></div>
+                                <div class="toc-item" style="margin-left:0"><a href="#endpoints"><strong>12</strong><span>Exposing Endpoints</span></a></div>
                                 
-                                <div class="toc-item" style="margin-left:0"><a href="#mergingSchemas"><strong>13</strong><span>Merging Schemas</span></a></div>
+                                <div class="toc-item" style="margin-left:0"><a href="#annotationConfiguration"><strong>13</strong><span>Annotation Configuration</span></a></div>
                                 
-                                <div class="toc-item" style="margin-left:0"><a href="#openApiViews"><strong>14</strong><span>Generating OpenAPI Views</span></a></div>
+                                <div class="toc-item" style="margin-left:0"><a href="#mergingSchemas"><strong>14</strong><span>Merging Schemas</span></a></div>
                                 
-                                <div class="toc-item" style="margin-left:0"><a href="#serverContext"><strong>15</strong><span>Server Context</span></a></div>
+                                <div class="toc-item" style="margin-left:0"><a href="#openApiViews"><strong>15</strong><span>Generating OpenAPI Views</span></a></div>
                                 
-                                <div class="toc-item" style="margin-left:0"><a href="#repository"><strong>16</strong><span>Repository</span></a></div>
+                                <div class="toc-item" style="margin-left:0"><a href="#serverContext"><strong>16</strong><span>Server Context</span></a></div>
                                 
-                                <div class="toc-item" style="margin-left:0"><a href="#breaks"><strong>17</strong><span>Breaking Changes</span></a></div>
+                                <div class="toc-item" style="margin-left:0"><a href="#repository"><strong>17</strong><span>Repository</span></a></div>
+                                
+                                <div class="toc-item" style="margin-left:0"><a href="#breaks"><strong>18</strong><span>Breaking Changes</span></a></div>
                                 
                             </div>
                         </div>
@@ -128,73 +130,75 @@
         
         <div class="toc-item" style="margin-left:0px" id="toc-item-namingstrategy"><a href="#namingstrategy"><strong>9</strong><span>Naming Strategy</span></a></div>
         
-        <div class="toc-item" style="margin-left:0px" id="toc-item-swaggerAnnotations"><a href="#swaggerAnnotations"><strong>10</strong><span>Swagger Annotations</span></a></div>
+        <div class="toc-item" style="margin-left:0px" id="toc-item-customSerializers"><a href="#customSerializers"><strong>10</strong><span>Custom serializers</span></a></div>
         
-        <div class="toc-item" style="margin-left:10px" id="toc-item-schemasAndPojos"><a href="#schemasAndPojos"><strong>10.1</strong><span>Schemas and POJOs</span></a></div>
+        <div class="toc-item" style="margin-left:0px" id="toc-item-swaggerAnnotations"><a href="#swaggerAnnotations"><strong>11</strong><span>Swagger Annotations</span></a></div>
         
-        <div class="toc-item" style="margin-left:10px" id="toc-item-schemasAndMetaAnnotations"><a href="#schemasAndMetaAnnotations"><strong>10.2</strong><span>Schemas and Meta Annotations</span></a></div>
+        <div class="toc-item" style="margin-left:10px" id="toc-item-schemasAndPojos"><a href="#schemasAndPojos"><strong>11.1</strong><span>Schemas and POJOs</span></a></div>
         
-        <div class="toc-item" style="margin-left:10px" id="toc-item-schemasAndGenerics"><a href="#schemasAndGenerics"><strong>10.3</strong><span>Schemas and Generics</span></a></div>
+        <div class="toc-item" style="margin-left:10px" id="toc-item-schemasAndMetaAnnotations"><a href="#schemasAndMetaAnnotations"><strong>11.2</strong><span>Schemas and Meta Annotations</span></a></div>
         
-        <div class="toc-item" style="margin-left:10px" id="toc-item-schemasNaming"><a href="#schemasNaming"><strong>10.4</strong><span>Schemas naming</span></a></div>
+        <div class="toc-item" style="margin-left:10px" id="toc-item-schemasAndGenerics"><a href="#schemasAndGenerics"><strong>11.3</strong><span>Schemas and Generics</span></a></div>
         
-        <div class="toc-item" style="margin-left:10px" id="toc-item-schemasAnnotationResolution"><a href="#schemasAnnotationResolution"><strong>10.5</strong><span>Schemas Annotation resolution</span></a></div>
+        <div class="toc-item" style="margin-left:10px" id="toc-item-schemasNaming"><a href="#schemasNaming"><strong>11.4</strong><span>Schemas naming</span></a></div>
         
-        <div class="toc-item" style="margin-left:0px" id="toc-item-endpoints"><a href="#endpoints"><strong>11</strong><span>Exposing Endpoints</span></a></div>
+        <div class="toc-item" style="margin-left:10px" id="toc-item-schemasAnnotationResolution"><a href="#schemasAnnotationResolution"><strong>11.5</strong><span>Schemas Annotation resolution</span></a></div>
         
-        <div class="toc-item" style="margin-left:10px" id="toc-item-enableendpoints"><a href="#enableendpoints"><strong>11.1</strong><span>Enable Endpoints</span></a></div>
+        <div class="toc-item" style="margin-left:0px" id="toc-item-endpoints"><a href="#endpoints"><strong>12</strong><span>Exposing Endpoints</span></a></div>
         
-        <div class="toc-item" style="margin-left:10px" id="toc-item-endpointstags"><a href="#endpointstags"><strong>11.2</strong><span>Endpoints Tags</span></a></div>
+        <div class="toc-item" style="margin-left:10px" id="toc-item-enableendpoints"><a href="#enableendpoints"><strong>12.1</strong><span>Enable Endpoints</span></a></div>
         
-        <div class="toc-item" style="margin-left:10px" id="toc-item-micronautendpoints"><a href="#micronautendpoints"><strong>11.3</strong><span>Micronaut Built-In Endpoints</span></a></div>
+        <div class="toc-item" style="margin-left:10px" id="toc-item-endpointstags"><a href="#endpointstags"><strong>12.2</strong><span>Endpoints Tags</span></a></div>
         
-        <div class="toc-item" style="margin-left:10px" id="toc-item-endpointservers"><a href="#endpointservers"><strong>11.4</strong><span>Endpoints Servers</span></a></div>
+        <div class="toc-item" style="margin-left:10px" id="toc-item-micronautendpoints"><a href="#micronautendpoints"><strong>12.3</strong><span>Micronaut Built-In Endpoints</span></a></div>
         
-        <div class="toc-item" style="margin-left:10px" id="toc-item-endpointssecurityrequirements"><a href="#endpointssecurityrequirements"><strong>11.5</strong><span>Endpoints Security Requirements</span></a></div>
+        <div class="toc-item" style="margin-left:10px" id="toc-item-endpointservers"><a href="#endpointservers"><strong>12.4</strong><span>Endpoints Servers</span></a></div>
         
-        <div class="toc-item" style="margin-left:10px" id="toc-item-endpointspath"><a href="#endpointspath"><strong>11.6</strong><span>Endpoints Path</span></a></div>
+        <div class="toc-item" style="margin-left:10px" id="toc-item-endpointssecurityrequirements"><a href="#endpointssecurityrequirements"><strong>12.5</strong><span>Endpoints Security Requirements</span></a></div>
         
-        <div class="toc-item" style="margin-left:0px" id="toc-item-annotationConfiguration"><a href="#annotationConfiguration"><strong>12</strong><span>Annotation Configuration</span></a></div>
+        <div class="toc-item" style="margin-left:10px" id="toc-item-endpointspath"><a href="#endpointspath"><strong>12.6</strong><span>Endpoints Path</span></a></div>
         
-        <div class="toc-item" style="margin-left:10px" id="toc-item-openapiinclude"><a href="#openapiinclude"><strong>12.1</strong><span>@OpenAPIInclude</span></a></div>
+        <div class="toc-item" style="margin-left:0px" id="toc-item-annotationConfiguration"><a href="#annotationConfiguration"><strong>13</strong><span>Annotation Configuration</span></a></div>
         
-        <div class="toc-item" style="margin-left:10px" id="toc-item-openapimanagement"><a href="#openapimanagement"><strong>12.2</strong><span>@OpenAPIManagement</span></a></div>
+        <div class="toc-item" style="margin-left:10px" id="toc-item-openapiinclude"><a href="#openapiinclude"><strong>13.1</strong><span>@OpenAPIInclude</span></a></div>
         
-        <div class="toc-item" style="margin-left:10px" id="toc-item-openapisecurity"><a href="#openapisecurity"><strong>12.3</strong><span>@OpenAPISecurity</span></a></div>
+        <div class="toc-item" style="margin-left:10px" id="toc-item-openapimanagement"><a href="#openapimanagement"><strong>13.2</strong><span>@OpenAPIManagement</span></a></div>
         
-        <div class="toc-item" style="margin-left:10px" id="toc-item-accessorsStyle"><a href="#accessorsStyle"><strong>12.4</strong><span>@AccessorsStyle</span></a></div>
+        <div class="toc-item" style="margin-left:10px" id="toc-item-openapisecurity"><a href="#openapisecurity"><strong>13.3</strong><span>@OpenAPISecurity</span></a></div>
         
-        <div class="toc-item" style="margin-left:0px" id="toc-item-mergingSchemas"><a href="#mergingSchemas"><strong>13</strong><span>Merging Schemas</span></a></div>
+        <div class="toc-item" style="margin-left:10px" id="toc-item-accessorsStyle"><a href="#accessorsStyle"><strong>13.4</strong><span>@AccessorsStyle</span></a></div>
         
-        <div class="toc-item" style="margin-left:0px" id="toc-item-openApiViews"><a href="#openApiViews"><strong>14</strong><span>Generating OpenAPI Views</span></a></div>
+        <div class="toc-item" style="margin-left:0px" id="toc-item-mergingSchemas"><a href="#mergingSchemas"><strong>14</strong><span>Merging Schemas</span></a></div>
         
-        <div class="toc-item" style="margin-left:10px" id="toc-item-mappingPath"><a href="#mappingPath"><strong>14.1</strong><span>Mapping Path</span></a></div>
+        <div class="toc-item" style="margin-left:0px" id="toc-item-openApiViews"><a href="#openApiViews"><strong>15</strong><span>Generating OpenAPI Views</span></a></div>
         
-        <div class="toc-item" style="margin-left:10px" id="toc-item-viewsGenerationWithPropertiesFile"><a href="#viewsGenerationWithPropertiesFile"><strong>14.2</strong><span>Enable Views Generation with a properties file</span></a></div>
+        <div class="toc-item" style="margin-left:10px" id="toc-item-mappingPath"><a href="#mappingPath"><strong>15.1</strong><span>Mapping Path</span></a></div>
         
-        <div class="toc-item" style="margin-left:10px" id="toc-item-viewsGenerationWithSystemProperties"><a href="#viewsGenerationWithSystemProperties"><strong>14.3</strong><span>Enable Views Generation with system properties</span></a></div>
+        <div class="toc-item" style="margin-left:10px" id="toc-item-viewsGenerationWithPropertiesFile"><a href="#viewsGenerationWithPropertiesFile"><strong>15.2</strong><span>Enable Views Generation with a properties file</span></a></div>
         
-        <div class="toc-item" style="margin-left:10px" id="toc-item-swaggerui"><a href="#swaggerui"><strong>14.4</strong><span>Swagger-UI</span></a></div>
+        <div class="toc-item" style="margin-left:10px" id="toc-item-viewsGenerationWithSystemProperties"><a href="#viewsGenerationWithSystemProperties"><strong>15.3</strong><span>Enable Views Generation with system properties</span></a></div>
         
-        <div class="toc-item" style="margin-left:20px" id="toc-item-oauth2"><a href="#oauth2"><strong>14.4.1</strong><span>Swagger UI - OAuth 2.0 configuration</span></a></div>
+        <div class="toc-item" style="margin-left:10px" id="toc-item-swaggerui"><a href="#swaggerui"><strong>15.4</strong><span>Swagger-UI</span></a></div>
         
-        <div class="toc-item" style="margin-left:10px" id="toc-item-redoc"><a href="#redoc"><strong>14.5</strong><span>Redoc</span></a></div>
+        <div class="toc-item" style="margin-left:20px" id="toc-item-oauth2"><a href="#oauth2"><strong>15.4.1</strong><span>Swagger UI - OAuth 2.0 configuration</span></a></div>
         
-        <div class="toc-item" style="margin-left:10px" id="toc-item-rapidoc"><a href="#rapidoc"><strong>14.6</strong><span>RapiDoc</span></a></div>
+        <div class="toc-item" style="margin-left:10px" id="toc-item-redoc"><a href="#redoc"><strong>15.5</strong><span>Redoc</span></a></div>
         
-        <div class="toc-item" style="margin-left:10px" id="toc-item-rapipdf"><a href="#rapipdf"><strong>14.7</strong><span>RapiPdf</span></a></div>
+        <div class="toc-item" style="margin-left:10px" id="toc-item-rapidoc"><a href="#rapidoc"><strong>15.6</strong><span>RapiDoc</span></a></div>
         
-        <div class="toc-item" style="margin-left:0px" id="toc-item-serverContext"><a href="#serverContext"><strong>15</strong><span>Server Context</span></a></div>
+        <div class="toc-item" style="margin-left:10px" id="toc-item-rapipdf"><a href="#rapipdf"><strong>15.7</strong><span>RapiPdf</span></a></div>
         
-        <div class="toc-item" style="margin-left:10px" id="toc-item-compileResolution"><a href="#compileResolution"><strong>15.1</strong><span>Compile Time Resolution</span></a></div>
+        <div class="toc-item" style="margin-left:0px" id="toc-item-serverContext"><a href="#serverContext"><strong>16</strong><span>Server Context</span></a></div>
         
-        <div class="toc-item" style="margin-left:10px" id="toc-item-serverFilter"><a href="#serverFilter"><strong>15.2</strong><span>HttpServerFilter</span></a></div>
+        <div class="toc-item" style="margin-left:10px" id="toc-item-compileResolution"><a href="#compileResolution"><strong>16.1</strong><span>Compile Time Resolution</span></a></div>
         
-        <div class="toc-item" style="margin-left:10px" id="toc-item-urlParameter"><a href="#urlParameter"><strong>15.3</strong><span>URL Parameter</span></a></div>
+        <div class="toc-item" style="margin-left:10px" id="toc-item-serverFilter"><a href="#serverFilter"><strong>16.2</strong><span>HttpServerFilter</span></a></div>
         
-        <div class="toc-item" style="margin-left:0px" id="toc-item-repository"><a href="#repository"><strong>16</strong><span>Repository</span></a></div>
+        <div class="toc-item" style="margin-left:10px" id="toc-item-urlParameter"><a href="#urlParameter"><strong>16.3</strong><span>URL Parameter</span></a></div>
         
-        <div class="toc-item" style="margin-left:0px" id="toc-item-breaks"><a href="#breaks"><strong>17</strong><span>Breaking Changes</span></a></div>
+        <div class="toc-item" style="margin-left:0px" id="toc-item-repository"><a href="#repository"><strong>17</strong><span>Repository</span></a></div>
+        
+        <div class="toc-item" style="margin-left:0px" id="toc-item-breaks"><a href="#breaks"><strong>18</strong><span>Breaking Changes</span></a></div>
         
         </div>
     </div>
@@ -282,7 +286,7 @@
 <p>        <div class="listingblock multi-language-sample">
 <div class="title"></div>
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="gradle">annotationProcessor(<span class="hljs-string">"io.micronaut.openapi:micronaut-openapi:4.6.1-SNAPSHOT")</span></code></pre>
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="gradle">annotationProcessor(<span class="hljs-string">"io.micronaut.openapi:micronaut-openapi:4.7.0-SNAPSHOT")</span></code></pre>
 </div>
 </div>
 <div class="listingblock multi-language-sample">
@@ -292,7 +296,7 @@
     &lt;path&gt;
         &lt;groupId&gt;io.micronaut.openapi&lt;/groupId&gt;
         &lt;artifactId&gt;micronaut-openapi&lt;/artifactId&gt;
-        &lt;version&gt;4.6.1-SNAPSHOT&lt;/version&gt;
+        &lt;version&gt;4.7.0-SNAPSHOT&lt;/version&gt;
     &lt;/path&gt;
 &lt;/annotationProcessorPaths&gt;</code></pre>
 </div>
@@ -809,7 +813,125 @@ the following <strong>jackson</strong>'s <code>PropertyNamingStrategy</code>:</p
 </ul>
 </div>
 
-<h1 id="swaggerAnnotations"><a class="anchor" href="#swaggerAnnotations"></a>10 Swagger Annotations</h1>
+<h1 id="customSerializers"><a class="anchor" href="#customSerializers"></a>10 Custom serializers</h1>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/customSerializers.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>You can set custom classes to create different open api schemas for selected classes:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">micronaut:
+  openapi:
+  schema:
+    org.somepackage.MyComplexType: java.lang.String
+    org.somepackage.MyComplexType2: java.lang.Integer</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>or by system properties:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">-Dmicronaut.opemapi.schema.org.somepackage.MyComplexType=java.lang.String -Dmicronaut.opemapi.schema.org.somepackage.MyComplexType2=java.lang.Integer</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>or by openapi.properties</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">micronaut.opemapi.schema.org.somepackage.MyComplexType=java.lang.String
+micronaut.opemapi.schema.org.somepackage.MyComplexType2=java.lang.Integer</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Also, it can be used for replace classes schema with generics, for example, if you use jaxb generated classes and have custom serializer for JAXBElement class.
+And you can set cutom schemas for different type args.
+For example if you have this classes structure:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package test.mypackage;
+
+class MyDto {
+
+    public JAXBElement&lt;? extends XmlElement&gt; xmlElement;
+    public JAXBElement&lt;? extends XmlElement2&gt; xmlElement2;
+    public JAXBElement&lt;? extends XmlElement3&gt; xmlElement3;
+}
+
+class XmlElement {
+    public String propStr;
+}
+
+class XmlElement2 {
+    public String propStr2;
+}
+
+class XmlElement3 {
+    public String propStr3;
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You can customize classes structure for openapi schema:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package io.micronaut.openapi;
+
+// if you want to use generic from fields with type JAXBElement&lt;T&gt;
+class MyJaxbElement&lt;T&gt; {
+    public String type;
+    public T value;
+}
+
+class MyJaxbElement2 {
+    public String type;
+    public List&lt;String&gt; values;
+}
+
+class MyJaxbElement3 {
+    public String type;
+    public String value;
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>And set openapi properties to map classes to custom openapi schema classes:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">micronaut:
+  openapi:
+    schema:
+      io.micronaut.openapi.JAXBElement: io.micronaut.openapi.MyJaxbElement
+      io.micronaut.openapi.JAXBElement&lt;test.mypackage.XmlElement2&gt;: io.micronaut.openapi.MyJaxbElement2
+      io.micronaut.openapi.JAXBElement&lt;test.mypackage.XmlElement3&gt;: io.micronaut.openapi.MyJaxbElement3</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Important!
+After changing these settings, a complete recompilation of the project is necessary to ensure that the new settings are applied correctly.
+</td>
+</tr>
+</table>
+</div>
+
+<h1 id="swaggerAnnotations"><a class="anchor" href="#swaggerAnnotations"></a>11 Swagger Annotations</h1>
 
 <div class='contribute-btn'>
     <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/swaggerAnnotations.adoc"'>
@@ -996,7 +1118,7 @@ paths:
 </div>
 </div>
 
-<h2 id="schemasAndPojos"><a class="anchor" href="#schemasAndPojos"></a>10.1 Schemas and POJOs</h2>
+<h2 id="schemasAndPojos"><a class="anchor" href="#schemasAndPojos"></a>11.1 Schemas and POJOs</h2>
 
 <div class='contribute-btn'>
     <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/swaggerAnnotations/schemasAndPojos.adoc"'>
@@ -1068,7 +1190,7 @@ enum PetType {
 </table>
 </div>
 
-<h2 id="schemasAndMetaAnnotations"><a class="anchor" href="#schemasAndMetaAnnotations"></a>10.2 Schemas and Meta Annotations</h2>
+<h2 id="schemasAndMetaAnnotations"><a class="anchor" href="#schemasAndMetaAnnotations"></a>11.2 Schemas and Meta Annotations</h2>
 
 <div class='contribute-btn'>
     <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/swaggerAnnotations/schemasAndMetaAnnotations.adoc"'>
@@ -1098,7 +1220,7 @@ enum PetType {
 <p>Then whenever <code>Pet</code> is used as a parameter you can annotate the parameter with <code>@MyAnn</code>.</p>
 </div>
 
-<h2 id="schemasAndGenerics"><a class="anchor" href="#schemasAndGenerics"></a>10.3 Schemas and Generics</h2>
+<h2 id="schemasAndGenerics"><a class="anchor" href="#schemasAndGenerics"></a>11.3 Schemas and Generics</h2>
 
 <div class='contribute-btn'>
     <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/swaggerAnnotations/schemasAndGenerics.adoc"'>
@@ -1147,7 +1269,7 @@ public Response&lt;Pet&gt; updatePet(Pet pet) {
 <p>In the above case the generated schema will be named <code>#/components/schemas/ResponseOfPet</code>.</p>
 </div>
 
-<h2 id="schemasNaming"><a class="anchor" href="#schemasNaming"></a>10.4 Schemas naming</h2>
+<h2 id="schemasNaming"><a class="anchor" href="#schemasNaming"></a>11.4 Schemas naming</h2>
 
 <div class='contribute-btn'>
     <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/swaggerAnnotations/schemasNaming.adoc"'>
@@ -1215,7 +1337,7 @@ class Owner {
 </table>
 </div>
 
-<h2 id="schemasAnnotationResolution"><a class="anchor" href="#schemasAnnotationResolution"></a>10.5 Schemas Annotation resolution</h2>
+<h2 id="schemasAnnotationResolution"><a class="anchor" href="#schemasAnnotationResolution"></a>11.5 Schemas Annotation resolution</h2>
 
 <div class='contribute-btn'>
     <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/swaggerAnnotations/schemasAnnotationResolution.adoc"'>
@@ -1270,7 +1392,7 @@ class Owner {
 </table>
 </div>
 
-<h1 id="endpoints"><a class="anchor" href="#endpoints"></a>11 Exposing Endpoints</h1>
+<h1 id="endpoints"><a class="anchor" href="#endpoints"></a>12 Exposing Endpoints</h1>
 
 <div class='contribute-btn'>
     <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/endpoints.adoc"'>
@@ -1283,7 +1405,7 @@ class Owner {
 <p>It is possible to expose management Endpoints in the openapi specification file.</p>
 </div>
 
-<h2 id="enableendpoints"><a class="anchor" href="#enableendpoints"></a>11.1 Enable Endpoints</h2>
+<h2 id="enableendpoints"><a class="anchor" href="#enableendpoints"></a>12.1 Enable Endpoints</h2>
 
 <div class='contribute-btn'>
     <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/endpoints/enableendpoints.adoc"'>
@@ -1305,7 +1427,7 @@ class Owner {
 </div>
 </div>
 
-<h2 id="endpointstags"><a class="anchor" href="#endpointstags"></a>11.2 Endpoints Tags</h2>
+<h2 id="endpointstags"><a class="anchor" href="#endpointstags"></a>12.2 Endpoints Tags</h2>
 
 <div class='contribute-btn'>
     <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/endpoints/endpointstags.adoc"'>
@@ -1324,7 +1446,7 @@ class Owner {
 </div>
 </div>
 
-<h2 id="micronautendpoints"><a class="anchor" href="#micronautendpoints"></a>11.3 Micronaut Built-In Endpoints</h2>
+<h2 id="micronautendpoints"><a class="anchor" href="#micronautendpoints"></a>12.3 Micronaut Built-In Endpoints</h2>
 
 <div class='contribute-btn'>
     <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/endpoints/micronautendpoints.adoc"'>
@@ -1340,7 +1462,7 @@ class Owner {
 <p>        <div class="listingblock multi-language-sample">
 <div class="title"></div>
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="gradle">annotationProcessor(<span class="hljs-string">"io.micronaut:micronaut-management:4.6.1-SNAPSHOT")</span></code></pre>
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="gradle">annotationProcessor(<span class="hljs-string">"io.micronaut:micronaut-management:4.7.0-SNAPSHOT")</span></code></pre>
 </div>
 </div>
 <div class="listingblock multi-language-sample">
@@ -1350,7 +1472,7 @@ class Owner {
     &lt;path&gt;
         &lt;groupId&gt;io.micronaut&lt;/groupId&gt;
         &lt;artifactId&gt;micronaut-management&lt;/artifactId&gt;
-        &lt;version&gt;4.6.1-SNAPSHOT&lt;/version&gt;
+        &lt;version&gt;4.7.0-SNAPSHOT&lt;/version&gt;
     &lt;/path&gt;
 &lt;/annotationProcessorPaths&gt;</code></pre>
 </div>
@@ -1360,7 +1482,7 @@ class Owner {
 <p>        <div class="listingblock multi-language-sample">
 <div class="title"></div>
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="gradle">implementation(<span class="hljs-string">"io.micronaut:micronaut-management:4.6.1-SNAPSHOT")</span></code></pre>
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="gradle">implementation(<span class="hljs-string">"io.micronaut:micronaut-management:4.7.0-SNAPSHOT")</span></code></pre>
 </div>
 </div>
 <div class="listingblock multi-language-sample">
@@ -1368,7 +1490,7 @@ class Owner {
 <pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="maven">&lt;dependency&gt;
     &lt;groupId&gt;io.micronaut&lt;/groupId&gt;
     &lt;artifactId&gt;micronaut-management&lt;/artifactId&gt;
-    &lt;version&gt;4.6.1-SNAPSHOT&lt;/version&gt;
+    &lt;version&gt;4.7.0-SNAPSHOT&lt;/version&gt;
 &lt;/dependency&gt;</code></pre>
 </div>
 </div></p>
@@ -1399,7 +1521,7 @@ endpoints.refresh.security-requirements=[{"petstore_auth": ["write:pets", "read:
 </div>
 </div>
 
-<h2 id="endpointservers"><a class="anchor" href="#endpointservers"></a>11.4 Endpoints Servers</h2>
+<h2 id="endpointservers"><a class="anchor" href="#endpointservers"></a>12.4 Endpoints Servers</h2>
 
 <div class='contribute-btn'>
     <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/endpoints/endpointservers.adoc"'>
@@ -1438,7 +1560,7 @@ endpoints.refresh.security-requirements=[{"petstore_auth": ["write:pets", "read:
 </div>
 </div>
 
-<h2 id="endpointssecurityrequirements"><a class="anchor" href="#endpointssecurityrequirements"></a>11.5 Endpoints Security Requirements</h2>
+<h2 id="endpointssecurityrequirements"><a class="anchor" href="#endpointssecurityrequirements"></a>12.5 Endpoints Security Requirements</h2>
 
 <div class='contribute-btn'>
     <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/endpoints/endpointssecurityrequirements.adoc"'>
@@ -1463,7 +1585,7 @@ endpoints.refresh.security-requirements=[{"petstore_auth": ["write:pets", "read:
 <p>Don&#8217;t forget to declare the referenced <code>SecurityScheme</code>.</p>
 </div>
 
-<h2 id="endpointspath"><a class="anchor" href="#endpointspath"></a>11.6 Endpoints Path</h2>
+<h2 id="endpointspath"><a class="anchor" href="#endpointspath"></a>12.6 Endpoints Path</h2>
 
 <div class='contribute-btn'>
     <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/endpoints/endpointspath.adoc"'>
@@ -1485,7 +1607,7 @@ endpoints.refresh.security-requirements=[{"petstore_auth": ["write:pets", "read:
 </div>
 </div>
 
-<h1 id="annotationConfiguration"><a class="anchor" href="#annotationConfiguration"></a>12 Annotation Configuration</h1>
+<h1 id="annotationConfiguration"><a class="anchor" href="#annotationConfiguration"></a>13 Annotation Configuration</h1>
 
 <div class='contribute-btn'>
     <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/annotationConfiguration.adoc"'>
@@ -1504,7 +1626,7 @@ endpoints.refresh.security-requirements=[{"petstore_auth": ["write:pets", "read:
 <p>        <div class="listingblock multi-language-sample">
 <div class="title"></div>
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="gradle">implementation(<span class="hljs-string">"io.micronaut.openapi:micronaut-openapi:4.6.1-SNAPSHOT")</span></code></pre>
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="gradle">implementation(<span class="hljs-string">"io.micronaut.openapi:micronaut-openapi:4.7.0-SNAPSHOT")</span></code></pre>
 </div>
 </div>
 <div class="listingblock multi-language-sample">
@@ -1512,13 +1634,13 @@ endpoints.refresh.security-requirements=[{"petstore_auth": ["write:pets", "read:
 <pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="maven">&lt;dependency&gt;
     &lt;groupId&gt;io.micronaut.openapi&lt;/groupId&gt;
     &lt;artifactId&gt;micronaut-openapi&lt;/artifactId&gt;
-    &lt;version&gt;4.6.1-SNAPSHOT&lt;/version&gt;
+    &lt;version&gt;4.7.0-SNAPSHOT&lt;/version&gt;
 &lt;/dependency&gt;</code></pre>
 </div>
 </div></p>
 </div>
 
-<h2 id="openapiinclude"><a class="anchor" href="#openapiinclude"></a>12.1 @OpenAPIInclude</h2>
+<h2 id="openapiinclude"><a class="anchor" href="#openapiinclude"></a>13.1 @OpenAPIInclude</h2>
 
 <div class='contribute-btn'>
     <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/annotationConfiguration/openapiinclude.adoc"'>
@@ -1561,7 +1683,7 @@ public class Application {
 </div>
 </div>
 
-<h2 id="openapimanagement"><a class="anchor" href="#openapimanagement"></a>12.2 @OpenAPIManagement</h2>
+<h2 id="openapimanagement"><a class="anchor" href="#openapimanagement"></a>13.2 @OpenAPIManagement</h2>
 
 <div class='contribute-btn'>
     <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/annotationConfiguration/openapimanagement.adoc"'>
@@ -1591,7 +1713,7 @@ io.micronaut.management.endpoint.threads.ThreadDumpEndpoint }
 </div>
 </div>
 
-<h2 id="openapisecurity"><a class="anchor" href="#openapisecurity"></a>12.3 @OpenAPISecurity</h2>
+<h2 id="openapisecurity"><a class="anchor" href="#openapisecurity"></a>13.3 @OpenAPISecurity</h2>
 
 <div class='contribute-btn'>
     <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/annotationConfiguration/openapisecurity.adoc"'>
@@ -1614,7 +1736,7 @@ classes = { io.micronaut.security.endpoints.LoginController.class, io.micronaut.
 </div>
 </div>
 
-<h2 id="accessorsStyle"><a class="anchor" href="#accessorsStyle"></a>12.4 @AccessorsStyle</h2>
+<h2 id="accessorsStyle"><a class="anchor" href="#accessorsStyle"></a>13.4 @AccessorsStyle</h2>
 
 <div class='contribute-btn'>
     <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/annotationConfiguration/accessorsStyle.adoc"'>
@@ -1687,7 +1809,7 @@ class Person {
 <p>Using <code>@AccessorsStyle</code> will tell Micronaut how to access getters and setters and will also generate the appropriate Open API spec.</p>
 </div>
 
-<h1 id="mergingSchemas"><a class="anchor" href="#mergingSchemas"></a>13 Merging Schemas</h1>
+<h1 id="mergingSchemas"><a class="anchor" href="#mergingSchemas"></a>14 Merging Schemas</h1>
 
 <div class='contribute-btn'>
     <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/mergingSchemas.adoc"'>
@@ -1849,7 +1971,7 @@ paths:
 <p>Micronaut will include the endpoints defined in those files in the generated output.</p>
 </div>
 
-<h1 id="openApiViews"><a class="anchor" href="#openApiViews"></a>14 Generating OpenAPI Views</h1>
+<h1 id="openApiViews"><a class="anchor" href="#openApiViews"></a>15 Generating OpenAPI Views</h1>
 
 <div class='contribute-btn'>
     <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/openApiViews.adoc"'>
@@ -1869,7 +1991,7 @@ You can also use <a href="https://mrin9.github.io/RapiPdf/">RapiPdf</a> to gener
 <p>The resources needed to render the views (javascript, css, &#8230;&#8203;) are loaded from CDNs: <a href="https://unpkg.com">unpkg.com</a> and <a href="https://fonts.googleapis.com/">fonts.googleapis.com</a>.</p>
 </div>
 
-<h2 id="mappingPath"><a class="anchor" href="#mappingPath"></a>14.1 Mapping Path</h2>
+<h2 id="mappingPath"><a class="anchor" href="#mappingPath"></a>15.1 Mapping Path</h2>
 
 <div class='contribute-btn'>
     <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/openApiViews/mappingPath.adoc"'>
@@ -1903,7 +2025,7 @@ You can also use <a href="https://mrin9.github.io/RapiPdf/">RapiPdf</a> to gener
 <p>You will need to set the <code>mapping.path</code> property accordingly: <code>micronaut.openapi.views.spec=mapping.path=swaggerYAML&#8230;&#8203;</code>.</p>
 </div>
 
-<h2 id="viewsGenerationWithPropertiesFile"><a class="anchor" href="#viewsGenerationWithPropertiesFile"></a>14.2 Enable Views Generation with a properties file</h2>
+<h2 id="viewsGenerationWithPropertiesFile"><a class="anchor" href="#viewsGenerationWithPropertiesFile"></a>15.2 Enable Views Generation with a properties file</h2>
 
 <div class='contribute-btn'>
     <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/openApiViews/viewsGenerationWithPropertiesFile.adoc"'>
@@ -1930,7 +2052,7 @@ rapidoc.sort-endpoints-by=method
 </div>
 </div>
 
-<h2 id="viewsGenerationWithSystemProperties"><a class="anchor" href="#viewsGenerationWithSystemProperties"></a>14.3 Enable Views Generation with system properties</h2>
+<h2 id="viewsGenerationWithSystemProperties"><a class="anchor" href="#viewsGenerationWithSystemProperties"></a>15.3 Enable Views Generation with system properties</h2>
 
 <div class='contribute-btn'>
     <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/openApiViews/viewsGenerationWithSystemProperties.adoc"'>
@@ -2067,7 +2189,7 @@ rapidoc.sort-endpoints-by=method
 </div>
 </div>
 
-<h2 id="swaggerui"><a class="anchor" href="#swaggerui"></a>14.4 Swagger-UI</h2>
+<h2 id="swaggerui"><a class="anchor" href="#swaggerui"></a>15.4 Swagger-UI</h2>
 
 <div class='contribute-btn'>
     <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/openApiViews/swaggerui.adoc"'>
@@ -2198,7 +2320,7 @@ rapidoc.sort-endpoints-by=method
 <p>With the above configuration in place when you run your application you can access your Swagger documentation at http://localhost:8080/swagger-ui.</p>
 </div>
 
-<h2 id="oauth2"><a class="anchor" href="#oauth2"></a>14.4.1 Swagger UI - OAuth 2.0 configuration</h2>
+<h2 id="oauth2"><a class="anchor" href="#oauth2"></a>15.4.1 Swagger UI - OAuth 2.0 configuration</h2>
 
 <div class='contribute-btn'>
     <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/openApiViews/swaggerui/oauth2.adoc"'>
@@ -2358,7 +2480,7 @@ public class OrderController {
 <p>The previous sample uses a remote <a href="https://micronaut-projects.github.io/micronaut-security/latest/guide/index.html#jwks">Json Web Key Set</a> to validate the token issued by the authorization server. If you use <a href="https://micronaut-projects.github.io/micronaut-security/latest/guide/index.html#openid">Micronaut Security OpenID Connect support</a> with a server compatible with <a href="https://openid.net/specs/openid-connect-discovery-1_0.html">OpenID Connect Discovery</a>, the JWKS of the authorization server is automatically configured.</p>
 </div>
 
-<h2 id="redoc"><a class="anchor" href="#redoc"></a>14.5 Redoc</h2>
+<h2 id="redoc"><a class="anchor" href="#redoc"></a>15.5 Redoc</h2>
 
 <div class='contribute-btn'>
     <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/openApiViews/redoc.adoc"'>
@@ -2501,7 +2623,7 @@ public class OrderController {
 <p>With the above configuration in place when you run your application you can access your Swagger documentation at http://localhost:8080/redoc.</p>
 </div>
 
-<h2 id="rapidoc"><a class="anchor" href="#rapidoc"></a>14.6 RapiDoc</h2>
+<h2 id="rapidoc"><a class="anchor" href="#rapidoc"></a>15.6 RapiDoc</h2>
 
 <div class='contribute-btn'>
     <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/openApiViews/rapidoc.adoc"'>
@@ -2713,7 +2835,7 @@ public class OrderController {
 <p>With the above configuration in place when you run your application you can access your Swagger documentation at http://localhost:8080/rapidoc.</p>
 </div>
 
-<h2 id="rapipdf"><a class="anchor" href="#rapipdf"></a>14.7 RapiPdf</h2>
+<h2 id="rapipdf"><a class="anchor" href="#rapipdf"></a>15.7 RapiPdf</h2>
 
 <div class='contribute-btn'>
     <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/openApiViews/rapipdf.adoc"'>
@@ -2783,7 +2905,7 @@ public class OrderController {
 <p>It will add a button to the view to generate a PDF from the spec file.</p>
 </div>
 
-<h1 id="serverContext"><a class="anchor" href="#serverContext"></a>15 Server Context</h1>
+<h1 id="serverContext"><a class="anchor" href="#serverContext"></a>16 Server Context</h1>
 
 <div class='contribute-btn'>
     <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/serverContext.adoc"'>
@@ -2816,7 +2938,7 @@ Since the yaml specification file and the views are generated at compile time, t
 <p>The view will first look for the cookie and if not present for the parameter.</p>
 </div>
 
-<h2 id="compileResolution"><a class="anchor" href="#compileResolution"></a>15.1 Compile Time Resolution</h2>
+<h2 id="compileResolution"><a class="anchor" href="#compileResolution"></a>16.1 Compile Time Resolution</h2>
 
 <div class='contribute-btn'>
     <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/serverContext/compileResolution.adoc"'>
@@ -2832,7 +2954,7 @@ Since the yaml specification file and the views are generated at compile time, t
 <p>If you want the resolution of the context path at runtime use one of the following methods:</p>
 </div>
 
-<h2 id="serverFilter"><a class="anchor" href="#serverFilter"></a>15.2 HttpServerFilter</h2>
+<h2 id="serverFilter"><a class="anchor" href="#serverFilter"></a>16.2 HttpServerFilter</h2>
 
 <div class='contribute-btn'>
     <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/serverContext/serverFilter.adoc"'>
@@ -2949,7 +3071,7 @@ public class OpenApiContextPathFilter implements HttpServerFilter {
 </div>
 </div>
 
-<h2 id="urlParameter"><a class="anchor" href="#urlParameter"></a>15.3 URL Parameter</h2>
+<h2 id="urlParameter"><a class="anchor" href="#urlParameter"></a>16.3 URL Parameter</h2>
 
 <div class='contribute-btn'>
     <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/serverContext/urlParameter.adoc"'>
@@ -2962,7 +3084,7 @@ public class OpenApiContextPathFilter implements HttpServerFilter {
 <p>Just add a parameter to the view url. For instance if the context path is set to <code>/context/path</code> you will access your view with <code><a href="http://localhost:8080/context/path/swagger-ui?contextPath=%2Fcontext%2Fpath" class="bare">http://localhost:8080/context/path/swagger-ui?contextPath=%2Fcontext%2Fpath</a></code>.</p>
 </div>
 
-<h1 id="repository"><a class="anchor" href="#repository"></a>16 Repository</h1>
+<h1 id="repository"><a class="anchor" href="#repository"></a>17 Repository</h1>
 
 <div class='contribute-btn'>
     <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/repository.adoc"'>
@@ -2978,7 +3100,7 @@ public class OpenApiContextPathFilter implements HttpServerFilter {
 <p><a href="https://github.com/micronaut-projects/micronaut-openapi">https://github.com/micronaut-projects/micronaut-openapi</a></p>
 </div>
 
-<h1 id="breaks"><a class="anchor" href="#breaks"></a>17 Breaking Changes</h1>
+<h1 id="breaks"><a class="anchor" href="#breaks"></a>18 Breaking Changes</h1>
 
 <div class='contribute-btn'>
     <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/breaks.adoc"'>
