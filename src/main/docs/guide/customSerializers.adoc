@@ -3,9 +3,9 @@ You can set custom classes to create different open api schemas for selected cla
 ```yaml
 micronaut:
   openapi:
-  schema:
-    org.somepackage.MyComplexType: java.lang.String
-    org.somepackage.MyComplexType2: java.lang.Integer
+    schema:
+      org.somepackage.MyComplexType: java.lang.String
+      org.somepackage.MyComplexType2: java.lang.Integer
 ```
 
 or by system properties:
@@ -17,8 +17,8 @@ or by system properties:
 or by openapi.properties
 
 ```properties
-micronaut.opemapi.schema.org.somepackage.MyComplexType=java.lang.String
-micronaut.opemapi.schema.org.somepackage.MyComplexType2=java.lang.Integer
+micronaut.openapi.schema.org.somepackage.MyComplexType=java.lang.String
+micronaut.openapi.schema.org.somepackage.MyComplexType2=java.lang.Integer
 ```
 
 Also, it can be used for replace classes schema with generics, for example, if you use jaxb generated classes and have custom serializer for JAXBElement class.
