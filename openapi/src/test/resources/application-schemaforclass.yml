@@ -1,0 +1,5 @@
+micronaut:
+  openapi:
+    schema:
+      io.micronaut.openapi.ObjectId: java.lang.String
+      io.micronaut.openapi.JAXBElement: io.micronaut.openapi.MyJaxbElement
