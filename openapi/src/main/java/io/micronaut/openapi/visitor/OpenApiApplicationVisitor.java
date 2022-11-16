@@ -656,10 +656,9 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
 
     private static OpenAPI resolvePropertyPlaceHolders(OpenAPI openAPI, VisitorContext visitorContext) {
         List<Map.Entry<String, String>> expandableProperties = getExpandableProperties(visitorContext);
-        if (CollectionUtils.isEmpty(expandableProperties)) {
-            return openAPI;
+        if (CollectionUtils.isNotEmpty(expandableProperties)) {
+            visitorContext.info("Expanding properties: " + expandableProperties);
         }
-        visitorContext.info("Expanding properties: " + expandableProperties);
         JsonNode root = resolvePlaceholders(ConvertUtils.getYamlMapper().convertValue(openAPI, ObjectNode.class), s -> expandProperties(s, expandableProperties, visitorContext));
         return ConvertUtils.getYamlMapper().convertValue(root, OpenAPI.class);
     }
