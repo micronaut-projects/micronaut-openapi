@@ -293,10 +293,12 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
 
         // third read environments properties
         Environment environment = getEnv(context);
-        for (Map.Entry<String, Object> entry : environment.getProperties(MICRONAUT_OPENAPI_SCHEMA, StringConvention.RAW).entrySet()) {
-            String configuredClassName = entry.getKey();
-            String targetClassName = (String) entry.getValue();
-            readCustomSchema(configuredClassName, targetClassName, customSchemas, context);
+        if (environment != null) {
+            for (Map.Entry<String, Object> entry : environment.getProperties(MICRONAUT_OPENAPI_SCHEMA, StringConvention.RAW).entrySet()) {
+                String configuredClassName = entry.getKey();
+                String targetClassName = (String) entry.getValue();
+                readCustomSchema(configuredClassName, targetClassName, customSchemas, context);
+            }
         }
 
         context.put(MICRONAUT_CUSTOM_SCHEMAS, customSchemas);
