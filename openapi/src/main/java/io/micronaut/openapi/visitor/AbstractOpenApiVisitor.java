@@ -1957,6 +1957,7 @@ abstract class AbstractOpenApiVisitor {
         return null;
     }
 
+    @SuppressWarnings("java:S3655") // false positive
     private void readAllInterfaces(OpenAPI openAPI, VisitorContext context, @Nullable Element definingElement, List<MediaType> mediaTypes,
                                    Schema schema, ClassElement superType, Map<String, Schema> schemas, Map<String, ClassElement> superTypeArgs) {
         String parentSchemaName = computeDefaultSchemaName(definingElement, superType, superTypeArgs, context);
@@ -2006,6 +2007,7 @@ abstract class AbstractOpenApiVisitor {
      *
      * @throws JsonProcessingException when Json parsing fails
      */
+    @SuppressWarnings("java:S3776")
     protected Schema readSchema(AnnotationValue<io.swagger.v3.oas.annotations.media.Schema> schemaValue, OpenAPI openAPI, VisitorContext context, @Nullable Element type, Map<String, ClassElement> typeArgs, List<MediaType> mediaTypes) throws JsonProcessingException {
         Map<CharSequence, Object> values = schemaValue.getValues()
             .entrySet()
@@ -2233,6 +2235,7 @@ abstract class AbstractOpenApiVisitor {
         }
     }
 
+    @SuppressWarnings("java:S3776")
     private void processPropertyElements(OpenAPI openAPI, VisitorContext context, Element type, Map<String, ClassElement> typeArgs, Schema schema, List<? extends TypedElement> publicFields, List<MediaType> mediaTypes, JavadocDescription classJavadoc) {
 
         ClassElement classElement = null;
