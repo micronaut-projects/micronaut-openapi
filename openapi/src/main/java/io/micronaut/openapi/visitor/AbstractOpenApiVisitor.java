@@ -751,16 +751,19 @@ abstract class AbstractOpenApiVisitor {
         if (type != null && schemaAnnotationValue == null) {
             schemaAnnotationValue = type.getAnnotation(io.swagger.v3.oas.annotations.media.Schema.class);
         }
+        boolean substitudedType = false;
         if (schemaAnnotationValue != null) {
             String impl = schemaAnnotationValue.stringValue("implementation").orElse(null);
             if (StringUtils.isNotEmpty(impl)) {
                 type = context.getClassElement(impl).orElse(type);
+                substitudedType = type != null;
             } else {
                 String schemaType = schemaAnnotationValue.stringValue("type").orElse(null);
                 if (StringUtils.isNotEmpty(schemaType) && !(type instanceof EnumElement)) {
                     PrimitiveType primitiveType = PrimitiveType.fromName(schemaType);
                     if (primitiveType != null && primitiveType != PrimitiveType.OBJECT) {
                         type = context.getClassElement(primitiveType.getKeyClass()).orElse(type);
+                        substitudedType = type != null;
                     }
                 }
             }
@@ -923,6 +926,10 @@ abstract class AbstractOpenApiVisitor {
                     schema = SchemaUtils.arraySchema(schema);
                 } else if (isNullable) {
                     schema.setNullable(true);
+                }
+
+                if (substitudedType) {
+                    ApplySubstituteSchema.apply(schemaAnnotationValue, schema);
                 }
             }
         }
