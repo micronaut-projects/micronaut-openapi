@@ -29,6 +29,7 @@ import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -50,6 +51,7 @@ import io.micronaut.context.DefaultApplicationContextBuilder;
 import io.micronaut.context.env.Environment;
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.core.annotation.Nullable;
+import io.micronaut.core.naming.conventions.StringConvention;
 import io.micronaut.core.type.Argument;
 import io.micronaut.core.type.GenericArgument;
 import io.micronaut.core.util.CollectionUtils;
@@ -98,7 +100,6 @@ import com.fasterxml.jackson.databind.node.TextNode;
     OpenApiApplicationVisitor.MICRONAUT_OPENAPI_TARGET_FILE,
     OpenApiApplicationVisitor.MICRONAUT_OPENAPI_ADDITIONAL_FILES,
     OpenApiApplicationVisitor.MICRONAUT_OPENAPI_CONFIG_FILE,
-
 })
 public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements TypeElementVisitor<OpenAPIDefinition, Object> {
 
@@ -179,6 +180,24 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
     private static final String MICRONAUT_ENVIRONMENT_CREATED = "micronaut.environment.created";
     private static final String MICRONAUT_OPENAPI_PROPERTIES = "micronaut.openapi.properties";
     private static final String MICRONAUT_OPENAPI_ENDPOINTS = "micronaut.openapi.endpoints";
+
+    /**
+     * Properties prefix to set custom schema implementations for selected clases.
+     * For example, if you want to set simple 'java.lang.String' class to some complex 'org.somepackage.MyComplexType' class you need to write:
+     * <p>
+     * micronaut.openapi.schema.org.somepackage.MyComplexType=java.lang.String
+     *
+     * Also, you can set it in your application.yml file like this:
+     * <p>
+     * micronaut:
+     *   openapi:
+     *     schema:
+     *       org.somepackage.MyComplexType: java.lang.String
+     *       org.somepackage.MyComplexType2: java.lang.Integer
+     *       ...
+     */
+    private static final String MICRONAUT_OPENAPI_SCHEMA = "micronaut.openapi.schema";
+    private static final String MICRONAUT_CUSTOM_SCHEMAS = "micronaut.internal.custom.schemas";
     /**
      * Loaded expandable properties. Need to save them to reuse in diffferent places.
      */
@@ -245,6 +264,108 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         }
 
         classElement = element;
+    }
+
+    public static ClassElement getCustomSchema(String className, Map<String, ClassElement> typeArgs, VisitorContext context) {
+
+        Map<String, CustomSchema> customSchemas = (Map<String, CustomSchema>) context.get(MICRONAUT_CUSTOM_SCHEMAS, Map.class).orElse(null);
+        if (customSchemas != null) {
+            String key = getClassNameWithGenerics(className, typeArgs);
+
+            CustomSchema customSchema = customSchemas.get(key);
+            if (customSchema != null) {
+                return customSchema.classElement;
+            }
+            customSchema = customSchemas.get(className);
+
+            return customSchema != null ? customSchema.classElement : null;
+        }
+
+        customSchemas = new HashMap<>();
+
+        // first read system properties
+        Properties sysProps = System.getProperties();
+        readCustomSchemas(sysProps, customSchemas, context);
+
+        // second read openapi.properties file
+        Properties fileProps = readOpenApiConfigFile(context);
+        readCustomSchemas(fileProps, customSchemas, context);
+
+        // third read environments properties
+        Environment environment = getEnv(context);
+        for (Map.Entry<String, Object> entry : environment.getProperties(MICRONAUT_OPENAPI_SCHEMA, StringConvention.RAW).entrySet()) {
+            String configuredClassName = entry.getKey();
+            String targetClassName = (String) entry.getValue();
+            readCustomSchema(configuredClassName, targetClassName, customSchemas, context);
+        }
+
+        context.put(MICRONAUT_CUSTOM_SCHEMAS, customSchemas);
+
+        if (customSchemas.isEmpty()) {
+            return null;
+        }
+
+        String key = getClassNameWithGenerics(className, typeArgs);
+
+        CustomSchema customSchema = customSchemas.get(key);
+        if (customSchema != null) {
+            return customSchema.classElement;
+        }
+        customSchema = customSchemas.get(className);
+
+        return customSchema != null ? customSchema.classElement : null;
+    }
+
+    private static String getClassNameWithGenerics(String className, Map<String, ClassElement> typeArgs) {
+        StringBuilder key = new StringBuilder(className);
+        if (!typeArgs.isEmpty()) {
+            key.append('<');
+            boolean isFirst = true;
+            for (ClassElement typeArg : typeArgs.values()) {
+                if (!isFirst) {
+                    key.append(',');
+                }
+                key.append(typeArg.getName());
+                isFirst = false;
+            }
+            key.append('>');
+        }
+        return key.toString();
+    }
+
+    private static void readCustomSchemas(Properties props, Map<String, CustomSchema> customSchemas, VisitorContext context) {
+
+        for (String prop : props.stringPropertyNames()) {
+            if (!prop.startsWith(MICRONAUT_OPENAPI_SCHEMA)) {
+                continue;
+            }
+            String className = prop.substring(MICRONAUT_OPENAPI_SCHEMA.length() + 1);
+            String targetClassName = props.getProperty(prop);
+            readCustomSchema(className, targetClassName, customSchemas, context);
+        }
+    }
+
+    private static void readCustomSchema(String className, String targetClassName, Map<String, CustomSchema> customSchemas, VisitorContext context) {
+        if (customSchemas.containsKey(className)) {
+            return;
+        }
+        ClassElement targetClassElement = context.getClassElement(targetClassName).orElse(null);
+        if (targetClassElement == null) {
+            context.warn("Can't find class " + targetClassName + " in classpath. Skip it.", null);
+            return;
+        }
+
+        List<String> configuredTypeArgs = null;
+        int genericNameStart = className.indexOf('<');
+        if (genericNameStart > 0) {
+            String[] generics = className.substring(genericNameStart + 1, className.indexOf('>')).split(",");
+            configuredTypeArgs = new ArrayList<>();
+            for (String generic : generics) {
+                configuredTypeArgs.add(generic.trim());
+            }
+        }
+
+        customSchemas.put(className, new CustomSchema(configuredTypeArgs, targetClassElement));
     }
 
     public static String getConfigurationProperty(String key, VisitorContext context) {
@@ -656,10 +777,9 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
 
     private static OpenAPI resolvePropertyPlaceHolders(OpenAPI openAPI, VisitorContext visitorContext) {
         List<Map.Entry<String, String>> expandableProperties = getExpandableProperties(visitorContext);
-        if (CollectionUtils.isEmpty(expandableProperties)) {
-            return openAPI;
+        if (CollectionUtils.isNotEmpty(expandableProperties)) {
+            visitorContext.info("Expanding properties: " + expandableProperties);
         }
-        visitorContext.info("Expanding properties: " + expandableProperties);
         JsonNode root = resolvePlaceholders(ConvertUtils.getYamlMapper().convertValue(openAPI, ObjectNode.class), s -> expandProperties(s, expandableProperties, visitorContext));
         return ConvertUtils.getYamlMapper().convertValue(root, OpenAPI.class);
     }
@@ -807,5 +927,24 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             return propertyName;
         }
 
+    }
+
+    static final class CustomSchema {
+
+        private final List<String> typeArgs;
+        private final ClassElement classElement;
+
+        private CustomSchema(List<String> typeArgs, ClassElement classElement) {
+            this.typeArgs = typeArgs;
+            this.classElement = classElement;
+        }
+
+        public List<String> getTypeArgs() {
+            return typeArgs;
+        }
+
+        public ClassElement getClassElement() {
+            return classElement;
+        }
     }
 }
