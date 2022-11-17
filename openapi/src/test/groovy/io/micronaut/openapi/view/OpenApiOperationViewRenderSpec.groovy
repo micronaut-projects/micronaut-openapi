@@ -1,5 +1,6 @@
 package io.micronaut.openapi.view
 
+import io.micronaut.openapi.visitor.OpenApiApplicationVisitor
 import spock.lang.Specification
 
 import java.nio.charset.StandardCharsets
@@ -46,19 +47,19 @@ class OpenApiOperationViewRenderSpec extends Specification {
         Files.exists(outputDir.resolve("swagger-ui").resolve("res").resolve("rapipdf-min.js"))
         Files.exists(outputDir.resolve("swagger-ui").resolve("res").resolve("flattop.css"))
 
-        outputDir.resolve("redoc").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains("redoc/res/redoc.standalone.js")
+        outputDir.resolve("redoc").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains("/redoc/res/redoc.standalone.js")
         outputDir.resolve("redoc").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains(cfg.getSpecURL())
-        outputDir.resolve("redoc").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains("redoc/res/rapipdf-min.js")
-        outputDir.resolve("rapidoc").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains("rapidoc/res/rapidoc-min.js")
+        outputDir.resolve("redoc").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains("/redoc/res/rapipdf-min.js")
+        outputDir.resolve("rapidoc").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains("/rapidoc/res/rapidoc-min.js")
         outputDir.resolve("rapidoc").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains(cfg.getSpecURL())
-        outputDir.resolve("rapidoc").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains("rapidoc/res/rapipdf-min.js")
-        outputDir.resolve("swagger-ui").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains("swagger-ui/res/swagger-ui-bundle.js")
-        outputDir.resolve("swagger-ui").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains("swagger-ui/res/swagger-ui-standalone-preset.js")
-        outputDir.resolve("swagger-ui").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains("swagger-ui/res/swagger-ui.css")
-        outputDir.resolve("swagger-ui").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains("swagger-ui/res/favicon-32x32.png")
-        outputDir.resolve("swagger-ui").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains("swagger-ui/res/favicon-16x16.png")
+        outputDir.resolve("rapidoc").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains("/rapidoc/res/rapipdf-min.js")
+        outputDir.resolve("swagger-ui").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains("/swagger-ui/res/swagger-ui-bundle.js")
+        outputDir.resolve("swagger-ui").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains("/swagger-ui/res/swagger-ui-standalone-preset.js")
+        outputDir.resolve("swagger-ui").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains("/swagger-ui/res/swagger-ui.css")
+        outputDir.resolve("swagger-ui").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains("/swagger-ui/res/favicon-32x32.png")
+        outputDir.resolve("swagger-ui").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains("/swagger-ui/res/favicon-16x16.png")
         outputDir.resolve("swagger-ui").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains(cfg.getSpecURL())
-        outputDir.resolve("swagger-ui").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains("swagger-ui/res/rapipdf-min.js")
+        outputDir.resolve("swagger-ui").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains("/swagger-ui/res/rapipdf-min.js")
     }
 
     void "test render OpenApiView specification with custom redoc js url"() {
@@ -231,4 +232,102 @@ class OpenApiOperationViewRenderSpec extends Specification {
         indexHtml.contains('clientSecret: "bar"')
     }
 
+    void "test generates urlResourcesPrefix context-path and openapi.context.path"() {
+        given:
+        System.setProperty("micronaut.server.context-path", "/local-path")
+        System.setProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_CONTEXT_SERVER_PATH, "/server-context-path")
+        String spec = "swagger-ui.enabled=true"
+        OpenApiViewConfig cfg = OpenApiViewConfig.fromSpecification(spec, new Properties())
+        Path outputDir = Paths.get("output")
+        cfg.title = "OpenAPI documentation"
+        cfg.specFile = "swagger.yml"
+        cfg.render(outputDir, null)
+
+        expect:
+        cfg.enabled
+        cfg.swaggerUIConfig != null
+        cfg.title == "OpenAPI documentation"
+        cfg.specFile == "swagger.yml"
+
+        String urlPrefix = cfg.swaggerUIConfig.getFinalUrlPrefix(OpenApiViewConfig.RendererType.SWAGGER_UI, null)
+
+        urlPrefix
+        urlPrefix == '/server-context-path/local-path/swagger-ui/res/'
+
+        cleanup:
+        System.clearProperty("micronaut.server.context-path")
+        System.clearProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_CONTEXT_SERVER_PATH)
+    }
+
+    void "test generates urlResourcesPrefix only context-path"() {
+        given:
+        System.setProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_CONTEXT_SERVER_PATH, "/server-context-path")
+        String spec = "swagger-ui.enabled=true"
+        OpenApiViewConfig cfg = OpenApiViewConfig.fromSpecification(spec, new Properties())
+        Path outputDir = Paths.get("output")
+        cfg.title = "OpenAPI documentation"
+        cfg.specFile = "swagger.yml"
+        cfg.render(outputDir, null)
+
+        expect:
+        cfg.enabled
+        cfg.swaggerUIConfig != null
+        cfg.title == "OpenAPI documentation"
+        cfg.specFile == "swagger.yml"
+
+        String urlPrefix = cfg.swaggerUIConfig.getFinalUrlPrefix(OpenApiViewConfig.RendererType.SWAGGER_UI, null)
+
+        urlPrefix
+        urlPrefix == '/server-context-path/swagger-ui/res/'
+
+        cleanup:
+        System.clearProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_CONTEXT_SERVER_PATH)
+    }
+
+    void "test generates urlResourcesPrefix only openapi.context.path"() {
+        given:
+        System.setProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_CONTEXT_SERVER_PATH, "/server-context-path")
+        String spec = "swagger-ui.enabled=true"
+        OpenApiViewConfig cfg = OpenApiViewConfig.fromSpecification(spec, new Properties())
+        Path outputDir = Paths.get("output")
+        cfg.title = "OpenAPI documentation"
+        cfg.specFile = "swagger.yml"
+        cfg.render(outputDir, null)
+
+        expect:
+        cfg.enabled
+        cfg.swaggerUIConfig != null
+        cfg.title == "OpenAPI documentation"
+        cfg.specFile == "swagger.yml"
+
+        String urlPrefix = cfg.swaggerUIConfig.getFinalUrlPrefix(OpenApiViewConfig.RendererType.SWAGGER_UI, null)
+
+        urlPrefix
+        urlPrefix == '/server-context-path/swagger-ui/res/'
+
+        cleanup:
+        System.clearProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_CONTEXT_SERVER_PATH)
+    }
+
+    void "test generates urlResourcesPrefix without context paths"() {
+        given:
+        String spec = "swagger-ui.enabled=true"
+        OpenApiViewConfig cfg = OpenApiViewConfig.fromSpecification(spec, new Properties())
+        Path outputDir = Paths.get("output")
+        cfg.title = "OpenAPI documentation"
+        cfg.specFile = "swagger.yml"
+        cfg.render(outputDir, null)
+
+        expect:
+        cfg.enabled
+        cfg.swaggerUIConfig != null
+        cfg.title == "OpenAPI documentation"
+        cfg.specFile == "swagger.yml"
+
+        String urlPrefix = cfg.swaggerUIConfig.getFinalUrlPrefix(OpenApiViewConfig.RendererType.SWAGGER_UI, null)
+
+        urlPrefix
+        urlPrefix == '/swagger-ui/res/'
+
+    }
 }

@@ -92,6 +92,7 @@ final class RapiPDFConfig extends AbstractViewConfig {
     private RapiPDFConfig() {
         super("rapipdf.");
         jsUrl = DEFAULT_RAPIPDF_JS_PATH;
+        withFinalUrlPrefixCache = false;
     }
 
     /**
