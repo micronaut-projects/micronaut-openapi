@@ -186,7 +186,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
      * For example, if you want to set simple 'java.lang.String' class to some complex 'org.somepackage.MyComplexType' class you need to write:
      * <p>
      * micronaut.openapi.schema.org.somepackage.MyComplexType=java.lang.String
-     *
+     * <p>
      * Also, you can set it in your application.yml file like this:
      * <p>
      * micronaut:
@@ -810,6 +810,8 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             Utils.setTestReferenceAfterPlaceholders(openAPI);
         }
 
+        removeEmtpyComponents(openAPI);
+
         String isJson = getConfigurationProperty(MICRONAUT_OPENAPI_JSON_FORMAT, visitorContext);
         boolean isYaml = !(StringUtils.isNotEmpty(isJson) && isJson.equals(StringUtils.TRUE));
 
@@ -831,6 +833,26 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         visitedElements = visitedElements(visitorContext);
     }
 
+    private void removeEmtpyComponents(OpenAPI openAPI) {
+        Components components = openAPI.getComponents();
+        if (components == null) {
+            return;
+        }
+        if (CollectionUtils.isEmpty(components.getSchemas())
+            && CollectionUtils.isEmpty(components.getResponses())
+            && CollectionUtils.isEmpty(components.getParameters())
+            && CollectionUtils.isEmpty(components.getExamples())
+            && CollectionUtils.isEmpty(components.getRequestBodies())
+            && CollectionUtils.isEmpty(components.getHeaders())
+            && CollectionUtils.isEmpty(components.getSecuritySchemes())
+            && CollectionUtils.isEmpty(components.getLinks())
+            && CollectionUtils.isEmpty(components.getCallbacks())
+            && CollectionUtils.isEmpty(components.getExtensions())
+        ) {
+            openAPI.setComponents(null);
+        }
+    }
+
     private void sortOpenAPI(OpenAPI openAPI) {
         // Sort paths
         if (openAPI.getPaths() != null) {
@@ -844,6 +866,10 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
 
         // Sort all reusable Components
         Components components = openAPI.getComponents();
+        if (components == null) {
+            return;
+        }
+
         sortComponent(components, Components::getSchemas, Components::setSchemas);
         sortComponent(components, Components::getResponses, Components::setResponses);
         sortComponent(components, Components::getParameters, Components::setParameters);
