@@ -341,8 +341,7 @@ abstract class AbstractOpenApiVisitor {
             CharSequence key = entry.getKey();
             Object value = entry.getValue();
 
-            if (value instanceof AnnotationValue) {
-                AnnotationValue<?> av = (AnnotationValue<?>) value;
+            if (value instanceof AnnotationValue<?> av) {
                 if (av.getAnnotationName().equals(io.swagger.v3.oas.annotations.media.ArraySchema.class.getName())) {
                     final Map<CharSequence, Object> valueMap = resolveArraySchemaAnnotationValues(context, av);
                     newValues.put("schema", valueMap);
@@ -350,8 +349,7 @@ abstract class AbstractOpenApiVisitor {
                     final Map<CharSequence, Object> valueMap = resolveAnnotationValues(context, av);
                     newValues.put(key, valueMap);
                 }
-            } else if (value instanceof AnnotationClassValue) {
-                AnnotationClassValue<?> acv = (AnnotationClassValue<?>) value;
+            } else if (value instanceof AnnotationClassValue<?> acv) {
                 final Optional<? extends Class<?>> type = acv.getType();
                 type.ifPresent(aClass -> newValues.put(key, aClass));
             } else if (value != null) {
@@ -493,8 +491,7 @@ abstract class AbstractOpenApiVisitor {
 
                                     List<Object> list = new ArrayList<>();
                                     for (Object o : a) {
-                                        if (o instanceof AnnotationValue) {
-                                            final AnnotationValue<?> av = (AnnotationValue<?>) o;
+                                        if (o instanceof AnnotationValue<?> av) {
                                             final Map<CharSequence, Object> valueMap = resolveAnnotationValues(context, av);
                                             list.add(valueMap);
                                         } else {
@@ -550,13 +547,11 @@ abstract class AbstractOpenApiVisitor {
                             for (io.swagger.v3.oas.models.media.Encoding.StyleEnum styleValue : io.swagger.v3.oas.models.media.Encoding.StyleEnum.values()) {
                                 if (styleValue.toString().equals(value)) {
                                     encodingStyle = styleValue;
-                                    newValues.put(key, styleValue.toString());
                                     break;
                                 }
                             }
-                        } else {
-                            newValues.put(key, encodingStyle.toString());
                         }
+                        newValues.put(key, encodingStyle.toString());
                     }
                 } else if (key.equals("ref")) {
                     newValues.put("$ref", value);
@@ -629,8 +624,7 @@ abstract class AbstractOpenApiVisitor {
     }
 
     private Optional<Object> parseJsonString(Object object) {
-        if (object instanceof String) {
-            String string = (String) object;
+        if (object instanceof String string) {
             try {
                 return Optional.of(ConvertUtils.getConvertJsonMapper().readValue(string, Map.class));
             } catch (IOException e) {

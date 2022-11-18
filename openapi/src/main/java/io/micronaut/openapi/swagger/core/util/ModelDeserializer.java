@@ -86,7 +86,7 @@ public class ModelDeserializer extends JsonDeserializer<Schema> {
         JsonNode type = node.get("type");
         String format = node.get("format") == null ? "" : node.get("format").textValue();
 
-        if (type != null && "array".equals(((TextNode) type).textValue())) {
+        if (type != null && "array".equals(type.textValue())) {
             schema = ConvertUtils.getJsonMapper().convertValue(node, ArraySchema.class);
         } else if (type != null) {
             if (type.textValue().equals("integer")) {
@@ -177,9 +177,7 @@ public class ModelDeserializer extends JsonDeserializer<Schema> {
                 schema.types(new LinkedHashSet<>(Collections.singletonList(type.textValue())));
             } else if (type instanceof ArrayNode) {
                 Set<String> types = new LinkedHashSet<>();
-                type.elements().forEachRemaining(n -> {
-                    types.add(n.textValue());
-                });
+                type.elements().forEachRemaining(n -> types.add(n.textValue()));
                 schema.types(types);
             }
             if (additionalProperties != null) {

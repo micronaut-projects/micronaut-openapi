@@ -45,6 +45,8 @@ import io.swagger.v3.oas.models.media.UUIDSchema;
 
 import com.fasterxml.jackson.databind.type.TypeFactory;
 
+import static java.util.Map.entry;
+
 /**
  * The {@code PrimitiveType} enumeration defines a mapping of limited set
  * of classes into Swagger primitive types.
@@ -228,27 +230,27 @@ public enum PrimitiveType {
         systemPrefixes.add("javax.");
         nonSystemTypes.add("java.time.LocalTime");
 
-        final Map<String, String> dms = new HashMap<>();
-        dms.put("integer_int32", "integer");
-        dms.put("integer_", "integer");
-        dms.put("integer_int64", "long");
-        dms.put("number_", "number");
-        dms.put("number_float", "float");
-        dms.put("number_double", "double");
-        dms.put("string_", "string");
-        dms.put("string_byte", "byte");
-        dms.put("string_email", "email");
-        dms.put("string_binary", "binary");
-        dms.put("string_uri", "uri");
-        dms.put("string_url", "url");
-        dms.put("string_uuid", "uuid");
-        dms.put("string_date", "date");
-        dms.put("string_date-time", "date-time");
-        dms.put("string_partial-time", "partial-time");
-        dms.put("string_password", "password");
-        dms.put("boolean_", "boolean");
-        dms.put("object_", "object");
-        datatypeMappings = Collections.unmodifiableMap(dms);
+        datatypeMappings = Map.ofEntries(
+            entry("integer_int32", "integer"),
+            entry("integer_", "integer"),
+            entry("integer_int64", "long"),
+            entry("number_", "number"),
+            entry("number_float", "float"),
+            entry("number_double", "double"),
+            entry("string_", "string"),
+            entry("string_byte", "byte"),
+            entry("string_email", "email"),
+            entry("string_binary", "binary"),
+            entry("string_uri", "uri"),
+            entry("string_url", "url"),
+            entry("string_uuid", "uuid"),
+            entry("string_date", "date"),
+            entry("string_date-time", "date-time"),
+            entry("string_partial-time", "partial-time"),
+            entry("string_password", "password"),
+            entry("boolean_", "boolean"),
+            entry("object_", "object")
+        );
 
         final Map<Class<?>, PrimitiveType> keyClasses = new HashMap<>();
         addKeys(keyClasses, BOOLEAN, Boolean.class, Boolean.TYPE);
@@ -289,7 +291,7 @@ public enum PrimitiveType {
 
         final Map<String, PrimitiveType> names = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
         for (PrimitiveType item : values()) {
-            final String name = item.getCommonName();
+            final String name = item.commonName;
             if (name != null) {
                 addKeys(names, item, name);
             }

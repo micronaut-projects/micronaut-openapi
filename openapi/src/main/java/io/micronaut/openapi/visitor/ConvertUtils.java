@@ -59,7 +59,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
  */
 public final class ConvertUtils {
 
-    private static final TypeReference<Map<String, Object>> MAP_TYPE_REFERENCE = new TypeReference<Map<String, Object>>() {
+    private static final TypeReference<Map<String, Object>> MAP_TYPE_REFERENCE = new TypeReference<>() {
     };
     /**
      * The JSON mapper.

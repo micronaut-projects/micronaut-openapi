@@ -81,17 +81,14 @@ class EndpointsConfiguration {
                     }
                     String entryType = entry.getKey().substring(idx + 1);
                     String name = entry.getKey().substring(ENDPOINTS_PREFIX.length(), idx);
+                    Endpoint endpoint = endpoints.computeIfAbsent(name, key -> new Endpoint());
                     if ("security-requirements".equals(entryType)) {
-                        Endpoint endpoint = endpoints.computeIfAbsent(name, key -> new Endpoint());
                         endpoint.setSecurityRequirements(parseSecurityRequirements(entry.getValue(), context));
                     } else  if ("servers".equals(entryType)) {
-                        Endpoint endpoint = endpoints.computeIfAbsent(name, key -> new Endpoint());
                         endpoint.setServers(parseServers(entry.getValue(), context));
                     } else if ("tags".equals(entryType)) {
-                        Endpoint endpoint = endpoints.computeIfAbsent(name, key -> new Endpoint());
                         endpoint.setTags(parseTags(entry.getValue()));
                     } else if ("class".equals(entryType)) {
-                        Endpoint endpoint = endpoints.computeIfAbsent(name, key -> new Endpoint());
                         endpoint.setClassElement(context.getClassElement(entry.getValue()));
                     }
                 });
@@ -152,11 +149,11 @@ class EndpointsConfiguration {
     }
 
     private static List<Server> parseServers(String servers, VisitorContext context)  {
-        return parseModel(servers, context, new TypeReference<List<Server>>() { });
+        return parseModel(servers, context, new TypeReference<>() { });
     }
 
     private static List<SecurityRequirement> parseSecurityRequirements(String securityRequirements, VisitorContext context)  {
-        return parseModel(securityRequirements, context, new TypeReference<List<SecurityRequirement>>() { });
+        return parseModel(securityRequirements, context, new TypeReference<>() { });
     }
 
     private static <T> List<T> parseModel(String s, VisitorContext context, TypeReference<List<T>> typeReference)  {

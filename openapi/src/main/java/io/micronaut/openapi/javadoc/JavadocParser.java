@@ -73,12 +73,10 @@ public class JavadocParser {
                 }
                 if (tag instanceof ReturnTag) {
                     javadocDescription.setReturnDescription(htmlToMarkdownConverter.convert(((ReturnTag) tag).getDescription()).trim());
-                } else if (tag instanceof ParamTag) {
-                    ParamTag paramTag = (ParamTag) tag;
+                } else if (tag instanceof ParamTag paramTag) {
                     String paramDesc = htmlToMarkdownConverter.convert(paramTag.getParamDescription()).trim();
                     javadocDescription.getParameters().put(paramTag.getParamName(), paramDesc);
-                } else if (tag instanceof PropertyTag) {
-                    PropertyTag propertyTag = (PropertyTag) tag;
+                } else if (tag instanceof PropertyTag propertyTag) {
                     String paramDesc = htmlToMarkdownConverter.convert(propertyTag.getParamDescription()).trim();
                     javadocDescription.getParameters().put(propertyTag.getPropertyName(), paramDesc);
                 }

@@ -117,7 +117,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
     protected static final String CONTEXT_CHILD_OP_ID_SUFFIX_ADD_ALWAYS = "internal.opId.suffixes.add.always";
     protected static final String IS_PROCESS_PARENT_CLASS = "internal.is.process.parent";
 
-    private static final TypeReference<Map<CharSequence, Object>> MAP_TYPE = new TypeReference<Map<CharSequence, Object>>() {
+    private static final TypeReference<Map<CharSequence, Object>> MAP_TYPE = new TypeReference<>() {
     };
     private static final int MAX_SUMMARY_LENGTH = 200;
     private static final String THREE_DOTS = "...";
@@ -555,24 +555,13 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
 
             PathItem pathItem = openAPI.getPaths().get(matchTemplate.toPathString());
             switch (httpMethod) {
-                case GET:
-                    pathItem.getGet().addParametersItem(parameter);
-                    break;
-                case POST:
-                    pathItem.getPost().addParametersItem(parameter);
-                    break;
-                case PUT:
-                    pathItem.getPut().addParametersItem(parameter);
-                    break;
-                case DELETE:
-                    pathItem.getDelete().addParametersItem(parameter);
-                    break;
-                case PATCH:
-                    pathItem.getPatch().addParametersItem(parameter);
-                    break;
-                default:
-                    // do nothing
-                    break;
+                case GET -> pathItem.getGet().addParametersItem(parameter);
+                case POST -> pathItem.getPost().addParametersItem(parameter);
+                case PUT -> pathItem.getPut().addParametersItem(parameter);
+                case DELETE -> pathItem.getDelete().addParametersItem(parameter);
+                case PATCH -> pathItem.getPatch().addParametersItem(parameter);
+                // do nothing
+                default -> { }
             }
         }
     }
@@ -1138,25 +1127,16 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         if (paramAnnStyle == null) {
             return null;
         }
-        switch (paramAnnStyle) {
-            case MATRIX:
-                return Parameter.StyleEnum.MATRIX;
-            case LABEL:
-                return Parameter.StyleEnum.LABEL;
-            case FORM:
-                return Parameter.StyleEnum.FORM;
-            case SPACEDELIMITED:
-                return Parameter.StyleEnum.SPACEDELIMITED;
-            case PIPEDELIMITED:
-                return Parameter.StyleEnum.PIPEDELIMITED;
-            case DEEPOBJECT:
-                return Parameter.StyleEnum.DEEPOBJECT;
-            case SIMPLE:
-                return Parameter.StyleEnum.SIMPLE;
-            case DEFAULT:
-            default:
-                return null;
-        }
+        return switch (paramAnnStyle) {
+            case MATRIX -> Parameter.StyleEnum.MATRIX;
+            case LABEL -> Parameter.StyleEnum.LABEL;
+            case FORM -> Parameter.StyleEnum.FORM;
+            case SPACEDELIMITED -> Parameter.StyleEnum.SPACEDELIMITED;
+            case PIPEDELIMITED -> Parameter.StyleEnum.PIPEDELIMITED;
+            case DEEPOBJECT -> Parameter.StyleEnum.DEEPOBJECT;
+            case SIMPLE -> Parameter.StyleEnum.SIMPLE;
+            case DEFAULT -> null;
+        };
     }
 
     private io.swagger.v3.oas.models.ExternalDocumentation readExternalDocs(MethodElement element, VisitorContext context) {
