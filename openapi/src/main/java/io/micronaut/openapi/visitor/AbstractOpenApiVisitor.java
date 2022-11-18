@@ -54,6 +54,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
 import io.micronaut.context.env.Environment;
 import io.micronaut.core.annotation.AnnotationClassValue;
 import io.micronaut.core.annotation.AnnotationValue;
+import io.micronaut.core.annotation.NonNull;
 import io.micronaut.core.annotation.Nullable;
 import io.micronaut.core.beans.BeanMap;
 import io.micronaut.core.bind.annotation.Bindable;
@@ -93,6 +94,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.DiscriminatorMapping;
 import io.swagger.v3.oas.annotations.media.Encoding;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema.AccessMode;
 import io.swagger.v3.oas.annotations.media.Schema.AdditionalPropertiesValue;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.OAuthScope;
@@ -758,16 +760,19 @@ abstract class AbstractOpenApiVisitor {
         if (type != null && schemaAnnotationValue == null) {
             schemaAnnotationValue = type.getAnnotation(io.swagger.v3.oas.annotations.media.Schema.class);
         }
+        boolean isSubstitudedType = false;
         if (schemaAnnotationValue != null) {
             String impl = schemaAnnotationValue.stringValue("implementation").orElse(null);
             if (StringUtils.isNotEmpty(impl)) {
                 type = context.getClassElement(impl).orElse(type);
+                isSubstitudedType = true;
             } else {
                 String schemaType = schemaAnnotationValue.stringValue("type").orElse(null);
                 if (StringUtils.isNotEmpty(schemaType) && !(type instanceof EnumElement)) {
                     PrimitiveType primitiveType = PrimitiveType.fromName(schemaType);
                     if (primitiveType != null && primitiveType != PrimitiveType.OBJECT) {
                         type = context.getClassElement(primitiveType.getKeyClass()).orElse(type);
+                        isSubstitudedType = true;
                     }
                 }
             }
@@ -904,6 +909,10 @@ abstract class AbstractOpenApiVisitor {
             }
 
             if (schema != null) {
+
+                if (isSubstitudedType) {
+                    processShemaAnn(schema, context, definingElement, schemaAnnotationValue);
+                }
 
                 if (definingElement != null && StringUtils.isEmpty(schema.getDescription())) {
                     if (fieldJavadoc != null) {
@@ -1388,6 +1397,12 @@ abstract class AbstractOpenApiVisitor {
         }
 
         Schema schemaToBind = new Schema();
+        processShemaAnn(schemaToBind, context, element, schemaAnn);
+
+        return schemaToBind;
+    }
+
+    void processShemaAnn(Schema schemaToBind, VisitorContext context, Element element, @NonNull AnnotationValue<io.swagger.v3.oas.annotations.media.Schema> schemaAnn) {
 
         Map<CharSequence, Object> annValues = schemaAnn.getValues();
         if (annValues.containsKey("description")) {
@@ -1471,15 +1486,15 @@ abstract class AbstractOpenApiVisitor {
         }
         String accessModeStr = (String) annValues.get("accessMode");
         if (StringUtils.isNotEmpty(accessModeStr)) {
-            io.swagger.v3.oas.annotations.media.Schema.AccessMode schemaAccessMode = io.swagger.v3.oas.annotations.media.Schema.AccessMode.valueOf(accessModeStr);
-            if (schemaAccessMode != io.swagger.v3.oas.annotations.media.Schema.AccessMode.AUTO) {
-                if (schemaAccessMode == io.swagger.v3.oas.annotations.media.Schema.AccessMode.READ_ONLY) {
+            AccessMode schemaAccessMode = AccessMode.valueOf(accessModeStr);
+            if (schemaAccessMode != AccessMode.AUTO) {
+                if (schemaAccessMode == AccessMode.READ_ONLY) {
                     schemaToBind.setReadOnly(true);
                     schemaToBind.setWriteOnly(null);
-                } else if (schemaAccessMode == io.swagger.v3.oas.annotations.media.Schema.AccessMode.WRITE_ONLY) {
+                } else if (schemaAccessMode == AccessMode.WRITE_ONLY) {
                     schemaToBind.setReadOnly(false);
                     schemaToBind.setWriteOnly(null);
-                } else if (schemaAccessMode == io.swagger.v3.oas.annotations.media.Schema.AccessMode.READ_WRITE) {
+                } else if (schemaAccessMode == AccessMode.READ_WRITE) {
                     schemaToBind.setReadOnly(null);
                     schemaToBind.setWriteOnly(null);
                 }
@@ -1526,8 +1541,6 @@ abstract class AbstractOpenApiVisitor {
                 schemaToBind.additionalProperties(false);
             }
         }
-
-        return schemaToBind;
     }
 
     private void setSchemaDocumentation(Element element, Schema schemaToBind) {
