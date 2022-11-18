@@ -39,7 +39,7 @@ public abstract class ExampleMixin {
     @JsonAnySetter
     public abstract void addExtension(String name, Object value);
 
-    @JsonInclude(Include.CUSTOM)
+    @JsonInclude(Include.NON_NULL)
     public abstract Object getValue();
 
     @JsonIgnore

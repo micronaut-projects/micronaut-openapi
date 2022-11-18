@@ -72,7 +72,9 @@ public class ModelDeserializer extends JsonDeserializer<Schema> {
             schema = deserializeJsonSchema(node);
             return schema;
         }
-
+        if (node.isBoolean()) {
+            return new Schema().booleanSchemaValue(node.booleanValue());
+        }
 
         List<String> composed = Arrays.asList("allOf", "anyOf", "oneOf");
         for (String field : composed) {
@@ -126,23 +128,22 @@ public class ModelDeserializer extends JsonDeserializer<Schema> {
         JsonNode additionalProperties = node.get("additionalProperties");
         Schema schema;
         if (additionalProperties != null) {
-            // try first to convert to Schema, if it fails it must be a boolean
-            try {
-                Schema innerSchema = ConvertUtils.getJsonMapper().convertValue(additionalProperties, Schema.class);
-                ((ObjectNode) node).remove("additionalProperties");
-                MapSchema ms = ConvertUtils.getJsonMapper().convertValue(node, MapSchema.class);
-                ms.setAdditionalProperties(innerSchema);
-                schema = ms;
-            } catch (Exception e) {
+            if (additionalProperties.isBoolean()) {
                 Boolean additionalPropsBoolean = ConvertUtils.getJsonMapper().convertValue(additionalProperties, Boolean.class);
+                ((ObjectNode)node).remove("additionalProperties");
                 if (additionalPropsBoolean) {
                     schema = ConvertUtils.getJsonMapper().convertValue(node, MapSchema.class);
                 } else {
                     schema = ConvertUtils.getJsonMapper().convertValue(node, ObjectSchema.class);
                 }
                 schema.setAdditionalProperties(additionalPropsBoolean);
+            } else {
+                Schema innerSchema = ConvertUtils.getJsonMapper().convertValue(additionalProperties, Schema.class);
+                ((ObjectNode)node).remove("additionalProperties");
+                MapSchema ms = ConvertUtils.getJsonMapper().convertValue(node, MapSchema.class);
+                ms.setAdditionalProperties(innerSchema);
+                schema = ms;
             }
-
         } else {
             schema = ConvertUtils.getJsonMapper().convertValue(node, ObjectSchema.class);
         }

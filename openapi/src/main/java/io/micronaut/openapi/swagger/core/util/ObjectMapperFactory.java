@@ -19,6 +19,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import io.micronaut.core.annotation.Internal;
+import io.micronaut.openapi.swagger.core.jackson.ExampleSerializer;
 import io.micronaut.openapi.swagger.core.jackson.MediaTypeSerializer;
 import io.micronaut.openapi.swagger.core.jackson.Schema31Serializer;
 import io.micronaut.openapi.swagger.core.jackson.SchemaSerializer;
@@ -37,8 +38,6 @@ import io.micronaut.openapi.swagger.core.jackson.mixin.OpenAPIMixin;
 import io.micronaut.openapi.swagger.core.jackson.mixin.OperationMixin;
 import io.micronaut.openapi.swagger.core.jackson.mixin.Schema31Mixin;
 import io.micronaut.openapi.swagger.core.jackson.mixin.SchemaMixin;
-import io.micronaut.openapi.swagger.core.util.DeserializationModule;
-import io.micronaut.openapi.swagger.core.util.DeserializationModule31;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.ExternalDocumentation;
 import io.swagger.v3.oas.models.OpenAPI;
@@ -143,6 +142,10 @@ public class ObjectMapperFactory {
                                 return new SchemaSerializer((JsonSerializer<Object>) serializer);
                             } else if (MediaType.class.isAssignableFrom(desc.getBeanClass())) {
                                 return new MediaTypeSerializer((JsonSerializer<Object>) serializer);
+                            } else if (MediaType.class.isAssignableFrom(desc.getBeanClass())) {
+                                return new MediaTypeSerializer((JsonSerializer<Object>) serializer);
+                            } else if (Example.class.isAssignableFrom(desc.getBeanClass())) {
+                                return new ExampleSerializer((JsonSerializer<Object>) serializer);
                             }
                             return serializer;
                         }
@@ -162,6 +165,8 @@ public class ObjectMapperFactory {
                                 return new Schema31Serializer((JsonSerializer<Object>) serializer);
                             } else if (MediaType.class.isAssignableFrom(desc.getBeanClass())) {
                                 return new MediaTypeSerializer((JsonSerializer<Object>) serializer);
+                            } else if (Example.class.isAssignableFrom(desc.getBeanClass())) {
+                                return new ExampleSerializer((JsonSerializer<Object>) serializer);
                             }
                             return serializer;
                         }
