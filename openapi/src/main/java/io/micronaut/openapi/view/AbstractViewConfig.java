@@ -35,8 +35,10 @@ abstract class AbstractViewConfig {
 
     protected String prefix;
     protected String jsUrl = "";
+    protected String finalUrlPrefix;
     protected String resourcesContextPath = "/res";
     protected boolean isDefaultJsUrl = true;
+    protected boolean withFinalUrlPrefixCache = true;
     protected Map<String, Object> options = new HashMap<>();
 
     /**
@@ -83,16 +85,40 @@ abstract class AbstractViewConfig {
     }
 
     protected String getFinalUrlPrefix(OpenApiViewConfig.RendererType rendererType, VisitorContext context) {
+        if (finalUrlPrefix != null && withFinalUrlPrefixCache) {
+            return finalUrlPrefix;
+        }
+
+        // process micronaut.openapi.server.context.path
+        String serverContextPath = OpenApiApplicationVisitor.getConfigurationProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_CONTEXT_SERVER_PATH, context);
+        if (serverContextPath == null) {
+            serverContextPath = StringUtils.EMPTY_STRING;
+        }
+        String finalUrl = serverContextPath.startsWith(OpenApiViewConfig.SLASH) ? serverContextPath : OpenApiViewConfig.SLASH + serverContextPath;
+        if (!finalUrl.endsWith(OpenApiViewConfig.SLASH)) {
+            finalUrl += OpenApiViewConfig.SLASH;
+        }
+
+        // process micronaut.server.context-path
         String contextPath = OpenApiApplicationVisitor.getConfigurationProperty("micronaut.server.context-path", context);
         if (contextPath == null) {
             contextPath = StringUtils.EMPTY_STRING;
         }
-        String finalUrl = contextPath + (contextPath.endsWith("/") ? resourcesContextPath.substring(1) : resourcesContextPath);
-        if (!finalUrl.endsWith("/")) {
-            finalUrl += "/";
+        finalUrl += contextPath.startsWith(OpenApiViewConfig.SLASH) ? contextPath.substring(1) : contextPath;
+        if (!finalUrl.endsWith(OpenApiViewConfig.SLASH)) {
+            finalUrl += OpenApiViewConfig.SLASH;
         }
 
-        return rendererType.getTemplatePath() + finalUrl;
+        // standard path
+        finalUrl += rendererType.getTemplatePath();
+        finalUrl += finalUrl.endsWith(OpenApiViewConfig.SLASH) ? resourcesContextPath.substring(1) : resourcesContextPath;
+        if (!finalUrl.endsWith(OpenApiViewConfig.SLASH)) {
+            finalUrl += OpenApiViewConfig.SLASH;
+        }
+
+        finalUrlPrefix = finalUrl;
+
+        return finalUrl;
     }
 
     /**
