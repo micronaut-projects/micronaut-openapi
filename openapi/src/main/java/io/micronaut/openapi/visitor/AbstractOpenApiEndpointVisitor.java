@@ -629,29 +629,53 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         if (newParameter == null) {
             return;
         }
-        if (StringUtils.isEmpty(newParameter.getName())) {
-            newParameter.setName(parameter.getName());
-        }
 
-        if (newParameter.getRequired() == null && !isNullable(parameter)) {
-            newParameter.setRequired(true);
-        }
-        if (javadocDescription != null && StringUtils.isEmpty(newParameter.getDescription())) {
-            CharSequence desc = javadocDescription.getParameters().get(parameter.getName());
-            if (desc != null) {
-                newParameter.setDescription(desc.toString());
+        if (newParameter.getExplode() != null && newParameter.getExplode() && "query".equals(newParameter.getIn()) && !parameterType.isIterable()) {
+            Schema explodedSchema = resolveSchema(openAPI, parameter, parameterType, context, consumesMediaTypes, null, null);
+            if (explodedSchema != null) {
+                if (openAPI.getComponents() != null && openAPI.getComponents().getSchemas() != null && StringUtils.isNotEmpty(explodedSchema.get$ref())) {
+                    explodedSchema = openAPI.getComponents().getSchemas().get(explodedSchema.get$ref().substring(Components.COMPONENTS_SCHEMAS_REF.length()));
+                }
+                if (CollectionUtils.isNotEmpty(explodedSchema.getProperties())) {
+                    Map<String, Schema> props = explodedSchema.getProperties();
+                    for (Map.Entry<String, Schema> entry : props.entrySet()) {
+                        Parameter unwrappedParameter = new QueryParameter();
+                        if (CollectionUtils.isNotEmpty(explodedSchema.getRequired()) && explodedSchema.getRequired().contains(entry.getKey())) {
+                            unwrappedParameter.setRequired(true);
+                        }
+                        unwrappedParameter.setName(entry.getKey());
+                        unwrappedParameter.setSchema(entry.getValue());
+                        swaggerParameters.add(unwrappedParameter);
+                    }
+                }
             }
-        }
-        swaggerParameters.add(newParameter);
+        } else {
 
-        Schema schema = newParameter.getSchema();
-        if (schema == null) {
-            schema = resolveSchema(openAPI, parameter, parameterType, context, consumesMediaTypes, null, null);
-        }
+            if (StringUtils.isEmpty(newParameter.getName())) {
+                newParameter.setName(parameter.getName());
+            }
 
-        if (schema != null) {
-            schema = bindSchemaForElement(context, parameter, parameterType, schema);
-            newParameter.setSchema(schema);
+            if (newParameter.getRequired() == null && !isNullable(parameter)) {
+                newParameter.setRequired(true);
+            }
+            if (javadocDescription != null && StringUtils.isEmpty(newParameter.getDescription())) {
+                CharSequence desc = javadocDescription.getParameters().get(parameter.getName());
+                if (desc != null) {
+                    newParameter.setDescription(desc.toString());
+                }
+            }
+
+            swaggerParameters.add(newParameter);
+
+            Schema schema = newParameter.getSchema();
+            if (schema == null) {
+                schema = resolveSchema(openAPI, parameter, parameterType, context, consumesMediaTypes, null, null);
+            }
+
+            if (schema != null) {
+                schema = bindSchemaForElement(context, parameter, parameterType, schema);
+                newParameter.setSchema(schema);
+            }
         }
     }
 
@@ -692,14 +716,14 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             }
         } else if (parameter.isAnnotationPresent(PathVariable.class)) {
             String paramName = parameter.getValue(PathVariable.class, String.class).orElse(parameterName);
-            UriMatchVariable var = pathVariables.get(paramName);
-            if (var == null) {
+            UriMatchVariable variable = pathVariables.get(paramName);
+            if (variable == null) {
                 context.fail("Path variable name: '" + paramName + "' not found in path.", parameter);
                 return null;
             }
             newParameter = new PathParameter();
             newParameter.setName(paramName);
-            final boolean exploded = var.isExploded();
+            final boolean exploded = variable.isExploded();
             if (exploded) {
                 newParameter.setExplode(exploded);
             }

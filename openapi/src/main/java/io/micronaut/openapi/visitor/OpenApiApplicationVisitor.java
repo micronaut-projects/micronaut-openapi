@@ -78,11 +78,14 @@ import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
+
+import static io.swagger.v3.oas.models.Components.COMPONENTS_SCHEMAS_REF;
 
 /**
  * Visits the application class.
@@ -811,6 +814,23 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             Utils.setTestReferenceAfterPlaceholders(openAPI);
         }
 
+        // remove unused schemas
+        try {
+            if (openAPI.getComponents() != null) {
+                Map<String, Schema> schemas = openAPI.getComponents().getSchemas();
+                if (CollectionUtils.isNotEmpty(schemas)) {
+                    String openApiJson = ConvertUtils.getJsonMapper().writeValueAsString(openAPI);
+                    for (String schemaName : schemas.keySet()) {
+                        if (!openApiJson.contains(COMPONENTS_SCHEMAS_REF + schemaName)) {
+                            schemas.remove(schemaName);
+                        }
+                    }
+                }
+            }
+        } catch (JsonProcessingException e) {
+            // do nothing
+        }
+
         removeEmtpyComponents(openAPI);
 
         String isJson = getConfigurationProperty(MICRONAUT_OPENAPI_JSON_FORMAT, visitorContext);
@@ -839,6 +859,37 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         if (components == null) {
             return;
         }
+        if (CollectionUtils.isEmpty(components.getSchemas())) {
+            components.setSchemas(null);
+        }
+        if (CollectionUtils.isEmpty(components.getResponses())) {
+            components.setResponses(null);
+        }
+        if (CollectionUtils.isEmpty(components.getParameters())) {
+            components.setParameters(null);
+        }
+        if (CollectionUtils.isEmpty(components.getExamples())) {
+            components.setExamples(null);
+        }
+        if (CollectionUtils.isEmpty(components.getRequestBodies())) {
+            components.setRequestBodies(null);
+        }
+        if (CollectionUtils.isEmpty(components.getHeaders())) {
+            components.setHeaders(null);
+        }
+        if (CollectionUtils.isEmpty(components.getSecuritySchemes())) {
+            components.setSecuritySchemes(null);
+        }
+        if (CollectionUtils.isEmpty(components.getLinks())) {
+            components.setLinks(null);
+        }
+        if (CollectionUtils.isEmpty(components.getCallbacks())) {
+            components.setCallbacks(null);
+        }
+        if (CollectionUtils.isEmpty(components.getExtensions())) {
+            components.setExtensions(null);
+        }
+
         if (CollectionUtils.isEmpty(components.getSchemas())
             && CollectionUtils.isEmpty(components.getResponses())
             && CollectionUtils.isEmpty(components.getParameters())

@@ -946,11 +946,11 @@ abstract class AbstractOpenApiVisitor {
             .orElse(computeDefaultSchemaName(null, customElementType != null ? customElementType : elementType, elementType.getTypeArguments(), context));
         Schema wrappedPropertySchema = schemas.get(schemaName);
         Map<String, Schema> properties = wrappedPropertySchema.getProperties();
-        if (properties == null || properties.isEmpty()) {
+        if (CollectionUtils.isEmpty(properties)) {
             return;
         }
-        String prefix = uw.stringValue("prefix").orElse("");
-        String suffix = uw.stringValue("suffix").orElse("");
+        String prefix = uw.stringValue("prefix").orElse(StringUtils.EMPTY_STRING);
+        String suffix = uw.stringValue("suffix").orElse(StringUtils.EMPTY_STRING);
         for (Entry<String, Schema> prop : properties.entrySet()) {
             try {
                 String propertyName = prop.getKey();
