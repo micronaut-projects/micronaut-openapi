@@ -85,6 +85,7 @@ class Test {
 
     @JsonUnwrapped(prefix = "aaa", suffix = "zzz")
     public Pet petRenamed;
+    public Pet plainPet;
 }
 
 @jakarta.inject.Singleton
@@ -101,8 +102,9 @@ class MyBean {}
 
         then:"the components are valid"
         schema.type == 'object'
-        schema.properties.size() == 12
+        schema.properties.size() == 13
         schema.properties['plain'].$ref == '#/components/schemas/Dummy'
+        schema.properties['plainPet'].$ref == '#/components/schemas/Pet'
         schema.properties['unwrappedDisabled'].$ref == '#/components/schemas/Dummy'
         schema.properties['aa'].type == 'integer'
         schema.properties['bb'] == null
