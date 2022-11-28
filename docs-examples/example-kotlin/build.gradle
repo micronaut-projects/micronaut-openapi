@@ -8,7 +8,7 @@ repositories {
 }
 
 dependencies {
-    kapt project(":openapi")
+    kapt projects.openapi
     kapt(mn.micronaut.inject.java)
     kapt(mn.micronaut.validation)
 
