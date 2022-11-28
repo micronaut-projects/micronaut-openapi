@@ -7,7 +7,7 @@ managed-javadoc-parser = "0.3.1"
 # Versions beyond 0.62.2 require Java 11
 managed-html2md-converter = "0.62.2"
 
-kotlin = "1.7.10"
+kotlin = "1.7.20"
 
 [libraries]
 # Duplicated to keep catalog compatibility with 3.4.x.  Can be removed for 4.0.0
@@ -23,11 +23,6 @@ managed-html2md-converter = {module = "com.vladsch.flexmark:flexmark-html2md-con
 # Versions from BOM
 junit-jupiter-api = { module = "org.junit.jupiter:junit-jupiter-api" }
 junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine" }
-logback-classic = { module = "ch.qos.logback:logback-classic" }
-reactor-core = { module = "io.projectreactor:reactor-core" }
-spock-core = { module = "org.spockframework:spock-core" }
-rxjava2 = { module = "io.reactivex.rxjava2:rxjava" }
-rxjava3 = { module = "io.reactivex.rxjava3:rxjava" }
 testcontainers-spock = { module = "org.testcontainers:spock" }
 
 kotlin-stdlib-jdk8 = { module = "org.jetbrains.kotlin:kotlin-stdlib-jdk8", version.ref = "kotlin" }

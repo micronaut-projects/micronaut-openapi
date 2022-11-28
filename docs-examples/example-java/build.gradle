@@ -1,28 +1,24 @@
 plugins {
     id "java"
-}
-
-repositories {
-    mavenCentral()
-    maven { url "https://s01.oss.sonatype.org/content/repositories/snapshots/" }
+    id "io.micronaut.build.internal.openapi-base"
 }
 
 dependencies {
     testImplementation(platform(mn.micronaut.bom))
 
-    testImplementation project(":openapi")
+    testImplementation projects.openapi
     testImplementation(mn.micronaut.runtime)
     testImplementation(mn.micronaut.inject.java)
     testImplementation(mn.micronaut.validation)
     testImplementation(libs.managed.swagger.annotations)
-    testImplementation(libs.reactor.core)
+    testImplementation(mn.reactor)
     testImplementation(mn.micronaut.hibernate.validator)
     testImplementation(libs.junit.jupiter.api)
 
     testCompileOnly(mn.micronaut.inject.java)
 
     testRuntimeOnly(libs.junit.jupiter.engine)
-    testRuntimeOnly(libs.logback.classic)
+    testRuntimeOnly(mn.logback)
 }
 
 
