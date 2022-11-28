@@ -23,7 +23,7 @@ dependencies {
     testImplementation(libs.kotlin.stdlib.jdk8)
     testImplementation(libs.kotlin.reflect)
 
-    testRuntimeOnly(libs.logback.classic)
+    testRuntimeOnly(mn.logback)
     testRuntimeOnly(libs.junit.jupiter.engine)
 }
 
