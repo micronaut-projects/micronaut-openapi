@@ -23,6 +23,7 @@ dependencies {
     testImplementation(mn.micronaut.validation)
     testImplementation(libs.managed.swagger.annotations)
     testImplementation(mn.reactor)
+    testImplementation(mn.micronaut.hibernate.validator)
     testImplementation(libs.testcontainers.spock)
     testImplementation(mn.spock)
 
