@@ -16,7 +16,7 @@ dependencies {
 
     testImplementation(platform(mn.micronaut.bom))
     testImplementation(libs.managed.swagger.annotations)
-    testImplementation(libs.reactor.core)
+    testImplementation(mn.reactor)
     testImplementation(mn.micronaut.runtime)
     testImplementation(mn.micronaut.validation)
     testImplementation(mn.micronaut.hibernate.validator)

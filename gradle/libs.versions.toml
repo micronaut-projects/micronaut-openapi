@@ -28,7 +28,6 @@ managed-slf4j-nop = { module = "org.slf4j:slf4j-nop", version.ref = "managed-slf
 # Versions from BOM
 junit-jupiter-api = { module = "org.junit.jupiter:junit-jupiter-api" }
 junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine" }
-reactor-core = { module = "io.projectreactor:reactor-core" }
 spock-core = { module = "org.spockframework:spock-core" }
 rxjava2 = { module = "io.reactivex.rxjava2:rxjava" }
 rxjava3 = { module = "io.reactivex.rxjava3:rxjava" }
