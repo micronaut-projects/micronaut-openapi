@@ -22,7 +22,7 @@ dependencies {
         exclude group: "org.codehaus.groovy", module: "groovy-all"
     }
 
-    testRuntimeOnly(libs.logback.classic)
+    testRuntimeOnly(mn.logback)
 }
 
 

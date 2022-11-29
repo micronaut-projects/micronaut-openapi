@@ -21,7 +21,7 @@ dependencies {
     testCompileOnly(mn.micronaut.inject.java)
 
     testRuntimeOnly(libs.junit.jupiter.engine)
-    testRuntimeOnly(libs.logback.classic)
+    testRuntimeOnly(mn.logback)
 }
 
 
