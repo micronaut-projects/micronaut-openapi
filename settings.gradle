@@ -32,5 +32,7 @@ dependencyResolutionManagement {
 }
 
 micronautBuild {
+    addSnapshotRepository()
     importMicronautCatalog()
+    importMicronautCatalog("micronaut-security")
 }
