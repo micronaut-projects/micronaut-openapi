@@ -35,4 +35,12 @@ micronautBuild {
     addSnapshotRepository()
     importMicronautCatalog()
     importMicronautCatalog("micronaut-security")
+    importMicronautCatalog("micronaut-serde")
+    importMicronautCatalog("micronaut-rxjava2")
+    importMicronautCatalog("micronaut-rxjava3")
+    importMicronautCatalog("micronaut-groovy")
+    importMicronautCatalog("micronaut-validation")
+    importMicronautCatalog("micronaut-data")
+    importMicronautCatalog("micronaut-test")
+    importMicronautCatalog("micronaut-kotlin")
 }

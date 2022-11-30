@@ -7,7 +7,7 @@ dependencies {
 
     implementation(mn.micronaut.http)
 
-    api(libs.jackson.databind)
+    api(mn.jackson.databind)
     api(libs.jackson.dataformat.yaml)
     api(libs.jackson.datatype.jsr310)
     api(libs.managed.swagger.models)
@@ -21,21 +21,18 @@ dependencies {
     api(libs.managed.jsoup)
 
     testImplementation(mn.micronaut.runtime)
-    testImplementation(mn.micronaut.security)
-    testImplementation(mn.micronaut.serde.jackson)
+    testImplementation(mnSecurity.micronaut.security)
+    testImplementation(mnSerde.micronaut.serde.jackson)
     testImplementation(mn.micronaut.inject.groovy)
     testImplementation(mn.micronaut.inject.groovy.test)
     testImplementation(mn.micronaut.inject.java)
     testImplementation(mn.micronaut.inject.java.test)
-    testImplementation(mn.micronaut.data.jdbc)
     testImplementation(mn.snakeyaml)
-    testImplementation(mn.rxjava2)
-    testImplementation(mn.rxjava3)
+    testImplementation(mnRxjava2.micronaut.rxjava2)
+    testImplementation(mnRxjava3.micronaut.rxjava3)
+    testImplementation(mnData.micronaut.data.model)
     testImplementation(mn.micronaut.management)
-    testImplementation(libs.managed.html2md.converter)
-    testImplementation(libs.javax.validation.api)
-    testImplementation(libs.jakarta.validation.api)
-    testImplementation(libs.javax.validation.api)
+    testImplementation(mnValidation.validation)
     testImplementation(libs.jakarta.validation.api)
 }
 

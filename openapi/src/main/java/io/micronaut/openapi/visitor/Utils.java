@@ -18,6 +18,7 @@ package io.micronaut.openapi.visitor;
 import java.io.File;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -82,6 +83,11 @@ public final class Utils {
                 @Override
                 public <T> Optional<T> getProperty(@NonNull String name, @NonNull ArgumentConversionContext<T> conversionContext) {
                     return Optional.empty();
+                }
+
+                @Override
+                public Collection<List<String>> getPropertyPathMatches(String pathPattern) {
+                    return null;
                 }
             }, new DefaultMutableConversionService());
         }

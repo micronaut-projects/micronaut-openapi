@@ -13,7 +13,6 @@ repositories {
 }
 
 dependencies {
-    testImplementation(platform(mn.micronaut.bom))
 
     testImplementation projects.openapi
     testImplementation(mn.snakeyaml)
@@ -22,14 +21,13 @@ dependencies {
     testImplementation(mn.micronaut.validation)
     testImplementation(libs.managed.swagger.annotations)
     testImplementation(mn.reactor)
-    testImplementation(libs.junit.jupiter.api)
+    testImplementation(mnTest.micronaut.test.junit5)
 
     testCompileOnly(mn.micronaut.inject.java)
 
     testRuntimeOnly(libs.junit.jupiter.engine)
-    testRuntimeOnly(mn.logback)
+    testRuntimeOnly(mn.logback.classic)
 }
-
 
 compileJava.options.compilerArgs += '-parameters'
 compileTestJava.options.compilerArgs += '-parameters'

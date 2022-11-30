@@ -15,14 +15,12 @@ repositories {
 }
 
 dependencies {
-    kapt(platform(mn.micronaut.bom))
     kapt projects.openapi
     kapt(mn.micronaut.inject.java)
-    kapt(mn.micronaut.validation)
+    kapt(mnValidation.micronaut.validation)
 
     kaptTest(mn.micronaut.inject.java)
 
-    testImplementation(platform(mn.micronaut.bom))
     testImplementation(libs.managed.swagger.annotations)
     testImplementation(mn.reactor)
     testImplementation(mn.snakeyaml)
@@ -30,9 +28,12 @@ dependencies {
     testImplementation(mn.micronaut.validation)
     testImplementation(libs.kotlin.stdlib.jdk8)
     testImplementation(libs.kotlin.reflect)
+    testImplementation(mnTest.micronaut.test.junit5)
 
-    testRuntimeOnly(mn.logback)
+    testCompileOnly(mn.micronaut.inject.java)
+
     testRuntimeOnly(libs.junit.jupiter.engine)
+    testRuntimeOnly(mn.logback.classic)
 }
 
 test {
