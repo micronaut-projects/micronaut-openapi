@@ -6,18 +6,16 @@ plugins {
 dependencies {
     testCompileOnly(mn.micronaut.inject.groovy)
 
-    testImplementation(platform(mn.micronaut.bom))
+    testImplementation(platform(mn.micronaut.core.bom))
     testImplementation projects.openapi
     testImplementation(mn.micronaut.runtime)
-    testImplementation(mn.micronaut.runtime.groovy)
     testImplementation(mn.micronaut.validation)
     testImplementation(libs.managed.swagger.annotations)
     testImplementation(mn.reactor)
-    testImplementation(mn.micronaut.hibernate.validator)
+    testImplementation(libs.micronaut.hibernate.validator)
     testImplementation(libs.testcontainers.spock)
-    testImplementation(mn.spock)
 
-    testRuntimeOnly(mn.logback)
+    testRuntimeOnly(mn.logback.classic)
 }
 
 

@@ -1,7 +1,482 @@
 [
-	{
+  {
     "type": "io.micronaut.openapi.visitor.AbstractOpenApiEndpointVisitor",
     "member": "Field propertyPlaceholderResolver",
     "reason": "Internal non-public API class"
-	}
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.mappers.OpenAPIManagementAnnotationMapper",
+    "member": "Implemented interface io.micronaut.inject.annotation.TypedAnnotationMapper",
+    "reason": "Micronaut 4 changes to injection and Bean Definition"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.mappers.OpenAPIManagementAnnotationMapper",
+    "member": "Implemented interface io.micronaut.inject.annotation.AnnotationMapper",
+    "reason": "Micronaut 4 changes to injection and Bean Definition"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.mappers.OpenAPISecurityAnnotationMapper",
+    "member": "Implemented interface io.micronaut.inject.annotation.TypedAnnotationMapper",
+    "reason": "Micronaut 4 changes to injection and Bean Definition"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.mappers.OpenAPISecurityAnnotationMapper",
+    "member": "Implemented interface io.micronaut.inject.annotation.AnnotationMapper",
+    "reason": "Micronaut 4 changes to injection and Bean Definition"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.ApiResponseRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.TypedAnnotationTransformer",
+    "reason": "Micronaut 4 changes to injection and Bean Definition"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.ApiResponseRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.AnnotationTransformer",
+    "reason": "Micronaut 4 changes to injection and Bean Definition"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.ApiResponsesRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.TypedAnnotationTransformer",
+    "reason": "Micronaut 4 changes to injection and Bean Definition"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.ApiResponsesRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.AnnotationTransformer",
+    "reason": "Micronaut 4 changes to injection and Bean Definition"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.ArraySchemaRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.TypedAnnotationTransformer",
+    "reason": "Micronaut 4 changes to injection and Bean Definition"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.ArraySchemaRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.AnnotationTransformer",
+    "reason": "Micronaut 4 changes to injection and Bean Definition"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.CallbackRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.TypedAnnotationTransformer",
+    "reason": "Micronaut 4 changes to injection and Bean Definition"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.CallbackRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.AnnotationTransformer",
+    "reason": "Micronaut 4 changes to injection and Bean Definition"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.CallbacksRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.TypedAnnotationTransformer",
+    "reason": "Micronaut 4 changes to injection and Bean Definition"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.CallbacksRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.AnnotationTransformer",
+    "reason": "Micronaut 4 changes to injection and Bean Definition"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.ContactRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.TypedAnnotationTransformer",
+    "reason": "Micronaut 4 changes to injection and Bean Definition"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.ContactRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.AnnotationTransformer",
+    "reason": "Micronaut 4 changes to injection and Bean Definition"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.ContentRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.TypedAnnotationTransformer",
+    "reason": "Micronaut 4 changes to injection and Bean Definition"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.ContentRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.AnnotationTransformer",
+    "reason": "Micronaut 4 changes to injection and Bean Definition"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.DiscriminatorMappingRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.TypedAnnotationTransformer",
+    "reason": "Micronaut 4 changes to injection and Bean Definition"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.DiscriminatorMappingRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.AnnotationTransformer",
+    "reason": "Micronaut 4 changes to injection and Bean Definition"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.EncodingRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.TypedAnnotationTransformer",
+    "reason": "Micronaut 4 changes to injection and Bean Definition"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.EncodingRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.AnnotationTransformer",
+    "reason": "Micronaut 4 changes to injection and Bean Definition"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.ExampleObjectMappingRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.TypedAnnotationTransformer",
+    "reason": "Micronaut 4 changes to injection and Bean Definition"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.ExampleObjectMappingRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.AnnotationTransformer",
+    "reason": "Micronaut 4 changes to injection and Bean Definition"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.ExtensionPropertyRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.TypedAnnotationTransformer",
+    "reason": "Micronaut 4 changes to injection and Bean Definition"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.ExtensionPropertyRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.AnnotationTransformer",
+    "reason": "Micronaut 4 changes to injection and Bean Definition"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.ExtensionRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.TypedAnnotationTransformer",
+    "reason": "Micronaut 4 changes to injection and Bean Definition"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.ExtensionRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.AnnotationTransformer",
+    "reason": "Micronaut 4 changes to injection and Bean Definition"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.ExtensionsRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.TypedAnnotationTransformer",
+    "reason": "Micronaut 4 changes to injection and Bean Definition"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.ExtensionsRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.AnnotationTransformer",
+    "reason": "Micronaut 4 changes to injection and Bean Definition"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.ExternalDocumentationRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.TypedAnnotationTransformer",
+    "reason": "Micronaut 4 changes to injection and Bean Definition"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.ExternalDocumentationRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.AnnotationTransformer",
+    "reason": "Micronaut 4 changes to injection and Bean Definition"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.HeaderRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.TypedAnnotationTransformer",
+    "reason": "Micronaut 4 changes to injection and Bean Definition"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.HeaderRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.AnnotationTransformer",
+    "reason": "Micronaut 4 changes to injection and Bean Definition"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.HiddenRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.TypedAnnotationTransformer",
+    "reason": "Micronaut 4 changes to injection and Bean Definition"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.HiddenRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.AnnotationTransformer",
+    "reason": "Micronaut 4 changes to injection and Bean Definition"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.InfoRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.TypedAnnotationTransformer",
+    "reason": "Micronaut 4 changes to injection and Bean Definition"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.InfoRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.AnnotationTransformer",
+    "reason": "Micronaut 4 changes to injection and Bean Definition"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.LicenseRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.TypedAnnotationTransformer",
+    "reason": "Micronaut 4 changes to injection and Bean Definition"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.LicenseRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.AnnotationTransformer",
+    "reason": "Micronaut 4 changes to injection and Bean Definition"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.LinkParameterRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.TypedAnnotationTransformer",
+    "reason": "Micronaut 4 changes to injection and Bean Definition"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.LinkParameterRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.AnnotationTransformer",
+    "reason": "Micronaut 4 changes to injection and Bean Definition"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.LinkRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.TypedAnnotationTransformer",
+    "reason": "Micronaut 4 changes to injection and Bean Definition"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.LinkRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.AnnotationTransformer",
+    "reason": "Micronaut 4 changes to injection and Bean Definition"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.OAuthFlowRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.TypedAnnotationTransformer",
+    "reason": "Micronaut 4 changes to injection and Bean Definition"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.OAuthFlowRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.AnnotationTransformer",
+    "reason": "Micronaut 4 changes to injection and Bean Definition"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.OAuthFlowsRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.TypedAnnotationTransformer",
+    "reason": "Micronaut 4 changes to injection and Bean Definition"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.OAuthFlowsRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.AnnotationTransformer",
+    "reason": "Micronaut 4 changes to injection and Bean Definition"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.OAuthScopeRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.TypedAnnotationTransformer",
+    "reason": "Micronaut 4 changes to injection and Bean Definition"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.OAuthScopeRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.AnnotationTransformer",
+    "reason": "Micronaut 4 changes to injection and Bean Definition"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.OpenAPIDefinitionRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.TypedAnnotationTransformer",
+    "reason": "Micronaut 4 changes to injection and Bean Definition"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.OpenAPIDefinitionRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.AnnotationTransformer",
+    "reason": "Micronaut 4 changes to injection and Bean Definition"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.OperationRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.TypedAnnotationTransformer",
+    "reason": "Micronaut 4 changes to injection and Bean Definition"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.OperationRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.AnnotationTransformer",
+    "reason": "Micronaut 4 changes to injection and Bean Definition"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.ParameterRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.TypedAnnotationTransformer",
+    "reason": "Micronaut 4 changes to injection and Bean Definition"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.ParameterRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.AnnotationTransformer",
+    "reason": "Micronaut 4 changes to injection and Bean Definition"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.ParametersRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.TypedAnnotationTransformer",
+    "reason": "Micronaut 4 changes to injection and Bean Definition"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.ParametersRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.AnnotationTransformer",
+    "reason": "Micronaut 4 changes to injection and Bean Definition"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.RequestBodyRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.TypedAnnotationTransformer",
+    "reason": "Micronaut 4 changes to injection and Bean Definition"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.RequestBodyRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.AnnotationTransformer",
+    "reason": "Micronaut 4 changes to injection and Bean Definition"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.SchemaRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.TypedAnnotationTransformer",
+    "reason": "Micronaut 4 changes to injection and Bean Definition"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.SchemaRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.AnnotationTransformer",
+    "reason": "Micronaut 4 changes to injection and Bean Definition"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.SecurityRequirementRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.TypedAnnotationTransformer",
+    "reason": "Micronaut 4 changes to injection and Bean Definition"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.SecurityRequirementRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.AnnotationTransformer",
+    "reason": "Micronaut 4 changes to injection and Bean Definition"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.SecurityRequirementsRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.TypedAnnotationTransformer",
+    "reason": "Micronaut 4 changes to injection and Bean Definition"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.SecurityRequirementsRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.AnnotationTransformer",
+    "reason": "Micronaut 4 changes to injection and Bean Definition"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.SecuritySchemeRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.TypedAnnotationTransformer",
+    "reason": "Micronaut 4 changes to injection and Bean Definition"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.SecuritySchemeRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.AnnotationTransformer",
+    "reason": "Micronaut 4 changes to injection and Bean Definition"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.SecuritySchemesRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.TypedAnnotationTransformer",
+    "reason": "Micronaut 4 changes to injection and Bean Definition"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.SecuritySchemesRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.AnnotationTransformer",
+    "reason": "Micronaut 4 changes to injection and Bean Definition"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.ServerRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.TypedAnnotationTransformer",
+    "reason": "Micronaut 4 changes to injection and Bean Definition"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.ServerRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.AnnotationTransformer",
+    "reason": "Micronaut 4 changes to injection and Bean Definition"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.ServersRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.TypedAnnotationTransformer",
+    "reason": "Micronaut 4 changes to injection and Bean Definition"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.ServersRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.AnnotationTransformer",
+    "reason": "Micronaut 4 changes to injection and Bean Definition"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.ServerVariableRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.TypedAnnotationTransformer",
+    "reason": "Micronaut 4 changes to injection and Bean Definition"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.ServerVariableRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.AnnotationTransformer",
+    "reason": "Micronaut 4 changes to injection and Bean Definition"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.TagRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.TypedAnnotationTransformer",
+    "reason": "Micronaut 4 changes to injection and Bean Definition"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.TagRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.AnnotationTransformer",
+    "reason": "Micronaut 4 changes to injection and Bean Definition"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.TagsRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.TypedAnnotationTransformer",
+    "reason": "Micronaut 4 changes to injection and Bean Definition"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.TagsRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.AnnotationTransformer",
+    "reason": "Micronaut 4 changes to injection and Bean Definition"
+  },
+  {
+    "type": "io.micronaut.openapi.visitor.OpenApiApplicationVisitor",
+    "member": "Implemented interface io.micronaut.inject.visitor.TypeElementVisitor",
+    "reason": "Micronaut 4 changes to injection and Bean Definition"
+  },
+  {
+    "type": "io.micronaut.openapi.visitor.OpenApiApplicationVisitor",
+    "member": "Implemented interface io.micronaut.core.order.Ordered",
+    "reason": "Micronaut 4 changes to injection and Bean Definition"
+  },
+  {
+    "type": "io.micronaut.openapi.visitor.OpenApiApplicationVisitor",
+    "member": "Implemented interface io.micronaut.core.util.Toggleable",
+    "reason": "Micronaut 4 changes to injection and Bean Definition"
+  },
+  {
+    "type": "io.micronaut.openapi.visitor.OpenApiControllerVisitor",
+    "member": "Implemented interface io.micronaut.inject.visitor.TypeElementVisitor",
+    "reason": "Micronaut 4 changes to injection and Bean Definition"
+  },
+  {
+    "type": "io.micronaut.openapi.visitor.OpenApiControllerVisitor",
+    "member": "Implemented interface io.micronaut.core.order.Ordered",
+    "reason": "Micronaut 4 changes to injection and Bean Definition"
+  },
+  {
+    "type": "io.micronaut.openapi.visitor.OpenApiControllerVisitor",
+    "member": "Implemented interface io.micronaut.core.util.Toggleable",
+    "reason": "Micronaut 4 changes to injection and Bean Definition"
+  },
+  {
+    "type": "io.micronaut.openapi.visitor.OpenApiEndpointVisitor",
+    "member": "Implemented interface io.micronaut.inject.visitor.TypeElementVisitor",
+    "reason": "Micronaut 4 changes to injection and Bean Definition"
+  },
+  {
+    "type": "io.micronaut.openapi.visitor.OpenApiEndpointVisitor",
+    "member": "Implemented interface io.micronaut.core.order.Ordered",
+    "reason": "Micronaut 4 changes to injection and Bean Definition"
+  },
+  {
+    "type": "io.micronaut.openapi.visitor.OpenApiEndpointVisitor",
+    "member": "Implemented interface io.micronaut.core.util.Toggleable",
+    "reason": "Micronaut 4 changes to injection and Bean Definition"
+  },
+  {
+    "type": "io.micronaut.openapi.visitor.OpenApiIncludeVisitor",
+    "member": "Implemented interface io.micronaut.inject.visitor.TypeElementVisitor",
+    "reason": "Micronaut 4 changes to injection and Bean Definition"
+  },
+  {
+    "type": "io.micronaut.openapi.visitor.OpenApiIncludeVisitor",
+    "member": "Implemented interface io.micronaut.core.order.Ordered",
+    "reason": "Micronaut 4 changes to injection and Bean Definition"
+  },
+  {
+    "type": "io.micronaut.openapi.visitor.OpenApiIncludeVisitor",
+    "member": "Implemented interface io.micronaut.core.util.Toggleable",
+    "reason": "Micronaut 4 changes to injection and Bean Definition"
+  },
+  {
+    "type": "io.micronaut.openapi.visitor.OpenApiJacksonVisitor",
+    "member": "Implemented interface io.micronaut.inject.visitor.TypeElementVisitor",
+    "reason": "Micronaut 4 changes to injection and Bean Definition"
+  },
+  {
+    "type": "io.micronaut.openapi.visitor.OpenApiJacksonVisitor",
+    "member": "Implemented interface io.micronaut.core.order.Ordered",
+    "reason": "Micronaut 4 changes to injection and Bean Definition"
+  },
+  {
+    "type": "io.micronaut.openapi.visitor.OpenApiJacksonVisitor",
+    "member": "Implemented interface io.micronaut.core.util.Toggleable",
+    "reason": "Micronaut 4 changes to injection and Bean Definition"
+  }
 ]

@@ -4,7 +4,7 @@ plugins {
 }
 
 dependencies {
-    testImplementation(platform(mn.micronaut.bom))
+    testImplementation(platform(mn.micronaut.core.bom))
 
     testImplementation projects.openapi
     testImplementation(mn.micronaut.runtime)
@@ -12,13 +12,13 @@ dependencies {
     testImplementation(mn.micronaut.validation)
     testImplementation(libs.managed.swagger.annotations)
     testImplementation(mn.reactor)
-    testImplementation(mn.micronaut.hibernate.validator)
+    testImplementation(libs.micronaut.hibernate.validator)
     testImplementation(libs.junit.jupiter.api)
 
     testCompileOnly(mn.micronaut.inject.java)
 
     testRuntimeOnly(libs.junit.jupiter.engine)
-    testRuntimeOnly(mn.logback)
+    testRuntimeOnly(mn.logback.classic)
 }
 
 

@@ -2277,8 +2277,8 @@ abstract class AbstractOpenApiVisitor {
 
     private Schema getPrimitiveType(String typeName) {
         Schema schema = null;
-        Optional<Class> aClass = ClassUtils.getPrimitiveType(typeName);
-        if (!aClass.isPresent()) {
+        Optional<Class<?>> aClass = ClassUtils.getPrimitiveType(typeName);
+        if (aClass.isEmpty()) {
             aClass = ClassUtils.forName(typeName, getClass().getClassLoader());
         }
 

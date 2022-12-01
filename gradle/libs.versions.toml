@@ -3,16 +3,21 @@ managed-swagger = "2.2.7"
 managed-javadoc-parser = "0.3.1"
 managed-jsoup = "1.15.3"
 managed-jakarta-validation-api = "3.0.2"
-managed-slf4j = "1.7.36"
+managed-slf4j = "2.0.4"
 
 # Versions beyond 0.62.2 require Java 11
 managed-html2md-converter = "0.62.2"
 
+micronaut-data = "3.8.1" # TODO update once 4.0.0-SNAPSHOT is out
+micronaut-hibernate-validator = "4.0.0-SNAPSHOT" # TODO update once 4.0.0-SNAPSHOT is out
+micronaut-rxjava2 = "2.0.0-SNAPSHOT"
+micronaut-rxjava3 = "3.0.0-SNAPSHOT"
+micronaut-security = "4.0.0-SNAPSHOT"
+micronaut-serde = "2.0.0-SNAPSHOT"
+
 kotlin = "1.7.21"
 
 [libraries]
-# Duplicated to keep catalog compatibility with 3.4.x.  Can be removed for 4.0.0
-managed-swagger = { module = "io.swagger.core.v3:swagger-core", version.ref = "managed-swagger-compat" }
 managed-swagger-core = { module = "io.swagger.core.v3:swagger-core", version.ref = "managed-swagger" }
 
 managed-swagger-annotations = { module = "io.swagger.core.v3:swagger-annotations", version.ref = "managed-swagger" }
@@ -22,6 +27,15 @@ managed-javadoc-parser = { module = "com.github.chhorz:javadoc-parser", version.
 managed-html2md-converter = { module = "com.vladsch.flexmark:flexmark-html2md-converter", version.ref = "managed-html2md-converter" }
 managed-jsoup = { module = "org.jsoup:jsoup", version.ref = "managed-jsoup" }
 managed-slf4j-nop = { module = "org.slf4j:slf4j-nop", version.ref = "managed-slf4j" }
+
+# TODO: Fix when we have a BOM
+micronaut-hibernate-validator = { module = "io.micronaut.beanvalidation:micronaut-hibernate-validator", version.ref = "micronaut-hibernate-validator" }
+
+micronaut-data = { module = "io.micronaut.data:micronaut-data-bom", version.ref = "micronaut-data" }
+micronaut-rxjava2 = { module = "io.micronaut.rxjava2:micronaut-rxjava2-bom", version.ref = "micronaut-rxjava2" }
+micronaut-rxjava3 = { module = "io.micronaut.rxjava3:micronaut-rxjava3-bom", version.ref = "micronaut-rxjava3" }
+micronaut-security = { module = "io.micronaut.security:micronaut-security-bom", version.ref = "micronaut-security" }
+micronaut-serde = { module = "io.micronaut.serde:micronaut-serde-bom", version.ref = "micronaut-serde" }
 
 # Versions from BOM
 junit-jupiter-api = { module = "org.junit.jupiter:junit-jupiter-api" }

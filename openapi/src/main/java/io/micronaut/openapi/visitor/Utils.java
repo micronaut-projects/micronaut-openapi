@@ -18,6 +18,7 @@ package io.micronaut.openapi.visitor;
 import java.io.File;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -28,7 +29,7 @@ import io.micronaut.context.env.DefaultPropertyPlaceholderResolver;
 import io.micronaut.context.env.PropertyPlaceholderResolver;
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.core.convert.ArgumentConversionContext;
-import io.micronaut.core.convert.DefaultConversionService;
+import io.micronaut.core.convert.ConversionService;
 import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.core.value.PropertyResolver;
 import io.micronaut.http.MediaType;
@@ -83,7 +84,12 @@ public final class Utils {
                 public <T> Optional<T> getProperty(@NonNull String name, @NonNull ArgumentConversionContext<T> conversionContext) {
                     return Optional.empty();
                 }
-            }, new DefaultConversionService());
+
+                @Override
+                public Collection<List<String>> getPropertyPathMatches(String pathPattern) {
+                    return Collections.emptyList();
+                }
+            }, ConversionService.SHARED);
         }
         return propertyPlaceholderResolver;
     }

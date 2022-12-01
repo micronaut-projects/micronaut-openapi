@@ -2,10 +2,7 @@ plugins {
     id "io.micronaut.build.internal.docs"
     id "io.micronaut.build.internal.quality-reporting"
 }
-repositories {
-    mavenCentral()
-    maven { url "https://s01.oss.sonatype.org/content/repositories/snapshots/" }
-}
+
 allprojects {
     configurations.all {
         all*.exclude group: "io.spring.nohttp"

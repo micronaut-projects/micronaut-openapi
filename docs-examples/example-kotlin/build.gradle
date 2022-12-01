@@ -11,16 +11,16 @@ dependencies {
 
     kaptTest(mn.micronaut.inject.java)
 
-    testImplementation(platform(mn.micronaut.bom))
+    testImplementation(platform(mn.micronaut.core.bom))
     testImplementation(libs.managed.swagger.annotations)
     testImplementation(mn.reactor)
     testImplementation(mn.micronaut.runtime)
     testImplementation(mn.micronaut.validation)
-    testImplementation(mn.micronaut.hibernate.validator)
+    testImplementation(libs.micronaut.hibernate.validator)
     testImplementation(libs.kotlin.stdlib.jdk8)
     testImplementation(libs.kotlin.reflect)
 
-    testRuntimeOnly(mn.logback)
+    testRuntimeOnly(mn.logback.classic)
     testRuntimeOnly(libs.junit.jupiter.engine)
 }
 
