@@ -1,6 +1,7 @@
 # Auto detect text files and perform LF normalization
 *        text=auto
 *        text=lf
+*        text=lf
 
 *.java   text eol=lf
 *.html   text
@@ -12,11 +13,6 @@
 *.md     text diff=markdown eol=lf
 *.py     text diff=python executable
 *.pl     text diff=perl executable
-*.pm     text diff=perl
-*.css    text diff=css
-*.js     text
-*.sql    text
-*.q      text
 *.css    text diff=css eol=lf
 *.js     text eol=lf
 *.sql    text eol=lf
