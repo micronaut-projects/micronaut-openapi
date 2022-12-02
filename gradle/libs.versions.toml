@@ -4,19 +4,36 @@ managed-swagger = "2.2.7"
 managed-swagger-compat = "2.2.7"
 managed-javadoc-parser = "0.3.1"
 managed-jsoup = "1.15.3"
+managed-slf4j = "2.0.4"
+managed-html2md-converter = "0.64.0"
 managed-jakarta-validation-api = "3.0.2"
-managed-slf4j = "1.7.36"
-
-# Versions beyond 0.62.2 require Java 11
-managed-html2md-converter = "0.62.2"
 
 kotlin = "1.7.21"
+micronaut-security = "4.0.0-SNAPSHOT"
+micronaut-serde = "2.0.0-SNAPSHOT"
+micronaut-rxjava2 = "2.0.0-SNAPSHOT"
+micronaut-rxjava3 = "3.0.0-SNAPSHOT"
+micronaut-groovy = "4.0.0-SNAPSHOT"
+micronaut-validation = "4.0.0-SNAPSHOT"
+micronaut-data = "3.8.2-SNAPSHOT"
+micronaut-test = "4.0.0-SNAPSHOT"
+micronaut-kotlin = "4.0.0-SNAPSHOT"
 
 [libraries]
+
+micronaut-security = { module = "io.micronaut.security:micronaut-security-bom", version.ref = "micronaut-security" }
+micronaut-serde = { module = "io.micronaut.serde:micronaut-serde-bom", version.ref = "micronaut-serde" }
+micronaut-rxjava2 = { module = "io.micronaut.rxjava2:micronaut-rxjava2-bom", version.ref = "micronaut-rxjava2" }
+micronaut-rxjava3 = { module = "io.micronaut.rxjava3:micronaut-rxjava3-bom", version.ref = "micronaut-rxjava3" }
+micronaut-groovy = { module = "io.micronaut.groovy:micronaut-groovy-bom", version.ref = "micronaut-groovy" }
+micronaut-validation = { module = "io.micronaut.validation:micronaut-validation-bom", version.ref = "micronaut-validation" }
+micronaut-data = { module = "io.micronaut.data:micronaut-data-bom", version.ref = "micronaut-data" }
+micronaut-test = { module = "io.micronaut.test:micronaut-test-bom", version.ref = "micronaut-test" }
+micronaut-kotlin = { module = "io.micronaut.kotlin:micronaut-kotlin-bom", version.ref = "micronaut-kotlin" }
+
 # Duplicated to keep catalog compatibility with 3.4.x.  Can be removed for 4.0.0
 managed-swagger = { module = "io.swagger.core.v3:swagger-core", version.ref = "managed-swagger-compat" }
 managed-swagger-core = { module = "io.swagger.core.v3:swagger-core", version.ref = "managed-swagger" }
-
 managed-swagger-annotations = { module = "io.swagger.core.v3:swagger-annotations", version.ref = "managed-swagger" }
 managed-swagger-models = { module = "io.swagger.core.v3:swagger-models", version.ref = "managed-swagger" }
 
@@ -26,18 +43,10 @@ managed-jsoup = { module = "org.jsoup:jsoup", version.ref = "managed-jsoup" }
 managed-slf4j-nop = { module = "org.slf4j:slf4j-nop", version.ref = "managed-slf4j" }
 
 # Versions from BOM
-junit-jupiter-api = { module = "org.junit.jupiter:junit-jupiter-api" }
 junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine" }
-spock-core = { module = "org.spockframework:spock-core" }
-rxjava2 = { module = "io.reactivex.rxjava2:rxjava" }
-rxjava3 = { module = "io.reactivex.rxjava3:rxjava" }
-jackson-databind = { module = "com.fasterxml.jackson.core:jackson-databind" }
 jackson-datatype-jsr310 = { module = "com.fasterxml.jackson.datatype:jackson-datatype-jsr310" }
 jackson-dataformat-yaml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml" }
-javax-validation-api = { module = "javax.validation:validation-api" }
 jakarta-validation-api = { module = "jakarta.validation:jakarta.validation-api", version.ref = "managed-jakarta-validation-api" }
-
-testcontainers-spock = { module = "org.testcontainers:spock" }
 
 kotlin-stdlib-jdk8 = { module = "org.jetbrains.kotlin:kotlin-stdlib-jdk8", version.ref = "kotlin" }
 kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
@@ -45,3 +54,4 @@ kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref =
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
+kotlin-allopen = { id = "org.jetbrains.kotlin.plugin.allopen", version.ref = "kotlin" }

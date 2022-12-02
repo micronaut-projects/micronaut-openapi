@@ -5,6 +5,6 @@
     "https://checkstyle.org/dtds/suppressions_1_2.dtd">
 
 <suppressions>
-    <suppress checks="." files="io[\\/]micronaut[\\/]openapi[\\/]swagger[\\/]" />
+    <suppress checks="." files="io[\\/]micronaut[\\/]openapi[\\/]swagger[\\/]core[\\/]" />
     <suppress checks="FileLength" files=".*" />
 </suppressions>

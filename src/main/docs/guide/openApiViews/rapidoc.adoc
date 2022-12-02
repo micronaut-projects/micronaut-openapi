@@ -49,7 +49,7 @@ The views will be generated to the `META-INF/swagger/views/rapidoc` directory of
 
 See https://mrin9.github.io/RapiDoc/api.html[RapiDoc Options] for a description.
 
-To expose the the `rapidoc` views, you also must expose the generated `yaml`:
+To expose the `rapidoc` views, you also must expose the generated `yaml`:
 
 .Exposing Swagger YAML And Rapidoc Views
 [source,yaml]

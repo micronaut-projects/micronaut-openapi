@@ -59,11 +59,9 @@ public final class Pair<S, T> {
             return true;
         }
 
-        if (!(o instanceof Pair)) {
+        if (!(o instanceof Pair<?, ?> pair)) {
             return false;
         }
-
-        Pair<?, ?> pair = (Pair<?, ?>) o;
 
         if (!Objects.equals(first, pair.first)) {
             return false;

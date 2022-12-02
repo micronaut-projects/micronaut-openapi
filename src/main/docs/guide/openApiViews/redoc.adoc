@@ -1,4 +1,4 @@
-Views supports https://github.com/Rebilly/ReDoc[Redoc], to enable it use `redoc.enabled=true`.
+Views support https://github.com/Rebilly/ReDoc[Redoc], to enable it use `redoc.enabled=true`.
 
 The views will be generated to the `META-INF/swagger/views/redoc` directory of your project’s class output.
 
@@ -31,7 +31,7 @@ The views will be generated to the `META-INF/swagger/views/redoc` directory of y
 
 See https://github.com/Redocly/redoc#redoc-options-object[Redoc Options] for a description of the above properites.
 
-To expose the the `redoc` views, you also must expose the generated `yaml`:
+To expose the `redoc` views, you also must expose the generated `yaml`:
 
 .Exposing Swagger YAML And Redoc Views
 [source,yaml]

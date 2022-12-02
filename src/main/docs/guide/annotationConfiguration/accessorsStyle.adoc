@@ -12,7 +12,7 @@ class Person {
     private Integer debtValue;
     private Integer totalGoals;
 
-    public Person(String name, Integer debtValue, Integer totalGoals) {
+    Person(String name, Integer debtValue, Integer totalGoals) {
         this.name = name;
         this.debtValue = debtValue;
         this.totalGoals = totalGoals;

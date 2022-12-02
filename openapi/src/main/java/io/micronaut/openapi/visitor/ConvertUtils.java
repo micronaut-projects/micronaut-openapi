@@ -42,10 +42,9 @@ import javax.xml.datatype.XMLGregorianCalendar;
 import io.micronaut.core.annotation.AnnotationValue;
 import io.micronaut.core.beans.BeanMap;
 import io.micronaut.inject.visitor.VisitorContext;
-import io.micronaut.openapi.swagger.ObjectMapperFactory;
+import io.micronaut.openapi.swagger.core.util.ObjectMapperFactory;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 
-import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -60,7 +59,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
  */
 public final class ConvertUtils {
 
-    private static final TypeReference<Map<String, Object>> MAP_TYPE_REFERENCE = new TypeReference<Map<String, Object>>() {
+    private static final TypeReference<Map<String, Object>> MAP_TYPE_REFERENCE = new TypeReference<>() {
     };
     /**
      * The JSON mapper.

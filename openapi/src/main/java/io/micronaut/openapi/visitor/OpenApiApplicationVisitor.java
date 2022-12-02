@@ -17,6 +17,7 @@ package io.micronaut.openapi.visitor;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.io.Serial;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.net.URI;
@@ -210,7 +211,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
      */
     private static final String MICRONAUT_INTERNAL_EXPANDBLE_PROPERTIES_LOADED = "micronaut.internal.expandable.props.loaded";
 
-    private static final Argument<List<Map.Entry<String, String>>> EXPANDABLE_PROPERTIES_ARGUMENT = new GenericArgument<List<Map.Entry<String, String>>>() { };
+    private static final Argument<List<Map.Entry<String, String>>> EXPANDABLE_PROPERTIES_ARGUMENT = new GenericArgument<>() { };
 
     private ClassElement classElement;
     private int visitedElements = -1;
@@ -611,16 +612,16 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         if (name == null) {
             return null;
         }
-        switch (name.toUpperCase(Locale.US)) {
-            case "LOWER_CAMEL_CASE":  return new LowerCamelCasePropertyNamingStrategy();
-            case "UPPER_CAMEL_CASE":  return (PropertyNamingStrategies.NamingBase) PropertyNamingStrategies.UPPER_CAMEL_CASE;
-            case "SNAKE_CASE": return (PropertyNamingStrategies.NamingBase) PropertyNamingStrategies.SNAKE_CASE;
-            case "UPPER_SNAKE_CASE": return (PropertyNamingStrategies.NamingBase) PropertyNamingStrategies.UPPER_SNAKE_CASE;
-            case "LOWER_CASE":  return (PropertyNamingStrategies.NamingBase) PropertyNamingStrategies.LOWER_CASE;
-            case "KEBAB_CASE":  return (PropertyNamingStrategies.NamingBase) PropertyNamingStrategies.KEBAB_CASE;
-            case "LOWER_DOT_CASE":  return (PropertyNamingStrategies.NamingBase) PropertyNamingStrategies.LOWER_DOT_CASE;
-            default: return  null;
-        }
+        return switch (name.toUpperCase(Locale.US)) {
+            case "LOWER_CAMEL_CASE" -> new LowerCamelCasePropertyNamingStrategy();
+            case "UPPER_CAMEL_CASE" -> (PropertyNamingStrategies.NamingBase) PropertyNamingStrategies.UPPER_CAMEL_CASE;
+            case "SNAKE_CASE" -> (PropertyNamingStrategies.NamingBase) PropertyNamingStrategies.SNAKE_CASE;
+            case "UPPER_SNAKE_CASE" -> (PropertyNamingStrategies.NamingBase) PropertyNamingStrategies.UPPER_SNAKE_CASE;
+            case "LOWER_CASE" -> (PropertyNamingStrategies.NamingBase) PropertyNamingStrategies.LOWER_CASE;
+            case "KEBAB_CASE" -> (PropertyNamingStrategies.NamingBase) PropertyNamingStrategies.KEBAB_CASE;
+            case "LOWER_DOT_CASE" -> (PropertyNamingStrategies.NamingBase) PropertyNamingStrategies.LOWER_DOT_CASE;
+            default -> null;
+        };
     }
 
     private Optional<Path> openApiSpecFile(String fileName, VisitorContext visitorContext) {
@@ -680,7 +681,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                     }
                     List<String> required = model.getRequired();
                     if (required != null) {
-                        List<String> updatedRequired = required.stream().map(propertyNamingStrategy::translate).collect(Collectors.toList());
+                        List<String> updatedRequired = required.stream().map(propertyNamingStrategy::translate).toList();
                         required.clear();
                         required.addAll(updatedRequired);
                     }
@@ -999,6 +1000,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
 
     static class LowerCamelCasePropertyNamingStrategy extends PropertyNamingStrategies.NamingBase {
 
+        @Serial
         private static final long serialVersionUID = -2750503285679998670L;
 
         @Override

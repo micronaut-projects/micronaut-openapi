@@ -286,7 +286,7 @@ class OpenApiOperationViewRenderSpec extends Specification {
 
     void "test generates urlResourcesPrefix only openapi.context.path"() {
         given:
-        System.setProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_CONTEXT_SERVER_PATH, "/server-context-path")
+        System.setProperty("micronaut.server.context-path", "/local-path")
         String spec = "swagger-ui.enabled=true"
         OpenApiViewConfig cfg = OpenApiViewConfig.fromSpecification(spec, new Properties())
         Path outputDir = Paths.get("output")
@@ -303,10 +303,10 @@ class OpenApiOperationViewRenderSpec extends Specification {
         String urlPrefix = cfg.swaggerUIConfig.getFinalUrlPrefix(OpenApiViewConfig.RendererType.SWAGGER_UI, null)
 
         urlPrefix
-        urlPrefix == '/server-context-path/swagger-ui/res/'
+        urlPrefix == '/local-path/swagger-ui/res/'
 
         cleanup:
-        System.clearProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_CONTEXT_SERVER_PATH)
+        System.clearProperty("micronaut.server.context-path")
     }
 
     void "test generates urlResourcesPrefix without context paths"() {

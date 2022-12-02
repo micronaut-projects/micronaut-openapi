@@ -6,8 +6,9 @@ pluginManagement {
 }
 
 plugins {
-    id("io.micronaut.build.shared.settings") version "6.1.0"
+    id 'io.micronaut.build.shared.settings' version '6.1.0'
 }
+enableFeaturePreview 'TYPESAFE_PROJECT_ACCESSORS'
 
 rootProject.name="openapi-parent"
 
@@ -17,6 +18,30 @@ include 'docs-examples:example-groovy'
 include 'docs-examples:example-java'
 include 'docs-examples:example-kotlin'
 
+enableFeaturePreview 'TYPESAFE_PROJECT_ACCESSORS'
+
+dependencyResolutionManagement {
+    repositories {
+        mavenCentral()
+        maven {
+            url "https://s01.oss.sonatype.org/content/repositories/snapshots/"
+            mavenContent {
+                snapshotsOnly()
+            }
+        }
+    }
+}
+
 micronautBuild {
+    addSnapshotRepository()
     importMicronautCatalog()
+    importMicronautCatalog("micronaut-security")
+    importMicronautCatalog("micronaut-serde")
+    importMicronautCatalog("micronaut-rxjava2")
+    importMicronautCatalog("micronaut-rxjava3")
+    importMicronautCatalog("micronaut-groovy")
+    importMicronautCatalog("micronaut-validation")
+    importMicronautCatalog("micronaut-data")
+    importMicronautCatalog("micronaut-test")
+    importMicronautCatalog("micronaut-kotlin")
 }

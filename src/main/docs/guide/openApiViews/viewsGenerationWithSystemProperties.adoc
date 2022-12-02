@@ -1,8 +1,8 @@
-By default the generation of views is disabled. 
+By default the generation of views is disabled.
 
 To turn it on you have to set the following system property `micronaut.openapi.views.spec`.
 
-The string syntax is a series of comma-separated key-value pairs, to enable and configure the views. 
+The string syntax is a series of comma-separated key-value pairs, to enable and configure the views.
 
 .System Property
 [source]
@@ -91,7 +91,7 @@ or in Maven with Groovy:
         <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>properties-maven-plugin</artifactId>
-        <version>1.0.0</version>
+        <version>1.1.0</version>
         <executions>
           <execution>
             <goals>
