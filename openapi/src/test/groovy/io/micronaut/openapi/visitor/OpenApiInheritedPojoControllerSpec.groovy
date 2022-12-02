@@ -1219,8 +1219,8 @@ class MyBean {}
         sleeperSchema != null
         catSchema != null
 
-        petSchema.type == null
-        petSchema.properties == null
+        petSchema.type == 'object'
+        petSchema.properties.size() == 2
         animalSchema.type == 'object'
         animalSchema.properties.size() == 1
         sleeperSchema.type == 'object'
@@ -1235,10 +1235,8 @@ class MyBean {}
         catSchema.allOf[3].type == 'object'
         catSchema.allOf[3].properties['clawSize'].type == 'integer'
 
-        petSchema.allOf.size() == 2
-        petSchema.allOf[0].type == 'object'
-        petSchema.allOf[0].properties.size() == 2
-        petSchema.allOf[1].$ref == '#/components/schemas/Animal'
+        petSchema.allOf.size() == 1
+        petSchema.allOf[0].$ref == '#/components/schemas/Animal'
     }
 
     void "test build OpenAPI for interface inheritance with generics"() {
@@ -1441,4 +1439,102 @@ class MyBean {}
         opParentRequest
     }
 
+    void "test class inheritance Schema"() {
+
+        given: "An API definition"
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import java.util.List;
+
+import io.micronaut.core.annotation.Introspected;
+import io.micronaut.http.annotation.Body;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Post;
+import io.swagger.v3.oas.annotations.media.Schema;
+
+@Controller
+class MyOperations {
+
+    @Post("/get")
+    void getRequest(@Body MyDto dto) {
+    }
+}
+
+@Schema(name = "MyDto", description = "This is filter")
+@Introspected
+class MyDto extends FilterDto {
+
+    @Schema(hidden = true)
+    private final String entityType;
+    private final String entitySubType;
+    @Schema(description = "My description")
+    private final List<RelationFilter> relationFilters;
+
+    MyDto(String entityType, String entitySubType, List<RelationFilter> relationFilters, Integer page) {
+        super(page);
+        this.entityType = entityType;
+        this.entitySubType = entitySubType;
+        this.relationFilters = relationFilters;
+    }
+
+    public String getEntityType() {
+        return entityType;
+    }
+
+    public String getEntitySubType() {
+        return entitySubType;
+    }
+
+    public List<RelationFilter> getRelationFilters() {
+        return relationFilters;
+    }
+}
+
+@Schema(name = "FilterDto", description = "This is parent filter")
+@Introspected
+class FilterDto {
+
+    @Schema(name="page", description = "Page description", type = "integer", defaultValue = "0")
+    private final Integer page;
+
+    FilterDto(Integer page) {
+        this.page = page;
+    }
+
+    public Integer getPage() {
+        return page;
+    }
+}
+
+@Introspected
+class RelationFilter {
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        then: "the state is correct"
+        Utils.testReference != null
+
+        when: "The OpenAPI is retrieved"
+        OpenAPI openAPI = Utils.testReference
+        Schema myDtoSchema = openAPI.components.schemas.MyDto
+        Schema filterDtoSchema = openAPI.components.schemas.FilterDto
+
+        then:
+        myDtoSchema
+        !myDtoSchema.properties.entityType
+        myDtoSchema.properties.entitySubType
+        myDtoSchema.properties.relationFilters
+        myDtoSchema.allOf
+        myDtoSchema.allOf.size() == 1
+        myDtoSchema.allOf[0].$ref == '#/components/schemas/FilterDto'
+
+        filterDtoSchema
+        filterDtoSchema.properties.page
+        filterDtoSchema.properties.page.type == 'integer'
+        filterDtoSchema.properties.page.default == 0
+    }
 }

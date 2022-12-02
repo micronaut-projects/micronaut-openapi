@@ -29,8 +29,6 @@ managed-slf4j-nop = { module = "org.slf4j:slf4j-nop", version.ref = "managed-slf
 junit-jupiter-api = { module = "org.junit.jupiter:junit-jupiter-api" }
 junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine" }
 spock-core = { module = "org.spockframework:spock-core" }
-rxjava2 = { module = "io.reactivex.rxjava2:rxjava" }
-rxjava3 = { module = "io.reactivex.rxjava3:rxjava" }
 jackson-databind = { module = "com.fasterxml.jackson.core:jackson-databind" }
 jackson-datatype-jsr310 = { module = "com.fasterxml.jackson.datatype:jackson-datatype-jsr310" }
 jackson-dataformat-yaml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml" }
