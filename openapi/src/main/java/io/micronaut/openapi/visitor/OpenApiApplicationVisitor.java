@@ -101,6 +101,7 @@ import static io.swagger.v3.oas.models.Components.COMPONENTS_SCHEMAS_REF;
     OpenApiApplicationVisitor.MICRONAUT_ENVIRONMENT_ENABLED,
     OpenApiApplicationVisitor.MICRONAUT_CONFIG_FILE_LOCATIONS,
     OpenApiApplicationVisitor.MICRONAUT_OPENAPI_TARGET_FILE,
+    OpenApiApplicationVisitor.MICRONAUT_OPENAPI_VIEWS_DEST_DIR,
     OpenApiApplicationVisitor.MICRONAUT_OPENAPI_ADDITIONAL_FILES,
     OpenApiApplicationVisitor.MICRONAUT_OPENAPI_CONFIG_FILE,
 })
@@ -130,6 +131,10 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
      * System property that enables setting the target file to write to.
      */
     public static final String MICRONAUT_OPENAPI_TARGET_FILE = "micronaut.openapi.target.file";
+    /**
+     * System property that specifies the path where the generated UI elements will be located.
+     */
+    public static final String MICRONAUT_OPENAPI_VIEWS_DEST_DIR = "micronaut.openapi.views.dest.dir";
     /**
      * System property that specifies the location of additional swagger YAML and JSON files to read from.
      */
@@ -603,7 +608,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             cfg.setTitle(title);
             cfg.setSpecFile(specFile);
             cfg.setServerContextPath(getConfigurationProperty(MICRONAUT_OPENAPI_CONTEXT_SERVER_PATH, context));
-            cfg.render(destinationDir.resolve("views"), context);
+            cfg.render(destinationDir, context);
         }
     }
 
@@ -623,34 +628,48 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         }
     }
 
-    private Optional<Path> openApiSpecFile(String fileName, VisitorContext visitorContext) {
-        Optional<Path> path = userDefinedSpecFile(visitorContext);
-        if (path.isPresent()) {
-            return path;
-        }
+    private Optional<Path> getDefaultFilePath(String fileName, VisitorContext context) {
         // default location
-        Optional<GeneratedFile> generatedFile = visitorContext.visitMetaInfFile("swagger/" + fileName, Element.EMPTY_ELEMENT_ARRAY);
+        Optional<GeneratedFile> generatedFile = context.visitMetaInfFile("swagger/" + fileName, Element.EMPTY_ELEMENT_ARRAY);
         if (generatedFile.isPresent()) {
             URI uri = generatedFile.get().toURI();
             // happens in tests 'mem:///CLASS_OUTPUT/META-INF/swagger/swagger.yml'
             if (uri.getScheme() != null && !uri.getScheme().equals("mem")) {
                 Path specPath = Paths.get(uri);
-                createDirectories(specPath, visitorContext);
+                createDirectories(specPath, context);
                 return Optional.of(specPath);
             }
         }
-        visitorContext.warn("Unable to get swagger/" + fileName + " file.", null);
+        context.warn("Unable to get swagger/" + fileName + " file.", null);
         return Optional.empty();
     }
 
-    private Optional<Path> userDefinedSpecFile(VisitorContext visitorContext) {
-        String targetFile = getConfigurationProperty(MICRONAUT_OPENAPI_TARGET_FILE, visitorContext);
+    private Optional<Path> openApiSpecFile(String fileName, VisitorContext visitorContext) {
+        Optional<Path> path = userDefinedSpecFile(visitorContext);
+        if (path.isPresent()) {
+            return path;
+        }
+        return getDefaultFilePath(fileName, visitorContext);
+    }
+
+    private Optional<Path> userDefinedSpecFile(VisitorContext context) {
+        String targetFile = getConfigurationProperty(MICRONAUT_OPENAPI_TARGET_FILE, context);
         if (StringUtils.isEmpty(targetFile)) {
             return Optional.empty();
         }
-        Path specFile = resolve(visitorContext, Paths.get(targetFile));
-        createDirectories(specFile, visitorContext);
+        Path specFile = resolve(context, Paths.get(targetFile));
+        createDirectories(specFile, context);
         return Optional.of(specFile);
+    }
+
+    private Path getViewsDestDir(Path defaultSwaggerFilePath, VisitorContext context) {
+        String destDir = getConfigurationProperty(MICRONAUT_OPENAPI_VIEWS_DEST_DIR, context);
+        if (StringUtils.isNotEmpty(destDir)) {
+            Path destPath = resolve(context, Paths.get(destDir));
+            createDirectories(destPath, context);
+            return destPath;
+        }
+        return defaultSwaggerFilePath.getParent().resolve("views");
     }
 
     private static void createDirectories(Path f, VisitorContext visitorContext) {
@@ -939,8 +958,8 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         }
     }
 
-    private void writeYamlToFile(OpenAPI openAPI, String fileName, String documentTitle, VisitorContext visitorContext, boolean isYaml) {
-        Optional<Path> specFile = openApiSpecFile(fileName, visitorContext);
+    private void writeYamlToFile(OpenAPI openAPI, String fileName, String documentTitle, VisitorContext context, boolean isYaml) {
+        Optional<Path> specFile = openApiSpecFile(fileName, context);
         try (Writer writer = getFileWriter(specFile)) {
             (isYaml ? ConvertUtils.getYamlMapper() : ConvertUtils.getJsonMapper()).writeValue(writer, openAPI);
             if (Utils.isTestMode()) {
@@ -952,17 +971,20 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             } else {
                 @SuppressWarnings("OptionalGetWithoutIsPresent")
                 Path specPath = specFile.get();
-                visitorContext.info("Writing OpenAPI file to destination: " + specPath);
-                visitorContext.getClassesOutputPath().ifPresent(path -> {
+                context.info("Writing OpenAPI file to destination: " + specPath);
+                Path viewsDestDirs = getViewsDestDir(getDefaultFilePath(fileName, context).get(), context);
+                context.info("Writing OpenAPI views to destination: " + viewsDestDirs);
+                context.getClassesOutputPath().ifPresent(path -> {
                     // add relative paths for the specPath, and its parent META-INF/swagger
                     // so that micronaut-graal visitor knows about them
-                    visitorContext.addGeneratedResource(path.relativize(specPath).toString());
-                    visitorContext.addGeneratedResource(path.relativize(specPath.getParent()).toString());
+                    context.addGeneratedResource(path.relativize(specPath).toString());
+                    context.addGeneratedResource(path.relativize(specPath.getParent()).toString());
+                    context.addGeneratedResource(path.relativize(viewsDestDirs).toString());
                 });
-                renderViews(documentTitle, specPath.getFileName().toString(), specPath.getParent(), visitorContext);
+                renderViews(documentTitle, specPath.getFileName().toString(), viewsDestDirs, context);
             }
         } catch (Exception e) {
-            visitorContext.warn("Unable to generate swagger." + (isYaml ? "yml" : "json") + ": " + specFile.orElse(null) + " - " + e.getMessage(), classElement);
+            context.warn("Unable to generate swagger." + (isYaml ? "yml" : "json") + ": " + specFile.orElse(null) + " - " + e.getMessage(), classElement);
         }
     }
 
