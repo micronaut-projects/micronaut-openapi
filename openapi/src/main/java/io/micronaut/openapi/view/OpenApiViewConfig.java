@@ -370,7 +370,7 @@ public final class OpenApiViewConfig {
      * @return The updated template.
      */
     static String replacePlaceHolder(String template, String placeHolder, String value, String valuePrefix) {
-        if (value == null || value.isEmpty()) {
+        if (StringUtils.isEmpty(value)) {
             return template.replace("{{" + placeHolder + "}}", "");
         } else {
             return template.replace("{{" + placeHolder + "}}", valuePrefix + value);

@@ -388,11 +388,7 @@ final class RapidocConfig extends AbstractViewConfig implements Renderer {
      * @return A RapidocConfig.
      */
     static RapidocConfig fromProperties(Map<String, String> properties) {
-        RapidocConfig cfg = AbstractViewConfig.fromProperties(new RapidocConfig(), DEFAULT_OPTIONS, properties);
-        if (DEFAULT_RAPIDOC_JS_PATH.equals(cfg.jsUrl)) {
-            cfg.isDefaultJsUrl = true;
-        }
-        return cfg;
+        return AbstractViewConfig.fromProperties(new RapidocConfig(), DEFAULT_OPTIONS, properties);
     }
 
     @Override
