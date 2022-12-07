@@ -497,7 +497,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         }
     }
 
-    private static Path resolve(VisitorContext context, Path path) {
+    public static Path resolve(VisitorContext context, Path path) {
         if (!path.isAbsolute() && context != null) {
             Optional<Path> projectDir = context.getProjectDir();
             if (projectDir.isPresent()) {

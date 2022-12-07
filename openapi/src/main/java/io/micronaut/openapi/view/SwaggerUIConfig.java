@@ -35,7 +35,7 @@ import io.micronaut.openapi.view.OpenApiViewConfig.RendererType;
  *
  * @author croudet
  */
-final class SwaggerUIConfig extends AbstractViewConfig implements Renderer {
+final class SwaggerUIConfig extends AbstractViewConfig {
 
     private static final String DEFAULT_SWAGGER_JS_PATH = OpenApiViewConfig.RESOURCE_DIR + "/";
 

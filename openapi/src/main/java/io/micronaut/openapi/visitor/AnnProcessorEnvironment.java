@@ -69,7 +69,7 @@ public class AnnProcessorEnvironment extends DefaultEnvironment {
 
         boolean isEnabled = context != null ? context.get(MICRONAUT_ENVIRONMENT_ENABLED, Boolean.class).orElse(false) : false;
         if (isEnabled) {
-            Path projectPath = context.getProjectDir().orElse(Utils.isTestMode() ? Paths.get(System.getProperty("user.dir")) : null);
+            Path projectPath = Utils.getProjectPath(context);
             if (projectPath != null) {
                 projectDir = "file:" + projectPath.toString().replaceAll("\\\\", "/");
                 projectResourcesPath = projectDir + (projectDir.endsWith("/") ? StringUtils.EMPTY_STRING : "/") + "src/main/resources/";

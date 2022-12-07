@@ -37,6 +37,7 @@ abstract class AbstractViewConfig {
     protected String jsUrl = "";
     protected String finalUrlPrefix;
     protected String resourcesContextPath = "/res";
+    protected String templatePath;
     protected boolean isDefaultJsUrl = true;
     protected boolean withFinalUrlPrefixCache = true;
     protected Map<String, Object> options = new HashMap<>();
@@ -60,6 +61,12 @@ abstract class AbstractViewConfig {
     protected abstract Function<String, Object> getConverter(String key);
 
     protected abstract List<String> getResources();
+
+    public String getTemplatePath() {
+        return templatePath;
+    }
+
+    public abstract String render(String template, VisitorContext context);
 
     /**
      * Adds an option.
@@ -141,6 +148,11 @@ abstract class AbstractViewConfig {
             if (StringUtils.isNotEmpty(resourcesContextPath)) {
                 cfg.resourcesContextPath = resourcesContextPath.startsWith("/") ? resourcesContextPath : "/" + resourcesContextPath;
             }
+        }
+
+        String templatePath = properties.get(cfg.prefix + "template.path");
+        if (StringUtils.isNotEmpty(templatePath)) {
+            cfg.templatePath = templatePath;
         }
 
         cfg.options.putAll(defaultOptions);

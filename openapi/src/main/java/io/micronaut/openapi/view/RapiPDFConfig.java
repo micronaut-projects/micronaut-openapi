@@ -160,4 +160,9 @@ final class RapiPDFConfig extends AbstractViewConfig {
     protected List<String> getResources() {
         return RESOURCE_FILES;
     }
+
+    @Override
+    public String render(String template, VisitorContext context) {
+        throw new IllegalStateException("RapiPDF doesn't support render");
+    }
 }

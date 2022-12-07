@@ -31,13 +31,17 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
+import io.micronaut.core.io.scan.ClassPathResourceLoader;
+import io.micronaut.core.io.scan.DefaultClassPathResourceLoader;
 import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.core.util.StringUtils;
 import io.micronaut.inject.visitor.VisitorContext;
 import io.micronaut.openapi.visitor.OpenApiApplicationVisitor;
+import io.micronaut.openapi.visitor.Utils;
 
 /**
  * OpenApi view configuration for Swagger-ui, ReDoc and RapiDoc.
@@ -257,21 +261,77 @@ public final class OpenApiViewConfig {
         StringBuilder buf = new StringBuilder(1024);
         ClassLoader classLoader = getClass().getClassLoader();
         try (InputStream in = classLoader.getResourceAsStream(templateName);
-             BufferedReader r = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8))
+             BufferedReader reader = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8))
         ) {
-            String line;
-            while ((line = r.readLine()) != null) {
-                buf.append(line).append('\n');
-            }
-            return buf.toString();
+            return readFile(reader);
         } catch (Exception e) {
             throw new IOException("Fail to load " + templateName, e);
         }
     }
 
-    private void render(Renderer renderer, Path outputDir, String templateName, VisitorContext context) throws IOException {
-        String template = readTemplateFromClasspath(templateName);
-        template = renderer.render(template, context);
+    private String readTemplateFromCustomPath(String customPathStr, VisitorContext context) throws IOException {
+        String projectDir = StringUtils.EMPTY_STRING;
+        Path projectPath = Utils.getProjectPath(context);
+        if (projectPath != null) {
+            projectDir = projectPath.toString().replaceAll("\\\\", "/");
+        }
+        if (customPathStr.startsWith("project:")) {
+            customPathStr = customPathStr.replace("project:", projectDir);
+        } else if (!customPathStr.startsWith("file:") && !customPathStr.startsWith("classpath:")) {
+            if (!projectDir.endsWith(SLASH)) {
+                projectDir += SLASH;
+            }
+            if (customPathStr.startsWith(SLASH)) {
+                customPathStr = customPathStr.substring(1);
+            }
+            customPathStr = projectDir + customPathStr;
+        } else if (customPathStr.startsWith("file:")) {
+            customPathStr = customPathStr.substring(5);
+        } else if (customPathStr.startsWith("classpath:")) {
+            ClassPathResourceLoader resourceLoader = new DefaultClassPathResourceLoader(getClass().getClassLoader());
+            Optional<InputStream> inOpt = resourceLoader.getResourceAsStream(customPathStr);
+            if (!inOpt.isPresent()) {
+                throw new IOException("Fail to load " + customPathStr);
+            }
+            try (InputStream in = inOpt.get();
+                 BufferedReader reader = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8))
+            ) {
+                return readFile(reader);
+            } catch (IOException e) {
+                throw new IOException("Fail to load " + customPathStr, e);
+            }
+        }
+
+        Path templatePath = OpenApiApplicationVisitor.resolve(context, Paths.get(customPathStr));
+        if (!Files.isReadable(templatePath)) {
+            throw new IOException("Can't read file " + customPathStr);
+        }
+        try (BufferedReader reader = Files.newBufferedReader(templatePath)) {
+            return readFile(reader);
+        } catch (IOException e) {
+            throw new IOException("Fail to load " + customPathStr, e);
+        }
+    }
+
+    private String readFile(BufferedReader reader) throws IOException {
+        StringBuilder buf = new StringBuilder(1024);
+        String line;
+        while ((line = reader.readLine()) != null) {
+            buf.append(line).append('\n');
+        }
+        return buf.toString();
+    }
+
+    private void render(AbstractViewConfig cfg, Path outputDir, String templateName, VisitorContext context) throws IOException {
+
+        String template;
+        if (StringUtils.isEmpty(cfg.templatePath)) {
+            template = readTemplateFromClasspath(templateName);
+        } else {
+            template = readTemplateFromCustomPath(cfg.templatePath, context);
+        }
+
+        template = cfg.render(template, context);
         template = replacePlaceHolder(template, "specURL", getSpecURL(context), "");
         template = replacePlaceHolder(template, "title", getTitle(), "");
         if (!Files.exists(outputDir)) {
