@@ -229,11 +229,7 @@ final class SwaggerUIConfig extends AbstractViewConfig {
     static SwaggerUIConfig fromProperties(Map<String, String> properties) {
         SwaggerUIConfig cfg = new SwaggerUIConfig();
         cfg.theme = Theme.valueOf(properties.getOrDefault(PREFIX_SWAGGER_UI + ".theme", cfg.theme.name()).toUpperCase(Locale.US));
-        AbstractViewConfig.fromProperties(cfg, DEFAULT_OPTIONS, properties);
-        if (DEFAULT_SWAGGER_JS_PATH.equals(cfg.jsUrl)) {
-            cfg.isDefaultJsUrl = true;
-        }
-        return cfg;
+        return AbstractViewConfig.fromProperties(cfg, DEFAULT_OPTIONS, properties);
     }
 
     @Override

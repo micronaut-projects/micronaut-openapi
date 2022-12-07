@@ -137,11 +137,7 @@ final class RedocConfig extends AbstractViewConfig {
      * @return A RedocConfig.
      */
     static RedocConfig fromProperties(Map<String, String> properties) {
-        RedocConfig cfg = AbstractViewConfig.fromProperties(new RedocConfig(), DEFAULT_OPTIONS, properties);
-        if (DEFAULT_REDOC_JS_PATH.equals(cfg.jsUrl)) {
-            cfg.isDefaultJsUrl = true;
-        }
-        return cfg;
+        return AbstractViewConfig.fromProperties(new RedocConfig(), DEFAULT_OPTIONS, properties);
     }
 
     @Override
