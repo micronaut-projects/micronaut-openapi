@@ -189,11 +189,17 @@ public final class OpenApiViewConfig {
             if (swaggerUIConfig.rapiPDFConfig.enabled) {
                 copyResources(swaggerUIConfig.rapiPDFConfig, swaggerUiDir, TEMPLATES_RAPIPDF, swaggerUIConfig.rapiPDFConfig.getResources(), visitorContext);
             }
-            copySwaggerUiTheme(swaggerUIConfig.theme.getCss() + ".css", swaggerUiDir, TEMPLATES_SWAGGER_UI, visitorContext);
+            copySwaggerUiTheme(swaggerUIConfig, swaggerUiDir, TEMPLATES_SWAGGER_UI, visitorContext);
         }
     }
 
-    private void copySwaggerUiTheme(String themeFileName, Path outputDir, String templatesDir, VisitorContext context) throws IOException {
+    private void copySwaggerUiTheme(SwaggerUIConfig cfg, Path outputDir, String templatesDir, VisitorContext context) throws IOException {
+
+        if (!cfg.copyTheme) {
+            return;
+        }
+
+        String themeFileName = cfg.theme.getCss() + ".css";
 
         Path resDir = outputDir.resolve(RESOURCE_DIR);
         if (!Files.exists(resDir)) {
@@ -222,7 +228,7 @@ public final class OpenApiViewConfig {
     }
 
     private void copyResources(AbstractViewConfig cfg, Path outputDir, String templateDir, List<String> resources, VisitorContext context) throws IOException {
-        if (!cfg.isDefaultJsUrl) {
+        if (!cfg.copyResources) {
             return;
         }
 
