@@ -69,8 +69,6 @@ import io.micronaut.http.MediaType;
 import io.micronaut.http.uri.UriMatchTemplate;
 import io.micronaut.inject.ast.ClassElement;
 import io.micronaut.inject.ast.Element;
-import io.micronaut.inject.ast.ElementModifier;
-import io.micronaut.inject.ast.ElementQuery;
 import io.micronaut.inject.ast.EnumConstantElement;
 import io.micronaut.inject.ast.EnumElement;
 import io.micronaut.inject.ast.FieldElement;
@@ -126,7 +124,9 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import static io.micronaut.openapi.visitor.ConvertUtils.resolveExtensions;
+import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.MICRONAUT_OPENAPI_FIELD_VISIBILITY_LEVEL;
 import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.expandProperties;
+import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.getConfigurationProperty;
 import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.getExpandableProperties;
 import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.resolvePlaceholders;
 import static io.micronaut.openapi.visitor.Utils.resolveComponents;
@@ -2197,7 +2197,44 @@ abstract class AbstractOpenApiVisitor {
             }
             processPropertyElements(openAPI, context, type, typeArgs, schema, beanProperties, mediaTypes, classJavadoc);
 
-            final List<FieldElement> publicFields = classElement.getEnclosedElements(ElementQuery.ALL_FIELDS.modifiers(mods -> mods.contains(ElementModifier.PUBLIC) && mods.size() == 1));
+            String visibilityLevelProp = getConfigurationProperty(MICRONAUT_OPENAPI_FIELD_VISIBILITY_LEVEL, context);
+            VisibilityLevel visibilityLevel = VisibilityLevel.PUBLIC;
+            if (StringUtils.hasText(visibilityLevelProp)) {
+                try {
+                    visibilityLevel = VisibilityLevel.valueOf(visibilityLevelProp.toUpperCase());
+                } catch (Exception e) {
+                    throw new IllegalStateException("Wrong value for visibility level property: " + getConfigurationProperty(MICRONAUT_OPENAPI_FIELD_VISIBILITY_LEVEL, context));
+                }
+            }
+
+            final List<FieldElement> publicFields = new ArrayList<>();
+
+            for (FieldElement field : classElement.getFields()) {
+                if (field.isStatic()) {
+                    continue;
+                }
+                if (visibilityLevel == VisibilityLevel.PUBLIC
+                    && !field.isPublic()) {
+                    continue;
+                } else if (visibilityLevel == VisibilityLevel.PROTECTED
+                    && (!field.isPublic() && !field.isProtected())) {
+                    continue;
+                } else if (visibilityLevel == VisibilityLevel.PACKAGE
+                    && (!field.isPublic() && !field.isProtected() && !field.isPackagePrivate())) {
+                    continue;
+                }
+                boolean alreadyProcessed = false;
+                for (PropertyElement prop : beanProperties) {
+                    if (prop.getName().equals(field.getName())) {
+                        alreadyProcessed = true;
+                        break;
+                    }
+                }
+                if (alreadyProcessed) {
+                    continue;
+                }
+                publicFields.add(field);
+            }
 
             processPropertyElements(openAPI, context, type, typeArgs, schema, publicFields, mediaTypes, classJavadoc);
         }
