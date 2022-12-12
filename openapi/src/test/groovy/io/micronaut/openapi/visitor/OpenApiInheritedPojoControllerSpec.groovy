@@ -1537,4 +1537,80 @@ class MyBean {}
         filterDtoSchema.properties.page.type == 'integer'
         filterDtoSchema.properties.page.default == 0
     }
+
+    void "test class two level inheritance Schema"() {
+
+        given: "An API definition"
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.swagger.v3.oas.annotations.media.Schema;
+
+@Controller
+class MyOperations {
+
+    @Get("/get")
+    ExportPaymentsRequest getRequest() {
+        return null;
+    }
+}
+
+@Schema(name = "RequestType2_4_0")
+class RequestType {
+}
+
+@Schema(name = "ExportRequestType2_4_0")
+class ExportRequestType extends RequestType {
+}
+
+/**
+ * My request
+ */
+@Schema(name = "ExportPaymentsRequest2_4_0")
+class ExportPaymentsRequest extends ExportRequestType {
+
+    protected Object field;
+
+    public Object getField() {
+        return field;
+    }
+
+    public void setField(Object field) {
+        this.field = field;
+    }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        then: "the state is correct"
+        Utils.testReference != null
+
+        when: "The OpenAPI is retrieved"
+        OpenAPI openAPI = Utils.testReference
+        Schema requestTypeSchema = openAPI.components.schemas.RequestType2_4_0
+        Schema exportRequestTypeSchema = openAPI.components.schemas.ExportRequestType2_4_0
+        Schema exportPaymentsRequestSchema = openAPI.components.schemas.ExportPaymentsRequest2_4_0
+
+        then:
+        requestTypeSchema
+        requestTypeSchema.type == 'object'
+        !requestTypeSchema.allOf
+
+        exportRequestTypeSchema
+        exportRequestTypeSchema.type == 'object'
+        exportRequestTypeSchema.allOf
+        exportRequestTypeSchema.allOf.size() == 1
+        exportRequestTypeSchema.allOf[0].$ref == '#/components/schemas/RequestType2_4_0'
+
+        exportPaymentsRequestSchema
+        exportPaymentsRequestSchema.type == 'object'
+        exportPaymentsRequestSchema.allOf
+        exportPaymentsRequestSchema.allOf.size() == 2
+        exportPaymentsRequestSchema.allOf[0].$ref == '#/components/schemas/ExportRequestType2_4_0'
+        exportPaymentsRequestSchema.allOf[1].$ref == '#/components/schemas/RequestType2_4_0'
+    }
 }
