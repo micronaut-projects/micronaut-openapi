@@ -1926,7 +1926,9 @@ abstract class AbstractOpenApiVisitor {
     @SuppressWarnings("java:S3655") // false positive
     private void readAllInterfaces(OpenAPI openAPI, VisitorContext context, @Nullable Element definingElement, List<MediaType> mediaTypes,
                                    Schema schema, ClassElement superType, Map<String, Schema> schemas, Map<String, ClassElement> superTypeArgs) {
-        String parentSchemaName = computeDefaultSchemaName(definingElement, superType, superTypeArgs, context);
+        String parentSchemaName = superType.stringValue(io.swagger.v3.oas.annotations.media.Schema.class, "name")
+            .orElse(computeDefaultSchemaName(definingElement, superType, superTypeArgs, context));
+
         if (schemas.get(parentSchemaName) != null
             || getSchemaDefinition(openAPI, context, superType, superTypeArgs, null, mediaTypes) != null) {
             Schema parentSchema = new Schema();
