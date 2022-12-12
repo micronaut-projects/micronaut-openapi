@@ -5,6 +5,7 @@ The views will be generated to the `META-INF/swagger/views/redoc` directory of y
 |===
 |`redoc.enabled` | `true` or `false`  When 'true' the Redoc view is generated.
 | `redoc.js.url` | Override path to use to find the js file. Path must contain a file named redoc.standalone.js. The value can be a URL path like: "https://unpkg.com/redoc/bundles/". Must contain trailing slash.,
+| `redoc.copy-resources` | Copy or not local JS and CSS resources. Set to `false` if you are using external resources (eg https://unpkg.com/redoc/bundles/). Default `true`
 | `redoc.expand-single-schema-field` |
 | `redoc.expand-default-server-variables` |
 | `redoc.menu-toggle` |

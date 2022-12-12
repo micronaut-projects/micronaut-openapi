@@ -105,6 +105,10 @@ final class SwaggerUIConfig extends AbstractViewConfig {
         DEFAULT_OPTIONS.put("validatorUrl", null);
     }
 
+    String themeUrl;
+    boolean isDefaultThemeUrl = true;
+    boolean copyTheme = true;
+
     RapiPDFConfig rapiPDFConfig;
     SwaggerUIConfig.Theme theme = Theme.CLASSIC;
 
@@ -229,6 +233,18 @@ final class SwaggerUIConfig extends AbstractViewConfig {
     static SwaggerUIConfig fromProperties(Map<String, String> properties) {
         SwaggerUIConfig cfg = new SwaggerUIConfig();
         cfg.theme = Theme.valueOf(properties.getOrDefault(PREFIX_SWAGGER_UI + ".theme", cfg.theme.name()).toUpperCase(Locale.US));
+
+        String copyTheme = properties.get(cfg.prefix + "copy-theme");
+        if (StringUtils.isNotEmpty(copyTheme) && "false".equalsIgnoreCase(copyTheme)) {
+            cfg.copyTheme = false;
+        }
+
+        String themeUrl = properties.get(cfg.prefix + "theme.url");
+        if (StringUtils.isNotEmpty(themeUrl)) {
+            cfg.themeUrl = themeUrl;
+            cfg.isDefaultThemeUrl = false;
+        }
+
         return AbstractViewConfig.fromProperties(cfg, DEFAULT_OPTIONS, properties);
     }
 
@@ -241,7 +257,7 @@ final class SwaggerUIConfig extends AbstractViewConfig {
         template = OpenApiViewConfig.replacePlaceHolder(template, PREFIX_SWAGGER_UI + ".js.url.prefix", isDefaultJsUrl ? finalUrlPrefix : jsUrl, "");
         template = OpenApiViewConfig.replacePlaceHolder(template, PREFIX_SWAGGER_UI + ".attributes", toOptions(), "");
         template = template.replace("{{" + PREFIX_SWAGGER_UI + ".theme}}", theme == null || Theme.CLASSIC == theme ? "" :
-            "<link rel='stylesheet' type='text/css' href='" + finalUrlPrefix + theme.getCss() + ".css' />");
+            "<link rel='stylesheet' type='text/css' href='" + (isDefaultThemeUrl ? finalUrlPrefix + theme.getCss() + ".css" : themeUrl) + "' />");
         template = template.replace("{{" + PREFIX_SWAGGER_UI + DOT + OPTION_OAUTH2 + "}}", hasOauth2Option(options) ? toOauth2Options() : "");
         return template;
     }

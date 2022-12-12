@@ -39,6 +39,7 @@ abstract class AbstractViewConfig {
     protected String resourcesContextPath = "/res";
     protected String templatePath;
     protected boolean isDefaultJsUrl = true;
+    protected boolean copyResources = true;
     protected boolean withFinalUrlPrefixCache = true;
     protected Map<String, Object> options = new HashMap<>();
 
@@ -139,6 +140,12 @@ abstract class AbstractViewConfig {
      * @return A View config.
      */
     static <T extends AbstractViewConfig> T fromProperties(T cfg, Map<String, Object> defaultOptions, Map<String, String> properties) {
+
+        String copyResources = properties.get(cfg.prefix + "copy-resources");
+        if (StringUtils.isNotEmpty(copyResources) && "false".equalsIgnoreCase(copyResources)) {
+            cfg.copyResources = false;
+        }
+
         String jsUrl = properties.get(cfg.prefix + "js.url");
         if (StringUtils.isNotEmpty(jsUrl)) {
             cfg.jsUrl = jsUrl;

@@ -1,10 +1,9 @@
 The views will be generated to the `META-INF/swagger/views/rapidoc` directory of your project’s class output.
 
-
-
 |===
 | `rapidoc.enabled` | `true` or `false` When 'true' the RapiDoc view is generated.
 | `rapidoc.js.url` | Override path to use to find the js file. Path must contain a file named rapidoc-min.js. The value can be a URL path like: "https://unpkg.com/rapidoc/dist/". Must contain trailing slash.,
+| `rapidoc.copy-resources` | Copy or not local JS and CSS resources. Set to `false` if you are using external resources (eg https://unpkg.com/rapidoc/dist/). Default `true`
 | `rapidoc.style` |
 | `rapidoc.sort-tags` |
 | `rapidoc.sort-endpoints-by` |
@@ -49,7 +48,7 @@ The views will be generated to the `META-INF/swagger/views/rapidoc` directory of
 
 See https://mrin9.github.io/RapiDoc/api.html[RapiDoc Options] for a description.
 
-To expose the the `rapidoc` views, you also must expose the generated `yaml`:
+To expose the `rapidoc` views, you also must expose the generated `yaml`:
 
 .Exposing Swagger YAML And Rapidoc Views
 [source,yaml]
