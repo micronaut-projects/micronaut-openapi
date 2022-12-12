@@ -99,6 +99,7 @@ import static io.swagger.v3.oas.models.Components.COMPONENTS_SCHEMAS_REF;
     OpenApiApplicationVisitor.MICRONAUT_OPENAPI_JSON_FORMAT,
     OpenApiApplicationVisitor.MICRONAUT_OPENAPI_ENVIRONMENTS,
     OpenApiApplicationVisitor.MICRONAUT_ENVIRONMENT_ENABLED,
+    OpenApiApplicationVisitor.MICRONAUT_OPENAPI_FIELD_VISIBILITY_LEVEL,
     OpenApiApplicationVisitor.MICRONAUT_CONFIG_FILE_LOCATIONS,
     OpenApiApplicationVisitor.MICRONAUT_OPENAPI_TARGET_FILE,
     OpenApiApplicationVisitor.MICRONAUT_OPENAPI_VIEWS_DEST_DIR,
@@ -139,6 +140,17 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
      * System property that specifies the location of additional swagger YAML and JSON files to read from.
      */
     public static final String MICRONAUT_OPENAPI_ADDITIONAL_FILES = "micronaut.openapi.additional.files";
+    /**
+     * System property that specifies the schema classes fields visibility level. By default, only public fields visibile.
+     * <p>
+     * Available values:
+     * </p>
+     * PRIVATE
+     * PACKAGE
+     * PROTECTED
+     * PUBLIC
+     */
+    public static final String MICRONAUT_OPENAPI_FIELD_VISIBILITY_LEVEL = "micronaut.openapi.field.visibility.level";
     /**
      * Default openapi config file.
      */
