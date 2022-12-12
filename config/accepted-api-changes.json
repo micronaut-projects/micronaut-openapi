@@ -1,7 +1,987 @@
 [
-	{
+  {
     "type": "io.micronaut.openapi.visitor.AbstractOpenApiEndpointVisitor",
     "member": "Field propertyPlaceholderResolver",
     "reason": "Internal non-public API class"
-	}
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.mappers.OpenAPIManagementAnnotationMapper",
+    "member": "Implemented interface io.micronaut.inject.annotation.TypedAnnotationMapper",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.mappers.OpenAPIManagementAnnotationMapper",
+    "member": "Implemented interface io.micronaut.inject.annotation.AnnotationMapper",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.mappers.OpenAPISecurityAnnotationMapper",
+    "member": "Implemented interface io.micronaut.inject.annotation.TypedAnnotationMapper",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.mappers.OpenAPISecurityAnnotationMapper",
+    "member": "Implemented interface io.micronaut.inject.annotation.AnnotationMapper",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.ApiResponseRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.TypedAnnotationTransformer",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.ApiResponseRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.AnnotationTransformer",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.ApiResponsesRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.TypedAnnotationTransformer",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.ApiResponsesRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.AnnotationTransformer",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.ArraySchemaRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.TypedAnnotationTransformer",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.ArraySchemaRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.AnnotationTransformer",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.CallbackRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.TypedAnnotationTransformer",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.CallbackRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.AnnotationTransformer",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.CallbacksRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.TypedAnnotationTransformer",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.CallbacksRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.AnnotationTransformer",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.ContactRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.TypedAnnotationTransformer",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.ContactRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.AnnotationTransformer",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.ContentRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.TypedAnnotationTransformer",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.ContentRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.AnnotationTransformer",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.DiscriminatorMappingRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.TypedAnnotationTransformer",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.DiscriminatorMappingRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.AnnotationTransformer",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.EncodingRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.TypedAnnotationTransformer",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.EncodingRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.AnnotationTransformer",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.ExampleObjectMappingRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.TypedAnnotationTransformer",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.ExampleObjectMappingRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.AnnotationTransformer",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.ExtensionPropertyRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.TypedAnnotationTransformer",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.ExtensionPropertyRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.AnnotationTransformer",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.ExtensionRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.TypedAnnotationTransformer",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.ExtensionRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.AnnotationTransformer",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.ExtensionsRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.TypedAnnotationTransformer",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.ExtensionsRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.AnnotationTransformer",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.ExternalDocumentationRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.TypedAnnotationTransformer",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.ExternalDocumentationRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.AnnotationTransformer",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.HeaderRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.TypedAnnotationTransformer",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.HeaderRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.AnnotationTransformer",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.HiddenRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.TypedAnnotationTransformer",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.HiddenRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.AnnotationTransformer",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.InfoRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.TypedAnnotationTransformer",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.InfoRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.AnnotationTransformer",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.LicenseRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.TypedAnnotationTransformer",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.LicenseRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.AnnotationTransformer",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.LinkParameterRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.TypedAnnotationTransformer",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.LinkParameterRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.AnnotationTransformer",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.LinkRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.TypedAnnotationTransformer",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.LinkRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.AnnotationTransformer",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.OAuthFlowRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.TypedAnnotationTransformer",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.OAuthFlowRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.AnnotationTransformer",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.OAuthFlowsRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.TypedAnnotationTransformer",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.OAuthFlowsRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.AnnotationTransformer",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.OAuthScopeRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.TypedAnnotationTransformer",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.OAuthScopeRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.AnnotationTransformer",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.OpenAPIDefinitionRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.TypedAnnotationTransformer",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.OpenAPIDefinitionRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.AnnotationTransformer",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.OperationRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.TypedAnnotationTransformer",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.OperationRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.AnnotationTransformer",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.ParameterRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.TypedAnnotationTransformer",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.ParameterRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.AnnotationTransformer",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.ParametersRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.TypedAnnotationTransformer",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.ParametersRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.AnnotationTransformer",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.RequestBodyRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.TypedAnnotationTransformer",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.RequestBodyRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.AnnotationTransformer",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.SchemaRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.TypedAnnotationTransformer",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.SchemaRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.AnnotationTransformer",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.SecurityRequirementRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.TypedAnnotationTransformer",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.SecurityRequirementRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.AnnotationTransformer",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.SecurityRequirementsRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.TypedAnnotationTransformer",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.SecurityRequirementsRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.AnnotationTransformer",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.SecuritySchemeRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.TypedAnnotationTransformer",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.SecuritySchemeRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.AnnotationTransformer",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.SecuritySchemesRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.TypedAnnotationTransformer",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.SecuritySchemesRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.AnnotationTransformer",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.ServerRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.TypedAnnotationTransformer",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.ServerRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.AnnotationTransformer",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.ServersRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.TypedAnnotationTransformer",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.ServersRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.AnnotationTransformer",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.ServerVariableRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.TypedAnnotationTransformer",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.ServerVariableRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.AnnotationTransformer",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.TagRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.TypedAnnotationTransformer",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.TagRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.AnnotationTransformer",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.TagsRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.TypedAnnotationTransformer",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.annotation.transformers.TagsRetentionPolicyAnnotationTransformer",
+    "member": "Implemented interface io.micronaut.inject.annotation.AnnotationTransformer",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.swagger.jackson.ApiResponsesSerializer",
+    "member": "Constructor io.micronaut.openapi.swagger.jackson.ApiResponsesSerializer()",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.swagger.jackson.ApiResponsesSerializer",
+    "member": "Implemented interface com.fasterxml.jackson.databind.jsonFormatVisitors.JsonFormatVisitable",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.swagger.jackson.CallbackSerializer",
+    "member": "Constructor io.micronaut.openapi.swagger.jackson.CallbackSerializer()",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.swagger.jackson.CallbackSerializer",
+    "member": "Implemented interface com.fasterxml.jackson.databind.jsonFormatVisitors.JsonFormatVisitable",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.swagger.jackson.MediaTypeSerializer",
+    "member": "Constructor io.micronaut.openapi.swagger.jackson.MediaTypeSerializer(com.fasterxml.jackson.databind.JsonSerializer)",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.swagger.jackson.MediaTypeSerializer",
+    "member": "Implemented interface com.fasterxml.jackson.databind.jsonFormatVisitors.JsonFormatVisitable",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.swagger.jackson.MediaTypeSerializer",
+    "member": "Implemented interface com.fasterxml.jackson.databind.ser.ResolvableSerializer",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.swagger.jackson.mixin.Components31Mixin",
+    "member": "Constructor io.micronaut.openapi.swagger.jackson.mixin.Components31Mixin()",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.swagger.jackson.mixin.ComponentsMixin",
+    "member": "Constructor io.micronaut.openapi.swagger.jackson.mixin.ComponentsMixin()",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.swagger.jackson.mixin.DateSchemaMixin",
+    "member": "Constructor io.micronaut.openapi.swagger.jackson.mixin.DateSchemaMixin()",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.swagger.jackson.mixin.Discriminator31Mixin",
+    "member": "Constructor io.micronaut.openapi.swagger.jackson.mixin.Discriminator31Mixin()",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.swagger.jackson.mixin.DiscriminatorMixin",
+    "member": "Constructor io.micronaut.openapi.swagger.jackson.mixin.DiscriminatorMixin()",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.swagger.jackson.mixin.ExampleMixin",
+    "member": "Constructor io.micronaut.openapi.swagger.jackson.mixin.ExampleMixin()",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.swagger.jackson.mixin.ExtensionsMixin",
+    "member": "Constructor io.micronaut.openapi.swagger.jackson.mixin.ExtensionsMixin()",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.swagger.jackson.mixin.Info31Mixin",
+    "member": "Constructor io.micronaut.openapi.swagger.jackson.mixin.Info31Mixin()",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.swagger.jackson.mixin.InfoMixin",
+    "member": "Constructor io.micronaut.openapi.swagger.jackson.mixin.InfoMixin()",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.swagger.jackson.mixin.LicenseMixin",
+    "member": "Constructor io.micronaut.openapi.swagger.jackson.mixin.LicenseMixin()",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.swagger.jackson.mixin.MediaTypeMixin",
+    "member": "Constructor io.micronaut.openapi.swagger.jackson.mixin.MediaTypeMixin()",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.swagger.jackson.mixin.OpenAPI31Mixin",
+    "member": "Constructor io.micronaut.openapi.swagger.jackson.mixin.OpenAPI31Mixin()",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.swagger.jackson.mixin.OpenAPIMixin",
+    "member": "Constructor io.micronaut.openapi.swagger.jackson.mixin.OpenAPIMixin()",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.swagger.jackson.mixin.OperationMixin",
+    "member": "Constructor io.micronaut.openapi.swagger.jackson.mixin.OperationMixin()",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.swagger.jackson.mixin.Schema31Mixin",
+    "member": "Constructor io.micronaut.openapi.swagger.jackson.mixin.Schema31Mixin()",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.swagger.jackson.mixin.Schema31Mixin$TypeSerializer",
+    "member": "Constructor io.micronaut.openapi.swagger.jackson.mixin.Schema31Mixin$TypeSerializer()",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.swagger.jackson.mixin.Schema31Mixin$TypeSerializer",
+    "member": "Implemented interface com.fasterxml.jackson.databind.jsonFormatVisitors.JsonFormatVisitable",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.swagger.jackson.mixin.SchemaConverterMixin",
+    "member": "Constructor io.micronaut.openapi.swagger.jackson.mixin.SchemaConverterMixin()",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.swagger.jackson.mixin.SchemaMixin",
+    "member": "Constructor io.micronaut.openapi.swagger.jackson.mixin.SchemaMixin()",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.swagger.jackson.PathsSerializer",
+    "member": "Constructor io.micronaut.openapi.swagger.jackson.PathsSerializer()",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.swagger.jackson.PathsSerializer",
+    "member": "Implemented interface com.fasterxml.jackson.databind.jsonFormatVisitors.JsonFormatVisitable",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.swagger.jackson.Schema31Serializer",
+    "member": "Constructor io.micronaut.openapi.swagger.jackson.Schema31Serializer(com.fasterxml.jackson.databind.JsonSerializer)",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.swagger.jackson.Schema31Serializer",
+    "member": "Implemented interface com.fasterxml.jackson.databind.jsonFormatVisitors.JsonFormatVisitable",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.swagger.jackson.Schema31Serializer",
+    "member": "Implemented interface com.fasterxml.jackson.databind.ser.ResolvableSerializer",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.swagger.jackson.SchemaSerializer",
+    "member": "Constructor io.micronaut.openapi.swagger.jackson.SchemaSerializer(com.fasterxml.jackson.databind.JsonSerializer)",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.swagger.jackson.SchemaSerializer",
+    "member": "Implemented interface com.fasterxml.jackson.databind.jsonFormatVisitors.JsonFormatVisitable",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.swagger.jackson.SchemaSerializer",
+    "member": "Implemented interface com.fasterxml.jackson.databind.ser.ResolvableSerializer",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.swagger.jackson.util.ApiResponses31Deserializer",
+    "member": "Constructor io.micronaut.openapi.swagger.jackson.util.ApiResponses31Deserializer()",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.swagger.jackson.util.ApiResponses31Deserializer",
+    "member": "Implemented interface com.fasterxml.jackson.databind.deser.NullValueProvider",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.swagger.jackson.util.ApiResponsesDeserializer",
+    "member": "Field openapi31",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.swagger.jackson.util.ApiResponsesDeserializer",
+    "member": "Constructor io.micronaut.openapi.swagger.jackson.util.ApiResponsesDeserializer()",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.swagger.jackson.util.ApiResponsesDeserializer",
+    "member": "Implemented interface com.fasterxml.jackson.databind.deser.NullValueProvider",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.swagger.jackson.util.Callback31Deserializer",
+    "member": "Constructor io.micronaut.openapi.swagger.jackson.util.Callback31Deserializer()",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.swagger.jackson.util.Callback31Deserializer",
+    "member": "Implemented interface com.fasterxml.jackson.databind.deser.NullValueProvider",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.swagger.jackson.util.CallbackDeserializer",
+    "member": "Field openapi31",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.swagger.jackson.util.CallbackDeserializer",
+    "member": "Constructor io.micronaut.openapi.swagger.jackson.util.CallbackDeserializer()",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.swagger.jackson.util.CallbackDeserializer",
+    "member": "Implemented interface com.fasterxml.jackson.databind.deser.NullValueProvider",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.swagger.jackson.util.DeserializationModule",
+    "member": "Constructor io.micronaut.openapi.swagger.jackson.util.DeserializationModule()",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.swagger.jackson.util.DeserializationModule",
+    "member": "Implemented interface com.fasterxml.jackson.core.Versioned",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.swagger.jackson.util.DeserializationModule",
+    "member": "Implemented interface java.io.Serializable",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.swagger.jackson.util.DeserializationModule31",
+    "member": "Constructor io.micronaut.openapi.swagger.jackson.util.DeserializationModule31()",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.swagger.jackson.util.DeserializationModule31",
+    "member": "Implemented interface com.fasterxml.jackson.core.Versioned",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.swagger.jackson.util.DeserializationModule31",
+    "member": "Implemented interface java.io.Serializable",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.swagger.jackson.util.EncodingPropertyStyleEnumDeserializer",
+    "member": "Constructor io.micronaut.openapi.swagger.jackson.util.EncodingPropertyStyleEnumDeserializer()",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.swagger.jackson.util.EncodingPropertyStyleEnumDeserializer",
+    "member": "Implemented interface com.fasterxml.jackson.databind.deser.NullValueProvider",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.swagger.jackson.util.EncodingStyleEnumDeserializer",
+    "member": "Constructor io.micronaut.openapi.swagger.jackson.util.EncodingStyleEnumDeserializer()",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.swagger.jackson.util.EncodingStyleEnumDeserializer",
+    "member": "Implemented interface com.fasterxml.jackson.databind.deser.NullValueProvider",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.swagger.jackson.util.HeaderStyleEnumDeserializer",
+    "member": "Constructor io.micronaut.openapi.swagger.jackson.util.HeaderStyleEnumDeserializer()",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.swagger.jackson.util.HeaderStyleEnumDeserializer",
+    "member": "Implemented interface com.fasterxml.jackson.databind.deser.NullValueProvider",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.swagger.jackson.util.Model31Deserializer",
+    "member": "Constructor io.micronaut.openapi.swagger.jackson.util.Model31Deserializer()",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.swagger.jackson.util.Model31Deserializer",
+    "member": "Implemented interface com.fasterxml.jackson.databind.deser.NullValueProvider",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.swagger.jackson.util.ModelDeserializer",
+    "member": "Field openapi31",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.swagger.jackson.util.ModelDeserializer",
+    "member": "Constructor io.micronaut.openapi.swagger.jackson.util.ModelDeserializer()",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.swagger.jackson.util.ModelDeserializer",
+    "member": "Implemented interface com.fasterxml.jackson.databind.deser.NullValueProvider",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.swagger.jackson.util.Parameter31Deserializer",
+    "member": "Constructor io.micronaut.openapi.swagger.jackson.util.Parameter31Deserializer()",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.swagger.jackson.util.Parameter31Deserializer",
+    "member": "Implemented interface com.fasterxml.jackson.databind.deser.NullValueProvider",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.swagger.jackson.util.ParameterDeserializer",
+    "member": "Field openapi31",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.swagger.jackson.util.ParameterDeserializer",
+    "member": "Constructor io.micronaut.openapi.swagger.jackson.util.ParameterDeserializer()",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.swagger.jackson.util.ParameterDeserializer",
+    "member": "Implemented interface com.fasterxml.jackson.databind.deser.NullValueProvider",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.swagger.jackson.util.Paths31Deserializer",
+    "member": "Constructor io.micronaut.openapi.swagger.jackson.util.Paths31Deserializer()",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.swagger.jackson.util.Paths31Deserializer",
+    "member": "Implemented interface com.fasterxml.jackson.databind.deser.NullValueProvider",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.swagger.jackson.util.PathsDeserializer",
+    "member": "Field openapi31",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.swagger.jackson.util.PathsDeserializer",
+    "member": "Constructor io.micronaut.openapi.swagger.jackson.util.PathsDeserializer()",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.swagger.jackson.util.PathsDeserializer",
+    "member": "Implemented interface com.fasterxml.jackson.databind.deser.NullValueProvider",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.swagger.jackson.util.SecurityScheme31Deserializer",
+    "member": "Constructor io.micronaut.openapi.swagger.jackson.util.SecurityScheme31Deserializer()",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.swagger.jackson.util.SecurityScheme31Deserializer",
+    "member": "Implemented interface com.fasterxml.jackson.databind.deser.NullValueProvider",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.swagger.jackson.util.SecuritySchemeDeserializer",
+    "member": "Field openapi31",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.swagger.jackson.util.SecuritySchemeDeserializer",
+    "member": "Constructor io.micronaut.openapi.swagger.jackson.util.SecuritySchemeDeserializer()",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.swagger.jackson.util.SecuritySchemeDeserializer",
+    "member": "Implemented interface com.fasterxml.jackson.databind.deser.NullValueProvider",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.swagger.PrimitiveType",
+    "member": "Field FLOAT",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.swagger.PrimitiveType",
+    "member": "Field datatypeMappings",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.swagger.PrimitiveType",
+    "member": "Field BINARY",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.swagger.PrimitiveType",
+    "member": "Field DECIMAL",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.swagger.PrimitiveType",
+    "member": "Field EMAIL",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.swagger.PrimitiveType",
+    "member": "Field URI",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.swagger.PrimitiveType",
+    "member": "Field URL",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.swagger.PrimitiveType",
+    "member": "Field INT",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.swagger.PrimitiveType",
+    "member": "Field BYTE",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.swagger.PrimitiveType",
+    "member": "Field DOUBLE",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.swagger.PrimitiveType",
+    "member": "Field UUID",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.swagger.PrimitiveType",
+    "member": "Field FILE",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.swagger.PrimitiveType",
+    "member": "Field LONG",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.swagger.PrimitiveType",
+    "member": "Field INTEGER",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.swagger.PrimitiveType",
+    "member": "Field NUMBER",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.swagger.PrimitiveType",
+    "member": "Field PARTIAL_TIME",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.swagger.PrimitiveType",
+    "member": "Field OBJECT",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.swagger.PrimitiveType",
+    "member": "Field BOOLEAN",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.swagger.PrimitiveType",
+    "member": "Field DATE",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.swagger.PrimitiveType",
+    "member": "Field STRING",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.swagger.PrimitiveType",
+    "member": "Field DATE_TIME",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.swagger.PrimitiveType",
+    "member": "Implemented interface java.lang.constant.Constable",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.swagger.PrimitiveType",
+    "member": "Implemented interface java.lang.Comparable",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.swagger.PrimitiveType",
+    "member": "Implemented interface java.io.Serializable",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.visitor.OpenApiApplicationVisitor",
+    "member": "Field MICRONAUT_OPENAPI_VIEWS_DEST_DIR",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.visitor.OpenApiApplicationVisitor",
+    "member": "Implemented interface io.micronaut.inject.visitor.TypeElementVisitor",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.visitor.OpenApiApplicationVisitor",
+    "member": "Implemented interface io.micronaut.core.order.Ordered",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.visitor.OpenApiApplicationVisitor",
+    "member": "Implemented interface io.micronaut.core.util.Toggleable",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.visitor.OpenApiControllerVisitor",
+    "member": "Implemented interface io.micronaut.inject.visitor.TypeElementVisitor",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.visitor.OpenApiControllerVisitor",
+    "member": "Implemented interface io.micronaut.core.order.Ordered",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.visitor.OpenApiControllerVisitor",
+    "member": "Implemented interface io.micronaut.core.util.Toggleable",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.visitor.OpenApiEndpointVisitor",
+    "member": "Implemented interface io.micronaut.inject.visitor.TypeElementVisitor",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.visitor.OpenApiEndpointVisitor",
+    "member": "Implemented interface io.micronaut.core.order.Ordered",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.visitor.OpenApiEndpointVisitor",
+    "member": "Implemented interface io.micronaut.core.util.Toggleable",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.visitor.OpenApiIncludeVisitor",
+    "member": "Implemented interface io.micronaut.inject.visitor.TypeElementVisitor",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.visitor.OpenApiIncludeVisitor",
+    "member": "Implemented interface io.micronaut.core.order.Ordered",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.visitor.OpenApiIncludeVisitor",
+    "member": "Implemented interface io.micronaut.core.util.Toggleable",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.visitor.OpenApiJacksonVisitor",
+    "member": "Implemented interface io.micronaut.inject.visitor.TypeElementVisitor",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.visitor.OpenApiJacksonVisitor",
+    "member": "Implemented interface io.micronaut.core.order.Ordered",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.visitor.OpenApiJacksonVisitor",
+    "member": "Implemented interface io.micronaut.core.util.Toggleable",
+    "reason": "Major update for Micronaut 4.0.0"
+  }
 ]
