@@ -111,7 +111,7 @@ var activeTableTab = "activeTableTab";
 </dl>
 <hr>
 <br>
-<pre>@SupportedOptions(value={"micronaut.openapi.server.context.path","micronaut.openapi.property.naming.strategy","micronaut.openapi.views.spec","micronaut.openapi.json.format","micronaut.openapi.environments","micronaut.environment.enabled","micronaut.openapi.config.file.locations","micronaut.openapi.target.file","micronaut.openapi.views.dest.dir","micronaut.openapi.additional.files","micronaut.openapi.config.file"})
+<pre>@SupportedOptions(value={"micronaut.openapi.server.context.path","micronaut.openapi.property.naming.strategy","micronaut.openapi.views.spec","micronaut.openapi.json.format","micronaut.openapi.environments","micronaut.environment.enabled","micronaut.openapi.field.visibility.level","micronaut.openapi.config.file.locations","micronaut.openapi.target.file","micronaut.openapi.views.dest.dir","micronaut.openapi.additional.files","micronaut.openapi.config.file"})
 public class <span class="typeNameLabel">OpenApiApplicationVisitor</span>
 extends java.lang.Object
 implements io.micronaut.inject.visitor.TypeElementVisitor&lt;io.swagger.v3.oas.annotations.OpenAPIDefinition,java.lang.Object&gt;</pre>
@@ -217,35 +217,41 @@ implements io.micronaut.inject.visitor.TypeElementVisitor&lt;io.swagger.v3.oas.a
 </tr>
 <tr class="altColor">
 <td class="colFirst"><code>static java.lang.String</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/openapi/visitor/OpenApiApplicationVisitor.html#MICRONAUT_OPENAPI_FIELD_VISIBILITY_LEVEL">MICRONAUT_OPENAPI_FIELD_VISIBILITY_LEVEL</a></span></code>
+<div class="block">System property that specifies the schema classes fields visibility level.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>static java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/openapi/visitor/OpenApiApplicationVisitor.html#MICRONAUT_OPENAPI_JSON_FORMAT">MICRONAUT_OPENAPI_JSON_FORMAT</a></span></code>
 <div class="block">Is this property true, output file format will be JSON, otherwise YAML.</div>
 </td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><code>static java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/openapi/visitor/OpenApiApplicationVisitor.html#MICRONAUT_OPENAPI_PROPERTY_NAMING_STRATEGY">MICRONAUT_OPENAPI_PROPERTY_NAMING_STRATEGY</a></span></code>
 <div class="block">System property for naming strategy.</div>
 </td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><code>static java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/openapi/visitor/OpenApiApplicationVisitor.html#MICRONAUT_OPENAPI_TARGET_FILE">MICRONAUT_OPENAPI_TARGET_FILE</a></span></code>
 <div class="block">System property that enables setting the target file to write to.</div>
 </td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><code>static java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/openapi/visitor/OpenApiApplicationVisitor.html#MICRONAUT_OPENAPI_VIEWS_DEST_DIR">MICRONAUT_OPENAPI_VIEWS_DEST_DIR</a></span></code>
 <div class="block">System property that specifies the path where the generated UI elements will be located.</div>
 </td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><code>static java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/openapi/visitor/OpenApiApplicationVisitor.html#MICRONAUT_OPENAPI_VIEWS_SPEC">MICRONAUT_OPENAPI_VIEWS_SPEC</a></span></code>
 <div class="block">System property for views specification.</div>
 </td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><code>static java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/openapi/visitor/OpenApiApplicationVisitor.html#OPENAPI_CONFIG_FILE">OPENAPI_CONFIG_FILE</a></span></code>
 <div class="block">Default openapi config file.</div>
@@ -615,6 +621,27 @@ implements io.micronaut.inject.visitor.TypeElementVisitor&lt;io.swagger.v3.oas.a
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
 <dd><a href="../../../../constant-values.html#io.micronaut.openapi.visitor.OpenApiApplicationVisitor.MICRONAUT_OPENAPI_ADDITIONAL_FILES">Constant Field Values</a></dd>
+</dl>
+</li>
+</ul>
+<a name="MICRONAUT_OPENAPI_FIELD_VISIBILITY_LEVEL">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>MICRONAUT_OPENAPI_FIELD_VISIBILITY_LEVEL</h4>
+<pre>public static final&nbsp;java.lang.String MICRONAUT_OPENAPI_FIELD_VISIBILITY_LEVEL</pre>
+<div class="block">System property that specifies the schema classes fields visibility level. By default, only public fields visibile.
+ <p>
+ Available values:
+ </p>
+ PRIVATE
+ PACKAGE
+ PROTECTED
+ PUBLIC</div>
+<dl>
+<dt><span class="seeLabel">See Also:</span></dt>
+<dd><a href="../../../../constant-values.html#io.micronaut.openapi.visitor.OpenApiApplicationVisitor.MICRONAUT_OPENAPI_FIELD_VISIBILITY_LEVEL">Constant Field Values</a></dd>
 </dl>
 </li>
 </ul>
