@@ -2121,9 +2121,11 @@ abstract class AbstractOpenApiVisitor {
         if (metaAnnName != null && !io.swagger.v3.oas.annotations.media.Schema.class.getName().equals(metaAnnName)) {
             return NameUtils.getSimpleName(metaAnnName);
         }
+        String fullClassName;
         String javaName;
         if (type instanceof TypedElement) {
             ClassElement typeType = ((TypedElement) type).getType();
+            fullClassName = typeType.getName();
             if (CollectionUtils.isNotEmpty(typeType.getTypeArguments())) {
                 javaName = computeNameWithGenerics(typeType, typeArgs, context);
             } else {
@@ -2131,8 +2133,18 @@ abstract class AbstractOpenApiVisitor {
             }
         } else {
             javaName = type.getSimpleName();
+            fullClassName = type.getName();
         }
-        return javaName.replace("$", ".");
+        String packageName = fullClassName.substring(0, fullClassName.lastIndexOf('.'));
+        OpenApiApplicationVisitor.SchemaDecorator schemaDecorator = OpenApiApplicationVisitor.getSchemaDecoration(packageName, context);
+        javaName = javaName.replace("$", ".");
+        if (schemaDecorator != null) {
+            javaName = (StringUtils.hasText(schemaDecorator.getPrefix()) ? schemaDecorator.getPrefix() : StringUtils.EMPTY_STRING)
+                + javaName
+                + (StringUtils.hasText(schemaDecorator.getPostfix()) ? schemaDecorator.getPostfix() : StringUtils.EMPTY_STRING);
+        }
+
+        return javaName;
     }
 
     private String computeNameWithGenerics(ClassElement classElement, Map<String, ClassElement> typeArgs, VisitorContext context) {

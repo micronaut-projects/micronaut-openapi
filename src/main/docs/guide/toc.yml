@@ -11,6 +11,7 @@ exposingSwaggerOutput: Exposing Swagger Output
 controllers: OpenAPI Generation for Controllers
 namingstrategy: Naming Strategy
 customSerializers: Custom serializers
+schemaDecorators: Schema decorators
 swaggerAnnotations:
   title: Swagger Annotations
   schemasAndPojos: Schemas and POJOs
