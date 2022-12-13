@@ -219,6 +219,25 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
     private static final String MICRONAUT_OPENAPI_SCHEMA = "micronaut.openapi.schema";
     private static final String MICRONAUT_CUSTOM_SCHEMAS = "micronaut.internal.custom.schemas";
     /**
+     * Properties prefix to set schema name prefixe or postfix by package.
+     * For example, if you have some classes with same names in different packages you can set postfix like this:
+     * <p>
+     * micronaut.openapi.schema-postfix.org.api.v1_0_0=1_0_0
+     * micronaut.openapi.schema-postfix.org.api.v2_0_0=2_0_0
+     * <p>
+     * Also, you can set it in your application.yml file like this:
+     * <p>
+     * micronaut:
+     *   openapi:
+     *     schema-postfix:
+     *         org.api.v1_0_0: 1_0_0
+     *         org.api.v2_0_0: 2_0_0
+     *       ...
+     */
+    private static final String MICRONAUT_OPENAPI_SCHEMA_PREFIX = "micronaut.openapi.schema-prefix";
+    private static final String MICRONAUT_OPENAPI_SCHEMA_POSTFIX = "micronaut.openapi.schema-postfix";
+    private static final String MICRONAUT_SCHEMA_DECORATORS = "micronaut.internal.schema-decorators";
+    /**
      * Loaded expandable properties. Need to save them to reuse in diffferent places.
      */
     private static final String MICRONAUT_INTERNAL_EXPANDBLE_PROPERTIES = "micronaut.internal.expandable.props";
@@ -284,6 +303,79 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         }
 
         classElement = element;
+    }
+
+    public static SchemaDecorator getSchemaDecoration(String packageName, VisitorContext context) {
+
+        Map<String, SchemaDecorator> schemaDecorators = (Map<String, SchemaDecorator>) context.get(MICRONAUT_SCHEMA_DECORATORS, Map.class).orElse(null);
+        if (schemaDecorators != null) {
+            return schemaDecorators.get(packageName);
+        }
+
+        schemaDecorators = new HashMap<>();
+
+        // first read system properties
+        Properties sysProps = System.getProperties();
+        readSchemaDecorators(sysProps, schemaDecorators, context);
+
+        // second read openapi.properties file
+        Properties fileProps = readOpenApiConfigFile(context);
+        readSchemaDecorators(fileProps, schemaDecorators, context);
+
+        // third read environments properties
+        Environment environment = getEnv(context);
+        if (environment != null) {
+            for (Map.Entry<String, Object> entry : environment.getProperties(MICRONAUT_OPENAPI_SCHEMA_PREFIX, StringConvention.RAW).entrySet()) {
+                String configuredPackageName = entry.getKey();
+                SchemaDecorator decorator = schemaDecorators.get(entry.getKey());
+                if (decorator == null) {
+                    decorator = new SchemaDecorator();
+                    schemaDecorators.put(entry.getKey(), decorator);
+                }
+                decorator.setPrefix((String) entry.getValue());
+            }
+
+            for (Map.Entry<String, Object> entry : environment.getProperties(MICRONAUT_OPENAPI_SCHEMA_POSTFIX, StringConvention.RAW).entrySet()) {
+                String configuredPackageName = entry.getKey();
+                SchemaDecorator decorator = schemaDecorators.get(entry.getKey());
+                if (decorator == null) {
+                    decorator = new SchemaDecorator();
+                    schemaDecorators.put(entry.getKey(), decorator);
+                }
+                decorator.setPostfix((String) entry.getValue());
+            }
+        }
+
+        context.put(MICRONAUT_SCHEMA_DECORATORS, schemaDecorators);
+
+        return schemaDecorators.get(packageName);
+    }
+
+    private static void readSchemaDecorators(Properties props, Map<String, SchemaDecorator> schemaDecorators, VisitorContext context) {
+
+        for (String prop : props.stringPropertyNames()) {
+            boolean isPrefix = false;
+            String packageName = null;
+            if (prop.startsWith(MICRONAUT_OPENAPI_SCHEMA_PREFIX)) {
+                packageName = prop.substring(MICRONAUT_OPENAPI_SCHEMA_PREFIX.length() + 1);
+                isPrefix = true;
+            } else if (prop.startsWith(MICRONAUT_OPENAPI_SCHEMA_POSTFIX)) {
+                packageName = prop.substring(MICRONAUT_OPENAPI_SCHEMA_POSTFIX.length() + 1);
+            }
+            if (StringUtils.isEmpty(packageName)) {
+                continue;
+            }
+            SchemaDecorator schemaDecorator = schemaDecorators.get(packageName);
+            if (schemaDecorator == null) {
+                schemaDecorator = new SchemaDecorator();
+                schemaDecorators.put(packageName, schemaDecorator);
+            }
+            if (isPrefix) {
+                schemaDecorator.setPrefix(props.getProperty(prop));
+            } else {
+                schemaDecorator.setPostfix(props.getProperty(prop));
+            }
+        }
     }
 
     public static ClassElement getCustomSchema(String className, Map<String, ClassElement> typeArgs, VisitorContext context) {
@@ -1058,6 +1150,28 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
 
         public ClassElement getClassElement() {
             return classElement;
+        }
+    }
+
+    static final class SchemaDecorator {
+
+        private String prefix;
+        private String postfix;
+
+        public String getPrefix() {
+            return prefix;
+        }
+
+        public void setPrefix(String prefix) {
+            this.prefix = prefix;
+        }
+
+        public String getPostfix() {
+            return postfix;
+        }
+
+        public void setPostfix(String postfix) {
+            this.postfix = postfix;
         }
     }
 }
