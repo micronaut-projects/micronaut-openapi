@@ -219,7 +219,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
     private static final String MICRONAUT_OPENAPI_SCHEMA = "micronaut.openapi.schema";
     private static final String MICRONAUT_CUSTOM_SCHEMAS = "micronaut.internal.custom.schemas";
     /**
-     * Properties prefix to set schema name prefixe or postfix by package.
+     * Properties prefix to set schema name prefix or postfix by package.
      * For example, if you have some classes with same names in different packages you can set postfix like this:
      * <p>
      * micronaut.openapi.schema-postfix.org.api.v1_0_0=1_0_0
