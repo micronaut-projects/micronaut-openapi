@@ -329,7 +329,8 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                 String configuredPackageName = entry.getKey();
                 SchemaDecorator decorator = schemaDecorators.get(entry.getKey());
                 if (decorator == null) {
-                    schemaDecorators.put(entry.getKey(), decorator = new SchemaDecorator());
+                    decorator = new SchemaDecorator();
+                    schemaDecorators.put(entry.getKey(), decorator);
                 }
                 decorator.setPrefix((String) entry.getValue());
             }
@@ -338,7 +339,8 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                 String configuredPackageName = entry.getKey();
                 SchemaDecorator decorator = schemaDecorators.get(entry.getKey());
                 if (decorator == null) {
-                    schemaDecorators.put(entry.getKey(), decorator = new SchemaDecorator());
+                    decorator = new SchemaDecorator();
+                    schemaDecorators.put(entry.getKey(), decorator);
                 }
                 decorator.setPostfix((String) entry.getValue());
             }
@@ -365,7 +367,8 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             }
             SchemaDecorator schemaDecorator = schemaDecorators.get(packageName);
             if (schemaDecorator == null) {
-                schemaDecorators.put(packageName, schemaDecorator = new SchemaDecorator());
+                schemaDecorator = new SchemaDecorator();
+                schemaDecorators.put(packageName, schemaDecorator);
             }
             if (isPrefix) {
                 schemaDecorator.setPrefix(props.getProperty(prop));
