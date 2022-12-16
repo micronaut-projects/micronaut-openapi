@@ -8,7 +8,7 @@ managed-slf4j = "2.0.4"
 managed-html2md-converter = "0.64.0"
 managed-jakarta-validation-api = "3.0.2"
 
-kotlin = "1.7.21"
+kotlin = "1.7.22"
 micronaut-security = "4.0.0-SNAPSHOT"
 micronaut-serde = "2.0.0-SNAPSHOT"
 micronaut-rxjava2 = "2.0.0-SNAPSHOT"
