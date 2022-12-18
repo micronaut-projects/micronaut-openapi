@@ -450,7 +450,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
     private static void readCustomSchemas(Properties props, Map<String, CustomSchema> customSchemas, VisitorContext context) {
 
         for (String prop : props.stringPropertyNames()) {
-            if (!prop.startsWith(MICRONAUT_OPENAPI_SCHEMA)) {
+            if (!prop.startsWith(MICRONAUT_OPENAPI_SCHEMA) || prop.startsWith(MICRONAUT_OPENAPI_SCHEMA_PREFIX) || prop.startsWith(MICRONAUT_OPENAPI_SCHEMA_POSTFIX)) {
                 continue;
             }
             String className = prop.substring(MICRONAUT_OPENAPI_SCHEMA.length() + 1);
