@@ -15,7 +15,7 @@ micronaut-rxjava2 = "2.0.0-SNAPSHOT"
 micronaut-rxjava3 = "3.0.0-SNAPSHOT"
 micronaut-groovy = "4.0.0-SNAPSHOT"
 micronaut-validation = "4.0.0-SNAPSHOT"
-micronaut-data = "3.8.2-SNAPSHOT"
+micronaut-data = "3.9.3"
 micronaut-test = "4.0.0-SNAPSHOT"
 micronaut-kotlin = "4.0.0-SNAPSHOT"
 
