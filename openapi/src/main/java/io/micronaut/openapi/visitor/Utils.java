@@ -47,6 +47,9 @@ import io.swagger.v3.oas.models.OpenAPI;
  */
 public final class Utils {
 
+    public static final String PLACEHOLDER_PREFIX = "${";
+    public static final String PLACEHOLDER_POSTFIX = "}";
+
     public static final String ATTR_OPENAPI = "io.micronaut.OPENAPI";
     public static final String ATTR_TEST_MODE = "io.micronaut.OPENAPI_TEST";
     public static final String ATTR_VISITED_ELEMENTS = "io.micronaut.OPENAPI.visited.elements";

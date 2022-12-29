@@ -10,7 +10,7 @@ managed-slf4j = "1.7.36"
 # Versions beyond 0.62.2 require Java 11
 managed-html2md-converter = "0.62.2"
 
-kotlin = "1.7.21"
+kotlin = "1.7.22"
 
 [libraries]
 # Duplicated to keep catalog compatibility with 3.4.x.  Can be removed for 4.0.0
