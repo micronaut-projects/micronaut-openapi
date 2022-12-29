@@ -37,7 +37,7 @@ class MyController {
 @Introspected
 class MyRequestBean {
 
-    public static final String HEADER_CONTENT_TYPE = "Content-type";
+    public static final String HEADER_CONTENT_TYPE = "My-Content-type";
 
     HttpRequest<?> httpRequest;
 
@@ -54,7 +54,7 @@ class MyRequestBean {
     @Header(HEADER_CONTENT_TYPE)
     private String contentType;
 
-    public MyRequestBean(HttpRequest<?> httpRequest, String pathVariable, String queryValue, String contentType) {
+    MyRequestBean(HttpRequest<?> httpRequest, String pathVariable, String queryValue, String contentType) {
         this.httpRequest = httpRequest;
         this.pathVariable = pathVariable;
         this.queryValue = queryValue;
@@ -101,7 +101,7 @@ class MyBean {}
             operation.parameters[1].description == 'Any query value'
             operation.parameters[1].in == 'query'
             operation.parameters[1].required
-            operation.parameters[2].name == 'Content-type'
+            operation.parameters[2].name == 'My-Content-type'
             operation.parameters[2].description == 'Any content type'
             operation.parameters[2].in == 'header'
             !operation.parameters[2].required

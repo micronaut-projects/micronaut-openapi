@@ -40,6 +40,7 @@ import io.micronaut.core.reflect.ClassUtils;
 import io.micronaut.core.util.ArrayUtils;
 import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.core.util.StringUtils;
+import io.micronaut.http.HttpHeaders;
 import io.micronaut.http.HttpMethod;
 import io.micronaut.http.HttpRequest;
 import io.micronaut.http.HttpResponse;
@@ -741,6 +742,15 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         } else if (parameter.isAnnotationPresent(Header.class)) {
             String headerName = parameter.getValue(Header.class, "name", String.class).orElse(parameter
                 .getValue(Header.class, String.class).orElseGet(() -> NameUtils.hyphenate(parameterName)));
+            // Header parameter named "Authorization" are ignored. Use the `securitySchemes` and `security` sections instead to define authorization
+            // Header parameter named "Content-Type" are ignored. The values for the "Content-Type" header are defined by `request.body.content.<media-type>`
+            // Header parameter named "Accept" are ignored. The values for the "Accept" header are defined by `responses.<code>.content.<media-type>`
+            if (HttpHeaders.AUTHORIZATION.equalsIgnoreCase(headerName)
+                || HttpHeaders.CONTENT_TYPE.equalsIgnoreCase(headerName)
+                || HttpHeaders.ACCEPT.equalsIgnoreCase(headerName)
+            ) {
+                return null;
+            }
             newParameter = new HeaderParameter();
             newParameter.setName(headerName);
         } else if (parameter.isAnnotationPresent(CookieValue.class)) {
