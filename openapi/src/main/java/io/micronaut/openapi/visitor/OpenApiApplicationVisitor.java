@@ -942,7 +942,9 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                 Map<String, Schema> schemas = openAPI.getComponents().getSchemas();
                 if (CollectionUtils.isNotEmpty(schemas)) {
                     String openApiJson = ConvertUtils.getJsonMapper().writeValueAsString(openAPI);
-                    for (String schemaName : schemas.keySet()) {
+                    // Create a copy of the keySet so that we can modify the map while in a foreach
+                    Set<String> keySet = schemas.keySet().stream().collect(Collectors.toSet());
+                    for (String schemaName : keySet) {
                         if (!openApiJson.contains(COMPONENTS_SCHEMAS_REF + schemaName)) {
                             schemas.remove(schemaName);
                         }
