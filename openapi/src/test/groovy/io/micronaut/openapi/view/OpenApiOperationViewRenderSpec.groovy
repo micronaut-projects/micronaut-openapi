@@ -47,19 +47,19 @@ class OpenApiOperationViewRenderSpec extends Specification {
         Files.exists(outputDir.resolve("swagger-ui").resolve("res").resolve("rapipdf-min.js"))
         Files.exists(outputDir.resolve("swagger-ui").resolve("res").resolve("flattop.css"))
 
-        outputDir.resolve("redoc").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains("/redoc/res/redoc.standalone.js")
+        outputDir.resolve("redoc").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains("redoc/res/redoc.standalone.js")
         outputDir.resolve("redoc").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains(cfg.getSpecURL())
-        outputDir.resolve("redoc").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains("/redoc/res/rapipdf-min.js")
-        outputDir.resolve("rapidoc").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains("/rapidoc/res/rapidoc-min.js")
+        outputDir.resolve("redoc").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains("redoc/res/rapipdf-min.js")
+        outputDir.resolve("rapidoc").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains("rapidoc/res/rapidoc-min.js")
         outputDir.resolve("rapidoc").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains(cfg.getSpecURL())
-        outputDir.resolve("rapidoc").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains("/rapidoc/res/rapipdf-min.js")
-        outputDir.resolve("swagger-ui").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains("/swagger-ui/res/swagger-ui-bundle.js")
-        outputDir.resolve("swagger-ui").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains("/swagger-ui/res/swagger-ui-standalone-preset.js")
-        outputDir.resolve("swagger-ui").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains("/swagger-ui/res/swagger-ui.css")
-        outputDir.resolve("swagger-ui").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains("/swagger-ui/res/favicon-32x32.png")
-        outputDir.resolve("swagger-ui").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains("/swagger-ui/res/favicon-16x16.png")
+        outputDir.resolve("rapidoc").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains("rapidoc/res/rapipdf-min.js")
+        outputDir.resolve("swagger-ui").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains("swagger-ui/res/swagger-ui-bundle.js")
+        outputDir.resolve("swagger-ui").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains("swagger-ui/res/swagger-ui-standalone-preset.js")
+        outputDir.resolve("swagger-ui").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains("swagger-ui/res/swagger-ui.css")
+        outputDir.resolve("swagger-ui").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains("swagger-ui/res/favicon-32x32.png")
+        outputDir.resolve("swagger-ui").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains("swagger-ui/res/favicon-16x16.png")
         outputDir.resolve("swagger-ui").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains(cfg.getSpecURL())
-        outputDir.resolve("swagger-ui").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains("/swagger-ui/res/rapipdf-min.js")
+        outputDir.resolve("swagger-ui").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains("swagger-ui/res/rapipdf-min.js")
     }
 
     void "test render OpenApiView specification with custom redoc js url"() {
@@ -328,7 +328,7 @@ class OpenApiOperationViewRenderSpec extends Specification {
         String urlPrefix = cfg.swaggerUIConfig.getFinalUrlPrefix(OpenApiViewConfig.RendererType.SWAGGER_UI, null)
 
         urlPrefix
-        urlPrefix == '/swagger-ui/res/'
+        urlPrefix == 'swagger-ui/res/'
 
     }
 }

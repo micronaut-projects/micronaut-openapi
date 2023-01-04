@@ -15,12 +15,10 @@
  */
 package io.micronaut.openapi.view;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import io.micronaut.core.util.StringUtils;
 import io.micronaut.inject.visitor.VisitorContext;
@@ -99,34 +97,20 @@ abstract class AbstractViewConfig {
 
         // process micronaut.openapi.server.context.path
         String serverContextPath = OpenApiApplicationVisitor.getConfigurationProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_CONTEXT_SERVER_PATH, context);
-        if (serverContextPath == null) {
-            serverContextPath = StringUtils.EMPTY_STRING;
-        }
-        String finalUrl = serverContextPath.startsWith(OpenApiViewConfig.SLASH) ? serverContextPath : OpenApiViewConfig.SLASH + serverContextPath;
-        if (!finalUrl.endsWith(OpenApiViewConfig.SLASH)) {
-            finalUrl += OpenApiViewConfig.SLASH;
-        }
 
         // process micronaut.server.context-path
         String contextPath = OpenApiApplicationVisitor.getConfigurationProperty("micronaut.server.context-path", context);
-        if (contextPath == null) {
-            contextPath = StringUtils.EMPTY_STRING;
-        }
-        finalUrl += contextPath.startsWith(OpenApiViewConfig.SLASH) ? contextPath.substring(1) : contextPath;
-        if (!finalUrl.endsWith(OpenApiViewConfig.SLASH)) {
-            finalUrl += OpenApiViewConfig.SLASH;
-        }
 
         // standard path
-        finalUrl += rendererType.getTemplatePath();
-        finalUrl += finalUrl.endsWith(OpenApiViewConfig.SLASH) ? resourcesContextPath.substring(1) : resourcesContextPath;
-        if (!finalUrl.endsWith(OpenApiViewConfig.SLASH)) {
-            finalUrl += OpenApiViewConfig.SLASH;
-        }
+        String standardPath = rendererType.getTemplatePath();
 
-        finalUrlPrefix = finalUrl;
+        finalUrlPrefix = Stream.of(serverContextPath, contextPath, standardPath, resourcesContextPath)
+            .filter(StringUtils::isNotEmpty)
+            .reduce(StringUtils::prependUri)
+            .map(it -> it.endsWith(OpenApiViewConfig.SLASH) ? it : it + OpenApiViewConfig.SLASH)
+            .orElse("");
 
-        return finalUrl;
+        return finalUrlPrefix;
     }
 
     /**
