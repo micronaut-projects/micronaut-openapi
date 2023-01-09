@@ -1,5 +1,40 @@
 [
   {
+    "type": "io.micronaut.openapi.visitor.VisibilityLevel",
+    "member": "Field PACKAGE",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.visitor.VisibilityLevel",
+    "member": "Field PUBLIC",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.visitor.VisibilityLevel",
+    "member": "Field PROTECTED",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.visitor.VisibilityLevel",
+    "member": "Field PRIVATE",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.visitor.VisibilityLevel",
+    "member": "Implemented interface java.lang.constant.Constable",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.visitor.VisibilityLevel",
+    "member": "Implemented interface java.lang.Comparable",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.visitor.VisibilityLevel",
+    "member": "Implemented interface java.io.Serializable",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
     "type": "io.micronaut.openapi.visitor.AbstractOpenApiEndpointVisitor",
     "member": "Field propertyPlaceholderResolver",
     "reason": "Internal non-public API class"
@@ -907,6 +942,11 @@
   {
     "type": "io.micronaut.openapi.visitor.OpenApiApplicationVisitor",
     "member": "Field MICRONAUT_OPENAPI_VIEWS_DEST_DIR",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.visitor.OpenApiApplicationVisitor",
+    "member": "Field MICRONAUT_OPENAPI_FIELD_VISIBILITY_LEVEL",
     "reason": "Major update for Micronaut 4.0.0"
   },
   {

@@ -1,21 +1,19 @@
 [versions]
-managed-swagger = "2.2.7"
-# Required to keep catalog compatibility with 3.4.x.  Can be removed for 4.0.0
-managed-swagger-compat = "2.2.7"
+managed-swagger = "2.2.8"
 managed-javadoc-parser = "0.3.1"
 managed-jsoup = "1.15.3"
 managed-slf4j = "2.0.6"
 managed-html2md-converter = "0.64.0"
 managed-jakarta-validation-api = "3.0.2"
 
-kotlin = "1.7.22"
+kotlin = "1.8.0"
 micronaut-security = "4.0.0-SNAPSHOT"
 micronaut-serde = "2.0.0-SNAPSHOT"
 micronaut-rxjava2 = "2.0.0-SNAPSHOT"
 micronaut-rxjava3 = "3.0.0-SNAPSHOT"
 micronaut-groovy = "4.0.0-SNAPSHOT"
 micronaut-validation = "4.0.0-SNAPSHOT"
-micronaut-data = "3.8.2-SNAPSHOT"
+micronaut-data = "4.0.0-SNAPSHOT"
 micronaut-test = "4.0.0-SNAPSHOT"
 micronaut-kotlin = "4.0.0-SNAPSHOT"
 
@@ -31,8 +29,6 @@ micronaut-data = { module = "io.micronaut.data:micronaut-data-bom", version.ref 
 micronaut-test = { module = "io.micronaut.test:micronaut-test-bom", version.ref = "micronaut-test" }
 micronaut-kotlin = { module = "io.micronaut.kotlin:micronaut-kotlin-bom", version.ref = "micronaut-kotlin" }
 
-# Duplicated to keep catalog compatibility with 3.4.x.  Can be removed for 4.0.0
-managed-swagger = { module = "io.swagger.core.v3:swagger-core", version.ref = "managed-swagger-compat" }
 managed-swagger-core = { module = "io.swagger.core.v3:swagger-core", version.ref = "managed-swagger" }
 managed-swagger-annotations = { module = "io.swagger.core.v3:swagger-annotations", version.ref = "managed-swagger" }
 managed-swagger-models = { module = "io.swagger.core.v3:swagger-models", version.ref = "managed-swagger" }
