@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -37,6 +38,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -942,7 +944,9 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                 Map<String, Schema> schemas = openAPI.getComponents().getSchemas();
                 if (CollectionUtils.isNotEmpty(schemas)) {
                     String openApiJson = ConvertUtils.getJsonMapper().writeValueAsString(openAPI);
-                    for (String schemaName : schemas.keySet()) {
+                    // Create a copy of the keySet so that we can modify the map while in a foreach
+                    Set<String> keySet = new HashSet<>(schemas.keySet());
+                    for (String schemaName : keySet) {
                         if (!openApiJson.contains(COMPONENTS_SCHEMAS_REF + schemaName)) {
                             schemas.remove(schemaName);
                         }
