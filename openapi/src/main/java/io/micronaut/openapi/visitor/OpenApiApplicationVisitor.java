@@ -495,6 +495,10 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
 
     @Nullable
     public static Environment getEnv(VisitorContext context) {
+        if (!isEnvEnabled(context)) {
+            return null;
+        }
+
         Environment existedEnvironment = context != null ? context.get(MICRONAUT_ENVIRONMENT, Environment.class).orElse(null) : null;
         Boolean envCreated = context != null ? context.get(MICRONAUT_ENVIRONMENT_CREATED, Boolean.class).orElse(null) : null;
         if (envCreated != null && envCreated) {
@@ -510,8 +514,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         return environment;
     }
 
-    public static List<String> getActiveEnvs(VisitorContext context) {
-
+    private static boolean isEnvEnabled(VisitorContext context) {
         String isEnabledStr = System.getProperty(MICRONAUT_ENVIRONMENT_ENABLED, readOpenApiConfigFile(context).getProperty(MICRONAUT_ENVIRONMENT_ENABLED));
         boolean isEnabled = true;
         if (StringUtils.isNotEmpty(isEnabledStr)) {
@@ -520,7 +523,12 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         if (context != null) {
             context.put(MICRONAUT_ENVIRONMENT_ENABLED, isEnabled);
         }
-        if (!isEnabled) {
+        return isEnabled;
+    }
+
+    public static List<String> getActiveEnvs(VisitorContext context) {
+
+        if (!isEnvEnabled(context)) {
             return Collections.emptyList();
         }
 
@@ -873,16 +881,43 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
     }
 
     public static String expandProperties(String s, List<Map.Entry<String, String>> properties, VisitorContext context) {
-        if (StringUtils.isEmpty(s)) {
+        if (StringUtils.isEmpty(s) || !s.contains(Utils.PLACEHOLDER_PREFIX)) {
             return s;
         }
+
+        // form openapi file (expandable properties)
         if (CollectionUtils.isNotEmpty(properties)) {
             for (Map.Entry<String, String> entry : properties) {
                 s = s.replace(entry.getKey(), entry.getValue());
             }
         }
-        Environment environment = getEnv(context);
-        return environment != null ? environment.getPlaceholderResolver().resolvePlaceholders(s).orElse(s) : s;
+
+        return replacePlaceholders(s, context);
+    }
+
+    public static String replacePlaceholders(String value, VisitorContext context) {
+        if (StringUtils.isEmpty(value) || !value.contains(Utils.PLACEHOLDER_PREFIX)) {
+            return value;
+        }
+        // system properties
+        if (CollectionUtils.isNotEmpty(System.getProperties())) {
+            for (Map.Entry<Object, Object> sysProp : System.getProperties().entrySet()) {
+                value = value.replace(Utils.PLACEHOLDER_PREFIX + sysProp.getKey().toString() + Utils.PLACEHOLDER_POSTFIX, sysProp.getValue().toString());
+            }
+        }
+
+        // form openapi file
+        for (Map.Entry<Object, Object> fileProp : OpenApiApplicationVisitor.readOpenApiConfigFile(context).entrySet()) {
+            value = value.replace(Utils.PLACEHOLDER_PREFIX + fileProp.getKey().toString() + Utils.PLACEHOLDER_POSTFIX, fileProp.getValue().toString());
+        }
+
+        // from environments
+        Environment environment = OpenApiApplicationVisitor.getEnv(context);
+        if (environment != null) {
+            value = environment.getPlaceholderResolver().resolvePlaceholders(value).orElse(value);
+        }
+
+        return value;
     }
 
     public static List<Map.Entry<String, String>> getExpandableProperties(VisitorContext context) {

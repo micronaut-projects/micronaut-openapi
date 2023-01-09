@@ -51,7 +51,6 @@ import java.util.stream.Stream;
 
 import javax.xml.datatype.XMLGregorianCalendar;
 
-import io.micronaut.context.env.Environment;
 import io.micronaut.core.annotation.AnnotationClassValue;
 import io.micronaut.core.annotation.AnnotationValue;
 import io.micronaut.core.annotation.NonNull;
@@ -301,11 +300,8 @@ abstract class AbstractOpenApiVisitor {
                 result.append(c);
             }
 
-            String resultPath = result.toString();
-            Environment environment = OpenApiApplicationVisitor.getEnv(context);
-            if (environment != null) {
-                resultPath = environment.getPlaceholderResolver().resolvePlaceholders(resultPath).orElse(resultPath);
-            }
+            String resultPath = OpenApiApplicationVisitor.replacePlaceholders(result.toString(), context);
+
             if (!resultPath.startsWith("/") && !resultPath.startsWith("$")) {
                 resultPath = "/" + resultPath;
             }

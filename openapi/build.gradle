@@ -13,7 +13,7 @@ dependencies {
     api(libs.managed.swagger.models)
     api(libs.managed.swagger.annotations)
     api(libs.managed.javadoc.parser)
-    api(libs.managed.slf4j.nop)
+    api(mn.slf4j.nop)
     api(libs.managed.html2md.converter) {
         exclude group: "org.jetbrains", module: "annotations"
     }

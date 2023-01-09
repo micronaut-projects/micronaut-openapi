@@ -81,7 +81,6 @@ class MyBean {}
         sliceMyDtoSchema.properties.empty
         sliceMyDtoSchema.properties.numberOfElements
 
-        sortSchema.properties.sorted
         sortSchema.properties.orderBy
 
         sortOrderSchema.properties.ignoreCase
