@@ -122,6 +122,7 @@ public class OpenApiControllerVisitor extends AbstractOpenApiEndpointVisitor imp
         boolean isParentClass = context.get(IS_PROCESS_PARENT_CLASS, Boolean.class).orElse(false);
 
         return (!isParentClass && !element.isAnnotationPresent(Controller.class))
+            || element.isAnnotationPresent(Hidden.class)
             || ignoreByRequires(element, context);
     }
 

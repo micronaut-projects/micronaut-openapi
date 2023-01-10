@@ -10,6 +10,58 @@ import spock.lang.Issue
 
 class OpenApiControllerVisitorSpec extends AbstractOpenApiTypeElementSpec {
 
+    void "test hidden endpoint with inheritance"() {
+
+        given:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.swagger.v3.oas.annotations.Hidden;
+
+@Controller
+class ControllerThree extends AbstractController {
+
+    @Hidden
+    @Override
+    void methodTwo() {
+    }
+
+    void methodFour() {
+    }
+
+    @Get("/five")
+    void methodFive() {
+    }
+}
+
+@Hidden
+class AbstractController {
+    @Get("/should-be-hidden/one")
+    void methodOne() {
+    }
+
+    @Get("/should-be-hidden/two")
+    void methodTwo() {
+    }
+
+    void methodThree() {
+    }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        when:
+        Paths paths = Utils.testReference?.paths
+
+        then:
+        paths
+        paths.size() == 1
+        paths.containsKey("/five")
+    }
+
     void "test hidden endpoint"() {
 
         given:
