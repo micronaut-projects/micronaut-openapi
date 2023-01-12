@@ -6,6 +6,7 @@ import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.Operation
 import io.swagger.v3.oas.models.PathItem
 import io.swagger.v3.oas.models.Paths
+import io.swagger.v3.oas.models.media.Schema
 import spock.lang.Issue
 
 class OpenApiControllerVisitorSpec extends AbstractOpenApiTypeElementSpec {
@@ -62,6 +63,84 @@ class MyBean {}
         paths.containsKey("/five")
     }
 
+    void "test java.util collections"() {
+
+        given:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import java.util.*;
+import java.util.concurrent.*;
+
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Post;
+
+@Controller
+class HelloWorldController {
+
+    @Post("/ArrayList")
+    public ArrayList<AB> ArrayList() {
+        return null;
+    }
+
+    @Post("/ArrayDeque")
+    public ArrayDeque<AB> ArrayDeque() {
+        return null;
+    }
+
+    @Post("/LinkedBlockingDeque")
+    public LinkedBlockingDeque<AB> LinkedBlockingDeque() {
+        return null;
+    }
+
+    @Post("/SynchronousQueue")
+    public SynchronousQueue<AB> SynchronousQueue() {
+        return null;
+    }
+}
+
+class AB {
+    public String someField;
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        when:
+        Paths paths = Utils.testReference?.paths
+        Map<String, Schema> schemas = Utils.testReference?.components?.schemas
+
+        then:
+        paths
+        paths.size() == 4
+
+        paths."/ArrayList"
+        paths."/ArrayList".post.operationId == 'ArrayList'
+        paths."/ArrayList".post.responses."200".content."application/json".schema.type == 'array'
+        paths."/ArrayList".post.responses."200".content."application/json".schema.items.$ref == '#/components/schemas/AB'
+
+        paths."/ArrayDeque"
+        paths."/ArrayDeque".post.operationId == 'ArrayDeque'
+        paths."/ArrayDeque".post.responses."200".content."application/json".schema.type == 'array'
+        paths."/ArrayDeque".post.responses."200".content."application/json".schema.items.$ref == '#/components/schemas/AB'
+
+        paths."/LinkedBlockingDeque"
+        paths."/LinkedBlockingDeque".post.operationId == 'LinkedBlockingDeque'
+        paths."/LinkedBlockingDeque".post.responses."200".content."application/json".schema.type == 'array'
+        paths."/LinkedBlockingDeque".post.responses."200".content."application/json".schema.items.$ref == '#/components/schemas/AB'
+
+        paths."/SynchronousQueue"
+        paths."/SynchronousQueue".post.operationId == 'SynchronousQueue'
+        paths."/SynchronousQueue".post.responses."200".content."application/json".schema.type == 'array'
+        paths."/SynchronousQueue".post.responses."200".content."application/json".schema.items.$ref == '#/components/schemas/AB'
+
+        schemas
+        schemas.size() == 1
+
+        schemas.AB.type == 'object'
+        schemas.AB.properties.someField.type == 'string'
+    }
+
     void "test hidden endpoint"() {
 
         given:
@@ -82,19 +161,19 @@ import java.util.List;
 class HelloWorldController {
 
     @Post("/public")
-    public HttpResponse<String> publicEnpoint() {
+    public HttpResponse<String> publicEndpoint() {
         return null;
     }
 
     @Hidden
     @Post("/private")
-    public HttpResponse<String> internalEnpoint() {
+    public HttpResponse<String> internalEndpoint() {
         return null;
     }
 
     @Operation(hidden = true)
     @Post("/private-operation")
-    public HttpResponse<String> internalEnpoint2() {
+    public HttpResponse<String> internalEndpoint2() {
         return null;
     }
 

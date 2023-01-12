@@ -25,7 +25,7 @@ import io.micronaut.http.annotation.Post;
 class Controller1 {
 
     @Post("/c1")
-    public HttpResponse<String> publicEnpoint() {
+    public HttpResponse<String> publicEndpoint() {
         return null;
     }
 }
@@ -35,7 +35,7 @@ class Controller1 {
 class Controller2 {
 
     @Post("/c2")
-    public HttpResponse<String> publicEnpoint() {
+    public HttpResponse<String> publicEndpoint() {
         return null;
     }
 }
@@ -75,7 +75,7 @@ import io.micronaut.http.annotation.Post;
 class Controller1 {
 
     @Post("/c1")
-    public HttpResponse<String> publicEnpoint() {
+    public HttpResponse<String> publicEndpoint() {
         return null;
     }
 }
@@ -85,7 +85,7 @@ class Controller1 {
 class Controller2 {
 
     @Post("/c2")
-    public HttpResponse<String> publicEnpoint() {
+    public HttpResponse<String> publicEndpoint() {
         return null;
     }
 }
@@ -130,7 +130,7 @@ import java.util.List;
 class Controller1 {
 
     @Post("/c1")
-    public HttpResponse<String> publicEnpoint() {
+    public HttpResponse<String> publicEndpoint() {
         return null;
     }
 }
@@ -140,7 +140,7 @@ class Controller1 {
 class Controller2 {
 
     @Post("/c2")
-    public HttpResponse<String> publicEnpoint() {
+    public HttpResponse<String> publicEndpoint() {
         return null;
     }
 }
@@ -185,7 +185,7 @@ import java.util.List;
 class Controller1 {
 
     @Post("/c1")
-    public HttpResponse<String> publicEnpoint() {
+    public HttpResponse<String> publicEndpoint() {
         return null;
     }
 }
@@ -195,7 +195,7 @@ class Controller1 {
 class Controller2 {
 
     @Post("/c2")
-    public HttpResponse<String> publicEnpoint() {
+    public HttpResponse<String> publicEndpoint() {
         return null;
     }
 }
@@ -205,7 +205,7 @@ class Controller2 {
 class Controller3 {
 
     @Post("/c3")
-    public HttpResponse<String> publicEnpoint() {
+    public HttpResponse<String> publicEndpoint() {
         return null;
     }
 }
@@ -251,7 +251,7 @@ import java.util.List;
 class Controller1 {
 
     @Post("/c1")
-    public HttpResponse<String> publicEnpoint() {
+    public HttpResponse<String> publicEndpoint() {
         return null;
     }
 }
@@ -261,7 +261,7 @@ class Controller1 {
 class Controller2 {
 
     @Post("/c2")
-    public HttpResponse<String> publicEnpoint() {
+    public HttpResponse<String> publicEndpoint() {
         return null;
     }
 }
@@ -308,7 +308,7 @@ import java.util.List;
 class Controller1 {
 
     @Post("/c1")
-    public HttpResponse<String> publicEnpoint() {
+    public HttpResponse<String> publicEndpoint() {
         return null;
     }
 }
@@ -319,7 +319,7 @@ class Controller1 {
 class Controller2 {
 
     @Post("/c2")
-    public HttpResponse<String> publicEnpoint() {
+    public HttpResponse<String> publicEndpoint() {
         return null;
     }
 }
@@ -330,7 +330,7 @@ class Controller2 {
 class Controller3 {
 
     @Post("/c3")
-    public HttpResponse<String> publicEnpoint() {
+    public HttpResponse<String> publicEndpoint() {
         return null;
     }
 }
