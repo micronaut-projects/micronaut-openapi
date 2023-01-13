@@ -779,9 +779,18 @@ abstract class AbstractOpenApiVisitor {
             boolean isPublisher = false;
             boolean isObservable = false;
             boolean isNullable = false;
-
+            // MultipartBody implements Publisher<CompletedPart> (Issue : #907)
+            if (type.isAssignable("io.micronaut.http.server.multipart.MultipartBody")) {
+                isPublisher = true;
+                type = type.getInterfaces()
+                    .stream()
+                    .filter(i -> i.isAssignable("org.reactivestreams.Publisher"))
+                    .findFirst()
+                    .flatMap(ClassElement::getFirstTypeArgument)
+                    .orElse(null);
+            }
             // StreamingFileUpload implements Publisher, but it should be not considered as a Publisher in the spec file
-            if (!type.isAssignable("io.micronaut.http.multipart.StreamingFileUpload") && Utils.isContainerType(type)) {
+            else if (!type.isAssignable("io.micronaut.http.multipart.StreamingFileUpload") && Utils.isContainerType(type)) {
                 isPublisher = type.isAssignable("org.reactivestreams.Publisher") && !type.isAssignable("reactor.core.publisher.Mono");
                 isObservable = type.isAssignable("io.reactivex.Observable") && !type.isAssignable("reactor.core.publisher.Mono");
                 type = componentType;
