@@ -821,7 +821,7 @@ class MyController {
     @Get("/subscription/{subscriptionId}")
     public String getSubscription(@Parameter(description="foo") @CookieValue String subscriptionId,
             @QueryValue String q,
-            @Header String contentType,
+            @Header String myContentType,
             @Nullable @Header(name = "Bundle-ID") String bundleId,
             @Header("X-API-Version") String apiVersion) {
         return null;
@@ -845,7 +845,7 @@ class MyBean {}
         operation.parameters[1].name == 'q'
         operation.parameters[1].required
         operation.parameters[2].in == 'header'
-        operation.parameters[2].name == 'content-type'
+        operation.parameters[2].name == 'my-content-type'
         operation.parameters[2].required
         operation.parameters[3].in == 'header'
         operation.parameters[3].name == 'Bundle-ID'
@@ -1215,5 +1215,44 @@ class MyBean {}
         operation.responses."200".content."application/json".schema.$ref == '#/components/schemas/TestPojo'
         operation.responses."500".content."application/json".schema.$ref == '#/components/schemas/TestPojo'
         operation.responses."201".content."application/xml".schema.type == 'string'
+    }
+
+    void "test skip ignored headers"() {
+
+        given:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.http.HttpHeaders;
+import io.micronaut.http.HttpResponse;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Header;
+import io.micronaut.http.annotation.Post;
+
+@Controller
+class HelloWorldController {
+
+    @Post("/public")
+    public HttpResponse<String> publicEnpoint(
+            @Header(HttpHeaders.AUTHORIZATION) String auth,
+            @Header(HttpHeaders.CONTENT_TYPE) String contentType,
+            @Header(HttpHeaders.ACCEPT) String accept,
+            @Header String myHeader
+    ) {
+        return null;
+    }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        when:
+        Operation operation = Utils.testReference?.paths?."/public"?.post
+
+        then:
+        operation
+        operation.parameters
+        operation.parameters.size() == 1
+        operation.parameters[0].name == 'my-header'
     }
 }

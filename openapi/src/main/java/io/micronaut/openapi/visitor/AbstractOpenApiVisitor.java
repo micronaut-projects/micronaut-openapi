@@ -2348,7 +2348,7 @@ abstract class AbstractOpenApiVisitor {
 
                     String type = (String) map.get("type");
                     if (!SecurityScheme.Type.APIKEY.toString().equals(type)) {
-                        removeAndWarnSecSchemeProp(map, "name", context);
+                        removeAndWarnSecSchemeProp(map, "name", context, false);
                         removeAndWarnSecSchemeProp(map, "in", context);
                     }
                     if (!SecurityScheme.Type.OAUTH2.toString().equals(type)) {
@@ -2394,7 +2394,11 @@ abstract class AbstractOpenApiVisitor {
     }
 
     private void removeAndWarnSecSchemeProp(Map<CharSequence, Object> map, String prop, VisitorContext context) {
-        if (map.containsKey(prop)) {
+        removeAndWarnSecSchemeProp(map, prop, context, true);
+    }
+
+    private void removeAndWarnSecSchemeProp(Map<CharSequence, Object> map, String prop, VisitorContext context, boolean withWarn) {
+        if (map.containsKey(prop) && withWarn) {
             context.warn("'" + prop + "' property can't set for securityScheme with type " + map.get("type") + ". Skip it", null);
         }
         map.remove(prop);
