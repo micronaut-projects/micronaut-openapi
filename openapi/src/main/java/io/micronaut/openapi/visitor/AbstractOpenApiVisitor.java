@@ -844,7 +844,7 @@ abstract class AbstractOpenApiVisitor {
                         } else {
                             schema = getPrimitiveType(Object.class.getName());
                         }
-                        List<FieldElement> fields = type.getFields();
+                        List<FieldElement> fields = type.getPackageName().startsWith("java.util") ? Collections.emptyList() : type.getFields();
                         if (schema != null && fields.isEmpty()) {
                             schema = SchemaUtils.arraySchema(schema);
                         } else {
