@@ -148,11 +148,11 @@ abstract class AbstractOpenApiVisitor {
     /**
      * Stores the current in progress type.
      */
-    private List<String> inProgressSchemas = new ArrayList<>(10);
+    private final List<String> inProgressSchemas = new ArrayList<>(10);
     /**
      * {@link PropertyNamingStrategy} instances cache.
      */
-    private Map<String, PropertyNamingStrategy> propertyNamingStrategyInstances = new HashMap<>();
+    private final Map<String, PropertyNamingStrategy> propertyNamingStrategyInstances = new HashMap<>();
 
     /**
      * Increments the number of visited elements.
@@ -1227,20 +1227,20 @@ abstract class AbstractOpenApiVisitor {
 
             element.findAnnotation("javax.validation.constraints.Size$List")
                 .ifPresent(listAnn -> listAnn.getValue(AnnotationValue.class)
-                    .ifPresent(ann -> ((Optional<Integer>) ann.get("min", Integer.class))
+                    .ifPresent(ann -> ann.intValue("min")
                         .ifPresent(schemaToBind::setMinItems)));
             element.findAnnotation("jakarta.validation.constraints.Size$List")
                 .ifPresent(listAnn -> listAnn.getValue(AnnotationValue.class)
-                    .ifPresent(ann -> ((Optional<Integer>) ann.get("min", Integer.class))
+                    .ifPresent(ann -> ann.intValue("min")
                         .ifPresent(schemaToBind::setMinItems)));
 
             element.findAnnotation("javax.validation.constraints.Size$List")
                 .ifPresent(listAnn -> listAnn.getValue(AnnotationValue.class)
-                    .ifPresent(ann -> ((Optional<Integer>) ann.get("max", Integer.class))
+                    .ifPresent(ann -> ann.intValue("max")
                         .ifPresent(schemaToBind::setMaxItems)));
             element.findAnnotation("jakarta.validation.constraints.Size$List")
                 .ifPresent(listAnn -> listAnn.getValue(AnnotationValue.class)
-                    .ifPresent(ann -> ((Optional<Integer>) ann.get("max", Integer.class))
+                    .ifPresent(ann -> ann.intValue("max")
                         .ifPresent(schemaToBind::setMaxItems)));
 
         } else {
@@ -1254,20 +1254,16 @@ abstract class AbstractOpenApiVisitor {
 
                 element.findAnnotation("javax.validation.constraints.Size$List")
                     .ifPresent(listAnn -> {
-                        for (AnnotationValue ann : (Set<AnnotationValue>) listAnn.getValues().get("value")) {
-                            ((Optional<Integer>) ann.get("min", Integer.class))
-                                .ifPresent(schemaToBind::setMinLength);
-                            ((Optional<Integer>) ann.get("max", Integer.class))
-                                .ifPresent(schemaToBind::setMaxLength);
+                        for (AnnotationValue<?> ann : listAnn.getAnnotations("value")) {
+                            ann.intValue("min").ifPresent(schemaToBind::setMinLength);
+                            ann.intValue("max").ifPresent(schemaToBind::setMaxLength);
                         }
                     });
                 element.findAnnotation("jakarta.validation.constraints.Size$List")
                     .ifPresent(listAnn -> {
-                        for (AnnotationValue ann : (Set<AnnotationValue>) listAnn.getValues().get("value")) {
-                            ((Optional<Integer>) ann.get("min", Integer.class))
-                                .ifPresent(schemaToBind::setMinLength);
-                            ((Optional<Integer>) ann.get("max", Integer.class))
-                                .ifPresent(schemaToBind::setMaxLength);
+                        for (AnnotationValue<?> ann : listAnn.getAnnotations("value")) {
+                            ann.intValue("min").ifPresent(schemaToBind::setMinLength);
+                            ann.intValue("max").ifPresent(schemaToBind::setMaxLength);
                         }
                     });
             }
@@ -1291,60 +1287,60 @@ abstract class AbstractOpenApiVisitor {
 
             element.findAnnotation("javax.validation.constraints.Min$List")
                 .ifPresent(listAnn -> {
-                    for (AnnotationValue ann : (Set<AnnotationValue>) listAnn.getValues().get("value")) {
-                        ((Optional<BigDecimal>) ann.getValue(BigDecimal.class))
+                    for (AnnotationValue<?> ann : listAnn.getAnnotations("value")) {
+                        ann.getValue(BigDecimal.class)
                             .ifPresent(schemaToBind::setMinimum);
                     }
                 });
             element.findAnnotation("jakarta.validation.constraints.Min$List")
                 .ifPresent(listAnn -> {
-                    for (AnnotationValue ann : (Set<AnnotationValue>) listAnn.getValues().get("value")) {
-                        ((Optional<BigDecimal>) ann.getValue(BigDecimal.class))
+                    for (AnnotationValue<?> ann : listAnn.getAnnotations("value")) {
+                        ann.getValue(BigDecimal.class)
                             .ifPresent(schemaToBind::setMinimum);
                     }
                 });
 
             element.findAnnotation("javax.validation.constraints.Max$List")
                 .ifPresent(listAnn -> {
-                    for (AnnotationValue ann : (Set<AnnotationValue>) listAnn.getValues().get("value")) {
-                        ((Optional<BigDecimal>) ann.getValue(BigDecimal.class))
+                    for (AnnotationValue<?> ann : listAnn.getAnnotations("value")) {
+                        ann.getValue(BigDecimal.class)
                             .ifPresent(schemaToBind::setMaximum);
                     }
                 });
             element.findAnnotation("jakarta.validation.constraints.Max$List")
                 .ifPresent(listAnn -> {
-                    for (AnnotationValue ann : (Set<AnnotationValue>) listAnn.getValues().get("value")) {
-                        ((Optional<BigDecimal>) ann.getValue(BigDecimal.class))
+                    for (AnnotationValue<?> ann : listAnn.getAnnotations("value")) {
+                        ann.getValue(BigDecimal.class)
                             .ifPresent(schemaToBind::setMaximum);
                     }
                 });
 
             element.findAnnotation("javax.validation.constraints.DecimalMin$List")
                 .ifPresent(listAnn -> {
-                    for (AnnotationValue ann : (Set<AnnotationValue>) listAnn.getValues().get("value")) {
-                        ((Optional<BigDecimal>) ann.getValue(BigDecimal.class))
+                    for (AnnotationValue<?> ann : listAnn.getAnnotations("value")) {
+                        ann.getValue(BigDecimal.class)
                             .ifPresent(schemaToBind::setMinimum);
                     }
                 });
             element.findAnnotation("jakarta.validation.constraints.DecimalMin$List")
                 .ifPresent(listAnn -> {
-                    for (AnnotationValue ann : (Set<AnnotationValue>) listAnn.getValues().get("value")) {
-                        ((Optional<BigDecimal>) ann.getValue(BigDecimal.class))
+                    for (AnnotationValue<?> ann : listAnn.getAnnotations("value")) {
+                        ann.getValue(BigDecimal.class)
                             .ifPresent(schemaToBind::setMinimum);
                     }
                 });
 
             element.findAnnotation("javax.validation.constraints.DecimalMax$List")
                 .ifPresent(listAnn -> {
-                    for (AnnotationValue ann : (Set<AnnotationValue>) listAnn.getValues().get("value")) {
-                        ((Optional<BigDecimal>) ann.getValue(BigDecimal.class))
+                    for (AnnotationValue<?> ann : listAnn.getAnnotations("value")) {
+                        ann.getValue(BigDecimal.class)
                             .ifPresent(schemaToBind::setMaximum);
                     }
                 });
             element.findAnnotation("jakarta.validation.constraints.DecimalMax$List")
                 .ifPresent(listAnn -> {
-                    for (AnnotationValue ann : (Set<AnnotationValue>) listAnn.getValues().get("value")) {
-                        ((Optional<BigDecimal>) ann.getValue(BigDecimal.class))
+                    for (AnnotationValue<?> ann : listAnn.getAnnotations("value")) {
+                        ann.getValue(BigDecimal.class)
                             .ifPresent(schemaToBind::setMaximum);
                     }
                 });
@@ -1352,31 +1348,31 @@ abstract class AbstractOpenApiVisitor {
             element.findAnnotation("javax.validation.constraints.Email$List")
                 .ifPresent(listAnn -> {
                     schemaToBind.setFormat(PrimitiveType.EMAIL.getCommonName());
-                    for (AnnotationValue ann : (Set<AnnotationValue>) listAnn.getValues().get("value")) {
-                        ((Optional<String>) ann.stringValue("regexp"))
+                    for (AnnotationValue<?> ann : listAnn.getAnnotations("value")) {
+                        ann.stringValue("regexp")
                             .ifPresent(schemaToBind::setPattern);
                     }
                 });
             element.findAnnotation("jakarta.validation.constraints.Email$List")
                 .ifPresent(listAnn -> {
                     schemaToBind.setFormat(PrimitiveType.EMAIL.getCommonName());
-                    for (AnnotationValue ann : (Set<AnnotationValue>) listAnn.getValues().get("value")) {
-                        ((Optional<String>) ann.stringValue("regexp"))
+                    for (AnnotationValue<?> ann : listAnn.getAnnotations("value")) {
+                        ann.stringValue("regexp")
                             .ifPresent(schemaToBind::setPattern);
                     }
                 });
 
             element.findAnnotation("javax.validation.constraints.Pattern$List")
                 .ifPresent(listAnn -> {
-                    for (AnnotationValue ann : (Set<AnnotationValue>) listAnn.getValues().get("value")) {
-                        ((Optional<String>) ann.stringValue("regexp"))
+                    for (AnnotationValue<?> ann : listAnn.getAnnotations("value")) {
+                        ann.stringValue("regexp")
                             .ifPresent(schemaToBind::setPattern);
                     }
                 });
             element.findAnnotation("jakarta.validation.constraints.Pattern$List")
                 .ifPresent(listAnn -> {
-                    for (AnnotationValue ann : (Set<AnnotationValue>) listAnn.getValues().get("value")) {
-                        ((Optional<String>) ann.stringValue("regexp"))
+                    for (AnnotationValue<?> ann : listAnn.getAnnotations("value")) {
+                        ann.stringValue("regexp")
                             .ifPresent(schemaToBind::setPattern);
                     }
                 });
