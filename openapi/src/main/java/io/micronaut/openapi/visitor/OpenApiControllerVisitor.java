@@ -100,16 +100,16 @@ public class OpenApiControllerVisitor extends AbstractOpenApiEndpointVisitor imp
 
         // check env and notEnv
         for (AnnotationValue<Requires> requiresAnn : requiresAnnotations) {
-            Optional<String[]> reqEnvs = requiresAnn.get(RequiresCondition.MEMBER_ENV, String[].class);
-            if (reqEnvs.isPresent()) {
-                boolean result = Arrays.stream(reqEnvs.get()).anyMatch(activeEnvs::contains);
+            String[] reqEnvs = requiresAnn.stringValues(RequiresCondition.MEMBER_ENV);
+            if (reqEnvs.length != 0) {
+                boolean result = Arrays.stream(reqEnvs).anyMatch(activeEnvs::contains);
                 if (!result) {
                     return true;
                 }
             }
-            Optional<String[]> reqNotEnvs = requiresAnn.get(RequiresCondition.MEMBER_NOT_ENV, String[].class);
-            if (reqNotEnvs.isPresent()) {
-                boolean result = Arrays.stream(reqNotEnvs.get()).noneMatch(activeEnvs::contains);
+            String[] reqNotEnvs = requiresAnn.stringValues(RequiresCondition.MEMBER_NOT_ENV);
+            if (reqNotEnvs.length != 0) {
+                boolean result = Arrays.stream(reqNotEnvs).noneMatch(activeEnvs::contains);
                 if (!result) {
                     return true;
                 }
