@@ -3,6 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
     <title>OpenAPI/Swagger Support</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <link rel="stylesheet" href="../css/main.css" type="text/css" media="screen, print" title="Style" charset="utf-8" />
     <link rel="stylesheet" href="../css/custom.css" type="text/css" media="screen, print" title="Style" charset="utf-8" />
@@ -63,23 +64,21 @@
                                 
                                 <div class="toc-item" style="margin-left:0"><a href="#customSerializers"><strong>10</strong><span>Custom serializers</span></a></div>
                                 
-                                <div class="toc-item" style="margin-left:0"><a href="#schemaDecorators"><strong>11</strong><span>Schema decorators</span></a></div>
+                                <div class="toc-item" style="margin-left:0"><a href="#swaggerAnnotations"><strong>11</strong><span>Swagger Annotations</span></a></div>
                                 
-                                <div class="toc-item" style="margin-left:0"><a href="#swaggerAnnotations"><strong>12</strong><span>Swagger Annotations</span></a></div>
+                                <div class="toc-item" style="margin-left:0"><a href="#endpoints"><strong>12</strong><span>Exposing Endpoints</span></a></div>
                                 
-                                <div class="toc-item" style="margin-left:0"><a href="#endpoints"><strong>13</strong><span>Exposing Endpoints</span></a></div>
+                                <div class="toc-item" style="margin-left:0"><a href="#annotationConfiguration"><strong>13</strong><span>Annotation Configuration</span></a></div>
                                 
-                                <div class="toc-item" style="margin-left:0"><a href="#annotationConfiguration"><strong>14</strong><span>Annotation Configuration</span></a></div>
+                                <div class="toc-item" style="margin-left:0"><a href="#mergingSchemas"><strong>14</strong><span>Merging Schemas</span></a></div>
                                 
-                                <div class="toc-item" style="margin-left:0"><a href="#mergingSchemas"><strong>15</strong><span>Merging Schemas</span></a></div>
+                                <div class="toc-item" style="margin-left:0"><a href="#openApiViews"><strong>15</strong><span>Generating OpenAPI Views</span></a></div>
                                 
-                                <div class="toc-item" style="margin-left:0"><a href="#openApiViews"><strong>16</strong><span>Generating OpenAPI Views</span></a></div>
+                                <div class="toc-item" style="margin-left:0"><a href="#serverContext"><strong>16</strong><span>Server Context</span></a></div>
                                 
-                                <div class="toc-item" style="margin-left:0"><a href="#serverContext"><strong>17</strong><span>Server Context</span></a></div>
+                                <div class="toc-item" style="margin-left:0"><a href="#repository"><strong>17</strong><span>Repository</span></a></div>
                                 
-                                <div class="toc-item" style="margin-left:0"><a href="#repository"><strong>18</strong><span>Repository</span></a></div>
-                                
-                                <div class="toc-item" style="margin-left:0"><a href="#breaks"><strong>19</strong><span>Breaking Changes</span></a></div>
+                                <div class="toc-item" style="margin-left:0"><a href="#breaks"><strong>18</strong><span>Breaking Changes</span></a></div>
                                 
                             </div>
                         </div>
@@ -134,75 +133,73 @@
         
         <div class="toc-item" style="margin-left:0px" id="toc-item-customSerializers"><a href="#customSerializers"><strong>10</strong><span>Custom serializers</span></a></div>
         
-        <div class="toc-item" style="margin-left:0px" id="toc-item-schemaDecorators"><a href="#schemaDecorators"><strong>11</strong><span>Schema decorators</span></a></div>
+        <div class="toc-item" style="margin-left:0px" id="toc-item-swaggerAnnotations"><a href="#swaggerAnnotations"><strong>11</strong><span>Swagger Annotations</span></a></div>
         
-        <div class="toc-item" style="margin-left:0px" id="toc-item-swaggerAnnotations"><a href="#swaggerAnnotations"><strong>12</strong><span>Swagger Annotations</span></a></div>
+        <div class="toc-item" style="margin-left:10px" id="toc-item-schemasAndPojos"><a href="#schemasAndPojos"><strong>11.1</strong><span>Schemas and POJOs</span></a></div>
         
-        <div class="toc-item" style="margin-left:10px" id="toc-item-schemasAndPojos"><a href="#schemasAndPojos"><strong>12.1</strong><span>Schemas and POJOs</span></a></div>
+        <div class="toc-item" style="margin-left:10px" id="toc-item-schemasAndMetaAnnotations"><a href="#schemasAndMetaAnnotations"><strong>11.2</strong><span>Schemas and Meta Annotations</span></a></div>
         
-        <div class="toc-item" style="margin-left:10px" id="toc-item-schemasAndMetaAnnotations"><a href="#schemasAndMetaAnnotations"><strong>12.2</strong><span>Schemas and Meta Annotations</span></a></div>
+        <div class="toc-item" style="margin-left:10px" id="toc-item-schemasAndGenerics"><a href="#schemasAndGenerics"><strong>11.3</strong><span>Schemas and Generics</span></a></div>
         
-        <div class="toc-item" style="margin-left:10px" id="toc-item-schemasAndGenerics"><a href="#schemasAndGenerics"><strong>12.3</strong><span>Schemas and Generics</span></a></div>
+        <div class="toc-item" style="margin-left:10px" id="toc-item-schemasNaming"><a href="#schemasNaming"><strong>11.4</strong><span>Schemas naming</span></a></div>
         
-        <div class="toc-item" style="margin-left:10px" id="toc-item-schemasNaming"><a href="#schemasNaming"><strong>12.4</strong><span>Schemas naming</span></a></div>
+        <div class="toc-item" style="margin-left:10px" id="toc-item-schemasAnnotationResolution"><a href="#schemasAnnotationResolution"><strong>11.5</strong><span>Schemas Annotation resolution</span></a></div>
         
-        <div class="toc-item" style="margin-left:10px" id="toc-item-schemasAnnotationResolution"><a href="#schemasAnnotationResolution"><strong>12.5</strong><span>Schemas Annotation resolution</span></a></div>
+        <div class="toc-item" style="margin-left:0px" id="toc-item-endpoints"><a href="#endpoints"><strong>12</strong><span>Exposing Endpoints</span></a></div>
         
-        <div class="toc-item" style="margin-left:0px" id="toc-item-endpoints"><a href="#endpoints"><strong>13</strong><span>Exposing Endpoints</span></a></div>
+        <div class="toc-item" style="margin-left:10px" id="toc-item-enableendpoints"><a href="#enableendpoints"><strong>12.1</strong><span>Enable Endpoints</span></a></div>
         
-        <div class="toc-item" style="margin-left:10px" id="toc-item-enableendpoints"><a href="#enableendpoints"><strong>13.1</strong><span>Enable Endpoints</span></a></div>
+        <div class="toc-item" style="margin-left:10px" id="toc-item-endpointstags"><a href="#endpointstags"><strong>12.2</strong><span>Endpoints Tags</span></a></div>
         
-        <div class="toc-item" style="margin-left:10px" id="toc-item-endpointstags"><a href="#endpointstags"><strong>13.2</strong><span>Endpoints Tags</span></a></div>
+        <div class="toc-item" style="margin-left:10px" id="toc-item-micronautendpoints"><a href="#micronautendpoints"><strong>12.3</strong><span>Micronaut Built-In Endpoints</span></a></div>
         
-        <div class="toc-item" style="margin-left:10px" id="toc-item-micronautendpoints"><a href="#micronautendpoints"><strong>13.3</strong><span>Micronaut Built-In Endpoints</span></a></div>
+        <div class="toc-item" style="margin-left:10px" id="toc-item-endpointservers"><a href="#endpointservers"><strong>12.4</strong><span>Endpoints Servers</span></a></div>
         
-        <div class="toc-item" style="margin-left:10px" id="toc-item-endpointservers"><a href="#endpointservers"><strong>13.4</strong><span>Endpoints Servers</span></a></div>
+        <div class="toc-item" style="margin-left:10px" id="toc-item-endpointssecurityrequirements"><a href="#endpointssecurityrequirements"><strong>12.5</strong><span>Endpoints Security Requirements</span></a></div>
         
-        <div class="toc-item" style="margin-left:10px" id="toc-item-endpointssecurityrequirements"><a href="#endpointssecurityrequirements"><strong>13.5</strong><span>Endpoints Security Requirements</span></a></div>
+        <div class="toc-item" style="margin-left:10px" id="toc-item-endpointspath"><a href="#endpointspath"><strong>12.6</strong><span>Endpoints Path</span></a></div>
         
-        <div class="toc-item" style="margin-left:10px" id="toc-item-endpointspath"><a href="#endpointspath"><strong>13.6</strong><span>Endpoints Path</span></a></div>
+        <div class="toc-item" style="margin-left:0px" id="toc-item-annotationConfiguration"><a href="#annotationConfiguration"><strong>13</strong><span>Annotation Configuration</span></a></div>
         
-        <div class="toc-item" style="margin-left:0px" id="toc-item-annotationConfiguration"><a href="#annotationConfiguration"><strong>14</strong><span>Annotation Configuration</span></a></div>
+        <div class="toc-item" style="margin-left:10px" id="toc-item-openapiinclude"><a href="#openapiinclude"><strong>13.1</strong><span>@OpenAPIInclude</span></a></div>
         
-        <div class="toc-item" style="margin-left:10px" id="toc-item-openapiinclude"><a href="#openapiinclude"><strong>14.1</strong><span>@OpenAPIInclude</span></a></div>
+        <div class="toc-item" style="margin-left:10px" id="toc-item-openapimanagement"><a href="#openapimanagement"><strong>13.2</strong><span>@OpenAPIManagement</span></a></div>
         
-        <div class="toc-item" style="margin-left:10px" id="toc-item-openapimanagement"><a href="#openapimanagement"><strong>14.2</strong><span>@OpenAPIManagement</span></a></div>
+        <div class="toc-item" style="margin-left:10px" id="toc-item-openapisecurity"><a href="#openapisecurity"><strong>13.3</strong><span>@OpenAPISecurity</span></a></div>
         
-        <div class="toc-item" style="margin-left:10px" id="toc-item-openapisecurity"><a href="#openapisecurity"><strong>14.3</strong><span>@OpenAPISecurity</span></a></div>
+        <div class="toc-item" style="margin-left:10px" id="toc-item-accessorsStyle"><a href="#accessorsStyle"><strong>13.4</strong><span>@AccessorsStyle</span></a></div>
         
-        <div class="toc-item" style="margin-left:10px" id="toc-item-accessorsStyle"><a href="#accessorsStyle"><strong>14.4</strong><span>@AccessorsStyle</span></a></div>
+        <div class="toc-item" style="margin-left:0px" id="toc-item-mergingSchemas"><a href="#mergingSchemas"><strong>14</strong><span>Merging Schemas</span></a></div>
         
-        <div class="toc-item" style="margin-left:0px" id="toc-item-mergingSchemas"><a href="#mergingSchemas"><strong>15</strong><span>Merging Schemas</span></a></div>
+        <div class="toc-item" style="margin-left:0px" id="toc-item-openApiViews"><a href="#openApiViews"><strong>15</strong><span>Generating OpenAPI Views</span></a></div>
         
-        <div class="toc-item" style="margin-left:0px" id="toc-item-openApiViews"><a href="#openApiViews"><strong>16</strong><span>Generating OpenAPI Views</span></a></div>
+        <div class="toc-item" style="margin-left:10px" id="toc-item-mappingPath"><a href="#mappingPath"><strong>15.1</strong><span>Mapping Path</span></a></div>
         
-        <div class="toc-item" style="margin-left:10px" id="toc-item-mappingPath"><a href="#mappingPath"><strong>16.1</strong><span>Mapping Path</span></a></div>
+        <div class="toc-item" style="margin-left:10px" id="toc-item-viewsGenerationWithPropertiesFile"><a href="#viewsGenerationWithPropertiesFile"><strong>15.2</strong><span>Enable Views Generation with a properties file</span></a></div>
         
-        <div class="toc-item" style="margin-left:10px" id="toc-item-viewsGenerationWithPropertiesFile"><a href="#viewsGenerationWithPropertiesFile"><strong>16.2</strong><span>Enable Views Generation with a properties file</span></a></div>
+        <div class="toc-item" style="margin-left:10px" id="toc-item-viewsGenerationWithSystemProperties"><a href="#viewsGenerationWithSystemProperties"><strong>15.3</strong><span>Enable Views Generation with system properties</span></a></div>
         
-        <div class="toc-item" style="margin-left:10px" id="toc-item-viewsGenerationWithSystemProperties"><a href="#viewsGenerationWithSystemProperties"><strong>16.3</strong><span>Enable Views Generation with system properties</span></a></div>
+        <div class="toc-item" style="margin-left:10px" id="toc-item-swaggerui"><a href="#swaggerui"><strong>15.4</strong><span>Swagger-UI</span></a></div>
         
-        <div class="toc-item" style="margin-left:10px" id="toc-item-swaggerui"><a href="#swaggerui"><strong>16.4</strong><span>Swagger-UI</span></a></div>
+        <div class="toc-item" style="margin-left:20px" id="toc-item-oauth2"><a href="#oauth2"><strong>15.4.1</strong><span>Swagger UI - OAuth 2.0 configuration</span></a></div>
         
-        <div class="toc-item" style="margin-left:20px" id="toc-item-oauth2"><a href="#oauth2"><strong>16.4.1</strong><span>Swagger UI - OAuth 2.0 configuration</span></a></div>
+        <div class="toc-item" style="margin-left:10px" id="toc-item-redoc"><a href="#redoc"><strong>15.5</strong><span>Redoc</span></a></div>
         
-        <div class="toc-item" style="margin-left:10px" id="toc-item-redoc"><a href="#redoc"><strong>16.5</strong><span>Redoc</span></a></div>
+        <div class="toc-item" style="margin-left:10px" id="toc-item-rapidoc"><a href="#rapidoc"><strong>15.6</strong><span>RapiDoc</span></a></div>
         
-        <div class="toc-item" style="margin-left:10px" id="toc-item-rapidoc"><a href="#rapidoc"><strong>16.6</strong><span>RapiDoc</span></a></div>
+        <div class="toc-item" style="margin-left:10px" id="toc-item-rapipdf"><a href="#rapipdf"><strong>15.7</strong><span>RapiPdf</span></a></div>
         
-        <div class="toc-item" style="margin-left:10px" id="toc-item-rapipdf"><a href="#rapipdf"><strong>16.7</strong><span>RapiPdf</span></a></div>
+        <div class="toc-item" style="margin-left:0px" id="toc-item-serverContext"><a href="#serverContext"><strong>16</strong><span>Server Context</span></a></div>
         
-        <div class="toc-item" style="margin-left:0px" id="toc-item-serverContext"><a href="#serverContext"><strong>17</strong><span>Server Context</span></a></div>
+        <div class="toc-item" style="margin-left:10px" id="toc-item-compileResolution"><a href="#compileResolution"><strong>16.1</strong><span>Compile Time Resolution</span></a></div>
         
-        <div class="toc-item" style="margin-left:10px" id="toc-item-compileResolution"><a href="#compileResolution"><strong>17.1</strong><span>Compile Time Resolution</span></a></div>
+        <div class="toc-item" style="margin-left:10px" id="toc-item-serverFilter"><a href="#serverFilter"><strong>16.2</strong><span>HttpServerFilter</span></a></div>
         
-        <div class="toc-item" style="margin-left:10px" id="toc-item-serverFilter"><a href="#serverFilter"><strong>17.2</strong><span>HttpServerFilter</span></a></div>
+        <div class="toc-item" style="margin-left:10px" id="toc-item-urlParameter"><a href="#urlParameter"><strong>16.3</strong><span>URL Parameter</span></a></div>
         
-        <div class="toc-item" style="margin-left:10px" id="toc-item-urlParameter"><a href="#urlParameter"><strong>17.3</strong><span>URL Parameter</span></a></div>
+        <div class="toc-item" style="margin-left:0px" id="toc-item-repository"><a href="#repository"><strong>17</strong><span>Repository</span></a></div>
         
-        <div class="toc-item" style="margin-left:0px" id="toc-item-repository"><a href="#repository"><strong>18</strong><span>Repository</span></a></div>
-        
-        <div class="toc-item" style="margin-left:0px" id="toc-item-breaks"><a href="#breaks"><strong>19</strong><span>Breaking Changes</span></a></div>
+        <div class="toc-item" style="margin-left:0px" id="toc-item-breaks"><a href="#breaks"><strong>18</strong><span>Breaking Changes</span></a></div>
         
         </div>
     </div>
@@ -218,7 +215,7 @@
 <h1 id="introduction"><a class="anchor" href="#introduction"></a>1 Introduction</h1>
 
 <div class='contribute-btn'>
-    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/4.8.x/src/main/docs/guide/introduction.adoc"'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/introduction.adoc"'>
         <i class='fa fa-pencil-square-o'></i> Improve this doc
     </button>
 </div>
@@ -237,7 +234,7 @@
 <h1 id="releaseHistory"><a class="anchor" href="#releaseHistory"></a>2 Release History</h1>
 
 <div class='contribute-btn'>
-    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/4.8.x/src/main/docs/guide/releaseHistory.adoc"'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/releaseHistory.adoc"'>
         <i class='fa fa-pencil-square-o'></i> Improve this doc
     </button>
 </div>
@@ -253,7 +250,7 @@
 <h1 id="cli"><a class="anchor" href="#cli"></a>3 Using the Micronaut CLI</h1>
 
 <div class='contribute-btn'>
-    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/4.8.x/src/main/docs/guide/cli.adoc"'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/cli.adoc"'>
         <i class='fa fa-pencil-square-o'></i> Improve this doc
     </button>
 </div>
@@ -277,7 +274,7 @@
 <h1 id="gettingStarted"><a class="anchor" href="#gettingStarted"></a>4 Dependencies</h1>
 
 <div class='contribute-btn'>
-    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/4.8.x/src/main/docs/guide/gettingStarted.adoc"'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/gettingStarted.adoc"'>
         <i class='fa fa-pencil-square-o'></i> Improve this doc
     </button>
 </div>
@@ -290,7 +287,7 @@
 <p>        <div class="listingblock multi-language-sample">
 <div class="title"></div>
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="gradle">annotationProcessor(<span class="hljs-string">"io.micronaut.openapi:micronaut-openapi:4.8.3-SNAPSHOT")</span></code></pre>
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="gradle">annotationProcessor(<span class="hljs-string">"io.micronaut.openapi:micronaut-openapi:5.0.0-SNAPSHOT")</span></code></pre>
 </div>
 </div>
 <div class="listingblock multi-language-sample">
@@ -300,7 +297,7 @@
     &lt;path&gt;
         &lt;groupId&gt;io.micronaut.openapi&lt;/groupId&gt;
         &lt;artifactId&gt;micronaut-openapi&lt;/artifactId&gt;
-        &lt;version&gt;4.8.3-SNAPSHOT&lt;/version&gt;
+        &lt;version&gt;5.0.0-SNAPSHOT&lt;/version&gt;
     &lt;/path&gt;
 &lt;/annotationProcessorPaths&gt;</code></pre>
 </div>
@@ -341,7 +338,7 @@ For Kotlin the <code>openapi</code> dependency should be in the <code>kapt</code
 <h1 id="openApiDefinition"><a class="anchor" href="#openApiDefinition"></a>5 OpenAPI Definition</h1>
 
 <div class='contribute-btn'>
-    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/4.8.x/src/main/docs/guide/openApiDefinition.adoc"'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/openApiDefinition.adoc"'>
         <i class='fa fa-pencil-square-o'></i> Improve this doc
     </button>
 </div>
@@ -467,7 +464,7 @@ info:
 <h1 id="configuration"><a class="anchor" href="#configuration"></a>6 OpenAPI Processing Options</h1>
 
 <div class='contribute-btn'>
-    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/4.8.x/src/main/docs/guide/configuration.adoc"'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/configuration.adoc"'>
         <i class='fa fa-pencil-square-o'></i> Improve this doc
     </button>
 </div>
@@ -480,7 +477,7 @@ info:
 <h2 id="propertiesFileConfiguration"><a class="anchor" href="#propertiesFileConfiguration"></a>6.1 Configuring OpenAPI Processing with a properties file</h2>
 
 <div class='contribute-btn'>
-    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/4.8.x/src/main/docs/guide/configuration/propertiesFileConfiguration.adoc"'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/configuration/propertiesFileConfiguration.adoc"'>
         <i class='fa fa-pencil-square-o'></i> Improve this doc
     </button>
 </div>
@@ -559,7 +556,7 @@ info:
 <h2 id="systemPropertyConfiguration"><a class="anchor" href="#systemPropertyConfiguration"></a>6.2 Configuring OpenAPI Processing with system properties</h2>
 
 <div class='contribute-btn'>
-    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/4.8.x/src/main/docs/guide/configuration/systemPropertyConfiguration.adoc"'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/configuration/systemPropertyConfiguration.adoc"'>
         <i class='fa fa-pencil-square-o'></i> Improve this doc
     </button>
 </div>
@@ -617,7 +614,7 @@ info:
 <h1 id="exposingSwaggerOutput"><a class="anchor" href="#exposingSwaggerOutput"></a>7 Exposing Swagger Output</h1>
 
 <div class='contribute-btn'>
-    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/4.8.x/src/main/docs/guide/exposingSwaggerOutput.adoc"'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/exposingSwaggerOutput.adoc"'>
         <i class='fa fa-pencil-square-o'></i> Improve this doc
     </button>
 </div>
@@ -644,14 +641,14 @@ info:
 <h1 id="controllers"><a class="anchor" href="#controllers"></a>8 OpenAPI Generation for Controllers</h1>
 
 <div class='contribute-btn'>
-    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/4.8.x/src/main/docs/guide/controllers.adoc"'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/controllers.adoc"'>
         <i class='fa fa-pencil-square-o'></i> Improve this doc
     </button>
 </div>
 
 
 <div class="paragraph">
-<p>By default Micronaut will automatically at compile time build out the Swagger YAML definition from your defined controllers and methods. For example given the following class:</p>
+<p>By default, Micronaut will automatically at compile time build out the Swagger YAML definition from your defined controllers and methods. For example given the following class:</p>
 </div>
 <div class="listingblock multi-language-sample">
 <div class="title">Hello World Example</div>
@@ -781,7 +778,7 @@ paths:
 <h1 id="namingstrategy"><a class="anchor" href="#namingstrategy"></a>9 Naming Strategy</h1>
 
 <div class='contribute-btn'>
-    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/4.8.x/src/main/docs/guide/namingstrategy.adoc"'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/namingstrategy.adoc"'>
         <i class='fa fa-pencil-square-o'></i> Improve this doc
     </button>
 </div>
@@ -820,7 +817,7 @@ the following <strong>jackson</strong>'s <code>PropertyNamingStrategy</code>:</p
 <h1 id="customSerializers"><a class="anchor" href="#customSerializers"></a>10 Custom serializers</h1>
 
 <div class='contribute-btn'>
-    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/4.8.x/src/main/docs/guide/customSerializers.adoc"'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/customSerializers.adoc"'>
         <i class='fa fa-pencil-square-o'></i> Improve this doc
     </button>
 </div>
@@ -935,62 +932,10 @@ After changing these settings, a complete recompilation of the project is necess
 </table>
 </div>
 
-<h1 id="schemaDecorators"><a class="anchor" href="#schemaDecorators"></a>11 Schema decorators</h1>
+<h1 id="swaggerAnnotations"><a class="anchor" href="#swaggerAnnotations"></a>11 Swagger Annotations</h1>
 
 <div class='contribute-btn'>
-    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/4.8.x/src/main/docs/guide/schemaDecorators.adoc"'>
-        <i class='fa fa-pencil-square-o'></i> Improve this doc
-    </button>
-</div>
-
-
-<div class="paragraph">
-<p>If you have some classes with same names in different packages you can set postfix like this:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">micronaut:
-  openapi:
-    schema-postfix:
-      org.api.v1_0_0: 1_0_0
-      org.api.v2_0_0: 2_0_0</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>or by system properties:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-none hljs">-Dmicronaut.openapi.schema-postfix.org.api.v1_0_0=1_0_0 -Dmicronaut.openapi.schema-postfix.org.api.v2_0_0=2_0_0</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>or by openapi.properties</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">micronaut.openapi.schema-postfix.org.api.v1_0_0=1_0_0
-micronaut.openapi.schema-postfix.org.api.v2_0_0=2_0_0</code></pre>
-</div>
-</div>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-note" title="Note"></i>
-</td>
-<td class="content">
-Important!
-After changing these settings, a complete recompilation of the project is necessary to ensure that the new settings are applied correctly.
-</td>
-</tr>
-</table>
-</div>
-
-<h1 id="swaggerAnnotations"><a class="anchor" href="#swaggerAnnotations"></a>12 Swagger Annotations</h1>
-
-<div class='contribute-btn'>
-    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/4.8.x/src/main/docs/guide/swaggerAnnotations.adoc"'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/swaggerAnnotations.adoc"'>
         <i class='fa fa-pencil-square-o'></i> Improve this doc
     </button>
 </div>
@@ -1174,10 +1119,10 @@ paths:
 </div>
 </div>
 
-<h2 id="schemasAndPojos"><a class="anchor" href="#schemasAndPojos"></a>12.1 Schemas and POJOs</h2>
+<h2 id="schemasAndPojos"><a class="anchor" href="#schemasAndPojos"></a>11.1 Schemas and POJOs</h2>
 
 <div class='contribute-btn'>
-    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/4.8.x/src/main/docs/guide/swaggerAnnotations/schemasAndPojos.adoc"'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/swaggerAnnotations/schemasAndPojos.adoc"'>
         <i class='fa fa-pencil-square-o'></i> Improve this doc
     </button>
 </div>
@@ -1229,7 +1174,7 @@ class Pet {
 }
 
 enum PetType {
-    DOG, CAT;
+    DOG, CAT
 }</code></pre>
 </div>
 </div>
@@ -1246,10 +1191,10 @@ enum PetType {
 </table>
 </div>
 
-<h2 id="schemasAndMetaAnnotations"><a class="anchor" href="#schemasAndMetaAnnotations"></a>12.2 Schemas and Meta Annotations</h2>
+<h2 id="schemasAndMetaAnnotations"><a class="anchor" href="#schemasAndMetaAnnotations"></a>11.2 Schemas and Meta Annotations</h2>
 
 <div class='contribute-btn'>
-    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/4.8.x/src/main/docs/guide/swaggerAnnotations/schemasAndMetaAnnotations.adoc"'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/swaggerAnnotations/schemasAndMetaAnnotations.adoc"'>
         <i class='fa fa-pencil-square-o'></i> Improve this doc
     </button>
 </div>
@@ -1276,10 +1221,10 @@ enum PetType {
 <p>Then whenever <code>Pet</code> is used as a parameter you can annotate the parameter with <code>@MyAnn</code>.</p>
 </div>
 
-<h2 id="schemasAndGenerics"><a class="anchor" href="#schemasAndGenerics"></a>12.3 Schemas and Generics</h2>
+<h2 id="schemasAndGenerics"><a class="anchor" href="#schemasAndGenerics"></a>11.3 Schemas and Generics</h2>
 
 <div class='contribute-btn'>
-    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/4.8.x/src/main/docs/guide/swaggerAnnotations/schemasAndGenerics.adoc"'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/swaggerAnnotations/schemasAndGenerics.adoc"'>
         <i class='fa fa-pencil-square-o'></i> Improve this doc
     </button>
 </div>
@@ -1295,7 +1240,7 @@ enum PetType {
     private T r;
     public T getResult() {
         return r;
-    };
+    }
 }
 
 @Controller("/")
@@ -1325,17 +1270,17 @@ public Response&lt;Pet&gt; updatePet(Pet pet) {
 <p>In the above case the generated schema will be named <code>#/components/schemas/ResponseOfPet</code>.</p>
 </div>
 
-<h2 id="schemasNaming"><a class="anchor" href="#schemasNaming"></a>12.4 Schemas naming</h2>
+<h2 id="schemasNaming"><a class="anchor" href="#schemasNaming"></a>11.4 Schemas naming</h2>
 
 <div class='contribute-btn'>
-    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/4.8.x/src/main/docs/guide/swaggerAnnotations/schemasNaming.adoc"'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/swaggerAnnotations/schemasNaming.adoc"'>
         <i class='fa fa-pencil-square-o'></i> Improve this doc
     </button>
 </div>
 
 
 <div class="paragraph">
-<p>By default Micronaut uses Class simple name for Custom type schemas. Micronaut use simple name no matter if <code>@Schema</code>
+<p>By default, Micronaut uses Class simple name for Custom type schemas. Micronaut use simple name no matter if <code>@Schema</code>
 annotation is defined on type or on property (getter). That means that if you have two properties of same type with <code>@Schema</code>
 annotation without <code>name</code> set, Micronaut will accidentally override one definition with another. So in that case you should
 set <code>name</code> on <code>@Schema</code> annotation.</p>
@@ -1393,10 +1338,10 @@ class Owner {
 </table>
 </div>
 
-<h2 id="schemasAnnotationResolution"><a class="anchor" href="#schemasAnnotationResolution"></a>12.5 Schemas Annotation resolution</h2>
+<h2 id="schemasAnnotationResolution"><a class="anchor" href="#schemasAnnotationResolution"></a>11.5 Schemas Annotation resolution</h2>
 
 <div class='contribute-btn'>
-    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/4.8.x/src/main/docs/guide/swaggerAnnotations/schemasAnnotationResolution.adoc"'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/swaggerAnnotations/schemasAnnotationResolution.adoc"'>
         <i class='fa fa-pencil-square-o'></i> Improve this doc
     </button>
 </div>
@@ -1448,10 +1393,10 @@ class Owner {
 </table>
 </div>
 
-<h1 id="endpoints"><a class="anchor" href="#endpoints"></a>13 Exposing Endpoints</h1>
+<h1 id="endpoints"><a class="anchor" href="#endpoints"></a>12 Exposing Endpoints</h1>
 
 <div class='contribute-btn'>
-    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/4.8.x/src/main/docs/guide/endpoints.adoc"'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/endpoints.adoc"'>
         <i class='fa fa-pencil-square-o'></i> Improve this doc
     </button>
 </div>
@@ -1461,10 +1406,10 @@ class Owner {
 <p>It is possible to expose management Endpoints in the openapi specification file.</p>
 </div>
 
-<h2 id="enableendpoints"><a class="anchor" href="#enableendpoints"></a>13.1 Enable Endpoints</h2>
+<h2 id="enableendpoints"><a class="anchor" href="#enableendpoints"></a>12.1 Enable Endpoints</h2>
 
 <div class='contribute-btn'>
-    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/4.8.x/src/main/docs/guide/endpoints/enableendpoints.adoc"'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/endpoints/enableendpoints.adoc"'>
         <i class='fa fa-pencil-square-o'></i> Improve this doc
     </button>
 </div>
@@ -1483,10 +1428,10 @@ class Owner {
 </div>
 </div>
 
-<h2 id="endpointstags"><a class="anchor" href="#endpointstags"></a>13.2 Endpoints Tags</h2>
+<h2 id="endpointstags"><a class="anchor" href="#endpointstags"></a>12.2 Endpoints Tags</h2>
 
 <div class='contribute-btn'>
-    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/4.8.x/src/main/docs/guide/endpoints/endpointstags.adoc"'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/endpoints/endpointstags.adoc"'>
         <i class='fa fa-pencil-square-o'></i> Improve this doc
     </button>
 </div>
@@ -1498,14 +1443,14 @@ class Owner {
 <div class="listingblock">
 <div class="title">openapi.properties</div>
 <div class="content">
-<pre>endpoints.tags=Management Endpoints</pre>
+<pre>endpoints.tags=Management Enpoints</pre>
 </div>
 </div>
 
-<h2 id="micronautendpoints"><a class="anchor" href="#micronautendpoints"></a>13.3 Micronaut Built-In Endpoints</h2>
+<h2 id="micronautendpoints"><a class="anchor" href="#micronautendpoints"></a>12.3 Micronaut Built-In Endpoints</h2>
 
 <div class='contribute-btn'>
-    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/4.8.x/src/main/docs/guide/endpoints/micronautendpoints.adoc"'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/endpoints/micronautendpoints.adoc"'>
         <i class='fa fa-pencil-square-o'></i> Improve this doc
     </button>
 </div>
@@ -1518,7 +1463,7 @@ class Owner {
 <p>        <div class="listingblock multi-language-sample">
 <div class="title"></div>
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="gradle">annotationProcessor(<span class="hljs-string">"io.micronaut:micronaut-management:4.8.3-SNAPSHOT")</span></code></pre>
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="gradle">annotationProcessor(<span class="hljs-string">"io.micronaut:micronaut-management:5.0.0-SNAPSHOT")</span></code></pre>
 </div>
 </div>
 <div class="listingblock multi-language-sample">
@@ -1528,7 +1473,7 @@ class Owner {
     &lt;path&gt;
         &lt;groupId&gt;io.micronaut&lt;/groupId&gt;
         &lt;artifactId&gt;micronaut-management&lt;/artifactId&gt;
-        &lt;version&gt;4.8.3-SNAPSHOT&lt;/version&gt;
+        &lt;version&gt;5.0.0-SNAPSHOT&lt;/version&gt;
     &lt;/path&gt;
 &lt;/annotationProcessorPaths&gt;</code></pre>
 </div>
@@ -1538,7 +1483,7 @@ class Owner {
 <p>        <div class="listingblock multi-language-sample">
 <div class="title"></div>
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="gradle">implementation(<span class="hljs-string">"io.micronaut:micronaut-management:4.8.3-SNAPSHOT")</span></code></pre>
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="gradle">implementation(<span class="hljs-string">"io.micronaut:micronaut-management:5.0.0-SNAPSHOT")</span></code></pre>
 </div>
 </div>
 <div class="listingblock multi-language-sample">
@@ -1546,7 +1491,7 @@ class Owner {
 <pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="maven">&lt;dependency&gt;
     &lt;groupId&gt;io.micronaut&lt;/groupId&gt;
     &lt;artifactId&gt;micronaut-management&lt;/artifactId&gt;
-    &lt;version&gt;4.8.3-SNAPSHOT&lt;/version&gt;
+    &lt;version&gt;5.0.0-SNAPSHOT&lt;/version&gt;
 &lt;/dependency&gt;</code></pre>
 </div>
 </div></p>
@@ -1577,10 +1522,10 @@ endpoints.refresh.security-requirements=[{"petstore_auth": ["write:pets", "read:
 </div>
 </div>
 
-<h2 id="endpointservers"><a class="anchor" href="#endpointservers"></a>13.4 Endpoints Servers</h2>
+<h2 id="endpointservers"><a class="anchor" href="#endpointservers"></a>12.4 Endpoints Servers</h2>
 
 <div class='contribute-btn'>
-    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/4.8.x/src/main/docs/guide/endpoints/endpointservers.adoc"'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/endpoints/endpointservers.adoc"'>
         <i class='fa fa-pencil-square-o'></i> Improve this doc
     </button>
 </div>
@@ -1616,10 +1561,10 @@ endpoints.refresh.security-requirements=[{"petstore_auth": ["write:pets", "read:
 </div>
 </div>
 
-<h2 id="endpointssecurityrequirements"><a class="anchor" href="#endpointssecurityrequirements"></a>13.5 Endpoints Security Requirements</h2>
+<h2 id="endpointssecurityrequirements"><a class="anchor" href="#endpointssecurityrequirements"></a>12.5 Endpoints Security Requirements</h2>
 
 <div class='contribute-btn'>
-    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/4.8.x/src/main/docs/guide/endpoints/endpointssecurityrequirements.adoc"'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/endpoints/endpointssecurityrequirements.adoc"'>
         <i class='fa fa-pencil-square-o'></i> Improve this doc
     </button>
 </div>
@@ -1641,10 +1586,10 @@ endpoints.refresh.security-requirements=[{"petstore_auth": ["write:pets", "read:
 <p>Don&#8217;t forget to declare the referenced <code>SecurityScheme</code>.</p>
 </div>
 
-<h2 id="endpointspath"><a class="anchor" href="#endpointspath"></a>13.6 Endpoints Path</h2>
+<h2 id="endpointspath"><a class="anchor" href="#endpointspath"></a>12.6 Endpoints Path</h2>
 
 <div class='contribute-btn'>
-    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/4.8.x/src/main/docs/guide/endpoints/endpointspath.adoc"'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/endpoints/endpointspath.adoc"'>
         <i class='fa fa-pencil-square-o'></i> Improve this doc
     </button>
 </div>
@@ -1663,10 +1608,10 @@ endpoints.refresh.security-requirements=[{"petstore_auth": ["write:pets", "read:
 </div>
 </div>
 
-<h1 id="annotationConfiguration"><a class="anchor" href="#annotationConfiguration"></a>14 Annotation Configuration</h1>
+<h1 id="annotationConfiguration"><a class="anchor" href="#annotationConfiguration"></a>13 Annotation Configuration</h1>
 
 <div class='contribute-btn'>
-    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/4.8.x/src/main/docs/guide/annotationConfiguration.adoc"'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/annotationConfiguration.adoc"'>
         <i class='fa fa-pencil-square-o'></i> Improve this doc
     </button>
 </div>
@@ -1682,7 +1627,7 @@ endpoints.refresh.security-requirements=[{"petstore_auth": ["write:pets", "read:
 <p>        <div class="listingblock multi-language-sample">
 <div class="title"></div>
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="gradle">implementation(<span class="hljs-string">"io.micronaut.openapi:micronaut-openapi:4.8.3-SNAPSHOT")</span></code></pre>
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="gradle">implementation(<span class="hljs-string">"io.micronaut.openapi:micronaut-openapi:5.0.0-SNAPSHOT")</span></code></pre>
 </div>
 </div>
 <div class="listingblock multi-language-sample">
@@ -1690,16 +1635,16 @@ endpoints.refresh.security-requirements=[{"petstore_auth": ["write:pets", "read:
 <pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="maven">&lt;dependency&gt;
     &lt;groupId&gt;io.micronaut.openapi&lt;/groupId&gt;
     &lt;artifactId&gt;micronaut-openapi&lt;/artifactId&gt;
-    &lt;version&gt;4.8.3-SNAPSHOT&lt;/version&gt;
+    &lt;version&gt;5.0.0-SNAPSHOT&lt;/version&gt;
 &lt;/dependency&gt;</code></pre>
 </div>
 </div></p>
 </div>
 
-<h2 id="openapiinclude"><a class="anchor" href="#openapiinclude"></a>14.1 @OpenAPIInclude</h2>
+<h2 id="openapiinclude"><a class="anchor" href="#openapiinclude"></a>13.1 @OpenAPIInclude</h2>
 
 <div class='contribute-btn'>
-    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/4.8.x/src/main/docs/guide/annotationConfiguration/openapiinclude.adoc"'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/annotationConfiguration/openapiinclude.adoc"'>
         <i class='fa fa-pencil-square-o'></i> Improve this doc
     </button>
 </div>
@@ -1739,10 +1684,10 @@ public class Application {
 </div>
 </div>
 
-<h2 id="openapimanagement"><a class="anchor" href="#openapimanagement"></a>14.2 @OpenAPIManagement</h2>
+<h2 id="openapimanagement"><a class="anchor" href="#openapimanagement"></a>13.2 @OpenAPIManagement</h2>
 
 <div class='contribute-btn'>
-    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/4.8.x/src/main/docs/guide/annotationConfiguration/openapimanagement.adoc"'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/annotationConfiguration/openapimanagement.adoc"'>
         <i class='fa fa-pencil-square-o'></i> Improve this doc
     </button>
 </div>
@@ -1769,10 +1714,10 @@ io.micronaut.management.endpoint.threads.ThreadDumpEndpoint }
 </div>
 </div>
 
-<h2 id="openapisecurity"><a class="anchor" href="#openapisecurity"></a>14.3 @OpenAPISecurity</h2>
+<h2 id="openapisecurity"><a class="anchor" href="#openapisecurity"></a>13.3 @OpenAPISecurity</h2>
 
 <div class='contribute-btn'>
-    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/4.8.x/src/main/docs/guide/annotationConfiguration/openapisecurity.adoc"'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/annotationConfiguration/openapisecurity.adoc"'>
         <i class='fa fa-pencil-square-o'></i> Improve this doc
     </button>
 </div>
@@ -1792,10 +1737,10 @@ classes = { io.micronaut.security.endpoints.LoginController.class, io.micronaut.
 </div>
 </div>
 
-<h2 id="accessorsStyle"><a class="anchor" href="#accessorsStyle"></a>14.4 @AccessorsStyle</h2>
+<h2 id="accessorsStyle"><a class="anchor" href="#accessorsStyle"></a>13.4 @AccessorsStyle</h2>
 
 <div class='contribute-btn'>
-    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/4.8.x/src/main/docs/guide/annotationConfiguration/accessorsStyle.adoc"'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/annotationConfiguration/accessorsStyle.adoc"'>
         <i class='fa fa-pencil-square-o'></i> Improve this doc
     </button>
 </div>
@@ -1817,7 +1762,7 @@ class Person {
     private Integer debtValue;
     private Integer totalGoals;
 
-    public Person(String name, Integer debtValue, Integer totalGoals) {
+    Person(String name, Integer debtValue, Integer totalGoals) {
         this.name = name;
         this.debtValue = debtValue;
         this.totalGoals = totalGoals;
@@ -1865,10 +1810,10 @@ class Person {
 <p>Using <code>@AccessorsStyle</code> will tell Micronaut how to access getters and setters and will also generate the appropriate Open API spec.</p>
 </div>
 
-<h1 id="mergingSchemas"><a class="anchor" href="#mergingSchemas"></a>15 Merging Schemas</h1>
+<h1 id="mergingSchemas"><a class="anchor" href="#mergingSchemas"></a>14 Merging Schemas</h1>
 
 <div class='contribute-btn'>
-    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/4.8.x/src/main/docs/guide/mergingSchemas.adoc"'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/mergingSchemas.adoc"'>
         <i class='fa fa-pencil-square-o'></i> Improve this doc
     </button>
 </div>
@@ -2027,17 +1972,17 @@ paths:
 <p>Micronaut will include the endpoints defined in those files in the generated output.</p>
 </div>
 
-<h1 id="openApiViews"><a class="anchor" href="#openApiViews"></a>16 Generating OpenAPI Views</h1>
+<h1 id="openApiViews"><a class="anchor" href="#openApiViews"></a>15 Generating OpenAPI Views</h1>
 
 <div class='contribute-btn'>
-    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/4.8.x/src/main/docs/guide/openApiViews.adoc"'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/openApiViews.adoc"'>
         <i class='fa fa-pencil-square-o'></i> Improve this doc
     </button>
 </div>
 
 
 <div class="paragraph">
-<p>Micronaut can generate views for your generated OpenApi specification. Currently <a href="https://github.com/swagger-api/swagger-ui">Swagger-ui</a>, <a href="https://github.com/Rebilly/ReDoc">Redoc</a> and <a href="https://github.com/mrin9/RapiDoc">RapiDoc</a> are supported.
+<p>Micronaut can generate views for your generated OpenApi specification. Currently, <a href="https://github.com/swagger-api/swagger-ui">Swagger-ui</a>, <a href="https://github.com/Rebilly/ReDoc">Redoc</a> and <a href="https://github.com/mrin9/RapiDoc">RapiDoc</a> are supported.
 You can also use <a href="https://mrin9.github.io/RapiPdf/">RapiPdf</a> to generate a PDF from your spec file.</p>
 </div>
 <div class="paragraph">
@@ -2047,10 +1992,10 @@ You can also use <a href="https://mrin9.github.io/RapiPdf/">RapiPdf</a> to gener
 <p>The resources needed to render the views (javascript, css, &#8230;&#8203;) are loaded from CDNs: <a href="https://unpkg.com">unpkg.com</a> and <a href="https://fonts.googleapis.com/">fonts.googleapis.com</a>.</p>
 </div>
 
-<h2 id="mappingPath"><a class="anchor" href="#mappingPath"></a>16.1 Mapping Path</h2>
+<h2 id="mappingPath"><a class="anchor" href="#mappingPath"></a>15.1 Mapping Path</h2>
 
 <div class='contribute-btn'>
-    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/4.8.x/src/main/docs/guide/openApiViews/mappingPath.adoc"'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/openApiViews/mappingPath.adoc"'>
         <i class='fa fa-pencil-square-o'></i> Improve this doc
     </button>
 </div>
@@ -2081,10 +2026,10 @@ You can also use <a href="https://mrin9.github.io/RapiPdf/">RapiPdf</a> to gener
 <p>You will need to set the <code>mapping.path</code> property accordingly: <code>micronaut.openapi.views.spec=mapping.path=swaggerYAML&#8230;&#8203;</code>.</p>
 </div>
 
-<h2 id="viewsGenerationWithPropertiesFile"><a class="anchor" href="#viewsGenerationWithPropertiesFile"></a>16.2 Enable Views Generation with a properties file</h2>
+<h2 id="viewsGenerationWithPropertiesFile"><a class="anchor" href="#viewsGenerationWithPropertiesFile"></a>15.2 Enable Views Generation with a properties file</h2>
 
 <div class='contribute-btn'>
-    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/4.8.x/src/main/docs/guide/openApiViews/viewsGenerationWithPropertiesFile.adoc"'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/openApiViews/viewsGenerationWithPropertiesFile.adoc"'>
         <i class='fa fa-pencil-square-o'></i> Improve this doc
     </button>
 </div>
@@ -2108,10 +2053,10 @@ rapidoc.sort-endpoints-by=method
 </div>
 </div>
 
-<h2 id="viewsGenerationWithSystemProperties"><a class="anchor" href="#viewsGenerationWithSystemProperties"></a>16.3 Enable Views Generation with system properties</h2>
+<h2 id="viewsGenerationWithSystemProperties"><a class="anchor" href="#viewsGenerationWithSystemProperties"></a>15.3 Enable Views Generation with system properties</h2>
 
 <div class='contribute-btn'>
-    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/4.8.x/src/main/docs/guide/openApiViews/viewsGenerationWithSystemProperties.adoc"'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/openApiViews/viewsGenerationWithSystemProperties.adoc"'>
         <i class='fa fa-pencil-square-o'></i> Improve this doc
     </button>
 </div>
@@ -2223,7 +2168,7 @@ rapidoc.sort-endpoints-by=method
         &lt;plugin&gt;
         &lt;groupId&gt;org.codehaus.mojo&lt;/groupId&gt;
         &lt;artifactId&gt;properties-maven-plugin&lt;/artifactId&gt;
-        &lt;version&gt;1.0.0&lt;/version&gt;
+        &lt;version&gt;1.1.0&lt;/version&gt;
         &lt;executions&gt;
           &lt;execution&gt;
             &lt;goals&gt;
@@ -2245,10 +2190,10 @@ rapidoc.sort-endpoints-by=method
 </div>
 </div>
 
-<h2 id="swaggerui"><a class="anchor" href="#swaggerui"></a>16.4 Swagger-UI</h2>
+<h2 id="swaggerui"><a class="anchor" href="#swaggerui"></a>15.4 Swagger-UI</h2>
 
 <div class='contribute-btn'>
-    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/4.8.x/src/main/docs/guide/openApiViews/swaggerui.adoc"'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/openApiViews/swaggerui.adoc"'>
         <i class='fa fa-pencil-square-o'></i> Improve this doc
     </button>
 </div>
@@ -2275,20 +2220,8 @@ rapidoc.sort-endpoints-by=method
 <td class="tableblock halign-left valign-top"><p class="tableblock">Override path to use to find the js file. Path must contain a files named swagger-ui.css, swagger-ui-bundle.js, swagger-ui-standalone-present.js. The value can be a URL path like: "https://unpkg.com/swagger-ui-dist/". Must contain trailing slash.,</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>swagger-ui.copy-resources</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Copy or not local JS and CSS resources. Set to <code>false</code> if you are using external resources (eg <a href="https://unpkg.com/swagger-ui-dist/" class="bare">https://unpkg.com/swagger-ui-dist/</a>). Default <code>true</code></p></td>
-</tr>
-<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>swagger-ui.theme</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>DEFAULT</code> or <code>MATERIAL</code> or <code>FEELING_BLUE</code> <code>FLATTOP</code> <code>MONOKAI</code> <code>MUTED</code> <code>NEWSPAPER</code> <code>OUTLINE</code>. The theme of swagger-ui to use. These are case-insensitive. Default is <code>DEFAULT</code>. See <a href="https://github.com/ostranme/swagger-ui-themes">Swagger UI Themes</a>.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>swagger-ui.theme.url</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Override path to use to find the theme CSS file.,</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>swagger-ui.copy-theme</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Copy or not local theme CSS resources. Set to <code>false</code> if you are using external resources (eg <a href="https://swagger-theme.com/flattop.css" class="bare">https://swagger-theme.com/flattop.css</a>). Default <code>true</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>DEFAULT</code> or <code>MATERIAL</code> or <code>FEELING_BLUE</code> <code>FLATTOP</code> <code>MONOKAI</code> <code>MUTED</code> <code>NEWSPAPER</code> <code>OUTLINE</code>. The theme of swagger-ui to use. These are case insensitive. Default is <code>DEFAULT</code>. See <a href="https://github.com/ostranme/swagger-ui-themes">Swagger UI Themes</a>.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>swagger-ui.displayOperationId</code></p></td>
@@ -2388,10 +2321,10 @@ rapidoc.sort-endpoints-by=method
 <p>With the above configuration in place when you run your application you can access your Swagger documentation at http://localhost:8080/swagger-ui.</p>
 </div>
 
-<h2 id="oauth2"><a class="anchor" href="#oauth2"></a>16.4.1 Swagger UI - OAuth 2.0 configuration</h2>
+<h2 id="oauth2"><a class="anchor" href="#oauth2"></a>15.4.1 Swagger UI - OAuth 2.0 configuration</h2>
 
 <div class='contribute-btn'>
-    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/4.8.x/src/main/docs/guide/openApiViews/swaggerui/oauth2.adoc"'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/openApiViews/swaggerui/oauth2.adoc"'>
         <i class='fa fa-pencil-square-o'></i> Improve this doc
     </button>
 </div>
@@ -2548,17 +2481,17 @@ public class OrderController {
 <p>The previous sample uses a remote <a href="https://micronaut-projects.github.io/micronaut-security/latest/guide/index.html#jwks">Json Web Key Set</a> to validate the token issued by the authorization server. If you use <a href="https://micronaut-projects.github.io/micronaut-security/latest/guide/index.html#openid">Micronaut Security OpenID Connect support</a> with a server compatible with <a href="https://openid.net/specs/openid-connect-discovery-1_0.html">OpenID Connect Discovery</a>, the JWKS of the authorization server is automatically configured.</p>
 </div>
 
-<h2 id="redoc"><a class="anchor" href="#redoc"></a>16.5 Redoc</h2>
+<h2 id="redoc"><a class="anchor" href="#redoc"></a>15.5 Redoc</h2>
 
 <div class='contribute-btn'>
-    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/4.8.x/src/main/docs/guide/openApiViews/redoc.adoc"'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/openApiViews/redoc.adoc"'>
         <i class='fa fa-pencil-square-o'></i> Improve this doc
     </button>
 </div>
 
 
 <div class="paragraph">
-<p>Views supports <a href="https://github.com/Rebilly/ReDoc">Redoc</a>, to enable it use <code>redoc.enabled=true</code>.</p>
+<p>Views support <a href="https://github.com/Rebilly/ReDoc">Redoc</a>, to enable it use <code>redoc.enabled=true</code>.</p>
 </div>
 <div class="paragraph">
 <p>The views will be generated to the <code>META-INF/swagger/views/redoc</code> directory of your project’s class output.</p>
@@ -2576,10 +2509,6 @@ public class OrderController {
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>redoc.js.url</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Override path to use to find the js file. Path must contain a file named redoc.standalone.js. The value can be a URL path like: "https://unpkg.com/redoc/bundles/". Must contain trailing slash.,</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>redoc.copy-resources</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Copy or not local JS and CSS resources. Set to <code>false</code> if you are using external resources (eg <a href="https://unpkg.com/redoc/bundles/" class="bare">https://unpkg.com/redoc/bundles/</a>). Default <code>true</code></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>redoc.expand-single-schema-field</code></p></td>
@@ -2675,7 +2604,7 @@ public class OrderController {
 <p>See <a href="https://github.com/Redocly/redoc#redoc-options-object">Redoc Options</a> for a description of the above properites.</p>
 </div>
 <div class="paragraph">
-<p>To expose the the <code>redoc</code> views, you also must expose the generated <code>yaml</code>:</p>
+<p>To expose the <code>redoc</code> views, you also must expose the generated <code>yaml</code>:</p>
 </div>
 <div class="listingblock">
 <div class="title">Exposing Swagger YAML And Redoc Views</div>
@@ -2695,10 +2624,10 @@ public class OrderController {
 <p>With the above configuration in place when you run your application you can access your Swagger documentation at http://localhost:8080/redoc.</p>
 </div>
 
-<h2 id="rapidoc"><a class="anchor" href="#rapidoc"></a>16.6 RapiDoc</h2>
+<h2 id="rapidoc"><a class="anchor" href="#rapidoc"></a>15.6 RapiDoc</h2>
 
 <div class='contribute-btn'>
-    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/4.8.x/src/main/docs/guide/openApiViews/rapidoc.adoc"'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/openApiViews/rapidoc.adoc"'>
         <i class='fa fa-pencil-square-o'></i> Improve this doc
     </button>
 </div>
@@ -2720,10 +2649,6 @@ public class OrderController {
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapidoc.js.url</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Override path to use to find the js file. Path must contain a file named rapidoc-min.js. The value can be a URL path like: "https://unpkg.com/rapidoc/dist/". Must contain trailing slash.,</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapidoc.copy-resources</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Copy or not local JS and CSS resources. Set to <code>false</code> if you are using external resources (eg <a href="https://unpkg.com/rapidoc/dist/" class="bare">https://unpkg.com/rapidoc/dist/</a>). Default <code>true</code></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapidoc.style</code></p></td>
@@ -2911,10 +2836,10 @@ public class OrderController {
 <p>With the above configuration in place when you run your application you can access your Swagger documentation at http://localhost:8080/rapidoc.</p>
 </div>
 
-<h2 id="rapipdf"><a class="anchor" href="#rapipdf"></a>16.7 RapiPdf</h2>
+<h2 id="rapipdf"><a class="anchor" href="#rapipdf"></a>15.7 RapiPdf</h2>
 
 <div class='contribute-btn'>
-    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/4.8.x/src/main/docs/guide/openApiViews/rapipdf.adoc"'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/openApiViews/rapipdf.adoc"'>
         <i class='fa fa-pencil-square-o'></i> Improve this doc
     </button>
 </div>
@@ -2939,10 +2864,6 @@ public class OrderController {
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapipdf.js.url</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Override path to use to find the js file. Path must contain a file named rapdipdf-min.js.  The value can be a URL path like: "https://unpkg.com/rapipdf/dist/". Must contain trailing slash.,</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapipdf.copy-resources</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Copy or not local JS and CSS resources. Set to <code>false</code> if you are using external resources (eg <a href="https://unpkg.com/rapipdf/dist/" class="bare">https://unpkg.com/rapipdf/dist/</a>). Default <code>true</code></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapipdf.include-api-details</code></p></td>
@@ -2985,10 +2906,10 @@ public class OrderController {
 <p>It will add a button to the view to generate a PDF from the spec file.</p>
 </div>
 
-<h1 id="serverContext"><a class="anchor" href="#serverContext"></a>17 Server Context</h1>
+<h1 id="serverContext"><a class="anchor" href="#serverContext"></a>16 Server Context</h1>
 
 <div class='contribute-btn'>
-    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/4.8.x/src/main/docs/guide/serverContext.adoc"'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/serverContext.adoc"'>
         <i class='fa fa-pencil-square-o'></i> Improve this doc
     </button>
 </div>
@@ -3018,10 +2939,10 @@ Since the yaml specification file and the views are generated at compile time, t
 <p>The view will first look for the cookie and if not present for the parameter.</p>
 </div>
 
-<h2 id="compileResolution"><a class="anchor" href="#compileResolution"></a>17.1 Compile Time Resolution</h2>
+<h2 id="compileResolution"><a class="anchor" href="#compileResolution"></a>16.1 Compile Time Resolution</h2>
 
 <div class='contribute-btn'>
-    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/4.8.x/src/main/docs/guide/serverContext/compileResolution.adoc"'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/serverContext/compileResolution.adoc"'>
         <i class='fa fa-pencil-square-o'></i> Improve this doc
     </button>
 </div>
@@ -3034,10 +2955,10 @@ Since the yaml specification file and the views are generated at compile time, t
 <p>If you want the resolution of the context path at runtime use one of the following methods:</p>
 </div>
 
-<h2 id="serverFilter"><a class="anchor" href="#serverFilter"></a>17.2 HttpServerFilter</h2>
+<h2 id="serverFilter"><a class="anchor" href="#serverFilter"></a>16.2 HttpServerFilter</h2>
 
 <div class='contribute-btn'>
-    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/4.8.x/src/main/docs/guide/serverContext/serverFilter.adoc"'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/serverContext/serverFilter.adoc"'>
         <i class='fa fa-pencil-square-o'></i> Improve this doc
     </button>
 </div>
@@ -3151,10 +3072,10 @@ public class OpenApiContextPathFilter implements HttpServerFilter {
 </div>
 </div>
 
-<h2 id="urlParameter"><a class="anchor" href="#urlParameter"></a>17.3 URL Parameter</h2>
+<h2 id="urlParameter"><a class="anchor" href="#urlParameter"></a>16.3 URL Parameter</h2>
 
 <div class='contribute-btn'>
-    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/4.8.x/src/main/docs/guide/serverContext/urlParameter.adoc"'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/serverContext/urlParameter.adoc"'>
         <i class='fa fa-pencil-square-o'></i> Improve this doc
     </button>
 </div>
@@ -3164,10 +3085,10 @@ public class OpenApiContextPathFilter implements HttpServerFilter {
 <p>Just add a parameter to the view url. For instance if the context path is set to <code>/context/path</code> you will access your view with <code><a href="http://localhost:8080/context/path/swagger-ui?contextPath=%2Fcontext%2Fpath" class="bare">http://localhost:8080/context/path/swagger-ui?contextPath=%2Fcontext%2Fpath</a></code>.</p>
 </div>
 
-<h1 id="repository"><a class="anchor" href="#repository"></a>18 Repository</h1>
+<h1 id="repository"><a class="anchor" href="#repository"></a>17 Repository</h1>
 
 <div class='contribute-btn'>
-    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/4.8.x/src/main/docs/guide/repository.adoc"'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/repository.adoc"'>
         <i class='fa fa-pencil-square-o'></i> Improve this doc
     </button>
 </div>
@@ -3180,10 +3101,10 @@ public class OpenApiContextPathFilter implements HttpServerFilter {
 <p><a href="https://github.com/micronaut-projects/micronaut-openapi">https://github.com/micronaut-projects/micronaut-openapi</a></p>
 </div>
 
-<h1 id="breaks"><a class="anchor" href="#breaks"></a>19 Breaking Changes</h1>
+<h1 id="breaks"><a class="anchor" href="#breaks"></a>18 Breaking Changes</h1>
 
 <div class='contribute-btn'>
-    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/4.8.x/src/main/docs/guide/breaks.adoc"'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/breaks.adoc"'>
         <i class='fa fa-pencil-square-o'></i> Improve this doc
     </button>
 </div>
