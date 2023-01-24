@@ -69,11 +69,13 @@ import io.micronaut.http.MediaType;
 import io.micronaut.http.uri.UriMatchTemplate;
 import io.micronaut.inject.ast.ClassElement;
 import io.micronaut.inject.ast.Element;
+import io.micronaut.inject.ast.ElementQuery;
 import io.micronaut.inject.ast.EnumConstantElement;
 import io.micronaut.inject.ast.EnumElement;
 import io.micronaut.inject.ast.FieldElement;
 import io.micronaut.inject.ast.GenericPlaceholderElement;
 import io.micronaut.inject.ast.MemberElement;
+import io.micronaut.inject.ast.MethodElement;
 import io.micronaut.inject.ast.PropertyElement;
 import io.micronaut.inject.ast.TypedElement;
 import io.micronaut.inject.visitor.VisitorContext;
@@ -116,6 +118,7 @@ import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
+import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
@@ -1809,14 +1812,17 @@ abstract class AbstractOpenApiVisitor {
                             schema.setDescription(javadoc.getMethodDescription());
                         }
                         schemas.put(schemaName, schema);
-                        if (schema.getType() == null) {
-                            schema.setType(PrimitiveType.STRING.getCommonName());
-                        }
+
+                        EnumElement enumEl = (EnumElement) type;
+                        schema.setType(checkEnumJsonValueType(enumEl, schema.getType()));
                         if (CollectionUtils.isEmpty(schema.getEnum())) {
-                            schema.setEnum(getEnumValues((EnumElement) type, schema.getType(), schema.getFormat(), context));
+                            schema.setEnum(getEnumValues(enumEl, schema.getType(), schema.getFormat(), context));
                         }
                     } else {
-                        schema = processSuperTypes(null, schemaName, type, definingElement, openAPI, mediaTypes, schemas, context);
+                        Schema schemaWithSuperTypes = processSuperTypes(null, schemaName, type, definingElement, openAPI, mediaTypes, schemas, context);
+                        if (schemaWithSuperTypes != null) {
+                            schema = schemaWithSuperTypes;
+                        }
                         if (javadoc != null && StringUtils.hasText(javadoc.getMethodDescription())) {
                             schema.setDescription(javadoc.getMethodDescription());
                         }
@@ -1903,6 +1909,16 @@ abstract class AbstractOpenApiVisitor {
             classElement.getSuperType().ifPresent(superTypes::add);
         }
         if (!type.isRecord() && !superTypes.isEmpty()) {
+            // skip if it is Enum or Object super class
+            String firstSuperTypeName = superTypes.get(0).getName();
+            if (superTypes.size() == 1
+                && (firstSuperTypeName.equals(Enum.class.getName()) || firstSuperTypeName.equals(Object.class.getName()))) {
+                schema.setName(schemaName);
+                schemas.put(schemaName, schema);
+
+                return null;
+            }
+
             if (schema == null) {
                 schema = new ComposedSchema();
                 schema.setType("object");
@@ -2059,10 +2075,10 @@ abstract class AbstractOpenApiVisitor {
             schema.setType("object");
         }
         if (type instanceof EnumElement) {
-            elType = elType != null ? elType : PrimitiveType.STRING.getCommonName();
-            schema.setType(elType);
+            EnumElement enumEl = (EnumElement) type;
+            schema.setType(checkEnumJsonValueType(enumEl, elType != null ? elType : PrimitiveType.STRING.getCommonName()));
             if (CollectionUtils.isEmpty(schema.getEnum())) {
-                schema.setEnum(getEnumValues((EnumElement) type, elType, elFormat, context));
+                schema.setEnum(getEnumValues((EnumElement) type, schema.getType(), elFormat, context));
             }
         } else {
             JavadocDescription javadoc = Utils.getJavadocParser().parse(type.getDescription());
@@ -2070,6 +2086,24 @@ abstract class AbstractOpenApiVisitor {
             checkAllOf(composedSchema);
         }
         return schema;
+    }
+
+    private String checkEnumJsonValueType(EnumElement type, String schemaType) {
+        if (schemaType != null && !schemaType.equals(PrimitiveType.STRING.getCommonName())) {
+            return schemaType;
+        }
+        PrimitiveType jsonValueType = null;
+        // check JsonValue method
+        for (MethodElement method : type.getEnclosedElements(ElementQuery.ALL_METHODS)) {
+            if (method.isAnnotationPresent(JsonValue.class)) {
+                jsonValueType = PrimitiveType.fromName(method.getReturnType().getName());
+                break;
+            }
+        }
+        if (jsonValueType != null) {
+            schemaType = jsonValueType.getCommonName();
+        }
+        return schemaType != null ? schemaType : PrimitiveType.STRING.getCommonName();
     }
 
     private List<Object> getEnumValues(EnumElement type, String schemaType, String schemaFormat, VisitorContext context) {
@@ -2128,7 +2162,7 @@ abstract class AbstractOpenApiVisitor {
         }
         String packageName;
         String javaName;
-        if (type instanceof TypedElement) {
+        if (type instanceof TypedElement && !(type instanceof EnumElement)) {
             ClassElement typeType = ((TypedElement) type).getType();
             packageName = typeType.getPackageName();
             if (CollectionUtils.isNotEmpty(typeType.getTypeArguments())) {
