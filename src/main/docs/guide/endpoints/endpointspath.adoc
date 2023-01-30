@@ -1,9 +1,6 @@
 If you are using a custom path for your endpoints use `endpoints.path` to set it:
 
-.openapi.properties endpoints.path property
-----
+.openapi.properties
+```properties
 endpoints.path=/endpoints
-...
-..
-.
-----
+```

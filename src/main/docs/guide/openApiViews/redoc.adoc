@@ -35,7 +35,7 @@ See https://github.com/Redocly/redoc#redoc-options-object[Redoc Options] for a d
 To expose the the `redoc` views, you also must expose the generated `yaml`:
 
 .Exposing Swagger YAML And Redoc Views
-[source,yaml]
+[configuration]
 ----
 micronaut:
     router:

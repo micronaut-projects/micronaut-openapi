@@ -51,7 +51,7 @@ See https://mrin9.github.io/RapiDoc/api.html[RapiDoc Options] for a description.
 To expose the `rapidoc` views, you also must expose the generated `yaml`:
 
 .Exposing Swagger YAML And Rapidoc Views
-[source,yaml]
+[configuration]
 ----
 micronaut:
     router:
