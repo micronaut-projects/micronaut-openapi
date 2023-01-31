@@ -1,6 +1,9 @@
 To process user defined endpoints simply add:
 
 .openapi.properties
-```properties
+----
 endpoints.enabled=true
-```
+...
+..
+.
+----
