@@ -257,4 +257,83 @@ class PetController {
         post.parameters.get(0).name == 'type'
         !post.parameters.get(0).required
     }
+
+    void "test build OpenAPI with Nullable annotations"() {
+        when:
+        buildBeanDefinition('test.PetController','''
+package test;
+
+import io.micronaut.core.annotation.Introspected;
+import io.micronaut.core.annotation.Nullable;
+import io.micronaut.http.annotation.Body;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+
+@Introspected
+class HelloWorldDto {
+
+    @org.eclipse.jdt.annotation.Nullable
+    public String eclipse;
+
+    @org.jspecify.annotations.Nullable
+    public String jspecify;
+
+    @jakarta.annotation.Nullable
+    public String jakarta;
+
+    @javax.annotation.Nullable
+    public String javax;
+
+    @androidx.annotation.Nullable
+    public String androidx;
+
+    @edu.umd.cs.findbugs.annotations.Nullable
+    public String edu;
+
+    @io.reactivex.annotations.Nullable
+    public String rxjava2;
+
+    @io.reactivex.rxjava3.annotations.Nullable
+    public String rxjava3;
+
+    @reactor.util.annotation.Nullable
+    public String reactor;
+
+    @Nullable
+    public String micronaut;
+}
+
+@Controller
+class HelloWorldController {
+    @Get
+    public HelloWorldDto helloWorld(@Body HelloWorldDto dto) {
+        return dto;
+    }
+}
+
+''')
+        then:"the state is correct"
+        Utils.testReference != null
+
+        when:"The OpenAPI is retrieved"
+        OpenAPI openAPI = Utils.testReference
+        Schema schema = openAPI.components.schemas['HelloWorldDto']
+
+        then:"the components are valid"
+        schema.type == 'object'
+        schema.properties.size() == 10
+
+        // TODO: Can't find stereotypes, while issue not fixed:
+//        schema.properties.eclipse.nullable
+//        schema.properties.jspecify.nullable
+
+        schema.properties.jakarta.nullable
+        schema.properties.javax.nullable
+        schema.properties.androidx.nullable
+        schema.properties.edu.nullable
+        schema.properties.rxjava2.nullable
+        schema.properties.rxjava3.nullable
+        schema.properties.reactor.nullable
+        schema.properties.micronaut.nullable
+    }
 }

@@ -6,6 +6,10 @@ managed-javadoc-parser = "0.3.1"
 managed-jsoup = "1.15.3"
 managed-jakarta-validation-api = "3.0.2"
 managed-slf4j = "1.7.36"
+managed-jspecify = "0.3.0"
+managed-jdt-annotation = "2.2.700"
+managed-android-annotation = "1.5.0"
+managed-spotbugs-annotations = "4.7.3"
 
 # Versions beyond 0.62.2 require Java 11
 managed-html2md-converter = "0.62.2"
@@ -36,6 +40,10 @@ jackson-datatype-jsr310 = { module = "com.fasterxml.jackson.datatype:jackson-dat
 jackson-dataformat-yaml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml" }
 javax-validation-api = { module = "javax.validation:validation-api" }
 jakarta-validation-api = { module = "jakarta.validation:jakarta.validation-api", version.ref = "managed-jakarta-validation-api" }
+spotbugs-annotations = { module = "com.github.spotbugs:spotbugs-annotations", version.ref = "managed-spotbugs-annotations" }
+jspecify = { module = "org.jspecify:jspecify", version.ref = "managed-jspecify" }
+jdt-annotation = { module = "org.eclipse.jdt:org.eclipse.jdt.annotation", version.ref = "managed-jdt-annotation" }
+android-annotation = { module = "androidx.annotation:annotation", version.ref = "managed-android-annotation" }
 
 testcontainers-spock = { module = "org.testcontainers:spock" }
 
