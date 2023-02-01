@@ -1,12 +1,13 @@
 If you have some classes with same names in different packages you can set postfix like this:
 
-```yaml
+[configuration]
+----
 micronaut:
   openapi:
     schema-postfix:
       org.api.v1_0_0: 1_0_0
       org.api.v2_0_0: 2_0_0
-```
+----
 
 or by system properties:
 
