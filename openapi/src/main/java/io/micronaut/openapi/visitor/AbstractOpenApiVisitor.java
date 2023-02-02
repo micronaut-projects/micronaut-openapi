@@ -2088,7 +2088,8 @@ abstract class AbstractOpenApiVisitor {
         return schema;
     }
 
-    private String checkEnumJsonValueType(EnumElement type, String schemaType) {
+    @NonNull
+    private String checkEnumJsonValueType(@NonNull EnumElement type, @Nullable String schemaType) {
         if (schemaType != null && !schemaType.equals(PrimitiveType.STRING.getCommonName())) {
             return schemaType;
         }
