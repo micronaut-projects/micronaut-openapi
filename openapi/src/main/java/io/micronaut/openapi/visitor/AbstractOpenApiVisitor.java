@@ -788,9 +788,8 @@ abstract class AbstractOpenApiVisitor {
                     .findFirst()
                     .flatMap(ClassElement::getFirstTypeArgument)
                     .orElse(null);
-            }
-            // StreamingFileUpload implements Publisher, but it should be not considered as a Publisher in the spec file
-            else if (!type.isAssignable("io.micronaut.http.multipart.StreamingFileUpload") && Utils.isContainerType(type)) {
+                // StreamingFileUpload implements Publisher, but it should be not considered as a Publisher in the spec file
+            } else if (!type.isAssignable("io.micronaut.http.multipart.StreamingFileUpload") && Utils.isContainerType(type)) {
                 isPublisher = type.isAssignable("org.reactivestreams.Publisher") && !type.isAssignable("reactor.core.publisher.Mono");
                 isObservable = type.isAssignable("io.reactivex.Observable") && !type.isAssignable("reactor.core.publisher.Mono");
                 type = componentType;
