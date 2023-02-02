@@ -4,13 +4,13 @@ managed-swagger = "2.2.7"
 managed-swagger-compat = "2.2.7"
 managed-javadoc-parser = "0.3.1"
 managed-jsoup = "1.15.3"
+managed-jakarta-validation-api = "3.0.2"
 managed-slf4j = "1.7.36"
 
 # Versions beyond 0.62.2 require Java 11
 managed-html2md-converter = "0.62.2"
 
 kotlin = "1.7.22"
-jakarta-validation-api = "3.0.2"
 jspecify = "0.3.0"
 jdt-annotation = "2.2.700"
 android-annotation = "1.5.0"
@@ -39,7 +39,7 @@ jackson-databind = { module = "com.fasterxml.jackson.core:jackson-databind" }
 jackson-datatype-jsr310 = { module = "com.fasterxml.jackson.datatype:jackson-datatype-jsr310" }
 jackson-dataformat-yaml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml" }
 javax-validation-api = { module = "javax.validation:validation-api" }
-jakarta-validation-api = { module = "jakarta.validation:jakarta.validation-api", version.ref = "jakarta-validation-api" }
+jakarta-validation-api = { module = "jakarta.validation:jakarta.validation-api", version.ref = "managed-jakarta-validation-api" }
 spotbugs-annotations = { module = "com.github.spotbugs:spotbugs-annotations", version.ref = "spotbugs-annotations" }
 jspecify = { module = "org.jspecify:jspecify", version.ref = "jspecify" }
 jdt-annotation = { module = "org.eclipse.jdt:org.eclipse.jdt.annotation", version.ref = "jdt-annotation" }
