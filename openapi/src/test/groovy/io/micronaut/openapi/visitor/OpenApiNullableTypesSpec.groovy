@@ -323,7 +323,7 @@ class HelloWorldController {
         schema.type == 'object'
         schema.properties.size() == 10
 
-        // TODO: Can't find stereotypes, while issue not fixed:
+        // TODO: Can't find stereotypes, while issue not fixed: https://github.com/micronaut-projects/micronaut-core/issues/8706
 //        schema.properties.eclipse.nullable
 //        schema.properties.jspecify.nullable
 
