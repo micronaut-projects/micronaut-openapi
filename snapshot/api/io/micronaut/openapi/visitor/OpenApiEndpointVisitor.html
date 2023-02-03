@@ -227,8 +227,8 @@ implements io.micronaut.inject.visitor.TypeElementVisitor&lt;java.lang.Object,ja
 </tr>
 <tr id="i2" class="altColor">
 <td class="colFirst"><code>protected io.swagger.v3.oas.models.media.Schema</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/openapi/visitor/OpenApiEndpointVisitor.html#bindSchemaForElement-io.micronaut.inject.visitor.VisitorContext-io.micronaut.inject.ast.Element-io.micronaut.inject.ast.ClassElement-io.swagger.v3.oas.models.media.Schema-">bindSchemaForElement</a></span>(io.micronaut.inject.visitor.VisitorContext&nbsp;context,
-                    io.micronaut.inject.ast.Element&nbsp;element,
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/openapi/visitor/OpenApiEndpointVisitor.html#bindSchemaForElement-io.micronaut.inject.visitor.VisitorContext-io.micronaut.inject.ast.TypedElement-io.micronaut.inject.ast.ClassElement-io.swagger.v3.oas.models.media.Schema-">bindSchemaForElement</a></span>(io.micronaut.inject.visitor.VisitorContext&nbsp;context,
+                    io.micronaut.inject.ast.TypedElement&nbsp;element,
                     io.micronaut.inject.ast.ClassElement&nbsp;elementType,
                     io.swagger.v3.oas.models.media.Schema&nbsp;schemaToBind)</code>
 <div class="block">Binds the schema for the given element.</div>
@@ -315,8 +315,8 @@ implements io.micronaut.inject.visitor.TypeElementVisitor&lt;java.lang.Object,ja
 </tr>
 <tr id="i15" class="rowColor">
 <td class="colFirst"><code>protected void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/openapi/visitor/OpenApiEndpointVisitor.html#processSchemaProperty-io.micronaut.inject.visitor.VisitorContext-io.micronaut.inject.ast.Element-io.micronaut.inject.ast.ClassElement-io.micronaut.inject.ast.Element-io.swagger.v3.oas.models.media.Schema-io.swagger.v3.oas.models.media.Schema-">processSchemaProperty</a></span>(io.micronaut.inject.visitor.VisitorContext&nbsp;context,
-                     io.micronaut.inject.ast.Element&nbsp;element,
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/openapi/visitor/OpenApiEndpointVisitor.html#processSchemaProperty-io.micronaut.inject.visitor.VisitorContext-io.micronaut.inject.ast.TypedElement-io.micronaut.inject.ast.ClassElement-io.micronaut.inject.ast.Element-io.swagger.v3.oas.models.media.Schema-io.swagger.v3.oas.models.media.Schema-">processSchemaProperty</a></span>(io.micronaut.inject.visitor.VisitorContext&nbsp;context,
+                     io.micronaut.inject.ast.TypedElement&nbsp;element,
                      io.micronaut.inject.ast.ClassElement&nbsp;elementType,
                      io.micronaut.inject.ast.Element&nbsp;classElement,
                      io.swagger.v3.oas.models.media.Schema&nbsp;parentSchema,
@@ -783,14 +783,14 @@ protected&nbsp;io.swagger.v3.oas.models.media.Schema&nbsp;resolveSchema(io.swagg
 </dl>
 </li>
 </ul>
-<a name="processSchemaProperty-io.micronaut.inject.visitor.VisitorContext-io.micronaut.inject.ast.Element-io.micronaut.inject.ast.ClassElement-io.micronaut.inject.ast.Element-io.swagger.v3.oas.models.media.Schema-io.swagger.v3.oas.models.media.Schema-">
+<a name="processSchemaProperty-io.micronaut.inject.visitor.VisitorContext-io.micronaut.inject.ast.TypedElement-io.micronaut.inject.ast.ClassElement-io.micronaut.inject.ast.Element-io.swagger.v3.oas.models.media.Schema-io.swagger.v3.oas.models.media.Schema-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>processSchemaProperty</h4>
 <pre>protected&nbsp;void&nbsp;processSchemaProperty(io.micronaut.inject.visitor.VisitorContext&nbsp;context,
-                                     io.micronaut.inject.ast.Element&nbsp;element,
+                                     io.micronaut.inject.ast.TypedElement&nbsp;element,
                                      io.micronaut.inject.ast.ClassElement&nbsp;elementType,
                                      @Nullable
                                      io.micronaut.inject.ast.Element&nbsp;classElement,
@@ -819,14 +819,14 @@ protected&nbsp;io.swagger.v3.oas.models.media.Schema&nbsp;resolveSchema(io.swagg
                                        io.micronaut.inject.ast.Element&nbsp;classElement)</pre>
 </li>
 </ul>
-<a name="bindSchemaForElement-io.micronaut.inject.visitor.VisitorContext-io.micronaut.inject.ast.Element-io.micronaut.inject.ast.ClassElement-io.swagger.v3.oas.models.media.Schema-">
+<a name="bindSchemaForElement-io.micronaut.inject.visitor.VisitorContext-io.micronaut.inject.ast.TypedElement-io.micronaut.inject.ast.ClassElement-io.swagger.v3.oas.models.media.Schema-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>bindSchemaForElement</h4>
 <pre>protected&nbsp;io.swagger.v3.oas.models.media.Schema&nbsp;bindSchemaForElement(io.micronaut.inject.visitor.VisitorContext&nbsp;context,
-                                                                     io.micronaut.inject.ast.Element&nbsp;element,
+                                                                     io.micronaut.inject.ast.TypedElement&nbsp;element,
                                                                      io.micronaut.inject.ast.ClassElement&nbsp;elementType,
                                                                      io.swagger.v3.oas.models.media.Schema&nbsp;schemaToBind)</pre>
 <div class="block">Binds the schema for the given element.</div>
