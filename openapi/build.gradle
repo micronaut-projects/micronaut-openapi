@@ -30,10 +30,16 @@ dependencies {
     testImplementation(mn.micronaut.data.jdbc)
     testImplementation(mn.rxjava2)
     testImplementation(mn.rxjava3)
+    testImplementation(mn.reactor.core)
+    testImplementation(mn.jsr305)
     testImplementation(mn.micronaut.management)
     testImplementation(libs.managed.html2md.converter)
     testImplementation(libs.javax.validation.api)
     testImplementation(libs.jakarta.validation.api)
+    testImplementation(libs.jspecify)
+    testImplementation(libs.jdt.annotation)
+    testImplementation(libs.android.annotation)
+    testImplementation(libs.spotbugs.annotations)
 
     if (org.gradle.internal.jvm.Jvm.current().getJavaVersion().isJava8()) {
         testImplementation files(org.gradle.internal.jvm.Jvm.current().toolsJar)

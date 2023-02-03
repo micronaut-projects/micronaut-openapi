@@ -53,6 +53,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
 
 import io.micronaut.core.annotation.AnnotationClassValue;
 import io.micronaut.core.annotation.AnnotationValue;
+import io.micronaut.core.annotation.Internal;
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.core.annotation.Nullable;
 import io.micronaut.core.beans.BeanMap;
@@ -137,6 +138,7 @@ import static java.util.stream.Collectors.toMap;
  * @author graemerocher
  * @since 1.0
  */
+@Internal
 abstract class AbstractOpenApiVisitor {
 
     private static final Lock VISITED_ELEMENTS_LOCK = new ReentrantLock();
@@ -981,7 +983,7 @@ abstract class AbstractOpenApiVisitor {
      * @param parentSchema The parent schema
      * @param propertySchema The property schema
      */
-    protected void processSchemaProperty(VisitorContext context, Element element, ClassElement elementType, @Nullable Element classElement, Schema parentSchema, Schema propertySchema) {
+    protected void processSchemaProperty(VisitorContext context, TypedElement element, ClassElement elementType, @Nullable Element classElement, Schema parentSchema, Schema propertySchema) {
         if (propertySchema != null) {
             AnnotationValue<JsonUnwrapped> uw = element.getAnnotation(JsonUnwrapped.class);
             if (uw != null && uw.booleanValue("enabled").orElse(Boolean.TRUE)) {
@@ -1111,7 +1113,7 @@ abstract class AbstractOpenApiVisitor {
      *
      * @return The bound schema
      */
-    protected Schema bindSchemaForElement(VisitorContext context, Element element, ClassElement elementType, Schema schemaToBind) {
+    protected Schema bindSchemaForElement(VisitorContext context, TypedElement element, ClassElement elementType, Schema schemaToBind) {
         AnnotationValue<io.swagger.v3.oas.annotations.media.Schema> schemaAnn = element.getAnnotation(io.swagger.v3.oas.annotations.media.Schema.class);
         Schema originalSchema = schemaToBind;
 
@@ -1177,8 +1179,7 @@ abstract class AbstractOpenApiVisitor {
         }
         // @Schema annotation takes priority over nullability annotations
         Boolean isSchemaNullable = element.booleanValue(io.swagger.v3.oas.annotations.media.Schema.class, "nullable").orElse(null);
-        boolean isNullable = (isSchemaNullable == null && (element.isNullable() || isTypeNullable(elementType)))
-            || Boolean.TRUE.equals(isSchemaNullable);
+        boolean isNullable = (isSchemaNullable == null && TypeElementUtils.isNullable(element)) || Boolean.TRUE.equals(isSchemaNullable);
         if (isNullable) {
             topLevelSchema.setNullable(true);
             notOnlyRef = true;

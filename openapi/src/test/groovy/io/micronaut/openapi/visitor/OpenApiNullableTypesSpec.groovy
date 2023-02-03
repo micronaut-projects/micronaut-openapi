@@ -4,6 +4,9 @@ import io.micronaut.openapi.AbstractOpenApiTypeElementSpec
 import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.Operation
 import io.swagger.v3.oas.models.media.Schema
+import spock.lang.Issue
+import spock.lang.PendingFeature
+import spock.lang.Unroll
 
 class OpenApiNullableTypesSpec extends AbstractOpenApiTypeElementSpec {
 
@@ -256,5 +259,85 @@ class PetController {
         post.parameters.get(0).in == 'path'
         post.parameters.get(0).name == 'type'
         !post.parameters.get(0).required
+    }
+
+    @Unroll
+    void "test build OpenAPI with Nullable annotations"(String annotation) {
+        when:
+        buildBeanDefinition('test.PetController', sampleClass(annotation))
+        then:"the state is correct"
+        Utils.testReference != null
+
+        when:"The OpenAPI is retrieved"
+        OpenAPI openAPI = Utils.testReference
+        Schema schema = openAPI.components.schemas['HelloWorldDto']
+
+        then:"the components are valid"
+        schema.type == 'object'
+        schema.properties.size() == 1
+        schema.properties.nullprop.nullable
+
+        where:
+        annotation << [
+                'io.micronaut.core.annotation.Nullable',
+                'jakarta.annotation.Nullable',
+                'javax.annotation.Nullable',
+                'androidx.annotation.Nullable',
+                'edu.umd.cs.findbugs.annotations.Nullable',
+                'io.reactivex.annotations.Nullable',
+                'io.reactivex.rxjava3.annotations.Nullable',
+                'reactor.util.annotation.Nullable',
+        ]
+    }
+
+    @Issue("https://github.com/micronaut-projects/micronaut-core/issues/8706")
+    @PendingFeature(reason = "Can't find stereotypes, while issue not fixed")
+    @Unroll
+    void "test build OpenAPI with eclipse and jspecify Nullable annotations"(String annotation) {
+        when:
+        buildBeanDefinition('test.PetController', sampleClass(annotation))
+        then:"the state is correct"
+        Utils.testReference != null
+
+        when:"The OpenAPI is retrieved"
+        OpenAPI openAPI = Utils.testReference
+        Schema schema = openAPI.components.schemas['HelloWorldDto']
+
+        then:"the components are valid"
+        schema.type == 'object'
+        schema.properties.size() == 1
+
+        schema.properties.nullprop.nullable
+
+        where:
+        annotation << [
+                'org.eclipse.jdt.annotation.Nullable',
+                'org.jspecify.annotations.Nullable',
+        ]
+    }
+
+    private static String sampleClass(String annotation) {
+        """\
+package test;
+
+import io.micronaut.core.annotation.Introspected;
+import io.micronaut.http.annotation.Body;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+
+@Introspected
+class HelloWorldDto {
+    @${annotation}
+    public String nullprop;
+}
+
+@Controller
+class HelloWorldController {
+    @Get
+    public HelloWorldDto helloWorld(@Body HelloWorldDto dto) {
+        return dto;
+    }
+}
+"""
     }
 }

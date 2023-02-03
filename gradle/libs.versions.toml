@@ -11,6 +11,10 @@ managed-slf4j = "1.7.36"
 managed-html2md-converter = "0.62.2"
 
 kotlin = "1.7.22"
+jspecify = "0.3.0"
+jdt-annotation = "2.2.700"
+android-annotation = "1.5.0"
+spotbugs-annotations = "4.7.3"
 
 [libraries]
 # Duplicated to keep catalog compatibility with 3.4.x.  Can be removed for 4.0.0
@@ -36,6 +40,10 @@ jackson-datatype-jsr310 = { module = "com.fasterxml.jackson.datatype:jackson-dat
 jackson-dataformat-yaml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml" }
 javax-validation-api = { module = "javax.validation:validation-api" }
 jakarta-validation-api = { module = "jakarta.validation:jakarta.validation-api", version.ref = "managed-jakarta-validation-api" }
+spotbugs-annotations = { module = "com.github.spotbugs:spotbugs-annotations", version.ref = "spotbugs-annotations" }
+jspecify = { module = "org.jspecify:jspecify", version.ref = "jspecify" }
+jdt-annotation = { module = "org.eclipse.jdt:org.eclipse.jdt.annotation", version.ref = "jdt-annotation" }
+android-annotation = { module = "androidx.annotation:annotation", version.ref = "android-annotation" }
 
 testcontainers-spock = { module = "org.testcontainers:spock" }
 
