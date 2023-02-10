@@ -191,10 +191,11 @@ public final class ConvertUtils {
      * Detect openapi type nd format by java class name.
      *
      * @param className java class name
+     * @param isArray is it array
      *
      * @return pair with openapi type and format
      */
-    public static Pair<String, String> getTypeAndFormatByClass(String className) {
+    public static Pair<String, String> getTypeAndFormatByClass(String className, boolean isArray) {
         if (className == null) {
             return Pair.of("object", null);
         }
@@ -222,9 +223,13 @@ public final class ConvertUtils {
         } else if (Double.class.getName().equals(className)
             || double.class.getName().equals(className)) {
             return Pair.of("number", "double");
+        } else if (isArray && (Byte.class.getName().equals(className)
+            || byte.class.getName().equals(className))) {
+            return Pair.of("string", "byte");
+            // swagger doesn't support type byte
         } else if (Byte.class.getName().equals(className)
             || byte.class.getName().equals(className)) {
-            return Pair.of("string", "byte");
+            return Pair.of("integer", "int32");
         } else if (BigDecimal.class.getName().equals(className)) {
             return Pair.of("number", null);
         } else if (URI.class.getName().equals(className)) {

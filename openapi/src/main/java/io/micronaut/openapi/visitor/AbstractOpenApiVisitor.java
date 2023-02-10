@@ -905,6 +905,8 @@ abstract class AbstractOpenApiVisitor {
                     schema = new StringSchema().format("partial-time");
                 } else if (type.isAssignable(Number.class)) {
                     schema = PrimitiveType.NUMBER.createProperty();
+                } else if (type.getName().equals(Object.class.getName())) {
+                    schema = PrimitiveType.OBJECT.createProperty();
                 } else {
                     schema = getSchemaDefinition(openAPI, context, type, typeArgs, definingElement, mediaTypes);
                 }
@@ -1022,7 +1024,7 @@ abstract class AbstractOpenApiVisitor {
                             String elType = schemaAnnotationValue.stringValue("type").orElse(null);
                             String elFormat = schemaAnnotationValue.stringValue("format").orElse(null);
                             if (elType == null && elementType != null) {
-                                Pair<String, String> typeAndFormat = ConvertUtils.getTypeAndFormatByClass(elementType.getName());
+                                Pair<String, String> typeAndFormat = ConvertUtils.getTypeAndFormatByClass(elementType.getName(), elementType.isArray());
                                 elType = typeAndFormat.getFirst();
                                 if (elFormat == null) {
                                     elFormat = typeAndFormat.getSecond();
@@ -1583,7 +1585,7 @@ abstract class AbstractOpenApiVisitor {
     protected Schema bindSchemaAnnotationValue(VisitorContext context, Element element, Schema schemaToBind, AnnotationValue<io.swagger.v3.oas.annotations.media.Schema> schemaAnn) {
 
         ClassElement classElement = ((TypedElement) element).getType();
-        Pair<String, String> typeAndFormat = classElement.isIterable() ? Pair.of("array", null) : ConvertUtils.getTypeAndFormatByClass(classElement.getName());
+        Pair<String, String> typeAndFormat = classElement.isIterable() ? Pair.of("array", null) : ConvertUtils.getTypeAndFormatByClass(classElement.getName(), classElement.isArray());
 
         JsonNode schemaJson = toJson(schemaAnn.getValues(), context);
         return doBindSchemaAnnotationValue(context, element, schemaToBind, schemaJson,
@@ -1604,7 +1606,8 @@ abstract class AbstractOpenApiVisitor {
         }
 
         if (elType == null && element != null) {
-            Pair<String, String> typeAndFormat = ConvertUtils.getTypeAndFormatByClass(((TypedElement) element).getType().getName());
+            ClassElement typeEl = ((TypedElement) element).getType();
+            Pair<String, String> typeAndFormat = ConvertUtils.getTypeAndFormatByClass(typeEl.getName(), typeEl.isArray());
             elType = typeAndFormat.getFirst();
             if (elFormat == null) {
                 elFormat = typeAndFormat.getSecond();
@@ -1814,7 +1817,9 @@ abstract class AbstractOpenApiVisitor {
                         schemas.put(schemaName, schema);
 
                         EnumElement enumEl = (EnumElement) type;
-                        schema.setType(checkEnumJsonValueType(enumEl, schema.getType()));
+                        Pair<String, String> typeAndFormat = checkEnumJsonValueType(enumEl, schema.getType(), schema.getFormat());
+                        schema.setType(typeAndFormat.getFirst());
+                        schema.setFormat(typeAndFormat.getSecond());
                         if (CollectionUtils.isEmpty(schema.getEnum())) {
                             schema.setEnum(getEnumValues(enumEl, schema.getType(), schema.getFormat(), context));
                         }
@@ -1894,6 +1899,11 @@ abstract class AbstractOpenApiVisitor {
                                      List<MediaType> mediaTypes,
                                      Map<String, Schema> schemas,
                                      VisitorContext context) {
+
+        if (type.getName().equals(Object.class.getName())) {
+            return null;
+        }
+
         ClassElement classElement = ((TypedElement) type).getType();
         List<ClassElement> superTypes = new ArrayList<>();
         Collection<ClassElement> parentInterfaces = classElement.getInterfaces();
@@ -2012,8 +2022,9 @@ abstract class AbstractOpenApiVisitor {
 
         String elType = (String) values.get("type");
         String elFormat = (String) values.get("format");
-        if (elType == null && type != null) {
-            Pair<String, String> typeAndFormat = ConvertUtils.getTypeAndFormatByClass(type.getName());
+        if (elType == null && type instanceof TypedElement) {
+            TypedElement typedType = (TypedElement) type;
+            Pair<String, String> typeAndFormat = ConvertUtils.getTypeAndFormatByClass(typedType.getName(), typedType.isArray());
             elType = typeAndFormat.getFirst();
             if (elFormat == null) {
                 elFormat = typeAndFormat.getSecond();
@@ -2076,7 +2087,8 @@ abstract class AbstractOpenApiVisitor {
         }
         if (type instanceof EnumElement) {
             EnumElement enumEl = (EnumElement) type;
-            schema.setType(checkEnumJsonValueType(enumEl, elType != null ? elType : PrimitiveType.STRING.getCommonName()));
+            Pair<String, String> typeAndFormat = checkEnumJsonValueType(enumEl, elType != null ? elType : PrimitiveType.STRING.getCommonName(), null);
+            schema.setType(typeAndFormat.getFirst());
             if (CollectionUtils.isEmpty(schema.getEnum())) {
                 schema.setEnum(getEnumValues((EnumElement) type, schema.getType(), elFormat, context));
             }
@@ -2089,22 +2101,19 @@ abstract class AbstractOpenApiVisitor {
     }
 
     @NonNull
-    private String checkEnumJsonValueType(@NonNull EnumElement type, @Nullable String schemaType) {
+    private Pair<String, String> checkEnumJsonValueType(@NonNull EnumElement type, @Nullable String schemaType, @Nullable String schemaFormat) {
         if (schemaType != null && !schemaType.equals(PrimitiveType.STRING.getCommonName())) {
-            return schemaType;
+            return Pair.of(schemaType, schemaFormat);
         }
-        PrimitiveType jsonValueType = null;
+        Pair<String, String> result = null;
         // check JsonValue method
         for (MethodElement method : type.getEnclosedElements(ElementQuery.ALL_METHODS)) {
             if (method.isAnnotationPresent(JsonValue.class)) {
-                jsonValueType = PrimitiveType.fromName(method.getReturnType().getName());
+                result = ConvertUtils.getTypeAndFormatByClass(method.getReturnType().getName(), method.getReturnType().isArray());
                 break;
             }
         }
-        if (jsonValueType != null) {
-            schemaType = jsonValueType.getCommonName();
-        }
-        return schemaType != null ? schemaType : PrimitiveType.STRING.getCommonName();
+        return result != null ? result : Pair.of(PrimitiveType.STRING.getCommonName(), schemaFormat);
     }
 
     private List<Object> getEnumValues(EnumElement type, String schemaType, String schemaFormat, VisitorContext context) {
