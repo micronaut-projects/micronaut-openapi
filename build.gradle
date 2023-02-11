@@ -19,7 +19,7 @@ allprojects {
         all*.exclude group: "io.spring.nohttp"
         resolutionStrategy.dependencySubstitution {
             substitute(module("org.codehaus.groovy:groovy"))
-                    .using(module("org.apache.groovy:groovy:4.0.8"))
+                    .using(module("org.apache.groovy:groovy:4.0.9"))
         }
     }
 }
