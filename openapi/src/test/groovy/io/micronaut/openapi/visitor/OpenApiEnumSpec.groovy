@@ -534,4 +534,145 @@ class MyBean {}
         schema.enum.get(0) == 'AWS'
         schema.enum.get(1) == 'AZURE'
     }
+
+    void "test build OpenAPI enum Schema with byte type values"() {
+
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import java.util.List;
+
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Post;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonValue;
+
+@Controller
+class OpenApiController {
+
+    @Post
+    public void postRaw(DictionaryRequest request) {
+    }
+}
+
+class DictionaryRequest {
+
+    protected Type1 type1;
+    protected Type2 type2;
+
+    public Type1 getType1() {
+        return type1;
+    }
+
+    public void setType1(Type1 type1) {
+        this.type1 = type1;
+    }
+
+    public Type2 getType2() {
+        return type2;
+    }
+
+    public void setType2(Type2 type2) {
+        this.type2 = type2;
+    }
+}
+
+enum Type1 {
+
+    @JsonProperty("1")
+    _1(((byte) 1)),
+    @JsonProperty("2")
+    _2(((byte) 2));
+
+    private final byte value;
+
+    Type1(byte value) {
+        this.value = value;
+    }
+
+    @JsonValue
+    public byte value() {
+        return value;
+    }
+
+    @JsonCreator
+    public static Type1 fromValue(byte v) {
+        for (Type1 c : values()) {
+            if (c.value == v) {
+                return c;
+            }
+        }
+        throw new IllegalArgumentException(String.valueOf(v));
+    }
+}
+
+enum Type2 {
+
+    @JsonProperty("111")
+    _1("111"),
+    @JsonProperty("222")
+    _2("222");
+
+    private final byte[] value;
+
+    Type2(String value) {
+        this.value = value.getBytes();
+    }
+
+    @JsonValue
+    public byte[] value() {
+        return value;
+    }
+
+    @JsonCreator
+    public static Type2 fromValue(byte[] v) {
+        for (Type2 c : values()) {
+            if (c.value == v) {
+                return c;
+            }
+        }
+        throw new IllegalArgumentException(String.valueOf(v));
+    }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        then: "the state is correct"
+        Utils.testReferenceAfterPlaceholders != null
+
+        when: "The OpenAPI is retrieved"
+        OpenAPI openAPI = Utils.testReferenceAfterPlaceholders
+
+        then: "the state is correct"
+        openAPI.components
+        openAPI.components.schemas
+        openAPI.components.schemas.size() == 3
+
+        when:
+        Schema requestSchema = openAPI.components.schemas['DictionaryRequest']
+        Schema type1Schema = openAPI.components.schemas['Type1']
+        Schema type2Schema = openAPI.components.schemas['Type2']
+
+        then: "the components are valid"
+        requestSchema
+        type1Schema
+        type1Schema.enum
+        type1Schema.enum.size() == 2
+        type1Schema.type == 'integer'
+        type1Schema.format == 'int32'
+        type1Schema.enum.contains(1)
+        type1Schema.enum.contains(2)
+
+        type2Schema
+        type2Schema.enum
+        type2Schema.enum.size() == 2
+        type2Schema.type == 'string'
+        type2Schema.format == 'byte'
+        type2Schema.enum.contains("111")
+        type2Schema.enum.contains("222")
+    }
 }
