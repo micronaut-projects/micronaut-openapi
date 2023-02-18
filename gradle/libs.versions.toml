@@ -1,7 +1,7 @@
 [versions]
 managed-swagger = "2.2.8"
 managed-javadoc-parser = "0.3.1"
-managed-jsoup = "1.15.3"
+managed-jsoup = "1.15.4"
 managed-slf4j = "2.0.6"
 managed-html2md-converter = "0.64.0"
 managed-jakarta-validation-api = "3.0.2"
