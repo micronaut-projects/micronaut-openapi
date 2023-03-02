@@ -10,7 +10,7 @@
         {{rapipdf.script}}
     </head>
     <script>
-        window.addEventListener('DOMContentLoaded', (event) => {
+        window.addEventListener('DOMContentLoaded', () => {
             const docEl = document.getElementById('rapidoc');
             docEl.addEventListener('before-try', (e) => {
                 e.detail.request.headers.append('AAA-BBB', 'CCC DDDD');
@@ -34,16 +34,6 @@
             }
             rapidoc.setAttribute('spec-url', contextPath + '{{specURL}}');
             {{rapipdf.specurl}}
-            document.addEventListener('DOMContentLoaded', (event) => {
-                let docEl = document.getElementById("rapidoc");
-
-                // 2. before-try (Aborts all post calls)
-                docEl.addEventListener('before-try', (e) => {
-                    if (e.detail.request.method === 'POST') {
-                        e.detail.controller.abort();
-                    }
-                });
-            })
         </script>
     </body>
 </html>
