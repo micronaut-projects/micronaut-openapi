@@ -675,4 +675,126 @@ class MyBean {}
         type2Schema.enum.contains("111")
         type2Schema.enum.contains("222")
     }
+
+    void "test build OpenAPI enum Schema with JsonValue returned another enum"() {
+
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import java.util.List;
+
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Post;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonValue;
+
+@Controller
+class OpenApiController {
+
+    @Post
+    public void postRaw(DictionaryRequest request) {
+    }
+}
+
+class DictionaryRequest {
+
+    protected Type1 type1;
+
+    public Type1 getType1() {
+        return type1;
+    }
+
+    public void setType1(Type1 type1) {
+        this.type1 = type1;
+    }
+}
+
+enum Type1 {
+
+    @JsonProperty("558301010000")
+    _558301010000(Type2._558301010000),
+    @JsonProperty("558301020000")
+    _558301020000(Type2._558301020000);
+
+    private final Type2 value;
+
+    Type1(Type2 value) {
+        this.value = value;
+    }
+
+    @JsonValue
+    public Type2 value() {
+        return value;
+    }
+
+    @JsonCreator
+    public static Type1 fromValue(Type2 v) {
+        for (Type1 c : values()) {
+            if (c.value == v) {
+                return c;
+            }
+        }
+        throw new IllegalArgumentException(String.valueOf(v));
+    }
+}
+
+enum Type2 {
+
+    @JsonProperty("558301010000")
+    _558301010000("558301010000"),
+    @JsonProperty("558301020000")
+    _558301020000("558301020000");
+
+    private final String value;
+
+    Type2(String value) {
+        this.value = value;
+    }
+
+    @JsonValue
+    public String value() {
+        return value;
+    }
+
+    @JsonCreator
+    public static Type2 fromValue(String v) {
+        for (Type2 c : values()) {
+            if (c.value.equals(v)) {
+                return c;
+            }
+        }
+        throw new IllegalArgumentException(String.valueOf(v));
+    }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        then: "the state is correct"
+        Utils.testReferenceAfterPlaceholders != null
+
+        when: "The OpenAPI is retrieved"
+        OpenAPI openAPI = Utils.testReferenceAfterPlaceholders
+
+        then: "the state is correct"
+        openAPI.components
+        openAPI.components.schemas
+        openAPI.components.schemas.size() == 2
+
+        when:
+        Schema requestSchema = openAPI.components.schemas['DictionaryRequest']
+        Schema type1Schema = openAPI.components.schemas['Type1']
+
+        then: "the components are valid"
+        requestSchema
+        type1Schema
+        type1Schema.enum
+        type1Schema.enum.size() == 2
+        type1Schema.type == 'string'
+        type1Schema.enum.contains("558301010000")
+        type1Schema.enum.contains("558301020000")
+    }
 }

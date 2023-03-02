@@ -2109,7 +2109,11 @@ abstract class AbstractOpenApiVisitor {
         // check JsonValue method
         for (MethodElement method : type.getEnclosedElements(ElementQuery.ALL_METHODS)) {
             if (method.isAnnotationPresent(JsonValue.class)) {
-                result = ConvertUtils.getTypeAndFormatByClass(method.getReturnType().getName(), method.getReturnType().isArray());
+                ClassElement returnType = method.getReturnType();
+                if (returnType.isEnum()) {
+                    return checkEnumJsonValueType((EnumElement) returnType, null, null);
+                }
+                result = ConvertUtils.getTypeAndFormatByClass(returnType.getName(), method.getReturnType().isArray());
                 break;
             }
         }
