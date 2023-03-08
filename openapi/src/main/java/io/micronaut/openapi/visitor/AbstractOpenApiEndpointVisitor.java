@@ -657,7 +657,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                         }
                         unwrappedParameter.setName(entry.getKey());
                         unwrappedParameter.setSchema(entry.getValue());
-                        swaggerParameters.add(unwrappedParameter);
+                        addSwaggerParamater(unwrappedParameter, swaggerParameters);
                     }
                 }
             }
@@ -677,7 +677,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                 }
             }
 
-            swaggerParameters.add(newParameter);
+            addSwaggerParamater(newParameter, swaggerParameters);
 
             Schema schema = newParameter.getSchema();
             if (schema == null) {
@@ -689,6 +689,15 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                 newParameter.setSchema(schema);
             }
         }
+    }
+
+    private void addSwaggerParamater(Parameter newParameter, List<Parameter> swaggerParameters) {
+        for (Parameter swaggerParameter : swaggerParameters) {
+            if (newParameter.getName().equals(swaggerParameter.getName())) {
+                return;
+            }
+        }
+        swaggerParameters.add(newParameter);
     }
 
     private void processBodyParameter(VisitorContext context, OpenAPI openAPI, JavadocDescription javadocDescription,
