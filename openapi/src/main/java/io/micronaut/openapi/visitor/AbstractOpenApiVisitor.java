@@ -149,6 +149,14 @@ abstract class AbstractOpenApiVisitor {
     private static final ComposedSchema EMPTY_COMPOSED_SCHEMA = new ComposedSchema();
 
     /**
+     * Stores relations between schema names and class names.
+     */
+    private final Map<String, String> schemaNameToClassNameMap = new HashMap<>();
+    /**
+     * Stores class name counters for schema suffix, when found classes with same name in different packages.
+     */
+    private final Map<String, Integer> shemaNameSuffixCounterMap = new HashMap<>();
+    /**
      * Stores the current in progress type.
      */
     private List<String> inProgressSchemas = new ArrayList<>(10);
@@ -2175,28 +2183,41 @@ abstract class AbstractOpenApiVisitor {
             return NameUtils.getSimpleName(metaAnnName);
         }
         String packageName;
-        String javaName;
+        String resultSchemaName;
         if (type instanceof TypedElement && !(type instanceof EnumElement)) {
             ClassElement typeType = ((TypedElement) type).getType();
             packageName = typeType.getPackageName();
             if (CollectionUtils.isNotEmpty(typeType.getTypeArguments())) {
-                javaName = computeNameWithGenerics(typeType, typeArgs, context);
+                resultSchemaName = computeNameWithGenerics(typeType, typeArgs, context);
             } else {
-                javaName = computeNameWithGenerics(typeType, Collections.emptyMap(), context);
+                resultSchemaName = computeNameWithGenerics(typeType, Collections.emptyMap(), context);
             }
         } else {
-            javaName = type.getSimpleName();
+            resultSchemaName = type.getSimpleName();
             packageName = NameUtils.getPackageName(type.getName());
         }
+
         OpenApiApplicationVisitor.SchemaDecorator schemaDecorator = OpenApiApplicationVisitor.getSchemaDecoration(packageName, context);
-        javaName = javaName.replace("$", ".");
+        resultSchemaName = resultSchemaName.replace("$", ".");
         if (schemaDecorator != null) {
-            javaName = (StringUtils.hasText(schemaDecorator.getPrefix()) ? schemaDecorator.getPrefix() : StringUtils.EMPTY_STRING)
-                + javaName
+            resultSchemaName = (StringUtils.hasText(schemaDecorator.getPrefix()) ? schemaDecorator.getPrefix() : StringUtils.EMPTY_STRING)
+                + resultSchemaName
                 + (StringUtils.hasText(schemaDecorator.getPostfix()) ? schemaDecorator.getPostfix() : StringUtils.EMPTY_STRING);
         }
+        String fullClassNameWithGenerics = packageName + '.' + resultSchemaName;
 
-        return javaName;
+        // Check if the class exists in other packages. If so, you need to add a suffix,
+        // because there are two classes in different packages, but with the same class name.
+        String storedClassName = schemaNameToClassNameMap.get(resultSchemaName);
+        if (storedClassName != null && !storedClassName.equals(fullClassNameWithGenerics)) {
+            int index = shemaNameSuffixCounterMap.getOrDefault(resultSchemaName, 0);
+            index++;
+            shemaNameSuffixCounterMap.put(resultSchemaName, index);
+            resultSchemaName += "_" + index;
+        }
+        schemaNameToClassNameMap.put(resultSchemaName, fullClassNameWithGenerics);
+
+        return resultSchemaName;
     }
 
     private String computeNameWithGenerics(ClassElement classElement, Map<String, ClassElement> typeArgs, VisitorContext context) {
