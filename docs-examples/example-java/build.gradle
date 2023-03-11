@@ -14,16 +14,17 @@ repositories {
 
 dependencies {
 
+    testAnnotationProcessor(mn.micronaut.inject.java)
+
+    testCompileOnly(mn.micronaut.inject.java)
+
     testImplementation projects.openapi
     testImplementation(mn.snakeyaml)
     testImplementation(mn.micronaut.runtime)
-    testImplementation(mn.micronaut.inject.java)
-    testImplementation(mn.micronaut.validation)
-    testImplementation(libs.managed.swagger.annotations)
     testImplementation(mn.reactor)
+    testImplementation(mnValidation.validation)
+    testImplementation(libs.managed.swagger.annotations)
     testImplementation(mnTest.micronaut.test.junit5)
-
-    testCompileOnly(mn.micronaut.inject.java)
 
     testRuntimeOnly(libs.junit.jupiter.engine)
     testRuntimeOnly(mn.logback.classic)

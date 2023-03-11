@@ -165,7 +165,7 @@ class MyController {
 }
 
 class Pet {
-    @javax.validation.constraints.Min(18)
+    @jakarta.validation.constraints.Min(18)
     private int age;
 
 
@@ -228,7 +228,7 @@ class MyController {
 }
 
 class Pet {
-    @javax.validation.constraints.Min(18)
+    @jakarta.validation.constraints.Min(18)
     private int age;
 
 
@@ -293,7 +293,7 @@ class MyController {
 }
 
 class Pet {
-    @javax.validation.constraints.Min(18)
+    @jakarta.validation.constraints.Min(18)
     private int age;
 
 

@@ -6,7 +6,7 @@ pluginManagement {
 }
 
 plugins {
-    id 'io.micronaut.build.shared.settings' version '6.2.2'
+    id 'io.micronaut.build.shared.settings' version '6.3.5'
 }
 enableFeaturePreview 'TYPESAFE_PROJECT_ACCESSORS'
 
@@ -42,6 +42,5 @@ micronautBuild {
     importMicronautCatalog("micronaut-groovy")
     importMicronautCatalog("micronaut-validation")
     importMicronautCatalog("micronaut-data")
-    importMicronautCatalog("micronaut-test")
     importMicronautCatalog("micronaut-kotlin")
 }

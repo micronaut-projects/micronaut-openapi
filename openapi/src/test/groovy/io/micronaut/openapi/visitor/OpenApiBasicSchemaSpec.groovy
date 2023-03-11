@@ -26,7 +26,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 
-import javax.validation.constraints.*;
+import jakarta.validation.constraints.*;
 
 @Controller
 class PersonController {
@@ -162,7 +162,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 
-import javax.validation.constraints.*;
+import jakarta.validation.constraints.*;
 
 @Controller
 class PersonController {
@@ -295,7 +295,7 @@ import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import javax.validation.constraints.*;
+import jakarta.validation.constraints.*;
 @Controller
 class PersonController {
     @Operation(
@@ -419,7 +419,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 
-import javax.validation.constraints.*;
+import jakarta.validation.constraints.*;
 
 @Controller
 class PersonController {
@@ -559,7 +559,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 
-import javax.validation.constraints.*;
+import jakarta.validation.constraints.*;
 
 @Controller
 class PersonController {
@@ -699,7 +699,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 
-import javax.validation.constraints.*;
+import jakarta.validation.constraints.*;
 
 @Controller
 class PersonController {
@@ -854,7 +854,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 
-import javax.validation.constraints.*;
+import jakarta.validation.constraints.*;
 
 @Controller
 class PersonController {
@@ -1012,7 +1012,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 
-import javax.validation.constraints.*;
+import jakarta.validation.constraints.*;
 
 @Controller
 class PersonController {
@@ -1159,9 +1159,9 @@ public class MyBean {}
         buildBeanDefinition("test.MyBean", '''
 package test;
 
-import javax.validation.constraints.NegativeOrZero;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.PositiveOrZero;
+import jakarta.validation.constraints.NegativeOrZero;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.PositiveOrZero;
 
 import io.micronaut.core.annotation.Introspected;
 import io.micronaut.http.HttpResponse;

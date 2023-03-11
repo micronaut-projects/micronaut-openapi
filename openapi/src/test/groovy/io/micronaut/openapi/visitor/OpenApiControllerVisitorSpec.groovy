@@ -267,7 +267,7 @@ import io.micronaut.http.*;
 import com.fasterxml.jackson.core.*;
 import io.micronaut.http.hateoas.*;
 import java.util.List;
-import javax.validation.constraints.*;
+import jakarta.validation.constraints.*;
 
 class Pet {
     private String name;
@@ -333,7 +333,7 @@ import io.micronaut.http.*;
 import com.fasterxml.jackson.core.*;
 import io.micronaut.http.hateoas.*;
 import java.util.List;
-import javax.validation.constraints.*;
+import jakarta.validation.constraints.*;
 
 @Controller("/")
 class MyController {
@@ -705,7 +705,7 @@ class MyBean {}
 
     }
 
-    void "test parse javax.validation constraints for String"() {
+    void "test parse jakarta.validation constraints for String"() {
         given:
         buildBeanDefinition('test.MyBean', '''
 package test;
@@ -715,7 +715,7 @@ import io.swagger.v3.oas.annotations.media.*;
 import io.swagger.v3.oas.annotations.enums.*;
 import io.micronaut.http.annotation.*;
 import java.util.List;
-import javax.validation.constraints.*;
+import jakarta.validation.constraints.*;
 
 @Controller("/")
 class MyController {
@@ -751,7 +751,7 @@ class MyBean {}
 
     }
 
-    void "test parse javax.validation constraints for String[]"() {
+    void "test parse jakarta.validation constraints for String[]"() {
         given:
         buildBeanDefinition('test.MyBean', '''
 package test;
@@ -761,7 +761,7 @@ import io.swagger.v3.oas.annotations.media.*;
 import io.swagger.v3.oas.annotations.enums.*;
 import io.micronaut.http.annotation.*;
 import java.util.List;
-import javax.validation.constraints.*;
+import jakarta.validation.constraints.*;
 
 @Controller("/")
 class MyController {
@@ -796,7 +796,7 @@ class MyBean {}
 
     }
 
-    void "test parse javax.validation constraints for List"() {
+    void "test parse jakarta.validation constraints for List"() {
         given:
         buildBeanDefinition('test.MyBean', '''
 package test;
@@ -806,7 +806,7 @@ import io.swagger.v3.oas.annotations.media.*;
 import io.swagger.v3.oas.annotations.enums.*;
 import io.micronaut.http.annotation.*;
 import java.util.List;
-import javax.validation.constraints.*;
+import jakarta.validation.constraints.*;
 
 @Controller("/")
 class MyController {
@@ -841,7 +841,7 @@ class MyBean {}
 
     }
 
-    void "test parse javax.validation.NotEmpty constraint for List"() {
+    void "test parse jakarta.validation.NotEmpty constraint for List"() {
         given:
         buildBeanDefinition('test.MyBean', '''
 package test;
@@ -851,7 +851,7 @@ import io.swagger.v3.oas.annotations.media.*;
 import io.swagger.v3.oas.annotations.enums.*;
 import io.micronaut.http.annotation.*;
 import java.util.List;
-import javax.validation.constraints.*;
+import jakarta.validation.constraints.*;
 
 @Controller("/")
 class MyController {
@@ -981,7 +981,7 @@ import io.swagger.v3.oas.annotations.media.*;
 import io.swagger.v3.oas.annotations.enums.*;
 import io.micronaut.http.annotation.*;
 import java.util.List;
-import javax.validation.constraints.*;
+import jakarta.validation.constraints.*;
 
 @Controller("/")
 class MyController {

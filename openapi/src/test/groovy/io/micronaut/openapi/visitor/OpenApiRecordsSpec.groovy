@@ -152,8 +152,8 @@ class MyBean {}
         buildBeanDefinition('test.MyBean', '''
 package test;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;

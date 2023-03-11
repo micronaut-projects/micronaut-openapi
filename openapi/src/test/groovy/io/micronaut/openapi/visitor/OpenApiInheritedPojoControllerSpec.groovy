@@ -165,8 +165,8 @@ import io.micronaut.validation.Validated;
 import io.reactivex.Single;
 import io.swagger.v3.oas.annotations.media.Schema;
 
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -358,8 +358,8 @@ import io.reactivex.Single;
 import io.swagger.v3.oas.annotations.media.DiscriminatorMapping;
 import io.swagger.v3.oas.annotations.media.Schema;
 
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -551,9 +551,9 @@ class MyBean {}
         buildBeanDefinition('test.MyBean', '''
 package test;
 
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.Positive;import javax.validation.constraints.PositiveOrZero;import javax.validation.constraints.Size;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Positive;import jakarta.validation.constraints.PositiveOrZero;import jakarta.validation.constraints.Size;
 
 import io.micronaut.http.MediaType;
 import io.micronaut.http.annotation.Controller;
@@ -738,7 +738,7 @@ class Cat extends Pet {
         @JsonSubTypes.Type(value = Dog.class, name = "Dog") })
 @Schema(description = "Pet Desc")
 class Pet {
-    @javax.validation.constraints.Min(18)
+    @jakarta.validation.constraints.Min(18)
     private int age;
 
     private String name;
@@ -758,7 +758,7 @@ class Pet {
         name = n;
     }
 
-    @javax.validation.constraints.Size(max = 30)
+    @jakarta.validation.constraints.Size(max = 30)
     public String getName() {
         return name;
     }
@@ -820,10 +820,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import io.micronaut.core.annotation.Nullable;
-import javax.validation.Valid;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Min;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Min;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -440,502 +440,502 @@
     "reason": "Major update for Micronaut 4.0.0"
   },
   {
-    "type": "io.micronaut.openapi.swagger.jackson.ApiResponsesSerializer",
-    "member": "Constructor io.micronaut.openapi.swagger.jackson.ApiResponsesSerializer()",
+    "type": "io.micronaut.openapi.swagger.core.util.jackson.ApiResponsesSerializer",
+    "member": "Constructor io.micronaut.openapi.swagger.core.util.jackson.ApiResponsesSerializer()",
     "reason": "Major update for Micronaut 4.0.0"
   },
   {
-    "type": "io.micronaut.openapi.swagger.jackson.ApiResponsesSerializer",
+    "type": "io.micronaut.openapi.swagger.core.util.jackson.ApiResponsesSerializer",
     "member": "Implemented interface com.fasterxml.jackson.databind.jsonFormatVisitors.JsonFormatVisitable",
     "reason": "Major update for Micronaut 4.0.0"
   },
   {
-    "type": "io.micronaut.openapi.swagger.jackson.CallbackSerializer",
-    "member": "Constructor io.micronaut.openapi.swagger.jackson.CallbackSerializer()",
+    "type": "io.micronaut.openapi.swagger.core.util.jackson.CallbackSerializer",
+    "member": "Constructor io.micronaut.openapi.swagger.core.util.jackson.CallbackSerializer()",
     "reason": "Major update for Micronaut 4.0.0"
   },
   {
-    "type": "io.micronaut.openapi.swagger.jackson.CallbackSerializer",
+    "type": "io.micronaut.openapi.swagger.core.util.jackson.CallbackSerializer",
     "member": "Implemented interface com.fasterxml.jackson.databind.jsonFormatVisitors.JsonFormatVisitable",
     "reason": "Major update for Micronaut 4.0.0"
   },
   {
-    "type": "io.micronaut.openapi.swagger.jackson.MediaTypeSerializer",
-    "member": "Constructor io.micronaut.openapi.swagger.jackson.MediaTypeSerializer(com.fasterxml.jackson.databind.JsonSerializer)",
+    "type": "io.micronaut.openapi.swagger.core.util.jackson.MediaTypeSerializer",
+    "member": "Constructor io.micronaut.openapi.swagger.core.util.jackson.MediaTypeSerializer(com.fasterxml.jackson.databind.JsonSerializer)",
     "reason": "Major update for Micronaut 4.0.0"
   },
   {
-    "type": "io.micronaut.openapi.swagger.jackson.MediaTypeSerializer",
+    "type": "io.micronaut.openapi.swagger.core.util.jackson.MediaTypeSerializer",
     "member": "Implemented interface com.fasterxml.jackson.databind.jsonFormatVisitors.JsonFormatVisitable",
     "reason": "Major update for Micronaut 4.0.0"
   },
   {
-    "type": "io.micronaut.openapi.swagger.jackson.MediaTypeSerializer",
+    "type": "io.micronaut.openapi.swagger.core.util.jackson.MediaTypeSerializer",
     "member": "Implemented interface com.fasterxml.jackson.databind.ser.ResolvableSerializer",
     "reason": "Major update for Micronaut 4.0.0"
   },
   {
-    "type": "io.micronaut.openapi.swagger.jackson.mixin.Components31Mixin",
-    "member": "Constructor io.micronaut.openapi.swagger.jackson.mixin.Components31Mixin()",
+    "type": "io.micronaut.openapi.swagger.core.util.jackson.mixin.Components31Mixin",
+    "member": "Constructor io.micronaut.openapi.swagger.core.util.jackson.mixin.Components31Mixin()",
     "reason": "Major update for Micronaut 4.0.0"
   },
   {
-    "type": "io.micronaut.openapi.swagger.jackson.mixin.ComponentsMixin",
-    "member": "Constructor io.micronaut.openapi.swagger.jackson.mixin.ComponentsMixin()",
+    "type": "io.micronaut.openapi.swagger.core.util.jackson.mixin.ComponentsMixin",
+    "member": "Constructor io.micronaut.openapi.swagger.core.util.jackson.mixin.ComponentsMixin()",
     "reason": "Major update for Micronaut 4.0.0"
   },
   {
-    "type": "io.micronaut.openapi.swagger.jackson.mixin.DateSchemaMixin",
-    "member": "Constructor io.micronaut.openapi.swagger.jackson.mixin.DateSchemaMixin()",
+    "type": "io.micronaut.openapi.swagger.core.util.jackson.mixin.DateSchemaMixin",
+    "member": "Constructor io.micronaut.openapi.swagger.core.util.jackson.mixin.DateSchemaMixin()",
     "reason": "Major update for Micronaut 4.0.0"
   },
   {
-    "type": "io.micronaut.openapi.swagger.jackson.mixin.Discriminator31Mixin",
-    "member": "Constructor io.micronaut.openapi.swagger.jackson.mixin.Discriminator31Mixin()",
+    "type": "io.micronaut.openapi.swagger.core.util.jackson.mixin.Discriminator31Mixin",
+    "member": "Constructor io.micronaut.openapi.swagger.core.util.jackson.mixin.Discriminator31Mixin()",
     "reason": "Major update for Micronaut 4.0.0"
   },
   {
-    "type": "io.micronaut.openapi.swagger.jackson.mixin.DiscriminatorMixin",
-    "member": "Constructor io.micronaut.openapi.swagger.jackson.mixin.DiscriminatorMixin()",
+    "type": "io.micronaut.openapi.swagger.core.util.jackson.mixin.DiscriminatorMixin",
+    "member": "Constructor io.micronaut.openapi.swagger.core.util.jackson.mixin.DiscriminatorMixin()",
     "reason": "Major update for Micronaut 4.0.0"
   },
   {
-    "type": "io.micronaut.openapi.swagger.jackson.mixin.ExampleMixin",
-    "member": "Constructor io.micronaut.openapi.swagger.jackson.mixin.ExampleMixin()",
+    "type": "io.micronaut.openapi.swagger.core.util.jackson.mixin.ExampleMixin",
+    "member": "Constructor io.micronaut.openapi.swagger.core.util.jackson.mixin.ExampleMixin()",
     "reason": "Major update for Micronaut 4.0.0"
   },
   {
-    "type": "io.micronaut.openapi.swagger.jackson.mixin.ExtensionsMixin",
-    "member": "Constructor io.micronaut.openapi.swagger.jackson.mixin.ExtensionsMixin()",
+    "type": "io.micronaut.openapi.swagger.core.util.jackson.mixin.ExtensionsMixin",
+    "member": "Constructor io.micronaut.openapi.swagger.core.util.jackson.mixin.ExtensionsMixin()",
     "reason": "Major update for Micronaut 4.0.0"
   },
   {
-    "type": "io.micronaut.openapi.swagger.jackson.mixin.Info31Mixin",
-    "member": "Constructor io.micronaut.openapi.swagger.jackson.mixin.Info31Mixin()",
+    "type": "io.micronaut.openapi.swagger.core.util.jackson.mixin.Info31Mixin",
+    "member": "Constructor io.micronaut.openapi.swagger.core.util.jackson.mixin.Info31Mixin()",
     "reason": "Major update for Micronaut 4.0.0"
   },
   {
-    "type": "io.micronaut.openapi.swagger.jackson.mixin.InfoMixin",
-    "member": "Constructor io.micronaut.openapi.swagger.jackson.mixin.InfoMixin()",
+    "type": "io.micronaut.openapi.swagger.core.util.jackson.mixin.InfoMixin",
+    "member": "Constructor io.micronaut.openapi.swagger.core.util.jackson.mixin.InfoMixin()",
     "reason": "Major update for Micronaut 4.0.0"
   },
   {
-    "type": "io.micronaut.openapi.swagger.jackson.mixin.LicenseMixin",
-    "member": "Constructor io.micronaut.openapi.swagger.jackson.mixin.LicenseMixin()",
+    "type": "io.micronaut.openapi.swagger.core.util.jackson.mixin.LicenseMixin",
+    "member": "Constructor io.micronaut.openapi.swagger.core.util.jackson.mixin.LicenseMixin()",
     "reason": "Major update for Micronaut 4.0.0"
   },
   {
-    "type": "io.micronaut.openapi.swagger.jackson.mixin.MediaTypeMixin",
-    "member": "Constructor io.micronaut.openapi.swagger.jackson.mixin.MediaTypeMixin()",
+    "type": "io.micronaut.openapi.swagger.core.util.jackson.mixin.MediaTypeMixin",
+    "member": "Constructor io.micronaut.openapi.swagger.core.util.jackson.mixin.MediaTypeMixin()",
     "reason": "Major update for Micronaut 4.0.0"
   },
   {
-    "type": "io.micronaut.openapi.swagger.jackson.mixin.OpenAPI31Mixin",
-    "member": "Constructor io.micronaut.openapi.swagger.jackson.mixin.OpenAPI31Mixin()",
+    "type": "io.micronaut.openapi.swagger.core.util.jackson.mixin.OpenAPI31Mixin",
+    "member": "Constructor io.micronaut.openapi.swagger.core.util.jackson.mixin.OpenAPI31Mixin()",
     "reason": "Major update for Micronaut 4.0.0"
   },
   {
-    "type": "io.micronaut.openapi.swagger.jackson.mixin.OpenAPIMixin",
-    "member": "Constructor io.micronaut.openapi.swagger.jackson.mixin.OpenAPIMixin()",
+    "type": "io.micronaut.openapi.swagger.core.util.jackson.mixin.OpenAPIMixin",
+    "member": "Constructor io.micronaut.openapi.swagger.core.util.jackson.mixin.OpenAPIMixin()",
     "reason": "Major update for Micronaut 4.0.0"
   },
   {
-    "type": "io.micronaut.openapi.swagger.jackson.mixin.OperationMixin",
-    "member": "Constructor io.micronaut.openapi.swagger.jackson.mixin.OperationMixin()",
+    "type": "io.micronaut.openapi.swagger.core.util.jackson.mixin.OperationMixin",
+    "member": "Constructor io.micronaut.openapi.swagger.core.util.jackson.mixin.OperationMixin()",
     "reason": "Major update for Micronaut 4.0.0"
   },
   {
-    "type": "io.micronaut.openapi.swagger.jackson.mixin.Schema31Mixin",
-    "member": "Constructor io.micronaut.openapi.swagger.jackson.mixin.Schema31Mixin()",
+    "type": "io.micronaut.openapi.swagger.core.util.jackson.mixin.Schema31Mixin",
+    "member": "Constructor io.micronaut.openapi.swagger.core.util.jackson.mixin.Schema31Mixin()",
     "reason": "Major update for Micronaut 4.0.0"
   },
   {
-    "type": "io.micronaut.openapi.swagger.jackson.mixin.Schema31Mixin$TypeSerializer",
-    "member": "Constructor io.micronaut.openapi.swagger.jackson.mixin.Schema31Mixin$TypeSerializer()",
+    "type": "io.micronaut.openapi.swagger.core.util.jackson.mixin.Schema31Mixin$TypeSerializer",
+    "member": "Constructor io.micronaut.openapi.swagger.core.util.jackson.mixin.Schema31Mixin$TypeSerializer()",
     "reason": "Major update for Micronaut 4.0.0"
   },
   {
-    "type": "io.micronaut.openapi.swagger.jackson.mixin.Schema31Mixin$TypeSerializer",
+    "type": "io.micronaut.openapi.swagger.core.util.jackson.mixin.Schema31Mixin$TypeSerializer",
     "member": "Implemented interface com.fasterxml.jackson.databind.jsonFormatVisitors.JsonFormatVisitable",
     "reason": "Major update for Micronaut 4.0.0"
   },
   {
-    "type": "io.micronaut.openapi.swagger.jackson.mixin.SchemaConverterMixin",
-    "member": "Constructor io.micronaut.openapi.swagger.jackson.mixin.SchemaConverterMixin()",
+    "type": "io.micronaut.openapi.swagger.core.util.jackson.mixin.SchemaConverterMixin",
+    "member": "Constructor io.micronaut.openapi.swagger.core.util.jackson.mixin.SchemaConverterMixin()",
     "reason": "Major update for Micronaut 4.0.0"
   },
   {
-    "type": "io.micronaut.openapi.swagger.jackson.mixin.SchemaMixin",
-    "member": "Constructor io.micronaut.openapi.swagger.jackson.mixin.SchemaMixin()",
+    "type": "io.micronaut.openapi.swagger.core.util.jackson.mixin.SchemaMixin",
+    "member": "Constructor io.micronaut.openapi.swagger.core.util.jackson.mixin.SchemaMixin()",
     "reason": "Major update for Micronaut 4.0.0"
   },
   {
-    "type": "io.micronaut.openapi.swagger.jackson.PathsSerializer",
-    "member": "Constructor io.micronaut.openapi.swagger.jackson.PathsSerializer()",
+    "type": "io.micronaut.openapi.swagger.core.util.jackson.PathsSerializer",
+    "member": "Constructor io.micronaut.openapi.swagger.core.util.jackson.PathsSerializer()",
     "reason": "Major update for Micronaut 4.0.0"
   },
   {
-    "type": "io.micronaut.openapi.swagger.jackson.PathsSerializer",
+    "type": "io.micronaut.openapi.swagger.core.util.jackson.PathsSerializer",
     "member": "Implemented interface com.fasterxml.jackson.databind.jsonFormatVisitors.JsonFormatVisitable",
     "reason": "Major update for Micronaut 4.0.0"
   },
   {
-    "type": "io.micronaut.openapi.swagger.jackson.Schema31Serializer",
-    "member": "Constructor io.micronaut.openapi.swagger.jackson.Schema31Serializer(com.fasterxml.jackson.databind.JsonSerializer)",
+    "type": "io.micronaut.openapi.swagger.core.util.jackson.Schema31Serializer",
+    "member": "Constructor io.micronaut.openapi.swagger.core.util.jackson.Schema31Serializer(com.fasterxml.jackson.databind.JsonSerializer)",
     "reason": "Major update for Micronaut 4.0.0"
   },
   {
-    "type": "io.micronaut.openapi.swagger.jackson.Schema31Serializer",
+    "type": "io.micronaut.openapi.swagger.core.util.jackson.Schema31Serializer",
     "member": "Implemented interface com.fasterxml.jackson.databind.jsonFormatVisitors.JsonFormatVisitable",
     "reason": "Major update for Micronaut 4.0.0"
   },
   {
-    "type": "io.micronaut.openapi.swagger.jackson.Schema31Serializer",
+    "type": "io.micronaut.openapi.swagger.core.util.jackson.Schema31Serializer",
     "member": "Implemented interface com.fasterxml.jackson.databind.ser.ResolvableSerializer",
     "reason": "Major update for Micronaut 4.0.0"
   },
   {
-    "type": "io.micronaut.openapi.swagger.jackson.SchemaSerializer",
-    "member": "Constructor io.micronaut.openapi.swagger.jackson.SchemaSerializer(com.fasterxml.jackson.databind.JsonSerializer)",
+    "type": "io.micronaut.openapi.swagger.core.util.jackson.SchemaSerializer",
+    "member": "Constructor io.micronaut.openapi.swagger.core.util.jackson.SchemaSerializer(com.fasterxml.jackson.databind.JsonSerializer)",
     "reason": "Major update for Micronaut 4.0.0"
   },
   {
-    "type": "io.micronaut.openapi.swagger.jackson.SchemaSerializer",
+    "type": "io.micronaut.openapi.swagger.core.util.jackson.SchemaSerializer",
     "member": "Implemented interface com.fasterxml.jackson.databind.jsonFormatVisitors.JsonFormatVisitable",
     "reason": "Major update for Micronaut 4.0.0"
   },
   {
-    "type": "io.micronaut.openapi.swagger.jackson.SchemaSerializer",
+    "type": "io.micronaut.openapi.swagger.core.util.jackson.SchemaSerializer",
     "member": "Implemented interface com.fasterxml.jackson.databind.ser.ResolvableSerializer",
     "reason": "Major update for Micronaut 4.0.0"
   },
   {
-    "type": "io.micronaut.openapi.swagger.jackson.util.ApiResponses31Deserializer",
-    "member": "Constructor io.micronaut.openapi.swagger.jackson.util.ApiResponses31Deserializer()",
+    "type": "io.micronaut.openapi.swagger.core.util.jackson.util.ApiResponses31Deserializer",
+    "member": "Constructor io.micronaut.openapi.swagger.core.util.jackson.util.ApiResponses31Deserializer()",
     "reason": "Major update for Micronaut 4.0.0"
   },
   {
-    "type": "io.micronaut.openapi.swagger.jackson.util.ApiResponses31Deserializer",
+    "type": "io.micronaut.openapi.swagger.core.util.jackson.util.ApiResponses31Deserializer",
     "member": "Implemented interface com.fasterxml.jackson.databind.deser.NullValueProvider",
     "reason": "Major update for Micronaut 4.0.0"
   },
   {
-    "type": "io.micronaut.openapi.swagger.jackson.util.ApiResponsesDeserializer",
+    "type": "io.micronaut.openapi.swagger.core.util.jackson.util.ApiResponsesDeserializer",
     "member": "Field openapi31",
     "reason": "Major update for Micronaut 4.0.0"
   },
   {
-    "type": "io.micronaut.openapi.swagger.jackson.util.ApiResponsesDeserializer",
-    "member": "Constructor io.micronaut.openapi.swagger.jackson.util.ApiResponsesDeserializer()",
+    "type": "io.micronaut.openapi.swagger.core.util.jackson.util.ApiResponsesDeserializer",
+    "member": "Constructor io.micronaut.openapi.swagger.core.util.jackson.util.ApiResponsesDeserializer()",
     "reason": "Major update for Micronaut 4.0.0"
   },
   {
-    "type": "io.micronaut.openapi.swagger.jackson.util.ApiResponsesDeserializer",
+    "type": "io.micronaut.openapi.swagger.core.util.jackson.util.ApiResponsesDeserializer",
     "member": "Implemented interface com.fasterxml.jackson.databind.deser.NullValueProvider",
     "reason": "Major update for Micronaut 4.0.0"
   },
   {
-    "type": "io.micronaut.openapi.swagger.jackson.util.Callback31Deserializer",
-    "member": "Constructor io.micronaut.openapi.swagger.jackson.util.Callback31Deserializer()",
+    "type": "io.micronaut.openapi.swagger.core.util.jackson.util.Callback31Deserializer",
+    "member": "Constructor io.micronaut.openapi.swagger.core.util.jackson.util.Callback31Deserializer()",
     "reason": "Major update for Micronaut 4.0.0"
   },
   {
-    "type": "io.micronaut.openapi.swagger.jackson.util.Callback31Deserializer",
+    "type": "io.micronaut.openapi.swagger.core.util.jackson.util.Callback31Deserializer",
     "member": "Implemented interface com.fasterxml.jackson.databind.deser.NullValueProvider",
     "reason": "Major update for Micronaut 4.0.0"
   },
   {
-    "type": "io.micronaut.openapi.swagger.jackson.util.CallbackDeserializer",
+    "type": "io.micronaut.openapi.swagger.core.util.jackson.util.CallbackDeserializer",
     "member": "Field openapi31",
     "reason": "Major update for Micronaut 4.0.0"
   },
   {
-    "type": "io.micronaut.openapi.swagger.jackson.util.CallbackDeserializer",
-    "member": "Constructor io.micronaut.openapi.swagger.jackson.util.CallbackDeserializer()",
+    "type": "io.micronaut.openapi.swagger.core.util.jackson.util.CallbackDeserializer",
+    "member": "Constructor io.micronaut.openapi.swagger.core.util.jackson.util.CallbackDeserializer()",
     "reason": "Major update for Micronaut 4.0.0"
   },
   {
-    "type": "io.micronaut.openapi.swagger.jackson.util.CallbackDeserializer",
+    "type": "io.micronaut.openapi.swagger.core.util.jackson.util.CallbackDeserializer",
     "member": "Implemented interface com.fasterxml.jackson.databind.deser.NullValueProvider",
     "reason": "Major update for Micronaut 4.0.0"
   },
   {
-    "type": "io.micronaut.openapi.swagger.jackson.util.DeserializationModule",
-    "member": "Constructor io.micronaut.openapi.swagger.jackson.util.DeserializationModule()",
+    "type": "io.micronaut.openapi.swagger.core.util.jackson.util.DeserializationModule",
+    "member": "Constructor io.micronaut.openapi.swagger.core.util.jackson.util.DeserializationModule()",
     "reason": "Major update for Micronaut 4.0.0"
   },
   {
-    "type": "io.micronaut.openapi.swagger.jackson.util.DeserializationModule",
+    "type": "io.micronaut.openapi.swagger.core.util.jackson.util.DeserializationModule",
     "member": "Implemented interface com.fasterxml.jackson.core.Versioned",
     "reason": "Major update for Micronaut 4.0.0"
   },
   {
-    "type": "io.micronaut.openapi.swagger.jackson.util.DeserializationModule",
+    "type": "io.micronaut.openapi.swagger.core.util.jackson.util.DeserializationModule",
     "member": "Implemented interface java.io.Serializable",
     "reason": "Major update for Micronaut 4.0.0"
   },
   {
-    "type": "io.micronaut.openapi.swagger.jackson.util.DeserializationModule31",
-    "member": "Constructor io.micronaut.openapi.swagger.jackson.util.DeserializationModule31()",
+    "type": "io.micronaut.openapi.swagger.core.util.jackson.util.DeserializationModule31",
+    "member": "Constructor io.micronaut.openapi.swagger.core.util.jackson.util.DeserializationModule31()",
     "reason": "Major update for Micronaut 4.0.0"
   },
   {
-    "type": "io.micronaut.openapi.swagger.jackson.util.DeserializationModule31",
+    "type": "io.micronaut.openapi.swagger.core.util.jackson.util.DeserializationModule31",
     "member": "Implemented interface com.fasterxml.jackson.core.Versioned",
     "reason": "Major update for Micronaut 4.0.0"
   },
   {
-    "type": "io.micronaut.openapi.swagger.jackson.util.DeserializationModule31",
+    "type": "io.micronaut.openapi.swagger.core.util.jackson.util.DeserializationModule31",
     "member": "Implemented interface java.io.Serializable",
     "reason": "Major update for Micronaut 4.0.0"
   },
   {
-    "type": "io.micronaut.openapi.swagger.jackson.util.EncodingPropertyStyleEnumDeserializer",
-    "member": "Constructor io.micronaut.openapi.swagger.jackson.util.EncodingPropertyStyleEnumDeserializer()",
+    "type": "io.micronaut.openapi.swagger.core.util.jackson.util.EncodingPropertyStyleEnumDeserializer",
+    "member": "Constructor io.micronaut.openapi.swagger.core.util.jackson.util.EncodingPropertyStyleEnumDeserializer()",
     "reason": "Major update for Micronaut 4.0.0"
   },
   {
-    "type": "io.micronaut.openapi.swagger.jackson.util.EncodingPropertyStyleEnumDeserializer",
+    "type": "io.micronaut.openapi.swagger.core.util.jackson.util.EncodingPropertyStyleEnumDeserializer",
     "member": "Implemented interface com.fasterxml.jackson.databind.deser.NullValueProvider",
     "reason": "Major update for Micronaut 4.0.0"
   },
   {
-    "type": "io.micronaut.openapi.swagger.jackson.util.EncodingStyleEnumDeserializer",
-    "member": "Constructor io.micronaut.openapi.swagger.jackson.util.EncodingStyleEnumDeserializer()",
+    "type": "io.micronaut.openapi.swagger.core.util.jackson.util.EncodingStyleEnumDeserializer",
+    "member": "Constructor io.micronaut.openapi.swagger.core.util.jackson.util.EncodingStyleEnumDeserializer()",
     "reason": "Major update for Micronaut 4.0.0"
   },
   {
-    "type": "io.micronaut.openapi.swagger.jackson.util.EncodingStyleEnumDeserializer",
+    "type": "io.micronaut.openapi.swagger.core.util.jackson.util.EncodingStyleEnumDeserializer",
     "member": "Implemented interface com.fasterxml.jackson.databind.deser.NullValueProvider",
     "reason": "Major update for Micronaut 4.0.0"
   },
   {
-    "type": "io.micronaut.openapi.swagger.jackson.util.HeaderStyleEnumDeserializer",
-    "member": "Constructor io.micronaut.openapi.swagger.jackson.util.HeaderStyleEnumDeserializer()",
+    "type": "io.micronaut.openapi.swagger.core.util.jackson.util.HeaderStyleEnumDeserializer",
+    "member": "Constructor io.micronaut.openapi.swagger.core.util.jackson.util.HeaderStyleEnumDeserializer()",
     "reason": "Major update for Micronaut 4.0.0"
   },
   {
-    "type": "io.micronaut.openapi.swagger.jackson.util.HeaderStyleEnumDeserializer",
+    "type": "io.micronaut.openapi.swagger.core.util.jackson.util.HeaderStyleEnumDeserializer",
     "member": "Implemented interface com.fasterxml.jackson.databind.deser.NullValueProvider",
     "reason": "Major update for Micronaut 4.0.0"
   },
   {
-    "type": "io.micronaut.openapi.swagger.jackson.util.Model31Deserializer",
-    "member": "Constructor io.micronaut.openapi.swagger.jackson.util.Model31Deserializer()",
+    "type": "io.micronaut.openapi.swagger.core.util.jackson.util.Model31Deserializer",
+    "member": "Constructor io.micronaut.openapi.swagger.core.util.jackson.util.Model31Deserializer()",
     "reason": "Major update for Micronaut 4.0.0"
   },
   {
-    "type": "io.micronaut.openapi.swagger.jackson.util.Model31Deserializer",
+    "type": "io.micronaut.openapi.swagger.core.util.jackson.util.Model31Deserializer",
     "member": "Implemented interface com.fasterxml.jackson.databind.deser.NullValueProvider",
     "reason": "Major update for Micronaut 4.0.0"
   },
   {
-    "type": "io.micronaut.openapi.swagger.jackson.util.ModelDeserializer",
+    "type": "io.micronaut.openapi.swagger.core.util.jackson.util.ModelDeserializer",
     "member": "Field openapi31",
     "reason": "Major update for Micronaut 4.0.0"
   },
   {
-    "type": "io.micronaut.openapi.swagger.jackson.util.ModelDeserializer",
-    "member": "Constructor io.micronaut.openapi.swagger.jackson.util.ModelDeserializer()",
+    "type": "io.micronaut.openapi.swagger.core.util.jackson.util.ModelDeserializer",
+    "member": "Constructor io.micronaut.openapi.swagger.core.util.jackson.util.ModelDeserializer()",
     "reason": "Major update for Micronaut 4.0.0"
   },
   {
-    "type": "io.micronaut.openapi.swagger.jackson.util.ModelDeserializer",
+    "type": "io.micronaut.openapi.swagger.core.util.jackson.util.ModelDeserializer",
     "member": "Implemented interface com.fasterxml.jackson.databind.deser.NullValueProvider",
     "reason": "Major update for Micronaut 4.0.0"
   },
   {
-    "type": "io.micronaut.openapi.swagger.jackson.util.Parameter31Deserializer",
-    "member": "Constructor io.micronaut.openapi.swagger.jackson.util.Parameter31Deserializer()",
+    "type": "io.micronaut.openapi.swagger.core.util.jackson.util.Parameter31Deserializer",
+    "member": "Constructor io.micronaut.openapi.swagger.core.util.jackson.util.Parameter31Deserializer()",
     "reason": "Major update for Micronaut 4.0.0"
   },
   {
-    "type": "io.micronaut.openapi.swagger.jackson.util.Parameter31Deserializer",
+    "type": "io.micronaut.openapi.swagger.core.util.jackson.util.Parameter31Deserializer",
     "member": "Implemented interface com.fasterxml.jackson.databind.deser.NullValueProvider",
     "reason": "Major update for Micronaut 4.0.0"
   },
   {
-    "type": "io.micronaut.openapi.swagger.jackson.util.ParameterDeserializer",
+    "type": "io.micronaut.openapi.swagger.core.util.jackson.util.ParameterDeserializer",
     "member": "Field openapi31",
     "reason": "Major update for Micronaut 4.0.0"
   },
   {
-    "type": "io.micronaut.openapi.swagger.jackson.util.ParameterDeserializer",
-    "member": "Constructor io.micronaut.openapi.swagger.jackson.util.ParameterDeserializer()",
+    "type": "io.micronaut.openapi.swagger.core.util.jackson.util.ParameterDeserializer",
+    "member": "Constructor io.micronaut.openapi.swagger.core.util.jackson.util.ParameterDeserializer()",
     "reason": "Major update for Micronaut 4.0.0"
   },
   {
-    "type": "io.micronaut.openapi.swagger.jackson.util.ParameterDeserializer",
+    "type": "io.micronaut.openapi.swagger.core.util.jackson.util.ParameterDeserializer",
     "member": "Implemented interface com.fasterxml.jackson.databind.deser.NullValueProvider",
     "reason": "Major update for Micronaut 4.0.0"
   },
   {
-    "type": "io.micronaut.openapi.swagger.jackson.util.Paths31Deserializer",
-    "member": "Constructor io.micronaut.openapi.swagger.jackson.util.Paths31Deserializer()",
+    "type": "io.micronaut.openapi.swagger.core.util.jackson.util.Paths31Deserializer",
+    "member": "Constructor io.micronaut.openapi.swagger.core.util.jackson.util.Paths31Deserializer()",
     "reason": "Major update for Micronaut 4.0.0"
   },
   {
-    "type": "io.micronaut.openapi.swagger.jackson.util.Paths31Deserializer",
+    "type": "io.micronaut.openapi.swagger.core.util.jackson.util.Paths31Deserializer",
     "member": "Implemented interface com.fasterxml.jackson.databind.deser.NullValueProvider",
     "reason": "Major update for Micronaut 4.0.0"
   },
   {
-    "type": "io.micronaut.openapi.swagger.jackson.util.PathsDeserializer",
+    "type": "io.micronaut.openapi.swagger.core.util.jackson.util.PathsDeserializer",
     "member": "Field openapi31",
     "reason": "Major update for Micronaut 4.0.0"
   },
   {
-    "type": "io.micronaut.openapi.swagger.jackson.util.PathsDeserializer",
-    "member": "Constructor io.micronaut.openapi.swagger.jackson.util.PathsDeserializer()",
+    "type": "io.micronaut.openapi.swagger.core.util.jackson.util.PathsDeserializer",
+    "member": "Constructor io.micronaut.openapi.swagger.core.util.jackson.util.PathsDeserializer()",
     "reason": "Major update for Micronaut 4.0.0"
   },
   {
-    "type": "io.micronaut.openapi.swagger.jackson.util.PathsDeserializer",
+    "type": "io.micronaut.openapi.swagger.core.util.jackson.util.PathsDeserializer",
     "member": "Implemented interface com.fasterxml.jackson.databind.deser.NullValueProvider",
     "reason": "Major update for Micronaut 4.0.0"
   },
   {
-    "type": "io.micronaut.openapi.swagger.jackson.util.SecurityScheme31Deserializer",
-    "member": "Constructor io.micronaut.openapi.swagger.jackson.util.SecurityScheme31Deserializer()",
+    "type": "io.micronaut.openapi.swagger.core.util.jackson.util.SecurityScheme31Deserializer",
+    "member": "Constructor io.micronaut.openapi.swagger.core.util.jackson.util.SecurityScheme31Deserializer()",
     "reason": "Major update for Micronaut 4.0.0"
   },
   {
-    "type": "io.micronaut.openapi.swagger.jackson.util.SecurityScheme31Deserializer",
+    "type": "io.micronaut.openapi.swagger.core.util.jackson.util.SecurityScheme31Deserializer",
     "member": "Implemented interface com.fasterxml.jackson.databind.deser.NullValueProvider",
     "reason": "Major update for Micronaut 4.0.0"
   },
   {
-    "type": "io.micronaut.openapi.swagger.jackson.util.SecuritySchemeDeserializer",
+    "type": "io.micronaut.openapi.swagger.core.util.jackson.util.SecuritySchemeDeserializer",
     "member": "Field openapi31",
     "reason": "Major update for Micronaut 4.0.0"
   },
   {
-    "type": "io.micronaut.openapi.swagger.jackson.util.SecuritySchemeDeserializer",
-    "member": "Constructor io.micronaut.openapi.swagger.jackson.util.SecuritySchemeDeserializer()",
+    "type": "io.micronaut.openapi.swagger.core.util.jackson.util.SecuritySchemeDeserializer",
+    "member": "Constructor io.micronaut.openapi.swagger.core.util.jackson.util.SecuritySchemeDeserializer()",
     "reason": "Major update for Micronaut 4.0.0"
   },
   {
-    "type": "io.micronaut.openapi.swagger.jackson.util.SecuritySchemeDeserializer",
+    "type": "io.micronaut.openapi.swagger.core.util.jackson.util.SecuritySchemeDeserializer",
     "member": "Implemented interface com.fasterxml.jackson.databind.deser.NullValueProvider",
     "reason": "Major update for Micronaut 4.0.0"
   },
   {
-    "type": "io.micronaut.openapi.swagger.PrimitiveType",
+    "type": "io.micronaut.openapi.swagger.core.util.PrimitiveType",
     "member": "Field FLOAT",
     "reason": "Major update for Micronaut 4.0.0"
   },
   {
-    "type": "io.micronaut.openapi.swagger.PrimitiveType",
+    "type": "io.micronaut.openapi.swagger.core.util.PrimitiveType",
     "member": "Field datatypeMappings",
     "reason": "Major update for Micronaut 4.0.0"
   },
   {
-    "type": "io.micronaut.openapi.swagger.PrimitiveType",
+    "type": "io.micronaut.openapi.swagger.core.util.PrimitiveType",
     "member": "Field BINARY",
     "reason": "Major update for Micronaut 4.0.0"
   },
   {
-    "type": "io.micronaut.openapi.swagger.PrimitiveType",
+    "type": "io.micronaut.openapi.swagger.core.util.PrimitiveType",
     "member": "Field DECIMAL",
     "reason": "Major update for Micronaut 4.0.0"
   },
   {
-    "type": "io.micronaut.openapi.swagger.PrimitiveType",
+    "type": "io.micronaut.openapi.swagger.core.util.PrimitiveType",
     "member": "Field EMAIL",
     "reason": "Major update for Micronaut 4.0.0"
   },
   {
-    "type": "io.micronaut.openapi.swagger.PrimitiveType",
+    "type": "io.micronaut.openapi.swagger.core.util.PrimitiveType",
     "member": "Field URI",
     "reason": "Major update for Micronaut 4.0.0"
   },
   {
-    "type": "io.micronaut.openapi.swagger.PrimitiveType",
+    "type": "io.micronaut.openapi.swagger.core.util.PrimitiveType",
     "member": "Field URL",
     "reason": "Major update for Micronaut 4.0.0"
   },
   {
-    "type": "io.micronaut.openapi.swagger.PrimitiveType",
+    "type": "io.micronaut.openapi.swagger.core.util.PrimitiveType",
     "member": "Field INT",
     "reason": "Major update for Micronaut 4.0.0"
   },
   {
-    "type": "io.micronaut.openapi.swagger.PrimitiveType",
+    "type": "io.micronaut.openapi.swagger.core.util.PrimitiveType",
     "member": "Field BYTE",
     "reason": "Major update for Micronaut 4.0.0"
   },
   {
-    "type": "io.micronaut.openapi.swagger.PrimitiveType",
+    "type": "io.micronaut.openapi.swagger.core.util.PrimitiveType",
     "member": "Field DOUBLE",
     "reason": "Major update for Micronaut 4.0.0"
   },
   {
-    "type": "io.micronaut.openapi.swagger.PrimitiveType",
+    "type": "io.micronaut.openapi.swagger.core.util.PrimitiveType",
     "member": "Field UUID",
     "reason": "Major update for Micronaut 4.0.0"
   },
   {
-    "type": "io.micronaut.openapi.swagger.PrimitiveType",
+    "type": "io.micronaut.openapi.swagger.core.util.PrimitiveType",
     "member": "Field FILE",
     "reason": "Major update for Micronaut 4.0.0"
   },
   {
-    "type": "io.micronaut.openapi.swagger.PrimitiveType",
+    "type": "io.micronaut.openapi.swagger.core.util.PrimitiveType",
     "member": "Field LONG",
     "reason": "Major update for Micronaut 4.0.0"
   },
   {
-    "type": "io.micronaut.openapi.swagger.PrimitiveType",
+    "type": "io.micronaut.openapi.swagger.core.util.PrimitiveType",
     "member": "Field INTEGER",
     "reason": "Major update for Micronaut 4.0.0"
   },
   {
-    "type": "io.micronaut.openapi.swagger.PrimitiveType",
+    "type": "io.micronaut.openapi.swagger.core.util.PrimitiveType",
     "member": "Field NUMBER",
     "reason": "Major update for Micronaut 4.0.0"
   },
   {
-    "type": "io.micronaut.openapi.swagger.PrimitiveType",
+    "type": "io.micronaut.openapi.swagger.core.util.PrimitiveType",
     "member": "Field PARTIAL_TIME",
     "reason": "Major update for Micronaut 4.0.0"
   },
   {
-    "type": "io.micronaut.openapi.swagger.PrimitiveType",
+    "type": "io.micronaut.openapi.swagger.core.util.PrimitiveType",
     "member": "Field OBJECT",
     "reason": "Major update for Micronaut 4.0.0"
   },
   {
-    "type": "io.micronaut.openapi.swagger.PrimitiveType",
+    "type": "io.micronaut.openapi.swagger.core.util.PrimitiveType",
     "member": "Field BOOLEAN",
     "reason": "Major update for Micronaut 4.0.0"
   },
   {
-    "type": "io.micronaut.openapi.swagger.PrimitiveType",
+    "type": "io.micronaut.openapi.swagger.core.util.PrimitiveType",
     "member": "Field DATE",
     "reason": "Major update for Micronaut 4.0.0"
   },
   {
-    "type": "io.micronaut.openapi.swagger.PrimitiveType",
+    "type": "io.micronaut.openapi.swagger.core.util.PrimitiveType",
     "member": "Field STRING",
     "reason": "Major update for Micronaut 4.0.0"
   },
   {
-    "type": "io.micronaut.openapi.swagger.PrimitiveType",
+    "type": "io.micronaut.openapi.swagger.core.util.PrimitiveType",
     "member": "Field DATE_TIME",
     "reason": "Major update for Micronaut 4.0.0"
   },
   {
-    "type": "io.micronaut.openapi.swagger.PrimitiveType",
+    "type": "io.micronaut.openapi.swagger.core.util.PrimitiveType",
     "member": "Implemented interface java.lang.constant.Constable",
     "reason": "Major update for Micronaut 4.0.0"
   },
   {
-    "type": "io.micronaut.openapi.swagger.PrimitiveType",
+    "type": "io.micronaut.openapi.swagger.core.util.PrimitiveType",
     "member": "Implemented interface java.lang.Comparable",
     "reason": "Major update for Micronaut 4.0.0"
   },
   {
-    "type": "io.micronaut.openapi.swagger.PrimitiveType",
+    "type": "io.micronaut.openapi.swagger.core.util.PrimitiveType",
     "member": "Implemented interface java.io.Serializable",
     "reason": "Major update for Micronaut 4.0.0"
   },

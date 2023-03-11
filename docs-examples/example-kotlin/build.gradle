@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.kotlin.kapt)
@@ -25,7 +27,7 @@ dependencies {
     testImplementation(mn.reactor)
     testImplementation(mn.snakeyaml)
     testImplementation(mn.micronaut.runtime)
-    testImplementation(mn.micronaut.validation)
+    testImplementation(mnValidation.validation)
     testImplementation(libs.kotlin.stdlib.jdk8)
     testImplementation(libs.kotlin.reflect)
     testImplementation(mnTest.micronaut.test.junit5)
@@ -49,9 +51,9 @@ test {
 }
 
 compileTestKotlin {
-    kotlinOptions {
-        jvmTarget = '17'
-        javaParameters = true
+    compilerOptions {
+        jvmTarget.set(JvmTarget.JVM_17)
+        javaParameters.set(true)
     }
 }
 ext.skipDocumentation=true

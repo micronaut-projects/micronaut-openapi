@@ -1,7 +1,7 @@
 package io.micronaut.openapi.visitor
 
 import io.micronaut.openapi.AbstractOpenApiTypeElementSpec
-import io.micronaut.openapi.swagger.PrimitiveType
+import io.micronaut.openapi.swagger.core.util.PrimitiveType
 import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.Operation
 import io.swagger.v3.oas.models.media.Schema
