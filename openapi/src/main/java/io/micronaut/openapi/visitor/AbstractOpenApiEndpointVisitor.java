@@ -32,7 +32,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import io.micronaut.core.annotation.AnnotationValue;
-import io.micronaut.core.annotation.Nullable;
 import io.micronaut.core.beans.BeanMap;
 import io.micronaut.core.bind.annotation.Bindable;
 import io.micronaut.core.naming.NameUtils;
@@ -40,6 +39,7 @@ import io.micronaut.core.reflect.ClassUtils;
 import io.micronaut.core.util.ArrayUtils;
 import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.core.util.StringUtils;
+import io.micronaut.http.HttpHeaders;
 import io.micronaut.http.HttpMethod;
 import io.micronaut.http.HttpRequest;
 import io.micronaut.http.HttpResponse;
@@ -99,6 +99,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 
+import static io.micronaut.openapi.visitor.TypeElementUtils.isNullable;
 import static io.micronaut.openapi.visitor.Utils.DEFAULT_MEDIA_TYPES;
 
 /**
@@ -645,7 +646,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                         }
                         unwrappedParameter.setName(entry.getKey());
                         unwrappedParameter.setSchema(entry.getValue());
-                        swaggerParameters.add(unwrappedParameter);
+                        addSwaggerParamater(unwrappedParameter, swaggerParameters);
                     }
                 }
             }
@@ -665,7 +666,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                 }
             }
 
-            swaggerParameters.add(newParameter);
+            addSwaggerParamater(newParameter, swaggerParameters);
 
             Schema schema = newParameter.getSchema();
             if (schema == null) {
@@ -677,6 +678,15 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                 newParameter.setSchema(schema);
             }
         }
+    }
+
+    private void addSwaggerParamater(Parameter newParameter, List<Parameter> swaggerParameters) {
+        for (Parameter swaggerParameter : swaggerParameters) {
+            if (newParameter.getName().equals(swaggerParameter.getName())) {
+                return;
+            }
+        }
+        swaggerParameters.add(newParameter);
     }
 
     private void processBodyParameter(VisitorContext context, OpenAPI openAPI, JavadocDescription javadocDescription,
@@ -730,6 +740,15 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         } else if (parameter.isAnnotationPresent(Header.class)) {
             String headerName = parameter.getValue(Header.class, "name", String.class).orElse(parameter
                 .getValue(Header.class, String.class).orElseGet(() -> NameUtils.hyphenate(parameterName)));
+            // Header parameter named "Authorization" are ignored. Use the `securitySchemes` and `security` sections instead to define authorization
+            // Header parameter named "Content-Type" are ignored. The values for the "Content-Type" header are defined by `request.body.content.<media-type>`
+            // Header parameter named "Accept" are ignored. The values for the "Accept" header are defined by `responses.<code>.content.<media-type>`
+            if (HttpHeaders.AUTHORIZATION.equalsIgnoreCase(headerName)
+                || HttpHeaders.CONTENT_TYPE.equalsIgnoreCase(headerName)
+                || HttpHeaders.ACCEPT.equalsIgnoreCase(headerName)
+            ) {
+                return null;
+            }
             newParameter = new HeaderParameter();
             newParameter.setName(headerName);
         } else if (parameter.isAnnotationPresent(CookieValue.class)) {
@@ -844,14 +863,6 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         }
 
         return newParameter;
-    }
-
-    private boolean isNullable(TypedElement element) {
-        return element.isNullable()
-            || element.getType().isOptional()
-            || element.hasStereotype(Nullable.class)
-            || element.hasStereotype("jakarta.annotation.Nullable")
-            || element.hasStereotype("org.jetbrains.annotations.Nullable");
     }
 
     private void processBody(VisitorContext context, OpenAPI openAPI,

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 original authors
+ * Copyright 2017-2022 original authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,24 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.micronaut.openapi.view;
-
-import io.micronaut.inject.visitor.VisitorContext;
+package io.micronaut.openapi.visitor;
 
 /**
- * Basic interface to replace placeHolder with values.
- *
- * @author croudet
+ * Visibility level for properties, constructors and methods.
  */
-interface Renderer {
-
-    /**
-     * Replaces placeHolder in template with values.
-     *
-     * @param template The template to process.
-     * @param context Visitor context.
-     *
-     * @return A template.
-     */
-    String render(String template, VisitorContext context);
+public enum VisibilityLevel {
+    PRIVATE,
+    PACKAGE,
+    PROTECTED,
+    PUBLIC
 }

@@ -34,6 +34,10 @@ dependencies {
     testImplementation(mn.micronaut.management)
     testImplementation(mnValidation.validation)
     testImplementation(libs.jakarta.validation.api)
+    testImplementation(libs.jspecify)
+    testImplementation(libs.jdt.annotation)
+    testImplementation(libs.android.annotation)
+    testImplementation(libs.spotbugs.annotations)
 }
 
 configurations.configureEach {

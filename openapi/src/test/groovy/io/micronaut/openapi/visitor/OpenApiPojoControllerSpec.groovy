@@ -321,7 +321,7 @@ class Tag {
     private String name;
     private String description;
 
-    public Tag(String name, String description) {
+    Tag(String name, String description) {
         this.name = name;
         this.description = description;
     }

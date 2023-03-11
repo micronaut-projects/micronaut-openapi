@@ -1,12 +1,17 @@
 [versions]
 managed-swagger = "2.2.8"
 managed-javadoc-parser = "0.3.1"
-managed-jsoup = "1.15.3"
+managed-jsoup = "1.15.4"
 managed-slf4j = "2.0.6"
 managed-html2md-converter = "0.64.0"
 managed-jakarta-validation-api = "3.0.2"
 
-kotlin = "1.8.0"
+kotlin = "1.8.10"
+jspecify = "0.3.0"
+jdt-annotation = "2.2.700"
+android-annotation = "1.6.0"
+spotbugs-annotations = "4.7.3"
+
 micronaut-security = "4.0.0-SNAPSHOT"
 micronaut-serde = "2.0.0-SNAPSHOT"
 micronaut-rxjava2 = "2.0.0-SNAPSHOT"
@@ -43,6 +48,10 @@ junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine" }
 jackson-datatype-jsr310 = { module = "com.fasterxml.jackson.datatype:jackson-datatype-jsr310" }
 jackson-dataformat-yaml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml" }
 jakarta-validation-api = { module = "jakarta.validation:jakarta.validation-api", version.ref = "managed-jakarta-validation-api" }
+spotbugs-annotations = { module = "com.github.spotbugs:spotbugs-annotations", version.ref = "spotbugs-annotations" }
+jspecify = { module = "org.jspecify:jspecify", version.ref = "jspecify" }
+jdt-annotation = { module = "org.eclipse.jdt:org.eclipse.jdt.annotation", version.ref = "jdt-annotation" }
+android-annotation = { module = "androidx.annotation:annotation", version.ref = "android-annotation" }
 
 kotlin-stdlib-jdk8 = { module = "org.jetbrains.kotlin:kotlin-stdlib-jdk8", version.ref = "kotlin" }
 kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }

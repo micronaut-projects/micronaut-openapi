@@ -5,6 +5,7 @@ RapiPdf supports the following options:
 |===
 | `rapipdf.enabled` | `true` or `false`,
 | `rapipdf.js.url` | Override path to use to find the js file. Path must contain a file named rapdipdf-min.js.  The value can be a URL path like: "https://unpkg.com/rapipdf/dist/". Must contain trailing slash.,
+| `rapipdf.copy-resources` | Copy or not local JS and CSS resources. Set to `false` if you are using external resources (eg https://unpkg.com/rapipdf/dist/). Default `true`
 | `rapipdf.include-api-details`
 | `rapipdf.pdf-title`
 | `rapipdf.include-api-list`

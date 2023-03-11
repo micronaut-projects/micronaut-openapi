@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -38,6 +39,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -100,8 +102,10 @@ import static io.swagger.v3.oas.models.Components.COMPONENTS_SCHEMAS_REF;
     OpenApiApplicationVisitor.MICRONAUT_OPENAPI_JSON_FORMAT,
     OpenApiApplicationVisitor.MICRONAUT_OPENAPI_ENVIRONMENTS,
     OpenApiApplicationVisitor.MICRONAUT_ENVIRONMENT_ENABLED,
+    OpenApiApplicationVisitor.MICRONAUT_OPENAPI_FIELD_VISIBILITY_LEVEL,
     OpenApiApplicationVisitor.MICRONAUT_CONFIG_FILE_LOCATIONS,
     OpenApiApplicationVisitor.MICRONAUT_OPENAPI_TARGET_FILE,
+    OpenApiApplicationVisitor.MICRONAUT_OPENAPI_VIEWS_DEST_DIR,
     OpenApiApplicationVisitor.MICRONAUT_OPENAPI_ADDITIONAL_FILES,
     OpenApiApplicationVisitor.MICRONAUT_OPENAPI_CONFIG_FILE,
 })
@@ -132,9 +136,24 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
      */
     public static final String MICRONAUT_OPENAPI_TARGET_FILE = "micronaut.openapi.target.file";
     /**
+     * System property that specifies the path where the generated UI elements will be located.
+     */
+    public static final String MICRONAUT_OPENAPI_VIEWS_DEST_DIR = "micronaut.openapi.views.dest.dir";
+    /**
      * System property that specifies the location of additional swagger YAML and JSON files to read from.
      */
     public static final String MICRONAUT_OPENAPI_ADDITIONAL_FILES = "micronaut.openapi.additional.files";
+    /**
+     * System property that specifies the schema classes fields visibility level. By default, only public fields visibile.
+     * <p>
+     * Available values:
+     * </p>
+     * PRIVATE
+     * PACKAGE
+     * PROTECTED
+     * PUBLIC
+     */
+    public static final String MICRONAUT_OPENAPI_FIELD_VISIBILITY_LEVEL = "micronaut.openapi.field.visibility.level";
     /**
      * Default openapi config file.
      */
@@ -203,6 +222,25 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
     private static final String MICRONAUT_OPENAPI_SCHEMA = "micronaut.openapi.schema";
     private static final String MICRONAUT_CUSTOM_SCHEMAS = "micronaut.internal.custom.schemas";
     /**
+     * Properties prefix to set schema name prefix or postfix by package.
+     * For example, if you have some classes with same names in different packages you can set postfix like this:
+     * <p>
+     * micronaut.openapi.schema-postfix.org.api.v1_0_0=1_0_0
+     * micronaut.openapi.schema-postfix.org.api.v2_0_0=2_0_0
+     * <p>
+     * Also, you can set it in your application.yml file like this:
+     * <p>
+     * micronaut:
+     *   openapi:
+     *     schema-postfix:
+     *         org.api.v1_0_0: 1_0_0
+     *         org.api.v2_0_0: 2_0_0
+     *       ...
+     */
+    private static final String MICRONAUT_OPENAPI_SCHEMA_PREFIX = "micronaut.openapi.schema-prefix";
+    private static final String MICRONAUT_OPENAPI_SCHEMA_POSTFIX = "micronaut.openapi.schema-postfix";
+    private static final String MICRONAUT_SCHEMA_DECORATORS = "micronaut.internal.schema-decorators";
+    /**
      * Loaded expandable properties. Need to save them to reuse in diffferent places.
      */
     private static final String MICRONAUT_INTERNAL_EXPANDBLE_PROPERTIES = "micronaut.internal.expandable.props";
@@ -268,6 +306,79 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         }
 
         classElement = element;
+    }
+
+    public static SchemaDecorator getSchemaDecoration(String packageName, VisitorContext context) {
+
+        Map<String, SchemaDecorator> schemaDecorators = (Map<String, SchemaDecorator>) context.get(MICRONAUT_SCHEMA_DECORATORS, Map.class).orElse(null);
+        if (schemaDecorators != null) {
+            return schemaDecorators.get(packageName);
+        }
+
+        schemaDecorators = new HashMap<>();
+
+        // first read system properties
+        Properties sysProps = System.getProperties();
+        readSchemaDecorators(sysProps, schemaDecorators, context);
+
+        // second read openapi.properties file
+        Properties fileProps = readOpenApiConfigFile(context);
+        readSchemaDecorators(fileProps, schemaDecorators, context);
+
+        // third read environments properties
+        Environment environment = getEnv(context);
+        if (environment != null) {
+            for (Map.Entry<String, Object> entry : environment.getProperties(MICRONAUT_OPENAPI_SCHEMA_PREFIX, StringConvention.RAW).entrySet()) {
+                String configuredPackageName = entry.getKey();
+                SchemaDecorator decorator = schemaDecorators.get(entry.getKey());
+                if (decorator == null) {
+                    decorator = new SchemaDecorator();
+                    schemaDecorators.put(entry.getKey(), decorator);
+                }
+                decorator.setPrefix((String) entry.getValue());
+            }
+
+            for (Map.Entry<String, Object> entry : environment.getProperties(MICRONAUT_OPENAPI_SCHEMA_POSTFIX, StringConvention.RAW).entrySet()) {
+                String configuredPackageName = entry.getKey();
+                SchemaDecorator decorator = schemaDecorators.get(entry.getKey());
+                if (decorator == null) {
+                    decorator = new SchemaDecorator();
+                    schemaDecorators.put(entry.getKey(), decorator);
+                }
+                decorator.setPostfix((String) entry.getValue());
+            }
+        }
+
+        context.put(MICRONAUT_SCHEMA_DECORATORS, schemaDecorators);
+
+        return schemaDecorators.get(packageName);
+    }
+
+    private static void readSchemaDecorators(Properties props, Map<String, SchemaDecorator> schemaDecorators, VisitorContext context) {
+
+        for (String prop : props.stringPropertyNames()) {
+            boolean isPrefix = false;
+            String packageName = null;
+            if (prop.startsWith(MICRONAUT_OPENAPI_SCHEMA_PREFIX)) {
+                packageName = prop.substring(MICRONAUT_OPENAPI_SCHEMA_PREFIX.length() + 1);
+                isPrefix = true;
+            } else if (prop.startsWith(MICRONAUT_OPENAPI_SCHEMA_POSTFIX)) {
+                packageName = prop.substring(MICRONAUT_OPENAPI_SCHEMA_POSTFIX.length() + 1);
+            }
+            if (StringUtils.isEmpty(packageName)) {
+                continue;
+            }
+            SchemaDecorator schemaDecorator = schemaDecorators.get(packageName);
+            if (schemaDecorator == null) {
+                schemaDecorator = new SchemaDecorator();
+                schemaDecorators.put(packageName, schemaDecorator);
+            }
+            if (isPrefix) {
+                schemaDecorator.setPrefix(props.getProperty(prop));
+            } else {
+                schemaDecorator.setPostfix(props.getProperty(prop));
+            }
+        }
     }
 
     public static ClassElement getCustomSchema(String className, Map<String, ClassElement> typeArgs, VisitorContext context) {
@@ -342,7 +453,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
     private static void readCustomSchemas(Properties props, Map<String, CustomSchema> customSchemas, VisitorContext context) {
 
         for (String prop : props.stringPropertyNames()) {
-            if (!prop.startsWith(MICRONAUT_OPENAPI_SCHEMA)) {
+            if (!prop.startsWith(MICRONAUT_OPENAPI_SCHEMA) || prop.startsWith(MICRONAUT_OPENAPI_SCHEMA_PREFIX) || prop.startsWith(MICRONAUT_OPENAPI_SCHEMA_POSTFIX)) {
                 continue;
             }
             String className = prop.substring(MICRONAUT_OPENAPI_SCHEMA.length() + 1);
@@ -385,6 +496,10 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
 
     @Nullable
     public static Environment getEnv(VisitorContext context) {
+        if (!isEnvEnabled(context)) {
+            return null;
+        }
+
         Environment existedEnvironment = context != null ? context.get(MICRONAUT_ENVIRONMENT, Environment.class).orElse(null) : null;
         Boolean envCreated = context != null ? context.get(MICRONAUT_ENVIRONMENT_CREATED, Boolean.class).orElse(null) : null;
         if (envCreated != null && envCreated) {
@@ -400,8 +515,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         return environment;
     }
 
-    public static List<String> getActiveEnvs(VisitorContext context) {
-
+    private static boolean isEnvEnabled(VisitorContext context) {
         String isEnabledStr = System.getProperty(MICRONAUT_ENVIRONMENT_ENABLED, readOpenApiConfigFile(context).getProperty(MICRONAUT_ENVIRONMENT_ENABLED));
         boolean isEnabled = true;
         if (StringUtils.isNotEmpty(isEnabledStr)) {
@@ -410,7 +524,12 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         if (context != null) {
             context.put(MICRONAUT_ENVIRONMENT_ENABLED, isEnabled);
         }
-        if (!isEnabled) {
+        return isEnabled;
+    }
+
+    public static List<String> getActiveEnvs(VisitorContext context) {
+
+        if (!isEnvEnabled(context)) {
             return Collections.emptyList();
         }
 
@@ -493,7 +612,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         }
     }
 
-    private static Path resolve(VisitorContext context, Path path) {
+    public static Path resolve(VisitorContext context, Path path) {
         if (!path.isAbsolute() && context != null) {
             Optional<Path> projectDir = context.getProjectDir();
             if (projectDir.isPresent()) {
@@ -604,7 +723,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             cfg.setTitle(title);
             cfg.setSpecFile(specFile);
             cfg.setServerContextPath(getConfigurationProperty(MICRONAUT_OPENAPI_CONTEXT_SERVER_PATH, context));
-            cfg.render(destinationDir.resolve("views"), context);
+            cfg.render(destinationDir, context);
         }
     }
 
@@ -624,34 +743,48 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         };
     }
 
-    private Optional<Path> openApiSpecFile(String fileName, VisitorContext visitorContext) {
-        Optional<Path> path = userDefinedSpecFile(visitorContext);
-        if (path.isPresent()) {
-            return path;
-        }
+    private Optional<Path> getDefaultFilePath(String fileName, VisitorContext context) {
         // default location
-        Optional<GeneratedFile> generatedFile = visitorContext.visitMetaInfFile("swagger/" + fileName, Element.EMPTY_ELEMENT_ARRAY);
+        Optional<GeneratedFile> generatedFile = context.visitMetaInfFile("swagger/" + fileName, Element.EMPTY_ELEMENT_ARRAY);
         if (generatedFile.isPresent()) {
             URI uri = generatedFile.get().toURI();
             // happens in tests 'mem:///CLASS_OUTPUT/META-INF/swagger/swagger.yml'
             if (uri.getScheme() != null && !uri.getScheme().equals("mem")) {
                 Path specPath = Paths.get(uri);
-                createDirectories(specPath, visitorContext);
+                createDirectories(specPath, context);
                 return Optional.of(specPath);
             }
         }
-        visitorContext.warn("Unable to get swagger/" + fileName + " file.", null);
+        context.warn("Unable to get swagger/" + fileName + " file.", null);
         return Optional.empty();
     }
 
-    private Optional<Path> userDefinedSpecFile(VisitorContext visitorContext) {
-        String targetFile = getConfigurationProperty(MICRONAUT_OPENAPI_TARGET_FILE, visitorContext);
+    private Optional<Path> openApiSpecFile(String fileName, VisitorContext visitorContext) {
+        Optional<Path> path = userDefinedSpecFile(visitorContext);
+        if (path.isPresent()) {
+            return path;
+        }
+        return getDefaultFilePath(fileName, visitorContext);
+    }
+
+    private Optional<Path> userDefinedSpecFile(VisitorContext context) {
+        String targetFile = getConfigurationProperty(MICRONAUT_OPENAPI_TARGET_FILE, context);
         if (StringUtils.isEmpty(targetFile)) {
             return Optional.empty();
         }
-        Path specFile = resolve(visitorContext, Paths.get(targetFile));
-        createDirectories(specFile, visitorContext);
+        Path specFile = resolve(context, Paths.get(targetFile));
+        createDirectories(specFile, context);
         return Optional.of(specFile);
+    }
+
+    private Path getViewsDestDir(Path defaultSwaggerFilePath, VisitorContext context) {
+        String destDir = getConfigurationProperty(MICRONAUT_OPENAPI_VIEWS_DEST_DIR, context);
+        if (StringUtils.isNotEmpty(destDir)) {
+            Path destPath = resolve(context, Paths.get(destDir));
+            createDirectories(destPath, context);
+            return destPath;
+        }
+        return defaultSwaggerFilePath.getParent().resolve("views");
     }
 
     private static void createDirectories(Path f, VisitorContext visitorContext) {
@@ -749,16 +882,43 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
     }
 
     public static String expandProperties(String s, List<Map.Entry<String, String>> properties, VisitorContext context) {
-        if (StringUtils.isEmpty(s)) {
+        if (StringUtils.isEmpty(s) || !s.contains(Utils.PLACEHOLDER_PREFIX)) {
             return s;
         }
+
+        // form openapi file (expandable properties)
         if (CollectionUtils.isNotEmpty(properties)) {
             for (Map.Entry<String, String> entry : properties) {
                 s = s.replace(entry.getKey(), entry.getValue());
             }
         }
-        Environment environment = getEnv(context);
-        return environment != null ? environment.getPlaceholderResolver().resolvePlaceholders(s).orElse(s) : s;
+
+        return replacePlaceholders(s, context);
+    }
+
+    public static String replacePlaceholders(String value, VisitorContext context) {
+        if (StringUtils.isEmpty(value) || !value.contains(Utils.PLACEHOLDER_PREFIX)) {
+            return value;
+        }
+        // system properties
+        if (CollectionUtils.isNotEmpty(System.getProperties())) {
+            for (Map.Entry<Object, Object> sysProp : System.getProperties().entrySet()) {
+                value = value.replace(Utils.PLACEHOLDER_PREFIX + sysProp.getKey().toString() + Utils.PLACEHOLDER_POSTFIX, sysProp.getValue().toString());
+            }
+        }
+
+        // form openapi file
+        for (Map.Entry<Object, Object> fileProp : OpenApiApplicationVisitor.readOpenApiConfigFile(context).entrySet()) {
+            value = value.replace(Utils.PLACEHOLDER_PREFIX + fileProp.getKey().toString() + Utils.PLACEHOLDER_POSTFIX, fileProp.getValue().toString());
+        }
+
+        // from environments
+        Environment environment = OpenApiApplicationVisitor.getEnv(context);
+        if (environment != null) {
+            value = environment.getPlaceholderResolver().resolvePlaceholders(value).orElse(value);
+        }
+
+        return value;
     }
 
     public static List<Map.Entry<String, String>> getExpandableProperties(VisitorContext context) {
@@ -820,7 +980,9 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                 Map<String, Schema> schemas = openAPI.getComponents().getSchemas();
                 if (CollectionUtils.isNotEmpty(schemas)) {
                     String openApiJson = ConvertUtils.getJsonMapper().writeValueAsString(openAPI);
-                    for (String schemaName : schemas.keySet()) {
+                    // Create a copy of the keySet so that we can modify the map while in a foreach
+                    Set<String> keySet = new HashSet<>(schemas.keySet());
+                    for (String schemaName : keySet) {
                         if (!openApiJson.contains(COMPONENTS_SCHEMAS_REF + schemaName)) {
                             schemas.remove(schemaName);
                         }
@@ -940,8 +1102,8 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         }
     }
 
-    private void writeYamlToFile(OpenAPI openAPI, String fileName, String documentTitle, VisitorContext visitorContext, boolean isYaml) {
-        Optional<Path> specFile = openApiSpecFile(fileName, visitorContext);
+    private void writeYamlToFile(OpenAPI openAPI, String fileName, String documentTitle, VisitorContext context, boolean isYaml) {
+        Optional<Path> specFile = openApiSpecFile(fileName, context);
         try (Writer writer = getFileWriter(specFile)) {
             (isYaml ? ConvertUtils.getYamlMapper() : ConvertUtils.getJsonMapper()).writeValue(writer, openAPI);
             if (Utils.isTestMode()) {
@@ -953,17 +1115,20 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             } else {
                 @SuppressWarnings("OptionalGetWithoutIsPresent")
                 Path specPath = specFile.get();
-                visitorContext.info("Writing OpenAPI file to destination: " + specPath);
-                visitorContext.getClassesOutputPath().ifPresent(path -> {
+                context.info("Writing OpenAPI file to destination: " + specPath);
+                Path viewsDestDirs = getViewsDestDir(getDefaultFilePath(fileName, context).get(), context);
+                context.info("Writing OpenAPI views to destination: " + viewsDestDirs);
+                context.getClassesOutputPath().ifPresent(path -> {
                     // add relative paths for the specPath, and its parent META-INF/swagger
                     // so that micronaut-graal visitor knows about them
-                    visitorContext.addGeneratedResource(path.relativize(specPath).toString());
-                    visitorContext.addGeneratedResource(path.relativize(specPath.getParent()).toString());
+                    context.addGeneratedResource(path.relativize(specPath).toString());
+                    context.addGeneratedResource(path.relativize(specPath.getParent()).toString());
+                    context.addGeneratedResource(path.relativize(viewsDestDirs).toString());
                 });
-                renderViews(documentTitle, specPath.getFileName().toString(), specPath.getParent(), visitorContext);
+                renderViews(documentTitle, specPath.getFileName().toString(), viewsDestDirs, context);
             }
         } catch (Exception e) {
-            visitorContext.warn("Unable to generate swagger." + (isYaml ? "yml" : "json") + ": " + specFile.orElse(null) + " - " + e.getMessage(), classElement);
+            context.warn("Unable to generate swagger." + (isYaml ? "yml" : "json") + ": " + specFile.orElse(null) + " - " + e.getMessage(), classElement);
         }
     }
 
@@ -1026,6 +1191,28 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
 
         public ClassElement getClassElement() {
             return classElement;
+        }
+    }
+
+    static final class SchemaDecorator {
+
+        private String prefix;
+        private String postfix;
+
+        public String getPrefix() {
+            return prefix;
+        }
+
+        public void setPrefix(String prefix) {
+            this.prefix = prefix;
+        }
+
+        public String getPostfix() {
+            return postfix;
+        }
+
+        public void setPostfix(String postfix) {
+            this.postfix = postfix;
         }
     }
 }

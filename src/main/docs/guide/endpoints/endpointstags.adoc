@@ -2,5 +2,5 @@ You can also provide some tags for all endpoints with the `endpoints.tags=<comma
 
 .openapi.properties
 ----
-endpoints.tags=Management Enpoints
+endpoints.tags=Management Endpoints
 ----

@@ -72,6 +72,8 @@ import io.swagger.v3.oas.models.servers.ServerVariable;
 import io.swagger.v3.oas.models.servers.ServerVariables;
 import io.swagger.v3.oas.models.tags.Tag;
 
+import org.yaml.snakeyaml.LoaderOptions;
+
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.databind.BeanDescription;
@@ -84,6 +86,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.BeanSerializerModifier;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactoryBuilder;
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator.Feature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
@@ -103,11 +106,15 @@ public class ObjectMapperFactory {
     }
 
     public static ObjectMapper createYaml(boolean openapi31) {
-        YAMLFactory factory = new YAMLFactory();
-        factory.disable(Feature.WRITE_DOC_START_MARKER);
-        factory.enable(Feature.MINIMIZE_QUOTES);
-        factory.enable(Feature.SPLIT_LINES);
-        factory.enable(Feature.ALWAYS_QUOTE_NUMBERS_AS_STRINGS);
+        LoaderOptions loaderOptions = new LoaderOptions();
+        loaderOptions.setAllowDuplicateKeys(false);
+        YAMLFactory factory = new YAMLFactoryBuilder(new YAMLFactory())
+            .loaderOptions(loaderOptions)
+            .disable(Feature.WRITE_DOC_START_MARKER)
+            .enable(Feature.MINIMIZE_QUOTES)
+            .enable(Feature.SPLIT_LINES)
+            .enable(Feature.ALWAYS_QUOTE_NUMBERS_AS_STRINGS)
+            .build();
 
         return create(factory, openapi31);
     }

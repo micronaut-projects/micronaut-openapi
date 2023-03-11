@@ -1436,4 +1436,143 @@ public class MyBean {}
         schema.properties.mySubObject.type == null
         schema.properties.mySubObject.format == null
     }
+
+    @Issue("https://github.com/micronaut-projects/micronaut-openapi/issues/947")
+    void "test dto schema with same name class in different packages"() {
+        when:
+        buildBeanDefinition("test.MyBean", '''
+package test;
+
+import io.micronaut.http.annotation.Body;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Post;
+import io.micronaut.openapi.test1.Entity;
+
+@Controller
+class TestController {
+
+    @Post("test1")
+    String test1(@Body Entity entity) {
+        return null;
+    }
+
+    @Post("test2")
+    String test2(@Body io.micronaut.openapi.test2.Entity entity) {
+        return null;
+    }
+
+    @Post("test3")
+    String test3(@Body io.micronaut.openapi.test3.Entity entity) {
+        return null;
+    }
+}
+@jakarta.inject.Singleton
+public class MyBean {}
+''')
+
+        OpenAPI openAPI = Utils.testReference
+
+        then:
+        openAPI.components.schemas
+        openAPI.components.schemas.size() == 3
+        Schema entityTest1 = openAPI.components.schemas.Entity
+        Schema entityTest2 = openAPI.components.schemas.Entity_1
+        Schema entityTest3 = openAPI.components.schemas.Entity_2
+
+        entityTest1
+        entityTest1.properties.fieldB
+        entityTest1.properties.fieldB.type == 'string'
+
+        entityTest2
+        entityTest2.properties.fieldA
+        entityTest2.properties.fieldA.type == 'string'
+
+        entityTest3
+        entityTest3.properties.fieldC
+        entityTest3.properties.fieldC.type == 'string'
+    }
+
+    void "test dto schema with same name class in different packages with generics"() {
+        when:
+        buildBeanDefinition("test.MyBean", '''
+package test;
+
+import io.micronaut.http.annotation.Body;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Post;
+import io.micronaut.openapi.test1.EntityWithGeneric;
+
+@Controller
+class TestController {
+
+    @Post("test1")
+    String test1(@Body EntityWithGeneric<String> entity) {
+        return null;
+    }
+
+    @Post("test11")
+    String test11(@Body EntityWithGeneric<Integer> entity) {
+        return null;
+    }
+
+    @Post("test2")
+    String test2(@Body io.micronaut.openapi.test2.EntityWithGeneric<String, Integer> entity) {
+        return null;
+    }
+
+    @Post("test22")
+    String test22(@Body io.micronaut.openapi.test2.EntityWithGeneric<String, String> entity) {
+        return null;
+    }
+
+    @Post("test3")
+    String test3(@Body io.micronaut.openapi.test3.EntityWithGeneric<String, Integer> entity) {
+        return null;
+    }
+
+    @Post("test33")
+    String test33(@Body io.micronaut.openapi.test3.EntityWithGeneric<String, String> entity) {
+        return null;
+    }
+}
+@jakarta.inject.Singleton
+public class MyBean {}
+''')
+
+        OpenAPI openAPI = Utils.testReference
+
+        then:
+        openAPI.components.schemas
+        openAPI.components.schemas.size() == 6
+        Schema entityTest1 = openAPI.components.schemas.EntityWithGeneric_String_
+        Schema entityTest11 = openAPI.components.schemas.EntityWithGeneric_Integer_
+        Schema entityTest2 = openAPI.components.schemas."EntityWithGeneric_String.Integer_"
+        Schema entityTest22 = openAPI.components.schemas."EntityWithGeneric_String.String_"
+        Schema entityTest3 = openAPI.components.schemas."EntityWithGeneric_String.Integer__1"
+        Schema entityTest33 = openAPI.components.schemas."EntityWithGeneric_String.String__1"
+
+        entityTest1
+        entityTest1.properties.fieldB
+        entityTest1.properties.fieldB.type == 'string'
+
+        entityTest11
+        entityTest11.properties.fieldB
+        entityTest11.properties.fieldB.type == 'integer'
+
+        entityTest2
+        entityTest2.properties.fieldA
+        entityTest2.properties.fieldA.type == 'string'
+
+        entityTest22
+        entityTest22.properties.fieldA
+        entityTest22.properties.fieldA.type == 'string'
+
+        entityTest3
+        entityTest3.properties.fieldC
+        entityTest3.properties.fieldC.type == 'string'
+
+        entityTest33
+        entityTest33.properties.fieldC
+        entityTest33.properties.fieldC.type == 'string'
+    }
 }

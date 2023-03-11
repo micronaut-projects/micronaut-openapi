@@ -1,12 +1,13 @@
 You can set custom classes to create different open api schemas for selected classes:
 
-```yaml
+[configuration]
+----
 micronaut:
   openapi:
     schema:
       org.somepackage.MyComplexType: java.lang.String
       org.somepackage.MyComplexType2: java.lang.Integer
-```
+----
 
 or by system properties:
 
@@ -25,7 +26,8 @@ Also, it can be used for replace classes schema with generics, for example, if y
 And you can set cutom schemas for different type args.
 For example if you have this classes structure:
 
-```java
+[source,java]
+----
 package test.mypackage;
 
 class MyDto {
@@ -46,11 +48,12 @@ class XmlElement2 {
 class XmlElement3 {
     public String propStr3;
 }
-```
+----
 
 You can customize classes structure for openapi schema:
 
-```java
+[source,java]
+----
 package io.micronaut.openapi;
 
 // if you want to use generic from fields with type JAXBElement<T>
@@ -68,18 +71,19 @@ class MyJaxbElement3 {
     public String type;
     public String value;
 }
-```
+----
 
 And set openapi properties to map classes to custom openapi schema classes:
 
-```yaml
+[configuartion]
+----
 micronaut:
   openapi:
     schema:
       io.micronaut.openapi.JAXBElement: io.micronaut.openapi.MyJaxbElement
       io.micronaut.openapi.JAXBElement<test.mypackage.XmlElement2>: io.micronaut.openapi.MyJaxbElement2
       io.micronaut.openapi.JAXBElement<test.mypackage.XmlElement3>: io.micronaut.openapi.MyJaxbElement3
-```
+----
 
 NOTE: Important!
 After changing these settings, a complete recompilation of the project is necessary to ensure that the new settings are applied correctly.
