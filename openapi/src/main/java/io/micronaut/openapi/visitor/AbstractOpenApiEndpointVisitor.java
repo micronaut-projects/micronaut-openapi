@@ -1387,7 +1387,15 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                             newApiResponse.setContent(contentFromProduces);
                         }
                     }
-                    apiResponses.put(response.get("responseCode", String.class).orElse("default"), newApiResponse);
+                    var responseCode = response.get("responseCode", String.class).orElse(null);
+                    try {
+                        if (StringUtils.isEmpty(newApiResponse.getDescription())) {
+                            newApiResponse.setDescription(responseCode == null || responseCode.equals("default") ? "OK response" : HttpStatus.getDefaultReason(Integer.parseInt(responseCode)));
+                        }
+                    } catch (Exception e) {
+                        newApiResponse.setDescription("Response " + responseCode);
+                    }
+                    apiResponses.put(responseCode, newApiResponse);
                 }
             }
             operation.setResponses(apiResponses);
