@@ -10,7 +10,7 @@ plugins {
 }
 enableFeaturePreview 'TYPESAFE_PROJECT_ACCESSORS'
 
-rootProject.name="openapi-parent"
+rootProject.name = "openapi-parent"
 
 include "openapi"
 include "openapi-bom"
@@ -33,6 +33,7 @@ dependencyResolutionManagement {
 }
 
 micronautBuild {
+    useStandardizedProjectNames = true
     addSnapshotRepository()
     importMicronautCatalog()
     importMicronautCatalog("micronaut-security")

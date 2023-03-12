@@ -17,7 +17,7 @@ repositories {
 }
 
 dependencies {
-    kapt projects.openapi
+    kapt projects.micronautOpenapi
     kapt(mn.micronaut.inject.java)
     kapt(mnValidation.micronaut.validation)
 
@@ -52,8 +52,8 @@ test {
 
 compileTestKotlin {
     compilerOptions {
-        jvmTarget.set(JvmTarget.JVM_17)
-        javaParameters.set(true)
+        jvmTarget = JvmTarget.JVM_17
+        javaParameters = true
     }
 }
 ext.skipDocumentation=true

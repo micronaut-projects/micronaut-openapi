@@ -19,7 +19,7 @@ dependencies {
     testCompileOnly(mn.micronaut.inject.groovy)
     testCompileOnly(libs.managed.swagger.annotations)
 
-    testImplementation projects.openapi
+    testImplementation projects.micronautOpenapi
     testImplementation(mn.snakeyaml)
     testImplementation(mn.micronaut.runtime)
     testImplementation(mnGroovy.micronaut.runtime.groovy)

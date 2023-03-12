@@ -18,7 +18,7 @@ dependencies {
 
     testCompileOnly(mn.micronaut.inject.java)
 
-    testImplementation projects.openapi
+    testImplementation projects.micronautOpenapi
     testImplementation(mn.snakeyaml)
     testImplementation(mn.micronaut.runtime)
     testImplementation(mn.reactor)
