@@ -43,6 +43,9 @@ import io.micronaut.core.annotation.AnnotationValue;
 import io.micronaut.core.beans.BeanMap;
 import io.micronaut.inject.visitor.VisitorContext;
 import io.micronaut.openapi.swagger.core.util.ObjectMapperFactory;
+import io.swagger.v3.oas.models.media.Content;
+import io.swagger.v3.oas.models.media.MediaType;
+import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -51,6 +54,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * Convert utilities methods.
@@ -100,13 +104,37 @@ public final class ConvertUtils {
      * @throws JsonProcessingException if error
      */
     public static <T> T treeToValue(JsonNode jn, Class<T> clazz, VisitorContext context) throws JsonProcessingException {
-        T value = CONVERT_JSON_MAPPER.treeToValue(jn, clazz);
+
+        T value;
+        try {
+            value = CONVERT_JSON_MAPPER.treeToValue(jn, clazz);
+        } catch (Exception e) {
+            // fix for problem with groovy. Jackson throw excetpion with ApiResponse class
+            if (clazz == ApiResponse.class && jn.has("content")) {
+                var contentNode = jn.get("content");
+                ((ObjectNode) jn).set("content", null);
+                value = CONVERT_JSON_MAPPER.treeToValue(jn, clazz);
+                var result = new Content();
+                if (contentNode.isArray()) {
+                    for (var content : contentNode) {
+                        processMediaType(result, content);
+                    }
+                } else {
+                    processMediaType(result, contentNode);
+                }
+                ((ApiResponse) value).setContent(result);
+            } else {
+                throw e;
+            }
+        }
 
         if (value == null) {
             return null;
         }
 
-        resolveExtensions(jn).ifPresent(extensions -> BeanMap.of(value).put("extensions", extensions));
+        var finalValue = value;
+
+        resolveExtensions(jn).ifPresent(extensions -> BeanMap.of(finalValue).put("extensions", extensions));
         String elType = jn.has("type") ? jn.get("type").textValue() : null;
         String elFormat = jn.has("format") ? jn.get("format").textValue() : null;
         JsonNode defaultValueNode = jn.get("defaultValue");
@@ -140,6 +168,12 @@ public final class ConvertUtils {
         }
 
         return value;
+    }
+
+    private static void processMediaType(Content result, JsonNode content) throws JsonProcessingException {
+        var mediaType = content.has("mediaType") ? content.get("mediaType").asText() : io.micronaut.http.MediaType.APPLICATION_JSON;
+        var mediaTypeObj = CONVERT_JSON_MAPPER.treeToValue(content, MediaType.class);
+        result.addMediaType(mediaType, mediaTypeObj);
     }
 
     public static Object normalizeValue(String valueStr, String type, String format, VisitorContext context) throws JsonProcessingException {
