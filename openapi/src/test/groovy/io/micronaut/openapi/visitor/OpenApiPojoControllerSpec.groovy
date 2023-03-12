@@ -321,7 +321,7 @@ class Tag {
     private String name;
     private String description;
 
-    public Tag(String name, String description) {
+    Tag(String name, String description) {
         this.name = name;
         this.description = description;
     }
@@ -405,20 +405,20 @@ package test;
 
 import java.util.List;
 
-import javax.validation.constraints.DecimalMax;
-import javax.validation.constraints.DecimalMin;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.Negative;
-import javax.validation.constraints.NegativeOrZero;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Positive;
-import javax.validation.constraints.PositiveOrZero;
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.DecimalMax;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Negative;
+import jakarta.validation.constraints.NegativeOrZero;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
+import jakarta.validation.constraints.Size;
 
 import io.micronaut.http.annotation.Body;
 import io.micronaut.http.annotation.Controller;
@@ -2381,7 +2381,7 @@ package test;
 
 import java.util.UUID;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 import io.micronaut.http.annotation.Body;
 import io.micronaut.http.annotation.Controller;
@@ -2627,7 +2627,7 @@ class MyBean {}
         buildBeanDefinition('test.MyBean', '''
 package test;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 import io.micronaut.http.HttpStatus;
 import io.micronaut.http.annotation.Body;
@@ -2652,13 +2652,13 @@ class CustomersController {
 class CreateCustomerRequest {
 
     @org.jetbrains.annotations.Nullable()
-    @javax.validation.constraints.NotNull()
+    @jakarta.validation.constraints.NotNull()
     @io.swagger.v3.oas.annotations.media.Schema(nullable = false, required = true)
     private final java.lang.String customerName = null;
 
     @org.jetbrains.annotations.Nullable()
-    @javax.validation.constraints.PastOrPresent()
-    @javax.validation.constraints.NotNull()
+    @jakarta.validation.constraints.PastOrPresent()
+    @jakarta.validation.constraints.NotNull()
     @io.swagger.v3.oas.annotations.media.Schema(nullable = false, required = true)
     private final java.time.LocalDate birthDate = null;
 

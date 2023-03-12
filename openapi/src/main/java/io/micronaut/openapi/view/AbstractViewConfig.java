@@ -37,7 +37,9 @@ abstract class AbstractViewConfig {
     protected String jsUrl = "";
     protected String finalUrlPrefix;
     protected String resourcesContextPath = "/res";
+    protected String templatePath;
     protected boolean isDefaultJsUrl = true;
+    protected boolean copyResources = true;
     protected boolean withFinalUrlPrefixCache = true;
     protected Map<String, Object> options = new HashMap<>();
 
@@ -60,6 +62,12 @@ abstract class AbstractViewConfig {
     protected abstract Function<String, Object> getConverter(String key);
 
     protected abstract List<String> getResources();
+
+    public String getTemplatePath() {
+        return templatePath;
+    }
+
+    public abstract String render(String template, VisitorContext context);
 
     /**
      * Adds an option.
@@ -132,6 +140,12 @@ abstract class AbstractViewConfig {
      * @return A View config.
      */
     static <T extends AbstractViewConfig> T fromProperties(T cfg, Map<String, Object> defaultOptions, Map<String, String> properties) {
+
+        String copyResources = properties.get(cfg.prefix + "copy-resources");
+        if (StringUtils.isNotEmpty(copyResources) && "false".equalsIgnoreCase(copyResources)) {
+            cfg.copyResources = false;
+        }
+
         String jsUrl = properties.get(cfg.prefix + "js.url");
         if (StringUtils.isNotEmpty(jsUrl)) {
             cfg.jsUrl = jsUrl;
@@ -141,6 +155,11 @@ abstract class AbstractViewConfig {
             if (StringUtils.isNotEmpty(resourcesContextPath)) {
                 cfg.resourcesContextPath = resourcesContextPath.startsWith("/") ? resourcesContextPath : "/" + resourcesContextPath;
             }
+        }
+
+        String templatePath = properties.get(cfg.prefix + "template.path");
+        if (StringUtils.isNotEmpty(templatePath)) {
+            cfg.templatePath = templatePath;
         }
 
         cfg.options.putAll(defaultOptions);

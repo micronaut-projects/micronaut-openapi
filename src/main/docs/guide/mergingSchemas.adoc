@@ -105,7 +105,7 @@ components:
         state:
           required:
           - "true"
-          type: string    
+          type: string
 ----
 
 You could also have a yaml file describing the endpoint which exposes the generated OpenAPI YAML file:
@@ -132,15 +132,11 @@ paths:
             text/plain: {}
 ----
 
-To merge both files with the generated OpenAPI definition point Micronaut to look for additional OpenAPI yaml files in the `openapi` folder. You need to set the property `micronaut.openapi.additional.files`. 
+To merge both files with the generated OpenAPI definition point, Micronaut searches for additional OpenAPI yaml files in the `openapi` folder, which is specified by `micronaut.openapi.additional.files`.
 
-[source,bash]
 .openapi.properties
-----
+```properties
 micronaut.openapi.additional.files=openapi
-...
-..
-.
-----
+```
 
-Micronaut will include the endpoints defined in those files in the generated output. 
+Micronaut includes the endpoints defined in those files in the generated output.

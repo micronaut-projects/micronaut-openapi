@@ -6,5 +6,8 @@ micronautBom {
     suppressions {
         acceptedVersionRegressions.add("swagger-compat")
         acceptedLibraryRegressions.add("swagger")
+
+        acceptedVersionRegressions.add("jakarta-validation-api")
+        acceptedLibraryRegressions.add("jakarta-validation-api")
     }
 }

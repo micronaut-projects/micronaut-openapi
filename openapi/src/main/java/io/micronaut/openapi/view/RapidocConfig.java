@@ -30,7 +30,7 @@ import io.micronaut.openapi.view.OpenApiViewConfig.RendererType;
  *
  * @author croudet
  */
-final class RapidocConfig extends AbstractViewConfig implements Renderer {
+final class RapidocConfig extends AbstractViewConfig {
 
     public static final String RAPIDOC_PREFIX = "rapidoc.";
     private static final String DEFAULT_RAPIDOC_JS_PATH = OpenApiViewConfig.RESOURCE_DIR + "/";
@@ -388,11 +388,7 @@ final class RapidocConfig extends AbstractViewConfig implements Renderer {
      * @return A RapidocConfig.
      */
     static RapidocConfig fromProperties(Map<String, String> properties) {
-        RapidocConfig cfg = AbstractViewConfig.fromProperties(new RapidocConfig(), DEFAULT_OPTIONS, properties);
-        if (DEFAULT_RAPIDOC_JS_PATH.equals(cfg.jsUrl)) {
-            cfg.isDefaultJsUrl = true;
-        }
-        return cfg;
+        return AbstractViewConfig.fromProperties(new RapidocConfig(), DEFAULT_OPTIONS, properties);
     }
 
     @Override

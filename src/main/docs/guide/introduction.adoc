@@ -2,4 +2,4 @@ Micronaut includes support for producing https://www.openapis.org[OpenAPI] (Swag
 
 You can customize the generated Swagger using the standard <<swaggerAnnotations, Swagger Annotations>>.
 
-If you wish to generate Micronaut projects from OpenAPI definition files, utilize the https://openapi-generator.tech/[OpenAPI Generator]'s Micronaut support. Refer to the https://guides.micronaut.io/latest/micronaut-openapi-generator-server["Micronaut server genreation with OpenAPI" guide] or the https://guides.micronaut.io/latest/micronaut-openapi-generator-client["Micronaut Client generation with OpenAPI" guide] for details.
+If you wish to generate Micronaut projects from OpenAPI definition files, utilize the https://openapi-generator.tech/[OpenAPI Generator]'s Micronaut support. Refer to the https://guides.micronaut.io/latest/micronaut-openapi-generator-server["Micronaut server generation with OpenAPI" guide] or the https://guides.micronaut.io/latest/micronaut-openapi-generator-client["Micronaut Client generation with OpenAPI" guide] for details.

@@ -35,7 +35,7 @@ import io.micronaut.openapi.view.OpenApiViewConfig.RendererType;
  *
  * @author croudet
  */
-final class SwaggerUIConfig extends AbstractViewConfig implements Renderer {
+final class SwaggerUIConfig extends AbstractViewConfig {
 
     private static final String DEFAULT_SWAGGER_JS_PATH = OpenApiViewConfig.RESOURCE_DIR + "/";
 
@@ -104,6 +104,10 @@ final class SwaggerUIConfig extends AbstractViewConfig implements Renderer {
         DEFAULT_OPTIONS.put("deepLinking", Boolean.TRUE);
         DEFAULT_OPTIONS.put("validatorUrl", null);
     }
+
+    String themeUrl;
+    boolean isDefaultThemeUrl = true;
+    boolean copyTheme = true;
 
     RapiPDFConfig rapiPDFConfig;
     SwaggerUIConfig.Theme theme = Theme.CLASSIC;
@@ -229,11 +233,19 @@ final class SwaggerUIConfig extends AbstractViewConfig implements Renderer {
     static SwaggerUIConfig fromProperties(Map<String, String> properties) {
         SwaggerUIConfig cfg = new SwaggerUIConfig();
         cfg.theme = Theme.valueOf(properties.getOrDefault(PREFIX_SWAGGER_UI + ".theme", cfg.theme.name()).toUpperCase(Locale.US));
-        AbstractViewConfig.fromProperties(cfg, DEFAULT_OPTIONS, properties);
-        if (DEFAULT_SWAGGER_JS_PATH.equals(cfg.jsUrl)) {
-            cfg.isDefaultJsUrl = true;
+
+        String copyTheme = properties.get(cfg.prefix + "copy-theme");
+        if (StringUtils.isNotEmpty(copyTheme) && "false".equalsIgnoreCase(copyTheme)) {
+            cfg.copyTheme = false;
         }
-        return cfg;
+
+        String themeUrl = properties.get(cfg.prefix + "theme.url");
+        if (StringUtils.isNotEmpty(themeUrl)) {
+            cfg.themeUrl = themeUrl;
+            cfg.isDefaultThemeUrl = false;
+        }
+
+        return AbstractViewConfig.fromProperties(cfg, DEFAULT_OPTIONS, properties);
     }
 
     @Override
@@ -245,7 +257,7 @@ final class SwaggerUIConfig extends AbstractViewConfig implements Renderer {
         template = OpenApiViewConfig.replacePlaceHolder(template, PREFIX_SWAGGER_UI + ".js.url.prefix", isDefaultJsUrl ? finalUrlPrefix : jsUrl, "");
         template = OpenApiViewConfig.replacePlaceHolder(template, PREFIX_SWAGGER_UI + ".attributes", toOptions(), "");
         template = template.replace("{{" + PREFIX_SWAGGER_UI + ".theme}}", theme == null || Theme.CLASSIC == theme ? "" :
-            "<link rel='stylesheet' type='text/css' href='" + finalUrlPrefix + theme.getCss() + ".css' />");
+            "<link rel='stylesheet' type='text/css' href='" + (isDefaultThemeUrl ? finalUrlPrefix + theme.getCss() + ".css" : themeUrl) + "' />");
         template = template.replace("{{" + PREFIX_SWAGGER_UI + DOT + OPTION_OAUTH2 + "}}", hasOauth2Option(options) ? toOauth2Options() : "");
         return template;
     }

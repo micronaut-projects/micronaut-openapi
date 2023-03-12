@@ -229,4 +229,56 @@ class MyBean {}
         requestBody.content['multipart/form-data'].schema.properties['part'].format == 'binary'
     }
 
+    @Issue("https://github.com/micronaut-projects/micronaut-openapi/issues/907")
+    void "test multipart upload with MultipartBody and @Body"() {
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.http.annotation.Body;
+import io.micronaut.http.server.multipart.MultipartBody;
+import io.micronaut.http.MediaType;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Post;
+import jakarta.inject.Singleton;
+import org.reactivestreams.Publisher;
+
+@Singleton
+@Controller("/")
+class UploadOpenApiController {
+
+    @Post(value = "/receive-multipart-body", consumes = MediaType.MULTIPART_FORM_DATA, produces = MediaType.TEXT_PLAIN)
+    Publisher<String> completeMB(@Body MultipartBody file) {
+        return reactor.core.publisher.Mono.just("");
+    }
+
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+
+        OpenAPI openAPI = Utils.testReference
+
+        then:
+        openAPI
+        openAPI.paths.size() == 1
+
+        when:
+        Operation operation = openAPI.paths?.get("/receive-multipart-body")?.post
+        RequestBody requestBody = operation.requestBody
+
+        then:
+        requestBody.required
+        requestBody.content
+        requestBody.content.size() == 1
+        requestBody.content['multipart/form-data'].schema
+        requestBody.content['multipart/form-data'].schema instanceof ArraySchema
+        requestBody.content['multipart/form-data'].schema.items instanceof BinarySchema
+
+        expect:
+        operation
+        operation.responses.size() == 1
+    }
+
 }

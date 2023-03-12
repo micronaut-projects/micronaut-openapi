@@ -18,6 +18,8 @@ package io.micronaut.openapi.visitor;
 import java.io.File;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -46,6 +48,9 @@ import io.swagger.v3.oas.models.OpenAPI;
  */
 public final class Utils {
 
+    public static final String PLACEHOLDER_PREFIX = "${";
+    public static final String PLACEHOLDER_POSTFIX = "}";
+
     public static final String ATTR_OPENAPI = "io.micronaut.OPENAPI";
     public static final String ATTR_TEST_MODE = "io.micronaut.OPENAPI_TEST";
     public static final String ATTR_VISITED_ELEMENTS = "io.micronaut.OPENAPI.visited.elements";
@@ -61,6 +66,10 @@ public final class Utils {
     private static JavadocParser javadocParser = new JavadocParser();
 
     private Utils() {
+    }
+
+    public static Path getProjectPath(VisitorContext context) {
+        return context.getProjectDir().orElse(Utils.isTestMode() ? Paths.get(System.getProperty("user.dir")) : null);
     }
 
     /**

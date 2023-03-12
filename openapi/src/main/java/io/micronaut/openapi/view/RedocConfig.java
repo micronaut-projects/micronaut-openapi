@@ -29,7 +29,7 @@ import io.micronaut.openapi.view.OpenApiViewConfig.RendererType;
  *
  * @author croudet
  */
-final class RedocConfig extends AbstractViewConfig implements Renderer {
+final class RedocConfig extends AbstractViewConfig {
 
     private static final String DEFAULT_REDOC_JS_PATH = OpenApiViewConfig.RESOURCE_DIR + "/";
 
@@ -137,11 +137,7 @@ final class RedocConfig extends AbstractViewConfig implements Renderer {
      * @return A RedocConfig.
      */
     static RedocConfig fromProperties(Map<String, String> properties) {
-        RedocConfig cfg = AbstractViewConfig.fromProperties(new RedocConfig(), DEFAULT_OPTIONS, properties);
-        if (DEFAULT_REDOC_JS_PATH.equals(cfg.jsUrl)) {
-            cfg.isDefaultJsUrl = true;
-        }
-        return cfg;
+        return AbstractViewConfig.fromProperties(new RedocConfig(), DEFAULT_OPTIONS, properties);
     }
 
     @Override

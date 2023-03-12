@@ -105,11 +105,7 @@ final class RapiPDFConfig extends AbstractViewConfig {
     static RapiPDFConfig fromProperties(Map<String, String> properties) {
         RapiPDFConfig cfg = new RapiPDFConfig();
         cfg.enabled = "true".equals(properties.getOrDefault("rapipdf.enabled", Boolean.FALSE.toString()));
-        AbstractViewConfig.fromProperties(cfg, DEFAULT_OPTIONS, properties);
-        if (DEFAULT_RAPIPDF_JS_PATH.equals(cfg.jsUrl)) {
-            cfg.isDefaultJsUrl = true;
-        }
-        return cfg;
+        return AbstractViewConfig.fromProperties(cfg, DEFAULT_OPTIONS, properties);
     }
 
     /**
@@ -159,5 +155,10 @@ final class RapiPDFConfig extends AbstractViewConfig {
     @Override
     protected List<String> getResources() {
         return RESOURCE_FILES;
+    }
+
+    @Override
+    public String render(String template, VisitorContext context) {
+        throw new IllegalStateException("RapiPDF doesn't support render");
     }
 }

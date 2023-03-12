@@ -13,14 +13,17 @@ repositories {
 }
 
 dependencies {
-    testCompileOnly(mn.micronaut.inject.groovy)
 
-    testImplementation projects.openapi
+    testAnnotationProcessor(mn.micronaut.inject.groovy)
+
+    testCompileOnly(mn.micronaut.inject.groovy)
+    testCompileOnly(libs.managed.swagger.annotations)
+
+    testImplementation projects.micronautOpenapi
     testImplementation(mn.snakeyaml)
     testImplementation(mn.micronaut.runtime)
     testImplementation(mnGroovy.micronaut.runtime.groovy)
-    testImplementation(mn.micronaut.validation)
-    testImplementation(libs.managed.swagger.annotations)
+    testImplementation(mnValidation.validation)
     testImplementation(mn.reactor)
     testImplementation(mnTest.micronaut.test.spock)
 

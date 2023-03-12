@@ -165,8 +165,8 @@ import io.micronaut.validation.Validated;
 import io.reactivex.Single;
 import io.swagger.v3.oas.annotations.media.Schema;
 
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -358,8 +358,8 @@ import io.reactivex.Single;
 import io.swagger.v3.oas.annotations.media.DiscriminatorMapping;
 import io.swagger.v3.oas.annotations.media.Schema;
 
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -551,9 +551,9 @@ class MyBean {}
         buildBeanDefinition('test.MyBean', '''
 package test;
 
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.Positive;import javax.validation.constraints.PositiveOrZero;import javax.validation.constraints.Size;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Positive;import jakarta.validation.constraints.PositiveOrZero;import jakarta.validation.constraints.Size;
 
 import io.micronaut.http.MediaType;
 import io.micronaut.http.annotation.Controller;
@@ -738,7 +738,7 @@ class Cat extends Pet {
         @JsonSubTypes.Type(value = Dog.class, name = "Dog") })
 @Schema(description = "Pet Desc")
 class Pet {
-    @javax.validation.constraints.Min(18)
+    @jakarta.validation.constraints.Min(18)
     private int age;
 
     private String name;
@@ -758,7 +758,7 @@ class Pet {
         name = n;
     }
 
-    @javax.validation.constraints.Size(max = 30)
+    @jakarta.validation.constraints.Size(max = 30)
     public String getName() {
         return name;
     }
@@ -820,10 +820,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import io.micronaut.core.annotation.Nullable;
-import javax.validation.Valid;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Min;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Min;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -1536,5 +1536,81 @@ class MyBean {}
         filterDtoSchema.properties.page
         filterDtoSchema.properties.page.type == 'integer'
         filterDtoSchema.properties.page.default == 0
+    }
+
+    void "test class two level inheritance Schema"() {
+
+        given: "An API definition"
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.swagger.v3.oas.annotations.media.Schema;
+
+@Controller
+class MyOperations {
+
+    @Get("/get")
+    ExportPaymentsRequest getRequest() {
+        return null;
+    }
+}
+
+@Schema(name = "RequestType2_4_0")
+class RequestType {
+}
+
+@Schema(name = "ExportRequestType2_4_0")
+class ExportRequestType extends RequestType {
+}
+
+/**
+ * My request
+ */
+@Schema(name = "ExportPaymentsRequest2_4_0")
+class ExportPaymentsRequest extends ExportRequestType {
+
+    protected Object field;
+
+    public Object getField() {
+        return field;
+    }
+
+    public void setField(Object field) {
+        this.field = field;
+    }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        then: "the state is correct"
+        Utils.testReference != null
+
+        when: "The OpenAPI is retrieved"
+        OpenAPI openAPI = Utils.testReference
+        Schema requestTypeSchema = openAPI.components.schemas.RequestType2_4_0
+        Schema exportRequestTypeSchema = openAPI.components.schemas.ExportRequestType2_4_0
+        Schema exportPaymentsRequestSchema = openAPI.components.schemas.ExportPaymentsRequest2_4_0
+
+        then:
+        requestTypeSchema
+        requestTypeSchema.type == 'object'
+        !requestTypeSchema.allOf
+
+        exportRequestTypeSchema
+        exportRequestTypeSchema.type == 'object'
+        exportRequestTypeSchema.allOf
+        exportRequestTypeSchema.allOf.size() == 1
+        exportRequestTypeSchema.allOf[0].$ref == '#/components/schemas/RequestType2_4_0'
+
+        exportPaymentsRequestSchema
+        exportPaymentsRequestSchema.type == 'object'
+        exportPaymentsRequestSchema.allOf
+        exportPaymentsRequestSchema.allOf.size() == 2
+        exportPaymentsRequestSchema.allOf[0].$ref == '#/components/schemas/ExportRequestType2_4_0'
+        exportPaymentsRequestSchema.allOf[1].$ref == '#/components/schemas/RequestType2_4_0'
     }
 }

@@ -14,7 +14,7 @@ package test;
 
 import java.util.List;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.MediaType;
@@ -106,7 +106,7 @@ package test;
 
 import java.util.List;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.MediaType;

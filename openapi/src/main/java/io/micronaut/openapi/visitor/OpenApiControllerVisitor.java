@@ -29,7 +29,6 @@ import java.util.stream.Collectors;
 import io.micronaut.context.RequiresCondition;
 import io.micronaut.context.annotation.Requires;
 import io.micronaut.context.env.Environment;
-import io.micronaut.context.env.PropertyPlaceholderResolver;
 import io.micronaut.core.annotation.AnnotationValue;
 import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.core.util.StringUtils;
@@ -123,6 +122,7 @@ public class OpenApiControllerVisitor extends AbstractOpenApiEndpointVisitor imp
         boolean isParentClass = context.get(IS_PROCESS_PARENT_CLASS, Boolean.class).orElse(false);
 
         return (!isParentClass && !element.isAnnotationPresent(Controller.class))
+            || element.isAnnotationPresent(Hidden.class)
             || ignoreByRequires(element, context);
     }
 
@@ -187,21 +187,19 @@ public class OpenApiControllerVisitor extends AbstractOpenApiEndpointVisitor imp
             controllerValue = customUri;
         }
 
-        Environment environment = OpenApiApplicationVisitor.getEnv(context);
-        PropertyPlaceholderResolver propertyPlaceholderResolver = environment != null ? environment.getPlaceholderResolver() : Utils.getPropertyPlaceholderResolver();
-        controllerValue = propertyPlaceholderResolver.resolvePlaceholders(controllerValue).orElse(controllerValue);
+        controllerValue = OpenApiApplicationVisitor.replacePlaceholders(controllerValue, context);
 
         UriMatchTemplate matchTemplate = UriMatchTemplate.of(controllerValue);
         // check if we have multiple uris
         String[] uris = element.stringValues(HttpMethodMapping.class, "uris");
         if (uris.length == 0) {
             String methodValue = element.getValue(HttpMethodMapping.class, String.class).orElse("/");
-            methodValue = propertyPlaceholderResolver.resolvePlaceholders(methodValue).orElse(methodValue);
+            methodValue = OpenApiApplicationVisitor.replacePlaceholders(methodValue, context);
             return Collections.singletonList(matchTemplate.nest(methodValue));
         } else {
             List<UriMatchTemplate> matchTemplates = new ArrayList<>(uris.length);
             for (String methodValue : uris) {
-                methodValue = propertyPlaceholderResolver.resolvePlaceholders(methodValue).orElse(methodValue);
+                methodValue = OpenApiApplicationVisitor.replacePlaceholders(methodValue, context);
                 matchTemplates.add(matchTemplate.nest(methodValue));
             }
             return matchTemplates;

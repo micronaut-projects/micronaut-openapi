@@ -6,9 +6,140 @@ import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.Operation
 import io.swagger.v3.oas.models.PathItem
 import io.swagger.v3.oas.models.Paths
+import io.swagger.v3.oas.models.media.Schema
 import spock.lang.Issue
 
 class OpenApiControllerVisitorSpec extends AbstractOpenApiTypeElementSpec {
+
+    void "test hidden endpoint with inheritance"() {
+
+        given:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.swagger.v3.oas.annotations.Hidden;
+
+@Controller
+class ControllerThree extends AbstractController {
+
+    @Hidden
+    @Override
+    void methodTwo() {
+    }
+
+    void methodFour() {
+    }
+
+    @Get("/five")
+    void methodFive() {
+    }
+}
+
+@Hidden
+class AbstractController {
+    @Get("/should-be-hidden/one")
+    void methodOne() {
+    }
+
+    @Get("/should-be-hidden/two")
+    void methodTwo() {
+    }
+
+    void methodThree() {
+    }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        when:
+        Paths paths = Utils.testReference?.paths
+
+        then:
+        paths
+        paths.size() == 1
+        paths.containsKey("/five")
+    }
+
+    void "test java.util collections"() {
+
+        given:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import java.util.*;
+import java.util.concurrent.*;
+
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Post;
+
+@Controller
+class HelloWorldController {
+
+    @Post("/ArrayList")
+    public ArrayList<AB> ArrayList() {
+        return null;
+    }
+
+    @Post("/ArrayDeque")
+    public ArrayDeque<AB> ArrayDeque() {
+        return null;
+    }
+
+    @Post("/LinkedBlockingDeque")
+    public LinkedBlockingDeque<AB> LinkedBlockingDeque() {
+        return null;
+    }
+
+    @Post("/SynchronousQueue")
+    public SynchronousQueue<AB> SynchronousQueue() {
+        return null;
+    }
+}
+
+class AB {
+    public String someField;
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        when:
+        Paths paths = Utils.testReference?.paths
+        Map<String, Schema> schemas = Utils.testReference?.components?.schemas
+
+        then:
+        paths
+        paths.size() == 4
+
+        paths."/ArrayList"
+        paths."/ArrayList".post.operationId == 'ArrayList'
+        paths."/ArrayList".post.responses."200".content."application/json".schema.type == 'array'
+        paths."/ArrayList".post.responses."200".content."application/json".schema.items.$ref == '#/components/schemas/AB'
+
+        paths."/ArrayDeque"
+        paths."/ArrayDeque".post.operationId == 'ArrayDeque'
+        paths."/ArrayDeque".post.responses."200".content."application/json".schema.type == 'array'
+        paths."/ArrayDeque".post.responses."200".content."application/json".schema.items.$ref == '#/components/schemas/AB'
+
+        paths."/LinkedBlockingDeque"
+        paths."/LinkedBlockingDeque".post.operationId == 'LinkedBlockingDeque'
+        paths."/LinkedBlockingDeque".post.responses."200".content."application/json".schema.type == 'array'
+        paths."/LinkedBlockingDeque".post.responses."200".content."application/json".schema.items.$ref == '#/components/schemas/AB'
+
+        paths."/SynchronousQueue"
+        paths."/SynchronousQueue".post.operationId == 'SynchronousQueue'
+        paths."/SynchronousQueue".post.responses."200".content."application/json".schema.type == 'array'
+        paths."/SynchronousQueue".post.responses."200".content."application/json".schema.items.$ref == '#/components/schemas/AB'
+
+        schemas
+        schemas.size() == 1
+
+        schemas.AB.type == 'object'
+        schemas.AB.properties.someField.type == 'string'
+    }
 
     void "test hidden endpoint"() {
 
@@ -30,19 +161,19 @@ import java.util.List;
 class HelloWorldController {
 
     @Post("/public")
-    public HttpResponse<String> publicEnpoint() {
+    public HttpResponse<String> publicEndpoint() {
         return null;
     }
 
     @Hidden
     @Post("/private")
-    public HttpResponse<String> internalEnpoint() {
+    public HttpResponse<String> internalEndpoint() {
         return null;
     }
 
     @Operation(hidden = true)
     @Post("/private-operation")
-    public HttpResponse<String> internalEnpoint2() {
+    public HttpResponse<String> internalEndpoint2() {
         return null;
     }
 
@@ -136,7 +267,7 @@ import io.micronaut.http.*;
 import com.fasterxml.jackson.core.*;
 import io.micronaut.http.hateoas.*;
 import java.util.List;
-import javax.validation.constraints.*;
+import jakarta.validation.constraints.*;
 
 class Pet {
     private String name;
@@ -202,7 +333,7 @@ import io.micronaut.http.*;
 import com.fasterxml.jackson.core.*;
 import io.micronaut.http.hateoas.*;
 import java.util.List;
-import javax.validation.constraints.*;
+import jakarta.validation.constraints.*;
 
 @Controller("/")
 class MyController {
@@ -574,7 +705,7 @@ class MyBean {}
 
     }
 
-    void "test parse javax.validation constraints for String"() {
+    void "test parse jakarta.validation constraints for String"() {
         given:
         buildBeanDefinition('test.MyBean', '''
 package test;
@@ -584,7 +715,7 @@ import io.swagger.v3.oas.annotations.media.*;
 import io.swagger.v3.oas.annotations.enums.*;
 import io.micronaut.http.annotation.*;
 import java.util.List;
-import javax.validation.constraints.*;
+import jakarta.validation.constraints.*;
 
 @Controller("/")
 class MyController {
@@ -620,7 +751,7 @@ class MyBean {}
 
     }
 
-    void "test parse javax.validation constraints for String[]"() {
+    void "test parse jakarta.validation constraints for String[]"() {
         given:
         buildBeanDefinition('test.MyBean', '''
 package test;
@@ -630,7 +761,7 @@ import io.swagger.v3.oas.annotations.media.*;
 import io.swagger.v3.oas.annotations.enums.*;
 import io.micronaut.http.annotation.*;
 import java.util.List;
-import javax.validation.constraints.*;
+import jakarta.validation.constraints.*;
 
 @Controller("/")
 class MyController {
@@ -665,7 +796,7 @@ class MyBean {}
 
     }
 
-    void "test parse javax.validation constraints for List"() {
+    void "test parse jakarta.validation constraints for List"() {
         given:
         buildBeanDefinition('test.MyBean', '''
 package test;
@@ -675,7 +806,7 @@ import io.swagger.v3.oas.annotations.media.*;
 import io.swagger.v3.oas.annotations.enums.*;
 import io.micronaut.http.annotation.*;
 import java.util.List;
-import javax.validation.constraints.*;
+import jakarta.validation.constraints.*;
 
 @Controller("/")
 class MyController {
@@ -710,7 +841,7 @@ class MyBean {}
 
     }
 
-    void "test parse javax.validation.NotEmpty constraint for List"() {
+    void "test parse jakarta.validation.NotEmpty constraint for List"() {
         given:
         buildBeanDefinition('test.MyBean', '''
 package test;
@@ -720,7 +851,7 @@ import io.swagger.v3.oas.annotations.media.*;
 import io.swagger.v3.oas.annotations.enums.*;
 import io.micronaut.http.annotation.*;
 import java.util.List;
-import javax.validation.constraints.*;
+import jakarta.validation.constraints.*;
 
 @Controller("/")
 class MyController {
@@ -769,7 +900,7 @@ class MyController {
     @Get("/subscription/{subscriptionId}")
     public String getSubscription(@Parameter(description="foo") @CookieValue String subscriptionId,
             @QueryValue String q,
-            @Header String contentType,
+            @Header String myContentType,
             @Nullable @Header(name = "Bundle-ID") String bundleId,
             @Header("X-API-Version") String apiVersion) {
         return null;
@@ -793,7 +924,7 @@ class MyBean {}
         operation.parameters[1].name == 'q'
         operation.parameters[1].required
         operation.parameters[2].in == 'header'
-        operation.parameters[2].name == 'content-type'
+        operation.parameters[2].name == 'my-content-type'
         operation.parameters[2].required
         operation.parameters[3].in == 'header'
         operation.parameters[3].name == 'Bundle-ID'
@@ -850,7 +981,7 @@ import io.swagger.v3.oas.annotations.media.*;
 import io.swagger.v3.oas.annotations.enums.*;
 import io.micronaut.http.annotation.*;
 import java.util.List;
-import javax.validation.constraints.*;
+import jakarta.validation.constraints.*;
 
 @Controller("/")
 class MyController {
@@ -1158,5 +1289,44 @@ class MyBean {}
         operation.responses."200".content."application/json".schema.$ref == '#/components/schemas/TestPojo'
         operation.responses."500".content."application/json".schema.$ref == '#/components/schemas/TestPojo'
         operation.responses."201".content."application/xml".schema.type == 'string'
+    }
+
+    void "test skip ignored headers"() {
+
+        given:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.http.HttpHeaders;
+import io.micronaut.http.HttpResponse;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Header;
+import io.micronaut.http.annotation.Post;
+
+@Controller
+class HelloWorldController {
+
+    @Post("/public")
+    public HttpResponse<String> publicEnpoint(
+            @Header(HttpHeaders.AUTHORIZATION) String auth,
+            @Header(HttpHeaders.CONTENT_TYPE) String contentType,
+            @Header(HttpHeaders.ACCEPT) String accept,
+            @Header String myHeader
+    ) {
+        return null;
+    }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        when:
+        Operation operation = Utils.testReference?.paths?."/public"?.post
+
+        then:
+        operation
+        operation.parameters
+        operation.parameters.size() == 1
+        operation.parameters[0].name == 'my-header'
     }
 }
