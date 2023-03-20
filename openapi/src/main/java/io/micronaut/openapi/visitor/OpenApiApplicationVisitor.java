@@ -174,6 +174,13 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
      */
     public static final String MICRONAUT_OPENAPI_JSON_FORMAT = "micronaut.openapi.json.format";
     /**
+     * The name of the result swagger file.
+     * <p>
+     * Default filename is &lt;info.title&gt;-&lt;info.version&gt;.yml.
+     * If info annotation not set, filename will be swagger.yml.
+     */
+    public static final String MICRONAUT_OPENAPI_FILENAME = "micronaut.openapi.filename";
+    /**
      * Active micronaut environments which will be used for @Requires annotations.
      */
     public static final String MICRONAUT_OPENAPI_ENVIRONMENTS = "micronaut.openapi.environments";
@@ -1011,6 +1018,17 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             }
             fileName = documentTitle + ext;
         }
+        String fileNameFromConfig = getConfigurationProperty(MICRONAUT_OPENAPI_FILENAME, visitorContext);
+        if (StringUtils.isNotEmpty(fileNameFromConfig)) {
+            fileName = replacePlaceholders(fileNameFromConfig, visitorContext) + ext;
+            if (fileName.contains("${version}")) {
+                fileName = fileName.replaceAll("\\$\\{version}", info != null && info.getVersion() != null ? info.getVersion() : StringUtils.EMPTY_STRING);
+            }
+            if (fileName.contains("${")) {
+                visitorContext.warn("Can't set some placeholders in fileName: " + fileName, null);
+            }
+        }
+
         writeYamlToFile(openAPI, fileName, documentTitle, visitorContext, isYaml);
         visitedElements = visitedElements(visitorContext);
     }
@@ -1106,6 +1124,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         try (Writer writer = getFileWriter(specFile)) {
             (isYaml ? ConvertUtils.getYamlMapper() : ConvertUtils.getJsonMapper()).writeValue(writer, openAPI);
             if (Utils.isTestMode()) {
+                Utils.setTestFileName(fileName);
                 if (isYaml) {
                     Utils.setTestYamlReference(writer.toString());
                 } else {
