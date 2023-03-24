@@ -1,0 +1,3886 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+    <title>OpenAPI/Swagger Support</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="stylesheet" href="../css/main.css" type="text/css" media="screen, print" title="Style" charset="utf-8" />
+    <link rel="stylesheet" href="../css/custom.css" type="text/css" media="screen, print" title="Style" charset="utf-8" />
+    <link rel="stylesheet" href="../css/pdf.css" type="text/css" media="print" title="PDF" charset="utf-8" />
+    <link rel="stylesheet" href="../css/highlight/agate.css">
+    <script src="../js/highlight.pack.js"></script>
+    <script src="../js/guide.js"></script>
+    <script src="../js/multi-language-sample.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+    <link rel="stylesheet" href="../css/multi-language-sample.css"/>
+    <script src="../js/docs.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.5.13/clipboard.min.js"></script>
+    <script type="text/javascript">
+        function addJsClass(el) {
+            var classes = document.body.className.split(" ");
+            classes.push("js");
+            document.body.className = classes.join(" ");
+        }
+    </script>
+
+</head>
+
+<body class="body" id="docs" onload="addJsClass();" onhashchange="highlightMenu()">
+
+<div id="table-of-content-nav-link" class="desktop">
+    <a id="theme-switcher" title="Switch to dark theme" href="javascript:switchTheme(true)"><i class="fa fa-moon-o"></i></a>
+    <a title="Collapse/Open Table of contents" title="Hide Table of Contents" href="javascript:hideTableOfContents();" class="button">[ + ]</a>
+</div>
+
+<div id="main">
+    <div id="navigation" class="no-print">
+        <div class="navTitle">
+            <span id="logo"><a href="http://micronaut.io" title="Go to Micronaut Website"><img src="../img/micronaut-logo-white.svg" alt="Micronaut"/></a></span>
+        </div>
+        <div class="navLinks">
+            <ul>
+                    <li><div id="nav-summary" onmouseover="toggleNavSummary(false)" onmouseout="toggleNavSummary(true)" class="desktop">
+                            <a href="../guide/index.html" class="button">Table of contents</a>
+                            <div id="nav-summary-childs" style="display:none;">
+                                
+                                <div class="toc-item" style="margin-left:0"><a href="#introduction"><strong>1</strong><span>Introduction</span></a></div>
+                                
+                                <div class="toc-item" style="margin-left:0"><a href="#releaseHistory"><strong>2</strong><span>Release History</span></a></div>
+                                
+                                <div class="toc-item" style="margin-left:0"><a href="#cli"><strong>3</strong><span>Using the Micronaut CLI</span></a></div>
+                                
+                                <div class="toc-item" style="margin-left:0"><a href="#gettingStarted"><strong>4</strong><span>Dependencies</span></a></div>
+                                
+                                <div class="toc-item" style="margin-left:0"><a href="#openApiDefinition"><strong>5</strong><span>OpenAPI Definition</span></a></div>
+                                
+                                <div class="toc-item" style="margin-left:0"><a href="#configuration"><strong>6</strong><span>OpenAPI Processing Options</span></a></div>
+                                
+                                <div class="toc-item" style="margin-left:0"><a href="#exposingSwaggerOutput"><strong>7</strong><span>Exposing Swagger Output</span></a></div>
+                                
+                                <div class="toc-item" style="margin-left:0"><a href="#controllers"><strong>8</strong><span>OpenAPI Generation for Controllers</span></a></div>
+                                
+                                <div class="toc-item" style="margin-left:0"><a href="#namingstrategy"><strong>9</strong><span>Naming Strategy</span></a></div>
+                                
+                                <div class="toc-item" style="margin-left:0"><a href="#customSerializers"><strong>10</strong><span>Custom serializers</span></a></div>
+                                
+                                <div class="toc-item" style="margin-left:0"><a href="#schemaDecorators"><strong>11</strong><span>Schema decorators</span></a></div>
+                                
+                                <div class="toc-item" style="margin-left:0"><a href="#swaggerAnnotations"><strong>12</strong><span>Swagger Annotations</span></a></div>
+                                
+                                <div class="toc-item" style="margin-left:0"><a href="#endpoints"><strong>13</strong><span>Exposing Endpoints</span></a></div>
+                                
+                                <div class="toc-item" style="margin-left:0"><a href="#annotationConfiguration"><strong>14</strong><span>Annotation Configuration</span></a></div>
+                                
+                                <div class="toc-item" style="margin-left:0"><a href="#mergingSchemas"><strong>15</strong><span>Merging Schemas</span></a></div>
+                                
+                                <div class="toc-item" style="margin-left:0"><a href="#openApiViews"><strong>16</strong><span>Generating OpenAPI Views</span></a></div>
+                                
+                                <div class="toc-item" style="margin-left:0"><a href="#serverContext"><strong>17</strong><span>Server Context</span></a></div>
+                                
+                                <div class="toc-item" style="margin-left:0"><a href="#repository"><strong>18</strong><span>Repository</span></a></div>
+                                
+                                <div class="toc-item" style="margin-left:0"><a href="#breaks"><strong>19</strong><span>Breaking Changes</span></a></div>
+                                
+                            </div>
+                        </div>
+                    </li>
+
+                <li id="table-of-content-nav-link-mobile" class="mobile">
+                    <a title="Scroll to Table of contents" href="javascript:scrollToTop();" class="button">Toc</a>
+                </li>
+                <li class="desktop">
+                    <a title="Go to API documentation" href="../api/index.html" class="button">API Reference</a>
+                </li>
+                <li class="mobile">
+                    <a title="Go to API documentation" href="../api/index.html" class="button">API</a>
+                </li>
+                <li class="desktop">
+                    <a title="Go to Configuration Reference documentation" href="../guide/configurationreference.html" class="button">Configuration Reference</a>
+                </li>
+                <li class="mobile">
+                    <a title="Go to Configuration Reference documentation" href="../guide/configurationreference.html" class="button">Conf</a>
+                </li>
+            </ul>
+
+        </div>
+    </div>
+    
+    <div id="table-of-content">
+        <div class="toc-content">
+
+        <h2>Table of Contents</h2>
+        
+        <div class="toc-item" style="margin-left:0px" id="toc-item-introduction"><a href="#introduction"><strong>1</strong><span>Introduction</span></a></div>
+        
+        <div class="toc-item" style="margin-left:0px" id="toc-item-releaseHistory"><a href="#releaseHistory"><strong>2</strong><span>Release History</span></a></div>
+        
+        <div class="toc-item" style="margin-left:0px" id="toc-item-cli"><a href="#cli"><strong>3</strong><span>Using the Micronaut CLI</span></a></div>
+        
+        <div class="toc-item" style="margin-left:0px" id="toc-item-gettingStarted"><a href="#gettingStarted"><strong>4</strong><span>Dependencies</span></a></div>
+        
+        <div class="toc-item" style="margin-left:0px" id="toc-item-openApiDefinition"><a href="#openApiDefinition"><strong>5</strong><span>OpenAPI Definition</span></a></div>
+        
+        <div class="toc-item" style="margin-left:0px" id="toc-item-configuration"><a href="#configuration"><strong>6</strong><span>OpenAPI Processing Options</span></a></div>
+        
+        <div class="toc-item" style="margin-left:10px" id="toc-item-propertiesFileConfiguration"><a href="#propertiesFileConfiguration"><strong>6.1</strong><span>Configuring OpenAPI Processing with a properties file</span></a></div>
+        
+        <div class="toc-item" style="margin-left:10px" id="toc-item-systemPropertyConfiguration"><a href="#systemPropertyConfiguration"><strong>6.2</strong><span>Configuring OpenAPI Processing with system properties</span></a></div>
+        
+        <div class="toc-item" style="margin-left:0px" id="toc-item-exposingSwaggerOutput"><a href="#exposingSwaggerOutput"><strong>7</strong><span>Exposing Swagger Output</span></a></div>
+        
+        <div class="toc-item" style="margin-left:0px" id="toc-item-controllers"><a href="#controllers"><strong>8</strong><span>OpenAPI Generation for Controllers</span></a></div>
+        
+        <div class="toc-item" style="margin-left:0px" id="toc-item-namingstrategy"><a href="#namingstrategy"><strong>9</strong><span>Naming Strategy</span></a></div>
+        
+        <div class="toc-item" style="margin-left:0px" id="toc-item-customSerializers"><a href="#customSerializers"><strong>10</strong><span>Custom serializers</span></a></div>
+        
+        <div class="toc-item" style="margin-left:0px" id="toc-item-schemaDecorators"><a href="#schemaDecorators"><strong>11</strong><span>Schema decorators</span></a></div>
+        
+        <div class="toc-item" style="margin-left:0px" id="toc-item-swaggerAnnotations"><a href="#swaggerAnnotations"><strong>12</strong><span>Swagger Annotations</span></a></div>
+        
+        <div class="toc-item" style="margin-left:10px" id="toc-item-schemasAndPojos"><a href="#schemasAndPojos"><strong>12.1</strong><span>Schemas and POJOs</span></a></div>
+        
+        <div class="toc-item" style="margin-left:10px" id="toc-item-schemasAndMetaAnnotations"><a href="#schemasAndMetaAnnotations"><strong>12.2</strong><span>Schemas and Meta Annotations</span></a></div>
+        
+        <div class="toc-item" style="margin-left:10px" id="toc-item-schemasAndGenerics"><a href="#schemasAndGenerics"><strong>12.3</strong><span>Schemas and Generics</span></a></div>
+        
+        <div class="toc-item" style="margin-left:10px" id="toc-item-schemasNaming"><a href="#schemasNaming"><strong>12.4</strong><span>Schemas naming</span></a></div>
+        
+        <div class="toc-item" style="margin-left:10px" id="toc-item-schemasAnnotationResolution"><a href="#schemasAnnotationResolution"><strong>12.5</strong><span>Schemas Annotation resolution</span></a></div>
+        
+        <div class="toc-item" style="margin-left:0px" id="toc-item-endpoints"><a href="#endpoints"><strong>13</strong><span>Exposing Endpoints</span></a></div>
+        
+        <div class="toc-item" style="margin-left:10px" id="toc-item-enableendpoints"><a href="#enableendpoints"><strong>13.1</strong><span>Enable Endpoints</span></a></div>
+        
+        <div class="toc-item" style="margin-left:10px" id="toc-item-endpointstags"><a href="#endpointstags"><strong>13.2</strong><span>Endpoints Tags</span></a></div>
+        
+        <div class="toc-item" style="margin-left:10px" id="toc-item-micronautendpoints"><a href="#micronautendpoints"><strong>13.3</strong><span>Micronaut Built-In Endpoints</span></a></div>
+        
+        <div class="toc-item" style="margin-left:10px" id="toc-item-endpointservers"><a href="#endpointservers"><strong>13.4</strong><span>Endpoints Servers</span></a></div>
+        
+        <div class="toc-item" style="margin-left:10px" id="toc-item-endpointssecurityrequirements"><a href="#endpointssecurityrequirements"><strong>13.5</strong><span>Endpoints Security Requirements</span></a></div>
+        
+        <div class="toc-item" style="margin-left:10px" id="toc-item-endpointspath"><a href="#endpointspath"><strong>13.6</strong><span>Endpoints Path</span></a></div>
+        
+        <div class="toc-item" style="margin-left:0px" id="toc-item-annotationConfiguration"><a href="#annotationConfiguration"><strong>14</strong><span>Annotation Configuration</span></a></div>
+        
+        <div class="toc-item" style="margin-left:10px" id="toc-item-openapiinclude"><a href="#openapiinclude"><strong>14.1</strong><span>@OpenAPIInclude</span></a></div>
+        
+        <div class="toc-item" style="margin-left:10px" id="toc-item-openapimanagement"><a href="#openapimanagement"><strong>14.2</strong><span>@OpenAPIManagement</span></a></div>
+        
+        <div class="toc-item" style="margin-left:10px" id="toc-item-openapisecurity"><a href="#openapisecurity"><strong>14.3</strong><span>@OpenAPISecurity</span></a></div>
+        
+        <div class="toc-item" style="margin-left:10px" id="toc-item-accessorsStyle"><a href="#accessorsStyle"><strong>14.4</strong><span>@AccessorsStyle</span></a></div>
+        
+        <div class="toc-item" style="margin-left:0px" id="toc-item-mergingSchemas"><a href="#mergingSchemas"><strong>15</strong><span>Merging Schemas</span></a></div>
+        
+        <div class="toc-item" style="margin-left:0px" id="toc-item-openApiViews"><a href="#openApiViews"><strong>16</strong><span>Generating OpenAPI Views</span></a></div>
+        
+        <div class="toc-item" style="margin-left:10px" id="toc-item-mappingPath"><a href="#mappingPath"><strong>16.1</strong><span>Mapping Path</span></a></div>
+        
+        <div class="toc-item" style="margin-left:10px" id="toc-item-viewsGenerationWithPropertiesFile"><a href="#viewsGenerationWithPropertiesFile"><strong>16.2</strong><span>Enable Views Generation with a properties file</span></a></div>
+        
+        <div class="toc-item" style="margin-left:10px" id="toc-item-viewsGenerationWithSystemProperties"><a href="#viewsGenerationWithSystemProperties"><strong>16.3</strong><span>Enable Views Generation with system properties</span></a></div>
+        
+        <div class="toc-item" style="margin-left:10px" id="toc-item-swaggerui"><a href="#swaggerui"><strong>16.4</strong><span>Swagger-UI</span></a></div>
+        
+        <div class="toc-item" style="margin-left:20px" id="toc-item-oauth2"><a href="#oauth2"><strong>16.4.1</strong><span>Swagger UI - OAuth 2.0 configuration</span></a></div>
+        
+        <div class="toc-item" style="margin-left:10px" id="toc-item-redoc"><a href="#redoc"><strong>16.5</strong><span>Redoc</span></a></div>
+        
+        <div class="toc-item" style="margin-left:10px" id="toc-item-rapidoc"><a href="#rapidoc"><strong>16.6</strong><span>RapiDoc</span></a></div>
+        
+        <div class="toc-item" style="margin-left:10px" id="toc-item-rapipdf"><a href="#rapipdf"><strong>16.7</strong><span>RapiPdf</span></a></div>
+        
+        <div class="toc-item" style="margin-left:0px" id="toc-item-serverContext"><a href="#serverContext"><strong>17</strong><span>Server Context</span></a></div>
+        
+        <div class="toc-item" style="margin-left:10px" id="toc-item-compileResolution"><a href="#compileResolution"><strong>17.1</strong><span>Compile Time Resolution</span></a></div>
+        
+        <div class="toc-item" style="margin-left:10px" id="toc-item-serverFilter"><a href="#serverFilter"><strong>17.2</strong><span>HttpServerFilter</span></a></div>
+        
+        <div class="toc-item" style="margin-left:10px" id="toc-item-urlParameter"><a href="#urlParameter"><strong>17.3</strong><span>URL Parameter</span></a></div>
+        
+        <div class="toc-item" style="margin-left:0px" id="toc-item-repository"><a href="#repository"><strong>18</strong><span>Repository</span></a></div>
+        
+        <div class="toc-item" style="margin-left:0px" id="toc-item-breaks"><a href="#breaks"><strong>19</strong><span>Breaking Changes</span></a></div>
+        
+        </div>
+    </div>
+    
+    <div class="docs-content">
+    <div class="project">
+        <h1>OpenAPI/Swagger Support</h1>
+        <p></p>
+        <p>Configuration to integrate Micronaut and OpenAPI/Swagger</p>
+        <p><strong>Version:</strong> <select style='max-width: 200px' onChange='window.document.location.href=this.options[this.selectedIndex].value;'><option value='https://micronaut-projects.github.io/micronaut-openapi/snapshot/guide/index.html'>SNAPSHOT</option><option value='https://micronaut-projects.github.io/micronaut-openapi/latest/guide/index.html'>LATEST</option><option selected='selected' value='https://micronaut-projects.github.io/micronaut-openapi/5.0.0-M1/guide/index.html'>5.0.0-M1</option><option value='https://micronaut-projects.github.io/micronaut-openapi/4.8.5/guide/index.html'>4.8.5</option><option value='https://micronaut-projects.github.io/micronaut-openapi/4.8.4/guide/index.html'>4.8.4</option><option value='https://micronaut-projects.github.io/micronaut-openapi/4.8.3/guide/index.html'>4.8.3</option><option value='https://micronaut-projects.github.io/micronaut-openapi/4.8.2/guide/index.html'>4.8.2</option><option value='https://micronaut-projects.github.io/micronaut-openapi/4.8.1/guide/index.html'>4.8.1</option><option value='https://micronaut-projects.github.io/micronaut-openapi/4.8.0/guide/index.html'>4.8.0</option><option value='https://micronaut-projects.github.io/micronaut-openapi/4.7.1/guide/index.html'>4.7.1</option><option value='https://micronaut-projects.github.io/micronaut-openapi/4.7.0/guide/index.html'>4.7.0</option><option value='https://micronaut-projects.github.io/micronaut-openapi/4.6.0/guide/index.html'>4.6.0</option><option value='https://micronaut-projects.github.io/micronaut-openapi/4.5.2/guide/index.html'>4.5.2</option><option value='https://micronaut-projects.github.io/micronaut-openapi/4.5.1/guide/index.html'>4.5.1</option><option value='https://micronaut-projects.github.io/micronaut-openapi/4.5.0/guide/index.html'>4.5.0</option><option value='https://micronaut-projects.github.io/micronaut-openapi/4.4.3/guide/index.html'>4.4.3</option><option value='https://micronaut-projects.github.io/micronaut-openapi/4.4.2/guide/index.html'>4.4.2</option><option value='https://micronaut-projects.github.io/micronaut-openapi/4.4.1/guide/index.html'>4.4.1</option><option value='https://micronaut-projects.github.io/micronaut-openapi/4.4.0/guide/index.html'>4.4.0</option><option value='https://micronaut-projects.github.io/micronaut-openapi/4.3.0/guide/index.html'>4.3.0</option><option value='https://micronaut-projects.github.io/micronaut-openapi/4.2.2/guide/index.html'>4.2.2</option><option value='https://micronaut-projects.github.io/micronaut-openapi/4.2.1/guide/index.html'>4.2.1</option><option value='https://micronaut-projects.github.io/micronaut-openapi/4.2.0/guide/index.html'>4.2.0</option><option value='https://micronaut-projects.github.io/micronaut-openapi/4.1.0/guide/index.html'>4.1.0</option><option value='https://micronaut-projects.github.io/micronaut-openapi/4.0.1/guide/index.html'>4.0.1</option><option value='https://micronaut-projects.github.io/micronaut-openapi/4.0.0/guide/index.html'>4.0.0</option><option value='https://micronaut-projects.github.io/micronaut-openapi/3.2.0/guide/index.html'>3.2.0</option><option value='https://micronaut-projects.github.io/micronaut-openapi/3.1.0/guide/index.html'>3.1.0</option><option value='https://micronaut-projects.github.io/micronaut-openapi/3.0.4/guide/index.html'>3.0.4</option><option value='https://micronaut-projects.github.io/micronaut-openapi/3.0.3/guide/index.html'>3.0.3</option><option value='https://micronaut-projects.github.io/micronaut-openapi/3.0.2/guide/index.html'>3.0.2</option><option value='https://micronaut-projects.github.io/micronaut-openapi/3.0.1/guide/index.html'>3.0.1</option></select> </p>
+    </div>
+    
+<h1 id="introduction"><a class="anchor" href="#introduction"></a>1 Introduction</h1>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/introduction.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>Micronaut includes support for producing <a href="https://www.openapis.org">OpenAPI</a> (Swagger) YAML at compilation time. Micronaut will at compile time produce a OpenAPI 3.x compliant YAML file just based on the regular Micronaut annotations and the javadoc comments within your code.</p>
+</div>
+<div class="paragraph">
+<p>You can customize the generated Swagger using the standard <a href="#swaggerAnnotations">Swagger Annotations</a>.</p>
+</div>
+<div class="paragraph">
+<p>If you wish to generate Micronaut projects from OpenAPI definition files, utilize the <a href="https://openapi-generator.tech/">OpenAPI Generator</a>'s Micronaut support. Refer to the <a href="https://guides.micronaut.io/latest/micronaut-openapi-generator-server">"Micronaut server generation with OpenAPI" guide</a> or the <a href="https://guides.micronaut.io/latest/micronaut-openapi-generator-client">"Micronaut Client generation with OpenAPI" guide</a> for details.</p>
+</div>
+
+<h1 id="releaseHistory"><a class="anchor" href="#releaseHistory"></a>2 Release History</h1>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/releaseHistory.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>For this project, you can find a list of releases (with release notes) here:</p>
+</div>
+<div class="paragraph">
+<p><a href="https://github.com/micronaut-projects/micronaut-openapi/releases">https://github.com/micronaut-projects/micronaut-openapi/releases</a></p>
+</div>
+
+<h1 id="cli"><a class="anchor" href="#cli"></a>3 Using the Micronaut CLI</h1>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/cli.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>To create a project with OpenAPI/Swagger support using the Micronaut CLI, supply the <code>openapi</code> feature to the <code>features</code> flag. For example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>$ mn create-app my-openapi-app --features openapi</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This will create a project with the minimum necessary configuration for OpenAPI.</p>
+</div>
+<div class="paragraph">
+<p>If you have already created a Micronaut project and will like to add Swagger support, you can simply follow instructions in subsequent sections.</p>
+</div>
+
+<h1 id="gettingStarted"><a class="anchor" href="#gettingStarted"></a>4 Dependencies</h1>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/gettingStarted.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>To get started add Micronaut&#8217;s <code>openapi</code> to the annotation processor scope of your build configuration:</p>
+</div>
+<div class="paragraph">
+<p>        <div class="listingblock multi-language-sample">
+<div class="title"></div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="gradle">annotationProcessor(<span class="hljs-string">"io.micronaut.openapi:micronaut-openapi:5.0.0-M1")</span></code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="title"></div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="maven">&lt;annotationProcessorPaths&gt;
+    &lt;path&gt;
+        &lt;groupId&gt;io.micronaut.openapi&lt;/groupId&gt;
+        &lt;artifactId&gt;micronaut-openapi&lt;/artifactId&gt;
+        &lt;version&gt;5.0.0-M1&lt;/version&gt;
+    &lt;/path&gt;
+&lt;/annotationProcessorPaths&gt;</code></pre>
+</div>
+</div></p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+For Kotlin the <code>openapi</code> dependency should be in the <code>kapt</code> scope and for Groovy in the <code>compileOnly</code> scope.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>To use the <a href="https://github.com/swagger-api/swagger-core/wiki/Swagger-2.X---Annotations">Swagger Annotations</a> add them to the compile classpath</p>
+</div>
+<div class="paragraph">
+<p>        <div class="listingblock multi-language-sample">
+<div class="title"></div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="gradle">implementation(<span class="hljs-string">"io.swagger.core.v3:swagger-annotations")</span></code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="maven">&lt;dependency&gt;
+    &lt;groupId&gt;io.swagger.core.v3&lt;/groupId&gt;
+    &lt;artifactId&gt;swagger-annotations&lt;/artifactId&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div></p>
+</div>
+
+<h1 id="openApiDefinition"><a class="anchor" href="#openApiDefinition"></a>5 OpenAPI Definition</h1>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/openApiDefinition.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>Once dependencies have been configured a minimum requirement is to add a <code>@OpenAPIDefinition</code> annotation to your <code>Application</code> class:</p>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="title">Example @OpenAPIDefinition usage</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import io.micronaut.runtime.Micronaut;
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.info.Contact;
+import io.swagger.v3.oas.annotations.info.Info;
+import io.swagger.v3.oas.annotations.info.License;
+
+
+@OpenAPIDefinition(
+        info = @Info(
+                title = "Hello World",
+                version = "0.0",
+                description = "My API",
+                license = @License(name = "Apache 2.0", url = "https://foo.bar"),
+                contact = @Contact(url = "https://gigantic-server.com", name = "Fred", email = "Fred@gigagantic-server.com")
+        )
+)
+public class Application {
+
+    public static void main(String[] args) {
+        Micronaut.run(Application.class);
+    }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="title">Example @OpenAPIDefinition usage</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">import io.swagger.v3.oas.annotations.OpenAPIDefinition
+import io.swagger.v3.oas.annotations.info.Contact
+import io.swagger.v3.oas.annotations.info.Info
+import io.swagger.v3.oas.annotations.info.License
+
+
+@OpenAPIDefinition(
+        info = @Info(
+                title = "Hello World",
+                version = "0.0",
+                description = "My API",
+                license = @License(name = "Apache 2.0", url = "https://foo.bar"),
+                contact = @Contact(url = "https://gigantic-server.com", name = "Fred", email = "Fred@gigagantic-server.com")
+        )
+)
+class Application {
+    static void main(String[] args) {
+        Micronaut.run(Application)
+    }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="title">Example @OpenAPIDefinition usage</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">import io.micronaut.runtime.Micronaut
+import io.swagger.v3.oas.annotations.OpenAPIDefinition
+import io.swagger.v3.oas.annotations.info.Contact
+import io.swagger.v3.oas.annotations.info.Info
+import io.swagger.v3.oas.annotations.info.License
+
+
+@OpenAPIDefinition(
+        info = Info(
+                title = "Hello World",
+                version = "0.0",
+                description = "My API",
+                license = License(name = "Apache 2.0", url = "https://foo.bar"),
+                contact = Contact(url = "https://gigantic-server.com", name = "Fred", email = "Fred@gigagantic-server.com")
+        )
+)
+object Application {
+
+    @JvmStatic
+    fun main(args: Array&lt;String&gt;) {
+        Micronaut.run(Application.javaClass)
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>With that in place, you compile your project and a OpenAPI YAML file will be generated to the <code>META-INF/swagger</code> directory of your project&#8217;s class output. For example, the above configuration generates:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>For Java <code>build/classes/java/main/META-INF/swagger/hello-world-0.0.yml</code></p>
+</li>
+<li>
+<p>For Kotlin <code>build/tmp/kapt3/classes/main/META-INF/swagger/hello-world-0.0.yml</code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The previously defined annotations will produce YAML like the following:</p>
+</div>
+<div class="listingblock">
+<div class="title">Generated OpenAPI YAML</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">openapi: 3.0.1
+info:
+  title: the title
+  description: My API
+  contact:
+    name: Fred
+    url: https://gigantic-server.com
+    email: Fred@gigagantic-server.com
+  license:
+    name: Apache 2.0
+    url: https://foo.bar
+  version: "0.0"</code></pre>
+</div>
+</div>
+
+<h1 id="configuration"><a class="anchor" href="#configuration"></a>6 OpenAPI Processing Options</h1>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/configuration.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>It is possible to tweak the OpenAPI processing with system properties or with a properties file. Options specified with system properties have priority over those defined in the <code>openapi.properties</code> file.</p>
+</div>
+
+<h2 id="propertiesFileConfiguration"><a class="anchor" href="#propertiesFileConfiguration"></a>6.1 Configuring OpenAPI Processing with a properties file</h2>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/configuration/propertiesFileConfiguration.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>You can specify OpenAPI processing configuration in a file located at the root level of your project directory. The expected filename is <code>openapi.properties</code>.</p>
+</div>
+<div class="paragraph">
+<p>It is possible to specify a different location and filename with the <code>micronaut.openapi.config.file</code> System property.</p>
+</div>
+<div class="listingblock">
+<div class="title">openapi.properties Example</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">micronaut.openapi.property.naming.strategy=KEBAB_CASE
+micronaut.openapi.target.file=myspecfile.yml
+...
+..
+.</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Properties prefixed with <code>micronaut.openapi.expand</code> will be expanded at compile time, for instance with:</p>
+</div>
+<div class="listingblock">
+<div class="title">openapi.properties Property Resolution</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">micronaut.openapi.expand.api.version=v1.1
+micronaut.openapi.expand.openapi.description=A nice API</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The following example shows how to use the previous <code>micronaut.openapi.expand</code> properties:</p>
+</div>
+<div class="listingblock">
+<div class="title">Application Simple Application</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@OpenAPIDefinition(
+        info = @Info(
+                title = "Hello World",
+                version = "${api.version}",
+                description = "${openapi.description}",
+                license = @License(name = "Apache 2.0", url = "https://foo.bar"),
+                contact = @Contact(url = "https://gigantic-server.com", name = "Fred", email = "Fred@gigagantic-server.com")
+        )
+)
+public class Application {
+
+    public static void main(String[] args) {
+        Micronaut.run(Application.class);
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The generated specification file will look like:</p>
+</div>
+<div class="listingblock">
+<div class="title">Generated Swagger YAML</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">openapi: 3.0.1
+info:
+  title: Hello World
+  description: A nice API
+  contact:
+    name: Fred
+    url: https://gigantic-server.com
+    email: Fred@gigagantic-server.com
+  license:
+    name: Apache 2.0
+    url: https://foo.bar
+  version: "v1.1"</code></pre>
+</div>
+</div>
+
+<h2 id="systemPropertyConfiguration"><a class="anchor" href="#systemPropertyConfiguration"></a>6.2 Configuring OpenAPI Processing with system properties</h2>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/configuration/systemPropertyConfiguration.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>It is possible to tweak the OpenAPI processing via system properties.</p>
+</div>
+<div class="paragraph">
+<p>For instance in gradle:</p>
+</div>
+<div class="listingblock">
+<div class="title">Gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">tasks.withType(JavaCompile) {
+    options.fork = true
+    options.forkOptions.jvmArgs &lt;&lt; '-Dmicronaut.openapi.property.naming.strategy=SNAKE_CASE'
+
+    ...
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>or in gradle.properties</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>org.gradle.jvmargs=-Dmicronaut.openapi.property.naming.strategy=SNAKE_CASE</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>or in maven:</p>
+</div>
+<div class="listingblock">
+<div class="title">Maven</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;build&gt;
+    &lt;plugins&gt;
+        &lt;plugin&gt;
+            &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;
+            &lt;artifactId&gt;maven-compiler-plugin&lt;/artifactId&gt;
+            &lt;configuration&gt;
+                &lt;fork&gt;true&lt;/fork&gt;
+                &lt;compilerArgs&gt;
+                    &lt;arg&gt;-J-Dmicronaut.openapi.property.naming.strategy=SNAKE_CASE&lt;/arg&gt;
+                    ...
+                &lt;/compilerArgs&gt;
+            &lt;/configuration&gt;
+        &lt;/plugin&gt;
+    &lt;/plugins&gt;
+&lt;/build&gt;</code></pre>
+</div>
+</div>
+
+<h1 id="exposingSwaggerOutput"><a class="anchor" href="#exposingSwaggerOutput"></a>7 Exposing Swagger Output</h1>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/exposingSwaggerOutput.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>If you wish to expose the generated OpenAPI yaml output from your running application you can simply add the necessary static resource to the application configuration. For example:</p>
+</div>
+<div class="openblock">
+<div class="title">Exposing OpenAPI YAML</div>
+<div class="content">
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">micronaut.router.static-resources.swagger.paths=classpath:META-INF/swagger
+micronaut.router.static-resources.swagger.mapping=/swagger/**</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">micronaut:
+    router:
+        static-resources:
+            swagger:
+                paths: classpath:META-INF/swagger
+                mapping: /swagger/**</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-toml hljs" data-lang="toml">[micronaut]
+  [micronaut.router]
+    [micronaut.router.static-resources]
+      [micronaut.router.static-resources.swagger]
+        paths="classpath:META-INF/swagger"
+        mapping="/swagger/**"</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-groovy-config hljs" data-lang="groovy-config">micronaut {
+  router {
+    staticResources {
+      swagger {
+        paths = "classpath:META-INF/swagger"
+        mapping = "/swagger/**"
+      }
+    }
+  }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-hocon hljs" data-lang="hocon">{
+  micronaut {
+    router {
+      static-resources {
+        swagger {
+          paths = "classpath:META-INF/swagger"
+          mapping = "/swagger/**"
+        }
+      }
+    }
+  }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json-config hljs" data-lang="json-config">{
+  "micronaut": {
+    "router": {
+      "static-resources": {
+        "swagger": {
+          "paths": "classpath:META-INF/swagger",
+          "mapping": "/swagger/**"
+        }
+      }
+    }
+  }
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>With the above configuration in place when you run your application you can access your Swagger documentation at <code><a href="http://localhost:8080/swagger/hello-world-0.0.yml" class="bare">http://localhost:8080/swagger/hello-world-0.0.yml</a></code>.</p>
+</div>
+
+<h1 id="controllers"><a class="anchor" href="#controllers"></a>8 OpenAPI Generation for Controllers</h1>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/controllers.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>By default, Micronaut will automatically at compile time build out the Swagger YAML definition from your defined controllers and methods. For example given the following class:</p>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="title">Hello World Example</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import io.micronaut.http.MediaType;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import reactor.core.publisher.Mono;
+
+
+@Controller("/")
+public class HelloController {
+
+    /**
+     * @param name The person's name
+     * @return The greeting
+     */
+    @Get(uri = "/hello/{name}", produces = MediaType.TEXT_PLAIN)
+    public Mono&lt;String&gt; index(String name) {
+        return Mono.just("Hello " + name + "!");
+    }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="title">Hello World Example</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">import io.micronaut.http.MediaType
+
+import io.micronaut.http.annotation.Controller
+import io.micronaut.http.annotation.Get
+import reactor.core.publisher.Mono
+
+@Controller("/")
+class HelloController {
+
+    /**
+     * @param name The person's name
+     * @return The greeting
+     */
+    @Get(uri = "/hello/{name}", produces = MediaType.TEXT_PLAIN)
+    Mono&lt;String&gt; index(String name) {
+        return Single.just("Hello $name!")
+    }
+}
+
+@Controller("/")
+class HelloController {
+
+    /**
+     * @param name The person's name
+     * @return The greeting
+     */
+    @Get(uri = "/hello/{name}", produces = MediaType.TEXT_PLAIN)
+    Mono&lt;String&gt; index(String name) {
+        return Single.just("Hello $name!")
+    }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="title">Hello World Example</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">import io.micronaut.http.MediaType
+import io.micronaut.http.annotation.Controller
+import io.micronaut.http.annotation.Get
+import reactor.core.publisher.Mono
+
+
+@Controller("/")
+open class HelloController {
+
+    /**
+     * @param name The person's name
+     * @return The greeting
+     */
+    @Get(uri = "/hello/{name}", produces = [MediaType.TEXT_PLAIN])
+    open fun index(name: String): Mono&lt;String&gt; {
+        return Mono.just("Hello $name!")
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The resulting output will be:</p>
+</div>
+<div class="listingblock">
+<div class="title">Example Generated Swagger Output</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">openapi: 3.0.1
+info:
+  title: Hello World
+  description: My API
+  contact:
+    name: Fred
+    url: https://gigantic-server.com
+    email: Fred@gigagantic-server.com
+  license:
+    name: Apache 2.0
+    url: https://foo.bar
+  version: "0.0"
+paths:
+  /hello/{name}:
+    get:
+      description: ""
+      operationId: index
+      parameters:
+      - name: name
+        in: path
+        description: The person's name
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: The greeting
+          content:
+            text/plain:
+              schema:
+                type: string</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Notice how the javadoc comments are used to fill out the description of the API.</p>
+</div>
+
+<h1 id="namingstrategy"><a class="anchor" href="#namingstrategy"></a>9 Naming Strategy</h1>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/namingstrategy.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>You can control how the Schema property names are dumped by setting the <code>micronaut.openapi.property.naming.strategy</code> system property. It accepts one of
+the following <strong>jackson</strong>'s <code>PropertyNamingStrategy</code>:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>LOWER_CAMEL_CASE</strong></p>
+</li>
+<li>
+<p><strong>UPPER_CAMEL_CASE</strong></p>
+</li>
+<li>
+<p><strong>SNAKE_CASE</strong></p>
+</li>
+<li>
+<p><strong>UPPER_SNAKE_CASE</strong></p>
+</li>
+<li>
+<p><strong>LOWER_CASE</strong></p>
+</li>
+<li>
+<p><strong>KEBAB_CASE</strong></p>
+</li>
+<li>
+<p><strong>LOWER_DOT_CASE</strong>.</p>
+</li>
+</ul>
+</div>
+
+<h1 id="customSerializers"><a class="anchor" href="#customSerializers"></a>10 Custom serializers</h1>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/customSerializers.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>You can set custom classes to create different open api schemas for selected classes:</p>
+</div>
+<div class="openblock">
+<div class="content">
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">micronaut.openapi.schema.org.somepackage.MyComplexType=java.lang.String
+micronaut.openapi.schema.org.somepackage.MyComplexType2=java.lang.Integer</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">micronaut:
+  openapi:
+    schema:
+      org.somepackage.MyComplexType: java.lang.String
+      org.somepackage.MyComplexType2: java.lang.Integer</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-toml hljs" data-lang="toml">[micronaut]
+  [micronaut.openapi]
+    [micronaut.openapi.schema]
+      "org.somepackage.MyComplexType"="java.lang.String"
+      "org.somepackage.MyComplexType2"="java.lang.Integer"</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-groovy-config hljs" data-lang="groovy-config">micronaut {
+  openapi {
+    schema {
+      org.somepackage.MyComplexType = "java.lang.String"
+      org.somepackage.MyComplexType2 = "java.lang.Integer"
+    }
+  }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-hocon hljs" data-lang="hocon">{
+  micronaut {
+    openapi {
+      schema {
+        "org.somepackage.MyComplexType" = "java.lang.String"
+        "org.somepackage.MyComplexType2" = "java.lang.Integer"
+      }
+    }
+  }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json-config hljs" data-lang="json-config">{
+  "micronaut": {
+    "openapi": {
+      "schema": {
+        "org.somepackage.MyComplexType": "java.lang.String",
+        "org.somepackage.MyComplexType2": "java.lang.Integer"
+      }
+    }
+  }
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>or by system properties:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">-Dmicronaut.opemapi.schema.org.somepackage.MyComplexType=java.lang.String -Dmicronaut.opemapi.schema.org.somepackage.MyComplexType2=java.lang.Integer</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>or by openapi.properties</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">micronaut.openapi.schema.org.somepackage.MyComplexType=java.lang.String
+micronaut.openapi.schema.org.somepackage.MyComplexType2=java.lang.Integer</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Also, it can be used for replace classes schema with generics, for example, if you use jaxb generated classes and have custom serializer for JAXBElement class.
+And you can set cutom schemas for different type args.
+For example if you have this classes structure:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package test.mypackage;
+
+class MyDto {
+
+    public JAXBElement&lt;? extends XmlElement&gt; xmlElement;
+    public JAXBElement&lt;? extends XmlElement2&gt; xmlElement2;
+    public JAXBElement&lt;? extends XmlElement3&gt; xmlElement3;
+}
+
+class XmlElement {
+    public String propStr;
+}
+
+class XmlElement2 {
+    public String propStr2;
+}
+
+class XmlElement3 {
+    public String propStr3;
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You can customize classes structure for openapi schema:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package io.micronaut.openapi;
+
+// if you want to use generic from fields with type JAXBElement&lt;T&gt;
+class MyJaxbElement&lt;T&gt; {
+    public String type;
+    public T value;
+}
+
+class MyJaxbElement2 {
+    public String type;
+    public List&lt;String&gt; values;
+}
+
+class MyJaxbElement3 {
+    public String type;
+    public String value;
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>And set openapi properties to map classes to custom openapi schema classes:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>micronaut:
+  openapi:
+    schema:
+      io.micronaut.openapi.JAXBElement: io.micronaut.openapi.MyJaxbElement
+      io.micronaut.openapi.JAXBElement&lt;test.mypackage.XmlElement2&gt;: io.micronaut.openapi.MyJaxbElement2
+      io.micronaut.openapi.JAXBElement&lt;test.mypackage.XmlElement3&gt;: io.micronaut.openapi.MyJaxbElement3</pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Important!
+After changing these settings, a complete recompilation of the project is necessary to ensure that the new settings are applied correctly.
+</td>
+</tr>
+</table>
+</div>
+
+<h1 id="schemaDecorators"><a class="anchor" href="#schemaDecorators"></a>11 Schema decorators</h1>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/schemaDecorators.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>If you have some classes with same names in different packages you can set postfix like this:</p>
+</div>
+<div class="openblock">
+<div class="content">
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">micronaut.openapi.schema-postfix.org.api.v1_0_0=100
+micronaut.openapi.schema-postfix.org.api.v2_0_0=200</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">micronaut:
+  openapi:
+    schema-postfix:
+      org.api.v1_0_0: 1_0_0
+      org.api.v2_0_0: 2_0_0</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-toml hljs" data-lang="toml">[micronaut]
+  [micronaut.openapi]
+    [micronaut.openapi.schema-postfix]
+      "org.api.v1_0_0"=100
+      "org.api.v2_0_0"=200</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-groovy-config hljs" data-lang="groovy-config">micronaut {
+  openapi {
+    schemaPostfix {
+      org.api.v1_0_0 = 100
+      org.api.v2_0_0 = 200
+    }
+  }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-hocon hljs" data-lang="hocon">{
+  micronaut {
+    openapi {
+      schema-postfix {
+        "org.api.v1_0_0" = 100
+        "org.api.v2_0_0" = 200
+      }
+    }
+  }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json-config hljs" data-lang="json-config">{
+  "micronaut": {
+    "openapi": {
+      "schema-postfix": {
+        "org.api.v1_0_0": 100,
+        "org.api.v2_0_0": 200
+      }
+    }
+  }
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>or by system properties:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">-Dmicronaut.openapi.schema-postfix.org.api.v1_0_0=1_0_0 -Dmicronaut.openapi.schema-postfix.org.api.v2_0_0=2_0_0</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>or by openapi.properties</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">micronaut.openapi.schema-postfix.org.api.v1_0_0=1_0_0
+micronaut.openapi.schema-postfix.org.api.v2_0_0=2_0_0</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Important!
+After changing these settings, a complete recompilation of the project is necessary to ensure that the new settings are applied correctly.
+</td>
+</tr>
+</table>
+</div>
+
+<h1 id="swaggerAnnotations"><a class="anchor" href="#swaggerAnnotations"></a>12 Swagger Annotations</h1>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/swaggerAnnotations.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>You can take full control by augmenting your definition with <a href="https://github.com/swagger-api/swagger-core/wiki/Swagger-2.X---Annotations">Swagger Annotations</a>. <strong>Swagger annotations take precedence over javadoc</strong>.</p>
+</div>
+<div class="paragraph">
+<p>Add the Swagger annotations to the compile classpath</p>
+</div>
+<div class="paragraph">
+<p>        <div class="listingblock multi-language-sample">
+<div class="title"></div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="gradle">implementation(<span class="hljs-string">"io.swagger.core.v3:swagger-annotations")</span></code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="maven">&lt;dependency&gt;
+    &lt;groupId&gt;io.swagger.core.v3&lt;/groupId&gt;
+    &lt;artifactId&gt;swagger-annotations&lt;/artifactId&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div></p>
+</div>
+<div class="paragraph">
+<p>and then annotate your controllers:</p>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="title">Using Swagger Annotations</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import io.micronaut.http.MediaType;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
+import jakarta.validation.constraints.NotBlank;
+import reactor.core.publisher.Mono;
+
+
+@Controller("/")
+public class HelloController {
+
+    /**
+     * @param name The person's name
+     * @return The greeting message
+     */
+    @Get(uri="/greetings/{name}", produces= MediaType.TEXT_PLAIN)
+    @Operation(summary = "Greets a person",
+            description = "A friendly greeting is returned"
+    )
+    @ApiResponse(
+            content = @Content(mediaType = "text/plain",
+                    schema = @Schema(type="string"))
+    )
+    @ApiResponse(responseCode = "400", description = "Invalid Name Supplied")
+    @ApiResponse(responseCode = "404", description = "Person not found")
+    @Tag(name = "greeting")
+    public Mono&lt;String&gt; greetings(@Parameter(description="The name of the person") @NotBlank String name) {
+        return Mono.just("Hello " + name + ", How are you doing?");
+    }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="title">Using Swagger Annotations</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">@Controller("/")
+class HelloController {
+
+    /**
+     * @param name The person's name
+     * @return The greeting message
+     */
+    @Get(uri="/greetings/{name}", produces= MediaType.TEXT_PLAIN)
+    @Operation(summary = "Greets a person",
+            description = "A friendly greeting is returned"
+    )
+    @ApiResponse(
+            content = @Content(mediaType = "text/plain",
+                    schema = @Schema(type="string"))
+    )
+    @ApiResponse(responseCode = "400", description = "Invalid Name Supplied")
+    @ApiResponse(responseCode = "404", description = "Person not found")
+    @Tag(name = "greeting")
+    Mono&lt;String&gt; greetings(@Parameter(description="The name of the person") @NotBlank String name) {
+        return Single.just("Hello $name, How are you doing?")
+    }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="title">Using Swagger Annotations</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">import io.micronaut.http.MediaType
+import io.micronaut.http.annotation.Controller
+import io.micronaut.http.annotation.Get
+import reactor.core.publisher.Mono
+import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.media.Content
+import io.swagger.v3.oas.annotations.media.Schema
+import io.swagger.v3.oas.annotations.responses.ApiResponse
+import io.swagger.v3.oas.annotations.responses.ApiResponses
+import io.swagger.v3.oas.annotations.tags.Tag
+
+
+@Controller("/")
+open class HelloController {
+
+    /**
+     * @param name The person's name
+     * @return The greeting message
+     */
+    @Get(uri = "/greetings/{name}", produces = [MediaType.TEXT_PLAIN])
+    @Operation(summary = "Greets a person", description = "A friendly greeting is returned")
+    // Please Note: Repeatable Annotations with non-SOURCE retentions are not yet supported with Kotlin so we are using `@ApiResponses`
+    // instead of `@ApiResponse`, see https://youtrack.jetbrains.com/issue/KT-12794
+    @ApiResponses(
+            ApiResponse(content = [Content(mediaType = "text/plain", schema = Schema(type = "string"))]),
+            ApiResponse(responseCode = "400", description = "Invalid Name Supplied"),
+            ApiResponse(responseCode = "404", description = "Person not found")
+    )
+    @Tag(name = "greeting")
+    open fun greetings(name: String): Mono&lt;String&gt; {
+        return Mono.just("Hello $name, how are you doing?")
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The resulting output will be:</p>
+</div>
+<div class="listingblock">
+<div class="title">Example Generated Swagger Output</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">openapi: 3.0.1
+info:
+  title: Hello World
+  description: My API
+  contact:
+    name: Fred
+    url: https://gigantic-server.com
+    email: Fred@gigagantic-server.com
+  license:
+    name: Apache 2.0
+    url: https://foo.bar
+  version: "0.0"
+paths:
+  /greetings/{name}:
+    get:
+      tags:
+      - greeting
+      summary: Greets a person
+      description: A friendly greeting is returned
+      operationId: greetings
+      parameters:
+      - name: name
+        in: path
+        description: The name of the person
+        required: true
+        schema:
+          minLength: 1
+          type: string
+      responses:
+        200:
+          content:
+            text/plain:
+              schema:
+                type: string
+        400:
+          description: Invalid Name Supplied
+        404:
+          description: Person not found</code></pre>
+</div>
+</div>
+
+<h2 id="schemasAndPojos"><a class="anchor" href="#schemasAndPojos"></a>12.1 Schemas and POJOs</h2>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/swaggerAnnotations/schemasAndPojos.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>If you return types are not simple strings and primitive types then Micronaut will attempt to generate a Schema definition. You can customize the
+generation of the Schema by using the <code>@Schema</code> annotation on your POJO. For example:</p>
+</div>
+<div class="listingblock">
+<div class="title">Using the @Schema Annotation</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import io.swagger.v3.oas.annotations.media.Schema;
+
+@Schema(name="MyPet", description="Pet description") <i class="conum" data-value="1"></i><b>(1)</b>
+class Pet {
+    private PetType type;
+    private int age;
+    private String name;
+
+    public void setAge(int a) {
+        age = a;
+    }
+
+    /**
+     * The age
+     */
+    @Schema(description="Pet age", maximum="20") <i class="conum" data-value="2"></i><b>(2)</b>
+    public int getAge() {
+        return age;
+    }
+
+    public void setName(String n) {
+        name = n;
+    }
+
+    @Schema(description="Pet name", maxLength=20)
+    public String getName() {
+        return name;
+    }
+
+    public void setType(PetType t) {
+        type = t;
+    }
+
+    public PetType getType() {
+        return type;
+    }
+}
+
+enum PetType {
+    DOG, CAT
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>The <code>@Schema</code> annotation is used to customize the name of the schema</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Properties can be customized too.</td>
+</tr>
+</table>
+</div>
+
+<h2 id="schemasAndMetaAnnotations"><a class="anchor" href="#schemasAndMetaAnnotations"></a>12.2 Schemas and Meta Annotations</h2>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/swaggerAnnotations/schemasAndMetaAnnotations.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>If you don&#8217;t have control of the source code and don&#8217;t want to have to annotate each parameter with <code>@Schema</code> then it can be convenient to instead use a meta annotation.</p>
+</div>
+<div class="paragraph">
+<p>For example if the aforementioned <code>Pet</code> class cannot be annotated with <code>@Schema</code> you can define a meta annotation:</p>
+</div>
+<div class="listingblock">
+<div class="title">Swagger Meta Annotation</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Documented
+@Retention(RUNTIME)
+@Target({ElementType.PARAMETER, ElementType.FIELD})
+@Schema(name="MyPet", description="Pet description")
+@interface MyAnn {
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Then whenever <code>Pet</code> is used as a parameter you can annotate the parameter with <code>@MyAnn</code>.</p>
+</div>
+
+<h2 id="schemasAndGenerics"><a class="anchor" href="#schemasAndGenerics"></a>12.3 Schemas and Generics</h2>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/swaggerAnnotations/schemasAndGenerics.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>If a method return type includes generics then these will be included when calculating the schema name. For example the following:</p>
+</div>
+<div class="listingblock">
+<div class="title">Swagger returns types and generics</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">class Response&lt;T&gt; {
+    private T r;
+    public T getResult() {
+        return r;
+    }
+}
+
+@Controller("/")
+class MyController {
+
+    @Put("/")
+    public Response&lt;Pet&gt; updatePet(Pet pet) {
+        ...
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Will result in a schema called <code>#/components/schemas/Response&lt;Pet&gt;</code> being generated. If you wish to alter the name of the schema you can do so with the <code>@Schema</code> annotation:</p>
+</div>
+<div class="listingblock">
+<div class="title">Changing the name of response schema</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Put("/")
+@Schema(name="ResponseOfPet")
+public Response&lt;Pet&gt; updatePet(Pet pet) {
+    ...
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>In the above case the generated schema will be named <code>#/components/schemas/ResponseOfPet</code>.</p>
+</div>
+
+<h2 id="schemasNaming"><a class="anchor" href="#schemasNaming"></a>12.4 Schemas naming</h2>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/swaggerAnnotations/schemasNaming.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>By default, Micronaut uses Class simple name for Custom type schemas. Micronaut use simple name no matter if <code>@Schema</code>
+annotation is defined on type or on property (getter). That means that if you have two properties of same type with <code>@Schema</code>
+annotation without <code>name</code> set, Micronaut will accidentally override one definition with another. So in that case you should
+set <code>name</code> on <code>@Schema</code> annotation.</p>
+</div>
+<div class="listingblock">
+<div class="title">Schema name resolution</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import io.swagger.v3.oas.annotations.media.Schema;
+
+@Schema(description="A pet") <i class="conum" data-value="1"></i><b>(1)</b>
+class Pet {
+}
+
+class Owner {
+    private Pet bird;
+    private Pet cat;
+    private Pet dog;
+
+
+    @Schema(description="Pet that is a a bird") <i class="conum" data-value="2"></i><b>(2)</b>
+    public Pet getBird() {
+        return bird;
+    }
+
+    @Schema(description="Pet that is a cat") <i class="conum" data-value="3"></i><b>(3)</b>
+    public Pet getCat() {
+        return cat;
+    }
+
+    @Schema(name="Dog", description="Pet that is a dog") <i class="conum" data-value="4"></i><b>(4)</b>
+    public Pet getDog() {
+        return cat;
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Micronaut will generate schema with name <code>Pet</code></td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Micronaut will generate schema with name <code>Pet</code> since name is not set, this will conflict with &lt;1&gt; and &lt;3&gt;, final Pet schema might be incorrect</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Micronaut will generate schema with name <code>Pet</code> since name is not set, this will conflict with &lt;1&gt; and &lt;2&gt;, final Pet schema might be incorrect</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Micronaut will generate schema with unique name <code>Dog</code> since name is set, there is no conflict, schema is correctly generated</td>
+</tr>
+</table>
+</div>
+
+<h2 id="schemasAnnotationResolution"><a class="anchor" href="#schemasAnnotationResolution"></a>12.5 Schemas Annotation resolution</h2>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/swaggerAnnotations/schemasAnnotationResolution.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>You can apply <code>@Schema</code> annotation to type or property. But it&#8217;s important to note, that Micronaut will prioritize <code>@Schema</code> on property over <code>@Schema</code> on type.</p>
+</div>
+<div class="listingblock">
+<div class="title">Schema annotation resolution</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import io.swagger.v3.oas.annotations.media.Schema;
+
+@Schema(description="Pet") <i class="conum" data-value="1"></i><b>(1)</b>
+class Pet {
+}
+
+class Owner {
+
+    private Pet cat;
+    private Pet dog;
+
+    public Pet getCat() { <i class="conum" data-value="2"></i><b>(2)</b>
+        return cat;
+    }
+
+    @Schema(name="MyPet", description="This is my pet") <i class="conum" data-value="3"></i><b>(3)</b>
+    public Pet getDog() {
+        return dog;
+    }
+
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Micronaut will detect this annotation</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Micronaut will use annotation &lt;1&gt; from type since there is none on property</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Micronaut will use this annotation even if there exists one on Pet type</td>
+</tr>
+</table>
+</div>
+
+<h1 id="endpoints"><a class="anchor" href="#endpoints"></a>13 Exposing Endpoints</h1>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/endpoints.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>It is possible to expose management Endpoints in the openapi specification file.</p>
+</div>
+
+<h2 id="enableendpoints"><a class="anchor" href="#enableendpoints"></a>13.1 Enable Endpoints</h2>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/endpoints/enableendpoints.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>To process user defined endpoints simply add:</p>
+</div>
+<div class="listingblock">
+<div class="title">openapi.properties</div>
+<div class="content">
+<pre>endpoints.enabled=true
+...
+..
+.</pre>
+</div>
+</div>
+
+<h2 id="endpointstags"><a class="anchor" href="#endpointstags"></a>13.2 Endpoints Tags</h2>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/endpoints/endpointstags.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>You can also provide some tags for all endpoints with the <code>endpoints.tags=&lt;comma separated list of tags&gt;</code> flag, for instance:</p>
+</div>
+<div class="listingblock">
+<div class="title">openapi.properties</div>
+<div class="content">
+<pre>endpoints.tags=Management Endpoints</pre>
+</div>
+</div>
+
+<h2 id="micronautendpoints"><a class="anchor" href="#micronautendpoints"></a>13.3 Micronaut Built-In Endpoints</h2>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/endpoints/micronautendpoints.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>To enable the processing of built-in endpoints (<a href="https://docs.micronaut.io/latest/guide/index.html#providedEndpoints" class="bare">https://docs.micronaut.io/latest/guide/index.html#providedEndpoints</a>), you have to expose <code>micronaut-management</code> as annotation processor and runtime dependency:</p>
+</div>
+<div class="paragraph">
+<p>        <div class="listingblock multi-language-sample">
+<div class="title"></div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="gradle">annotationProcessor(<span class="hljs-string">"io.micronaut:micronaut-management:5.0.0-M1")</span></code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="title"></div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="maven">&lt;annotationProcessorPaths&gt;
+    &lt;path&gt;
+        &lt;groupId&gt;io.micronaut&lt;/groupId&gt;
+        &lt;artifactId&gt;micronaut-management&lt;/artifactId&gt;
+        &lt;version&gt;5.0.0-M1&lt;/version&gt;
+    &lt;/path&gt;
+&lt;/annotationProcessorPaths&gt;</code></pre>
+</div>
+</div></p>
+</div>
+<div class="paragraph">
+<p>        <div class="listingblock multi-language-sample">
+<div class="title"></div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="gradle">implementation(<span class="hljs-string">"io.micronaut:micronaut-management:5.0.0-M1")</span></code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="maven">&lt;dependency&gt;
+    &lt;groupId&gt;io.micronaut&lt;/groupId&gt;
+    &lt;artifactId&gt;micronaut-management&lt;/artifactId&gt;
+    &lt;version&gt;5.0.0-M1&lt;/version&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div></p>
+</div>
+<div class="paragraph">
+<p>and declare them in the <a href="#propertiesFileConfiguration">openapi.properties</a> file:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>endpoints.enabled=true
+endpoints.tags=Management Endpoints
+endpoints.routes.class=io.micronaut.management.endpoint.routes.RoutesEndpoint
+endpoints.beans.class=io.micronaut.management.endpoint.beans.BeansEndpoint
+endpoints.health.class=io.micronaut.management.endpoint.health.HealthEndpoint
+endpoints.loggers.class=io.micronaut.management.endpoint.loggers.LoggersEndpoint
+endpoints.refresh.class=io.micronaut.management.endpoint.refresh.RefreshEndpoint</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The syntax is the following: <code>endpoints.&lt;name&gt;.class=&lt;full class name of the endpoint&gt;</code> where <code>name</code> is an arbitrary name.
+You can also add some tags, servers and security requirements to each endpoint:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>endpoints.refresh.class=io.micronaut.management.endpoint.refresh.RefreshEndpoint
+endpoints.refresh.servers=[{"url": "https://staging.gigantic-server.com/v1", "description": "Staging server"}]
+endpoints.refresh.security-requirements=[{"petstore_auth": ["write:pets", "read:pets"]}]</pre>
+</div>
+</div>
+
+<h2 id="endpointservers"><a class="anchor" href="#endpointservers"></a>13.4 Endpoints Servers</h2>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/endpoints/endpointservers.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>You can also provide some servers for all endpoints with the <code>endpoints.server=&lt;json array of io.swagger.v3.oas.models.servers.Server&gt;</code> flag, for instance:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>endpoints.servers=[ \
+    { \
+      "url": "https://{username}.gigantic-server.com:{port}/{basePath}", \
+      "description": "The production API server", \
+      "variables": { \
+        "username": { \
+          "default": "demo", \
+          "description": "this value is assigned by the service provider, in this example `gigantic-server.com`" \
+        }, \
+        "port": { \
+          "enum": [ \
+            "8443", \
+            "443" \
+          ], \
+          "default": "8443" \
+        }, \
+        "basePath": { \
+          "default": "v2" \
+        } \
+      } \
+    } \
+  ]</pre>
+</div>
+</div>
+
+<h2 id="endpointssecurityrequirements"><a class="anchor" href="#endpointssecurityrequirements"></a>13.5 Endpoints Security Requirements</h2>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/endpoints/endpointssecurityrequirements.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>You can also provide some security requirements for all endpoints with the <code>endpoints.security-requirements=&lt;json array of io.swagger.v3.oas.models.security.SecurityRequirement&gt;</code> flag, for instance:</p>
+</div>
+<div class="listingblock">
+<div class="title">openapi.properties endpoints.security-requirement property</div>
+<div class="content">
+<pre>endpoints.security-requirements=[{"api_key": []}]
+...
+..
+.</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Don&#8217;t forget to declare the referenced <code>SecurityScheme</code>.</p>
+</div>
+
+<h2 id="endpointspath"><a class="anchor" href="#endpointspath"></a>13.6 Endpoints Path</h2>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/endpoints/endpointspath.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>If you are using a custom path for your endpoints use <code>endpoints.path</code> to set it:</p>
+</div>
+<div class="listingblock">
+<div class="title">openapi.properties endpoints.path property</div>
+<div class="content">
+<pre>endpoints.path=/endpoints
+...
+..
+.</pre>
+</div>
+</div>
+
+<h1 id="annotationConfiguration"><a class="anchor" href="#annotationConfiguration"></a>14 Annotation Configuration</h1>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/annotationConfiguration.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>Several annotations (<a href="../api/io/micronaut/openapi/annotation/OpenAPIInclude.html">OpenAPIInclude</a> <a href="../api/io/micronaut/openapi/annotation/OpenAPISecurity.html">OpenAPISecurity</a> <a href="../api/io/micronaut/openapi/annotation/OpenAPIManagement.html">OpenAPIManagement</a>) are available to enhance the generated OpenAPI.</p>
+</div>
+<div class="paragraph">
+<p>To use them add Micronaut&#8217;s <code>openapi</code> to the compile classpath of your application:</p>
+</div>
+<div class="paragraph">
+<p>        <div class="listingblock multi-language-sample">
+<div class="title"></div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="gradle">implementation(<span class="hljs-string">"io.micronaut.openapi:micronaut-openapi:5.0.0-M1")</span></code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="maven">&lt;dependency&gt;
+    &lt;groupId&gt;io.micronaut.openapi&lt;/groupId&gt;
+    &lt;artifactId&gt;micronaut-openapi&lt;/artifactId&gt;
+    &lt;version&gt;5.0.0-M1&lt;/version&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div></p>
+</div>
+
+<h2 id="openapiinclude"><a class="anchor" href="#openapiinclude"></a>14.1 @OpenAPIInclude</h2>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/annotationConfiguration/openapiinclude.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>You can use <a href="../api/io/micronaut/openapi/annotation/OpenAPIInclude.html">OpenAPIInclude</a> you can include additional <a href="../api/io/micronaut/http/annotation/Controller.html">Controller</a> or
+<a href="../api/io/micronaut/management/endpoint/annotation/Endpoint.html">Endpoint</a> already compiled
+classes in the OpenAPI processing.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@OpenAPIDefinition(
+        info = @Info(
+                title = "Hello World",
+                version = "${api.version}",
+                description = "${openapi.description}",
+                license = @License(name = "Apache 2.0", url = "https://foo.bar"),
+                contact = @Contact(url = "https://gigantic-server.com", name = "Fred", email = "Fred@gigagantic-server.com")
+        )
+)
+@OpenAPIInclude(
+        classes = { io.micronaut.security.endpoints.LoginController.class, io.micronaut.security.endpoints.LogoutController.class },
+        tags = @Tag(name = "Security")
+)
+@OpenAPIInclude(
+        classes = io.micronaut.management.endpoint.env.EnvironmentEndpoint.class,
+        tags = @Tag(name = "Management"),
+        security = @SecurityRequirement(name = "BEARER", scopes = {"ADMIN"})
+)
+public class Application {
+
+    public static void main(String[] args) {
+        Micronaut.run(Application.class);
+    }
+}</code></pre>
+</div>
+</div>
+
+<h2 id="openapimanagement"><a class="anchor" href="#openapimanagement"></a>14.2 @OpenAPIManagement</h2>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/annotationConfiguration/openapimanagement.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p><a href="../api/io/micronaut/openapi/annotation/OpenAPIManagement.html">OpenAPIManagement</a> adds management endpoints.</p>
+</div>
+<div class="paragraph">
+<p><a href="../api/io/micronaut/openapi/annotation/OpenAPIManagement.html">OpenAPIManagement</a> is mapped to:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@OpenAPIInclude(
+classes = { io.micronaut.management.endpoint.beans.BeansEndpoint.class, io.micronaut.management.endpoint.env.EnvironmentEndpoint.class,
+io.micronaut.management.endpoint.health.HealthEndpoint.class,
+io.micronaut.management.endpoint.info.InfoEndpoint.class,
+io.micronaut.management.endpoint.loggers.LoggersEndpoint.class,
+io.micronaut.management.endpoint.refresh.RefreshEndpoint.class,
+io.micronaut.management.endpoint.routes.RoutesEndpoint.class,
+io.micronaut.management.endpoint.stop.ServerStopEndpoint.class,
+io.micronaut.management.endpoint.threads.ThreadDumpEndpoint }
+)</code></pre>
+</div>
+</div>
+
+<h2 id="openapisecurity"><a class="anchor" href="#openapisecurity"></a>14.3 @OpenAPISecurity</h2>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/annotationConfiguration/openapisecurity.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p><a href="../api/io/micronaut/openapi/annotation/OpenAPISecurity.html">OpenAPISecurity</a> adds security endpoints.</p>
+</div>
+<div class="paragraph">
+<p>It is mapped to:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@OpenAPIInclude(
+classes = { io.micronaut.security.endpoints.LoginController.class, io.micronaut.security.endpoints.LogoutController.class }
+)</code></pre>
+</div>
+</div>
+
+<h2 id="accessorsStyle"><a class="anchor" href="#accessorsStyle"></a>14.4 @AccessorsStyle</h2>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/annotationConfiguration/accessorsStyle.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>You can use <a href="https://docs.micronaut.io/latest/api/io/micronaut/core/annotation/AccessorsStyle.html">@AccessorsStyle</a> to define your custom getters and setters if they are not the default <code>get</code> and <code>set</code>.</p>
+</div>
+<div class="paragraph">
+<p>This is useful when defining getters and setters in a "fluent" way or when using Lombok for that:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Introspected
+@AccessorsStyle(readPrefixes = "", writePrefixes = "") <i class="conum" data-value="1"></i><b>(1)</b>
+class Person {
+
+    private String name;
+    private Integer debtValue;
+    private Integer totalGoals;
+
+    Person(String name, Integer debtValue, Integer totalGoals) {
+        this.name = name;
+        this.debtValue = debtValue;
+        this.totalGoals = totalGoals;
+    }
+
+    public String name() { <i class="conum" data-value="2"></i><b>(2)</b>
+        return name;
+    }
+
+    public Integer debtValue() {
+        return debtValue;
+    }
+
+    public Integer totalGoals() {
+        return totalGoals;
+    }
+
+    public void name(String name) { <i class="conum" data-value="2"></i><b>(2)</b>
+        this.name = name;
+    }
+
+    public void debtValue(Integer debtValue) {
+        this.debtValue = debtValue;
+    }
+
+    public void totalGoals(Integer totalGoals) {
+        this.totalGoals = totalGoals;
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Use <code>@AccessorsStyle</code> to configure the custom prefixes. In this case no prefix.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Define getters and setters without prefixes.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Using <code>@AccessorsStyle</code> will tell Micronaut how to access getters and setters and will also generate the appropriate Open API spec.</p>
+</div>
+
+<h1 id="mergingSchemas"><a class="anchor" href="#mergingSchemas"></a>15 Merging Schemas</h1>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/mergingSchemas.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>Often times you might want to generate OpenAPI (Swagger) YAML for built-in endpoints or paths from some other modules, such as <code>security</code>. In order to generate YAML including all that information, Micronaut supports merging of multiple OpenAPI YAML files. So, you can create OpenAPI YAML files manually at some predefined path from where the information will then be merged into the final YAML file.</p>
+</div>
+<div class="paragraph">
+<p>For example, if you are using <a href="https://micronaut-projects.github.io/micronaut-security/latest/guide/index.html#openid">Micronaut&#8217;s Security OpenID Connect</a> with <a href="https://aws.amazon.com/cognito/">Amazon Cognito</a> your application exposes several endpoints which you could define in an external OpenAPI YAML file such as:</p>
+</div>
+<div class="listingblock">
+<div class="title">openapi/oauth.yml</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">openapi: 3.0.1
+info:
+  title: OAuth
+  description: Endpoints related to the integration with Amazon Cognito
+  version: "1.0"
+paths:
+  /logout:
+    get:
+      tags:
+      - security
+      description: deletes the JWT cookie and redirects to /oauth/login/cognito
+      operationId: logout
+      parameters: []
+      responses:
+        "200":
+          description: logout 200 response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Object'
+        "302":
+          links:
+            oauth-login-cognito:
+              operationId: oauth-login-cognito
+  /oauth/callback/cognito:
+    get:
+      tags:
+      - security
+      description: receives a callback from the authorization server with a code to
+        exchange it for an access and id token
+      externalDocs:
+        description: Amazon Cognito Token Endpoint documentation
+        url: https://docs.aws.amazon.com/cognito/latest/developerguide/token-endpoint.html
+      operationId: oauth-callback-cognito
+      parameters:
+      - name: authorizationResponse
+        in: query
+        required: true
+        explode: true
+        schema:
+          $ref: '#/components/schemas/AuthorizationResponse'
+      responses:
+        "303":
+          description: redirects to home page upon successful completion of the authorization
+            code grant flow
+          headers:
+            Set-Cookie:
+              description: Cookied named JWT with the id token obtained from the authorization
+                server as the value
+  /oauth/login/cognito:
+    get:
+      tags:
+      - security
+      description: redirects to authorization server sign in page
+      externalDocs:
+        description: Amazon Cognito Authorization Endpoint documentation
+        url: https://docs.aws.amazon.com/cognito/latest/developerguide/authorization-endpoint.html
+      operationId: oauth-login-cognito
+      parameters: []
+      responses:
+        "302":
+          description: redirects to authorization server sign in page
+  /oauth/logout:
+    get:
+      tags:
+      - security
+      description: ends the session in the authorization server and the redirects
+        to /logout
+      externalDocs:
+        description: Amazon Cognito Logout Endpoint documentation
+        url: https://docs.aws.amazon.com/cognito/latest/developerguide/logout-endpoint.html
+      operationId: oauth-logout
+      parameters: []
+      responses:
+        "302":
+          links:
+            logout:
+              operationId: logout
+components:
+  schemas:
+    AuthorizationResponse:
+      required:
+      - code
+      - state
+      type: object
+      properties:
+        code:
+          required:
+          - "true"
+          type: string
+          description: an authorization code which the OAuth 2.0 client can exchange
+            for an access token
+        nonce:
+          required:
+          - "false"
+          type: string
+          nullable: true
+        state:
+          required:
+          - "true"
+          type: string</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You could also have a yaml file describing the endpoint which exposes the generated OpenAPI YAML file:</p>
+</div>
+<div class="listingblock">
+<div class="title">openapi/swagger.yml</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">openapi: 3.0.1
+info:
+  title: swagger
+  version: "1.0"
+paths:
+  /swagger/demo-0.0.yml:
+    get:
+      tags:
+        - openapi
+      description: returns the OpenAPI YAML file describing the API
+      operationId: swagger
+      parameters: []
+      responses:
+        "200":
+          description: OpenAPI YAML file describing the API
+          content:
+            text/plain: {}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>To merge both files with the generated OpenAPI definition point, Micronaut searches for additional OpenAPI yaml files in the <code>openapi</code> folder, which is specified by <code>micronaut.openapi.additional.files</code>.</p>
+</div>
+<div class="listingblock">
+<div class="title">openapi.properties</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">micronaut.openapi.additional.files=openapi</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Micronaut includes the endpoints defined in those files in the generated output.</p>
+</div>
+
+<h1 id="openApiViews"><a class="anchor" href="#openApiViews"></a>16 Generating OpenAPI Views</h1>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/openApiViews.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>Micronaut can generate views for your generated OpenApi specification. Currently, <a href="https://github.com/swagger-api/swagger-ui">Swagger-ui</a>, <a href="https://github.com/Rebilly/ReDoc">Redoc</a> and <a href="https://github.com/mrin9/RapiDoc">RapiDoc</a> are supported.
+You can also use <a href="https://mrin9.github.io/RapiPdf/">RapiPdf</a> to generate a PDF from your spec file.</p>
+</div>
+<div class="paragraph">
+<p>You can enable multiple views generation in a single application.</p>
+</div>
+<div class="paragraph">
+<p>The resources needed to render the views (javascript, css, &#8230;&#8203;) are loaded from CDNs: <a href="https://unpkg.com">unpkg.com</a> and <a href="https://fonts.googleapis.com/">fonts.googleapis.com</a>.</p>
+</div>
+
+<h2 id="mappingPath"><a class="anchor" href="#mappingPath"></a>16.1 Mapping Path</h2>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/openApiViews/mappingPath.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>The path from where the swagger specification will be served by the http server defaults to <code>swagger</code>. You can change it via the <code>mapping.path</code> property.</p>
+</div>
+<div class="paragraph">
+<p>Thus, by default, the views expect to find the <code>yaml</code> under <code>/swagger</code>.</p>
+</div>
+<div class="paragraph">
+<p>If you change this mapping to something else:</p>
+</div>
+<div class="openblock">
+<div class="title">Exposing Swagger YAML</div>
+<div class="content">
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">micronaut.router.static-resources.swagger.paths=classpath:META-INF/swagger
+micronaut.router.static-resources.swagger.mapping=/swaggerYAML/**</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">micronaut:
+    router:
+        static-resources:
+            swagger:
+                paths: classpath:META-INF/swagger
+                mapping: /swaggerYAML/**</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-toml hljs" data-lang="toml">[micronaut]
+  [micronaut.router]
+    [micronaut.router.static-resources]
+      [micronaut.router.static-resources.swagger]
+        paths="classpath:META-INF/swagger"
+        mapping="/swaggerYAML/**"</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-groovy-config hljs" data-lang="groovy-config">micronaut {
+  router {
+    staticResources {
+      swagger {
+        paths = "classpath:META-INF/swagger"
+        mapping = "/swaggerYAML/**"
+      }
+    }
+  }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-hocon hljs" data-lang="hocon">{
+  micronaut {
+    router {
+      static-resources {
+        swagger {
+          paths = "classpath:META-INF/swagger"
+          mapping = "/swaggerYAML/**"
+        }
+      }
+    }
+  }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json-config hljs" data-lang="json-config">{
+  "micronaut": {
+    "router": {
+      "static-resources": {
+        "swagger": {
+          "paths": "classpath:META-INF/swagger",
+          "mapping": "/swaggerYAML/**"
+        }
+      }
+    }
+  }
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>You will need to set the <code>mapping.path</code> property accordingly: <code>micronaut.openapi.views.spec=mapping.path=swaggerYAML&#8230;&#8203;</code>.</p>
+</div>
+
+<h2 id="viewsGenerationWithPropertiesFile"><a class="anchor" href="#viewsGenerationWithPropertiesFile"></a>16.2 Enable Views Generation with a properties file</h2>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/openApiViews/viewsGenerationWithPropertiesFile.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>By default the generation of views is disabled. You can enable views generation with a <a href="#propertiesFileConfiguration">configuration properties file</a>.</p>
+</div>
+<div class="listingblock">
+<div class="title">openapi.properties Example Views Generation Swagger-UI Redoc, Rapidoc</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">swagger-ui.enabled=true
+redoc.enabled=true
+rapidoc.enabled=true
+rapidoc.bg-color=#14191f
+rapidoc.text-color=#aec2e0
+rapidoc.sort-endpoints-by=method
+...
+..
+.</code></pre>
+</div>
+</div>
+
+<h2 id="viewsGenerationWithSystemProperties"><a class="anchor" href="#viewsGenerationWithSystemProperties"></a>16.3 Enable Views Generation with system properties</h2>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/openApiViews/viewsGenerationWithSystemProperties.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>By default the generation of views is disabled.</p>
+</div>
+<div class="paragraph">
+<p>To turn it on you have to set the following system property <code>micronaut.openapi.views.spec</code>.</p>
+</div>
+<div class="paragraph">
+<p>The string syntax is a series of comma-separated key-value pairs, to enable and configure the views.</p>
+</div>
+<div class="listingblock">
+<div class="title">System Property</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">micronaut.openapi.views.spec=redoc.enabled=true,rapidoc.enabled=true,swagger-ui.enabled=true,swagger-ui.theme=flattop</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>For instance in Gradle for Kotlin projects:</p>
+</div>
+<div class="listingblock">
+<div class="title">Gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">JAVA_TOOL_OPTIONS=-Dmicronaut.openapi.views.spec=redoc.enabled=true,rapidoc.enabled=true,swagger-ui.enabled=true,swagger-ui.theme=flattop \
+        ./gradlew --no-daemon clean assemble</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>or in gradle.properties:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">org.gradle.jvmargs=-Dmicronaut.openapi.views.spec=redoc.enabled=true,rapidoc.enabled=true,swagger-ui.enabled=true,swagger-ui.theme=flattop</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>or in build.gradle as well:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">kapt {
+    arguments {
+        arg("micronaut.openapi.views.spec", "redoc.enabled=true,rapidoc.enabled=true,swagger-ui.enabled=true,swagger-ui.theme=flattop")
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>or in Gradle for Java projects:</p>
+</div>
+<div class="listingblock">
+<div class="title">Gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">tasks.withType(JavaCompile) {
+    options.fork = true
+    options.forkOptions.jvmArgs &lt;&lt; '-Dmicronaut.openapi.views.spec=rapidoc.enabled=true,swagger-ui.enabled=true,swagger-ui.theme=flattop'
+
+    ...
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>or in Gradle for Groovy projects:</p>
+</div>
+<div class="listingblock">
+<div class="title">Gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">tasks.withType(GroovyCompile) {
+    groovyOptions.forkOptions.jvmArgs.add('-Dgroovy.parameters=true')
+    groovyOptions.forkOptions.jvmArgs.add('-Dmicronaut.openapi.views.spec=rapidoc.enabled=true,swagger-ui.enabled=true,swagger-ui.theme=flattop')
+    ...
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>or in Maven:</p>
+</div>
+<div class="listingblock">
+<div class="title">Maven</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;build&gt;
+    &lt;plugins&gt;
+        &lt;plugin&gt;
+            &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;
+            &lt;artifactId&gt;maven-compiler-plugin&lt;/artifactId&gt;
+            &lt;configuration&gt;
+                &lt;fork&gt;true&lt;/fork&gt;
+                &lt;compilerArgs&gt;
+                    &lt;arg&gt;-Amicronaut.openapi.views.spec=rapidoc.enabled=true,swagger-ui.enabled=true,swagger-ui.theme=flattop&lt;/arg&gt;
+                    ...
+                &lt;/compilerArgs&gt;
+            &lt;/configuration&gt;
+        &lt;/plugin&gt;
+    &lt;/plugins&gt;
+&lt;/build&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>or in Maven with Groovy:</p>
+</div>
+<div class="listingblock">
+<div class="title">Maven + Groovy</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;build&gt;
+    &lt;plugins&gt;
+        &lt;plugin&gt;
+        &lt;groupId&gt;org.codehaus.mojo&lt;/groupId&gt;
+        &lt;artifactId&gt;properties-maven-plugin&lt;/artifactId&gt;
+        &lt;version&gt;1.1.0&lt;/version&gt;
+        &lt;executions&gt;
+          &lt;execution&gt;
+            &lt;goals&gt;
+              &lt;goal&gt;set-system-properties&lt;/goal&gt;
+            &lt;/goals&gt;
+            &lt;configuration&gt;
+              &lt;properties&gt;
+                &lt;property&gt;
+                  &lt;name&gt;micronaut.openapi.views.spec&lt;/name&gt;
+                  &lt;value&gt;rapidoc.enabled=true,swagger-ui.enabled=true,swagger-ui.theme=flattop&lt;/value&gt;
+                &lt;/property&gt;
+              &lt;/properties&gt;
+            &lt;/configuration&gt;
+          &lt;/execution&gt;
+        &lt;/executions&gt;
+      &lt;/plugin&gt;
+    &lt;/plugins&gt;
+&lt;/build&gt;</code></pre>
+</div>
+</div>
+
+<h2 id="swaggerui"><a class="anchor" href="#swaggerui"></a>16.4 Swagger-UI</h2>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/openApiViews/swaggerui.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>Views supports <a href="https://swagger.io/tools/swagger-ui/">Swagger UI</a>, to enable it use <code>swagger-ui.enabled=true</code>.</p>
+</div>
+<div class="paragraph">
+<p>The views will be generated to the <code>META-INF/swagger/views/swagger-ui</code> directory of your project’s class output.</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>swagger-ui.enabled</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>true</code> or <code>false</code> When 'true' the Swagger-ui view is generated.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>swagger-ui.js.url</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Override path to use to find the js file. Path must contain a files named swagger-ui.css, swagger-ui-bundle.js, swagger-ui-standalone-present.js. The value can be a URL path like: "https://unpkg.com/swagger-ui-dist/". Must contain trailing slash.,</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>swagger-ui.copy-resources</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Copy or not local JS and CSS resources. Set to <code>false</code> if you are using external resources (eg <a href="https://unpkg.com/swagger-ui-dist/" class="bare">https://unpkg.com/swagger-ui-dist/</a>). Default <code>true</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>swagger-ui.theme</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>DEFAULT</code> or <code>MATERIAL</code> or <code>FEELING_BLUE</code> <code>FLATTOP</code> <code>MONOKAI</code> <code>MUTED</code> <code>NEWSPAPER</code> <code>OUTLINE</code>. The theme of swagger-ui to use. These are case-insensitive. Default is <code>DEFAULT</code>. See <a href="https://github.com/ostranme/swagger-ui-themes">Swagger UI Themes</a>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>swagger-ui.theme.url</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Override path to use to find the theme CSS file.,</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>swagger-ui.copy-theme</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Copy or not local theme CSS resources. Set to <code>false</code> if you are using external resources (eg <a href="https://swagger-theme.com/flattop.css" class="bare">https://swagger-theme.com/flattop.css</a>). Default <code>true</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>swagger-ui.displayOperationId</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>swagger-ui.oauth2RedirectUrl</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>swagger-ui.showMutatedRequest</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>swagger-ui.deepLinking</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>swagger-ui.supportedSubmitMethods</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>swagger-ui.defaultModelsExpandDepth</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>swagger-ui.layout</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>swagger-ui.defaultModelRendering</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>swagger-ui.docExpansion</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>swagger-ui.filter</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>swagger-ui.validatorUrl</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>swagger-ui.showCommonExtensions</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>swagger-ui.maxDisplayedTags</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>swagger-ui.withCredentials</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>swagger-ui.displayRequestDuration</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>swagger-ui.showExtensions</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>swagger-ui.operationsSorter</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>swagger-ui.tagsSorter</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>See <a href="https://github.com/swagger-api/swagger-ui/blob/HEAD/docs/usage/configuration.md">Swagger UI Configuration</a> for a description.</p>
+</div>
+<div class="paragraph">
+<p>To expose the <code>swagger-ui</code> views, you also must expose the generated <code>yaml</code>:</p>
+</div>
+<div class="openblock">
+<div class="title">Exposing Swagger YAML and Swagger UI Views</div>
+<div class="content">
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">micronaut.router.static-resources.swagger.paths=classpath:META-INF/swagger
+micronaut.router.static-resources.swagger.mapping=/swagger/**
+micronaut.router.static-resources.swagger-ui.paths=classpath:META-INF/swagger/views/swagger-ui
+micronaut.router.static-resources.swagger-ui.mapping=/swagger-ui/**</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">micronaut:
+    router:
+        static-resources:
+            swagger:
+                paths: classpath:META-INF/swagger
+                mapping: /swagger/**
+            swagger-ui:
+                paths: classpath:META-INF/swagger/views/swagger-ui
+                mapping: /swagger-ui/**</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-toml hljs" data-lang="toml">[micronaut]
+  [micronaut.router]
+    [micronaut.router.static-resources]
+      [micronaut.router.static-resources.swagger]
+        paths="classpath:META-INF/swagger"
+        mapping="/swagger/**"
+      [micronaut.router.static-resources.swagger-ui]
+        paths="classpath:META-INF/swagger/views/swagger-ui"
+        mapping="/swagger-ui/**"</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-groovy-config hljs" data-lang="groovy-config">micronaut {
+  router {
+    staticResources {
+      swagger {
+        paths = "classpath:META-INF/swagger"
+        mapping = "/swagger/**"
+      }
+      swaggerUi {
+        paths = "classpath:META-INF/swagger/views/swagger-ui"
+        mapping = "/swagger-ui/**"
+      }
+    }
+  }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-hocon hljs" data-lang="hocon">{
+  micronaut {
+    router {
+      static-resources {
+        swagger {
+          paths = "classpath:META-INF/swagger"
+          mapping = "/swagger/**"
+        }
+        swagger-ui {
+          paths = "classpath:META-INF/swagger/views/swagger-ui"
+          mapping = "/swagger-ui/**"
+        }
+      }
+    }
+  }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json-config hljs" data-lang="json-config">{
+  "micronaut": {
+    "router": {
+      "static-resources": {
+        "swagger": {
+          "paths": "classpath:META-INF/swagger",
+          "mapping": "/swagger/**"
+        },
+        "swagger-ui": {
+          "paths": "classpath:META-INF/swagger/views/swagger-ui",
+          "mapping": "/swagger-ui/**"
+        }
+      }
+    }
+  }
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>With the above configuration in place when you run your application you can access your Swagger documentation at http://localhost:8080/swagger-ui.</p>
+</div>
+
+<h2 id="oauth2"><a class="anchor" href="#oauth2"></a>16.4.1 Swagger UI - OAuth 2.0 configuration</h2>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/openApiViews/swaggerui/oauth2.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p><a href="https://swagger.io/docs/open-source-tools/swagger-ui/usage/oauth2/">Swagger UI OAuth 2.0</a> integration allows you to obtain a token from an authorization server directly from Swagger UI. Then, when you use the <code>Try This</code> button
+in the Swagger UI, the requests issued incorporate a valid token.</p>
+</div>
+<div class="paragraph">
+<p>You can configure it by setting the following properties:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 100%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>swagger-ui.oauth2RedirectUrl</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>swagger-ui.oauth2.clientId</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>swagger-ui.oauth2.clientSecret</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>swagger-ui.oauth2.realm</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>swagger-ui.oauth2.appName</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>swagger-ui.oauth2.scopeSeparator</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>swagger-ui.oauth2.scopes</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>swagger-ui.oauth2.additionalQueryStringParams</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>swagger-ui.oauth2.useBasicAuthenticationWithAccessCodeGrant</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>swagger-ui.oauth2.usePkceWithAuthorizationCodeGrant</code></p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>When setting any of those properties, Micronaut will generate not only a <code>swagger-ui/index.html</code> file, but also a
+<code>swagger-ui/oauth2-redirect.html</code> one. <strong>You will need to configure that endpoint as a callback URL in your OAuth 2 Authorization Server</strong>.</p>
+</div>
+<div class="paragraph">
+<p>An example configuration could be:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>micronaut.openapi.views.spec=swagger-ui.enabled=true,swagger-ui.theme=flattop,swagger-ui.oauth2RedirectUrl=http://localhost:8080/swagger-ui/oauth2-redirect.html,swagger-ui.oauth2.clientId=myClientId,swagger-ui.oauth2.scopes=openid,swagger-ui.oauth2.usePkceWithAuthorizationCodeGrant=true</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Then, you configure the <code>@SecurityScheme</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@SecurityScheme(name = "openid",
+        type = SecuritySchemeType.OAUTH2,
+        scheme = "bearer",
+        bearerFormat = "jwt",
+        flows = @OAuthFlows(
+                authorizationCode = @OAuthFlow(
+                        authorizationUrl = "https://mycompany.okta.com/oauth2/default/v1/authorize",
+                        tokenUrl = "https://mycompany.okta.com/oauth2/default/v1/token",
+                        refreshUrl = "",
+                        scopes = @OAuthScope(name = "openid", description = "OpenID role")
+                )
+        )
+)
+@OpenAPIDefinition(
+        info = @Info(
+                title = "API service",
+                version = "0.0",
+                description = "My API",
+                license = @License(name = "Apache 2.0", url = "https://foo.bar"),
+                contact = @Contact(url = "https://gigantic-server.com", name = "Fred", email = "Fred@gigagantic-server.com")
+        )
+)
+public class Application {
+    public static void main(String[] args) {
+        Micronaut.run(Application.class, args);
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>And the appropriate <code>@SecurityRequirement</code> on controllers,. eg:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.micronaut.security.annotation.Secured;
+import io.micronaut.security.rules.SecurityRule;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+
+@Controller
+@Secured(SecurityRule.IS_AUTHENTICATED)
+public class OrderController {
+
+    @Get
+    @SecurityRequirement(name = "openid", scopes = "openid")
+    public String index() {
+        return "Example Response";
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Do not forget to configure Micronaut Security accordingly:</p>
+</div>
+<div class="openblock">
+<div class="content">
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">micronaut.security.enabled=true
+micronaut.security.token.jwt.enabled=true
+micronaut.security.token.jwt.signatures.jwks.okta.url=https://mycompany.okta.com/oauth2/default/v1/keys
+micronaut.security.intercept-url-map[0].pattern=/swagger-ui/**
+micronaut.security.intercept-url-map[0].httpMethod=GET
+micronaut.security.intercept-url-map[0].access[0]=isAnonymous()
+micronaut.security.intercept-url-map[1].pattern=/swagger/**
+micronaut.security.intercept-url-map[1].access[0]=isAnonymous()
+micronaut.router.static-resources.swagger.paths=classpath:META-INF/swagger
+micronaut.router.static-resources.swagger.mapping=/swagger/**
+micronaut.router.static-resources.swagger-ui.paths=classpath:META-INF/swagger/views/swagger-ui
+micronaut.router.static-resources.swagger-ui.mapping=/swagger-ui/**</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">micronaut:
+  security:
+    enabled: true
+    token:
+      jwt:
+        enabled: true
+        signatures:
+          jwks:
+            okta:
+              url: 'https://mycompany.okta.com/oauth2/default/v1/keys'
+    intercept-url-map:
+      - pattern: /swagger-ui/**
+        httpMethod: GET
+        access:
+          - isAnonymous()
+      - pattern: /swagger/**
+        access:
+          - isAnonymous()
+  router:
+    static-resources:
+      swagger:
+        paths: classpath:META-INF/swagger
+        mapping: /swagger/**
+      swagger-ui:
+        paths: classpath:META-INF/swagger/views/swagger-ui
+        mapping: /swagger-ui/**</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-toml hljs" data-lang="toml">[micronaut]
+  [micronaut.security]
+    enabled=true
+    [micronaut.security.token]
+      [micronaut.security.token.jwt]
+        enabled=true
+        [micronaut.security.token.jwt.signatures]
+          [micronaut.security.token.jwt.signatures.jwks]
+            [micronaut.security.token.jwt.signatures.jwks.okta]
+              url="https://mycompany.okta.com/oauth2/default/v1/keys"
+    [[micronaut.security.intercept-url-map]]
+      pattern="/swagger-ui/**"
+      httpMethod="GET"
+      access=[
+        "isAnonymous()"
+      ]
+    [[micronaut.security.intercept-url-map]]
+      pattern="/swagger/**"
+      access=[
+        "isAnonymous()"
+      ]
+  [micronaut.router]
+    [micronaut.router.static-resources]
+      [micronaut.router.static-resources.swagger]
+        paths="classpath:META-INF/swagger"
+        mapping="/swagger/**"
+      [micronaut.router.static-resources.swagger-ui]
+        paths="classpath:META-INF/swagger/views/swagger-ui"
+        mapping="/swagger-ui/**"</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-groovy-config hljs" data-lang="groovy-config">micronaut {
+  security {
+    enabled = true
+    token {
+      jwt {
+        enabled = true
+        signatures {
+          jwks {
+            okta {
+              url = "https://mycompany.okta.com/oauth2/default/v1/keys"
+            }
+          }
+        }
+      }
+    }
+    interceptUrlMap = [{
+        pattern = "/swagger-ui/**"
+        httpMethod = "GET"
+        access = ["isAnonymous()"]
+      }, {
+        pattern = "/swagger/**"
+        access = ["isAnonymous()"]
+      }]
+  }
+  router {
+    staticResources {
+      swagger {
+        paths = "classpath:META-INF/swagger"
+        mapping = "/swagger/**"
+      }
+      swaggerUi {
+        paths = "classpath:META-INF/swagger/views/swagger-ui"
+        mapping = "/swagger-ui/**"
+      }
+    }
+  }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-hocon hljs" data-lang="hocon">{
+  micronaut {
+    security {
+      enabled = true
+      token {
+        jwt {
+          enabled = true
+          signatures {
+            jwks {
+              okta {
+                url = "https://mycompany.okta.com/oauth2/default/v1/keys"
+              }
+            }
+          }
+        }
+      }
+      intercept-url-map = [{
+          pattern = "/swagger-ui/**"
+          httpMethod = "GET"
+          access = ["isAnonymous()"]
+        }, {
+          pattern = "/swagger/**"
+          access = ["isAnonymous()"]
+        }]
+    }
+    router {
+      static-resources {
+        swagger {
+          paths = "classpath:META-INF/swagger"
+          mapping = "/swagger/**"
+        }
+        swagger-ui {
+          paths = "classpath:META-INF/swagger/views/swagger-ui"
+          mapping = "/swagger-ui/**"
+        }
+      }
+    }
+  }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json-config hljs" data-lang="json-config">{
+  "micronaut": {
+    "security": {
+      "enabled": true,
+      "token": {
+        "jwt": {
+          "enabled": true,
+          "signatures": {
+            "jwks": {
+              "okta": {
+                "url": "https://mycompany.okta.com/oauth2/default/v1/keys"
+              }
+            }
+          }
+        }
+      },
+      "intercept-url-map": [{
+          "pattern": "/swagger-ui/**",
+          "httpMethod": "GET",
+          "access": ["isAnonymous()"]
+        }, {
+          "pattern": "/swagger/**",
+          "access": ["isAnonymous()"]
+        }]
+    },
+    "router": {
+      "static-resources": {
+        "swagger": {
+          "paths": "classpath:META-INF/swagger",
+          "mapping": "/swagger/**"
+        },
+        "swagger-ui": {
+          "paths": "classpath:META-INF/swagger/views/swagger-ui",
+          "mapping": "/swagger-ui/**"
+        }
+      }
+    }
+  }
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>The previous sample uses a remote <a href="https://micronaut-projects.github.io/micronaut-security/latest/guide/index.html#jwks">Json Web Key Set</a> to validate the token issued by the authorization server. If you use <a href="https://micronaut-projects.github.io/micronaut-security/latest/guide/index.html#openid">Micronaut Security OpenID Connect support</a> with a server compatible with <a href="https://openid.net/specs/openid-connect-discovery-1_0.html">OpenID Connect Discovery</a>, the JWKS of the authorization server is automatically configured.</p>
+</div>
+
+<h2 id="redoc"><a class="anchor" href="#redoc"></a>16.5 Redoc</h2>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/openApiViews/redoc.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>Views support <a href="https://github.com/Rebilly/ReDoc">Redoc</a>, to enable it use <code>redoc.enabled=true</code>.</p>
+</div>
+<div class="paragraph">
+<p>The views will be generated to the <code>META-INF/swagger/views/redoc</code> directory of your project’s class output.</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>redoc.enabled</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>true</code> or <code>false</code>  When 'true' the Redoc view is generated.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>redoc.js.url</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Override path to use to find the js file. Path must contain a file named redoc.standalone.js. The value can be a URL path like: "https://unpkg.com/redoc/bundles/". Must contain trailing slash.,</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>redoc.copy-resources</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Copy or not local JS and CSS resources. Set to <code>false</code> if you are using external resources (eg <a href="https://unpkg.com/redoc/bundles/" class="bare">https://unpkg.com/redoc/bundles/</a>). Default <code>true</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>redoc.expand-single-schema-field</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>redoc.expand-default-server-variables</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>redoc.menu-toggle</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>redoc.only-required-in-samples</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>redoc.payload-sample-idx</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>redoc.sort-props-alphabetically</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>redoc.untrusted-spec</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>redoc.expand-responses</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>redoc.show-extensions</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>redoc.native-scrollbars</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>redoc.path-in-middle-panel</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>redoc.suppress-warnings</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>redoc.hide-hostname</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>redoc.disable-search</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>redoc.json-sample-expand-level</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>redoc.scroll-y-offset</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>redoc.hide-download-button</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>redoc.no-auto-auth</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>redoc.theme</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>redoc.hide-single-request-sample-tab</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>redoc.required-props-first</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>redoc.hide-loading</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>See <a href="https://github.com/Redocly/redoc#redoc-options-object">Redoc Options</a> for a description of the above properites.</p>
+</div>
+<div class="paragraph">
+<p>To expose the <code>redoc</code> views, you also must expose the generated <code>yaml</code>:</p>
+</div>
+<div class="openblock">
+<div class="title">Exposing Swagger YAML And Redoc Views</div>
+<div class="content">
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">micronaut.router.static-resources.swagger.paths=classpath:META-INF/swagger
+micronaut.router.static-resources.swagger.mapping=/swagger/**
+micronaut.router.static-resources.redoc.paths=classpath:META-INF/swagger/views/redoc
+micronaut.router.static-resources.redoc.mapping=/redoc/**</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">micronaut:
+    router:
+        static-resources:
+            swagger:
+                paths: classpath:META-INF/swagger
+                mapping: /swagger/**
+            redoc:
+                paths: classpath:META-INF/swagger/views/redoc
+                mapping: /redoc/**</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-toml hljs" data-lang="toml">[micronaut]
+  [micronaut.router]
+    [micronaut.router.static-resources]
+      [micronaut.router.static-resources.swagger]
+        paths="classpath:META-INF/swagger"
+        mapping="/swagger/**"
+      [micronaut.router.static-resources.redoc]
+        paths="classpath:META-INF/swagger/views/redoc"
+        mapping="/redoc/**"</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-groovy-config hljs" data-lang="groovy-config">micronaut {
+  router {
+    staticResources {
+      swagger {
+        paths = "classpath:META-INF/swagger"
+        mapping = "/swagger/**"
+      }
+      redoc {
+        paths = "classpath:META-INF/swagger/views/redoc"
+        mapping = "/redoc/**"
+      }
+    }
+  }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-hocon hljs" data-lang="hocon">{
+  micronaut {
+    router {
+      static-resources {
+        swagger {
+          paths = "classpath:META-INF/swagger"
+          mapping = "/swagger/**"
+        }
+        redoc {
+          paths = "classpath:META-INF/swagger/views/redoc"
+          mapping = "/redoc/**"
+        }
+      }
+    }
+  }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json-config hljs" data-lang="json-config">{
+  "micronaut": {
+    "router": {
+      "static-resources": {
+        "swagger": {
+          "paths": "classpath:META-INF/swagger",
+          "mapping": "/swagger/**"
+        },
+        "redoc": {
+          "paths": "classpath:META-INF/swagger/views/redoc",
+          "mapping": "/redoc/**"
+        }
+      }
+    }
+  }
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>With the above configuration in place when you run your application you can access your Swagger documentation at http://localhost:8080/redoc.</p>
+</div>
+
+<h2 id="rapidoc"><a class="anchor" href="#rapidoc"></a>16.6 RapiDoc</h2>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/openApiViews/rapidoc.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>The views will be generated to the <code>META-INF/swagger/views/rapidoc</code> directory of your project’s class output.</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapidoc.enabled</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>true</code> or <code>false</code> When 'true' the RapiDoc view is generated.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapidoc.js.url</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Override path to use to find the js file. Path must contain a file named rapidoc-min.js. The value can be a URL path like: "https://unpkg.com/rapidoc/dist/". Must contain trailing slash.,</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapidoc.copy-resources</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Copy or not local JS and CSS resources. Set to <code>false</code> if you are using external resources (eg <a href="https://unpkg.com/rapidoc/dist/" class="bare">https://unpkg.com/rapidoc/dist/</a>). Default <code>true</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapidoc.style</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapidoc.sort-tags</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapidoc.sort-endpoints-by</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapidoc.heading-text</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapidoc.goto-path</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapidoc.theme</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapidoc.bg-color</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapidoc.text-color</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapidoc.header-color</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapidoc.regular-font</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapidoc.mono-font</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapidoc.font-size</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapidoc.nav-bg-color</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapidoc.nav-text-color</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapidoc.nav-hover-bg-color</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapidoc.nav-hover-text-color</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapidoc.nav-accent-color</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapidoc.nav-item-spacing</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapidoc.layout</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapidoc.render-style</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapidoc.schema-style</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapidoc.schema-expand-level</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapidoc.schema-description-expanded</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapidoc.default-schema-tab</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapidoc.response-area-height</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapidoc.show-info</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapidoc.info-description-headings-in-navbar</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapidoc.show-components</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapidoc.show-header</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapidoc.allow-authentication</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapidoc.allow-spec-url-load</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapidoc.allow-spec-file-load</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapidoc.allow-search</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapidoc.allow-try</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapidoc.allow-server-selection</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapidoc.api-key-name</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapidoc.api-key-value</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapidoc.api-key-location</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapidoc.server-url</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapidoc.default-api-server</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>See <a href="https://mrin9.github.io/RapiDoc/api.html">RapiDoc Options</a> for a description.</p>
+</div>
+<div class="paragraph">
+<p>To expose the <code>rapidoc</code> views, you also must expose the generated <code>yaml</code>:</p>
+</div>
+<div class="openblock">
+<div class="title">Exposing Swagger YAML And Rapidoc Views</div>
+<div class="content">
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">micronaut.router.static-resources.swagger.paths=classpath:META-INF/swagger
+micronaut.router.static-resources.swagger.mapping=/swagger/**
+micronaut.router.static-resources.rapidoc.paths=classpath:META-INF/swagger/views/rapidoc
+micronaut.router.static-resources.rapidoc.mapping=/rapidoc/**</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">micronaut:
+    router:
+        static-resources:
+            swagger:
+                paths: classpath:META-INF/swagger
+                mapping: /swagger/**
+            rapidoc:
+                paths: classpath:META-INF/swagger/views/rapidoc
+                mapping: /rapidoc/**</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-toml hljs" data-lang="toml">[micronaut]
+  [micronaut.router]
+    [micronaut.router.static-resources]
+      [micronaut.router.static-resources.swagger]
+        paths="classpath:META-INF/swagger"
+        mapping="/swagger/**"
+      [micronaut.router.static-resources.rapidoc]
+        paths="classpath:META-INF/swagger/views/rapidoc"
+        mapping="/rapidoc/**"</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-groovy-config hljs" data-lang="groovy-config">micronaut {
+  router {
+    staticResources {
+      swagger {
+        paths = "classpath:META-INF/swagger"
+        mapping = "/swagger/**"
+      }
+      rapidoc {
+        paths = "classpath:META-INF/swagger/views/rapidoc"
+        mapping = "/rapidoc/**"
+      }
+    }
+  }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-hocon hljs" data-lang="hocon">{
+  micronaut {
+    router {
+      static-resources {
+        swagger {
+          paths = "classpath:META-INF/swagger"
+          mapping = "/swagger/**"
+        }
+        rapidoc {
+          paths = "classpath:META-INF/swagger/views/rapidoc"
+          mapping = "/rapidoc/**"
+        }
+      }
+    }
+  }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json-config hljs" data-lang="json-config">{
+  "micronaut": {
+    "router": {
+      "static-resources": {
+        "swagger": {
+          "paths": "classpath:META-INF/swagger",
+          "mapping": "/swagger/**"
+        },
+        "rapidoc": {
+          "paths": "classpath:META-INF/swagger/views/rapidoc",
+          "mapping": "/rapidoc/**"
+        }
+      }
+    }
+  }
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>With the above configuration in place when you run your application you can access your Swagger documentation at http://localhost:8080/rapidoc.</p>
+</div>
+
+<h2 id="rapipdf"><a class="anchor" href="#rapipdf"></a>16.7 RapiPdf</h2>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/openApiViews/rapipdf.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>Views also supports <a href="https://mrin9.github.io/RapiPdf/">RapiPdf</a>, to enable it use <code>rapipdf.enabled=true</code>.</p>
+</div>
+<div class="paragraph">
+<p>RapiPdf supports the following options:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapipdf.enabled</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>true</code> or <code>false</code>,</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapipdf.js.url</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Override path to use to find the js file. Path must contain a file named rapdipdf-min.js.  The value can be a URL path like: "https://unpkg.com/rapipdf/dist/". Must contain trailing slash.,</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapipdf.copy-resources</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Copy or not local JS and CSS resources. Set to <code>false</code> if you are using external resources (eg <a href="https://unpkg.com/rapipdf/dist/" class="bare">https://unpkg.com/rapipdf/dist/</a>). Default <code>true</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapipdf.include-api-details</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapipdf.pdf-title</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapipdf.include-api-list</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapipdf.include-security</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapipdf.input-bg</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapipdf.hide-input</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapipdf.pdf-footer-text</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapipdf.pdf-primary-color</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapipdf.pdf-schema-style</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapipdf.button-label</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapipdf.pdf-alternate-color</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapipdf.include-info</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapipdf.include-toc</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapipdf.button-color</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapipdf.style</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapipdf.input-color</code></p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>See <a href="https://mrin9.github.io/RapiPdf/">RapiPdf Attributes</a> for a description.</p>
+</div>
+<div class="paragraph">
+<p>It will add a button to the view to generate a PDF from the spec file.</p>
+</div>
+
+<h1 id="serverContext"><a class="anchor" href="#serverContext"></a>17 Server Context</h1>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/serverContext.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>In the micronaut configuration file you can define a server context path (with <code>micronaut.server.context-path</code>) which serves as a base path for all routes.
+Since the yaml specification file and the views are generated at compile time, these resources are not aware of changes during runtime (e.g. context-path is determined by a reverse proxy).</p>
+</div>
+<div class="paragraph">
+<p>It is still possible for the views to work in case a context path is defined:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Set <code>micronaut.openapi.server.context.path</code> property for compile time resolution, or</p>
+</li>
+<li>
+<p>Use a <code>HttpServerFilter</code> that will add a cookie, or</p>
+</li>
+<li>
+<p>Add a parameter to the url.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The view will first look for the cookie and if not present for the parameter.</p>
+</div>
+
+<h2 id="compileResolution"><a class="anchor" href="#compileResolution"></a>17.1 Compile Time Resolution</h2>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/serverContext/compileResolution.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>Either set <code>micronaut.openapi.server.context.path</code> as a System Property or in <code>openapi.properties</code>, then all paths will be prepend with the specified value at compile time.</p>
+</div>
+<div class="paragraph">
+<p>If you want the resolution of the context path at runtime use one of the following methods:</p>
+</div>
+
+<h2 id="serverFilter"><a class="anchor" href="#serverFilter"></a>17.2 HttpServerFilter</h2>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/serverContext/serverFilter.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>Use a <code>HttpServerFilter</code> to add a cookie which contains the context-path. This can be done in two ways:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Set the context-path from a static property (has to be set during compile time), or</p>
+</li>
+<li>
+<p>Parse the context path from the request headers. This is particularly useful if your application runs behind a reverse proxy, which strips the context-path before forwarding the request to the application. Most reverse proxies should provide the possibility to set the stripped context-path as a header (e.g. X-Forwarded-Prefix in the case of traefik).</p>
+</li>
+</ul>
+</div>
+<div class="sect2">
+<h3 id="_static_property">Static Property</h3>
+<div class="paragraph">
+<p>Create a <code>HttpServerFilter</code> that will add a cookie with name <code>contextPath</code>.</p>
+</div>
+<div class="listingblock">
+<div class="title">HttpServerFilter for static context-path</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import java.time.Duration;
+
+import org.reactivestreams.Publisher;
+
+import io.micronaut.context.annotation.Requires;
+import io.micronaut.context.annotation.Value;
+import io.micronaut.core.async.publisher.Publishers;
+import io.micronaut.http.HttpMethod;
+import io.micronaut.http.HttpRequest;
+import io.micronaut.http.MutableHttpResponse;
+import io.micronaut.http.annotation.Filter;
+import io.micronaut.http.cookie.Cookie;
+import io.micronaut.http.filter.HttpServerFilter;
+import io.micronaut.http.filter.ServerFilterChain;
+
+@Requires(property = "micronaut.server.context-path")
+@Filter(methods = {HttpMethod.GET, HttpMethod.HEAD}, patterns = {"/**/rapidoc*", "/**/redoc*", "/**/swagger-ui*"})
+public class OpenApiViewCookieContextPathFilter implements HttpServerFilter {
+    private final Cookie contextPathCookie;
+
+    OpenApiViewCookieContextPathFilter(@Value("${micronaut.server.context-path}") String contextPath) {
+        this.contextPathCookie = Cookie.of("contextPath", contextPath).maxAge(Duration.ofMinutes(2L));
+    }
+
+    @Override
+    public Publisher&lt;MutableHttpResponse&lt;?&gt;&gt; doFilter(HttpRequest&lt;?&gt; request, ServerFilterChain chain) {
+        return Publishers.map(chain.proceed(request), response -&gt; response.cookie(contextPathCookie));
+    }
+
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_from_http_header">From HTTP Header</h3>
+<div class="paragraph">
+<p>The <code>HttpServerFilter</code> looks very similar to the one above. The main difference is that it parses the <code>context-path</code> value from the request headers.</p>
+</div>
+<div class="listingblock">
+<div class="title">HttpServerFilter from request headers</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import java.time.Duration;
+
+import org.reactivestreams.Publisher;
+
+import io.micronaut.context.annotation.Requires;
+import io.micronaut.context.annotation.Value;
+import io.micronaut.core.async.publisher.Publishers;
+import io.micronaut.http.HttpMethod;
+import io.micronaut.http.HttpRequest;
+import io.micronaut.http.MutableHttpResponse;
+import io.micronaut.http.annotation.Filter;
+import io.micronaut.http.cookie.Cookie;
+import io.micronaut.http.filter.HttpServerFilter;
+import io.micronaut.http.filter.ServerFilterChain;
+
+
+@Filter(
+	methods = {HttpMethod.GET, HttpMethod.HEAD},
+	patterns = {"/**/rapidoc*", "/**/redoc*", "/**/swagger-ui*"}
+)
+@Requires(property = "micronaut.server.context-path-header")
+public class OpenApiContextPathFilter implements HttpServerFilter {
+
+	private final String contextPathHeader;
+
+	OpenApiContextPathFilter(@Value("${micronaut.server.context-path-header}") String contextPathHeader) {
+		this.contextPathHeader = contextPathHeader;
+	}
+
+	@Override
+	public Publisher&lt;MutableHttpResponse&lt;?&gt;&gt; doFilter(HttpRequest&lt;?&gt; request, ServerFilterChain chain) {
+		final String contextPath = request.getHeaders().get(contextPathHeader);
+
+		if (contextPath != null) {
+			Cookie contextPathCookie = Cookie.of("contextPath", contextPath).maxAge(Duration.ofMinutes(2L));
+			return Publishers.map(chain.proceed(request), response -&gt; response.cookie(contextPathCookie));
+		} else {
+			return chain.proceed(request);
+		}
+	}
+
+}</code></pre>
+</div>
+</div>
+</div>
+
+<h2 id="urlParameter"><a class="anchor" href="#urlParameter"></a>17.3 URL Parameter</h2>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/serverContext/urlParameter.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>Just add a parameter to the view url. For instance if the context path is set to <code>/context/path</code> you will access your view with <code><a href="http://localhost:8080/context/path/swagger-ui?contextPath=%2Fcontext%2Fpath" class="bare">http://localhost:8080/context/path/swagger-ui?contextPath=%2Fcontext%2Fpath</a></code>.</p>
+</div>
+
+<h1 id="repository"><a class="anchor" href="#repository"></a>18 Repository</h1>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/repository.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>You can find the source code of this project in this repository:</p>
+</div>
+<div class="paragraph">
+<p><a href="https://github.com/micronaut-projects/micronaut-openapi">https://github.com/micronaut-projects/micronaut-openapi</a></p>
+</div>
+
+<h1 id="breaks"><a class="anchor" href="#breaks"></a>19 Breaking Changes</h1>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/breaks.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>This section documents breaking changes between Micronaut OpenAPI versions:</p>
+</div>
+<div class="sect1">
+<h2 id="_micronaut_openapi_4_0_0">Micronaut OpenAPI 4.0.0</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Micronaut OpenAPI no longer generates <code>200</code> or <code>default</code> HTTP status code responses when using <code>@ApiResponse</code> annotation. It&#8217;s up to the user to define all the appropriate status codes.</p>
+</div>
+</div>
+</div>
+
+    </div>
+</div>
+
+<script type="text/javascript">
+
+</script>
+</body>
+</html>
