@@ -74,6 +74,7 @@ final class SwaggerUIConfig extends AbstractViewConfig {
         VALID_OPTIONS.put("showExtensions", AbstractViewConfig::asBoolean);
         VALID_OPTIONS.put("showCommonExtensions", AbstractViewConfig::asBoolean);
         VALID_OPTIONS.put("tagsSorter", AbstractViewConfig::asQuotedString);
+        VALID_OPTIONS.put("useUnsafeMarkdown", AbstractViewConfig::asQuotedString);
         VALID_OPTIONS.put("onComplete", AbstractViewConfig::asQuotedString);
         VALID_OPTIONS.put("syntaxHighlight", AbstractViewConfig::asBoolean);
         VALID_OPTIONS.put("syntaxHighlight.activate", AbstractViewConfig::asBoolean);
@@ -103,6 +104,7 @@ final class SwaggerUIConfig extends AbstractViewConfig {
         DEFAULT_OPTIONS.put("layout", "\"StandaloneLayout\"");
         DEFAULT_OPTIONS.put("deepLinking", Boolean.TRUE);
         DEFAULT_OPTIONS.put("validatorUrl", null);
+        DEFAULT_OPTIONS.put("tagsSorter", "\"alpha\"");
     }
 
     String themeUrl;

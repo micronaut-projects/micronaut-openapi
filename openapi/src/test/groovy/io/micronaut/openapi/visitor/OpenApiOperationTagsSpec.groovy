@@ -13,8 +13,6 @@ class OpenApiOperationTagsSpec extends AbstractOpenApiTypeElementSpec {
         buildBeanDefinition('test.MyBean', '''
 package test;
 
-import io.micronaut.http.HttpResponse;
-import io.micronaut.http.HttpStatus;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
@@ -243,8 +241,6 @@ class MyBean {}
         buildBeanDefinition('test.MyBean', '''
 package test;
 
-import io.micronaut.http.HttpResponse;
-import io.micronaut.http.HttpStatus;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
@@ -366,14 +362,14 @@ class MyBean {}
         operation
         operation.tags
         operation.tags.size() == 8
-        operation.tags.get(0) == "Tag 0"
-        operation.tags.get(1) == "Tag 1"
-        operation.tags.get(2) == "Tag 2"
-        operation.tags.get(3) == "Tag 3"
-        operation.tags.get(4) == "Tag 01"
-        operation.tags.get(5) == "Tag 11"
-        operation.tags.get(6) == "Tag 21"
-        operation.tags.get(7) == "Tag 31"
+        operation.tags.contains("Tag 0")
+        operation.tags.contains("Tag 1")
+        operation.tags.contains("Tag 2")
+        operation.tags.contains("Tag 3")
+        operation.tags.contains("Tag 01")
+        operation.tags.contains("Tag 11")
+        operation.tags.contains("Tag 21")
+        operation.tags.contains("Tag 31")
 
         openAPI.tags
         openAPI.tags.size() == 6
@@ -432,13 +428,8 @@ class MyBean {}
         buildBeanDefinition('test.MyBean', '''
 package test;
 
-import io.micronaut.http.HttpResponse;
-import io.micronaut.http.HttpStatus;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
-import io.swagger.v3.oas.annotations.ExternalDocumentation;
-import io.swagger.v3.oas.annotations.extensions.Extension;
-import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.tags.Tags;
 
@@ -471,10 +462,10 @@ class MyBean {}
         operation
         operation.tags
         operation.tags.size() == 4
-        operation.tags.get(0) == "Tag 0"
-        operation.tags.get(1) == "Complex tag"
-        operation.tags.get(2) == "Tag 2"
-        operation.tags.get(3) == "Tag 3"
+        operation.tags.contains("Tag 0")
+        operation.tags.contains("Complex tag")
+        operation.tags.contains("Tag 2")
+        operation.tags.contains("Tag 3")
 
         openAPI.tags
         openAPI.tags.size() == 1
@@ -482,4 +473,56 @@ class MyBean {}
         openAPI.tags.get(0).description == "this is description"
     }
 
+    void "test check tags sorting"() {
+
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.tags.Tags;
+
+@Tag(name = "C Tag")
+@Controller("/path")
+class OpenApiController {
+
+    @Get(uri = "/200")
+    @Tag(name = "Z Tag")
+    @Tags({
+            @Tag(name = "S Tag"),
+            @Tag(name = "A Tag"),
+            @Tag(name = "B Tag", description = "this is description")
+    })
+    public String processSync() {
+        return null;
+    }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        then: "the state is correct"
+        Utils.testReference != null
+
+        when: "The OpenAPI is retrieved"
+        OpenAPI openAPI = Utils.testReference
+        Operation operation = openAPI.paths.get("/path/200").get
+
+        then:
+        operation
+        operation.tags
+        operation.tags.size() == 5
+        operation.tags.get(0) == "A Tag"
+        operation.tags.get(1) == "B Tag"
+        operation.tags.get(2) == "C Tag"
+        operation.tags.get(3) == "S Tag"
+        operation.tags.get(4) == "Z Tag"
+
+        openAPI.tags
+        openAPI.tags.size() == 1
+        openAPI.tags.get(0).name == "B Tag"
+        openAPI.tags.get(0).description == "this is description"
+    }
 }

@@ -98,6 +98,7 @@ import static io.swagger.v3.oas.models.Components.COMPONENTS_SCHEMAS_REF;
     OpenApiApplicationVisitor.MICRONAUT_OPENAPI_CONTEXT_SERVER_PATH,
     OpenApiApplicationVisitor.MICRONAUT_OPENAPI_PROPERTY_NAMING_STRATEGY,
     OpenApiApplicationVisitor.MICRONAUT_OPENAPI_VIEWS_SPEC,
+    OpenApiApplicationVisitor.MICRONAUT_OPENAPI_FILENAME,
     OpenApiApplicationVisitor.MICRONAUT_OPENAPI_JSON_FORMAT,
     OpenApiApplicationVisitor.MICRONAUT_OPENAPI_ENVIRONMENTS,
     OpenApiApplicationVisitor.MICRONAUT_ENVIRONMENT_ENABLED,

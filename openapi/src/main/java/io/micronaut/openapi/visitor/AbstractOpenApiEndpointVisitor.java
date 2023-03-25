@@ -20,6 +20,7 @@ import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -1556,6 +1557,9 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         element.getValues(Tags.class, AnnotationValue.class).forEach((k, v) -> v.stringValue("name").ifPresent(name -> addTagIfNotPresent((String) name, swaggerOperation)));
 
         classTags.forEach(tag -> addTagIfNotPresent(tag.getName(), swaggerOperation));
+        if (CollectionUtils.isNotEmpty(swaggerOperation.getTags())) {
+            swaggerOperation.getTags().sort(Comparator.naturalOrder());
+        }
     }
 
     private List<io.swagger.v3.oas.models.tags.Tag> readTags(ClassElement element, VisitorContext context) {
