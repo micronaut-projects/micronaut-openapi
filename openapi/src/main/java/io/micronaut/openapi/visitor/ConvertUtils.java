@@ -40,11 +40,20 @@ import java.util.UUID;
 import javax.xml.datatype.XMLGregorianCalendar;
 
 import io.micronaut.core.annotation.AnnotationValue;
+import io.micronaut.core.annotation.NonNull;
+import io.micronaut.core.annotation.Nullable;
 import io.micronaut.core.beans.BeanMap;
+import io.micronaut.core.util.CollectionUtils;
+import io.micronaut.inject.ast.ClassElement;
+import io.micronaut.inject.ast.ElementQuery;
+import io.micronaut.inject.ast.EnumElement;
+import io.micronaut.inject.ast.MethodElement;
 import io.micronaut.inject.visitor.VisitorContext;
 import io.micronaut.openapi.swagger.ObjectMapperFactory;
+import io.micronaut.openapi.swagger.PrimitiveType;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 
+import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -188,7 +197,38 @@ public final class ConvertUtils {
     }
 
     /**
-     * Detect openapi type nd format by java class name.
+     * Detect openapi type and format for enums.
+     *
+     * @param type enum element
+     * @param schemaType type from swagger Schema annotation
+     * @param schemaFormat format from swagger Schema annotation
+     *
+     * @return pair with openapi type and format
+     */
+    @NonNull
+    public static Pair<String, String> checkEnumJsonValueType(VisitorContext context, @NonNull EnumElement type, @Nullable String schemaType, @Nullable String schemaFormat) {
+        if (schemaType != null && !schemaType.equals(PrimitiveType.STRING.getCommonName())) {
+            return Pair.of(schemaType, schemaFormat);
+        }
+        Pair<String, String> result = null;
+        // check JsonValue method
+        List<MethodElement> methods = type.getEnclosedElements(ElementQuery.ALL_METHODS.annotated(metadata -> metadata.isAnnotationPresent(JsonValue.class)));
+        if (CollectionUtils.isNotEmpty(methods)) {
+            MethodElement firstMethod = methods.get(0);
+            if (methods.size() > 1) {
+                context.warn("Found " + methods.size() + " methods with @JsonValue. Process method " + firstMethod, type);
+            }
+            ClassElement returnType = firstMethod.getReturnType();
+            if (returnType.isEnum()) {
+                return checkEnumJsonValueType(context, (EnumElement) returnType, null, null);
+            }
+            result = ConvertUtils.getTypeAndFormatByClass(returnType.getName(), firstMethod.getReturnType().isArray());
+        }
+        return result != null ? result : Pair.of(PrimitiveType.STRING.getCommonName(), schemaFormat);
+    }
+
+    /**
+     * Detect openapi type and format by java class name.
      *
      * @param className java class name
      * @param isArray is it array

@@ -797,4 +797,91 @@ class MyBean {}
         type1Schema.enum.contains("558301010000")
         type1Schema.enum.contains("558301020000")
     }
+
+    void "test enum as schema property"() {
+
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.core.annotation.Introspected;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Post;
+import io.swagger.v3.oas.annotations.media.Schema;
+
+@Controller
+class OpenApiController {
+
+    @Post
+    public ReadBackupSettingsExDto getBackupSettings11() {
+        return null;
+    }
+}
+
+@Introspected
+@Schema(description = "Schema that represents the current backup settings")
+class ReadBackupSettingsExDto {
+
+    @Schema(description = "Required backup frequency", requiredMode = Schema.RequiredMode.REQUIRED, nullable = false)
+    private BackupFrequencyExDto requiredBackupFrequency;
+
+    @Schema(description = "Optional backup frequency. The key/value be omitted in the JSON result.", requiredMode = Schema.RequiredMode.NOT_REQUIRED, nullable = true)
+    private BackupFrequencyExDto optionalBackupFrequency;
+
+    public BackupFrequencyExDto getRequiredBackupFrequency() {
+        return requiredBackupFrequency;
+    }
+
+    public void setRequiredBackupFrequency(BackupFrequencyExDto requiredBackupFrequency) {
+        this.requiredBackupFrequency = requiredBackupFrequency;
+    }
+
+    public BackupFrequencyExDto getOptionalBackupFrequency() {
+        return optionalBackupFrequency;
+    }
+
+    public void setOptionalBackupFrequency(BackupFrequencyExDto optionalBackupFrequency) {
+        this.optionalBackupFrequency = optionalBackupFrequency;
+    }
+}
+
+@Introspected
+@Schema(description = "Schema that represents the frequency of the backup")
+enum BackupFrequencyExDto {
+
+    DAILY,
+    MONDAY,
+    TUESDAY,
+    WEDNESDAY,
+    THURSDAY,
+    FRIDAY,
+    SATURDAY,
+    SUNDAY
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        then: "the state is correct"
+        Utils.testReferenceAfterPlaceholders != null
+
+        when: "The OpenAPI is retrieved"
+        OpenAPI openAPI = Utils.testReferenceAfterPlaceholders
+
+        then: "the state is correct"
+        openAPI.components
+        openAPI.components.schemas
+        openAPI.components.schemas.size() == 2
+
+        when:
+        Schema backupFrequencySchema = openAPI.components.schemas.BackupFrequencyExDto
+        Schema readBackupSchema = openAPI.components.schemas.ReadBackupSettingsExDto
+
+        then: "the components are valid"
+        backupFrequencySchema
+        readBackupSchema
+        backupFrequencySchema.enum
+        backupFrequencySchema.enum.size() == 8
+        backupFrequencySchema.type == 'string'
+    }
 }
