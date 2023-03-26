@@ -16,6 +16,8 @@
 package io.micronaut.openapi.visitor;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.lang.annotation.Annotation;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -2279,6 +2281,10 @@ abstract class AbstractOpenApiVisitor {
             try {
                 beanProperties = classElement.getBeanProperties().stream().filter(p -> !"groovy.lang.MetaClass".equals(p.getType().getName())).collect(Collectors.toList());
             } catch (Exception e) {
+                StringWriter sw = new StringWriter();
+                PrintWriter pw = new PrintWriter(sw);
+                e.printStackTrace(pw);
+                context.warn("Error with getting properties for class " + classElement.getName() + ": " + e + "\n" + sw, classElement);
                 // Workaround for https://github.com/micronaut-projects/micronaut-openapi/issues/313
                 beanProperties = Collections.emptyList();
             }
