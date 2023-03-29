@@ -60,6 +60,7 @@ public final class Utils {
     private static PropertyPlaceholderResolver propertyPlaceholderResolver;
     private static OpenAPI testReference;
     private static OpenAPI testReferenceAfterPlaceholders;
+    private static String testFileName;
     private static String testYamlReference;
     private static String testJsonReference;
 
@@ -215,6 +216,14 @@ public final class Utils {
 
     public static String getTestJsonReference() {
         return testJsonReference;
+    }
+
+    public static String getTestFileName() {
+        return testFileName;
+    }
+
+    public static void setTestFileName(String testFileName) {
+        Utils.testFileName = testFileName;
     }
 
     public static void setTestJsonReference(String testJsonReference) {

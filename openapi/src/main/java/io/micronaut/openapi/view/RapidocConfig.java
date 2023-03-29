@@ -42,7 +42,7 @@ final class RapidocConfig extends AbstractViewConfig {
     private static final Map<String, Object> DEFAULT_OPTIONS = new HashMap<>();
 
     // https://rapidocweb.com/api.html
-    private static final Map<String, Function<String, Object>> VALID_OPTIONS = new HashMap<>(58);
+    private static final Map<String, Function<String, Object>> VALID_OPTIONS = new HashMap<>(61);
 
     static {
         VALID_OPTIONS.put("style", AbstractViewConfig::asString);
@@ -79,6 +79,8 @@ final class RapidocConfig extends AbstractViewConfig {
         VALID_OPTIONS.put("nav-hover-bg-color", AbstractViewConfig::asString);
         VALID_OPTIONS.put("nav-hover-text-color", AbstractViewConfig::asString);
         VALID_OPTIONS.put("nav-accent-color", AbstractViewConfig::asString);
+        VALID_OPTIONS.put("nav-accent-text-color", AbstractViewConfig::asString);
+        VALID_OPTIONS.put("nav-active-item-marker", AbstractViewConfig::asString);
         VALID_OPTIONS.put("nav-item-spacing", new EnumConverter<>(NavItemSpacing.class));
         VALID_OPTIONS.put("on-nav-tag-click", NavTagClick::byCode);
 
@@ -99,6 +101,7 @@ final class RapidocConfig extends AbstractViewConfig {
         VALID_OPTIONS.put("allow-search", AbstractViewConfig::asBoolean);
         VALID_OPTIONS.put("allow-advanced-search", AbstractViewConfig::asBoolean);
         VALID_OPTIONS.put("allow-try", AbstractViewConfig::asBoolean);
+        VALID_OPTIONS.put("show-curl-before-try", AbstractViewConfig::asBoolean);
         VALID_OPTIONS.put("allow-server-selection", AbstractViewConfig::asBoolean);
         VALID_OPTIONS.put("allow-schema-description-expand-toggle", AbstractViewConfig::asBoolean);
 

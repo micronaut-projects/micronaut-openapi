@@ -99,6 +99,7 @@ import static io.swagger.v3.oas.models.Components.COMPONENTS_SCHEMAS_REF;
     OpenApiApplicationVisitor.MICRONAUT_OPENAPI_CONTEXT_SERVER_PATH,
     OpenApiApplicationVisitor.MICRONAUT_OPENAPI_PROPERTY_NAMING_STRATEGY,
     OpenApiApplicationVisitor.MICRONAUT_OPENAPI_VIEWS_SPEC,
+    OpenApiApplicationVisitor.MICRONAUT_OPENAPI_FILENAME,
     OpenApiApplicationVisitor.MICRONAUT_OPENAPI_JSON_FORMAT,
     OpenApiApplicationVisitor.MICRONAUT_OPENAPI_ENVIRONMENTS,
     OpenApiApplicationVisitor.MICRONAUT_ENVIRONMENT_ENABLED,
@@ -175,6 +176,13 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
      */
     public static final String MICRONAUT_OPENAPI_JSON_FORMAT = "micronaut.openapi.json.format";
     /**
+     * The name of the result swagger file.
+     * <p>
+     * Default filename is &lt;info.title&gt;-&lt;info.version&gt;.yml.
+     * If info annotation not set, filename will be swagger.yml.
+     */
+    public static final String MICRONAUT_OPENAPI_FILENAME = "micronaut.openapi.filename";
+    /**
      * Active micronaut environments which will be used for @Requires annotations.
      */
     public static final String MICRONAUT_OPENAPI_ENVIRONMENTS = "micronaut.openapi.environments";
@@ -250,6 +258,9 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
     private static final String MICRONAUT_INTERNAL_EXPANDBLE_PROPERTIES_LOADED = "micronaut.internal.expandable.props.loaded";
 
     private static final Argument<List<Map.Entry<String, String>>> EXPANDABLE_PROPERTIES_ARGUMENT = new GenericArgument<>() { };
+    private static final String EXT_YML = ".yml";
+    private static final String EXT_YAML = ".yaml";
+    private static final String EXT_JSON = ".json";
 
     private ClassElement classElement;
     private int visitedElements = -1;
@@ -591,9 +602,9 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             Path directory = resolve(context, Paths.get(additionalSwaggerFiles));
             if (Files.isDirectory(directory)) {
                 context.info("Merging Swagger OpenAPI YAML and JSON files from location: " + directory);
-                try (DirectoryStream<Path> stream = Files.newDirectoryStream(directory, path -> path.toString().endsWith(".yml") || path.toString().endsWith(".json"))) {
+                try (DirectoryStream<Path> stream = Files.newDirectoryStream(directory, path -> isYaml(path.toString().toLowerCase()) || path.toString().toLowerCase().endsWith(EXT_JSON))) {
                     stream.forEach(path -> {
-                        boolean isYaml = path.toString().endsWith(".yml");
+                        boolean isYaml = isYaml(path.toString().toLowerCase());
                         context.info("Reading Swagger OpenAPI " + (isYaml ? "YAML" : "JSON") + " file " + path.getFileName());
                         OpenAPI parsedOpenApi = null;
                         try {
@@ -610,6 +621,10 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                 context.warn(directory + " does not exist or is not a directory", element);
             }
         }
+    }
+
+    private boolean isYaml(String path) {
+        return path.endsWith(EXT_YML) || path.endsWith(EXT_YAML);
     }
 
     public static Path resolve(VisitorContext context, Path path) {
@@ -996,9 +1011,9 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         removeEmtpyComponents(openAPI);
 
         String isJson = getConfigurationProperty(MICRONAUT_OPENAPI_JSON_FORMAT, visitorContext);
-        boolean isYaml = !(StringUtils.isNotEmpty(isJson) && isJson.equals(StringUtils.TRUE));
+        boolean isYaml = !(StringUtils.isNotEmpty(isJson) && isJson.equalsIgnoreCase(StringUtils.TRUE));
 
-        String ext = isYaml ? ".yml" : ".json";
+        String ext = isYaml ? EXT_YML : EXT_JSON;
         String fileName = "swagger" + ext;
         String documentTitle = "OpenAPI";
 
@@ -1012,6 +1027,17 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             }
             fileName = documentTitle + ext;
         }
+        String fileNameFromConfig = getConfigurationProperty(MICRONAUT_OPENAPI_FILENAME, visitorContext);
+        if (StringUtils.isNotEmpty(fileNameFromConfig)) {
+            fileName = replacePlaceholders(fileNameFromConfig, visitorContext) + ext;
+            if (fileName.contains("${version}")) {
+                fileName = fileName.replaceAll("\\$\\{version}", info != null && info.getVersion() != null ? info.getVersion() : StringUtils.EMPTY_STRING);
+            }
+            if (fileName.contains("${")) {
+                visitorContext.warn("Can't set some placeholders in fileName: " + fileName, null);
+            }
+        }
+
         writeYamlToFile(openAPI, fileName, documentTitle, visitorContext, isYaml);
         visitedElements = visitedElements(visitorContext);
     }
@@ -1107,6 +1133,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         try (Writer writer = getFileWriter(specFile)) {
             (isYaml ? ConvertUtils.getYamlMapper() : ConvertUtils.getJsonMapper()).writeValue(writer, openAPI);
             if (Utils.isTestMode()) {
+                Utils.setTestFileName(fileName);
                 if (isYaml) {
                     Utils.setTestYamlReference(writer.toString());
                 } else {
@@ -1128,7 +1155,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                 renderViews(documentTitle, specPath.getFileName().toString(), viewsDestDirs, context);
             }
         } catch (Exception e) {
-            context.warn("Unable to generate swagger." + (isYaml ? "yml" : "json") + ": " + specFile.orElse(null) + " - " + e.getMessage(), classElement);
+            context.warn("Unable to generate swagger" + (isYaml ? EXT_YML : EXT_JSON) + ": " + specFile.orElse(null) + " - " + e.getMessage(), classElement);
         }
     }
 
