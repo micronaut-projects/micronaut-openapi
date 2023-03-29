@@ -233,6 +233,7 @@ public final class ConvertUtils {
     /**
      * Detect openapi type and format for enums.
      *
+     * @param context visitor context
      * @param type enum element
      * @param schemaType type from swagger Schema annotation
      * @param schemaFormat format from swagger Schema annotation
