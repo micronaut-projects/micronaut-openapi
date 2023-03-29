@@ -1002,10 +1002,19 @@ abstract class AbstractOpenApiVisitor {
                 // check schema required flag
                 AnnotationValue<io.swagger.v3.oas.annotations.media.Schema> schemaAnnotationValue = element.getAnnotation(io.swagger.v3.oas.annotations.media.Schema.class);
                 Optional<Boolean> elementSchemaRequired = Optional.empty();
+                boolean isAutoRequiredMode = true;
                 boolean isRequiredDefaultValueSet = false;
                 if (schemaAnnotationValue != null) {
                     elementSchemaRequired = schemaAnnotationValue.get("required", Argument.of(Boolean.TYPE));
                     isRequiredDefaultValueSet = !schemaAnnotationValue.contains("required");
+                    io.swagger.v3.oas.annotations.media.Schema.RequiredMode requiredMode = schemaAnnotationValue.enumValue("requiredMode", io.swagger.v3.oas.annotations.media.Schema.RequiredMode.class).orElse(null);
+                    if (requiredMode == io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED) {
+                        elementSchemaRequired = Optional.of(true);
+                        isAutoRequiredMode = false;
+                    } else if (requiredMode == io.swagger.v3.oas.annotations.media.Schema.RequiredMode.NOT_REQUIRED) {
+                        elementSchemaRequired = Optional.of(false);
+                        isAutoRequiredMode = false;
+                    }
                 }
 
                 // check field annotaions (@NonNull, @Nullable, etc.)
@@ -1014,7 +1023,7 @@ abstract class AbstractOpenApiVisitor {
                 boolean isMandatoryInConstructor = doesParamExistsMandatoryInConstructor(element, classElement);
                 boolean required = elementSchemaRequired.orElse(isNotNullable || isMandatoryInConstructor);
 
-                if (isRequiredDefaultValueSet && isNotNullable) {
+                if (isRequiredDefaultValueSet && isAutoRequiredMode && isNotNullable) {
                     required = true;
                 }
 

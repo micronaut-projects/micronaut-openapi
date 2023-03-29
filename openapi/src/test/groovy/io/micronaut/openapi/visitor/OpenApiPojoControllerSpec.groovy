@@ -2540,44 +2540,44 @@ import javax.validation.constraints.*;
 
 import java.util.List;
 
-@Controller(value = "/v1/customers")
+@Controller("/v1/customers")
 @Validated
 class CustomersController {
 
-    @org.jetbrains.annotations.NotNull()
-    @Status(value = HttpStatus.CREATED)
+    @org.jetbrains.annotations.NotNull
+    @Status(HttpStatus.CREATED)
     @Post
-    public String createCustomer(@org.jetbrains.annotations.NotNull() @Body @Valid() CreateCustomerRequest request) {
+    public String createCustomer(@org.jetbrains.annotations.NotNull @Body @Valid CreateCustomerRequest request) {
         return null;
     }
 }
 
-@io.micronaut.core.annotation.Introspected()
+@io.micronaut.core.annotation.Introspected
 class CreateCustomerRequest {
 
-    @org.jetbrains.annotations.Nullable()
-    @javax.validation.constraints.NotNull()
+    @org.jetbrains.annotations.Nullable
+    @javax.validation.constraints.NotNull
     @io.swagger.v3.oas.annotations.media.Schema(nullable = false, required = true)
     private final java.lang.String customerName = null;
 
-    @org.jetbrains.annotations.Nullable()
-    @javax.validation.constraints.PastOrPresent()
-    @javax.validation.constraints.NotNull()
+    @org.jetbrains.annotations.Nullable
+    @javax.validation.constraints.PastOrPresent
+    @javax.validation.constraints.NotNull
     @io.swagger.v3.oas.annotations.media.Schema(nullable = false, required = true)
     private final java.time.LocalDate birthDate = null;
 
     public CreateCustomerRequest(
-            @org.jetbrains.annotations.Nullable() java.lang.String customerName,
-            @org.jetbrains.annotations.Nullable() java.time.LocalDate birthDate) {
+            @org.jetbrains.annotations.Nullable java.lang.String customerName,
+            @org.jetbrains.annotations.Nullable java.time.LocalDate birthDate) {
         super();
     }
 
-    @org.jetbrains.annotations.Nullable()
+    @org.jetbrains.annotations.Nullable
     public final java.lang.String getCustomerName() {
         return null;
     }
 
-    @org.jetbrains.annotations.Nullable()
+    @org.jetbrains.annotations.Nullable
     public final java.time.LocalDate getBirthDate() {
         return null;
     }
@@ -2695,7 +2695,7 @@ class RootController {
 class Greeting {
     private final String content;
 
-    public Greeting(String content) {
+    Greeting(String content) {
         this.content = content;
     }
 
@@ -2760,7 +2760,7 @@ class RootController {
 class Greeting {
     private final String content;
 
-    public Greeting(String content) {
+    Greeting(String content) {
         this.content = content;
     }
 
@@ -2831,4 +2831,162 @@ class MyBean {}
         root.get.responses['404'].content['application/pdf']
     }
 
+    void "test @Schema requiredMode"() {
+        given: "An API definition"
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import javax.validation.constraints.NotNull;
+
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Post;
+import io.swagger.v3.oas.annotations.media.Schema;
+
+@Controller
+class CustomersController {
+
+    @Post
+    public String createCustomer(MyDto request) {
+        return null;
+    }
+}
+
+class MyDto {
+
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
+    private String reqField;
+    @Schema(requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    private String notReqField;
+    @NotNull
+    @Schema(requiredMode = Schema.RequiredMode.AUTO)
+    private String autoReqField;
+    @NotNull
+    @Schema
+    private String autoReqField2;
+    @Schema(requiredMode = Schema.RequiredMode.AUTO)
+    private String autoNotReqField;
+    @Schema
+    private String autoNotReqField2;
+    @Schema(required = true)
+    private String reqFieldDeprecated;
+    @Schema(required = false)
+    private String notReqFieldDeprecated;
+    @NotNull
+    @Schema(required = false)
+    private String notReqFieldDeprecated2;
+    @Schema(required = true, requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    private String notReqFieldDeprecatedWithMode;
+    @Schema(required = false, requiredMode = Schema.RequiredMode.REQUIRED)
+    private String reqFieldDeprecatedWithMode;
+
+    public String getReqField() {
+        return reqField;
+    }
+
+    public void setReqField(String reqField) {
+        this.reqField = reqField;
+    }
+
+    public String getNotReqField() {
+        return notReqField;
+    }
+
+    public void setNotReqField(String notReqField) {
+        this.notReqField = notReqField;
+    }
+
+    public String getAutoReqField() {
+        return autoReqField;
+    }
+
+    public void setAutoReqField(String autoReqField) {
+        this.autoReqField = autoReqField;
+    }
+
+    public String getAutoReqField2() {
+        return autoReqField2;
+    }
+
+    public void setAutoReqField2(String autoReqField2) {
+        this.autoReqField2 = autoReqField2;
+    }
+
+    public String getAutoNotReqField() {
+        return autoNotReqField;
+    }
+
+    public void setAutoNotReqField(String autoNotReqField) {
+        this.autoNotReqField = autoNotReqField;
+    }
+
+    public String getAutoNotReqField2() {
+        return autoNotReqField2;
+    }
+
+    public void setAutoNotReqField2(String autoNotReqField2) {
+        this.autoNotReqField2 = autoNotReqField2;
+    }
+
+    public String getReqFieldDeprecated() {
+        return reqFieldDeprecated;
+    }
+
+    public void setReqFieldDeprecated(String reqFieldDeprecated) {
+        this.reqFieldDeprecated = reqFieldDeprecated;
+    }
+
+    public String getNotReqFieldDeprecated() {
+        return notReqFieldDeprecated;
+    }
+
+    public void setNotReqFieldDeprecated(String notReqFieldDeprecated) {
+        this.notReqFieldDeprecated = notReqFieldDeprecated;
+    }
+
+    public String getNotReqFieldDeprecated2() {
+        return notReqFieldDeprecated2;
+    }
+
+    public void setNotReqFieldDeprecated2(String notReqFieldDeprecated2) {
+        this.notReqFieldDeprecated2 = notReqFieldDeprecated2;
+    }
+
+    public String getNotReqFieldDeprecatedWithMode() {
+        return notReqFieldDeprecatedWithMode;
+    }
+
+    public void setNotReqFieldDeprecatedWithMode(String notReqFieldDeprecatedWithMode) {
+        this.notReqFieldDeprecatedWithMode = notReqFieldDeprecatedWithMode;
+    }
+
+    public String getReqFieldDeprecatedWithMode() {
+        return reqFieldDeprecatedWithMode;
+    }
+
+    public void setReqFieldDeprecatedWithMode(String reqFieldDeprecatedWithMode) {
+        this.reqFieldDeprecatedWithMode = reqFieldDeprecatedWithMode;
+    }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        then: "the state is correct"
+        Utils.testReference != null
+
+        when: "The OpenAPI is retrieved"
+        OpenAPI openAPI = Utils.testReference
+        Schema schema = openAPI.components.schemas.MyDto
+
+        then:
+        schema.properties.size() == 11
+
+        schema.required.size() == 5
+        schema.required.contains('reqField')
+        schema.required.contains('autoReqField')
+        schema.required.contains('autoReqField2')
+        schema.required.contains('reqFieldDeprecated')
+        schema.required.contains('reqFieldDeprecatedWithMode')
+    }
 }
