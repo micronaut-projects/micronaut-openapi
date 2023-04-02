@@ -15,14 +15,14 @@
  */
 package io.micronaut.openapi.annotation.mappers;
 
+import java.util.Collections;
+import java.util.List;
+
 import io.micronaut.core.annotation.AnnotationValue;
 import io.micronaut.inject.annotation.TypedAnnotationMapper;
 import io.micronaut.inject.visitor.VisitorContext;
 import io.micronaut.openapi.annotation.OpenAPIInclude;
 import io.micronaut.openapi.annotation.OpenAPISecurity;
-
-import java.util.Collections;
-import java.util.List;
 
 /**
  * Mapper for security endpoints.
@@ -37,15 +37,16 @@ public class OpenAPISecurityAnnotationMapper implements TypedAnnotationMapper<Op
     @Override
     public List<AnnotationValue<?>> map(AnnotationValue<OpenAPISecurity> annotation, VisitorContext visitorContext) {
         return Collections.singletonList(
-                AnnotationValue
-                        .builder(OpenAPIInclude.class)
-                        .values(
-                                "io.micronaut.security.endpoints.LoginController",
-                                "io.micronaut.security.endpoints.LogoutController"
-                        )
-                        .member("tags", annotation.getAnnotations("tags").toArray(new AnnotationValue[0]))
-                        .member("security", annotation.getAnnotations("security").toArray(new AnnotationValue[0]))
-                        .build()
+            AnnotationValue.builder(OpenAPIInclude.class)
+                .values(
+                    "io.micronaut.security.endpoints.LoginController",
+                    "io.micronaut.security.endpoints.LogoutController",
+                    "io.micronaut.security.token.jwt.endpoints.KeysController",
+                    "io.micronaut.security.token.jwt.endpoints.OauthController"
+                )
+                .member("tags", annotation.getAnnotations("tags").toArray(new AnnotationValue[0]))
+                .member("security", annotation.getAnnotations("security").toArray(new AnnotationValue[0]))
+                .build()
         );
     }
 

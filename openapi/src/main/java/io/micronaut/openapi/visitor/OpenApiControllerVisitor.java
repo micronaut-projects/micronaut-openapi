@@ -167,6 +167,11 @@ public class OpenApiControllerVisitor extends AbstractOpenApiEndpointVisitor imp
         return mediaTypes(element, Produces.class);
     }
 
+    @Override
+    public int getOrder() {
+        return 50;
+    }
+
     private List<MediaType> mediaTypes(MethodElement element, Class<? extends Annotation> ann) {
         String[] values = element.stringValues(ann);
         if (values.length == 0) {

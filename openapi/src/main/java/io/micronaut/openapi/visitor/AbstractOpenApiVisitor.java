@@ -252,7 +252,7 @@ abstract class AbstractOpenApiVisitor {
      *
      * @return The {@link PathItem}
      */
-    List<PathItem> resolvePathItems(VisitorContext context, List<UriMatchTemplate> matchTemplates) {
+    Map<String, List<PathItem>> resolvePathItems(VisitorContext context, List<UriMatchTemplate> matchTemplates) {
         OpenAPI openAPI = Utils.resolveOpenAPI(context);
         Paths paths = openAPI.getPaths();
         if (paths == null) {
@@ -260,7 +260,7 @@ abstract class AbstractOpenApiVisitor {
             openAPI.setPaths(paths);
         }
 
-        List<PathItem> resultPaths = new ArrayList<>();
+        Map<String, List<PathItem>> resultPathItemsMap = new HashMap<>();
 
         for (UriMatchTemplate matchTemplate : matchTemplates) {
 
@@ -326,10 +326,15 @@ abstract class AbstractOpenApiVisitor {
                 resultPath = contextPath + resultPath;
             }
 
-            resultPaths.add(paths.computeIfAbsent(resultPath, key -> new PathItem()));
+            List<PathItem> resultPathItems = resultPathItemsMap.get(resultPath);
+            if (resultPathItems == null) {
+                resultPathItems = new ArrayList<>();
+                resultPathItemsMap.put(resultPath, resultPathItems);
+            }
+            resultPathItems.add(paths.computeIfAbsent(resultPath, key -> new PathItem()));
         }
 
-        return resultPaths;
+        return resultPathItemsMap;
     }
 
     /**
