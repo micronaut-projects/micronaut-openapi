@@ -33,6 +33,8 @@ import static io.swagger.v3.oas.models.Components.COMPONENTS_SCHEMAS_REF;
  */
 public final class SchemaUtils {
 
+    public static final String TYPE_OBJECT = "object";
+
     private SchemaUtils() {
     }
 

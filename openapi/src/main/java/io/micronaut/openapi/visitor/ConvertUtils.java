@@ -61,6 +61,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
+import static io.micronaut.openapi.visitor.SchemaUtils.TYPE_OBJECT;
+
 /**
  * Convert utilities methods.
  *
@@ -159,7 +161,7 @@ public final class ConvertUtils {
         if (valueStr == null) {
             return null;
         }
-        if (type == null || type.equals("object")) {
+        if (type == null || type.equals(TYPE_OBJECT)) {
             return CONVERT_JSON_MAPPER.readValue(valueStr, Map.class);
         }
         return parseByTypeAndFormat(valueStr, type, format, context, isMicronautFormat);
@@ -199,6 +201,7 @@ public final class ConvertUtils {
     /**
      * Detect openapi type and format for enums.
      *
+     * @param context visitor context
      * @param type enum element
      * @param schemaType type from swagger Schema annotation
      * @param schemaFormat format from swagger Schema annotation
@@ -237,7 +240,7 @@ public final class ConvertUtils {
      */
     public static Pair<String, String> getTypeAndFormatByClass(String className, boolean isArray) {
         if (className == null) {
-            return Pair.of("object", null);
+            return Pair.of(TYPE_OBJECT, null);
         }
 
         if (String.class.getName().equals(className)
@@ -296,7 +299,7 @@ public final class ConvertUtils {
         } else if (LocalTime.class.getName().equals(className)) {
             return Pair.of("string", "partial-time");
         } else {
-            return Pair.of("object", null);
+            return Pair.of(TYPE_OBJECT, null);
         }
     }
 

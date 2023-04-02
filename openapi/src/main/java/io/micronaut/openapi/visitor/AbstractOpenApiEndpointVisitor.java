@@ -83,7 +83,6 @@ import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.PathItem;
 import io.swagger.v3.oas.models.media.ComposedSchema;
 import io.swagger.v3.oas.models.media.Content;
-import io.swagger.v3.oas.models.media.ObjectSchema;
 import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.parameters.CookieParameter;
 import io.swagger.v3.oas.models.parameters.HeaderParameter;
@@ -100,6 +99,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 
+import static io.micronaut.openapi.visitor.SchemaUtils.TYPE_OBJECT;
 import static io.micronaut.openapi.visitor.TypeElementUtils.isNullable;
 import static io.micronaut.openapi.visitor.Utils.DEFAULT_MEDIA_TYPES;
 
@@ -474,7 +474,9 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                 consumesMediaTypes = consumesMediaTypes.isEmpty() ? DEFAULT_MEDIA_TYPES : consumesMediaTypes;
                 consumesMediaTypes.forEach(mediaType -> {
                     io.swagger.v3.oas.models.media.MediaType mt = new io.swagger.v3.oas.models.media.MediaType();
-                    mt.setSchema(new ObjectSchema());
+                    Schema schema = new Schema();
+                    schema.setType(TYPE_OBJECT);
+                    mt.setSchema(schema);
                     content.addMediaType(mediaType.toString(), mt);
                 });
             }
@@ -619,7 +621,8 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
 
                     String bodyAnnValue = parameter.getAnnotation(Body.class).getValue(String.class).orElse(null);
                     if (StringUtils.isNotEmpty(bodyAnnValue)) {
-                        Schema wrapperSchema = new ObjectSchema();
+                        Schema wrapperSchema = new Schema();
+                        wrapperSchema.setType(TYPE_OBJECT);
                         if (isElementNotNullable(parameter, parameterType)) {
                             wrapperSchema.addRequiredItem(bodyAnnValue);
                         }

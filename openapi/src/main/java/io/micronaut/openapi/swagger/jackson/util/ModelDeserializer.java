@@ -36,7 +36,6 @@ import io.swagger.v3.oas.models.media.IntegerSchema;
 import io.swagger.v3.oas.models.media.JsonSchema;
 import io.swagger.v3.oas.models.media.MapSchema;
 import io.swagger.v3.oas.models.media.NumberSchema;
-import io.swagger.v3.oas.models.media.ObjectSchema;
 import io.swagger.v3.oas.models.media.PasswordSchema;
 import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.media.StringSchema;
@@ -50,6 +49,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
+
+import static io.micronaut.openapi.visitor.SchemaUtils.TYPE_OBJECT;
 
 /**
  * This class is copied from swagger-core library.
@@ -138,13 +139,17 @@ public class ModelDeserializer extends JsonDeserializer<Schema> {
                 if (additionalPropsBoolean) {
                     schema = ConvertUtils.getJsonMapper().convertValue(node, MapSchema.class);
                 } else {
-                    schema = ConvertUtils.getJsonMapper().convertValue(node, ObjectSchema.class);
+                    // don't need to use ObjectSchema, because after it we can have problems withh allOf block
+                    schema = ConvertUtils.getConvertJsonMapper().convertValue(node, Schema.class);
+                    schema.setType(TYPE_OBJECT);
                 }
                 schema.setAdditionalProperties(additionalPropsBoolean);
             }
 
         } else {
-            schema = ConvertUtils.getJsonMapper().convertValue(node, ObjectSchema.class);
+            // don't need to use ObjectSchema, because after it we can have problems withh allOf block
+            schema = ConvertUtils.getConvertJsonMapper().convertValue(node, Schema.class);
+            schema.setType(TYPE_OBJECT);
         }
         if (schema != null) {
             try {

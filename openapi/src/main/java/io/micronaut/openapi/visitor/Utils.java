@@ -17,6 +17,8 @@ package io.micronaut.openapi.visitor;
 
 import java.io.File;
 import java.io.InputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.nio.ByteBuffer;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -178,6 +180,20 @@ public final class Utils {
             }
         }
         return openAPI;
+    }
+
+    /**
+     * Return stacktrace for throwable and message.
+     *
+     * @param t throwable
+     * @return stacktrace
+     */
+    public static String printStackTrace(Throwable t) {
+        StringWriter sw = new StringWriter();
+        sw.append(t.getMessage()).append('\n');
+        PrintWriter pw = new PrintWriter(sw);
+        t.printStackTrace(pw);
+        return sw.toString();
     }
 
     public static boolean isTestMode() {
