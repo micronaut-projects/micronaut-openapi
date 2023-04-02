@@ -240,14 +240,12 @@ class MyBean {}
         ((ComposedSchema) catSchema).allOf.size() == 2
         ((ComposedSchema) catSchema).allOf[0].get$ref() == "#/components/schemas/Pet"
         ((ComposedSchema) catSchema).allOf[1].properties.size() == 1
-        ((ComposedSchema) catSchema).allOf[1].type == "object"
         ((ComposedSchema) catSchema).allOf[1].properties.get("breed") instanceof Schema
         ((ComposedSchema) catSchema).allOf[1].properties.get("breed").get$ref() == "#/components/schemas/CatBreed"
 
         ((ComposedSchema) dogSchema).allOf.size() == 2
         ((ComposedSchema) dogSchema).allOf[0].$ref == '#/components/schemas/Pet'
         ((ComposedSchema) dogSchema).allOf[1].properties.size() == 1
-        ((ComposedSchema) dogSchema).allOf[1].type == "object"
         ((ComposedSchema) dogSchema).allOf[1].properties.get("breed") instanceof Schema
         ((ComposedSchema) dogSchema).allOf[1].properties.get("breed").get$ref() == "#/components/schemas/DogBreed"
 

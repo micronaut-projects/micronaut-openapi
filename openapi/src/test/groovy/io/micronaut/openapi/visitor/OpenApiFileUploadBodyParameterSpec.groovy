@@ -94,7 +94,7 @@ class MyBean {}
         requestBody.content
         requestBody.content.size() == 1
         requestBody.content['multipart/form-data'].schema
-        requestBody.content['multipart/form-data'].schema instanceof ObjectSchema
+        requestBody.content['multipart/form-data'].schema.type == 'object'
         requestBody.content['multipart/form-data'].schema.properties['file']
         requestBody.content['multipart/form-data'].schema.properties['file'] instanceof BinarySchema
         requestBody.content['multipart/form-data'].schema.properties['file'].description == "File Parts."
@@ -112,7 +112,7 @@ class MyBean {}
         requestBody.content
         requestBody.content.size() == 1
         requestBody.content['multipart/form-data'].schema
-        requestBody.content['multipart/form-data'].schema instanceof ObjectSchema
+        requestBody.content['multipart/form-data'].schema.type == 'object'
         requestBody.content['multipart/form-data'].schema.properties['file']
         requestBody.content['multipart/form-data'].schema.properties['file'] instanceof BinarySchema
         requestBody.content['multipart/form-data'].schema.properties['file'].description == "Completed File."
@@ -130,7 +130,7 @@ class MyBean {}
         requestBody.content
         requestBody.content.size() == 1
         requestBody.content['multipart/form-data'].schema
-        requestBody.content['multipart/form-data'].schema instanceof ObjectSchema
+        requestBody.content['multipart/form-data'].schema.type == 'object'
         requestBody.content['multipart/form-data'].schema.properties['file']
         requestBody.content['multipart/form-data'].schema.properties['file'] instanceof BinarySchema
         requestBody.content['multipart/form-data'].schema.properties['file'].description == "Streaming File."
@@ -148,7 +148,7 @@ class MyBean {}
         requestBody.content
         requestBody.content.size() == 1
         requestBody.content['multipart/form-data'].schema
-        requestBody.content['multipart/form-data'].schema instanceof ObjectSchema
+        requestBody.content['multipart/form-data'].schema.type == 'object'
         requestBody.content['multipart/form-data'].schema.properties['file1']
         requestBody.content['multipart/form-data'].schema.properties['file1'] instanceof BinarySchema
         requestBody.content['multipart/form-data'].schema.properties['file1'].description == "Streaming File 1."
@@ -169,7 +169,7 @@ class MyBean {}
         requestBody.content
         requestBody.content.size() == 1
         requestBody.content['multipart/form-data'].schema
-        requestBody.content['multipart/form-data'].schema instanceof ObjectSchema
+        requestBody.content['multipart/form-data'].schema.type == 'object'
         requestBody.content['multipart/form-data'].schema.properties['files']
         requestBody.content['multipart/form-data'].schema.properties['files'] instanceof ArraySchema
         requestBody.content['multipart/form-data'].schema.properties['files'].description == 'List of Files.'
@@ -220,7 +220,7 @@ class MyBean {}
         requestBody.content
         requestBody.content.size() == 1
         requestBody.content['multipart/form-data'].schema
-        requestBody.content['multipart/form-data'].schema instanceof ObjectSchema
+        requestBody.content['multipart/form-data'].schema.type == 'object'
 
         and: 'the  @Part value is used instead of the parameter name'
         requestBody.content['multipart/form-data'].schema.properties['part']
