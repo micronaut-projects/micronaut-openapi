@@ -51,8 +51,6 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 
-import static io.micronaut.openapi.visitor.SchemaUtils.TYPE_OBJECT;
-
 /**
  * This class is copied from swagger-core library.
  *
@@ -86,7 +84,7 @@ public class ModelDeserializer extends JsonDeserializer<Schema> {
         JsonNode type = node.get("type");
         String format = node.get("format") == null ? "" : node.get("format").textValue();
 
-        if (type != null && "array".equals(type.textValue())) {
+        if (type != null && "array".equals(((TextNode) type).textValue())) {
             schema = ConvertUtils.getJsonMapper().convertValue(node, ArraySchema.class);
         } else if (type != null) {
             if (type.textValue().equals("integer")) {
@@ -140,17 +138,13 @@ public class ModelDeserializer extends JsonDeserializer<Schema> {
                 if (additionalPropsBoolean) {
                     schema = ConvertUtils.getJsonMapper().convertValue(node, MapSchema.class);
                 } else {
-                    // don't need to use ObjectSchema, because after we can have problems withh allOf block
                     schema = ConvertUtils.getJsonMapper().convertValue(node, ObjectSchema.class);
-                    schema.setType(TYPE_OBJECT);
                 }
                 schema.setAdditionalProperties(additionalPropsBoolean);
             }
 
         } else {
-            // don't need to use ObjectSchema, because after we can have problems withh allOf block
-            schema = ConvertUtils.getConvertJsonMapper().convertValue(node, ObjectSchema.class);
-            schema.setType(TYPE_OBJECT);
+            schema = ConvertUtils.getJsonMapper().convertValue(node, ObjectSchema.class);
         }
         if (schema != null) {
             try {
