@@ -26,6 +26,7 @@ import java.util.Set;
 import io.micronaut.core.annotation.Internal;
 import io.micronaut.core.util.StringUtils;
 import io.micronaut.openapi.visitor.ConvertUtils;
+import io.micronaut.openapi.visitor.SimpleSchema;
 import io.swagger.v3.oas.models.media.ArraySchema;
 import io.swagger.v3.oas.models.media.BooleanSchema;
 import io.swagger.v3.oas.models.media.ComposedSchema;
@@ -84,7 +85,7 @@ public class ModelDeserializer extends JsonDeserializer<Schema> {
         JsonNode type = node.get("type");
         String format = node.get("format") == null ? "" : node.get("format").textValue();
 
-        if (type != null && "array".equals(((TextNode) type).textValue())) {
+        if (type != null && "array".equals(type.textValue())) {
             schema = ConvertUtils.getJsonMapper().convertValue(node, ArraySchema.class);
         } else if (type != null) {
             if (type.textValue().equals("integer")) {
@@ -111,18 +112,18 @@ public class ModelDeserializer extends JsonDeserializer<Schema> {
                     schema = ConvertUtils.getJsonMapper().convertValue(node, StringSchema.class);
                 }
             } else if (type.textValue().equals("object")) {
-                schema = deserializeObjectSchema(node);
+                schema = deserializeObjectSchema(node, true);
             }
         } else if (node.get("$ref") != null) {
             schema = new Schema().$ref(node.get("$ref").asText());
         } else { // assume object
-            schema = deserializeObjectSchema(node);
+            schema = deserializeObjectSchema(node, false);
         }
 
         return schema;
     }
 
-    private Schema deserializeObjectSchema(JsonNode node) {
+    private Schema deserializeObjectSchema(JsonNode node, boolean withType) {
         JsonNode additionalProperties = node.get("additionalProperties");
         Schema schema;
         if (additionalProperties != null) {
@@ -138,13 +139,21 @@ public class ModelDeserializer extends JsonDeserializer<Schema> {
                 if (additionalPropsBoolean) {
                     schema = ConvertUtils.getJsonMapper().convertValue(node, MapSchema.class);
                 } else {
-                    schema = ConvertUtils.getJsonMapper().convertValue(node, ObjectSchema.class);
+                    if (withType) {
+                        schema = ConvertUtils.getJsonMapper().convertValue(node, ObjectSchema.class);
+                    } else {
+                        schema = ConvertUtils.getJsonMapper().convertValue(node, SimpleSchema.class);
+                    }
                 }
                 schema.setAdditionalProperties(additionalPropsBoolean);
             }
 
         } else {
-            schema = ConvertUtils.getJsonMapper().convertValue(node, ObjectSchema.class);
+            if (withType) {
+                schema = ConvertUtils.getJsonMapper().convertValue(node, ObjectSchema.class);
+            } else {
+                schema = ConvertUtils.getJsonMapper().convertValue(node, SimpleSchema.class);
+            }
         }
         if (schema != null) {
             try {

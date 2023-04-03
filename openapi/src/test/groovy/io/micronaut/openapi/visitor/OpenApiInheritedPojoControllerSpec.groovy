@@ -1663,10 +1663,10 @@ enum BackupSubEnum12 {
 class MyBean {}
 ''')
         then: "the state is correct"
-        Utils.testReference != null
+        Utils.testReferenceAfterPlaceholders != null
 
         when: "The OpenAPI is retrieved"
-        OpenAPI openAPI = Utils.testReference
+        OpenAPI openAPI = Utils.testReferenceAfterPlaceholders
         Schema backupDto12Schema = openAPI.components.schemas.BackupDto12
 
         then:
