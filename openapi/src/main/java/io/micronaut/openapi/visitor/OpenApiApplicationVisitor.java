@@ -95,6 +95,7 @@ import static io.swagger.v3.oas.models.Components.COMPONENTS_SCHEMAS_REF;
  * @since 1.0
  */
 @SupportedOptions({
+    OpenApiApplicationVisitor.MICRONAUT_OPENAPI_ENABLED,
     OpenApiApplicationVisitor.MICRONAUT_OPENAPI_CONTEXT_SERVER_PATH,
     OpenApiApplicationVisitor.MICRONAUT_OPENAPI_PROPERTY_NAMING_STRATEGY,
     OpenApiApplicationVisitor.MICRONAUT_OPENAPI_VIEWS_SPEC,
@@ -111,6 +112,12 @@ import static io.swagger.v3.oas.models.Components.COMPONENTS_SCHEMAS_REF;
 })
 public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements TypeElementVisitor<OpenAPIDefinition, Object> {
 
+    /**
+     * System property that enables or disables open api annotation processing.
+     * <br>
+     * Default: true
+     */
+    public static final String MICRONAUT_OPENAPI_ENABLED = "micronaut.openapi.enabled";
     /**
      * System property that enables setting the open api config file.
      */
@@ -267,6 +274,9 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
     @Override
     public void visitClass(ClassElement element, VisitorContext context) {
         try {
+            if (!Utils.isOpenApiEnabled()) {
+                return;
+            }
             incrementVisitedElements(context);
             context.info("Generating OpenAPI Documentation");
             OpenAPI openAPI = readOpenAPI(element, context);
@@ -971,6 +981,9 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
     @Override
     public void finish(VisitorContext context) {
         try {
+            if (!Utils.isOpenApiEnabled()) {
+                return;
+            }
             if (visitedElements == visitedElements(context)) {
                 // nothing new visited, avoid rewriting the files.
                 return;
@@ -1177,24 +1190,24 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         }
     }
 
-    private void processEndpoints(VisitorContext visitorContext) {
-        EndpointsConfiguration endpointsCfg = endPointsConfiguration(visitorContext);
+    private void processEndpoints(VisitorContext context) {
+        EndpointsConfiguration endpointsCfg = endPointsConfiguration(context);
         if (endpointsCfg.isEnabled() && !endpointsCfg.getEndpoints().isEmpty()) {
             OpenApiEndpointVisitor visitor = new OpenApiEndpointVisitor(true);
             endpointsCfg.getEndpoints().values().stream()
             .filter(endpoint -> endpoint.getClassElement().isPresent())
             .forEach(endpoint -> {
                 ClassElement element = endpoint.getClassElement().get();
-                visitorContext.put(MICRONAUT_OPENAPI_ENDPOINT_CLASS_TAGS, endpoint.getTags());
-                visitorContext.put(MICRONAUT_OPENAPI_ENDPOINT_SERVERS, endpoint.getServers());
-                visitorContext.put(MICRONAUT_OPENAPI_ENDPOINT_SECURITY_REQUIREMENTS, endpoint.getSecurityRequirements());
-                visitor.visitClass(element, visitorContext);
+                context.put(MICRONAUT_OPENAPI_ENDPOINT_CLASS_TAGS, endpoint.getTags());
+                context.put(MICRONAUT_OPENAPI_ENDPOINT_SERVERS, endpoint.getServers());
+                context.put(MICRONAUT_OPENAPI_ENDPOINT_SECURITY_REQUIREMENTS, endpoint.getSecurityRequirements());
+                visitor.visitClass(element, context);
                 element.getEnclosedElements(ElementQuery.ALL_METHODS
                                 .modifiers(mods -> !mods.contains(ElementModifier.STATIC) && !mods.contains(ElementModifier.PRIVATE))
                                 .named(name -> !name.contains("$"))
                         )
-                        .forEach(method -> visitor.visitMethod(method, visitorContext));
-            });
+                        .forEach(method -> visitor.visitMethod(method, context));
+                });
         }
     }
 

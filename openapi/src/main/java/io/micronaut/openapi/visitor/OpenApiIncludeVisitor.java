@@ -18,6 +18,8 @@ package io.micronaut.openapi.visitor;
 import java.util.List;
 import java.util.Optional;
 
+import javax.annotation.processing.SupportedOptions;
+
 import io.micronaut.core.annotation.AnnotationValue;
 import io.micronaut.core.util.ArrayUtils;
 import io.micronaut.http.annotation.Controller;
@@ -31,15 +33,21 @@ import io.micronaut.openapi.annotation.OpenAPIIncludes;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.MICRONAUT_OPENAPI_ENABLED;
+
 /**
  * A {@link TypeElementVisitor} that builds the Swagger model from Micronaut controllers included by @{@link OpenAPIInclude} at the compile time.
  *
  * @author Denis Stepanov
  */
+@SupportedOptions(MICRONAUT_OPENAPI_ENABLED)
 public class OpenApiIncludeVisitor implements TypeElementVisitor<OpenAPIIncludes, Object> {
 
     @Override
-    public void visitClass(ClassElement element, VisitorContext visitorContext) {
+    public void visitClass(ClassElement element, VisitorContext context) {
+        if (!Utils.isOpenApiEnabled()) {
+            return;
+        }
         for (AnnotationValue<OpenAPIInclude> includeAnnotation : element.getAnnotationValuesByType(OpenAPIInclude.class)) {
             String[] classes = includeAnnotation.stringValues();
             if (ArrayUtils.isNotEmpty(classes)) {
@@ -50,12 +58,12 @@ public class OpenApiIncludeVisitor implements TypeElementVisitor<OpenAPIIncludes
                 OpenApiControllerVisitor controllerVisitor = new OpenApiControllerVisitor(tags, security, customUri.orElse(null));
                 OpenApiEndpointVisitor endpointVisitor = new OpenApiEndpointVisitor(true, tags.isEmpty() ? null : tags, security.isEmpty() ? null : security);
                 for (String className : classes) {
-                    visitorContext.getClassElement(className)
+                    context.getClassElement(className)
                             .ifPresent(ce -> {
                                 if (ce.isAnnotationPresent(Controller.class)) {
-                                    visit(controllerVisitor, visitorContext, ce);
+                                    visit(controllerVisitor, context, ce);
                                 } else if (ce.isAnnotationPresent("io.micronaut.management.endpoint.annotation.Endpoint")) {
-                                    visit(endpointVisitor, visitorContext, ce);
+                                    visit(endpointVisitor, context, ce);
                                 }
                             });
                 }

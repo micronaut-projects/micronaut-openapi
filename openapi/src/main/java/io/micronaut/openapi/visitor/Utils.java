@@ -34,6 +34,7 @@ import io.micronaut.core.annotation.NonNull;
 import io.micronaut.core.convert.ArgumentConversionContext;
 import io.micronaut.core.convert.DefaultConversionService;
 import io.micronaut.core.util.CollectionUtils;
+import io.micronaut.core.util.StringUtils;
 import io.micronaut.core.value.PropertyResolver;
 import io.micronaut.http.MediaType;
 import io.micronaut.inject.ast.ClassElement;
@@ -41,6 +42,8 @@ import io.micronaut.inject.visitor.VisitorContext;
 import io.micronaut.openapi.javadoc.JavadocParser;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
+
+import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.MICRONAUT_OPENAPI_ENABLED;
 
 /**
  * Some util methods.
@@ -70,12 +73,17 @@ public final class Utils {
     private Utils() {
     }
 
+    public static boolean isOpenApiEnabled() {
+        String isEnabledStr = System.getProperty(MICRONAUT_OPENAPI_ENABLED, StringUtils.TRUE);
+        return !StringUtils.isNotEmpty(isEnabledStr) || !isEnabledStr.equalsIgnoreCase(StringUtils.FALSE);
+    }
+
     public static Path getProjectPath(VisitorContext context) {
         return context.getProjectDir().orElse(Utils.isTestMode() ? Paths.get(System.getProperty("user.dir")) : null);
     }
 
     /**
-     * @return An Instance of sdefault {@link PropertyPlaceholderResolver} to resolve placeholders.
+     * @return An Instance of default {@link PropertyPlaceholderResolver} to resolve placeholders.
      */
     public static PropertyPlaceholderResolver getPropertyPlaceholderResolver() {
         if (propertyPlaceholderResolver == null) {

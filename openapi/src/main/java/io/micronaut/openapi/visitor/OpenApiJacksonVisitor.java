@@ -20,6 +20,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import javax.annotation.processing.SupportedOptions;
+
 import io.micronaut.core.annotation.AnnotationClassValue;
 import io.micronaut.core.annotation.AnnotationValue;
 import io.micronaut.core.annotation.NonNull;
@@ -33,6 +35,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
+import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.MICRONAUT_OPENAPI_ENABLED;
+
 /**
  * A {@link TypeElementVisitor} that builds appropriate {@link Schema} annotation for the parent class of a hierarchy
  * when using Jackson {@link JsonTypeInfo} and {@link JsonSubTypes}.
@@ -40,6 +44,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
  * @author Iván López
  * @since 3.0.0
  */
+@SupportedOptions(MICRONAUT_OPENAPI_ENABLED)
 public class OpenApiJacksonVisitor implements TypeElementVisitor<Object, Object> {
 
     @Override
@@ -62,7 +67,10 @@ public class OpenApiJacksonVisitor implements TypeElementVisitor<Object, Object>
     }
 
     @Override
-    public void visitClass(ClassElement element, VisitorContext visitorContext) {
+    public void visitClass(ClassElement element, VisitorContext context) {
+        if (!Utils.isOpenApiEnabled()) {
+            return;
+        }
         AnnotationValue<JsonSubTypes> jsonSubTypesDecAnn = element.getDeclaredAnnotation(JsonSubTypes.class);
         AnnotationValue<JsonTypeInfo> jsonTypeInfoDecAnn = element.getDeclaredAnnotation(JsonTypeInfo.class);
         AnnotationValue<Schema> schemaAnn = element.getDeclaredAnnotation(Schema.class);

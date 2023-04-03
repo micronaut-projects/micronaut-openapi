@@ -26,6 +26,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.annotation.processing.SupportedOptions;
+
 import io.micronaut.context.RequiresCondition;
 import io.micronaut.context.annotation.Requires;
 import io.micronaut.context.env.Environment;
@@ -53,6 +55,7 @@ import io.swagger.v3.oas.models.servers.Server;
 
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 
+import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.MICRONAUT_OPENAPI_ENABLED;
 import static io.micronaut.openapi.visitor.Utils.DEFAULT_MEDIA_TYPES;
 
 /**
@@ -61,6 +64,7 @@ import static io.micronaut.openapi.visitor.Utils.DEFAULT_MEDIA_TYPES;
  * @author graemerocher
  * @since 1.0
  */
+@SupportedOptions(MICRONAUT_OPENAPI_ENABLED)
 public class OpenApiControllerVisitor extends AbstractOpenApiEndpointVisitor implements TypeElementVisitor<Object, HttpMethodMapping> {
 
     private final String customUri;
