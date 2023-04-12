@@ -220,6 +220,11 @@ public class OpenApiEndpointVisitor extends AbstractOpenApiEndpointVisitor imple
         return securityRequirements;
     }
 
+    @Override
+    public int getOrder() {
+        return 40;
+    }
+
     private static List<MediaType> mediaTypes(String... arr) {
         if (ArrayUtils.isEmpty(arr)) {
             return DEFAULT_MEDIA_TYPES;

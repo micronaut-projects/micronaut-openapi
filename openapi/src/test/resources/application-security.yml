@@ -1,0 +1,23 @@
+micronaut:
+  security:
+    enabled: true
+    reject-not-found: false
+    redirect:
+      forbidden:
+        enabled: false
+      unauthorized:
+        enabled: false
+    token:
+      enabled: true
+    intercept-url-map:
+      - pattern: /swagger/*
+        http-method: GET
+        access: isAnonymous()
+      - pattern: /swagger-ui/*
+        http-method: GET
+        access: isAnonymous()
+      - pattern: /fromfile/*
+        access: isAuthenticated()
+      - pattern: /from-file2/*
+        http-method: PUT
+        access: role1,role2
