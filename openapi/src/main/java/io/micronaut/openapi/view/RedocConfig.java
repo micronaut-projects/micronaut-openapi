@@ -31,13 +31,14 @@ import io.micronaut.openapi.view.OpenApiViewConfig.RendererType;
  */
 final class RedocConfig extends AbstractViewConfig {
 
+    public static final String REDOC_PREFIX = "redoc.";
     private static final String DEFAULT_REDOC_JS_PATH = OpenApiViewConfig.RESOURCE_DIR + "/";
 
     private static final List<String> RESOURCE_FILES = Collections.singletonList(
         DEFAULT_REDOC_JS_PATH + "redoc.standalone.js"
     );
 
-    private static final Map<String, Object> DEFAULT_OPTIONS = Collections.emptyMap();
+    private static final Map<String, Object> DEFAULT_OPTIONS;
 
     // https://github.com/Redocly/redoc#redoc-options-object
     private static final Map<String, Function<String, Object>> VALID_OPTIONS = new HashMap<>(38);
@@ -81,6 +82,8 @@ final class RedocConfig extends AbstractViewConfig {
         VALID_OPTIONS.put("nonce", AbstractViewConfig::asString);
         VALID_OPTIONS.put("side-nav-style", SideNavStyle::byCode);
         VALID_OPTIONS.put("show-webhook-verb", AbstractViewConfig::asBoolean);
+
+        DEFAULT_OPTIONS = Collections.singletonMap("sort-tags-alphabetically", Boolean.TRUE);
     }
 
     /**
@@ -125,7 +128,7 @@ final class RedocConfig extends AbstractViewConfig {
     RapiPDFConfig rapiPDFConfig;
 
     private RedocConfig() {
-        super("redoc.");
+        super(REDOC_PREFIX);
         jsUrl = DEFAULT_REDOC_JS_PATH;
     }
 
