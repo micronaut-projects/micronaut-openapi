@@ -172,6 +172,9 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
      * @param context The visitor context
      */
     public void visitClass(ClassElement element, VisitorContext context) {
+        if (!Utils.isOpenApiEnabled()) {
+            return;
+        }
         if (ignore(element, context)) {
             return;
         }
@@ -368,6 +371,9 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
      * @param context The visitor context
      */
     public void visitMethod(MethodElement element, VisitorContext context) {
+        if (!Utils.isOpenApiEnabled()) {
+            return;
+        }
         if (ignore(element, context)) {
             return;
         }

@@ -786,4 +786,75 @@ class MyBean {}
         withRef.scheme == null
         withRef.$ref == '#/components/securitySchemes/foo'
     }
+
+    void "test disable openapi"() {
+
+        given: "An API definition"
+        Utils.testReference = null
+        Utils.testReferenceAfterPlaceholders = null
+        System.setProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_ENABLED, "false")
+
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Post;
+import io.reactivex.Single;
+import io.swagger.v3.oas.annotations.Hidden;
+import io.swagger.v3.oas.annotations.media.Schema;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+/**
+ * @author graemerocher
+ * @since 1.0
+ */
+@Controller("/pets")
+interface PetOperations<T extends Pet> {
+
+    @Post
+    Single<T> save(String name, int age);
+}
+
+class Pet {
+
+    private int privateAge;
+    protected int protectedAge;
+    int packageAge;
+
+    public int age;
+
+    // ignored by json
+    @JsonIgnore
+    public int ignored;
+    // hidden by swagger
+    @Hidden
+    public int hidden;
+    // hidden by swagger
+    @Schema(hidden = true)
+    public int hidden2;
+
+    // private should not be included
+    private String name;
+
+    // protected should not be included
+    protected String protectme;
+
+    // static should not be included
+    public static String CONST;
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        then: "the state is correct"
+        !Utils.testReference
+        !Utils.testReferenceAfterPlaceholders
+
+        cleanup:
+        System.clearProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_FIELD_VISIBILITY_LEVEL)
+        System.clearProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_ENABLED)
+    }
+
 }
