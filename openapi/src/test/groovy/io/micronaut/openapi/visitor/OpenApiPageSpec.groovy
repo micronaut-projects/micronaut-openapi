@@ -69,7 +69,6 @@ class MyBean {}
         pageMyDtoSchema.allOf.size() == 2
         pageMyDtoSchema.allOf.get(0) instanceof Schema
         ((Schema)pageMyDtoSchema.allOf.get(0)).$ref == '#/components/schemas/Slice_MyDto_'
-        pageMyDtoSchema.allOf.get(1) instanceof ObjectSchema
         ((Schema)pageMyDtoSchema.allOf.get(1)).properties.totalSize
         ((Schema)pageMyDtoSchema.allOf.get(1)).properties.totalPages
 

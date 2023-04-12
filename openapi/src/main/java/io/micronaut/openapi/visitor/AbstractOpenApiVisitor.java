@@ -16,8 +16,6 @@
 package io.micronaut.openapi.visitor;
 
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.lang.annotation.Annotation;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -107,7 +105,6 @@ import io.swagger.v3.oas.models.Paths;
 import io.swagger.v3.oas.models.media.ArraySchema;
 import io.swagger.v3.oas.models.media.ComposedSchema;
 import io.swagger.v3.oas.models.media.MapSchema;
-import io.swagger.v3.oas.models.media.ObjectSchema;
 import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.media.StringSchema;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
@@ -131,6 +128,7 @@ import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.expandPrope
 import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.getConfigurationProperty;
 import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.getExpandableProperties;
 import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.resolvePlaceholders;
+import static io.micronaut.openapi.visitor.SchemaUtils.TYPE_OBJECT;
 import static io.micronaut.openapi.visitor.Utils.resolveComponents;
 import static java.util.stream.Collectors.toMap;
 
@@ -1225,11 +1223,23 @@ abstract class AbstractOpenApiVisitor {
             boolean addSchemaToBind = !schemaToBind.equals(EMPTY_SCHEMA);
 
             if (addSchemaToBind) {
+                if (TYPE_OBJECT.equals(originalSchema.getType())) {
+                    if (composedSchema.getType() == null) {
+                        composedSchema.setType(TYPE_OBJECT);
+                    }
+                    originalSchema.setType(null);
+                }
                 composedSchema.addAllOfItem(originalSchema);
             } else if (isNullable && CollectionUtils.isEmpty(composedSchema.getAllOf())) {
                 composedSchema.addOneOfItem(originalSchema);
             }
             if (addSchemaToBind && !schemaToBind.equals(originalSchema)) {
+                if (TYPE_OBJECT.equals(schemaToBind.getType())) {
+                    if (composedSchema.getType() == null) {
+                        composedSchema.setType(TYPE_OBJECT);
+                    }
+                    originalSchema.setType(null);
+                }
                 composedSchema.addAllOfItem(schemaToBind);
             }
 
@@ -1536,6 +1546,12 @@ abstract class AbstractOpenApiVisitor {
         if (ArrayUtils.isNotEmpty(allOf)) {
             List<Schema<?>> schemaList = namesToSchemas(openAPI, context, allOf, Collections.emptyList());
             for (Schema<?> s : schemaList) {
+                if (TYPE_OBJECT.equals(s.getType())) {
+                    if (schemaToBind.getType() == null) {
+                        schemaToBind.setType(TYPE_OBJECT);
+                    }
+                    s.setType(null);
+                }
                 schemaToBind.addAllOfItem(s);
             }
         }
@@ -1762,7 +1778,7 @@ abstract class AbstractOpenApiVisitor {
                 bindSchemaForClassName(context, valueMap, className);
             }
             if (not.isPresent()) {
-                final Schema schemaNot = resolveSchema(null, context.getClassElement(not.get()).get(), context, Collections.emptyList());
+                final Schema<?> schemaNot = resolveSchema(null, context.getClassElement(not.get()).get(), context, Collections.emptyList());
                 Map<CharSequence, Object> schemaMap = new HashMap<>();
                 schemaToValueMap(schemaMap, schemaNot);
                 valueMap.put("not", schemaMap);
@@ -1782,7 +1798,7 @@ abstract class AbstractOpenApiVisitor {
             final Optional<ClassElement> classElement = context.getClassElement(className);
             Map<CharSequence, Object> schemaMap = new HashMap<>();
             if (classElement.isPresent()) {
-                final Schema schema = resolveSchema(null, classElement.get(), context, Collections.emptyList());
+                final Schema<?> schema = resolveSchema(null, classElement.get(), context, Collections.emptyList());
                 schemaToValueMap(schemaMap, schema);
             }
             return schemaMap;
@@ -1793,25 +1809,28 @@ abstract class AbstractOpenApiVisitor {
     private void bindSchemaForClassName(VisitorContext context, Map<CharSequence, Object> valueMap, String className) {
         final Optional<ClassElement> classElement = context.getClassElement(className);
         if (classElement.isPresent()) {
-            final Schema schema = resolveSchema(null, classElement.get(), context, Collections.emptyList());
+            final Schema<?> schema = resolveSchema(null, classElement.get(), context, Collections.emptyList());
             schemaToValueMap(valueMap, schema);
         }
     }
 
     private void checkAllOf(Schema<Object> composedSchema) {
-        if (composedSchema != null && composedSchema.getAllOf() != null && !composedSchema.getAllOf().isEmpty() && composedSchema.getProperties() != null
-            && !composedSchema.getProperties().isEmpty()) {
-            // put all properties as siblings of allOf
-            ObjectSchema propSchema = new ObjectSchema();
-            propSchema.properties(composedSchema.getProperties());
-            propSchema.setDescription(composedSchema.getDescription());
-            propSchema.setRequired(composedSchema.getRequired());
-            composedSchema.setProperties(null);
-            composedSchema.setDescription(null);
-            composedSchema.setRequired(null);
-            composedSchema.setType(null);
-            composedSchema.addAllOfItem(propSchema);
+        if (composedSchema == null || CollectionUtils.isEmpty(composedSchema.getAllOf()) || CollectionUtils.isEmpty(composedSchema.getProperties())) {
+            return;
         }
+        if (composedSchema.getType() == null) {
+            composedSchema.setType(TYPE_OBJECT);
+        }
+        // put all properties as siblings of allOf
+        Schema<?> propSchema = new Schema<>();
+        propSchema.properties(composedSchema.getProperties());
+        propSchema.setDescription(composedSchema.getDescription());
+        propSchema.setRequired(composedSchema.getRequired());
+        propSchema.setType(null);
+        composedSchema.setProperties(null);
+        composedSchema.setDescription(null);
+        composedSchema.setRequired(null);
+        composedSchema.addAllOfItem(propSchema);
     }
 
     private Schema getSchemaDefinition(
@@ -1964,7 +1983,7 @@ abstract class AbstractOpenApiVisitor {
 
             if (schema == null) {
                 schema = new ComposedSchema();
-                schema.setType("object");
+                schema.setType(TYPE_OBJECT);
             }
             for (ClassElement sType : superTypes) {
                 Map<String, ClassElement> sTypeArgs = sType.getTypeArguments();
@@ -1977,7 +1996,7 @@ abstract class AbstractOpenApiVisitor {
         } else {
             if (schema == null) {
                 schema = new Schema();
-                schema.setType("object");
+                schema.setType(TYPE_OBJECT);
             }
         }
 
@@ -2102,6 +2121,12 @@ abstract class AbstractOpenApiVisitor {
         if (ArrayUtils.isNotEmpty(allOf)) {
             List<Schema<?>> schemaList = namesToSchemas(openAPI, context, allOf, mediaTypes);
             for (Schema<?> s : schemaList) {
+                if (TYPE_OBJECT.equals(s.getType())) {
+                    if (composedSchema.getType() == null) {
+                        composedSchema.setType(TYPE_OBJECT);
+                    }
+                    s.setType(null);
+                }
                 composedSchema.addAllOfItem(s);
             }
         }
@@ -2289,10 +2314,7 @@ abstract class AbstractOpenApiVisitor {
             try {
                 beanProperties = classElement.getBeanProperties().stream().filter(p -> !"groovy.lang.MetaClass".equals(p.getType().getName())).collect(Collectors.toList());
             } catch (Exception e) {
-                StringWriter sw = new StringWriter();
-                PrintWriter pw = new PrintWriter(sw);
-                e.printStackTrace(pw);
-                context.warn("Error with getting properties for class " + classElement.getName() + ": " + e + "\n" + sw, classElement);
+                context.warn("Error with getting properties for class " + classElement.getName() + ": " + e + "\n" + Utils.printStackTrace(e), classElement);
                 // Workaround for https://github.com/micronaut-projects/micronaut-openapi/issues/313
                 beanProperties = Collections.emptyList();
             }

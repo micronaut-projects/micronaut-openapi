@@ -266,56 +266,60 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
 
     @Override
     public void visitClass(ClassElement element, VisitorContext context) {
-        incrementVisitedElements(context);
-        context.info("Generating OpenAPI Documentation");
-        OpenAPI openAPI = readOpenAPI(element, context);
-        mergeAdditionalSwaggerFiles(element, context, openAPI);
-        // handle type level tags
-        List<io.swagger.v3.oas.models.tags.Tag> tagList = processOpenApiAnnotation(
+        try {
+            incrementVisitedElements(context);
+            context.info("Generating OpenAPI Documentation");
+            OpenAPI openAPI = readOpenAPI(element, context);
+            mergeAdditionalSwaggerFiles(element, context, openAPI);
+            // handle type level tags
+            List<io.swagger.v3.oas.models.tags.Tag> tagList = processOpenApiAnnotation(
                 element,
                 context,
                 Tag.class,
                 io.swagger.v3.oas.models.tags.Tag.class,
                 openAPI.getTags()
-        );
-        openAPI.setTags(tagList);
+            );
+            openAPI.setTags(tagList);
 
-        // handle type level security requirements
-        List<io.swagger.v3.oas.models.security.SecurityRequirement> securityRequirements = readSecurityRequirements(element);
-        if (openAPI.getSecurity() != null) {
-            securityRequirements.addAll(openAPI.getSecurity());
-        }
+            // handle type level security requirements
+            List<io.swagger.v3.oas.models.security.SecurityRequirement> securityRequirements = readSecurityRequirements(element);
+            if (openAPI.getSecurity() != null) {
+                securityRequirements.addAll(openAPI.getSecurity());
+            }
 
-        openAPI.setSecurity(securityRequirements);
+            openAPI.setSecurity(securityRequirements);
 
-        // handle type level servers
-        List<io.swagger.v3.oas.models.servers.Server> servers = processOpenApiAnnotation(
+            // handle type level servers
+            List<io.swagger.v3.oas.models.servers.Server> servers = processOpenApiAnnotation(
                 element,
                 context,
                 Server.class,
                 io.swagger.v3.oas.models.servers.Server.class,
                 openAPI.getServers()
-        );
-        openAPI.setServers(servers);
+            );
+            openAPI.setServers(servers);
 
-        // Handle Application securityRequirements schemes
-        processSecuritySchemes(element, context);
+            // Handle Application securityRequirements schemes
+            processSecuritySchemes(element, context);
 
-        Optional<OpenAPI> attr = context.get(Utils.ATTR_OPENAPI, OpenAPI.class);
-        if (attr.isPresent()) {
-            OpenAPI existing = attr.get();
-            Optional.ofNullable(openAPI.getInfo())
+            Optional<OpenAPI> attr = context.get(Utils.ATTR_OPENAPI, OpenAPI.class);
+            if (attr.isPresent()) {
+                OpenAPI existing = attr.get();
+                Optional.ofNullable(openAPI.getInfo())
                     .ifPresent(existing::setInfo);
-            copyOpenAPI(existing, openAPI);
-        } else {
-            context.put(Utils.ATTR_OPENAPI, openAPI);
-        }
+                copyOpenAPI(existing, openAPI);
+            } else {
+                context.put(Utils.ATTR_OPENAPI, openAPI);
+            }
 
-        if (Utils.isTestMode()) {
-            Utils.resolveOpenAPI(context);
-        }
+            if (Utils.isTestMode()) {
+                Utils.resolveOpenAPI(context);
+            }
 
-        classElement = element;
+            classElement = element;
+        } catch (Throwable t) {
+            context.warn("Error with processing class:\n" + Utils.printStackTrace(t), classElement);
+        }
     }
 
     public static SchemaDecorator getSchemaDecoration(String packageName, VisitorContext context) {
@@ -965,80 +969,85 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
     }
 
     @Override
-    public void finish(VisitorContext visitorContext) {
-        if (visitedElements == visitedElements(visitorContext)) {
-            // nothing new visited, avoid rewriting the files.
-            return;
-        }
-        Optional<OpenAPI> attr = visitorContext.get(Utils.ATTR_OPENAPI, OpenAPI.class);
-        if (!attr.isPresent()) {
-            return;
-        }
-        OpenAPI openAPI = attr.get();
-        processEndpoints(visitorContext);
-        applyPropertyNamingStrategy(openAPI, visitorContext);
-        applyPropertyServerContextPath(openAPI, visitorContext);
-        openAPI = resolvePropertyPlaceHolders(openAPI, visitorContext);
-        sortOpenAPI(openAPI);
-        // Process after sorting so order is stable
-        new JacksonDiscriminatorPostProcessor().addMissingDiscriminatorType(openAPI);
-        new OpenApiOperationsPostProcessor().processOperations(openAPI);
-        // need to replace openAPI after property placeholders resolved
-        if (Utils.isTestMode()) {
-            Utils.setTestReferenceAfterPlaceholders(openAPI);
-        }
-
-        // remove unused schemas
+    public void finish(VisitorContext context) {
         try {
-            if (openAPI.getComponents() != null) {
-                Map<String, Schema> schemas = openAPI.getComponents().getSchemas();
-                if (CollectionUtils.isNotEmpty(schemas)) {
-                    String openApiJson = ConvertUtils.getJsonMapper().writeValueAsString(openAPI);
-                    // Create a copy of the keySet so that we can modify the map while in a foreach
-                    Set<String> keySet = new HashSet<>(schemas.keySet());
-                    for (String schemaName : keySet) {
-                        if (!openApiJson.contains(COMPONENTS_SCHEMAS_REF + schemaName)) {
-                            schemas.remove(schemaName);
+            if (visitedElements == visitedElements(context)) {
+                // nothing new visited, avoid rewriting the files.
+                return;
+            }
+            Optional<OpenAPI> attr = context.get(Utils.ATTR_OPENAPI, OpenAPI.class);
+            if (!attr.isPresent()) {
+                return;
+            }
+            OpenAPI openAPI = attr.get();
+            processEndpoints(context);
+            applyPropertyNamingStrategy(openAPI, context);
+            applyPropertyServerContextPath(openAPI, context);
+            openAPI = resolvePropertyPlaceHolders(openAPI, context);
+            sortOpenAPI(openAPI);
+            // Process after sorting so order is stable
+            new JacksonDiscriminatorPostProcessor().addMissingDiscriminatorType(openAPI);
+            new OpenApiOperationsPostProcessor().processOperations(openAPI);
+            // need to replace openAPI after property placeholders resolved
+            if (Utils.isTestMode()) {
+                Utils.setTestReferenceAfterPlaceholders(openAPI);
+            }
+
+            // remove unused schemas
+            try {
+                if (openAPI.getComponents() != null) {
+                    Map<String, Schema> schemas = openAPI.getComponents().getSchemas();
+                    if (CollectionUtils.isNotEmpty(schemas)) {
+                        String openApiJson = ConvertUtils.getJsonMapper().writeValueAsString(openAPI);
+                        // Create a copy of the keySet so that we can modify the map while in a foreach
+                        Set<String> keySet = new HashSet<>(schemas.keySet());
+                        for (String schemaName : keySet) {
+                            if (!openApiJson.contains(COMPONENTS_SCHEMAS_REF + schemaName)) {
+                                schemas.remove(schemaName);
+                            }
                         }
                     }
                 }
+            } catch (JsonProcessingException e) {
+                // do nothing
             }
-        } catch (JsonProcessingException e) {
-            // do nothing
+
+            removeEmtpyComponents(openAPI);
+
+            String isJson = getConfigurationProperty(MICRONAUT_OPENAPI_JSON_FORMAT, context);
+            boolean isYaml = !(StringUtils.isNotEmpty(isJson) && isJson.equalsIgnoreCase(StringUtils.TRUE));
+
+            String ext = isYaml ? EXT_YML : EXT_JSON;
+            String fileName = "swagger" + ext;
+            String documentTitle = "OpenAPI";
+
+            Info info = openAPI.getInfo();
+            if (info != null) {
+                documentTitle = Optional.ofNullable(info.getTitle()).orElse(Environment.DEFAULT_NAME);
+                documentTitle = documentTitle.toLowerCase(Locale.US).replace(' ', '-');
+                String version = info.getVersion();
+                if (version != null) {
+                    documentTitle = documentTitle + '-' + version;
+                }
+                fileName = documentTitle + ext;
+            }
+            String fileNameFromConfig = getConfigurationProperty(MICRONAUT_OPENAPI_FILENAME, context);
+            if (StringUtils.isNotEmpty(fileNameFromConfig)) {
+                fileName = replacePlaceholders(fileNameFromConfig, context) + ext;
+                if (fileName.contains("${version}")) {
+                    fileName = fileName.replaceAll("\\$\\{version}", info != null && info.getVersion() != null ? info.getVersion() : StringUtils.EMPTY_STRING);
+                }
+                if (fileName.contains("${")) {
+                    context.warn("Can't set some placeholders in fileName: " + fileName, null);
+                }
+            }
+
+            writeYamlToFile(openAPI, fileName, documentTitle, context, isYaml);
+            visitedElements = visitedElements(context);
+        } catch (Throwable t) {
+            context.warn("Error:\n" + Utils.printStackTrace(t), null);
+            throw t;
         }
-
-        removeEmtpyComponents(openAPI);
-
-        String isJson = getConfigurationProperty(MICRONAUT_OPENAPI_JSON_FORMAT, visitorContext);
-        boolean isYaml = !(StringUtils.isNotEmpty(isJson) && isJson.equalsIgnoreCase(StringUtils.TRUE));
-
-        String ext = isYaml ? EXT_YML : EXT_JSON;
-        String fileName = "swagger" + ext;
-        String documentTitle = "OpenAPI";
-
-        Info info = openAPI.getInfo();
-        if (info != null) {
-            documentTitle = Optional.ofNullable(info.getTitle()).orElse(Environment.DEFAULT_NAME);
-            documentTitle = documentTitle.toLowerCase(Locale.US).replace(' ', '-');
-            String version = info.getVersion();
-            if (version != null) {
-                documentTitle = documentTitle + '-' + version;
-            }
-            fileName = documentTitle + ext;
-        }
-        String fileNameFromConfig = getConfigurationProperty(MICRONAUT_OPENAPI_FILENAME, visitorContext);
-        if (StringUtils.isNotEmpty(fileNameFromConfig)) {
-            fileName = replacePlaceholders(fileNameFromConfig, visitorContext) + ext;
-            if (fileName.contains("${version}")) {
-                fileName = fileName.replaceAll("\\$\\{version}", info != null && info.getVersion() != null ? info.getVersion() : StringUtils.EMPTY_STRING);
-            }
-            if (fileName.contains("${")) {
-                visitorContext.warn("Can't set some placeholders in fileName: " + fileName, null);
-            }
-        }
-
-        writeYamlToFile(openAPI, fileName, documentTitle, visitorContext, isYaml);
-        visitedElements = visitedElements(visitorContext);
     }
 
     private void removeEmtpyComponents(OpenAPI openAPI) {
