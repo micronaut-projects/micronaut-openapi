@@ -3,7 +3,6 @@ package io.micronaut.openapi.visitor
 import io.micronaut.openapi.AbstractOpenApiTypeElementSpec
 import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.Operation
-import io.swagger.v3.oas.models.media.ComposedSchema
 import io.swagger.v3.oas.models.media.Schema
 import io.swagger.v3.oas.models.parameters.RequestBody
 import spock.lang.IgnoreIf
@@ -547,4 +546,77 @@ class MyBean {}
         !emailSendProtocolDtoSchemaFromReadEmailSettingsDto.required
     }
 
+    void "test OpenAPI with inheritance and allOf together"() {
+        given:
+        buildBeanDefinition('test.MyBean', '''
+
+package test;
+
+import javax.validation.constraints.NotNull;
+
+import io.micronaut.core.annotation.Introspected;
+import io.micronaut.http.annotation.Body;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Post;
+import io.swagger.v3.oas.annotations.media.Schema;
+
+@Controller
+class MyController {
+
+    @Post("/bike")
+    public void bike(@Body Owner owner) {
+    }
+
+    @Post("/car")
+    public void car(@Body Car car) {
+    }
+}
+
+@Introspected
+@Schema(description = "Represents a person that owns a car or a bike")
+class Owner {
+
+    /**
+     * The bike
+     */
+    @NotNull
+    public Bike bike;
+    /**
+     * The car
+     */
+    @NotNull
+    public Car car;
+}
+
+@Introspected
+@Schema(description = "Vehicle of the owner.")
+abstract class Vehicle {
+}
+
+@Introspected
+@Schema(allOf = Vehicle.class)
+class Bike extends Vehicle {
+}
+
+@Introspected
+@Schema(allOf = Vehicle.class)
+class Car extends Vehicle {
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+
+        OpenAPI openAPI = Utils.testReference
+        Map<String, Schema> schemas = openAPI.getComponents().getSchemas()
+
+        expect:
+        Schema owner = schemas["Vehicle"]
+        Schema vehicleRef = owner.getProperties()["Owner.Vehicle"]
+        vehicleRef.allOf[0].$ref == "#/components/schemas/Owner.Vehicle"
+        vehicleRef.allOf[1].description == "Vehicle of the owner. Here a car or bike with a name"
+        Schema ownerVehicle = schemas["Owner.Vehicle"]
+        ownerVehicle.oneOf[0].$ref == '#/components/schemas/Car'
+        ownerVehicle.oneOf[1].$ref == '#/components/schemas/Bike'
+    }
 }
