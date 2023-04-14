@@ -12,7 +12,7 @@ micronaut:
 or by system properties:
 
 ```
--Dmicronaut.opemapi.schema.org.somepackage.MyComplexType=java.lang.String -Dmicronaut.opemapi.schema.org.somepackage.MyComplexType2=java.lang.Integer
+-Dmicronaut.openapi.schema.org.somepackage.MyComplexType=java.lang.String -Dmicronaut.openapi.schema.org.somepackage.MyComplexType2=java.lang.Integer
 ```
 
 or by openapi.properties
