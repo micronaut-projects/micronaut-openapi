@@ -1557,7 +1557,9 @@ abstract class AbstractOpenApiVisitor {
                     }
                     s.setType(null);
                 }
-                schemaToBind.addAllOfItem(s);
+                if (schemaToBind.getAllOf() == null || !schemaToBind.getAllOf().contains(s)) {
+                    schemaToBind.addAllOfItem(s);
+                }
             }
         }
         final AnnotationClassValue<?>[] anyOf = (AnnotationClassValue<?>[]) annValues.get("anyOf");
@@ -2132,7 +2134,9 @@ abstract class AbstractOpenApiVisitor {
                     }
                     s.setType(null);
                 }
-                composedSchema.addAllOfItem(s);
+                if (composedSchema.getAllOf() == null || !composedSchema.getAllOf().contains(s)) {
+                    composedSchema.addAllOfItem(s);
+                }
             }
         }
         final AnnotationClassValue<?>[] anyOf = (AnnotationClassValue<?>[]) values.get("anyOf");

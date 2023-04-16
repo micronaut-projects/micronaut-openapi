@@ -659,7 +659,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             return;
         }
 
-        Parameter newParameter = processMethodParameterAnnotation(context, permitsRequestBody, pathVariables, parameter, extraBodyParameters);
+        Parameter newParameter = processMethodParameterAnnotation(context, swaggerOperation, permitsRequestBody, pathVariables, parameter, extraBodyParameters);
         if (newParameter == null) {
             return;
         }
@@ -744,7 +744,8 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         }
     }
 
-    private Parameter processMethodParameterAnnotation(VisitorContext context, boolean permitsRequestBody,
+    private Parameter processMethodParameterAnnotation(VisitorContext context, io.swagger.v3.oas.models.Operation swaggerOperation,
+                                                       boolean permitsRequestBody,
                                                        Map<String, UriMatchVariable> pathVariables, TypedElement parameter,
                                                        List<TypedElement> extraBodyParameters) {
         Parameter newParameter = null;
@@ -761,7 +762,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             String paramName = parameter.getValue(PathVariable.class, String.class).orElse(parameterName);
             UriMatchVariable variable = pathVariables.get(paramName);
             if (variable == null) {
-                context.fail("Path variable name: '" + paramName + "' not found in path.", parameter);
+                context.warn("Path variable name: '" + paramName + "' not found in path, operation: " + swaggerOperation.getOperationId(), parameter);
                 return null;
             }
             newParameter = new PathParameter();

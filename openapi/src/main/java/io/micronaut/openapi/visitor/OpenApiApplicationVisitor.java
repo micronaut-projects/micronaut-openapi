@@ -1217,6 +1217,8 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             return;
         }
 
+        sortAllOf(components.getSchemas());
+
         sortComponent(components, Components::getSchemas, Components::setSchemas);
         sortComponent(components, Components::getResponses, Components::setResponses);
         sortComponent(components, Components::getParameters, Components::setParameters);
@@ -1232,6 +1234,36 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         if (components != null && getter.apply(components) != null) {
             Map<String, T> component = getter.apply(components);
             setter.accept(components, new TreeMap<>(component));
+        }
+    }
+
+    /**
+     * Sort schemas list in allOf block: schemas with ref must be first, next other schemas.
+     *
+     * @param schemas all schema components
+     */
+    private void sortAllOf(Map<String, Schema> schemas) {
+
+        if (CollectionUtils.isEmpty(schemas)) {
+            return;
+        }
+
+        for (Schema schema : schemas.values()) {
+            if (CollectionUtils.isEmpty(schema.getAllOf())
+                || schema.getAllOf().size() == 1) {
+                continue;
+            }
+            List<Schema> finalList = new ArrayList<>(schema.getAllOf().size());
+            List<Schema> schemasWithoutRef = new ArrayList<>(schema.getAllOf().size() - 1);
+            for (Schema schemaAllOf : (List<Schema>) schema.getAllOf()) {
+                if (StringUtils.isEmpty(schemaAllOf.get$ref())) {
+                    schemasWithoutRef.add(schemaAllOf);
+                    continue;
+                }
+                finalList.add(schemaAllOf);
+            }
+            finalList.addAll(schemasWithoutRef);
+            schema.setAllOf(finalList);
         }
     }
 
