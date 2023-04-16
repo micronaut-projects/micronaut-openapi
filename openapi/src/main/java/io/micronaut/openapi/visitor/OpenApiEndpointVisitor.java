@@ -88,7 +88,7 @@ public class OpenApiEndpointVisitor extends AbstractOpenApiEndpointVisitor imple
         if (!isOpenApiEnabled(context)) {
             return;
         }
-        EndpointsConfiguration cfg = OpenApiApplicationVisitor.endPointsConfiguration(context);
+        EndpointsConfiguration cfg = OpenApiApplicationVisitor.endpointsConfiguration(context);
         if (enabled == null) {
             enabled = cfg.isEnabled();
         }

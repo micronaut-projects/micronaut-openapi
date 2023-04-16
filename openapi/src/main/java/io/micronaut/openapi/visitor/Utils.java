@@ -31,6 +31,7 @@ import java.util.concurrent.Future;
 import io.micronaut.context.env.DefaultPropertyPlaceholderResolver;
 import io.micronaut.context.env.PropertyPlaceholderResolver;
 import io.micronaut.core.annotation.NonNull;
+import io.micronaut.core.annotation.Nullable;
 import io.micronaut.core.convert.ArgumentConversionContext;
 import io.micronaut.core.convert.DefaultConversionService;
 import io.micronaut.core.util.CollectionUtils;
@@ -70,6 +71,7 @@ public final class Utils {
     private Utils() {
     }
 
+    @Nullable
     public static Path getProjectPath(VisitorContext context) {
         Path path;
         try {
@@ -77,10 +79,6 @@ public final class Utils {
         } catch (Exception e) {
             path = Utils.isTestMode() ? Paths.get(System.getProperty("user.dir")) : null;
         }
-        if (path == null) {
-            context.warn("Can't identificate project path", null);
-        }
-
         return path;
     }
 

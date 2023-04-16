@@ -754,7 +754,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
      *
      * @return The EndpointsConfiguration.
      */
-    static EndpointsConfiguration endPointsConfiguration(VisitorContext context) {
+    static EndpointsConfiguration endpointsConfiguration(VisitorContext context) {
         Optional<EndpointsConfiguration> cfg = context.get(MICRONAUT_OPENAPI_ENDPOINTS, EndpointsConfiguration.class);
         if (cfg.isPresent()) {
             return cfg.get();
@@ -1047,15 +1047,57 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
     }
 
     public static List<Map.Entry<String, String>> getExpandableProperties(VisitorContext context) {
-        List<Map.Entry<String, String>> expandableProperties;
+
+        List<Map.Entry<String, String>> expandableProperties = new ArrayList<>();
         Optional<Boolean> propertiesLoaded = context.get(MICRONAUT_INTERNAL_EXPANDBLE_PROPERTIES_LOADED, Boolean.class);
         if (!propertiesLoaded.orElse(false)) {
 
-            expandableProperties = readOpenApiConfigFile(context).entrySet()
-                .stream()
-                .filter(entry -> entry.getKey().toString().startsWith(MICRONAUT_OPENAPI_EXPAND_PREFIX))
-                .map(entry -> new AbstractMap.SimpleImmutableEntry<>("${" + entry.getKey().toString().substring(MICRONAUT_OPENAPI_EXPAND_PREFIX.length()) + '}', entry.getValue().toString()))
-                .collect(Collectors.toList());
+            // first, check system properties and environmets config files
+            AnnProcessorEnvironment env = (AnnProcessorEnvironment) getEnv(context);
+            Map<String, Object> propertiesFromEnv = null;
+            if (env != null) {
+                try {
+                    propertiesFromEnv = env.getProperties("micronaut.openapi.expand", null);
+                } catch (Exception e) {
+                    context.warn("Error:\n" + Utils.printStackTrace(e), null);
+                }
+            }
+
+            Map<String, String> expandedPropsMap = new HashMap<>();
+            if (CollectionUtils.isNotEmpty(propertiesFromEnv)) {
+                for (Map.Entry<String, Object> entry : propertiesFromEnv.entrySet()) {
+                    expandedPropsMap.put(entry.getKey(), entry.getValue().toString());
+                }
+            }
+
+            // next, read openapi.properties file
+            Properties openapiProps = readOpenApiConfigFile(context);
+            for (Map.Entry<Object, Object> entry : openapiProps.entrySet()) {
+                String key = entry.getKey().toString();
+                if (!key.startsWith(MICRONAUT_OPENAPI_EXPAND_PREFIX)) {
+                    continue;
+                }
+                expandedPropsMap.put(key, entry.getValue().toString());
+            }
+
+            // next, read system properties
+            if (CollectionUtils.isNotEmpty(System.getProperties())) {
+                for (Map.Entry<Object, Object> entry : System.getProperties().entrySet()) {
+                    String key = entry.getKey().toString();
+                    if (!key.startsWith(MICRONAUT_OPENAPI_EXPAND_PREFIX)) {
+                        continue;
+                    }
+                    expandedPropsMap.put(key, entry.getValue().toString());
+                }
+            }
+
+            for (Map.Entry<String, String> entry : expandedPropsMap.entrySet()) {
+                String key = entry.getKey();
+                if (key.startsWith(MICRONAUT_OPENAPI_EXPAND_PREFIX)) {
+                    key = key.substring(MICRONAUT_OPENAPI_EXPAND_PREFIX.length());
+                }
+                expandableProperties.add(new AbstractMap.SimpleImmutableEntry<>("${" + key + '}', entry.getValue()));
+            }
 
             context.put(MICRONAUT_INTERNAL_EXPANDBLE_PROPERTIES, expandableProperties);
             context.put(MICRONAUT_INTERNAL_EXPANDBLE_PROPERTIES_LOADED, true);
@@ -1330,7 +1372,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
     }
 
     private void processEndpoints(VisitorContext context) {
-        EndpointsConfiguration endpointsCfg = endPointsConfiguration(context);
+        EndpointsConfiguration endpointsCfg = endpointsConfiguration(context);
         if (endpointsCfg.isEnabled() && !endpointsCfg.getEndpoints().isEmpty()) {
             OpenApiEndpointVisitor visitor = new OpenApiEndpointVisitor(true);
             endpointsCfg.getEndpoints().values().stream()
