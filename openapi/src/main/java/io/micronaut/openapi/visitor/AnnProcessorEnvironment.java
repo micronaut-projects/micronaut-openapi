@@ -73,8 +73,6 @@ public class AnnProcessorEnvironment extends DefaultEnvironment {
             if (projectPath != null) {
                 projectDir = "file:" + projectPath.toString().replaceAll("\\\\", "/");
                 projectResourcesPath = projectDir + (projectDir.endsWith("/") ? StringUtils.EMPTY_STRING : "/") + "src/main/resources/";
-            } else {
-                context.warn("Can't identificate projectPath", null);
             }
 
             String configFileLocations = System.getProperty(MICRONAUT_CONFIG_FILE_LOCATIONS);

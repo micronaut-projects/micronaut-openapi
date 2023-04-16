@@ -23,7 +23,7 @@ import io.micronaut.core.annotation.Nullable;
 import io.micronaut.http.HttpMethod;
 
 /**
- * Copy of class io.micronaut.security.config.InterceptUrlMapPattern from micronaut-security
+ * Copy of class io.micronaut.security.config.InterceptUrlMapPattern from micronaut-security.
  *
  * @since 4.8.7
  */

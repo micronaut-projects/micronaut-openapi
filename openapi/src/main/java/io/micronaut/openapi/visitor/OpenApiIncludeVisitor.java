@@ -34,6 +34,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.MICRONAUT_OPENAPI_ENABLED;
+import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.isOpenApiEnabled;
 
 /**
  * A {@link TypeElementVisitor} that builds the Swagger model from Micronaut controllers included by @{@link OpenAPIInclude} at the compile time.
@@ -45,7 +46,7 @@ public class OpenApiIncludeVisitor implements TypeElementVisitor<OpenAPIIncludes
 
     @Override
     public void visitClass(ClassElement element, VisitorContext context) {
-        if (!Utils.isOpenApiEnabled()) {
+        if (!isOpenApiEnabled(context)) {
             return;
         }
         for (AnnotationValue<OpenAPIInclude> includeAnnotation : element.getAnnotationValuesByType(OpenAPIInclude.class)) {

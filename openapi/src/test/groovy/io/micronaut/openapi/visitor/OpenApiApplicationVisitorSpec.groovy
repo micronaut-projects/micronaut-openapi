@@ -1,5 +1,6 @@
 package io.micronaut.openapi.visitor
 
+import io.micronaut.context.env.Environment
 import io.micronaut.openapi.AbstractOpenApiTypeElementSpec
 import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.security.SecurityScheme
@@ -857,4 +858,138 @@ class MyBean {}
         System.clearProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_ENABLED)
     }
 
+    void "test disable openapi from file"() {
+
+        given: "An API definition"
+        Utils.testReference = null
+        Utils.testReferenceAfterPlaceholders = null
+        System.setProperty(OpenApiApplicationVisitor.MICRONAUT_CONFIG_FILE_LOCATIONS, "project:/src/test/resources/")
+        System.setProperty(Environment.ENVIRONMENTS_PROPERTY, "disabled-openapi")
+
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Post;
+import io.reactivex.Single;
+import io.swagger.v3.oas.annotations.Hidden;
+import io.swagger.v3.oas.annotations.media.Schema;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+@Controller("/pets")
+interface PetOperations<T extends Pet> {
+
+    @Post
+    Single<T> save(String name, int age);
+}
+
+class Pet {
+
+    private int privateAge;
+    protected int protectedAge;
+    int packageAge;
+
+    public int age;
+
+    // ignored by json
+    @JsonIgnore
+    public int ignored;
+    // hidden by swagger
+    @Hidden
+    public int hidden;
+    // hidden by swagger
+    @Schema(hidden = true)
+    public int hidden2;
+
+    // private should not be included
+    private String name;
+
+    // protected should not be included
+    protected String protectme;
+
+    // static should not be included
+    public static String CONST;
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        then: "the state is correct"
+        !Utils.testReference
+        !Utils.testReferenceAfterPlaceholders
+
+        cleanup:
+        System.clearProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_FIELD_VISIBILITY_LEVEL)
+        System.clearProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_ENABLED)
+        System.clearProperty(OpenApiApplicationVisitor.MICRONAUT_INTERNAL_OPENAPI_ENABLED)
+        System.clearProperty(OpenApiApplicationVisitor.MICRONAUT_CONFIG_FILE_LOCATIONS)
+        System.clearProperty(Environment.ENVIRONMENTS_PROPERTY)
+    }
+
+    void "test disable openapi from openapi.properties file"() {
+
+        given: "An API definition"
+        Utils.testReference = null
+        Utils.testReferenceAfterPlaceholders = null
+        System.setProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_CONFIG_FILE, "openapi-disabled-openapi.properties")
+
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Post;
+import io.reactivex.Single;
+import io.swagger.v3.oas.annotations.Hidden;
+import io.swagger.v3.oas.annotations.media.Schema;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+@Controller("/pets")
+interface PetOperations<T extends Pet> {
+
+    @Post
+    Single<T> save(String name, int age);
+}
+
+class Pet {
+
+    private int privateAge;
+    protected int protectedAge;
+    int packageAge;
+
+    public int age;
+
+    // ignored by json
+    @JsonIgnore
+    public int ignored;
+    // hidden by swagger
+    @Hidden
+    public int hidden;
+    // hidden by swagger
+    @Schema(hidden = true)
+    public int hidden2;
+
+    // private should not be included
+    private String name;
+
+    // protected should not be included
+    protected String protectme;
+
+    // static should not be included
+    public static String CONST;
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        then: "the state is correct"
+        !Utils.testReference
+        !Utils.testReferenceAfterPlaceholders
+
+        cleanup:
+        System.clearProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_CONFIG_FILE)
+    }
 }

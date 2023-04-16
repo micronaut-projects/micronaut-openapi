@@ -43,6 +43,7 @@ import io.swagger.v3.oas.models.tags.Tag;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 
 import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.MICRONAUT_OPENAPI_ENABLED;
+import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.isOpenApiEnabled;
 import static io.micronaut.openapi.visitor.Utils.DEFAULT_MEDIA_TYPES;
 
 /**
@@ -84,7 +85,7 @@ public class OpenApiEndpointVisitor extends AbstractOpenApiEndpointVisitor imple
 
     @Override
     public void visitClass(ClassElement element, VisitorContext context) {
-        if (!Utils.isOpenApiEnabled()) {
+        if (!isOpenApiEnabled(context)) {
             return;
         }
         EndpointsConfiguration cfg = OpenApiApplicationVisitor.endPointsConfiguration(context);
