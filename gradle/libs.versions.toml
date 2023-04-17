@@ -5,7 +5,7 @@ managed-jsoup = "1.15.4"
 managed-slf4j = "2.0.6"
 managed-html2md-converter = "0.64.0"
 
-kotlin = "1.8.10"
+kotlin = "1.8.20"
 jspecify = "0.3.0"
 jdt-annotation = "2.2.700"
 android-annotation = "1.6.0"
