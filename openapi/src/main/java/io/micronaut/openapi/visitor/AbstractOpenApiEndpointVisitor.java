@@ -107,8 +107,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 
-import static io.micronaut.openapi.visitor.SchemaUtils.TYPE_OBJECT;
 import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.getSecurityProperties;
+import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.isOpenApiEnabled;
+import static io.micronaut.openapi.visitor.SchemaUtils.TYPE_OBJECT;
 import static io.micronaut.openapi.visitor.TypeElementUtils.isNullable;
 import static io.micronaut.openapi.visitor.Utils.DEFAULT_MEDIA_TYPES;
 
@@ -172,7 +173,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
      * @param context The visitor context
      */
     public void visitClass(ClassElement element, VisitorContext context) {
-        if (!Utils.isOpenApiEnabled()) {
+        if (!isOpenApiEnabled(context)) {
             return;
         }
         if (ignore(element, context)) {
@@ -371,7 +372,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
      * @param context The visitor context
      */
     public void visitMethod(MethodElement element, VisitorContext context) {
-        if (!Utils.isOpenApiEnabled()) {
+        if (!isOpenApiEnabled(context)) {
             return;
         }
         if (ignore(element, context)) {

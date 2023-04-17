@@ -1,0 +1,5 @@
+micronaut:
+  openapi:
+    expand:
+      url1: /expandUrl1
+      url2: /expandUrl2

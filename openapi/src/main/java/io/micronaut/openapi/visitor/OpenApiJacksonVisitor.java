@@ -36,6 +36,7 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.MICRONAUT_OPENAPI_ENABLED;
+import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.isOpenApiEnabled;
 
 /**
  * A {@link TypeElementVisitor} that builds appropriate {@link Schema} annotation for the parent class of a hierarchy
@@ -68,7 +69,7 @@ public class OpenApiJacksonVisitor implements TypeElementVisitor<Object, Object>
 
     @Override
     public void visitClass(ClassElement element, VisitorContext context) {
-        if (!Utils.isOpenApiEnabled()) {
+        if (!isOpenApiEnabled(context)) {
             return;
         }
         AnnotationValue<JsonSubTypes> jsonSubTypesDecAnn = element.getDeclaredAnnotation(JsonSubTypes.class);
