@@ -10,3 +10,4 @@ io.micronaut.openapi.swagger.jackson.mixin
 io.micronaut.openapi.swagger.jackson.util
 io.micronaut.openapi.view
 io.micronaut.openapi.visitor
+io.micronaut.openapi.visitor.security
