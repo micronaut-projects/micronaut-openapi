@@ -27,6 +27,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import io.micronaut.context.ApplicationContextConfiguration;
+import io.micronaut.context.env.AbstractPropertySourceLoader;
 import io.micronaut.context.env.ActiveEnvironment;
 import io.micronaut.context.env.CachedEnvironment;
 import io.micronaut.context.env.DefaultEnvironment;
@@ -63,7 +64,7 @@ public class AnnProcessorEnvironment extends DefaultEnvironment {
      * @param context visitor context
      */
     public AnnProcessorEnvironment(ApplicationContextConfiguration configuration, VisitorContext context) {
-        super(configuration);
+        super(configuration, false);
 
         annotationProcessingConfigLocations = new ArrayList<>();
 
@@ -166,9 +167,14 @@ public class AnnProcessorEnvironment extends DefaultEnvironment {
     private void readPropertySourceList(String name, ResourceLoader resourceLoader, List<PropertySource> propertySources) {
         Collection<PropertySourceLoader> propertySourceLoaders = getPropertySourceLoaders();
         if (propertySourceLoaders.isEmpty()) {
-            loadPropertySourceFromLoader(name, new PropertiesPropertySourceLoader(), propertySources, resourceLoader);
+            PropertiesPropertySourceLoader propertySourceLoader = new PropertiesPropertySourceLoader();
+            propertySourceLoader.setLogEnabled(false);
+            loadPropertySourceFromLoader(name, propertySourceLoader, propertySources, resourceLoader);
         } else {
             for (PropertySourceLoader propertySourceLoader : propertySourceLoaders) {
+                if (propertySourceLoader instanceof AbstractPropertySourceLoader) {
+                    ((AbstractPropertySourceLoader) propertySourceLoader).setLogEnabled(false);
+                }
                 loadPropertySourceFromLoader(name, propertySourceLoader, propertySources, resourceLoader);
             }
         }
