@@ -3,14 +3,14 @@ managed-swagger = "2.2.9"
 # Required to keep catalog compatibility with 3.4.x.  Can be removed for 4.0.0
 managed-swagger-compat = "2.2.9"
 managed-javadoc-parser = "0.3.1"
-managed-jsoup = "1.15.4"
+managed-jsoup = "1.16.1"
 managed-jakarta-validation-api = "3.0.2"
 managed-slf4j = "1.7.36"
 
 # Versions beyond 0.62.2 require Java 11
 managed-html2md-converter = "0.62.2"
 
-kotlin = "1.8.20"
+kotlin = "1.8.21"
 jspecify = "0.3.0"
 jdt-annotation = "2.2.700"
 android-annotation = "1.6.0"
