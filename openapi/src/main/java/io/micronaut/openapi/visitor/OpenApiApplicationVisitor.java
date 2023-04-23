@@ -1189,9 +1189,9 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                 if (fileName.contains("${version}")) {
                     fileName = fileName.replaceAll("\\$\\{version}", info != null && info.getVersion() != null ? info.getVersion() : StringUtils.EMPTY_STRING);
                 }
-                if (fileName.contains("${")) {
-                    context.warn("Can't set some placeholders in fileName: " + fileName, null);
-                }
+            }
+            if (fileName.contains("${")) {
+                context.warn("Can't set some placeholders in fileName: " + fileName, null);
             }
 
             writeYamlToFile(openAPI, fileName, documentTitle, context, isYaml);
