@@ -306,6 +306,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         if (loadedValue == null) {
             boolean value = OpenApiApplicationVisitor.getBooleanProperty(MICRONAUT_OPENAPI_ENABLED, true, context);
             context.put(MICRONAUT_INTERNAL_OPENAPI_ENABLED, value);
+            System.setProperty(MICRONAUT_OPENAPI_ENABLED, Boolean.toString(value));
             return value;
         }
         return loadedValue;
@@ -551,7 +552,10 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
     }
 
     public static String getConfigurationProperty(String key, VisitorContext context) {
-        String value = System.getProperty(key, readOpenApiConfigFile(context).getProperty(key));
+        String value = System.getProperty(key);
+        if (value == null) {
+            value = readOpenApiConfigFile(context).getProperty(key);
+        }
         if (value != null) {
             return value;
         }

@@ -372,7 +372,7 @@ class MyBean {}
 ''')
         then:
         Utils.testFileName
-        Utils.testFileName == 'my-openapi-my-version.yml'
+        Utils.testFileName == 'example-api-1.0.yml'
 
         cleanup:
         System.clearProperty(OpenApiApplicationVisitor.MICRONAUT_CONFIG_FILE_LOCATIONS)

@@ -77,7 +77,7 @@ public final class Utils {
         try {
             path = context.getProjectDir().orElse(Utils.isTestMode() ? Paths.get(System.getProperty("user.dir")) : null);
         } catch (Exception e) {
-            path = Utils.isTestMode() ? Paths.get(System.getProperty("user.dir")) : null;
+            path = Paths.get(System.getProperty("user.dir"));
         }
         return path;
     }
