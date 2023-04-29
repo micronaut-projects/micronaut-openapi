@@ -12,7 +12,7 @@ android-annotation = "1.6.0"
 spotbugs-annotations = "4.7.3"
 
 micronaut-security = "4.0.0-M1"
-micronaut-serde = "2.0.0-M1"
+micronaut-serde = "2.0.0-SNAPSHOT"
 micronaut-rxjava2 = "2.0.0-M1"
 micronaut-rxjava3 = "3.0.0-M1"
 micronaut-groovy = "4.0.0-M1"
