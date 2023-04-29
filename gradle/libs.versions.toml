@@ -19,7 +19,7 @@ micronaut-groovy = "4.0.0-M1"
 micronaut-validation = "4.0.0-M4"
 micronaut-data = "4.0.0-M1"
 micronaut-test = "4.0.0-M1"
-micronaut-kotlin = "4.0.0-M1"
+micronaut-kotlin = "4.0.0-SNAPSHOT"
 
 [libraries]
 
