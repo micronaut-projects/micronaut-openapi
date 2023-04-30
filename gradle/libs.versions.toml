@@ -1,7 +1,7 @@
 [versions]
-managed-swagger = "2.2.9"
+managed-swagger = "2.2.10"
 # Required to keep catalog compatibility with 3.4.x.  Can be removed for 4.0.0
-managed-swagger-compat = "2.2.9"
+managed-swagger-compat = "2.2.10"
 managed-javadoc-parser = "0.3.1"
 managed-jsoup = "1.16.1"
 managed-jakarta-validation-api = "3.0.2"

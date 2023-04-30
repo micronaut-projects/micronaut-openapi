@@ -55,6 +55,8 @@ import io.micronaut.core.annotation.NonNull;
 import io.micronaut.core.annotation.Nullable;
 import io.micronaut.core.convert.ConversionService;
 import io.micronaut.core.convert.DefaultConversionService;
+import io.micronaut.core.io.scan.ClassPathResourceLoader;
+import io.micronaut.core.io.scan.DefaultClassPathResourceLoader;
 import io.micronaut.core.naming.conventions.StringConvention;
 import io.micronaut.core.type.Argument;
 import io.micronaut.core.type.GenericArgument;
@@ -673,6 +675,21 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                 DefaultConversionService conversionService = new DefaultConversionService();
                 conversionService.addConverter(Map.class, InterceptUrlMapPattern.class, new InterceptUrlMapConverter(conversionService));
                 return conversionService;
+            }
+
+            @Override
+            public ClassPathResourceLoader getResourceLoader() {
+                ClassLoader classLoader = ApplicationContextConfiguration.class.getClassLoader();
+                if (classLoader == null) {
+                    classLoader = Thread.currentThread().getContextClassLoader();
+                }
+                if (classLoader == null) {
+                    classLoader = ClassPathResourceLoader.class.getClassLoader();
+                }
+                if (classLoader == null) {
+                    classLoader = ClassLoader.getSystemClassLoader();
+                }
+                return new DefaultClassPathResourceLoader(classLoader, null, false, false);
             }
 
             @Override

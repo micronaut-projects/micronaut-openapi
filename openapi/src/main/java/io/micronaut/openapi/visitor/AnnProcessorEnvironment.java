@@ -27,7 +27,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import io.micronaut.context.ApplicationContextConfiguration;
-import io.micronaut.context.env.AbstractPropertySourceLoader;
 import io.micronaut.context.env.ActiveEnvironment;
 import io.micronaut.context.env.CachedEnvironment;
 import io.micronaut.context.env.DefaultEnvironment;
@@ -35,9 +34,11 @@ import io.micronaut.context.env.Environment;
 import io.micronaut.context.env.PropertiesPropertySourceLoader;
 import io.micronaut.context.env.PropertySource;
 import io.micronaut.context.env.PropertySourceLoader;
+import io.micronaut.context.env.yaml.YamlPropertySourceLoader;
 import io.micronaut.context.exceptions.ConfigurationException;
 import io.micronaut.core.io.ResourceLoader;
 import io.micronaut.core.io.file.DefaultFileSystemResourceLoader;
+import io.micronaut.core.io.scan.DefaultClassPathResourceLoader;
 import io.micronaut.core.order.OrderUtil;
 import io.micronaut.core.util.StringUtils;
 import io.micronaut.inject.visitor.VisitorContext;
@@ -147,7 +148,11 @@ public class AnnProcessorEnvironment extends DefaultEnvironment {
             if (configLocation.equals("classpath:/")) {
                 resourceLoader = this;
             } else if (configLocation.startsWith("classpath:")) {
-                resourceLoader = forBase(configLocation);
+                if (this.resourceLoader instanceof DefaultClassPathResourceLoader) {
+                    resourceLoader = ((DefaultClassPathResourceLoader) this.resourceLoader).forBase(configLocation, false);
+                } else {
+                    resourceLoader = forBase(configLocation);
+                }
             } else if (configLocation.startsWith("file:")) {
                 configLocation = configLocation.substring(5);
                 Path configLocationPath = Paths.get(configLocation);
@@ -167,17 +172,21 @@ public class AnnProcessorEnvironment extends DefaultEnvironment {
     private void readPropertySourceList(String name, ResourceLoader resourceLoader, List<PropertySource> propertySources) {
         Collection<PropertySourceLoader> propertySourceLoaders = getPropertySourceLoaders();
         if (propertySourceLoaders.isEmpty()) {
-            PropertiesPropertySourceLoader propertySourceLoader = new PropertiesPropertySourceLoader();
-            propertySourceLoader.setLogEnabled(false);
+            PropertiesPropertySourceLoader propertySourceLoader = new PropertiesPropertySourceLoader(false);
             loadPropertySourceFromLoader(name, propertySourceLoader, propertySources, resourceLoader);
         } else {
             for (PropertySourceLoader propertySourceLoader : propertySourceLoaders) {
-                if (propertySourceLoader instanceof AbstractPropertySourceLoader) {
-                    ((AbstractPropertySourceLoader) propertySourceLoader).setLogEnabled(false);
-                }
                 loadPropertySourceFromLoader(name, propertySourceLoader, propertySources, resourceLoader);
             }
         }
+    }
+
+    @Override
+    public Collection<PropertySourceLoader> getPropertySourceLoaders() {
+        List<PropertySourceLoader> loaders = new ArrayList<>(2);
+        loaders.add(new YamlPropertySourceLoader(false));
+        loaders.add(new PropertiesPropertySourceLoader(false));
+        return loaders;
     }
 
     private void loadPropertySourceFromLoader(String name, PropertySourceLoader propertySourceLoader, List<PropertySource> propertySources, ResourceLoader resourceLoader) {

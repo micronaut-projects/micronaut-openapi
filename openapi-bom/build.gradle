@@ -2,3 +2,9 @@ plugins {
     id "io.micronaut.build.internal.bom"
 }
 
+micronautBom {
+    suppressions {
+        acceptedVersionRegressions.add("slf4j")
+        acceptedLibraryRegressions.add("slf4j-nop")
+    }
+}
