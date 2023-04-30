@@ -1,0 +1,33 @@
+micronaut:
+  application:
+    name: openapi-test
+
+  views:
+    folder: static
+
+  router:
+    static-resources:
+      default:
+        enabled: true
+        mapping: /**/*
+        paths:
+          - classpath:static
+
+      swagger:
+        paths: classpath:META-INF/swagger
+        mapping: /swagger/**
+
+  server:
+    multipart:
+      max-file-size: 10485760 # 10 MiB
+
+netty:
+  default:
+    allocator:
+      max-order: 3
+
+api:
+  title: "Example API"
+  version: "1.0"
+  description: "API for ..."
+
