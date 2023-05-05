@@ -3,7 +3,7 @@ managed-swagger = "2.2.9"
 managed-javadoc-parser = "0.3.1"
 managed-jsoup = "1.16.1"
 managed-slf4j = "2.0.7"
-managed-html2md-converter = "0.64.0"
+managed-html2md-converter = "0.64.4"
 
 kotlin = "1.8.21"
 jspecify = "0.3.0"
