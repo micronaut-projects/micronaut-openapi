@@ -187,10 +187,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
 
         if (element.isAnnotationPresent(Controller.class)) {
 
-            String url = element.stringValue(UriMapping.class).orElse(null);
-            if (url != null) {
-                context.put(CONTEXT_CHILD_PATH, url);
-            }
+            element.stringValue(UriMapping.class).ifPresent(url -> context.put(CONTEXT_CHILD_PATH, url));
             String prefix = "";
             String suffix = "";
             boolean addAlways = true;
@@ -275,7 +272,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
      *
      * @return The servers.
      */
-    protected abstract List<io.swagger.v3.oas.models.servers.Server> methodServers(MethodElement element, VisitorContext context);
+    protected abstract List<Server> methodServers(MethodElement element, VisitorContext context);
 
     /**
      * Returns the class tags.
@@ -1502,10 +1499,11 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
     }
 
     private void readApiResponses(MethodElement element, VisitorContext context, io.swagger.v3.oas.models.Operation swaggerOperation) {
-        List<AnnotationValue<io.swagger.v3.oas.annotations.responses.ApiResponse>> classResponseAnnotations = element.getDeclaringType().getDeclaredAnnotationValuesByType(io.swagger.v3.oas.annotations.responses.ApiResponse.class);
-        List<AnnotationValue<io.swagger.v3.oas.annotations.responses.ApiResponse>> methodResponseAnnotations = element.getDeclaredAnnotationValuesByType(io.swagger.v3.oas.annotations.responses.ApiResponse.class);
-        processResponses(swaggerOperation, classResponseAnnotations, element, context);
+        List<AnnotationValue<io.swagger.v3.oas.annotations.responses.ApiResponse>> methodResponseAnnotations = element.getAnnotationValuesByType(io.swagger.v3.oas.annotations.responses.ApiResponse.class);
         processResponses(swaggerOperation, methodResponseAnnotations, element, context);
+
+        List<AnnotationValue<io.swagger.v3.oas.annotations.responses.ApiResponse>> classResponseAnnotations = element.getDeclaringType().getAnnotationValuesByType(io.swagger.v3.oas.annotations.responses.ApiResponse.class);
+        processResponses(swaggerOperation, classResponseAnnotations, element, context);
     }
 
     private void processResponses(io.swagger.v3.oas.models.Operation operation, List<AnnotationValue<io.swagger.v3.oas.annotations.responses.ApiResponse>> responseAnnotations, MethodElement element, VisitorContext context) {
@@ -1516,6 +1514,10 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         }
         if (CollectionUtils.isNotEmpty(responseAnnotations)) {
             for (AnnotationValue<io.swagger.v3.oas.annotations.responses.ApiResponse> response : responseAnnotations) {
+                String responseCode = response.stringValue("responseCode").orElse("default");
+                if (apiResponses.containsKey(responseCode)) {
+                    continue;
+                }
                 Optional<ApiResponse> newResponse = toValue(response.getValues(), context, ApiResponse.class);
                 if (newResponse.isPresent()) {
                     ApiResponse newApiResponse = newResponse.get();
@@ -1552,7 +1554,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                             newApiResponse.setContent(contentFromProduces);
                         }
                     }
-                    apiResponses.put(response.get("responseCode", String.class).orElse("default"), newApiResponse);
+                    apiResponses.put(responseCode, newApiResponse);
                 }
             }
             operation.setResponses(apiResponses);

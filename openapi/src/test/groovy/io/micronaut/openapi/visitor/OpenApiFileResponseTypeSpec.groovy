@@ -1,26 +1,28 @@
 package io.micronaut.openapi.visitor
 
-import io.micronaut.annotation.processing.test.AbstractTypeElementSpec
+
+import io.micronaut.openapi.AbstractOpenApiTypeElementSpec
 import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.Operation
 
-class OpenApiFileResponseTypeSpec extends AbstractTypeElementSpec {
-    def setup() {
-        System.setProperty(Utils.ATTR_TEST_MODE, "true")
-    }
+class OpenApiFileResponseTypeSpec extends AbstractOpenApiTypeElementSpec {
 
     void "test build the OpenAPI for returning files"() {
         when:
         buildBeanDefinition('test.MyBean', '''
 package test;
 
-import io.micronaut.http.HttpResponse;
-import io.micronaut.http.annotation.*;
-import io.micronaut.http.server.types.files.*;
-
-import java.io.*;
-import java.nio.*;
+import java.io.File;
+import java.io.InputStream;
+import java.nio.ByteBuffer;
 import java.util.UUID;
+
+import io.micronaut.http.HttpResponse;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.micronaut.http.annotation.Produces;
+import io.micronaut.http.server.types.files.StreamedFile;
+import io.micronaut.http.server.types.files.SystemFile;
 
 @Controller("/upload")
 class FooController {
