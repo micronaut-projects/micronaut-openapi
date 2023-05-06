@@ -35,6 +35,7 @@ class MyDto {
     private JAXBElement<? extends XmlElement> xmlElement;
     private JAXBElement<? extends XmlElement2> xmlElement2;
     public JAXBElement<? extends XmlElement3> xmlElement3;
+    public JAXBElement<? extends XmlElement4> xmlElement4;
 
     public ObjectId getId() {
         return id;
@@ -110,6 +111,19 @@ class XmlElement3 {
     }
 }
 
+class XmlElement4 {
+
+    private String propStr3;
+
+    public String getPropStr3() {
+        return propStr3;
+    }
+
+    public void setPropStr3(String propStr3) {
+        this.propStr3 = propStr3;
+    }
+}
+
 @jakarta.inject.Singleton
 class MyBean {}
 ''')
@@ -122,6 +136,8 @@ class MyBean {}
         Schema myJaxbElementSchema = openAPI.components.schemas.MyJaxbElement_XmlElement_
         Schema myJaxbElement2Schema = openAPI.components.schemas.MyJaxbElement2
         Schema myJaxbElement3Schema = openAPI.components.schemas.MyJaxbElement3
+        Schema myJaxbElement4Schema = openAPI.components.schemas.MyJaxbElement4
+        Schema discountSchema = openAPI.components.schemas."MyJaxbElement4.Discount"
         Schema xmlElementSchema = openAPI.components.schemas.XmlElement
 
         then:
@@ -145,6 +161,19 @@ class MyBean {}
         myJaxbElement3Schema
         myJaxbElement3Schema.properties.type.type == 'string'
         myJaxbElement3Schema.properties.value.type == 'string'
+
+        myJaxbElement4Schema
+        myJaxbElement4Schema.properties.type.$ref
+        myJaxbElement4Schema.properties.type.$ref == '#/components/schemas/MyJaxbElement4.DiscountTypeType'
+
+        myJaxbElement4Schema.properties.value.allOf
+        myJaxbElement4Schema.properties.value.allOf.size() == 2
+        myJaxbElement4Schema.properties.value.allOf.get(0).$ref == '#/components/schemas/MyJaxbElement4.Discount'
+        myJaxbElement4Schema.properties.value.allOf.get(1).oneOf
+        myJaxbElement4Schema.properties.value.allOf.get(1).oneOf.size() == 3
+        myJaxbElement4Schema.properties.value.allOf.get(1).oneOf.get(0).$ref == '#/components/schemas/MyJaxbElement4.DiscountSizeOpenApi'
+        myJaxbElement4Schema.properties.value.allOf.get(1).oneOf.get(1).$ref == '#/components/schemas/MyJaxbElement4.DiscountFixedOpenApi'
+        myJaxbElement4Schema.properties.value.allOf.get(1).oneOf.get(2).$ref == '#/components/schemas/MyJaxbElement4.MultiplierSizeOpenApi'
 
         xmlElementSchema
         xmlElementSchema.properties.propStr.type == 'string'
