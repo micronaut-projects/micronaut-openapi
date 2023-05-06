@@ -1566,14 +1566,18 @@ abstract class AbstractOpenApiVisitor {
         if (ArrayUtils.isNotEmpty(anyOf)) {
             List<Schema<?>> schemaList = namesToSchemas(openAPI, context, anyOf, Collections.emptyList());
             for (Schema<?> s : schemaList) {
-                schemaToBind.addAnyOfItem(s);
+                if (schemaToBind.getAnyOf() == null || !schemaToBind.getAnyOf().contains(s)) {
+                    schemaToBind.addAnyOfItem(s);
+                }
             }
         }
         final AnnotationClassValue<?>[] oneOf = (AnnotationClassValue<?>[]) annValues.get("oneOf");
         if (ArrayUtils.isNotEmpty(oneOf)) {
             List<Schema<?>> schemaList = namesToSchemas(openAPI, context, oneOf, Collections.emptyList());
             for (Schema<?> s : schemaList) {
-                schemaToBind.addOneOfItem(s);
+                if (schemaToBind.getOneOf() == null || !schemaToBind.getOneOf().contains(s)) {
+                    schemaToBind.addOneOfItem(s);
+                }
             }
         }
 
@@ -2143,14 +2147,18 @@ abstract class AbstractOpenApiVisitor {
         if (ArrayUtils.isNotEmpty(anyOf)) {
             List<Schema<?>> schemaList = namesToSchemas(openAPI, context, anyOf, mediaTypes);
             for (Schema<?> s : schemaList) {
-                composedSchema.addAnyOfItem(s);
+                if (composedSchema.getAnyOf() == null || !composedSchema.getAnyOf().contains(s)) {
+                    composedSchema.addAnyOfItem(s);
+                }
             }
         }
         final AnnotationClassValue<?>[] oneOf = (AnnotationClassValue<?>[]) values.get("oneOf");
         if (ArrayUtils.isNotEmpty(oneOf)) {
             List<Schema<?>> schemaList = namesToSchemas(openAPI, context, oneOf, mediaTypes);
             for (Schema<?> s : schemaList) {
-                composedSchema.addOneOfItem(s);
+                if (composedSchema.getOneOf() == null || !composedSchema.getOneOf().contains(s)) {
+                    composedSchema.addOneOfItem(s);
+                }
             }
         }
 
