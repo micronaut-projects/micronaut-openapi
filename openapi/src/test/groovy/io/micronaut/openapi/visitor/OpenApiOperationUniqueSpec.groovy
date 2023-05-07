@@ -73,8 +73,8 @@ class TestController2 {
 class MyBean {}
 ''')
 
-        Operation firstOperation = Utils.testReferenceAfterPlaceholders?.paths?.get("/test1")?.get
-        Operation secondOperation = Utils.testReferenceAfterPlaceholders?.paths?.get("/test2")?.get
+        Operation firstOperation = Utils.testReference?.paths?.get("/test1")?.get
+        Operation secondOperation = Utils.testReference?.paths?.get("/test2")?.get
 
         expect:
         firstOperation.getOperationId() == "index"
@@ -163,9 +163,9 @@ class TestController3 {
 class MyBean {}
 ''')
 
-        Operation firstGenerated = Utils.testReferenceAfterPlaceholders?.paths?.get("/test1")?.get
-        Operation operationWithId = Utils.testReferenceAfterPlaceholders?.paths?.get("/test2")?.get
-        Operation secondGenerated = Utils.testReferenceAfterPlaceholders?.paths?.get("/test3")?.get
+        Operation firstGenerated = Utils.testReference?.paths?.get("/test1")?.get
+        Operation operationWithId = Utils.testReference?.paths?.get("/test2")?.get
+        Operation secondGenerated = Utils.testReference?.paths?.get("/test3")?.get
 
         expect:
         firstGenerated.getOperationId() == "index"
@@ -208,8 +208,8 @@ class TestController2 {
 class MyBean {}
 ''')
 
-        Operation firstOperation = Utils.testReferenceAfterPlaceholders?.paths?.get("/test1")?.get
-        Operation secondOperation = Utils.testReferenceAfterPlaceholders?.paths?.get("/test2")?.get
+        Operation firstOperation = Utils.testReference?.paths?.get("/test1")?.get
+        Operation secondOperation = Utils.testReference?.paths?.get("/test2")?.get
 
         expect:
         firstOperation.getOperationId() == "myIndex"

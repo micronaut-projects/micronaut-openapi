@@ -102,7 +102,7 @@ class MyBean {}
         Utils.testReference != null
 
         when:"The OpenAPI is retrieved"
-        OpenAPI openAPI = Utils.testReferenceAfterPlaceholders
+        OpenAPI openAPI = Utils.testReference
         PathItem pathItem = openAPI.paths.get("/pets")
 
         then:"it is included in the OpenAPI doc"

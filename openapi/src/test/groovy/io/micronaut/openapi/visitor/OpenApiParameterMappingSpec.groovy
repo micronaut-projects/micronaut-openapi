@@ -423,25 +423,28 @@ import io.swagger.v3.oas.annotations.enums.*;
 interface Test {
 
     @Get("/test1")
-    public String test1(String name);
+    String test1(String name);
 
     @Post("/test2")
-    public String test2(String name);
+    String test2(String name);
 
     @Get("/test3")
-    public String test3(Principal principal);
+    String test3(Principal principal);
 
     @Get("/test4")
-    public String test4(HttpRequest req);
+    String test4(HttpRequest req);
 
     @Get("/test5")
-    public String test5(HttpRequest req, Principal principal, String name, String greeting);
+    String test5(HttpRequest req, Principal principal, String name, String greeting);
 
     @Get("/test6{?bar}")
-    public String test6(@Nullable String bar, String name);
+    String test6(@Nullable String bar, String name);
 
     @Post("/test7")
-    public String test7(String someId, @Nullable String someNotRequired, java.util.Optional<String> someNotRequired2, HttpRequest req, Principal principal, @Body Greeting myBody);
+    String test7(String someId, @Nullable String someNotRequired, java.util.Optional<String> someNotRequired2, HttpRequest req, Principal principal, @Body Greeting myBody);
+
+    @Get("/test8{/pathVar1,pathVar2}")
+    String test8(String pathVar1, String pathVar2, String queryVar, @Nullable String name);
 }
 
 class Greeting {
@@ -526,6 +529,52 @@ class MyBean {}
         pathItem.post.requestBody.content['application/json'].schema.allOf[1].properties['someNotRequired'].nullable == true
         pathItem.post.requestBody.content['application/json'].schema.allOf[1].properties['someNotRequired2']
         pathItem.post.requestBody.content['application/json'].schema.allOf[1].properties['someNotRequired2'].nullable == true
+
+        when:
+        def pathItem1 = openAPI.paths.get("/test8")
+        def pathItem2 = openAPI.paths.get("/test8/{pathVar1}")
+        def pathItem3 = openAPI.paths.get("/test8/{pathVar1}/{pathVar2}")
+
+        then:
+        pathItem1.get.operationId == 'test8'
+        pathItem1.get.parameters
+        pathItem1.get.parameters.size() == 2
+        pathItem1.get.parameters[0].name == 'queryVar'
+        pathItem1.get.parameters[0].required
+        pathItem1.get.parameters[0].in == 'query'
+        pathItem1.get.parameters[1].name == 'name'
+        !pathItem1.get.parameters[1].required
+        pathItem1.get.parameters[1].in == 'query'
+
+        pathItem2.get.operationId == 'test8_1'
+        pathItem2.get.parameters
+        pathItem2.get.parameters.size() == 3
+
+        pathItem2.get.parameters[0].name == 'pathVar1'
+        pathItem2.get.parameters[0].required
+        pathItem2.get.parameters[0].in == 'path'
+        pathItem2.get.parameters[1].name == 'queryVar'
+        pathItem2.get.parameters[1].required
+        pathItem2.get.parameters[1].in == 'query'
+        pathItem2.get.parameters[2].name == 'name'
+        !pathItem2.get.parameters[2].required
+        pathItem2.get.parameters[2].in == 'query'
+
+        pathItem3.get.operationId == 'test8_2'
+        pathItem3.get.parameters
+        pathItem3.get.parameters.size() == 4
+        pathItem3.get.parameters[0].name == 'pathVar1'
+        pathItem3.get.parameters[0].required
+        pathItem3.get.parameters[0].in == 'path'
+        pathItem3.get.parameters[1].name == 'pathVar2'
+        pathItem3.get.parameters[1].required
+        pathItem3.get.parameters[1].in == 'path'
+        pathItem3.get.parameters[2].name == 'queryVar'
+        pathItem3.get.parameters[2].required
+        pathItem3.get.parameters[2].in == 'query'
+        pathItem3.get.parameters[3].name == 'name'
+        !pathItem3.get.parameters[3].required
+        pathItem3.get.parameters[3].in == 'query'
     }
 
     void "test @Parameter in header and explode is true"() {

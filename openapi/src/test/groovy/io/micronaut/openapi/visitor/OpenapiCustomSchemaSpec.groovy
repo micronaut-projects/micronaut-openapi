@@ -137,7 +137,6 @@ class MyBean {}
         Schema myJaxbElement2Schema = openAPI.components.schemas.MyJaxbElement2
         Schema myJaxbElement3Schema = openAPI.components.schemas.MyJaxbElement3
         Schema myJaxbElement4Schema = openAPI.components.schemas.MyJaxbElement4
-        Schema discountSchema = openAPI.components.schemas."MyJaxbElement4.Discount"
         Schema xmlElementSchema = openAPI.components.schemas.XmlElement
 
         then:
@@ -148,6 +147,7 @@ class MyBean {}
         myDtoSchema.properties.xmlElement.$ref == '#/components/schemas/MyJaxbElement_XmlElement_'
         myDtoSchema.properties.xmlElement2.$ref == '#/components/schemas/MyJaxbElement2'
         myDtoSchema.properties.xmlElement3.$ref == '#/components/schemas/MyJaxbElement3'
+        myDtoSchema.properties.xmlElement4.$ref == '#/components/schemas/MyJaxbElement4'
 
         myJaxbElementSchema
         myJaxbElementSchema.properties.type.type == 'string'
@@ -166,14 +166,12 @@ class MyBean {}
         myJaxbElement4Schema.properties.type.$ref
         myJaxbElement4Schema.properties.type.$ref == '#/components/schemas/MyJaxbElement4.DiscountTypeType'
 
-        myJaxbElement4Schema.properties.value.allOf
-        myJaxbElement4Schema.properties.value.allOf.size() == 2
-        myJaxbElement4Schema.properties.value.allOf.get(0).$ref == '#/components/schemas/MyJaxbElement4.Discount'
-        myJaxbElement4Schema.properties.value.allOf.get(1).oneOf
-        myJaxbElement4Schema.properties.value.allOf.get(1).oneOf.size() == 3
-        myJaxbElement4Schema.properties.value.allOf.get(1).oneOf.get(0).$ref == '#/components/schemas/MyJaxbElement4.DiscountSizeOpenApi'
-        myJaxbElement4Schema.properties.value.allOf.get(1).oneOf.get(1).$ref == '#/components/schemas/MyJaxbElement4.DiscountFixedOpenApi'
-        myJaxbElement4Schema.properties.value.allOf.get(1).oneOf.get(2).$ref == '#/components/schemas/MyJaxbElement4.MultiplierSizeOpenApi'
+        myJaxbElement4Schema.properties.value
+        myJaxbElement4Schema.properties.value.oneOf
+        myJaxbElement4Schema.properties.value.oneOf.size() == 3
+        myJaxbElement4Schema.properties.value.oneOf.get(0).$ref == '#/components/schemas/MyJaxbElement4.DiscountSizeOpenApi'
+        myJaxbElement4Schema.properties.value.oneOf.get(1).$ref == '#/components/schemas/MyJaxbElement4.DiscountFixedOpenApi'
+        myJaxbElement4Schema.properties.value.oneOf.get(2).$ref == '#/components/schemas/MyJaxbElement4.MultiplierSizeOpenApi'
 
         xmlElementSchema
         xmlElementSchema.properties.propStr.type == 'string'

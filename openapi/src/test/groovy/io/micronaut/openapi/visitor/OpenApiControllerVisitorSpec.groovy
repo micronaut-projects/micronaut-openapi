@@ -1001,7 +1001,7 @@ class MyController {
 class MyBean {}
 ''')
         when:
-        OpenAPI api = Utils.testReferenceAfterPlaceholders
+        OpenAPI api = Utils.testReference
 
         then:
         api.paths.size() == 2
@@ -1078,7 +1078,6 @@ class MyBean {}
 
         then:
         openAPI.components.schemas.size() == 1
-        openAPI.components.schemas['TestPojo'].name == 'TestPojo'
         openAPI.components.schemas['TestPojo'].type == 'object'
         openAPI.components.schemas['TestPojo'].properties.size() == 1
         openAPI.components.schemas['TestPojo'].properties['testString'].type == 'string'

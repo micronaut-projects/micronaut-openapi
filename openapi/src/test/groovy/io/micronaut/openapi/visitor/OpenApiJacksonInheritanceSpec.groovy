@@ -84,7 +84,7 @@ class Dog implements Pet {
 class MyBean {}
 ''')
 
-        OpenAPI openAPI = Utils.testReferenceAfterPlaceholders
+        OpenAPI openAPI = Utils.testReference
 
         expect:
         openAPI

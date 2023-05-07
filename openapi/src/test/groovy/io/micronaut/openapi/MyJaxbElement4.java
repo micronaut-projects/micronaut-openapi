@@ -4,7 +4,6 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
-import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 public class MyJaxbElement4 {
@@ -18,11 +17,7 @@ public class MyJaxbElement4 {
      * Discount data
      */
     @Schema(oneOf = {DiscountSizeOpenApi.class, DiscountFixedOpenApi.class, MultiplierSizeOpenApi.class})
-    public Discount value;
-
-    @Hidden
-    public interface Discount {
-    }
+    public Object value;
 
     /**
      * Discout type
@@ -37,7 +32,7 @@ public class MyJaxbElement4 {
     /**
      * Discount size
      */
-    public static class DiscountSizeOpenApi implements Discount {
+    public static class DiscountSizeOpenApi {
 
         /**
          * Value description
@@ -57,7 +52,7 @@ public class MyJaxbElement4 {
     /**
      * Discount fixed
      */
-    public static class DiscountFixedOpenApi implements Discount {
+    public static class DiscountFixedOpenApi {
 
         /**
          * Value description
@@ -76,7 +71,7 @@ public class MyJaxbElement4 {
     /**
      * Multiplier size
      */
-    public static class MultiplierSizeOpenApi implements Discount {
+    public static class MultiplierSizeOpenApi {
 
         /**
          * Value description

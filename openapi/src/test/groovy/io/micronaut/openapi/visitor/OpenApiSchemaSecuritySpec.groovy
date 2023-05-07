@@ -96,10 +96,10 @@ class MyDto {
 class MyBean {}
 ''')
         then:
-        Utils.testReferenceAfterPlaceholders != null
+        Utils.testReference != null
 
         when:
-        OpenAPI openAPI = Utils.testReferenceAfterPlaceholders
+        OpenAPI openAPI = Utils.testReference
         Schema myDtoSchema = openAPI.components.schemas.MyDto
         SecurityScheme secSchema = openAPI.components.securitySchemes."my-schema"
 
@@ -218,10 +218,10 @@ class MyDto {
 class MyBean {}
 ''')
         then:
-        Utils.testReferenceAfterPlaceholders != null
+        Utils.testReference != null
 
         when:
-        OpenAPI openAPI = Utils.testReferenceAfterPlaceholders
+        OpenAPI openAPI = Utils.testReference
         Schema myDtoSchema = openAPI.components.schemas.MyDto
         SecurityScheme secSchema = openAPI.components.securitySchemes."Authorization"
 
@@ -341,10 +341,10 @@ class MyDto {
 class MyBean {}
 ''')
         then:
-        Utils.testReferenceAfterPlaceholders != null
+        Utils.testReference != null
 
         when:
-        OpenAPI openAPI = Utils.testReferenceAfterPlaceholders
+        OpenAPI openAPI = Utils.testReference
         Schema myDtoSchema = openAPI.components.schemas.MyDto
         SecurityScheme secSchema = openAPI.components.securitySchemes."customSchema"
 
@@ -465,10 +465,10 @@ class MyDto {
 class MyBean {}
 ''')
         then:
-        Utils.testReferenceAfterPlaceholders != null
+        Utils.testReference != null
 
         when:
-        OpenAPI openAPI = Utils.testReferenceAfterPlaceholders
+        OpenAPI openAPI = Utils.testReference
         Schema myDtoSchema = openAPI.components.schemas.MyDto
         SecurityScheme secSchema = openAPI.components.securitySchemes."Authorization"
 
