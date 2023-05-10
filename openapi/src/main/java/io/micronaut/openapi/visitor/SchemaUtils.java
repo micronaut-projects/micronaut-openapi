@@ -18,6 +18,7 @@ package io.micronaut.openapi.visitor;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import io.micronaut.core.annotation.Internal;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.media.ArraySchema;
@@ -32,6 +33,7 @@ import static io.swagger.v3.oas.models.Components.COMPONENTS_SCHEMAS_REF;
  *
  * @since 4.5.0
  */
+@Internal
 public final class SchemaUtils {
 
     public static final Schema<?> EMPTY_SCHEMA = new Schema<>();

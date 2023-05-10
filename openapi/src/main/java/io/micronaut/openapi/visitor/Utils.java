@@ -26,6 +26,7 @@ import java.util.Optional;
 
 import io.micronaut.context.env.DefaultPropertyPlaceholderResolver;
 import io.micronaut.context.env.PropertyPlaceholderResolver;
+import io.micronaut.core.annotation.Internal;
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.core.annotation.Nullable;
 import io.micronaut.core.convert.ArgumentConversionContext;
@@ -42,6 +43,7 @@ import io.swagger.v3.oas.models.OpenAPI;
  *
  * @since 4.4.0
  */
+@Internal
 public final class Utils {
 
     public static final String PLACEHOLDER_PREFIX = "${";

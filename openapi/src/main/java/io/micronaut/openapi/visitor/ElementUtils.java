@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.Future;
 
+import io.micronaut.core.annotation.Internal;
 import io.micronaut.core.annotation.Nullable;
 import io.micronaut.inject.ast.ClassElement;
 import io.micronaut.inject.ast.TypedElement;
@@ -32,6 +33,7 @@ import io.micronaut.inject.ast.TypedElement;
  *
  * @since 4.8.3
  */
+@Internal
 public final class ElementUtils {
 
     public static final List<String> CONTAINER_TYPES = Arrays.asList(
@@ -128,7 +130,9 @@ public final class ElementUtils {
      * @return true if this type assignable with known container and type argument is void
      */
     public static boolean isReactiveAndVoid(ClassElement type) {
-        return isContainerType(type) && type.getFirstTypeArgument().isPresent() && isVoid(type.getFirstTypeArgument().get());
+        return type.isAssignable("io.reactivex.Completable")
+            || type.isAssignable("io.reactivex.rxjava3.core.Completable")
+            || (isContainerType(type) && type.getFirstTypeArgument().isPresent() && isVoid(type.getFirstTypeArgument().get()));
     }
 
     private static boolean findAnyAssignable(ClassElement type, List<String> typeNames) {

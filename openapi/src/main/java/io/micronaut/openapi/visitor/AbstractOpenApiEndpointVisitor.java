@@ -1530,7 +1530,9 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
     }
 
     private boolean isSingleResponseType(ClassElement returnType) {
-        return (returnType.isAssignable("io.reactivex.Single") || returnType.isAssignable("org.reactivestreams.Publisher"))
+        return (returnType.isAssignable("io.reactivex.Single")
+            || returnType.isAssignable("io.reactivex.rxjava3.core.Single")
+            || returnType.isAssignable("org.reactivestreams.Publisher"))
             && returnType.getFirstTypeArgument().isPresent()
             && isResponseType(returnType.getFirstTypeArgument().get());
     }

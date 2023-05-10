@@ -15,6 +15,7 @@
  */
 package io.micronaut.openapi.visitor;
 
+import io.micronaut.core.annotation.Internal;
 import io.micronaut.inject.visitor.VisitorContext;
 
 /**
@@ -22,6 +23,7 @@ import io.micronaut.inject.visitor.VisitorContext;
  *
  * @since 4.5.0
  */
+@Internal
 public final class ContextUtils {
 
     private ContextUtils() {
