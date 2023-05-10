@@ -852,9 +852,11 @@ abstract class AbstractOpenApiVisitor {
                     .flatMap(ClassElement::getFirstTypeArgument)
                     .orElse(null);
                 // StreamingFileUpload implements Publisher, but it should be not considered as a Publisher in the spec file
-            } else if (!type.isAssignable("io.micronaut.http.multipart.StreamingFileUpload") && Utils.isContainerType(type)) {
-                isPublisher = type.isAssignable("org.reactivestreams.Publisher") && !type.isAssignable("reactor.core.publisher.Mono");
-                isObservable = type.isAssignable("io.reactivex.Observable") && !type.isAssignable("reactor.core.publisher.Mono");
+            } else if (!type.isAssignable("io.micronaut.http.multipart.StreamingFileUpload") && ElementUtils.isContainerType(type)) {
+                isPublisher = (type.isAssignable("org.reactivestreams.Publisher") || type.isAssignable("kotlinx.coroutines.flow.Flow"))
+                    && !type.isAssignable("reactor.core.publisher.Mono");
+                isObservable = (type.isAssignable("io.reactivex.Observable") || type.isAssignable("io.reactivex.rxjava3.core.Observable"))
+                    && !type.isAssignable("reactor.core.publisher.Mono");
                 type = componentType;
                 if (componentType != null) {
                     typeArgs = componentType.getTypeArguments();
@@ -922,7 +924,7 @@ abstract class AbstractOpenApiVisitor {
                             schema = getSchemaDefinition(openAPI, context, type, typeArgs, definingElement, mediaTypes);
                         }
                     }
-                } else if (Utils.isReturnTypeFile(type)) {
+                } else if (ElementUtils.isReturnTypeFile(type)) {
                     schema = PrimitiveType.FILE.createProperty();
                 } else if (type.isAssignable(Boolean.class) || type.isAssignable(boolean.class)) {
                     schema = PrimitiveType.BOOLEAN.createProperty();
@@ -1256,7 +1258,7 @@ abstract class AbstractOpenApiVisitor {
         }
         // @Schema annotation takes priority over nullability annotations
         Boolean isSchemaNullable = element.booleanValue(io.swagger.v3.oas.annotations.media.Schema.class, "nullable").orElse(null);
-        boolean isNullable = (isSchemaNullable == null && TypeElementUtils.isNullable(element)) || Boolean.TRUE.equals(isSchemaNullable);
+        boolean isNullable = (isSchemaNullable == null && ElementUtils.isNullable(element)) || Boolean.TRUE.equals(isSchemaNullable);
         if (isNullable) {
             topLevelSchema.setNullable(true);
             notOnlyRef = true;

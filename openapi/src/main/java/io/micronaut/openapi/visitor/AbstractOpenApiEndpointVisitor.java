@@ -32,7 +32,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import io.micronaut.core.annotation.AnnotationValue;
 import io.micronaut.core.beans.BeanMap;
@@ -110,7 +109,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.getSecurityProperties;
 import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.isOpenApiEnabled;
 import static io.micronaut.openapi.visitor.SchemaUtils.TYPE_OBJECT;
-import static io.micronaut.openapi.visitor.TypeElementUtils.isNullable;
+import static io.micronaut.openapi.visitor.ElementUtils.isNullable;
 import static io.micronaut.openapi.visitor.Utils.DEFAULT_MEDIA_TYPES;
 
 /**
@@ -1113,7 +1112,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
     private ClassElement returnType(MethodElement element, VisitorContext context) {
         ClassElement returnType = element.getGenericReturnType();
 
-        if (isVoid(returnType) || isReactiveAndVoid(returnType)) {
+        if (ElementUtils.isVoid(returnType) || ElementUtils.isReactiveAndVoid(returnType)) {
             returnType = null;
         } else if (isResponseType(returnType)) {
             returnType = returnType.getFirstTypeArgument().orElse(returnType);
@@ -1526,25 +1525,14 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
     }
 
     private boolean isResponseType(ClassElement returnType) {
-        return returnType.isAssignable(HttpResponse.class) || returnType.isAssignable("org.springframework.http.HttpEntity");
+        return returnType.isAssignable(HttpResponse.class)
+            || returnType.isAssignable("org.springframework.http.HttpEntity");
     }
 
     private boolean isSingleResponseType(ClassElement returnType) {
-        boolean assignable = returnType.isAssignable("io.reactivex.Single") ||
-            returnType.isAssignable("org.reactivestreams.Publisher");
-        return assignable
+        return (returnType.isAssignable("io.reactivex.Single") || returnType.isAssignable("org.reactivestreams.Publisher"))
             && returnType.getFirstTypeArgument().isPresent()
             && isResponseType(returnType.getFirstTypeArgument().get());
-    }
-
-    private boolean isVoid(ClassElement returnType) {
-        return returnType.isAssignable(void.class) || returnType.isAssignable(Void.class) || returnType.isAssignable("kotlin.Unit");
-    }
-
-    private boolean isReactiveAndVoid(ClassElement returnType) {
-        return returnType.isAssignable("io.reactivex.Completable") ||
-            Stream.of("reactor.core.publisher.Mono", "reactor.core.publisher.Flux", "io.reactivex.Flowable", "io.reactivex.Maybe")
-                .anyMatch(t -> returnType.isAssignable(t) && returnType.getFirstTypeArgument().isPresent() && isVoid(returnType.getFirstTypeArgument().get()));
     }
 
     private io.swagger.v3.oas.models.Operation getOperationOnPathItem(PathItem pathItem, HttpMethod httpMethod) {
@@ -1759,8 +1747,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
     private void processUrlCallbackExpression(VisitorContext context,
                                               io.swagger.v3.oas.models.Operation swaggerOperation, AnnotationValue<Callback> callbackAnn,
                                               String callbackName, final String callbackUrl) {
-        final List<AnnotationValue<Operation>> operations = callbackAnn.getAnnotations("operation",
-            Operation.class);
+        final List<AnnotationValue<Operation>> operations = callbackAnn.getAnnotations("operation", Operation.class);
         if (CollectionUtils.isEmpty(operations)) {
             Map<String, io.swagger.v3.oas.models.callbacks.Callback> callbacks = initCallbacks(
                 swaggerOperation);
