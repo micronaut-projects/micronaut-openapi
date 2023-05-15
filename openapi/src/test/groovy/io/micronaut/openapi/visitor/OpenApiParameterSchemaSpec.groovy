@@ -17,7 +17,7 @@ import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
 import io.micronaut.http.annotation.Patch;import io.micronaut.http.annotation.Post;
 import io.micronaut.http.annotation.Put;
-import io.swagger.v3.oas.annotations.Parameter;
+import io.micronaut.http.annotation.QueryValue;import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.Period;
@@ -28,19 +28,19 @@ class OpenApiController {
 
     @Get
     public HttpResponse<String> processSync(
-            @Parameter(schema = @Schema(implementation = String.class)) Optional<Period> period) {
+            @Parameter(schema = @Schema(implementation = String.class)) @QueryValue Optional<Period> period) {
         return HttpResponse.ok();
     }
 
     @Post
     public HttpResponse<String> processSync2(
-            @Parameter(ref = "#/components/parameters/MyParam") Optional<Period> period) {
+            @Parameter(schema = @Schema(minLength = 10, maxLength = 20)) @QueryValue Optional<Period> period) {
         return HttpResponse.ok();
     }
 
     @Put
     public HttpResponse<String> processSync3(
-            @Parameter(schema = @Schema(ref = "#/components/schemas/MyParamSchema")) Optional<Period> period) {
+            @Parameter(schema = @Schema(ref = "#/components/schemas/MyParamSchema")) @QueryValue Optional<Period> period) {
         return HttpResponse.ok();
     }
 }
@@ -56,7 +56,6 @@ class MyBean {}
         Operation operation = openAPI.paths."/path".get
         Operation operationPost = openAPI.paths."/path".post
         Operation operationPut = openAPI.paths."/path".put
-        Operation operationPatch = openAPI.paths."/path".patch
 
         then:
         operation
@@ -67,7 +66,9 @@ class MyBean {}
         operation.parameters[0].schema
         operation.parameters[0].schema.type == "string"
 
-        operationPost.parameters[0].get$ref() == "#/components/parameters/MyParam"
+        operationPost.parameters[0].schema
+        operationPost.parameters[0].schema.minLength == 10
+        operationPost.parameters[0].schema.maxLength == 20
 
         operationPut.parameters[0].schema.allOf.get(0).get$ref() == "#/components/schemas/MyParamSchema"
     }
@@ -80,20 +81,16 @@ package test;
 
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.annotation.Controller;
-import io.micronaut.http.annotation.Get;
-import io.micronaut.http.annotation.Patch;import io.micronaut.http.annotation.Post;
-import io.micronaut.http.annotation.Put;
+import io.micronaut.http.annotation.Patch;
+import io.micronaut.http.annotation.QueryValue;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
-
-import java.time.Period;
-import java.util.Optional;
 
 @Controller("/path")
 class OpenApiController {
 
     @Patch
-    public HttpResponse<String> processSync4(@Parameter(schema = @Schema(type = "string", format = "uuid")) String param) {
+    public HttpResponse<String> processSync4(@Parameter(schema = @Schema(type = "string", format = "uuid")) @QueryValue String param) {
         return HttpResponse.ok();
     }
 }

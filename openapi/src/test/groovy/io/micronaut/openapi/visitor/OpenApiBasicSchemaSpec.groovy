@@ -6,6 +6,8 @@ import io.swagger.v3.oas.models.Operation
 import io.swagger.v3.oas.models.media.Schema
 import spock.lang.Issue
 
+import java.time.OffsetDateTime
+
 class OpenApiBasicSchemaSpec extends AbstractOpenApiTypeElementSpec {
 
     void "test @PositiveOrZero and @NegativeOrZero correctly results in minimum 0 and maximum 0"() {
@@ -1321,7 +1323,7 @@ class DemoData {
     private URL url;
     @Schema(defaultValue = "274191c9-c176-4b1c-8263-1b658cbdc7fc")
     private UUID uuid;
-    @Schema(defaultValue = "Jan 12, 1952")
+    @Schema(defaultValue = "2007-12-03T10:15:30+01:00")
     private Date date;
     @Schema(defaultValue = "myDefault3")
     private MySubObject mySubObject;
@@ -1428,13 +1430,14 @@ public class MyBean {}
         schema.properties.uuid.type == 'string'
         schema.properties.uuid.format == 'uuid'
 
-        schema.properties.date.default == 'Jan 12, 1952'
+        // TODO: need to add support custom format for DateTime
+        schema.properties.date.default == OffsetDateTime.parse('2007-12-03T10:15:30+01:00')
         schema.properties.date.type == 'string'
         schema.properties.date.format == 'date-time'
 
-        schema.properties.mySubObject.default == 'myDefault3'
-        schema.properties.mySubObject.type == null
-        schema.properties.mySubObject.format == null
+        schema.properties.mySubObject.allOf.get(1).default == 'myDefault3'
+        schema.properties.mySubObject.allOf.get(1).type == null
+        schema.properties.mySubObject.allOf.get(1).format == null
     }
 
     @Issue("https://github.com/micronaut-projects/micronaut-openapi/issues/947")

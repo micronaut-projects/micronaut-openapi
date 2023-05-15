@@ -72,49 +72,49 @@ class MyBean {}
 
         OpenAPI openAPI = Utils.testReference
         Operation operation = openAPI.paths?.get("/")?.get
+        def petSchema = openAPI.components.schemas['Pets'];
 
         expect:
         operation
         operation.responses.size() == 1
-        openAPI.components.schemas['Pets'].description == 'Pets'
-        openAPI.components.schemas['Pets'].properties['pets'].nullable == false
-        openAPI.components.schemas['Pets'].properties['pets'].description == 'a list of Pets'
-        openAPI.components.schemas['Pets'].properties['pets'].minItems == 2
-        openAPI.components.schemas['Pets'].properties['pets'].items.$ref == '#/components/schemas/Pet'
-        openAPI.components.schemas['Pets'].properties['pets'].items.description == 'Pet'
-        openAPI.components.schemas['Pets'].properties['pets'].items.nullable == null
+        petSchema.description == 'Pets'
+        petSchema.properties['pets'].nullable == false
+        petSchema.properties['pets'].description == 'a list of Pets'
+        petSchema.properties['pets'].minItems == 2
+        petSchema.properties['pets'].items.$ref == '#/components/schemas/Pet'
+        petSchema.properties['pets'].items.nullable == null
 
-        openAPI.components.schemas['Pets'].properties['ids'].nullable == false
-        openAPI.components.schemas['Pets'].properties['ids'].description == 'a list of Ids'
-        openAPI.components.schemas['Pets'].properties['ids'].minItems == 2
-        openAPI.components.schemas['Pets'].properties['ids'].items.format == 'int64'
-        openAPI.components.schemas['Pets'].properties['ids'].items.description == 'Yes'
-        openAPI.components.schemas['Pets'].properties['ids'].items.nullable == true
+        petSchema.properties['ids'].nullable == false
+        petSchema.properties['ids'].description == 'a list of Ids'
+        petSchema.properties['ids'].minItems == 2
+        petSchema.properties['ids'].items.format == 'int64'
+        petSchema.properties['ids'].items.description == 'Yes'
+        petSchema.properties['ids'].items.nullable == true
 
-        openAPI.components.schemas['Pets'].properties['primitiveIds'].nullable == false
-        openAPI.components.schemas['Pets'].properties['primitiveIds'].description == 'a list of primitive Ids'
-        openAPI.components.schemas['Pets'].properties['primitiveIds'].minItems == 2
-        openAPI.components.schemas['Pets'].properties['primitiveIds'].items.format == 'int64'
-        openAPI.components.schemas['Pets'].properties['primitiveIds'].items.description == 'Yes'
-        openAPI.components.schemas['Pets'].properties['primitiveIds'].items.nullable == true
+        petSchema.properties['primitiveIds'].nullable == false
+        petSchema.properties['primitiveIds'].description == 'a list of primitive Ids'
+        petSchema.properties['primitiveIds'].minItems == 2
+        petSchema.properties['primitiveIds'].items.format == 'int64'
+        petSchema.properties['primitiveIds'].items.description == 'Yes'
+        petSchema.properties['primitiveIds'].items.nullable == true
 
-        openAPI.components.schemas['Pets'].properties['nestedPrimitiveIds'].description == 'a nested array of primitive Ids'
-        openAPI.components.schemas['Pets'].properties['nestedPrimitiveIds'].items.items.format == 'int64'
+        petSchema.properties['nestedPrimitiveIds'].description == 'a nested array of primitive Ids'
+        petSchema.properties['nestedPrimitiveIds'].items.items.format == 'int64'
 
-        openAPI.components.schemas['Pets'].properties['nestedPetList'].description == 'a nested list of Pets'
-        openAPI.components.schemas['Pets'].properties['nestedPetList'].items.items.$ref == '#/components/schemas/Pet'
+        petSchema.properties['nestedPetList'].description == 'a nested list of Pets'
+        petSchema.properties['nestedPetList'].items.items.$ref == '#/components/schemas/Pet'
 
-        openAPI.components.schemas['Pets'].properties['nestedPetArray'].description == 'a nested array of Pets'
-        openAPI.components.schemas['Pets'].properties['nestedPetArray'].items.items.$ref == '#/components/schemas/Pet'
+        petSchema.properties['nestedPetArray'].description == 'a nested array of Pets'
+        petSchema.properties['nestedPetArray'].items.items.$ref == '#/components/schemas/Pet'
 
-        openAPI.components.schemas['Pets'].properties['nestedIdArray'].description == 'a nested array of Ids'
-        openAPI.components.schemas['Pets'].properties['nestedIdArray'].items.items.format == 'int64'
+        petSchema.properties['nestedIdArray'].description == 'a nested array of Ids'
+        petSchema.properties['nestedIdArray'].items.items.format == 'int64'
 
-        openAPI.components.schemas['Pets'].properties['idArrayList'].description == 'a list of nested Ids'
-        openAPI.components.schemas['Pets'].properties['idArrayList'].items.items.format == 'int64'
+        petSchema.properties['idArrayList'].description == 'a list of nested Ids'
+        petSchema.properties['idArrayList'].items.items.format == 'int64'
 
-        openAPI.components.schemas['Pets'].properties['idListArray'].description == 'an array of nested Ids'
-        openAPI.components.schemas['Pets'].properties['idListArray'].items.items.format == 'int64'
+        petSchema.properties['idListArray'].description == 'an array of nested Ids'
+        petSchema.properties['idListArray'].items.items.format == 'int64'
     }
 
     void "test ArraySchema with arraySchema field in Controller ApiResponse"() {

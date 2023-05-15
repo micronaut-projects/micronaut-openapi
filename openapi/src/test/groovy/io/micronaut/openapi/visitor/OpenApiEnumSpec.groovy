@@ -642,10 +642,10 @@ enum Type2 {
 class MyBean {}
 ''')
         then: "the state is correct"
-        Utils.testReferenceAfterPlaceholders != null
+        Utils.testReference != null
 
         when: "The OpenAPI is retrieved"
-        OpenAPI openAPI = Utils.testReferenceAfterPlaceholders
+        OpenAPI openAPI = Utils.testReference
 
         then: "the state is correct"
         openAPI.components
@@ -774,10 +774,10 @@ enum Type2 {
 class MyBean {}
 ''')
         then: "the state is correct"
-        Utils.testReferenceAfterPlaceholders != null
+        Utils.testReference != null
 
         when: "The OpenAPI is retrieved"
-        OpenAPI openAPI = Utils.testReferenceAfterPlaceholders
+        OpenAPI openAPI = Utils.testReference
 
         then: "the state is correct"
         openAPI.components
@@ -863,10 +863,10 @@ enum BackupFrequencyExDto {
 class MyBean {}
 ''')
         then: "the state is correct"
-        Utils.testReferenceAfterPlaceholders != null
+        Utils.testReference != null
 
         when: "The OpenAPI is retrieved"
-        OpenAPI openAPI = Utils.testReferenceAfterPlaceholders
+        OpenAPI openAPI = Utils.testReference
 
         then: "the state is correct"
         openAPI.components

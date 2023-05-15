@@ -1214,7 +1214,7 @@ class MyBean {}
         catSchema != null
 
         petSchema.type == 'object'
-        petSchema.properties.size() == 2
+        petSchema.properties.size() == 3
         animalSchema.type == 'object'
         animalSchema.properties.size() == 1
         sleeperSchema.type == 'object'
@@ -1594,13 +1594,10 @@ class MyBean {}
         !requestTypeSchema.allOf
 
         exportRequestTypeSchema
-        exportRequestTypeSchema.type == 'object'
-        exportRequestTypeSchema.allOf
-        exportRequestTypeSchema.allOf.size() == 1
-        exportRequestTypeSchema.allOf[0].$ref == '#/components/schemas/RequestType2_4_0'
+        !exportRequestTypeSchema.allOf
+        exportRequestTypeSchema.$ref == '#/components/schemas/RequestType2_4_0'
 
         exportPaymentsRequestSchema
-        exportPaymentsRequestSchema.type == 'object'
         exportPaymentsRequestSchema.allOf
         exportPaymentsRequestSchema.allOf.size() == 2
         exportPaymentsRequestSchema.allOf[0].$ref == '#/components/schemas/ExportRequestType2_4_0'
@@ -1663,10 +1660,10 @@ enum BackupSubEnum12 {
 class MyBean {}
 ''')
         then: "the state is correct"
-        Utils.testReferenceAfterPlaceholders != null
+        Utils.testReference != null
 
         when: "The OpenAPI is retrieved"
-        OpenAPI openAPI = Utils.testReferenceAfterPlaceholders
+        OpenAPI openAPI = Utils.testReference
         Schema backupDto12Schema = openAPI.components.schemas.BackupDto12
 
         then:

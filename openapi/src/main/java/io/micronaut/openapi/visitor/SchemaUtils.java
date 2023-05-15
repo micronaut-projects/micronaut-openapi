@@ -21,6 +21,7 @@ import java.util.Map;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.media.ArraySchema;
+import io.swagger.v3.oas.models.media.ComposedSchema;
 import io.swagger.v3.oas.models.media.Schema;
 
 import static io.micronaut.openapi.visitor.Utils.resolveComponents;
@@ -33,6 +34,9 @@ import static io.swagger.v3.oas.models.Components.COMPONENTS_SCHEMAS_REF;
  */
 public final class SchemaUtils {
 
+    public static final Schema<?> EMPTY_SCHEMA = new Schema<>();
+    public static final Schema<?> EMPTY_SIMPLE_SCHEMA = new SimpleSchema();
+    public static final Schema<?> EMPTY_COMPOSED_SCHEMA = new ComposedSchema();
     public static final String TYPE_OBJECT = "object";
 
     private SchemaUtils() {

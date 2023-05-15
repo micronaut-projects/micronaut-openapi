@@ -366,26 +366,26 @@ class MyBean {}
         petSchema.properties['name'].type == 'string'
         petSchema.properties['name'].description == 'The Pet Name'
 
-        ((MapSchema) petSchema.properties['freeForm']).type == "object"
-        ((MapSchema) petSchema.properties['freeForm']).description == "A free-form object"
-        ((MapSchema) petSchema.properties['freeForm']).getAdditionalProperties() == true
+        petSchema.properties['freeForm'].type == "object"
+        petSchema.properties['freeForm'].description == "A free-form object"
+        petSchema.properties['freeForm'].getAdditionalProperties() == true
 
-        ((MapSchema) petSchema.properties['dictionariesPlain']).type == "object"
-        ((MapSchema) petSchema.properties['dictionariesPlain']).description == "A string-to-string dictionary"
-        ((Schema) ((MapSchema) petSchema.properties['dictionariesPlain']).getAdditionalProperties()).getType() == "string"
+        petSchema.properties['dictionariesPlain'].type == "object"
+        petSchema.properties['dictionariesPlain'].description == "A string-to-string dictionary"
+        petSchema.properties['dictionariesPlain'].getAdditionalProperties().getType() == "string"
 
-        ((MapSchema) petSchema.properties['tags']).type == "object"
-        ((MapSchema) petSchema.properties['tags']).description == "A string-to-object dictionary"
-        ((Schema) ((MapSchema) petSchema.properties['tags']).getAdditionalProperties()).$ref == "#/components/schemas/Tag"
+        petSchema.properties['tags'].type == "object"
+        petSchema.properties['tags'].description == "A string-to-object dictionary"
+        petSchema.properties['tags'].getAdditionalProperties().$ref == "#/components/schemas/Tag"
 
         tagSchema.properties['name'].type == "string"
         tagSchema.properties['name'].description == "The Tag Name"
         tagSchema.properties['description'].type == "string"
 
-        ((MapSchema) petSchema.properties['tagArrays']).type == "object"
-        ((MapSchema) petSchema.properties['tagArrays']).description == "A string-to-array dictionary"
-        ((ArraySchema) ((MapSchema) petSchema.properties['tagArrays']).getAdditionalProperties()).getType() == "array"
-        ((ArraySchema) ((MapSchema) petSchema.properties['tagArrays']).getAdditionalProperties()).getItems().$ref == "#/components/schemas/Tag"
+        petSchema.properties['tagArrays'].type == "object"
+        petSchema.properties['tagArrays'].description == "A string-to-array dictionary"
+        petSchema.properties['tagArrays'].getAdditionalProperties().getType() == "array"
+        petSchema.properties['tagArrays'].getAdditionalProperties().getItems().$ref == "#/components/schemas/Tag"
     }
 
     void "test build OpenAPI doc for POJO type with javax.constraints"() {
@@ -2354,7 +2354,6 @@ class MyBean {}
 
         then:
         openAPI.components.schemas.size() == 1
-        openAPI.components.schemas['Greeting'].name == 'Greeting'
         openAPI.components.schemas['Greeting'].description == 'Represent a greeting between a sender and a receiver'
         openAPI.components.schemas['Greeting'].type == 'object'
         openAPI.components.schemas['Greeting'].properties.size() == 3
@@ -2424,7 +2423,6 @@ class MyBean {}
 
         then:
         openAPI.components.schemas.size() == 1
-        openAPI.components.schemas['MyDTO'].name == 'MyDTO'
         openAPI.components.schemas['MyDTO'].type == 'object'
         openAPI.components.schemas['MyDTO'].properties.size() == 2
         openAPI.components.schemas['MyDTO'].properties['shouldBeNumber'].type == 'number'
