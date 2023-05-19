@@ -1,5 +1,30 @@
 [
   {
+    "type": "io.micronaut.openapi.visitor.OpenApiApplicationVisitor",
+    "member": "Field MICRONAUT_OPENAPI_ENABLED",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.visitor.OpenApiApplicationVisitor",
+    "member": "Field MICRONAUT_OPENAPI_SECURITY_DEFAULT_SCHEMA_NAME",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.visitor.OpenApiApplicationVisitor",
+    "member": "Field MICRONAUT_OPENAPI_SECURITY_ENABLED",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.visitor.SimpleSchema",
+    "member": "Constructor io.micronaut.openapi.visitor.SimpleSchema()",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
+    "type": "io.micronaut.openapi.visitor.SchemaUtils",
+    "member": "Field TYPE_OBJECT",
+    "reason": "Major update for Micronaut 4.0.0"
+  },
+  {
     "type": "io.micronaut.openapi.visitor.VisibilityLevel",
     "member": "Field PACKAGE",
     "reason": "Major update for Micronaut 4.0.0"
