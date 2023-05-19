@@ -21,7 +21,6 @@ dependencies {
     api(libs.managed.jsoup)
 
     testImplementation(mn.micronaut.management)
-    testImplementation(mn.micronaut.runtime)
     testImplementation(mn.micronaut.inject.groovy.test)
     testImplementation(mn.micronaut.inject.java.test)
     testImplementation(mn.snakeyaml)

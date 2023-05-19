@@ -4,12 +4,6 @@ plugins {
 
 repositories {
     mavenCentral()
-    maven {
-        url "https://s01.oss.sonatype.org/content/repositories/snapshots/"
-        mavenContent {
-            snapshotsOnly()
-        }
-    }
 }
 
 dependencies {
@@ -18,16 +12,16 @@ dependencies {
 
     testCompileOnly(mn.micronaut.inject.java)
 
+    testImplementation(mn.micronaut.http)
     testImplementation projects.micronautOpenapi
     testImplementation(mn.snakeyaml)
-    testImplementation(mn.micronaut.runtime)
     testImplementation(mn.reactor)
     testImplementation(mnValidation.validation)
     testImplementation(libs.managed.swagger.annotations)
     testImplementation(mnTest.micronaut.test.junit5)
 
     testRuntimeOnly(libs.junit.jupiter.engine)
-    testRuntimeOnly(mn.logback.classic)
+    testRuntimeOnly(mnLogging.logback.classic)
 }
 
 compileJava.options.compilerArgs += '-parameters'

@@ -11,17 +11,19 @@ jdt-annotation = "2.2.700"
 android-annotation = "1.6.0"
 spotbugs-annotations = "4.7.3"
 
-micronaut-security = "4.0.0-M1"
-micronaut-serde = "2.0.0-M1"
+micronaut-security = "4.0.0-M3"
+micronaut-serde = "2.0.0-M7"
 micronaut-rxjava2 = "2.0.0-M1"
 micronaut-rxjava3 = "3.0.0-M1"
 micronaut-groovy = "4.0.0-M1"
-micronaut-validation = "4.0.0-M4"
-micronaut-data = "4.0.0-M1"
-micronaut-test = "4.0.0-M1"
-micronaut-kotlin = "4.0.0-M1"
+micronaut-validation = "4.0.0-M7"
+micronaut-data = "4.0.0-M4"
+micronaut-test = "4.0.0-M4"
+micronaut-kotlin = "4.0.0-M2"
 
+micronaut-logging = "1.0.0-M2"
 [libraries]
+micronaut-logging = { module = "io.micronaut.logging:micronaut-logging-bom", version.ref = "micronaut-logging" }
 
 micronaut-security = { module = "io.micronaut.security:micronaut-security-bom", version.ref = "micronaut-security" }
 micronaut-serde = { module = "io.micronaut.serde:micronaut-serde-bom", version.ref = "micronaut-serde" }

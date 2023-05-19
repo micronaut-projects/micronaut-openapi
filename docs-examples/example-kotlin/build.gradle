@@ -8,12 +8,6 @@ plugins {
 
 repositories {
     mavenCentral()
-    maven {
-        url "https://s01.oss.sonatype.org/content/repositories/snapshots/"
-        mavenContent {
-            snapshotsOnly()
-        }
-    }
 }
 
 dependencies {
@@ -23,10 +17,10 @@ dependencies {
 
     kaptTest(mn.micronaut.inject.java)
 
+    testImplementation(mn.micronaut.http)
     testImplementation(libs.managed.swagger.annotations)
     testImplementation(mn.reactor)
     testImplementation(mn.snakeyaml)
-    testImplementation(mn.micronaut.runtime)
     testImplementation(mnValidation.validation)
     testImplementation(libs.kotlin.stdlib.jdk8)
     testImplementation(libs.kotlin.reflect)
@@ -35,7 +29,7 @@ dependencies {
     testCompileOnly(mn.micronaut.inject.java)
 
     testRuntimeOnly(libs.junit.jupiter.engine)
-    testRuntimeOnly(mn.logback.classic)
+    testRuntimeOnly(mnLogging.logback.classic)
 }
 
 test {
