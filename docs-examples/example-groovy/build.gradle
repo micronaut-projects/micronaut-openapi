@@ -4,11 +4,6 @@ plugins {
 
 repositories {
     mavenCentral()
-    maven {
-        mavenContent {
-            snapshotsOnly()
-        }
-    }
 }
 
 dependencies {

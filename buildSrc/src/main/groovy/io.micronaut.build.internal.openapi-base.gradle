@@ -1,10 +1,5 @@
 repositories {
     mavenCentral()
-    maven {
-        mavenContent {
-            snapshotsOnly()
-        }
-    }
 }
 
 tasks.withType(Test) {
