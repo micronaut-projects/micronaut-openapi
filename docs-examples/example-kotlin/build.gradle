@@ -17,10 +17,10 @@ dependencies {
 
     kaptTest(mn.micronaut.inject.java)
 
+    testImplementation(mn.micronaut.http)
     testImplementation(libs.managed.swagger.annotations)
     testImplementation(mn.reactor)
     testImplementation(mn.snakeyaml)
-    testImplementation(mn.micronaut.runtime)
     testImplementation(mnValidation.validation)
     testImplementation(libs.kotlin.stdlib.jdk8)
     testImplementation(libs.kotlin.reflect)
