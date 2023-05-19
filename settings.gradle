@@ -27,6 +27,7 @@ dependencyResolutionManagement {
 }
 
 micronautBuild {
+    importMicronautCatalog("micronaut-logging")
     useStandardizedProjectNames = true
     importMicronautCatalog()
     importMicronautCatalog("micronaut-security")

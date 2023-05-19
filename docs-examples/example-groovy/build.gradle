@@ -21,7 +21,7 @@ dependencies {
     testImplementation(mn.reactor)
     testImplementation(mnTest.micronaut.test.spock)
 
-    testRuntimeOnly(mn.logback.classic)
+    testRuntimeOnly(mnLogging.logback.classic)
 }
 
 

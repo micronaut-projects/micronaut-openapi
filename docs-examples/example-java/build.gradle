@@ -21,7 +21,7 @@ dependencies {
     testImplementation(mnTest.micronaut.test.junit5)
 
     testRuntimeOnly(libs.junit.jupiter.engine)
-    testRuntimeOnly(mn.logback.classic)
+    testRuntimeOnly(mnLogging.logback.classic)
 }
 
 compileJava.options.compilerArgs += '-parameters'
