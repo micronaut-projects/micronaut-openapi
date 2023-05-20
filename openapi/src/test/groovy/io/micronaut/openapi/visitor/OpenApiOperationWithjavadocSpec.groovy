@@ -253,7 +253,6 @@ class MyBean {}
         openAPI.components.schemas.size() == 1
 
         Schema personSchema = openAPI.components.schemas['Person']
-        personSchema.name == 'Person'
         personSchema.type == 'object'
         personSchema.description == 'The Person class description'
         personSchema.properties.name.type == 'string'

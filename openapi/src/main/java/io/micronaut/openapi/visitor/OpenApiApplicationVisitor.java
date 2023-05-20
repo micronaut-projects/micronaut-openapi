@@ -81,9 +81,14 @@ import io.swagger.v3.oas.annotations.servers.Server;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.PathItem;
 import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.media.Content;
+import io.swagger.v3.oas.models.media.MediaType;
 import io.swagger.v3.oas.models.media.Schema;
+import io.swagger.v3.oas.models.parameters.Parameter;
+import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -93,6 +98,10 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 
+import static io.micronaut.openapi.visitor.SchemaUtils.EMPTY_COMPOSED_SCHEMA;
+import static io.micronaut.openapi.visitor.SchemaUtils.EMPTY_SCHEMA;
+import static io.micronaut.openapi.visitor.SchemaUtils.EMPTY_SIMPLE_SCHEMA;
+import static io.micronaut.openapi.visitor.SchemaUtils.TYPE_OBJECT;
 import static io.swagger.v3.oas.models.Components.COMPONENTS_SCHEMAS_REF;
 
 /**
@@ -322,29 +331,29 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                 return;
             }
             context.info("Generating OpenAPI Documentation");
-            OpenAPI openAPI = readOpenAPI(element, context);
+            OpenAPI openApi = readOpenApi(element, context);
 
             // Handle Application securityRequirements schemes
             processSecuritySchemes(element, context);
 
-            mergeAdditionalSwaggerFiles(element, context, openAPI);
+            mergeAdditionalSwaggerFiles(element, context, openApi);
             // handle type level tags
             List<io.swagger.v3.oas.models.tags.Tag> tagList = processOpenApiAnnotation(
                 element,
                 context,
                 Tag.class,
                 io.swagger.v3.oas.models.tags.Tag.class,
-                openAPI.getTags()
+                openApi.getTags()
             );
-            openAPI.setTags(tagList);
+            openApi.setTags(tagList);
 
             // handle type level security requirements
             List<io.swagger.v3.oas.models.security.SecurityRequirement> securityRequirements = readSecurityRequirements(element);
-            if (openAPI.getSecurity() != null) {
-                securityRequirements.addAll(openAPI.getSecurity());
+            if (openApi.getSecurity() != null) {
+                securityRequirements.addAll(openApi.getSecurity());
             }
 
-            openAPI.setSecurity(securityRequirements);
+            openApi.setSecurity(securityRequirements);
 
             // handle type level servers
             List<io.swagger.v3.oas.models.servers.Server> servers = processOpenApiAnnotation(
@@ -352,22 +361,22 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                 context,
                 Server.class,
                 io.swagger.v3.oas.models.servers.Server.class,
-                openAPI.getServers()
+                openApi.getServers()
             );
-            openAPI.setServers(servers);
+            openApi.setServers(servers);
 
         Optional<OpenAPI> attr = context.get(Utils.ATTR_OPENAPI, OpenAPI.class);
         if (attr.isPresent()) {
             OpenAPI existing = attr.get();
-            Optional.ofNullable(openAPI.getInfo())
+            Optional.ofNullable(openApi.getInfo())
                     .ifPresent(existing::setInfo);
-                copyOpenAPI(existing, openAPI);
+                copyOpenApi(existing, openApi);
             } else {
-                context.put(Utils.ATTR_OPENAPI, openAPI);
+                context.put(Utils.ATTR_OPENAPI, openApi);
             }
 
             if (Utils.isTestMode()) {
-                Utils.resolveOpenAPI(context);
+                Utils.resolveOpenApi(context);
             }
 
             classElement = element;
@@ -743,7 +752,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                         } catch (IOException e) {
                             context.warn("Unable to read file " + path.getFileName() + ": " + e.getMessage(), element);
                         }
-                        copyOpenAPI(openAPI, parsedOpenApi);
+                        copyOpenApi(openAPI, parsedOpenApi);
                     });
                 } catch (IOException e) {
                     context.warn("Unable to read  file from " + directory + ": " + e.getMessage(), element);
@@ -820,7 +829,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
      * @param to The {@link OpenAPI} object to copy to
      * @param from The {@link OpenAPI} object to copy from
      */
-    private void copyOpenAPI(OpenAPI to, OpenAPI from) {
+    private void copyOpenApi(OpenAPI to, OpenAPI from) {
         if (to != null && from != null) {
             Optional.ofNullable(from.getTags()).ifPresent(tags -> tags.forEach(to::addTagsItem));
             Optional.ofNullable(from.getServers()).ifPresent(servers -> servers.forEach(to::addServersItem));
@@ -847,7 +856,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         }
     }
 
-    private OpenAPI readOpenAPI(ClassElement element, VisitorContext context) {
+    private OpenAPI readOpenApi(ClassElement element, VisitorContext context) {
         return element.findAnnotation(OpenAPIDefinition.class).flatMap(o -> {
                     Optional<OpenAPI> result = toValue(o.getValues(), context, OpenAPI.class);
                     result.ifPresent(openAPI -> {
@@ -1152,40 +1161,13 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             if (!attr.isPresent()) {
                 return;
             }
-            OpenAPI openAPI = attr.get();
+            OpenAPI openApi = attr.get();
             processEndpoints(context);
-            applyPropertyNamingStrategy(openAPI, context);
-            applyPropertyServerContextPath(openAPI, context);
-            openAPI = resolvePropertyPlaceHolders(openAPI, context);
-            sortOpenAPI(openAPI);
-            // Process after sorting so order is stable
-            new JacksonDiscriminatorPostProcessor().addMissingDiscriminatorType(openAPI);
-            new OpenApiOperationsPostProcessor().processOperations(openAPI);
-            // need to replace openAPI after property placeholders resolved
+            openApi = postProcessOpenApi(openApi, context);
+            // need to set test reference to openApi after post-processing
             if (Utils.isTestMode()) {
-                Utils.setTestReferenceAfterPlaceholders(openAPI);
+                Utils.setTestReference(openApi);
             }
-
-            // remove unused schemas
-            try {
-                if (openAPI.getComponents() != null) {
-                    Map<String, Schema> schemas = openAPI.getComponents().getSchemas();
-                    if (CollectionUtils.isNotEmpty(schemas)) {
-                        String openApiJson = ConvertUtils.getJsonMapper().writeValueAsString(openAPI);
-                        // Create a copy of the keySet so that we can modify the map while in a foreach
-                        Set<String> keySet = new HashSet<>(schemas.keySet());
-                        for (String schemaName : keySet) {
-                            if (!openApiJson.contains(COMPONENTS_SCHEMAS_REF + schemaName)) {
-                                schemas.remove(schemaName);
-                            }
-                        }
-                    }
-                }
-            } catch (JsonProcessingException e) {
-                // do nothing
-            }
-
-            removeEmtpyComponents(openAPI);
 
             String isJson = getConfigurationProperty(MICRONAUT_OPENAPI_JSON_FORMAT, context);
             boolean isYaml = !(StringUtils.isNotEmpty(isJson) && isJson.equalsIgnoreCase(StringUtils.TRUE));
@@ -1194,7 +1176,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             String fileName = "swagger" + ext;
             String documentTitle = "OpenAPI";
 
-            Info info = openAPI.getInfo();
+            Info info = openApi.getInfo();
             if (info != null) {
                 documentTitle = Optional.ofNullable(info.getTitle()).orElse(Environment.DEFAULT_NAME);
                 documentTitle = documentTitle.toLowerCase(Locale.US).replace(' ', '-');
@@ -1215,7 +1197,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                 context.warn("Can't set some placeholders in fileName: " + fileName, null);
             }
 
-            writeYamlToFile(openAPI, fileName, documentTitle, context, isYaml);
+            writeYamlToFile(openApi, fileName, documentTitle, context, isYaml);
             visitedElements = visitedElements(context);
         } catch (Throwable t) {
             context.warn("Error:\n" + Utils.printStackTrace(t), null);
@@ -1226,6 +1208,42 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
     @Override
     public int getOrder() {
         return 100;
+    }
+
+    private OpenAPI postProcessOpenApi(OpenAPI openApi, VisitorContext context) {
+
+        applyPropertyNamingStrategy(openApi, context);
+        applyPropertyServerContextPath(openApi, context);
+
+        normalizeOpenApi(openApi);
+        // Process after sorting so order is stable
+        new JacksonDiscriminatorPostProcessor().addMissingDiscriminatorType(openApi);
+        new OpenApiOperationsPostProcessor().processOperations(openApi);
+
+        // remove unused schemas
+        try {
+            if (openApi.getComponents() != null) {
+                Map<String, Schema> schemas = openApi.getComponents().getSchemas();
+                if (CollectionUtils.isNotEmpty(schemas)) {
+                    String openApiJson = ConvertUtils.getJsonMapper().writeValueAsString(openApi);
+                    // Create a copy of the keySet so that we can modify the map while in a foreach
+                    Set<String> keySet = new HashSet<>(schemas.keySet());
+                    for (String schemaName : keySet) {
+                        if (!openApiJson.contains(COMPONENTS_SCHEMAS_REF + schemaName)) {
+                            schemas.remove(schemaName);
+                        }
+                    }
+                }
+            }
+        } catch (JsonProcessingException e) {
+            // do nothing
+        }
+
+        removeEmtpyComponents(openApi);
+
+        openApi = resolvePropertyPlaceHolders(openApi, context);
+
+        return openApi;
     }
 
     private void removeEmtpyComponents(OpenAPI openAPI) {
@@ -1279,7 +1297,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         }
     }
 
-    private void sortOpenAPI(OpenAPI openAPI) {
+    private void normalizeOpenApi(OpenAPI openAPI) {
         // Sort paths
         if (openAPI.getPaths() != null) {
             io.swagger.v3.oas.models.Paths sortedPaths = new io.swagger.v3.oas.models.Paths();
@@ -1288,6 +1306,16 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                 sortedPaths.setExtensions(new TreeMap<>(openAPI.getPaths().getExtensions()));
             }
             openAPI.setPaths(sortedPaths);
+            for (PathItem pathItem : sortedPaths.values()) {
+                normalizeOperation(pathItem.getGet());
+                normalizeOperation(pathItem.getPut());
+                normalizeOperation(pathItem.getPost());
+                normalizeOperation(pathItem.getDelete());
+                normalizeOperation(pathItem.getOptions());
+                normalizeOperation(pathItem.getHead());
+                normalizeOperation(pathItem.getPatch());
+                normalizeOperation(pathItem.getTrace());
+            }
         }
 
         // Sort all reusable Components
@@ -1296,7 +1324,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             return;
         }
 
-        sortAllOf(components.getSchemas());
+        normalizeSchemas(components.getSchemas());
 
         sortComponent(components, Components::getSchemas, Components::setSchemas);
         sortComponent(components, Components::getResponses, Components::setResponses);
@@ -1309,6 +1337,69 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         sortComponent(components, Components::getCallbacks, Components::setCallbacks);
     }
 
+    private void normalizeOperation(Operation operation) {
+        if (operation == null) {
+            return;
+        }
+        if (CollectionUtils.isNotEmpty(operation.getParameters())) {
+            for (Parameter parameter : operation.getParameters()) {
+                if (parameter == null) {
+                    continue;
+                }
+                Schema<?> paramSchema = parameter.getSchema();
+                if (paramSchema == null) {
+                    continue;
+                }
+                Schema<?> normalizedSchema = normalizeSchema(paramSchema);
+                if (normalizedSchema != null) {
+                    parameter.setSchema(normalizedSchema);
+                } else if (paramSchema.equals(EMPTY_SIMPLE_SCHEMA)) {
+                    paramSchema.setType(TYPE_OBJECT);
+                }
+            }
+        }
+        if (operation.getRequestBody() != null) {
+            normalizeContent(operation.getRequestBody().getContent());
+        }
+        if (CollectionUtils.isNotEmpty(operation.getResponses())) {
+            for (ApiResponse apiResponse : operation.getResponses().values()) {
+                normalizeContent(apiResponse.getContent());
+            }
+        }
+    }
+
+    private void normalizeContent(Content content) {
+        if (CollectionUtils.isEmpty(content)) {
+            return;
+        }
+        for (MediaType mediaType : content.values()) {
+            Schema mediaTypeSchema = mediaType.getSchema();
+            if (mediaTypeSchema == null) {
+                continue;
+            }
+            Schema<?> normalizedSchema = normalizeSchema(mediaTypeSchema);
+            if (normalizedSchema != null) {
+                mediaType.setSchema(normalizedSchema);
+            } else if (mediaTypeSchema.equals(EMPTY_SIMPLE_SCHEMA)) {
+                mediaTypeSchema.setType(TYPE_OBJECT);
+            }
+            Map<String, Schema> paramSchemas = mediaTypeSchema.getProperties();
+            if (CollectionUtils.isNotEmpty(paramSchemas)) {
+                Map<String, Schema> paramNormalizedSchemas = new HashMap<>();
+                for (Map.Entry<String, Schema> paramEntry : paramSchemas.entrySet()) {
+                    Schema paramSchema = paramEntry.getValue();
+                    Schema paramNormalizedSchema = normalizeSchema(paramSchema);
+                    if (paramNormalizedSchema != null) {
+                        paramNormalizedSchemas.put(paramEntry.getKey(), paramNormalizedSchema);
+                    }
+                }
+                if (CollectionUtils.isNotEmpty(paramNormalizedSchemas)) {
+                    paramSchemas.putAll(paramNormalizedSchemas);
+                }
+            }
+        }
+    }
+
     private <T> void sortComponent(Components components, Function<Components, Map<String, T>> getter, BiConsumer<Components, Map<String, T>> setter) {
         if (components != null && getter.apply(components) != null) {
             Map<String, T> component = getter.apply(components);
@@ -1316,38 +1407,134 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         }
     }
 
+    private Schema normalizeSchema(Schema schema) {
+        List<Schema> allOf = schema.getAllOf();
+        if (CollectionUtils.isEmpty(allOf)) {
+            return null;
+        }
+
+        if (allOf.size() == 1) {
+
+            Schema<?> allOfSchema = allOf.get(0);
+
+            schema.setAllOf(null);
+            // if schema has only allOf block with one item or only defaultValue property or only type
+            Object defaultValue = schema.getDefault();
+            String type = schema.getType();
+            String serializedDefaultValue;
+            try {
+                serializedDefaultValue = defaultValue != null ? ConvertUtils.getJsonMapper().writeValueAsString(defaultValue) : null;
+            } catch (JsonProcessingException e) {
+                return null;
+            }
+            schema.setDefault(null);
+            schema.setType(null);
+            Schema normalizedSchema = null;
+
+            Object allOfDefaultValue = allOfSchema.getDefault();
+            String serializedAllOfDefaultValue;
+            try {
+                serializedAllOfDefaultValue = allOfDefaultValue != null ? ConvertUtils.getJsonMapper().writeValueAsString(allOfDefaultValue) : null;
+            } catch (JsonProcessingException e) {
+                return null;
+            }
+            boolean isSameType = allOfSchema.getType() == null || allOfSchema.getType().equals(type);
+
+            if (schema.equals(EMPTY_SCHEMA) || schema.equals(EMPTY_COMPOSED_SCHEMA)
+                && (serializedDefaultValue == null || serializedDefaultValue.equals(serializedAllOfDefaultValue))
+                && (type == null || allOfSchema.getType() == null || allOfSchema.getType().equals(type))) {
+                normalizedSchema = allOfSchema;
+            }
+            schema.setType(type);
+            schema.setAllOf(allOf);
+            schema.setDefault(defaultValue);
+            return normalizedSchema;
+        }
+        List<Schema> finalList = new ArrayList<>(allOf.size());
+        List<Schema> schemasWithoutRef = new ArrayList<>(allOf.size() - 1);
+        for (Schema schemaAllOf : allOf) {
+            Schema normalizedSchema = normalizeSchema(schemaAllOf);
+            if (normalizedSchema != null) {
+                schemaAllOf = normalizedSchema;
+            }
+            Map<String, Schema> paramSchemas = schemaAllOf.getProperties();
+            if (CollectionUtils.isNotEmpty(paramSchemas)) {
+                Map<String, Schema> paramNormalizedSchemas = new HashMap<>();
+                for (Map.Entry<String, Schema> paramEntry : paramSchemas.entrySet()) {
+                    Schema paramSchema = paramEntry.getValue();
+                    Schema paramNormalizedSchema = normalizeSchema(paramSchema);
+                    if (paramNormalizedSchema != null) {
+                        paramNormalizedSchemas.put(paramEntry.getKey(), paramNormalizedSchema);
+                    }
+                }
+                if (CollectionUtils.isNotEmpty(paramNormalizedSchemas)) {
+                    paramSchemas.putAll(paramNormalizedSchemas);
+                }
+            }
+
+            if (StringUtils.isEmpty(schemaAllOf.get$ref())) {
+                schemasWithoutRef.add(schemaAllOf);
+                // remove all description fields, if it's already set in main schema
+                if (StringUtils.isNotEmpty(schema.getDescription())
+                    && StringUtils.isNotEmpty(schemaAllOf.getDescription())) {
+                    schemaAllOf.setDescription(null);
+                }
+                // remove deplicate default field
+                if (schema.getDefault() != null
+                    && schemaAllOf.getDefault() != null && schema.getDefault().equals(schemaAllOf.getDefault())) {
+                    schema.setDefault(null);
+                }
+                continue;
+            }
+            finalList.add(schemaAllOf);
+        }
+        finalList.addAll(schemasWithoutRef);
+        schema.setAllOf(finalList);
+        return null;
+    }
+
     /**
      * Sort schemas list in allOf block: schemas with ref must be first, next other schemas.
      *
      * @param schemas all schema components
      */
-    private void sortAllOf(Map<String, Schema> schemas) {
+    private void normalizeSchemas(Map<String, Schema> schemas) {
 
         if (CollectionUtils.isEmpty(schemas)) {
             return;
         }
 
-        for (Schema schema : schemas.values()) {
-            if (CollectionUtils.isEmpty(schema.getAllOf())
-                || schema.getAllOf().size() == 1) {
-                continue;
+        Map<String, Schema> normalizedSchemas = new HashMap<>();
+
+        for (Map.Entry<String, Schema> entry : schemas.entrySet()) {
+            Schema schema = entry.getValue();
+            Schema normalizedSchema = normalizeSchema(schema);
+            if (normalizedSchema != null) {
+                normalizedSchemas.put(entry.getKey(), normalizedSchema);
+            } else if (schema.equals(EMPTY_SIMPLE_SCHEMA)) {
+                schema.setType(TYPE_OBJECT);
             }
-            List<Schema> finalList = new ArrayList<>(schema.getAllOf().size());
-            List<Schema> schemasWithoutRef = new ArrayList<>(schema.getAllOf().size() - 1);
-            for (Schema schemaAllOf : (List<Schema>) schema.getAllOf()) {
-                if (StringUtils.isEmpty(schemaAllOf.get$ref())) {
-                    schemasWithoutRef.add(schemaAllOf);
-                    // remove all description fields, if it's already set in main schema
-                    if (StringUtils.isNotEmpty(schema.getDescription())
-                        && StringUtils.isNotEmpty(schemaAllOf.getDescription())) {
-                        schemaAllOf.setDescription(null);
+
+            Map<String, Schema> paramSchemas = schema.getProperties();
+            if (CollectionUtils.isNotEmpty(paramSchemas)) {
+                Map<String, Schema> paramNormalizedSchemas = new HashMap<>();
+                for (Map.Entry<String, Schema> paramEntry : paramSchemas.entrySet()) {
+                    Schema paramSchema = paramEntry.getValue();
+                    Schema paramNormalizedSchema = normalizeSchema(paramSchema);
+                    if (paramNormalizedSchema != null) {
+                        paramNormalizedSchemas.put(paramEntry.getKey(), paramNormalizedSchema);
+                    } else if (paramSchema.equals(EMPTY_SIMPLE_SCHEMA)) {
+                        paramSchema.setType(TYPE_OBJECT);
                     }
-                    continue;
                 }
-                finalList.add(schemaAllOf);
+                if (CollectionUtils.isNotEmpty(paramNormalizedSchemas)) {
+                    paramSchemas.putAll(paramNormalizedSchemas);
+                }
             }
-            finalList.addAll(schemasWithoutRef);
-            schema.setAllOf(finalList);
+        }
+
+        if (CollectionUtils.isNotEmpty(normalizedSchemas)) {
+            schemas.putAll(normalizedSchemas);
         }
     }
 

@@ -289,10 +289,10 @@ class HelloWorldController implements HelloWorldApi {
 class MyBean {}
 ''')
         then:
-        Utils.testReferenceAfterPlaceholders != null
+        Utils.testReference != null
 
         when:
-        OpenAPI openAPI = Utils.testReferenceAfterPlaceholders
+        OpenAPI openAPI = Utils.testReference
 
         then:
         openAPI.info != null

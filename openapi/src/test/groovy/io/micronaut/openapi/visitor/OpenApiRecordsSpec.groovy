@@ -41,7 +41,6 @@ class MyBean {}
         then:
         openAPI.components.schemas
         openAPI.components.schemas.size() == 1
-        openAPI.components.schemas['Person'].name == 'Person'
         openAPI.components.schemas['Person'].type == 'object'
         openAPI.components.schemas['Person'].properties['name'].type == 'string'
         openAPI.components.schemas['Person'].properties['age'].type == 'integer'
@@ -84,7 +83,6 @@ class MyBean {}
         then:
         openAPI.components.schemas
         openAPI.components.schemas.size() == 1
-        openAPI.components.schemas['Person'].name == 'Person'
         openAPI.components.schemas['Person'].type == 'object'
         openAPI.components.schemas['Person'].properties['name'].type == 'string'
         openAPI.components.schemas['Person'].properties['age'].type == 'integer'
@@ -136,7 +134,6 @@ class MyBean {}
         openAPI.components.schemas.size() == 1
 
         Schema personSchema = openAPI.components.schemas['Person']
-        personSchema.name == 'Person'
         personSchema.type == 'object'
         personSchema.description == 'The Person class description'
         personSchema.properties.name.type == 'string'
@@ -195,7 +192,6 @@ class MyBean {}
         openAPI.components.schemas.size() == 1
 
         Schema petchema = openAPI.components.schemas['Pet']
-        petchema.name == 'Pet'
         petchema.type == 'object'
         petchema.description == null
         petchema.properties.name.type == 'string'

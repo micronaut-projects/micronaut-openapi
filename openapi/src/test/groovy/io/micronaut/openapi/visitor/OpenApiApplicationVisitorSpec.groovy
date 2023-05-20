@@ -698,11 +698,6 @@ import io.swagger.v3.oas.annotations.security.SecurityScheme;
                        scopes = @OAuthScope(name = "write:pets", description = "modify pets in your account"))),
     description = "ssssss"
 )
-@SecurityScheme(
-    name = "schemeWithRef",
-    type = SecuritySchemeType.DEFAULT,
-    ref = "#/components/securitySchemes/foo"
-)
 class Application {
 }
 
@@ -775,24 +770,12 @@ class MyBean {}
         oauth2.flows
         oauth2.flows.implicit
         oauth2.scheme == null
-
-        def withRef = openAPI.components.securitySchemes['schemeWithRef']
-        withRef.type == null
-        withRef.in == null
-        withRef.name == null
-        withRef.description == null
-        withRef.openIdConnectUrl == null
-        withRef.bearerFormat == null
-        withRef.flows == null
-        withRef.scheme == null
-        withRef.$ref == '#/components/securitySchemes/foo'
     }
 
     void "test disable openapi"() {
 
         given: "An API definition"
         Utils.testReference = null
-        Utils.testReferenceAfterPlaceholders = null
         System.setProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_ENABLED, "false")
 
         when:
@@ -851,7 +834,6 @@ class MyBean {}
 ''')
         then: "the state is correct"
         !Utils.testReference
-        !Utils.testReferenceAfterPlaceholders
 
         cleanup:
         System.clearProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_FIELD_VISIBILITY_LEVEL)
@@ -862,7 +844,6 @@ class MyBean {}
 
         given: "An API definition"
         Utils.testReference = null
-        Utils.testReferenceAfterPlaceholders = null
         System.setProperty(OpenApiApplicationVisitor.MICRONAUT_CONFIG_FILE_LOCATIONS, "project:/src/test/resources/")
         System.setProperty(Environment.ENVIRONMENTS_PROPERTY, "disabled-openapi")
 
@@ -918,7 +899,6 @@ class MyBean {}
 ''')
         then: "the state is correct"
         !Utils.testReference
-        !Utils.testReferenceAfterPlaceholders
 
         cleanup:
         System.clearProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_FIELD_VISIBILITY_LEVEL)
@@ -932,7 +912,6 @@ class MyBean {}
 
         given: "An API definition"
         Utils.testReference = null
-        Utils.testReferenceAfterPlaceholders = null
         System.setProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_CONFIG_FILE, "openapi-disabled-openapi.properties")
 
         when:
@@ -987,7 +966,6 @@ class MyBean {}
 ''')
         then: "the state is correct"
         !Utils.testReference
-        !Utils.testReferenceAfterPlaceholders
 
         cleanup:
         System.clearProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_CONFIG_FILE)

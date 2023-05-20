@@ -55,7 +55,7 @@ class AvailabilityRequest2 {
 class MyBean {}
 ''')
 
-        OpenAPI openAPI = Utils.testReferenceAfterPlaceholders
+        OpenAPI openAPI = Utils.testReference
         Operation getOp = openAPI.paths?.get("/")?.get
         Operation getOp2 = openAPI.paths?.get("/test/")?.get
 

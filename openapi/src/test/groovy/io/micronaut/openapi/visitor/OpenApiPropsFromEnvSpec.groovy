@@ -178,10 +178,10 @@ class HelloWorldController implements HelloWorldApi {
 class MyBean {}
 ''')
         then:
-        Utils.testReferenceAfterPlaceholders != null
+        Utils.testReference != null
 
         when:
-        OpenAPI openAPI = Utils.testReferenceAfterPlaceholders
+        OpenAPI openAPI = Utils.testReference
 
         PathItem helloPathItem = openAPI.paths."/hello"
         PathItem loginPathItem = openAPI.paths."/myLoginUrl"
@@ -282,10 +282,10 @@ class HelloWorldController implements HelloWorldApi {
 class MyBean {}
 ''')
         then:
-        Utils.testReferenceAfterPlaceholders != null
+        Utils.testReference != null
 
         when:
-        OpenAPI openAPI = Utils.testReferenceAfterPlaceholders
+        OpenAPI openAPI = Utils.testReference
 
         PathItem helloPathItem = openAPI.paths."/hello"
         PathItem loginPathItem = openAPI.paths."/expandUrl1"
@@ -386,10 +386,10 @@ class HelloWorldController implements HelloWorldApi {
 class MyBean {}
 ''')
         then:
-        Utils.testReferenceAfterPlaceholders != null
+        Utils.testReference != null
 
         when:
-        OpenAPI openAPI = Utils.testReferenceAfterPlaceholders
+        OpenAPI openAPI = Utils.testReference
 
         PathItem helloPathItem = openAPI.paths."/hello"
         PathItem loginPathItem = openAPI.paths."/expandUrl1"

@@ -61,7 +61,6 @@ public final class Utils {
 
     private static PropertyPlaceholderResolver propertyPlaceholderResolver;
     private static OpenAPI testReference;
-    private static OpenAPI testReferenceAfterPlaceholders;
     private static String testFileName;
     private static String testYamlReference;
     private static String testJsonReference;
@@ -179,14 +178,11 @@ public final class Utils {
      *
      * @return The {@link OpenAPI} instance
      */
-    public static OpenAPI resolveOpenAPI(VisitorContext context) {
+    public static OpenAPI resolveOpenApi(VisitorContext context) {
         OpenAPI openAPI = context.get(ATTR_OPENAPI, OpenAPI.class).orElse(null);
         if (openAPI == null) {
             openAPI = new OpenAPI();
             context.put(ATTR_OPENAPI, openAPI);
-            if (isTestMode()) {
-                setTestReference(openAPI);
-            }
         }
         return openAPI;
     }
@@ -195,6 +191,7 @@ public final class Utils {
      * Return stacktrace for throwable and message.
      *
      * @param t throwable
+     *
      * @return stacktrace
      */
     public static String printStackTrace(Throwable t) {
@@ -215,14 +212,6 @@ public final class Utils {
 
     public static void setTestReference(OpenAPI testReference) {
         Utils.testReference = testReference;
-    }
-
-    public static OpenAPI getTestReferenceAfterPlaceholders() {
-        return testReferenceAfterPlaceholders;
-    }
-
-    public static void setTestReferenceAfterPlaceholders(OpenAPI testReferenceAfterPlaceholders) {
-        Utils.testReferenceAfterPlaceholders = testReferenceAfterPlaceholders;
     }
 
     public static String getTestYamlReference() {
