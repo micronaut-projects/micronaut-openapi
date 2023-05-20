@@ -324,7 +324,6 @@ class MyBean {}
         cleanup:
         System.clearProperty(OpenApiApplicationVisitor.MICRONAUT_CONFIG_FILE_LOCATIONS)
         System.clearProperty(Environment.ENVIRONMENTS_PROPERTY)
-        System.clearProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_CONFIG_FILE)
     }
 
     void "test expanded properties from system properties"() {

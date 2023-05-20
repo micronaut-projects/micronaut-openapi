@@ -52,7 +52,7 @@ class MyBean {}
         openAPI.paths['/internal/routes'].get
 
         cleanup:
-        System.setProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_CONFIG_FILE, "")
+        System.clearProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_CONFIG_FILE)
     }
 
 }

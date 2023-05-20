@@ -436,7 +436,7 @@ class MyBean {}
         openAPI.paths[uri].post.requestBody
 
         cleanup:
-        System.setProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_CONFIG_FILE, "")
+        System.clearProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_CONFIG_FILE)
     }
 
     void "test build OpenAPI doc for simple type with generics"() {
@@ -836,7 +836,6 @@ class MyBean {}
         !Utils.testReference
 
         cleanup:
-        System.clearProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_FIELD_VISIBILITY_LEVEL)
         System.clearProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_ENABLED)
     }
 
@@ -901,9 +900,6 @@ class MyBean {}
         !Utils.testReference
 
         cleanup:
-        System.clearProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_FIELD_VISIBILITY_LEVEL)
-        System.clearProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_ENABLED)
-        System.clearProperty(OpenApiApplicationVisitor.MICRONAUT_INTERNAL_OPENAPI_ENABLED)
         System.clearProperty(OpenApiApplicationVisitor.MICRONAUT_CONFIG_FILE_LOCATIONS)
         System.clearProperty(Environment.ENVIRONMENTS_PROPERTY)
     }

@@ -4,15 +4,11 @@ import io.micronaut.openapi.AbstractOpenApiTypeElementSpec
 
 class OpenApiOutputJsonSpec extends AbstractOpenApiTypeElementSpec {
 
-    def setup() {
-        System.setProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_JSON_FORMAT, "true")
-    }
-
-    def cleanup() {
-        System.clearProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_JSON_FORMAT)
-    }
-
     void "test paths and schemas for OpenAPI are sorted"() {
+
+        setup:
+        System.setProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_JSON_FORMAT, "true")
+
         when:
         buildBeanDefinition('test.MyBean', '''
 package test;
@@ -153,6 +149,9 @@ class MyBean {}
 "Person1":{"required":["debtValue","name","totalGoals"],"type":"object","properties":{"name":{"type":"string"},"debtValue":{"type":"integer","format":"int32"},"totalGoals":{"type":"integer","format":"int32"}}},\
 "Person2":{"required":["name"],"type":"object","properties":{"name":{"type":"string"}}},\
 "Person3":{"required":["name"],"type":"object","properties":{"name":{"type":"string"}}}}}}''')
+
+        cleanup:
+        System.clearProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_JSON_FORMAT)
     }
 
 }
