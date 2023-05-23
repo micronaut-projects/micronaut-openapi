@@ -39,6 +39,8 @@ dependencies {
     testImplementation(libs.jdt.annotation)
     testImplementation(libs.android.annotation)
     testImplementation(libs.spotbugs.annotations)
+    testImplementation(libs.kotlinx.coroutines.reactive)
+    testImplementation(libs.kotlinx.coroutines.reactor)
 
     if (org.gradle.internal.jvm.Jvm.current().getJavaVersion().isJava8()) {
         testImplementation files(org.gradle.internal.jvm.Jvm.current().toolsJar)

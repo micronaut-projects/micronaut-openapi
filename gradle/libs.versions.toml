@@ -10,6 +10,7 @@ managed-jakarta-validation-api = "3.0.2"
 managed-html2md-converter = "0.62.2"
 
 kotlin = "1.8.21"
+kotlin-coroutines = "1.7.0"
 jspecify = "0.3.0"
 jdt-annotation = "2.2.700"
 android-annotation = "1.6.0"
@@ -47,6 +48,8 @@ testcontainers-spock = { module = "org.testcontainers:spock" }
 
 kotlin-stdlib-jdk8 = { module = "org.jetbrains.kotlin:kotlin-stdlib-jdk8", version.ref = "kotlin" }
 kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
+kotlinx-coroutines-reactive = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-reactive", version.ref = "kotlin-coroutines" }
+kotlinx-coroutines-reactor = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-reactor", version.ref = "kotlin-coroutines" }
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }

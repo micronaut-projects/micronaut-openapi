@@ -15,29 +15,24 @@
  */
 package io.micronaut.openapi.visitor;
 
-import java.io.File;
-import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.nio.ByteBuffer;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.Future;
 
 import io.micronaut.context.env.DefaultPropertyPlaceholderResolver;
 import io.micronaut.context.env.PropertyPlaceholderResolver;
+import io.micronaut.core.annotation.Internal;
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.core.annotation.Nullable;
 import io.micronaut.core.convert.ArgumentConversionContext;
 import io.micronaut.core.convert.DefaultConversionService;
-import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.core.value.PropertyResolver;
 import io.micronaut.http.MediaType;
-import io.micronaut.inject.ast.ClassElement;
 import io.micronaut.inject.visitor.VisitorContext;
 import io.micronaut.openapi.javadoc.JavadocParser;
 import io.swagger.v3.oas.models.Components;
@@ -48,6 +43,7 @@ import io.swagger.v3.oas.models.OpenAPI;
  *
  * @since 4.4.0
  */
+@Internal
 public final class Utils {
 
     public static final String PLACEHOLDER_PREFIX = "${";
@@ -106,30 +102,6 @@ public final class Utils {
             }, new DefaultConversionService());
         }
         return propertyPlaceholderResolver;
-    }
-
-    public static boolean isContainerType(ClassElement type) {
-        return CollectionUtils.setOf(
-            Optional.class.getName(),
-            Future.class.getName(),
-            "org.reactivestreams.Publisher",
-            "io.reactivex.Single",
-            "io.reactivex.Observable",
-            "io.reactivex.Maybe",
-            "io.reactivex.rxjava3.core.Single",
-            "io.reactivex.rxjava3.core.Observable",
-            "io.reactivex.rxjava3.core.Maybe"
-        ).stream().anyMatch(type::isAssignable);
-    }
-
-    public static boolean isReturnTypeFile(ClassElement type) {
-        return CollectionUtils.setOf(
-            // this class from micronaut-http-server
-            "io.micronaut.http.server.types.files.FileCustomizableResponseType",
-            File.class.getName(),
-            InputStream.class.getName(),
-            ByteBuffer.class.getName()
-        ).stream().anyMatch(type::isAssignable);
     }
 
     /**
