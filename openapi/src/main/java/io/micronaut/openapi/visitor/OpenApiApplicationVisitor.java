@@ -55,6 +55,8 @@ import io.micronaut.core.annotation.NonNull;
 import io.micronaut.core.annotation.Nullable;
 import io.micronaut.core.convert.ConversionService;
 import io.micronaut.core.convert.DefaultConversionService;
+import io.micronaut.core.io.scan.ClassPathResourceLoader;
+import io.micronaut.core.io.scan.DefaultClassPathResourceLoader;
 import io.micronaut.core.naming.conventions.StringConvention;
 import io.micronaut.core.type.Argument;
 import io.micronaut.core.type.GenericArgument;
@@ -315,6 +317,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         if (loadedValue == null) {
             boolean value = OpenApiApplicationVisitor.getBooleanProperty(MICRONAUT_OPENAPI_ENABLED, true, context);
             context.put(MICRONAUT_INTERNAL_OPENAPI_ENABLED, value);
+            System.setProperty(MICRONAUT_OPENAPI_ENABLED, Boolean.toString(value));
             return value;
         }
         return loadedValue;
@@ -560,7 +563,10 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
     }
 
     public static String getConfigurationProperty(String key, VisitorContext context) {
-        String value = System.getProperty(key, readOpenApiConfigFile(context).getProperty(key));
+        String value = System.getProperty(key);
+        if (value == null) {
+            value = readOpenApiConfigFile(context).getProperty(key);
+        }
         if (value != null) {
             return value;
         }
@@ -678,6 +684,21 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                 DefaultConversionService conversionService = new DefaultConversionService();
                 conversionService.addConverter(Map.class, InterceptUrlMapPattern.class, new InterceptUrlMapConverter(conversionService));
                 return conversionService;
+            }
+
+            @Override
+            public ClassPathResourceLoader getResourceLoader() {
+                ClassLoader classLoader = ApplicationContextConfiguration.class.getClassLoader();
+                if (classLoader == null) {
+                    classLoader = Thread.currentThread().getContextClassLoader();
+                }
+                if (classLoader == null) {
+                    classLoader = ClassPathResourceLoader.class.getClassLoader();
+                }
+                if (classLoader == null) {
+                    classLoader = ClassLoader.getSystemClassLoader();
+                }
+                return new DefaultClassPathResourceLoader(classLoader, null, false, false);
             }
 
             @Override
@@ -1171,9 +1192,9 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                 if (fileName.contains("${version}")) {
                     fileName = fileName.replaceAll("\\$\\{version}", info != null && info.getVersion() != null ? info.getVersion() : StringUtils.EMPTY_STRING);
                 }
-                if (fileName.contains("${")) {
-                    context.warn("Can't set some placeholders in fileName: " + fileName, null);
-                }
+            }
+            if (fileName.contains("${")) {
+                context.warn("Can't set some placeholders in fileName: " + fileName, null);
             }
 
             writeYamlToFile(openApi, fileName, documentTitle, context, isYaml);

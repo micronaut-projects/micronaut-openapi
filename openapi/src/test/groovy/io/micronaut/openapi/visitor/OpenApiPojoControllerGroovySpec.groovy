@@ -8,11 +8,12 @@ import spock.lang.Issue
 class OpenApiPojoControllerGroovySpec extends AbstractBeanDefinitionSpec {
 
     def setup() {
+        System.clearProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_ENABLED)
         System.setProperty(Utils.ATTR_TEST_MODE, "true")
     }
 
     def cleanup() {
-        System.setProperty(Utils.ATTR_TEST_MODE, "")
+        System.clearProperty(Utils.ATTR_TEST_MODE)
     }
 
     @Issue("https://github.com/micronaut-projects/micronaut-openapi/issues/561")

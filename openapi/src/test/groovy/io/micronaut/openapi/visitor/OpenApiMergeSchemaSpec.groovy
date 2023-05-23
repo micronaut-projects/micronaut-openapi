@@ -125,6 +125,6 @@ class MyBean {}
         components.schemas.size() == 3
 
         cleanup:
-        System.setProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_ADDITIONAL_FILES, "")
+        System.clearProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_ADDITIONAL_FILES)
     }
 }

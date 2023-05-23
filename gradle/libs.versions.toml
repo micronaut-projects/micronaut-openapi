@@ -1,16 +1,15 @@
 [versions]
-managed-swagger = "2.2.9"
+managed-swagger = "2.2.10"
 # Required to keep catalog compatibility with 3.4.x.  Can be removed for 4.0.0
-managed-swagger-compat = "2.2.9"
+managed-swagger-compat = "2.2.10"
 managed-javadoc-parser = "0.3.1"
-managed-jsoup = "1.15.4"
+managed-jsoup = "1.16.1"
 managed-jakarta-validation-api = "3.0.2"
-managed-slf4j = "1.7.36"
 
 # Versions beyond 0.62.2 require Java 11
 managed-html2md-converter = "0.62.2"
 
-kotlin = "1.8.20"
+kotlin = "1.8.21"
 kotlin-coroutines = "1.7.0"
 jspecify = "0.3.0"
 jdt-annotation = "2.2.700"
@@ -28,7 +27,6 @@ managed-swagger-models = { module = "io.swagger.core.v3:swagger-models", version
 managed-javadoc-parser = { module = "com.github.chhorz:javadoc-parser", version.ref = "managed-javadoc-parser" }
 managed-html2md-converter = { module = "com.vladsch.flexmark:flexmark-html2md-converter", version.ref = "managed-html2md-converter" }
 managed-jsoup = { module = "org.jsoup:jsoup", version.ref = "managed-jsoup" }
-managed-slf4j-nop = { module = "org.slf4j:slf4j-nop", version.ref = "managed-slf4j" }
 
 # Versions from BOM
 junit-jupiter-api = { module = "org.junit.jupiter:junit-jupiter-api" }

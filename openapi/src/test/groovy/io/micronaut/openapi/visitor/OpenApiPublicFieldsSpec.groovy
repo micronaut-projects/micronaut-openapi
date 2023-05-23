@@ -86,9 +86,6 @@ class MyBean {}
         pathItem.post.requestBody.content['application/json'].schema.properties.size() == 2
         pathItem.post.requestBody.content['application/json'].schema.properties['name'].type == 'string'
         !pathItem.post.requestBody.content['application/json'].schema.properties['name'].nullable
-
-        cleanup:
-        System.clearProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_FIELD_VISIBILITY_LEVEL)
     }
 
     void "test private visibility level"() {
