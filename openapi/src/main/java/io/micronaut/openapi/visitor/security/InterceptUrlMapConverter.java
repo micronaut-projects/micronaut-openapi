@@ -27,6 +27,7 @@ import io.micronaut.core.convert.ConversionContext;
 import io.micronaut.core.convert.ConversionService;
 import io.micronaut.core.convert.TypeConverter;
 import io.micronaut.core.naming.conventions.StringConvention;
+import io.micronaut.core.type.Argument;
 import io.micronaut.http.HttpMethod;
 
 /**
@@ -65,7 +66,7 @@ public class InterceptUrlMapConverter implements TypeConverter<Map, InterceptUrl
         m = transform(m);
         Optional<String> optionalPattern = conversionService.convert(m.get(PATTERN), String.class);
         if (optionalPattern.isPresent()) {
-            Optional<List<String>> optionalAccessList = conversionService.convert(m.get(ACCESS), List.class);
+            Optional<List<String>> optionalAccessList = conversionService.convert(m.get(ACCESS), Argument.listOf(String.class));
             optionalAccessList = optionalAccessList.map(list -> list.stream()
                 .map(o -> conversionService.convert(o, String.class))
                 .filter(Optional::isPresent)

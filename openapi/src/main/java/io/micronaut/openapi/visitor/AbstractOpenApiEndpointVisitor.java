@@ -1662,7 +1662,6 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                             newApiResponse.setContent(contentFromProduces);
                         }
                     }
-                    var responseCode = response.get("responseCode", String.class).orElse(null);
                     try {
                         if (StringUtils.isEmpty(newApiResponse.getDescription())) {
                             newApiResponse.setDescription(responseCode == null || responseCode.equals("default") ? "OK response" : HttpStatus.getDefaultReason(Integer.parseInt(responseCode)));
