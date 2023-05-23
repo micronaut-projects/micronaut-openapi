@@ -15,12 +15,14 @@
  */
 package io.micronaut.openapi.visitor;
 
+import io.micronaut.core.annotation.Internal;
 import io.micronaut.core.util.StringUtils;
 
 /**
  * Number utils.
  */
-public class NumberUtils {
+@Internal
+public final class NumberUtils {
 
     /**
      * <p>Checks whether the String a valid Java number.</p>

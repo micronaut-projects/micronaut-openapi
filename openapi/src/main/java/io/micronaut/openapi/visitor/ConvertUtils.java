@@ -40,6 +40,7 @@ import java.util.UUID;
 import javax.xml.datatype.XMLGregorianCalendar;
 
 import io.micronaut.core.annotation.AnnotationValue;
+import io.micronaut.core.annotation.Internal;
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.core.annotation.Nullable;
 import io.micronaut.core.beans.BeanMap;
@@ -68,6 +69,7 @@ import static io.micronaut.openapi.visitor.SchemaUtils.TYPE_OBJECT;
  *
  * @since 4.4.1
  */
+@Internal
 public final class ConvertUtils {
 
     private static final TypeReference<Map<String, Object>> MAP_TYPE_REFERENCE = new TypeReference<Map<String, Object>>() {
