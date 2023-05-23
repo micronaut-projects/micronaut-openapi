@@ -1,16 +1,19 @@
 [versions]
 managed-swagger = "2.2.10"
 managed-javadoc-parser = "0.3.1"
+managed-jakarta-validation-api = "3.0.2"
 managed-jsoup = "1.16.1"
 managed-slf4j = "2.0.7"
 managed-html2md-converter = "0.64.6"
 
 kotlin = "1.8.21"
+kotlin-coroutines = "1.7.0"
 jspecify = "0.3.0"
 jdt-annotation = "2.2.700"
 android-annotation = "1.6.0"
 spotbugs-annotations = "4.7.3"
 
+micronaut = "4.0.0-M4"
 micronaut-security = "4.0.0-M3"
 micronaut-serde = "2.0.0-M8"
 micronaut-rxjava2 = "2.0.0-M1"
@@ -42,7 +45,6 @@ managed-swagger-models = { module = "io.swagger.core.v3:swagger-models", version
 managed-javadoc-parser = { module = "com.github.chhorz:javadoc-parser", version.ref = "managed-javadoc-parser" }
 managed-html2md-converter = { module = "com.vladsch.flexmark:flexmark-html2md-converter", version.ref = "managed-html2md-converter" }
 managed-jsoup = { module = "org.jsoup:jsoup", version.ref = "managed-jsoup" }
-managed-slf4j-nop = { module = "org.slf4j:slf4j-nop", version.ref = "managed-slf4j" }
 
 # Versions from BOM
 junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine" }
@@ -55,6 +57,8 @@ android-annotation = { module = "androidx.annotation:annotation", version.ref = 
 
 kotlin-stdlib-jdk8 = { module = "org.jetbrains.kotlin:kotlin-stdlib-jdk8", version.ref = "kotlin" }
 kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
+kotlinx-coroutines-reactive = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-reactive", version.ref = "kotlin-coroutines" }
+kotlinx-coroutines-reactor = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-reactor", version.ref = "kotlin-coroutines" }
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }

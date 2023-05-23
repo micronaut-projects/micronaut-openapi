@@ -5,6 +5,7 @@ import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.Operation
 import io.swagger.v3.oas.models.media.ComposedSchema
 import io.swagger.v3.oas.models.media.Schema
+import spock.lang.IgnoreIf
 
 class OpenApiInheritedPojoControllerSpec extends AbstractOpenApiTypeElementSpec {
 
@@ -318,7 +319,6 @@ class MyBean {}
         dogSchema != null
         catSchema != null
         catSchema.allOf[0].$ref == '#/components/schemas/Pet'
-        catSchema.allOf[1].type == 'object'
         catSchema.allOf[1].properties.size() == 1
         catSchema.allOf[1].properties['clawSize'].type == 'integer'
         petSchema.type == 'object'
@@ -516,7 +516,6 @@ class MyBean {}
         dogSchema != null
         catSchema != null
         catSchema.allOf[0].$ref == '#/components/schemas/Pet'
-        catSchema.allOf[1].type == 'object'
         catSchema.allOf[1].properties.size() == 1
         catSchema.allOf[1].properties['clawSize'].type == 'integer'
         petSchema.type == 'object'
@@ -658,7 +657,7 @@ class MyBean {}
         petSchema != null
         dogSchema != null
         catSchema != null
-        catSchema.type == null
+        catSchema.type == 'object'
         catSchema.properties == null
         petSchema.type == 'object'
         petSchema.properties.size() == 2
@@ -667,7 +666,6 @@ class MyBean {}
 
         catSchema.allOf.size() == 2
         catSchema.allOf[0].$ref == '#/components/schemas/Pet'
-        catSchema.allOf[1].type == 'object'
         catSchema.allOf[1].properties['clawSize'].type == 'integer'
     }
 
@@ -780,7 +778,7 @@ class MyBean {}
         petSchema != null
         dogSchema != null
         catSchema != null
-        catSchema.type == null
+        catSchema.type == 'object'
         catSchema.properties == null
         petSchema.description == 'Pet Desc'
         petSchema.type == 'object'
@@ -788,7 +786,6 @@ class MyBean {}
 
         catSchema.allOf.size() == 2
         catSchema.allOf[0].$ref == '#/components/schemas/Pet'
-        catSchema.allOf[1].type == 'object'
         catSchema.allOf[1].properties.size() == 1
         catSchema.allOf[1].properties['clawSize'].type == 'integer'
         dogSchema.allOf.size() == 2
@@ -1031,14 +1028,12 @@ class MyBean {}
         ((ComposedSchema) catSchema).allOf.size() == 2
         ((ComposedSchema) catSchema).allOf[0].get$ref() == "#/components/schemas/Pet"
         ((ComposedSchema) catSchema).allOf[1].properties.size() == 1
-        ((ComposedSchema) catSchema).allOf[1].type == "object"
         ((ComposedSchema) catSchema).allOf[1].properties.get("breed") instanceof Schema
         ((ComposedSchema) catSchema).allOf[1].properties.get("breed").get$ref() == "#/components/schemas/CatBreed"
 
         ((ComposedSchema) dogSchema).allOf.size() == 2
         ((ComposedSchema) dogSchema).allOf[0].$ref == '#/components/schemas/Pet'
         ((ComposedSchema) dogSchema).allOf[1].properties.size() == 1
-        ((ComposedSchema) dogSchema).allOf[1].type == "object"
         ((ComposedSchema) dogSchema).allOf[1].properties.get("breed") instanceof Schema
         ((ComposedSchema) dogSchema).allOf[1].properties.get("breed").get$ref() == "#/components/schemas/DogBreed"
 
@@ -1134,14 +1129,13 @@ class MyBean {}
         petSchema != null
         dogSchema != null
         catSchema != null
-        catSchema.type == null
+        catSchema.type == 'object'
         catSchema.properties == null
         petSchema.type == 'object'
         petSchema.properties.size() == 2
 
         catSchema.allOf.size() == 2
         catSchema.allOf[0].$ref == '#/components/schemas/Pet'
-        catSchema.allOf[1].type == 'object'
         catSchema.allOf[1].properties['clawSize'].type == 'integer'
     }
 
@@ -1220,19 +1214,18 @@ class MyBean {}
         catSchema != null
 
         petSchema.type == 'object'
-        petSchema.properties.size() == 2
+        petSchema.properties.size() == 3
         animalSchema.type == 'object'
         animalSchema.properties.size() == 1
         sleeperSchema.type == 'object'
         sleeperSchema.properties.size() == 1
-        catSchema.type == null
+        catSchema.type == 'object'
         catSchema.properties == null
 
         catSchema.allOf.size() == 4
         catSchema.allOf[0].$ref == '#/components/schemas/Pet'
         catSchema.allOf[1].$ref == '#/components/schemas/Animal'
         catSchema.allOf[2].$ref == '#/components/schemas/Sleeper'
-        catSchema.allOf[3].type == 'object'
         catSchema.allOf[3].properties['clawSize'].type == 'integer'
 
         petSchema.allOf.size() == 1
@@ -1601,16 +1594,93 @@ class MyBean {}
         !requestTypeSchema.allOf
 
         exportRequestTypeSchema
-        exportRequestTypeSchema.type == 'object'
-        exportRequestTypeSchema.allOf
-        exportRequestTypeSchema.allOf.size() == 1
-        exportRequestTypeSchema.allOf[0].$ref == '#/components/schemas/RequestType2_4_0'
+        !exportRequestTypeSchema.allOf
+        exportRequestTypeSchema.$ref == '#/components/schemas/RequestType2_4_0'
 
         exportPaymentsRequestSchema
-        exportPaymentsRequestSchema.type == 'object'
         exportPaymentsRequestSchema.allOf
         exportPaymentsRequestSchema.allOf.size() == 2
         exportPaymentsRequestSchema.allOf[0].$ref == '#/components/schemas/ExportRequestType2_4_0'
         exportPaymentsRequestSchema.allOf[1].$ref == '#/components/schemas/RequestType2_4_0'
+    }
+
+    @IgnoreIf({ !jvm.isJava16Compatible() })
+    void "test type is null for allOf"() {
+
+        given: "An API definition"
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.core.annotation.Introspected;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
+@Controller("/bug12")
+@Tag(name = "Bug12")
+class BackupController {
+
+    @Get("/backup")
+    BackupDto12 getBackup() {
+        return new BackupDto12(new BackupSubObject12("somewhere"), BackupSubEnum12.WORKING);
+    }
+}
+
+@Introspected
+@Schema(description = "Schema to represent a backup")
+record BackupDto12(
+
+        @Schema(description = "Referenced class. $ref shouldn't specify the type of BackupSubObject12")
+        BackupSubObject12 location,
+
+        @Schema(description = "Referenced enum. $ref shouldn't specify the type of BackupSubEnum12")
+        BackupSubEnum12 state
+) {
+}
+
+@Introspected
+@Schema(description = "Schema to describe the backup location")
+record BackupSubObject12(
+
+        @Schema(description = "Location of the backup")
+        String backupLocation
+) {
+}
+
+@Introspected
+@Schema(description = "State of the backup")
+enum BackupSubEnum12 {
+    WORKING,
+    FAILED
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        then: "the state is correct"
+        Utils.testReference != null
+
+        when: "The OpenAPI is retrieved"
+        OpenAPI openAPI = Utils.testReference
+        Schema backupDto12Schema = openAPI.components.schemas.BackupDto12
+
+        then:
+        backupDto12Schema
+        backupDto12Schema.properties
+        backupDto12Schema.properties.location
+        backupDto12Schema.properties.location.allOf
+        backupDto12Schema.properties.location.allOf.size() == 2
+        backupDto12Schema.properties.location.allOf[0].$ref == '#/components/schemas/BackupSubObject12'
+        !backupDto12Schema.properties.location.allOf[1].type
+        backupDto12Schema.properties.location.allOf[1].description == 'Referenced class. $ref shouldn\'t specify the type of BackupSubObject12'
+
+        backupDto12Schema.properties.state
+        backupDto12Schema.properties.state.allOf
+        backupDto12Schema.properties.state.allOf.size() == 2
+        backupDto12Schema.properties.state.allOf[0].$ref == '#/components/schemas/BackupSubEnum12'
+        !backupDto12Schema.properties.state.allOf[1].type
+        backupDto12Schema.properties.state.allOf[1].description == 'Referenced enum. $ref shouldn\'t specify the type of BackupSubEnum12'
     }
 }

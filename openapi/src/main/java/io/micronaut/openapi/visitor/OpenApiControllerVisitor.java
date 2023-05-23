@@ -26,10 +26,13 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.annotation.processing.SupportedOptions;
+
 import io.micronaut.context.RequiresCondition;
 import io.micronaut.context.annotation.Requires;
 import io.micronaut.context.env.Environment;
 import io.micronaut.core.annotation.AnnotationValue;
+import io.micronaut.core.util.ArrayUtils;
 import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.core.util.StringUtils;
 import io.micronaut.http.HttpMethod;
@@ -53,6 +56,7 @@ import io.swagger.v3.oas.models.servers.Server;
 
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 
+import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.MICRONAUT_OPENAPI_ENABLED;
 import static io.micronaut.openapi.visitor.Utils.DEFAULT_MEDIA_TYPES;
 
 /**
@@ -61,6 +65,7 @@ import static io.micronaut.openapi.visitor.Utils.DEFAULT_MEDIA_TYPES;
  * @author graemerocher
  * @since 1.0
  */
+@SupportedOptions(MICRONAUT_OPENAPI_ENABLED)
 public class OpenApiControllerVisitor extends AbstractOpenApiEndpointVisitor implements TypeElementVisitor<Object, HttpMethodMapping> {
 
     private final String customUri;
@@ -167,13 +172,20 @@ public class OpenApiControllerVisitor extends AbstractOpenApiEndpointVisitor imp
         return mediaTypes(element, Produces.class);
     }
 
+    @Override
+    public int getOrder() {
+        return 50;
+    }
+
     private List<MediaType> mediaTypes(MethodElement element, Class<? extends Annotation> ann) {
         String[] values = element.stringValues(ann);
-        if (values.length == 0) {
+        if (ArrayUtils.isEmpty(values)) {
             return DEFAULT_MEDIA_TYPES;
-        } else {
-            return Arrays.stream(values).map(MediaType::of).distinct().collect(Collectors.toList());
         }
+        return Arrays.stream(values)
+            .map(MediaType::of)
+            .distinct()
+            .collect(Collectors.toList());
     }
 
     @Override
@@ -192,18 +204,17 @@ public class OpenApiControllerVisitor extends AbstractOpenApiEndpointVisitor imp
         UriMatchTemplate matchTemplate = UriMatchTemplate.of(controllerValue);
         // check if we have multiple uris
         String[] uris = element.stringValues(HttpMethodMapping.class, "uris");
-        if (uris.length == 0) {
+        if (ArrayUtils.isEmpty(uris)) {
             String methodValue = element.getValue(HttpMethodMapping.class, String.class).orElse("/");
             methodValue = OpenApiApplicationVisitor.replacePlaceholders(methodValue, context);
             return Collections.singletonList(matchTemplate.nest(methodValue));
-        } else {
-            List<UriMatchTemplate> matchTemplates = new ArrayList<>(uris.length);
-            for (String methodValue : uris) {
-                methodValue = OpenApiApplicationVisitor.replacePlaceholders(methodValue, context);
-                matchTemplates.add(matchTemplate.nest(methodValue));
-            }
-            return matchTemplates;
         }
+        List<UriMatchTemplate> matchTemplates = new ArrayList<>(uris.length);
+        for (String methodValue : uris) {
+            methodValue = OpenApiApplicationVisitor.replacePlaceholders(methodValue, context);
+            matchTemplates.add(matchTemplate.nest(methodValue));
+        }
+        return matchTemplates;
     }
 
     @Override

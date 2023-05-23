@@ -21,6 +21,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javax.annotation.processing.SupportedOptions;
+
 import io.micronaut.core.annotation.AnnotationValue;
 import io.micronaut.core.naming.NameUtils;
 import io.micronaut.core.util.ArrayUtils;
@@ -40,6 +42,8 @@ import io.swagger.v3.oas.models.tags.Tag;
 
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 
+import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.MICRONAUT_OPENAPI_ENABLED;
+import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.isOpenApiEnabled;
 import static io.micronaut.openapi.visitor.Utils.DEFAULT_MEDIA_TYPES;
 
 /**
@@ -49,6 +53,7 @@ import static io.micronaut.openapi.visitor.Utils.DEFAULT_MEDIA_TYPES;
  * @author croudet
  * @since 1.4
  */
+@SupportedOptions(MICRONAUT_OPENAPI_ENABLED)
 public class OpenApiEndpointVisitor extends AbstractOpenApiEndpointVisitor implements TypeElementVisitor<Object, Object> {
 
     private String id;
@@ -80,7 +85,10 @@ public class OpenApiEndpointVisitor extends AbstractOpenApiEndpointVisitor imple
 
     @Override
     public void visitClass(ClassElement element, VisitorContext context) {
-        EndpointsConfiguration cfg = OpenApiApplicationVisitor.endPointsConfiguration(context);
+        if (!isOpenApiEnabled(context)) {
+            return;
+        }
+        EndpointsConfiguration cfg = OpenApiApplicationVisitor.endpointsConfiguration(context);
         if (enabled == null) {
             enabled = cfg.isEnabled();
         }
@@ -218,6 +226,11 @@ public class OpenApiEndpointVisitor extends AbstractOpenApiEndpointVisitor imple
         securityRequirements.addAll(context.get(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_ENDPOINT_SECURITY_REQUIREMENTS, List.class,
             Collections.emptyList()));
         return securityRequirements;
+    }
+
+    @Override
+    public int getOrder() {
+        return 40;
     }
 
     private static List<MediaType> mediaTypes(String... arr) {

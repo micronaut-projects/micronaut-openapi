@@ -225,8 +225,7 @@ class MyController2 {
                                                                 name = "test",
                                                                 description = "this is description",
                                                                 defaultValue = "{\\"stampWidth\\": 100}",
-                                                                format = "binary",
-                                                                ref = "#/components/schemas/Head4Schema"
+                                                                format = "binary"
                                                             )
                                                     ),
                                                     @Header(
@@ -529,7 +528,6 @@ class MyBean {}
         !operation.requestBody.content."multipart/mixed".encoding.firstOject.headers.MyHeader2.required
         !operation.requestBody.content."multipart/mixed".encoding.firstOject.headers.MyHeader2.deprecated
         operation.requestBody.content."multipart/mixed".encoding.firstOject.headers.MyHeader3.get$ref() == '#/components/headers/Head3'
-        operation.requestBody.content."multipart/mixed".encoding.firstOject.headers.MyHeader4.schema.get$ref() == '#/components/schemas/Head4Schema'
         operation.requestBody.content."multipart/mixed".encoding.firstOject.headers.MyHeader4.schema.description == 'this is description'
         operation.requestBody.content."multipart/mixed".encoding.firstOject.headers.MyHeader4.schema.default
         operation.requestBody.content."multipart/mixed".encoding.firstOject.headers.MyHeader4.schema.format == 'binary'

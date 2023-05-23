@@ -291,10 +291,10 @@ class HelloWorldController implements HelloWorldApi {
 class MyBean {}
 ''')
         then:
-        Utils.testReferenceAfterPlaceholders != null
+        Utils.testReference != null
 
         when:
-        OpenAPI openAPI = Utils.testReferenceAfterPlaceholders
+        OpenAPI openAPI = Utils.testReference
 
         then:
         openAPI.info != null
@@ -334,6 +334,9 @@ class MyBean {}
 //        openAPI.components.schemas['UsernamePasswordCredentials'].required.size() == 2
         openAPI.components.schemas['UsernamePasswordCredentials'].properties['username']
         openAPI.components.schemas['UsernamePasswordCredentials'].properties['password']
+
+        cleanup:
+        System.clearProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_CONFIG_FILE)
     }
 
     void "test build OpenAPI doc for simple endpoint"() {

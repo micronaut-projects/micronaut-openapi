@@ -104,9 +104,10 @@ class MyBean {}
         requestBody.content
         requestBody.content.size() == 1
         requestBody.content['multipart/form-data'].schema
-        requestBody.content['multipart/form-data'].schema instanceof ObjectSchema
+        requestBody.content['multipart/form-data'].schema.type == 'object'
         requestBody.content['multipart/form-data'].schema.properties['file']
-        requestBody.content['multipart/form-data'].schema.properties['file'] instanceof BinarySchema
+        requestBody.content['multipart/form-data'].schema.properties['file'].type == 'string'
+        requestBody.content['multipart/form-data'].schema.properties['file'].format == 'binary'
         requestBody.content['multipart/form-data'].schema.properties['file'].description == "The file parts."
 
         expect:
@@ -122,9 +123,10 @@ class MyBean {}
         requestBody.content
         requestBody.content.size() == 1
         requestBody.content['multipart/form-data'].schema
-        requestBody.content['multipart/form-data'].schema instanceof ObjectSchema
+        requestBody.content['multipart/form-data'].schema.type == 'object'
         requestBody.content['multipart/form-data'].schema.properties['file']
-        requestBody.content['multipart/form-data'].schema.properties['file'] instanceof BinarySchema
+        requestBody.content['multipart/form-data'].schema.properties['file'].type == 'string'
+        requestBody.content['multipart/form-data'].schema.properties['file'].format == 'binary'
         requestBody.content['multipart/form-data'].schema.properties['file'].description == "The complete file."
 
         expect:
@@ -140,9 +142,10 @@ class MyBean {}
         requestBody.content
         requestBody.content.size() == 1
         requestBody.content['multipart/form-data'].schema
-        requestBody.content['multipart/form-data'].schema instanceof ObjectSchema
+        requestBody.content['multipart/form-data'].schema.type == 'object'
         requestBody.content['multipart/form-data'].schema.properties['file']
-        requestBody.content['multipart/form-data'].schema.properties['file'] instanceof BinarySchema
+        requestBody.content['multipart/form-data'].schema.properties['file'].type == 'string'
+        requestBody.content['multipart/form-data'].schema.properties['file'].format == 'binary'
         requestBody.content['multipart/form-data'].schema.properties['file'].description == "The streaming file."
 
         expect:
@@ -158,12 +161,14 @@ class MyBean {}
         requestBody.content
         requestBody.content.size() == 1
         requestBody.content['multipart/form-data'].schema
-        requestBody.content['multipart/form-data'].schema instanceof ObjectSchema
+        requestBody.content['multipart/form-data'].schema.type == 'object'
         requestBody.content['multipart/form-data'].schema.properties['file1']
-        requestBody.content['multipart/form-data'].schema.properties['file1'] instanceof BinarySchema
+        requestBody.content['multipart/form-data'].schema.properties['file1'].type == 'string'
+        requestBody.content['multipart/form-data'].schema.properties['file1'].format == 'binary'
         requestBody.content['multipart/form-data'].schema.properties['file1'].description == "The streaming file 1."
         requestBody.content['multipart/form-data'].schema.properties['file2']
-        requestBody.content['multipart/form-data'].schema.properties['file2'] instanceof BinarySchema
+        requestBody.content['multipart/form-data'].schema.properties['file2'].type == 'string'
+        requestBody.content['multipart/form-data'].schema.properties['file2'].format == 'binary'
         requestBody.content['multipart/form-data'].schema.properties['file2'].description == "The streaming file 2."
 
         expect:
@@ -179,11 +184,12 @@ class MyBean {}
         requestBody.content
         requestBody.content.size() == 1
         requestBody.content['multipart/form-data'].schema
-        requestBody.content['multipart/form-data'].schema instanceof ObjectSchema
+        requestBody.content['multipart/form-data'].schema.type == 'object'
         requestBody.content['multipart/form-data'].schema.properties['files']
         requestBody.content['multipart/form-data'].schema.properties['files'] instanceof ArraySchema
         requestBody.content['multipart/form-data'].schema.properties['files'].description == 'The streaming files.'
-        requestBody.content['multipart/form-data'].schema.properties['files'].items instanceof BinarySchema
+        requestBody.content['multipart/form-data'].schema.properties['files'].items.type == 'string'
+        requestBody.content['multipart/form-data'].schema.properties['files'].items.format == 'binary'
 
         expect:
         operation

@@ -4,11 +4,11 @@ import io.micronaut.openapi.AbstractOpenApiTypeElementSpec
 
 class OpenApiOutputYamlSpec extends AbstractOpenApiTypeElementSpec {
 
-    def setup() {
-        System.clearProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_JSON_FORMAT)
-    }
-
     void "test paths and schemas for OpenAPI are sorted"() {
+
+        setup:
+        System.clearProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_JSON_FORMAT)
+
         when:
         buildBeanDefinition('test.MyBean', '''
 package test;

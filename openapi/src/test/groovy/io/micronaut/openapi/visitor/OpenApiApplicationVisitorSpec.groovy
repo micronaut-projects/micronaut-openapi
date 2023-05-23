@@ -1,5 +1,6 @@
 package io.micronaut.openapi.visitor
 
+import io.micronaut.context.env.Environment
 import io.micronaut.openapi.AbstractOpenApiTypeElementSpec
 import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.security.SecurityScheme
@@ -435,7 +436,7 @@ class MyBean {}
         openAPI.paths[uri].post.requestBody
 
         cleanup:
-        System.setProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_CONFIG_FILE, "")
+        System.clearProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_CONFIG_FILE)
     }
 
     void "test build OpenAPI doc for simple type with generics"() {
@@ -697,11 +698,6 @@ import io.swagger.v3.oas.annotations.security.SecurityScheme;
                        scopes = @OAuthScope(name = "write:pets", description = "modify pets in your account"))),
     description = "ssssss"
 )
-@SecurityScheme(
-    name = "schemeWithRef",
-    type = SecuritySchemeType.DEFAULT,
-    ref = "#/components/securitySchemes/foo"
-)
 class Application {
 }
 
@@ -774,16 +770,200 @@ class MyBean {}
         oauth2.flows
         oauth2.flows.implicit
         oauth2.scheme == null
+    }
 
-        def withRef = openAPI.components.securitySchemes['schemeWithRef']
-        withRef.type == null
-        withRef.in == null
-        withRef.name == null
-        withRef.description == null
-        withRef.openIdConnectUrl == null
-        withRef.bearerFormat == null
-        withRef.flows == null
-        withRef.scheme == null
-        withRef.$ref == '#/components/securitySchemes/foo'
+    void "test disable openapi"() {
+
+        given: "An API definition"
+        Utils.testReference = null
+        System.setProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_ENABLED, "false")
+
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Post;
+import io.reactivex.Single;
+import io.swagger.v3.oas.annotations.Hidden;
+import io.swagger.v3.oas.annotations.media.Schema;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+/**
+ * @author graemerocher
+ * @since 1.0
+ */
+@Controller("/pets")
+interface PetOperations<T extends Pet> {
+
+    @Post
+    Single<T> save(String name, int age);
+}
+
+class Pet {
+
+    private int privateAge;
+    protected int protectedAge;
+    int packageAge;
+
+    public int age;
+
+    // ignored by json
+    @JsonIgnore
+    public int ignored;
+    // hidden by swagger
+    @Hidden
+    public int hidden;
+    // hidden by swagger
+    @Schema(hidden = true)
+    public int hidden2;
+
+    // private should not be included
+    private String name;
+
+    // protected should not be included
+    protected String protectme;
+
+    // static should not be included
+    public static String CONST;
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        then: "the state is correct"
+        !Utils.testReference
+
+        cleanup:
+        System.clearProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_ENABLED)
+    }
+
+    void "test disable openapi from file"() {
+
+        given: "An API definition"
+        Utils.testReference = null
+        System.setProperty(OpenApiApplicationVisitor.MICRONAUT_CONFIG_FILE_LOCATIONS, "project:/src/test/resources/")
+        System.setProperty(Environment.ENVIRONMENTS_PROPERTY, "disabled-openapi")
+
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Post;
+import io.reactivex.Single;
+import io.swagger.v3.oas.annotations.Hidden;
+import io.swagger.v3.oas.annotations.media.Schema;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+@Controller("/pets")
+interface PetOperations<T extends Pet> {
+
+    @Post
+    Single<T> save(String name, int age);
+}
+
+class Pet {
+
+    private int privateAge;
+    protected int protectedAge;
+    int packageAge;
+
+    public int age;
+
+    // ignored by json
+    @JsonIgnore
+    public int ignored;
+    // hidden by swagger
+    @Hidden
+    public int hidden;
+    // hidden by swagger
+    @Schema(hidden = true)
+    public int hidden2;
+
+    // private should not be included
+    private String name;
+
+    // protected should not be included
+    protected String protectme;
+
+    // static should not be included
+    public static String CONST;
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        then: "the state is correct"
+        !Utils.testReference
+
+        cleanup:
+        System.clearProperty(OpenApiApplicationVisitor.MICRONAUT_CONFIG_FILE_LOCATIONS)
+        System.clearProperty(Environment.ENVIRONMENTS_PROPERTY)
+    }
+
+    void "test disable openapi from openapi.properties file"() {
+
+        given: "An API definition"
+        Utils.testReference = null
+        System.setProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_CONFIG_FILE, "openapi-disabled-openapi.properties")
+
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Post;
+import io.reactivex.Single;
+import io.swagger.v3.oas.annotations.Hidden;
+import io.swagger.v3.oas.annotations.media.Schema;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+@Controller("/pets")
+interface PetOperations<T extends Pet> {
+
+    @Post
+    Single<T> save(String name, int age);
+}
+
+class Pet {
+
+    private int privateAge;
+    protected int protectedAge;
+    int packageAge;
+
+    public int age;
+
+    // ignored by json
+    @JsonIgnore
+    public int ignored;
+    // hidden by swagger
+    @Hidden
+    public int hidden;
+    // hidden by swagger
+    @Schema(hidden = true)
+    public int hidden2;
+
+    // private should not be included
+    private String name;
+
+    // protected should not be included
+    protected String protectme;
+
+    // static should not be included
+    public static String CONST;
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        then: "the state is correct"
+        !Utils.testReference
+
+        cleanup:
+        System.clearProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_CONFIG_FILE)
     }
 }

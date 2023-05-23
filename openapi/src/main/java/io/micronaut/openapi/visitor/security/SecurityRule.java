@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2022 original authors
+ * Copyright 2017-2023 original authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,28 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.micronaut.openapi.visitor;
+package io.micronaut.openapi.visitor.security;
 
 import io.micronaut.core.annotation.Internal;
-import io.micronaut.inject.visitor.VisitorContext;
 
 /**
- * Convert utilities methods.
+ * Copy of class io.micronaut.security.rules.SecurityRule from micronaut-security.
  *
- * @since 4.5.0
+ * @since 4.8.7
  */
 @Internal
-public final class ContextUtils {
+public interface SecurityRule {
 
-    private ContextUtils() {
-    }
-
-    public static Integer getVisitedElements(VisitorContext context) {
-        Integer visitedElements = context.get(Utils.ATTR_VISITED_ELEMENTS, Integer.class).orElse(null);
-        if (visitedElements == null) {
-            visitedElements = 0;
-            context.put(Utils.ATTR_VISITED_ELEMENTS, visitedElements);
-        }
-        return visitedElements;
-    }
+    /**
+     * The token to represent allowing anonymous access.
+     */
+    String IS_ANONYMOUS = "isAnonymous()";
+    /**
+     * The token to represent allowing any authenticated access.
+     */
+    String IS_AUTHENTICATED = "isAuthenticated()";
+    /**
+     * The token to represent no security roles are allowed.
+     */
+    String DENY_ALL = "denyAll()";
 }

@@ -15,9 +15,8 @@
  */
 package io.micronaut.openapi.visitor;
 
-import java.io.File;
-import java.io.InputStream;
-import java.nio.ByteBuffer;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
@@ -25,17 +24,17 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.Future;
 
 import io.micronaut.context.env.DefaultPropertyPlaceholderResolver;
 import io.micronaut.context.env.PropertyPlaceholderResolver;
+import io.micronaut.core.annotation.Internal;
 import io.micronaut.core.annotation.NonNull;
+import io.micronaut.core.annotation.Nullable;
 import io.micronaut.core.convert.ArgumentConversionContext;
 import io.micronaut.core.convert.DefaultMutableConversionService;
 import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.core.value.PropertyResolver;
 import io.micronaut.http.MediaType;
-import io.micronaut.inject.ast.ClassElement;
 import io.micronaut.inject.visitor.VisitorContext;
 import io.micronaut.openapi.javadoc.JavadocParser;
 import io.swagger.v3.oas.models.Components;
@@ -46,6 +45,7 @@ import io.swagger.v3.oas.models.OpenAPI;
  *
  * @since 4.4.0
  */
+@Internal
 public final class Utils {
 
     public static final String PLACEHOLDER_PREFIX = "${";
@@ -59,7 +59,6 @@ public final class Utils {
 
     private static PropertyPlaceholderResolver propertyPlaceholderResolver;
     private static OpenAPI testReference;
-    private static OpenAPI testReferenceAfterPlaceholders;
     private static String testFileName;
     private static String testYamlReference;
     private static String testJsonReference;
@@ -69,12 +68,20 @@ public final class Utils {
     private Utils() {
     }
 
+    @Nullable
     public static Path getProjectPath(VisitorContext context) {
-        return context.getProjectDir().orElse(Utils.isTestMode() ? Paths.get(System.getProperty("user.dir")) : null);
+        Path path;
+        try {
+            path = context.getProjectDir().orElse(Utils.isTestMode() ? Paths.get(System.getProperty("user.dir")) : null);
+        } catch (Exception e) {
+            // Should never happen
+            path = Paths.get(System.getProperty("user.dir"));
+        }
+        return path;
     }
 
     /**
-     * @return An Instance of sdefault {@link PropertyPlaceholderResolver} to resolve placeholders.
+     * @return An Instance of default {@link PropertyPlaceholderResolver} to resolve placeholders.
      */
     public static PropertyPlaceholderResolver getPropertyPlaceholderResolver() {
         if (propertyPlaceholderResolver == null) {
@@ -102,30 +109,6 @@ public final class Utils {
             }, new DefaultMutableConversionService());
         }
         return propertyPlaceholderResolver;
-    }
-
-    public static boolean isContainerType(ClassElement type) {
-        return CollectionUtils.setOf(
-            Optional.class.getName(),
-            Future.class.getName(),
-            "org.reactivestreams.Publisher",
-            "io.reactivex.Single",
-            "io.reactivex.Observable",
-            "io.reactivex.Maybe",
-            "io.reactivex.rxjava3.core.Single",
-            "io.reactivex.rxjava3.core.Observable",
-            "io.reactivex.rxjava3.core.Maybe"
-        ).stream().anyMatch(type::isAssignable);
-    }
-
-    public static boolean isReturnTypeFile(ClassElement type) {
-        return CollectionUtils.setOf(
-            // this class from micronaut-http-server
-            "io.micronaut.http.server.types.files.FileCustomizableResponseType",
-            File.class.getName(),
-            InputStream.class.getName(),
-            ByteBuffer.class.getName()
-        ).stream().anyMatch(type::isAssignable);
     }
 
     /**
@@ -174,16 +157,28 @@ public final class Utils {
      *
      * @return The {@link OpenAPI} instance
      */
-    public static OpenAPI resolveOpenAPI(VisitorContext context) {
+    public static OpenAPI resolveOpenApi(VisitorContext context) {
         OpenAPI openAPI = context.get(ATTR_OPENAPI, OpenAPI.class).orElse(null);
         if (openAPI == null) {
             openAPI = new OpenAPI();
             context.put(ATTR_OPENAPI, openAPI);
-            if (isTestMode()) {
-                setTestReference(openAPI);
-            }
         }
         return openAPI;
+    }
+
+    /**
+     * Return stacktrace for throwable and message.
+     *
+     * @param t throwable
+     *
+     * @return stacktrace
+     */
+    public static String printStackTrace(Throwable t) {
+        StringWriter sw = new StringWriter();
+        sw.append(t.getMessage()).append('\n');
+        PrintWriter pw = new PrintWriter(sw);
+        t.printStackTrace(pw);
+        return sw.toString();
     }
 
     public static boolean isTestMode() {
@@ -196,14 +191,6 @@ public final class Utils {
 
     public static void setTestReference(OpenAPI testReference) {
         Utils.testReference = testReference;
-    }
-
-    public static OpenAPI getTestReferenceAfterPlaceholders() {
-        return testReferenceAfterPlaceholders;
-    }
-
-    public static void setTestReferenceAfterPlaceholders(OpenAPI testReferenceAfterPlaceholders) {
-        Utils.testReferenceAfterPlaceholders = testReferenceAfterPlaceholders;
     }
 
     public static String getTestYamlReference() {

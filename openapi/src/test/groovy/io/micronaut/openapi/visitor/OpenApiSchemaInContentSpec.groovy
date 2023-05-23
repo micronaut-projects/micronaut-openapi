@@ -36,7 +36,7 @@ class OpenApiController {
             description = "This is description",
             tags = "Normalize",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Desc1", content = @Content(mediaType = MediaType.ALL, schema = @Schema(type = "blob", format = "binary"))),
+                    @ApiResponse(responseCode = "200", description = "Desc1", content = @Content(mediaType = MediaType.ALL, schema = @Schema(type = "string", format = "binary"))),
                     @ApiResponse(responseCode = "300", description = "Desc1", content = @Content(mediaType = MediaType.ALL, schema = @Schema(ref = "#/components/schemas/myCustomSchema"))),
                     @ApiResponse(responseCode = "400", description = "Desc2", content = @Content(schema = @Schema(implementation = Response.class))),
             })
@@ -93,7 +93,7 @@ class MyBean {}
         operation.responses
         operation.responses.size() == 3
         operation.responses."200".content.'*/*'.schema
-        operation.responses."200".content.'*/*'.schema.type == 'blob'
+        operation.responses."200".content.'*/*'.schema.type == 'string'
         operation.responses."200".content.'*/*'.schema.format == 'binary'
         operation.responses."300".content.'*/*'.schema.$ref == '#/components/schemas/myCustomSchema'
     }
@@ -129,7 +129,7 @@ class OpenApiController {
             description = "This is description",
             tags = "Normalize")
     @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "Desc1", content = @Content(mediaType = MediaType.ALL, schema = @Schema(type = "blob", format = "binary"))),
+        @ApiResponse(responseCode = "200", description = "Desc1", content = @Content(mediaType = MediaType.ALL, schema = @Schema(type = "string", format = "binary"))),
         @ApiResponse(responseCode = "300", description = "Desc1", content = @Content(mediaType = MediaType.ALL, schema = @Schema(ref = "#/components/schemas/myCustomSchema"))),
         @ApiResponse(responseCode = "400", description = "Desc2", content = @Content(schema = @Schema(implementation = Response.class))),
     })
@@ -186,7 +186,7 @@ class MyBean {}
         operation.responses
         operation.responses.size() == 3
         operation.responses."200".content.'*/*'.schema
-        operation.responses."200".content.'*/*'.schema.type == 'blob'
+        operation.responses."200".content.'*/*'.schema.type == 'string'
         operation.responses."200".content.'*/*'.schema.format == 'binary'
         operation.responses."300".content.'*/*'.schema.$ref == '#/components/schemas/myCustomSchema'
     }

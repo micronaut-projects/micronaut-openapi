@@ -12,7 +12,7 @@ class OpenApiNullableTypesSpec extends AbstractOpenApiTypeElementSpec {
 
     void "test build OpenAPI for java.util.Optional"() {
         when:
-        buildBeanDefinition('test.PetController','''
+        buildBeanDefinition('test.PetController', '''
 package test;
 
 import io.micronaut.http.HttpResponse;
@@ -71,14 +71,14 @@ class PetController {
 }
 
 ''')
-        then:"the state is correct"
+        then: "the state is correct"
         Utils.testReference != null
 
-        when:"The OpenAPI is retrieved"
+        when: "The OpenAPI is retrieved"
         OpenAPI openAPI = Utils.testReference
         Schema petSchema = openAPI.components.schemas['Pet']
 
-        then:"the components are valid"
+        then: "the components are valid"
         petSchema.type == 'object'
         petSchema.properties.size() == 2
 
@@ -91,7 +91,7 @@ class PetController {
 
     void "test build OpenAPI for nullable fields"() {
         when:
-        buildBeanDefinition('test.PetController','''
+        buildBeanDefinition('test.PetController', '''
 package test;
 
 import io.micronaut.core.annotation.Nullable;
@@ -153,14 +153,14 @@ class PetController {
 }
 
 ''')
-        then:"the state is correct"
+        then: "the state is correct"
         Utils.testReference != null
 
-        when:"The OpenAPI is retrieved"
+        when: "The OpenAPI is retrieved"
         OpenAPI openAPI = Utils.testReference
         Schema petSchema = openAPI.components.schemas['Pet']
 
-        then:"the components are valid"
+        then: "the components are valid"
         petSchema.type == 'object'
         petSchema.properties.size() == 2
 
@@ -170,7 +170,7 @@ class PetController {
 
     void "test build OpenAPI for nullable fields2"() {
         when:
-        buildBeanDefinition('test.PetController','''
+        buildBeanDefinition('test.PetController', '''
 package test;
 
 import io.micronaut.core.annotation.Nullable;
@@ -232,16 +232,16 @@ class PetController {
 }
 
 ''')
-        then:"the state is correct"
+        then: "the state is correct"
         Utils.testReference != null
 
-        when:"The OpenAPI is retrieved"
+        when: "The OpenAPI is retrieved"
         OpenAPI openAPI = Utils.testReference
         Operation get = openAPI.paths."/pet/{name}/{type}".get
         Operation post = openAPI.paths."/pet/{type}".post
         Schema petSchema = openAPI.components.schemas['Pet']
 
-        then:"the components are valid"
+        then: "the components are valid"
         petSchema.type == 'object'
         petSchema.properties.size() == 2
 
@@ -252,27 +252,28 @@ class PetController {
         get.parameters.get(0).name == 'name'
         get.parameters.get(0).required
 
+        // Path variables always required
         get.parameters.get(1).in == 'path'
         get.parameters.get(1).name == 'type'
-        !get.parameters.get(1).required
+        get.parameters.get(1).required
 
         post.parameters.get(0).in == 'path'
         post.parameters.get(0).name == 'type'
-        !post.parameters.get(0).required
+        post.parameters.get(0).required
     }
 
     @Unroll
     void "test build OpenAPI with Nullable annotations"(String annotation) {
         when:
         buildBeanDefinition('test.PetController', sampleClass(annotation))
-        then:"the state is correct"
+        then: "the state is correct"
         Utils.testReference != null
 
-        when:"The OpenAPI is retrieved"
+        when: "The OpenAPI is retrieved"
         OpenAPI openAPI = Utils.testReference
         Schema schema = openAPI.components.schemas['HelloWorldDto']
 
-        then:"the components are valid"
+        then: "the components are valid"
         schema.type == 'object'
         schema.properties.size() == 1
         schema.properties.nullprop.nullable
@@ -296,14 +297,14 @@ class PetController {
     void "test build OpenAPI with eclipse and jspecify Nullable annotations"(String annotation) {
         when:
         buildBeanDefinition('test.PetController', sampleClass(annotation))
-        then:"the state is correct"
+        then: "the state is correct"
         Utils.testReference != null
 
-        when:"The OpenAPI is retrieved"
+        when: "The OpenAPI is retrieved"
         OpenAPI openAPI = Utils.testReference
         Schema schema = openAPI.components.schemas['HelloWorldDto']
 
-        then:"the components are valid"
+        then: "the components are valid"
         schema.type == 'object'
         schema.properties.size() == 1
 

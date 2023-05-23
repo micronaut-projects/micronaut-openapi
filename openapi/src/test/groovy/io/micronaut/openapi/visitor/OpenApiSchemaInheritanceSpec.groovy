@@ -540,4 +540,364 @@ class MyBean {}
         !emailSendProtocolDtoSchemaFromReadEmailSettingsDto.required
     }
 
+    void "test OpenAPI with inheritance and allOf together in complex openApi"() {
+        given:
+        buildBeanDefinition('test.MyBean', '''
+
+package test;
+
+import java.io.Serializable;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.validation.constraints.NotNull;
+
+import io.micronaut.core.annotation.Introspected;
+import io.micronaut.core.annotation.Nullable;
+import io.micronaut.http.annotation.Body;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Post;
+import io.swagger.v3.oas.annotations.Hidden;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Schema;
+
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+
+@Controller
+class MyController {
+
+    @Post("/bike")
+    public void bike(@Body Owner owner) {
+    }
+
+    @Post("/car")
+    public void car(@Body Car car) {
+    }
+}
+
+@Introspected
+@Schema(description = "Represents a person that owns a car or a bike")
+class Owner {
+
+    /**
+     * The bike
+     */
+    @NotNull
+    public Bike bike;
+    /**
+     * The car
+     */
+    @NotNull
+    public Car car;
+}
+
+@Introspected
+@Schema(description = "Vehicle of the owner.")
+abstract class Vehicle<T> {
+
+    private List<T> vehicleField;
+
+    /**
+     * Getter javadoc.
+     */
+    @ArraySchema(schema = @Schema(implementation = Document.class, description = "List of objects"))
+    @NotNull
+    public List<T> getVehicleField() {
+        return vehicleField;
+    }
+
+    public void setVehicleField(List<T> vehicleField) {
+        this.vehicleField = vehicleField;
+    }
+}
+
+/**
+ * Bike schema.
+ */
+@Introspected
+class Bike extends Vehicle<MyDocument> {
+
+    /**
+     * Child getter javadoc.
+     */
+    @Override
+    public List<MyDocument> getVehicleField() {
+        return super.getVehicleField();
+    }
+}
+
+/**
+ * Car schema.
+ */
+@Introspected
+class Car extends Vehicle<AverageStats> {
+
+    private String carField;
+
+    /**
+     * Child getter javadoc.
+     */
+    @Override
+    public List<AverageStats> getVehicleField() {
+        return super.getVehicleField();
+    }
+
+    /**
+     * Getter javadoc.
+     */
+    public String getCarField() {
+        return carField;
+    }
+
+    public void setCarField(String carField) {
+        this.carField = carField;
+    }
+}
+
+/**
+ * AverageStats class javadoc.
+ */
+@Schema(allOf = Document.class)
+class AverageStats extends DocumentImpl {
+
+    /**
+     * Average value
+     */
+    @NotNull
+    private Double statValue;
+    /**
+     * The second metric.
+     */
+    @NotNull
+    private Long secondMetric;
+
+    public Double getStatValue() {
+        return statValue;
+    }
+
+    public void setStatValue(Double statValue) {
+        this.statValue = statValue;
+    }
+
+    public Long getSecondMetric() {
+        return secondMetric;
+    }
+
+    public void setSecondMetric(Long secondMetric) {
+        this.secondMetric = secondMetric;
+    }
+}
+
+/**
+ * MyDocument class javadoc.
+ */
+@Schema(allOf = Document.class)
+class MyDocument extends DocumentImpl {
+
+    /**
+     * NII field
+     */
+    @NotNull
+    private Long nii;
+    /**
+     * Field2 description
+     */
+    @NotNull
+    private Long field2;
+
+    public Long getField2() {
+        return field2;
+    }
+
+    public void setField2(Long field2) {
+       this.field2 = field2;
+    }
+
+    public Long getNii() {
+        return nii;
+    }
+
+    public void setNii(Long nii) {
+       this.nii = nii;
+    }
+}
+
+/**
+ * DocumentImpl class javadoc.
+ */
+class DocumentImpl implements Document, Serializable {
+
+    @Schema(description = "Inique id", required = true)
+    private String id;
+
+    @Schema(hidden = true)
+    @Hidden
+    private Boolean hidden;
+
+    @Schema(description = "Modification date in UnixTime",
+            implementation = long.class,
+            accessMode = Schema.AccessMode.READ_ONLY)
+    private long modified;
+
+    @Schema(description = "Shema name",
+            implementation = String.class,
+            accessMode = Schema.AccessMode.READ_ONLY)
+    @JsonProperty(required = true)
+    private String schema;
+
+    @Hidden
+    @JsonIgnore
+    private Set<DocumentProperty> properties;
+
+    @Override
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    @Hidden
+    @JsonIgnore
+    public Boolean isHidden() {
+        return hidden;
+    }
+
+    @Schema(hidden = true)
+    @JsonProperty
+    public void setHidden(Boolean hidden) {
+        this.hidden = hidden;
+    }
+
+    @JsonProperty
+    @Override
+    public long getModified() {
+        return modified;
+    }
+
+    @JsonProperty
+    @Override
+    public @NotNull String getSchema() {
+        return null;
+    }
+
+    @JsonProperty
+    public Document setSchema(String schema) {
+        this.schema = schema;
+        return this;
+    }
+
+    @JsonIgnore
+    @Override
+    public final @Nullable Object getExpand(String field) {
+        return null;
+    }
+
+    @JsonAnyGetter
+    @NotNull
+    @Override
+    public final Map<String, Object> getExpands() {
+        return Collections.emptyMap();
+    }
+
+    @JsonAnySetter
+    @Override
+    public final void setExpand(@Nullable String field, @Nullable Object value) {
+    }
+}
+
+enum DocumentProperty {
+    READ_ONLY
+}
+
+interface Document {
+
+    /**
+     * @return document identified
+     */
+    String getId();
+
+    /**
+     * @return document modified time as UnixTime
+     */
+    long getModified();
+
+    /**
+     * @return document schema
+     */
+    @NotNull
+    String getSchema();
+
+    /**
+     * @param field to get value
+     * @return specified field value
+     */
+    @Nullable
+    Object getExpand(String field);
+
+    /**
+     * @return retrieve all documents expand fields
+     */
+    @NotNull
+    Map<String, Object> getExpands();
+
+    /**
+     * @param field to set value to
+     * @param value to set for field
+     */
+    void setExpand(@Nullable String field, @Nullable Object value);
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+
+        OpenAPI openAPI = Utils.testReference
+        def schemas = openAPI.getComponents().getSchemas()
+
+        expect:
+        schemas
+//        schemas.size() == 9
+
+        def averageStats = schemas.AverageStats
+        averageStats.allOf.size() == 3
+        averageStats.allOf.get(0).$ref == '#/components/schemas/Document'
+        averageStats.allOf.get(1).$ref == '#/components/schemas/DocumentImpl'
+        averageStats.allOf.get(2).$ref == null
+
+        def bike = schemas.Bike
+        bike.allOf.size() == 2
+        bike.allOf.get(0).$ref == '#/components/schemas/Vehicle_MyDocument_'
+        bike.allOf.get(1).$ref == null
+        bike.allOf.get(1).properties.size() == 1
+        bike.allOf.get(1).properties.vehicleField.description == 'Child getter javadoc.'
+
+        def car = schemas.Car
+        car.allOf.size() == 2
+        car.allOf.get(0).$ref == '#/components/schemas/Vehicle_AverageStats_'
+        car.allOf.get(1).$ref == null
+        car.allOf.get(1).properties.size() == 2
+        car.allOf.get(1).properties.vehicleField.description == 'Child getter javadoc.'
+        car.allOf.get(1).properties.carField.description == 'Getter javadoc.'
+
+        def document = schemas.Document
+        document.properties.id
+        document.properties.modified
+        document.properties.schema
+        document.properties.expands
+        document.properties.expands.additionalProperties == true
+
+        def myDocument = schemas.MyDocument
+        myDocument.allOf.size() == 3
+        myDocument.allOf.get(0).$ref == '#/components/schemas/Document'
+        myDocument.allOf.get(1).$ref == '#/components/schemas/DocumentImpl'
+        myDocument.allOf.get(2).$ref == null
+    }
 }

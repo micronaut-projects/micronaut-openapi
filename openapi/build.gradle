@@ -13,7 +13,6 @@ dependencies {
     api(libs.managed.swagger.models)
     api(libs.managed.swagger.annotations)
     api(libs.managed.javadoc.parser)
-    api(libs.managed.slf4j.nop)
     api(libs.managed.html2md.converter) {
         exclude group: "org.jetbrains", module: "annotations"
     }
@@ -34,6 +33,8 @@ dependencies {
     testImplementation(libs.jdt.annotation)
     testImplementation(libs.android.annotation)
     testImplementation(libs.spotbugs.annotations)
+    testImplementation(libs.kotlinx.coroutines.reactive)
+    testImplementation(libs.kotlinx.coroutines.reactor)
 }
 
 configurations.configureEach {

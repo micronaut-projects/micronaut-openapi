@@ -50,10 +50,10 @@ class MyDto {
 class MyBean {}
 ''')
         then: "the state is correct"
-        Utils.testReferenceAfterPlaceholders != null
+        Utils.testReference != null
 
         when: "The OpenAPI is retrieved"
-        OpenAPI openAPI = Utils.testReferenceAfterPlaceholders
+        OpenAPI openAPI = Utils.testReference
         Schema dtoSchema = openAPI.components.schemas['MyDto']
 
         then: "the components are valid"
@@ -121,10 +121,10 @@ class MyDto {
 class MyBean {}
 ''')
         then: "the state is correct"
-        Utils.testReferenceAfterPlaceholders != null
+        Utils.testReference != null
 
         when: "The OpenAPI is retrieved"
-        OpenAPI openAPI = Utils.testReferenceAfterPlaceholders
+        OpenAPI openAPI = Utils.testReference
         Info info = openAPI.info
 
         then: "the components are valid"

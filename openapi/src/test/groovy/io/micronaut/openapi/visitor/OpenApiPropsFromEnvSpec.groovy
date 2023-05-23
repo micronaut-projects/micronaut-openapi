@@ -178,10 +178,10 @@ class HelloWorldController implements HelloWorldApi {
 class MyBean {}
 ''')
         then:
-        Utils.testReferenceAfterPlaceholders != null
+        Utils.testReference != null
 
         when:
-        OpenAPI openAPI = Utils.testReferenceAfterPlaceholders
+        OpenAPI openAPI = Utils.testReference
 
         PathItem helloPathItem = openAPI.paths."/hello"
         PathItem loginPathItem = openAPI.paths."/myLoginUrl"
@@ -222,6 +222,212 @@ class MyBean {}
         System.clearProperty(OpenApiApplicationVisitor.MICRONAUT_CONFIG_FILE_LOCATIONS)
         System.clearProperty(Environment.ENVIRONMENTS_PROPERTY)
         System.clearProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_CONFIG_FILE)
+    }
+
+    void "test expanded properties from environment"() {
+
+        given:
+        System.setProperty(OpenApiApplicationVisitor.MICRONAUT_CONFIG_FILE_LOCATIONS, "project:/src/test/resources/")
+        System.setProperty(Environment.ENVIRONMENTS_PROPERTY, "expand-props")
+
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.http.HttpResponse;
+import io.micronaut.http.MediaType;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.micronaut.http.annotation.Produces;
+import io.micronaut.openapi.annotation.OpenAPIInclude;
+import io.micronaut.security.endpoints.LoginController;
+import io.micronaut.security.endpoints.LogoutController;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
+@OpenAPIInclude(value = LoginController.class,
+    uri = "${url1}",
+    tags = @Tag(name = "Tag 4"),
+    security = @SecurityRequirement(name = "req 3", scopes = {"b", "c"})
+)
+@OpenAPIInclude(value = LogoutController.class,
+    uri = "${url2}",
+    tags = @Tag(name = "Tag 5"),
+    security = @SecurityRequirement(name = "req 3", scopes = {"b", "c"})
+)
+class Application {
+
+}
+
+@Tag(name = "HelloWorld")
+interface HelloWorldApi {
+ @Get("/")
+    @Produces(MediaType.TEXT_PLAIN)
+    @Operation(summary = "Get a message", description = "Returns a simple hello world.")
+    @ApiResponse(responseCode = "200", description = "All good.")
+    HttpResponse<String> helloWorld();
+}
+
+@Controller("/hello")
+@Tag(name = "HelloWorldController")
+class HelloWorldController implements HelloWorldApi {
+    @Override
+    public HttpResponse<String> helloWorld() {
+        return null;
+    }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        then:
+        Utils.testReference != null
+
+        when:
+        OpenAPI openAPI = Utils.testReference
+
+        PathItem helloPathItem = openAPI.paths."/hello"
+        PathItem loginPathItem = openAPI.paths."/expandUrl1"
+        PathItem logoutPathItem = openAPI.paths."/expandUrl2"
+
+        then:
+        helloPathItem
+        loginPathItem.post.operationId == 'login'
+        loginPathItem.post.tags[0] == "Tag 4"
+        loginPathItem.post.security[0]["req 3"]
+        loginPathItem.post.requestBody
+        loginPathItem.post.requestBody.required
+        loginPathItem.post.requestBody.content
+        loginPathItem.post.requestBody.content.size() == 2
+        loginPathItem.post.requestBody.content['application/x-www-form-urlencoded'].schema
+        loginPathItem.post.requestBody.content['application/x-www-form-urlencoded'].schema['$ref'] == '#/components/schemas/UsernamePasswordCredentials'
+        loginPathItem.post.requestBody.content['application/json'].schema
+        loginPathItem.post.requestBody.content['application/json'].schema['$ref'] == '#/components/schemas/UsernamePasswordCredentials'
+        loginPathItem.post.responses['200'].content['application/json'].schema.type == 'object'
+
+        logoutPathItem.post.operationId == 'index'
+        logoutPathItem.post.tags[0] == "Tag 5"
+        logoutPathItem.post.security[0]["req 3"]
+        loginPathItem.post.responses['200'].content['application/json'].schema.type == 'object'
+
+        logoutPathItem.get.operationId == 'indexGet'
+        logoutPathItem.get.tags[0] == "Tag 5"
+        logoutPathItem.get.security[0]["req 3"]
+        loginPathItem.post.responses['200'].content['application/json'].schema.type == 'object'
+
+        openAPI.components.schemas['UsernamePasswordCredentials']
+        openAPI.components.schemas['UsernamePasswordCredentials'].required.size() == 2
+        openAPI.components.schemas['UsernamePasswordCredentials'].properties['username']
+        openAPI.components.schemas['UsernamePasswordCredentials'].properties['password']
+
+        cleanup:
+        System.clearProperty(OpenApiApplicationVisitor.MICRONAUT_CONFIG_FILE_LOCATIONS)
+        System.clearProperty(Environment.ENVIRONMENTS_PROPERTY)
+    }
+
+    void "test expanded properties from system properties"() {
+
+        given:
+        System.setProperty("micronaut.openapi.expand.url1", "/expandUrl1")
+        System.setProperty("micronaut.openapi.expand.url2", "/expandUrl2")
+
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.http.HttpResponse;
+import io.micronaut.http.MediaType;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.micronaut.http.annotation.Produces;
+import io.micronaut.openapi.annotation.OpenAPIInclude;
+import io.micronaut.security.endpoints.LoginController;
+import io.micronaut.security.endpoints.LogoutController;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
+@OpenAPIInclude(value = LoginController.class,
+    uri = "${url1}",
+    tags = @Tag(name = "Tag 4"),
+    security = @SecurityRequirement(name = "req 3", scopes = {"b", "c"})
+)
+@OpenAPIInclude(value = LogoutController.class,
+    uri = "${url2}",
+    tags = @Tag(name = "Tag 5"),
+    security = @SecurityRequirement(name = "req 3", scopes = {"b", "c"})
+)
+class Application {
+
+}
+
+@Tag(name = "HelloWorld")
+interface HelloWorldApi {
+ @Get("/")
+    @Produces(MediaType.TEXT_PLAIN)
+    @Operation(summary = "Get a message", description = "Returns a simple hello world.")
+    @ApiResponse(responseCode = "200", description = "All good.")
+    HttpResponse<String> helloWorld();
+}
+
+@Controller("/hello")
+@Tag(name = "HelloWorldController")
+class HelloWorldController implements HelloWorldApi {
+    @Override
+    public HttpResponse<String> helloWorld() {
+        return null;
+    }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        then:
+        Utils.testReference != null
+
+        when:
+        OpenAPI openAPI = Utils.testReference
+
+        PathItem helloPathItem = openAPI.paths."/hello"
+        PathItem loginPathItem = openAPI.paths."/expandUrl1"
+        PathItem logoutPathItem = openAPI.paths."/expandUrl2"
+
+        then:
+        helloPathItem
+        loginPathItem.post.operationId == 'login'
+        loginPathItem.post.tags[0] == "Tag 4"
+        loginPathItem.post.security[0]["req 3"]
+        loginPathItem.post.requestBody
+        loginPathItem.post.requestBody.required
+        loginPathItem.post.requestBody.content
+        loginPathItem.post.requestBody.content.size() == 2
+        loginPathItem.post.requestBody.content['application/x-www-form-urlencoded'].schema
+        loginPathItem.post.requestBody.content['application/x-www-form-urlencoded'].schema['$ref'] == '#/components/schemas/UsernamePasswordCredentials'
+        loginPathItem.post.requestBody.content['application/json'].schema
+        loginPathItem.post.requestBody.content['application/json'].schema['$ref'] == '#/components/schemas/UsernamePasswordCredentials'
+        loginPathItem.post.responses['200'].content['application/json'].schema.type == 'object'
+
+        logoutPathItem.post.operationId == 'index'
+        logoutPathItem.post.tags[0] == "Tag 5"
+        logoutPathItem.post.security[0]["req 3"]
+        loginPathItem.post.responses['200'].content['application/json'].schema.type == 'object'
+
+        logoutPathItem.get.operationId == 'indexGet'
+        logoutPathItem.get.tags[0] == "Tag 5"
+        logoutPathItem.get.security[0]["req 3"]
+        loginPathItem.post.responses['200'].content['application/json'].schema.type == 'object'
+
+        openAPI.components.schemas['UsernamePasswordCredentials']
+        openAPI.components.schemas['UsernamePasswordCredentials'].required.size() == 2
+        openAPI.components.schemas['UsernamePasswordCredentials'].properties['username']
+        openAPI.components.schemas['UsernamePasswordCredentials'].properties['password']
+
+        cleanup:
+        System.clearProperty("micronaut.openapi.expand.url1")
+        System.clearProperty("micronaut.openapi.expand.url2")
     }
 
 }

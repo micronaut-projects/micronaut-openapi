@@ -40,6 +40,7 @@ import java.util.UUID;
 import javax.xml.datatype.XMLGregorianCalendar;
 
 import io.micronaut.core.annotation.AnnotationValue;
+import io.micronaut.core.annotation.Internal;
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.core.annotation.Nullable;
 import io.micronaut.core.beans.BeanMap;
@@ -65,11 +66,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import static io.micronaut.openapi.visitor.SchemaUtils.TYPE_OBJECT;
+
 /**
  * Convert utilities methods.
  *
  * @since 4.4.1
  */
+@Internal
 public final class ConvertUtils {
 
     private static final TypeReference<Map<String, Object>> MAP_TYPE_REFERENCE = new TypeReference<>() {
@@ -193,7 +197,7 @@ public final class ConvertUtils {
         if (valueStr == null) {
             return null;
         }
-        if (type == null || type.equals("object")) {
+        if (type == null || type.equals(TYPE_OBJECT)) {
             return CONVERT_JSON_MAPPER.readValue(valueStr, Map.class);
         }
         return parseByTypeAndFormat(valueStr, type, format, context, isMicronautFormat);
@@ -272,7 +276,7 @@ public final class ConvertUtils {
      */
     public static Pair<String, String> getTypeAndFormatByClass(String className, boolean isArray) {
         if (className == null) {
-            return Pair.of("object", null);
+            return Pair.of(TYPE_OBJECT, null);
         }
 
         if (String.class.getName().equals(className)
@@ -331,7 +335,7 @@ public final class ConvertUtils {
         } else if (LocalTime.class.getName().equals(className)) {
             return Pair.of("string", "partial-time");
         } else {
-            return Pair.of("object", null);
+            return Pair.of(TYPE_OBJECT, null);
         }
     }
 

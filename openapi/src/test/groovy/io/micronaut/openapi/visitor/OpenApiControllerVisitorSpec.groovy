@@ -996,7 +996,7 @@ class MyController {
 class MyBean {}
 ''')
         when:
-        OpenAPI api = Utils.testReferenceAfterPlaceholders
+        OpenAPI api = Utils.testReference
 
         then:
         api.paths.size() == 2
@@ -1073,7 +1073,6 @@ class MyBean {}
 
         then:
         openAPI.components.schemas.size() == 1
-        openAPI.components.schemas['TestPojo'].name == 'TestPojo'
         openAPI.components.schemas['TestPojo'].type == 'object'
         openAPI.components.schemas['TestPojo'].properties.size() == 1
         openAPI.components.schemas['TestPojo'].properties['testString'].type == 'string'
@@ -1328,5 +1327,474 @@ class MyBean {}
         operation.parameters
         operation.parameters.size() == 1
         operation.parameters[0].name == 'my-header'
+    }
+
+    void "test ApiResponse declared in interaface on method level"() {
+
+        given:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+
+import org.reactivestreams.Publisher;
+
+@Controller
+class MyController implements MyEndpoint {
+
+    @Get("/data")
+    @Override
+    public Publisher<String> getData() {
+        return null;
+    }
+}
+
+interface MyEndpoint {
+
+    @ApiResponse(responseCode = "200", description = "All is ok")
+    @ApiResponse(responseCode = "404", description = "Data is missing")
+    Publisher<String> getData();
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        when:
+        Operation operation = Utils.testReference?.paths?."/data"?.get
+
+        then:
+        operation
+        operation.responses.size() == 2
+        operation.responses."200".description == 'All is ok'
+        operation.responses."404".description == 'Data is missing'
+    }
+
+    void "test ApiResponse declared in interaface and class on method level"() {
+
+        given:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+
+import org.reactivestreams.Publisher;
+
+@Controller
+class MyController implements MyEndpoint {
+
+    @Get("/data")
+    @ApiResponse(responseCode = "407", description = "My response1")
+    @ApiResponse(responseCode = "515", description = "My response2")
+    @ApiResponse(responseCode = "200", description = "My ok")
+    @Override
+    public Publisher<String> getData() {
+        return null;
+    }
+}
+
+interface MyEndpoint {
+
+    @ApiResponse(responseCode = "200", description = "All is ok")
+    @ApiResponse(responseCode = "404", description = "Data is missing")
+    Publisher<String> getData();
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        when:
+        Operation operation = Utils.testReference?.paths?."/data"?.get
+
+        then:
+        operation
+        operation.responses.size() == 4
+        operation.responses."200".description == 'My ok'
+        operation.responses."404".description == 'Data is missing'
+        operation.responses."407".description == 'My response1'
+        operation.responses."515".description == 'My response2'
+    }
+
+    void "test ApiResponse declared in interaface on class level"() {
+
+        given:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+
+import org.reactivestreams.Publisher;
+
+@Controller
+class MyController implements MyEndpoint {
+
+    @Get("/data")
+    @Override
+    public Publisher<String> getData() {
+        return null;
+    }
+
+    @Get("/data2")
+    @Override
+    public Publisher<String> getData2() {
+        return null;
+    }
+}
+
+@ApiResponse(responseCode = "200", description = "All is ok")
+@ApiResponse(responseCode = "404", description = "Data is missing")
+interface MyEndpoint {
+
+    Publisher<String> getData();
+
+    Publisher<String> getData2();
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        when:
+        Operation operation = Utils.testReference?.paths?."/data"?.get
+        Operation operation2 = Utils.testReference?.paths?."/data2"?.get
+
+        then:
+        operation
+        operation.responses.size() == 2
+        operation.responses."200".description == 'All is ok'
+        operation.responses."404".description == 'Data is missing'
+
+        operation2
+        operation2.responses.size() == 2
+        operation2.responses."200".description == 'All is ok'
+        operation2.responses."404".description == 'Data is missing'
+    }
+
+    void "test ApiResponse declared in interaface and class on class level"() {
+
+        given:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+
+import org.reactivestreams.Publisher;
+
+@ApiResponse(responseCode = "407", description = "My response1")
+@ApiResponse(responseCode = "515", description = "My response2")
+@ApiResponse(responseCode = "200", description = "My ok")
+@Controller
+class MyController implements MyEndpoint {
+
+    @Get("/data")
+    @Override
+    public Publisher<String> getData() {
+        return null;
+    }
+
+    @Get("/data2")
+    @Override
+    public Publisher<String> getData2() {
+        return null;
+    }
+}
+
+@ApiResponse(responseCode = "200", description = "All is ok")
+@ApiResponse(responseCode = "404", description = "Data is missing")
+interface MyEndpoint {
+
+    Publisher<String> getData();
+
+    Publisher<String> getData2();
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        when:
+        Operation operation = Utils.testReference?.paths?."/data"?.get
+        Operation operation2 = Utils.testReference?.paths?."/data2"?.get
+
+        then:
+        operation
+        operation.responses.size() == 4
+        operation.responses."200".description == 'My ok'
+        operation.responses."404".description == 'Data is missing'
+        operation.responses."407".description == 'My response1'
+        operation.responses."515".description == 'My response2'
+
+        operation2
+        operation2.responses.size() == 4
+        operation2.responses."200".description == 'My ok'
+        operation2.responses."404".description == 'Data is missing'
+        operation.responses."407".description == 'My response1'
+        operation.responses."515".description == 'My response2'
+    }
+
+    void "test ApiResponse declared in interaface and class on class and method levels"() {
+
+        given:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+
+import org.reactivestreams.Publisher;
+
+@ApiResponse(responseCode = "407", description = "My response1")
+@ApiResponse(responseCode = "515", description = "My response2")
+@ApiResponse(responseCode = "200", description = "My ok")
+@Controller
+class MyController implements MyEndpoint {
+
+    @ApiResponse(responseCode = "200", description = "Method ok")
+    @ApiResponse(responseCode = "303", description = "Method redirect")
+    @ApiResponse(responseCode = "501", description = "Method error")
+    @Get("/data")
+    @Override
+    public Publisher<String> getData() {
+        return null;
+    }
+}
+
+@ApiResponse(responseCode = "200", description = "All is ok")
+@ApiResponse(responseCode = "404", description = "Data is missing")
+@ApiResponse(responseCode = "501", description = "Interface 501 code")
+interface MyEndpoint {
+
+    @ApiResponse(responseCode = "200", description = "Method ok")
+    @ApiResponse(responseCode = "201", description = "Interface code")
+    Publisher<String> getData();
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        when:
+        Operation operation = Utils.testReference?.paths?."/data"?.get
+
+        then:
+        operation
+        operation.responses.size() == 7
+        // method
+        operation.responses."200".description == 'Method ok'
+        operation.responses."201".description == 'Interface code'
+        operation.responses."303".description == 'Method redirect'
+        operation.responses."501".description == 'Method error'
+
+        // class
+        operation.responses."404".description == 'Data is missing'
+        operation.responses."407".description == 'My response1'
+        operation.responses."515".description == 'My response2'
+    }
+
+    void "test ApiResponses declared in interaface and class on class and method levels"() {
+
+        given:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;import io.swagger.v3.oas.annotations.responses.ApiResponses;
+
+import org.reactivestreams.Publisher;
+
+@ApiResponses({
+    @ApiResponse(responseCode = "407", description = "My response1"),
+    @ApiResponse(responseCode = "515", description = "My response2"),
+    @ApiResponse(responseCode = "200", description = "My ok"),
+})
+@Controller
+class MyController implements MyEndpoint {
+
+    @ApiResponse(responseCode = "200", description = "Method ok")
+    @ApiResponse(responseCode = "303", description = "Method redirect")
+    @ApiResponse(responseCode = "501", description = "Method error")
+    @Get("/data")
+    @Override
+    public Publisher<String> getData() {
+        return null;
+    }
+}
+
+@ApiResponse(responseCode = "200", description = "All is ok")
+@ApiResponse(responseCode = "404", description = "Data is missing")
+@ApiResponse(responseCode = "501", description = "Interface 501 code")
+interface MyEndpoint {
+
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Method ok"),
+        @ApiResponse(responseCode = "201", description = "Interface code"),
+    })
+    Publisher<String> getData();
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        when:
+        Operation operation = Utils.testReference?.paths?."/data"?.get
+
+        then:
+        operation
+        operation.responses.size() == 7
+        // method
+        operation.responses."200".description == 'Method ok'
+        operation.responses."201".description == 'Interface code'
+        operation.responses."303".description == 'Method redirect'
+        operation.responses."501".description == 'Method error'
+
+        // class
+        operation.responses."404".description == 'Data is missing'
+        operation.responses."407".description == 'My response1'
+        operation.responses."515".description == 'My response2'
+    }
+
+    void "test container types"() {
+
+        given:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
+
+import io.micronaut.http.annotation.Body;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Post;
+import io.reactivex.rxjava3.core.Flowable;
+import io.reactivex.rxjava3.core.Maybe;
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.core.Single;
+
+import org.reactivestreams.Publisher;
+
+import kotlinx.coroutines.flow.Flow;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
+@Controller
+class HelloWorldController {
+
+    // arrays
+    // kotlin coroutines
+    @Post("/endpoint11")
+    public Flow<MyDto> endpoint1(@Body Flow<MyDto> body) {
+        return null;
+    }
+
+    // reactivex3
+    @Post("/endpoint12")
+    public Flowable<MyDto> endpoint1(@Body Flowable<MyDto> body) {
+        return null;
+    }
+
+    @Post("/endpoint13")
+    public Observable<MyDto> endpoint1(@Body Observable<MyDto> body) {
+        return null;
+    }
+
+    // reactivex2
+    @Post("/endpoint14")
+    public io.reactivex.Flowable<MyDto> endpoint1(@Body io.reactivex.Flowable<MyDto> body) {
+        return null;
+    }
+
+    @Post("/endpoint15")
+    public io.reactivex.Observable<MyDto> endpoint1(@Body io.reactivex.Observable<MyDto> body) {
+        return null;
+    }
+
+    // reactor
+    @Post("/endpoint16")
+    public Flux<MyDto> endpoint1(@Body Flux<MyDto> body) {
+        return null;
+    }
+
+    @Post("/endpoint17")
+    public Publisher<MyDto> endpoint1(@Body Publisher<MyDto> body) {
+        return null;
+    }
+
+    // single result
+    @Post("/endpoint21")
+    public Future<MyDto> endpoint1(@Body Future<MyDto> body) {
+        return null;
+    }
+
+    @Post("/endpoint22")
+    public CompletableFuture<MyDto> endpoint1(@Body CompletableFuture<MyDto> body) {
+        return null;
+    }
+
+    @Post("/endpoint23")
+    public Optional<MyDto> endpoint1(@Body Optional<MyDto> body) {
+        return null;
+    }
+
+    @Post("/endpoint24")
+    public Mono<MyDto> endpoint1(@Body Mono<MyDto> body) {
+        return null;
+    }
+
+    @Post("/endpoint25")
+    public Single<MyDto> endpoint1(@Body Single<MyDto> body) {
+        return null;
+    }
+
+    @Post("/endpoint26")
+    public Maybe<MyDto> endpoint1(@Body Maybe<MyDto> body) {
+        return null;
+    }
+
+    @Post("/endpoint27")
+    public io.reactivex.Single<MyDto> endpoint1(@Body io.reactivex.Single<MyDto> body) {
+        return null;
+    }
+
+    @Post("/endpoint28")
+    public io.reactivex.Maybe<MyDto> endpoint1(@Body io.reactivex.Maybe<MyDto> body) {
+        return null;
+    }
+
+}
+
+class MyDto {
+
+    public String field;
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        when:
+        OpenAPI openAPI = Utils.testReference
+
+        then:
+
+        // collection
+        for (def i = 1; i < 8; i++) {
+            def operation = openAPI.paths.get("/endpoint1" + i).post
+            assert operation.requestBody.content."application/json".schema.items.$ref == '#/components/schemas/MyDto'
+            assert operation.requestBody.content."application/json".schema.items.$ref == '#/components/schemas/MyDto'
+        }
+
+        // single
+        for (def i = 1; i < 9; i++) {
+            def operation = openAPI.paths.get("/endpoint2" + i).post
+            assert operation.requestBody.content."application/json".schema.$ref == '#/components/schemas/MyDto'
+            assert operation.responses."200".content."application/json".schema.$ref == '#/components/schemas/MyDto'
+        }
+
     }
 }
