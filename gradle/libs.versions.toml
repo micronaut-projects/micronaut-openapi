@@ -7,7 +7,7 @@ managed-slf4j = "2.0.7"
 managed-html2md-converter = "0.64.6"
 
 kotlin = "1.8.21"
-kotlin-coroutines = "1.7.0"
+kotlin-coroutines = "1.7.1"
 jspecify = "0.3.0"
 jdt-annotation = "2.2.700"
 android-annotation = "1.6.0"
