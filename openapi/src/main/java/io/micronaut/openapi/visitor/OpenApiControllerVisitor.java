@@ -151,7 +151,7 @@ public class OpenApiControllerVisitor extends AbstractOpenApiEndpointVisitor imp
     protected HttpMethod httpMethod(MethodElement element) {
         Optional<Class<? extends Annotation>> httpMethodOpt = element
                 .getAnnotationTypeByStereotype(HttpMethodMapping.class);
-        if (!httpMethodOpt.isPresent()) {
+        if (httpMethodOpt.isEmpty()) {
             return null;
         }
         try {

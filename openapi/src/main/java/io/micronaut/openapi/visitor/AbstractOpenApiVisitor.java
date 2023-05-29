@@ -70,6 +70,7 @@ import io.micronaut.http.uri.UriMatchTemplate;
 import io.micronaut.http.uri.UriMatchVariable;
 import io.micronaut.inject.ast.ClassElement;
 import io.micronaut.inject.ast.Element;
+import io.micronaut.inject.ast.ElementQuery;
 import io.micronaut.inject.ast.EnumConstantElement;
 import io.micronaut.inject.ast.EnumElement;
 import io.micronaut.inject.ast.FieldElement;
@@ -362,11 +363,7 @@ abstract class AbstractOpenApiVisitor {
             }
 
             for (String finalPath : finalPaths.values()) {
-                List<PathItem> resultPathItems = resultPathItemsMap.get(finalPath);
-                if (resultPathItems == null) {
-                    resultPathItems = new ArrayList<>();
-                    resultPathItemsMap.put(finalPath, resultPathItems);
-                }
+                List<PathItem> resultPathItems = resultPathItemsMap.computeIfAbsent(finalPath, k -> new ArrayList<>());
                 resultPathItems.add(paths.computeIfAbsent(finalPath, key -> new PathItem()));
             }
         }
@@ -1097,8 +1094,8 @@ abstract class AbstractOpenApiVisitor {
                         String elFormat = schemaAnnotationValue.stringValue("format").orElse(null);
                         if (elType == null && elementType != null) {
                             Pair<String, String> typeAndFormat;
-                            if (elementType instanceof EnumElement) {
-                                typeAndFormat = ConvertUtils.checkEnumJsonValueType(context, (EnumElement) elementType, elType, elFormat);
+                            if (elementType instanceof EnumElement enumEl) {
+                                typeAndFormat = ConvertUtils.checkEnumJsonValueType(context, enumEl, elType, elFormat);
                             } else {
                                 typeAndFormat = ConvertUtils.getTypeAndFormatByClass(elementType.getName(), elementType.isArray());
                             }
@@ -1130,8 +1127,8 @@ abstract class AbstractOpenApiVisitor {
     }
 
     private boolean doesParamExistsMandatoryInConstructor(Element element, @Nullable Element classElement) {
-        if (classElement instanceof ClassElement) {
-            return ((ClassElement) classElement).getPrimaryConstructor().flatMap(methodElement -> Arrays.stream(methodElement.getParameters())
+        if (classElement instanceof ClassElement classEl) {
+            return classEl.getPrimaryConstructor().flatMap(methodElement -> Arrays.stream(methodElement.getParameters())
                     .filter(parameterElement -> parameterElement.getName().equals(element.getName()))
                     .map(parameterElement -> !parameterElement.isNullable())
                     .findFirst())
@@ -1167,7 +1164,7 @@ abstract class AbstractOpenApiVisitor {
         if (classElement != null && classElement.hasAnnotation(JsonNaming.class)) {
             // INVESTIGATE: "classValue" doesn't work in this case
             Optional<String> propertyNamingStrategyClass = classElement.stringValue(JsonNaming.class);
-            if (!propertyNamingStrategyClass.isPresent()) {
+            if (propertyNamingStrategyClass.isEmpty()) {
                 return name;
             }
             PropertyNamingStrategy strategy = propertyNamingStrategyInstances.computeIfAbsent(propertyNamingStrategyClass.get(), clazz -> {
@@ -1177,8 +1174,8 @@ abstract class AbstractOpenApiVisitor {
                     throw new RuntimeException("Cannot instantiate: " + clazz);
                 }
             });
-            if (strategy instanceof PropertyNamingStrategies.NamingBase) {
-                return ((PropertyNamingStrategies.NamingBase) strategy).translate(name);
+            if (strategy instanceof PropertyNamingStrategies.NamingBase namingBase) {
+                return namingBase.translate(name);
             }
         }
         return name;
@@ -1614,8 +1611,8 @@ abstract class AbstractOpenApiVisitor {
             String doc = element.getDocumentation().orElse(null);
             if (StringUtils.isEmpty(doc)) {
                 // next, find field javadoc
-                if (element instanceof MemberElement) {
-                    List<FieldElement> fields = ((MemberElement) element).getDeclaringType().getFields();
+                if (element instanceof MemberElement memberEl) {
+                    List<FieldElement> fields = memberEl.getDeclaringType().getFields();
                     if (CollectionUtils.isNotEmpty(fields)) {
                         for (FieldElement field : fields) {
                             if (field.getName().equals(element.getName())) {
@@ -1651,8 +1648,8 @@ abstract class AbstractOpenApiVisitor {
         Pair<String, String> typeAndFormat;
         if (classElement.isIterable()) {
             typeAndFormat = Pair.of("array", null);
-        } else if (classElement instanceof EnumElement) {
-            typeAndFormat = ConvertUtils.checkEnumJsonValueType(context, (EnumElement) classElement, null, null);
+        } else if (classElement instanceof EnumElement enumEl) {
+            typeAndFormat = ConvertUtils.checkEnumJsonValueType(context, enumEl, null, null);
         } else {
             typeAndFormat = ConvertUtils.getTypeAndFormatByClass(classElement.getName(), classElement.isArray());
         }
@@ -1689,8 +1686,8 @@ abstract class AbstractOpenApiVisitor {
         if (elType == null && element != null) {
             ClassElement typeEl = ((TypedElement) element).getType();
             Pair<String, String> typeAndFormat;
-            if (typeEl instanceof EnumElement) {
-                typeAndFormat = ConvertUtils.checkEnumJsonValueType(context, (EnumElement) typeEl, elType, elFormat);
+            if (typeEl instanceof EnumElement enumEl) {
+                typeAndFormat = ConvertUtils.checkEnumJsonValueType(context, enumEl, elType, elFormat);
             } else {
                 typeAndFormat = ConvertUtils.getTypeAndFormatByClass(typeEl.getName(), typeEl.isArray());
             }
@@ -1884,13 +1881,13 @@ abstract class AbstractOpenApiVisitor {
         // returned always null and found Schema annotation only on getters and setters
         AnnotationValue<io.swagger.v3.oas.annotations.media.Schema> schemaValue = null;
         if (definingElement != null) {
-            if (definingElement instanceof PropertyElement) {
-                var getterOpt = ((PropertyElement) definingElement).getReadMethod();
+            if (definingElement instanceof PropertyElement propertyEl) {
+                var getterOpt = propertyEl.getReadMethod();
                 if (getterOpt.isPresent()) {
                     schemaValue = getterOpt.get().getDeclaredAnnotation(io.swagger.v3.oas.annotations.media.Schema.class);
                 }
                 if (schemaValue == null) {
-                    var setterOpt = ((PropertyElement) definingElement).getWriteMethod();
+                    var setterOpt = propertyEl.getWriteMethod();
                     if (setterOpt.isPresent()) {
                         schemaValue = setterOpt.get().getDeclaredAnnotation(io.swagger.v3.oas.annotations.media.Schema.class);
                     }
@@ -1919,7 +1916,7 @@ abstract class AbstractOpenApiVisitor {
                 JavadocDescription javadoc = Utils.getJavadocParser().parse(type.getDocumentation().orElse(null));
                 if (schema == null) {
 
-                    if (type instanceof EnumElement) {
+                    if (type instanceof EnumElement enumEl) {
                         schema = new Schema();
                         schema.setName(schemaName);
                         if (javadoc != null && StringUtils.hasText(javadoc.getMethodDescription())) {
@@ -1927,7 +1924,6 @@ abstract class AbstractOpenApiVisitor {
                         }
                         schemas.put(schemaName, schema);
 
-                        EnumElement enumEl = (EnumElement) type;
                         Pair<String, String> typeAndFormat = ConvertUtils.checkEnumJsonValueType(context, enumEl, schema.getType(), schema.getFormat());
                         schema.setType(typeAndFormat.getFirst());
                         schema.setFormat(typeAndFormat.getSecond());
@@ -1995,7 +1991,7 @@ abstract class AbstractOpenApiVisitor {
             setSchemaDocumentation(type, schema);
             Schema schemaRef = new Schema();
             schemaRef.set$ref(SchemaUtils.schemaRef(schema.getName()));
-            if (definingElement instanceof ClassElement && ((ClassElement) definingElement).isIterable()) {
+            if (definingElement instanceof ClassElement classEl && classEl.isIterable()) {
                 schemaRef.setDescription(schema.getDescription());
             }
             return schemaRef;
@@ -2188,11 +2184,10 @@ abstract class AbstractOpenApiVisitor {
 
         String elType = (String) values.get("type");
         String elFormat = (String) values.get("format");
-        if (elType == null && type instanceof TypedElement) {
-            TypedElement typedType = (TypedElement) type;
+        if (elType == null && type instanceof TypedElement typedType) {
             Pair<String, String> typeAndFormat;
-            if (typedType instanceof EnumElement) {
-                typeAndFormat = ConvertUtils.checkEnumJsonValueType(context, (EnumElement) typedType, elType, elFormat);
+            if (typedType instanceof EnumElement enumEl) {
+                typeAndFormat = ConvertUtils.checkEnumJsonValueType(context, enumEl, elType, elFormat);
             } else {
                 typeAndFormat = ConvertUtils.getTypeAndFormatByClass(typedType.getName(), typedType.isArray());
             }
@@ -2233,9 +2228,9 @@ abstract class AbstractOpenApiVisitor {
         if (schema.getFormat() == null) {
             schema.setFormat(elFormat);
         }
-        if (type instanceof EnumElement) {
+        if (type instanceof EnumElement enumEl) {
             if (CollectionUtils.isEmpty(schema.getEnum())) {
-                schema.setEnum(getEnumValues((EnumElement) type, schema.getType(), elFormat, context));
+                schema.setEnum(getEnumValues(enumEl, schema.getType(), elFormat, context));
             }
         } else {
             JavadocDescription javadoc = Utils.getJavadocParser().parse(type.getDescription());
@@ -2301,8 +2296,8 @@ abstract class AbstractOpenApiVisitor {
         }
         String packageName;
         String resultSchemaName;
-        if (type instanceof TypedElement && !(type instanceof EnumElement)) {
-            ClassElement typeType = ((TypedElement) type).getType();
+        if (type instanceof TypedElement typedEl && !(type instanceof EnumElement)) {
+            ClassElement typeType = typedEl.getType();
             packageName = typeType.getPackageName();
             if (CollectionUtils.isNotEmpty(typeType.getTypeArguments())) {
                 resultSchemaName = computeNameWithGenerics(typeType, typeArgs, context);
@@ -2385,16 +2380,18 @@ abstract class AbstractOpenApiVisitor {
 
     private void populateSchemaProperties(OpenAPI openAPI, VisitorContext context, Element type, Map<String, ClassElement> typeArgs, Schema schema, List<MediaType> mediaTypes, JavadocDescription classJavadoc) {
         ClassElement classElement = null;
-        if (type instanceof ClassElement) {
-            classElement = (ClassElement) type;
-        } else if (type instanceof TypedElement) {
-            classElement = ((TypedElement) type).getType();
+        if (type instanceof ClassElement classEl) {
+            classElement = classEl;
+        } else if (type instanceof TypedElement typedEl) {
+            classElement = typedEl.getType();
         }
 
         if (classElement != null) {
             List<PropertyElement> beanProperties;
             try {
-                beanProperties = classElement.getBeanProperties().stream().filter(p -> !"groovy.lang.MetaClass".equals(p.getType().getName())).collect(Collectors.toList());
+                beanProperties = classElement.getBeanProperties().stream()
+                        .filter(p -> !"groovy.lang.MetaClass".equals(p.getType().getName()))
+                        .toList();
             } catch (Exception e) {
                 context.warn("Error with getting properties for class " + classElement.getName() + ": " + e + "\n" + Utils.printStackTrace(e), classElement);
                 // Workaround for https://github.com/micronaut-projects/micronaut-openapi/issues/313
@@ -2449,10 +2446,10 @@ abstract class AbstractOpenApiVisitor {
     private void processPropertyElements(OpenAPI openAPI, VisitorContext context, Element type, Map<String, ClassElement> typeArgs, Schema schema, List<? extends TypedElement> publicFields, List<MediaType> mediaTypes, JavadocDescription classJavadoc) {
 
         ClassElement classElement = null;
-        if (type instanceof ClassElement) {
-            classElement = (ClassElement) type;
-        } else if (type instanceof TypedElement) {
-            classElement = ((TypedElement) type).getType();
+        if (type instanceof ClassElement classEl) {
+            classElement = classEl;
+        } else if (type instanceof TypedElement typedEl) {
+            classElement = typedEl.getType();
         }
 
         for (TypedElement publicField : publicFields) {
@@ -2465,21 +2462,36 @@ abstract class AbstractOpenApiVisitor {
                 continue;
             }
 
+            var isGetterOverriden = false;
             JavadocDescription fieldJavadoc = null;
             if (classElement != null) {
                 for (FieldElement field : classElement.getFields()) {
                     if (field.getName().equals(publicField.getName())) {
-                        fieldJavadoc = Utils.getJavadocParser().parse(field.getDocumentation().orElse(null));
+                        fieldJavadoc = Utils.getJavadocParser().parse(publicField.getDocumentation().orElse(field.getDocumentation().orElse(null)));
                         break;
+                    }
+                }
+
+                // checking if the getter is overridden and has javadoc and other annotations
+                if (publicField instanceof PropertyElement propertyEl) {
+                    var readerMethod = propertyEl.getReadMethod().orElse(null);
+                    if (readerMethod != null) {
+                        var methods = classElement.getEnclosedElements(ElementQuery.ALL_METHODS.includeOverriddenMethods());
+                        for (var method : methods) {
+                            if (readerMethod.overrides(method)) {
+                                isGetterOverriden = CollectionUtils.isNotEmpty(readerMethod.getAnnotationNames()) || fieldJavadoc != null;
+                                break;
+                            }
+                        }
                     }
                 }
             }
 
-            if (publicField instanceof MemberElement && ((MemberElement) publicField).getDeclaringType().getType().getName().equals(type.getName())) {
+            if (publicField instanceof MemberElement memberEl && (memberEl.getDeclaringType().getType().getName().equals(type.getName()) || isGetterOverriden)) {
 
                 ClassElement fieldType = publicField.getType();
-                if (publicField.getType() instanceof GenericPlaceholderElement) {
-                    ClassElement genericType = typeArgs.get(((GenericPlaceholderElement) publicField.getType()).getVariableName());
+                if (publicField.getType() instanceof GenericPlaceholderElement genericPlaceholderEl) {
+                    ClassElement genericType = typeArgs.get(genericPlaceholderEl.getVariableName());
                     if (genericType != null) {
                         fieldType = genericType;
                     }

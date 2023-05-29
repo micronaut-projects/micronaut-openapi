@@ -107,10 +107,10 @@ public final class OpenApiViewConfig {
         if (specification == null) {
             return Collections.emptyMap();
         }
-        return Arrays.stream(specification.split(",")).map(String::trim).filter(s -> !s.isEmpty())
+        return Arrays.stream(specification.split(",")).map(String::strip).filter(s -> !s.isEmpty())
             .map(s -> s.split("=")).filter(keyValue -> keyValue.length == 2).peek(keyValue -> {
-                keyValue[0] = keyValue[0].trim();
-                keyValue[1] = keyValue[1].trim();
+                keyValue[0] = keyValue[0].strip();
+                keyValue[1] = keyValue[1].strip();
             }).filter(keyValue -> !keyValue[0].isEmpty() && !keyValue[1].isEmpty())
             .collect(Collectors.toMap(keyValue -> keyValue[0], keyValue -> keyValue[1]));
     }

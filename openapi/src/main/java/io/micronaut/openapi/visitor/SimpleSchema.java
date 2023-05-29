@@ -15,9 +15,9 @@
  */
 package io.micronaut.openapi.visitor;
 
-import java.util.Objects;
-
 import io.swagger.v3.oas.models.media.Schema;
+
+import java.util.Objects;
 
 /**
  * Copy of MapSchema but without type 'object'. Need this class to correct deserializing schema without type.
@@ -54,10 +54,8 @@ public class SimpleSchema extends Schema<Object> {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("class SimpleSchema {\n");
-        sb.append("    ").append(toIndentedString(super.toString())).append("\n");
-        sb.append("}");
-        return sb.toString();
+        return "class SimpleSchema {\n" +
+                "    " + toIndentedString(super.toString()) + "\n" +
+                "}";
     }
 }

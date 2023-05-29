@@ -40,6 +40,9 @@ public class JavadocParser {
 
     private static final Set<String> IGNORED = CollectionUtils.setOf("see", "since", "author", "version", "deprecated", "throws", "exception", "category");
 
+    private final FlexmarkHtmlConverter htmlToMarkdownConverter = FlexmarkHtmlConverter.builder()
+            .build();
+
     /**
      * Parse the javadoc in a {@link JavadocDescription}.
      *
@@ -58,26 +61,24 @@ public class JavadocParser {
             .withOutputType(OutputType.HTML)
             .build();
 
-        FlexmarkHtmlConverter htmlToMarkdownConverter = FlexmarkHtmlConverter.builder().build();
-
-        JavaDoc javaDoc = javaDocParser.parse(text.trim());
+        JavaDoc javaDoc = javaDocParser.parse(text.strip());
 
         JavadocDescription javadocDescription = new JavadocDescription();
-        javadocDescription.setMethodSummary(htmlToMarkdownConverter.convert(javaDoc.getSummary()).trim());
-        javadocDescription.setMethodDescription(htmlToMarkdownConverter.convert(javaDoc.getDescription()).trim());
+        javadocDescription.setMethodSummary(htmlToMarkdownConverter.convert(javaDoc.getSummary()).strip());
+        javadocDescription.setMethodDescription(htmlToMarkdownConverter.convert(javaDoc.getDescription()).strip());
 
         if (CollectionUtils.isNotEmpty(javaDoc.getTags())) {
             for (Tag tag : javaDoc.getTags()) {
                 if (IGNORED.contains(tag.getTagName())) {
                     continue;
                 }
-                if (tag instanceof ReturnTag) {
-                    javadocDescription.setReturnDescription(htmlToMarkdownConverter.convert(((ReturnTag) tag).getDescription()).trim());
+                if (tag instanceof ReturnTag returnTag) {
+                    javadocDescription.setReturnDescription(htmlToMarkdownConverter.convert(returnTag.getDescription()).strip());
                 } else if (tag instanceof ParamTag paramTag) {
-                    String paramDesc = htmlToMarkdownConverter.convert(paramTag.getParamDescription()).trim();
+                    String paramDesc = htmlToMarkdownConverter.convert(paramTag.getParamDescription()).strip();
                     javadocDescription.getParameters().put(paramTag.getParamName(), paramDesc);
                 } else if (tag instanceof PropertyTag propertyTag) {
-                    String paramDesc = htmlToMarkdownConverter.convert(propertyTag.getParamDescription()).trim();
+                    String paramDesc = htmlToMarkdownConverter.convert(propertyTag.getParamDescription()).strip();
                     javadocDescription.getParameters().put(propertyTag.getPropertyName(), paramDesc);
                 }
             }

@@ -484,6 +484,6 @@ class MyBean {}
         openAPI.components.schemas['TimeUnit'].enum[3] == 'Hour'
         openAPI.components.schemas['TimeUnit'].enum[4] == 'Day'
         openAPI.components.schemas['TimeUnit'].enum[5] == 'Week'
-        openAPI.components.schemas['Time'].allOf[0].$ref == '#/components/schemas/Quantity_Time.TimeUnit_'
+        openAPI.components.schemas['Time'].$ref == '#/components/schemas/Quantity_Time.TimeUnit_'
     }
 }

@@ -54,7 +54,6 @@ import io.micronaut.context.DefaultApplicationContextBuilder;
 import io.micronaut.context.env.Environment;
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.core.annotation.Nullable;
-import io.micronaut.core.convert.ConversionService;
 import io.micronaut.core.convert.DefaultMutableConversionService;
 import io.micronaut.core.convert.MutableConversionService;
 import io.micronaut.core.io.scan.ClassPathResourceLoader;
@@ -1024,7 +1023,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
     public static JsonNode resolvePlaceholders(JsonNode node, UnaryOperator<String> propertyExpander) {
         if (node.isTextual()) {
             final String text = node.textValue();
-            if (text == null || text.trim().isEmpty()) {
+            if (text == null || text.isBlank()) {
                 return node;
             }
             final String newText = propertyExpander.apply(text);
@@ -1160,7 +1159,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                 return;
             }
             Optional<OpenAPI> attr = context.get(Utils.ATTR_OPENAPI, OpenAPI.class);
-            if (!attr.isPresent()) {
+            if (attr.isEmpty()) {
                 return;
             }
             OpenAPI openApi = attr.get();

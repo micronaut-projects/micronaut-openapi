@@ -552,8 +552,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.validation.constraints.NotNull;
-
 import io.micronaut.core.annotation.Introspected;
 import io.micronaut.core.annotation.Nullable;
 import io.micronaut.http.annotation.Body;
@@ -562,6 +560,10 @@ import io.micronaut.http.annotation.Post;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
+
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
@@ -626,6 +628,9 @@ class Bike extends Vehicle<MyDocument> {
     /**
      * Child getter javadoc.
      */
+    @Size(min = 10, max = 20)
+    @NotEmpty
+    @ArraySchema(schema = @Schema(implementation = Document.class))
     @Override
     public List<MyDocument> getVehicleField() {
         return super.getVehicleField();
@@ -864,7 +869,7 @@ class MyBean {}
 
         expect:
         schemas
-//        schemas.size() == 9
+        schemas.size() == 9
 
         def averageStats = schemas.AverageStats
         averageStats.allOf.size() == 3
