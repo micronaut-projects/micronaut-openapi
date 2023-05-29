@@ -1119,11 +1119,11 @@ abstract class AbstractOpenApiVisitor {
     }
 
     protected boolean isElementNotNullable(Element element, @Nullable Element classElement) {
-        return element.isAnnotationPresent("javax.validation.constraints.NotNull$List")
+        return element.isAnnotationPresent("jakarta.validation.constraints.NotNull$List")
             || element.isAnnotationPresent("jakarta.validation.constraints.NotNull$List")
-            || element.isAnnotationPresent("javax.validation.constraints.NotBlank$List")
             || element.isAnnotationPresent("jakarta.validation.constraints.NotBlank$List")
-            || element.isAnnotationPresent("javax.validation.constraints.NotEmpty$List")
+            || element.isAnnotationPresent("jakarta.validation.constraints.NotBlank$List")
+            || element.isAnnotationPresent("jakarta.validation.constraints.NotEmpty$List")
             || element.isAnnotationPresent("jakarta.validation.constraints.NotEmpty$List")
             || element.isNonNull()
             || element.booleanValue(JsonProperty.class, "required").orElse(false);
@@ -1320,12 +1320,12 @@ abstract class AbstractOpenApiVisitor {
         final boolean isIterableOrMap = elementType.isIterable() || elementType.isAssignable(Map.class);
 
         if (isIterableOrMap) {
-            if (element.isAnnotationPresent("javax.validation.constraints.NotEmpty$List")
+            if (element.isAnnotationPresent("jakarta.validation.constraints.NotEmpty$List")
                 || element.isAnnotationPresent("jakarta.validation.constraints.NotEmpty$List")) {
                 schemaToBind.setMinItems(1);
             }
 
-            element.findAnnotation("javax.validation.constraints.Size$List")
+            element.findAnnotation("jakarta.validation.constraints.Size$List")
                 .ifPresent(listAnn -> listAnn.getValue(AnnotationValue.class)
                     .ifPresent(ann -> ann.intValue("min")
                         .ifPresent(schemaToBind::setMinItems)));
@@ -1334,7 +1334,7 @@ abstract class AbstractOpenApiVisitor {
                     .ifPresent(ann -> ann.intValue("min")
                         .ifPresent(schemaToBind::setMinItems)));
 
-            element.findAnnotation("javax.validation.constraints.Size$List")
+            element.findAnnotation("jakarta.validation.constraints.Size$List")
                 .ifPresent(listAnn -> listAnn.getValue(AnnotationValue.class)
                     .ifPresent(ann -> ann.intValue("max")
                         .ifPresent(schemaToBind::setMaxItems)));
@@ -1345,14 +1345,14 @@ abstract class AbstractOpenApiVisitor {
 
         } else {
             if (PrimitiveType.STRING.getCommonName().equals(schemaToBind.getType())) {
-                if (element.isAnnotationPresent("javax.validation.constraints.NotEmpty$List")
+                if (element.isAnnotationPresent("jakarta.validation.constraints.NotEmpty$List")
                     || element.isAnnotationPresent("jakarta.validation.constraints.NotEmpty$List")
-                    || element.isAnnotationPresent("javax.validation.constraints.NotBlank$List")
+                    || element.isAnnotationPresent("jakarta.validation.constraints.NotBlank$List")
                     || element.isAnnotationPresent("jakarta.validation.constraints.NotBlank$List")) {
                     schemaToBind.setMinLength(1);
                 }
 
-                element.findAnnotation("javax.validation.constraints.Size$List")
+                element.findAnnotation("jakarta.validation.constraints.Size$List")
                     .ifPresent(listAnn -> {
                         for (AnnotationValue<?> ann : listAnn.getAnnotations("value")) {
                             ann.intValue("min").ifPresent(schemaToBind::setMinLength);
@@ -1368,24 +1368,24 @@ abstract class AbstractOpenApiVisitor {
                     });
             }
 
-            if (element.isAnnotationPresent("javax.validation.constraints.Negative$List")
+            if (element.isAnnotationPresent("jakarta.validation.constraints.Negative$List")
                 || element.isAnnotationPresent("jakarta.validation.constraints.Negative$List")) {
                 schemaToBind.setMaximum(BigDecimal.ZERO);
             }
-            if (element.isAnnotationPresent("javax.validation.constraints.NegativeOrZero$List")
+            if (element.isAnnotationPresent("jakarta.validation.constraints.NegativeOrZero$List")
                 || element.isAnnotationPresent("jakarta.validation.constraints.NegativeOrZero$List")) {
                 schemaToBind.setMaximum(BigDecimal.ZERO);
             }
-            if (element.isAnnotationPresent("javax.validation.constraints.Positive$List")
+            if (element.isAnnotationPresent("jakarta.validation.constraints.Positive$List")
                 || element.isAnnotationPresent("jakarta.validation.constraints.Positive$List")) {
                 schemaToBind.setMinimum(BigDecimal.ZERO);
             }
-            if (element.isAnnotationPresent("javax.validation.constraints.PositiveOrZero$List")
+            if (element.isAnnotationPresent("jakarta.validation.constraints.PositiveOrZero$List")
                 || element.isAnnotationPresent("jakarta.validation.constraints.PositiveOrZero$List")) {
                 schemaToBind.setMinimum(BigDecimal.ZERO);
             }
 
-            element.findAnnotation("javax.validation.constraints.Min$List")
+            element.findAnnotation("jakarta.validation.constraints.Min$List")
                 .ifPresent(listAnn -> {
                     for (AnnotationValue<?> ann : listAnn.getAnnotations("value")) {
                         ann.getValue(BigDecimal.class)
@@ -1400,7 +1400,7 @@ abstract class AbstractOpenApiVisitor {
                     }
                 });
 
-            element.findAnnotation("javax.validation.constraints.Max$List")
+            element.findAnnotation("jakarta.validation.constraints.Max$List")
                 .ifPresent(listAnn -> {
                     for (AnnotationValue<?> ann : listAnn.getAnnotations("value")) {
                         ann.getValue(BigDecimal.class)
@@ -1415,7 +1415,7 @@ abstract class AbstractOpenApiVisitor {
                     }
                 });
 
-            element.findAnnotation("javax.validation.constraints.DecimalMin$List")
+            element.findAnnotation("jakarta.validation.constraints.DecimalMin$List")
                 .ifPresent(listAnn -> {
                     for (AnnotationValue<?> ann : listAnn.getAnnotations("value")) {
                         ann.getValue(BigDecimal.class)
@@ -1430,7 +1430,7 @@ abstract class AbstractOpenApiVisitor {
                     }
                 });
 
-            element.findAnnotation("javax.validation.constraints.DecimalMax$List")
+            element.findAnnotation("jakarta.validation.constraints.DecimalMax$List")
                 .ifPresent(listAnn -> {
                     for (AnnotationValue<?> ann : listAnn.getAnnotations("value")) {
                         ann.getValue(BigDecimal.class)
@@ -1445,7 +1445,7 @@ abstract class AbstractOpenApiVisitor {
                     }
                 });
 
-            element.findAnnotation("javax.validation.constraints.Email$List")
+            element.findAnnotation("jakarta.validation.constraints.Email$List")
                 .ifPresent(listAnn -> {
                     schemaToBind.setFormat(PrimitiveType.EMAIL.getCommonName());
                     for (AnnotationValue<?> ann : listAnn.getAnnotations("value")) {
@@ -1462,7 +1462,7 @@ abstract class AbstractOpenApiVisitor {
                     }
                 });
 
-            element.findAnnotation("javax.validation.constraints.Pattern$List")
+            element.findAnnotation("jakarta.validation.constraints.Pattern$List")
                 .ifPresent(listAnn -> {
                     for (AnnotationValue<?> ann : listAnn.getAnnotations("value")) {
                         ann.stringValue("regexp")

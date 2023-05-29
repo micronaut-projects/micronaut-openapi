@@ -552,7 +552,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 import io.micronaut.core.annotation.Introspected;
 import io.micronaut.core.annotation.Nullable;
