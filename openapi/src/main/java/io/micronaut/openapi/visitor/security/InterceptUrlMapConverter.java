@@ -77,7 +77,7 @@ public class InterceptUrlMapConverter implements TypeConverter<Map, InterceptUrl
                 Optional<HttpMethod> httpMethod;
                 if (m.containsKey(HTTP_METHOD)) {
                     httpMethod = conversionService.convert(m.get(HTTP_METHOD), HttpMethod.class);
-                    if (!httpMethod.isPresent()) {
+                    if (httpMethod.isEmpty()) {
                         throw new ConfigurationException(String.format("interceptUrlMap configuration record %s rejected due to invalid %s key.", m, HTTP_METHOD));
                     }
                 } else {

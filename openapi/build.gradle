@@ -5,7 +5,7 @@ plugins {
 dependencies {
     compileOnly(mn.micronaut.core.processor)
 
-    implementation(mn.micronaut.http)
+    implementation(mn.micronaut.http.server)
 
     api(mn.jackson.databind)
     api(libs.jackson.dataformat.yaml)

@@ -121,7 +121,7 @@ final class RapiPDFConfig extends AbstractViewConfig {
         if (enabled) {
             String style = (String) options.get("style");
             boolean styleUpdated = false;
-            if (style == null || style.trim().isEmpty()) {
+            if (style == null || style.isBlank()) {
                 styleUpdated = true;
                 // set default style
                 if (RendererType.REDOC == rendererType) {

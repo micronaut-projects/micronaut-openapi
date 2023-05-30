@@ -5,7 +5,6 @@ import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.Operation
 import io.swagger.v3.oas.models.media.ComposedSchema
 import io.swagger.v3.oas.models.media.Schema
-import spock.lang.IgnoreIf
 
 class OpenApiInheritedPojoControllerSpec extends AbstractOpenApiTypeElementSpec {
 
@@ -1604,7 +1603,6 @@ class MyBean {}
         exportPaymentsRequestSchema.allOf[1].$ref == '#/components/schemas/RequestType2_4_0'
     }
 
-    @IgnoreIf({ !jvm.isJava16Compatible() })
     void "test type is null for allOf"() {
 
         given: "An API definition"

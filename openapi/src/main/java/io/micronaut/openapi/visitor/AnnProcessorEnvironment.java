@@ -65,7 +65,7 @@ public class AnnProcessorEnvironment extends DefaultEnvironment {
      * @param context visitor context
      */
     public AnnProcessorEnvironment(ApplicationContextConfiguration configuration, VisitorContext context) {
-        super(configuration);
+        super(configuration, false);
 
         annotationProcessingConfigLocations = new ArrayList<>();
 
@@ -148,8 +148,8 @@ public class AnnProcessorEnvironment extends DefaultEnvironment {
             if (configLocation.equals("classpath:/")) {
                 resourceLoader = this;
             } else if (configLocation.startsWith("classpath:")) {
-                if (this.resourceLoader instanceof DefaultClassPathResourceLoader) {
-                    resourceLoader = this.resourceLoader.forBase(configLocation);
+                if (this.resourceLoader instanceof DefaultClassPathResourceLoader defClassPathResourceLoader) {
+                    resourceLoader = defClassPathResourceLoader.forBase(configLocation, false);
                 } else {
                     resourceLoader = forBase(configLocation);
                 }
@@ -172,7 +172,7 @@ public class AnnProcessorEnvironment extends DefaultEnvironment {
     private void readPropertySourceList(String name, ResourceLoader resourceLoader, List<PropertySource> propertySources) {
         Collection<PropertySourceLoader> propertySourceLoaders = getPropertySourceLoaders();
         if (propertySourceLoaders.isEmpty()) {
-            PropertiesPropertySourceLoader propertySourceLoader = new PropertiesPropertySourceLoader();
+            PropertiesPropertySourceLoader propertySourceLoader = new PropertiesPropertySourceLoader(false);
             loadPropertySourceFromLoader(name, propertySourceLoader, propertySources, resourceLoader);
         } else {
             for (PropertySourceLoader propertySourceLoader : propertySourceLoaders) {
@@ -184,8 +184,8 @@ public class AnnProcessorEnvironment extends DefaultEnvironment {
     @Override
     public Collection<PropertySourceLoader> getPropertySourceLoaders() {
         List<PropertySourceLoader> loaders = new ArrayList<>(2);
-        loaders.add(new YamlPropertySourceLoader());
-        loaders.add(new PropertiesPropertySourceLoader());
+        loaders.add(new YamlPropertySourceLoader(false));
+        loaders.add(new PropertiesPropertySourceLoader(false));
         return loaders;
     }
 

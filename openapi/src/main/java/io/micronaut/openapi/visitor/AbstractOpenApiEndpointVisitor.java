@@ -231,7 +231,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
     private void processTags(ClassElement element, VisitorContext context) {
         classTags = readTags(element, context);
         List<io.swagger.v3.oas.models.tags.Tag> userDefinedClassTags = classTags(element, context);
-        if (classTags == null || classTags.isEmpty()) {
+        if (CollectionUtils.isEmpty(classTags)) {
             classTags = userDefinedClassTags == null ? Collections.emptyList() : userDefinedClassTags;
         } else if (userDefinedClassTags != null) {
             for (io.swagger.v3.oas.models.tags.Tag tag : userDefinedClassTags) {
@@ -840,7 +840,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             AnnotationValue<io.swagger.v3.oas.annotations.Parameter> parameterAnnotation = parameter.getAnnotation(io.swagger.v3.oas.annotations.Parameter.class);
             // Skip recognizing parameter if it's manually defined by "in"
             if (parameterAnnotation == null || !parameterAnnotation.booleanValue("hidden").orElse(false)
-                && !parameterAnnotation.stringValue("in").isPresent()) {
+                && parameterAnnotation.stringValue("in").isEmpty()) {
                 if (permitsRequestBody) {
                     extraBodyParameters.add(parameter);
                 } else {
@@ -961,11 +961,8 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                 if (newParameter != null) {
                     final Schema parameterSchema = newParameter.getSchema();
                     if (paramAnn.contains("schema") && parameterSchema != null) {
-                        final AnnotationValue schemaAnn = paramAnn.get("schema", AnnotationValue.class)
-                            .orElse(null);
-                        if (schemaAnn != null) {
-                            bindSchemaAnnotationValue(context, parameter, parameterSchema, schemaAnn);
-                        }
+                        paramAnn.get("schema", AnnotationValue.class)
+                                .ifPresent(schemaAnn -> bindSchemaAnnotationValue(context, parameter, parameterSchema, schemaAnn));
                     }
                 }
             }
@@ -1397,7 +1394,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             HttpMethod httpMethod = httpMethod(element);
             for (InterceptUrlMapPattern securityRule : securityRules) {
                 if (PathMatcher.ANT.matches(securityRule.getPattern(), path)
-                    && (httpMethod == null || !securityRule.getHttpMethod().isPresent() || httpMethod == securityRule.getHttpMethod().get())) {
+                    && (httpMethod == null || securityRule.getHttpMethod().isEmpty() || httpMethod == securityRule.getHttpMethod().get())) {
 
                     processSecurityAccess(securitySchemeName, securityRule.getAccess(), operation);
                 }
@@ -1450,31 +1447,18 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         if (explode.isPresent()) {
             Explode ex = explode.get();
             switch (ex) {
-                case TRUE:
-                    paramValues.put("explode", Boolean.TRUE);
-                    break;
-                case FALSE:
-                    paramValues.put("explode", Boolean.FALSE);
-                    break;
-                case DEFAULT:
-                default:
+                case TRUE -> paramValues.put("explode", Boolean.TRUE);
+                case FALSE -> paramValues.put("explode", Boolean.FALSE);
+                default -> {
                     String in = (String) paramValues.get("in");
-                    if (in == null || in.isEmpty()) {
+                    if (StringUtils.isEmpty(in)) {
                         in = "DEFAULT";
                     }
                     switch (ParameterIn.valueOf(in.toUpperCase(Locale.US))) {
-                        case COOKIE:
-                        case QUERY:
-                            paramValues.put("explode", Boolean.TRUE);
-                            break;
-                        case DEFAULT:
-                        case HEADER:
-                        case PATH:
-                        default:
-                            paramValues.put("explode", Boolean.FALSE);
-                            break;
+                        case COOKIE, QUERY -> paramValues.put("explode", Boolean.TRUE);
+                        default -> paramValues.put("explode", Boolean.FALSE);
                     }
-                    break;
+                }
             }
         }
     }
@@ -1518,90 +1502,80 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
     }
 
     private io.swagger.v3.oas.models.Operation getOperationOnPathItem(PathItem pathItem, HttpMethod httpMethod) {
-        switch (httpMethod) {
-            case GET:
-                return pathItem.getGet();
-            case POST:
-                return pathItem.getPost();
-            case PUT:
-                return pathItem.getPut();
-            case PATCH:
-                return pathItem.getPatch();
-            case DELETE:
-                return pathItem.getDelete();
-            case HEAD:
-                return pathItem.getHead();
-            case OPTIONS:
-                return pathItem.getOptions();
-            case TRACE:
-                return pathItem.getTrace();
-            default:
-                return null;
-        }
+        return switch (httpMethod) {
+            case GET -> pathItem.getGet();
+            case POST -> pathItem.getPost();
+            case PUT -> pathItem.getPut();
+            case PATCH -> pathItem.getPatch();
+            case DELETE -> pathItem.getDelete();
+            case HEAD -> pathItem.getHead();
+            case OPTIONS -> pathItem.getOptions();
+            case TRACE -> pathItem.getTrace();
+            default -> null;
+        };
     }
 
     private io.swagger.v3.oas.models.Operation setOperationOnPathItem(PathItem pathItem, io.swagger.v3.oas.models.Operation swaggerOperation, HttpMethod httpMethod) {
         io.swagger.v3.oas.models.Operation operation = swaggerOperation;
         switch (httpMethod) {
-            case GET:
+            case GET -> {
                 if (pathItem.getGet() != null) {
                     operation = pathItem.getGet();
                 } else {
                     pathItem.get(swaggerOperation);
                 }
-                break;
-            case POST:
+            }
+            case POST -> {
                 if (pathItem.getPost() != null) {
                     operation = pathItem.getPost();
                 } else {
                     pathItem.post(swaggerOperation);
                 }
-                break;
-            case PUT:
+            }
+            case PUT -> {
                 if (pathItem.getPut() != null) {
                     operation = pathItem.getPut();
                 } else {
                     pathItem.put(swaggerOperation);
                 }
-                break;
-            case PATCH:
+            }
+            case PATCH -> {
                 if (pathItem.getPatch() != null) {
                     operation = pathItem.getPatch();
                 } else {
                     pathItem.patch(swaggerOperation);
                 }
-                break;
-            case DELETE:
+            }
+            case DELETE -> {
                 if (pathItem.getDelete() != null) {
                     operation = pathItem.getDelete();
                 } else {
                     pathItem.delete(swaggerOperation);
                 }
-                break;
-            case HEAD:
+            }
+            case HEAD -> {
                 if (pathItem.getHead() != null) {
                     operation = pathItem.getHead();
                 } else {
                     pathItem.head(swaggerOperation);
                 }
-                break;
-            case OPTIONS:
+            }
+            case OPTIONS -> {
                 if (pathItem.getOptions() != null) {
                     operation = pathItem.getOptions();
                 } else {
                     pathItem.options(swaggerOperation);
                 }
-                break;
-            case TRACE:
+            }
+            case TRACE -> {
                 if (pathItem.getTrace() != null) {
                     operation = pathItem.getTrace();
                 } else {
                     pathItem.trace(swaggerOperation);
                 }
-                break;
-            default:
-                operation = swaggerOperation;
-                // unprocessable
+            }
+            default -> {
+            }
         }
         return operation;
     }
@@ -1701,7 +1675,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         }
         for (AnnotationValue<Callback> callbackAnn : callbackAnnotations) {
             final Optional<String> name = callbackAnn.stringValue("name");
-            if (!name.isPresent()) {
+            if (name.isEmpty()) {
                 continue;
             }
             String callbackName = name.get();
@@ -1725,11 +1699,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         final Components components = Utils.resolveComponents(Utils.resolveOpenApi(context));
         Map<String, io.swagger.v3.oas.models.callbacks.Callback> callbacks = initCallbacks(swaggerOperation);
         final io.swagger.v3.oas.models.callbacks.Callback callbackRef = new io.swagger.v3.oas.models.callbacks.Callback();
-        if (refCallback != null) {
-            callbackRef.set$ref(refCallback);
-        } else {
-            callbackRef.set$ref(COMPONENTS_CALLBACKS_PREFIX + callbackName);
-        }
+        callbackRef.set$ref(refCallback != null ? refCallback : COMPONENTS_CALLBACKS_PREFIX + callbackName);
         callbacks.put(callbackName, callbackRef);
     }
 

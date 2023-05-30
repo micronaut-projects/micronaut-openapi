@@ -15,6 +15,10 @@
  */
 package io.micronaut.openapi.visitor;
 
+import io.micronaut.core.annotation.Internal;
+import io.micronaut.inject.ast.ClassElement;
+import io.micronaut.inject.ast.TypedElement;
+
 import java.io.File;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
@@ -22,11 +26,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.Future;
-
-import io.micronaut.core.annotation.Internal;
-import io.micronaut.core.annotation.Nullable;
-import io.micronaut.inject.ast.ClassElement;
-import io.micronaut.inject.ast.TypedElement;
 
 /**
  * Some util methods.
@@ -75,18 +74,7 @@ public final class ElementUtils {
      */
     public static boolean isNullable(TypedElement element) {
         return element.isNullable()
-            || element.getType().isOptional()
-            || element.hasStereotype(Nullable.class)
-            || element.hasStereotype("javax.annotation.Nullable")
-            || element.hasStereotype("jakarta.annotation.Nullable")
-            || element.hasStereotype("org.jetbrains.annotations.Nullable")
-            || element.hasStereotype("androidx.annotation.Nullable")
-            || element.hasStereotype("edu.umd.cs.findbugs.annotations.Nullable")
-            || element.hasStereotype("org.eclipse.jdt.annotation.Nullable")
-            || element.hasStereotype("io.reactivex.annotations.Nullable")
-            || element.hasStereotype("io.reactivex.rxjava3.annotations.Nullable")
-            || element.hasStereotype("reactor.util.annotation.Nullable")
-            || element.hasStereotype("org.jspecify.annotations.Nullable");
+            || element.getType().isOptional();
     }
 
     /**
