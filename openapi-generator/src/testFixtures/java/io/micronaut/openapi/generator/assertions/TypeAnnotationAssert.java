@@ -5,6 +5,7 @@ import org.assertj.core.util.CanIgnoreReturnValue;
 
 import java.util.List;
 
+//CHECKSTYLE:OFF
 @CanIgnoreReturnValue
 public class TypeAnnotationAssert extends AbstractAnnotationAssert<TypeAnnotationAssert> {
 

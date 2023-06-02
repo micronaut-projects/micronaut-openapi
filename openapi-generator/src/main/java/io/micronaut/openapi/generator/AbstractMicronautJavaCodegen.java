@@ -1,3 +1,18 @@
+/*
+ * Copyright 2017-2023 original authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package io.micronaut.openapi.generator;
 
 import com.google.common.collect.ImmutableMap;
@@ -56,8 +71,15 @@ abstract class AbstractMicronautJavaCodegen extends AbstractJavaCodegen implemen
     public static final String OPT_GENERATE_SWAGGER_ANNOTATIONS_TRUE = "true";
     public static final String OPT_GENERATE_SWAGGER_ANNOTATIONS_FALSE = "false";
     public static final String OPT_GENERATE_OPERATION_ONLY_FOR_FIRST_TAG = "generateOperationOnlyForFirstTag";
+    public static final String CONTENT_TYPE_APPLICATION_FORM_URLENCODED = "application/x-www-form-urlencoded";
+    public static final String CONTENT_TYPE_APPLICATION_JSON = "application/json";
+    public static final String CONTENT_TYPE_MULTIPART_FORM_DATA = "multipart/form-data";
+    public static final String CONTENT_TYPE_ANY = "*/*";
+    public static final String DATE_FORMAT = "yyyy-MM-dd";
+    public static final String DATETIME_FORMAT = DATE_FORMAT + "'T'HH:mm:ss.SSS";
+    public static final String OFFSET_DATETIME_FORMAT = DATETIME_FORMAT + "XXXX";
 
-    public enum SerializationLibraryKind {JACKSON, MICRONAUT_SERDE_JACKSON}
+    public enum SerializationLibraryKind { JACKSON, MICRONAUT_SERDE_JACKSON }
 
     protected String title;
     protected boolean useBeanValidation;
@@ -72,17 +94,10 @@ abstract class AbstractMicronautJavaCodegen extends AbstractJavaCodegen implemen
     protected boolean generateOperationOnlyForFirstTag;
     protected String serializationLibrary = SerializationLibraryKind.JACKSON.name();
 
-    public static final String CONTENT_TYPE_APPLICATION_FORM_URLENCODED = "application/x-www-form-urlencoded";
-    public static final String CONTENT_TYPE_APPLICATION_JSON = "application/json";
-    public static final String CONTENT_TYPE_MULTIPART_FORM_DATA = "multipart/form-data";
-    public static final String CONTENT_TYPE_ANY = "*/*";
-    public static final String DATE_FORMAT = "yyyy-MM-dd";
-    public static final String DATETIME_FORMAT = DATE_FORMAT + "'T'HH:mm:ss.SSS";
-    public static final String OFFSET_DATETIME_FORMAT = DATETIME_FORMAT + "XXXX";
-
     protected AbstractMicronautJavaCodegen() {
         super();
 
+        // CHECKSTYLE:OFF
         // Set all the fields
         useBeanValidation = true;
         useOptional = false;
@@ -105,6 +120,7 @@ abstract class AbstractMicronautJavaCodegen extends AbstractJavaCodegen implemen
         generateSwaggerAnnotations = this instanceof JavaMicronautClientCodegen ?
             OPT_GENERATE_SWAGGER_ANNOTATIONS_FALSE : OPT_GENERATE_SWAGGER_ANNOTATIONS_SWAGGER_2;
         generateOperationOnlyForFirstTag = this instanceof JavaMicronautServerCodegen;
+        // CHECKSTYLE:ON
 
         // Set implemented features for user information
         modifyFeatureSet(features -> features
@@ -278,14 +294,7 @@ abstract class AbstractMicronautJavaCodegen extends AbstractJavaCodegen implemen
         }
         writePropertyBack(OPT_GENERATE_OPERATION_ONLY_FOR_FIRST_TAG, generateOperationOnlyForFirstTag);
 
-        if (additionalProperties.containsKey(OPT_TEST)) {
-            switch ((String) additionalProperties.get(OPT_TEST)) {
-                case OPT_TEST_JUNIT, OPT_TEST_SPOCK ->
-                    this.testTool = (String) additionalProperties.get(OPT_TEST);
-                default ->
-                    throw new RuntimeException("Test tool \"" + additionalProperties.get(OPT_TEST) + "\" is not supported or misspelled.");
-            }
-        }
+        maybeSetTestTool();
         additionalProperties.put(OPT_TEST, testTool);
         if (testTool.equals(OPT_TEST_JUNIT)) {
             additionalProperties.put("isTestJunit", true);
@@ -293,19 +302,7 @@ abstract class AbstractMicronautJavaCodegen extends AbstractJavaCodegen implemen
             additionalProperties.put("isTestSpock", true);
         }
 
-        if (additionalProperties.containsKey(OPT_GENERATE_SWAGGER_ANNOTATIONS)) {
-            String value = String.valueOf(additionalProperties.get(OPT_GENERATE_SWAGGER_ANNOTATIONS));
-            switch (value) {
-                case OPT_GENERATE_SWAGGER_ANNOTATIONS_SWAGGER_1 ->
-                    this.generateSwaggerAnnotations = OPT_GENERATE_SWAGGER_ANNOTATIONS_SWAGGER_1;
-                case OPT_GENERATE_SWAGGER_ANNOTATIONS_SWAGGER_2, OPT_GENERATE_SWAGGER_ANNOTATIONS_TRUE ->
-                    this.generateSwaggerAnnotations = OPT_GENERATE_SWAGGER_ANNOTATIONS_SWAGGER_2;
-                case OPT_GENERATE_SWAGGER_ANNOTATIONS_FALSE ->
-                    this.generateSwaggerAnnotations = OPT_GENERATE_SWAGGER_ANNOTATIONS_FALSE;
-                default ->
-                    throw new RuntimeException("Value \"" + value + "\" for the " + OPT_GENERATE_SWAGGER_ANNOTATIONS + " parameter is unsupported or misspelled");
-            }
-        }
+        maybeSetSwagger();
         if (OPT_GENERATE_SWAGGER_ANNOTATIONS_SWAGGER_1.equals(this.generateSwaggerAnnotations)) {
             additionalProperties.put("generateSwagger1Annotations", true);
         } else if (OPT_GENERATE_SWAGGER_ANNOTATIONS_SWAGGER_2.equals(this.generateSwaggerAnnotations)) {
@@ -365,6 +362,35 @@ abstract class AbstractMicronautJavaCodegen extends AbstractJavaCodegen implemen
         additionalProperties.put("apiFolder", apiFolder);
         additionalProperties.put("modelFolder", modelFolder);
     }
+
+    // CHECKSTYLE:OFF
+    private void maybeSetSwagger() {
+        if (additionalProperties.containsKey(OPT_GENERATE_SWAGGER_ANNOTATIONS)) {
+            String value = String.valueOf(additionalProperties.get(OPT_GENERATE_SWAGGER_ANNOTATIONS));
+            switch (value) {
+                case OPT_GENERATE_SWAGGER_ANNOTATIONS_SWAGGER_1 ->
+                    this.generateSwaggerAnnotations = OPT_GENERATE_SWAGGER_ANNOTATIONS_SWAGGER_1;
+                case OPT_GENERATE_SWAGGER_ANNOTATIONS_SWAGGER_2, OPT_GENERATE_SWAGGER_ANNOTATIONS_TRUE ->
+                    this.generateSwaggerAnnotations = OPT_GENERATE_SWAGGER_ANNOTATIONS_SWAGGER_2;
+                case OPT_GENERATE_SWAGGER_ANNOTATIONS_FALSE ->
+                    this.generateSwaggerAnnotations = OPT_GENERATE_SWAGGER_ANNOTATIONS_FALSE;
+                default ->
+                    throw new RuntimeException("Value \"" + value + "\" for the " + OPT_GENERATE_SWAGGER_ANNOTATIONS + " parameter is unsupported or misspelled");
+            }
+        }
+    }
+
+    private void maybeSetTestTool() {
+        if (additionalProperties.containsKey(OPT_TEST)) {
+            switch ((String) additionalProperties.get(OPT_TEST)) {
+                case OPT_TEST_JUNIT, OPT_TEST_SPOCK ->
+                    this.testTool = (String) additionalProperties.get(OPT_TEST);
+                default ->
+                    throw new RuntimeException("Test tool \"" + additionalProperties.get(OPT_TEST) + "\" is not supported or misspelled.");
+            }
+        }
+    }
+    // CHECKSTYLE:ON
 
     @Override
     public String apiTestFileFolder() {
@@ -690,13 +716,6 @@ abstract class AbstractMicronautJavaCodegen extends AbstractJavaCodegen implemen
             .put("replaceDotsWithUnderscore", new ReplaceDotsWithUnderscoreLambda());
     }
 
-    private static class ReplaceDotsWithUnderscoreLambda implements Mustache.Lambda {
-        @Override
-        public void execute(final Template.Fragment fragment, final Writer writer) throws IOException {
-            writer.write(fragment.execute().replace('.', '_'));
-        }
-    }
-
     public void setSerializationLibrary(final String serializationLibrary) {
         try {
             this.serializationLibrary = SerializationLibraryKind.valueOf(serializationLibrary).name();
@@ -707,5 +726,13 @@ abstract class AbstractMicronautJavaCodegen extends AbstractJavaCodegen implemen
             }
             throw new RuntimeException(sb.toString());
         }
+    }
+
+    private static class ReplaceDotsWithUnderscoreLambda implements Mustache.Lambda {
+        @Override
+        public void execute(final Template.Fragment fragment, final Writer writer) throws IOException {
+            writer.write(fragment.execute().replace('.', '_'));
+        }
+
     }
 }

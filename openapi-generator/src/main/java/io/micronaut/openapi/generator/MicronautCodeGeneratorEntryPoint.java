@@ -1,11 +1,11 @@
 /*
- * Copyright 2003-2021 the original author or authors.
+ * Copyright 2017-2021 original authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     https://www.apache.org/licenses/LICENSE-2.0
+ * https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -26,40 +26,36 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 
 /**
  * Main entry point for Micronaut OpenAPI code generation.
  */
-public class MicronautCodeGeneratorEntryPoint {
+public final class MicronautCodeGeneratorEntryPoint {
     private final URI definitionFile;
     private final File outputDirectory;
     private final AbstractMicronautJavaCodegen codeGenerator;
     private final EnumSet<OutputKind> outputs;
     private final Options options;
     private final ServerOptions serverOptions;
-
-    /**
-     * Returns a code generator builder.
-     * @return the builder
-     */
-    public static Builder builder() {
-        return new DefaultBuilder();
-    }
+    private final ClientOptions clientOptions;
 
     private MicronautCodeGeneratorEntryPoint(URI definitionFile,
                                              File outputDirectory,
                                              AbstractMicronautJavaCodegen codeGenerator,
                                              EnumSet<OutputKind> outputs,
                                              Options options,
-                                             ServerOptions serverOptions) {
+                                             ServerOptions serverOptions,
+                                             ClientOptions clientOptions) {
         this.definitionFile = definitionFile;
         this.outputDirectory = outputDirectory;
         this.codeGenerator = codeGenerator;
         this.outputs = outputs;
         this.options = options;
         this.serverOptions = serverOptions;
+        this.clientOptions = clientOptions;
     }
 
     private static void withPath(File file, Consumer<? super String> action) {
@@ -127,6 +123,11 @@ public class MicronautCodeGeneratorEntryPoint {
         codeGenerator.setUseOptional(options.optional);
         codeGenerator.setUseBeanValidation(options.beanValidation);
         codeGenerator.setTestTool(options.testFramework.value);
+        configureServerOptions();
+        configureClientOptions();
+    }
+
+    private void configureServerOptions() {
         if (serverOptions != null && codeGenerator instanceof JavaMicronautServerCodegen serverCodegen) {
             if (serverOptions.controllerPackage != null) {
                 serverCodegen.setControllerPackage(serverOptions.controllerPackage);
@@ -138,36 +139,81 @@ public class MicronautCodeGeneratorEntryPoint {
         }
     }
 
+    public void configureClientOptions() {
+        if (clientOptions != null && codeGenerator instanceof JavaMicronautClientCodegen clientCodegen) {
+            if (clientOptions.additionalClientTypeAnnotations != null) {
+                clientCodegen.setAdditionalClientTypeAnnotations(clientOptions.additionalClientTypeAnnotations);
+            }
+            if (clientOptions.clientId != null) {
+                clientCodegen.setClientId(clientCodegen.clientId);
+            }
+            if (clientOptions.authorizationFilterPattern != null) {
+                clientCodegen.setAuthorizationFilterPattern(clientCodegen.authorizationFilterPattern);
+            }
+            if (clientOptions.basePathSeparator != null) {
+                clientCodegen.setBasePathSeparator(clientCodegen.basePathSeparator);
+            }
+            clientCodegen.setConfigureAuthorization(clientOptions.useAuth);
+        }
+    }
+
+    /**
+     * Returns a code generator builder.
+     *
+     * @return the builder
+     */
+    public static Builder builder() {
+        return new DefaultBuilder();
+    }
+
     /**
      * A code generator builder.
      */
+    @SuppressWarnings("UnusedReturnValue")
     public interface Builder {
         /**
-         * Sets the code generator which should be used (e.g server or client)
+         * Sets the code generator which should be used (e.g server or client).
+         *
          * @param generator the generator
          * @return this builder
          */
         Builder forCodeGenerator(MicronautCodeGenerator generator);
 
         /**
-         * Configures the code generator to create a client
+         * Configures the code generator to create a client.
+         *
          * @return this builder
          */
-        Builder forClient();
-
-        /**
-         * Configures the code generator to create a server
-         * @return this builder
-         */
-        default Builder forServer() {
-            return forServer(o -> {});
+        default Builder forClient() {
+            return forClient(o -> {
+            });
         }
 
         /**
-         * Configures the code generator to create a server
+         * Configures the code generator to create a client.
+         *
+         * @param clientOptionsSpec the client options
          * @return this builder
          */
-        Builder forServer(Consumer<? super ServerOptionsBuilder> serverOptions);
+        Builder forClient(Consumer<? super ClientOptionsBuilder> clientOptionsSpec);
+
+        /**
+         * Configures the code generator to create a server.
+         *
+         * @return this builder
+         */
+        default Builder forServer() {
+            return forServer(o -> {
+            });
+        }
+
+        /**
+         * Configures the code generator to create a server.
+         *
+         * @param serverOptionsSpec the server options
+         * @return this builder
+         */
+        Builder forServer(Consumer<? super ServerOptionsBuilder> serverOptionsSpec);
 
         /**
          * Sets the URI to the OpenAPI definition file.
@@ -181,6 +227,7 @@ public class MicronautCodeGeneratorEntryPoint {
 
         /**
          * Sets the directory where to output the generated sources.
+         *
          * @param outputDirectory the generated sources output directory
          * @return this builder
          */
@@ -188,20 +235,23 @@ public class MicronautCodeGeneratorEntryPoint {
 
         /**
          * Sets which output files should be generated.
+         *
          * @param elements the different elements to generate
          * @return this builder
          */
         Builder withOutputs(OutputKind... elements);
 
         /**
-         * Configures the code generation options
+         * Configures the code generation options.
+         *
          * @param optionsConfigurer the configuration
          * @return this builder
          */
         Builder withOptions(Consumer<? super OptionsBuilder> optionsConfigurer);
 
         /**
-         * Returns a configured code generator
+         * Returns a configured code generator.
+         *
          * @return the configured code generator
          */
         MicronautCodeGeneratorEntryPoint build();
@@ -210,51 +260,67 @@ public class MicronautCodeGeneratorEntryPoint {
     /**
      * Builder for generic options that the Micronaut code generator supports.
      */
+    @SuppressWarnings("UnusedReturnValue")
     public interface OptionsBuilder {
         /**
-         * Sets the package of the generated API classes
+         * Sets the package of the generated API classes.
+         *
          * @param apiPackage the package name
          * @return this builder
          */
         OptionsBuilder withApiPackage(String apiPackage);
+
         /**
-         * Sets the package of the generated invoker classes
+         * Sets the package of the generated invoker classes.
+         *
          * @param invokerPackage the package name
          * @return this builder
          */
         OptionsBuilder withInvokerPackage(String invokerPackage);
+
         /**
-         * Sets the package of the generated model classes
+         * Sets the package of the generated model classes.
+         *
          * @param modelPackage the package name
          * @return this builder
          */
         OptionsBuilder withModelPackage(String modelPackage);
+
         /**
-         * Sets the artifact id of the project
+         * Sets the artifact id of the project.
+         *
          * @param artifactId the artifact id
          * @return this builder
          */
         OptionsBuilder withArtifactId(String artifactId);
+
         /**
-         * If set to true, the generator will use reactive types
+         * If set to true, the generator will use reactive types.
+         *
          * @param reactive the reactive flag
          * @return this builder
          */
         OptionsBuilder withReactive(boolean reactive);
+
         /**
-         * If true, the generated client will use responses wrapped in HttpResponse
+         * If true, the generated client will use responses wrapped in HttpResponse.
+         *
          * @param wrapInHttpResponse the wrapping flag
          * @return this builder
          */
         OptionsBuilder withWrapInHttpResponse(boolean wrapInHttpResponse);
+
         /**
-         * If set to true, the generated code will use bean validation
+         * If set to true, the generated code will use bean validation.
+         *
          * @param beanValidation the bean validation flag
          * @return this builder
          */
         OptionsBuilder withBeanValidation(boolean beanValidation);
+
         /**
          * If set to true, the generated code will make use of {@link java.util.Optional}.
+         *
          * @param optional the optional flag
          * @return this builder
          */
@@ -262,6 +328,7 @@ public class MicronautCodeGeneratorEntryPoint {
 
         /**
          * Configures the test framework to use for generated tests.
+         *
          * @param testFramework the test framework
          * @return this builder
          */
@@ -271,12 +338,94 @@ public class MicronautCodeGeneratorEntryPoint {
     /**
      * Configures options which are specific to the server code.
      */
+    @SuppressWarnings("UnusedReturnValue")
     public interface ServerOptionsBuilder {
+        /**
+         * Sets the package name of generated controller classes.
+         *
+         * @param controllerPackage the package name
+         * @return this builder
+         */
         ServerOptionsBuilder withControllerPackage(String controllerPackage);
+
+        /**
+         * If set to true, the code generator will output abstract classes
+         * for the controller, instead of concrete implementations.
+         *
+         * @param abstractClasses the abstract classes flag
+         * @return this builder
+         */
         ServerOptionsBuilder withGenerateAbstractClasses(boolean abstractClasses);
+
+        /**
+         * If set to true, controller operations will return not implemented status.
+         *
+         * @param generateOperationsToReturnNotImplemented the not implemented flag
+         * @return this builder
+         */
         ServerOptionsBuilder withGenerateOperationsToReturnNotImplemented(boolean generateOperationsToReturnNotImplemented);
+
+        /**
+         * If set to true, controllers will be generated using examples.
+         *
+         * @param generateControllerFromExamples the examples flag
+         * @return this builder
+         */
         ServerOptionsBuilder withGenerateControllerFromExamples(boolean generateControllerFromExamples);
+
+        /**
+         * If set to true, generated code will add support for authentication.
+         *
+         * @param useAuth the authentication flag
+         * @return this builder
+         */
         ServerOptionsBuilder withAuthentication(boolean useAuth);
+    }
+
+    /**
+     * The client generator options builder.
+     */
+    @SuppressWarnings("UnusedReturnValue")
+    public interface ClientOptionsBuilder {
+        /**
+         * If set to true the client will be configured for authorization.
+         *
+         * @param useAuth the authorization flag
+         * @return this builder
+         */
+        ClientOptionsBuilder withAuthorization(boolean useAuth);
+
+        /**
+         * Sets the authorization filter pattern.
+         *
+         * @param authorizationFilterPattern the filter pattern
+         * @return this builder
+         */
+        ClientOptionsBuilder withAuthorizationFilterPattern(String authorizationFilterPattern);
+
+        /**
+         * Sets the client id.
+         *
+         * @param clientId the client id
+         * @return this builder
+         */
+        ClientOptionsBuilder withClientId(String clientId);
+
+        /**
+         * Sets annotations for client type (class level annotations).
+         *
+         * @param additionalClientTypeAnnotations the type annotations
+         * @return this builder
+         */
+        ClientOptionsBuilder withAdditionalClientTypeAnnotations(List<String> additionalClientTypeAnnotations);
+
+        /**
+         * Sets the separator to use between the application name and base path when referencing the property.
+         *
+         * @param basePathSeparator the base path separator
+         * @return this builder
+         */
+        ClientOptionsBuilder withBasePathSeparator(String basePathSeparator);
     }
 
     /**
@@ -311,13 +460,13 @@ public class MicronautCodeGeneratorEntryPoint {
 
     private static class DefaultBuilder implements Builder {
         private static final Consumer<DefaultBuilder> HAS_OUTPUT = b -> Objects.requireNonNull(b.outputDirectory, "Sources directory must not be null");
-
         private Options options;
         private AbstractMicronautJavaCodegen codeGenerator;
         private URI definitionFile;
         private File outputDirectory;
         private final EnumSet<OutputKind> outputs = EnumSet.noneOf(OutputKind.class);
         private ServerOptions serverOptions;
+        private ClientOptions clientOptions;
 
         @Override
         public Builder forCodeGenerator(MicronautCodeGenerator generator) {
@@ -326,8 +475,11 @@ public class MicronautCodeGeneratorEntryPoint {
         }
 
         @Override
-        public Builder forClient() {
+        public Builder forClient(Consumer<? super ClientOptionsBuilder> clientOptionsSpec) {
             this.codeGenerator = new JavaMicronautClientCodegen();
+            var clientOptionsBuilder = new DefaultClientOptionsBuilder();
+            clientOptionsSpec.accept(clientOptionsBuilder);
+            this.clientOptions = clientOptionsBuilder.build();
             return this;
         }
 
@@ -382,7 +534,8 @@ public class MicronautCodeGeneratorEntryPoint {
                 codeGenerator,
                 outputs,
                 options,
-                serverOptions);
+                serverOptions,
+                clientOptions);
         }
 
         private static class DefaultOptionsBuilder implements OptionsBuilder {
@@ -498,6 +651,57 @@ public class MicronautCodeGeneratorEntryPoint {
         }
     }
 
+    private static class DefaultClientOptionsBuilder implements ClientOptionsBuilder {
+        private List<String> additionalClientTypeAnnotations;
+        private String authorizationFilterPattern;
+        private String basePathSeparator;
+        private String clientId;
+        private boolean useAuth;
+
+        @Override
+        public ClientOptionsBuilder withAuthorization(boolean useAuth) {
+            this.useAuth = useAuth;
+            return this;
+        }
+
+        @Override
+        public ClientOptionsBuilder withAuthorizationFilterPattern(String authorizationFilterPattern) {
+            this.authorizationFilterPattern = authorizationFilterPattern;
+            return this;
+        }
+
+        @Override
+        public ClientOptionsBuilder withClientId(String clientId) {
+            this.clientId = clientId;
+            return this;
+        }
+
+        @Override
+        public ClientOptionsBuilder withAdditionalClientTypeAnnotations(List<String> additionalClientTypeAnnotations) {
+            this.additionalClientTypeAnnotations = additionalClientTypeAnnotations;
+            return this;
+        }
+
+        @Override
+        public ClientOptionsBuilder withBasePathSeparator(String basePathSeparator) {
+            this.basePathSeparator = basePathSeparator;
+            return this;
+        }
+
+        private ClientOptions build() {
+            return new ClientOptions(
+                additionalClientTypeAnnotations,
+                authorizationFilterPattern,
+                basePathSeparator,
+                clientId,
+                useAuth);
+        }
+    }
+
+    /**
+     * The different test frameworks which are supported
+     * by this generator.
+     */
     public enum TestFramework {
         JUNIT5(AbstractMicronautJavaCodegen.OPT_TEST_JUNIT),
         SPOCK(AbstractMicronautJavaCodegen.OPT_TEST_SPOCK);
@@ -518,7 +722,8 @@ public class MicronautCodeGeneratorEntryPoint {
         boolean optional,
         boolean reactive,
         boolean wrapInHttpResponse,
-        TestFramework testFramework) {}
+        TestFramework testFramework) {
+    }
 
     private record ServerOptions(
         String controllerPackage,
@@ -526,5 +731,15 @@ public class MicronautCodeGeneratorEntryPoint {
         boolean generateOperationsToReturnNotImplemented,
         boolean generateControllerFromExamples,
         boolean useAuth
-    ) {}
+    ) {
+    }
+
+    private record ClientOptions(
+        List<String> additionalClientTypeAnnotations,
+        String authorizationFilterPattern,
+        String basePathSeparator,
+        String clientId,
+        boolean useAuth
+    ) {
+    }
 }

@@ -20,3 +20,12 @@ dependencies {
     testFixturesImplementation libs.openapi.generator
     testFixturesImplementation libs.junit5.api
 }
+
+micronautBuild {
+    def simpleVersion = version
+    if (version.contains('-')) {
+        simpleVersion = version.substring(0, version.indexOf('-'))
+    }
+    def (String major, String minor, String patch) = simpleVersion.split("[.]")
+    binaryCompatibility.enabled = major.toInteger() >= 5 && minor.toInteger() >= 0 && patch.toInteger() > 0
+}
