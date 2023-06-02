@@ -4,18 +4,26 @@ managed-javadoc-parser = "0.3.1"
 managed-jsoup = "1.16.1"
 managed-html2md-converter = "0.64.8"
 
+assertj = "3.24.2"
 kotlin = "1.8.21"
 kotlin-coroutines = "1.7.1"
 jspecify = "0.3.0"
 jdt-annotation = "2.2.700"
 android-annotation = "1.6.0"
 spotbugs-annotations = "4.7.3"
+openapi-generator = "6.6.0"
+junit5 = "5.9.3"
+swagger-parser = "1.0.66"
+swagger-parser-v3 = "2.1.14"
+javaparser = "3.25.3"
 
 micronaut = "4.0.0-M5"
+micronaut-platform = "4.0.0-M2"
 micronaut-security = "4.0.0-M4"
 micronaut-serde = "2.0.0-M8"
 micronaut-rxjava2 = "2.0.0-M2"
 micronaut-rxjava3 = "3.0.0-M3"
+micronaut-gradle-plugin = "4.0.0-M4"
 micronaut-groovy = "4.0.0-M1"
 micronaut-validation = "4.0.0-M9"
 micronaut-data = "4.0.0-M6"
@@ -33,11 +41,13 @@ micronaut-security = { module = "io.micronaut.security:micronaut-security-bom", 
 micronaut-serde = { module = "io.micronaut.serde:micronaut-serde-bom", version.ref = "micronaut-serde" }
 micronaut-rxjava2 = { module = "io.micronaut.rxjava2:micronaut-rxjava2-bom", version.ref = "micronaut-rxjava2" }
 micronaut-rxjava3 = { module = "io.micronaut.rxjava3:micronaut-rxjava3-bom", version.ref = "micronaut-rxjava3" }
+micronaut-gradle-plugin = { module = "io.micronaut.gradle:micronaut-minimal-plugin", version.ref = "micronaut-gradle-plugin"}
 micronaut-groovy = { module = "io.micronaut.groovy:micronaut-groovy-bom", version.ref = "micronaut-groovy" }
 micronaut-validation = { module = "io.micronaut.validation:micronaut-validation-bom", version.ref = "micronaut-validation" }
 micronaut-data = { module = "io.micronaut.data:micronaut-data-bom", version.ref = "micronaut-data" }
 micronaut-test = { module = "io.micronaut.test:micronaut-test-bom", version.ref = "micronaut-test" }
 micronaut-kotlin = { module = "io.micronaut.kotlin:micronaut-kotlin-bom", version.ref = "micronaut-kotlin" }
+micronaut-platform = { module = "io.micronaut.platform:micronaut-platform", version.ref = "micronaut-platform"}
 
 managed-swagger-core = { module = "io.swagger.core.v3:swagger-core", version.ref = "managed-swagger" }
 managed-swagger-annotations = { module = "io.swagger.core.v3:swagger-annotations", version.ref = "managed-swagger" }
@@ -56,10 +66,19 @@ jspecify = { module = "org.jspecify:jspecify", version.ref = "jspecify" }
 jdt-annotation = { module = "org.eclipse.jdt:org.eclipse.jdt.annotation", version.ref = "jdt-annotation" }
 android-annotation = { module = "androidx.annotation:annotation", version.ref = "android-annotation" }
 
+assertj = { module = "org.assertj:assertj-core", version.ref = "assertj" }
+javaparser = { module = "com.github.javaparser:javaparser-symbol-solver-core", version.ref = "javaparser" }
+junit5-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit5" }
+junit5-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit5" }
+
 kotlin-stdlib-jdk8 = { module = "org.jetbrains.kotlin:kotlin-stdlib-jdk8", version.ref = "kotlin" }
 kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
 kotlinx-coroutines-reactive = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-reactive", version.ref = "kotlin-coroutines" }
 kotlinx-coroutines-reactor = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-reactor", version.ref = "kotlin-coroutines" }
+
+openapi-generator = { module = "org.openapitools:openapi-generator", version.ref = "openapi-generator" }
+swagger-parser = { module = "io.swagger:swagger-parser", version.ref = "swagger-parser" }
+swagger-parser-v3 = { module = "io.swagger.parser.v3:swagger-parser-v3", version.ref = "swagger-parser-v3" }
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }

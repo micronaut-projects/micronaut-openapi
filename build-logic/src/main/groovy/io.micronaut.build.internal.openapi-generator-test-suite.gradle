@@ -1,0 +1,42 @@
+import io.micronaut.build.internal.openapi.OpenApiGeneratorTask
+
+plugins {
+    id 'io.micronaut.minimal.application'
+}
+
+repositories {
+    mavenCentral()
+}
+
+configurations {
+    openapiGenerator {
+        canBeResolved = true
+        canBeConsumed = false
+    }
+}
+
+dependencies {
+    openapiGenerator(project(":test-suite-generator-util"))
+}
+
+def openapiGenerate = tasks.register("generateOpenApi", OpenApiGeneratorTask) {
+    classpath.from(configurations.openapiGenerator)
+    openApiDefinition.convention(layout.projectDirectory.file("petstore.json"))
+    outputDirectory.convention(layout.buildDirectory.dir("generated/openapi"))
+    generatorKind.convention("client")
+}
+
+sourceSets {
+    main {
+        java.srcDir(openapiGenerate.map(OpenApiGeneratorTask::getGeneratedSourcesDirectory))
+    }
+    test {
+        java.srcDir(openapiGenerate.map(OpenApiGeneratorTask::getGeneratedTestSourcesDirectory))
+    }
+}
+
+micronaut {
+    version = libs.versions.micronaut.platform.get()
+    runtime("netty")
+    testRuntime("junit5")
+}
