@@ -2,7 +2,7 @@ repositories {
     mavenCentral()
 }
 
-tasks.withType(Test) {
+tasks.withType(Test).configureEach {
     testLogging {
         showStandardStreams = true
         exceptionFormat = 'full'

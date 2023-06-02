@@ -1,0 +1,11 @@
+plugins {
+    id "application"
+}
+
+application {
+    mainClass = "io.micronaut.openapi.testsuite.GeneratorMain"
+}
+
+dependencies {
+    implementation(project(":micronaut-openapi-generator"))
+}
