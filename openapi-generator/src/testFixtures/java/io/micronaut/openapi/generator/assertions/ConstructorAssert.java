@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+//CHECKSTYLE:OFF
 @CanIgnoreReturnValue
 public class ConstructorAssert extends AbstractAssert<ConstructorAssert, ConstructorDeclaration> {
 

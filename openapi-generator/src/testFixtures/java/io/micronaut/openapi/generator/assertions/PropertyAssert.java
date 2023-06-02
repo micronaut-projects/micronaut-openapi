@@ -5,6 +5,7 @@ import org.assertj.core.api.Assertions;
 import org.assertj.core.api.ObjectAssert;
 import org.assertj.core.util.CanIgnoreReturnValue;
 
+//CHECKSTYLE:OFF
 @CanIgnoreReturnValue
 public class PropertyAssert extends ObjectAssert<FieldDeclaration> {
 

@@ -1,3 +1,18 @@
+/*
+ * Copyright 2017-2023 original authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package io.micronaut.openapi.generator;
 
 import org.openapitools.codegen.CliOption;
@@ -35,8 +50,8 @@ class JavaMicronautClientCodegen extends AbstractMicronautJavaCodegen {
         configureAuthorization = false;
 
         generatorMetadata = GeneratorMetadata.newBuilder(generatorMetadata)
-                .stability(Stability.BETA)
-                .build();
+            .stability(Stability.BETA)
+            .build();
         additionalProperties.put("client", "true");
 
         cliOptions.add(CliOption.newBoolean(OPT_CONFIGURE_AUTH, "Configure all the authorization methods as specified in the file", configureAuthorization));
@@ -80,7 +95,7 @@ class JavaMicronautClientCodegen extends AbstractMicronautJavaCodegen {
         writePropertyBack(OPT_CONFIGURE_AUTH_FILTER_PATTERN, false);
         writePropertyBack(OPT_CONFIGURE_CLIENT_ID, false);
 
-        if(additionalProperties.containsKey(BASE_PATH_SEPARATOR)) {
+        if (additionalProperties.containsKey(BASE_PATH_SEPARATOR)) {
             basePathSeparator = additionalProperties.get(BASE_PATH_SEPARATOR).toString();
         }
         writePropertyBack(BASE_PATH_SEPARATOR, basePathSeparator);
@@ -159,5 +174,9 @@ class JavaMicronautClientCodegen extends AbstractMicronautJavaCodegen {
 
     public void setBasePathSeparator(final String separator) {
         this.basePathSeparator = separator;
+    }
+
+    public void setConfigureAuthorization(boolean configureAuthorization) {
+        this.configureAuthorization = configureAuthorization;
     }
 }
