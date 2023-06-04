@@ -18,7 +18,7 @@ micronaut-rxjava2 = "2.0.0-M3"
 micronaut-rxjava3 = "3.0.0-M3"
 micronaut-groovy = "4.0.0-M1"
 micronaut-validation = "4.0.0-M9"
-micronaut-data = "4.0.0-M6"
+micronaut-data = "4.0.0-M7"
 micronaut-test = "4.0.0-M4"
 micronaut-kotlin = "4.0.0-M3"
 
