@@ -11,7 +11,7 @@ jdt-annotation = "2.2.700"
 android-annotation = "1.6.0"
 spotbugs-annotations = "4.7.3"
 
-micronaut = "4.0.0-M6"
+micronaut = "4.0.0-M7"
 micronaut-security = "4.0.0-M5"
 micronaut-serde = "2.0.0-M9"
 micronaut-rxjava2 = "2.0.0-M4"
