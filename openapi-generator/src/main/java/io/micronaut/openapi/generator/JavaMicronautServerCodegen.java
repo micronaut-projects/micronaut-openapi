@@ -45,17 +45,17 @@ class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen {
 
     public static final String NAME = "java-micronaut-server";
 
+    protected static final String CONTROLLER_PREFIX = "";
+    protected static final String CONTROLLER_SUFFIX = "Controller";
+    protected static final String API_PREFIX = "";
+    protected static final String API_SUFFIX = "Api";
+
     protected String apiPackage = "org.openapitools.api";
     protected String controllerPackage = "org.openapitools.controller";
     protected boolean generateImplementationFiles = true;
     protected boolean generateOperationsToReturnNotImplemented = true;
     protected boolean generateControllerFromExamples = false;
     protected boolean useAuth = true;
-
-    protected static final String CONTROLLER_PREFIX = "";
-    protected static final String CONTROLLER_SUFFIX = "Controller";
-    protected static final String API_PREFIX = "";
-    protected static final String API_SUFFIX = "Api";
 
     public JavaMicronautServerCodegen() {
         super();
