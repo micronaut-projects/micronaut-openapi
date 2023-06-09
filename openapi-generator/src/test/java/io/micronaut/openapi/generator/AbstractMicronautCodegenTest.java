@@ -4,9 +4,11 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -59,31 +61,55 @@ public abstract class AbstractMicronautCodegenTest {
     }
 
     public static void assertFileContainsRegex(String path, String... regex) {
+        assertFileExists(path);
         String file = readFile(path);
         for (String line: regex)
             assertTrue(Pattern.compile(line.replace(" ", "\\s+")).matcher(file).find());
     }
 
     public static void assertFileNotContainsRegex(String path, String... regex) {
+        assertFileExists(path);
         String file = readFile(path);
         for (String line: regex)
             assertFalse(Pattern.compile(line.replace(" ", "\\s+")).matcher(file).find());
     }
 
     public static void assertFileContains(String path, String... lines) {
+        assertFileExists(path);
         String file = linearize(readFile(path));
         for (String line : lines)
             assertTrue(file.contains(linearize(line)), "File does not contain line [" + line + "]");
     }
 
     public static void assertFileNotContains(String path, String... lines) {
+        assertFileExists(path);
         String file = linearize(readFile(path));
         for (String line : lines)
             assertFalse(file.contains(linearize(line)), "File contains line [" + line + "]");
     }
 
-    public static void assertFileExists(String path) {
-        assertTrue(Paths.get(path).toFile().exists(), "File \"" + path + "\" should exist");
+    public static void assertFileExists(String file) {
+        Path path = Paths.get(file);
+        if (!path.toFile().exists()) {
+            while (path.getParent() != null && !path.getParent().toFile().exists()) {
+                path = path.getParent();
+            }
+            String message = "File \"" + file + "\" should exist, however \"" + path  + "\" could not be found.";
+            if (path.getParent() != null) {
+                Path parent = path.getParent();
+                File[] contents = parent.toFile().listFiles();
+                message += "\nContents of folder \"" + path.getParent() + "\": ";
+                if (contents == null) {
+                    message += null;
+                } else {
+                    message += Arrays.stream(contents)
+                        .map(f -> f.toString().substring(parent.toString().length() + 1))
+                        .collect(Collectors.toList());
+                }
+                message += ".";
+            }
+            fail(message);
+        }
     }
 
     public static void assertFileNotExists(String path) {
@@ -103,6 +129,6 @@ public abstract class AbstractMicronautCodegenTest {
     }
 
     public static String linearize(String target) {
-        return target.replaceAll("\r?\n", "").replaceAll("\\s+", "\\s");
+        return target.replaceAll("\r?\n", "").replaceAll("\\s+", "s");
     }
 }

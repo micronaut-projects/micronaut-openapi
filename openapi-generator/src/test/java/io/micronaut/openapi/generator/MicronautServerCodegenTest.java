@@ -27,7 +27,7 @@ public class MicronautServerCodegenTest extends AbstractMicronautCodegenTest {
     }
 
     @Test
-    public void testInitialConfigValues() throws Exception {
+    public void testInitialConfigValues() {
         final JavaMicronautServerCodegen codegen = new JavaMicronautServerCodegen();
         codegen.processOpts();
 
@@ -40,8 +40,8 @@ public class MicronautServerCodegenTest extends AbstractMicronautCodegenTest {
         assertFalse(codegen.isHideGenerationTimestamp());
         assertEquals(codegen.modelPackage(), "org.openapitools.model");
         assertEquals(codegen.additionalProperties().get(CodegenConstants.MODEL_PACKAGE), "org.openapitools.model");
-        assertEquals(codegen.apiPackage(), "org.openapitools.controller");
-        assertEquals(codegen.additionalProperties().get(CodegenConstants.API_PACKAGE), "org.openapitools.controller");
+        assertEquals(codegen.apiPackage(), "org.openapitools.api");
+        assertEquals(codegen.additionalProperties().get(CodegenConstants.API_PACKAGE), "org.openapitools.api");
         assertEquals(codegen.additionalProperties().get(JavaMicronautServerCodegen.OPT_CONTROLLER_PACKAGE), "org.openapitools.controller");
         assertEquals(codegen.getInvokerPackage(), "org.openapitools");
         assertEquals(codegen.additionalProperties().get(CodegenConstants.INVOKER_PACKAGE), "org.openapitools");
@@ -52,7 +52,7 @@ public class MicronautServerCodegenTest extends AbstractMicronautCodegenTest {
         JavaMicronautServerCodegen codegen = new JavaMicronautServerCodegen();
         codegen.additionalProperties().put(CodegenConstants.INVOKER_PACKAGE, "org.test.test");
         codegen.additionalProperties().put(CodegenConstants.MODEL_PACKAGE, "org.test.test.model");
-        codegen.additionalProperties().put(JavaMicronautServerCodegen.OPT_CONTROLLER_PACKAGE, "org.test.test.controller");
+        codegen.additionalProperties().put(CodegenConstants.API_PACKAGE, "org.test.test.api");
         String outputPath = generateFiles(codegen, PETSTORE_PATH,
                 CodegenConstants.SUPPORTING_FILES,
                 CodegenConstants.APIS,
@@ -61,10 +61,10 @@ public class MicronautServerCodegenTest extends AbstractMicronautCodegenTest {
         String invokerFolder = outputPath + "src/main/java/org/test/test/";
         assertFileExists(invokerFolder + "Application.java");
 
-        String controllerFolder = outputPath + "src/main/java/org/test/test/controller/";
-        assertFileExists(controllerFolder + "PetController.java");
-        assertFileExists(controllerFolder + "StoreController.java");
-        assertFileExists(controllerFolder + "UserController.java");
+        String apiFolder = outputPath + "src/main/java/org/test/test/api/";
+        assertFileExists(apiFolder + "PetApi.java");
+        assertFileExists(apiFolder + "StoreApi.java");
+        assertFileExists(apiFolder + "UserApi.java");
 
         String modelFolder = outputPath + "src/main/java/org/test/test/model/";
         assertFileExists(modelFolder + "Pet.java");
@@ -83,8 +83,9 @@ public class MicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                 CodegenConstants.APIS);
 
         // Files are not generated
-        assertFileContains(outputPath + "/src/main/java/org/openapitools/controller/PetController.java", "@Valid");
-        assertFileContains(outputPath + "/src/main/java/org/openapitools/controller/PetController.java", "@NotNull");
+        String apiFolder = outputPath + "/src/main/java/org/openapitools/api/";
+        assertFileContains(apiFolder + "PetApi.java", "@Valid");
+        assertFileContains(apiFolder + "PetApi.java", "@NotNull");
     }
 
     @Test
@@ -95,8 +96,9 @@ public class MicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                 CodegenConstants.APIS);
 
         // Files are not generated
-        assertFileNotContains(outputPath + "/src/main/java/org/openapitools/controller/PetController.java", "@Valid");
-        assertFileNotContains(outputPath + "/src/main/java/org/openapitools/controller/PetController.java", "@NotNull");
+        String apiFolder = outputPath + "/src/main/java/org/openapitools/api/";
+        assertFileNotContains(apiFolder + "PetApi.java", "@Valid");
+        assertFileNotContains(apiFolder + "PetApi.java", "@NotNull");
     }
 
     @Test
@@ -110,8 +112,9 @@ public class MicronautServerCodegenTest extends AbstractMicronautCodegenTest {
 
         // Files are not generated
         assertFileExists(outputPath + "src/test/java/");
-        assertFileExists(outputPath + "src/test/java/org/openapitools/controller/PetControllerTest.java");
-        assertFileContains(outputPath + "src/test/java/org/openapitools/controller/PetControllerTest.java", "PetControllerTest", "@MicronautTest");
+        String apiTestFolder = outputPath + "src/test/java/org/openapitools/api/";
+        assertFileExists(apiTestFolder + "PetApiTest.java");
+        assertFileContains(apiTestFolder + "PetApiTest.java", "PetApiTest", "@MicronautTest");
     }
 
     @Test
@@ -125,8 +128,9 @@ public class MicronautServerCodegenTest extends AbstractMicronautCodegenTest {
 
         // Files are not generated
         assertFileExists(outputPath + "src/test/groovy");
-        assertFileExists(outputPath + "src/test/groovy/org/openapitools/controller/PetControllerSpec.groovy");
-        assertFileContains(outputPath + "src/test/groovy/org/openapitools/controller/PetControllerSpec.groovy", "PetControllerSpec", "@MicronautTest");
+        String apiTestFolder = outputPath + "src/test/groovy/org/openapitools/api/";
+        assertFileExists(apiTestFolder + "PetApiSpec.groovy");
+        assertFileContains(apiTestFolder + "PetApiSpec.groovy", "PetApiSpec", "@MicronautTest");
     }
 
     @Test
@@ -161,7 +165,7 @@ public class MicronautServerCodegenTest extends AbstractMicronautCodegenTest {
 
     @Test
     @Disabled("Feature may not be fully implemented in OpenAPI generator")
-    public void testExtraAnnotations() throws Exception {
+    public void testExtraAnnotations() {
 
         JavaMicronautServerCodegen codegen = new JavaMicronautServerCodegen();
         String outputPath = generateFiles(codegen, "src/test/resources/3_0/issue_11772.yml", CodegenConstants.MODELS);
@@ -176,10 +180,10 @@ public class MicronautServerCodegenTest extends AbstractMicronautCodegenTest {
         codegen.additionalProperties().put(JavaMicronautServerCodegen.OPT_USE_AUTH, false);
         String outputPath = generateFiles(codegen, ROLES_EXTENSION_TEST_PATH, CodegenConstants.MODELS, CodegenConstants.APIS);
 
-        String controllerPath = outputPath + "src/main/java/org/openapitools/controller/";
-        assertFileNotContains(controllerPath + "BooksController.java", "@Secured");
-        assertFileNotContains(controllerPath + "UsersController.java", "@Secured");
-        assertFileNotContains(controllerPath + "ReviewsController.java", "@Secured");
+        String apiPath = outputPath + "src/main/java/org/openapitools/api/";
+        assertFileNotContains(apiPath + "BooksApi.java", "@Secured");
+        assertFileNotContains(apiPath + "UsersApi.java", "@Secured");
+        assertFileNotContains(apiPath + "ReviewsApi.java", "@Secured");
     }
 
     @Test
@@ -188,17 +192,17 @@ public class MicronautServerCodegenTest extends AbstractMicronautCodegenTest {
         codegen.additionalProperties().put(JavaMicronautServerCodegen.OPT_USE_AUTH, true);
         String outputPath = generateFiles(codegen, ROLES_EXTENSION_TEST_PATH, CodegenConstants.MODELS, CodegenConstants.APIS);
 
-        String controllerPath = outputPath + "src/main/java/org/openapitools/controller/";
-        assertFileContainsRegex(controllerPath + "BooksController.java", "IS_ANONYMOUS[^;]{0,100}bookSearchGet");
-        assertFileContainsRegex(controllerPath + "BooksController.java", "@Secured\\(\\{\"admin\"\\}\\)[^;]{0,100}createBook");
-        assertFileContainsRegex(controllerPath + "BooksController.java", "IS_ANONYMOUS[^;]{0,100}getBook");
-        assertFileContainsRegex(controllerPath + "BooksController.java", "IS_AUTHENTICATED[^;]{0,100}reserveBook");
+        String apiPath = outputPath + "src/main/java/org/openapitools/api/";
+        assertFileContainsRegex(apiPath + "BooksApi.java", "IS_ANONYMOUS[^;]{0,100}bookSearchGet");
+        assertFileContainsRegex(apiPath + "BooksApi.java", "@Secured\\(\\{\"admin\"\\}\\)[^;]{0,100}createBook");
+        assertFileContainsRegex(apiPath + "BooksApi.java", "IS_ANONYMOUS[^;]{0,100}getBook");
+        assertFileContainsRegex(apiPath + "BooksApi.java", "IS_AUTHENTICATED[^;]{0,100}reserveBook");
 
-        assertFileContainsRegex(controllerPath + "ReviewsController.java", "IS_AUTHENTICATED[^;]{0,100}bookSendReviewPost");
-        assertFileContainsRegex(controllerPath + "ReviewsController.java", "IS_ANONYMOUS[^;]{0,100}bookViewReviewsGet");
+        assertFileContainsRegex(apiPath + "ReviewsApi.java", "IS_AUTHENTICATED[^;]{0,100}bookSendReviewPost");
+        assertFileContainsRegex(apiPath + "ReviewsApi.java", "IS_ANONYMOUS[^;]{0,100}bookViewReviewsGet");
 
-        assertFileContainsRegex(controllerPath + "UsersController.java", "IS_ANONYMOUS[^;]{0,100}getUserProfile");
-        assertFileContainsRegex(controllerPath + "UsersController.java", "IS_AUTHENTICATED[^;]{0,100}updateProfile");
+        assertFileContainsRegex(apiPath + "UsersApi.java", "IS_ANONYMOUS[^;]{0,100}getUserProfile");
+        assertFileContainsRegex(apiPath + "UsersApi.java", "IS_AUTHENTICATED[^;]{0,100}updateProfile");
     }
 
     @Test
@@ -208,8 +212,8 @@ public class MicronautServerCodegenTest extends AbstractMicronautCodegenTest {
         codegen.additionalProperties().put(JavaMicronautServerCodegen.OPT_WRAP_IN_HTTP_RESPONSE, "true");
         String outputPath = generateFiles(codegen, PETSTORE_PATH, CodegenConstants.MODELS, CodegenConstants.APIS);
 
-        String controllerPath = outputPath + "src/main/java/org/openapitools/controller/";
-        assertFileContains(controllerPath + "PetController.java", "Mono<HttpResponse<Pet>>");
+        String apiPath = outputPath + "src/main/java/org/openapitools/api/";
+        assertFileContains(apiPath + "PetApi.java", "Mono<HttpResponse<Pet>>");
     }
 
     @Test
@@ -219,9 +223,9 @@ public class MicronautServerCodegenTest extends AbstractMicronautCodegenTest {
         codegen.additionalProperties().put(JavaMicronautServerCodegen.OPT_WRAP_IN_HTTP_RESPONSE, "false");
         String outputPath = generateFiles(codegen, PETSTORE_PATH, CodegenConstants.MODELS, CodegenConstants.APIS);
 
-        String controllerPath = outputPath + "src/main/java/org/openapitools/controller/";
-        assertFileContains(controllerPath + "PetController.java", "Mono<Pet>");
-        assertFileNotContains(controllerPath + "PetController.java", "HttpResponse");
+        String apiPath = outputPath + "src/main/java/org/openapitools/api/";
+        assertFileContains(apiPath + "PetApi.java", "Mono<Pet>");
+        assertFileNotContains(apiPath + "PetApi.java", "HttpResponse");
     }
 
     @Test
@@ -231,9 +235,9 @@ public class MicronautServerCodegenTest extends AbstractMicronautCodegenTest {
         codegen.additionalProperties().put(JavaMicronautServerCodegen.OPT_WRAP_IN_HTTP_RESPONSE, "true");
         String outputPath = generateFiles(codegen, PETSTORE_PATH, CodegenConstants.MODELS, CodegenConstants.APIS);
 
-        String controllerPath = outputPath + "src/main/java/org/openapitools/controller/";
-        assertFileContains(controllerPath + "PetController.java", "HttpResponse<Pet>");
-        assertFileNotContains(controllerPath + "PetController.java", "Mono");
+        String apiPath = outputPath + "src/main/java/org/openapitools/api/";
+        assertFileContains(apiPath + "PetApi.java", "HttpResponse<Pet>");
+        assertFileNotContains(apiPath + "PetApi.java", "Mono");
     }
 
     @Test
@@ -243,10 +247,10 @@ public class MicronautServerCodegenTest extends AbstractMicronautCodegenTest {
         codegen.additionalProperties().put(JavaMicronautServerCodegen.OPT_WRAP_IN_HTTP_RESPONSE, "false");
         String outputPath = generateFiles(codegen, PETSTORE_PATH, CodegenConstants.MODELS, CodegenConstants.APIS);
 
-        String controllerPath = outputPath + "src/main/java/org/openapitools/controller/";
-        assertFileContains(controllerPath + "PetController.java", "Pet");
-        assertFileNotContains(controllerPath + "PetController.java", "Mono");
-        assertFileNotContains(controllerPath + "PetController.java", "HttpResponse");
+        String apiPath = outputPath + "src/main/java/org/openapitools/api/";
+        assertFileContains(apiPath + "PetApi.java", "Pet");
+        assertFileNotContains(apiPath + "PetApi.java", "Mono");
+        assertFileNotContains(apiPath + "PetApi.java", "HttpResponse");
     }
 
     @Test
@@ -255,25 +259,25 @@ public class MicronautServerCodegenTest extends AbstractMicronautCodegenTest {
         String outputPath = generateFiles(codegen, MULTI_TAGS_TEST_PATH, CodegenConstants.MODELS,
                 CodegenConstants.APIS, CodegenConstants.API_TESTS);
 
-        String controllerPath = outputPath + "src/main/java/org/openapitools/controller/";
-        String controllerTestPath = outputPath + "/src/test/java/org/openapitools/controller/";
+        String apiPath = outputPath + "src/main/java/org/openapitools/api/";
+        String apiTestPath = outputPath + "/src/test/java/org/openapitools/api/";
 
         // Verify files are generated only for the required tags
-        assertFileExists(controllerPath + "AuthorsController.java");
-        assertFileExists(controllerPath + "BooksController.java");
-        assertFileNotExists(controllerPath + "SearchController.java");
+        assertFileExists(apiPath + "AuthorsApi.java");
+        assertFileExists(apiPath + "BooksApi.java");
+        assertFileNotExists(apiPath + "SearchApi.java");
 
         // Verify the same for test files
-        assertFileExists(controllerTestPath + "AuthorsControllerTest.java");
-        assertFileExists(controllerTestPath + "BooksControllerTest.java");
-        assertFileNotExists(controllerTestPath + "SearchControllerTest.java");
+        assertFileExists(apiTestPath + "AuthorsApiTest.java");
+        assertFileExists(apiTestPath + "BooksApiTest.java");
+        assertFileNotExists(apiTestPath + "SearchApiTest.java");
 
         // Verify all the methods are generated only ones
-        assertFileContains(controllerPath + "AuthorsController.java",
+        assertFileContains(apiPath + "AuthorsApi.java",
                 "authorSearchGet", "getAuthor", "getAuthorBooks");
-        assertFileContains(controllerPath + "BooksController.java",
+        assertFileContains(apiPath + "BooksApi.java",
                 "bookCreateEntryPost", "bookSearchGet", "bookSendReviewPost", "getBook", "isBookAvailable");
-        assertFileNotContains(controllerPath + "BooksController.java", "getAuthorBooks");
+        assertFileNotContains(apiPath + "BooksApi.java", "getAuthorBooks");
     }
 
     @Test
@@ -283,25 +287,25 @@ public class MicronautServerCodegenTest extends AbstractMicronautCodegenTest {
         String outputPath = generateFiles(codegen, MULTI_TAGS_TEST_PATH, CodegenConstants.MODELS,
                 CodegenConstants.APIS, CodegenConstants.API_TESTS);
 
-        String controllerPath = outputPath + "src/main/java/org/openapitools/controller/";
-        String controllerTestPath = outputPath + "/src/test/java/org/openapitools/controller/";
+        String apiPath = outputPath + "src/main/java/org/openapitools/api/";
+        String apiTestPath = outputPath + "/src/test/java/org/openapitools/api/";
 
         // Verify all the tags created
-        assertFileExists(controllerPath + "AuthorsController.java");
-        assertFileExists(controllerPath + "BooksController.java");
-        assertFileExists(controllerPath + "SearchController.java");
+        assertFileExists(apiPath + "AuthorsApi.java");
+        assertFileExists(apiPath + "BooksApi.java");
+        assertFileExists(apiPath + "SearchApi.java");
 
         // Verify the same for test files
-        assertFileExists(controllerTestPath + "AuthorsControllerTest.java");
-        assertFileExists(controllerTestPath + "BooksControllerTest.java");
-        assertFileExists(controllerTestPath + "SearchControllerTest.java");
+        assertFileExists(apiTestPath + "AuthorsApiTest.java");
+        assertFileExists(apiTestPath + "BooksApiTest.java");
+        assertFileExists(apiTestPath + "SearchApiTest.java");
 
         // Verify all the methods are repeated for each of the tags
-        assertFileContains(controllerPath + "AuthorsController.java",
+        assertFileContains(apiPath + "AuthorsApi.java",
                 "authorSearchGet", "getAuthor", "getAuthorBooks");
-        assertFileContains(controllerPath + "BooksController.java",
+        assertFileContains(apiPath + "BooksApi.java",
                 "bookCreateEntryPost", "bookSearchGet", "bookSendReviewPost", "getBook", "isBookAvailable", "getAuthorBooks");
-        assertFileContains(controllerPath + "SearchController.java",
+        assertFileContains(apiPath + "SearchApi.java",
                 "authorSearchGet", "bookSearchGet");
     }
 }

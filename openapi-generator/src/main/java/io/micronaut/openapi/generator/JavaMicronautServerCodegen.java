@@ -32,7 +32,7 @@ import java.util.stream.Collectors;
 class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen {
     public static final String OPT_CONTROLLER_PACKAGE = "controllerPackage";
     public static final String OPT_GENERATE_CONTROLLER_FROM_EXAMPLES = "generateControllerFromExamples";
-    public static final String OPT_GENERATE_CONTROLLER_AS_ABSTRACT = "generateControllerAsAbstract";
+    public static final String OPT_GENERATE_IMPLEMENTATION_FILES = "generateImplementationFiles";
     public static final String OPT_GENERATE_OPERATIONS_TO_RETURN_NOT_IMPLEMENTED = "generateOperationsToReturnNotImplemented";
 
     public static final String EXTENSION_ROLES = "x-roles";
@@ -45,16 +45,17 @@ class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen {
 
     public static final String NAME = "java-micronaut-server";
 
+    protected String apiPackage = "org.openapitools.api";
     protected String controllerPackage = "org.openapitools.controller";
-    protected boolean generateControllerAsAbstract = false;
+    protected boolean generateImplementationFiles = true;
     protected boolean generateOperationsToReturnNotImplemented = true;
     protected boolean generateControllerFromExamples = false;
     protected boolean useAuth = true;
 
-    protected String controllerPrefix = "";
-    protected String controllerSuffix = "Controller";
-    protected String apiPrefix = "Abstract";
-    protected String apiSuffix = "Controller";
+    protected static final String CONTROLLER_PREFIX = "";
+    protected static final String CONTROLLER_SUFFIX = "Controller";
+    protected static final String API_PREFIX = "";
+    protected static final String API_SUFFIX = "Api";
 
     public JavaMicronautServerCodegen() {
         super();
@@ -68,16 +69,13 @@ class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen {
                 .build();
         additionalProperties.put("server", "true");
 
-        cliOptions.add(new CliOption(OPT_CONTROLLER_PACKAGE, "The package in which controllers will be generated").defaultValue(apiPackage));
-        cliOptions.removeIf(c -> c.getOpt().equals(CodegenConstants.API_PACKAGE));
+        cliOptions.add(new CliOption(OPT_CONTROLLER_PACKAGE, "The package in which api implementations (controllers) will be generated.").defaultValue(apiPackage));
         cliOptions.add(CliOption.newBoolean(OPT_GENERATE_CONTROLLER_FROM_EXAMPLES,
-                "Generate the implementation of controller and tests from parameter and return examples that will verify that the api works as desired (for testing)",
+                "Generate the implementation of controller and tests from parameter and return examples that will verify that the api works as desired (for testing).",
                 generateControllerFromExamples));
-        cliOptions.add(CliOption.newBoolean(OPT_GENERATE_CONTROLLER_AS_ABSTRACT,
-                "Generate an abstract class for controller to be extended. (" + CodegenConstants.API_PACKAGE +
-                " is then used for the abstract class, and " + OPT_CONTROLLER_PACKAGE +
-                " is used for implementation that extends it.)",
-                generateControllerAsAbstract));
+        cliOptions.add(CliOption.newBoolean(OPT_GENERATE_IMPLEMENTATION_FILES,
+                "Whether to generate controller implementations that need to be filled in.",
+            generateImplementationFiles));
         cliOptions.add(CliOption.newBoolean(OPT_GENERATE_OPERATIONS_TO_RETURN_NOT_IMPLEMENTED,
                 "Return HTTP 501 Not Implemented instead of an empty response in the generated controller methods.",
                 generateOperationsToReturnNotImplemented));
@@ -109,8 +107,8 @@ class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen {
         this.controllerPackage = controllerPackage;
     }
 
-    public void setGenerateControllerAsAbstract(boolean generateControllerAsAbstract) {
-        this.generateControllerAsAbstract = generateControllerAsAbstract;
+    public void setGenerateImplementationFiles(boolean generateImplementationFiles) {
+        this.generateImplementationFiles = generateImplementationFiles;
     }
 
     public void setGenerateOperationsToReturnNotImplemented(boolean generateOperationsToReturnNotImplemented) {
@@ -127,29 +125,28 @@ class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen {
 
     @Override
     public void processOpts() {
+        super.processOpts();
+
         // Get all the properties that require to know if user specified them directly
-        if (additionalProperties.containsKey(OPT_GENERATE_CONTROLLER_AS_ABSTRACT)) {
-            generateControllerAsAbstract = convertPropertyToBoolean(OPT_GENERATE_CONTROLLER_AS_ABSTRACT);
+        if (additionalProperties.containsKey(OPT_GENERATE_IMPLEMENTATION_FILES)) {
+            generateImplementationFiles = convertPropertyToBoolean(OPT_GENERATE_IMPLEMENTATION_FILES);
         }
-        writePropertyBack(OPT_GENERATE_CONTROLLER_AS_ABSTRACT, generateControllerAsAbstract);
+        writePropertyBack(OPT_GENERATE_IMPLEMENTATION_FILES, generateImplementationFiles);
 
         if (additionalProperties.containsKey(OPT_GENERATE_OPERATIONS_TO_RETURN_NOT_IMPLEMENTED)) {
             generateOperationsToReturnNotImplemented = convertPropertyToBoolean(OPT_GENERATE_OPERATIONS_TO_RETURN_NOT_IMPLEMENTED);
         }
         writePropertyBack(OPT_GENERATE_OPERATIONS_TO_RETURN_NOT_IMPLEMENTED, generateOperationsToReturnNotImplemented);
 
+        if (additionalProperties.containsKey(CodegenConstants.API_PACKAGE)) {
+            apiPackage = (String) additionalProperties.get(CodegenConstants.API_PACKAGE);
+        }
+        additionalProperties.put(CodegenConstants.API_PACKAGE, apiPackage);
+
         if (additionalProperties.containsKey(OPT_CONTROLLER_PACKAGE)) {
             controllerPackage = (String) additionalProperties.get(OPT_CONTROLLER_PACKAGE);
-        } else if (!generateControllerAsAbstract && additionalProperties.containsKey(CodegenConstants.API_PACKAGE)) {
-            controllerPackage = (String) additionalProperties.get(CodegenConstants.API_PACKAGE);
         }
         additionalProperties.put(OPT_CONTROLLER_PACKAGE, controllerPackage);
-
-        if (!generateControllerAsAbstract) {
-            apiPackage = controllerPackage;
-            additionalProperties.put(CodegenConstants.API_PACKAGE, apiPackage);
-        }
-        super.processOpts();
 
         // Get all the other properties after superclass processed everything
         if (additionalProperties.containsKey(OPT_GENERATE_CONTROLLER_FROM_EXAMPLES)) {
@@ -164,14 +161,9 @@ class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen {
 
         // Api file
         apiTemplateFiles.clear();
-        if (generateControllerAsAbstract) {
-            setApiNamePrefix(apiPrefix);
-            setApiNameSuffix(apiSuffix);
-        } else {
-            setApiNamePrefix(controllerPrefix);
-            setApiNameSuffix(controllerSuffix);
-        }
-        apiTemplateFiles.put("server/controller.mustache", ".java");
+        setApiNamePrefix(API_PREFIX);
+        setApiNameSuffix(API_SUFFIX);
+        apiTemplateFiles.put("server/controller-interface.mustache", ".java");
 
         // Add documentation files
         supportingFiles.add(new SupportingFile("server/doc/README.mustache", "", "README.md").doNotOverwrite());
@@ -181,13 +173,13 @@ class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen {
         // Add test files
         apiTestTemplateFiles.clear();
         // Controller Implementation is generated as a test file - so that it is not overwritten
-        if (generateControllerAsAbstract) {
-            apiTestTemplateFiles.put("server/controllerImplementation.mustache", ".java");
-        }
-        if (testTool.equals(OPT_TEST_JUNIT)) {
-            apiTestTemplateFiles.put("server/test/controller_test.mustache", ".java");
-        } else if (testTool.equals(OPT_TEST_SPOCK)) {
-            apiTestTemplateFiles.put("server/test/controller_test.groovy.mustache", ".groovy");
+        if (generateImplementationFiles) {
+            apiTestTemplateFiles.put("server/controller-implementation.mustache", ".java");
+            if (testTool.equals(OPT_TEST_JUNIT)) {
+                apiTestTemplateFiles.put("server/test/controller_test.mustache", ".java");
+            } else if (testTool.equals(OPT_TEST_SPOCK)) {
+                apiTestTemplateFiles.put("server/test/controller_test.groovy.mustache", ".groovy");
+            }
         }
 
         // Add Application.java file
@@ -203,13 +195,14 @@ class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen {
 
     @Override
     public String apiTestFilename(String templateName, String tag) {
+        String controllerName = StringUtils.camelize(CONTROLLER_PREFIX + "_" + tag + "_" + CONTROLLER_SUFFIX);
+
         // For controller implementation
-        if (generateControllerAsAbstract && templateName.contains("controllerImplementation")) {
+        if (generateImplementationFiles && templateName.contains("controller-implementation")) {
             String implementationFolder = outputFolder + File.separator +
                     sourceFolder + File.separator +
                     controllerPackage.replace('.', File.separatorChar);
-            return (implementationFolder + File.separator +
-                    StringUtils.camelize(controllerPrefix + "_" + tag + "_" + controllerSuffix) + ".java"
+            return (implementationFolder + File.separator + controllerName + ".java"
             ).replace('/', File.separatorChar);
         }
 
@@ -234,7 +227,7 @@ class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen {
 
         // Add the controller classname to operations
         OperationMap operations = objs.getOperations();
-        String controllerClassname = StringUtils.camelize(controllerPrefix + "_" + operations.getPathPrefix() + "_" + controllerSuffix);
+        String controllerClassname = StringUtils.camelize(CONTROLLER_PREFIX + "_" + operations.getPathPrefix() + "_" + CONTROLLER_SUFFIX);
         objs.put("controllerClassname", controllerClassname);
 
         List<CodegenOperation> allOperations = (List<CodegenOperation>) operations.get("operation");
