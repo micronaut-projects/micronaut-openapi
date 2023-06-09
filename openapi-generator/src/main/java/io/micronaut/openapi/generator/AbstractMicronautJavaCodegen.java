@@ -38,6 +38,7 @@ import org.openapitools.codegen.model.ModelsMap;
 import org.openapitools.codegen.model.OperationMap;
 import org.openapitools.codegen.model.OperationsMap;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Arrays;
@@ -392,20 +393,24 @@ abstract class AbstractMicronautJavaCodegen extends AbstractJavaCodegen implemen
     }
     // CHECKSTYLE:ON
 
+    public String testFileFolder() {
+        if (testTool.equals(OPT_TEST_SPOCK)) {
+            return (getOutputDir() + "/src/test/groovy/").replace('/', File.separatorChar);
+        }
+        return (getOutputDir() + "/src/test/java/").replace('/', File.separatorChar);
+    }
+
     @Override
     public String apiTestFileFolder() {
-        if (testTool.equals(OPT_TEST_SPOCK)) {
-            return getOutputDir() + "/src/test/groovy/" + apiPackage().replaceAll("\\.", "/");
-        }
-        return getOutputDir() + "/src/test/java/" + apiPackage().replaceAll("\\.", "/");
+        return testFileFolder() + apiPackage().replaceAll("\\.", "/");
     }
 
     @Override
     public String modelTestFileFolder() {
         if (testTool.equals(OPT_TEST_SPOCK)) {
-            return getOutputDir() + "/src/test/groovy/" + modelPackage().replaceAll("\\.", "/");
+            return getOutputDir() + "/src/test/groovy/" + modelPackage().replace('.', File.separatorChar);
         }
-        return getOutputDir() + "/src/test/java/" + modelPackage().replaceAll("\\.", "/");
+        return getOutputDir() + "/src/test/java/" + modelPackage().replace('.', File.separatorChar);
     }
 
     @Override
