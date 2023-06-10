@@ -483,6 +483,10 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         if (requestBody != null && !extraBodyParameters.isEmpty()) {
             requestBody.getContent().forEach((mediaTypeName, mediaType) -> {
                 Schema schema = mediaType.getSchema();
+                if (schema == null) {
+                    schema = new Schema();
+                    mediaType.setSchema(schema);
+                }
                 if (schema.get$ref() != null) {
                     ComposedSchema composedSchema = new ComposedSchema();
                     Schema extraBodyParametersSchema = new Schema();
