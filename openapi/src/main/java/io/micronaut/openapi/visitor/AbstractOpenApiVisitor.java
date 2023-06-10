@@ -318,7 +318,7 @@ abstract class AbstractOpenApiVisitor {
             if (!resultPath.startsWith("/") && !resultPath.startsWith("$")) {
                 resultPath = "/" + resultPath;
             }
-            String contextPath = OpenApiApplicationVisitor.getConfigurationProperty("micronaut.server.context-path", context);
+            String contextPath = OpenApiApplicationVisitor.getConfigurationProperty(OpenApiApplicationVisitor.MICRONAUT_SERVER_CONTEXT_PATH, context);
             if (StringUtils.isNotEmpty(contextPath)) {
                 if (!contextPath.startsWith("/") && !contextPath.startsWith("$")) {
                     contextPath = "/" + contextPath;

@@ -25,6 +25,9 @@ import java.util.stream.Collectors;
 import io.micronaut.core.util.StringUtils;
 import io.micronaut.inject.visitor.VisitorContext;
 import io.micronaut.openapi.visitor.OpenApiApplicationVisitor;
+import io.micronaut.openapi.visitor.Utils;
+
+import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.MICRONAUT_INTERNAL_OPENAPI_FILENAME;
 
 /**
  * Abstract View Config.
@@ -35,6 +38,7 @@ abstract class AbstractViewConfig {
 
     protected String prefix;
     protected String jsUrl = "";
+    protected String specUrl;
     protected String finalUrlPrefix;
     protected String resourcesContextPath = "/res";
     protected String templatePath;
@@ -108,7 +112,7 @@ abstract class AbstractViewConfig {
         }
 
         // process micronaut.server.context-path
-        String contextPath = OpenApiApplicationVisitor.getConfigurationProperty("micronaut.server.context-path", context);
+        String contextPath = OpenApiApplicationVisitor.getConfigurationProperty(OpenApiApplicationVisitor.MICRONAUT_SERVER_CONTEXT_PATH, context);
         if (contextPath == null) {
             contextPath = StringUtils.EMPTY_STRING;
         }
@@ -136,14 +140,21 @@ abstract class AbstractViewConfig {
      * @param cfg A View config.
      * @param defaultOptions The default options.
      * @param properties The options to parse.
+     * @param context Visitor context.
      *
      * @return A View config.
      */
-    static <T extends AbstractViewConfig> T fromProperties(T cfg, Map<String, Object> defaultOptions, Map<String, String> properties) {
+    static <T extends AbstractViewConfig> T fromProperties(T cfg, Map<String, Object> defaultOptions, Map<String, String> properties, VisitorContext context) {
 
         String copyResources = properties.get(cfg.prefix + "copy-resources");
         if (StringUtils.isNotEmpty(copyResources) && "false".equalsIgnoreCase(copyResources)) {
             cfg.copyResources = false;
+        }
+
+        String specUrl = properties.get(cfg.prefix + "spec.url");
+        if (specUrl != null) {
+            cfg.specUrl = specUrl.replace(Utils.PLACEHOLDER_PREFIX + "filename" + Utils.PLACEHOLDER_POSTFIX,
+                context != null ? context.get(MICRONAUT_INTERNAL_OPENAPI_FILENAME, String.class).orElse("") : "");
         }
 
         String jsUrl = properties.get(cfg.prefix + "js.url");
