@@ -124,6 +124,7 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import static io.micronaut.openapi.visitor.ConvertUtils.resolveExtensions;
+import static io.micronaut.openapi.visitor.ConvertUtils.setDefaultValueObject;
 import static io.micronaut.openapi.visitor.ElementUtils.isFileUpload;
 import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.MICRONAUT_OPENAPI_FIELD_VISIBILITY_LEVEL;
 import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.expandProperties;
@@ -1102,12 +1103,7 @@ abstract class AbstractOpenApiVisitor {
                                     elFormat = typeAndFormat.getSecond();
                                 }
                             }
-                            try {
-                                propertySchemaFinal.setDefault(ConvertUtils.normalizeValue(value, elType, elFormat, context));
-                            } catch (JsonProcessingException e) {
-                                context.warn("Can't parse value " + value + " to " + elType + ": " + e.getMessage(), element);
-                                propertySchemaFinal.setDefault(value);
-                            }
+                            setDefaultValueObject(propertySchemaFinal, value, element, elType, elFormat, false, context);
                         });
                 }
             }
@@ -1246,12 +1242,7 @@ abstract class AbstractOpenApiVisitor {
         }
         final String defaultValue = element.getValue(Bindable.class, "defaultValue", String.class).orElse(null);
         if (defaultValue != null && schemaToBind.getDefault() == null) {
-            try {
-                topLevelSchema.setDefault(ConvertUtils.normalizeValue(defaultValue, schemaToBind.getType(), schemaToBind.getFormat(), context, true));
-            } catch (JsonProcessingException e) {
-                context.warn("Can't convert " + defaultValue + " to " + schemaToBind.getType() + ": " + e.getMessage(), element);
-                topLevelSchema.setDefault(defaultValue);
-            }
+            setDefaultValueObject(schemaToBind, defaultValue, elementType, schemaToBind.getType(), schemaToBind.getFormat(), true, context);
             notOnlyRef = true;
         }
         // @Schema annotation takes priority over nullability annotations
@@ -1263,12 +1254,7 @@ abstract class AbstractOpenApiVisitor {
         }
         final String defaultJacksonValue = element.stringValue(JsonProperty.class, "defaultValue").orElse(null);
         if (defaultJacksonValue != null && schemaToBind.getDefault() == null) {
-            try {
-                topLevelSchema.setDefault(ConvertUtils.normalizeValue(defaultJacksonValue, schemaToBind.getType(), schemaToBind.getFormat(), context));
-            } catch (JsonProcessingException e) {
-                context.warn("Can't convert " + defaultJacksonValue + " to " + schemaToBind.getType() + ": " + e.getMessage(), element);
-                topLevelSchema.setDefault(defaultJacksonValue);
-            }
+            setDefaultValueObject(topLevelSchema, defaultJacksonValue, elementType, schemaToBind.getType(), schemaToBind.getFormat(), false, context);
             notOnlyRef = true;
         }
 
@@ -1555,12 +1541,7 @@ abstract class AbstractOpenApiVisitor {
 
         String schemaDefaultValue = (String) annValues.get("defaultValue");
         if (schemaDefaultValue != null) {
-            try {
-                schemaToBind.setDefault(ConvertUtils.normalizeValue(schemaDefaultValue, schemaToBind.getType(), schemaToBind.getFormat(), context));
-            } catch (JsonProcessingException e) {
-                context.warn("Can't convert " + schemaDefaultValue + " to " + schemaToBind.getType() + ": " + e.getMessage(), element);
-                schemaToBind.setDefault(schemaDefaultValue);
-            }
+            setDefaultValueObject(schemaToBind, schemaDefaultValue, element, schemaToBind.getType(), schemaToBind.getFormat(), false, context);
         }
         String schemaExample = (String) annValues.get("example");
         if (StringUtils.isNotEmpty(schemaExample)) {
@@ -1701,12 +1682,7 @@ abstract class AbstractOpenApiVisitor {
         }
 
         if (StringUtils.isNotEmpty(defaultValue)) {
-            try {
-                schemaToBind.setDefault(ConvertUtils.normalizeValue(defaultValue, elType, elFormat, context));
-            } catch (IOException e) {
-                context.warn("Can't convert " + defaultValue + " to " + elType + ", format: " + elFormat + ": " + e.getMessage(), element);
-                schemaToBind.setDefault(defaultValue);
-            }
+            setDefaultValueObject(schemaToBind, defaultValue, element, elType, elFormat, false, context);
         }
         if (ArrayUtils.isNotEmpty(allowableValues)) {
             for (String allowableValue : allowableValues) {
@@ -2198,12 +2174,7 @@ abstract class AbstractOpenApiVisitor {
             }
         }
         String defaultValue = schemaValue.stringValue("defaultValue").orElse(null);
-        try {
-            schema.setDefault(ConvertUtils.normalizeValue(defaultValue, elType, elFormat, context));
-        } catch (IOException e) {
-            context.warn("Can't convert " + defaultValue + " to " + elType + ": " + e.getMessage(), type);
-            schema.setDefault(defaultValue);
-        }
+        setDefaultValueObject(schema, defaultValue, type, elType, elFormat, false, context);
 
         processClassValues(schema, values, mediaTypes, context);
 
