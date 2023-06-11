@@ -90,6 +90,21 @@ public final class ElementUtils {
     }
 
     /**
+     * Checking if the type is file upload type.
+     *
+     * @param type type element
+     *
+     * @return true if this type one of known file upload types
+     */
+    public static boolean isFileUpload(ClassElement type) {
+        String typeName = type.getName();
+        return "io.micronaut.http.multipart.StreamingFileUpload".equals(typeName)
+            || "io.micronaut.http.multipart.CompletedFileUpload".equals(typeName)
+            || "io.micronaut.http.multipart.CompletedPart".equals(typeName)
+            || "io.micronaut.http.multipart.PartData".equals(typeName);
+    }
+
+    /**
      * Checking if the type is file.
      *
      * @param type type element

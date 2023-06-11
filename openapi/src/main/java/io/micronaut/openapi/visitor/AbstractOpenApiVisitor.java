@@ -124,6 +124,7 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import static io.micronaut.openapi.visitor.ConvertUtils.resolveExtensions;
+import static io.micronaut.openapi.visitor.ElementUtils.isFileUpload;
 import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.MICRONAUT_OPENAPI_FIELD_VISIBILITY_LEVEL;
 import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.expandProperties;
 import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.getConfigurationProperty;
@@ -880,10 +881,7 @@ abstract class AbstractOpenApiVisitor {
                 }
 
                 // File upload case
-                if ("io.micronaut.http.multipart.StreamingFileUpload".equals(typeName) ||
-                    "io.micronaut.http.multipart.CompletedFileUpload".equals(typeName) ||
-                    "io.micronaut.http.multipart.CompletedPart".equals(typeName) ||
-                    "io.micronaut.http.multipart.PartData".equals(typeName)) {
+                if (isFileUpload(type)) {
                     isPublisher = isPublisher && !"io.micronaut.http.multipart.PartData".equals(typeName);
                     // For file upload, we use PrimitiveType.BINARY
                     typeName = PrimitiveType.BINARY.name();
