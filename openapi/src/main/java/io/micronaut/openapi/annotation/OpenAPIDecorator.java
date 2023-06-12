@@ -50,15 +50,18 @@ public @interface OpenAPIDecorator {
      * @return Prefix for operation ids.
      */
     String value() default "";
+
     /**
      * @return Prefix for operation ids.
      */
     @AliasFor(member = "value")
     String opIdPrefix() default "";
+
     /**
      * @return Suffix for operation ids.
      */
     String opIdSuffix() default "";
+
     /**
      * @return is this flag false, prefixes and suffixes will not be added to operationId
      * if operationId is set explicitly in the {@link io.swagger.v3.oas.annotations.Operation} annotation

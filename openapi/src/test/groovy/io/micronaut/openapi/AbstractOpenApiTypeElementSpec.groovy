@@ -7,11 +7,17 @@ import io.micronaut.openapi.visitor.Utils
 abstract class AbstractOpenApiTypeElementSpec extends AbstractTypeElementSpec {
 
     def setup() {
+        Utils.setAllKnownVersions(null)
+        Utils.setAllKnownGroups(null)
+        Utils.setEndpointInfos(null)
         System.clearProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_ENABLED)
         System.setProperty(Utils.ATTR_TEST_MODE, "true")
     }
 
     def cleanup() {
+        Utils.setAllKnownVersions(null)
+        Utils.setAllKnownGroups(null)
+        Utils.setEndpointInfos(null)
         System.clearProperty(Utils.ATTR_TEST_MODE)
     }
 

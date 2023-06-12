@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.security.Principal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -43,6 +44,7 @@ import io.micronaut.core.util.ArrayUtils;
 import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.core.util.PathMatcher;
 import io.micronaut.core.util.StringUtils;
+import io.micronaut.core.version.annotation.Version;
 import io.micronaut.http.HttpHeaders;
 import io.micronaut.http.HttpMethod;
 import io.micronaut.http.HttpRequest;
@@ -70,7 +72,11 @@ import io.micronaut.inject.ast.ParameterElement;
 import io.micronaut.inject.ast.TypedElement;
 import io.micronaut.inject.visitor.VisitorContext;
 import io.micronaut.openapi.annotation.OpenAPIDecorator;
+import io.micronaut.openapi.annotation.OpenAPIGroup;
 import io.micronaut.openapi.javadoc.JavadocDescription;
+import io.micronaut.openapi.swagger.PrimitiveType;
+import io.micronaut.openapi.visitor.group.EndpointInfo;
+import io.micronaut.openapi.visitor.group.RouterVersioningProperties;
 import io.micronaut.openapi.visitor.security.InterceptUrlMapPattern;
 import io.micronaut.openapi.visitor.security.SecurityProperties;
 import io.micronaut.openapi.visitor.security.SecurityRule;
@@ -114,6 +120,8 @@ import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.isOpenApiEn
 import static io.micronaut.openapi.visitor.SchemaUtils.COMPONENTS_CALLBACKS_PREFIX;
 import static io.micronaut.openapi.visitor.SchemaUtils.COMPONENTS_SCHEMAS_PREFIX;
 import static io.micronaut.openapi.visitor.SchemaUtils.TYPE_OBJECT;
+import static io.micronaut.openapi.visitor.SchemaUtils.getOperationOnPathItem;
+import static io.micronaut.openapi.visitor.SchemaUtils.setOperationOnPathItem;
 import static io.micronaut.openapi.visitor.Utils.DEFAULT_MEDIA_TYPES;
 
 /**
@@ -140,31 +148,6 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
 
     private static boolean isAnnotationPresent(Element element, String className) {
         return element.findAnnotation(className).isPresent();
-    }
-
-    private static RequestBody mergeRequestBody(RequestBody rq1, RequestBody rq2) {
-        if (rq1.getRequired() == null) {
-            rq1.setRequired(rq2.getRequired());
-        }
-        if (rq1.get$ref() == null) {
-            rq1.set$ref(rq2.get$ref());
-        }
-        if (rq1.getDescription() == null) {
-            rq1.setDescription(rq2.getDescription());
-        }
-        if (rq1.getExtensions() == null) {
-            rq1.setExtensions(rq2.getExtensions());
-        } else if (rq2.getExtensions() != null) {
-            rq1.getExtensions().forEach((key, value) -> rq1.getExtensions().putIfAbsent(key, value));
-        }
-        if (rq1.getContent() == null) {
-            rq1.setContent(rq2.getContent());
-        } else if (rq2.getContent() != null) {
-            Content c1 = rq1.getContent();
-            Content c2 = rq2.getContent();
-            c2.forEach(c1::putIfAbsent);
-        }
-        return rq1;
     }
 
     /**
@@ -391,11 +374,12 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         boolean permitsRequestBody = HttpMethod.permitsRequestBody(httpMethod);
 
         Map<String, List<PathItem>> pathItemsMap = resolvePathItems(context, matchTemplates);
+        List<MediaType> consumesMediaTypes = consumesMediaTypes(element);
+        List<MediaType> producesMediaTypes = producesMediaTypes(element);
 
         for (Map.Entry<String, List<PathItem>> pathItemEntry : pathItemsMap.entrySet()) {
             List<PathItem> pathItems = pathItemEntry.getValue();
 
-            List<MediaType> consumesMediaTypes = consumesMediaTypes(element);
             Map<PathItem, io.swagger.v3.oas.models.Operation> swaggerOperations = readOperations(pathItemEntry.getKey(), httpMethod, pathItems, element, context);
 
             boolean isRequestBodySchemaSet = false;
@@ -438,30 +422,33 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                     if (requestBody != null) {
                         RequestBody currentRequestBody = swaggerOperation.getRequestBody();
                         if (currentRequestBody != null) {
-                            swaggerOperation.setRequestBody(mergeRequestBody(currentRequestBody, requestBody));
+                            swaggerOperation.setRequestBody(SchemaUtils.mergeRequestBody(currentRequestBody, requestBody));
                         } else {
                             swaggerOperation.setRequestBody(requestBody);
                         }
                     }
                 }
 
-                swaggerOperation = setOperationOnPathItem(operationEntry.getKey(), swaggerOperation, httpMethod);
-            }
+                setOperationOnPathItem(operationEntry.getKey(), httpMethod, swaggerOperation);
 
-            Map<String, UriMatchVariable> pathVariables = new HashMap<>();
-            for (UriMatchTemplate matchTemplate : matchTemplates) {
-                for (Map.Entry<String, UriMatchVariable> varEntry : pathVariables(matchTemplate).entrySet()) {
-                    if (pathItemEntry.getKey().contains("{" + varEntry.getKey() + '}')) {
-                        pathVariables.put(varEntry.getKey(), varEntry.getValue());
+                Map<String, UriMatchVariable> pathVariables = new HashMap<>();
+                for (UriMatchTemplate matchTemplate : matchTemplates) {
+                    for (Map.Entry<String, UriMatchVariable> varEntry : pathVariables(matchTemplate).entrySet()) {
+                        if (pathItemEntry.getKey().contains("{" + varEntry.getKey() + '}')) {
+                            pathVariables.put(varEntry.getKey(), varEntry.getValue());
+                        }
                     }
+                    // @Parameters declared at method level take precedence over the declared as method arguments, so we process them first
+                    processParameterAnnotationInMethod(element, openAPI, matchTemplate, httpMethod, swaggerOperation, pathVariables);
                 }
-                // @Parameters declared at method level take precedence over the declared as method arguments, so we process them first
-                processParameterAnnotationInMethod(element, openAPI, matchTemplate, httpMethod, pathVariables);
-            }
-            List<TypedElement> extraBodyParameters = new ArrayList<>();
-            for (io.swagger.v3.oas.models.Operation operation : swaggerOperations.values()) {
-                processParameters(element, context, openAPI, operation, javadocDescription, permitsRequestBody, pathVariables, consumesMediaTypes, extraBodyParameters, httpMethod, matchTemplates, pathItems);
-                processExtraBodyParameters(context, httpMethod, openAPI, operation, javadocDescription, isRequestBodySchemaSet, consumesMediaTypes, extraBodyParameters);
+
+                List<TypedElement> extraBodyParameters = new ArrayList<>();
+                for (io.swagger.v3.oas.models.Operation operation : swaggerOperations.values()) {
+                    processParameters(element, context, openAPI, operation, javadocDescription, permitsRequestBody, pathVariables, consumesMediaTypes, extraBodyParameters, httpMethod, matchTemplates, pathItems);
+                    processExtraBodyParameters(context, httpMethod, openAPI, operation, javadocDescription, isRequestBodySchemaSet, consumesMediaTypes, extraBodyParameters);
+
+                    processMicronautVersionAndGroup(operation, pathItemEntry.getKey(), httpMethod, consumesMediaTypes, producesMediaTypes, element, context);
+                }
             }
         }
     }
@@ -481,7 +468,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                 requestBody.setRequired(true);
                 swaggerOperation.setRequestBody(requestBody);
 
-                consumesMediaTypes = consumesMediaTypes.isEmpty() ? DEFAULT_MEDIA_TYPES : consumesMediaTypes;
+                consumesMediaTypes = CollectionUtils.isEmpty(consumesMediaTypes) ? DEFAULT_MEDIA_TYPES : consumesMediaTypes;
                 consumesMediaTypes.forEach(mediaType -> {
                     io.swagger.v3.oas.models.media.MediaType mt = new io.swagger.v3.oas.models.media.MediaType();
                     Schema schema = new Schema();
@@ -574,10 +561,11 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
     }
 
     private void processParameterAnnotationInMethod(MethodElement element,
-                                                    OpenAPI openAPI,
-                                                    UriMatchTemplate matchTemplate,
-                                                    HttpMethod httpMethod,
-                                                    Map<String, UriMatchVariable> pathVariables) {
+                                                                                  OpenAPI openAPI,
+                                                                                  UriMatchTemplate matchTemplate,
+                                                                                  HttpMethod httpMethod,
+                                                                                  io.swagger.v3.oas.models.Operation operation,
+                                                                                  Map<String, UriMatchVariable> pathVariables) {
 
         List<AnnotationValue<io.swagger.v3.oas.annotations.Parameter>> parameterAnnotations = element
             .getDeclaredAnnotationValuesByType(io.swagger.v3.oas.annotations.Parameter.class);
@@ -640,27 +628,10 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                 }
             }
 
+            operation.addParametersItem(parameter);
             PathItem pathItem = openAPI.getPaths().get(matchTemplate.toPathString());
-            switch (httpMethod) {
-                case GET:
-                    pathItem.getGet().addParametersItem(parameter);
-                    break;
-                case POST:
-                    pathItem.getPost().addParametersItem(parameter);
-                    break;
-                case PUT:
-                    pathItem.getPut().addParametersItem(parameter);
-                    break;
-                case DELETE:
-                    pathItem.getDelete().addParametersItem(parameter);
-                    break;
-                case PATCH:
-                    pathItem.getPatch().addParametersItem(parameter);
-                    break;
-                default:
-                    // do nothing
-                    break;
-            }
+
+            setOperationOnPathItem(pathItem, httpMethod, operation);
         }
     }
 
@@ -692,7 +663,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             for (PathItem pathItem : pathItems) {
                 existedOpertion = getOperationOnPathItem(pathItem, httpMethod);
                 if (existedOpertion != null) {
-                    swaggerOperation = existedOpertion;
+//                    swaggerOperation = existedOpertion;
                     break;
                 }
             }
@@ -1581,95 +1552,6 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             && isResponseType(returnType.getFirstTypeArgument().get());
     }
 
-    private io.swagger.v3.oas.models.Operation getOperationOnPathItem(PathItem pathItem, HttpMethod httpMethod) {
-        switch (httpMethod) {
-            case GET:
-                return pathItem.getGet();
-            case POST:
-                return pathItem.getPost();
-            case PUT:
-                return pathItem.getPut();
-            case PATCH:
-                return pathItem.getPatch();
-            case DELETE:
-                return pathItem.getDelete();
-            case HEAD:
-                return pathItem.getHead();
-            case OPTIONS:
-                return pathItem.getOptions();
-            case TRACE:
-                return pathItem.getTrace();
-            default:
-                return null;
-        }
-    }
-
-    private io.swagger.v3.oas.models.Operation setOperationOnPathItem(PathItem pathItem, io.swagger.v3.oas.models.Operation swaggerOperation, HttpMethod httpMethod) {
-        io.swagger.v3.oas.models.Operation operation = swaggerOperation;
-        switch (httpMethod) {
-            case GET:
-                if (pathItem.getGet() != null) {
-                    operation = pathItem.getGet();
-                } else {
-                    pathItem.get(swaggerOperation);
-                }
-                break;
-            case POST:
-                if (pathItem.getPost() != null) {
-                    operation = pathItem.getPost();
-                } else {
-                    pathItem.post(swaggerOperation);
-                }
-                break;
-            case PUT:
-                if (pathItem.getPut() != null) {
-                    operation = pathItem.getPut();
-                } else {
-                    pathItem.put(swaggerOperation);
-                }
-                break;
-            case PATCH:
-                if (pathItem.getPatch() != null) {
-                    operation = pathItem.getPatch();
-                } else {
-                    pathItem.patch(swaggerOperation);
-                }
-                break;
-            case DELETE:
-                if (pathItem.getDelete() != null) {
-                    operation = pathItem.getDelete();
-                } else {
-                    pathItem.delete(swaggerOperation);
-                }
-                break;
-            case HEAD:
-                if (pathItem.getHead() != null) {
-                    operation = pathItem.getHead();
-                } else {
-                    pathItem.head(swaggerOperation);
-                }
-                break;
-            case OPTIONS:
-                if (pathItem.getOptions() != null) {
-                    operation = pathItem.getOptions();
-                } else {
-                    pathItem.options(swaggerOperation);
-                }
-                break;
-            case TRACE:
-                if (pathItem.getTrace() != null) {
-                    operation = pathItem.getTrace();
-                } else {
-                    pathItem.trace(swaggerOperation);
-                }
-                break;
-            default:
-                operation = swaggerOperation;
-                // unprocessable
-        }
-        return operation;
-    }
-
     private void readApiResponses(MethodElement element, VisitorContext context, io.swagger.v3.oas.models.Operation swaggerOperation) {
         List<AnnotationValue<io.swagger.v3.oas.annotations.responses.ApiResponse>> methodResponseAnnotations = element.getAnnotationValuesByType(io.swagger.v3.oas.annotations.responses.ApiResponse.class);
         processResponses(swaggerOperation, methodResponseAnnotations, element, context);
@@ -1836,7 +1718,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             for (AnnotationValue<Operation> operation : operations) {
                 final Optional<HttpMethod> operationMethod = operation.get("method", HttpMethod.class);
                 operationMethod.ifPresent(httpMethod -> toValue(operation.getValues(), context, io.swagger.v3.oas.models.Operation.class)
-                    .ifPresent(op -> setOperationOnPathItem(pathItem, op, httpMethod)));
+                    .ifPresent(op -> setOperationOnPathItem(pathItem, httpMethod, op)));
             }
             Map<String, io.swagger.v3.oas.models.callbacks.Callback> callbacks = initCallbacks(
                 swaggerOperation);
@@ -1859,6 +1741,85 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         List<String> tags = swaggerOperation.getTags();
         if (tags == null || !tags.contains(tag)) {
             swaggerOperation.addTagsItem(tag);
+        }
+    }
+
+    private void processMicronautVersionAndGroup(io.swagger.v3.oas.models.Operation swaggerOperation, String url,
+                                                 HttpMethod httpMethod,
+                                                 List<MediaType> consumesMediaTypes,
+                                                 List<MediaType> producesMediaTypes,
+                                                 MethodElement element, VisitorContext context) {
+
+        String methodKey = httpMethod.name()
+            + '#' + url
+            + '#' + CollectionUtils.toString(CollectionUtils.isEmpty(consumesMediaTypes) ? DEFAULT_MEDIA_TYPES : consumesMediaTypes)
+            + '#' + CollectionUtils.toString(CollectionUtils.isEmpty(producesMediaTypes) ? DEFAULT_MEDIA_TYPES : producesMediaTypes);
+
+        List<String> groups = null;
+        List<String> excludedGroups = null;
+        List<AnnotationValue<OpenAPIGroup>> groupAnnotations = element.getAnnotationValuesByType(OpenAPIGroup.class);
+        if (CollectionUtils.isNotEmpty(groupAnnotations)) {
+            AnnotationValue<OpenAPIGroup> annotationValue = groupAnnotations.get(0);
+            groups = Arrays.asList(annotationValue.stringValues("value"));
+            excludedGroups = Arrays.asList(annotationValue.stringValues("excluded"));
+        }
+
+        String version = null;
+        List<AnnotationValue<Version>> versionsAnnotations = element.getAnnotationValuesByType(Version.class);
+        if (CollectionUtils.isNotEmpty(versionsAnnotations)) {
+            version = versionsAnnotations.get(0).stringValue().orElse(null);
+        }
+
+        if (version != null) {
+            Set<String> allKnownVersions = Utils.getAllKnownVersions();
+            if (allKnownVersions == null) {
+                allKnownVersions = new HashSet<>();
+                Utils.setAllKnownVersions(allKnownVersions);
+            }
+            allKnownVersions.add(version);
+        }
+
+        Map<String, List<EndpointInfo>> endpointInfosMap = Utils.getEndpointInfos();
+        if (endpointInfosMap == null) {
+            endpointInfosMap = new HashMap<>();
+            Utils.setEndpointInfos(endpointInfosMap);
+        }
+        List<EndpointInfo> endpointInfos = endpointInfosMap.computeIfAbsent(methodKey, (k) -> new ArrayList<>());
+        endpointInfos.add(new EndpointInfo(
+            url,
+            httpMethod,
+            element,
+            swaggerOperation,
+            version,
+            groups,
+            excludedGroups));
+
+        RouterVersioningProperties versioningProperties = OpenApiApplicationVisitor.getRouterVersioningProperties(context);
+        if (!versioningProperties.isEnabled() || !versioningProperties.isRouterVersiningEnabled()
+            || (!versioningProperties.isHeaderEnabled() && !versioningProperties.isParameterEnabled())) {
+            return;
+        }
+
+        if (versioningProperties.isParameterEnabled()) {
+            addVersionParameters(swaggerOperation, versioningProperties.getParameterNames(), false);
+        }
+        if (versioningProperties.isHeaderEnabled()) {
+            addVersionParameters(swaggerOperation, versioningProperties.getHeaderNames(), true);
+        }
+    }
+
+    private void addVersionParameters(io.swagger.v3.oas.models.Operation swaggerOperation, List<String> names, boolean isHeader) {
+
+        String in = isHeader ? ParameterIn.HEADER.toString() : ParameterIn.QUERY.toString();
+
+        for (String parameterName : names) {
+            Parameter parameter = new Parameter();
+            parameter.setIn(in);
+            parameter.setDescription("API version");
+            parameter.setName(parameterName);
+            parameter.setSchema(PrimitiveType.STRING.createProperty());
+
+            swaggerOperation.addParametersItem(parameter);
         }
     }
 

@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import io.micronaut.context.env.DefaultPropertyPlaceholderResolver;
 import io.micronaut.context.env.PropertyPlaceholderResolver;
@@ -35,6 +36,7 @@ import io.micronaut.core.value.PropertyResolver;
 import io.micronaut.http.MediaType;
 import io.micronaut.inject.visitor.VisitorContext;
 import io.micronaut.openapi.javadoc.JavadocParser;
+import io.micronaut.openapi.visitor.group.EndpointInfo;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 
@@ -54,6 +56,10 @@ public final class Utils {
     public static final String ATTR_VISITED_ELEMENTS = "io.micronaut.OPENAPI.visited.elements";
 
     public static final List<MediaType> DEFAULT_MEDIA_TYPES = Collections.singletonList(MediaType.APPLICATION_JSON_TYPE);
+
+    private static Set<String> allKnownVersions;
+    private static Set<String> allKnownGroups;
+    private static Map<String, List<EndpointInfo>> endpointInfos;
 
     private static PropertyPlaceholderResolver propertyPlaceholderResolver;
     private static OpenAPI testReference;
@@ -216,5 +222,29 @@ public final class Utils {
 
     public static void setJavadocParser(JavadocParser javadocParser) {
         Utils.javadocParser = javadocParser;
+    }
+
+    public static Set<String> getAllKnownVersions() {
+        return allKnownVersions;
+    }
+
+    public static void setAllKnownVersions(Set<String> allKnownVersions) {
+        Utils.allKnownVersions = allKnownVersions;
+    }
+
+    public static Set<String> getAllKnownGroups() {
+        return allKnownGroups;
+    }
+
+    public static void setAllKnownGroups(Set<String> allKnownGroups) {
+        Utils.allKnownGroups = allKnownGroups;
+    }
+
+    public static Map<String, List<EndpointInfo>> getEndpointInfos() {
+        return endpointInfos;
+    }
+
+    public static void setEndpointInfos(Map<String, List<EndpointInfo>> endpointInfos) {
+        Utils.endpointInfos = endpointInfos;
     }
 }
