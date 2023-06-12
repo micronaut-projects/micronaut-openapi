@@ -40,3 +40,9 @@ micronaut {
     runtime("netty")
     testRuntime("junit5")
 }
+
+dependencies {
+    constraints {
+        implementation("io.micronaut:micronaut-http-client:${libs.versions.micronaut.core.get()}")
+    }
+}
