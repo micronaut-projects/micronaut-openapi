@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.List;
 
 
-class JavaMicronautClientCodegen extends AbstractMicronautJavaCodegen {
+class JavaMicronautClientCodegen extends AbstractMicronautJavaCodegen<JavaMicronautClientOptionsBuilder> {
 
     public static final String OPT_CONFIGURE_AUTH = "configureAuth";
     public static final String OPT_CONFIGURE_AUTH_FILTER_PATTERN = "configureAuthFilterPattern";
@@ -178,5 +178,66 @@ class JavaMicronautClientCodegen extends AbstractMicronautJavaCodegen {
 
     public void setConfigureAuthorization(boolean configureAuthorization) {
         this.configureAuthorization = configureAuthorization;
+    }
+
+    @Override
+    public JavaMicronautClientOptionsBuilder optionsBuilder() {
+        return new DefaultClientOptionsBuilder();
+    }
+
+    static class DefaultClientOptionsBuilder implements JavaMicronautClientOptionsBuilder {
+        private List<String> additionalClientTypeAnnotations;
+        private String authorizationFilterPattern;
+        private String basePathSeparator;
+        private String clientId;
+        private boolean useAuth;
+
+        @Override
+        public JavaMicronautClientOptionsBuilder withAuthorization(boolean useAuth) {
+            this.useAuth = useAuth;
+            return this;
+        }
+
+        @Override
+        public JavaMicronautClientOptionsBuilder withAuthorizationFilterPattern(String authorizationFilterPattern) {
+            this.authorizationFilterPattern = authorizationFilterPattern;
+            return this;
+        }
+
+        @Override
+        public JavaMicronautClientOptionsBuilder withClientId(String clientId) {
+            this.clientId = clientId;
+            return this;
+        }
+
+        @Override
+        public JavaMicronautClientOptionsBuilder withAdditionalClientTypeAnnotations(List<String> additionalClientTypeAnnotations) {
+            this.additionalClientTypeAnnotations = additionalClientTypeAnnotations;
+            return this;
+        }
+
+        @Override
+        public JavaMicronautClientOptionsBuilder withBasePathSeparator(String basePathSeparator) {
+            this.basePathSeparator = basePathSeparator;
+            return this;
+        }
+
+        ClientOptions build() {
+            return new ClientOptions(
+                additionalClientTypeAnnotations,
+                authorizationFilterPattern,
+                basePathSeparator,
+                clientId,
+                useAuth);
+        }
+    }
+
+    record ClientOptions(
+        List<String> additionalClientTypeAnnotations,
+        String authorizationFilterPattern,
+        String basePathSeparator,
+        String clientId,
+        boolean useAuth
+    ) {
     }
 }

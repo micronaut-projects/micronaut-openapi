@@ -53,10 +53,11 @@ public class GeneratorMain {
                 serverOptions.withControllerPackage("io.micronaut.openapi.test.controller");
                 // commented out because currently this would prevent the test project from compiling
                 // because we generate both abstract classes _and_ dummy implementations
-                // serverOptions.withGenerateAbstractClasses(true);
+                 serverOptions.withGenerateAbstractClasses(true);
             });
         } else {
-            builder.forClient();
+            builder.forClient(client -> {
+            });
         }
         builder.build().generate();
     }

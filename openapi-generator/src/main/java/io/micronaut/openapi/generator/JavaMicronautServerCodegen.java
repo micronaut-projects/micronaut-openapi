@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 
-class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen {
+class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen<JavaMicronautServerOptionsBuilder> {
     public static final String OPT_CONTROLLER_PACKAGE = "controllerPackage";
     public static final String OPT_GENERATE_CONTROLLER_FROM_EXAMPLES = "generateControllerFromExamples";
     public static final String OPT_GENERATE_IMPLEMENTATION_FILES = "generateImplementationFiles";
@@ -256,5 +256,61 @@ class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen {
         }
 
         return objs;
+    }
+
+    @Override
+    public JavaMicronautServerOptionsBuilder optionsBuilder() {
+        return new DefaultServerOptionsBuilder();
+    }
+
+    static class DefaultServerOptionsBuilder implements JavaMicronautServerOptionsBuilder {
+        private String controllerPackage;
+        private boolean generateAbstractClasses;
+        private boolean generateControllerFromExamples;
+        private boolean generateOperationsToReturnNotImplemented = true;
+        private boolean useAuth = true;
+
+        @Override
+        public JavaMicronautServerOptionsBuilder withControllerPackage(String controllerPackage) {
+            this.controllerPackage = controllerPackage;
+            return this;
+        }
+
+        @Override
+        public JavaMicronautServerOptionsBuilder withGenerateAbstractClasses(boolean abstractClasses) {
+            this.generateAbstractClasses = abstractClasses;
+            return this;
+        }
+
+        @Override
+        public JavaMicronautServerOptionsBuilder withGenerateOperationsToReturnNotImplemented(boolean generateOperationsToReturnNotImplemented) {
+            this.generateOperationsToReturnNotImplemented = generateOperationsToReturnNotImplemented;
+            return this;
+        }
+
+        @Override
+        public JavaMicronautServerOptionsBuilder withGenerateControllerFromExamples(boolean generateControllerFromExamples) {
+            this.generateControllerFromExamples = generateControllerFromExamples;
+            return this;
+        }
+
+        @Override
+        public JavaMicronautServerOptionsBuilder withAuthentication(boolean useAuth) {
+            this.useAuth = useAuth;
+            return this;
+        }
+
+        ServerOptions build() {
+            return new ServerOptions(controllerPackage, generateAbstractClasses, generateOperationsToReturnNotImplemented, generateControllerFromExamples, useAuth);
+        }
+    }
+
+    record ServerOptions(
+        String controllerPackage,
+        boolean generateAbstractClasses,
+        boolean generateOperationsToReturnNotImplemented,
+        boolean generateControllerFromExamples,
+        boolean useAuth
+    ) {
     }
 }

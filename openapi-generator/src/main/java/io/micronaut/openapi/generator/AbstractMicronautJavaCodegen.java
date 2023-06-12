@@ -51,7 +51,7 @@ import java.util.stream.Collectors;
 
 import static org.openapitools.codegen.CodegenConstants.INVOKER_PACKAGE;
 
-abstract class AbstractMicronautJavaCodegen extends AbstractJavaCodegen implements BeanValidationFeatures, OptionalFeatures, MicronautCodeGenerator {
+abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBuilder> extends AbstractJavaCodegen implements BeanValidationFeatures, OptionalFeatures, MicronautCodeGenerator<T> {
     public static final String OPT_TITLE = "title";
     public static final String OPT_TEST = "test";
     public static final String OPT_TEST_JUNIT = "junit";

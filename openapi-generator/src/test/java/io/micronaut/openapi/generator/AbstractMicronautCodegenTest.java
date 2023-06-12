@@ -32,7 +32,7 @@ public abstract class AbstractMicronautCodegenTest {
      * @param filesToGenerate - which files to generate - can be CodegenConstants.MODELS, APIS, SUPPORTING_FILES, ...
      * @return - the path to the generated folder
      */
-    protected String generateFiles(AbstractMicronautJavaCodegen codegen, String configPath, String... filesToGenerate) {
+    protected String generateFiles(AbstractMicronautJavaCodegen<?> codegen, String configPath, String... filesToGenerate) {
         File output = null;
         try {
             output = Files.createTempDirectory("test").toFile().getCanonicalFile();
@@ -42,7 +42,7 @@ public abstract class AbstractMicronautCodegenTest {
         output.deleteOnExit();
 
         MicronautCodeGeneratorEntryPoint.builder()
-            .forCodeGenerator(codegen)
+            .forCodeGenerator(codegen, unused -> {})
             .withDefinitionFile(new File(configPath).toURI())
             .withOutputDirectory(output)
             .withOutputs(Arrays.stream(filesToGenerate)

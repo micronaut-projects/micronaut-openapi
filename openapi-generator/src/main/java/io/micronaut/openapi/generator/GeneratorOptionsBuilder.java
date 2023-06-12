@@ -15,10 +15,6 @@
  */
 package io.micronaut.openapi.generator;
 
-/**
- * Marker interface for all Micronaut code generators, used
- * to avoid leaking internal types to public APIs.
- */
-public interface MicronautCodeGenerator<T extends GeneratorOptionsBuilder> {
-    T optionsBuilder();
+public interface GeneratorOptionsBuilder {
+
 }
