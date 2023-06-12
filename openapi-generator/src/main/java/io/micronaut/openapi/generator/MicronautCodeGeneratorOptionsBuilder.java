@@ -91,4 +91,6 @@ public interface MicronautCodeGeneratorOptionsBuilder {
      * @return this builder
      */
     MicronautCodeGeneratorOptionsBuilder withTestFramework(MicronautCodeGeneratorEntryPoint.TestFramework testFramework);
+
+    MicronautCodeGeneratorOptionsBuilder withSerializationLibrary(SerializationLibraryKind library);
 }

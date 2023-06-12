@@ -80,8 +80,6 @@ abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBuilder> e
     public static final String DATETIME_FORMAT = DATE_FORMAT + "'T'HH:mm:ss.SSS";
     public static final String OFFSET_DATETIME_FORMAT = DATETIME_FORMAT + "XXXX";
 
-    public enum SerializationLibraryKind { JACKSON, MICRONAUT_SERDE_JACKSON }
-
     protected String title;
     protected boolean useBeanValidation;
     protected boolean useOptional;
@@ -93,7 +91,7 @@ abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBuilder> e
     protected String appName;
     protected String generateSwaggerAnnotations;
     protected boolean generateOperationOnlyForFirstTag;
-    protected String serializationLibrary = SerializationLibraryKind.JACKSON.name();
+    protected String serializationLibrary = SerializationLibraryKind.MICRONAUT_SERDE_JACKSON.name();
 
     protected AbstractMicronautJavaCodegen() {
         super();

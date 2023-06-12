@@ -8,7 +8,7 @@ public class JavaMicronautClientCodegenSerializationLibraryTest extends Abstract
     @Test
     public void testSerializationLibraryJackson() {
         JavaMicronautClientCodegen codegen = new JavaMicronautClientCodegen();
-        codegen.additionalProperties().put(CodegenConstants.SERIALIZATION_LIBRARY, AbstractMicronautJavaCodegen.SerializationLibraryKind.JACKSON.name());
+        codegen.additionalProperties().put(CodegenConstants.SERIALIZATION_LIBRARY, SerializationLibraryKind.JACKSON.name());
         String outputPath = generateFiles(codegen, PETSTORE_PATH,
                                           CodegenConstants.MODELS);
 
@@ -32,7 +32,7 @@ public class JavaMicronautClientCodegenSerializationLibraryTest extends Abstract
     @Test
     public void testSerializationLibraryMicronautSerdeJackson() {
         JavaMicronautClientCodegen codegen = new JavaMicronautClientCodegen();
-        codegen.additionalProperties().put(CodegenConstants.SERIALIZATION_LIBRARY, AbstractMicronautJavaCodegen.SerializationLibraryKind.MICRONAUT_SERDE_JACKSON.name());
+        codegen.additionalProperties().put(CodegenConstants.SERIALIZATION_LIBRARY, SerializationLibraryKind.MICRONAUT_SERDE_JACKSON.name());
         String outputPath = generateFiles(codegen, PETSTORE_PATH,
                                           CodegenConstants.MODELS);
 

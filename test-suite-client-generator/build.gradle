@@ -10,7 +10,7 @@ that tests can be ran with Micronaut 4
 dependencies {
     annotationProcessor("io.micronaut:micronaut-http-validation")
     implementation("io.micronaut:micronaut-http-client")
-    implementation("io.micronaut:micronaut-jackson-databind")
+    implementation("io.micronaut.serde:micronaut-serde-jackson")
     implementation("jakarta.annotation:jakarta.annotation-api")
     implementation("io.micronaut.validation:micronaut-validation")
     implementation("io.projectreactor:reactor-core")

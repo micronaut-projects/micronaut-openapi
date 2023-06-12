@@ -122,6 +122,7 @@ public final class MicronautCodeGeneratorEntryPoint {
         codeGenerator.setUseOptional(options.optional);
         codeGenerator.setUseBeanValidation(options.beanValidation);
         codeGenerator.setTestTool(options.testFramework.value);
+        codeGenerator.setSerializationLibrary(options.serializationLibraryKind().name());
         configureServerOptions();
         configureClientOptions();
     }
@@ -287,6 +288,7 @@ public final class MicronautCodeGeneratorEntryPoint {
             private boolean reactive = true;
             private boolean wrapInHttpResponse;
             private TestFramework testFramework = TestFramework.JUNIT5;
+            private SerializationLibraryKind serializationLibraryKind = SerializationLibraryKind.MICRONAUT_SERDE_JACKSON;
 
             @Override
             public MicronautCodeGeneratorOptionsBuilder withApiPackage(String apiPackage) {
@@ -342,8 +344,14 @@ public final class MicronautCodeGeneratorEntryPoint {
                 return this;
             }
 
+            @Override
+            public MicronautCodeGeneratorOptionsBuilder withSerializationLibrary(SerializationLibraryKind library) {
+                this.serializationLibraryKind = library;
+                return this;
+            }
+
             private Options build() {
-                return new Options(apiPackage, modelPackage, invokerPackage, artifactId, beanValidation, optional, reactive, wrapInHttpResponse, testFramework);
+                return new Options(apiPackage, modelPackage, invokerPackage, artifactId, beanValidation, optional, reactive, wrapInHttpResponse, testFramework, serializationLibraryKind);
             }
         }
     }
@@ -372,7 +380,8 @@ public final class MicronautCodeGeneratorEntryPoint {
         boolean optional,
         boolean reactive,
         boolean wrapInHttpResponse,
-        TestFramework testFramework) {
+        TestFramework testFramework,
+        SerializationLibraryKind serializationLibraryKind) {
     }
 
 }
