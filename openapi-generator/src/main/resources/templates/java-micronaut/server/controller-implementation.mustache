@@ -2,6 +2,10 @@
 package {{controllerPackage}};
 
 import io.micronaut.http.annotation.Controller;
+{{#generateOperationsToReturnNotImplemented}}
+import io.micronaut.http.HttpStatus;
+import io.micronaut.http.exceptions.HttpStatusException;
+{{/generateOperationsToReturnNotImplemented}}
 {{#reactive}}
 import reactor.core.publisher.Mono;
 {{/reactive}}

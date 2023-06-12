@@ -14,10 +14,6 @@ import reactor.core.publisher.Mono;
 {{#wrapInHttpResponse}}
 import io.micronaut.http.HttpResponse;
 {{/wrapInHttpResponse}}
-{{#generateOperationsToReturnNotImplemented}}
-import io.micronaut.http.HttpStatus;
-import io.micronaut.http.exceptions.HttpStatusException;
-{{/generateOperationsToReturnNotImplemented}}
 {{#imports}}
 import {{import}};
 {{/imports}}
