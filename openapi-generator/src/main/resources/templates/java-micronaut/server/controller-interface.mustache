@@ -1,6 +1,7 @@
 {{>common/licenseInfo}}
 package {{apiPackage}};
 
+{{#formatNoEmptyLines}}
 import io.micronaut.http.annotation.*;
 import io.micronaut.core.annotation.Nullable;
 import io.micronaut.core.convert.format.Format;
@@ -35,14 +36,15 @@ import io.swagger.annotations.*;
 {{#generateSwagger2Annotations}}
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 {{/generateSwagger2Annotations}}
+{{/formatNoEmptyLines}}
 
+{{#formatOneEmptyLine}}
 {{>common/generatedAnnotation}}
 {{^generateControllerAsAbstract}}
 @Controller
@@ -51,14 +53,15 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 @Tag(name = "{{{baseName}}}", description = {{#tagDescription}}"{{{.}}}"{{/tagDescription}}{{^tagDescription}}"The {{{baseName}}} API"{{/tagDescription}})
 {{/generateSwagger2Annotations}}
 public interface {{classname}} {
+
 {{#operations}}
     {{#operation}}
-{{>common/operationAnnotations}}{{!
-    micronaut annotations
-    }}    @{{#lambda.pascalcase}}{{#lambda.lowercase}}{{httpMethod}}{{/lambda.lowercase}}{{/lambda.pascalcase}}(uri="{{{path}}}")
-    @Produces(value = {{openbrace}}{{#produces}}"{{{mediaType}}}"{{^-last}}, {{/-last}}{{/produces}}{{closebrace}})
+        {{#formatNoEmptyLines}}
+{{>common/operationAnnotations}}
+    @{{#lambda.pascalcase}}{{#lambda.lowercase}}{{httpMethod}}{{/lambda.lowercase}}{{/lambda.pascalcase}}("{{{path}}}")
+    @Produces({{openbrace}}{{#produces}}"{{{mediaType}}}"{{^-last}}, {{/-last}}{{/produces}}{{closebrace}})
     {{#consumes.0}}
-    @Consumes(value = {{openbrace}}{{#consumes}}"{{{mediaType}}}"{{^-last}}, {{/-last}}{{/consumes}}{{closebrace}})
+    @Consumes({{openbrace}}{{#consumes}}"{{{mediaType}}}"{{^-last}}, {{/-last}}{{/consumes}}{{closebrace}})
     {{/consumes.0}}
     {{!security annotations}}
     {{#useAuth}}
@@ -66,11 +69,15 @@ public interface {{classname}} {
     {{/useAuth}}
     {{!the method definition}}
     {{>common/operationReturnType}} {{nickname}}({{#allParams}}
-        {{>server/params/queryParams}}{{>server/params/pathParams}}{{>server/params/headerParams}}{{>server/params/bodyParams}}{{>server/params/formParams}}{{>server/params/cookieParams}}{{^-last}}, {{/-last}}{{#-last}}
-    {{/-last}}{{/allParams}});
-    {{^-last}}
+        {{#indent}}
+            {{>common/params/validation}}
+        {{/indent}}
+        {{>server/params/annotations}}
+        {{>server/params/type}} {{paramName}}{{^-last}}, {{/-last}}
+    {{/allParams}});
+        {{/formatNoEmptyLines}}
 
-    {{/-last}}
     {{/operation}}
 {{/operations}}
 }
+{{/formatOneEmptyLine}}

@@ -1,8 +1,12 @@
+{{#formatNoEmptyLines}}
 {{#additionalOneOfTypeAnnotations}}
 {{{.}}}
 {{/additionalOneOfTypeAnnotations}}
-{{>common/generatedAnnotation}}{{>common/model/typeInfoAnnotation}}{{>common/model/xmlAnnotation}}
+{{>common/generatedAnnotation}}
+{{>common/model/typeInfoAnnotation}}
+{{>common/model/xmlAnnotation}}
 public interface {{classname}} {{#vendorExtensions.x-implements}}{{#-first}}extends {{{.}}}{{/-first}}{{^-first}}, {{{.}}}{{/-first}}{{/vendorExtensions.x-implements}} {
+{{/formatNoEmptyLines}}
     {{#discriminator}}
     public {{propertyType}} {{propertyGetter}}();
     {{/discriminator}}

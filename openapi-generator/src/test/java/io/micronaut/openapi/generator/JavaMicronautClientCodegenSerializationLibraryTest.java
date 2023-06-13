@@ -37,13 +37,14 @@ public class JavaMicronautClientCodegenSerializationLibraryTest extends Abstract
                                           CodegenConstants.MODELS);
 
         // Model contains micronaut serde annotation
-        String micronautSerDeAnnotation = "@io.micronaut.serde.annotation.Serdeable";
+        String micronautSerdeAnnotation = "@Serdeable";
         String modelPath = outputPath + "src/main/java/org/openapitools/model/";
-        assertFileContains(modelPath + "Pet.java", micronautSerDeAnnotation);
-        assertFileContains(modelPath + "User.java", micronautSerDeAnnotation);
-        assertFileContains(modelPath + "Order.java", micronautSerDeAnnotation);
-        assertFileContains(modelPath + "Tag.java", micronautSerDeAnnotation);
-        assertFileContains(modelPath + "Category.java", micronautSerDeAnnotation);
+        assertFileContains(modelPath + "Pet.java", "import io.micronaut.serde.annotation.Serdeable");
+        assertFileContains(modelPath + "Pet.java", micronautSerdeAnnotation);
+        assertFileContains(modelPath + "User.java", micronautSerdeAnnotation);
+        assertFileContains(modelPath + "Order.java", micronautSerdeAnnotation);
+        assertFileContains(modelPath + "Tag.java", micronautSerdeAnnotation);
+        assertFileContains(modelPath + "Category.java", micronautSerdeAnnotation);
 
         //JsonFormat with micronaut-serde-jackson must be without shape attribute
         assertFileNotContains(modelPath + "Order.java", "@JsonFormat(shape = JsonFormat.Shape.STRING");
