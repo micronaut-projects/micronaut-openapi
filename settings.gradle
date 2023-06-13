@@ -3,6 +3,7 @@ pluginManagement {
         gradlePluginPortal()
         mavenCentral()
     }
+    includeBuild "build-logic"
 }
 
 plugins {
@@ -14,9 +15,13 @@ rootProject.name = "openapi-parent"
 
 include "openapi"
 include "openapi-bom"
+include "openapi-generator"
 include 'docs-examples:example-groovy'
 include 'docs-examples:example-java'
 include 'docs-examples:example-kotlin'
+include 'test-suite-client-generator'
+include 'test-suite-server-generator'
+include 'test-suite-generator-util'
 
 enableFeaturePreview 'TYPESAFE_PROJECT_ACCESSORS'
 

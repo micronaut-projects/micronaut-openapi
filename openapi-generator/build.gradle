@@ -1,0 +1,31 @@
+plugins {
+    id 'io.micronaut.build.internal.openapi-simple-module'
+}
+
+dependencies {
+    constraints {
+        api(libs.swagger.parser) {
+            because("OpenAPI generator depends on older release which isn't compatible with SnakeYAML")
+        }
+        api(libs.swagger.parser.v3) {
+            because("OpenAPI generator depends on older release which isn't compatible with SnakeYAML")
+        }
+    }
+    implementation libs.openapi.generator
+    testImplementation libs.junit5.api
+    testRuntimeOnly libs.junit5.engine
+
+    testFixturesImplementation libs.assertj
+    testFixturesImplementation libs.javaparser
+    testFixturesImplementation libs.openapi.generator
+    testFixturesImplementation libs.junit5.api
+}
+
+micronautBuild {
+    def simpleVersion = version
+    if (version.contains('-')) {
+        simpleVersion = version.substring(0, version.indexOf('-'))
+    }
+    def (String major, String minor, String patch) = simpleVersion.split("[.]")
+    binaryCompatibility.enabled = major.toInteger() >= 5 && minor.toInteger() >= 0 && patch.toInteger() > 0
+}
