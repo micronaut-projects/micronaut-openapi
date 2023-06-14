@@ -13,7 +13,7 @@ public class JavaMicronautClientCodegenSerializationLibraryTest extends Abstract
                                           CodegenConstants.MODELS);
 
         // Model does not contain micronaut serde annotation
-        String micronautSerDeAnnotation = "@io.micronaut.serde.annotation.Serdeable";
+        String micronautSerDeAnnotation = "@Serdeable";
         String modelPath = outputPath + "src/main/java/org/openapitools/model/";
         assertFileNotContains(modelPath + "Pet.java", micronautSerDeAnnotation);
         assertFileNotContains(modelPath + "User.java", micronautSerDeAnnotation);

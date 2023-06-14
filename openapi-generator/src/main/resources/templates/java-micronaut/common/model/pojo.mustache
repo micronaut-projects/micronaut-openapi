@@ -311,7 +311,7 @@ public class {{classname}} {{#parent}}extends {{{parent}}} {{/parent}}{{#vendorE
     public String toString() {
         return "{{classname}}("
         {{#allVars}}
-            + "{{name}}: " + {{name}}{{^-last}} + ", "{{/-last}}
+            + "{{name}}: " + {{{getter}}}(){{^-last}} + ", "{{/-last}}
         {{/allVars}}
             + ")";
     }

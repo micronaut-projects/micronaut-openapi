@@ -54,7 +54,7 @@
     {{#jackson}}
     @JsonCreator
     {{/jackson}}
-    public static StatusEnum fromValue(String value) {
+    public static {{>common/model/enumName}} fromValue(String value) {
         {{^isNullable}}
         if (!VALUE_MAPPING.containsKey(value{{#isString}}{{#useEnumCaseInsensitive}}.toLowerCase(){{/useEnumCaseInsensitive}}{{/isString}})) {
             throw new IllegalArgumentException("Unexpected value '" + value + "'");
