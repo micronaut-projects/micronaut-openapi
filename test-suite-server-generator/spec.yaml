@@ -12,6 +12,34 @@ consumes:
 produces:
   - application/json
 
+x-headers:
+  PageNumberHeader: &Page-Number-header
+    name: Page-Number
+    in: header
+    type: string
+    description: The page number of the current page
+  PageSizeHeader: &Page-Size-header
+    name: Page-Size
+    in: header
+    type: string
+    description: The number of items per page
+  TotalCountHeader: &Total-Count-header
+    name: Total-Count
+    in: header
+    type: string
+    description: |
+      The total number of items available in the entire collections, not just the items returned in the current page
+  PageCountHeader: &Page-Count-header
+    name: Page-Count
+    in: header
+    type: string
+    description: The total number of pages based on the page size and total count
+  LinkHeader: &Link-header
+    name: Link
+    in: header
+    type: string
+    description: The URLS to the first, last, previous and next pages.
+
 paths:
   /sendPrimitives/{name}:
     get:
@@ -423,26 +451,6 @@ paths:
           schema:
             type: string
             format: byte
-  /sendBytesLarge:
-    put:
-      operationId: sendBytesLarge
-      tags: [ requestBody ]
-      description: A method to send a large amount of bytes
-      produces: [ "application/octet-stream" ]
-      consumes: [ "application/octet-stream" ]
-      x-obmcs-large-response-payload: true
-      parameters:
-        - in: body
-          name: bytesLarge
-          schema:
-            type: string
-            format: byte
-      responses:
-        200:
-          description: Success
-          schema:
-            type: string
-            format: byte
   /getSimpleModel:
     get:
       operationId: getSimpleModel
@@ -478,41 +486,33 @@ paths:
         200:
           description: Success
           headers:
-            opc-next-page:
-              type: string
+            Page-Number: *Page-Number-header
+            Page-Size: *Page-Size-header
+            Total-Count: *Total-Count-header
+            Page-Count: *Page-Count-header
+            Link: *Link-header
           schema:
             type: array
             items:
               $ref: '#/definitions/SimpleModel'
-  /getPaginatedSimpleModelCollection:
+  /getDatedSimpleModel:
     get:
-      operationId: getPaginatedSimpleModelCollection
+      operationId: getDatedSimpleModel
       tags: [ responseBody ]
-      description: A method to get a simple model collection as a paginated response
-      responses:
-        200:
-          description: Success
-          headers:
-            opc-next-page:
-              type: string
-          schema:
-            $ref: '#/definitions/SimpleModelCollection'
-  /getTaggedSimpleModel:
-    get:
-      operationId: getTaggedSimpleModel
-      tags: [ responseBody ]
-      description: A method to get a tagged simple model
+      description: A method to get a simple model with last-modified header
       responses:
         202:
           description: Success
           headers:
-            etag:
+            Last-Modified:
               type: string
+              format: date-time
+              description: The last modified date for the requested object
           schema:
             $ref: '#/definitions/SimpleModel'
-  /getSimpleModelWithNonStandardHeader:
+  /getSimpleModelWithNonMappedHeader:
     get:
-      operationId: getSimpleModelWithNonStandardHeader
+      operationId: getSimpleModelWithNonMappedHeader
       tags: [ responseBody ]
       description: A method to get a simple model as a response
       responses:
@@ -526,16 +526,16 @@ paths:
             $ref: '#/definitions/SimpleModel'
         default:
           $ref: '#/responses/Error'
-  /getTaggedSimpleModelWithNonStandardHeaders:
+  /getDatedSimpleModelWithNonMappedHeader:
     get:
-      operationId: getTaggedSimpleModelWithNonStandardHeaders
+      operationId: getDatedSimpleModelWithNonMappedHeader
       tags: [ responseBody ]
       description: A method to get a tagged simple model with non standard headers
       responses:
         200:
           description: Success
           headers:
-            etag:
+            Last-Modified:
               type: string
             custom-header:
               type: string
@@ -595,13 +595,6 @@ definitions:
           type: string
       state:
         $ref: '#/definitions/StateEnum'
-  SimpleModelCollection:
-    type: object
-    properties:
-      models:
-        type: array
-        items:
-          $ref: '#/definitions/SimpleModel'
   ModelWithRequiredProperties:
     type: object
     properties:
