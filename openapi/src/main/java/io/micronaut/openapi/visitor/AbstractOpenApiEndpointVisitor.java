@@ -228,6 +228,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             context.remove(CONTEXT_CHILD_OP_ID_SUFFIX);
             context.remove(CONTEXT_CHILD_OP_ID_SUFFIX_ADD_ALWAYS);
         }
+        context.remove(CONTEXT_CHILD_PATH);
     }
 
     private void processTags(ClassElement element, VisitorContext context) {
