@@ -387,11 +387,12 @@ final class RapidocConfig extends AbstractViewConfig {
      * Builds a RapidocConfig given a set of properties.
      *
      * @param properties A set of properties.
+     * @param context Visitor context.
      *
      * @return A RapidocConfig.
      */
-    static RapidocConfig fromProperties(Map<String, String> properties) {
-        return AbstractViewConfig.fromProperties(new RapidocConfig(), DEFAULT_OPTIONS, properties);
+    static RapidocConfig fromProperties(Map<String, String> properties, VisitorContext context) {
+        return AbstractViewConfig.fromProperties(new RapidocConfig(), DEFAULT_OPTIONS, properties, context);
     }
 
     @Override
