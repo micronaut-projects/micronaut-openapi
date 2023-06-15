@@ -30,6 +30,11 @@ class NetworkOperations {
         return "";
     }
 
+    @Get("/first")
+    String methodEmptyList(@QueryValue(value = "test", defaultValue = ",") List<String> items) {
+        return "";
+    }
+
     @Get("/sec")
     String method2(@QueryValue(value = "test", defaultValue = "a1,a2,a3") List<String> items) {
         return "";
@@ -50,6 +55,7 @@ class MyBean {}
         when: "The OpenAPI is retrieved"
         OpenAPI openAPI = Utils.testReference
         PathItem pathItem = openAPI.paths.get("/")
+        PathItem pathItemFirst = openAPI.paths.get("/first")
         PathItem pathItemSec = openAPI.paths.get("/sec")
         PathItem pathItemThird = openAPI.paths.get("/third")
 
@@ -60,6 +66,13 @@ class MyBean {}
         pathItem.get.parameters[0].schema.type == 'array'
         pathItem.get.parameters[0].schema.default
         pathItem.get.parameters[0].schema.default[0] == ''
+
+        pathItemFirst.get.parameters.size() == 1
+        pathItemFirst.get.parameters[0].name == 'test'
+        pathItemFirst.get.parameters[0].schema
+        pathItemFirst.get.parameters[0].schema.type == 'array'
+        pathItemFirst.get.parameters[0].schema.default != null
+        pathItemFirst.get.parameters[0].schema.default.size() == 0
 
         pathItemSec.get.parameters.size() == 1
         pathItemSec.get.parameters[0].name == 'test'
