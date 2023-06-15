@@ -36,24 +36,24 @@ public class GeneratorMain {
             .withOutputs(
                 MODELS,
                 APIS,
-                API_TESTS,
-                MODEL_TESTS
+                SUPPORTING_FILES
             )
             .withOptions(options -> {
-                options.withInvokerPackage("io.micronaut.openapi.test.invoker");
+                options.withInvokerPackage("io.micronaut.openapi.test");
                 options.withApiPackage("io.micronaut.openapi.test.api");
                 options.withModelPackage("io.micronaut.openapi.test.model");
                 options.withBeanValidation(true);
                 options.withOptional(true);
                 options.withReactive(true);
-                options.withTestFramework(MicronautCodeGeneratorEntryPoint.TestFramework.JUNIT5);
+                options.withTestFramework(MicronautCodeGeneratorEntryPoint.TestFramework.SPOCK);
             });
         if (server) {
             builder.forServer(serverOptions -> {
                 serverOptions.withControllerPackage("io.micronaut.openapi.test.controller");
                 // commented out because currently this would prevent the test project from compiling
                 // because we generate both abstract classes _and_ dummy implementations
-                 serverOptions.withGenerateAbstractClasses(true);
+                 serverOptions.withGenerateAbstractClasses(false);
+                 serverOptions.withAuthentication(false);
             });
         } else {
             builder.forClient(client -> {

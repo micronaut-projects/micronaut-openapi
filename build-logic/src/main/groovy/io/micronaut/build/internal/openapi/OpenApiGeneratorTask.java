@@ -63,7 +63,7 @@ public abstract class OpenApiGeneratorTask extends DefaultTask {
 
     @Internal
     public Provider<Directory> getGeneratedTestSourcesDirectory() {
-        return getOutputDirectory().dir("src/test/java");
+        return getOutputDirectory().dir("src/test/groovy");
     }
 
     @Inject

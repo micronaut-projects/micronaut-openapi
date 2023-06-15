@@ -1,6 +1,7 @@
 {{>common/licenseInfo}}
 package {{package}};
 
+{{#formatNoEmptyLines}}
 {{#useReflectionEqualsHashCode}}
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -38,7 +39,13 @@ import android.os.Parcel;
 import {{javaxPackage}}.validation.constraints.*;
 import {{javaxPackage}}.validation.Valid;
 {{/useBeanValidation}}
-import io.micronaut.core.annotation.*;
+import io.micronaut.core.annotation.Introspected;
+{{^generateHardNullable}}
+import io.micronaut.core.annotation.Nullable;
+{{/generateHardNullable}}
+{{#generateHardNullable}}
+import {{{invokerPackage}}}.annotation.HardNullable;
+{{/generateHardNullable}}
 import {{javaxPackage}}.annotation.Generated;
 {{#generateSwagger1Annotations}}
 import io.swagger.annotations.ApiModel;
@@ -47,6 +54,7 @@ import io.swagger.annotations.ApiModelProperty;
 {{#generateSwagger2Annotations}}
 import io.swagger.v3.oas.annotations.media.Schema;
 {{/generateSwagger2Annotations}}
+{{/formatNoEmptyLines}}
 
 {{#formatOneEmptyLine}}
     {{#models}}

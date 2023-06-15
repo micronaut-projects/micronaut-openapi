@@ -1,7 +1,12 @@
-{{!
-default type
-}}{{^isDate}}{{^isDateTime}}{{{dataType}}}{{/isDateTime}}{{/isDate}}{{!
-date-time
-}}{{#isDateTime}}@Format("{{{datetimeFormat}}}") {{{dataType}}}{{/isDateTime}}{{!
-date
-}}{{#isDate}}@Format("{{{dateFormat}}}") {{{dataType}}}{{/isDate}}
+{{^isDate}}{{^isDateTime}}{{^isEnum}}
+    {{{dataType}}}
+{{/isEnum}}{{/isDateTime}}{{/isDate}}
+{{#isDateTime}}
+    @Format("{{{datetimeFormat}}}") {{{dataType}}}
+{{/isDateTime}}
+{{#isDate}}
+    @Format("{{{dateFormat}}}") {{{dataType}}}
+{{/isDate}}
+{{#isEnum}}
+    {{{datatypeWithEnum}}}
+{{/isEnum}}

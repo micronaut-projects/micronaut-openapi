@@ -135,7 +135,7 @@ public final class MicronautCodeGeneratorEntryPoint {
             serverCodegen.setGenerateImplementationFiles(serverOptions.generateAbstractClasses());
             serverCodegen.setGenerateOperationsToReturnNotImplemented(serverOptions.generateOperationsToReturnNotImplemented());
             serverCodegen.setGenerateControllerFromExamples(serverOptions.generateControllerFromExamples());
-            serverCodegen.setUseAuth(serverCodegen.useAuth);
+            serverCodegen.setUseAuth(serverOptions.useAuth());
         }
     }
 

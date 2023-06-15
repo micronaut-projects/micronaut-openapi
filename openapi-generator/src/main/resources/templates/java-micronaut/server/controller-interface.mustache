@@ -3,7 +3,12 @@ package {{apiPackage}};
 
 {{#formatNoEmptyLines}}
 import io.micronaut.http.annotation.*;
+{{^generateHardNullable}}
 import io.micronaut.core.annotation.Nullable;
+{{/generateHardNullable}}
+{{#generateHardNullable}}
+import {{{invokerPackage}}}.annotation.HardNullable;
+{{/generateHardNullable}}
 import io.micronaut.core.convert.format.Format;
 {{#useAuth}}
 import io.micronaut.security.annotation.Secured;
@@ -73,7 +78,7 @@ public interface {{classname}} {
             {{>common/params/validation}}
         {{/indent}}
         {{>server/params/annotations}}
-        {{>server/params/type}} {{paramName}}{{^-last}}, {{/-last}}
+        {{#formatSingleLine}}{{>server/params/type}} {{paramName}}{{^-last}},{{/-last}}{{/formatSingleLine}}
     {{/allParams}});
         {{/formatNoEmptyLines}}
 

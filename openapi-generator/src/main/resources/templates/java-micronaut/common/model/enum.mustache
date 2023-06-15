@@ -5,6 +5,9 @@
 @XmlType(name="{{datatypeWithEnum}}")
 @XmlEnum({{dataType}}.class)
 {{/withXml}}
+{{#micronaut_serde_jackson}}
+@Serdeable
+{{/micronaut_serde_jackson}}
 {{#additionalEnumTypeAnnotations}}
 {{{.}}}
 {{/additionalEnumTypeAnnotations}}
@@ -54,7 +57,7 @@
     {{#jackson}}
     @JsonCreator
     {{/jackson}}
-    public static {{>common/model/enumName}} fromValue(String value) {
+    {{#formatSingleLine}}public static {{>common/model/enumName}} fromValue(String value){{/formatSingleLine}} {
         {{^isNullable}}
         if (!VALUE_MAPPING.containsKey(value{{#isString}}{{#useEnumCaseInsensitive}}.toLowerCase(){{/useEnumCaseInsensitive}}{{/isString}})) {
             throw new IllegalArgumentException("Unexpected value '" + value + "'");

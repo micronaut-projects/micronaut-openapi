@@ -1,5 +1,6 @@
 plugins {
     id 'io.micronaut.build.internal.openapi-generator-test-suite'
+    id 'groovy'
 }
 
 description = """
@@ -9,7 +10,7 @@ that tests can be ran with Micronaut 4
 
 dependencies {
     annotationProcessor("io.micronaut:micronaut-http-validation")
-    implementation("io.micronaut.security:micronaut-security")
+    annotationProcessor("io.micronaut.serde:micronaut-serde-processor")
     implementation("io.micronaut:micronaut-http-client")
     implementation("io.micronaut.serde:micronaut-serde-api")
     implementation("jakarta.annotation:jakarta.annotation-api")
@@ -18,9 +19,19 @@ dependencies {
     implementation(projects.micronautOpenapi) {
         because("Required for Swagger")
     }
+    testCompileOnly("io.micronaut:micronaut-inject-groovy-test")
+    testCompileOnly("io.micronaut:micronaut-inject-java-test")
+    testImplementation("io.micronaut.test:micronaut-test-spock")
+
     testRuntimeOnly("io.micronaut:micronaut-json-core")
     testRuntimeOnly("io.micronaut.serde:micronaut-serde-jackson")
     runtimeOnly("ch.qos.logback:logback-classic")
+}
+
+sourceSets {
+    test {
+        java.srcDir('src/test/groovy')
+    }
 }
 
 tasks.named("generateOpenApi") {

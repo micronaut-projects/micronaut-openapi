@@ -34,6 +34,7 @@ class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen<JavaMicron
     public static final String OPT_GENERATE_CONTROLLER_FROM_EXAMPLES = "generateControllerFromExamples";
     public static final String OPT_GENERATE_IMPLEMENTATION_FILES = "generateImplementationFiles";
     public static final String OPT_GENERATE_OPERATIONS_TO_RETURN_NOT_IMPLEMENTED = "generateOperationsToReturnNotImplemented";
+    public static final String OPT_GENERATE_HARD_NULLABLE = "generateHardNullable";
 
     public static final String EXTENSION_ROLES = "x-roles";
     public static final String ANONYMOUS_ROLE_KEY = "isAnonymous()";
@@ -56,6 +57,7 @@ class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen<JavaMicron
     protected boolean generateOperationsToReturnNotImplemented = true;
     protected boolean generateControllerFromExamples = false;
     protected boolean useAuth = true;
+    protected boolean generateHardNullable = true;
 
     public JavaMicronautServerCodegen() {
         super();
@@ -81,6 +83,8 @@ class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen<JavaMicron
                 generateOperationsToReturnNotImplemented));
 
         cliOptions.add(CliOption.newBoolean(OPT_USE_AUTH, "Whether to import authorization and to annotate controller methods accordingly", useAuth));
+        cliOptions.add(CliOption.newBoolean(OPT_GENERATE_HARD_NULLABLE, "Whether to generate and use an inherited nullable annotation", generateHardNullable));
+
 
         // Set the type mappings
         // It could be also StreamingFileUpload
@@ -159,22 +163,32 @@ class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen<JavaMicron
         }
         writePropertyBack(OPT_USE_AUTH, useAuth);
 
+        if (additionalProperties.containsKey(OPT_GENERATE_HARD_NULLABLE)) {
+            generateHardNullable = convertPropertyToBoolean(OPT_GENERATE_HARD_NULLABLE);
+        }
+        writePropertyBack(OPT_GENERATE_HARD_NULLABLE, generateHardNullable);
+
         // Api file
         apiTemplateFiles.clear();
         setApiNamePrefix(API_PREFIX);
         setApiNameSuffix(API_SUFFIX);
         apiTemplateFiles.put("server/controller-interface.mustache", ".java");
 
-        // Add documentation files
-        supportingFiles.add(new SupportingFile("server/doc/README.mustache", "", "README.md").doNotOverwrite());
-        apiDocTemplateFiles.clear();
-        apiDocTemplateFiles.put("server/doc/controller_doc.mustache", ".md");
-
-        // Add test files
         apiTestTemplateFiles.clear();
-        // Controller Implementation is generated as a test file - so that it is not overwritten
         if (generateImplementationFiles) {
+            // Add documentation files
+            supportingFiles.add(new SupportingFile("server/doc/README.mustache", "", "README.md").doNotOverwrite());
+            apiDocTemplateFiles.clear();
+            apiDocTemplateFiles.put("server/doc/controller_doc.mustache", ".md");
+
+            // Add Application.java file
+            String invokerFolder = (sourceFolder + '/' + invokerPackage).replace('.', '/');
+            supportingFiles.add(new SupportingFile("common/configuration/Application.mustache", invokerFolder, "Application.java").doNotOverwrite());
+
+            // Controller Implementation is generated as a test file - so that it is not overwritten
             apiTestTemplateFiles.put("server/controller-implementation.mustache", ".java");
+
+            // Add test files
             if (testTool.equals(OPT_TEST_JUNIT)) {
                 apiTestTemplateFiles.put("server/test/controller_test.mustache", ".java");
             } else if (testTool.equals(OPT_TEST_SPOCK)) {
@@ -182,9 +196,11 @@ class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen<JavaMicron
             }
         }
 
-        // Add Application.java file
-        String invokerFolder = (sourceFolder + '/' + invokerPackage).replace('.', '/');
-        supportingFiles.add(new SupportingFile("common/configuration/Application.mustache", invokerFolder, "Application.java").doNotOverwrite());
+        // Add HardNullable.java file
+        if (generateHardNullable) {
+            String folder = (sourceFolder + '.' + invokerPackage + ".annotation").replace('.', File.separatorChar);
+            supportingFiles.add(new SupportingFile("server/HardNullable.mustache", folder, "HardNullable.java"));
+        }
     }
 
     @Override
