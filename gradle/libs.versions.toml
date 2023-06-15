@@ -31,7 +31,7 @@ micronaut-test = "4.0.0-M6"
 micronaut-kotlin = "4.0.0-M4"
 micronaut-platform = "4.0.0-M3"
 
-micronaut-logging = "1.0.0-M3"
+micronaut-logging = "1.0.0-M4"
 [libraries]
 # Core
 micronaut-core = { module = 'io.micronaut:micronaut-core-bom', version.ref = 'micronaut' }
