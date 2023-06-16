@@ -20,11 +20,17 @@ public @interface OpenAPIGroup {
     /**
      * @return The names of the OpenAPi groups.
      */
+    @AliasFor(member = "names")
+    String[] value() default {};
+
+    /**
+     * @return The names of the OpenAPi groups.
+     */
     @AliasFor(member = "value")
     String[] names() default {};
 
     /**
      * @return The names of the OpenAPi groups to exclude endpoints from.
      */
-    String[] excluded() default {};
+    String[] exclude() default {};
 }

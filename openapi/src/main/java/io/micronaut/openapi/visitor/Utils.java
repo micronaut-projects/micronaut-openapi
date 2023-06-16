@@ -37,6 +37,7 @@ import io.micronaut.http.MediaType;
 import io.micronaut.inject.visitor.VisitorContext;
 import io.micronaut.openapi.javadoc.JavadocParser;
 import io.micronaut.openapi.visitor.group.EndpointInfo;
+import io.micronaut.openapi.visitor.group.OpenApiInfo;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 
@@ -63,6 +64,10 @@ public final class Utils {
 
     private static PropertyPlaceholderResolver propertyPlaceholderResolver;
     private static OpenAPI testReference;
+    /**
+     * OpenAPI objects by key - Pair.of(group, version)
+     */
+    private static Map<Pair<String, String>, OpenApiInfo> testReferences;
     private static String testFileName;
     private static String testYamlReference;
     private static String testJsonReference;
@@ -190,6 +195,14 @@ public final class Utils {
 
     public static void setTestReference(OpenAPI testReference) {
         Utils.testReference = testReference;
+    }
+
+    public static Map<Pair<String, String>, OpenApiInfo> getTestReferences() {
+        return testReferences;
+    }
+
+    public static void setTestReferences(Map<Pair<String, String>, OpenApiInfo> testReferences) {
+        Utils.testReferences = testReferences;
     }
 
     public static String getTestYamlReference() {

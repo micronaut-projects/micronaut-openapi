@@ -41,7 +41,9 @@ import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.core.util.StringUtils;
 import io.micronaut.inject.visitor.VisitorContext;
 import io.micronaut.openapi.visitor.OpenApiApplicationVisitor;
+import io.micronaut.openapi.visitor.Pair;
 import io.micronaut.openapi.visitor.Utils;
+import io.micronaut.openapi.visitor.group.OpenApiInfo;
 
 import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.MICRONAUT_SERVER_CONTEXT_PATH;
 
@@ -78,6 +80,7 @@ public final class OpenApiViewConfig {
     private SwaggerUIConfig swaggerUIConfig;
     private RedocConfig redocConfig;
     private RapidocConfig rapidocConfig;
+    private final Map<Pair<String, String>, OpenApiInfo> openApiInfos;
 
     /**
      * The Renderer types.
@@ -99,7 +102,8 @@ public final class OpenApiViewConfig {
         }
     }
 
-    private OpenApiViewConfig() {
+    private OpenApiViewConfig(Map<Pair<String, String>, OpenApiInfo> openApiInfos) {
+        this.openApiInfos = openApiInfos;
     }
 
     /**
@@ -126,24 +130,24 @@ public final class OpenApiViewConfig {
      *
      * @return An OpenApiViewConfig.
      */
-    public static OpenApiViewConfig fromSpecification(String specification, Properties openApiProperties, VisitorContext context) {
+    public static OpenApiViewConfig fromSpecification(String specification, Map<Pair<String, String>, OpenApiInfo> openApiInfos, Properties openApiProperties, VisitorContext context) {
         Map<String, String> openApiMap = new HashMap<>(openApiProperties.size());
         openApiProperties.forEach((key, value) -> openApiMap.put((String) key, (String) value));
         openApiMap.putAll(parse(specification));
-        OpenApiViewConfig cfg = new OpenApiViewConfig();
-        RapiPDFConfig rapiPDFConfig = RapiPDFConfig.fromProperties(openApiMap, context);
+        OpenApiViewConfig cfg = new OpenApiViewConfig(openApiInfos);
+        RapiPDFConfig rapiPDFConfig = RapiPDFConfig.fromProperties(openApiMap, openApiInfos, context);
         if ("true".equals(openApiMap.getOrDefault("redoc.enabled", Boolean.FALSE.toString()))) {
-            cfg.redocConfig = RedocConfig.fromProperties(openApiMap, context);
+            cfg.redocConfig = RedocConfig.fromProperties(openApiMap, openApiInfos, context);
             cfg.redocConfig.rapiPDFConfig = rapiPDFConfig;
         }
         if ("true".equals(openApiMap.getOrDefault("rapidoc.enabled", Boolean.FALSE.toString()))) {
-            cfg.rapidocConfig = RapidocConfig.fromProperties(openApiMap, context);
+            cfg.rapidocConfig = RapidocConfig.fromProperties(openApiMap, openApiInfos, context);
             cfg.rapidocConfig.rapiPDFConfig = rapiPDFConfig;
         }
-        if ("true".equals(openApiMap.getOrDefault("swagger-ui.enabled", Boolean.FALSE.toString()))) {
-            cfg.swaggerUIConfig = SwaggerUIConfig.fromProperties(openApiMap, context);
+//        if ("true".equals(openApiMap.getOrDefault("swagger-ui.enabled", Boolean.FALSE.toString()))) {
+            cfg.swaggerUIConfig = SwaggerUIConfig.fromProperties(openApiMap, openApiInfos, context);
             cfg.swaggerUIConfig.rapiPDFConfig = rapiPDFConfig;
-        }
+//        }
         cfg.mappingPath = openApiMap.getOrDefault("mapping.path", "swagger");
         return cfg;
     }

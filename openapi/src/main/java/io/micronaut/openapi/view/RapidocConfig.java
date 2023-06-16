@@ -24,6 +24,8 @@ import java.util.function.Function;
 
 import io.micronaut.inject.visitor.VisitorContext;
 import io.micronaut.openapi.view.OpenApiViewConfig.RendererType;
+import io.micronaut.openapi.visitor.Pair;
+import io.micronaut.openapi.visitor.group.OpenApiInfo;
 
 /**
  * RapiDoc configuration.
@@ -378,8 +380,8 @@ final class RapidocConfig extends AbstractViewConfig {
 
     RapiPDFConfig rapiPDFConfig;
 
-    private RapidocConfig() {
-        super(RAPIDOC_PREFIX);
+    private RapidocConfig(Map<Pair<String, String>, OpenApiInfo> openApiInfos) {
+        super(RAPIDOC_PREFIX, openApiInfos);
         jsUrl = DEFAULT_RAPIDOC_JS_PATH;
     }
 
@@ -391,8 +393,8 @@ final class RapidocConfig extends AbstractViewConfig {
      *
      * @return A RapidocConfig.
      */
-    static RapidocConfig fromProperties(Map<String, String> properties, VisitorContext context) {
-        return AbstractViewConfig.fromProperties(new RapidocConfig(), DEFAULT_OPTIONS, properties, context);
+    static RapidocConfig fromProperties(Map<String, String> properties, Map<Pair<String, String>, OpenApiInfo> openApiInfos, VisitorContext context) {
+        return AbstractViewConfig.fromProperties(new RapidocConfig(openApiInfos), DEFAULT_OPTIONS, properties, RendererType.RAPIDOC, context);
     }
 
     @Override

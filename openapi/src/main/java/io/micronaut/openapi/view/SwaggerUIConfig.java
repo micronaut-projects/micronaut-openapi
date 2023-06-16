@@ -26,9 +26,15 @@ import java.util.stream.Collectors;
 
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.core.annotation.Nullable;
+import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.core.util.StringUtils;
 import io.micronaut.inject.visitor.VisitorContext;
 import io.micronaut.openapi.view.OpenApiViewConfig.RendererType;
+import io.micronaut.openapi.visitor.ConvertUtils;
+import io.micronaut.openapi.visitor.Pair;
+import io.micronaut.openapi.visitor.group.OpenApiInfo;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 /**
  * Swagger-ui configuration.
@@ -48,6 +54,8 @@ final class SwaggerUIConfig extends AbstractViewConfig {
     );
 
     private static final Map<String, Object> DEFAULT_OPTIONS = new HashMap<>(4);
+    private static final String OPTION_PRIMARY_NAME = "primaryName";
+    private static final String OPTION_URLS = "urls";
     private static final String OPTION_OAUTH2 = "oauth2";
     private static final String DOT = ".";
     private static final String PREFIX_SWAGGER_UI = "swagger-ui";
@@ -189,8 +197,8 @@ final class SwaggerUIConfig extends AbstractViewConfig {
         }
     }
 
-    private SwaggerUIConfig() {
-        super(PREFIX_SWAGGER_UI + DOT);
+    private SwaggerUIConfig(Map<Pair<String, String>, OpenApiInfo> openApiInfos) {
+        super(PREFIX_SWAGGER_UI + DOT, openApiInfos);
         jsUrl = DEFAULT_SWAGGER_JS_PATH;
     }
 
@@ -217,7 +225,7 @@ final class SwaggerUIConfig extends AbstractViewConfig {
         if (StringUtils.hasText(properties)) {
             return "ui.initOAuth({\n" + properties + "\n});";
         } else {
-            return "";
+            return StringUtils.EMPTY_STRING;
         }
     }
 
@@ -233,8 +241,8 @@ final class SwaggerUIConfig extends AbstractViewConfig {
      *
      * @return A SwaggerUIConfig.
      */
-    static SwaggerUIConfig fromProperties(Map<String, String> properties, VisitorContext context) {
-        SwaggerUIConfig cfg = new SwaggerUIConfig();
+    static SwaggerUIConfig fromProperties(Map<String, String> properties, Map<Pair<String, String>, OpenApiInfo> openApiInfos, VisitorContext context) {
+        SwaggerUIConfig cfg = new SwaggerUIConfig(openApiInfos);
         cfg.theme = Theme.valueOf(properties.getOrDefault(PREFIX_SWAGGER_UI + ".theme", cfg.theme.name()).toUpperCase(Locale.US));
 
         String copyTheme = properties.get(cfg.prefix + "copy-theme");
@@ -248,7 +256,7 @@ final class SwaggerUIConfig extends AbstractViewConfig {
             cfg.isDefaultThemeUrl = false;
         }
 
-        return AbstractViewConfig.fromProperties(cfg, DEFAULT_OPTIONS, properties, context);
+        return AbstractViewConfig.fromProperties(cfg, DEFAULT_OPTIONS, properties, RendererType.SWAGGER_UI, context);
     }
 
     @Override
@@ -257,12 +265,35 @@ final class SwaggerUIConfig extends AbstractViewConfig {
         String finalUrlPrefix = getFinalUrlPrefix(RendererType.SWAGGER_UI, context);
 
         template = rapiPDFConfig.render(template, RendererType.SWAGGER_UI, context);
-        template = OpenApiViewConfig.replacePlaceHolder(template, PREFIX_SWAGGER_UI + ".js.url.prefix", isDefaultJsUrl ? finalUrlPrefix : jsUrl, "");
-        template = OpenApiViewConfig.replacePlaceHolder(template, PREFIX_SWAGGER_UI + ".attributes", toOptions(), "");
-        template = template.replace("{{" + PREFIX_SWAGGER_UI + ".theme}}", theme == null || Theme.CLASSIC == theme ? "" :
+        template = OpenApiViewConfig.replacePlaceHolder(template, PREFIX_SWAGGER_UI + ".js.url.prefix", isDefaultJsUrl ? finalUrlPrefix : jsUrl, StringUtils.EMPTY_STRING);
+        template = OpenApiViewConfig.replacePlaceHolder(template, PREFIX_SWAGGER_UI + ".attributes", toOptions(), StringUtils.EMPTY_STRING);
+        template = template.replace("{{" + PREFIX_SWAGGER_UI + ".theme}}", theme == null || Theme.CLASSIC == theme ? StringUtils.EMPTY_STRING :
             "<link rel='stylesheet' type='text/css' href='" + (isDefaultThemeUrl ? finalUrlPrefix + theme.getCss() + ".css" : themeUrl) + "' />");
-        template = template.replace("{{" + PREFIX_SWAGGER_UI + DOT + OPTION_OAUTH2 + "}}", hasOauth2Option(options) ? toOauth2Options() : "");
+        template = template.replace("{{" + PREFIX_SWAGGER_UI + DOT + OPTION_OAUTH2 + "}}", hasOauth2Option(options) ? toOauth2Options() : StringUtils.EMPTY_STRING);
+        template = template.replace("{{" + PREFIX_SWAGGER_UI + DOT + OPTION_PRIMARY_NAME + "}}", StringUtils.isNotEmpty(primaryName) ? primaryName : StringUtils.EMPTY_STRING);
+        template = template.replace("{{" + PREFIX_SWAGGER_UI + DOT + OPTION_URLS + "}}", getUrlStr(context));
         return template;
+    }
+
+    @NonNull
+    private String getPrimaryName(VisitorContext context) {
+        if (StringUtils.isEmpty(primaryName)) {
+            return StringUtils.EMPTY_STRING;
+        }
+        return "urls.primaryName:" + primaryName + ',';
+    }
+
+    @NonNull
+    private String getUrlStr(VisitorContext context) {
+        if (CollectionUtils.isEmpty(urls)) {
+            return StringUtils.EMPTY_STRING;
+        }
+        try {
+            return "urls:" + ConvertUtils.getJsonMapper().writeValueAsString(urls) + ',';
+        } catch (JsonProcessingException e) {
+            context.warn("Some problems with serialize urls " + e.getMessage(), null);
+        }
+        return StringUtils.EMPTY_STRING;
     }
 
     @Override

@@ -15,6 +15,7 @@
  */
 package io.micronaut.openapi.view;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -25,9 +26,12 @@ import java.util.stream.Collectors;
 import io.micronaut.core.util.StringUtils;
 import io.micronaut.inject.visitor.VisitorContext;
 import io.micronaut.openapi.visitor.OpenApiApplicationVisitor;
+import io.micronaut.openapi.visitor.Pair;
 import io.micronaut.openapi.visitor.Utils;
+import io.micronaut.openapi.visitor.group.GroupProperties;
+import io.micronaut.openapi.visitor.group.OpenApiInfo;
 
-import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.MICRONAUT_INTERNAL_OPENAPI_FILENAME;
+import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.getGroupProperties;
 
 /**
  * Abstract View Config.
@@ -39,21 +43,32 @@ abstract class AbstractViewConfig {
     protected String prefix;
     protected String jsUrl = "";
     protected String specUrl;
-    protected String finalUrlPrefix;
+    /**
+     * URL prefix from config properties.
+     */
+    protected String urlPrefix;
+    /**
+     * URL prefix for templates and resources.
+     */
+    protected String fullUrlPrefix;
     protected String resourcesContextPath = "/res";
     protected String templatePath;
     protected boolean isDefaultJsUrl = true;
     protected boolean copyResources = true;
     protected boolean withFinalUrlPrefixCache = true;
+    protected String primaryName;
+    protected List<OpenApiUrl> urls = new ArrayList<>();
     protected Map<String, Object> options = new HashMap<>();
-
+    protected Map<Pair<String, String>, OpenApiInfo> openApiInfos;
     /**
      * An AbstractViewConfig.
      *
      * @param prefix The configuration key prefix.
+     * @param openApiInfos Inforamtion about all generated openAPI files.
      */
-    protected AbstractViewConfig(String prefix) {
+    protected AbstractViewConfig(String prefix, Map<Pair<String, String>, OpenApiInfo> openApiInfos) {
         this.prefix = prefix;
+        this.openApiInfos = openApiInfos;
     }
 
     /**
@@ -97,8 +112,8 @@ abstract class AbstractViewConfig {
     }
 
     protected String getFinalUrlPrefix(OpenApiViewConfig.RendererType rendererType, VisitorContext context) {
-        if (finalUrlPrefix != null && withFinalUrlPrefixCache) {
-            return finalUrlPrefix;
+        if (fullUrlPrefix != null && withFinalUrlPrefixCache) {
+            return fullUrlPrefix;
         }
 
         // process micronaut.openapi.server.context.path
@@ -121,6 +136,8 @@ abstract class AbstractViewConfig {
             finalUrl += OpenApiViewConfig.SLASH;
         }
 
+        urlPrefix = finalUrl;
+
         // standard path
         finalUrl += rendererType.getTemplatePath();
         finalUrl += finalUrl.endsWith(OpenApiViewConfig.SLASH) ? resourcesContextPath.substring(1) : resourcesContextPath;
@@ -128,7 +145,7 @@ abstract class AbstractViewConfig {
             finalUrl += OpenApiViewConfig.SLASH;
         }
 
-        finalUrlPrefix = finalUrl;
+        fullUrlPrefix = finalUrl;
 
         return finalUrl;
     }
@@ -144,17 +161,47 @@ abstract class AbstractViewConfig {
      *
      * @return A View config.
      */
-    static <T extends AbstractViewConfig> T fromProperties(T cfg, Map<String, Object> defaultOptions, Map<String, String> properties, VisitorContext context) {
+    static <T extends AbstractViewConfig> T fromProperties(T cfg, Map<String, Object> defaultOptions, Map<String, String> properties, OpenApiViewConfig.RendererType rendererType, VisitorContext context) {
 
         String copyResources = properties.get(cfg.prefix + "copy-resources");
         if (StringUtils.isNotEmpty(copyResources) && "false".equalsIgnoreCase(copyResources)) {
             cfg.copyResources = false;
         }
 
-        String specUrl = properties.get(cfg.prefix + "spec.url");
-        if (specUrl != null) {
-            cfg.specUrl = specUrl.replace(Utils.PLACEHOLDER_PREFIX + "filename" + Utils.PLACEHOLDER_POSTFIX,
-                context != null ? context.get(MICRONAUT_INTERNAL_OPENAPI_FILENAME, String.class).orElse("") : "");
+        boolean withUrls = cfg.openApiInfos.size() > 1 || cfg.openApiInfos.get(Pair.NULL_STRING_PAIR) == null;
+
+        if (withUrls) {
+            List<OpenApiUrl> urls = new ArrayList<>();
+            for (OpenApiInfo openApiInfo : cfg.openApiInfos.values()) {
+                String groupName = openApiInfo.getGroupName();
+                String version = openApiInfo.getVersion();
+                if (StringUtils.isEmpty(groupName)) {
+                    continue;
+                }
+
+                GroupProperties groupProperties = getGroupProperties(groupName, context);
+                if (groupProperties != null && groupProperties.getTitle() != null) {
+                    groupName = groupProperties.getTitle();
+                }
+                cfg.getFinalUrlPrefix(OpenApiViewConfig.RendererType.SWAGGER_UI, context);
+                String groupUrl = cfg.urlPrefix + (!cfg.urlPrefix.endsWith("/") ? "/swagger/" : "swagger/") + openApiInfo.getFilename();
+                if (groupUrl != null) {
+                    urls.add(new OpenApiUrl(groupUrl, groupName));
+                }
+            }
+            cfg.urls = urls;
+        } else {
+            String specUrl = properties.get(cfg.prefix + "spec.url");
+            if (specUrl != null) {
+
+                String filenameFromContext = null;
+                if (context != null) {
+                    filenameFromContext = cfg.openApiInfos.get(Pair.NULL_STRING_PAIR).getFilename();
+                }
+
+                cfg.specUrl = specUrl.replace(Utils.PLACEHOLDER_PREFIX + "filename" + Utils.PLACEHOLDER_POSTFIX,
+                    filenameFromContext != null ? filenameFromContext : "");
+            }
         }
 
         String jsUrl = properties.get(cfg.prefix + "js.url");
@@ -220,7 +267,7 @@ abstract class AbstractViewConfig {
      * @return A quoted String.
      */
     static Object asQuotedString(String v) {
-        return v == null ? null : '"' + v + '"';
+        return v == null ? null : "\"" + v + '"';
     }
 
     /**
@@ -249,6 +296,25 @@ abstract class AbstractViewConfig {
         @Override
         public Object apply(String v) {
             return v == null ? null : Enum.valueOf(type, v.toUpperCase(Locale.US));
+        }
+    }
+
+    static class OpenApiUrl {
+
+        private final String url;
+        private final String name;
+
+        OpenApiUrl(String url, String name) {
+            this.url = url;
+            this.name = name;
+        }
+
+        public String getUrl() {
+            return url;
+        }
+
+        public String getName() {
+            return name;
         }
     }
 }

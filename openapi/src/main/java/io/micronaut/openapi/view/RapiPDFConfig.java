@@ -24,6 +24,8 @@ import java.util.function.Function;
 
 import io.micronaut.inject.visitor.VisitorContext;
 import io.micronaut.openapi.view.OpenApiViewConfig.RendererType;
+import io.micronaut.openapi.visitor.Pair;
+import io.micronaut.openapi.visitor.group.OpenApiInfo;
 
 /**
  * RapiPDF configuration.
@@ -89,8 +91,8 @@ final class RapiPDFConfig extends AbstractViewConfig {
 
     boolean enabled; //false
 
-    private RapiPDFConfig() {
-        super("rapipdf.");
+    private RapiPDFConfig(Map<Pair<String, String>, OpenApiInfo> openApiInfos) {
+        super("rapipdf.", openApiInfos);
         jsUrl = DEFAULT_RAPIPDF_JS_PATH;
         withFinalUrlPrefixCache = false;
     }
@@ -103,10 +105,10 @@ final class RapiPDFConfig extends AbstractViewConfig {
      *
      * @return A RapipdfConfig.
      */
-    static RapiPDFConfig fromProperties(Map<String, String> properties, VisitorContext context) {
-        RapiPDFConfig cfg = new RapiPDFConfig();
+    static RapiPDFConfig fromProperties(Map<String, String> properties, Map<Pair<String, String>, OpenApiInfo> openApiInfos, VisitorContext context) {
+        RapiPDFConfig cfg = new RapiPDFConfig(openApiInfos);
         cfg.enabled = "true".equals(properties.getOrDefault("rapipdf.enabled", Boolean.FALSE.toString()));
-        return AbstractViewConfig.fromProperties(cfg, DEFAULT_OPTIONS, properties, context);
+        return AbstractViewConfig.fromProperties(cfg, DEFAULT_OPTIONS, properties, null, context);
     }
 
     /**
