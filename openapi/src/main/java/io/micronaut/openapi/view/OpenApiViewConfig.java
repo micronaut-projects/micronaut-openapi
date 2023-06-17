@@ -125,6 +125,7 @@ public final class OpenApiViewConfig {
      * Creates an OpenApiViewConfig form a String representation.
      *
      * @param specification A String representation of an OpenApiViewConfig.
+     * @param openApiInfos Open API info objects.
      * @param openApiProperties The open api properties.
      * @param context Visitor context.
      *
@@ -144,10 +145,10 @@ public final class OpenApiViewConfig {
             cfg.rapidocConfig = RapidocConfig.fromProperties(openApiMap, openApiInfos, context);
             cfg.rapidocConfig.rapiPDFConfig = rapiPDFConfig;
         }
-//        if ("true".equals(openApiMap.getOrDefault("swagger-ui.enabled", Boolean.FALSE.toString()))) {
+        if ("true".equals(openApiMap.getOrDefault("swagger-ui.enabled", Boolean.FALSE.toString()))) {
             cfg.swaggerUIConfig = SwaggerUIConfig.fromProperties(openApiMap, openApiInfos, context);
             cfg.swaggerUIConfig.rapiPDFConfig = rapiPDFConfig;
-//        }
+        }
         cfg.mappingPath = openApiMap.getOrDefault("mapping.path", "swagger");
         return cfg;
     }

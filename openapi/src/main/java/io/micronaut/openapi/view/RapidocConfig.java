@@ -389,6 +389,7 @@ final class RapidocConfig extends AbstractViewConfig {
      * Builds a RapidocConfig given a set of properties.
      *
      * @param properties A set of properties.
+     * @param openApiInfos Open API info objects.
      * @param context Visitor context.
      *
      * @return A RapidocConfig.

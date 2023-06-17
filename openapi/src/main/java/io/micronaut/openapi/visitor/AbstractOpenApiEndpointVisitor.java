@@ -68,6 +68,7 @@ import io.micronaut.inject.ast.Element;
 import io.micronaut.inject.ast.ElementQuery;
 import io.micronaut.inject.ast.FieldElement;
 import io.micronaut.inject.ast.MethodElement;
+import io.micronaut.inject.ast.PackageElement;
 import io.micronaut.inject.ast.ParameterElement;
 import io.micronaut.inject.ast.TypedElement;
 import io.micronaut.inject.visitor.VisitorContext;
@@ -76,6 +77,8 @@ import io.micronaut.openapi.annotation.OpenAPIGroup;
 import io.micronaut.openapi.javadoc.JavadocDescription;
 import io.micronaut.openapi.swagger.PrimitiveType;
 import io.micronaut.openapi.visitor.group.EndpointInfo;
+import io.micronaut.openapi.visitor.group.GroupProperties;
+import io.micronaut.openapi.visitor.group.GroupProperties.PackageProperties;
 import io.micronaut.openapi.visitor.group.RouterVersioningProperties;
 import io.micronaut.openapi.visitor.security.InterceptUrlMapPattern;
 import io.micronaut.openapi.visitor.security.SecurityProperties;
@@ -115,6 +118,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 import static io.micronaut.openapi.visitor.ElementUtils.isFileUpload;
 import static io.micronaut.openapi.visitor.ElementUtils.isNullable;
+import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.getGroupsPropertiesMap;
 import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.getSecurityProperties;
 import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.isOpenApiEnabled;
 import static io.micronaut.openapi.visitor.SchemaUtils.COMPONENTS_CALLBACKS_PREFIX;
@@ -370,7 +374,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         }
         incrementVisitedElements(context);
         OpenAPI openAPI = Utils.resolveOpenApi(context);
-        JavadocDescription javadocDescription = null;
+        JavadocDescription javadocDescription;
         boolean permitsRequestBody = HttpMethod.permitsRequestBody(httpMethod);
 
         Map<String, List<PathItem>> pathItemsMap = resolvePathItems(context, matchTemplates);
@@ -1748,71 +1752,94 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                                                  HttpMethod httpMethod,
                                                  List<MediaType> consumesMediaTypes,
                                                  List<MediaType> producesMediaTypes,
-                                                 MethodElement element, VisitorContext context) {
+                                                 MethodElement methodElement, VisitorContext context) {
 
         String methodKey = httpMethod.name()
             + '#' + url
             + '#' + CollectionUtils.toString(CollectionUtils.isEmpty(consumesMediaTypes) ? DEFAULT_MEDIA_TYPES : consumesMediaTypes)
             + '#' + CollectionUtils.toString(CollectionUtils.isEmpty(producesMediaTypes) ? DEFAULT_MEDIA_TYPES : producesMediaTypes);
 
-        List<String> groups = null;
-        List<String> excludedGroups = null;
-        List<AnnotationValue<OpenAPIGroup>> groupAnnotations = element.getAnnotationValuesByType(OpenAPIGroup.class);
-        if (CollectionUtils.isNotEmpty(groupAnnotations)) {
-            AnnotationValue<OpenAPIGroup> annotationValue = groupAnnotations.get(0);
-            groups = Arrays.asList(annotationValue.stringValues("value"));
-            Set<String> allKnownGroups = Utils.getAllKnownGroups();
-            if (allKnownGroups == null) {
-                allKnownGroups = new HashSet<>();
-                Utils.setAllKnownGroups(allKnownGroups);
+        Map<String, GroupProperties> groupPropertiesMap = getGroupsPropertiesMap(context);
+        List<String> groups = new ArrayList<>();
+        List<String> excludedGroups = new ArrayList<>();
+
+        PackageElement packageElement = methodElement.getDeclaringType().getPackage();
+        String packageName = packageElement.getName();
+
+        processGroups(groups, excludedGroups, methodElement.getAnnotationValuesByType(OpenAPIGroup.class), groupPropertiesMap);
+        processGroups(groups, excludedGroups, packageElement.getAnnotationValuesByType(OpenAPIGroup.class), groupPropertiesMap);
+        // properties from system properties or from environment more priority than annotations
+        for (GroupProperties groupProperties : groupPropertiesMap.values()) {
+            if (CollectionUtils.isNotEmpty(groupProperties.getPackages())) {
+                for (PackageProperties groupPackage : groupProperties.getPackages()) {
+                    boolean isInclude = groupPackage.isIncludeSubpackages() ? packageName.startsWith(groupPackage.getName()) : packageName.equals(groupPackage.getName());
+                    if (isInclude) {
+                        groups.add(groupProperties.getName());
+                    }
+                }
             }
-            allKnownGroups.addAll(groups);
-
-            excludedGroups = Arrays.asList(annotationValue.stringValues("excluded"));
-        }
-
-        String version = null;
-        List<AnnotationValue<Version>> versionsAnnotations = element.getAnnotationValuesByType(Version.class);
-        if (CollectionUtils.isNotEmpty(versionsAnnotations)) {
-            version = versionsAnnotations.get(0).stringValue().orElse(null);
-        }
-
-        if (version != null) {
-            Set<String> allKnownVersions = Utils.getAllKnownVersions();
-            if (allKnownVersions == null) {
-                allKnownVersions = new HashSet<>();
-                Utils.setAllKnownVersions(allKnownVersions);
+            if (CollectionUtils.isNotEmpty(groupProperties.getPackagesExclude())) {
+                for (PackageProperties excludePackage : groupProperties.getPackagesExclude()) {
+                    boolean isExclude = excludePackage.isIncludeSubpackages() ? packageName.startsWith(excludePackage.getName()) : packageName.equals(excludePackage.getName());
+                    if (isExclude) {
+                        excludedGroups.add(groupProperties.getName());
+                    }
+                }
             }
-            allKnownVersions.add(version);
         }
-
-        Map<String, List<EndpointInfo>> endpointInfosMap = Utils.getEndpointInfos();
-        if (endpointInfosMap == null) {
-            endpointInfosMap = new HashMap<>();
-            Utils.setEndpointInfos(endpointInfosMap);
-        }
-        List<EndpointInfo> endpointInfos = endpointInfosMap.computeIfAbsent(methodKey, (k) -> new ArrayList<>());
-        endpointInfos.add(new EndpointInfo(
-            url,
-            httpMethod,
-            element,
-            swaggerOperation,
-            version,
-            groups,
-            excludedGroups));
 
         RouterVersioningProperties versioningProperties = OpenApiApplicationVisitor.getRouterVersioningProperties(context);
-        if (!versioningProperties.isEnabled() || !versioningProperties.isRouterVersiningEnabled()
-            || (!versioningProperties.isHeaderEnabled() && !versioningProperties.isParameterEnabled())) {
+        boolean isVersioningEnabled = versioningProperties.isEnabled() && versioningProperties.isRouterVersiningEnabled()
+            && (versioningProperties.isHeaderEnabled() || versioningProperties.isParameterEnabled());
+
+        if (isVersioningEnabled) {
+
+            String version = null;
+
+            List<AnnotationValue<Version>> versionsAnnotations = methodElement.getAnnotationValuesByType(Version.class);
+            if (CollectionUtils.isNotEmpty(versionsAnnotations)) {
+                version = versionsAnnotations.get(0).stringValue().orElse(null);
+            }
+
+            if (version != null) {
+                Utils.getAllKnownVersions().add(version);
+            }
+
+            Map<String, List<EndpointInfo>> endpointInfosMap = Utils.getEndpointInfos();
+            if (endpointInfosMap == null) {
+                endpointInfosMap = new HashMap<>();
+                Utils.setEndpointInfos(endpointInfosMap);
+            }
+            List<EndpointInfo> endpointInfos = endpointInfosMap.computeIfAbsent(methodKey, (k) -> new ArrayList<>());
+            endpointInfos.add(new EndpointInfo(
+                url,
+                httpMethod,
+                methodElement,
+                swaggerOperation,
+                version,
+                groups,
+                excludedGroups));
+
+            if (versioningProperties.isParameterEnabled()) {
+                addVersionParameters(swaggerOperation, versioningProperties.getParameterNames(), false);
+            }
+            if (versioningProperties.isHeaderEnabled()) {
+                addVersionParameters(swaggerOperation, versioningProperties.getHeaderNames(), true);
+            }
+        }
+    }
+
+    private void processGroups(List<String> groups, List<String> excludedGroups, List<AnnotationValue<OpenAPIGroup>> annotationValues, Map<String, GroupProperties> groupPropertiesMap) {
+        if (CollectionUtils.isEmpty(annotationValues)) {
             return;
         }
-
-        if (versioningProperties.isParameterEnabled()) {
-            addVersionParameters(swaggerOperation, versioningProperties.getParameterNames(), false);
+        for (AnnotationValue<OpenAPIGroup> annValue : annotationValues) {
+            groups.addAll(Arrays.asList(annValue.stringValues("value")));
+            excludedGroups.addAll(Arrays.asList(annValue.stringValues("exclude")));
         }
-        if (versioningProperties.isHeaderEnabled()) {
-            addVersionParameters(swaggerOperation, versioningProperties.getHeaderNames(), true);
-        }
+        Set<String> allKnownGroups = Utils.getAllKnownGroups();
+        allKnownGroups.addAll(groups);
+        allKnownGroups.addAll(excludedGroups);
     }
 
     private void addVersionParameters(io.swagger.v3.oas.models.Operation swaggerOperation, List<String> names, boolean isHeader) {

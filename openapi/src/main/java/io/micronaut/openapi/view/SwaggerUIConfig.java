@@ -237,6 +237,7 @@ final class SwaggerUIConfig extends AbstractViewConfig {
      * Builds a SwaggerUIConfig given a set of properties.
      *
      * @param properties A set of properties.
+     * @param openApiInfos Open API info objects.
      * @param context Visitor context.
      *
      * @return A SwaggerUIConfig.
@@ -270,7 +271,7 @@ final class SwaggerUIConfig extends AbstractViewConfig {
         template = template.replace("{{" + PREFIX_SWAGGER_UI + ".theme}}", theme == null || Theme.CLASSIC == theme ? StringUtils.EMPTY_STRING :
             "<link rel='stylesheet' type='text/css' href='" + (isDefaultThemeUrl ? finalUrlPrefix + theme.getCss() + ".css" : themeUrl) + "' />");
         template = template.replace("{{" + PREFIX_SWAGGER_UI + DOT + OPTION_OAUTH2 + "}}", hasOauth2Option(options) ? toOauth2Options() : StringUtils.EMPTY_STRING);
-        template = template.replace("{{" + PREFIX_SWAGGER_UI + DOT + OPTION_PRIMARY_NAME + "}}", StringUtils.isNotEmpty(primaryName) ? primaryName : StringUtils.EMPTY_STRING);
+        template = template.replace("{{" + PREFIX_SWAGGER_UI + DOT + OPTION_PRIMARY_NAME + "}}", StringUtils.isNotEmpty(primaryName) ? getPrimaryName(context) : StringUtils.EMPTY_STRING);
         template = template.replace("{{" + PREFIX_SWAGGER_UI + DOT + OPTION_URLS + "}}", getUrlStr(context));
         return template;
     }
@@ -280,7 +281,7 @@ final class SwaggerUIConfig extends AbstractViewConfig {
         if (StringUtils.isEmpty(primaryName)) {
             return StringUtils.EMPTY_STRING;
         }
-        return "urls.primaryName:" + primaryName + ',';
+        return "\"urls.primaryName\":\"" + primaryName + "\",";
     }
 
     @NonNull

@@ -20,6 +20,7 @@ import java.io.StringWriter;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -65,7 +66,7 @@ public final class Utils {
     private static PropertyPlaceholderResolver propertyPlaceholderResolver;
     private static OpenAPI testReference;
     /**
-     * OpenAPI objects by key - Pair.of(group, version)
+     * OpenAPI objects by key - {@code Pair.of(group, version)}.
      */
     private static Map<Pair<String, String>, OpenApiInfo> testReferences;
     private static String testFileName;
@@ -238,6 +239,9 @@ public final class Utils {
     }
 
     public static Set<String> getAllKnownVersions() {
+        if (allKnownVersions == null) {
+            allKnownVersions = new HashSet<>();
+        }
         return allKnownVersions;
     }
 
@@ -246,6 +250,9 @@ public final class Utils {
     }
 
     public static Set<String> getAllKnownGroups() {
+        if (allKnownGroups == null) {
+            allKnownGroups = new HashSet<>();
+        }
         return allKnownGroups;
     }
 

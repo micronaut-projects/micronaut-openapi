@@ -60,6 +60,7 @@ abstract class AbstractViewConfig {
     protected List<OpenApiUrl> urls = new ArrayList<>();
     protected Map<String, Object> options = new HashMap<>();
     protected Map<Pair<String, String>, OpenApiInfo> openApiInfos;
+
     /**
      * An AbstractViewConfig.
      *
@@ -157,6 +158,7 @@ abstract class AbstractViewConfig {
      * @param cfg A View config.
      * @param defaultOptions The default options.
      * @param properties The options to parse.
+     * @param rendererType The render type.
      * @param context Visitor context.
      *
      * @return A View config.
@@ -168,34 +170,47 @@ abstract class AbstractViewConfig {
             cfg.copyResources = false;
         }
 
-        boolean withUrls = cfg.openApiInfos.size() > 1 || cfg.openApiInfos.get(Pair.NULL_STRING_PAIR) == null;
+        boolean withUrls = cfg.openApiInfos != null && (cfg.openApiInfos.size() > 1 || cfg.openApiInfos.get(Pair.NULL_STRING_PAIR) == null);
 
         if (withUrls) {
+
+            String primaryName = null;
             List<OpenApiUrl> urls = new ArrayList<>();
             for (OpenApiInfo openApiInfo : cfg.openApiInfos.values()) {
                 String groupName = openApiInfo.getGroupName();
                 String version = openApiInfo.getVersion();
-                if (StringUtils.isEmpty(groupName)) {
+                if (StringUtils.isEmpty(groupName) && StringUtils.isEmpty(version)) {
                     continue;
                 }
 
-                GroupProperties groupProperties = getGroupProperties(groupName, context);
-                if (groupProperties != null && groupProperties.getTitle() != null) {
-                    groupName = groupProperties.getTitle();
+                if (StringUtils.isEmpty(groupName)) {
+                    groupName = version;
                 }
+
+                GroupProperties groupProperties = getGroupProperties(groupName, context);
+                if (groupProperties != null) {
+                    if (groupProperties.getDisplayName() != null) {
+                        groupName = groupProperties.getDisplayName();
+                    }
+                    if (groupProperties.getPrimary() != null && groupProperties.getPrimary()) {
+                        primaryName = groupName;
+                    }
+                }
+
                 cfg.getFinalUrlPrefix(OpenApiViewConfig.RendererType.SWAGGER_UI, context);
                 String groupUrl = cfg.urlPrefix + (!cfg.urlPrefix.endsWith("/") ? "/swagger/" : "swagger/") + openApiInfo.getFilename();
-                if (groupUrl != null) {
-                    urls.add(new OpenApiUrl(groupUrl, groupName));
-                }
+                urls.add(new OpenApiUrl(groupUrl, groupName));
             }
             cfg.urls = urls;
+            if (primaryName != null) {
+                cfg.primaryName = primaryName;
+            }
         } else {
             String specUrl = properties.get(cfg.prefix + "spec.url");
             if (specUrl != null) {
 
                 String filenameFromContext = null;
-                if (context != null) {
+                if (context != null && cfg.openApiInfos != null) {
                     filenameFromContext = cfg.openApiInfos.get(Pair.NULL_STRING_PAIR).getFilename();
                 }
 

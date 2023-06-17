@@ -28,7 +28,6 @@ import java.nio.file.StandardOpenOption;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -75,6 +74,7 @@ import io.micronaut.openapi.postprocessors.OpenApiOperationsPostProcessor;
 import io.micronaut.openapi.view.OpenApiViewConfig;
 import io.micronaut.openapi.visitor.group.EndpointInfo;
 import io.micronaut.openapi.visitor.group.GroupProperties;
+import io.micronaut.openapi.visitor.group.GroupProperties.PackageProperties;
 import io.micronaut.openapi.visitor.group.OpenApiInfo;
 import io.micronaut.openapi.visitor.group.RouterVersioningProperties;
 import io.micronaut.openapi.visitor.security.InterceptUrlMapConverter;
@@ -680,20 +680,19 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         return routerVersioningProperties;
     }
 
-    public static Collection<GroupProperties> getGroupProperties(VisitorContext context) {
-        return getGroupsProperties(null, context);
-    }
-
     public static GroupProperties getGroupProperties(String groupName, VisitorContext context) {
-        Collection<GroupProperties> allGroupsProperties = getGroupsProperties(groupName, context);
-        return allGroupsProperties != null ? allGroupsProperties.iterator().next() : null;
+        if (groupName == null) {
+            return null;
+        }
+        Map<String, GroupProperties> allGroupsProperties = getGroupsPropertiesMap(context);
+        return CollectionUtils.isNotEmpty(allGroupsProperties) ? allGroupsProperties.get(groupName) : null;
     }
 
-    private static Collection<GroupProperties> getGroupsProperties(String groupName, VisitorContext context) {
+    public static Map<String, GroupProperties> getGroupsPropertiesMap(VisitorContext context) {
 
         Map<String, GroupProperties> groupPropertiesMap = (Map<String, GroupProperties>) context.get(MICRONAUT_INTERNAL_GROUPS, Map.class).orElse(null);
         if (groupPropertiesMap != null) {
-            return groupName != null ? Collections.singletonList(groupPropertiesMap.get(groupName)) : groupPropertiesMap.values();
+            return groupPropertiesMap;
         }
 
         groupPropertiesMap = new HashMap<>();
@@ -710,12 +709,19 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         Environment environment = getEnv(context);
         if (environment != null) {
             for (Map.Entry<String, Object> entry : environment.getProperties(MICRONAUT_OPENAPI_GROUPS, StringConvention.RAW).entrySet()) {
-                setGroupProperty(entry.getKey(), entry.getKey(), entry.getValue(), groupPropertiesMap, context);
+                String entryKey = entry.getKey();
+                String[] propParts = entryKey.split("\\.");
+                String propName = propParts[propParts.length - 1];
+                String groupName = entryKey.substring(0, entryKey.length() - propName.length() - 1);
+                setGroupProperty(groupName, propName, entry.getValue(), groupPropertiesMap, context);
             }
         }
+
+        Utils.getAllKnownGroups().addAll(groupPropertiesMap.keySet());
+
         context.put(MICRONAUT_INTERNAL_GROUPS, groupPropertiesMap);
 
-        return groupName != null ? Collections.singletonList(groupPropertiesMap.get(groupName)) : groupPropertiesMap.values();
+        return groupPropertiesMap;
     }
 
     private static void readGroupsProperties(Properties props, Map<String, GroupProperties> groupPropertiesMap, VisitorContext context) {
@@ -734,6 +740,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             setGroupProperty(groupName, prop, value, groupPropertiesMap, context);
         }
     }
+
     private static void setGroupProperty(String groupName, String propertyName, Object value, Map<String, GroupProperties> groupPropertiesMap, VisitorContext context) {
         if (value == null) {
             return;
@@ -741,9 +748,10 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         String valueStr = value.toString();
         GroupProperties groupProperties = groupPropertiesMap.computeIfAbsent(groupName, GroupProperties::new);
         switch (propertyName.toLowerCase()) {
-            case "title":
-                if (groupProperties.getTitle() == null) {
-                    groupProperties.setTitle(valueStr);
+            case "display-name":
+            case "displayname":
+                if (groupProperties.getDisplayName() == null) {
+                    groupProperties.setDisplayName(valueStr);
                 }
                 break;
             case "filename":
@@ -751,7 +759,46 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                     groupProperties.setFilename(valueStr);
                 }
                 break;
+            case "packages":
+                if (groupProperties.getPackages() == null) {
+                    List<PackageProperties> packages = new ArrayList<>();
+                    for (String groupPackage : valueStr.split(",")) {
+                        packages.add(getPackageProperties(groupPackage));
+                    }
+                    groupProperties.setPackages(packages);
+                }
+                break;
+            case "primary":
+                if (groupProperties.getPrimary() == null) {
+                    groupProperties.setPrimary(Boolean.valueOf(valueStr));
+                }
+                break;
+            case "packagesexclude":
+            case "packages-exclude":
+            case "packages.exclude":
+                if (groupProperties.getPackagesExclude() == null) {
+                    List<PackageProperties> packagesExclude = new ArrayList<>();
+                    for (String groupPackage : valueStr.split(",")) {
+                        packagesExclude.add(getPackageProperties(groupPackage));
+                    }
+                    groupProperties.setPackagesExclude(packagesExclude);
+                }
+                break;
+            default:
+                break;
         }
+    }
+
+    private static PackageProperties getPackageProperties(String groupPackage) {
+        groupPackage = groupPackage.trim();
+        boolean includeSubpackages = groupPackage.endsWith("*");
+        if (includeSubpackages) {
+            groupPackage = groupPackage.substring(0, groupPackage.length() - 2);
+        }
+        if (groupPackage.endsWith(".")) {
+            groupPackage = groupPackage.substring(0, groupPackage.length() - 2);
+        }
+        return new PackageProperties(groupPackage, includeSubpackages);
     }
 
     public static boolean getBooleanProperty(String property, boolean defaultValue, VisitorContext context) {
@@ -997,7 +1044,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             Optional.ofNullable(from.getComponents()).ifPresent(components -> {
                 Map<String, Schema> schemas = components.getSchemas();
 
-                if (schemas != null && !schemas.isEmpty()) {
+                if (CollectionUtils.isNotEmpty(schemas)) {
                     schemas.forEach((k, v) -> {
                         if (v.getName() == null) {
                             v.setName(k);
@@ -1033,12 +1080,12 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
     private void renderViews(String title, Map<Pair<String, String>, OpenApiInfo> openApiInfos, Path destinationDir, VisitorContext context) throws IOException {
         String viewSpecification = getConfigurationProperty(MICRONAUT_OPENAPI_VIEWS_SPEC, context);
         OpenApiViewConfig cfg = OpenApiViewConfig.fromSpecification(viewSpecification, openApiInfos, readOpenApiConfigFile(context), context);
-//        if (cfg.isEnabled()) {
+        if (cfg.isEnabled()) {
             cfg.setTitle(title);
             cfg.setSpecFile(openApiInfos.values().iterator().next().getSpecFilePath());
             cfg.setServerContextPath(getConfigurationProperty(MICRONAUT_OPENAPI_CONTEXT_SERVER_PATH, context));
             cfg.render(destinationDir, context);
-//        }
+        }
     }
 
     private static PropertyNamingStrategies.NamingBase fromName(String name) {
@@ -1323,7 +1370,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             OpenAPI openApi = attr.get();
             processEndpoints(context);
 
-            mergeMicronautEndpointInfos(openApi, context);
+//            mergeMicronautEndpointInfos(openApi, context);
             Map<Pair<String, String>, OpenApiInfo> openApiInfos = divideOpenapiByGroupsAndVersions(openApi, context);
             if (Utils.isTestMode()) {
                 Utils.setTestReferences(openApiInfos);
@@ -1368,8 +1415,6 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                         fileName = fileName.replaceAll("\\$\\{version}", versionFromInfo);
                     }
                 }
-
-                context.warn("openApiInfos.size() = " + openApiInfos.size(), null);
 
                 // contruct filename for group
                 if (openApiInfos.size() > 1) {
@@ -1424,7 +1469,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
 
         for (List<EndpointInfo> endpointInfos : endpointInfosMap.values()) {
             for (EndpointInfo endpointInfo : endpointInfos) {
-                if (CollectionUtils.isEmpty(endpointInfo.getGroups())) {
+                if (CollectionUtils.isEmpty(endpointInfo.getGroups()) && endpointInfo.getVersion() == null) {
                     commonEndpoints.add(endpointInfo);
                     continue;
                 }
@@ -1432,58 +1477,15 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                     if (CollectionUtils.isNotEmpty(endpointInfo.getExcludedGroups()) && endpointInfo.getExcludedGroups().contains(group)) {
                         continue;
                     }
-
-                    GroupProperties groupProperties = getGroupProperties(group, context);
-                    boolean hasGroupProperties = groupProperties != null;
-
-                    Pair<String, String> key = Pair.of(group, endpointInfo.getVersion());
-                    OpenApiInfo openApiInfo = result.get(key);
-                    OpenAPI newOpenApi;
-                    if (openApiInfo == null) {
-
-                        newOpenApi = new OpenAPI();
-
-                        openApiInfo = new OpenApiInfo(
-                            endpointInfo.getVersion(),
-                            group,
-                            hasGroupProperties ? groupProperties.getTitle() : null,
-                            hasGroupProperties ? groupProperties.getName() : null,
-                            newOpenApi
-                        );
-                        result.put(key, openApiInfo);
-
-                        newOpenApi.setTags(openApi.getTags());
-                        newOpenApi.setServers(openApi.getServers());
-                        newOpenApi.setInfo(openApi.getInfo());
-                        newOpenApi.setSecurity(openApi.getSecurity());
-                        newOpenApi.setExternalDocs(openApi.getExternalDocs());
-                    } else {
-                        newOpenApi = openApiInfo.getOpenApi();
-                    }
-                    io.swagger.v3.oas.models.Paths paths = newOpenApi.getPaths();
-                    if (paths == null) {
-                        paths = new io.swagger.v3.oas.models.Paths();
-                        newOpenApi.setPaths(paths);
-                    }
-                    PathItem pathItem = paths.computeIfAbsent(endpointInfo.getUrl(), (pathurl) -> new PathItem());
-                    Operation operation = getOperationOnPathItem(pathItem, endpointInfo.getHttpMethod());
-                    if (operation == null) {
-                        setOperationOnPathItem(pathItem, endpointInfo.getHttpMethod(), endpointInfo.getOperation());
-                        continue;
-                    }
-                    Operation newOperation;
-                    try {
-                        newOperation = ConvertUtils.getJsonMapper().treeToValue(ConvertUtils.getJsonMapper().valueToTree(operation), Operation.class);
-                    } catch (JsonProcessingException e) {
-                        context.warn("Error\n" + Utils.printStackTrace(e), null);
-                        continue;
-                    }
-                    setOperationOnPathItem(pathItem, endpointInfo.getHttpMethod(), SchemaUtils.mergeOperations(newOperation, endpointInfo.getOperation()));
+                    OpenAPI newOpenApi = addOpenApiInfo(group, endpointInfo.getVersion(), openApi, result, context);
+                    addOperation(endpointInfo, newOpenApi);
                 }
-//                } else {
-//                    // group by version
-//                    Pair<String, String> pair = Pair.of(null, endpointInfo.getVersion());
-//                    result.computeIfAbsent(pair, ())
+
+                // if we have only versions without groups
+                if (CollectionUtils.isEmpty(endpointInfo.getGroups())) {
+                    OpenAPI newOpenApi = addOpenApiInfo(null, endpointInfo.getVersion(), openApi, result, context);
+                    addOperation(endpointInfo, newOpenApi);
+                }
             }
         }
 
@@ -1496,29 +1498,71 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                 if (CollectionUtils.isNotEmpty(commonEndpoint.getExcludedGroups()) && commonEndpoint.getExcludedGroups().contains(group)) {
                     continue;
                 }
-                io.swagger.v3.oas.models.Paths paths = openAPI.getPaths();
-                if (paths == null) {
-                    paths = new io.swagger.v3.oas.models.Paths();
-                    openAPI.setPaths(paths);
-                }
-                PathItem pathItem = paths.computeIfAbsent(commonEndpoint.getUrl(), (pathurl) -> new PathItem());
-                Operation operation = getOperationOnPathItem(pathItem, commonEndpoint.getHttpMethod());
-                if (operation == null) {
-                    setOperationOnPathItem(pathItem, commonEndpoint.getHttpMethod(), commonEndpoint.getOperation());
-                    continue;
-                }
-                Operation newOperation;
-                try {
-                    newOperation = ConvertUtils.getJsonMapper().treeToValue(ConvertUtils.getJsonMapper().valueToTree(operation), Operation.class);
-                } catch (JsonProcessingException e) {
-                    context.warn("Error\n" + Utils.printStackTrace(e), null);
-                    continue;
-                }
-                setOperationOnPathItem(pathItem, commonEndpoint.getHttpMethod(), SchemaUtils.mergeOperations(newOperation, commonEndpoint.getOperation()));
+                addOperation(commonEndpoint, openAPI);
             }
         }
 
         return result;
+    }
+
+    private void addOperation(EndpointInfo endpointInfo, OpenAPI openApi) {
+        if (openApi == null) {
+            return;
+        }
+        io.swagger.v3.oas.models.Paths paths = openApi.getPaths();
+        if (paths == null) {
+            paths = new io.swagger.v3.oas.models.Paths();
+            openApi.setPaths(paths);
+        }
+        PathItem pathItem = paths.computeIfAbsent(endpointInfo.getUrl(), (pathurl) -> new PathItem());
+        Operation operation = getOperationOnPathItem(pathItem, endpointInfo.getHttpMethod());
+        if (operation == null) {
+            setOperationOnPathItem(pathItem, endpointInfo.getHttpMethod(), endpointInfo.getOperation());
+            return;
+        }
+        setOperationOnPathItem(pathItem, endpointInfo.getHttpMethod(), SchemaUtils.mergeOperations(operation, endpointInfo.getOperation()));
+    }
+
+    private OpenAPI addOpenApiInfo(String group, String version, OpenAPI openApi, Map<Pair<String, String>, OpenApiInfo> openApiInfoMap, VisitorContext context) {
+        GroupProperties groupProperties = getGroupProperties(group, context);
+        boolean hasGroupProperties = groupProperties != null;
+
+        Pair<String, String> key = Pair.of(group, version);
+        OpenApiInfo openApiInfo = openApiInfoMap.get(key);
+        OpenAPI newOpenApi;
+        if (openApiInfo == null) {
+
+            newOpenApi = new OpenAPI();
+
+            openApiInfo = new OpenApiInfo(
+                version,
+                group,
+                hasGroupProperties ? groupProperties.getDisplayName() : null,
+                hasGroupProperties ? groupProperties.getFilename() : null,
+                newOpenApi
+            );
+            openApiInfoMap.put(key, openApiInfo);
+
+            OpenAPI openApiCopy;
+            try {
+                openApiCopy = ConvertUtils.getJsonMapper().treeToValue(ConvertUtils.getJsonMapper().valueToTree(openApi), OpenAPI.class);
+            } catch (JsonProcessingException e) {
+                context.warn("Error\n" + Utils.printStackTrace(e), null);
+                return null;
+            }
+
+            newOpenApi.setTags(openApiCopy.getTags());
+            newOpenApi.setServers(openApiCopy.getServers());
+            newOpenApi.setInfo(openApiCopy.getInfo());
+            newOpenApi.setSecurity(openApiCopy.getSecurity());
+            newOpenApi.setExternalDocs(openApiCopy.getExternalDocs());
+            newOpenApi.setComponents(openApiCopy.getComponents());
+
+        } else {
+            newOpenApi = openApiInfo.getOpenApi();
+        }
+
+        return newOpenApi;
     }
 
     private void mergeMicronautEndpointInfos(OpenAPI openApi, VisitorContext context) {
@@ -1565,7 +1609,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                     // Create a copy of the keySet so that we can modify the map while in a foreach
                     Set<String> keySet = new HashSet<>(schemas.keySet());
                     for (String schemaName : keySet) {
-                        if (!openApiJson.contains(COMPONENTS_SCHEMAS_REF + schemaName)) {
+                        if (!openApiJson.contains("\"" + COMPONENTS_SCHEMAS_REF + schemaName + '"')) {
                             schemas.remove(schemaName);
                         }
                     }
@@ -1930,7 +1974,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
 
     private void processEndpoints(VisitorContext context) {
         EndpointsConfiguration endpointsCfg = endpointsConfiguration(context);
-        if (/*endpointsCfg.isEnabled() &&*/ CollectionUtils.isNotEmpty(endpointsCfg.getEndpoints())) {
+        if (endpointsCfg.isEnabled() && CollectionUtils.isNotEmpty(endpointsCfg.getEndpoints())) {
             OpenApiEndpointVisitor visitor = new OpenApiEndpointVisitor(true);
             endpointsCfg.getEndpoints().values().stream()
             .filter(endpoint -> endpoint.getClassElement().isPresent())

@@ -101,6 +101,7 @@ final class RapiPDFConfig extends AbstractViewConfig {
      * Builds a RapiPDFConfig given a set of properties.
      *
      * @param properties A set of properties.
+     * @param openApiInfos Open API info objects.
      * @param context Visitor context.
      *
      * @return A RapipdfConfig.

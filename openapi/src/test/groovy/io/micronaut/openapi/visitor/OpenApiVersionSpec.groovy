@@ -19,26 +19,12 @@ class OpenApiVersionSpec extends AbstractOpenApiTypeElementSpec {
         buildBeanDefinition('test.MyBean', '''
 package test;
 
-import io.micronaut.core.annotation.Introspected;
-import io.micronaut.core.version.annotation.Version;import io.micronaut.http.HttpResponse;
-import io.micronaut.http.MediaType;
+import io.micronaut.core.version.annotation.Version;
 import io.micronaut.http.annotation.Controller;
-import io.micronaut.http.annotation.Get;import io.micronaut.http.annotation.Post;
-import io.micronaut.http.multipart.CompletedFileUpload;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.enums.ParameterIn;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Encoding;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import jakarta.inject.Singleton;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
+import io.micronaut.http.annotation.Get;
+import io.micronaut.http.annotation.Post;
 
-import javax.validation.constraints.NotNull;
-import java.util.Map;
+import jakarta.inject.Singleton;
 
 @Controller("/versioned")
 class VersionedController {
@@ -53,6 +39,11 @@ class VersionedController {
     @Get("/hello")
     String helloV2() {
         return "helloV2";
+    }
+
+    @Post("/common")
+    String common() {
+        return null;
     }
 }
 

@@ -26,7 +26,7 @@ import io.swagger.v3.oas.models.Operation;
  * Entity to storage information about same swagger operations, but with different versions api.
  * Need it to merge them in post-processing.
  *
- * @since 4.9.1
+ * @since 4.9.2
  */
 @Internal
 public final class EndpointInfo {
