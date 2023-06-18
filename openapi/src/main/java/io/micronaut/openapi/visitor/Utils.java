@@ -20,7 +20,6 @@ import java.io.StringWriter;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -66,7 +65,15 @@ public final class Utils {
     /**
      * Groups openAPI objects, described by OpenAPIDefinition annotations.
      */
-    private static Map<String, OpenAPI> openApis = new HashMap<>();
+    private static Map<String, OpenAPI> openApis;
+    /**
+     * Group names by included controller or endpoint class names with OpenAPIInclude annotation.
+     */
+    private static Map<String, List<String>> includedClassesGroups;
+    /**
+     * Excluded group names by included controller or endpoint class names with OpenAPIInclude annotation.
+     */
+    private static Map<String, List<String>> includedClassesGroupsExcluded;
 
     private static PropertyPlaceholderResolver propertyPlaceholderResolver;
     private static OpenAPI testReference;
@@ -279,5 +286,37 @@ public final class Utils {
 
     public static void setOpenApis(Map<String, OpenAPI> openApis) {
         Utils.openApis = openApis;
+    }
+
+    public static Map<String, List<String>> getIncludedClassesGroups() {
+        return includedClassesGroups;
+    }
+
+    public static void setIncludedClassesGroups(Map<String, List<String>> includedClassesGroups) {
+        Utils.includedClassesGroups = includedClassesGroups;
+    }
+
+    public static Map<String, List<String>> getIncludedClassesGroupsExcluded() {
+        return includedClassesGroupsExcluded;
+    }
+
+    public static void setIncludedClassesGroupsExcluded(Map<String, List<String>> includedClassesGroupsExcluded) {
+        Utils.includedClassesGroupsExcluded = includedClassesGroupsExcluded;
+    }
+
+    public static void clean() {
+        openApis = null;
+        endpointInfos = null;
+        includedClassesGroups = null;
+        includedClassesGroupsExcluded = null;
+
+        allKnownGroups = null;
+        allKnownVersions = null;
+
+        testReference = null;
+        testReferences = null;
+        testFileName = null;
+        testYamlReference = null;
+        testJsonReference = null;
     }
 }

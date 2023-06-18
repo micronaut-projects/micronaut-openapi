@@ -1376,7 +1376,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             OpenAPI openApi = attr.get();
             processEndpoints(context);
 
-//            mergeMicronautEndpointInfos(openApi, context);
+            mergeMicronautEndpointInfos(openApi, context);
             Map<Pair<String, String>, OpenApiInfo> openApiInfos = divideOpenapiByGroupsAndVersions(openApi, context);
             if (Utils.isTestMode()) {
                 Utils.setTestReferences(openApiInfos);
@@ -1428,7 +1428,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                         fileName = openApiInfo.getFilename();
                     } else {
 
-                        // default name: swagger-<groupName>-<version>
+                        // default name: swagger-<version>-<groupName>-<apiVersion>
 
                         fileName = fileName.substring(0, fileName.length() - ext.length())
                             + (openApiInfo.getGroupName() != null ? "-" + openApiInfo.getGroupName() : StringUtils.EMPTY_STRING)
@@ -1436,8 +1436,11 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                     }
 
                     fileName = replacePlaceholders(fileName, context) + ext;
+                    if (fileName.contains("${apiVersion}")) {
+                        fileName = fileName.replaceAll("\\$\\{apiVersion}", openApiInfo.getVersion() != null ? openApiInfo.getVersion() : versionFromInfo);
+                    }
                     if (fileName.contains("${version}")) {
-                        fileName = fileName.replaceAll("\\$\\{version}", openApiInfo.getVersion() != null ? openApiInfo.getVersion() : versionFromInfo);
+                        fileName = fileName.replaceAll("\\$\\{version}", versionFromInfo);
                     }
                     if (fileName.contains("${group}")) {
                         fileName = fileName.replaceAll("\\$\\{group}", openApiInfo.getGroupName() != null ? openApiInfo.getGroupName() : StringUtils.EMPTY_STRING);
@@ -1601,7 +1604,9 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                     setOperationOnPathItem(pathItem, endpointInfo.getHttpMethod(), endpointInfo.getOperation());
                     continue;
                 }
-                setOperationOnPathItem(pathItem, endpointInfo.getHttpMethod(), SchemaUtils.mergeOperations(operation, endpointInfo.getOperation()));
+                if (endpointInfo.getVersion() == null) {
+                    setOperationOnPathItem(pathItem, endpointInfo.getHttpMethod(), SchemaUtils.mergeOperations(operation, endpointInfo.getOperation()));
+                }
             }
         }
     }

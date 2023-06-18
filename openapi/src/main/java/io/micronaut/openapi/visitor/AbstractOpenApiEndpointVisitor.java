@@ -565,11 +565,11 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
     }
 
     private void processParameterAnnotationInMethod(MethodElement element,
-                                                                                  OpenAPI openAPI,
-                                                                                  UriMatchTemplate matchTemplate,
-                                                                                  HttpMethod httpMethod,
-                                                                                  io.swagger.v3.oas.models.Operation operation,
-                                                                                  Map<String, UriMatchVariable> pathVariables) {
+                                                    OpenAPI openAPI,
+                                                    UriMatchTemplate matchTemplate,
+                                                    HttpMethod httpMethod,
+                                                    io.swagger.v3.oas.models.Operation operation,
+                                                    Map<String, UriMatchVariable> pathVariables) {
 
         List<AnnotationValue<io.swagger.v3.oas.annotations.Parameter>> parameterAnnotations = element
             .getDeclaredAnnotationValuesByType(io.swagger.v3.oas.annotations.Parameter.class);
@@ -1527,7 +1527,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             || parameter.isAnnotationPresent(Hidden.class)
             || parameter.isAnnotationPresent(JsonIgnore.class)
             || parameter.booleanValue(io.swagger.v3.oas.annotations.Parameter.class, "hidden")
-                .orElse(false)
+            .orElse(false)
             || isAnnotationPresent(parameter, "io.micronaut.session.annotation.SessionValue")
             || isIgnoredParameterType(parameter.getType());
     }
@@ -1763,11 +1763,15 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         List<String> groups = new ArrayList<>();
         List<String> excludedGroups = new ArrayList<>();
 
-        PackageElement packageEl = methodEl.getDeclaringType().getPackage();
+        ClassElement classEl = methodEl.getDeclaringType();
+        PackageElement packageEl = classEl.getPackage();
         String packageName = packageEl.getName();
 
         processGroups(groups, excludedGroups, methodEl.getAnnotationValuesByType(OpenAPIGroup.class), groupPropertiesMap);
         processGroups(groups, excludedGroups, packageEl.getAnnotationValuesByType(OpenAPIGroup.class), groupPropertiesMap);
+
+        processGroupsFromIncludedEndpoints(groups, excludedGroups, classEl.getName(), groupPropertiesMap);
+
         // properties from system properties or from environment more priority than annotations
         for (GroupProperties groupProperties : groupPropertiesMap.values()) {
             if (CollectionUtils.isNotEmpty(groupProperties.getPackages())) {
@@ -1838,6 +1842,22 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         Set<String> allKnownGroups = Utils.getAllKnownGroups();
         allKnownGroups.addAll(groups);
         allKnownGroups.addAll(excludedGroups);
+    }
+
+    private void processGroupsFromIncludedEndpoints(List<String> groups, List<String> excludedGroups, String className, Map<String, GroupProperties> groupPropertiesMap) {
+        if (CollectionUtils.isEmpty(Utils.getIncludedClassesGroups()) && CollectionUtils.isEmpty(Utils.getIncludedClassesGroupsExcluded())) {
+            return;
+        }
+
+        List<String> classGroups = Utils.getIncludedClassesGroups() != null ? Utils.getIncludedClassesGroups().get(className) : Collections.emptyList();
+        List<String> classExcludedGroups = Utils.getIncludedClassesGroupsExcluded() != null ? Utils.getIncludedClassesGroupsExcluded().get(className) : Collections.emptyList();
+
+        groups.addAll(classGroups);
+        excludedGroups.addAll(classExcludedGroups);
+
+        Set<String> allKnownGroups = Utils.getAllKnownGroups();
+        allKnownGroups.addAll(classGroups);
+        allKnownGroups.addAll(classExcludedGroups);
     }
 
     private void addVersionParameters(io.swagger.v3.oas.models.Operation swaggerOperation, List<String> names, boolean isHeader) {

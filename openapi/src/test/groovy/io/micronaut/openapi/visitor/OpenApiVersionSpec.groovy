@@ -3,9 +3,6 @@ package io.micronaut.openapi.visitor
 import io.micronaut.openapi.AbstractOpenApiTypeElementSpec
 import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.Operation
-import io.swagger.v3.oas.models.PathItem
-import io.swagger.v3.oas.models.media.Encoding
-import io.swagger.v3.oas.models.media.Schema
 
 class OpenApiVersionSpec extends AbstractOpenApiTypeElementSpec {
 
@@ -251,19 +248,32 @@ class MyBean {}
         operation.parameters
         operation.parameters.size() == 4
 
-        operation.parameters.get(0).name == "myApiHeader1"
-        operation.parameters.get(0).in == "header"
-        operation.parameters.get(0).schema.type == "string"
-        operation.parameters.get(1).name == "myApiHeader2"
-        operation.parameters.get(1).in == "header"
-        operation.parameters.get(1).schema.type == "string"
+        def found1 = false
+        def found2 = false
+        def found3 = false
+        def found4 = false
 
-        operation.parameters.get(2).name == "myApiParam2"
-        operation.parameters.get(2).in == "query"
-        operation.parameters.get(2).schema.type == "string"
-        operation.parameters.get(3).name == "myApiParam1"
-        operation.parameters.get(3).in == "query"
-        operation.parameters.get(3).schema.type == "string"
+        operation.parameters.forEach {
+            if (it.name == "myApiHeader1") {
+                it.in == "header"
+                it.schema.type == "string"
+                found1 = true
+            } else if (it.name == "myApiHeader2") {
+                it.in == "header"
+                it.schema.type == "string"
+                found2 = true
+            } else if (it.name == "myApiParam1") {
+                it.in == "query"
+                it.schema.type == "string"
+                found3 = true
+            } else if (it.name == "myApiParam2") {
+                it.in == "query"
+                it.schema.type == "string"
+                found4 = true
+            }
+        }
+
+        found1 && found2 && found3 && found4
 
         cleanup:
         System.clearProperty("micronaut.router.versioning.enabled")
@@ -360,4 +370,5 @@ class MyBean {}
         cleanup:
         System.clearProperty("micronaut.router.versioning.enabled")
         System.clearProperty("micronaut.router.versioning.parameter.enabled")
-    }}
+    }
+}

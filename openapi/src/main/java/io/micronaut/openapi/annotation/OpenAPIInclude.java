@@ -69,7 +69,7 @@ public @interface OpenAPIInclude {
      *
      * @since 4.9.2
      */
-    String[] groupsExclude() default {};
+    String[] groupsExcluded() default {};
 
     /**
      * @return Custom URI for controller
