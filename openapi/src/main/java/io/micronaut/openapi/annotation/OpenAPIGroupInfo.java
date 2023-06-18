@@ -17,20 +17,23 @@ package io.micronaut.openapi.annotation;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
+import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 import io.micronaut.context.annotation.AliasFor;
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
  * @since 4.9.2
  */
+@Repeatable(OpenAPIGroupInfos.class)
 @Retention(RUNTIME)
 @Documented
-@Target({ElementType.PACKAGE, ElementType.TYPE, ElementType.METHOD})
-public @interface OpenAPIGroup {
+@Target({ElementType.PACKAGE, ElementType.TYPE, ElementType.ANNOTATION_TYPE})
+public @interface OpenAPIGroupInfo {
 
     /**
      * @return The names of the OpenAPi groups.
@@ -45,7 +48,7 @@ public @interface OpenAPIGroup {
     String[] names() default {};
 
     /**
-     * @return The names of the OpenAPi groups to exclude endpoints from.
+     * @return OpenAPI object describing information about group.
      */
-    String[] exclude() default {};
+    OpenAPIDefinition info();
 }

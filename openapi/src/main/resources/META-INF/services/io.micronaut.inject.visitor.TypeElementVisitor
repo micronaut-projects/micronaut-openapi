@@ -3,3 +3,4 @@ io.micronaut.openapi.visitor.OpenApiControllerVisitor
 io.micronaut.openapi.visitor.OpenApiEndpointVisitor
 io.micronaut.openapi.visitor.OpenApiIncludeVisitor
 io.micronaut.openapi.visitor.OpenApiJacksonVisitor
+io.micronaut.openapi.visitor.OpenApiGroupInfoVisitor

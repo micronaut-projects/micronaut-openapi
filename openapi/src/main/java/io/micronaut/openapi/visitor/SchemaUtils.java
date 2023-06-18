@@ -23,10 +23,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import io.micronaut.core.annotation.AnnotationValue;
 import io.micronaut.core.annotation.Internal;
 import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.core.util.StringUtils;
 import io.micronaut.http.HttpMethod;
+import io.swagger.v3.oas.annotations.extensions.Extension;
+import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Operation;
@@ -58,6 +61,8 @@ import io.swagger.v3.oas.models.parameters.RequestBody;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.servers.Server;
+
+import com.fasterxml.jackson.databind.JsonNode;
 
 import static io.micronaut.openapi.visitor.Utils.resolveComponents;
 import static io.swagger.v3.oas.models.Components.COMPONENTS_SCHEMAS_REF;
@@ -96,6 +101,7 @@ public final class SchemaUtils {
     public static final String TYPE_OBJECT = "object";
 
     private static final List<Schema<?>> ALL_EMPTY_SCHEMAS;
+    private static final String PREFIX_X = "x-";
 
     static {
         List<Schema<?>> schemas = new ArrayList<>();
@@ -127,6 +133,57 @@ public final class SchemaUtils {
 
     public static boolean isEmptySchema(Schema<?> schema) {
         return ALL_EMPTY_SCHEMAS.contains(schema);
+    }
+
+    // Copy of io.swagger.v3.core.util.AnnotationsUtils.getExtensions
+    public static void processExtensions(Map<CharSequence, Object> map, AnnotationValue<Extension> extension) {
+        String name = extension.stringValue("name").orElse(StringUtils.EMPTY_STRING);
+        final String key = !name.isEmpty() ? prependIfMissing(name, PREFIX_X) : name;
+        for (AnnotationValue<ExtensionProperty> prop : extension.getAnnotations("properties", ExtensionProperty.class)) {
+            final String propertyName = prop.getRequiredValue("name", String.class);
+            final String propertyValue = prop.getRequiredValue(String.class);
+            JsonNode processedValue;
+            final boolean propertyAsJson = prop.get("parseValue", boolean.class, false);
+            if (StringUtils.hasText(propertyName) && StringUtils.hasText(propertyValue)) {
+                if (key.isEmpty()) {
+                    if (propertyAsJson) {
+                        try {
+                            processedValue = ConvertUtils.getJsonMapper().readTree(propertyValue);
+                            map.put(prependIfMissing(propertyName, PREFIX_X), processedValue);
+                        } catch (Exception e) {
+                            map.put(prependIfMissing(propertyName, PREFIX_X), propertyValue);
+                        }
+                    } else {
+                        map.put(prependIfMissing(propertyName, PREFIX_X), propertyValue);
+                    }
+                } else {
+                    Object value = map.get(key);
+                    if (!(value instanceof Map)) {
+                        value = new LinkedHashMap<>();
+                        map.put(key, value);
+                    }
+                    @SuppressWarnings("unchecked")
+                    final Map<String, Object> mapValue = (Map<String, Object>) value;
+                    if (propertyAsJson) {
+                        try {
+                            processedValue = ConvertUtils.getJsonMapper().readTree(propertyValue);
+                            mapValue.put(propertyName, processedValue);
+                        } catch (Exception e) {
+                            mapValue.put(propertyName, propertyValue);
+                        }
+                    } else {
+                        mapValue.put(propertyName, propertyValue);
+                    }
+                }
+            }
+        }
+    }
+
+    public static String prependIfMissing(final String str, final String prefix) {
+        if (str == null || StringUtils.isEmpty(prefix) || str.startsWith(prefix)) {
+            return str;
+        }
+        return prefix + str;
     }
 
     public static Map<String, Schema> resolveSchemas(OpenAPI openAPI) {

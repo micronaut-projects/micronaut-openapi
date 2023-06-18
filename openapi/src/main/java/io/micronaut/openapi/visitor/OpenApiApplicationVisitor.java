@@ -754,6 +754,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                     groupProperties.setDisplayName(valueStr);
                 }
                 break;
+            case "file-name":
             case "filename":
                 if (groupProperties.getFilename() == null) {
                     groupProperties.setFilename(valueStr);
@@ -773,9 +774,14 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                     groupProperties.setPrimary(Boolean.valueOf(valueStr));
                 }
                 break;
+            case "commonexclude":
+            case "common-exclude":
+                if (groupProperties.getCommonExclude() == null) {
+                    groupProperties.setCommonExclude(Boolean.valueOf(valueStr));
+                }
+                break;
             case "packagesexclude":
             case "packages-exclude":
-            case "packages.exclude":
                 if (groupProperties.getPackagesExclude() == null) {
                     List<PackageProperties> packagesExclude = new ArrayList<>();
                     for (String groupPackage : valueStr.split(",")) {
@@ -1489,9 +1495,15 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             }
         }
 
+        // add common endpoints (without group name)
         for (Map.Entry<Pair<String, String>, OpenApiInfo> entry : result.entrySet()) {
 
             String group = entry.getKey().getFirst();
+            GroupProperties groupProperties = getGroupProperties(group, context);
+            if (groupProperties != null && groupProperties.getCommonExclude() != null && groupProperties.getCommonExclude()) {
+                continue;
+            }
+
             OpenAPI openAPI = entry.getValue().getOpenApi();
 
             for (EndpointInfo commonEndpoint : commonEndpoints) {
@@ -1532,7 +1544,12 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         OpenAPI newOpenApi;
         if (openApiInfo == null) {
 
-            newOpenApi = new OpenAPI();
+            Map<String, OpenAPI> knownOpenApis = Utils.getOpenApis();
+            if (CollectionUtils.isNotEmpty(knownOpenApis) && knownOpenApis.containsKey(group)) {
+                newOpenApi = knownOpenApis.get(group);
+            } else {
+                newOpenApi = new OpenAPI();
+            }
 
             openApiInfo = new OpenApiInfo(
                 version,
@@ -1541,6 +1558,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                 hasGroupProperties ? groupProperties.getFilename() : null,
                 newOpenApi
             );
+
             openApiInfoMap.put(key, openApiInfo);
 
             OpenAPI openApiCopy;
@@ -1551,11 +1569,14 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                 return null;
             }
 
-            newOpenApi.setTags(openApiCopy.getTags());
-            newOpenApi.setServers(openApiCopy.getServers());
-            newOpenApi.setInfo(openApiCopy.getInfo());
-            newOpenApi.setSecurity(openApiCopy.getSecurity());
-            newOpenApi.setExternalDocs(openApiCopy.getExternalDocs());
+            if (CollectionUtils.isEmpty(knownOpenApis) || !knownOpenApis.containsKey(group)) {
+                newOpenApi.setTags(openApiCopy.getTags());
+                newOpenApi.setServers(openApiCopy.getServers());
+                newOpenApi.setInfo(openApiCopy.getInfo());
+                newOpenApi.setSecurity(openApiCopy.getSecurity());
+                newOpenApi.setExternalDocs(openApiCopy.getExternalDocs());
+            }
+
             newOpenApi.setComponents(openApiCopy.getComponents());
 
         } else {

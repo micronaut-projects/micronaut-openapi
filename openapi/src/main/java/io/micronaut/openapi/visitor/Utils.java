@@ -20,6 +20,7 @@ import java.io.StringWriter;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -62,6 +63,10 @@ public final class Utils {
     private static Set<String> allKnownVersions;
     private static Set<String> allKnownGroups;
     private static Map<String, List<EndpointInfo>> endpointInfos;
+    /**
+     * Groups openAPI objects, described by OpenAPIDefinition annotations.
+     */
+    private static Map<String, OpenAPI> openApis = new HashMap<>();
 
     private static PropertyPlaceholderResolver propertyPlaceholderResolver;
     private static OpenAPI testReference;
@@ -266,5 +271,13 @@ public final class Utils {
 
     public static void setEndpointInfos(Map<String, List<EndpointInfo>> endpointInfos) {
         Utils.endpointInfos = endpointInfos;
+    }
+
+    public static Map<String, OpenAPI> getOpenApis() {
+        return openApis;
+    }
+
+    public static void setOpenApis(Map<String, OpenAPI> openApis) {
+        Utils.openApis = openApis;
     }
 }

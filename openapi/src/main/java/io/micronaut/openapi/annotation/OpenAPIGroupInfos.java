@@ -20,32 +20,20 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
-import io.micronaut.context.annotation.AliasFor;
-
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
+ * Allows {@link OpenAPIGroupInfo} to be repeatable.
+ *
  * @since 4.9.2
  */
-@Retention(RUNTIME)
 @Documented
-@Target({ElementType.PACKAGE, ElementType.TYPE, ElementType.METHOD})
-public @interface OpenAPIGroup {
+@Retention(RUNTIME)
+@Target({ElementType.PACKAGE, ElementType.TYPE, ElementType.ANNOTATION_TYPE})
+public @interface OpenAPIGroupInfos {
 
     /**
-     * @return The names of the OpenAPi groups.
+     * @return An array of {@link OpenAPIGroupInfo}
      */
-    @AliasFor(member = "names")
-    String[] value() default {};
-
-    /**
-     * @return The names of the OpenAPi groups.
-     */
-    @AliasFor(member = "value")
-    String[] names() default {};
-
-    /**
-     * @return The names of the OpenAPi groups to exclude endpoints from.
-     */
-    String[] exclude() default {};
+    OpenAPIGroupInfo[] value() default {};
 }

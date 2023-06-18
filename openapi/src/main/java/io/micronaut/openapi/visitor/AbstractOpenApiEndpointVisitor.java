@@ -1752,7 +1752,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                                                  HttpMethod httpMethod,
                                                  List<MediaType> consumesMediaTypes,
                                                  List<MediaType> producesMediaTypes,
-                                                 MethodElement methodElement, VisitorContext context) {
+                                                 MethodElement methodEl, VisitorContext context) {
 
         String methodKey = httpMethod.name()
             + '#' + url
@@ -1763,11 +1763,11 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         List<String> groups = new ArrayList<>();
         List<String> excludedGroups = new ArrayList<>();
 
-        PackageElement packageElement = methodElement.getDeclaringType().getPackage();
-        String packageName = packageElement.getName();
+        PackageElement packageEl = methodEl.getDeclaringType().getPackage();
+        String packageName = packageEl.getName();
 
-        processGroups(groups, excludedGroups, methodElement.getAnnotationValuesByType(OpenAPIGroup.class), groupPropertiesMap);
-        processGroups(groups, excludedGroups, packageElement.getAnnotationValuesByType(OpenAPIGroup.class), groupPropertiesMap);
+        processGroups(groups, excludedGroups, methodEl.getAnnotationValuesByType(OpenAPIGroup.class), groupPropertiesMap);
+        processGroups(groups, excludedGroups, packageEl.getAnnotationValuesByType(OpenAPIGroup.class), groupPropertiesMap);
         // properties from system properties or from environment more priority than annotations
         for (GroupProperties groupProperties : groupPropertiesMap.values()) {
             if (CollectionUtils.isNotEmpty(groupProperties.getPackages())) {
@@ -1792,34 +1792,17 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         boolean isVersioningEnabled = versioningProperties.isEnabled() && versioningProperties.isRouterVersiningEnabled()
             && (versioningProperties.isHeaderEnabled() || versioningProperties.isParameterEnabled());
 
+        String version = null;
+
         if (isVersioningEnabled) {
 
-            String version = null;
-
-            List<AnnotationValue<Version>> versionsAnnotations = methodElement.getAnnotationValuesByType(Version.class);
+            List<AnnotationValue<Version>> versionsAnnotations = methodEl.getAnnotationValuesByType(Version.class);
             if (CollectionUtils.isNotEmpty(versionsAnnotations)) {
                 version = versionsAnnotations.get(0).stringValue().orElse(null);
             }
-
             if (version != null) {
                 Utils.getAllKnownVersions().add(version);
             }
-
-            Map<String, List<EndpointInfo>> endpointInfosMap = Utils.getEndpointInfos();
-            if (endpointInfosMap == null) {
-                endpointInfosMap = new HashMap<>();
-                Utils.setEndpointInfos(endpointInfosMap);
-            }
-            List<EndpointInfo> endpointInfos = endpointInfosMap.computeIfAbsent(methodKey, (k) -> new ArrayList<>());
-            endpointInfos.add(new EndpointInfo(
-                url,
-                httpMethod,
-                methodElement,
-                swaggerOperation,
-                version,
-                groups,
-                excludedGroups));
-
             if (versioningProperties.isParameterEnabled()) {
                 addVersionParameters(swaggerOperation, versioningProperties.getParameterNames(), false);
             }
@@ -1827,6 +1810,21 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                 addVersionParameters(swaggerOperation, versioningProperties.getHeaderNames(), true);
             }
         }
+
+        Map<String, List<EndpointInfo>> endpointInfosMap = Utils.getEndpointInfos();
+        if (endpointInfosMap == null) {
+            endpointInfosMap = new HashMap<>();
+            Utils.setEndpointInfos(endpointInfosMap);
+        }
+        List<EndpointInfo> endpointInfos = endpointInfosMap.computeIfAbsent(methodKey, (k) -> new ArrayList<>());
+        endpointInfos.add(new EndpointInfo(
+            url,
+            httpMethod,
+            methodEl,
+            swaggerOperation,
+            version,
+            groups,
+            excludedGroups));
     }
 
     private void processGroups(List<String> groups, List<String> excludedGroups, List<AnnotationValue<OpenAPIGroup>> annotationValues, Map<String, GroupProperties> groupPropertiesMap) {

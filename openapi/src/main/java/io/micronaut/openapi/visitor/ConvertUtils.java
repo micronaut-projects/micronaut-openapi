@@ -102,6 +102,18 @@ public final class ConvertUtils {
     private ConvertUtils() {
     }
 
+    public static Optional<Object> parseJsonString(Object object) {
+        if (object instanceof String) {
+            String string = (String) object;
+            try {
+                return Optional.of(ConvertUtils.getConvertJsonMapper().readValue(string, Map.class));
+            } catch (IOException e) {
+                return Optional.empty();
+            }
+        }
+        return Optional.empty();
+    }
+
     /**
      * Converts Json node into a class' instance or throws 'com.fasterxml.jackson.core.JsonProcessingException', adds extensions if present.
      *

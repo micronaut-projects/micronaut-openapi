@@ -40,6 +40,10 @@ public final class GroupProperties {
      */
     private Boolean primary;
     /**
+     * Is this group exclude common endpoints.
+     */
+    private Boolean commonExclude;
+    /**
      * Group final swagger filename.
      */
     private String filename;
@@ -98,6 +102,14 @@ public final class GroupProperties {
 
     public void setPackagesExclude(List<PackageProperties> packagesExclude) {
         this.packagesExclude = packagesExclude;
+    }
+
+    public Boolean getCommonExclude() {
+        return commonExclude;
+    }
+
+    public void setCommonExclude(Boolean commonExclude) {
+        this.commonExclude = commonExclude;
     }
 
     /**

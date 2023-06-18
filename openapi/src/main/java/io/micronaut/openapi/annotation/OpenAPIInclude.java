@@ -58,6 +58,20 @@ public @interface OpenAPIInclude {
     String[] classNames() default {};
 
     /**
+     * @return Array of groups to which this controller should be included.
+     *
+     * @since 4.9.2
+     */
+    String[] groups() default {};
+
+    /**
+     * @return Array of groups to which this controller should not be included.
+     *
+     * @since 4.9.2
+     */
+    String[] groupsExclude() default {};
+
+    /**
      * @return Custom URI for controller
      *
      * @since 4.4.0

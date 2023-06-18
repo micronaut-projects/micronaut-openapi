@@ -123,6 +123,7 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import static io.micronaut.openapi.visitor.ConvertUtils.parseJsonString;
 import static io.micronaut.openapi.visitor.ConvertUtils.resolveExtensions;
 import static io.micronaut.openapi.visitor.ConvertUtils.setDefaultValueObject;
 import static io.micronaut.openapi.visitor.ElementUtils.isFileUpload;
@@ -132,6 +133,7 @@ import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.getConfigur
 import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.getExpandableProperties;
 import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.resolvePlaceholders;
 import static io.micronaut.openapi.visitor.SchemaUtils.TYPE_OBJECT;
+import static io.micronaut.openapi.visitor.SchemaUtils.processExtensions;
 import static io.micronaut.openapi.visitor.Utils.resolveComponents;
 import static java.util.stream.Collectors.toMap;
 
@@ -225,7 +227,6 @@ abstract class AbstractOpenApiVisitor {
         }
         return Optional.empty();
     }
-
 
     /**
      * Reads the security requirements annotation of the specified element.
@@ -630,68 +631,6 @@ abstract class AbstractOpenApiVisitor {
         return newValues.containsKey("discriminator") ? (Map<String, Object>) newValues.get("discriminator") : new HashMap<>();
     }
 
-    // Copy of io.swagger.v3.core.util.AnnotationsUtils.getExtensions
-    private void processExtensions(Map<CharSequence, Object> map, AnnotationValue<Extension> extension) {
-        String name = extension.stringValue("name").orElse(StringUtils.EMPTY_STRING);
-        final String key = !name.isEmpty() ? prependIfMissing(name, "x-") : name;
-        for (AnnotationValue<ExtensionProperty> prop : extension.getAnnotations("properties", ExtensionProperty.class)) {
-            final String propertyName = prop.getRequiredValue("name", String.class);
-            final String propertyValue = prop.getRequiredValue(String.class);
-            JsonNode processedValue;
-            final boolean propertyAsJson = prop.get("parseValue", boolean.class, false);
-            if (StringUtils.hasText(propertyName) && StringUtils.hasText(propertyValue)) {
-                if (key.isEmpty()) {
-                    if (propertyAsJson) {
-                        try {
-                            processedValue = ConvertUtils.getJsonMapper().readTree(propertyValue);
-                            map.put(prependIfMissing(propertyName, "x-"), processedValue);
-                        } catch (Exception e) {
-                            map.put(prependIfMissing(propertyName, "x-"), propertyValue);
-                        }
-                    } else {
-                        map.put(prependIfMissing(propertyName, "x-"), propertyValue);
-                    }
-                } else {
-                    Object value = map.get(key);
-                    if (!(value instanceof Map)) {
-                        value = new LinkedHashMap<>();
-                        map.put(key, value);
-                    }
-                    @SuppressWarnings("unchecked") final Map<String, Object> mapValue = (Map<String, Object>) value;
-                    if (propertyAsJson) {
-                        try {
-                            processedValue = ConvertUtils.getJsonMapper().readTree(propertyValue);
-                            mapValue.put(propertyName, processedValue);
-                        } catch (Exception e) {
-                            mapValue.put(propertyName, propertyValue);
-                        }
-                    } else {
-                        mapValue.put(propertyName, propertyValue);
-                    }
-                }
-            }
-        }
-    }
-
-    public static String prependIfMissing(final String str, final String prefix) {
-        if (str == null || StringUtils.isEmpty(prefix) || str.startsWith(prefix)) {
-            return str;
-        }
-        return prefix + str;
-    }
-
-    private Optional<Object> parseJsonString(Object object) {
-        if (object instanceof String) {
-            String string = (String) object;
-            try {
-                return Optional.of(ConvertUtils.getConvertJsonMapper().readValue(string, Map.class));
-            } catch (IOException e) {
-                return Optional.empty();
-            }
-        }
-        return Optional.empty();
-    }
-
     private <T extends Schema> void processAnnotationValue(VisitorContext context, AnnotationValue<?> annotationValue, Map<CharSequence, Object> arraySchemaMap, List<String> filters, Class<T> type) {
         Map<CharSequence, Object> values = annotationValue.getValues().entrySet().stream()
             .filter(entry -> filters == null || !filters.contains((String) entry.getKey()))
@@ -784,7 +723,8 @@ abstract class AbstractOpenApiVisitor {
      *
      * @return The schema or null if it cannot be resolved
      */
-    protected @Nullable Schema resolveSchema(@Nullable Element definingElement, ClassElement type, VisitorContext context, List<MediaType> mediaTypes) {
+    @Nullable
+    protected Schema resolveSchema(@Nullable Element definingElement, ClassElement type, VisitorContext context, List<MediaType> mediaTypes) {
         return resolveSchema(Utils.resolveOpenApi(context), definingElement, type, context, mediaTypes, null, null);
     }
 
