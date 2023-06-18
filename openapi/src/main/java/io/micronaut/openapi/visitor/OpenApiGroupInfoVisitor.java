@@ -31,6 +31,7 @@ import io.micronaut.inject.ast.PackageElement;
 import io.micronaut.inject.visitor.TypeElementVisitor;
 import io.micronaut.inject.visitor.VisitorContext;
 import io.micronaut.openapi.annotation.OpenAPIGroupInfo;
+import io.micronaut.openapi.annotation.OpenAPIInclude;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.models.OpenAPI;
 
@@ -39,6 +40,9 @@ import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.MICRONAUT_O
 import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.isOpenApiEnabled;
 
 /**
+ * A {@link TypeElementVisitor} that read the @{@link OpenAPIGroupInfo} annotations at the compile
+ * time.
+ *
  * @since 4.9.2
  */
 @Internal

@@ -25,6 +25,9 @@ import io.micronaut.context.annotation.AliasFor;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
+ * With this annotation, you can specify one or more groups that this endpoint will be included in,
+ * as well as specify groups from which this endpoint should be excluded.
+ *
  * @since 4.9.2
  */
 @Retention(RUNTIME)

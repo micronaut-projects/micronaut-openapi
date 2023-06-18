@@ -27,6 +27,10 @@ import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
+ * With this annotation, you can specify the OpenAPIDefinition description that will be inserted
+ * into a specific swagger file, only for this group. Thus, you can make different descriptions
+ * for different groups.
+ *
  * @since 4.9.2
  */
 @Repeatable(OpenAPIGroupInfos.class)

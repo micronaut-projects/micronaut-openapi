@@ -23,7 +23,7 @@ import io.micronaut.inject.ast.MethodElement;
 import io.swagger.v3.oas.models.Operation;
 
 /**
- * Entity to storage information about same swagger operations, but with different versions api.
+ * Entity to storage information about same swagger operations, but with different version / group.
  * Need it to merge them in post-processing.
  *
  * @since 4.9.2
