@@ -974,7 +974,7 @@ abstract class AbstractOpenApiVisitor {
             if (schema != null) {
 
                 if (isSubstitudedType) {
-                    processShemaAnn(schema, context, definingElement, schemaAnnotationValue);
+                    processShemaAnn(schema, context, definingElement, type, schemaAnnotationValue);
                 }
 
                 if (definingElement != null && StringUtils.isEmpty(schema.getDescription())) {
@@ -1191,7 +1191,7 @@ abstract class AbstractOpenApiVisitor {
         Schema originalSchema = schemaToBind;
 
         if (originalSchema.get$ref() != null) {
-            Schema schemaFromAnn = schemaFromAnnotation(context, element, schemaAnn);
+            Schema schemaFromAnn = schemaFromAnnotation(context, element, elementType, schemaAnn);
             if (schemaFromAnn != null) {
                 schemaToBind = schemaFromAnn;
             }
@@ -1467,18 +1467,18 @@ abstract class AbstractOpenApiVisitor {
         }
     }
 
-    Schema schemaFromAnnotation(VisitorContext context, Element element, AnnotationValue<io.swagger.v3.oas.annotations.media.Schema> schemaAnn) {
+    Schema schemaFromAnnotation(VisitorContext context, Element element, ClassElement type, AnnotationValue<io.swagger.v3.oas.annotations.media.Schema> schemaAnn) {
         if (schemaAnn == null) {
             return null;
         }
 
         Schema schemaToBind = new Schema();
-        processShemaAnn(schemaToBind, context, element, schemaAnn);
+        processShemaAnn(schemaToBind, context, element, type, schemaAnn);
 
         return schemaToBind;
     }
 
-    void processShemaAnn(Schema schemaToBind, VisitorContext context, Element element, @NonNull AnnotationValue<io.swagger.v3.oas.annotations.media.Schema> schemaAnn) {
+    void processShemaAnn(Schema schemaToBind, VisitorContext context, Element element, ClassElement type, @NonNull AnnotationValue<io.swagger.v3.oas.annotations.media.Schema> schemaAnn) {
 
         Map<CharSequence, Object> annValues = schemaAnn.getValues();
         if (annValues.containsKey("description")) {
@@ -1541,7 +1541,7 @@ abstract class AbstractOpenApiVisitor {
 
         String schemaDefaultValue = (String) annValues.get("defaultValue");
         if (schemaDefaultValue != null) {
-            setDefaultValueObject(schemaToBind, schemaDefaultValue, element, schemaToBind.getType(), schemaToBind.getFormat(), false, context);
+            setDefaultValueObject(schemaToBind, schemaDefaultValue, type, schemaToBind.getType(), schemaToBind.getFormat(), false, context);
         }
         String schemaExample = (String) annValues.get("example");
         if (StringUtils.isNotEmpty(schemaExample)) {
