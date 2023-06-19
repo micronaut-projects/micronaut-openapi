@@ -15,6 +15,9 @@
  */
 package io.micronaut.openapi.generator;
 
+/**
+ * The main interface of the generator options builder.
+ */
 public interface GeneratorOptionsBuilder {
 
 }

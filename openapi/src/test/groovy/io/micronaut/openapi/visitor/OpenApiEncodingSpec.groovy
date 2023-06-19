@@ -651,7 +651,7 @@ class MyBean {}
         buildBeanDefinition('test.MyBean', '''
 package test;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.MediaType;
@@ -732,7 +732,7 @@ package test;
 
 import java.util.HashMap;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 import io.micronaut.http.MediaType;
 import io.micronaut.http.annotation.Controller;
