@@ -1,0 +1,16 @@
+plugins {
+    id 'io.micronaut.build.internal.openapi-module'
+}
+
+dependencies {
+    api(libs.managed.swagger.annotations)
+}
+
+micronautBuild {
+    def simpleVersion = version
+    if (version.contains('-')) {
+        simpleVersion = version.substring(0, version.indexOf('-'))
+    }
+    def (String major, String minor, String patch) = simpleVersion.split("[.]")
+    binaryCompatibility.enabled = major.toInteger() >= 5 && minor.toInteger() >= 0 && patch.toInteger() > 0
+}
