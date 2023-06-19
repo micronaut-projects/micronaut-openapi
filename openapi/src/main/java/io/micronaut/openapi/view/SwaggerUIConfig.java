@@ -229,10 +229,11 @@ final class SwaggerUIConfig extends AbstractViewConfig {
      * Builds a SwaggerUIConfig given a set of properties.
      *
      * @param properties A set of properties.
+     * @param context Visitor context.
      *
      * @return A SwaggerUIConfig.
      */
-    static SwaggerUIConfig fromProperties(Map<String, String> properties) {
+    static SwaggerUIConfig fromProperties(Map<String, String> properties, VisitorContext context) {
         SwaggerUIConfig cfg = new SwaggerUIConfig();
         cfg.theme = Theme.valueOf(properties.getOrDefault(PREFIX_SWAGGER_UI + ".theme", cfg.theme.name()).toUpperCase(Locale.US));
 
@@ -247,7 +248,7 @@ final class SwaggerUIConfig extends AbstractViewConfig {
             cfg.isDefaultThemeUrl = false;
         }
 
-        return AbstractViewConfig.fromProperties(cfg, DEFAULT_OPTIONS, properties);
+        return AbstractViewConfig.fromProperties(cfg, DEFAULT_OPTIONS, properties, context);
     }
 
     @Override

@@ -46,6 +46,7 @@ import io.micronaut.core.annotation.Nullable;
 import io.micronaut.core.beans.BeanMap;
 import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.inject.ast.ClassElement;
+import io.micronaut.inject.ast.Element;
 import io.micronaut.inject.ast.ElementQuery;
 import io.micronaut.inject.ast.EnumElement;
 import io.micronaut.inject.ast.MethodElement;
@@ -54,6 +55,7 @@ import io.micronaut.openapi.swagger.core.util.PrimitiveType;
 import io.micronaut.openapi.swagger.core.util.ObjectMapperFactory;
 import io.swagger.v3.oas.models.media.Content;
 import io.swagger.v3.oas.models.media.MediaType;
+import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 
@@ -232,6 +234,21 @@ public final class ConvertUtils {
         SecurityRequirement securityRequirement = new SecurityRequirement();
         securityRequirement.addList(name, scopes);
         return securityRequirement;
+    }
+
+    public static void setDefaultValueObject(Schema<?> schema, String defaultValue, @Nullable Element element, @Nullable String schemaType, @Nullable String schemaFormat, boolean isMicronautFormat, VisitorContext context) {
+        try {
+            Pair<String, String> typeAndFormat;
+            if (element instanceof EnumElement) {
+                typeAndFormat = ConvertUtils.checkEnumJsonValueType(context, (EnumElement) element, schemaType, schemaFormat);
+            } else {
+                typeAndFormat = Pair.of(schemaType, schemaFormat);
+            }
+            schema.setDefault(ConvertUtils.normalizeValue(defaultValue, typeAndFormat.getFirst(), typeAndFormat.getSecond(), context, isMicronautFormat));
+        } catch (JsonProcessingException e) {
+            context.warn("Can't convert " + defaultValue + " to " + schemaType + ": " + e.getMessage(), element);
+            schema.setDefault(defaultValue);
+        }
     }
 
     /**

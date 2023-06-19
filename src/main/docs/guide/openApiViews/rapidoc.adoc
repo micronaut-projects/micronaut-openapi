@@ -2,7 +2,8 @@ The views will be generated to the `META-INF/swagger/views/rapidoc` directory of
 
 |===
 | `rapidoc.enabled` | `true` or `false` When 'true' the RapiDoc view is generated.
-| `rapidoc.js.url` | Override path to use to find the js file. Path must contain a file named rapidoc-min.js. The value can be a URL path like: "https://unpkg.com/rapidoc/dist/". Must contain trailing slash.,
+| `rapidoc.js.url` | Override path to use to find the js file. Path must contain a file named rapidoc-min.js. The value can be a URL path like: "https://unpkg.com/rapidoc/dist/". Must contain trailing slash.
+| `rapidoc.spec.url` | Override path in swagger file path line. If you don't set, then value will be `<context-path>/swagger/<spec_filename>`. You can use the placeholder `${filename}` it will be replaced with the final name of the generated swagger file.
 | `rapidoc.copy-resources` | Copy or not local JS and CSS resources. Set to `false` if you are using external resources (eg https://unpkg.com/rapidoc/dist/). Default `true`
 | `rapidoc.style` |
 | `rapidoc.sort-tags` |

@@ -136,11 +136,12 @@ final class RedocConfig extends AbstractViewConfig {
      * Builds a RedocConfig given a set of properties.
      *
      * @param properties A set of properties.
+     * @param context Visitor context.
      *
      * @return A RedocConfig.
      */
-    static RedocConfig fromProperties(Map<String, String> properties) {
-        return AbstractViewConfig.fromProperties(new RedocConfig(), DEFAULT_OPTIONS, properties);
+    static RedocConfig fromProperties(Map<String, String> properties, VisitorContext context) {
+        return AbstractViewConfig.fromProperties(new RedocConfig(), DEFAULT_OPTIONS, properties, context);
     }
 
     @Override

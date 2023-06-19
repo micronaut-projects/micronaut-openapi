@@ -7,7 +7,7 @@ class OpenApiOperationViewParseSpec extends Specification {
     void "test parse empty OpenApiView specification"() {
         given:
         String spec = ""
-        OpenApiViewConfig cfg = OpenApiViewConfig.fromSpecification(spec, new Properties())
+        OpenApiViewConfig cfg = OpenApiViewConfig.fromSpecification(spec, new Properties(), null)
 
         expect:
         cfg.enabled == false
@@ -16,7 +16,7 @@ class OpenApiOperationViewParseSpec extends Specification {
     void "test parse OpenApiView specification, views enabled"() {
         given:
         String spec = "mapping.path=somewhere,redoc.enabled=true,rapidoc.enabled=true,swagger-ui.enabled=true"
-        OpenApiViewConfig cfg = OpenApiViewConfig.fromSpecification(spec, new Properties())
+        OpenApiViewConfig cfg = OpenApiViewConfig.fromSpecification(spec, new Properties(), null)
 
         expect:
         cfg.enabled == true
@@ -28,8 +28,8 @@ class OpenApiOperationViewParseSpec extends Specification {
 
     void "test parse OpenApiView specification, redoc enabled"() {
         given:
-        String spec = "redoc.enabled=true,redoc.js.url=version123"
-        OpenApiViewConfig cfg = OpenApiViewConfig.fromSpecification(spec, new Properties())
+        String spec = "redoc.enabled=true,redoc.js.url=version123,redoc.spec.url=/my/spec/file.yml"
+        OpenApiViewConfig cfg = OpenApiViewConfig.fromSpecification(spec, new Properties(), null)
 
         expect:
         cfg.enabled == true
@@ -38,12 +38,13 @@ class OpenApiOperationViewParseSpec extends Specification {
         cfg.swaggerUIConfig == null
         cfg.redocConfig != null
         cfg.redocConfig.jsUrl == "version123"
+        cfg.redocConfig.specUrl == "/my/spec/file.yml"
     }
 
     void "test parse OpenApiView specification, rapidoc enabled"() {
         given:
-        String spec = "rapidoc.enabled=true,rapidoc.js.url=version123,rapidoc.layout=row,rapidoc.theme=light"
-        OpenApiViewConfig cfg = OpenApiViewConfig.fromSpecification(spec, new Properties())
+        String spec = "rapidoc.enabled=true,rapidoc.js.url=version123,rapidoc.layout=row,rapidoc.theme=light,rapidoc.spec.url=/my/spec/file.yml"
+        OpenApiViewConfig cfg = OpenApiViewConfig.fromSpecification(spec, new Properties(), null)
 
         expect:
         cfg.enabled == true
@@ -52,14 +53,15 @@ class OpenApiOperationViewParseSpec extends Specification {
         cfg.swaggerUIConfig == null
         cfg.rapidocConfig != null
         cfg.rapidocConfig.jsUrl == "version123"
+        cfg.rapidocConfig.specUrl == "/my/spec/file.yml"
         cfg.rapidocConfig.options['theme'] == RapidocConfig.Theme.LIGHT
         cfg.rapidocConfig.options['layout'] == RapidocConfig.Layout.ROW
     }
 
     void "test parse OpenApiView specification, swagger-ui enabled"() {
         given:
-        String spec = "swagger-ui.enabled=true,swagger-ui.js.url=version123,swagger-ui.theme=flattop,swagger-ui.deepLinking=false"
-        OpenApiViewConfig cfg = OpenApiViewConfig.fromSpecification(spec, new Properties())
+        String spec = "swagger-ui.enabled=true,swagger-ui.js.url=version123,swagger-ui.spec.url=/my/spec/file.yml,swagger-ui.theme=flattop,swagger-ui.deepLinking=false"
+        OpenApiViewConfig cfg = OpenApiViewConfig.fromSpecification(spec, new Properties(), null)
 
         expect:
         cfg.enabled == true
@@ -68,6 +70,7 @@ class OpenApiOperationViewParseSpec extends Specification {
         cfg.rapidocConfig == null
         cfg.swaggerUIConfig != null
         cfg.swaggerUIConfig.jsUrl == "version123"
+        cfg.swaggerUIConfig.specUrl == "/my/spec/file.yml"
         cfg.swaggerUIConfig.theme == SwaggerUIConfig.Theme.FLATTOP
         cfg.swaggerUIConfig.options['deepLinking'] == false
     }
