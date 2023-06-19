@@ -131,7 +131,6 @@ import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.expandPrope
 import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.getConfigurationProperty;
 import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.getExpandableProperties;
 import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.resolvePlaceholders;
-import static io.micronaut.openapi.visitor.SchemaUtils.EMPTY_SCHEMA;
 import static io.micronaut.openapi.visitor.SchemaUtils.TYPE_OBJECT;
 import static io.micronaut.openapi.visitor.Utils.resolveComponents;
 import static java.util.stream.Collectors.toMap;
@@ -146,7 +145,6 @@ import static java.util.stream.Collectors.toMap;
 abstract class AbstractOpenApiVisitor {
 
     private static final Lock VISITED_ELEMENTS_LOCK = new ReentrantLock();
-    private static final ComposedSchema EMPTY_COMPOSED_SCHEMA = new ComposedSchema();
 
     /**
      * Stores relations between schema names and class names.
@@ -1258,7 +1256,7 @@ abstract class AbstractOpenApiVisitor {
             notOnlyRef = true;
         }
 
-        boolean addSchemaToBind = !schemaToBind.equals(EMPTY_SCHEMA);
+        boolean addSchemaToBind = !SchemaUtils.isEmptySchema(schemaToBind);
 
         if (addSchemaToBind) {
             if (TYPE_OBJECT.equals(originalSchema.getType())) {
@@ -1267,7 +1265,7 @@ abstract class AbstractOpenApiVisitor {
                 }
                 originalSchema.setType(null);
             }
-            if (!originalSchema.equals(EMPTY_SCHEMA)) {
+            if (!SchemaUtils.isEmptySchema(originalSchema)) {
                 composedSchema.addAllOfItem(originalSchema);
             }
         } else if (isNullable && CollectionUtils.isEmpty(composedSchema.getAllOf())) {
@@ -1283,7 +1281,7 @@ abstract class AbstractOpenApiVisitor {
             composedSchema.addAllOfItem(schemaToBind);
         }
 
-        if (!composedSchema.equals(EMPTY_COMPOSED_SCHEMA)
+        if (!SchemaUtils.isEmptySchema(composedSchema)
             && ((CollectionUtils.isNotEmpty(composedSchema.getAllOf()) && composedSchema.getAllOf().size() > 1)
             || CollectionUtils.isNotEmpty(composedSchema.getOneOf())
             || CollectionUtils.isNotEmpty(composedSchema.getAnyOf())
