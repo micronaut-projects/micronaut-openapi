@@ -43,6 +43,6 @@ micronaut {
 
 dependencies {
     constraints {
-        implementation("io.micronaut:micronaut-http-client:${libs.versions.micronaut.core.get()}")
+        implementation("io.micronaut:micronaut-http-client:${libs.versions.micronaut.asProvider().get()}")
     }
 }
