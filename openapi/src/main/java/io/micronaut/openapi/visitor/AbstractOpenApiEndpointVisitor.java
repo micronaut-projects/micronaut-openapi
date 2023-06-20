@@ -111,6 +111,8 @@ import static io.micronaut.openapi.visitor.ElementUtils.isFileUpload;
 import static io.micronaut.openapi.visitor.ElementUtils.isNullable;
 import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.getSecurityProperties;
 import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.isOpenApiEnabled;
+import static io.micronaut.openapi.visitor.SchemaUtils.COMPONENTS_CALLBACKS_PREFIX;
+import static io.micronaut.openapi.visitor.SchemaUtils.COMPONENTS_SCHEMAS_PREFIX;
 import static io.micronaut.openapi.visitor.SchemaUtils.TYPE_OBJECT;
 import static io.micronaut.openapi.visitor.Utils.DEFAULT_MEDIA_TYPES;
 
@@ -121,8 +123,6 @@ import static io.micronaut.openapi.visitor.Utils.DEFAULT_MEDIA_TYPES;
  * @since 1.0
  */
 public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisitor {
-
-    public static final String COMPONENTS_CALLBACKS_PREFIX = "#/components/callbacks/";
 
     protected static final String CONTEXT_CHILD_PATH = "internal.child.path";
     protected static final String CONTEXT_CHILD_OP_ID_PREFIX = "internal.opId.prefix";
@@ -398,6 +398,8 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             List<MediaType> consumesMediaTypes = consumesMediaTypes(element);
             Map<PathItem, io.swagger.v3.oas.models.Operation> swaggerOperations = readOperations(pathItemEntry.getKey(), httpMethod, pathItems, element, context);
 
+            boolean isRequestBodySchemaSet = false;
+
             for (Map.Entry<PathItem, io.swagger.v3.oas.models.Operation> operationEntry : swaggerOperations.entrySet()) {
                 io.swagger.v3.oas.models.Operation swaggerOperation = operationEntry.getValue();
                 io.swagger.v3.oas.models.ExternalDocumentation externalDocs = readExternalDocs(element, context);
@@ -427,7 +429,12 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                 readResponse(element, context, openAPI, swaggerOperation, javadocDescription);
 
                 if (permitsRequestBody) {
-                    RequestBody requestBody = readSwaggerRequestBody(element, consumesMediaTypes, context);
+                    Pair<RequestBody, Boolean> requestBodyPair = readSwaggerRequestBody(element, consumesMediaTypes, context);
+                    RequestBody requestBody = null;
+                    if (requestBodyPair != null) {
+                        requestBody = requestBodyPair.getFirst();
+                        isRequestBodySchemaSet = requestBodyPair.getSecond();
+                    }
                     if (requestBody != null) {
                         RequestBody currentRequestBody = swaggerOperation.getRequestBody();
                         if (currentRequestBody != null) {
@@ -454,7 +461,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             List<TypedElement> extraBodyParameters = new ArrayList<>();
             for (io.swagger.v3.oas.models.Operation operation : swaggerOperations.values()) {
                 processParameters(element, context, openAPI, operation, javadocDescription, permitsRequestBody, pathVariables, consumesMediaTypes, extraBodyParameters, httpMethod, matchTemplates, pathItems);
-                processExtraBodyParameters(context, httpMethod, openAPI, operation, javadocDescription, consumesMediaTypes, extraBodyParameters);
+                processExtraBodyParameters(context, httpMethod, openAPI, operation, javadocDescription, isRequestBodySchemaSet, consumesMediaTypes, extraBodyParameters);
             }
         }
     }
@@ -462,6 +469,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
     private void processExtraBodyParameters(VisitorContext context, HttpMethod httpMethod, OpenAPI openAPI,
                                             io.swagger.v3.oas.models.Operation swaggerOperation,
                                             JavadocDescription javadocDescription,
+                                            boolean isRequestBodySchemaSet,
                                             List<MediaType> consumesMediaTypes,
                                             List<TypedElement> extraBodyParameters) {
         RequestBody requestBody = swaggerOperation.getRequestBody();
@@ -491,31 +499,39 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                     mediaType.setSchema(schema);
                 }
                 if (schema.get$ref() != null) {
-                    ComposedSchema composedSchema = new ComposedSchema();
-                    Schema extraBodyParametersSchema = new Schema();
-                    // Composition of existing + a new schema where extra body parameters are going to be added
-                    composedSchema.addAllOfItem(schema);
-                    composedSchema.addAllOfItem(extraBodyParametersSchema);
-                    schema = extraBodyParametersSchema;
-                    mediaType.setSchema(composedSchema);
+                    if (isRequestBodySchemaSet) {
+                        schema = openAPI.getComponents().getSchemas().get(schema.get$ref().substring(COMPONENTS_SCHEMAS_PREFIX.length()));
+                    } else {
+                        ComposedSchema composedSchema = new ComposedSchema();
+                        Schema extraBodyParametersSchema = new Schema();
+                        // Composition of existing + a new schema where extra body parameters are going to be added
+                        composedSchema.addAllOfItem(schema);
+                        composedSchema.addAllOfItem(extraBodyParametersSchema);
+                        schema = extraBodyParametersSchema;
+                        mediaType.setSchema(composedSchema);
+                    }
                 }
                 for (TypedElement parameter : extraBodyParameters) {
-                    processBodyParameter(context, openAPI, javadocDescription, MediaType.of(mediaTypeName), schema, parameter);
+                    if (!isRequestBodySchemaSet) {
+                        processBodyParameter(context, openAPI, javadocDescription, MediaType.of(mediaTypeName), schema, parameter);
+                    }
                     if (mediaTypeName.equals(MediaType.MULTIPART_FORM_DATA)) {
-                        for (String prop : (Set<String>) schema.getProperties().keySet()) {
-                            Map<String, Encoding> encodings = mediaType.getEncoding();
-                            if (encodings == null) {
-                                encodings = new HashMap<>();
-                                mediaType.setEncoding(encodings);
-                            }
-                            // if content type doesn't set by annotation,
-                            // we can set application/octet-stream for file upload classes
-                            Encoding encoding = encodings.get(prop);
-                            if (encoding == null && isFileUpload(parameter.getType())) {
-                                encoding = new Encoding();
-                                encodings.put(prop, encoding);
+                        if (CollectionUtils.isNotEmpty(schema.getProperties())) {
+                            for (String prop : (Set<String>) schema.getProperties().keySet()) {
+                                Map<String, Encoding> encodings = mediaType.getEncoding();
+                                if (encodings == null) {
+                                    encodings = new HashMap<>();
+                                    mediaType.setEncoding(encodings);
+                                }
+                                // if content type doesn't set by annotation,
+                                // we can set application/octet-stream for file upload classes
+                                Encoding encoding = encodings.get(prop);
+                                if (encoding == null && isFileUpload(parameter.getType())) {
+                                    encoding = new Encoding();
+                                    encodings.put(prop, encoding);
 
-                                encoding.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+                                    encoding.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+                                }
                             }
                         }
                     }
@@ -662,9 +678,9 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             return;
         }
         if (permitsRequestBody && swaggerOperation.getRequestBody() == null) {
-            RequestBody requestBody = readSwaggerRequestBody(parameter, consumesMediaTypes, context);
-            if (requestBody != null) {
-                swaggerOperation.setRequestBody(requestBody);
+            Pair<RequestBody, Boolean> requestBodyPair = readSwaggerRequestBody(parameter, consumesMediaTypes, context);
+            if (requestBodyPair != null && requestBodyPair.getFirst() != null) {
+                swaggerOperation.setRequestBody(requestBodyPair.getFirst());
             }
         }
 
@@ -1717,7 +1733,8 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         }
     }
 
-    private RequestBody readSwaggerRequestBody(Element element, List<MediaType> consumesMediaTypes, VisitorContext context) {
+    // boolean - is swagger schema has implementation
+    private Pair<RequestBody, Boolean> readSwaggerRequestBody(Element element, List<MediaType> consumesMediaTypes, VisitorContext context) {
         AnnotationValue<io.swagger.v3.oas.annotations.parameters.RequestBody> requestBodyAnnValue =
             element.findAnnotation(io.swagger.v3.oas.annotations.parameters.RequestBody.class).orElse(null);
 
@@ -1725,7 +1742,16 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             return null;
         }
 
+        boolean hasSchemaImplementation = false;
+
         AnnotationValue<io.swagger.v3.oas.annotations.media.Content> content = requestBodyAnnValue.getAnnotation("content", io.swagger.v3.oas.annotations.media.Content.class).orElse(null);
+        if (content != null) {
+            AnnotationValue<io.swagger.v3.oas.annotations.media.Schema> swaggerSchema = content.getAnnotation("schema", io.swagger.v3.oas.annotations.media.Schema.class).orElse(null);
+            if (swaggerSchema != null) {
+                hasSchemaImplementation = swaggerSchema.stringValue("implementation").orElse(null) != null;
+            }
+        }
+
         RequestBody requestBody = toValue(requestBodyAnnValue.getValues(), context, RequestBody.class).orElse(null);
         // if media type doesn't set in swagger annotation, check micronaut annotation
         if (content != null
@@ -1740,7 +1766,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             }
         }
 
-        return requestBody;
+        return Pair.of(requestBody, hasSchemaImplementation);
     }
 
     private void readServers(MethodElement element, VisitorContext context, io.swagger.v3.oas.models.Operation swaggerOperation) {
