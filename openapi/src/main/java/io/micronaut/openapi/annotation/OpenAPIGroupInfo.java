@@ -24,7 +24,7 @@ import java.lang.annotation.Target;
 import io.micronaut.context.annotation.AliasFor;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import static java.lang.annotation.RetentionPolicy.SOURCE;
 
 /**
  * With this annotation, you can specify the OpenAPIDefinition description that will be inserted
@@ -34,7 +34,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * @since 4.9.2
  */
 @Repeatable(OpenAPIGroupInfos.class)
-@Retention(RUNTIME)
+@Retention(SOURCE)
 @Documented
 @Target({ElementType.PACKAGE, ElementType.TYPE, ElementType.ANNOTATION_TYPE})
 public @interface OpenAPIGroupInfo {

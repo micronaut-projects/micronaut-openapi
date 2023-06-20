@@ -22,7 +22,7 @@ import java.lang.annotation.Target;
 
 import io.micronaut.context.annotation.AliasFor;
 
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import static java.lang.annotation.RetentionPolicy.SOURCE;
 
 /**
  * The annotation can be used to add suffix and prefix for operationIds. For example, when you have
@@ -41,7 +41,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  *
  * @since 4.5.0
  */
-@Retention(RUNTIME)
+@Retention(SOURCE)
 @Documented
 @Target({ElementType.TYPE, ElementType.METHOD})
 public @interface OpenAPIDecorator {
@@ -64,7 +64,7 @@ public @interface OpenAPIDecorator {
 
     /**
      * @return is this flag false, prefixes and suffixes will not be added to operationId
-     * if operationId is set explicitly in the {@link io.swagger.v3.oas.annotations.Operation} annotation
+     *     if operationId is set explicitly in the {@link io.swagger.v3.oas.annotations.Operation} annotation
      */
     boolean addAlways() default true;
 }

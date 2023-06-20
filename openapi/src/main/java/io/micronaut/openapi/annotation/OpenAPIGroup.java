@@ -22,7 +22,7 @@ import java.lang.annotation.Target;
 
 import io.micronaut.context.annotation.AliasFor;
 
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import static java.lang.annotation.RetentionPolicy.SOURCE;
 
 /**
  * With this annotation, you can specify one or more groups that this endpoint will be included in,
@@ -30,7 +30,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  *
  * @since 4.9.2
  */
-@Retention(RUNTIME)
+@Retention(SOURCE)
 @Documented
 @Target({ElementType.PACKAGE, ElementType.TYPE, ElementType.METHOD})
 public @interface OpenAPIGroup {
