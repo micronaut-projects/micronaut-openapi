@@ -15,7 +15,7 @@ dependencies {
     implementation("jakarta.annotation:jakarta.annotation-api")
     implementation("io.micronaut.validation:micronaut-validation")
     implementation("io.projectreactor:reactor-core")
-    implementation(project(":micronaut-openapi")) {
+    implementation(projects.micronautOpenapi) {
         because("Required for Swagger")
     }
     testRuntimeOnly("io.micronaut:micronaut-json-core")

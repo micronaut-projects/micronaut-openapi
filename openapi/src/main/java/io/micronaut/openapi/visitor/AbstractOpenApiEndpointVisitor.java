@@ -89,6 +89,7 @@ import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.PathItem;
 import io.swagger.v3.oas.models.media.ComposedSchema;
 import io.swagger.v3.oas.models.media.Content;
+import io.swagger.v3.oas.models.media.Encoding;
 import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.parameters.CookieParameter;
 import io.swagger.v3.oas.models.parameters.HeaderParameter;
@@ -106,10 +107,11 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 
+import static io.micronaut.openapi.visitor.ElementUtils.isFileUpload;
+import static io.micronaut.openapi.visitor.ElementUtils.isNullable;
 import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.getSecurityProperties;
 import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.isOpenApiEnabled;
 import static io.micronaut.openapi.visitor.SchemaUtils.TYPE_OBJECT;
-import static io.micronaut.openapi.visitor.ElementUtils.isNullable;
 import static io.micronaut.openapi.visitor.Utils.DEFAULT_MEDIA_TYPES;
 
 /**
@@ -226,6 +228,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             context.remove(CONTEXT_CHILD_OP_ID_SUFFIX);
             context.remove(CONTEXT_CHILD_OP_ID_SUFFIX_ADD_ALWAYS);
         }
+        context.remove(CONTEXT_CHILD_PATH);
     }
 
     private void processTags(ClassElement element, VisitorContext context) {
@@ -392,6 +395,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         for (Map.Entry<String, List<PathItem>> pathItemEntry : pathItemsMap.entrySet()) {
             List<PathItem> pathItems = pathItemEntry.getValue();
 
+            List<MediaType> consumesMediaTypes = consumesMediaTypes(element);
             Map<PathItem, io.swagger.v3.oas.models.Operation> swaggerOperations = readOperations(pathItemEntry.getKey(), httpMethod, pathItems, element, context);
 
             for (Map.Entry<PathItem, io.swagger.v3.oas.models.Operation> operationEntry : swaggerOperations.entrySet()) {
@@ -423,13 +427,13 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                 readResponse(element, context, openAPI, swaggerOperation, javadocDescription);
 
                 if (permitsRequestBody) {
-                    Optional<RequestBody> requestBody = readSwaggerRequestBody(element, context);
-                    if (requestBody.isPresent()) {
+                    RequestBody requestBody = readSwaggerRequestBody(element, consumesMediaTypes, context);
+                    if (requestBody != null) {
                         RequestBody currentRequestBody = swaggerOperation.getRequestBody();
                         if (currentRequestBody != null) {
-                            swaggerOperation.setRequestBody(mergeRequestBody(currentRequestBody, requestBody.get()));
+                            swaggerOperation.setRequestBody(mergeRequestBody(currentRequestBody, requestBody));
                         } else {
-                            swaggerOperation.setRequestBody(requestBody.get());
+                            swaggerOperation.setRequestBody(requestBody);
                         }
                     }
                 }
@@ -447,7 +451,6 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                 // @Parameters declared at method level take precedence over the declared as method arguments, so we process them first
                 processParameterAnnotationInMethod(element, openAPI, matchTemplate, httpMethod, pathVariables);
             }
-            List<MediaType> consumesMediaTypes = consumesMediaTypes(element);
             List<TypedElement> extraBodyParameters = new ArrayList<>();
             for (io.swagger.v3.oas.models.Operation operation : swaggerOperations.values()) {
                 processParameters(element, context, openAPI, operation, javadocDescription, permitsRequestBody, pathVariables, consumesMediaTypes, extraBodyParameters, httpMethod, matchTemplates, pathItems);
@@ -483,6 +486,10 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         if (requestBody != null && !extraBodyParameters.isEmpty()) {
             requestBody.getContent().forEach((mediaTypeName, mediaType) -> {
                 Schema schema = mediaType.getSchema();
+                if (schema == null) {
+                    schema = new Schema();
+                    mediaType.setSchema(schema);
+                }
                 if (schema.get$ref() != null) {
                     ComposedSchema composedSchema = new ComposedSchema();
                     Schema extraBodyParametersSchema = new Schema();
@@ -494,6 +501,24 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                 }
                 for (TypedElement parameter : extraBodyParameters) {
                     processBodyParameter(context, openAPI, javadocDescription, MediaType.of(mediaTypeName), schema, parameter);
+                    if (mediaTypeName.equals(MediaType.MULTIPART_FORM_DATA)) {
+                        for (String prop : (Set<String>) schema.getProperties().keySet()) {
+                            Map<String, Encoding> encodings = mediaType.getEncoding();
+                            if (encodings == null) {
+                                encodings = new HashMap<>();
+                                mediaType.setEncoding(encodings);
+                            }
+                            // if content type doesn't set by annotation,
+                            // we can set application/octet-stream for file upload classes
+                            Encoding encoding = encodings.get(prop);
+                            if (encoding == null && isFileUpload(parameter.getType())) {
+                                encoding = new Encoding();
+                                encodings.put(prop, encoding);
+
+                                encoding.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+                            }
+                        }
+                    }
                 }
             });
         }
@@ -626,7 +651,10 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             return;
         }
         if (permitsRequestBody && swaggerOperation.getRequestBody() == null) {
-            readSwaggerRequestBody(parameter, context).ifPresent(swaggerOperation::setRequestBody);
+            RequestBody requestBody = readSwaggerRequestBody(parameter, consumesMediaTypes, context);
+            if (requestBody != null) {
+                swaggerOperation.setRequestBody(requestBody);
+            }
         }
 
         consumesMediaTypes = CollectionUtils.isNotEmpty(consumesMediaTypes) ? consumesMediaTypes : DEFAULT_MEDIA_TYPES;
@@ -1650,9 +1678,30 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         }
     }
 
-    private Optional<RequestBody> readSwaggerRequestBody(Element element, VisitorContext context) {
-        return element.findAnnotation(io.swagger.v3.oas.annotations.parameters.RequestBody.class)
-            .flatMap(annotation -> toValue(annotation.getValues(), context, RequestBody.class));
+    private RequestBody readSwaggerRequestBody(Element element, List<MediaType> consumesMediaTypes, VisitorContext context) {
+        AnnotationValue<io.swagger.v3.oas.annotations.parameters.RequestBody> requestBodyAnnValue =
+            element.findAnnotation(io.swagger.v3.oas.annotations.parameters.RequestBody.class).orElse(null);
+
+        if (requestBodyAnnValue == null) {
+            return null;
+        }
+
+        AnnotationValue<io.swagger.v3.oas.annotations.media.Content> content = requestBodyAnnValue.getAnnotation("content", io.swagger.v3.oas.annotations.media.Content.class).orElse(null);
+        RequestBody requestBody = toValue(requestBodyAnnValue.getValues(), context, RequestBody.class).orElse(null);
+        // if media type doesn't set in swagger annotation, check micronaut annotation
+        if (content != null
+            && !content.stringValue("mediaType").isPresent()
+            && requestBody != null
+            && requestBody.getContent() != null
+            && !consumesMediaTypes.equals(DEFAULT_MEDIA_TYPES)) {
+
+            io.swagger.v3.oas.models.media.MediaType defaultSwaggerMediaType = requestBody.getContent().remove(MediaType.APPLICATION_JSON);
+            for (MediaType mediaType : consumesMediaTypes) {
+                requestBody.getContent().put(mediaType.toString(), defaultSwaggerMediaType);
+            }
+        }
+
+        return requestBody;
     }
 
     private void readServers(MethodElement element, VisitorContext context, io.swagger.v3.oas.models.Operation swaggerOperation) {

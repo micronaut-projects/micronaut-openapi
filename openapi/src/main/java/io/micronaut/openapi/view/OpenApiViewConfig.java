@@ -43,6 +43,8 @@ import io.micronaut.inject.visitor.VisitorContext;
 import io.micronaut.openapi.visitor.OpenApiApplicationVisitor;
 import io.micronaut.openapi.visitor.Utils;
 
+import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.MICRONAUT_SERVER_CONTEXT_PATH;
+
 /**
  * OpenApi view configuration for Swagger-ui, ReDoc and RapiDoc.
  * By default, no views are enabled.
@@ -120,25 +122,26 @@ public final class OpenApiViewConfig {
      *
      * @param specification A String representation of an OpenApiViewConfig.
      * @param openApiProperties The open api properties.
+     * @param context Visitor context.
      *
      * @return An OpenApiViewConfig.
      */
-    public static OpenApiViewConfig fromSpecification(String specification, Properties openApiProperties) {
+    public static OpenApiViewConfig fromSpecification(String specification, Properties openApiProperties, VisitorContext context) {
         Map<String, String> openApiMap = new HashMap<>(openApiProperties.size());
         openApiProperties.forEach((key, value) -> openApiMap.put((String) key, (String) value));
         openApiMap.putAll(parse(specification));
         OpenApiViewConfig cfg = new OpenApiViewConfig();
-        RapiPDFConfig rapiPDFConfig = RapiPDFConfig.fromProperties(openApiMap);
+        RapiPDFConfig rapiPDFConfig = RapiPDFConfig.fromProperties(openApiMap, context);
         if ("true".equals(openApiMap.getOrDefault("redoc.enabled", Boolean.FALSE.toString()))) {
-            cfg.redocConfig = RedocConfig.fromProperties(openApiMap);
+            cfg.redocConfig = RedocConfig.fromProperties(openApiMap, context);
             cfg.redocConfig.rapiPDFConfig = rapiPDFConfig;
         }
         if ("true".equals(openApiMap.getOrDefault("rapidoc.enabled", Boolean.FALSE.toString()))) {
-            cfg.rapidocConfig = RapidocConfig.fromProperties(openApiMap);
+            cfg.rapidocConfig = RapidocConfig.fromProperties(openApiMap, context);
             cfg.rapidocConfig.rapiPDFConfig = rapiPDFConfig;
         }
         if ("true".equals(openApiMap.getOrDefault("swagger-ui.enabled", Boolean.FALSE.toString()))) {
-            cfg.swaggerUIConfig = SwaggerUIConfig.fromProperties(openApiMap);
+            cfg.swaggerUIConfig = SwaggerUIConfig.fromProperties(openApiMap, context);
             cfg.swaggerUIConfig.rapiPDFConfig = rapiPDFConfig;
         }
         cfg.mappingPath = openApiMap.getOrDefault("mapping.path", "swagger");
@@ -338,7 +341,7 @@ public final class OpenApiViewConfig {
         }
 
         template = cfg.render(template, context);
-        template = replacePlaceHolder(template, "specURL", getSpecURL(context), "");
+        template = replacePlaceHolder(template, "specURL", getSpecURL(cfg, context), "");
         template = replacePlaceHolder(template, "title", getTitle(), "");
         if (!Files.exists(outputDir)) {
             Files.createDirectories(outputDir);
@@ -389,14 +392,20 @@ public final class OpenApiViewConfig {
     /**
      * Returns the relative openApi specification url path.
      *
+     * @param cfg view config.
      * @param context Visitor context.
      *
      * @return A path.
      */
-    public String getSpecURL(VisitorContext context) {
+    public String getSpecURL(AbstractViewConfig cfg, VisitorContext context) {
+
+        if (cfg.specUrl != null) {
+            return cfg.specUrl;
+        }
+
         String specUrl = StringUtils.prependUri(serverContextPath, StringUtils.prependUri(mappingPath, specFile));
         if (StringUtils.isEmpty(serverContextPath)) {
-            String contextPath = OpenApiApplicationVisitor.getConfigurationProperty("micronaut.server.context-path", context);
+            String contextPath = OpenApiApplicationVisitor.getConfigurationProperty(MICRONAUT_SERVER_CONTEXT_PATH, context);
             if (contextPath == null) {
                 contextPath = StringUtils.EMPTY_STRING;
             }

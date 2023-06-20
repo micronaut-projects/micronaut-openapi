@@ -1,20 +1,17 @@
 [versions]
-managed-swagger = "2.2.10"
+managed-swagger = "2.2.12"
 managed-javadoc-parser = "0.3.1"
 managed-jsoup = "1.16.1"
 managed-html2md-converter = "0.64.8"
 
-assertj = "3.24.2"
 kotlin = "1.8.22"
-kotlin-coroutines = "1.7.1"
 jspecify = "0.3.0"
 jdt-annotation = "2.2.700"
 android-annotation = "1.6.0"
 spotbugs-annotations = "4.7.3"
 openapi-generator = "6.6.0"
-junit5 = "5.9.3"
-swagger-parser = "1.0.66"
-swagger-parser-v3 = "2.1.14"
+swagger-parser = "1.0.67"
+swagger-parser-v3 = "2.1.15"
 javaparser = "3.25.3"
 
 micronaut = "4.0.0-RC1"
@@ -29,14 +26,12 @@ micronaut-data = "4.0.0-M11"
 micronaut-test = "4.0.0-M8"
 micronaut-kotlin = "4.0.0-M5"
 micronaut-platform = "4.0.0-M4"
-
 micronaut-logging = "1.0.0-M4"
+
 [libraries]
 # Core
 micronaut-core = { module = 'io.micronaut:micronaut-core-bom', version.ref = 'micronaut' }
-
 micronaut-logging = { module = "io.micronaut.logging:micronaut-logging-bom", version.ref = "micronaut-logging" }
-
 micronaut-security = { module = "io.micronaut.security:micronaut-security-bom", version.ref = "micronaut-security" }
 micronaut-serde = { module = "io.micronaut.serde:micronaut-serde-bom", version.ref = "micronaut-serde" }
 micronaut-rxjava2 = { module = "io.micronaut.rxjava2:micronaut-rxjava2-bom", version.ref = "micronaut-rxjava2" }
@@ -61,20 +56,17 @@ managed-jsoup = { module = "org.jsoup:jsoup", version.ref = "managed-jsoup" }
 junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine" }
 jackson-datatype-jsr310 = { module = "com.fasterxml.jackson.datatype:jackson-datatype-jsr310" }
 jackson-dataformat-yaml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml" }
-spotbugs-annotations = { module = "com.github.spotbugs:spotbugs-annotations", version.ref = "spotbugs-annotations" }
-jspecify = { module = "org.jspecify:jspecify", version.ref = "jspecify" }
-jdt-annotation = { module = "org.eclipse.jdt:org.eclipse.jdt.annotation", version.ref = "jdt-annotation" }
-android-annotation = { module = "androidx.annotation:annotation", version.ref = "android-annotation" }
-
-assertj = { module = "org.assertj:assertj-core", version.ref = "assertj" }
-javaparser = { module = "com.github.javaparser:javaparser-symbol-solver-core", version.ref = "javaparser" }
-junit5-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit5" }
-junit5-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit5" }
+assertj = { module = "org.assertj:assertj-core" }
+kotlinx-coroutines-reactive = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-reactive" }
+kotlinx-coroutines-reactor = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-reactor" }
 
 kotlin-stdlib-jdk8 = { module = "org.jetbrains.kotlin:kotlin-stdlib-jdk8", version.ref = "kotlin" }
 kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
-kotlinx-coroutines-reactive = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-reactive", version.ref = "kotlin-coroutines" }
-kotlinx-coroutines-reactor = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-reactor", version.ref = "kotlin-coroutines" }
+jspecify = { module = "org.jspecify:jspecify", version.ref = "jspecify" }
+spotbugs-annotations = { module = "com.github.spotbugs:spotbugs-annotations", version.ref = "spotbugs-annotations" }
+jdt-annotation = { module = "org.eclipse.jdt:org.eclipse.jdt.annotation", version.ref = "jdt-annotation" }
+android-annotation = { module = "androidx.annotation:annotation", version.ref = "android-annotation" }
+javaparser = { module = "com.github.javaparser:javaparser-symbol-solver-core", version.ref = "javaparser" }
 
 openapi-generator = { module = "org.openapitools:openapi-generator", version.ref = "openapi-generator" }
 swagger-parser = { module = "io.swagger:swagger-parser", version.ref = "swagger-parser" }

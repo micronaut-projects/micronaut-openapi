@@ -644,4 +644,167 @@ class MyBean {}
         operation.requestBody.content."multipart/mixed2".encoding.secondOject.extensions."x-myExt22".prop1 == "prop1Val1"
         operation.requestBody.content."multipart/mixed2".encoding.secondOject.extensions."x-myExt22".prop2 == "prop2Val2"
     }
+
+    void "test build OpenAPI multipart form data"() {
+
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import jakarta.validation.constraints.NotNull;
+
+import io.micronaut.http.HttpResponse;
+import io.micronaut.http.MediaType;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Post;
+import io.micronaut.http.multipart.CompletedFileUpload;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Encoding;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
+
+import jakarta.inject.Singleton;
+
+@Controller("/path/{input}")
+class OpenApiController {
+
+    /**
+     * Operation description.
+     *
+     * @param template Template description
+     * @param parameters Parameters description
+     */
+    @RequestBody(
+            description = "Body description",
+            content = @Content(encoding = {
+            @Encoding(name = "template", contentType = MediaType.APPLICATION_OCTET_STREAM),
+            @Encoding(name = "parameters", contentType = MediaType.APPLICATION_JSON),
+    }))
+    @Post(consumes = MediaType.MULTIPART_FORM_DATA)
+    public String print(
+            String input,
+            @NotNull CompletedFileUpload template,
+            String parameters) {
+        return null;
+    }
+}
+
+@Singleton
+class MyBean {}
+''')
+        then: "the state is correct"
+        Utils.testReference != null
+
+        when: "The OpenAPI is retrieved"
+        OpenAPI openAPI = Utils.testReference
+        Operation operation = openAPI.paths.get("/path/{input}").post
+
+        then:
+        operation
+
+        operation.parameters.size() == 1
+        operation.parameters.get(0).name == 'input'
+        operation.parameters.get(0).in == 'path'
+        operation.parameters.get(0).required
+        operation.parameters.get(0).schema
+        operation.parameters.get(0).schema.type == 'string'
+
+        operation.requestBody
+        operation.requestBody.description == "Body description"
+        operation.requestBody.content
+        operation.requestBody.content.size() == 1
+        operation.requestBody.content."multipart/form-data"
+        operation.requestBody.content."multipart/form-data".schema
+        operation.requestBody.content."multipart/form-data".schema.required.size() == 1
+        operation.requestBody.content."multipart/form-data".schema.required.get(0) == 'template'
+        operation.requestBody.content."multipart/form-data".schema.properties.size() == 2
+        operation.requestBody.content."multipart/form-data".schema.properties.'template'.type == 'string'
+        operation.requestBody.content."multipart/form-data".schema.properties.'template'.format == 'binary'
+        operation.requestBody.content."multipart/form-data".schema.properties.'parameters'.type == 'string'
+        operation.requestBody.content."multipart/form-data".encoding."template".contentType == "application/octet-stream"
+        operation.requestBody.content."multipart/form-data".encoding."parameters".contentType == "application/json"
+    }
+
+    void "test build OpenAPI multipart form data auto set application/octet-stream"() {
+
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import java.util.HashMap;
+
+import jakarta.validation.constraints.NotNull;
+
+import io.micronaut.http.MediaType;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Post;
+import io.micronaut.http.multipart.CompletedFileUpload;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Encoding;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
+
+import jakarta.inject.Singleton;
+
+@Controller("/path/{input}")
+class OpenApiController {
+
+    /**
+     * Operation description.
+     *
+     * @param template Template description
+     * @param parameters Parameters description
+     */
+    @RequestBody(
+            description = "Body description",
+            content = @Content(encoding = {
+            @Encoding(name = "parameters", contentType = MediaType.APPLICATION_JSON),
+    }))
+    @Post(consumes = MediaType.MULTIPART_FORM_DATA)
+    public String print(
+            String input,
+            @NotNull CompletedFileUpload template,
+            @Schema(implementation = Parameters.class) String parameters) {
+        return null;
+    }
+}
+
+class Parameters extends HashMap<String, Object> {
+
+}
+
+@Singleton
+class MyBean {}
+''')
+        then: "the state is correct"
+        Utils.testReference != null
+
+        when: "The OpenAPI is retrieved"
+        OpenAPI openAPI = Utils.testReference
+        Operation operation = openAPI.paths.get("/path/{input}").post
+
+        then:
+        operation
+
+        operation.parameters.size() == 1
+        operation.parameters.get(0).name == 'input'
+        operation.parameters.get(0).in == 'path'
+        operation.parameters.get(0).required
+        operation.parameters.get(0).schema
+        operation.parameters.get(0).schema.type == 'string'
+
+        operation.requestBody
+        operation.requestBody.description == "Body description"
+        operation.requestBody.content
+        operation.requestBody.content.size() == 1
+        operation.requestBody.content."multipart/form-data"
+        operation.requestBody.content."multipart/form-data".schema
+        operation.requestBody.content."multipart/form-data".schema.required.size() == 1
+        operation.requestBody.content."multipart/form-data".schema.required.get(0) == 'template'
+        operation.requestBody.content."multipart/form-data".schema.properties.size() == 2
+        operation.requestBody.content."multipart/form-data".schema.properties.'template'.type == 'string'
+        operation.requestBody.content."multipart/form-data".schema.properties.'template'.format == 'binary'
+        operation.requestBody.content."multipart/form-data".schema.properties.'parameters'.type == 'object'
+        operation.requestBody.content."multipart/form-data".encoding."template".contentType == "application/octet-stream"
+        operation.requestBody.content."multipart/form-data".encoding."parameters".contentType == "application/json"
+    }
 }

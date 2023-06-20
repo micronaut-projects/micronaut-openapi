@@ -240,6 +240,14 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
     public static final String MICRONAUT_CONFIG_FILE_LOCATIONS = "micronaut.openapi.config.file.locations";
 
     /**
+     * Loaded micronaut-http server context path property.
+     */
+    public static final String MICRONAUT_SERVER_CONTEXT_PATH = "micronaut.server.context-path";
+    /**
+     * Final calculated openapi filename.
+     */
+    public static final String MICRONAUT_INTERNAL_OPENAPI_FILENAME = "micronaut.internal.openapi.filename";
+    /**
      * Loaded micronaut environment.
      */
     private static final String MICRONAUT_ENVIRONMENT = "micronaut.environment";
@@ -874,7 +882,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
 
     private void renderViews(String title, String specFile, Path destinationDir, VisitorContext context) throws IOException {
         String viewSpecification = getConfigurationProperty(MICRONAUT_OPENAPI_VIEWS_SPEC, context);
-        OpenApiViewConfig cfg = OpenApiViewConfig.fromSpecification(viewSpecification, readOpenApiConfigFile(context));
+        OpenApiViewConfig cfg = OpenApiViewConfig.fromSpecification(viewSpecification, readOpenApiConfigFile(context), context);
         if (cfg.isEnabled()) {
             cfg.setTitle(title);
             cfg.setSpecFile(specFile);
@@ -1197,6 +1205,8 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             if (fileName.contains("${")) {
                 context.warn("Can't set some placeholders in fileName: " + fileName, null);
             }
+
+            context.put(MICRONAUT_INTERNAL_OPENAPI_FILENAME, fileName);
 
             writeYamlToFile(openApi, fileName, documentTitle, context, isYaml);
             visitedElements = visitedElements(context);
