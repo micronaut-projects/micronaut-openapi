@@ -22,7 +22,7 @@ import io.micronaut.core.annotation.Internal;
 /**
  * Micronaut router versioning properties.
  *
- * @since 4.9.2
+ * @since 4.10.0
  */
 @Internal
 public final class RouterVersioningProperties {

@@ -31,7 +31,7 @@ import static java.lang.annotation.RetentionPolicy.SOURCE;
  * into a specific swagger file, only for this group. Thus, you can make different descriptions
  * for different groups.
  *
- * @since 4.9.2
+ * @since 4.10.0
  */
 @Repeatable(OpenAPIGroupInfos.class)
 @Retention(SOURCE)

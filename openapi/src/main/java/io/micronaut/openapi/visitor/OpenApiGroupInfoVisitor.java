@@ -43,7 +43,7 @@ import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.isOpenApiEn
  * A {@link TypeElementVisitor} that read the @{@link OpenAPIGroupInfo} annotations at the compile
  * time.
  *
- * @since 4.9.2
+ * @since 4.10.0
  */
 @Internal
 @SupportedOptions(MICRONAUT_OPENAPI_ENABLED)

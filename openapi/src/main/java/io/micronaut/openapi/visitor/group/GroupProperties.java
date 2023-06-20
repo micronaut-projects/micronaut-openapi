@@ -22,7 +22,7 @@ import io.micronaut.core.annotation.Internal;
 /**
  * OpenAPI group properties.
  *
- * @since 4.9.2
+ * @since 4.10.0
  */
 @Internal
 public final class GroupProperties {
@@ -115,7 +115,7 @@ public final class GroupProperties {
     /**
      * Package name with inclusion subpackasges flag.
      *
-     * @since 4.9.2
+     * @since 4.10.0
      */
     @Internal
     public static final class PackageProperties {

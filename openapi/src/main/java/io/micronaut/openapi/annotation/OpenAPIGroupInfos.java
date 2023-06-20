@@ -25,7 +25,7 @@ import static java.lang.annotation.RetentionPolicy.SOURCE;
 /**
  * Allows {@link OpenAPIGroupInfo} to be repeatable.
  *
- * @since 4.9.2
+ * @since 4.10.0
  */
 @Documented
 @Retention(SOURCE)

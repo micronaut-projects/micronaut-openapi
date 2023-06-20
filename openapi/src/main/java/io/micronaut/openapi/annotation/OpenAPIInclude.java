@@ -60,14 +60,14 @@ public @interface OpenAPIInclude {
     /**
      * @return Array of groups to which this controller should be included.
      *
-     * @since 4.9.2
+     * @since 4.10.0
      */
     String[] groups() default {};
 
     /**
      * @return Array of groups to which this controller should not be included.
      *
-     * @since 4.9.2
+     * @since 4.10.0
      */
     String[] groupsExcluded() default {};
 
