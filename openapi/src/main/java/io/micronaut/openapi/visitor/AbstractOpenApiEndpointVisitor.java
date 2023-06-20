@@ -386,7 +386,6 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
 
             Map<PathItem, io.swagger.v3.oas.models.Operation> swaggerOperations = readOperations(pathItemEntry.getKey(), httpMethod, pathItems, element, context);
 
-            boolean isRequestBodySchemaSet = false;
 
             for (Map.Entry<PathItem, io.swagger.v3.oas.models.Operation> operationEntry : swaggerOperations.entrySet()) {
                 io.swagger.v3.oas.models.Operation swaggerOperation = operationEntry.getValue();
@@ -415,6 +414,8 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                 }
 
                 readResponse(element, context, openAPI, swaggerOperation, javadocDescription);
+
+                boolean isRequestBodySchemaSet = false;
 
                 if (permitsRequestBody) {
                     Pair<RequestBody, Boolean> requestBodyPair = readSwaggerRequestBody(element, consumesMediaTypes, context);
