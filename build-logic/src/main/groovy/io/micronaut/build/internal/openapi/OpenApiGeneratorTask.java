@@ -20,6 +20,7 @@ import org.gradle.api.file.ConfigurableFileCollection;
 import org.gradle.api.file.Directory;
 import org.gradle.api.file.DirectoryProperty;
 import org.gradle.api.file.RegularFileProperty;
+import org.gradle.api.provider.ListProperty;
 import org.gradle.api.provider.Property;
 import org.gradle.api.provider.Provider;
 import org.gradle.api.tasks.Classpath;
@@ -66,6 +67,10 @@ public abstract class OpenApiGeneratorTask extends DefaultTask {
         return getOutputDirectory().dir("src/test/groovy");
     }
 
+    @Input
+    public abstract ListProperty<String> getOutputKinds();
+
+
     @Inject
     protected abstract ExecOperations getExecOperations();
 
@@ -82,6 +87,7 @@ public abstract class OpenApiGeneratorTask extends DefaultTask {
             args.add(getGeneratorKind().get());
             args.add(getOpenApiDefinition().get().getAsFile().toURI().toString());
             args.add(getOutputDirectory().get().getAsFile().getAbsolutePath());
+            args.add(String.join(",", getOutputKinds().get()));
             javaexec.args(args);
         });
     }

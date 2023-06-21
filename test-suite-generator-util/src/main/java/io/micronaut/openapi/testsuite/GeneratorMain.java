@@ -20,24 +20,37 @@ import io.micronaut.openapi.generator.MicronautCodeGeneratorEntryPoint;
 import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
-
-import static io.micronaut.openapi.generator.MicronautCodeGeneratorEntryPoint.OutputKind.*;
+import java.util.Arrays;
 
 /**
  * An entry point to be used in tests, to simulate
  * what the Micronaut OpenAPI Gradle plugin would do
  */
 public class GeneratorMain {
+
+    /**
+     * The main executable.
+     *
+     * @param args The argument array, consisting of:
+     *             <ol>
+     *                 <li>Server or client boolean.</li>
+     *                 <li>The definition file path.</li>
+     *                 <li>The output directory.</li>
+     *                 <li>A comma-separated list of output kinds.</li>
+     *             </ol>
+     * @throws URISyntaxException In case definition file path is incorrect.
+     */
     public static void main(String[] args) throws URISyntaxException {
         boolean server = "server".equals(args[0]);
+        MicronautCodeGeneratorEntryPoint.OutputKind[] outputKinds
+            = Arrays.stream(args[3].split(","))
+            .map(MicronautCodeGeneratorEntryPoint.OutputKind::of)
+            .toArray(MicronautCodeGeneratorEntryPoint.OutputKind[]::new);
+
         var builder = MicronautCodeGeneratorEntryPoint.builder()
             .withDefinitionFile(new URI(args[1]))
             .withOutputDirectory(new File(args[2]))
-            .withOutputs(
-                MODELS,
-                APIS,
-                SUPPORTING_FILES
-            )
+            .withOutputs(outputKinds)
             .withOptions(options -> {
                 options.withInvokerPackage("io.micronaut.openapi.test");
                 options.withApiPackage("io.micronaut.openapi.test.api");
@@ -52,7 +65,7 @@ public class GeneratorMain {
                 serverOptions.withControllerPackage("io.micronaut.openapi.test.controller");
                 // commented out because currently this would prevent the test project from compiling
                 // because we generate both abstract classes _and_ dummy implementations
-                 serverOptions.withGenerateAbstractClasses(false);
+                 serverOptions.withGenerateImplementationFiles(false);
                  serverOptions.withAuthentication(false);
             });
         } else {

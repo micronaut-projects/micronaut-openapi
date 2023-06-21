@@ -154,7 +154,6 @@ class RequestBodyControllerSpec extends Specification {
                 .numRepresentatives(100000).description("A hopping animal") | _
     }
 
-    @Ignore("Verify the correct behaviour")
     void "test send date model"() {
         given:
         DateModel dateModel = new DateModel()
@@ -166,7 +165,7 @@ class RequestBodyControllerSpec extends Specification {
         String response = client.retrieve(request, Argument.of(String), Argument.of(String))
 
         then:
-        '{"commitDate":"2022-01-03","commitDateTime":"1999-01-01T00:01:10.456+01:00"}' == response
+        '{"commitDate":"2022-01-03","commitDateTime":"1998-12-31T23:01:10.456Z"}' == response
     }
 
     void "test send nested model"() {

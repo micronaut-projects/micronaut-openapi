@@ -281,7 +281,7 @@ class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen<JavaMicron
 
     static class DefaultServerOptionsBuilder implements JavaMicronautServerOptionsBuilder {
         private String controllerPackage;
-        private boolean generateAbstractClasses;
+        private boolean generateImplementationFiles;
         private boolean generateControllerFromExamples;
         private boolean generateOperationsToReturnNotImplemented = true;
         private boolean useAuth = true;
@@ -293,8 +293,8 @@ class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen<JavaMicron
         }
 
         @Override
-        public JavaMicronautServerOptionsBuilder withGenerateAbstractClasses(boolean abstractClasses) {
-            this.generateAbstractClasses = abstractClasses;
+        public JavaMicronautServerOptionsBuilder withGenerateImplementationFiles(boolean generateImplementationFiles) {
+            this.generateImplementationFiles = generateImplementationFiles;
             return this;
         }
 
@@ -317,13 +317,13 @@ class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen<JavaMicron
         }
 
         ServerOptions build() {
-            return new ServerOptions(controllerPackage, generateAbstractClasses, generateOperationsToReturnNotImplemented, generateControllerFromExamples, useAuth);
+            return new ServerOptions(controllerPackage, generateImplementationFiles, generateOperationsToReturnNotImplemented, generateControllerFromExamples, useAuth);
         }
     }
 
     record ServerOptions(
         String controllerPackage,
-        boolean generateAbstractClasses,
+        boolean generateImplementationFiles,
         boolean generateOperationsToReturnNotImplemented,
         boolean generateControllerFromExamples,
         boolean useAuth

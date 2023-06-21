@@ -29,13 +29,12 @@ public interface JavaMicronautServerOptionsBuilder extends GeneratorOptionsBuild
     JavaMicronautServerOptionsBuilder withControllerPackage(String controllerPackage);
 
     /**
-     * If set to true, the code generator will output abstract classes
-     * for the controller, instead of concrete implementations.
+     * Whether to generate controller implementations that need to be filled in.
      *
-     * @param abstractClasses the abstract classes flag
+     * @param generateImplementationFiles the implementation files flag
      * @return this builder
      */
-    JavaMicronautServerOptionsBuilder withGenerateAbstractClasses(boolean abstractClasses);
+    JavaMicronautServerOptionsBuilder withGenerateImplementationFiles(boolean generateImplementationFiles);
 
     /**
      * If set to true, controller operations will return not implemented status.
