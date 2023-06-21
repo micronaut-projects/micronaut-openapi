@@ -413,18 +413,17 @@ abstract class AbstractOpenApiVisitor {
                     Object[] a = (Object[]) value;
                     if (ArrayUtils.isNotEmpty(a)) {
                         Object first = a[0];
-                        boolean areAnnotationValues = first instanceof AnnotationValue;
-                        boolean areClassValues = first instanceof AnnotationClassValue;
 
-                        if (areClassValues) {
+                        // are class values
+                        if ( first instanceof AnnotationClassValue) {
                             List<Class<?>> classes = new ArrayList<>(a.length);
                             for (Object o : a) {
                                 AnnotationClassValue<?> acv = (AnnotationClassValue<?>) o;
                                 acv.getType().ifPresent(classes::add);
                             }
                             newValues.put(key, classes);
-                        } else if (areAnnotationValues) {
-                            String annotationName = ((AnnotationValue<?>) first).getAnnotationName();
+                        } else if (first instanceof AnnotationValue<?> annValue) {
+                            String annotationName = annValue.getAnnotationName();
                             if (io.swagger.v3.oas.annotations.security.SecurityRequirement.class.getName().equals(annotationName)) {
                                 List<SecurityRequirement> securityRequirements = new ArrayList<>(a.length);
                                 for (Object o : a) {
@@ -833,8 +832,8 @@ abstract class AbstractOpenApiVisitor {
 
         Schema schema = null;
 
-        if (type instanceof EnumElement) {
-            schema = getSchemaDefinition(openAPI, context, type, typeArgs, definingElement, mediaTypes);
+        if (type instanceof EnumElement enumEl) {
+            schema = getSchemaDefinition(openAPI, context, enumEl, typeArgs, definingElement, mediaTypes);
         } else {
 
             boolean isPublisher = false;

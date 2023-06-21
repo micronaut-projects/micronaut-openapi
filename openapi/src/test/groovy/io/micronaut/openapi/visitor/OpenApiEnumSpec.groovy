@@ -891,7 +891,6 @@ class MyBean {}
         buildBeanDefinition('test.MyBean', '''
 package test;
 
-import io.micronaut.core.annotation.Introspected;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.MediaType;
 import io.micronaut.http.annotation.Controller;
@@ -913,13 +912,14 @@ class OpenApiController {
     }
 }
 
-@Schema(example = "{\\n"
-        + "\\"s3url\\" : \\"s3://bucket/b559615a-af21-417f-9a63-e5f6eca42342.docx\\","
-        + "\\"stampWidth\\" : 220,"
-        + "\\"stampHeight\\" : 85,"
-        + "\\"stampAlign\\" : \\"LEFT\\","
-        + "\\"pageNumber\\" : 1"
-        + "}")
+@Schema(example = """
+            {
+                "s3url" : "s3://bucket/b559615a-af21-417f-9a63-e5f6eca42342.docx",
+                "stampWidth" : 220,
+                "stampHeight" : 85,
+                "stampAlign" : "LEFT",
+                "pageNumber" : 1"
+            }""")
 class Parameters {
 
     /**
