@@ -1,0 +1,68 @@
+/**
+ * {{^description}}Gets or Sets {{{name}}}{{/description}}{{#description}}{{description}}{{/description}}
+ */
+{{#withXml}}
+@XmlType(name="{{datatypeWithEnum}}")
+@XmlEnum({{dataType}}.class)
+{{/withXml}}
+{{#micronaut_serde_jackson}}
+@Serdeable
+{{/micronaut_serde_jackson}}
+{{#additionalEnumTypeAnnotations}}
+{{{.}}}
+{{/additionalEnumTypeAnnotations}}
+{{#formatSingleLine}}public enum {{>common/model/enumName}}{{/formatSingleLine}} {
+    {{#allowableValues}}
+        {{#enumVars}}
+            {{#enumDescription}}
+    /**
+     * {{enumDescription}}
+     */
+            {{/enumDescription}}
+            {{#withXml}}
+    @XmlEnumValue({{#isInteger}}"{{/isInteger}}{{#isDouble}}"{{/isDouble}}{{#isLong}}"{{/isLong}}{{#isFloat}}"{{/isFloat}}{{{value}}}{{#isInteger}}"{{/isInteger}}{{#isDouble}}"{{/isDouble}}{{#isLong}}"{{/isLong}}{{#isFloat}}"{{/isFloat}})
+            {{/withXml}}
+    {{{name}}}({{{value}}}){{^-last}},{{/-last}}{{#-last}};{{/-last}}
+        {{/enumVars}}
+    {{/allowableValues}}
+
+    private final {{{dataType}}} value;
+
+    {{#formatSingleLine}}{{>common/model/enumName}}{{/formatSingleLine}}({{{dataType}}} value) {
+        this.value = value;
+    }
+
+    /**
+     * @return The value represented by this enum
+     */
+    {{#jackson}}
+    @JsonValue
+    {{/jackson}}
+    public {{{dataType}}} getValue() {
+        return value;
+    }
+
+    @Override
+    public String toString() {
+        return String.valueOf(value);
+    }
+
+    {{#formatSingleLine}}private final static Map<{{{dataType}}}, {{>common/model/enumName}}> VALUE_MAPPING = Arrays.stream(values()){{/formatSingleLine}}
+        .collect(Collectors.toMap(v -> v.getValue(){{#isString}}{{#useEnumCaseInsensitive}}.toLowerCase(){{/useEnumCaseInsensitive}}{{/isString}}, v -> v));
+
+    /**
+     * Create this enum from a value.
+     * @return The enum.
+     */
+    {{#jackson}}
+    @JsonCreator
+    {{/jackson}}
+    {{#formatSingleLine}}public static {{>common/model/enumName}} fromValue(String value){{/formatSingleLine}} {
+        {{^isNullable}}
+        if (!VALUE_MAPPING.containsKey(value{{#isString}}{{#useEnumCaseInsensitive}}.toLowerCase(){{/useEnumCaseInsensitive}}{{/isString}})) {
+            throw new IllegalArgumentException("Unexpected value '" + value + "'");
+        }
+        {{/isNullable}}
+        return VALUE_MAPPING.get(value{{#isString}}{{#useEnumCaseInsensitive}}.toLowerCase(){{/useEnumCaseInsensitive}}{{/isString}});
+    }
+}

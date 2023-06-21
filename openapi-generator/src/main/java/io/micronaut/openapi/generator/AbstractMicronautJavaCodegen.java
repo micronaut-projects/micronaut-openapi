@@ -194,8 +194,8 @@ abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBuilder> e
 
         // Add reserved words
         String[] reservedWordsArray = {
-            "client", "format", "queryvalue", "queryparam", "pathvariable", "header", "cookie",
-            "authorization", "body", "application"
+            "Client", "Format", "QueryValue", "QueryParam", "PathVariable", "Header", "Cookie",
+            "Authorization", "Body", "application"
         };
         reservedWords.addAll(Arrays.asList(reservedWordsArray));
     }
@@ -312,6 +312,9 @@ abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBuilder> e
             setSerializationLibrary((String) additionalProperties.get(CodegenConstants.SERIALIZATION_LIBRARY));
         }
         additionalProperties.put(this.serializationLibrary.toLowerCase(Locale.US), true);
+        if (SerializationLibraryKind.MICRONAUT_SERDE_JACKSON.name().equals(serializationLibrary)) {
+            additionalProperties.put(SerializationLibraryKind.JACKSON.name().toLowerCase(Locale.US), true);
+        }
 
         // Add all the supporting files
         String resourceFolder = projectFolder + "/resources";
@@ -360,6 +363,11 @@ abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBuilder> e
         additionalProperties.put("resourceFolder", resourceFolder);
         additionalProperties.put("apiFolder", apiFolder);
         additionalProperties.put("modelFolder", modelFolder);
+
+        additionalProperties.put("formatNoEmptyLines", new Formatting.LineFormatter(0));
+        additionalProperties.put("formatOneEmptyLine", new Formatting.LineFormatter(1));
+        additionalProperties.put("formatSingleLine", new Formatting.SingleLineFormatter());
+        additionalProperties.put("indent", new Formatting.IndentFormatter(4));
     }
 
     // CHECKSTYLE:OFF
