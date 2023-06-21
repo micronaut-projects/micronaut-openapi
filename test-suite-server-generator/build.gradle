@@ -11,7 +11,7 @@ that tests can be ran with Micronaut 4
 dependencies {
     annotationProcessor("io.micronaut:micronaut-http-validation")
     annotationProcessor("io.micronaut.serde:micronaut-serde-processor")
-    implementation("io.micronaut:micronaut-http-client")
+    implementation("io.micronaut:micronaut-http")
     implementation("io.micronaut.serde:micronaut-serde-api")
     implementation("jakarta.annotation:jakarta.annotation-api")
     implementation("io.micronaut.validation:micronaut-validation")
@@ -22,6 +22,8 @@ dependencies {
     testCompileOnly("io.micronaut:micronaut-inject-groovy-test")
     testCompileOnly("io.micronaut:micronaut-inject-java-test")
     testImplementation("io.micronaut.test:micronaut-test-spock")
+    testImplementation("io.micronaut:micronaut-http-client")
+
 
     testRuntimeOnly("io.micronaut:micronaut-json-core")
     testRuntimeOnly("io.micronaut.serde:micronaut-serde-jackson")
