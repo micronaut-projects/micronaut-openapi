@@ -104,15 +104,14 @@ extends <a href="GeneratorOptionsBuilder.html" title="interface in io.micronaut.
 <div class="block">Sets the package name of generated controller classes.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="JavaMicronautServerOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">JavaMicronautServerOptionsBuilder</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withGenerateAbstractClasses(boolean)" class="member-name-link">withGenerateAbstractClasses</a><wbr>(boolean&nbsp;abstractClasses)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withGenerateControllerFromExamples(boolean)" class="member-name-link">withGenerateControllerFromExamples</a><wbr>(boolean&nbsp;generateControllerFromExamples)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
-<div class="block">If set to true, the code generator will output abstract classes
- for the controller, instead of concrete implementations.</div>
+<div class="block">If set to true, controllers will be generated using examples.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="JavaMicronautServerOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">JavaMicronautServerOptionsBuilder</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withGenerateControllerFromExamples(boolean)" class="member-name-link">withGenerateControllerFromExamples</a><wbr>(boolean&nbsp;generateControllerFromExamples)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withGenerateImplementationFiles(boolean)" class="member-name-link">withGenerateImplementationFiles</a><wbr>(boolean&nbsp;generateImplementationFiles)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
-<div class="block">If set to true, controllers will be generated using examples.</div>
+<div class="block">Whether to generate controller implementations that need to be filled in.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="JavaMicronautServerOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">JavaMicronautServerOptionsBuilder</a></code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withGenerateOperationsToReturnNotImplemented(boolean)" class="member-name-link">withGenerateOperationsToReturnNotImplemented</a><wbr>(boolean&nbsp;generateOperationsToReturnNotImplemented)</code></div>
@@ -147,14 +146,13 @@ extends <a href="GeneratorOptionsBuilder.html" title="interface in io.micronaut.
 </section>
 </li>
 <li>
-<section class="detail" id="withGenerateAbstractClasses(boolean)">
-<h3>withGenerateAbstractClasses</h3>
-<div class="member-signature"><span class="return-type"><a href="JavaMicronautServerOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">JavaMicronautServerOptionsBuilder</a></span>&nbsp;<span class="element-name">withGenerateAbstractClasses</span><wbr><span class="parameters">(boolean&nbsp;abstractClasses)</span></div>
-<div class="block">If set to true, the code generator will output abstract classes
- for the controller, instead of concrete implementations.</div>
+<section class="detail" id="withGenerateImplementationFiles(boolean)">
+<h3>withGenerateImplementationFiles</h3>
+<div class="member-signature"><span class="return-type"><a href="JavaMicronautServerOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">JavaMicronautServerOptionsBuilder</a></span>&nbsp;<span class="element-name">withGenerateImplementationFiles</span><wbr><span class="parameters">(boolean&nbsp;generateImplementationFiles)</span></div>
+<div class="block">Whether to generate controller implementations that need to be filled in.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
-<dd><code>abstractClasses</code> - the abstract classes flag</dd>
+<dd><code>generateImplementationFiles</code> - the implementation files flag</dd>
 <dt>Returns:</dt>
 <dd>this builder</dd>
 </dl>
