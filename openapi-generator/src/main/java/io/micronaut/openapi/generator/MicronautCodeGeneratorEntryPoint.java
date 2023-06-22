@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2021 original authors
+ * Copyright 2017-2023 original authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,6 +33,7 @@ import java.util.function.Consumer;
  * Main entry point for Micronaut OpenAPI code generation.
  */
 public final class MicronautCodeGeneratorEntryPoint {
+
     private final URI definitionFile;
     private final File outputDirectory;
     private final AbstractMicronautJavaCodegen<?> codeGenerator;
@@ -197,7 +198,9 @@ public final class MicronautCodeGeneratorEntryPoint {
     }
 
     private static class DefaultBuilder implements MicronautCodeGeneratorBuilder {
+
         private static final Consumer<DefaultBuilder> HAS_OUTPUT = b -> Objects.requireNonNull(b.outputDirectory, "Sources directory must not be null");
+
         private Options options;
         private AbstractMicronautJavaCodegen<?> codeGenerator;
         private URI definitionFile;
@@ -208,7 +211,7 @@ public final class MicronautCodeGeneratorEntryPoint {
 
         @Override
         public <B extends GeneratorOptionsBuilder, G extends MicronautCodeGenerator<B>> MicronautCodeGeneratorBuilder forCodeGenerator(G generator, Consumer<? super B> configuration) {
-            this.codeGenerator = (AbstractMicronautJavaCodegen<?>) generator;
+            codeGenerator = (AbstractMicronautJavaCodegen<?>) generator;
             var builder = generator.optionsBuilder();
             configuration.accept(builder);
             return this;
@@ -216,19 +219,19 @@ public final class MicronautCodeGeneratorEntryPoint {
 
         @Override
         public MicronautCodeGeneratorBuilder forClient(Consumer<? super JavaMicronautClientOptionsBuilder> clientOptionsSpec) {
-            this.codeGenerator = new JavaMicronautClientCodegen();
+            codeGenerator = new JavaMicronautClientCodegen();
             var clientOptionsBuilder = new JavaMicronautClientCodegen.DefaultClientOptionsBuilder();
             clientOptionsSpec.accept(clientOptionsBuilder);
-            this.clientOptions = clientOptionsBuilder.build();
+            clientOptions = clientOptionsBuilder.build();
             return this;
         }
 
         @Override
         public MicronautCodeGeneratorBuilder forServer(Consumer<? super JavaMicronautServerOptionsBuilder> serverOptionsSpec) {
-            this.codeGenerator = new JavaMicronautServerCodegen();
+            codeGenerator = new JavaMicronautServerCodegen();
             var serverOptionsBuilder = new JavaMicronautServerCodegen.DefaultServerOptionsBuilder();
             serverOptionsSpec.accept(serverOptionsBuilder);
-            this.serverOptions = serverOptionsBuilder.build();
+            serverOptions = serverOptionsBuilder.build();
             return this;
         }
 
@@ -246,7 +249,7 @@ public final class MicronautCodeGeneratorEntryPoint {
 
         @Override
         public MicronautCodeGeneratorBuilder withOutputs(OutputKind... elements) {
-            this.outputs.addAll(Arrays.asList(elements));
+            outputs.addAll(Arrays.asList(elements));
             return this;
         }
 
@@ -254,7 +257,7 @@ public final class MicronautCodeGeneratorEntryPoint {
         public MicronautCodeGeneratorBuilder withOptions(Consumer<? super MicronautCodeGeneratorOptionsBuilder> optionsConfigurer) {
             DefaultOptionsBuilder builder = new DefaultOptionsBuilder();
             optionsConfigurer.accept(builder);
-            this.options = builder.build();
+            options = builder.build();
             return this;
         }
 
@@ -279,6 +282,7 @@ public final class MicronautCodeGeneratorEntryPoint {
         }
 
         private static class DefaultOptionsBuilder implements MicronautCodeGeneratorOptionsBuilder {
+
             private String apiPackage;
             private String artifactId;
             private boolean beanValidation = true;
@@ -346,7 +350,7 @@ public final class MicronautCodeGeneratorEntryPoint {
 
             @Override
             public MicronautCodeGeneratorOptionsBuilder withSerializationLibrary(SerializationLibraryKind library) {
-                this.serializationLibraryKind = library;
+                serializationLibraryKind = library;
                 return this;
             }
 

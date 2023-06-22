@@ -52,6 +52,7 @@ import java.util.stream.Collectors;
 import static org.openapitools.codegen.CodegenConstants.INVOKER_PACKAGE;
 
 abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBuilder> extends AbstractJavaCodegen implements BeanValidationFeatures, OptionalFeatures, MicronautCodeGenerator<T> {
+
     public static final String OPT_TITLE = "title";
     public static final String OPT_TEST = "test";
     public static final String OPT_TEST_JUNIT = "junit";
@@ -142,8 +143,8 @@ abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBuilder> e
         additionalProperties.put("closebrace", "}");
 
         // Set client options that will be presented to user
-        updateOption(INVOKER_PACKAGE, this.getInvokerPackage());
-        updateOption(CodegenConstants.ARTIFACT_ID, this.getArtifactId());
+        updateOption(INVOKER_PACKAGE, getInvokerPackage());
+        updateOption(CodegenConstants.ARTIFACT_ID, getArtifactId());
         updateOption(CodegenConstants.API_PACKAGE, apiPackage);
         updateOption(CodegenConstants.MODEL_PACKAGE, modelPackage);
 
@@ -233,7 +234,7 @@ abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBuilder> e
     @Override
     public void setInvokerPackage(String invokerPackage) {
         super.setInvokerPackage(invokerPackage);
-        updateOption(INVOKER_PACKAGE, this.getInvokerPackage());
+        updateOption(INVOKER_PACKAGE, getInvokerPackage());
     }
 
     @Override
@@ -242,7 +243,7 @@ abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBuilder> e
 
         // Get properties
         if (additionalProperties.containsKey(OPT_TITLE)) {
-            this.title = (String) additionalProperties.get(OPT_TITLE);
+            title = (String) additionalProperties.get(OPT_TITLE);
         }
 
         if (additionalProperties.containsKey(INVOKER_PACKAGE)) {
@@ -259,37 +260,37 @@ abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBuilder> e
 
         // Get boolean properties
         if (additionalProperties.containsKey(USE_BEANVALIDATION)) {
-            this.setUseBeanValidation(convertPropertyToBoolean(USE_BEANVALIDATION));
+            setUseBeanValidation(convertPropertyToBoolean(USE_BEANVALIDATION));
         }
         writePropertyBack(USE_BEANVALIDATION, useBeanValidation);
 
         if (additionalProperties.containsKey(USE_OPTIONAL)) {
-            this.setUseOptional(convertPropertyToBoolean(USE_OPTIONAL));
+            setUseOptional(convertPropertyToBoolean(USE_OPTIONAL));
         }
         writePropertyBack(USE_OPTIONAL, useOptional);
 
         if (additionalProperties.containsKey(OPT_VISITABLE)) {
-            this.setVisitable(convertPropertyToBoolean(OPT_VISITABLE));
+            setVisitable(convertPropertyToBoolean(OPT_VISITABLE));
         }
         writePropertyBack(OPT_VISITABLE, visitable);
 
         if (additionalProperties.containsKey(OPT_REQUIRED_PROPERTIES_IN_CONSTRUCTOR)) {
-            this.requiredPropertiesInConstructor = convertPropertyToBoolean(OPT_REQUIRED_PROPERTIES_IN_CONSTRUCTOR);
+            requiredPropertiesInConstructor = convertPropertyToBoolean(OPT_REQUIRED_PROPERTIES_IN_CONSTRUCTOR);
         }
         writePropertyBack(OPT_REQUIRED_PROPERTIES_IN_CONSTRUCTOR, requiredPropertiesInConstructor);
 
         if (additionalProperties.containsKey(OPT_REACTIVE)) {
-            this.reactive = convertPropertyToBoolean(OPT_REACTIVE);
+            reactive = convertPropertyToBoolean(OPT_REACTIVE);
         }
         writePropertyBack(OPT_REACTIVE, reactive);
 
         if (additionalProperties.containsKey(OPT_WRAP_IN_HTTP_RESPONSE)) {
-            this.wrapInHttpResponse = convertPropertyToBoolean(OPT_WRAP_IN_HTTP_RESPONSE);
+            wrapInHttpResponse = convertPropertyToBoolean(OPT_WRAP_IN_HTTP_RESPONSE);
         }
         writePropertyBack(OPT_WRAP_IN_HTTP_RESPONSE, wrapInHttpResponse);
 
         if (additionalProperties.containsKey(OPT_GENERATE_OPERATION_ONLY_FOR_FIRST_TAG)) {
-            this.generateOperationOnlyForFirstTag = convertPropertyToBoolean(OPT_GENERATE_OPERATION_ONLY_FOR_FIRST_TAG);
+            generateOperationOnlyForFirstTag = convertPropertyToBoolean(OPT_GENERATE_OPERATION_ONLY_FOR_FIRST_TAG);
         }
         writePropertyBack(OPT_GENERATE_OPERATION_ONLY_FOR_FIRST_TAG, generateOperationOnlyForFirstTag);
 
@@ -302,16 +303,16 @@ abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBuilder> e
         }
 
         maybeSetSwagger();
-        if (OPT_GENERATE_SWAGGER_ANNOTATIONS_SWAGGER_1.equals(this.generateSwaggerAnnotations)) {
+        if (OPT_GENERATE_SWAGGER_ANNOTATIONS_SWAGGER_1.equals(generateSwaggerAnnotations)) {
             additionalProperties.put("generateSwagger1Annotations", true);
-        } else if (OPT_GENERATE_SWAGGER_ANNOTATIONS_SWAGGER_2.equals(this.generateSwaggerAnnotations)) {
+        } else if (OPT_GENERATE_SWAGGER_ANNOTATIONS_SWAGGER_2.equals(generateSwaggerAnnotations)) {
             additionalProperties.put("generateSwagger2Annotations", true);
         }
 
         if (additionalProperties.containsKey(CodegenConstants.SERIALIZATION_LIBRARY)) {
             setSerializationLibrary((String) additionalProperties.get(CodegenConstants.SERIALIZATION_LIBRARY));
         }
-        additionalProperties.put(this.serializationLibrary.toLowerCase(Locale.US), true);
+        additionalProperties.put(serializationLibrary.toLowerCase(Locale.US), true);
         if (SerializationLibraryKind.MICRONAUT_SERDE_JACKSON.name().equals(serializationLibrary)) {
             additionalProperties.put(SerializationLibraryKind.JACKSON.name().toLowerCase(Locale.US), true);
         }
@@ -376,11 +377,11 @@ abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBuilder> e
             String value = String.valueOf(additionalProperties.get(OPT_GENERATE_SWAGGER_ANNOTATIONS));
             switch (value) {
                 case OPT_GENERATE_SWAGGER_ANNOTATIONS_SWAGGER_1 ->
-                    this.generateSwaggerAnnotations = OPT_GENERATE_SWAGGER_ANNOTATIONS_SWAGGER_1;
+                    generateSwaggerAnnotations = OPT_GENERATE_SWAGGER_ANNOTATIONS_SWAGGER_1;
                 case OPT_GENERATE_SWAGGER_ANNOTATIONS_SWAGGER_2, OPT_GENERATE_SWAGGER_ANNOTATIONS_TRUE ->
-                    this.generateSwaggerAnnotations = OPT_GENERATE_SWAGGER_ANNOTATIONS_SWAGGER_2;
+                    generateSwaggerAnnotations = OPT_GENERATE_SWAGGER_ANNOTATIONS_SWAGGER_2;
                 case OPT_GENERATE_SWAGGER_ANNOTATIONS_FALSE ->
-                    this.generateSwaggerAnnotations = OPT_GENERATE_SWAGGER_ANNOTATIONS_FALSE;
+                    generateSwaggerAnnotations = OPT_GENERATE_SWAGGER_ANNOTATIONS_FALSE;
                 default ->
                     throw new RuntimeException("Value \"" + value + "\" for the " + OPT_GENERATE_SWAGGER_ANNOTATIONS + " parameter is unsupported or misspelled");
             }
@@ -391,7 +392,7 @@ abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBuilder> e
         if (additionalProperties.containsKey(OPT_TEST)) {
             switch ((String) additionalProperties.get(OPT_TEST)) {
                 case OPT_TEST_JUNIT, OPT_TEST_SPOCK ->
-                    this.testTool = (String) additionalProperties.get(OPT_TEST);
+                    testTool = (String) additionalProperties.get(OPT_TEST);
                 default ->
                     throw new RuntimeException("Test tool \"" + additionalProperties.get(OPT_TEST) + "\" is not supported or misspelled.");
             }

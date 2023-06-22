@@ -1,14 +1,15 @@
 package io.micronaut.openapi.generator;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-
 import java.net.URI;
 import java.net.URISyntaxException;
+
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class MicronautCodeGeneratorEntryPointTest {
+
     @Test
     @DisplayName("Can build with a custom code generator")
     void testCustomGenerator() throws URISyntaxException {
@@ -21,6 +22,7 @@ class MicronautCodeGeneratorEntryPointTest {
     }
 
     private static class TestGenerator extends AbstractMicronautJavaCodegen<TestBuilder> {
+
         private String value;
 
         @Override
@@ -37,6 +39,7 @@ class MicronautCodeGeneratorEntryPointTest {
     }
 
     public interface TestBuilder extends GeneratorOptionsBuilder {
+
         TestBuilder withValue(String value);
     }
 }

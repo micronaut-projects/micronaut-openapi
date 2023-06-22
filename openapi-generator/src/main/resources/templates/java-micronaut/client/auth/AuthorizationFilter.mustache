@@ -39,7 +39,8 @@ import {{javaxPackage}}.annotation.Generated;
 {{>common/generatedAnnotation}}
 @Filter({{#configureAuthFilterPattern}}"{{authorizationFilterPattern}}"{{/configureAuthFilterPattern}}{{^configureAuthFilterPattern}}Filter.MATCH_ALL_PATTERN{{/configureAuthFilterPattern}})
 public class AuthorizationFilter implements HttpClientFilter {
-    private static final Logger LOG = LoggerFactory.getLogger(ClientCredentialsHttpClientFilter.class);
+
+    private static final Logger log = LoggerFactory.getLogger(ClientCredentialsHttpClientFilter.class);
 
     private final BeanContext beanContext;
     private final Map<String, OauthClientConfiguration> clientConfigurationByName;
@@ -76,7 +77,7 @@ public class AuthorizationFilter implements HttpClientFilter {
         if (CollectionUtils.isNotEmpty(names)) {
             List<Publisher<HttpRequest>> authorizers = new ArrayList<>(names.size());
 
-            for (Object nameObject: names) {
+            for (Object nameObject : names) {
                 if (!(nameObject instanceof String)) {
                     continue;
                 }
@@ -100,9 +101,7 @@ public class AuthorizationFilter implements HttpClientFilter {
 
                 ClientCredentialsClient clientCredentialsClient = getClientCredentialsClient(name);
                 if (clientCredentialsClient == null) {
-                    if (LOG.isTraceEnabled()) {
-                        LOG.trace("Could not retrieve client credentials client for OAuth 2.0 client {}", name);
-                    }
+                    log.trace("Could not retrieve client credentials client for OAuth 2.0 client {}", name);
                     continue;
                 }
 
