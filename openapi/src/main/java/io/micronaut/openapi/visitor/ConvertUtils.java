@@ -239,8 +239,8 @@ public final class ConvertUtils {
     public static void setDefaultValueObject(Schema<?> schema, String defaultValue, @Nullable Element element, @Nullable String schemaType, @Nullable String schemaFormat, boolean isMicronautFormat, VisitorContext context) {
         try {
             Pair<String, String> typeAndFormat;
-            if (element instanceof EnumElement) {
-                typeAndFormat = ConvertUtils.checkEnumJsonValueType(context, (EnumElement) element, schemaType, schemaFormat);
+            if (element instanceof EnumElement enumEl) {
+                typeAndFormat = ConvertUtils.checkEnumJsonValueType(context, enumEl, schemaType, schemaFormat);
             } else {
                 typeAndFormat = Pair.of(schemaType, schemaFormat);
             }

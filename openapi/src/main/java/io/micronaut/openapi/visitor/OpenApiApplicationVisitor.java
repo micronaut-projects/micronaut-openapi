@@ -99,8 +99,6 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 
-import static io.micronaut.openapi.visitor.SchemaUtils.EMPTY_COMPOSED_SCHEMA;
-import static io.micronaut.openapi.visitor.SchemaUtils.EMPTY_SCHEMA;
 import static io.micronaut.openapi.visitor.SchemaUtils.EMPTY_SIMPLE_SCHEMA;
 import static io.micronaut.openapi.visitor.SchemaUtils.TYPE_OBJECT;
 import static io.swagger.v3.oas.models.Components.COMPONENTS_SCHEMAS_REF;
@@ -1451,7 +1449,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             }
             boolean isSameType = allOfSchema.getType() == null || allOfSchema.getType().equals(type);
 
-            if (schema.equals(EMPTY_SCHEMA) || schema.equals(EMPTY_COMPOSED_SCHEMA)
+            if (SchemaUtils.isEmptySchema(schema)
                 && (serializedDefaultValue == null || serializedDefaultValue.equals(serializedAllOfDefaultValue))
                 && (type == null || allOfSchema.getType() == null || allOfSchema.getType().equals(type))) {
                 normalizedSchema = allOfSchema;

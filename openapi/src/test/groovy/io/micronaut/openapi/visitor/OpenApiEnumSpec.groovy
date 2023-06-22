@@ -884,4 +884,97 @@ class MyBean {}
         backupFrequencySchema.enum.size() == 8
         backupFrequencySchema.type == 'string'
     }
+
+    void "test enum field default schema value"() {
+
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.http.HttpResponse;
+import io.micronaut.http.MediaType;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Post;
+import io.micronaut.http.multipart.CompletedFileUpload;
+import io.swagger.v3.oas.annotations.Hidden;
+import io.swagger.v3.oas.annotations.media.Schema;
+
+import jakarta.validation.constraints.NotNull;
+
+@Controller
+class OpenApiController {
+
+    @Post(consumes = MediaType.MULTIPART_FORM_DATA)
+    public HttpResponse processAsync(
+            @NotNull CompletedFileUpload template,
+            @Schema(implementation = Parameters.class) String parameters) {
+        return null;
+    }
+}
+
+@Schema(example = """
+            {
+                "s3url" : "s3://bucket/b559615a-af21-417f-9a63-e5f6eca42342.docx",
+                "stampWidth" : 220,
+                "stampHeight" : 85,
+                "stampAlign" : "LEFT",
+                "pageNumber" : 1"
+            }""")
+class Parameters {
+
+    /**
+     * Certificate base64 encoded
+     */
+    @Hidden
+    public String certificate;
+    public String s3url;
+    @Schema(defaultValue = "220")
+    public Integer stampWidth;
+    @Schema(defaultValue = "85")
+    public Integer stampHeight;
+    @Schema(defaultValue = "RIGHT")
+    public ParagraphAlignment stampAlign;
+}
+
+enum ParagraphAlignment {
+
+    START(1),
+    CENTER(2),
+    END(3),
+    LEFT(4),
+    RIGHT(5);
+
+    private final int value;
+
+    ParagraphAlignment(int val) {
+        value = val;
+    }
+
+    public static ParagraphAlignment valueOf(int type) {
+        return null;
+    }
+
+    public int getValue() {
+        return value;
+    }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        then: "the state is correct"
+        Utils.testReference != null
+
+        when: "The OpenAPI is retrieved"
+        OpenAPI openAPI = Utils.testReference
+        Operation operation = openAPI.paths.get("/").post
+        Schema parametersSchema = openAPI.components.schemas.Parameters
+
+        then:
+        operation
+        parametersSchema
+        parametersSchema.properties.stampAlign.allOf
+        parametersSchema.properties.stampAlign.allOf[0].$ref == '#/components/schemas/ParagraphAlignment'
+        parametersSchema.properties.stampAlign.allOf[1].default == 'RIGHT'
+    }
 }
