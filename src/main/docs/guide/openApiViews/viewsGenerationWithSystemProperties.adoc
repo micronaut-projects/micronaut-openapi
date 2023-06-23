@@ -1,8 +1,8 @@
-By default the generation of views is disabled. 
+By default, the generation of views is disabled.
 
 To turn it on you have to set the following system property `micronaut.openapi.views.spec`.
 
-The string syntax is a series of comma-separated key-value pairs, to enable and configure the views. 
+The string syntax is a series of comma-separated key-value pairs, to enable and configure the views.
 
 .System Property
 [source]
