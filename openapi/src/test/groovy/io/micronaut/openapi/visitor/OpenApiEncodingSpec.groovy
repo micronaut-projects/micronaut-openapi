@@ -816,7 +816,7 @@ package test;
 
 import java.util.HashMap;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 import io.micronaut.http.MediaType;
 import io.micronaut.http.annotation.Controller;
