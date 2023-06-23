@@ -1,4 +1,4 @@
-By default the generation of views is disabled.
+By default, the generation of views is disabled.
 
 To turn it on you have to set the following system property `micronaut.openapi.views.spec`.
 
