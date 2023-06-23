@@ -415,7 +415,7 @@ abstract class AbstractOpenApiVisitor {
                         Object first = a[0];
 
                         // are class values
-                        if ( first instanceof AnnotationClassValue) {
+                        if (first instanceof AnnotationClassValue) {
                             List<Class<?>> classes = new ArrayList<>(a.length);
                             for (Object o : a) {
                                 AnnotationClassValue<?> acv = (AnnotationClassValue<?>) o;
