@@ -24,8 +24,6 @@ import io.swagger.v3.oas.models.headers.Header;
  *
  * @author Henrique Mota
  */
-@Introspected(classes = {
-    Header.class,
-})
+@Introspected(classes = Header.class)
 public class HeaderConfiguration {
 }

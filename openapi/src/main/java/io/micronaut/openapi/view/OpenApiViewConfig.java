@@ -299,7 +299,7 @@ public final class OpenApiViewConfig {
         } else if (customPathStr.startsWith("classpath:")) {
             ClassPathResourceLoader resourceLoader = new DefaultClassPathResourceLoader(getClass().getClassLoader());
             Optional<InputStream> inOpt = resourceLoader.getResourceAsStream(customPathStr);
-            if (!inOpt.isPresent()) {
+            if (inOpt.isEmpty()) {
                 throw new IOException("Fail to load " + customPathStr);
             }
             try (InputStream in = inOpt.get();

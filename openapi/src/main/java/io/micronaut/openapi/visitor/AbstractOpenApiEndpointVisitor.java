@@ -1147,7 +1147,6 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         } else if (isResponseType(returnType)) {
             returnType = returnType.getFirstTypeArgument().orElse(returnType);
         } else if (isSingleResponseType(returnType)) {
-            returnType = returnType.getFirstTypeArgument().get();
             returnType = returnType.getFirstTypeArgument().orElse(returnType);
         }
 

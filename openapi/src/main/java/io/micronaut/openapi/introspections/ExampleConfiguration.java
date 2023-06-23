@@ -24,8 +24,6 @@ import io.swagger.v3.oas.models.examples.Example;
  *
  * @author Henrique Mota
  */
-@Introspected(classes = {
-    Example.class,
-})
+@Introspected(classes = Example.class)
 public class ExampleConfiguration {
 }

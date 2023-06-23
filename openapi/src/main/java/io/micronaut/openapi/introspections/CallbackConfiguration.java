@@ -24,8 +24,6 @@ import io.swagger.v3.oas.models.callbacks.Callback;
  *
  * @author Henrique Mota
  */
-@Introspected(classes = {
-    Callback.class,
-})
+@Introspected(classes = Callback.class)
 public class CallbackConfiguration {
 }

@@ -24,8 +24,6 @@ import io.swagger.v3.oas.models.tags.Tag;
  *
  * @author Henrique Mota
  */
-@Introspected(classes = {
-    Tag.class,
-})
+@Introspected(classes = Tag.class)
 public class TagsConfiguration {
 }
