@@ -24,7 +24,8 @@ import org.openapitools.codegen.meta.Stability;
 import java.util.Arrays;
 import java.util.List;
 
-class JavaMicronautClientCodegen extends AbstractMicronautJavaCodegen<JavaMicronautClientOptionsBuilder> {
+@SuppressWarnings("checkstyle:DesignForExtension")
+public class JavaMicronautClientCodegen extends AbstractMicronautJavaCodegen<JavaMicronautClientOptionsBuilder> {
 
     public static final String OPT_CONFIGURE_AUTH = "configureAuth";
     public static final String OPT_CONFIGURE_AUTH_FILTER_PATTERN = "configureAuthFilterPattern";

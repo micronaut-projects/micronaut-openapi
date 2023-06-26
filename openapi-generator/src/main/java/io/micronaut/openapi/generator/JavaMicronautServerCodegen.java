@@ -27,7 +27,8 @@ import java.io.File;
 import java.util.Collections;
 import java.util.List;
 
-class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen<JavaMicronautServerOptionsBuilder> {
+@SuppressWarnings("checkstyle:DesignForExtension")
+public class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen<JavaMicronautServerOptionsBuilder> {
 
     public static final String OPT_CONTROLLER_PACKAGE = "controllerPackage";
     public static final String OPT_GENERATE_CONTROLLER_FROM_EXAMPLES = "generateControllerFromExamples";
