@@ -10,12 +10,12 @@ import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import {{javaxPackage}}.annotation.Generated;
 
-
 {{>common/generatedAnnotation}}
 @Documented
 @Retention(RUNTIME)
 @Target(METHOD)
 @Bindable
 public @interface Authorizations {
+
     Authorization[] value();
 }

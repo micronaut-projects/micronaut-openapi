@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 original authors
+ * Copyright 2017-2023 original authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -82,14 +82,12 @@ class EndpointsConfiguration {
                     String entryType = entry.getKey().substring(idx + 1);
                     String name = entry.getKey().substring(ENDPOINTS_PREFIX.length(), idx);
                     Endpoint endpoint = endpoints.computeIfAbsent(name, key -> new Endpoint());
-                    if ("security-requirements".equals(entryType)) {
-                        endpoint.setSecurityRequirements(parseSecurityRequirements(entry.getValue(), context));
-                    } else  if ("servers".equals(entryType)) {
-                        endpoint.setServers(parseServers(entry.getValue(), context));
-                    } else if ("tags".equals(entryType)) {
-                        endpoint.setTags(parseTags(entry.getValue()));
-                    } else if ("class".equals(entryType)) {
-                        endpoint.setClassElement(context.getClassElement(entry.getValue()));
+                    switch (entryType) {
+                        case "security-requirements" -> endpoint.setSecurityRequirements(parseSecurityRequirements(entry.getValue(), context));
+                        case "servers" -> endpoint.setServers(parseServers(entry.getValue(), context));
+                        case "tags" -> endpoint.setTags(parseTags(entry.getValue()));
+                        case "class" -> endpoint.setClassElement(context.getClassElement(entry.getValue()));
+                        default -> context.warn("Unknown value " + entryType, null);
                     }
                 });
     }

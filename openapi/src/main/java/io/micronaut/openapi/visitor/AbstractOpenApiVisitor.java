@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 original authors
+ * Copyright 2017-2023 original authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -415,7 +415,7 @@ abstract class AbstractOpenApiVisitor {
                         Object first = a[0];
 
                         // are class values
-                        if ( first instanceof AnnotationClassValue) {
+                        if (first instanceof AnnotationClassValue) {
                             List<Class<?>> classes = new ArrayList<>(a.length);
                             for (Object o : a) {
                                 AnnotationClassValue<?> acv = (AnnotationClassValue<?>) o;
@@ -606,7 +606,9 @@ abstract class AbstractOpenApiVisitor {
                                 }
                             }
                         }
-                        newValues.put(key, encodingStyle.toString());
+                        if (encodingStyle != null) {
+                            newValues.put(key, encodingStyle.toString());
+                        }
                     }
                 } else if (key.equals("ref")) {
                     newValues.put("$ref", value);
@@ -781,7 +783,8 @@ abstract class AbstractOpenApiVisitor {
      *
      * @return The schema or null if it cannot be resolved
      */
-    protected @Nullable Schema resolveSchema(@Nullable Element definingElement, ClassElement type, VisitorContext context, List<MediaType> mediaTypes) {
+    @Nullable
+    protected Schema resolveSchema(@Nullable Element definingElement, ClassElement type, VisitorContext context, List<MediaType> mediaTypes) {
         return resolveSchema(Utils.resolveOpenApi(context), definingElement, type, context, mediaTypes, null, null);
     }
 
@@ -827,8 +830,8 @@ abstract class AbstractOpenApiVisitor {
             }
         }
 
-        ClassElement componentType = type.getFirstTypeArgument().orElse(null);
-        Map<String, ClassElement> typeArgs = type.getTypeArguments();
+        ClassElement componentType = type != null ? type.getFirstTypeArgument().orElse(null) : null;
+        Map<String, ClassElement> typeArgs = type != null ? type.getTypeArguments() : null;
 
         Schema schema = null;
 
@@ -2148,7 +2151,7 @@ abstract class AbstractOpenApiVisitor {
             .stream()
             .collect(toMap(e -> e.getKey().equals("requiredProperties") ? "required" : e.getKey(), Map.Entry::getValue));
         Optional<Schema> schemaOpt = toValue(values, context, Schema.class);
-        if (!schemaOpt.isPresent()) {
+        if (schemaOpt.isEmpty()) {
             return null;
         }
         Schema schema = schemaOpt.get();
@@ -2219,7 +2222,7 @@ abstract class AbstractOpenApiVisitor {
                 continue;
             }
             AnnotationValue<JsonProperty> jsonProperty = element.getAnnotation(JsonProperty.class);
-            String jacksonValue = jsonProperty != null ? jsonProperty.stringValue("value").get() : null;
+            String jacksonValue = jsonProperty != null ? jsonProperty.stringValue("value").orElse(null) : null;
             if (StringUtils.hasText(jacksonValue)) {
                 try {
                     enumValues.add(ConvertUtils.normalizeValue(jacksonValue, schemaType, schemaFormat, context));
@@ -2306,8 +2309,7 @@ abstract class AbstractOpenApiVisitor {
 
     private void computeNameWithGenerics(ClassElement classElement, StringBuilder builder, Set<String> computed, Map<String, ClassElement> typeArgs, VisitorContext context) {
         computed.add(classElement.getName());
-        final Map<String, ClassElement> typeArguments = typeArgs;
-        final Iterator<ClassElement> i = typeArguments.values().iterator();
+        final Iterator<ClassElement> i = typeArgs.values().iterator();
         if (i.hasNext()) {
 
             builder.append('_');

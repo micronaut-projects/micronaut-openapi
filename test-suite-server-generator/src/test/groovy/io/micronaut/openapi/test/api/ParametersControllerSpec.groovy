@@ -16,7 +16,6 @@ import spock.lang.Specification
 import io.micronaut.openapi.test.model.SendPrimitivesResponse
 import spock.lang.Unroll
 
-
 @MicronautTest
 class ParametersControllerSpec extends Specification {
 

@@ -10,15 +10,17 @@
      * {{nickname}}
         {{/notes}}
     {{/summary}}
-     *
     {{#allParams}}
+     *
      * @param {{paramName}} {{description}}{{#required}} (required){{/required}}{{^required}} (optional{{#defaultValue}}, default to {{{.}}}{{/defaultValue}}){{/required}}
     {{/allParams}}
     {{#returnType}}
+     *
      * @return {{returnType}}
     {{/returnType}}
     {{#externalDocs}}
      * {{description}}
+     *
      * @see <a href="{{url}}">{{summary}} Documentation</a>
     {{/externalDocs}}
      */

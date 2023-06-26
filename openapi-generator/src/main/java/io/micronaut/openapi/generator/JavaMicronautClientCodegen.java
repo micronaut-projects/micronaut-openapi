@@ -24,7 +24,6 @@ import org.openapitools.codegen.meta.Stability;
 import java.util.Arrays;
 import java.util.List;
 
-
 class JavaMicronautClientCodegen extends AbstractMicronautJavaCodegen<JavaMicronautClientOptionsBuilder> {
 
     public static final String OPT_CONFIGURE_AUTH = "configureAuth";
@@ -43,8 +42,7 @@ class JavaMicronautClientCodegen extends AbstractMicronautJavaCodegen<JavaMicron
     protected String basePathSeparator = "-";
     protected String clientId;
 
-    public JavaMicronautClientCodegen() {
-        super();
+    JavaMicronautClientCodegen() {
 
         title = "OpenAPI Micronaut Client";
         configureAuthorization = false;
@@ -85,7 +83,7 @@ class JavaMicronautClientCodegen extends AbstractMicronautJavaCodegen<JavaMicron
         super.processOpts();
 
         if (additionalProperties.containsKey(OPT_CONFIGURE_AUTH)) {
-            this.configureAuthorization = convertPropertyToBoolean(OPT_CONFIGURE_AUTH);
+            configureAuthorization = convertPropertyToBoolean(OPT_CONFIGURE_AUTH);
         }
         writePropertyBack(OPT_CONFIGURE_AUTH, configureAuthorization);
 
@@ -116,26 +114,26 @@ class JavaMicronautClientCodegen extends AbstractMicronautJavaCodegen<JavaMicron
 
             if (additionalProperties.containsKey(AUTHORIZATION_FILTER_PATTERN)) {
                 String pattern = additionalProperties.get(AUTHORIZATION_FILTER_PATTERN).toString();
-                this.setAuthorizationFilterPattern(pattern);
+                setAuthorizationFilterPattern(pattern);
                 additionalProperties.put(AUTHORIZATION_FILTER_PATTERN, authorizationFilterPattern);
             }
         }
 
         if (additionalProperties.containsKey(ADDITIONAL_CLIENT_TYPE_ANNOTATIONS)) {
             String additionalClientAnnotationsList = additionalProperties.get(ADDITIONAL_CLIENT_TYPE_ANNOTATIONS).toString();
-            this.setAdditionalClientTypeAnnotations(Arrays.asList(additionalClientAnnotationsList.trim().split("\\s*(;|\\r?\\n)\\s*")));
+            setAdditionalClientTypeAnnotations(Arrays.asList(additionalClientAnnotationsList.trim().split("\\s*(;|\\r?\\n)\\s*")));
             additionalProperties.put(ADDITIONAL_CLIENT_TYPE_ANNOTATIONS, additionalClientTypeAnnotations);
         }
 
         if (additionalProperties.containsKey(CLIENT_ID)) {
             String id = additionalProperties.get(CLIENT_ID).toString();
-            this.setClientId(id);
+            setClientId(id);
             additionalProperties.put(CLIENT_ID, clientId);
         }
 
         if (additionalProperties.containsKey(BASE_PATH_SEPARATOR)) {
             String separator = additionalProperties.get(BASE_PATH_SEPARATOR).toString();
-            this.setBasePathSeparator(separator);
+            setBasePathSeparator(separator);
             additionalProperties.put(BASE_PATH_SEPARATOR, basePathSeparator);
         }
 
@@ -164,16 +162,16 @@ class JavaMicronautClientCodegen extends AbstractMicronautJavaCodegen<JavaMicron
 
     public void setAuthorizationFilterPattern(final String pattern) {
         writePropertyBack(OPT_CONFIGURE_AUTH_FILTER_PATTERN, true);
-        this.authorizationFilterPattern = pattern;
+        authorizationFilterPattern = pattern;
     }
 
     public void setClientId(final String id) {
         writePropertyBack(OPT_CONFIGURE_CLIENT_ID, true);
-        this.clientId = id;
+        clientId = id;
     }
 
     public void setBasePathSeparator(final String separator) {
-        this.basePathSeparator = separator;
+        basePathSeparator = separator;
     }
 
     public void setConfigureAuthorization(boolean configureAuthorization) {

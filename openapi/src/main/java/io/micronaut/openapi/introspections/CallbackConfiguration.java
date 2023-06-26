@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 original authors
+ * Copyright 2017-2023 original authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,8 +24,6 @@ import io.swagger.v3.oas.models.callbacks.Callback;
  *
  * @author Henrique Mota
  */
-@Introspected(classes = {
-    Callback.class,
-})
+@Introspected(classes = Callback.class)
 public class CallbackConfiguration {
 }

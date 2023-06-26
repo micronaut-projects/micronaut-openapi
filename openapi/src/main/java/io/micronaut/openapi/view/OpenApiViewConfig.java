@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 original authors
+ * Copyright 2017-2023 original authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -299,7 +299,7 @@ public final class OpenApiViewConfig {
         } else if (customPathStr.startsWith("classpath:")) {
             ClassPathResourceLoader resourceLoader = new DefaultClassPathResourceLoader(getClass().getClassLoader());
             Optional<InputStream> inOpt = resourceLoader.getResourceAsStream(customPathStr);
-            if (!inOpt.isPresent()) {
+            if (inOpt.isEmpty()) {
                 throw new IOException("Fail to load " + customPathStr);
             }
             try (InputStream in = inOpt.get();

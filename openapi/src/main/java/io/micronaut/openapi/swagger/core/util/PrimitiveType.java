@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2022 original authors
+ * Copyright 2017-2023 original authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -314,7 +314,7 @@ public enum PrimitiveType {
     /**
      * Adds support for custom mapping of classes to primitive types
      *
-     * @return Map of custom classes to primitive type
+     * @return Set of custom classes to primitive type
      *
      * @since 2.0.6
      */
@@ -325,7 +325,7 @@ public enum PrimitiveType {
     /**
      * Adds support for custom mapping of classes to primitive types
      *
-     * @return Map of custom classes to primitive type
+     * @return Set of custom classes to primitive type
      *
      * @since 2.1.2
      */

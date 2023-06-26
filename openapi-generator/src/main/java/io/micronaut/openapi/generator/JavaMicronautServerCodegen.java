@@ -26,10 +26,9 @@ import org.openapitools.codegen.utils.StringUtils;
 import java.io.File;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
-
 
 class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen<JavaMicronautServerOptionsBuilder> {
+
     public static final String OPT_CONTROLLER_PACKAGE = "controllerPackage";
     public static final String OPT_GENERATE_CONTROLLER_FROM_EXAMPLES = "generateControllerFromExamples";
     public static final String OPT_GENERATE_IMPLEMENTATION_FILES = "generateImplementationFiles";
@@ -59,8 +58,7 @@ class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen<JavaMicron
     protected boolean useAuth = true;
     protected boolean generateHardNullable = true;
 
-    public JavaMicronautServerCodegen() {
-        super();
+    JavaMicronautServerCodegen() {
 
         title = "OpenAPI Micronaut Server";
         apiPackage = "org.openapitools.api";
@@ -254,18 +252,12 @@ class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen<JavaMicron
                     operation.vendorExtensions.put(EXTENSION_ROLES, Collections.singletonList(role));
                 } else {
                     List<String> roles = (List<String>) operation.vendorExtensions.get(EXTENSION_ROLES);
-                    roles = roles.stream().map(role -> {
-                        switch (role) {
-                            case ANONYMOUS_ROLE_KEY:
-                                return ANONYMOUS_ROLE;
-                            case AUTHORIZED_ROLE_KEY:
-                                return AUTHORIZED_ROLE;
-                            case DENY_ALL_ROLE_KEY:
-                                return DENY_ALL_ROLE;
-                            default:
-                                return "\"" + escapeText(role) + "\"";
-                        }
-                    }).collect(Collectors.toList());
+                    roles = roles.stream().map(role -> switch (role) {
+                        case ANONYMOUS_ROLE_KEY -> ANONYMOUS_ROLE;
+                        case AUTHORIZED_ROLE_KEY -> AUTHORIZED_ROLE;
+                        case DENY_ALL_ROLE_KEY -> DENY_ALL_ROLE;
+                        default -> "\"" + escapeText(role) + "\"";
+                    }).toList();
                     operation.vendorExtensions.put(EXTENSION_ROLES, roles);
                 }
             }

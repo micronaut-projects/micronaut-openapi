@@ -15,21 +15,21 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-
 /**
  * An abstract class with methods useful for testing
  */
 public abstract class AbstractMicronautCodegenTest {
+
     /**
      * Path to a common test configuration file
      */
     protected final String PETSTORE_PATH = "src/test/resources/petstore.json";
 
     /**
-     *
      * @param codegen - the code generator
      * @param configPath - the path to the config starting from src/test/resources
      * @param filesToGenerate - which files to generate - can be CodegenConstants.MODELS, APIS, SUPPORTING_FILES, ...
+     *
      * @return - the path to the generated folder
      */
     protected String generateFiles(AbstractMicronautJavaCodegen<?> codegen, String configPath, String... filesToGenerate) {
@@ -42,7 +42,8 @@ public abstract class AbstractMicronautCodegenTest {
         output.deleteOnExit();
 
         MicronautCodeGeneratorEntryPoint.builder()
-            .forCodeGenerator(codegen, unused -> {})
+            .forCodeGenerator(codegen, unused -> {
+            })
             .withDefinitionFile(new File(configPath).toURI())
             .withOutputDirectory(output)
             .withOutputs(Arrays.stream(filesToGenerate)
@@ -63,29 +64,33 @@ public abstract class AbstractMicronautCodegenTest {
     public static void assertFileContainsRegex(String path, String... regex) {
         assertFileExists(path);
         String file = readFile(path);
-        for (String line: regex)
+        for (String line : regex) {
             assertTrue(Pattern.compile(line.replace(" ", "\\s+")).matcher(file).find());
+        }
     }
 
     public static void assertFileNotContainsRegex(String path, String... regex) {
         assertFileExists(path);
         String file = readFile(path);
-        for (String line: regex)
+        for (String line : regex) {
             assertFalse(Pattern.compile(line.replace(" ", "\\s+")).matcher(file).find());
+        }
     }
 
     public static void assertFileContains(String path, String... lines) {
         assertFileExists(path);
         String file = linearize(readFile(path));
-        for (String line : lines)
+        for (String line : lines) {
             assertTrue(file.contains(linearize(line)), "File does not contain line [" + line + "]");
+        }
     }
 
     public static void assertFileNotContains(String path, String... lines) {
         assertFileExists(path);
         String file = linearize(readFile(path));
-        for (String line : lines)
+        for (String line : lines) {
             assertFalse(file.contains(linearize(line)), "File contains line [" + line + "]");
+        }
     }
 
     public static void assertFileExists(String file) {
@@ -94,7 +99,7 @@ public abstract class AbstractMicronautCodegenTest {
             while (path.getParent() != null && !path.getParent().toFile().exists()) {
                 path = path.getParent();
             }
-            String message = "File \"" + file + "\" should exist, however \"" + path  + "\" could not be found.";
+            String message = "File \"" + file + "\" should exist, however \"" + path + "\" could not be found.";
             if (path.getParent() != null) {
                 Path parent = path.getParent();
                 File[] contents = parent.toFile().listFiles();

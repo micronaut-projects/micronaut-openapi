@@ -13,7 +13,6 @@ import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import {{javaxPackage}}.annotation.Generated;
 
-
 {{>common/generatedAnnotation}}
 @Documented
 @Retention(RUNTIME)
@@ -21,16 +20,17 @@ import {{javaxPackage}}.annotation.Generated;
 @Bindable
 @Repeatable(Authorizations.class)
 public @interface Authorization {
+
     /**
      * The name of the authorization
      */
-    @AliasFor(annotation=Bindable.class, member="value")
+    @AliasFor(annotation = Bindable.class, member = "value")
     String value() default "";
 
     /**
      * The name of the authorization
      */
-    @AliasFor(annotation=Bindable.class, member="value")
+    @AliasFor(annotation = Bindable.class, member = "value")
     String name() default "";
 
     /**
