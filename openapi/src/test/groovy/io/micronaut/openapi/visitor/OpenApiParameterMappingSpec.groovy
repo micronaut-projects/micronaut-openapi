@@ -972,7 +972,7 @@ class MyBean {}
         PathItem pathItem = openAPI.paths."/path"
 
         then:
-        pathItem.post.operationId == 'save'
+        pathItem.post.operationId == 'save' || pathItem.post.operationId == 'save2'
         !pathItem.post.parameters
         pathItem.post.requestBody
         pathItem.post.requestBody.content

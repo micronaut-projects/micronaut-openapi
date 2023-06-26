@@ -72,6 +72,11 @@ import io.micronaut.inject.writer.GeneratedFile;
 import io.micronaut.openapi.postprocessors.JacksonDiscriminatorPostProcessor;
 import io.micronaut.openapi.postprocessors.OpenApiOperationsPostProcessor;
 import io.micronaut.openapi.view.OpenApiViewConfig;
+import io.micronaut.openapi.visitor.group.EndpointInfo;
+import io.micronaut.openapi.visitor.group.GroupProperties;
+import io.micronaut.openapi.visitor.group.GroupProperties.PackageProperties;
+import io.micronaut.openapi.visitor.group.OpenApiInfo;
+import io.micronaut.openapi.visitor.group.RouterVersioningProperties;
 import io.micronaut.openapi.visitor.security.InterceptUrlMapConverter;
 import io.micronaut.openapi.visitor.security.InterceptUrlMapPattern;
 import io.micronaut.openapi.visitor.security.SecurityProperties;
@@ -100,6 +105,10 @@ import com.fasterxml.jackson.databind.node.TextNode;
 
 import static io.micronaut.openapi.visitor.SchemaUtils.EMPTY_SIMPLE_SCHEMA;
 import static io.micronaut.openapi.visitor.SchemaUtils.TYPE_OBJECT;
+import static io.micronaut.openapi.visitor.SchemaUtils.getOperationOnPathItem;
+import static io.micronaut.openapi.visitor.SchemaUtils.setOperationOnPathItem;
+import static io.micronaut.openapi.visitor.group.RouterVersioningProperties.DEFAULT_HEADER_NAME;
+import static io.micronaut.openapi.visitor.group.RouterVersioningProperties.DEFAULT_PARAMETER_NAME;
 import static io.swagger.v3.oas.models.Components.COMPONENTS_SCHEMAS_REF;
 
 /**
@@ -124,6 +133,7 @@ import static io.swagger.v3.oas.models.Components.COMPONENTS_SCHEMAS_REF;
     OpenApiApplicationVisitor.MICRONAUT_OPENAPI_ADDITIONAL_FILES,
     OpenApiApplicationVisitor.MICRONAUT_OPENAPI_CONFIG_FILE,
     OpenApiApplicationVisitor.MICRONAUT_OPENAPI_SECURITY_ENABLED,
+    OpenApiApplicationVisitor.MICRONAUT_OPENAPI_VERSIONING_ENABLED,
 })
 public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements TypeElementVisitor<OpenAPIDefinition, Object> {
 
@@ -220,12 +230,18 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
      */
     public static final String MICRONAUT_ENVIRONMENT_ENABLED = "micronaut.environment.enabled";
     /**
-     * Is this property true, micronaut-openapi will process micronaut-security proerties and annotations
+     * Is this property true, micronaut-openapi will process micronaut-security properties and annotations
      * to construct openapi security schema.
      * <br>
      * Default value is "true".
      */
     public static final String MICRONAUT_OPENAPI_SECURITY_ENABLED = "micronaut.openapi.security.enabled";
+    /**
+     * Is this property true, micronaut-openapi will process micronaut-router versioning prpoerties and annotations.
+     * <br>
+     * Default value is "true".
+     */
+    public static final String MICRONAUT_OPENAPI_VERSIONING_ENABLED = "micronaut.openapi.versioning.enabled";
     /**
      * Config file locations. By default, micronaut-openapi search config in standard path:
      * &lt;project_path&gt;/src/main/resources/
@@ -241,9 +257,9 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
      */
     public static final String MICRONAUT_SERVER_CONTEXT_PATH = "micronaut.server.context-path";
     /**
-     * Final calculated openapi filename.
+     * Final calculated openapi filenames.
      */
-    public static final String MICRONAUT_INTERNAL_OPENAPI_FILENAME = "micronaut.internal.openapi.filename";
+    public static final String MICRONAUT_INTERNAL_OPENAPI_FILENAMES = "micronaut.internal.openapi.filenames";
     /**
      * Loaded micronaut environment.
      */
@@ -288,6 +304,26 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
     private static final String MICRONAUT_OPENAPI_SCHEMA_POSTFIX = "micronaut.openapi.schema-postfix";
     private static final String MICRONAUT_SCHEMA_DECORATORS = "micronaut.internal.schema-decorators";
     /**
+     * Properties prefix to set custom schema implementations for selected clases.
+     * For example, if you want to set simple 'java.lang.String' class to some complex 'org.somepackage.MyComplexType' class you need to write:
+     * <p>
+     * -Dmicronaut.openapi.group.my-group1.title="Title 1"
+     * <p>
+     * Also, you can set it in your application.yml file like this:
+     * <p>
+     * micronaut:
+     *   openapi:
+     *     group:
+     *       my-group1:
+     *         title: Title 1
+     *         filename: swagger-${group}-${apiVersion}-${version}.yml
+     *       my-group2:
+     *         title: Title 2
+     *       ...
+     */
+    private static final String MICRONAUT_OPENAPI_GROUPS = "micronaut.openapi.groups";
+    private static final String MICRONAUT_INTERNAL_GROUPS = "micronaut.internal.groups";
+    /**
      * Loaded expandable properties. Need to save them to reuse in diffferent places.
      */
     private static final String MICRONAUT_INTERNAL_EXPANDBLE_PROPERTIES = "micronaut.internal.expandable.props";
@@ -296,9 +332,13 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
      */
     private static final String MICRONAUT_INTERNAL_EXPANDBLE_PROPERTIES_LOADED = "micronaut.internal.expandable.props.loaded";
     /**
-     * Loaded micronaut-security and microanut-opanpi security properties.
+     * Loaded micronaut-security and microanut-openanpi security properties.
      */
     private static final String MICRONAUT_INTERNAL_SECURITY_PROPERTIES = "micronaut.internal.security.properties";
+    /**
+     * Loaded micronaut-router and microanut-openanpi router versioning properties.
+     */
+    private static final String MICRONAUT_INTERNAL_ROUTER_VERSIONING_PROPERTIES = "micronaut.internal.router.versioning.properties";
     /**
      * Loaded micronaut.openapi.enabled property value.
      * <br>
@@ -412,7 +452,6 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         Environment environment = getEnv(context);
         if (environment != null) {
             for (Map.Entry<String, Object> entry : environment.getProperties(MICRONAUT_OPENAPI_SCHEMA_PREFIX, StringConvention.RAW).entrySet()) {
-                String configuredPackageName = entry.getKey();
                 SchemaDecorator decorator = schemaDecorators.get(entry.getKey());
                 if (decorator == null) {
                     decorator = new SchemaDecorator();
@@ -422,7 +461,6 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             }
 
             for (Map.Entry<String, Object> entry : environment.getProperties(MICRONAUT_OPENAPI_SCHEMA_POSTFIX, StringConvention.RAW).entrySet()) {
-                String configuredPackageName = entry.getKey();
                 SchemaDecorator decorator = schemaDecorators.get(entry.getKey());
                 if (decorator == null) {
                     decorator = new SchemaDecorator();
@@ -621,12 +659,180 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         return securityProperties;
     }
 
+    public static RouterVersioningProperties getRouterVersioningProperties(VisitorContext context) {
+
+        RouterVersioningProperties routerVersioningProperties = context.get(MICRONAUT_INTERNAL_ROUTER_VERSIONING_PROPERTIES, RouterVersioningProperties.class).orElse(null);
+        if (routerVersioningProperties != null) {
+            return routerVersioningProperties;
+        }
+
+        routerVersioningProperties = new RouterVersioningProperties(
+            getBooleanProperty(MICRONAUT_OPENAPI_VERSIONING_ENABLED, true, context),
+            getBooleanProperty("micronaut.router.versioning.enabled", false, context),
+            getBooleanProperty("micronaut.router.versioning.header.enabled", false, context),
+            getListStringsProperty("micronaut.router.versioning.header.names", Collections.singletonList(DEFAULT_HEADER_NAME), context),
+            getBooleanProperty("micronaut.router.versioning.parameter.enabled", false, context),
+            getListStringsProperty("micronaut.router.versioning.parameter.names", Collections.singletonList(DEFAULT_PARAMETER_NAME), context)
+        );
+
+        context.put(MICRONAUT_INTERNAL_ROUTER_VERSIONING_PROPERTIES, routerVersioningProperties);
+
+        return routerVersioningProperties;
+    }
+
+    public static GroupProperties getGroupProperties(String groupName, VisitorContext context) {
+        if (groupName == null) {
+            return null;
+        }
+        Map<String, GroupProperties> allGroupsProperties = getGroupsPropertiesMap(context);
+        return CollectionUtils.isNotEmpty(allGroupsProperties) ? allGroupsProperties.get(groupName) : null;
+    }
+
+    public static Map<String, GroupProperties> getGroupsPropertiesMap(VisitorContext context) {
+
+        Map<String, GroupProperties> groupPropertiesMap = (Map<String, GroupProperties>) context.get(MICRONAUT_INTERNAL_GROUPS, Map.class).orElse(null);
+        if (groupPropertiesMap != null) {
+            return groupPropertiesMap;
+        }
+
+        groupPropertiesMap = new HashMap<>();
+
+        // first read system properties
+        Properties sysProps = System.getProperties();
+        readGroupsProperties(sysProps, groupPropertiesMap, context);
+
+        // second read openapi.properties file
+        Properties fileProps = readOpenApiConfigFile(context);
+        readGroupsProperties(fileProps, groupPropertiesMap, context);
+
+        // third read environments properties
+        Environment environment = getEnv(context);
+        if (environment != null) {
+            for (Map.Entry<String, Object> entry : environment.getProperties(MICRONAUT_OPENAPI_GROUPS, StringConvention.RAW).entrySet()) {
+                String entryKey = entry.getKey();
+                String[] propParts = entryKey.split("\\.");
+                String propName = propParts[propParts.length - 1];
+                String groupName = entryKey.substring(0, entryKey.length() - propName.length() - 1);
+                setGroupProperty(groupName, propName, entry.getValue(), groupPropertiesMap, context);
+            }
+        }
+
+        Utils.getAllKnownGroups().addAll(groupPropertiesMap.keySet());
+
+        context.put(MICRONAUT_INTERNAL_GROUPS, groupPropertiesMap);
+
+        return groupPropertiesMap;
+    }
+
+    private static void readGroupsProperties(Properties props, Map<String, GroupProperties> groupPropertiesMap, VisitorContext context) {
+
+        for (String prop : props.stringPropertyNames()) {
+            if (!prop.startsWith(MICRONAUT_OPENAPI_GROUPS)) {
+                continue;
+            }
+            int groupNameIndexEnd = prop.indexOf('.', MICRONAUT_OPENAPI_GROUPS.length() + 1);
+            if (groupNameIndexEnd < 0) {
+                continue;
+            }
+            String groupName = prop.substring(MICRONAUT_OPENAPI_GROUPS.length() + 1, groupNameIndexEnd);
+            String propertyName = prop.substring(groupNameIndexEnd + 1);
+            String value = props.getProperty(prop);
+            setGroupProperty(groupName, prop, value, groupPropertiesMap, context);
+        }
+    }
+
+    private static void setGroupProperty(String groupName, String propertyName, Object value, Map<String, GroupProperties> groupPropertiesMap, VisitorContext context) {
+        if (value == null) {
+            return;
+        }
+        String valueStr = value.toString();
+        GroupProperties groupProperties = groupPropertiesMap.computeIfAbsent(groupName, GroupProperties::new);
+        switch (propertyName.toLowerCase()) {
+            case "display-name":
+            case "displayname":
+                if (groupProperties.getDisplayName() == null) {
+                    groupProperties.setDisplayName(valueStr);
+                }
+                break;
+            case "file-name":
+            case "filename":
+                if (groupProperties.getFilename() == null) {
+                    groupProperties.setFilename(valueStr);
+                }
+                break;
+            case "packages":
+                if (groupProperties.getPackages() == null) {
+                    List<PackageProperties> packages = new ArrayList<>();
+                    for (String groupPackage : valueStr.split(",")) {
+                        packages.add(getPackageProperties(groupPackage));
+                    }
+                    groupProperties.setPackages(packages);
+                }
+                break;
+            case "primary":
+                if (groupProperties.getPrimary() == null) {
+                    groupProperties.setPrimary(Boolean.valueOf(valueStr));
+                }
+                break;
+            case "commonexclude":
+            case "common-exclude":
+                if (groupProperties.getCommonExclude() == null) {
+                    groupProperties.setCommonExclude(Boolean.valueOf(valueStr));
+                }
+                break;
+            case "packagesexclude":
+            case "packages-exclude":
+                if (groupProperties.getPackagesExclude() == null) {
+                    List<PackageProperties> packagesExclude = new ArrayList<>();
+                    for (String groupPackage : valueStr.split(",")) {
+                        packagesExclude.add(getPackageProperties(groupPackage));
+                    }
+                    groupProperties.setPackagesExclude(packagesExclude);
+                }
+                break;
+            default:
+                break;
+        }
+    }
+
+    private static PackageProperties getPackageProperties(String groupPackage) {
+        groupPackage = groupPackage.trim();
+        boolean includeSubpackages = groupPackage.endsWith("*");
+        if (includeSubpackages) {
+            groupPackage = groupPackage.substring(0, groupPackage.length() - 2);
+        }
+        if (groupPackage.endsWith(".")) {
+            groupPackage = groupPackage.substring(0, groupPackage.length() - 2);
+        }
+        return new PackageProperties(groupPackage, includeSubpackages);
+    }
+
     public static boolean getBooleanProperty(String property, boolean defaultValue, VisitorContext context) {
         String str = getConfigurationProperty(property, context);
         if (StringUtils.isEmpty(str)) {
             return defaultValue;
         }
         return !StringUtils.FALSE.equalsIgnoreCase(str);
+    }
+
+    public static List<String> getListStringsProperty(String property, List<String> defaultValue, VisitorContext context) {
+        String strValue = System.getProperty(property);
+        if (StringUtils.isEmpty(strValue)) {
+            strValue = readOpenApiConfigFile(context).getProperty(property);
+        }
+        if (StringUtils.isNotEmpty(strValue)) {
+            List<String> result = new ArrayList<>();
+            for (String item : strValue.split(",")) {
+                result.add(item.trim());
+            }
+            return result;
+        }
+
+        Environment env = getEnv(context);
+        if (env != null) {
+            return env.get(property, Argument.LIST_OF_STRING).orElse(defaultValue);
+        }
+        return defaultValue;
     }
 
     @Nullable
@@ -721,7 +927,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             return environment;
         } catch (Exception e) {
             if (context != null) {
-                context.warn("Can't create environment: " + e.getMessage(), null);
+                context.warn("Can't create environment: " + e.getMessage() + ".\n" + Utils.printStackTrace(e), null);
             }
         }
         return environment;
@@ -844,7 +1050,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             Optional.ofNullable(from.getComponents()).ifPresent(components -> {
                 Map<String, Schema> schemas = components.getSchemas();
 
-                if (schemas != null && !schemas.isEmpty()) {
+                if (CollectionUtils.isNotEmpty(schemas)) {
                     schemas.forEach((k, v) -> {
                         if (v.getName() == null) {
                             v.setName(k);
@@ -877,12 +1083,12 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                 }).orElse(new OpenAPI());
     }
 
-    private void renderViews(String title, String specFile, Path destinationDir, VisitorContext context) throws IOException {
+    private void renderViews(String title, Map<Pair<String, String>, OpenApiInfo> openApiInfos, Path destinationDir, VisitorContext context) throws IOException {
         String viewSpecification = getConfigurationProperty(MICRONAUT_OPENAPI_VIEWS_SPEC, context);
-        OpenApiViewConfig cfg = OpenApiViewConfig.fromSpecification(viewSpecification, readOpenApiConfigFile(context), context);
+        OpenApiViewConfig cfg = OpenApiViewConfig.fromSpecification(viewSpecification, openApiInfos, readOpenApiConfigFile(context), context);
         if (cfg.isEnabled()) {
             cfg.setTitle(title);
-            cfg.setSpecFile(specFile);
+            cfg.setSpecFile(openApiInfos.values().iterator().next().getSpecFilePath());
             cfg.setServerContextPath(getConfigurationProperty(MICRONAUT_OPENAPI_CONTEXT_SERVER_PATH, context));
             cfg.render(destinationDir, context);
         }
@@ -1169,47 +1375,239 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             }
             OpenAPI openApi = attr.get();
             processEndpoints(context);
-            openApi = postProcessOpenApi(openApi, context);
-            // need to set test reference to openApi after post-processing
+
+            mergeMicronautEndpointInfos(openApi, context);
+            Map<Pair<String, String>, OpenApiInfo> openApiInfos = divideOpenapiByGroupsAndVersions(openApi, context);
             if (Utils.isTestMode()) {
-                Utils.setTestReference(openApi);
+                Utils.setTestReferences(openApiInfos);
             }
 
             String isJson = getConfigurationProperty(MICRONAUT_OPENAPI_JSON_FORMAT, context);
             boolean isYaml = !(StringUtils.isNotEmpty(isJson) && isJson.equalsIgnoreCase(StringUtils.TRUE));
-
-            String ext = isYaml ? EXT_YML : EXT_JSON;
-            String fileName = "swagger" + ext;
             String documentTitle = "OpenAPI";
 
-            Info info = openApi.getInfo();
-            if (info != null) {
-                documentTitle = Optional.ofNullable(info.getTitle()).orElse(Environment.DEFAULT_NAME);
-                documentTitle = documentTitle.toLowerCase(Locale.US).replace(' ', '-');
-                String version = info.getVersion();
-                if (version != null) {
-                    documentTitle = documentTitle + '-' + version;
+            for (Map.Entry<Pair<String, String>, OpenApiInfo> entry : openApiInfos.entrySet()) {
+
+                OpenApiInfo openApiInfo = entry.getValue();
+
+                openApi = openApiInfo.getOpenApi();
+
+                openApi = postProcessOpenApi(openApi, context);
+                // need to set test reference to openApi after post-processing
+                if (Utils.isTestMode()) {
+                    Utils.setTestReference(openApi);
                 }
-                fileName = documentTitle + ext;
-            }
-            String fileNameFromConfig = getConfigurationProperty(MICRONAUT_OPENAPI_FILENAME, context);
-            if (StringUtils.isNotEmpty(fileNameFromConfig)) {
-                fileName = replacePlaceholders(fileNameFromConfig, context) + ext;
-                if (fileName.contains("${version}")) {
-                    fileName = fileName.replaceAll("\\$\\{version}", info != null && info.getVersion() != null ? info.getVersion() : StringUtils.EMPTY_STRING);
+
+                String ext = isYaml ? EXT_YML : EXT_JSON;
+                String fileName = "swagger" + ext;
+
+                Info info = openApi.getInfo();
+                if (info != null) {
+                    documentTitle = Optional.ofNullable(info.getTitle()).orElse(Environment.DEFAULT_NAME);
+                    documentTitle = documentTitle.toLowerCase(Locale.US).replace(' ', '-');
+                    String version = info.getVersion();
+                    if (version != null) {
+                        documentTitle = documentTitle + '-' + version;
+                    }
+                    fileName = documentTitle + ext;
                 }
-            }
-            if (fileName.contains("${")) {
-                context.warn("Can't set some placeholders in fileName: " + fileName, null);
+
+                String versionFromInfo = info != null && info.getVersion() != null ? info.getVersion() : StringUtils.EMPTY_STRING;
+
+                String fileNameFromConfig = getConfigurationProperty(MICRONAUT_OPENAPI_FILENAME, context);
+                if (StringUtils.isNotEmpty(fileNameFromConfig)) {
+                    fileName = replacePlaceholders(fileNameFromConfig, context) + ext;
+                    if (fileName.contains("${version}")) {
+                        fileName = fileName.replaceAll("\\$\\{version}", versionFromInfo);
+                    }
+                }
+
+                // contruct filename for group
+                if (openApiInfos.size() > 1) {
+                    if (StringUtils.isNotEmpty(openApiInfo.getFilename())) {
+                        fileName = openApiInfo.getFilename();
+                    } else {
+
+                        // default name: swagger-<version>-<groupName>-<apiVersion>
+
+                        fileName = fileName.substring(0, fileName.length() - ext.length())
+                            + (openApiInfo.getGroupName() != null ? "-" + openApiInfo.getGroupName() : StringUtils.EMPTY_STRING)
+                            + (openApiInfo.getVersion() != null ? "-" + openApiInfo.getVersion() : StringUtils.EMPTY_STRING);
+                    }
+
+                    fileName = replacePlaceholders(fileName, context) + ext;
+                    if (fileName.contains("${apiVersion}")) {
+                        fileName = fileName.replaceAll("\\$\\{apiVersion}", openApiInfo.getVersion() != null ? openApiInfo.getVersion() : versionFromInfo);
+                    }
+                    if (fileName.contains("${version}")) {
+                        fileName = fileName.replaceAll("\\$\\{version}", versionFromInfo);
+                    }
+                    if (fileName.contains("${group}")) {
+                        fileName = fileName.replaceAll("\\$\\{group}", openApiInfo.getGroupName() != null ? openApiInfo.getGroupName() : StringUtils.EMPTY_STRING);
+                    }
+                }
+                if (fileName.contains("${")) {
+                    context.warn("Can't set some placeholders in fileName: " + fileName, null);
+                }
+
+                openApiInfo.setFilename(fileName);
             }
 
-            context.put(MICRONAUT_INTERNAL_OPENAPI_FILENAME, fileName);
+            writeYamlToFile(openApiInfos, documentTitle, context, isYaml);
 
-            writeYamlToFile(openApi, fileName, documentTitle, context, isYaml);
             visitedElements = visitedElements(context);
         } catch (Throwable t) {
             context.warn("Error:\n" + Utils.printStackTrace(t), null);
             throw t;
+        }
+    }
+
+    private Map<Pair<String, String>, OpenApiInfo> divideOpenapiByGroupsAndVersions(OpenAPI openApi, VisitorContext context) {
+        Map<String, List<EndpointInfo>> endpointInfosMap = Utils.getEndpointInfos();
+        Set<String> allVersions = Utils.getAllKnownVersions();
+        Set<String> allGroups = Utils.getAllKnownGroups();
+        if (CollectionUtils.isEmpty(endpointInfosMap)
+            || (CollectionUtils.isEmpty(allVersions) && CollectionUtils.isEmpty(allGroups))) {
+            return Collections.singletonMap(Pair.NULL_STRING_PAIR, new OpenApiInfo(openApi));
+        }
+
+        List<EndpointInfo> commonEndpoints = new ArrayList<>();
+
+        // key version, groupName
+        Map<Pair<String, String>, OpenApiInfo> result = new HashMap<>();
+
+        for (List<EndpointInfo> endpointInfos : endpointInfosMap.values()) {
+            for (EndpointInfo endpointInfo : endpointInfos) {
+                if (CollectionUtils.isEmpty(endpointInfo.getGroups()) && endpointInfo.getVersion() == null) {
+                    commonEndpoints.add(endpointInfo);
+                    continue;
+                }
+                for (String group : endpointInfo.getGroups()) {
+                    if (CollectionUtils.isNotEmpty(endpointInfo.getExcludedGroups()) && endpointInfo.getExcludedGroups().contains(group)) {
+                        continue;
+                    }
+                    OpenAPI newOpenApi = addOpenApiInfo(group, endpointInfo.getVersion(), openApi, result, context);
+                    addOperation(endpointInfo, newOpenApi);
+                }
+
+                // if we have only versions without groups
+                if (CollectionUtils.isEmpty(endpointInfo.getGroups())) {
+                    OpenAPI newOpenApi = addOpenApiInfo(null, endpointInfo.getVersion(), openApi, result, context);
+                    addOperation(endpointInfo, newOpenApi);
+                }
+            }
+        }
+
+        // add common endpoints (without group name)
+        for (Map.Entry<Pair<String, String>, OpenApiInfo> entry : result.entrySet()) {
+
+            String group = entry.getKey().getFirst();
+            GroupProperties groupProperties = getGroupProperties(group, context);
+            if (groupProperties != null && groupProperties.getCommonExclude() != null && groupProperties.getCommonExclude()) {
+                continue;
+            }
+
+            OpenAPI openAPI = entry.getValue().getOpenApi();
+
+            for (EndpointInfo commonEndpoint : commonEndpoints) {
+                if (CollectionUtils.isNotEmpty(commonEndpoint.getExcludedGroups()) && commonEndpoint.getExcludedGroups().contains(group)) {
+                    continue;
+                }
+                addOperation(commonEndpoint, openAPI);
+            }
+        }
+
+        return result;
+    }
+
+    private void addOperation(EndpointInfo endpointInfo, OpenAPI openApi) {
+        if (openApi == null) {
+            return;
+        }
+        io.swagger.v3.oas.models.Paths paths = openApi.getPaths();
+        if (paths == null) {
+            paths = new io.swagger.v3.oas.models.Paths();
+            openApi.setPaths(paths);
+        }
+        PathItem pathItem = paths.computeIfAbsent(endpointInfo.getUrl(), (pathurl) -> new PathItem());
+        Operation operation = getOperationOnPathItem(pathItem, endpointInfo.getHttpMethod());
+        if (operation == null) {
+            setOperationOnPathItem(pathItem, endpointInfo.getHttpMethod(), endpointInfo.getOperation());
+            return;
+        }
+        setOperationOnPathItem(pathItem, endpointInfo.getHttpMethod(), SchemaUtils.mergeOperations(operation, endpointInfo.getOperation()));
+    }
+
+    private OpenAPI addOpenApiInfo(String group, String version, OpenAPI openApi, Map<Pair<String, String>, OpenApiInfo> openApiInfoMap, VisitorContext context) {
+        GroupProperties groupProperties = getGroupProperties(group, context);
+        boolean hasGroupProperties = groupProperties != null;
+
+        Pair<String, String> key = Pair.of(group, version);
+        OpenApiInfo openApiInfo = openApiInfoMap.get(key);
+        OpenAPI newOpenApi;
+        if (openApiInfo == null) {
+
+            Map<String, OpenAPI> knownOpenApis = Utils.getOpenApis();
+            if (CollectionUtils.isNotEmpty(knownOpenApis) && knownOpenApis.containsKey(group)) {
+                newOpenApi = knownOpenApis.get(group);
+            } else {
+                newOpenApi = new OpenAPI();
+            }
+
+            openApiInfo = new OpenApiInfo(
+                version,
+                group,
+                hasGroupProperties ? groupProperties.getDisplayName() : null,
+                hasGroupProperties ? groupProperties.getFilename() : null,
+                newOpenApi
+            );
+
+            openApiInfoMap.put(key, openApiInfo);
+
+            OpenAPI openApiCopy;
+            try {
+                openApiCopy = ConvertUtils.getJsonMapper().treeToValue(ConvertUtils.getJsonMapper().valueToTree(openApi), OpenAPI.class);
+            } catch (JsonProcessingException e) {
+                context.warn("Error\n" + Utils.printStackTrace(e), null);
+                return null;
+            }
+
+            if (CollectionUtils.isEmpty(knownOpenApis) || !knownOpenApis.containsKey(group)) {
+                newOpenApi.setTags(openApiCopy.getTags());
+                newOpenApi.setServers(openApiCopy.getServers());
+                newOpenApi.setInfo(openApiCopy.getInfo());
+                newOpenApi.setSecurity(openApiCopy.getSecurity());
+                newOpenApi.setExternalDocs(openApiCopy.getExternalDocs());
+            }
+
+            newOpenApi.setComponents(openApiCopy.getComponents());
+
+        } else {
+            newOpenApi = openApiInfo.getOpenApi();
+        }
+
+        return newOpenApi;
+    }
+
+    private void mergeMicronautEndpointInfos(OpenAPI openApi, VisitorContext context) {
+
+        Map<String, List<EndpointInfo>> endpointInfosMap = Utils.getEndpointInfos();
+        if (CollectionUtils.isEmpty(endpointInfosMap)) {
+            return;
+        }
+        // we need to merge operations for single path without versions
+        for (List<EndpointInfo> endpointInfos : endpointInfosMap.values()) {
+            for (EndpointInfo endpointInfo : endpointInfos) {
+                PathItem pathItem = openApi.getPaths().get(endpointInfo.getUrl());
+                Operation operation = getOperationOnPathItem(pathItem, endpointInfo.getHttpMethod());
+                if (operation == null) {
+                    setOperationOnPathItem(pathItem, endpointInfo.getHttpMethod(), endpointInfo.getOperation());
+                    continue;
+                }
+                if (endpointInfo.getVersion() == null) {
+                    setOperationOnPathItem(pathItem, endpointInfo.getHttpMethod(), SchemaUtils.mergeOperations(operation, endpointInfo.getOperation()));
+                }
+            }
         }
     }
 
@@ -1237,7 +1635,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                     // Create a copy of the keySet so that we can modify the map while in a foreach
                     Set<String> keySet = new HashSet<>(schemas.keySet());
                     for (String schemaName : keySet) {
-                        if (!openApiJson.contains(COMPONENTS_SCHEMAS_REF + schemaName)) {
+                        if (!openApiJson.contains("\"" + COMPONENTS_SCHEMAS_REF + schemaName + '"')) {
                             schemas.remove(schemaName);
                         }
                     }
@@ -1546,34 +1944,47 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         }
     }
 
-    private void writeYamlToFile(OpenAPI openAPI, String fileName, String documentTitle, VisitorContext context, boolean isYaml) {
-        Optional<Path> specFile = openApiSpecFile(fileName, context);
-        try (Writer writer = getFileWriter(specFile)) {
-            (isYaml ? ConvertUtils.getYamlMapper() : ConvertUtils.getJsonMapper()).writeValue(writer, openAPI);
-            if (Utils.isTestMode()) {
-                Utils.setTestFileName(fileName);
-                if (isYaml) {
-                    Utils.setTestYamlReference(writer.toString());
+    private void writeYamlToFile(Map<Pair<String, String>, OpenApiInfo> openApiInfos, String documentTitle, VisitorContext context, boolean isYaml) {
+
+        Path viewsDestDirs = null;
+
+        for (OpenApiInfo openApiInfo : openApiInfos.values()) {
+            Optional<Path> specFile = openApiSpecFile(openApiInfo.getFilename(), context);
+            try (Writer writer = getFileWriter(specFile)) {
+                (isYaml ? ConvertUtils.getYamlMapper() : ConvertUtils.getJsonMapper()).writeValue(writer, openApiInfo.getOpenApi());
+                if (Utils.isTestMode()) {
+                    Utils.setTestFileName(openApiInfo.getFilename());
+                    if (isYaml) {
+                        Utils.setTestYamlReference(writer.toString());
+                    } else {
+                        Utils.setTestJsonReference(writer.toString());
+                    }
                 } else {
-                    Utils.setTestJsonReference(writer.toString());
+                    @SuppressWarnings("OptionalGetWithoutIsPresent")
+                    Path specPath = specFile.get();
+                    context.info("Writing OpenAPI file to destination: " + specPath);
+                    viewsDestDirs = getViewsDestDir(getDefaultFilePath(openApiInfo.getFilename(), context).get(), context);
+                    context.info("Writing OpenAPI views to destination: " + viewsDestDirs);
+                    final Path viewsDestDirsFinal = viewsDestDirs;
+                    context.getClassesOutputPath().ifPresent(path -> {
+                        // add relative paths for the specPath, and its parent META-INF/swagger
+                        // so that micronaut-graal visitor knows about them
+                        context.addGeneratedResource(path.relativize(specPath).toString());
+                        context.addGeneratedResource(path.relativize(specPath.getParent()).toString());
+                        context.addGeneratedResource(path.relativize(viewsDestDirsFinal).toString());
+                    });
+                    openApiInfo.setSpecFilePath(specPath.getFileName().toString());
                 }
-            } else {
-                @SuppressWarnings("OptionalGetWithoutIsPresent")
-                Path specPath = specFile.get();
-                context.info("Writing OpenAPI file to destination: " + specPath);
-                Path viewsDestDirs = getViewsDestDir(getDefaultFilePath(fileName, context).get(), context);
-                context.info("Writing OpenAPI views to destination: " + viewsDestDirs);
-                context.getClassesOutputPath().ifPresent(path -> {
-                    // add relative paths for the specPath, and its parent META-INF/swagger
-                    // so that micronaut-graal visitor knows about them
-                    context.addGeneratedResource(path.relativize(specPath).toString());
-                    context.addGeneratedResource(path.relativize(specPath.getParent()).toString());
-                    context.addGeneratedResource(path.relativize(viewsDestDirs).toString());
-                });
-                renderViews(documentTitle, specPath.getFileName().toString(), viewsDestDirs, context);
+            } catch (Exception e) {
+                context.warn("Unable to generate swagger" + (isYaml ? EXT_YML : EXT_JSON) + ": " + specFile.orElse(null) + " - " + e.getMessage() + ".\n" + Utils.printStackTrace(e), classElement);
             }
-        } catch (Exception e) {
-            context.warn("Unable to generate swagger" + (isYaml ? EXT_YML : EXT_JSON) + ": " + specFile.orElse(null) + " - " + e.getMessage(), classElement);
+        }
+        if (!Utils.isTestMode() && viewsDestDirs != null) {
+            try {
+                renderViews(documentTitle, openApiInfos, viewsDestDirs, context);
+            } catch (Exception e) {
+                context.warn("Unable to render swagger" + (isYaml ? EXT_YML : EXT_JSON) + ": " + openApiInfos.get(0).getSpecFilePath() + " - " + e.getMessage() + ".\n" + Utils.printStackTrace(e), classElement);
+            }
         }
     }
 
@@ -1589,7 +2000,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
 
     private void processEndpoints(VisitorContext context) {
         EndpointsConfiguration endpointsCfg = endpointsConfiguration(context);
-        if (endpointsCfg.isEnabled() && !endpointsCfg.getEndpoints().isEmpty()) {
+        if (endpointsCfg.isEnabled() && CollectionUtils.isNotEmpty(endpointsCfg.getEndpoints())) {
             OpenApiEndpointVisitor visitor = new OpenApiEndpointVisitor(true);
             endpointsCfg.getEndpoints().values().stream()
             .filter(endpoint -> endpoint.getClassElement().isPresent())

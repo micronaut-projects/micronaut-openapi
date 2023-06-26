@@ -15,17 +15,17 @@
  */
 package io.micronaut.openapi.annotation;
 
-import io.micronaut.context.annotation.AliasFor;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import io.swagger.v3.oas.annotations.tags.Tag;
-
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import io.micronaut.context.annotation.AliasFor;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
+import static java.lang.annotation.RetentionPolicy.SOURCE;
 
 /**
  * The annotation can be used to include additional io.micronaut.http.annotation.Controller or
@@ -35,7 +35,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * @author Denis Stepanov
  */
 @Repeatable(OpenAPIIncludes.class)
-@Retention(RUNTIME)
+@Retention(SOURCE)
 @Documented
 @Target({ElementType.TYPE, ElementType.ANNOTATION_TYPE})
 public @interface OpenAPIInclude {
@@ -56,6 +56,20 @@ public @interface OpenAPIInclude {
      */
     @AliasFor(member = "value")
     String[] classNames() default {};
+
+    /**
+     * @return Array of groups to which this controller should be included.
+     *
+     * @since 4.10.0
+     */
+    String[] groups() default {};
+
+    /**
+     * @return Array of groups to which this controller should not be included.
+     *
+     * @since 4.10.0
+     */
+    String[] groupsExcluded() default {};
 
     /**
      * @return Custom URI for controller

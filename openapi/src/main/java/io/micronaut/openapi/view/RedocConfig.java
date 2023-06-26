@@ -23,6 +23,8 @@ import java.util.function.Function;
 
 import io.micronaut.inject.visitor.VisitorContext;
 import io.micronaut.openapi.view.OpenApiViewConfig.RendererType;
+import io.micronaut.openapi.visitor.Pair;
+import io.micronaut.openapi.visitor.group.OpenApiInfo;
 
 /**
  * ReDoc configuration.
@@ -127,8 +129,8 @@ final class RedocConfig extends AbstractViewConfig {
 
     RapiPDFConfig rapiPDFConfig;
 
-    private RedocConfig() {
-        super(REDOC_PREFIX);
+    private RedocConfig(Map<Pair<String, String>, OpenApiInfo> openApiInfos) {
+        super(REDOC_PREFIX, openApiInfos);
         jsUrl = DEFAULT_REDOC_JS_PATH;
     }
 
@@ -136,12 +138,13 @@ final class RedocConfig extends AbstractViewConfig {
      * Builds a RedocConfig given a set of properties.
      *
      * @param properties A set of properties.
+     * @param openApiInfos Open API info objects.
      * @param context Visitor context.
      *
      * @return A RedocConfig.
      */
-    static RedocConfig fromProperties(Map<String, String> properties, VisitorContext context) {
-        return AbstractViewConfig.fromProperties(new RedocConfig(), DEFAULT_OPTIONS, properties, context);
+    static RedocConfig fromProperties(Map<String, String> properties, Map<Pair<String, String>, OpenApiInfo> openApiInfos, VisitorContext context) {
+        return AbstractViewConfig.fromProperties(new RedocConfig(openApiInfos), DEFAULT_OPTIONS, properties, RendererType.REDOC, context);
     }
 
     @Override

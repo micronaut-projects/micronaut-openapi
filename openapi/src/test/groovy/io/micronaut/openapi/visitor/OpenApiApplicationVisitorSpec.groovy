@@ -776,6 +776,7 @@ class MyBean {}
 
         given: "An API definition"
         Utils.testReference = null
+        Utils.testReferences = null
         System.setProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_ENABLED, "false")
 
         when:
@@ -843,6 +844,7 @@ class MyBean {}
 
         given: "An API definition"
         Utils.testReference = null
+        Utils.testReferences = null
         System.setProperty(OpenApiApplicationVisitor.MICRONAUT_CONFIG_FILE_LOCATIONS, "project:/src/test/resources/")
         System.setProperty(Environment.ENVIRONMENTS_PROPERTY, "disabled-openapi")
 
@@ -908,6 +910,7 @@ class MyBean {}
 
         given: "An API definition"
         Utils.testReference = null
+        Utils.testReferences = null
         System.setProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_CONFIG_FILE, "openapi-disabled-openapi.properties")
 
         when:

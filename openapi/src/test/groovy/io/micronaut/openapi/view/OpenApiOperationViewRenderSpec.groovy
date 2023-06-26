@@ -17,7 +17,7 @@ class OpenApiOperationViewRenderSpec extends Specification {
     void "test render OpenApiView specification"() {
         given:
         String spec = "redoc.enabled=true,rapidoc.enabled=true,swagger-ui.enabled=true,rapipdf.enabled=true,swagger-ui.theme=flattop"
-        OpenApiViewConfig cfg = OpenApiViewConfig.fromSpecification(spec, new Properties(), null)
+        OpenApiViewConfig cfg = OpenApiViewConfig.fromSpecification(spec, null, new Properties(), null)
         Path outputDir = Paths.get("output")
         cfg.title = "OpenAPI documentation"
         cfg.specFile = "swagger.yml"
@@ -67,7 +67,7 @@ class OpenApiOperationViewRenderSpec extends Specification {
     void "test render OpenApiView specification with custom redoc js url"() {
         given:
         String spec = "redoc.enabled=true,rapipdf.enabled=true,redoc.copy-resources=false,redoc.js.url=https://cdn.redoc.ly/redoc/latest/bundles/"
-        OpenApiViewConfig cfg = OpenApiViewConfig.fromSpecification(spec, new Properties(), null)
+        OpenApiViewConfig cfg = OpenApiViewConfig.fromSpecification(spec, null, new Properties(), null)
         Path outputDir = Paths.get("output")
         cfg.title = "OpenAPI documentation"
         cfg.specFile = "swagger.yml"
@@ -93,7 +93,7 @@ class OpenApiOperationViewRenderSpec extends Specification {
     void "test render OpenApiView specification with custom swagger js and css urls"() {
         given:
         String spec = "swagger-ui.enabled=true,rapipdf.enabled=true,swagger-ui.theme=flattop,swagger-ui.copy-theme=false,swagger-ui.theme.url=https://flattop.com/theme.css,swagger-ui.copy-resources=false,swagger-ui.js.url=https://unpkg.com/swagger-ui-dist/"
-        OpenApiViewConfig cfg = OpenApiViewConfig.fromSpecification(spec, new Properties(), null)
+        OpenApiViewConfig cfg = OpenApiViewConfig.fromSpecification(spec, null, new Properties(), null)
         Path outputDir = Paths.get("output")
         cfg.title = "OpenAPI documentation"
         cfg.specFile = "swagger.yml"
@@ -127,7 +127,7 @@ class OpenApiOperationViewRenderSpec extends Specification {
     void "test render OpenApiView specification with server context path"() {
         given:
         String spec = "redoc.enabled=true,rapidoc.enabled=true,swagger-ui.enabled=true"
-        OpenApiViewConfig cfg = OpenApiViewConfig.fromSpecification(spec, new Properties(), null)
+        OpenApiViewConfig cfg = OpenApiViewConfig.fromSpecification(spec, null, new Properties(), null)
         Path outputDir = Paths.get("output")
         cfg.title = "OpenAPI documentation"
         cfg.specFile = "swagger.yml"
@@ -156,7 +156,7 @@ class OpenApiOperationViewRenderSpec extends Specification {
     void "test render OpenApiView specification custom mapping path"() {
         given:
         String spec = "mapping.path=somewhere,redoc.enabled=true,rapidoc.enabled=true,swagger-ui.enabled=true"
-        OpenApiViewConfig cfg = OpenApiViewConfig.fromSpecification(spec, new Properties(), null)
+        OpenApiViewConfig cfg = OpenApiViewConfig.fromSpecification(spec, null, new Properties(), null)
         Path outputDir = Paths.get("output")
         cfg.title = "OpenAPI documentation"
         cfg.specFile = "swagger.yml"
@@ -184,7 +184,7 @@ class OpenApiOperationViewRenderSpec extends Specification {
     void "test render OpenApiView specification with custom mapping path and server context path"() {
         given:
         String spec = "mapping.path=somewhere,redoc.enabled=true,rapidoc.enabled=true,swagger-ui.enabled=true"
-        OpenApiViewConfig cfg = OpenApiViewConfig.fromSpecification(spec, new Properties(), null)
+        OpenApiViewConfig cfg = OpenApiViewConfig.fromSpecification(spec, null, new Properties(), null)
         Path outputDir = Paths.get("output")
         cfg.title = "OpenAPI documentation"
         cfg.specFile = "swagger.yml"
@@ -215,7 +215,7 @@ class OpenApiOperationViewRenderSpec extends Specification {
     void "test generates oauth2-redirect.html"() {
         given:
         String spec = "swagger-ui.enabled=true,swagger-ui.oauth2RedirectUrl=http://localhost:8080/foo/bar,swagger-ui.oauth2.clientId=foo,swagger-ui.oauth2.clientSecret=bar"
-        OpenApiViewConfig cfg = OpenApiViewConfig.fromSpecification(spec, new Properties(), null)
+        OpenApiViewConfig cfg = OpenApiViewConfig.fromSpecification(spec, null, new Properties(), null)
         Path outputDir = Paths.get("output")
         cfg.title = "OpenAPI documentation"
         cfg.specFile = "swagger.yml"
@@ -246,7 +246,7 @@ class OpenApiOperationViewRenderSpec extends Specification {
         System.setProperty(OpenApiApplicationVisitor.MICRONAUT_SERVER_CONTEXT_PATH, "/local-path")
         System.setProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_CONTEXT_SERVER_PATH, "/server-context-path")
         String spec = "swagger-ui.enabled=true"
-        OpenApiViewConfig cfg = OpenApiViewConfig.fromSpecification(spec, new Properties(), null)
+        OpenApiViewConfig cfg = OpenApiViewConfig.fromSpecification(spec, null, new Properties(), null)
         Path outputDir = Paths.get("output")
         cfg.title = "OpenAPI documentation"
         cfg.specFile = "swagger.yml"
@@ -272,7 +272,7 @@ class OpenApiOperationViewRenderSpec extends Specification {
         given:
         System.setProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_CONTEXT_SERVER_PATH, "/server-context-path")
         String spec = "swagger-ui.enabled=true"
-        OpenApiViewConfig cfg = OpenApiViewConfig.fromSpecification(spec, new Properties(), null)
+        OpenApiViewConfig cfg = OpenApiViewConfig.fromSpecification(spec, null, new Properties(), null)
         Path outputDir = Paths.get("output")
         cfg.title = "OpenAPI documentation"
         cfg.specFile = "swagger.yml"
@@ -297,7 +297,7 @@ class OpenApiOperationViewRenderSpec extends Specification {
         given:
         System.setProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_CONTEXT_SERVER_PATH, "/server-context-path")
         String spec = "swagger-ui.enabled=true"
-        OpenApiViewConfig cfg = OpenApiViewConfig.fromSpecification(spec, new Properties(), null)
+        OpenApiViewConfig cfg = OpenApiViewConfig.fromSpecification(spec, null, new Properties(), null)
         Path outputDir = Paths.get("output")
         cfg.title = "OpenAPI documentation"
         cfg.specFile = "swagger.yml"
@@ -321,7 +321,7 @@ class OpenApiOperationViewRenderSpec extends Specification {
     void "test generates urlResourcesPrefix without context paths"() {
         given:
         String spec = "swagger-ui.enabled=true"
-        OpenApiViewConfig cfg = OpenApiViewConfig.fromSpecification(spec, new Properties(), null)
+        OpenApiViewConfig cfg = OpenApiViewConfig.fromSpecification(spec, null, new Properties(), null)
         Path outputDir = Paths.get("output")
         cfg.title = "OpenAPI documentation"
         cfg.specFile = "swagger.yml"

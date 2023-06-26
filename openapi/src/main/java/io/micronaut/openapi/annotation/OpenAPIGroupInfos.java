@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 original authors
+ * Copyright 2017-2023 original authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,34 +20,20 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import io.swagger.v3.oas.annotations.tags.Tag;
-
 import static java.lang.annotation.RetentionPolicy.SOURCE;
 
 /**
- * The annotation to include Micronaut security endpoints.
+ * Allows {@link OpenAPIGroupInfo} to be repeatable.
  *
- * @author Denis Stepanov
+ * @since 4.10.0
  */
 @Documented
 @Retention(SOURCE)
-@Target({ElementType.TYPE, ElementType.ANNOTATION_TYPE})
-public @interface OpenAPISecurity {
+@Target({ElementType.PACKAGE, ElementType.TYPE, ElementType.ANNOTATION_TYPE})
+public @interface OpenAPIGroupInfos {
 
     /**
-     * A list of tags used by the specification with additional metadata.
-     * The order of the tags can be used to reflect on their order by the parsing tools.
-     *
-     * @return the tags used by the specification with any additional metadata
+     * @return An array of {@link OpenAPIGroupInfo}
      */
-    Tag[] tags() default {};
-
-    /**
-     * A declaration of which security mechanisms can be used across the API.
-     *
-     * @return the array of servers used for this API
-     */
-    SecurityRequirement[] security() default {};
-
+    OpenAPIGroupInfo[] value() default {};
 }

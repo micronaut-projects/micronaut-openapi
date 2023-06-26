@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 original authors
+ * Copyright 2017-2023 original authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,34 +20,35 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import io.micronaut.context.annotation.AliasFor;
 
 import static java.lang.annotation.RetentionPolicy.SOURCE;
 
 /**
- * The annotation to include Micronaut security endpoints.
+ * With this annotation, you can specify one or more groups that this endpoint will be included in,
+ * as well as specify groups from which this endpoint should be excluded.
  *
- * @author Denis Stepanov
+ * @since 4.10.0
  */
-@Documented
 @Retention(SOURCE)
-@Target({ElementType.TYPE, ElementType.ANNOTATION_TYPE})
-public @interface OpenAPISecurity {
+@Documented
+@Target({ElementType.PACKAGE, ElementType.TYPE, ElementType.METHOD})
+public @interface OpenAPIGroup {
 
     /**
-     * A list of tags used by the specification with additional metadata.
-     * The order of the tags can be used to reflect on their order by the parsing tools.
-     *
-     * @return the tags used by the specification with any additional metadata
+     * @return The names of the OpenAPi groups.
      */
-    Tag[] tags() default {};
+    @AliasFor(member = "names")
+    String[] value() default {};
 
     /**
-     * A declaration of which security mechanisms can be used across the API.
-     *
-     * @return the array of servers used for this API
+     * @return The names of the OpenAPi groups.
      */
-    SecurityRequirement[] security() default {};
+    @AliasFor(member = "value")
+    String[] names() default {};
 
+    /**
+     * @return The names of the OpenAPi groups to exclude endpoints from.
+     */
+    String[] exclude() default {};
 }

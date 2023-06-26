@@ -23,12 +23,12 @@
                 },
                 cookie = extract(document.cookie),
                 contextPath = cookie === '' ? extract(window.location.search.substring(1)) : cookie,
-                f = contextPath === '' ? undefined : function(system) {
+                f = contextPath === '' ? undefined : () => {
                     return {
                         statePlugins: {
                             spec: {
                                 wrapActions: {
-                                    updateJsonSpec: (oriAction, system) => (...args) => {
+                                    updateJsonSpec: (oriAction) => (...args) => {
                                         let [spec] = args;
                                         if (spec && spec.paths) {
                                             const newPaths = {};
@@ -53,6 +53,8 @@
                         SwaggerUIBundle.plugins.DownloadUrl,
                         f
                     ],
+                    {{swagger-ui.primaryName}}
+                    {{swagger-ui.urls}}
                     {{swagger-ui.attributes}}
                 });
                 {{swagger-ui.oauth2}}
