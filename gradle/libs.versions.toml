@@ -1,5 +1,5 @@
 [versions]
-managed-swagger = "2.2.12"
+managed-swagger = "2.2.13"
 managed-javadoc-parser = "0.3.1"
 managed-jsoup = "1.16.1"
 managed-html2md-converter = "0.64.8"
