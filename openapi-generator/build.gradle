@@ -11,7 +11,7 @@ dependencies {
             because("OpenAPI generator depends on older release which isn't compatible with SnakeYAML")
         }
     }
-    implementation libs.openapi.generator
+    api libs.openapi.generator
 
     testImplementation mnTest.micronaut.test.junit5
 
