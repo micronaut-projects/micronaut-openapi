@@ -2338,20 +2338,17 @@ micronaut.router.static-resources.swagger.mapping=/swaggerYAML/**</code></pre>
 
 
 <div class="paragraph">
-<p>By default the generation of views is disabled. You can enable views generation with a <a href="#propertiesFileConfiguration">configuration properties file</a>.</p>
+<p>By default, the generation of views is disabled. You can enable views generation with a <a href="#propertiesFileConfiguration">configuration properties file</a>.</p>
 </div>
 <div class="listingblock">
-<div class="title">openapi.properties Example Views Generation Swagger-UI Redoc, Rapidoc</div>
+<div class="title">openapi.properties Example Views Generation Swagger-UI, Redoc, Rapidoc</div>
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-none hljs">swagger-ui.enabled=true
-redoc.enabled=true
-rapidoc.enabled=true
-rapidoc.bg-color=#14191f
-rapidoc.text-color=#aec2e0
-rapidoc.sort-endpoints-by=method
-...
-..
-.</code></pre>
+<pre class="highlightjs highlight"><code class="language-none hljs">micronaut.openapi.views.spec = swagger-ui.enabled=true,\
+    redoc.enabled=true, \
+    rapidoc.enabled=true, \
+    rapidoc.bg-color=#14191f, \
+    rapidoc.text-color=#aec2e0, \
+    rapidoc.sort-endpoints-by=method</code></pre>
 </div>
 </div>
 
@@ -2365,7 +2362,7 @@ rapidoc.sort-endpoints-by=method
 
 
 <div class="paragraph">
-<p>By default the generation of views is disabled.</p>
+<p>By default, the generation of views is disabled.</p>
 </div>
 <div class="paragraph">
 <p>To turn it on you have to set the following system property <code>micronaut.openapi.views.spec</code>.</p>
