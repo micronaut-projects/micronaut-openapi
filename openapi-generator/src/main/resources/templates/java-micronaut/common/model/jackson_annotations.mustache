@@ -31,18 +31,26 @@
     {{#jackson}}
         {{^micronaut_serde_jackson}}
             {{#isDateTime}}
-        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "{{{datetimeFormat}}}")
+                {{#datetimeFormat}}
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "{{{datetimeFormat}}}")
+                {{/datetimeFormat}}
             {{/isDateTime}}
             {{#isDate}}
-        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "{{{dateFormat}}}")
+                {{#dateFormat}}
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "{{{dateFormat}}}")
+                {{/dateFormat}}
             {{/isDate}}
         {{/micronaut_serde_jackson}}
     {{/jackson}}
     {{#micronaut_serde_jackson}}
         {{#isDateTime}}
+            {{#datatimeFormat}}
     @JsonFormat(pattern = "{{{datetimeFormat}}}")
+            {{/datatimeFormat}}
         {{/isDateTime}}
         {{#isDate}}
+            {{#dateFormat}}
     @JsonFormat(pattern = "{{{dateFormat}}}")
+            {{/dateFormat}}
         {{/isDate}}
     {{/micronaut_serde_jackson}}

@@ -10,7 +10,7 @@ import reactor.core.publisher.Mono;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.OffsetDateTime;
+import java.time.ZonedDateTime;
 import java.util.stream.Collectors;
 
 @Controller
@@ -37,7 +37,7 @@ public class ParametersController implements ParametersApi {
 
     @Override
     public Mono<SendDatesResponse> sendDates(
-            LocalDate commitDate, OffsetDateTime commitDateTime) {
+            LocalDate commitDate, ZonedDateTime commitDateTime) {
         return Mono.just(new SendDatesResponse()
                 .commitDate(commitDate)
                 .commitDateTime(commitDateTime));

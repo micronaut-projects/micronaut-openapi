@@ -67,8 +67,9 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
     public static final String OPT_REQUIRED_PROPERTIES_IN_CONSTRUCTOR = "requiredPropertiesInConstructor";
     public static final String OPT_USE_AUTH = "useAuth";
     public static final String OPT_VISITABLE = "visitable";
-    public static final String OPT_DATE_LIBRARY_JAVA8 = "java8";
-    public static final String OPT_DATE_LIBRARY_JAVA8_LOCAL_DATETIME = "java8-localdatetime";
+    public static final String OPT_DATE_LIBRARY_ZONED_DATETIME = "ZONED_DATETIME";
+    public static final String OPT_DATE_LIBRARY_OFFSET_DATETIME = "OFFSET_DATETIME";
+    public static final String OPT_DATE_LIBRARY_LOCAL_DATETIME = "LOCAL_DATETIME";
     public static final String OPT_DATE_FORMAT = "dateFormat";
     public static final String OPT_DATETIME_FORMAT = "datetimeFormat";
     public static final String OPT_REACTIVE = "reactive";
@@ -84,9 +85,6 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
     public static final String CONTENT_TYPE_APPLICATION_JSON = "application/json";
     public static final String CONTENT_TYPE_MULTIPART_FORM_DATA = "multipart/form-data";
     public static final String CONTENT_TYPE_ANY = "*/*";
-    public static final String DATE_FORMAT = "yyyy-MM-dd";
-    public static final String DATETIME_FORMAT = DATE_FORMAT + "'T'HH:mm:ss.SSS";
-    public static final String OFFSET_DATETIME_FORMAT = DATETIME_FORMAT + "XXXX";
 
     protected String title;
     protected boolean useBeanValidation;
@@ -122,7 +120,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
         embeddedTemplateDir = templateDir = "templates/java-micronaut";
         apiDocPath = "docs/apis";
         modelDocPath = "docs/models";
-        dateLibrary = OPT_DATE_LIBRARY_JAVA8;
+        dateLibrary = OPT_DATE_LIBRARY_ZONED_DATETIME;
         reactive = true;
         wrapInHttpResponse = false;
         appName = artifactId;
@@ -189,8 +187,8 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
         // Modify the DATE_LIBRARY option to only have supported values
         cliOptions.stream().filter(o -> o.getOpt().equals(DATE_LIBRARY)).findFirst().ifPresent(opt -> {
             Map<String, String> valuesEnum = new HashMap<>();
-            valuesEnum.put(OPT_DATE_LIBRARY_JAVA8, opt.getEnum().get(OPT_DATE_LIBRARY_JAVA8));
-            valuesEnum.put(OPT_DATE_LIBRARY_JAVA8_LOCAL_DATETIME, opt.getEnum().get(OPT_DATE_LIBRARY_JAVA8_LOCAL_DATETIME));
+            valuesEnum.put(OPT_DATE_LIBRARY_OFFSET_DATETIME, opt.getEnum().get(OPT_DATE_LIBRARY_OFFSET_DATETIME));
+            valuesEnum.put(OPT_DATE_LIBRARY_LOCAL_DATETIME, opt.getEnum().get(OPT_DATE_LIBRARY_LOCAL_DATETIME));
             opt.setEnum(valuesEnum);
         });
 
@@ -208,6 +206,11 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
             "Authorization", "Body", "application"
         };
         reservedWords.addAll(Arrays.asList(reservedWordsArray));
+
+        importMapping.put("LocalDateTime", "java.time.LocalDateTime");
+        importMapping.put("OffsetDateTime", "java.time.OffsetDateTime");
+        importMapping.put("ZonedDateTime", "java.time.ZonedDateTime");
+        importMapping.put("LocalDate", "java.time.LocalDate");
     }
 
     public void setWrapInHttpResponse(boolean wrapInHttpResponse) {
@@ -335,19 +338,20 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
         additionalProperties.put("javaxPackage", "jakarta");
 
         // Use the default java time
-        additionalProperties.putIfAbsent(OPT_DATE_FORMAT, DATE_FORMAT);
-        if (dateLibrary.equals(OPT_DATE_LIBRARY_JAVA8)) {
-            typeMapping.put("DateTime", "OffsetDateTime");
-            typeMapping.put("date", "LocalDate");
-            additionalProperties.putIfAbsent(OPT_DATETIME_FORMAT, OFFSET_DATETIME_FORMAT);
-        } else if (dateLibrary.equals(OPT_DATE_LIBRARY_JAVA8_LOCAL_DATETIME)) {
-            typeMapping.put("DateTime", "LocalDateTime");
-            typeMapping.put("date", "LocalDate");
-            additionalProperties.putIfAbsent(OPT_DATETIME_FORMAT, DATETIME_FORMAT);
+        switch (dateLibrary) {
+            case OPT_DATE_LIBRARY_OFFSET_DATETIME -> {
+                typeMapping.put("DateTime", "OffsetDateTime");
+                typeMapping.put("date", "LocalDate");
+            }
+            case OPT_DATE_LIBRARY_ZONED_DATETIME -> {
+                typeMapping.put("DateTime", "ZonedDateTime");
+                typeMapping.put("date", "LocalDate");
+            }
+            case OPT_DATE_LIBRARY_LOCAL_DATETIME -> {
+                typeMapping.put("DateTime", "LocalDateTime");
+                typeMapping.put("date", "LocalDate");
+            }
         }
-        importMapping.putIfAbsent("LocalDateTime", "java.time.LocalDateTime");
-        importMapping.putIfAbsent("OffsetDateTime", "java.time.OffsetDateTime");
-        importMapping.putIfAbsent("LocalDate", "java.time.LocalDate");
 
         // Add documentation files
         modelDocTemplateFiles.clear();
@@ -885,6 +889,10 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
             }
             throw new RuntimeException(sb.toString());
         }
+    }
+
+    public void setDateTimeLibrary(String name) {
+        setDateLibrary(name);
     }
 
     private static class ReplaceDotsWithUnderscoreLambda implements Mustache.Lambda {

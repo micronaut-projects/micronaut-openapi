@@ -158,14 +158,14 @@ class RequestBodyControllerSpec extends Specification {
         given:
         DateModel dateModel = new DateModel()
                 .commitDate(LocalDate.parse("2022-01-03"))
-                .commitDateTime(OffsetDateTime.parse("1999-01-01T00:01:10.456+01:00"))
+                .commitDateTime(OffsetDateTime.parse("1999-01-01T00:01:10.456+01:00").toZonedDateTime())
         HttpRequest<?> request = HttpRequest.POST("/sendDateModel", dateModel)
 
         when:
         String response = client.retrieve(request, Argument.of(String), Argument.of(String))
 
         then:
-        '{"commitDate":"2022-01-03","commitDateTime":"1998-12-31T23:01:10.456Z"}' == response
+        '{"commitDate":"2022-01-03","commitDateTime":"1999-01-01T00:01:10.456+01:00"}' == response
     }
 
     void "test send nested model"() {

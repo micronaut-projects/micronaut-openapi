@@ -471,6 +471,31 @@ paths:
             $ref: '#/definitions/SimpleModel'
         default:
           $ref: '#/responses/Error'
+  /getDateTime:
+    get:
+      operationId: getDateTime
+      tags: [ responseBody ]
+      description: A method to get date time in the response
+      responses:
+        200:
+          description: Success
+          schema:
+            type: string
+            format: date-time
+        default:
+          $ref: '#/responses/Error'
+  /getDateModel:
+    get:
+      operationId: getDateModel
+      tags: [ responseBody ]
+      description: A method to get a model containing dates in the response
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: '#/definitions/DateModel'
+        default:
+          $ref: '#/responses/Error'
   /getSimpleModelWithNonStandardStatus:
     get:
       operationId: getSimpleModelWithNonStandardStatus

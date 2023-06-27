@@ -64,6 +64,7 @@ public class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen<Jav
     protected boolean generateStreamingFileUpload = false;
 
     JavaMicronautServerCodegen() {
+        super();
 
         title = "OpenAPI Micronaut Server";
         apiPackage = "org.openapitools.api";

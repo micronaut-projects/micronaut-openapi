@@ -1,11 +1,11 @@
-{{^isDate}}{{^isDateTime}}{{^isEnum}}
+{{^isEnum}}{{^isDateTime}}{{^isDate}}
     {{{dataType}}}
-{{/isEnum}}{{/isDateTime}}{{/isDate}}
+{{/isDate}}{{/isDateTime}}{{/isEnum}}
 {{#isDateTime}}
-    @Format("{{{datetimeFormat}}}") {{{dataType}}}
+    {{#dateFormat}}@Format("{{{datetimeFormat}}}"){{/dateFormat}} {{{dataType}}}
 {{/isDateTime}}
 {{#isDate}}
-    @Format("{{{dateFormat}}}") {{{dataType}}}
+    {{#dateTimeFormat}}@Format("{{{dateFormat}}}"){{/dateTimeFormat}} {{{dataType}}}
 {{/isDate}}
 {{#isEnum}}
     {{{datatypeWithEnum}}}
