@@ -1,8 +1,11 @@
 package io.micronaut.openapi.test.api;
 
+import io.micronaut.http.MediaType;
 import io.micronaut.data.model.Page;
 import io.micronaut.data.model.Pageable;
 import io.micronaut.http.multipart.CompletedFileUpload;
+import io.micronaut.http.server.types.files.FileCustomizableResponseType;
+import io.micronaut.http.server.types.files.StreamedFile;
 import io.micronaut.openapi.test.dated.DatedResponse;
 import io.micronaut.openapi.test.model.SimpleModel;
 import io.micronaut.openapi.test.model.StateEnum;
@@ -78,8 +81,8 @@ public class ResponseBodyController implements ResponseBodyApi {
     }
 
     @Override
-    public Mono<CompletedFileUpload> getFile() {
+    public Mono<FileCustomizableResponseType> getFile() {
         ByteArrayInputStream stream = new ByteArrayInputStream("My file content".getBytes());
-        return Mono.empty();
+        return Mono.just(new StreamedFile(stream, MediaType.TEXT_PLAIN_TYPE));
     }
 }

@@ -108,10 +108,9 @@ class ResponseBodyControllerSpec extends Specification {
         HttpStatus.NOT_FOUND == e.status
     }
 
-    @Ignore("Requires fixing")
     void "test get file"() {
         given:
-        HttpRequest<?> request = HttpRequest.GET("/getFile").contentType(MediaType.MULTIPART_FORM_DATA_TYPE)
+        HttpRequest<?> request = HttpRequest.GET("/getFile")
 
         when:
         Argument<byte[]> arg = Argument.of(byte[])

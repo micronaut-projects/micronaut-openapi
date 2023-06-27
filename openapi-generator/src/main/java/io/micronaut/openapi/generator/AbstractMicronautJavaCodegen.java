@@ -589,9 +589,15 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
 
 
     @Override
-    public CodegenOperation fromOperation(String path, String httpMethod, Operation operation,
-                                          List<Server> servers) {
+    public CodegenOperation fromOperation(
+            String path, String httpMethod, Operation operation, List<Server> servers
+    ) {
         CodegenOperation op = super.fromOperation(path, httpMethod, operation, servers);
+
+        if (op.isResponseFile) {
+            op.returnType = typeMapping.get("responseFile");
+            op.imports.add(op.returnType);
+        }
 
         op.vendorExtensions.put("originalParams", new ArrayList(op.allParams));
         op.vendorExtensions.put("originReturnProperty", op.returnProperty);

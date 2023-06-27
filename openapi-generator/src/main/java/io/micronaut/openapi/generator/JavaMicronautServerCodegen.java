@@ -15,6 +15,8 @@
  */
 package io.micronaut.openapi.generator;
 
+import io.swagger.v3.oas.models.Operation;
+import io.swagger.v3.oas.models.servers.Server;
 import org.openapitools.codegen.*;
 import org.openapitools.codegen.meta.GeneratorMetadata;
 import org.openapitools.codegen.meta.Stability;
@@ -35,6 +37,7 @@ public class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen<Jav
     public static final String OPT_GENERATE_IMPLEMENTATION_FILES = "generateImplementationFiles";
     public static final String OPT_GENERATE_OPERATIONS_TO_RETURN_NOT_IMPLEMENTED = "generateOperationsToReturnNotImplemented";
     public static final String OPT_GENERATE_HARD_NULLABLE = "generateHardNullable";
+    public static final String OPT_GENERATE_STREAMING_FILE_UPLOAD = "generateStreamingFileUpload";
 
     public static final String EXTENSION_ROLES = "x-roles";
     public static final String ANONYMOUS_ROLE_KEY = "isAnonymous()";
@@ -58,6 +61,7 @@ public class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen<Jav
     protected boolean generateControllerFromExamples = false;
     protected boolean useAuth = true;
     protected boolean generateHardNullable = true;
+    protected boolean generateStreamingFileUpload = false;
 
     JavaMicronautServerCodegen() {
 
@@ -83,12 +87,17 @@ public class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen<Jav
 
         cliOptions.add(CliOption.newBoolean(OPT_USE_AUTH, "Whether to import authorization and to annotate controller methods accordingly", useAuth));
         cliOptions.add(CliOption.newBoolean(OPT_GENERATE_HARD_NULLABLE, "Whether to generate and use an inherited nullable annotation", generateHardNullable));
+        cliOptions.add(CliOption.newBoolean(OPT_GENERATE_STREAMING_FILE_UPLOAD, "Whether to generate StreamingFileUpload type for file request body", generateStreamingFileUpload));
 
 
         // Set the type mappings
         // It could be also StreamingFileUpload
         typeMapping.put("file", "CompletedFileUpload");
         importMapping.put("CompletedFileUpload", "io.micronaut.http.multipart.CompletedFileUpload");
+        importMapping.put("StreamingFileUpload", "io.micronaut.http.multipart.StreamingFileUpload");
+
+        typeMapping.put("responseFile", "FileCustomizableResponseType");
+        importMapping.put("FileCustomizableResponseType", "io.micronaut.http.server.types.files.FileCustomizableResponseType");
     }
 
     @Override
@@ -167,6 +176,11 @@ public class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen<Jav
         }
         writePropertyBack(OPT_GENERATE_HARD_NULLABLE, generateHardNullable);
 
+        if (additionalProperties.containsKey(OPT_GENERATE_STREAMING_FILE_UPLOAD)) {
+            generateStreamingFileUpload = convertPropertyToBoolean(OPT_GENERATE_STREAMING_FILE_UPLOAD);
+        }
+        writePropertyBack(OPT_GENERATE_STREAMING_FILE_UPLOAD, generateStreamingFileUpload);
+
         // Api file
         apiTemplateFiles.clear();
         setApiNamePrefix(API_PREFIX);
@@ -199,6 +213,10 @@ public class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen<Jav
         if (generateHardNullable) {
             String folder = (sourceFolder + '.' + invokerPackage + ".annotation").replace('.', File.separatorChar);
             supportingFiles.add(new SupportingFile("server/HardNullable.mustache", folder, "HardNullable.java"));
+        }
+
+        if (generateStreamingFileUpload) {
+            typeMapping.put("file", "StreamingFileUpload");
         }
     }
 

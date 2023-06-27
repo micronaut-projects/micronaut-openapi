@@ -58,6 +58,9 @@ public class JavaMicronautClientCodegen extends AbstractMicronautJavaCodegen<Jav
         cliOptions.add(CliOption.newString(AUTHORIZATION_FILTER_PATTERN, "Configure the authorization filter pattern for the client. Generally defined when generating clients from multiple specification files"));
         cliOptions.add(CliOption.newString(BASE_PATH_SEPARATOR, "Configure the separator to use between the application name and base path when referencing the property").defaultValue(basePathSeparator));
         cliOptions.add(CliOption.newString(CLIENT_ID, "Configure the service ID for the Client"));
+
+        typeMapping.put("file", "byte[]");
+        typeMapping.put("responseFile", "InputStream");
     }
 
     @Override
