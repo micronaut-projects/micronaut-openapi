@@ -379,8 +379,8 @@ public final class MicronautCodeGeneratorEntryPoint {
             }
 
             @Override
-            public MicronautCodeGeneratorOptionsBuilder withDateTimeLibrary(DateTimeFormat library) {
-                dateTimeFormat = library;
+            public MicronautCodeGeneratorOptionsBuilder withDateTimeFormat(DateTimeFormat format) {
+                dateTimeFormat = format;
                 return this;
             }
 

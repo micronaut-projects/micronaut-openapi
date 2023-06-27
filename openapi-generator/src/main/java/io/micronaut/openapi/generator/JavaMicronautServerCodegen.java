@@ -15,8 +15,6 @@
  */
 package io.micronaut.openapi.generator;
 
-import io.swagger.v3.oas.models.Operation;
-import io.swagger.v3.oas.models.servers.Server;
 import org.openapitools.codegen.*;
 import org.openapitools.codegen.meta.GeneratorMetadata;
 import org.openapitools.codegen.meta.Stability;
@@ -29,6 +27,9 @@ import java.io.File;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * The generator for creating Micronaut servers.
+ */
 @SuppressWarnings("checkstyle:DesignForExtension")
 public class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen<JavaMicronautServerOptionsBuilder> {
 

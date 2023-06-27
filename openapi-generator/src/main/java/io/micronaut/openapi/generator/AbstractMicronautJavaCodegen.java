@@ -57,6 +57,11 @@ import java.util.stream.Collectors;
 
 import static org.openapitools.codegen.CodegenConstants.INVOKER_PACKAGE;
 
+/**
+ * Base generator for Micronaut.
+ *
+ * @param <T> The generator options builder.
+ */
 @SuppressWarnings("checkstyle:DesignForExtension")
 public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBuilder> extends AbstractJavaCodegen implements BeanValidationFeatures, OptionalFeatures, MicronautCodeGenerator<T> {
 
@@ -351,6 +356,8 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
                 typeMapping.put("DateTime", "LocalDateTime");
                 typeMapping.put("date", "LocalDate");
             }
+            default -> {
+            }
         }
 
         // Add documentation files
@@ -590,7 +597,6 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
         codegenModel.imports.remove("ApiModelProperty");
         return codegenModel;
     }
-
 
     @Override
     public CodegenOperation fromOperation(

@@ -24,6 +24,9 @@ import org.openapitools.codegen.meta.Stability;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * The generator for creating Micronaut clients.
+ */
 @SuppressWarnings("checkstyle:DesignForExtension")
 public class JavaMicronautClientCodegen extends AbstractMicronautJavaCodegen<JavaMicronautClientOptionsBuilder> {
 

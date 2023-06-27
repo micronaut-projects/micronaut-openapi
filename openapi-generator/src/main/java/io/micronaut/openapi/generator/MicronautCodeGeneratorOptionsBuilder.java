@@ -121,13 +121,16 @@ public interface MicronautCodeGeneratorOptionsBuilder {
     MicronautCodeGeneratorOptionsBuilder withSerializationLibrary(SerializationLibraryKind library);
 
     /**
-     * Configure the serialization library.
+     * Configure the date-time format.
      *
-     * @param library the serialization library.
+     * @param format the date-time format.
      * @return this builder
      */
-    MicronautCodeGeneratorOptionsBuilder withDateTimeLibrary(DateTimeFormat library);
+    MicronautCodeGeneratorOptionsBuilder withDateTimeFormat(DateTimeFormat format);
 
+    /**
+     * The possible date-time formatting configurations.
+     */
     enum DateTimeFormat {
         OFFSET_DATETIME,
         ZONED_DATETIME,
