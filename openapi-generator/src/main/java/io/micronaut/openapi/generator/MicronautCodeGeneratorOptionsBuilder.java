@@ -15,6 +15,8 @@
  */
 package io.micronaut.openapi.generator;
 
+import java.util.List;
+
 /**
  * Builder for generic options that the Micronaut code generator supports.
  */
@@ -52,6 +54,14 @@ public interface MicronautCodeGeneratorOptionsBuilder {
      * @return this builder
      */
     MicronautCodeGeneratorOptionsBuilder withArtifactId(String artifactId);
+
+    /**
+     * Add the parameter mappings.
+     *
+     * @param parameterMappings the parameter mappings specified by a {@link AbstractMicronautJavaCodegen.ParameterMapping} objects
+     * @return this builder
+     */
+    MicronautCodeGeneratorOptionsBuilder withParameterMappings(List<AbstractMicronautJavaCodegen.ParameterMapping> parameterMappings);
 
     /**
      * If set to true, the generator will use reactive types.

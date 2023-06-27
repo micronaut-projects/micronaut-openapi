@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 
@@ -117,6 +118,9 @@ public final class MicronautCodeGeneratorEntryPoint {
         }
         if (options.artifactId != null) {
             codeGenerator.setArtifactId(options.artifactId);
+        }
+        if (options.parameterMappings != null) {
+            codeGenerator.addParameterMappings(options.parameterMappings);
         }
         codeGenerator.setReactive(options.reactive);
         codeGenerator.setWrapInHttpResponse(options.wrapInHttpResponse);
@@ -288,6 +292,7 @@ public final class MicronautCodeGeneratorEntryPoint {
             private boolean beanValidation = true;
             private String invokerPackage;
             private String modelPackage;
+            private List<AbstractMicronautJavaCodegen.ParameterMapping> parameterMappings;
             private boolean optional = false;
             private boolean reactive = true;
             private boolean wrapInHttpResponse;
@@ -315,6 +320,12 @@ public final class MicronautCodeGeneratorEntryPoint {
             @Override
             public MicronautCodeGeneratorOptionsBuilder withArtifactId(String artifactId) {
                 this.artifactId = artifactId;
+                return this;
+            }
+
+            @Override
+            public MicronautCodeGeneratorOptionsBuilder withParameterMappings(List<AbstractMicronautJavaCodegen.ParameterMapping> parameterMappings) {
+                this.parameterMappings = parameterMappings;
                 return this;
             }
 
@@ -355,7 +366,7 @@ public final class MicronautCodeGeneratorEntryPoint {
             }
 
             private Options build() {
-                return new Options(apiPackage, modelPackage, invokerPackage, artifactId, beanValidation, optional, reactive, wrapInHttpResponse, testFramework, serializationLibraryKind);
+                return new Options(apiPackage, modelPackage, invokerPackage, artifactId, parameterMappings, beanValidation, optional, reactive, wrapInHttpResponse, testFramework, serializationLibraryKind);
             }
         }
     }
@@ -380,6 +391,7 @@ public final class MicronautCodeGeneratorEntryPoint {
         String modelPackage,
         String invokerPackage,
         String artifactId,
+        List<AbstractMicronautJavaCodegen.ParameterMapping> parameterMappings,
         boolean beanValidation,
         boolean optional,
         boolean reactive,

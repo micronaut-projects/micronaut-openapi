@@ -20,7 +20,10 @@ import com.samskivert.mustache.Mustache;
 import com.samskivert.mustache.Template;
 import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.media.Schema;
+import io.swagger.v3.oas.models.servers.Server;
 import org.apache.commons.lang3.StringUtils;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.openapitools.codegen.CliOption;
 import org.openapitools.codegen.CodegenConstants;
 import org.openapitools.codegen.CodegenModel;
@@ -41,12 +44,16 @@ import org.openapitools.codegen.model.OperationsMap;
 import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.openapitools.codegen.CodegenConstants.INVOKER_PACKAGE;
@@ -94,6 +101,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
     protected String generateSwaggerAnnotations;
     protected boolean generateOperationOnlyForFirstTag;
     protected String serializationLibrary = SerializationLibraryKind.MICRONAUT_SERDE_JACKSON.name();
+    protected List<ParameterMapping> parameterMappings = new ArrayList<>();
 
     protected AbstractMicronautJavaCodegen() {
         super();
@@ -372,6 +380,10 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
         additionalProperties.put("indent", new Formatting.IndentFormatter(4));
     }
 
+    public void addParameterMappings(List<ParameterMapping> parameterMappings) {
+        this.parameterMappings.addAll(parameterMappings);
+    }
+
     // CHECKSTYLE:OFF
     private void maybeSetSwagger() {
         if (additionalProperties.containsKey(OPT_GENERATE_SWAGGER_ANNOTATIONS)) {
@@ -571,6 +583,68 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
         return codegenModel;
     }
 
+
+    @Override
+    public CodegenOperation fromOperation(String path, String httpMethod, Operation operation,
+                                          List<Server> servers) {
+        CodegenOperation op = super.fromOperation(path, httpMethod, operation, servers);
+
+        processParametersWithAdditionalMappings(op.allParams, op.imports);
+
+        return op;
+    }
+
+    /**
+     * Method that maps parameters if a corresponding mapping is specified.
+     *
+     * @param params The parameters to modify.
+     * @param imports The operation imports.
+     */
+    private void processParametersWithAdditionalMappings(List<CodegenParameter> params, Set<String> imports) {
+        Map<String, ParameterMapping> additionalMappings = new LinkedHashMap<>();
+        Iterator<CodegenParameter> iter = params.iterator();
+        while (iter.hasNext()) {
+            CodegenParameter param = iter.next();
+            boolean paramWasMapped = false;
+            for (ParameterMapping mapping : parameterMappings) {
+                if (mapping.doesMatch(param)) {
+                    additionalMappings.put(mapping.mappedName(), mapping);
+                    paramWasMapped = true;
+                }
+            }
+            if (paramWasMapped) {
+                iter.remove();
+            }
+        }
+
+        for (ParameterMapping mapping : additionalMappings.values()) {
+            if (mapping.mappedType() != null) {
+                CodegenParameter newParam = new CodegenParameter();
+                newParam.dataType = mapping.mappedType();
+                newParam.paramName = mapping.mappedName();
+                newParam.required = true;
+                newParam.isModel = mapping.isValidated;
+
+                // Set the imports
+                int classNameIndex = findFirstCapitalIndex(newParam.dataType);
+                if (classNameIndex != 0) {
+                    // Add import if fully-qualified name is used
+                    String dataType = newParam.dataType.substring(classNameIndex);
+                    importMapping.put(dataType, newParam.dataType);
+                    newParam.dataType = dataType;
+                }
+                imports.add(newParam.dataType);
+
+                // Set the paramName
+                if (newParam.paramName == null) {
+                    newParam.paramName = toParamName(newParam.dataType);
+                }
+
+                params.add(newParam);
+            }
+        }
+    }
+
     @Override
     public Map<String, ModelsMap> postProcessAllModels(Map<String, ModelsMap> objs) {
         objs = super.postProcessAllModels(objs);
@@ -729,6 +803,15 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
             .put("replaceDotsWithUnderscore", new ReplaceDotsWithUnderscoreLambda());
     }
 
+    private static int findFirstCapitalIndex(String str) {
+        for (int i = 0; i < str.length(); i++) {
+            if (Character.isUpperCase(str.charAt(i))) {
+                return i;
+            }
+        }
+        return 0;
+    }
+
     public void setSerializationLibrary(final String serializationLibrary) {
         try {
             this.serializationLibrary = SerializationLibraryKind.valueOf(serializationLibrary).name();
@@ -746,6 +829,55 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
         public void execute(final Template.Fragment fragment, final Writer writer) throws IOException {
             writer.write(fragment.execute().replace('.', '_'));
         }
+    }
 
+    /**
+     * A record that can be used to specify parameter mapping.
+     * Parameter mapping would map a given parameter to a specific type and name.
+     *
+     * @param name The name of the parameter as described by the name field in specification.
+     * @param location The location of parameter. Path parameters cannot be mapped, as this
+     *                 behavior should not be used.
+     * @param mappedType The type to which the parameter should be mapped. If multiple parameters
+     *                   have the same mapping, only one parameter will be present. If set to null,
+     *                   the original parameter will be deleted.
+     * @param mappedName The unique name of the parameter to be used as method parameter name.
+     */
+    public record ParameterMapping(
+        String name,
+        ParameterLocation location,
+        String mappedType,
+        String mappedName,
+        boolean isValidated
+    ) {
+
+        /**
+         * @return Whether a given parameter matches this mapper.
+         */
+        boolean doesMatch(CodegenParameter parameter) {
+            if (name != null && !name.equals(parameter.baseName)) {
+                return false;
+            }
+            if (location == null) {
+                return true;
+            }
+            return switch (location) {
+                case HEADER -> parameter.isHeaderParam;
+                case QUERY -> parameter.isQueryParam;
+                case FORM -> parameter.isFormParam;
+                case COOKIE -> parameter.isCookieParam;
+                default -> true;
+            };
+        }
+
+        /**
+         * The location of the parameter to be mapped.
+         */
+        public enum ParameterLocation {
+            HEADER,
+            QUERY,
+            FORM,
+            COOKIE
+        }
     }
 }
