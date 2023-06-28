@@ -194,6 +194,18 @@ paths:
           description: Success
           schema:
             type: string
+  /sendMappedParameter:
+    get:
+      operationId: sendMappedParameter
+      tags: [ parameters ]
+      description: A method that has a header that is mapped to a custom type
+      parameters:
+        - $ref: '#/parameters/FilterHeader'
+      responses:
+        200:
+          description: Success
+          schema:
+            type: string
   /sendValidatedCollection:
     post:
       operationId: sendValidatedCollection
@@ -771,6 +783,13 @@ parameters:
       Parameter describing the sort. Allows specifying the sorting direction using the keywords {@code asc} and
       {@code desc} after each property. For example, {@code "sort=name desc,age"} will sort by name in descending
       order and age in ascending.
+  FilterHeader:
+    name: Filter
+    in: header
+    type: string
+    description: |
+      A filter parameter that allows filtering the response. The conditions are comma separated and
+      must be of type [property][comparator][value] where comparator is one of =, < and >.
 
 responses:
   Error:

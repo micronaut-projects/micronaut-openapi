@@ -1,5 +1,6 @@
 package io.micronaut.openapi.test.api;
 
+import io.micronaut.data.model.Pageable;
 import io.micronaut.http.multipart.CompletedFileUpload;
 import io.micronaut.openapi.test.model.SimpleModel;
 import io.micronaut.openapi.test.model.StateEnum;
@@ -37,7 +38,7 @@ public class ResponseBodyController implements ResponseBodyApi {
     }
 
     @Override
-    public Mono<List<SimpleModel>> getPaginatedSimpleModel(Integer page) {
+    public Mono<List<SimpleModel>> getPaginatedSimpleModel(Pageable pageable) {
         return Mono.just(SIMPLE_MODELS);
     }
 

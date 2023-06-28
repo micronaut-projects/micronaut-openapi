@@ -1,5 +1,8 @@
 package io.micronaut.openapi.test.api;
 
+import io.micronaut.data.model.Pageable;
+import io.micronaut.data.model.Sort;
+import io.micronaut.openapi.test.filter.MyFilter;
 import io.micronaut.openapi.test.model.SendDatesResponse;
 import io.micronaut.openapi.test.model.SendPrimitivesResponse;
 import io.micronaut.http.annotation.Controller;
@@ -8,6 +11,7 @@ import reactor.core.publisher.Mono;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
+import java.util.stream.Collectors;
 
 @Controller
 public class ParametersController implements ParametersApi {
@@ -45,12 +49,27 @@ public class ParametersController implements ParametersApi {
     }
 
     @Override
-    public Mono<String> sendIgnoredHeader(String header) {
+    public Mono<String> sendIgnoredHeader() {
         return Mono.just("Success");
     }
 
     @Override
-    public Mono<String> sendPageQuery(Integer page, Integer size, String sort) {
-        return Mono.just("(page: " + page + ", size: " + size + ", sort: " + sort + ")");
+    public Mono<String> sendPageQuery(Pageable pageable) {
+        return Mono.just(
+            "(page: " + pageable.getNumber() +
+            ", size: " + pageable.getSize() +
+            ", sort: " + sortToString(pageable.getSort()) + ")"
+        );
+    }
+
+    @Override
+    public Mono<String> sendMappedParameter(MyFilter myFilter) {
+        return Mono.just(myFilter.toString());
+    }
+
+    private String sortToString(Sort sort) {
+        return sort.getOrderBy().stream().map(
+            order -> order.getProperty() + "(dir=" + order.getDirection() + ")"
+        ).collect(Collectors.joining(" "));
     }
 }

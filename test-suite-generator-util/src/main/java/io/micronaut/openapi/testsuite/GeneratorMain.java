@@ -15,12 +15,18 @@
  */
 package io.micronaut.openapi.testsuite;
 
+import io.micronaut.openapi.generator.AbstractMicronautJavaCodegen;
 import io.micronaut.openapi.generator.MicronautCodeGeneratorEntryPoint;
 
 import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * An entry point to be used in tests, to simulate
@@ -42,6 +48,7 @@ public class GeneratorMain {
      */
     public static void main(String[] args) throws URISyntaxException {
         boolean server = "server".equals(args[0]);
+        List<AbstractMicronautJavaCodegen.ParameterMapping> parameterMappings = parseParameterMappings(args[4]);
         MicronautCodeGeneratorEntryPoint.OutputKind[] outputKinds
             = Arrays.stream(args[3].split(","))
             .map(MicronautCodeGeneratorEntryPoint.OutputKind::of)
@@ -59,6 +66,7 @@ public class GeneratorMain {
                 options.withOptional(true);
                 options.withReactive(true);
                 options.withTestFramework(MicronautCodeGeneratorEntryPoint.TestFramework.SPOCK);
+                options.withParameterMappings(parameterMappings);
             });
         if (server) {
             builder.forServer(serverOptions -> {
@@ -73,5 +81,65 @@ public class GeneratorMain {
             });
         }
         builder.build().generate();
+    }
+
+    private static List<AbstractMicronautJavaCodegen.ParameterMapping> parseParameterMappings(String string) {
+        return parseListOfMaps(string).stream().map(map -> new AbstractMicronautJavaCodegen.ParameterMapping(
+            map.get("name"),
+            AbstractMicronautJavaCodegen.ParameterMapping.ParameterLocation.valueOf(map.get("location")),
+            map.get("mappedType"),
+            map.get("mappedName"),
+            "true".equals(map.get("isValidated"))
+        )).collect(Collectors.toList());
+    }
+
+    private static List<Map<String, String>> parseListOfMaps(String string) {
+        System.out.println("json: " + string);
+
+        List<Map<String, String>> result = new ArrayList<>();
+        if (string.isBlank()) {
+            return result;
+        }
+
+        assert string.charAt(0) == '[';
+        int i = 1;
+
+        while(string.charAt(i) != ']') {
+            if (string.charAt(i) == ' ') {
+                ++i;
+            }
+
+            assert string.charAt(i) == '{';
+            ++i;
+
+            Map<String, String> map = new HashMap<>();
+            result.add(map);
+            int endIndex = string.indexOf('}', i);
+
+            while (i < endIndex) {
+                if (string.charAt(i) == ' ') {
+                    ++i;
+                }
+                int nameIndex = string.indexOf('=', i);
+                String name = string.substring(i, nameIndex);
+                i = nameIndex + 1;
+                int valueIndex = string.indexOf(',', i);
+                if (endIndex < valueIndex || valueIndex == -1) {
+                    valueIndex = endIndex;
+                }
+                String value = string.substring(i, valueIndex);
+                i = valueIndex + 1;
+
+                map.put(name, value);
+            }
+
+            if (i != string.length() - 1) {
+                assert string.charAt(i) == ',';
+                ++i;
+            }
+        }
+        assert i == string.length() - 1;
+
+        return result;
     }
 }
