@@ -22,8 +22,6 @@ import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.servers.Server;
 import org.apache.commons.lang3.StringUtils;
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
 import org.openapitools.codegen.CliOption;
 import org.openapitools.codegen.CodegenConstants;
 import org.openapitools.codegen.CodegenModel;
@@ -53,6 +51,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -102,6 +101,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
     protected boolean generateOperationOnlyForFirstTag;
     protected String serializationLibrary = SerializationLibraryKind.MICRONAUT_SERDE_JACKSON.name();
     protected List<ParameterMapping> parameterMappings = new ArrayList<>();
+    protected List<ResponseBodyMapping> responseBodyMappings = new ArrayList<>();
 
     protected AbstractMicronautJavaCodegen() {
         super();
@@ -384,6 +384,10 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
         this.parameterMappings.addAll(parameterMappings);
     }
 
+    public void addResponseBodyMappings(List<ResponseBodyMapping> responseBodyMappings) {
+        this.responseBodyMappings.addAll(responseBodyMappings);
+    }
+
     // CHECKSTYLE:OFF
     private void maybeSetSwagger() {
         if (additionalProperties.containsKey(OPT_GENERATE_SWAGGER_ANNOTATIONS)) {
@@ -590,6 +594,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
         CodegenOperation op = super.fromOperation(path, httpMethod, operation, servers);
 
         processParametersWithAdditionalMappings(op.allParams, op.imports);
+        processWithResponseBodyMapping(op);
 
         return op;
     }
@@ -620,29 +625,87 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
         for (ParameterMapping mapping : additionalMappings.values()) {
             if (mapping.mappedType() != null) {
                 CodegenParameter newParam = new CodegenParameter();
-                newParam.dataType = mapping.mappedType();
                 newParam.paramName = mapping.mappedName();
                 newParam.required = true;
                 newParam.isModel = mapping.isValidated;
 
-                // Set the imports
-                int classNameIndex = findFirstCapitalIndex(newParam.dataType);
-                if (classNameIndex != 0) {
-                    // Add import if fully-qualified name is used
-                    String dataType = newParam.dataType.substring(classNameIndex);
-                    importMapping.put(dataType, newParam.dataType);
-                    newParam.dataType = dataType;
-                }
-                imports.add(newParam.dataType);
+                String typeName = makeSureImported(mapping.mappedType(), imports);
+                newParam.dataType = typeName;
 
-                // Set the paramName
+                // Set the paramName if required
                 if (newParam.paramName == null) {
-                    newParam.paramName = toParamName(newParam.dataType);
+                    newParam.paramName = toParamName(typeName);
                 }
 
                 params.add(newParam);
             }
         }
+    }
+
+    /**
+     * Method that changes the return type if the corresponding header is specified.
+     *
+     * @param op The operation to modify.
+     */
+    private void processWithResponseBodyMapping(CodegenOperation op) {
+        ResponseBodyMapping bodyMapping = null;
+
+        Iterator<CodegenProperty> iter = op.responseHeaders.iterator();
+        while (iter.hasNext()) {
+            CodegenProperty header = iter.next();
+            boolean headerWasMapped = false;
+            for (ResponseBodyMapping mapping : responseBodyMappings) {
+                if (mapping.doesMatch(header.baseName, op.isArray)) {
+                    if (mapping.mappedBodyType() != null) {
+                        bodyMapping = mapping;
+                    }
+                    headerWasMapped = true;
+                }
+            }
+            if (headerWasMapped) {
+                iter.remove();
+            }
+        }
+
+        if (bodyMapping != null) {
+            CodegenProperty newProperty = new CodegenProperty();
+            newProperty.required = true;
+            newProperty.isModel = bodyMapping.isValidated;
+
+            String typeName = makeSureImported(bodyMapping.mappedBodyType(), op.imports);
+
+            if (bodyMapping.isListWrapper) {
+                newProperty.dataType = typeName + '<' + op.returnBaseType + '>';
+                newProperty.items = op.returnProperty.items;
+            } else {
+                newProperty.dataType = typeName + '<' + op.returnType + '>';
+                newProperty.items = op.returnProperty;
+            }
+
+            op.returnType = newProperty.dataType;
+            op.returnContainer = null;
+            op.returnProperty = newProperty;
+        }
+    }
+
+    private String makeSureImported(String typeName, Set<String> imports) {
+        // Find the index of the first capital letter
+        int firstCapitalIndex = 0;
+        for (int i = 0; i < typeName.length(); i++) {
+            if (Character.isUpperCase(typeName.charAt(i))) {
+                firstCapitalIndex = i;
+            }
+        }
+
+        // Add import if the name is fully-qualified
+        if (firstCapitalIndex != 0) {
+            // Add import if fully-qualified name is used
+            String dataType = typeName.substring(firstCapitalIndex);
+            importMapping.put(dataType, typeName);
+            typeName = dataType;
+        }
+        imports.add(typeName);
+        return typeName;
     }
 
     @Override
@@ -803,15 +866,6 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
             .put("replaceDotsWithUnderscore", new ReplaceDotsWithUnderscoreLambda());
     }
 
-    private static int findFirstCapitalIndex(String str) {
-        for (int i = 0; i < str.length(); i++) {
-            if (Character.isUpperCase(str.charAt(i))) {
-                return i;
-            }
-        }
-        return 0;
-    }
-
     public void setSerializationLibrary(final String serializationLibrary) {
         try {
             this.serializationLibrary = SerializationLibraryKind.valueOf(serializationLibrary).name();
@@ -842,19 +896,16 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
      *                   have the same mapping, only one parameter will be present. If set to null,
      *                   the original parameter will be deleted.
      * @param mappedName The unique name of the parameter to be used as method parameter name.
+     * @param isValidated Whether the mapped parameter requires validation.
      */
-    public record ParameterMapping(
+    public record ParameterMapping (
         String name,
         ParameterLocation location,
         String mappedType,
         String mappedName,
         boolean isValidated
     ) {
-
-        /**
-         * @return Whether a given parameter matches this mapper.
-         */
-        boolean doesMatch(CodegenParameter parameter) {
+        private boolean doesMatch(CodegenParameter parameter) {
             if (name != null && !name.equals(parameter.baseName)) {
                 return false;
             }
@@ -866,7 +917,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
                 case QUERY -> parameter.isQueryParam;
                 case FORM -> parameter.isFormParam;
                 case COOKIE -> parameter.isCookieParam;
-                default -> true;
+                case BODY -> parameter.isBodyParam;
             };
         }
 
@@ -877,7 +928,33 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
             HEADER,
             QUERY,
             FORM,
-            COOKIE
+            COOKIE,
+            BODY
+        }
+    }
+
+    /**
+     * A record that can be used to specify parameter mapping.
+     * Parameter mapping would map a given parameter to a specific type and name.
+     *
+     * @param headerName The response header name that triggers the change of response type.
+     * @param mappedBodyType The type in which will be used as the response type. The type must take
+     *                    a single type parameter, which will be the original body.
+     * @param isListWrapper Whether the mapped body type needs to be supplied list items
+     *                      as property.
+     * @param isValidated Whether the mapped response body type required validation.
+     */
+    public record ResponseBodyMapping (
+        String headerName,
+        String mappedBodyType,
+        boolean isListWrapper,
+        boolean isValidated
+    ) {
+        private boolean doesMatch(String header, boolean isBodyList) {
+            if (isListWrapper && !isBodyList) {
+                return false;
+            }
+            return Objects.equals(headerName, header);
         }
     }
 }

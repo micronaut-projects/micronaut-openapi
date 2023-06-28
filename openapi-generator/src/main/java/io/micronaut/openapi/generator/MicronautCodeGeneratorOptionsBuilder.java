@@ -64,6 +64,15 @@ public interface MicronautCodeGeneratorOptionsBuilder {
     MicronautCodeGeneratorOptionsBuilder withParameterMappings(List<AbstractMicronautJavaCodegen.ParameterMapping> parameterMappings);
 
     /**
+     * Add the response body mappings.
+     *
+     * @param responseBodyMappings the response body mappings specified by a {@link AbstractMicronautJavaCodegen.ResponseBodyMapping} objects
+     * @return this builder
+     */
+    MicronautCodeGeneratorOptionsBuilder withResponseBodyMappings(List<AbstractMicronautJavaCodegen.ResponseBodyMapping> responseBodyMappings);
+
+
+    /**
      * If set to true, the generator will use reactive types.
      *
      * @param reactive the reactive flag
