@@ -74,6 +74,9 @@ public abstract class OpenApiGeneratorTask extends DefaultTask {
     @Input
     public abstract ListProperty<Map<String, String>> getParameterMappings();
 
+    @Input
+    public abstract ListProperty<Map<String, String>> getResponseBodyMappings();
+
 
     @Inject
     protected abstract ExecOperations getExecOperations();
@@ -94,6 +97,7 @@ public abstract class OpenApiGeneratorTask extends DefaultTask {
             args.add(getOutputDirectory().get().getAsFile().getAbsolutePath());
             args.add(String.join(",", getOutputKinds().get()));
             args.add(getParameterMappings().get().toString());
+            args.add(getResponseBodyMappings().get().toString());
             javaexec.args(args);
         });
     }

@@ -41,24 +41,38 @@ class ResponseBodyControllerSpec extends Specification {
         ResponseBodyController.SIMPLE_MODEL == response.body()
     }
 
-    // TODO implement the behavior and test
     void "test get paginated simple model"() {
+        given:
+        var page = "12"
+        var pageSize = "10"
+
         when:
+        HttpRequest<?> request = HttpRequest.GET("/getPaginatedSimpleModel?page=${page}&size=${pageSize}")
         HttpResponse<List<SimpleModel>> response =
-                client.exchange(HttpRequest.GET("/getPaginatedSimpleModel"), Argument.listOf(SimpleModel))
+                client.exchange(request, Argument.listOf(SimpleModel))
 
         then:
+        var totalCount = "3"
+        var pageCount = "1"
+
         HttpStatus.OK == response.status
         ResponseBodyController.SIMPLE_MODELS == response.body()
+        page == response.header("X-Page-Number")
+        totalCount == response.header("X-Total-Count")
+        3 == response.body().size()
+        pageSize == response.header("X-Page-Size")
+        pageCount == response.header("X-Page-Count")
     }
 
-    // TODO implement the behavior and test
     void "test get dated simple model"() {
+        when:
         HttpResponse<SimpleModel> response =
                 client.exchange(HttpRequest.GET("/getDatedSimpleModel"), Argument.of(SimpleModel))
 
-        HttpStatus.ACCEPTED == response.status()
+        then:
+        HttpStatus.OK == response.status()
         ResponseBodyController.SIMPLE_MODEL == response.body()
+        ResponseBodyController.LAST_MODIFIED_STRING == response.header("Last-Modified")
     }
 
     void "test get simple model with non standard status"() {

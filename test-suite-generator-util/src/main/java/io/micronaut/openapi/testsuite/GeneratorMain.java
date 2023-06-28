@@ -48,7 +48,11 @@ public class GeneratorMain {
      */
     public static void main(String[] args) throws URISyntaxException {
         boolean server = "server".equals(args[0]);
-        List<AbstractMicronautJavaCodegen.ParameterMapping> parameterMappings = parseParameterMappings(args[4]);
+        List<AbstractMicronautJavaCodegen.ParameterMapping> parameterMappings =
+            parseParameterMappings(args[4]);
+        List<AbstractMicronautJavaCodegen.ResponseBodyMapping> responseBodyMappings =
+            parseResponseBodyMappings(args[5]);
+
         MicronautCodeGeneratorEntryPoint.OutputKind[] outputKinds
             = Arrays.stream(args[3].split(","))
             .map(MicronautCodeGeneratorEntryPoint.OutputKind::of)
@@ -67,6 +71,7 @@ public class GeneratorMain {
                 options.withReactive(true);
                 options.withTestFramework(MicronautCodeGeneratorEntryPoint.TestFramework.SPOCK);
                 options.withParameterMappings(parameterMappings);
+                options.withResponseBodyMappings(responseBodyMappings);
             });
         if (server) {
             builder.forServer(serverOptions -> {
@@ -89,6 +94,15 @@ public class GeneratorMain {
             AbstractMicronautJavaCodegen.ParameterMapping.ParameterLocation.valueOf(map.get("location")),
             map.get("mappedType"),
             map.get("mappedName"),
+            "true".equals(map.get("isValidated"))
+        )).collect(Collectors.toList());
+    }
+
+    private static List<AbstractMicronautJavaCodegen.ResponseBodyMapping> parseResponseBodyMappings(String string) {
+        return parseListOfMaps(string).stream().map(map -> new AbstractMicronautJavaCodegen.ResponseBodyMapping(
+            map.get("headerName"),
+            map.get("mappedBodyType"),
+            "true".equals(map.get("isListWrapper")),
             "true".equals(map.get("isValidated"))
         )).collect(Collectors.toList());
     }

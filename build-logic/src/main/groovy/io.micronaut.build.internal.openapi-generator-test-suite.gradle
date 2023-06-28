@@ -26,6 +26,7 @@ def openapiGenerate = tasks.register("generateOpenApi", OpenApiGeneratorTask) {
     generatorKind.convention("client")
     outputKinds.convention(["models", "apis", "supportingFiles", "modelTests", "apiTests"])
     parameterMappings.convention([])
+    responseBodyMappings.convention([])
 }
 
 sourceSets {

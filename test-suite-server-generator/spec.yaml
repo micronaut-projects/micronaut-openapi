@@ -13,32 +13,28 @@ produces:
   - application/json
 
 x-headers:
-  PageNumberHeader: &Page-Number-header
-    name: Page-Number
-    in: header
+  PageNumberHeader: &X-Page-Number-header
+    name: X-Page-Number
     type: string
     description: The page number of the current page
-  PageSizeHeader: &Page-Size-header
-    name: Page-Size
-    in: header
+  PageSizeHeader: &X-Page-Size-header
+    name: X-Page-Size
     type: string
     description: The number of items per page
-  TotalCountHeader: &Total-Count-header
-    name: Total-Count
-    in: header
+  TotalCountHeader: &X-Total-Count-header
+    name: X-Total-Count
     type: string
     description: |
       The total number of items available in the entire collections, not just the items returned in the current page
-  PageCountHeader: &Page-Count-header
-    name: Page-Count
-    in: header
+  PageCountHeader: &X-Page-Count-header
+    name: X-Page-Count
     type: string
     description: The total number of pages based on the page size and total count
-  LinkHeader: &Link-header
-    name: Link
-    in: header
+  LastModifiedHeader: &Last-Modified-header
+    name: Last-Modified
     type: string
-    description: The URLS to the first, last, previous and next pages.
+    format: date-time
+    description: The last time an entity returned with the response was modified.
 
 paths:
   /sendPrimitives/{name}:
@@ -498,11 +494,10 @@ paths:
         200:
           description: Success
           headers:
-            Page-Number: *Page-Number-header
-            Page-Size: *Page-Size-header
-            Total-Count: *Total-Count-header
-            Page-Count: *Page-Count-header
-            Link: *Link-header
+            X-Page-Number: *X-Page-Number-header
+            X-Page-Size: *X-Page-Size-header
+            X-Total-Count: *X-Total-Count-header
+            X-Page-Count: *X-Page-Count-header
           schema:
             type: array
             items:
@@ -513,13 +508,10 @@ paths:
       tags: [ responseBody ]
       description: A method to get a simple model with last-modified header
       responses:
-        202:
+        200:
           description: Success
           headers:
-            Last-Modified:
-              type: string
-              format: date-time
-              description: The last modified date for the requested object
+            Last-Modified: *Last-Modified-header
           schema:
             $ref: '#/definitions/SimpleModel'
   /getSimpleModelWithNonMappedHeader:
@@ -547,8 +539,7 @@ paths:
         200:
           description: Success
           headers:
-            Last-Modified:
-              type: string
+            Last-Modified: *Last-Modified-header
             custom-header:
               type: string
               description: A custom header

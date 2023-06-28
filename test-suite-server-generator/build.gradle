@@ -50,4 +50,10 @@ tasks.named("generateOpenApi") {
             // Custom filtering header
             ["name": "Filter", "location": "HEADER", "mappedType": "io.micronaut.openapi.test.filter.MyFilter"]
     ]
+    responseBodyMappings = [
+            // Response with Last-Modified header mapping
+            ["headerName": "Last-Modified", "mappedBodyType": "io.micronaut.openapi.test.dated.DatedResponse"],
+            // Response with Page body
+            ["headerName": "X-Page-Number", "mappedBodyType": "io.micronaut.data.model.Page", "isListWrapper": true]
+    ]
 }
