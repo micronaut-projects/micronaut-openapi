@@ -593,6 +593,8 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
                                           List<Server> servers) {
         CodegenOperation op = super.fromOperation(path, httpMethod, operation, servers);
 
+        op.vendorExtensions.put("originalParams", new ArrayList(op.allParams));
+        op.vendorExtensions.put("originReturnProperty", op.returnProperty);
         processParametersWithAdditionalMappings(op.allParams, op.imports);
         processWithResponseBodyMapping(op);
 
