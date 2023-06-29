@@ -7,3 +7,10 @@ repositories {
     mavenCentral()
     google()
 }
+
+micronautBuild {
+    binaryCompatibility {
+        baselineVersion = "5.0.0-M9"
+        enabled = true
+    }
+}
