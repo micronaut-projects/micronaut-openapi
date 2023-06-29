@@ -42,18 +42,18 @@ tasks.named("generateOpenApi") {
     outputKinds = ["models", "apis", "supportingFiles"]
     parameterMappings = [
             // Pageable parameter
-            ["name": "page", "location": "QUERY", "mappedType": "io.micronaut.data.model.Pageable"],
-            ["name": "size", "location": "QUERY", "mappedType": "io.micronaut.data.model.Pageable"],
-            ["name": "sortOrder", "location": "QUERY", "mappedType": "io.micronaut.data.model.Pageable"],
+            [name: "page", location: "QUERY", mappedType: "io.micronaut.data.model.Pageable"],
+            [name: "size", location: "QUERY", mappedType: "io.micronaut.data.model.Pageable"],
+            [name: "sortOrder", location: "QUERY", mappedType: "io.micronaut.data.model.Pageable"],
             // Ignored header
-            ["name": "ignored-header", "location": "HEADER"],
+            [name: "ignored-header", location: "HEADER"],
             // Custom filtering header
-            ["name": "Filter", "location": "HEADER", "mappedType": "io.micronaut.openapi.test.filter.MyFilter"]
+            [name: "Filter", location: "HEADER", mappedType: "io.micronaut.openapi.test.filter.MyFilter"]
     ]
     responseBodyMappings = [
             // Response with Last-Modified header mapping
-            ["headerName": "Last-Modified", "mappedBodyType": "io.micronaut.openapi.test.dated.DatedResponse"],
+            [headerName: "Last-Modified", mappedBodyType: "io.micronaut.openapi.test.dated.DatedResponse"],
             // Response with Page body
-            ["headerName": "X-Page-Number", "mappedBodyType": "io.micronaut.data.model.Page", "isListWrapper": true]
+            [headerName: "X-Page-Number", mappedBodyType: "io.micronaut.data.model.Page", isListWrapper: true]
     ]
 }
