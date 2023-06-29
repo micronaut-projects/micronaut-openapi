@@ -108,8 +108,6 @@ public class GeneratorMain {
     }
 
     private static List<Map<String, String>> parseListOfMaps(String string) {
-        System.out.println("json: " + string);
-
         List<Map<String, String>> result = new ArrayList<>();
         if (string.isBlank()) {
             return result;

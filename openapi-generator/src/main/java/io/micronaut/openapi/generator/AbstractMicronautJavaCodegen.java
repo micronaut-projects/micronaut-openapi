@@ -655,14 +655,10 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
         Iterator<CodegenProperty> iter = op.responseHeaders.iterator();
         while (iter.hasNext()) {
             CodegenProperty header = iter.next();
-            System.out.println("Checking header: " + header.baseName);
             boolean headerWasMapped = false;
             for (ResponseBodyMapping mapping : responseBodyMappings) {
-                System.out.println("Checking mapping: " + mapping.headerName());
                 if (mapping.doesMatch(header.baseName, op.isArray)) {
-                    System.out.println("Mached mapping: " + mapping.headerName());
                     if (mapping.mappedBodyType() != null) {
-                        System.out.println("Body type matched: " + mapping.headerName());
                         bodyMapping = mapping;
                     }
                     headerWasMapped = true;
