@@ -79,6 +79,10 @@ loadScripts(document, 'script');</script>
 </div>
 <section class="class-description" id="class-description">
 <dl class="notes">
+<dt>Type Parameters:</dt>
+<dd><code>T</code> - The generator options builder.</dd>
+</dl>
+<dl class="notes">
 <dt>All Implemented Interfaces:</dt>
 <dd><code><a href="MicronautCodeGenerator.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGenerator</a>&lt;T&gt;</code>, <code>org.openapitools.codegen.CodegenConfig</code>, <code>org.openapitools.codegen.languages.features.BeanValidationFeatures</code>, <code>org.openapitools.codegen.languages.features.DocumentationProviderFeatures</code>, <code>org.openapitools.codegen.languages.features.OptionalFeatures</code></dd>
 </dl>
@@ -90,6 +94,7 @@ loadScripts(document, 'script');</script>
 <div class="type-signature"><span class="modifiers">public abstract class </span><span class="element-name type-name-label">AbstractMicronautJavaCodegen&lt;T extends <a href="GeneratorOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">GeneratorOptionsBuilder</a>&gt;</span>
 <span class="extends-implements">extends org.openapitools.codegen.languages.AbstractJavaCodegen
 implements org.openapitools.codegen.languages.features.BeanValidationFeatures, org.openapitools.codegen.languages.features.OptionalFeatures, <a href="MicronautCodeGenerator.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGenerator</a>&lt;T&gt;</span></div>
+<div class="block">Base generator for Micronaut.</div>
 </section>
 <section class="summary">
 <ul class="summary-list">
@@ -142,12 +147,6 @@ implements org.openapitools.codegen.languages.features.BeanValidationFeatures, o
 <div class="col-first even-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
 <div class="col-second even-row-color"><code><a href="#CONTENT_TYPE_MULTIPART_FORM_DATA" class="member-name-link">CONTENT_TYPE_MULTIPART_FORM_DATA</a></code></div>
 <div class="col-last even-row-color">&nbsp;</div>
-<div class="col-first odd-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second odd-row-color"><code><a href="#DATE_FORMAT" class="member-name-link">DATE_FORMAT</a></code></div>
-<div class="col-last odd-row-color">&nbsp;</div>
-<div class="col-first even-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second even-row-color"><code><a href="#DATETIME_FORMAT" class="member-name-link">DATETIME_FORMAT</a></code></div>
-<div class="col-last even-row-color">&nbsp;</div>
 <div class="col-first odd-row-color"><code>protected boolean</code></div>
 <div class="col-second odd-row-color"><code><a href="#generateOperationOnlyForFirstTag" class="member-name-link">generateOperationOnlyForFirstTag</a></code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
@@ -155,19 +154,19 @@ implements org.openapitools.codegen.languages.features.BeanValidationFeatures, o
 <div class="col-second even-row-color"><code><a href="#generateSwaggerAnnotations" class="member-name-link">generateSwaggerAnnotations</a></code></div>
 <div class="col-last even-row-color">&nbsp;</div>
 <div class="col-first odd-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second odd-row-color"><code><a href="#OFFSET_DATETIME_FORMAT" class="member-name-link">OFFSET_DATETIME_FORMAT</a></code></div>
+<div class="col-second odd-row-color"><code><a href="#OPT_APPLICATION_NAME" class="member-name-link">OPT_APPLICATION_NAME</a></code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
 <div class="col-first even-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second even-row-color"><code><a href="#OPT_APPLICATION_NAME" class="member-name-link">OPT_APPLICATION_NAME</a></code></div>
+<div class="col-second even-row-color"><code><a href="#OPT_DATE_FORMAT" class="member-name-link">OPT_DATE_FORMAT</a></code></div>
 <div class="col-last even-row-color">&nbsp;</div>
 <div class="col-first odd-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second odd-row-color"><code><a href="#OPT_DATE_FORMAT" class="member-name-link">OPT_DATE_FORMAT</a></code></div>
+<div class="col-second odd-row-color"><code><a href="#OPT_DATE_LIBRARY_LOCAL_DATETIME" class="member-name-link">OPT_DATE_LIBRARY_LOCAL_DATETIME</a></code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
 <div class="col-first even-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second even-row-color"><code><a href="#OPT_DATE_LIBRARY_JAVA8" class="member-name-link">OPT_DATE_LIBRARY_JAVA8</a></code></div>
+<div class="col-second even-row-color"><code><a href="#OPT_DATE_LIBRARY_OFFSET_DATETIME" class="member-name-link">OPT_DATE_LIBRARY_OFFSET_DATETIME</a></code></div>
 <div class="col-last even-row-color">&nbsp;</div>
 <div class="col-first odd-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second odd-row-color"><code><a href="#OPT_DATE_LIBRARY_JAVA8_LOCAL_DATETIME" class="member-name-link">OPT_DATE_LIBRARY_JAVA8_LOCAL_DATETIME</a></code></div>
+<div class="col-second odd-row-color"><code><a href="#OPT_DATE_LIBRARY_ZONED_DATETIME" class="member-name-link">OPT_DATE_LIBRARY_ZONED_DATETIME</a></code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
 <div class="col-first even-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
 <div class="col-second even-row-color"><code><a href="#OPT_DATETIME_FORMAT" class="member-name-link">OPT_DATETIME_FORMAT</a></code></div>
@@ -326,8 +325,12 @@ implements org.openapitools.codegen.languages.features.BeanValidationFeatures, o
  io.swagger.v3.oas.models.Operation&nbsp;operation,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;io.swagger.v3.oas.models.servers.Server&gt;&nbsp;servers)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getExampleValue(java.lang.String,java.lang.String,java.lang.String,java.lang.Boolean,java.util.List,java.lang.String,java.lang.String,java.util.List,boolean,boolean)" class="member-name-link">getExampleValue</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;defaultValue,
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>org.openapitools.codegen.CodegenParameter</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#fromParameter(io.swagger.v3.oas.models.parameters.Parameter,java.util.Set)" class="member-name-link">fromParameter</a><wbr>(io.swagger.v3.oas.models.parameters.Parameter&nbsp;param,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Set.html" title="class or interface in java.util" class="external-link">Set</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;&nbsp;imports)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getExampleValue(java.lang.String,java.lang.String,java.lang.String,java.lang.Boolean,java.util.List,java.lang.String,java.lang.String,java.util.List,boolean,boolean)" class="member-name-link">getExampleValue</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;defaultValue,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;example,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;dataType,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Boolean.html" title="class or interface in java.lang" class="external-link">Boolean</a>&nbsp;isModel,
@@ -337,14 +340,17 @@ implements org.openapitools.codegen.languages.features.BeanValidationFeatures, o
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;org.openapitools.codegen.CodegenProperty&gt;&nbsp;requiredVars,
  boolean&nbsp;groovy,
  boolean&nbsp;isProperty)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>protected <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getParameterExampleValue(org.openapitools.codegen.CodegenParameter,boolean)" class="member-name-link">getParameterExampleValue</a><wbr>(org.openapitools.codegen.CodegenParameter&nbsp;p,
- boolean&nbsp;groovy)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>protected <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getPropertyExampleValue(org.openapitools.codegen.CodegenProperty,boolean)" class="member-name-link">getPropertyExampleValue</a><wbr>(org.openapitools.codegen.CodegenProperty&nbsp;p,
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getParameterExampleValue(org.openapitools.codegen.CodegenParameter,boolean)" class="member-name-link">getParameterExampleValue</a><wbr>(org.openapitools.codegen.CodegenParameter&nbsp;p,
  boolean&nbsp;groovy)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>protected <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getPropertyExampleValue(org.openapitools.codegen.CodegenProperty,boolean)" class="member-name-link">getPropertyExampleValue</a><wbr>(org.openapitools.codegen.CodegenProperty&nbsp;p,
+ boolean&nbsp;groovy)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getUseInlineModelResolver()" class="member-name-link">getUseInlineModelResolver</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#isUseBeanValidation()" class="member-name-link">isUseBeanValidation</a>()</code></div>
@@ -378,47 +384,50 @@ implements org.openapitools.codegen.languages.features.BeanValidationFeatures, o
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setArtifactId(java.lang.String)" class="member-name-link">setArtifactId</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;artifactId)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setInvokerPackage(java.lang.String)" class="member-name-link">setInvokerPackage</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;invokerPackage)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setDateTimeLibrary(java.lang.String)" class="member-name-link">setDateTimeLibrary</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;name)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setModelPackage(java.lang.String)" class="member-name-link">setModelPackage</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;modelPackage)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setInvokerPackage(java.lang.String)" class="member-name-link">setInvokerPackage</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;invokerPackage)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setParameterExampleValue(org.openapitools.codegen.CodegenParameter)" class="member-name-link">setParameterExampleValue</a><wbr>(org.openapitools.codegen.CodegenParameter&nbsp;p)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setModelPackage(java.lang.String)" class="member-name-link">setModelPackage</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;modelPackage)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setReactive(boolean)" class="member-name-link">setReactive</a><wbr>(boolean&nbsp;reactive)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setParameterExampleValue(org.openapitools.codegen.CodegenParameter)" class="member-name-link">setParameterExampleValue</a><wbr>(org.openapitools.codegen.CodegenParameter&nbsp;p)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setSerializationLibrary(java.lang.String)" class="member-name-link">setSerializationLibrary</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;serializationLibrary)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setReactive(boolean)" class="member-name-link">setReactive</a><wbr>(boolean&nbsp;reactive)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setTestTool(java.lang.String)" class="member-name-link">setTestTool</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;testTool)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setSerializationLibrary(java.lang.String)" class="member-name-link">setSerializationLibrary</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;serializationLibrary)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setUseBeanValidation(boolean)" class="member-name-link">setUseBeanValidation</a><wbr>(boolean&nbsp;useBeanValidation)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setTestTool(java.lang.String)" class="member-name-link">setTestTool</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;testTool)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setUseOptional(boolean)" class="member-name-link">setUseOptional</a><wbr>(boolean&nbsp;useOptional)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setUseBeanValidation(boolean)" class="member-name-link">setUseBeanValidation</a><wbr>(boolean&nbsp;useBeanValidation)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setVisitable(boolean)" class="member-name-link">setVisitable</a><wbr>(boolean&nbsp;visitable)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setUseOptional(boolean)" class="member-name-link">setUseOptional</a><wbr>(boolean&nbsp;useOptional)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setWrapInHttpResponse(boolean)" class="member-name-link">setWrapInHttpResponse</a><wbr>(boolean&nbsp;wrapInHttpResponse)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setVisitable(boolean)" class="member-name-link">setVisitable</a><wbr>(boolean&nbsp;visitable)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#testFileFolder()" class="member-name-link">testFileFolder</a>()</code></div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setWrapInHttpResponse(boolean)" class="member-name-link">setWrapInHttpResponse</a><wbr>(boolean&nbsp;wrapInHttpResponse)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#toApiTestFilename(java.lang.String)" class="member-name-link">toApiTestFilename</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;name)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#testFileFolder()" class="member-name-link">testFileFolder</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#toApiVarName(java.lang.String)" class="member-name-link">toApiVarName</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;name)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#toApiTestFilename(java.lang.String)" class="member-name-link">toApiTestFilename</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;name)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#toModelTestFilename(java.lang.String)" class="member-name-link">toModelTestFilename</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;name)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#toApiVarName(java.lang.String)" class="member-name-link">toApiVarName</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;name)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#toModelTestFilename(java.lang.String)" class="member-name-link">toModelTestFilename</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;name)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 </div>
 </div>
 </div>
@@ -427,13 +436,13 @@ implements org.openapitools.codegen.languages.features.BeanValidationFeatures, o
 <code>addAdditionPropertiesToCodeGenModel, addImports, addImportsToOneOfInterface, apiDocFileFolder, apiFileFolder, applyJakartaPackage, applyJavaxPackage, escapeQuotationMark, escapeReservedWord, escapeUnsafeCharacters, findByName, getAdditionalModelTypeAnnotations, getAdditionalOneOfTypeAnnotations, getAlias, getAnnotationLibrary, getArtifactDescription, getArtifactId, getArtifactUrl, getArtifactVersion, getBooleanGetterPrefix, getDateLibrary, getDeveloperEmail, getDeveloperName, getDeveloperOrganization, getDeveloperOrganizationUrl, getDocumentationProvider, getGroupId, getInvokerPackage, getLicenseName, getLicenseUrl, getOutputTestFolder, getSchemaType, getScmConnection, getScmDeveloperConnection, getScmUrl, getSerializableModel, getSourceFolder, getSupportedVendorExtensions, getterAndSetterCapitalize, getTestFolder, getTypeDeclaration, handleImplicitHeaders, isAddNullableImports, isOpenApiNullable, modelDocFileFolder, modelFileFolder, needToImport, postProcessFile, postProcessModelProperty, postProcessModels, preprocessOpenAPI, setAdditionalEnumTypeAnnotations, setAdditionalModelTypeAnnotations, setAdditionalOneOfTypeAnnotations, setAnnotationLibrary, setArtifactDescription, setArtifactUrl, setArtifactVersion, setBooleanGetterPrefix, setCamelCaseDollarSign, setContainerDefaultToNull, setDateLibrary, setDeveloperEmail, setDeveloperName, setDeveloperOrganization, setDeveloperOrganizationUrl, setDisableHtmlEscaping, setDiscriminatorCaseSensitive, setDocumentationProvider, setFullJavaUtil, setGroupId, setIgnoreAnyOfInEnum, setImplicitHeaders, setImplicitHeadersRegex, setLicenseName, setLicenseUrl, setOpenApiNullable, setOutputDir, setOutputTestFolder, setParameterExampleValue, setParameterExampleValue, setParentArtifactId, setParentGroupId, setParentOverridden, setParentVersion, setScmConnection, setScmDeveloperConnection, setScmUrl, setSerializableModel, setSerializeBigDecimalAsString, setSourceFolder, setSupportAsync, setSupportJava6, setTestFolder, setUseJakartaEe, setWithXml, toApiDocFilename, toApiFilename, toArrayDefaultValue, toBooleanGetter, toDefaultParameterValue, toDefaultValue, toEnumName, toEnumValue, toEnumVarName, toExampleValue, toModelDocFilename, toModelFilename, toModelName, toOperationId, toParamName, toRegularExpression, toVarName</code></div>
 <div class="inherited-list">
 <h3 id="methods-inherited-from-class-org.openapitools.codegen.DefaultCodegen">Methods inherited from class&nbsp;org.openapitools.codegen.DefaultCodegen</h3>
-<code>addBodyModelSchema, addHeaders, addImport, addImport, addImport, addImports, addImports, addImports, addImportsForPropertyType, additionalProperties, addOneOfInterfaceModel, addOneOfNameExtension, addOption, addParentContainer, addProperties, addRegularExpressionDelimiter, addRequiredVarsMap, addSwitch, addVars, addVars, addVarsRequiredVarsAdditionalProps, apiDocFilename, apiDocTemplateFiles, apiFilename, apiPackage, apiTemplateFiles, apiTestFilename, apiTestTemplateFiles, buildEnumVars, buildLibraryCliOption, cliOptions, convertPropertyToBoolean, convertPropertyToBooleanAndWriteBack, createDiscriminator, defaultIncludes, defaultTemplatingEngine, embeddedTemplateDir, encodePath, escapeText, escapeTextWhileAllowingNewLines, fileSuffix, findCommonPrefixOfVars, findMethodResponse, fromCallback, fromFormProperty, fromParameter, fromProperty, fromProperty, fromProperty, fromRequestBody, fromRequestBodyToFormParameters, fromResponse, fromSecurity, fromServers, fromServerVariables, generateExamplePath, generateJSONSpecFile, generateYAMLSpecFile, generatorLanguage, generatorLanguageVersion, getAdditionalProperties, getAdditionalPropertiesName, getAddSuffixToDuplicateOperationNicknames, getAllModels, getAllOfDescendants, getAllowUnicodeIdentifiers, getApiNamePrefix, getApiNameSuffix, getCollectionFormat, getCollectionFormat, getConsumesInfo, getContent, getContentType, getDisallowAdditionalPropertiesIfNotPresent, getDocExtension, getEnsureUniqueParams, getEnumDefaultValue, getEnumUnknownDefaultCase, getFeatureSet, getFilesMetadataFilename, getGeneratorMetadata, getGitHost, getGitRepoId, getGitUserId, getHelp, getHttpUserAgent, getIgnoreFilePathOverride, getInnerEnumAllowableValues, getInputSpec, getItemsName, getLegacyDiscriminatorBehavior, getLibrary, getModelNamePrefix, getModelNameSuffix, getModelNameToSchemaCache, getMostInnerItems, getName, getOneOfAnyOfDescendants, getOrGenerateOperationId, getOutputDir, getParameterDataType, getPrependFormOrBodyParameters, getProducesInfo, getReleaseNote, getRemoveOperationIdPrefixCount, getRemoveOperationIdPrefixDelimiter, getSchemaAdditionalProperties, getSchemaFromBooleanOrSchema, getSchemaItems, getSingleSchemaType, getSortModelPropertiesByRequiredFlag, getSortParamsByRequiredFlag, getSymbolName, getTag, getTemplatingEngine, getTypeDeclaration, getUseInlineModelResolver, getUseOneOfInterfaces, getUseOpenAPINormalizer, getVersionMetadataFilename, handleMethodResponse, handleMethodResponse, handleSpecialCharacters, hasBodyParameter, hasFormParameter, importMapping, initializeSpecialCharacterMapping, inlineSchemaNameDefault, inlineSchemaNameMapping, instantiationTypes, isAnyTypeSchema, isDataTypeBinary, isDataTypeFile, isDataTypeString, isEnableMinimalUpdate, isEnablePostProcessFile, isFreeFormObject, isHideGenerationTimestamp, isJsonMimeType, isJsonVendorMimeType, isLibrary, isParameterNameUnique, isPropertyInnerMostEnum, isRemoveEnumValuePrefix, isRemoveOperationIdPrefix, isReservedWord, isSkipOperationExample, isSkipOverwrite, isStrictSpecBehavior, languageSpecificPrimitives, lowerCamelCase, modelDocTemplateFiles, modelFilename, modelPackage, modelTemplateFiles, modelTestTemplateFiles, modifyFeatureSet, openapiNormalizer, outputFolder, postProcess, postProcessModelsEnum, postProcessParameter, postProcessSupportingFileData, processCompiler, processOpenAPI, processTemplatingEngine, processTestExampleData, removeNonNameElementToCamelCase, removeNonNameElementToCamelCase, removeOption, removeSelfReferenceImports, reservedWords, reservedWordsMappings, sanitizeName, sanitizeName, sanitizeName, schemaMapping, serverVariableOverrides, setAddProps, setAllowUnicodeIdentifiers, setApiNamePrefix, setApiNameSuffix, setCircularReferences, setDisallowAdditionalPropertiesIfNotPresent, setDocExtension, setEnableMinimalUpdate, setEnablePostProcessFile, setEnsureUniqueParams, setEnumUnknownDefaultCase, setFilesMetadataFilename, setGitHost, setGitRepoId, setGitUserId, setHideGenerationTimestamp, setHttpUserAgent, setIgnoreFilePathOverride, setInputSpec, setLegacyDiscriminatorBehavior, setLibrary, setModelNamePrefix, setModelNameSuffix, setNonArrayMapProperty, setOpenAPI, setParameterBooleanFlagWithCodegenProperty, setParameterEncodingValues, setParameterNullable, setPrependFormOrBodyParameters, setReleaseNote, setRemoveEnumValuePrefix, setRemoveOperationIdPrefix, setRemoveOperationIdPrefixCount, setRemoveOperationIdPrefixDelimiter, setReservedWordsLowerCase, setSkipOperationExample, setSkipOverwrite, setSortModelPropertiesByRequiredFlag, setSortParamsByRequiredFlag, setStrictSpecBehavior, setTemplateDir, setTemplatingEngine, setUseOneOfInterfaces, setVersionMetadataFilename, shouldAddImport, shouldOverwrite, supportedLibraries, supportingFiles, templateDir, testPackage, toAllOfName, toAnyOfName, toApiImport, toApiName, toArrayModelParamName, toDefaultValue, toDefaultValueWithParam, toEnumDefaultValue, toExamples, toGetter, toInstantiationType, toMediaTypeSchemaName, toModelImport, toModelImportMap, toOneOfName, toSetter, toTestCaseName, typeMapping, unaliasPropertySchema, unaliasSchema, updateAllModels, updateCodegenPropertyEnum, updateDataTypeWithEnumForArray, updateDataTypeWithEnumForMap, updateEnumVarsWithExtensions, updateModelForAnyType, updateModelForComposedSchema, updateModelForInteger, updateModelForNumber, updateModelForObject, updateModelForString, updateOption, updateParameterForString, updatePropertyForAnyType, updatePropertyForArray, updatePropertyForInteger, updatePropertyForMap, updatePropertyForMap, updatePropertyForNumber, updatePropertyForObject, updatePropertyForString, updateRequestBodyForArray, updateRequestBodyForMap, updateRequestBodyForObject, updateRequestBodyForPrimitiveType, updateRequestBodyForString, vendorExtensions, writePropertyBack</code></div>
+<code>addBodyModelSchema, addHeaders, addImport, addImport, addImport, addImports, addImports, addImports, addImportsForPropertyType, additionalProperties, addOneOfInterfaceModel, addOneOfNameExtension, addOption, addParentContainer, addProperties, addRegularExpressionDelimiter, addRequiredVarsMap, addSwitch, addVars, addVars, addVarsRequiredVarsAdditionalProps, apiDocFilename, apiDocTemplateFiles, apiFilename, apiPackage, apiTemplateFiles, apiTestFilename, apiTestTemplateFiles, buildEnumVars, buildLibraryCliOption, cliOptions, convertPropertyToBoolean, convertPropertyToBooleanAndWriteBack, createDiscriminator, defaultIncludes, defaultTemplatingEngine, embeddedTemplateDir, encodePath, escapeText, escapeTextWhileAllowingNewLines, fileSuffix, findCommonPrefixOfVars, findMethodResponse, fromCallback, fromFormProperty, fromProperty, fromProperty, fromProperty, fromRequestBody, fromRequestBodyToFormParameters, fromResponse, fromSecurity, fromServers, fromServerVariables, generateExamplePath, generateJSONSpecFile, generateYAMLSpecFile, generatorLanguage, generatorLanguageVersion, getAdditionalProperties, getAdditionalPropertiesName, getAddSuffixToDuplicateOperationNicknames, getAllModels, getAllOfDescendants, getAllowUnicodeIdentifiers, getApiNamePrefix, getApiNameSuffix, getCollectionFormat, getCollectionFormat, getConsumesInfo, getContent, getContentType, getDisallowAdditionalPropertiesIfNotPresent, getDocExtension, getEnsureUniqueParams, getEnumDefaultValue, getEnumUnknownDefaultCase, getFeatureSet, getFilesMetadataFilename, getGeneratorMetadata, getGitHost, getGitRepoId, getGitUserId, getHelp, getHttpUserAgent, getIgnoreFilePathOverride, getInnerEnumAllowableValues, getInputSpec, getItemsName, getLegacyDiscriminatorBehavior, getLibrary, getModelNamePrefix, getModelNameSuffix, getModelNameToSchemaCache, getMostInnerItems, getName, getOneOfAnyOfDescendants, getOrGenerateOperationId, getOutputDir, getParameterDataType, getPrependFormOrBodyParameters, getProducesInfo, getReleaseNote, getRemoveOperationIdPrefixCount, getRemoveOperationIdPrefixDelimiter, getSchemaAdditionalProperties, getSchemaFromBooleanOrSchema, getSchemaItems, getSingleSchemaType, getSortModelPropertiesByRequiredFlag, getSortParamsByRequiredFlag, getSymbolName, getTag, getTemplatingEngine, getTypeDeclaration, getUseOneOfInterfaces, getUseOpenAPINormalizer, getVersionMetadataFilename, handleMethodResponse, handleMethodResponse, handleSpecialCharacters, hasBodyParameter, hasFormParameter, importMapping, initializeSpecialCharacterMapping, inlineSchemaNameDefault, inlineSchemaNameMapping, instantiationTypes, isAnyTypeSchema, isDataTypeBinary, isDataTypeFile, isDataTypeString, isEnableMinimalUpdate, isEnablePostProcessFile, isFreeFormObject, isHideGenerationTimestamp, isJsonMimeType, isJsonVendorMimeType, isLibrary, isParameterNameUnique, isPropertyInnerMostEnum, isRemoveEnumValuePrefix, isRemoveOperationIdPrefix, isReservedWord, isSkipOperationExample, isSkipOverwrite, isStrictSpecBehavior, languageSpecificPrimitives, lowerCamelCase, modelDocTemplateFiles, modelFilename, modelPackage, modelTemplateFiles, modelTestTemplateFiles, modifyFeatureSet, openapiNormalizer, outputFolder, postProcess, postProcessModelsEnum, postProcessParameter, postProcessSupportingFileData, processCompiler, processOpenAPI, processTemplatingEngine, processTestExampleData, removeNonNameElementToCamelCase, removeNonNameElementToCamelCase, removeOption, removeSelfReferenceImports, reservedWords, reservedWordsMappings, sanitizeName, sanitizeName, sanitizeName, schemaMapping, serverVariableOverrides, setAddProps, setAllowUnicodeIdentifiers, setApiNamePrefix, setApiNameSuffix, setCircularReferences, setDisallowAdditionalPropertiesIfNotPresent, setDocExtension, setEnableMinimalUpdate, setEnablePostProcessFile, setEnsureUniqueParams, setEnumUnknownDefaultCase, setFilesMetadataFilename, setGitHost, setGitRepoId, setGitUserId, setHideGenerationTimestamp, setHttpUserAgent, setIgnoreFilePathOverride, setInputSpec, setLegacyDiscriminatorBehavior, setLibrary, setModelNamePrefix, setModelNameSuffix, setNonArrayMapProperty, setOpenAPI, setParameterBooleanFlagWithCodegenProperty, setParameterEncodingValues, setParameterNullable, setPrependFormOrBodyParameters, setReleaseNote, setRemoveEnumValuePrefix, setRemoveOperationIdPrefix, setRemoveOperationIdPrefixCount, setRemoveOperationIdPrefixDelimiter, setReservedWordsLowerCase, setSkipOperationExample, setSkipOverwrite, setSortModelPropertiesByRequiredFlag, setSortParamsByRequiredFlag, setStrictSpecBehavior, setTemplateDir, setTemplatingEngine, setUseOneOfInterfaces, setVersionMetadataFilename, shouldAddImport, shouldOverwrite, supportedLibraries, supportingFiles, templateDir, testPackage, toAllOfName, toAnyOfName, toApiImport, toApiName, toArrayModelParamName, toDefaultValue, toDefaultValueWithParam, toEnumDefaultValue, toExamples, toGetter, toInstantiationType, toMediaTypeSchemaName, toModelImport, toModelImportMap, toOneOfName, toSetter, toTestCaseName, typeMapping, unaliasPropertySchema, unaliasSchema, updateAllModels, updateCodegenPropertyEnum, updateDataTypeWithEnumForArray, updateDataTypeWithEnumForMap, updateEnumVarsWithExtensions, updateModelForAnyType, updateModelForComposedSchema, updateModelForInteger, updateModelForNumber, updateModelForObject, updateModelForString, updateOption, updateParameterForString, updatePropertyForAnyType, updatePropertyForArray, updatePropertyForInteger, updatePropertyForMap, updatePropertyForMap, updatePropertyForNumber, updatePropertyForObject, updatePropertyForString, updateRequestBodyForArray, updateRequestBodyForMap, updateRequestBodyForObject, updateRequestBodyForPrimitiveType, updateRequestBodyForString, vendorExtensions, writePropertyBack</code></div>
 <div class="inherited-list">
 <h3 id="methods-inherited-from-class-java.lang.Object">Methods inherited from class&nbsp;java.lang.<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></h3>
 <code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#clone()" title="class or interface in java.lang" class="external-link">clone</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#equals(java.lang.Object)" title="class or interface in java.lang" class="external-link">equals</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#finalize()" title="class or interface in java.lang" class="external-link">finalize</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#getClass()" title="class or interface in java.lang" class="external-link">getClass</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#hashCode()" title="class or interface in java.lang" class="external-link">hashCode</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#notify()" title="class or interface in java.lang" class="external-link">notify</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#notifyAll()" title="class or interface in java.lang" class="external-link">notifyAll</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#toString()" title="class or interface in java.lang" class="external-link">toString</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#wait()" title="class or interface in java.lang" class="external-link">wait</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#wait(long)" title="class or interface in java.lang" class="external-link">wait</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#wait(long,int)" title="class or interface in java.lang" class="external-link">wait</a></code></div>
 <div class="inherited-list">
 <h3 id="methods-inherited-from-class-org.openapitools.codegen.CodegenConfig">Methods inherited from interface&nbsp;org.openapitools.codegen.CodegenConfig</h3>
-<code>additionalProperties, apiDocFilename, apiDocTemplateFiles, apiFilename, apiPackage, apiTemplateFiles, apiTestFilename, apiTestTemplateFiles, cliOptions, defaultIncludes, defaultTemplatingEngine, embeddedTemplateDir, encodePath, escapeText, escapeTextWhileAllowingNewLines, fileSuffix, fromSecurity, fromServers, fromServerVariables, generateExamplePath, generatorLanguage, generatorLanguageVersion, getAddSuffixToDuplicateOperationNicknames, getDocExtension, getFeatureSet, getFilesMetadataFilename, getGeneratorMetadata, getGitHost, getGitRepoId, getGitUserId, getHelp, getHttpUserAgent, getIgnoreFilePathOverride, getInputSpec, getLibrary, getName, getOutputDir, getReleaseNote, getTag, getTemplatingEngine, getTypeDeclaration, getUseInlineModelResolver, getUseOpenAPINormalizer, getVersionMetadataFilename, importMapping, inlineSchemaNameDefault, inlineSchemaNameMapping, instantiationTypes, isEnableMinimalUpdate, isEnablePostProcessFile, isHideGenerationTimestamp, isRemoveEnumValuePrefix, isRemoveOperationIdPrefix, isSkipOperationExample, isSkipOverwrite, isStrictSpecBehavior, languageSpecificPrimitives, modelDocTemplateFiles, modelFilename, modelPackage, modelTemplateFiles, modelTestTemplateFiles, openapiNormalizer, outputFolder, postProcess, postProcessParameter, postProcessSupportingFileData, processCompiler, processOpenAPI, processTemplatingEngine, reservedWords, reservedWordsMappings, sanitizeName, schemaMapping, serverVariableOverrides, setDocExtension, setEnableMinimalUpdate, setEnablePostProcessFile, setGitHost, setGitRepoId, setGitUserId, setHideGenerationTimestamp, setHttpUserAgent, setIgnoreFilePathOverride, setInputSpec, setLibrary, setOpenAPI, setReleaseNote, setRemoveEnumValuePrefix, setRemoveOperationIdPrefix, setSkipOperationExample, setSkipOverwrite, setStrictSpecBehavior, setTemplatingEngine, shouldOverwrite, supportedLibraries, supportingFiles, templateDir, testPackage, toApiImport, toApiName, toGetter, toModelImport, toModelImportMap, toSetter, typeMapping, unaliasSchema, updateAllModels, vendorExtensions</code></div>
+<code>additionalProperties, apiDocFilename, apiDocTemplateFiles, apiFilename, apiPackage, apiTemplateFiles, apiTestFilename, apiTestTemplateFiles, cliOptions, defaultIncludes, defaultTemplatingEngine, embeddedTemplateDir, encodePath, escapeText, escapeTextWhileAllowingNewLines, fileSuffix, fromSecurity, fromServers, fromServerVariables, generateExamplePath, generatorLanguage, generatorLanguageVersion, getAddSuffixToDuplicateOperationNicknames, getDocExtension, getFeatureSet, getFilesMetadataFilename, getGeneratorMetadata, getGitHost, getGitRepoId, getGitUserId, getHelp, getHttpUserAgent, getIgnoreFilePathOverride, getInputSpec, getLibrary, getName, getOutputDir, getReleaseNote, getTag, getTemplatingEngine, getTypeDeclaration, getUseOpenAPINormalizer, getVersionMetadataFilename, importMapping, inlineSchemaNameDefault, inlineSchemaNameMapping, instantiationTypes, isEnableMinimalUpdate, isEnablePostProcessFile, isHideGenerationTimestamp, isRemoveEnumValuePrefix, isRemoveOperationIdPrefix, isSkipOperationExample, isSkipOverwrite, isStrictSpecBehavior, languageSpecificPrimitives, modelDocTemplateFiles, modelFilename, modelPackage, modelTemplateFiles, modelTestTemplateFiles, openapiNormalizer, outputFolder, postProcess, postProcessParameter, postProcessSupportingFileData, processCompiler, processOpenAPI, processTemplatingEngine, reservedWords, reservedWordsMappings, sanitizeName, schemaMapping, serverVariableOverrides, setDocExtension, setEnableMinimalUpdate, setEnablePostProcessFile, setGitHost, setGitRepoId, setGitUserId, setHideGenerationTimestamp, setHttpUserAgent, setIgnoreFilePathOverride, setInputSpec, setLibrary, setOpenAPI, setReleaseNote, setRemoveEnumValuePrefix, setRemoveOperationIdPrefix, setSkipOperationExample, setSkipOverwrite, setStrictSpecBehavior, setTemplatingEngine, shouldOverwrite, supportedLibraries, supportingFiles, templateDir, testPackage, toApiImport, toApiName, toGetter, toModelImport, toModelImportMap, toSetter, typeMapping, unaliasSchema, updateAllModels, vendorExtensions</code></div>
 <div class="inherited-list">
 <h3 id="methods-inherited-from-class-org.openapitools.codegen.languages.features.DocumentationProviderFeatures">Methods inherited from interface&nbsp;org.openapitools.codegen.languages.features.DocumentationProviderFeatures</h3>
 <code>defaultDocumentationProvider, supportedAnnotationLibraries, supportedDocumentationProvider</code></div>
@@ -550,28 +559,42 @@ implements org.openapitools.codegen.languages.features.BeanValidationFeatures, o
 </section>
 </li>
 <li>
-<section class="detail" id="OPT_DATE_LIBRARY_JAVA8">
-<h3>OPT_DATE_LIBRARY_JAVA8</h3>
-<div class="member-signature"><span class="modifiers">public static final</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">OPT_DATE_LIBRARY_JAVA8</span></div>
+<section class="detail" id="OPT_DATE_LIBRARY_ZONED_DATETIME">
+<h3>OPT_DATE_LIBRARY_ZONED_DATETIME</h3>
+<div class="member-signature"><span class="modifiers">public static final</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">OPT_DATE_LIBRARY_ZONED_DATETIME</span></div>
 <dl class="notes">
 <dt>See Also:</dt>
 <dd>
 <ul class="see-list">
-<li><a href="../../../../constant-values.html#io.micronaut.openapi.generator.AbstractMicronautJavaCodegen.OPT_DATE_LIBRARY_JAVA8">Constant Field Values</a></li>
+<li><a href="../../../../constant-values.html#io.micronaut.openapi.generator.AbstractMicronautJavaCodegen.OPT_DATE_LIBRARY_ZONED_DATETIME">Constant Field Values</a></li>
 </ul>
 </dd>
 </dl>
 </section>
 </li>
 <li>
-<section class="detail" id="OPT_DATE_LIBRARY_JAVA8_LOCAL_DATETIME">
-<h3>OPT_DATE_LIBRARY_JAVA8_LOCAL_DATETIME</h3>
-<div class="member-signature"><span class="modifiers">public static final</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">OPT_DATE_LIBRARY_JAVA8_LOCAL_DATETIME</span></div>
+<section class="detail" id="OPT_DATE_LIBRARY_OFFSET_DATETIME">
+<h3>OPT_DATE_LIBRARY_OFFSET_DATETIME</h3>
+<div class="member-signature"><span class="modifiers">public static final</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">OPT_DATE_LIBRARY_OFFSET_DATETIME</span></div>
 <dl class="notes">
 <dt>See Also:</dt>
 <dd>
 <ul class="see-list">
-<li><a href="../../../../constant-values.html#io.micronaut.openapi.generator.AbstractMicronautJavaCodegen.OPT_DATE_LIBRARY_JAVA8_LOCAL_DATETIME">Constant Field Values</a></li>
+<li><a href="../../../../constant-values.html#io.micronaut.openapi.generator.AbstractMicronautJavaCodegen.OPT_DATE_LIBRARY_OFFSET_DATETIME">Constant Field Values</a></li>
+</ul>
+</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="OPT_DATE_LIBRARY_LOCAL_DATETIME">
+<h3>OPT_DATE_LIBRARY_LOCAL_DATETIME</h3>
+<div class="member-signature"><span class="modifiers">public static final</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">OPT_DATE_LIBRARY_LOCAL_DATETIME</span></div>
+<dl class="notes">
+<dt>See Also:</dt>
+<dd>
+<ul class="see-list">
+<li><a href="../../../../constant-values.html#io.micronaut.openapi.generator.AbstractMicronautJavaCodegen.OPT_DATE_LIBRARY_LOCAL_DATETIME">Constant Field Values</a></li>
 </ul>
 </dd>
 </dl>
@@ -782,48 +805,6 @@ implements org.openapitools.codegen.languages.features.BeanValidationFeatures, o
 <dd>
 <ul class="see-list">
 <li><a href="../../../../constant-values.html#io.micronaut.openapi.generator.AbstractMicronautJavaCodegen.CONTENT_TYPE_ANY">Constant Field Values</a></li>
-</ul>
-</dd>
-</dl>
-</section>
-</li>
-<li>
-<section class="detail" id="DATE_FORMAT">
-<h3>DATE_FORMAT</h3>
-<div class="member-signature"><span class="modifiers">public static final</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">DATE_FORMAT</span></div>
-<dl class="notes">
-<dt>See Also:</dt>
-<dd>
-<ul class="see-list">
-<li><a href="../../../../constant-values.html#io.micronaut.openapi.generator.AbstractMicronautJavaCodegen.DATE_FORMAT">Constant Field Values</a></li>
-</ul>
-</dd>
-</dl>
-</section>
-</li>
-<li>
-<section class="detail" id="DATETIME_FORMAT">
-<h3>DATETIME_FORMAT</h3>
-<div class="member-signature"><span class="modifiers">public static final</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">DATETIME_FORMAT</span></div>
-<dl class="notes">
-<dt>See Also:</dt>
-<dd>
-<ul class="see-list">
-<li><a href="../../../../constant-values.html#io.micronaut.openapi.generator.AbstractMicronautJavaCodegen.DATETIME_FORMAT">Constant Field Values</a></li>
-</ul>
-</dd>
-</dl>
-</section>
-</li>
-<li>
-<section class="detail" id="OFFSET_DATETIME_FORMAT">
-<h3>OFFSET_DATETIME_FORMAT</h3>
-<div class="member-signature"><span class="modifiers">public static final</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">OFFSET_DATETIME_FORMAT</span></div>
-<dl class="notes">
-<dt>See Also:</dt>
-<dd>
-<ul class="see-list">
-<li><a href="../../../../constant-values.html#io.micronaut.openapi.generator.AbstractMicronautJavaCodegen.OFFSET_DATETIME_FORMAT">Constant Field Values</a></li>
 </ul>
 </dd>
 </dl>
@@ -1182,6 +1163,29 @@ implements org.openapitools.codegen.languages.features.BeanValidationFeatures, o
 </section>
 </li>
 <li>
+<section class="detail" id="fromParameter(io.swagger.v3.oas.models.parameters.Parameter,java.util.Set)">
+<h3>fromParameter</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">org.openapitools.codegen.CodegenParameter</span>&nbsp;<span class="element-name">fromParameter</span><wbr><span class="parameters">(io.swagger.v3.oas.models.parameters.Parameter&nbsp;param,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Set.html" title="class or interface in java.util" class="external-link">Set</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;&nbsp;imports)</span></div>
+<dl class="notes">
+<dt>Overrides:</dt>
+<dd><code>fromParameter</code>&nbsp;in class&nbsp;<code>org.openapitools.codegen.DefaultCodegen</code></dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="getUseInlineModelResolver()">
+<h3>getUseInlineModelResolver</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">getUseInlineModelResolver</span>()</div>
+<dl class="notes">
+<dt>Specified by:</dt>
+<dd><code>getUseInlineModelResolver</code>&nbsp;in interface&nbsp;<code>org.openapitools.codegen.CodegenConfig</code></dd>
+<dt>Overrides:</dt>
+<dd><code>getUseInlineModelResolver</code>&nbsp;in class&nbsp;<code>org.openapitools.codegen.DefaultCodegen</code></dd>
+</dl>
+</section>
+</li>
+<li>
 <section class="detail" id="fromOperation(java.lang.String,java.lang.String,io.swagger.v3.oas.models.Operation,java.util.List)">
 <h3>fromOperation</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">org.openapitools.codegen.CodegenOperation</span>&nbsp;<span class="element-name">fromOperation</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;path,
@@ -1267,6 +1271,12 @@ implements org.openapitools.codegen.languages.features.BeanValidationFeatures, o
 <section class="detail" id="setSerializationLibrary(java.lang.String)">
 <h3>setSerializationLibrary</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setSerializationLibrary</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;serializationLibrary)</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="setDateTimeLibrary(java.lang.String)">
+<h3>setDateTimeLibrary</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setDateTimeLibrary</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;name)</span></div>
 </section>
 </li>
 </ul>

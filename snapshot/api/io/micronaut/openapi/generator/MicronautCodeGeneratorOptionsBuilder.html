@@ -43,7 +43,7 @@ loadScripts(document, 'script');</script>
 <div>
 <ul class="sub-nav-list">
 <li>Summary:&nbsp;</li>
-<li>Nested&nbsp;|&nbsp;</li>
+<li><a href="#nested-class-summary">Nested</a>&nbsp;|&nbsp;</li>
 <li>Field&nbsp;|&nbsp;</li>
 <li>Constr&nbsp;|&nbsp;</li>
 <li><a href="#method-summary">Method</a></li>
@@ -77,6 +77,23 @@ loadScripts(document, 'script');</script>
 </section>
 <section class="summary">
 <ul class="summary-list">
+<!-- ======== NESTED CLASS SUMMARY ======== -->
+<li>
+<section class="nested-class-summary" id="nested-class-summary">
+<h2>Nested Class Summary</h2>
+<div class="caption"><span>Nested Classes</span></div>
+<div class="summary-table three-column-summary">
+<div class="table-header col-first">Modifier and Type</div>
+<div class="table-header col-second">Interface</div>
+<div class="table-header col-last">Description</div>
+<div class="col-first even-row-color"><code>static enum&nbsp;</code></div>
+<div class="col-second even-row-color"><code><a href="MicronautCodeGeneratorOptionsBuilder.DateTimeFormat.html" class="type-name-link" title="enum class in io.micronaut.openapi.generator">MicronautCodeGeneratorOptionsBuilder.DateTimeFormat</a></code></div>
+<div class="col-last even-row-color">
+<div class="block">The possible date-time formatting configurations.</div>
+</div>
+</div>
+</section>
+</li>
 <!-- ========== METHOD SUMMARY =========== -->
 <li>
 <section class="method-summary" id="method-summary">
@@ -104,46 +121,53 @@ loadScripts(document, 'script');</script>
 <div class="block">If set to true, the generated code will use bean validation.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="MicronautCodeGeneratorOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorOptionsBuilder</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withInvokerPackage(java.lang.String)" class="member-name-link">withInvokerPackage</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;invokerPackage)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withDateTimeFormat(io.micronaut.openapi.generator.MicronautCodeGeneratorOptionsBuilder.DateTimeFormat)" class="member-name-link">withDateTimeFormat</a><wbr>(<a href="MicronautCodeGeneratorOptionsBuilder.DateTimeFormat.html" title="enum class in io.micronaut.openapi.generator">MicronautCodeGeneratorOptionsBuilder.DateTimeFormat</a>&nbsp;format)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block">Configure the date-time format.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="MicronautCodeGeneratorOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorOptionsBuilder</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withInvokerPackage(java.lang.String)" class="member-name-link">withInvokerPackage</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;invokerPackage)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Sets the package of the generated invoker classes.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="MicronautCodeGeneratorOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorOptionsBuilder</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withModelPackage(java.lang.String)" class="member-name-link">withModelPackage</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;modelPackage)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="MicronautCodeGeneratorOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorOptionsBuilder</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withModelPackage(java.lang.String)" class="member-name-link">withModelPackage</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;modelPackage)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Sets the package of the generated model classes.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="MicronautCodeGeneratorOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorOptionsBuilder</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withOptional(boolean)" class="member-name-link">withOptional</a><wbr>(boolean&nbsp;optional)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="MicronautCodeGeneratorOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorOptionsBuilder</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withOptional(boolean)" class="member-name-link">withOptional</a><wbr>(boolean&nbsp;optional)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">If set to true, the generated code will make use of <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Optional.html" title="class or interface in java.util" class="external-link"><code>Optional</code></a>.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="MicronautCodeGeneratorOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorOptionsBuilder</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withParameterMappings(java.util.List)" class="member-name-link">withParameterMappings</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="AbstractMicronautJavaCodegen.ParameterMapping.html" title="class in io.micronaut.openapi.generator">AbstractMicronautJavaCodegen.ParameterMapping</a>&gt;&nbsp;parameterMappings)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="MicronautCodeGeneratorOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorOptionsBuilder</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withParameterMappings(java.util.List)" class="member-name-link">withParameterMappings</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="AbstractMicronautJavaCodegen.ParameterMapping.html" title="class in io.micronaut.openapi.generator">AbstractMicronautJavaCodegen.ParameterMapping</a>&gt;&nbsp;parameterMappings)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Add the parameter mappings.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="MicronautCodeGeneratorOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorOptionsBuilder</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withReactive(boolean)" class="member-name-link">withReactive</a><wbr>(boolean&nbsp;reactive)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="MicronautCodeGeneratorOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorOptionsBuilder</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withReactive(boolean)" class="member-name-link">withReactive</a><wbr>(boolean&nbsp;reactive)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">If set to true, the generator will use reactive types.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="MicronautCodeGeneratorOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorOptionsBuilder</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withResponseBodyMappings(java.util.List)" class="member-name-link">withResponseBodyMappings</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="AbstractMicronautJavaCodegen.ResponseBodyMapping.html" title="class in io.micronaut.openapi.generator">AbstractMicronautJavaCodegen.ResponseBodyMapping</a>&gt;&nbsp;responseBodyMappings)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="MicronautCodeGeneratorOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorOptionsBuilder</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withResponseBodyMappings(java.util.List)" class="member-name-link">withResponseBodyMappings</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="AbstractMicronautJavaCodegen.ResponseBodyMapping.html" title="class in io.micronaut.openapi.generator">AbstractMicronautJavaCodegen.ResponseBodyMapping</a>&gt;&nbsp;responseBodyMappings)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Add the response body mappings.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="MicronautCodeGeneratorOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorOptionsBuilder</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withSerializationLibrary(io.micronaut.openapi.generator.SerializationLibraryKind)" class="member-name-link">withSerializationLibrary</a><wbr>(<a href="SerializationLibraryKind.html" title="enum class in io.micronaut.openapi.generator">SerializationLibraryKind</a>&nbsp;library)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">&nbsp;</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="MicronautCodeGeneratorOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorOptionsBuilder</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withTestFramework(io.micronaut.openapi.generator.MicronautCodeGeneratorEntryPoint.TestFramework)" class="member-name-link">withTestFramework</a><wbr>(<a href="MicronautCodeGeneratorEntryPoint.TestFramework.html" title="enum class in io.micronaut.openapi.generator">MicronautCodeGeneratorEntryPoint.TestFramework</a>&nbsp;testFramework)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withSerializationLibrary(io.micronaut.openapi.generator.SerializationLibraryKind)" class="member-name-link">withSerializationLibrary</a><wbr>(<a href="SerializationLibraryKind.html" title="enum class in io.micronaut.openapi.generator">SerializationLibraryKind</a>&nbsp;library)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
-<div class="block">Configures the test framework to use for generated tests.</div>
+<div class="block">Configure the serialization library.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="MicronautCodeGeneratorOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorOptionsBuilder</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withWrapInHttpResponse(boolean)" class="member-name-link">withWrapInHttpResponse</a><wbr>(boolean&nbsp;wrapInHttpResponse)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withTestFramework(io.micronaut.openapi.generator.MicronautCodeGeneratorEntryPoint.TestFramework)" class="member-name-link">withTestFramework</a><wbr>(<a href="MicronautCodeGeneratorEntryPoint.TestFramework.html" title="enum class in io.micronaut.openapi.generator">MicronautCodeGeneratorEntryPoint.TestFramework</a>&nbsp;testFramework)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block">Configures the test framework to use for generated tests.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="MicronautCodeGeneratorOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorOptionsBuilder</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withWrapInHttpResponse(boolean)" class="member-name-link">withWrapInHttpResponse</a><wbr>(boolean&nbsp;wrapInHttpResponse)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">If true, the generated client will use responses wrapped in HttpResponse.</div>
 </div>
 </div>
@@ -307,6 +331,26 @@ loadScripts(document, 'script');</script>
 <section class="detail" id="withSerializationLibrary(io.micronaut.openapi.generator.SerializationLibraryKind)">
 <h3>withSerializationLibrary</h3>
 <div class="member-signature"><span class="return-type"><a href="MicronautCodeGeneratorOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorOptionsBuilder</a></span>&nbsp;<span class="element-name">withSerializationLibrary</span><wbr><span class="parameters">(<a href="SerializationLibraryKind.html" title="enum class in io.micronaut.openapi.generator">SerializationLibraryKind</a>&nbsp;library)</span></div>
+<div class="block">Configure the serialization library.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>library</code> - the serialization library.</dd>
+<dt>Returns:</dt>
+<dd>this builder</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="withDateTimeFormat(io.micronaut.openapi.generator.MicronautCodeGeneratorOptionsBuilder.DateTimeFormat)">
+<h3>withDateTimeFormat</h3>
+<div class="member-signature"><span class="return-type"><a href="MicronautCodeGeneratorOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorOptionsBuilder</a></span>&nbsp;<span class="element-name">withDateTimeFormat</span><wbr><span class="parameters">(<a href="MicronautCodeGeneratorOptionsBuilder.DateTimeFormat.html" title="enum class in io.micronaut.openapi.generator">MicronautCodeGeneratorOptionsBuilder.DateTimeFormat</a>&nbsp;format)</span></div>
+<div class="block">Configure the date-time format.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>format</code> - the date-time format.</dd>
+<dt>Returns:</dt>
+<dd>this builder</dd>
+</dl>
 </section>
 </li>
 </ul>
