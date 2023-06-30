@@ -123,11 +123,36 @@ class ParametersControllerSpec extends Specification {
     void "test send page query"() {
         when:
         HttpRequest<?> request =
-                HttpRequest.GET("/sendPageQuery?page=2&size=20&sort=my-property%20desc,my-property-2")
+                HttpRequest.GET("/sendPageQuery?page=2&size=20&sort=my-property,desc&sort=my-property-2")
         String response = client.retrieve(request, Argument.of(String), Argument.of(String))
 
         then:
-        "(page: 2, size: 20, sort: my-property desc,my-property-2)" == response
+        "(page: 2, size: 20, sort: my-property(dir=DESC) my-property-2(dir=ASC))" == response
+    }
+
+    void "test send mapped parameter"() {
+        given:
+        var filter = "name=Andrew,age>20"
+
+        when:
+        HttpRequest<?> request =
+                HttpRequest.GET("/sendMappedParameter")
+                .header("Filter", filter)
+        String response = client.retrieve(request, Argument.of(String), Argument.of(String))
+
+        then:
+        response == filter
+    }
+
+    void "test send invalid mapped parameter"() {
+        when:
+        HttpRequest<?> request = HttpRequest.GET("/sendMappedParameter")
+                .header("Filter", "name=Andrew,age>20,something-else")
+        client.retrieve(request, Argument.of(String), Argument.of(String))
+
+        then:
+        var e = thrown(HttpClientResponseException)
+        HttpStatus.BAD_REQUEST == e.status
     }
 
 }

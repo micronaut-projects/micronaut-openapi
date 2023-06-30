@@ -75,9 +75,9 @@
             {{/responses}}
         }{{#hasParams}},
         parameters = {
-            {{#allParams}}
+            {{#vendorExtensions.originalParams}}
             @Parameter(name = "{{paramName}}"{{#description}}, description = "{{{description}}}"{{/description}}{{#required}}, required = true{{/required}}){{^-last}},{{/-last}}
-            {{/allParams}}
+            {{/vendorExtensions.originalParams}}
         }{{/hasParams}}{{#hasAuthMethods}},
         security = {
             {{#authMethods}}

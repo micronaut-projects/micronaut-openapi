@@ -38,6 +38,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * A task which simulates what the Gradle Micronaut plugin
@@ -70,6 +71,12 @@ public abstract class OpenApiGeneratorTask extends DefaultTask {
     @Input
     public abstract ListProperty<String> getOutputKinds();
 
+    @Input
+    public abstract ListProperty<Map<String, String>> getParameterMappings();
+
+    @Input
+    public abstract ListProperty<Map<String, String>> getResponseBodyMappings();
+
 
     @Inject
     protected abstract ExecOperations getExecOperations();
@@ -80,6 +87,7 @@ public abstract class OpenApiGeneratorTask extends DefaultTask {
         var generatedTestSourcesDir = getGeneratedTestSourcesDirectory().get().getAsFile();
         Files.createDirectories(generatedSourcesDir.toPath());
         Files.createDirectories(generatedTestSourcesDir.toPath());
+        getProject().getLogger().info("json: " + getParameterMappings().get());
         getExecOperations().javaexec(javaexec -> {
             javaexec.setClasspath(getClasspath());
             javaexec.getMainClass().set("io.micronaut.openapi.testsuite.GeneratorMain");
@@ -88,6 +96,8 @@ public abstract class OpenApiGeneratorTask extends DefaultTask {
             args.add(getOpenApiDefinition().get().getAsFile().toURI().toString());
             args.add(getOutputDirectory().get().getAsFile().getAbsolutePath());
             args.add(String.join(",", getOutputKinds().get()));
+            args.add(getParameterMappings().get().toString());
+            args.add(getResponseBodyMappings().get().toString());
             javaexec.args(args);
         });
     }
