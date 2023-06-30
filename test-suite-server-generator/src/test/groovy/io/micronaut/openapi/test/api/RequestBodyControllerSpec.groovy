@@ -321,13 +321,20 @@ class RequestBodyControllerSpec extends Specification {
         stringResponse.contains('"class":"' + discriminatorName + '"')
 
         where:
-        discriminatorName | model
-        BIRD_DISCRIMINATOR | new Bird().beakLength(BigDecimal.valueOf(12, 1))
-                .featherDescription("Large blue and white feathers").numWings(2).color(ColorEnum.BLUE)
-        MAMMAL_DISCRIMINATOR | new Mammal(20.5f, "A typical Canadian beaver").color(ColorEnum.BLUE)
-        REPTILE_DISCRIMINATOR | new Reptile(0, true)
-                .fangDescription("A pair of venomous fangs")
-                .color(ColorEnum.BLUE)
+        discriminatorName
+                | model
+        BIRD_DISCRIMINATOR
+                | new Bird()
+                    .beakLength(BigDecimal.valueOf(12, 1))
+                    .color(ColorEnum.BLUE)
+                    .featherDescription("Large blue and white feathers").numWings(2)
+        MAMMAL_DISCRIMINATOR
+                | new Mammal(20.5f, "A typical Canadian beaver")
+                    .color(ColorEnum.BLUE)
+        REPTILE_DISCRIMINATOR
+                | new Reptile(0, true)
+                    .color(ColorEnum.BLUE)
+                    .fangDescription("A pair of venomous fangs")
     }
 
     void "test send bytes"() {

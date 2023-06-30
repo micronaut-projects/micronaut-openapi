@@ -239,7 +239,6 @@ public class {{classname}} {{#parent}}extends {{{parent}}} {{/parent}}{{#vendorE
         } catch (java.util.NoSuchElementException e) {
             // this can never happen, as we make sure above that the value is present
         }
-        return this;
                 {{/vendorExtensions.x-is-jackson-optional-nullable}}
                 {{^vendorExtensions.x-is-jackson-optional-nullable}}
                     {{^required}}
@@ -248,8 +247,8 @@ public class {{classname}} {{#parent}}extends {{{parent}}} {{/parent}}{{#vendorE
         }
                     {{/required}}
         this.{{name}}.add({{name}}Item);
-        return this;
                 {{/vendorExtensions.x-is-jackson-optional-nullable}}
+        return this;
     }
             {{/isArray}}
 
@@ -268,7 +267,6 @@ public class {{classname}} {{#parent}}extends {{{parent}}} {{/parent}}{{#vendorE
         } catch (java.util.NoSuchElementException e) {
             // this can never happen, as we make sure above that the value is present
         }
-    return this;
                 {{/vendorExtensions.x-is-jackson-optional-nullable}}
                 {{^vendorExtensions.x-is-jackson-optional-nullable}}
                     {{^required}}
@@ -277,13 +275,40 @@ public class {{classname}} {{#parent}}extends {{{parent}}} {{/parent}}{{#vendorE
         }
                     {{/required}}
         this.{{name}}.put(key, {{name}}Item);
-        return this;
                 {{/vendorExtensions.x-is-jackson-optional-nullable}}
-  }
+        return this;
+    }
             {{/isMap}}
 
         {{/isReadOnly}}
     {{/vars}}
+
+    {{#parentVars}}
+        {{^isReadOnly}}
+    @Override
+    public {{classname}} {{name}}({{{datatypeWithEnum}}} {{name}}) {
+        {{{setter}}}({{name}});
+        return this;
+    }
+
+            {{#isArray}}
+    @Override
+    public {{classname}} add{{nameInCamelCase}}Item({{{items.datatypeWithEnum}}} {{name}}Item) {
+        super.add{{nameInCamelCase}}Item({{name}}Item);
+        return this;
+    }
+            {{/isArray}}
+
+            {{#isMap}}
+    @Override
+    public {{classname}} put{{nameInCamelCase}}Item(String key, {{{items.datatypeWithEnum}}} {{name}}Item) {
+        super.put{{nameInCamelCase}}Item(key, {{name}}Item);
+        return this;
+    }
+            {{/isMap}}
+
+        {{/isReadOnly}}
+    {{/parentVars}}
 
     @Override
     public boolean equals(Object o) {

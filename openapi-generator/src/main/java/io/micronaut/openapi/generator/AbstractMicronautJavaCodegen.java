@@ -748,6 +748,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
             CodegenModel model = models.getModels().get(0).getModel();
             if (model.getParentModel() != null) {
                 model.vendorExtensions.put("requiredParentVars", model.getParentModel().requiredVars);
+                model.parentVars = model.getParentModel().allVars;
             }
 
             List<CodegenProperty> requiredVars = model.vars.stream().filter(v -> v.required).collect(Collectors.toList());
