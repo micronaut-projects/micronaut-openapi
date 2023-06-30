@@ -9,7 +9,8 @@ components.java.withVariantsFromConfiguration(configurations.testFixturesRuntime
 
 micronautBuild {
     binaryCompatibility {
-        baselineVersion = "5.0.0-M9"
         enabled = true
+        // TODO required for now. Remove after Micronaut 4 release
+        baselineVersion = "5.0.0-M9"
     }
 }
