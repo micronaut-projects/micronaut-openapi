@@ -119,9 +119,19 @@ loadScripts(document, 'script');</script>
 <div class="block">If set to true, the generated code will make use of <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Optional.html" title="class or interface in java.util" class="external-link"><code>Optional</code></a>.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="MicronautCodeGeneratorOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorOptionsBuilder</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withReactive(boolean)" class="member-name-link">withReactive</a><wbr>(boolean&nbsp;reactive)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withParameterMappings(java.util.List)" class="member-name-link">withParameterMappings</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="AbstractMicronautJavaCodegen.ParameterMapping.html" title="class in io.micronaut.openapi.generator">AbstractMicronautJavaCodegen.ParameterMapping</a>&gt;&nbsp;parameterMappings)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block">Add the parameter mappings.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="MicronautCodeGeneratorOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorOptionsBuilder</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withReactive(boolean)" class="member-name-link">withReactive</a><wbr>(boolean&nbsp;reactive)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">If set to true, the generator will use reactive types.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="MicronautCodeGeneratorOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorOptionsBuilder</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withResponseBodyMappings(java.util.List)" class="member-name-link">withResponseBodyMappings</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="AbstractMicronautJavaCodegen.ResponseBodyMapping.html" title="class in io.micronaut.openapi.generator">AbstractMicronautJavaCodegen.ResponseBodyMapping</a>&gt;&nbsp;responseBodyMappings)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block">Add the response body mappings.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="MicronautCodeGeneratorOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorOptionsBuilder</a></code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withSerializationLibrary(io.micronaut.openapi.generator.SerializationLibraryKind)" class="member-name-link">withSerializationLibrary</a><wbr>(<a href="SerializationLibraryKind.html" title="enum class in io.micronaut.openapi.generator">SerializationLibraryKind</a>&nbsp;library)</code></div>
@@ -197,6 +207,32 @@ loadScripts(document, 'script');</script>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>artifactId</code> - the artifact id</dd>
+<dt>Returns:</dt>
+<dd>this builder</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="withParameterMappings(java.util.List)">
+<h3>withParameterMappings</h3>
+<div class="member-signature"><span class="return-type"><a href="MicronautCodeGeneratorOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorOptionsBuilder</a></span>&nbsp;<span class="element-name">withParameterMappings</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="AbstractMicronautJavaCodegen.ParameterMapping.html" title="class in io.micronaut.openapi.generator">AbstractMicronautJavaCodegen.ParameterMapping</a>&gt;&nbsp;parameterMappings)</span></div>
+<div class="block">Add the parameter mappings.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>parameterMappings</code> - the parameter mappings specified by a <a href="AbstractMicronautJavaCodegen.ParameterMapping.html" title="class in io.micronaut.openapi.generator"><code>AbstractMicronautJavaCodegen.ParameterMapping</code></a> objects</dd>
+<dt>Returns:</dt>
+<dd>this builder</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="withResponseBodyMappings(java.util.List)">
+<h3>withResponseBodyMappings</h3>
+<div class="member-signature"><span class="return-type"><a href="MicronautCodeGeneratorOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorOptionsBuilder</a></span>&nbsp;<span class="element-name">withResponseBodyMappings</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="AbstractMicronautJavaCodegen.ResponseBodyMapping.html" title="class in io.micronaut.openapi.generator">AbstractMicronautJavaCodegen.ResponseBodyMapping</a>&gt;&nbsp;responseBodyMappings)</span></div>
+<div class="block">Add the response body mappings.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>responseBodyMappings</code> - the response body mappings specified by a <a href="AbstractMicronautJavaCodegen.ResponseBodyMapping.html" title="class in io.micronaut.openapi.generator"><code>AbstractMicronautJavaCodegen.ResponseBodyMapping</code></a> objects</dd>
 <dt>Returns:</dt>
 <dd>this builder</dd>
 </dl>
