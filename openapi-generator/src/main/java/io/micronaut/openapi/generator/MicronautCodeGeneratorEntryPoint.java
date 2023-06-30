@@ -131,8 +131,10 @@ public final class MicronautCodeGeneratorEntryPoint {
         codeGenerator.setUseBeanValidation(options.beanValidation);
         codeGenerator.setTestTool(options.testFramework.value);
         codeGenerator.setSerializationLibrary(options.serializationLibraryKind().name());
+        codeGenerator.setDateTimeLibrary(options.dateTimeFormat().name());
         configureServerOptions();
         configureClientOptions();
+        codeGenerator.processOpts();
     }
 
     private void configureServerOptions() {
@@ -302,6 +304,7 @@ public final class MicronautCodeGeneratorEntryPoint {
             private boolean wrapInHttpResponse;
             private TestFramework testFramework = TestFramework.JUNIT5;
             private SerializationLibraryKind serializationLibraryKind = SerializationLibraryKind.MICRONAUT_SERDE_JACKSON;
+            private DateTimeFormat dateTimeFormat = DateTimeFormat.ZONED_DATETIME;
 
             @Override
             public MicronautCodeGeneratorOptionsBuilder withApiPackage(String apiPackage) {
@@ -375,8 +378,14 @@ public final class MicronautCodeGeneratorEntryPoint {
                 return this;
             }
 
+            @Override
+            public MicronautCodeGeneratorOptionsBuilder withDateTimeFormat(DateTimeFormat format) {
+                dateTimeFormat = format;
+                return this;
+            }
+
             private Options build() {
-                return new Options(apiPackage, modelPackage, invokerPackage, artifactId, parameterMappings, responseBodyMappings, beanValidation, optional, reactive, wrapInHttpResponse, testFramework, serializationLibraryKind);
+                return new Options(apiPackage, modelPackage, invokerPackage, artifactId, parameterMappings, responseBodyMappings, beanValidation, optional, reactive, wrapInHttpResponse, testFramework, serializationLibraryKind, dateTimeFormat);
             }
         }
     }
@@ -408,7 +417,9 @@ public final class MicronautCodeGeneratorEntryPoint {
         boolean reactive,
         boolean wrapInHttpResponse,
         TestFramework testFramework,
-        SerializationLibraryKind serializationLibraryKind) {
+        SerializationLibraryKind serializationLibraryKind,
+        MicronautCodeGeneratorOptionsBuilder.DateTimeFormat dateTimeFormat
+    ) {
     }
 
 }

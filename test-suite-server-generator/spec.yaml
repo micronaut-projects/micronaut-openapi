@@ -1,40 +1,11 @@
-swagger: "2.0"
+openapi: "3.0.0"
 info:
   version: 1.0.0
   title: Compute API
   description: API for the Compute Service
-host: localhost:8000
-basePath: /api
-schemes:
-  - http
-consumes:
-  - application/json
-produces:
-  - application/json
-
-x-headers:
-  PageNumberHeader: &X-Page-Number-header
-    name: X-Page-Number
-    type: string
-    description: The page number of the current page
-  PageSizeHeader: &X-Page-Size-header
-    name: X-Page-Size
-    type: string
-    description: The number of items per page
-  TotalCountHeader: &X-Total-Count-header
-    name: X-Total-Count
-    type: string
-    description: |
-      The total number of items available in the entire collections, not just the items returned in the current page
-  PageCountHeader: &X-Page-Count-header
-    name: X-Page-Count
-    type: string
-    description: The total number of pages based on the page size and total count
-  LastModifiedHeader: &Last-Modified-header
-    name: Last-Modified
-    type: string
-    format: date-time
-    description: The last time an entity returned with the response was modified.
+servers:
+  - url: localhost:8000/api
+    description: The api server
 
 paths:
   /sendPrimitives/{name}:
@@ -45,37 +16,32 @@ paths:
       parameters:
         - name: name
           in: path
-          type: string
           required: true
+          schema:
+            type: string
         - name: age
           in: query
-          type: number
           required: true
+          schema:
+            type: number
         - name: height
           in: header
-          type: number
-          format: float
           required: true
+          schema:
+            type: number
+            format: float
         - name: isPositive
           in: query
-          type: boolean
           required: true
+          schema:
+            type: boolean
       responses:
         200:
           description: Success
-          schema:
-            type: object
-            title: SendPrimitivesResponse
-            properties:
-              name:
-                type: string
-              age:
-                type: number
-              height:
-                type: number
-                format: float
-              isPositive:
-                type: boolean
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SendPrimitivesResponse'
         default:
           $ref: '#/responses/Error'
   /sendValidatedPrimitives:
@@ -83,37 +49,42 @@ paths:
       operationId: sendValidatedPrimitives
       tags: [ parameters ]
       description: a method to send primitives with validation
-      produces: [ 'text/plain' ]
       parameters:
         - name: name
           in: query
-          type: string
-          minLength: 3
-          pattern: "[a-zA-Z]+"
+          schema:
+            type: string
+            minLength: 3
+            pattern: "[a-zA-Z]+"
         - name: age
           in: query
-          type: integer
-          format: int
-          minimum: 10
-          maximum: 200
+          schema:
+            type: integer
+            format: int
+            minimum: 10
+            maximum: 200
         - name: favoriteNumber
           in: query
-          type: number
-          minimum: -100.5
-          maximum: 100.5
+          schema:
+            type: number
+            minimum: -100.5
+            maximum: 100.5
         - name: height
           in: query
-          type: number
-          format: double
-          minimum: 0.1
-          maximum: 3
-          exclusiveMaximum: true
-          exclusiveMinimum: true
+          schema:
+            type: number
+            format: double
+            minimum: 0.1
+            maximum: 3
+            exclusiveMaximum: true
+            exclusiveMinimum: true
       responses:
         200:
           description: Success
-          schema:
-            type: string
+          content:
+            text/plain:
+              schema:
+                type: string
         default:
           $ref: '#/responses/Error'
   /sendDates:
@@ -123,28 +94,41 @@ paths:
       description: A method to send dates as parameters
       parameters:
         - name: commitDate
-          type: string
           in: query
-          format: date
+          schema:
+            type: string
+            format: date
         - name: commitDateTime
-          type: string
           in: query
-          format: date-time
+          schema:
+            type: string
+            format: date-time
       responses:
         200:
           description: Success
-          schema:
-            type: object
-            title: SendDatesResponse
-            properties:
-              commitDate:
-                type: string
-                format: date
-              commitDateTime:
-                type: string
-                format: date-time
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SendDatesResponse'
         default:
           $ref: '#/responses/Error'
+  /sendParameterEnum:
+    get:
+      operationId: sendParameterEnum
+      tags: [ parameters ]
+      description: A method to send an enum as a query parameter
+      parameters:
+        - name: colorParam
+          in: query
+          schema:
+            $ref: '#/components/schemas/ColorEnum'
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ColorEnum'
   /sendOpcRequestId:
     get:
       operationId: sendIgnoredHeader
@@ -155,12 +139,15 @@ paths:
       parameters:
         - in: header
           name: ignored-header
-          type: string
+          schema:
+            type: string
       responses:
         200:
           description: Success
-          schema:
-            type: string
+          content:
+            text/plain:
+              schema:
+                type: string
   /getIgnoredHeader:
     get:
       operationId: getIgnoredHeader
@@ -173,35 +160,42 @@ paths:
           description: Success
           headers:
             ignored-header:
-              type: string
-          schema:
-            type: string
+              schema:
+                type: string
+          content:
+            text/plain:
+              schema:
+                type: string
   /sendPageQuery:
     get:
       operationId: sendPageQuery
       tags: [ parameters ]
       description: A method that takes page query as its argument
       parameters:
-        - $ref: '#/parameters/PageQueryParam'
-        - $ref: '#/parameters/PageSizeQueryParam'
-        - $ref: '#/parameters/PageSortQueryParam'
+        - $ref: '#/components/parameters/PageQueryParam'
+        - $ref: '#/components/parameters/PageSizeQueryParam'
+        - $ref: '#/components/parameters/PageSortQueryParam'
       responses:
         200:
           description: Success
-          schema:
-            type: string
+          content:
+            text/plain:
+              schema:
+                type: string
   /sendMappedParameter:
     get:
       operationId: sendMappedParameter
       tags: [ parameters ]
       description: A method that has a header that is mapped to a custom type
       parameters:
-        - $ref: '#/parameters/FilterHeader'
+        - $ref: '#/components/parameters/FilterHeader'
       responses:
         200:
           description: Success
-          schema:
-            type: string
+          content:
+            text/plain:
+              schema:
+                type: string
   /sendValidatedCollection:
     post:
       operationId: sendValidatedCollection
@@ -209,9 +203,9 @@ paths:
       description: A method to send a validated collection in body
       requestBody:
         content:
-          'application/json':
+          application/json:
             schema:
-              name: collection
+              title: collection
               type: array
               items:
                 type: array
@@ -227,17 +221,18 @@ paths:
       operationId: sendSimpleModel
       tags: [ requestBody ]
       description: A method to send a simple model in body
-      parameters:
-        - name: simpleModel
-          in: body
-          required: true
-          schema:
-            $ref: '#/definitions/SimpleModel'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SimpleModel'
       responses:
         200:
           description: Success
-          schema:
-            $ref: '#/definitions/SimpleModel'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SimpleModel'
         default:
           $ref: '#/responses/Error'
   /sendListOfSimpleModels:
@@ -245,37 +240,41 @@ paths:
       operationId: sendListOfSimpleModels
       tags: [ requestBody ]
       description: A method to send a list of simple models in body
-      parameters:
-        - name: simpleModels
-          in: body
-          required: true
-          schema:
-            type: array
-            items:
-              $ref: '#/definitions/SimpleModel'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              required: true
+              type: array
+              title: simpleModels
+              items:
+                $ref: '#/components/schemas/SimpleModel'
       responses:
         200:
           description: Success
-          schema:
-            type: array
-            items:
-              $ref: '#/definitions/SimpleModel'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SimpleModel'
   /sendModelWithRequiredProperties:
     post:
       operationId: sendModelWithRequiredProperties
       tags: [ requestBody ]
       description: A method to send a model with required properties
-      parameters:
-        - name: model
-          in: body
-          required: true
-          schema:
-            $ref: '#/definitions/ModelWithRequiredProperties'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ModelWithRequiredProperties'
       responses:
         200:
           description: Success
-          schema:
-            $ref: '#/definitions/ModelWithRequiredProperties'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ModelWithRequiredProperties'
         default:
           $ref: '#/responses/Error'
   /sendDateModel:
@@ -283,17 +282,18 @@ paths:
       operationId: sendDateModel
       tags: [ requestBody ]
       description: A method to send a model with dates as properties
-      parameters:
-        - name: model
-          in: body
-          required: true
-          schema:
-            $ref: '#/definitions/DateModel'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DateModel'
       responses:
         200:
           description: Success
-          schema:
-            $ref: '#/definitions/DateModel'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DateModel'
         default:
           $ref: '#/responses/Error'
   /sendEnum:
@@ -301,17 +301,19 @@ paths:
       operationId: sendEnum
       tags: [ requestBody ]
       description: A method to send a simple enum in body
-      parameters:
-        - name: color
-          in: body
-          required: true
-          schema:
-            $ref: '#/definitions/ColorEnum'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ColorEnum'
       responses:
         200:
           description: Success
-          schema:
-            $ref: '#/definitions/ColorEnum'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ColorEnum'
         default:
           $ref: '#/responses/Error'
   /sendEnumList:
@@ -319,21 +321,23 @@ paths:
       operationId: sendEnumList
       tags: [ requestBody ]
       description: A method to send an enum list
-      parameters:
-        - name: available-colors
-          in: body
-          required: true
-          schema:
-            type: array
-            items:
-              $ref: '#/definitions/ColorEnum'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/ColorEnum'
       responses:
         200:
           description: Success
-          schema:
-            type: array
-            items:
-              $ref: '#/definitions/ColorEnum'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ColorEnum'
         default:
           $ref: '#/responses/Error'
   /sendModelWithMapProperty:
@@ -341,33 +345,37 @@ paths:
       operationId: sendModelWithMapProperty
       tags: [ requestBody ]
       description: A method to send a model that contains maps
-      parameters:
-        - name: model
-          in: body
-          required: true
-          schema:
-            $ref: '#/definitions/ModelWithMapProperty'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ModelWithMapProperty'
       responses:
         200:
           description: Success
-          schema:
-            $ref: '#/definitions/ModelWithMapProperty'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ModelWithMapProperty'
   /sendNestedModel:
     post:
       operationId: sendNestedModel
       tags: [ requestBody ]
       description: A method to send a model with another one nested as a property
-      parameters:
-        - name: model
-          in: body
-          required: true
-          schema:
-            $ref: '#/definitions/NestedModel'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NestedModel'
       responses:
         200:
           description: Success
-          schema:
-            $ref: '#/definitions/NestedModel'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NestedModel'
         default:
           $ref: '#/responses/Error'
   /sendModelWithInnerEnum:
@@ -375,17 +383,19 @@ paths:
       operationId: sendModelWithInnerEnum
       tags: [ requestBody ]
       description: A method to send a model with an inner enum as property
-      parameters:
-        - name: model
-          in: body
-          required: true
-          schema:
-            $ref: '#/definitions/ModelWithInnerEnum'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ModelWithInnerEnum'
       responses:
         200:
           description: Success
-          schema:
-            $ref: '#/definitions/ModelWithInnerEnum'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ModelWithInnerEnum'
         default:
           $ref: '#/responses/Error'
   /sendModelWithEnumList:
@@ -393,17 +403,19 @@ paths:
       operationId: sendModelWithEnumList
       tags: [ requestBody ]
       description: A method to send a model with an enum list as a property
-      parameters:
-        - name: model
-          in: body
-          required: true
-          schema:
-            $ref: '#/definitions/ModelWithEnumList'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ModelWithEnumList'
       responses:
         200:
           description: Success
-          schema:
-            $ref: '#/definitions/ModelWithEnumList'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ModelWithEnumList'
         default:
           $ref: '#/responses/Error'
   /sendModelWithDiscriminator:
@@ -411,33 +423,42 @@ paths:
       operationId: sendModelWithDiscriminator
       tags: [ requestBody ]
       description: A method to send a model with discriminator in body
-      parameters:
-        - name: model
-          in: body
-          required: true
-          schema:
-            $ref: '#/definitions/Animal'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Animal'
       responses:
         200:
           description: Success
-          schema:
-            $ref: '#/definitions/Animal'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Animal'
   /sendFile:
     put:
       operationId: sendFile
       tags: [ requestBody ]
       description: A method to send file as a request body
-      consumes: [ "multipart/form-data" ]
-      parameters:
-        - in: formData
-          name: file
-          type: file
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
       responses:
         200:
           description: Success
-          schema:
-            type: string
-            format: byte
+          content:
+            application/json:
+              schema:
+                type: string
+                format: byte
         default:
           $ref: '#/responses/Error'
   /sendBytes:
@@ -445,20 +466,20 @@ paths:
       operationId: sendBytes
       tags: [ requestBody ]
       description: A method to send bytes
-      produces: [ "application/octet-stream" ]
-      consumes: [ "application/octet-stream" ]
-      parameters:
-        - in: body
-          name: bytes
-          schema:
-            type: string
-            format: byte
+      requestBody:
+        content:
+          application/octet-stream:
+            schema:
+              type: string
+              format: byte
       responses:
         200:
           description: Success
-          schema:
-            type: string
-            format: byte
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: byte
   /getSimpleModel:
     get:
       operationId: getSimpleModel
@@ -467,8 +488,39 @@ paths:
       responses:
         200:
           description: Success
-          schema:
-            $ref: '#/definitions/SimpleModel'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SimpleModel'
+        default:
+          $ref: '#/responses/Error'
+  /getDateTime:
+    get:
+      operationId: getDateTime
+      tags: [ responseBody ]
+      description: A method to get date time in the response
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: string
+                format: date-time
+        default:
+          $ref: '#/responses/Error'
+  /getDateModel:
+    get:
+      operationId: getDateModel
+      tags: [ responseBody ]
+      description: A method to get a model containing dates in the response
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DateModel'
         default:
           $ref: '#/responses/Error'
   /getSimpleModelWithNonStandardStatus:
@@ -479,29 +531,37 @@ paths:
       responses:
         202:
           description: Success
-          schema:
-            $ref: '#/definitions/SimpleModel'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SimpleModel'
         default:
           $ref: '#/responses/Error'
   /getPaginatedSimpleModel:
     get:
       operationId: getPaginatedSimpleModel
       parameters:
-        - $ref: '#/parameters/PageQueryParam'
+        - $ref: '#/components/parameters/PageQueryParam'
       tags: [ responseBody ]
       description: A method to get a simple model list as a paginated response
       responses:
         200:
           description: Success
           headers:
-            X-Page-Number: *X-Page-Number-header
-            X-Page-Size: *X-Page-Size-header
-            X-Total-Count: *X-Total-Count-header
-            X-Page-Count: *X-Page-Count-header
-          schema:
-            type: array
-            items:
-              $ref: '#/definitions/SimpleModel'
+            X-Page-Number:
+              $ref: '#/components/headers/X-Page-Number'
+            X-Page-Size:
+              $ref: '#/components/headers/X-Page-Size'
+            X-Total-Count:
+              $ref: '#/components/headers/X-Total-Count'
+            X-Page-Count:
+              $ref: '#/components/headers/X-Page-Count'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SimpleModel'
   /getDatedSimpleModel:
     get:
       operationId: getDatedSimpleModel
@@ -511,9 +571,12 @@ paths:
         200:
           description: Success
           headers:
-            Last-Modified: *Last-Modified-header
-          schema:
-            $ref: '#/definitions/SimpleModel'
+            Last-Modified:
+              $ref: '#/components/headers/Last-Modified'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SimpleModel'
   /getSimpleModelWithNonMappedHeader:
     get:
       operationId: getSimpleModelWithNonMappedHeader
@@ -524,10 +587,13 @@ paths:
           description: Success
           headers:
             custom-header:
-              type: string
               description: A header with an additional description
-          schema:
-            $ref: '#/definitions/SimpleModel'
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SimpleModel'
         default:
           $ref: '#/responses/Error'
   /getDatedSimpleModelWithNonMappedHeader:
@@ -539,12 +605,16 @@ paths:
         200:
           description: Success
           headers:
-            Last-Modified: *Last-Modified-header
+            Last-Modified:
+              $ref: '#/components/headers/Last-Modified'
             custom-header:
-              type: string
               description: A custom header
-          schema:
-            $ref: '#/definitions/SimpleModel'
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SimpleModel'
   /getErrorResponse:
     get:
       operationId: getErrorResponse
@@ -553,245 +623,300 @@ paths:
       responses:
         404:
           description: Not Found
-          schema:
-            $ref: '#/definitions/Error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /getFile:
     get:
       operationId: getFile
       tags: [ responseBody ]
       description: A method to get file as a response body
-      produces: [ "text/plain" ]
       responses:
         200:
           description: Success
-          schema:
-            type: file
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
         default:
           $ref: '#/responses/Error'
 
-definitions:
-  SimpleModel:
-    type: object
-    properties:
-      color:
-        type: string
-        minLength: 2
-      numEdges:
-        minimum: 1
-        type: integer
-        format: int64
-      area:
-        minimum: 0
-        exclusiveMinimum: true
-        type: number
-        format: float
-      exactArea:
-        minimum: 0
-        exclusiveMinimum: true
-        type: number
-      convex:
-        type: boolean
-      points:
-        type: array
-        minItems: 3
-        items:
+components:
+  schemas:
+    SendPrimitivesResponse:
+      type: object
+      properties:
+        name:
           type: string
-      state:
-        $ref: '#/definitions/StateEnum'
-  ModelWithRequiredProperties:
-    type: object
-    properties:
-      species:
-        type: string
-      weight:
-        type: number
-        format: float
-      numRepresentatives:
-        type: integer
-        format: int32
-      description:
-        type: string
-    required: [species, weight]
-  DateModel:
-    type: object
-    properties:
-      commitDate:
-        type: string
-        format: date
-      commitDateTime:
-        type: string
-        format: date-time
-  NestedModel:
-    type: object
-    properties:
-      simpleModel:
-        $ref: '#/definitions/SimpleModel'
-      additionalInfo:
-        type: string
-  ModelWithInnerEnum:
-    type: object
-    properties:
-      species-name:
-        type: string
-      num-representatives:
-        type: integer
-        format: int64
-      mammal-order:
-        title: MammalOrder
-        type: string
-        enum: [ monotreme, marsupial, placental ]
-  ModelWithEnumList:
-    type: object
-    properties:
-      favoriteColors:
-        type: array
-        items:
-          $ref: '#/definitions/ColorEnum'
-  ModelWithMapProperty:
-    type: object
-    properties:
-      map:
-        type: object
-        additionalProperties:
+        age:
+          type: number
+        height:
+          type: number
+          format: float
+        isPositive:
+          type: boolean
+    SendDatesResponse:
+      type: object
+      properties:
+        commitDate:
           type: string
-      deepMap:
-        type: object
-        additionalProperties:
+          format: date
+        commitDateTime:
+          type: string
+          format: date-time
+    SimpleModel:
+      type: object
+      properties:
+        color:
+          type: string
+          minLength: 2
+        numEdges:
+          minimum: 1
+          type: integer
+          format: int64
+        area:
+          minimum: 0
+          exclusiveMinimum: true
+          type: number
+          format: float
+        exactArea:
+          minimum: 0
+          exclusiveMinimum: true
+          type: number
+        convex:
+          type: boolean
+        points:
+          type: array
+          minItems: 3
+          items:
+            type: string
+        state:
+          $ref: '#/components/schemas/StateEnum'
+    ModelWithRequiredProperties:
+      type: object
+      properties:
+        species:
+          type: string
+        weight:
+          type: number
+          format: float
+        numRepresentatives:
+          type: integer
+          format: int32
+        description:
+          type: string
+      required: [species, weight]
+    DateModel:
+      type: object
+      properties:
+        commitDate:
+          type: string
+          format: date
+        commitDateTime:
+          type: string
+          format: date-time
+    NestedModel:
+      type: object
+      properties:
+        simpleModel:
+          $ref: '#/components/schemas/SimpleModel'
+        additionalInfo:
+          type: string
+    ModelWithInnerEnum:
+      type: object
+      properties:
+        species-name:
+          type: string
+        num-representatives:
+          type: integer
+          format: int64
+        mammal-order:
+          title: MammalOrder
+          type: string
+          enum: [ monotreme, marsupial, placental ]
+    ModelWithEnumList:
+      type: object
+      properties:
+        favoriteColors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ColorEnum'
+    ModelWithMapProperty:
+      type: object
+      properties:
+        map:
           type: object
           additionalProperties:
-            minLength: 2
             type: string
-      deepObjectMap:
-        type: object
-        additionalProperties:
+        deepMap:
           type: object
           additionalProperties:
             type: object
-            $ref: '#/definitions/SimpleModel'
-  StateEnum:
-    type: string
-    enum: ['starting', 'running', 'stopped', 'deleted']
-  Animal:
-    type: object
-    discriminator: class
-    properties:
-      class:
-        type: string
-      color:
-        $ref: '#/definitions/ColorEnum'
-  Bird:
-    type: object
-    allOf:
-      - $ref: '#/definitions/Animal'
-      - discriminator: ave
-        properties:
-          numWings:
-            type: integer
-            format: int32
-          beakLength:
-            type: number
-          featherDescription:
-            type: string
-  Mammal:
-    type: object
-    required: [ weight, description ]
-    allOf:
-      - $ref: '#/definitions/Animal'
-      - discriminator: mammalia
-        properties:
-          weight:
-            type: number
-            format: float
-          description:
-            type: string
-  Reptile:
-    type: object
-    required: [numLegs, fangs]
-    allOf:
-      - $ref: '#/definitions/Animal'
-      - discriminator: reptilia
-        properties:
-          numLegs:
-            type: integer
-          fangs:
-            type: boolean
-          fangDescription:
-            type: string
-  ColorEnum:
-    type: string
-    enum: ['red', 'blue', 'green', 'light-blue', 'dark-green']
-  ProxyFleetSummary:
-    type: object
-    description: proxy fleet summary object
-    properties:
-      proxyFleetName:
-        type: string
-        description: The unique name of the splat proxy fleet.
-      compartmentId:
-        type: string
-        description: The compartment id
-      location:
-        type: string
-        description: the location of the fleet, SUBSTRATE/OVERLAY
-        enum: [SUBSTRATE, OVERLAY]
-      lifecycleState:
-        type: string
-        description: the status of the fleet, ACTIVE/DELETED
-        enum: [ACTIVE, DELETED]
-      services:
-        type: array
-        description: an array of service names on the fleet
-        items:
+            additionalProperties:
+              minLength: 2
+              type: string
+        deepObjectMap:
+          type: object
+          additionalProperties:
+            type: object
+            additionalProperties:
+              $ref: '#/components/schemas/SimpleModel'
+    StateEnum:
+      type: string
+      enum: ['starting', 'running', 'stopped', 'deleted']
+    Animal:
+      type: object
+      discriminator:
+        propertyName: class
+        mapping:
+          ave: '#/components/schemas/Bird'
+          mammalia: '#/components/schemas/Mammal'
+          reptilia: '#/components/schemas/Reptile'
+      properties:
+        class:
           type: string
-  Error:
-    type: object
-    description: An object for describing errors
-    properties:
-      message:
+        color:
+          $ref: '#/components/schemas/ColorEnum'
+    Bird:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/Animal'
+      properties:
+        numWings:
+          type: integer
+          format: int32
+        beakLength:
+          type: number
+        featherDescription:
+          type: string
+    Mammal:
+      type: object
+      required: [ weight, description ]
+      allOf:
+        - $ref: '#/components/schemas/Animal'
+      properties:
+        weight:
+          type: number
+          format: float
+        description:
+          type: string
+    Reptile:
+      type: object
+      required: [numLegs, fangs]
+      allOf:
+        - $ref: '#/components/schemas/Animal'
+      properties:
+        numLegs:
+          type: integer
+        fangs:
+          type: boolean
+        fangDescription:
+          type: string
+    ColorEnum:
+      type: string
+      enum: ['red', 'blue', 'green', 'light-blue', 'dark-green']
+    ProxyFleetSummary:
+      type: object
+      description: proxy fleet summary object
+      properties:
+        proxyFleetName:
+          type: string
+          description: The unique name of the splat proxy fleet.
+        compartmentId:
+          type: string
+          description: The compartment id
+        location:
+          type: string
+          description: the location of the fleet, SUBSTRATE/OVERLAY
+          enum: [SUBSTRATE, OVERLAY]
+        lifecycleState:
+          type: string
+          description: the status of the fleet, ACTIVE/DELETED
+          enum: [ACTIVE, DELETED]
+        services:
+          type: array
+          description: an array of service names on the fleet
+          items:
+            type: string
+    Error:
+      type: object
+      description: An object for describing errors
+      properties:
+        message:
+          type: string
+          description: The error message
+
+  parameters:
+    PageQueryParam:
+      name: page
+      in: query
+      description: The page number to retrieve starting from 0.
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+    PageSizeQueryParam:
+      name: size
+      in: query
+      description: The number of items per page.
+      schema:
+        type: integer
+        minimum: 1
+        default: 10
+    PageSortQueryParam:
+      name: sortOrder
+      in: query
+      description: |
+        Parameter describing the sort. Allows specifying the sorting direction using the keywords {@code asc} and
+        {@code desc} after each property. For example, {@code "sort=name desc,age"} will sort by name in descending
+        order and age in ascending.
+      schema:
         type: string
-        description: The error message
+    FilterHeader:
+      name: Filter
+      in: header
+      description: |
+        A filter parameter that allows filtering the response. The conditions are comma separated and
+        must be of type [property][comparator][value] where comparator is one of =, < and >.
+      schema:
+        type: string
 
-parameters:
-  PageQueryParam:
-    name: page
-    in: query
-    type: integer
-    minimum: 0
-    default: 0
-    description: The page number to retrieve starting from 0.
-  PageSizeQueryParam:
-    name: size
-    in: query
-    type: integer
-    minimum: 1
-    default: 10
-    description: The number of items per page.
-  PageSortQueryParam:
-    name: sortOrder
-    in: query
-    type: string
-    description: |
-      Parameter describing the sort. Allows specifying the sorting direction using the keywords {@code asc} and
-      {@code desc} after each property. For example, {@code "sort=name desc,age"} will sort by name in descending
-      order and age in ascending.
-  FilterHeader:
-    name: Filter
-    in: header
-    type: string
-    description: |
-      A filter parameter that allows filtering the response. The conditions are comma separated and
-      must be of type [property][comparator][value] where comparator is one of =, < and >.
+  responses:
+    Error:
+      description: An unexpected error has occurred
+    400:
+      description: Bad Request
+    401:
+      description: Unauthorized
+    404:
+      description: Not Found
+    500:
+      description: Internal Server Error
+    default:
+      description: Unknown Error
 
-responses:
-  Error:
-    description: An unexpected error has occurred
-  400:
-    description: Bad Request
-  401:
-    description: Unauthorized
-  404:
-    description: Not Found
-  500:
-    description: Internal Server Error
-  default:
-    description: Unknown Error
+  headers:
+    X-Page-Number:
+      description: The page number of the current page
+      schema:
+        type: string
+    X-Page-Size:
+      description: The number of items per page
+      schema:
+        type: string
+    X-Total-Count:
+      description: |
+        The total number of items available in the entire collections, not just the items returned in the current page
+      schema:
+        type: string
+    X-Page-Count:
+      description: The total number of pages based on the page size and total count
+      schema:
+        type: string
+    Last-Modified:
+      description: The last time an entity returned with the response was modified.
+      schema:
+        type: string
+        format: date-time

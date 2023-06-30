@@ -4,17 +4,18 @@ import io.micronaut.core.type.Argument
 import io.micronaut.http.HttpRequest
 import io.micronaut.http.HttpResponse
 import io.micronaut.http.HttpStatus
-import io.micronaut.http.MediaType
 import io.micronaut.http.client.BlockingHttpClient
 import io.micronaut.http.client.HttpClient
 import io.micronaut.http.client.annotation.Client
 import io.micronaut.http.client.exceptions.HttpClientResponseException
+import io.micronaut.openapi.test.model.DateModel
 import io.micronaut.openapi.test.model.SimpleModel
 import io.micronaut.runtime.server.EmbeddedServer
 import io.micronaut.test.extensions.spock.annotation.MicronautTest
 import jakarta.inject.Inject
-import spock.lang.Ignore
 import spock.lang.Specification
+
+import java.time.ZonedDateTime
 
 @MicronautTest
 class ResponseBodyControllerSpec extends Specification {
@@ -39,6 +40,36 @@ class ResponseBodyControllerSpec extends Specification {
         then:
         HttpStatus.OK == response.status
         ResponseBodyController.SIMPLE_MODEL == response.body()
+    }
+
+    void "test get date time"() {
+        when:
+        HttpResponse<ZonedDateTime> response = client.exchange("/getDateTime", ZonedDateTime)
+
+        then:
+        HttpStatus.OK == response.status()
+        ResponseBodyController.DATE_TIME_INSTANCE == response.body()
+
+        when:
+        String stringResponse = client.retrieve("/getDateTime", String)
+
+        then:
+        '"2022-12-04T06:35:00.784-05:00[America/Toronto]"' == stringResponse
+    }
+
+    void "test get date model"() {
+        when:
+        HttpResponse<DateModel> response = client.exchange("/getDateModel", DateModel)
+
+        then:
+        HttpStatus.OK == response.status()
+        ResponseBodyController.DATE_MODEL_INSTANCE == response.body()
+
+        when:
+        String strResponse = client.retrieve("/getDateModel", String)
+
+        then:
+        '{"commitDate":"2023-06-27","commitDateTime":"2022-12-04T06:35:00.784-05:00[America/Toronto]"}' == strResponse
     }
 
     void "test get paginated simple model"() {
@@ -108,10 +139,9 @@ class ResponseBodyControllerSpec extends Specification {
         HttpStatus.NOT_FOUND == e.status
     }
 
-    @Ignore("Requires fixing")
     void "test get file"() {
         given:
-        HttpRequest<?> request = HttpRequest.GET("/getFile").contentType(MediaType.MULTIPART_FORM_DATA_TYPE)
+        HttpRequest<?> request = HttpRequest.GET("/getFile")
 
         when:
         Argument<byte[]> arg = Argument.of(byte[])

@@ -19,9 +19,6 @@ class JavaMicronautClientCodegenSerializationLibraryTest extends AbstractMicrona
         assertFileNotContains(modelPath + "Order.java", micronautSerDeAnnotation);
         assertFileNotContains(modelPath + "Tag.java", micronautSerDeAnnotation);
         assertFileNotContains(modelPath + "Category.java", micronautSerDeAnnotation);
-
-        //JsonFormat with jackson must be with shape attribute
-        assertFileContains(modelPath + "Order.java", "@JsonFormat(shape = JsonFormat.Shape.STRING");
     }
 
     /**
@@ -44,8 +41,5 @@ class JavaMicronautClientCodegenSerializationLibraryTest extends AbstractMicrona
         assertFileContains(modelPath + "Order.java", micronautSerdeAnnotation);
         assertFileContains(modelPath + "Tag.java", micronautSerdeAnnotation);
         assertFileContains(modelPath + "Category.java", micronautSerdeAnnotation);
-
-        //JsonFormat with micronaut-serde-jackson must be without shape attribute
-        assertFileNotContains(modelPath + "Order.java", "@JsonFormat(shape = JsonFormat.Shape.STRING");
     }
 }

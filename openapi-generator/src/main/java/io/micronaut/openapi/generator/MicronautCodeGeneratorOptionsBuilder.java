@@ -112,5 +112,29 @@ public interface MicronautCodeGeneratorOptionsBuilder {
      */
     MicronautCodeGeneratorOptionsBuilder withTestFramework(MicronautCodeGeneratorEntryPoint.TestFramework testFramework);
 
+    /**
+     * Configure the serialization library.
+     *
+     * @param library the serialization library.
+     * @return this builder
+     */
     MicronautCodeGeneratorOptionsBuilder withSerializationLibrary(SerializationLibraryKind library);
+
+    /**
+     * Configure the date-time format.
+     *
+     * @param format the date-time format.
+     * @return this builder
+     */
+    MicronautCodeGeneratorOptionsBuilder withDateTimeFormat(DateTimeFormat format);
+
+    /**
+     * The possible date-time formatting configurations.
+     */
+    enum DateTimeFormat {
+        OFFSET_DATETIME,
+        ZONED_DATETIME,
+        LOCAL_DATETIME;
+    }
+
 }
