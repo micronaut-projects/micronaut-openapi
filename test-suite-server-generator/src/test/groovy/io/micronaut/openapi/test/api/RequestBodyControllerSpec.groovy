@@ -324,10 +324,10 @@ class RequestBodyControllerSpec extends Specification {
         discriminatorName | model
         BIRD_DISCRIMINATOR | new Bird().beakLength(BigDecimal.valueOf(12, 1))
                 .featherDescription("Large blue and white feathers").numWings(2).color(ColorEnum.BLUE)
-        MAMMAL_DISCRIMINATOR | new Mammal().weight(20.5f)
-                .description("A typical Canadian beaver").color(ColorEnum.BLUE)
-        REPTILE_DISCRIMINATOR | new Reptile().fangs(true).fangDescription("A pair of venomous fangs")
-                .numLegs(0).color(ColorEnum.BLUE)
+        MAMMAL_DISCRIMINATOR | new Mammal(20.5f, "A typical Canadian beaver").color(ColorEnum.BLUE)
+        REPTILE_DISCRIMINATOR | new Reptile(0, true)
+                .fangDescription("A pair of venomous fangs")
+                .color(ColorEnum.BLUE)
     }
 
     void "test send bytes"() {

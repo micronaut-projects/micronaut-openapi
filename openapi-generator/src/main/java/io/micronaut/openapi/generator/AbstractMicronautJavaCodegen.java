@@ -20,6 +20,7 @@ import com.samskivert.mustache.Mustache;
 import com.samskivert.mustache.Template;
 import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.media.Schema;
+import io.swagger.v3.oas.models.parameters.Parameter;
 import io.swagger.v3.oas.models.servers.Server;
 import org.apache.commons.lang3.StringUtils;
 import org.openapitools.codegen.CliOption;
@@ -596,6 +597,18 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
         codegenModel.imports.remove("ApiModel");
         codegenModel.imports.remove("ApiModelProperty");
         return codegenModel;
+    }
+
+    @Override
+    public CodegenParameter fromParameter(Parameter param, Set<String> imports) {
+        CodegenParameter parameter = super.fromParameter(param, imports);
+        return parameter;
+    }
+
+    @Override
+    public boolean getUseInlineModelResolver() {
+        // This will allow TODO
+        return false;
     }
 
     @Override

@@ -28,7 +28,7 @@ public class RequestBodyController implements RequestBodyApi {
     }
 
     @Override
-    public Mono<Void> sendValidatedCollection() {
+    public Mono<Void> sendValidatedCollection(List<List<String>> collection) {
         return Mono.empty();
     }
 

@@ -1,5 +1,6 @@
 package io.micronaut.openapi.test.api;
 
+import io.micronaut.openapi.test.model.ColorEnum;
 import io.micronaut.data.model.Pageable;
 import io.micronaut.data.model.Sort;
 import io.micronaut.openapi.test.filter.MyFilter;
@@ -41,6 +42,11 @@ public class ParametersController implements ParametersApi {
         return Mono.just(new SendDatesResponse()
                 .commitDate(commitDate)
                 .commitDateTime(commitDateTime));
+    }
+
+    @Override
+    public Mono<ColorEnum> sendParameterEnum(ColorEnum colorParam) {
+        return Mono.just(colorParam);
     }
 
     @Override

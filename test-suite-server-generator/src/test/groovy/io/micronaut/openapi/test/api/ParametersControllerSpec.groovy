@@ -8,6 +8,7 @@ import io.micronaut.http.client.BlockingHttpClient
 import io.micronaut.http.client.HttpClient
 import io.micronaut.http.client.annotation.Client
 import io.micronaut.http.client.exceptions.HttpClientResponseException
+import io.micronaut.openapi.test.model.ColorEnum
 import io.micronaut.runtime.server.EmbeddedServer
 import io.micronaut.test.extensions.spock.annotation.MicronautTest
 import jakarta.inject.Inject
@@ -108,6 +109,31 @@ class ParametersControllerSpec extends Specification {
         "favoriteNumber=100.6" | "favoriteNumber: must be less than or equal to 100.5"
         "height=0"             | "height: must be greater than or equal to 0.1"
         "height=100"           | "height: must be less than or equal to 3"
+    }
+
+    void "test send parameter enum #color"() {
+        given:
+        HttpRequest<?> request = HttpRequest.GET("/sendParameterEnum?colorParam=${color.value}")
+
+        when:
+        ColorEnum response = client.retrieve(request, Argument.of(ColorEnum))
+
+        then:
+        color == response
+
+        when:
+        String stringResponse = client.retrieve(request, Argument.of(String))
+
+        then:
+        '"' + color.value + '"' == stringResponse
+
+        where:
+        color                | _
+        ColorEnum.BLUE       | _
+        ColorEnum.RED        | _
+        ColorEnum.GREEN      | _
+        ColorEnum.LIGHT_BLUE | _
+        ColorEnum.DARK_GREEN | _
     }
 
     void "test send dates"() {
