@@ -81,7 +81,7 @@ class MicronautServerCodegenTest extends AbstractMicronautCodegenTest {
     void doUseValidationParam() {
         JavaMicronautServerCodegen codegen = new JavaMicronautServerCodegen();
         codegen.additionalProperties().put(JavaMicronautServerCodegen.USE_BEANVALIDATION, "true");
-        String outputPath = generateFiles(codegen, "../test-suite-server-generator/spec.yaml",
+        String outputPath = generateFiles(codegen, PETSTORE_PATH,
             CodegenConstants.APIS);
 
         // Files are not generated
