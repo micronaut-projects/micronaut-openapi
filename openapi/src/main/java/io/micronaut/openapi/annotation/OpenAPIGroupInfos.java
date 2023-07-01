@@ -23,17 +23,17 @@ import java.lang.annotation.Target;
 import static java.lang.annotation.RetentionPolicy.SOURCE;
 
 /**
- * Allows {@link OpenAPIInclude} to be repeatable.
+ * Allows {@link OpenAPIGroupInfo} to be repeatable.
  *
- * @author Denis Stepanov
+ * @since 4.10.0
  */
 @Documented
 @Retention(SOURCE)
-@Target({ElementType.TYPE, ElementType.ANNOTATION_TYPE})
-public @interface OpenAPIIncludes {
+@Target({ElementType.PACKAGE, ElementType.TYPE, ElementType.ANNOTATION_TYPE})
+public @interface OpenAPIGroupInfos {
 
     /**
-     * @return A group of {@link OpenAPIInclude}
+     * @return An array of {@link OpenAPIGroupInfo}
      */
-    OpenAPIInclude[] value() default {};
+    OpenAPIGroupInfo[] value() default {};
 }

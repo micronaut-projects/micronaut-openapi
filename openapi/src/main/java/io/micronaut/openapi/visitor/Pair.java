@@ -28,6 +28,8 @@ import java.util.stream.Collectors;
  */
 public final class Pair<S, T> {
 
+    public static final Pair<String, String> NULL_STRING_PAIR = Pair.of(null, null);
+
     private final S first;
     private final T second;
 

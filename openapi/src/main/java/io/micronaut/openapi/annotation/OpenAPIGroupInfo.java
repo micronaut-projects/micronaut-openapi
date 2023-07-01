@@ -17,23 +17,42 @@ package io.micronaut.openapi.annotation;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
+import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
+
+import io.micronaut.context.annotation.AliasFor;
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 
 import static java.lang.annotation.RetentionPolicy.SOURCE;
 
 /**
- * Allows {@link OpenAPIInclude} to be repeatable.
+ * With this annotation, you can specify the OpenAPIDefinition description that will be inserted
+ * into a specific swagger file, only for this group. Thus, you can make different descriptions
+ * for different groups.
  *
- * @author Denis Stepanov
+ * @since 4.10.0
  */
-@Documented
+@Repeatable(OpenAPIGroupInfos.class)
 @Retention(SOURCE)
-@Target({ElementType.TYPE, ElementType.ANNOTATION_TYPE})
-public @interface OpenAPIIncludes {
+@Documented
+@Target({ElementType.PACKAGE, ElementType.TYPE, ElementType.ANNOTATION_TYPE})
+public @interface OpenAPIGroupInfo {
 
     /**
-     * @return A group of {@link OpenAPIInclude}
+     * @return The names of the OpenAPi groups.
      */
-    OpenAPIInclude[] value() default {};
+    @AliasFor(member = "names")
+    String[] value() default {};
+
+    /**
+     * @return The names of the OpenAPi groups.
+     */
+    @AliasFor(member = "value")
+    String[] names() default {};
+
+    /**
+     * @return OpenAPI object describing information about group.
+     */
+    OpenAPIDefinition info();
 }

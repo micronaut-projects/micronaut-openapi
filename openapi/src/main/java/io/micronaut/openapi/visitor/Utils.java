@@ -21,9 +21,11 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import io.micronaut.context.env.DefaultPropertyPlaceholderResolver;
 import io.micronaut.context.env.PropertyPlaceholderResolver;
@@ -36,6 +38,8 @@ import io.micronaut.core.value.PropertyResolver;
 import io.micronaut.http.MediaType;
 import io.micronaut.inject.visitor.VisitorContext;
 import io.micronaut.openapi.javadoc.JavadocParser;
+import io.micronaut.openapi.visitor.group.EndpointInfo;
+import io.micronaut.openapi.visitor.group.OpenApiInfo;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 
@@ -56,8 +60,28 @@ public final class Utils {
 
     public static final List<MediaType> DEFAULT_MEDIA_TYPES = Collections.singletonList(MediaType.APPLICATION_JSON_TYPE);
 
+    private static Set<String> allKnownVersions;
+    private static Set<String> allKnownGroups;
+    private static Map<String, List<EndpointInfo>> endpointInfos;
+    /**
+     * Groups openAPI objects, described by OpenAPIDefinition annotations.
+     */
+    private static Map<String, OpenAPI> openApis;
+    /**
+     * Group names by included controller or endpoint class names with OpenAPIInclude annotation.
+     */
+    private static Map<String, List<String>> includedClassesGroups;
+    /**
+     * Excluded group names by included controller or endpoint class names with OpenAPIInclude annotation.
+     */
+    private static Map<String, List<String>> includedClassesGroupsExcluded;
+
     private static PropertyPlaceholderResolver propertyPlaceholderResolver;
     private static OpenAPI testReference;
+    /**
+     * OpenAPI objects by key - {@code Pair.of(group, version)}.
+     */
+    private static Map<Pair<String, String>, OpenApiInfo> testReferences;
     private static String testFileName;
     private static String testYamlReference;
     private static String testJsonReference;
@@ -192,6 +216,14 @@ public final class Utils {
         Utils.testReference = testReference;
     }
 
+    public static Map<Pair<String, String>, OpenApiInfo> getTestReferences() {
+        return testReferences;
+    }
+
+    public static void setTestReferences(Map<Pair<String, String>, OpenApiInfo> testReferences) {
+        Utils.testReferences = testReferences;
+    }
+
     public static String getTestYamlReference() {
         return testYamlReference;
     }
@@ -222,5 +254,75 @@ public final class Utils {
 
     public static void setJavadocParser(JavadocParser javadocParser) {
         Utils.javadocParser = javadocParser;
+    }
+
+    public static Set<String> getAllKnownVersions() {
+        if (allKnownVersions == null) {
+            allKnownVersions = new HashSet<>();
+        }
+        return allKnownVersions;
+    }
+
+    public static void setAllKnownVersions(Set<String> allKnownVersions) {
+        Utils.allKnownVersions = allKnownVersions;
+    }
+
+    public static Set<String> getAllKnownGroups() {
+        if (allKnownGroups == null) {
+            allKnownGroups = new HashSet<>();
+        }
+        return allKnownGroups;
+    }
+
+    public static void setAllKnownGroups(Set<String> allKnownGroups) {
+        Utils.allKnownGroups = allKnownGroups;
+    }
+
+    public static Map<String, List<EndpointInfo>> getEndpointInfos() {
+        return endpointInfos;
+    }
+
+    public static void setEndpointInfos(Map<String, List<EndpointInfo>> endpointInfos) {
+        Utils.endpointInfos = endpointInfos;
+    }
+
+    public static Map<String, OpenAPI> getOpenApis() {
+        return openApis;
+    }
+
+    public static void setOpenApis(Map<String, OpenAPI> openApis) {
+        Utils.openApis = openApis;
+    }
+
+    public static Map<String, List<String>> getIncludedClassesGroups() {
+        return includedClassesGroups;
+    }
+
+    public static void setIncludedClassesGroups(Map<String, List<String>> includedClassesGroups) {
+        Utils.includedClassesGroups = includedClassesGroups;
+    }
+
+    public static Map<String, List<String>> getIncludedClassesGroupsExcluded() {
+        return includedClassesGroupsExcluded;
+    }
+
+    public static void setIncludedClassesGroupsExcluded(Map<String, List<String>> includedClassesGroupsExcluded) {
+        Utils.includedClassesGroupsExcluded = includedClassesGroupsExcluded;
+    }
+
+    public static void clean() {
+        openApis = null;
+        endpointInfos = null;
+        includedClassesGroups = null;
+        includedClassesGroupsExcluded = null;
+
+        allKnownGroups = null;
+        allKnownVersions = null;
+
+        testReference = null;
+        testReferences = null;
+        testFileName = null;
+        testYamlReference = null;
+        testJsonReference = null;
     }
 }

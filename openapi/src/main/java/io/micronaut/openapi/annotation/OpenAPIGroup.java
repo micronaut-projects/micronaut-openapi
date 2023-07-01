@@ -20,20 +20,35 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
+import io.micronaut.context.annotation.AliasFor;
+
 import static java.lang.annotation.RetentionPolicy.SOURCE;
 
 /**
- * Allows {@link OpenAPIInclude} to be repeatable.
+ * With this annotation, you can specify one or more groups that this endpoint will be included in,
+ * as well as specify groups from which this endpoint should be excluded.
  *
- * @author Denis Stepanov
+ * @since 4.10.0
  */
-@Documented
 @Retention(SOURCE)
-@Target({ElementType.TYPE, ElementType.ANNOTATION_TYPE})
-public @interface OpenAPIIncludes {
+@Documented
+@Target({ElementType.PACKAGE, ElementType.TYPE, ElementType.METHOD})
+public @interface OpenAPIGroup {
 
     /**
-     * @return A group of {@link OpenAPIInclude}
+     * @return The names of the OpenAPi groups.
      */
-    OpenAPIInclude[] value() default {};
+    @AliasFor(member = "names")
+    String[] value() default {};
+
+    /**
+     * @return The names of the OpenAPi groups.
+     */
+    @AliasFor(member = "value")
+    String[] names() default {};
+
+    /**
+     * @return The names of the OpenAPi groups to exclude endpoints from.
+     */
+    String[] exclude() default {};
 }
