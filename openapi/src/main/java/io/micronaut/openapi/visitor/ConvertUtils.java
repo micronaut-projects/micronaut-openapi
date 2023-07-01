@@ -153,12 +153,10 @@ public final class ConvertUtils {
             CharSequence key = entry.getKey();
             Object value = entry.getValue();
 
-            if (value instanceof AnnotationValue) {
-                AnnotationValue<?> av = (AnnotationValue<?>) value;
+            if (value instanceof AnnotationValue<?> av) {
                 final Map<CharSequence, Object> valueMap = toValueMap(av.getValues(), context);
                 newValues.put(key, valueMap);
-            } else if (value instanceof AnnotationClassValue) {
-                AnnotationClassValue<?> acv = (AnnotationClassValue<?>) value;
+            } else if (value instanceof AnnotationClassValue<?> acv) {
                 acv.getType().ifPresent(aClass -> newValues.put(key, aClass));
             } else if (value != null) {
                 if (value.getClass().isArray()) {
@@ -224,8 +222,7 @@ public final class ConvertUtils {
 
                                     List<Object> list = new ArrayList<>();
                                     for (Object o : a) {
-                                        if (o instanceof AnnotationValue) {
-                                            final AnnotationValue<?> av = (AnnotationValue<?>) o;
+                                        if (o instanceof AnnotationValue<?> av) {
                                             final Map<CharSequence, Object> valueMap = toValueMap(av.getValues(), context);
                                             list.add(valueMap);
                                         } else {
@@ -250,8 +247,7 @@ public final class ConvertUtils {
     }
 
     public static Optional<Object> parseJsonString(Object object) {
-        if (object instanceof String) {
-            String string = (String) object;
+        if (object instanceof String string) {
             try {
                 return Optional.of(ConvertUtils.getConvertJsonMapper().readValue(string, Map.class));
             } catch (IOException e) {

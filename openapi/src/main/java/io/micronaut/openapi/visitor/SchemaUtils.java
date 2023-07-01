@@ -100,33 +100,28 @@ public final class SchemaUtils {
 
     public static final String TYPE_OBJECT = "object";
 
-    private static final List<Schema<?>> ALL_EMPTY_SCHEMAS;
+    private static final List<Schema<?>> ALL_EMPTY_SCHEMAS = List.of(
+        EMPTY_SCHEMA,
+        EMPTY_ARRAY_SCHEMA,
+        EMPTY_BINARY_SCHEMA,
+        EMPTY_BOOLEAN_SCHEMA,
+        EMPTY_BYTE_ARRAY_SCHEMA,
+        EMPTY_COMPOSED_SCHEMA,
+        EMPTY_DATE_SCHEMA,
+        EMPTY_DATE_TIME_SCHEMA,
+        EMPTY_EMAIL_SCHEMA,
+        EMPTY_FILE_SCHEMA,
+        EMPTY_INTEGER_SCHEMA,
+        EMPTY_JSON_SCHEMA,
+        EMPTY_MAP_SCHEMA,
+        EMPTY_NUMBER_SCHEMA,
+        EMPTY_OBJECT_SCHEMA,
+        EMPTY_PASSWORD_SCHEMA,
+        EMPTY_STRING_SCHEMA,
+        EMPTY_UUID_SCHEMA,
+        EMPTY_SIMPLE_SCHEMA
+    );
     private static final String PREFIX_X = "x-";
-
-    static {
-        List<Schema<?>> schemas = new ArrayList<>();
-        schemas.add(EMPTY_SCHEMA);
-        schemas.add(EMPTY_ARRAY_SCHEMA);
-        schemas.add(EMPTY_BINARY_SCHEMA);
-        schemas.add(EMPTY_BOOLEAN_SCHEMA);
-        schemas.add(EMPTY_BYTE_ARRAY_SCHEMA);
-        schemas.add(EMPTY_COMPOSED_SCHEMA);
-        schemas.add(EMPTY_DATE_SCHEMA);
-        schemas.add(EMPTY_DATE_TIME_SCHEMA);
-        schemas.add(EMPTY_EMAIL_SCHEMA);
-        schemas.add(EMPTY_FILE_SCHEMA);
-        schemas.add(EMPTY_INTEGER_SCHEMA);
-        schemas.add(EMPTY_JSON_SCHEMA);
-        schemas.add(EMPTY_MAP_SCHEMA);
-        schemas.add(EMPTY_NUMBER_SCHEMA);
-        schemas.add(EMPTY_OBJECT_SCHEMA);
-        schemas.add(EMPTY_PASSWORD_SCHEMA);
-        schemas.add(EMPTY_STRING_SCHEMA);
-        schemas.add(EMPTY_UUID_SCHEMA);
-        schemas.add(EMPTY_SIMPLE_SCHEMA);
-
-        ALL_EMPTY_SCHEMAS = Collections.unmodifiableList(schemas);
-    }
 
     private SchemaUtils() {
     }
@@ -195,7 +190,7 @@ public final class SchemaUtils {
         return schemas;
     }
 
-    public static ArraySchema arraySchema(Schema schema) {
+    public static ArraySchema arraySchema(Schema<?> schema) {
         if (schema == null) {
             return null;
         }
@@ -214,26 +209,17 @@ public final class SchemaUtils {
             return null;
         }
 
-        switch (httpMethod) {
-            case GET:
-                return pathItem.getGet();
-            case POST:
-                return pathItem.getPost();
-            case PUT:
-                return pathItem.getPut();
-            case PATCH:
-                return pathItem.getPatch();
-            case DELETE:
-                return pathItem.getDelete();
-            case HEAD:
-                return pathItem.getHead();
-            case OPTIONS:
-                return pathItem.getOptions();
-            case TRACE:
-                return pathItem.getTrace();
-            default:
-                return null;
-        }
+        return switch (httpMethod) {
+            case GET -> pathItem.getGet();
+            case POST -> pathItem.getPost();
+            case PUT -> pathItem.getPut();
+            case PATCH -> pathItem.getPatch();
+            case DELETE -> pathItem.getDelete();
+            case HEAD -> pathItem.getHead();
+            case OPTIONS -> pathItem.getOptions();
+            case TRACE -> pathItem.getTrace();
+            default -> null;
+        };
     }
 
     public static void setOperationOnPathItem(PathItem pathItem, HttpMethod httpMethod, Operation operation) {
@@ -241,24 +227,14 @@ public final class SchemaUtils {
             return;
         }
         switch (httpMethod) {
-            case GET:
-                pathItem.setGet(operation);
-                break;
-            case POST:
-                pathItem.setPost(operation);
-                break;
-            case PUT:
-                pathItem.setPut(operation);
-                break;
-            case DELETE:
-                pathItem.setDelete(operation);
-                break;
-            case PATCH:
-                pathItem.setPatch(operation);
-                break;
-            default:
+            case GET -> pathItem.setGet(operation);
+            case POST -> pathItem.setPost(operation);
+            case PUT -> pathItem.setPut(operation);
+            case DELETE -> pathItem.setDelete(operation);
+            case PATCH -> pathItem.setPatch(operation);
+            default -> {
                 // do nothing
-                break;
+            }
         }
     }
 
@@ -455,17 +431,6 @@ public final class SchemaUtils {
         } else if (CollectionUtils.isNotEmpty(l2.getExtensions())) {
             l2.getExtensions().putAll(l1.getExtensions());
             l1.setExtensions(l2.getExtensions());
-        }
-
-        if (CollectionUtils.isEmpty(l1.getHeaders())) {
-            l1.setHeaders(l2.getHeaders());
-        } else if (CollectionUtils.isNotEmpty(l2.getHeaders())) {
-            for (Map.Entry<String, Header> entry1 : l1.getHeaders().entrySet()) {
-                Header h2 = l2.getHeaders().get(entry1.getKey());
-                entry1.setValue(mergeHeader(entry1.getValue(), h2));
-            }
-            l2.getHeaders().putAll(l1.getHeaders());
-            l1.setHeaders(l2.getHeaders());
         }
 
         return l1;

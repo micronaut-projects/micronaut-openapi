@@ -749,19 +749,17 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         String valueStr = value.toString();
         GroupProperties groupProperties = groupPropertiesMap.computeIfAbsent(groupName, GroupProperties::new);
         switch (propertyName.toLowerCase()) {
-            case "display-name":
-            case "displayname":
+            case "displayname", "display-name" -> {
                 if (groupProperties.getDisplayName() == null) {
                     groupProperties.setDisplayName(valueStr);
                 }
-                break;
-            case "file-name":
-            case "filename":
+            }
+            case "filename", "file-name" -> {
                 if (groupProperties.getFilename() == null) {
                     groupProperties.setFilename(valueStr);
                 }
-                break;
-            case "packages":
+            }
+            case "packages" -> {
                 if (groupProperties.getPackages() == null) {
                     List<PackageProperties> packages = new ArrayList<>();
                     for (String groupPackage : valueStr.split(",")) {
@@ -769,20 +767,18 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                     }
                     groupProperties.setPackages(packages);
                 }
-                break;
-            case "primary":
+            }
+            case "primary" -> {
                 if (groupProperties.getPrimary() == null) {
                     groupProperties.setPrimary(Boolean.valueOf(valueStr));
                 }
-                break;
-            case "commonexclude":
-            case "common-exclude":
+            }
+            case "commonexclude", "common-exclude" -> {
                 if (groupProperties.getCommonExclude() == null) {
                     groupProperties.setCommonExclude(Boolean.valueOf(valueStr));
                 }
-                break;
-            case "packagesexclude":
-            case "packages-exclude":
+            }
+            case "packagesexclude", "packages-exclude" -> {
                 if (groupProperties.getPackagesExclude() == null) {
                     List<PackageProperties> packagesExclude = new ArrayList<>();
                     for (String groupPackage : valueStr.split(",")) {
@@ -790,9 +786,9 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                     }
                     groupProperties.setPackagesExclude(packagesExclude);
                 }
-                break;
-            default:
-                break;
+            }
+            default -> {
+            }
         }
     }
 

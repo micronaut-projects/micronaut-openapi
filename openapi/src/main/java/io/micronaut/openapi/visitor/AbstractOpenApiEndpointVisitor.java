@@ -75,7 +75,7 @@ import io.micronaut.inject.visitor.VisitorContext;
 import io.micronaut.openapi.annotation.OpenAPIDecorator;
 import io.micronaut.openapi.annotation.OpenAPIGroup;
 import io.micronaut.openapi.javadoc.JavadocDescription;
-import io.micronaut.openapi.swagger.PrimitiveType;
+import io.micronaut.openapi.swagger.core.util.PrimitiveType;
 import io.micronaut.openapi.visitor.group.EndpointInfo;
 import io.micronaut.openapi.visitor.group.GroupProperties;
 import io.micronaut.openapi.visitor.group.GroupProperties.PackageProperties;
@@ -476,7 +476,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                 consumesMediaTypes = CollectionUtils.isEmpty(consumesMediaTypes) ? DEFAULT_MEDIA_TYPES : consumesMediaTypes;
                 consumesMediaTypes.forEach(mediaType -> {
                     io.swagger.v3.oas.models.media.MediaType mt = new io.swagger.v3.oas.models.media.MediaType();
-                    Schema schema = new Schema();
+                    var schema = new Schema<>();
                     schema.setType(TYPE_OBJECT);
                     mt.setSchema(schema);
                     content.addMediaType(mediaType.toString(), mt);
@@ -485,9 +485,9 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         }
         if (requestBody != null && !extraBodyParameters.isEmpty()) {
             requestBody.getContent().forEach((mediaTypeName, mediaType) -> {
-                Schema schema = mediaType.getSchema();
+                var schema = mediaType.getSchema();
                 if (schema == null) {
-                    schema = new Schema();
+                    schema = new Schema<>();
                     mediaType.setSchema(schema);
                 }
                 if (schema.get$ref() != null) {
@@ -495,7 +495,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                         schema = openAPI.getComponents().getSchemas().get(schema.get$ref().substring(COMPONENTS_SCHEMAS_PREFIX.length()));
                     } else {
                         ComposedSchema composedSchema = new ComposedSchema();
-                        Schema extraBodyParametersSchema = new Schema();
+                        var extraBodyParametersSchema = new Schema<>();
                         // Composition of existing + a new schema where extra body parameters are going to be added
                         composedSchema.addAllOfItem(schema);
                         composedSchema.addAllOfItem(extraBodyParametersSchema);
@@ -581,7 +581,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             }
 
             Parameter parameter = new Parameter();
-            parameter.schema(new Schema());
+            parameter.schema(new Schema<>());
 
             paramAnn.stringValue("name").ifPresent(parameter::name);
             paramAnn.enumValue("in", ParameterIn.class).ifPresent(in -> parameter.in(in.toString()));
@@ -693,11 +693,11 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
 
                         io.swagger.v3.oas.models.media.MediaType mediaType = entry.getValue();
 
-                        Schema propertySchema = bindSchemaForElement(context, parameter, parameterType, mediaType.getSchema());
+                        Schema<?> propertySchema = bindSchemaForElement(context, parameter, parameterType, mediaType.getSchema());
 
                         String bodyAnnValue = parameter.getAnnotation(Body.class).getValue(String.class).orElse(null);
                         if (StringUtils.isNotEmpty(bodyAnnValue)) {
-                            Schema wrapperSchema = new Schema();
+                            var wrapperSchema = new Schema<>();
                             wrapperSchema.setType(TYPE_OBJECT);
                             if (isElementNotNullable(parameter, parameterType)) {
                                 wrapperSchema.addRequiredItem(bodyAnnValue);
@@ -728,7 +728,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         }
 
         if (newParameter.getExplode() != null && newParameter.getExplode() && "query".equals(newParameter.getIn()) && !parameterType.isIterable()) {
-            Schema explodedSchema = resolveSchema(openAPI, parameter, parameterType, context, consumesMediaTypes, null, null);
+            Schema<?> explodedSchema = resolveSchema(openAPI, parameter, parameterType, context, consumesMediaTypes, null, null);
             if (explodedSchema != null) {
                 if (openAPI.getComponents() != null && openAPI.getComponents().getSchemas() != null && StringUtils.isNotEmpty(explodedSchema.get$ref())) {
                     explodedSchema = openAPI.getComponents().getSchemas().get(explodedSchema.get$ref().substring(Components.COMPONENTS_SCHEMAS_REF.length()));
@@ -764,7 +764,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
 
             addSwaggerParamater(newParameter, swaggerParameters);
 
-            Schema schema = newParameter.getSchema();
+            Schema<?> schema = newParameter.getSchema();
             if (schema == null) {
                 schema = resolveSchema(openAPI, parameter, parameterType, context, consumesMediaTypes, null, null);
             }
@@ -791,7 +791,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
 
     private void processBodyParameter(VisitorContext context, OpenAPI openAPI, JavadocDescription javadocDescription,
                                       MediaType mediaType, Schema schema, TypedElement parameter) {
-        Schema propertySchema = resolveSchema(openAPI, parameter, parameter.getType(), context,
+        Schema<?> propertySchema = resolveSchema(openAPI, parameter, parameter.getType(), context,
             Collections.singletonList(mediaType), null, null);
         if (propertySchema != null) {
 
@@ -838,7 +838,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             newParameter.setName(paramName);
             final boolean exploded = variable.isExploded();
             if (exploded) {
-                newParameter.setExplode(exploded);
+                newParameter.setExplode(true);
             }
         } else if (parameter.isAnnotationPresent(Header.class)) {
             String headerName = parameter.getValue(Header.class, "name", String.class).orElse(parameter
@@ -948,7 +948,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                                 if (newParameter == null) {
                                     newParameter = new Parameter();
                                 }
-                                newParameter.schema(new Schema().$ref(schemaNode.get("$ref").asText()));
+                                newParameter.schema(new Schema<>().$ref(schemaNode.get("$ref").asText()));
                             }
                         }
                     } catch (Exception e) {
@@ -990,7 +990,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                 }
 
                 if (newParameter != null) {
-                    final Schema parameterSchema = newParameter.getSchema();
+                    final Schema<?> parameterSchema = newParameter.getSchema();
                     if (paramAnn.contains("schema") && parameterSchema != null) {
                         paramAnn.get("schema", AnnotationValue.class)
                                 .ifPresent(schemaAnn -> bindSchemaAnnotationValue(context, parameter, parameterSchema, schemaAnn));
@@ -1339,11 +1339,10 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
 
     private io.swagger.v3.oas.models.ExternalDocumentation readExternalDocs(MethodElement element, VisitorContext context) {
         final Optional<AnnotationValue<ExternalDocumentation>> externalDocsAnn = element.findAnnotation(ExternalDocumentation.class);
-        io.swagger.v3.oas.models.ExternalDocumentation externalDocs = externalDocsAnn
+
+        return externalDocsAnn
             .flatMap(o -> toValue(o.getValues(), context, io.swagger.v3.oas.models.ExternalDocumentation.class))
             .orElse(null);
-
-        return externalDocs;
     }
 
     private void readSecurityRequirements(MethodElement element, String path, io.swagger.v3.oas.models.Operation operation, VisitorContext context) {
@@ -1590,7 +1589,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                     }
                     try {
                         if (StringUtils.isEmpty(newApiResponse.getDescription())) {
-                            newApiResponse.setDescription(responseCode == null || responseCode.equals("default") ? "OK response" : HttpStatus.getDefaultReason(Integer.parseInt(responseCode)));
+                            newApiResponse.setDescription(responseCode.equals("default") ? "OK response" : HttpStatus.getDefaultReason(Integer.parseInt(responseCode)));
                         }
                     } catch (Exception e) {
                         newApiResponse.setDescription("Response " + responseCode);
@@ -1624,7 +1623,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         RequestBody requestBody = toValue(requestBodyAnnValue.getValues(), context, RequestBody.class).orElse(null);
         // if media type doesn't set in swagger annotation, check micronaut annotation
         if (content != null
-            && !content.stringValue("mediaType").isPresent()
+            && content.stringValue("mediaType").isEmpty()
             && requestBody != null
             && requestBody.getContent() != null
             && !consumesMediaTypes.equals(DEFAULT_MEDIA_TYPES)) {
