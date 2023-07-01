@@ -5,7 +5,7 @@ plugins {
 dependencies {
     compileOnly(mn.micronaut.core.processor)
 
-    implementation(mn.micronaut.http.server)
+    implementation(mn.micronaut.http)
 
     api(projects.micronautOpenapiAnnotations)
     api(mn.jackson.databind)
@@ -22,6 +22,7 @@ dependencies {
     testImplementation(mn.micronaut.management)
     testImplementation(mn.micronaut.inject.groovy.test)
     testImplementation(mn.micronaut.inject.java.test)
+    testImplementation(mn.micronaut.http.server)
     testImplementation(mn.snakeyaml)
     testImplementation(mnSecurity.micronaut.security)
     testImplementation(mnSerde.micronaut.serde.jackson)
