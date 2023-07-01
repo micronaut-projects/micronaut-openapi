@@ -907,7 +907,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                 if (classLoader == null) {
                     classLoader = ClassLoader.getSystemClassLoader();
                 }
-                return new DefaultClassPathResourceLoader(classLoader, null, false);
+                return new DefaultClassPathResourceLoader(classLoader, null, false, false);
             }
 
             @Override
