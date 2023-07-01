@@ -5,7 +5,7 @@ plugins {
 dependencies {
     compileOnly(mn.micronaut.core.processor)
 
-    implementation(mn.micronaut.http.server)
+    implementation(mn.micronaut.http)
 
     api(projects.micronautOpenapiAnnotations)
     api(mn.jackson.databind)
