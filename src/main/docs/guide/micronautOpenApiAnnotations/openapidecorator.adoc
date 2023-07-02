@@ -1,0 +1,16 @@
+The annotation can be used to add suffix and prefix for operationIds.
+This solves the problem when you have several different controllers, but with same operation names.
+
+For example, when you have 2 controllers with same operations, but use generics:
+[source,java]
+----
+@OpenAPIDecorator(opIdPrefix = "cats-", opIdSuffix = "-suffix")
+@Controller("/cats")
+interface MyCatsOperations extends Api<MyRequest, MyResponse> {
+}
+
+@OpenAPIDecorator("dogs-")
+@Controller("/dogs")
+interface MyDogsOperations extends Api<MyRequest, MyResponse> {
+}
+----

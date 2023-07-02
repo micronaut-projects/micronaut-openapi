@@ -1,0 +1,49 @@
+If you need to describe a particular group with a separate `@OpenAPIDefinition` annotation,
+then add the OpenAPIGroupInfo annotation, in which specify the names of the group
+to which this OpenAPI description belongs. This way you can generate as many
+different swagger files as you want from one project.
+
+An annotation can be added at the class level or at the package level.
+
+[source,java]
+----
+@OpenAPIGroupInfo(
+        names = "v1",
+        info = @OpenAPIDefinition(
+            info = @Info(
+                    title = "Public api v1",
+                    version = "v1",
+                    description = "This is API version 1",
+                    license = @License(name = "Apache 2.0", url = "https://foo.bar"),
+                    contact = @Contact(url = "https://gigantic-server.com", name = "Fred", email = "Fred@gigagantic-server.com")
+            )
+        )
+)
+@OpenAPIGroupInfo(
+        names = "v2",
+        info = @OpenAPIDefinition(
+            info = @Info(
+                    title = "Public api v2",
+                    version = "v2",
+                    description = "This is API version 2",
+                    license = @License(name = "Apache 2.0", url = "https://foo.bar"),
+                    contact = @Contact(url = "https://gigantic-server.com", name = "Fred", email = "Fred@gigagantic-server.com")
+            )
+        )
+)
+@OpenAPIDefinition(
+        info = @Info(
+                title = "Private api",
+                version = "${service.version}",
+                description = "This is API version 2",
+                license = @License(name = "Apache 2.0", url = "https://foo.bar"),
+                contact = @Contact(url = "https://gigantic-server.com", name = "Fred", email = "Fred@gigagantic-server.com")
+        )
+)
+public class Application {
+
+    public static void main(String[] args) {
+        Micronaut.run(Application.class);
+    }
+}
+----

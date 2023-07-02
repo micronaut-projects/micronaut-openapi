@@ -1,0 +1,4 @@
+Micronaut OpenAPI allows you to split the description of endpoints into several
+files. To do this, you can use the versioning mechanism built into Micronaut
+(using the `@Version` annotation) and / or group endpoints using the `@OpenAPIGroup`
+annotation or configuration.
