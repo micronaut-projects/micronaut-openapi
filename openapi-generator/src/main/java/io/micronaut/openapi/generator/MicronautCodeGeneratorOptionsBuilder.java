@@ -81,12 +81,20 @@ public interface MicronautCodeGeneratorOptionsBuilder {
     MicronautCodeGeneratorOptionsBuilder withReactive(boolean reactive);
 
     /**
-     * If true, the generated client will use responses wrapped in HttpResponse.
+     * If true, the generated operation return types will be wrapped in HttpResponse.
      *
-     * @param wrapInHttpResponse the wrapping flag
+     * @param generateHttpResponseAlways the wrapping flag
      * @return this builder
      */
-    MicronautCodeGeneratorOptionsBuilder withWrapInHttpResponse(boolean wrapInHttpResponse);
+    MicronautCodeGeneratorOptionsBuilder withGenerateHttpResponseAlways(boolean generateHttpResponseAlways);
+
+    /**
+     * Wrap the operations response in HttpResponse object where non-200 HTTP status codes or additional headers are defined.
+     *
+     * @param generateHttpResponseWhereRequired the wrapping flag
+     * @return this builder
+     */
+    MicronautCodeGeneratorOptionsBuilder withGenerateHttpResponseWhereRequired(boolean generateHttpResponseWhereRequired);
 
     /**
      * If set to true, the generated code will use bean validation.
@@ -134,7 +142,7 @@ public interface MicronautCodeGeneratorOptionsBuilder {
     enum DateTimeFormat {
         OFFSET_DATETIME,
         ZONED_DATETIME,
-        LOCAL_DATETIME;
+        LOCAL_DATETIME
     }
 
 }

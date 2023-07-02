@@ -13,6 +13,7 @@ import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Post;
 import io.micronaut.http.multipart.CompletedFileUpload;
 import jakarta.validation.Valid;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.io.ByteArrayOutputStream;
@@ -38,8 +39,8 @@ public class RequestBodyController implements RequestBodyApi {
     }
 
     @Override
-    public Mono<List<SimpleModel>> sendListOfSimpleModels(List<SimpleModel> simpleModels) {
-        return Mono.just(simpleModels);
+    public Flux<SimpleModel> sendListOfSimpleModels(List<SimpleModel> simpleModels) {
+        return Flux.fromIterable(simpleModels);
     }
 
     @Override
@@ -58,9 +59,9 @@ public class RequestBodyController implements RequestBodyApi {
     }
 
     @Override
-    public Mono<List<ColorEnum>> sendEnumList(
+    public Flux<ColorEnum> sendEnumList(
             List<@Valid ColorEnum> availableColors) {
-        return Mono.just(availableColors);
+        return Flux.fromIterable(availableColors);
     }
 
     @Override

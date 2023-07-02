@@ -67,7 +67,9 @@ final class DatedResponseBodyWriter<T> implements MessageBodyWriter<DatedRespons
         OutputStream outputStream
     ) throws CodecException {
         if (bodyType != null && bodyWriter != null) {
-            headers.add(LAST_MODIFIED_HEADER, dated.getLastModified().toString());
+            if (dated.getLastModified() != null) {
+                headers.add(LAST_MODIFIED_HEADER, dated.getLastModified().toString());
+            }
             bodyWriter.writeTo(bodyType, mediaType, dated.getBody(), headers, outputStream);
         } else {
             throw new ConfigurationException("No JSON message writer present");

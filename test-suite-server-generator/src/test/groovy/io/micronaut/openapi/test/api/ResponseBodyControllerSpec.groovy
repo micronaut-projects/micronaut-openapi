@@ -107,26 +107,33 @@ class ResponseBodyControllerSpec extends Specification {
     }
 
     void "test get simple model with non standard status"() {
+        when:
         HttpResponse<SimpleModel> response = client.exchange("/getSimpleModelWithNonStandardStatus", SimpleModel)
 
-        HttpStatus.ACCEPTED == response.status()
+        then:
+        HttpStatus.CREATED == response.status()
         ResponseBodyController.SIMPLE_MODEL == response.body()
     }
 
-    // TODO implement the behavior and test
-    void "test get dated simple model with non standard headers"() {
+    void "test get dated simple model with non mapped header"() {
+        when:
         HttpResponse<SimpleModel> response = client.exchange(
-                HttpRequest.GET("/getTaggedSimpleModelWithNonStandardHeaders"), Argument.of(SimpleModel))
+                HttpRequest.GET("/getDatedSimpleModelWithNonMappedHeader"), Argument.of(SimpleModel))
 
+        then:
         HttpStatus.OK == response.status
         ResponseBodyController.SIMPLE_MODEL == response.body()
+        "custom-value" == response.header("custom-header")
+        ResponseBodyController.LAST_MODIFIED_STRING == response.header("Last-Modified")
     }
 
     void "test get simple model with non mapped header"() {
-        HttpResponse<SimpleModel> response = client.exchange("/getSimpleModelWithNonStandardHeader", SimpleModel)
+        when:
+        HttpResponse<SimpleModel> response = client.exchange("/getSimpleModelWithNonMappedHeader", SimpleModel)
 
+        then:
         HttpStatus.OK == response.status
-        "simple model" == response.headers.get("custom-header")
+        "custom-value-2" == response.headers.get("custom-header")
         ResponseBodyController.SIMPLE_MODEL == response.body()
     }
 

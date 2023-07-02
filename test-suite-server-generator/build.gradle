@@ -54,6 +54,11 @@ tasks.named("generateOpenApi") {
             // Response with Last-Modified header mapping
             [headerName: "Last-Modified", mappedBodyType: "io.micronaut.openapi.test.dated.DatedResponse"],
             // Response with Page body
-            [headerName: "X-Page-Number", mappedBodyType: "io.micronaut.data.model.Page", isListWrapper: true]
+            [headerName: "X-Page-Number", mappedBodyType: "io.micronaut.data.model.Page", isListWrapper: true],
+            [headerName: "X-Page-Count", mappedBodyType: "io.micronaut.data.model.Page", isListWrapper: true],
+            [headerName: "X-Total-Count", mappedBodyType: "io.micronaut.data.model.Page", isListWrapper: true],
+            [headerName: "X-Page-Size", mappedBodyType: "io.micronaut.data.model.Page", isListWrapper: true],
+            // Ignored header - Does not wrap the response in HttpResponse
+            [headerName: "ignored-header"]
     ]
 }

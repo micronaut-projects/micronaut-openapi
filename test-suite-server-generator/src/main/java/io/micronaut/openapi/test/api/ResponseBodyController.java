@@ -1,9 +1,9 @@
 package io.micronaut.openapi.test.api;
 
+import io.micronaut.http.HttpResponse;
 import io.micronaut.http.MediaType;
 import io.micronaut.data.model.Page;
 import io.micronaut.data.model.Pageable;
-import io.micronaut.http.multipart.CompletedFileUpload;
 import io.micronaut.http.server.types.files.FileCustomizableResponseType;
 import io.micronaut.http.server.types.files.StreamedFile;
 import io.micronaut.openapi.test.model.DateModel;
@@ -81,18 +81,22 @@ public class ResponseBodyController implements ResponseBodyApi {
     }
 
     @Override
-    public Mono<SimpleModel> getSimpleModelWithNonStandardStatus() {
-        return Mono.just(SIMPLE_MODEL);
+    public HttpResponse<Mono<SimpleModel>> getSimpleModelWithNonStandardStatus() {
+        return HttpResponse.created(Mono.just(SIMPLE_MODEL));
     }
 
     @Override
-    public Mono<DatedResponse<SimpleModel>> getDatedSimpleModelWithNonMappedHeader() {
-        return Mono.just(DatedResponse.of(SIMPLE_MODEL));
+    public HttpResponse<Mono<DatedResponse<SimpleModel>>> getDatedSimpleModelWithNonMappedHeader() {
+        DatedResponse<SimpleModel> datedResponse = DatedResponse.of(SIMPLE_MODEL)
+            .withLastModified(LAST_MODIFIED_DATE);
+        return HttpResponse.ok(Mono.just(datedResponse))
+            .header("custom-header", "custom-value");
     }
 
     @Override
-    public Mono<SimpleModel> getSimpleModelWithNonMappedHeader() {
-        return Mono.just(SIMPLE_MODEL);
+    public HttpResponse<Mono<SimpleModel>> getSimpleModelWithNonMappedHeader() {
+        return HttpResponse.ok(Mono.just(SIMPLE_MODEL))
+            .header("custom-header", "custom-value-2");
     }
 
     @Override

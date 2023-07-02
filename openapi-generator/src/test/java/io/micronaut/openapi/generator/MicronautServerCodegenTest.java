@@ -211,7 +211,7 @@ class MicronautServerCodegenTest extends AbstractMicronautCodegenTest {
     void doGenerateMonoWrapHttpResponse() {
         JavaMicronautServerCodegen codegen = new JavaMicronautServerCodegen();
         codegen.additionalProperties().put(JavaMicronautServerCodegen.OPT_REACTIVE, "true");
-        codegen.additionalProperties().put(JavaMicronautServerCodegen.OPT_WRAP_IN_HTTP_RESPONSE, "true");
+        codegen.additionalProperties().put(JavaMicronautServerCodegen.OPT_GENERATE_HTTP_RESPONSE_ALWAYS, "true");
         String outputPath = generateFiles(codegen, PETSTORE_PATH, CodegenConstants.MODELS, CodegenConstants.APIS);
 
         String apiPath = outputPath + "src/main/java/org/openapitools/api/";
@@ -222,7 +222,7 @@ class MicronautServerCodegenTest extends AbstractMicronautCodegenTest {
     void doGenerateMono() {
         JavaMicronautServerCodegen codegen = new JavaMicronautServerCodegen();
         codegen.additionalProperties().put(JavaMicronautServerCodegen.OPT_REACTIVE, "true");
-        codegen.additionalProperties().put(JavaMicronautServerCodegen.OPT_WRAP_IN_HTTP_RESPONSE, "false");
+        codegen.additionalProperties().put(JavaMicronautServerCodegen.OPT_GENERATE_HTTP_RESPONSE_ALWAYS, "false");
         String outputPath = generateFiles(codegen, PETSTORE_PATH, CodegenConstants.MODELS, CodegenConstants.APIS);
 
         String apiPath = outputPath + "src/main/java/org/openapitools/api/";
@@ -234,7 +234,7 @@ class MicronautServerCodegenTest extends AbstractMicronautCodegenTest {
     void doGenerateWrapHttpResponse() {
         JavaMicronautServerCodegen codegen = new JavaMicronautServerCodegen();
         codegen.additionalProperties().put(JavaMicronautServerCodegen.OPT_REACTIVE, "false");
-        codegen.additionalProperties().put(JavaMicronautServerCodegen.OPT_WRAP_IN_HTTP_RESPONSE, "true");
+        codegen.additionalProperties().put(JavaMicronautServerCodegen.OPT_GENERATE_HTTP_RESPONSE_ALWAYS, "true");
         String outputPath = generateFiles(codegen, PETSTORE_PATH, CodegenConstants.MODELS, CodegenConstants.APIS);
 
         String apiPath = outputPath + "src/main/java/org/openapitools/api/";
@@ -246,7 +246,7 @@ class MicronautServerCodegenTest extends AbstractMicronautCodegenTest {
     void doGenerateNoMonoNoWrapHttpResponse() {
         JavaMicronautServerCodegen codegen = new JavaMicronautServerCodegen();
         codegen.additionalProperties().put(JavaMicronautServerCodegen.OPT_REACTIVE, "false");
-        codegen.additionalProperties().put(JavaMicronautServerCodegen.OPT_WRAP_IN_HTTP_RESPONSE, "false");
+        codegen.additionalProperties().put(JavaMicronautServerCodegen.OPT_GENERATE_HTTP_RESPONSE_ALWAYS, "false");
         String outputPath = generateFiles(codegen, PETSTORE_PATH, CodegenConstants.MODELS, CodegenConstants.APIS);
 
         String apiPath = outputPath + "src/main/java/org/openapitools/api/";

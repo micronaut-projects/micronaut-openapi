@@ -529,7 +529,7 @@ paths:
       tags: [ responseBody ]
       description: A method to get a simple model as a response
       responses:
-        202:
+        201:
           description: Success
           content:
             application/json:
