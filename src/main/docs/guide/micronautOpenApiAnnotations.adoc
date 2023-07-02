@@ -1,0 +1,11 @@
+Several annotations (api:openapi.annotation.OpenAPIDecorator[]
+api:openapi.annotation.OpenAPIGroup[]
+api:openapi.annotation.OpenAPIGroupInfo[]
+api:openapi.annotation.OpenAPIInclude[]
+api:openapi.annotation.OpenAPISecurity[]
+api:openapi.annotation.OpenAPIManagement[])
+are available to enhance the generated OpenAPI.
+
+To use them add Micronaut's `openapi` to to compile classpath of your application:
+
+dependency:micronaut-openapi[scope="compileOnly", version="{version}", groupId="io.micronaut.openapi"]

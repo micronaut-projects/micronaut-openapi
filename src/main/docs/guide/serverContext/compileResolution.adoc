@@ -1,3 +1,3 @@
-Either set `micronaut.openapi.server.context.path` as a System Property or in `openapi.properties`, then all paths will be prepend with the specified value at compile time.
+Either set `micronaut.openapi.server.context.path` as a System Property or in `openapi.properties`, then all paths will be prepended with the specified value at compile time.
 
 If you want the resolution of the context path at runtime use one of the following methods:

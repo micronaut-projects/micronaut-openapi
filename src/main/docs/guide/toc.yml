@@ -27,8 +27,11 @@ endpoints:
   endpointservers: Endpoints Servers
   endpointssecurityrequirements: Endpoints Security Requirements
   endpointspath: Endpoints Path
-annotationConfiguration:
-  title: Annotation Configuration
+micronautOpenApiAnnotations:
+  title: Micronaut OpenAPI annotations
+  openapidecorator: '@OpenAPIDecorator'
+  openapigroup: '@OpenAPIGroup'
+  openapigroupinfo: '@OpenAPIGroupInfo'
   openapiinclude: '@OpenAPIInclude'
   openapimanagement: '@OpenAPIManagement'
   openapisecurity: '@OpenAPISecurity'
@@ -45,6 +48,10 @@ openApiViews:
   redoc: Redoc
   rapidoc: RapiDoc
   rapipdf: RapiPdf
+versionsAndGroups:
+  title: Versions and groups
+  versions: Micronaut versioning
+  groups: OpenAPI groups
 serverContext:
   title: Server Context
   compileResolution: Compile Time Resolution

@@ -1,0 +1,70 @@
+To group endpoints according to different characteristics (API version,
+entity type, public / private, etc.), you can use the `@OpenAPIGroup` annotation.
+
+With this annotation, you can specify which groups this endpoint belongs to and
+which groups it should be excluded from. An annotation can be written at the method,
+class or package level. You can also set binding to a group through the configuration,
+if you do not want to add annotations in the code.
+
+You can set some additional settings for the group through system properties / application.yml / openapi.properties:
+
+Usage example:
+[source,java]
+----
+@Controller
+public class ApiController {
+
+    @OpenAPIGroup("v2")
+    @Post("/save/{id}")
+    public String save2(String id, Object body) {
+        return "OK!";
+    }
+
+    @OpenAPIGroup({"v1", "v2"})
+    @Post("/save")
+    public String save(Object body) {
+        return "OK!";
+    }
+}
+----
+
+[source,yaml]
+----
+micronaut:
+  openapi:
+    groups:
+      v1:
+        #The title that will be displayed in the group selector in the UI
+        display-name: My API v1
+        # A flag indicating that the swagger UI should select this group in the selector by default.
+        primary: true
+        # The name of the final swagger file. If it is not set, then by default the name will be generated according
+        # to the following pattern: swagger-<version>-<groupName>-<apiVersion>. version - application version from the main
+        # OpenAPIDefinition annotation, api-version - version from micronaut @Version annotation
+        filename: myapiv1
+        # Whether to exclude common endpoints from this group
+        common-exclude: true
+        # An additional way to add or remove endpoints from a given batch group.
+        # Strong package matching and inclusion of all subpackages is supported (* symbol)
+        packages: com.micronaut.controller.v1.*
+        packages-exclude:
+          - com.micronaut.controller.v1
+          - com.micronaut.controller
+      v2:
+        display-name: My API v2
+      "v3.testv3group":
+        packages-exclude:
+         - com.micronaut.controller.v3
+         - com.micronaut.controller
+----
+
+After processing the annotation processor, you will get 3 different swagger files.
+
+== Integration with UI
+
+In rapidoc and redoc do not support multiple files at the same time,
+so for normal API display, you will have to complete the template yourself.
+
+Swagger UI has support for multiple files out of the box. The example above would look something like this:
+
+image::../../resources/img/swagger-ui-with-groups.png[]
