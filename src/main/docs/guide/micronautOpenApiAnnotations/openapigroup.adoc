@@ -1,0 +1,36 @@
+You can divide your API description into several separate files using the OpenAPIGroup annotation.
+With this annotation, you can specify one or more groups that this endpoint will be included in,
+as well as specify groups from which this endpoint should be excluded. You can annotate method, class or package (subpackages not included!).
+
+For example, you have a controller like this:
+
+[source,java]
+----
+@Controller
+public class ApiController {
+
+    @OpenAPIGroup(exclude = "v2")
+    @Get("/read/{id}")
+    public String read(String id) {
+        return "OK!";
+    }
+
+    @OpenAPIGroup("v2")
+    @Post("/save/{id}")
+    public String save2(String id, Object body) {
+        return "OK!";
+    }
+
+    @OpenAPIGroup({"v1", "v2"})
+    @Post("/save")
+    public String save(Object body) {
+        return "OK!";
+    }
+}
+----
+
+After processing, you will have 2 different swagger files. The first file for group *v1*
+contain the description of the endpoints `/save` and `/read/{id}`. The second one will contain
+the description of the endpoints `/save` and `/save/{id}`.
+
+You can read more about groups here: xref:../versionsAndGroups.adoc[Versions and groups]

@@ -1,0 +1,163 @@
+How to use the `@Version` annotation can be read here: link:https://docs.micronaut.io/latest/guide/#apiVersioning[Micronaut API versioning].
+
+Micronaut OpenAPI support this versioning and automatticaly add pararameters or headers
+with version from your `application.yml`.
+
+For example:
+
+.VersionedController.java
+[source,java]
+----
+@Controller("/versioned")
+public class VersionedController {
+
+    @Version("1")
+    @Get("/hello")
+    public String helloV1() {
+        return "helloV1";
+    }
+
+    @Version("2")
+    @Post("/hello")
+    public String helloV2(UserDto userDto) {
+        return "helloV2";
+    }
+
+    @Post("/common")
+    public String common() {
+        return null;
+    }
+
+    public static class UserDto {
+
+        public String name;
+        public int age;
+        public String secondName;
+        @NotNull
+        public String address;
+    }
+}
+----
+
+.application.yml
+[source,yaml]
+----
+micronaut:
+  router:
+    versioning:
+      enabled: true
+      parameter:
+        enabled: true
+        names: version
+----
+
+After processing the annotation processor, you will see 2 swagger files:
+
+.Generated swagger-1.yml
+[source,yaml]
+----
+openapi: 3.0.1
+info:
+  title: Api
+  version: "1.0"
+paths:
+  /versioned/common:
+    post:
+      operationId: common
+      parameters:
+      - name: version
+        in: query
+        description: API version
+        schema:
+          type: string
+      responses:
+        "200":
+          description: common 200 response
+          content:
+            application/json:
+              schema:
+                type: string
+  /versioned/hello:
+    get:
+      operationId: helloV1
+      parameters:
+      - name: version
+        in: query
+        description: API version
+        schema:
+          type: string
+      responses:
+        "200":
+          description: helloV1 200 response
+          content:
+            application/json:
+              schema:
+                type: string
+----
+
+.Generated swagger-2.yml
+[source,yaml]
+----
+openapi: 3.0.1
+info:
+  title: Api
+  version: "2.0"
+paths:
+  /versioned/common:
+    post:
+      operationId: common
+      parameters:
+      - name: version
+        in: query
+        description: API version
+        schema:
+          type: string
+      responses:
+        "200":
+          description: common 200 response
+          content:
+            application/json:
+              schema:
+                type: string
+  /versioned/hello:
+    post:
+      operationId: helloV2
+      parameters:
+      - name: version
+        in: query
+        description: API version
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userDto:
+                  $ref: '#/components/schemas/UserDto'
+        required: true
+      responses:
+        "200":
+          description: helloV2 200 response
+          content:
+            application/json:
+              schema:
+                type: string
+components:
+  schemas:
+    UserDto:
+      required:
+      - address
+      type: object
+      properties:
+        name:
+          type: string
+        age:
+          type: integer
+          format: int32
+        secondName:
+          type: string
+        address:
+          type: string
+----

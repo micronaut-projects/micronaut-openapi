@@ -1,4 +1,4 @@
-By default Micronaut uses Class simple name for Custom type schemas. Micronaut use simple name no matter if `@Schema`
+By default, Micronaut uses Class simple name for Custom type schemas. Micronaut use simple name no matter if `@Schema`
 annotation is defined on type or on property (getter). That means that if you have two properties of same type with `@Schema`
 annotation without `name` set, Micronaut will accidentally override one definition with another. So in that case you should
 set `name` on `@Schema` annotation.

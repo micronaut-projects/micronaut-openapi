@@ -17,15 +17,15 @@ paths:
       - security
       description: deletes the JWT cookie and redirects to /oauth/login/cognito
       operationId: logout
-      parameters: []
       responses:
-        "200":
+        200:
           description: logout 200 response
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Object'
-        "302":
+        302:
+          description: Found
           links:
             oauth-login-cognito:
               operationId: oauth-login-cognito
@@ -47,13 +47,15 @@ paths:
         schema:
           $ref: '#/components/schemas/AuthorizationResponse'
       responses:
-        "303":
+        303:
           description: redirects to home page upon successful completion of the authorization
             code grant flow
           headers:
             Set-Cookie:
               description: Cookied named JWT with the id token obtained from the authorization
                 server as the value
+              schema:
+                type: string
   /oauth/login/cognito:
     get:
       tags:
@@ -63,9 +65,8 @@ paths:
         description: Amazon Cognito Authorization Endpoint documentation
         url: https://docs.aws.amazon.com/cognito/latest/developerguide/authorization-endpoint.html
       operationId: oauth-login-cognito
-      parameters: []
       responses:
-        "302":
+        302:
           description: redirects to authorization server sign in page
   /oauth/logout:
     get:
@@ -77,9 +78,9 @@ paths:
         description: Amazon Cognito Logout Endpoint documentation
         url: https://docs.aws.amazon.com/cognito/latest/developerguide/logout-endpoint.html
       operationId: oauth-logout
-      parameters: []
       responses:
-        "302":
+        302:
+          description: Found
           links:
             logout:
               operationId: logout
@@ -92,20 +93,16 @@ components:
       type: object
       properties:
         code:
-          required:
-          - "true"
           type: string
           description: an authorization code which the OAuth 2.0 client can exchange
             for an access token
         nonce:
-          required:
-          - "false"
           type: string
           nullable: true
         state:
-          required:
-          - "true"
           type: string
+    Object:
+      type: object
 ----
 
 You could also have a yaml file describing the endpoint which exposes the generated OpenAPI YAML file:
@@ -124,7 +121,6 @@ paths:
         - openapi
       description: returns the OpenAPI YAML file describing the API
       operationId: swagger
-      parameters: []
       responses:
         "200":
           description: OpenAPI YAML file describing the API
@@ -135,8 +131,9 @@ paths:
 To merge both files with the generated OpenAPI definition point, Micronaut searches for additional OpenAPI yaml files in the `openapi` folder, which is specified by `micronaut.openapi.additional.files`.
 
 .openapi.properties
-```properties
+[source,properties]
+----
 micronaut.openapi.additional.files=openapi
-```
+----
 
 Micronaut includes the endpoints defined in those files in the generated output.

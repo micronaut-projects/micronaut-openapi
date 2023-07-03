@@ -11,16 +11,18 @@ micronaut:
 
 or by system properties:
 
-```
+[source]
+----
 -Dmicronaut.openapi.schema.org.somepackage.MyComplexType=java.lang.String -Dmicronaut.openapi.schema.org.somepackage.MyComplexType2=java.lang.Integer
-```
+----
 
 or by openapi.properties
 
-```properties
+[source,properties]
+----
 micronaut.openapi.schema.org.somepackage.MyComplexType=java.lang.String
 micronaut.openapi.schema.org.somepackage.MyComplexType2=java.lang.Integer
-```
+----
 
 Also, it can be used for replace classes schema with generics, for example, if you use jaxb generated classes and have custom serializer for JAXBElement class.
 And you can set cutom schemas for different type args.
