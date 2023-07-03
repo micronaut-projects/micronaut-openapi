@@ -11,16 +11,18 @@ micronaut:
 
 or by system properties:
 
-```
+[source]
+----
 -Dmicronaut.openapi.schema-postfix.org.api.v1_0_0=1_0_0 -Dmicronaut.openapi.schema-postfix.org.api.v2_0_0=2_0_0
-```
+----
 
 or by openapi.properties
 
-```properties
+[source,properties]
+----
 micronaut.openapi.schema-postfix.org.api.v1_0_0=1_0_0
 micronaut.openapi.schema-postfix.org.api.v2_0_0=2_0_0
-```
+----
 
 NOTE: Important!
 After changing these settings, a complete recompilation of the project is necessary to ensure that the new settings are applied correctly.

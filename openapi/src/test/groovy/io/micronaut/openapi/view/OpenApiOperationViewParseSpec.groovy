@@ -7,7 +7,7 @@ class OpenApiOperationViewParseSpec extends Specification {
     void "test parse empty OpenApiView specification"() {
         given:
         String spec = ""
-        OpenApiViewConfig cfg = OpenApiViewConfig.fromSpecification(spec, new Properties(), null)
+        OpenApiViewConfig cfg = OpenApiViewConfig.fromSpecification(spec, null, new Properties(), null)
 
         expect:
         cfg.enabled == false
@@ -16,7 +16,7 @@ class OpenApiOperationViewParseSpec extends Specification {
     void "test parse OpenApiView specification, views enabled"() {
         given:
         String spec = "mapping.path=somewhere,redoc.enabled=true,rapidoc.enabled=true,swagger-ui.enabled=true"
-        OpenApiViewConfig cfg = OpenApiViewConfig.fromSpecification(spec, new Properties(), null)
+        OpenApiViewConfig cfg = OpenApiViewConfig.fromSpecification(spec, null, new Properties(), null)
 
         expect:
         cfg.enabled == true
@@ -29,7 +29,7 @@ class OpenApiOperationViewParseSpec extends Specification {
     void "test parse OpenApiView specification, redoc enabled"() {
         given:
         String spec = "redoc.enabled=true,redoc.js.url=version123,redoc.spec.url=/my/spec/file.yml"
-        OpenApiViewConfig cfg = OpenApiViewConfig.fromSpecification(spec, new Properties(), null)
+        OpenApiViewConfig cfg = OpenApiViewConfig.fromSpecification(spec, null, new Properties(), null)
 
         expect:
         cfg.enabled == true
@@ -44,7 +44,7 @@ class OpenApiOperationViewParseSpec extends Specification {
     void "test parse OpenApiView specification, rapidoc enabled"() {
         given:
         String spec = "rapidoc.enabled=true,rapidoc.js.url=version123,rapidoc.layout=row,rapidoc.theme=light,rapidoc.spec.url=/my/spec/file.yml"
-        OpenApiViewConfig cfg = OpenApiViewConfig.fromSpecification(spec, new Properties(), null)
+        OpenApiViewConfig cfg = OpenApiViewConfig.fromSpecification(spec, null, new Properties(), null)
 
         expect:
         cfg.enabled == true
@@ -61,7 +61,7 @@ class OpenApiOperationViewParseSpec extends Specification {
     void "test parse OpenApiView specification, swagger-ui enabled"() {
         given:
         String spec = "swagger-ui.enabled=true,swagger-ui.js.url=version123,swagger-ui.spec.url=/my/spec/file.yml,swagger-ui.theme=flattop,swagger-ui.deepLinking=false"
-        OpenApiViewConfig cfg = OpenApiViewConfig.fromSpecification(spec, new Properties(), null)
+        OpenApiViewConfig cfg = OpenApiViewConfig.fromSpecification(spec, null, new Properties(), null)
 
         expect:
         cfg.enabled == true

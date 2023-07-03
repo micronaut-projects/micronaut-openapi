@@ -20,7 +20,7 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import static java.lang.annotation.RetentionPolicy.SOURCE;
 
 /**
  * Allows {@link OpenAPIInclude} to be repeatable.
@@ -28,7 +28,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * @author Denis Stepanov
  */
 @Documented
-@Retention(RUNTIME)
+@Retention(SOURCE)
 @Target({ElementType.TYPE, ElementType.ANNOTATION_TYPE})
 public @interface OpenAPIIncludes {
 

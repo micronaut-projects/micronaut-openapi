@@ -1,1 +1,3 @@
-It is possible to tweak the OpenAPI processing with system properties or with a properties file. Options specified with system properties have priority over those defined in the `openapi.properties` file.
+It is possible to tweak the OpenAPI processing with system properties or with
+a properties file. Options specified with system properties have priority over
+those defined in the `openapi.properties` file.

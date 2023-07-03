@@ -23,5 +23,4 @@ You can also add some tags, servers and security requirements to each endpoint:
 endpoints.refresh.class=io.micronaut.management.endpoint.refresh.RefreshEndpoint
 endpoints.refresh.servers=[{"url": "https://staging.gigantic-server.com/v1", "description": "Staging server"}]
 endpoints.refresh.security-requirements=[{"petstore_auth": ["write:pets", "read:pets"]}]
-
 ----
