@@ -81,22 +81,22 @@ public class ResponseBodyController implements ResponseBodyApi {
     }
 
     @Override
-    public HttpResponse<Mono<SimpleModel>> getSimpleModelWithNonStandardStatus() {
-        return HttpResponse.created(Mono.just(SIMPLE_MODEL));
+    public Mono<HttpResponse<SimpleModel>> getSimpleModelWithNonStandardStatus() {
+        return Mono.just(HttpResponse.created(SIMPLE_MODEL));
     }
 
     @Override
-    public HttpResponse<Mono<DatedResponse<SimpleModel>>> getDatedSimpleModelWithNonMappedHeader() {
+    public Mono<HttpResponse<DatedResponse<SimpleModel>>> getDatedSimpleModelWithNonMappedHeader() {
         DatedResponse<SimpleModel> datedResponse = DatedResponse.of(SIMPLE_MODEL)
             .withLastModified(LAST_MODIFIED_DATE);
-        return HttpResponse.ok(Mono.just(datedResponse))
-            .header("custom-header", "custom-value");
+        return Mono.just(HttpResponse.ok(datedResponse)
+            .header("custom-header", "custom-value"));
     }
 
     @Override
-    public HttpResponse<Mono<SimpleModel>> getSimpleModelWithNonMappedHeader() {
-        return HttpResponse.ok(Mono.just(SIMPLE_MODEL))
-            .header("custom-header", "custom-value-2");
+    public Mono<HttpResponse<SimpleModel>> getSimpleModelWithNonMappedHeader() {
+        return Mono.just(HttpResponse.ok(SIMPLE_MODEL)
+            .header("custom-header", "custom-value-2"));
     }
 
     @Override

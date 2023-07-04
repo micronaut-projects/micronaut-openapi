@@ -39,8 +39,8 @@ public class RequestBodyController implements RequestBodyApi {
     }
 
     @Override
-    public Flux<SimpleModel> sendListOfSimpleModels(List<SimpleModel> simpleModels) {
-        return Flux.fromIterable(simpleModels);
+    public Mono<List<SimpleModel>> sendListOfSimpleModels(List<SimpleModel> simpleModels) {
+        return Mono.just(simpleModels);
     }
 
     @Override
@@ -59,9 +59,9 @@ public class RequestBodyController implements RequestBodyApi {
     }
 
     @Override
-    public Flux<ColorEnum> sendEnumList(
+    public Mono<List<ColorEnum>> sendEnumList(
             List<@Valid ColorEnum> availableColors) {
-        return Flux.fromIterable(availableColors);
+        return Mono.just(availableColors);
     }
 
     @Override

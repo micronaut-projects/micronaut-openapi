@@ -747,14 +747,6 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
     }
 
     private void processOperationWithResponseWrappers(CodegenOperation op) {
-        if (reactive) {
-            if (op.isArray) {
-                wrapOperationReturnType(op, "reactor.core.publisher.Flux", false, true);
-            } else {
-                wrapOperationReturnType(op, "reactor.core.publisher.Mono", false, false);
-            }
-        }
-
         boolean hasNon200StatusCodes = op.responses.stream().anyMatch(
             response -> !"200".equals(response.code) && response.code.startsWith("2")
         );
@@ -762,6 +754,10 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
         boolean requiresHttpResponse = hasNon200StatusCodes || hasNonMappedHeaders;
         if (generateHttpResponseAlways || (generateHttpResponseWhereRequired && requiresHttpResponse)) {
             wrapOperationReturnType(op, "io.micronaut.http.HttpResponse", false, false);
+        }
+
+        if (reactive) {
+            wrapOperationReturnType(op, "reactor.core.publisher.Mono", false, false);
         }
     }
 
