@@ -12,6 +12,6 @@ micronautBuild {
     binaryCompatibility {
         enabled = true
         // TODO required for now. Remove after Micronaut 4 release
-        baselineVersion = "5.0.0-M9"
+        baselineVersion = "5.0.0-M10"
     }
 }
