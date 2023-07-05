@@ -67,7 +67,7 @@ public interface {{classname}} {
             {{/authMethods}}
         {{/configureAuth}}
     {{!the method definition}}
-    {{>common/operationReturnType}} {{nickname}}({{#allParams}}
+    {{^returnType}}void{{/returnType}}{{#returnType}}{{{returnType}}}{{/returnType}} {{nickname}}({{#allParams}}
         {{#formatSingleLine}}{{>client/params/queryParams}}{{>client/params/pathParams}}{{>client/params/headerParams}}{{>client/params/bodyParams}}{{>client/params/formParams}}{{>client/params/cookieParams}}{{^-last}},{{/-last}}{{/formatSingleLine}}
     {{/allParams}});
     {{/formatNoEmptyLines}}

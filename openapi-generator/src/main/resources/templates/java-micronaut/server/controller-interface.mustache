@@ -73,7 +73,7 @@ public interface {{classname}} {
     @Secured({{openbrace}}{{#vendorExtensions.x-roles}}{{{.}}}{{^-last}}, {{/-last}}{{/vendorExtensions.x-roles}}{{closebrace}})
     {{/useAuth}}
     {{!the method definition}}
-    {{>common/operationReturnType}} {{nickname}}({{#allParams}}
+    {{^returnType}}void{{/returnType}}{{#returnType}}{{{returnType}}}{{/returnType}} {{nickname}}({{#allParams}}
         {{#indent}}
             {{>common/params/validation}}
         {{/indent}}

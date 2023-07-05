@@ -79,7 +79,8 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
     public static final String OPT_DATE_FORMAT = "dateFormat";
     public static final String OPT_DATETIME_FORMAT = "datetimeFormat";
     public static final String OPT_REACTIVE = "reactive";
-    public static final String OPT_WRAP_IN_HTTP_RESPONSE = "wrapInHttpResponse";
+    public static final String OPT_GENERATE_HTTP_RESPONSE_ALWAYS = "generateHttpResponseAlways";
+    public static final String OPT_GENERATE_HTTP_RESPONSE_WHERE_REQUIRED = "generateHttpResponseWhereRequired";
     public static final String OPT_APPLICATION_NAME = "applicationName";
     public static final String OPT_GENERATE_SWAGGER_ANNOTATIONS = "generateSwaggerAnnotations";
     public static final String OPT_GENERATE_SWAGGER_ANNOTATIONS_SWAGGER_1 = "swagger1";
@@ -99,7 +100,8 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
     protected String testTool;
     protected boolean requiredPropertiesInConstructor = true;
     protected boolean reactive;
-    protected boolean wrapInHttpResponse;
+    protected boolean generateHttpResponseAlways;
+    protected boolean generateHttpResponseWhereRequired = true;
     protected String appName;
     protected String generateSwaggerAnnotations;
     protected boolean generateOperationOnlyForFirstTag;
@@ -128,7 +130,6 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
         modelDocPath = "docs/models";
         dateLibrary = OPT_DATE_LIBRARY_ZONED_DATETIME;
         reactive = true;
-        wrapInHttpResponse = false;
         appName = artifactId;
         generateSwaggerAnnotations = this instanceof JavaMicronautClientCodegen ?
             OPT_GENERATE_SWAGGER_ANNOTATIONS_FALSE : OPT_GENERATE_SWAGGER_ANNOTATIONS_SWAGGER_2;
@@ -168,7 +169,8 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
         cliOptions.add(CliOption.newBoolean(OPT_VISITABLE, "Generate visitor for subtypes with a discriminator", visitable));
         cliOptions.add(CliOption.newBoolean(OPT_REQUIRED_PROPERTIES_IN_CONSTRUCTOR, "Allow only to create models with all the required properties provided in constructor", requiredPropertiesInConstructor));
         cliOptions.add(CliOption.newBoolean(OPT_REACTIVE, "Make the responses use Reactor Mono as wrapper", reactive));
-        cliOptions.add(CliOption.newBoolean(OPT_WRAP_IN_HTTP_RESPONSE, "Wrap the response in HttpResponse object", wrapInHttpResponse));
+        cliOptions.add(CliOption.newBoolean(OPT_GENERATE_HTTP_RESPONSE_ALWAYS, "Always wrap the operations response in HttpResponse object", generateHttpResponseAlways));
+        cliOptions.add(CliOption.newBoolean(OPT_GENERATE_HTTP_RESPONSE_WHERE_REQUIRED, "Wrap the operations response in HttpResponse object where non-200 HTTP status codes or additional headers are defined", generateHttpResponseWhereRequired));
         cliOptions.add(CliOption.newBoolean(OPT_GENERATE_OPERATION_ONLY_FOR_FIRST_TAG, "When false, the operation method will be duplicated in each of the tags if multiple tags are assigned to this operation. " +
                                                                                        "If true, each operation will be generated only once in the first assigned tag.", generateOperationOnlyForFirstTag));
         CliOption testToolOption = new CliOption(OPT_TEST, "Specify which test tool to generate files for").defaultValue(testTool);
@@ -219,8 +221,12 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
         importMapping.put("LocalDate", "java.time.LocalDate");
     }
 
-    public void setWrapInHttpResponse(boolean wrapInHttpResponse) {
-        this.wrapInHttpResponse = wrapInHttpResponse;
+    public void setGenerateHttpResponseAlways(boolean generateHttpResponseAlways) {
+        this.generateHttpResponseAlways = generateHttpResponseAlways;
+    }
+
+    public void setGenerateHttpResponseWhereRequired(boolean generateHttpResponseWhereRequired) {
+        this.generateHttpResponseWhereRequired = generateHttpResponseWhereRequired;
     }
 
     public void setReactive(boolean reactive) {
@@ -302,10 +308,14 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
         }
         writePropertyBack(OPT_REACTIVE, reactive);
 
-        if (additionalProperties.containsKey(OPT_WRAP_IN_HTTP_RESPONSE)) {
-            wrapInHttpResponse = convertPropertyToBoolean(OPT_WRAP_IN_HTTP_RESPONSE);
+        if (additionalProperties.containsKey(OPT_GENERATE_HTTP_RESPONSE_ALWAYS)) {
+            generateHttpResponseAlways = convertPropertyToBoolean(OPT_GENERATE_HTTP_RESPONSE_ALWAYS);
         }
-        writePropertyBack(OPT_WRAP_IN_HTTP_RESPONSE, wrapInHttpResponse);
+        writePropertyBack(OPT_GENERATE_HTTP_RESPONSE_ALWAYS, generateHttpResponseAlways);
+        if (additionalProperties.containsKey(OPT_GENERATE_HTTP_RESPONSE_WHERE_REQUIRED)) {
+            generateHttpResponseWhereRequired = convertPropertyToBoolean(OPT_GENERATE_HTTP_RESPONSE_WHERE_REQUIRED);
+        }
+        writePropertyBack(OPT_GENERATE_HTTP_RESPONSE_WHERE_REQUIRED, generateHttpResponseWhereRequired);
 
         if (additionalProperties.containsKey(OPT_GENERATE_OPERATION_ONLY_FOR_FIRST_TAG)) {
             generateOperationOnlyForFirstTag = convertPropertyToBoolean(OPT_GENERATE_OPERATION_ONLY_FOR_FIRST_TAG);
@@ -606,12 +616,6 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
     }
 
     @Override
-    public boolean getUseInlineModelResolver() {
-        // This will allow TODO
-        return false;
-    }
-
-    @Override
     public CodegenOperation fromOperation(
             String path, String httpMethod, Operation operation, List<Server> servers
     ) {
@@ -626,6 +630,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
         op.vendorExtensions.put("originReturnProperty", op.returnProperty);
         processParametersWithAdditionalMappings(op.allParams, op.imports);
         processWithResponseBodyMapping(op);
+        processOperationWithResponseWrappers(op);
 
         return op;
     }
@@ -699,23 +704,60 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
         }
 
         if (bodyMapping != null) {
-            CodegenProperty newProperty = new CodegenProperty();
-            newProperty.required = true;
-            newProperty.isModel = bodyMapping.isValidated;
+            wrapOperationReturnType(op, bodyMapping.mappedBodyType,
+                bodyMapping.isValidated, bodyMapping.isListWrapper);
+        }
+    }
 
-            String typeName = makeSureImported(bodyMapping.mappedBodyType(), op.imports);
+    /**
+     * Wrap the return type of operation in the provided type.
+     *
+     * @param op The operation to modify.
+     * @param wrapperType The wrapper type.
+     * @param isValidated Whether the wrapper requires validation.
+     * @param isListWrapper Whether the wrapper should be around list items.
+     */
+    private void wrapOperationReturnType(
+            CodegenOperation op, String wrapperType, boolean isValidated, boolean isListWrapper
+    ) {
+        CodegenProperty newReturnType = new CodegenProperty();
+        newReturnType.required = true;
+        newReturnType.isModel = isValidated;
 
-            if (bodyMapping.isListWrapper) {
-                newProperty.dataType = typeName + '<' + op.returnBaseType + '>';
-                newProperty.items = op.returnProperty.items;
-            } else {
-                newProperty.dataType = typeName + '<' + op.returnType + '>';
-                newProperty.items = op.returnProperty;
+        String typeName = makeSureImported(wrapperType, op.imports);
+
+        if (isListWrapper && op.isArray && op.returnProperty.items != null) {
+            newReturnType.dataType = typeName + '<' + op.returnBaseType + '>';
+            newReturnType.items = op.returnProperty.items;
+        } else {
+            String originalReturnType =  op.returnType;
+            if (originalReturnType == null) {
+                originalReturnType = "Void";
+                op.returnProperty = new CodegenProperty();
+                op.returnProperty.dataType = "Void";
             }
+            newReturnType.dataType = typeName + '<' + originalReturnType + '>';
+            newReturnType.items = op.returnProperty;
+        }
 
-            op.returnType = newProperty.dataType;
-            op.returnContainer = null;
-            op.returnProperty = newProperty;
+        op.returnType = newReturnType.dataType;
+        op.returnContainer = null;
+        op.returnProperty = newReturnType;
+        op.isArray = op.returnProperty.isArray;
+    }
+
+    private void processOperationWithResponseWrappers(CodegenOperation op) {
+        boolean hasNon200StatusCodes = op.responses.stream().anyMatch(
+            response -> !"200".equals(response.code) && response.code.startsWith("2")
+        );
+        boolean hasNonMappedHeaders = !op.responseHeaders.isEmpty();
+        boolean requiresHttpResponse = hasNon200StatusCodes || hasNonMappedHeaders;
+        if (generateHttpResponseAlways || (generateHttpResponseWhereRequired && requiresHttpResponse)) {
+            wrapOperationReturnType(op, "io.micronaut.http.HttpResponse", false, false);
+        }
+
+        if (reactive) {
+            wrapOperationReturnType(op, "reactor.core.publisher.Mono", false, false);
         }
     }
 

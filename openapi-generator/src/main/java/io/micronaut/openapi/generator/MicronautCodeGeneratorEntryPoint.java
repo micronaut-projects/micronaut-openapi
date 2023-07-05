@@ -126,7 +126,7 @@ public final class MicronautCodeGeneratorEntryPoint {
             codeGenerator.addResponseBodyMappings(options.responseBodyMappings);
         }
         codeGenerator.setReactive(options.reactive);
-        codeGenerator.setWrapInHttpResponse(options.wrapInHttpResponse);
+        codeGenerator.setGenerateHttpResponseAlways(options.generateHttpResponseAlways);
         codeGenerator.setUseOptional(options.optional);
         codeGenerator.setUseBeanValidation(options.beanValidation);
         codeGenerator.setTestTool(options.testFramework.value);
@@ -301,7 +301,8 @@ public final class MicronautCodeGeneratorEntryPoint {
             private List<AbstractMicronautJavaCodegen.ResponseBodyMapping> responseBodyMappings;
             private boolean optional = false;
             private boolean reactive = true;
-            private boolean wrapInHttpResponse;
+            private boolean generateHttpResponseAlways;
+            private boolean generateHttpResponseWhereRequired;
             private TestFramework testFramework = TestFramework.JUNIT5;
             private SerializationLibraryKind serializationLibraryKind = SerializationLibraryKind.MICRONAUT_SERDE_JACKSON;
             private DateTimeFormat dateTimeFormat = DateTimeFormat.ZONED_DATETIME;
@@ -349,8 +350,14 @@ public final class MicronautCodeGeneratorEntryPoint {
             }
 
             @Override
-            public MicronautCodeGeneratorOptionsBuilder withWrapInHttpResponse(boolean wrapInHttpResponse) {
-                this.wrapInHttpResponse = wrapInHttpResponse;
+            public MicronautCodeGeneratorOptionsBuilder withGenerateHttpResponseAlways(boolean generateHttpResponseAlways) {
+                this.generateHttpResponseAlways = generateHttpResponseAlways;
+                return this;
+            }
+
+            @Override
+            public MicronautCodeGeneratorOptionsBuilder withGenerateHttpResponseWhereRequired(boolean generateHttpResponseWhereRequired) {
+                this.generateHttpResponseWhereRequired = generateHttpResponseWhereRequired;
                 return this;
             }
 
@@ -385,7 +392,7 @@ public final class MicronautCodeGeneratorEntryPoint {
             }
 
             private Options build() {
-                return new Options(apiPackage, modelPackage, invokerPackage, artifactId, parameterMappings, responseBodyMappings, beanValidation, optional, reactive, wrapInHttpResponse, testFramework, serializationLibraryKind, dateTimeFormat);
+                return new Options(apiPackage, modelPackage, invokerPackage, artifactId, parameterMappings, responseBodyMappings, beanValidation, optional, reactive, generateHttpResponseAlways, generateHttpResponseWhereRequired, testFramework, serializationLibraryKind, dateTimeFormat);
             }
         }
     }
@@ -415,7 +422,8 @@ public final class MicronautCodeGeneratorEntryPoint {
         boolean beanValidation,
         boolean optional,
         boolean reactive,
-        boolean wrapInHttpResponse,
+        boolean generateHttpResponseAlways,
+        boolean generateHttpResponseWhereRequired,
         TestFramework testFramework,
         SerializationLibraryKind serializationLibraryKind,
         MicronautCodeGeneratorOptionsBuilder.DateTimeFormat dateTimeFormat
