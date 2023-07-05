@@ -126,6 +126,16 @@ loadScripts(document, 'script');</script>
 <div class="block">Configure the date-time format.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="MicronautCodeGeneratorOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorOptionsBuilder</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withGenerateHttpResponseAlways(boolean)" class="member-name-link">withGenerateHttpResponseAlways</a><wbr>(boolean&nbsp;generateHttpResponseAlways)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block">If true, the generated operation return types will be wrapped in HttpResponse.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="MicronautCodeGeneratorOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorOptionsBuilder</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withGenerateHttpResponseWhereRequired(boolean)" class="member-name-link">withGenerateHttpResponseWhereRequired</a><wbr>(boolean&nbsp;generateHttpResponseWhereRequired)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block">Wrap the operations response in HttpResponse object where non-200 HTTP status codes or additional headers are defined.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="MicronautCodeGeneratorOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorOptionsBuilder</a></code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withInvokerPackage(java.lang.String)" class="member-name-link">withInvokerPackage</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;invokerPackage)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Sets the package of the generated invoker classes.</div>
@@ -164,11 +174,6 @@ loadScripts(document, 'script');</script>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withTestFramework(io.micronaut.openapi.generator.MicronautCodeGeneratorEntryPoint.TestFramework)" class="member-name-link">withTestFramework</a><wbr>(<a href="MicronautCodeGeneratorEntryPoint.TestFramework.html" title="enum class in io.micronaut.openapi.generator">MicronautCodeGeneratorEntryPoint.TestFramework</a>&nbsp;testFramework)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Configures the test framework to use for generated tests.</div>
-</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="MicronautCodeGeneratorOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorOptionsBuilder</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withWrapInHttpResponse(boolean)" class="member-name-link">withWrapInHttpResponse</a><wbr>(boolean&nbsp;wrapInHttpResponse)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
-<div class="block">If true, the generated client will use responses wrapped in HttpResponse.</div>
 </div>
 </div>
 </div>
@@ -276,13 +281,26 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
-<section class="detail" id="withWrapInHttpResponse(boolean)">
-<h3>withWrapInHttpResponse</h3>
-<div class="member-signature"><span class="return-type"><a href="MicronautCodeGeneratorOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorOptionsBuilder</a></span>&nbsp;<span class="element-name">withWrapInHttpResponse</span><wbr><span class="parameters">(boolean&nbsp;wrapInHttpResponse)</span></div>
-<div class="block">If true, the generated client will use responses wrapped in HttpResponse.</div>
+<section class="detail" id="withGenerateHttpResponseAlways(boolean)">
+<h3>withGenerateHttpResponseAlways</h3>
+<div class="member-signature"><span class="return-type"><a href="MicronautCodeGeneratorOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorOptionsBuilder</a></span>&nbsp;<span class="element-name">withGenerateHttpResponseAlways</span><wbr><span class="parameters">(boolean&nbsp;generateHttpResponseAlways)</span></div>
+<div class="block">If true, the generated operation return types will be wrapped in HttpResponse.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
-<dd><code>wrapInHttpResponse</code> - the wrapping flag</dd>
+<dd><code>generateHttpResponseAlways</code> - the wrapping flag</dd>
+<dt>Returns:</dt>
+<dd>this builder</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="withGenerateHttpResponseWhereRequired(boolean)">
+<h3>withGenerateHttpResponseWhereRequired</h3>
+<div class="member-signature"><span class="return-type"><a href="MicronautCodeGeneratorOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorOptionsBuilder</a></span>&nbsp;<span class="element-name">withGenerateHttpResponseWhereRequired</span><wbr><span class="parameters">(boolean&nbsp;generateHttpResponseWhereRequired)</span></div>
+<div class="block">Wrap the operations response in HttpResponse object where non-200 HTTP status codes or additional headers are defined.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>generateHttpResponseWhereRequired</code> - the wrapping flag</dd>
 <dt>Returns:</dt>
 <dd>this builder</dd>
 </dl>
