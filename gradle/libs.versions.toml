@@ -15,7 +15,7 @@ swagger-parser-v3 = "2.1.16"
 javaparser = "3.25.4"
 
 micronaut = "4.0.0-RC4"
-micronaut-security = "4.0.0-M7"
+micronaut-security = "4.0.0-M8"
 micronaut-serde = "2.0.0-M12"
 micronaut-rxjava2 = "2.0.0-M6"
 micronaut-rxjava3 = "3.0.0-M6"
