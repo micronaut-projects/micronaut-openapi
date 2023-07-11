@@ -1,7 +1,7 @@
 If you wish to expose the generated OpenAPI yaml output from your running application you can simply add the necessary static resource to the application configuration. For example:
 
 .Exposing OpenAPI YAML
-[configuration]
+[source,yaml]
 ----
 micronaut:
     router:

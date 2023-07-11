@@ -6,6 +6,7 @@ dependency:micronaut-management[scope="implementation", version="{version}", gro
 
 and declare them in the <<propertiesFileConfiguration, openapi.properties>> file:
 
+[source,properties]
 ----
 endpoints.enabled=true
 endpoints.tags=Management Endpoints
@@ -19,6 +20,7 @@ endpoints.refresh.class=io.micronaut.management.endpoint.refresh.RefreshEndpoint
 The syntax is the following: `endpoints.<name>.class=<full class name of the endpoint>` where `name` is an arbitrary name.
 You can also add some tags, servers and security requirements to each endpoint:
 
+[source,properties]
 ----
 endpoints.refresh.class=io.micronaut.management.endpoint.refresh.RefreshEndpoint
 endpoints.refresh.servers=[{"url": "https://staging.gigantic-server.com/v1", "description": "Staging server"}]

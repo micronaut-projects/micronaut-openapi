@@ -5,13 +5,13 @@ Thus, by default, the views expect to find the `yaml` under `/swagger`.
 If you change this mapping to something else:
 
 .Exposing Swagger YAML
-[configuration]
+[source,yaml]
 ----
 micronaut:
-    router:
-        static-resources:
-            swagger:
-                paths: classpath:META-INF/swagger
-                mapping: /swaggerYAML/**
+  router:
+    static-resources:
+      swagger:
+        paths: classpath:META-INF/swagger
+        mapping: /swaggerYAML/**
 ----
 You will need to set the `mapping.path` property accordingly: `micronaut.openapi.views.spec=mapping.path=swaggerYAML...`.
