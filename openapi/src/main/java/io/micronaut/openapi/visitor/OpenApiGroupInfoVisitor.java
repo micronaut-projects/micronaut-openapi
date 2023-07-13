@@ -31,7 +31,6 @@ import io.micronaut.inject.ast.PackageElement;
 import io.micronaut.inject.visitor.TypeElementVisitor;
 import io.micronaut.inject.visitor.VisitorContext;
 import io.micronaut.openapi.annotation.OpenAPIGroupInfo;
-import io.micronaut.openapi.annotation.OpenAPIInclude;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.models.OpenAPI;
 

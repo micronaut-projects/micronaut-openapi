@@ -457,17 +457,6 @@ public final class SchemaUtils {
             l1.setExtensions(l2.getExtensions());
         }
 
-        if (CollectionUtils.isEmpty(l1.getHeaders())) {
-            l1.setHeaders(l2.getHeaders());
-        } else if (CollectionUtils.isNotEmpty(l2.getHeaders())) {
-            for (Map.Entry<String, Header> entry1 : l1.getHeaders().entrySet()) {
-                Header h2 = l2.getHeaders().get(entry1.getKey());
-                entry1.setValue(mergeHeader(entry1.getValue(), h2));
-            }
-            l2.getHeaders().putAll(l1.getHeaders());
-            l1.setHeaders(l2.getHeaders());
-        }
-
         return l1;
     }
 
