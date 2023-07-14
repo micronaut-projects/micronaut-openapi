@@ -134,6 +134,7 @@ import static io.swagger.v3.oas.models.Components.COMPONENTS_SCHEMAS_REF;
     OpenApiApplicationVisitor.MICRONAUT_OPENAPI_CONFIG_FILE,
     OpenApiApplicationVisitor.MICRONAUT_OPENAPI_SECURITY_ENABLED,
     OpenApiApplicationVisitor.MICRONAUT_OPENAPI_VERSIONING_ENABLED,
+    OpenApiApplicationVisitor.MICRONAUT_OPENAPI_PROJECT_DIR,
 })
 public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements TypeElementVisitor<OpenAPIDefinition, Object> {
 
@@ -175,6 +176,14 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
      * System property that specifies the location of additional swagger YAML and JSON files to read from.
      */
     public static final String MICRONAUT_OPENAPI_ADDITIONAL_FILES = "micronaut.openapi.additional.files";
+    /**
+     * System property that specifies the location of current project.
+     */
+    public static final String MICRONAUT_OPENAPI_PROJECT_DIR = "micronaut.openapi.project.dir";
+    /**
+     * Loaded project directory from system properties.
+     */
+    public static final String MICRONAUT_INTERNAL_OPENAPI_PROJECT_DIR = "micronaut.internal.openapi.project.dir";
     /**
      * System property that specifies the default security schema name, if it's not specified by annotation SecurityScheme.
      */
