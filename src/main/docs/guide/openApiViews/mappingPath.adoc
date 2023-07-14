@@ -5,7 +5,7 @@ Thus, by default, the views expect to find the `yaml` under `/swagger`.
 If you change this mapping to something else:
 
 .Exposing Swagger YAML
-[source,yaml]
+[configuration]
 ----
 micronaut:
   router:
