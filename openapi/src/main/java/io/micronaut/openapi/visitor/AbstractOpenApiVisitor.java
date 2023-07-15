@@ -645,7 +645,7 @@ abstract class AbstractOpenApiVisitor {
     }
 
     private <T extends Schema<?>> void processAnnotationValue(VisitorContext context, AnnotationValue<?> annotationValue,
-                                                              Map<CharSequence, Object> arraySchemaMap, List<String> filters, Class<T> type, @Nullable ClassElement jsonViewClass) {
+                                                                                                                       Map<CharSequence, Object> arraySchemaMap, List<String> filters, Class<T> type, @Nullable ClassElement jsonViewClass) {
         Map<CharSequence, Object> values = annotationValue.getValues().entrySet().stream()
             .filter(entry -> filters == null || !filters.contains((String) entry.getKey()))
             .collect(toMap(e -> e.getKey().equals("requiredProperties") ? "required" : e.getKey(), Map.Entry::getValue));
@@ -849,7 +849,7 @@ abstract class AbstractOpenApiVisitor {
                     schema = primitiveType.createProperty();
                 } else if (type.isAssignable(Map.class.getName())) {
                     schema = new MapSchema();
-                    if (typeArgs.isEmpty()) {
+                    if (CollectionUtils.isEmpty(typeArgs)) {
                         schema.setAdditionalProperties(true);
                     } else {
                         ClassElement valueType = typeArgs.get("V");
@@ -978,7 +978,7 @@ abstract class AbstractOpenApiVisitor {
         for (Entry<String, Schema> prop : properties.entrySet()) {
             try {
                 String propertyName = prop.getKey();
-                Schema propertySchema = prop.getValue();
+                Schema<?> propertySchema = prop.getValue();
                 boolean isRequired = wrappedPropertySchema.getRequired() != null && wrappedPropertySchema.getRequired().contains(propertyName);
                 if (StringUtils.isNotEmpty(suffix) || StringUtils.isNotEmpty(prefix)) {
                     propertyName = prefix + propertyName + suffix;
@@ -1003,7 +1003,7 @@ abstract class AbstractOpenApiVisitor {
      * @param propertySchema The property schema
      */
     protected void processSchemaProperty(VisitorContext context, TypedElement element, ClassElement elementType, @Nullable Element classElement,
-                                         Schema<?> parentSchema, Schema<?> propertySchema) {
+                                                                              Schema<?> parentSchema, Schema<?> propertySchema) {
         if (propertySchema == null) {
             return;
         }
@@ -1039,7 +1039,7 @@ abstract class AbstractOpenApiVisitor {
                 required = true;
             }
 
-            propertySchema = bindSchemaForElement(context, element, elementType, propertySchema);
+            propertySchema = bindSchemaForElement(context, element, elementType, propertySchema, null);
             String propertyName = resolvePropertyName(element, classElement, propertySchema);
             propertySchema.setRequired(null);
             Schema<?> propertySchemaFinal = propertySchema;
@@ -1090,7 +1090,7 @@ abstract class AbstractOpenApiVisitor {
         return false;
     }
 
-    private void addProperty(Schema parentSchema, String name, Schema propertySchema, boolean required) {
+    private void addProperty(Schema<?> parentSchema, String name, Schema<?> propertySchema, boolean required) {
         parentSchema.addProperty(name, propertySchema);
         if (required) {
             List<String> requiredList = parentSchema.getRequired();

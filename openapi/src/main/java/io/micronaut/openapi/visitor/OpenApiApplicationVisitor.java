@@ -1797,7 +1797,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             return;
         }
         for (MediaType mediaType : content.values()) {
-            Schema mediaTypeSchema = mediaType.getSchema();
+            Schema<?> mediaTypeSchema = mediaType.getSchema();
             if (mediaTypeSchema == null) {
                 continue;
             }
@@ -1811,8 +1811,8 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             if (CollectionUtils.isNotEmpty(paramSchemas)) {
                 Map<String, Schema> paramNormalizedSchemas = new HashMap<>();
                 for (Map.Entry<String, Schema> paramEntry : paramSchemas.entrySet()) {
-                    Schema paramSchema = paramEntry.getValue();
-                    Schema paramNormalizedSchema = normalizeSchema(paramSchema);
+                    Schema<?> paramSchema = paramEntry.getValue();
+                    Schema<?> paramNormalizedSchema = normalizeSchema(paramSchema);
                     if (paramNormalizedSchema != null) {
                         paramNormalizedSchemas.put(paramEntry.getKey(), paramNormalizedSchema);
                     }
@@ -1831,7 +1831,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         }
     }
 
-    private Schema normalizeSchema(Schema schema) {
+    private Schema<?> normalizeSchema(Schema<?> schema) {
         List<Schema> allOf = schema.getAllOf();
         if (CollectionUtils.isEmpty(allOf)) {
             return null;
@@ -1853,7 +1853,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             }
             schema.setDefault(null);
             schema.setType(null);
-            Schema normalizedSchema = null;
+            Schema<?> normalizedSchema = null;
 
             Object allOfDefaultValue = allOfSchema.getDefault();
             String serializedAllOfDefaultValue;
@@ -1876,8 +1876,8 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         }
         List<Schema> finalList = new ArrayList<>(allOf.size());
         List<Schema> schemasWithoutRef = new ArrayList<>(allOf.size() - 1);
-        for (Schema schemaAllOf : allOf) {
-            Schema normalizedSchema = normalizeSchema(schemaAllOf);
+        for (Schema<?> schemaAllOf : allOf) {
+            Schema<?> normalizedSchema = normalizeSchema(schemaAllOf);
             if (normalizedSchema != null) {
                 schemaAllOf = normalizedSchema;
             }
@@ -1885,8 +1885,8 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             if (CollectionUtils.isNotEmpty(paramSchemas)) {
                 Map<String, Schema> paramNormalizedSchemas = new HashMap<>();
                 for (Map.Entry<String, Schema> paramEntry : paramSchemas.entrySet()) {
-                    Schema paramSchema = paramEntry.getValue();
-                    Schema paramNormalizedSchema = normalizeSchema(paramSchema);
+                    Schema<?> paramSchema = paramEntry.getValue();
+                    Schema<?> paramNormalizedSchema = normalizeSchema(paramSchema);
                     if (paramNormalizedSchema != null) {
                         paramNormalizedSchemas.put(paramEntry.getKey(), paramNormalizedSchema);
                     }
@@ -1931,8 +1931,8 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         Map<String, Schema> normalizedSchemas = new HashMap<>();
 
         for (Map.Entry<String, Schema> entry : schemas.entrySet()) {
-            Schema schema = entry.getValue();
-            Schema normalizedSchema = normalizeSchema(schema);
+            Schema<?> schema = entry.getValue();
+            Schema<?> normalizedSchema = normalizeSchema(schema);
             if (normalizedSchema != null) {
                 normalizedSchemas.put(entry.getKey(), normalizedSchema);
             } else if (schema.equals(EMPTY_SIMPLE_SCHEMA)) {
@@ -1943,8 +1943,8 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             if (CollectionUtils.isNotEmpty(paramSchemas)) {
                 Map<String, Schema> paramNormalizedSchemas = new HashMap<>();
                 for (Map.Entry<String, Schema> paramEntry : paramSchemas.entrySet()) {
-                    Schema paramSchema = paramEntry.getValue();
-                    Schema paramNormalizedSchema = normalizeSchema(paramSchema);
+                    Schema<?> paramSchema = paramEntry.getValue();
+                    Schema<?> paramNormalizedSchema = normalizeSchema(paramSchema);
                     if (paramNormalizedSchema != null) {
                         paramNormalizedSchemas.put(paramEntry.getKey(), paramNormalizedSchema);
                     } else if (paramSchema.equals(EMPTY_SIMPLE_SCHEMA)) {
@@ -1968,7 +1968,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
 
         for (OpenApiInfo openApiInfo : openApiInfos.values()) {
             Optional<Path> specFile = openApiSpecFile(openApiInfo.getFilename(), context);
-            try (Writer writer = getFileWriter(specFile)) {
+            try (Writer writer = getFileWriter(specFile.orElse(null))) {
                 (isYaml ? ConvertUtils.getYamlMapper() : ConvertUtils.getJsonMapper()).writeValue(writer, openApiInfo.getOpenApi());
                 if (Utils.isTestMode()) {
                     Utils.setTestFileName(openApiInfo.getFilename());
@@ -2001,16 +2001,19 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             try {
                 renderViews(documentTitle, openApiInfos, viewsDestDirs, context);
             } catch (Exception e) {
-                context.warn("Unable to render swagger" + (isYaml ? EXT_YML : EXT_JSON) + ": " + openApiInfos.get(0).getSpecFilePath() + " - " + e.getMessage() + ".\n" + Utils.printStackTrace(e), classElement);
+                context.warn("Unable to render swagger" + (isYaml ? EXT_YML : EXT_JSON) + ": " + openApiInfos.values()
+                    .stream()
+                    .map(OpenApiInfo::getSpecFilePath)
+                    .collect(Collectors.joining(", ", "files ", "")) + " - " + e.getMessage() + ".\n" + Utils.printStackTrace(e), classElement);
             }
         }
     }
 
-    private Writer getFileWriter(Optional<Path> specFile) throws IOException {
+    private Writer getFileWriter(Path specFile) throws IOException {
         if (Utils.isTestMode()) {
             return new StringWriter();
-        } else if (specFile.isPresent()) {
-            return Files.newBufferedWriter(specFile.get(), StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
+        } else if (specFile != null) {
+            return Files.newBufferedWriter(specFile, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
         } else {
             throw new IOException("Swagger spec file location is not present");
         }

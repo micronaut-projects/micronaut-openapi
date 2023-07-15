@@ -1466,7 +1466,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             HttpMethod httpMethod = httpMethod(element);
             for (InterceptUrlMapPattern securityRule : securityRules) {
                 if (PathMatcher.ANT.matches(securityRule.getPattern(), path)
-                    && (httpMethod == null || securityRule.getHttpMethod().isEmpty() || httpMethod == securityRule.getHttpMethod().get())) {
+                    && (httpMethod == null || securityRule.getHttpMethod() == null || httpMethod == securityRule.getHttpMethod())) {
 
                     processSecurityAccess(securitySchemeName, securityRule.getAccess(), operation);
                 }
