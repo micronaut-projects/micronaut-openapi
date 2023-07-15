@@ -262,9 +262,17 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
      */
     public static final String MICRONAUT_INTERNAL_OPENAPI_FILENAMES = "micronaut.internal.openapi.filenames";
     /**
+     * Loaded micronaut-http-server-netty property (json-view.enabled).
+     */
+    public static final String MICRONAUT_JACKSON_JSON_VIEW_ENABLED = "jackson.json-view.enabled";
+    /**
      * Loaded micronaut environment.
      */
     private static final String MICRONAUT_ENVIRONMENT = "micronaut.environment";
+    /**
+     * Loaded into context jackson.json-view.enabled property value.
+     */
+    private static final String MICRONAUT_INTERNAL_JACKSON_JSON_VIEW_ENABLED = "micronaut.internal.jackson.json-view.enabled";
     private static final String MICRONAUT_ENVIRONMENT_CREATED = "micronaut.environment.created";
     private static final String MICRONAUT_OPENAPI_PROPERTIES = "micronaut.openapi.properties";
     private static final String MICRONAUT_OPENAPI_ENDPOINTS = "micronaut.openapi.endpoints";
@@ -617,6 +625,19 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         }
         Environment environment = getEnv(context);
         return environment != null ? environment.get(key, String.class).orElse(null) : null;
+    }
+
+    public static boolean isJsonViewEnabled(VisitorContext context) {
+
+        Boolean isJsonViewEnabled = context.get(MICRONAUT_INTERNAL_JACKSON_JSON_VIEW_ENABLED, Boolean.class).orElse(null);
+        if (isJsonViewEnabled != null) {
+            return isJsonViewEnabled;
+        }
+
+        isJsonViewEnabled = getBooleanProperty(MICRONAUT_JACKSON_JSON_VIEW_ENABLED, false, context);
+        context.put(MICRONAUT_INTERNAL_JACKSON_JSON_VIEW_ENABLED, isJsonViewEnabled);
+
+        return isJsonViewEnabled;
     }
 
     public static SecurityProperties getSecurityProperties(VisitorContext context) {
@@ -1067,7 +1088,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
 
     private OpenAPI readOpenApi(ClassElement element, VisitorContext context) {
         return element.findAnnotation(OpenAPIDefinition.class).flatMap(o -> {
-                    Optional<OpenAPI> result = toValue(o.getValues(), context, OpenAPI.class);
+                    Optional<OpenAPI> result = toValue(o.getValues(), context, OpenAPI.class, null);
                     result.ifPresent(openAPI -> {
                         List<io.swagger.v3.oas.models.security.SecurityRequirement> securityRequirements =
                                 o.getAnnotations("security", SecurityRequirement.class)

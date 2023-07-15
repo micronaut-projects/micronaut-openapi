@@ -35,6 +35,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import io.micronaut.core.annotation.AnnotationValue;
+import io.micronaut.core.annotation.Nullable;
 import io.micronaut.core.beans.BeanMap;
 import io.micronaut.core.bind.annotation.Bindable;
 import io.micronaut.core.naming.NameUtils;
@@ -113,6 +114,7 @@ import io.swagger.v3.oas.models.security.SecurityScheme;
 import io.swagger.v3.oas.models.servers.Server;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -120,6 +122,7 @@ import static io.micronaut.openapi.visitor.ElementUtils.isFileUpload;
 import static io.micronaut.openapi.visitor.ElementUtils.isNullable;
 import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.getGroupsPropertiesMap;
 import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.getSecurityProperties;
+import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.isJsonViewEnabled;
 import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.isOpenApiEnabled;
 import static io.micronaut.openapi.visitor.SchemaUtils.COMPONENTS_CALLBACKS_PREFIX;
 import static io.micronaut.openapi.visitor.SchemaUtils.COMPONENTS_SCHEMAS_PREFIX;
@@ -235,7 +238,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
     private void processExternalDocs(ClassElement element, VisitorContext context) {
         final Optional<AnnotationValue<ExternalDocumentation>> externalDocsAnn = element.findAnnotation(ExternalDocumentation.class);
         classExternalDocs = externalDocsAnn
-            .flatMap(o -> toValue(o.getValues(), context, io.swagger.v3.oas.models.ExternalDocumentation.class))
+            .flatMap(o -> toValue(o.getValues(), context, io.swagger.v3.oas.models.ExternalDocumentation.class, null))
             .orElse(null);
     }
 
@@ -381,11 +384,24 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         List<MediaType> consumesMediaTypes = consumesMediaTypes(element);
         List<MediaType> producesMediaTypes = producesMediaTypes(element);
 
+        ClassElement jsonViewClass = null;
+        if (isJsonViewEnabled(context)) {
+            AnnotationValue<JsonView> jsonViewAnnotation = element.findAnnotation(JsonView.class).orElse(null);
+            if (jsonViewAnnotation == null) {
+                jsonViewAnnotation = element.getOwningType().findAnnotation(JsonView.class).orElse(null);
+            }
+            if (jsonViewAnnotation != null) {
+                String jsonViewClassName = jsonViewAnnotation.stringValue().orElse(null);
+                if (jsonViewClassName != null) {
+                    jsonViewClass = context.getClassElement(jsonViewClassName).orElse(null);
+                }
+            }
+        }
+
         for (Map.Entry<String, List<PathItem>> pathItemEntry : pathItemsMap.entrySet()) {
             List<PathItem> pathItems = pathItemEntry.getValue();
 
-            Map<PathItem, io.swagger.v3.oas.models.Operation> swaggerOperations = readOperations(pathItemEntry.getKey(), httpMethod, pathItems, element, context);
-
+            Map<PathItem, io.swagger.v3.oas.models.Operation> swaggerOperations = readOperations(pathItemEntry.getKey(), httpMethod, pathItems, element, context, jsonViewClass);
 
             for (Map.Entry<PathItem, io.swagger.v3.oas.models.Operation> operationEntry : swaggerOperations.entrySet()) {
                 io.swagger.v3.oas.models.Operation swaggerOperation = operationEntry.getValue();
@@ -401,11 +417,11 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
 
                 readSecurityRequirements(element, pathItemEntry.getKey(), swaggerOperation, context);
 
-                readApiResponses(element, context, swaggerOperation);
+                readApiResponses(element, context, swaggerOperation, jsonViewClass);
 
                 readServers(element, context, swaggerOperation);
 
-                readCallbacks(element, context, swaggerOperation);
+                readCallbacks(element, context, swaggerOperation, jsonViewClass);
 
                 javadocDescription = getMethodDescription(element, swaggerOperation);
 
@@ -413,7 +429,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                     swaggerOperation.setDeprecated(true);
                 }
 
-                readResponse(element, context, openAPI, swaggerOperation, javadocDescription);
+                readResponse(element, context, openAPI, swaggerOperation, javadocDescription, jsonViewClass);
 
                 boolean isRequestBodySchemaSet = false;
 
@@ -693,9 +709,11 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
 
                         io.swagger.v3.oas.models.media.MediaType mediaType = entry.getValue();
 
-                        Schema<?> propertySchema = bindSchemaForElement(context, parameter, parameterType, mediaType.getSchema());
+                        Schema<?> propertySchema = bindSchemaForElement(context, parameter, parameterType, mediaType.getSchema(), null);
 
-                        String bodyAnnValue = parameter.getAnnotation(Body.class).getValue(String.class).orElse(null);
+                        AnnotationValue<Body> bodyAnn = parameter.getAnnotation(Body.class);
+
+                        String bodyAnnValue = bodyAnn != null ? bodyAnn.getValue(String.class).orElse(null) : null;
                         if (StringUtils.isNotEmpty(bodyAnnValue)) {
                             var wrapperSchema = new Schema<>();
                             wrapperSchema.setType(TYPE_OBJECT);
@@ -728,7 +746,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         }
 
         if (newParameter.getExplode() != null && newParameter.getExplode() && "query".equals(newParameter.getIn()) && !parameterType.isIterable()) {
-            Schema<?> explodedSchema = resolveSchema(openAPI, parameter, parameterType, context, consumesMediaTypes, null, null);
+            Schema<?> explodedSchema = resolveSchema(openAPI, parameter, parameterType, context, consumesMediaTypes, null, null, null);
             if (explodedSchema != null) {
                 if (openAPI.getComponents() != null && openAPI.getComponents().getSchemas() != null && StringUtils.isNotEmpty(explodedSchema.get$ref())) {
                     explodedSchema = openAPI.getComponents().getSchemas().get(explodedSchema.get$ref().substring(Components.COMPONENTS_SCHEMAS_REF.length()));
@@ -766,11 +784,11 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
 
             Schema<?> schema = newParameter.getSchema();
             if (schema == null) {
-                schema = resolveSchema(openAPI, parameter, parameterType, context, consumesMediaTypes, null, null);
+                schema = resolveSchema(openAPI, parameter, parameterType, context, consumesMediaTypes, null, null, null);
             }
 
             if (schema != null) {
-                schema = bindSchemaForElement(context, parameter, parameterType, schema);
+                schema = bindSchemaForElement(context, parameter, parameterType, schema, null);
                 newParameter.setSchema(schema);
             }
         }
@@ -791,8 +809,19 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
 
     private void processBodyParameter(VisitorContext context, OpenAPI openAPI, JavadocDescription javadocDescription,
                                       MediaType mediaType, Schema schema, TypedElement parameter) {
-        Schema<?> propertySchema = resolveSchema(openAPI, parameter, parameter.getType(), context,
-            Collections.singletonList(mediaType), null, null);
+
+        ClassElement jsonViewClass = null;
+        if (isJsonViewEnabled(context)) {
+            AnnotationValue<JsonView> jsonViewAnnotation = parameter.findAnnotation(JsonView.class).orElse(null);
+            if (jsonViewAnnotation != null) {
+                String jsonViewClassName = jsonViewAnnotation.stringValue().orElse(null);
+                if (jsonViewClassName != null) {
+                    jsonViewClass = context.getClassElement(jsonViewClassName).orElse(null);
+                }
+            }
+        }
+
+        Schema<?> propertySchema = resolveSchema(openAPI, parameter, parameter.getType(), context, Collections.singletonList(mediaType), jsonViewClass, null, null);
         if (propertySchema != null) {
 
             Optional<String> description = parameter.getValue(io.swagger.v3.oas.annotations.Parameter.class, "description", String.class);
@@ -926,7 +955,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                     return null;
                 }
 
-                Map<CharSequence, Object> paramValues = toValueMap(paramAnn.getValues(), context);
+                Map<CharSequence, Object> paramValues = toValueMap(paramAnn.getValues(), context, null);
                 Utils.normalizeEnumValues(paramValues, Collections.singletonMap("in", ParameterIn.class));
                 if (parameter.isAnnotationPresent(Header.class)) {
                     paramValues.put("in", ParameterIn.HEADER.toString());
@@ -993,7 +1022,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                     final Schema<?> parameterSchema = newParameter.getSchema();
                     if (paramAnn.contains("schema") && parameterSchema != null) {
                         paramAnn.get("schema", AnnotationValue.class)
-                                .ifPresent(schemaAnn -> bindSchemaAnnotationValue(context, parameter, parameterSchema, schemaAnn));
+                                .ifPresent(schemaAnn -> bindSchemaAnnotationValue(context, parameter, parameterSchema, schemaAnn, null));
                     }
                 }
             }
@@ -1010,6 +1039,18 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                              io.swagger.v3.oas.models.Operation swaggerOperation, JavadocDescription javadocDescription,
                              boolean permitsRequestBody, List<MediaType> consumesMediaTypes, TypedElement parameter,
                              ClassElement parameterType) {
+
+        ClassElement jsonViewClass = null;
+        if (isJsonViewEnabled(context)) {
+            AnnotationValue<JsonView> jsonViewAnnotation = parameter.findAnnotation(JsonView.class).orElse(null);
+            if (jsonViewAnnotation != null) {
+                String jsonViewClassName = jsonViewAnnotation.stringValue().orElse(null);
+                if (jsonViewClassName != null) {
+                    jsonViewClass = context.getClassElement(jsonViewClassName).orElse(null);
+                }
+            }
+        }
+
         if (!permitsRequestBody) {
             return;
         }
@@ -1028,7 +1069,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             requestBody.setRequired(true);
         }
 
-        final Content content = buildContent(parameter, parameterType, consumesMediaTypes, openAPI, context);
+        final Content content = buildContent(parameter, parameterType, consumesMediaTypes, openAPI, context, jsonViewClass);
         if (requestBody.getContent() == null) {
             requestBody.setContent(content);
         } else {
@@ -1077,13 +1118,13 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
     }
 
     private void readResponse(MethodElement element, VisitorContext context, OpenAPI openAPI,
-                              io.swagger.v3.oas.models.Operation swaggerOperation, JavadocDescription javadocDescription) {
+                              io.swagger.v3.oas.models.Operation swaggerOperation, JavadocDescription javadocDescription, @Nullable ClassElement jsonViewClass) {
 
         boolean withMethodResponses = element.hasDeclaredAnnotation(io.swagger.v3.oas.annotations.responses.ApiResponse.class)
             || element.hasDeclaredAnnotation(io.swagger.v3.oas.annotations.responses.ApiResponse.class);
 
         HttpStatus methodResponseStatus = element.enumValue(Status.class, HttpStatus.class).orElse(HttpStatus.OK);
-        String responseCode = String.valueOf(methodResponseStatus.getCode());
+        String responseCode = Integer.toString(methodResponseStatus.getCode());
         ApiResponses responses = swaggerOperation.getResponses();
         ApiResponse response = null;
 
@@ -1105,22 +1146,22 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             } else {
                 response.setDescription(javadocDescription.getReturnDescription());
             }
-            addResponseContent(element, context, openAPI, response);
+            addResponseContent(element, context, openAPI, response, jsonViewClass);
             responses.put(responseCode, response);
         } else if (response != null && response.getContent() == null) {
-            addResponseContent(element, context, openAPI, response);
+            addResponseContent(element, context, openAPI, response, jsonViewClass);
         }
     }
 
-    private void addResponseContent(MethodElement element, VisitorContext context, OpenAPI openAPI, ApiResponse response) {
+    private void addResponseContent(MethodElement element, VisitorContext context, OpenAPI openAPI, ApiResponse response, @Nullable ClassElement jsonViewClass) {
         ClassElement returnType = returnType(element, context);
         if (returnType != null && !returnType.getCanonicalName().equals(Void.class.getName())) {
             List<MediaType> producesMediaTypes = producesMediaTypes(element);
             Content content;
             if (producesMediaTypes.isEmpty()) {
-                content = buildContent(element, returnType, DEFAULT_MEDIA_TYPES, openAPI, context);
+                content = buildContent(element, returnType, DEFAULT_MEDIA_TYPES, openAPI, context, jsonViewClass);
             } else {
-                content = buildContent(element, returnType, producesMediaTypes, openAPI, context);
+                content = buildContent(element, returnType, producesMediaTypes, openAPI, context, jsonViewClass);
             }
             response.setContent(content);
         }
@@ -1176,12 +1217,13 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         return javadocDescription;
     }
 
-    private Map<PathItem, io.swagger.v3.oas.models.Operation> readOperations(String path, HttpMethod httpMethod, List<PathItem> pathItems, MethodElement element, VisitorContext context) {
+    private Map<PathItem, io.swagger.v3.oas.models.Operation> readOperations(String path, HttpMethod httpMethod, List<PathItem> pathItems, MethodElement element, VisitorContext context, @Nullable ClassElement jsonViewClass) {
         Map<PathItem, io.swagger.v3.oas.models.Operation> swaggerOperations = new HashMap<>(pathItems.size());
         final Optional<AnnotationValue<Operation>> operationAnnotation = element.findAnnotation(Operation.class);
+
         for (PathItem pathItem : pathItems) {
             io.swagger.v3.oas.models.Operation swaggerOperation = operationAnnotation
-                .flatMap(o -> toValue(o.getValues(), context, io.swagger.v3.oas.models.Operation.class))
+                .flatMap(o -> toValue(o.getValues(), context, io.swagger.v3.oas.models.Operation.class, jsonViewClass))
                 .orElse(new io.swagger.v3.oas.models.Operation());
 
             if (CollectionUtils.isNotEmpty(swaggerOperation.getParameters())) {
@@ -1341,7 +1383,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         final Optional<AnnotationValue<ExternalDocumentation>> externalDocsAnn = element.findAnnotation(ExternalDocumentation.class);
 
         return externalDocsAnn
-            .flatMap(o -> toValue(o.getValues(), context, io.swagger.v3.oas.models.ExternalDocumentation.class))
+            .flatMap(o -> toValue(o.getValues(), context, io.swagger.v3.oas.models.ExternalDocumentation.class, null))
             .orElse(null);
     }
 
@@ -1531,15 +1573,16 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             && isResponseType(returnType.getFirstTypeArgument().get());
     }
 
-    private void readApiResponses(MethodElement element, VisitorContext context, io.swagger.v3.oas.models.Operation swaggerOperation) {
+    private void readApiResponses(MethodElement element, VisitorContext context, io.swagger.v3.oas.models.Operation swaggerOperation, @Nullable ClassElement jsonViewClass) {
         List<AnnotationValue<io.swagger.v3.oas.annotations.responses.ApiResponse>> methodResponseAnnotations = element.getAnnotationValuesByType(io.swagger.v3.oas.annotations.responses.ApiResponse.class);
-        processResponses(swaggerOperation, methodResponseAnnotations, element, context);
+        processResponses(swaggerOperation, methodResponseAnnotations, element, context, jsonViewClass);
 
         List<AnnotationValue<io.swagger.v3.oas.annotations.responses.ApiResponse>> classResponseAnnotations = element.getDeclaringType().getAnnotationValuesByType(io.swagger.v3.oas.annotations.responses.ApiResponse.class);
-        processResponses(swaggerOperation, classResponseAnnotations, element, context);
+        processResponses(swaggerOperation, classResponseAnnotations, element, context, jsonViewClass);
     }
 
-    private void processResponses(io.swagger.v3.oas.models.Operation operation, List<AnnotationValue<io.swagger.v3.oas.annotations.responses.ApiResponse>> responseAnnotations, MethodElement element, VisitorContext context) {
+    private void processResponses(io.swagger.v3.oas.models.Operation operation, List<AnnotationValue<io.swagger.v3.oas.annotations.responses.ApiResponse>> responseAnnotations,
+                                  MethodElement element, VisitorContext context, @Nullable ClassElement jsonViewClass) {
         ApiResponses apiResponses = operation.getResponses();
         if (apiResponses == null) {
             apiResponses = new ApiResponses();
@@ -1551,11 +1594,11 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                 if (apiResponses.containsKey(responseCode)) {
                     continue;
                 }
-                Optional<ApiResponse> newResponse = toValue(response.getValues(), context, ApiResponse.class);
+                Optional<ApiResponse> newResponse = toValue(response.getValues(), context, ApiResponse.class, jsonViewClass);
                 if (newResponse.isPresent()) {
                     ApiResponse newApiResponse = newResponse.get();
                     if (response.booleanValue("useReturnTypeSchema").orElse(false) && element != null) {
-                        addResponseContent(element, context, Utils.resolveOpenApi(context), newApiResponse);
+                        addResponseContent(element, context, Utils.resolveOpenApi(context), newApiResponse, jsonViewClass);
                     } else {
 
                         List<MediaType> producesMediaTypes = producesMediaTypes(element);
@@ -1620,7 +1663,18 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             }
         }
 
-        RequestBody requestBody = toValue(requestBodyAnnValue.getValues(), context, RequestBody.class).orElse(null);
+        ClassElement jsonViewClass = null;
+        if (isJsonViewEnabled(context) && element instanceof ParameterElement) {
+            AnnotationValue<JsonView> jsonViewAnnotation = element.findAnnotation(JsonView.class).orElse(null);
+            if (jsonViewAnnotation != null) {
+                String jsonViewClassName = jsonViewAnnotation.stringValue().orElse(null);
+                if (jsonViewClassName != null) {
+                    jsonViewClass = context.getClassElement(jsonViewClassName).orElse(null);
+                }
+            }
+        }
+
+        RequestBody requestBody = toValue(requestBodyAnnValue.getValues(), context, RequestBody.class, jsonViewClass).orElse(null);
         // if media type doesn't set in swagger annotation, check micronaut annotation
         if (content != null
             && content.stringValue("mediaType").isEmpty()
@@ -1644,7 +1698,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
     }
 
     private void readCallbacks(MethodElement element, VisitorContext context,
-                               io.swagger.v3.oas.models.Operation swaggerOperation) {
+                               io.swagger.v3.oas.models.Operation swaggerOperation, @Nullable ClassElement jsonViewClass) {
         AnnotationValue<Callbacks> callbacksAnnotation = element.getAnnotation(Callbacks.class);
         List<AnnotationValue<Callback>> callbackAnnotations;
         if (callbacksAnnotation != null) {
@@ -1669,7 +1723,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             }
             final Optional<String> expr = callbackAnn.stringValue("callbackUrlExpression");
             if (expr.isPresent()) {
-                processUrlCallbackExpression(context, swaggerOperation, callbackAnn, callbackName, expr.get());
+                processUrlCallbackExpression(context, swaggerOperation, callbackAnn, callbackName, expr.get(), jsonViewClass);
             } else {
                 processCallbackReference(context, swaggerOperation, callbackName, null);
             }
@@ -1687,7 +1741,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
 
     private void processUrlCallbackExpression(VisitorContext context,
                                               io.swagger.v3.oas.models.Operation swaggerOperation, AnnotationValue<Callback> callbackAnn,
-                                              String callbackName, final String callbackUrl) {
+                                              String callbackName, final String callbackUrl, @Nullable ClassElement jsonViewClass) {
         final List<AnnotationValue<Operation>> operations = callbackAnn.getAnnotations("operation", Operation.class);
         if (CollectionUtils.isEmpty(operations)) {
             Map<String, io.swagger.v3.oas.models.callbacks.Callback> callbacks = initCallbacks(
@@ -1699,7 +1753,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             final PathItem pathItem = new PathItem();
             for (AnnotationValue<Operation> operation : operations) {
                 final Optional<HttpMethod> operationMethod = operation.get("method", HttpMethod.class);
-                operationMethod.ifPresent(httpMethod -> toValue(operation.getValues(), context, io.swagger.v3.oas.models.Operation.class)
+                operationMethod.ifPresent(httpMethod -> toValue(operation.getValues(), context, io.swagger.v3.oas.models.Operation.class, jsonViewClass)
                     .ifPresent(op -> setOperationOnPathItem(pathItem, httpMethod, op)));
             }
             Map<String, io.swagger.v3.oas.models.callbacks.Callback> callbacks = initCallbacks(
@@ -1907,17 +1961,17 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
 
     final List<io.swagger.v3.oas.models.tags.Tag> readTags(List<AnnotationValue<Tag>> annotations, VisitorContext context) {
         return annotations.stream()
-            .map(av -> toValue(av.getValues(), context, io.swagger.v3.oas.models.tags.Tag.class))
+            .map(av -> toValue(av.getValues(), context, io.swagger.v3.oas.models.tags.Tag.class, null))
             .filter(Optional::isPresent)
             .map(Optional::get)
             .collect(Collectors.toList());
     }
 
-    private Content buildContent(Element definingElement, ClassElement type, List<MediaType> mediaTypes, OpenAPI openAPI, VisitorContext context) {
+    private Content buildContent(Element definingElement, ClassElement type, List<MediaType> mediaTypes, OpenAPI openAPI, VisitorContext context, @Nullable ClassElement jsonViewClass) {
         Content content = new Content();
         mediaTypes.forEach(mediaType -> {
             io.swagger.v3.oas.models.media.MediaType mt = new io.swagger.v3.oas.models.media.MediaType();
-            mt.setSchema(resolveSchema(openAPI, definingElement, type, context, Collections.singletonList(mediaType), null, null));
+            mt.setSchema(resolveSchema(openAPI, definingElement, type, context, Collections.singletonList(mediaType), jsonViewClass, null, null));
             content.addMediaType(mediaType.toString(), mt);
         });
         return content;
