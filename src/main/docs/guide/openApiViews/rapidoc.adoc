@@ -52,17 +52,17 @@ See https://mrin9.github.io/RapiDoc/api.html[RapiDoc Options] for a description.
 To expose the `rapidoc` views, you also must expose the generated `yaml`:
 
 .Exposing Swagger YAML And Rapidoc Views
-[configuration]
+[source,yaml]
 ----
 micronaut:
-    router:
-        static-resources:
-            swagger:
-                paths: classpath:META-INF/swagger
-                mapping: /swagger/**
-            rapidoc:
-                paths: classpath:META-INF/swagger/views/rapidoc
-                mapping: /rapidoc/**
+  router:
+    static-resources:
+      swagger:
+        paths: classpath:META-INF/swagger
+        mapping: /swagger/**
+      rapidoc:
+        paths: classpath:META-INF/swagger/views/rapidoc
+        mapping: /rapidoc/**
 ----
 
 With the above configuration in place when you run your application you can access your Swagger documentation at +http://localhost:8080/rapidoc+.

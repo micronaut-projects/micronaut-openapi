@@ -3,7 +3,7 @@ You can specify OpenAPI processing configuration in a file located at the root l
 It is possible to specify a different location and filename with the `micronaut.openapi.config.file` System property.
 
 .openapi.properties Example
-[source]
+[source,properties]
 ----
 micronaut.openapi.property.naming.strategy=KEBAB_CASE
 micronaut.openapi.target.file=myspecfile.yml
@@ -15,7 +15,7 @@ micronaut.openapi.target.file=myspecfile.yml
 Properties prefixed with `micronaut.openapi.expand` will be expanded at compile time, for instance with:
 
 .openapi.properties Property Resolution
-[source]
+[source,properties]
 ----
 micronaut.openapi.expand.api.version=v1.1
 micronaut.openapi.expand.openapi.description=A nice API

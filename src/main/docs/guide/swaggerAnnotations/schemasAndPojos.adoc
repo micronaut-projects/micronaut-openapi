@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(name="MyPet", description="Pet description") // <1>
 class Pet {
+
     private PetType type;
     private int age;
     private String name;

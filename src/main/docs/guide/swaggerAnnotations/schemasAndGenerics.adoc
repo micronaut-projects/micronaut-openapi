@@ -4,9 +4,15 @@ If a method return type includes generics then these will be included when calcu
 [source,java]
 ----
 class Response<T> {
+
     private T r;
+
     public T getResult() {
         return r;
+    }
+
+    public void setResult(T r) {
+        this.r = r;
     }
 }
 
@@ -26,7 +32,7 @@ Will result in a schema called `#/components/schemas/Response<Pet>` being genera
 [source,java]
 ----
 @Put("/")
-@Schema(name="ResponseOfPet")
+@Schema(name = "ResponseOfPet")
 public Response<Pet> updatePet(Pet pet) {
     ...
 }
