@@ -2,7 +2,6 @@ package io.micronaut.openapi.generator;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -28,7 +27,7 @@ public abstract class AbstractMicronautCodegenTest {
     /**
      * @param codegen - the code generator
      * @param configPath - the path to the config starting from src/test/resources
-     * @param filesToGenerate - which files to generate - can be CodegenConstants.MODELS, APIS, SUPPORTING_FILES, ...
+     * @param filesToGenerate - which files to generate - can be CodegenConstants. MODELS, APIS, SUPPORTING_FILES, ...
      *
      * @return - the path to the generated folder
      */
@@ -124,7 +123,7 @@ public abstract class AbstractMicronautCodegenTest {
     public static String readFile(String path) {
         String file = null;
         try {
-            file = new String(Files.readAllBytes(Paths.get(path)), StandardCharsets.UTF_8);
+            file = Files.readString(Paths.get(path));
             assertNotNull(file, "File \"" + path + "\" does not exist");
         } catch (IOException e) {
             fail("Unable to evaluate file " + path);

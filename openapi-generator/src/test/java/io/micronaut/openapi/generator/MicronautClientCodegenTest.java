@@ -24,7 +24,7 @@ class MicronautClientCodegenTest extends AbstractMicronautCodegenTest {
     }
 
     @Test
-    void testInitialConfigValues() throws Exception {
+    void testInitialConfigValues() {
         final JavaMicronautClientCodegen codegen = new JavaMicronautClientCodegen();
         codegen.processOpts();
 

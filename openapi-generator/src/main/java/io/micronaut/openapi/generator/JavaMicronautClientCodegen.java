@@ -47,7 +47,6 @@ public class JavaMicronautClientCodegen extends AbstractMicronautJavaCodegen<Jav
     protected String clientId;
 
     JavaMicronautClientCodegen() {
-        super();
 
         title = "OpenAPI Micronaut Client";
         configureAuthorization = false;

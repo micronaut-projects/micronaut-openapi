@@ -26,7 +26,7 @@ import java.util.function.Consumer;
 public interface MicronautCodeGeneratorBuilder {
 
     /**
-     * Sets the code generator which should be used (e.g server or client).
+     * Sets the code generator which should be used (e.g. server or client).
      *
      * @param generator the generator
      * @param configuration the configuration block for this generator

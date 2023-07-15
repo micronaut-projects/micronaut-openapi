@@ -21,7 +21,7 @@ public class ConstructorAssert extends AbstractAssert<ConstructorAssert, Constru
     ConstructorAssert(final JavaFileAssert fileAssert, final ConstructorDeclaration constructorDeclaration) {
         super(constructorDeclaration, ConstructorAssert.class);
         this.fileAssert = fileAssert;
-        this.signature = constructorDeclaration.getDeclarationAsString();
+        signature = constructorDeclaration.getDeclarationAsString();
     }
 
     public JavaFileAssert toFileAssert() {

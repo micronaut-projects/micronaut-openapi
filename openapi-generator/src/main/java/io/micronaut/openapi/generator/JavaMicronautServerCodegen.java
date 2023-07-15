@@ -59,13 +59,12 @@ public class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen<Jav
     protected String controllerPackage = "org.openapitools.controller";
     protected boolean generateImplementationFiles = true;
     protected boolean generateOperationsToReturnNotImplemented = true;
-    protected boolean generateControllerFromExamples = false;
+    protected boolean generateControllerFromExamples;
     protected boolean useAuth = true;
     protected boolean generateHardNullable = true;
-    protected boolean generateStreamingFileUpload = false;
+    protected boolean generateStreamingFileUpload;
 
     JavaMicronautServerCodegen() {
-        super();
 
         title = "OpenAPI Micronaut Server";
         apiPackage = "org.openapitools.api";

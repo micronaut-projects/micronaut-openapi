@@ -110,7 +110,6 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
     protected List<ResponseBodyMapping> responseBodyMappings = new ArrayList<>();
 
     protected AbstractMicronautJavaCodegen() {
-        super();
 
         // CHECKSTYLE:OFF
         // Set all the fields
@@ -611,8 +610,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
 
     @Override
     public CodegenParameter fromParameter(Parameter param, Set<String> imports) {
-        CodegenParameter parameter = super.fromParameter(param, imports);
-        return parameter;
+        return super.fromParameter(param, imports);
     }
 
     @Override
@@ -626,7 +624,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
             op.imports.add(op.returnType);
         }
 
-        op.vendorExtensions.put("originalParams", new ArrayList(op.allParams));
+        op.vendorExtensions.put("originalParams", new ArrayList<>(op.allParams));
         op.vendorExtensions.put("originReturnProperty", op.returnProperty);
         processParametersWithAdditionalMappings(op.allParams, op.imports);
         processWithResponseBodyMapping(op);

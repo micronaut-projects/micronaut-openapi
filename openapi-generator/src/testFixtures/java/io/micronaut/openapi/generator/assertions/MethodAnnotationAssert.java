@@ -15,13 +15,13 @@ public class MethodAnnotationAssert extends AbstractAnnotationAssert<MethodAnnot
     protected MethodAnnotationAssert(final MethodAssert methodAssert, final List<AnnotationExpr> annotationExpr) {
         super(annotationExpr);
         this.methodAssert = methodAssert;
-        this.constructorAssert = null;
+        constructorAssert = null;
     }
 
     protected MethodAnnotationAssert(final ConstructorAssert constructorAssert, final List<AnnotationExpr> annotationExpr) {
         super(annotationExpr);
         this.constructorAssert = constructorAssert;
-        this.methodAssert = null;
+        methodAssert = null;
     }
 
     public MethodAssert toMethod() {
