@@ -79,6 +79,7 @@ import io.micronaut.inject.ast.GenericPlaceholderElement;
 import io.micronaut.inject.ast.MemberElement;
 import io.micronaut.inject.ast.PropertyElement;
 import io.micronaut.inject.ast.TypedElement;
+import io.micronaut.inject.ast.WildcardElement;
 import io.micronaut.inject.visitor.VisitorContext;
 import io.micronaut.openapi.javadoc.JavadocDescription;
 import io.micronaut.openapi.swagger.core.util.PrimitiveType;
@@ -787,13 +788,26 @@ abstract class AbstractOpenApiVisitor {
             }
         }
 
+        Boolean isArray = null;
+        Boolean isIterable = null;
+
         ClassElement componentType = type != null ? type.getFirstTypeArgument().orElse(null) : null;
+        if (type instanceof WildcardElement wildcardEl) {
+            type = CollectionUtils.isNotEmpty(wildcardEl.getUpperBounds()) ? wildcardEl.getUpperBounds().get(0) : null;
+        } else if (type instanceof GenericPlaceholderElement placeholderEl) {
+            isArray = type.isArray();
+            isIterable = type.isIterable();
+            type = placeholderEl.getResolved().orElse(CollectionUtils.isNotEmpty(placeholderEl.getBounds()) ? placeholderEl.getBounds().get(0) : null);
+        }
         Map<String, ClassElement> typeArgs = type != null ? type.getTypeArguments() : null;
 
         Schema<?> schema = null;
 
         if (type instanceof EnumElement enumEl) {
             schema = getSchemaDefinition(openAPI, context, enumEl, typeArgs, definingElement, mediaTypes, jsonViewClass);
+            if (isArray != null && isArray) {
+                schema = SchemaUtils.arraySchema(schema);
+            }
         } else {
 
             boolean isPublisher = false;
@@ -830,6 +844,13 @@ abstract class AbstractOpenApiVisitor {
 
             if (type != null) {
 
+                if (isArray == null) {
+                    isArray = type.isArray();
+                }
+                if (isIterable == null) {
+                    isIterable = type.isIterable();
+                }
+
                 String typeName = type.getName();
                 ClassElement customTypeSchema = OpenApiApplicationVisitor.getCustomSchema(typeName, typeArgs, context);
                 if (customTypeSchema != null) {
@@ -843,9 +864,9 @@ abstract class AbstractOpenApiVisitor {
                     typeName = PrimitiveType.BINARY.name();
                 }
                 PrimitiveType primitiveType = PrimitiveType.fromName(typeName);
-                if (!type.isArray() && ClassUtils.isJavaLangType(typeName)) {
+                if (!isArray && ClassUtils.isJavaLangType(typeName)) {
                     schema = getPrimitiveType(typeName);
-                } else if (!type.isArray() && primitiveType != null) {
+                } else if (!isArray && primitiveType != null) {
                     schema = primitiveType.createProperty();
                 } else if (type.isAssignable(Map.class.getName())) {
                     schema = new MapSchema();
@@ -859,8 +880,8 @@ abstract class AbstractOpenApiVisitor {
                             schema.setAdditionalProperties(resolveSchema(openAPI, type, valueType, context, mediaTypes, jsonViewClass, null, classJavadoc));
                         }
                     }
-                } else if (type.isIterable()) {
-                    if (type.isArray()) {
+                } else if (isIterable) {
+                    if (isArray) {
                         schema = resolveSchema(openAPI, type, type.fromArray(), context, mediaTypes, jsonViewClass, null, classJavadoc);
                         if (schema != null) {
                             schema = SchemaUtils.arraySchema(schema);
