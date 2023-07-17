@@ -1,6 +1,6 @@
 If you have some classes with same names in different packages you can set postfix like this:
 
-[source,yaml]
+[configuration]
 ----
 micronaut:
   openapi:

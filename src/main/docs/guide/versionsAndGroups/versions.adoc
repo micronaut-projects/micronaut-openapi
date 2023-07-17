@@ -40,7 +40,7 @@ public class VersionedController {
 ----
 
 .application.yml
-[source,yaml]
+[configuration]
 ----
 micronaut:
   router:

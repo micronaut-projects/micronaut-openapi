@@ -12,6 +12,7 @@ controllers: OpenAPI Generation for Controllers
 namingstrategy: Naming Strategy
 customSerializers: Custom serializers
 schemaDecorators: Schema decorators
+kotlin: Kotlin specific
 swaggerAnnotations:
   title: Swagger Annotations
   schemasAndPojos: Schemas and POJOs

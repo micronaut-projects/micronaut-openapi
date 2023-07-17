@@ -4,7 +4,7 @@ managed-javadoc-parser = "0.3.1"
 managed-jsoup = "1.16.1"
 managed-html2md-converter = "0.64.8"
 
-kotlin = "1.9.0"
+kotlin = "1.8.22"
 jspecify = "0.3.0"
 jdt-annotation = "2.2.700"
 android-annotation = "1.6.0"

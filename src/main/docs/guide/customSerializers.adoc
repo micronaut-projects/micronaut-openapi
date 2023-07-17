@@ -1,6 +1,6 @@
 You can set custom classes to create different open api schemas for selected classes:
 
-[source,yaml]
+[configuration]
 ----
 micronaut:
   openapi:
@@ -77,7 +77,7 @@ class MyJaxbElement3 {
 
 And set openapi properties to map classes to custom openapi schema classes:
 
-[source,yaml]
+[configuration]
 ----
 micronaut:
   openapi:
