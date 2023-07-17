@@ -487,7 +487,6 @@ class MyBean {}
         openAPI.components.schemas['Time'].$ref == '#/components/schemas/Quantity_Time.TimeUnit_'
     }
 
-
     void "test schema with generic wildcard or placeholder"() {
         given:
         buildBeanDefinition('test.MyBean', '''

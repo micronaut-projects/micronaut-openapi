@@ -808,7 +808,7 @@ abstract class AbstractOpenApiVisitor {
             if (isArray != null && isArray) {
                 schema = SchemaUtils.arraySchema(schema);
             }
-        } else {
+        } else if (type != null) {
 
             boolean isPublisher = false;
             boolean isObservable = false;
