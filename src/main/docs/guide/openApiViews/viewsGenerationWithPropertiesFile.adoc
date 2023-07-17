@@ -1,7 +1,7 @@
 By default, the generation of views is disabled. You can enable views generation with a <<propertiesFileConfiguration, configuration properties file>>.
 
 .openapi.properties Example Views Generation Swagger-UI, Redoc, Rapidoc
-[source]
+[source,properties]
 ----
 micronaut.openapi.views.spec = swagger-ui.enabled=true,\
     redoc.enabled=true, \

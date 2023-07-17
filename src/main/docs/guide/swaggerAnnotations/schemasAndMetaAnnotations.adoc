@@ -8,7 +8,7 @@ For example if the aforementioned `Pet` class cannot be annotated with `@Schema`
 @Documented
 @Retention(RUNTIME)
 @Target({ElementType.PARAMETER, ElementType.FIELD})
-@Schema(name="MyPet", description="Pet description")
+@Schema(name = "MyPet", description = "Pet description")
 @interface MyAnn {
 }
 ----

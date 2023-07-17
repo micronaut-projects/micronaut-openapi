@@ -1,4 +1,4 @@
-It is possible to tweak the OpenAPI processing via system properties. 
+It is possible to tweak the OpenAPI processing via system properties.
 
 For instance in gradle:
 
@@ -13,7 +13,8 @@ tasks.withType(JavaCompile) {
 }
 ----
 
-or in gradle.properties 
+or in gradle.properties
+[source,properties]
 ----
 org.gradle.jvmargs=-Dmicronaut.openapi.property.naming.strategy=SNAKE_CASE
 ----

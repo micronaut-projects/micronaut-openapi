@@ -21,13 +21,14 @@ When setting any of those properties, Micronaut will generate not only a `swagge
 
 An example configuration could be:
 
+[source,properties]
 ----
 micronaut.openapi.views.spec=swagger-ui.enabled=true,swagger-ui.theme=flattop,swagger-ui.oauth2RedirectUrl=http://localhost:8080/swagger-ui/oauth2-redirect.html,swagger-ui.oauth2.clientId=myClientId,swagger-ui.oauth2.scopes=openid,swagger-ui.oauth2.usePkceWithAuthorizationCodeGrant=true
 ----
 
 Then, you configure the `@SecurityScheme`:
 
-[source, java]
+[source,java]
 ----
 @SecurityScheme(name = "openid",
         type = SecuritySchemeType.OAUTH2,
@@ -82,7 +83,7 @@ public class OrderController {
 
 Do not forget to configure Micronaut Security accordingly:
 
-[configuration]
+[source,yaml]
 ----
 micronaut:
   security:

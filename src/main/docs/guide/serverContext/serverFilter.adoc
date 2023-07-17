@@ -28,10 +28,11 @@ import io.micronaut.http.filter.ServerFilterChain;
 @Requires(property = "micronaut.server.context-path")
 @Filter(methods = {HttpMethod.GET, HttpMethod.HEAD}, patterns = {"/**/rapidoc*", "/**/redoc*", "/**/swagger-ui*"})
 public class OpenApiViewCookieContextPathFilter implements HttpServerFilter {
+
     private final Cookie contextPathCookie;
 
     OpenApiViewCookieContextPathFilter(@Value("${micronaut.server.context-path}") String contextPath) {
-        this.contextPathCookie = Cookie.of("contextPath", contextPath).maxAge(Duration.ofMinutes(2L));
+        contextPathCookie = Cookie.of("contextPath", contextPath).maxAge(Duration.ofMinutes(2L));
     }
 
     @Override
