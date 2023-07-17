@@ -278,7 +278,7 @@
 </div>
 <div class="listingblock">
 <div class="content">
-<pre>$ mn create-app my-openapi-app --features openapi</pre>
+<pre class="highlightjs highlight"><code class="language-commandline hljs" data-lang="commandline">$ mn create-app my-openapi-app --features openapi</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -339,7 +339,7 @@ For Kotlin the <code>openapi</code> dependency should be in the <code>kapt</code
 <p>        <div class="listingblock multi-language-sample">
 <div class="title"></div>
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="gradle">implementation(<span class="hljs-string">"io.swagger.core.v3:swagger-annotations")</span></code></pre>
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="gradle">compileOnly(<span class="hljs-string">"io.swagger.core.v3:swagger-annotations")</span></code></pre>
 </div>
 </div>
 <div class="listingblock multi-language-sample">
@@ -347,9 +347,33 @@ For Kotlin the <code>openapi</code> dependency should be in the <code>kapt</code
 <pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="maven">&lt;dependency&gt;
     &lt;groupId&gt;io.swagger.core.v3&lt;/groupId&gt;
     &lt;artifactId&gt;swagger-annotations&lt;/artifactId&gt;
+    &lt;scope&gt;provided&lt;/scope&gt;
 &lt;/dependency&gt;</code></pre>
 </div>
 </div></p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Also, do not forget that for the correct operation of the annotation processor, the correct parameter
+names in the controllers are required, therefore it is recommended that all libraries from which you plan
+to add controllers be compiled with the <code>-parameters</code> flag. For example like this (with gradle build):
+</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">tasks.withType(JavaCompile).configureEach {
+    options.compilerArgs = [
+            '-parameters'
+    ]
+}</code></pre>
+</div>
 </div>
 
 <h1 id="openApiDefinition"><a class="anchor" href="#openApiDefinition"></a>5 OpenAPI Definition</h1>
@@ -511,7 +535,7 @@ those defined in the <code>openapi.properties</code> file.</p>
 <div class="listingblock">
 <div class="title">openapi.properties Example</div>
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-none hljs">micronaut.openapi.property.naming.strategy=KEBAB_CASE
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">micronaut.openapi.property.naming.strategy=KEBAB_CASE
 micronaut.openapi.target.file=myspecfile.yml
 ...
 ..
@@ -524,7 +548,7 @@ micronaut.openapi.target.file=myspecfile.yml
 <div class="listingblock">
 <div class="title">openapi.properties Property Resolution</div>
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-none hljs">micronaut.openapi.expand.api.version=v1.1
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">micronaut.openapi.expand.api.version=v1.1
 micronaut.openapi.expand.openapi.description=A nice API</code></pre>
 </div>
 </div>
@@ -603,7 +627,7 @@ info:
 </div>
 <div class="listingblock">
 <div class="content">
-<pre>org.gradle.jvmargs=-Dmicronaut.openapi.property.naming.strategy=SNAKE_CASE</pre>
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">org.gradle.jvmargs=-Dmicronaut.openapi.property.naming.strategy=SNAKE_CASE</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -642,16 +666,8 @@ info:
 <div class="paragraph">
 <p>If you wish to expose the generated OpenAPI yaml output from your running application you can simply add the necessary static resource to the application configuration. For example:</p>
 </div>
-<div class="openblock">
+<div class="listingblock">
 <div class="title">Exposing OpenAPI YAML</div>
-<div class="content">
-<div class="listingblock multi-language-sample">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">micronaut.router.static-resources.swagger.paths=classpath:META-INF/swagger
-micronaut.router.static-resources.swagger.mapping=/swagger/**</code></pre>
-</div>
-</div>
-<div class="listingblock multi-language-sample">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">micronaut:
     router:
@@ -659,64 +675,6 @@ micronaut.router.static-resources.swagger.mapping=/swagger/**</code></pre>
             swagger:
                 paths: classpath:META-INF/swagger
                 mapping: /swagger/**</code></pre>
-</div>
-</div>
-<div class="listingblock multi-language-sample">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-toml hljs" data-lang="toml">[micronaut]
-  [micronaut.router]
-    [micronaut.router.static-resources]
-      [micronaut.router.static-resources.swagger]
-        paths="classpath:META-INF/swagger"
-        mapping="/swagger/**"</code></pre>
-</div>
-</div>
-<div class="listingblock multi-language-sample">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-groovy-config hljs" data-lang="groovy-config">micronaut {
-  router {
-    staticResources {
-      swagger {
-        paths = "classpath:META-INF/swagger"
-        mapping = "/swagger/**"
-      }
-    }
-  }
-}</code></pre>
-</div>
-</div>
-<div class="listingblock multi-language-sample">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-hocon hljs" data-lang="hocon">{
-  micronaut {
-    router {
-      static-resources {
-        swagger {
-          paths = "classpath:META-INF/swagger"
-          mapping = "/swagger/**"
-        }
-      }
-    }
-  }
-}</code></pre>
-</div>
-</div>
-<div class="listingblock multi-language-sample">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-json-config hljs" data-lang="json-config">{
-  "micronaut": {
-    "router": {
-      "static-resources": {
-        "swagger": {
-          "paths": "classpath:META-INF/swagger",
-          "mapping": "/swagger/**"
-        }
-      }
-    }
-  }
-}</code></pre>
-</div>
-</div>
 </div>
 </div>
 <div class="paragraph">
@@ -911,15 +869,7 @@ the following <strong>jackson</strong>'s <code>PropertyNamingStrategy</code>:</p
 <div class="paragraph">
 <p>You can set custom classes to create different open api schemas for selected classes:</p>
 </div>
-<div class="openblock">
-<div class="content">
-<div class="listingblock multi-language-sample">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">micronaut.openapi.schema.org.somepackage.MyComplexType=java.lang.String
-micronaut.openapi.schema.org.somepackage.MyComplexType2=java.lang.Integer</code></pre>
-</div>
-</div>
-<div class="listingblock multi-language-sample">
+<div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">micronaut:
   openapi:
@@ -928,63 +878,12 @@ micronaut.openapi.schema.org.somepackage.MyComplexType2=java.lang.Integer</code>
       org.somepackage.MyComplexType2: java.lang.Integer</code></pre>
 </div>
 </div>
-<div class="listingblock multi-language-sample">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-toml hljs" data-lang="toml">[micronaut]
-  [micronaut.openapi]
-    [micronaut.openapi.schema]
-      "org.somepackage.MyComplexType"="java.lang.String"
-      "org.somepackage.MyComplexType2"="java.lang.Integer"</code></pre>
-</div>
-</div>
-<div class="listingblock multi-language-sample">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-groovy-config hljs" data-lang="groovy-config">micronaut {
-  openapi {
-    schema {
-      org.somepackage.MyComplexType = "java.lang.String"
-      org.somepackage.MyComplexType2 = "java.lang.Integer"
-    }
-  }
-}</code></pre>
-</div>
-</div>
-<div class="listingblock multi-language-sample">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-hocon hljs" data-lang="hocon">{
-  micronaut {
-    openapi {
-      schema {
-        "org.somepackage.MyComplexType" = "java.lang.String"
-        "org.somepackage.MyComplexType2" = "java.lang.Integer"
-      }
-    }
-  }
-}</code></pre>
-</div>
-</div>
-<div class="listingblock multi-language-sample">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-json-config hljs" data-lang="json-config">{
-  "micronaut": {
-    "openapi": {
-      "schema": {
-        "org.somepackage.MyComplexType": "java.lang.String",
-        "org.somepackage.MyComplexType2": "java.lang.Integer"
-      }
-    }
-  }
-}</code></pre>
-</div>
-</div>
-</div>
-</div>
 <div class="paragraph">
 <p>or by system properties:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-none hljs">-Dmicronaut.openapi.schema.org.somepackage.MyComplexType=java.lang.String -Dmicronaut.openapi.schema.org.somepackage.MyComplexType2=java.lang.Integer</code></pre>
+<pre class="highlightjs highlight"><code class="language-commandline hljs" data-lang="commandline">-Dmicronaut.openapi.schema.org.somepackage.MyComplexType=java.lang.String -Dmicronaut.openapi.schema.org.somepackage.MyComplexType2=java.lang.Integer</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1054,12 +953,12 @@ class MyJaxbElement3 {
 </div>
 <div class="listingblock">
 <div class="content">
-<pre>micronaut:
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">micronaut:
   openapi:
     schema:
       io.micronaut.openapi.JAXBElement: io.micronaut.openapi.MyJaxbElement
       io.micronaut.openapi.JAXBElement&lt;test.mypackage.XmlElement2&gt;: io.micronaut.openapi.MyJaxbElement2
-      io.micronaut.openapi.JAXBElement&lt;test.mypackage.XmlElement3&gt;: io.micronaut.openapi.MyJaxbElement3</pre>
+      io.micronaut.openapi.JAXBElement&lt;test.mypackage.XmlElement3&gt;: io.micronaut.openapi.MyJaxbElement3</code></pre>
 </div>
 </div>
 <div class="admonitionblock note">
@@ -1088,15 +987,7 @@ After changing these settings, a complete recompilation of the project is necess
 <div class="paragraph">
 <p>If you have some classes with same names in different packages you can set postfix like this:</p>
 </div>
-<div class="openblock">
-<div class="content">
-<div class="listingblock multi-language-sample">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">micronaut.openapi.schema-postfix.org.api.v1_0_0=100
-micronaut.openapi.schema-postfix.org.api.v2_0_0=200</code></pre>
-</div>
-</div>
-<div class="listingblock multi-language-sample">
+<div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">micronaut:
   openapi:
@@ -1105,63 +996,12 @@ micronaut.openapi.schema-postfix.org.api.v2_0_0=200</code></pre>
       org.api.v2_0_0: 2_0_0</code></pre>
 </div>
 </div>
-<div class="listingblock multi-language-sample">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-toml hljs" data-lang="toml">[micronaut]
-  [micronaut.openapi]
-    [micronaut.openapi.schema-postfix]
-      "org.api.v1_0_0"=100
-      "org.api.v2_0_0"=200</code></pre>
-</div>
-</div>
-<div class="listingblock multi-language-sample">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-groovy-config hljs" data-lang="groovy-config">micronaut {
-  openapi {
-    schemaPostfix {
-      org.api.v1_0_0 = 100
-      org.api.v2_0_0 = 200
-    }
-  }
-}</code></pre>
-</div>
-</div>
-<div class="listingblock multi-language-sample">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-hocon hljs" data-lang="hocon">{
-  micronaut {
-    openapi {
-      schema-postfix {
-        "org.api.v1_0_0" = 100
-        "org.api.v2_0_0" = 200
-      }
-    }
-  }
-}</code></pre>
-</div>
-</div>
-<div class="listingblock multi-language-sample">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-json-config hljs" data-lang="json-config">{
-  "micronaut": {
-    "openapi": {
-      "schema-postfix": {
-        "org.api.v1_0_0": 100,
-        "org.api.v2_0_0": 200
-      }
-    }
-  }
-}</code></pre>
-</div>
-</div>
-</div>
-</div>
 <div class="paragraph">
 <p>or by system properties:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-none hljs">-Dmicronaut.openapi.schema-postfix.org.api.v1_0_0=1_0_0 -Dmicronaut.openapi.schema-postfix.org.api.v2_0_0=2_0_0</code></pre>
+<pre class="highlightjs highlight"><code class="language-commandline hljs" data-lang="commandline">-Dmicronaut.openapi.schema-postfix.org.api.v1_0_0=1_0_0 -Dmicronaut.openapi.schema-postfix.org.api.v2_0_0=2_0_0</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1395,6 +1235,7 @@ generation of the Schema by using the <code>@Schema</code> annotation on your PO
 
 @Schema(name="MyPet", description="Pet description") <i class="conum" data-value="1"></i><b>(1)</b>
 class Pet {
+
     private PetType type;
     private int age;
     private String name;
@@ -1430,7 +1271,7 @@ class Pet {
 }
 
 enum PetType {
-    DOG, CAT;
+    DOG, CAT
 }</code></pre>
 </div>
 </div>
@@ -1468,7 +1309,7 @@ enum PetType {
 <pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Documented
 @Retention(RUNTIME)
 @Target({ElementType.PARAMETER, ElementType.FIELD})
-@Schema(name="MyPet", description="Pet description")
+@Schema(name = "MyPet", description = "Pet description")
 @interface MyAnn {
 }</code></pre>
 </div>
@@ -1493,10 +1334,16 @@ enum PetType {
 <div class="title">Swagger returns types and generics</div>
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">class Response&lt;T&gt; {
+
     private T r;
+
     public T getResult() {
         return r;
-    };
+    }
+
+    public void setResult(T r) {
+        this.r = r;
+    }
 }
 
 @Controller("/")
@@ -1516,7 +1363,7 @@ class MyController {
 <div class="title">Changing the name of response schema</div>
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Put("/")
-@Schema(name="ResponseOfPet")
+@Schema(name = "ResponseOfPet")
 public Response&lt;Pet&gt; updatePet(Pet pet) {
     ...
 }</code></pre>
@@ -1546,27 +1393,27 @@ set <code>name</code> on <code>@Schema</code> annotation.</p>
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">import io.swagger.v3.oas.annotations.media.Schema;
 
-@Schema(description="A pet") <i class="conum" data-value="1"></i><b>(1)</b>
+@Schema(description = "A pet") <i class="conum" data-value="1"></i><b>(1)</b>
 class Pet {
 }
 
 class Owner {
+
     private Pet bird;
     private Pet cat;
     private Pet dog;
 
-
-    @Schema(description="Pet that is a a bird") <i class="conum" data-value="2"></i><b>(2)</b>
+    @Schema(description = "Pet that is a a bird") <i class="conum" data-value="2"></i><b>(2)</b>
     public Pet getBird() {
         return bird;
     }
 
-    @Schema(description="Pet that is a cat") <i class="conum" data-value="3"></i><b>(3)</b>
+    @Schema(description = "Pet that is a cat") <i class="conum" data-value="3"></i><b>(3)</b>
     public Pet getCat() {
         return cat;
     }
 
-    @Schema(name="Dog", description="Pet that is a dog") <i class="conum" data-value="4"></i><b>(4)</b>
+    @Schema(name = "Dog", description = "Pet that is a dog") <i class="conum" data-value="4"></i><b>(4)</b>
     public Pet getDog() {
         return cat;
     }
@@ -1699,7 +1546,7 @@ class Owner {
 <div class="listingblock">
 <div class="title">openapi.properties</div>
 <div class="content">
-<pre>endpoints.tags=Management Endpoints</pre>
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">endpoints.tags=Management Endpoints</code></pre>
 </div>
 </div>
 
@@ -1757,13 +1604,13 @@ class Owner {
 </div>
 <div class="listingblock">
 <div class="content">
-<pre>endpoints.enabled=true
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">endpoints.enabled=true
 endpoints.tags=Management Endpoints
 endpoints.routes.class=io.micronaut.management.endpoint.routes.RoutesEndpoint
 endpoints.beans.class=io.micronaut.management.endpoint.beans.BeansEndpoint
 endpoints.health.class=io.micronaut.management.endpoint.health.HealthEndpoint
 endpoints.loggers.class=io.micronaut.management.endpoint.loggers.LoggersEndpoint
-endpoints.refresh.class=io.micronaut.management.endpoint.refresh.RefreshEndpoint</pre>
+endpoints.refresh.class=io.micronaut.management.endpoint.refresh.RefreshEndpoint</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1772,9 +1619,9 @@ You can also add some tags, servers and security requirements to each endpoint:<
 </div>
 <div class="listingblock">
 <div class="content">
-<pre>endpoints.refresh.class=io.micronaut.management.endpoint.refresh.RefreshEndpoint
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">endpoints.refresh.class=io.micronaut.management.endpoint.refresh.RefreshEndpoint
 endpoints.refresh.servers=[{"url": "https://staging.gigantic-server.com/v1", "description": "Staging server"}]
-endpoints.refresh.security-requirements=[{"petstore_auth": ["write:pets", "read:pets"]}]</pre>
+endpoints.refresh.security-requirements=[{"petstore_auth": ["write:pets", "read:pets"]}]</code></pre>
 </div>
 </div>
 
@@ -1792,7 +1639,7 @@ endpoints.refresh.security-requirements=[{"petstore_auth": ["write:pets", "read:
 </div>
 <div class="listingblock">
 <div class="content">
-<pre>endpoints.servers=[ \
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">endpoints.servers=[ \
     { \
       "url": "https://{username}.gigantic-server.com:{port}/{basePath}", \
       "description": "The production API server", \
@@ -1813,7 +1660,7 @@ endpoints.refresh.security-requirements=[{"petstore_auth": ["write:pets", "read:
         } \
       } \
     } \
-  ]</pre>
+  ]</code></pre>
 </div>
 </div>
 
@@ -1832,10 +1679,10 @@ endpoints.refresh.security-requirements=[{"petstore_auth": ["write:pets", "read:
 <div class="listingblock">
 <div class="title">openapi.properties endpoints.security-requirement property</div>
 <div class="content">
-<pre>endpoints.security-requirements=[{"api_key": []}]
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">endpoints.security-requirements=[{"api_key": []}]
 ...
 ..
-.</pre>
+.</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1857,10 +1704,10 @@ endpoints.refresh.security-requirements=[{"petstore_auth": ["write:pets", "read:
 <div class="listingblock">
 <div class="title">openapi.properties <strong>endpoints.path</strong> property</div>
 <div class="content">
-<pre>endpoints.path=/endpoints
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">endpoints.path=/endpoints
 ...
 ..
-.</pre>
+.</code></pre>
 </div>
 </div>
 
@@ -2414,81 +2261,15 @@ You can also use <a href="https://mrin9.github.io/RapiPdf/">RapiPdf</a> to gener
 <div class="paragraph">
 <p>If you change this mapping to something else:</p>
 </div>
-<div class="openblock">
+<div class="listingblock">
 <div class="title">Exposing Swagger YAML</div>
 <div class="content">
-<div class="listingblock multi-language-sample">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">micronaut.router.static-resources.swagger.paths=classpath:META-INF/swagger
-micronaut.router.static-resources.swagger.mapping=/swaggerYAML/**</code></pre>
-</div>
-</div>
-<div class="listingblock multi-language-sample">
-<div class="content">
 <pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">micronaut:
-    router:
-        static-resources:
-            swagger:
-                paths: classpath:META-INF/swagger
-                mapping: /swaggerYAML/**</code></pre>
-</div>
-</div>
-<div class="listingblock multi-language-sample">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-toml hljs" data-lang="toml">[micronaut]
-  [micronaut.router]
-    [micronaut.router.static-resources]
-      [micronaut.router.static-resources.swagger]
-        paths="classpath:META-INF/swagger"
-        mapping="/swaggerYAML/**"</code></pre>
-</div>
-</div>
-<div class="listingblock multi-language-sample">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-groovy-config hljs" data-lang="groovy-config">micronaut {
-  router {
-    staticResources {
-      swagger {
-        paths = "classpath:META-INF/swagger"
-        mapping = "/swaggerYAML/**"
-      }
-    }
-  }
-}</code></pre>
-</div>
-</div>
-<div class="listingblock multi-language-sample">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-hocon hljs" data-lang="hocon">{
-  micronaut {
-    router {
-      static-resources {
-        swagger {
-          paths = "classpath:META-INF/swagger"
-          mapping = "/swaggerYAML/**"
-        }
-      }
-    }
-  }
-}</code></pre>
-</div>
-</div>
-<div class="listingblock multi-language-sample">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-json-config hljs" data-lang="json-config">{
-  "micronaut": {
-    "router": {
-      "static-resources": {
-        "swagger": {
-          "paths": "classpath:META-INF/swagger",
-          "mapping": "/swaggerYAML/**"
-        }
-      }
-    }
-  }
-}</code></pre>
-</div>
-</div>
+  router:
+    static-resources:
+      swagger:
+        paths: classpath:META-INF/swagger
+        mapping: /swaggerYAML/**</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -2510,7 +2291,7 @@ micronaut.router.static-resources.swagger.mapping=/swaggerYAML/**</code></pre>
 <div class="listingblock">
 <div class="title">openapi.properties Example Views Generation Swagger-UI, Redoc, Rapidoc</div>
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-none hljs">micronaut.openapi.views.spec = swagger-ui.enabled=true,\
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">micronaut.openapi.views.spec = swagger-ui.enabled=true,\
     redoc.enabled=true, \
     rapidoc.enabled=true, \
     rapidoc.bg-color=#14191f, \
@@ -2540,7 +2321,7 @@ micronaut.router.static-resources.swagger.mapping=/swaggerYAML/**</code></pre>
 <div class="listingblock">
 <div class="title">System Property</div>
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-none hljs">micronaut.openapi.views.spec=redoc.enabled=true,rapidoc.enabled=true,swagger-ui.enabled=true,swagger-ui.theme=flattop</code></pre>
+<pre class="highlightjs highlight"><code class="language-commandline hljs" data-lang="commandline">-Dmicronaut.openapi.views.spec=redoc.enabled=true,rapidoc.enabled=true,swagger-ui.enabled=true,swagger-ui.theme=flattop</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -2785,101 +2566,18 @@ micronaut.router.static-resources.swagger.mapping=/swaggerYAML/**</code></pre>
 <div class="paragraph">
 <p>To expose the <code>swagger-ui</code> views, you also must expose the generated <code>yaml</code>:</p>
 </div>
-<div class="openblock">
+<div class="listingblock">
 <div class="title">Exposing Swagger YAML and Swagger UI Views</div>
 <div class="content">
-<div class="listingblock multi-language-sample">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">micronaut.router.static-resources.swagger.paths=classpath:META-INF/swagger
-micronaut.router.static-resources.swagger.mapping=/swagger/**
-micronaut.router.static-resources.swagger-ui.paths=classpath:META-INF/swagger/views/swagger-ui
-micronaut.router.static-resources.swagger-ui.mapping=/swagger-ui/**</code></pre>
-</div>
-</div>
-<div class="listingblock multi-language-sample">
-<div class="content">
 <pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">micronaut:
-    router:
-        static-resources:
-            swagger:
-                paths: classpath:META-INF/swagger
-                mapping: /swagger/**
-            swagger-ui:
-                paths: classpath:META-INF/swagger/views/swagger-ui
-                mapping: /swagger-ui/**</code></pre>
-</div>
-</div>
-<div class="listingblock multi-language-sample">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-toml hljs" data-lang="toml">[micronaut]
-  [micronaut.router]
-    [micronaut.router.static-resources]
-      [micronaut.router.static-resources.swagger]
-        paths="classpath:META-INF/swagger"
-        mapping="/swagger/**"
-      [micronaut.router.static-resources.swagger-ui]
-        paths="classpath:META-INF/swagger/views/swagger-ui"
-        mapping="/swagger-ui/**"</code></pre>
-</div>
-</div>
-<div class="listingblock multi-language-sample">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-groovy-config hljs" data-lang="groovy-config">micronaut {
-  router {
-    staticResources {
-      swagger {
-        paths = "classpath:META-INF/swagger"
-        mapping = "/swagger/**"
-      }
-      swaggerUi {
-        paths = "classpath:META-INF/swagger/views/swagger-ui"
-        mapping = "/swagger-ui/**"
-      }
-    }
-  }
-}</code></pre>
-</div>
-</div>
-<div class="listingblock multi-language-sample">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-hocon hljs" data-lang="hocon">{
-  micronaut {
-    router {
-      static-resources {
-        swagger {
-          paths = "classpath:META-INF/swagger"
-          mapping = "/swagger/**"
-        }
-        swagger-ui {
-          paths = "classpath:META-INF/swagger/views/swagger-ui"
-          mapping = "/swagger-ui/**"
-        }
-      }
-    }
-  }
-}</code></pre>
-</div>
-</div>
-<div class="listingblock multi-language-sample">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-json-config hljs" data-lang="json-config">{
-  "micronaut": {
-    "router": {
-      "static-resources": {
-        "swagger": {
-          "paths": "classpath:META-INF/swagger",
-          "mapping": "/swagger/**"
-        },
-        "swagger-ui": {
-          "paths": "classpath:META-INF/swagger/views/swagger-ui",
-          "mapping": "/swagger-ui/**"
-        }
-      }
-    }
-  }
-}</code></pre>
-</div>
-</div>
+  router:
+    static-resources:
+      swagger:
+        paths: classpath:META-INF/swagger
+        mapping: /swagger/**
+      swagger-ui:
+        paths: classpath:META-INF/swagger/views/swagger-ui
+        mapping: /swagger-ui/**</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -2948,7 +2646,7 @@ in the Swagger UI, the requests issued incorporate a valid token.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre>micronaut.openapi.views.spec=swagger-ui.enabled=true,swagger-ui.theme=flattop,swagger-ui.oauth2RedirectUrl=http://localhost:8080/swagger-ui/oauth2-redirect.html,swagger-ui.oauth2.clientId=myClientId,swagger-ui.oauth2.scopes=openid,swagger-ui.oauth2.usePkceWithAuthorizationCodeGrant=true</pre>
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">micronaut.openapi.views.spec=swagger-ui.enabled=true,swagger-ui.theme=flattop,swagger-ui.oauth2RedirectUrl=http://localhost:8080/swagger-ui/oauth2-redirect.html,swagger-ui.oauth2.clientId=myClientId,swagger-ui.oauth2.scopes=openid,swagger-ui.oauth2.usePkceWithAuthorizationCodeGrant=true</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -3011,25 +2709,7 @@ public class OrderController {
 <div class="paragraph">
 <p>Do not forget to configure Micronaut Security accordingly:</p>
 </div>
-<div class="openblock">
-<div class="content">
-<div class="listingblock multi-language-sample">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">micronaut.security.enabled=true
-micronaut.security.token.jwt.enabled=true
-micronaut.security.token.jwt.signatures.jwks.okta.url=https://mycompany.okta.com/oauth2/default/v1/keys
-micronaut.security.intercept-url-map[0].pattern=/swagger-ui/**
-micronaut.security.intercept-url-map[0].httpMethod=GET
-micronaut.security.intercept-url-map[0].access[0]=isAnonymous()
-micronaut.security.intercept-url-map[1].pattern=/swagger/**
-micronaut.security.intercept-url-map[1].access[0]=isAnonymous()
-micronaut.router.static-resources.swagger.paths=classpath:META-INF/swagger
-micronaut.router.static-resources.swagger.mapping=/swagger/**
-micronaut.router.static-resources.swagger-ui.paths=classpath:META-INF/swagger/views/swagger-ui
-micronaut.router.static-resources.swagger-ui.mapping=/swagger-ui/**</code></pre>
-</div>
-</div>
-<div class="listingblock multi-language-sample">
+<div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">micronaut:
   security:
@@ -3057,168 +2737,6 @@ micronaut.router.static-resources.swagger-ui.mapping=/swagger-ui/**</code></pre>
       swagger-ui:
         paths: classpath:META-INF/swagger/views/swagger-ui
         mapping: /swagger-ui/**</code></pre>
-</div>
-</div>
-<div class="listingblock multi-language-sample">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-toml hljs" data-lang="toml">[micronaut]
-  [micronaut.security]
-    enabled=true
-    [micronaut.security.token]
-      [micronaut.security.token.jwt]
-        enabled=true
-        [micronaut.security.token.jwt.signatures]
-          [micronaut.security.token.jwt.signatures.jwks]
-            [micronaut.security.token.jwt.signatures.jwks.okta]
-              url="https://mycompany.okta.com/oauth2/default/v1/keys"
-    [[micronaut.security.intercept-url-map]]
-      pattern="/swagger-ui/**"
-      httpMethod="GET"
-      access=[
-        "isAnonymous()"
-      ]
-    [[micronaut.security.intercept-url-map]]
-      pattern="/swagger/**"
-      access=[
-        "isAnonymous()"
-      ]
-  [micronaut.router]
-    [micronaut.router.static-resources]
-      [micronaut.router.static-resources.swagger]
-        paths="classpath:META-INF/swagger"
-        mapping="/swagger/**"
-      [micronaut.router.static-resources.swagger-ui]
-        paths="classpath:META-INF/swagger/views/swagger-ui"
-        mapping="/swagger-ui/**"</code></pre>
-</div>
-</div>
-<div class="listingblock multi-language-sample">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-groovy-config hljs" data-lang="groovy-config">micronaut {
-  security {
-    enabled = true
-    token {
-      jwt {
-        enabled = true
-        signatures {
-          jwks {
-            okta {
-              url = "https://mycompany.okta.com/oauth2/default/v1/keys"
-            }
-          }
-        }
-      }
-    }
-    interceptUrlMap = [{
-        pattern = "/swagger-ui/**"
-        httpMethod = "GET"
-        access = ["isAnonymous()"]
-      }, {
-        pattern = "/swagger/**"
-        access = ["isAnonymous()"]
-      }]
-  }
-  router {
-    staticResources {
-      swagger {
-        paths = "classpath:META-INF/swagger"
-        mapping = "/swagger/**"
-      }
-      swaggerUi {
-        paths = "classpath:META-INF/swagger/views/swagger-ui"
-        mapping = "/swagger-ui/**"
-      }
-    }
-  }
-}</code></pre>
-</div>
-</div>
-<div class="listingblock multi-language-sample">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-hocon hljs" data-lang="hocon">{
-  micronaut {
-    security {
-      enabled = true
-      token {
-        jwt {
-          enabled = true
-          signatures {
-            jwks {
-              okta {
-                url = "https://mycompany.okta.com/oauth2/default/v1/keys"
-              }
-            }
-          }
-        }
-      }
-      intercept-url-map = [{
-          pattern = "/swagger-ui/**"
-          httpMethod = "GET"
-          access = ["isAnonymous()"]
-        }, {
-          pattern = "/swagger/**"
-          access = ["isAnonymous()"]
-        }]
-    }
-    router {
-      static-resources {
-        swagger {
-          paths = "classpath:META-INF/swagger"
-          mapping = "/swagger/**"
-        }
-        swagger-ui {
-          paths = "classpath:META-INF/swagger/views/swagger-ui"
-          mapping = "/swagger-ui/**"
-        }
-      }
-    }
-  }
-}</code></pre>
-</div>
-</div>
-<div class="listingblock multi-language-sample">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-json-config hljs" data-lang="json-config">{
-  "micronaut": {
-    "security": {
-      "enabled": true,
-      "token": {
-        "jwt": {
-          "enabled": true,
-          "signatures": {
-            "jwks": {
-              "okta": {
-                "url": "https://mycompany.okta.com/oauth2/default/v1/keys"
-              }
-            }
-          }
-        }
-      },
-      "intercept-url-map": [{
-          "pattern": "/swagger-ui/**",
-          "httpMethod": "GET",
-          "access": ["isAnonymous()"]
-        }, {
-          "pattern": "/swagger/**",
-          "access": ["isAnonymous()"]
-        }]
-    },
-    "router": {
-      "static-resources": {
-        "swagger": {
-          "paths": "classpath:META-INF/swagger",
-          "mapping": "/swagger/**"
-        },
-        "swagger-ui": {
-          "paths": "classpath:META-INF/swagger/views/swagger-ui",
-          "mapping": "/swagger-ui/**"
-        }
-      }
-    }
-  }
-}</code></pre>
-</div>
-</div>
 </div>
 </div>
 <div class="paragraph">
@@ -3358,101 +2876,18 @@ micronaut.router.static-resources.swagger-ui.mapping=/swagger-ui/**</code></pre>
 <div class="paragraph">
 <p>To expose the <code>redoc</code> views, you also must expose the generated <code>yaml</code>:</p>
 </div>
-<div class="openblock">
+<div class="listingblock">
 <div class="title">Exposing Swagger YAML And Redoc Views</div>
 <div class="content">
-<div class="listingblock multi-language-sample">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">micronaut.router.static-resources.swagger.paths=classpath:META-INF/swagger
-micronaut.router.static-resources.swagger.mapping=/swagger/**
-micronaut.router.static-resources.redoc.paths=classpath:META-INF/swagger/views/redoc
-micronaut.router.static-resources.redoc.mapping=/redoc/**</code></pre>
-</div>
-</div>
-<div class="listingblock multi-language-sample">
-<div class="content">
 <pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">micronaut:
-    router:
-        static-resources:
-            swagger:
-                paths: classpath:META-INF/swagger
-                mapping: /swagger/**
-            redoc:
-                paths: classpath:META-INF/swagger/views/redoc
-                mapping: /redoc/**</code></pre>
-</div>
-</div>
-<div class="listingblock multi-language-sample">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-toml hljs" data-lang="toml">[micronaut]
-  [micronaut.router]
-    [micronaut.router.static-resources]
-      [micronaut.router.static-resources.swagger]
-        paths="classpath:META-INF/swagger"
-        mapping="/swagger/**"
-      [micronaut.router.static-resources.redoc]
-        paths="classpath:META-INF/swagger/views/redoc"
-        mapping="/redoc/**"</code></pre>
-</div>
-</div>
-<div class="listingblock multi-language-sample">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-groovy-config hljs" data-lang="groovy-config">micronaut {
-  router {
-    staticResources {
-      swagger {
-        paths = "classpath:META-INF/swagger"
-        mapping = "/swagger/**"
-      }
-      redoc {
-        paths = "classpath:META-INF/swagger/views/redoc"
-        mapping = "/redoc/**"
-      }
-    }
-  }
-}</code></pre>
-</div>
-</div>
-<div class="listingblock multi-language-sample">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-hocon hljs" data-lang="hocon">{
-  micronaut {
-    router {
-      static-resources {
-        swagger {
-          paths = "classpath:META-INF/swagger"
-          mapping = "/swagger/**"
-        }
-        redoc {
-          paths = "classpath:META-INF/swagger/views/redoc"
-          mapping = "/redoc/**"
-        }
-      }
-    }
-  }
-}</code></pre>
-</div>
-</div>
-<div class="listingblock multi-language-sample">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-json-config hljs" data-lang="json-config">{
-  "micronaut": {
-    "router": {
-      "static-resources": {
-        "swagger": {
-          "paths": "classpath:META-INF/swagger",
-          "mapping": "/swagger/**"
-        },
-        "redoc": {
-          "paths": "classpath:META-INF/swagger/views/redoc",
-          "mapping": "/redoc/**"
-        }
-      }
-    }
-  }
-}</code></pre>
-</div>
-</div>
+  router:
+    static-resources:
+      swagger:
+        paths: classpath:META-INF/swagger
+        mapping: /swagger/**
+      redoc:
+        paths: classpath:META-INF/swagger/views/redoc
+        mapping: /redoc/**</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -3661,101 +3096,18 @@ micronaut.router.static-resources.redoc.mapping=/redoc/**</code></pre>
 <div class="paragraph">
 <p>To expose the <code>rapidoc</code> views, you also must expose the generated <code>yaml</code>:</p>
 </div>
-<div class="openblock">
+<div class="listingblock">
 <div class="title">Exposing Swagger YAML And Rapidoc Views</div>
 <div class="content">
-<div class="listingblock multi-language-sample">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">micronaut.router.static-resources.swagger.paths=classpath:META-INF/swagger
-micronaut.router.static-resources.swagger.mapping=/swagger/**
-micronaut.router.static-resources.rapidoc.paths=classpath:META-INF/swagger/views/rapidoc
-micronaut.router.static-resources.rapidoc.mapping=/rapidoc/**</code></pre>
-</div>
-</div>
-<div class="listingblock multi-language-sample">
-<div class="content">
 <pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">micronaut:
-    router:
-        static-resources:
-            swagger:
-                paths: classpath:META-INF/swagger
-                mapping: /swagger/**
-            rapidoc:
-                paths: classpath:META-INF/swagger/views/rapidoc
-                mapping: /rapidoc/**</code></pre>
-</div>
-</div>
-<div class="listingblock multi-language-sample">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-toml hljs" data-lang="toml">[micronaut]
-  [micronaut.router]
-    [micronaut.router.static-resources]
-      [micronaut.router.static-resources.swagger]
-        paths="classpath:META-INF/swagger"
-        mapping="/swagger/**"
-      [micronaut.router.static-resources.rapidoc]
-        paths="classpath:META-INF/swagger/views/rapidoc"
-        mapping="/rapidoc/**"</code></pre>
-</div>
-</div>
-<div class="listingblock multi-language-sample">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-groovy-config hljs" data-lang="groovy-config">micronaut {
-  router {
-    staticResources {
-      swagger {
-        paths = "classpath:META-INF/swagger"
-        mapping = "/swagger/**"
-      }
-      rapidoc {
-        paths = "classpath:META-INF/swagger/views/rapidoc"
-        mapping = "/rapidoc/**"
-      }
-    }
-  }
-}</code></pre>
-</div>
-</div>
-<div class="listingblock multi-language-sample">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-hocon hljs" data-lang="hocon">{
-  micronaut {
-    router {
-      static-resources {
-        swagger {
-          paths = "classpath:META-INF/swagger"
-          mapping = "/swagger/**"
-        }
-        rapidoc {
-          paths = "classpath:META-INF/swagger/views/rapidoc"
-          mapping = "/rapidoc/**"
-        }
-      }
-    }
-  }
-}</code></pre>
-</div>
-</div>
-<div class="listingblock multi-language-sample">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-json-config hljs" data-lang="json-config">{
-  "micronaut": {
-    "router": {
-      "static-resources": {
-        "swagger": {
-          "paths": "classpath:META-INF/swagger",
-          "mapping": "/swagger/**"
-        },
-        "rapidoc": {
-          "paths": "classpath:META-INF/swagger/views/rapidoc",
-          "mapping": "/rapidoc/**"
-        }
-      }
-    }
-  }
-}</code></pre>
-</div>
-</div>
+  router:
+    static-resources:
+      swagger:
+        paths: classpath:META-INF/swagger
+        mapping: /swagger/**
+      rapidoc:
+        paths: classpath:META-INF/swagger/views/rapidoc
+        mapping: /rapidoc/**</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -4226,10 +3578,11 @@ import io.micronaut.http.filter.ServerFilterChain;
 @Requires(property = "micronaut.server.context-path")
 @Filter(methods = {HttpMethod.GET, HttpMethod.HEAD}, patterns = {"/**/rapidoc*", "/**/redoc*", "/**/swagger-ui*"})
 public class OpenApiViewCookieContextPathFilter implements HttpServerFilter {
+
     private final Cookie contextPathCookie;
 
     OpenApiViewCookieContextPathFilter(@Value("${micronaut.server.context-path}") String contextPath) {
-        this.contextPathCookie = Cookie.of("contextPath", contextPath).maxAge(Duration.ofMinutes(2L));
+        contextPathCookie = Cookie.of("contextPath", contextPath).maxAge(Duration.ofMinutes(2L));
     }
 
     @Override
