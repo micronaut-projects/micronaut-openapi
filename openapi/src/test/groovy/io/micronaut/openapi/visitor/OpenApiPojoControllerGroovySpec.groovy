@@ -88,4 +88,83 @@ class MyBean {}
         !schema.required.contains('battingAverage')
     }
 
+    @Issue("https://github.com/micronaut-projects/micronaut-openapi/issues/1135")
+    void "test build OpenAPI for set of enums"() {
+        given: "An API definition"
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test
+
+import groovy.transform.CompileStatic
+import io.micronaut.core.annotation.Nullable
+import io.micronaut.http.HttpResponse
+import io.micronaut.http.annotation.Controller
+import io.micronaut.http.annotation.Get
+import io.swagger.v3.oas.annotations.media.Schema
+
+@CompileStatic
+@Controller
+class DogController {
+
+    @Get('/dog')
+    HttpResponse<Dog> get() {
+        Dog dog = new Dog(
+                name: 'Rex', breed: Breed.GERMAN_SHEPHERD,
+                traits: EnumSet.of(Trait.QUICKNESS, Trait.COURAGE, Trait.LOYALTY)
+        )
+
+        return HttpResponse.ok(dog)
+    }
+}
+
+@CompileStatic
+class Dog {
+
+    String name
+    Breed breed
+    Set<Trait> traits
+}
+
+@CompileStatic
+enum Breed {
+
+    GERMAN_SHEPHERD,
+    BULLDOG,
+    GOLDEN_RETRIEVER
+}
+
+@CompileStatic
+enum Trait {
+
+    QUICKNESS,
+    COURAGE,
+    LOYALTY
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        then: "the state is correct"
+        Utils.testReference != null
+
+        when: "The OpenAPI is retrieved"
+        OpenAPI openAPI = Utils.testReference
+        Schema breedSchema = openAPI.components.schemas['Breed']
+        Schema dogSchema = openAPI.components.schemas['Dog']
+        Schema traitSchema = openAPI.components.schemas['Trait']
+
+        then: "the components are valid"
+        breedSchema
+        dogSchema
+        traitSchema
+
+        dogSchema.properties.traits
+        dogSchema.properties.traits.type == 'array'
+        dogSchema.properties.traits.items.$ref == '#/components/schemas/Trait'
+
+        traitSchema.type == 'string'
+        traitSchema.enum.get(0) == 'QUICKNESS'
+        traitSchema.enum.get(1) == 'COURAGE'
+        traitSchema.enum.get(2) == 'LOYALTY'
+    }
 }
