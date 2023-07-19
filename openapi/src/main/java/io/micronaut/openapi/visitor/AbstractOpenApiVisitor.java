@@ -792,6 +792,11 @@ abstract class AbstractOpenApiVisitor {
         Boolean isIterable = null;
 
         ClassElement componentType = type != null ? type.getFirstTypeArgument().orElse(null) : null;
+        if (componentType != null && !componentType.isIterable() && !componentType.isArray()) {
+            // bug in micronaut-core, see "test build OpenAPI for set of enums"
+            // type.getFirstTypeArgument() return ClassElement, but must be EnumElement
+            componentType = context.getClassElement(componentType.getName()).orElse(componentType);
+        }
         if (type instanceof WildcardElement) {
             WildcardElement wildcardEl = (WildcardElement) type;
             type = CollectionUtils.isNotEmpty(wildcardEl.getUpperBounds()) ? wildcardEl.getUpperBounds().get(0) : null;
