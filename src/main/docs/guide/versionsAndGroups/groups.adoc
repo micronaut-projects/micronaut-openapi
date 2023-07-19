@@ -28,7 +28,7 @@ public class ApiController {
 }
 ----
 
-[source,yaml]
+[configuration]
 ----
 micronaut:
   openapi:

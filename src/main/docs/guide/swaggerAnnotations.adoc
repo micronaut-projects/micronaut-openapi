@@ -1,8 +1,8 @@
 You can take full control by augmenting your definition with https://github.com/swagger-api/swagger-core/wiki/Swagger-2.X---Annotations[Swagger Annotations]. **Swagger annotations take precedence over javadoc**.
 
-Add the Swagger annotations to compile classpath
+Add the Micronaut OpenAPI annotations to compile classpath
 
-dependency:swagger-annotations[scope="implementation", groupId="io.swagger.core.v3"]
+dependency:micronaut-openapi-annotations[scope="compileOnly", groupId="io.micronaut.openapi"]
 
 and then annotate your controllers:
 

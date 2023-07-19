@@ -23,7 +23,7 @@ open class HelloController {
      */
     @Get(uri = "/greetings/{name}", produces = [MediaType.TEXT_PLAIN])
     @Operation(summary = "Greets a person", description = "A friendly greeting is returned")
-    // Please Note: Repeatable Annotations with non-SOURCE retentions are not yet supported with Kotlin so we are using `@ApiResponses`
+    // Please Note: Repeatable Annotations with non-SOURCE retentions are not yet supported with Kotlin, so we are using `@ApiResponses`
     // instead of `@ApiResponse`, see https://youtrack.jetbrains.com/issue/KT-12794
     @ApiResponses(
             ApiResponse(content = [Content(mediaType = "text/plain", schema = Schema(type = "string"))]),

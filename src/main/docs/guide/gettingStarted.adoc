@@ -4,6 +4,17 @@ dependency:micronaut-openapi[scope="annotationProcessor", version="{version}", g
 
 NOTE: For Kotlin the `openapi` dependency should be in the `kapt` scope and for Groovy in the `compileOnly` scope.
 
-To use the https://github.com/swagger-api/swagger-core/wiki/Swagger-2.X---Annotations[Swagger Annotations] add them to compile classpath
+To use the https://github.com/swagger-api/swagger-core/wiki/Swagger-2.X---Annotations[Swagger Annotations] or Micronaut OpenAPI annotations add them to compile classpath
 
-dependency:swagger-annotations[scope="implementation", groupId="io.swagger.core.v3"]
+dependency:micronaut-openapi-annotations[scope="compileOnly", groupId="io.micronaut.openapi"]
+
+NOTE: Also, do not forget that for the correct operation of the annotation processor, the correct parameter
+names in the controllers are required, therefore it is recommended that all libraries from which you plan
+to add controllers be compiled with the `-parameters` flag. For example like this (with gradle build):
+```groovy
+tasks.withType(JavaCompile).configureEach {
+    options.compilerArgs = [
+            '-parameters'
+    ]
+}
+```

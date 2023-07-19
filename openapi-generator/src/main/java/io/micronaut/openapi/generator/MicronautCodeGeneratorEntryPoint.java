@@ -299,7 +299,7 @@ public final class MicronautCodeGeneratorEntryPoint {
             private String modelPackage;
             private List<AbstractMicronautJavaCodegen.ParameterMapping> parameterMappings;
             private List<AbstractMicronautJavaCodegen.ResponseBodyMapping> responseBodyMappings;
-            private boolean optional = false;
+            private boolean optional;
             private boolean reactive = true;
             private boolean generateHttpResponseAlways;
             private boolean generateHttpResponseWhereRequired;

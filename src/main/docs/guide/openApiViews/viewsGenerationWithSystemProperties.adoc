@@ -5,9 +5,9 @@ To turn it on you have to set the following system property `micronaut.openapi.v
 The string syntax is a series of comma-separated key-value pairs, to enable and configure the views.
 
 .System Property
-[source]
+[source,commandline]
 ----
-micronaut.openapi.views.spec=redoc.enabled=true,rapidoc.enabled=true,swagger-ui.enabled=true,swagger-ui.theme=flattop
+-Dmicronaut.openapi.views.spec=redoc.enabled=true,rapidoc.enabled=true,swagger-ui.enabled=true,swagger-ui.theme=flattop
 ----
 
 For instance in Gradle for Kotlin projects:

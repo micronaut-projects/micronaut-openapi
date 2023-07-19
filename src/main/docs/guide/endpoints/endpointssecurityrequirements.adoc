@@ -1,6 +1,7 @@
 You can also provide some security requirements for all endpoints with the `endpoints.security-requirements=<json array of io.swagger.v3.oas.models.security.SecurityRequirement>` flag, for instance:
 
 .openapi.properties endpoints.security-requirement property
+[source,properties]
 ----
 endpoints.security-requirements=[{"api_key": []}]
 ...

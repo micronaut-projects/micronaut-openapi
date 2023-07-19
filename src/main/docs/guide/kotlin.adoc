@@ -1,0 +1,12 @@
+To support incremental annotation processing, you need to explicitly set the path to
+the project directory through the annotation processor setting `micronaut.openapi.project.dir` like this:
+
+.Gradle
+[source,groovy]
+```
+kapt {
+    arguments {
+        arg("micronaut.openapi.project.dir", projectDir)
+    }
+}
+```

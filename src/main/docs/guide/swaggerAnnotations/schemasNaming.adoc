@@ -8,27 +8,27 @@ set `name` on `@Schema` annotation.
 ----
 import io.swagger.v3.oas.annotations.media.Schema;
 
-@Schema(description="A pet") // <1>
+@Schema(description = "A pet") // <1>
 class Pet {
 }
 
 class Owner {
+
     private Pet bird;
     private Pet cat;
     private Pet dog;
 
-
-    @Schema(description="Pet that is a a bird") // <2>
+    @Schema(description = "Pet that is a a bird") // <2>
     public Pet getBird() {
         return bird;
     }
 
-    @Schema(description="Pet that is a cat") // <3>
+    @Schema(description = "Pet that is a cat") // <3>
     public Pet getCat() {
         return cat;
     }
 
-    @Schema(name="Dog", description="Pet that is a dog") // <4>
+    @Schema(name = "Dog", description = "Pet that is a dog") // <4>
     public Pet getDog() {
         return cat;
     }

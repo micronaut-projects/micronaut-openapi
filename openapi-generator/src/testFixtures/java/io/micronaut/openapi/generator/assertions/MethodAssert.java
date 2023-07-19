@@ -22,7 +22,7 @@ public class MethodAssert extends AbstractAssert<MethodAssert, MethodDeclaration
     MethodAssert(final JavaFileAssert fileAssert, final MethodDeclaration methodDeclaration) {
         super(methodDeclaration, MethodAssert.class);
         this.fileAssert = fileAssert;
-        this.methodSignature = methodDeclaration.getDeclarationAsString();
+        methodSignature = methodDeclaration.getDeclarationAsString();
     }
 
     public JavaFileAssert toFileAssert() {

@@ -135,6 +135,8 @@ import static io.swagger.v3.oas.models.Components.COMPONENTS_SCHEMAS_REF;
     OpenApiApplicationVisitor.MICRONAUT_OPENAPI_CONFIG_FILE,
     OpenApiApplicationVisitor.MICRONAUT_OPENAPI_SECURITY_ENABLED,
     OpenApiApplicationVisitor.MICRONAUT_OPENAPI_VERSIONING_ENABLED,
+    OpenApiApplicationVisitor.MICRONAUT_OPENAPI_JSON_VIEW_DEFAULT_INCLUSION,
+    OpenApiApplicationVisitor.MICRONAUT_OPENAPI_PROJECT_DIR,
 })
 public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements TypeElementVisitor<OpenAPIDefinition, Object> {
 
@@ -176,6 +178,14 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
      * System property that specifies the location of additional swagger YAML and JSON files to read from.
      */
     public static final String MICRONAUT_OPENAPI_ADDITIONAL_FILES = "micronaut.openapi.additional.files";
+    /**
+     * System property that specifies the location of current project.
+     */
+    public static final String MICRONAUT_OPENAPI_PROJECT_DIR = "micronaut.openapi.project.dir";
+    /**
+     * Loaded project directory from system properties.
+     */
+    public static final String MICRONAUT_INTERNAL_OPENAPI_PROJECT_DIR = "micronaut.internal.openapi.project.dir";
     /**
      * System property that specifies the default security schema name, if it's not specified by annotation SecurityScheme.
      */
@@ -252,6 +262,13 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
      * directory.
      */
     public static final String MICRONAUT_CONFIG_FILE_LOCATIONS = "micronaut.openapi.config.file.locations";
+    /**
+     * Property that determines whether properties that have no view annotations are included in JSON serialization views.
+     * If enabled, non-annotated properties will be included; when disabled, they will be excluded.
+     * <br>
+     * Default value is "true".
+     */
+    public static final String MICRONAUT_OPENAPI_JSON_VIEW_DEFAULT_INCLUSION = "micronaut.openapi.json.view.default.inclusion";
 
     /**
      * Loaded micronaut-http server context path property.
@@ -262,9 +279,21 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
      */
     public static final String MICRONAUT_INTERNAL_OPENAPI_FILENAMES = "micronaut.internal.openapi.filenames";
     /**
+     * Loaded micronaut-http-server-netty property (json-view.enabled).
+     */
+    public static final String MICRONAUT_JACKSON_JSON_VIEW_ENABLED = "jackson.json-view.enabled";
+    /**
      * Loaded micronaut environment.
      */
     private static final String MICRONAUT_ENVIRONMENT = "micronaut.environment";
+    /**
+     * Loaded into context jackson.json-view.enabled property value.
+     */
+    private static final String MICRONAUT_INTERNAL_JACKSON_JSON_VIEW_ENABLED = "micronaut.internal.jackson.json-view.enabled";
+    /**
+     * Loaded into context micronaut.openapi.json-view.default-inclusion property value.
+     */
+    private static final String MICRONAUT_INTERNAL_JACKSON_JSON_VIEW_DEFAULT_INCLUSION = "micronaut.internal.json-view.default-inclusion";
     private static final String MICRONAUT_ENVIRONMENT_CREATED = "micronaut.environment.created";
     private static final String MICRONAUT_OPENAPI_PROPERTIES = "micronaut.openapi.properties";
     private static final String MICRONAUT_OPENAPI_ENDPOINTS = "micronaut.openapi.endpoints";
@@ -617,6 +646,32 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         }
         Environment environment = getEnv(context);
         return environment != null ? environment.get(key, String.class).orElse(null) : null;
+    }
+
+    public static boolean isJsonViewEnabled(VisitorContext context) {
+
+        Boolean isJsonViewEnabled = context.get(MICRONAUT_INTERNAL_JACKSON_JSON_VIEW_ENABLED, Boolean.class).orElse(null);
+        if (isJsonViewEnabled != null) {
+            return isJsonViewEnabled;
+        }
+
+        isJsonViewEnabled = getBooleanProperty(MICRONAUT_JACKSON_JSON_VIEW_ENABLED, false, context);
+        context.put(MICRONAUT_INTERNAL_JACKSON_JSON_VIEW_ENABLED, isJsonViewEnabled);
+
+        return isJsonViewEnabled;
+    }
+
+    public static boolean isJsonViewDefaultInclusion(VisitorContext context) {
+
+        Boolean isJsonViewDefaultInclusion = context.get(MICRONAUT_INTERNAL_JACKSON_JSON_VIEW_DEFAULT_INCLUSION, Boolean.class).orElse(null);
+        if (isJsonViewDefaultInclusion != null) {
+            return isJsonViewDefaultInclusion;
+        }
+
+        isJsonViewDefaultInclusion = getBooleanProperty(MICRONAUT_OPENAPI_JSON_VIEW_DEFAULT_INCLUSION, true, context);
+        context.put(MICRONAUT_INTERNAL_JACKSON_JSON_VIEW_DEFAULT_INCLUSION, isJsonViewDefaultInclusion);
+
+        return isJsonViewDefaultInclusion;
     }
 
     public static SecurityProperties getSecurityProperties(VisitorContext context) {
@@ -1067,7 +1122,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
 
     private OpenAPI readOpenApi(ClassElement element, VisitorContext context) {
         return element.findAnnotation(OpenAPIDefinition.class).flatMap(o -> {
-                    Optional<OpenAPI> result = toValue(o.getValues(), context, OpenAPI.class);
+                    Optional<OpenAPI> result = toValue(o.getValues(), context, OpenAPI.class, null);
                     result.ifPresent(openAPI -> {
                         List<io.swagger.v3.oas.models.security.SecurityRequirement> securityRequirements =
                                 o.getAnnotations("security", SecurityRequirement.class)
@@ -1776,7 +1831,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             return;
         }
         for (MediaType mediaType : content.values()) {
-            Schema mediaTypeSchema = mediaType.getSchema();
+            Schema<?> mediaTypeSchema = mediaType.getSchema();
             if (mediaTypeSchema == null) {
                 continue;
             }
@@ -1790,8 +1845,8 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             if (CollectionUtils.isNotEmpty(paramSchemas)) {
                 Map<String, Schema> paramNormalizedSchemas = new HashMap<>();
                 for (Map.Entry<String, Schema> paramEntry : paramSchemas.entrySet()) {
-                    Schema paramSchema = paramEntry.getValue();
-                    Schema paramNormalizedSchema = normalizeSchema(paramSchema);
+                    Schema<?> paramSchema = paramEntry.getValue();
+                    Schema<?> paramNormalizedSchema = normalizeSchema(paramSchema);
                     if (paramNormalizedSchema != null) {
                         paramNormalizedSchemas.put(paramEntry.getKey(), paramNormalizedSchema);
                     }
@@ -1810,7 +1865,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         }
     }
 
-    private Schema normalizeSchema(Schema schema) {
+    private Schema<?> normalizeSchema(Schema<?> schema) {
         List<Schema> allOf = schema.getAllOf();
         if (CollectionUtils.isEmpty(allOf)) {
             return null;
@@ -1832,7 +1887,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             }
             schema.setDefault(null);
             schema.setType(null);
-            Schema normalizedSchema = null;
+            Schema<?> normalizedSchema = null;
 
             Object allOfDefaultValue = allOfSchema.getDefault();
             String serializedAllOfDefaultValue;
@@ -1855,8 +1910,8 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         }
         List<Schema> finalList = new ArrayList<>(allOf.size());
         List<Schema> schemasWithoutRef = new ArrayList<>(allOf.size() - 1);
-        for (Schema schemaAllOf : allOf) {
-            Schema normalizedSchema = normalizeSchema(schemaAllOf);
+        for (Schema<?> schemaAllOf : allOf) {
+            Schema<?> normalizedSchema = normalizeSchema(schemaAllOf);
             if (normalizedSchema != null) {
                 schemaAllOf = normalizedSchema;
             }
@@ -1864,8 +1919,8 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             if (CollectionUtils.isNotEmpty(paramSchemas)) {
                 Map<String, Schema> paramNormalizedSchemas = new HashMap<>();
                 for (Map.Entry<String, Schema> paramEntry : paramSchemas.entrySet()) {
-                    Schema paramSchema = paramEntry.getValue();
-                    Schema paramNormalizedSchema = normalizeSchema(paramSchema);
+                    Schema<?> paramSchema = paramEntry.getValue();
+                    Schema<?> paramNormalizedSchema = normalizeSchema(paramSchema);
                     if (paramNormalizedSchema != null) {
                         paramNormalizedSchemas.put(paramEntry.getKey(), paramNormalizedSchema);
                     }
@@ -1910,8 +1965,8 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         Map<String, Schema> normalizedSchemas = new HashMap<>();
 
         for (Map.Entry<String, Schema> entry : schemas.entrySet()) {
-            Schema schema = entry.getValue();
-            Schema normalizedSchema = normalizeSchema(schema);
+            Schema<?> schema = entry.getValue();
+            Schema<?> normalizedSchema = normalizeSchema(schema);
             if (normalizedSchema != null) {
                 normalizedSchemas.put(entry.getKey(), normalizedSchema);
             } else if (schema.equals(EMPTY_SIMPLE_SCHEMA)) {
@@ -1922,8 +1977,8 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             if (CollectionUtils.isNotEmpty(paramSchemas)) {
                 Map<String, Schema> paramNormalizedSchemas = new HashMap<>();
                 for (Map.Entry<String, Schema> paramEntry : paramSchemas.entrySet()) {
-                    Schema paramSchema = paramEntry.getValue();
-                    Schema paramNormalizedSchema = normalizeSchema(paramSchema);
+                    Schema<?> paramSchema = paramEntry.getValue();
+                    Schema<?> paramNormalizedSchema = normalizeSchema(paramSchema);
                     if (paramNormalizedSchema != null) {
                         paramNormalizedSchemas.put(paramEntry.getKey(), paramNormalizedSchema);
                     } else if (paramSchema.equals(EMPTY_SIMPLE_SCHEMA)) {
@@ -1947,7 +2002,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
 
         for (OpenApiInfo openApiInfo : openApiInfos.values()) {
             Optional<Path> specFile = openApiSpecFile(openApiInfo.getFilename(), context);
-            try (Writer writer = getFileWriter(specFile)) {
+            try (Writer writer = getFileWriter(specFile.orElse(null))) {
                 (isYaml ? ConvertUtils.getYamlMapper() : ConvertUtils.getJsonMapper()).writeValue(writer, openApiInfo.getOpenApi());
                 if (Utils.isTestMode()) {
                     Utils.setTestFileName(openApiInfo.getFilename());
@@ -1980,16 +2035,19 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             try {
                 renderViews(documentTitle, openApiInfos, viewsDestDirs, context);
             } catch (Exception e) {
-                context.warn("Unable to render swagger" + (isYaml ? EXT_YML : EXT_JSON) + ": " + openApiInfos.get(0).getSpecFilePath() + " - " + e.getMessage() + ".\n" + Utils.printStackTrace(e), classElement);
+                context.warn("Unable to render swagger" + (isYaml ? EXT_YML : EXT_JSON) + ": " + openApiInfos.values()
+                    .stream()
+                    .map(OpenApiInfo::getSpecFilePath)
+                    .collect(Collectors.joining(", ", "files ", "")) + " - " + e.getMessage() + ".\n" + Utils.printStackTrace(e), classElement);
             }
         }
     }
 
-    private Writer getFileWriter(Optional<Path> specFile) throws IOException {
+    private Writer getFileWriter(Path specFile) throws IOException {
         if (Utils.isTestMode()) {
             return new StringWriter();
-        } else if (specFile.isPresent()) {
-            return Files.newBufferedWriter(specFile.get(), StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
+        } else if (specFile != null) {
+            return Files.newBufferedWriter(specFile, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
         } else {
             throw new IOException("Swagger spec file location is not present");
         }

@@ -30,10 +30,7 @@ The views will be generated to the `META-INF/swagger/views/swagger-ui` directory
 | `swagger-ui.tagsSorter` |
 |===
 
-
 See https://github.com/swagger-api/swagger-ui/blob/HEAD/docs/usage/configuration.md[Swagger UI Configuration] for a description.
-
-
 
 
 To expose the `swagger-ui` views, you also must expose the generated `yaml`:
@@ -42,14 +39,14 @@ To expose the `swagger-ui` views, you also must expose the generated `yaml`:
 [configuration]
 ----
 micronaut:
-    router:
-        static-resources:
-            swagger:
-                paths: classpath:META-INF/swagger
-                mapping: /swagger/**
-            swagger-ui:
-                paths: classpath:META-INF/swagger/views/swagger-ui
-                mapping: /swagger-ui/**
+  router:
+    static-resources:
+      swagger:
+        paths: classpath:META-INF/swagger
+        mapping: /swagger/**
+      swagger-ui:
+        paths: classpath:META-INF/swagger/views/swagger-ui
+        mapping: /swagger-ui/**
 ----
 
 With the above configuration in place when you run your application you can access your Swagger documentation at +http://localhost:8080/swagger-ui+.

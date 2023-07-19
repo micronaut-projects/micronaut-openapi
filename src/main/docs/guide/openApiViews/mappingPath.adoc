@@ -8,10 +8,10 @@ If you change this mapping to something else:
 [configuration]
 ----
 micronaut:
-    router:
-        static-resources:
-            swagger:
-                paths: classpath:META-INF/swagger
-                mapping: /swaggerYAML/**
+  router:
+    static-resources:
+      swagger:
+        paths: classpath:META-INF/swagger
+        mapping: /swaggerYAML/**
 ----
 You will need to set the `mapping.path` property accordingly: `micronaut.openapi.views.spec=mapping.path=swaggerYAML...`.

@@ -16,7 +16,6 @@
 package io.micronaut.openapi.visitor.security;
 
 import java.util.List;
-import java.util.Optional;
 
 import io.micronaut.core.annotation.Internal;
 import io.micronaut.core.annotation.Nullable;
@@ -32,12 +31,12 @@ public final class InterceptUrlMapPattern {
 
     private final String pattern;
     private final List<String> access;
-    private final Optional<HttpMethod> httpMethod;
+    private final HttpMethod httpMethod;
 
     public InterceptUrlMapPattern(String pattern, List<String> access, @Nullable HttpMethod httpMethod) {
         this.pattern = pattern;
         this.access = access;
-        this.httpMethod = Optional.ofNullable(httpMethod);
+        this.httpMethod = httpMethod;
     }
 
     public String getPattern() {
@@ -48,7 +47,7 @@ public final class InterceptUrlMapPattern {
         return access;
     }
 
-    public Optional<HttpMethod> getHttpMethod() {
+    public HttpMethod getHttpMethod() {
         return httpMethod;
     }
 }

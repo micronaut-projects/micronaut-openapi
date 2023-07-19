@@ -1,10 +1,14 @@
 package io.micronaut.openapi.generator.assertions;
 
-import com.github.javaparser.JavaParser;
-import com.github.javaparser.ParseResult;
-import com.github.javaparser.ParserConfiguration;
-import com.github.javaparser.ast.CompilationUnit;
-import com.google.common.collect.ImmutableMap;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
 import io.swagger.parser.OpenAPIParser;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
@@ -13,21 +17,18 @@ import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.servers.Server;
 import io.swagger.v3.parser.core.models.ParseOptions;
+
 import org.openapitools.codegen.CodegenModel;
 import org.openapitools.codegen.InlineModelResolver;
 import org.openapitools.codegen.model.ModelMap;
 import org.openapitools.codegen.model.ModelsMap;
 import org.openapitools.codegen.utils.ModelUtils;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import com.github.javaparser.JavaParser;
+import com.github.javaparser.ParseResult;
+import com.github.javaparser.ParserConfiguration;
+import com.github.javaparser.ast.CompilationUnit;
+import com.google.common.collect.ImmutableMap;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -39,7 +40,7 @@ public class TestUtils {
 
     /**
      * Helper method for parsing specs into an intermediary OpenAPI structure for pre-processing.
-     *
+     * <p>
      * Use this method only for tests targeting processing helpers such as {@link ModelUtils}
      * or {@link InlineModelResolver}. Using this for testing generators will mean you're not testing the OpenAPI document
      * in a state the generator will be presented at runtime.
@@ -80,7 +81,7 @@ public class TestUtils {
         return openAPI;
     }
 
-    public static OpenAPI createOpenAPIWithOneSchema(String name, Schema schema) {
+    public static OpenAPI createOpenAPIWithOneSchema(String name, Schema<?> schema) {
         OpenAPI openAPI = createOpenAPI();
         openAPI.setComponents(new Components());
         openAPI.getComponents().addSchemas(name, schema);
@@ -102,7 +103,7 @@ public class TestUtils {
                     if (fileName.endsWith(".java")) {
                         String fileContents = "";
                         try {
-                            fileContents = new String(Files.readAllBytes(f.toPath()), StandardCharsets.UTF_8);
+                            fileContents = Files.readString(f.toPath());
                         } catch (IOException ignored) {
 
                         }
@@ -122,11 +123,12 @@ public class TestUtils {
 
     public static void assertFileContains(Path path, String... lines) {
         try {
-            String generatedFile = new String(Files.readAllBytes(path), StandardCharsets.UTF_8);
+            String generatedFile = Files.readString(path);
             String file = linearize(generatedFile);
             assertNotNull(file);
-            for (String line : lines)
+            for (String line : lines) {
                 assertTrue(file.contains(linearize(line)), "File does not contain line [" + line + "]");
+            }
         } catch (IOException e) {
             fail("Unable to evaluate file " + path);
         }
@@ -139,19 +141,20 @@ public class TestUtils {
     public static void assertFileNotContains(Path path, String... lines) {
         String generatedFile = null;
         try {
-            generatedFile = new String(Files.readAllBytes(path), StandardCharsets.UTF_8);
+            generatedFile = Files.readString(path);
         } catch (IOException e) {
             fail("Unable to evaluate file " + path);
         }
         String file = linearize(generatedFile);
         assertNotNull(file);
-        for (String line : lines)
+        for (String line : lines) {
             assertFalse(file.contains(linearize(line)));
+        }
     }
 
     public static void assertFileNotExists(Path path) {
         try {
-            new String(Files.readAllBytes(path), StandardCharsets.UTF_8);
+            Files.readString(path);
             fail("File exists when it should not: " + path);
         } catch (IOException e) {
             // File exists, pass.
@@ -161,7 +164,7 @@ public class TestUtils {
 
     public static void assertFileExists(Path path) {
         try {
-            new String(Files.readAllBytes(path), StandardCharsets.UTF_8);
+            Files.readString(path);
             // File exists, pass.
             assertTrue(true);
         } catch (IOException e) {

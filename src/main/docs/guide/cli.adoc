@@ -1,5 +1,6 @@
 To create a project with OpenAPI/Swagger support using the Micronaut CLI, supply the `openapi` feature to the `features` flag. For example:
 
+[source,commandline]
 ----
 $ mn create-app my-openapi-app --features openapi
 ----

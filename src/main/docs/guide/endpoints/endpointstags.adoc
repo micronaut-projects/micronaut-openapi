@@ -1,6 +1,7 @@
 You can also provide some tags for all endpoints with the `endpoints.tags=<comma separated list of tags>` flag, for instance:
 
 .openapi.properties
+[source,properties]
 ----
 endpoints.tags=Management Endpoints
 ----

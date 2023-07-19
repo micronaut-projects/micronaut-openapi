@@ -15,13 +15,13 @@ public class ParameterAssert extends ObjectAssert<Parameter> {
     protected ParameterAssert(final MethodAssert methodAssert, final Parameter parameter) {
         super(parameter);
         this.methodAssert = methodAssert;
-        this.constructorAssert = null;
+        constructorAssert = null;
     }
 
     protected ParameterAssert(final ConstructorAssert constructorAssert, final Parameter parameter) {
         super(parameter);
         this.constructorAssert = constructorAssert;
-        this.methodAssert = null;
+        methodAssert = null;
     }
 
     public MethodAssert toMethod() {
