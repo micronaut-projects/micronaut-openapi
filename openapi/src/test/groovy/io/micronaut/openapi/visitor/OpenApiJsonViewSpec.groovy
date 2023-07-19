@@ -227,4 +227,88 @@ class MyBean {}
         cleanup:
         System.clearProperty(OpenApiApplicationVisitor.MICRONAUT_JACKSON_JSON_VIEW_ENABLED)
     }
+
+    void "test build OpenAPI with changed JsonView default inclusion"() {
+
+        setup:
+        System.setProperty(OpenApiApplicationVisitor.MICRONAUT_JACKSON_JSON_VIEW_ENABLED, "true")
+        System.setProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_JSON_VIEW_DEFAULT_INCLUSION, "false")
+
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import java.util.List;
+
+import io.micronaut.http.HttpResponse;
+import io.micronaut.http.annotation.Body;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.micronaut.http.annotation.Post;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+
+import com.fasterxml.jackson.annotation.JsonView;
+
+@Controller
+class OpenApiController {
+
+    @Get("/summary")
+    @JsonView(View.Summary.class)
+    @Operation(summary = "Return car summaries",
+            responses = @ApiResponse(responseCode = "200", content = @Content(array = @ArraySchema(schema = @Schema(implementation = Car.class)))))
+    public HttpResponse<?> getSummaries() {
+        return null;
+    }
+}
+
+interface View {
+
+    interface Summary {}
+}
+
+class Car {
+
+    @JsonView(View.Summary.class)
+    public String made;
+    public String model;
+    public List<Tire> tires;
+    public int price;
+    public int age;
+    public String color;
+}
+
+class Tire {
+
+    public String made;
+    public String condition;
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        then: "the state is correct"
+        Utils.testReference != null
+
+        when: "The OpenAPI is retrieved"
+        OpenAPI openAPI = Utils.testReference
+        Schema carSummary = openAPI.components.schemas['Car_Summary']
+        Operation summaryOp = openAPI.paths."/summary".get
+
+        then:
+
+        summaryOp
+        summaryOp.responses.'200'.content.'application/json'.schema.items.$ref == '#/components/schemas/Car_Summary'
+
+        carSummary
+        carSummary.properties.size() == 1
+        carSummary.properties.made
+
+        cleanup:
+        System.clearProperty(OpenApiApplicationVisitor.MICRONAUT_JACKSON_JSON_VIEW_ENABLED)
+        System.clearProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_JSON_VIEW_DEFAULT_INCLUSION)
+    }
 }
