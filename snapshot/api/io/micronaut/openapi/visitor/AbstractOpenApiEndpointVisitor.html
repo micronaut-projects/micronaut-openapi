@@ -149,26 +149,29 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>protected io.swagger.v3.oas.models.media.Schema&lt;?&gt;</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#bindArraySchemaAnnotationValue(io.micronaut.inject.visitor.VisitorContext,io.micronaut.inject.ast.Element,io.swagger.v3.oas.models.media.Schema,io.micronaut.core.annotation.AnnotationValue)" class="member-name-link">bindArraySchemaAnnotationValue</a><wbr>(io.micronaut.inject.visitor.VisitorContext&nbsp;context,
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#bindArraySchemaAnnotationValue(io.micronaut.inject.visitor.VisitorContext,io.micronaut.inject.ast.Element,io.swagger.v3.oas.models.media.Schema,io.micronaut.core.annotation.AnnotationValue,io.micronaut.inject.ast.ClassElement)" class="member-name-link">bindArraySchemaAnnotationValue</a><wbr>(io.micronaut.inject.visitor.VisitorContext&nbsp;context,
  io.micronaut.inject.ast.Element&nbsp;element,
  io.swagger.v3.oas.models.media.Schema&lt;?&gt;&nbsp;schemaToBind,
- io.micronaut.core.annotation.AnnotationValue&lt;io.swagger.v3.oas.annotations.media.ArraySchema&gt;&nbsp;schemaAnn)</code></div>
+ io.micronaut.core.annotation.AnnotationValue&lt;io.swagger.v3.oas.annotations.media.ArraySchema&gt;&nbsp;schemaAnn,
+ @Nullable io.micronaut.inject.ast.ClassElement&nbsp;jsonViewClass)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Binds the array schema for the given element.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>protected io.swagger.v3.oas.models.media.Schema&lt;?&gt;</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#bindSchemaAnnotationValue(io.micronaut.inject.visitor.VisitorContext,io.micronaut.inject.ast.Element,io.swagger.v3.oas.models.media.Schema,io.micronaut.core.annotation.AnnotationValue)" class="member-name-link">bindSchemaAnnotationValue</a><wbr>(io.micronaut.inject.visitor.VisitorContext&nbsp;context,
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#bindSchemaAnnotationValue(io.micronaut.inject.visitor.VisitorContext,io.micronaut.inject.ast.Element,io.swagger.v3.oas.models.media.Schema,io.micronaut.core.annotation.AnnotationValue,io.micronaut.inject.ast.ClassElement)" class="member-name-link">bindSchemaAnnotationValue</a><wbr>(io.micronaut.inject.visitor.VisitorContext&nbsp;context,
  io.micronaut.inject.ast.Element&nbsp;element,
  io.swagger.v3.oas.models.media.Schema&lt;?&gt;&nbsp;schemaToBind,
- io.micronaut.core.annotation.AnnotationValue&lt;io.swagger.v3.oas.annotations.media.Schema&gt;&nbsp;schemaAnn)</code></div>
+ io.micronaut.core.annotation.AnnotationValue&lt;io.swagger.v3.oas.annotations.media.Schema&gt;&nbsp;schemaAnn,
+ @Nullable io.micronaut.inject.ast.ClassElement&nbsp;jsonViewClass)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Binds the schema for the given element.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>protected io.swagger.v3.oas.models.media.Schema&lt;?&gt;</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#bindSchemaForElement(io.micronaut.inject.visitor.VisitorContext,io.micronaut.inject.ast.TypedElement,io.micronaut.inject.ast.ClassElement,io.swagger.v3.oas.models.media.Schema)" class="member-name-link">bindSchemaForElement</a><wbr>(io.micronaut.inject.visitor.VisitorContext&nbsp;context,
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#bindSchemaForElement(io.micronaut.inject.visitor.VisitorContext,io.micronaut.inject.ast.TypedElement,io.micronaut.inject.ast.ClassElement,io.swagger.v3.oas.models.media.Schema,io.micronaut.inject.ast.ClassElement)" class="member-name-link">bindSchemaForElement</a><wbr>(io.micronaut.inject.visitor.VisitorContext&nbsp;context,
  io.micronaut.inject.ast.TypedElement&nbsp;element,
  io.micronaut.inject.ast.ClassElement&nbsp;elementType,
- io.swagger.v3.oas.models.media.Schema&lt;?&gt;&nbsp;schemaToBind)</code></div>
+ io.swagger.v3.oas.models.media.Schema&lt;?&gt;&nbsp;schemaToBind,
+ @Nullable io.micronaut.inject.ast.ClassElement&nbsp;jsonViewClass)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Binds the schema for the given element.</div>
 </div>
@@ -259,37 +262,41 @@ A extends <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/
 <div class="block">Returns the produces media types.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>protected io.swagger.v3.oas.models.media.Schema&lt;?&gt;</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#readSchema(io.micronaut.core.annotation.AnnotationValue,io.swagger.v3.oas.models.OpenAPI,io.micronaut.inject.visitor.VisitorContext,io.micronaut.inject.ast.Element,java.util.Map,java.util.List)" class="member-name-link">readSchema</a><wbr>(io.micronaut.core.annotation.AnnotationValue&lt;io.swagger.v3.oas.annotations.media.Schema&gt;&nbsp;schemaValue,
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#readSchema(io.micronaut.core.annotation.AnnotationValue,io.swagger.v3.oas.models.OpenAPI,io.micronaut.inject.visitor.VisitorContext,io.micronaut.inject.ast.Element,java.util.Map,java.util.List,io.micronaut.inject.ast.ClassElement)" class="member-name-link">readSchema</a><wbr>(io.micronaut.core.annotation.AnnotationValue&lt;io.swagger.v3.oas.annotations.media.Schema&gt;&nbsp;schemaValue,
  io.swagger.v3.oas.models.OpenAPI&nbsp;openAPI,
  io.micronaut.inject.visitor.VisitorContext&nbsp;context,
  @Nullable io.micronaut.inject.ast.Element&nbsp;type,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>,<wbr>io.micronaut.inject.ast.ClassElement&gt;&nbsp;typeArgs,
- <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;io.micronaut.http.MediaType&gt;&nbsp;mediaTypes)</code></div>
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;io.micronaut.http.MediaType&gt;&nbsp;mediaTypes,
+ @Nullable io.micronaut.inject.ast.ClassElement&nbsp;jsonViewClass)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Reads schema.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>protected @Nullable io.swagger.v3.oas.models.media.Schema&lt;?&gt;</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#resolveSchema(io.micronaut.inject.ast.Element,io.micronaut.inject.ast.ClassElement,io.micronaut.inject.visitor.VisitorContext,java.util.List)" class="member-name-link">resolveSchema</a><wbr>(@Nullable io.micronaut.inject.ast.Element&nbsp;definingElement,
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#resolveSchema(io.micronaut.inject.ast.Element,io.micronaut.inject.ast.ClassElement,io.micronaut.inject.visitor.VisitorContext,java.util.List,io.micronaut.inject.ast.ClassElement)" class="member-name-link">resolveSchema</a><wbr>(@Nullable io.micronaut.inject.ast.Element&nbsp;definingElement,
  io.micronaut.inject.ast.ClassElement&nbsp;type,
  io.micronaut.inject.visitor.VisitorContext&nbsp;context,
- <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;io.micronaut.http.MediaType&gt;&nbsp;mediaTypes)</code></div>
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;io.micronaut.http.MediaType&gt;&nbsp;mediaTypes,
+ @Nullable io.micronaut.inject.ast.ClassElement&nbsp;jsonViewClass)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Resolves the schema for the given type element.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>protected @Nullable io.swagger.v3.oas.models.media.Schema&lt;?&gt;</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#resolveSchema(io.swagger.v3.oas.models.OpenAPI,io.micronaut.inject.ast.Element,io.micronaut.inject.ast.ClassElement,io.micronaut.inject.visitor.VisitorContext,java.util.List,io.micronaut.openapi.javadoc.JavadocDescription,io.micronaut.openapi.javadoc.JavadocDescription)" class="member-name-link">resolveSchema</a><wbr>(io.swagger.v3.oas.models.OpenAPI&nbsp;openAPI,
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#resolveSchema(io.swagger.v3.oas.models.OpenAPI,io.micronaut.inject.ast.Element,io.micronaut.inject.ast.ClassElement,io.micronaut.inject.visitor.VisitorContext,java.util.List,io.micronaut.inject.ast.ClassElement,io.micronaut.openapi.javadoc.JavadocDescription,io.micronaut.openapi.javadoc.JavadocDescription)" class="member-name-link">resolveSchema</a><wbr>(io.swagger.v3.oas.models.OpenAPI&nbsp;openAPI,
  @Nullable io.micronaut.inject.ast.Element&nbsp;definingElement,
  io.micronaut.inject.ast.ClassElement&nbsp;type,
  io.micronaut.inject.visitor.VisitorContext&nbsp;context,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;io.micronaut.http.MediaType&gt;&nbsp;mediaTypes,
+ @Nullable io.micronaut.inject.ast.ClassElement&nbsp;jsonViewClass,
  <a href="../javadoc/JavadocDescription.html" title="class in io.micronaut.openapi.javadoc">JavadocDescription</a>&nbsp;fieldJavadoc,
  <a href="../javadoc/JavadocDescription.html" title="class in io.micronaut.openapi.javadoc">JavadocDescription</a>&nbsp;classJavadoc)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Resolves the schema for the given type element.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>protected <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/CharSequence.html" title="class or interface in java.lang" class="external-link">CharSequence</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&gt;</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#toValueMap(java.util.Map,io.micronaut.inject.visitor.VisitorContext)" class="member-name-link">toValueMap</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/CharSequence.html" title="class or interface in java.lang" class="external-link">CharSequence</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&gt;&nbsp;values,
- io.micronaut.inject.visitor.VisitorContext&nbsp;context)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#toValueMap(java.util.Map,io.micronaut.inject.visitor.VisitorContext,io.micronaut.inject.ast.ClassElement)" class="member-name-link">toValueMap</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/CharSequence.html" title="class or interface in java.lang" class="external-link">CharSequence</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&gt;&nbsp;values,
+ io.micronaut.inject.visitor.VisitorContext&nbsp;context,
+ @Nullable io.micronaut.inject.ast.ClassElement&nbsp;jsonViewClass)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Convert the values to a map.</div>
 </div>
@@ -601,29 +608,34 @@ A extends <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/
 </section>
 </li>
 <li>
-<section class="detail" id="toValueMap(java.util.Map,io.micronaut.inject.visitor.VisitorContext)">
+<section class="detail" id="toValueMap(java.util.Map,io.micronaut.inject.visitor.VisitorContext,io.micronaut.inject.ast.ClassElement)">
 <h3>toValueMap</h3>
 <div class="member-signature"><span class="modifiers">protected</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/CharSequence.html" title="class or interface in java.lang" class="external-link">CharSequence</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&gt;</span>&nbsp;<span class="element-name">toValueMap</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/CharSequence.html" title="class or interface in java.lang" class="external-link">CharSequence</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&gt;&nbsp;values,
- io.micronaut.inject.visitor.VisitorContext&nbsp;context)</span></div>
+ io.micronaut.inject.visitor.VisitorContext&nbsp;context,
+ @Nullable
+ @Nullable io.micronaut.inject.ast.ClassElement&nbsp;jsonViewClass)</span></div>
 <div class="block">Convert the values to a map.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>values</code> - The values</dd>
 <dd><code>context</code> - The visitor context</dd>
+<dd><code>jsonViewClass</code> - Class from JsonView annotation</dd>
 <dt>Returns:</dt>
 <dd>The map</dd>
 </dl>
 </section>
 </li>
 <li>
-<section class="detail" id="resolveSchema(io.micronaut.inject.ast.Element,io.micronaut.inject.ast.ClassElement,io.micronaut.inject.visitor.VisitorContext,java.util.List)">
+<section class="detail" id="resolveSchema(io.micronaut.inject.ast.Element,io.micronaut.inject.ast.ClassElement,io.micronaut.inject.visitor.VisitorContext,java.util.List,io.micronaut.inject.ast.ClassElement)">
 <h3>resolveSchema</h3>
 <div class="member-signature"><span class="annotations">@Nullable
 </span><span class="modifiers">protected</span>&nbsp;<span class="return-type">@Nullable io.swagger.v3.oas.models.media.Schema&lt;?&gt;</span>&nbsp;<span class="element-name">resolveSchema</span><wbr><span class="parameters">(@Nullable
  @Nullable io.micronaut.inject.ast.Element&nbsp;definingElement,
  io.micronaut.inject.ast.ClassElement&nbsp;type,
  io.micronaut.inject.visitor.VisitorContext&nbsp;context,
- <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;io.micronaut.http.MediaType&gt;&nbsp;mediaTypes)</span></div>
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;io.micronaut.http.MediaType&gt;&nbsp;mediaTypes,
+ @Nullable
+ @Nullable io.micronaut.inject.ast.ClassElement&nbsp;jsonViewClass)</span></div>
 <div class="block">Resolves the schema for the given type element.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
@@ -631,13 +643,14 @@ A extends <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/
 <dd><code>type</code> - The type element</dd>
 <dd><code>context</code> - The context</dd>
 <dd><code>mediaTypes</code> - An optional media type</dd>
+<dd><code>jsonViewClass</code> - Class from JsonView annotation</dd>
 <dt>Returns:</dt>
 <dd>The schema or null if it cannot be resolved</dd>
 </dl>
 </section>
 </li>
 <li>
-<section class="detail" id="resolveSchema(io.swagger.v3.oas.models.OpenAPI,io.micronaut.inject.ast.Element,io.micronaut.inject.ast.ClassElement,io.micronaut.inject.visitor.VisitorContext,java.util.List,io.micronaut.openapi.javadoc.JavadocDescription,io.micronaut.openapi.javadoc.JavadocDescription)">
+<section class="detail" id="resolveSchema(io.swagger.v3.oas.models.OpenAPI,io.micronaut.inject.ast.Element,io.micronaut.inject.ast.ClassElement,io.micronaut.inject.visitor.VisitorContext,java.util.List,io.micronaut.inject.ast.ClassElement,io.micronaut.openapi.javadoc.JavadocDescription,io.micronaut.openapi.javadoc.JavadocDescription)">
 <h3>resolveSchema</h3>
 <div class="member-signature"><span class="annotations">@Nullable
 </span><span class="modifiers">protected</span>&nbsp;<span class="return-type">@Nullable io.swagger.v3.oas.models.media.Schema&lt;?&gt;</span>&nbsp;<span class="element-name">resolveSchema</span><wbr><span class="parameters">(io.swagger.v3.oas.models.OpenAPI&nbsp;openAPI,
@@ -646,6 +659,8 @@ A extends <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/
  io.micronaut.inject.ast.ClassElement&nbsp;type,
  io.micronaut.inject.visitor.VisitorContext&nbsp;context,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;io.micronaut.http.MediaType&gt;&nbsp;mediaTypes,
+ @Nullable
+ @Nullable io.micronaut.inject.ast.ClassElement&nbsp;jsonViewClass,
  <a href="../javadoc/JavadocDescription.html" title="class in io.micronaut.openapi.javadoc">JavadocDescription</a>&nbsp;fieldJavadoc,
  <a href="../javadoc/JavadocDescription.html" title="class in io.micronaut.openapi.javadoc">JavadocDescription</a>&nbsp;classJavadoc)</span></div>
 <div class="block">Resolves the schema for the given type element.</div>
@@ -658,6 +673,7 @@ A extends <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/
 <dd><code>mediaTypes</code> - An optional media type</dd>
 <dd><code>fieldJavadoc</code> - Field-level java doc</dd>
 <dd><code>classJavadoc</code> - Class-level java doc</dd>
+<dd><code>jsonViewClass</code> - Class from JsonView annotation</dd>
 <dt>Returns:</dt>
 <dd>The schema or null if it cannot be resolved</dd>
 </dl>
@@ -694,12 +710,14 @@ A extends <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/
 </section>
 </li>
 <li>
-<section class="detail" id="bindSchemaForElement(io.micronaut.inject.visitor.VisitorContext,io.micronaut.inject.ast.TypedElement,io.micronaut.inject.ast.ClassElement,io.swagger.v3.oas.models.media.Schema)">
+<section class="detail" id="bindSchemaForElement(io.micronaut.inject.visitor.VisitorContext,io.micronaut.inject.ast.TypedElement,io.micronaut.inject.ast.ClassElement,io.swagger.v3.oas.models.media.Schema,io.micronaut.inject.ast.ClassElement)">
 <h3>bindSchemaForElement</h3>
 <div class="member-signature"><span class="modifiers">protected</span>&nbsp;<span class="return-type">io.swagger.v3.oas.models.media.Schema&lt;?&gt;</span>&nbsp;<span class="element-name">bindSchemaForElement</span><wbr><span class="parameters">(io.micronaut.inject.visitor.VisitorContext&nbsp;context,
  io.micronaut.inject.ast.TypedElement&nbsp;element,
  io.micronaut.inject.ast.ClassElement&nbsp;elementType,
- io.swagger.v3.oas.models.media.Schema&lt;?&gt;&nbsp;schemaToBind)</span></div>
+ io.swagger.v3.oas.models.media.Schema&lt;?&gt;&nbsp;schemaToBind,
+ @Nullable
+ @Nullable io.micronaut.inject.ast.ClassElement&nbsp;jsonViewClass)</span></div>
 <div class="block">Binds the schema for the given element.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
@@ -707,6 +725,7 @@ A extends <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/
 <dd><code>element</code> - The element</dd>
 <dd><code>elementType</code> - The element type</dd>
 <dd><code>schemaToBind</code> - The schema to bind</dd>
+<dd><code>jsonViewClass</code> - Class from JsonView annotation</dd>
 <dt>Returns:</dt>
 <dd>The bound schema</dd>
 </dl>
@@ -721,12 +740,14 @@ A extends <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/
 </section>
 </li>
 <li>
-<section class="detail" id="bindSchemaAnnotationValue(io.micronaut.inject.visitor.VisitorContext,io.micronaut.inject.ast.Element,io.swagger.v3.oas.models.media.Schema,io.micronaut.core.annotation.AnnotationValue)">
+<section class="detail" id="bindSchemaAnnotationValue(io.micronaut.inject.visitor.VisitorContext,io.micronaut.inject.ast.Element,io.swagger.v3.oas.models.media.Schema,io.micronaut.core.annotation.AnnotationValue,io.micronaut.inject.ast.ClassElement)">
 <h3>bindSchemaAnnotationValue</h3>
 <div class="member-signature"><span class="modifiers">protected</span>&nbsp;<span class="return-type">io.swagger.v3.oas.models.media.Schema&lt;?&gt;</span>&nbsp;<span class="element-name">bindSchemaAnnotationValue</span><wbr><span class="parameters">(io.micronaut.inject.visitor.VisitorContext&nbsp;context,
  io.micronaut.inject.ast.Element&nbsp;element,
  io.swagger.v3.oas.models.media.Schema&lt;?&gt;&nbsp;schemaToBind,
- io.micronaut.core.annotation.AnnotationValue&lt;io.swagger.v3.oas.annotations.media.Schema&gt;&nbsp;schemaAnn)</span></div>
+ io.micronaut.core.annotation.AnnotationValue&lt;io.swagger.v3.oas.annotations.media.Schema&gt;&nbsp;schemaAnn,
+ @Nullable
+ @Nullable io.micronaut.inject.ast.ClassElement&nbsp;jsonViewClass)</span></div>
 <div class="block">Binds the schema for the given element.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
@@ -734,18 +755,21 @@ A extends <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/
 <dd><code>element</code> - The element</dd>
 <dd><code>schemaToBind</code> - The schema to bind</dd>
 <dd><code>schemaAnn</code> - The schema annotation</dd>
+<dd><code>jsonViewClass</code> - Class from JsonView annotation</dd>
 <dt>Returns:</dt>
 <dd>The bound schema</dd>
 </dl>
 </section>
 </li>
 <li>
-<section class="detail" id="bindArraySchemaAnnotationValue(io.micronaut.inject.visitor.VisitorContext,io.micronaut.inject.ast.Element,io.swagger.v3.oas.models.media.Schema,io.micronaut.core.annotation.AnnotationValue)">
+<section class="detail" id="bindArraySchemaAnnotationValue(io.micronaut.inject.visitor.VisitorContext,io.micronaut.inject.ast.Element,io.swagger.v3.oas.models.media.Schema,io.micronaut.core.annotation.AnnotationValue,io.micronaut.inject.ast.ClassElement)">
 <h3>bindArraySchemaAnnotationValue</h3>
 <div class="member-signature"><span class="modifiers">protected</span>&nbsp;<span class="return-type">io.swagger.v3.oas.models.media.Schema&lt;?&gt;</span>&nbsp;<span class="element-name">bindArraySchemaAnnotationValue</span><wbr><span class="parameters">(io.micronaut.inject.visitor.VisitorContext&nbsp;context,
  io.micronaut.inject.ast.Element&nbsp;element,
  io.swagger.v3.oas.models.media.Schema&lt;?&gt;&nbsp;schemaToBind,
- io.micronaut.core.annotation.AnnotationValue&lt;io.swagger.v3.oas.annotations.media.ArraySchema&gt;&nbsp;schemaAnn)</span></div>
+ io.micronaut.core.annotation.AnnotationValue&lt;io.swagger.v3.oas.annotations.media.ArraySchema&gt;&nbsp;schemaAnn,
+ @Nullable
+ @Nullable io.micronaut.inject.ast.ClassElement&nbsp;jsonViewClass)</span></div>
 <div class="block">Binds the array schema for the given element.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
@@ -753,13 +777,14 @@ A extends <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/
 <dd><code>element</code> - The element</dd>
 <dd><code>schemaToBind</code> - The schema to bind</dd>
 <dd><code>schemaAnn</code> - The schema annotation</dd>
+<dd><code>jsonViewClass</code> - Class from JsonView annotation</dd>
 <dt>Returns:</dt>
 <dd>The bound schema</dd>
 </dl>
 </section>
 </li>
 <li>
-<section class="detail" id="readSchema(io.micronaut.core.annotation.AnnotationValue,io.swagger.v3.oas.models.OpenAPI,io.micronaut.inject.visitor.VisitorContext,io.micronaut.inject.ast.Element,java.util.Map,java.util.List)">
+<section class="detail" id="readSchema(io.micronaut.core.annotation.AnnotationValue,io.swagger.v3.oas.models.OpenAPI,io.micronaut.inject.visitor.VisitorContext,io.micronaut.inject.ast.Element,java.util.Map,java.util.List,io.micronaut.inject.ast.ClassElement)">
 <h3>readSchema</h3>
 <div class="member-signature"><span class="modifiers">protected</span>&nbsp;<span class="return-type">io.swagger.v3.oas.models.media.Schema&lt;?&gt;</span>&nbsp;<span class="element-name">readSchema</span><wbr><span class="parameters">(io.micronaut.core.annotation.AnnotationValue&lt;io.swagger.v3.oas.annotations.media.Schema&gt;&nbsp;schemaValue,
  io.swagger.v3.oas.models.OpenAPI&nbsp;openAPI,
@@ -767,7 +792,9 @@ A extends <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/
  @Nullable
  @Nullable io.micronaut.inject.ast.Element&nbsp;type,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>,<wbr>io.micronaut.inject.ast.ClassElement&gt;&nbsp;typeArgs,
- <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;io.micronaut.http.MediaType&gt;&nbsp;mediaTypes)</span>
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;io.micronaut.http.MediaType&gt;&nbsp;mediaTypes,
+ @Nullable
+ @Nullable io.micronaut.inject.ast.ClassElement&nbsp;jsonViewClass)</span>
                                                        throws <span class="exceptions">com.fasterxml.jackson.core.JsonProcessingException</span></div>
 <div class="block">Reads schema.</div>
 <dl class="notes">
@@ -778,6 +805,7 @@ A extends <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/
 <dd><code>type</code> - type element</dd>
 <dd><code>typeArgs</code> - type arguments</dd>
 <dd><code>mediaTypes</code> - The media types of schema</dd>
+<dd><code>jsonViewClass</code> - Class from JsonView annotation</dd>
 <dt>Returns:</dt>
 <dd>New schema instance</dd>
 <dt>Throws:</dt>

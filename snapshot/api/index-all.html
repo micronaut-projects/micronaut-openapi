@@ -229,15 +229,15 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/swagger/core/util/PrimitiveType.html#BINARY" class="member-name-link">BINARY</a> - Enum constant in enum class io.micronaut.openapi.swagger.core.util.<a href="io/micronaut/openapi/swagger/core/util/PrimitiveType.html" title="enum class in io.micronaut.openapi.swagger.core.util">PrimitiveType</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="io/micronaut/openapi/visitor/AbstractOpenApiEndpointVisitor.html#bindArraySchemaAnnotationValue(io.micronaut.inject.visitor.VisitorContext,io.micronaut.inject.ast.Element,io.swagger.v3.oas.models.media.Schema,io.micronaut.core.annotation.AnnotationValue)" class="member-name-link">bindArraySchemaAnnotationValue(VisitorContext, Element, Schema&lt;?&gt;, AnnotationValue&lt;ArraySchema&gt;)</a> - Method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/AbstractOpenApiEndpointVisitor.html" title="class in io.micronaut.openapi.visitor">AbstractOpenApiEndpointVisitor</a></dt>
+<dt><a href="io/micronaut/openapi/visitor/AbstractOpenApiEndpointVisitor.html#bindArraySchemaAnnotationValue(io.micronaut.inject.visitor.VisitorContext,io.micronaut.inject.ast.Element,io.swagger.v3.oas.models.media.Schema,io.micronaut.core.annotation.AnnotationValue,io.micronaut.inject.ast.ClassElement)" class="member-name-link">bindArraySchemaAnnotationValue(VisitorContext, Element, Schema&lt;?&gt;, AnnotationValue&lt;ArraySchema&gt;, ClassElement)</a> - Method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/AbstractOpenApiEndpointVisitor.html" title="class in io.micronaut.openapi.visitor">AbstractOpenApiEndpointVisitor</a></dt>
 <dd>
 <div class="block">Binds the array schema for the given element.</div>
 </dd>
-<dt><a href="io/micronaut/openapi/visitor/AbstractOpenApiEndpointVisitor.html#bindSchemaAnnotationValue(io.micronaut.inject.visitor.VisitorContext,io.micronaut.inject.ast.Element,io.swagger.v3.oas.models.media.Schema,io.micronaut.core.annotation.AnnotationValue)" class="member-name-link">bindSchemaAnnotationValue(VisitorContext, Element, Schema&lt;?&gt;, AnnotationValue&lt;Schema&gt;)</a> - Method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/AbstractOpenApiEndpointVisitor.html" title="class in io.micronaut.openapi.visitor">AbstractOpenApiEndpointVisitor</a></dt>
+<dt><a href="io/micronaut/openapi/visitor/AbstractOpenApiEndpointVisitor.html#bindSchemaAnnotationValue(io.micronaut.inject.visitor.VisitorContext,io.micronaut.inject.ast.Element,io.swagger.v3.oas.models.media.Schema,io.micronaut.core.annotation.AnnotationValue,io.micronaut.inject.ast.ClassElement)" class="member-name-link">bindSchemaAnnotationValue(VisitorContext, Element, Schema&lt;?&gt;, AnnotationValue&lt;Schema&gt;, ClassElement)</a> - Method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/AbstractOpenApiEndpointVisitor.html" title="class in io.micronaut.openapi.visitor">AbstractOpenApiEndpointVisitor</a></dt>
 <dd>
 <div class="block">Binds the schema for the given element.</div>
 </dd>
-<dt><a href="io/micronaut/openapi/visitor/AbstractOpenApiEndpointVisitor.html#bindSchemaForElement(io.micronaut.inject.visitor.VisitorContext,io.micronaut.inject.ast.TypedElement,io.micronaut.inject.ast.ClassElement,io.swagger.v3.oas.models.media.Schema)" class="member-name-link">bindSchemaForElement(VisitorContext, TypedElement, ClassElement, Schema&lt;?&gt;)</a> - Method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/AbstractOpenApiEndpointVisitor.html" title="class in io.micronaut.openapi.visitor">AbstractOpenApiEndpointVisitor</a></dt>
+<dt><a href="io/micronaut/openapi/visitor/AbstractOpenApiEndpointVisitor.html#bindSchemaForElement(io.micronaut.inject.visitor.VisitorContext,io.micronaut.inject.ast.TypedElement,io.micronaut.inject.ast.ClassElement,io.swagger.v3.oas.models.media.Schema,io.micronaut.inject.ast.ClassElement)" class="member-name-link">bindSchemaForElement(VisitorContext, TypedElement, ClassElement, Schema&lt;?&gt;, ClassElement)</a> - Method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/AbstractOpenApiEndpointVisitor.html" title="class in io.micronaut.openapi.visitor">AbstractOpenApiEndpointVisitor</a></dt>
 <dd>
 <div class="block">Binds the schema for the given element.</div>
 </dd>
@@ -715,7 +715,7 @@ loadScripts(document, 'script');</script>
 </dd>
 <dt><a href="io/micronaut/openapi/generator/MicronautCodeGeneratorBuilder.html#forCodeGenerator(G,java.util.function.Consumer)" class="member-name-link">forCodeGenerator(G, Consumer&lt;? super B&gt;)</a> - Method in interface io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/MicronautCodeGeneratorBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorBuilder</a></dt>
 <dd>
-<div class="block">Sets the code generator which should be used (e.g server or client).</div>
+<div class="block">Sets the code generator which should be used (e.g.</div>
 </dd>
 <dt><a href="io/micronaut/openapi/generator/AbstractMicronautJavaCodegen.ParameterMapping.ParameterLocation.html#FORM" class="member-name-link">FORM</a> - Enum constant in enum class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/AbstractMicronautJavaCodegen.ParameterMapping.ParameterLocation.html" title="enum class in io.micronaut.openapi.generator">AbstractMicronautJavaCodegen.ParameterMapping.ParameterLocation</a></dt>
 <dd>&nbsp;</dd>
@@ -1398,6 +1398,10 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/visitor/group/GroupProperties.PackageProperties.html#isIncludeSubpackages()" class="member-name-link">isIncludeSubpackages()</a> - Method in class io.micronaut.openapi.visitor.group.<a href="io/micronaut/openapi/visitor/group/GroupProperties.PackageProperties.html" title="class in io.micronaut.openapi.visitor.group">GroupProperties.PackageProperties</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/visitor/OpenApiApplicationVisitor.html#isJsonViewDefaultInclusion(io.micronaut.inject.visitor.VisitorContext)" class="member-name-link">isJsonViewDefaultInclusion(VisitorContext)</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/OpenApiApplicationVisitor.html" title="class in io.micronaut.openapi.visitor">OpenApiApplicationVisitor</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/visitor/OpenApiApplicationVisitor.html#isJsonViewEnabled(io.micronaut.inject.visitor.VisitorContext)" class="member-name-link">isJsonViewEnabled(VisitorContext)</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/OpenApiApplicationVisitor.html" title="class in io.micronaut.openapi.visitor">OpenApiApplicationVisitor</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/visitor/security/SecurityProperties.html#isJwtBearerEnabled()" class="member-name-link">isJwtBearerEnabled()</a> - Method in class io.micronaut.openapi.visitor.security.<a href="io/micronaut/openapi/visitor/security/SecurityProperties.html" title="class in io.micronaut.openapi.visitor.security">SecurityProperties</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/visitor/security/SecurityProperties.html#isJwtCookieEnabled()" class="member-name-link">isJwtCookieEnabled()</a> - Method in class io.micronaut.openapi.visitor.security.<a href="io/micronaut/openapi/visitor/security/SecurityProperties.html" title="class in io.micronaut.openapi.visitor.security">SecurityProperties</a></dt>
@@ -1630,6 +1634,14 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Final calculated openapi filenames.</div>
 </dd>
+<dt><a href="io/micronaut/openapi/visitor/OpenApiApplicationVisitor.html#MICRONAUT_INTERNAL_OPENAPI_PROJECT_DIR" class="member-name-link">MICRONAUT_INTERNAL_OPENAPI_PROJECT_DIR</a> - Static variable in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/OpenApiApplicationVisitor.html" title="class in io.micronaut.openapi.visitor">OpenApiApplicationVisitor</a></dt>
+<dd>
+<div class="block">Loaded project directory from system properties.</div>
+</dd>
+<dt><a href="io/micronaut/openapi/visitor/OpenApiApplicationVisitor.html#MICRONAUT_JACKSON_JSON_VIEW_ENABLED" class="member-name-link">MICRONAUT_JACKSON_JSON_VIEW_ENABLED</a> - Static variable in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/OpenApiApplicationVisitor.html" title="class in io.micronaut.openapi.visitor">OpenApiApplicationVisitor</a></dt>
+<dd>
+<div class="block">Loaded micronaut-http-server-netty property (json-view.enabled).</div>
+</dd>
 <dt><a href="io/micronaut/openapi/visitor/OpenApiApplicationVisitor.html#MICRONAUT_OPENAPI_ADDITIONAL_FILES" class="member-name-link">MICRONAUT_OPENAPI_ADDITIONAL_FILES</a> - Static variable in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/OpenApiApplicationVisitor.html" title="class in io.micronaut.openapi.visitor">OpenApiApplicationVisitor</a></dt>
 <dd>
 <div class="block">System property that specifies the location of additional swagger YAML and JSON files to read from.</div>
@@ -1677,6 +1689,14 @@ loadScripts(document, 'script');</script>
 <dt><a href="io/micronaut/openapi/visitor/OpenApiApplicationVisitor.html#MICRONAUT_OPENAPI_JSON_FORMAT" class="member-name-link">MICRONAUT_OPENAPI_JSON_FORMAT</a> - Static variable in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/OpenApiApplicationVisitor.html" title="class in io.micronaut.openapi.visitor">OpenApiApplicationVisitor</a></dt>
 <dd>
 <div class="block">Is this property true, output file format will be JSON, otherwise YAML.</div>
+</dd>
+<dt><a href="io/micronaut/openapi/visitor/OpenApiApplicationVisitor.html#MICRONAUT_OPENAPI_JSON_VIEW_DEFAULT_INCLUSION" class="member-name-link">MICRONAUT_OPENAPI_JSON_VIEW_DEFAULT_INCLUSION</a> - Static variable in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/OpenApiApplicationVisitor.html" title="class in io.micronaut.openapi.visitor">OpenApiApplicationVisitor</a></dt>
+<dd>
+<div class="block">Property that determines whether properties that have no view annotations are included in JSON serialization views.</div>
+</dd>
+<dt><a href="io/micronaut/openapi/visitor/OpenApiApplicationVisitor.html#MICRONAUT_OPENAPI_PROJECT_DIR" class="member-name-link">MICRONAUT_OPENAPI_PROJECT_DIR</a> - Static variable in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/OpenApiApplicationVisitor.html" title="class in io.micronaut.openapi.visitor">OpenApiApplicationVisitor</a></dt>
+<dd>
+<div class="block">System property that specifies the location of current project.</div>
 </dd>
 <dt><a href="io/micronaut/openapi/visitor/OpenApiApplicationVisitor.html#MICRONAUT_OPENAPI_PROPERTY_NAMING_STRATEGY" class="member-name-link">MICRONAUT_OPENAPI_PROPERTY_NAMING_STRATEGY</a> - Static variable in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/OpenApiApplicationVisitor.html" title="class in io.micronaut.openapi.visitor">OpenApiApplicationVisitor</a></dt>
 <dd>
@@ -2246,7 +2266,7 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/visitor/AnnProcessorEnvironment.html#readPropertySources(java.lang.String)" class="member-name-link">readPropertySources(String)</a> - Method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/AnnProcessorEnvironment.html" title="class in io.micronaut.openapi.visitor">AnnProcessorEnvironment</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="io/micronaut/openapi/visitor/AbstractOpenApiEndpointVisitor.html#readSchema(io.micronaut.core.annotation.AnnotationValue,io.swagger.v3.oas.models.OpenAPI,io.micronaut.inject.visitor.VisitorContext,io.micronaut.inject.ast.Element,java.util.Map,java.util.List)" class="member-name-link">readSchema(AnnotationValue&lt;Schema&gt;, OpenAPI, VisitorContext, Element, Map&lt;String, ClassElement&gt;, List&lt;MediaType&gt;)</a> - Method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/AbstractOpenApiEndpointVisitor.html" title="class in io.micronaut.openapi.visitor">AbstractOpenApiEndpointVisitor</a></dt>
+<dt><a href="io/micronaut/openapi/visitor/AbstractOpenApiEndpointVisitor.html#readSchema(io.micronaut.core.annotation.AnnotationValue,io.swagger.v3.oas.models.OpenAPI,io.micronaut.inject.visitor.VisitorContext,io.micronaut.inject.ast.Element,java.util.Map,java.util.List,io.micronaut.inject.ast.ClassElement)" class="member-name-link">readSchema(AnnotationValue&lt;Schema&gt;, OpenAPI, VisitorContext, Element, Map&lt;String, ClassElement&gt;, List&lt;MediaType&gt;, ClassElement)</a> - Method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/AbstractOpenApiEndpointVisitor.html" title="class in io.micronaut.openapi.visitor">AbstractOpenApiEndpointVisitor</a></dt>
 <dd>
 <div class="block">Reads schema.</div>
 </dd>
@@ -2294,11 +2314,11 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/visitor/OpenApiApplicationVisitor.html#resolvePlaceholders(com.fasterxml.jackson.databind.node.ObjectNode,java.util.function.UnaryOperator)" class="member-name-link">resolvePlaceholders(ObjectNode, UnaryOperator&lt;String&gt;)</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/OpenApiApplicationVisitor.html" title="class in io.micronaut.openapi.visitor">OpenApiApplicationVisitor</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="io/micronaut/openapi/visitor/AbstractOpenApiEndpointVisitor.html#resolveSchema(io.micronaut.inject.ast.Element,io.micronaut.inject.ast.ClassElement,io.micronaut.inject.visitor.VisitorContext,java.util.List)" class="member-name-link">resolveSchema(Element, ClassElement, VisitorContext, List&lt;MediaType&gt;)</a> - Method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/AbstractOpenApiEndpointVisitor.html" title="class in io.micronaut.openapi.visitor">AbstractOpenApiEndpointVisitor</a></dt>
+<dt><a href="io/micronaut/openapi/visitor/AbstractOpenApiEndpointVisitor.html#resolveSchema(io.micronaut.inject.ast.Element,io.micronaut.inject.ast.ClassElement,io.micronaut.inject.visitor.VisitorContext,java.util.List,io.micronaut.inject.ast.ClassElement)" class="member-name-link">resolveSchema(Element, ClassElement, VisitorContext, List&lt;MediaType&gt;, ClassElement)</a> - Method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/AbstractOpenApiEndpointVisitor.html" title="class in io.micronaut.openapi.visitor">AbstractOpenApiEndpointVisitor</a></dt>
 <dd>
 <div class="block">Resolves the schema for the given type element.</div>
 </dd>
-<dt><a href="io/micronaut/openapi/visitor/AbstractOpenApiEndpointVisitor.html#resolveSchema(io.swagger.v3.oas.models.OpenAPI,io.micronaut.inject.ast.Element,io.micronaut.inject.ast.ClassElement,io.micronaut.inject.visitor.VisitorContext,java.util.List,io.micronaut.openapi.javadoc.JavadocDescription,io.micronaut.openapi.javadoc.JavadocDescription)" class="member-name-link">resolveSchema(OpenAPI, Element, ClassElement, VisitorContext, List&lt;MediaType&gt;, JavadocDescription, JavadocDescription)</a> - Method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/AbstractOpenApiEndpointVisitor.html" title="class in io.micronaut.openapi.visitor">AbstractOpenApiEndpointVisitor</a></dt>
+<dt><a href="io/micronaut/openapi/visitor/AbstractOpenApiEndpointVisitor.html#resolveSchema(io.swagger.v3.oas.models.OpenAPI,io.micronaut.inject.ast.Element,io.micronaut.inject.ast.ClassElement,io.micronaut.inject.visitor.VisitorContext,java.util.List,io.micronaut.inject.ast.ClassElement,io.micronaut.openapi.javadoc.JavadocDescription,io.micronaut.openapi.javadoc.JavadocDescription)" class="member-name-link">resolveSchema(OpenAPI, Element, ClassElement, VisitorContext, List&lt;MediaType&gt;, ClassElement, JavadocDescription, JavadocDescription)</a> - Method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/AbstractOpenApiEndpointVisitor.html" title="class in io.micronaut.openapi.visitor">AbstractOpenApiEndpointVisitor</a></dt>
 <dd>
 <div class="block">Resolves the schema for the given type element.</div>
 </dd>
@@ -2732,12 +2752,12 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Convert the given Map to a JSON node and then to the specified type.</div>
 </dd>
-<dt><a href="io/micronaut/openapi/visitor/AbstractOpenApiEndpointVisitor.html#toValueMap(java.util.Map,io.micronaut.inject.visitor.VisitorContext)" class="member-name-link">toValueMap(Map&lt;CharSequence, Object&gt;, VisitorContext)</a> - Method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/AbstractOpenApiEndpointVisitor.html" title="class in io.micronaut.openapi.visitor">AbstractOpenApiEndpointVisitor</a></dt>
+<dt><a href="io/micronaut/openapi/visitor/ConvertUtils.html#toValueMap(java.util.Map,io.micronaut.inject.visitor.VisitorContext)" class="member-name-link">toValueMap(Map&lt;CharSequence, Object&gt;, VisitorContext)</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/ConvertUtils.html" title="class in io.micronaut.openapi.visitor">ConvertUtils</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/visitor/AbstractOpenApiEndpointVisitor.html#toValueMap(java.util.Map,io.micronaut.inject.visitor.VisitorContext,io.micronaut.inject.ast.ClassElement)" class="member-name-link">toValueMap(Map&lt;CharSequence, Object&gt;, VisitorContext, ClassElement)</a> - Method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/AbstractOpenApiEndpointVisitor.html" title="class in io.micronaut.openapi.visitor">AbstractOpenApiEndpointVisitor</a></dt>
 <dd>
 <div class="block">Convert the values to a map.</div>
 </dd>
-<dt><a href="io/micronaut/openapi/visitor/ConvertUtils.html#toValueMap(java.util.Map,io.micronaut.inject.visitor.VisitorContext)" class="member-name-link">toValueMap(Map&lt;CharSequence, Object&gt;, VisitorContext)</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/ConvertUtils.html" title="class in io.micronaut.openapi.visitor">ConvertUtils</a></dt>
-<dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/annotation/transformers/OpenAPIDefinitionRetentionPolicyAnnotationTransformer.html#transform(io.micronaut.core.annotation.AnnotationValue,io.micronaut.inject.visitor.VisitorContext)" class="member-name-link">transform(AnnotationValue&lt;OpenAPIDefinition&gt;, VisitorContext)</a> - Method in class io.micronaut.openapi.annotation.transformers.<a href="io/micronaut/openapi/annotation/transformers/OpenAPIDefinitionRetentionPolicyAnnotationTransformer.html" title="class in io.micronaut.openapi.annotation.transformers">OpenAPIDefinitionRetentionPolicyAnnotationTransformer</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/visitor/ConvertUtils.html#treeToValue(com.fasterxml.jackson.databind.JsonNode,java.lang.Class,io.micronaut.inject.visitor.VisitorContext)" class="member-name-link">treeToValue(JsonNode, Class&lt;T&gt;, VisitorContext)</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/ConvertUtils.html" title="class in io.micronaut.openapi.visitor">ConvertUtils</a></dt>
