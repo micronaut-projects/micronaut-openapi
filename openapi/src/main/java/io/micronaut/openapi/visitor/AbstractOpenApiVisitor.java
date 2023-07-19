@@ -132,9 +132,12 @@ import static io.micronaut.openapi.visitor.ConvertUtils.resolveExtensions;
 import static io.micronaut.openapi.visitor.ConvertUtils.setDefaultValueObject;
 import static io.micronaut.openapi.visitor.ElementUtils.isFileUpload;
 import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.MICRONAUT_OPENAPI_FIELD_VISIBILITY_LEVEL;
+import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.MICRONAUT_OPENAPI_JSON_VIEW_DEFAULT_INCLUSION;
 import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.expandProperties;
+import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.getBooleanProperty;
 import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.getConfigurationProperty;
 import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.getExpandableProperties;
+import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.isJsonViewDefaultInclusion;
 import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.resolvePlaceholders;
 import static io.micronaut.openapi.visitor.SchemaUtils.TYPE_OBJECT;
 import static io.micronaut.openapi.visitor.SchemaUtils.processExtensions;
@@ -2477,7 +2480,7 @@ abstract class AbstractOpenApiVisitor {
                     }
                 }
 
-                if (withJsonView && notAllowedByJsonView(publicField, classLvlJsonViewClasses, jsonViewClass, context)) {
+                if (withJsonView && !allowedByJsonView(publicField, classLvlJsonViewClasses, jsonViewClass, context)) {
                     continue;
                 }
 
@@ -2495,22 +2498,22 @@ abstract class AbstractOpenApiVisitor {
         }
     }
 
-    private boolean notAllowedByJsonView(TypedElement publicField, String[] classLvlJsonViewClasses, ClassElement jsonViewClassEl, VisitorContext context) {
+    private boolean allowedByJsonView(TypedElement publicField, String[] classLvlJsonViewClasses, ClassElement jsonViewClassEl, VisitorContext context) {
         String[] fieldJsonViewClasses = publicField.getAnnotationMetadata().stringValues(JsonView.class);
         if (ArrayUtils.isEmpty(fieldJsonViewClasses)) {
             fieldJsonViewClasses = classLvlJsonViewClasses;
         }
         if (ArrayUtils.isEmpty(fieldJsonViewClasses)) {
-            return false;
+            return isJsonViewDefaultInclusion(context);
         }
 
         for (String fieldJsonViewClass : fieldJsonViewClasses) {
             if (jsonViewClassEl.isAssignable(context.getClassElement(fieldJsonViewClass).get())) {
-                return false;
+                return true;
             }
         }
 
-        return true;
+        return false;
     }
 
     private Schema<?> getPrimitiveType(String typeName) {
