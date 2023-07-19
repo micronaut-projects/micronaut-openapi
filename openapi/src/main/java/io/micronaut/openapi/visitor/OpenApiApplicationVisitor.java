@@ -134,6 +134,7 @@ import static io.swagger.v3.oas.models.Components.COMPONENTS_SCHEMAS_REF;
     OpenApiApplicationVisitor.MICRONAUT_OPENAPI_CONFIG_FILE,
     OpenApiApplicationVisitor.MICRONAUT_OPENAPI_SECURITY_ENABLED,
     OpenApiApplicationVisitor.MICRONAUT_OPENAPI_VERSIONING_ENABLED,
+    OpenApiApplicationVisitor.MICRONAUT_OPENAPI_JSON_VIEW_DEFAULT_INCLUSION,
 })
 public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements TypeElementVisitor<OpenAPIDefinition, Object> {
 
@@ -251,6 +252,13 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
      * directory.
      */
     public static final String MICRONAUT_CONFIG_FILE_LOCATIONS = "micronaut.openapi.config.file.locations";
+    /**
+     * Property that determines whether properties that have no view annotations are included in JSON serialization views.
+     * If enabled, non-annotated properties will be included; when disabled, they will be excluded.
+     * <br>
+     * Default value is "true".
+     */
+    public static final String MICRONAUT_OPENAPI_JSON_VIEW_DEFAULT_INCLUSION = "micronaut.openapi.json.view.default.inclusion";
 
     /**
      * Loaded micronaut-http server context path property.
@@ -272,6 +280,10 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
      * Loaded into context jackson.json-view.enabled property value.
      */
     private static final String MICRONAUT_INTERNAL_JACKSON_JSON_VIEW_ENABLED = "micronaut.internal.jackson.json-view.enabled";
+    /**
+     * Loaded into context micronaut.openapi.json-view.default-inclusion property value.
+     */
+    private static final String MICRONAUT_INTERNAL_JACKSON_JSON_VIEW_DEFAULT_INCLUSION = "micronaut.internal.json-view.default-inclusion";
     private static final String MICRONAUT_ENVIRONMENT_CREATED = "micronaut.environment.created";
     private static final String MICRONAUT_OPENAPI_PROPERTIES = "micronaut.openapi.properties";
     private static final String MICRONAUT_OPENAPI_ENDPOINTS = "micronaut.openapi.endpoints";
@@ -637,6 +649,19 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         context.put(MICRONAUT_INTERNAL_JACKSON_JSON_VIEW_ENABLED, isJsonViewEnabled);
 
         return isJsonViewEnabled;
+    }
+
+    public static boolean isJsonViewDefaultInclusion(VisitorContext context) {
+
+        Boolean isJsonViewDefaultInclusion = context.get(MICRONAUT_INTERNAL_JACKSON_JSON_VIEW_DEFAULT_INCLUSION, Boolean.class).orElse(null);
+        if (isJsonViewDefaultInclusion != null) {
+            return isJsonViewDefaultInclusion;
+        }
+
+        isJsonViewDefaultInclusion = getBooleanProperty(MICRONAUT_OPENAPI_JSON_VIEW_DEFAULT_INCLUSION, true, context);
+        context.put(MICRONAUT_INTERNAL_JACKSON_JSON_VIEW_DEFAULT_INCLUSION, isJsonViewDefaultInclusion);
+
+        return isJsonViewDefaultInclusion;
     }
 
     public static SecurityProperties getSecurityProperties(VisitorContext context) {
