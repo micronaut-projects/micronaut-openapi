@@ -673,7 +673,6 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         return isJsonViewDefaultInclusion;
     }
 
-
     public static SecurityProperties getSecurityProperties(VisitorContext context) {
 
         SecurityProperties securityProperties = context.get(MICRONAUT_INTERNAL_SECURITY_PROPERTIES, SecurityProperties.class).orElse(null);
