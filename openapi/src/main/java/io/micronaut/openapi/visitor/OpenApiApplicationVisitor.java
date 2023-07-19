@@ -268,7 +268,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
      * <br>
      * Default value is "true".
      */
-    public static final String MICRONAUT_OPENAPI_JSON_VIEW_DEFAULT_INCLUSION = "micronaut.openapi.json-view.default-inclusion";
+    public static final String MICRONAUT_OPENAPI_JSON_VIEW_DEFAULT_INCLUSION = "micronaut.openapi.json.view.default.inclusion";
 
     /**
      * Loaded micronaut-http server context path property.
