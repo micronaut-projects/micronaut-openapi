@@ -135,6 +135,7 @@ import static io.swagger.v3.oas.models.Components.COMPONENTS_SCHEMAS_REF;
     OpenApiApplicationVisitor.MICRONAUT_OPENAPI_CONFIG_FILE,
     OpenApiApplicationVisitor.MICRONAUT_OPENAPI_SECURITY_ENABLED,
     OpenApiApplicationVisitor.MICRONAUT_OPENAPI_VERSIONING_ENABLED,
+    OpenApiApplicationVisitor.MICRONAUT_OPENAPI_JSON_VIEW_DEFAULT_INCLUSION,
     OpenApiApplicationVisitor.MICRONAUT_OPENAPI_PROJECT_DIR,
 })
 public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements TypeElementVisitor<OpenAPIDefinition, Object> {
