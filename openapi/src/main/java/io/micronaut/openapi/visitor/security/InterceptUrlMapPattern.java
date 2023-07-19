@@ -16,7 +16,6 @@
 package io.micronaut.openapi.visitor.security;
 
 import java.util.List;
-import java.util.Optional;
 
 import io.micronaut.core.annotation.Internal;
 import io.micronaut.core.annotation.Nullable;
