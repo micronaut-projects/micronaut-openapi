@@ -83,7 +83,7 @@ public class OrderController {
 
 Do not forget to configure Micronaut Security accordingly:
 
-[source,yaml]
+[configuration]
 ----
 micronaut:
   security:

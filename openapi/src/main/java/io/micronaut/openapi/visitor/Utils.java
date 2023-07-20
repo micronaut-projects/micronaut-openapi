@@ -42,6 +42,9 @@ import io.micronaut.openapi.visitor.group.OpenApiInfo;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 
+import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.MICRONAUT_INTERNAL_OPENAPI_PROJECT_DIR;
+import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.MICRONAUT_OPENAPI_PROJECT_DIR;
+
 /**
  * Some util methods.
  *
@@ -92,14 +95,28 @@ public final class Utils {
 
     @Nullable
     public static Path getProjectPath(VisitorContext context) {
-        Path path;
-        try {
-            path = context.getProjectDir().orElse(Utils.isTestMode() ? Paths.get(System.getProperty("user.dir")) : null);
-        } catch (Exception e) {
-            // Should never happen
-            path = Paths.get(System.getProperty("user.dir"));
+
+        Path projectPath = context.get(MICRONAUT_INTERNAL_OPENAPI_PROJECT_DIR, Path.class).orElse(null);
+        if (projectPath != null) {
+            return projectPath;
         }
-        return path;
+
+        String projectDir = System.getProperty(MICRONAUT_OPENAPI_PROJECT_DIR);
+        if (projectDir != null) {
+            projectPath = Paths.get(projectDir);
+        }
+        if (projectPath == null) {
+            try {
+                projectPath = context.getProjectDir().orElse(Utils.isTestMode() ? Paths.get(System.getProperty("user.dir")) : null);
+            } catch (Exception e) {
+                // Should never happen
+                projectPath = Paths.get(System.getProperty("user.dir"));
+            }
+        }
+
+        context.put(MICRONAUT_INTERNAL_OPENAPI_PROJECT_DIR, projectPath);
+
+        return projectPath;
     }
 
     /**

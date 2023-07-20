@@ -36,7 +36,7 @@ See https://github.com/swagger-api/swagger-ui/blob/HEAD/docs/usage/configuration
 To expose the `swagger-ui` views, you also must expose the generated `yaml`:
 
 .Exposing Swagger YAML and Swagger UI Views
-[source,yaml]
+[configuration]
 ----
 micronaut:
   router:
