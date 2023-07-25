@@ -1,8 +1,8 @@
 To enable the processing of built-in endpoints (https://docs.micronaut.io/latest/guide/index.html#providedEndpoints), you have to expose `micronaut-management` as annotation processor and runtime dependency:
 
-dependency:micronaut-management[scope="annotationProcessor", version="{version}", groupId="io.micronaut"]
+dependency:micronaut-management[scope="annotationProcessor", groupId="io.micronaut"]
 
-dependency:micronaut-management[scope="implementation", version="{version}", groupId="io.micronaut"]
+dependency:micronaut-management[scope="implementation", groupId="io.micronaut"]
 
 and declare them in the <<propertiesFileConfiguration, openapi.properties>> file:
 
