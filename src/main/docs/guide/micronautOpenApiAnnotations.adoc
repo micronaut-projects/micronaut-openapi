@@ -8,4 +8,4 @@ are available to enhance the generated OpenAPI.
 
 To use them add Micronaut's `openapi` to to compile classpath of your application:
 
-dependency:micronaut-openapi[scope="compileOnly", version="{version}", groupId="io.micronaut.openapi"]
+dependency:micronaut-openapi[scope="compileOnly", groupId="io.micronaut.openapi"]
