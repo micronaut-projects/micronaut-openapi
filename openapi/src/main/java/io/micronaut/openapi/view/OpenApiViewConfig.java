@@ -40,12 +40,13 @@ import io.micronaut.core.io.scan.DefaultClassPathResourceLoader;
 import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.core.util.StringUtils;
 import io.micronaut.inject.visitor.VisitorContext;
-import io.micronaut.openapi.visitor.OpenApiApplicationVisitor;
 import io.micronaut.openapi.visitor.Pair;
-import io.micronaut.openapi.visitor.Utils;
 import io.micronaut.openapi.visitor.group.OpenApiInfo;
 
-import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.MICRONAUT_SERVER_CONTEXT_PATH;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_SERVER_CONTEXT_PATH;
+import static io.micronaut.openapi.visitor.ConfigUtils.getConfigProperty;
+import static io.micronaut.openapi.visitor.ConfigUtils.getProjectPath;
+import static io.micronaut.openapi.visitor.FileUtils.resolve;
 
 /**
  * OpenApi view configuration for Swagger-ui, ReDoc and RapiDoc.
@@ -166,38 +167,38 @@ public final class OpenApiViewConfig {
      * Generates the views given this configuration.
      *
      * @param outputDir The destination directory of the generated views.
-     * @param visitorContext The visitor context
+     * @param context The visitor context
      *
      * @throws IOException When the generation fails.
      */
-    public void render(Path outputDir, VisitorContext visitorContext) throws IOException {
+    public void render(Path outputDir, VisitorContext context) throws IOException {
         if (redocConfig != null) {
             Path redocDir = outputDir.resolve(REDOC);
-            render(redocConfig, redocDir, TEMPLATES + SLASH + TEMPLATES_REDOC + SLASH + TEMPLATE_INDEX_HTML, visitorContext);
-            copyResources(redocConfig, redocDir, TEMPLATES_REDOC, redocConfig.getResources(), visitorContext);
+            render(redocConfig, redocDir, TEMPLATES + SLASH + TEMPLATES_REDOC + SLASH + TEMPLATE_INDEX_HTML, context);
+            copyResources(redocConfig, redocDir, TEMPLATES_REDOC, redocConfig.getResources(), context);
             if (redocConfig.rapiPDFConfig.enabled) {
-                copyResources(redocConfig.rapiPDFConfig, redocDir, TEMPLATES_RAPIPDF, redocConfig.rapiPDFConfig.getResources(), visitorContext);
+                copyResources(redocConfig.rapiPDFConfig, redocDir, TEMPLATES_RAPIPDF, redocConfig.rapiPDFConfig.getResources(), context);
             }
         }
         if (rapidocConfig != null) {
             Path rapidocDir = outputDir.resolve(RAPIDOC);
-            render(rapidocConfig, rapidocDir, TEMPLATES + SLASH + TEMPLATES_RAPIDOC + SLASH + TEMPLATE_INDEX_HTML, visitorContext);
-            copyResources(rapidocConfig, rapidocDir, TEMPLATES_RAPIDOC, rapidocConfig.getResources(), visitorContext);
+            render(rapidocConfig, rapidocDir, TEMPLATES + SLASH + TEMPLATES_RAPIDOC + SLASH + TEMPLATE_INDEX_HTML, context);
+            copyResources(rapidocConfig, rapidocDir, TEMPLATES_RAPIDOC, rapidocConfig.getResources(), context);
             if (rapidocConfig.rapiPDFConfig.enabled) {
-                copyResources(rapidocConfig.rapiPDFConfig, rapidocDir, TEMPLATES_RAPIPDF, rapidocConfig.rapiPDFConfig.getResources(), visitorContext);
+                copyResources(rapidocConfig.rapiPDFConfig, rapidocDir, TEMPLATES_RAPIPDF, rapidocConfig.rapiPDFConfig.getResources(), context);
             }
         }
         if (swaggerUIConfig != null) {
             Path swaggerUiDir = outputDir.resolve(SWAGGER_UI);
-            render(swaggerUIConfig, swaggerUiDir, TEMPLATES + SLASH + TEMPLATES_SWAGGER_UI + SLASH + TEMPLATE_INDEX_HTML, visitorContext);
+            render(swaggerUIConfig, swaggerUiDir, TEMPLATES + SLASH + TEMPLATES_SWAGGER_UI + SLASH + TEMPLATE_INDEX_HTML, context);
             if (SwaggerUIConfig.hasOauth2Option(swaggerUIConfig.options)) {
-                render(swaggerUIConfig, swaggerUiDir, TEMPLATES + SLASH + TEMPLATES_SWAGGER_UI + SLASH + TEMPLATE_OAUTH_2_REDIRECT_HTML, visitorContext);
+                render(swaggerUIConfig, swaggerUiDir, TEMPLATES + SLASH + TEMPLATES_SWAGGER_UI + SLASH + TEMPLATE_OAUTH_2_REDIRECT_HTML, context);
             }
-            copyResources(swaggerUIConfig, swaggerUiDir, TEMPLATES_SWAGGER_UI, swaggerUIConfig.getResources(), visitorContext);
+            copyResources(swaggerUIConfig, swaggerUiDir, TEMPLATES_SWAGGER_UI, swaggerUIConfig.getResources(), context);
             if (swaggerUIConfig.rapiPDFConfig.enabled) {
-                copyResources(swaggerUIConfig.rapiPDFConfig, swaggerUiDir, TEMPLATES_RAPIPDF, swaggerUIConfig.rapiPDFConfig.getResources(), visitorContext);
+                copyResources(swaggerUIConfig.rapiPDFConfig, swaggerUiDir, TEMPLATES_RAPIPDF, swaggerUIConfig.rapiPDFConfig.getResources(), context);
             }
-            copySwaggerUiTheme(swaggerUIConfig, swaggerUiDir, TEMPLATES_SWAGGER_UI, visitorContext);
+            copySwaggerUiTheme(swaggerUIConfig, swaggerUiDir, TEMPLATES_SWAGGER_UI, context);
         }
     }
 
@@ -285,7 +286,7 @@ public final class OpenApiViewConfig {
 
     private String readTemplateFromCustomPath(String customPathStr, VisitorContext context) throws IOException {
         String projectDir = StringUtils.EMPTY_STRING;
-        Path projectPath = Utils.getProjectPath(context);
+        Path projectPath = getProjectPath(context);
         if (projectPath != null) {
             projectDir = projectPath.toString().replaceAll("\\\\", "/");
         }
@@ -316,7 +317,7 @@ public final class OpenApiViewConfig {
             }
         }
 
-        Path templatePath = OpenApiApplicationVisitor.resolve(context, Paths.get(customPathStr));
+        Path templatePath = resolve(context, Paths.get(customPathStr));
         if (!Files.isReadable(templatePath)) {
             throw new IOException("Can't read file " + customPathStr);
         }
@@ -410,7 +411,7 @@ public final class OpenApiViewConfig {
 
         String specUrl = StringUtils.prependUri(serverContextPath, StringUtils.prependUri(mappingPath, specFile));
         if (StringUtils.isEmpty(serverContextPath)) {
-            String contextPath = OpenApiApplicationVisitor.getConfigurationProperty(MICRONAUT_SERVER_CONTEXT_PATH, context);
+            String contextPath = getConfigProperty(MICRONAUT_SERVER_CONTEXT_PATH, context);
             if (contextPath == null) {
                 contextPath = StringUtils.EMPTY_STRING;
             }

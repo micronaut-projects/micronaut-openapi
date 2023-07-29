@@ -10,7 +10,7 @@ class OpenApiSchemaSecuritySpec extends AbstractOpenApiTypeElementSpec {
 
     void "test map micronaut security settings to OpenAPI with SecurityScheme"() {
         given:
-        System.setProperty(OpenApiApplicationVisitor.MICRONAUT_CONFIG_FILE_LOCATIONS, "project:/src/test/resources/")
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_CONFIG_FILE_LOCATIONS, "project:/src/test/resources/")
         System.setProperty(Environment.ENVIRONMENTS_PROPERTY, "security")
 
         when:
@@ -135,13 +135,13 @@ class MyBean {}
         openAPI.paths."/privateRoles".get.security.get(0)."my-schema".contains("myRole2")
 
         cleanup:
-        System.clearProperty(OpenApiApplicationVisitor.MICRONAUT_CONFIG_FILE_LOCATIONS)
+        System.clearProperty(OpenApiConfigProperty.MICRONAUT_CONFIG_FILE_LOCATIONS)
         System.clearProperty(Environment.ENVIRONMENTS_PROPERTY)
     }
 
     void "test map micronaut security settings to OpenAPI without SecurityScheme"() {
         given:
-        System.setProperty(OpenApiApplicationVisitor.MICRONAUT_CONFIG_FILE_LOCATIONS, "project:/src/test/resources/")
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_CONFIG_FILE_LOCATIONS, "project:/src/test/resources/")
         System.setProperty(Environment.ENVIRONMENTS_PROPERTY, "security")
 
         when:
@@ -257,14 +257,14 @@ class MyBean {}
         openAPI.paths."/privateRoles".get.security.get(0)."Authorization".contains("myRole2")
 
         cleanup:
-        System.clearProperty(OpenApiApplicationVisitor.MICRONAUT_CONFIG_FILE_LOCATIONS)
+        System.clearProperty(OpenApiConfigProperty.MICRONAUT_CONFIG_FILE_LOCATIONS)
         System.clearProperty(Environment.ENVIRONMENTS_PROPERTY)
     }
 
     void "test map micronaut security settings to OpenAPI with custm schema name"() {
         given:
-        System.setProperty(OpenApiApplicationVisitor.MICRONAUT_CONFIG_FILE_LOCATIONS, "project:/src/test/resources/")
-        System.setProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_SECURITY_DEFAULT_SCHEMA_NAME, "customSchema")
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_CONFIG_FILE_LOCATIONS, "project:/src/test/resources/")
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_SECURITY_DEFAULT_SCHEMA_NAME, "customSchema")
         System.setProperty(Environment.ENVIRONMENTS_PROPERTY, "security")
 
         when:
@@ -380,14 +380,14 @@ class MyBean {}
         openAPI.paths."/privateRoles".get.security.get(0)."customSchema".contains("myRole2")
 
         cleanup:
-        System.clearProperty(OpenApiApplicationVisitor.MICRONAUT_CONFIG_FILE_LOCATIONS)
-        System.clearProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_SECURITY_DEFAULT_SCHEMA_NAME)
+        System.clearProperty(OpenApiConfigProperty.MICRONAUT_CONFIG_FILE_LOCATIONS)
+        System.clearProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_SECURITY_DEFAULT_SCHEMA_NAME)
         System.clearProperty(Environment.ENVIRONMENTS_PROPERTY)
     }
 
     void "test map micronaut security settings to OpenAPI with class level annotation"() {
         given:
-        System.setProperty(OpenApiApplicationVisitor.MICRONAUT_CONFIG_FILE_LOCATIONS, "project:/src/test/resources/")
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_CONFIG_FILE_LOCATIONS, "project:/src/test/resources/")
         System.setProperty(Environment.ENVIRONMENTS_PROPERTY, "security")
 
         when:
@@ -513,7 +513,7 @@ class MyBean {}
         openAPI.paths."/privateRoles".get.security.get(0)."Authorization".contains("myRole2")
 
         cleanup:
-        System.clearProperty(OpenApiApplicationVisitor.MICRONAUT_CONFIG_FILE_LOCATIONS)
+        System.clearProperty(OpenApiConfigProperty.MICRONAUT_CONFIG_FILE_LOCATIONS)
         System.clearProperty(Environment.ENVIRONMENTS_PROPERTY)
     }
 }

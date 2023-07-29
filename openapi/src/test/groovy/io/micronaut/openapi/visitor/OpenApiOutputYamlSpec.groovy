@@ -7,7 +7,7 @@ class OpenApiOutputYamlSpec extends AbstractOpenApiTypeElementSpec {
     void "test paths and schemas for OpenAPI are sorted"() {
 
         setup:
-        System.clearProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_JSON_FORMAT)
+        System.clearProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_JSON_FORMAT)
 
         when:
         buildBeanDefinition('test.MyBean', '''
