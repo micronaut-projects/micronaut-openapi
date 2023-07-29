@@ -7,7 +7,7 @@ class OpenApiOutputJsonSpec extends AbstractOpenApiTypeElementSpec {
     void "test paths and schemas for OpenAPI are sorted"() {
 
         setup:
-        System.setProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_JSON_FORMAT, "true")
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_JSON_FORMAT, "true")
 
         when:
         buildBeanDefinition('test.MyBean', '''
@@ -151,7 +151,7 @@ class MyBean {}
 "Person3":{"required":["name"],"type":"object","properties":{"name":{"type":"string"}}}}}}''')
 
         cleanup:
-        System.clearProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_JSON_FORMAT)
+        System.clearProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_JSON_FORMAT)
     }
 
 }
