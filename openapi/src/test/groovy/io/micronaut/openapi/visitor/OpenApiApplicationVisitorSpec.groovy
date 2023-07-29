@@ -969,4 +969,47 @@ class MyBean {}
         cleanup:
         System.clearProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_CONFIG_FILE)
     }
+
+    void "test build OpenAPIDefinition with placeholders"() {
+
+        given: "An API definition"
+        Utils.testReference = null
+        Utils.testReferences = null
+        System.setProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_CONFIG_FILE, "openapi-placeholders.properties")
+
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.info.Info;
+
+@OpenAPIDefinition(
+        info = @Info(
+                title = "broken-micronaut-openapi-expand",
+                version = "${api.version}",
+                description = "${another.placeholder.value}"
+        )
+)
+class Application {
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        then:
+        Utils.testReference != null
+
+        when:
+        OpenAPI openAPI = Utils.testReference
+
+        then:
+        openAPI.info
+        openAPI.info.title == "broken-micronaut-openapi-expand"
+        openAPI.info.description == 'monkey'
+        openAPI.info.version == '2.2.2'
+
+        cleanup:
+        System.clearProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_CONFIG_FILE)
+    }
 }

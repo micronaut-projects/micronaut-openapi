@@ -25,7 +25,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -379,7 +378,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
      */
     private static final String DEFAULT_SECURITY_SCHEMA_NAME = "Authorization";
 
-    private static final Argument<List<Map.Entry<String, String>>> EXPANDABLE_PROPERTIES_ARGUMENT = new GenericArgument<List<Map.Entry<String, String>>>() { };
+    private static final Argument<List<Pair<String, String>>> EXPANDABLE_PROPERTIES_ARGUMENT = new GenericArgument<List<Pair<String, String>>>() { };
     private static final String EXT_YML = ".yml";
     private static final String EXT_YAML = ".yaml";
     private static final String EXT_JSON = ".json";
@@ -912,8 +911,12 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
     }
 
     private static boolean isEnvEnabled(VisitorContext context) {
-        String isEnabledStr = System.getProperty(MICRONAUT_ENVIRONMENT_ENABLED, readOpenApiConfigFile(context).getProperty(MICRONAUT_ENVIRONMENT_ENABLED));
+
         boolean isEnabled = true;
+        String isEnabledStr = System.getProperty(MICRONAUT_ENVIRONMENT_ENABLED);
+        if (StringUtils.isEmpty(isEnabledStr)) {
+            isEnabledStr = readOpenApiConfigFile(context).getProperty(MICRONAUT_ENVIRONMENT_ENABLED);
+        }
         if (StringUtils.isNotEmpty(isEnabledStr)) {
             isEnabled = Boolean.parseBoolean(isEnabledStr);
         }
@@ -1181,12 +1184,12 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         return Optional.empty();
     }
 
-    private Optional<Path> openApiSpecFile(String fileName, VisitorContext visitorContext) {
-        Optional<Path> path = userDefinedSpecFile(visitorContext);
+    private Optional<Path> openApiSpecFile(String fileName, VisitorContext context) {
+        Optional<Path> path = userDefinedSpecFile(context);
         if (path.isPresent()) {
             return path;
         }
-        return getDefaultFilePath(fileName, visitorContext);
+        return getDefaultFilePath(fileName, context);
     }
 
     private Optional<Path> userDefinedSpecFile(VisitorContext context) {
@@ -1209,21 +1212,21 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         return defaultSwaggerFilePath.getParent().resolve("views");
     }
 
-    private static void createDirectories(Path f, VisitorContext visitorContext) {
+    private static void createDirectories(Path f, VisitorContext context) {
         if (f.getParent() != null) {
             try {
                 Files.createDirectories(f.getParent());
             } catch (IOException e) {
-                visitorContext.warn("Fail to create directories for" + f + ": " + e.getMessage(), null);
+                context.warn("Fail to create directories for" + f + ": " + e.getMessage(), null);
             }
         }
     }
 
-    private void applyPropertyNamingStrategy(OpenAPI openAPI, VisitorContext visitorContext) {
-        final String namingStrategyName = getConfigurationProperty(MICRONAUT_OPENAPI_PROPERTY_NAMING_STRATEGY, visitorContext);
+    private void applyPropertyNamingStrategy(OpenAPI openAPI, VisitorContext context) {
+        final String namingStrategyName = getConfigurationProperty(MICRONAUT_OPENAPI_PROPERTY_NAMING_STRATEGY, context);
         final PropertyNamingStrategies.NamingBase propertyNamingStrategy = fromName(namingStrategyName);
         if (propertyNamingStrategy != null) {
-            visitorContext.info("Using " + namingStrategyName + " property naming strategy.");
+            context.info("Using " + namingStrategyName + " property naming strategy.");
             if (openAPI.getComponents() != null && CollectionUtils.isNotEmpty(openAPI.getComponents().getSchemas())) {
                 openAPI.getComponents().getSchemas().values().forEach(model -> {
                     Map<String, Schema> properties = model.getProperties();
@@ -1245,12 +1248,12 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         }
     }
 
-    private void applyPropertyServerContextPath(OpenAPI openAPI, VisitorContext visitorContext) {
-        final String serverContextPath = getConfigurationProperty(MICRONAUT_OPENAPI_CONTEXT_SERVER_PATH, visitorContext);
+    private void applyPropertyServerContextPath(OpenAPI openAPI, VisitorContext context) {
+        final String serverContextPath = getConfigurationProperty(MICRONAUT_OPENAPI_CONTEXT_SERVER_PATH, context);
         if (serverContextPath == null || serverContextPath.isEmpty()) {
             return;
         }
-        visitorContext.info("Applying server context path: " + serverContextPath + " to Paths.");
+        context.info("Applying server context path: " + serverContextPath + " to Paths.");
         io.swagger.v3.oas.models.Paths paths = openAPI.getPaths();
         if (paths == null || paths.isEmpty()) {
             return;
@@ -1303,15 +1306,15 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         }
     }
 
-    public static String expandProperties(String s, List<Map.Entry<String, String>> properties, VisitorContext context) {
+    public static String expandProperties(String s, List<Pair<String, String>> properties, VisitorContext context) {
         if (StringUtils.isEmpty(s) || !s.contains(Utils.PLACEHOLDER_PREFIX)) {
             return s;
         }
 
         // form openapi file (expandable properties)
         if (CollectionUtils.isNotEmpty(properties)) {
-            for (Map.Entry<String, String> entry : properties) {
-                s = s.replace(entry.getKey(), entry.getValue());
+            for (Pair<String, String> entry : properties) {
+                s = s.replaceAll(entry.getFirst(), entry.getSecond());
             }
         }
 
@@ -1343,74 +1346,74 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         return value;
     }
 
-    public static List<Map.Entry<String, String>> getExpandableProperties(VisitorContext context) {
+    public static List<Pair<String, String>> getExpandableProperties(VisitorContext context) {
 
-        List<Map.Entry<String, String>> expandableProperties = new ArrayList<>();
-        Optional<Boolean> propertiesLoaded = context.get(MICRONAUT_INTERNAL_EXPANDBLE_PROPERTIES_LOADED, Boolean.class);
-        if (!propertiesLoaded.orElse(false)) {
+        boolean propertiesLoaded = context.get(MICRONAUT_INTERNAL_EXPANDBLE_PROPERTIES_LOADED, Boolean.class).orElse(false);
+        if (propertiesLoaded) {
+            return context.get(MICRONAUT_INTERNAL_EXPANDBLE_PROPERTIES, EXPANDABLE_PROPERTIES_ARGUMENT).orElse(null);
+        }
 
-            // first, check system properties and environmets config files
-            AnnProcessorEnvironment env = (AnnProcessorEnvironment) getEnv(context);
-            Map<String, Object> propertiesFromEnv = null;
-            if (env != null) {
-                try {
-                    propertiesFromEnv = env.getProperties("micronaut.openapi.expand", null);
-                } catch (Exception e) {
-                    context.warn("Error:\n" + Utils.printStackTrace(e), null);
-                }
+        List<Pair<String, String>> expandableProperties = new ArrayList<>();
+
+        // first, check system properties and environmets config files
+        AnnProcessorEnvironment env = (AnnProcessorEnvironment) getEnv(context);
+        Map<String, Object> propertiesFromEnv = null;
+        if (env != null) {
+            try {
+                propertiesFromEnv = env.getProperties("micronaut.openapi.expand", null);
+            } catch (Exception e) {
+                context.warn("Error:\n" + Utils.printStackTrace(e), null);
             }
+        }
 
-            Map<String, String> expandedPropsMap = new HashMap<>();
-            if (CollectionUtils.isNotEmpty(propertiesFromEnv)) {
-                for (Map.Entry<String, Object> entry : propertiesFromEnv.entrySet()) {
-                    expandedPropsMap.put(entry.getKey(), entry.getValue().toString());
-                }
+        Map<String, String> expandedPropsMap = new HashMap<>();
+        if (CollectionUtils.isNotEmpty(propertiesFromEnv)) {
+            for (Map.Entry<String, Object> entry : propertiesFromEnv.entrySet()) {
+                expandedPropsMap.put(entry.getKey(), entry.getValue().toString());
             }
+        }
 
-            // next, read openapi.properties file
-            Properties openapiProps = readOpenApiConfigFile(context);
-            for (Map.Entry<Object, Object> entry : openapiProps.entrySet()) {
+        // next, read openapi.properties file
+        Properties openapiProps = readOpenApiConfigFile(context);
+        for (Map.Entry<Object, Object> entry : openapiProps.entrySet()) {
+            String key = entry.getKey().toString();
+            if (!key.startsWith(MICRONAUT_OPENAPI_EXPAND_PREFIX)) {
+                continue;
+            }
+            expandedPropsMap.put(key, entry.getValue().toString());
+        }
+
+        // next, read system properties
+        if (CollectionUtils.isNotEmpty(System.getProperties())) {
+            for (Map.Entry<Object, Object> entry : System.getProperties().entrySet()) {
                 String key = entry.getKey().toString();
                 if (!key.startsWith(MICRONAUT_OPENAPI_EXPAND_PREFIX)) {
                     continue;
                 }
                 expandedPropsMap.put(key, entry.getValue().toString());
             }
-
-            // next, read system properties
-            if (CollectionUtils.isNotEmpty(System.getProperties())) {
-                for (Map.Entry<Object, Object> entry : System.getProperties().entrySet()) {
-                    String key = entry.getKey().toString();
-                    if (!key.startsWith(MICRONAUT_OPENAPI_EXPAND_PREFIX)) {
-                        continue;
-                    }
-                    expandedPropsMap.put(key, entry.getValue().toString());
-                }
-            }
-
-            for (Map.Entry<String, String> entry : expandedPropsMap.entrySet()) {
-                String key = entry.getKey();
-                if (key.startsWith(MICRONAUT_OPENAPI_EXPAND_PREFIX)) {
-                    key = key.substring(MICRONAUT_OPENAPI_EXPAND_PREFIX.length());
-                }
-                expandableProperties.add(new AbstractMap.SimpleImmutableEntry<>("${" + key + '}', entry.getValue()));
-            }
-
-            context.put(MICRONAUT_INTERNAL_EXPANDBLE_PROPERTIES, expandableProperties);
-            context.put(MICRONAUT_INTERNAL_EXPANDBLE_PROPERTIES_LOADED, true);
-        } else {
-            expandableProperties = context.get(MICRONAUT_INTERNAL_EXPANDBLE_PROPERTIES, EXPANDABLE_PROPERTIES_ARGUMENT).orElse(null);
         }
+
+        for (Map.Entry<String, String> entry : expandedPropsMap.entrySet()) {
+            String key = entry.getKey();
+            if (key.startsWith(MICRONAUT_OPENAPI_EXPAND_PREFIX)) {
+                key = key.substring(MICRONAUT_OPENAPI_EXPAND_PREFIX.length());
+            }
+            expandableProperties.add(Pair.of("\\$\\{" + key + '}', entry.getValue()));
+        }
+
+        context.put(MICRONAUT_INTERNAL_EXPANDBLE_PROPERTIES, expandableProperties);
+        context.put(MICRONAUT_INTERNAL_EXPANDBLE_PROPERTIES_LOADED, true);
 
         return expandableProperties;
     }
 
-    private static OpenAPI resolvePropertyPlaceHolders(OpenAPI openAPI, VisitorContext visitorContext) {
-        List<Map.Entry<String, String>> expandableProperties = getExpandableProperties(visitorContext);
+    private static OpenAPI resolvePropertyPlaceHolders(OpenAPI openAPI, VisitorContext context) {
+        List<Pair<String, String>> expandableProperties = getExpandableProperties(context);
         if (CollectionUtils.isNotEmpty(expandableProperties)) {
-            visitorContext.info("Expanding properties: " + expandableProperties);
+            context.info("Expanding properties: " + expandableProperties);
         }
-        JsonNode root = resolvePlaceholders(ConvertUtils.getYamlMapper().convertValue(openAPI, ObjectNode.class), s -> expandProperties(s, expandableProperties, visitorContext));
+        JsonNode root = resolvePlaceholders(ConvertUtils.getYamlMapper().convertValue(openAPI, ObjectNode.class), s -> expandProperties(s, expandableProperties, context));
         return ConvertUtils.getYamlMapper().convertValue(root, OpenAPI.class);
     }
 
@@ -1448,6 +1451,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                 openApi = openApiInfo.getOpenApi();
 
                 openApi = postProcessOpenApi(openApi, context);
+                openApiInfo.setOpenApi(openApi);
                 // need to set test reference to openApi after post-processing
                 if (Utils.isTestMode()) {
                     Utils.setTestReference(openApi);
@@ -1501,7 +1505,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                         fileName = fileName.replaceAll("\\$\\{group}", openApiInfo.getGroupName() != null ? openApiInfo.getGroupName() : StringUtils.EMPTY_STRING);
                     }
                 }
-                if (fileName.contains("${")) {
+                if (fileName.contains(Utils.PLACEHOLDER_PREFIX)) {
                     context.warn("Can't set some placeholders in fileName: " + fileName, null);
                 }
 
