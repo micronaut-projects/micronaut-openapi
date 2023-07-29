@@ -43,8 +43,8 @@ import io.micronaut.core.order.OrderUtil;
 import io.micronaut.core.util.StringUtils;
 import io.micronaut.inject.visitor.VisitorContext;
 
-import static io.micronaut.openapi.visitor.ConfigProperty.MICRONAUT_CONFIG_FILE_LOCATIONS;
-import static io.micronaut.openapi.visitor.ConfigProperty.MICRONAUT_ENVIRONMENT_ENABLED;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_CONFIG_FILE_LOCATIONS;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_ENVIRONMENT_ENABLED;
 import static io.micronaut.openapi.visitor.ConfigUtils.getProjectPath;
 
 /**

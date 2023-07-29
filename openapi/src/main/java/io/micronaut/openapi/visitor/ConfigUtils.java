@@ -36,8 +36,8 @@ import io.micronaut.context.env.Environment;
 import io.micronaut.core.annotation.Internal;
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.core.annotation.Nullable;
-import io.micronaut.core.convert.ConversionService;
-import io.micronaut.core.convert.DefaultConversionService;
+import io.micronaut.core.convert.DefaultMutableConversionService;
+import io.micronaut.core.convert.MutableConversionService;
 import io.micronaut.core.io.scan.ClassPathResourceLoader;
 import io.micronaut.core.io.scan.DefaultClassPathResourceLoader;
 import io.micronaut.core.naming.conventions.StringConvention;
@@ -52,23 +52,23 @@ import io.micronaut.openapi.visitor.security.InterceptUrlMapConverter;
 import io.micronaut.openapi.visitor.security.InterceptUrlMapPattern;
 import io.micronaut.openapi.visitor.security.SecurityProperties;
 
-import static io.micronaut.openapi.visitor.ConfigProperty.ALL;
-import static io.micronaut.openapi.visitor.ConfigProperty.MICRONAUT_ENVIRONMENT_ENABLED;
-import static io.micronaut.openapi.visitor.ConfigProperty.MICRONAUT_JACKSON_JSON_VIEW_ENABLED;
-import static io.micronaut.openapi.visitor.ConfigProperty.MICRONAUT_OPENAPI_CONFIG_FILE;
-import static io.micronaut.openapi.visitor.ConfigProperty.MICRONAUT_OPENAPI_ENABLED;
-import static io.micronaut.openapi.visitor.ConfigProperty.MICRONAUT_OPENAPI_ENVIRONMENTS;
-import static io.micronaut.openapi.visitor.ConfigProperty.MICRONAUT_OPENAPI_EXPAND_PREFIX;
-import static io.micronaut.openapi.visitor.ConfigProperty.MICRONAUT_OPENAPI_GROUPS;
-import static io.micronaut.openapi.visitor.ConfigProperty.MICRONAUT_OPENAPI_JSON_VIEW_DEFAULT_INCLUSION;
-import static io.micronaut.openapi.visitor.ConfigProperty.MICRONAUT_OPENAPI_PROJECT_DIR;
-import static io.micronaut.openapi.visitor.ConfigProperty.MICRONAUT_OPENAPI_SCHEMA;
-import static io.micronaut.openapi.visitor.ConfigProperty.MICRONAUT_OPENAPI_SCHEMA_POSTFIX;
-import static io.micronaut.openapi.visitor.ConfigProperty.MICRONAUT_OPENAPI_SCHEMA_PREFIX;
-import static io.micronaut.openapi.visitor.ConfigProperty.MICRONAUT_OPENAPI_SECURITY_DEFAULT_SCHEMA_NAME;
-import static io.micronaut.openapi.visitor.ConfigProperty.MICRONAUT_OPENAPI_SECURITY_ENABLED;
-import static io.micronaut.openapi.visitor.ConfigProperty.MICRONAUT_OPENAPI_VERSIONING_ENABLED;
-import static io.micronaut.openapi.visitor.ConfigProperty.OPENAPI_CONFIG_FILE;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.ALL;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_ENVIRONMENT_ENABLED;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_JACKSON_JSON_VIEW_ENABLED;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_CONFIG_FILE;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ENABLED;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ENVIRONMENTS;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_EXPAND_PREFIX;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_GROUPS;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_JSON_VIEW_DEFAULT_INCLUSION;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_PROJECT_DIR;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_SCHEMA;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_SCHEMA_POSTFIX;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_SCHEMA_PREFIX;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_SECURITY_DEFAULT_SCHEMA_NAME;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_SECURITY_ENABLED;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_VERSIONING_ENABLED;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.OPENAPI_CONFIG_FILE;
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_CUSTOM_SCHEMAS;
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_ENVIRONMENT;
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_ENVIRONMENT_CREATED;
@@ -737,10 +737,10 @@ public final class ConfigUtils {
 
         ApplicationContextConfiguration configuration = new ApplicationContextConfiguration() {
             @Override
-            public ConversionService<?> getConversionService() {
-                DefaultConversionService conversionService = new DefaultConversionService();
+            public Optional<MutableConversionService> getConversionService() {
+                MutableConversionService conversionService = new DefaultMutableConversionService();
                 conversionService.addConverter(Map.class, InterceptUrlMapPattern.class, new InterceptUrlMapConverter(conversionService));
-                return conversionService;
+                return Optional.of(conversionService);
             }
 
             @Override

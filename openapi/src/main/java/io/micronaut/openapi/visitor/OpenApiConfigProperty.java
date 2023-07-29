@@ -24,7 +24,7 @@ import java.util.Set;
  *
  * @since 4.10.0
  */
-public interface ConfigProperty {
+public interface OpenApiConfigProperty {
 
     /**
      * System property that enables or disables open api annotation processing.

@@ -31,8 +31,8 @@ import io.micronaut.openapi.visitor.Utils;
 import io.micronaut.openapi.visitor.group.GroupProperties;
 import io.micronaut.openapi.visitor.group.OpenApiInfo;
 
-import static io.micronaut.openapi.visitor.ConfigProperty.MICRONAUT_OPENAPI_CONTEXT_SERVER_PATH;
-import static io.micronaut.openapi.visitor.ConfigProperty.MICRONAUT_SERVER_CONTEXT_PATH;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_CONTEXT_SERVER_PATH;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_SERVER_CONTEXT_PATH;
 import static io.micronaut.openapi.visitor.ConfigUtils.getGroupProperties;
 
 /**

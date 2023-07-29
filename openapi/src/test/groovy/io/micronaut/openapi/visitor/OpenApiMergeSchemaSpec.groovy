@@ -12,7 +12,7 @@ class OpenApiMergeSchemaSpec extends AbstractOpenApiTypeElementSpec {
     void "test merging of additional OpenAPI schema"() {
         given:
         String additionalSwaggerFilesDir= new File("src/test/resources/swagger").absolutePath
-        System.setProperty(ConfigProperty.MICRONAUT_OPENAPI_ADDITIONAL_FILES, additionalSwaggerFilesDir)
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_ADDITIONAL_FILES, additionalSwaggerFilesDir)
 
         when:
         buildBeanDefinition('test.MyBean', '''
@@ -125,6 +125,6 @@ class MyBean {}
         components.schemas.size() == 3
 
         cleanup:
-        System.clearProperty(ConfigProperty.MICRONAUT_OPENAPI_ADDITIONAL_FILES)
+        System.clearProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_ADDITIONAL_FILES)
     }
 }

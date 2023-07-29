@@ -9,7 +9,7 @@ class OpenApiApplicationVisitorSpec extends AbstractOpenApiTypeElementSpec {
 
     void "test build OpenAPI doc for simple endpoint"() {
         given:"An API definition"
-        System.setProperty(ConfigProperty.MICRONAUT_OPENAPI_CONFIG_FILE, "openapi-endpoints.properties")
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_CONFIG_FILE, "openapi-endpoints.properties")
 
         when:
         buildBeanDefinition('test.MyBean', '''
@@ -436,7 +436,7 @@ class MyBean {}
         openAPI.paths[uri].post.requestBody
 
         cleanup:
-        System.clearProperty(ConfigProperty.MICRONAUT_OPENAPI_CONFIG_FILE)
+        System.clearProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_CONFIG_FILE)
     }
 
     void "test build OpenAPI doc for simple type with generics"() {
@@ -777,7 +777,7 @@ class MyBean {}
         given: "An API definition"
         Utils.testReference = null
         Utils.testReferences = null
-        System.setProperty(ConfigProperty.MICRONAUT_OPENAPI_ENABLED, "false")
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_ENABLED, "false")
 
         when:
         buildBeanDefinition('test.MyBean', '''
@@ -837,7 +837,7 @@ class MyBean {}
         !Utils.testReference
 
         cleanup:
-        System.clearProperty(ConfigProperty.MICRONAUT_OPENAPI_ENABLED)
+        System.clearProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_ENABLED)
     }
 
     void "test disable openapi from file"() {
@@ -845,7 +845,7 @@ class MyBean {}
         given: "An API definition"
         Utils.testReference = null
         Utils.testReferences = null
-        System.setProperty(ConfigProperty.MICRONAUT_CONFIG_FILE_LOCATIONS, "project:/src/test/resources/")
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_CONFIG_FILE_LOCATIONS, "project:/src/test/resources/")
         System.setProperty(Environment.ENVIRONMENTS_PROPERTY, "disabled-openapi")
 
         when:
@@ -902,7 +902,7 @@ class MyBean {}
         !Utils.testReference
 
         cleanup:
-        System.clearProperty(ConfigProperty.MICRONAUT_CONFIG_FILE_LOCATIONS)
+        System.clearProperty(OpenApiConfigProperty.MICRONAUT_CONFIG_FILE_LOCATIONS)
         System.clearProperty(Environment.ENVIRONMENTS_PROPERTY)
     }
 
@@ -911,7 +911,7 @@ class MyBean {}
         given: "An API definition"
         Utils.testReference = null
         Utils.testReferences = null
-        System.setProperty(ConfigProperty.MICRONAUT_OPENAPI_CONFIG_FILE, "openapi-disabled-openapi.properties")
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_CONFIG_FILE, "openapi-disabled-openapi.properties")
 
         when:
         buildBeanDefinition('test.MyBean', '''
@@ -967,7 +967,7 @@ class MyBean {}
         !Utils.testReference
 
         cleanup:
-        System.clearProperty(ConfigProperty.MICRONAUT_OPENAPI_CONFIG_FILE)
+        System.clearProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_CONFIG_FILE)
     }
 
     void "test build OpenAPIDefinition with placeholders"() {
@@ -975,7 +975,7 @@ class MyBean {}
         given: "An API definition"
         Utils.testReference = null
         Utils.testReferences = null
-        System.setProperty(ConfigProperty.MICRONAUT_OPENAPI_CONFIG_FILE, "openapi-placeholders.properties")
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_CONFIG_FILE, "openapi-placeholders.properties")
 
         when:
         buildBeanDefinition('test.MyBean', '''
@@ -1010,49 +1010,6 @@ class MyBean {}
         openAPI.info.version == '2.2.2'
 
         cleanup:
-        System.clearProperty(ConfigProperty.MICRONAUT_OPENAPI_CONFIG_FILE)
-    }
-
-    void "test build OpenAPIDefinition with placeholders"() {
-
-        given: "An API definition"
-        Utils.testReference = null
-        Utils.testReferences = null
-        System.setProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_CONFIG_FILE, "openapi-placeholders.properties")
-
-        when:
-        buildBeanDefinition('test.MyBean', '''
-package test;
-
-import io.swagger.v3.oas.annotations.OpenAPIDefinition;
-import io.swagger.v3.oas.annotations.info.Info;
-
-@OpenAPIDefinition(
-        info = @Info(
-                title = "broken-micronaut-openapi-expand",
-                version = "${api.version}",
-                description = "${another.placeholder.value}"
-        )
-)
-class Application {
-}
-
-@jakarta.inject.Singleton
-class MyBean {}
-''')
-        then:
-        Utils.testReference != null
-
-        when:
-        OpenAPI openAPI = Utils.testReference
-
-        then:
-        openAPI.info
-        openAPI.info.title == "broken-micronaut-openapi-expand"
-        openAPI.info.description == 'monkey'
-        openAPI.info.version == '2.2.2'
-
-        cleanup:
-        System.clearProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_CONFIG_FILE)
+        System.clearProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_CONFIG_FILE)
     }
 }

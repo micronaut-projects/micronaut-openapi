@@ -10,7 +10,7 @@ class OpenApiJsonViewSpec extends AbstractOpenApiTypeElementSpec {
     void "test build OpenAPI with JsonView"() {
 
         setup:
-        System.setProperty(ConfigProperty.MICRONAUT_JACKSON_JSON_VIEW_ENABLED, "true")
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_JACKSON_JSON_VIEW_ENABLED, "true")
 
         when:
         buildBeanDefinition('test.MyBean', '''
@@ -225,14 +225,14 @@ class MyBean {}
         tireDetail.properties.condition
 
         cleanup:
-        System.clearProperty(ConfigProperty.MICRONAUT_JACKSON_JSON_VIEW_ENABLED)
+        System.clearProperty(OpenApiConfigProperty.MICRONAUT_JACKSON_JSON_VIEW_ENABLED)
     }
 
     void "test build OpenAPI with changed JsonView default inclusion"() {
 
         setup:
-        System.setProperty(ConfigProperty.MICRONAUT_JACKSON_JSON_VIEW_ENABLED, "true")
-        System.setProperty(ConfigProperty.MICRONAUT_OPENAPI_JSON_VIEW_DEFAULT_INCLUSION, "false")
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_JACKSON_JSON_VIEW_ENABLED, "true")
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_JSON_VIEW_DEFAULT_INCLUSION, "false")
 
         when:
         buildBeanDefinition('test.MyBean', '''
@@ -308,7 +308,7 @@ class MyBean {}
         carSummary.properties.made
 
         cleanup:
-        System.clearProperty(ConfigProperty.MICRONAUT_JACKSON_JSON_VIEW_ENABLED)
-        System.clearProperty(ConfigProperty.MICRONAUT_OPENAPI_JSON_VIEW_DEFAULT_INCLUSION)
+        System.clearProperty(OpenApiConfigProperty.MICRONAUT_JACKSON_JSON_VIEW_ENABLED)
+        System.clearProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_JSON_VIEW_DEFAULT_INCLUSION)
     }
 }

@@ -9,7 +9,7 @@ class OpenApiControllerRequiresVisitorSpec extends AbstractOpenApiTypeElementSpe
     void "test requires env for controller"() {
 
         given:
-        System.setProperty(ConfigProperty.MICRONAUT_CONFIG_FILE_LOCATIONS, "project:/src/test/resources/")
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_CONFIG_FILE_LOCATIONS, "project:/src/test/resources/")
         System.setProperty(Environment.ENVIRONMENTS_PROPERTY, "env1,env2")
 
         buildBeanDefinition('test.MyBean', '''
@@ -53,13 +53,13 @@ class MyBean {}
 
         cleanup:
         System.clearProperty(Environment.ENVIRONMENTS_PROPERTY)
-        System.clearProperty(ConfigProperty.MICRONAUT_CONFIG_FILE_LOCATIONS)
+        System.clearProperty(OpenApiConfigProperty.MICRONAUT_CONFIG_FILE_LOCATIONS)
     }
 
     void "test requires not env for controller"() {
 
         given:
-        System.setProperty(ConfigProperty.MICRONAUT_CONFIG_FILE_LOCATIONS, "project:/src/test/resources/")
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_CONFIG_FILE_LOCATIONS, "project:/src/test/resources/")
         System.setProperty(Environment.ENVIRONMENTS_PROPERTY, "env1,env2")
 
         buildBeanDefinition('test.MyBean', '''
@@ -103,13 +103,13 @@ class MyBean {}
 
         cleanup:
         System.clearProperty(Environment.ENVIRONMENTS_PROPERTY)
-        System.clearProperty(ConfigProperty.MICRONAUT_CONFIG_FILE_LOCATIONS)
+        System.clearProperty(OpenApiConfigProperty.MICRONAUT_CONFIG_FILE_LOCATIONS)
     }
 
     void "test requires not env and env for controller"() {
 
         given:
-        System.setProperty(ConfigProperty.MICRONAUT_CONFIG_FILE_LOCATIONS, "project:/src/test/resources/")
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_CONFIG_FILE_LOCATIONS, "project:/src/test/resources/")
         System.setProperty(Environment.ENVIRONMENTS_PROPERTY, "env1,env2")
 
         buildBeanDefinition('test.MyBean', '''
@@ -158,13 +158,13 @@ class MyBean {}
 
         cleanup:
         System.clearProperty(Environment.ENVIRONMENTS_PROPERTY)
-        System.clearProperty(ConfigProperty.MICRONAUT_CONFIG_FILE_LOCATIONS)
+        System.clearProperty(OpenApiConfigProperty.MICRONAUT_CONFIG_FILE_LOCATIONS)
     }
 
     void "test requires multiple env for controller"() {
 
         given:
-        System.setProperty(ConfigProperty.MICRONAUT_CONFIG_FILE_LOCATIONS, "project:/src/test/resources/")
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_CONFIG_FILE_LOCATIONS, "project:/src/test/resources/")
         System.setProperty(Environment.ENVIRONMENTS_PROPERTY, "env1,env2")
 
         buildBeanDefinition('test.MyBean', '''
@@ -224,13 +224,13 @@ class MyBean {}
 
         cleanup:
         System.clearProperty(Environment.ENVIRONMENTS_PROPERTY)
-        System.clearProperty(ConfigProperty.MICRONAUT_CONFIG_FILE_LOCATIONS)
+        System.clearProperty(OpenApiConfigProperty.MICRONAUT_CONFIG_FILE_LOCATIONS)
     }
 
     void "test requires multiple notenv for controller"() {
 
         given:
-        System.setProperty(ConfigProperty.MICRONAUT_CONFIG_FILE_LOCATIONS, "project:/src/test/resources/")
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_CONFIG_FILE_LOCATIONS, "project:/src/test/resources/")
         System.setProperty(Environment.ENVIRONMENTS_PROPERTY, "env1,env2")
 
         buildBeanDefinition('test.MyBean', '''
@@ -279,13 +279,13 @@ class MyBean {}
 
         cleanup:
         System.clearProperty(Environment.ENVIRONMENTS_PROPERTY)
-        System.clearProperty(ConfigProperty.MICRONAUT_CONFIG_FILE_LOCATIONS)
+        System.clearProperty(OpenApiConfigProperty.MICRONAUT_CONFIG_FILE_LOCATIONS)
     }
 
     void "test requires multiple annotations with env for controller"() {
 
         given:
-        System.setProperty(ConfigProperty.MICRONAUT_CONFIG_FILE_LOCATIONS, "project:/src/test/resources/")
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_CONFIG_FILE_LOCATIONS, "project:/src/test/resources/")
         System.setProperty(Environment.ENVIRONMENTS_PROPERTY, "env1,env2")
 
         buildBeanDefinition('test.MyBean', '''
@@ -348,6 +348,6 @@ class MyBean {}
 
         cleanup:
         System.clearProperty(Environment.ENVIRONMENTS_PROPERTY)
-        System.clearProperty(ConfigProperty.MICRONAUT_CONFIG_FILE_LOCATIONS)
+        System.clearProperty(OpenApiConfigProperty.MICRONAUT_CONFIG_FILE_LOCATIONS)
     }
 }

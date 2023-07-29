@@ -16,7 +16,6 @@
 package io.micronaut.openapi.visitor;
 
 import java.io.IOException;
-import java.io.Reader;
 import java.io.Serial;
 import java.io.StringWriter;
 import java.io.Writer;
@@ -45,15 +44,6 @@ import java.util.stream.Collectors;
 
 import io.micronaut.context.DefaultApplicationContextBuilder;
 import io.micronaut.context.env.Environment;
-import io.micronaut.core.annotation.NonNull;
-import io.micronaut.core.annotation.Nullable;
-import io.micronaut.core.convert.DefaultMutableConversionService;
-import io.micronaut.core.convert.MutableConversionService;
-import io.micronaut.core.io.scan.ClassPathResourceLoader;
-import io.micronaut.core.io.scan.DefaultClassPathResourceLoader;
-import io.micronaut.core.naming.conventions.StringConvention;
-import io.micronaut.core.type.Argument;
-import io.micronaut.core.type.GenericArgument;
 import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.core.util.StringUtils;
 import io.micronaut.inject.ast.ClassElement;
@@ -93,15 +83,15 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 
-import static io.micronaut.openapi.visitor.ConfigProperty.ALL;
-import static io.micronaut.openapi.visitor.ConfigProperty.MICRONAUT_OPENAPI_ADDITIONAL_FILES;
-import static io.micronaut.openapi.visitor.ConfigProperty.MICRONAUT_OPENAPI_CONTEXT_SERVER_PATH;
-import static io.micronaut.openapi.visitor.ConfigProperty.MICRONAUT_OPENAPI_FILENAME;
-import static io.micronaut.openapi.visitor.ConfigProperty.MICRONAUT_OPENAPI_JSON_FORMAT;
-import static io.micronaut.openapi.visitor.ConfigProperty.MICRONAUT_OPENAPI_PROPERTY_NAMING_STRATEGY;
-import static io.micronaut.openapi.visitor.ConfigProperty.MICRONAUT_OPENAPI_TARGET_FILE;
-import static io.micronaut.openapi.visitor.ConfigProperty.MICRONAUT_OPENAPI_VIEWS_DEST_DIR;
-import static io.micronaut.openapi.visitor.ConfigProperty.MICRONAUT_OPENAPI_VIEWS_SPEC;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.ALL;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ADDITIONAL_FILES;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_CONTEXT_SERVER_PATH;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_FILENAME;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_JSON_FORMAT;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_PROPERTY_NAMING_STRATEGY;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_TARGET_FILE;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_VIEWS_DEST_DIR;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_VIEWS_SPEC;
 import static io.micronaut.openapi.visitor.ConfigUtils.endpointsConfiguration;
 import static io.micronaut.openapi.visitor.ConfigUtils.getConfigProperty;
 import static io.micronaut.openapi.visitor.ConfigUtils.getEnv;
