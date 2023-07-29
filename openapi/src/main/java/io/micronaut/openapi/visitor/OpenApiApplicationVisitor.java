@@ -913,7 +913,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
     private static boolean isEnvEnabled(VisitorContext context) {
 
         boolean isEnabled = true;
-        String isEnabledStr = System.getProperty(MICRONAUT_ENVIRONMENT_ENABLED);
+        String isEnabledStr = context.getOptions().get(MICRONAUT_ENVIRONMENT_ENABLED);
         if (StringUtils.isEmpty(isEnabledStr)) {
             isEnabledStr = readOpenApiConfigFile(context).getProperty(MICRONAUT_ENVIRONMENT_ENABLED);
         }
@@ -1070,7 +1070,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             return props.get();
         }
         Properties openApiProperties = new Properties();
-        String cfgFile = System.getProperty(MICRONAUT_OPENAPI_CONFIG_FILE, OPENAPI_CONFIG_FILE);
+        String cfgFile = context != null ? context.getOptions().getOrDefault(MICRONAUT_OPENAPI_CONFIG_FILE, OPENAPI_CONFIG_FILE) : System.getProperty(MICRONAUT_OPENAPI_CONFIG_FILE, OPENAPI_CONFIG_FILE) ;
         if (StringUtils.isNotEmpty(cfgFile)) {
             Path cfg = resolve(context, Paths.get(cfgFile));
             if (Files.isReadable(cfg)) {
