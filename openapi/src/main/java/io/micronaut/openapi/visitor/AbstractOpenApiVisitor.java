@@ -1629,7 +1629,7 @@ abstract class AbstractOpenApiVisitor {
                                                JsonNode schemaJson, String elType, String elFormat, AnnotationValue<?> schemaAnn,
                                                @Nullable ClassElement jsonViewClass) {
 
-        // need to set placeholders to set correct values to example field
+        // need to set placeholders to set correct values and types to example field
         schemaJson = resolvePlaceholders(schemaJson, s -> expandProperties(s, getExpandableProperties(context), context));
         try {
             schemaToBind = ConvertUtils.getJsonMapper().readerForUpdating(schemaToBind).readValue(schemaJson);
