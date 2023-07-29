@@ -34,8 +34,8 @@ import io.micronaut.openapi.annotation.OpenAPIIncludes;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
-import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.MICRONAUT_OPENAPI_ENABLED;
-import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.isOpenApiEnabled;
+import static io.micronaut.openapi.visitor.ConfigProperty.MICRONAUT_OPENAPI_ENABLED;
+import static io.micronaut.openapi.visitor.ConfigUtils.isOpenApiEnabled;
 
 /**
  * A {@link TypeElementVisitor} that builds the Swagger model from Micronaut controllers included by @{@link OpenAPIInclude} at the compile time.
@@ -64,15 +64,15 @@ public class OpenApiIncludeVisitor implements TypeElementVisitor<OpenAPIIncludes
                 OpenApiEndpointVisitor endpointVisitor = new OpenApiEndpointVisitor(true, tags.isEmpty() ? null : tags, security.isEmpty() ? null : security);
                 for (String className : classes) {
                     context.getClassElement(className)
-                        .ifPresent(ce -> {
-                            groupVisitor.visitClass(ce, context);
+                            .ifPresent(ce -> {
+                                groupVisitor.visitClass(ce, context);
 
-                            if (ce.isAnnotationPresent(Controller.class)) {
-                                visit(controllerVisitor, context, ce);
-                            } else if (ce.isAnnotationPresent("io.micronaut.management.endpoint.annotation.Endpoint")) {
-                                visit(endpointVisitor, context, ce);
-                            }
-                        });
+                                if (ce.isAnnotationPresent(Controller.class)) {
+                                    visit(controllerVisitor, context, ce);
+                                } else if (ce.isAnnotationPresent("io.micronaut.management.endpoint.annotation.Endpoint")) {
+                                    visit(endpointVisitor, context, ce);
+                                }
+                            });
                 }
             }
         }
@@ -81,9 +81,9 @@ public class OpenApiIncludeVisitor implements TypeElementVisitor<OpenAPIIncludes
     private void visit(TypeElementVisitor<?, ?> visitor, VisitorContext context, ClassElement ce) {
         visitor.visitClass(ce, context);
         ce.getEnclosedElements(ElementQuery.ALL_METHODS
-                .modifiers(mods -> !mods.contains(ElementModifier.STATIC) && !mods.contains(ElementModifier.PRIVATE))
-                .named(name -> !name.contains("$"))
-            )
-            .forEach(method -> visitor.visitMethod(method, context));
+                        .modifiers(mods -> !mods.contains(ElementModifier.STATIC) && !mods.contains(ElementModifier.PRIVATE))
+                        .named(name -> !name.contains("$"))
+                )
+                .forEach(method -> visitor.visitMethod(method, context));
     }
 }

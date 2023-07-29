@@ -91,7 +91,7 @@ class MyBean {}
     void "test private visibility level"() {
 
         given: "An API definition"
-        System.setProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_FIELD_VISIBILITY_LEVEL, VisibilityLevel.PRIVATE.toString())
+        System.setProperty(ConfigProperty.MICRONAUT_OPENAPI_FIELD_VISIBILITY_LEVEL, VisibilityLevel.PRIVATE.toString())
 
         when:
         buildBeanDefinition('test.MyBean', '''
@@ -166,13 +166,13 @@ class MyBean {}
         !petSchema.required
 
         cleanup:
-        System.clearProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_FIELD_VISIBILITY_LEVEL)
+        System.clearProperty(ConfigProperty.MICRONAUT_OPENAPI_FIELD_VISIBILITY_LEVEL)
     }
 
     void "test package-private visibility level"() {
 
         given: "An API definition"
-        System.setProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_FIELD_VISIBILITY_LEVEL, VisibilityLevel.PACKAGE.toString())
+        System.setProperty(ConfigProperty.MICRONAUT_OPENAPI_FIELD_VISIBILITY_LEVEL, VisibilityLevel.PACKAGE.toString())
 
         when:
         buildBeanDefinition('test.MyBean', '''
@@ -245,13 +245,13 @@ class MyBean {}
         !petSchema.required
 
         cleanup:
-        System.clearProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_FIELD_VISIBILITY_LEVEL)
+        System.clearProperty(ConfigProperty.MICRONAUT_OPENAPI_FIELD_VISIBILITY_LEVEL)
     }
 
     void "test protected visibility level"() {
 
         given: "An API definition"
-        System.setProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_FIELD_VISIBILITY_LEVEL, VisibilityLevel.PROTECTED.toString())
+        System.setProperty(ConfigProperty.MICRONAUT_OPENAPI_FIELD_VISIBILITY_LEVEL, VisibilityLevel.PROTECTED.toString())
 
         when:
         buildBeanDefinition('test.MyBean', '''
@@ -323,13 +323,13 @@ class MyBean {}
         !petSchema.required
 
         cleanup:
-        System.clearProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_FIELD_VISIBILITY_LEVEL)
+        System.clearProperty(ConfigProperty.MICRONAUT_OPENAPI_FIELD_VISIBILITY_LEVEL)
     }
 
     void "test public visibility level"() {
 
         given: "An API definition"
-        System.setProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_FIELD_VISIBILITY_LEVEL, VisibilityLevel.PUBLIC.toString())
+        System.setProperty(ConfigProperty.MICRONAUT_OPENAPI_FIELD_VISIBILITY_LEVEL, VisibilityLevel.PUBLIC.toString())
 
         when:
         buildBeanDefinition('test.MyBean', '''
@@ -399,13 +399,13 @@ class MyBean {}
         !petSchema.required
 
         cleanup:
-        System.clearProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_FIELD_VISIBILITY_LEVEL)
+        System.clearProperty(ConfigProperty.MICRONAUT_OPENAPI_FIELD_VISIBILITY_LEVEL)
     }
 
     void "test private visibility level with getters"() {
 
         given: "An API definition"
-        System.setProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_FIELD_VISIBILITY_LEVEL, VisibilityLevel.PRIVATE.toString())
+        System.setProperty(ConfigProperty.MICRONAUT_OPENAPI_FIELD_VISIBILITY_LEVEL, VisibilityLevel.PRIVATE.toString())
 
         when:
         buildBeanDefinition('test.MyBean', '''
@@ -488,6 +488,6 @@ class MyBean {}
         !petSchema.required
 
         cleanup:
-        System.clearProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_FIELD_VISIBILITY_LEVEL)
+        System.clearProperty(ConfigProperty.MICRONAUT_OPENAPI_FIELD_VISIBILITY_LEVEL)
     }
 }

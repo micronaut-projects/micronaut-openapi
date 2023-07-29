@@ -403,7 +403,7 @@ public class MyBean {}
 
     void "test render OpenApiView specification with custom property naming strategy"() {
         given:
-        System.setProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_PROPERTY_NAMING_STRATEGY, "SNAKE_CASE")
+        System.setProperty(ConfigProperty.MICRONAUT_OPENAPI_PROPERTY_NAMING_STRATEGY, "SNAKE_CASE")
 
         when:
         buildBeanDefinition("test.MyBean", '''
@@ -538,12 +538,12 @@ public class MyBean {}
         openAPI.components.schemas["Person"].properties["total_goals"].description == "The total number of person's goals."
 
         cleanup:
-        System.clearProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_PROPERTY_NAMING_STRATEGY)
+        System.clearProperty(ConfigProperty.MICRONAUT_OPENAPI_PROPERTY_NAMING_STRATEGY)
     }
 
     void "test render OpenApiView specification with LOWER_CAMEL_CASE property naming strategy - Issue #241"() {
         given:
-        System.setProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_PROPERTY_NAMING_STRATEGY, "LOWER_CAMEL_CASE")
+        System.setProperty(ConfigProperty.MICRONAUT_OPENAPI_PROPERTY_NAMING_STRATEGY, "LOWER_CAMEL_CASE")
 
         when:
         buildBeanDefinition("test.MyBean", '''
@@ -678,12 +678,12 @@ public class MyBean {}
         openAPI.components.schemas["Person"].properties["totalGoals"].description == "The total number of person's goals."
 
         cleanup:
-        System.clearProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_PROPERTY_NAMING_STRATEGY)
+        System.clearProperty(ConfigProperty.MICRONAUT_OPENAPI_PROPERTY_NAMING_STRATEGY)
     }
 
     void "test render OpenApiView specification with custom property naming strategy and required properties - Issue #240"() {
         given:
-        System.setProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_PROPERTY_NAMING_STRATEGY, "SNAKE_CASE")
+        System.setProperty(ConfigProperty.MICRONAUT_OPENAPI_PROPERTY_NAMING_STRATEGY, "SNAKE_CASE")
 
         when:
         buildBeanDefinition("test.MyBean", '''
@@ -835,7 +835,7 @@ public class MyBean {}
         personSchema.required.contains("total_goals")
 
         cleanup:
-        System.clearProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_PROPERTY_NAMING_STRATEGY)
+        System.clearProperty(ConfigProperty.MICRONAUT_OPENAPI_PROPERTY_NAMING_STRATEGY)
     }
 
     void "test READ_ONLY accessMode correctly results in setting readOnly to true"() {

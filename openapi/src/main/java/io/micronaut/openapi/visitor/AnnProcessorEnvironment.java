@@ -43,8 +43,9 @@ import io.micronaut.core.order.OrderUtil;
 import io.micronaut.core.util.StringUtils;
 import io.micronaut.inject.visitor.VisitorContext;
 
-import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.MICRONAUT_CONFIG_FILE_LOCATIONS;
-import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.MICRONAUT_ENVIRONMENT_ENABLED;
+import static io.micronaut.openapi.visitor.ConfigProperty.MICRONAUT_CONFIG_FILE_LOCATIONS;
+import static io.micronaut.openapi.visitor.ConfigProperty.MICRONAUT_ENVIRONMENT_ENABLED;
+import static io.micronaut.openapi.visitor.ConfigUtils.getProjectPath;
 
 /**
  * Specific environment for annotation processing level. Solve problem with access to resources
@@ -71,13 +72,13 @@ public class AnnProcessorEnvironment extends DefaultEnvironment {
 
         boolean isEnabled = context != null ? context.get(MICRONAUT_ENVIRONMENT_ENABLED, Boolean.class).orElse(false) : false;
         if (isEnabled) {
-            Path projectPath = Utils.getProjectPath(context);
+            Path projectPath = getProjectPath(context);
             if (projectPath != null) {
                 projectDir = "file:" + projectPath.toString().replaceAll("\\\\", "/");
                 projectResourcesPath = projectDir + (projectDir.endsWith("/") ? StringUtils.EMPTY_STRING : "/") + "src/main/resources/";
             }
 
-            String configFileLocations = System.getProperty(MICRONAUT_CONFIG_FILE_LOCATIONS);
+            String configFileLocations = context.getOptions().get(MICRONAUT_CONFIG_FILE_LOCATIONS);
             if (projectResourcesPath != null && StringUtils.isEmpty(configFileLocations)) {
                 annotationProcessingConfigLocations.add(projectResourcesPath);
             } else if (StringUtils.isNotEmpty(configFileLocations)) {
@@ -129,10 +130,10 @@ public class AnnProcessorEnvironment extends DefaultEnvironment {
 
     private void readConstantPropertySources(String name, List<PropertySource> propertySources) {
         Set<String> propertySourceNames = Stream.concat(Stream.of(name), getActiveNames().stream().map(env -> name + "-" + env))
-            .collect(Collectors.toSet());
+                .collect(Collectors.toSet());
         getConstantPropertySources().stream()
-            .filter(p -> propertySourceNames.contains(p.getName()))
-            .forEach(propertySources::add);
+                .filter(p -> propertySourceNames.contains(p.getName()))
+                .forEach(propertySources::add);
     }
 
     /**

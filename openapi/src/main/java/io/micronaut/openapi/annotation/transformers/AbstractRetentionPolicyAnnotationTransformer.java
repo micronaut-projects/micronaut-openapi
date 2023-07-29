@@ -44,7 +44,7 @@ abstract class AbstractRetentionPolicyAnnotationTransformer<T extends Annotation
     }
 
     @Override
-    public List<AnnotationValue<?>> transform(AnnotationValue<T> annotation, VisitorContext visitorContext) {
+    public List<AnnotationValue<?>> transform(AnnotationValue<T> annotation, VisitorContext context) {
         return Collections.singletonList(
                               AnnotationValue.builder(annotation, RetentionPolicy.SOURCE).build());
     }

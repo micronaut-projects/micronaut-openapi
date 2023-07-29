@@ -8,7 +8,7 @@ import spock.lang.Issue
 class OpenApiPojoControllerGroovySpec extends AbstractBeanDefinitionSpec {
 
     def setup() {
-        System.clearProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_ENABLED)
+        System.clearProperty(ConfigProperty.MICRONAUT_OPENAPI_ENABLED)
         System.setProperty(Utils.ATTR_TEST_MODE, "true")
     }
 

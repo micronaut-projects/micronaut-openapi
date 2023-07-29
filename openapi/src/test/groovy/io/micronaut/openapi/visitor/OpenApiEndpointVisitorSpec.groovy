@@ -8,7 +8,7 @@ class OpenApiEndpointVisitorSpec extends AbstractOpenApiTypeElementSpec {
 
     void 'test build OpenAPI with custom url for endpoints'() {
         given: 'An API definition'
-        System.setProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_CONFIG_FILE, "openapi-custom-endpoints.properties")
+        System.setProperty(ConfigProperty.MICRONAUT_OPENAPI_CONFIG_FILE, "openapi-custom-endpoints.properties")
 
         when:
         buildBeanDefinition('test.MyBean', '''
@@ -52,7 +52,7 @@ class MyBean {}
         openAPI.paths['/internal/routes'].get
 
         cleanup:
-        System.clearProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_CONFIG_FILE)
+        System.clearProperty(ConfigProperty.MICRONAUT_OPENAPI_CONFIG_FILE)
     }
 
 }

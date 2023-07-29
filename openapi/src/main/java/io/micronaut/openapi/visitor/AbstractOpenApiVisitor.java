@@ -82,6 +82,7 @@ import io.micronaut.inject.ast.WildcardElement;
 import io.micronaut.inject.visitor.VisitorContext;
 import io.micronaut.openapi.javadoc.JavadocDescription;
 import io.micronaut.openapi.swagger.PrimitiveType;
+import io.micronaut.openapi.visitor.ConfigUtils.SchemaDecorator;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -125,15 +126,18 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import static io.micronaut.openapi.visitor.ConfigProperty.MICRONAUT_OPENAPI_FIELD_VISIBILITY_LEVEL;
+import static io.micronaut.openapi.visitor.ConfigProperty.MICRONAUT_SERVER_CONTEXT_PATH;
+import static io.micronaut.openapi.visitor.ConfigUtils.getConfigProperty;
+import static io.micronaut.openapi.visitor.ConfigUtils.getCustomSchema;
+import static io.micronaut.openapi.visitor.ConfigUtils.getExpandableProperties;
+import static io.micronaut.openapi.visitor.ConfigUtils.getSchemaDecoration;
+import static io.micronaut.openapi.visitor.ConfigUtils.isJsonViewDefaultInclusion;
 import static io.micronaut.openapi.visitor.ConvertUtils.parseJsonString;
 import static io.micronaut.openapi.visitor.ConvertUtils.resolveExtensions;
 import static io.micronaut.openapi.visitor.ConvertUtils.setDefaultValueObject;
 import static io.micronaut.openapi.visitor.ElementUtils.isFileUpload;
-import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.MICRONAUT_OPENAPI_FIELD_VISIBILITY_LEVEL;
 import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.expandProperties;
-import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.getConfigurationProperty;
-import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.getExpandableProperties;
-import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.isJsonViewDefaultInclusion;
 import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.resolvePlaceholders;
 import static io.micronaut.openapi.visitor.SchemaUtils.TYPE_OBJECT;
 import static io.micronaut.openapi.visitor.SchemaUtils.processExtensions;
@@ -324,7 +328,7 @@ abstract class AbstractOpenApiVisitor {
             if (!resultPath.startsWith("/") && !resultPath.startsWith("$")) {
                 resultPath = "/" + resultPath;
             }
-            String contextPath = OpenApiApplicationVisitor.getConfigurationProperty(OpenApiApplicationVisitor.MICRONAUT_SERVER_CONTEXT_PATH, context);
+            String contextPath = ConfigUtils.getConfigProperty(MICRONAUT_SERVER_CONTEXT_PATH, context);
             if (StringUtils.isNotEmpty(contextPath)) {
                 if (!contextPath.startsWith("/") && !contextPath.startsWith("$")) {
                     contextPath = "/" + contextPath;
@@ -860,7 +864,7 @@ abstract class AbstractOpenApiVisitor {
                 }
 
                 String typeName = type.getName();
-                ClassElement customTypeSchema = OpenApiApplicationVisitor.getCustomSchema(typeName, typeArgs, context);
+                ClassElement customTypeSchema = getCustomSchema(typeName, typeArgs, context);
                 if (customTypeSchema != null) {
                     type = customTypeSchema;
                 }
@@ -994,7 +998,7 @@ abstract class AbstractOpenApiVisitor {
 
     private void handleUnwrapped(VisitorContext context, Element element, ClassElement elementType, Schema parentSchema, AnnotationValue<JsonUnwrapped> uw) {
         Map<String, Schema> schemas = SchemaUtils.resolveSchemas(Utils.resolveOpenApi(context));
-        ClassElement customElementType = OpenApiApplicationVisitor.getCustomSchema(elementType.getName(), elementType.getTypeArguments(), context);
+        ClassElement customElementType = getCustomSchema(elementType.getName(), elementType.getTypeArguments(), context);
         String schemaName = element.stringValue(io.swagger.v3.oas.annotations.media.Schema.class, "name")
             .orElse(computeDefaultSchemaName(null, customElementType != null ? customElementType : elementType, elementType.getTypeArguments(), context, null));
         Schema wrappedPropertySchema = schemas.get(schemaName);
@@ -1998,7 +2002,7 @@ abstract class AbstractOpenApiVisitor {
             }
             for (ClassElement sType : superTypes) {
                 Map<String, ClassElement> sTypeArgs = sType.getTypeArguments();
-                ClassElement customStype = OpenApiApplicationVisitor.getCustomSchema(sType.getName(), sTypeArgs, context);
+                ClassElement customStype = getCustomSchema(sType.getName(), sTypeArgs, context);
                 if (customStype != null) {
                     sType = customStype;
                 }
@@ -2040,7 +2044,7 @@ abstract class AbstractOpenApiVisitor {
                 }
 
                 Map<String, ClassElement> interfaceTypeArgs = interfaceElement.getTypeArguments();
-                ClassElement customInterfaceType = OpenApiApplicationVisitor.getCustomSchema(interfaceElement.getName(), interfaceTypeArgs, context);
+                ClassElement customInterfaceType = getCustomSchema(interfaceElement.getName(), interfaceTypeArgs, context);
                 if (customInterfaceType != null) {
                     interfaceElement = customInterfaceType;
                 }
@@ -2050,7 +2054,7 @@ abstract class AbstractOpenApiVisitor {
         } else if (superType.getSuperType().isPresent()) {
             ClassElement superSuperType = superType.getSuperType().get();
             Map<String, ClassElement> superSuperTypeArgs = superSuperType.getTypeArguments();
-            ClassElement customSuperSuperType = OpenApiApplicationVisitor.getCustomSchema(superSuperType.getName(), superSuperTypeArgs, context);
+            ClassElement customSuperSuperType = getCustomSchema(superSuperType.getName(), superSuperTypeArgs, context);
             if (customSuperSuperType != null) {
                 superSuperType = customSuperSuperType;
             }
@@ -2231,7 +2235,7 @@ abstract class AbstractOpenApiVisitor {
                 if (classElementOpt.isPresent()) {
                     ClassElement classElement = classElementOpt.get();
                     Map<String, ClassElement> classElementTypeArgs = classElement.getTypeArguments();
-                    ClassElement customClassElement = OpenApiApplicationVisitor.getCustomSchema(classElement.getName(), classElementTypeArgs, context);
+                    ClassElement customClassElement = getCustomSchema(classElement.getName(), classElementTypeArgs, context);
                     if (customClassElement != null) {
                         classElement = customClassElement;
                     }
@@ -2274,7 +2278,7 @@ abstract class AbstractOpenApiVisitor {
             packageName = NameUtils.getPackageName(type.getName());
         }
 
-        OpenApiApplicationVisitor.SchemaDecorator schemaDecorator = OpenApiApplicationVisitor.getSchemaDecoration(packageName, context);
+        SchemaDecorator schemaDecorator = getSchemaDecoration(packageName, context);
         resultSchemaName = resultSchemaName.replaceAll("\\$", ".") + jsonViewPostfix;
         if (schemaDecorator != null) {
             resultSchemaName = (StringUtils.hasText(schemaDecorator.getPrefix()) ? schemaDecorator.getPrefix() : StringUtils.EMPTY_STRING)
@@ -2314,7 +2318,7 @@ abstract class AbstractOpenApiVisitor {
                 ClassElement ce = i.next();
                 builder.append(ce.getSimpleName());
                 Map<String, ClassElement> ceTypeArgs = ce.getTypeArguments();
-                ClassElement customElement = OpenApiApplicationVisitor.getCustomSchema(ce.getName(), ceTypeArgs, context);
+                ClassElement customElement = getCustomSchema(ce.getName(), ceTypeArgs, context);
                 if (customElement != null) {
                     ce = customElement;
                 }
@@ -2327,20 +2331,6 @@ abstract class AbstractOpenApiVisitor {
             }
             builder.append('_');
         }
-    }
-
-    /**
-     * Returns true if classElement is a JavaClassElement.
-     *
-     * @param classElement A ClassElement.
-     * @param context The context.
-     *
-     * @return true if classElement is a JavaClassElement.
-     */
-    static boolean isJavaElement(ClassElement classElement, VisitorContext context) {
-        return classElement != null &&
-            "io.micronaut.annotation.processing.visitor.JavaClassElement".equals(classElement.getClass().getName()) &&
-            "io.micronaut.annotation.processing.visitor.JavaVisitorContext".equals(context.getClass().getName());
     }
 
     private void populateSchemaProperties(OpenAPI openAPI, VisitorContext context, Element type, Map<String, ClassElement> typeArgs, Schema schema,
@@ -2363,13 +2353,13 @@ abstract class AbstractOpenApiVisitor {
             }
             processPropertyElements(openAPI, context, type, typeArgs, schema, beanProperties, mediaTypes, classJavadoc, jsonViewClass);
 
-            String visibilityLevelProp = getConfigurationProperty(MICRONAUT_OPENAPI_FIELD_VISIBILITY_LEVEL, context);
+            String visibilityLevelProp = getConfigProperty(MICRONAUT_OPENAPI_FIELD_VISIBILITY_LEVEL, context);
             VisibilityLevel visibilityLevel = VisibilityLevel.PUBLIC;
             if (StringUtils.hasText(visibilityLevelProp)) {
                 try {
                     visibilityLevel = VisibilityLevel.valueOf(visibilityLevelProp.toUpperCase());
                 } catch (Exception e) {
-                    throw new IllegalStateException("Wrong value for visibility level property: " + getConfigurationProperty(MICRONAUT_OPENAPI_FIELD_VISIBILITY_LEVEL, context));
+                    throw new IllegalStateException("Wrong value for visibility level property: " + getConfigProperty(MICRONAUT_OPENAPI_FIELD_VISIBILITY_LEVEL, context));
                 }
             }
 

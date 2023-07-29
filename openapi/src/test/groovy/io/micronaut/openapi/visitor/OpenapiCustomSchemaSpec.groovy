@@ -9,7 +9,7 @@ class OpenapiCustomSchemaSpec extends AbstractOpenApiTypeElementSpec {
 
     void "test custom OpenAPI schema for class"() {
         given:
-        System.setProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_CONFIG_FILE, "openapi-custom-schema-for-class.properties")
+        System.setProperty(ConfigProperty.MICRONAUT_OPENAPI_CONFIG_FILE, "openapi-custom-schema-for-class.properties")
 
         when:
         buildBeanDefinition('test.MyBean', '''
@@ -179,12 +179,12 @@ class MyBean {}
         xmlElementSchema.properties.propNum.type == 'integer'
 
         cleanup:
-        System.clearProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_CONFIG_FILE)
+        System.clearProperty(ConfigProperty.MICRONAUT_OPENAPI_CONFIG_FILE)
     }
 
     void "test custom OpenAPI schema for class with env properties"() {
         given:
-        System.setProperty(OpenApiApplicationVisitor.MICRONAUT_CONFIG_FILE_LOCATIONS, "project:/src/test/resources/")
+        System.setProperty(ConfigProperty.MICRONAUT_CONFIG_FILE_LOCATIONS, "project:/src/test/resources/")
         System.setProperty(Environment.ENVIRONMENTS_PROPERTY, "schemaforclass")
 
         when:
@@ -279,7 +279,7 @@ class MyBean {}
         xmlElementSchema.properties.propNum.type == 'integer'
 
         cleanup:
-        System.clearProperty(OpenApiApplicationVisitor.MICRONAUT_CONFIG_FILE_LOCATIONS)
+        System.clearProperty(ConfigProperty.MICRONAUT_CONFIG_FILE_LOCATIONS)
         System.clearProperty(Environment.ENVIRONMENTS_PROPERTY)
     }
 }

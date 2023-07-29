@@ -13,7 +13,7 @@ class OpenApiPlaceholdersSpec extends AbstractOpenApiTypeElementSpec {
     void "test build OpenAPI schema example with placeholder"() {
 
         given: 'An API definition'
-        System.setProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_CONFIG_FILE, "openapi-placeholder-type.properties")
+        System.setProperty(ConfigProperty.MICRONAUT_OPENAPI_CONFIG_FILE, "openapi-placeholder-type.properties")
 
         when:
         buildBeanDefinition('test.MyBean', '''
@@ -65,7 +65,7 @@ class MyBean {}
         dtoSchema.properties.versionLong.example == 42
 
         cleanup:
-        System.clearProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_CONFIG_FILE)
+        System.clearProperty(ConfigProperty.MICRONAUT_OPENAPI_CONFIG_FILE)
     }
 
     void "test build OpenAPIDefinition with placeholder"() {

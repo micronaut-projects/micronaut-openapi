@@ -213,7 +213,7 @@ class MyBean {}
     void "test build OpenAPI doc for security Login controller with custom uris and placeholder"() {
 
         given:
-        System.setProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_CONFIG_FILE, "openapi-controller-cutom-uri.properties")
+        System.setProperty(ConfigProperty.MICRONAUT_OPENAPI_CONFIG_FILE, "openapi-controller-cutom-uri.properties")
 
         when:
         buildBeanDefinition('test.MyBean', '''
@@ -333,7 +333,7 @@ class MyBean {}
         openAPI.components.schemas['UsernamePasswordCredentials'].properties['password']
 
         cleanup:
-        System.clearProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_CONFIG_FILE)
+        System.clearProperty(ConfigProperty.MICRONAUT_OPENAPI_CONFIG_FILE)
     }
 
     void "test build OpenAPI doc for simple endpoint"() {
