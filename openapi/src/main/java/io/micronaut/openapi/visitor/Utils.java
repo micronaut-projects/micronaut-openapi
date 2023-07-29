@@ -101,7 +101,7 @@ public final class Utils {
             return projectPath;
         }
 
-        String projectDir = System.getProperty(MICRONAUT_OPENAPI_PROJECT_DIR);
+        String projectDir = context.getOptions().get(MICRONAUT_OPENAPI_PROJECT_DIR);
         if (projectDir != null) {
             projectPath = Paths.get(projectDir);
         }
