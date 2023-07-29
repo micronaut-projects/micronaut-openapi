@@ -35,7 +35,7 @@ public class OpenAPISecurityAnnotationMapper implements TypedAnnotationMapper<Op
     }
 
     @Override
-    public List<AnnotationValue<?>> map(AnnotationValue<OpenAPISecurity> annotation, VisitorContext visitorContext) {
+    public List<AnnotationValue<?>> map(AnnotationValue<OpenAPISecurity> annotation, VisitorContext context) {
         return Collections.singletonList(
             AnnotationValue.builder(OpenAPIInclude.class)
                 .values(

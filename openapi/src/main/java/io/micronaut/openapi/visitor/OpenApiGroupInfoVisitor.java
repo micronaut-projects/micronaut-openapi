@@ -34,9 +34,9 @@ import io.micronaut.openapi.annotation.OpenAPIGroupInfo;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.models.OpenAPI;
 
+import static io.micronaut.openapi.visitor.ConfigProperty.MICRONAUT_OPENAPI_ENABLED;
+import static io.micronaut.openapi.visitor.ConfigUtils.isOpenApiEnabled;
 import static io.micronaut.openapi.visitor.ConvertUtils.toValue;
-import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.MICRONAUT_OPENAPI_ENABLED;
-import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.isOpenApiEnabled;
 
 /**
  * A {@link TypeElementVisitor} that read the @{@link OpenAPIGroupInfo} annotations at the compile
@@ -125,7 +125,7 @@ public class OpenApiGroupInfoVisitor implements TypeElementVisitor<Object, Objec
                 continue;
             }
             List<AnnotationValue<io.swagger.v3.oas.annotations.security.SecurityRequirement>> securityRequirementAnns =
-                openApiAnn.getAnnotations("security", io.swagger.v3.oas.annotations.security.SecurityRequirement.class);
+                    openApiAnn.getAnnotations("security", io.swagger.v3.oas.annotations.security.SecurityRequirement.class);
             List<io.swagger.v3.oas.models.security.SecurityRequirement> securityRequirements = new ArrayList<>();
             for (AnnotationValue<io.swagger.v3.oas.annotations.security.SecurityRequirement> securityRequirementAnn : securityRequirementAnns) {
                 securityRequirements.add(ConvertUtils.mapToSecurityRequirement(securityRequirementAnn));

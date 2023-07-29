@@ -25,13 +25,15 @@ import java.util.stream.Collectors;
 
 import io.micronaut.core.util.StringUtils;
 import io.micronaut.inject.visitor.VisitorContext;
-import io.micronaut.openapi.visitor.OpenApiApplicationVisitor;
+import io.micronaut.openapi.visitor.ConfigUtils;
 import io.micronaut.openapi.visitor.Pair;
 import io.micronaut.openapi.visitor.Utils;
 import io.micronaut.openapi.visitor.group.GroupProperties;
 import io.micronaut.openapi.visitor.group.OpenApiInfo;
 
-import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.getGroupProperties;
+import static io.micronaut.openapi.visitor.ConfigProperty.MICRONAUT_OPENAPI_CONTEXT_SERVER_PATH;
+import static io.micronaut.openapi.visitor.ConfigProperty.MICRONAUT_SERVER_CONTEXT_PATH;
+import static io.micronaut.openapi.visitor.ConfigUtils.getGroupProperties;
 
 /**
  * Abstract View Config.
@@ -109,7 +111,7 @@ abstract class AbstractViewConfig {
      */
     protected String toHtmlAttributes() {
         return options.entrySet().stream().map(e -> e.getKey() + "=\"" + e.getValue() + '"')
-            .collect(Collectors.joining(" "));
+                .collect(Collectors.joining(" "));
     }
 
     protected String getFinalUrlPrefix(OpenApiViewConfig.RendererType rendererType, VisitorContext context) {
@@ -118,7 +120,7 @@ abstract class AbstractViewConfig {
         }
 
         // process micronaut.openapi.server.context.path
-        String serverContextPath = OpenApiApplicationVisitor.getConfigurationProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_CONTEXT_SERVER_PATH, context);
+        String serverContextPath = ConfigUtils.getConfigProperty(MICRONAUT_OPENAPI_CONTEXT_SERVER_PATH, context);
         if (serverContextPath == null) {
             serverContextPath = StringUtils.EMPTY_STRING;
         }
@@ -128,7 +130,7 @@ abstract class AbstractViewConfig {
         }
 
         // process micronaut.server.context-path
-        String contextPath = OpenApiApplicationVisitor.getConfigurationProperty(OpenApiApplicationVisitor.MICRONAUT_SERVER_CONTEXT_PATH, context);
+        String contextPath = ConfigUtils.getConfigProperty(MICRONAUT_SERVER_CONTEXT_PATH, context);
         if (contextPath == null) {
             contextPath = StringUtils.EMPTY_STRING;
         }
@@ -215,7 +217,7 @@ abstract class AbstractViewConfig {
                 }
 
                 cfg.specUrl = specUrl.replace(Utils.PLACEHOLDER_PREFIX + "filename" + Utils.PLACEHOLDER_POSTFIX,
-                    filenameFromContext != null ? filenameFromContext : "");
+                        filenameFromContext != null ? filenameFromContext : "");
             }
         }
 
@@ -237,7 +239,7 @@ abstract class AbstractViewConfig {
 
         cfg.options.putAll(defaultOptions);
         properties.entrySet().stream().filter(entry -> entry.getKey().startsWith(cfg.prefix))
-            .forEach(cfg::addAttribute);
+                .forEach(cfg::addAttribute);
         return cfg;
     }
 

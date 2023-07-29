@@ -15,8 +15,14 @@
  */
 package io.micronaut.openapi.visitor;
 
+import java.util.List;
+import java.util.Map;
+
 import io.micronaut.core.annotation.Internal;
+import io.micronaut.core.type.Argument;
+import io.micronaut.core.type.GenericArgument;
 import io.micronaut.inject.visitor.VisitorContext;
+import io.micronaut.openapi.visitor.group.GroupProperties;
 
 /**
  * Convert utilities methods.
@@ -25,6 +31,11 @@ import io.micronaut.inject.visitor.VisitorContext;
  */
 @Internal
 public final class ContextUtils {
+
+    public static final Argument<List<Pair<String, String>>> EXPANDABLE_PROPERTIES_ARGUMENT = new GenericArgument<List<Pair<String, String>>>() { };
+    public static final Argument<Map<String, ConfigUtils.SchemaDecorator>> ARGUMENT_SCHEMA_DECORATORS_MAP = new GenericArgument<Map<String, ConfigUtils.SchemaDecorator>>() { };
+    public static final Argument<Map<String, ConfigUtils.CustomSchema>> ARGUMENT_CUSTOM_SCHEMA_MAP = new GenericArgument<Map<String, ConfigUtils.CustomSchema>>() { };
+    public static final Argument<Map<String, GroupProperties>> ARGUMENT_GROUP_PROPERTIES_MAP = new GenericArgument<Map<String, GroupProperties>>() { };
 
     private ContextUtils() {
     }

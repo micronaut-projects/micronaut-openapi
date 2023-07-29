@@ -8,7 +8,7 @@ class OpenApiOutputCustomFileNameSpec extends AbstractOpenApiTypeElementSpec {
     void "test default filename"() {
 
         given:
-        System.setProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_FILENAME, "my-openapi-\${version}")
+        System.setProperty(ConfigProperty.MICRONAUT_OPENAPI_FILENAME, "my-openapi-\${version}")
 
         when:
         buildBeanDefinition('test.MyBean', '''
@@ -126,12 +126,12 @@ class MyBean {}
         Utils.testFileName == 'my-openapi-0.0.yml'
 
         cleanup:
-        System.clearProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_FILENAME);
+        System.clearProperty(ConfigProperty.MICRONAUT_OPENAPI_FILENAME);
     }
 
     void "test default filename with placeholders"() {
         given:
-        System.setProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_FILENAME, "my-openapi-\${version}")
+        System.setProperty(ConfigProperty.MICRONAUT_OPENAPI_FILENAME, "my-openapi-\${version}")
         System.setProperty("version", "my-version")
 
         when:
@@ -250,13 +250,13 @@ class MyBean {}
         Utils.testFileName == 'my-openapi-my-version.yml'
 
         cleanup:
-        System.clearProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_FILENAME)
+        System.clearProperty(ConfigProperty.MICRONAUT_OPENAPI_FILENAME)
         System.clearProperty("version")
     }
 
     void "test default filename with placeholders2"() {
         given:
-        System.setProperty(OpenApiApplicationVisitor.MICRONAUT_CONFIG_FILE_LOCATIONS, "project:/src/test/resources/")
+        System.setProperty(ConfigProperty.MICRONAUT_CONFIG_FILE_LOCATIONS, "project:/src/test/resources/")
         System.setProperty(Environment.ENVIRONMENTS_PROPERTY, "info")
 
         when:
@@ -375,7 +375,7 @@ class MyBean {}
         Utils.testFileName == 'example-api-1.0.yml'
 
         cleanup:
-        System.clearProperty(OpenApiApplicationVisitor.MICRONAUT_CONFIG_FILE_LOCATIONS)
+        System.clearProperty(ConfigProperty.MICRONAUT_CONFIG_FILE_LOCATIONS)
         System.clearProperty(Environment.ENVIRONMENTS_PROPERTY)
     }
 }
