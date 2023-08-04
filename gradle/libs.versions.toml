@@ -25,7 +25,7 @@ micronaut-validation = "4.0.1"
 micronaut-data = "4.0.1"
 micronaut-test = "4.0.1"
 micronaut-kotlin = "4.0.1"
-micronaut-platform = "4.0.0"
+micronaut-platform = "4.0.3"
 micronaut-logging = "1.0.0"
 
 [libraries]
