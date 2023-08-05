@@ -79,6 +79,29 @@
 <div class="contentContainer">
 <ul class="blockList">
 <li class="blockList">
+<table class="typeSummary" border="0" cellpadding="3" cellspacing="0" summary="Interface Summary table, listing interfaces, and an explanation">
+<caption><span>Interface Summary</span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Interface</th>
+<th class="colLast" scope="col">Description</th>
+</tr>
+<tbody>
+<tr class="altColor">
+<td class="colFirst"><a href="../../../../io/micronaut/openapi/visitor/ContextProperty.html" title="interface in io.micronaut.openapi.visitor">ContextProperty</a></td>
+<td class="colLast">
+<div class="block">Visitor context properties.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><a href="../../../../io/micronaut/openapi/visitor/OpenApiConfigProperty.html" title="interface in io.micronaut.openapi.visitor">OpenApiConfigProperty</a></td>
+<td class="colLast">
+<div class="block">Supported configuration properties.</div>
+</td>
+</tr>
+</tbody>
+</table>
+</li>
+<li class="blockList">
 <table class="typeSummary" border="0" cellpadding="3" cellspacing="0" summary="Class Summary table, listing classes, and an explanation">
 <caption><span>Class Summary</span><span class="tabEnd">&nbsp;</span></caption>
 <tr>
@@ -99,87 +122,105 @@
 </td>
 </tr>
 <tr class="altColor">
+<td class="colFirst"><a href="../../../../io/micronaut/openapi/visitor/ConfigUtils.html" title="class in io.micronaut.openapi.visitor">ConfigUtils</a></td>
+<td class="colLast">
+<div class="block">Configuration utilities methods.</div>
+</td>
+</tr>
+<tr class="rowColor">
 <td class="colFirst"><a href="../../../../io/micronaut/openapi/visitor/ContextUtils.html" title="class in io.micronaut.openapi.visitor">ContextUtils</a></td>
 <td class="colLast">
 <div class="block">Convert utilities methods.</div>
 </td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><a href="../../../../io/micronaut/openapi/visitor/ConvertUtils.html" title="class in io.micronaut.openapi.visitor">ConvertUtils</a></td>
 <td class="colLast">
 <div class="block">Convert utilities methods.</div>
 </td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><a href="../../../../io/micronaut/openapi/visitor/ElementUtils.html" title="class in io.micronaut.openapi.visitor">ElementUtils</a></td>
 <td class="colLast">
 <div class="block">Some util methods.</div>
 </td>
 </tr>
+<tr class="altColor">
+<td class="colFirst"><a href="../../../../io/micronaut/openapi/visitor/EndpointsConfiguration.html" title="class in io.micronaut.openapi.visitor">EndpointsConfiguration</a></td>
+<td class="colLast">
+<div class="block">Endpoints configuration.</div>
+</td>
+</tr>
 <tr class="rowColor">
+<td class="colFirst"><a href="../../../../io/micronaut/openapi/visitor/FileUtils.html" title="class in io.micronaut.openapi.visitor">FileUtils</a></td>
+<td class="colLast">
+<div class="block">File utilities methods.</div>
+</td>
+</tr>
+<tr class="altColor">
 <td class="colFirst"><a href="../../../../io/micronaut/openapi/visitor/NumberUtils.html" title="class in io.micronaut.openapi.visitor">NumberUtils</a></td>
 <td class="colLast">
 <div class="block">Number utils.</div>
 </td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><a href="../../../../io/micronaut/openapi/visitor/OpenApiApplicationVisitor.html" title="class in io.micronaut.openapi.visitor">OpenApiApplicationVisitor</a></td>
 <td class="colLast">
 <div class="block">Visits the application class.</div>
 </td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><a href="../../../../io/micronaut/openapi/visitor/OpenApiControllerVisitor.html" title="class in io.micronaut.openapi.visitor">OpenApiControllerVisitor</a></td>
 <td class="colLast">
 <div class="block">A <code>TypeElementVisitor</code> the builds the Swagger model from Micronaut controllers at compile time.</div>
 </td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><a href="../../../../io/micronaut/openapi/visitor/OpenApiEndpointVisitor.html" title="class in io.micronaut.openapi.visitor">OpenApiEndpointVisitor</a></td>
 <td class="colLast">
 <div class="block">A <code>TypeElementVisitor</code> the builds the Swagger model from Micronaut
  controllers at compile time.</div>
 </td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><a href="../../../../io/micronaut/openapi/visitor/OpenApiGroupInfoVisitor.html" title="class in io.micronaut.openapi.visitor">OpenApiGroupInfoVisitor</a></td>
 <td class="colLast">
 <div class="block">A <code>TypeElementVisitor</code> that read the @<a href="../../../../io/micronaut/openapi/annotation/OpenAPIGroupInfo.html" title="annotation in io.micronaut.openapi.annotation"><code>OpenAPIGroupInfo</code></a> annotations at the compile
  time.</div>
 </td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><a href="../../../../io/micronaut/openapi/visitor/OpenApiIncludeVisitor.html" title="class in io.micronaut.openapi.visitor">OpenApiIncludeVisitor</a></td>
 <td class="colLast">
 <div class="block">A <code>TypeElementVisitor</code> that builds the Swagger model from Micronaut controllers included by @<a href="../../../../io/micronaut/openapi/annotation/OpenAPIInclude.html" title="annotation in io.micronaut.openapi.annotation"><code>OpenAPIInclude</code></a> at the compile time.</div>
 </td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><a href="../../../../io/micronaut/openapi/visitor/OpenApiJacksonVisitor.html" title="class in io.micronaut.openapi.visitor">OpenApiJacksonVisitor</a></td>
 <td class="colLast">
 <div class="block">A <code>TypeElementVisitor</code> that builds appropriate <code>Schema</code> annotation for the parent class of a hierarchy
  when using Jackson <code>JsonTypeInfo</code> and <code>JsonSubTypes</code>.</div>
 </td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><a href="../../../../io/micronaut/openapi/visitor/Pair.html" title="class in io.micronaut.openapi.visitor">Pair</a>&lt;S,T&gt;</td>
 <td class="colLast">
 <div class="block">Helper class for handling two values.</div>
 </td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><a href="../../../../io/micronaut/openapi/visitor/SchemaUtils.html" title="class in io.micronaut.openapi.visitor">SchemaUtils</a></td>
 <td class="colLast">
 <div class="block">Some schema util methods.</div>
 </td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><a href="../../../../io/micronaut/openapi/visitor/SimpleSchema.html" title="class in io.micronaut.openapi.visitor">SimpleSchema</a></td>
 <td class="colLast">
 <div class="block">Copy of MapSchema but without type 'object'.</div>
 </td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><a href="../../../../io/micronaut/openapi/visitor/Utils.html" title="class in io.micronaut.openapi.visitor">Utils</a></td>
 <td class="colLast">
 <div class="block">Some util methods.</div>

@@ -215,7 +215,7 @@ extends java.lang.Object</pre>
 <tr id="i4" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../io/micronaut/openapi/view/OpenApiViewConfig.html#render-java.nio.file.Path-io.micronaut.inject.visitor.VisitorContext-">render</a></span>(java.nio.file.Path&nbsp;outputDir,
-      io.micronaut.inject.visitor.VisitorContext&nbsp;visitorContext)</code>
+      io.micronaut.inject.visitor.VisitorContext&nbsp;context)</code>
 <div class="block">Generates the views given this configuration.</div>
 </td>
 </tr>
@@ -414,13 +414,13 @@ extends java.lang.Object</pre>
 <li class="blockList">
 <h4>render</h4>
 <pre>public&nbsp;void&nbsp;render(java.nio.file.Path&nbsp;outputDir,
-                   io.micronaut.inject.visitor.VisitorContext&nbsp;visitorContext)
+                   io.micronaut.inject.visitor.VisitorContext&nbsp;context)
             throws java.io.IOException</pre>
 <div class="block">Generates the views given this configuration.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>outputDir</code> - The destination directory of the generated views.</dd>
-<dd><code>visitorContext</code> - The visitor context</dd>
+<dd><code>context</code> - The visitor context</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
 <dd><code>java.io.IOException</code> - When the generation fails.</dd>
 </dl>
