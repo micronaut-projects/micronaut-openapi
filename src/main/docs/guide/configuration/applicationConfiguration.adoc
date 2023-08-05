@@ -1,0 +1,43 @@
+It is possible to tweak the OpenAPI processing via standard way with micronaut environments (application.yml file).
+
+.application.yml Example
+[source,yaml]
+----
+micronaut:
+  openapi:
+    target:
+     file: myspecfile.yml
+    property:
+      naming:
+        strategy: KEBAB_CASE
+----
+
+Also, you can use properties from `application.yml` file for placeholders.
+
+.application.yml Sample properties for placeholders
+[source,yaml]
+----
+my:
+  api:
+    version: 1.0.0
+    title: My title
+    api-description: My description
+----
+
+.Application.java Simple Application
+[source,java]
+----
+@OpenAPIDefinition(
+        info = @Info(
+                title = "${my.api.version}",
+                version = "${my.api.title}",
+                description = "${my.api.api-description}"
+        )
+)
+public class Application {
+
+    public static void main(String[] args) {
+        Micronaut.run(Application.class);
+    }
+}
+----

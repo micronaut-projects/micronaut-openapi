@@ -140,10 +140,6 @@ public interface OpenApiConfigProperty {
      */
     String MICRONAUT_SERVER_CONTEXT_PATH = "micronaut.server.context-path";
     /**
-     * Final calculated openapi filenames.
-     */
-    String MICRONAUT_INTERNAL_OPENAPI_FILENAMES = "micronaut.internal.openapi.filenames";
-    /**
      * Loaded micronaut-http-server-netty property (json-view.enabled).
      */
     String MICRONAUT_JACKSON_JSON_VIEW_ENABLED = "jackson.json-view.enabled";
@@ -157,10 +153,10 @@ public interface OpenApiConfigProperty {
      * Also, you can set it in your application.yml file like this:
      * <p>
      * micronaut:
-     * openapi:
-     * schema:
-     * org.somepackage.MyComplexType: java.lang.String
-     * org.somepackage.MyComplexType2: java.lang.Integer
+     *   openapi:
+     *     schema:
+     *       org.somepackage.MyComplexType: java.lang.String
+     *       org.somepackage.MyComplexType2: java.lang.Integer
      * ...
      */
     String MICRONAUT_OPENAPI_SCHEMA = "micronaut.openapi.schema";
@@ -174,10 +170,10 @@ public interface OpenApiConfigProperty {
      * Also, you can set it in your application.yml file like this:
      * <p>
      * micronaut:
-     * openapi:
-     * schema-postfix:
-     * org.api.v1_0_0: 1_0_0
-     * org.api.v2_0_0: 2_0_0
+     *   openapi:
+     *     schema-postfix:
+     *       org.api.v1_0_0: 1_0_0
+     *       org.api.v2_0_0: 2_0_0
      * ...
      */
     String MICRONAUT_OPENAPI_SCHEMA_PREFIX = "micronaut.openapi.schema-prefix";
@@ -191,13 +187,13 @@ public interface OpenApiConfigProperty {
      * Also, you can set it in your application.yml file like this:
      * <p>
      * micronaut:
-     * openapi:
-     * group:
-     * my-group1:
-     * title: Title 1
-     * filename: swagger-${group}-${apiVersion}-${version}.yml
-     * my-group2:
-     * title: Title 2
+     *   openapi:
+     *     group:
+     *       my-group1:
+     *         title: Title 1
+     *         filename: swagger-${group}-${apiVersion}-${version}.yml
+     *       my-group2:
+     *         title: Title 2
      * ...
      */
     String MICRONAUT_OPENAPI_GROUPS = "micronaut.openapi.groups";
