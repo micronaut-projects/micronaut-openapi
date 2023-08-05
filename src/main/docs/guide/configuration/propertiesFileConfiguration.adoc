@@ -61,3 +61,12 @@ info:
     url: https://foo.bar
   version: "v1.1"
 ----
+
+NOTE: So, `micronaut-openapi` expanded properties is old solution, now you can also use any properties for placeholders. For example, if you set properties without prefix `micronaut.openapi.expand` micronaut-openapi will process them as with this prefix.
+
+.openapi.properties Property Resolution without prefix
+[source,properties]
+----
+api.version=v1.1
+openapi.description=A nice API
+----
