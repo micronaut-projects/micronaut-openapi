@@ -118,12 +118,13 @@ import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 
+import static io.micronaut.openapi.visitor.ConfigUtils.getGroupsPropertiesMap;
+import static io.micronaut.openapi.visitor.ConfigUtils.getRouterVersioningProperties;
+import static io.micronaut.openapi.visitor.ConfigUtils.getSecurityProperties;
+import static io.micronaut.openapi.visitor.ConfigUtils.isJsonViewEnabled;
+import static io.micronaut.openapi.visitor.ConfigUtils.isOpenApiEnabled;
 import static io.micronaut.openapi.visitor.ElementUtils.isFileUpload;
 import static io.micronaut.openapi.visitor.ElementUtils.isNullable;
-import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.getGroupsPropertiesMap;
-import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.getSecurityProperties;
-import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.isJsonViewEnabled;
-import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.isOpenApiEnabled;
 import static io.micronaut.openapi.visitor.SchemaUtils.COMPONENTS_CALLBACKS_PREFIX;
 import static io.micronaut.openapi.visitor.SchemaUtils.COMPONENTS_SCHEMAS_PREFIX;
 import static io.micronaut.openapi.visitor.SchemaUtils.TYPE_OBJECT;
@@ -1824,7 +1825,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             }
         }
 
-        RouterVersioningProperties versioningProperties = OpenApiApplicationVisitor.getRouterVersioningProperties(context);
+        RouterVersioningProperties versioningProperties = getRouterVersioningProperties(context);
         boolean isVersioningEnabled = versioningProperties.isEnabled() && versioningProperties.isRouterVersiningEnabled()
             && (versioningProperties.isHeaderEnabled() || versioningProperties.isParameterEnabled());
 

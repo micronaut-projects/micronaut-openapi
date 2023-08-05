@@ -37,7 +37,8 @@ import com.fasterxml.jackson.core.type.TypeReference;
  *
  * @author croudet
  */
-class EndpointsConfiguration {
+public class EndpointsConfiguration {
+
     private static final String ENDPOINTS_PREFIX = "endpoints.";
 
     public static final String ENDPOINTS_ENABLED = ENDPOINTS_PREFIX + "enabled";
@@ -60,15 +61,15 @@ class EndpointsConfiguration {
      * @param properties The properties to process.
      */
     EndpointsConfiguration(VisitorContext context, Properties properties) {
-        String enabledStr = OpenApiApplicationVisitor.getConfigurationProperty(ENDPOINTS_ENABLED, context);
+        String enabledStr = ConfigUtils.getConfigProperty(ENDPOINTS_ENABLED, context);
         enabled = StringUtils.hasText(enabledStr) && Boolean.parseBoolean(enabledStr);
         if (!enabled) {
             return;
         }
-        path = parsePath(OpenApiApplicationVisitor.getConfigurationProperty(ENDPOINTS_PATH, context));
-        tags = parseTags(OpenApiApplicationVisitor.getConfigurationProperty(ENDPOINTS_TAGS, context));
-        servers = parseServers(OpenApiApplicationVisitor.getConfigurationProperty(ENDPOINTS_SERVERS, context), context);
-        securityRequirements = parseSecurityRequirements(OpenApiApplicationVisitor.getConfigurationProperty(ENDPOINTS_SECURITY_REQUIREMENTS, context), context);
+        path = parsePath(ConfigUtils.getConfigProperty(ENDPOINTS_PATH, context));
+        tags = parseTags(ConfigUtils.getConfigProperty(ENDPOINTS_TAGS, context));
+        servers = parseServers(ConfigUtils.getConfigProperty(ENDPOINTS_SERVERS, context), context);
+        securityRequirements = parseSecurityRequirements(ConfigUtils.getConfigProperty(ENDPOINTS_SECURITY_REQUIREMENTS, context), context);
         endpoints = new LinkedHashMap<>();
         Map<String, String> map = new HashMap<>(properties.size());
         properties.forEach((key, value) -> map.put((String) key, (String) value));

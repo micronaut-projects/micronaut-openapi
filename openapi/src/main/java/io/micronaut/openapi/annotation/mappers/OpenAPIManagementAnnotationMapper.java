@@ -35,7 +35,7 @@ public class OpenAPIManagementAnnotationMapper implements TypedAnnotationMapper<
     }
 
     @Override
-    public List<AnnotationValue<?>> map(AnnotationValue<OpenAPIManagement> annotation, VisitorContext visitorContext) {
+    public List<AnnotationValue<?>> map(AnnotationValue<OpenAPIManagement> annotation, VisitorContext context) {
         return Collections.singletonList(
             AnnotationValue.builder(OpenAPIInclude.class)
                 .values(

@@ -11,7 +11,7 @@ class OpenApiPropsFromEnvSpec extends AbstractOpenApiTypeElementSpec {
     void "test requires env for controller"() {
 
         given:
-        System.setProperty(OpenApiApplicationVisitor.MICRONAUT_CONFIG_FILE_LOCATIONS, "project:/src/test/resources/")
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_CONFIG_FILE_LOCATIONS, "project:/src/test/resources/")
         System.setProperty(Environment.ENVIRONMENTS_PROPERTY, "local")
 
         buildBeanDefinition('test.MyBean', '''
@@ -58,13 +58,13 @@ class MyBean {}
 
         cleanup:
         System.clearProperty(Environment.ENVIRONMENTS_PROPERTY)
-        System.clearProperty(OpenApiApplicationVisitor.MICRONAUT_CONFIG_FILE_LOCATIONS)
+        System.clearProperty(OpenApiConfigProperty.MICRONAUT_CONFIG_FILE_LOCATIONS)
     }
 
     void "test disabled micronaut environments"() {
 
         given:
-        System.setProperty(OpenApiApplicationVisitor.MICRONAUT_ENVIRONMENT_ENABLED, "false")
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_ENVIRONMENT_ENABLED, "false")
         System.setProperty(Environment.ENVIRONMENTS_PROPERTY, "local")
         System.setProperty("props-from-env-test.paths.my-controller.get", "myGet")
 
@@ -115,14 +115,14 @@ class MyBean {}
         cleanup:
         System.clearProperty("props-from-env-test.paths.my-controller.get")
         System.clearProperty(Environment.ENVIRONMENTS_PROPERTY)
-        System.clearProperty(OpenApiApplicationVisitor.MICRONAUT_ENVIRONMENT_ENABLED)
+        System.clearProperty(OpenApiConfigProperty.MICRONAUT_ENVIRONMENT_ENABLED)
     }
 
     void "test expanded properties with environments"() {
 
         given:
-        System.setProperty(OpenApiApplicationVisitor.MICRONAUT_CONFIG_FILE_LOCATIONS, "project:/src/test/resources/")
-        System.setProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_CONFIG_FILE, "openapi-controller-cutom-uri.properties")
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_CONFIG_FILE_LOCATIONS, "project:/src/test/resources/")
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_CONFIG_FILE, "openapi-controller-cutom-uri.properties")
         System.setProperty(Environment.ENVIRONMENTS_PROPERTY, "local2")
 
         when:
@@ -219,15 +219,15 @@ class MyBean {}
         openAPI.components.schemas['UsernamePasswordCredentials'].properties['password']
 
         cleanup:
-        System.clearProperty(OpenApiApplicationVisitor.MICRONAUT_CONFIG_FILE_LOCATIONS)
+        System.clearProperty(OpenApiConfigProperty.MICRONAUT_CONFIG_FILE_LOCATIONS)
         System.clearProperty(Environment.ENVIRONMENTS_PROPERTY)
-        System.clearProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_CONFIG_FILE)
+        System.clearProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_CONFIG_FILE)
     }
 
     void "test expanded properties from environment"() {
 
         given:
-        System.setProperty(OpenApiApplicationVisitor.MICRONAUT_CONFIG_FILE_LOCATIONS, "project:/src/test/resources/")
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_CONFIG_FILE_LOCATIONS, "project:/src/test/resources/")
         System.setProperty(Environment.ENVIRONMENTS_PROPERTY, "expand-props")
 
         when:
@@ -323,7 +323,7 @@ class MyBean {}
         openAPI.components.schemas['UsernamePasswordCredentials'].properties['password']
 
         cleanup:
-        System.clearProperty(OpenApiApplicationVisitor.MICRONAUT_CONFIG_FILE_LOCATIONS)
+        System.clearProperty(OpenApiConfigProperty.MICRONAUT_CONFIG_FILE_LOCATIONS)
         System.clearProperty(Environment.ENVIRONMENTS_PROPERTY)
     }
 

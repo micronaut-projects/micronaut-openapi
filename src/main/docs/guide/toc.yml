@@ -7,6 +7,8 @@ configuration:
   title: OpenAPI Processing Options
   propertiesFileConfiguration: Configuring OpenAPI Processing with a properties file
   systemPropertyConfiguration: Configuring OpenAPI Processing with system properties
+  applicationConfiguration: Configuring OpenAPI Processing with an application.yml file
+  availableOptions: Available OpenAPI processing options
 exposingSwaggerOutput: Exposing Swagger Output
 controllers: OpenAPI Generation for Controllers
 namingstrategy: Naming Strategy

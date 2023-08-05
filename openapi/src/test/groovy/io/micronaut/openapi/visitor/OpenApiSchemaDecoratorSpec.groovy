@@ -9,7 +9,7 @@ class OpenApiSchemaDecoratorSpec extends AbstractOpenApiTypeElementSpec {
 
     void "test custom OpenAPI schema decorators"() {
         given:
-        System.setProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_CONFIG_FILE, "openapi-schema-decorators.properties")
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_CONFIG_FILE, "openapi-schema-decorators.properties")
 
         when:
         buildBeanDefinition('test.MyBean', '''
@@ -66,12 +66,12 @@ class MyBean {}
         openAPI.paths."/v2".get.responses['200'].content."application/json".schema.$ref == '#/components/schemas/MyDto2_0_1'
 
         cleanup:
-        System.clearProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_CONFIG_FILE)
+        System.clearProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_CONFIG_FILE)
     }
 
     void "test custom OpenAPI schema decorators with environments"() {
         given:
-        System.setProperty(OpenApiApplicationVisitor.MICRONAUT_CONFIG_FILE_LOCATIONS, "project:/src/test/resources/")
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_CONFIG_FILE_LOCATIONS, "project:/src/test/resources/")
         System.setProperty(Environment.ENVIRONMENTS_PROPERTY, "schemadecorator")
 
         when:
@@ -129,7 +129,7 @@ class MyBean {}
         openAPI.paths."/v2".get.responses['200'].content."application/json".schema.$ref == '#/components/schemas/MyDto2_0_1'
 
         cleanup:
-        System.clearProperty(OpenApiApplicationVisitor.MICRONAUT_CONFIG_FILE_LOCATIONS)
+        System.clearProperty(OpenApiConfigProperty.MICRONAUT_CONFIG_FILE_LOCATIONS)
         System.clearProperty(Environment.ENVIRONMENTS_PROPERTY)
     }
 }

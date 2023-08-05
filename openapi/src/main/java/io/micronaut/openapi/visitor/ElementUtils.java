@@ -15,10 +15,6 @@
  */
 package io.micronaut.openapi.visitor;
 
-import io.micronaut.core.annotation.Internal;
-import io.micronaut.inject.ast.ClassElement;
-import io.micronaut.inject.ast.TypedElement;
-
 import java.io.File;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
@@ -26,6 +22,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.Future;
+
+import io.micronaut.core.annotation.Internal;
+import io.micronaut.inject.ast.ClassElement;
+import io.micronaut.inject.ast.TypedElement;
+import io.micronaut.inject.visitor.VisitorContext;
 
 /**
  * Some util methods.
@@ -36,33 +37,47 @@ import java.util.concurrent.Future;
 public final class ElementUtils {
 
     public static final List<String> CONTAINER_TYPES = Arrays.asList(
-        Optional.class.getName(),
-        Future.class.getName(),
-        "org.reactivestreams.Publisher",
-        "io.reactivex.Single",
-        "io.reactivex.Observable",
-        "io.reactivex.Maybe",
-        "io.reactivex.rxjava3.core.Single",
-        "io.reactivex.rxjava3.core.Observable",
-        "io.reactivex.rxjava3.core.Maybe",
-        "kotlinx.coroutines.flow.Flow"
+            Optional.class.getName(),
+            Future.class.getName(),
+            "org.reactivestreams.Publisher",
+            "io.reactivex.Single",
+            "io.reactivex.Observable",
+            "io.reactivex.Maybe",
+            "io.reactivex.rxjava3.core.Single",
+            "io.reactivex.rxjava3.core.Observable",
+            "io.reactivex.rxjava3.core.Maybe",
+            "kotlinx.coroutines.flow.Flow"
     );
 
     public static final List<String> FILE_TYPES = Arrays.asList(
-        // this class from micronaut-http-server
-        "io.micronaut.http.server.types.files.FileCustomizableResponseType",
-        File.class.getName(),
-        InputStream.class.getName(),
-        ByteBuffer.class.getName()
+            // this class from micronaut-http-server
+            "io.micronaut.http.server.types.files.FileCustomizableResponseType",
+            File.class.getName(),
+            InputStream.class.getName(),
+            ByteBuffer.class.getName()
     );
 
     public static final List<String> VOID_TYPES = Arrays.asList(
-        void.class.getName(),
-        Void.class.getName(),
-        "kotlin.Unit"
+            void.class.getName(),
+            Void.class.getName(),
+            "kotlin.Unit"
     );
 
     private ElementUtils() {
+    }
+
+    /**
+     * Returns true if classElement is a JavaClassElement.
+     *
+     * @param classElement A ClassElement.
+     * @param context The context.
+     *
+     * @return true if classElement is a JavaClassElement.
+     */
+    public static boolean isJavaElement(ClassElement classElement, VisitorContext context) {
+        return classElement != null &&
+                "io.micronaut.annotation.processing.visitor.JavaClassElement".equals(classElement.getClass().getName()) &&
+                "io.micronaut.annotation.processing.visitor.JavaVisitorContext".equals(context.getClass().getName());
     }
 
     /**
@@ -74,7 +89,7 @@ public final class ElementUtils {
      */
     public static boolean isNullable(TypedElement element) {
         return element.isNullable()
-            || element.getType().isOptional();
+                || element.getType().isOptional();
     }
 
     /**
@@ -87,9 +102,9 @@ public final class ElementUtils {
     public static boolean isFileUpload(ClassElement type) {
         String typeName = type.getName();
         return "io.micronaut.http.multipart.StreamingFileUpload".equals(typeName)
-            || "io.micronaut.http.multipart.CompletedFileUpload".equals(typeName)
-            || "io.micronaut.http.multipart.CompletedPart".equals(typeName)
-            || "io.micronaut.http.multipart.PartData".equals(typeName);
+                || "io.micronaut.http.multipart.CompletedFileUpload".equals(typeName)
+                || "io.micronaut.http.multipart.CompletedPart".equals(typeName)
+                || "io.micronaut.http.multipart.PartData".equals(typeName);
     }
 
     /**
@@ -134,8 +149,8 @@ public final class ElementUtils {
      */
     public static boolean isReactiveAndVoid(ClassElement type) {
         return type.isAssignable("io.reactivex.Completable")
-            || type.isAssignable("io.reactivex.rxjava3.core.Completable")
-            || (isContainerType(type) && type.getFirstTypeArgument().isPresent() && isVoid(type.getFirstTypeArgument().get()));
+                || type.isAssignable("io.reactivex.rxjava3.core.Completable")
+                || (isContainerType(type) && type.getFirstTypeArgument().isPresent() && isVoid(type.getFirstTypeArgument().get()));
     }
 
     private static boolean findAnyAssignable(ClassElement type, List<String> typeNames) {
