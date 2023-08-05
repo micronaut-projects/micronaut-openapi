@@ -2,13 +2,12 @@ package io.micronaut.openapi.visitor
 
 import io.micronaut.openapi.AbstractOpenApiTypeElementSpec
 import io.swagger.v3.oas.models.OpenAPI
-import io.swagger.v3.oas.models.security.SecurityScheme
 
 class OpenApiEndpointVisitorSpec extends AbstractOpenApiTypeElementSpec {
 
     void 'test build OpenAPI with custom url for endpoints'() {
         given: 'An API definition'
-        System.setProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_CONFIG_FILE, "openapi-custom-endpoints.properties")
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_CONFIG_FILE, "openapi-custom-endpoints.properties")
 
         when:
         buildBeanDefinition('test.MyBean', '''
@@ -52,7 +51,7 @@ class MyBean {}
         openAPI.paths['/internal/routes'].get
 
         cleanup:
-        System.clearProperty(OpenApiApplicationVisitor.MICRONAUT_OPENAPI_CONFIG_FILE)
+        System.clearProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_CONFIG_FILE)
     }
 
 }

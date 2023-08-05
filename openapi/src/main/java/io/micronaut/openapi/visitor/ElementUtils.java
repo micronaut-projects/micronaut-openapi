@@ -27,6 +27,7 @@ import io.micronaut.core.annotation.Internal;
 import io.micronaut.core.annotation.Nullable;
 import io.micronaut.inject.ast.ClassElement;
 import io.micronaut.inject.ast.TypedElement;
+import io.micronaut.inject.visitor.VisitorContext;
 
 /**
  * Some util methods.
@@ -64,6 +65,20 @@ public final class ElementUtils {
     );
 
     private ElementUtils() {
+    }
+
+    /**
+     * Returns true if classElement is a JavaClassElement.
+     *
+     * @param classElement A ClassElement.
+     * @param context The context.
+     *
+     * @return true if classElement is a JavaClassElement.
+     */
+    public static boolean isJavaElement(ClassElement classElement, VisitorContext context) {
+        return classElement != null &&
+                "io.micronaut.annotation.processing.visitor.JavaClassElement".equals(classElement.getClass().getName()) &&
+                "io.micronaut.annotation.processing.visitor.JavaVisitorContext".equals(context.getClass().getName());
     }
 
     /**

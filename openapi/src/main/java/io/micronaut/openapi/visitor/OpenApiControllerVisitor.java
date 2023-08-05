@@ -56,7 +56,9 @@ import io.swagger.v3.oas.models.servers.Server;
 
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 
-import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.MICRONAUT_OPENAPI_ENABLED;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ENABLED;
+import static io.micronaut.openapi.visitor.ConfigUtils.getActiveEnvs;
+import static io.micronaut.openapi.visitor.ConfigUtils.getEnv;
 import static io.micronaut.openapi.visitor.Utils.DEFAULT_MEDIA_TYPES;
 
 /**
@@ -91,12 +93,12 @@ public class OpenApiControllerVisitor extends AbstractOpenApiEndpointVisitor imp
         if (CollectionUtils.isEmpty(requiresAnnotations)) {
             return false;
         }
-        Environment environment = OpenApiApplicationVisitor.getEnv(context);
+        Environment environment = getEnv(context);
         Set<String> activeEnvs;
         if (environment != null) {
             activeEnvs = environment.getActiveNames();
         } else {
-            activeEnvs = new HashSet<>(OpenApiApplicationVisitor.getActiveEnvs(context));
+            activeEnvs = new HashSet<>(getActiveEnvs(context));
         }
         if (CollectionUtils.isEmpty(activeEnvs)) {
             return false;

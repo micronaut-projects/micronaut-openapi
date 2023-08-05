@@ -17,8 +17,6 @@ package io.micronaut.openapi.visitor;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -30,7 +28,6 @@ import io.micronaut.context.env.DefaultPropertyPlaceholderResolver;
 import io.micronaut.context.env.PropertyPlaceholderResolver;
 import io.micronaut.core.annotation.Internal;
 import io.micronaut.core.annotation.NonNull;
-import io.micronaut.core.annotation.Nullable;
 import io.micronaut.core.convert.ArgumentConversionContext;
 import io.micronaut.core.convert.DefaultConversionService;
 import io.micronaut.core.value.PropertyResolver;
@@ -41,9 +38,6 @@ import io.micronaut.openapi.visitor.group.EndpointInfo;
 import io.micronaut.openapi.visitor.group.OpenApiInfo;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
-
-import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.MICRONAUT_INTERNAL_OPENAPI_PROJECT_DIR;
-import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.MICRONAUT_OPENAPI_PROJECT_DIR;
 
 /**
  * Some util methods.
@@ -91,32 +85,6 @@ public final class Utils {
     private static JavadocParser javadocParser = new JavadocParser();
 
     private Utils() {
-    }
-
-    @Nullable
-    public static Path getProjectPath(VisitorContext context) {
-
-        Path projectPath = context.get(MICRONAUT_INTERNAL_OPENAPI_PROJECT_DIR, Path.class).orElse(null);
-        if (projectPath != null) {
-            return projectPath;
-        }
-
-        String projectDir = System.getProperty(MICRONAUT_OPENAPI_PROJECT_DIR);
-        if (projectDir != null) {
-            projectPath = Paths.get(projectDir);
-        }
-        if (projectPath == null) {
-            try {
-                projectPath = context.getProjectDir().orElse(Utils.isTestMode() ? Paths.get(System.getProperty("user.dir")) : null);
-            } catch (Exception e) {
-                // Should never happen
-                projectPath = Paths.get(System.getProperty("user.dir"));
-            }
-        }
-
-        context.put(MICRONAUT_INTERNAL_OPENAPI_PROJECT_DIR, projectPath);
-
-        return projectPath;
     }
 
     /**
