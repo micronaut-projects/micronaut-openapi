@@ -130,6 +130,10 @@
         
         <div class="toc-item" style="margin-left:10px" id="toc-item-systemPropertyConfiguration"><a href="#systemPropertyConfiguration"><strong>6.2</strong><span>Configuring OpenAPI Processing with system properties</span></a></div>
         
+        <div class="toc-item" style="margin-left:10px" id="toc-item-applicationConfiguration"><a href="#applicationConfiguration"><strong>6.3</strong><span>Configuring OpenAPI Processing with an application.yml file</span></a></div>
+        
+        <div class="toc-item" style="margin-left:10px" id="toc-item-availableOptions"><a href="#availableOptions"><strong>6.4</strong><span>Available OpenAPI processing options</span></a></div>
+        
         <div class="toc-item" style="margin-left:0px" id="toc-item-exposingSwaggerOutput"><a href="#exposingSwaggerOutput"><strong>7</strong><span>Exposing Swagger Output</span></a></div>
         
         <div class="toc-item" style="margin-left:0px" id="toc-item-controllers"><a href="#controllers"><strong>8</strong><span>OpenAPI Generation for Controllers</span></a></div>
@@ -599,6 +603,25 @@ info:
   version: "v1.1"</code></pre>
 </div>
 </div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+So, <code>micronaut-openapi</code> expanded properties is old solution, now you can also use any properties for placeholders. For example, if you set properties without prefix <code>micronaut.openapi.expand</code> micronaut-openapi will process them as with this prefix.
+</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="title">openapi.properties Property Resolution without prefix</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">api.version=v1.1
+openapi.description=A nice API</code></pre>
+</div>
+</div>
 
 <h2 id="systemPropertyConfiguration"><a class="anchor" href="#systemPropertyConfiguration"></a>6.2 Configuring OpenAPI Processing with system properties</h2>
 
@@ -657,6 +680,271 @@ info:
 &lt;/build&gt;</code></pre>
 </div>
 </div>
+
+<h2 id="applicationConfiguration"><a class="anchor" href="#applicationConfiguration"></a>6.3 Configuring OpenAPI Processing with an application.yml file</h2>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/4.10.x/src/main/docs/guide/configuration/applicationConfiguration.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>It is possible to tweak the OpenAPI processing via standard way with micronaut environments (application.yml file).</p>
+</div>
+<div class="listingblock">
+<div class="title">application.yml Example</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">micronaut:
+  openapi:
+    target:
+     file: myspecfile.yml
+    property:
+      naming:
+        strategy: KEBAB_CASE</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Also, you can use properties from <code>application.yml</code> file for placeholders.</p>
+</div>
+<div class="listingblock">
+<div class="title">application.yml Sample properties for placeholders</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">my:
+  api:
+    version: 1.0.0
+    title: My title
+    api-description: My description</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Application.java Simple Application</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@OpenAPIDefinition(
+        info = @Info(
+                title = "${my.api.version}",
+                version = "${my.api.title}",
+                description = "${my.api.api-description}"
+        )
+)
+public class Application {
+
+    public static void main(String[] args) {
+        Micronaut.run(Application.class);
+    }
+}</code></pre>
+</div>
+</div>
+
+<h2 id="availableOptions"><a class="anchor" href="#availableOptions"></a>6.4 Available OpenAPI processing options</h2>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/4.10.x/src/main/docs/guide/configuration/availableOptions.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>micronaut.openapi.enabled</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">System property that enables or disables open api annotation processing.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Default: <code>true</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>micronaut.openapi.config.file</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">System property that enables setting the open api config file.</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>micronaut.openapi.server.context.path</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">System property for server context path.</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>micronaut.openapi.property.naming.strategy</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">System property for naming strategy. One jackson PropertyNamingStrategy.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Default: <code>LOWER_CAMEL_CASE</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>micronaut.openapi.views.spec</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">System property for views specification.</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>micronaut.openapi.target.file</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">System property that enables setting the target file to write to.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Default: <code>META-INF/swagger/${applicationName}-$4.10.0-SNAPSHOT.yml</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>micronaut.openapi.views.dest.dir</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">System property that specifies the path where the generated UI elements will be located.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Default: <code>META-INF/swagger/views/</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>micronaut.openapi.additional.files</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">System property that specifies the location of additional swagger YAML and JSON files to read from.</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>micronaut.openapi.project.dir</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">System property that specifies the location of current project. Need to set this property mannually if you use kotlin (to save incremental annotation processing) or have some troubles with auto calculation project path.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Default: calculated automatically</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>micronaut.openapi.security.default-schema-name</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">System property that specifies the default security schema name, if it&#8217;s not specified by annotation SecurityScheme.</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>micronaut.openapi.security.enabled</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Is this property true, micronaut-openapi will process micronaut-security properties and annotations to construct openapi security schema.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Default: <code>true</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>micronaut.openapi.field.visibility.level</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">System property that specifies the schema classes fields visibility level. By default, only public fields visibile.<br>
+&#160;<br>
+<strong>Available values:</strong><br>
+PRIVATE<br>
+PACKAGE<br>
+PROTECTED<br>
+PUBLIC</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Default: <code>PUBLIC</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>micronaut.openapi.json.format</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Is this property true, output file format will be JSON, otherwise YAML.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Default: <code>false</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>micronaut.openapi.filename</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The name of the result swagger file.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Default: <code>${info.title}-${info.version}.yml</code>, if info block not set, filename will be <code>swagger.yml</code>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>micronaut.openapi.environments</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Active micronaut environments which will be used for @Requires annotations.</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>micronaut.openapi.environments.enabled</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Is this property true, properties wll be loaded in the standard way from application.yml. Also, environments from <code>micronaut.openapi.environments</code> property will set as additional environments, if you want to set specific environment name for openAPI generator.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Default: <code>true</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>micronaut.openapi.versioning.enabled</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Is this property true, micronaut-openapi will process micronaut-router versioning prpoerties and annotations.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Default: <code>true</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>micronaut.server.context-path</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>micronaut-http</code> server context path property.</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>micronaut.internal.openapi.filenames</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Final calculated openapi filenames.</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>jackson.json-view.enabled</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>micronaut-http</code> property (<code>json-view.enabled</code>).</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Default: <code>false</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>micronaut.openapi.json.view.default.inclusion</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Property that determines whether properties that have no view annotations are included in JSON serialization views. If enabled, non-annotated properties will be included; when disabled, they will be excluded.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Default: <code>true</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>micronaut.openapi.expand.*</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Prefix for expandable properties. These properties can be used only for placeholders.</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>micronaut.openapi.config.file.locations</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Config file locations. By default, micronaut-openapi search config in standard path: <code>&lt;project_path&gt;/src/main/resources/</code><br>
+&#160;<br>
+You can set your custom paths separated by <code>,</code>. To set absolute paths use prefix <code>file:</code>,
+classpath paths use prefix <code>classpath:</code> or use prefix <code>project:</code> to set paths from project
+directory.</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>micronaut.openapi.schema.*</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Properties prefix to set custom schema implementations for selected clases.<br>
+For example, if you want to set simple <code>java.lang.String</code> class to some complex <code>org.somepackage.MyComplexType</code> class you need to write:<br>
+[source,properties]
+----
+micronaut.openapi.schema.org.somepackage.MyComplexType=java.lang.String<br>
+----
+Also, you can set it in your <code>application.yml</code> file like this:<br>
+[source,yaml]
+----
+micronaut:
+  openapi:
+    schema:
+      org.somepackage.MyComplexType: java.lang.String
+      org.somepackage.MyComplexType2: java.lang.Integer
+----</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>micronaut.openapi.schema-prefix</code><br>
+<code>micronaut.openapi.schema-postfix</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Properties prefix to set schema name prefix or postfix by package.<br>
+For example, if you have some classes with same names in different packages you can set postfix like this:<br>
+[source,properties]
+----
+micronaut.openapi.schema-postfix.org.api.v1_0_0=1_0_0
+micronaut.openapi.schema-postfix.org.api.v2_0_0=2_0_0
+----
+Also, you can set it in your <code>application.yml</code> file like this:
+[source,yaml]
+----
+micronaut:
+  openapi:
+    schema-postfix:
+      org.api.v1_0_0: 1_0_0
+      org.api.v2_0_0: 2_0_0
+    schema-prefix:
+      org.api.v1_0_0: public
+      org.api.v2_0_0: private
+----</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>micronaut.openapi.groups.*</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Properties prefix to set custom schema implementations for selected clases.<br>
+For example, if you want to set simple 'java.lang.String' class to some complex 'org.somepackage.MyComplexType' class you need to write:<br>
+[source]
+----
+-Dmicronaut.openapi.group.my-group1.title="Title 1"
+----</p>
+<p class="tableblock">Also, you can set it in your application.yml file like this:</p>
+<p class="tableblock">[source,yaml]
+----
+micronaut:
+  openapi:
+    group:
+      my-group1:
+        title: Title 1
+        filename: swagger-${group}-${apiVersion}-$4.10.0-SNAPSHOT.yml
+      my-group2:
+        title: Title 2
+----</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+</tbody>
+</table>
 
 <h1 id="exposingSwaggerOutput"><a class="anchor" href="#exposingSwaggerOutput"></a>7 Exposing Swagger Output</h1>
 
