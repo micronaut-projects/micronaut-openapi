@@ -34,60 +34,50 @@ classpath paths use prefix `classpath:` or use prefix `project:` to set paths fr
 directory. |
 |`micronaut.openapi.schema.*` | Properties prefix to set custom schema implementations for selected clases. +
 For example, if you want to set simple `java.lang.String` class to some complex `org.somepackage.MyComplexType` class you need to write: +
-[source,properties]
-----
+{nbsp} +
 micronaut.openapi.schema.org.somepackage.MyComplexType=java.lang.String +
-----
+{nbsp} +
 Also, you can set it in your `application.yml` file like this: +
-[source,yaml]
-----
-micronaut:
-  openapi:
-    schema:
-      org.somepackage.MyComplexType: java.lang.String
-      org.somepackage.MyComplexType2: java.lang.Integer
-----
+{nbsp} +
+micronaut: +
+{nbsp}{nbsp}openapi: +
+{nbsp}{nbsp}{nbsp}{nbsp}schema: +
+{nbsp}{nbsp}{nbsp}{nbsp}{nbsp}{nbsp}org.somepackage.MyComplexType: java.lang.String +
+{nbsp}{nbsp}{nbsp}{nbsp}{nbsp}{nbsp}org.somepackage.MyComplexType2: java.lang.Integer
 |
 |`micronaut.openapi.schema-prefix` +
 `micronaut.openapi.schema-postfix` | Properties prefix to set schema name prefix or postfix by package. +
 For example, if you have some classes with same names in different packages you can set postfix like this: +
-[source,properties]
-----
-micronaut.openapi.schema-postfix.org.api.v1_0_0=1_0_0
-micronaut.openapi.schema-postfix.org.api.v2_0_0=2_0_0
-----
-Also, you can set it in your `application.yml` file like this:
-[source,yaml]
-----
-micronaut:
-  openapi:
-    schema-postfix:
-      org.api.v1_0_0: 1_0_0
-      org.api.v2_0_0: 2_0_0
-    schema-prefix:
-      org.api.v1_0_0: public
-      org.api.v2_0_0: private
-----
+{nbsp} +
+micronaut.openapi.schema-postfix.org.api.v1_0_0=1_0_0 +
+micronaut.openapi.schema-postfix.org.api.v2_0_0=2_0_0 +
+{nbsp} +
+Also, you can set it in your `application.yml` file like this: +
+{nbsp} +
+micronaut: +
+{nbsp}{nbsp}openapi: +
+{nbsp}{nbsp}{nbsp}{nbsp}schema-postfix: +
+{nbsp}{nbsp}{nbsp}{nbsp}{nbsp}{nbsp}org.api.v1_0_0: 1_0_0 +
+{nbsp}{nbsp}{nbsp}{nbsp}{nbsp}{nbsp}org.api.v2_0_0: 2_0_0 +
+{nbsp}{nbsp}{nbsp}{nbsp}schema-prefix: +
+{nbsp}{nbsp}{nbsp}{nbsp}{nbsp}{nbsp}org.api.v1_0_0: public +
+{nbsp}{nbsp}{nbsp}{nbsp}{nbsp}{nbsp}org.api.v2_0_0: private +
+{nbsp} +
 |
 |`micronaut.openapi.groups.*` | Properties prefix to set custom schema implementations for selected clases. +
 For example, if you want to set simple 'java.lang.String' class to some complex 'org.somepackage.MyComplexType' class you need to write: +
-[source]
-----
--Dmicronaut.openapi.group.my-group1.title="Title 1"
-----
-
-Also, you can set it in your application.yml file like this:
-
-[source,yaml]
-----
-micronaut:
-  openapi:
-    group:
-      my-group1:
-        title: Title 1
-        filename: swagger-${group}-${apiVersion}-${version}.yml
-      my-group2:
-        title: Title 2
-----
+{nbsp} +
+-Dmicronaut.openapi.group.my-group1.title="Title 1" +
+{nbsp} +
+Also, you can set it in your application.yml file like this: +
+{nbsp} +
+micronaut: +
+{nbsp}{nbsp}openapi: +
+{nbsp}{nbsp}{nbsp}{nbsp}group: +
+{nbsp}{nbsp}{nbsp}{nbsp}{nbsp}{nbsp}my-group1: +
+{nbsp}{nbsp}{nbsp}{nbsp}{nbsp}{nbsp}{nbsp}{nbsp}title: Title 1 +
+{nbsp}{nbsp}{nbsp}{nbsp}{nbsp}{nbsp}{nbsp}{nbsp}filename: swagger-${group}-${apiVersion}-${version}.yml +
+{nbsp}{nbsp}{nbsp}{nbsp}{nbsp}{nbsp}my-group2: +
+{nbsp}{nbsp}{nbsp}{nbsp}{nbsp}{nbsp}{nbsp}{nbsp}title: Title 2 +
 |
 |===
