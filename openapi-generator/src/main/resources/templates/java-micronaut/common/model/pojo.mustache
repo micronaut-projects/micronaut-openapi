@@ -113,7 +113,7 @@ public class {{classname}} {{#parent}}extends {{{parent}}} {{/parent}}{{#vendorE
     {{/vars}}
 
     {{#requiredPropertiesInConstructor}}
-    public {{classname}}({{#requiredVars}}{{{datatypeWithEnum}}} {{name}}{{^-last}}, {{/-last}}{{/requiredVars}}) {
+    public {{classname}}({{#requiredVars}}{{{datatypeWithEnum}}} {{name}}{{^-last}}, {{/-last}}{{/requiredVars}}{{#vendorExtensions.areRequiredVarsAndReadOnlyVars}}, {{/vendorExtensions.areRequiredVarsAndReadOnlyVars}}{{#readOnlyVars}}{{{datatypeWithEnum}}} {{name}}{{^-last}}, {{/-last}}{{/readOnlyVars}}) {
         {{#parent}}
         super({{#vendorExtensions.requiredParentVars}}{{name}}{{^-last}}, {{/-last}}{{/vendorExtensions.requiredParentVars}});
         {{/parent}}

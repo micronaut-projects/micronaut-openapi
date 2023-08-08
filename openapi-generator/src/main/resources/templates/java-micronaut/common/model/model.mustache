@@ -58,6 +58,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
     {{#models}}
         {{#model}}
             {{#isEnum}}
+
 {{>common/model/enum}}
             {{/isEnum}}
             {{^isEnum}}
