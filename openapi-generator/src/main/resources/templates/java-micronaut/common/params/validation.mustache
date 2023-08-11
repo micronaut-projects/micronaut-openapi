@@ -33,30 +33,30 @@
     {{!Pattern}}
     {{#pattern}}
         {{^isByteArray}}
-    @Pattern(regexp="{{{pattern}}}")
+    @Pattern(regexp = "{{{pattern}}}")
         {{/isByteArray}}
     {{/pattern}}
     {{!Min length && max length}}
     {{#minLength}}
         {{#maxLength}}
-    @Size(min={{minLength}}, max={{maxLength}})
+    @Size(min = {{minLength}}, max = {{maxLength}})
         {{/maxLength}}
     {{/minLength}}
     {{#minLength}}{{^maxLength}}
-    @Size(min={{minLength}})
+    @Size(min = {{minLength}})
     {{/maxLength}}{{/minLength}}
     {{^minLength}}{{#maxLength}}
-    @Size(max={{maxLength}})
+    @Size(max = {{maxLength}})
     {{/maxLength}}{{/minLength}}
     {{!Size}}
     {{#minItems}}{{#maxItems}}
-    @Size(min={{minItems}}, max={{maxItems}})
+    @Size(min = {{minItems}}, max = {{maxItems}})
     {{/maxItems}}{{/minItems}}
     {{#minItems}}{{^maxItems}}
-    @Size(min={{minItems}})
+    @Size(min = {{minItems}})
     {{/maxItems}}{{/minItems}}
     {{^minItems}}{{#maxItems}}
-    @Size(max={{maxItems}})
+    @Size(max = {{maxItems}})
     {{/maxItems}}{{/minItems}}
     {{!Email}}
     {{#isEmail}}
@@ -84,11 +84,11 @@
     {{^isInteger}}
         {{^isLong}}{{!minimum for decimal value}}
             {{#minimum}}
-    @DecimalMin({{#exclusiveMinimum}}value={{/exclusiveMinimum}}"{{minimum}}"{{#exclusiveMinimum}}, inclusive=false{{/exclusiveMinimum}})
+    @DecimalMin({{#exclusiveMinimum}}value = {{/exclusiveMinimum}}"{{minimum}}"{{#exclusiveMinimum}}, inclusive = false{{/exclusiveMinimum}})
             {{/minimum}}
     {{!maximal for decimal value}}
             {{#maximum}}
-    @DecimalMax({{#exclusiveMaximum}}value={{/exclusiveMaximum}}"{{maximum}}"{{#exclusiveMaximum}}, inclusive=false{{/exclusiveMaximum}})
+    @DecimalMax({{#exclusiveMaximum}}value = {{/exclusiveMaximum}}"{{maximum}}"{{#exclusiveMaximum}}, inclusive = false{{/exclusiveMaximum}})
             {{/maximum}}
         {{/isLong}}
     {{/isInteger}}

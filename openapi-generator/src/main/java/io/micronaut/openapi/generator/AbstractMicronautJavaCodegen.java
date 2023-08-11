@@ -793,6 +793,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
 
             List<CodegenProperty> requiredVars = model.vars.stream().filter(v -> v.required).collect(Collectors.toList());
             model.vendorExtensions.put("requiredVars", requiredVars);
+            model.vendorExtensions.put("areRequiredVarsAndReadOnlyVars", !requiredVars.isEmpty() && !model.readOnlyVars.isEmpty());
         }
 
         return objs;
