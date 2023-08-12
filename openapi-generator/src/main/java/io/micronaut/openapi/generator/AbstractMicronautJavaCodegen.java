@@ -53,6 +53,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -445,6 +446,8 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
         return (getOutputDir() + "/src/test/java/").replace('/', File.separatorChar);
     }
 
+    public abstract boolean isServer();
+
     @Override
     public String apiTestFileFolder() {
         return testFileFolder() + apiPackage().replaceAll("\\.", "/");
@@ -614,9 +617,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
     }
 
     @Override
-    public CodegenOperation fromOperation(
-            String path, String httpMethod, Operation operation, List<Server> servers
-    ) {
+    public CodegenOperation fromOperation(String path, String httpMethod, Operation operation, List<Server> servers) {
         CodegenOperation op = super.fromOperation(path, httpMethod, operation, servers);
 
         if (op.isResponseFile) {
@@ -715,9 +716,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
      * @param isValidated Whether the wrapper requires validation.
      * @param isListWrapper Whether the wrapper should be around list items.
      */
-    private void wrapOperationReturnType(
-            CodegenOperation op, String wrapperType, boolean isValidated, boolean isListWrapper
-    ) {
+    private void wrapOperationReturnType(CodegenOperation op, String wrapperType, boolean isValidated, boolean isListWrapper) {
         CodegenProperty newReturnType = new CodegenProperty();
         newReturnType.required = true;
         newReturnType.isModel = isValidated;
@@ -784,6 +783,9 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
     public Map<String, ModelsMap> postProcessAllModels(Map<String, ModelsMap> objs) {
         objs = super.postProcessAllModels(objs);
 
+        var isServer = isServer();
+        var random = new Random();
+
         for (ModelsMap models : objs.values()) {
             CodegenModel model = models.getModels().get(0).getModel();
 
@@ -822,9 +824,17 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
             model.vendorExtensions.put("requiredVarsWithoutDiscriminator", requiredVarsWithoutDiscriminator);
             model.vendorExtensions.put("requiredVars", requiredVars);
             model.vendorExtensions.put("areRequiredVarsAndReadOnlyVars", !requiredVarsWithoutDiscriminator.isEmpty() && !model.readOnlyVars.isEmpty());
+            model.vendorExtensions.put("serialId", random.nextLong());
             if (model.discriminator != null) {
                 model.vendorExtensions.put("hasMappedModels", !model.discriminator.getMappedModels().isEmpty());
                 model.vendorExtensions.put("hasMultipleMappedModels", model.discriminator.getMappedModels().size() > 1);
+            }
+            model.vendorExtensions.put("isServer", isServer);
+            for (var property : model.vars) {
+                property.vendorExtensions.put("isServer", isServer);
+            }
+            for (var property : model.requiredVars) {
+                property.vendorExtensions.put("isServer", isServer);
             }
         }
 

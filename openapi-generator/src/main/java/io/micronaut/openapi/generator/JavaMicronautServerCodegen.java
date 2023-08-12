@@ -222,6 +222,11 @@ public class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen<Jav
     }
 
     @Override
+    public boolean isServer() {
+        return true;
+    }
+
+    @Override
     public String apiTestFileFolder() {
         // Set it to the whole output dir, so that validation always passes
         return super.getOutputDir();

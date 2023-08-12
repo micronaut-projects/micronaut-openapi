@@ -13,9 +13,16 @@
     @JsonInclude(JsonInclude.Include.USE_DEFAULTS)
         {{/required}}{{/items.isNullable}}
     {{/isMap}}
-    {{^isMap}}{{^required}}
+    {{^isMap}}
+        {{#required}}
+            {{#isReadOnly}}
     @JsonInclude(JsonInclude.Include.USE_DEFAULTS)
-    {{/required}}{{/isMap}}
+            {{/isReadOnly}}
+        {{/required}}
+        {{^required}}
+    @JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+        {{/required}}
+    {{/isMap}}
     {{#withXml}}
         {{^isContainer}}
     @JacksonXmlProperty({{#isXmlAttribute}}isAttribute = true, {{/isXmlAttribute}}{{#xmlNamespace}}namespace="{{xmlNamespace}}", {{/xmlNamespace}}localName = "{{#xmlName}}{{xmlName}}{{/xmlName}}{{^xmlName}}{{baseName}}{{/xmlName}}")

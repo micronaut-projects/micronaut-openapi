@@ -163,6 +163,11 @@ public class JavaMicronautClientCodegen extends AbstractMicronautJavaCodegen<Jav
         apiDocTemplateFiles.put("client/doc/api_doc.mustache", ".md");
     }
 
+    @Override
+    public boolean isServer() {
+        return false;
+    }
+
     public void setAdditionalClientTypeAnnotations(final List<String> additionalClientTypeAnnotations) {
         this.additionalClientTypeAnnotations = additionalClientTypeAnnotations;
     }
