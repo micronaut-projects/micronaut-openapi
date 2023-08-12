@@ -10,20 +10,35 @@
 @Schema({{#name}}name = "{{name}}", {{/name}}description = "{{{description}}}")
     {{/generateSwagger2Annotations}}
 {{/description}}
+{{#lombok}}
+    {{#parent}}
+@EqualsAndHashCode(callSuper = true)
+    {{/parent}}
+@Accessors(chain = true)
+@NoArgsConstructor
+@Data
+{{/lombok}}
 {{#micronaut_serde_jackson}}
 @Serdeable
 {{/micronaut_serde_jackson}}
 {{#jackson}}
-@JsonPropertyOrder({
+{{#vendorExtensions.withMultipleVars}}
+@JsonPropertyOrder({{openbrace}}
     {{#vars}}
     {{classname}}.JSON_PROPERTY_{{nameInSnakeCase}}{{^-last}},{{/-last}}
     {{/vars}}
-})
+{{closebrace}})
+{{/vendorExtensions.withMultipleVars}}
+{{^vendorExtensions.withMultipleVars}}
+@JsonPropertyOrder({{#vars}}{{classname}}.JSON_PROPERTY_{{nameInSnakeCase}}{{/vars}})
+{{/vendorExtensions.withMultipleVars}}
 {{/jackson}}
 {{#additionalModelTypeAnnotations}}
 {{{.}}}
 {{/additionalModelTypeAnnotations}}
+{{#withGeneratedAnnotation}}
 {{>common/generatedAnnotation}}
+{{/withGeneratedAnnotation}}
 {{#discriminator}}
 {{>common/model/typeInfoAnnotation}}
 {{/discriminator}}
@@ -37,6 +52,7 @@
 {{!Declare the class with extends and implements}}
 public class {{classname}} {{#parent}}extends {{{parent}}} {{/parent}}{{#vendorExtensions.x-implements}}{{#-first}}implements {{{.}}}{{/-first}}{{^-first}}, {{{.}}}{{/-first}}{{#-last}} {{/-last}}{{/vendorExtensions.x-implements}}{
 {{/formatNoEmptyLines}}
+
     {{#serializableModel}}
 
     @Serial
@@ -61,17 +77,17 @@ public class {{classname}} {{#parent}}extends {{{parent}}} {{/parent}}{{#vendorE
             {{/isXmlAttribute}}
             {{^isXmlAttribute}}
                 {{^isContainer}}
-    @XmlElement({{#xmlNamespace}}namespace="{{xmlNamespace}}", {{/xmlNamespace}}name = "{{#xmlName}}{{xmlName}}{{/xmlName}}{{^xmlName}}{{baseName}}{{/xmlName}}")
+    @XmlElement({{#xmlNamespace}}namespace = "{{xmlNamespace}}", {{/xmlNamespace}}name = "{{#xmlName}}{{xmlName}}{{/xmlName}}{{^xmlName}}{{baseName}}{{/xmlName}}")
                 {{/isContainer}}
                 {{#isContainer}}
-    // Is a container wrapped={{isXmlWrapped}}
+    // Is a container wrapped = {{isXmlWrapped}}
                     {{#items}}
-    // items.name={{name}} items.baseName={{baseName}} items.xmlName={{xmlName}} items.xmlNamespace={{xmlNamespace}}
-    // items.example={{example}} items.type={{dataType}}
-    @XmlElement({{#xmlNamespace}}namespace="{{xmlNamespace}}", {{/xmlNamespace}}name = "{{#xmlName}}{{xmlName}}{{/xmlName}}{{^xmlName}}{{baseName}}{{/xmlName}}")
+    // items.name = {{name}} items.baseName = {{baseName}} items.xmlName = {{xmlName}} items.xmlNamespace = {{xmlNamespace}}
+    // items.example = {{example}} items.type = {{dataType}}
+    @XmlElement({{#xmlNamespace}}namespace = "{{xmlNamespace}}", {{/xmlNamespace}}name = "{{#xmlName}}{{xmlName}}{{/xmlName}}{{^xmlName}}{{baseName}}{{/xmlName}}")
                     {{/items}}
                     {{#isXmlWrapped}}
-    @XmlElementWrapper({{#xmlNamespace}}namespace="{{xmlNamespace}}", {{/xmlNamespace}}name = "{{#xmlName}}{{xmlName}}{{/xmlName}}{{^xmlName}}{{baseName}}{{/xmlName}}")
+    @XmlElementWrapper({{#xmlNamespace}}namespace = "{{xmlNamespace}}", {{/xmlNamespace}}name = "{{#xmlName}}{{xmlName}}{{/xmlName}}{{^xmlName}}{{baseName}}{{/xmlName}}")
                     {{/isXmlWrapped}}
                 {{/isContainer}}
             {{/isXmlAttribute}}
@@ -115,6 +131,7 @@ public class {{classname}} {{#parent}}extends {{{parent}}} {{/parent}}{{#vendorE
     {{/vars}}
 
     {{#requiredPropertiesInConstructor}}
+        {{#vendorExtensions.withRequiredVars}}
     public {{classname}}({{#vendorExtensions.requiredVarsWithoutDiscriminator}}{{#isReadOnly}}{{#vendorExtensions.isServer}}{{^-first}}, {{/-first}}{{{datatypeWithEnum}}} {{name}}{{/vendorExtensions.isServer}}{{/isReadOnly}}{{^isReadOnly}}{{^-first}}, {{/-first}}{{{datatypeWithEnum}}} {{name}}{{/isReadOnly}}{{/vendorExtensions.requiredVarsWithoutDiscriminator}}) {
         {{#parent}}
         super({{#vendorExtensions.requiredParentVarsWithoutDiscriminator}}{{name}}{{^-last}}, {{/-last}}{{/vendorExtensions.requiredParentVarsWithoutDiscriminator}});
@@ -132,19 +149,15 @@ public class {{classname}} {{#parent}}extends {{{parent}}} {{/parent}}{{#vendorE
             {{/isDiscriminator}}
         {{/vendorExtensions.requiredVars}}
     }
-    {{/requiredPropertiesInConstructor}}
-    {{^requiredPropertiesInConstructor}}
-    public {{classname}}() {
-        {{#parent}}
-        super();
-        {{/parent}}
-    }
+        {{/vendorExtensions.withRequiredVars}}
     {{/requiredPropertiesInConstructor}}
 
     {{#vars}}
+        {{^vendorExtensions.lombok}}
     /**
         {{#description}}
      * {{description}}
+     *
         {{/description}}
      * @return the {{name}} property value
      */
@@ -165,12 +178,14 @@ public class {{classname}} {{#parent}}extends {{{parent}}} {{/parent}}{{#vendorE
         return {{name}};
         {{/vendorExtensions.x-is-jackson-optional-nullable}}
     }
+        {{/vendorExtensions.lombok}}
 
     {{#useOptional}}
         {{^required}}
     /**
         {{#description}}
      * {{description}}
+     *
         {{/description}}
      * @return the {{name}} property value wrapped in an optional
      */
@@ -188,6 +203,7 @@ public class {{classname}} {{#parent}}extends {{{parent}}} {{/parent}}{{#vendorE
         {{/required}}
     {{/useOptional}}
 
+    {{^vendorExtensions.lombok}}
     /**
      * Set the {{name}} property value
      */
@@ -202,10 +218,12 @@ public class {{classname}} {{#parent}}extends {{{parent}}} {{/parent}}{{#vendorE
         this.{{name}} = {{name}};
             {{/vendorExtensions.x-is-jackson-optional-nullable}}
     }
+    {{/vendorExtensions.lombok}}
 
             {{#vendorExtensions.x-is-jackson-optional-nullable}}
     /**
      * A JsonNullable getter that will be used for JSON serialization.
+     *
      * @return JsonNullable version of {{name}}
      */
 {{>common/model/jackson_annotations}}
@@ -220,8 +238,10 @@ public class {{classname}} {{#parent}}extends {{{parent}}} {{/parent}}{{#vendorE
         {{/vendorExtensions.x-is-jackson-optional-nullable}}
 
         {{^isReadOnly}}
+            {{^vendorExtensions.lombok}}
     /**
      * Set {{name}} in a chainable fashion.
+     *
      * @return The same instance of {{classname}} for chaining.
      */
     public {{classname}} {{name}}({{{datatypeWithEnum}}} {{name}}) {
@@ -233,30 +253,31 @@ public class {{classname}} {{#parent}}extends {{{parent}}} {{/parent}}{{#vendorE
             {{/vendorExtensions.x-is-jackson-optional-nullable}}
         return this;
     }
-
+            {{/vendorExtensions.lombok}}
             {{#isArray}}
     /**
      * Add an item to the {{name}} property in a chainable fashion.
+     *
      * @return The same instance of {{classname}} for chaining.
      */
     public {{classname}} add{{nameInCamelCase}}Item({{{items.datatypeWithEnum}}} {{name}}Item) {
                 {{#vendorExtensions.x-is-jackson-optional-nullable}}
-        if (this.{{name}} == null || !this.{{name}}.isPresent()) {
-            this.{{name}} = JsonNullable.<{{{datatypeWithEnum}}}>of({{{defaultValue}}}{{^defaultValue}}new {{#uniqueItems}}LinkedHashSet{{/uniqueItems}}{{^uniqueItems}}ArrayList{{/uniqueItems}}<>(){{/defaultValue}});
+        if ({{name}} == null || !{{name}}.isPresent()) {
+            {{name}} = JsonNullable.<{{{datatypeWithEnum}}}>of({{{defaultValue}}}{{^defaultValue}}new {{#uniqueItems}}LinkedHashSet{{/uniqueItems}}{{^uniqueItems}}ArrayList{{/uniqueItems}}<>(){{/defaultValue}});
         }
         try {
-            this.{{name}}.get().add({{name}}Item);
+            {{name}}.get().add({{name}}Item);
         } catch (java.util.NoSuchElementException e) {
             // this can never happen, as we make sure above that the value is present
         }
                 {{/vendorExtensions.x-is-jackson-optional-nullable}}
                 {{^vendorExtensions.x-is-jackson-optional-nullable}}
                     {{^required}}
-        if (this.{{name}} == null) {
-            this.{{name}} = {{{defaultValue}}}{{^defaultValue}}new {{#uniqueItems}}LinkedHashSet{{/uniqueItems}}{{^uniqueItems}}ArrayList{{/uniqueItems}}<>(){{/defaultValue}};
+        if ({{name}} == null) {
+            {{name}} = {{{defaultValue}}}{{^defaultValue}}new {{#uniqueItems}}LinkedHashSet{{/uniqueItems}}{{^uniqueItems}}ArrayList{{/uniqueItems}}<>(){{/defaultValue}};
         }
                     {{/required}}
-        this.{{name}}.add({{name}}Item);
+        {{name}}.add({{name}}Item);
                 {{/vendorExtensions.x-is-jackson-optional-nullable}}
         return this;
     }
@@ -265,6 +286,7 @@ public class {{classname}} {{#parent}}extends {{{parent}}} {{/parent}}{{#vendorE
             {{#isMap}}
     /**
      * Set the value for the key for the {{name}} map property in a chainable fashion.
+     *
      * @return The same instance of {{classname}} for chaining.
      */
     public {{classname}} put{{nameInCamelCase}}Item(String key, {{{items.datatypeWithEnum}}} {{name}}Item) {
@@ -296,8 +318,8 @@ public class {{classname}} {{#parent}}extends {{{parent}}} {{/parent}}{{#vendorE
     {{#parentVars}}
         {{^isReadOnly}}
     @Override
-    public {{classname}} {{name}}({{{datatypeWithEnum}}} {{name}}) {
-        {{{setter}}}({{name}});
+    public {{classname}} {{#lombok}}{{{setter}}}{{/lombok}}{{^lombok}}{{name}}{{/lombok}}({{{datatypeWithEnum}}} {{name}}) {
+        super.{{{setter}}}({{name}});
         return this;
     }
 
@@ -320,6 +342,7 @@ public class {{classname}} {{#parent}}extends {{{parent}}} {{/parent}}{{#vendorE
         {{/isReadOnly}}
     {{/parentVars}}
 
+{{^lombok}}
     @Override
     public boolean equals(Object o) {
     {{#useReflectionEqualsHashCode}}
@@ -334,7 +357,7 @@ public class {{classname}} {{#parent}}extends {{{parent}}} {{/parent}}{{#vendorE
         }
         {{#hasVars}}
         {{classname}} {{classVarName}} = ({{classname}}) o;
-        return {{#vars}}{{#isByteArray}}Arrays{{/isByteArray}}{{^isByteArray}}Objects{{/isByteArray}}.equals(this.{{name}}, {{classVarName}}.{{name}}){{^-last}} &&
+        return {{#vars}}{{#isByteArray}}Arrays{{/isByteArray}}{{^isByteArray}}Objects{{/isByteArray}}.equals({{name}}, {{classVarName}}.{{name}}){{^-last}} &&
             {{/-last}}{{/vars}}{{#parent}} &&
             super.equals(o){{/parent}};
         {{/hasVars}}
@@ -362,6 +385,7 @@ public class {{classname}} {{#parent}}extends {{{parent}}} {{/parent}}{{#vendorE
         {{/allVars}}
             + ")";
     }
+{{/lombok}}
 
     {{#parcelableModel}}
     public void writeToParcel(Parcel out, int flags) {
@@ -441,6 +465,7 @@ public class {{classname}} {{#parent}}extends {{{parent}}} {{/parent}}{{#vendorE
      * @param <R> the return type of the visitor
      */
     public interface Visitor<R> {
+
         {{#discriminator.mappedModels}}
         R visit{{modelName}}({{modelName}} value);
         {{/discriminator.mappedModels}}

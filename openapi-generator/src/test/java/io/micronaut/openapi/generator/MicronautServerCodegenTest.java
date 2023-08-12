@@ -145,8 +145,6 @@ class MicronautServerCodegenTest extends AbstractMicronautCodegenTest {
         String modelPath = outputPath + "src/main/java/org/openapitools/model/";
         assertFileContains(modelPath + "Pet.java", "public Pet(String name, List<String> photoUrls)");
         assertFileNotContains(modelPath + "Pet.java", "public Pet()");
-        assertFileContains(modelPath + "User.java", "public User()");
-        assertFileContains(modelPath + "Order.java", "public Order()");
     }
 
     @Test
@@ -157,16 +155,13 @@ class MicronautServerCodegenTest extends AbstractMicronautCodegenTest {
 
         // Constructor should have properties
         String modelPath = outputPath + "src/main/java/org/openapitools/model/";
-        assertFileContains(modelPath + "Pet.java", "public Pet()");
         assertFileNotContainsRegex(modelPath + "Pet.java", "public Pet\\([^)]+\\)");
-        assertFileContains(modelPath + "User.java", "public User()");
         assertFileNotContainsRegex(modelPath + "User.java", "public User\\([^)]+\\)");
-        assertFileContains(modelPath + "Order.java", "public Order()");
         assertFileNotContainsRegex(modelPath + "Order.java", "public Order\\([^)]+\\)");
     }
 
     @Test
-    @Disabled("Feature may not be fully implemented in OpenAPI generator")
+    @Disabled("Feature is not fully implemented in OpenAPI generator 6.x. Will be fixed in openapi-generator 7.0.0")
     void testExtraAnnotations() {
 
         JavaMicronautServerCodegen codegen = new JavaMicronautServerCodegen();
@@ -196,7 +191,7 @@ class MicronautServerCodegenTest extends AbstractMicronautCodegenTest {
 
         String apiPath = outputPath + "src/main/java/org/openapitools/api/";
         assertFileContainsRegex(apiPath + "BooksApi.java", "IS_ANONYMOUS[^;]{0,100}bookSearchGet");
-        assertFileContainsRegex(apiPath + "BooksApi.java", "@Secured\\(\\{\"admin\"\\}\\)[^;]{0,100}createBook");
+        assertFileContainsRegex(apiPath + "BooksApi.java", "@Secured\\(\"admin\"\\)[^;]{0,100}createBook");
         assertFileContainsRegex(apiPath + "BooksApi.java", "IS_ANONYMOUS[^;]{0,100}getBook");
         assertFileContainsRegex(apiPath + "BooksApi.java", "IS_AUTHENTICATED[^;]{0,100}reserveBook");
 

@@ -159,8 +159,6 @@ class MicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         String modelPath = outputPath + "src/main/java/org/openapitools/model/";
         assertFileContains(modelPath + "Pet.java", "public Pet(String name, List<String> photoUrls)");
         assertFileNotContains(modelPath + "Pet.java", "public Pet()");
-        assertFileContains(modelPath + "User.java", "public User()");
-        assertFileContains(modelPath + "Order.java", "public Order()");
     }
 
     @Test
@@ -171,11 +169,8 @@ class MicronautClientCodegenTest extends AbstractMicronautCodegenTest {
 
         // Constructor should have properties
         String modelPath = outputPath + "src/main/java/org/openapitools/model/";
-        assertFileContains(modelPath + "Pet.java", "public Pet()");
         assertFileNotContainsRegex(modelPath + "Pet.java", "public Pet\\([^)]+\\)");
-        assertFileContains(modelPath + "User.java", "public User()");
         assertFileNotContainsRegex(modelPath + "User.java", "public User\\([^)]+\\)");
-        assertFileContains(modelPath + "Order.java", "public Order()");
         assertFileNotContainsRegex(modelPath + "Order.java", "public Order\\([^)]+\\)");
     }
 
@@ -188,7 +183,7 @@ class MicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         // body and response content types should be properly annotated using @Consumes and @Produces micronaut annotations
         String apiPath = outputPath + "src/main/java/org/openapitools/api/";
         assertFileContains(apiPath + "DefaultApi.java", "@Consumes({\"application/vnd.oracle.resource+json; type=collection\", \"application/vnd.oracle.resource+json; type=error\"})");
-        assertFileContains(apiPath + "DefaultApi.java", "@Produces({\"application/vnd.oracle.resource+json; type=singular\"})");
+        assertFileContains(apiPath + "DefaultApi.java", "@Produces(\"application/vnd.oracle.resource+json; type=singular\")");
     }
 
     @Test

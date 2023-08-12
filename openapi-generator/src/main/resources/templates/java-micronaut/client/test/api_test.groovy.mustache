@@ -16,7 +16,6 @@ import java.util.List
 import java.util.Map
 import java.util.HashSet
 
-
 /**
  * API tests for {{classname}}
  */
@@ -25,7 +24,6 @@ class {{classname}}Spec extends Specification {
 
     @Inject
     {{classname}} api
-
     {{#operations}}{{#operation}}
     /**
      * {{summary}}
@@ -54,6 +52,6 @@ class {{classname}}Spec extends Specification {
         true
         // TODO: test validations
     }
-
     {{/operation}}{{/operations}}
+
 }

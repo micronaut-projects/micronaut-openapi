@@ -1,8 +1,24 @@
 package {{invokerPackage}};
 
+{{#aot}}
+import io.micronaut.context.ApplicationContextBuilder;
+import io.micronaut.context.ApplicationContextConfigurer;
+import io.micronaut.context.annotation.ContextConfigurer;
+{{/aot}}
 import io.micronaut.runtime.Micronaut;
 
 public class Application {
+{{#aot}}
+
+    @ContextConfigurer
+    public static class MyConfigurer implements ApplicationContextConfigurer {
+
+        @Override
+        public void configure(ApplicationContextBuilder context) {
+            context.deduceEnvironment(false);
+        }
+    }
+{{/aot}}
 
     public static void main(String[] args) {
         Micronaut.run(Application.class, args);

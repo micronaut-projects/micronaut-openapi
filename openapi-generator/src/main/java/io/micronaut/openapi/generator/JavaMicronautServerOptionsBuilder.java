@@ -60,4 +60,28 @@ public interface JavaMicronautServerOptionsBuilder extends GeneratorOptionsBuild
      * @return this builder
      */
     JavaMicronautServerOptionsBuilder withAuthentication(boolean useAuth);
+
+    /**
+     * If set to true, generated code will be with lombok annotations.
+     *
+     * @param lombok generate code with lombok annotations or not
+     * @return this builder
+     */
+    JavaMicronautServerOptionsBuilder withLombok(boolean lombok);
+
+    /**
+     * If set to true, generated code will be with jakarta.annotation.Generated annotation.
+     *
+     * @param generatedAnnotation generate code with jakarta.annotation.Generated annotation or not
+     * @return this builder
+     */
+    JavaMicronautServerOptionsBuilder withGeneratedAnnotation(boolean generatedAnnotation);
+
+    /**
+     * If set to true, generated compatible code with micronaut-aot.
+     *
+     * @param aot generate compatible code with micronaut-aot or not
+     * @return this builder
+     */
+    JavaMicronautServerOptionsBuilder withAot(boolean aot);
 }

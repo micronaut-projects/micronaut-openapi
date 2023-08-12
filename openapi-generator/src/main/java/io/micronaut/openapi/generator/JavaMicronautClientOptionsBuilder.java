@@ -62,4 +62,20 @@ public interface JavaMicronautClientOptionsBuilder extends GeneratorOptionsBuild
      * @return this builder
      */
     JavaMicronautClientOptionsBuilder withBasePathSeparator(String basePathSeparator);
+
+    /**
+     * If set to true, generated code will be with lombok annotations.
+     *
+     * @param lombok generate code with lombok annotations or not
+     * @return this builder
+     */
+    JavaMicronautClientOptionsBuilder withLombok(boolean lombok);
+
+    /**
+     * If set to true, generated code will be with jakarta.annotation.Generated annotation.
+     *
+     * @param generatedAnnotation generate code with jakarta.annotation.Generated annotation or not
+     * @return this builder
+     */
+    JavaMicronautClientOptionsBuilder withGeneratedAnnotation(boolean generatedAnnotation);
 }

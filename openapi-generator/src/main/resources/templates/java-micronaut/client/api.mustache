@@ -42,11 +42,12 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
 {{#formatOneEmptyLine}}
 {{#additionalClientTypeAnnotations}}
-	{{{.}}}
+{{{.}}}
 {{/additionalClientTypeAnnotations}}
+{{#withGeneratedAnnotation}}
 {{>common/generatedAnnotation}}
-@Client({{#configureClientId}}id = "{{clientId}}",
-  path = {{/configureClientId}}"${{openbrace}}{{{applicationName}}}{{basePathSeparator}}base-path{{closebrace}}")
+{{/withGeneratedAnnotation}}
+@Client({{#configureClientId}}id = "{{clientId}}", path = {{/configureClientId}}"${{openbrace}}{{{applicationName}}}{{basePathSeparator}}base-path{{closebrace}}")
 public interface {{classname}} {
 {{#operations}}
 
@@ -54,16 +55,16 @@ public interface {{classname}} {
     {{#formatNoEmptyLines}}
 {{>common/operationAnnotations}}{{!
 }}    @{{#lambda.pascalcase}}{{#lambda.lowercase}}{{httpMethod}}{{/lambda.lowercase}}{{/lambda.pascalcase}}("{{{path}}}")
-    {{#hasProduces}}
-    {{#produces}}{{#-first}}@Consumes({{openbrace}}{{/-first}}"{{{mediaType}}}"{{^-last}}, {{/-last}}{{#-last}}{{closebrace}}){{/-last}}{{/produces}}
-    {{/hasProduces}}
-    {{#hasConsumes}}
-    {{#consumes}}{{#-first}}@Produces({{openbrace}}{{/-first}}"{{{mediaType}}}"{{^-last}}, {{/-last}}{{#-last}}{{closebrace}}){{/-last}}{{/consumes}}
-    {{/hasConsumes}}
+    {{^vendorExtensions.onlyDefaultConsumeOrEmpty}}
+    {{#produces}}{{#-first}}@Consumes({{#produces.1}}{{openbrace}}{{/produces.1}}{{/-first}}"{{{mediaType}}}"{{^-last}}, {{/-last}}{{#-last}}{{#produces.1}}{{closebrace}}{{/produces.1}}){{/-last}}{{/produces}}
+    {{/vendorExtensions.onlyDefaultConsumeOrEmpty}}
+    {{^vendorExtensions.onlyDefaultProduceOrEmpty}}
+    {{#consumes}}{{#-first}}@Produces({{#consumes.1}}{{openbrace}}{{/consumes.1}}{{/-first}}"{{{mediaType}}}"{{^-last}}, {{/-last}}{{#-last}}{{#consumes.1}}{{closebrace}}{{/consumes.1}}){{/-last}}{{/consumes}}
+    {{/vendorExtensions.onlyDefaultProduceOrEmpty}}
     {{!auth methods}}
         {{#configureAuth}}
             {{#authMethods}}
-    @Authorization(name = "{{{name}}}"{{!scopes}}{{#isOAuth}}, scopes = {{openbrace}}{{#scopes}}"{{{scope}}}"{{^-last}}, {{/-last}}{{/scopes}}{{closebrace}}{{/isOAuth}})
+    @Authorization(name = "{{{name}}}"{{!scopes}}{{#isOAuth}}, scopes = {{#scopes.1}}{{openbrace}}{{/scopes.1}}{{#scopes}}"{{{scope}}}"{{^-last}}, {{/-last}}{{/scopes}}{{#scopes.1}}{{closebrace}}{{/scopes.1}}{{/isOAuth}})
             {{/authMethods}}
         {{/configureAuth}}
     {{!the method definition}}

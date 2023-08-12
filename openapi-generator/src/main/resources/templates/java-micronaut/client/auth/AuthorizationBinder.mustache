@@ -15,11 +15,13 @@ import java.util.ArrayList;
 import java.util.List;
 import {{javaxPackage}}.annotation.Generated;
 
+{{#withGeneratedAnnotation}}
 {{>common/generatedAnnotation}}
+{{/withGeneratedAnnotation}}
 @Singleton
 public class AuthorizationBinder implements AnnotatedClientRequestBinder<Authorization> {
 
-    public static final CharSequence AUTHORIZATION_NAMES  = "micronaut.security.AUTHORIZATION_NAMES";
+    public static final CharSequence AUTHORIZATION_NAMES = "micronaut.security.AUTHORIZATION_NAMES";
 
     @NonNull
     @Override
@@ -37,7 +39,7 @@ public class AuthorizationBinder implements AnnotatedClientRequestBinder<Authori
 
         if (CollectionUtils.isNotEmpty(annotations)) {
             List<String> authorizationNames = new ArrayList<>();
-            for (AnnotationValue<Authorization> annotation: annotations) {
+            for (AnnotationValue<Authorization> annotation : annotations) {
                 annotation.get("name", String.class)
                         .filter(StringUtils::isNotEmpty)
                         .ifPresent(v -> authorizationNames.add(configurationName(v)));
