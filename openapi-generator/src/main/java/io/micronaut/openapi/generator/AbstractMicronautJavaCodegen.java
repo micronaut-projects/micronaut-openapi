@@ -786,14 +786,46 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
 
         for (ModelsMap models : objs.values()) {
             CodegenModel model = models.getModels().get(0).getModel();
-            if (model.getParentModel() != null) {
-                model.vendorExtensions.put("requiredParentVars", model.getParentModel().requiredVars);
+
+            var hasParent = model.getParentModel() != null;
+            var requiredVarsWithoutDiscriminator = new ArrayList<CodegenProperty>();
+            for (var v : model.requiredVars) {
+                boolean isDiscriminator = false;
+                if (hasParent) {
+                    for (var pv : model.getParentModel().getAllVars()) {
+                        if (pv.required && pv.getName().equals(v.getName())) {
+                            isDiscriminator = pv.isDiscriminator;
+                            break;
+                        }
+                    }
+                } else {
+                    isDiscriminator = v.isDiscriminator;
+                }
+                if (!isDiscriminator) {
+                    requiredVarsWithoutDiscriminator.add(v);
+                }
+            }
+
+            if (hasParent) {
+                var parentRequiredVarsWithoutDiscriminator = new ArrayList<CodegenProperty>();
+                for (var v : model.getParentModel().vars) {
+                    if (v.required && !v.isDiscriminator) {
+                        parentRequiredVarsWithoutDiscriminator.add(v);
+                    }
+                }
+                model.vendorExtensions.put("requiredParentVarsWithoutDiscriminator", parentRequiredVarsWithoutDiscriminator);
                 model.parentVars = model.getParentModel().allVars;
             }
 
             List<CodegenProperty> requiredVars = model.vars.stream().filter(v -> v.required).collect(Collectors.toList());
+
+            model.vendorExtensions.put("requiredVarsWithoutDiscriminator", requiredVarsWithoutDiscriminator);
             model.vendorExtensions.put("requiredVars", requiredVars);
-            model.vendorExtensions.put("areRequiredVarsAndReadOnlyVars", !requiredVars.isEmpty() && !model.readOnlyVars.isEmpty());
+            model.vendorExtensions.put("areRequiredVarsAndReadOnlyVars", !requiredVarsWithoutDiscriminator.isEmpty() && !model.readOnlyVars.isEmpty());
+            if (model.discriminator != null) {
+                model.vendorExtensions.put("hasMappedModels", !model.discriminator.getMappedModels().isEmpty());
+                model.vendorExtensions.put("hasMultipleMappedModels", model.discriminator.getMappedModels().size() > 1);
+            }
         }
 
         return objs;

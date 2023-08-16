@@ -113,16 +113,17 @@ public class {{classname}} {{#parent}}extends {{{parent}}} {{/parent}}{{#vendorE
     {{/vars}}
 
     {{#requiredPropertiesInConstructor}}
-    public {{classname}}({{#requiredVars}}{{{datatypeWithEnum}}} {{name}}{{^-last}}, {{/-last}}{{/requiredVars}}{{#vendorExtensions.areRequiredVarsAndReadOnlyVars}}, {{/vendorExtensions.areRequiredVarsAndReadOnlyVars}}{{#readOnlyVars}}{{{datatypeWithEnum}}} {{name}}{{^-last}}, {{/-last}}{{/readOnlyVars}}) {
+    public {{classname}}({{#vendorExtensions.requiredVarsWithoutDiscriminator}}{{{datatypeWithEnum}}} {{name}}{{^-last}}, {{/-last}}{{/vendorExtensions.requiredVarsWithoutDiscriminator}}{{#vendorExtensions.areRequiredVarsAndReadOnlyVars}}, {{/vendorExtensions.areRequiredVarsAndReadOnlyVars}}{{#readOnlyVars}}{{{datatypeWithEnum}}} {{name}}{{^-last}}, {{/-last}}{{/readOnlyVars}}) {
         {{#parent}}
-        super({{#vendorExtensions.requiredParentVars}}{{name}}{{^-last}}, {{/-last}}{{/vendorExtensions.requiredParentVars}});
+        super({{#vendorExtensions.requiredParentVarsWithoutDiscriminator}}{{name}}{{^-last}}, {{/-last}}{{/vendorExtensions.requiredParentVarsWithoutDiscriminator}});
         {{/parent}}
         {{#vendorExtensions.requiredVars}}
+            {{^isDiscriminator}}
         this.{{name}} = {{name}};
+            {{/isDiscriminator}}
         {{/vendorExtensions.requiredVars}}
     }
     {{/requiredPropertiesInConstructor}}
-
     {{^requiredPropertiesInConstructor}}
     public {{classname}}() {
         {{#parent}}
