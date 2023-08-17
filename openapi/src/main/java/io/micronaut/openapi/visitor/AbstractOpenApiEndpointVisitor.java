@@ -825,7 +825,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         Schema<?> propertySchema = resolveSchema(openAPI, parameter, parameter.getType(), context, Collections.singletonList(mediaType), jsonViewClass, null, null);
         if (propertySchema != null) {
 
-            Optional<String> description = parameter.getValue(io.swagger.v3.oas.annotations.Parameter.class, "description", String.class);
+            Optional<String> description = parameter.stringValue(io.swagger.v3.oas.annotations.Parameter.class, "description");
             description.ifPresent(propertySchema::setDescription);
             processSchemaProperty(context, parameter, parameter.getType(), null, schema, propertySchema);
             if (isNullable(parameter)) {
@@ -871,8 +871,9 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                 newParameter.setExplode(true);
             }
         } else if (parameter.isAnnotationPresent(Header.class)) {
-            String headerName = parameter.getValue(Header.class, "name", String.class).orElse(parameter
-                .getValue(Header.class, String.class).orElseGet(() -> NameUtils.hyphenate(parameterName)));
+            String headerName = parameter.stringValue(Header.class, "name")
+                .orElse(parameter.stringValue(Header.class)
+                    .orElseGet(() -> NameUtils.hyphenate(parameterName)));
             // Header parameter named "Authorization" are ignored. Use the `securitySchemes` and `security` sections instead to define authorization
             // Header parameter named "Content-Type" are ignored. The values for the "Content-Type" header are defined by `request.body.content.<media-type>`
             // Header parameter named "Accept" are ignored. The values for the "Accept" header are defined by `responses.<code>.content.<media-type>`

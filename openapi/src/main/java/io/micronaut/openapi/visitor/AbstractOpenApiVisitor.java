@@ -1225,7 +1225,7 @@ abstract class AbstractOpenApiVisitor {
             topLevelSchema.setDeprecated(true);
             notOnlyRef = true;
         }
-        final String defaultValue = element.getValue(Bindable.class, "defaultValue", String.class).orElse(null);
+        final String defaultValue = element.stringValue(Bindable.class, "defaultValue").orElse(null);
         if (defaultValue != null && schemaToBind.getDefault() == null) {
             setDefaultValueObject(schemaToBind, defaultValue, elementType, schemaToBind.getType(), schemaToBind.getFormat(), true, context);
             notOnlyRef = true;
