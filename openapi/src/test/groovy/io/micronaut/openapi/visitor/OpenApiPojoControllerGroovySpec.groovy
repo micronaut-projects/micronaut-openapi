@@ -167,4 +167,36 @@ class MyBean {}
         traitSchema.enum.get(1) == 'COURAGE'
         traitSchema.enum.get(2) == 'LOYALTY'
     }
+
+    void "test empty default value for Map body type groovy"() {
+        when:
+        buildBeanDefinition("test.MyBean", '''
+package test;
+
+import java.util.Map
+
+import io.micronaut.http.annotation.Body
+import io.micronaut.http.annotation.Controller
+import io.micronaut.http.annotation.Post
+
+@Controller
+class TestController {
+
+    @Post("test1")
+    String test1(@Body Map body) {
+        return null
+    }
+}
+
+@jakarta.inject.Singleton
+public class MyBean {}
+''')
+
+        OpenAPI openAPI = Utils.testReference
+
+        then:
+        openAPI.paths."/test1".post.requestBody.content."application/json".schema.type == 'object'
+        openAPI.paths."/test1".post.requestBody.content."application/json".schema.additionalProperties == true
+        openAPI.paths."/test1".post.requestBody.content."application/json".schema.default == null
+    }
 }
