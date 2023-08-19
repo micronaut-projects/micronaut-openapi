@@ -96,4 +96,12 @@ public interface ContextProperty {
      * Default: true
      */
     String MICRONAUT_INTERNAL_OPENAPI_ENABLED = "micronaut.internal.openapi.enabled";
+    /**
+     * Saved generated files.
+     */
+    String MICRONAUT_INTERNAL_GENERATED_FILE = "micronaut.internal.generated.file";
+    /**
+     * Calculated class output directory path.
+     */
+    String MICRONAUT_INTERNAL_CLASSPATH_OUTPUT = "micronaut.internal.classpath.ouptut";
 }

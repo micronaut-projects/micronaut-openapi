@@ -40,13 +40,14 @@ import io.micronaut.core.io.scan.DefaultClassPathResourceLoader;
 import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.core.util.StringUtils;
 import io.micronaut.inject.visitor.VisitorContext;
+import io.micronaut.openapi.visitor.ContextUtils;
 import io.micronaut.openapi.visitor.Pair;
 import io.micronaut.openapi.visitor.group.OpenApiInfo;
 
-import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_SERVER_CONTEXT_PATH;
 import static io.micronaut.openapi.visitor.ConfigUtils.getConfigProperty;
 import static io.micronaut.openapi.visitor.ConfigUtils.getProjectPath;
 import static io.micronaut.openapi.visitor.FileUtils.resolve;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_SERVER_CONTEXT_PATH;
 
 /**
  * OpenApi view configuration for Swagger-ui, ReDoc and RapiDoc.
@@ -115,11 +116,11 @@ public final class OpenApiViewConfig {
             return Collections.emptyMap();
         }
         return Arrays.stream(specification.split(",")).map(String::strip).filter(s -> !s.isEmpty())
-            .map(s -> s.split("=")).filter(keyValue -> keyValue.length == 2).peek(keyValue -> {
-                keyValue[0] = keyValue[0].strip();
-                keyValue[1] = keyValue[1].strip();
-            }).filter(keyValue -> !keyValue[0].isEmpty() && !keyValue[1].isEmpty())
-            .collect(Collectors.toMap(keyValue -> keyValue[0], keyValue -> keyValue[1]));
+                .map(s -> s.split("=")).filter(keyValue -> keyValue.length == 2).peek(keyValue -> {
+                    keyValue[0] = keyValue[0].strip();
+                    keyValue[1] = keyValue[1].strip();
+                }).filter(keyValue -> !keyValue[0].isEmpty() && !keyValue[1].isEmpty())
+                .collect(Collectors.toMap(keyValue -> keyValue[0], keyValue -> keyValue[1]));
     }
 
     /**
@@ -223,10 +224,11 @@ public final class OpenApiViewConfig {
             Path file = resDir.resolve(themeFileName);
             if (context != null) {
                 context.info("Writing OpenAPI View Resources to destination: " + file);
-                context.getClassesOutputPath().ifPresent(path -> {
+                var classesOutputPath = ContextUtils.getClassesOutputPath(context);
+                if (classesOutputPath != null) {
                     // add relative path for the file, so that the micronaut-graal visitor knows about it
-                    context.addGeneratedResource(path.relativize(file).toString());
-                });
+                    context.addGeneratedResource(classesOutputPath.relativize(file).toString());
+                }
             }
         } catch (Exception e) {
             if (context != null) {
@@ -257,10 +259,11 @@ public final class OpenApiViewConfig {
 
                     if (context != null) {
                         context.info("Writing OpenAPI View Resources to destination: " + file);
-                        context.getClassesOutputPath().ifPresent(path -> {
+                        var classesOutputPath = ContextUtils.getClassesOutputPath(context);
+                        if (classesOutputPath != null) {
                             // add relative path for the file, so that the micronaut-graal visitor knows about it
-                            context.addGeneratedResource(path.relativize(file).toString());
-                        });
+                            context.addGeneratedResource(classesOutputPath.relativize(file).toString());
+                        }
                     }
                 } catch (Exception e) {
                     if (context != null) {
@@ -356,13 +359,14 @@ public final class OpenApiViewConfig {
         Path file = outputDir.resolve(fileName);
         if (context != null) {
             context.info("Writing OpenAPI View to destination: " + file);
-            context.getClassesOutputPath().ifPresent(path -> {
+            var classesOutputPath = ContextUtils.getClassesOutputPath(context);
+            if (classesOutputPath != null) {
                 // add relative path for the file, so that the micronaut-graal visitor knows about it
-                context.addGeneratedResource(path.relativize(file).toString());
-            });
+                context.addGeneratedResource(classesOutputPath.relativize(file).toString());
+            }
         }
         try (BufferedWriter writer = Files.newBufferedWriter(file, StandardCharsets.UTF_8,
-            StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING)
+                StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING)
         ) {
             writer.write(template);
         }

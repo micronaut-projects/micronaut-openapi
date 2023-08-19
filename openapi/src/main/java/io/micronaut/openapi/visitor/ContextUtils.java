@@ -15,14 +15,20 @@
  */
 package io.micronaut.openapi.visitor;
 
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
 import io.micronaut.core.annotation.Internal;
 import io.micronaut.core.type.Argument;
 import io.micronaut.core.type.GenericArgument;
+import io.micronaut.inject.ast.Element;
 import io.micronaut.inject.visitor.VisitorContext;
+import io.micronaut.inject.writer.GeneratedFile;
 import io.micronaut.openapi.visitor.group.GroupProperties;
+
+import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_CLASSPATH_OUTPUT;
+import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_GENERATED_FILE;
 
 /**
  * Convert utilities methods.
@@ -32,10 +38,10 @@ import io.micronaut.openapi.visitor.group.GroupProperties;
 @Internal
 public final class ContextUtils {
 
-    public static final Argument<List<Pair<String, String>>> EXPANDABLE_PROPERTIES_ARGUMENT = new GenericArgument<List<Pair<String, String>>>() { };
-    public static final Argument<Map<String, ConfigUtils.SchemaDecorator>> ARGUMENT_SCHEMA_DECORATORS_MAP = new GenericArgument<Map<String, ConfigUtils.SchemaDecorator>>() { };
-    public static final Argument<Map<String, ConfigUtils.CustomSchema>> ARGUMENT_CUSTOM_SCHEMA_MAP = new GenericArgument<Map<String, ConfigUtils.CustomSchema>>() { };
-    public static final Argument<Map<String, GroupProperties>> ARGUMENT_GROUP_PROPERTIES_MAP = new GenericArgument<Map<String, GroupProperties>>() { };
+    public static final Argument<List<Pair<String, String>>> EXPANDABLE_PROPERTIES_ARGUMENT = new GenericArgument<>() { };
+    public static final Argument<Map<String, ConfigUtils.SchemaDecorator>> ARGUMENT_SCHEMA_DECORATORS_MAP = new GenericArgument<>() { };
+    public static final Argument<Map<String, ConfigUtils.CustomSchema>> ARGUMENT_CUSTOM_SCHEMA_MAP = new GenericArgument<>() { };
+    public static final Argument<Map<String, GroupProperties>> ARGUMENT_GROUP_PROPERTIES_MAP = new GenericArgument<>() { };
 
     private ContextUtils() {
     }
@@ -47,5 +53,52 @@ public final class ContextUtils {
             context.put(Utils.ATTR_VISITED_ELEMENTS, visitedElements);
         }
         return visitedElements;
+    }
+
+    public static Path getClassesOutputPath(VisitorContext context) {
+
+        var outputPath = context.get(MICRONAUT_INTERNAL_CLASSPATH_OUTPUT, Path.class).orElse(null);
+        if (outputPath != null) {
+            return outputPath;
+        }
+        visitMetaInfFile("dummy" + System.nanoTime(), context);
+        return context.get(MICRONAUT_INTERNAL_CLASSPATH_OUTPUT, Path.class).orElse(null);
+    }
+
+    public static GeneratedFile visitMetaInfFile(String path, VisitorContext context) {
+
+        var cachedFile = context.get(MICRONAUT_INTERNAL_GENERATED_FILE + path, GeneratedFile.class).orElse(null);
+        if (cachedFile != null) {
+            return cachedFile;
+        }
+        var generatedFile = context.visitMetaInfFile(path, Element.EMPTY_ELEMENT_ARRAY).orElse(null);
+        if (generatedFile == null) {
+            context.warn("Unable to get " + path + " file.", null);
+            return null;
+        }
+
+        context.put(MICRONAUT_INTERNAL_GENERATED_FILE + path, generatedFile);
+
+        if (!context.contains(MICRONAUT_INTERNAL_CLASSPATH_OUTPUT)) {
+
+            var uri = generatedFile.toURI();
+            // happens in tests 'mem:///CLASS_OUTPUT/META-INF/swagger/swagger.yml'
+            if (uri.getScheme() != null && !uri.getScheme().equals("mem")) {
+                var generatedFilePath = Path.of(uri);
+                var count = 0;
+                for (var i = 0; i < path.length(); i++) {
+                    if (path.charAt(i) == '/') {
+                        generatedFilePath = generatedFilePath.getParent();
+                        count++;
+                    }
+                }
+                // now this is classesOutputDir, parent of META-INF direcory
+                generatedFilePath = generatedFilePath.getParent();
+
+                context.put(MICRONAUT_INTERNAL_CLASSPATH_OUTPUT, generatedFilePath);
+            }
+        }
+
+        return generatedFile;
     }
 }

@@ -74,6 +74,7 @@ import io.micronaut.inject.ast.ElementQuery;
 import io.micronaut.inject.ast.EnumConstantElement;
 import io.micronaut.inject.ast.EnumElement;
 import io.micronaut.inject.ast.FieldElement;
+import io.micronaut.inject.ast.GenericElement;
 import io.micronaut.inject.ast.GenericPlaceholderElement;
 import io.micronaut.inject.ast.MemberElement;
 import io.micronaut.inject.ast.PropertyElement;
@@ -807,6 +808,10 @@ abstract class AbstractOpenApiVisitor {
             isArray = type.isArray();
             isIterable = type.isIterable();
             type = placeholderEl.getResolved().orElse(CollectionUtils.isNotEmpty(placeholderEl.getBounds()) ? placeholderEl.getBounds().get(0) : null);
+        } else if (type instanceof GenericElement genericEl) {
+            isArray = type.isArray();
+            isIterable = type.isIterable();
+            type = genericEl.getResolved().orElse(null);
         }
         Map<String, ClassElement> typeArgs = type != null ? type.getTypeArguments() : null;
 

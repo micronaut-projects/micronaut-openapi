@@ -47,7 +47,6 @@ import io.micronaut.context.env.Environment;
 import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.core.util.StringUtils;
 import io.micronaut.inject.ast.ClassElement;
-import io.micronaut.inject.ast.Element;
 import io.micronaut.inject.ast.ElementModifier;
 import io.micronaut.inject.ast.ElementQuery;
 import io.micronaut.inject.ast.MethodElement;
@@ -312,38 +311,38 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         };
     }
 
-    private Optional<Path> getDefaultFilePath(String fileName, VisitorContext context) {
+    private Path getDefaultFilePath(String fileName, VisitorContext context) {
         // default location
-        Optional<GeneratedFile> generatedFile = context.visitMetaInfFile("swagger/" + fileName, Element.EMPTY_ELEMENT_ARRAY);
-        if (generatedFile.isPresent()) {
-            URI uri = generatedFile.get().toURI();
+        GeneratedFile generatedFile = ContextUtils.visitMetaInfFile("swagger/" + fileName, context);
+        if (generatedFile != null) {
+            URI uri = generatedFile.toURI();
             // happens in tests 'mem:///CLASS_OUTPUT/META-INF/swagger/swagger.yml'
             if (uri.getScheme() != null && !uri.getScheme().equals("mem")) {
                 Path specPath = Paths.get(uri);
                 createDirectories(specPath, context);
-                return Optional.of(specPath);
+                return specPath;
             }
         }
         context.warn("Unable to get swagger/" + fileName + " file.", null);
-        return Optional.empty();
+        return null;
     }
 
-    private Optional<Path> openApiSpecFile(String fileName, VisitorContext context) {
-        Optional<Path> path = userDefinedSpecFile(context);
-        if (path.isPresent()) {
+    private Path openApiSpecFile(String fileName, VisitorContext context) {
+        Path path = userDefinedSpecFile(context);
+        if (path != null) {
             return path;
         }
         return getDefaultFilePath(fileName, context);
     }
 
-    private Optional<Path> userDefinedSpecFile(VisitorContext context) {
+    private Path userDefinedSpecFile(VisitorContext context) {
         String targetFile = getConfigProperty(MICRONAUT_OPENAPI_TARGET_FILE, context);
         if (StringUtils.isEmpty(targetFile)) {
-            return Optional.empty();
+            return null;
         }
         Path specFile = resolve(context, Paths.get(targetFile));
         createDirectories(specFile, context);
-        return Optional.of(specFile);
+        return specFile;
     }
 
     private Path getViewsDestDir(Path defaultSwaggerFilePath, VisitorContext context) {
@@ -1167,8 +1166,8 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         Path viewsDestDirs = null;
 
         for (OpenApiInfo openApiInfo : openApiInfos.values()) {
-            Optional<Path> specFile = openApiSpecFile(openApiInfo.getFilename(), context);
-            try (Writer writer = getFileWriter(specFile.orElse(null))) {
+            Path specFile = openApiSpecFile(openApiInfo.getFilename(), context);
+            try (Writer writer = getFileWriter(specFile)) {
                 (isYaml ? ConvertUtils.getYamlMapper() : ConvertUtils.getJsonMapper()).writeValue(writer, openApiInfo.getOpenApi());
                 if (Utils.isTestMode()) {
                     Utils.setTestFileName(openApiInfo.getFilename());
@@ -1179,22 +1178,23 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                     }
                 } else {
                     @SuppressWarnings("OptionalGetWithoutIsPresent")
-                    Path specPath = specFile.get();
+                    Path specPath = specFile;
                     context.info("Writing OpenAPI file to destination: " + specPath);
-                    viewsDestDirs = getViewsDestDir(getDefaultFilePath(openApiInfo.getFilename(), context).get(), context);
+                    viewsDestDirs = getViewsDestDir(getDefaultFilePath(openApiInfo.getFilename(), context), context);
                     context.info("Writing OpenAPI views to destination: " + viewsDestDirs);
                     final Path viewsDestDirsFinal = viewsDestDirs;
-                    context.getClassesOutputPath().ifPresent(path -> {
+                    var classesOutputPath = ContextUtils.getClassesOutputPath(context);
+                    if (classesOutputPath != null) {
                         // add relative paths for the specPath, and its parent META-INF/swagger
                         // so that micronaut-graal visitor knows about them
-                        context.addGeneratedResource(path.relativize(specPath).toString());
-                        context.addGeneratedResource(path.relativize(specPath.getParent()).toString());
-                        context.addGeneratedResource(path.relativize(viewsDestDirsFinal).toString());
-                    });
+                        context.addGeneratedResource(classesOutputPath.relativize(specPath).toString());
+                        context.addGeneratedResource(classesOutputPath.relativize(specPath.getParent()).toString());
+                        context.addGeneratedResource(classesOutputPath.relativize(viewsDestDirsFinal).toString());
+                    }
                     openApiInfo.setSpecFilePath(specPath.getFileName().toString());
                 }
             } catch (Exception e) {
-                context.warn("Unable to generate swagger" + (isYaml ? EXT_YML : EXT_JSON) + ": " + specFile.orElse(null) + " - " + e.getMessage() + ".\n" + Utils.printStackTrace(e), classElement);
+                context.warn("Unable to generate swagger" + (isYaml ? EXT_YML : EXT_JSON) + ": " + specFile + " - " + e.getMessage() + ".\n" + Utils.printStackTrace(e), classElement);
             }
         }
         if (!Utils.isTestMode() && viewsDestDirs != null) {
