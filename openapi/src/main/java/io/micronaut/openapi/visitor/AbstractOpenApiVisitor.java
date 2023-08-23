@@ -1246,7 +1246,7 @@ abstract class AbstractOpenApiVisitor {
         boolean addSchemaToBind = !SchemaUtils.isEmptySchema(schemaToBind);
 
         if (addSchemaToBind) {
-            if (TYPE_OBJECT.equals(originalSchema.getType())) {
+            if (TYPE_OBJECT.equals(originalSchema.getType()) && !(originalSchema instanceof MapSchema)) {
                 if (composedSchema.getType() == null) {
                     composedSchema.setType(TYPE_OBJECT);
                 }
@@ -1259,7 +1259,7 @@ abstract class AbstractOpenApiVisitor {
             composedSchema.addAllOfItem(originalSchema);
         }
         if (addSchemaToBind && !schemaToBind.equals(originalSchema)) {
-            if (TYPE_OBJECT.equals(schemaToBind.getType())) {
+            if (TYPE_OBJECT.equals(schemaToBind.getType()) && !(originalSchema instanceof MapSchema)) {
                 if (composedSchema.getType() == null) {
                     composedSchema.setType(TYPE_OBJECT);
                 }
