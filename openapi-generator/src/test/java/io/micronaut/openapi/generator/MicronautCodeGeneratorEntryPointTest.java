@@ -26,6 +26,11 @@ class MicronautCodeGeneratorEntryPointTest {
         private String value;
 
         @Override
+        public boolean isServer() {
+            return false;
+        }
+
+        @Override
         public TestBuilder optionsBuilder() {
             return new TestBuilder() {
                 @Override

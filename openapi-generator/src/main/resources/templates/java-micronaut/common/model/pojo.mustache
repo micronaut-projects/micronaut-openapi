@@ -38,7 +38,9 @@
 public class {{classname}} {{#parent}}extends {{{parent}}} {{/parent}}{{#vendorExtensions.x-implements}}{{#-first}}implements {{{.}}}{{/-first}}{{^-first}}, {{{.}}}{{/-first}}{{#-last}} {{/-last}}{{/vendorExtensions.x-implements}}{
 {{/formatNoEmptyLines}}
     {{#serializableModel}}
-    private static final long serialVersionUID = 1L;
+
+    @Serial
+    private static final long serialVersionUID = {{{vendorExtensions.serialId}}}L;
     {{/serializableModel}}
 
     {{#vars}}
@@ -113,13 +115,20 @@ public class {{classname}} {{#parent}}extends {{{parent}}} {{/parent}}{{#vendorE
     {{/vars}}
 
     {{#requiredPropertiesInConstructor}}
-    public {{classname}}({{#vendorExtensions.requiredVarsWithoutDiscriminator}}{{{datatypeWithEnum}}} {{name}}{{^-last}}, {{/-last}}{{/vendorExtensions.requiredVarsWithoutDiscriminator}}{{#vendorExtensions.areRequiredVarsAndReadOnlyVars}}, {{/vendorExtensions.areRequiredVarsAndReadOnlyVars}}{{#readOnlyVars}}{{{datatypeWithEnum}}} {{name}}{{^-last}}, {{/-last}}{{/readOnlyVars}}) {
+    public {{classname}}({{#vendorExtensions.requiredVarsWithoutDiscriminator}}{{#isReadOnly}}{{#vendorExtensions.isServer}}{{^-first}}, {{/-first}}{{{datatypeWithEnum}}} {{name}}{{/vendorExtensions.isServer}}{{/isReadOnly}}{{^isReadOnly}}{{^-first}}, {{/-first}}{{{datatypeWithEnum}}} {{name}}{{/isReadOnly}}{{/vendorExtensions.requiredVarsWithoutDiscriminator}}) {
         {{#parent}}
         super({{#vendorExtensions.requiredParentVarsWithoutDiscriminator}}{{name}}{{^-last}}, {{/-last}}{{/vendorExtensions.requiredParentVarsWithoutDiscriminator}});
         {{/parent}}
         {{#vendorExtensions.requiredVars}}
             {{^isDiscriminator}}
+                {{#isReadOnly}}
+                    {{#vendorExtensions.isServer}}
         this.{{name}} = {{name}};
+                    {{/vendorExtensions.isServer}}
+                {{/isReadOnly}}
+                {{^isReadOnly}}
+        this.{{name}} = {{name}};
+                {{/isReadOnly}}
             {{/isDiscriminator}}
         {{/vendorExtensions.requiredVars}}
     }
@@ -185,7 +194,7 @@ public class {{classname}} {{#parent}}extends {{{parent}}} {{/parent}}{{#vendorE
         {{#vendorExtensions.x-setter-extra-annotation}}
     {{{vendorExtensions.x-setter-extra-annotation}}}
         {{/vendorExtensions.x-setter-extra-annotation}}
-    {{^isReadOnly}}public {{/isReadOnly}}{{#isReadOnly}}{{^micronaut_serde_jersey}}private {{/micronaut_serde_jersey}}{{/isReadOnly}}void {{setter}}({{{datatypeWithEnum}}} {{name}}) {
+    public void {{setter}}({{{datatypeWithEnum}}} {{name}}) {
             {{#vendorExtensions.x-is-jackson-optional-nullable}}
         this.{{name}} = JsonNullable.<{{{datatypeWithEnum}}}>of({{name}});
             {{/vendorExtensions.x-is-jackson-optional-nullable}}
@@ -205,7 +214,7 @@ public class {{classname}} {{#parent}}extends {{{parent}}} {{/parent}}{{#vendorE
     }
 
     @JsonProperty(JSON_PROPERTY_{{nameInSnakeCase}})
-    {{#isReadOnly}}private{{/isReadOnly}}{{^isReadOnly}}public{{/isReadOnly}} void {{setter}}_JsonNullable(JsonNullable<{{{datatypeWithEnum}}}> {{name}}) {
+    public void {{setter}}_JsonNullable(JsonNullable<{{{datatypeWithEnum}}}> {{name}}) {
     {{! For getters/setters that have name differing from attribute name, we must include setter (albeit private) for jackson to be able to set the attribute}}       this.{{name}} = {{name}};
     }
         {{/vendorExtensions.x-is-jackson-optional-nullable}}

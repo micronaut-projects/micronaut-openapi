@@ -8,6 +8,21 @@
     {{/generateHardNullable}}
 {{/isNullable}}
 {{^isNullable}}
+    {{#required}}
+        {{#isReadOnly}}
+            {{#vendorExtensions.isServer}}
+                {{#generateHardNullable}}
+    @HardNullable
+                {{/generateHardNullable}}
+                {{^generateHardNullable}}
+    @Nullable
+                {{/generateHardNullable}}
+            {{/vendorExtensions.isServer}}
+            {{^vendorExtensions.isServer}}
+    @Nullable
+            {{/vendorExtensions.isServer}}
+        {{/isReadOnly}}
+    {{/required}}
     {{^required}}
         {{#generateHardNullable}}
     @HardNullable
@@ -21,7 +36,9 @@
 {{#useBeanValidation}}
     {{^isNullable}}
         {{#required}}
+            {{^isReadOnly}}
     @NotNull
+            {{/isReadOnly}}
         {{/required}}
     {{/isNullable}}
     {{!Validate all pojos and enums}}
