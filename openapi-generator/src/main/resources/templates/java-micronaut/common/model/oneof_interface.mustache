@@ -2,7 +2,9 @@
 {{#additionalOneOfTypeAnnotations}}
 {{{.}}}
 {{/additionalOneOfTypeAnnotations}}
+{{#withGeneratedAnnotation}}
 {{>common/generatedAnnotation}}
+{{/withGeneratedAnnotation}}
 {{>common/model/typeInfoAnnotation}}
 {{>common/model/xmlAnnotation}}
 public interface {{classname}} {{#vendorExtensions.x-implements}}{{#-first}}extends {{{.}}}{{/-first}}{{^-first}}, {{{.}}}{{/-first}}{{/vendorExtensions.x-implements}} {

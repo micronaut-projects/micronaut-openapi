@@ -1,6 +1,5 @@
 {{>common/licenseInfo}}
 package {{apiPackage}};
-
 {{#formatNoEmptyLines}}
 import io.micronaut.http.annotation.*;
 {{^generateHardNullable}}
@@ -50,7 +49,9 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 {{/formatNoEmptyLines}}
 
 {{#formatOneEmptyLine}}
+{{#withGeneratedAnnotation}}
 {{>common/generatedAnnotation}}
+{{/withGeneratedAnnotation}}
 {{^generateControllerAsAbstract}}
 @Controller
 {{/generateControllerAsAbstract}}
@@ -64,21 +65,19 @@ public interface {{classname}} {
         {{#formatNoEmptyLines}}
 {{>common/operationAnnotations}}
     @{{#lambda.pascalcase}}{{#lambda.lowercase}}{{httpMethod}}{{/lambda.lowercase}}{{/lambda.pascalcase}}("{{{path}}}")
-    @Produces({{openbrace}}{{#produces}}"{{{mediaType}}}"{{^-last}}, {{/-last}}{{/produces}}{{closebrace}})
-    {{#consumes.0}}
-    @Consumes({{openbrace}}{{#consumes}}"{{{mediaType}}}"{{^-last}}, {{/-last}}{{/consumes}}{{closebrace}})
-    {{/consumes.0}}
+    {{^vendorExtensions.onlyDefaultProduceOrEmpty}}
+    @Produces({{#produces.1}}{{openbrace}}{{/produces.1}}{{#produces}}"{{{mediaType}}}"{{^-last}}, {{/-last}}{{/produces}}{{#produces.1}}{{closebrace}}{{/produces.1}})
+    {{/vendorExtensions.onlyDefaultProduceOrEmpty}}
+    {{^vendorExtensions.onlyDefaultConsumeOrEmpty}}
+    @Consumes({{#consumes.1}}{{openbrace}}{{/consumes.1}}{{#consumes}}"{{{mediaType}}}"{{^-last}}, {{/-last}}{{/consumes}}{{#consumes.1}}{{closebrace}}{{/consumes.1}})
+    {{/vendorExtensions.onlyDefaultConsumeOrEmpty}}
     {{!security annotations}}
     {{#useAuth}}
-    @Secured({{openbrace}}{{#vendorExtensions.x-roles}}{{{.}}}{{^-last}}, {{/-last}}{{/vendorExtensions.x-roles}}{{closebrace}})
+    @Secured({{#vendorExtensions.x-roles.1}}{{openbrace}}{{/vendorExtensions.x-roles.1}}{{#vendorExtensions.x-roles}}{{{.}}}{{^-last}}, {{/-last}}{{/vendorExtensions.x-roles}}{{#vendorExtensions.x-roles.1}}{{closebrace}}{{/vendorExtensions.x-roles.1}})
     {{/useAuth}}
     {{!the method definition}}
     {{^returnType}}void{{/returnType}}{{#returnType}}{{{returnType}}}{{/returnType}} {{nickname}}({{#allParams}}
-        {{#indent}}
-            {{>common/params/validation}}
-        {{/indent}}
-        {{>server/params/annotations}}
-        {{#formatSingleLine}}{{>server/params/type}} {{paramName}}{{^-last}},{{/-last}}{{/formatSingleLine}}
+        {{#formatSingleLine}}{{>server/params/annotations}}{{#indent}}{{>common/params/validation}}{{/indent}}{{>server/params/type}} {{paramName}}{{^-last}},{{/-last}}{{/formatSingleLine}}
     {{/allParams}});
         {{/formatNoEmptyLines}}
 

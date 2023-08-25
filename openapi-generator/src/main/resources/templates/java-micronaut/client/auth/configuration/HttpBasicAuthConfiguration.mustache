@@ -7,11 +7,21 @@ import io.micronaut.context.annotation.Parameter;
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.http.MutableHttpRequest;
 import {{javaxPackage}}.annotation.Generated;
+{{#lombok}}
+import lombok.Getter;
+import lombok.Setter;
+{{/lombok}}
 
-
+{{#withGeneratedAnnotation}}
 {{>common/generatedAnnotation}}
+{{/withGeneratedAnnotation}}
+{{#lombok}}
+@Getter
+@Setter
+{{/lombok}}
 @EachProperty("security.basic-auth")
 public class HttpBasicAuthConfiguration implements ConfigurableAuthorization {
+
     private final String name;
     private String username;
     private String password;
@@ -31,6 +41,7 @@ public class HttpBasicAuthConfiguration implements ConfigurableAuthorization {
     public void applyAuthorization(@NonNull MutableHttpRequest<?> request) {
         request.basicAuth(username, password);
     }
+{{^lombok}}
 
     @Override
     public String getName() {
@@ -52,4 +63,5 @@ public class HttpBasicAuthConfiguration implements ConfigurableAuthorization {
     public void setPassword(String password) {
         this.password = password;
     }
+{{/lombok}}
 }

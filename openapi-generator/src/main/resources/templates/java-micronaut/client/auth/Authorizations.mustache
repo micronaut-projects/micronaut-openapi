@@ -10,7 +10,9 @@ import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import {{javaxPackage}}.annotation.Generated;
 
+{{#withGeneratedAnnotation}}
 {{>common/generatedAnnotation}}
+{{/withGeneratedAnnotation}}
 @Documented
 @Retention(RUNTIME)
 @Target(METHOD)

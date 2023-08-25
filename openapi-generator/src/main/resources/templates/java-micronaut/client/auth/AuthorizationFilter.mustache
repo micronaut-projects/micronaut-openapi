@@ -19,11 +19,15 @@ import io.micronaut.security.oauth2.client.clientcredentials.ClientCredentialsCo
 import io.micronaut.security.oauth2.client.clientcredentials.propagation.ClientCredentialsHttpClientFilter;
 import io.micronaut.security.oauth2.client.clientcredentials.propagation.ClientCredentialsTokenPropagator;
 import io.micronaut.security.oauth2.configuration.OauthClientConfiguration;
-import io.micronaut.security.oauth2.endpoint.token.response.TokenResponse;
 import {{invokerPackage}}.auth.configuration.ConfigurableAuthorization;
 import org.reactivestreams.Publisher;
+{{#lombok}}
+import lombok.extern.slf4j.Slf4j;
+{{/lombok}}
+{{^lombok}}
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+{{/lombok}}
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -35,13 +39,19 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import {{javaxPackage}}.annotation.Generated;
 
-
+{{#withGeneratedAnnotation}}
 {{>common/generatedAnnotation}}
+{{/withGeneratedAnnotation}}
+{{#lombok}}
+@Slf4j
+{{/lombok}}
 @Filter({{#configureAuthFilterPattern}}"{{authorizationFilterPattern}}"{{/configureAuthFilterPattern}}{{^configureAuthFilterPattern}}Filter.MATCH_ALL_PATTERN{{/configureAuthFilterPattern}})
 public class AuthorizationFilter implements HttpClientFilter {
+{{^lombok}}
 
     private static final Logger log = LoggerFactory.getLogger(ClientCredentialsHttpClientFilter.class);
 
+{{/lombok}}
     private final BeanContext beanContext;
     private final Map<String, OauthClientConfiguration> clientConfigurationByName;
 
@@ -58,13 +68,13 @@ public class AuthorizationFilter implements HttpClientFilter {
             Stream<ConfigurableAuthorization> configurableAuthorizations
     ) {
         this.beanContext = beanContext;
-        this.clientConfigurationByName = clientConfigurations
+        this.defaultTokenPropagator = defaultTokenPropagator;
+        clientConfigurationByName = clientConfigurations
                 .filter(Toggleable::isEnabled)
                 .collect(Collectors.toMap(OauthClientConfiguration::getName, v -> v));
-        this.defaultTokenPropagator = defaultTokenPropagator;
-        this.tokenPropagatorByName = new HashMap<>();
-        this.clientCredentialsClientByName = new HashMap<>();
-        this.authorizationsByName = configurableAuthorizations
+        tokenPropagatorByName = new HashMap<>();
+        clientCredentialsClientByName = new HashMap<>();
+        authorizationsByName = configurableAuthorizations
                 .collect(Collectors.toMap(ConfigurableAuthorization::getName, v -> v));
     }
 
@@ -75,13 +85,12 @@ public class AuthorizationFilter implements HttpClientFilter {
     ) {
         List<?> names = request.getAttribute(AuthorizationBinder.AUTHORIZATION_NAMES, List.class).orElse(null);
         if (CollectionUtils.isNotEmpty(names)) {
-            List<Publisher<HttpRequest>> authorizers = new ArrayList<>(names.size());
+            var authorizers = new ArrayList<Publisher<HttpRequest<?>>>(names.size());
 
             for (Object nameObject : names) {
-                if (!(nameObject instanceof String)) {
+                if (!(nameObject instanceof String name)) {
                     continue;
                 }
-                String name = (String) nameObject;
 
                 // Check if other authorizations have the key
                 if (authorizationsByName.containsKey(name)) {
@@ -106,10 +115,10 @@ public class AuthorizationFilter implements HttpClientFilter {
                 }
 
                 ClientCredentialsTokenPropagator tokenHandler = getTokenPropagator(name);
-                Flux<HttpRequest> authorizer = Flux.from(clientCredentialsClient
+                Flux<HttpRequest<?>> authorizer = Flux.from(clientCredentialsClient
                         .requestToken(getScope(clientConfiguration)))
-                        .map(TokenResponse::getAccessToken)
-                        .map(accessToken -> {
+                        .map(tokenResponse -> {
+                            var accessToken = tokenResponse.getAccessToken();
                             if (StringUtils.isNotEmpty(accessToken)) {
                                 tokenHandler.writeToken(request, accessToken);
                             }
@@ -121,7 +130,6 @@ public class AuthorizationFilter implements HttpClientFilter {
             return Flux.concat(authorizers)
                     .switchMap(v -> chain.proceed(request));
         }
-
 
         return chain.proceed(request);
     }
@@ -151,6 +159,8 @@ public class AuthorizationFilter implements HttpClientFilter {
 
     @Nullable
     protected String getScope(@NonNull OauthClientConfiguration oauthClient) {
-        return oauthClient.getClientCredentials().flatMap(ClientCredentialsConfiguration::getScope).orElse(null);
+        return oauthClient.getClientCredentials()
+                .flatMap(ClientCredentialsConfiguration::getScope)
+                .orElse(null);
     }
 }

@@ -15,12 +15,6 @@
  */
 package io.micronaut.openapi.generator;
 
-import io.swagger.parser.OpenAPIParser;
-import io.swagger.v3.parser.core.models.ParseOptions;
-import org.openapitools.codegen.ClientOptInput;
-import org.openapitools.codegen.CodegenConstants;
-import org.openapitools.codegen.DefaultGenerator;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -29,6 +23,13 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
+
+import io.swagger.parser.OpenAPIParser;
+import io.swagger.v3.parser.core.models.ParseOptions;
+
+import org.openapitools.codegen.ClientOptInput;
+import org.openapitools.codegen.CodegenConstants;
+import org.openapitools.codegen.DefaultGenerator;
 
 /**
  * Main entry point for Micronaut OpenAPI code generation.
@@ -146,6 +147,8 @@ public final class MicronautCodeGeneratorEntryPoint {
             serverCodegen.setGenerateOperationsToReturnNotImplemented(serverOptions.generateOperationsToReturnNotImplemented());
             serverCodegen.setGenerateControllerFromExamples(serverOptions.generateControllerFromExamples());
             serverCodegen.setUseAuth(serverOptions.useAuth());
+            serverCodegen.setLombok(serverOptions.lombok());
+            serverCodegen.setGeneratedAnnotation(serverOptions.generatedAnnotation());
         }
     }
 
@@ -164,6 +167,8 @@ public final class MicronautCodeGeneratorEntryPoint {
                 clientCodegen.setBasePathSeparator(clientCodegen.basePathSeparator);
             }
             clientCodegen.setConfigureAuthorization(clientOptions.useAuth());
+            clientCodegen.setLombok(clientOptions.lombok());
+            clientCodegen.setGeneratedAnnotation(clientOptions.generatedAnnotation());
         }
     }
 
@@ -402,6 +407,7 @@ public final class MicronautCodeGeneratorEntryPoint {
      * by this generator.
      */
     public enum TestFramework {
+
         JUNIT5(AbstractMicronautJavaCodegen.OPT_TEST_JUNIT),
         SPOCK(AbstractMicronautJavaCodegen.OPT_TEST_SPOCK);
 

@@ -15,14 +15,14 @@
  */
 package io.micronaut.openapi.generator;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.openapitools.codegen.CliOption;
 import org.openapitools.codegen.CodegenType;
 import org.openapitools.codegen.SupportingFile;
 import org.openapitools.codegen.meta.GeneratorMetadata;
 import org.openapitools.codegen.meta.Stability;
-
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * The generator for creating Micronaut clients.
@@ -49,7 +49,6 @@ public class JavaMicronautClientCodegen extends AbstractMicronautJavaCodegen<Jav
     JavaMicronautClientCodegen() {
 
         title = "OpenAPI Micronaut Client";
-        configureAuthorization = false;
 
         generatorMetadata = GeneratorMetadata.newBuilder(generatorMetadata)
             .stability(Stability.BETA)
@@ -196,11 +195,14 @@ public class JavaMicronautClientCodegen extends AbstractMicronautJavaCodegen<Jav
     }
 
     static class DefaultClientOptionsBuilder implements JavaMicronautClientOptionsBuilder {
+
         private List<String> additionalClientTypeAnnotations;
         private String authorizationFilterPattern;
         private String basePathSeparator;
         private String clientId;
         private boolean useAuth;
+        private boolean lombok;
+        private boolean generatedAnnotation = true;
 
         @Override
         public JavaMicronautClientOptionsBuilder withAuthorization(boolean useAuth) {
@@ -232,13 +234,28 @@ public class JavaMicronautClientCodegen extends AbstractMicronautJavaCodegen<Jav
             return this;
         }
 
+        @Override
+        public JavaMicronautClientOptionsBuilder withLombok(boolean lombok) {
+            this.lombok = lombok;
+            return this;
+        }
+
+        @Override
+        public JavaMicronautClientOptionsBuilder withGeneratedAnnotation(boolean generatedAnnotation) {
+            this.generatedAnnotation = generatedAnnotation;
+            return this;
+        }
+
         ClientOptions build() {
             return new ClientOptions(
                 additionalClientTypeAnnotations,
                 authorizationFilterPattern,
                 basePathSeparator,
                 clientId,
-                useAuth);
+                useAuth,
+                lombok,
+                generatedAnnotation
+            );
         }
     }
 
@@ -247,7 +264,9 @@ public class JavaMicronautClientCodegen extends AbstractMicronautJavaCodegen<Jav
         String authorizationFilterPattern,
         String basePathSeparator,
         String clientId,
-        boolean useAuth
+        boolean useAuth,
+        boolean lombok,
+        boolean generatedAnnotation
     ) {
     }
 }

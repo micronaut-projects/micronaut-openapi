@@ -69,6 +69,8 @@ paths:
       responses:
         '200':
           description: success
+        '404':
+          description: error
   /book/createEntry:
     post:
       tags: [books]
@@ -138,7 +140,7 @@ components:
       default:
         name: "Bob's Adventures"
         availability: "available"
-    BookAvailability: 
+    BookAvailability:
       type: string
       enum: ["available", "not available", "reserved"]
       default: "not available"

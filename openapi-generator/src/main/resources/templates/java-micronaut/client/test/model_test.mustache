@@ -10,7 +10,8 @@ import org.junit.jupiter.api.Assertions;
  * Model tests for {{classname}}
  */
 @MicronautTest
-public class {{classname}}Test {
+class {{classname}}Test {
+
     {{#models}}
     {{#model}}
     {{^vendorExtensions.x-is-one-of-interface}}
@@ -22,7 +23,7 @@ public class {{classname}}Test {
      * Model tests for {{classname}}
      */
     @Test
-    public void test{{classname}}() {
+    void test{{classname}}() {
         // TODO: test {{classname}}
     }
 
@@ -31,7 +32,7 @@ public class {{classname}}Test {
      * Test the property '{{name}}'
      */
     @Test
-    public void {{name}}Test() {
+    void {{name}}Test() {
         // TODO: test {{name}}
     }
 

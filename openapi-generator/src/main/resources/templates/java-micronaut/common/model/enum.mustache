@@ -5,6 +5,10 @@
 @XmlType(name="{{datatypeWithEnum}}")
 @XmlEnum({{dataType}}.class)
 {{/withXml}}
+{{#lombok}}
+@RequiredArgsConstructor
+@Getter(onMethod = @__(@JsonValue))
+{{/lombok}}
 {{#micronaut_serde_jackson}}
 @Serdeable
 {{/micronaut_serde_jackson}}
@@ -28,6 +32,7 @@
     {{/allowableValues}}
 
     private final {{{dataType}}} value;
+{{^lombok}}
 
     {{#formatSingleLine}}{{>common/model/enumName}}{{/formatSingleLine}}({{{dataType}}} value) {
         this.value = value;
@@ -42,18 +47,20 @@
     public {{{dataType}}} getValue() {
         return value;
     }
+{{/lombok}}
 
     @Override
     public String toString() {
         return String.valueOf(value);
     }
 
-    {{#formatSingleLine}}private final static Map<{{{dataType}}}, {{>common/model/enumName}}> VALUE_MAPPING = Arrays.stream(values()){{/formatSingleLine}}
-        .collect(Collectors.toMap(v -> v.getValue(){{#isString}}{{#useEnumCaseInsensitive}}.toLowerCase(){{/useEnumCaseInsensitive}}{{/isString}}, v -> v));
+    {{#formatSingleLine}}public final static Map<{{{dataType}}}, {{>common/model/enumName}}> VALUE_MAPPING = Map.copyOf(Arrays.stream(values()){{/formatSingleLine}}
+        .collect(Collectors.toMap(v -> v.value{{#isString}}{{#useEnumCaseInsensitive}}.toLowerCase(){{/useEnumCaseInsensitive}}{{/isString}}, v -> v)));
 
     /**
      * Create this enum from a value.
-     * @return The enum.
+     *
+     * @return The enum
      */
     {{#jackson}}
     @JsonCreator

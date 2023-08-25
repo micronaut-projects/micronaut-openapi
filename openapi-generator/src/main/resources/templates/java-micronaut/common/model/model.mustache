@@ -19,6 +19,16 @@ import {{import}};
 import java.io.Serial;
 import java.io.Serializable;
 {{/serializableModel}}
+{{#lombok}}
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+import lombok.experimental.Accessors;
+{{/lombok}}
 {{#jackson}}
 import com.fasterxml.jackson.annotation.*;
 {{/jackson}}
@@ -46,7 +56,9 @@ import io.micronaut.core.annotation.Nullable;
 {{#generateHardNullable}}
 import {{{invokerPackage}}}.annotation.HardNullable;
 {{/generateHardNullable}}
+{{#withGeneratedAnnotation}}
 import {{javaxPackage}}.annotation.Generated;
+{{/withGeneratedAnnotation}}
 {{#generateSwagger1Annotations}}
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;

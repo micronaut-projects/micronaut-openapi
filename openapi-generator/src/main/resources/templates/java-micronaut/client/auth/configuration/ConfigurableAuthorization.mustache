@@ -5,9 +5,11 @@ import io.micronaut.core.annotation.NonNull;
 import io.micronaut.http.MutableHttpRequest;
 import {{javaxPackage}}.annotation.Generated;
 
-
+{{#withGeneratedAnnotation}}
 {{>common/generatedAnnotation}}
+{{/withGeneratedAnnotation}}
 public interface ConfigurableAuthorization {
+
     String getName();
 
     void applyAuthorization(@NonNull MutableHttpRequest<?> request);

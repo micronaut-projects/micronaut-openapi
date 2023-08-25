@@ -21,22 +21,21 @@ import java.util.HashSet;
  * API tests for {{classname}}
  */
 @MicronautTest
-public class {{classname}}Test {
+class {{classname}}Test {
 
     @Inject
     {{classname}} api;
-
     {{#operations}}{{#operation}}
     /**
      * {{summary}}
      {{#notes}}
-     *
+     * <p>
      * {{notes}}
      {{/notes}}
      */
     @Test
     @Disabled("Not Implemented")
-    public void {{operationId}}Test() {
+    void {{operationId}}Test() {
         // given
         {{#allParams}}
         {{{dataType}}} {{paramName}} = {{{example}}};
@@ -54,6 +53,5 @@ public class {{classname}}Test {
         // then
         // TODO implement the {{operationId}}Test()
     }
-
     {{/operation}}{{/operations}}
 }

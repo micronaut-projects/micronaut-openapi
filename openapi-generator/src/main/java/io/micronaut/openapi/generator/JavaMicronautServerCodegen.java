@@ -15,17 +15,22 @@
  */
 package io.micronaut.openapi.generator;
 
-import org.openapitools.codegen.*;
+import java.io.File;
+import java.util.Collections;
+import java.util.List;
+
+import org.openapitools.codegen.CliOption;
+import org.openapitools.codegen.CodegenConstants;
+import org.openapitools.codegen.CodegenOperation;
+import org.openapitools.codegen.CodegenParameter;
+import org.openapitools.codegen.CodegenType;
+import org.openapitools.codegen.SupportingFile;
 import org.openapitools.codegen.meta.GeneratorMetadata;
 import org.openapitools.codegen.meta.Stability;
 import org.openapitools.codegen.model.ModelMap;
 import org.openapitools.codegen.model.OperationMap;
 import org.openapitools.codegen.model.OperationsMap;
 import org.openapitools.codegen.utils.StringUtils;
-
-import java.io.File;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * The generator for creating Micronaut servers.
@@ -39,6 +44,7 @@ public class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen<Jav
     public static final String OPT_GENERATE_OPERATIONS_TO_RETURN_NOT_IMPLEMENTED = "generateOperationsToReturnNotImplemented";
     public static final String OPT_GENERATE_HARD_NULLABLE = "generateHardNullable";
     public static final String OPT_GENERATE_STREAMING_FILE_UPLOAD = "generateStreamingFileUpload";
+    public static final String OPT_AOT = "aot";
 
     public static final String EXTENSION_ROLES = "x-roles";
     public static final String ANONYMOUS_ROLE_KEY = "isAnonymous()";
@@ -63,6 +69,7 @@ public class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen<Jav
     protected boolean useAuth = true;
     protected boolean generateHardNullable = true;
     protected boolean generateStreamingFileUpload;
+    protected boolean aot;
 
     JavaMicronautServerCodegen() {
 
@@ -71,24 +78,25 @@ public class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen<Jav
         apiDocPath = "docs/controllers";
 
         generatorMetadata = GeneratorMetadata.newBuilder(generatorMetadata)
-                .stability(Stability.BETA)
-                .build();
+            .stability(Stability.BETA)
+            .build();
         additionalProperties.put("server", "true");
 
         cliOptions.add(new CliOption(OPT_CONTROLLER_PACKAGE, "The package in which api implementations (controllers) will be generated.").defaultValue(apiPackage));
         cliOptions.add(CliOption.newBoolean(OPT_GENERATE_CONTROLLER_FROM_EXAMPLES,
-                "Generate the implementation of controller and tests from parameter and return examples that will verify that the api works as desired (for testing).",
-                generateControllerFromExamples));
+            "Generate the implementation of controller and tests from parameter and return examples that will verify that the api works as desired (for testing).",
+            generateControllerFromExamples));
         cliOptions.add(CliOption.newBoolean(OPT_GENERATE_IMPLEMENTATION_FILES,
-                "Whether to generate controller implementations that need to be filled in.",
+            "Whether to generate controller implementations that need to be filled in.",
             generateImplementationFiles));
         cliOptions.add(CliOption.newBoolean(OPT_GENERATE_OPERATIONS_TO_RETURN_NOT_IMPLEMENTED,
-                "Return HTTP 501 Not Implemented instead of an empty response in the generated controller methods.",
-                generateOperationsToReturnNotImplemented));
+            "Return HTTP 501 Not Implemented instead of an empty response in the generated controller methods.",
+            generateOperationsToReturnNotImplemented));
 
         cliOptions.add(CliOption.newBoolean(OPT_USE_AUTH, "Whether to import authorization and to annotate controller methods accordingly", useAuth));
         cliOptions.add(CliOption.newBoolean(OPT_GENERATE_HARD_NULLABLE, "Whether to generate and use an inherited nullable annotation", generateHardNullable));
         cliOptions.add(CliOption.newBoolean(OPT_GENERATE_STREAMING_FILE_UPLOAD, "Whether to generate StreamingFileUpload type for file request body", generateStreamingFileUpload));
+        cliOptions.add(CliOption.newBoolean(OPT_AOT, "Generate compatible code with micronaut-aot", aot));
 
 
         // Set the type mappings
@@ -172,6 +180,11 @@ public class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen<Jav
         }
         writePropertyBack(OPT_USE_AUTH, useAuth);
 
+        if (additionalProperties.containsKey(OPT_AOT)) {
+            aot = convertPropertyToBoolean(OPT_AOT);
+        }
+        writePropertyBack(OPT_AOT, aot);
+
         if (additionalProperties.containsKey(OPT_GENERATE_HARD_NULLABLE)) {
             generateHardNullable = convertPropertyToBoolean(OPT_GENERATE_HARD_NULLABLE);
         }
@@ -239,8 +252,8 @@ public class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen<Jav
         // For controller implementation
         if (generateImplementationFiles && templateName.contains("controller-implementation")) {
             String implementationFolder = outputFolder + File.separator +
-                    sourceFolder + File.separator +
-                    controllerPackage.replace('.', File.separatorChar);
+                sourceFolder + File.separator +
+                controllerPackage.replace('.', File.separatorChar);
             return (implementationFolder + File.separator + controllerName + ".java"
             ).replace('/', File.separatorChar);
         }
@@ -297,11 +310,15 @@ public class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen<Jav
     }
 
     static class DefaultServerOptionsBuilder implements JavaMicronautServerOptionsBuilder {
+
         private String controllerPackage;
         private boolean generateImplementationFiles;
         private boolean generateControllerFromExamples;
         private boolean generateOperationsToReturnNotImplemented = true;
         private boolean useAuth = true;
+        private boolean lombok;
+        private boolean generatedAnnotation = true;
+        private boolean aot;
 
         @Override
         public JavaMicronautServerOptionsBuilder withControllerPackage(String controllerPackage) {
@@ -333,8 +350,35 @@ public class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen<Jav
             return this;
         }
 
+        @Override
+        public JavaMicronautServerOptionsBuilder withLombok(boolean lombok) {
+            this.lombok = lombok;
+            return this;
+        }
+
+        @Override
+        public JavaMicronautServerOptionsBuilder withGeneratedAnnotation(boolean generatedAnnotation) {
+            this.generatedAnnotation = generatedAnnotation;
+            return this;
+        }
+
+        @Override
+        public JavaMicronautServerOptionsBuilder withAot(boolean aot) {
+            this.aot = aot;
+            return this;
+        }
+
         ServerOptions build() {
-            return new ServerOptions(controllerPackage, generateImplementationFiles, generateOperationsToReturnNotImplemented, generateControllerFromExamples, useAuth);
+            return new ServerOptions(
+                controllerPackage,
+                generateImplementationFiles,
+                generateOperationsToReturnNotImplemented,
+                generateControllerFromExamples,
+                useAuth,
+                lombok,
+                generatedAnnotation,
+                aot
+            );
         }
     }
 
@@ -343,7 +387,10 @@ public class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen<Jav
         boolean generateImplementationFiles,
         boolean generateOperationsToReturnNotImplemented,
         boolean generateControllerFromExamples,
-        boolean useAuth
+        boolean useAuth,
+        boolean lombok,
+        boolean generatedAnnotation,
+        boolean aot
     ) {
     }
 }

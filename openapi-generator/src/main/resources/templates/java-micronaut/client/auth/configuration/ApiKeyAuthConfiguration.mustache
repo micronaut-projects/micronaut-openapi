@@ -8,11 +8,21 @@ import io.micronaut.core.annotation.NonNull;
 import io.micronaut.http.MutableHttpRequest;
 import io.micronaut.http.cookie.Cookie;
 import {{javaxPackage}}.annotation.Generated;
+{{#lombok}}
+import lombok.Getter;
+import lombok.Setter;
+{{/lombok}}
 
-
+{{#withGeneratedAnnotation}}
 {{>common/generatedAnnotation}}
+{{/withGeneratedAnnotation}}
+{{#lombok}}
+@Getter
+@Setter
+{{/lombok}}
 @EachProperty("security.api-key-auth")
 public class ApiKeyAuthConfiguration implements ConfigurableAuthorization {
+
     private final String name;
     private AuthKeyLocation location;
     private String paramName;
@@ -33,14 +43,15 @@ public class ApiKeyAuthConfiguration implements ConfigurableAuthorization {
 
     @Override
     public void applyAuthorization(@NonNull MutableHttpRequest<?> request) {
-        if (this.location == AuthKeyLocation.HEADER) {
-            request.header(this.paramName, this.apiKey);
-        } else if (this.location == AuthKeyLocation.QUERY) {
-            request.getParameters().add(this.paramName, this.apiKey);
-        } else if (this.location == AuthKeyLocation.COOKIE) {
-            request.cookie(Cookie.of(this.paramName, this.apiKey));
+        if (location == AuthKeyLocation.HEADER) {
+            request.header(paramName, apiKey);
+        } else if (location == AuthKeyLocation.QUERY) {
+            request.getParameters().add(paramName, apiKey);
+        } else if (location == AuthKeyLocation.COOKIE) {
+            request.cookie(Cookie.of(paramName, apiKey));
         }
     }
+{{^lombok}}
 
     @Override
     public String getName() {
@@ -70,10 +81,11 @@ public class ApiKeyAuthConfiguration implements ConfigurableAuthorization {
     public void setApiKey(String apiKey) {
         this.apiKey = apiKey;
     }
+{{/lombok}}
 
     public enum AuthKeyLocation {
         HEADER,
         QUERY,
-        COOKIE;
+        COOKIE
     }
 }
