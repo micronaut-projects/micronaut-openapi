@@ -63,7 +63,7 @@ final class SwaggerUIConfig extends AbstractViewConfig {
     private static final String COMMNA_NEW_LINE = ",\n";
 
     // https://github.com/swagger-api/swagger-ui/blob/HEAD/docs/usage/configuration.md
-    private static final Map<String, Function<String, Object>> VALID_OPTIONS = new HashMap<>(29);
+    private static final Map<String, Function<String, Object>> VALID_OPTIONS = new HashMap<>(30);
     // https://github.com/swagger-api/swagger-ui/blob/master/docs/usage/oauth2.md
     private static final Map<String, Function<String, Object>> VALID_OAUTH2_OPTIONS = new HashMap<>(9);
 
@@ -98,6 +98,7 @@ final class SwaggerUIConfig extends AbstractViewConfig {
         VALID_OPTIONS.put("supportedSubmitMethods", AbstractViewConfig::asString);
         VALID_OPTIONS.put("validatorUrl", AbstractViewConfig::asQuotedString);
         VALID_OPTIONS.put("withCredentials", AbstractViewConfig::asBoolean);
+        VALID_OPTIONS.put("persistAuthorization", AbstractViewConfig::asBoolean);
 
         VALID_OAUTH2_OPTIONS.put(OPTION_OAUTH2 + ".clientId", AbstractViewConfig::asQuotedString);
         VALID_OAUTH2_OPTIONS.put(OPTION_OAUTH2 + ".clientSecret", AbstractViewConfig::asQuotedString);

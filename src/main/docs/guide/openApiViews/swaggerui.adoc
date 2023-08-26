@@ -28,6 +28,7 @@ The views will be generated to the `META-INF/swagger/views/swagger-ui` directory
 | `swagger-ui.showExtensions` |
 | `swagger-ui.operationsSorter` |
 | `swagger-ui.tagsSorter` |
+| `swagger-ui.persistAuthorization` |
 |===
 
 See https://github.com/swagger-api/swagger-ui/blob/HEAD/docs/usage/configuration.md[Swagger UI Configuration] for a description.
