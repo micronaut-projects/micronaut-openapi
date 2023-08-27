@@ -8,4 +8,5 @@
     <suppress checks="." files="io[\\/]micronaut[\\/]openapi[\\/]swagger[\\/]core[\\/]" />
     <suppress checks="FileLength" files=".*" />
     <suppress checks="ParameterNumber" files=".*" />
+    <suppress checks="." files="io[\\/]micronaut[\\/]openapi[\\/]adoc[\\/]md" />
 </suppressions>

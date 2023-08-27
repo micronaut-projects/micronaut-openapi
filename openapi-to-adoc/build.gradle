@@ -1,0 +1,25 @@
+plugins {
+    id "io.micronaut.build.internal.binary-compatibility-check"
+    id 'io.micronaut.build.internal.module'
+    id 'io.micronaut.build.internal.openapi-base'
+}
+
+micronautBuild {
+    binaryCompatibility {
+        enabled = false
+    }
+}
+
+dependencies {
+
+    api libs.pegdown
+    api libs.managed.parboiled
+    api libs.managed.jsoup
+    api libs.managed.freemarker
+
+    implementation projects.micronautOpenapiCommon
+
+    testImplementation mnTest.micronaut.test.junit5
+
+    testRuntimeOnly libs.junit.jupiter.engine
+}
