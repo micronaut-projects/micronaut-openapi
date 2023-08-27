@@ -12,6 +12,7 @@ dependencies {
         }
     }
     api libs.openapi.generator
+    implementation libs.commons.codec
 
     testImplementation mnTest.micronaut.test.junit5
 

@@ -32,6 +32,12 @@ dependencies {
     testRuntimeOnly(mnLogging.logback.classic)
 }
 
+kapt {
+    arguments {
+        arg("micronaut.openapi.project.dir", projectDir.toString())
+    }
+}
+
 test {
     useJUnitPlatform()
 

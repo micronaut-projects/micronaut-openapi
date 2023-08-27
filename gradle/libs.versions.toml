@@ -13,6 +13,7 @@ openapi-generator = "7.0.0"
 swagger-parser = "1.0.67"
 swagger-parser-v3 = "2.1.16"
 javaparser = "3.25.5"
+commons-codec = "1.16.0"
 
 micronaut = "4.1.2"
 micronaut-security = "4.1.0"
@@ -25,7 +26,7 @@ micronaut-validation = "4.0.3"
 micronaut-data = "4.1.2"
 micronaut-test = "4.0.2"
 micronaut-kotlin = "4.0.2"
-micronaut-platform = "4.0.5"
+micronaut-platform = "4.0.6"
 micronaut-logging = "1.1.2"
 
 [libraries]
@@ -56,9 +57,6 @@ managed-jsoup = { module = "org.jsoup:jsoup", version.ref = "managed-jsoup" }
 junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine" }
 jackson-datatype-jsr310 = { module = "com.fasterxml.jackson.datatype:jackson-datatype-jsr310" }
 jackson-dataformat-yaml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml" }
-assertj = { module = "org.assertj:assertj-core" }
-kotlinx-coroutines-reactive = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-reactive" }
-kotlinx-coroutines-reactor = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-reactor" }
 
 kotlin-stdlib-jdk8 = { module = "org.jetbrains.kotlin:kotlin-stdlib-jdk8", version.ref = "kotlin" }
 kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
@@ -67,6 +65,7 @@ spotbugs-annotations = { module = "com.github.spotbugs:spotbugs-annotations", ve
 jdt-annotation = { module = "org.eclipse.jdt:org.eclipse.jdt.annotation", version.ref = "jdt-annotation" }
 android-annotation = { module = "androidx.annotation:annotation", version.ref = "android-annotation" }
 javaparser = { module = "com.github.javaparser:javaparser-symbol-solver-core", version.ref = "javaparser" }
+commons-codec = { module = "commons-codec:commons-codec", version.ref = "commons-codec" }
 
 openapi-generator = { module = "org.openapitools:openapi-generator", version.ref = "openapi-generator" }
 swagger-parser = { module = "io.swagger:swagger-parser", version.ref = "swagger-parser" }
