@@ -208,7 +208,7 @@
           "pet"
         ],
         "summary": "Find pet by ID",
-        "description": "Returns a pet when ID < 10.  ID > 10 or nonintegers will simulate API error conditions",
+        "description": "Returns a pet when ID < 10. ID > 10 or nonintegers will simulate API error conditions",
         "operationId": "getPetById",
         "produces": [
           "application/json",

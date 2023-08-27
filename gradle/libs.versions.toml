@@ -3,6 +3,8 @@ managed-swagger = "2.2.16"
 managed-javadoc-parser = "0.3.1"
 managed-jsoup = "1.16.1"
 managed-html2md-converter = "0.64.8"
+managed-parboiled = "1.4.1"
+managed-freemarker = "2.3.32"
 
 kotlin = "1.9.10"
 jspecify = "0.3.0"
@@ -14,6 +16,7 @@ swagger-parser = "1.0.67"
 swagger-parser-v3 = "2.1.16"
 javaparser = "3.25.5"
 commons-codec = "1.16.0"
+pegdown = "1.6.0"
 
 micronaut = "4.1.6"
 micronaut-security = "4.1.0"
@@ -52,6 +55,8 @@ managed-swagger-models = { module = "io.swagger.core.v3:swagger-models", version
 managed-javadoc-parser = { module = "com.github.chhorz:javadoc-parser", version.ref = "managed-javadoc-parser" }
 managed-html2md-converter = { module = "com.vladsch.flexmark:flexmark-html2md-converter", version.ref = "managed-html2md-converter" }
 managed-jsoup = { module = "org.jsoup:jsoup", version.ref = "managed-jsoup" }
+managed-parboiled = { module = "org.parboiled:parboiled-java", version.ref = "managed-parboiled" }
+managed-freemarker = { module = "org.freemarker:freemarker", version.ref = "managed-freemarker" }
 
 # Versions from BOM
 junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine" }
@@ -67,6 +72,7 @@ jdt-annotation = { module = "org.eclipse.jdt:org.eclipse.jdt.annotation", versio
 android-annotation = { module = "androidx.annotation:annotation", version.ref = "android-annotation" }
 javaparser = { module = "com.github.javaparser:javaparser-symbol-solver-core", version.ref = "javaparser" }
 commons-codec = { module = "commons-codec:commons-codec", version.ref = "commons-codec" }
+pegdown = {module = "org.pegdown:pegdown", version.ref = "pegdown"}
 
 openapi-generator = { module = "org.openapitools:openapi-generator", version.ref = "openapi-generator" }
 swagger-parser = { module = "io.swagger:swagger-parser", version.ref = "swagger-parser" }
