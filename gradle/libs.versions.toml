@@ -16,7 +16,7 @@ javaparser = "3.25.4"
 
 micronaut = "4.1.2"
 micronaut-security = "4.0.4"
-micronaut-serde = "2.2.1"
+micronaut-serde = "2.2.4"
 micronaut-rxjava2 = "2.0.1"
 micronaut-rxjava3 = "3.0.1"
 micronaut-gradle-plugin = "4.0.2"
