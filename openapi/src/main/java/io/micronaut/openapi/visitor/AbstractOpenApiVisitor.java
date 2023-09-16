@@ -46,7 +46,6 @@ import java.util.UUID;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.xml.datatype.XMLGregorianCalendar;
@@ -251,10 +250,11 @@ abstract class AbstractOpenApiVisitor {
     }
 
     List<SecurityRequirement> readSecurityRequirements(List<AnnotationValue<io.swagger.v3.oas.annotations.security.SecurityRequirement>> annotations) {
-        return annotations
-            .stream()
-            .map(ConvertUtils::mapToSecurityRequirement)
-            .collect(Collectors.toList());
+        var result = new ArrayList<SecurityRequirement>(annotations.size());
+        for (var ann : annotations) {
+            result.add(ConvertUtils.mapToSecurityRequirement(ann));
+        }
+        return result;
     }
 
     /**
@@ -1804,7 +1804,7 @@ abstract class AbstractOpenApiVisitor {
                 schemaToValueMap(schemaMap, schema);
             }
             return schemaMap;
-        }).collect(Collectors.toList());
+        }).toList();
         valueMap.put(key, namesToSchemas);
     }
 
@@ -2254,7 +2254,7 @@ abstract class AbstractOpenApiVisitor {
                 }
 
                 return Stream.empty();
-            }).collect(Collectors.toList());
+            }).toList();
     }
 
     private String computeDefaultSchemaName(Element definingElement, Element type, Map<String, ClassElement> typeArgs, VisitorContext context,

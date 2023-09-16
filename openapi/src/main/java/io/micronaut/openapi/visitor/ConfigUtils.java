@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import io.micronaut.context.ApplicationContextConfiguration;
@@ -791,7 +790,7 @@ public final class ConfigUtils {
                     .filter(StringUtils::isNotEmpty)
                     .flatMap(s -> Arrays.stream(s.split(",")))
                     .map(String::trim)
-                    .collect(Collectors.toList());
+                    .toList();
         } else {
             activeEnvs = new ArrayList<>();
         }

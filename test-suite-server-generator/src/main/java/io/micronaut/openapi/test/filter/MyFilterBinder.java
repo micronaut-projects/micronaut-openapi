@@ -1,14 +1,15 @@
 package io.micronaut.openapi.test.filter;
 
+import java.util.Optional;
+
 import io.micronaut.core.convert.ArgumentConversionContext;
 import io.micronaut.core.type.Argument;
 import io.micronaut.http.HttpRequest;
 import io.micronaut.http.HttpStatus;
 import io.micronaut.http.bind.binders.TypedRequestArgumentBinder;
 import io.micronaut.http.exceptions.HttpStatusException;
-import jakarta.inject.Singleton;
 
-import java.util.Optional;
+import jakarta.inject.Singleton;
 
 /**
  * A custom parameter binder for MyFilter parameter type.

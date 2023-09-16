@@ -34,6 +34,7 @@ dependencies {
     testImplementation(libs.jdt.annotation)
     testImplementation(libs.android.annotation)
     testImplementation(libs.spotbugs.annotations)
+    testImplementation(libs.kotlinx.coroutines.reactor)
 }
 
 configurations.configureEach {

@@ -1,5 +1,12 @@
 package io.micronaut.openapi.test.api;
 
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.util.List;
+
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Post;
+import io.micronaut.http.multipart.CompletedFileUpload;
 import io.micronaut.openapi.test.model.Animal;
 import io.micronaut.openapi.test.model.ColorEnum;
 import io.micronaut.openapi.test.model.DateModel;
@@ -9,15 +16,9 @@ import io.micronaut.openapi.test.model.ModelWithMapProperty;
 import io.micronaut.openapi.test.model.ModelWithRequiredProperties;
 import io.micronaut.openapi.test.model.NestedModel;
 import io.micronaut.openapi.test.model.SimpleModel;
-import io.micronaut.http.annotation.Controller;
-import io.micronaut.http.annotation.Post;
-import io.micronaut.http.multipart.CompletedFileUpload;
+
 import jakarta.validation.Valid;
 import reactor.core.publisher.Mono;
-
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
-import java.util.List;
 
 @Controller
 public class RequestBodyController implements RequestBodyApi {
@@ -59,7 +60,7 @@ public class RequestBodyController implements RequestBodyApi {
 
     @Override
     public Mono<List<ColorEnum>> sendEnumList(
-            List<@Valid ColorEnum> availableColors) {
+        List<@Valid ColorEnum> availableColors) {
         return Mono.just(availableColors);
     }
 

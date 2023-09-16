@@ -622,10 +622,10 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
             }
             op.consumes = op.consumes == null ? null : op.consumes.stream()
                     .filter(contentType -> !CONTENT_TYPE_ANY.equals(contentType.get("mediaType")))
-                    .collect(Collectors.toList());
+                    .toList();
             op.produces = op.produces == null ? null : op.produces.stream()
                     .filter(contentType -> !CONTENT_TYPE_ANY.equals(contentType.get("mediaType")))
-                    .collect(Collectors.toList());
+                    .toList();
 
             // is only default "application/json" media type
             if (op.consumes == null
@@ -888,7 +888,9 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
                 model.parentVars = model.getParentModel().allVars;
             }
 
-            List<CodegenProperty> requiredVars = model.vars.stream().filter(v -> v.required).collect(Collectors.toList());
+            List<CodegenProperty> requiredVars = model.vars.stream()
+                .filter(v -> v.required)
+                .toList();
 
             model.vendorExtensions.put("withMultipleVars", model.vars.size() > 1);
             model.vendorExtensions.put("requiredVarsWithoutDiscriminator", requiredVarsWithoutDiscriminator);

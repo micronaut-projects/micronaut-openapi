@@ -95,7 +95,7 @@ public class GeneratorMain {
             map.get("mappedType"),
             map.get("mappedName"),
             "true".equals(map.get("isValidated"))
-        )).collect(Collectors.toList());
+        )).toList();
     }
 
     private static List<AbstractMicronautJavaCodegen.ResponseBodyMapping> parseResponseBodyMappings(String string) {
@@ -104,7 +104,7 @@ public class GeneratorMain {
             map.get("mappedBodyType"),
             "true".equals(map.get("isListWrapper")),
             "true".equals(map.get("isValidated"))
-        )).collect(Collectors.toList());
+        )).toList();
     }
 
     private static List<Map<String, String>> parseListOfMaps(String string) {

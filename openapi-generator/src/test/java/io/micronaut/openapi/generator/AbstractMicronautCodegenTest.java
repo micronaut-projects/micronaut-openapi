@@ -108,7 +108,7 @@ public abstract class AbstractMicronautCodegenTest {
                 } else {
                     message += Arrays.stream(contents)
                         .map(f -> f.toString().substring(parent.toString().length() + 1))
-                        .collect(Collectors.toList());
+                        .toList();
                 }
                 message += ".";
             }
