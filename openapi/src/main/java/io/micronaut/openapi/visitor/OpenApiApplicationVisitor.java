@@ -38,6 +38,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.function.BiConsumer;
+import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
@@ -83,15 +84,6 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 
-import static io.micronaut.openapi.visitor.OpenApiConfigProperty.ALL;
-import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ADDITIONAL_FILES;
-import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_CONTEXT_SERVER_PATH;
-import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_FILENAME;
-import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_JSON_FORMAT;
-import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_PROPERTY_NAMING_STRATEGY;
-import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_TARGET_FILE;
-import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_VIEWS_DEST_DIR;
-import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_VIEWS_SPEC;
 import static io.micronaut.openapi.visitor.ConfigUtils.endpointsConfiguration;
 import static io.micronaut.openapi.visitor.ConfigUtils.getConfigProperty;
 import static io.micronaut.openapi.visitor.ConfigUtils.getEnv;
@@ -106,6 +98,15 @@ import static io.micronaut.openapi.visitor.FileUtils.EXT_JSON;
 import static io.micronaut.openapi.visitor.FileUtils.EXT_YML;
 import static io.micronaut.openapi.visitor.FileUtils.createDirectories;
 import static io.micronaut.openapi.visitor.FileUtils.resolve;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.ALL;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ADDITIONAL_FILES;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_CONTEXT_SERVER_PATH;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_FILENAME;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_JSON_FORMAT;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_PROPERTY_NAMING_STRATEGY;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_TARGET_FILE;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_VIEWS_DEST_DIR;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_VIEWS_SPEC;
 import static io.micronaut.openapi.visitor.SchemaUtils.EMPTY_SIMPLE_SCHEMA;
 import static io.micronaut.openapi.visitor.SchemaUtils.TYPE_OBJECT;
 import static io.micronaut.openapi.visitor.SchemaUtils.getOperationOnPathItem;
@@ -772,10 +773,115 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         }
 
         removeEmtpyComponents(openApi);
+        findAndRemoveDuplicates(openApi);
 
         openApi = resolvePropertyPlaceHolders(openApi, context);
 
         return openApi;
+    }
+
+    private <T> List<T> findAndRemoveDuplicates(List<T> elements, BiPredicate<T, T> predicate) {
+        if (CollectionUtils.isEmpty(elements)) {
+            return elements;
+        }
+        var result = new ArrayList<T>();
+        for (var element : elements) {
+            boolean found = false;
+            for (var el : result) {
+                if (predicate.test(element, el)) {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                result.add(element);
+            }
+        }
+        if (result.size() != elements.size()) {
+            return result;
+        }
+        return elements;
+    }
+
+    void findAndRemoveDuplicates(OpenAPI openApi) {
+        openApi.setTags(findAndRemoveDuplicates(openApi.getTags(), (el1, el2) -> el1.getName() != null && el1.getName().equals(el2.getName())));
+        openApi.setServers(findAndRemoveDuplicates(openApi.getServers(), (el1, el2) -> el1.getUrl() != null && el1.getUrl().equals(el2.getUrl())));
+        openApi.setSecurity(findAndRemoveDuplicates(openApi.getSecurity(), (el1, el2) -> el1 != null && el1.equals(el2)));
+        if (CollectionUtils.isNotEmpty(openApi.getPaths())) {
+            for (var path : openApi.getPaths().values()) {
+                path.setServers(findAndRemoveDuplicates(path.getServers(), (el1, el2) -> el1.getUrl() != null && el1.getUrl().equals(el2.getUrl())));
+                path.setParameters(findAndRemoveDuplicates(path.getParameters(), (el1, el2) -> el1.getName() != null && el1.getName().equals(el2.getName())
+                    && el1.getIn() != null && el1.getIn().equals(el2.getIn())));
+                findAndRemoveDuplicates(path.getGet());
+                findAndRemoveDuplicates(path.getPut());
+                findAndRemoveDuplicates(path.getPost());
+                findAndRemoveDuplicates(path.getDelete());
+                findAndRemoveDuplicates(path.getOptions());
+                findAndRemoveDuplicates(path.getHead());
+                findAndRemoveDuplicates(path.getPatch());
+                findAndRemoveDuplicates(path.getTrace());
+            }
+        }
+        if (openApi.getComponents() != null) {
+            if (CollectionUtils.isNotEmpty(openApi.getComponents().getSchemas())) {
+                for (var schema : openApi.getComponents().getSchemas().values()) {
+                    findAndRemoveDuplicates(schema);
+                }
+            }
+        }
+        if (openApi.getComponents() != null) {
+            if (CollectionUtils.isNotEmpty(openApi.getComponents().getSchemas())) {
+                for (var schema : openApi.getComponents().getSchemas().values()) {
+                    findAndRemoveDuplicates(schema);
+                }
+            }
+        }
+    }
+
+    private void findAndRemoveDuplicates(Schema schema) {
+        if (schema == null) {
+            return;
+        }
+        schema.setRequired(findAndRemoveDuplicates(schema.getRequired(), (el1, el2) -> el1 != null && el1.equals(el2)));
+        schema.setPrefixItems(findAndRemoveDuplicates(schema.getPrefixItems(), (el1, el2) -> el1 != null && el1.equals(el2)));
+        schema.setAllOf(findAndRemoveDuplicates(schema.getAllOf(), (el1, el2) -> el1 != null && el1.equals(el2)));
+        schema.setAnyOf(findAndRemoveDuplicates(schema.getAnyOf(), (el1, el2) -> el1 != null && el1.equals(el2)));
+        schema.setOneOf(findAndRemoveDuplicates(schema.getOneOf(), (el1, el2) -> el1 != null && el1.equals(el2)));
+    }
+
+    private void findAndRemoveDuplicates(Operation operation) {
+        if (operation == null) {
+            return;
+        }
+        operation.setTags(findAndRemoveDuplicates(operation.getTags(), (el1, el2) -> el1 != null && el1.equals(el2)));
+        operation.setServers(findAndRemoveDuplicates(operation.getServers(), (el1, el2) -> el1.getUrl() != null && el1.getUrl().equals(el2.getUrl())));
+        operation.setSecurity(findAndRemoveDuplicates(operation.getSecurity(), (el1, el2) -> el1 != null && el1.equals(el2)));
+        if (CollectionUtils.isNotEmpty(operation.getParameters())) {
+            for (var param : operation.getParameters()) {
+                findAndRemoveDuplicates(param.getContent());
+                findAndRemoveDuplicates(param.getSchema());
+            }
+            operation.setParameters(findAndRemoveDuplicates(operation.getParameters(), (el1, el2) -> el1.getName() != null && el1.getName().equals(el2.getName())
+                && el1.getIn() != null && el1.getIn().equals(el2.getIn())));
+        }
+
+        if (operation.getRequestBody() != null) {
+            findAndRemoveDuplicates(operation.getRequestBody().getContent());
+        }
+        if (CollectionUtils.isNotEmpty(operation.getResponses())) {
+            for (var response : operation.getResponses().values()) {
+                findAndRemoveDuplicates(response.getContent());
+            }
+        }
+    }
+
+    private void findAndRemoveDuplicates(Content content) {
+        if (CollectionUtils.isEmpty(content)) {
+            return;
+        }
+        for (var mediaType : content.values()) {
+            findAndRemoveDuplicates(mediaType.getSchema());
+        }
     }
 
     private void removeEmtpyComponents(OpenAPI openAPI) {

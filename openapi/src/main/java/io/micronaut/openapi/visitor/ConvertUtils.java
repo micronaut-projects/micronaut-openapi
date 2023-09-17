@@ -381,8 +381,10 @@ public final class ConvertUtils {
      */
     public static SecurityRequirement mapToSecurityRequirement(AnnotationValue<io.swagger.v3.oas.annotations.security.SecurityRequirement> r) {
         String name = r.getRequiredValue("name", String.class);
-        List<String> scopes = r.get("scopes", String[].class).map(Arrays::asList).orElse(Collections.emptyList());
-        SecurityRequirement securityRequirement = new SecurityRequirement();
+        List<String> scopes = r.get("scopes", String[].class)
+            .map(Arrays::asList)
+            .orElse(Collections.emptyList());
+        var securityRequirement = new SecurityRequirement();
         securityRequirement.addList(name, scopes);
         return securityRequirement;
     }
