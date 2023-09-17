@@ -217,11 +217,27 @@ class MicronautServerCodegenTest extends AbstractMicronautCodegenTest {
     void doGenerateMono() {
         JavaMicronautServerCodegen codegen = new JavaMicronautServerCodegen();
         codegen.additionalProperties().put(JavaMicronautServerCodegen.OPT_REACTIVE, "true");
+        codegen.additionalProperties().put(JavaMicronautServerCodegen.OPT_FLUX_FOR_ARRAYS, "false");
         codegen.additionalProperties().put(JavaMicronautServerCodegen.OPT_GENERATE_HTTP_RESPONSE_ALWAYS, "false");
         String outputPath = generateFiles(codegen, PETSTORE_PATH, CodegenConstants.MODELS, CodegenConstants.APIS);
 
         String apiPath = outputPath + "src/main/java/org/openapitools/api/";
         assertFileContains(apiPath + "PetApi.java", "Mono<Pet>");
+        assertFileNotContains(apiPath + "PetApi.java", "Flux<Pet>");
+        assertFileNotContains(apiPath + "PetApi.java", "HttpResponse");
+    }
+
+    @Test
+    void doGenerateMonoAndFlux() {
+        JavaMicronautServerCodegen codegen = new JavaMicronautServerCodegen();
+        codegen.additionalProperties().put(JavaMicronautServerCodegen.OPT_REACTIVE, "true");
+        codegen.additionalProperties().put(JavaMicronautServerCodegen.OPT_FLUX_FOR_ARRAYS, "true");
+        codegen.additionalProperties().put(JavaMicronautServerCodegen.OPT_GENERATE_HTTP_RESPONSE_ALWAYS, "false");
+        String outputPath = generateFiles(codegen, PETSTORE_PATH, CodegenConstants.MODELS, CodegenConstants.APIS);
+
+        String apiPath = outputPath + "src/main/java/org/openapitools/api/";
+        assertFileContains(apiPath + "PetApi.java", "Mono<Pet>");
+        assertFileContains(apiPath + "PetApi.java", "Flux<Pet>");
         assertFileNotContains(apiPath + "PetApi.java", "HttpResponse");
     }
 

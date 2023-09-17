@@ -72,6 +72,14 @@ public interface JavaMicronautClientOptionsBuilder extends GeneratorOptionsBuild
     JavaMicronautClientOptionsBuilder withLombok(boolean lombok);
 
     /**
+     * If set to true, generated code will be with Flux{@literal <}?> instead Mono{@literal <}List{@literal <}?>>.
+     *
+     * @param fluxForArrays generate code with Flux{@literal <}?> instead Mono{@literal <}List{@literal <}?>> or not
+     * @return this builder
+     */
+    JavaMicronautClientOptionsBuilder withFluxForArrays(boolean fluxForArrays);
+
+    /**
      * If set to true, generated code will be with jakarta.annotation.Generated annotation.
      *
      * @param generatedAnnotation generate code with jakarta.annotation.Generated annotation or not

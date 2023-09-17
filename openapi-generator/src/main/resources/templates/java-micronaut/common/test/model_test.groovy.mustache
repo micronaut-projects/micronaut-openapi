@@ -10,7 +10,8 @@ import jakarta.inject.Inject
  * Model tests for {{classname}}
  */
 @MicronautTest
-public class {{classname}}Spec extends Specification {
+class {{classname}}Spec extends Specification {
+
     {{#models}}
     {{#model}}
     {{^vendorExtensions.x-is-one-of-interface}}

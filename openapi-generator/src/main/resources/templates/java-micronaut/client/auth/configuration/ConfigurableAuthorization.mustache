@@ -3,7 +3,9 @@ package {{invokerPackage}}.auth.configuration;
 
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.http.MutableHttpRequest;
+{{#withGeneratedAnnotation}}
 import {{javaxPackage}}.annotation.Generated;
+{{/withGeneratedAnnotation}}
 
 {{#withGeneratedAnnotation}}
 {{>common/generatedAnnotation}}

@@ -16,4 +16,6 @@ dependencies {
     implementation("io.micronaut.validation:micronaut-validation")
     implementation("io.projectreactor:reactor-core")
     runtimeOnly("ch.qos.logback:logback-classic")
+
+    testImplementation("io.micronaut.test:micronaut-test-spock")
 }

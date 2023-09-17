@@ -11,7 +11,9 @@ import java.lang.annotation.Target;
 
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
+{{#withGeneratedAnnotation}}
 import {{javaxPackage}}.annotation.Generated;
+{{/withGeneratedAnnotation}}
 
 {{#withGeneratedAnnotation}}
 {{>common/generatedAnnotation}}
