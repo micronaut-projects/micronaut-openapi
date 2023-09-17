@@ -321,4 +321,27 @@ class MicronautServerCodegenTest extends AbstractMicronautCodegenTest {
         assertFileContains(apiPath + "SearchApi.java",
             "authorSearchGet", "bookSearchGet");
     }
+
+    @Test
+    void testReadOnlyConstructorBug() {
+
+        var codegen = new JavaMicronautServerCodegen();
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/readonlyconstructorbug.yml", CodegenConstants.MODELS);
+        String apiPath = outputPath + "src/main/java/org/openapitools/model/";
+
+        assertFileContains(apiPath + "BookInfo.java", "public BookInfo(String name, String requiredReadOnly)");
+        assertFileContains(apiPath + "ExtendedBookInfo.java", "public ExtendedBookInfo(String isbn, String name, String requiredReadOnly)", "super(name, requiredReadOnly)");
+    }
+
+    @Test
+    void testDiscriminatorConstructorBug() {
+
+        var codegen = new JavaMicronautServerCodegen();
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/discriminatorconstructorbug.yml", CodegenConstants.MODELS);
+        String apiPath = outputPath + "src/main/java/org/openapitools/model/";
+
+        assertFileContains(apiPath + "BookInfo.java", "public BookInfo(String name)");
+        assertFileContains(apiPath + "BasicBookInfo.java", "public BasicBookInfo(String author, String name)", "super(name)");
+        assertFileContains(apiPath + "DetailedBookInfo.java", "public DetailedBookInfo(String isbn, String name, String author)", "super(author, name)");
+    }
 }

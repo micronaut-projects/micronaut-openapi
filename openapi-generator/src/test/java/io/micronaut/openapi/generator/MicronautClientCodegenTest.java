@@ -268,4 +268,27 @@ class MicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         // Micronaut declarative http client should use the provided path separator
         assertFileContains(outputPath + "/src/main/java/org/openapitools/api/PetApi.java", "@Client(\"${openapi-micronaut-client.base-path}\")");
     }
+
+    @Test
+    void testReadOnlyConstructorBug() {
+
+        var codegen = new JavaMicronautClientCodegen();
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/readonlyconstructorbug.yml", CodegenConstants.MODELS);
+        String apiPath = outputPath + "src/main/java/org/openapitools/model/";
+
+        assertFileContains(apiPath + "BookInfo.java", "public BookInfo(String name)");
+        assertFileContains(apiPath + "ExtendedBookInfo.java", "public ExtendedBookInfo(String isbn, String name)", "super(name)");
+    }
+
+    @Test
+    void testDiscriminatorConstructorBug() {
+
+        var codegen = new JavaMicronautClientCodegen();
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/discriminatorconstructorbug.yml", CodegenConstants.MODELS);
+        String apiPath = outputPath + "src/main/java/org/openapitools/model/";
+
+        assertFileContains(apiPath + "BookInfo.java", "public BookInfo(String name)");
+        assertFileContains(apiPath + "BasicBookInfo.java", "public BasicBookInfo(String author, String name)", "super(name)");
+        assertFileContains(apiPath + "DetailedBookInfo.java", "public DetailedBookInfo(String isbn, String name, String author)", "super(author, name)");
+    }
 }

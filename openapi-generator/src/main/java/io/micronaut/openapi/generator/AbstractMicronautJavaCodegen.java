@@ -860,38 +860,21 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
 
             var hasParent = model.getParentModel() != null;
             var requiredVarsWithoutDiscriminator = new ArrayList<CodegenProperty>();
-            for (var v : model.requiredVars) {
-                boolean isDiscriminator = false;
-                if (hasParent) {
-                    for (var pv : model.getParentModel().getAllVars()) {
-                        if (pv.required && pv.getName().equals(v.getName())) {
-                            isDiscriminator = pv.isDiscriminator;
-                            break;
-                        }
-                    }
-                } else {
-                    isDiscriminator = v.isDiscriminator;
-                }
-                if (!isDiscriminator) {
-                    requiredVarsWithoutDiscriminator.add(v);
-                }
-            }
+            var requiredParentVarsWithoutDiscriminator = new ArrayList<CodegenProperty>();
 
-            if (hasParent) {
-                var parentRequiredVarsWithoutDiscriminator = new ArrayList<CodegenProperty>();
-                for (var v : model.getParentModel().vars) {
-                    if (v.required && !v.isDiscriminator) {
-                        parentRequiredVarsWithoutDiscriminator.add(v);
-                    }
-                }
-                model.vendorExtensions.put("requiredParentVarsWithoutDiscriminator", parentRequiredVarsWithoutDiscriminator);
-                model.parentVars = model.getParentModel().allVars;
-            }
+            processParentModel(model, requiredVarsWithoutDiscriminator, requiredParentVarsWithoutDiscriminator);
 
-            List<CodegenProperty> requiredVars = model.vars.stream().filter(v -> v.required).collect(Collectors.toList());
+            List<CodegenProperty> requiredVars = model.vars.stream()
+                .filter(v -> v.required)
+                .toList();
 
             model.vendorExtensions.put("withMultipleVars", model.vars.size() > 1);
-            model.vendorExtensions.put("requiredVarsWithoutDiscriminator", requiredVarsWithoutDiscriminator);
+            if (!requiredParentVarsWithoutDiscriminator.isEmpty()) {
+                model.vendorExtensions.put("requiredParentVarsWithoutDiscriminator", requiredParentVarsWithoutDiscriminator);
+            }
+            if (!requiredVarsWithoutDiscriminator.isEmpty()) {
+                model.vendorExtensions.put("requiredVarsWithoutDiscriminator", requiredVarsWithoutDiscriminator);
+            }
             model.vendorExtensions.put("requiredVars", requiredVars);
             model.vendorExtensions.put("areRequiredVarsAndReadOnlyVars", !requiredVarsWithoutDiscriminator.isEmpty() && !model.readOnlyVars.isEmpty());
             model.vendorExtensions.put("serialId", random.nextLong());
@@ -913,6 +896,75 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
         }
 
         return objs;
+    }
+
+    private void processParentModel(CodegenModel model, List<CodegenProperty> requiredVarsWithoutDiscriminator, List<CodegenProperty> requiredParentVarsWithoutDiscriminator) {
+        var parent = model.getParentModel();
+        var hasParent = parent != null;
+
+        for (var v : model.requiredVars) {
+            boolean isDiscriminator = isDiscriminator(v, model);
+            if (!isDiscriminator(v, model) && !containsProp(v, requiredVarsWithoutDiscriminator)) {
+                requiredVarsWithoutDiscriminator.add(v);
+            }
+        }
+
+        requiredParentVarsWithoutDiscriminator(model, requiredParentVarsWithoutDiscriminator);
+        if (hasParent) {
+            model.parentVars = parent.allVars;
+        }
+        if (hasParent) {
+            processParentModel(parent, requiredVarsWithoutDiscriminator, requiredParentVarsWithoutDiscriminator);
+        }
+    }
+
+    private void requiredParentVarsWithoutDiscriminator(CodegenModel model, List<CodegenProperty> requiredParentVarsWithoutDiscriminator) {
+
+        var parent = model.parentModel;
+        if (parent == null) {
+            return;
+        }
+
+        for (var v : parent.vars) {
+            boolean isDiscriminator = isDiscriminator(v, model);
+            if (v.required && !isDiscriminator) {
+                v.vendorExtensions.put("isServerOrNotReadOnly", !v.isReadOnly || isServer());
+                if (!containsProp(v, requiredParentVarsWithoutDiscriminator)) {
+                    requiredParentVarsWithoutDiscriminator.add(v);
+                }
+            }
+        }
+    }
+
+    private boolean containsProp(CodegenProperty prop, List<CodegenProperty> props) {
+        for (var p : props) {
+            if (prop.name.equals(p.name)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean isDiscriminator(CodegenProperty prop, CodegenModel model) {
+        var isDiscriminator = prop.isDiscriminator;
+        if (isDiscriminator) {
+            return true;
+        }
+        if (model.parentModel == null) {
+            return false;
+        }
+        CodegenProperty parentProp = null;
+        for (var pv : model.parentModel.allVars) {
+            if (pv.required && pv.name.equals(prop.name)) {
+                isDiscriminator = pv.isDiscriminator;
+                parentProp = pv;
+                break;
+            }
+        }
+        if (isDiscriminator) {
+            return true;
+        }
+        return parentProp != null && isDiscriminator(parentProp, model.parentModel);
     }
 
     @Override
