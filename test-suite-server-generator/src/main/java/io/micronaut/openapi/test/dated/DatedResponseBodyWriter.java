@@ -1,8 +1,6 @@
 package io.micronaut.openapi.test.dated;
 
-
 import io.micronaut.context.exceptions.ConfigurationException;
-import io.micronaut.core.annotation.Nullable;
 import io.micronaut.core.annotation.Order;
 import io.micronaut.core.type.Argument;
 import io.micronaut.core.type.MutableHeaders;
@@ -11,7 +9,6 @@ import io.micronaut.http.annotation.Produces;
 import io.micronaut.http.body.MessageBodyHandlerRegistry;
 import io.micronaut.http.body.MessageBodyWriter;
 import io.micronaut.http.codec.CodecException;
-import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 
 import java.io.OutputStream;
@@ -30,32 +27,9 @@ final class DatedResponseBodyWriter<T> implements MessageBodyWriter<DatedRespons
     private static final String LAST_MODIFIED_HEADER = "Last-Modified";
 
     private final MessageBodyHandlerRegistry registry;
-    private final MessageBodyWriter<T> bodyWriter;
-    private final Argument<T> bodyType;
 
-    @Inject
     DatedResponseBodyWriter(MessageBodyHandlerRegistry registry) {
-        this(registry, null, null);
-    }
-
-    private DatedResponseBodyWriter(
-        MessageBodyHandlerRegistry registry,
-        @Nullable MessageBodyWriter<T> bodyWriter,
-        @Nullable Argument<T> bodyType
-    ) {
         this.registry = registry;
-        this.bodyWriter = bodyWriter;
-        this.bodyType = bodyType;
-    }
-
-    @Override
-    public MessageBodyWriter<DatedResponse<T>> createSpecific(
-        Argument<DatedResponse<T>> type
-    ) {
-        Argument<T> bt = type.getTypeParameters()[0];
-        MessageBodyWriter<T> writer = registry.findWriter(bt, List.of(MediaType.APPLICATION_JSON_TYPE))
-                .orElseThrow(() -> new ConfigurationException("No JSON message writer present"));
-        return new DatedResponseBodyWriter<>(registry, writer, bt);
     }
 
     @Override
@@ -66,14 +40,13 @@ final class DatedResponseBodyWriter<T> implements MessageBodyWriter<DatedRespons
         MutableHeaders headers,
         OutputStream outputStream
     ) throws CodecException {
-        if (bodyType != null && bodyWriter != null) {
-            if (dated.getLastModified() != null) {
-                headers.add(LAST_MODIFIED_HEADER, dated.getLastModified().toString());
-            }
-            bodyWriter.writeTo(bodyType, mediaType, dated.getBody(), headers, outputStream);
-        } else {
-            throw new ConfigurationException("No JSON message writer present");
+        Argument<T> bt = type.getTypeParameters()[0];
+        MessageBodyWriter<T> writer = registry.findWriter(bt, List.of(MediaType.APPLICATION_JSON_TYPE))
+            .orElseThrow(() -> new ConfigurationException("No JSON message writer present"));
+        if (dated.getLastModified() != null) {
+            headers.add(LAST_MODIFIED_HEADER, dated.getLastModified().toString());
         }
+        writer.writeTo(bt, mediaType, dated.getBody(), headers, outputStream);
     }
 
     @Override
@@ -81,12 +54,9 @@ final class DatedResponseBodyWriter<T> implements MessageBodyWriter<DatedRespons
         Argument<DatedResponse<T>> type,
         MediaType mediaType
     ) {
-        return bodyType != null && bodyWriter != null && bodyWriter.isWriteable(bodyType, mediaType);
-    }
-
-    @Override
-    public boolean isBlocking() {
-        return bodyWriter != null && bodyWriter.isBlocking();
+        Argument<T> bt = type.getTypeParameters()[0];
+        return registry.findWriter(bt, List.of(MediaType.APPLICATION_JSON_TYPE)).isPresent() &&
+            mediaType.equals(MediaType.APPLICATION_JSON_TYPE);
     }
 
 }
