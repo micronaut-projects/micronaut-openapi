@@ -757,6 +757,8 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/swagger/core/util/PrimitiveType.html#FLOAT" class="member-name-link">FLOAT</a> - Enum constant in enum class io.micronaut.openapi.swagger.core.util.<a href="io/micronaut/openapi/swagger/core/util/PrimitiveType.html" title="enum class in io.micronaut.openapi.swagger.core.util">PrimitiveType</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/AbstractMicronautJavaCodegen.html#fluxForArrays" class="member-name-link">fluxForArrays</a> - Variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/AbstractMicronautJavaCodegen.html" title="class in io.micronaut.openapi.generator">AbstractMicronautJavaCodegen</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/generator/MicronautCodeGeneratorBuilder.html#forClient()" class="member-name-link">forClient()</a> - Method in interface io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/MicronautCodeGeneratorBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorBuilder</a></dt>
 <dd>
 <div class="block">Configures the code generator to create a client.</div>
@@ -2201,6 +2203,8 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/generator/AbstractMicronautJavaCodegen.html#OPT_DATETIME_FORMAT" class="member-name-link">OPT_DATETIME_FORMAT</a> - Static variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/AbstractMicronautJavaCodegen.html" title="class in io.micronaut.openapi.generator">AbstractMicronautJavaCodegen</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/AbstractMicronautJavaCodegen.html#OPT_FLUX_FOR_ARRAYS" class="member-name-link">OPT_FLUX_FOR_ARRAYS</a> - Static variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/AbstractMicronautJavaCodegen.html" title="class in io.micronaut.openapi.generator">AbstractMicronautJavaCodegen</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/generator/JavaMicronautServerCodegen.html#OPT_GENERATE_CONTROLLER_FROM_EXAMPLES" class="member-name-link">OPT_GENERATE_CONTROLLER_FROM_EXAMPLES</a> - Static variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/JavaMicronautServerCodegen.html" title="class in io.micronaut.openapi.generator">JavaMicronautServerCodegen</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/generator/JavaMicronautServerCodegen.html#OPT_GENERATE_HARD_NULLABLE" class="member-name-link">OPT_GENERATE_HARD_NULLABLE</a> - Static variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/JavaMicronautServerCodegen.html" title="class in io.micronaut.openapi.generator">JavaMicronautServerCodegen</a></dt>
@@ -2703,6 +2707,8 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/visitor/group/OpenApiInfo.html#setFilename(java.lang.String)" class="member-name-link">setFilename(String)</a> - Method in class io.micronaut.openapi.visitor.group.<a href="io/micronaut/openapi/visitor/group/OpenApiInfo.html" title="class in io.micronaut.openapi.visitor.group">OpenApiInfo</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/AbstractMicronautJavaCodegen.html#setFluxForArrays(boolean)" class="member-name-link">setFluxForArrays(boolean)</a> - Method in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/AbstractMicronautJavaCodegen.html" title="class in io.micronaut.openapi.generator">AbstractMicronautJavaCodegen</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/generator/JavaMicronautServerCodegen.html#setGenerateControllerFromExamples(boolean)" class="member-name-link">setGenerateControllerFromExamples(boolean)</a> - Method in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/JavaMicronautServerCodegen.html" title="class in io.micronaut.openapi.generator">JavaMicronautServerCodegen</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/generator/AbstractMicronautJavaCodegen.html#setGeneratedAnnotation(boolean)" class="member-name-link">setGeneratedAnnotation(boolean)</a> - Method in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/AbstractMicronautJavaCodegen.html" title="class in io.micronaut.openapi.generator">AbstractMicronautJavaCodegen</a></dt>
@@ -3122,6 +3128,14 @@ the order they are declared.</div>
 <dt><a href="io/micronaut/openapi/generator/MicronautCodeGeneratorBuilder.html#withDefinitionFile(java.net.URI)" class="member-name-link">withDefinitionFile(URI)</a> - Method in interface io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/MicronautCodeGeneratorBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorBuilder</a></dt>
 <dd>
 <div class="block">Sets the URI to the OpenAPI definition file.</div>
+</dd>
+<dt><a href="io/micronaut/openapi/generator/JavaMicronautClientOptionsBuilder.html#withFluxForArrays(boolean)" class="member-name-link">withFluxForArrays(boolean)</a> - Method in interface io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/JavaMicronautClientOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">JavaMicronautClientOptionsBuilder</a></dt>
+<dd>
+<div class="block">If set to true, generated code will be with Flux&lt;?> instead Mono&lt;List&lt;?>>.</div>
+</dd>
+<dt><a href="io/micronaut/openapi/generator/JavaMicronautServerOptionsBuilder.html#withFluxForArrays(boolean)" class="member-name-link">withFluxForArrays(boolean)</a> - Method in interface io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/JavaMicronautServerOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">JavaMicronautServerOptionsBuilder</a></dt>
+<dd>
+<div class="block">If set to true, generated code will be with Flux&lt;?> instead Mono&lt;List&lt;?>>.</div>
 </dd>
 <dt><a href="io/micronaut/openapi/generator/JavaMicronautServerOptionsBuilder.html#withGenerateControllerFromExamples(boolean)" class="member-name-link">withGenerateControllerFromExamples(boolean)</a> - Method in interface io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/JavaMicronautServerOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">JavaMicronautServerOptionsBuilder</a></dt>
 <dd>
