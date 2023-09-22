@@ -317,6 +317,7 @@ public class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen<Jav
         private boolean generateOperationsToReturnNotImplemented = true;
         private boolean useAuth = true;
         private boolean lombok;
+        private boolean fluxForArrays;
         private boolean generatedAnnotation = true;
         private boolean aot;
 
@@ -357,6 +358,12 @@ public class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen<Jav
         }
 
         @Override
+        public JavaMicronautServerOptionsBuilder withFluxForArrays(boolean fluxForArrays) {
+            this.fluxForArrays = fluxForArrays;
+            return this;
+        }
+
+        @Override
         public JavaMicronautServerOptionsBuilder withGeneratedAnnotation(boolean generatedAnnotation) {
             this.generatedAnnotation = generatedAnnotation;
             return this;
@@ -376,6 +383,7 @@ public class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen<Jav
                 generateControllerFromExamples,
                 useAuth,
                 lombok,
+                fluxForArrays,
                 generatedAnnotation,
                 aot
             );
@@ -389,6 +397,7 @@ public class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen<Jav
         boolean generateControllerFromExamples,
         boolean useAuth,
         boolean lombok,
+        boolean fluxForArrays,
         boolean generatedAnnotation,
         boolean aot
     ) {

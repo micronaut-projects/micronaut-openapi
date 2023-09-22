@@ -148,6 +148,7 @@ public final class MicronautCodeGeneratorEntryPoint {
             serverCodegen.setGenerateControllerFromExamples(serverOptions.generateControllerFromExamples());
             serverCodegen.setUseAuth(serverOptions.useAuth());
             serverCodegen.setLombok(serverOptions.lombok());
+            serverCodegen.setFluxForArrays(serverOptions.fluxForArrays());
             serverCodegen.setGeneratedAnnotation(serverOptions.generatedAnnotation());
         }
     }
@@ -168,6 +169,7 @@ public final class MicronautCodeGeneratorEntryPoint {
             }
             clientCodegen.setConfigureAuthorization(clientOptions.useAuth());
             clientCodegen.setLombok(clientOptions.lombok());
+            clientCodegen.setFluxForArrays(clientOptions.fluxForArrays());
             clientCodegen.setGeneratedAnnotation(clientOptions.generatedAnnotation());
         }
     }

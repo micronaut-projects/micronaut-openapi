@@ -2,10 +2,10 @@
         {{!The body needs to be implemented by user}}
         // TODO implement {{nickname}}();
         {{^generateOperationsToReturnNotImplemented}}
-        {{#reactive}}{{#wrapInHttpResponse}}return Mono.fromCallable(HttpResponse::ok);{{/wrapInHttpResponse}}{{^wrapInHttpResponse}}return Mono.empty();{{/wrapInHttpResponse}}{{/reactive}}{{^reactive}}{{#wrapInHttpResponse}}return HttpResponse.ok();{{/wrapInHttpResponse}}{{^wrapInHttpResponse}}{{#returnType}}return null;{{/returnType}}{{/wrapInHttpResponse}}{{/reactive}}
+        {{#reactive}}{{#wrapInHttpResponse}}return {{#vendorExtensions.isReturnFlux}}Flux.from({{/vendorExtensions.isReturnFlux}}Mono.fromCallable(HttpResponse::ok){{#vendorExtensions.isReturnFlux}}){{/vendorExtensions.isReturnFlux}};{{/wrapInHttpResponse}}{{^wrapInHttpResponse}}{{#vendorExtensions.isReturnFlux}}return Flux.empty();{{/vendorExtensions.isReturnFlux}}{{^vendorExtensions.isReturnFlux}}return Mono.empty();{{/vendorExtensions.isReturnFlux}}{{/wrapInHttpResponse}}{{/reactive}}{{^reactive}}{{#wrapInHttpResponse}}return HttpResponse.ok();{{/wrapInHttpResponse}}{{^wrapInHttpResponse}}{{#returnType}}return null;{{/returnType}}{{/wrapInHttpResponse}}{{/reactive}}
         {{/generateOperationsToReturnNotImplemented}}
         {{#generateOperationsToReturnNotImplemented}}
-        {{#reactive}}{{#wrapInHttpResponse}}return Mono.just(HttpResponse.status(HttpStatus.NOT_IMPLEMENTED));{{/wrapInHttpResponse}}{{^wrapInHttpResponse}}return Mono.error(new HttpStatusException(HttpStatus.NOT_IMPLEMENTED, null));{{/wrapInHttpResponse}}{{/reactive}}{{^reactive}}{{#wrapInHttpResponse}}return HttpResponse.status(HttpStatus.NOT_IMPLEMENTED);{{/wrapInHttpResponse}}{{^wrapInHttpResponse}}throw new HttpStatusException(HttpStatus.NOT_IMPLEMENTED, null);{{/wrapInHttpResponse}}{{/reactive}}
+        {{#reactive}}{{#wrapInHttpResponse}}{{#vendorExtensions.isReturnFlux}}return Flux.just(HttpResponse.status(HttpStatus.NOT_IMPLEMENTED));{{/vendorExtensions.isReturnFlux}}{{^vendorExtensions.isReturnFlux}}return Mono.just(HttpResponse.status(HttpStatus.NOT_IMPLEMENTED));{{/vendorExtensions.isReturnFlux}}{{/wrapInHttpResponse}}{{^wrapInHttpResponse}}{{#vendorExtensions.isReturnFlux}}return Flux.error(new HttpStatusException(HttpStatus.NOT_IMPLEMENTED, null));{{/vendorExtensions.isReturnFlux}}{{^vendorExtensions.isReturnFlux}}return Mono.error(new HttpStatusException(HttpStatus.NOT_IMPLEMENTED, null));{{/vendorExtensions.isReturnFlux}}{{/wrapInHttpResponse}}{{/reactive}}{{^reactive}}{{#wrapInHttpResponse}}return HttpResponse.status(HttpStatus.NOT_IMPLEMENTED);{{/wrapInHttpResponse}}{{^wrapInHttpResponse}}throw new HttpStatusException(HttpStatus.NOT_IMPLEMENTED, null);{{/wrapInHttpResponse}}{{/reactive}}
         {{/generateOperationsToReturnNotImplemented}}
     {{/generateControllerFromExamples}}
     {{#generateControllerFromExamples}}
@@ -20,7 +20,7 @@
         return type present
         }}{{#returnType}}return {{!
         reactive start
-        }}{{#reactive}}Mono.fromCallable(() -> {{/reactive}}{{!
+        }}{{#reactive}}{{#vendorExtensions.isReturnFlux}}Flux.from({{/vendorExtensions.isReturnFlux}}Mono.fromCallable(() -> {{/reactive}}{{!
         wrapInHttpResponse start
         }}{{#wrapInHttpResponse}}HttpResponse.ok({{/wrapInHttpResponse}}{{!
         body
@@ -28,13 +28,13 @@
         wrapInHttpResponse end
         }}{{#wrapInHttpResponse}}){{/wrapInHttpResponse}}{{!
         reactive end
-        }}{{#reactive}}){{/reactive}};{{/returnType}}{{!
+        }}{{#vendorExtensions.isReturnFlux}}){{/vendorExtensions.isReturnFlux}}{{#reactive}}){{/reactive}};{{/returnType}}{{!
         return type not present
         }}{{^returnType}}{{!
         reactive
         }}{{#reactive}}return {{!
         wrapInHttpResponse
-        }}{{#wrapInHttpResponse}}Mono.fromCallable(HttpResponse::ok){{/wrapInHttpResponse}}{{^wrapInHttpResponse}}Mono.fromCallable(() -> null){{/wrapInHttpResponse}};{{/reactive}}{{!
+        }}{{#vendorExtensions.isReturnFlux}}Flux.from({{/vendorExtensions.isReturnFlux}}{{#wrapInHttpResponse}}Mono.fromCallable(HttpResponse::ok){{/wrapInHttpResponse}}{{^wrapInHttpResponse}}Mono.fromCallable(() -> null){{/wrapInHttpResponse}}{{#vendorExtensions.isReturnFlux}}){{/vendorExtensions.isReturnFlux}};{{/reactive}}{{!
         not reactive
         }}{{^reactive}}{{!
         wrapInHttpResponse

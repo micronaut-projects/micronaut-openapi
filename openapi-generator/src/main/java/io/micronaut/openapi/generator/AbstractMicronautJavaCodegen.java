@@ -76,6 +76,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
     public static final String OPT_REQUIRED_PROPERTIES_IN_CONSTRUCTOR = "requiredPropertiesInConstructor";
     public static final String OPT_USE_AUTH = "useAuth";
     public static final String OPT_USE_LOMBOK = "lombok";
+    public static final String OPT_FLUX_FOR_ARRAYS = "fluxForArrays";
     public static final String OPT_GENERATED_ANNOTATION = "generatedAnnotation";
     public static final String OPT_VISITABLE = "visitable";
     public static final String OPT_DATE_LIBRARY_ZONED_DATETIME = "ZONED_DATETIME";
@@ -98,11 +99,15 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
     public static final String CONTENT_TYPE_MULTIPART_FORM_DATA = "multipart/form-data";
     public static final String CONTENT_TYPE_ANY = "*/*";
 
+    private static final String MONO_CLASS_NAME = "reactor.core.publisher.Mono";
+    private static final String FLUX_CLASS_NAME = "reactor.core.publisher.Flux";
+
     protected String title;
     protected boolean useBeanValidation;
     protected boolean useOptional;
     protected boolean visitable;
     protected boolean lombok;
+    protected boolean fluxForArrays;
     protected boolean generatedAnnotation = true;
     protected String testTool;
     protected boolean requiredPropertiesInConstructor = true;
@@ -170,6 +175,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
         cliOptions.add(new CliOption(OPT_TITLE, "Client service name").defaultValue(title));
         cliOptions.add(new CliOption(OPT_APPLICATION_NAME, "Micronaut application name (Defaults to the " + CodegenConstants.ARTIFACT_ID + " value)").defaultValue(appName));
         cliOptions.add(CliOption.newBoolean(OPT_USE_LOMBOK, "Whether or not to use lombok annotations in generated code", lombok));
+        cliOptions.add(CliOption.newBoolean(OPT_FLUX_FOR_ARRAYS, "Whether or not to use Flux<?> instead Mono<List<?>> for arrays in generated code", fluxForArrays));
         cliOptions.add(CliOption.newBoolean(OPT_GENERATED_ANNOTATION, "Generate code with \"@Generated\" annotation", generatedAnnotation));
         cliOptions.add(CliOption.newBoolean(USE_BEANVALIDATION, "Use BeanValidation API annotations", useBeanValidation));
         cliOptions.add(CliOption.newBoolean(USE_OPTIONAL, "Use Optional container for optional parameters", useOptional));
@@ -275,6 +281,10 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
         this.lombok = lombok;
     }
 
+    public void setFluxForArrays(boolean fluxForArrays) {
+        this.fluxForArrays = fluxForArrays;
+    }
+
     public void setGeneratedAnnotation(boolean generatedAnnotation) {
         this.generatedAnnotation = generatedAnnotation;
     }
@@ -310,6 +320,11 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
             lombok = convertPropertyToBoolean(OPT_USE_LOMBOK);
         }
         writePropertyBack(OPT_USE_LOMBOK, lombok);
+
+        if (additionalProperties.containsKey(OPT_FLUX_FOR_ARRAYS)) {
+            fluxForArrays = convertPropertyToBoolean(OPT_FLUX_FOR_ARRAYS);
+        }
+        writePropertyBack(OPT_FLUX_FOR_ARRAYS, fluxForArrays);
 
         if (additionalProperties.containsKey(OPT_GENERATED_ANNOTATION)) {
             generatedAnnotation = convertPropertyToBoolean(OPT_GENERATED_ANNOTATION);
@@ -751,8 +766,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
         }
 
         if (bodyMapping != null) {
-            wrapOperationReturnType(op, bodyMapping.mappedBodyType,
-                    bodyMapping.isValidated, bodyMapping.isListWrapper);
+            wrapOperationReturnType(op, bodyMapping.mappedBodyType, bodyMapping.isValidated, bodyMapping.isListWrapper);
         }
     }
 
@@ -771,11 +785,17 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
 
         String typeName = makeSureImported(wrapperType, op.imports);
 
-        if (isListWrapper && op.isArray && op.returnProperty.items != null) {
+        String originalReturnType;
+        if ((isListWrapper || fluxForArrays) && op.isArray && op.returnProperty.items != null) {
+            if (fluxForArrays && wrapperType.equals(MONO_CLASS_NAME)) {
+                typeName = makeSureImported(FLUX_CLASS_NAME, op.imports);
+                op.vendorExtensions.put("isReturnFlux", true);
+            }
+            originalReturnType = op.returnBaseType;
             newReturnType.dataType = typeName + '<' + op.returnBaseType + '>';
             newReturnType.items = op.returnProperty.items;
         } else {
-            String originalReturnType = op.returnType;
+            originalReturnType = op.returnType;
             if (originalReturnType == null) {
                 originalReturnType = "Void";
                 op.returnProperty = new CodegenProperty();
@@ -784,6 +804,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
             newReturnType.dataType = typeName + '<' + originalReturnType + '>';
             newReturnType.items = op.returnProperty;
         }
+        op.vendorExtensions.put("originalReturnType", originalReturnType);
 
         op.returnType = newReturnType.dataType;
         op.returnContainer = null;
@@ -802,7 +823,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
         }
 
         if (reactive) {
-            wrapOperationReturnType(op, "reactor.core.publisher.Mono", false, false);
+            wrapOperationReturnType(op, MONO_CLASS_NAME, false, false);
         }
     }
 

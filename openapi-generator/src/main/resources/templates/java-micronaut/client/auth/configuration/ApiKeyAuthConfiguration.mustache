@@ -7,7 +7,9 @@ import io.micronaut.context.annotation.Parameter;
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.http.MutableHttpRequest;
 import io.micronaut.http.cookie.Cookie;
+{{#withGeneratedAnnotation}}
 import {{javaxPackage}}.annotation.Generated;
+{{/withGeneratedAnnotation}}
 {{#lombok}}
 import lombok.Getter;
 import lombok.Setter;

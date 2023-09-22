@@ -39,7 +39,7 @@ sourceSets {
 tasks.named("generateOpenApi") {
     generatorKind = "server"
     openApiDefinition = layout.projectDirectory.file("spec.yaml")
-    outputKinds = ["models", "apis", "supportingFiles"]
+    outputKinds = ["models", "apis", "modelDocs", "supportingFiles", "modelTests", "apiTests"]
     parameterMappings = [
             // Pageable parameter
             [name: "page", location: "QUERY", mappedType: "io.micronaut.data.model.Pageable"],

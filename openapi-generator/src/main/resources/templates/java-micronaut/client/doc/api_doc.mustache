@@ -26,6 +26,7 @@ Or the `@Inject` annotation:
 ```java
 @Singleton
 class MyClass {
+
     @Inject
     {{classname}} {{#lambda.camelcase}}{{classname}}{{/lambda.camelcase}};
 
@@ -41,7 +42,7 @@ More information can be found inside [Inversion of Control guide section](https:
 <a id="{{operationId}}"></a>
 # **{{operationId}}**
 ```java
-{{#returnType}}Mono<{{{returnType}}}>{{/returnType}}{{^returnType}}Mono<Void>{{/returnType}} {{classname}}.{{nickname}}({{#allParams}}{{{paramName}}}{{#hasMore}}, {{/hasMore}}{{/allParams}})
+{{#returnType}}{{{returnType}}}{{/returnType}}{{^returnType}}Mono<Void>{{/returnType}} {{classname}}.{{nickname}}({{#allParams}}{{{paramName}}}{{#hasMore}}, {{/hasMore}}{{/allParams}})
 ```
 
 {{summary}}{{#notes}}
