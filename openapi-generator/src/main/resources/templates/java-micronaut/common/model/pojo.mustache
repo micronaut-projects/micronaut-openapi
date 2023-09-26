@@ -134,7 +134,7 @@ public class {{classname}} {{#parent}}extends {{{parent}}} {{/parent}}{{#vendorE
         {{#vendorExtensions.withRequiredVars}}
     public {{classname}}({{#vendorExtensions.requiredVarsWithoutDiscriminator}}{{#isReadOnly}}{{#vendorExtensions.isServer}}{{^-first}}, {{/-first}}{{{datatypeWithEnum}}} {{name}}{{/vendorExtensions.isServer}}{{/isReadOnly}}{{^isReadOnly}}{{^-first}}, {{/-first}}{{{datatypeWithEnum}}} {{name}}{{/isReadOnly}}{{/vendorExtensions.requiredVarsWithoutDiscriminator}}) {
         {{#parent}}
-        super({{#vendorExtensions.requiredParentVarsWithoutDiscriminator}}{{name}}{{^-last}}, {{/-last}}{{/vendorExtensions.requiredParentVarsWithoutDiscriminator}});
+        super({{#vendorExtensions.requiredParentVarsWithoutDiscriminator}}{{#vendorExtensions.isServerOrNotReadOnly}}{{^-first}}, {{/-first}}{{name}}{{/vendorExtensions.isServerOrNotReadOnly}}{{/vendorExtensions.requiredParentVarsWithoutDiscriminator}});
         {{/parent}}
         {{#vendorExtensions.requiredVars}}
             {{^isDiscriminator}}
