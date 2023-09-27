@@ -63,6 +63,7 @@ public class JavaMicronautClientCodegen extends AbstractMicronautJavaCodegen<Jav
 
         typeMapping.put("file", "byte[]");
         typeMapping.put("responseFile", "InputStream");
+        importMapping.put("InputStream", "java.io.InputStream");
     }
 
     @Override
