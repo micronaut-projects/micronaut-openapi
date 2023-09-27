@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.annotation.processing.SupportedOptions;
 
@@ -238,7 +237,9 @@ public class OpenApiEndpointVisitor extends AbstractOpenApiEndpointVisitor imple
         if (ArrayUtils.isEmpty(arr)) {
             return DEFAULT_MEDIA_TYPES;
         }
-        return Arrays.stream(arr).map(MediaType::of).collect(Collectors.toList());
+        return Arrays.stream(arr)
+            .map(MediaType::of)
+            .toList();
     }
 
     private static HttpMethodDesciption httpMethodDescription(MethodElement element) {

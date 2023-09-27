@@ -79,8 +79,7 @@ class ResponseBodyControllerSpec extends Specification {
 
         when:
         HttpRequest<?> request = HttpRequest.GET("/getPaginatedSimpleModel?page=${page}&size=${pageSize}")
-        HttpResponse<List<SimpleModel>> response =
-                client.exchange(request, Argument.listOf(SimpleModel))
+        HttpResponse<List<SimpleModel>> response = client.exchange(request, Argument.listOf(SimpleModel))
 
         then:
         var totalCount = "3"

@@ -19,13 +19,13 @@ public record MyFilter (
     List<Condition> conditions
 ) {
 
-    private static final String CONDITION_REGEX = "^(.+)([<>=])(.+)$";
-    private static final Pattern CONDITION_PATTERN = Pattern.compile(CONDITION_REGEX);
-
     /**
      * An implementation with no filtering.
      */
     public static final MyFilter EMPTY = new MyFilter(List.of());
+
+    private static final String CONDITION_REGEX = "^(.+)([<>=])(.+)$";
+    private static final Pattern CONDITION_PATTERN = Pattern.compile(CONDITION_REGEX);
 
     /**
      * Parse the filter from a query parameter.
@@ -39,13 +39,15 @@ public record MyFilter (
         }
         List<Condition> conditions = Arrays.stream(value.split(","))
             .map(Condition::parse)
-            .collect(Collectors.toList());
+            .toList();
         return new MyFilter(conditions);
     }
 
     @Override
     public String toString() {
-        return conditions.stream().map(Object::toString).collect(Collectors.joining(","));
+        return conditions.stream()
+            .map(Object::toString)
+            .collect(Collectors.joining(","));
     }
 
     /**
@@ -68,16 +70,15 @@ public record MyFilter (
          */
         public static Condition parse(String string) {
             Matcher matcher = CONDITION_PATTERN.matcher(string);
-            if (matcher.find()) {
-                return new Condition(
-                    matcher.group(1),
-                    ConditionComparator.parse(matcher.group(2)),
-                    matcher.group(3)
-                );
-            } else {
+            if (!matcher.find()) {
                 throw new ParseException("The filter condition must match '" + CONDITION_REGEX +
                     "' but is '" + string + "'");
             }
+            return new Condition(
+                matcher.group(1),
+                ConditionComparator.parse(matcher.group(2)),
+                matcher.group(3)
+            );
         }
 
         @Override
@@ -90,6 +91,7 @@ public record MyFilter (
      * An enum value for specifying how to compare in the condition.
      */
     public enum ConditionComparator {
+
         EQUALS("="),
         GREATER_THAN(">"),
         LESS_THAN("<");

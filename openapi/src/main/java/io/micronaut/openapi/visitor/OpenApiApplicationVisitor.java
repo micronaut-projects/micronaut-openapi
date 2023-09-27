@@ -38,7 +38,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.function.BiConsumer;
-import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
@@ -145,11 +144,11 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             mergeAdditionalSwaggerFiles(element, context, openApi);
             // handle type level tags
             List<io.swagger.v3.oas.models.tags.Tag> tagList = processOpenApiAnnotation(
-                    element,
-                    context,
-                    Tag.class,
-                    io.swagger.v3.oas.models.tags.Tag.class,
-                    openApi.getTags()
+                element,
+                context,
+                Tag.class,
+                io.swagger.v3.oas.models.tags.Tag.class,
+                openApi.getTags()
             );
             openApi.setTags(tagList);
 
@@ -163,11 +162,11 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
 
             // handle type level servers
             List<io.swagger.v3.oas.models.servers.Server> servers = processOpenApiAnnotation(
-                    element,
-                    context,
-                    Server.class,
-                    io.swagger.v3.oas.models.servers.Server.class,
-                    openApi.getServers()
+                element,
+                context,
+                Server.class,
+                io.swagger.v3.oas.models.servers.Server.class,
+                openApi.getServers()
             );
             openApi.setServers(servers);
 
@@ -175,7 +174,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             if (attr.isPresent()) {
                 OpenAPI existing = attr.get();
                 Optional.ofNullable(openApi.getInfo())
-                        .ifPresent(existing::setInfo);
+                    .ifPresent(existing::setInfo);
                 copyOpenApi(existing, openApi);
             } else {
                 context.put(Utils.ATTR_OPENAPI, openApi);
@@ -270,11 +269,10 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         return element.findAnnotation(OpenAPIDefinition.class).flatMap(o -> {
             Optional<OpenAPI> result = toValue(o.getValues(), context, OpenAPI.class, null);
             result.ifPresent(openAPI -> {
-                List<io.swagger.v3.oas.models.security.SecurityRequirement> securityRequirements =
-                        o.getAnnotations("security", SecurityRequirement.class)
-                                .stream()
-                                .map(ConvertUtils::mapToSecurityRequirement)
-                                .collect(Collectors.toList());
+                var securityRequirements = new ArrayList<io.swagger.v3.oas.models.security.SecurityRequirement>();
+                for (var secRequirementAnn : o.getAnnotations("security", SecurityRequirement.class)) {
+                    securityRequirements.add(ConvertUtils.mapToSecurityRequirement(secRequirementAnn));
+                }
                 openAPI.setSecurity(securityRequirements);
             });
             return result;
@@ -298,12 +296,18 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         }
         return switch (name.toUpperCase(Locale.US)) {
             case "LOWER_CAMEL_CASE" -> new LowerCamelCasePropertyNamingStrategy();
-            case "UPPER_CAMEL_CASE" -> (PropertyNamingStrategies.NamingBase) PropertyNamingStrategies.UPPER_CAMEL_CASE;
-            case "SNAKE_CASE" -> (PropertyNamingStrategies.NamingBase) PropertyNamingStrategies.SNAKE_CASE;
-            case "UPPER_SNAKE_CASE" -> (PropertyNamingStrategies.NamingBase) PropertyNamingStrategies.UPPER_SNAKE_CASE;
-            case "LOWER_CASE" -> (PropertyNamingStrategies.NamingBase) PropertyNamingStrategies.LOWER_CASE;
-            case "KEBAB_CASE" -> (PropertyNamingStrategies.NamingBase) PropertyNamingStrategies.KEBAB_CASE;
-            case "LOWER_DOT_CASE" -> (PropertyNamingStrategies.NamingBase) PropertyNamingStrategies.LOWER_DOT_CASE;
+            case "UPPER_CAMEL_CASE" ->
+                (PropertyNamingStrategies.NamingBase) PropertyNamingStrategies.UPPER_CAMEL_CASE;
+            case "SNAKE_CASE" ->
+                (PropertyNamingStrategies.NamingBase) PropertyNamingStrategies.SNAKE_CASE;
+            case "UPPER_SNAKE_CASE" ->
+                (PropertyNamingStrategies.NamingBase) PropertyNamingStrategies.UPPER_SNAKE_CASE;
+            case "LOWER_CASE" ->
+                (PropertyNamingStrategies.NamingBase) PropertyNamingStrategies.LOWER_CASE;
+            case "KEBAB_CASE" ->
+                (PropertyNamingStrategies.NamingBase) PropertyNamingStrategies.KEBAB_CASE;
+            case "LOWER_DOT_CASE" ->
+                (PropertyNamingStrategies.NamingBase) PropertyNamingStrategies.LOWER_DOT_CASE;
             default -> null;
         };
     }
@@ -362,8 +366,8 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                     Map<String, Schema> properties = model.getProperties();
                     if (properties != null) {
                         Map<String, Schema> newProperties = properties.entrySet().stream()
-                                .collect(Collectors.toMap(entry -> propertyNamingStrategy.translate(entry.getKey()),
-                                        Map.Entry::getValue, (prop1, prop2) -> prop1, LinkedHashMap::new));
+                            .collect(Collectors.toMap(entry -> propertyNamingStrategy.translate(entry.getKey()),
+                                Map.Entry::getValue, (prop1, prop2) -> prop1, LinkedHashMap::new));
                         model.getProperties().clear();
                         model.setProperties(newProperties);
                     }
@@ -558,8 +562,8 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                         // default name: swagger-<version>-<groupName>-<apiVersion>
 
                         fileName = fileName.substring(0, fileName.length() - ext.length())
-                                + (openApiInfo.getGroupName() != null ? "-" + openApiInfo.getGroupName() : StringUtils.EMPTY_STRING)
-                                + (openApiInfo.getVersion() != null ? "-" + openApiInfo.getVersion() : StringUtils.EMPTY_STRING);
+                            + (openApiInfo.getGroupName() != null ? "-" + openApiInfo.getGroupName() : StringUtils.EMPTY_STRING)
+                            + (openApiInfo.getVersion() != null ? "-" + openApiInfo.getVersion() : StringUtils.EMPTY_STRING);
                     }
 
                     fileName = replacePlaceholders(fileName, context) + ext;
@@ -594,7 +598,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         Set<String> allVersions = Utils.getAllKnownVersions();
         Set<String> allGroups = Utils.getAllKnownGroups();
         if (CollectionUtils.isEmpty(endpointInfosMap)
-                || (CollectionUtils.isEmpty(allVersions) && CollectionUtils.isEmpty(allGroups))) {
+            || (CollectionUtils.isEmpty(allVersions) && CollectionUtils.isEmpty(allGroups))) {
             return Collections.singletonMap(Pair.NULL_STRING_PAIR, new OpenApiInfo(openApi));
         }
 
@@ -682,11 +686,11 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             }
 
             openApiInfo = new OpenApiInfo(
-                    version,
-                    group,
-                    hasGroupProperties ? groupProperties.getDisplayName() : null,
-                    hasGroupProperties ? groupProperties.getFilename() : null,
-                    newOpenApi
+                version,
+                group,
+                hasGroupProperties ? groupProperties.getDisplayName() : null,
+                hasGroupProperties ? groupProperties.getFilename() : null,
+                newOpenApi
             );
 
             openApiInfoMap.put(key, openApiInfo);
@@ -780,37 +784,19 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         return openApi;
     }
 
-    private <T> List<T> findAndRemoveDuplicates(List<T> elements, BiPredicate<T, T> predicate) {
-        if (CollectionUtils.isEmpty(elements)) {
-            return elements;
-        }
-        var result = new ArrayList<T>();
-        for (var element : elements) {
-            boolean found = false;
-            for (var el : result) {
-                if (predicate.test(element, el)) {
-                    found = true;
-                    break;
-                }
-            }
-            if (!found) {
-                result.add(element);
-            }
-        }
-        if (result.size() != elements.size()) {
-            return result;
-        }
-        return elements;
-    }
-
+    /**
+     * Find and remove duplicates in openApi object.
+     *
+     * @param openApi openAPI object
+     */
     void findAndRemoveDuplicates(OpenAPI openApi) {
-        openApi.setTags(findAndRemoveDuplicates(openApi.getTags(), (el1, el2) -> el1.getName() != null && el1.getName().equals(el2.getName())));
-        openApi.setServers(findAndRemoveDuplicates(openApi.getServers(), (el1, el2) -> el1.getUrl() != null && el1.getUrl().equals(el2.getUrl())));
-        openApi.setSecurity(findAndRemoveDuplicates(openApi.getSecurity(), (el1, el2) -> el1 != null && el1.equals(el2)));
+        openApi.setTags(Utils.findAndRemoveDuplicates(openApi.getTags(), (el1, el2) -> el1.getName() != null && el1.getName().equals(el2.getName())));
+        openApi.setServers(Utils.findAndRemoveDuplicates(openApi.getServers(), (el1, el2) -> el1.getUrl() != null && el1.getUrl().equals(el2.getUrl())));
+        openApi.setSecurity(Utils.findAndRemoveDuplicates(openApi.getSecurity(), (el1, el2) -> el1 != null && el1.equals(el2)));
         if (CollectionUtils.isNotEmpty(openApi.getPaths())) {
             for (var path : openApi.getPaths().values()) {
-                path.setServers(findAndRemoveDuplicates(path.getServers(), (el1, el2) -> el1.getUrl() != null && el1.getUrl().equals(el2.getUrl())));
-                path.setParameters(findAndRemoveDuplicates(path.getParameters(), (el1, el2) -> el1.getName() != null && el1.getName().equals(el2.getName())
+                path.setServers(Utils.findAndRemoveDuplicates(path.getServers(), (el1, el2) -> el1.getUrl() != null && el1.getUrl().equals(el2.getUrl())));
+                path.setParameters(Utils.findAndRemoveDuplicates(path.getParameters(), (el1, el2) -> el1.getName() != null && el1.getName().equals(el2.getName())
                     && el1.getIn() != null && el1.getIn().equals(el2.getIn())));
                 findAndRemoveDuplicates(path.getGet());
                 findAndRemoveDuplicates(path.getPut());
@@ -842,26 +828,26 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         if (schema == null) {
             return;
         }
-        schema.setRequired(findAndRemoveDuplicates(schema.getRequired(), (el1, el2) -> el1 != null && el1.equals(el2)));
-        schema.setPrefixItems(findAndRemoveDuplicates(schema.getPrefixItems(), (el1, el2) -> el1 != null && el1.equals(el2)));
-        schema.setAllOf(findAndRemoveDuplicates(schema.getAllOf(), (el1, el2) -> el1 != null && el1.equals(el2)));
-        schema.setAnyOf(findAndRemoveDuplicates(schema.getAnyOf(), (el1, el2) -> el1 != null && el1.equals(el2)));
-        schema.setOneOf(findAndRemoveDuplicates(schema.getOneOf(), (el1, el2) -> el1 != null && el1.equals(el2)));
+        schema.setRequired(Utils.findAndRemoveDuplicates(schema.getRequired(), (el1, el2) -> el1 != null && el1.equals(el2)));
+        schema.setPrefixItems(Utils.findAndRemoveDuplicates(schema.getPrefixItems(), (el1, el2) -> el1 != null && el1.equals(el2)));
+        schema.setAllOf(Utils.findAndRemoveDuplicates(schema.getAllOf(), (el1, el2) -> el1 != null && el1.equals(el2)));
+        schema.setAnyOf(Utils.findAndRemoveDuplicates(schema.getAnyOf(), (el1, el2) -> el1 != null && el1.equals(el2)));
+        schema.setOneOf(Utils.findAndRemoveDuplicates(schema.getOneOf(), (el1, el2) -> el1 != null && el1.equals(el2)));
     }
 
     private void findAndRemoveDuplicates(Operation operation) {
         if (operation == null) {
             return;
         }
-        operation.setTags(findAndRemoveDuplicates(operation.getTags(), (el1, el2) -> el1 != null && el1.equals(el2)));
-        operation.setServers(findAndRemoveDuplicates(operation.getServers(), (el1, el2) -> el1.getUrl() != null && el1.getUrl().equals(el2.getUrl())));
-        operation.setSecurity(findAndRemoveDuplicates(operation.getSecurity(), (el1, el2) -> el1 != null && el1.equals(el2)));
+        operation.setTags(Utils.findAndRemoveDuplicates(operation.getTags(), (el1, el2) -> el1 != null && el1.equals(el2)));
+        operation.setServers(Utils.findAndRemoveDuplicates(operation.getServers(), (el1, el2) -> el1.getUrl() != null && el1.getUrl().equals(el2.getUrl())));
+        operation.setSecurity(Utils.findAndRemoveDuplicates(operation.getSecurity(), (el1, el2) -> el1 != null && el1.equals(el2)));
         if (CollectionUtils.isNotEmpty(operation.getParameters())) {
             for (var param : operation.getParameters()) {
                 findAndRemoveDuplicates(param.getContent());
                 findAndRemoveDuplicates(param.getSchema());
             }
-            operation.setParameters(findAndRemoveDuplicates(operation.getParameters(), (el1, el2) -> el1.getName() != null && el1.getName().equals(el2.getName())
+            operation.setParameters(Utils.findAndRemoveDuplicates(operation.getParameters(), (el1, el2) -> el1.getName() != null && el1.getName().equals(el2.getName())
                 && el1.getIn() != null && el1.getIn().equals(el2.getIn())));
         }
 
@@ -921,15 +907,15 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         }
 
         if (CollectionUtils.isEmpty(components.getSchemas())
-                && CollectionUtils.isEmpty(components.getResponses())
-                && CollectionUtils.isEmpty(components.getParameters())
-                && CollectionUtils.isEmpty(components.getExamples())
-                && CollectionUtils.isEmpty(components.getRequestBodies())
-                && CollectionUtils.isEmpty(components.getHeaders())
-                && CollectionUtils.isEmpty(components.getSecuritySchemes())
-                && CollectionUtils.isEmpty(components.getLinks())
-                && CollectionUtils.isEmpty(components.getCallbacks())
-                && CollectionUtils.isEmpty(components.getExtensions())
+            && CollectionUtils.isEmpty(components.getResponses())
+            && CollectionUtils.isEmpty(components.getParameters())
+            && CollectionUtils.isEmpty(components.getExamples())
+            && CollectionUtils.isEmpty(components.getRequestBodies())
+            && CollectionUtils.isEmpty(components.getHeaders())
+            && CollectionUtils.isEmpty(components.getSecuritySchemes())
+            && CollectionUtils.isEmpty(components.getLinks())
+            && CollectionUtils.isEmpty(components.getCallbacks())
+            && CollectionUtils.isEmpty(components.getExtensions())
         ) {
             openAPI.setComponents(null);
         }
@@ -1079,8 +1065,8 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             boolean isSameType = allOfSchema.getType() == null || allOfSchema.getType().equals(type);
 
             if (SchemaUtils.isEmptySchema(schema)
-                    && (serializedDefaultValue == null || serializedDefaultValue.equals(serializedAllOfDefaultValue))
-                    && (type == null || allOfSchema.getType() == null || allOfSchema.getType().equals(type))) {
+                && (serializedDefaultValue == null || serializedDefaultValue.equals(serializedAllOfDefaultValue))
+                && (type == null || allOfSchema.getType() == null || allOfSchema.getType().equals(type))) {
                 normalizedSchema = allOfSchema;
             }
             schema.setType(type);
@@ -1114,12 +1100,12 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                 schemasWithoutRef.add(schemaAllOf);
                 // remove all description fields, if it's already set in main schema
                 if (StringUtils.isNotEmpty(schema.getDescription())
-                        && StringUtils.isNotEmpty(schemaAllOf.getDescription())) {
+                    && StringUtils.isNotEmpty(schemaAllOf.getDescription())) {
                     schemaAllOf.setDescription(null);
                 }
                 // remove deplicate default field
                 if (schema.getDefault() != null
-                        && schemaAllOf.getDefault() != null && schema.getDefault().equals(schemaAllOf.getDefault())) {
+                    && schemaAllOf.getDefault() != null && schema.getDefault().equals(schemaAllOf.getDefault())) {
                     schema.setDefault(null);
                 }
                 continue;
@@ -1216,9 +1202,9 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                 renderViews(documentTitle, openApiInfos, viewsDestDirs, context);
             } catch (Exception e) {
                 context.warn("Unable to render swagger" + (isYaml ? EXT_YML : EXT_JSON) + ": " + openApiInfos.values()
-                        .stream()
-                        .map(OpenApiInfo::getSpecFilePath)
-                        .collect(Collectors.joining(", ", "files ", "")) + " - " + e.getMessage() + ".\n" + Utils.printStackTrace(e), classElement);
+                    .stream()
+                    .map(OpenApiInfo::getSpecFilePath)
+                    .collect(Collectors.joining(", ", "files ", "")) + " - " + e.getMessage() + ".\n" + Utils.printStackTrace(e), classElement);
             }
         }
     }
@@ -1238,19 +1224,19 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         if (endpointsCfg.isEnabled() && CollectionUtils.isNotEmpty(endpointsCfg.getEndpoints())) {
             OpenApiEndpointVisitor visitor = new OpenApiEndpointVisitor(true);
             endpointsCfg.getEndpoints().values().stream()
-                    .filter(endpoint -> endpoint.getClassElement().isPresent())
-                    .forEach(endpoint -> {
-                        ClassElement classEl = endpoint.getClassElement().get();
-                        context.put(MICRONAUT_INTERNAL_OPENAPI_ENDPOINT_CLASS_TAGS, endpoint.getTags());
-                        context.put(MICRONAUT_INTERNAL_OPENAPI_ENDPOINT_SERVERS, endpoint.getServers());
-                        context.put(MICRONAUT_INTERNAL_OPENAPI_ENDPOINT_SECURITY_REQUIREMENTS, endpoint.getSecurityRequirements());
-                        visitor.visitClass(classEl, context);
-                        for (MethodElement methodEl : classEl.getEnclosedElements(ElementQuery.ALL_METHODS
-                                .modifiers(mods -> !mods.contains(ElementModifier.STATIC) && !mods.contains(ElementModifier.PRIVATE))
-                                .named(name -> !name.contains("$")))) {
-                            visitor.visitMethod(methodEl, context);
-                        }
-                    });
+                .filter(endpoint -> endpoint.getClassElement().isPresent())
+                .forEach(endpoint -> {
+                    ClassElement classEl = endpoint.getClassElement().get();
+                    context.put(MICRONAUT_INTERNAL_OPENAPI_ENDPOINT_CLASS_TAGS, endpoint.getTags());
+                    context.put(MICRONAUT_INTERNAL_OPENAPI_ENDPOINT_SERVERS, endpoint.getServers());
+                    context.put(MICRONAUT_INTERNAL_OPENAPI_ENDPOINT_SECURITY_REQUIREMENTS, endpoint.getSecurityRequirements());
+                    visitor.visitClass(classEl, context);
+                    for (MethodElement methodEl : classEl.getEnclosedElements(ElementQuery.ALL_METHODS
+                        .modifiers(mods -> !mods.contains(ElementModifier.STATIC) && !mods.contains(ElementModifier.PRIVATE))
+                        .named(name -> !name.contains("$")))) {
+                        visitor.visitMethod(methodEl, context);
+                    }
+                });
         }
     }
 

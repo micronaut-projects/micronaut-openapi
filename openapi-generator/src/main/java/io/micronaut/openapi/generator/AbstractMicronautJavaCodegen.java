@@ -622,10 +622,10 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
             }
             op.consumes = op.consumes == null ? null : op.consumes.stream()
                     .filter(contentType -> !CONTENT_TYPE_ANY.equals(contentType.get("mediaType")))
-                    .collect(Collectors.toList());
+                    .toList();
             op.produces = op.produces == null ? null : op.produces.stream()
                     .filter(contentType -> !CONTENT_TYPE_ANY.equals(contentType.get("mediaType")))
-                    .collect(Collectors.toList());
+                    .toList();
 
             // is only default "application/json" media type
             if (op.consumes == null

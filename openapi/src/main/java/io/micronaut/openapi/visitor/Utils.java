@@ -17,6 +17,7 @@ package io.micronaut.openapi.visitor;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -24,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.BiPredicate;
 
 import io.micronaut.context.env.DefaultPropertyPlaceholderResolver;
 import io.micronaut.context.env.PropertyPlaceholderResolver;
@@ -31,6 +33,7 @@ import io.micronaut.core.annotation.Internal;
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.core.convert.ArgumentConversionContext;
 import io.micronaut.core.convert.DefaultMutableConversionService;
+import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.core.value.PropertyResolver;
 import io.micronaut.http.MediaType;
 import io.micronaut.inject.visitor.VisitorContext;
@@ -140,6 +143,38 @@ public final class Utils {
                 }
             }
         }
+    }
+
+    /**
+     * Find and remove duplicates in lists.
+     *
+     * @param elements list of elements
+     * @param predicate predicate for calculating duplicate element
+     * @param <T> elements class
+     *
+     * @return list of elements without duplicates
+     */
+    public static <T> List<T> findAndRemoveDuplicates(List<T> elements, BiPredicate<T, T> predicate) {
+        if (CollectionUtils.isEmpty(elements)) {
+            return elements;
+        }
+        var result = new ArrayList<T>();
+        for (var element : elements) {
+            boolean found = false;
+            for (var el : result) {
+                if (predicate.test(element, el)) {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                result.add(element);
+            }
+        }
+        if (result.size() != elements.size()) {
+            return result;
+        }
+        return elements;
     }
 
     /**

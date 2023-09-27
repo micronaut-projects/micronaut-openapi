@@ -1,5 +1,7 @@
 package io.micronaut.openapi.test.page;
 
+import java.io.OutputStream;
+import java.util.List;
 
 import io.micronaut.context.exceptions.ConfigurationException;
 import io.micronaut.core.annotation.Nullable;
@@ -12,14 +14,12 @@ import io.micronaut.http.annotation.Produces;
 import io.micronaut.http.body.MessageBodyHandlerRegistry;
 import io.micronaut.http.body.MessageBodyWriter;
 import io.micronaut.http.codec.CodecException;
+
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 
-import java.io.OutputStream;
-import java.util.List;
-
 /**
- * An class for writing {@link Page} to the HTTP response with content as JSON body.
+ * A class for writing {@link Page} to the HTTP response with content as JSON body.
  *
  * @param <T> the type of page item
  */
@@ -53,12 +53,10 @@ final class PageBodyWriter<T> implements MessageBodyWriter<Page<T>> {
     }
 
     @Override
-    public MessageBodyWriter<Page<T>> createSpecific(
-        Argument<Page<T>> type
-    ) {
+    public MessageBodyWriter<Page<T>> createSpecific(Argument<Page<T>> type) {
         Argument<List<T>> bt = Argument.listOf(type.getTypeParameters()[0]);
         MessageBodyWriter<List<T>> writer = registry.findWriter(bt, List.of(MediaType.APPLICATION_JSON_TYPE))
-                .orElseThrow(() -> new ConfigurationException("No JSON message writer present"));
+            .orElseThrow(() -> new ConfigurationException("No JSON message writer present"));
         return new PageBodyWriter<>(registry, writer, bt);
     }
 
@@ -70,24 +68,20 @@ final class PageBodyWriter<T> implements MessageBodyWriter<Page<T>> {
         MutableHeaders headers,
         OutputStream outputStream
     ) throws CodecException {
-        if (bodyType != null && bodyWriter != null) {
-            headers.add(PAGE_NUMBER_HEADER, String.valueOf(page.getPageNumber()));
-            headers.add(PAGE_SIZE_HEADER, String.valueOf(page.getSize()));
-            headers.add(PAGE_COUNT_HEADER, String.valueOf(page.getTotalPages()));
-            headers.add(TOTAL_COUNT_HEADER, String.valueOf(page.getTotalSize()));
-
-            bodyWriter.writeTo(bodyType, mediaType, page.getContent(), headers, outputStream);
-        } else {
+        if (bodyType == null || bodyWriter == null) {
             throw new ConfigurationException("No JSON message writer present");
         }
+        headers.add(PAGE_NUMBER_HEADER, Integer.toString(page.getPageNumber()))
+            .add(PAGE_SIZE_HEADER, Integer.toString(page.getSize()))
+            .add(PAGE_COUNT_HEADER, Integer.toString(page.getTotalPages()))
+            .add(TOTAL_COUNT_HEADER, Long.toString(page.getTotalSize()));
+
+        bodyWriter.writeTo(bodyType, mediaType, page.getContent(), headers, outputStream);
     }
 
     @Override
-    public boolean isWriteable(
-        Argument<Page<T>> type,
-        MediaType mediaType
-    ) {
-        return bodyType != null && bodyWriter != null && bodyWriter.isWriteable(bodyType, mediaType);
+    public boolean isWriteable(Argument<Page<T>> type, MediaType mediaType) {
+        return bodyType == null || bodyWriter != null && bodyWriter.isWriteable(bodyType, mediaType);
     }
 
     @Override

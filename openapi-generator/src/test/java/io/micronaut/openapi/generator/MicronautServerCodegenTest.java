@@ -161,14 +161,11 @@ class MicronautServerCodegenTest extends AbstractMicronautCodegenTest {
     }
 
     @Test
-    @Disabled("Feature is not fully implemented in OpenAPI generator 6.x. Will be fixed in openapi-generator 7.0.0")
     void testExtraAnnotations() {
-
         JavaMicronautServerCodegen codegen = new JavaMicronautServerCodegen();
         String outputPath = generateFiles(codegen, "src/test/resources/3_0/issue_11772.yml", CodegenConstants.MODELS);
 
         TestUtils.assertExtraAnnotationFiles(outputPath + "/src/main/java/org/openapitools/model");
-
     }
 
     @Test
