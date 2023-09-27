@@ -1,0 +1,24 @@
+openapi: "3.0.3"
+info:
+  version: "v1"
+  title: "Dummy"
+paths:
+  /assets:export:
+    get:
+      operationId: "Dummy"
+      description: ""
+      parameters:
+        - name: "query"
+          in: "query"
+          description: ""
+          required: false
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: ""
+          content:
+            '*/*':
+              schema:
+                type: "string"
+                format: "binary"
