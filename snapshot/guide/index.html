@@ -1577,7 +1577,7 @@ the project directory through the annotation processor setting <code>micronaut.o
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-none hljs">kapt {
     arguments {
-        arg("micronaut.openapi.project.dir", projectDir)
+        arg("micronaut.openapi.project.dir", projectDir.toString())
     }
 }</code></pre>
 </div>
