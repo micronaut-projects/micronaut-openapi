@@ -885,13 +885,14 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
             }
             for (var property : model.vars) {
                 property.vendorExtensions.put("lombok", lombok);
+                property.vendorExtensions.put("defaultValueIsNotNull", property.defaultValue != null && !property.defaultValue.equals("null"));
+                property.vendorExtensions.put("isServer", isServer);
             }
             model.vendorExtensions.put("isServer", isServer);
-            for (var property : model.vars) {
-                property.vendorExtensions.put("isServer", isServer);
-            }
             for (var property : model.requiredVars) {
+                property.vendorExtensions.put("lombok", lombok);
                 property.vendorExtensions.put("isServer", isServer);
+                property.vendorExtensions.put("defaultValueIsNotNull", property.defaultValue != null && !property.defaultValue.equals("null"));
             }
         }
 
