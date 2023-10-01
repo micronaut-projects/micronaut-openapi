@@ -25,6 +25,7 @@ import java.util.Properties;
 
 import io.micronaut.core.util.StringUtils;
 import io.micronaut.inject.visitor.VisitorContext;
+import io.micronaut.openapi.OpenApiUtils;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.servers.Server;
 import io.swagger.v3.oas.models.tags.Tag;
@@ -160,7 +161,7 @@ public class EndpointsConfiguration {
             return Collections.emptyList();
         }
         try {
-            return ConvertUtils.getConvertJsonMapper().readValue(s, typeReference);
+            return OpenApiUtils.getConvertJsonMapper().readValue(s, typeReference);
         } catch (JsonProcessingException e) {
             context.warn("Fail to parse " + typeReference.getType().toString() + ": " + s + " - " + e.getMessage(), null);
         }

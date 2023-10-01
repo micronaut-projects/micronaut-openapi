@@ -29,8 +29,8 @@ import io.micronaut.core.annotation.Nullable;
 import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.core.util.StringUtils;
 import io.micronaut.inject.visitor.VisitorContext;
+import io.micronaut.openapi.OpenApiUtils;
 import io.micronaut.openapi.view.OpenApiViewConfig.RendererType;
-import io.micronaut.openapi.visitor.ConvertUtils;
 import io.micronaut.openapi.visitor.Pair;
 import io.micronaut.openapi.visitor.group.OpenApiInfo;
 
@@ -291,7 +291,7 @@ final class SwaggerUIConfig extends AbstractViewConfig {
             return StringUtils.EMPTY_STRING;
         }
         try {
-            return "urls:" + ConvertUtils.getJsonMapper().writeValueAsString(urls) + ',';
+            return "urls:" + OpenApiUtils.getJsonMapper().writeValueAsString(urls) + ',';
         } catch (JsonProcessingException e) {
             context.warn("Some problems with serialize urls " + e.getMessage(), null);
         }

@@ -304,7 +304,7 @@ class MyBean {}
         pathItem.post.parameters[0].name == 'fooBar'
     }
 
-    void "test prinicipal is not included"() {
+    void "test principal is not included"() {
 
         given: "An API definition"
         when:

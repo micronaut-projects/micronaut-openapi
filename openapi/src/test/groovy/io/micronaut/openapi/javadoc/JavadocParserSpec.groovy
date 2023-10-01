@@ -83,7 +83,7 @@ And more stuff.
 
 @since 1.0
 @param foo The foo param
-With more foo param desctiption
+With more foo param description
 @param bar The {@code bar} param
 @return The {@value return} value
 with more return description
@@ -96,7 +96,7 @@ as it is multiline
         desc.methodDescription
         desc.returnDescription
         desc.parameters.size() == 2
-        desc.parameters['foo'] == '''The foo param With more foo param desctiption'''
+        desc.parameters['foo'] == '''The foo param With more foo param description'''
         desc.parameters['bar'] == 'The `bar` param'
         desc.methodSummary == 'This is a description with **bold** and `some code`.'
         desc.methodDescription == '''This is a description with **bold** and `some code`.

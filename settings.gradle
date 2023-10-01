@@ -17,16 +17,14 @@ include "openapi"
 include "openapi-annotations"
 include "openapi-bom"
 include "openapi-common"
+include "openapi-adoc"
 include "openapi-generator"
-include "openapi-to-adoc"
 include 'docs-examples:example-groovy'
 include 'docs-examples:example-java'
 include 'docs-examples:example-kotlin'
 include 'test-suite-client-generator'
 include 'test-suite-server-generator'
 include 'test-suite-generator-util'
-
-enableFeaturePreview 'TYPESAFE_PROJECT_ACCESSORS'
 
 dependencyResolutionManagement {
     repositories {

@@ -261,7 +261,7 @@ class MyBean {}
         System.clearProperty(Environment.ENVIRONMENTS_PROPERTY)
     }
 
-    void "test map micronaut security settings to OpenAPI with custm schema name"() {
+    void "test map micronaut security settings to OpenAPI with custom schema name"() {
         given:
         System.setProperty(OpenApiConfigProperty.MICRONAUT_CONFIG_FILE_LOCATIONS, "project:/src/test/resources/")
         System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_SECURITY_DEFAULT_SCHEMA_NAME, "customSchema")

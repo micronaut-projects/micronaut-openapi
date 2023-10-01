@@ -71,7 +71,7 @@ public interface OpenApiConfigProperty {
      */
     String MICRONAUT_OPENAPI_SECURITY_DEFAULT_SCHEMA_NAME = "micronaut.openapi.security.default-schema-name";
     /**
-     * System property that specifies the schema classes fields visibility level. By default, only public fields visibile.
+     * System property that specifies the schema classes fields visibility level. By default, only public fields visible.
      * <p>
      * Available values:
      * </p>
@@ -112,7 +112,7 @@ public interface OpenApiConfigProperty {
      */
     String MICRONAUT_OPENAPI_SECURITY_ENABLED = "micronaut.openapi.security.enabled";
     /**
-     * Is this property true, micronaut-openapi will process micronaut-router versioning prpoerties and annotations.
+     * Is this property true, micronaut-openapi will process micronaut-router versioning properties and annotations.
      * <br>
      * Default value is "true".
      */
@@ -143,7 +143,7 @@ public interface OpenApiConfigProperty {
     String MICRONAUT_JACKSON_JSON_VIEW_ENABLED = "jackson.json-view.enabled";
 
     /**
-     * Properties prefix to set custom schema implementations for selected clases.
+     * Properties prefix to set custom schema implementations for selected classes.
      * For example, if you want to set simple 'java.lang.String' class to some complex 'org.somepackage.MyComplexType' class you need to write:
      * <p>
      * micronaut.openapi.schema.org.somepackage.MyComplexType=java.lang.String
@@ -177,7 +177,7 @@ public interface OpenApiConfigProperty {
     String MICRONAUT_OPENAPI_SCHEMA_PREFIX = "micronaut.openapi.schema-prefix";
     String MICRONAUT_OPENAPI_SCHEMA_POSTFIX = "micronaut.openapi.schema-postfix";
     /**
-     * Properties prefix to set custom schema implementations for selected clases.
+     * Properties prefix to set custom schema implementations for selected classes.
      * For example, if you want to set simple 'java.lang.String' class to some complex 'org.somepackage.MyComplexType' class you need to write:
      * <p>
      * -Dmicronaut.openapi.group.my-group1.title="Title 1"
@@ -199,31 +199,31 @@ public interface OpenApiConfigProperty {
     /**
      * Prefix for custom sub-template names.
      */
-    String MICRONAUT_OPENAPI_ADOC_TEMPLATE_PREFIX = "micronaut.openapi.adoc.template.";
+    String MICRONAUT_OPENAPI_ADOC_TEMPLATE_PREFIX = "micronaut.openapi.adoc.templates.";
     /**
-     * Is convertion to Asciidoc enabled.
+     * Is conversion to Asciidoc enabled.
      */
     String MICRONAUT_OPENAPI_ADOC_ENABLED = "micronaut.openapi.adoc.enabled";
     /**
      * Custom template directory.
      */
-    String MICRONAUT_OPENAPI_ADOC_TEMPLATES_DIR_PATH = "micronaut.openapi.adoc.template-dir";
+    String MICRONAUT_OPENAPI_ADOC_TEMPLATES_DIR_PATH = "micronaut.openapi.adoc.template.dir";
     /**
      * Custom final template filename.
      */
-    String MICRONAUT_OPENAPI_ADOC_TEMPLATE_FILENAME = "micronaut.openapi.adoc.template-filename";
+    String MICRONAUT_OPENAPI_ADOC_TEMPLATE_FILENAME = "micronaut.openapi.adoc.template.filename";
     /**
      * Result adoc file output directory.
      */
-    String MICRONAUT_OPENAPI_ADOC_OUTPUT_DIR_PATH = "micronaut.openapi.adoc.output-dir";
+    String MICRONAUT_OPENAPI_ADOC_OUTPUT_DIR_PATH = "micronaut.openapi.adoc.output.dir";
     /**
      * Result adoc filename.
      */
-    String MICRONAUT_OPENAPI_ADOC_OUTPUT_FILENAME = "micronaut.openapi.adoc.output-filename";
+    String MICRONAUT_OPENAPI_ADOC_OUTPUT_FILENAME = "micronaut.openapi.adoc.output.filename";
     /**
      * OpenAPI file path.
      */
-    String MICRONAUT_OPENAPI_ADOC_OPENAPI_PATH = "micronaut.openapi.adoc.openapi-path";
+    String MICRONAUT_OPENAPI_ADOC_OPENAPI_PATH = "micronaut.openapi.adoc.openapi.path";
     /**
      * Default openapi config file.
      */

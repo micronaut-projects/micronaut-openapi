@@ -1,3 +1,18 @@
+/*
+ * Copyright 2017-2023 original authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package io.micronaut.openapi.visitor;
 
 import java.io.StringWriter;
@@ -12,15 +27,34 @@ import io.micronaut.inject.visitor.VisitorContext;
 import io.micronaut.openapi.adoc.OpenApiToAdocConverter;
 import io.micronaut.openapi.visitor.group.OpenApiInfo;
 
+import static io.micronaut.openapi.visitor.FileUtils.EXT_ADOC;
+import static io.micronaut.openapi.visitor.FileUtils.EXT_JSON;
+import static io.micronaut.openapi.visitor.FileUtils.EXT_YAML;
+import static io.micronaut.openapi.visitor.FileUtils.EXT_YML;
 import static io.micronaut.openapi.visitor.FileUtils.createDirectories;
 import static io.micronaut.openapi.visitor.FileUtils.getDefaultFilePath;
 import static io.micronaut.openapi.visitor.FileUtils.resolve;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ADOC_OUTPUT_DIR_PATH;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ADOC_OUTPUT_FILENAME;
 
-public class AdocModule {
+/**
+ * Method to convert final openapi file to adoc format.
+ *
+ * @since 5.2.0
+ */
+public final class AdocModule {
 
-    public void convert(OpenApiInfo openApiInfo, Map<String, String> props, VisitorContext context) {
+    private AdocModule() {
+    }
+
+    /**
+     * Convert and save to file openAPI object in adoc format.
+     *
+     * @param openApiInfo openApiInfo object
+     * @param props openapi-adoc properties
+     * @param context visitor context
+     */
+    public static void convert(OpenApiInfo openApiInfo, Map<String, String> props, VisitorContext context) {
 
         try {
             var writer = new StringWriter();
@@ -28,7 +62,7 @@ public class AdocModule {
 
             var adoc = writer.toString();
 
-            var outputPath = getOutputPath(props, context);
+            var outputPath = getOutputPath(openApiInfo, props, context);
             context.info("Writing AsciiDoc OpenAPI file to destination: " + outputPath);
             context.getClassesOutputPath().ifPresent(path -> {
                 // add relative paths for the specPath, and its parent META-INF/swagger
@@ -46,9 +80,20 @@ public class AdocModule {
         }
     }
 
-    private Path getOutputPath(Map<String, String> props, VisitorContext context) {
+    private static Path getOutputPath(OpenApiInfo openApiInfo, Map<String, String> props, VisitorContext context) {
 
-        var fileName = props.getOrDefault(MICRONAUT_OPENAPI_ADOC_OUTPUT_FILENAME, "openApiDoc.adoc");
+        var fileName = props.get(MICRONAUT_OPENAPI_ADOC_OUTPUT_FILENAME);
+        if (StringUtils.isEmpty(fileName)) {
+
+            var openApiFilename = openApiInfo.getFilename();
+
+            if (openApiFilename.endsWith(EXT_JSON)
+                || openApiFilename.endsWith(EXT_YML)
+                || openApiFilename.endsWith(EXT_YAML)) {
+                fileName = openApiFilename.substring(0, openApiFilename.lastIndexOf('.'));
+            }
+            fileName += EXT_ADOC;
+        }
 
         Path outputPath;
         String outputDir = props.get(MICRONAUT_OPENAPI_ADOC_OUTPUT_DIR_PATH);

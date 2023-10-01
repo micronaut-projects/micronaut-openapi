@@ -46,6 +46,7 @@ import io.micronaut.core.util.StringUtils;
 import io.micronaut.inject.ast.ClassElement;
 import io.micronaut.inject.visitor.VisitorContext;
 import io.micronaut.openapi.visitor.group.GroupProperties;
+import io.micronaut.openapi.visitor.group.OpenApiInfo;
 import io.micronaut.openapi.visitor.group.RouterVersioningProperties;
 import io.micronaut.openapi.visitor.security.InterceptUrlMapConverter;
 import io.micronaut.openapi.visitor.security.InterceptUrlMapPattern;
@@ -69,6 +70,7 @@ import static io.micronaut.openapi.visitor.ContextUtils.ARGUMENT_CUSTOM_SCHEMA_M
 import static io.micronaut.openapi.visitor.ContextUtils.ARGUMENT_GROUP_PROPERTIES_MAP;
 import static io.micronaut.openapi.visitor.ContextUtils.ARGUMENT_SCHEMA_DECORATORS_MAP;
 import static io.micronaut.openapi.visitor.ContextUtils.EXPANDABLE_PROPERTIES_ARGUMENT;
+import static io.micronaut.openapi.visitor.FileUtils.calcFinalFilename;
 import static io.micronaut.openapi.visitor.FileUtils.resolve;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.ALL;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_ENVIRONMENT_ENABLED;
@@ -249,12 +251,12 @@ public final class ConfigUtils {
 
         List<Pair<String, String>> expandableProperties = new ArrayList<>();
 
-        // first, check system properties and environmets config files
+        // first, check system properties and environments config files
         AnnProcessorEnvironment env = (AnnProcessorEnvironment) getEnv(context);
         Map<String, Object> propertiesFromEnv = null;
         if (env != null) {
             try {
-                propertiesFromEnv = env.getProperties(MICRONAUT_OPENAPI_EXPAND_PREFIX.substring(0, MICRONAUT_OPENAPI_EXPAND_PREFIX.length() - 2), null);
+                propertiesFromEnv = env.getProperties(MICRONAUT_OPENAPI_EXPAND_PREFIX.substring(0, MICRONAUT_OPENAPI_EXPAND_PREFIX.length() - 1), null);
             } catch (Exception e) {
                 context.warn("Error:\n" + Utils.printStackTrace(e), null);
             }
@@ -305,7 +307,7 @@ public final class ConfigUtils {
         return expandableProperties;
     }
 
-    public static Map<String, String> getAdocProperties(VisitorContext context) {
+    public static Map<String, String> getAdocProperties(OpenApiInfo openApiInfo, boolean isSingleGroup, VisitorContext context) {
 
         var adocProperties = new HashMap<String, String>();
         adocProperties.put(MICRONAUT_OPENAPI_ADOC_TEMPLATES_DIR_PATH, getConfigProperty(MICRONAUT_OPENAPI_ADOC_TEMPLATES_DIR_PATH, context));
@@ -314,12 +316,12 @@ public final class ConfigUtils {
         adocProperties.put(MICRONAUT_OPENAPI_ADOC_OUTPUT_FILENAME, getConfigProperty(MICRONAUT_OPENAPI_ADOC_OUTPUT_FILENAME, context));
         adocProperties.put(MICRONAUT_OPENAPI_ADOC_OPENAPI_PATH, getConfigProperty(MICRONAUT_OPENAPI_ADOC_OPENAPI_PATH, context));
 
-        // first, check system properties and environmets config files
+        // first, check system properties and environments config files
         var env = (AnnProcessorEnvironment) getEnv(context);
         Map<String, Object> propertiesFromEnv = null;
         if (env != null) {
             try {
-                propertiesFromEnv = env.getProperties(MICRONAUT_OPENAPI_ADOC_TEMPLATE_PREFIX.substring(0, MICRONAUT_OPENAPI_ADOC_TEMPLATE_PREFIX.length() - 2), null);
+                propertiesFromEnv = env.getProperties(MICRONAUT_OPENAPI_ADOC_TEMPLATE_PREFIX.substring(0, MICRONAUT_OPENAPI_ADOC_TEMPLATE_PREFIX.length() - 1), null);
             } catch (Exception e) {
                 context.warn("Error:\n" + Utils.printStackTrace(e), null);
             }
@@ -351,6 +353,9 @@ public final class ConfigUtils {
                 adocProperties.put(key, entry.getValue().toString());
             }
         }
+
+        var fileName = StringUtils.isNotEmpty(openApiInfo.getAdocFilename()) ? openApiInfo.getAdocFilename() : adocProperties.get(MICRONAUT_OPENAPI_ADOC_OUTPUT_FILENAME);
+        var titleAndFilename = calcFinalFilename(openApiInfo.getAdocFilename(), openApiInfo, isSingleGroup, "adoc", context);
 
         return adocProperties;
     }
@@ -388,7 +393,7 @@ public final class ConfigUtils {
             return securityProperties;
         }
 
-        // load micronaut security properies
+        // load micronaut security properties
         Environment environment = getEnv(context);
         List<InterceptUrlMapPattern> interceptUrlMapPatterns;
         if (environment != null) {
@@ -548,16 +553,24 @@ public final class ConfigUtils {
         String valueStr = value.toString();
         GroupProperties groupProperties = groupPropertiesMap.computeIfAbsent(groupName, GroupProperties::new);
         switch (propertyName.toLowerCase()) {
-            case "display-name":
-            case "displayname":
+            case "display-name", "displayname":
                 if (groupProperties.getDisplayName() == null) {
                     groupProperties.setDisplayName(valueStr);
                 }
                 break;
-            case "file-name":
-            case "filename":
+            case "file-name", "filename":
                 if (groupProperties.getFilename() == null) {
                     groupProperties.setFilename(valueStr);
+                }
+                break;
+            case "adoc-file-name", "adocfilename":
+                if (groupProperties.getAdocFilename() == null) {
+                    groupProperties.setAdocFilename(valueStr);
+                }
+                break;
+            case "adoc-enabled", "adocenabled":
+                if (groupProperties.getAdocEnabled() == null) {
+                    groupProperties.setAdocEnabled(Boolean.valueOf(valueStr));
                 }
                 break;
             case "packages":
@@ -574,14 +587,12 @@ public final class ConfigUtils {
                     groupProperties.setPrimary(Boolean.valueOf(valueStr));
                 }
                 break;
-            case "commonexclude":
-            case "common-exclude":
+            case "commonexclude", "common-exclude":
                 if (groupProperties.getCommonExclude() == null) {
                     groupProperties.setCommonExclude(Boolean.valueOf(valueStr));
                 }
                 break;
-            case "packagesexclude":
-            case "packages-exclude":
+            case "packagesexclude", "packages-exclude":
                 if (groupProperties.getPackagesExclude() == null) {
                     List<GroupProperties.PackageProperties> packagesExclude = new ArrayList<>();
                     for (String groupPackage : valueStr.split(",")) {
@@ -890,7 +901,10 @@ public final class ConfigUtils {
         }
     }
 
-    static final class SchemaDecorator {
+    /**
+     * Information about decorator.
+     */
+    public static final class SchemaDecorator {
 
         private String prefix;
         private String postfix;

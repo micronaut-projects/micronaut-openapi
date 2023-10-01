@@ -1306,7 +1306,7 @@ import io.micronaut.http.annotation.Post;
 class HelloWorldController {
 
     @Post("/public")
-    public HttpResponse<String> publicEnpoint(
+    public HttpResponse<String> publicEndpoint(
             @Header(HttpHeaders.AUTHORIZATION) String auth,
             @Header(HttpHeaders.CONTENT_TYPE) String contentType,
             @Header(HttpHeaders.ACCEPT) String accept,
@@ -1329,7 +1329,7 @@ class MyBean {}
         operation.parameters[0].name == 'my-header'
     }
 
-    void "test ApiResponse declared in interaface on method level"() {
+    void "test ApiResponse declared in interface on method level"() {
 
         given:
         buildBeanDefinition('test.MyBean', '''
@@ -1371,7 +1371,7 @@ class MyBean {}
         operation.responses."404".description == 'Data is missing'
     }
 
-    void "test ApiResponse declared in interaface and class on method level"() {
+    void "test ApiResponse declared in interface and class on method level"() {
 
         given:
         buildBeanDefinition('test.MyBean', '''
@@ -1418,7 +1418,7 @@ class MyBean {}
         operation.responses."515".description == 'My response2'
     }
 
-    void "test ApiResponse declared in interaface on class level"() {
+    void "test ApiResponse declared in interface on class level"() {
 
         given:
         buildBeanDefinition('test.MyBean', '''
@@ -1474,7 +1474,7 @@ class MyBean {}
         operation2.responses."404".description == 'Data is missing'
     }
 
-    void "test ApiResponse declared in interaface and class on class level"() {
+    void "test ApiResponse declared in interface and class on class level"() {
 
         given:
         buildBeanDefinition('test.MyBean', '''
@@ -1537,7 +1537,7 @@ class MyBean {}
         operation.responses."515".description == 'My response2'
     }
 
-    void "test ApiResponse declared in interaface and class on class and method levels"() {
+    void "test ApiResponse declared in interface and class on class and method levels"() {
 
         given:
         buildBeanDefinition('test.MyBean', '''
@@ -1596,7 +1596,7 @@ class MyBean {}
         operation.responses."515".description == 'My response2'
     }
 
-    void "test ApiResponses declared in interaface and class on class and method levels"() {
+    void "test ApiResponses declared in interface and class on class and method levels"() {
 
         given:
         buildBeanDefinition('test.MyBean', '''

@@ -15,15 +15,11 @@
  */
 package io.micronaut.openapi;
 
-import java.util.Map;
-
-import io.micronaut.core.annotation.Internal;
-import io.micronaut.openapi.swagger.core.util.ObjectMapperFactory;
-
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import io.micronaut.core.annotation.Internal;
+import io.micronaut.openapi.swagger.core.util.ObjectMapperFactory;
 
 /**
  * Convert utilities methods.
@@ -33,22 +29,20 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 @Internal
 public final class OpenApiUtils {
 
-    private static final TypeReference<Map<String, Object>> MAP_TYPE_REFERENCE = new TypeReference<>() {
-    };
     /**
      * The JSON mapper.
      */
-    private static final ObjectMapper JSON_MAPPER = ObjectMapperFactory.createJson()
+    public static final ObjectMapper JSON_MAPPER = ObjectMapperFactory.createJson()
         .enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
     /**
      * The JSON 3.1 mapper.
      */
-    private static final ObjectMapper JSON_MAPPER_31 = ObjectMapperFactory.createJson31()
+    public static final ObjectMapper JSON_MAPPER_31 = ObjectMapperFactory.createJson31()
         .enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
     /**
      * The JSON mapper for security scheme.
      */
-    private static final ObjectMapper CONVERT_JSON_MAPPER = ObjectMapperFactory.buildStrictGenericObjectMapper()
+    public static final ObjectMapper CONVERT_JSON_MAPPER = ObjectMapperFactory.buildStrictGenericObjectMapper()
         .enable(SerializationFeature.WRITE_ENUMS_USING_TO_STRING)
         .disable(SerializationFeature.FAIL_ON_EMPTY_BEANS, SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
         .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)

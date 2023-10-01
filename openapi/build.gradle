@@ -5,7 +5,7 @@ plugins {
 dependencies {
 
     compileOnly(mn.micronaut.core.processor)
-    compileOnly(projects.micronautOpenapiToAdoc)
+    compileOnly(projects.micronautOpenapiAdoc)
 
     implementation(mn.micronaut.http)
 

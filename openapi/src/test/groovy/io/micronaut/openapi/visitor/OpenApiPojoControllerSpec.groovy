@@ -956,7 +956,7 @@ class MyBean {}
         pathItem.post.responses['200'].content == null
 
 
-        when: "An obsevable is returned"
+        when: "An observable is returned"
         pathItem = openAPI.paths.get("/pets/observable")
 
         then:

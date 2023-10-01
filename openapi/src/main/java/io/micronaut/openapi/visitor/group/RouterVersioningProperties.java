@@ -31,16 +31,16 @@ public final class RouterVersioningProperties {
     public static final String DEFAULT_PARAMETER_NAME = "api-version";
 
     private final boolean enabled;
-    private final boolean routerVersiningEnabled;
+    private final boolean routerVersioningEnabled;
     private final boolean headerEnabled;
     private final List<String> headerNames;
 
     private final boolean parameterEnabled;
     private final List<String> parameterNames;
 
-    public RouterVersioningProperties(boolean enabled, boolean routerVersiningEnabled, boolean headerEnabled, List<String> headerNames, boolean parameterEnabled, List<String> parameterNames) {
+    public RouterVersioningProperties(boolean enabled, boolean routerVersioningEnabled, boolean headerEnabled, List<String> headerNames, boolean parameterEnabled, List<String> parameterNames) {
         this.enabled = enabled;
-        this.routerVersiningEnabled = routerVersiningEnabled;
+        this.routerVersioningEnabled = routerVersioningEnabled;
         this.headerEnabled = headerEnabled;
         this.headerNames = headerNames;
         this.parameterEnabled = parameterEnabled;
@@ -51,8 +51,8 @@ public final class RouterVersioningProperties {
         return enabled;
     }
 
-    public boolean isRouterVersiningEnabled() {
-        return routerVersiningEnabled;
+    public boolean isRouterVersioningEnabled() {
+        return routerVersioningEnabled;
     }
 
     public boolean isHeaderEnabled() {

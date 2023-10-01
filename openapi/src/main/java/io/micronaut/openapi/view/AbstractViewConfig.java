@@ -67,7 +67,7 @@ abstract class AbstractViewConfig {
      * An AbstractViewConfig.
      *
      * @param prefix The configuration key prefix.
-     * @param openApiInfos Inforamtion about all generated openAPI files.
+     * @param openApiInfos Information about all generated openAPI files.
      */
     protected AbstractViewConfig(String prefix, Map<Pair<String, String>, OpenApiInfo> openApiInfos) {
         this.prefix = prefix;

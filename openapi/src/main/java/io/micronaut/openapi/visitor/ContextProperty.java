@@ -31,7 +31,7 @@ public interface ContextProperty {
      */
     String MICRONAUT_INTERNAL_OPENAPI_ENDPOINTS = "micronaut.internal.openapi.endpoints";
     /**
-     * Flag that shows that the environament propeerties are already loaded into the context.
+     * Flag that shows that the environment properties are already loaded into the context.
      */
     String MICRONAUT_INTERNAL_ENVIRONMENT_CREATED = "micronaut.internal.environment.created";
     /**
@@ -75,7 +75,7 @@ public interface ContextProperty {
      */
     String MICRONAUT_INTERNAL_GROUPS = "micronaut.internal.groups";
     /**
-     * Loaded expandable properties. Need to save them to reuse in diffferent places.
+     * Loaded expandable properties. Need to save them to reuse in different places.
      */
     String MICRONAUT_INTERNAL_EXPANDABLE_PROPERTIES = "micronaut.internal.expandable.props";
     /**
@@ -83,11 +83,11 @@ public interface ContextProperty {
      */
     String MICRONAUT_INTERNAL_EXPANDABLE_PROPERTIES_LOADED = "micronaut.internal.expandable.props.loaded";
     /**
-     * Loaded micronaut-security and microanut-openanpi security properties.
+     * Loaded micronaut-security and micronaut-openapi security properties.
      */
     String MICRONAUT_INTERNAL_SECURITY_PROPERTIES = "micronaut.internal.security.properties";
     /**
-     * Loaded micronaut-router and microanut-openanpi router versioning properties.
+     * Loaded micronaut-router and micronaut-openapi router versioning properties.
      */
     String MICRONAUT_INTERNAL_ROUTER_VERSIONING_PROPERTIES = "micronaut.internal.router.versioning.properties";
     /**
