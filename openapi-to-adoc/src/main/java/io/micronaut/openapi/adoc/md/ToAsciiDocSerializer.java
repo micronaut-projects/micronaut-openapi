@@ -89,10 +89,6 @@ public class ToAsciiDocSerializer implements Visitor {
 
     protected RootNode rootNode;
 
-    public ToAsciiDocSerializer(RootNode rootNode) {
-        this(rootNode, null);
-    }
-
     public ToAsciiDocSerializer(RootNode rootNode, String source) {
         printer = new Printer();
         autoDetectLanguageType = true;
@@ -363,7 +359,7 @@ public class ToAsciiDocSerializer implements Visitor {
             case Endash -> printer.print("–");
             case HRule -> printer.println().print("'''");
             case Linebreak -> {
-                // look for length of span to detect hard line break (2 trailing spaces plus endline)
+                // look for length of span to detect hard line break (2 trailing spaces plus end-line)
                 // necessary because Pegdown doesn't distinguish between a hard line break and a normal line break
                 if (source != null && source.substring(node.getStartIndex(), node.getEndIndex()).startsWith(HARD_LINE_BREAK_MARKDOWN)) {
                     printer.print(" +").println();
@@ -524,7 +520,7 @@ public class ToAsciiDocSerializer implements Visitor {
             type = detectLanguage(text);
         }
 
-        if (!type.isEmpty()) {
+        if (type != null && !type.isEmpty()) {
             printer.print("[source," + type + "]");
         }
 

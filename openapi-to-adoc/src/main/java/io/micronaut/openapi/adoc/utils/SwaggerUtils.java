@@ -41,7 +41,7 @@ public final class SwaggerUtils {
     private SwaggerUtils() {
     }
 
-    public static OpenAPI readOpenApi(String swaggerFileConent, boolean isJson) {
+    public static OpenAPI readOpenApi(String swaggerFileContent, boolean isJson) {
 
         ObjectMapper mapper;
         if (isJson) {
@@ -51,7 +51,7 @@ public final class SwaggerUtils {
         }
 
         try {
-            return mapper.readValue(swaggerFileConent, OpenAPI.class);
+            return mapper.readValue(swaggerFileContent, OpenAPI.class);
         } catch (JsonProcessingException e) {
             throw new IllegalArgumentException("Can't parse swagger file", e);
         }

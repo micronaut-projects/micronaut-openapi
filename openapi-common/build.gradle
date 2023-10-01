@@ -16,3 +16,7 @@ dependencies {
     api(libs.managed.swagger.models)
     api(libs.managed.javadoc.parser)
 }
+
+test {
+    useJUnitPlatform()
+}

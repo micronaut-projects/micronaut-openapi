@@ -22,10 +22,6 @@ dependencies {
     testRuntimeOnly libs.junit.jupiter.engine
 }
 
-configurations.configureEach {
-    all*.exclude group: "ch.qos.logback"
-}
-
 test {
     useJUnitPlatform()
 }
