@@ -15,8 +15,6 @@
  */
 package io.micronaut.openapi.visitor;
 
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -153,10 +151,10 @@ public interface OpenApiConfigProperty {
      * Also, you can set it in your application.yml file like this:
      * <p>
      * micronaut:
-     *   openapi:
-     *     schema:
-     *       org.somepackage.MyComplexType: java.lang.String
-     *       org.somepackage.MyComplexType2: java.lang.Integer
+     * openapi:
+     * schema:
+     * org.somepackage.MyComplexType: java.lang.String
+     * org.somepackage.MyComplexType2: java.lang.Integer
      * ...
      */
     String MICRONAUT_OPENAPI_SCHEMA = "micronaut.openapi.schema";
@@ -170,10 +168,10 @@ public interface OpenApiConfigProperty {
      * Also, you can set it in your application.yml file like this:
      * <p>
      * micronaut:
-     *   openapi:
-     *     schema-postfix:
-     *       org.api.v1_0_0: 1_0_0
-     *       org.api.v2_0_0: 2_0_0
+     * openapi:
+     * schema-postfix:
+     * org.api.v1_0_0: 1_0_0
+     * org.api.v2_0_0: 2_0_0
      * ...
      */
     String MICRONAUT_OPENAPI_SCHEMA_PREFIX = "micronaut.openapi.schema-prefix";
@@ -187,17 +185,45 @@ public interface OpenApiConfigProperty {
      * Also, you can set it in your application.yml file like this:
      * <p>
      * micronaut:
-     *   openapi:
-     *     group:
-     *       my-group1:
-     *         title: Title 1
-     *         filename: swagger-${group}-${apiVersion}-${version}.yml
-     *       my-group2:
-     *         title: Title 2
+     * openapi:
+     * group:
+     * my-group1:
+     * title: Title 1
+     * filename: swagger-${group}-${apiVersion}-${version}.yml
+     * my-group2:
+     * title: Title 2
      * ...
      */
     String MICRONAUT_OPENAPI_GROUPS = "micronaut.openapi.groups";
 
+    /**
+     * Prefix for custom sub-template names.
+     */
+    String MICRONAUT_OPENAPI_ADOC_TEMPLATE_PREFIX = "micronaut.openapi.adoc.template.";
+    /**
+     * Is convertion to Asciidoc enabled.
+     */
+    String MICRONAUT_OPENAPI_ADOC_ENABLED = "micronaut.openapi.adoc.enabled";
+    /**
+     * Custom template directory.
+     */
+    String MICRONAUT_OPENAPI_ADOC_TEMPLATES_DIR_PATH = "micronaut.openapi.adoc.template-dir";
+    /**
+     * Custom final template filename.
+     */
+    String MICRONAUT_OPENAPI_ADOC_TEMPLATE_FILENAME = "micronaut.openapi.adoc.template-filename";
+    /**
+     * Result adoc file output directory.
+     */
+    String MICRONAUT_OPENAPI_ADOC_OUTPUT_DIR_PATH = "micronaut.openapi.adoc.output-dir";
+    /**
+     * Result adoc filename.
+     */
+    String MICRONAUT_OPENAPI_ADOC_OUTPUT_FILENAME = "micronaut.openapi.adoc.output-filename";
+    /**
+     * OpenAPI file path.
+     */
+    String MICRONAUT_OPENAPI_ADOC_OPENAPI_PATH = "micronaut.openapi.adoc.openapi-path";
     /**
      * Default openapi config file.
      */
@@ -206,24 +232,30 @@ public interface OpenApiConfigProperty {
     /**
      * All supported annotation processor properties.
      */
-    Set<String> ALL = new HashSet<>(Arrays.asList(
-            MICRONAUT_OPENAPI_ENABLED,
-            MICRONAUT_OPENAPI_CONTEXT_SERVER_PATH,
-            MICRONAUT_OPENAPI_PROPERTY_NAMING_STRATEGY,
-            MICRONAUT_OPENAPI_VIEWS_SPEC,
-            MICRONAUT_OPENAPI_FILENAME,
-            MICRONAUT_OPENAPI_JSON_FORMAT,
-            MICRONAUT_OPENAPI_ENVIRONMENTS,
-            MICRONAUT_ENVIRONMENT_ENABLED,
-            MICRONAUT_OPENAPI_FIELD_VISIBILITY_LEVEL,
-            MICRONAUT_CONFIG_FILE_LOCATIONS,
-            MICRONAUT_OPENAPI_TARGET_FILE,
-            MICRONAUT_OPENAPI_VIEWS_DEST_DIR,
-            MICRONAUT_OPENAPI_ADDITIONAL_FILES,
-            MICRONAUT_OPENAPI_CONFIG_FILE,
-            MICRONAUT_OPENAPI_SECURITY_ENABLED,
-            MICRONAUT_OPENAPI_VERSIONING_ENABLED,
-            MICRONAUT_OPENAPI_JSON_VIEW_DEFAULT_INCLUSION,
-            MICRONAUT_OPENAPI_PROJECT_DIR
-    ));
+    Set<String> ALL = Set.of(
+        MICRONAUT_OPENAPI_ENABLED,
+        MICRONAUT_OPENAPI_CONTEXT_SERVER_PATH,
+        MICRONAUT_OPENAPI_PROPERTY_NAMING_STRATEGY,
+        MICRONAUT_OPENAPI_VIEWS_SPEC,
+        MICRONAUT_OPENAPI_FILENAME,
+        MICRONAUT_OPENAPI_JSON_FORMAT,
+        MICRONAUT_OPENAPI_ENVIRONMENTS,
+        MICRONAUT_ENVIRONMENT_ENABLED,
+        MICRONAUT_OPENAPI_FIELD_VISIBILITY_LEVEL,
+        MICRONAUT_CONFIG_FILE_LOCATIONS,
+        MICRONAUT_OPENAPI_TARGET_FILE,
+        MICRONAUT_OPENAPI_VIEWS_DEST_DIR,
+        MICRONAUT_OPENAPI_ADDITIONAL_FILES,
+        MICRONAUT_OPENAPI_CONFIG_FILE,
+        MICRONAUT_OPENAPI_SECURITY_ENABLED,
+        MICRONAUT_OPENAPI_VERSIONING_ENABLED,
+        MICRONAUT_OPENAPI_JSON_VIEW_DEFAULT_INCLUSION,
+        MICRONAUT_OPENAPI_PROJECT_DIR,
+        MICRONAUT_OPENAPI_ADOC_ENABLED,
+        MICRONAUT_OPENAPI_ADOC_TEMPLATES_DIR_PATH,
+        MICRONAUT_OPENAPI_ADOC_TEMPLATE_FILENAME,
+        MICRONAUT_OPENAPI_ADOC_OUTPUT_DIR_PATH,
+        MICRONAUT_OPENAPI_ADOC_OUTPUT_FILENAME,
+        MICRONAUT_OPENAPI_ADOC_OPENAPI_PATH
+    );
 }

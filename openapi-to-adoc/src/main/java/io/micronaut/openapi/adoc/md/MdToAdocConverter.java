@@ -40,9 +40,9 @@ import org.pegdown.ast.RootNode;
  *
  * @since 5.2.0
  */
-public final class Converter {
+public final class MdToAdocConverter {
 
-    private Converter() {
+    private MdToAdocConverter() {
     }
 
     /**
@@ -52,7 +52,7 @@ public final class Converter {
      *
      * @return Asciidoc text
      */
-    public static String convertMdToAdoc(String markdown) {
+    public static String convert(String markdown) {
         if (markdown == null || markdown.isBlank()) {
             return markdown;
         }
@@ -71,21 +71,21 @@ public final class Converter {
      *
      * @param openApi OpenAPI object
      */
-    public static void convertMdToAdoc(OpenAPI openApi) {
+    public static void convert(OpenAPI openApi) {
         var info = openApi.getInfo();
         if (info != null) {
-            info.setDescription(convertMdToAdoc(info.getDescription()));
-            info.setTermsOfService(convertMdToAdoc(info.getTermsOfService()));
+            info.setDescription(convert(info.getDescription()));
+            info.setTermsOfService(convert(info.getTermsOfService()));
         }
         processExternalDocs(openApi.getExternalDocs());
 
         var servers = openApi.getServers();
         if (CollectionUtils.isNotEmpty(servers)) {
             for (var server : servers) {
-                server.setDescription(convertMdToAdoc(server.getDescription()));
+                server.setDescription(convert(server.getDescription()));
                 if (CollectionUtils.isNotEmpty(server.getVariables())) {
                     for (var serverVar : server.getVariables().values()) {
-                        serverVar.setDescription(convertMdToAdoc(serverVar.getDescription()));
+                        serverVar.setDescription(convert(serverVar.getDescription()));
                     }
                 }
             }
@@ -94,7 +94,7 @@ public final class Converter {
         var tags = openApi.getTags();
         if (CollectionUtils.isNotEmpty(tags)) {
             for (var tag : tags) {
-                tag.setDescription(convertMdToAdoc(tag.getDescription()));
+                tag.setDescription(convert(tag.getDescription()));
                 processExternalDocs(tag.getExternalDocs());
             }
         }
@@ -102,15 +102,15 @@ public final class Converter {
         var paths = openApi.getPaths();
         if (CollectionUtils.isNotEmpty(paths)) {
             for (var path : paths.values()) {
-                path.setSummary(convertMdToAdoc(path.getSummary()));
-                path.setDescription(convertMdToAdoc(path.getDescription()));
+                path.setSummary(convert(path.getSummary()));
+                path.setDescription(convert(path.getDescription()));
                 for (var operation : path.readOperations()) {
-                    operation.setSummary(convertMdToAdoc(operation.getSummary()));
-                    operation.setDescription(convertMdToAdoc(operation.getDescription()));
+                    operation.setSummary(convert(operation.getSummary()));
+                    operation.setDescription(convert(operation.getDescription()));
                     processExternalDocs(operation.getExternalDocs());
                     var requestBody = operation.getRequestBody();
                     if (requestBody != null) {
-                        requestBody.setDescription(convertMdToAdoc(requestBody.getDescription()));
+                        requestBody.setDescription(convert(requestBody.getDescription()));
                         processContent(requestBody.getContent());
                     }
                     if (CollectionUtils.isNotEmpty(operation.getParameters())) {
@@ -118,7 +118,7 @@ public final class Converter {
                             processSchema(parameter.getSchema());
                             processExamples(parameter.getExamples());
                             processContent(parameter.getContent());
-                            parameter.setDescription(convertMdToAdoc(parameter.getDescription()));
+                            parameter.setDescription(convert(parameter.getDescription()));
                         }
                     }
                     processResponses(operation.getResponses());
@@ -144,7 +144,7 @@ public final class Converter {
         if (externalDocs == null) {
             return;
         }
-        externalDocs.setDescription(convertMdToAdoc(externalDocs.getDescription()));
+        externalDocs.setDescription(convert(externalDocs.getDescription()));
     }
 
     private static void processSchemas(Map<String, Schema> schemas) {
@@ -161,7 +161,7 @@ public final class Converter {
             return;
         }
         processExternalDocs(schema.getExternalDocs());
-        schema.setDescription(convertMdToAdoc(schema.getDescription()));
+        schema.setDescription(convert(schema.getDescription()));
         processSchemas(schema.getProperties());
         processSchema(schema.getItems());
     }
@@ -171,7 +171,7 @@ public final class Converter {
             return;
         }
         for (var header : headers.values()) {
-            header.setDescription(convertMdToAdoc(header.getDescription()));
+            header.setDescription(convert(header.getDescription()));
             processExamples(header.getExamples());
             processSchema(header.getSchema());
             processContent(header.getContent());
@@ -183,8 +183,8 @@ public final class Converter {
             return;
         }
         for (var example : examples.values()) {
-            example.setSummary(convertMdToAdoc(example.getSummary()));
-            example.setDescription(convertMdToAdoc(example.getDescription()));
+            example.setSummary(convert(example.getSummary()));
+            example.setDescription(convert(example.getDescription()));
         }
     }
 
@@ -213,11 +213,11 @@ public final class Converter {
         for (var response : responses.values()) {
             processHeaders(response.getHeaders());
             processContent(response.getContent());
-            response.setDescription(convertMdToAdoc(response.getDescription()));
+            response.setDescription(convert(response.getDescription()));
             processLinks(response.getLinks());
             if (CollectionUtils.isNotEmpty(response.getLinks())) {
                 for (var link : response.getLinks().values()) {
-                    link.setDescription(convertMdToAdoc(link.getDescription()));
+                    link.setDescription(convert(link.getDescription()));
                 }
             }
         }
@@ -229,7 +229,7 @@ public final class Converter {
         }
 
         for (var link : links.values()) {
-            link.setDescription(convertMdToAdoc(link.getDescription()));
+            link.setDescription(convert(link.getDescription()));
         }
     }
 
@@ -242,7 +242,7 @@ public final class Converter {
             processSchema(parameter.getSchema());
             processExamples(parameter.getExamples());
             processContent(parameter.getContent());
-            parameter.setDescription(convertMdToAdoc(parameter.getDescription()));
+            parameter.setDescription(convert(parameter.getDescription()));
         }
     }
 
@@ -252,7 +252,7 @@ public final class Converter {
         }
 
         for (var requestBody : requestBodies) {
-            requestBody.setDescription(convertMdToAdoc(requestBody.getDescription()));
+            requestBody.setDescription(convert(requestBody.getDescription()));
             processContent(requestBody.getContent());
         }
     }
@@ -263,7 +263,7 @@ public final class Converter {
         }
 
         for (var securityScheme : securitySchemes) {
-            securityScheme.setDescription(convertMdToAdoc(securityScheme.getDescription()));
+            securityScheme.setDescription(convert(securityScheme.getDescription()));
         }
     }
 }

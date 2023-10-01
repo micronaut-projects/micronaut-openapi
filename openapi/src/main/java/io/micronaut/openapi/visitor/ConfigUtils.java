@@ -51,23 +51,6 @@ import io.micronaut.openapi.visitor.security.InterceptUrlMapConverter;
 import io.micronaut.openapi.visitor.security.InterceptUrlMapPattern;
 import io.micronaut.openapi.visitor.security.SecurityProperties;
 
-import static io.micronaut.openapi.visitor.OpenApiConfigProperty.ALL;
-import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_ENVIRONMENT_ENABLED;
-import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_JACKSON_JSON_VIEW_ENABLED;
-import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_CONFIG_FILE;
-import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ENABLED;
-import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ENVIRONMENTS;
-import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_EXPAND_PREFIX;
-import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_GROUPS;
-import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_JSON_VIEW_DEFAULT_INCLUSION;
-import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_PROJECT_DIR;
-import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_SCHEMA;
-import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_SCHEMA_POSTFIX;
-import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_SCHEMA_PREFIX;
-import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_SECURITY_DEFAULT_SCHEMA_NAME;
-import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_SECURITY_ENABLED;
-import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_VERSIONING_ENABLED;
-import static io.micronaut.openapi.visitor.OpenApiConfigProperty.OPENAPI_CONFIG_FILE;
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_CUSTOM_SCHEMAS;
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_ENVIRONMENT;
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_ENVIRONMENT_CREATED;
@@ -87,6 +70,29 @@ import static io.micronaut.openapi.visitor.ContextUtils.ARGUMENT_GROUP_PROPERTIE
 import static io.micronaut.openapi.visitor.ContextUtils.ARGUMENT_SCHEMA_DECORATORS_MAP;
 import static io.micronaut.openapi.visitor.ContextUtils.EXPANDABLE_PROPERTIES_ARGUMENT;
 import static io.micronaut.openapi.visitor.FileUtils.resolve;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.ALL;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_ENVIRONMENT_ENABLED;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_JACKSON_JSON_VIEW_ENABLED;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ADOC_OPENAPI_PATH;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ADOC_OUTPUT_DIR_PATH;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ADOC_OUTPUT_FILENAME;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ADOC_TEMPLATES_DIR_PATH;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ADOC_TEMPLATE_FILENAME;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ADOC_TEMPLATE_PREFIX;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_CONFIG_FILE;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ENABLED;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ENVIRONMENTS;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_EXPAND_PREFIX;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_GROUPS;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_JSON_VIEW_DEFAULT_INCLUSION;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_PROJECT_DIR;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_SCHEMA;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_SCHEMA_POSTFIX;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_SCHEMA_PREFIX;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_SECURITY_DEFAULT_SCHEMA_NAME;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_SECURITY_ENABLED;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_VERSIONING_ENABLED;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.OPENAPI_CONFIG_FILE;
 import static io.micronaut.openapi.visitor.group.RouterVersioningProperties.DEFAULT_HEADER_NAME;
 import static io.micronaut.openapi.visitor.group.RouterVersioningProperties.DEFAULT_PARAMETER_NAME;
 
@@ -248,7 +254,7 @@ public final class ConfigUtils {
         Map<String, Object> propertiesFromEnv = null;
         if (env != null) {
             try {
-                propertiesFromEnv = env.getProperties("micronaut.openapi.expand", null);
+                propertiesFromEnv = env.getProperties(MICRONAUT_OPENAPI_EXPAND_PREFIX.substring(0, MICRONAUT_OPENAPI_EXPAND_PREFIX.length() - 2), null);
             } catch (Exception e) {
                 context.warn("Error:\n" + Utils.printStackTrace(e), null);
             }
@@ -297,6 +303,56 @@ public final class ConfigUtils {
         context.put(MICRONAUT_INTERNAL_EXPANDABLE_PROPERTIES_LOADED, true);
 
         return expandableProperties;
+    }
+
+    public static Map<String, String> getAdocProperties(VisitorContext context) {
+
+        var adocProperties = new HashMap<String, String>();
+        adocProperties.put(MICRONAUT_OPENAPI_ADOC_TEMPLATES_DIR_PATH, getConfigProperty(MICRONAUT_OPENAPI_ADOC_TEMPLATES_DIR_PATH, context));
+        adocProperties.put(MICRONAUT_OPENAPI_ADOC_TEMPLATE_FILENAME, getConfigProperty(MICRONAUT_OPENAPI_ADOC_TEMPLATE_FILENAME, context));
+        adocProperties.put(MICRONAUT_OPENAPI_ADOC_OUTPUT_DIR_PATH, getConfigProperty(MICRONAUT_OPENAPI_ADOC_OUTPUT_DIR_PATH, context));
+        adocProperties.put(MICRONAUT_OPENAPI_ADOC_OUTPUT_FILENAME, getConfigProperty(MICRONAUT_OPENAPI_ADOC_OUTPUT_FILENAME, context));
+        adocProperties.put(MICRONAUT_OPENAPI_ADOC_OPENAPI_PATH, getConfigProperty(MICRONAUT_OPENAPI_ADOC_OPENAPI_PATH, context));
+
+        // first, check system properties and environmets config files
+        var env = (AnnProcessorEnvironment) getEnv(context);
+        Map<String, Object> propertiesFromEnv = null;
+        if (env != null) {
+            try {
+                propertiesFromEnv = env.getProperties(MICRONAUT_OPENAPI_ADOC_TEMPLATE_PREFIX.substring(0, MICRONAUT_OPENAPI_ADOC_TEMPLATE_PREFIX.length() - 2), null);
+            } catch (Exception e) {
+                context.warn("Error:\n" + Utils.printStackTrace(e), null);
+            }
+        }
+
+        if (CollectionUtils.isNotEmpty(propertiesFromEnv)) {
+            for (var entry : propertiesFromEnv.entrySet()) {
+                adocProperties.put(entry.getKey(), entry.getValue().toString());
+            }
+        }
+
+        // next, read openapi.properties file
+        Properties openapiProps = readOpenApiConfigFile(context);
+        for (Map.Entry<Object, Object> entry : openapiProps.entrySet()) {
+            String key = entry.getKey().toString();
+            if (!key.startsWith(MICRONAUT_OPENAPI_EXPAND_PREFIX)) {
+                continue;
+            }
+            adocProperties.put(key, entry.getValue().toString());
+        }
+
+        // next, read system properties
+        if (CollectionUtils.isNotEmpty(System.getProperties())) {
+            for (Map.Entry<Object, Object> entry : System.getProperties().entrySet()) {
+                String key = entry.getKey().toString();
+                if (!key.startsWith(MICRONAUT_OPENAPI_EXPAND_PREFIX)) {
+                    continue;
+                }
+                adocProperties.put(key, entry.getValue().toString());
+            }
+        }
+
+        return adocProperties;
     }
 
     public static boolean isJsonViewEnabled(VisitorContext context) {
@@ -349,16 +405,16 @@ public final class ConfigUtils {
         boolean tokenEnabled = getBooleanProperty("micronaut.security.token.enabled", false, context);
 
         securityProperties = new SecurityProperties(
-                getBooleanProperty(MICRONAUT_OPENAPI_SECURITY_ENABLED, true, context),
-                getBooleanProperty("micronaut.security.enabled", false, context),
-                defaultSchemaName,
-                interceptUrlMapPatterns,
-                tokenEnabled,
-                getBooleanProperty("micronaut.security.token.jwt.enabled", tokenEnabled, context),
-                getBooleanProperty("micronaut.security.token.jwt.bearer", tokenEnabled, context),
-                getBooleanProperty("micronaut.security.token.jwt.cookie.enabled", false, context),
-                getBooleanProperty("micronaut.security.oauth2.enabled", false, context),
-                getBooleanProperty("micronaut.security.basic-auth.enabled", false, context)
+            getBooleanProperty(MICRONAUT_OPENAPI_SECURITY_ENABLED, true, context),
+            getBooleanProperty("micronaut.security.enabled", false, context),
+            defaultSchemaName,
+            interceptUrlMapPatterns,
+            tokenEnabled,
+            getBooleanProperty("micronaut.security.token.jwt.enabled", tokenEnabled, context),
+            getBooleanProperty("micronaut.security.token.jwt.bearer", tokenEnabled, context),
+            getBooleanProperty("micronaut.security.token.jwt.cookie.enabled", false, context),
+            getBooleanProperty("micronaut.security.oauth2.enabled", false, context),
+            getBooleanProperty("micronaut.security.basic-auth.enabled", false, context)
         );
 
         context.put(MICRONAUT_INTERNAL_SECURITY_PROPERTIES, securityProperties);
@@ -374,12 +430,12 @@ public final class ConfigUtils {
         }
 
         routerVersioningProperties = new RouterVersioningProperties(
-                getBooleanProperty(MICRONAUT_OPENAPI_VERSIONING_ENABLED, true, context),
-                getBooleanProperty("micronaut.router.versioning.enabled", false, context),
-                getBooleanProperty("micronaut.router.versioning.header.enabled", false, context),
-                getListStringsProperty("micronaut.router.versioning.header.names", Collections.singletonList(DEFAULT_HEADER_NAME), context),
-                getBooleanProperty("micronaut.router.versioning.parameter.enabled", false, context),
-                getListStringsProperty("micronaut.router.versioning.parameter.names", Collections.singletonList(DEFAULT_PARAMETER_NAME), context)
+            getBooleanProperty(MICRONAUT_OPENAPI_VERSIONING_ENABLED, true, context),
+            getBooleanProperty("micronaut.router.versioning.enabled", false, context),
+            getBooleanProperty("micronaut.router.versioning.header.enabled", false, context),
+            getListStringsProperty("micronaut.router.versioning.header.names", Collections.singletonList(DEFAULT_HEADER_NAME), context),
+            getBooleanProperty("micronaut.router.versioning.parameter.enabled", false, context),
+            getListStringsProperty("micronaut.router.versioning.parameter.names", Collections.singletonList(DEFAULT_PARAMETER_NAME), context)
         );
 
         context.put(MICRONAUT_INTERNAL_ROUTER_VERSIONING_PROPERTIES, routerVersioningProperties);
@@ -463,7 +519,7 @@ public final class ConfigUtils {
         if (cfg.isPresent()) {
             return cfg.get();
         }
-        EndpointsConfiguration conf = new EndpointsConfiguration(context, readOpenApiConfigFile(context));
+        var conf = new EndpointsConfiguration(context, readOpenApiConfigFile(context));
         context.put(MICRONAUT_INTERNAL_ENVIRONMENT_CREATED, conf);
         return conf;
     }
@@ -787,10 +843,10 @@ public final class ConfigUtils {
         List<String> activeEnvs;
         if (StringUtils.isNotEmpty(activeEnvStr)) {
             activeEnvs = Stream.of(activeEnvStr)
-                    .filter(StringUtils::isNotEmpty)
-                    .flatMap(s -> Arrays.stream(s.split(",")))
-                    .map(String::trim)
-                    .toList();
+                .filter(StringUtils::isNotEmpty)
+                .flatMap(s -> Arrays.stream(s.split(",")))
+                .map(String::trim)
+                .toList();
         } else {
             activeEnvs = new ArrayList<>();
         }

@@ -39,5 +39,4 @@ public interface TemplatePaths {
     String SCHEMA_TYPE = "schemaType";
     String SECURITY_REQUIREMENTS = "securityRequirements";
     String SERVERS = "servers";
-
 }

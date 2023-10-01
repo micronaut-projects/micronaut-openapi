@@ -1,6 +1,6 @@
 plugins {
     id "io.micronaut.build.internal.binary-compatibility-check"
-    id 'io.micronaut.build.internal.module'
+    id 'io.micronaut.build.internal.openapi-module'
 }
 
 micronautBuild {
@@ -15,8 +15,4 @@ dependencies {
     api(libs.jackson.datatype.jsr310)
     api(libs.managed.swagger.models)
     api(libs.managed.javadoc.parser)
-}
-
-test {
-    useJUnitPlatform()
 }

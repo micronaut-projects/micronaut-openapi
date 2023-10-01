@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.io.Serial;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.net.URI;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -47,13 +46,11 @@ import io.micronaut.context.env.Environment;
 import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.core.util.StringUtils;
 import io.micronaut.inject.ast.ClassElement;
-import io.micronaut.inject.ast.Element;
 import io.micronaut.inject.ast.ElementModifier;
 import io.micronaut.inject.ast.ElementQuery;
 import io.micronaut.inject.ast.MethodElement;
 import io.micronaut.inject.visitor.TypeElementVisitor;
 import io.micronaut.inject.visitor.VisitorContext;
-import io.micronaut.inject.writer.GeneratedFile;
 import io.micronaut.openapi.postprocessors.JacksonDiscriminatorPostProcessor;
 import io.micronaut.openapi.postprocessors.OpenApiOperationsPostProcessor;
 import io.micronaut.openapi.view.OpenApiViewConfig;
@@ -84,6 +81,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 
 import static io.micronaut.openapi.visitor.ConfigUtils.endpointsConfiguration;
+import static io.micronaut.openapi.visitor.ConfigUtils.getAdocProperties;
+import static io.micronaut.openapi.visitor.ConfigUtils.getBooleanProperty;
 import static io.micronaut.openapi.visitor.ConfigUtils.getConfigProperty;
 import static io.micronaut.openapi.visitor.ConfigUtils.getEnv;
 import static io.micronaut.openapi.visitor.ConfigUtils.getExpandableProperties;
@@ -95,16 +94,22 @@ import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_OP
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_OPENAPI_ENDPOINT_SERVERS;
 import static io.micronaut.openapi.visitor.FileUtils.EXT_JSON;
 import static io.micronaut.openapi.visitor.FileUtils.EXT_YML;
-import static io.micronaut.openapi.visitor.FileUtils.createDirectories;
+import static io.micronaut.openapi.visitor.FileUtils.getDefaultFilePath;
+import static io.micronaut.openapi.visitor.FileUtils.getViewsDestDir;
+import static io.micronaut.openapi.visitor.FileUtils.openApiSpecFile;
 import static io.micronaut.openapi.visitor.FileUtils.resolve;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.ALL;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ADDITIONAL_FILES;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ADOC_ENABLED;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ADOC_OPENAPI_PATH;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ADOC_OUTPUT_DIR_PATH;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ADOC_OUTPUT_FILENAME;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ADOC_TEMPLATES_DIR_PATH;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ADOC_TEMPLATE_FILENAME;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_CONTEXT_SERVER_PATH;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_FILENAME;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_JSON_FORMAT;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_PROPERTY_NAMING_STRATEGY;
-import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_TARGET_FILE;
-import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_VIEWS_DEST_DIR;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_VIEWS_SPEC;
 import static io.micronaut.openapi.visitor.SchemaUtils.EMPTY_SIMPLE_SCHEMA;
 import static io.micronaut.openapi.visitor.SchemaUtils.TYPE_OBJECT;
@@ -310,50 +315,6 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                 (PropertyNamingStrategies.NamingBase) PropertyNamingStrategies.LOWER_DOT_CASE;
             default -> null;
         };
-    }
-
-    private Optional<Path> getDefaultFilePath(String fileName, VisitorContext context) {
-        // default location
-        Optional<GeneratedFile> generatedFile = context.visitMetaInfFile("swagger/" + fileName, Element.EMPTY_ELEMENT_ARRAY);
-        if (generatedFile.isPresent()) {
-            URI uri = generatedFile.get().toURI();
-            // happens in tests 'mem:///CLASS_OUTPUT/META-INF/swagger/swagger.yml'
-            if (uri.getScheme() != null && !uri.getScheme().equals("mem")) {
-                Path specPath = Paths.get(uri);
-                createDirectories(specPath, context);
-                return Optional.of(specPath);
-            }
-        }
-        context.warn("Unable to get swagger/" + fileName + " file.", null);
-        return Optional.empty();
-    }
-
-    private Optional<Path> openApiSpecFile(String fileName, VisitorContext context) {
-        Optional<Path> path = userDefinedSpecFile(context);
-        if (path.isPresent()) {
-            return path;
-        }
-        return getDefaultFilePath(fileName, context);
-    }
-
-    private Optional<Path> userDefinedSpecFile(VisitorContext context) {
-        String targetFile = getConfigProperty(MICRONAUT_OPENAPI_TARGET_FILE, context);
-        if (StringUtils.isEmpty(targetFile)) {
-            return Optional.empty();
-        }
-        Path specFile = resolve(context, Paths.get(targetFile));
-        createDirectories(specFile, context);
-        return Optional.of(specFile);
-    }
-
-    private Path getViewsDestDir(Path defaultSwaggerFilePath, VisitorContext context) {
-        String destDir = getConfigProperty(MICRONAUT_OPENAPI_VIEWS_DEST_DIR, context);
-        if (StringUtils.isNotEmpty(destDir)) {
-            Path destPath = resolve(context, Paths.get(destDir));
-            createDirectories(destPath, context);
-            return destPath;
-        }
-        return defaultSwaggerFilePath.getParent().resolve("views");
     }
 
     private void applyPropertyNamingStrategy(OpenAPI openAPI, VisitorContext context) {
@@ -1165,6 +1126,22 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
     private void writeYamlToFile(Map<Pair<String, String>, OpenApiInfo> openApiInfos, String documentTitle, VisitorContext context, boolean isYaml) {
 
         Path viewsDestDirs = null;
+        AdocModule adocModule = null;
+        Map<String, String> adocProperties = null;
+
+        if (!Utils.isTestMode() && getBooleanProperty(MICRONAUT_OPENAPI_ADOC_ENABLED, false, context)) {
+            Class<?> converterClass = null;
+            try {
+                converterClass = Class.forName("io.micronaut.openapi.adoc.OpenApiToAdocConverter");
+            } catch (ClassNotFoundException e) {
+                //
+            }
+            if (converterClass != null) {
+                adocModule = new AdocModule();
+            }
+
+            adocProperties = getAdocProperties(context);
+        }
 
         for (OpenApiInfo openApiInfo : openApiInfos.values()) {
             Optional<Path> specFile = openApiSpecFile(openApiInfo.getFilename(), context);
@@ -1192,6 +1169,10 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                         context.addGeneratedResource(path.relativize(viewsDestDirsFinal).toString());
                     });
                     openApiInfo.setSpecFilePath(specPath.getFileName().toString());
+
+                    if (adocModule != null) {
+                        adocModule.convert(openApiInfo, adocProperties, context);
+                    }
                 }
             } catch (Exception e) {
                 context.warn("Unable to generate swagger" + (isYaml ? EXT_YML : EXT_JSON) + ": " + specFile.orElse(null) + " - " + e.getMessage() + ".\n" + Utils.printStackTrace(e), classElement);

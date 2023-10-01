@@ -17,14 +17,17 @@ package io.micronaut.openapi.adoc;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 import io.micronaut.openapi.OpenApiUtils;
 import io.micronaut.openapi.adoc.utils.SwaggerUtils;
+import io.swagger.v3.oas.models.OpenAPI;
 
 import freemarker.cache.ClassTemplateLoader;
 import freemarker.cache.FileTemplateLoader;
@@ -59,24 +62,55 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  *
  * @since 4.2.0
  */
-public class OpenapiToAdocConverter {
+public final class OpenApiToAdocConverter {
 
     private static final String TEMPLATE_PREFIX = "template_";
     private static final String TEMPLATES_DIR = "/template";
 
+    private OpenApiToAdocConverter() {
+    }
+
     /**
      * Convertion from openAPI format to asciidoc format.
      *
-     * @throws TemplateException som problms with freemarker templates
+     * @throws TemplateException som problems with freemarker templates
      * @throws IOException some problems with files
      */
-    public void convert() throws TemplateException, IOException {
-
-        var openApiFile = System.getProperty(ConfigProperty.OPENAPIDOC_OPENAPI_PATH);
+    public static void convert() throws TemplateException, IOException {
+        var openApiFile = System.getProperty(OpenApiToAdocConfigProperty.MICRONAUT_OPENAPI_ADOC_OPENAPI_PATH);
         if (openApiFile == null || openApiFile.isBlank()) {
             throw new IllegalArgumentException("OpenAPI file path not set");
         }
         var openApi = SwaggerUtils.readOpenApiFromLocation(openApiFile);
+
+        var outputPath = Paths.get(System.getProperty(OpenApiToAdocConfigProperty.MICRONAUT_OPENAPI_ADOC_OUTPUT_DIR_PATH, "build/generated"))
+            .resolve(System.getProperty(OpenApiToAdocConfigProperty.MICRONAUT_OPENAPI_ADOC_OUTPUT_FILENAME, "openApiDoc.adoc"));
+
+        if (outputPath.getParent() != null) {
+            try {
+                Files.createDirectories(outputPath.getParent());
+            } catch (IOException e) {
+                throw new RuntimeException("Failed create directory", e);
+            }
+        }
+
+        var fileExists = Files.exists(outputPath);
+        try (var writer = fileExists ? Files.newBufferedWriter(outputPath, UTF_8, StandardOpenOption.APPEND) : Files.newBufferedWriter(outputPath, UTF_8)) {
+            convert(openApi, System.getProperties(), writer);
+        }
+    }
+
+    /**
+     * Convertion from openAPI format to asciidoc format.
+     *
+     * @param openApi openAPI object
+     * @param props converter config properties
+     * @param writer writer for rendered template
+     *
+     * @throws TemplateException som problems with freemarker templates
+     * @throws IOException some problems with files
+     */
+    public static void convert(OpenAPI openApi, Map props, Writer writer) throws TemplateException, IOException {
 
         var model = new HashMap<String, Object>();
         model.put("info", openApi.getInfo());
@@ -107,15 +141,13 @@ public class OpenapiToAdocConverter {
 
         for (var entry : System.getProperties().entrySet()) {
             var key = entry.getKey().toString();
-            if (key.startsWith(ConfigProperty.OPENAPIDOC_TEMPLATE_PREFIX)) {
-                model.put(key.replace(ConfigProperty.OPENAPIDOC_TEMPLATE_PREFIX, TEMPLATE_PREFIX), entry.getValue());
+            if (key.startsWith(OpenApiToAdocConfigProperty.MICRONAUT_OPENAPI_ADOC_TEMPLATE_PREFIX)) {
+                model.put(key.replace(OpenApiToAdocConfigProperty.MICRONAUT_OPENAPI_ADOC_TEMPLATE_PREFIX, TEMPLATE_PREFIX), entry.getValue());
             }
         }
 
-        var templateFilename = System.getProperty(ConfigProperty.OPENAPIDOC_TEMPLATE_FILENAME, "openApiDoc.ftl");
-        var outputPath = Paths.get(System.getProperty(ConfigProperty.OPENAPIDOC_OUTPUT_DIR_PATH, "build/generated"))
-            .resolve(System.getProperty(ConfigProperty.OPENAPIDOC_OUTPUT_FILENAME, "openApiDoc.adoc"));
-        var customTemplatesDirsStr = System.getProperty(ConfigProperty.OPENAPIDOC_TEMPLATES_DIR_PATH);
+        var templateFilename = System.getProperty(OpenApiToAdocConfigProperty.MICRONAUT_OPENAPI_ADOC_TEMPLATE_FILENAME, "openApiDoc.ftl");
+        var customTemplatesDirsStr = System.getProperty(OpenApiToAdocConfigProperty.MICRONAUT_OPENAPI_ADOC_TEMPLATES_DIR_PATH);
         String[] customTemplatesDirs = null;
         if (customTemplatesDirsStr != null && !customTemplatesDirsStr.isBlank()) {
             customTemplatesDirs = customTemplatesDirsStr.split(",");
@@ -124,28 +156,17 @@ public class OpenapiToAdocConverter {
         var cfg = getFreemarkerConfig(customTemplatesDirs);
         var template = cfg.getTemplate(templateFilename);
 
-        if (outputPath.getParent() != null) {
-            try {
-                Files.createDirectories(outputPath.getParent());
-            } catch (IOException e) {
-                throw new RuntimeException("Failed create directory", e);
-            }
-        }
-
-        var fileExists = Files.exists(outputPath);
-        try (var writer = fileExists ? Files.newBufferedWriter(outputPath, UTF_8, StandardOpenOption.APPEND) : Files.newBufferedWriter(outputPath, UTF_8)) {
-            template.process(model, writer);
-        }
+        template.process(model, writer);
     }
 
-    private Configuration getFreemarkerConfig(String[] customTemplatesDirs) throws IOException, TemplateModelException {
-        TemplateLoader templateLoader = new ClassTemplateLoader(getClass(), TEMPLATES_DIR);
+    private static Configuration getFreemarkerConfig(String[] customTemplatesDirs) throws IOException, TemplateModelException {
+        TemplateLoader templateLoader = new ClassTemplateLoader(OpenApiToAdocConverter.class, TEMPLATES_DIR);
         if (customTemplatesDirs != null && customTemplatesDirs.length > 0) {
             var templateLoaders = new ArrayList<TemplateLoader>();
             for (var templateDir : customTemplatesDirs) {
                 templateDir = templateDir.strip();
                 if (templateDir.startsWith(CLASSPATH_SCHEME)) {
-                    templateLoaders.add(new ClassTemplateLoader(getClass(), templateDir.substring(CLASSPATH_SCHEME.length())));
+                    templateLoaders.add(new ClassTemplateLoader(OpenApiToAdocConverter.class, templateDir.substring(CLASSPATH_SCHEME.length())));
                 } else {
                     if (templateDir.startsWith(FILE_SCHEME)) {
                         templateDir = templateDir.substring(FILE_SCHEME.length());
@@ -167,7 +188,7 @@ public class OpenapiToAdocConverter {
         return cfg;
     }
 
-    private String template(String templateName) {
+    private static String template(String templateName) {
         return TEMPLATE_PREFIX + templateName;
     }
 }
