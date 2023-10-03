@@ -36,7 +36,7 @@ import org.openapitools.codegen.utils.StringUtils;
  * The generator for creating Micronaut servers.
  */
 @SuppressWarnings("checkstyle:DesignForExtension")
-public class JavaMicronautServerCodegen extends JavaAbstractMicronautCodegen<JavaMicronautServerOptionsBuilder> {
+public class KotlinMicronautServerCodegen extends KotlinAbstractMicronautCodegen<JavaMicronautServerOptionsBuilder> {
 
     public static final String OPT_CONTROLLER_PACKAGE = "controllerPackage";
     public static final String OPT_GENERATE_CONTROLLER_FROM_EXAMPLES = "generateControllerFromExamples";
@@ -54,7 +54,7 @@ public class JavaMicronautServerCodegen extends JavaAbstractMicronautCodegen<Jav
     public static final String DENY_ALL_ROLE_KEY = "denyAll()";
     public static final String DENY_ALL_ROLE = "SecurityRule.DENY_ALL";
 
-    public static final String NAME = "java-micronaut-server";
+    public static final String NAME = "kotlin-micronaut-server";
 
     protected static final String CONTROLLER_PREFIX = "";
     protected static final String CONTROLLER_SUFFIX = "Controller";
@@ -71,7 +71,7 @@ public class JavaMicronautServerCodegen extends JavaAbstractMicronautCodegen<Jav
     protected boolean generateStreamingFileUpload;
     protected boolean aot;
 
-    JavaMicronautServerCodegen() {
+    KotlinMicronautServerCodegen() {
 
         title = "OpenAPI Micronaut Server";
         apiPackage = "org.openapitools.api";
@@ -199,7 +199,7 @@ public class JavaMicronautServerCodegen extends JavaAbstractMicronautCodegen<Jav
         apiTemplateFiles.clear();
         setApiNamePrefix(API_PREFIX);
         setApiNameSuffix(API_SUFFIX);
-        apiTemplateFiles.put("server/controller-interface.mustache", ".java");
+        apiTemplateFiles.put("server/controller-interface.mustache", ".kt");
 
         apiTestTemplateFiles.clear();
         if (generateImplementationFiles) {
@@ -208,25 +208,23 @@ public class JavaMicronautServerCodegen extends JavaAbstractMicronautCodegen<Jav
             apiDocTemplateFiles.clear();
             apiDocTemplateFiles.put("server/doc/controller_doc.mustache", ".md");
 
-            // Add Application.java file
-            String invokerFolder = (sourceFolder + '/' + invokerPackage).replace('.', '/');
-            supportingFiles.add(new SupportingFile("common/configuration/Application.mustache", invokerFolder, "Application.java").doNotOverwrite());
+            // Add Application.kt file
+            String invokerFolder = (sourceFolder + '/' + packageName).replace('.', '/');
+            supportingFiles.add(new SupportingFile("common/configuration/Application.mustache", invokerFolder, "Application.kt").doNotOverwrite());
 
             // Controller Implementation is generated as a test file - so that it is not overwritten
-            apiTestTemplateFiles.put("server/controller-implementation.mustache", ".java");
+            apiTestTemplateFiles.put("server/controller-implementation.mustache", ".kt");
 
             // Add test files
             if (testTool.equals(OPT_TEST_JUNIT)) {
-                apiTestTemplateFiles.put("server/test/controller_test.mustache", ".java");
-            } else if (testTool.equals(OPT_TEST_SPOCK)) {
-                apiTestTemplateFiles.put("server/test/controller_test.groovy.mustache", ".groovy");
+                apiTestTemplateFiles.put("server/test/controller_test.mustache", ".kt");
             }
         }
 
-        // Add HardNullable.java file
+        // Add HardNullable.kt file
         if (generateHardNullable) {
-            String folder = (sourceFolder + '.' + invokerPackage + ".annotation").replace('.', File.separatorChar);
-            supportingFiles.add(new SupportingFile("server/HardNullable.mustache", folder, "HardNullable.java"));
+            String folder = (sourceFolder + '.' + packageName + ".annotation").replace('.', File.separatorChar);
+            supportingFiles.add(new SupportingFile("server/HardNullable.mustache", folder, "HardNullable.kt"));
         }
 
         if (generateStreamingFileUpload) {
@@ -254,7 +252,7 @@ public class JavaMicronautServerCodegen extends JavaAbstractMicronautCodegen<Jav
             String implementationFolder = outputFolder + File.separator +
                 sourceFolder + File.separator +
                 controllerPackage.replace('.', File.separatorChar);
-            return (implementationFolder + File.separator + controllerName + ".java"
+            return (implementationFolder + File.separator + controllerName + ".kt"
             ).replace('/', File.separatorChar);
         }
 
@@ -316,7 +314,6 @@ public class JavaMicronautServerCodegen extends JavaAbstractMicronautCodegen<Jav
         private boolean generateControllerFromExamples;
         private boolean generateOperationsToReturnNotImplemented = true;
         private boolean useAuth = true;
-        private boolean lombok;
         private boolean fluxForArrays;
         private boolean generatedAnnotation = true;
         private boolean aot;
@@ -353,7 +350,6 @@ public class JavaMicronautServerCodegen extends JavaAbstractMicronautCodegen<Jav
 
         @Override
         public JavaMicronautServerOptionsBuilder withLombok(boolean lombok) {
-            this.lombok = lombok;
             return this;
         }
 
@@ -382,7 +378,6 @@ public class JavaMicronautServerCodegen extends JavaAbstractMicronautCodegen<Jav
                 generateOperationsToReturnNotImplemented,
                 generateControllerFromExamples,
                 useAuth,
-                lombok,
                 fluxForArrays,
                 generatedAnnotation,
                 aot
@@ -396,7 +391,6 @@ public class JavaMicronautServerCodegen extends JavaAbstractMicronautCodegen<Jav
         boolean generateOperationsToReturnNotImplemented,
         boolean generateControllerFromExamples,
         boolean useAuth,
-        boolean lombok,
         boolean fluxForArrays,
         boolean generatedAnnotation,
         boolean aot

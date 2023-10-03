@@ -58,18 +58,18 @@ public interface MicronautCodeGeneratorOptionsBuilder {
     /**
      * Add the parameter mappings.
      *
-     * @param parameterMappings the parameter mappings specified by a {@link AbstractMicronautJavaCodegen.ParameterMapping} objects
+     * @param parameterMappings the parameter mappings specified by a {@link JavaAbstractMicronautCodegen.ParameterMapping} objects
      * @return this builder
      */
-    MicronautCodeGeneratorOptionsBuilder withParameterMappings(List<AbstractMicronautJavaCodegen.ParameterMapping> parameterMappings);
+    MicronautCodeGeneratorOptionsBuilder withParameterMappings(List<JavaAbstractMicronautCodegen.ParameterMapping> parameterMappings);
 
     /**
      * Add the response body mappings.
      *
-     * @param responseBodyMappings the response body mappings specified by a {@link AbstractMicronautJavaCodegen.ResponseBodyMapping} objects
+     * @param responseBodyMappings the response body mappings specified by a {@link JavaAbstractMicronautCodegen.ResponseBodyMapping} objects
      * @return this builder
      */
-    MicronautCodeGeneratorOptionsBuilder withResponseBodyMappings(List<AbstractMicronautJavaCodegen.ResponseBodyMapping> responseBodyMappings);
+    MicronautCodeGeneratorOptionsBuilder withResponseBodyMappings(List<JavaAbstractMicronautCodegen.ResponseBodyMapping> responseBodyMappings);
 
 
     /**

@@ -38,7 +38,7 @@ public final class MicronautCodeGeneratorEntryPoint {
 
     private final URI definitionFile;
     private final File outputDirectory;
-    private final AbstractMicronautJavaCodegen<?> codeGenerator;
+    private final JavaAbstractMicronautCodegen<?> codeGenerator;
     private final EnumSet<OutputKind> outputs;
     private final Options options;
     private final JavaMicronautServerCodegen.ServerOptions serverOptions;
@@ -46,7 +46,7 @@ public final class MicronautCodeGeneratorEntryPoint {
 
     private MicronautCodeGeneratorEntryPoint(URI definitionFile,
                                              File outputDirectory,
-                                             AbstractMicronautJavaCodegen<?> codeGenerator,
+                                             JavaAbstractMicronautCodegen<?> codeGenerator,
                                              EnumSet<OutputKind> outputs,
                                              Options options,
                                              JavaMicronautServerCodegen.ServerOptions serverOptions,
@@ -134,6 +134,9 @@ public final class MicronautCodeGeneratorEntryPoint {
         codeGenerator.setTestTool(options.testFramework.value);
         codeGenerator.setSerializationLibrary(options.serializationLibraryKind().name());
         codeGenerator.setDateTimeLibrary(options.dateTimeFormat().name());
+        codeGenerator.setLombok(serverOptions.lombok());
+        codeGenerator.setFluxForArrays(serverOptions.fluxForArrays());
+        codeGenerator.setGeneratedAnnotation(clientOptions.generatedAnnotation());
         configureServerOptions();
         configureClientOptions();
         codeGenerator.processOpts();
@@ -148,9 +151,6 @@ public final class MicronautCodeGeneratorEntryPoint {
             serverCodegen.setGenerateOperationsToReturnNotImplemented(serverOptions.generateOperationsToReturnNotImplemented());
             serverCodegen.setGenerateControllerFromExamples(serverOptions.generateControllerFromExamples());
             serverCodegen.setUseAuth(serverOptions.useAuth());
-            serverCodegen.setLombok(serverOptions.lombok());
-            serverCodegen.setFluxForArrays(serverOptions.fluxForArrays());
-            serverCodegen.setGeneratedAnnotation(serverOptions.generatedAnnotation());
         }
     }
 
@@ -169,9 +169,6 @@ public final class MicronautCodeGeneratorEntryPoint {
                 clientCodegen.setBasePathSeparator(clientCodegen.basePathSeparator);
             }
             clientCodegen.setConfigureAuthorization(clientOptions.useAuth());
-            clientCodegen.setLombok(clientOptions.lombok());
-            clientCodegen.setFluxForArrays(clientOptions.fluxForArrays());
-            clientCodegen.setGeneratedAnnotation(clientOptions.generatedAnnotation());
         }
     }
 
@@ -212,6 +209,10 @@ public final class MicronautCodeGeneratorEntryPoint {
             }
             throw new IllegalArgumentException("Unknown output kind '" + name + "'");
         }
+
+        public String getGeneratorProperty() {
+            return generatorProperty;
+        }
     }
 
     private static class DefaultBuilder implements MicronautCodeGeneratorBuilder {
@@ -219,7 +220,7 @@ public final class MicronautCodeGeneratorEntryPoint {
         private static final Consumer<DefaultBuilder> HAS_OUTPUT = b -> Objects.requireNonNull(b.outputDirectory, "Sources directory must not be null");
 
         private Options options;
-        private AbstractMicronautJavaCodegen<?> codeGenerator;
+        private JavaAbstractMicronautCodegen<?> codeGenerator;
         private URI definitionFile;
         private File outputDirectory;
         private final EnumSet<OutputKind> outputs = EnumSet.noneOf(OutputKind.class);
@@ -228,7 +229,7 @@ public final class MicronautCodeGeneratorEntryPoint {
 
         @Override
         public <B extends GeneratorOptionsBuilder, G extends MicronautCodeGenerator<B>> MicronautCodeGeneratorBuilder forCodeGenerator(G generator, Consumer<? super B> configuration) {
-            codeGenerator = (AbstractMicronautJavaCodegen<?>) generator;
+            codeGenerator = (JavaAbstractMicronautCodegen<?>) generator;
             var builder = generator.optionsBuilder();
             configuration.accept(builder);
             return this;
@@ -305,8 +306,8 @@ public final class MicronautCodeGeneratorEntryPoint {
             private boolean beanValidation = true;
             private String invokerPackage;
             private String modelPackage;
-            private List<AbstractMicronautJavaCodegen.ParameterMapping> parameterMappings;
-            private List<AbstractMicronautJavaCodegen.ResponseBodyMapping> responseBodyMappings;
+            private List<JavaAbstractMicronautCodegen.ParameterMapping> parameterMappings;
+            private List<JavaAbstractMicronautCodegen.ResponseBodyMapping> responseBodyMappings;
             private boolean optional;
             private boolean reactive = true;
             private boolean generateHttpResponseAlways;
@@ -340,13 +341,13 @@ public final class MicronautCodeGeneratorEntryPoint {
             }
 
             @Override
-            public MicronautCodeGeneratorOptionsBuilder withParameterMappings(List<AbstractMicronautJavaCodegen.ParameterMapping> parameterMappings) {
+            public MicronautCodeGeneratorOptionsBuilder withParameterMappings(List<JavaAbstractMicronautCodegen.ParameterMapping> parameterMappings) {
                 this.parameterMappings = parameterMappings;
                 return this;
             }
 
             @Override
-            public MicronautCodeGeneratorOptionsBuilder withResponseBodyMappings(List<AbstractMicronautJavaCodegen.ResponseBodyMapping> responseBodyMappings) {
+            public MicronautCodeGeneratorOptionsBuilder withResponseBodyMappings(List<JavaAbstractMicronautCodegen.ResponseBodyMapping> responseBodyMappings) {
                 this.responseBodyMappings = responseBodyMappings;
                 return this;
             }
@@ -411,8 +412,8 @@ public final class MicronautCodeGeneratorEntryPoint {
      */
     public enum TestFramework {
 
-        JUNIT5(AbstractMicronautJavaCodegen.OPT_TEST_JUNIT),
-        SPOCK(AbstractMicronautJavaCodegen.OPT_TEST_SPOCK);
+        JUNIT5(JavaAbstractMicronautCodegen.OPT_TEST_JUNIT),
+        SPOCK(JavaAbstractMicronautCodegen.OPT_TEST_SPOCK);
 
         private final String value;
 
@@ -426,8 +427,8 @@ public final class MicronautCodeGeneratorEntryPoint {
         String modelPackage,
         String invokerPackage,
         String artifactId,
-        List<AbstractMicronautJavaCodegen.ParameterMapping> parameterMappings,
-        List<AbstractMicronautJavaCodegen.ResponseBodyMapping> responseBodyMappings,
+        List<JavaAbstractMicronautCodegen.ParameterMapping> parameterMappings,
+        List<JavaAbstractMicronautCodegen.ResponseBodyMapping> responseBodyMappings,
         boolean beanValidation,
         boolean optional,
         boolean reactive,

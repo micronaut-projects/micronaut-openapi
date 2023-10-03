@@ -15,7 +15,7 @@
  */
 package io.micronaut.openapi.testsuite;
 
-import io.micronaut.openapi.generator.AbstractMicronautJavaCodegen;
+import io.micronaut.openapi.generator.JavaAbstractMicronautCodegen;
 import io.micronaut.openapi.generator.MicronautCodeGeneratorEntryPoint;
 
 import java.io.File;
@@ -26,7 +26,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * An entry point to be used in tests, to simulate
@@ -48,9 +47,9 @@ public class GeneratorMain {
      */
     public static void main(String[] args) throws URISyntaxException {
         boolean server = "server".equals(args[0]);
-        List<AbstractMicronautJavaCodegen.ParameterMapping> parameterMappings =
+        List<JavaAbstractMicronautCodegen.ParameterMapping> parameterMappings =
             parseParameterMappings(args[4]);
-        List<AbstractMicronautJavaCodegen.ResponseBodyMapping> responseBodyMappings =
+        List<JavaAbstractMicronautCodegen.ResponseBodyMapping> responseBodyMappings =
             parseResponseBodyMappings(args[5]);
 
         MicronautCodeGeneratorEntryPoint.OutputKind[] outputKinds
@@ -88,18 +87,18 @@ public class GeneratorMain {
         builder.build().generate();
     }
 
-    private static List<AbstractMicronautJavaCodegen.ParameterMapping> parseParameterMappings(String string) {
-        return parseListOfMaps(string).stream().map(map -> new AbstractMicronautJavaCodegen.ParameterMapping(
+    private static List<JavaAbstractMicronautCodegen.ParameterMapping> parseParameterMappings(String string) {
+        return parseListOfMaps(string).stream().map(map -> new JavaAbstractMicronautCodegen.ParameterMapping(
             map.get("name"),
-            AbstractMicronautJavaCodegen.ParameterMapping.ParameterLocation.valueOf(map.get("location")),
+            JavaAbstractMicronautCodegen.ParameterMapping.ParameterLocation.valueOf(map.get("location")),
             map.get("mappedType"),
             map.get("mappedName"),
             "true".equals(map.get("isValidated"))
         )).toList();
     }
 
-    private static List<AbstractMicronautJavaCodegen.ResponseBodyMapping> parseResponseBodyMappings(String string) {
-        return parseListOfMaps(string).stream().map(map -> new AbstractMicronautJavaCodegen.ResponseBodyMapping(
+    private static List<JavaAbstractMicronautCodegen.ResponseBodyMapping> parseResponseBodyMappings(String string) {
+        return parseListOfMaps(string).stream().map(map -> new JavaAbstractMicronautCodegen.ResponseBodyMapping(
             map.get("headerName"),
             map.get("mappedBodyType"),
             "true".equals(map.get("isListWrapper")),

@@ -1,0 +1,12 @@
+{{^isEnum}}{{^isDateTime}}{{^isDate}}
+    {{{dataType}}}
+{{/isDate}}{{/isDateTime}}{{/isEnum}}
+{{#isDateTime}}
+    {{#dateFormat}}@Format("{{{datetimeFormat}}}"){{/dateFormat}} {{{dataType}}}
+{{/isDateTime}}
+{{#isDate}}
+    {{#dateTimeFormat}}@Format("{{{dateFormat}}}"){{/dateTimeFormat}} {{{dataType}}}
+{{/isDate}}
+{{#isEnum}}
+    {{{datatypeWithEnum}}}
+{{/isEnum}}

@@ -1,0 +1,73 @@
+{{>common/licenseInfo}}
+package {{package}};
+
+import io.micronaut.http.annotation.*;
+import io.micronaut.core.annotation.*;
+import io.micronaut.http.client.annotation.Client;
+{{#configureAuth}}
+import {{invokerPackage}}.auth.Authorization;
+{{/configureAuth}}
+import io.micronaut.core.convert.format.Format;
+{{#wrapInHttpResponse}}
+import io.micronaut.http.HttpResponse;
+{{/wrapInHttpResponse}}
+{{#imports}}
+import {{import}};
+{{/imports}}
+{{#generatedAnnotation}}
+import {{javaxPackage}}.annotation.Generated;
+{{/generatedAnnotation}}
+{{#useBeanValidation}}
+import {{javaxPackage}}.validation.Valid;
+import {{javaxPackage}}.validation.constraints.*;
+{{/useBeanValidation}}
+{{#generateSwagger1Annotations}}
+import io.swagger.annotations.*;
+{{/generateSwagger1Annotations}}
+{{#generateSwagger2Annotations}}
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+{{/generateSwagger2Annotations}}
+
+{{#formatOneEmptyLine}}
+{{#additionalClientTypeAnnotations}}
+{{{.}}}
+{{/additionalClientTypeAnnotations}}
+{{#generatedAnnotation}}
+{{>common/generatedAnnotation}}
+{{/generatedAnnotation}}
+@Client({{#configureClientId}}id = "{{clientId}}", path = {{/configureClientId}}"\${{openbrace}}{{{applicationName}}}{{basePathSeparator}}base-path{{closebrace}}")
+interface {{classname}} {
+{{#operations}}
+
+    {{#operation}}
+    {{#formatNoEmptyLines}}
+{{>common/operationAnnotations}}{{!
+}}    @{{#lambda.pascalcase}}{{#lambda.lowercase}}{{httpMethod}}{{/lambda.lowercase}}{{/lambda.pascalcase}}("{{{path}}}")
+    {{^vendorExtensions.onlyDefaultConsumeOrEmpty}}
+    {{#produces}}{{#-first}}@Consumes({{#produces.1}}{{openbrace}}{{/produces.1}}{{/-first}}"{{{mediaType}}}"{{^-last}}, {{/-last}}{{#-last}}{{#produces.1}}{{closebrace}}{{/produces.1}}){{/-last}}{{/produces}}
+    {{/vendorExtensions.onlyDefaultConsumeOrEmpty}}
+    {{^vendorExtensions.onlyDefaultProduceOrEmpty}}
+    {{#consumes}}{{#-first}}@Produces({{#consumes.1}}{{openbrace}}{{/consumes.1}}{{/-first}}"{{{mediaType}}}"{{^-last}}, {{/-last}}{{#-last}}{{#consumes.1}}{{closebrace}}{{/consumes.1}}){{/-last}}{{/consumes}}
+    {{/vendorExtensions.onlyDefaultProduceOrEmpty}}
+    {{!auth methods}}
+        {{#configureAuth}}
+            {{#authMethods}}
+    @Authorization(name = "{{{name}}}"{{!scopes}}{{#isOAuth}}, scopes = {{#scopes.1}}{{openbrace}}{{/scopes.1}}{{#scopes}}"{{{scope}}}"{{^-last}}, {{/-last}}{{/scopes}}{{#scopes.1}}{{closebrace}}{{/scopes.1}}{{/isOAuth}})
+            {{/authMethods}}
+        {{/configureAuth}}
+    {{!the method definition}}
+    fun {{nickname}}({{#allParams}}
+        {{#formatSingleLine}}{{>client/params/queryParams}}{{>client/params/pathParams}}{{>client/params/headerParams}}{{>client/params/bodyParams}}{{>client/params/formParams}}{{>client/params/cookieParams}}{{^-last}},{{/-last}}{{/formatSingleLine}}
+    {{/allParams}}){{#vendorExtensions.returnTypeWithoutPrefix}}: {{{vendorExtensions.returnTypeWithoutPrefix}}}{{/vendorExtensions.returnTypeWithoutPrefix}}
+    {{/formatNoEmptyLines}}
+    {{/operation}}
+{{/operations}}
+}
+{{/formatOneEmptyLine}}

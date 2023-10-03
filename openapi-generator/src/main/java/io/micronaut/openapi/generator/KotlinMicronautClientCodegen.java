@@ -28,7 +28,7 @@ import org.openapitools.codegen.meta.Stability;
  * The generator for creating Micronaut clients.
  */
 @SuppressWarnings("checkstyle:DesignForExtension")
-public class JavaMicronautClientCodegen extends JavaAbstractMicronautCodegen<JavaMicronautClientOptionsBuilder> {
+public class KotlinMicronautClientCodegen extends KotlinAbstractMicronautCodegen<JavaMicronautClientOptionsBuilder> {
 
     public static final String OPT_CONFIGURE_AUTH = "configureAuth";
     public static final String OPT_CONFIGURE_AUTH_FILTER_PATTERN = "configureAuthFilterPattern";
@@ -38,7 +38,7 @@ public class JavaMicronautClientCodegen extends JavaAbstractMicronautCodegen<Jav
     public static final String BASE_PATH_SEPARATOR = "basePathSeparator";
     public static final String CLIENT_ID = "clientId";
 
-    public static final String NAME = "java-micronaut-client";
+    public static final String NAME = "kotlin-micronaut-client";
 
     protected boolean configureAuthorization;
     protected List<String> additionalClientTypeAnnotations;
@@ -46,7 +46,7 @@ public class JavaMicronautClientCodegen extends JavaAbstractMicronautCodegen<Jav
     protected String basePathSeparator = "-";
     protected String clientId;
 
-    JavaMicronautClientCodegen() {
+    KotlinMicronautClientCodegen() {
 
         title = "OpenAPI Micronaut Client";
 
@@ -105,19 +105,19 @@ public class JavaMicronautClientCodegen extends JavaAbstractMicronautCodegen<Jav
         }
         writePropertyBack(BASE_PATH_SEPARATOR, basePathSeparator);
 
-        final String invokerFolder = (sourceFolder + '/' + invokerPackage).replace(".", "/");
+        final String invokerFolder = (sourceFolder + '/' + packageName).replace(".", "/");
 
         // Authorization files
         if (configureAuthorization) {
             final String authFolder = invokerFolder + "/auth";
-            supportingFiles.add(new SupportingFile("client/auth/Authorization.mustache", authFolder, "Authorization.java"));
-            supportingFiles.add(new SupportingFile("client/auth/AuthorizationBinder.mustache", authFolder, "AuthorizationBinder.java"));
-            supportingFiles.add(new SupportingFile("client/auth/Authorizations.mustache", authFolder, "Authorizations.java"));
-            supportingFiles.add(new SupportingFile("client/auth/AuthorizationFilter.mustache", authFolder, "AuthorizationFilter.java"));
+            supportingFiles.add(new SupportingFile("client/auth/Authorization.mustache", authFolder, "Authorization.kt"));
+            supportingFiles.add(new SupportingFile("client/auth/AuthorizationBinder.mustache", authFolder, "AuthorizationBinder.kt"));
+            supportingFiles.add(new SupportingFile("client/auth/Authorizations.mustache", authFolder, "Authorizations.kt"));
+            supportingFiles.add(new SupportingFile("client/auth/AuthorizationFilter.mustache", authFolder, "AuthorizationFilter.kt"));
             final String authConfigurationFolder = authFolder + "/configuration";
-            supportingFiles.add(new SupportingFile("client/auth/configuration/ApiKeyAuthConfiguration.mustache", authConfigurationFolder, "ApiKeyAuthConfiguration.java"));
-            supportingFiles.add(new SupportingFile("client/auth/configuration/ConfigurableAuthorization.mustache", authConfigurationFolder, "ConfigurableAuthorization.java"));
-            supportingFiles.add(new SupportingFile("client/auth/configuration/HttpBasicAuthConfiguration.mustache", authConfigurationFolder, "HttpBasicAuthConfiguration.java"));
+            supportingFiles.add(new SupportingFile("client/auth/configuration/ApiKeyAuthConfiguration.mustache", authConfigurationFolder, "ApiKeyAuthConfiguration.kt"));
+            supportingFiles.add(new SupportingFile("client/auth/configuration/ConfigurableAuthorization.mustache", authConfigurationFolder, "ConfigurableAuthorization.kt"));
+            supportingFiles.add(new SupportingFile("client/auth/configuration/HttpBasicAuthConfiguration.mustache", authConfigurationFolder, "HttpBasicAuthConfiguration.kt"));
 
             if (additionalProperties.containsKey(AUTHORIZATION_FILTER_PATTERN)) {
                 String pattern = additionalProperties.get(AUTHORIZATION_FILTER_PATTERN).toString();
@@ -145,14 +145,12 @@ public class JavaMicronautClientCodegen extends JavaAbstractMicronautCodegen<Jav
 
         // Api file
         apiTemplateFiles.clear();
-        apiTemplateFiles.put("client/api.mustache", ".java");
+        apiTemplateFiles.put("client/api.mustache", ".kt");
 
         // Add test files
         apiTestTemplateFiles.clear();
         if (testTool.equals(OPT_TEST_JUNIT)) {
-            apiTestTemplateFiles.put("client/test/api_test.mustache", ".java");
-        } else if (testTool.equals(OPT_TEST_SPOCK)) {
-            apiTestTemplateFiles.put("client/test/api_test.groovy.mustache", ".groovy");
+            apiTestTemplateFiles.put("client/test/api_test.mustache", ".kt");
         }
 
         // Add documentation files
@@ -201,7 +199,6 @@ public class JavaMicronautClientCodegen extends JavaAbstractMicronautCodegen<Jav
         private String basePathSeparator;
         private String clientId;
         private boolean useAuth;
-        private boolean lombok;
         private boolean fluxForArrays;
         private boolean generatedAnnotation = true;
 
@@ -237,7 +234,6 @@ public class JavaMicronautClientCodegen extends JavaAbstractMicronautCodegen<Jav
 
         @Override
         public JavaMicronautClientOptionsBuilder withLombok(boolean lombok) {
-            this.lombok = lombok;
             return this;
         }
 
@@ -260,7 +256,6 @@ public class JavaMicronautClientCodegen extends JavaAbstractMicronautCodegen<Jav
                 basePathSeparator,
                 clientId,
                 useAuth,
-                lombok,
                 fluxForArrays,
                 generatedAnnotation
             );
@@ -273,7 +268,6 @@ public class JavaMicronautClientCodegen extends JavaAbstractMicronautCodegen<Jav
         String basePathSeparator,
         String clientId,
         boolean useAuth,
-        boolean lombok,
         boolean fluxForArrays,
         boolean generatedAnnotation
     ) {

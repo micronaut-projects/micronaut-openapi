@@ -7,7 +7,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -31,14 +30,14 @@ public abstract class AbstractMicronautCodegenTest {
      *
      * @return - the path to the generated folder
      */
-    protected String generateFiles(AbstractMicronautJavaCodegen<?> codegen, String configPath, String... filesToGenerate) {
+    protected String generateFiles(JavaAbstractMicronautCodegen<?> codegen, String configPath, String... filesToGenerate) {
         File output = null;
         try {
             output = Files.createTempDirectory("test").toFile().getCanonicalFile();
         } catch (IOException e) {
             fail("Unable to create temporary directory for output");
         }
-        output.deleteOnExit();
+//        output.deleteOnExit();
 
         MicronautCodeGeneratorEntryPoint.builder()
             .forCodeGenerator(codegen, unused -> {

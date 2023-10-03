@@ -1,0 +1,83 @@
+{{>common/licenseInfo}}
+package {{apiPackage}}
+{{#formatNoEmptyLines}}
+import io.micronaut.http.annotation.*
+{{^generateHardNullable}}
+import io.micronaut.core.annotation.Nullable
+{{/generateHardNullable}}
+{{#generateHardNullable}}
+import {{{invokerPackage}}}.annotation.HardNullable
+{{/generateHardNullable}}
+import io.micronaut.core.convert.format.Format
+{{#useAuth}}
+import io.micronaut.security.annotation.Secured
+import io.micronaut.security.rules.SecurityRule
+{{/useAuth}}
+{{#reactive}}
+import reactor.core.publisher.Mono
+import reactor.core.publisher.Flux
+{{/reactive}}
+{{#wrapInHttpResponse}}
+import io.micronaut.http.HttpResponse
+{{/wrapInHttpResponse}}
+{{#imports}}
+import {{import}}
+{{/imports}}
+{{#generatedAnnotation}}
+import {{javaxPackage}}.annotation.Generated
+{{/generatedAnnotation}}
+{{#useBeanValidation}}
+import {{javaxPackage}}.validation.Valid
+import {{javaxPackage}}.validation.constraints.*
+{{/useBeanValidation}}
+{{#generateSwagger1Annotations}}
+import io.swagger.annotations.*
+{{/generateSwagger1Annotations}}
+{{#generateSwagger2Annotations}}
+import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.Parameter
+import io.swagger.v3.oas.annotations.media.Content
+import io.swagger.v3.oas.annotations.media.Schema
+import io.swagger.v3.oas.annotations.responses.ApiResponse
+import io.swagger.v3.oas.annotations.tags.Tag
+import io.swagger.v3.oas.annotations.security.SecurityRequirement
+{{/generateSwagger2Annotations}}
+{{/formatNoEmptyLines}}
+
+{{#formatOneEmptyLine}}
+{{#generatedAnnotation}}
+{{>common/generatedAnnotation}}
+{{/generatedAnnotation}}
+{{^generateControllerAsAbstract}}
+@Controller
+{{/generateControllerAsAbstract}}
+{{#generateSwagger2Annotations}}
+@Tag(name = "{{{baseName}}}", description = {{#tagDescription}}"{{{.}}}"{{/tagDescription}}{{^tagDescription}}"The {{{baseName}}} API"{{/tagDescription}})
+{{/generateSwagger2Annotations}}
+public interface {{classname}} {
+
+{{#operations}}
+    {{#operation}}
+        {{#formatNoEmptyLines}}
+{{>common/operationAnnotations}}
+    @{{#lambda.pascalcase}}{{#lambda.lowercase}}{{httpMethod}}{{/lambda.lowercase}}{{/lambda.pascalcase}}("{{{path}}}")
+    {{^vendorExtensions.onlyDefaultProduceOrEmpty}}
+    @Produces({{#produces.1}}{{openbrace}}{{/produces.1}}{{#produces}}"{{{mediaType}}}"{{^-last}}, {{/-last}}{{/produces}}{{#produces.1}}{{closebrace}}{{/produces.1}})
+    {{/vendorExtensions.onlyDefaultProduceOrEmpty}}
+    {{^vendorExtensions.onlyDefaultConsumeOrEmpty}}
+    @Consumes({{#consumes.1}}{{openbrace}}{{/consumes.1}}{{#consumes}}"{{{mediaType}}}"{{^-last}}, {{/-last}}{{/consumes}}{{#consumes.1}}{{closebrace}}{{/consumes.1}})
+    {{/vendorExtensions.onlyDefaultConsumeOrEmpty}}
+    {{!security annotations}}
+    {{#useAuth}}
+    @Secured({{#vendorExtensions.x-roles.1}}{{openbrace}}{{/vendorExtensions.x-roles.1}}{{#vendorExtensions.x-roles}}{{{.}}}{{^-last}}, {{/-last}}{{/vendorExtensions.x-roles}}{{#vendorExtensions.x-roles.1}}{{closebrace}}{{/vendorExtensions.x-roles.1}})
+    {{/useAuth}}
+    {{!the method definition}}
+    fun {{nickname}}({{#allParams}}
+        {{#formatSingleLine}}{{>server/params/annotations}}{{#indent}}{{>common/params/validation}}{{/indent}}{{>server/params/type}} {{paramName}}{{^-last}},{{/-last}}{{/formatSingleLine}}
+    {{/allParams}}){{#returnType}}: {{{returnType}}}{{/returnType}}
+        {{/formatNoEmptyLines}}
+
+    {{/operation}}
+{{/operations}}
+}
+{{/formatOneEmptyLine}}
