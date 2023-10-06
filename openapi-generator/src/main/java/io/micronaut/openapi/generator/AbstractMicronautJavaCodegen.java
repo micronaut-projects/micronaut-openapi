@@ -658,6 +658,12 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
                 });
                 op.formParams.clear();
             }
+
+            for (var param : op.allParams) {
+                if (useBeanValidation && !param.isContainer && param.isModel) {
+                    param.vendorExtensions.put("withValid", true);
+                }
+            }
         }
 
         return objs;
@@ -883,20 +889,28 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
                 model.vendorExtensions.put("hasMappedModels", !model.discriminator.getMappedModels().isEmpty());
                 model.vendorExtensions.put("hasMultipleMappedModels", model.discriminator.getMappedModels().size() > 1);
             }
-            for (var property : model.vars) {
-                property.vendorExtensions.put("lombok", lombok);
-                property.vendorExtensions.put("defaultValueIsNotNull", property.defaultValue != null && !property.defaultValue.equals("null"));
-                property.vendorExtensions.put("isServer", isServer);
-            }
             model.vendorExtensions.put("isServer", isServer);
+            for (var property : model.vars) {
+                processProperty(property, isServer, objs);
+            }
             for (var property : model.requiredVars) {
-                property.vendorExtensions.put("lombok", lombok);
-                property.vendorExtensions.put("isServer", isServer);
-                property.vendorExtensions.put("defaultValueIsNotNull", property.defaultValue != null && !property.defaultValue.equals("null"));
+                processProperty(property, isServer, objs);
             }
         }
 
         return objs;
+    }
+
+    private void processProperty(CodegenProperty property, boolean isServer, Map<String, ModelsMap> models) {
+        property.vendorExtensions.put("isServer", isServer);
+        property.vendorExtensions.put("lombok", lombok);
+        property.vendorExtensions.put("defaultValueIsNotNull", property.defaultValue != null && !property.defaultValue.equals("null"));
+        if (useBeanValidation && (
+            (!property.isContainer && property.isModel)
+                || (property.getIsArray() && models.containsKey(property.getComplexType()))
+        )) {
+            property.vendorExtensions.put("withValid", true);
+        }
     }
 
     private void processParentModel(CodegenModel model, List<CodegenProperty> requiredVarsWithoutDiscriminator, List<CodegenProperty> requiredParentVarsWithoutDiscriminator) {
