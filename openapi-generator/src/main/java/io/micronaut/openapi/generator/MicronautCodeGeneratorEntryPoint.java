@@ -128,6 +128,7 @@ public final class MicronautCodeGeneratorEntryPoint {
         }
         codeGenerator.setReactive(options.reactive);
         codeGenerator.setGenerateHttpResponseAlways(options.generateHttpResponseAlways);
+        codeGenerator.setGenerateHttpResponseWhereRequired(options.generateHttpResponseWhereRequired);
         codeGenerator.setUseOptional(options.optional);
         codeGenerator.setUseBeanValidation(options.beanValidation);
         codeGenerator.setTestTool(options.testFramework.value);
