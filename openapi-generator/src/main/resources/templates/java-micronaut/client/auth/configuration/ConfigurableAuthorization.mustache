@@ -3,13 +3,13 @@ package {{invokerPackage}}.auth.configuration;
 
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.http.MutableHttpRequest;
-{{#withGeneratedAnnotation}}
+{{#generatedAnnotation}}
 import {{javaxPackage}}.annotation.Generated;
-{{/withGeneratedAnnotation}}
+{{/generatedAnnotation}}
 
-{{#withGeneratedAnnotation}}
+{{#generatedAnnotation}}
 {{>common/generatedAnnotation}}
-{{/withGeneratedAnnotation}}
+{{/generatedAnnotation}}
 public interface ConfigurableAuthorization {
 
     String getName();

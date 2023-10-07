@@ -37,13 +37,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-{{#withGeneratedAnnotation}}
+{{#generatedAnnotation}}
 import {{javaxPackage}}.annotation.Generated;
-{{/withGeneratedAnnotation}}
+{{/generatedAnnotation}}
 
-{{#withGeneratedAnnotation}}
+{{#generatedAnnotation}}
 {{>common/generatedAnnotation}}
-{{/withGeneratedAnnotation}}
+{{/generatedAnnotation}}
 {{#lombok}}
 @Slf4j
 {{/lombok}}

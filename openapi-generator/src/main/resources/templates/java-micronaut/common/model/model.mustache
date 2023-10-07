@@ -56,9 +56,9 @@ import io.micronaut.core.annotation.Nullable;
 {{#generateHardNullable}}
 import {{{invokerPackage}}}.annotation.HardNullable;
 {{/generateHardNullable}}
-{{#withGeneratedAnnotation}}
+{{#generatedAnnotation}}
 import {{javaxPackage}}.annotation.Generated;
-{{/withGeneratedAnnotation}}
+{{/generatedAnnotation}}
 {{#generateSwagger1Annotations}}
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
