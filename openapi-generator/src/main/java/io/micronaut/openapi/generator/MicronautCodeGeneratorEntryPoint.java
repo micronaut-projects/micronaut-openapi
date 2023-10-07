@@ -310,7 +310,7 @@ public final class MicronautCodeGeneratorEntryPoint {
             private boolean optional;
             private boolean reactive = true;
             private boolean generateHttpResponseAlways;
-            private boolean generateHttpResponseWhereRequired;
+            private boolean generateHttpResponseWhereRequired = true;
             private TestFramework testFramework = TestFramework.JUNIT5;
             private SerializationLibraryKind serializationLibraryKind = SerializationLibraryKind.MICRONAUT_SERDE_JACKSON;
             private DateTimeFormat dateTimeFormat = DateTimeFormat.ZONED_DATETIME;
