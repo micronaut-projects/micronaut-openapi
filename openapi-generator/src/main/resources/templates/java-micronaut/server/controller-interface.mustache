@@ -23,9 +23,9 @@ import io.micronaut.http.HttpResponse;
 {{#imports}}
 import {{import}};
 {{/imports}}
-{{#withGeneratedAnnotation}}
+{{#generatedAnnotation}}
 import {{javaxPackage}}.annotation.Generated;
-{{/withGeneratedAnnotation}}
+{{/generatedAnnotation}}
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -52,9 +52,9 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 {{/formatNoEmptyLines}}
 
 {{#formatOneEmptyLine}}
-{{#withGeneratedAnnotation}}
+{{#generatedAnnotation}}
 {{>common/generatedAnnotation}}
-{{/withGeneratedAnnotation}}
+{{/generatedAnnotation}}
 {{^generateControllerAsAbstract}}
 @Controller
 {{/generateControllerAsAbstract}}

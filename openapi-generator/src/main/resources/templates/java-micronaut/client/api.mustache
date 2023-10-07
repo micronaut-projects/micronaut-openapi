@@ -17,9 +17,9 @@ import io.micronaut.http.HttpResponse;
 {{#imports}}
 import {{import}};
 {{/imports}}
-{{#withGeneratedAnnotation}}
+{{#generatedAnnotation}}
 import {{javaxPackage}}.annotation.Generated;
-{{/withGeneratedAnnotation}}
+{{/generatedAnnotation}}
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -46,9 +46,9 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 {{#additionalClientTypeAnnotations}}
 {{{.}}}
 {{/additionalClientTypeAnnotations}}
-{{#withGeneratedAnnotation}}
+{{#generatedAnnotation}}
 {{>common/generatedAnnotation}}
-{{/withGeneratedAnnotation}}
+{{/generatedAnnotation}}
 @Client({{#configureClientId}}id = "{{clientId}}", path = {{/configureClientId}}"${{openbrace}}{{{applicationName}}}{{basePathSeparator}}base-path{{closebrace}}")
 public interface {{classname}} {
 {{#operations}}

@@ -13,13 +13,13 @@ import io.micronaut.http.client.bind.ClientRequestUriContext;
 import jakarta.inject.Singleton;
 import java.util.ArrayList;
 import java.util.List;
-{{#withGeneratedAnnotation}}
+{{#generatedAnnotation}}
 import {{javaxPackage}}.annotation.Generated;
-{{/withGeneratedAnnotation}}
+{{/generatedAnnotation}}
 
-{{#withGeneratedAnnotation}}
+{{#generatedAnnotation}}
 {{>common/generatedAnnotation}}
-{{/withGeneratedAnnotation}}
+{{/generatedAnnotation}}
 @Singleton
 public class AuthorizationBinder implements AnnotatedClientRequestBinder<Authorization> {
 
