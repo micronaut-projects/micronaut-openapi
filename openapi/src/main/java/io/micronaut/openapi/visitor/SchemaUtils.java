@@ -211,27 +211,29 @@ public final class SchemaUtils {
 
         return switch (httpMethod) {
             case GET -> pathItem.getGet();
-            case POST -> pathItem.getPost();
             case PUT -> pathItem.getPut();
-            case PATCH -> pathItem.getPatch();
+            case POST -> pathItem.getPost();
             case DELETE -> pathItem.getDelete();
-            case HEAD -> pathItem.getHead();
             case OPTIONS -> pathItem.getOptions();
+            case HEAD -> pathItem.getHead();
+            case PATCH -> pathItem.getPatch();
             case TRACE -> pathItem.getTrace();
             default -> null;
         };
     }
-
     public static void setOperationOnPathItem(PathItem pathItem, HttpMethod httpMethod, Operation operation) {
         if (pathItem == null) {
             return;
         }
         switch (httpMethod) {
             case GET -> pathItem.setGet(operation);
-            case POST -> pathItem.setPost(operation);
             case PUT -> pathItem.setPut(operation);
+            case POST -> pathItem.setPost(operation);
             case DELETE -> pathItem.setDelete(operation);
+            case OPTIONS -> pathItem.setOptions(operation);
+            case HEAD -> pathItem.setHead(operation);
             case PATCH -> pathItem.setPatch(operation);
+            case TRACE -> pathItem.setTrace(operation);
             default -> {
                 // do nothing
             }
