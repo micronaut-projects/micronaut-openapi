@@ -30,11 +30,8 @@ import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.core.util.StringUtils;
 import io.micronaut.inject.visitor.VisitorContext;
 import io.micronaut.openapi.view.OpenApiViewConfig.RendererType;
-import io.micronaut.openapi.visitor.ConvertUtils;
 import io.micronaut.openapi.visitor.Pair;
 import io.micronaut.openapi.visitor.group.OpenApiInfo;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
 
 /**
  * Swagger-ui configuration.
@@ -287,15 +284,22 @@ final class SwaggerUIConfig extends AbstractViewConfig {
 
     @NonNull
     private String getUrlStr(VisitorContext context) {
-        if (CollectionUtils.isEmpty(urls)) {
+        if (CollectionUtils.isEmpty(urls) || (withUrls != null && !withUrls)) {
             return StringUtils.EMPTY_STRING;
         }
-        try {
-            return "urls:" + ConvertUtils.getJsonMapper().writeValueAsString(urls) + ',';
-        } catch (JsonProcessingException e) {
-            context.warn("Some problems with serialize urls " + e.getMessage(), null);
+
+        var isFirst = true;
+        var result = new StringBuilder("urls: [");
+        for (var url : urls) {
+            if (!isFirst) {
+                result.append(',');
+            }
+            result.append("{url: contextPath + '").append(url.url())
+                .append(", name: '").append(url.name()).append("'}");
+            isFirst = false;
         }
-        return StringUtils.EMPTY_STRING;
+        result.append("],");
+        return result.toString();
     }
 
     @Override
