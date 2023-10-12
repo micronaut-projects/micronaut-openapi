@@ -513,7 +513,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                     if (isRequestBodySchemaSet) {
                         schema = openAPI.getComponents().getSchemas().get(schema.get$ref().substring(COMPONENTS_SCHEMAS_PREFIX.length()));
                     } else {
-                        ComposedSchema composedSchema = new ComposedSchema();
+                        var composedSchema = new ComposedSchema();
                         var extraBodyParametersSchema = new Schema<>();
                         // Composition of existing + a new schema where extra body parameters are going to be added
                         composedSchema.addAllOfItem(schema);
@@ -580,8 +580,15 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
     }
 
     private boolean alreadyProcessedParameter(List<Parameter> swaggerParameters, ParameterElement parameter) {
-        return swaggerParameters.stream()
-            .anyMatch(p -> p.getName().equals(parameter.getName()) && p.getIn() != null);
+        if (CollectionUtils.isEmpty(swaggerParameters)) {
+            return false;
+        }
+        for (var param : swaggerParameters) {
+            if (param.getName().equals(parameter.getName()) && param.getIn() != null) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void processParameterAnnotationInMethod(MethodElement element,
@@ -849,6 +856,9 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                                                        List<TypedElement> extraBodyParameters,
                                                        HttpMethod httpMethod,
                                                        List<UriMatchTemplate> matchTemplates) {
+
+        boolean isBodyParameter = false;
+
         Parameter newParameter = null;
         String parameterName = parameter.getName();
         if (!parameter.hasStereotype(Bindable.class) && pathVariables.containsKey(parameterName)) {
@@ -897,6 +907,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             newParameter.setName(queryVar);
         } else if (parameter.isAnnotationPresent(Part.class) && permitsRequestBody) {
             extraBodyParameters.add(parameter);
+            isBodyParameter = true;
         } else if (parameter.hasAnnotation("io.micronaut.management.endpoint.annotation.Selector")) {
             newParameter = new PathParameter();
             newParameter.setName(parameterName);
@@ -907,6 +918,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                 && parameterAnnotation.stringValue("in").isEmpty()) {
                 if (permitsRequestBody) {
                     extraBodyParameters.add(parameter);
+                    isBodyParameter = true;
                 } else {
 
                     UriMatchVariable pathVariable = pathVariables.get(parameterName);
@@ -946,6 +958,10 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                     }
                 }
             }
+        }
+
+        if (isBodyParameter) {
+            return null;
         }
 
         if (parameter.isAnnotationPresent(io.swagger.v3.oas.annotations.Parameter.class)) {

@@ -104,6 +104,12 @@ public final class ElementUtils {
      * @return true if this type one of known file upload types
      */
     public static boolean isFileUpload(ClassElement type) {
+        if (ElementUtils.isContainerType(type)) {
+            var typeArg = type.getFirstTypeArgument().orElse(null);
+            if (typeArg != null) {
+                type = typeArg;
+            }
+        }
         String typeName = type.getName();
         return "io.micronaut.http.multipart.StreamingFileUpload".equals(typeName)
                 || "io.micronaut.http.multipart.CompletedFileUpload".equals(typeName)
