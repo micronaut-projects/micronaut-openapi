@@ -1,6 +1,10 @@
 package io.micronaut.openapi.view
 
 import io.micronaut.openapi.visitor.OpenApiConfigProperty
+import io.micronaut.openapi.visitor.Pair
+import io.micronaut.openapi.visitor.group.OpenApiInfo
+import io.swagger.v3.oas.models.OpenAPI
+import org.apache.groovy.util.Maps
 import spock.lang.Specification
 
 import java.nio.charset.StandardCharsets
@@ -338,5 +342,49 @@ class OpenApiOperationViewRenderSpec extends Specification {
         urlPrefix
         urlPrefix == '/swagger-ui/res/'
 
+    }
+
+    void "test swaggerUi without groups"() {
+        given:
+        String spec = "swagger-ui.enabled=true"
+        def openApiInfo = new OpenApiInfo("1", "1", "title", "swagger.yml", new OpenAPI());
+        OpenApiViewConfig cfg = OpenApiViewConfig.fromSpecification(spec, Maps.of(Pair.NULL_STRING_PAIR, openApiInfo), new Properties(), null)
+        Path outputDir = Paths.get("output")
+        cfg.title = "OpenAPI documentation"
+        cfg.specFile = "swagger.yml"
+        cfg.swaggerUIConfig?.urls.size() == 1
+        cfg.render(outputDir, null)
+
+        expect:
+        Files.exists(outputDir.resolve("swagger-ui").resolve("index.html"))
+
+        when:
+        def indexText = outputDir.resolve("swagger-ui").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name())
+
+        then:
+        indexText.contains(cfg.getSpecURL(cfg.swaggerUIConfig, null))
+        !indexText.contains("urls:")
+    }
+
+    void "test swaggerUi with groups"() {
+        given:
+        String spec = "swagger-ui.enabled=true"
+        def openApiInfo = new OpenApiInfo("1", "1", "title", "swagger.yml", new OpenAPI());
+        OpenApiViewConfig cfg = OpenApiViewConfig.fromSpecification(spec, Maps.of(Pair.of("1", "1"), openApiInfo), new Properties(), null)
+        Path outputDir = Paths.get("output")
+        cfg.title = "OpenAPI documentation"
+        cfg.specFile = "swagger.yml"
+        cfg.swaggerUIConfig?.urls.size() == 1
+        cfg.render(outputDir, null)
+
+        expect:
+        Files.exists(outputDir.resolve("swagger-ui").resolve("index.html"))
+
+        when:
+        def indexText = outputDir.resolve("swagger-ui").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name())
+
+        then:
+        indexText.contains(cfg.getSpecURL(cfg.swaggerUIConfig, null))
+        indexText.contains("urls: [{url: contextPath + '/swagger/swagger.yml, name: '1'}],")
     }
 }

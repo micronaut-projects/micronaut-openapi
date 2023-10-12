@@ -128,8 +128,6 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_FIELD_VISIBILITY_LEVEL;
-import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_SERVER_CONTEXT_PATH;
 import static io.micronaut.openapi.visitor.ConfigUtils.getConfigProperty;
 import static io.micronaut.openapi.visitor.ConfigUtils.getCustomSchema;
 import static io.micronaut.openapi.visitor.ConfigUtils.getExpandableProperties;
@@ -138,9 +136,14 @@ import static io.micronaut.openapi.visitor.ConfigUtils.isJsonViewDefaultInclusio
 import static io.micronaut.openapi.visitor.ConvertUtils.parseJsonString;
 import static io.micronaut.openapi.visitor.ConvertUtils.resolveExtensions;
 import static io.micronaut.openapi.visitor.ConvertUtils.setDefaultValueObject;
+import static io.micronaut.openapi.visitor.ElementUtils.isElementNotNullable;
 import static io.micronaut.openapi.visitor.ElementUtils.isFileUpload;
+import static io.micronaut.openapi.visitor.ElementUtils.isNullable;
 import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.expandProperties;
 import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.resolvePlaceholders;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_FIELD_VISIBILITY_LEVEL;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_SERVER_CONTEXT_PATH;
+import static io.micronaut.openapi.visitor.SchemaUtils.EMPTY_SCHEMA;
 import static io.micronaut.openapi.visitor.SchemaUtils.TYPE_OBJECT;
 import static io.micronaut.openapi.visitor.SchemaUtils.processExtensions;
 import static io.micronaut.openapi.visitor.Utils.resolveComponents;
@@ -652,7 +655,8 @@ abstract class AbstractOpenApiVisitor {
     }
 
     private <T extends Schema<?>> void processAnnotationValue(VisitorContext context, AnnotationValue<?> annotationValue,
-                                                                                                                       Map<CharSequence, Object> arraySchemaMap, List<String> filters, Class<T> type, @Nullable ClassElement jsonViewClass) {
+                                                              Map<CharSequence, Object> arraySchemaMap, List<String> filters,
+                                                              Class<T> type, @Nullable ClassElement jsonViewClass) {
         Map<CharSequence, Object> values = annotationValue.getValues().entrySet().stream()
             .filter(entry -> filters == null || !filters.contains((String) entry.getKey()))
             .collect(toMap(e -> e.getKey().equals("requiredProperties") ? "required" : e.getKey(), Map.Entry::getValue));
@@ -871,7 +875,7 @@ abstract class AbstractOpenApiVisitor {
                 }
                 PrimitiveType primitiveType = PrimitiveType.fromName(typeName);
                 if (!isArray && ClassUtils.isJavaLangType(typeName)) {
-                    schema = getPrimitiveType(typeName);
+                    schema = getPrimitiveType(type, typeName);
                 } else if (!isArray && primitiveType != null) {
                     schema = primitiveType.createProperty();
                 } else if (type.isAssignable(Map.class.getName())) {
@@ -896,10 +900,11 @@ abstract class AbstractOpenApiVisitor {
                         if (componentType != null) {
                             schema = resolveSchema(openAPI, type, componentType, context, mediaTypes, jsonViewClass, null, classJavadoc);
                         } else {
-                            schema = getPrimitiveType(Object.class.getName());
+                            schema = getPrimitiveType(null, Object.class.getName());
                         }
                         List<FieldElement> fields = type.getPackageName().startsWith("java.util") ? Collections.emptyList() : type.getFields();
                         if (schema != null && fields.isEmpty()) {
+                            schema = processGenericAnnotations(schema, componentType);
                             schema = SchemaUtils.arraySchema(schema);
                         } else {
                             schema = getSchemaDefinition(openAPI, context, type, typeArgs, definingElement, mediaTypes, jsonViewClass);
@@ -950,6 +955,7 @@ abstract class AbstractOpenApiVisitor {
                     schema = PrimitiveType.OBJECT.createProperty();
                 } else {
                     schema = getSchemaDefinition(openAPI, context, type, typeArgs, definingElement, mediaTypes, jsonViewClass);
+                    schema = processGenericAnnotations(schema, componentType);
                 }
             }
 
@@ -987,6 +993,26 @@ abstract class AbstractOpenApiVisitor {
                 }
             }
         }
+        return schema;
+    }
+
+    private Schema<?> processGenericAnnotations(Schema<?> schema, ClassElement componentType) {
+        if (componentType == null) {
+            return schema;
+        }
+        var primitiveComponentType = getPrimitiveType(componentType, componentType.getName());
+        if (primitiveComponentType == null) {
+            var schemaFromTypeArgAnnotations = new Schema<>();
+            processArgTypeAnnotations(componentType, schemaFromTypeArgAnnotations);
+            if (schemaFromTypeArgAnnotations.equals(EMPTY_SCHEMA)) {
+                return schema;
+            }
+            var composedSchema = new ComposedSchema();
+            composedSchema.addAllOfItem(schema);
+            composedSchema.addAllOfItem(schemaFromTypeArgAnnotations);
+            return composedSchema;
+        }
+
         return schema;
     }
 
@@ -1092,17 +1118,6 @@ abstract class AbstractOpenApiVisitor {
                 });
             }
         }
-    }
-
-    protected boolean isElementNotNullable(Element element, @Nullable Element classElement) {
-        return element.isAnnotationPresent("javax.validation.constraints.NotNull$List")
-            || element.isAnnotationPresent("jakarta.validation.constraints.NotNull$List")
-            || element.isAnnotationPresent("javax.validation.constraints.NotBlank$List")
-            || element.isAnnotationPresent("jakarta.validation.constraints.NotBlank$List")
-            || element.isAnnotationPresent("javax.validation.constraints.NotEmpty$List")
-            || element.isAnnotationPresent("jakarta.validation.constraints.NotEmpty$List")
-            || element.isNonNull()
-            || element.booleanValue(JsonProperty.class, "required").orElse(false);
     }
 
     private boolean doesParamExistsMandatoryInConstructor(Element element, @Nullable Element classElement) {
@@ -1233,7 +1248,7 @@ abstract class AbstractOpenApiVisitor {
         }
         // @Schema annotation takes priority over nullability annotations
         Boolean isSchemaNullable = element.booleanValue(io.swagger.v3.oas.annotations.media.Schema.class, "nullable").orElse(null);
-        boolean isNullable = (isSchemaNullable == null && ElementUtils.isNullable(element)) || Boolean.TRUE.equals(isSchemaNullable);
+        boolean isNullable = (isSchemaNullable == null && isNullable(element)) || Boolean.TRUE.equals(isSchemaNullable);
         if (isNullable) {
             topLevelSchema.setNullable(true);
             notOnlyRef = true;
@@ -1445,7 +1460,8 @@ abstract class AbstractOpenApiVisitor {
                     }
                 });
 
-            element.getValue("io.micronaut.http.annotation.Part", String.class).ifPresent(schemaToBind::setName);
+            element.getValue("io.micronaut.http.annotation.Part", String.class)
+                .ifPresent(schemaToBind::setName);
         }
     }
 
@@ -1710,7 +1726,7 @@ abstract class AbstractOpenApiVisitor {
             }
             // remove schema that maps to 'items'
             JsonNode items = objNode.remove("schema");
-            if (items != null && schemaToBind != null && schemaToBind.getType().equals("array") && schemaToBind.getItems() != null) {
+            if (items != null && schemaToBind != null && (schemaToBind.getType() != null && schemaToBind.getType().equals("array")) && schemaToBind.getItems() != null) {
                 // if it has no $ref add properties, otherwise we are good
                 if (schemaToBind.getItems().get$ref() == null) {
                     try {
@@ -1874,7 +1890,9 @@ abstract class AbstractOpenApiVisitor {
             final boolean isBasicType = ClassUtils.isJavaBasicType(type.getName());
             final PrimitiveType primitiveType;
             if (isBasicType) {
-                primitiveType = ClassUtils.forName(type.getName(), getClass().getClassLoader()).map(PrimitiveType::fromType).orElse(null);
+                primitiveType = ClassUtils.forName(type.getName(), getClass().getClassLoader())
+                    .map(PrimitiveType::fromType)
+                    .orElse(null);
             } else {
                 primitiveType = null;
             }
@@ -2316,6 +2334,43 @@ abstract class AbstractOpenApiVisitor {
         return builder.toString();
     }
 
+    private String addTypeArgsAnnotations(String memberName, Object annValue) {
+
+        var result = new StringBuilder();
+
+        if (annValue instanceof AnnotationValue aValue) {
+            var annName = aValue.getAnnotationName();
+            var values = ((Map<String, Object>) aValue.getValues());
+            var endPos = annName.contains("$") ? annName.lastIndexOf('$') : annName.length();
+            result.append(annName.substring(annName.lastIndexOf('.') + 1, endPos));
+            if (CollectionUtils.isNotEmpty(values)) {
+                result.append('_');
+                for (var entry : values.entrySet()) {
+                    result.append(addTypeArgsAnnotations(entry.getKey(), entry.getValue()));
+                }
+                result.append('_');
+            }
+        } else if (annValue instanceof Iterable<?> iterable) {
+            var isFirst = true;
+            for (var item : iterable) {
+                if (!isFirst) {
+                    result.append('_');
+                }
+                if (memberName != null) {
+                    result.append(memberName).append('_');
+                }
+                result.append(addTypeArgsAnnotations(null, item));
+                isFirst = false;
+            }
+        } else {
+            if(memberName != null && !memberName.equals("value")) {
+                result.append(memberName).append('_');
+            }
+            result.append(annValue);
+        }
+        return result.toString();
+    }
+
     private void computeNameWithGenerics(ClassElement classElement, StringBuilder builder, Set<String> computed, Map<String, ClassElement> typeArgs, VisitorContext context) {
         computed.add(classElement.getName());
         final Iterator<ClassElement> i = typeArgs.values().iterator();
@@ -2324,6 +2379,15 @@ abstract class AbstractOpenApiVisitor {
             builder.append('_');
             while (i.hasNext()) {
                 ClassElement ce = i.next();
+                if (ClassUtils.isJavaLangType(ce.getName())) {
+                    var typeArgAnnotations = ce.getAnnotationNames();
+                    if (CollectionUtils.isNotEmpty(typeArgAnnotations)) {
+                        for (var typeArgAnnName : typeArgAnnotations) {
+                            var annValue = ce.getAnnotation(typeArgAnnName);
+                            builder.append(addTypeArgsAnnotations(null, typeArgAnnName.endsWith("$List") ? annValue.getValues().get("value") : annValue));
+                        }
+                    }
+                }
                 builder.append(ce.getSimpleName());
                 Map<String, ClassElement> ceTypeArgs = ce.getTypeArguments();
                 ClassElement customElement = getCustomSchema(ce.getName(), ceTypeArgs, context);
@@ -2505,7 +2569,17 @@ abstract class AbstractOpenApiVisitor {
         return false;
     }
 
-    private Schema<?> getPrimitiveType(String typeName) {
+    private void processArgTypeAnnotations(ClassElement type, @Nullable Schema schema) {
+        if (schema == null || type == null || type.getAnnotationNames().isEmpty()) {
+            return;
+        }
+        if (isNullable(type)) {
+            schema.setNullable(true);
+        }
+        processJavaxValidationAnnotations(type, type, schema);
+    }
+
+    private Schema<?> getPrimitiveType(ClassElement type, String typeName) {
         Schema<?> schema = null;
         Class<?> aClass = ClassUtils.getPrimitiveType(typeName).orElse(null);
         if (aClass == null) {
@@ -2520,6 +2594,9 @@ abstract class AbstractOpenApiVisitor {
                 schema = primitiveType.createProperty();
             }
         }
+
+        processArgTypeAnnotations(type, schema);
+
         return schema;
     }
 

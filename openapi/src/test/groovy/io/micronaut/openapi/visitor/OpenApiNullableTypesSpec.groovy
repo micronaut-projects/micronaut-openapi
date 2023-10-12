@@ -292,7 +292,6 @@ class PetController {
     }
 
     @Issue("https://github.com/micronaut-projects/micronaut-core/issues/8706")
-    @PendingFeature(reason = "Can't find stereotypes, while issue not fixed")
     @Unroll
     void "test build OpenAPI with eclipse and jspecify Nullable annotations"(String annotation) {
         when:

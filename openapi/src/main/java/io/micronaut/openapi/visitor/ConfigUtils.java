@@ -478,6 +478,9 @@ public final class ConfigUtils {
 
     public static Map<String, GroupProperties> getGroupsPropertiesMap(VisitorContext context) {
 
+        if (context == null) {
+            return Collections.emptyMap();
+        }
         Map<String, GroupProperties> groupPropertiesMap = context.get(MICRONAUT_INTERNAL_GROUPS, ARGUMENT_GROUP_PROPERTIES_MAP).orElse(null);
         if (groupPropertiesMap != null) {
             return groupPropertiesMap;
