@@ -1797,4 +1797,128 @@ class MyBean {}
         }
 
     }
+
+    void "test parse @Part StreamingFileUpload parameter data"() {
+        given:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.http.MediaType;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Part;
+import io.micronaut.http.annotation.Post;
+import io.micronaut.http.multipart.StreamingFileUpload;
+import io.swagger.v3.oas.annotations.Parameter;
+
+import org.reactivestreams.Publisher;
+
+@Controller("/api")
+class MyController {
+
+    @Post(uri = "/model", consumes = MediaType.MULTIPART_FORM_DATA)
+    public String model(@Parameter(description = "Bind multi-part") @Part Publisher<StreamingFileUpload> files) {
+        return null;
+     }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        when:
+        OpenAPI openAPI = Utils.testReference
+        Operation operation = openAPI?.paths?."/api/model"?.post
+
+        then:
+        operation
+        operation.requestBody
+        operation.requestBody.content."multipart/form-data".schema.properties.files
+        operation.requestBody.content."multipart/form-data".schema.properties.files.type == "array"
+        operation.requestBody.content."multipart/form-data".schema.properties.files.description == "Bind multi-part"
+        operation.requestBody.content."multipart/form-data".schema.properties.files.items.type == "string"
+        operation.requestBody.content."multipart/form-data".schema.properties.files.items.format == "binary"
+        operation.requestBody.content."multipart/form-data".encoding.files.contentType == 'application/octet-stream'
+        !operation.parameters
+    }
+
+    void "test parse @Part CompletedFileUpload parameter data"() {
+        given:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.http.MediaType;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Part;
+import io.micronaut.http.annotation.Post;
+import io.micronaut.http.multipart.CompletedFileUpload;
+import io.swagger.v3.oas.annotations.Parameter;
+
+@Controller("/api")
+class MyController {
+
+    @Post(uri = "/model", consumes = MediaType.MULTIPART_FORM_DATA)
+    public String model(
+        @Parameter(description = "Bind multi-part") @Part CompletedFileUpload files
+    ) {
+        return null;
+     }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        when:
+        OpenAPI openAPI = Utils.testReference
+        Operation operation = openAPI?.paths?."/api/model"?.post
+
+        then:
+        operation
+        operation.requestBody
+        operation.requestBody.content."multipart/form-data".schema.properties.files
+        operation.requestBody.content."multipart/form-data".schema.properties.files.type == "string"
+        operation.requestBody.content."multipart/form-data".schema.properties.files.format == "binary"
+        operation.requestBody.content."multipart/form-data".schema.properties.files.description == "Bind multi-part"
+        operation.requestBody.content."multipart/form-data".encoding.files.contentType == 'application/octet-stream'
+        !operation.parameters
+    }
+
+    void "test parse @Format ZonedDateTime parameter data"() {
+        given:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import java.time.ZonedDateTime;
+
+import io.micronaut.core.convert.format.Format;
+import io.micronaut.http.annotation.Body;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Post;
+import io.swagger.v3.oas.annotations.Parameter;
+
+@Controller("/api")
+class MyController {
+
+    @Post(uri = "/model")
+    public String model(
+        @Parameter(description = "Simple datetime param") @Format("yyyy-MM-dd'T'HH:mm[:ss][.SSS][XXX]") ZonedDateTime date
+    ) {
+        return null;
+     }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        when:
+        OpenAPI openAPI = Utils.testReference
+        Operation operation = openAPI?.paths?."/api/model"?.post
+
+        then:
+        operation
+        operation.requestBody
+        operation.requestBody.content."application/json".schema.properties.date
+        operation.requestBody.content."application/json".schema.properties.date.type == "string"
+        operation.requestBody.content."application/json".schema.properties.date.format == "date-time"
+        operation.requestBody.content."application/json".schema.properties.date.description == "Simple datetime param"
+        !operation.parameters
+    }
 }

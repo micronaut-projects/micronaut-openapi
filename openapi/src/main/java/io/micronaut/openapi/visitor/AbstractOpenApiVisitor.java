@@ -2362,7 +2362,7 @@ abstract class AbstractOpenApiVisitor {
                 isFirst = false;
             }
         } else {
-            if(memberName != null && !memberName.equals("value")) {
+            if (memberName != null && !memberName.equals("value")) {
                 result.append(memberName).append('_');
             }
             result.append(annValue);
