@@ -347,7 +347,7 @@ class OpenApiOperationViewRenderSpec extends Specification {
     void "test swaggerUi without groups"() {
         given:
         String spec = "swagger-ui.enabled=true"
-        def openApiInfo = new OpenApiInfo("1", "1", "title", "swagger.yml", new OpenAPI());
+        def openApiInfo = new OpenApiInfo("1", "1", "title", "swagger.yml", false, null, new OpenAPI());
         OpenApiViewConfig cfg = OpenApiViewConfig.fromSpecification(spec, Maps.of(Pair.NULL_STRING_PAIR, openApiInfo), new Properties(), null)
         Path outputDir = Paths.get("output")
         cfg.title = "OpenAPI documentation"
@@ -369,7 +369,7 @@ class OpenApiOperationViewRenderSpec extends Specification {
     void "test swaggerUi with groups"() {
         given:
         String spec = "swagger-ui.enabled=true"
-        def openApiInfo = new OpenApiInfo("1", "1", "title", "swagger.yml", new OpenAPI());
+        def openApiInfo = new OpenApiInfo("1", "1", "title", "swagger.yml", false, null, new OpenAPI());
         OpenApiViewConfig cfg = OpenApiViewConfig.fromSpecification(spec, Maps.of(Pair.of("1", "1"), openApiInfo), new Properties(), null)
         Path outputDir = Paths.get("output")
         cfg.title = "OpenAPI documentation"
