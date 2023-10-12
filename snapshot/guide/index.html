@@ -2280,8 +2280,8 @@ endpoints.refresh.security-requirements=[{"petstore_auth": ["write:pets", "read:
 <a href="../api/io/micronaut/openapi/annotation/OpenAPIGroup.html">OpenAPIGroup</a>
 <a href="../api/io/micronaut/openapi/annotation/OpenAPIGroupInfo.html">OpenAPIGroupInfo</a>
 <a href="../api/io/micronaut/openapi/annotation/OpenAPIInclude.html">OpenAPIInclude</a>
-<a href="../api/io/micronaut/openapi/annotation/OpenAPISecurity.html">OpenAPISecurity</a>
 <a href="../api/io/micronaut/openapi/annotation/OpenAPIManagement.html">OpenAPIManagement</a>)
+<a href="../api/io/micronaut/openapi/annotation/OpenAPISecurity.html">OpenAPISecurity</a>
 are available to enhance the generated OpenAPI.</p>
 </div>
 <div class="paragraph">
@@ -2291,14 +2291,14 @@ are available to enhance the generated OpenAPI.</p>
 <p>        <div class="listingblock multi-language-sample">
 <div class="title"></div>
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="gradle">compileOnly(<span class="hljs-string">"io.micronaut.openapi:micronaut-openapi")</span></code></pre>
+<pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="gradle">compileOnly(<span class="hljs-string">"io.micronaut.openapi:micronaut-openapi-annotations")</span></code></pre>
 </div>
 </div>
 <div class="listingblock multi-language-sample">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="maven">&lt;dependency&gt;
     &lt;groupId&gt;io.micronaut.openapi&lt;/groupId&gt;
-    &lt;artifactId&gt;micronaut-openapi&lt;/artifactId&gt;
+    &lt;artifactId&gt;micronaut-openapi-annotations&lt;/artifactId&gt;
     &lt;scope&gt;provided&lt;/scope&gt;
 &lt;/dependency&gt;</code></pre>
 </div>
@@ -3096,7 +3096,7 @@ micronaut.router.static-resources.swagger.mapping=/swaggerYAML/**</code></pre>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>swagger-ui.theme</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>DEFAULT</code> or <code>MATERIAL</code> or <code>FEELING_BLUE</code> <code>FLATTOP</code> <code>MONOKAI</code> <code>MUTED</code> <code>NEWSPAPER</code> <code>OUTLINE</code>. The theme of swagger-ui to use. These are case-insensitive. Default is <code>DEFAULT</code>. See <a href="https://github.com/ostranme/swagger-ui-themes">Swagger UI Themes</a>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>DEFAULT</code> or <code>MATERIAL</code> or <code>FEELING_BLUE</code> <code>FLATTOP</code> <code>MONOKAI</code> <code>MUTED</code> <code>NEWSPAPER</code> <code>OUTLINE</code> <code>DARK</code> <code>DARK2</code>. The theme of swagger-ui to use. These are case-insensitive. Default is <code>DEFAULT</code>. See <a href="https://github.com/ostranme/swagger-ui-themes">Swagger UI Themes</a>.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>swagger-ui.theme.url</code></p></td>
