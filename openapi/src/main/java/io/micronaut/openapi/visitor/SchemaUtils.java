@@ -223,6 +223,7 @@ public final class SchemaUtils {
             default -> null;
         };
     }
+
     public static void setOperationOnPathItem(PathItem pathItem, HttpMethod httpMethod, Operation operation) {
         if (pathItem == null) {
             return;
