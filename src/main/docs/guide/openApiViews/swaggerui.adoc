@@ -7,7 +7,7 @@ The views will be generated to the `META-INF/swagger/views/swagger-ui` directory
 | `swagger-ui.js.url` | Override path to use to find the js file. Path must contain a files named swagger-ui.css, swagger-ui-bundle.js, swagger-ui-standalone-present.js. The value can be a URL path like: "https://unpkg.com/swagger-ui-dist/". Must contain trailing slash.,
 | `swagger-ui.spec.url` | Override path in swagger file path line. If you don't set, then value will be `<context-path>/swagger/<spec_filename>`. You can use the placeholder `${filename}` it will be replaced with the final name of the generated swagger file.
 | `swagger-ui.copy-resources` | Copy or not local JS and CSS resources. Set to `false` if you are using external resources (eg https://unpkg.com/swagger-ui-dist/). Default `true`
-| `swagger-ui.theme` | `DEFAULT` or `MATERIAL` or `FEELING_BLUE` `FLATTOP` `MONOKAI` `MUTED` `NEWSPAPER` `OUTLINE`. The theme of swagger-ui to use. These are case-insensitive. Default is `DEFAULT`. See https://github.com/ostranme/swagger-ui-themes[Swagger UI Themes].
+| `swagger-ui.theme` | `DEFAULT` or `MATERIAL` or `FEELING_BLUE` `FLATTOP` `MONOKAI` `MUTED` `NEWSPAPER` `OUTLINE` `DARK` `DARK2`. The theme of swagger-ui to use. These are case-insensitive. Default is `DEFAULT`. See https://github.com/ostranme/swagger-ui-themes[Swagger UI Themes].
 | `swagger-ui.theme.url` | Override path to use to find the theme CSS file.,
 | `swagger-ui.copy-theme` | Copy or not local theme CSS resources. Set to `false` if you are using external resources (eg https://swagger-theme.com/flattop.css). Default `true`
 | `swagger-ui.displayOperationId` |
