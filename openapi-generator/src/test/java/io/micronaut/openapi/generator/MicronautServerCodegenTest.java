@@ -340,4 +340,17 @@ class MicronautServerCodegenTest extends AbstractMicronautCodegenTest {
         assertFileContains(apiPath + "BasicBookInfo.java", "public BasicBookInfo(String author, String name)", "super(name)");
         assertFileContains(apiPath + "DetailedBookInfo.java", "public DetailedBookInfo(String isbn, String name, String author)", "super(author, name)");
     }
+
+    @Test
+    void testGenericAnnotations() {
+
+        var codegen = new JavaMicronautServerCodegen();
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/modelwithprimitivelist.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String apiPath = outputPath + "src/main/java/org/openapitools/api/";
+        String modelPath = outputPath + "src/main/java/org/openapitools/model/";
+
+        assertFileContains(apiPath + "BooksApi.java", "@Body @NotNull List<@Pattern(regexp = \"[a-zA-Z ]+\") @Size(max = 10) @NotNull String> requestBody");
+        assertFileContains(modelPath + "CountsContainer.java", "private List<@NotEmpty List<@NotNull List<@Size(max = 10) @NotNull String>>> counts;");
+        assertFileContains(modelPath + "BooksContainer.java", "private List<@Pattern(regexp = \"[a-zA-Z ]+\") @Size(max = 10) @NotNull String> books;");
+    }
 }

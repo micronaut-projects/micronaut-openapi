@@ -310,6 +310,19 @@ class MicronautClientCodegenTest extends AbstractMicronautCodegenTest {
     }
 
     @Test
+    void testGenericAnnotations() {
+
+        var codegen = new JavaMicronautClientCodegen();
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/modelwithprimitivelist.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String apiPath = outputPath + "src/main/java/org/openapitools/api/";
+        String modelPath = outputPath + "src/main/java/org/openapitools/model/";
+
+        assertFileContains(apiPath + "BooksApi.java", "List<@Pattern(regexp = \"[a-zA-Z ]+\") @Size(max = 10) @NotNull String> requestBody");
+        assertFileContains(modelPath + "CountsContainer.java", "private List<@NotEmpty List<@NotNull List<@Size(max = 10) @NotNull String>>> counts;");
+        assertFileContains(modelPath + "BooksContainer.java", "private List<@Pattern(regexp = \"[a-zA-Z ]+\") @Size(max = 10) @NotNull String> books;");
+    }
+
+    @Test
     void testDiscriminatorConstructorBug() {
 
         var codegen = new JavaMicronautClientCodegen();
