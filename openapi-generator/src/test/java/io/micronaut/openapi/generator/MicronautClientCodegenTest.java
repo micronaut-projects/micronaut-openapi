@@ -294,6 +294,22 @@ class MicronautClientCodegenTest extends AbstractMicronautCodegenTest {
     }
 
     @Test
+    void testAddValidAnnotations() {
+
+        var codegen = new JavaMicronautClientCodegen();
+        codegen.additionalProperties().put(JavaMicronautClientCodegen.USE_BEANVALIDATION, "true");
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/modelwithlist.yml", CodegenConstants.APIS, CodegenConstants.API_TESTS, CodegenConstants.MODELS);
+        String apiPath = outputPath + "src/main/java/org/openapitools/model/";
+
+        assertFileContains(apiPath + "BooksContainer.java",
+            """
+                        @Valid
+                        @JsonProperty(JSON_PROPERTY_BOOKS)
+                        private List<Book> books;
+                    """);
+    }
+
+    @Test
     void testDiscriminatorConstructorBug() {
 
         var codegen = new JavaMicronautClientCodegen();
