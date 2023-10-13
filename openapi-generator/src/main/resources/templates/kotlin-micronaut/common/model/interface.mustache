@@ -45,7 +45,7 @@
     {{/description}}
     {{#formatNoEmptyLines}}
 {{>common/model/field_annotations}}
-    var {{name}}: {{{vendorExtensions.typeWithEnumWithoutPrefix}}}{{^required}}?{{/required}}
+    var {{name}}: {{{datatypeWithEnum}}}{{^required}}?{{/required}}
     {{/formatNoEmptyLines}}
 {{/vars}}
 

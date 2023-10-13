@@ -1,18 +1,18 @@
 {{>common/licenseInfo}}
-package {{invokerPackage}}.auth.configuration;
+package {{invokerPackage}}.auth.configuration
 
-import io.micronaut.core.annotation.NonNull;
-import io.micronaut.http.MutableHttpRequest;
+import io.micronaut.core.annotation.NonNull
+import io.micronaut.http.MutableHttpRequest
 {{#generatedAnnotation}}
-import {{javaxPackage}}.annotation.Generated;
+import {{javaxPackage}}.annotation.Generated
 {{/generatedAnnotation}}
 
 {{#generatedAnnotation}}
 {{>common/generatedAnnotation}}
 {{/generatedAnnotation}}
-public interface ConfigurableAuthorization {
+interface ConfigurableAuthorization {
 
-    String getName();
+    fun getName(): String
 
-    void applyAuthorization(@NonNull MutableHttpRequest<?> request);
+    fun applyAuthorization(@NonNull request: MutableHttpRequest<*>)
 }

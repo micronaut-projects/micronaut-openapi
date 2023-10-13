@@ -10,12 +10,12 @@
      * {{nickname}}
         {{/notes}}
     {{/summary}}
-    {{#allParams}}
+    {{#vendorExtensions.originalParams}}
         {{#-first}}
      *
         {{/-first}}
      * @param {{paramName}}{{#description}} {{description}}{{/description}}{{#required}} (required){{/required}}{{^required}} (optional{{#defaultValue}}, default to {{{.}}}{{/defaultValue}}){{/required}}
-    {{/allParams}}
+    {{/vendorExtensions.originalParams}}
     {{#returnType}}
         {{^allParams.0}}
      *
@@ -39,46 +39,33 @@
         {{/description}}
         {{#tags.1}}
         {{!generate only when at least 2 tags}}
-        tags = {{openbrace}} {{#tags}}"{{name}}"{{^-last}}, {{/-last}}{{/tags}} {{closebrace}},
+        tags = [ {{#tags}}"{{name}}"{{^-last}}, {{/-last}}{{/tags}} ],
         {{/tags.1}}
-        responses = {{#responses.1}}{{openbrace}}
-    {{/responses.1}}{{#responses}}{{#responses.1}}
-            {{/responses.1}}@ApiResponse(responseCode = "{{{code}}}", description = "{{{message}}}"{{#baseType}}, content = {{#produces.1}}{{openbrace}}
+        responses = [
+            {{#responses}}
+            ApiResponse(responseCode = "{{{code}}}", description = "{{{message}}}"{{#baseType}}, content = [
                 {{#produces}}
-                @Content(mediaType = "{{{mediaType}}}", schema = @Schema(implementation = {{{baseType}}}.class)){{^-last}},{{/-last}}
+                Content(mediaType = "{{{mediaType}}}", schema = Schema(implementation = {{{baseType}}}::class)){{^-last}},{{/-last}}
                 {{/produces}}
-            {{closebrace}}{{/produces.1}}{{^produces.1}}{{#produces}}@Content(mediaType = "{{{mediaType}}}", schema = @Schema(implementation = {{{baseType}}}.class)){{/produces}}{{/produces.1}}{{/baseType}}){{^-last}},{{/-last}}{{#responses.1}}
-            {{/responses.1}}{{/responses}}{{#responses.1}}
-        {{closebrace}}{{/responses.1}}{{#hasParams}},
-        parameters = {{#vendorExtensions.originalParams.1}}{{openbrace}}
-            {{/vendorExtensions.originalParams.1}}{{#vendorExtensions.originalParams}}{{#vendorExtensions.originalParams.1}}
-            {{/vendorExtensions.originalParams.1}}@Parameter(name = "{{paramName}}"{{#description}}, description = "{{{description}}}"{{/description}}{{#required}}, required = true{{/required}}){{^-last}},{{/-last}}{{#vendorExtensions.hasMultipleParams}}
-            {{/vendorExtensions.hasMultipleParams}}{{/vendorExtensions.originalParams}}{{#vendorExtensions.originalParams.1}}
-        {{closebrace}}{{/vendorExtensions.originalParams.1}}{{/hasParams}}{{#hasAuthMethods}},
-        security = {{#authMethods.1}}{{openbrace}}
-            {{/authMethods.1}}{{#authMethods}}{{#authMethods.1}}
-            {{/authMethods.1}}@SecurityRequirement(name = "{{name}}"{{#isOAuth}}, scopes = {{openbrace}}{{#scopes}}"{{scope}}"{{^-last}}, {{/-last}}{{/scopes}}{{closebrace}}{{/isOAuth}}){{^-last}},{{/-last}}
-            {{/authMethods}}{{#authMethods.1}}
-        {{closebrace}}{{/authMethods.1}}{{/hasAuthMethods}}
+            ]{{/baseType}}){{^-last}},{{/-last}}
+            {{/responses}}
+        ]{{#hasParams}},
+        parameters = [
+            {{#vendorExtensions.originalParams}}
+            Parameter(name = "{{paramName}}"{{#description}}, description = "{{{description}}}"{{/description}}{{#required}}, required = true{{/required}}){{^-last}},{{/-last}}
+            {{/vendorExtensions.originalParams}}
+        ]{{/hasParams}}{{#hasAuthMethods}},
+        security = [
+            {{#authMethods}}
+            SecurityRequirement(name = "{{name}}"{{#isOAuth}}, scopes = {{openbrace}}{{#scopes}}"{{scope}}"{{^-last}}, {{/-last}}{{/scopes}}{{closebrace}}{{/isOAuth}}){{^-last}},{{/-last}}
+            {{/authMethods}}
+        ]{{/hasAuthMethods}}
     )
     {{/generateSwagger2Annotations}}
     {{#implicitHeadersParams.0}}
         {{#generateSwagger2Annotations}}
-            {{#implicitHeadersParams.1}}
-    @Parameters({{openbrace}}
-            {{/implicitHeadersParams.1}}
             {{#implicitHeadersParams}}
-        @Parameter(name = "{{paramName}}"{{#description}}, description = "{{{description}}}"{{/description}}{{#required}}, required = true{{/required}}){{^-last}},{{/-last}}
+    @Parameter(name = "{{paramName}}"{{#description}}, description = "{{{description}}}"{{/description}}{{#required}}, required = true{{/required}})
             {{/implicitHeadersParams}}
-            {{#implicitHeadersParams.1}}
-    {{closebrace}})
-            {{/implicitHeadersParams.1}}
         {{/generateSwagger2Annotations}}
-        {{#generateSwagger1Annotations}}
-    @ApiImplicitParams({{openbrace}}
-            {{#implicitHeadersParams}}
-        @ApiImplicitParam(name = "{{{baseName}}}", value = "{{{description}}}", {{#required}}required = true,{{/required}} dataType = "{{{dataType}}}", paramType = "header"){{^-last}},{{/-last}}
-            {{/implicitHeadersParams}}
-    {{closebrace}})
-        {{/generateSwagger1Annotations}}
     {{/implicitHeadersParams.0}}

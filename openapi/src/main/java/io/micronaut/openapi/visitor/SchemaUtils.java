@@ -21,6 +21,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import io.micronaut.core.annotation.AnnotationValue;
@@ -324,7 +325,7 @@ public final class SchemaUtils {
                 int i = 0;
                 for (Parameter p1 : op1.getParameters()) {
                     if (p1.getName().equals(p2.getName())
-                        && p1.getIn().equals(p2.getIn())) {
+                        && Objects.equals(p1.getIn(), p2.getIn())) {
                         existedParameter = p1;
                         break;
                     }

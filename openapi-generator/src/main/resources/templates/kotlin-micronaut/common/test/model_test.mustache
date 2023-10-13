@@ -1,0 +1,43 @@
+package {{package}}
+
+{{#imports}}import {{import}}
+{{/imports}}
+import io.micronaut.test.extensions.junit5.annotation.MicronautTest
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.Assertions
+
+/**
+ * Model tests for {{classname}}
+ */
+@MicronautTest
+class {{classname}}Test {
+
+    {{#models}}
+    {{#model}}
+    {{^vendorExtensions.x-is-one-of-interface}}
+    {{^isEnum}}
+    val model: {{classname}}? = null
+
+    {{/isEnum}}
+    /**
+     * Model tests for {{classname}}
+     */
+    @Test
+    fun test{{classname}}() {
+        // TODO: test {{classname}}
+    }
+
+    {{#allVars}}
+    /**
+     * Test the property '{{name}}'
+     */
+    @Test
+    fun {{name}}Test() {
+        // TODO: test {{name}}
+    }
+
+    {{/allVars}}
+    {{/vendorExtensions.x-is-one-of-interface}}
+    {{/model}}
+    {{/models}}
+}

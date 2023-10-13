@@ -28,7 +28,7 @@ import org.openapitools.codegen.meta.Stability;
  * The generator for creating Micronaut clients.
  */
 @SuppressWarnings("checkstyle:DesignForExtension")
-public class KotlinMicronautClientCodegen extends KotlinAbstractMicronautCodegen<JavaMicronautClientOptionsBuilder> {
+public class KotlinMicronautClientCodegen extends AbstractMicronautKotlinCodegen<KotlinMicronautClientOptionsBuilder> {
 
     public static final String OPT_CONFIGURE_AUTH = "configureAuth";
     public static final String OPT_CONFIGURE_AUTH_FILTER_PATTERN = "configureAuthFilterPattern";
@@ -61,7 +61,7 @@ public class KotlinMicronautClientCodegen extends KotlinAbstractMicronautCodegen
         cliOptions.add(CliOption.newString(BASE_PATH_SEPARATOR, "Configure the separator to use between the application name and base path when referencing the property").defaultValue(basePathSeparator));
         cliOptions.add(CliOption.newString(CLIENT_ID, "Configure the service ID for the Client"));
 
-        typeMapping.put("file", "byte[]");
+        typeMapping.put("file", "ByteArray");
         typeMapping.put("responseFile", "InputStream");
         importMapping.put("InputStream", "java.io.InputStream");
     }
@@ -188,11 +188,11 @@ public class KotlinMicronautClientCodegen extends KotlinAbstractMicronautCodegen
     }
 
     @Override
-    public JavaMicronautClientOptionsBuilder optionsBuilder() {
+    public KotlinMicronautClientOptionsBuilder optionsBuilder() {
         return new DefaultClientOptionsBuilder();
     }
 
-    static class DefaultClientOptionsBuilder implements JavaMicronautClientOptionsBuilder {
+    static class DefaultClientOptionsBuilder implements KotlinMicronautClientOptionsBuilder {
 
         private List<String> additionalClientTypeAnnotations;
         private String authorizationFilterPattern;
@@ -203,48 +203,43 @@ public class KotlinMicronautClientCodegen extends KotlinAbstractMicronautCodegen
         private boolean generatedAnnotation = true;
 
         @Override
-        public JavaMicronautClientOptionsBuilder withAuthorization(boolean useAuth) {
+        public KotlinMicronautClientOptionsBuilder withAuthorization(boolean useAuth) {
             this.useAuth = useAuth;
             return this;
         }
 
         @Override
-        public JavaMicronautClientOptionsBuilder withAuthorizationFilterPattern(String authorizationFilterPattern) {
+        public KotlinMicronautClientOptionsBuilder withAuthorizationFilterPattern(String authorizationFilterPattern) {
             this.authorizationFilterPattern = authorizationFilterPattern;
             return this;
         }
 
         @Override
-        public JavaMicronautClientOptionsBuilder withClientId(String clientId) {
+        public KotlinMicronautClientOptionsBuilder withClientId(String clientId) {
             this.clientId = clientId;
             return this;
         }
 
         @Override
-        public JavaMicronautClientOptionsBuilder withAdditionalClientTypeAnnotations(List<String> additionalClientTypeAnnotations) {
+        public KotlinMicronautClientOptionsBuilder withAdditionalClientTypeAnnotations(List<String> additionalClientTypeAnnotations) {
             this.additionalClientTypeAnnotations = additionalClientTypeAnnotations;
             return this;
         }
 
         @Override
-        public JavaMicronautClientOptionsBuilder withBasePathSeparator(String basePathSeparator) {
+        public KotlinMicronautClientOptionsBuilder withBasePathSeparator(String basePathSeparator) {
             this.basePathSeparator = basePathSeparator;
             return this;
         }
 
         @Override
-        public JavaMicronautClientOptionsBuilder withLombok(boolean lombok) {
-            return this;
-        }
-
-        @Override
-        public JavaMicronautClientOptionsBuilder withFluxForArrays(boolean fluxForArrays) {
+        public KotlinMicronautClientOptionsBuilder withFluxForArrays(boolean fluxForArrays) {
             this.fluxForArrays = fluxForArrays;
             return this;
         }
 
         @Override
-        public JavaMicronautClientOptionsBuilder withGeneratedAnnotation(boolean generatedAnnotation) {
+        public KotlinMicronautClientOptionsBuilder withGeneratedAnnotation(boolean generatedAnnotation) {
             this.generatedAnnotation = generatedAnnotation;
             return this;
         }

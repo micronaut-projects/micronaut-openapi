@@ -15,9 +15,6 @@
  */
 package io.micronaut.openapi.testsuite;
 
-import io.micronaut.openapi.generator.JavaAbstractMicronautCodegen;
-import io.micronaut.openapi.generator.MicronautCodeGeneratorEntryPoint;
-
 import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -26,6 +23,13 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import io.micronaut.openapi.generator.MicronautCodeGeneratorEntryPoint;
+import io.micronaut.openapi.generator.MicronautCodeGeneratorOptionsBuilder.GeneratorLanguage;
+import io.micronaut.openapi.generator.ParameterMapping;
+import io.micronaut.openapi.generator.ResponseBodyMapping;
+
+import static io.micronaut.openapi.generator.MicronautCodeGeneratorOptionsBuilder.GeneratorLanguage.JAVA;
 
 /**
  * An entry point to be used in tests, to simulate
@@ -47,9 +51,10 @@ public class GeneratorMain {
      */
     public static void main(String[] args) throws URISyntaxException {
         boolean server = "server".equals(args[0]);
-        List<JavaAbstractMicronautCodegen.ParameterMapping> parameterMappings =
+        var lang = GeneratorLanguage.valueOf(args[6].toUpperCase());
+        List<ParameterMapping> parameterMappings =
             parseParameterMappings(args[4]);
-        List<JavaAbstractMicronautCodegen.ResponseBodyMapping> responseBodyMappings =
+        List<ResponseBodyMapping> responseBodyMappings =
             parseResponseBodyMappings(args[5]);
 
         MicronautCodeGeneratorEntryPoint.OutputKind[] outputKinds
@@ -62,43 +67,59 @@ public class GeneratorMain {
             .withOutputDirectory(new File(args[2]))
             .withOutputs(outputKinds)
             .withOptions(options -> {
-                options.withInvokerPackage("io.micronaut.openapi.test");
-                options.withApiPackage("io.micronaut.openapi.test.api");
-                options.withModelPackage("io.micronaut.openapi.test.model");
-                options.withBeanValidation(true);
-                options.withOptional(true);
-                options.withReactive(true);
-                options.withTestFramework(MicronautCodeGeneratorEntryPoint.TestFramework.SPOCK);
-                options.withParameterMappings(parameterMappings);
-                options.withResponseBodyMappings(responseBodyMappings);
+                options.withLang(lang)
+                    .withInvokerPackage("io.micronaut.openapi.test")
+                    .withApiPackage("io.micronaut.openapi.test.api")
+                    .withModelPackage("io.micronaut.openapi.test.model")
+                    .withBeanValidation(true)
+                    .withOptional(true)
+                    .withReactive(true)
+                    .withTestFramework(lang == JAVA ? MicronautCodeGeneratorEntryPoint.TestFramework.SPOCK : MicronautCodeGeneratorEntryPoint.TestFramework.JUNIT5)
+                    .withParameterMappings(parameterMappings)
+                    .withResponseBodyMappings(responseBodyMappings);
             });
         if (server) {
-            builder.forServer(serverOptions -> {
-                serverOptions.withControllerPackage("io.micronaut.openapi.test.controller");
-                // commented out because currently this would prevent the test project from compiling
-                // because we generate both abstract classes _and_ dummy implementations
-                 serverOptions.withGenerateImplementationFiles(false);
-                 serverOptions.withAuthentication(false);
-            });
+            if (lang == GeneratorLanguage.KOTLIN) {
+                builder.forKotlinServer(serverOptions -> {
+                    serverOptions.withControllerPackage("io.micronaut.openapi.test.controller");
+                    // commented out because currently this would prevent the test project from compiling
+                    // because we generate both abstract classes _and_ dummy implementations
+                    serverOptions.withGenerateImplementationFiles(false);
+                    serverOptions.withAuthentication(false);
+                });
+            } else {
+                builder.forJavaServer(serverOptions -> {
+                    serverOptions.withControllerPackage("io.micronaut.openapi.test.controller");
+                    // commented out because currently this would prevent the test project from compiling
+                    // because we generate both abstract classes _and_ dummy implementations
+                    serverOptions.withGenerateImplementationFiles(false);
+                    serverOptions.withAuthentication(false);
+                });
+            }
         } else {
-            builder.forClient(client -> {
-            });
+            if (lang == GeneratorLanguage.KOTLIN) {
+                builder.forKotlinClient(client -> {
+                });
+            } else {
+                builder.forJavaClient(client -> {
+                });
+            }
         }
         builder.build().generate();
     }
 
-    private static List<JavaAbstractMicronautCodegen.ParameterMapping> parseParameterMappings(String string) {
-        return parseListOfMaps(string).stream().map(map -> new JavaAbstractMicronautCodegen.ParameterMapping(
+    private static List<ParameterMapping> parseParameterMappings(String string) {
+        return parseListOfMaps(string).stream().map(map -> new ParameterMapping(
             map.get("name"),
-            JavaAbstractMicronautCodegen.ParameterMapping.ParameterLocation.valueOf(map.get("location")),
+            ParameterMapping.ParameterLocation.valueOf(map.get("location")),
             map.get("mappedType"),
             map.get("mappedName"),
             "true".equals(map.get("isValidated"))
         )).toList();
     }
 
-    private static List<JavaAbstractMicronautCodegen.ResponseBodyMapping> parseResponseBodyMappings(String string) {
-        return parseListOfMaps(string).stream().map(map -> new JavaAbstractMicronautCodegen.ResponseBodyMapping(
+    private static List<ResponseBodyMapping> parseResponseBodyMappings(String string) {
+        return parseListOfMaps(string).stream().map(map -> new ResponseBodyMapping(
             map.get("headerName"),
             map.get("mappedBodyType"),
             "true".equals(map.get("isListWrapper")),

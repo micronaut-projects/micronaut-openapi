@@ -20,8 +20,10 @@ include "openapi-generator"
 include 'docs-examples:example-groovy'
 include 'docs-examples:example-java'
 include 'docs-examples:example-kotlin'
-include 'test-suite-client-generator'
-include 'test-suite-server-generator'
+include 'test-suite-java-client-generator'
+include 'test-suite-java-server-generator'
+include 'test-suite-kotlin-client-generator'
+include 'test-suite-kotlin-server-generator'
 include 'test-suite-generator-util'
 
 enableFeaturePreview 'TYPESAFE_PROJECT_ACCESSORS'

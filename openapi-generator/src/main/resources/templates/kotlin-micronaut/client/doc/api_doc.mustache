@@ -11,24 +11,24 @@ All URIs are relative to *{{basePath}}*
 ## Creating {{classname}}
 
 To initiate an instance of `{{classname}}`, you can use micronaut's `ApplicationContext`:
-```java
+```kotlin
 /* imports
-import io.micronaut.runtime.Micronaut;
-import io.micronaut.context.ApplicationContext;
-import {{package}}.{{classname}};
+import io.micronaut.runtime.Micronaut
+import io.micronaut.context.ApplicationContext
+import {{package}}.{{classname}}
 */
 
-ApplicationContext context = Micronaut.run(/* ... */);
-PetApi apiInstance = context.getBean({{classname}}.class);
+var context = Micronaut.run(/* ... */)
+var apiInstance = context.getBean({{classname}}::class.java)
 ```
 
 Or the `@Inject` annotation:
-```java
+```kotlin
 @Singleton
 class MyClass {
 
     @Inject
-    {{classname}} {{#lambda.camelcase}}{{classname}}{{/lambda.camelcase}};
+    lateinit {{classname}} {{#lambda.camelcase}}{{classname}}{{/lambda.camelcase}}
 
     /* ... use the injected variable */
 }
@@ -41,8 +41,8 @@ More information can be found inside [Inversion of Control guide section](https:
 {{#operation}}
 <a id="{{operationId}}"></a>
 # **{{operationId}}**
-```java
-{{#returnType}}{{{returnType}}}{{/returnType}}{{^returnType}}Mono<Void>{{/returnType}} {{classname}}.{{nickname}}({{#allParams}}{{{paramName}}}{{#hasMore}}, {{/hasMore}}{{/allParams}})
+```kotlin
+fun {{classname}}.{{nickname}}({{#allParams}}{{{paramName}}}{{#hasMore}}, {{/hasMore}}{{/allParams}}): {{#returnType}}{{{returnType}}}{{/returnType}}{{^returnType}}Mono<Void>{{/returnType}}
 ```
 
 {{summary}}{{#notes}}

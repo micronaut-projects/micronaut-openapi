@@ -21,7 +21,7 @@ class MicronautCodeGeneratorEntryPointTest {
         assertEquals("Hello", generator.value);
     }
 
-    private static class TestGenerator extends JavaAbstractMicronautCodegen<TestBuilder> {
+    private static class TestGenerator extends AbstractMicronautJavaCodegen<TestBuilder> {
 
         private String value;
 

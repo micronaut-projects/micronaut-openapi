@@ -1,157 +1,134 @@
 {{>common/licenseInfo}}
-package {{invokerPackage}}.auth;
+package {{invokerPackage}}.auth
 
-import io.micronaut.context.BeanContext;
-import io.micronaut.core.annotation.NonNull;
-import io.micronaut.core.annotation.Nullable;
-import io.micronaut.core.util.CollectionUtils;
-import io.micronaut.core.util.StringUtils;
-import io.micronaut.core.util.Toggleable;
-import io.micronaut.http.HttpRequest;
-import io.micronaut.http.HttpResponse;
-import io.micronaut.http.MutableHttpRequest;
-import io.micronaut.http.annotation.Filter;
-import io.micronaut.http.filter.ClientFilterChain;
-import io.micronaut.http.filter.HttpClientFilter;
-import io.micronaut.inject.qualifiers.Qualifiers;
-import io.micronaut.security.oauth2.client.clientcredentials.ClientCredentialsClient;
-import io.micronaut.security.oauth2.client.clientcredentials.ClientCredentialsConfiguration;
-import io.micronaut.security.oauth2.client.clientcredentials.propagation.ClientCredentialsHttpClientFilter;
-import io.micronaut.security.oauth2.client.clientcredentials.propagation.ClientCredentialsTokenPropagator;
-import io.micronaut.security.oauth2.configuration.OauthClientConfiguration;
-import {{invokerPackage}}.auth.configuration.ConfigurableAuthorization;
-import org.reactivestreams.Publisher;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-
+import io.micronaut.context.BeanContext
+import io.micronaut.core.annotation.NonNull
+import io.micronaut.core.annotation.Nullable
+import io.micronaut.http.HttpRequest
+import io.micronaut.http.HttpResponse
+import io.micronaut.http.MutableHttpRequest
+import io.micronaut.http.annotation.Filter
+import io.micronaut.http.filter.ClientFilterChain
+import io.micronaut.http.filter.HttpClientFilter
+import io.micronaut.inject.qualifiers.Qualifiers
+import io.micronaut.security.oauth2.client.clientcredentials.ClientCredentialsClient
+import io.micronaut.security.oauth2.client.clientcredentials.ClientCredentialsConfiguration
+import io.micronaut.security.oauth2.client.clientcredentials.propagation.ClientCredentialsHttpClientFilter
+import io.micronaut.security.oauth2.client.clientcredentials.propagation.ClientCredentialsTokenPropagator
+import io.micronaut.security.oauth2.configuration.OauthClientConfiguration
+import {{invokerPackage}}.auth.configuration.ConfigurableAuthorization
+import org.reactivestreams.Publisher
+import org.slf4j.LoggerFactory
+import reactor.core.publisher.Flux
+import reactor.core.publisher.Mono
+import java.util.stream.Collectors
+import java.util.stream.Stream
 {{#generatedAnnotation}}
-import {{javaxPackage}}.annotation.Generated;
+import {{javaxPackage}}.annotation.Generated
 {{/generatedAnnotation}}
 
 {{#generatedAnnotation}}
 {{>common/generatedAnnotation}}
 {{/generatedAnnotation}}
-{{#lombok}}
-@Slf4j
-{{/lombok}}
 @Filter({{#configureAuthFilterPattern}}"{{authorizationFilterPattern}}"{{/configureAuthFilterPattern}}{{^configureAuthFilterPattern}}Filter.MATCH_ALL_PATTERN{{/configureAuthFilterPattern}})
-public class AuthorizationFilter implements HttpClientFilter {
-{{^lombok}}
+open class AuthorizationFilter(
+        private val beanContext: BeanContext,
+        var defaultTokenPropagator: ClientCredentialsTokenPropagator,
+        clientConfigurations: Stream<OauthClientConfiguration>,
+        configurableAuthorizations: Stream<ConfigurableAuthorization>
+) : HttpClientFilter {
 
-    private static final Logger log = LoggerFactory.getLogger(ClientCredentialsHttpClientFilter.class);
-{{/lombok}}
+    companion object {
+        private val log = LoggerFactory.getLogger(ClientCredentialsHttpClientFilter::class.java)
+    }
 
-    private final BeanContext beanContext;
-    private final Map<String, OauthClientConfiguration> clientConfigurationByName;
+    val authorizationsByName: Map<String, ConfigurableAuthorization?>
 
-    ClientCredentialsTokenPropagator defaultTokenPropagator;
-    private final Map<String, ClientCredentialsTokenPropagator> tokenPropagatorByName;
-    private final Map<String, ClientCredentialsClient> clientCredentialsClientByName;
+    private val clientConfigurationByName: Map<String, OauthClientConfiguration?>
+    private val tokenPropagatorByName: MutableMap<String, ClientCredentialsTokenPropagator>
+    private val clientCredentialsClientByName: MutableMap<String, ClientCredentialsClient>
 
-    public final Map<String, ConfigurableAuthorization> authorizationsByName;
-
-    public AuthorizationFilter(
-            BeanContext beanContext,
-            Stream<OauthClientConfiguration> clientConfigurations,
-            ClientCredentialsTokenPropagator defaultTokenPropagator,
-            Stream<ConfigurableAuthorization> configurableAuthorizations
-    ) {
-        this.beanContext = beanContext;
-        this.defaultTokenPropagator = defaultTokenPropagator;
+    init {
         clientConfigurationByName = clientConfigurations
-                .filter(Toggleable::isEnabled)
-                .collect(Collectors.toMap(OauthClientConfiguration::getName, v -> v));
-        tokenPropagatorByName = new HashMap<>();
-        clientCredentialsClientByName = new HashMap<>();
+                .filter { obj: OauthClientConfiguration -> obj.isEnabled }
+                .collect(Collectors.toMap({ obj: OauthClientConfiguration -> obj.name }, { v: OauthClientConfiguration? -> v }))
+        tokenPropagatorByName = HashMap()
+        clientCredentialsClientByName = HashMap()
         authorizationsByName = configurableAuthorizations
-                .collect(Collectors.toMap(ConfigurableAuthorization::getName, v -> v));
+                .collect(Collectors.toMap({ obj: ConfigurableAuthorization -> obj.getName() }, { v: ConfigurableAuthorization? -> v }))
     }
 
-    @Override
-    public Publisher<? extends HttpResponse<?>> doFilter(
-            @NonNull MutableHttpRequest<?> request,
-            @NonNull ClientFilterChain chain
-    ) {
-        List<?> names = request.getAttribute(AuthorizationBinder.AUTHORIZATION_NAMES, List.class).orElse(null);
-        if (CollectionUtils.isNotEmpty(names)) {
-            var authorizers = new ArrayList<Publisher<HttpRequest<?>>>(names.size());
-
-            for (Object nameObject : names) {
-                if (!(nameObject instanceof String name)) {
-                    continue;
-                }
-
-                // Check if other authorizations have the key
-                if (authorizationsByName.containsKey(name)) {
-                    ConfigurableAuthorization authorizer = authorizationsByName.get(name);
-                    authorizers.add(Mono.fromCallable(() -> {
-                        authorizer.applyAuthorization(request);
-                        return request;
-                    }));
-                    continue;
-                }
-
-                // Perform OAuth authorization
-                OauthClientConfiguration clientConfiguration = clientConfigurationByName.get(name);
-                if (clientConfiguration == null) {
-                    continue;
-                }
-
-                ClientCredentialsClient clientCredentialsClient = getClientCredentialsClient(name);
-                if (clientCredentialsClient == null) {
-                    log.trace("Could not retrieve client credentials client for OAuth 2.0 client {}", name);
-                    continue;
-                }
-
-                ClientCredentialsTokenPropagator tokenHandler = getTokenPropagator(name);
-                Flux<HttpRequest<?>> authorizer = Flux.from(clientCredentialsClient
-                        .requestToken(getScope(clientConfiguration)))
-                        .map(tokenResponse -> {
-                            var accessToken = tokenResponse.getAccessToken();
-                            if (StringUtils.isNotEmpty(accessToken)) {
-                                tokenHandler.writeToken(request, accessToken);
-                            }
-                            return request;
-                        });
-                authorizers.add(authorizer);
-            }
-
-            return Flux.concat(authorizers)
-                    .switchMap(v -> chain.proceed(request));
+    override fun doFilter(request: @NonNull MutableHttpRequest<*>, chain: @NonNull ClientFilterChain): Publisher<out HttpResponse<*>?> {
+        val names = request.getAttribute(AuthorizationBinder.AUTHORIZATION_NAMES, MutableList::class.java).orElse(null)
+        if (names.isNullOrEmpty()) {
+            return chain.proceed(request)
         }
 
-        return chain.proceed(request);
+        val authorizers = ArrayList<Publisher<HttpRequest<*>?>>(names.size)
+        for (nameObject in names) {
+            if (nameObject !is String) {
+                continue
+            }
+
+            // Check if other authorizations have the key
+            if (authorizationsByName.containsKey(nameObject)) {
+                val authorizer = authorizationsByName[nameObject]!!
+                authorizers.add(Mono.fromCallable {
+                    authorizer.applyAuthorization(request)
+                    request
+                })
+                continue
+            }
+
+            // Perform OAuth authorization
+            val clientConfiguration = clientConfigurationByName[nameObject] ?: continue
+            val clientCredentialsClient = getClientCredentialsClient(nameObject)
+            if (clientCredentialsClient == null) {
+                log.trace("Could not retrieve client credentials client for OAuth 2.0 client {}", nameObject)
+                continue
+            }
+            val tokenHandler = getTokenPropagator(nameObject)
+            val authorizer = Flux.from(clientCredentialsClient
+                    .requestToken(getScope(clientConfiguration)))
+                    .map<HttpRequest<*>?> { tokenResponse ->
+                        val accessToken = tokenResponse.accessToken
+                        if (!accessToken.isNullOrEmpty()) {
+                            tokenHandler!!.writeToken(request, accessToken)
+                        }
+                        request
+                    }
+            authorizers.add(authorizer)
+        }
+        return Flux.concat(authorizers)
+                .switchMap { chain.proceed(request) }
     }
 
-    protected ClientCredentialsTokenPropagator getTokenPropagator(String name) {
-        ClientCredentialsTokenPropagator tokenPropagator = tokenPropagatorByName.get(name);
+    protected fun getTokenPropagator(name: String): ClientCredentialsTokenPropagator? {
+        var tokenPropagator = tokenPropagatorByName[name]
         if (tokenPropagator == null) {
-            tokenPropagator = beanContext.findBean(ClientCredentialsTokenPropagator.class, Qualifiers.byName(name))
-                    .orElse(defaultTokenPropagator);
+            tokenPropagator = beanContext.findBean(ClientCredentialsTokenPropagator::class.java, Qualifiers.byName(name))
+                    .orElse(defaultTokenPropagator)
             if (tokenPropagator != null) {
-                tokenPropagatorByName.put(name, tokenPropagator);
+                tokenPropagatorByName[name] = tokenPropagator
             }
         }
-        return tokenPropagator;
+        return tokenPropagator
     }
 
-    protected ClientCredentialsClient getClientCredentialsClient(String name) {
-        ClientCredentialsClient client = clientCredentialsClientByName.get(name);
+    protected fun getClientCredentialsClient(name: String): ClientCredentialsClient? {
+        var client = clientCredentialsClientByName[name]
         if (client == null) {
-            client = beanContext.findBean(ClientCredentialsClient.class, Qualifiers.byName(name)).orElse(null);
+            client = beanContext.findBean(ClientCredentialsClient::class.java, Qualifiers.byName(name)).orElse(null)
             if (client != null) {
-                clientCredentialsClientByName.put(name, client);
+                clientCredentialsClientByName[name] = client
             }
         }
-        return client;
+        return client
     }
 
-    @Nullable
-    protected String getScope(@NonNull OauthClientConfiguration oauthClient) {
-        return oauthClient.getClientCredentials()
-                .flatMap(ClientCredentialsConfiguration::getScope)
-                .orElse(null);
+    protected fun getScope(oauthClient: @NonNull OauthClientConfiguration): @Nullable String? {
+        return oauthClient.clientCredentials
+                .flatMap { obj: ClientCredentialsConfiguration -> obj.scope }
+                .orElse(null)
     }
 }

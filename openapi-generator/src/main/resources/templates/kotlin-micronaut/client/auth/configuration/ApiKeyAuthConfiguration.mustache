@@ -1,91 +1,45 @@
 {{>common/licenseInfo}}
-package {{invokerPackage}}.auth.configuration;
+package {{invokerPackage}}.auth.configuration
 
-import io.micronaut.context.annotation.ConfigurationInject;
-import io.micronaut.context.annotation.EachProperty;
-import io.micronaut.context.annotation.Parameter;
-import io.micronaut.core.annotation.NonNull;
-import io.micronaut.http.MutableHttpRequest;
-import io.micronaut.http.cookie.Cookie;
+import io.micronaut.context.annotation.ConfigurationInject
+import io.micronaut.context.annotation.EachProperty
+import io.micronaut.context.annotation.Parameter
+import io.micronaut.core.annotation.NonNull
+import io.micronaut.http.MutableHttpRequest
+import io.micronaut.http.cookie.Cookie
 {{#generatedAnnotation}}
-import {{javaxPackage}}.annotation.Generated;
+import {{javaxPackage}}.annotation.Generated
 {{/generatedAnnotation}}
-{{#lombok}}
-import lombok.Getter;
-import lombok.Setter;
-{{/lombok}}
 
 {{#generatedAnnotation}}
 {{>common/generatedAnnotation}}
 {{/generatedAnnotation}}
-{{#lombok}}
-@Getter
-@Setter
-{{/lombok}}
 @EachProperty("security.api-key-auth")
-public class ApiKeyAuthConfiguration implements ConfigurableAuthorization {
-
-    private final String name;
-    private AuthKeyLocation location;
-    private String paramName;
-    private String apiKey;
-
-    @ConfigurationInject
-    public ApiKeyAuthConfiguration(
-            @Parameter String name,
-            @NonNull AuthKeyLocation location,
-            @NonNull String paramName,
-            @NonNull String apiKey
-    ) {
-        this.name = name;
-        this.location = location;
-        this.paramName = paramName;
-        this.apiKey = apiKey;
-    }
+open class ApiKeyAuthConfiguration @ConfigurationInject constructor(
+        @Parameter val name: String,
+        @NonNull var location: AuthKeyLocation,
+        @NonNull var paramName: String,
+        @NonNull var apiKey: String
+): ConfigurableAuthorization {
 
     @Override
-    public void applyAuthorization(@NonNull MutableHttpRequest<?> request) {
-        if (location == AuthKeyLocation.HEADER) {
-            request.header(paramName, apiKey);
-        } else if (location == AuthKeyLocation.QUERY) {
-            request.getParameters().add(paramName, apiKey);
-        } else if (location == AuthKeyLocation.COOKIE) {
-            request.cookie(Cookie.of(paramName, apiKey));
+    override fun applyAuthorization(@NonNull request: MutableHttpRequest<*>) {
+        when (location) {
+            AuthKeyLocation.HEADER -> {
+                request.header(paramName, apiKey)
+            }
+            AuthKeyLocation.QUERY -> {
+                request.parameters.add(paramName, apiKey)
+            }
+            AuthKeyLocation.COOKIE -> {
+                request.cookie(Cookie.of(paramName, apiKey))
+            }
         }
     }
-{{^lombok}}
-
     @Override
-    public String getName() {
-        return name;
-    }
+    override fun getName() = name
 
-    public AuthKeyLocation getLocation() {
-        return location;
-    }
-
-    public String getParamName() {
-        return paramName;
-    }
-
-    public String getApiKey() {
-        return apiKey;
-    }
-
-    public void setLocation(AuthKeyLocation location) {
-        this.location = location;
-    }
-
-    public void setParamName(String paramName) {
-        this.paramName = paramName;
-    }
-
-    public void setApiKey(String apiKey) {
-        this.apiKey = apiKey;
-    }
-{{/lombok}}
-
-    public enum AuthKeyLocation {
+    enum class AuthKeyLocation {
         HEADER,
         QUERY,
         COOKIE

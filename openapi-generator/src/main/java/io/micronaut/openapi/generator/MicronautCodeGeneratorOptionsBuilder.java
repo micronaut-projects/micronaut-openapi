@@ -24,6 +24,14 @@ import java.util.List;
 public interface MicronautCodeGeneratorOptionsBuilder {
 
     /**
+     * Sets the generator language.
+     *
+     * @param lang generator language
+     * @return this builder
+     */
+    MicronautCodeGeneratorOptionsBuilder withLang(GeneratorLanguage lang);
+
+    /**
      * Sets the package of the generated API classes.
      *
      * @param apiPackage the package name
@@ -58,18 +66,18 @@ public interface MicronautCodeGeneratorOptionsBuilder {
     /**
      * Add the parameter mappings.
      *
-     * @param parameterMappings the parameter mappings specified by a {@link JavaAbstractMicronautCodegen.ParameterMapping} objects
+     * @param parameterMappings the parameter mappings specified by a {@link ParameterMapping} objects
      * @return this builder
      */
-    MicronautCodeGeneratorOptionsBuilder withParameterMappings(List<JavaAbstractMicronautCodegen.ParameterMapping> parameterMappings);
+    MicronautCodeGeneratorOptionsBuilder withParameterMappings(List<ParameterMapping> parameterMappings);
 
     /**
      * Add the response body mappings.
      *
-     * @param responseBodyMappings the response body mappings specified by a {@link JavaAbstractMicronautCodegen.ResponseBodyMapping} objects
+     * @param responseBodyMappings the response body mappings specified by a {@link ResponseBodyMapping} objects
      * @return this builder
      */
-    MicronautCodeGeneratorOptionsBuilder withResponseBodyMappings(List<JavaAbstractMicronautCodegen.ResponseBodyMapping> responseBodyMappings);
+    MicronautCodeGeneratorOptionsBuilder withResponseBodyMappings(List<ResponseBodyMapping> responseBodyMappings);
 
 
     /**
@@ -145,4 +153,10 @@ public interface MicronautCodeGeneratorOptionsBuilder {
         LOCAL_DATETIME
     }
 
+    /**
+     * The possible languages for generator.
+     */
+    enum GeneratorLanguage {
+        JAVA, KOTLIN,
+    }
 }

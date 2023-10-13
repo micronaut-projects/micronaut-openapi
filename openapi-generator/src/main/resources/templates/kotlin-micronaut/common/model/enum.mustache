@@ -10,6 +10,9 @@
 {{#micronaut_serde_jackson}}
 @Serdeable
 {{/micronaut_serde_jackson}}
+{{#generatedAnnotation}}
+{{>common/generatedAnnotation}}
+{{/generatedAnnotation}}
 {{#additionalEnumTypeAnnotations}}
 {{{.}}}
 {{/additionalEnumTypeAnnotations}}
@@ -38,7 +41,7 @@
 
     companion object {
 
-        val VALUE_MAPPING = entries.associateBy { it.name }
+        val VALUE_MAPPING = entries.associateBy { it.value }
 
         /**
          * Create this enum from a value.
@@ -48,6 +51,7 @@
          * @return The enum
          */
         @JsonCreator
+        @JvmStatic
         fun fromValue(value: String): {{>common/model/enumName}}{{#isNullable}}?{{/isNullable}} {
             {{^isNullable}}
             require(VALUE_MAPPING.containsKey(value)) { "Unexpected value '$value'" }

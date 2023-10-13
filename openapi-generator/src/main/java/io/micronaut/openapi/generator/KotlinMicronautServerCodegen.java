@@ -36,13 +36,12 @@ import org.openapitools.codegen.utils.StringUtils;
  * The generator for creating Micronaut servers.
  */
 @SuppressWarnings("checkstyle:DesignForExtension")
-public class KotlinMicronautServerCodegen extends KotlinAbstractMicronautCodegen<JavaMicronautServerOptionsBuilder> {
+public class KotlinMicronautServerCodegen extends AbstractMicronautKotlinCodegen<KotlinMicronautServerOptionsBuilder> {
 
     public static final String OPT_CONTROLLER_PACKAGE = "controllerPackage";
     public static final String OPT_GENERATE_CONTROLLER_FROM_EXAMPLES = "generateControllerFromExamples";
     public static final String OPT_GENERATE_IMPLEMENTATION_FILES = "generateImplementationFiles";
     public static final String OPT_GENERATE_OPERATIONS_TO_RETURN_NOT_IMPLEMENTED = "generateOperationsToReturnNotImplemented";
-    public static final String OPT_GENERATE_HARD_NULLABLE = "generateHardNullable";
     public static final String OPT_GENERATE_STREAMING_FILE_UPLOAD = "generateStreamingFileUpload";
     public static final String OPT_AOT = "aot";
 
@@ -67,7 +66,6 @@ public class KotlinMicronautServerCodegen extends KotlinAbstractMicronautCodegen
     protected boolean generateOperationsToReturnNotImplemented = true;
     protected boolean generateControllerFromExamples;
     protected boolean useAuth = true;
-    protected boolean generateHardNullable = true;
     protected boolean generateStreamingFileUpload;
     protected boolean aot;
 
@@ -94,7 +92,6 @@ public class KotlinMicronautServerCodegen extends KotlinAbstractMicronautCodegen
             generateOperationsToReturnNotImplemented));
 
         cliOptions.add(CliOption.newBoolean(OPT_USE_AUTH, "Whether to import authorization and to annotate controller methods accordingly", useAuth));
-        cliOptions.add(CliOption.newBoolean(OPT_GENERATE_HARD_NULLABLE, "Whether to generate and use an inherited nullable annotation", generateHardNullable));
         cliOptions.add(CliOption.newBoolean(OPT_GENERATE_STREAMING_FILE_UPLOAD, "Whether to generate StreamingFileUpload type for file request body", generateStreamingFileUpload));
         cliOptions.add(CliOption.newBoolean(OPT_AOT, "Generate compatible code with micronaut-aot", aot));
 
@@ -185,11 +182,6 @@ public class KotlinMicronautServerCodegen extends KotlinAbstractMicronautCodegen
         }
         writePropertyBack(OPT_AOT, aot);
 
-        if (additionalProperties.containsKey(OPT_GENERATE_HARD_NULLABLE)) {
-            generateHardNullable = convertPropertyToBoolean(OPT_GENERATE_HARD_NULLABLE);
-        }
-        writePropertyBack(OPT_GENERATE_HARD_NULLABLE, generateHardNullable);
-
         if (additionalProperties.containsKey(OPT_GENERATE_STREAMING_FILE_UPLOAD)) {
             generateStreamingFileUpload = convertPropertyToBoolean(OPT_GENERATE_STREAMING_FILE_UPLOAD);
         }
@@ -219,12 +211,6 @@ public class KotlinMicronautServerCodegen extends KotlinAbstractMicronautCodegen
             if (testTool.equals(OPT_TEST_JUNIT)) {
                 apiTestTemplateFiles.put("server/test/controller_test.mustache", ".kt");
             }
-        }
-
-        // Add HardNullable.kt file
-        if (generateHardNullable) {
-            String folder = (sourceFolder + '.' + packageName + ".annotation").replace('.', File.separatorChar);
-            supportingFiles.add(new SupportingFile("server/HardNullable.mustache", folder, "HardNullable.kt"));
         }
 
         if (generateStreamingFileUpload) {
@@ -303,11 +289,11 @@ public class KotlinMicronautServerCodegen extends KotlinAbstractMicronautCodegen
     }
 
     @Override
-    public JavaMicronautServerOptionsBuilder optionsBuilder() {
+    public KotlinMicronautServerOptionsBuilder optionsBuilder() {
         return new DefaultServerOptionsBuilder();
     }
 
-    static class DefaultServerOptionsBuilder implements JavaMicronautServerOptionsBuilder {
+    static class DefaultServerOptionsBuilder implements KotlinMicronautServerOptionsBuilder {
 
         private String controllerPackage;
         private boolean generateImplementationFiles;
@@ -319,54 +305,49 @@ public class KotlinMicronautServerCodegen extends KotlinAbstractMicronautCodegen
         private boolean aot;
 
         @Override
-        public JavaMicronautServerOptionsBuilder withControllerPackage(String controllerPackage) {
+        public KotlinMicronautServerOptionsBuilder withControllerPackage(String controllerPackage) {
             this.controllerPackage = controllerPackage;
             return this;
         }
 
         @Override
-        public JavaMicronautServerOptionsBuilder withGenerateImplementationFiles(boolean generateImplementationFiles) {
+        public KotlinMicronautServerOptionsBuilder withGenerateImplementationFiles(boolean generateImplementationFiles) {
             this.generateImplementationFiles = generateImplementationFiles;
             return this;
         }
 
         @Override
-        public JavaMicronautServerOptionsBuilder withGenerateOperationsToReturnNotImplemented(boolean generateOperationsToReturnNotImplemented) {
+        public KotlinMicronautServerOptionsBuilder withGenerateOperationsToReturnNotImplemented(boolean generateOperationsToReturnNotImplemented) {
             this.generateOperationsToReturnNotImplemented = generateOperationsToReturnNotImplemented;
             return this;
         }
 
         @Override
-        public JavaMicronautServerOptionsBuilder withGenerateControllerFromExamples(boolean generateControllerFromExamples) {
+        public KotlinMicronautServerOptionsBuilder withGenerateControllerFromExamples(boolean generateControllerFromExamples) {
             this.generateControllerFromExamples = generateControllerFromExamples;
             return this;
         }
 
         @Override
-        public JavaMicronautServerOptionsBuilder withAuthentication(boolean useAuth) {
+        public KotlinMicronautServerOptionsBuilder withAuthentication(boolean useAuth) {
             this.useAuth = useAuth;
             return this;
         }
 
         @Override
-        public JavaMicronautServerOptionsBuilder withLombok(boolean lombok) {
-            return this;
-        }
-
-        @Override
-        public JavaMicronautServerOptionsBuilder withFluxForArrays(boolean fluxForArrays) {
+        public KotlinMicronautServerOptionsBuilder withFluxForArrays(boolean fluxForArrays) {
             this.fluxForArrays = fluxForArrays;
             return this;
         }
 
         @Override
-        public JavaMicronautServerOptionsBuilder withGeneratedAnnotation(boolean generatedAnnotation) {
+        public KotlinMicronautServerOptionsBuilder withGeneratedAnnotation(boolean generatedAnnotation) {
             this.generatedAnnotation = generatedAnnotation;
             return this;
         }
 
         @Override
-        public JavaMicronautServerOptionsBuilder withAot(boolean aot) {
+        public KotlinMicronautServerOptionsBuilder withAot(boolean aot) {
             this.aot = aot;
             return this;
         }

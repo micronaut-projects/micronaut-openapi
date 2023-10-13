@@ -2,6 +2,15 @@
 {{#formatNoEmptyLines}}
 /**
  * {{#description}}{{.}}{{/description}}{{^description}}{{classname}}{{/description}}
+{{#vendorExtensions.withRequiredOrOptionalVars}}
+ *
+{{/vendorExtensions.withRequiredOrOptionalVars}}
+{{#vendorExtensions.requiredVarsWithoutDiscriminator}}
+ * @param {{name}} {{description}}
+{{/vendorExtensions.requiredVarsWithoutDiscriminator}}
+{{#vendorExtensions.optionalVars}}
+ * @param {{name}} {{description}}
+{{/vendorExtensions.optionalVars}}
  */
 {{#description}}
     {{#generateSwagger2Annotations}}
@@ -39,22 +48,16 @@
 {{#nonPublicApi}}internal {{/nonPublicApi}}{{#hasChildren}}open{{/hasChildren}}{{^hasChildren}}data{{/hasChildren}} class {{classname}} ({{#formatNoEmptyLines}}
 {{#vendorExtensions.requiredVarsWithoutDiscriminator}}
     {{>common/model/field_annotations}}
-    {{#isOverridden}}override {{/isOverridden}}{{^isOverridden}}{{#hasChildren}}open {{/hasChildren}}{{/isOverridden}}var {{name}}: {{vendorExtensions.typeWithEnumWithoutPrefix}}{{#isNullable}}?{{/isNullable}}{{#defaultValue}} = {{{.}}}{{/defaultValue}}{{^defaultValue}}{{#isNullable}} = null{{/isNullable}}{{/defaultValue}}{{^-last}}, {{/-last}}
+    {{#vendorExtensions.overridden}}override {{/vendorExtensions.overridden}}{{^vendorExtensions.overridden}}{{#hasChildren}}open {{/hasChildren}}{{/vendorExtensions.overridden}}var {{name}}: {{{vendorExtensions.typeWithEnumWithGenericAnnotations}}}{{#defaultValue}} = {{{.}}}{{/defaultValue}}{{^defaultValue}}{{#isNullable}} = null{{/isNullable}}{{/defaultValue}},
 {{/vendorExtensions.requiredVarsWithoutDiscriminator}}
-{{/formatNoEmptyLines}}){{#parent}}: {{{parent}}}{{#vendorExtensions.requiredParentVarsWithoutDiscriminator}}{{#-first}}({{/-first}}{{name}}{{#-last}}){{/-last}}{{^-last}}, {{/-last}}{{/vendorExtensions.requiredParentVarsWithoutDiscriminator}} {{/parent}}{{#vendorExtensions.x-implements}}{{#parent}}, {{/parent}}{{^parent}} : {{/parent}}{{^-first}}, {{{.}}}{{/-first}}{{#-last}} {{/-last}}{{/vendorExtensions.x-implements}} {{openbrace}}
 {{#vendorExtensions.withInheritance}}
     {{#vendorExtensions.optionalVars}}
-        {{#description}}
-    /**
-      * {{description}}
-      */
-        {{/description}}
-        {{#formatNoEmptyLines}}
     {{>common/model/field_annotations}}
-    {{#vendorExtensions.hasChildren}}open {{/vendorExtensions.hasChildren}}var {{name}}: {{{vendorExtensions.typeWithEnumWithoutPrefix}}}? = {{#defaultValue}}{{{.}}}{{/defaultValue}}{{^defaultValue}}null{{/defaultValue}}
-        {{/formatNoEmptyLines}}
+    {{#vendorExtensions.hasChildren}}open {{/vendorExtensions.hasChildren}}var {{name}}: {{{vendorExtensions.typeWithEnumWithGenericAnnotations}}} = {{#defaultValue}}{{{.}}}{{/defaultValue}}{{^defaultValue}}null{{/defaultValue}},
     {{/vendorExtensions.optionalVars}}
 {{/vendorExtensions.withInheritance}}
+{{/formatNoEmptyLines}}){{#parent}}: {{{parent}}}({{#vendorExtensions.requiredParentVarsWithoutDiscriminator}}{{name}}{{^-last}}, {{/-last}}{{/vendorExtensions.requiredParentVarsWithoutDiscriminator}}) {{/parent}}{{#vendorExtensions.x-implements}}{{#parent}}, {{/parent}}{{^parent}}: {{/parent}}{{^-first}}, {{{.}}}{{/-first}}{{#-last}} {{/-last}}{{/vendorExtensions.x-implements}} {{openbrace}}
+
     companion object {
     {{#serializableModel}}
 
@@ -67,7 +70,7 @@
         const val JSON_PROPERTY_{{nameInSnakeCase}} = "{{baseName}}"
     {{/vars}}
     }
-    {{#withInheritance}}
+    {{#vendorExtensions.withInheritance}}
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -102,7 +105,7 @@
     override fun toString(): String {
         return "{{classname}}({{#allVars}}{{name}}='${{name}}'{{^-last}}, {{/-last}}{{/allVars}})"
     }
-    {{/withInheritance}}
+    {{/vendorExtensions.withInheritance}}
 
     {{#vars}}
         {{#isEnum}}

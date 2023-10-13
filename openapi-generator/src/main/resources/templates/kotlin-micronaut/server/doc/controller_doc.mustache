@@ -3,13 +3,13 @@
 
 All URIs are relative to `"{{contextPath}}"`
 
-The controller class is defined in **[{{classname}}.java](../../{{{apiFolder}}}/{{classname}}.java)**
+The controller class is defined in **[{{classname}}.kt](../../{{{apiFolder}}}/{{classname}}.kt)**
 
-Method | HTTP request | Description
-------------- | ------------- | -------------
+| Method | HTTP request | Description |
+|------------- | ------------- | -------------|
 {{#operations}}
     {{#operation}}
-[**{{operationId}}**](#{{operationId}}) | **{{httpMethod}}** {{path}} | {{#summary}}{{summary}}{{/summary}}
+| [**{{operationId}}**](#{{operationId}}) | **{{httpMethod}}** {{path}} | {{#summary}}{{summary}}{{/summary}} |
     {{/operation}}
 {{/operations}}
 
@@ -17,8 +17,8 @@ Method | HTTP request | Description
     {{#operation}}
 <a id="{{operationId}}"></a>
 # **{{operationId}}**
-```java
-{{#returnType}}Mono<{{{returnType}}}>{{/returnType}}{{^returnType}}Mono<Object>{{/returnType}} {{classname}}.{{nickname}}({{#allParams}}{{{paramName}}}{{#hasMore}}, {{/hasMore}}{{/allParams}})
+```kotlin
+fun {{classname}}.{{nickname}}({{#allParams}}{{{paramName}}}{{#hasMore}}, {{/hasMore}}{{/allParams}}): {{#returnType}}Mono<{{{returnType}}}>{{/returnType}}{{^returnType}}Mono<Object>{{/returnType}}
 ```
 
 {{summary}}{{#notes}}
@@ -28,10 +28,10 @@ Method | HTTP request | Description
 {{#allParams}}
     {{#-last}}
 ### Parameters
-Name | Type | Description  | Notes
+| Name | Type | Description  | Notes |
 ------------- | ------------- | ------------- | -------------
 {{#allParams}}
-**{{paramName}}** | {{^isPrimitiveType}}[**{{dataType}}**](../../{{modelDocPath}}/{{baseType}}.md){{/isPrimitiveType}}{{#isPrimitiveType}}`{{dataType}}`{{/isPrimitiveType}} | {{description}} |{{^required}} [optional parameter]{{/required}}{{#defaultValue}} [default to `{{defaultValue}}`]{{/defaultValue}}{{#allowableValues}} [enum: {{#values}}`{{{.}}}`{{^-last}}, {{/-last}}{{/values}}]{{/allowableValues}}
+| **{{paramName}}** | {{^isPrimitiveType}}[**{{dataType}}**](../../{{modelDocPath}}/{{baseType}}.md){{/isPrimitiveType}}{{#isPrimitiveType}}`{{dataType}}`{{/isPrimitiveType}} | {{description}} |{{^required}} [optional parameter]{{/required}}{{#defaultValue}} [default to `{{defaultValue}}`]{{/defaultValue}}{{#allowableValues}} [enum: {{#values}}`{{{.}}}`{{^-last}}, {{/-last}}{{/values}}]{{/allowableValues}} |
 {{/allParams}}
     {{/-last}}
 {{/allParams}}

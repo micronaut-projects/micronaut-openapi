@@ -1,10 +1,6 @@
 {{>common/licenseInfo}}
 package {{package}}
 {{#formatNoEmptyLines}}
-{{#useOptional}}
-import java.util.Optional
-{{/useOptional}}
-import java.util.stream.Collectors
 {{#imports}}
 import {{import}}
 {{/imports}}
@@ -33,19 +29,10 @@ import {{javaxPackage}}.validation.constraints.*
 import {{javaxPackage}}.validation.Valid
 {{/useBeanValidation}}
 import io.micronaut.core.annotation.Introspected
-{{^generateHardNullable}}
 import io.micronaut.core.annotation.Nullable
-{{/generateHardNullable}}
-{{#generateHardNullable}}
-import {{{invokerPackage}}}.annotation.HardNullable
-{{/generateHardNullable}}
 {{#generatedAnnotation}}
 import {{javaxPackage}}.annotation.Generated
 {{/generatedAnnotation}}
-{{#generateSwagger1Annotations}}
-import io.swagger.annotations.ApiModel
-import io.swagger.annotations.ApiModelProperty
-{{/generateSwagger1Annotations}}
 {{#generateSwagger2Annotations}}
 import io.swagger.v3.oas.annotations.media.Schema
 {{/generateSwagger2Annotations}}

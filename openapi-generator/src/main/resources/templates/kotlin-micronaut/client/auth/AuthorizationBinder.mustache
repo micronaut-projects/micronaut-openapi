@@ -1,56 +1,54 @@
 {{>common/licenseInfo}}
-package {{invokerPackage}}.auth;
+package {{invokerPackage}}.auth
 
-import io.micronaut.aop.MethodInvocationContext;
-import io.micronaut.core.annotation.AnnotationValue;
-import io.micronaut.core.annotation.NonNull;
-import io.micronaut.core.naming.NameUtils;
-import io.micronaut.core.util.CollectionUtils;
-import io.micronaut.core.util.StringUtils;
-import io.micronaut.http.MutableHttpRequest;
-import io.micronaut.http.client.bind.AnnotatedClientRequestBinder;
-import io.micronaut.http.client.bind.ClientRequestUriContext;
-import jakarta.inject.Singleton;
-import java.util.ArrayList;
-import java.util.List;
+import io.micronaut.aop.MethodInvocationContext
+import io.micronaut.core.annotation.AnnotationValue
+import io.micronaut.core.annotation.NonNull
+import io.micronaut.core.naming.NameUtils
+import io.micronaut.http.MutableHttpRequest
+import io.micronaut.http.client.bind.AnnotatedClientRequestBinder
+import io.micronaut.http.client.bind.ClientRequestUriContext
+import jakarta.inject.Singleton
 {{#generatedAnnotation}}
-import {{javaxPackage}}.annotation.Generated;
+import {{javaxPackage}}.annotation.Generated
 {{/generatedAnnotation}}
 
 {{#generatedAnnotation}}
 {{>common/generatedAnnotation}}
 {{/generatedAnnotation}}
 @Singleton
-public class AuthorizationBinder implements AnnotatedClientRequestBinder<Authorization> {
+open class AuthorizationBinder : AnnotatedClientRequestBinder<Authorization> {
 
-    public static final CharSequence AUTHORIZATION_NAMES = "micronaut.security.AUTHORIZATION_NAMES";
+    companion object {
+        var AUTHORIZATION_NAMES = "micronaut.security.AUTHORIZATION_NAMES"
+    }
 
     @NonNull
     @Override
-    public Class<Authorization> getAnnotationType() {
-        return Authorization.class;
+    override fun getAnnotationType(): Class<Authorization> {
+        return Authorization::class.java
     }
 
     @Override
-    public void bind(@NonNull MethodInvocationContext<Object, Object> context,
-                     @NonNull ClientRequestUriContext uriContext,
-                     @NonNull MutableHttpRequest<?> request
+    override fun bind(@NonNull context: MethodInvocationContext<Any, Any>,
+             @NonNull uriContext: ClientRequestUriContext,
+             @NonNull request: MutableHttpRequest<*>
     ) {
-        List<AnnotationValue<Authorization>> annotations = context.getAnnotationMetadata()
-                .getAnnotationValuesByType(Authorization.class);
+        val annotations: List<AnnotationValue<Authorization>> = context.annotationMetadata
+                .getAnnotationValuesByType(Authorization::class.java)
 
-        if (CollectionUtils.isNotEmpty(annotations)) {
-            List<String> authorizationNames = new ArrayList<>();
-            for (AnnotationValue<Authorization> annotation : annotations) {
-                annotation.get("name", String.class)
-                        .filter(StringUtils::isNotEmpty)
-                        .ifPresent(v -> authorizationNames.add(configurationName(v)));
+        if (annotations.isNotEmpty()) {
+            val authorizationNames = ArrayList<String>()
+            for (ann in annotations) {
+                ann.get("name", String::class.java)
+                        .filter{ s -> !s.isNullOrEmpty()}
+                        .ifPresent {v -> authorizationNames.add(configurationName(v))}
             }
-            request.setAttribute(AUTHORIZATION_NAMES, authorizationNames);
+            request.setAttribute(AUTHORIZATION_NAMES, authorizationNames)
         }
     }
 
-    private String configurationName(String name) {
-        return NameUtils.hyphenate(name.replace('.', '_'), true);
+    private fun configurationName(name: String): String {
+        return NameUtils.hyphenate(name.replace('.', '_'), true)
     }
 }

@@ -1,14 +1,14 @@
-package {{package}};
+package {{package}}
 
-{{#imports}}import {{import}};
+{{#imports}}import {{import}}
 {{/imports}}
-import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Disabled;
-import jakarta.inject.Inject;
+import io.micronaut.test.extensions.junit5.annotation.MicronautTest
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Disabled
+import jakarta.inject.Inject
 {{#wrapInHttpResponse}}
-import io.micronaut.http.HttpResponse;
+import io.micronaut.http.HttpResponse
 {{/wrapInHttpResponse}}
 
 /**
@@ -27,8 +27,8 @@ class {{classname}}Test {
      * {{notes}}
      {{/notes}}
      */
-    @Test
     @Disabled("Not Implemented")
+    @Test
     fun {{operationId}}Test() {
         // given
         {{#allParams}}
@@ -37,11 +37,11 @@ class {{classname}}Test {
 
         // when
         {{#wrapInHttpResponse}}
-        var response = api.{{operationId}}({{#allParams}}{{paramName}}{{^-last}}, {{/-last}}{{/allParams}}){{#reactive}}.block(){{/reactive}};{{#returnType}}
-        {{{vendorExtensions.returnTypeWithoutPrefix}}} body = response.body();{{/returnType}}
+        var response = api.{{operationId}}({{#allParams}}{{paramName}}{{^-last}}, {{/-last}}{{/allParams}}){{#reactive}}.block(){{/reactive}}{{#returnType}}
+        var responseBody: {{{returnType}}} = response.body(){{/returnType}}
         {{/wrapInHttpResponse}}
         {{^wrapInHttpResponse}}
-        {{#returnType}}var body = {{/returnType}}api.{{operationId}}({{#allParams}}{{paramName}}{{^-last}}, {{/-last}}{{/allParams}}){{#reactive}}.block(){{/reactive}};
+        {{#returnType}}var responseBody = {{/returnType}}api.{{operationId}}({{#allParams}}{{paramName}}{{^-last}}, {{/-last}}{{/allParams}}){{#reactive}}.block(){{/reactive}}
         {{/wrapInHttpResponse}}
 
         // then

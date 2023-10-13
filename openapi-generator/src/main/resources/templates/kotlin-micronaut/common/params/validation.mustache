@@ -1,35 +1,15 @@
 
 {{#isNullable}}
-    {{#generateHardNullable}}
-    @HardNullable
-    {{/generateHardNullable}}
-    {{^generateHardNullable}}
     @Nullable
-    {{/generateHardNullable}}
 {{/isNullable}}
 {{^isNullable}}
     {{#required}}
         {{#isReadOnly}}
-            {{#vendorExtensions.isServer}}
-                {{#generateHardNullable}}
-    @HardNullable
-                {{/generateHardNullable}}
-                {{^generateHardNullable}}
     @Nullable
-                {{/generateHardNullable}}
-            {{/vendorExtensions.isServer}}
-            {{^vendorExtensions.isServer}}
-    @Nullable
-            {{/vendorExtensions.isServer}}
         {{/isReadOnly}}
     {{/required}}
     {{^required}}
-        {{#generateHardNullable}}
-    @HardNullable
-        {{/generateHardNullable}}
-        {{^generateHardNullable}}
     @Nullable
-        {{/generateHardNullable}}
     {{/required}}
 {{/isNullable}}
 {{!All the validation}}
@@ -42,11 +22,9 @@
         {{/required}}
     {{/isNullable}}
     {{!Validate all pojos and enums}}
-    {{^isContainer}}
-        {{#isModel}}
+    {{#vendorExtensions.withValid}}
     @Valid
-        {{/isModel}}
-    {{/isContainer}}
+    {{/vendorExtensions.withValid}}
     {{!Pattern}}
     {{#pattern}}
         {{^isByteArray}}

@@ -36,7 +36,7 @@ import org.openapitools.codegen.utils.StringUtils;
  * The generator for creating Micronaut servers.
  */
 @SuppressWarnings("checkstyle:DesignForExtension")
-public class JavaMicronautServerCodegen extends JavaAbstractMicronautCodegen<JavaMicronautServerOptionsBuilder> {
+public class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen<JavaMicronautServerOptionsBuilder> {
 
     public static final String OPT_CONTROLLER_PACKAGE = "controllerPackage";
     public static final String OPT_GENERATE_CONTROLLER_FROM_EXAMPLES = "generateControllerFromExamples";
@@ -269,7 +269,7 @@ public class JavaMicronautServerCodegen extends JavaAbstractMicronautCodegen<Jav
 
         if (p.isFile) {
             // The CompletedFileUpload cannot be initialized
-            p.example = "null";
+            p.example = null;
         }
     }
 

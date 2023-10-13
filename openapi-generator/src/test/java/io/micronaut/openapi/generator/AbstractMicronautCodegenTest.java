@@ -30,7 +30,7 @@ public abstract class AbstractMicronautCodegenTest {
      *
      * @return - the path to the generated folder
      */
-    protected String generateFiles(JavaAbstractMicronautCodegen<?> codegen, String configPath, String... filesToGenerate) {
+    protected String generateFiles(MicronautCodeGenerator<?> codegen, String configPath, String... filesToGenerate) {
         File output = null;
         try {
             output = Files.createTempDirectory("test").toFile().getCanonicalFile();
