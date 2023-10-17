@@ -13,6 +13,7 @@ import io.micronaut.openapi.test.model.SimpleModel
 import io.micronaut.runtime.server.EmbeddedServer
 import io.micronaut.test.extensions.spock.annotation.MicronautTest
 import jakarta.inject.Inject
+import spock.lang.Ignore
 import spock.lang.Specification
 
 import java.time.ZonedDateTime
@@ -134,6 +135,17 @@ class ResponseBodyControllerSpec extends Specification {
         HttpStatus.OK == response.status
         "custom-value-2" == response.headers.get("custom-header")
         ResponseBodyController.SIMPLE_MODEL == response.body()
+    }
+
+    @Ignore("ISSUE: https://github.com/micronaut-projects/micronaut-core/issues/9984")
+    void "test get model with validated list property"() {
+        when:
+        client.exchange("/getModelWithValidatedList", String)
+
+        then:
+        HttpClientResponseException e = thrown(HttpClientResponseException)
+        HttpStatus.BAD_REQUEST == e.status
+        e.message == "Bad Request"
     }
 
     void "test get error response"() {
