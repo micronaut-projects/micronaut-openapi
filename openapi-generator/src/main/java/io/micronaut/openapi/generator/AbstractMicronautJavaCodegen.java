@@ -664,8 +664,10 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
             for (var param : op.allParams) {
                 processGenericAnnotations(param);
             }
-            processGenericAnnotations(op.returnProperty);
-            op.returnType = op.returnProperty.vendorExtensions.get("typeWithEnumWithGenericAnnotations").toString();
+            if (op.returnProperty != null) {
+                processGenericAnnotations(op.returnProperty);
+                op.returnType = op.returnProperty.vendorExtensions.get("typeWithEnumWithGenericAnnotations").toString();
+            }
         }
 
         return objs;
@@ -690,7 +692,8 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
 
         if (op.isResponseFile) {
             op.returnType = typeMapping.get("responseFile");
-            op.returnProperty.dataType = op.returnProperty.datatypeWithEnum = op.returnType;
+            op.returnProperty.dataType = op.returnType;
+            op.returnProperty.datatypeWithEnum = op.returnType;
             op.imports.add(op.returnType);
         }
 
@@ -814,7 +817,8 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
             newReturnType.dataType = typeName + '<' + originalReturnType + '>';
             newReturnType.items = op.returnProperty;
         }
-        newReturnType.containerTypeMapped = newReturnType.containerType = typeName;
+        newReturnType.containerTypeMapped = typeName;
+        newReturnType.containerType = typeName;
         op.vendorExtensions.put("originalReturnType", originalReturnType);
 
         op.returnType = newReturnType.dataType;
@@ -934,8 +938,6 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
                 typeWithGenericAnnotations = "Map<String, " + genericAnnotations + itemsProp.vendorExtensions.get("typeWithGenericAnnotations") + ">";
                 typeWithEnumWithGenericAnnotations = "Map<String, " + genericAnnotations + itemsProp.vendorExtensions.get("typeWithEnumWithGenericAnnotations") + ">";
             } else if (containerType != null) {
-                System.out.println("Container: " + containerType);
-                System.out.println("Items: " + itemsProp);
                 var genericAnnotations = genericAnnotations(itemsProp);
                 processGenericAnnotations(itemsProp);
                 typeWithGenericAnnotations = containerType + "<" + genericAnnotations + itemsProp.vendorExtensions.get("typeWithGenericAnnotations") + ">";
