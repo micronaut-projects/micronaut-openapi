@@ -20,8 +20,6 @@ dependencies {
         because("Required for Swagger")
     }
 
-    testAnnotationProcessor("io.micronaut.validation:micronaut-validation-processor")
-
     testCompileOnly("io.micronaut:micronaut-inject-groovy-test")
     testCompileOnly("io.micronaut:micronaut-inject-java-test")
     testImplementation("io.micronaut.test:micronaut-test-spock")
