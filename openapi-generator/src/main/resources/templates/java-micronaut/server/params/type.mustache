@@ -1,5 +1,5 @@
 {{^isEnum}}{{^isDateTime}}{{^isDate}}
-    {{{dataType}}}
+    {{{vendorExtensions.typeWithGenericAnnotations}}}
 {{/isDate}}{{/isDateTime}}{{/isEnum}}
 {{#isDateTime}}
     {{#dateFormat}}@Format("{{{datetimeFormat}}}"){{/dateFormat}} {{{dataType}}}
@@ -8,5 +8,5 @@
     {{#dateTimeFormat}}@Format("{{{dateFormat}}}"){{/dateTimeFormat}} {{{dataType}}}
 {{/isDate}}
 {{#isEnum}}
-    {{{datatypeWithEnum}}}
+    {{{vendorExtensions.typeWithEnumWithGenericAnnotations}}}
 {{/isEnum}}

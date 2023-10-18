@@ -358,6 +358,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ModelWithMapProperty'
+  /sendModelWithValidatedListProperty:
+    post:
+      operationId: sendModelWithValidatedListProperty
+      tags: [ requestBody ]
+      description: A method to send a model that contains a list with validated items
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ModelWithValidatedListProperty'
+      responses:
+        200:
+          description: Success
   /sendNestedModel:
     post:
       operationId: sendNestedModel
@@ -535,6 +549,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SimpleModel'
+        default:
+          $ref: '#/responses/Error'
+  /getModelWithValidatedList:
+    get:
+      operationId: getModelWithValidatedList
+      tags: [ responseBody ]
+      description: A method to get a model with validated list as a response
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ModelWithValidatedListProperty'
         default:
           $ref: '#/responses/Error'
   /getPaginatedSimpleModel:
@@ -763,6 +791,26 @@ components:
             type: object
             additionalProperties:
               $ref: '#/components/schemas/SimpleModel'
+    ModelWithValidatedListProperty:
+      type: object
+      properties:
+        stringList:
+          type: array
+          items:
+            type: string
+            minLength: 3
+        objectList:
+          type: array
+          maxItems: 2
+          items:
+            $ref: '#/components/schemas/SimpleModel'
+        mapList:
+          type: array
+          items:
+            type: object
+            additionalProperties:
+              type: string
+              minLength: 2
     StateEnum:
       type: string
       enum: ['starting', 'running', 'stopped', 'deleted']

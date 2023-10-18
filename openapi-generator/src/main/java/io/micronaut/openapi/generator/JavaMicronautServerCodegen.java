@@ -274,6 +274,11 @@ public class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen<Jav
     }
 
     @Override
+    public boolean isGenerateHardNullable() {
+        return generateHardNullable;
+    }
+
+    @Override
     public OperationsMap postProcessOperationsWithModels(OperationsMap objs, List<ModelMap> allModels) {
         objs = super.postProcessOperationsWithModels(objs, allModels);
 

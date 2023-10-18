@@ -32,7 +32,7 @@ public class {{controllerClassname}} implements {{classname}} {
     {{#operation}}
     {{!the method definition}}
     @Override
-    public {{^returnType}}void{{/returnType}}{{#returnType}}{{{returnType}}}{{/returnType}} {{nickname}}({{#allParams}}{{{dataType}}} {{paramName}}{{^-last}}, {{/-last}}{{/allParams}}) {
+    public {{^returnType}}void{{/returnType}}{{#returnType}}{{{returnType}}}{{/returnType}} {{nickname}}({{#allParams}}{{{vendorExtensions.typeWithGenericAnnotations}}} {{paramName}}{{^-last}}, {{/-last}}{{/allParams}}) {
 {{>server/controllerOperationBody}}    }
     {{^-last}}
 
