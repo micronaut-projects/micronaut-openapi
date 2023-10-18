@@ -207,7 +207,7 @@ class MicronautServerCodegenTest extends AbstractMicronautCodegenTest {
         String outputPath = generateFiles(codegen, PETSTORE_PATH, CodegenConstants.MODELS, CodegenConstants.APIS);
 
         String apiPath = outputPath + "src/main/java/org/openapitools/api/";
-        assertFileContains(apiPath + "PetApi.java", "Mono<HttpResponse<Pet>>");
+        assertFileContains(apiPath + "PetApi.java", "Mono<HttpResponse<@Valid Pet>>");
     }
 
     @Test
@@ -219,8 +219,8 @@ class MicronautServerCodegenTest extends AbstractMicronautCodegenTest {
         String outputPath = generateFiles(codegen, PETSTORE_PATH, CodegenConstants.MODELS, CodegenConstants.APIS);
 
         String apiPath = outputPath + "src/main/java/org/openapitools/api/";
-        assertFileContains(apiPath + "PetApi.java", "Mono<Pet>");
-        assertFileNotContains(apiPath + "PetApi.java", "Flux<Pet>");
+        assertFileContains(apiPath + "PetApi.java", "Mono<@Valid Pet>");
+        assertFileNotContains(apiPath + "PetApi.java", "Flux<@Valid Pet>");
         assertFileNotContains(apiPath + "PetApi.java", "HttpResponse");
     }
 
@@ -233,8 +233,8 @@ class MicronautServerCodegenTest extends AbstractMicronautCodegenTest {
         String outputPath = generateFiles(codegen, PETSTORE_PATH, CodegenConstants.MODELS, CodegenConstants.APIS);
 
         String apiPath = outputPath + "src/main/java/org/openapitools/api/";
-        assertFileContains(apiPath + "PetApi.java", "Mono<Pet>");
-        assertFileContains(apiPath + "PetApi.java", "Flux<Pet>");
+        assertFileContains(apiPath + "PetApi.java", "Mono<@Valid Pet>");
+        assertFileContains(apiPath + "PetApi.java", "Flux<@Valid Pet>");
         assertFileNotContains(apiPath + "PetApi.java", "HttpResponse");
     }
 
@@ -246,7 +246,7 @@ class MicronautServerCodegenTest extends AbstractMicronautCodegenTest {
         String outputPath = generateFiles(codegen, PETSTORE_PATH, CodegenConstants.MODELS, CodegenConstants.APIS);
 
         String apiPath = outputPath + "src/main/java/org/openapitools/api/";
-        assertFileContains(apiPath + "PetApi.java", "HttpResponse<Pet>");
+        assertFileContains(apiPath + "PetApi.java", "HttpResponse<@Valid Pet>");
         assertFileNotContains(apiPath + "PetApi.java", "Mono");
     }
 

@@ -662,7 +662,11 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
             }
 
             for (var param : op.allParams) {
-                processGenericAnnotations(param.dataType, param.datatypeWithEnum, param.isArray, param.items, param.vendorExtensions);
+                processGenericAnnotations(param);
+            }
+            if (op.returnProperty != null) {
+                processGenericAnnotations(op.returnProperty);
+                op.returnType = op.returnProperty.vendorExtensions.get("typeWithEnumWithGenericAnnotations").toString();
             }
         }
 
@@ -688,6 +692,8 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
 
         if (op.isResponseFile) {
             op.returnType = typeMapping.get("responseFile");
+            op.returnProperty.dataType = op.returnType;
+            op.returnProperty.datatypeWithEnum = op.returnType;
             op.imports.add(op.returnType);
         }
 
@@ -806,14 +812,17 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
                 originalReturnType = "Void";
                 op.returnProperty = new CodegenProperty();
                 op.returnProperty.dataType = "Void";
+                op.returnProperty.openApiType = "";
             }
             newReturnType.dataType = typeName + '<' + originalReturnType + '>';
             newReturnType.items = op.returnProperty;
         }
+        newReturnType.containerTypeMapped = typeName;
+        newReturnType.containerType = typeName;
         op.vendorExtensions.put("originalReturnType", originalReturnType);
 
         op.returnType = newReturnType.dataType;
-        op.returnContainer = null;
+        op.returnContainer = newReturnType.containerTypeMapped;
         op.returnProperty = newReturnType;
         op.isArray = op.returnProperty.isArray;
     }
@@ -893,53 +902,57 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
                 property.vendorExtensions.put("lombok", lombok);
                 property.vendorExtensions.put("defaultValueIsNotNull", property.defaultValue != null && !property.defaultValue.equals("null"));
                 property.vendorExtensions.put("isServer", isServer);
-                processGenericAnnotations(property.dataType, property.datatypeWithEnum, property.isArray, property.items, property.vendorExtensions);
+                processGenericAnnotations(property);
             }
             model.vendorExtensions.put("isServer", isServer);
             for (var property : model.requiredVars) {
                 property.vendorExtensions.put("lombok", lombok);
                 property.vendorExtensions.put("isServer", isServer);
                 property.vendorExtensions.put("defaultValueIsNotNull", property.defaultValue != null && !property.defaultValue.equals("null"));
-                processGenericAnnotations(property.dataType, property.datatypeWithEnum, property.isArray, property.items, property.vendorExtensions);
+                processGenericAnnotations(property);
             }
         }
 
         return objs;
     }
 
-    private void processGenericAnnotations(String dataType, String dataTypeWithEnum, boolean isArray, CodegenProperty itemsProp, Map<String, Object> ext) {
+    private void processGenericAnnotations(CodegenParameter parameter) {
+        CodegenProperty items = parameter.isMap ? parameter.additionalProperties : parameter.items;
+        String datatypeWithEnum = parameter.datatypeWithEnum == null ? parameter.dataType : parameter.datatypeWithEnum;
+        processGenericAnnotations(parameter.dataType, datatypeWithEnum, parameter.isArray, parameter.isMap, parameter.containerTypeMapped, items, parameter.vendorExtensions);
+    }
+
+    private void processGenericAnnotations(CodegenProperty property) {
+        CodegenProperty items = property.isMap ? property.additionalProperties : property.items;
+        String datatypeWithEnum = property.datatypeWithEnum == null ? property.dataType : property.datatypeWithEnum;
+        processGenericAnnotations(property.dataType, datatypeWithEnum, property.isArray, property.isMap, property.containerTypeMapped, items, property.vendorExtensions);
+    }
+
+    private void processGenericAnnotations(String dataType, String dataTypeWithEnum, boolean isArray, boolean isMap, String containerType, CodegenProperty itemsProp, Map<String, Object> ext) {
         var typeWithGenericAnnotations = dataType;
         var typeWithEnumWithGenericAnnotations = dataTypeWithEnum;
-        var addedGenericAnnotations = false;
-        if (useBeanValidation && isArray && itemsProp != null && isPrimitive(itemsProp.openApiType) && dataType.contains("<")) {
-            var genericAnnotations = genericAnnotations(itemsProp);
-            if (itemsProp.isArray) {
-                processGenericAnnotations(itemsProp.dataType, itemsProp.datatypeWithEnum, true, itemsProp.items, itemsProp.vendorExtensions);
-                typeWithGenericAnnotations = addGenericAnnotations((String) itemsProp.vendorExtensions.get("typeWithGenericAnnotations"), dataType, genericAnnotations);
-                typeWithEnumWithGenericAnnotations = addGenericAnnotations((String) itemsProp.vendorExtensions.get("typeWithEnumWithGenericAnnotations"), dataTypeWithEnum, genericAnnotations);
-            } else {
-                typeWithGenericAnnotations = addGenericAnnotations(dataType, null, genericAnnotations);
-                typeWithEnumWithGenericAnnotations = addGenericAnnotations(dataTypeWithEnum, null, genericAnnotations);
+        if (useBeanValidation && itemsProp != null && dataType.contains("<")) {
+            if (isMap) {
+                var genericAnnotations = genericAnnotations(itemsProp);
+                processGenericAnnotations(itemsProp);
+                typeWithGenericAnnotations = "Map<String, " + genericAnnotations + itemsProp.vendorExtensions.get("typeWithGenericAnnotations") + ">";
+                typeWithEnumWithGenericAnnotations = "Map<String, " + genericAnnotations + itemsProp.vendorExtensions.get("typeWithEnumWithGenericAnnotations") + ">";
+            } else if (containerType != null) {
+                var genericAnnotations = genericAnnotations(itemsProp);
+                processGenericAnnotations(itemsProp);
+                typeWithGenericAnnotations = containerType + "<" + genericAnnotations + itemsProp.vendorExtensions.get("typeWithGenericAnnotations") + ">";
+                typeWithEnumWithGenericAnnotations = containerType + "<" + genericAnnotations + itemsProp.vendorExtensions.get("typeWithEnumWithGenericAnnotations") + ">";
             }
         }
         ext.put("typeWithGenericAnnotations", typeWithGenericAnnotations);
         ext.put("typeWithEnumWithGenericAnnotations", typeWithEnumWithGenericAnnotations);
     }
 
-    private String addGenericAnnotations(String type, String wrapType, String genericAnnotations) {
-        if (StringUtils.isEmpty(type) || StringUtils.isEmpty(genericAnnotations)) {
-            return type;
-        }
-        var t = wrapType != null ? wrapType : type;
-        var diamondOpen = t.indexOf('<');
-        var diamondClose = t.lastIndexOf('>');
-        var containerType = t.substring(0, diamondOpen);
-        var elementType = t.substring(diamondOpen + 1, diamondClose);
-        return containerType + '<' + genericAnnotations + (wrapType != null ? type : elementType) + '>';
-    }
-
     private boolean isPrimitive(String type) {
-        return switch (type.toLowerCase()) {
+        if (type == null) {
+            return false;
+        }
+        return switch (type) {
             case "array", "string", "boolean", "byte", "uri", "url", "uuid", "email", "integer", "long", "float", "double",
                 "number", "partial-time", "date", "date-time", "bigdecimal", "biginteger" -> true;
             default -> false;
@@ -948,11 +961,19 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
 
     private String genericAnnotations(CodegenProperty prop) {
 
-        var type = prop.openApiType.toLowerCase();
+        var type = prop.openApiType == null ? null : prop.openApiType.toLowerCase();
 
         var result = new StringBuilder();
+
+        if (prop.isModel) {
+            result.append("@Valid ");
+        }
+        if (!isPrimitive(type)) {
+            return result.toString();
+        }
+
         if (StringUtils.isNotEmpty(prop.pattern)) {
-            if (type.equals("email")) {
+            if ("email".equals(type)) {
                 result.append("@Email(regexp = \"");
             } else {
                 result.append("@Pattern(regexp = \"");
