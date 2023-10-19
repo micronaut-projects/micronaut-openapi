@@ -666,6 +666,10 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
                     param.vendorExtensions.put("withValid", true);
                 }
             }
+            if (op.returnProperty != null) {
+                processGenericAnnotations(op.returnProperty);
+                op.returnType = op.returnProperty.vendorExtensions.get("typeWithEnumWithGenericAnnotations").toString();
+            }
         }
 
         return objs;
@@ -691,6 +695,8 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
 
         if (op.isResponseFile) {
             op.returnType = typeMapping.get("responseFile");
+            op.returnProperty.dataType = op.returnType;
+            op.returnProperty.datatypeWithEnum = op.returnType;
             op.imports.add(op.returnType);
         }
 
@@ -809,14 +815,17 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
                 originalReturnType = "Void";
                 op.returnProperty = new CodegenProperty();
                 op.returnProperty.dataType = "Void";
+                op.returnProperty.openApiType = "";
             }
             newReturnType.dataType = typeName + '<' + originalReturnType + '>';
             newReturnType.items = op.returnProperty;
         }
+        newReturnType.containerTypeMapped = typeName;
+        newReturnType.containerType = typeName;
         op.vendorExtensions.put("originalReturnType", originalReturnType);
 
         op.returnType = newReturnType.dataType;
-        op.returnContainer = null;
+        op.returnContainer = newReturnType.containerTypeMapped;
         op.returnProperty = newReturnType;
         op.isArray = op.returnProperty.isArray;
     }
@@ -928,6 +937,172 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
 
         Utils.processGenericAnnotations(property.dataType, property.datatypeWithEnum, property.isArray, property.items, property.vendorExtensions,
             useBeanValidation, isGenerateHardNullable(), false, false, false, false);
+    }
+
+    private void processGenericAnnotations(CodegenParameter parameter) {
+        CodegenProperty items = parameter.isMap ? parameter.additionalProperties : parameter.items;
+        String datatypeWithEnum = parameter.datatypeWithEnum == null ? parameter.dataType : parameter.datatypeWithEnum;
+        processGenericAnnotations(parameter.dataType, datatypeWithEnum, parameter.isArray, parameter.isMap, parameter.containerTypeMapped, items, parameter.vendorExtensions);
+    }
+
+    private void processGenericAnnotations(CodegenProperty property) {
+        CodegenProperty items = property.isMap ? property.additionalProperties : property.items;
+        String datatypeWithEnum = property.datatypeWithEnum == null ? property.dataType : property.datatypeWithEnum;
+        processGenericAnnotations(property.dataType, datatypeWithEnum, property.isArray, property.isMap, property.containerTypeMapped, items, property.vendorExtensions);
+    }
+
+    private void processGenericAnnotations(String dataType, String dataTypeWithEnum, boolean isArray, boolean isMap, String containerType, CodegenProperty itemsProp, Map<String, Object> ext) {
+        var typeWithGenericAnnotations = dataType;
+        var typeWithEnumWithGenericAnnotations = dataTypeWithEnum;
+        if (useBeanValidation && itemsProp != null && dataType.contains("<")) {
+            if (isMap) {
+                var genericAnnotations = genericAnnotations(itemsProp);
+                processGenericAnnotations(itemsProp);
+                typeWithGenericAnnotations = "Map<String, " + genericAnnotations + itemsProp.vendorExtensions.get("typeWithGenericAnnotations") + ">";
+                typeWithEnumWithGenericAnnotations = "Map<String, " + genericAnnotations + itemsProp.vendorExtensions.get("typeWithEnumWithGenericAnnotations") + ">";
+            } else if (containerType != null) {
+                var genericAnnotations = genericAnnotations(itemsProp);
+                processGenericAnnotations(itemsProp);
+                typeWithGenericAnnotations = containerType + "<" + genericAnnotations + itemsProp.vendorExtensions.get("typeWithGenericAnnotations") + ">";
+                typeWithEnumWithGenericAnnotations = containerType + "<" + genericAnnotations + itemsProp.vendorExtensions.get("typeWithEnumWithGenericAnnotations") + ">";
+            }
+        }
+        ext.put("typeWithGenericAnnotations", typeWithGenericAnnotations);
+        ext.put("typeWithEnumWithGenericAnnotations", typeWithEnumWithGenericAnnotations);
+    }
+
+    private boolean isPrimitive(String type) {
+        if (type == null) {
+            return false;
+        }
+        return switch (type) {
+            case "array", "string", "boolean", "byte", "uri", "url", "uuid", "email", "integer", "long", "float", "double",
+                "number", "partial-time", "date", "date-time", "bigdecimal", "biginteger" -> true;
+            default -> false;
+        };
+    }
+
+    private String genericAnnotations(CodegenProperty prop) {
+
+        var type = prop.openApiType == null ? null : prop.openApiType.toLowerCase();
+
+        var result = new StringBuilder();
+
+        if (prop.isModel) {
+            result.append("@Valid ");
+        }
+        if (!isPrimitive(type)) {
+            return result.toString();
+        }
+
+        if (StringUtils.isNotEmpty(prop.pattern)) {
+            if ("email".equals(type)) {
+                result.append("@Email(regexp = \"");
+            } else {
+                result.append("@Pattern(regexp = \"");
+            }
+            result.append(prop.pattern).append("\") ");
+        }
+
+        var containsNotEmpty = false;
+
+        if (prop.minLength != null || prop.maxLength != null) {
+            if (prop.minLength != null && prop.minLength == 1 && prop.maxLength == null && !prop.isNullable) {
+                result.append("@NotEmpty ");
+                containsNotEmpty = true;
+            } else {
+                result.append("@Size(");
+                if (prop.minLength != null) {
+                    result.append("min = ").append(prop.minLength);
+                }
+                if (prop.maxLength != null) {
+                    if (prop.minLength != null) {
+                        result.append(", ");
+                    }
+                    result.append("max = ").append(prop.maxLength);
+                }
+                result.append(") ");
+            }
+        }
+
+        if (prop.minItems != null || prop.maxItems != null) {
+            if (prop.minItems != null && prop.minItems == 1 && prop.maxItems == null && !prop.isNullable) {
+                result.append("@NotEmpty ");
+                containsNotEmpty = true;
+            } else {
+                result.append("@Size(");
+                if (prop.minItems != null) {
+                    result.append("min = ").append(prop.minItems);
+                }
+                if (prop.maxItems != null) {
+                    if (prop.minItems != null) {
+                        result.append(", ");
+                    }
+                    result.append("max = ").append(prop.maxItems);
+                }
+                result.append(") ");
+            }
+        }
+        if (prop.isNullable) {
+            if (isGenerateHardNullable()) {
+                result.append("@HardNullable ");
+            } else {
+                result.append("@Nullable ");
+            }
+        } else if (!containsNotEmpty) {
+            result.append("@NotNull ");
+        }
+        if (StringUtils.isNotEmpty(prop.minimum)) {
+            try {
+                var longNumber = Long.parseLong(prop.minimum);
+                if (prop.exclusiveMinimum) {
+                    longNumber++;
+                }
+                if (longNumber == 0 && StringUtils.isEmpty(prop.maximum)) {
+                    result.append("@PositiveOrZero ");
+                } else if (longNumber == 1 && StringUtils.isEmpty(prop.maximum)) {
+                    result.append("@Positive ");
+                } else {
+                    result.append("@Min(").append(longNumber).append(") ");
+                }
+            } catch (Exception e) {
+                result.append("@DecimalMin(");
+                if (prop.exclusiveMinimum) {
+                    result.append("value = ");
+                }
+                result.append('"').append(prop.minimum).append('"');
+                if (prop.exclusiveMinimum) {
+                    result.append(", inclusive = false");
+                }
+                result.append(") ");
+            }
+        }
+        if (StringUtils.isNotEmpty(prop.maximum)) {
+            try {
+                var longNumber = Long.parseLong(prop.maximum);
+                if (prop.exclusiveMaximum) {
+                    longNumber--;
+                }
+                if (longNumber == 0 && StringUtils.isEmpty(prop.minimum)) {
+                    result.append("@NegativeOrZero ");
+                } else if (longNumber == -1 && StringUtils.isEmpty(prop.minimum)) {
+                    result.append("@Negative ");
+                } else {
+                    result.append("@Max(").append(longNumber).append(") ");
+                }
+            } catch (Exception e) {
+                result.append("@DecimalMax(");
+                if (prop.exclusiveMaximum) {
+                    result.append("value = ");
+                }
+                result.append('"').append(prop.maximum).append('"');
+                if (prop.exclusiveMaximum) {
+                    result.append(", inclusive = false");
+                }
+                result.append(") ");
+            }
+        }
+        return result.toString();
     }
 
     public boolean isGenerateHardNullable() {

@@ -323,4 +323,14 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         assertFileContains(apiPath + "BasicBookInfo.java", "public BasicBookInfo(String author, String name)", "super(name)");
         assertFileContains(apiPath + "DetailedBookInfo.java", "public DetailedBookInfo(String isbn, String name, String author)", "super(author, name)");
     }
+
+    @Test
+    void testWrongImportInputStream() {
+
+        var codegen = new JavaMicronautClientCodegen();
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/inputStream.yml", CodegenConstants.APIS, CodegenConstants.API_TESTS);
+        String apiPath = outputPath + "src/main/java/org/openapitools/api/";
+
+        assertFileContains(apiPath + "DefaultApi.java", "import java.io.InputStream;");
+    }
 }

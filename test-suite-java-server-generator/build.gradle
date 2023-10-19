@@ -19,6 +19,7 @@ dependencies {
     implementation(projects.micronautOpenapi) {
         because("Required for Swagger")
     }
+
     testCompileOnly("io.micronaut:micronaut-inject-groovy-test")
     testCompileOnly("io.micronaut:micronaut-inject-java-test")
     testImplementation("io.micronaut.test:micronaut-test-spock")

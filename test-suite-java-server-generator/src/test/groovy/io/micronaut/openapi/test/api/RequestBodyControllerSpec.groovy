@@ -18,6 +18,7 @@ import io.micronaut.openapi.test.model.ModelWithEnumList
 import io.micronaut.openapi.test.model.ModelWithInnerEnum
 import io.micronaut.openapi.test.model.ModelWithMapProperty
 import io.micronaut.openapi.test.model.ModelWithRequiredProperties
+import io.micronaut.openapi.test.model.ModelWithValidatedListProperty
 import io.micronaut.openapi.test.model.NestedModel
 import io.micronaut.openapi.test.model.Reptile
 import io.micronaut.openapi.test.model.SimpleModel
@@ -46,7 +47,7 @@ class RequestBodyControllerSpec extends Specification {
         this.client = reactiveClient.toBlocking()
     }
 
-    @Ignore("Not yet supported")
+    @Ignore("ISSUE: https://github.com/micronaut-projects/micronaut-core/issues/9984")
     void "test send validated collection"() {
         given:
         HttpRequest<?> request =
@@ -60,7 +61,7 @@ class RequestBodyControllerSpec extends Specification {
         def e = thrown(HttpClientResponseException)
 
         HttpStatus.BAD_REQUEST == e.status
-        e.message.contains("collection[0][0]: size must be between 3 and 2147483647")
+        e.message.contains("requestBody[0][0]: size must be between 3 and 2147483647")
     }
 
     void "test send simple model"() {
@@ -264,6 +265,27 @@ class RequestBodyControllerSpec extends Specification {
         model == response
     }
 
+    void "test send model with validated list property"() {
+        given:
+        HttpRequest<?> request = HttpRequest.POST("/sendModelWithValidatedListProperty", model)
+
+        when:
+        client.retrieve(request, String)
+
+        then:
+        var e = thrown(HttpClientResponseException)
+        e.getResponse().body().toString().contains(messageContent)
+
+        where:
+        model | messageContent
+        new ModelWithValidatedListProperty().stringList(["one", "two", ""])
+              | "model.stringList[2]: size must be between 3 and 2147483647"
+        new ModelWithValidatedListProperty().objectList([new SimpleModel(), new SimpleModel().numEdges(0)])
+                | "model.objectList[1].numEdges: must be greater than or equal to 1"
+        new ModelWithValidatedListProperty().objectList([new SimpleModel(), new SimpleModel(), new SimpleModel()])
+                | "model.objectList: size must be between 0 and 2"
+    }
+
     void "test send model with deep map property"() {
         given:
         Map<String, Map<String, String>> map = [
@@ -278,6 +300,27 @@ class RequestBodyControllerSpec extends Specification {
 
         then:
         model == response
+    }
+
+    void "test send model with validated deep map property"() {
+        given:
+        HttpRequest<?> request = HttpRequest.POST("/sendModelWithMapProperty", model)
+
+        when:
+        client.retrieve(request, String)
+
+        then:
+        var e = thrown(HttpClientResponseException)
+        e.getResponse().body().toString().contains(messageContent)
+
+        where:
+        model | messageContent
+        new ModelWithMapProperty().map(["bye": "one", "hello": null])
+              | "model.map[hello]: must not be null"
+        new ModelWithMapProperty().deepMap(["first": ["second": "aa", "third": "a"]])
+              | "model.deepMap[first][third]: size must be between 2 and 2147483647"
+        new ModelWithMapProperty().deepObjectMap(["first": ["second": new SimpleModel().color("a")]])
+              | "model.deepObjectMap[first][second].color: size must be between 2 and 2147483647"
     }
 
     void "test send model with deep map model property"() {
