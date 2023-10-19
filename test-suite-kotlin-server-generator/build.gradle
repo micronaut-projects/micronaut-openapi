@@ -14,6 +14,12 @@ dependencies {
     kapt("io.micronaut.validation:micronaut-validation-processor")
     kapt(mn.micronaut.inject.kotlin)
     kapt(mn.micronaut.inject.java)
+
+    annotationProcessor("io.micronaut.serde:micronaut-serde-processor")
+    annotationProcessor("io.micronaut.validation:micronaut-validation-processor")
+    annotationProcessor(mn.micronaut.inject.kotlin)
+    annotationProcessor(mn.micronaut.inject.java)
+
     implementation("io.micronaut:micronaut-http")
     implementation("io.micronaut.serde:micronaut-serde-api")
     implementation("io.micronaut:micronaut-inject-kotlin")

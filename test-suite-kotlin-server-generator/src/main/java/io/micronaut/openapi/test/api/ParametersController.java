@@ -14,7 +14,6 @@ import io.micronaut.openapi.test.model.SendDatesResponse;
 import io.micronaut.openapi.test.model.SendPrimitivesResponse;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import reactor.core.publisher.Mono;
 

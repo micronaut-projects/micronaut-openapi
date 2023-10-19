@@ -290,9 +290,8 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
 
         assertFileContains(apiPath + "BooksContainer.java",
             """
-                        @Valid
                         @JsonProperty(JSON_PROPERTY_BOOKS)
-                        private List<Book> books;
+                        private List<@Valid Book> books;
                     """);
     }
 

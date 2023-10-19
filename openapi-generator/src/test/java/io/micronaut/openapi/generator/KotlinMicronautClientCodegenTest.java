@@ -143,34 +143,33 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         // Constructor should have properties
         String modelPath = outputPath + "src/main/kotlin/org/openapitools/model/";
         assertFileContains(modelPath + "Pet.kt",
-            """
-                data class Pet (
-                    @NotNull
-                    @JsonProperty(JSON_PROPERTY_NAME)
-                    var name: String,
-                    @NotNull
-                    @JsonProperty(JSON_PROPERTY_PHOTO_URLS)
-                    var photoUrls: List<@NotNull String>,
-                    @Nullable
-                    @JsonProperty(JSON_PROPERTY_ID)
-                    @JsonInclude(JsonInclude.Include.USE_DEFAULTS)
-                    var id: Long? = null,
-                    @Nullable
-                    @Valid
-                    @JsonProperty(JSON_PROPERTY_CATEGORY)
-                    @JsonInclude(JsonInclude.Include.USE_DEFAULTS)
-                    var category: Category? = null,
-                    @Nullable
-                    @Valid
-                    @JsonProperty(JSON_PROPERTY_TAGS)
-                    @JsonInclude(JsonInclude.Include.USE_DEFAULTS)
-                    var tags: List<Tag>? = null,
-                    @Nullable
-                    @JsonProperty(JSON_PROPERTY_STATUS)
-                    @JsonInclude(JsonInclude.Include.USE_DEFAULTS)
-                    var status: Status? = null,
-                ) {
-                """);
+        """
+            data class Pet (
+                @NotNull
+                @JsonProperty(JSON_PROPERTY_NAME)
+                var name: String,
+                @NotNull
+                @JsonProperty(JSON_PROPERTY_PHOTO_URLS)
+                var photoUrls: List<@NotNull String>,
+                @Nullable
+                @JsonProperty(JSON_PROPERTY_ID)
+                @JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                var id: Long? = null,
+                @Nullable
+                @Valid
+                @JsonProperty(JSON_PROPERTY_CATEGORY)
+                @JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                var category: Category? = null,
+                @Nullable
+                @JsonProperty(JSON_PROPERTY_TAGS)
+                @JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                var tags: List<@Valid Tag>? = null,
+                @Nullable
+                @JsonProperty(JSON_PROPERTY_STATUS)
+                @JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                var status: Status? = null,
+            ) {
+            """);
     }
 
     @Test
@@ -341,9 +340,8 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
 
         assertFileContains(apiPath + "BooksContainer.kt",
             """
-                        @Valid
                         @JsonProperty(JSON_PROPERTY_BOOKS)
-                        var books: List<Book>
+                        var books: List<@Valid Book>
                     """);
     }
 

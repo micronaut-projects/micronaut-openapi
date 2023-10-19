@@ -3,6 +3,7 @@ package io.micronaut.openapi.test.api;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -25,6 +26,7 @@ import io.micronaut.openapi.test.model.ModelWithEnumList;
 import io.micronaut.openapi.test.model.ModelWithInnerEnum;
 import io.micronaut.openapi.test.model.ModelWithMapProperty;
 import io.micronaut.openapi.test.model.ModelWithRequiredProperties;
+import io.micronaut.openapi.test.model.ModelWithValidatedListProperty;
 import io.micronaut.openapi.test.model.NestedModel;
 import io.micronaut.openapi.test.model.Reptile;
 import io.micronaut.openapi.test.model.SimpleModel;
@@ -74,7 +76,7 @@ public class RequestBodyControllerTest {
             client.retrieve(request, Argument.of(String.class), Argument.of(String.class)));
 
         assertEquals(e.getStatus(), HttpStatus.BAD_REQUEST);
-        assertTrue(e.getMessage().contains("collection[0][0]: size must be between 3 and 2147483647"));
+        assertTrue(e.getMessage().contains("requestBody[0][0]: size must be between 3 and 2147483647"));
     }
 
     @Test
@@ -236,6 +238,31 @@ public class RequestBodyControllerTest {
         assertEquals(model, response);
     }
 
+    static Stream<Arguments> models2() {
+
+        var sm = new SimpleModel();
+        sm.setNumEdges(0L);
+
+        return Stream.of(
+            arguments(new ModelWithValidatedListProperty(List.of("one", "two", ""), null, null), "model.stringList[2]: size must be between 3 and 2147483647"),
+            arguments(new ModelWithValidatedListProperty(null, List.of(new SimpleModel(), sm), null), "model.objectList[1].numEdges: must be greater than or equal to 1"),
+            arguments(new ModelWithValidatedListProperty(null, List.of(new SimpleModel(), new SimpleModel(), new SimpleModel()), null), "model.objectList: size must be between 0 and 2")
+        );
+    }
+
+    @Disabled
+    @MethodSource("models2")
+    @ParameterizedTest
+    void testSendModelWithValidatedListProperty(ModelWithValidatedListProperty model, String messageContent) {
+
+        HttpRequest<?> request = HttpRequest.POST("/sendModelWithValidatedListProperty", model);
+
+        var e = assertThrows(HttpClientResponseException.class, () ->
+            client.retrieve(request, String.class));
+
+        assertTrue(e.getResponse().body().toString().contains(messageContent));
+    }
+
     @Test
     void testSendModelWithDeepMapProperty() {
 
@@ -250,6 +277,36 @@ public class RequestBodyControllerTest {
         var response = client.retrieve(request, ModelWithMapProperty.class);
 
         assertEquals(model, response);
+    }
+
+    static Stream<Arguments> models3() {
+
+        var map1 = new HashMap<String, String>() {{
+            put("bye", "one");
+            put("hello", null);
+        }};
+
+        var sm = new SimpleModel();
+        sm.setColor("a");
+
+        return Stream.of(
+            arguments(new ModelWithMapProperty(map1, null, null), "model.map[hello]: must not be null"),
+            arguments(new ModelWithMapProperty(null, Map.of("first", Map.of("second", "aa", "third", "a")), null), "model.deepMap[first][third]: size must be between 2 and 2147483647"),
+            arguments(new ModelWithMapProperty(null, null, Map.of("first", Map.of("second", sm))), "model.deepObjectMap[first][second].color: size must be between 2 and 2147483647")
+        );
+    }
+
+    @Disabled
+    @MethodSource("models3")
+    @ParameterizedTest
+    void testSendModelWithValidatedDeepMapProperty(ModelWithMapProperty model, String messageContent) {
+
+        HttpRequest<?> request = HttpRequest.POST("/sendModelWithMapProperty", model);
+
+        var e = assertThrows(HttpClientResponseException.class, () ->
+            client.retrieve(request, String.class));
+
+        assertTrue(e.getResponse().body().toString().contains(messageContent));
     }
 
     @Test

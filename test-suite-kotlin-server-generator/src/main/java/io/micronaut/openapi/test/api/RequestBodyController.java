@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.util.List;
 
+import io.micronaut.http.annotation.Body;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Post;
 import io.micronaut.http.multipart.CompletedFileUpload;
@@ -14,6 +15,7 @@ import io.micronaut.openapi.test.model.ModelWithEnumList;
 import io.micronaut.openapi.test.model.ModelWithInnerEnum;
 import io.micronaut.openapi.test.model.ModelWithMapProperty;
 import io.micronaut.openapi.test.model.ModelWithRequiredProperties;
+import io.micronaut.openapi.test.model.ModelWithValidatedListProperty;
 import io.micronaut.openapi.test.model.NestedModel;
 import io.micronaut.openapi.test.model.SimpleModel;
 
@@ -29,15 +31,14 @@ public class RequestBodyController implements RequestBodyApi {
         return request;
     }
 
-    @NotNull
-    @Override
-    public Mono<Void> sendValidatedCollection(@NotNull List<@NotNull ? extends List<String>> requestBody) {
-        return Mono.empty();
-    }
-
     @Override
     public Mono<SimpleModel> sendSimpleModel(SimpleModel simpleModel) {
         return Mono.just(simpleModel);
+    }
+
+    @Override
+    public Mono<Void> sendValidatedCollection(List<? extends List<String>> requestBody) {
+        return Mono.empty();
     }
 
     @Override
@@ -60,15 +61,19 @@ public class RequestBodyController implements RequestBodyApi {
         return Mono.just(ColorEnum.fromValue(color.replace("\"", "")));
     }
 
-    @NotNull
     @Override
-    public Mono<List<ColorEnum>> sendEnumList(@NotNull List<@Valid ? extends ColorEnum> availableColors) {
+    public Mono<List<ColorEnum>> sendEnumList(List<@Valid ? extends ColorEnum> availableColors) {
         return Mono.just((List<ColorEnum>) availableColors);
     }
 
     @Override
-    public Mono<ModelWithMapProperty> sendModelWithMapProperty(ModelWithMapProperty model) {
+    public Mono<ModelWithMapProperty> sendModelWithMapProperty(@Body @NotNull @Valid ModelWithMapProperty model) {
         return Mono.just(model);
+    }
+
+    @Override
+    public Mono<Void> sendModelWithValidatedListProperty(@Body @NotNull @Valid ModelWithValidatedListProperty model) {
+        return Mono.empty();
     }
 
     @Override

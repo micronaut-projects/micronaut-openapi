@@ -22,9 +22,11 @@
         {{/required}}
     {{/isNullable}}
     {{!Validate all pojos and enums}}
-    {{#vendorExtensions.withValid}}
+    {{^isContainer}}
+        {{#isModel}}
     @Valid
-    {{/vendorExtensions.withValid}}
+        {{/isModel}}
+    {{/isContainer}}
     {{!Pattern}}
     {{#pattern}}
         {{^isByteArray}}

@@ -7,7 +7,16 @@ import java.util.List;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Post;
 import io.micronaut.http.multipart.CompletedFileUpload;
-import io.micronaut.openapi.test.model.*;
+import io.micronaut.openapi.test.model.Animal;
+import io.micronaut.openapi.test.model.ColorEnum;
+import io.micronaut.openapi.test.model.DateModel;
+import io.micronaut.openapi.test.model.ModelWithEnumList;
+import io.micronaut.openapi.test.model.ModelWithInnerEnum;
+import io.micronaut.openapi.test.model.ModelWithMapProperty;
+import io.micronaut.openapi.test.model.ModelWithRequiredProperties;
+import io.micronaut.openapi.test.model.ModelWithValidatedListProperty;
+import io.micronaut.openapi.test.model.NestedModel;
+import io.micronaut.openapi.test.model.SimpleModel;
 
 import jakarta.validation.Valid;
 import reactor.core.publisher.Mono;

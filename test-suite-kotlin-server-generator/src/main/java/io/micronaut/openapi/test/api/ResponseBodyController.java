@@ -18,6 +18,7 @@ import io.micronaut.http.server.types.files.FileCustomizableResponseType;
 import io.micronaut.http.server.types.files.StreamedFile;
 import io.micronaut.openapi.test.dated.DatedResponse;
 import io.micronaut.openapi.test.model.DateModel;
+import io.micronaut.openapi.test.model.ModelWithValidatedListProperty;
 import io.micronaut.openapi.test.model.SimpleModel;
 import io.micronaut.openapi.test.model.StateEnum;
 
@@ -125,5 +126,15 @@ public class ResponseBodyController implements ResponseBodyApi {
     public Mono<FileCustomizableResponseType> getFile() {
         var stream = new ByteArrayInputStream("My file content".getBytes());
         return Mono.just(new StreamedFile(stream, MediaType.TEXT_PLAIN_TYPE));
+    }
+
+    @Override
+    public Mono<ModelWithValidatedListProperty> getModelWithValidatedList() {
+        var model = new SimpleModel();
+        model.setColor("a");
+        List<SimpleModel> objectList = List.of(model);
+        var wrapperModel = new ModelWithValidatedListProperty();
+        wrapperModel.setObjectList(objectList);
+        return Mono.just(wrapperModel);
     }
 }

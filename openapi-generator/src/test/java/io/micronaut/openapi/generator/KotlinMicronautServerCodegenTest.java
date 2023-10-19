@@ -127,39 +127,38 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
         String modelPath = outputPath + "src/main/kotlin/org/openapitools/model/";
         assertFileContains(modelPath + "Pet.kt",
             """
-                data class Pet (
-                    @NotNull
-                    @Schema(name = "name", example = "doggie", requiredMode = Schema.RequiredMode.REQUIRED)
-                    @JsonProperty(JSON_PROPERTY_NAME)
-                    var name: String,
-                    @NotNull
-                    @Schema(name = "photoUrls", requiredMode = Schema.RequiredMode.REQUIRED)
-                    @JsonProperty(JSON_PROPERTY_PHOTO_URLS)
-                    var photoUrls: List<@NotNull String>,
-                    @Nullable
-                    @Schema(name = "id", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-                    @JsonProperty(JSON_PROPERTY_ID)
-                    @JsonInclude(JsonInclude.Include.USE_DEFAULTS)
-                    var id: Long? = null,
-                    @Nullable
-                    @Valid
-                    @Schema(name = "category", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-                    @JsonProperty(JSON_PROPERTY_CATEGORY)
-                    @JsonInclude(JsonInclude.Include.USE_DEFAULTS)
-                    var category: Category? = null,
-                    @Nullable
-                    @Valid
-                    @Schema(name = "tags", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-                    @JsonProperty(JSON_PROPERTY_TAGS)
-                    @JsonInclude(JsonInclude.Include.USE_DEFAULTS)
-                    var tags: List<Tag>? = null,
-                    @Nullable
-                    @Schema(name = "status", description = "pet status in the store", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-                    @JsonProperty(JSON_PROPERTY_STATUS)
-                    @JsonInclude(JsonInclude.Include.USE_DEFAULTS)
-                    var status: Status? = null,
-                ) {
-                """);
+            data class Pet (
+                @NotNull
+                @Schema(name = "name", example = "doggie", requiredMode = Schema.RequiredMode.REQUIRED)
+                @JsonProperty(JSON_PROPERTY_NAME)
+                var name: String,
+                @NotNull
+                @Schema(name = "photoUrls", requiredMode = Schema.RequiredMode.REQUIRED)
+                @JsonProperty(JSON_PROPERTY_PHOTO_URLS)
+                var photoUrls: List<@NotNull String>,
+                @Nullable
+                @Schema(name = "id", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+                @JsonProperty(JSON_PROPERTY_ID)
+                @JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                var id: Long? = null,
+                @Nullable
+                @Valid
+                @Schema(name = "category", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+                @JsonProperty(JSON_PROPERTY_CATEGORY)
+                @JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                var category: Category? = null,
+                @Nullable
+                @Schema(name = "tags", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+                @JsonProperty(JSON_PROPERTY_TAGS)
+                @JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                var tags: List<@Valid Tag>? = null,
+                @Nullable
+                @Schema(name = "status", description = "pet status in the store", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+                @JsonProperty(JSON_PROPERTY_STATUS)
+                @JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                var status: Status? = null,
+            ) {
+            """);
     }
 
     @Test

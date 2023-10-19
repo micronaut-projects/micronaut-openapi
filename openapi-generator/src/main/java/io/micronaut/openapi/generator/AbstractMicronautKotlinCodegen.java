@@ -64,6 +64,7 @@ import org.openapitools.codegen.utils.ModelUtils;
 import com.google.common.collect.ImmutableMap;
 import com.samskivert.mustache.Mustache;
 
+import static io.micronaut.openapi.generator.Utils.processGenericAnnotations;
 import static org.openapitools.codegen.CodegenConstants.INVOKER_PACKAGE;
 import static org.openapitools.codegen.languages.KotlinClientCodegen.DATE_LIBRARY;
 import static org.openapitools.codegen.utils.StringUtils.camelize;
@@ -703,8 +704,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
             }
 
             for (var param : op.allParams) {
-                Utils.processGenericAnnotations(param.dataType, param.datatypeWithEnum, param.isArray, param.items, param.vendorExtensions,
-                    useBeanValidation, false, param.isNullable || !param.required,
+                processGenericAnnotations(param, useBeanValidation, false, param.isNullable || !param.required,
                     param.required, false, true);
                 param.vendorExtensions.put("isString", "string".equalsIgnoreCase(param.dataType));
                 param.vendorExtensions.put("withoutExample", param.example == null || param.example.equals("null"));
@@ -712,6 +712,11 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
                     || (param.getIsArray() && param.getComplexType() != null && models.containsKey(param.getComplexType())))) {
                     param.vendorExtensions.put("withValid", true);
                 }
+            }
+
+            if (op.returnProperty != null) {
+                processGenericAnnotations(op.returnProperty, useBeanValidation, false, false, false, false, false);
+                op.returnType = op.returnProperty.vendorExtensions.get("typeWithEnumWithGenericAnnotations").toString();
             }
         }
 
@@ -1074,8 +1079,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
             property.vendorExtensions.put("withValid", true);
         }
 
-        Utils.processGenericAnnotations(property.dataType, property.datatypeWithEnum, property.isArray, property.items, property.vendorExtensions,
-            useBeanValidation, false, property.isNullable || property.isDiscriminator,
+        processGenericAnnotations(property, useBeanValidation, false, property.isNullable || property.isDiscriminator,
             property.required, property.isReadOnly, true);
     }
 

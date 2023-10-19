@@ -18,6 +18,7 @@ package io.micronaut.openapi.generator;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.openapitools.codegen.CodegenParameter;
 import org.openapitools.codegen.CodegenProperty;
 
 /**
@@ -30,23 +31,40 @@ public final class Utils {
     private Utils() {
     }
 
-    public static void processGenericAnnotations(String dataType, String dataTypeWithEnum, boolean isArray, CodegenProperty itemsProp, Map<String, Object> ext,
+    public static void processGenericAnnotations(CodegenParameter parameter, boolean useBeanValidation, boolean isGenerateHardNullable,
+                                           boolean isNullable, boolean isRequired, boolean isReadonly, boolean withNullablePostfix) {
+        CodegenProperty items = parameter.isMap ? parameter.additionalProperties : parameter.items;
+        String datatypeWithEnum = parameter.datatypeWithEnum == null ? parameter.dataType : parameter.datatypeWithEnum;
+        processGenericAnnotations(parameter.dataType, datatypeWithEnum, parameter.isArray, parameter.isMap, parameter.containerTypeMapped,
+            items, parameter.vendorExtensions, useBeanValidation, isGenerateHardNullable, isNullable, isRequired, isReadonly, withNullablePostfix);
+    }
+
+    public static void processGenericAnnotations(CodegenProperty property, boolean useBeanValidation, boolean isGenerateHardNullable,
+                                           boolean isNullable, boolean isRequired, boolean isReadonly, boolean withNullablePostfix) {
+        CodegenProperty items = property.isMap ? property.additionalProperties : property.items;
+        String datatypeWithEnum = property.datatypeWithEnum == null ? property.dataType : property.datatypeWithEnum;
+        processGenericAnnotations(property.dataType, datatypeWithEnum, property.isArray, property.isMap, property.containerTypeMapped,
+            items, property.vendorExtensions, useBeanValidation, isGenerateHardNullable, isNullable, isRequired, isReadonly, withNullablePostfix);
+    }
+
+    public static void processGenericAnnotations(String dataType, String dataTypeWithEnum, boolean isArray, boolean isMap, String containerType, CodegenProperty itemsProp, Map<String, Object> ext,
                                                  boolean useBeanValidation, boolean isGenerateHardNullable, boolean isNullable,
                                                  boolean isRequired, boolean isReadonly,
                                                  boolean withNullablePostfix) {
         var typeWithGenericAnnotations = dataType;
         var typeWithEnumWithGenericAnnotations = dataTypeWithEnum;
         var addedGenericAnnotations = false;
-        if (useBeanValidation && isArray && itemsProp != null && isPrimitive(itemsProp.openApiType) && dataType.contains("<")) {
-            var genericAnnotations = genericAnnotations(itemsProp, isGenerateHardNullable);
-            if (itemsProp.isArray) {
-                processGenericAnnotations(itemsProp.dataType, itemsProp.datatypeWithEnum, true, itemsProp.items, itemsProp.vendorExtensions,
-                    useBeanValidation, isGenerateHardNullable, itemsProp.isNullable, itemsProp.required, itemsProp.isReadOnly, withNullablePostfix);
-                typeWithGenericAnnotations = addGenericAnnotations((String) itemsProp.vendorExtensions.get("typeWithGenericAnnotations"), dataType, genericAnnotations);
-                typeWithEnumWithGenericAnnotations = addGenericAnnotations((String) itemsProp.vendorExtensions.get("typeWithEnumWithGenericAnnotations"), dataTypeWithEnum, genericAnnotations);
-            } else {
-                typeWithGenericAnnotations = addGenericAnnotations(dataType, null, genericAnnotations);
-                typeWithEnumWithGenericAnnotations = addGenericAnnotations(dataTypeWithEnum, null, genericAnnotations);
+        if (useBeanValidation && itemsProp != null && dataType.contains("<")) {
+            if (isMap) {
+                var genericAnnotations = genericAnnotations(itemsProp, isGenerateHardNullable);
+                processGenericAnnotations(itemsProp, useBeanValidation, isGenerateHardNullable, itemsProp.isNullable, itemsProp.required, itemsProp.isReadOnly, withNullablePostfix);
+                typeWithGenericAnnotations = "Map<String, " + genericAnnotations + itemsProp.vendorExtensions.get("typeWithGenericAnnotations") + ">";
+                typeWithEnumWithGenericAnnotations = "Map<String, " + genericAnnotations + itemsProp.vendorExtensions.get("typeWithEnumWithGenericAnnotations") + ">";
+            } else if (containerType != null) {
+                var genericAnnotations = genericAnnotations(itemsProp, isGenerateHardNullable);
+                processGenericAnnotations(itemsProp, useBeanValidation, isGenerateHardNullable, itemsProp.isNullable, itemsProp.required, itemsProp.isReadOnly, withNullablePostfix);
+                typeWithGenericAnnotations = containerType + "<" + genericAnnotations + itemsProp.vendorExtensions.get("typeWithGenericAnnotations") + ">";
+                typeWithEnumWithGenericAnnotations = containerType + "<" + genericAnnotations + itemsProp.vendorExtensions.get("typeWithEnumWithGenericAnnotations") + ">";
             }
         }
 
@@ -56,11 +74,19 @@ public final class Utils {
 
     private static String genericAnnotations(CodegenProperty prop, boolean isGenerateHardNullable) {
 
-        var type = prop.openApiType.toLowerCase();
+        var type = prop.openApiType == null ? null : prop.openApiType.toLowerCase();
 
         var result = new StringBuilder();
+
+        if (prop.isModel) {
+            result.append("@Valid ");
+        }
+        if (!isPrimitive(type)) {
+            return result.toString();
+        }
+
         if (StringUtils.isNotEmpty(prop.pattern)) {
-            if (type.equals("email")) {
+            if ("email".equals(type)) {
                 result.append("@Email(regexp = \"");
             } else {
                 result.append("@Pattern(regexp = \"");
@@ -169,20 +195,11 @@ public final class Utils {
         return result.toString();
     }
 
-    public static String addGenericAnnotations(String type, String wrapType, String genericAnnotations) {
-        if (StringUtils.isEmpty(type) || StringUtils.isEmpty(genericAnnotations)) {
-            return type;
-        }
-        var t = wrapType != null ? wrapType : type;
-        var diamondOpen = t.indexOf('<');
-        var diamondClose = t.lastIndexOf('>');
-        var containerType = t.substring(0, diamondOpen);
-        var elementType = t.substring(diamondOpen + 1, diamondClose);
-        return containerType + '<' + genericAnnotations + (wrapType != null ? type : elementType) + '>';
-    }
-
     private static boolean isPrimitive(String type) {
-        return switch (type.toLowerCase()) {
+        if (type == null) {
+            return false;
+        }
+        return switch (type) {
             case "array", "string", "boolean", "byte", "uri", "url", "uuid", "email", "integer", "long", "float", "double",
                 "number", "partial-time", "date", "date-time", "bigdecimal", "biginteger" -> true;
             default -> false;
