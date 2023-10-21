@@ -6,7 +6,6 @@ import io.micronaut.test.extensions.junit5.annotation.MicronautTest
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Disabled
-import jakarta.inject.Inject
 {{#wrapInHttpResponse}}
 import io.micronaut.http.HttpResponse
 {{/wrapInHttpResponse}}
@@ -18,7 +17,6 @@ import io.micronaut.http.HttpResponse
 class {{classname}}Test(
     val api: {{classname}},
 ) {
-
     {{#operations}}{{#operation}}
     /**
      * {{summary}}
