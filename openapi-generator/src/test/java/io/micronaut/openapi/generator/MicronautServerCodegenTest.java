@@ -207,7 +207,7 @@ class MicronautServerCodegenTest extends AbstractMicronautCodegenTest {
         String outputPath = generateFiles(codegen, PETSTORE_PATH, CodegenConstants.MODELS, CodegenConstants.APIS);
 
         String apiPath = outputPath + "src/main/java/org/openapitools/api/";
-        assertFileContains(apiPath + "PetApi.java", "Mono<HttpResponse<Pet>>");
+        assertFileContains(apiPath + "PetApi.java", "Mono<HttpResponse<@Valid Pet>>");
     }
 
     @Test
@@ -219,8 +219,8 @@ class MicronautServerCodegenTest extends AbstractMicronautCodegenTest {
         String outputPath = generateFiles(codegen, PETSTORE_PATH, CodegenConstants.MODELS, CodegenConstants.APIS);
 
         String apiPath = outputPath + "src/main/java/org/openapitools/api/";
-        assertFileContains(apiPath + "PetApi.java", "Mono<Pet>");
-        assertFileNotContains(apiPath + "PetApi.java", "Flux<Pet>");
+        assertFileContains(apiPath + "PetApi.java", "Mono<@Valid Pet>");
+        assertFileNotContains(apiPath + "PetApi.java", "Flux<@Valid Pet>");
         assertFileNotContains(apiPath + "PetApi.java", "HttpResponse");
     }
 
@@ -233,8 +233,8 @@ class MicronautServerCodegenTest extends AbstractMicronautCodegenTest {
         String outputPath = generateFiles(codegen, PETSTORE_PATH, CodegenConstants.MODELS, CodegenConstants.APIS);
 
         String apiPath = outputPath + "src/main/java/org/openapitools/api/";
-        assertFileContains(apiPath + "PetApi.java", "Mono<Pet>");
-        assertFileContains(apiPath + "PetApi.java", "Flux<Pet>");
+        assertFileContains(apiPath + "PetApi.java", "Mono<@Valid Pet>");
+        assertFileContains(apiPath + "PetApi.java", "Flux<@Valid Pet>");
         assertFileNotContains(apiPath + "PetApi.java", "HttpResponse");
     }
 
@@ -246,7 +246,7 @@ class MicronautServerCodegenTest extends AbstractMicronautCodegenTest {
         String outputPath = generateFiles(codegen, PETSTORE_PATH, CodegenConstants.MODELS, CodegenConstants.APIS);
 
         String apiPath = outputPath + "src/main/java/org/openapitools/api/";
-        assertFileContains(apiPath + "PetApi.java", "HttpResponse<Pet>");
+        assertFileContains(apiPath + "PetApi.java", "HttpResponse<@Valid Pet>");
         assertFileNotContains(apiPath + "PetApi.java", "Mono");
     }
 
@@ -340,5 +340,18 @@ class MicronautServerCodegenTest extends AbstractMicronautCodegenTest {
         assertFileContains(apiPath + "BookInfo.java", "public BookInfo(String name)");
         assertFileContains(apiPath + "BasicBookInfo.java", "public BasicBookInfo(String author, String name)", "super(name)");
         assertFileContains(apiPath + "DetailedBookInfo.java", "public DetailedBookInfo(String isbn, String name, String author)", "super(author, name)");
+    }
+
+    @Test
+    void testGenericAnnotations() {
+
+        var codegen = new JavaMicronautServerCodegen();
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/modelwithprimitivelist.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String apiPath = outputPath + "src/main/java/org/openapitools/api/";
+        String modelPath = outputPath + "src/main/java/org/openapitools/model/";
+
+        assertFileContains(apiPath + "BooksApi.java", "@Body @NotNull List<@Pattern(regexp = \"[a-zA-Z ]+\") @Size(max = 10) @NotNull String> requestBody");
+        assertFileContains(modelPath + "CountsContainer.java", "private List<@NotEmpty List<@NotNull List<@Size(max = 10) @NotNull String>>> counts;");
+        assertFileContains(modelPath + "BooksContainer.java", "private List<@Pattern(regexp = \"[a-zA-Z ]+\") @Size(max = 10) @NotNull String> books;");
     }
 }

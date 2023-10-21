@@ -38,7 +38,7 @@ public abstract class AbstractMicronautCodegenTest {
         } catch (IOException e) {
             fail("Unable to create temporary directory for output");
         }
-        output.deleteOnExit();
+//        output.deleteOnExit();
 
         MicronautCodeGeneratorEntryPoint.builder()
             .forCodeGenerator(codegen, unused -> {

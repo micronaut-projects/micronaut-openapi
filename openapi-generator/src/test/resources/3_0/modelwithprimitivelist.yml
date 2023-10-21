@@ -1,0 +1,159 @@
+openapi: 3.0.0
+info:
+  description: This is a library API
+  version: 1.0.0
+  title: Library
+  license:
+    name: Apache-2.0
+    url: "https://www.apache.org/licenses/LICENSE-2.0.html"
+tags:
+  - name: books
+    description: Add books
+paths:
+  /add-book:
+    post:
+      tags: [books]
+      summary: Add a new book
+      operationId: addBook
+      requestBody:
+        required: true
+        content:
+          "application/json":
+            schema:
+              $ref: "#/components/schemas/Book"
+      responses:
+        "200":
+          description: Success
+        "400":
+          description: Bad Request
+  /add-book-in-container:
+    post:
+      tags: [books]
+      summary: Add a new book
+      operationId: addBookInContainer
+      requestBody:
+        required: true
+        content:
+          "application/json":
+            schema:
+              $ref: "#/components/schemas/BookContainer"
+      responses:
+        "200":
+          description: Success
+        "400":
+          description: Bad Request
+  /add-books:
+    post:
+      tags: [books]
+      summary: Add new books
+      operationId: addBooks
+      requestBody:
+        required: true
+        content:
+          "application/json":
+            schema:
+              $ref: "#/components/schemas/Books"
+      responses:
+        "200":
+          description: Success
+        "400":
+          description: Bad Request
+  /add-books-in-container:
+    post:
+      tags: [books]
+      summary: Add new books
+      operationId: addBooksInContainer
+      requestBody:
+        required: true
+        content:
+          "application/json":
+            schema:
+              $ref: "#/components/schemas/BooksContainer"
+      responses:
+        "200":
+          description: Success
+        "400":
+          description: Bad Request
+  /add-count-in-container:
+    post:
+      tags: [books]
+      summary: Add a new count
+      operationId: addCountInContainer
+      requestBody:
+        required: true
+        content:
+          "application/json":
+            schema:
+              $ref: "#/components/schemas/CountContainer"
+      responses:
+        "200":
+          description: Success
+        "400":
+          description: Bad Request
+  /add-counts-in-container:
+    post:
+      tags: [books]
+      summary: Add new counts
+      operationId: addCountsInContainer
+      requestBody:
+        required: true
+        content:
+          "application/json":
+            schema:
+              $ref: "#/components/schemas/CountsContainer"
+      responses:
+        "200":
+          description: Success
+        "400":
+          description: Bad Request
+components:
+  schemas:
+    Book:
+      type: string
+      maxLength: 10
+      pattern: "[a-zA-Z ]+"
+    Books:
+      type: array
+      items:
+        $ref: "#/components/schemas/Book"
+    BookContainer:
+      type: object
+      properties:
+        book:
+          $ref: "#/components/schemas/Book"
+      required:
+        - book
+    BooksContainer:
+      type: object
+      properties:
+        books:
+          $ref: "#/components/schemas/Books"
+      required:
+        - books
+    Count:
+      type: array
+      items:
+        type: array
+        items:
+          type: string
+          maxLength: 10
+        minLength: 1
+      minItems: 1
+    Counts:
+      type: array
+      items:
+        $ref: "#/components/schemas/Count"
+    CountContainer:
+      type: object
+      properties:
+        count:
+          $ref: "#/components/schemas/Count"
+      required:
+        - count
+    CountsContainer:
+      type: object
+      properties:
+        counts:
+          $ref: "#/components/schemas/Counts"
+      required:
+        - counts

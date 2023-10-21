@@ -7,15 +7,7 @@ import java.util.List;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Post;
 import io.micronaut.http.multipart.CompletedFileUpload;
-import io.micronaut.openapi.test.model.Animal;
-import io.micronaut.openapi.test.model.ColorEnum;
-import io.micronaut.openapi.test.model.DateModel;
-import io.micronaut.openapi.test.model.ModelWithEnumList;
-import io.micronaut.openapi.test.model.ModelWithInnerEnum;
-import io.micronaut.openapi.test.model.ModelWithMapProperty;
-import io.micronaut.openapi.test.model.ModelWithRequiredProperties;
-import io.micronaut.openapi.test.model.NestedModel;
-import io.micronaut.openapi.test.model.SimpleModel;
+import io.micronaut.openapi.test.model.*;
 
 import jakarta.validation.Valid;
 import reactor.core.publisher.Mono;
@@ -29,13 +21,13 @@ public class RequestBodyController implements RequestBodyApi {
     }
 
     @Override
-    public Mono<Void> sendValidatedCollection(List<List<String>> collection) {
-        return Mono.empty();
+    public Mono<SimpleModel> sendSimpleModel(SimpleModel simpleModel) {
+        return Mono.just(simpleModel);
     }
 
     @Override
-    public Mono<SimpleModel> sendSimpleModel(SimpleModel simpleModel) {
-        return Mono.just(simpleModel);
+    public Mono<Void> sendValidatedCollection(List<List<String>> requestBody) {
+        return null;
     }
 
     @Override
@@ -67,6 +59,11 @@ public class RequestBodyController implements RequestBodyApi {
     @Override
     public Mono<ModelWithMapProperty> sendModelWithMapProperty(ModelWithMapProperty model) {
         return Mono.just(model);
+    }
+
+    @Override
+    public Mono<Void> sendModelWithValidatedListProperty(ModelWithValidatedListProperty model) {
+        return Mono.empty();
     }
 
     @Override
