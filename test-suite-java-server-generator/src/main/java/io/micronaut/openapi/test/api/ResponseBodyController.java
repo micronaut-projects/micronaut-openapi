@@ -79,7 +79,7 @@ public class ResponseBodyController implements ResponseBodyApi {
 
     @Override
     public Mono<DatedResponse<SimpleModel>> getDatedSimpleModel() {
-        return Mono.just(DatedResponse.of(SIMPLE_MODEL).withLastModified(LAST_MODIFIED_DATE));
+        return Mono.just(DatedResponse.of(SIMPLE_MODEL, LAST_MODIFIED_DATE));
     }
 
     @Override
@@ -89,8 +89,7 @@ public class ResponseBodyController implements ResponseBodyApi {
 
     @Override
     public Mono<HttpResponse<DatedResponse<SimpleModel>>> getDatedSimpleModelWithNonMappedHeader() {
-        DatedResponse<SimpleModel> datedResponse = DatedResponse.of(SIMPLE_MODEL)
-            .withLastModified(LAST_MODIFIED_DATE);
+        DatedResponse<SimpleModel> datedResponse = DatedResponse.of(SIMPLE_MODEL, LAST_MODIFIED_DATE);
         return Mono.just(HttpResponse.ok(datedResponse)
             .header("custom-header", "custom-value"));
     }

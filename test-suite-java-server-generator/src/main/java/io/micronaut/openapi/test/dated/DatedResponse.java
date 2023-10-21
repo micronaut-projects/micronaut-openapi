@@ -1,9 +1,9 @@
 package io.micronaut.openapi.test.dated;
 
+import java.time.ZonedDateTime;
+
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.core.annotation.Nullable;
-
-import java.time.ZonedDateTime;
 
 /**
  * A response that contains information about last modification.
@@ -56,7 +56,7 @@ public final class DatedResponse<T> {
      * @param <T> The response body type.
      */
     public static <T> DatedResponse<T> of(@NonNull T body) {
-        return new DatedResponse<T>(body, null);
+        return new DatedResponse<>(body, null);
     }
 
     /**
@@ -68,6 +68,6 @@ public final class DatedResponse<T> {
      * @param <T> The body type.
      */
     public static <T> DatedResponse<T> of(@NonNull T body, @Nullable ZonedDateTime lastModified) {
-        return new DatedResponse<T>(body, lastModified);
+        return new DatedResponse<>(body, lastModified);
     }
 }

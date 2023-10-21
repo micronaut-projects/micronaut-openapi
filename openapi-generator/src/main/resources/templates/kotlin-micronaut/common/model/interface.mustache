@@ -49,19 +49,6 @@
     {{/formatNoEmptyLines}}
 {{/vars}}
 
-    companion object {
-    {{#serializableModel}}
-
-        @Serial
-        @JvmStatic
-        private val serialVersionUID = {{{vendorExtensions.serialId}}}L
-    {{/serializableModel}}
-
-    {{#vars}}
-        const val JSON_PROPERTY_{{nameInSnakeCase}} = "{{baseName}}"
-    {{/vars}}
-    }
-
     {{#vars}}
         {{#isEnum}}
             {{^isContainer}}
@@ -78,4 +65,17 @@
             {{/isContainer}}
         {{/isEnum}}
     {{/vars}}
+
+    companion object {
+    {{#serializableModel}}
+
+        @Serial
+        @JvmStatic
+        private val serialVersionUID = {{{vendorExtensions.serialId}}}L
+    {{/serializableModel}}
+
+    {{#vars}}
+        const val JSON_PROPERTY_{{nameInSnakeCase}} = "{{baseName}}"
+    {{/vars}}
+    }
 {{closebrace}}

@@ -19,10 +19,6 @@ import {{javaxPackage}}.annotation.Generated
 @Singleton
 open class AuthorizationBinder : AnnotatedClientRequestBinder<Authorization> {
 
-    companion object {
-        var AUTHORIZATION_NAMES = "micronaut.security.AUTHORIZATION_NAMES"
-    }
-
     @NonNull
     @Override
     override fun getAnnotationType(): Class<Authorization> {
@@ -50,5 +46,9 @@ open class AuthorizationBinder : AnnotatedClientRequestBinder<Authorization> {
 
     private fun configurationName(name: String): String {
         return NameUtils.hyphenate(name.replace('.', '_'), true)
+    }
+
+    companion object {
+        var AUTHORIZATION_NAMES = "micronaut.security.AUTHORIZATION_NAMES"
     }
 }

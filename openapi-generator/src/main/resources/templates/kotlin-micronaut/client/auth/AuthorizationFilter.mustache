@@ -32,15 +32,11 @@ import {{javaxPackage}}.annotation.Generated
 {{/generatedAnnotation}}
 @Filter({{#configureAuthFilterPattern}}"{{authorizationFilterPattern}}"{{/configureAuthFilterPattern}}{{^configureAuthFilterPattern}}Filter.MATCH_ALL_PATTERN{{/configureAuthFilterPattern}})
 open class AuthorizationFilter(
-        private val beanContext: BeanContext,
-        var defaultTokenPropagator: ClientCredentialsTokenPropagator,
-        clientConfigurations: Stream<OauthClientConfiguration>,
-        configurableAuthorizations: Stream<ConfigurableAuthorization>
+    defaultTokenPropagator: ClientCredentialsTokenPropagator,
+    clientConfigurations: Stream<OauthClientConfiguration>,
+    configurableAuthorizations: Stream<ConfigurableAuthorization>,
+    private val beanContext: BeanContext,
 ) : HttpClientFilter {
-
-    companion object {
-        private val log = LoggerFactory.getLogger(ClientCredentialsHttpClientFilter::class.java)
-    }
 
     val authorizationsByName: Map<String, ConfigurableAuthorization?>
 
@@ -130,5 +126,9 @@ open class AuthorizationFilter(
         return oauthClient.clientCredentials
                 .flatMap { obj: ClientCredentialsConfiguration -> obj.scope }
                 .orElse(null)
+    }
+
+    companion object {
+        private val log = LoggerFactory.getLogger(ClientCredentialsHttpClientFilter::class.java)
     }
 }

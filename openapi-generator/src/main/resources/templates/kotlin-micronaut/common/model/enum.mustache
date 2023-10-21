@@ -17,7 +17,7 @@
 {{{.}}}
 {{/additionalEnumTypeAnnotations}}
 {{#nonPublicApi}}internal {{/nonPublicApi}}{{#formatSingleLine}}enum class {{>common/model/enumName}}{{/formatSingleLine}} (
-        @get:JsonValue val value: String
+    @get:JsonValue val value: String
 ) {
 
     {{#allowableValues}}
@@ -41,6 +41,7 @@
 
     companion object {
 
+        @JvmField
         val VALUE_MAPPING = entries.associateBy { it.value }
 
         /**

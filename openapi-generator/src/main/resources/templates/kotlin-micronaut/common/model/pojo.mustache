@@ -58,18 +58,6 @@
 {{/vendorExtensions.withInheritance}}
 {{/formatNoEmptyLines}}){{#parent}}: {{{parent}}}({{#vendorExtensions.requiredParentVarsWithoutDiscriminator}}{{name}}{{^-last}}, {{/-last}}{{/vendorExtensions.requiredParentVarsWithoutDiscriminator}}) {{/parent}}{{#vendorExtensions.x-implements}}{{#parent}}, {{/parent}}{{^parent}}: {{/parent}}{{^-first}}, {{{.}}}{{/-first}}{{#-last}} {{/-last}}{{/vendorExtensions.x-implements}} {{openbrace}}
 
-    companion object {
-    {{#serializableModel}}
-
-        @Serial
-        @JvmStatic
-        private val serialVersionUID = {{{vendorExtensions.serialId}}}L
-    {{/serializableModel}}
-
-    {{#vars}}
-        const val JSON_PROPERTY_{{nameInSnakeCase}} = "{{baseName}}"
-    {{/vars}}
-    }
     {{#vendorExtensions.withInheritance}}
 
     override fun equals(other: Any?): Boolean {
@@ -122,5 +110,19 @@
                 {{/mostInnerItems}}
             {{/isContainer}}
         {{/isEnum}}
+
     {{/vars}}
+
+    companion object {
+    {{#serializableModel}}
+
+        @Serial
+        @JvmStatic
+        private val serialVersionUID = {{{vendorExtensions.serialId}}}L
+    {{/serializableModel}}
+
+    {{#vars}}
+        const val JSON_PROPERTY_{{nameInSnakeCase}} = "{{baseName}}"
+    {{/vars}}
+    }
 {{closebrace}}
