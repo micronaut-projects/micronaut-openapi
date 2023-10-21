@@ -15,10 +15,10 @@ import io.micronaut.http.HttpResponse
  * API tests for {{classname}}
  */
 @MicronautTest
-class {{classname}}Test {
+class {{classname}}Test(
+    val api: {{classname}},
+) {
 
-    @Inject
-    lateinit var api: {{classname}}
     {{#operations}}{{#operation}}
     /**
      * {{summary}}

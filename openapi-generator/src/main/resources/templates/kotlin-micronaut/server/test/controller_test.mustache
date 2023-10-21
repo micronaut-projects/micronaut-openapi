@@ -31,17 +31,12 @@ import java.io.IOException
  * API tests for {{classname}}
  */
 @MicronautTest
-class {{classname}}Test {
-
-    @Inject
-    lateinit var server: EmbeddedServer
-
-    @Inject
+class {{classname}}Test(
+    val server: EmbeddedServer
     @Client
-    lateinit var client: HttpClient
-
-    @Inject
-    lateinit var controller: {{classname}}
+    val client: HttpClient,
+    val controller: {{classname}},
+) {
 
     {{#operations}}
     {{#operation}}
