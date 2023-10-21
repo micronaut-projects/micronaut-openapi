@@ -14,17 +14,15 @@ import {{javaxPackage}}.annotation.Generated
 {{>common/generatedAnnotation}}
 {{/generatedAnnotation}}
 @EachProperty("security.basic-auth")
-open class HttpBasicAuthConfiguration @ConfigurationInject constructor(
-        @Parameter val name: String,
-        @NonNull var username: String,
-        @NonNull var password: String
+data class HttpBasicAuthConfiguration(
+    @Parameter val name: String,
+    @NonNull var username: String,
+    @NonNull var password: String
 ) : ConfigurableAuthorization {
 
-    @Override
     override fun applyAuthorization(@NonNull request: MutableHttpRequest<*>) {
         request.basicAuth(username, password)
     }
 
-    @Override
     override fun getName() = name
 }

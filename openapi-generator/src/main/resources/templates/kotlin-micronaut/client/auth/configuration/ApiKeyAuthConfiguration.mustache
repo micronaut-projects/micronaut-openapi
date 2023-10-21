@@ -15,14 +15,13 @@ import {{javaxPackage}}.annotation.Generated
 {{>common/generatedAnnotation}}
 {{/generatedAnnotation}}
 @EachProperty("security.api-key-auth")
-open class ApiKeyAuthConfiguration @ConfigurationInject constructor(
-        @Parameter val name: String,
-        @NonNull var location: AuthKeyLocation,
-        @NonNull var paramName: String,
-        @NonNull var apiKey: String
+data class ApiKeyAuthConfiguration(
+    @Parameter val name: String,
+    @NonNull var location: AuthKeyLocation,
+    @NonNull var paramName: String,
+    @NonNull var apiKey: String
 ): ConfigurableAuthorization {
 
-    @Override
     override fun applyAuthorization(@NonNull request: MutableHttpRequest<*>) {
         when (location) {
             AuthKeyLocation.HEADER -> {
@@ -36,7 +35,7 @@ open class ApiKeyAuthConfiguration @ConfigurationInject constructor(
             }
         }
     }
-    @Override
+
     override fun getName() = name
 
     enum class AuthKeyLocation {

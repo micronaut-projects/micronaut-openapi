@@ -20,12 +20,10 @@ import {{javaxPackage}}.annotation.Generated
 open class AuthorizationBinder : AnnotatedClientRequestBinder<Authorization> {
 
     @NonNull
-    @Override
     override fun getAnnotationType(): Class<Authorization> {
         return Authorization::class.java
     }
 
-    @Override
     override fun bind(@NonNull context: MethodInvocationContext<Any, Any>,
              @NonNull uriContext: ClientRequestUriContext,
              @NonNull request: MutableHttpRequest<*>
