@@ -210,7 +210,7 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
         var codegen = new KotlinMicronautServerCodegen();
         codegen.additionalProperties().put(KotlinMicronautServerCodegen.OPT_REACTIVE, "true");
         codegen.additionalProperties().put(KotlinMicronautServerCodegen.OPT_GENERATE_HTTP_RESPONSE_ALWAYS, "true");
-        String outputPath = generateFiles(codegen, PETSTORE_PATH, CodegenConstants.MODELS, CodegenConstants.APIS);
+        String outputPath = generateFiles(codegen, PETSTORE_PATH, CodegenConstants.MODELS, CodegenConstants.APIS, CodegenConstants.MODEL_TESTS);
 
         String apiPath = outputPath + "src/main/kotlin/org/openapitools/api/";
         assertFileContains(apiPath + "PetApi.kt", "Mono<HttpResponse<Pet>>");

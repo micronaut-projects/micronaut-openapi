@@ -10,16 +10,22 @@ import org.junit.jupiter.api.Assertions
  * Model tests for {{classname}}
  */
 @MicronautTest
-class {{classname}}Test {
+class {{classname}}Test(
+{{#models}}
+    {{#model}}
+        {{^vendorExtensions.x-is-one-of-interface}}
+            {{^isEnum}}
+    val model: {{classname}}? = null,
+            {{/isEnum}}
+        {{/vendorExtensions.x-is-one-of-interface}}
+    {{/model}}
+{{/models}}
+) {
 
     {{#models}}
     {{#model}}
     {{^vendorExtensions.x-is-one-of-interface}}
-    {{^isEnum}}
-    val model: {{classname}}? = null
-
-    {{/isEnum}}
-    /**
+        /**
      * Model tests for {{classname}}
      */
     @Test
