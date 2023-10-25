@@ -20,7 +20,6 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import io.micronaut.core.annotation.Internal;
 import io.micronaut.openapi.OpenApiUtils;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.responses.ApiResponses;
@@ -37,7 +36,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  *
  * @since 4.6.0
  */
-@Internal
 public class ApiResponsesDeserializer extends JsonDeserializer<ApiResponses> {
 
     protected boolean openapi31;

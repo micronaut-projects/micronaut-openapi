@@ -17,8 +17,6 @@ package io.micronaut.openapi.swagger.core.jackson;
 
 import java.io.IOException;
 
-import io.micronaut.core.annotation.Internal;
-import io.micronaut.core.util.StringUtils;
 import io.swagger.v3.oas.models.media.Schema;
 
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -32,7 +30,6 @@ import com.fasterxml.jackson.databind.ser.ResolvableSerializer;
  *
  * @since 4.6.0
  */
-@Internal
 public class SchemaSerializer extends JsonSerializer<Schema> implements ResolvableSerializer {
 
     private JsonSerializer<Object> defaultSerializer;
@@ -51,7 +48,7 @@ public class SchemaSerializer extends JsonSerializer<Schema> implements Resolvab
     @Override
     public void serialize(Schema value, JsonGenerator jgen, SerializerProvider provider) throws IOException {
 
-        if (!StringUtils.hasText(value.get$ref())) {
+        if (value.get$ref() == null || value.get$ref().isBlank()) {
 
             if (value.getExampleSetFlag() && value.getExample() == null) {
                 jgen.writeStartObject();

@@ -18,7 +18,6 @@ package io.micronaut.openapi.swagger.core.util;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import io.micronaut.core.annotation.Internal;
 import io.micronaut.openapi.swagger.core.jackson.ExampleSerializer;
 import io.micronaut.openapi.swagger.core.jackson.MediaTypeSerializer;
 import io.micronaut.openapi.swagger.core.jackson.Schema31Serializer;
@@ -95,7 +94,6 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
  *
  * @since 4.6.0
  */
-@Internal
 public class ObjectMapperFactory {
 
     private ObjectMapperFactory() {

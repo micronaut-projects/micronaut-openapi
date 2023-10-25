@@ -18,8 +18,6 @@ package io.micronaut.openapi.swagger.core.jackson;
 import java.io.IOException;
 import java.util.Map.Entry;
 
-import io.micronaut.core.annotation.Internal;
-import io.micronaut.core.util.StringUtils;
 import io.swagger.v3.oas.models.PathItem;
 import io.swagger.v3.oas.models.callbacks.Callback;
 
@@ -32,7 +30,6 @@ import com.fasterxml.jackson.databind.SerializerProvider;
  *
  * @since 4.6.0
  */
-@Internal
 public class CallbackSerializer extends JsonSerializer<Callback> {
 
     @Override
@@ -43,7 +40,7 @@ public class CallbackSerializer extends JsonSerializer<Callback> {
             jgen.writeStartObject();
 
             // not a ref
-            if (!StringUtils.hasText(value.get$ref())) {
+            if (value.get$ref() == null || value.get$ref().isBlank()) {
                 if (!value.isEmpty()) {
                     // write map
                     for (Entry<String, PathItem> entry : value.entrySet()) {
@@ -58,7 +55,7 @@ public class CallbackSerializer extends JsonSerializer<Callback> {
             }
             jgen.writeEndObject();
         } else {
-            if (value == null || !StringUtils.hasText(value.get$ref())) {
+            if (value == null || value.get$ref() == null || value.get$ref().isBlank()) {
                 provider.defaultSerializeValue(value, jgen);
             } else { // handle ref schema serialization skipping all other props
                 jgen.writeStartObject();

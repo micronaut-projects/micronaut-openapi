@@ -17,7 +17,6 @@ package io.micronaut.openapi.swagger.core.jackson;
 
 import java.io.IOException;
 
-import io.micronaut.core.annotation.Internal;
 import io.swagger.v3.oas.models.examples.Example;
 
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -31,7 +30,6 @@ import com.fasterxml.jackson.databind.ser.ResolvableSerializer;
  *
  * @since 5.0.0
  */
-@Internal
 public class ExampleSerializer extends JsonSerializer<Example> implements ResolvableSerializer {
 
     private JsonSerializer<Object> defaultSerializer;

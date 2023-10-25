@@ -17,7 +17,6 @@ package io.micronaut.openapi.swagger.core.jackson.mixin;
 
 import java.util.Map;
 
-import io.micronaut.core.annotation.Internal;
 import io.micronaut.openapi.swagger.core.jackson.CallbackSerializer;
 import io.swagger.v3.oas.models.PathItem;
 import io.swagger.v3.oas.models.callbacks.Callback;
@@ -32,7 +31,6 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
  *
  * @since 4.6.0
  */
-@Internal
 public abstract class ComponentsMixin {
 
     @JsonAnyGetter

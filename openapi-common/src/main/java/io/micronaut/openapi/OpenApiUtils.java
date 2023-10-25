@@ -18,7 +18,6 @@ package io.micronaut.openapi;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import io.micronaut.core.annotation.Internal;
 import io.micronaut.openapi.swagger.core.util.ObjectMapperFactory;
 
 /**
@@ -26,7 +25,6 @@ import io.micronaut.openapi.swagger.core.util.ObjectMapperFactory;
  *
  * @since 4.4.1
  */
-@Internal
 public final class OpenApiUtils {
 
     /**

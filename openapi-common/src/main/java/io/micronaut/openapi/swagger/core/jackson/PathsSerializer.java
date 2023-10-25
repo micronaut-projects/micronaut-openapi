@@ -18,7 +18,6 @@ package io.micronaut.openapi.swagger.core.jackson;
 import java.io.IOException;
 import java.util.Map.Entry;
 
-import io.micronaut.core.annotation.Internal;
 import io.swagger.v3.oas.models.PathItem;
 import io.swagger.v3.oas.models.Paths;
 
@@ -31,7 +30,6 @@ import com.fasterxml.jackson.databind.SerializerProvider;
  *
  * @since 4.6.0
  */
-@Internal
 public class PathsSerializer extends JsonSerializer<Paths> {
 
     @Override

@@ -20,7 +20,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-import io.micronaut.core.annotation.Internal;
 import io.micronaut.openapi.OpenApiUtils;
 import io.swagger.v3.oas.models.OpenAPI;
 
@@ -35,7 +34,6 @@ import static io.micronaut.openapi.adoc.utils.FileUtils.loadFileFromClasspath;
  *
  * @since 5.2.0
  */
-@Internal
 public final class SwaggerUtils {
 
     private SwaggerUtils() {

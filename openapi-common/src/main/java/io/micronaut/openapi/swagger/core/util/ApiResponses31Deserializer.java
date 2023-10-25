@@ -15,14 +15,11 @@
  */
 package io.micronaut.openapi.swagger.core.util;
 
-import io.micronaut.core.annotation.Internal;
-
 /**
  * This class is copied from swagger-core library.
  *
  * @since 4.6.0
  */
-@Internal
 public class ApiResponses31Deserializer extends ApiResponsesDeserializer {
 
     public ApiResponses31Deserializer() {

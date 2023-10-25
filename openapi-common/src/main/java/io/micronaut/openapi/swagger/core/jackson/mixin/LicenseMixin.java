@@ -17,8 +17,6 @@ package io.micronaut.openapi.swagger.core.jackson.mixin;
 
 import java.util.Map;
 
-import io.micronaut.core.annotation.Internal;
-
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -28,7 +26,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  *
  * @since 4.6.0
  */
-@Internal
 public abstract class LicenseMixin {
 
     @JsonAnyGetter

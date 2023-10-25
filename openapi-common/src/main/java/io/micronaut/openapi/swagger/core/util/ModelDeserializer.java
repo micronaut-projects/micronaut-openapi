@@ -23,8 +23,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import io.micronaut.core.annotation.Internal;
-import io.micronaut.core.util.StringUtils;
 import io.micronaut.openapi.OpenApiUtils;
 import io.micronaut.openapi.SimpleSchema;
 import io.swagger.v3.oas.models.media.ArraySchema;
@@ -57,7 +55,6 @@ import com.fasterxml.jackson.databind.node.TextNode;
  *
  * @since 4.6.0
  */
-@Internal
 public class ModelDeserializer extends JsonDeserializer<Schema> {
 
     protected boolean openapi31;
@@ -92,7 +89,7 @@ public class ModelDeserializer extends JsonDeserializer<Schema> {
         } else if (type != null) {
             if (type.textValue().equals("integer")) {
                 schema = OpenApiUtils.getJsonMapper().convertValue(node, IntegerSchema.class);
-                if (!StringUtils.hasText(format)) {
+                if (format == null || format.isBlank()) {
                     schema.setFormat(null);
                 }
             } else if (type.textValue().equals("number")) {

@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Iterator;
 
-import io.micronaut.core.annotation.Internal;
 import io.micronaut.openapi.OpenApiUtils;
 import io.swagger.v3.oas.models.security.OAuthFlows;
 import io.swagger.v3.oas.models.security.SecurityScheme;
@@ -36,7 +35,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  *
  * @since 4.6.0
  */
-@Internal
 public class SecuritySchemeDeserializer extends JsonDeserializer<SecurityScheme> {
 
     protected boolean openapi31;

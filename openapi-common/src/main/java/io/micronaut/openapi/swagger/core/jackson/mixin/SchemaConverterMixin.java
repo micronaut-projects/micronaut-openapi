@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import io.micronaut.core.annotation.Internal;
 import io.swagger.v3.oas.models.media.Schema;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
@@ -34,7 +33,6 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
  *
  * @since 4.6.0
  */
-@Internal
 public abstract class SchemaConverterMixin {
 
     @JsonIgnore

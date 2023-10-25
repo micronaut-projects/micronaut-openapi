@@ -29,8 +29,6 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 
-import io.micronaut.core.annotation.Internal;
-import io.micronaut.core.util.StringUtils;
 import io.swagger.v3.oas.models.media.BinarySchema;
 import io.swagger.v3.oas.models.media.BooleanSchema;
 import io.swagger.v3.oas.models.media.ByteArraySchema;
@@ -55,7 +53,6 @@ import static java.util.Map.entry;
  *
  * @since 4.6.0
  */
-@Internal
 public enum PrimitiveType {
     STRING(String.class, "string") {
         @Override
@@ -416,10 +413,10 @@ public enum PrimitiveType {
     }
 
     public static PrimitiveType fromTypeAndFormat(String type, String format) {
-        if (StringUtils.hasText(type) && type.equals("object")) {
+        if ("object".equals(type)) {
             return null;
         }
-        return fromName(datatypeMappings.get(String.format("%s_%s", StringUtils.hasText(type) ? type : "", StringUtils.hasText(format) ? format : "")));
+        return fromName(datatypeMappings.get(String.format("%s_%s", type != null && !type.isBlank() ? type : "", format != null && !format.isBlank() ? format : "")));
     }
 
     public static Schema createProperty(Type type) {

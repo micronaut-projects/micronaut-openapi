@@ -15,7 +15,6 @@
  */
 package io.micronaut.openapi.swagger.core.util;
 
-import io.micronaut.core.annotation.Internal;
 import io.swagger.v3.oas.models.Paths;
 import io.swagger.v3.oas.models.callbacks.Callback;
 import io.swagger.v3.oas.models.headers.Header;
@@ -33,7 +32,6 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
  *
  * @since 4.6.0
  */
-@Internal
 public class DeserializationModule extends SimpleModule {
 
     public DeserializationModule() {

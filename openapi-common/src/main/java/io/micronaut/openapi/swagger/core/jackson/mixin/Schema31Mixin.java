@@ -20,8 +20,6 @@ import java.math.BigDecimal;
 import java.util.Map;
 import java.util.Set;
 
-import io.micronaut.core.annotation.Internal;
-
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -39,7 +37,6 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
  *
  * @since 4.6.0
  */
-@Internal
 @JsonPropertyOrder(value = {"type", "format", "if", "then", "else"}, alphabetic = true)
 public abstract class Schema31Mixin {
 
