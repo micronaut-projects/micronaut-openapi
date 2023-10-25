@@ -25,7 +25,7 @@ micronaut.openapi.schema.org.somepackage.MyComplexType2=java.lang.Integer
 ----
 
 Also, it can be used for replace classes schema with generics, for example, if you use jaxb generated classes and have custom serializer for JAXBElement class.
-And you can set cutom schemas for different type args.
+And you can set custom schemas for different type args.
 For example if you have this classes structure:
 
 [source,java]

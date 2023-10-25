@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.io.Serial;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.net.URI;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -42,18 +41,16 @@ import java.util.function.Function;
 import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 
-import io.micronaut.context.DefaultApplicationContextBuilder;
 import io.micronaut.context.env.Environment;
 import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.core.util.StringUtils;
 import io.micronaut.inject.ast.ClassElement;
-import io.micronaut.inject.ast.Element;
 import io.micronaut.inject.ast.ElementModifier;
 import io.micronaut.inject.ast.ElementQuery;
 import io.micronaut.inject.ast.MethodElement;
 import io.micronaut.inject.visitor.TypeElementVisitor;
 import io.micronaut.inject.visitor.VisitorContext;
-import io.micronaut.inject.writer.GeneratedFile;
+import io.micronaut.openapi.OpenApiUtils;
 import io.micronaut.openapi.postprocessors.JacksonDiscriminatorPostProcessor;
 import io.micronaut.openapi.postprocessors.OpenApiOperationsPostProcessor;
 import io.micronaut.openapi.view.OpenApiViewConfig;
@@ -68,7 +65,6 @@ import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.PathItem;
-import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.media.Content;
 import io.swagger.v3.oas.models.media.MediaType;
 import io.swagger.v3.oas.models.media.Schema;
@@ -84,6 +80,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 
 import static io.micronaut.openapi.visitor.ConfigUtils.endpointsConfiguration;
+import static io.micronaut.openapi.visitor.ConfigUtils.getAdocProperties;
+import static io.micronaut.openapi.visitor.ConfigUtils.getBooleanProperty;
 import static io.micronaut.openapi.visitor.ConfigUtils.getConfigProperty;
 import static io.micronaut.openapi.visitor.ConfigUtils.getEnv;
 import static io.micronaut.openapi.visitor.ConfigUtils.getExpandableProperties;
@@ -95,16 +93,17 @@ import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_OP
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_OPENAPI_ENDPOINT_SERVERS;
 import static io.micronaut.openapi.visitor.FileUtils.EXT_JSON;
 import static io.micronaut.openapi.visitor.FileUtils.EXT_YML;
-import static io.micronaut.openapi.visitor.FileUtils.createDirectories;
+import static io.micronaut.openapi.visitor.FileUtils.calcFinalFilename;
+import static io.micronaut.openapi.visitor.FileUtils.getDefaultFilePath;
+import static io.micronaut.openapi.visitor.FileUtils.getViewsDestDir;
+import static io.micronaut.openapi.visitor.FileUtils.openApiSpecFile;
 import static io.micronaut.openapi.visitor.FileUtils.resolve;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.ALL;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ADDITIONAL_FILES;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ADOC_ENABLED;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_CONTEXT_SERVER_PATH;
-import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_FILENAME;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_JSON_FORMAT;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_PROPERTY_NAMING_STRATEGY;
-import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_TARGET_FILE;
-import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_VIEWS_DEST_DIR;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_VIEWS_SPEC;
 import static io.micronaut.openapi.visitor.SchemaUtils.EMPTY_SIMPLE_SCHEMA;
 import static io.micronaut.openapi.visitor.SchemaUtils.TYPE_OBJECT;
@@ -190,14 +189,6 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         }
     }
 
-    private ClassLoader resolveClassLoader() {
-        final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
-        if (contextClassLoader != null) {
-            return contextClassLoader;
-        }
-        return DefaultApplicationContextBuilder.class.getClassLoader();
-    }
-
     /**
      * Merge the OpenAPI YAML and JSON files into one single file.
      *
@@ -217,7 +208,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                         context.info("Reading Swagger OpenAPI " + (isYaml ? "YAML" : "JSON") + " file " + path.getFileName());
                         OpenAPI parsedOpenApi = null;
                         try {
-                            parsedOpenApi = (isYaml ? ConvertUtils.getYamlMapper() : ConvertUtils.getJsonMapper()).readValue(path.toFile(), OpenAPI.class);
+                            parsedOpenApi = (isYaml ? OpenApiUtils.getYamlMapper() : OpenApiUtils.getJsonMapper()).readValue(path.toFile(), OpenAPI.class);
                         } catch (IOException e) {
                             context.warn("Unable to read file " + path.getFileName() + ": " + e.getMessage(), element);
                         }
@@ -310,50 +301,6 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                 (PropertyNamingStrategies.NamingBase) PropertyNamingStrategies.LOWER_DOT_CASE;
             default -> null;
         };
-    }
-
-    private Optional<Path> getDefaultFilePath(String fileName, VisitorContext context) {
-        // default location
-        Optional<GeneratedFile> generatedFile = context.visitMetaInfFile("swagger/" + fileName, Element.EMPTY_ELEMENT_ARRAY);
-        if (generatedFile.isPresent()) {
-            URI uri = generatedFile.get().toURI();
-            // happens in tests 'mem:///CLASS_OUTPUT/META-INF/swagger/swagger.yml'
-            if (uri.getScheme() != null && !uri.getScheme().equals("mem")) {
-                Path specPath = Paths.get(uri);
-                createDirectories(specPath, context);
-                return Optional.of(specPath);
-            }
-        }
-        context.warn("Unable to get swagger/" + fileName + " file.", null);
-        return Optional.empty();
-    }
-
-    private Optional<Path> openApiSpecFile(String fileName, VisitorContext context) {
-        Optional<Path> path = userDefinedSpecFile(context);
-        if (path.isPresent()) {
-            return path;
-        }
-        return getDefaultFilePath(fileName, context);
-    }
-
-    private Optional<Path> userDefinedSpecFile(VisitorContext context) {
-        String targetFile = getConfigProperty(MICRONAUT_OPENAPI_TARGET_FILE, context);
-        if (StringUtils.isEmpty(targetFile)) {
-            return Optional.empty();
-        }
-        Path specFile = resolve(context, Paths.get(targetFile));
-        createDirectories(specFile, context);
-        return Optional.of(specFile);
-    }
-
-    private Path getViewsDestDir(Path defaultSwaggerFilePath, VisitorContext context) {
-        String destDir = getConfigProperty(MICRONAUT_OPENAPI_VIEWS_DEST_DIR, context);
-        if (StringUtils.isNotEmpty(destDir)) {
-            Path destPath = resolve(context, Paths.get(destDir));
-            createDirectories(destPath, context);
-            return destPath;
-        }
-        return defaultSwaggerFilePath.getParent().resolve("views");
     }
 
     private void applyPropertyNamingStrategy(OpenAPI openAPI, VisitorContext context) {
@@ -485,8 +432,8 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         if (CollectionUtils.isNotEmpty(expandableProperties)) {
             context.info("Expanding properties: " + expandableProperties);
         }
-        JsonNode root = resolvePlaceholders(ConvertUtils.getYamlMapper().convertValue(openAPI, ObjectNode.class), s -> expandProperties(s, expandableProperties, context));
-        return ConvertUtils.getYamlMapper().convertValue(root, OpenAPI.class);
+        JsonNode root = resolvePlaceholders(OpenApiUtils.getYamlMapper().convertValue(openAPI, ObjectNode.class), s -> expandProperties(s, expandableProperties, context));
+        return OpenApiUtils.getYamlMapper().convertValue(root, OpenAPI.class);
     }
 
     @Override
@@ -530,58 +477,10 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                 }
 
                 String ext = isYaml ? EXT_YML : EXT_JSON;
-                String fileName = "swagger" + ext;
 
-                Info info = openApi.getInfo();
-                if (info != null) {
-                    documentTitle = Optional.ofNullable(info.getTitle()).orElse(Environment.DEFAULT_NAME);
-                    documentTitle = documentTitle.toLowerCase(Locale.US).replace(' ', '-');
-                    String version = info.getVersion();
-                    if (version != null) {
-                        documentTitle = documentTitle + '-' + version;
-                    }
-                    fileName = documentTitle + ext;
-                }
-
-                String versionFromInfo = info != null && info.getVersion() != null ? info.getVersion() : StringUtils.EMPTY_STRING;
-
-                String fileNameFromConfig = getConfigProperty(MICRONAUT_OPENAPI_FILENAME, context);
-                if (StringUtils.isNotEmpty(fileNameFromConfig)) {
-                    fileName = replacePlaceholders(fileNameFromConfig, context) + ext;
-                    if (fileName.contains("${version}")) {
-                        fileName = fileName.replaceAll("\\$\\{version}", versionFromInfo);
-                    }
-                }
-
-                // contruct filename for group
-                if (openApiInfos.size() > 1) {
-                    if (StringUtils.isNotEmpty(openApiInfo.getFilename())) {
-                        fileName = openApiInfo.getFilename();
-                    } else {
-
-                        // default name: swagger-<version>-<groupName>-<apiVersion>
-
-                        fileName = fileName.substring(0, fileName.length() - ext.length())
-                            + (openApiInfo.getGroupName() != null ? "-" + openApiInfo.getGroupName() : StringUtils.EMPTY_STRING)
-                            + (openApiInfo.getVersion() != null ? "-" + openApiInfo.getVersion() : StringUtils.EMPTY_STRING);
-                    }
-
-                    fileName = replacePlaceholders(fileName, context) + ext;
-                    if (fileName.contains("${apiVersion}")) {
-                        fileName = fileName.replaceAll("\\$\\{apiVersion}", openApiInfo.getVersion() != null ? openApiInfo.getVersion() : versionFromInfo);
-                    }
-                    if (fileName.contains("${version}")) {
-                        fileName = fileName.replaceAll("\\$\\{version}", versionFromInfo);
-                    }
-                    if (fileName.contains("${group}")) {
-                        fileName = fileName.replaceAll("\\$\\{group}", openApiInfo.getGroupName() != null ? openApiInfo.getGroupName() : StringUtils.EMPTY_STRING);
-                    }
-                }
-                if (fileName.contains(Utils.PLACEHOLDER_PREFIX)) {
-                    context.warn("Can't set some placeholders in fileName: " + fileName, null);
-                }
-
-                openApiInfo.setFilename(fileName);
+                var titleAndFilename = calcFinalFilename(openApiInfo.getFilename(), openApiInfo, openApiInfos.size() == 1, ext, context);
+                documentTitle = titleAndFilename.getFirst();
+                openApiInfo.setFilename(titleAndFilename.getSecond());
             }
 
             writeYamlToFile(openApiInfos, documentTitle, context, isYaml);
@@ -660,7 +559,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             paths = new io.swagger.v3.oas.models.Paths();
             openApi.setPaths(paths);
         }
-        PathItem pathItem = paths.computeIfAbsent(endpointInfo.getUrl(), (pathurl) -> new PathItem());
+        PathItem pathItem = paths.computeIfAbsent(endpointInfo.getUrl(), (pathUrl) -> new PathItem());
         Operation operation = getOperationOnPathItem(pathItem, endpointInfo.getHttpMethod());
         if (operation == null) {
             setOperationOnPathItem(pathItem, endpointInfo.getHttpMethod(), endpointInfo.getOperation());
@@ -669,11 +568,12 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         setOperationOnPathItem(pathItem, endpointInfo.getHttpMethod(), SchemaUtils.mergeOperations(operation, endpointInfo.getOperation()));
     }
 
-    private OpenAPI addOpenApiInfo(String group, String version, OpenAPI openApi, Map<Pair<String, String>, OpenApiInfo> openApiInfoMap, VisitorContext context) {
+    private OpenAPI addOpenApiInfo(String group, String version, OpenAPI openApi, Map<Pair<String, String>,
+                                    OpenApiInfo> openApiInfoMap, VisitorContext context) {
         GroupProperties groupProperties = getGroupProperties(group, context);
         boolean hasGroupProperties = groupProperties != null;
 
-        Pair<String, String> key = Pair.of(group, version);
+        var key = Pair.of(group, version);
         OpenApiInfo openApiInfo = openApiInfoMap.get(key);
         OpenAPI newOpenApi;
         if (openApiInfo == null) {
@@ -690,6 +590,8 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                 group,
                 hasGroupProperties ? groupProperties.getDisplayName() : null,
                 hasGroupProperties ? groupProperties.getFilename() : null,
+                !hasGroupProperties || groupProperties.getAdocEnabled() == null || groupProperties.getAdocEnabled(),
+                hasGroupProperties ? groupProperties.getAdocFilename() : null,
                 newOpenApi
             );
 
@@ -697,7 +599,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
 
             OpenAPI openApiCopy;
             try {
-                openApiCopy = ConvertUtils.getJsonMapper().treeToValue(ConvertUtils.getJsonMapper().valueToTree(openApi), OpenAPI.class);
+                openApiCopy = OpenApiUtils.getJsonMapper().treeToValue(OpenApiUtils.getJsonMapper().valueToTree(openApi), OpenAPI.class);
             } catch (JsonProcessingException e) {
                 context.warn("Error\n" + Utils.printStackTrace(e), null);
                 return null;
@@ -762,7 +664,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             if (openApi.getComponents() != null) {
                 Map<String, Schema> schemas = openApi.getComponents().getSchemas();
                 if (CollectionUtils.isNotEmpty(schemas)) {
-                    String openApiJson = ConvertUtils.getJsonMapper().writeValueAsString(openApi);
+                    String openApiJson = OpenApiUtils.getJsonMapper().writeValueAsString(openApi);
                     // Create a copy of the keySet so that we can modify the map while in a foreach
                     Set<String> keySet = new HashSet<>(schemas.keySet());
                     for (String schemaName : keySet) {
@@ -1047,7 +949,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             String type = schema.getType();
             String serializedDefaultValue;
             try {
-                serializedDefaultValue = defaultValue != null ? ConvertUtils.getJsonMapper().writeValueAsString(defaultValue) : null;
+                serializedDefaultValue = defaultValue != null ? OpenApiUtils.getJsonMapper().writeValueAsString(defaultValue) : null;
             } catch (JsonProcessingException e) {
                 return null;
             }
@@ -1058,7 +960,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             Object allOfDefaultValue = allOfSchema.getDefault();
             String serializedAllOfDefaultValue;
             try {
-                serializedAllOfDefaultValue = allOfDefaultValue != null ? ConvertUtils.getJsonMapper().writeValueAsString(allOfDefaultValue) : null;
+                serializedAllOfDefaultValue = allOfDefaultValue != null ? OpenApiUtils.getJsonMapper().writeValueAsString(allOfDefaultValue) : null;
             } catch (JsonProcessingException e) {
                 return null;
             }
@@ -1103,7 +1005,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                     && StringUtils.isNotEmpty(schemaAllOf.getDescription())) {
                     schemaAllOf.setDescription(null);
                 }
-                // remove deplicate default field
+                // remove duplicate default field
                 if (schema.getDefault() != null
                     && schemaAllOf.getDefault() != null && schema.getDefault().equals(schemaAllOf.getDefault())) {
                     schema.setDefault(null);
@@ -1165,11 +1067,23 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
     private void writeYamlToFile(Map<Pair<String, String>, OpenApiInfo> openApiInfos, String documentTitle, VisitorContext context, boolean isYaml) {
 
         Path viewsDestDirs = null;
+        var isAdocModuleInClassPath = false;
+        var isGlobalAdocEnabled = getBooleanProperty(MICRONAUT_OPENAPI_ADOC_ENABLED, true, context);
+
+        if (!Utils.isTestMode()) {
+            try {
+                var converterClass = Class.forName("io.micronaut.openapi.adoc.OpenApiToAdocConverter");
+                isAdocModuleInClassPath = true;
+            } catch (ClassNotFoundException e) {
+                //
+            }
+        }
 
         for (OpenApiInfo openApiInfo : openApiInfos.values()) {
+
             Optional<Path> specFile = openApiSpecFile(openApiInfo.getFilename(), context);
             try (Writer writer = getFileWriter(specFile.orElse(null))) {
-                (isYaml ? ConvertUtils.getYamlMapper() : ConvertUtils.getJsonMapper()).writeValue(writer, openApiInfo.getOpenApi());
+                (isYaml ? OpenApiUtils.getYamlMapper() : OpenApiUtils.getJsonMapper()).writeValue(writer, openApiInfo.getOpenApi());
                 if (Utils.isTestMode()) {
                     Utils.setTestFileName(openApiInfo.getFilename());
                     if (isYaml) {
@@ -1192,6 +1106,11 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                         context.addGeneratedResource(path.relativize(viewsDestDirsFinal).toString());
                     });
                     openApiInfo.setSpecFilePath(specPath.getFileName().toString());
+
+                    if (isAdocModuleInClassPath && isGlobalAdocEnabled && openApiInfo.isAdocEnabled()) {
+                        var adocProperties = getAdocProperties(openApiInfo, openApiInfos.size() == 1, context);
+                        AdocModule.convert(openApiInfo, adocProperties, context);
+                    }
                 }
             } catch (Exception e) {
                 context.warn("Unable to generate swagger" + (isYaml ? EXT_YML : EXT_JSON) + ": " + specFile.orElse(null) + " - " + e.getMessage() + ".\n" + Utils.printStackTrace(e), classElement);

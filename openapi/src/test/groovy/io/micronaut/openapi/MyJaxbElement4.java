@@ -20,7 +20,7 @@ public class MyJaxbElement4 {
     public Object value;
 
     /**
-     * Discout type
+     * Discount type
      */
     public enum DiscountTypeType {
 

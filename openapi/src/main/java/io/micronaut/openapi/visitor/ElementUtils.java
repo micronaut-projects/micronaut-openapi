@@ -85,7 +85,7 @@ public final class ElementUtils {
     }
 
     /**
-     * Checks Nullable annotions / optinal type to understand that the element can be null.
+     * Checks Nullable annotations / optional type to understand that the element can be null.
      *
      * @param element typed element
      *

@@ -199,7 +199,7 @@ class MyController2 {
                             mediaType = "multipart/mixed",
                             encoding = {
                                     @Encoding(
-                                            name = "firstOject",
+                                            name = "firstObject",
                                             contentType = "application/xml; charset=utf-8",
                                             style = "DEEP_OBJECT",
                                             explode = true,
@@ -277,7 +277,7 @@ class MyController2 {
                                             }
                                     ),
                                     @Encoding(
-                                            name = "secondOject",
+                                            name = "secondObject",
                                             contentType = "application/json; charset=utf-8",
                                             style = "FORM",
                                             explode = true,
@@ -332,7 +332,7 @@ class MyController2 {
                             mediaType = "multipart/mixed2",
                             encoding = {
                                     @Encoding(
-                                            name = "firstOject",
+                                            name = "firstObject",
                                             contentType = "application/xml; charset=utf-8",
                                             style = "DEEP_OBJECT",
                                             explode = true,
@@ -367,7 +367,7 @@ class MyController2 {
                                             }
                                     ),
                                     @Encoding(
-                                            name = "secondOject",
+                                            name = "secondObject",
                                             contentType = "application/json; charset=utf-8",
                                             style = "FORM",
                                             explode = true,
@@ -516,71 +516,71 @@ class MyBean {}
         operation.requestBody.content."multipart/mixed".schema
         operation.requestBody.content."multipart/mixed".schema.$ref == '#/components/schemas/MyController2.Pet'
 
-        operation.requestBody.content."multipart/mixed".encoding.firstOject.contentType == "application/xml; charset=utf-8"
-        operation.requestBody.content."multipart/mixed".encoding.firstOject.style == Encoding.StyleEnum.DEEP_OBJECT
-        operation.requestBody.content."multipart/mixed".encoding.firstOject.explode
-        operation.requestBody.content."multipart/mixed".encoding.firstOject.allowReserved
-        operation.requestBody.content."multipart/mixed".encoding.firstOject.headers.size() == 5
-        operation.requestBody.content."multipart/mixed".encoding.firstOject.headers.MyHeader1.description == "Header 1 description"
-        operation.requestBody.content."multipart/mixed".encoding.firstOject.headers.MyHeader1.required
-        operation.requestBody.content."multipart/mixed".encoding.firstOject.headers.MyHeader1.deprecated
-        operation.requestBody.content."multipart/mixed".encoding.firstOject.headers.MyHeader2.description == "Header 2 description"
-        !operation.requestBody.content."multipart/mixed".encoding.firstOject.headers.MyHeader2.required
-        !operation.requestBody.content."multipart/mixed".encoding.firstOject.headers.MyHeader2.deprecated
-        operation.requestBody.content."multipart/mixed".encoding.firstOject.headers.MyHeader3.get$ref() == '#/components/headers/Head3'
-        operation.requestBody.content."multipart/mixed".encoding.firstOject.headers.MyHeader4.schema.description == 'this is description'
-        operation.requestBody.content."multipart/mixed".encoding.firstOject.headers.MyHeader4.schema.default
-        operation.requestBody.content."multipart/mixed".encoding.firstOject.headers.MyHeader4.schema.format == 'binary'
+        operation.requestBody.content."multipart/mixed".encoding.firstObject.contentType == "application/xml; charset=utf-8"
+        operation.requestBody.content."multipart/mixed".encoding.firstObject.style == Encoding.StyleEnum.DEEP_OBJECT
+        operation.requestBody.content."multipart/mixed".encoding.firstObject.explode
+        operation.requestBody.content."multipart/mixed".encoding.firstObject.allowReserved
+        operation.requestBody.content."multipart/mixed".encoding.firstObject.headers.size() == 5
+        operation.requestBody.content."multipart/mixed".encoding.firstObject.headers.MyHeader1.description == "Header 1 description"
+        operation.requestBody.content."multipart/mixed".encoding.firstObject.headers.MyHeader1.required
+        operation.requestBody.content."multipart/mixed".encoding.firstObject.headers.MyHeader1.deprecated
+        operation.requestBody.content."multipart/mixed".encoding.firstObject.headers.MyHeader2.description == "Header 2 description"
+        !operation.requestBody.content."multipart/mixed".encoding.firstObject.headers.MyHeader2.required
+        !operation.requestBody.content."multipart/mixed".encoding.firstObject.headers.MyHeader2.deprecated
+        operation.requestBody.content."multipart/mixed".encoding.firstObject.headers.MyHeader3.get$ref() == '#/components/headers/Head3'
+        operation.requestBody.content."multipart/mixed".encoding.firstObject.headers.MyHeader4.schema.description == 'this is description'
+        operation.requestBody.content."multipart/mixed".encoding.firstObject.headers.MyHeader4.schema.default
+        operation.requestBody.content."multipart/mixed".encoding.firstObject.headers.MyHeader4.schema.format == 'binary'
 
-        !operation.requestBody.content."multipart/mixed".encoding.firstOject.headers.MyHeader5.schema.get$ref()
-        operation.requestBody.content."multipart/mixed".encoding.firstOject.headers.MyHeader5.schema.description == 'this is description'
-        operation.requestBody.content."multipart/mixed".encoding.firstOject.headers.MyHeader5.schema.default
-        operation.requestBody.content."multipart/mixed".encoding.firstOject.headers.MyHeader5.schema.default.stampWidth == 100
-        operation.requestBody.content."multipart/mixed".encoding.firstOject.headers.MyHeader5.schema.example
-        operation.requestBody.content."multipart/mixed".encoding.firstOject.headers.MyHeader5.schema.example.stampWidth == 220
-        operation.requestBody.content."multipart/mixed".encoding.firstOject.headers.MyHeader5.schema.example.stampHeight == 85
-        operation.requestBody.content."multipart/mixed".encoding.firstOject.headers.MyHeader5.schema.example.pageNumber == 1
-        operation.requestBody.content."multipart/mixed".encoding.firstOject.headers.MyHeader5.schema.deprecated
-        operation.requestBody.content."multipart/mixed".encoding.firstOject.headers.MyHeader5.schema.readOnly
-        operation.requestBody.content."multipart/mixed".encoding.firstOject.headers.MyHeader5.schema.format == 'binary'
-        operation.requestBody.content."multipart/mixed".encoding.firstOject.headers.MyHeader5.schema.externalDocs.description == 'external docs'
-        operation.requestBody.content."multipart/mixed".encoding.firstOject.headers.MyHeader5.schema.title == 'the title'
-        operation.requestBody.content."multipart/mixed".encoding.firstOject.headers.MyHeader5.schema.exclusiveMinimum
-        operation.requestBody.content."multipart/mixed".encoding.firstOject.headers.MyHeader5.schema.exclusiveMaximum
-        operation.requestBody.content."multipart/mixed".encoding.firstOject.headers.MyHeader5.schema.maximum == 100
-        operation.requestBody.content."multipart/mixed".encoding.firstOject.headers.MyHeader5.schema.minimum == 10
-        operation.requestBody.content."multipart/mixed".encoding.firstOject.headers.MyHeader5.schema.maximum == 100
-        operation.requestBody.content."multipart/mixed".encoding.firstOject.headers.MyHeader5.schema.minLength == 10
-        operation.requestBody.content."multipart/mixed".encoding.firstOject.headers.MyHeader5.schema.maxLength == 100
-        operation.requestBody.content."multipart/mixed".encoding.firstOject.headers.MyHeader5.schema.minProperties == 10
-        operation.requestBody.content."multipart/mixed".encoding.firstOject.headers.MyHeader5.schema.maxProperties == 100
-        operation.requestBody.content."multipart/mixed".encoding.firstOject.headers.MyHeader5.schema.multipleOf == 1.5
-        operation.requestBody.content."multipart/mixed".encoding.firstOject.headers.MyHeader5.schema.pattern == "ppp"
+        !operation.requestBody.content."multipart/mixed".encoding.firstObject.headers.MyHeader5.schema.get$ref()
+        operation.requestBody.content."multipart/mixed".encoding.firstObject.headers.MyHeader5.schema.description == 'this is description'
+        operation.requestBody.content."multipart/mixed".encoding.firstObject.headers.MyHeader5.schema.default
+        operation.requestBody.content."multipart/mixed".encoding.firstObject.headers.MyHeader5.schema.default.stampWidth == 100
+        operation.requestBody.content."multipart/mixed".encoding.firstObject.headers.MyHeader5.schema.example
+        operation.requestBody.content."multipart/mixed".encoding.firstObject.headers.MyHeader5.schema.example.stampWidth == 220
+        operation.requestBody.content."multipart/mixed".encoding.firstObject.headers.MyHeader5.schema.example.stampHeight == 85
+        operation.requestBody.content."multipart/mixed".encoding.firstObject.headers.MyHeader5.schema.example.pageNumber == 1
+        operation.requestBody.content."multipart/mixed".encoding.firstObject.headers.MyHeader5.schema.deprecated
+        operation.requestBody.content."multipart/mixed".encoding.firstObject.headers.MyHeader5.schema.readOnly
+        operation.requestBody.content."multipart/mixed".encoding.firstObject.headers.MyHeader5.schema.format == 'binary'
+        operation.requestBody.content."multipart/mixed".encoding.firstObject.headers.MyHeader5.schema.externalDocs.description == 'external docs'
+        operation.requestBody.content."multipart/mixed".encoding.firstObject.headers.MyHeader5.schema.title == 'the title'
+        operation.requestBody.content."multipart/mixed".encoding.firstObject.headers.MyHeader5.schema.exclusiveMinimum
+        operation.requestBody.content."multipart/mixed".encoding.firstObject.headers.MyHeader5.schema.exclusiveMaximum
+        operation.requestBody.content."multipart/mixed".encoding.firstObject.headers.MyHeader5.schema.maximum == 100
+        operation.requestBody.content."multipart/mixed".encoding.firstObject.headers.MyHeader5.schema.minimum == 10
+        operation.requestBody.content."multipart/mixed".encoding.firstObject.headers.MyHeader5.schema.maximum == 100
+        operation.requestBody.content."multipart/mixed".encoding.firstObject.headers.MyHeader5.schema.minLength == 10
+        operation.requestBody.content."multipart/mixed".encoding.firstObject.headers.MyHeader5.schema.maxLength == 100
+        operation.requestBody.content."multipart/mixed".encoding.firstObject.headers.MyHeader5.schema.minProperties == 10
+        operation.requestBody.content."multipart/mixed".encoding.firstObject.headers.MyHeader5.schema.maxProperties == 100
+        operation.requestBody.content."multipart/mixed".encoding.firstObject.headers.MyHeader5.schema.multipleOf == 1.5
+        operation.requestBody.content."multipart/mixed".encoding.firstObject.headers.MyHeader5.schema.pattern == "ppp"
 
-        operation.requestBody.content."multipart/mixed".encoding.firstOject.extensions.size() == 2
-        operation.requestBody.content."multipart/mixed".encoding.firstOject.extensions."x-myExt1".prop1 == "prop1Val"
-        operation.requestBody.content."multipart/mixed".encoding.firstOject.extensions."x-myExt1".prop1 == "prop1Val"
-        operation.requestBody.content."multipart/mixed".encoding.firstOject.extensions."x-myExt1".prop2 == "prop2Val"
-        operation.requestBody.content."multipart/mixed".encoding.firstOject.extensions."x-myExt2".prop1 == "prop1Val1"
-        operation.requestBody.content."multipart/mixed".encoding.firstOject.extensions."x-myExt2".prop2 == "prop2Val2"
+        operation.requestBody.content."multipart/mixed".encoding.firstObject.extensions.size() == 2
+        operation.requestBody.content."multipart/mixed".encoding.firstObject.extensions."x-myExt1".prop1 == "prop1Val"
+        operation.requestBody.content."multipart/mixed".encoding.firstObject.extensions."x-myExt1".prop1 == "prop1Val"
+        operation.requestBody.content."multipart/mixed".encoding.firstObject.extensions."x-myExt1".prop2 == "prop2Val"
+        operation.requestBody.content."multipart/mixed".encoding.firstObject.extensions."x-myExt2".prop1 == "prop1Val1"
+        operation.requestBody.content."multipart/mixed".encoding.firstObject.extensions."x-myExt2".prop2 == "prop2Val2"
 
-        operation.requestBody.content."multipart/mixed".encoding.secondOject.contentType == "application/json; charset=utf-8"
-        operation.requestBody.content."multipart/mixed".encoding.secondOject.style == Encoding.StyleEnum.FORM
-        operation.requestBody.content."multipart/mixed".encoding.secondOject.explode
-        !operation.requestBody.content."multipart/mixed".encoding.secondOject.allowReserved
-        operation.requestBody.content."multipart/mixed".encoding.secondOject.extensions.size() == 2
-        operation.requestBody.content."multipart/mixed".encoding.secondOject.headers.MyHeader21.description == "Header 21 description"
-        operation.requestBody.content."multipart/mixed".encoding.secondOject.headers.MyHeader21.required
-        operation.requestBody.content."multipart/mixed".encoding.secondOject.headers.MyHeader21.deprecated
-        operation.requestBody.content."multipart/mixed".encoding.secondOject.headers.MyHeader22.description == "Header 22 description"
-        !operation.requestBody.content."multipart/mixed".encoding.secondOject.headers.MyHeader22.required
-        !operation.requestBody.content."multipart/mixed".encoding.secondOject.headers.MyHeader22.deprecated
-        operation.requestBody.content."multipart/mixed".encoding.secondOject.extensions.size() == 2
-        operation.requestBody.content."multipart/mixed".encoding.secondOject.extensions."x-myExt21".prop1 == "prop1Val"
-        operation.requestBody.content."multipart/mixed".encoding.secondOject.extensions."x-myExt21".prop1 == "prop1Val"
-        operation.requestBody.content."multipart/mixed".encoding.secondOject.extensions."x-myExt21".prop2 == "prop2Val"
-        operation.requestBody.content."multipart/mixed".encoding.secondOject.extensions."x-myExt22".prop1 == "prop1Val1"
-        operation.requestBody.content."multipart/mixed".encoding.secondOject.extensions."x-myExt22".prop2 == "prop2Val2"
+        operation.requestBody.content."multipart/mixed".encoding.secondObject.contentType == "application/json; charset=utf-8"
+        operation.requestBody.content."multipart/mixed".encoding.secondObject.style == Encoding.StyleEnum.FORM
+        operation.requestBody.content."multipart/mixed".encoding.secondObject.explode
+        !operation.requestBody.content."multipart/mixed".encoding.secondObject.allowReserved
+        operation.requestBody.content."multipart/mixed".encoding.secondObject.extensions.size() == 2
+        operation.requestBody.content."multipart/mixed".encoding.secondObject.headers.MyHeader21.description == "Header 21 description"
+        operation.requestBody.content."multipart/mixed".encoding.secondObject.headers.MyHeader21.required
+        operation.requestBody.content."multipart/mixed".encoding.secondObject.headers.MyHeader21.deprecated
+        operation.requestBody.content."multipart/mixed".encoding.secondObject.headers.MyHeader22.description == "Header 22 description"
+        !operation.requestBody.content."multipart/mixed".encoding.secondObject.headers.MyHeader22.required
+        !operation.requestBody.content."multipart/mixed".encoding.secondObject.headers.MyHeader22.deprecated
+        operation.requestBody.content."multipart/mixed".encoding.secondObject.extensions.size() == 2
+        operation.requestBody.content."multipart/mixed".encoding.secondObject.extensions."x-myExt21".prop1 == "prop1Val"
+        operation.requestBody.content."multipart/mixed".encoding.secondObject.extensions."x-myExt21".prop1 == "prop1Val"
+        operation.requestBody.content."multipart/mixed".encoding.secondObject.extensions."x-myExt21".prop2 == "prop2Val"
+        operation.requestBody.content."multipart/mixed".encoding.secondObject.extensions."x-myExt22".prop1 == "prop1Val1"
+        operation.requestBody.content."multipart/mixed".encoding.secondObject.extensions."x-myExt22".prop2 == "prop2Val2"
 
         operation.requestBody.content."multipart/mixed2"
         operation.requestBody.content."multipart/mixed2".schema
@@ -608,41 +608,41 @@ class MyBean {}
         operation.requestBody.content."multipart/mixed2".examples.Example2.extensions.'x-contExt2'.prop1 == "prop1Val1"
         operation.requestBody.content."multipart/mixed2".examples.Example2.extensions.'x-contExt2'.prop2 == "prop2Val2"
 
-        operation.requestBody.content."multipart/mixed2".encoding.firstOject.contentType == "application/xml; charset=utf-8"
-        operation.requestBody.content."multipart/mixed2".encoding.firstOject.style == Encoding.StyleEnum.DEEP_OBJECT
-        operation.requestBody.content."multipart/mixed2".encoding.firstOject.explode
-        operation.requestBody.content."multipart/mixed2".encoding.firstOject.allowReserved
-        operation.requestBody.content."multipart/mixed2".encoding.firstOject.headers.size() == 2
-        operation.requestBody.content."multipart/mixed2".encoding.firstOject.headers.MyHeader1.description == "Header 1 description"
-        operation.requestBody.content."multipart/mixed2".encoding.firstOject.headers.MyHeader1.required
-        operation.requestBody.content."multipart/mixed2".encoding.firstOject.headers.MyHeader1.deprecated
-        operation.requestBody.content."multipart/mixed2".encoding.firstOject.headers.MyHeader2.description == "Header 2 description"
-        !operation.requestBody.content."multipart/mixed2".encoding.firstOject.headers.MyHeader2.required
-        !operation.requestBody.content."multipart/mixed2".encoding.firstOject.headers.MyHeader2.deprecated
-        operation.requestBody.content."multipart/mixed2".encoding.firstOject.extensions.size() == 2
-        operation.requestBody.content."multipart/mixed2".encoding.firstOject.extensions."x-myExt1".prop1 == "prop1Val"
-        operation.requestBody.content."multipart/mixed2".encoding.firstOject.extensions."x-myExt1".prop1 == "prop1Val"
-        operation.requestBody.content."multipart/mixed2".encoding.firstOject.extensions."x-myExt1".prop2 == "prop2Val"
-        operation.requestBody.content."multipart/mixed2".encoding.firstOject.extensions."x-myExt2".prop1 == "prop1Val1"
-        operation.requestBody.content."multipart/mixed2".encoding.firstOject.extensions."x-myExt2".prop2 == "prop2Val2"
+        operation.requestBody.content."multipart/mixed2".encoding.firstObject.contentType == "application/xml; charset=utf-8"
+        operation.requestBody.content."multipart/mixed2".encoding.firstObject.style == Encoding.StyleEnum.DEEP_OBJECT
+        operation.requestBody.content."multipart/mixed2".encoding.firstObject.explode
+        operation.requestBody.content."multipart/mixed2".encoding.firstObject.allowReserved
+        operation.requestBody.content."multipart/mixed2".encoding.firstObject.headers.size() == 2
+        operation.requestBody.content."multipart/mixed2".encoding.firstObject.headers.MyHeader1.description == "Header 1 description"
+        operation.requestBody.content."multipart/mixed2".encoding.firstObject.headers.MyHeader1.required
+        operation.requestBody.content."multipart/mixed2".encoding.firstObject.headers.MyHeader1.deprecated
+        operation.requestBody.content."multipart/mixed2".encoding.firstObject.headers.MyHeader2.description == "Header 2 description"
+        !operation.requestBody.content."multipart/mixed2".encoding.firstObject.headers.MyHeader2.required
+        !operation.requestBody.content."multipart/mixed2".encoding.firstObject.headers.MyHeader2.deprecated
+        operation.requestBody.content."multipart/mixed2".encoding.firstObject.extensions.size() == 2
+        operation.requestBody.content."multipart/mixed2".encoding.firstObject.extensions."x-myExt1".prop1 == "prop1Val"
+        operation.requestBody.content."multipart/mixed2".encoding.firstObject.extensions."x-myExt1".prop1 == "prop1Val"
+        operation.requestBody.content."multipart/mixed2".encoding.firstObject.extensions."x-myExt1".prop2 == "prop2Val"
+        operation.requestBody.content."multipart/mixed2".encoding.firstObject.extensions."x-myExt2".prop1 == "prop1Val1"
+        operation.requestBody.content."multipart/mixed2".encoding.firstObject.extensions."x-myExt2".prop2 == "prop2Val2"
 
-        operation.requestBody.content."multipart/mixed2".encoding.secondOject.contentType == "application/json; charset=utf-8"
-        operation.requestBody.content."multipart/mixed2".encoding.secondOject.style == Encoding.StyleEnum.FORM
-        operation.requestBody.content."multipart/mixed2".encoding.secondOject.explode
-        !operation.requestBody.content."multipart/mixed2".encoding.secondOject.allowReserved
-        operation.requestBody.content."multipart/mixed2".encoding.secondOject.extensions.size() == 2
-        operation.requestBody.content."multipart/mixed2".encoding.secondOject.headers.MyHeader21.description == "Header 21 description"
-        operation.requestBody.content."multipart/mixed2".encoding.secondOject.headers.MyHeader21.required
-        operation.requestBody.content."multipart/mixed2".encoding.secondOject.headers.MyHeader21.deprecated
-        operation.requestBody.content."multipart/mixed2".encoding.secondOject.headers.MyHeader22.description == "Header 22 description"
-        !operation.requestBody.content."multipart/mixed2".encoding.secondOject.headers.MyHeader22.required
-        !operation.requestBody.content."multipart/mixed2".encoding.secondOject.headers.MyHeader22.deprecated
-        operation.requestBody.content."multipart/mixed2".encoding.secondOject.extensions.size() == 2
-        operation.requestBody.content."multipart/mixed2".encoding.secondOject.extensions."x-myExt21".prop1 == "prop1Val"
-        operation.requestBody.content."multipart/mixed2".encoding.secondOject.extensions."x-myExt21".prop1 == "prop1Val"
-        operation.requestBody.content."multipart/mixed2".encoding.secondOject.extensions."x-myExt21".prop2 == "prop2Val"
-        operation.requestBody.content."multipart/mixed2".encoding.secondOject.extensions."x-myExt22".prop1 == "prop1Val1"
-        operation.requestBody.content."multipart/mixed2".encoding.secondOject.extensions."x-myExt22".prop2 == "prop2Val2"
+        operation.requestBody.content."multipart/mixed2".encoding.secondObject.contentType == "application/json; charset=utf-8"
+        operation.requestBody.content."multipart/mixed2".encoding.secondObject.style == Encoding.StyleEnum.FORM
+        operation.requestBody.content."multipart/mixed2".encoding.secondObject.explode
+        !operation.requestBody.content."multipart/mixed2".encoding.secondObject.allowReserved
+        operation.requestBody.content."multipart/mixed2".encoding.secondObject.extensions.size() == 2
+        operation.requestBody.content."multipart/mixed2".encoding.secondObject.headers.MyHeader21.description == "Header 21 description"
+        operation.requestBody.content."multipart/mixed2".encoding.secondObject.headers.MyHeader21.required
+        operation.requestBody.content."multipart/mixed2".encoding.secondObject.headers.MyHeader21.deprecated
+        operation.requestBody.content."multipart/mixed2".encoding.secondObject.headers.MyHeader22.description == "Header 22 description"
+        !operation.requestBody.content."multipart/mixed2".encoding.secondObject.headers.MyHeader22.required
+        !operation.requestBody.content."multipart/mixed2".encoding.secondObject.headers.MyHeader22.deprecated
+        operation.requestBody.content."multipart/mixed2".encoding.secondObject.extensions.size() == 2
+        operation.requestBody.content."multipart/mixed2".encoding.secondObject.extensions."x-myExt21".prop1 == "prop1Val"
+        operation.requestBody.content."multipart/mixed2".encoding.secondObject.extensions."x-myExt21".prop1 == "prop1Val"
+        operation.requestBody.content."multipart/mixed2".encoding.secondObject.extensions."x-myExt21".prop2 == "prop2Val"
+        operation.requestBody.content."multipart/mixed2".encoding.secondObject.extensions."x-myExt22".prop1 == "prop1Val1"
+        operation.requestBody.content."multipart/mixed2".encoding.secondObject.extensions."x-myExt22".prop2 == "prop2Val2"
     }
 
     void "test build OpenAPI multipart form data"() {
