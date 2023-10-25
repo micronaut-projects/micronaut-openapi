@@ -78,13 +78,15 @@
                                 
                                 <div class="toc-item" style="margin-left:0"><a href="#openApiViews"><strong>17</strong><span>Generating OpenAPI Views</span></a></div>
                                 
-                                <div class="toc-item" style="margin-left:0"><a href="#versionsAndGroups"><strong>18</strong><span>Versions and groups</span></a></div>
+                                <div class="toc-item" style="margin-left:0"><a href="#convertToAdoc"><strong>18</strong><span>Conversion to Asciidoc</span></a></div>
                                 
-                                <div class="toc-item" style="margin-left:0"><a href="#serverContext"><strong>19</strong><span>Server Context</span></a></div>
+                                <div class="toc-item" style="margin-left:0"><a href="#versionsAndGroups"><strong>19</strong><span>Versions and groups</span></a></div>
                                 
-                                <div class="toc-item" style="margin-left:0"><a href="#repository"><strong>20</strong><span>Repository</span></a></div>
+                                <div class="toc-item" style="margin-left:0"><a href="#serverContext"><strong>20</strong><span>Server Context</span></a></div>
                                 
-                                <div class="toc-item" style="margin-left:0"><a href="#breaks"><strong>21</strong><span>Breaking Changes</span></a></div>
+                                <div class="toc-item" style="margin-left:0"><a href="#repository"><strong>21</strong><span>Repository</span></a></div>
+                                
+                                <div class="toc-item" style="margin-left:0"><a href="#breaks"><strong>22</strong><span>Breaking Changes</span></a></div>
                                 
                             </div>
                         </div>
@@ -209,23 +211,25 @@
         
         <div class="toc-item" style="margin-left:10px" id="toc-item-rapipdf"><a href="#rapipdf"><strong>17.7</strong><span>RapiPdf</span></a></div>
         
-        <div class="toc-item" style="margin-left:0px" id="toc-item-versionsAndGroups"><a href="#versionsAndGroups"><strong>18</strong><span>Versions and groups</span></a></div>
+        <div class="toc-item" style="margin-left:0px" id="toc-item-convertToAdoc"><a href="#convertToAdoc"><strong>18</strong><span>Conversion to Asciidoc</span></a></div>
         
-        <div class="toc-item" style="margin-left:10px" id="toc-item-versions"><a href="#versions"><strong>18.1</strong><span>Micronaut versioning</span></a></div>
+        <div class="toc-item" style="margin-left:0px" id="toc-item-versionsAndGroups"><a href="#versionsAndGroups"><strong>19</strong><span>Versions and groups</span></a></div>
         
-        <div class="toc-item" style="margin-left:10px" id="toc-item-groups"><a href="#groups"><strong>18.2</strong><span>OpenAPI groups</span></a></div>
+        <div class="toc-item" style="margin-left:10px" id="toc-item-versions"><a href="#versions"><strong>19.1</strong><span>Micronaut versioning</span></a></div>
         
-        <div class="toc-item" style="margin-left:0px" id="toc-item-serverContext"><a href="#serverContext"><strong>19</strong><span>Server Context</span></a></div>
+        <div class="toc-item" style="margin-left:10px" id="toc-item-groups"><a href="#groups"><strong>19.2</strong><span>OpenAPI groups</span></a></div>
         
-        <div class="toc-item" style="margin-left:10px" id="toc-item-compileResolution"><a href="#compileResolution"><strong>19.1</strong><span>Compile Time Resolution</span></a></div>
+        <div class="toc-item" style="margin-left:0px" id="toc-item-serverContext"><a href="#serverContext"><strong>20</strong><span>Server Context</span></a></div>
         
-        <div class="toc-item" style="margin-left:10px" id="toc-item-serverFilter"><a href="#serverFilter"><strong>19.2</strong><span>HttpServerFilter</span></a></div>
+        <div class="toc-item" style="margin-left:10px" id="toc-item-compileResolution"><a href="#compileResolution"><strong>20.1</strong><span>Compile Time Resolution</span></a></div>
         
-        <div class="toc-item" style="margin-left:10px" id="toc-item-urlParameter"><a href="#urlParameter"><strong>19.3</strong><span>URL Parameter</span></a></div>
+        <div class="toc-item" style="margin-left:10px" id="toc-item-serverFilter"><a href="#serverFilter"><strong>20.2</strong><span>HttpServerFilter</span></a></div>
         
-        <div class="toc-item" style="margin-left:0px" id="toc-item-repository"><a href="#repository"><strong>20</strong><span>Repository</span></a></div>
+        <div class="toc-item" style="margin-left:10px" id="toc-item-urlParameter"><a href="#urlParameter"><strong>20.3</strong><span>URL Parameter</span></a></div>
         
-        <div class="toc-item" style="margin-left:0px" id="toc-item-breaks"><a href="#breaks"><strong>21</strong><span>Breaking Changes</span></a></div>
+        <div class="toc-item" style="margin-left:0px" id="toc-item-repository"><a href="#repository"><strong>21</strong><span>Repository</span></a></div>
+        
+        <div class="toc-item" style="margin-left:0px" id="toc-item-breaks"><a href="#breaks"><strong>22</strong><span>Breaking Changes</span></a></div>
         
         </div>
     </div>
@@ -795,7 +799,7 @@ public class Application {
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>micronaut.openapi.project.dir</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">System property that specifies the location of current project. Need to set this property mannually if you use kotlin (to save incremental annotation processing) or have some troubles with auto calculation project path.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">System property that specifies the location of current project. Need to set this property manually if you use kotlin (to save incremental annotation processing) or have some troubles with auto calculation project path.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Default: calculated automatically</p></td>
 </tr>
 <tr>
@@ -810,7 +814,7 @@ public class Application {
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>micronaut.openapi.field.visibility.level</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">System property that specifies the schema classes fields visibility level. By default, only public fields visibile.<br>
+<td class="tableblock halign-left valign-top"><p class="tableblock">System property that specifies the schema classes fields visibility level. By default, only public fields visible.<br>
 &#160;<br>
 <strong>Available values:</strong><br>
 PRIVATE<br>
@@ -841,7 +845,7 @@ PUBLIC</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>micronaut.openapi.versioning.enabled</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Is this property true, micronaut-openapi will process micronaut-router versioning prpoerties and annotations.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Is this property true, micronaut-openapi will process micronaut-router versioning properties and annotations.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Default: <code>true</code></p></td>
 </tr>
 <tr>
@@ -880,7 +884,7 @@ directory.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>micronaut.openapi.schema.*</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Properties prefix to set custom schema implementations for selected clases.<br>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Properties prefix to set custom schema implementations for selected classes.<br>
 For example, if you want to set simple <code>java.lang.String</code> class to some complex <code>org.somepackage.MyComplexType</code> class you need to write:<br>
 &#160;<br>
 micronaut.openapi.schema.org.somepackage.MyComplexType=java.lang.String<br>
@@ -918,7 +922,7 @@ micronaut:<br>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>micronaut.openapi.groups.*</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Properties prefix to set custom schema implementations for selected clases.<br>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Properties prefix to set custom schema implementations for selected classes.<br>
 For example, if you want to set simple 'java.lang.String' class to some complex 'org.somepackage.MyComplexType' class you need to write:<br>
 &#160;<br>
 -Dmicronaut.openapi.group.my-group1.title="Title 1"<br>
@@ -1306,7 +1310,7 @@ micronaut.openapi.schema.org.somepackage.MyComplexType2=java.lang.Integer</code>
 </div>
 <div class="paragraph">
 <p>Also, it can be used for replace classes schema with generics, for example, if you use jaxb generated classes and have custom serializer for JAXBElement class.
-And you can set cutom schemas for different type args.
+And you can set custom schemas for different type args.
 For example if you have this classes structure:</p>
 </div>
 <div class="listingblock">
@@ -3758,7 +3762,7 @@ micronaut.router.static-resources.swagger-ui.mapping=/swagger-ui/**</code></pre>
 </tbody>
 </table>
 <div class="paragraph">
-<p>See <a href="https://github.com/Redocly/redoc#redoc-options-object">Redoc Options</a> for a description of the above properites.</p>
+<p>See <a href="https://github.com/Redocly/redoc#redoc-options-object">Redoc Options</a> for a description of the above properties.</p>
 </div>
 <div class="paragraph">
 <p>To expose the <code>redoc</code> views, you also must expose the generated <code>yaml</code>:</p>
@@ -4245,7 +4249,101 @@ micronaut.router.static-resources.rapidoc.mapping=/rapidoc/**</code></pre>
 <p>It will add a button to the view to generate a PDF from the spec file.</p>
 </div>
 
-<h1 id="versionsAndGroups"><a class="anchor" href="#versionsAndGroups"></a>18 Versions and groups</h1>
+<h1 id="convertToAdoc"><a class="anchor" href="#convertToAdoc"></a>18 Conversion to Asciidoc</h1>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/convertToAdoc.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>You also can generate file in Asciidoc format. Then you can convert Asciidoc to another format: <code>Markdown</code>, <code>HTML</code>, <code>PDF</code> or <code>DOCX</code>.</p>
+</div>
+<div class="paragraph">
+<p>To enable generation file in adoc format just set property <code>-Dmicronaut.openapi.adoc.enabled=true</code> and add micronaut-openapi-adoc dependency to classpath:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">annotationProcessor("io.micronaut.openapi:micronaut-openapi-adoc")</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Adoc generator based on Apache Freemarker templates, and you can override full template or just customize part of them.</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Available options</caption>
+<colgroup>
+<col style="width: 29.4117%;">
+<col style="width: 41.1764%;">
+<col style="width: 29.4119%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-middle"><code>micronaut.openapi.adoc.enabled</code></th>
+<th class="tableblock halign-left valign-middle">System property that enables or disables open api asciidoc conversion.</th>
+<th class="tableblock halign-left valign-middle">Default: <code>true</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-middle"><div class="content"><div class="paragraph">
+<p><code>micronaut.openapi.adoc.template.dir</code></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><div class="content"><div class="paragraph">
+<p>Template directory path.</p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><div class="content"><div class="paragraph">
+<p>Default: <code>classpath:/template</code></p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-middle"><div class="content"><div class="paragraph">
+<p><code>micronaut.openapi.adoc.template.filename</code></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><div class="content"><div class="paragraph">
+<p>Main template filename.</p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><div class="content"><div class="paragraph">
+<p>Default: <code>openApiDoc.ftl</code> (in classpath)</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-middle"><div class="content"><div class="paragraph">
+<p><code>micronaut.openapi.adoc.output.dir</code></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><div class="content"><div class="paragraph">
+<p>Output directory path.</p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><div class="content"><div class="paragraph">
+<p>Default: standard micronaut openapi output directory path</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-middle"><div class="content"><div class="paragraph">
+<p><code>micronaut.openapi.adoc.output.filename</code></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><div class="content"><div class="paragraph">
+<p>Final <code>adoc</code> file name.</p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><div class="content"><div class="paragraph">
+<p>Default: the same as openapi spec. filename</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-middle"><div class="content"><div class="paragraph">
+<p><code>micronaut.openapi.adoc.templates.*</code></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><div class="content"><div class="paragraph">
+<p>Prefix for custom template names. You can override any of the templates that are used in the default implementation to change only part of the resulting document.</p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><div class="content"></div></td>
+</tr>
+</tbody>
+</table>
+
+<h1 id="versionsAndGroups"><a class="anchor" href="#versionsAndGroups"></a>19 Versions and groups</h1>
 
 <div class='contribute-btn'>
     <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/versionsAndGroups.adoc"'>
@@ -4261,7 +4359,7 @@ files. To do this, you can use the versioning mechanism built into Micronaut
 annotation or configuration.</p>
 </div>
 
-<h2 id="versions"><a class="anchor" href="#versions"></a>18.1 Micronaut versioning</h2>
+<h2 id="versions"><a class="anchor" href="#versions"></a>19.1 Micronaut versioning</h2>
 
 <div class='contribute-btn'>
     <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/versionsAndGroups/versions.adoc"'>
@@ -4274,7 +4372,7 @@ annotation or configuration.</p>
 <p>How to use the <code>@Version</code> annotation can be read here: <a href="https://docs.micronaut.io/latest/guide/#apiVersioning">Micronaut API versioning</a>.</p>
 </div>
 <div class="paragraph">
-<p>Micronaut OpenAPI support this versioning and automatticaly add pararameters or headers
+<p>Micronaut OpenAPI support this versioning and automatically add parameters or headers
 with version from your <code>application.yml</code>.</p>
 </div>
 <div class="paragraph">
@@ -4510,7 +4608,7 @@ components:
 </div>
 </div>
 
-<h2 id="groups"><a class="anchor" href="#groups"></a>18.2 OpenAPI groups</h2>
+<h2 id="groups"><a class="anchor" href="#groups"></a>19.2 OpenAPI groups</h2>
 
 <div class='contribute-btn'>
     <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/versionsAndGroups/groups.adoc"'>
@@ -4723,7 +4821,7 @@ so for normal API display, you will have to complete the template yourself.</p>
 </div>
 </div>
 
-<h1 id="serverContext"><a class="anchor" href="#serverContext"></a>19 Server Context</h1>
+<h1 id="serverContext"><a class="anchor" href="#serverContext"></a>20 Server Context</h1>
 
 <div class='contribute-btn'>
     <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/serverContext.adoc"'>
@@ -4756,7 +4854,7 @@ Since the yaml specification file and the views are generated at compile time, t
 <p>The view will first look for the cookie and if not present for the parameter.</p>
 </div>
 
-<h2 id="compileResolution"><a class="anchor" href="#compileResolution"></a>19.1 Compile Time Resolution</h2>
+<h2 id="compileResolution"><a class="anchor" href="#compileResolution"></a>20.1 Compile Time Resolution</h2>
 
 <div class='contribute-btn'>
     <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/serverContext/compileResolution.adoc"'>
@@ -4772,7 +4870,7 @@ Since the yaml specification file and the views are generated at compile time, t
 <p>If you want the resolution of the context path at runtime use one of the following methods:</p>
 </div>
 
-<h2 id="serverFilter"><a class="anchor" href="#serverFilter"></a>19.2 HttpServerFilter</h2>
+<h2 id="serverFilter"><a class="anchor" href="#serverFilter"></a>20.2 HttpServerFilter</h2>
 
 <div class='contribute-btn'>
     <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/serverContext/serverFilter.adoc"'>
@@ -4890,7 +4988,7 @@ public class OpenApiContextPathFilter implements HttpServerFilter {
 </div>
 </div>
 
-<h2 id="urlParameter"><a class="anchor" href="#urlParameter"></a>19.3 URL Parameter</h2>
+<h2 id="urlParameter"><a class="anchor" href="#urlParameter"></a>20.3 URL Parameter</h2>
 
 <div class='contribute-btn'>
     <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/serverContext/urlParameter.adoc"'>
@@ -4903,7 +5001,7 @@ public class OpenApiContextPathFilter implements HttpServerFilter {
 <p>Just add a parameter to the view url. For instance if the context path is set to <code>/context/path</code> you will access your view with <code><a href="http://localhost:8080/context/path/swagger-ui?contextPath=%2Fcontext%2Fpath" class="bare">http://localhost:8080/context/path/swagger-ui?contextPath=%2Fcontext%2Fpath</a></code>.</p>
 </div>
 
-<h1 id="repository"><a class="anchor" href="#repository"></a>20 Repository</h1>
+<h1 id="repository"><a class="anchor" href="#repository"></a>21 Repository</h1>
 
 <div class='contribute-btn'>
     <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/repository.adoc"'>
@@ -4919,7 +5017,7 @@ public class OpenApiContextPathFilter implements HttpServerFilter {
 <p><a href="https://github.com/micronaut-projects/micronaut-openapi">https://github.com/micronaut-projects/micronaut-openapi</a></p>
 </div>
 
-<h1 id="breaks"><a class="anchor" href="#breaks"></a>21 Breaking Changes</h1>
+<h1 id="breaks"><a class="anchor" href="#breaks"></a>22 Breaking Changes</h1>
 
 <div class='contribute-btn'>
     <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/breaks.adoc"'>
