@@ -1,0 +1,21 @@
+plugins {
+    id "io.micronaut.build.internal.binary-compatibility-check"
+    id 'io.micronaut.build.internal.openapi-simple-module'
+}
+
+micronautBuild {
+    binaryCompatibility {
+        enabled = false
+    }
+}
+
+dependencies {
+    api(mn.jackson.databind)
+    api(libs.jackson.dataformat.yaml)
+    api(libs.jackson.datatype.jsr310)
+    api(libs.managed.swagger.models)
+}
+
+test {
+    useJUnitPlatform()
+}

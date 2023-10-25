@@ -5,7 +5,7 @@ import io.swagger.v3.oas.models.OpenAPI
 
 class OpenApiDecoratorSpec extends AbstractOpenApiTypeElementSpec {
 
-    void "test OpenApidecorator"() {
+    void "test OpenApiDecorator"() {
         given: "An API definition"
         when:
         buildBeanDefinition('test.MyBean', '''

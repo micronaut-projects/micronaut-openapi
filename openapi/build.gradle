@@ -3,11 +3,14 @@ plugins {
 }
 
 dependencies {
+
     compileOnly(mn.micronaut.core.processor)
+    compileOnly(projects.micronautOpenapiAdoc)
 
     implementation(mn.micronaut.http)
 
     api(projects.micronautOpenapiAnnotations)
+    api(projects.micronautOpenapiCommon)
     api(mn.jackson.databind)
     api(libs.jackson.dataformat.yaml)
     api(libs.jackson.datatype.jsr310)

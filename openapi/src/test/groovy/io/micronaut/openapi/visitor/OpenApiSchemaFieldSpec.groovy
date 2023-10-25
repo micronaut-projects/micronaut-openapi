@@ -202,7 +202,7 @@ class MyDto {
 }
 
 @Schema(
-        name = "ParametersShema",
+        name = "ParametersSchema",
         description = "this is description",
         nullable = true,
         deprecated = true,
@@ -259,7 +259,7 @@ class MyBean {}
         when: "The OpenAPI is retrieved"
         OpenAPI openAPI = Utils.testReference
         Schema dtoSchema = openAPI.components.schemas['MyDto']
-        Schema parametersSchema = openAPI.components.schemas['ParametersShema']
+        Schema parametersSchema = openAPI.components.schemas['ParametersSchema']
 
         then: "the components are valid"
         dtoSchema != null
@@ -282,18 +282,18 @@ class MyBean {}
         operation.requestBody.content."application/json".schema instanceof Schema
         ((Schema) operation.requestBody.content."application/json".schema).get$ref() == "#/components/schemas/MyDto"
 
-        dtoSchema.properties.parameters.get$ref() == "#/components/schemas/ParametersShema"
+        dtoSchema.properties.parameters.get$ref() == "#/components/schemas/ParametersSchema"
         !openAPI.components.schemas.MyDto.required
-        openAPI.components.schemas.ParametersShema.deprecated
-        openAPI.components.schemas.ParametersShema.nullable
-        openAPI.components.schemas.ParametersShema.readOnly
-        openAPI.components.schemas.ParametersShema.description == 'this is description'
-        openAPI.components.schemas.ParametersShema.example
-        openAPI.components.schemas.ParametersShema.example.stampWidth == 220
-        openAPI.components.schemas.ParametersShema.example.stampHeight == 85
-        openAPI.components.schemas.ParametersShema.example.pageNumber == 1
-        openAPI.components.schemas.ParametersShema.default
-        openAPI.components.schemas.ParametersShema.default.stampWidth == 100
+        openAPI.components.schemas.ParametersSchema.deprecated
+        openAPI.components.schemas.ParametersSchema.nullable
+        openAPI.components.schemas.ParametersSchema.readOnly
+        openAPI.components.schemas.ParametersSchema.description == 'this is description'
+        openAPI.components.schemas.ParametersSchema.example
+        openAPI.components.schemas.ParametersSchema.example.stampWidth == 220
+        openAPI.components.schemas.ParametersSchema.example.stampHeight == 85
+        openAPI.components.schemas.ParametersSchema.example.pageNumber == 1
+        openAPI.components.schemas.ParametersSchema.default
+        openAPI.components.schemas.ParametersSchema.default.stampWidth == 100
     }
 
     void "test schema on property level with default values"() {
@@ -881,7 +881,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
         info = @Info(
                 title = "Hello World",
                 version = "42",
-                description = "This is it. The answer to life , the universe and everyting",
+                description = "This is it. The answer to life , the universe and everything",
                 license = @License(name = "Apache 2.0", url = "https://foo.bar"),
                 contact = @Contact(url = "https://gigantic-server.com", name = "Fred", email = "Fred@gigagantic-server.com")
         )

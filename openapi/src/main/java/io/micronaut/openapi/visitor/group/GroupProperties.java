@@ -44,9 +44,17 @@ public final class GroupProperties {
      */
     private Boolean commonExclude;
     /**
-     * Group final swagger filename.
+     * Group final openapi filename.
      */
     private String filename;
+    /**
+     * Generate or not openApi document in Asciidoc format.
+     */
+    private Boolean adocEnabled;
+    /**
+     * Name of file in Asciidoc format.
+     */
+    private String adocFilename;
     /**
      * Packages included to this group. Override annotation configuration.
      */
@@ -88,6 +96,22 @@ public final class GroupProperties {
         this.filename = filename;
     }
 
+    public Boolean getAdocEnabled() {
+        return adocEnabled;
+    }
+
+    public void setAdocEnabled(Boolean adocEnabled) {
+        this.adocEnabled = adocEnabled;
+    }
+
+    public String getAdocFilename() {
+        return adocFilename;
+    }
+
+    public void setAdocFilename(String adocFilename) {
+        this.adocFilename = adocFilename;
+    }
+
     public List<PackageProperties> getPackages() {
         return packages;
     }
@@ -113,7 +137,7 @@ public final class GroupProperties {
     }
 
     /**
-     * Package name with inclusion subpackasges flag.
+     * Package name with inclusion subpackages flag.
      *
      * @since 4.10.0
      */

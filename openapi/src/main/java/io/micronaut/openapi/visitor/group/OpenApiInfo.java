@@ -19,7 +19,7 @@ import io.micronaut.core.annotation.Internal;
 import io.swagger.v3.oas.models.OpenAPI;
 
 /**
- * Helpfull object with information about openAPI object and group / version settings.
+ * Helpful object with information about openAPI object and group / version settings.
  *
  * @since 4.10.0
  */
@@ -30,6 +30,8 @@ public final class OpenApiInfo {
     private String groupName;
     private String groupTitle;
     private String filename;
+    private boolean adocEnabled = true;
+    private String adocFilename;
     private OpenAPI openApi;
     private String specFilePath;
 
@@ -37,11 +39,14 @@ public final class OpenApiInfo {
         this.openApi = openApi;
     }
 
-    public OpenApiInfo(String version, String groupName, String groupTitle, String filename, OpenAPI openApi) {
+    public OpenApiInfo(String version, String groupName, String groupTitle, String filename,
+                       boolean adocEnabled, String adocFilename, OpenAPI openApi) {
         this.version = version;
         this.groupName = groupName;
         this.groupTitle = groupTitle;
         this.filename = filename;
+        this.adocEnabled = adocEnabled;
+        this.adocFilename = adocFilename;
         this.openApi = openApi;
     }
 
@@ -75,6 +80,22 @@ public final class OpenApiInfo {
 
     public void setFilename(String filename) {
         this.filename = filename;
+    }
+
+    public boolean isAdocEnabled() {
+        return adocEnabled;
+    }
+
+    public void setAdocEnabled(boolean adocEnabled) {
+        this.adocEnabled = adocEnabled;
+    }
+
+    public String getAdocFilename() {
+        return adocFilename;
+    }
+
+    public void setAdocFilename(String adocFilename) {
+        this.adocFilename = adocFilename;
     }
 
     public OpenAPI getOpenApi() {

@@ -29,6 +29,8 @@ import io.micronaut.core.annotation.Internal;
 import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.core.util.StringUtils;
 import io.micronaut.http.HttpMethod;
+import io.micronaut.openapi.OpenApiUtils;
+import io.micronaut.openapi.SimpleSchema;
 import io.swagger.v3.oas.annotations.extensions.Extension;
 import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
 import io.swagger.v3.oas.models.Components;
@@ -144,7 +146,7 @@ public final class SchemaUtils {
                 if (key.isEmpty()) {
                     if (propertyAsJson) {
                         try {
-                            processedValue = ConvertUtils.getJsonMapper().readTree(propertyValue);
+                            processedValue = OpenApiUtils.getJsonMapper().readTree(propertyValue);
                             map.put(prependIfMissing(propertyName, PREFIX_X), processedValue);
                         } catch (Exception e) {
                             map.put(prependIfMissing(propertyName, PREFIX_X), propertyValue);
@@ -161,7 +163,7 @@ public final class SchemaUtils {
                     @SuppressWarnings("unchecked") final Map<String, Object> mapValue = (Map<String, Object>) value;
                     if (propertyAsJson) {
                         try {
-                            processedValue = ConvertUtils.getJsonMapper().readTree(propertyValue);
+                            processedValue = OpenApiUtils.getJsonMapper().readTree(propertyValue);
                             mapValue.put(propertyName, processedValue);
                         } catch (Exception e) {
                             mapValue.put(propertyName, propertyValue);
