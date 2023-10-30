@@ -545,7 +545,7 @@ public final class ConfigUtils {
             String groupName = prop.substring(MICRONAUT_OPENAPI_GROUPS.length() + 1, groupNameIndexEnd);
             String propertyName = prop.substring(groupNameIndexEnd + 1);
             String value = props.getProperty(prop);
-            setGroupProperty(groupName, prop, value, groupPropertiesMap, context);
+            setGroupProperty(groupName, propertyName, value, groupPropertiesMap, context);
         }
     }
 
