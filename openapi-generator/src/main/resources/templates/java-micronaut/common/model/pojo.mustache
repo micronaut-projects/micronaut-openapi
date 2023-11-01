@@ -36,9 +36,9 @@
 {{#additionalModelTypeAnnotations}}
 {{{.}}}
 {{/additionalModelTypeAnnotations}}
-{{#withGeneratedAnnotation}}
+{{#generatedAnnotation}}
 {{>common/generatedAnnotation}}
-{{/withGeneratedAnnotation}}
+{{/generatedAnnotation}}
 {{#discriminator}}
 {{>common/model/typeInfoAnnotation}}
 {{/discriminator}}
@@ -120,7 +120,7 @@ public class {{classname}} {{#parent}}extends {{{parent}}} {{/parent}}{{#vendorE
         {{/vendorExtensions.x-is-jackson-optional-nullable}}
         {{^vendorExtensions.x-is-jackson-optional-nullable}}
             {{#isContainer}}
-    private {{{datatypeWithEnum}}} {{name}}{{#required}}{{^requiredPropertiesInConstructor}}{{#vendorExtensions.defaultValueIsNotNull}}{{#defaultValue}} = {{{.}}}{{/defaultValue}}{{/vendorExtensions.defaultValueIsNotNull}}{{/requiredPropertiesInConstructor}}{{/required}};
+    private {{{vendorExtensions.typeWithEnumWithGenericAnnotations}}} {{name}}{{#required}}{{^requiredPropertiesInConstructor}}{{#vendorExtensions.defaultValueIsNotNull}}{{#defaultValue}} = {{{.}}}{{/defaultValue}}{{/vendorExtensions.defaultValueIsNotNull}}{{/requiredPropertiesInConstructor}}{{/required}};
             {{/isContainer}}
             {{^isContainer}}
     {{#isDiscriminator}}protected{{/isDiscriminator}}{{^isDiscriminator}}private{{/isDiscriminator}} {{{datatypeWithEnum}}} {{name}}{{#vendorExtensions.defaultValueIsNotNull}}{{#defaultValue}} = {{{.}}}{{/defaultValue}}{{/vendorExtensions.defaultValueIsNotNull}};

@@ -7,10 +7,10 @@
 |`*micronaut.openapi.target.file*` | System property that enables setting the target file to write to. | Default: `META-INF/swagger/${applicationName}-${version}.yml`
 |`*micronaut.openapi.views.dest.dir*` | System property that specifies the path where the generated UI elements will be located. | Default: `META-INF/swagger/views/`
 |`*micronaut.openapi.additional.files*` | System property that specifies the location of additional swagger YAML and JSON files to read from. |
-|`*micronaut.openapi.project.dir*` | System property that specifies the location of current project. Need to set this property mannually if you use kotlin (to save incremental annotation processing) or have some troubles with auto calculation project path. | Default: calculated automatically
+|`*micronaut.openapi.project.dir*` | System property that specifies the location of current project. Need to set this property manually if you use kotlin (to save incremental annotation processing) or have some troubles with auto calculation project path. | Default: calculated automatically
 |`*micronaut.openapi.security.default-schema-name*` | System property that specifies the default security schema name, if it's not specified by annotation SecurityScheme. |
 |`*micronaut.openapi.security.enabled*` | Is this property true, micronaut-openapi will process micronaut-security properties and annotations to construct openapi security schema. | Default: `true`
-|`*micronaut.openapi.field.visibility.level*` | System property that specifies the schema classes fields visibility level. By default, only public fields visibile. +
+|`*micronaut.openapi.field.visibility.level*` | System property that specifies the schema classes fields visibility level. By default, only public fields visible. +
 {nbsp} +
 **Available values:** +
 PRIVATE +
@@ -21,7 +21,7 @@ PUBLIC | Default: `PUBLIC`
 |`*micronaut.openapi.filename*` | The name of the result swagger file. | Default: `${info.title}-${info.version}.yml`, if info block not set, filename will be `swagger.yml`.
 |`*micronaut.openapi.environments*` | Active micronaut environments which will be used for @Requires annotations. |
 |`*micronaut.openapi.environments.enabled*` | Is this property true, properties wll be loaded in the standard way from application.yml. Also, environments from `micronaut.openapi.environments` property will set as additional environments, if you want to set specific environment name for openAPI generator. | Default: `true`
-|`*micronaut.openapi.versioning.enabled*` | Is this property true, micronaut-openapi will process micronaut-router versioning prpoerties and annotations. | Default: `true`
+|`*micronaut.openapi.versioning.enabled*` | Is this property true, micronaut-openapi will process micronaut-router versioning properties and annotations. | Default: `true`
 |`*micronaut.server.context-path*` | `micronaut-http` server context path property. |
 |`*micronaut.internal.openapi.filenames*` | Final calculated openapi filenames. |
 |`*jackson.json-view.enabled*` | `micronaut-http` property (`json-view.enabled`). | Default: `false`
@@ -32,7 +32,7 @@ PUBLIC | Default: `PUBLIC`
 You can set your custom paths separated by `,`. To set absolute paths use prefix `file:`,
 classpath paths use prefix `classpath:` or use prefix `project:` to set paths from project
 directory. |
-|`*micronaut.openapi.schema.**` | Properties prefix to set custom schema implementations for selected clases. +
+|`*micronaut.openapi.schema.**` | Properties prefix to set custom schema implementations for selected classes. +
 For example, if you want to set simple `java.lang.String` class to some complex `org.somepackage.MyComplexType` class you need to write: +
 {nbsp} +
 micronaut.openapi.schema.org.somepackage.MyComplexType=java.lang.String +
@@ -64,7 +64,7 @@ micronaut: +
 {nbsp}{nbsp}{nbsp}{nbsp}{nbsp}{nbsp}org.api.v2_0_0: private +
 {nbsp} +
 |
-|`*micronaut.openapi.groups.**` | Properties prefix to set custom schema implementations for selected clases. +
+|`*micronaut.openapi.groups.**` | Properties prefix to set custom schema implementations for selected classes. +
 For example, if you want to set simple 'java.lang.String' class to some complex 'org.somepackage.MyComplexType' class you need to write: +
 {nbsp} +
 -Dmicronaut.openapi.group.my-group1.title="Title 1" +

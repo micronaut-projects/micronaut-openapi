@@ -2,7 +2,7 @@
 
 [![Maven Central](https://img.shields.io/maven-central/v/io.micronaut.openapi/micronaut-openapi.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22io.micronaut.openapi%22%20AND%20a:%22micronaut-openapi%22)
 [![Build Status](https://github.com/micronaut-projects/micronaut-openapi/workflows/Java%20CI/badge.svg)](https://github.com/micronaut-projects/micronaut-openapi/actions)
-[![Revved up by Gradle Enterprise](https://img.shields.io/badge/Revved%20up%20by-Gradle%20Enterprise-06A0CE?logo=Gradle&labelColor=02303A)](https://ge.micronaut.io/scans)
+[![Revved up by Develocity](https://img.shields.io/badge/Revved%20up%20by-Develocity-06A0CE?logo=Gradle&labelColor=02303A)](https://ge.micronaut.io/scans)
 
 This project allows generating OpenAPI 3.x (Swagger) specifications for a Micronaut application at compilation time. By moving the generation of OpenAPI specs into the compiler this project allows Micronaut applications to save on memory and avoid the need for costly computation at runtime unlike most implementations of OpenAPI which rely on processing to occur on the server.
 

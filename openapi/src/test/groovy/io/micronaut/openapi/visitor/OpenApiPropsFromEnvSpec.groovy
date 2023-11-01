@@ -122,7 +122,7 @@ class MyBean {}
 
         given:
         System.setProperty(OpenApiConfigProperty.MICRONAUT_CONFIG_FILE_LOCATIONS, "project:/src/test/resources/")
-        System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_CONFIG_FILE, "openapi-controller-cutom-uri.properties")
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_CONFIG_FILE, "openapi-controller-custom-uri.properties")
         System.setProperty(Environment.ENVIRONMENTS_PROPERTY, "local2")
 
         when:
@@ -213,7 +213,7 @@ class MyBean {}
         loginPathItem.post.responses['200'].content['application/json'].schema.type == 'object'
 
         openAPI.components.schemas['UsernamePasswordCredentials']
-        // TODO: uncomment when micronaut-securty migrate to jakarta.validation
+        // TODO: uncomment when micronaut-security migrate to jakarta.validation
 //        openAPI.components.schemas['UsernamePasswordCredentials'].required.size() == 2
         openAPI.components.schemas['UsernamePasswordCredentials'].properties['username']
         openAPI.components.schemas['UsernamePasswordCredentials'].properties['password']
