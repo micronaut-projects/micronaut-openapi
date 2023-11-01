@@ -43,9 +43,9 @@ import io.micronaut.core.order.OrderUtil;
 import io.micronaut.core.util.StringUtils;
 import io.micronaut.inject.visitor.VisitorContext;
 
+import static io.micronaut.openapi.visitor.ConfigUtils.getProjectPath;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_CONFIG_FILE_LOCATIONS;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_ENVIRONMENT_ENABLED;
-import static io.micronaut.openapi.visitor.ConfigUtils.getProjectPath;
 
 /**
  * Specific environment for annotation processing level. Solve problem with access to resources
@@ -130,10 +130,10 @@ public class AnnProcessorEnvironment extends DefaultEnvironment {
 
     private void readConstantPropertySources(String name, List<PropertySource> propertySources) {
         Set<String> propertySourceNames = Stream.concat(Stream.of(name), getActiveNames().stream().map(env -> name + "-" + env))
-                .collect(Collectors.toSet());
+            .collect(Collectors.toSet());
         getConstantPropertySources().stream()
-                .filter(p -> propertySourceNames.contains(p.getName()))
-                .forEach(propertySources::add);
+            .filter(p -> propertySourceNames.contains(p.getName()))
+            .forEach(propertySources::add);
     }
 
     /**

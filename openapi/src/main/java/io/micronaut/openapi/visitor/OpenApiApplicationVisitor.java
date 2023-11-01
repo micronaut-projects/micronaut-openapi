@@ -303,51 +303,6 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         };
     }
 
-    // TODO
-    private Path getDefaultFilePath(String fileName, VisitorContext context) {
-        // default location
-        GeneratedFile generatedFile = ContextUtils.visitMetaInfFile("swagger/" + fileName, context);
-        if (generatedFile != null) {
-            URI uri = generatedFile.toURI();
-            // happens in tests 'mem:///CLASS_OUTPUT/META-INF/swagger/swagger.yml'
-            if (uri.getScheme() != null && !uri.getScheme().equals("mem")) {
-                Path specPath = Paths.get(uri);
-                createDirectories(specPath, context);
-                return specPath;
-            }
-        }
-        context.warn("Unable to get swagger/" + fileName + " file.", null);
-        return null;
-    }
-
-    private Path openApiSpecFile(String fileName, VisitorContext context) {
-        Path path = userDefinedSpecFile(context);
-        if (path != null) {
-            return path;
-        }
-        return getDefaultFilePath(fileName, context);
-    }
-
-    private Path userDefinedSpecFile(VisitorContext context) {
-        String targetFile = getConfigProperty(MICRONAUT_OPENAPI_TARGET_FILE, context);
-        if (StringUtils.isEmpty(targetFile)) {
-            return null;
-        }
-        Path specFile = resolve(context, Paths.get(targetFile));
-        createDirectories(specFile, context);
-        return specFile;
-    }
-
-    private Path getViewsDestDir(Path defaultSwaggerFilePath, VisitorContext context) {
-        String destDir = getConfigProperty(MICRONAUT_OPENAPI_VIEWS_DEST_DIR, context);
-        if (StringUtils.isNotEmpty(destDir)) {
-            Path destPath = resolve(context, Paths.get(destDir));
-            createDirectories(destPath, context);
-            return destPath;
-        }
-        return defaultSwaggerFilePath.getParent().resolve("views");
-    }
-
     private void applyPropertyNamingStrategy(OpenAPI openAPI, VisitorContext context) {
         final String namingStrategyName = getConfigProperty(MICRONAUT_OPENAPI_PROPERTY_NAMING_STRATEGY, context);
         final PropertyNamingStrategies.NamingBase propertyNamingStrategy = fromName(namingStrategyName);

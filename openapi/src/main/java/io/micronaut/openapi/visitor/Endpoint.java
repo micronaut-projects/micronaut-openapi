@@ -30,6 +30,7 @@ import io.swagger.v3.oas.models.tags.Tag;
  * @author croudet
  */
 class Endpoint {
+
     private Optional<ClassElement> element;
     private List<Tag> tags = Collections.emptyList();
     private List<Server> servers = Collections.emptyList();
@@ -37,6 +38,7 @@ class Endpoint {
 
     /**
      * Sets the ClassElement of the endpoint.
+     *
      * @param element A ClassElement,
      */
     void setClassElement(Optional<ClassElement> element) {
@@ -45,6 +47,7 @@ class Endpoint {
 
     /**
      * Sets the tags to add to the Endpoint entry in the spec file.
+     *
      * @param tags A list of tags.
      */
     void setTags(List<Tag> tags) {
@@ -53,6 +56,7 @@ class Endpoint {
 
     /**
      * Returns the Endpoint ClassElement.
+     *
      * @return A ClassElement.
      */
     Optional<ClassElement> getClassElement() {
@@ -61,6 +65,7 @@ class Endpoint {
 
     /**
      * Returns the tags to add to the Endpoint entry in the spec file.
+     *
      * @return The tags to add to the Endpoint entry in the spec file.
      */
     List<Tag> getTags() {
@@ -69,6 +74,7 @@ class Endpoint {
 
     /**
      * Returns the servers to add to the Endpoint entry in the spec file.
+     *
      * @return The servers to add to the Endpoint entry in the spec file.
      */
     public List<Server> getServers() {
@@ -77,6 +83,7 @@ class Endpoint {
 
     /**
      * Sets the servers to add to the Endpoint entry in the spec file.
+     *
      * @param servers A list of servers.
      */
     public void setServers(List<Server> servers) {
@@ -85,6 +92,7 @@ class Endpoint {
 
     /**
      * Returns the securityRequirements to add to the Endpoint entry in the spec file.
+     *
      * @return The securityRequirements to add to the Endpoint entry in the spec file.
      */
     public List<SecurityRequirement> getSecurityRequirements() {
@@ -93,6 +101,7 @@ class Endpoint {
 
     /**
      * Sets the securityRequirements to add to the Endpoint entry in the spec file.
+     *
      * @param securityRequirements A list of securityRequirements.
      */
     public void setSecurityRequirements(List<SecurityRequirement> securityRequirements) {
@@ -102,7 +111,7 @@ class Endpoint {
     @Override
     public String toString() {
         return "Endpoint [element=" + element + ", tags=" + tags + ", servers=" + servers + ", securityRequirements="
-                + securityRequirements + "]";
+            + securityRequirements + "]";
     }
 
 }

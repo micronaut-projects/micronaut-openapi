@@ -75,27 +75,28 @@ public class EndpointsConfiguration {
         Map<String, String> map = new HashMap<>(properties.size());
         properties.forEach((key, value) -> map.put((String) key, (String) value));
         map.entrySet().stream()
-                .filter(EndpointsConfiguration::validEntry)
-                .forEach(entry -> {
-                    int idx = entry.getKey().lastIndexOf('.');
-                    if (idx <= 0 || idx == entry.getKey().length() - 1 || entry.getValue() == null) {
-                        return;
-                    }
-                    String entryType = entry.getKey().substring(idx + 1);
-                    String name = entry.getKey().substring(ENDPOINTS_PREFIX.length(), idx);
-                    Endpoint endpoint = endpoints.computeIfAbsent(name, key -> new Endpoint());
-                    switch (entryType) {
-                        case "security-requirements" -> endpoint.setSecurityRequirements(parseSecurityRequirements(entry.getValue(), context));
-                        case "servers" -> endpoint.setServers(parseServers(entry.getValue(), context));
-                        case "tags" -> endpoint.setTags(parseTags(entry.getValue()));
-                        case "class" -> endpoint.setClassElement(context.getClassElement(entry.getValue()));
-                        default -> context.warn("Unknown value " + entryType, null);
-                    }
-                });
+            .filter(EndpointsConfiguration::validEntry)
+            .forEach(entry -> {
+                int idx = entry.getKey().lastIndexOf('.');
+                if (idx <= 0 || idx == entry.getKey().length() - 1 || entry.getValue() == null) {
+                    return;
+                }
+                String entryType = entry.getKey().substring(idx + 1);
+                String name = entry.getKey().substring(ENDPOINTS_PREFIX.length(), idx);
+                Endpoint endpoint = endpoints.computeIfAbsent(name, key -> new Endpoint());
+                switch (entryType) {
+                    case "security-requirements" -> endpoint.setSecurityRequirements(parseSecurityRequirements(entry.getValue(), context));
+                    case "servers" -> endpoint.setServers(parseServers(entry.getValue(), context));
+                    case "tags" -> endpoint.setTags(parseTags(entry.getValue()));
+                    case "class" -> endpoint.setClassElement(context.getClassElement(entry.getValue()));
+                    default -> context.warn("Unknown value " + entryType, null);
+                }
+            });
     }
 
     /**
      * Returns the base path for all Endpoints.
+     *
      * @return A path.
      */
     String getPath() {
@@ -104,6 +105,7 @@ public class EndpointsConfiguration {
 
     /**
      * Returns true if processing of Endpoints is enabled.
+     *
      * @return true if processing of Endpoints is enabled.
      */
     boolean isEnabled() {
@@ -112,6 +114,7 @@ public class EndpointsConfiguration {
 
     /**
      * The list of global tags to add to all Endpoints.
+     *
      * @return the list of global tags to add to all Endpoints.
      */
     List<Tag> getTags() {
@@ -120,6 +123,7 @@ public class EndpointsConfiguration {
 
     /**
      * The Endpoints to process.
+     *
      * @return The Endpoints to process.
      */
     Map<String, Endpoint> getEndpoints() {
@@ -128,6 +132,7 @@ public class EndpointsConfiguration {
 
     /**
      * The list of global servers to add to all Endpoints.
+     *
      * @return the list of global servers to add to all Endpoints.
      */
     List<Server> getServers() {
@@ -136,6 +141,7 @@ public class EndpointsConfiguration {
 
     /**
      * The list of global security requirements to add to all Endpoints.
+     *
      * @return the list of global security requirements to add to all Endpoints.
      */
     List<SecurityRequirement> getSecurityRequirements() {
@@ -145,18 +151,18 @@ public class EndpointsConfiguration {
     @Override
     public String toString() {
         return "EndpointsConfiguration [enabled=" + enabled + ", path=" + path + ", tags=" + tags + ", endpoints="
-                + endpoints + "]";
+            + endpoints + "]";
     }
 
-    private static List<Server> parseServers(String servers, VisitorContext context)  {
-        return parseModel(servers, context, new TypeReference<>() { });
+    private static List<Server> parseServers(String servers, VisitorContext context) {
+        return parseModel(servers, context, new TypeReference<>() {});
     }
 
-    private static List<SecurityRequirement> parseSecurityRequirements(String securityRequirements, VisitorContext context)  {
-        return parseModel(securityRequirements, context, new TypeReference<>() { });
+    private static List<SecurityRequirement> parseSecurityRequirements(String securityRequirements, VisitorContext context) {
+        return parseModel(securityRequirements, context, new TypeReference<>() {});
     }
 
-    private static <T> List<T> parseModel(String s, VisitorContext context, TypeReference<List<T>> typeReference)  {
+    private static <T> List<T> parseModel(String s, VisitorContext context, TypeReference<List<T>> typeReference) {
         if (StringUtils.isEmpty(s) || (!s.startsWith("[") && !s.endsWith("]"))) {
             return Collections.emptyList();
         }
@@ -170,11 +176,11 @@ public class EndpointsConfiguration {
 
     private static boolean validEntry(Map.Entry<String, String> entry) {
         return entry.getKey().startsWith(ENDPOINTS_PREFIX)
-        && !entry.getKey().equals(ENDPOINTS_ENABLED)
-        && !entry.getKey().equals(ENDPOINTS_TAGS)
-        && !entry.getKey().equals(ENDPOINTS_SERVERS)
-        && !entry.getKey().equals(ENDPOINTS_SECURITY_REQUIREMENTS)
-        && !entry.getKey().equals(ENDPOINTS_PATH);
+            && !entry.getKey().equals(ENDPOINTS_ENABLED)
+            && !entry.getKey().equals(ENDPOINTS_TAGS)
+            && !entry.getKey().equals(ENDPOINTS_SERVERS)
+            && !entry.getKey().equals(ENDPOINTS_SECURITY_REQUIREMENTS)
+            && !entry.getKey().equals(ENDPOINTS_PATH);
     }
 
     private static List<Tag> parseTags(String stringTagsStr) {

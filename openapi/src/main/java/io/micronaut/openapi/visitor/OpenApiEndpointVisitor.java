@@ -41,12 +41,12 @@ import io.swagger.v3.oas.models.tags.Tag;
 
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 
-import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ENABLED;
 import static io.micronaut.openapi.visitor.ConfigUtils.endpointsConfiguration;
 import static io.micronaut.openapi.visitor.ConfigUtils.isOpenApiEnabled;
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_OPENAPI_ENDPOINT_CLASS_TAGS;
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_OPENAPI_ENDPOINT_SECURITY_REQUIREMENTS;
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_OPENAPI_ENDPOINT_SERVERS;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ENABLED;
 import static io.micronaut.openapi.visitor.Utils.DEFAULT_MEDIA_TYPES;
 
 /**
@@ -169,7 +169,7 @@ public class OpenApiEndpointVisitor extends AbstractOpenApiEndpointVisitor imple
         AnnotationValue<JsonAnySetter> jsonAnySetterAnn = element.getAnnotation(JsonAnySetter.class);
 
         if (isHidden || element.isAnnotationPresent(Hidden.class)
-                || (jsonAnySetterAnn != null && jsonAnySetterAnn.booleanValue("enabled").orElse(true))) {
+            || (jsonAnySetterAnn != null && jsonAnySetterAnn.booleanValue("enabled").orElse(true))) {
             return true;
         }
         methodDescription = httpMethodDescription(element);
@@ -259,7 +259,7 @@ public class OpenApiEndpointVisitor extends AbstractOpenApiEndpointVisitor imple
             AnnotationValue<?> annotation = element.getAnnotation(endpointManagementAnnName);
             assert annotation != null;
             return new HttpMethodDescription(httpMethod, annotation.stringValue("description").orElse(null),
-                    annotation.stringValues("produces"), annotation.stringValues("consumes"));
+                annotation.stringValues("produces"), annotation.stringValues("consumes"));
         }
         return null;
     }
@@ -286,7 +286,7 @@ public class OpenApiEndpointVisitor extends AbstractOpenApiEndpointVisitor imple
         @Override
         public String toString() {
             return "HttpMethodDescription [httpMethod=" + httpMethod + ", description=" + description + ", produces="
-                    + Arrays.toString(produces) + ", consumes=" + Arrays.toString(consumes) + "]";
+                + Arrays.toString(produces) + ", consumes=" + Arrays.toString(consumes) + "]";
         }
     }
 

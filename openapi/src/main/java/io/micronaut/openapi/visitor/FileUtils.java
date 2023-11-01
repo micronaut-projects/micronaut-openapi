@@ -26,7 +26,6 @@ import java.util.Optional;
 import io.micronaut.context.env.Environment;
 import io.micronaut.core.annotation.Internal;
 import io.micronaut.core.util.StringUtils;
-import io.micronaut.inject.ast.Element;
 import io.micronaut.inject.visitor.VisitorContext;
 import io.micronaut.inject.writer.GeneratedFile;
 import io.micronaut.openapi.visitor.group.OpenApiInfo;
@@ -88,38 +87,38 @@ public final class FileUtils {
         return defaultSwaggerFilePath.getParent().resolve("views");
     }
 
-    public static Optional<Path> getDefaultFilePath(String fileName, VisitorContext context) {
+    public static Path getDefaultFilePath(String fileName, VisitorContext context) {
         // default location
-        Optional<GeneratedFile> generatedFile = context.visitMetaInfFile("swagger/" + fileName, Element.EMPTY_ELEMENT_ARRAY);
-        if (generatedFile.isPresent()) {
-            URI uri = generatedFile.get().toURI();
+        GeneratedFile generatedFile = ContextUtils.visitMetaInfFile("swagger/" + fileName, context);
+        if (generatedFile != null) {
+            URI uri = generatedFile.toURI();
             // happens in tests 'mem:///CLASS_OUTPUT/META-INF/swagger/swagger.yml'
             if (uri.getScheme() != null && !uri.getScheme().equals("mem")) {
                 Path specPath = Paths.get(uri);
                 createDirectories(specPath, context);
-                return Optional.of(specPath);
+                return specPath;
             }
         }
         context.warn("Unable to get swagger/" + fileName + " file.", null);
-        return Optional.empty();
+        return null;
     }
 
-    public static Optional<Path> openApiSpecFile(String fileName, VisitorContext context) {
-        Optional<Path> path = userDefinedSpecFile(context);
-        if (path.isPresent()) {
+    public static Path openApiSpecFile(String fileName, VisitorContext context) {
+        Path path = userDefinedSpecFile(context);
+        if (path != null) {
             return path;
         }
         return getDefaultFilePath(fileName, context);
     }
 
-    public static Optional<Path> userDefinedSpecFile(VisitorContext context) {
+    public static Path userDefinedSpecFile(VisitorContext context) {
         String targetFile = getConfigProperty(MICRONAUT_OPENAPI_TARGET_FILE, context);
         if (StringUtils.isEmpty(targetFile)) {
-            return Optional.empty();
+            return null;
         }
         Path specFile = resolve(context, Paths.get(targetFile));
         createDirectories(specFile, context);
-        return Optional.of(specFile);
+        return specFile;
     }
 
     public static Pair<String, String> calcFinalFilename(String groupFileName, OpenApiInfo openApiInfo, boolean isSingleGroup, String ext, VisitorContext context) {

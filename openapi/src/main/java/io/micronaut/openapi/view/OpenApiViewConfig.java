@@ -116,11 +116,11 @@ public final class OpenApiViewConfig {
             return Collections.emptyMap();
         }
         return Arrays.stream(specification.split(",")).map(String::strip).filter(s -> !s.isEmpty())
-                .map(s -> s.split("=")).filter(keyValue -> keyValue.length == 2).peek(keyValue -> {
-                    keyValue[0] = keyValue[0].strip();
-                    keyValue[1] = keyValue[1].strip();
-                }).filter(keyValue -> !keyValue[0].isEmpty() && !keyValue[1].isEmpty())
-                .collect(Collectors.toMap(keyValue -> keyValue[0], keyValue -> keyValue[1]));
+            .map(s -> s.split("=")).filter(keyValue -> keyValue.length == 2).peek(keyValue -> {
+                keyValue[0] = keyValue[0].strip();
+                keyValue[1] = keyValue[1].strip();
+            }).filter(keyValue -> !keyValue[0].isEmpty() && !keyValue[1].isEmpty())
+            .collect(Collectors.toMap(keyValue -> keyValue[0], keyValue -> keyValue[1]));
     }
 
     /**
@@ -366,7 +366,7 @@ public final class OpenApiViewConfig {
             }
         }
         try (BufferedWriter writer = Files.newBufferedWriter(file, StandardCharsets.UTF_8,
-                StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING)
+            StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING)
         ) {
             writer.write(template);
         }

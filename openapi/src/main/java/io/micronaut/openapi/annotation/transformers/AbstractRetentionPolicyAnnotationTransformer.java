@@ -28,10 +28,12 @@ import io.micronaut.inject.visitor.VisitorContext;
  * Changes the Retention Policy of the annotation to SOURCE.
  *
  * @param <T> The annotation type.
- * @since 2.1
+ *
  * @author croudet
+ * @since 2.1
  */
 abstract class AbstractRetentionPolicyAnnotationTransformer<T extends Annotation> implements TypedAnnotationTransformer<T> {
+
     private final Class<T> type;
 
     /**
@@ -46,7 +48,7 @@ abstract class AbstractRetentionPolicyAnnotationTransformer<T extends Annotation
     @Override
     public List<AnnotationValue<?>> transform(AnnotationValue<T> annotation, VisitorContext context) {
         return Collections.singletonList(
-                              AnnotationValue.builder(annotation, RetentionPolicy.SOURCE).build());
+            AnnotationValue.builder(annotation, RetentionPolicy.SOURCE).build());
     }
 
     @Override

@@ -52,12 +52,12 @@ public abstract class AbstractAnnotationAssert<ACTUAL extends AbstractAnnotation
 
     private static boolean hasAttributes(final AnnotationExpr annotation, final Map<String, String> expectedAttributesToContains) {
         final Map<String, String> actualAttributes;
-        if (annotation instanceof SingleMemberAnnotationExpr) {
+        if (annotation instanceof SingleMemberAnnotationExpr singleMemberAnnotationExpr) {
             actualAttributes = ImmutableMap.of(
-                "value", ((SingleMemberAnnotationExpr) annotation).getMemberValue().toString()
+                "value", singleMemberAnnotationExpr.getMemberValue().toString()
             );
-        } else if (annotation instanceof NormalAnnotationExpr) {
-            actualAttributes = ((NormalAnnotationExpr) annotation).getPairs().stream()
+        } else if (annotation instanceof NormalAnnotationExpr normalAnnotationExpr) {
+            actualAttributes = normalAnnotationExpr.getPairs().stream()
                 .collect(Collectors.toMap(NodeWithSimpleName::getNameAsString, pair -> pair.getValue().toString()));
         } else if (annotation instanceof MarkerAnnotationExpr) {
             actualAttributes = new HashMap<>();

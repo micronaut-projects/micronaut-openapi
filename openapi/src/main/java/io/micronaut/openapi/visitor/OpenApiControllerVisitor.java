@@ -55,9 +55,9 @@ import io.swagger.v3.oas.models.servers.Server;
 
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 
-import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ENABLED;
 import static io.micronaut.openapi.visitor.ConfigUtils.getActiveEnvs;
 import static io.micronaut.openapi.visitor.ConfigUtils.getEnv;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ENABLED;
 import static io.micronaut.openapi.visitor.Utils.DEFAULT_MEDIA_TYPES;
 
 /**
@@ -151,7 +151,7 @@ public class OpenApiControllerVisitor extends AbstractOpenApiEndpointVisitor imp
     @Override
     protected HttpMethod httpMethod(MethodElement element) {
         Optional<Class<? extends Annotation>> httpMethodOpt = element
-                .getAnnotationTypeByStereotype(HttpMethodMapping.class);
+            .getAnnotationTypeByStereotype(HttpMethodMapping.class);
         if (httpMethodOpt.isEmpty()) {
             return null;
         }
@@ -231,11 +231,11 @@ public class OpenApiControllerVisitor extends AbstractOpenApiEndpointVisitor imp
     @Override
     protected List<Server> methodServers(MethodElement element, VisitorContext context) {
         return processOpenApiAnnotation(
-                element,
-                context,
-                io.swagger.v3.oas.annotations.servers.Server.class,
-                Server.class,
-                Collections.emptyList()
+            element,
+            context,
+            io.swagger.v3.oas.annotations.servers.Server.class,
+            Server.class,
+            Collections.emptyList()
         );
     }
 

@@ -1042,7 +1042,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                     final Schema<?> parameterSchema = newParameter.getSchema();
                     if (paramAnn.contains("schema") && parameterSchema != null) {
                         paramAnn.get("schema", AnnotationValue.class)
-                                .ifPresent(schemaAnn -> bindSchemaAnnotationValue(context, parameter, parameterSchema, schemaAnn, null));
+                            .ifPresent(schemaAnn -> bindSchemaAnnotationValue(context, parameter, parameterSchema, schemaAnn, null));
                     }
                 }
             }

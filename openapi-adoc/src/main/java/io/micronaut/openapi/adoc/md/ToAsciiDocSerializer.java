@@ -201,8 +201,8 @@ public class ToAsciiDocSerializer implements Visitor {
         String text = printChildrenToString(node);
         LinkRenderer.Rendering imageRenderer = linkRenderer.render(node, text);
         Node linkNode;
-        if ((linkNode = findParentNode(node, rootNode)) instanceof ExpLinkNode) {
-            printImageTagWithLink(imageRenderer, linkRenderer.render((ExpLinkNode) linkNode, null));
+        if ((linkNode = findParentNode(node, rootNode)) instanceof ExpLinkNode expLinkNode) {
+            printImageTagWithLink(imageRenderer, linkRenderer.render(expLinkNode, null));
         } else {
             printImageTag(linkRenderer.render(node, text));
         }
