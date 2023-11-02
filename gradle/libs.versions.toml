@@ -15,7 +15,7 @@ spotbugs-annotations = "4.8.0"
 openapi-generator = "7.0.1"
 swagger-parser = "1.0.68"
 swagger-parser-v3 = "2.1.18"
-javaparser = "3.25.5"
+javaparser = "3.25.6"
 commons-codec = "1.16.0"
 
 micronaut = "4.1.11"
