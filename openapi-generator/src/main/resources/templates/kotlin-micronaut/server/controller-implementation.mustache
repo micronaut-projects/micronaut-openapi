@@ -1,0 +1,33 @@
+{{>common/licenseInfo}}
+package {{controllerPackage}}
+
+import io.micronaut.http.annotation.Controller
+{{#generateOperationsToReturnNotImplemented}}
+import io.micronaut.http.HttpStatus
+import io.micronaut.http.exceptions.HttpStatusException
+{{/generateOperationsToReturnNotImplemented}}
+{{#reactive}}
+import reactor.core.publisher.Flux
+{{/reactive}}
+{{#wrapInHttpResponse}}
+import io.micronaut.http.HttpResponse
+{{/wrapInHttpResponse}}
+import {{package}}.{{classname}}
+{{#imports}}
+import {{import}}
+{{/imports}}
+
+@Controller
+class {{controllerClassname}}: {{classname}} {
+
+{{#operations}}
+    {{#operation}}
+    {{!the method definition}}
+    override fun {{nickname}}({{#allParams}}{{paramName}}: {{{vendorExtensions.typeWithGenericAnnotations}}}{{^-last}}, {{/-last}}{{/allParams}}){{#returnType}}: {{{returnType}}}{{/returnType}} {
+{{>server/controllerOperationBody}}    }
+    {{^-last}}
+
+    {{/-last}}
+    {{/operation}}
+{{/operations}}
+}

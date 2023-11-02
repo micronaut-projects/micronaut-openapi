@@ -1,0 +1,65 @@
+plugins {
+    id 'io.micronaut.build.internal.openapi-java-generator-test-suite'
+    id 'groovy'
+}
+
+description = """
+This project tests that the generated server sources can be compiled and
+that tests can be ran with Micronaut 4
+"""
+
+dependencies {
+    annotationProcessor("io.micronaut.validation:micronaut-validation-processor")
+    annotationProcessor("io.micronaut.serde:micronaut-serde-processor")
+    implementation("io.micronaut:micronaut-http")
+    implementation("io.micronaut.serde:micronaut-serde-api")
+    implementation("jakarta.annotation:jakarta.annotation-api")
+    implementation("io.micronaut.validation:micronaut-validation")
+    implementation("io.projectreactor:reactor-core")
+    implementation(projects.micronautOpenapi) {
+        because("Required for Swagger")
+    }
+
+    testCompileOnly("io.micronaut:micronaut-inject-groovy-test")
+    testCompileOnly("io.micronaut:micronaut-inject-java-test")
+    testImplementation("io.micronaut.test:micronaut-test-spock")
+    testImplementation("io.micronaut:micronaut-http-client")
+    implementation(mnData.micronaut.data.runtime)
+
+    testRuntimeOnly("io.micronaut:micronaut-json-core")
+    testRuntimeOnly("io.micronaut.serde:micronaut-serde-jackson")
+    runtimeOnly("ch.qos.logback:logback-classic")
+}
+
+sourceSets {
+    test {
+        java.srcDir('src/test/groovy')
+    }
+}
+
+tasks.named("generateOpenApi") {
+    generatorKind = "server"
+    openApiDefinition = layout.projectDirectory.file("spec.yaml")
+    outputKinds = ["models", "apis", "modelDocs", "supportingFiles", "modelTests", "apiTests"]
+    parameterMappings = [
+            // Pageable parameter
+            [name: "page", location: "QUERY", mappedType: "io.micronaut.data.model.Pageable"],
+            [name: "size", location: "QUERY", mappedType: "io.micronaut.data.model.Pageable"],
+            [name: "sortOrder", location: "QUERY", mappedType: "io.micronaut.data.model.Pageable"],
+            // Ignored header
+            [name: "ignored-header", location: "HEADER"],
+            // Custom filtering header
+            [name: "Filter", location: "HEADER", mappedType: "io.micronaut.openapi.test.filter.MyFilter"]
+    ]
+    responseBodyMappings = [
+            // Response with Last-Modified header mapping
+            [headerName: "Last-Modified", mappedBodyType: "io.micronaut.openapi.test.dated.DatedResponse"],
+            // Response with Page body
+            [headerName: "X-Page-Number", mappedBodyType: "io.micronaut.data.model.Page", isListWrapper: true],
+            [headerName: "X-Page-Count", mappedBodyType: "io.micronaut.data.model.Page", isListWrapper: true],
+            [headerName: "X-Total-Count", mappedBodyType: "io.micronaut.data.model.Page", isListWrapper: true],
+            [headerName: "X-Page-Size", mappedBodyType: "io.micronaut.data.model.Page", isListWrapper: true],
+            // Ignored header - Does not wrap the response in HttpResponse
+            [headerName: "ignored-header"]
+    ]
+}

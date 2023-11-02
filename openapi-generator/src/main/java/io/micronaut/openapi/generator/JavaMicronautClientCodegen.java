@@ -128,7 +128,7 @@ public class JavaMicronautClientCodegen extends AbstractMicronautJavaCodegen<Jav
 
         if (additionalProperties.containsKey(ADDITIONAL_CLIENT_TYPE_ANNOTATIONS)) {
             String additionalClientAnnotationsList = additionalProperties.get(ADDITIONAL_CLIENT_TYPE_ANNOTATIONS).toString();
-            setAdditionalClientTypeAnnotations(Arrays.asList(additionalClientAnnotationsList.trim().split("\\s*(;|\\r?\\n)\\s*")));
+            additionalClientTypeAnnotations = Arrays.asList(additionalClientAnnotationsList.trim().split("\\s*(;|\\r?\\n)\\s*"));
             additionalProperties.put(ADDITIONAL_CLIENT_TYPE_ANNOTATIONS, additionalClientTypeAnnotations);
         }
 
@@ -139,8 +139,7 @@ public class JavaMicronautClientCodegen extends AbstractMicronautJavaCodegen<Jav
         }
 
         if (additionalProperties.containsKey(BASE_PATH_SEPARATOR)) {
-            String separator = additionalProperties.get(BASE_PATH_SEPARATOR).toString();
-            setBasePathSeparator(separator);
+            basePathSeparator = additionalProperties.get(BASE_PATH_SEPARATOR).toString();
             additionalProperties.put(BASE_PATH_SEPARATOR, basePathSeparator);
         }
 

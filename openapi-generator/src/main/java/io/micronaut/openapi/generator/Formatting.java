@@ -163,4 +163,15 @@ public enum Formatting {
             writer.write(text);
         }
     }
+
+    /**
+     * Replace dot to underscore.
+     */
+    public static class ReplaceDotsWithUnderscoreLambda implements Mustache.Lambda {
+
+        @Override
+        public void execute(final Template.Fragment fragment, final Writer writer) throws IOException {
+            writer.write(fragment.execute().replace('.', '_'));
+        }
+    }
 }

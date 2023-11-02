@@ -1,0 +1,81 @@
+
+{{#formatNoEmptyLines}}
+/**
+ * {{#description}}{{.}}{{/description}}{{^description}}{{classname}}{{/description}}
+ */
+{{#description}}
+    {{#generateSwagger2Annotations}}
+@Schema({{#name}}name = "{{name}}", {{/name}}description = "{{{description}}}")
+    {{/generateSwagger2Annotations}}
+{{/description}}
+{{#micronaut_serde_jackson}}
+@Serdeable
+{{/micronaut_serde_jackson}}
+{{#jackson}}
+@JsonPropertyOrder(
+    {{#vars}}
+        {{classname}}.JSON_PROPERTY_{{nameInSnakeCase}}{{^-last}},{{/-last}}
+    {{/vars}}
+)
+{{/jackson}}
+{{#additionalModelTypeAnnotations}}
+{{{.}}}
+{{/additionalModelTypeAnnotations}}
+{{#generatedAnnotation}}
+{{>common/generatedAnnotation}}
+{{/generatedAnnotation}}
+{{#discriminator}}
+{{>common/model/typeInfoAnnotation}}
+{{/discriminator}}
+{{>common/model/xmlAnnotation}}
+{{#useBeanValidation}}
+@Introspected
+{{/useBeanValidation}}
+{{#vendorExtensions.x-class-extra-annotation}}
+{{{vendorExtensions.x-class-extra-annotation}}}
+{{/vendorExtensions.x-class-extra-annotation}}
+{{/formatNoEmptyLines}}
+{{!Declare the class with extends and implements}}
+{{#nonPublicApi}}internal {{/nonPublicApi}}interface {{classname}}{{#parent}} : {{{parent}}} {{/parent}}{{#vendorExtensions.x-implements}}{{#parent}}, {{/parent}}{{^parent}} : {{/parent}}{{^-first}}, {{{.}}}{{/-first}}{{#-last}} {{/-last}}{{/vendorExtensions.x-implements}} {{openbrace}}
+{{#vars}}
+    {{#description}}
+    /**
+      * {{description}}
+      */
+    {{/description}}
+    {{#formatNoEmptyLines}}
+{{>common/model/field_annotations}}
+    var {{name}}: {{{datatypeWithEnum}}}{{^required}}?{{/required}}
+    {{/formatNoEmptyLines}}
+{{/vars}}
+
+    {{#vars}}
+        {{#isEnum}}
+            {{^isContainer}}
+                {{#indent}}
+{{>common/model/enum}}
+                {{/indent}}
+            {{/isContainer}}
+            {{#isContainer}}
+                {{#mostInnerItems}}
+                    {{#indent}}
+{{>common/model/enum}}
+                    {{/indent}}
+                {{/mostInnerItems}}
+            {{/isContainer}}
+        {{/isEnum}}
+    {{/vars}}
+
+    companion object {
+    {{#serializableModel}}
+
+        @Serial
+        @JvmStatic
+        private val serialVersionUID = {{{vendorExtensions.serialId}}}L
+    {{/serializableModel}}
+
+    {{#vars}}
+        const val JSON_PROPERTY_{{nameInSnakeCase}} = "{{baseName}}"
+    {{/vars}}
+    }
+{{closebrace}}

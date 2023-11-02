@@ -1,0 +1,46 @@
+{{>common/licenseInfo}}
+package {{invokerPackage}}.auth.configuration
+
+import io.micronaut.context.annotation.ConfigurationInject
+import io.micronaut.context.annotation.EachProperty
+import io.micronaut.context.annotation.Parameter
+import io.micronaut.core.annotation.NonNull
+import io.micronaut.http.MutableHttpRequest
+import io.micronaut.http.cookie.Cookie
+{{#generatedAnnotation}}
+import {{javaxPackage}}.annotation.Generated
+{{/generatedAnnotation}}
+
+{{#generatedAnnotation}}
+{{>common/generatedAnnotation}}
+{{/generatedAnnotation}}
+@EachProperty("security.api-key-auth")
+data class ApiKeyAuthConfiguration(
+    @Parameter val name: String,
+    @NonNull var location: AuthKeyLocation,
+    @NonNull var paramName: String,
+    @NonNull var apiKey: String
+): ConfigurableAuthorization {
+
+    override fun applyAuthorization(@NonNull request: MutableHttpRequest<*>) {
+        when (location) {
+            AuthKeyLocation.HEADER -> {
+                request.header(paramName, apiKey)
+            }
+            AuthKeyLocation.QUERY -> {
+                request.parameters.add(paramName, apiKey)
+            }
+            AuthKeyLocation.COOKIE -> {
+                request.cookie(Cookie.of(paramName, apiKey))
+            }
+        }
+    }
+
+    override fun getName() = name
+
+    enum class AuthKeyLocation {
+        HEADER,
+        QUERY,
+        COOKIE
+    }
+}

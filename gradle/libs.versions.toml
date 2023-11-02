@@ -7,7 +7,7 @@ managed-parboiled = "1.4.1"
 managed-freemarker = "2.3.32"
 managed-pegdown = "1.6.0"
 
-kotlin = "1.9.10"
+kotlin = "1.9.20"
 jspecify = "0.3.0"
 jdt-annotation = "2.2.700"
 android-annotation = "1.7.0"
@@ -18,7 +18,7 @@ swagger-parser-v3 = "2.1.18"
 javaparser = "3.25.5"
 commons-codec = "1.16.0"
 
-micronaut = "4.1.10"
+micronaut = "4.1.11"
 micronaut-security = "4.1.0"
 micronaut-serde = "2.2.6"
 micronaut-rxjava2 = "2.0.1"
@@ -61,6 +61,7 @@ managed-pegdown = {module = "org.pegdown:pegdown", version.ref = "managed-pegdow
 
 # Versions from BOM
 junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine" }
+junit-jupiter-params = { module = "org.junit.jupiter:junit-jupiter-params" }
 jackson-datatype-jsr310 = { module = "com.fasterxml.jackson.datatype:jackson-datatype-jsr310" }
 jackson-dataformat-yaml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml" }
 kotlinx-coroutines-reactor = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-reactor" }

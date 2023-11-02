@@ -131,10 +131,11 @@ public class {{classname}} {{#parent}}extends {{{parent}}} {{/parent}}{{#vendorE
     {{/vars}}
 
     {{#requiredPropertiesInConstructor}}
+        {{#formatNoEmptyLines}}
         {{#vendorExtensions.withRequiredVars}}
     public {{classname}}({{#vendorExtensions.requiredVarsWithoutDiscriminator}}{{#isReadOnly}}{{#vendorExtensions.isServer}}{{^-first}}, {{/-first}}{{{datatypeWithEnum}}} {{name}}{{/vendorExtensions.isServer}}{{/isReadOnly}}{{^isReadOnly}}{{^-first}}, {{/-first}}{{{datatypeWithEnum}}} {{name}}{{/isReadOnly}}{{/vendorExtensions.requiredVarsWithoutDiscriminator}}) {
         {{#parent}}
-        super({{#vendorExtensions.requiredParentVarsWithoutDiscriminator}}{{#vendorExtensions.isServerOrNotReadOnly}}{{^-first}}, {{/-first}}{{name}}{{/vendorExtensions.isServerOrNotReadOnly}}{{/vendorExtensions.requiredParentVarsWithoutDiscriminator}});
+        {{#vendorExtensions.requiredParentVarsWithoutDiscriminator.0}}super({{/vendorExtensions.requiredParentVarsWithoutDiscriminator.0}}{{#vendorExtensions.requiredParentVarsWithoutDiscriminator}}{{#vendorExtensions.isServerOrNotReadOnly}}{{^-first}}, {{/-first}}{{name}}{{/vendorExtensions.isServerOrNotReadOnly}}{{/vendorExtensions.requiredParentVarsWithoutDiscriminator}}{{#vendorExtensions.requiredParentVarsWithoutDiscriminator.0}});{{/vendorExtensions.requiredParentVarsWithoutDiscriminator.0}}
         {{/parent}}
         {{#vendorExtensions.requiredVars}}
             {{^isDiscriminator}}
@@ -150,6 +151,7 @@ public class {{classname}} {{#parent}}extends {{{parent}}} {{/parent}}{{#vendorE
         {{/vendorExtensions.requiredVars}}
     }
         {{/vendorExtensions.withRequiredVars}}
+        {{/formatNoEmptyLines}}
     {{/requiredPropertiesInConstructor}}
 
     {{#vars}}

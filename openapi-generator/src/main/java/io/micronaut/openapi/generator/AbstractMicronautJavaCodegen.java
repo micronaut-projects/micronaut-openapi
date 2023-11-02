@@ -16,8 +16,6 @@
 package io.micronaut.openapi.generator;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumSet;
@@ -27,11 +25,11 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import io.micronaut.openapi.generator.Formatting.ReplaceDotsWithUnderscoreLambda;
 import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.parameters.Parameter;
@@ -57,8 +55,8 @@ import org.openapitools.codegen.model.OperationsMap;
 
 import com.google.common.collect.ImmutableMap;
 import com.samskivert.mustache.Mustache;
-import com.samskivert.mustache.Template;
 
+import static io.micronaut.openapi.generator.Utils.processGenericAnnotations;
 import static org.openapitools.codegen.CodegenConstants.INVOKER_PACKAGE;
 
 /**
@@ -120,6 +118,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
     protected String serializationLibrary = SerializationLibraryKind.MICRONAUT_SERDE_JACKSON.name();
     protected List<ParameterMapping> parameterMappings = new ArrayList<>();
     protected List<ResponseBodyMapping> responseBodyMappings = new ArrayList<>();
+    protected Map<String, CodegenModel> allModels = new HashMap<>();
 
     protected AbstractMicronautJavaCodegen() {
 
@@ -662,10 +661,13 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
             }
 
             for (var param : op.allParams) {
-                processGenericAnnotations(param);
+                processGenericAnnotations(param, useBeanValidation, isGenerateHardNullable(), false, false, false, false);
+                if (useBeanValidation && !param.isContainer && param.isModel) {
+                    param.vendorExtensions.put("withValid", true);
+                }
             }
             if (op.returnProperty != null) {
-                processGenericAnnotations(op.returnProperty);
+                processGenericAnnotations(op.returnProperty, useBeanValidation, isGenerateHardNullable(), false, false, false, false);
                 op.returnType = op.returnProperty.vendorExtensions.get("typeWithEnumWithGenericAnnotations").toString();
             }
         }
@@ -678,6 +680,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
         CodegenModel codegenModel = super.fromModel(name, model);
         codegenModel.imports.remove("ApiModel");
         codegenModel.imports.remove("ApiModelProperty");
+        allModels.put(name, codegenModel);
         return codegenModel;
     }
 
@@ -737,7 +740,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
                 CodegenParameter newParam = new CodegenParameter();
                 newParam.paramName = mapping.mappedName();
                 newParam.required = true;
-                newParam.isModel = mapping.isValidated;
+                newParam.isModel = mapping.isValidated();
 
                 String typeName = makeSureImported(mapping.mappedType(), imports);
                 newParam.dataType = typeName;
@@ -778,7 +781,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
         }
 
         if (bodyMapping != null) {
-            wrapOperationReturnType(op, bodyMapping.mappedBodyType, bodyMapping.isValidated, bodyMapping.isListWrapper);
+            wrapOperationReturnType(op, bodyMapping.mappedBodyType(), bodyMapping.isValidated(), bodyMapping.isListWrapper());
         }
     }
 
@@ -879,9 +882,15 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
 
             processParentModel(model, requiredVarsWithoutDiscriminator, requiredParentVarsWithoutDiscriminator);
 
-            List<CodegenProperty> requiredVars = model.vars.stream()
-                .filter(v -> v.required)
-                .toList();
+            var optionalVars = new ArrayList<CodegenProperty>();
+            var requiredVars = new ArrayList<CodegenProperty>();
+            for (var v : model.vars) {
+                if (v.required) {
+                    requiredVars.add(v);
+                } else {
+                    optionalVars.add(v);
+                }
+            }
 
             model.vendorExtensions.put("withMultipleVars", model.vars.size() > 1);
             if (!requiredParentVarsWithoutDiscriminator.isEmpty()) {
@@ -891,195 +900,42 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
                 model.vendorExtensions.put("requiredVarsWithoutDiscriminator", requiredVarsWithoutDiscriminator);
             }
             model.vendorExtensions.put("requiredVars", requiredVars);
+            model.vendorExtensions.put("optionalVars", optionalVars);
             model.vendorExtensions.put("areRequiredVarsAndReadOnlyVars", !requiredVarsWithoutDiscriminator.isEmpty() && !model.readOnlyVars.isEmpty());
             model.vendorExtensions.put("serialId", random.nextLong());
             model.vendorExtensions.put("withRequiredVars", !model.requiredVars.isEmpty());
             if (model.discriminator != null) {
                 model.vendorExtensions.put("hasMappedModels", !model.discriminator.getMappedModels().isEmpty());
                 model.vendorExtensions.put("hasMultipleMappedModels", model.discriminator.getMappedModels().size() > 1);
-            }
-            for (var property : model.vars) {
-                property.vendorExtensions.put("lombok", lombok);
-                property.vendorExtensions.put("defaultValueIsNotNull", property.defaultValue != null && !property.defaultValue.equals("null"));
-                property.vendorExtensions.put("isServer", isServer);
-                processGenericAnnotations(property);
+                model.discriminator.getVendorExtensions().put("hasMappedModels", !model.discriminator.getMappedModels().isEmpty());
+                model.discriminator.getVendorExtensions().put("hasMultipleMappedModels", model.discriminator.getMappedModels().size() > 1);
             }
             model.vendorExtensions.put("isServer", isServer);
+            for (var property : model.vars) {
+                processProperty(property, isServer, objs);
+            }
             for (var property : model.requiredVars) {
-                property.vendorExtensions.put("lombok", lombok);
-                property.vendorExtensions.put("isServer", isServer);
-                property.vendorExtensions.put("defaultValueIsNotNull", property.defaultValue != null && !property.defaultValue.equals("null"));
-                processGenericAnnotations(property);
+                processProperty(property, isServer, objs);
             }
         }
 
         return objs;
     }
 
-    private void processGenericAnnotations(CodegenParameter parameter) {
-        CodegenProperty items = parameter.isMap ? parameter.additionalProperties : parameter.items;
-        String datatypeWithEnum = parameter.datatypeWithEnum == null ? parameter.dataType : parameter.datatypeWithEnum;
-        processGenericAnnotations(parameter.dataType, datatypeWithEnum, parameter.isArray, parameter.isMap, parameter.containerTypeMapped, items, parameter.vendorExtensions);
-    }
+    private void processProperty(CodegenProperty property, boolean isServer, Map<String, ModelsMap> models) {
 
-    private void processGenericAnnotations(CodegenProperty property) {
-        CodegenProperty items = property.isMap ? property.additionalProperties : property.items;
-        String datatypeWithEnum = property.datatypeWithEnum == null ? property.dataType : property.datatypeWithEnum;
-        processGenericAnnotations(property.dataType, datatypeWithEnum, property.isArray, property.isMap, property.containerTypeMapped, items, property.vendorExtensions);
-    }
-
-    private void processGenericAnnotations(String dataType, String dataTypeWithEnum, boolean isArray, boolean isMap, String containerType, CodegenProperty itemsProp, Map<String, Object> ext) {
-        var typeWithGenericAnnotations = dataType;
-        var typeWithEnumWithGenericAnnotations = dataTypeWithEnum;
-        if (useBeanValidation && itemsProp != null && dataType.contains("<")) {
-            if (isMap) {
-                var genericAnnotations = genericAnnotations(itemsProp);
-                processGenericAnnotations(itemsProp);
-                typeWithGenericAnnotations = "Map<String, " + genericAnnotations + itemsProp.vendorExtensions.get("typeWithGenericAnnotations") + ">";
-                typeWithEnumWithGenericAnnotations = "Map<String, " + genericAnnotations + itemsProp.vendorExtensions.get("typeWithEnumWithGenericAnnotations") + ">";
-            } else if (containerType != null) {
-                var genericAnnotations = genericAnnotations(itemsProp);
-                processGenericAnnotations(itemsProp);
-                typeWithGenericAnnotations = containerType + "<" + genericAnnotations + itemsProp.vendorExtensions.get("typeWithGenericAnnotations") + ">";
-                typeWithEnumWithGenericAnnotations = containerType + "<" + genericAnnotations + itemsProp.vendorExtensions.get("typeWithEnumWithGenericAnnotations") + ">";
-            }
-        }
-        ext.put("typeWithGenericAnnotations", typeWithGenericAnnotations);
-        ext.put("typeWithEnumWithGenericAnnotations", typeWithEnumWithGenericAnnotations);
-    }
-
-    private boolean isPrimitive(String type) {
-        if (type == null) {
-            return false;
-        }
-        return switch (type) {
-            case "array", "string", "boolean", "byte", "uri", "url", "uuid", "email", "integer", "long", "float", "double",
-                "number", "partial-time", "date", "date-time", "bigdecimal", "biginteger" -> true;
-            default -> false;
-        };
-    }
-
-    private String genericAnnotations(CodegenProperty prop) {
-
-        var type = prop.openApiType == null ? null : prop.openApiType.toLowerCase();
-
-        var result = new StringBuilder();
-
-        if (prop.isModel) {
-            result.append("@Valid ");
-        }
-        if (!isPrimitive(type)) {
-            return result.toString();
+        property.vendorExtensions.put("inRequiredArgsConstructor", !property.isReadOnly || isServer);
+        property.vendorExtensions.put("isServer", isServer);
+        property.vendorExtensions.put("lombok", lombok);
+        property.vendorExtensions.put("defaultValueIsNotNull", property.defaultValue != null && !property.defaultValue.equals("null"));
+        if (useBeanValidation && (
+            (!property.isContainer && property.isModel)
+                || (property.getIsArray() && property.getComplexType() != null && models.containsKey(property.getComplexType()))
+        )) {
+            property.vendorExtensions.put("withValid", true);
         }
 
-        if (StringUtils.isNotEmpty(prop.pattern)) {
-            if ("email".equals(type)) {
-                result.append("@Email(regexp = \"");
-            } else {
-                result.append("@Pattern(regexp = \"");
-            }
-            result.append(prop.pattern).append("\") ");
-        }
-
-        var containsNotEmpty = false;
-
-        if (prop.minLength != null || prop.maxLength != null) {
-            if (prop.minLength != null && prop.minLength == 1 && prop.maxLength == null && !prop.isNullable) {
-                result.append("@NotEmpty ");
-                containsNotEmpty = true;
-            } else {
-                result.append("@Size(");
-                if (prop.minLength != null) {
-                    result.append("min = ").append(prop.minLength);
-                }
-                if (prop.maxLength != null) {
-                    if (prop.minLength != null) {
-                        result.append(", ");
-                    }
-                    result.append("max = ").append(prop.maxLength);
-                }
-                result.append(") ");
-            }
-        }
-
-        if (prop.minItems != null || prop.maxItems != null) {
-            if (prop.minItems != null && prop.minItems == 1 && prop.maxItems == null && !prop.isNullable) {
-                result.append("@NotEmpty ");
-                containsNotEmpty = true;
-            } else {
-                result.append("@Size(");
-                if (prop.minItems != null) {
-                    result.append("min = ").append(prop.minItems);
-                }
-                if (prop.maxItems != null) {
-                    if (prop.minItems != null) {
-                        result.append(", ");
-                    }
-                    result.append("max = ").append(prop.maxItems);
-                }
-                result.append(") ");
-            }
-        }
-        if (prop.isNullable) {
-            if (isGenerateHardNullable()) {
-                result.append("@HardNullable ");
-            } else {
-                result.append("@Nullable ");
-            }
-        } else if (!containsNotEmpty) {
-            result.append("@NotNull ");
-        }
-        if (StringUtils.isNotEmpty(prop.minimum)) {
-            try {
-                var longNumber = Long.parseLong(prop.minimum);
-                if (prop.exclusiveMinimum) {
-                    longNumber++;
-                }
-                if (longNumber == 0 && StringUtils.isEmpty(prop.maximum)) {
-                    result.append("@PositiveOrZero ");
-                } else if (longNumber == 1 && StringUtils.isEmpty(prop.maximum)) {
-                    result.append("@Positive ");
-                } else {
-                    result.append("@Min(").append(longNumber).append(") ");
-                }
-            } catch (Exception e) {
-                result.append("@DecimalMin(");
-                if (prop.exclusiveMinimum) {
-                    result.append("value = ");
-                }
-                result.append('"').append(prop.minimum).append('"');
-                if (prop.exclusiveMinimum) {
-                    result.append(", inclusive = false");
-                }
-                result.append(") ");
-            }
-        }
-        if (StringUtils.isNotEmpty(prop.maximum)) {
-            try {
-                var longNumber = Long.parseLong(prop.maximum);
-                if (prop.exclusiveMaximum) {
-                    longNumber--;
-                }
-                if (longNumber == 0 && StringUtils.isEmpty(prop.minimum)) {
-                    result.append("@NegativeOrZero ");
-                } else if (longNumber == -1 && StringUtils.isEmpty(prop.minimum)) {
-                    result.append("@Negative ");
-                } else {
-                    result.append("@Max(").append(longNumber).append(") ");
-                }
-            } catch (Exception e) {
-                result.append("@DecimalMax(");
-                if (prop.exclusiveMaximum) {
-                    result.append("value = ");
-                }
-                result.append('"').append(prop.maximum).append('"');
-                if (prop.exclusiveMaximum) {
-                    result.append(", inclusive = false");
-                }
-                result.append(") ");
-            }
-        }
-        return result.toString();
+        processGenericAnnotations(property, useBeanValidation, isGenerateHardNullable(), false, false, false, false);
     }
 
     public boolean isGenerateHardNullable() {
@@ -1165,18 +1021,19 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
         List<Object> allowableValues = p.allowableValues == null ? null : (List<Object>) p.allowableValues.get("values");
 
         return getExampleValue(p.defaultValue, p.example, p.dataType, p.isModel, allowableValues,
-                p.items == null ? null : p.items.dataType,
-                p.items == null ? null : p.items.defaultValue,
-                p.requiredVars, groovy, false);
+            p.items == null ? null : p.items.dataType,
+            p.items == null ? null : p.items.defaultValue,
+            p.requiredVars, groovy, false);
     }
 
     protected String getPropertyExampleValue(CodegenProperty p, boolean groovy) {
         List<Object> allowableValues = p.allowableValues == null ? null : (List<Object>) p.allowableValues.get("values");
+        var model = allModels.get(p.getDataType());
 
         return getExampleValue(p.defaultValue, p.example, p.dataType, p.isModel, allowableValues,
-                p.items == null ? null : p.items.dataType,
-                p.items == null ? null : p.items.defaultValue,
-                null, groovy, true);
+            p.items == null ? null : p.items.dataType,
+            p.items == null ? null : p.items.defaultValue,
+            model != null ? model.requiredVars : null, groovy, true);
     }
 
     public String getExampleValue(
@@ -1312,86 +1169,4 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
         setDateLibrary(name);
     }
 
-    private static class ReplaceDotsWithUnderscoreLambda implements Mustache.Lambda {
-
-        @Override
-        public void execute(final Template.Fragment fragment, final Writer writer) throws IOException {
-            writer.write(fragment.execute().replace('.', '_'));
-        }
-    }
-
-    /**
-     * A record that can be used to specify parameter mapping.
-     * Parameter mapping would map a given parameter to a specific type and name.
-     *
-     * @param name The name of the parameter as described by the name field in specification.
-     * @param location The location of parameter. Path parameters cannot be mapped, as this
-     *                 behavior should not be used.
-     * @param mappedType The type to which the parameter should be mapped. If multiple parameters
-     *                   have the same mapping, only one parameter will be present. If set to null,
-     *                   the original parameter will be deleted.
-     * @param mappedName The unique name of the parameter to be used as method parameter name.
-     * @param isValidated Whether the mapped parameter requires validation.
-     */
-    public record ParameterMapping(
-            String name,
-            ParameterLocation location,
-            String mappedType,
-            String mappedName,
-            boolean isValidated
-    ) {
-
-        private boolean doesMatch(CodegenParameter parameter) {
-            if (name != null && !name.equals(parameter.baseName)) {
-                return false;
-            }
-            if (location == null) {
-                return true;
-            }
-            return switch (location) {
-                case HEADER -> parameter.isHeaderParam;
-                case QUERY -> parameter.isQueryParam;
-                case FORM -> parameter.isFormParam;
-                case COOKIE -> parameter.isCookieParam;
-                case BODY -> parameter.isBodyParam;
-            };
-        }
-
-        /**
-         * The location of the parameter to be mapped.
-         */
-        public enum ParameterLocation {
-            HEADER,
-            QUERY,
-            FORM,
-            COOKIE,
-            BODY
-        }
-    }
-
-    /**
-     * A record that can be used to specify parameter mapping.
-     * Parameter mapping would map a given parameter to a specific type and name.
-     *
-     * @param headerName The response header name that triggers the change of response type.
-     * @param mappedBodyType The type in which will be used as the response type. The type must take
-     *                    a single type parameter, which will be the original body.
-     * @param isListWrapper Whether the mapped body type needs to be supplied list items
-     *                      as property.
-     * @param isValidated Whether the mapped response body type required validation.
-     */
-    public record ResponseBodyMapping(
-            String headerName,
-            String mappedBodyType,
-            boolean isListWrapper,
-            boolean isValidated
-    ) {
-
-        private boolean doesMatch(String header, boolean isBodyList) {
-            if (isListWrapper && !isBodyList) {
-                return false;
-            }
-            return Objects.equals(headerName, header);
-        }
-    }
 }
