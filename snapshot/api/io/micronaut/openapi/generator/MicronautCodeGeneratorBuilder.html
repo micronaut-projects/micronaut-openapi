@@ -93,16 +93,6 @@ loadScripts(document, 'script');</script>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Returns a configured code generator.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code>default <a href="MicronautCodeGeneratorBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorBuilder</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code><a href="#forClient()" class="member-name-link">forClient</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5">
-<div class="block">Configures the code generator to create a client.</div>
-</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="MicronautCodeGeneratorBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorBuilder</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#forClient(java.util.function.Consumer)" class="member-name-link">forClient</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Consumer.html" title="class or interface in java.util.function" class="external-link">Consumer</a>&lt;? super <a href="JavaMicronautClientOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">JavaMicronautClientOptionsBuilder</a>&gt;&nbsp;clientOptionsSpec)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
-<div class="block">Configures the code generator to create a client.</div>
-</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>&lt;B extends <a href="GeneratorOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">GeneratorOptionsBuilder</a>,<wbr>
 G extends <a href="MicronautCodeGenerator.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGenerator</a>&lt;B&gt;&gt;<br><a href="MicronautCodeGeneratorBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorBuilder</a></code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#forCodeGenerator(G,java.util.function.Consumer)" class="member-name-link">forCodeGenerator</a><wbr>(G&nbsp;generator,
@@ -111,14 +101,44 @@ G extends <a href="MicronautCodeGenerator.html" title="interface in io.micronaut
 <div class="block">Sets the code generator which should be used (e.g.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code>default <a href="MicronautCodeGeneratorBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorBuilder</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code><a href="#forServer()" class="member-name-link">forServer</a>()</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code><a href="#forJavaClient()" class="member-name-link">forJavaClient</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5">
-<div class="block">Configures the code generator to create a server.</div>
+<div class="block">Configures the code generator to create a java client.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="MicronautCodeGeneratorBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorBuilder</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#forServer(java.util.function.Consumer)" class="member-name-link">forServer</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Consumer.html" title="class or interface in java.util.function" class="external-link">Consumer</a>&lt;? super <a href="JavaMicronautServerOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">JavaMicronautServerOptionsBuilder</a>&gt;&nbsp;serverOptionsSpec)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#forJavaClient(java.util.function.Consumer)" class="member-name-link">forJavaClient</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Consumer.html" title="class or interface in java.util.function" class="external-link">Consumer</a>&lt;? super <a href="JavaMicronautClientOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">JavaMicronautClientOptionsBuilder</a>&gt;&nbsp;clientOptionsSpec)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
-<div class="block">Configures the code generator to create a server.</div>
+<div class="block">Configures the code generator to create a java client.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code>default <a href="MicronautCodeGeneratorBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorBuilder</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code><a href="#forJavaServer()" class="member-name-link">forJavaServer</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5">
+<div class="block">Configures the code generator to create a java server.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="MicronautCodeGeneratorBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorBuilder</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#forJavaServer(java.util.function.Consumer)" class="member-name-link">forJavaServer</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Consumer.html" title="class or interface in java.util.function" class="external-link">Consumer</a>&lt;? super <a href="JavaMicronautServerOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">JavaMicronautServerOptionsBuilder</a>&gt;&nbsp;serverOptionsSpec)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block">Configures the code generator to create a java server.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code>default <a href="MicronautCodeGeneratorBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorBuilder</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code><a href="#forKotlinClient()" class="member-name-link">forKotlinClient</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5">
+<div class="block">Configures the code generator to create a kotlin client.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="MicronautCodeGeneratorBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorBuilder</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#forKotlinClient(java.util.function.Consumer)" class="member-name-link">forKotlinClient</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Consumer.html" title="class or interface in java.util.function" class="external-link">Consumer</a>&lt;? super <a href="KotlinMicronautClientOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">KotlinMicronautClientOptionsBuilder</a>&gt;&nbsp;clientOptionsSpec)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block">Configures the code generator to create a kotlin client.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code>default <a href="MicronautCodeGeneratorBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorBuilder</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code><a href="#forKotlinServer()" class="member-name-link">forKotlinServer</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5">
+<div class="block">Configures the code generator to create a kotlin server.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="MicronautCodeGeneratorBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorBuilder</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#forKotlinServer(java.util.function.Consumer)" class="member-name-link">forKotlinServer</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Consumer.html" title="class or interface in java.util.function" class="external-link">Consumer</a>&lt;? super <a href="KotlinMicronautServerOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">KotlinMicronautServerOptionsBuilder</a>&gt;&nbsp;serverOptionsSpec)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block">Configures the code generator to create a kotlin server.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="MicronautCodeGeneratorBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorBuilder</a></code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withDefinitionFile(java.net.URI)" class="member-name-link">withDefinitionFile</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/net/URI.html" title="class or interface in java.net" class="external-link">URI</a>&nbsp;definitionFile)</code></div>
@@ -175,10 +195,10 @@ G extends <a href="MicronautCodeGenerator.html" title="interface in io.micronaut
 </section>
 </li>
 <li>
-<section class="detail" id="forClient()">
-<h3>forClient</h3>
-<div class="member-signature"><span class="modifiers">default</span>&nbsp;<span class="return-type"><a href="MicronautCodeGeneratorBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorBuilder</a></span>&nbsp;<span class="element-name">forClient</span>()</div>
-<div class="block">Configures the code generator to create a client.</div>
+<section class="detail" id="forJavaClient()">
+<h3>forJavaClient</h3>
+<div class="member-signature"><span class="modifiers">default</span>&nbsp;<span class="return-type"><a href="MicronautCodeGeneratorBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorBuilder</a></span>&nbsp;<span class="element-name">forJavaClient</span>()</div>
+<div class="block">Configures the code generator to create a java client.</div>
 <dl class="notes">
 <dt>Returns:</dt>
 <dd>this builder</dd>
@@ -186,10 +206,10 @@ G extends <a href="MicronautCodeGenerator.html" title="interface in io.micronaut
 </section>
 </li>
 <li>
-<section class="detail" id="forClient(java.util.function.Consumer)">
-<h3>forClient</h3>
-<div class="member-signature"><span class="return-type"><a href="MicronautCodeGeneratorBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorBuilder</a></span>&nbsp;<span class="element-name">forClient</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Consumer.html" title="class or interface in java.util.function" class="external-link">Consumer</a>&lt;? super <a href="JavaMicronautClientOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">JavaMicronautClientOptionsBuilder</a>&gt;&nbsp;clientOptionsSpec)</span></div>
-<div class="block">Configures the code generator to create a client.</div>
+<section class="detail" id="forJavaClient(java.util.function.Consumer)">
+<h3>forJavaClient</h3>
+<div class="member-signature"><span class="return-type"><a href="MicronautCodeGeneratorBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorBuilder</a></span>&nbsp;<span class="element-name">forJavaClient</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Consumer.html" title="class or interface in java.util.function" class="external-link">Consumer</a>&lt;? super <a href="JavaMicronautClientOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">JavaMicronautClientOptionsBuilder</a>&gt;&nbsp;clientOptionsSpec)</span></div>
+<div class="block">Configures the code generator to create a java client.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>clientOptionsSpec</code> - the client options</dd>
@@ -199,10 +219,10 @@ G extends <a href="MicronautCodeGenerator.html" title="interface in io.micronaut
 </section>
 </li>
 <li>
-<section class="detail" id="forServer()">
-<h3>forServer</h3>
-<div class="member-signature"><span class="modifiers">default</span>&nbsp;<span class="return-type"><a href="MicronautCodeGeneratorBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorBuilder</a></span>&nbsp;<span class="element-name">forServer</span>()</div>
-<div class="block">Configures the code generator to create a server.</div>
+<section class="detail" id="forJavaServer()">
+<h3>forJavaServer</h3>
+<div class="member-signature"><span class="modifiers">default</span>&nbsp;<span class="return-type"><a href="MicronautCodeGeneratorBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorBuilder</a></span>&nbsp;<span class="element-name">forJavaServer</span>()</div>
+<div class="block">Configures the code generator to create a java server.</div>
 <dl class="notes">
 <dt>Returns:</dt>
 <dd>this builder</dd>
@@ -210,10 +230,58 @@ G extends <a href="MicronautCodeGenerator.html" title="interface in io.micronaut
 </section>
 </li>
 <li>
-<section class="detail" id="forServer(java.util.function.Consumer)">
-<h3>forServer</h3>
-<div class="member-signature"><span class="return-type"><a href="MicronautCodeGeneratorBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorBuilder</a></span>&nbsp;<span class="element-name">forServer</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Consumer.html" title="class or interface in java.util.function" class="external-link">Consumer</a>&lt;? super <a href="JavaMicronautServerOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">JavaMicronautServerOptionsBuilder</a>&gt;&nbsp;serverOptionsSpec)</span></div>
-<div class="block">Configures the code generator to create a server.</div>
+<section class="detail" id="forJavaServer(java.util.function.Consumer)">
+<h3>forJavaServer</h3>
+<div class="member-signature"><span class="return-type"><a href="MicronautCodeGeneratorBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorBuilder</a></span>&nbsp;<span class="element-name">forJavaServer</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Consumer.html" title="class or interface in java.util.function" class="external-link">Consumer</a>&lt;? super <a href="JavaMicronautServerOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">JavaMicronautServerOptionsBuilder</a>&gt;&nbsp;serverOptionsSpec)</span></div>
+<div class="block">Configures the code generator to create a java server.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>serverOptionsSpec</code> - the server options</dd>
+<dt>Returns:</dt>
+<dd>this builder</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="forKotlinClient()">
+<h3>forKotlinClient</h3>
+<div class="member-signature"><span class="modifiers">default</span>&nbsp;<span class="return-type"><a href="MicronautCodeGeneratorBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorBuilder</a></span>&nbsp;<span class="element-name">forKotlinClient</span>()</div>
+<div class="block">Configures the code generator to create a kotlin client.</div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>this builder</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="forKotlinClient(java.util.function.Consumer)">
+<h3>forKotlinClient</h3>
+<div class="member-signature"><span class="return-type"><a href="MicronautCodeGeneratorBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorBuilder</a></span>&nbsp;<span class="element-name">forKotlinClient</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Consumer.html" title="class or interface in java.util.function" class="external-link">Consumer</a>&lt;? super <a href="KotlinMicronautClientOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">KotlinMicronautClientOptionsBuilder</a>&gt;&nbsp;clientOptionsSpec)</span></div>
+<div class="block">Configures the code generator to create a kotlin client.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>clientOptionsSpec</code> - the client options</dd>
+<dt>Returns:</dt>
+<dd>this builder</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="forKotlinServer()">
+<h3>forKotlinServer</h3>
+<div class="member-signature"><span class="modifiers">default</span>&nbsp;<span class="return-type"><a href="MicronautCodeGeneratorBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorBuilder</a></span>&nbsp;<span class="element-name">forKotlinServer</span>()</div>
+<div class="block">Configures the code generator to create a kotlin server.</div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>this builder</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="forKotlinServer(java.util.function.Consumer)">
+<h3>forKotlinServer</h3>
+<div class="member-signature"><span class="return-type"><a href="MicronautCodeGeneratorBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorBuilder</a></span>&nbsp;<span class="element-name">forKotlinServer</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Consumer.html" title="class or interface in java.util.function" class="external-link">Consumer</a>&lt;? super <a href="KotlinMicronautServerOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">KotlinMicronautServerOptionsBuilder</a>&gt;&nbsp;serverOptionsSpec)</span></div>
+<div class="block">Configures the code generator to create a kotlin server.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>serverOptionsSpec</code> - the server options</dd>
