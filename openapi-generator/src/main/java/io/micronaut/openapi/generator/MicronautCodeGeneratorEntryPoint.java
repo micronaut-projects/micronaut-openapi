@@ -24,11 +24,13 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 
+import io.micronaut.openapi.generator.MicronautCodeGeneratorOptionsBuilder.GeneratorLanguage;
 import io.swagger.parser.OpenAPIParser;
 import io.swagger.v3.parser.core.models.ParseOptions;
 
 import org.openapitools.codegen.ClientOptInput;
 import org.openapitools.codegen.CodegenConstants;
+import org.openapitools.codegen.DefaultCodegen;
 import org.openapitools.codegen.DefaultGenerator;
 
 /**
@@ -38,26 +40,33 @@ public final class MicronautCodeGeneratorEntryPoint {
 
     private final URI definitionFile;
     private final File outputDirectory;
-    private final AbstractMicronautJavaCodegen<?> codeGenerator;
+    private final DefaultCodegen codeGenerator;
     private final EnumSet<OutputKind> outputs;
     private final Options options;
-    private final JavaMicronautServerCodegen.ServerOptions serverOptions;
-    private final JavaMicronautClientCodegen.ClientOptions clientOptions;
+    private final JavaMicronautServerCodegen.ServerOptions javaServerOptions;
+    private final JavaMicronautClientCodegen.ClientOptions javaClientOptions;
+    private final KotlinMicronautServerCodegen.ServerOptions kotlinServerOptions;
+    private final KotlinMicronautClientCodegen.ClientOptions kotlinClientOptions;
 
     private MicronautCodeGeneratorEntryPoint(URI definitionFile,
                                              File outputDirectory,
-                                             AbstractMicronautJavaCodegen<?> codeGenerator,
+                                             DefaultCodegen codeGenerator,
                                              EnumSet<OutputKind> outputs,
                                              Options options,
-                                             JavaMicronautServerCodegen.ServerOptions serverOptions,
-                                             JavaMicronautClientCodegen.ClientOptions clientOptions) {
+                                             JavaMicronautServerCodegen.ServerOptions javaServerOptions,
+                                             JavaMicronautClientCodegen.ClientOptions javaClientOptions,
+                                             KotlinMicronautServerCodegen.ServerOptions kotlinServerOptions,
+                                             KotlinMicronautClientCodegen.ClientOptions kotlinClientOptions
+                                             ) {
         this.definitionFile = definitionFile;
         this.outputDirectory = outputDirectory;
         this.codeGenerator = codeGenerator;
         this.outputs = outputs;
         this.options = options;
-        this.serverOptions = serverOptions;
-        this.clientOptions = clientOptions;
+        this.javaServerOptions = javaServerOptions;
+        this.javaClientOptions = javaClientOptions;
+        this.kotlinServerOptions = kotlinServerOptions;
+        this.kotlinClientOptions = kotlinClientOptions;
     }
 
     private static void withPath(File file, Consumer<? super String> action) {
@@ -83,12 +92,16 @@ public final class MicronautCodeGeneratorEntryPoint {
         withPath(outputDirectory, codeGenerator::setOutputDir);
 
         // Disable timestamps are it makes builds non preproducible
-        codeGenerator.setHideGenerationTimestamp(true);
+        if (codeGenerator instanceof AbstractMicronautJavaCodegen<?> javaCodegen) {
+            javaCodegen.setHideGenerationTimestamp(true);
+        } else if (codeGenerator instanceof AbstractMicronautKotlinCodegen<?> kotlinCodegen) {
+            kotlinCodegen.setHideGenerationTimestamp(true);
+        }
 
         configureOptions();
 
         // Create input
-        ClientOptInput input = new ClientOptInput();
+        var input = new ClientOptInput();
         input.openAPI(openAPI);
         input.config(codeGenerator);
 
@@ -114,64 +127,124 @@ public final class MicronautCodeGeneratorEntryPoint {
         if (options.apiPackage != null) {
             codeGenerator.setApiPackage(options.apiPackage);
         }
-        if (options.invokerPackage != null) {
-            codeGenerator.setInvokerPackage(options.invokerPackage);
+        if ((options.lang == null || options.lang == GeneratorLanguage.JAVA) && codeGenerator instanceof AbstractMicronautJavaCodegen<?> javaCodeGen) {
+
+            if (options.invokerPackage != null) {
+                javaCodeGen.setInvokerPackage(options.invokerPackage);
+            }
+            if (options.artifactId != null) {
+                javaCodeGen.setArtifactId(options.artifactId);
+            }
+            if (options.parameterMappings != null) {
+                javaCodeGen.addParameterMappings(options.parameterMappings);
+            }
+            if (options.responseBodyMappings != null) {
+                javaCodeGen.addResponseBodyMappings(options.responseBodyMappings);
+            }
+            javaCodeGen.setReactive(options.reactive);
+            javaCodeGen.setGenerateHttpResponseAlways(options.generateHttpResponseAlways);
+            javaCodeGen.setGenerateHttpResponseWhereRequired(options.generateHttpResponseWhereRequired);
+            javaCodeGen.setUseOptional(options.optional);
+            javaCodeGen.setUseBeanValidation(options.beanValidation);
+            javaCodeGen.setTestTool(options.testFramework.value);
+            javaCodeGen.setSerializationLibrary(options.serializationLibraryKind().name());
+            javaCodeGen.setDateTimeLibrary(options.dateTimeFormat().name());
+            configureJavaServerOptions();
+            configureJavaClientOptions();
+        } else if (options.lang == GeneratorLanguage.KOTLIN && codeGenerator instanceof AbstractMicronautKotlinCodegen<?> kotlinCodeGen) {
+
+            if (options.invokerPackage != null) {
+                kotlinCodeGen.setInvokerPackage(options.invokerPackage);
+            }
+            if (options.artifactId != null) {
+                kotlinCodeGen.setArtifactId(options.artifactId);
+            }
+            if (options.parameterMappings != null) {
+                kotlinCodeGen.addParameterMappings(options.parameterMappings);
+            }
+            if (options.responseBodyMappings != null) {
+                kotlinCodeGen.addResponseBodyMappings(options.responseBodyMappings);
+            }
+            kotlinCodeGen.setReactive(options.reactive);
+            kotlinCodeGen.setGenerateHttpResponseAlways(options.generateHttpResponseAlways);
+            kotlinCodeGen.setGenerateHttpResponseWhereRequired(options.generateHttpResponseWhereRequired);
+            kotlinCodeGen.setUseBeanValidation(options.beanValidation);
+            kotlinCodeGen.setTestTool(options.testFramework.value);
+            kotlinCodeGen.setSerializationLibrary(options.serializationLibraryKind().name());
+            kotlinCodeGen.setDateTimeLibrary(options.dateTimeFormat().name());
+            configureKotlinServerOptions();
+            configureKotlinClientOptions();
         }
-        if (options.artifactId != null) {
-            codeGenerator.setArtifactId(options.artifactId);
-        }
-        if (options.parameterMappings != null) {
-            codeGenerator.addParameterMappings(options.parameterMappings);
-        }
-        if (options.responseBodyMappings != null) {
-            codeGenerator.addResponseBodyMappings(options.responseBodyMappings);
-        }
-        codeGenerator.setReactive(options.reactive);
-        codeGenerator.setGenerateHttpResponseAlways(options.generateHttpResponseAlways);
-        codeGenerator.setGenerateHttpResponseWhereRequired(options.generateHttpResponseWhereRequired);
-        codeGenerator.setUseOptional(options.optional);
-        codeGenerator.setUseBeanValidation(options.beanValidation);
-        codeGenerator.setTestTool(options.testFramework.value);
-        codeGenerator.setSerializationLibrary(options.serializationLibraryKind().name());
-        codeGenerator.setDateTimeLibrary(options.dateTimeFormat().name());
-        configureServerOptions();
-        configureClientOptions();
         codeGenerator.processOpts();
     }
 
-    private void configureServerOptions() {
-        if (serverOptions != null && codeGenerator instanceof JavaMicronautServerCodegen serverCodegen) {
-            if (serverOptions.controllerPackage() != null) {
-                serverCodegen.setControllerPackage(serverOptions.controllerPackage());
+    private void configureJavaServerOptions() {
+        if (javaServerOptions != null && codeGenerator instanceof JavaMicronautServerCodegen javaServerCodegen) {
+            if (javaServerOptions.controllerPackage() != null) {
+                javaServerCodegen.setControllerPackage(javaServerOptions.controllerPackage());
             }
-            serverCodegen.setGenerateImplementationFiles(serverOptions.generateImplementationFiles());
-            serverCodegen.setGenerateOperationsToReturnNotImplemented(serverOptions.generateOperationsToReturnNotImplemented());
-            serverCodegen.setGenerateControllerFromExamples(serverOptions.generateControllerFromExamples());
-            serverCodegen.setUseAuth(serverOptions.useAuth());
-            serverCodegen.setLombok(serverOptions.lombok());
-            serverCodegen.setFluxForArrays(serverOptions.fluxForArrays());
-            serverCodegen.setGeneratedAnnotation(serverOptions.generatedAnnotation());
+            javaServerCodegen.setGenerateImplementationFiles(javaServerOptions.generateImplementationFiles());
+            javaServerCodegen.setGenerateOperationsToReturnNotImplemented(javaServerOptions.generateOperationsToReturnNotImplemented());
+            javaServerCodegen.setGenerateControllerFromExamples(javaServerOptions.generateControllerFromExamples());
+            javaServerCodegen.setUseAuth(javaServerOptions.useAuth());
+            javaServerCodegen.setLombok(javaServerOptions.lombok());
+            javaServerCodegen.setFluxForArrays(javaServerOptions.fluxForArrays());
+            javaServerCodegen.setGeneratedAnnotation(javaServerOptions.generatedAnnotation());
         }
     }
 
-    public void configureClientOptions() {
-        if (clientOptions != null && codeGenerator instanceof JavaMicronautClientCodegen clientCodegen) {
-            if (clientOptions.additionalClientTypeAnnotations() != null) {
-                clientCodegen.setAdditionalClientTypeAnnotations(clientOptions.additionalClientTypeAnnotations());
+    public void configureJavaClientOptions() {
+        if (javaClientOptions != null && codeGenerator instanceof JavaMicronautClientCodegen javaClientCodegen) {
+            if (javaClientOptions.additionalClientTypeAnnotations() != null) {
+                javaClientCodegen.setAdditionalClientTypeAnnotations(javaClientOptions.additionalClientTypeAnnotations());
             }
-            if (clientOptions.clientId() != null) {
-                clientCodegen.setClientId(clientCodegen.clientId);
+            if (javaClientOptions.clientId() != null) {
+                javaClientCodegen.setClientId(javaClientCodegen.clientId);
             }
-            if (clientOptions.authorizationFilterPattern() != null) {
-                clientCodegen.setAuthorizationFilterPattern(clientCodegen.authorizationFilterPattern);
+            if (javaClientOptions.authorizationFilterPattern() != null) {
+                javaClientCodegen.setAuthorizationFilterPattern(javaClientCodegen.authorizationFilterPattern);
             }
-            if (clientOptions.basePathSeparator() != null) {
-                clientCodegen.setBasePathSeparator(clientCodegen.basePathSeparator);
+            if (javaClientOptions.basePathSeparator() != null) {
+                javaClientCodegen.setBasePathSeparator(javaClientCodegen.basePathSeparator);
             }
-            clientCodegen.setConfigureAuthorization(clientOptions.useAuth());
-            clientCodegen.setLombok(clientOptions.lombok());
-            clientCodegen.setFluxForArrays(clientOptions.fluxForArrays());
-            clientCodegen.setGeneratedAnnotation(clientOptions.generatedAnnotation());
+            javaClientCodegen.setConfigureAuthorization(javaClientOptions.useAuth());
+            javaClientCodegen.setLombok(javaClientOptions.lombok());
+            javaClientCodegen.setFluxForArrays(javaClientOptions.fluxForArrays());
+            javaClientCodegen.setGeneratedAnnotation(javaClientOptions.generatedAnnotation());
+        }
+    }
+
+    private void configureKotlinServerOptions() {
+        if (kotlinServerOptions != null && codeGenerator instanceof KotlinMicronautServerCodegen kotlinServerCodegen) {
+            if (kotlinServerOptions.controllerPackage() != null) {
+                kotlinServerCodegen.setControllerPackage(kotlinServerOptions.controllerPackage());
+            }
+            kotlinServerCodegen.setGenerateImplementationFiles(kotlinServerOptions.generateImplementationFiles());
+            kotlinServerCodegen.setGenerateOperationsToReturnNotImplemented(kotlinServerOptions.generateOperationsToReturnNotImplemented());
+            kotlinServerCodegen.setGenerateControllerFromExamples(kotlinServerOptions.generateControllerFromExamples());
+            kotlinServerCodegen.setGeneratedAnnotation(kotlinServerOptions.generatedAnnotation());
+            kotlinServerCodegen.setUseAuth(kotlinServerOptions.useAuth());
+            kotlinServerCodegen.setFluxForArrays(kotlinServerOptions.fluxForArrays());
+        }
+    }
+
+    public void configureKotlinClientOptions() {
+        if (kotlinClientOptions != null && codeGenerator instanceof KotlinMicronautClientCodegen kotlinClientCodegen) {
+            if (kotlinClientOptions.additionalClientTypeAnnotations() != null) {
+                kotlinClientCodegen.setAdditionalClientTypeAnnotations(kotlinClientOptions.additionalClientTypeAnnotations());
+            }
+            if (kotlinClientOptions.clientId() != null) {
+                kotlinClientCodegen.setClientId(kotlinClientCodegen.clientId);
+            }
+            if (kotlinClientOptions.authorizationFilterPattern() != null) {
+                kotlinClientCodegen.setAuthorizationFilterPattern(kotlinClientCodegen.authorizationFilterPattern);
+            }
+            if (kotlinClientOptions.basePathSeparator() != null) {
+                kotlinClientCodegen.setBasePathSeparator(kotlinClientCodegen.basePathSeparator);
+            }
+            kotlinClientCodegen.setGeneratedAnnotation(kotlinClientOptions.generatedAnnotation());
+            kotlinClientCodegen.setConfigureAuthorization(kotlinClientOptions.useAuth());
+            kotlinClientCodegen.setFluxForArrays(kotlinClientOptions.fluxForArrays());
         }
     }
 
@@ -212,6 +285,10 @@ public final class MicronautCodeGeneratorEntryPoint {
             }
             throw new IllegalArgumentException("Unknown output kind '" + name + "'");
         }
+
+        public String getGeneratorProperty() {
+            return generatorProperty;
+        }
     }
 
     private static class DefaultBuilder implements MicronautCodeGeneratorBuilder {
@@ -219,36 +296,56 @@ public final class MicronautCodeGeneratorEntryPoint {
         private static final Consumer<DefaultBuilder> HAS_OUTPUT = b -> Objects.requireNonNull(b.outputDirectory, "Sources directory must not be null");
 
         private Options options;
-        private AbstractMicronautJavaCodegen<?> codeGenerator;
+        private DefaultCodegen codeGenerator;
         private URI definitionFile;
         private File outputDirectory;
         private final EnumSet<OutputKind> outputs = EnumSet.noneOf(OutputKind.class);
-        private JavaMicronautServerCodegen.ServerOptions serverOptions;
-        private JavaMicronautClientCodegen.ClientOptions clientOptions;
+        private JavaMicronautServerCodegen.ServerOptions javaServerOptions;
+        private JavaMicronautClientCodegen.ClientOptions javaClientOptions;
+        private KotlinMicronautServerCodegen.ServerOptions kotlinServerOptions;
+        private KotlinMicronautClientCodegen.ClientOptions kotlinClientOptions;
 
         @Override
         public <B extends GeneratorOptionsBuilder, G extends MicronautCodeGenerator<B>> MicronautCodeGeneratorBuilder forCodeGenerator(G generator, Consumer<? super B> configuration) {
-            codeGenerator = (AbstractMicronautJavaCodegen<?>) generator;
+            codeGenerator = (DefaultCodegen) generator;
             var builder = generator.optionsBuilder();
             configuration.accept(builder);
             return this;
         }
 
         @Override
-        public MicronautCodeGeneratorBuilder forClient(Consumer<? super JavaMicronautClientOptionsBuilder> clientOptionsSpec) {
+        public MicronautCodeGeneratorBuilder forJavaClient(Consumer<? super JavaMicronautClientOptionsBuilder> clientOptionsSpec) {
             codeGenerator = new JavaMicronautClientCodegen();
             var clientOptionsBuilder = new JavaMicronautClientCodegen.DefaultClientOptionsBuilder();
             clientOptionsSpec.accept(clientOptionsBuilder);
-            clientOptions = clientOptionsBuilder.build();
+            javaClientOptions = clientOptionsBuilder.build();
             return this;
         }
 
         @Override
-        public MicronautCodeGeneratorBuilder forServer(Consumer<? super JavaMicronautServerOptionsBuilder> serverOptionsSpec) {
+        public MicronautCodeGeneratorBuilder forJavaServer(Consumer<? super JavaMicronautServerOptionsBuilder> serverOptionsSpec) {
             codeGenerator = new JavaMicronautServerCodegen();
             var serverOptionsBuilder = new JavaMicronautServerCodegen.DefaultServerOptionsBuilder();
             serverOptionsSpec.accept(serverOptionsBuilder);
-            serverOptions = serverOptionsBuilder.build();
+            javaServerOptions = serverOptionsBuilder.build();
+            return this;
+        }
+
+        @Override
+        public MicronautCodeGeneratorBuilder forKotlinClient(Consumer<? super KotlinMicronautClientOptionsBuilder> clientOptionsSpec) {
+            codeGenerator = new KotlinMicronautClientCodegen();
+            var clientOptionsBuilder = new KotlinMicronautClientCodegen.DefaultClientOptionsBuilder();
+            clientOptionsSpec.accept(clientOptionsBuilder);
+            kotlinClientOptions = clientOptionsBuilder.build();
+            return this;
+        }
+
+        @Override
+        public MicronautCodeGeneratorBuilder forKotlinServer(Consumer<? super KotlinMicronautServerOptionsBuilder> serverOptionsSpec) {
+            codeGenerator = new KotlinMicronautServerCodegen();
+            var serverOptionsBuilder = new KotlinMicronautServerCodegen.DefaultServerOptionsBuilder();
+            serverOptionsSpec.accept(serverOptionsBuilder);
+            kotlinServerOptions = serverOptionsBuilder.build();
             return this;
         }
 
@@ -294,8 +391,11 @@ public final class MicronautCodeGeneratorEntryPoint {
                 codeGenerator,
                 outputs,
                 options,
-                serverOptions,
-                clientOptions);
+                javaServerOptions,
+                javaClientOptions,
+                kotlinServerOptions,
+                kotlinClientOptions
+            );
         }
 
         private static class DefaultOptionsBuilder implements MicronautCodeGeneratorOptionsBuilder {
@@ -305,8 +405,8 @@ public final class MicronautCodeGeneratorEntryPoint {
             private boolean beanValidation = true;
             private String invokerPackage;
             private String modelPackage;
-            private List<AbstractMicronautJavaCodegen.ParameterMapping> parameterMappings;
-            private List<AbstractMicronautJavaCodegen.ResponseBodyMapping> responseBodyMappings;
+            private List<ParameterMapping> parameterMappings;
+            private List<ResponseBodyMapping> responseBodyMappings;
             private boolean optional;
             private boolean reactive = true;
             private boolean generateHttpResponseAlways;
@@ -314,6 +414,13 @@ public final class MicronautCodeGeneratorEntryPoint {
             private TestFramework testFramework = TestFramework.JUNIT5;
             private SerializationLibraryKind serializationLibraryKind = SerializationLibraryKind.MICRONAUT_SERDE_JACKSON;
             private DateTimeFormat dateTimeFormat = DateTimeFormat.ZONED_DATETIME;
+            private GeneratorLanguage lang = GeneratorLanguage.JAVA;
+
+            @Override
+            public MicronautCodeGeneratorOptionsBuilder withLang(GeneratorLanguage lang) {
+                this.lang = lang;
+                return this;
+            }
 
             @Override
             public MicronautCodeGeneratorOptionsBuilder withApiPackage(String apiPackage) {
@@ -340,13 +447,13 @@ public final class MicronautCodeGeneratorEntryPoint {
             }
 
             @Override
-            public MicronautCodeGeneratorOptionsBuilder withParameterMappings(List<AbstractMicronautJavaCodegen.ParameterMapping> parameterMappings) {
+            public MicronautCodeGeneratorOptionsBuilder withParameterMappings(List<ParameterMapping> parameterMappings) {
                 this.parameterMappings = parameterMappings;
                 return this;
             }
 
             @Override
-            public MicronautCodeGeneratorOptionsBuilder withResponseBodyMappings(List<AbstractMicronautJavaCodegen.ResponseBodyMapping> responseBodyMappings) {
+            public MicronautCodeGeneratorOptionsBuilder withResponseBodyMappings(List<ResponseBodyMapping> responseBodyMappings) {
                 this.responseBodyMappings = responseBodyMappings;
                 return this;
             }
@@ -400,7 +507,7 @@ public final class MicronautCodeGeneratorEntryPoint {
             }
 
             private Options build() {
-                return new Options(apiPackage, modelPackage, invokerPackage, artifactId, parameterMappings, responseBodyMappings, beanValidation, optional, reactive, generateHttpResponseAlways, generateHttpResponseWhereRequired, testFramework, serializationLibraryKind, dateTimeFormat);
+                return new Options(lang, apiPackage, modelPackage, invokerPackage, artifactId, parameterMappings, responseBodyMappings, beanValidation, optional, reactive, generateHttpResponseAlways, generateHttpResponseWhereRequired, testFramework, serializationLibraryKind, dateTimeFormat);
             }
         }
     }
@@ -422,12 +529,13 @@ public final class MicronautCodeGeneratorEntryPoint {
     }
 
     private record Options(
+        GeneratorLanguage lang,
         String apiPackage,
         String modelPackage,
         String invokerPackage,
         String artifactId,
-        List<AbstractMicronautJavaCodegen.ParameterMapping> parameterMappings,
-        List<AbstractMicronautJavaCodegen.ResponseBodyMapping> responseBodyMappings,
+        List<ParameterMapping> parameterMappings,
+        List<ResponseBodyMapping> responseBodyMappings,
         boolean beanValidation,
         boolean optional,
         boolean reactive,

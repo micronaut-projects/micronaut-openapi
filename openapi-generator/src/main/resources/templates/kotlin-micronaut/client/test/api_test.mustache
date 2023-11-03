@@ -1,0 +1,49 @@
+package {{package}}
+
+{{#imports}}import {{import}}
+{{/imports}}
+import io.micronaut.test.extensions.junit5.annotation.MicronautTest
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Disabled
+{{#wrapInHttpResponse}}
+import io.micronaut.http.HttpResponse
+{{/wrapInHttpResponse}}
+
+/**
+ * API tests for {{classname}}
+ */
+@MicronautTest
+class {{classname}}Test(
+    val api: {{classname}},
+) {
+    {{#operations}}{{#operation}}
+    /**
+     * {{summary}}
+     {{#notes}}
+     * <p>
+     * {{notes}}
+     {{/notes}}
+     */
+    @Disabled("Not Implemented")
+    @Test
+    fun {{operationId}}Test() {
+        // given
+        {{#allParams}}
+        var {{paramName}} = {{{example}}}
+        {{/allParams}}
+
+        // when
+        {{#wrapInHttpResponse}}
+        var response = api.{{operationId}}({{#allParams}}{{paramName}}{{^-last}}, {{/-last}}{{/allParams}}){{#reactive}}.block(){{/reactive}}{{#returnType}}
+        var responseBody: {{{returnType}}} = response.body(){{/returnType}}
+        {{/wrapInHttpResponse}}
+        {{^wrapInHttpResponse}}
+        {{#returnType}}var responseBody = {{/returnType}}api.{{operationId}}({{#allParams}}{{paramName}}{{^-last}}, {{/-last}}{{/allParams}}){{#reactive}}.block(){{/reactive}}
+        {{/wrapInHttpResponse}}
+
+        // then
+        // TODO implement the {{operationId}}Test()
+    }
+    {{/operation}}{{/operations}}
+}

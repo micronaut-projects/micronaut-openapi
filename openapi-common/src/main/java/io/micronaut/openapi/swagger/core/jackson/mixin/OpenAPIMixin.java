@@ -24,6 +24,7 @@ import io.swagger.v3.oas.models.Paths;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 /**
@@ -34,6 +35,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 public abstract class OpenAPIMixin {
 
     @JsonAnyGetter
+    @JsonInclude
     public abstract Map<String, Object> getExtensions();
 
     @JsonAnySetter

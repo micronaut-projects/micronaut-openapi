@@ -15,6 +15,13 @@
  */
 package io.micronaut.build.internal.openapi;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.Map;
+
+import javax.inject.Inject;
+
 import org.gradle.api.DefaultTask;
 import org.gradle.api.file.ConfigurableFileCollection;
 import org.gradle.api.file.Directory;
@@ -33,13 +40,6 @@ import org.gradle.api.tasks.PathSensitivity;
 import org.gradle.api.tasks.TaskAction;
 import org.gradle.process.ExecOperations;
 
-import javax.inject.Inject;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 /**
  * A task which simulates what the Gradle Micronaut plugin
  * would do. Must be used with the test entry point.
@@ -55,17 +55,22 @@ public abstract class OpenApiGeneratorTask extends DefaultTask {
     @Input
     public abstract Property<String> getGeneratorKind();
 
+    @Input
+    public abstract Property<String> getLang();
+
     @OutputDirectory
     public abstract DirectoryProperty getOutputDirectory();
 
     @Internal
     public Provider<Directory> getGeneratedSourcesDirectory() {
-        return getOutputDirectory().dir("src/main/java");
+        String lang = getLang().get();
+        return lang.equalsIgnoreCase("JAVA") ? getOutputDirectory().dir("src/main/java") : getOutputDirectory().dir("src/main/kotlin");
     }
 
     @Internal
     public Provider<Directory> getGeneratedTestSourcesDirectory() {
-        return getOutputDirectory().dir("src/test/groovy");
+        String lang = getLang().get();
+        return lang.equalsIgnoreCase("JAVA") ? getOutputDirectory().dir("src/test/groovy") : getOutputDirectory().dir("src/test/kotlin");
     }
 
     @Input
@@ -77,7 +82,6 @@ public abstract class OpenApiGeneratorTask extends DefaultTask {
     @Input
     public abstract ListProperty<Map<String, String>> getResponseBodyMappings();
 
-
     @Inject
     protected abstract ExecOperations getExecOperations();
 
@@ -85,19 +89,21 @@ public abstract class OpenApiGeneratorTask extends DefaultTask {
     public void execute() throws IOException {
         var generatedSourcesDir = getGeneratedSourcesDirectory().get().getAsFile();
         var generatedTestSourcesDir = getGeneratedTestSourcesDirectory().get().getAsFile();
+        var lang = getLang().get();
         Files.createDirectories(generatedSourcesDir.toPath());
         Files.createDirectories(generatedTestSourcesDir.toPath());
-        getProject().getLogger().info("json: " + getParameterMappings().get());
+        getProject().getLogger().info("json: {}", getParameterMappings().get());
         getExecOperations().javaexec(javaexec -> {
             javaexec.setClasspath(getClasspath());
             javaexec.getMainClass().set("io.micronaut.openapi.testsuite.GeneratorMain");
-            List<String> args = new ArrayList<>();
+            var args = new ArrayList<String>();
             args.add(getGeneratorKind().get());
             args.add(getOpenApiDefinition().get().getAsFile().toURI().toString());
             args.add(getOutputDirectory().get().getAsFile().getAbsolutePath());
             args.add(String.join(",", getOutputKinds().get()));
             args.add(getParameterMappings().get().toString());
             args.add(getResponseBodyMappings().get().toString());
+            args.add(lang.toUpperCase());
             javaexec.args(args);
         });
     }

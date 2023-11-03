@@ -1,0 +1,31 @@
+{{>common/licenseInfo}}
+package {{invokerPackage}}.auth
+
+import io.micronaut.core.bind.annotation.Bindable
+
+import kotlin.annotation.AnnotationRetention.RUNTIME
+import kotlin.annotation.AnnotationTarget.FUNCTION
+{{#generatedAnnotation}}
+import {{javaxPackage}}.annotation.Generated
+{{/generatedAnnotation}}
+
+{{#generatedAnnotation}}
+{{>common/generatedAnnotation}}
+{{/generatedAnnotation}}
+@MustBeDocumented
+@Retention(RUNTIME)
+@Target(FUNCTION)
+@Bindable
+@Repeatable
+annotation class Authorization(
+
+    /**
+     * The name of the authorization.
+     */
+    val value: String = "",
+
+    /**
+     * The scopes for the oauth authorization.
+     */
+    val scopes: Array<String> = []
+)

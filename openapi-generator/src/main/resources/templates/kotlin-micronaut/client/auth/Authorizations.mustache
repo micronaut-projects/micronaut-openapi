@@ -1,0 +1,23 @@
+{{>common/licenseInfo}}
+package {{invokerPackage}}.auth
+
+import io.micronaut.core.bind.annotation.Bindable
+
+import kotlin.annotation.AnnotationRetention.RUNTIME
+import kotlin.annotation.AnnotationTarget.FUNCTION
+
+{{#generatedAnnotation}}
+import {{javaxPackage}}.annotation.Generated
+
+{{/generatedAnnotation}}
+{{#generatedAnnotation}}
+{{>common/generatedAnnotation}}
+{{/generatedAnnotation}}
+@MustBeDocumented
+@Retention(RUNTIME)
+@Target(FUNCTION)
+@Bindable
+annotation class Authorizations(
+
+    val value: Array<Authorization>
+)

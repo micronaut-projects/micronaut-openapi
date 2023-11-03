@@ -1,0 +1,75 @@
+{{>common/licenseInfo}}
+package {{apiPackage}}
+{{#formatNoEmptyLines}}
+import io.micronaut.http.annotation.*
+import io.micronaut.core.annotation.Nullable
+import io.micronaut.core.convert.format.Format
+{{#useAuth}}
+import io.micronaut.security.annotation.Secured
+import io.micronaut.security.rules.SecurityRule
+{{/useAuth}}
+{{#reactive}}
+import reactor.core.publisher.Flux
+{{/reactive}}
+{{#wrapInHttpResponse}}
+import io.micronaut.http.HttpResponse
+{{/wrapInHttpResponse}}
+{{#imports}}
+import {{import}}
+{{/imports}}
+{{#generatedAnnotation}}
+import {{javaxPackage}}.annotation.Generated
+{{/generatedAnnotation}}
+{{#useBeanValidation}}
+import {{javaxPackage}}.validation.Valid
+import {{javaxPackage}}.validation.constraints.*
+{{/useBeanValidation}}
+{{#generateSwagger2Annotations}}
+import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.Parameter
+import io.swagger.v3.oas.annotations.media.Content
+import io.swagger.v3.oas.annotations.media.Schema
+import io.swagger.v3.oas.annotations.responses.ApiResponse
+import io.swagger.v3.oas.annotations.tags.Tag
+import io.swagger.v3.oas.annotations.security.SecurityRequirement
+{{/generateSwagger2Annotations}}
+{{/formatNoEmptyLines}}
+
+{{#formatOneEmptyLine}}
+{{#generatedAnnotation}}
+{{>common/generatedAnnotation}}
+{{/generatedAnnotation}}
+{{^generateControllerAsAbstract}}
+@Controller
+{{/generateControllerAsAbstract}}
+{{#generateSwagger2Annotations}}
+@Tag(name = "{{{baseName}}}", description = {{#tagDescription}}"{{{.}}}"{{/tagDescription}}{{^tagDescription}}"The {{{baseName}}} API"{{/tagDescription}})
+{{/generateSwagger2Annotations}}
+interface {{classname}} {
+
+{{#operations}}
+    {{#operation}}
+        {{#formatNoEmptyLines}}
+{{>common/operationAnnotations}}
+    @{{#lambda.pascalcase}}{{#lambda.lowercase}}{{httpMethod}}{{/lambda.lowercase}}{{/lambda.pascalcase}}("{{{path}}}")
+    {{^vendorExtensions.onlyDefaultProduceOrEmpty}}
+    @Produces({{#produces}}"{{{mediaType}}}"{{^-last}}, {{/-last}}{{/produces}})
+    {{/vendorExtensions.onlyDefaultProduceOrEmpty}}
+    {{^vendorExtensions.onlyDefaultConsumeOrEmpty}}
+    @Consumes({{#consumes}}"{{{mediaType}}}"{{^-last}}, {{/-last}}{{/consumes}})
+    {{/vendorExtensions.onlyDefaultConsumeOrEmpty}}
+    {{!security annotations}}
+    {{#useAuth}}
+    @Secured({{#vendorExtensions.x-roles}}{{{.}}}{{^-last}}, {{/-last}}{{/vendorExtensions.x-roles}})
+    {{/useAuth}}
+    {{!the method definition}}
+    fun {{nickname}}({{#allParams}}
+        {{#formatSingleLine}}{{>server/params/annotations}}{{#indent}}{{>common/params/validation}}{{/indent}}{{#isDateTime}}{{#dateFormat}}@Format("{{{datetimeFormat}}}"){{/dateFormat}}{{/isDateTime}}{{#isDate}}{{#dateTimeFormat}}@Format("{{{dateFormat}}}"){{/dateTimeFormat}}{{/isDate}} {{paramName}}: {{#isEnum}}{{{vendorExtensions.typeWithEnumWithGenericAnnotations}}}{{/isEnum}}{{^isEnum}}{{{vendorExtensions.typeWithGenericAnnotations}}}{{/isEnum}}{{^-last}},{{/-last}}{{/formatSingleLine}}
+    {{/allParams}}){{#returnType}}: {{{returnType}}}{{/returnType}}
+        {{/formatNoEmptyLines}}
+
+    {{/operation}}
+{{/operations}}
+}
+{{/formatOneEmptyLine}}
+

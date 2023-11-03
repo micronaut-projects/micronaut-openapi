@@ -63,10 +63,10 @@ class {{classname}}Test {
      *
      * TODO fill in the parameters and test return value.
      */
-    @Test
-        {{^generateControllerFromExamples}}
+    {{^generateControllerFromExamples}}
     @Disabled("Not Implemented")
-        {{/generateControllerFromExamples}}
+    {{/generateControllerFromExamples}}
+    @Test
     void {{operationId}}MethodTest() {
         // given
         {{#allParams}}
@@ -95,10 +95,10 @@ class {{classname}}Test {
      *
      * TODO fill in the request parameters and test response.
      */
-    @Test
-        {{^generateControllerFromExamples}}
+    {{^generateControllerFromExamples}}
     @Disabled("Not Implemented")
-        {{/generateControllerFromExamples}}
+    {{/generateControllerFromExamples}}
+    @Test
     void {{operationId}}ClientApiTest() throws IOException {
         // given
         {{!Create the body}}
