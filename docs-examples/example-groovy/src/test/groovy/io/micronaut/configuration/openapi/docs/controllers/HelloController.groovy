@@ -3,7 +3,6 @@ package io.micronaut.configuration.openapi.docs.controllers
 // tag::imports[]
 import io.micronaut.http.MediaType
 
-// tag::imports[]
 import io.micronaut.http.annotation.Controller
 import io.micronaut.http.annotation.Get
 import reactor.core.publisher.Mono

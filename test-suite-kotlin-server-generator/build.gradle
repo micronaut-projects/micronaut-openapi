@@ -1,5 +1,3 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
-
 plugins {
     id 'io.micronaut.build.internal.openapi-kotlin-generator-test-suite'
     alias(libs.plugins.kotlin.jvm)
@@ -12,16 +10,17 @@ that tests can be ran with Micronaut 4
 """
 
 dependencies {
-    kapt("io.micronaut.serde:micronaut-serde-processor")
-    kapt("io.micronaut.validation:micronaut-validation-processor")
+
+    kapt(mnValidation.micronaut.validation.processor)
+    kapt(mnSerde.micronaut.serde.processor)
     kapt(mn.micronaut.inject.kotlin)
 
-    implementation("io.micronaut:micronaut-http")
-    implementation("io.micronaut.serde:micronaut-serde-api")
-    implementation("io.micronaut:micronaut-inject-kotlin")
-    implementation("jakarta.annotation:jakarta.annotation-api")
-    implementation("io.micronaut.validation:micronaut-validation")
-    implementation("io.projectreactor:reactor-core")
+    implementation(mn.micronaut.http)
+    implementation(mnSerde.micronaut.serde.api)
+    implementation(mn.micronaut.inject.kotlin)
+    implementation(mn.jakarta.annotation.api)
+    implementation(mnValidation.micronaut.validation)
+    implementation(mnReactor.micronaut.reactor)
     implementation(projects.micronautOpenapi) {
         because("Required for Swagger")
     }
@@ -31,17 +30,18 @@ dependencies {
 
     runtimeOnly mnLogging.logback.classic
 
+    kaptTest(mnValidation.micronaut.validation.processor)
+    kaptTest(mnSerde.micronaut.serde.processor)
     kaptTest(mn.micronaut.inject.kotlin)
-    kaptTest("io.micronaut.serde:micronaut-serde-processor")
-    kaptTest("io.micronaut.validation:micronaut-validation-processor")
 
-    testCompileOnly("io.micronaut:micronaut-inject-kotlin-test")
-    testImplementation("io.micronaut:micronaut-http-client")
+    testCompileOnly(mn.micronaut.inject.kotlin.test)
+
+    testImplementation(mn.micronaut.http.client)
     testImplementation mnTest.micronaut.test.junit5
     testImplementation libs.junit.jupiter.params
 
-    testRuntimeOnly("io.micronaut:micronaut-json-core")
-    testRuntimeOnly("io.micronaut.serde:micronaut-serde-jackson")
+    testRuntimeOnly(mn.micronaut.json.core)
+    testRuntimeOnly(mnSerde.micronaut.serde.jackson)
     testRuntimeOnly libs.junit.jupiter.engine
     testRuntimeOnly mnLogging.logback.classic
 }
