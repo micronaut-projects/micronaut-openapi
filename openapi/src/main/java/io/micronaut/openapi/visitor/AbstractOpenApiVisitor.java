@@ -854,17 +854,17 @@ abstract class AbstractOpenApiVisitor {
 
             if (type != null) {
 
+                String typeName = type.getName();
+                ClassElement customTypeSchema = getCustomSchema(typeName, typeArgs, context);
+                if (customTypeSchema != null) {
+                    type = customTypeSchema;
+                }
+
                 if (isArray == null) {
                     isArray = type.isArray();
                 }
                 if (isIterable == null) {
                     isIterable = type.isIterable();
-                }
-
-                String typeName = type.getName();
-                ClassElement customTypeSchema = getCustomSchema(typeName, typeArgs, context);
-                if (customTypeSchema != null) {
-                    type = customTypeSchema;
                 }
 
                 // File upload case
