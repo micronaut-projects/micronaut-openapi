@@ -28,7 +28,7 @@ micronaut-groovy = "4.0.1"
 micronaut-validation = "4.0.3"
 micronaut-data = "4.1.4"
 micronaut-test = "4.1.0"
-micronaut-kotlin = "4.0.2"
+micronaut-kotlin = "4.1.0"
 micronaut-platform = "4.1.5"
 micronaut-logging = "1.1.2"
 
