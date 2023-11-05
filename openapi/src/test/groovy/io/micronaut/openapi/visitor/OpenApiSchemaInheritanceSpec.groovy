@@ -738,7 +738,7 @@ class MyDocument extends DocumentImpl {
  */
 class DocumentImpl implements Document, Serializable {
 
-    @Schema(description = "Inique id", required = true)
+    @Schema(description = "Unique id", required = true)
     private String id;
 
     @Schema(hidden = true)
@@ -750,7 +750,7 @@ class DocumentImpl implements Document, Serializable {
             accessMode = Schema.AccessMode.READ_ONLY)
     private long modified;
 
-    @Schema(description = "Shema name",
+    @Schema(description = "Schema name",
             implementation = String.class,
             accessMode = Schema.AccessMode.READ_ONLY)
     @JsonProperty(required = true)

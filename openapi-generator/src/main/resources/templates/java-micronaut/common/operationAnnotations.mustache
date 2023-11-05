@@ -10,16 +10,16 @@
      * {{nickname}}
         {{/notes}}
     {{/summary}}
-    {{#allParams}}
+    {{#vendorExtensions.originalParams}}
         {{#-first}}
      *
         {{/-first}}
      * @param {{paramName}}{{#description}} {{description}}{{/description}}{{#required}} (required){{/required}}{{^required}} (optional{{#defaultValue}}, default to {{{.}}}{{/defaultValue}}){{/required}}
-    {{/allParams}}
+    {{/vendorExtensions.originalParams}}
     {{#returnType}}
-        {{^allParams.0}}
+        {{^vendorExtensions.originalParams.0}}
      *
-        {{/allParams.0}}
+        {{/vendorExtensions.originalParams.0}}
      * @return {{returnType}}
     {{/returnType}}
     {{#externalDocs}}

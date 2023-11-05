@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.annotation.processing.SupportedOptions;
 
@@ -61,7 +60,7 @@ import static io.micronaut.openapi.visitor.Utils.DEFAULT_MEDIA_TYPES;
 public class OpenApiEndpointVisitor extends AbstractOpenApiEndpointVisitor implements TypeElementVisitor<Object, Object> {
 
     private String id;
-    private HttpMethodDesciption methodDescription;
+    private HttpMethodDescription methodDescription;
 
     private Boolean enabled;
     private String path;
@@ -238,11 +237,13 @@ public class OpenApiEndpointVisitor extends AbstractOpenApiEndpointVisitor imple
         if (ArrayUtils.isEmpty(arr)) {
             return DEFAULT_MEDIA_TYPES;
         }
-        return Arrays.stream(arr).map(MediaType::of).collect(Collectors.toList());
+        return Arrays.stream(arr)
+            .map(MediaType::of)
+            .toList();
     }
 
-    private static HttpMethodDesciption httpMethodDescription(MethodElement element) {
-        HttpMethodDesciption httpMethodDescription = methodDescription(element, "io.micronaut.management.endpoint.annotation.Write", HttpMethod.POST);
+    private static HttpMethodDescription httpMethodDescription(MethodElement element) {
+        HttpMethodDescription httpMethodDescription = methodDescription(element, "io.micronaut.management.endpoint.annotation.Write", HttpMethod.POST);
         if (httpMethodDescription != null) {
             return httpMethodDescription;
         }
@@ -253,11 +254,11 @@ public class OpenApiEndpointVisitor extends AbstractOpenApiEndpointVisitor imple
         return methodDescription(element, "io.micronaut.management.endpoint.annotation.Delete", HttpMethod.DELETE);
     }
 
-    private static HttpMethodDesciption methodDescription(MethodElement element, String endpointManagementAnnName, HttpMethod httpMethod) {
+    private static HttpMethodDescription methodDescription(MethodElement element, String endpointManagementAnnName, HttpMethod httpMethod) {
         if (element.isAnnotationPresent(endpointManagementAnnName)) {
             AnnotationValue<?> annotation = element.getAnnotation(endpointManagementAnnName);
             assert annotation != null;
-            return new HttpMethodDesciption(httpMethod, annotation.stringValue("description").orElse(null),
+            return new HttpMethodDescription(httpMethod, annotation.stringValue("description").orElse(null),
                     annotation.stringValues("produces"), annotation.stringValues("consumes"));
         }
         return null;
@@ -268,14 +269,14 @@ public class OpenApiEndpointVisitor extends AbstractOpenApiEndpointVisitor imple
      *
      * @author croudet
      */
-    private static class HttpMethodDesciption {
+    private static class HttpMethodDescription {
 
         HttpMethod httpMethod;
         String description;
         String[] produces;
         String[] consumes;
 
-        HttpMethodDesciption(HttpMethod httpMethod, String description, String[] produces, String[] consumes) {
+        HttpMethodDescription(HttpMethod httpMethod, String description, String[] produces, String[] consumes) {
             this.httpMethod = httpMethod;
             this.description = description;
             this.produces = produces;
@@ -284,7 +285,7 @@ public class OpenApiEndpointVisitor extends AbstractOpenApiEndpointVisitor imple
 
         @Override
         public String toString() {
-            return "HttpMethodDesciption [httpMethod=" + httpMethod + ", description=" + description + ", produces="
+            return "HttpMethodDescription [httpMethod=" + httpMethod + ", description=" + description + ", produces="
                     + Arrays.toString(produces) + ", consumes=" + Arrays.toString(consumes) + "]";
         }
     }

@@ -12,6 +12,9 @@
 {{#micronaut_serde_jackson}}
 @Serdeable
 {{/micronaut_serde_jackson}}
+{{#generatedAnnotation}}
+{{>common/generatedAnnotation}}
+{{/generatedAnnotation}}
 {{#additionalEnumTypeAnnotations}}
 {{{.}}}
 {{/additionalEnumTypeAnnotations}}

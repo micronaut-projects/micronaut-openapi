@@ -5,4 +5,3 @@ plugins {
 dependencies {
     api(libs.managed.swagger.annotations)
 }
-

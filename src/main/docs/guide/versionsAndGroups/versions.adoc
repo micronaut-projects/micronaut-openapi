@@ -1,6 +1,6 @@
 How to use the `@Version` annotation can be read here: link:https://docs.micronaut.io/latest/guide/#apiVersioning[Micronaut API versioning].
 
-Micronaut OpenAPI support this versioning and automatticaly add pararameters or headers
+Micronaut OpenAPI support this versioning and automatically add parameters or headers
 with version from your `application.yml`.
 
 For example:

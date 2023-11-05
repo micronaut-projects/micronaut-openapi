@@ -51,6 +51,7 @@ openApiViews:
   redoc: Redoc
   rapidoc: RapiDoc
   rapipdf: RapiPdf
+convertToAdoc: Conversion to Asciidoc
 versionsAndGroups:
   title: Versions and groups
   versions: Micronaut versioning

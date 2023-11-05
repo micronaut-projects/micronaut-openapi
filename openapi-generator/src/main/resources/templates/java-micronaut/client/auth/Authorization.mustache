@@ -11,11 +11,13 @@ import java.lang.annotation.Target;
 
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
+{{#generatedAnnotation}}
 import {{javaxPackage}}.annotation.Generated;
+{{/generatedAnnotation}}
 
-{{#withGeneratedAnnotation}}
+{{#generatedAnnotation}}
 {{>common/generatedAnnotation}}
-{{/withGeneratedAnnotation}}
+{{/generatedAnnotation}}
 @Documented
 @Retention(RUNTIME)
 @Target(METHOD)

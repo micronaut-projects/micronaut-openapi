@@ -1306,7 +1306,7 @@ import io.micronaut.http.annotation.Post;
 class HelloWorldController {
 
     @Post("/public")
-    public HttpResponse<String> publicEnpoint(
+    public HttpResponse<String> publicEndpoint(
             @Header(HttpHeaders.AUTHORIZATION) String auth,
             @Header(HttpHeaders.CONTENT_TYPE) String contentType,
             @Header(HttpHeaders.ACCEPT) String accept,
@@ -1329,7 +1329,7 @@ class MyBean {}
         operation.parameters[0].name == 'my-header'
     }
 
-    void "test ApiResponse declared in interaface on method level"() {
+    void "test ApiResponse declared in interface on method level"() {
 
         given:
         buildBeanDefinition('test.MyBean', '''
@@ -1371,7 +1371,7 @@ class MyBean {}
         operation.responses."404".description == 'Data is missing'
     }
 
-    void "test ApiResponse declared in interaface and class on method level"() {
+    void "test ApiResponse declared in interface and class on method level"() {
 
         given:
         buildBeanDefinition('test.MyBean', '''
@@ -1418,7 +1418,7 @@ class MyBean {}
         operation.responses."515".description == 'My response2'
     }
 
-    void "test ApiResponse declared in interaface on class level"() {
+    void "test ApiResponse declared in interface on class level"() {
 
         given:
         buildBeanDefinition('test.MyBean', '''
@@ -1474,7 +1474,7 @@ class MyBean {}
         operation2.responses."404".description == 'Data is missing'
     }
 
-    void "test ApiResponse declared in interaface and class on class level"() {
+    void "test ApiResponse declared in interface and class on class level"() {
 
         given:
         buildBeanDefinition('test.MyBean', '''
@@ -1537,7 +1537,7 @@ class MyBean {}
         operation.responses."515".description == 'My response2'
     }
 
-    void "test ApiResponse declared in interaface and class on class and method levels"() {
+    void "test ApiResponse declared in interface and class on class and method levels"() {
 
         given:
         buildBeanDefinition('test.MyBean', '''
@@ -1596,7 +1596,7 @@ class MyBean {}
         operation.responses."515".description == 'My response2'
     }
 
-    void "test ApiResponses declared in interaface and class on class and method levels"() {
+    void "test ApiResponses declared in interface and class on class and method levels"() {
 
         given:
         buildBeanDefinition('test.MyBean', '''
@@ -1796,5 +1796,129 @@ class MyBean {}
             assert operation.responses."200".content."application/json".schema.$ref == '#/components/schemas/MyDto'
         }
 
+    }
+
+    void "test parse @Part StreamingFileUpload parameter data"() {
+        given:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.http.MediaType;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Part;
+import io.micronaut.http.annotation.Post;
+import io.micronaut.http.multipart.StreamingFileUpload;
+import io.swagger.v3.oas.annotations.Parameter;
+
+import org.reactivestreams.Publisher;
+
+@Controller("/api")
+class MyController {
+
+    @Post(uri = "/model", consumes = MediaType.MULTIPART_FORM_DATA)
+    public String model(@Parameter(description = "Bind multi-part") @Part Publisher<StreamingFileUpload> files) {
+        return null;
+     }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        when:
+        OpenAPI openAPI = Utils.testReference
+        Operation operation = openAPI?.paths?."/api/model"?.post
+
+        then:
+        operation
+        operation.requestBody
+        operation.requestBody.content."multipart/form-data".schema.properties.files
+        operation.requestBody.content."multipart/form-data".schema.properties.files.type == "array"
+        operation.requestBody.content."multipart/form-data".schema.properties.files.description == "Bind multi-part"
+        operation.requestBody.content."multipart/form-data".schema.properties.files.items.type == "string"
+        operation.requestBody.content."multipart/form-data".schema.properties.files.items.format == "binary"
+        operation.requestBody.content."multipart/form-data".encoding.files.contentType == 'application/octet-stream'
+        !operation.parameters
+    }
+
+    void "test parse @Part CompletedFileUpload parameter data"() {
+        given:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.http.MediaType;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Part;
+import io.micronaut.http.annotation.Post;
+import io.micronaut.http.multipart.CompletedFileUpload;
+import io.swagger.v3.oas.annotations.Parameter;
+
+@Controller("/api")
+class MyController {
+
+    @Post(uri = "/model", consumes = MediaType.MULTIPART_FORM_DATA)
+    public String model(
+        @Parameter(description = "Bind multi-part") @Part CompletedFileUpload files
+    ) {
+        return null;
+     }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        when:
+        OpenAPI openAPI = Utils.testReference
+        Operation operation = openAPI?.paths?."/api/model"?.post
+
+        then:
+        operation
+        operation.requestBody
+        operation.requestBody.content."multipart/form-data".schema.properties.files
+        operation.requestBody.content."multipart/form-data".schema.properties.files.type == "string"
+        operation.requestBody.content."multipart/form-data".schema.properties.files.format == "binary"
+        operation.requestBody.content."multipart/form-data".schema.properties.files.description == "Bind multi-part"
+        operation.requestBody.content."multipart/form-data".encoding.files.contentType == 'application/octet-stream'
+        !operation.parameters
+    }
+
+    void "test parse @Format ZonedDateTime parameter data"() {
+        given:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import java.time.ZonedDateTime;
+
+import io.micronaut.core.convert.format.Format;
+import io.micronaut.http.annotation.Body;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Post;
+import io.swagger.v3.oas.annotations.Parameter;
+
+@Controller("/api")
+class MyController {
+
+    @Post(uri = "/model")
+    public String model(
+        @Parameter(description = "Simple datetime param") @Format("yyyy-MM-dd'T'HH:mm[:ss][.SSS][XXX]") ZonedDateTime date
+    ) {
+        return null;
+     }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        when:
+        OpenAPI openAPI = Utils.testReference
+        Operation operation = openAPI?.paths?."/api/model"?.post
+
+        then:
+        operation
+        operation.requestBody
+        operation.requestBody.content."application/json".schema.properties.date
+        operation.requestBody.content."application/json".schema.properties.date.type == "string"
+        operation.requestBody.content."application/json".schema.properties.date.format == "date-time"
+        operation.requestBody.content."application/json".schema.properties.date.description == "Simple datetime param"
+        !operation.parameters
     }
 }

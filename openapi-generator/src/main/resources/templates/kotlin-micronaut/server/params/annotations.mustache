@@ -1,0 +1,23 @@
+
+{{#isQueryParam}}
+        @QueryValue({{#defaultValue}}value = {{/defaultValue}}"{{{baseName}}}"{{#defaultValue}}, defaultValue = "{{{defaultValue}}}"{{/defaultValue}})
+{{/isQueryParam}}
+{{#isPathParam}}
+        @PathVariable({{#defaultValue}}value = {{/defaultValue}}"{{baseName}}"{{#defaultValue}}, defaultValue = "{{{defaultValue}}}"{{/defaultValue}})
+{{/isPathParam}}
+{{#isHeaderParam}}
+        @Header({{#defaultValue}}value = {{/defaultValue}}"{{baseName}}"{{#defaultValue}}, defaultValue = "{{{defaultValue}}}"{{/defaultValue}})
+{{/isHeaderParam}}
+{{#isBodyParam}}
+    {{#isMultipart}}
+        @Part("{{baseName}}")
+    {{/isMultipart}}
+    {{^isMultipart}}
+        @Body
+    {{/isMultipart}}
+{{/isBodyParam}}
+{{#isFormParam}}
+{{/isFormParam}}
+{{#isCookieParam}}
+        @CookieValue({{#defaultValue}}value = {{/defaultValue}}"{{baseName}}"{{#defaultValue}}, defaultValue = "{{defaultValue}}"{{/defaultValue}})
+{{/isCookieParam}}

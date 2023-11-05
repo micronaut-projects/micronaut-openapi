@@ -73,6 +73,7 @@ import io.micronaut.inject.ast.PackageElement;
 import io.micronaut.inject.ast.ParameterElement;
 import io.micronaut.inject.ast.TypedElement;
 import io.micronaut.inject.visitor.VisitorContext;
+import io.micronaut.openapi.OpenApiUtils;
 import io.micronaut.openapi.annotation.OpenAPIDecorator;
 import io.micronaut.openapi.annotation.OpenAPIGroup;
 import io.micronaut.openapi.javadoc.JavadocDescription;
@@ -123,6 +124,7 @@ import static io.micronaut.openapi.visitor.ConfigUtils.getRouterVersioningProper
 import static io.micronaut.openapi.visitor.ConfigUtils.getSecurityProperties;
 import static io.micronaut.openapi.visitor.ConfigUtils.isJsonViewEnabled;
 import static io.micronaut.openapi.visitor.ConfigUtils.isOpenApiEnabled;
+import static io.micronaut.openapi.visitor.ElementUtils.isElementNotNullable;
 import static io.micronaut.openapi.visitor.ElementUtils.isFileUpload;
 import static io.micronaut.openapi.visitor.ElementUtils.isNullable;
 import static io.micronaut.openapi.visitor.SchemaUtils.COMPONENTS_CALLBACKS_PREFIX;
@@ -511,7 +513,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                     if (isRequestBodySchemaSet) {
                         schema = openAPI.getComponents().getSchemas().get(schema.get$ref().substring(COMPONENTS_SCHEMAS_PREFIX.length()));
                     } else {
-                        ComposedSchema composedSchema = new ComposedSchema();
+                        var composedSchema = new ComposedSchema();
                         var extraBodyParametersSchema = new Schema<>();
                         // Composition of existing + a new schema where extra body parameters are going to be added
                         composedSchema.addAllOfItem(schema);
@@ -578,8 +580,15 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
     }
 
     private boolean alreadyProcessedParameter(List<Parameter> swaggerParameters, ParameterElement parameter) {
-        return swaggerParameters.stream()
-            .anyMatch(p -> p.getName().equals(parameter.getName()) && p.getIn() != null);
+        if (CollectionUtils.isEmpty(swaggerParameters)) {
+            return false;
+        }
+        for (var param : swaggerParameters) {
+            if (param.getName().equals(parameter.getName()) && param.getIn() != null) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void processParameterAnnotationInMethod(MethodElement element,
@@ -680,12 +689,12 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         consumesMediaTypes = CollectionUtils.isNotEmpty(consumesMediaTypes) ? consumesMediaTypes : DEFAULT_MEDIA_TYPES;
 
         if (parameter.isAnnotationPresent(Body.class)) {
-            io.swagger.v3.oas.models.Operation existedOpertion = null;
+            io.swagger.v3.oas.models.Operation existedOperation = null;
             // check existed operations
             for (PathItem pathItem : pathItems) {
-                existedOpertion = getOperationOnPathItem(pathItem, httpMethod);
-                if (existedOpertion != null) {
-//                    swaggerOperation = existedOpertion;
+                existedOperation = getOperationOnPathItem(pathItem, httpMethod);
+                if (existedOperation != null) {
+//                    swaggerOperation = existedOperation;
                     break;
                 }
             }
@@ -695,8 +704,8 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
 
             RequestBody requestBody = swaggerOperation.getRequestBody();
             if (requestBody != null && requestBody.getContent() != null) {
-                if (existedOpertion != null) {
-                    for (Map.Entry<String, io.swagger.v3.oas.models.media.MediaType> entry : existedOpertion.getRequestBody().getContent().entrySet()) {
+                if (existedOperation != null) {
+                    for (Map.Entry<String, io.swagger.v3.oas.models.media.MediaType> entry : existedOperation.getRequestBody().getContent().entrySet()) {
                         boolean found = false;
                         for (MediaType mediaType : consumesMediaTypes) {
                             if (entry.getKey().equals(mediaType.getName())) {
@@ -742,7 +751,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             return;
         }
         if (newParameter.get$ref() != null) {
-            addSwaggerParamater(newParameter, swaggerParameters);
+            addSwaggerParameter(newParameter, swaggerParameters);
             return;
         }
 
@@ -761,7 +770,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                         }
                         unwrappedParameter.setName(entry.getKey());
                         unwrappedParameter.setSchema(entry.getValue());
-                        addSwaggerParamater(unwrappedParameter, swaggerParameters);
+                        addSwaggerParameter(unwrappedParameter, swaggerParameters);
                     }
                 }
             }
@@ -781,7 +790,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                 }
             }
 
-            addSwaggerParamater(newParameter, swaggerParameters);
+            addSwaggerParameter(newParameter, swaggerParameters);
 
             Schema<?> schema = newParameter.getSchema();
             if (schema == null) {
@@ -795,7 +804,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         }
     }
 
-    private void addSwaggerParamater(Parameter newParameter, List<Parameter> swaggerParameters) {
+    private void addSwaggerParameter(Parameter newParameter, List<Parameter> swaggerParameters) {
         if (newParameter.get$ref() != null) {
             swaggerParameters.add(newParameter);
             return;
@@ -847,6 +856,9 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                                                        List<TypedElement> extraBodyParameters,
                                                        HttpMethod httpMethod,
                                                        List<UriMatchTemplate> matchTemplates) {
+
+        boolean isBodyParameter = false;
+
         Parameter newParameter = null;
         String parameterName = parameter.getName();
         if (!parameter.hasStereotype(Bindable.class) && pathVariables.containsKey(parameterName)) {
@@ -895,6 +907,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             newParameter.setName(queryVar);
         } else if (parameter.isAnnotationPresent(Part.class) && permitsRequestBody) {
             extraBodyParameters.add(parameter);
+            isBodyParameter = true;
         } else if (parameter.hasAnnotation("io.micronaut.management.endpoint.annotation.Selector")) {
             newParameter = new PathParameter();
             newParameter.setName(parameterName);
@@ -905,6 +918,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                 && parameterAnnotation.stringValue("in").isEmpty()) {
                 if (permitsRequestBody) {
                     extraBodyParameters.add(parameter);
+                    isBodyParameter = true;
                 } else {
 
                     UriMatchVariable pathVariable = pathVariables.get(parameterName);
@@ -946,6 +960,10 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             }
         }
 
+        if (isBodyParameter) {
+            return null;
+        }
+
         if (parameter.isAnnotationPresent(io.swagger.v3.oas.annotations.Parameter.class)) {
             AnnotationValue<io.swagger.v3.oas.annotations.Parameter> paramAnn = parameter
                 .findAnnotation(io.swagger.v3.oas.annotations.Parameter.class).orElse(null);
@@ -968,7 +986,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                 }
                 processExplode(paramAnn, paramValues);
 
-                JsonNode jsonNode = ConvertUtils.getJsonMapper().valueToTree(paramValues);
+                JsonNode jsonNode = OpenApiUtils.getJsonMapper().valueToTree(paramValues);
 
                 if (newParameter == null) {
                     try {
@@ -989,27 +1007,27 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                     try {
                         Parameter v = ConvertUtils.treeToValue(jsonNode, Parameter.class, context);
                         if (v == null) {
-                            Map<CharSequence, Object> target = ConvertUtils.getConvertJsonMapper().convertValue(newParameter, MAP_TYPE);
+                            Map<CharSequence, Object> target = OpenApiUtils.getConvertJsonMapper().convertValue(newParameter, MAP_TYPE);
                             for (CharSequence name : paramValues.keySet()) {
                                 Object o = paramValues.get(name.toString());
                                 if (o != null) {
                                     target.put(name.toString(), o);
                                 }
                             }
-                            newParameter = ConvertUtils.getConvertJsonMapper().convertValue(target, Parameter.class);
+                            newParameter = OpenApiUtils.getConvertJsonMapper().convertValue(target, Parameter.class);
                         } else {
                             // horrible hack because Swagger
                             // ParameterDeserializer breaks updating
                             // existing objects
                             BeanMap<Parameter> beanMap = BeanMap.of(v);
-                            Map<CharSequence, Object> target = ConvertUtils.getConvertJsonMapper().convertValue(newParameter, MAP_TYPE);
+                            Map<CharSequence, Object> target = OpenApiUtils.getConvertJsonMapper().convertValue(newParameter, MAP_TYPE);
                             for (CharSequence name : beanMap.keySet()) {
                                 Object o = beanMap.get(name.toString());
                                 if (o != null) {
                                     target.put(name.toString(), o);
                                 }
                             }
-                            newParameter = ConvertUtils.getConvertJsonMapper().convertValue(target, Parameter.class);
+                            newParameter = OpenApiUtils.getConvertJsonMapper().convertValue(target, Parameter.class);
                         }
                     } catch (IOException e) {
                         context.warn("Error reading Swagger Parameter for element [" + parameter + "]: " + e.getMessage(), parameter);
@@ -1827,7 +1845,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         }
 
         RouterVersioningProperties versioningProperties = getRouterVersioningProperties(context);
-        boolean isVersioningEnabled = versioningProperties.isEnabled() && versioningProperties.isRouterVersiningEnabled()
+        boolean isVersioningEnabled = versioningProperties.isEnabled() && versioningProperties.isRouterVersioningEnabled()
             && (versioningProperties.isHeaderEnabled() || versioningProperties.isParameterEnabled());
 
         String version = null;

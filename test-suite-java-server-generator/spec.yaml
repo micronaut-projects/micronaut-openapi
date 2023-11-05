@@ -1,0 +1,970 @@
+openapi: "3.0.0"
+info:
+  version: 1.0.0
+  title: Compute API
+  description: API for the Compute Service
+servers:
+  - url: localhost:8000/api
+    description: The api server
+
+paths:
+  /sendPrimitives/{name}:
+    get:
+      operationId: sendPrimitives
+      tags: [ parameters ]
+      description: A method to send primitives as request parameters
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: age
+          in: query
+          required: true
+          schema:
+            type: number
+        - name: height
+          in: header
+          required: true
+          schema:
+            type: number
+            format: float
+        - name: isPositive
+          in: query
+          required: true
+          schema:
+            type: boolean
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SendPrimitivesResponse'
+        default:
+          $ref: '#/responses/Error'
+  /sendValidatedPrimitives:
+    get:
+      operationId: sendValidatedPrimitives
+      tags: [ parameters ]
+      description: a method to send primitives with validation
+      parameters:
+        - name: name
+          in: query
+          schema:
+            type: string
+            minLength: 3
+            pattern: "[a-zA-Z]+"
+        - name: age
+          in: query
+          schema:
+            type: integer
+            format: int
+            minimum: 10
+            maximum: 200
+        - name: favoriteNumber
+          in: query
+          schema:
+            type: number
+            minimum: -100.5
+            maximum: 100.5
+        - name: height
+          in: query
+          schema:
+            type: number
+            format: double
+            minimum: 0.1
+            maximum: 3
+            exclusiveMaximum: true
+            exclusiveMinimum: true
+      responses:
+        200:
+          description: Success
+          content:
+            text/plain:
+              schema:
+                type: string
+        default:
+          $ref: '#/responses/Error'
+  /sendDates:
+    get:
+      operationId: sendDates
+      tags: [ parameters ]
+      description: A method to send dates as parameters
+      parameters:
+        - name: commitDate
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: commitDateTime
+          in: query
+          schema:
+            type: string
+            format: date-time
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SendDatesResponse'
+        default:
+          $ref: '#/responses/Error'
+  /sendParameterEnum:
+    get:
+      operationId: sendParameterEnum
+      tags: [ parameters ]
+      description: A method to send an enum as a query parameter
+      parameters:
+        - name: colorParam
+          in: query
+          schema:
+            $ref: '#/components/schemas/ColorEnum'
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ColorEnum'
+  /sendOpcRequestId:
+    get:
+      operationId: sendIgnoredHeader
+      tags: [ parameters ]
+      description: |
+        A method that takes ignored-header as a header.
+        It will be ignored, this behavior is most likely used when handling is implemented in a filter.
+      parameters:
+        - in: header
+          name: ignored-header
+          schema:
+            type: string
+      responses:
+        200:
+          description: Success
+          content:
+            text/plain:
+              schema:
+                type: string
+  /getIgnoredHeader:
+    get:
+      operationId: getIgnoredHeader
+      tags: [ parameters ]
+      description: |
+        A method that returns a header that should be ignored.
+        It will be ignored, this behavior is most likely used when it will be set in a filter.
+      responses:
+        200:
+          description: Success
+          headers:
+            ignored-header:
+              schema:
+                type: string
+          content:
+            text/plain:
+              schema:
+                type: string
+  /sendPageQuery:
+    get:
+      operationId: sendPageQuery
+      tags: [ parameters ]
+      description: A method that takes page query as its argument
+      parameters:
+        - $ref: '#/components/parameters/PageQueryParam'
+        - $ref: '#/components/parameters/PageSizeQueryParam'
+        - $ref: '#/components/parameters/PageSortQueryParam'
+      responses:
+        200:
+          description: Success
+          content:
+            text/plain:
+              schema:
+                type: string
+  /sendMappedParameter:
+    get:
+      operationId: sendMappedParameter
+      tags: [ parameters ]
+      description: A method that has a header that is mapped to a custom type
+      parameters:
+        - $ref: '#/components/parameters/FilterHeader'
+      responses:
+        200:
+          description: Success
+          content:
+            text/plain:
+              schema:
+                type: string
+  /sendValidatedCollection:
+    post:
+      operationId: sendValidatedCollection
+      tags: [ requestBody ]
+      description: A method to send a validated collection in body
+      requestBody:
+        content:
+          application/json:
+            schema:
+              title: collection
+              type: array
+              items:
+                type: array
+                items:
+                  type: string
+                  minLength: 3
+                  pattern: "[a-zA-Z]+"
+      responses:
+        200:
+          description: Success
+  /sendSimpleModel:
+    post:
+      operationId: sendSimpleModel
+      tags: [ requestBody ]
+      description: A method to send a simple model in body
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SimpleModel'
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SimpleModel'
+        default:
+          $ref: '#/responses/Error'
+  /sendListOfSimpleModels:
+    post:
+      operationId: sendListOfSimpleModels
+      tags: [ requestBody ]
+      description: A method to send a list of simple models in body
+      requestBody:
+        content:
+          application/json:
+            schema:
+              required: true
+              type: array
+              title: simpleModels
+              items:
+                $ref: '#/components/schemas/SimpleModel'
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SimpleModel'
+  /sendModelWithRequiredProperties:
+    post:
+      operationId: sendModelWithRequiredProperties
+      tags: [ requestBody ]
+      description: A method to send a model with required properties
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ModelWithRequiredProperties'
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ModelWithRequiredProperties'
+        default:
+          $ref: '#/responses/Error'
+  /sendDateModel:
+    post:
+      operationId: sendDateModel
+      tags: [ requestBody ]
+      description: A method to send a model with dates as properties
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DateModel'
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DateModel'
+        default:
+          $ref: '#/responses/Error'
+  /sendEnum:
+    post:
+      operationId: sendEnum
+      tags: [ requestBody ]
+      description: A method to send a simple enum in body
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ColorEnum'
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ColorEnum'
+        default:
+          $ref: '#/responses/Error'
+  /sendEnumList:
+    post:
+      operationId: sendEnumList
+      tags: [ requestBody ]
+      description: A method to send an enum list
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/ColorEnum'
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ColorEnum'
+        default:
+          $ref: '#/responses/Error'
+  /sendModelWithMapProperty:
+    post:
+      operationId: sendModelWithMapProperty
+      tags: [ requestBody ]
+      description: A method to send a model that contains maps
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ModelWithMapProperty'
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ModelWithMapProperty'
+  /sendModelWithValidatedListProperty:
+    post:
+      operationId: sendModelWithValidatedListProperty
+      tags: [ requestBody ]
+      description: A method to send a model that contains a list with validated items
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ModelWithValidatedListProperty'
+      responses:
+        200:
+          description: Success
+  /sendNestedModel:
+    post:
+      operationId: sendNestedModel
+      tags: [ requestBody ]
+      description: A method to send a model with another one nested as a property
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NestedModel'
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NestedModel'
+        default:
+          $ref: '#/responses/Error'
+  /sendModelWithInnerEnum:
+    post:
+      operationId: sendModelWithInnerEnum
+      tags: [ requestBody ]
+      description: A method to send a model with an inner enum as property
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ModelWithInnerEnum'
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ModelWithInnerEnum'
+        default:
+          $ref: '#/responses/Error'
+  /sendModelWithEnumList:
+    post:
+      operationId: sendModelWithEnumList
+      tags: [ requestBody ]
+      description: A method to send a model with an enum list as a property
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ModelWithEnumList'
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ModelWithEnumList'
+        default:
+          $ref: '#/responses/Error'
+  /sendModelWithDiscriminator:
+    put:
+      operationId: sendModelWithDiscriminator
+      tags: [ requestBody ]
+      description: A method to send a model with discriminator in body
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Animal'
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Animal'
+  /sendFile:
+    put:
+      operationId: sendFile
+      tags: [ requestBody ]
+      description: A method to send file as a request body
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: string
+                format: byte
+        default:
+          $ref: '#/responses/Error'
+  /sendBytes:
+    put:
+      operationId: sendBytes
+      tags: [ requestBody ]
+      description: A method to send bytes
+      requestBody:
+        content:
+          application/octet-stream:
+            schema:
+              type: string
+              format: byte
+      responses:
+        200:
+          description: Success
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: byte
+  /getSimpleModel:
+    get:
+      operationId: getSimpleModel
+      tags: [ responseBody ]
+      description: A method to get a simple model as a response
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SimpleModel'
+        default:
+          $ref: '#/responses/Error'
+  /getDateTime:
+    get:
+      operationId: getDateTime
+      tags: [ responseBody ]
+      description: A method to get date time in the response
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: string
+                format: date-time
+        default:
+          $ref: '#/responses/Error'
+  /getDateModel:
+    get:
+      operationId: getDateModel
+      tags: [ responseBody ]
+      description: A method to get a model containing dates in the response
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DateModel'
+        default:
+          $ref: '#/responses/Error'
+  /getSimpleModelWithNonStandardStatus:
+    get:
+      operationId: getSimpleModelWithNonStandardStatus
+      tags: [ responseBody ]
+      description: A method to get a simple model as a response
+      responses:
+        201:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SimpleModel'
+        default:
+          $ref: '#/responses/Error'
+  /getModelWithValidatedList:
+    get:
+      operationId: getModelWithValidatedList
+      tags: [ responseBody ]
+      description: A method to get a model with validated list as a response
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ModelWithValidatedListProperty'
+        default:
+          $ref: '#/responses/Error'
+  /getPaginatedSimpleModel:
+    get:
+      operationId: getPaginatedSimpleModel
+      parameters:
+        - $ref: '#/components/parameters/PageQueryParam'
+      tags: [ responseBody ]
+      description: A method to get a simple model list as a paginated response
+      responses:
+        200:
+          description: Success
+          headers:
+            X-Page-Number:
+              $ref: '#/components/headers/X-Page-Number'
+            X-Page-Size:
+              $ref: '#/components/headers/X-Page-Size'
+            X-Total-Count:
+              $ref: '#/components/headers/X-Total-Count'
+            X-Page-Count:
+              $ref: '#/components/headers/X-Page-Count'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SimpleModel'
+  /getDatedSimpleModel:
+    get:
+      operationId: getDatedSimpleModel
+      tags: [ responseBody ]
+      description: A method to get a simple model with last-modified header
+      responses:
+        200:
+          description: Success
+          headers:
+            Last-Modified:
+              $ref: '#/components/headers/Last-Modified'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SimpleModel'
+  /getSimpleModelWithNonMappedHeader:
+    get:
+      operationId: getSimpleModelWithNonMappedHeader
+      tags: [ responseBody ]
+      description: A method to get a simple model as a response
+      responses:
+        200:
+          description: Success
+          headers:
+            custom-header:
+              description: A header with an additional description
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SimpleModel'
+        default:
+          $ref: '#/responses/Error'
+  /getDatedSimpleModelWithNonMappedHeader:
+    get:
+      operationId: getDatedSimpleModelWithNonMappedHeader
+      tags: [ responseBody ]
+      description: A method to get a tagged simple model with non standard headers
+      responses:
+        200:
+          description: Success
+          headers:
+            Last-Modified:
+              $ref: '#/components/headers/Last-Modified'
+            custom-header:
+              description: A custom header
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SimpleModel'
+  /getErrorResponse:
+    get:
+      operationId: getErrorResponse
+      tags: [ responseBody ]
+      description: A method throwing an error response
+      responses:
+        404:
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /getFile:
+    get:
+      operationId: getFile
+      tags: [ responseBody ]
+      description: A method to get file as a response body
+      responses:
+        200:
+          description: Success
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        default:
+          $ref: '#/responses/Error'
+
+components:
+  schemas:
+    SendPrimitivesResponse:
+      type: object
+      properties:
+        name:
+          type: string
+        age:
+          type: number
+        height:
+          type: number
+          format: float
+        isPositive:
+          type: boolean
+    SendDatesResponse:
+      type: object
+      properties:
+        commitDate:
+          type: string
+          format: date
+        commitDateTime:
+          type: string
+          format: date-time
+    SimpleModel:
+      type: object
+      properties:
+        color:
+          type: string
+          minLength: 2
+        numEdges:
+          minimum: 1
+          type: integer
+          format: int64
+        area:
+          minimum: 0
+          exclusiveMinimum: true
+          type: number
+          format: float
+        exactArea:
+          minimum: 0
+          exclusiveMinimum: true
+          type: number
+        convex:
+          type: boolean
+        points:
+          type: array
+          minItems: 3
+          items:
+            type: string
+        state:
+          $ref: '#/components/schemas/StateEnum'
+    ModelWithRequiredProperties:
+      type: object
+      properties:
+        species:
+          type: string
+        weight:
+          type: number
+          format: float
+        numRepresentatives:
+          type: integer
+          format: int32
+        description:
+          type: string
+      required: [species, weight]
+    DateModel:
+      type: object
+      properties:
+        commitDate:
+          type: string
+          format: date
+        commitDateTime:
+          type: string
+          format: date-time
+    NestedModel:
+      type: object
+      properties:
+        simpleModel:
+          $ref: '#/components/schemas/SimpleModel'
+        additionalInfo:
+          type: string
+    ModelWithInnerEnum:
+      type: object
+      properties:
+        species-name:
+          type: string
+        num-representatives:
+          type: integer
+          format: int64
+        mammal-order:
+          title: MammalOrder
+          type: string
+          enum: [ monotreme, marsupial, placental ]
+    ModelWithEnumList:
+      type: object
+      properties:
+        favoriteColors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ColorEnum'
+    ModelWithMapProperty:
+      type: object
+      properties:
+        map:
+          type: object
+          additionalProperties:
+            type: string
+        deepMap:
+          type: object
+          additionalProperties:
+            type: object
+            additionalProperties:
+              minLength: 2
+              type: string
+        deepObjectMap:
+          type: object
+          additionalProperties:
+            type: object
+            additionalProperties:
+              $ref: '#/components/schemas/SimpleModel'
+    ModelWithValidatedListProperty:
+      type: object
+      properties:
+        stringList:
+          type: array
+          items:
+            type: string
+            minLength: 3
+        objectList:
+          type: array
+          maxItems: 2
+          items:
+            $ref: '#/components/schemas/SimpleModel'
+        mapList:
+          type: array
+          items:
+            type: object
+            additionalProperties:
+              type: string
+              minLength: 2
+    StateEnum:
+      type: string
+      enum: ['starting', 'running', 'stopped', 'deleted']
+    Animal:
+      type: object
+      discriminator:
+        propertyName: class
+        mapping:
+          ave: '#/components/schemas/Bird'
+          mammalia: '#/components/schemas/Mammal'
+          reptilia: '#/components/schemas/Reptile'
+      properties:
+        class:
+          type: string
+        color:
+          $ref: '#/components/schemas/ColorEnum'
+    Bird:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/Animal'
+      properties:
+        numWings:
+          type: integer
+          format: int32
+        beakLength:
+          type: number
+        featherDescription:
+          type: string
+    Mammal:
+      type: object
+      required: [ weight, description ]
+      allOf:
+        - $ref: '#/components/schemas/Animal'
+      properties:
+        weight:
+          type: number
+          format: float
+        description:
+          type: string
+    Reptile:
+      type: object
+      required: [numLegs, fangs]
+      allOf:
+        - $ref: '#/components/schemas/Animal'
+      properties:
+        numLegs:
+          type: integer
+        fangs:
+          type: boolean
+        fangDescription:
+          type: string
+    ColorEnum:
+      type: string
+      enum: ['red', 'blue', 'green', 'light-blue', 'dark-green']
+    ProxyFleetSummary:
+      type: object
+      description: proxy fleet summary object
+      properties:
+        proxyFleetName:
+          type: string
+          description: The unique name of the splat proxy fleet.
+        compartmentId:
+          type: string
+          description: The compartment id
+        location:
+          type: string
+          description: the location of the fleet, SUBSTRATE/OVERLAY
+          enum: [SUBSTRATE, OVERLAY]
+        lifecycleState:
+          type: string
+          description: the status of the fleet, ACTIVE/DELETED
+          enum: [ACTIVE, DELETED]
+        services:
+          type: array
+          description: an array of service names on the fleet
+          items:
+            type: string
+    Error:
+      type: object
+      description: An object for describing errors
+      properties:
+        message:
+          type: string
+          description: The error message
+
+  parameters:
+    PageQueryParam:
+      name: page
+      in: query
+      description: The page number to retrieve starting from 0.
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+    PageSizeQueryParam:
+      name: size
+      in: query
+      description: The number of items per page.
+      schema:
+        type: integer
+        minimum: 1
+        default: 10
+    PageSortQueryParam:
+      name: sortOrder
+      in: query
+      description: |
+        Parameter describing the sort. Allows specifying the sorting direction using the keywords {@code asc} and
+        {@code desc} after each property. For example, {@code "sort=name desc,age"} will sort by name in descending
+        order and age in ascending.
+      schema:
+        type: string
+    FilterHeader:
+      name: Filter
+      in: header
+      description: |
+        A filter parameter that allows filtering the response. The conditions are comma separated and
+        must be of type [property][comparator][value] where comparator is one of =, < and >.
+      schema:
+        type: string
+
+  responses:
+    Error:
+      description: An unexpected error has occurred
+    400:
+      description: Bad Request
+    401:
+      description: Unauthorized
+    404:
+      description: Not Found
+    500:
+      description: Internal Server Error
+    default:
+      description: Unknown Error
+
+  headers:
+    X-Page-Number:
+      description: The page number of the current page
+      schema:
+        type: string
+    X-Page-Size:
+      description: The number of items per page
+      schema:
+        type: string
+    X-Total-Count:
+      description: |
+        The total number of items available in the entire collections, not just the items returned in the current page
+      schema:
+        type: string
+    X-Page-Count:
+      description: The total number of pages based on the page size and total count
+      schema:
+        type: string
+    Last-Modified:
+      description: The last time an entity returned with the response was modified.
+      schema:
+        type: string
+        format: date-time

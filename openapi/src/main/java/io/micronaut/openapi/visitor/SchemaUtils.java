@@ -21,6 +21,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import io.micronaut.core.annotation.AnnotationValue;
@@ -28,6 +29,8 @@ import io.micronaut.core.annotation.Internal;
 import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.core.util.StringUtils;
 import io.micronaut.http.HttpMethod;
+import io.micronaut.openapi.OpenApiUtils;
+import io.micronaut.openapi.SimpleSchema;
 import io.swagger.v3.oas.annotations.extensions.Extension;
 import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
 import io.swagger.v3.oas.models.Components;
@@ -143,7 +146,7 @@ public final class SchemaUtils {
                 if (key.isEmpty()) {
                     if (propertyAsJson) {
                         try {
-                            processedValue = ConvertUtils.getJsonMapper().readTree(propertyValue);
+                            processedValue = OpenApiUtils.getJsonMapper().readTree(propertyValue);
                             map.put(prependIfMissing(propertyName, PREFIX_X), processedValue);
                         } catch (Exception e) {
                             map.put(prependIfMissing(propertyName, PREFIX_X), propertyValue);
@@ -160,7 +163,7 @@ public final class SchemaUtils {
                     @SuppressWarnings("unchecked") final Map<String, Object> mapValue = (Map<String, Object>) value;
                     if (propertyAsJson) {
                         try {
-                            processedValue = ConvertUtils.getJsonMapper().readTree(propertyValue);
+                            processedValue = OpenApiUtils.getJsonMapper().readTree(propertyValue);
                             mapValue.put(propertyName, processedValue);
                         } catch (Exception e) {
                             mapValue.put(propertyName, propertyValue);
@@ -211,12 +214,12 @@ public final class SchemaUtils {
 
         return switch (httpMethod) {
             case GET -> pathItem.getGet();
-            case POST -> pathItem.getPost();
             case PUT -> pathItem.getPut();
-            case PATCH -> pathItem.getPatch();
+            case POST -> pathItem.getPost();
             case DELETE -> pathItem.getDelete();
-            case HEAD -> pathItem.getHead();
             case OPTIONS -> pathItem.getOptions();
+            case HEAD -> pathItem.getHead();
+            case PATCH -> pathItem.getPatch();
             case TRACE -> pathItem.getTrace();
             default -> null;
         };
@@ -228,10 +231,13 @@ public final class SchemaUtils {
         }
         switch (httpMethod) {
             case GET -> pathItem.setGet(operation);
-            case POST -> pathItem.setPost(operation);
             case PUT -> pathItem.setPut(operation);
+            case POST -> pathItem.setPost(operation);
             case DELETE -> pathItem.setDelete(operation);
+            case OPTIONS -> pathItem.setOptions(operation);
+            case HEAD -> pathItem.setHead(operation);
             case PATCH -> pathItem.setPatch(operation);
+            case TRACE -> pathItem.setTrace(operation);
             default -> {
                 // do nothing
             }
@@ -321,7 +327,7 @@ public final class SchemaUtils {
                 int i = 0;
                 for (Parameter p1 : op1.getParameters()) {
                     if (p1.getName().equals(p2.getName())
-                        && p1.getIn().equals(p2.getIn())) {
+                        && Objects.equals(p1.getIn(), p2.getIn())) {
                         existedParameter = p1;
                         break;
                     }

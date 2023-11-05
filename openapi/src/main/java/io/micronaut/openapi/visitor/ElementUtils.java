@@ -24,9 +24,13 @@ import java.util.Optional;
 import java.util.concurrent.Future;
 
 import io.micronaut.core.annotation.Internal;
+import io.micronaut.core.annotation.Nullable;
 import io.micronaut.inject.ast.ClassElement;
+import io.micronaut.inject.ast.Element;
 import io.micronaut.inject.ast.TypedElement;
 import io.micronaut.inject.visitor.VisitorContext;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * Some util methods.
@@ -81,7 +85,7 @@ public final class ElementUtils {
     }
 
     /**
-     * Checks Nullable annotions / optinal type to understand that the element can be null.
+     * Checks Nullable annotations / optional type to understand that the element can be null.
      *
      * @param element typed element
      *
@@ -100,11 +104,36 @@ public final class ElementUtils {
      * @return true if this type one of known file upload types
      */
     public static boolean isFileUpload(ClassElement type) {
+        if (ElementUtils.isContainerType(type)) {
+            var typeArg = type.getFirstTypeArgument().orElse(null);
+            if (typeArg != null) {
+                type = typeArg;
+            }
+        }
         String typeName = type.getName();
         return "io.micronaut.http.multipart.StreamingFileUpload".equals(typeName)
                 || "io.micronaut.http.multipart.CompletedFileUpload".equals(typeName)
                 || "io.micronaut.http.multipart.CompletedPart".equals(typeName)
                 || "io.micronaut.http.multipart.PartData".equals(typeName);
+    }
+
+    /**
+     * Checking if the element not nullable.
+     *
+     * @param element element
+     * @param classElement class element
+     *
+     * @return true if element is not nullable
+     */
+    public static boolean isElementNotNullable(Element element, @Nullable Element classElement) {
+        return element.isAnnotationPresent("javax.validation.constraints.NotNull$List")
+            || element.isAnnotationPresent("jakarta.validation.constraints.NotNull$List")
+            || element.isAnnotationPresent("javax.validation.constraints.NotBlank$List")
+            || element.isAnnotationPresent("jakarta.validation.constraints.NotBlank$List")
+            || element.isAnnotationPresent("javax.validation.constraints.NotEmpty$List")
+            || element.isAnnotationPresent("jakarta.validation.constraints.NotEmpty$List")
+            || element.isNonNull()
+            || element.booleanValue(JsonProperty.class, "required").orElse(false);
     }
 
     /**

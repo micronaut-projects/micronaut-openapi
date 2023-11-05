@@ -1,0 +1,57 @@
+{{>common/licenseInfo}}
+package {{package}}
+{{#formatNoEmptyLines}}
+{{#imports}}
+import {{import}}
+{{/imports}}
+{{#serializableModel}}
+import java.io.Serial
+import java.io.Serializable
+{{/serializableModel}}
+{{#jackson}}
+import com.fasterxml.jackson.annotation.*
+{{/jackson}}
+{{#micronaut_serde_jackson}}
+import io.micronaut.serde.annotation.Serdeable
+{{/micronaut_serde_jackson}}
+{{#withXml}}
+import com.fasterxml.jackson.dataformat.xml.annotation.*
+import com.fasterxml.jackson.annotation.*
+{{/withXml}}
+{{#withXml}}
+import {{javaxPackage}}.xml.bind.annotation.*
+{{/withXml}}
+{{#parcelableModel}}
+import android.os.Parcelable
+import android.os.Parcel
+{{/parcelableModel}}{{#useBeanValidation}}
+import {{javaxPackage}}.validation.constraints.*
+import {{javaxPackage}}.validation.Valid
+{{/useBeanValidation}}
+import io.micronaut.core.annotation.Introspected
+import io.micronaut.core.annotation.Nullable
+{{#generatedAnnotation}}
+import {{javaxPackage}}.annotation.Generated
+{{/generatedAnnotation}}
+{{#generateSwagger2Annotations}}
+import io.swagger.v3.oas.annotations.media.Schema
+{{/generateSwagger2Annotations}}
+{{/formatNoEmptyLines}}
+{{#formatOneEmptyLine}}
+    {{#models}}
+        {{#model}}
+            {{#isEnum}}
+
+{{>common/model/enum}}
+            {{/isEnum}}
+            {{^isEnum}}
+                {{#vendorExtensions.x-is-one-of-interface}}
+{{>common/model/oneof_interface}}
+                {{/vendorExtensions.x-is-one-of-interface}}
+                {{^vendorExtensions.x-is-one-of-interface}}
+{{>common/model/pojo}}
+                {{/vendorExtensions.x-is-one-of-interface}}
+            {{/isEnum}}
+        {{/model}}
+    {{/models}}
+{{/formatOneEmptyLine}}

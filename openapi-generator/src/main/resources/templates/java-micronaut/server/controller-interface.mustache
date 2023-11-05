@@ -15,6 +15,7 @@ import io.micronaut.security.rules.SecurityRule;
 {{/useAuth}}
 {{#reactive}}
 import reactor.core.publisher.Mono;
+import reactor.core.publisher.Flux;
 {{/reactive}}
 {{#wrapInHttpResponse}}
 import io.micronaut.http.HttpResponse;
@@ -22,7 +23,9 @@ import io.micronaut.http.HttpResponse;
 {{#imports}}
 import {{import}};
 {{/imports}}
+{{#generatedAnnotation}}
 import {{javaxPackage}}.annotation.Generated;
+{{/generatedAnnotation}}
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -49,9 +52,9 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 {{/formatNoEmptyLines}}
 
 {{#formatOneEmptyLine}}
-{{#withGeneratedAnnotation}}
+{{#generatedAnnotation}}
 {{>common/generatedAnnotation}}
-{{/withGeneratedAnnotation}}
+{{/generatedAnnotation}}
 {{^generateControllerAsAbstract}}
 @Controller
 {{/generateControllerAsAbstract}}

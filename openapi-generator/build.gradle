@@ -12,8 +12,10 @@ dependencies {
         }
     }
     api libs.openapi.generator
+    implementation libs.commons.codec
 
     testImplementation mnTest.micronaut.test.junit5
+    testImplementation libs.junit.jupiter.params
 
     testFixturesImplementation mnTest.assertj.core
     testFixturesImplementation libs.javaparser

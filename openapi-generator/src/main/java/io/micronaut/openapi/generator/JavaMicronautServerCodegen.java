@@ -61,7 +61,7 @@ public class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen<Jav
     protected static final String API_PREFIX = "";
     protected static final String API_SUFFIX = "Api";
 
-    protected String apiPackage = "org.openapitools.api";
+    protected String apiPackage;
     protected String controllerPackage = "org.openapitools.controller";
     protected boolean generateImplementationFiles = true;
     protected boolean generateOperationsToReturnNotImplemented = true;
@@ -269,8 +269,13 @@ public class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen<Jav
 
         if (p.isFile) {
             // The CompletedFileUpload cannot be initialized
-            p.example = "null";
+            p.example = null;
         }
+    }
+
+    @Override
+    public boolean isGenerateHardNullable() {
+        return generateHardNullable;
     }
 
     @Override
@@ -317,6 +322,7 @@ public class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen<Jav
         private boolean generateOperationsToReturnNotImplemented = true;
         private boolean useAuth = true;
         private boolean lombok;
+        private boolean fluxForArrays;
         private boolean generatedAnnotation = true;
         private boolean aot;
 
@@ -357,6 +363,12 @@ public class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen<Jav
         }
 
         @Override
+        public JavaMicronautServerOptionsBuilder withFluxForArrays(boolean fluxForArrays) {
+            this.fluxForArrays = fluxForArrays;
+            return this;
+        }
+
+        @Override
         public JavaMicronautServerOptionsBuilder withGeneratedAnnotation(boolean generatedAnnotation) {
             this.generatedAnnotation = generatedAnnotation;
             return this;
@@ -376,6 +388,7 @@ public class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen<Jav
                 generateControllerFromExamples,
                 useAuth,
                 lombok,
+                fluxForArrays,
                 generatedAnnotation,
                 aot
             );
@@ -389,6 +402,7 @@ public class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen<Jav
         boolean generateControllerFromExamples,
         boolean useAuth,
         boolean lombok,
+        boolean fluxForArrays,
         boolean generatedAnnotation,
         boolean aot
     ) {

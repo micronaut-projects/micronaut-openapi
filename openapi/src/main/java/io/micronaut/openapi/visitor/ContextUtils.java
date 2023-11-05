@@ -32,10 +32,10 @@ import io.micronaut.openapi.visitor.group.GroupProperties;
 @Internal
 public final class ContextUtils {
 
-    public static final Argument<List<Pair<String, String>>> EXPANDABLE_PROPERTIES_ARGUMENT = new GenericArgument<List<Pair<String, String>>>() { };
-    public static final Argument<Map<String, ConfigUtils.SchemaDecorator>> ARGUMENT_SCHEMA_DECORATORS_MAP = new GenericArgument<Map<String, ConfigUtils.SchemaDecorator>>() { };
-    public static final Argument<Map<String, ConfigUtils.CustomSchema>> ARGUMENT_CUSTOM_SCHEMA_MAP = new GenericArgument<Map<String, ConfigUtils.CustomSchema>>() { };
-    public static final Argument<Map<String, GroupProperties>> ARGUMENT_GROUP_PROPERTIES_MAP = new GenericArgument<Map<String, GroupProperties>>() { };
+    public static final Argument<List<Pair<String, String>>> EXPANDABLE_PROPERTIES_ARGUMENT = new GenericArgument<>() { };
+    public static final Argument<Map<String, ConfigUtils.SchemaDecorator>> ARGUMENT_SCHEMA_DECORATORS_MAP = new GenericArgument<>() { };
+    public static final Argument<Map<String, ConfigUtils.CustomSchema>> ARGUMENT_CUSTOM_SCHEMA_MAP = new GenericArgument<>() { };
+    public static final Argument<Map<String, GroupProperties>> ARGUMENT_GROUP_PROPERTIES_MAP = new GenericArgument<>() { };
 
     private ContextUtils() {
     }

@@ -1,0 +1,71 @@
+    /**
+    {{#summary}}
+     * {{openbrace}}@summary {{summary}}{{closebrace}}
+    {{/summary}}
+    {{#notes}}
+     * {{notes}}
+    {{/notes}}
+    {{^summary}}
+        {{^notes}}
+     * {{nickname}}
+        {{/notes}}
+    {{/summary}}
+    {{#vendorExtensions.originalParams}}
+        {{#-first}}
+     *
+        {{/-first}}
+     * @param {{paramName}}{{#description}} {{description}}{{/description}}{{#required}} (required){{/required}}{{^required}} (optional{{#defaultValue}}, default to {{{.}}}{{/defaultValue}}){{/required}}
+    {{/vendorExtensions.originalParams}}
+    {{#returnType}}
+        {{^allParams.0}}
+     *
+        {{/allParams.0}}
+     * @return {{returnType}}
+    {{/returnType}}
+    {{#externalDocs}}
+     * {{description}}
+     *
+     * @see <a href="{{url}}">{{summary}} Documentation</a>
+    {{/externalDocs}}
+     */
+    {{#generateSwagger2Annotations}}
+    @Operation(
+        operationId = "{{{operationId}}}",
+        {{#summary}}
+        summary = "{{{.}}}",
+        {{/summary}}
+        {{#description}}
+        description= "{{{.}}}",
+        {{/description}}
+        {{#tags.1}}
+        {{!generate only when at least 2 tags}}
+        tags = [ {{#tags}}"{{name}}"{{^-last}}, {{/-last}}{{/tags}} ],
+        {{/tags.1}}
+        responses = [
+            {{#responses}}
+            ApiResponse(responseCode = "{{{code}}}", description = "{{{message}}}"{{#baseType}}, content = [
+                {{#produces}}
+                Content(mediaType = "{{{mediaType}}}", schema = Schema(implementation = {{{baseType}}}::class)){{^-last}},{{/-last}}
+                {{/produces}}
+            ]{{/baseType}}){{^-last}},{{/-last}}
+            {{/responses}}
+        ]{{#hasParams}},
+        parameters = [
+            {{#vendorExtensions.originalParams}}
+            Parameter(name = "{{paramName}}"{{#description}}, description = "{{{description}}}"{{/description}}{{#required}}, required = true{{/required}}){{^-last}},{{/-last}}
+            {{/vendorExtensions.originalParams}}
+        ]{{/hasParams}}{{#hasAuthMethods}},
+        security = [
+            {{#authMethods}}
+            SecurityRequirement(name = "{{name}}"{{#isOAuth}}, scopes = {{openbrace}}{{#scopes}}"{{scope}}"{{^-last}}, {{/-last}}{{/scopes}}{{closebrace}}{{/isOAuth}}){{^-last}},{{/-last}}
+            {{/authMethods}}
+        ]{{/hasAuthMethods}}
+    )
+    {{/generateSwagger2Annotations}}
+    {{#implicitHeadersParams.0}}
+        {{#generateSwagger2Annotations}}
+            {{#implicitHeadersParams}}
+    @Parameter(name = "{{paramName}}"{{#description}}, description = "{{{description}}}"{{/description}}{{#required}}, required = true{{/required}})
+            {{/implicitHeadersParams}}
+        {{/generateSwagger2Annotations}}
+    {{/implicitHeadersParams.0}}

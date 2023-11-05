@@ -1,0 +1,93 @@
+#tag::info[]
+openapi: 3.0.0 # <1>
+info: # <2>
+  description: This is a library API
+  version: 1.0.0
+  title: Library
+  license:
+    name: Apache-2.0
+    url: "https://www.apache.org/licenses/LICENSE-2.0.html"
+tags: # <3>
+  - name: books
+    description: Search for books and add new ones
+#end::info[]
+#tag::paths[]
+paths:
+  #end::paths[]
+  #tag::search[]
+  /search:
+    get: # <1>
+      tags:
+        - books # <2>
+      summary: Search for a book
+      operationId: search # <3>
+      parameters: # <4>
+        - name: book-name
+          in: query
+          schema:
+            type: string
+            minLength: 3 # <5>
+        - name: author-name
+          in: query
+          schema:
+            type: string
+      responses: # <6>
+        "200": # <7>
+          description: Success
+          content:
+            "application/json":
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BookInfo"
+        "400": # <8>
+          description: Bad Request
+  #end::search[]
+  #tag::add[]
+  /add:
+    post: # <1>
+      tags: [books]
+      summary: Add a new book
+      operationId: addBook
+      requestBody: # <2>
+        required: true
+        content:
+          "application/json":
+            schema:
+              $ref: "#/components/schemas/BookInfo" # <3>
+      responses:
+        "200":
+          description: Success
+        "400":
+          description: Bad Request
+#end::add[]
+#tag::components[]
+components:
+  schemas:
+    BookInfo:
+      title: Book Info # <1>
+      description: Object contains all the info about a book
+      type: object
+      properties: # <2>
+        name: {type: string}
+        author: {type: string, minLength: 3}
+        optionalReadOnly: {type: string, readOnly: true}
+        requiredReadOnly: {type: string, readOnly: true}
+        type:
+          type: string
+          enum:
+            - EXTENDED
+      required: ["name", "requiredReadOnly"]
+      discriminator:
+        propertyName: type
+        mapping:
+          EXTENDED: "#/components/schemas/ExtendedBookInfo"
+    ExtendedBookInfo:
+      x-all-of-name: ExtendedBookInfo
+      allOf:
+        - $ref: '#/components/schemas/BookInfo'
+        - type: object
+          properties: # <2>
+            isbn: {type: string, pattern: "[0-9]{13}"}
+          required: ["isbn"]
+#end::components[]

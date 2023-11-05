@@ -30,11 +30,8 @@ import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.core.util.StringUtils;
 import io.micronaut.inject.visitor.VisitorContext;
 import io.micronaut.openapi.view.OpenApiViewConfig.RendererType;
-import io.micronaut.openapi.visitor.ConvertUtils;
 import io.micronaut.openapi.visitor.Pair;
 import io.micronaut.openapi.visitor.group.OpenApiInfo;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
 
 /**
  * Swagger-ui configuration.
@@ -63,7 +60,7 @@ final class SwaggerUIConfig extends AbstractViewConfig {
     private static final String COMMNA_NEW_LINE = ",\n";
 
     // https://github.com/swagger-api/swagger-ui/blob/HEAD/docs/usage/configuration.md
-    private static final Map<String, Function<String, Object>> VALID_OPTIONS = new HashMap<>(29);
+    private static final Map<String, Function<String, Object>> VALID_OPTIONS = new HashMap<>(30);
     // https://github.com/swagger-api/swagger-ui/blob/master/docs/usage/oauth2.md
     private static final Map<String, Function<String, Object>> VALID_OAUTH2_OPTIONS = new HashMap<>(9);
 
@@ -98,6 +95,7 @@ final class SwaggerUIConfig extends AbstractViewConfig {
         VALID_OPTIONS.put("supportedSubmitMethods", AbstractViewConfig::asString);
         VALID_OPTIONS.put("validatorUrl", AbstractViewConfig::asQuotedString);
         VALID_OPTIONS.put("withCredentials", AbstractViewConfig::asBoolean);
+        VALID_OPTIONS.put("persistAuthorization", AbstractViewConfig::asBoolean);
 
         VALID_OAUTH2_OPTIONS.put(OPTION_OAUTH2 + ".clientId", AbstractViewConfig::asQuotedString);
         VALID_OAUTH2_OPTIONS.put(OPTION_OAUTH2 + ".clientSecret", AbstractViewConfig::asQuotedString);
@@ -286,15 +284,22 @@ final class SwaggerUIConfig extends AbstractViewConfig {
 
     @NonNull
     private String getUrlStr(VisitorContext context) {
-        if (CollectionUtils.isEmpty(urls)) {
+        if (CollectionUtils.isEmpty(urls) || (withUrls != null && !withUrls)) {
             return StringUtils.EMPTY_STRING;
         }
-        try {
-            return "urls:" + ConvertUtils.getJsonMapper().writeValueAsString(urls) + ',';
-        } catch (JsonProcessingException e) {
-            context.warn("Some problems with serialize urls " + e.getMessage(), null);
+
+        var isFirst = true;
+        var result = new StringBuilder("urls: [");
+        for (var url : urls) {
+            if (!isFirst) {
+                result.append(',');
+            }
+            result.append("{url: contextPath + '").append(url.url())
+                .append(", name: '").append(url.name()).append("'}");
+            isFirst = false;
         }
-        return StringUtils.EMPTY_STRING;
+        result.append("],");
+        return result.toString();
     }
 
     @Override

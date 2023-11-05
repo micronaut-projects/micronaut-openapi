@@ -60,7 +60,7 @@ class OpenApiOperationViewParseSpec extends Specification {
 
     void "test parse OpenApiView specification, swagger-ui enabled"() {
         given:
-        String spec = "swagger-ui.enabled=true,swagger-ui.js.url=version123,swagger-ui.spec.url=/my/spec/file.yml,swagger-ui.theme=flattop,swagger-ui.deepLinking=false"
+        String spec = "swagger-ui.enabled=true,swagger-ui.js.url=version123,swagger-ui.spec.url=/my/spec/file.yml,swagger-ui.theme=flattop,swagger-ui.deepLinking=false,swagger-ui.persistAuthorization=true"
         OpenApiViewConfig cfg = OpenApiViewConfig.fromSpecification(spec, null, new Properties(), null)
 
         expect:
@@ -73,5 +73,6 @@ class OpenApiOperationViewParseSpec extends Specification {
         cfg.swaggerUIConfig.specUrl == "/my/spec/file.yml"
         cfg.swaggerUIConfig.theme == SwaggerUIConfig.Theme.FLATTOP
         cfg.swaggerUIConfig.options['deepLinking'] == false
+        cfg.swaggerUIConfig.options['persistAuthorization'] == true
     }
 }

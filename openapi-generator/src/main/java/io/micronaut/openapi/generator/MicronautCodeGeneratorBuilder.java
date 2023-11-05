@@ -37,40 +37,76 @@ public interface MicronautCodeGeneratorBuilder {
     <B extends GeneratorOptionsBuilder, G extends MicronautCodeGenerator<B>> MicronautCodeGeneratorBuilder forCodeGenerator(G generator, Consumer<? super B> configuration);
 
     /**
-     * Configures the code generator to create a client.
+     * Configures the code generator to create a java client.
      *
      * @return this builder
      */
-    default MicronautCodeGeneratorBuilder forClient() {
-        return forClient(o -> {
+    default MicronautCodeGeneratorBuilder forJavaClient() {
+        return forJavaClient(o -> {
         });
     }
 
     /**
-     * Configures the code generator to create a client.
+     * Configures the code generator to create a java client.
      *
      * @param clientOptionsSpec the client options
      * @return this builder
      */
-    MicronautCodeGeneratorBuilder forClient(Consumer<? super JavaMicronautClientOptionsBuilder> clientOptionsSpec);
+    MicronautCodeGeneratorBuilder forJavaClient(Consumer<? super JavaMicronautClientOptionsBuilder> clientOptionsSpec);
 
     /**
-     * Configures the code generator to create a server.
+     * Configures the code generator to create a java server.
      *
      * @return this builder
      */
-    default MicronautCodeGeneratorBuilder forServer() {
-        return forServer(o -> {
+    default MicronautCodeGeneratorBuilder forJavaServer() {
+        return forJavaServer(o -> {
         });
     }
 
     /**
-     * Configures the code generator to create a server.
+     * Configures the code generator to create a java server.
      *
      * @param serverOptionsSpec the server options
      * @return this builder
      */
-    MicronautCodeGeneratorBuilder forServer(Consumer<? super JavaMicronautServerOptionsBuilder> serverOptionsSpec);
+    MicronautCodeGeneratorBuilder forJavaServer(Consumer<? super JavaMicronautServerOptionsBuilder> serverOptionsSpec);
+
+    /**
+     * Configures the code generator to create a kotlin client.
+     *
+     * @return this builder
+     */
+    default MicronautCodeGeneratorBuilder forKotlinClient() {
+        return forKotlinClient(o -> {
+        });
+    }
+
+    /**
+     * Configures the code generator to create a kotlin client.
+     *
+     * @param clientOptionsSpec the client options
+     * @return this builder
+     */
+    MicronautCodeGeneratorBuilder forKotlinClient(Consumer<? super KotlinMicronautClientOptionsBuilder> clientOptionsSpec);
+
+    /**
+     * Configures the code generator to create a kotlin server.
+     *
+     * @return this builder
+     */
+    default MicronautCodeGeneratorBuilder forKotlinServer() {
+        return forKotlinServer(o -> {
+        });
+    }
+
+    /**
+     * Configures the code generator to create a kotlin server.
+     *
+     * @param serverOptionsSpec the server options
+     * @return this builder
+     */
+    MicronautCodeGeneratorBuilder forKotlinServer(Consumer<? super KotlinMicronautServerOptionsBuilder> serverOptionsSpec);
 
     /**
      * Sets the URI to the OpenAPI definition file.

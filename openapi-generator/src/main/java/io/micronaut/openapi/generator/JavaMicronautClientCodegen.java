@@ -63,6 +63,7 @@ public class JavaMicronautClientCodegen extends AbstractMicronautJavaCodegen<Jav
 
         typeMapping.put("file", "byte[]");
         typeMapping.put("responseFile", "InputStream");
+        importMapping.put("InputStream", "java.io.InputStream");
     }
 
     @Override
@@ -127,7 +128,7 @@ public class JavaMicronautClientCodegen extends AbstractMicronautJavaCodegen<Jav
 
         if (additionalProperties.containsKey(ADDITIONAL_CLIENT_TYPE_ANNOTATIONS)) {
             String additionalClientAnnotationsList = additionalProperties.get(ADDITIONAL_CLIENT_TYPE_ANNOTATIONS).toString();
-            setAdditionalClientTypeAnnotations(Arrays.asList(additionalClientAnnotationsList.trim().split("\\s*(;|\\r?\\n)\\s*")));
+            additionalClientTypeAnnotations = Arrays.asList(additionalClientAnnotationsList.trim().split("\\s*(;|\\r?\\n)\\s*"));
             additionalProperties.put(ADDITIONAL_CLIENT_TYPE_ANNOTATIONS, additionalClientTypeAnnotations);
         }
 
@@ -138,8 +139,7 @@ public class JavaMicronautClientCodegen extends AbstractMicronautJavaCodegen<Jav
         }
 
         if (additionalProperties.containsKey(BASE_PATH_SEPARATOR)) {
-            String separator = additionalProperties.get(BASE_PATH_SEPARATOR).toString();
-            setBasePathSeparator(separator);
+            basePathSeparator = additionalProperties.get(BASE_PATH_SEPARATOR).toString();
             additionalProperties.put(BASE_PATH_SEPARATOR, basePathSeparator);
         }
 
@@ -202,6 +202,7 @@ public class JavaMicronautClientCodegen extends AbstractMicronautJavaCodegen<Jav
         private String clientId;
         private boolean useAuth;
         private boolean lombok;
+        private boolean fluxForArrays;
         private boolean generatedAnnotation = true;
 
         @Override
@@ -241,6 +242,12 @@ public class JavaMicronautClientCodegen extends AbstractMicronautJavaCodegen<Jav
         }
 
         @Override
+        public JavaMicronautClientOptionsBuilder withFluxForArrays(boolean fluxForArrays) {
+            this.fluxForArrays = fluxForArrays;
+            return this;
+        }
+
+        @Override
         public JavaMicronautClientOptionsBuilder withGeneratedAnnotation(boolean generatedAnnotation) {
             this.generatedAnnotation = generatedAnnotation;
             return this;
@@ -254,6 +261,7 @@ public class JavaMicronautClientCodegen extends AbstractMicronautJavaCodegen<Jav
                 clientId,
                 useAuth,
                 lombok,
+                fluxForArrays,
                 generatedAnnotation
             );
         }
@@ -266,6 +274,7 @@ public class JavaMicronautClientCodegen extends AbstractMicronautJavaCodegen<Jav
         String clientId,
         boolean useAuth,
         boolean lombok,
+        boolean fluxForArrays,
         boolean generatedAnnotation
     ) {
     }

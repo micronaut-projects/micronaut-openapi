@@ -1,0 +1,28 @@
+{{>common/licenseInfo}}
+package {{invokerPackage}}.auth.configuration
+
+import io.micronaut.context.annotation.ConfigurationInject
+import io.micronaut.context.annotation.EachProperty
+import io.micronaut.context.annotation.Parameter
+import io.micronaut.core.annotation.NonNull
+import io.micronaut.http.MutableHttpRequest
+{{#generatedAnnotation}}
+import {{javaxPackage}}.annotation.Generated
+{{/generatedAnnotation}}
+
+{{#generatedAnnotation}}
+{{>common/generatedAnnotation}}
+{{/generatedAnnotation}}
+@EachProperty("security.basic-auth")
+data class HttpBasicAuthConfiguration(
+    @Parameter val name: String,
+    @NonNull var username: String,
+    @NonNull var password: String
+) : ConfigurableAuthorization {
+
+    override fun applyAuthorization(@NonNull request: MutableHttpRequest<*>) {
+        request.basicAuth(username, password)
+    }
+
+    override fun getName() = name
+}

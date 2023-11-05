@@ -1,0 +1,52 @@
+{{>common/licenseInfo}}
+package {{invokerPackage}}.auth
+
+import io.micronaut.aop.MethodInvocationContext
+import io.micronaut.core.annotation.AnnotationValue
+import io.micronaut.core.annotation.NonNull
+import io.micronaut.core.naming.NameUtils
+import io.micronaut.http.MutableHttpRequest
+import io.micronaut.http.client.bind.AnnotatedClientRequestBinder
+import io.micronaut.http.client.bind.ClientRequestUriContext
+import jakarta.inject.Singleton
+{{#generatedAnnotation}}
+import {{javaxPackage}}.annotation.Generated
+{{/generatedAnnotation}}
+
+{{#generatedAnnotation}}
+{{>common/generatedAnnotation}}
+{{/generatedAnnotation}}
+@Singleton
+open class AuthorizationBinder : AnnotatedClientRequestBinder<Authorization> {
+
+    @NonNull
+    override fun getAnnotationType(): Class<Authorization> {
+        return Authorization::class.java
+    }
+
+    override fun bind(@NonNull context: MethodInvocationContext<Any, Any>,
+             @NonNull uriContext: ClientRequestUriContext,
+             @NonNull request: MutableHttpRequest<*>
+    ) {
+        val annotations: List<AnnotationValue<Authorization>> = context.annotationMetadata
+                .getAnnotationValuesByType(Authorization::class.java)
+
+        if (annotations.isNotEmpty()) {
+            val authorizationNames = ArrayList<String>()
+            for (ann in annotations) {
+                ann.get("name", String::class.java)
+                        .filter{ s -> !s.isNullOrEmpty()}
+                        .ifPresent {v -> authorizationNames.add(configurationName(v))}
+            }
+            request.setAttribute(AUTHORIZATION_NAMES, authorizationNames)
+        }
+    }
+
+    private fun configurationName(name: String): String {
+        return NameUtils.hyphenate(name.replace('.', '_'), true)
+    }
+
+    companion object {
+        var AUTHORIZATION_NAMES = "micronaut.security.AUTHORIZATION_NAMES"
+    }
+}

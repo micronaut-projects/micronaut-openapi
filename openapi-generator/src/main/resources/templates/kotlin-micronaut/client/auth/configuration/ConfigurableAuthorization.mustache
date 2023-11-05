@@ -1,0 +1,18 @@
+{{>common/licenseInfo}}
+package {{invokerPackage}}.auth.configuration
+
+import io.micronaut.core.annotation.NonNull
+import io.micronaut.http.MutableHttpRequest
+{{#generatedAnnotation}}
+import {{javaxPackage}}.annotation.Generated
+{{/generatedAnnotation}}
+
+{{#generatedAnnotation}}
+{{>common/generatedAnnotation}}
+{{/generatedAnnotation}}
+interface ConfigurableAuthorization {
+
+    fun getName(): String
+
+    fun applyAuthorization(@NonNull request: MutableHttpRequest<*>)
+}

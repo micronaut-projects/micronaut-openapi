@@ -7,15 +7,17 @@ import io.micronaut.context.annotation.Parameter;
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.http.MutableHttpRequest;
 import io.micronaut.http.cookie.Cookie;
+{{#generatedAnnotation}}
 import {{javaxPackage}}.annotation.Generated;
+{{/generatedAnnotation}}
 {{#lombok}}
 import lombok.Getter;
 import lombok.Setter;
 {{/lombok}}
 
-{{#withGeneratedAnnotation}}
+{{#generatedAnnotation}}
 {{>common/generatedAnnotation}}
-{{/withGeneratedAnnotation}}
+{{/generatedAnnotation}}
 {{#lombok}}
 @Getter
 @Setter

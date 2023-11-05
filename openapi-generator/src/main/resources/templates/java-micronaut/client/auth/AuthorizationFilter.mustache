@@ -37,11 +37,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+{{#generatedAnnotation}}
 import {{javaxPackage}}.annotation.Generated;
+{{/generatedAnnotation}}
 
-{{#withGeneratedAnnotation}}
+{{#generatedAnnotation}}
 {{>common/generatedAnnotation}}
-{{/withGeneratedAnnotation}}
+{{/generatedAnnotation}}
 {{#lombok}}
 @Slf4j
 {{/lombok}}
@@ -50,8 +52,8 @@ public class AuthorizationFilter implements HttpClientFilter {
 {{^lombok}}
 
     private static final Logger log = LoggerFactory.getLogger(ClientCredentialsHttpClientFilter.class);
-
 {{/lombok}}
+
     private final BeanContext beanContext;
     private final Map<String, OauthClientConfiguration> clientConfigurationByName;
 

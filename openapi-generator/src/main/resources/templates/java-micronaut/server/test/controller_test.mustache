@@ -22,6 +22,7 @@ import org.junit.jupiter.api.Assertions;
 import jakarta.inject.Inject;
 {{#reactive}}
 import reactor.core.publisher.Mono;
+import reactor.core.publisher.Flux;
 {{/reactive}}
 import java.io.File;
 import java.io.FileReader;
@@ -62,10 +63,10 @@ class {{classname}}Test {
      *
      * TODO fill in the parameters and test return value.
      */
-    @Test
-        {{^generateControllerFromExamples}}
+    {{^generateControllerFromExamples}}
     @Disabled("Not Implemented")
-        {{/generateControllerFromExamples}}
+    {{/generateControllerFromExamples}}
+    @Test
     void {{operationId}}MethodTest() {
         // given
         {{#allParams}}
@@ -94,10 +95,10 @@ class {{classname}}Test {
      *
      * TODO fill in the request parameters and test response.
      */
-    @Test
-        {{^generateControllerFromExamples}}
+    {{^generateControllerFromExamples}}
     @Disabled("Not Implemented")
-        {{/generateControllerFromExamples}}
+    {{/generateControllerFromExamples}}
+    @Test
     void {{operationId}}ClientApiTest() throws IOException {
         // given
         {{!Create the body}}
@@ -105,17 +106,16 @@ class {{classname}}Test {
         {{{dataType}}} body = {{{example}}};
         {{/bodyParam}}
         {{#formParams.0}}
-        Map<String, Object> form = new HashMap<String, Object>(){{openbrace}}{{openbrace}}
+        var form = new HashMap<String, Object>();
             // Fill in the body form parameters
             {{#formParams}}
                 {{^isFile}}
-            put("{{{baseName}}}", {{{example}}});
+        form.put("{{{baseName}}}", {{{example}}});
                 {{/isFile}}
                 {{#isFile}}
-            put("{{{baseName}}}", new FileReader(File.createTempFile("test", ".tmp")));
+        form.put("{{{baseName}}}", new FileReader(File.createTempFile("test", ".tmp")));
                 {{/isFile}}
             {{/formParams}}
-        {{closebrace}}{{closebrace}};
         {{/formParams.0}}
         {{#isMultipart}}
             {{^formParams}}

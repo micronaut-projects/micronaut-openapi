@@ -59,6 +59,7 @@ abstract class AbstractViewConfig {
     protected boolean copyResources = true;
     protected boolean withFinalUrlPrefixCache = true;
     protected String primaryName;
+    protected Boolean withUrls;
     protected List<OpenApiUrl> urls = new ArrayList<>();
     protected Map<String, Object> options = new HashMap<>();
     protected Map<Pair<String, String>, OpenApiInfo> openApiInfos;
@@ -67,7 +68,7 @@ abstract class AbstractViewConfig {
      * An AbstractViewConfig.
      *
      * @param prefix The configuration key prefix.
-     * @param openApiInfos Inforamtion about all generated openAPI files.
+     * @param openApiInfos Information about all generated openAPI files.
      */
     protected AbstractViewConfig(String prefix, Map<Pair<String, String>, OpenApiInfo> openApiInfos) {
         this.prefix = prefix;
@@ -172,9 +173,9 @@ abstract class AbstractViewConfig {
             cfg.copyResources = false;
         }
 
-        boolean withUrls = cfg.openApiInfos != null && (cfg.openApiInfos.size() > 1 || cfg.openApiInfos.get(Pair.NULL_STRING_PAIR) == null);
+        cfg.withUrls = cfg.openApiInfos != null && (cfg.openApiInfos.size() > 1 || cfg.openApiInfos.get(Pair.NULL_STRING_PAIR) == null);
 
-        if (withUrls) {
+        if (cfg.withUrls) {
 
             String primaryName = null;
             List<OpenApiUrl> urls = new ArrayList<>();
@@ -241,6 +242,10 @@ abstract class AbstractViewConfig {
         properties.entrySet().stream().filter(entry -> entry.getKey().startsWith(cfg.prefix))
                 .forEach(cfg::addAttribute);
         return cfg;
+    }
+
+    public List<OpenApiUrl> getUrls() {
+        return urls;
     }
 
     /**

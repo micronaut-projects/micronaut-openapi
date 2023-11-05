@@ -15,48 +15,18 @@
  */
 package io.micronaut.openapi.visitor;
 
-import java.io.File;
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.net.URI;
-import java.net.URL;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.OffsetDateTime;
-import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
-
-import javax.xml.datatype.XMLGregorianCalendar;
-
-import io.micronaut.core.annotation.AnnotationClassValue;
-import io.micronaut.core.annotation.AnnotationValue;
-import io.micronaut.core.annotation.Internal;
-import io.micronaut.core.annotation.NonNull;
-import io.micronaut.core.annotation.Nullable;
+import com.fasterxml.jackson.annotation.JsonValue;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.micronaut.core.annotation.*;
 import io.micronaut.core.beans.BeanMap;
 import io.micronaut.core.util.ArrayUtils;
 import io.micronaut.core.util.CollectionUtils;
-import io.micronaut.inject.ast.ClassElement;
-import io.micronaut.inject.ast.Element;
-import io.micronaut.inject.ast.ElementQuery;
-import io.micronaut.inject.ast.EnumElement;
-import io.micronaut.inject.ast.MethodElement;
+import io.micronaut.inject.ast.*;
 import io.micronaut.inject.visitor.VisitorContext;
 import io.micronaut.openapi.swagger.core.util.PrimitiveType;
-import io.micronaut.openapi.swagger.core.util.ObjectMapperFactory;
 import io.swagger.v3.oas.annotations.extensions.Extension;
 import io.swagger.v3.oas.annotations.servers.Server;
 import io.swagger.v3.oas.annotations.servers.ServerVariable;
@@ -66,15 +36,18 @@ import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 
-import com.fasterxml.jackson.annotation.JsonValue;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import javax.xml.datatype.XMLGregorianCalendar;
+import java.io.File;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.net.URI;
+import java.net.URL;
+import java.time.*;
+import java.util.*;
 
+import static io.micronaut.openapi.OpenApiUtils.CONVERT_JSON_MAPPER;
+import static io.micronaut.openapi.OpenApiUtils.JSON_MAPPER;
 import static io.micronaut.openapi.visitor.SchemaUtils.TYPE_OBJECT;
 import static io.micronaut.openapi.visitor.SchemaUtils.processExtensions;
 
@@ -86,30 +59,8 @@ import static io.micronaut.openapi.visitor.SchemaUtils.processExtensions;
 @Internal
 public final class ConvertUtils {
 
-    private static final TypeReference<Map<String, Object>> MAP_TYPE_REFERENCE = new TypeReference<>() {
+    public static final TypeReference<Map<String, Object>> MAP_TYPE_REFERENCE = new TypeReference<>() {
     };
-    /**
-     * The JSON mapper.
-     */
-    private static final ObjectMapper JSON_MAPPER = ObjectMapperFactory.createJson()
-        .enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
-    /**
-     * The JSON 3.1 mapper.
-     */
-    private static final ObjectMapper JSON_MAPPER_31 = ObjectMapperFactory.createJson31()
-        .enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
-    /**
-     * The JSON mapper for security scheme.
-     */
-    private static final ObjectMapper CONVERT_JSON_MAPPER = ObjectMapperFactory.buildStrictGenericObjectMapper()
-        .enable(SerializationFeature.WRITE_ENUMS_USING_TO_STRING)
-        .disable(SerializationFeature.FAIL_ON_EMPTY_BEANS, SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-        .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-        .enable(DeserializationFeature.READ_ENUMS_USING_TO_STRING, DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
-    /**
-     * The YAML mapper.
-     */
-    private static final ObjectMapper YAML_MAPPER = ObjectMapperFactory.createYaml();
 
     private ConvertUtils() {
     }
@@ -144,7 +95,7 @@ public final class ConvertUtils {
      */
     public static JsonNode toJson(Map<CharSequence, Object> values, VisitorContext context) {
         Map<CharSequence, Object> newValues = toValueMap(values, context);
-        return ConvertUtils.getJsonMapper().valueToTree(newValues);
+        return JSON_MAPPER.valueToTree(newValues);
     }
 
     public static Map<CharSequence, Object> toValueMap(Map<CharSequence, Object> values, VisitorContext context) {
@@ -249,7 +200,7 @@ public final class ConvertUtils {
     public static Optional<Object> parseJsonString(Object object) {
         if (object instanceof String string) {
             try {
-                return Optional.of(ConvertUtils.getConvertJsonMapper().readValue(string, Map.class));
+                return Optional.of(CONVERT_JSON_MAPPER.readValue(string, Map.class));
             } catch (IOException e) {
                 return Optional.empty();
             }
@@ -275,7 +226,7 @@ public final class ConvertUtils {
         try {
             value = CONVERT_JSON_MAPPER.treeToValue(jn, clazz);
         } catch (Exception e) {
-            // fix for problem with groovy. Jackson throw excetpion with ApiResponse class
+            // fix for problem with groovy. Jackson throw exception with ApiResponse class
             if (clazz == ApiResponse.class && jn.has("content")) {
                 var contentNode = jn.get("content");
                 ((ObjectNode) jn).set("content", null);
@@ -381,8 +332,10 @@ public final class ConvertUtils {
      */
     public static SecurityRequirement mapToSecurityRequirement(AnnotationValue<io.swagger.v3.oas.annotations.security.SecurityRequirement> r) {
         String name = r.getRequiredValue("name", String.class);
-        List<String> scopes = r.get("scopes", String[].class).map(Arrays::asList).orElse(Collections.emptyList());
-        SecurityRequirement securityRequirement = new SecurityRequirement();
+        List<String> scopes = r.get("scopes", String[].class)
+            .map(Arrays::asList)
+            .orElse(Collections.emptyList());
+        var securityRequirement = new SecurityRequirement();
         securityRequirement.addList(name, scopes);
         return securityRequirement;
     }
@@ -569,21 +522,5 @@ public final class ConvertUtils {
         }
 
         return valueStr;
-    }
-
-    public static ObjectMapper getJsonMapper() {
-        return JSON_MAPPER;
-    }
-
-    public static ObjectMapper getJsonMapper31() {
-        return JSON_MAPPER_31;
-    }
-
-    public static ObjectMapper getConvertJsonMapper() {
-        return CONVERT_JSON_MAPPER;
-    }
-
-    public static ObjectMapper getYamlMapper() {
-        return YAML_MAPPER;
     }
 }

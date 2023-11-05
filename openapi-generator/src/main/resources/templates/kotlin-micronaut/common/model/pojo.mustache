@@ -1,0 +1,128 @@
+
+{{#formatNoEmptyLines}}
+/**
+ * {{#description}}{{.}}{{/description}}{{^description}}{{classname}}{{/description}}
+{{#vendorExtensions.withRequiredOrOptionalVars}}
+ *
+{{/vendorExtensions.withRequiredOrOptionalVars}}
+{{#vendorExtensions.requiredVarsWithoutDiscriminator}}
+ * @param {{name}} {{description}}
+{{/vendorExtensions.requiredVarsWithoutDiscriminator}}
+{{#vendorExtensions.optionalVars}}
+ * @param {{name}} {{description}}
+{{/vendorExtensions.optionalVars}}
+ */
+{{#description}}
+    {{#generateSwagger2Annotations}}
+@Schema({{#name}}name = "{{name}}", {{/name}}description = "{{{description}}}")
+    {{/generateSwagger2Annotations}}
+{{/description}}
+{{#micronaut_serde_jackson}}
+@Serdeable
+{{/micronaut_serde_jackson}}
+{{#jackson}}
+@JsonPropertyOrder(
+    {{#vars}}
+        {{classname}}.JSON_PROPERTY_{{nameInSnakeCase}}{{^-last}},{{/-last}}
+    {{/vars}}
+)
+{{/jackson}}
+{{#additionalModelTypeAnnotations}}
+{{{.}}}
+{{/additionalModelTypeAnnotations}}
+{{#generatedAnnotation}}
+{{>common/generatedAnnotation}}
+{{/generatedAnnotation}}
+{{#discriminator}}
+{{>common/model/typeInfoAnnotation}}
+{{/discriminator}}
+{{>common/model/xmlAnnotation}}
+{{#useBeanValidation}}
+@Introspected
+{{/useBeanValidation}}
+{{#vendorExtensions.x-class-extra-annotation}}
+{{{vendorExtensions.x-class-extra-annotation}}}
+{{/vendorExtensions.x-class-extra-annotation}}
+{{/formatNoEmptyLines}}
+{{!Declare the class with extends and implements}}
+{{#nonPublicApi}}internal {{/nonPublicApi}}{{#hasChildren}}open{{/hasChildren}}{{^hasChildren}}data{{/hasChildren}} class {{classname}} ({{#formatNoEmptyLines}}
+{{#vendorExtensions.requiredVarsWithoutDiscriminator}}
+    {{>common/model/field_annotations}}
+    {{#vendorExtensions.overridden}}override {{/vendorExtensions.overridden}}{{^vendorExtensions.overridden}}{{#hasChildren}}open {{/hasChildren}}{{/vendorExtensions.overridden}}var {{name}}: {{{vendorExtensions.typeWithEnumWithGenericAnnotations}}}{{#defaultValue}} = {{{.}}}{{/defaultValue}}{{^defaultValue}}{{#isNullable}} = null{{/isNullable}}{{/defaultValue}},
+{{/vendorExtensions.requiredVarsWithoutDiscriminator}}
+{{#vendorExtensions.withInheritance}}
+    {{#vendorExtensions.optionalVars}}
+    {{>common/model/field_annotations}}
+    {{#vendorExtensions.hasChildren}}open {{/vendorExtensions.hasChildren}}var {{name}}: {{{vendorExtensions.typeWithEnumWithGenericAnnotations}}} = {{#defaultValue}}{{{.}}}{{/defaultValue}}{{^defaultValue}}null{{/defaultValue}},
+    {{/vendorExtensions.optionalVars}}
+{{/vendorExtensions.withInheritance}}
+{{/formatNoEmptyLines}}){{#parent}}: {{{parent}}}({{#vendorExtensions.requiredParentVarsWithoutDiscriminator}}{{name}}{{^-last}}, {{/-last}}{{/vendorExtensions.requiredParentVarsWithoutDiscriminator}}) {{/parent}}{{#vendorExtensions.x-implements}}{{#parent}}, {{/parent}}{{^parent}}: {{/parent}}{{^-first}}, {{{.}}}{{/-first}}{{#-last}} {{/-last}}{{/vendorExtensions.x-implements}} {{openbrace}}
+
+    {{#vendorExtensions.withInheritance}}
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+    {{#parent}}
+        if (!super.equals(other)) return false
+    {{/parent}}
+        other as {{classname}}
+
+        {{#vars}}
+        if ({{name}} != other.{{name}}) return false
+        {{/vars}}
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = {{#parent}}super.hashCode(){{/parent}}{{^parent}}{{#vars.0}}{{name}}{{#isNullable}}?{{/isNullable}}.hashCode(){{#isNullable}} ?: 0{{/isNullable}}{{/vars.0}}{{/parent}}
+    {{#vars}}
+        {{#parent}}
+        result = 31 * result + {{#isNullable}}({{/isNullable}}{{name}}{{#isNullable}}?{{/isNullable}}.hashCode(){{#isNullable}} ?: 0){{/isNullable}}
+        {{/parent}}
+        {{^parent}}
+            {{^-first}}
+        result = {{#-first}}{{#parent}}31 * result + {{/parent}}{{/-first}}{{^-first}}31 * result + {{/-first}}{{#isNullable}}({{/isNullable}}{{name}}{{#isNullable}}?{{/isNullable}}.hashCode(){{#isNullable}} ?: 0){{/isNullable}}
+            {{/-first}}
+        {{/parent}}
+    {{/vars}}
+        return result
+    }
+
+    override fun toString(): String {
+        return "{{classname}}({{#allVars}}{{name}}='${{name}}'{{^-last}}, {{/-last}}{{/allVars}})"
+    }
+    {{/vendorExtensions.withInheritance}}
+
+    {{#vars}}
+        {{#isEnum}}
+            {{^isContainer}}
+                {{#indent}}
+{{>common/model/enum}}
+                {{/indent}}
+            {{/isContainer}}
+            {{#isContainer}}
+                {{#mostInnerItems}}
+                    {{#indent}}
+{{>common/model/enum}}
+                    {{/indent}}
+                {{/mostInnerItems}}
+            {{/isContainer}}
+        {{/isEnum}}
+
+    {{/vars}}
+
+    companion object {
+    {{#serializableModel}}
+
+        @Serial
+        @JvmStatic
+        private val serialVersionUID = {{{vendorExtensions.serialId}}}L
+    {{/serializableModel}}
+
+    {{#vars}}
+        const val JSON_PROPERTY_{{nameInSnakeCase}} = "{{baseName}}"
+    {{/vars}}
+    }
+{{closebrace}}
