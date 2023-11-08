@@ -326,7 +326,7 @@ public final class SchemaUtils {
                 Parameter existedParameter = null;
                 int i = 0;
                 for (Parameter p1 : op1.getParameters()) {
-                    if (p1.getName().equals(p2.getName())
+                    if (Objects.equals(p1.getName(), p2.getName())
                         && Objects.equals(p1.getIn(), p2.getIn())) {
                         existedParameter = p1;
                         break;
