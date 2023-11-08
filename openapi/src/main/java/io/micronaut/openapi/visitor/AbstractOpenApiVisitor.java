@@ -857,7 +857,19 @@ abstract class AbstractOpenApiVisitor {
                 String typeName = type.getName();
                 ClassElement customTypeSchema = getCustomSchema(typeName, typeArgs, context);
                 if (customTypeSchema != null) {
-                    type = customTypeSchema;
+                    Map<String, ClassElement> customTypeArgs = customTypeSchema.getTypeArguments();
+                    if (customTypeArgs.isEmpty()) {
+                        type = customTypeSchema;
+                    } else {
+                        Map<String, ClassElement> inheritedTypeArgs = new HashMap<>(customTypeArgs);
+                        for (String generic : customTypeArgs.keySet()) {
+                            ClassElement element = typeArgs.get(generic);
+                            if (element != null) {
+                                inheritedTypeArgs.put(generic, element);
+                            }
+                        }
+                        type = customTypeSchema.withTypeArguments(inheritedTypeArgs);
+                    }
                 }
 
                 if (isArray == null) {

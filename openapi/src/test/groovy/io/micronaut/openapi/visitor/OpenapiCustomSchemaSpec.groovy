@@ -320,12 +320,12 @@ class MyBean {}
         swaggerPageSchema.type == 'object'
         swaggerPageSchema.properties.content
         swaggerPageSchema.properties.content.type == 'array'
-        swaggerPageSchema.properties.content.items.type == 'object'
+        swaggerPageSchema.properties.content.items.type == 'string'
         swaggerPageSchema.properties.num
         swaggerPageSchema.properties.num.type == 'integer'
         swaggerPageSchema.properties.num.format == 'int32'
 
         cleanup:
-        System.clearProperty(OpenApiConfigProperty.MICRONAUT_CONFIG_FILE_LOCATIONS)
+        System.clearProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_CONFIG_FILE)
     }
 }
