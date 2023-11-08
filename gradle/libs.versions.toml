@@ -20,7 +20,7 @@ commons-codec = "1.16.0"
 
 micronaut = "4.1.11"
 micronaut-security = "4.1.0"
-micronaut-serde = "2.2.6"
+micronaut-serde = "2.3.2"
 micronaut-rxjava2 = "2.0.1"
 micronaut-rxjava3 = "3.1.0"
 micronaut-gradle-plugin = "4.1.2"
