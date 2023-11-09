@@ -282,4 +282,50 @@ class MyBean {}
         System.clearProperty(OpenApiConfigProperty.MICRONAUT_CONFIG_FILE_LOCATIONS)
         System.clearProperty(Environment.ENVIRONMENTS_PROPERTY)
     }
+
+    void "test custom OpenAPI schema for iterable class"() {
+        given:
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_CONFIG_FILE, "openapi-custom-schema-for-iterable-class.properties")
+
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.data.model.Page;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+
+@Controller
+class OpenApiController {
+
+    @Get("{?pageable*}")
+    public Page<String> processSync() {
+        return null;
+    }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        then:
+        Utils.testReference != null
+
+        when:
+        OpenAPI openAPI = Utils.testReference
+        Schema swaggerPageSchema = openAPI.components.schemas.'SwaggerPage_String_'
+
+        then:
+
+        swaggerPageSchema
+        swaggerPageSchema.type == 'object'
+        swaggerPageSchema.properties.content
+        swaggerPageSchema.properties.content.type == 'array'
+        swaggerPageSchema.properties.content.items.type == 'string'
+        swaggerPageSchema.properties.num
+        swaggerPageSchema.properties.num.type == 'integer'
+        swaggerPageSchema.properties.num.format == 'int32'
+
+        cleanup:
+        System.clearProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_CONFIG_FILE)
+    }
 }
