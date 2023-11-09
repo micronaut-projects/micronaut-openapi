@@ -2540,13 +2540,6 @@ abstract class AbstractOpenApiVisitor {
             if (publicField instanceof MemberElement memberEl && (memberEl.getDeclaringType().getType().getName().equals(type.getName()) || isGetterOverridden)) {
 
                 ClassElement fieldType = publicField.getGenericType();
-//                if (publicField.getType() instanceof GenericPlaceholderElement genericPlaceholderEl) {
-//                    ClassElement genericType = typeArgs.get(genericPlaceholderEl.getVariableName());
-//                    if (genericType != null) {
-//                        fieldType = genericType;
-//                    }
-//                }
-
                 if (withJsonView && !allowedByJsonView(publicField, classLvlJsonViewClasses, jsonViewClass, context)) {
                     continue;
                 }
