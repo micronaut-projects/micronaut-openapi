@@ -809,6 +809,9 @@ abstract class AbstractOpenApiVisitor {
             isArray = type.isArray();
             isIterable = type.isIterable();
             type = placeholderEl.getResolved().orElse(CollectionUtils.isNotEmpty(placeholderEl.getBounds()) ? placeholderEl.getBounds().get(0) : null);
+            if (!isArray) {
+                type = placeholderEl.getResolved().orElse(CollectionUtils.isNotEmpty(placeholderEl.getBounds()) ? placeholderEl.getBounds().get(0) : null);
+            }
         } else if (type instanceof GenericElement genericEl) {
             isArray = type.isArray();
             isIterable = type.isIterable();
@@ -862,7 +865,19 @@ abstract class AbstractOpenApiVisitor {
                 String typeName = type.getName();
                 ClassElement customTypeSchema = getCustomSchema(typeName, typeArgs, context);
                 if (customTypeSchema != null) {
-                    type = customTypeSchema;
+                    Map<String, ClassElement> customTypeArgs = customTypeSchema.getTypeArguments();
+                    if (customTypeArgs.isEmpty()) {
+                        type = customTypeSchema;
+                    } else {
+                        Map<String, ClassElement> inheritedTypeArgs = new HashMap<>(customTypeArgs);
+                        for (String generic : customTypeArgs.keySet()) {
+                            ClassElement element = typeArgs.get(generic);
+                            if (element != null) {
+                                inheritedTypeArgs.put(generic, element);
+                            }
+                        }
+                        type = customTypeSchema.withTypeArguments(inheritedTypeArgs);
+                    }
                 }
 
                 if (isArray == null) {
@@ -2530,13 +2545,7 @@ abstract class AbstractOpenApiVisitor {
 
             if (publicField instanceof MemberElement memberEl && (memberEl.getDeclaringType().getType().getName().equals(type.getName()) || isGetterOverridden)) {
 
-                ClassElement fieldType = publicField.getType();
-                if (publicField.getType() instanceof GenericPlaceholderElement genericPlaceholderEl) {
-                    ClassElement genericType = typeArgs.get(genericPlaceholderEl.getVariableName());
-                    if (genericType != null) {
-                        fieldType = genericType;
-                    }
-                }
+                ClassElement fieldType = publicField.getGenericType();
 
                 if (withJsonView && !allowedByJsonView(publicField, classLvlJsonViewClasses, jsonViewClass, context)) {
                     continue;
