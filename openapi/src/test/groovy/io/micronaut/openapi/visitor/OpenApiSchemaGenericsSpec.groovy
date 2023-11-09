@@ -397,7 +397,7 @@ class Response<T> {
     T r;
     public T getResult() {
         return r;
-    };
+    }
 }
 
 @jakarta.inject.Singleton
@@ -710,5 +710,108 @@ class MyBean {}
         get3.parameters[0].schema.items.allOf
         get3.parameters[0].schema.items.allOf[0].$ref == '#/components/schemas/CommonController.Channel'
         get3.parameters[0].schema.items.allOf[1].nullable
+    }
+
+    void "test schema with public fields type arguments"() {
+        given:
+        buildBeanDefinition('test.MyBean', '''
+
+package test;
+
+import java.util.Map;
+
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+
+@Controller
+class CommonController {
+
+    @Get("/get1")
+    public ListElement1<String> list1() {
+        return null;
+    }
+
+    @Get("/get2")
+    public ListElement2<String> list2() {
+        return null;
+    }
+
+    @Get("/get3")
+    public ListElement3<String> list3() {
+        return null;
+    }
+}
+
+class ListElement1<T> {
+
+    private T typeValue;
+    private Iterable<T> iterableValues;
+    private T[] arrayValues;
+
+    public T getTypeValue() {
+        return typeValue;
+    }
+
+    public void setTypeValue(T typeValue) {
+        this.typeValue = typeValue;
+    }
+
+    public Iterable<T> getIterableValues() {
+        return iterableValues;
+    }
+
+    public void setIterableValues(Iterable<T> iterableValues) {
+        this.iterableValues = iterableValues;
+    }
+
+    public T[] getArrayValues() {
+        return arrayValues;
+    }
+
+    public void setArrayValues(T[] arrayValues) {
+        this.arrayValues = arrayValues;
+    }
+}
+
+record ListElement2<T>(
+    T typeValue,
+    Iterable<T> iterableValues,
+    T[] arrayValues
+) {}
+
+class ListElement3<T> {
+
+    public T typeValue;
+    public Iterable<T> iterableValues;
+    public T[] arrayValues;
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+
+        OpenAPI openAPI = Utils.testReference
+        def schema1 = openAPI.components.schemas.'ListElement1_String_'
+        def schema2 = openAPI.components.schemas.'ListElement2_String_'
+        def schema3 = openAPI.components.schemas.'ListElement3_String_'
+
+        expect:
+        schema1.type == 'object'
+        schema1.properties.typeValue.type == 'string'
+        schema1.properties.arrayValues.type == 'string'
+        schema1.properties.iterableValues.type == 'array'
+        schema1.properties.iterableValues.items.type == 'string'
+
+        schema2.type == 'object'
+        schema2.properties.typeValue.type == 'string'
+        schema2.properties.arrayValues.type == 'string'
+        schema2.properties.iterableValues.type == 'array'
+        schema2.properties.iterableValues.items.type == 'string'
+
+        schema3.type == 'object'
+        schema3.properties.typeValue.type == 'string'
+        schema3.properties.arrayValues.type == 'string'
+        schema3.properties.iterableValues.type == 'array'
+        schema3.properties.iterableValues.items.type == 'string'
     }
 }
