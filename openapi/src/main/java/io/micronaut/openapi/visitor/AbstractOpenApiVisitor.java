@@ -854,17 +854,29 @@ abstract class AbstractOpenApiVisitor {
 
             if (type != null) {
 
+                String typeName = type.getName();
+                ClassElement customTypeSchema = getCustomSchema(typeName, typeArgs, context);
+                if (customTypeSchema != null) {
+                    Map<String, ClassElement> customTypeArgs = customTypeSchema.getTypeArguments();
+                    if (customTypeArgs.isEmpty()) {
+                        type = customTypeSchema;
+                    } else {
+                        Map<String, ClassElement> inheritedTypeArgs = new HashMap<>(customTypeArgs);
+                        for (String generic : customTypeArgs.keySet()) {
+                            ClassElement element = typeArgs.get(generic);
+                            if (element != null) {
+                                inheritedTypeArgs.put(generic, element);
+                            }
+                        }
+                        type = customTypeSchema.withTypeArguments(inheritedTypeArgs);
+                    }
+                }
+
                 if (isArray == null) {
                     isArray = type.isArray();
                 }
                 if (isIterable == null) {
                     isIterable = type.isIterable();
-                }
-
-                String typeName = type.getName();
-                ClassElement customTypeSchema = getCustomSchema(typeName, typeArgs, context);
-                if (customTypeSchema != null) {
-                    type = customTypeSchema;
                 }
 
                 // File upload case
@@ -2525,7 +2537,7 @@ abstract class AbstractOpenApiVisitor {
 
             if (publicField instanceof MemberElement memberEl && (memberEl.getDeclaringType().getType().getName().equals(type.getName()) || isGetterOverridden)) {
 
-                ClassElement fieldType = publicField.getType();
+                ClassElement fieldType = publicField.getGenericType();
                 if (publicField.getType() instanceof GenericPlaceholderElement genericPlaceholderEl) {
                     ClassElement genericType = typeArgs.get(genericPlaceholderEl.getVariableName());
                     if (genericType != null) {
