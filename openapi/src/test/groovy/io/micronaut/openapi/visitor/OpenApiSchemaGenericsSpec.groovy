@@ -529,11 +529,13 @@ enum TimeUnit implements Unit {
         this.suffix = suffix;
     }
 
-    @Override public BigDecimal ratio() {
+    @Override
+    public BigDecimal ratio() {
         return ratio;
     }
 
-    @Override public String suffix() {
+    @Override
+    public String suffix() {
         return suffix;
     }
 
@@ -798,19 +800,22 @@ class MyBean {}
         expect:
         schema1.type == 'object'
         schema1.properties.typeValue.type == 'string'
-        schema1.properties.arrayValues.type == 'string'
+        schema1.properties.arrayValues.type == 'array'
+        schema1.properties.arrayValues.items.type == 'string'
         schema1.properties.iterableValues.type == 'array'
         schema1.properties.iterableValues.items.type == 'string'
 
         schema2.type == 'object'
         schema2.properties.typeValue.type == 'string'
-        schema2.properties.arrayValues.type == 'string'
+        schema2.properties.arrayValues.type == 'array'
+        schema2.properties.arrayValues.items.type == 'string'
         schema2.properties.iterableValues.type == 'array'
         schema2.properties.iterableValues.items.type == 'string'
 
         schema3.type == 'object'
         schema3.properties.typeValue.type == 'string'
-        schema3.properties.arrayValues.type == 'string'
+        schema3.properties.arrayValues.type == 'array'
+        schema3.properties.arrayValues.items.type == 'string'
         schema3.properties.iterableValues.type == 'array'
         schema3.properties.iterableValues.items.type == 'string'
     }
