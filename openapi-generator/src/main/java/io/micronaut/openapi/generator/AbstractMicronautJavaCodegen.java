@@ -879,8 +879,9 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
             var hasParent = model.getParentModel() != null;
             var requiredVarsWithoutDiscriminator = new ArrayList<CodegenProperty>();
             var requiredParentVarsWithoutDiscriminator = new ArrayList<CodegenProperty>();
+            var allVars = new ArrayList<CodegenProperty>();
 
-            processParentModel(model, requiredVarsWithoutDiscriminator, requiredParentVarsWithoutDiscriminator);
+            processParentModel(model, requiredVarsWithoutDiscriminator, requiredParentVarsWithoutDiscriminator, allVars);
 
             var optionalVars = new ArrayList<CodegenProperty>();
             var requiredVars = new ArrayList<CodegenProperty>();
@@ -899,6 +900,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
             if (!requiredVarsWithoutDiscriminator.isEmpty()) {
                 model.vendorExtensions.put("requiredVarsWithoutDiscriminator", requiredVarsWithoutDiscriminator);
             }
+            model.allVars = allVars;
             model.vendorExtensions.put("requiredVars", requiredVars);
             model.vendorExtensions.put("optionalVars", optionalVars);
             model.vendorExtensions.put("areRequiredVarsAndReadOnlyVars", !requiredVarsWithoutDiscriminator.isEmpty() && !model.readOnlyVars.isEmpty());
@@ -942,9 +944,13 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
         return false;
     }
 
-    private void processParentModel(CodegenModel model, List<CodegenProperty> requiredVarsWithoutDiscriminator, List<CodegenProperty> requiredParentVarsWithoutDiscriminator) {
+    private void processParentModel(CodegenModel model, List<CodegenProperty> requiredVarsWithoutDiscriminator,
+                                    List<CodegenProperty> requiredParentVarsWithoutDiscriminator,
+                                    List<CodegenProperty> allVars) {
         var parent = model.getParentModel();
         var hasParent = parent != null;
+
+        allVars.addAll(model.vars);
 
         for (var v : model.requiredVars) {
             boolean isDiscriminator = isDiscriminator(v, model);
@@ -958,7 +964,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
             model.parentVars = parent.allVars;
         }
         if (hasParent) {
-            processParentModel(parent, requiredVarsWithoutDiscriminator, requiredParentVarsWithoutDiscriminator);
+            processParentModel(parent, requiredVarsWithoutDiscriminator, requiredParentVarsWithoutDiscriminator, allVars);
         }
     }
 

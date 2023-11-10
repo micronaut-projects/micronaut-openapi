@@ -43,7 +43,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/SendPrimitivesResponse'
         default:
-          $ref: '#/responses/Error'
+          $ref: '#/components/responses/Error'
   /sendValidatedPrimitives:
     get:
       operationId: sendValidatedPrimitives
@@ -86,7 +86,7 @@ paths:
               schema:
                 type: string
         default:
-          $ref: '#/responses/Error'
+          $ref: '#/components/responses/Error'
   /sendDates:
     get:
       operationId: sendDates
@@ -111,7 +111,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/SendDatesResponse'
         default:
-          $ref: '#/responses/Error'
+          $ref: '#/components/responses/Error'
   /sendParameterEnum:
     get:
       operationId: sendParameterEnum
@@ -234,7 +234,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/SimpleModel'
         default:
-          $ref: '#/responses/Error'
+          $ref: '#/components/responses/Error'
   /sendListOfSimpleModels:
     post:
       operationId: sendListOfSimpleModels
@@ -276,7 +276,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ModelWithRequiredProperties'
         default:
-          $ref: '#/responses/Error'
+          $ref: '#/components/responses/Error'
   /sendDateModel:
     post:
       operationId: sendDateModel
@@ -295,7 +295,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/DateModel'
         default:
-          $ref: '#/responses/Error'
+          $ref: '#/components/responses/Error'
   /sendEnum:
     post:
       operationId: sendEnum
@@ -315,7 +315,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ColorEnum'
         default:
-          $ref: '#/responses/Error'
+          $ref: '#/components/responses/Error'
   /sendEnumList:
     post:
       operationId: sendEnumList
@@ -339,7 +339,7 @@ paths:
                 items:
                   $ref: '#/components/schemas/ColorEnum'
         default:
-          $ref: '#/responses/Error'
+          $ref: '#/components/responses/Error'
   /sendModelWithMapProperty:
     post:
       operationId: sendModelWithMapProperty
@@ -391,7 +391,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/NestedModel'
         default:
-          $ref: '#/responses/Error'
+          $ref: '#/components/responses/Error'
   /sendModelWithInnerEnum:
     post:
       operationId: sendModelWithInnerEnum
@@ -411,7 +411,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ModelWithInnerEnum'
         default:
-          $ref: '#/responses/Error'
+          $ref: '#/components/responses/Error'
   /sendModelWithEnumList:
     post:
       operationId: sendModelWithEnumList
@@ -431,7 +431,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ModelWithEnumList'
         default:
-          $ref: '#/responses/Error'
+          $ref: '#/components/responses/Error'
   /sendModelWithDiscriminator:
     put:
       operationId: sendModelWithDiscriminator
@@ -474,7 +474,7 @@ paths:
                 type: string
                 format: byte
         default:
-          $ref: '#/responses/Error'
+          $ref: '#/components/responses/Error'
   /sendBytes:
     put:
       operationId: sendBytes
@@ -507,7 +507,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/SimpleModel'
         default:
-          $ref: '#/responses/Error'
+          $ref: '#/components/responses/Error'
   /getDateTime:
     get:
       operationId: getDateTime
@@ -522,7 +522,7 @@ paths:
                 type: string
                 format: date-time
         default:
-          $ref: '#/responses/Error'
+          $ref: '#/components/responses/Error'
   /getDateModel:
     get:
       operationId: getDateModel
@@ -536,7 +536,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/DateModel'
         default:
-          $ref: '#/responses/Error'
+          $ref: '#/components/responses/Error'
   /getSimpleModelWithNonStandardStatus:
     get:
       operationId: getSimpleModelWithNonStandardStatus
@@ -550,7 +550,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/SimpleModel'
         default:
-          $ref: '#/responses/Error'
+          $ref: '#/components/responses/Error'
   /getModelWithValidatedList:
     get:
       operationId: getModelWithValidatedList
@@ -564,7 +564,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ModelWithValidatedListProperty'
         default:
-          $ref: '#/responses/Error'
+          $ref: '#/components/responses/Error'
   /getPaginatedSimpleModel:
     get:
       operationId: getPaginatedSimpleModel
@@ -623,7 +623,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/SimpleModel'
         default:
-          $ref: '#/responses/Error'
+          $ref: '#/components/responses/Error'
   /getDatedSimpleModelWithNonMappedHeader:
     get:
       operationId: getDatedSimpleModelWithNonMappedHeader
@@ -669,7 +669,7 @@ paths:
                 type: string
                 format: binary
         default:
-          $ref: '#/responses/Error'
+          $ref: '#/components/responses/Error'
 
 components:
   schemas:

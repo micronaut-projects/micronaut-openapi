@@ -28,7 +28,9 @@ import android.os.Parcel
 import {{javaxPackage}}.validation.constraints.*
 import {{javaxPackage}}.validation.Valid
 {{/useBeanValidation}}
+{{^micronaut_serde_jackson}}
 import io.micronaut.core.annotation.Introspected
+{{/micronaut_serde_jackson}}
 import io.micronaut.core.annotation.Nullable
 {{#generatedAnnotation}}
 import {{javaxPackage}}.annotation.Generated

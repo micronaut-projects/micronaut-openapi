@@ -17,7 +17,7 @@ open class RequestBodyController : RequestBodyApi {
     }
 
     override fun sendSimpleModel(simpleModel: SimpleModel?): Mono<SimpleModel> {
-        return Mono.just(simpleModel)
+        return Mono.just(simpleModel!!)
     }
 
     override fun sendValidatedCollection(requestBody: List<List<String>>?): Mono<Void> {
@@ -25,15 +25,15 @@ open class RequestBodyController : RequestBodyApi {
     }
 
     override fun sendListOfSimpleModels(simpleModels: List<SimpleModel>?): Mono<List<SimpleModel>> {
-        return Mono.just(simpleModels)
+        return Mono.just(simpleModels!!)
     }
 
     override fun sendModelWithRequiredProperties(model: ModelWithRequiredProperties?): Mono<ModelWithRequiredProperties> {
-        return Mono.just(model)
+        return Mono.just(model!!)
     }
 
     override fun sendDateModel(model: DateModel?): Mono<DateModel> {
-        return Mono.just(model)
+        return Mono.just(model!!)
     }
 
     override fun sendEnum(color: String): Mono<ColorEnum> {
@@ -65,7 +65,7 @@ open class RequestBodyController : RequestBodyApi {
     }
 
     override fun sendBytes(bytes: ByteArray?): Mono<ByteArray> {
-        return Mono.just(bytes)
+        return Mono.just(bytes!!)
     }
 
     override fun sendModelWithEnumList(model: ModelWithEnumList): Mono<ModelWithEnumList> {
