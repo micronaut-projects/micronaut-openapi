@@ -20,11 +20,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import io.micronaut.context.ApplicationContextConfiguration;
 import io.micronaut.context.env.ActiveEnvironment;
@@ -43,9 +42,9 @@ import io.micronaut.core.order.OrderUtil;
 import io.micronaut.core.util.StringUtils;
 import io.micronaut.inject.visitor.VisitorContext;
 
+import static io.micronaut.openapi.visitor.ConfigUtils.getProjectPath;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_CONFIG_FILE_LOCATIONS;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_ENVIRONMENT_ENABLED;
-import static io.micronaut.openapi.visitor.ConfigUtils.getProjectPath;
 
 /**
  * Specific environment for annotation processing level. Solve problem with access to resources
@@ -129,11 +128,16 @@ public class AnnProcessorEnvironment extends DefaultEnvironment {
     }
 
     private void readConstantPropertySources(String name, List<PropertySource> propertySources) {
-        Set<String> propertySourceNames = Stream.concat(Stream.of(name), getActiveNames().stream().map(env -> name + "-" + env))
-                .collect(Collectors.toSet());
-        getConstantPropertySources().stream()
-                .filter(p -> propertySourceNames.contains(p.getName()))
-                .forEach(propertySources::add);
+        var propertySourceNames = new HashSet<String>(getActiveNames().size() + 1);
+        propertySourceNames.add(name);
+        for (var activeName : getActiveNames()) {
+            propertySourceNames.add(name + '-' + activeName);
+        }
+        for (var constPropertySource : getConstantPropertySources()) {
+            if (propertySourceNames.contains(constPropertySource.getName())) {
+                propertySources.add(constPropertySource);
+            }
+        }
     }
 
     /**
