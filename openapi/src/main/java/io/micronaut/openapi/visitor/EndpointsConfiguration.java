@@ -40,6 +40,8 @@ import com.fasterxml.jackson.core.type.TypeReference;
  */
 public class EndpointsConfiguration {
 
+    private static final TypeReference<List<Server>> TYPE_SERVERS_LIST = new TypeReference<>() { };
+    private static final TypeReference<List<SecurityRequirement>> TYPE_SECURITY_REQUIREMENTS_LIST = new TypeReference<>() { };
     private static final String ENDPOINTS_PREFIX = "endpoints.";
 
     public static final String ENDPOINTS_ENABLED = ENDPOINTS_PREFIX + "enabled";
@@ -155,11 +157,11 @@ public class EndpointsConfiguration {
     }
 
     private static List<Server> parseServers(String servers, VisitorContext context) {
-        return parseModel(servers, context, new TypeReference<>() {});
+        return parseModel(servers, context, TYPE_SERVERS_LIST);
     }
 
     private static List<SecurityRequirement> parseSecurityRequirements(String securityRequirements, VisitorContext context) {
-        return parseModel(securityRequirements, context, new TypeReference<>() {});
+        return parseModel(securityRequirements, context, TYPE_SECURITY_REQUIREMENTS_LIST);
     }
 
     private static <T> List<T> parseModel(String s, VisitorContext context, TypeReference<List<T>> typeReference) {

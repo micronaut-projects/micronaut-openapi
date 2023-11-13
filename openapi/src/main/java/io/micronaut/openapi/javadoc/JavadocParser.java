@@ -20,13 +20,11 @@ import java.util.Set;
 import io.micronaut.core.util.CollectionUtils;
 
 import com.github.chhorz.javadoc.JavaDoc;
-import com.github.chhorz.javadoc.JavaDocParser;
 import com.github.chhorz.javadoc.JavaDocParserBuilder;
 import com.github.chhorz.javadoc.OutputType;
 import com.github.chhorz.javadoc.tags.ParamTag;
 import com.github.chhorz.javadoc.tags.PropertyTag;
 import com.github.chhorz.javadoc.tags.ReturnTag;
-import com.github.chhorz.javadoc.tags.Tag;
 import com.vladsch.flexmark.html2md.converter.FlexmarkHtmlConverter;
 
 /**

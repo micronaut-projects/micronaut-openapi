@@ -100,7 +100,12 @@ public final class AdocModule {
         if (StringUtils.isNotEmpty(outputDir)) {
             outputPath = resolve(context, Paths.get(outputDir));
         } else {
-            outputPath = getDefaultFilePath(fileName, context).get().getParent();
+            var defaultFilePath = getDefaultFilePath(fileName, context);
+            if (defaultFilePath == null) {
+                context.warn("Can't read defaultFilePath property", null);
+                throw new RuntimeException("Can't read defaultFilePath property");
+            }
+            outputPath = defaultFilePath.getParent();
         }
         outputPath = outputPath.resolve(fileName);
         createDirectories(outputPath, context);
