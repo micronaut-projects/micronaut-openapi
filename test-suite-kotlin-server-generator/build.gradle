@@ -1,5 +1,3 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
-
 plugins {
     id 'io.micronaut.build.internal.openapi-kotlin-generator-test-suite'
     alias(libs.plugins.kotlin.jvm)
@@ -12,6 +10,7 @@ that tests can be ran with Micronaut 4
 """
 
 dependencies {
+
     kapt("io.micronaut.serde:micronaut-serde-processor")
     kapt("io.micronaut.validation:micronaut-validation-processor")
     kapt(mn.micronaut.inject.kotlin)
