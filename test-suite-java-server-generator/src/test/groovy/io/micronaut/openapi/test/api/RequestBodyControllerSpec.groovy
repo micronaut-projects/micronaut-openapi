@@ -354,6 +354,12 @@ class RequestBodyControllerSpec extends Specification {
         Animal response = client.retrieve(request, arg, Argument.of(String))
 
         then:
+        response.propertyClass == discriminatorName
+
+        when:
+        response.propertyClass = null
+
+        then:
         model == response
 
         when:

@@ -20,7 +20,7 @@ commons-codec = "1.16.0"
 
 micronaut = "4.2.0"
 micronaut-security = "4.2.0"
-micronaut-serde = "2.3.3"
+micronaut-serde = "2.4.0"
 micronaut-rxjava2 = "2.1.0"
 micronaut-rxjava3 = "3.1.0"
 micronaut-reactor = "3.1.0"

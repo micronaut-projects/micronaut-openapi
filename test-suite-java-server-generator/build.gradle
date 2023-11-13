@@ -13,15 +13,15 @@ dependencies {
     annotationProcessor(mnValidation.micronaut.validation.processor)
     annotationProcessor(mnSerde.micronaut.serde.processor)
 
+    compileOnly(projects.micronautOpenapiAnnotations)
+    compileOnly(mn.jackson.annotations)
+
     implementation(mn.micronaut.http)
     implementation(mnSerde.micronaut.serde.api)
     implementation(mn.jakarta.annotation.api)
     implementation(mnValidation.micronaut.validation)
     implementation(mnData.micronaut.data.runtime)
     implementation(mnReactor.micronaut.reactor)
-    implementation(projects.micronautOpenapi) {
-        because("Required for Swagger")
-    }
 
     runtimeOnly(mnLogging.logback.classic)
 

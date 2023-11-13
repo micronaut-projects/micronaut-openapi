@@ -1,0 +1,92 @@
+
+{{#isNullable}}
+    @field:Nullable
+{{/isNullable}}
+{{^isNullable}}
+    {{#required}}
+        {{#isReadOnly}}
+    @field:Nullable
+        {{/isReadOnly}}
+    {{/required}}
+    {{^required}}
+    @field:Nullable
+    {{/required}}
+{{/isNullable}}
+{{!All the validation}}
+{{#useBeanValidation}}
+    {{^isNullable}}
+        {{#required}}
+            {{^isReadOnly}}
+    @field:NotNull
+            {{/isReadOnly}}
+        {{/required}}
+    {{/isNullable}}
+    {{!Validate all pojos and enums}}
+    {{^isContainer}}
+        {{#isModel}}
+    @field:Valid
+        {{/isModel}}
+    {{/isContainer}}
+    {{!Pattern}}
+    {{#pattern}}
+        {{^isByteArray}}
+    @field:Pattern(regexp = "{{{pattern}}}")
+        {{/isByteArray}}
+    {{/pattern}}
+    {{!Min length && max length}}
+    {{#minLength}}
+        {{#maxLength}}
+    @field:Size(min = {{minLength}}, max = {{maxLength}})
+        {{/maxLength}}
+    {{/minLength}}
+    {{#minLength}}{{^maxLength}}
+    @field:Size(min = {{minLength}})
+    {{/maxLength}}{{/minLength}}
+    {{^minLength}}{{#maxLength}}
+    @field:Size(max = {{maxLength}})
+    {{/maxLength}}{{/minLength}}
+    {{!Size}}
+    {{#minItems}}{{#maxItems}}
+    @field:Size(min = {{minItems}}, max = {{maxItems}})
+    {{/maxItems}}{{/minItems}}
+    {{#minItems}}{{^maxItems}}
+    @field:Size(min = {{minItems}})
+    {{/maxItems}}{{/minItems}}
+    {{^minItems}}{{#maxItems}}
+    @field:Size(max = {{maxItems}})
+    {{/maxItems}}{{/minItems}}
+    {{!Email}}
+    {{#isEmail}}
+    @field:Email
+    {{/isEmail}}
+    {{!check for integer or long / all others=decimal type with @Decimal isInteger set}}
+    {{#isInteger}}
+        {{#minimum}}
+    @field:Min({{minimum}})
+        {{/minimum}}
+        {{#maximum}}
+    @field:Max({{maximum}})
+        {{/maximum}}
+    {{/isInteger}}
+    {{!isLong set}}
+    {{#isLong}}
+        {{#minimum}}
+    @field:Min({{minimum}}L)
+        {{/minimum}}
+        {{#maximum}}
+    @field:Max({{maximum}}L)
+        {{/maximum}}
+    {{/isLong}}
+    {{!Not Integer, not Long => we have a decimal value!}}
+    {{^isInteger}}
+        {{^isLong}}{{!minimum for decimal value}}
+            {{#minimum}}
+    @field:DecimalMin({{#exclusiveMinimum}}value = {{/exclusiveMinimum}}"{{minimum}}"{{#exclusiveMinimum}}, inclusive = false{{/exclusiveMinimum}})
+            {{/minimum}}
+    {{!maximal for decimal value}}
+            {{#maximum}}
+    @field:DecimalMax({{#exclusiveMaximum}}value = {{/exclusiveMaximum}}"{{maximum}}"{{#exclusiveMaximum}}, inclusive = false{{/exclusiveMaximum}})
+            {{/maximum}}
+        {{/isLong}}
+    {{/isInteger}}
+{{/useBeanValidation}}
