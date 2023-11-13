@@ -38,7 +38,9 @@
 {{/discriminator}}
 {{>common/model/xmlAnnotation}}
 {{#useBeanValidation}}
+    {{^micronaut_serde_jackson}}
 @Introspected
+    {{/micronaut_serde_jackson}}
 {{/useBeanValidation}}
 {{#vendorExtensions.x-class-extra-annotation}}
 {{{vendorExtensions.x-class-extra-annotation}}}

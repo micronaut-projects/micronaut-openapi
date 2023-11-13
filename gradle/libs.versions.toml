@@ -1,5 +1,5 @@
 [versions]
-managed-swagger = "2.2.18"
+managed-swagger = "2.2.19"
 managed-javadoc-parser = "0.3.1"
 managed-jsoup = "1.16.2"
 managed-html2md-converter = "0.64.8"
@@ -20,7 +20,7 @@ commons-codec = "1.16.0"
 
 micronaut = "4.1.11"
 micronaut-security = "4.2.0"
-micronaut-serde = "2.3.2"
+micronaut-serde = "2.3.3"
 micronaut-rxjava2 = "2.1.0"
 micronaut-rxjava3 = "3.1.0"
 micronaut-gradle-plugin = "4.1.2"

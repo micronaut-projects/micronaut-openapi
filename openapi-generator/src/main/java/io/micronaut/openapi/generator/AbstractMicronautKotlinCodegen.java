@@ -1014,8 +1014,9 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
             var hasParent = model.getParentModel() != null;
             var requiredVarsWithoutDiscriminator = new ArrayList<CodegenProperty>();
             var requiredParentVarsWithoutDiscriminator = new ArrayList<CodegenProperty>();
+            var allVars = new ArrayList<CodegenProperty>();
 
-            processParentModel(model, requiredVarsWithoutDiscriminator, requiredParentVarsWithoutDiscriminator, false);
+            processParentModel(model, requiredVarsWithoutDiscriminator, requiredParentVarsWithoutDiscriminator, allVars, false);
 
             var withInheritance = model.hasChildren || model.parent != null;
             model.vendorExtensions.put("withInheritance", withInheritance);
@@ -1043,6 +1044,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
             if (!requiredVarsWithoutDiscriminator.isEmpty()) {
                 model.vendorExtensions.put("requiredVarsWithoutDiscriminator", requiredVarsWithoutDiscriminator);
             }
+            model.allVars = allVars;
             model.vendorExtensions.put("requiredVars", requiredVars);
             model.vendorExtensions.put("withRequiredOrOptionalVars", !requiredVarsWithoutDiscriminator.isEmpty() || !optionalVars.isEmpty());
             model.vendorExtensions.put("optionalVars", optionalVars);
@@ -1083,9 +1085,14 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
             property.required, property.isReadOnly, true);
     }
 
-    private void processParentModel(CodegenModel model, List<CodegenProperty> requiredVarsWithoutDiscriminator, List<CodegenProperty> requiredParentVarsWithoutDiscriminator, boolean processParentModel) {
+    private void processParentModel(CodegenModel model, List<CodegenProperty> requiredVarsWithoutDiscriminator,
+                                    List<CodegenProperty> requiredParentVarsWithoutDiscriminator,
+                                    List<CodegenProperty> allVars,
+                                    boolean processParentModel) {
         var parent = model.getParentModel();
         var hasParent = parent != null;
+
+        allVars.addAll(model.vars);
 
         if (!processParentModel) {
             processVar(model, model.vars, requiredVarsWithoutDiscriminator, requiredParentVarsWithoutDiscriminator, processParentModel);
@@ -1098,7 +1105,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
             model.parentVars = parent.allVars;
         }
         if (hasParent) {
-            processParentModel(parent, requiredVarsWithoutDiscriminator, requiredParentVarsWithoutDiscriminator, true);
+            processParentModel(parent, requiredVarsWithoutDiscriminator, requiredParentVarsWithoutDiscriminator, allVars, true);
         }
     }
 
