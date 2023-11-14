@@ -145,28 +145,28 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         assertFileContains(modelPath + "Pet.kt",
         """
             data class Pet (
-                @NotNull
-                @JsonProperty(JSON_PROPERTY_NAME)
+                @field:NotNull
+                @field:JsonProperty(JSON_PROPERTY_NAME)
                 var name: String,
-                @NotNull
-                @JsonProperty(JSON_PROPERTY_PHOTO_URLS)
+                @field:NotNull
+                @field:JsonProperty(JSON_PROPERTY_PHOTO_URLS)
                 var photoUrls: List<@NotNull String>,
-                @Nullable
-                @JsonProperty(JSON_PROPERTY_ID)
-                @JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                @field:Nullable
+                @field:JsonProperty(JSON_PROPERTY_ID)
+                @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
                 var id: Long? = null,
-                @Nullable
-                @Valid
-                @JsonProperty(JSON_PROPERTY_CATEGORY)
-                @JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                @field:Nullable
+                @field:Valid
+                @field:JsonProperty(JSON_PROPERTY_CATEGORY)
+                @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
                 var category: Category? = null,
-                @Nullable
-                @JsonProperty(JSON_PROPERTY_TAGS)
-                @JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                @field:Nullable
+                @field:JsonProperty(JSON_PROPERTY_TAGS)
+                @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
                 var tags: List<@Valid Tag>? = null,
-                @Nullable
-                @JsonProperty(JSON_PROPERTY_STATUS)
-                @JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                @field:Nullable
+                @field:JsonProperty(JSON_PROPERTY_STATUS)
+                @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
                 var status: Status? = null,
             ) {
             """);
@@ -290,41 +290,41 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         assertFileContains(apiPath + "BookInfo.kt",
             """
                 open class BookInfo (
-                    @NotNull
-                    @JsonProperty(JSON_PROPERTY_NAME)
+                    @field:NotNull
+                    @field:JsonProperty(JSON_PROPERTY_NAME)
                     open var name: String,
-                    @Nullable
-                    @JsonProperty(JSON_PROPERTY_REQUIRED_READ_ONLY)
-                    @JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                    @field:Nullable
+                    @field:JsonProperty(JSON_PROPERTY_REQUIRED_READ_ONLY)
+                    @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
                     open var requiredReadOnly: String?,
-                    @Nullable
-                    @Size(min = 3)
-                    @JsonProperty(JSON_PROPERTY_AUTHOR)
-                    @JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                    @field:Nullable
+                    @field:Size(min = 3)
+                    @field:JsonProperty(JSON_PROPERTY_AUTHOR)
+                    @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
                     open var author: String? = null,
-                    @Nullable
-                    @JsonProperty(JSON_PROPERTY_OPTIONAL_READ_ONLY)
-                    @JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                    @field:Nullable
+                    @field:JsonProperty(JSON_PROPERTY_OPTIONAL_READ_ONLY)
+                    @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
                     open var optionalReadOnly: String? = null,
-                    @Nullable
-                    @JsonProperty(JSON_PROPERTY_TYPE)
-                    @JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                    @field:Nullable
+                    @field:JsonProperty(JSON_PROPERTY_TYPE)
+                    @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
                     open var type: Type? = null,
                 ) {
                 """);
         assertFileContains(apiPath + "ExtendedBookInfo.kt",
             """
                 data class ExtendedBookInfo (
-                    @NotNull
-                    @Pattern(regexp = "[0-9]{13}")
-                    @JsonProperty(JSON_PROPERTY_ISBN)
+                    @field:NotNull
+                    @field:Pattern(regexp = "[0-9]{13}")
+                    @field:JsonProperty(JSON_PROPERTY_ISBN)
                     var isbn: String,
-                    @NotNull
-                    @JsonProperty(JSON_PROPERTY_NAME)
+                    @field:NotNull
+                    @field:JsonProperty(JSON_PROPERTY_NAME)
                     override var name: String,
-                    @Nullable
-                    @JsonProperty(JSON_PROPERTY_REQUIRED_READ_ONLY)
-                    @JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                    @field:Nullable
+                    @field:JsonProperty(JSON_PROPERTY_REQUIRED_READ_ONLY)
+                    @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
                     override var requiredReadOnly: String?,
                 ): BookInfo(name, requiredReadOnly)  {
                 """);
@@ -340,7 +340,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
 
         assertFileContains(apiPath + "BooksContainer.kt",
             """
-                        @JsonProperty(JSON_PROPERTY_BOOKS)
+                        @field:JsonProperty(JSON_PROPERTY_BOOKS)
                         var books: List<@Valid Book>
                     """);
     }
@@ -371,38 +371,38 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         assertFileContains(apiPath + "BookInfo.kt",
                     """
                        open class BookInfo (
-                           @NotNull
-                           @JsonProperty(JSON_PROPERTY_NAME)
+                           @field:NotNull
+                           @field:JsonProperty(JSON_PROPERTY_NAME)
                            open var name: String,
-                           @NotNull
-                           @JsonProperty(JSON_PROPERTY_TYPE)
+                           @field:NotNull
+                           @field:JsonProperty(JSON_PROPERTY_TYPE)
                            open var type: Type? = null,
                        ) {""");
         assertFileContains(apiPath + "BasicBookInfo.kt",
             """
                 open class BasicBookInfo (
-                    @NotNull
-                    @Size(min = 3)
-                    @JsonProperty(JSON_PROPERTY_AUTHOR)
+                    @field:NotNull
+                    @field:Size(min = 3)
+                    @field:JsonProperty(JSON_PROPERTY_AUTHOR)
                     open var author: String,
-                    @NotNull
-                    @JsonProperty(JSON_PROPERTY_NAME)
+                    @field:NotNull
+                    @field:JsonProperty(JSON_PROPERTY_NAME)
                     override var name: String,
                 ): BookInfo(name)  {
                 """);
         assertFileContains(apiPath + "DetailedBookInfo.kt",
             """
                 data class DetailedBookInfo (
-                    @NotNull
-                    @Pattern(regexp = "[0-9]{13}")
-                    @JsonProperty(JSON_PROPERTY_ISBN)
+                    @field:NotNull
+                    @field:Pattern(regexp = "[0-9]{13}")
+                    @field:JsonProperty(JSON_PROPERTY_ISBN)
                     var isbn: String,
-                    @NotNull
-                    @Size(min = 3)
-                    @JsonProperty(JSON_PROPERTY_AUTHOR)
+                    @field:NotNull
+                    @field:Size(min = 3)
+                    @field:JsonProperty(JSON_PROPERTY_AUTHOR)
                     override var author: String,
-                    @NotNull
-                    @JsonProperty(JSON_PROPERTY_NAME)
+                    @field:NotNull
+                    @field:JsonProperty(JSON_PROPERTY_NAME)
                     override var name: String,
                 ): BasicBookInfo(author, name)
                 """);

@@ -9,26 +9,31 @@ that tests can be ran with Micronaut 4
 """
 
 dependencies {
-    annotationProcessor("io.micronaut.validation:micronaut-validation-processor")
-    annotationProcessor("io.micronaut.serde:micronaut-serde-processor")
-    implementation("io.micronaut:micronaut-http")
-    implementation("io.micronaut.serde:micronaut-serde-api")
-    implementation("jakarta.annotation:jakarta.annotation-api")
-    implementation("io.micronaut.validation:micronaut-validation")
-    implementation("io.projectreactor:reactor-core")
-    implementation(projects.micronautOpenapi) {
-        because("Required for Swagger")
-    }
 
-    testCompileOnly("io.micronaut:micronaut-inject-groovy-test")
-    testCompileOnly("io.micronaut:micronaut-inject-java-test")
-    testImplementation("io.micronaut.test:micronaut-test-spock")
-    testImplementation("io.micronaut:micronaut-http-client")
+    annotationProcessor(mnValidation.micronaut.validation.processor)
+    annotationProcessor(mnSerde.micronaut.serde.processor)
+
+    compileOnly(projects.micronautOpenapiAnnotations)
+    compileOnly(mn.jackson.annotations)
+
+    implementation(mn.micronaut.http)
+    implementation(mnSerde.micronaut.serde.api)
+    implementation(mn.jakarta.annotation.api)
+    implementation(mnValidation.micronaut.validation)
     implementation(mnData.micronaut.data.runtime)
+    implementation(mnReactor.micronaut.reactor)
 
-    testRuntimeOnly("io.micronaut:micronaut-json-core")
-    testRuntimeOnly("io.micronaut.serde:micronaut-serde-jackson")
-    runtimeOnly("ch.qos.logback:logback-classic")
+    runtimeOnly(mnLogging.logback.classic)
+
+    testCompileOnly(mn.micronaut.inject.groovy.test)
+    testCompileOnly(mn.micronaut.inject.java.test)
+
+    testImplementation(mnTest.micronaut.test.spock)
+    testImplementation(mn.micronaut.http.client)
+
+    testRuntimeOnly(mn.micronaut.json.core)
+    testRuntimeOnly(mnSerde.micronaut.serde.jackson)
+    testRuntimeOnly(mnLogging.logback.classic)
 }
 
 sourceSets {
