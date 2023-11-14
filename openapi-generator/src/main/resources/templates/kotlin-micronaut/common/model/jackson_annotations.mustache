@@ -4,34 +4,34 @@
  * If the field is required, always include it, even if it is null.
  * Else use custom behaviour, IOW use whatever is defined on the object mapper
  }}
-    @JsonProperty(JSON_PROPERTY_{{nameInSnakeCase}})
+    @field:JsonProperty(JSON_PROPERTY_{{nameInSnakeCase}})
     {{#isMap}}
         {{#items.isNullable}}
-    @JsonInclude(content = JsonInclude.Include.ALWAYS{{^required}}, value = JsonInclude.Include.USE_DEFAULTS{{/required}})
+    @field:JsonInclude(content = JsonInclude.Include.ALWAYS{{^required}}, value = JsonInclude.Include.USE_DEFAULTS{{/required}})
         {{/items.isNullable}}
         {{^items.isNullable}}{{^required}}
-    @JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+    @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
         {{/required}}{{/items.isNullable}}
     {{/isMap}}
     {{^isMap}}
         {{#required}}
             {{#isReadOnly}}
-    @JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+    @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
             {{/isReadOnly}}
         {{/required}}
         {{^required}}
-    @JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+    @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
         {{/required}}
     {{/isMap}}
     {{#withXml}}
         {{^isContainer}}
-    @JacksonXmlProperty({{#isXmlAttribute}}isAttribute = true, {{/isXmlAttribute}}{{#xmlNamespace}}namespace = "{{xmlNamespace}}", {{/xmlNamespace}}localName = "{{#xmlName}}{{xmlName}}{{/xmlName}}{{^xmlName}}{{baseName}}{{/xmlName}}")
-    @JacksonXmlProperty({{#isXmlAttribute}}isAttribute = true, {{/isXmlAttribute}}{{#xmlNamespace}}namespace = "{{xmlNamespace}}", {{/xmlNamespace}}localName = "{{#xmlName}}{{xmlName}}{{/xmlName}}{{^xmlName}}{{baseName}}{{/xmlName}}")
+    @field:JacksonXmlProperty({{#isXmlAttribute}}isAttribute = true, {{/isXmlAttribute}}{{#xmlNamespace}}namespace = "{{xmlNamespace}}", {{/xmlNamespace}}localName = "{{#xmlName}}{{xmlName}}{{/xmlName}}{{^xmlName}}{{baseName}}{{/xmlName}}")
+    @field:JacksonXmlProperty({{#isXmlAttribute}}isAttribute = true, {{/isXmlAttribute}}{{#xmlNamespace}}namespace = "{{xmlNamespace}}", {{/xmlNamespace}}localName = "{{#xmlName}}{{xmlName}}{{/xmlName}}{{^xmlName}}{{baseName}}{{/xmlName}}")
         {{/isContainer}}
         {{#isContainer}}
             {{#isXmlWrapped}}
     // items.xmlName={{items.xmlName}}
-    @JacksonXmlElementWrapper(useWrapping = {{isXmlWrapped}}, {{#xmlNamespace}}namespace = "{{xmlNamespace}}", {{/xmlNamespace}}localName = "{{#items.xmlName}}{{items.xmlName}}{{/items.xmlName}}{{^items.xmlName}}{{items.baseName}}{{/items.xmlName}}")
+    @field:JacksonXmlElementWrapper(useWrapping = {{isXmlWrapped}}, {{#xmlNamespace}}namespace = "{{xmlNamespace}}", {{/xmlNamespace}}localName = "{{#items.xmlName}}{{items.xmlName}}{{/items.xmlName}}{{^items.xmlName}}{{items.baseName}}{{/items.xmlName}}")
             {{/isXmlWrapped}}
         {{/isContainer}}
     {{/withXml}}
@@ -39,12 +39,12 @@
         {{^micronaut_serde_jackson}}
             {{#isDateTime}}
                 {{#datetimeFormat}}
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "{{{datetimeFormat}}}")
+    @field:JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "{{{datetimeFormat}}}")
                 {{/datetimeFormat}}
             {{/isDateTime}}
             {{#isDate}}
                 {{#dateFormat}}
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "{{{dateFormat}}}")
+    @field:JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "{{{dateFormat}}}")
                 {{/dateFormat}}
             {{/isDate}}
         {{/micronaut_serde_jackson}}
@@ -52,12 +52,12 @@
     {{#micronaut_serde_jackson}}
         {{#isDateTime}}
             {{#datatimeFormat}}
-    @JsonFormat(pattern = "{{{datetimeFormat}}}")
+    @field:JsonFormat(pattern = "{{{datetimeFormat}}}")
             {{/datatimeFormat}}
         {{/isDateTime}}
         {{#isDate}}
             {{#dateFormat}}
-    @JsonFormat(pattern = "{{{dateFormat}}}")
+    @field:JsonFormat(pattern = "{{{dateFormat}}}")
             {{/dateFormat}}
         {{/isDate}}
     {{/micronaut_serde_jackson}}

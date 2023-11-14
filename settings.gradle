@@ -43,6 +43,7 @@ micronautBuild {
     importMicronautCatalog("micronaut-serde")
     importMicronautCatalog("micronaut-rxjava2")
     importMicronautCatalog("micronaut-rxjava3")
+    importMicronautCatalog("micronaut-reactor")
     importMicronautCatalog("micronaut-groovy")
     importMicronautCatalog("micronaut-validation")
     importMicronautCatalog("micronaut-data")

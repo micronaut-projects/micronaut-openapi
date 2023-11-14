@@ -21,9 +21,10 @@ commons-codec = "1.16.0"
 
 micronaut = "4.2.0"
 micronaut-security = "4.2.0"
-micronaut-serde = "2.3.3"
+micronaut-serde = "2.4.0"
 micronaut-rxjava2 = "2.1.0"
 micronaut-rxjava3 = "3.1.0"
+micronaut-reactor = "3.1.0"
 micronaut-gradle-plugin = "4.1.2"
 micronaut-groovy = "4.1.0"
 micronaut-validation = "4.1.0"
@@ -41,6 +42,7 @@ micronaut-security = { module = "io.micronaut.security:micronaut-security-bom", 
 micronaut-serde = { module = "io.micronaut.serde:micronaut-serde-bom", version.ref = "micronaut-serde" }
 micronaut-rxjava2 = { module = "io.micronaut.rxjava2:micronaut-rxjava2-bom", version.ref = "micronaut-rxjava2" }
 micronaut-rxjava3 = { module = "io.micronaut.rxjava3:micronaut-rxjava3-bom", version.ref = "micronaut-rxjava3" }
+micronaut-reactor = { module = "io.micronaut.reactor:micronaut-reactor-bom", version.ref = "micronaut-reactor" }
 micronaut-gradle-plugin = { module = "io.micronaut.gradle:micronaut-minimal-plugin", version.ref = "micronaut-gradle-plugin"}
 micronaut-groovy = { module = "io.micronaut.groovy:micronaut-groovy-bom", version.ref = "micronaut-groovy" }
 micronaut-validation = { module = "io.micronaut.validation:micronaut-validation-bom", version.ref = "micronaut-validation" }

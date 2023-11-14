@@ -11,38 +11,38 @@ that tests can be ran with Micronaut 4
 
 dependencies {
 
-    ksp("io.micronaut.serde:micronaut-serde-processor")
-    ksp("io.micronaut.validation:micronaut-validation-processor")
+    ksp(mnValidation.micronaut.validation.processor)
+    ksp(mnSerde.micronaut.serde.processor)
     ksp(mn.micronaut.inject.kotlin)
 
-    implementation("io.micronaut:micronaut-http")
-    implementation("io.micronaut.serde:micronaut-serde-api")
-    implementation("io.micronaut:micronaut-inject-kotlin")
-    implementation("jakarta.annotation:jakarta.annotation-api")
-    implementation("io.micronaut.validation:micronaut-validation")
-    implementation("io.projectreactor:reactor-core")
-    implementation(projects.micronautOpenapi) {
-        because("Required for Swagger")
-    }
+    implementation(mn.jackson.annotations)
+    implementation(projects.micronautOpenapiAnnotations)
+    implementation(mn.micronaut.http)
+    implementation(mnSerde.micronaut.serde.api)
+    implementation(mn.micronaut.inject.kotlin)
+    implementation(mn.jakarta.annotation.api)
+    implementation(mnValidation.micronaut.validation)
+    implementation(mnReactor.micronaut.reactor)
     implementation(mnData.micronaut.data.runtime)
     implementation(libs.kotlin.stdlib.jdk8)
     implementation(libs.kotlin.reflect)
 
-    runtimeOnly mnLogging.logback.classic
+    runtimeOnly(mnLogging.logback.classic)
 
+    kspTest(mnValidation.micronaut.validation.processor)
+    kspTest(mnSerde.micronaut.serde.processor)
     kspTest(mn.micronaut.inject.kotlin)
-    kspTest("io.micronaut.serde:micronaut-serde-processor")
-    kspTest("io.micronaut.validation:micronaut-validation-processor")
 
-    testCompileOnly("io.micronaut:micronaut-inject-kotlin-test")
-    testImplementation("io.micronaut:micronaut-http-client")
-    testImplementation mnTest.micronaut.test.junit5
-    testImplementation libs.junit.jupiter.params
+    testCompileOnly(mn.micronaut.inject.kotlin.test)
 
-    testRuntimeOnly("io.micronaut:micronaut-json-core")
-    testRuntimeOnly("io.micronaut.serde:micronaut-serde-jackson")
-    testRuntimeOnly libs.junit.jupiter.engine
-    testRuntimeOnly mnLogging.logback.classic
+    testImplementation(mn.micronaut.http.client)
+    testImplementation(mnTest.micronaut.test.junit5)
+    testImplementation(libs.junit.jupiter.params)
+
+    testRuntimeOnly(mn.micronaut.json.core)
+    testRuntimeOnly(mnSerde.micronaut.serde.jackson)
+    testRuntimeOnly(libs.junit.jupiter.engine)
+    testRuntimeOnly(mnLogging.logback.classic)
 }
 
 tasks.named("generateOpenApi") {

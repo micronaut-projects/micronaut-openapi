@@ -207,6 +207,10 @@ class RequestBodyControllerTest(
     fun testSendModelWithDiscriminatorChild(discriminatorName: String, model: Animal) {
         val request = HttpRequest.PUT("/sendModelWithDiscriminator", model)
         val response = client.retrieve(request, Argument.of(Animal::class.java), Argument.of(String::class.java))
+
+        assertEquals(discriminatorName, response.propertyClass)
+
+        response.propertyClass = null
         assertEquals(model, response)
 
         val stringResponse = client.retrieve(request, Argument.of(String::class.java))
