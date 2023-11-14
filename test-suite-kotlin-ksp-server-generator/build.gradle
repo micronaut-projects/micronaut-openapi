@@ -1,7 +1,7 @@
 plugins {
     id 'io.micronaut.build.internal.openapi-kotlin-generator-test-suite'
     alias(libs.plugins.kotlin.jvm)
-    alias(libs.plugins.kotlin.kapt)
+    alias(libs.plugins.kotlin.ksp)
 }
 
 description = """
@@ -11,9 +11,9 @@ that tests can be ran with Micronaut 4
 
 dependencies {
 
-    kapt("io.micronaut.serde:micronaut-serde-processor")
-    kapt("io.micronaut.validation:micronaut-validation-processor")
-    kapt(mn.micronaut.inject.kotlin)
+    ksp("io.micronaut.serde:micronaut-serde-processor")
+    ksp("io.micronaut.validation:micronaut-validation-processor")
+    ksp(mn.micronaut.inject.kotlin)
 
     implementation("io.micronaut:micronaut-http")
     implementation("io.micronaut.serde:micronaut-serde-api")
@@ -30,9 +30,9 @@ dependencies {
 
     runtimeOnly mnLogging.logback.classic
 
-    kaptTest(mn.micronaut.inject.kotlin)
-    kaptTest("io.micronaut.serde:micronaut-serde-processor")
-    kaptTest("io.micronaut.validation:micronaut-validation-processor")
+    kspTest(mn.micronaut.inject.kotlin)
+    kspTest("io.micronaut.serde:micronaut-serde-processor")
+    kspTest("io.micronaut.validation:micronaut-validation-processor")
 
     testCompileOnly("io.micronaut:micronaut-inject-kotlin-test")
     testImplementation("io.micronaut:micronaut-http-client")

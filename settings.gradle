@@ -24,8 +24,10 @@ include 'docs-examples:example-java'
 include 'docs-examples:example-kotlin'
 include 'test-suite-java-client-generator'
 include 'test-suite-java-server-generator'
-include 'test-suite-kotlin-client-generator'
-include 'test-suite-kotlin-server-generator'
+include 'test-suite-kotlin-kapt-client-generator'
+include 'test-suite-kotlin-kapt-server-generator'
+include 'test-suite-kotlin-ksp-client-generator'
+include 'test-suite-kotlin-ksp-server-generator'
 include 'test-suite-generator-util'
 
 dependencyResolutionManagement {
