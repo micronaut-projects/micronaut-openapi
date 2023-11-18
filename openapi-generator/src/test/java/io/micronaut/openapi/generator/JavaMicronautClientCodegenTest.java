@@ -332,4 +332,18 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
 
         assertFileContains(apiPath + "DefaultApi.java", "import java.io.InputStream;");
     }
+
+    @Test
+    void testPropSecondUpperCaseChar() {
+
+        var codegen = new JavaMicronautClientCodegen();
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/propWithSecondUpperCaseChar.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String apiPath = outputPath + "src/main/java/org/openapitools/api/";
+        String modelPath = outputPath + "src/main/java/org/openapitools/model/";
+
+        assertFileContains(modelPath + "Book.java", "public static final String JSON_PROPERTY_TITLE = \"tItle\";",
+            "private String title;",
+            "public String getTitle()",
+            "public void setTitle(String title)");
+    }
 }
