@@ -1,0 +1,38 @@
+openapi: 3.0.0
+info:
+  description: This is a library API
+  version: 1.0.0
+  title: Library
+  license:
+    name: Apache-2.0
+    url: "https://www.apache.org/licenses/LICENSE-2.0.html"
+tags:
+  - name: books
+    description: Add books
+paths:
+  /add-book:
+    post:
+      tags: [books]
+      summary: Add a new book
+      operationId: addBook
+      requestBody:
+        required: true
+        content:
+          "application/json":
+            schema:
+              $ref: "#/components/schemas/Book"
+      responses:
+        "200":
+          description: Success
+        "400":
+          description: Bad Request
+components:
+  schemas:
+    Book:
+      type: object
+      properties:
+        tItle:
+          type: string
+          maxLength: 10
+      required:
+        - tItle
