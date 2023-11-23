@@ -20,8 +20,8 @@ import io.swagger.v3.oas.annotations.security.SecuritySchemes;
 /**
  * Changes the Retention Policy of the annotation to SOURCE.
  *
- * @since 2.1
  * @author croudet
+ * @since 2.1
  */
 public class SecuritySchemesRetentionPolicyAnnotationTransformer extends AbstractRetentionPolicyAnnotationTransformer<SecuritySchemes> {
 

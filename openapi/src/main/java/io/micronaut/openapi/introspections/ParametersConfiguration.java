@@ -16,7 +16,6 @@
 package io.micronaut.openapi.introspections;
 
 import io.micronaut.core.annotation.Introspected;
-
 import io.swagger.v3.oas.models.parameters.CookieParameter;
 import io.swagger.v3.oas.models.parameters.HeaderParameter;
 import io.swagger.v3.oas.models.parameters.Parameter;

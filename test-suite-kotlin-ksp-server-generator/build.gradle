@@ -1,7 +1,7 @@
 plugins {
     id 'io.micronaut.build.internal.openapi-kotlin-generator-test-suite'
     alias(libs.plugins.kotlin.jvm)
-    alias(libs.plugins.kotlin.kapt)
+    alias(libs.plugins.kotlin.ksp)
 }
 
 description = """
@@ -11,9 +11,9 @@ that tests can be ran with Micronaut 4
 
 dependencies {
 
-    kapt(mnValidation.micronaut.validation.processor)
-    kapt(mnSerde.micronaut.serde.processor)
-    kapt(mn.micronaut.inject.kotlin)
+    ksp(mnValidation.micronaut.validation.processor)
+    ksp(mnSerde.micronaut.serde.processor)
+    ksp(mn.micronaut.inject.kotlin)
 
     implementation(mn.jackson.annotations)
     implementation(projects.micronautOpenapiAnnotations)
@@ -28,10 +28,11 @@ dependencies {
     implementation(libs.kotlin.reflect)
 
     runtimeOnly(mnLogging.logback.classic)
+    runtimeOnly(mnSerde.micronaut.serde.jackson)
 
-    kaptTest(mnValidation.micronaut.validation.processor)
-    kaptTest(mnSerde.micronaut.serde.processor)
-    kaptTest(mn.micronaut.inject.kotlin)
+    kspTest(mnValidation.micronaut.validation.processor)
+    kspTest(mnSerde.micronaut.serde.processor)
+    kspTest(mn.micronaut.inject.kotlin)
 
     testCompileOnly(mn.micronaut.inject.kotlin.test)
 
@@ -70,6 +71,11 @@ tasks.named("generateOpenApi") {
             // Ignored header - Does not wrap the response in HttpResponse
             [headerName: "ignored-header"]
     ]
+}
+
+// TODO: Wait fix https://github.com/micronaut-projects/micronaut-core/issues/10117
+test {
+    exclude 'io/micronaut/**'
 }
 
 kotlin {

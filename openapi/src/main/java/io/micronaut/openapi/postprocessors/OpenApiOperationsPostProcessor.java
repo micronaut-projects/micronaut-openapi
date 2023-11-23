@@ -15,11 +15,11 @@
  */
 package io.micronaut.openapi.postprocessors;
 
-import io.swagger.v3.oas.models.OpenAPI;
-import io.swagger.v3.oas.models.Operation;
-
 import java.util.HashMap;
 import java.util.Map;
+
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.Operation;
 
 /**
  * A helper class that post process OpenApi operations.
@@ -39,29 +39,29 @@ public class OpenApiOperationsPostProcessor {
         Map<String, Integer> operationIdsIndex = new HashMap<>();
 
         openAPI.getPaths().values().stream()
-                .flatMap(pathItem -> pathItem.readOperations().stream())
-                .forEach(operation -> {
-                    String operationId = operation.getOperationId();
+            .flatMap(pathItem -> pathItem.readOperations().stream())
+            .forEach(operation -> {
+                String operationId = operation.getOperationId();
 
-                    if (operationIdsIndex.containsKey(operationId)) {
-                        int nextValue = operationIdsIndex.get(operationId);
+                if (operationIdsIndex.containsKey(operationId)) {
+                    int nextValue = operationIdsIndex.get(operationId);
 
-                        String newOperationId = operationId + '_' + nextValue;
-                        operation.setOperationId(newOperationId);
-                        updateResponseDescription(operation, operationId, newOperationId);
+                    String newOperationId = operationId + '_' + nextValue;
+                    operation.setOperationId(newOperationId);
+                    updateResponseDescription(operation, operationId, newOperationId);
 
-                        operationIdsIndex.put(operationId, ++nextValue);
-                    } else {
-                        operationIdsIndex.put(operationId, 1);
-                    }
-                });
+                    operationIdsIndex.put(operationId, ++nextValue);
+                } else {
+                    operationIdsIndex.put(operationId, 1);
+                }
+            });
     }
 
     private static void updateResponseDescription(Operation operation, String originalId, String newOperationId) {
         if (operation.getResponses() != null) {
             operation.getResponses().values().stream()
-                    .filter(apiResponse -> apiResponse != null && apiResponse.getDescription() != null)
-                    .forEach(apiResponse -> apiResponse.setDescription(apiResponse.getDescription().replaceFirst(originalId, newOperationId)));
+                .filter(apiResponse -> apiResponse != null && apiResponse.getDescription() != null)
+                .forEach(apiResponse -> apiResponse.setDescription(apiResponse.getDescription().replaceFirst(originalId, newOperationId)));
         }
     }
 

@@ -1080,9 +1080,8 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         }
 
         for (OpenApiInfo openApiInfo : openApiInfos.values()) {
-
-            Optional<Path> specFile = openApiSpecFile(openApiInfo.getFilename(), context);
-            try (Writer writer = getFileWriter(specFile.orElse(null))) {
+            Path specFile = openApiSpecFile(openApiInfo.getFilename(), context);
+            try (Writer writer = getFileWriter(specFile)) {
                 (isYaml ? OpenApiUtils.getYamlMapper() : OpenApiUtils.getJsonMapper()).writeValue(writer, openApiInfo.getOpenApi());
                 if (Utils.isTestMode()) {
                     Utils.setTestFileName(openApiInfo.getFilename());
@@ -1093,18 +1092,19 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                     }
                 } else {
                     @SuppressWarnings("OptionalGetWithoutIsPresent")
-                    Path specPath = specFile.get();
+                    Path specPath = specFile;
                     context.info("Writing OpenAPI file to destination: " + specPath);
-                    viewsDestDirs = getViewsDestDir(getDefaultFilePath(openApiInfo.getFilename(), context).get(), context);
+                    viewsDestDirs = getViewsDestDir(getDefaultFilePath(openApiInfo.getFilename(), context), context);
                     context.info("Writing OpenAPI views to destination: " + viewsDestDirs);
                     final Path viewsDestDirsFinal = viewsDestDirs;
-                    context.getClassesOutputPath().ifPresent(path -> {
+                    var classesOutputPath = ContextUtils.getClassesOutputPath(context);
+                    if (classesOutputPath != null) {
                         // add relative paths for the specPath, and its parent META-INF/swagger
                         // so that micronaut-graal visitor knows about them
-                        context.addGeneratedResource(path.relativize(specPath).toString());
-                        context.addGeneratedResource(path.relativize(specPath.getParent()).toString());
-                        context.addGeneratedResource(path.relativize(viewsDestDirsFinal).toString());
-                    });
+                        context.addGeneratedResource(classesOutputPath.relativize(specPath).toString());
+                        context.addGeneratedResource(classesOutputPath.relativize(specPath.getParent()).toString());
+                        context.addGeneratedResource(classesOutputPath.relativize(viewsDestDirsFinal).toString());
+                    }
                     openApiInfo.setSpecFilePath(specPath.getFileName().toString());
 
                     if (isAdocModuleInClassPath && isGlobalAdocEnabled && openApiInfo.isAdocEnabled()) {
@@ -1113,7 +1113,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                     }
                 }
             } catch (Exception e) {
-                context.warn("Unable to generate swagger" + (isYaml ? EXT_YML : EXT_JSON) + ": " + specFile.orElse(null) + " - " + e.getMessage() + ".\n" + Utils.printStackTrace(e), classElement);
+                context.warn("Unable to generate swagger" + (isYaml ? EXT_YML : EXT_JSON) + ": " + specFile + " - " + e.getMessage() + ".\n" + Utils.printStackTrace(e), classElement);
             }
         }
         if (!Utils.isTestMode() && viewsDestDirs != null) {

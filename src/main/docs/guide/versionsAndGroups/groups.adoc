@@ -67,4 +67,4 @@ so for normal API display, you will have to complete the template yourself.
 
 Swagger UI has support for multiple files out of the box. The example above would look something like this:
 
-image::../../resources/img/swagger-ui-with-groups.png[]
+image::swagger-ui-with-groups.png[]

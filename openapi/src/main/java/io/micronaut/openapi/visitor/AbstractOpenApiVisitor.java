@@ -74,6 +74,7 @@ import io.micronaut.inject.ast.ElementQuery;
 import io.micronaut.inject.ast.EnumConstantElement;
 import io.micronaut.inject.ast.EnumElement;
 import io.micronaut.inject.ast.FieldElement;
+import io.micronaut.inject.ast.GenericElement;
 import io.micronaut.inject.ast.GenericPlaceholderElement;
 import io.micronaut.inject.ast.MemberElement;
 import io.micronaut.inject.ast.PropertyElement;
@@ -770,8 +771,8 @@ abstract class AbstractOpenApiVisitor {
      */
     @Nullable
     protected Schema<?> resolveSchema(OpenAPI openAPI, @Nullable Element definingElement, ClassElement type, VisitorContext context,
-                                   List<MediaType> mediaTypes, @Nullable ClassElement jsonViewClass,
-                                   JavadocDescription fieldJavadoc, JavadocDescription classJavadoc) {
+                                      List<MediaType> mediaTypes, @Nullable ClassElement jsonViewClass,
+                                      JavadocDescription fieldJavadoc, JavadocDescription classJavadoc) {
 
         AnnotationValue<io.swagger.v3.oas.annotations.media.Schema> schemaAnnotationValue = null;
         if (definingElement != null) {
@@ -810,6 +811,10 @@ abstract class AbstractOpenApiVisitor {
             if (!isArray) {
                 type = placeholderEl.getResolved().orElse(CollectionUtils.isNotEmpty(placeholderEl.getBounds()) ? placeholderEl.getBounds().get(0) : null);
             }
+        } else if (type instanceof GenericElement genericEl) {
+            isArray = type.isArray();
+            isIterable = type.isIterable();
+            type = genericEl.getResolved().orElse(null);
         }
         Map<String, ClassElement> typeArgs = type != null ? type.getTypeArguments() : null;
 
@@ -1070,7 +1075,7 @@ abstract class AbstractOpenApiVisitor {
      * @param propertySchema The property schema
      */
     protected void processSchemaProperty(VisitorContext context, TypedElement element, ClassElement elementType, @Nullable Element classElement,
-                                                                              Schema<?> parentSchema, Schema<?> propertySchema) {
+                                         Schema<?> parentSchema, Schema<?> propertySchema) {
         if (propertySchema == null) {
             return;
         }
@@ -1129,7 +1134,7 @@ abstract class AbstractOpenApiVisitor {
                             }
                         }
                         setDefaultValueObject(propertySchemaFinal, value, element, elType, elFormat, false, context);
-                });
+                    });
             }
         }
     }
@@ -1201,7 +1206,7 @@ abstract class AbstractOpenApiVisitor {
      * @return The bound schema
      */
     protected Schema<?> bindSchemaForElement(VisitorContext context, TypedElement element, ClassElement elementType, Schema<?> schemaToBind,
-                                          @Nullable ClassElement jsonViewClass) {
+                                             @Nullable ClassElement jsonViewClass) {
         AnnotationValue<io.swagger.v3.oas.annotations.media.Schema> schemaAnn = element.getAnnotation(io.swagger.v3.oas.annotations.media.Schema.class);
         Schema<?> originalSchema = schemaToBind;
 
@@ -1640,8 +1645,8 @@ abstract class AbstractOpenApiVisitor {
      * @return The bound schema
      */
     protected Schema<?> bindSchemaAnnotationValue(VisitorContext context, Element element, Schema<?> schemaToBind,
-                                               AnnotationValue<io.swagger.v3.oas.annotations.media.Schema> schemaAnn,
-                                               @Nullable ClassElement jsonViewClass) {
+                                                  AnnotationValue<io.swagger.v3.oas.annotations.media.Schema> schemaAnn,
+                                                  @Nullable ClassElement jsonViewClass) {
 
         ClassElement classElement = ((TypedElement) element).getType();
         Pair<String, String> typeAndFormat;
@@ -1661,8 +1666,8 @@ abstract class AbstractOpenApiVisitor {
     }
 
     private Schema<?> doBindSchemaAnnotationValue(VisitorContext context, Element element, Schema schemaToBind,
-                                               JsonNode schemaJson, String elType, String elFormat, AnnotationValue<?> schemaAnn,
-                                               @Nullable ClassElement jsonViewClass) {
+                                                  JsonNode schemaJson, String elType, String elFormat, AnnotationValue<?> schemaAnn,
+                                                  @Nullable ClassElement jsonViewClass) {
 
         // need to set placeholders to set correct values and types to example field
         schemaJson = resolvePlaceholders(schemaJson, s -> expandProperties(s, getExpandableProperties(context), context));
@@ -1727,8 +1732,8 @@ abstract class AbstractOpenApiVisitor {
      * @return The bound schema
      */
     protected Schema<?> bindArraySchemaAnnotationValue(VisitorContext context, Element element, Schema<?> schemaToBind,
-                                                    AnnotationValue<io.swagger.v3.oas.annotations.media.ArraySchema> schemaAnn,
-                                                    @Nullable ClassElement jsonViewClass) {
+                                                       AnnotationValue<io.swagger.v3.oas.annotations.media.ArraySchema> schemaAnn,
+                                                       @Nullable ClassElement jsonViewClass) {
         JsonNode schemaJson = toJson(schemaAnn.getValues(), context, jsonViewClass);
         if (schemaJson.isObject()) {
             ObjectNode objNode = (ObjectNode) schemaJson;
@@ -1867,13 +1872,13 @@ abstract class AbstractOpenApiVisitor {
     }
 
     private Schema<?> getSchemaDefinition(OpenAPI openAPI,
-                                       VisitorContext context,
-                                       ClassElement type,
-                                       Map<String, ClassElement> typeArgs,
-                                       @Nullable Element definingElement,
-                                       List<MediaType> mediaTypes,
-                                       @Nullable ClassElement jsonViewClass
-                                       ) {
+                                          VisitorContext context,
+                                          ClassElement type,
+                                          Map<String, ClassElement> typeArgs,
+                                          @Nullable Element definingElement,
+                                          List<MediaType> mediaTypes,
+                                          @Nullable ClassElement jsonViewClass
+    ) {
 
         // Here we need to skip Schema annotation on field level, because with micronaut 3.x method getDeclaredAnnotation
         // returned always null and found Schema annotation only on getters and setters
@@ -2001,13 +2006,13 @@ abstract class AbstractOpenApiVisitor {
     }
 
     private Schema<?> processSuperTypes(Schema<?> schema,
-                                     String schemaName,
-                                     ClassElement type, @Nullable Element definingElement,
-                                     OpenAPI openAPI,
-                                     List<MediaType> mediaTypes,
-                                     Map<String, Schema> schemas,
-                                     VisitorContext context,
-                                     @Nullable ClassElement jsonViewClass) {
+                                        String schemaName,
+                                        ClassElement type, @Nullable Element definingElement,
+                                        OpenAPI openAPI,
+                                        List<MediaType> mediaTypes,
+                                        Map<String, Schema> schemas,
+                                        VisitorContext context,
+                                        @Nullable ClassElement jsonViewClass) {
 
         if (type.getName().equals(Object.class.getName())) {
             return null;
@@ -2176,8 +2181,8 @@ abstract class AbstractOpenApiVisitor {
      */
     @SuppressWarnings("java:S3776")
     protected Schema<?> readSchema(AnnotationValue<io.swagger.v3.oas.annotations.media.Schema> schemaValue, OpenAPI openAPI, VisitorContext context,
-                                @Nullable Element type, Map<String, ClassElement> typeArgs, List<MediaType> mediaTypes,
-                                @Nullable ClassElement jsonViewClass) throws JsonProcessingException {
+                                   @Nullable Element type, Map<String, ClassElement> typeArgs, List<MediaType> mediaTypes,
+                                   @Nullable ClassElement jsonViewClass) throws JsonProcessingException {
         Map<CharSequence, Object> values = schemaValue.getValues()
             .entrySet()
             .stream()
@@ -2432,8 +2437,8 @@ abstract class AbstractOpenApiVisitor {
             List<PropertyElement> beanProperties;
             try {
                 beanProperties = classElement.getBeanProperties().stream()
-                        .filter(p -> !"groovy.lang.MetaClass".equals(p.getType().getName()))
-                        .toList();
+                    .filter(p -> !"groovy.lang.MetaClass".equals(p.getType().getName()))
+                    .toList();
             } catch (Exception e) {
                 context.warn("Error with getting properties for class " + classElement.getName() + ": " + e + "\n" + Utils.printStackTrace(e), classElement);
                 // Workaround for https://github.com/micronaut-projects/micronaut-openapi/issues/313

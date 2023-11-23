@@ -23,6 +23,7 @@ dependencies {
     api(libs.managed.jsoup)
 
     testImplementation(mn.micronaut.management)
+    testImplementation(mn.micronaut.inject.kotlin.test)
     testImplementation(mn.micronaut.inject.groovy.test)
     testImplementation(mn.micronaut.inject.java.test)
     testImplementation(mn.micronaut.http.server)
@@ -46,4 +47,6 @@ configurations.configureEach {
 
 test {
     useJUnitPlatform()
+
+    maxHeapSize = "1024m"
 }

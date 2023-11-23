@@ -8,11 +8,12 @@ managed-freemarker = "2.3.32"
 managed-pegdown = "1.6.0"
 
 kotlin = "1.9.20"
+ksp = "1.9.20-1.0.14"
 jspecify = "0.3.0"
 jdt-annotation = "2.2.700"
 android-annotation = "1.7.0"
 spotbugs-annotations = "4.8.1"
-openapi-generator = "7.0.1"
+openapi-generator = "7.1.0"
 swagger-parser = "1.0.68"
 swagger-parser-v3 = "2.1.19"
 javaparser = "3.25.6"
@@ -83,5 +84,6 @@ swagger-parser-v3 = { module = "io.swagger.parser.v3:swagger-parser-v3", version
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kotlin-ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
 kotlin-allopen = { id = "org.jetbrains.kotlin.plugin.allopen", version.ref = "kotlin" }

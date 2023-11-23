@@ -35,8 +35,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
-import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ENABLED;
 import static io.micronaut.openapi.visitor.ConfigUtils.isOpenApiEnabled;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ENABLED;
 
 /**
  * A {@link TypeElementVisitor} that builds appropriate {@link Schema} annotation for the parent class of a hierarchy
@@ -57,8 +57,8 @@ public class OpenApiJacksonVisitor implements TypeElementVisitor<Object, Object>
     @Override
     public Set<String> getSupportedAnnotationNames() {
         return CollectionUtils.setOf(
-                "com.fasterxml.jackson.annotation.JsonSubTypes",
-                "com.fasterxml.jackson.annotation.JsonTypeInfo"
+            "com.fasterxml.jackson.annotation.JsonSubTypes",
+            "com.fasterxml.jackson.annotation.JsonTypeInfo"
         );
     }
 
@@ -108,9 +108,9 @@ public class OpenApiJacksonVisitor implements TypeElementVisitor<Object, Object>
                 String subTypeName = av.stringValue("name").orElse(null);
                 if (mappingClass != null && subTypeName != null) {
                     AnnotationValue<DiscriminatorMapping> discriminatorMapping = AnnotationValue.builder(DiscriminatorMapping.class)
-                            .member("value", subTypeName)
-                            .member("schema", mappingClass)
-                            .build();
+                        .member("value", subTypeName)
+                        .member("schema", mappingClass)
+                        .build();
                     discriminatorMappings.add(discriminatorMapping);
                     discriminatorClasses.add(mappingClass);
                 }

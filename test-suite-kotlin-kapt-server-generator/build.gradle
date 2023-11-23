@@ -1,0 +1,78 @@
+plugins {
+    id 'io.micronaut.build.internal.openapi-kotlin-generator-test-suite'
+    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.kotlin.kapt)
+}
+
+description = """
+This project tests that the generated server sources can be compiled and
+that tests can be ran with Micronaut 4
+"""
+
+dependencies {
+
+    kapt(mnValidation.micronaut.validation.processor)
+    kapt(mnSerde.micronaut.serde.processor)
+    kapt(mn.micronaut.inject.kotlin)
+
+    implementation(mn.jackson.annotations)
+    implementation(projects.micronautOpenapiAnnotations)
+    implementation(mn.micronaut.http)
+    implementation(mnSerde.micronaut.serde.api)
+    implementation(mn.micronaut.inject.kotlin)
+    implementation(mn.jakarta.annotation.api)
+    implementation(mnValidation.micronaut.validation)
+    implementation(mnReactor.micronaut.reactor)
+    implementation(mnData.micronaut.data.runtime)
+    implementation(libs.kotlin.stdlib.jdk8)
+    implementation(libs.kotlin.reflect)
+
+    runtimeOnly(mnLogging.logback.classic)
+    runtimeOnly(mnSerde.micronaut.serde.jackson)
+
+    kaptTest(mnValidation.micronaut.validation.processor)
+    kaptTest(mnSerde.micronaut.serde.processor)
+    kaptTest(mn.micronaut.inject.kotlin)
+
+    testCompileOnly(mn.micronaut.inject.kotlin.test)
+
+    testImplementation(mn.micronaut.http.client)
+    testImplementation(mnTest.micronaut.test.junit5)
+    testImplementation(libs.junit.jupiter.params)
+
+    testRuntimeOnly(mn.micronaut.json.core)
+    testRuntimeOnly(mnSerde.micronaut.serde.jackson)
+    testRuntimeOnly(libs.junit.jupiter.engine)
+    testRuntimeOnly(mnLogging.logback.classic)
+}
+
+tasks.named("generateOpenApi") {
+    generatorKind = "server"
+    openApiDefinition = layout.projectDirectory.file("../test-suite-kotlin-ksp-server-generator/spec.yaml")
+    outputKinds = ["models", "apis", "modelDocs", "supportingFiles", "modelTests", "apiTests"]
+    parameterMappings = [
+            // Pageable parameter
+            [name: "page", location: "QUERY", mappedType: "io.micronaut.data.model.Pageable"],
+            [name: "size", location: "QUERY", mappedType: "io.micronaut.data.model.Pageable"],
+            [name: "sortOrder", location: "QUERY", mappedType: "io.micronaut.data.model.Pageable"],
+            // Ignored header
+            [name: "ignored-header", location: "HEADER"],
+            // Custom filtering header
+            [name: "Filter", location: "HEADER", mappedType: "io.micronaut.openapi.test.filter.MyFilter"]
+    ]
+    responseBodyMappings = [
+            // Response with Last-Modified header mapping
+            [headerName: "Last-Modified", mappedBodyType: "io.micronaut.openapi.test.dated.DatedResponse"],
+            // Response with Page body
+            [headerName: "X-Page-Number", mappedBodyType: "io.micronaut.data.model.Page", isListWrapper: true],
+            [headerName: "X-Page-Count", mappedBodyType: "io.micronaut.data.model.Page", isListWrapper: true],
+            [headerName: "X-Total-Count", mappedBodyType: "io.micronaut.data.model.Page", isListWrapper: true],
+            [headerName: "X-Page-Size", mappedBodyType: "io.micronaut.data.model.Page", isListWrapper: true],
+            // Ignored header - Does not wrap the response in HttpResponse
+            [headerName: "ignored-header"]
+    ]
+}
+
+kotlin {
+    jvmToolchain(17)
+}

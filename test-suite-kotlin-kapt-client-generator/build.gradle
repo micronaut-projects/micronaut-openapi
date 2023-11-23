@@ -31,6 +31,10 @@ dependencies {
     kaptTest(mn.micronaut.inject.kotlin)
 
     testImplementation(mnTest.micronaut.test.junit5)
+
+    testRuntimeOnly(mnSerde.micronaut.serde.jackson)
+    testRuntimeOnly(libs.junit.jupiter.engine)
+    testRuntimeOnly(mnLogging.logback.classic)
 }
 
 kotlin {

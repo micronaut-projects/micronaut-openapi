@@ -1347,7 +1347,6 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         return packageName;
     }
 
-    @Override
     public void setSerializationLibrary(final String serializationLibrary) {
         try {
             this.serializationLibrary = SerializationLibraryKind.valueOf(serializationLibrary).name();

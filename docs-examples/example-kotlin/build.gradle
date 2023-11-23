@@ -1,6 +1,6 @@
 plugins {
     alias(libs.plugins.kotlin.jvm)
-    alias(libs.plugins.kotlin.kapt)
+    alias(libs.plugins.kotlin.ksp)
     alias(libs.plugins.kotlin.allopen)
 }
 
@@ -9,11 +9,13 @@ repositories {
 }
 
 dependencies {
-    kapt projects.micronautOpenapi
-    kapt(mn.micronaut.inject.java)
-    kapt(mnValidation.micronaut.validation)
 
-    kaptTest(mn.micronaut.inject.java)
+    kspTest(mn.micronaut.inject.kotlin)
+    kspTest(mnValidation.micronaut.validation)
+    kspTest(projects.micronautOpenapi)
+
+    testCompileOnly projects.micronautOpenapiAnnotations
+    testCompileOnly(mn.micronaut.inject.kotlin)
 
     testImplementation(mn.micronaut.http)
     testImplementation(libs.managed.swagger.annotations)
@@ -24,16 +26,12 @@ dependencies {
     testImplementation(libs.kotlin.reflect)
     testImplementation(mnTest.micronaut.test.junit5)
 
-    testCompileOnly(mn.micronaut.inject.java)
-
     testRuntimeOnly(libs.junit.jupiter.engine)
     testRuntimeOnly(mnLogging.logback.classic)
 }
 
-kapt {
-    arguments {
-        arg("micronaut.openapi.project.dir", projectDir.toString())
-    }
+ksp {
+    arg("micronaut.openapi.project.dir", projectDir.toString())
 }
 
 test {

@@ -208,13 +208,13 @@ final class SwaggerUIConfig extends AbstractViewConfig {
     private String toOptions(@NonNull Map<String, Function<String, Object>> validOptions,
                              @Nullable String keyPrefix) {
         return options
-                .entrySet()
-                .stream()
-                .filter(e -> validOptions.containsKey(e.getKey()))
-                .sorted(Map.Entry.comparingByKey())
-                .map(e -> ((keyPrefix != null && e.getKey().startsWith(keyPrefix)) ? e.getKey().substring(keyPrefix.length()) : e.getKey())
-                    + KEY_VALUE_SEPARATOR + e.getValue())
-                .collect(Collectors.joining(COMMNA_NEW_LINE));
+            .entrySet()
+            .stream()
+            .filter(e -> validOptions.containsKey(e.getKey()))
+            .sorted(Map.Entry.comparingByKey())
+            .map(e -> ((keyPrefix != null && e.getKey().startsWith(keyPrefix)) ? e.getKey().substring(keyPrefix.length()) : e.getKey())
+                + KEY_VALUE_SEPARATOR + e.getValue())
+            .collect(Collectors.joining(COMMNA_NEW_LINE));
     }
 
     @NonNull

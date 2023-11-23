@@ -31,9 +31,9 @@ import io.micronaut.openapi.visitor.Utils;
 import io.micronaut.openapi.visitor.group.GroupProperties;
 import io.micronaut.openapi.visitor.group.OpenApiInfo;
 
+import static io.micronaut.openapi.visitor.ConfigUtils.getGroupProperties;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_CONTEXT_SERVER_PATH;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_SERVER_CONTEXT_PATH;
-import static io.micronaut.openapi.visitor.ConfigUtils.getGroupProperties;
 
 /**
  * Abstract View Config.
@@ -112,7 +112,7 @@ abstract class AbstractViewConfig {
      */
     protected String toHtmlAttributes() {
         return options.entrySet().stream().map(e -> e.getKey() + "=\"" + e.getValue() + '"')
-                .collect(Collectors.joining(" "));
+            .collect(Collectors.joining(" "));
     }
 
     protected String getFinalUrlPrefix(OpenApiViewConfig.RendererType rendererType, VisitorContext context) {
@@ -218,7 +218,7 @@ abstract class AbstractViewConfig {
                 }
 
                 cfg.specUrl = specUrl.replace(Utils.PLACEHOLDER_PREFIX + "filename" + Utils.PLACEHOLDER_POSTFIX,
-                        filenameFromContext != null ? filenameFromContext : "");
+                    filenameFromContext != null ? filenameFromContext : "");
             }
         }
 
@@ -240,7 +240,7 @@ abstract class AbstractViewConfig {
 
         cfg.options.putAll(defaultOptions);
         properties.entrySet().stream().filter(entry -> entry.getKey().startsWith(cfg.prefix))
-                .forEach(cfg::addAttribute);
+            .forEach(cfg::addAttribute);
         return cfg;
     }
 

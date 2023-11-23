@@ -40,8 +40,8 @@ public class ExampleSerializer extends JsonSerializer<Example> implements Resolv
 
     @Override
     public void resolve(SerializerProvider serializerProvider) throws JsonMappingException {
-        if (defaultSerializer instanceof ResolvableSerializer) {
-            ((ResolvableSerializer) defaultSerializer).resolve(serializerProvider);
+        if (defaultSerializer instanceof ResolvableSerializer resolvableSerializer) {
+            resolvableSerializer.resolve(serializerProvider);
         }
     }
 

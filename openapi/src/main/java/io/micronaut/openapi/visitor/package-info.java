@@ -15,6 +15,7 @@
  */
 /**
  * Classes related with OpenAPI Visitor.
+ *
  * @author Sergio del Amo
  * @since 4.8.3
  */

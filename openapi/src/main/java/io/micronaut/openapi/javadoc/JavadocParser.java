@@ -20,13 +20,11 @@ import java.util.Set;
 import io.micronaut.core.util.CollectionUtils;
 
 import com.github.chhorz.javadoc.JavaDoc;
-import com.github.chhorz.javadoc.JavaDocParser;
 import com.github.chhorz.javadoc.JavaDocParserBuilder;
 import com.github.chhorz.javadoc.OutputType;
 import com.github.chhorz.javadoc.tags.ParamTag;
 import com.github.chhorz.javadoc.tags.PropertyTag;
 import com.github.chhorz.javadoc.tags.ReturnTag;
-import com.github.chhorz.javadoc.tags.Tag;
 import com.vladsch.flexmark.html2md.converter.FlexmarkHtmlConverter;
 
 /**
@@ -41,7 +39,7 @@ public class JavadocParser {
     private static final Set<String> IGNORED = CollectionUtils.setOf("see", "since", "author", "version", "deprecated", "throws", "exception", "category");
 
     private final FlexmarkHtmlConverter htmlToMarkdownConverter = FlexmarkHtmlConverter.builder()
-            .build();
+        .build();
 
     /**
      * Parse the javadoc in a {@link JavadocDescription}.
@@ -56,19 +54,19 @@ public class JavadocParser {
             return null;
         }
 
-        JavaDocParser javaDocParser = JavaDocParserBuilder
+        var javaDocParser = JavaDocParserBuilder
             .withAllKnownTags()
             .withOutputType(OutputType.HTML)
             .build();
 
         JavaDoc javaDoc = javaDocParser.parse(text.strip());
 
-        JavadocDescription javadocDescription = new JavadocDescription();
+        var javadocDescription = new JavadocDescription();
         javadocDescription.setMethodSummary(htmlToMarkdownConverter.convert(javaDoc.getSummary()).strip());
         javadocDescription.setMethodDescription(htmlToMarkdownConverter.convert(javaDoc.getDescription()).strip());
 
         if (CollectionUtils.isNotEmpty(javaDoc.getTags())) {
-            for (Tag tag : javaDoc.getTags()) {
+            for (var tag : javaDoc.getTags()) {
                 if (IGNORED.contains(tag.getTagName())) {
                     continue;
                 }
