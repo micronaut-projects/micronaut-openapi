@@ -206,6 +206,16 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
     }
 
     @Test
+    void generateAuth() {
+        var codegen = new KotlinMicronautServerCodegen();
+        codegen.additionalProperties().put(KotlinMicronautServerCodegen.OPT_USE_AUTH, true);
+        String outputPath = generateFiles(codegen, PETSTORE_PATH, CodegenConstants.MODELS, CodegenConstants.APIS);
+
+        String apiPath = outputPath + "src/main/kotlin/org/openapitools/api/";
+        assertFileContains(apiPath + "PetApi.kt", "SecurityRequirement(name = \"petstore_auth\", scopes = [\"write:pets\", \"read:pets\"])");
+    }
+
+    @Test
     void doGenerateMonoWrapHttpResponse() {
         var codegen = new KotlinMicronautServerCodegen();
         codegen.additionalProperties().put(KotlinMicronautServerCodegen.OPT_REACTIVE, "true");

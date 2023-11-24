@@ -57,7 +57,7 @@
         ]{{/hasParams}}{{#hasAuthMethods}},
         security = [
             {{#authMethods}}
-            SecurityRequirement(name = "{{name}}"{{#isOAuth}}, scopes = {{openbrace}}{{#scopes}}"{{scope}}"{{^-last}}, {{/-last}}{{/scopes}}{{closebrace}}{{/isOAuth}}){{^-last}},{{/-last}}
+            SecurityRequirement(name = "{{name}}"{{#isOAuth}}, scopes = [{{#scopes}}"{{scope}}"{{^-last}}, {{/-last}}{{/scopes}}]{{/isOAuth}}){{^-last}},{{/-last}}
             {{/authMethods}}
         ]{{/hasAuthMethods}}
     )

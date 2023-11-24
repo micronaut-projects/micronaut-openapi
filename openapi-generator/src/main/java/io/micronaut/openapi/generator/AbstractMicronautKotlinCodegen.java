@@ -80,7 +80,6 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
     public static final String OPT_TITLE = "title";
     public static final String OPT_TEST = "test";
     public static final String OPT_TEST_JUNIT = "junit";
-    public static final String OPT_TEST_SPOCK = "spock";
     public static final String OPT_REQUIRED_PROPERTIES_IN_CONSTRUCTOR = "requiredPropertiesInConstructor";
     public static final String OPT_USE_AUTH = "useAuth";
     public static final String OPT_FLUX_FOR_ARRAYS = "fluxForArrays";
@@ -544,7 +543,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
     private void maybeSetTestTool() {
         if (additionalProperties.containsKey(OPT_TEST)) {
             switch ((String) additionalProperties.get(OPT_TEST)) {
-                case OPT_TEST_JUNIT, OPT_TEST_SPOCK ->
+                case OPT_TEST_JUNIT ->
                     testTool = (String) additionalProperties.get(OPT_TEST);
                 default ->
                     throw new RuntimeException("Test tool \"" + additionalProperties.get(OPT_TEST) + "\" is not supported or misspelled.");
