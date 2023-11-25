@@ -4,12 +4,10 @@ import java.util.stream.Stream;
 
 import io.micronaut.openapi.generator.MicronautCodeGeneratorOptionsBuilder.GeneratorLanguage;
 
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.openapitools.codegen.CodegenConstants;
-import org.openapitools.codegen.DefaultCodegen;
 
 import static io.micronaut.openapi.generator.MicronautCodeGeneratorOptionsBuilder.GeneratorLanguage.JAVA;
 import static io.micronaut.openapi.generator.MicronautCodeGeneratorOptionsBuilder.GeneratorLanguage.KOTLIN;

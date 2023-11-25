@@ -1,5 +1,6 @@
 package io.micronaut.openapi;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 import javax.xml.namespace.QName;
@@ -8,6 +9,9 @@ import javax.xml.namespace.QName;
  * This class is copy of jakarta.xml.bind.api.JAXBElement
  */
 public class JAXBElement<T> implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     /**
      * xml element tag name
@@ -30,7 +34,7 @@ public class JAXBElement<T> implements Serializable {
     /**
      * true iff the xml element instance has xsi:nil="true".
      */
-    protected boolean nil = false;
+    protected boolean nil;
 
     /**
      * Designates global scope for an xml element.
@@ -169,6 +173,4 @@ public class JAXBElement<T> implements Serializable {
         }
         return value.getClass() != declaredType;
     }
-
-    private static final long serialVersionUID = 1L;
 }

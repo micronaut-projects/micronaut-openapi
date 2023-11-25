@@ -32,7 +32,7 @@ import com.fasterxml.jackson.databind.ser.ResolvableSerializer;
  */
 public class MediaTypeSerializer extends JsonSerializer<MediaType> implements ResolvableSerializer {
 
-    private JsonSerializer<Object> defaultSerializer;
+    private final JsonSerializer<Object> defaultSerializer;
 
     public MediaTypeSerializer(JsonSerializer<Object> serializer) {
         defaultSerializer = serializer;

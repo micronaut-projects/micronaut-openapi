@@ -92,7 +92,7 @@ public final class ContextUtils {
                         count++;
                     }
                 }
-                // now this is classesOutputDir, parent of META-INF direcory
+                // now this is classesOutputDir, parent of META-INF directory
                 generatedFilePath = generatedFilePath.getParent();
 
                 context.put(MICRONAUT_INTERNAL_CLASSPATH_OUTPUT, generatedFilePath);

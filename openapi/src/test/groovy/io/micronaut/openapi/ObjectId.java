@@ -2,6 +2,7 @@ package io.micronaut.openapi;
 
 import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
+import java.io.Serial;
 import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.security.SecureRandom;
@@ -15,6 +16,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public final class ObjectId implements Comparable<ObjectId>, Serializable {
 
     // unused, as this class uses a proxy for serialization
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private static final int OBJECT_ID_LENGTH = 12;
@@ -26,9 +28,10 @@ public final class ObjectId implements Comparable<ObjectId>, Serializable {
 
     private static final AtomicInteger NEXT_COUNTER = new AtomicInteger(new SecureRandom().nextInt());
 
-    private static final char[] HEX_CHARS = new char[]{
+    private static final char[] HEX_CHARS = {
         '0', '1', '2', '3', '4', '5', '6', '7',
-        '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
+        '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'
+    };
 
     /**
      * The timestamp
@@ -280,6 +283,7 @@ public final class ObjectId implements Comparable<ObjectId>, Serializable {
         return toHexString();
     }
 
+    @Serial
     private void readObject(final ObjectInputStream stream) throws InvalidObjectException {
         throw new InvalidObjectException("Proxy required");
     }
@@ -305,6 +309,7 @@ public final class ObjectId implements Comparable<ObjectId>, Serializable {
             bytes = objectId.toByteArray();
         }
 
+        @Serial
         private Object readResolve() {
             return new ObjectId(bytes);
         }

@@ -3,10 +3,10 @@ the project directory through the annotation processor setting `micronaut.openap
 
 .Gradle
 [source,groovy]
-```
+----
 kapt {
     arguments {
         arg("micronaut.openapi.project.dir", projectDir.toString())
     }
 }
-```
+----

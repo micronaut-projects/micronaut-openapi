@@ -90,7 +90,7 @@ public class EndpointsConfiguration {
                     case "security-requirements" -> endpoint.setSecurityRequirements(parseSecurityRequirements(entry.getValue(), context));
                     case "servers" -> endpoint.setServers(parseServers(entry.getValue(), context));
                     case "tags" -> endpoint.setTags(parseTags(entry.getValue()));
-                    case "class" -> endpoint.setClassElement(context.getClassElement(entry.getValue()));
+                    case "class" -> endpoint.setClassElement(context.getClassElement(entry.getValue()).orElse(null));
                     default -> context.warn("Unknown value " + entryType, null);
                 }
             });

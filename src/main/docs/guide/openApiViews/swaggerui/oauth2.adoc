@@ -59,7 +59,7 @@ public class Application {
 }
 ----
 
-And the appropriate `@SecurityRequirement` on controllers,. eg:
+And the appropriate `@SecurityRequirement` on controllers e.g.:
 
 [source,java]
 ----

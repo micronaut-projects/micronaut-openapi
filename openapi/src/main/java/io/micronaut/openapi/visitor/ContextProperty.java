@@ -103,5 +103,5 @@ public interface ContextProperty {
     /**
      * Calculated class output directory path.
      */
-    String MICRONAUT_INTERNAL_CLASSPATH_OUTPUT = "micronaut.internal.classpath.ouptut";
+    String MICRONAUT_INTERNAL_CLASSPATH_OUTPUT = "micronaut.internal.classpath.output";
 }

@@ -1978,8 +1978,6 @@ abstract class AbstractOpenApiVisitor {
                     if (schema != null) {
                         processSuperTypes(schema, schemaName, type, definingElement, openAPI, mediaTypes, schemas, context, jsonViewClass);
                     }
-                } catch (JsonProcessingException e) {
-                    context.warn("Error reading Swagger Parameter for element [" + type + "]: " + e.getMessage(), type);
                 } finally {
                     inProgressSchemas.remove(schemaName);
                 }
@@ -2176,13 +2174,11 @@ abstract class AbstractOpenApiVisitor {
      * @param jsonViewClass Class from JsonView annotation
      *
      * @return New schema instance
-     *
-     * @throws JsonProcessingException when Json parsing fails
      */
     @SuppressWarnings("java:S3776")
     protected Schema<?> readSchema(AnnotationValue<io.swagger.v3.oas.annotations.media.Schema> schemaValue, OpenAPI openAPI, VisitorContext context,
                                    @Nullable Element type, Map<String, ClassElement> typeArgs, List<MediaType> mediaTypes,
-                                   @Nullable ClassElement jsonViewClass) throws JsonProcessingException {
+                                   @Nullable ClassElement jsonViewClass) {
         Map<CharSequence, Object> values = schemaValue.getValues()
             .entrySet()
             .stream()
@@ -2361,7 +2357,7 @@ abstract class AbstractOpenApiVisitor {
             var annName = aValue.getAnnotationName();
             var values = ((Map<String, Object>) aValue.getValues());
             var endPos = annName.contains("$") ? annName.lastIndexOf('$') : annName.length();
-            result.append(annName.substring(annName.lastIndexOf('.') + 1, endPos));
+            result.append(annName, annName.lastIndexOf('.') + 1, endPos);
             if (CollectionUtils.isNotEmpty(values)) {
                 result.append('_');
                 for (var entry : values.entrySet()) {

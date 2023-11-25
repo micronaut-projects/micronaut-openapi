@@ -135,7 +135,7 @@ public class TestUtils {
     }
 
     public static String linearize(String target) {
-        return target.replaceAll("\r?\n", "").replaceAll("\\s+", "\\s");
+        return target.replaceAll("\r?\n", "").replaceAll("\\s+", "s");
     }
 
     public static void assertFileNotContains(Path path, String... lines) {

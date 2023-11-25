@@ -31,7 +31,7 @@ class OpenApiController {
                     description = "desc 0",
                     externalDocs = @ExternalDocumentation(
                             description = "docs desc0",
-                            url = "http://externaldoc.com",
+                            url = "https://externaldoc.com",
                             extensions = {
                                     @Extension(
                                             name = "extdocs.custom1",
@@ -100,7 +100,7 @@ class MyBean {}
         openAPI.tags.get(0).description == 'desc 0'
         openAPI.tags.get(0).externalDocs
         openAPI.tags.get(0).externalDocs.description == "docs desc0"
-        openAPI.tags.get(0).externalDocs.url == "http://externaldoc.com"
+        openAPI.tags.get(0).externalDocs.url == "https://externaldoc.com"
         openAPI.tags.get(0).externalDocs.extensions.'x-extdocs.custom1'.'prop11' == 'prop11Val'
         openAPI.tags.get(0).externalDocs.extensions.'x-extdocs.custom1'.'prop12' == 'prop12Val'
         openAPI.tags.get(0).externalDocs.extensions.'x-extdocs.custom2'.'prop21' == 'prop21Val'
@@ -146,7 +146,7 @@ class OpenApiController {
             description = "desc 0",
             externalDocs = @ExternalDocumentation(
                     description = "docs desc0",
-                    url = "http://externaldoc.com",
+                    url = "https://externaldoc.com",
                     extensions = {
                             @Extension(
                                     name = "extdocs.custom1",
@@ -214,7 +214,7 @@ class MyBean {}
         openAPI.tags.get(0).description == 'desc 0'
         openAPI.tags.get(0).externalDocs
         openAPI.tags.get(0).externalDocs.description == "docs desc0"
-        openAPI.tags.get(0).externalDocs.url == "http://externaldoc.com"
+        openAPI.tags.get(0).externalDocs.url == "https://externaldoc.com"
         openAPI.tags.get(0).externalDocs.extensions.'x-extdocs.custom1'.'prop11' == 'prop11Val'
         openAPI.tags.get(0).externalDocs.extensions.'x-extdocs.custom1'.'prop12' == 'prop12Val'
         openAPI.tags.get(0).externalDocs.extensions.'x-extdocs.custom2'.'prop21' == 'prop21Val'
@@ -255,7 +255,7 @@ import io.swagger.v3.oas.annotations.tags.Tags;
                 description = "desc 0",
                 externalDocs = @ExternalDocumentation(
                         description = "docs desc0",
-                        url = "http://externaldoc.com",
+                        url = "https://externaldoc.com",
                         extensions = {
                                 @Extension(
                                         name = "extdocs.custom1",
@@ -304,7 +304,7 @@ class OpenApiController {
                     description = "desc 0",
                     externalDocs = @ExternalDocumentation(
                             description = "docs desc0",
-                            url = "http://externaldoc.com",
+                            url = "https://externaldoc.com",
                             extensions = {
                                     @Extension(
                                             name = "extdocs.custom1",
@@ -377,7 +377,7 @@ class MyBean {}
         openAPI.tags.get(0).description == 'desc 0'
         openAPI.tags.get(0).externalDocs
         openAPI.tags.get(0).externalDocs.description == "docs desc0"
-        openAPI.tags.get(0).externalDocs.url == "http://externaldoc.com"
+        openAPI.tags.get(0).externalDocs.url == "https://externaldoc.com"
         openAPI.tags.get(0).externalDocs.extensions.'x-extdocs.custom1'.'prop11' == 'prop11Val'
         openAPI.tags.get(0).externalDocs.extensions.'x-extdocs.custom1'.'prop12' == 'prop12Val'
         openAPI.tags.get(0).externalDocs.extensions.'x-extdocs.custom2'.'prop21' == 'prop21Val'
@@ -401,7 +401,7 @@ class MyBean {}
         openAPI.tags.get(3).description == 'desc 0'
         openAPI.tags.get(3).externalDocs
         openAPI.tags.get(3).externalDocs.description == "docs desc0"
-        openAPI.tags.get(3).externalDocs.url == "http://externaldoc.com"
+        openAPI.tags.get(3).externalDocs.url == "https://externaldoc.com"
         openAPI.tags.get(3).externalDocs.extensions.'x-extdocs.custom1'.'prop11' == 'prop11Val'
         openAPI.tags.get(3).externalDocs.extensions.'x-extdocs.custom1'.'prop12' == 'prop12Val'
         openAPI.tags.get(3).externalDocs.extensions.'x-extdocs.custom2'.'prop21' == 'prop21Val'
