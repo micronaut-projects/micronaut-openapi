@@ -18,7 +18,6 @@ package io.micronaut.openapi.visitor;
 import java.io.File;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.Future;
@@ -40,7 +39,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @Internal
 public final class ElementUtils {
 
-    public static final List<String> CONTAINER_TYPES = Arrays.asList(
+    public static final List<String> CONTAINER_TYPES = List.of(
         Optional.class.getName(),
         Future.class.getName(),
         "org.reactivestreams.Publisher",
@@ -53,7 +52,7 @@ public final class ElementUtils {
         "kotlinx.coroutines.flow.Flow"
     );
 
-    public static final List<String> FILE_TYPES = Arrays.asList(
+    public static final List<String> FILE_TYPES = List.of(
         // this class from micronaut-http-server
         "io.micronaut.http.server.types.files.FileCustomizableResponseType",
         File.class.getName(),
@@ -61,7 +60,7 @@ public final class ElementUtils {
         ByteBuffer.class.getName()
     );
 
-    public static final List<String> VOID_TYPES = Arrays.asList(
+    public static final List<String> VOID_TYPES = List.of(
         void.class.getName(),
         Void.class.getName(),
         "kotlin.Unit"

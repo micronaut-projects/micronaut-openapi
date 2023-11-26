@@ -1,4 +1,4 @@
-Micronaut can generate views for your generated OpenApi specification. Currently, https://github.com/swagger-api/swagger-ui[Swagger-ui], https://github.com/Rebilly/ReDoc[Redoc] and https://github.com/mrin9/RapiDoc[RapiDoc] are supported.
+Micronaut can generate views for your generated OpenApi specification. Currently, https://github.com/swagger-api/swagger-ui[Swagger-ui], https://github.com/Redocly/redoc[Redoc], https://github.com/Authress-Engineering/openapi-explorer[OpenAPI Explorer] and https://github.com/rapi-doc/RapiDoc[RapiDoc] are supported.
 You can also use https://mrin9.github.io/RapiPdf/[RapiPdf] to generate a PDF from your spec file.
 
 You can enable multiple views generation in a single application.

@@ -15,7 +15,6 @@
  */
 package io.micronaut.openapi.view;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -42,7 +41,7 @@ final class SwaggerUIConfig extends AbstractViewConfig {
 
     private static final String DEFAULT_SWAGGER_JS_PATH = OpenApiViewConfig.RESOURCE_DIR + "/";
 
-    private static final List<String> RESOURCE_FILES = Arrays.asList(
+    private static final List<String> RESOURCE_FILES = List.of(
         DEFAULT_SWAGGER_JS_PATH + "swagger-ui.css",
         DEFAULT_SWAGGER_JS_PATH + "favicon-16x16.png",
         DEFAULT_SWAGGER_JS_PATH + "favicon-32x32.png",

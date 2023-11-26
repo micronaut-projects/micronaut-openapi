@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.security.Principal;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -1888,8 +1887,8 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             return;
         }
         for (AnnotationValue<OpenAPIGroup> annValue : annotationValues) {
-            groups.addAll(Arrays.asList(annValue.stringValues("value")));
-            excludedGroups.addAll(Arrays.asList(annValue.stringValues("exclude")));
+            groups.addAll(List.of(annValue.stringValues("value")));
+            excludedGroups.addAll(List.of(annValue.stringValues("exclude")));
         }
         Set<String> allKnownGroups = Utils.getAllKnownGroups();
         allKnownGroups.addAll(groups);

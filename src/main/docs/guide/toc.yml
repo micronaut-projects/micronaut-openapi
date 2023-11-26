@@ -49,6 +49,7 @@ openApiViews:
     title: Swagger-UI
     oauth2: Swagger UI - OAuth 2.0 configuration
   redoc: Redoc
+  openapiExplorer: OpenAPI Explorer
   rapidoc: RapiDoc
   rapipdf: RapiPdf
 convertToAdoc: Conversion to Asciidoc

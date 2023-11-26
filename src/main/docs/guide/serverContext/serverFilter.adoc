@@ -26,7 +26,7 @@ import io.micronaut.http.filter.HttpServerFilter;
 import io.micronaut.http.filter.ServerFilterChain;
 
 @Requires(property = "micronaut.server.context-path")
-@Filter(methods = {HttpMethod.GET, HttpMethod.HEAD}, patterns = {"/**/rapidoc*", "/**/redoc*", "/**/swagger-ui*"})
+@Filter(methods = {HttpMethod.GET, HttpMethod.HEAD}, patterns = {"/**/rapidoc*", "/**/redoc*", "/**/swagger-ui*", "/**/openapi-explorer*"})
 public class OpenApiViewCookieContextPathFilter implements HttpServerFilter {
 
     private final Cookie contextPathCookie;
@@ -68,7 +68,7 @@ import io.micronaut.http.filter.ServerFilterChain;
 
 @Filter(
 	methods = {HttpMethod.GET, HttpMethod.HEAD},
-	patterns = {"/**/rapidoc*", "/**/redoc*", "/**/swagger-ui*"}
+	patterns = {"/**/rapidoc*", "/**/redoc*", "/**/swagger-ui*", "/**/openapi-explorer*"}
 )
 @Requires(property = "micronaut.server.context-path-header")
 public class OpenApiContextPathFilter implements HttpServerFilter {

@@ -1139,7 +1139,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
             if (groovy) {
                 example = "[" + innerExample + "]";
             } else {
-                example = "Arrays.asList(" + innerExample + ")";
+                example = "List.of(" + innerExample + ")";
             }
         } else if ("Set".equals(containerType)) {
             if (groovy) {

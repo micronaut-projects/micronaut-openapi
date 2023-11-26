@@ -15,7 +15,6 @@
  */
 package io.micronaut.openapi.visitor;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -56,8 +55,8 @@ public class OpenApiIncludeVisitor implements TypeElementVisitor<OpenAPIIncludes
                 List<AnnotationValue<Tag>> tags = includeAnnotation.getAnnotations("tags", Tag.class);
                 List<AnnotationValue<SecurityRequirement>> security = includeAnnotation.getAnnotations("security", SecurityRequirement.class);
                 Optional<String> customUri = includeAnnotation.stringValue("uri");
-                List<String> groups = Arrays.asList(includeAnnotation.stringValues("groups"));
-                List<String> groupsExcluded = Arrays.asList(includeAnnotation.stringValues("groupsExcluded"));
+                List<String> groups = List.of(includeAnnotation.stringValues("groups"));
+                List<String> groupsExcluded = List.of(includeAnnotation.stringValues("groupsExcluded"));
 
                 OpenApiGroupInfoVisitor groupVisitor = new OpenApiGroupInfoVisitor(groups, groupsExcluded);
                 OpenApiControllerVisitor controllerVisitor = new OpenApiControllerVisitor(tags, security, customUri.orElse(null));

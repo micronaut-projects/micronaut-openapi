@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1,user-scalable=yes">
+    <title>OpenAPI Explorer</title>
+    <link rel="stylesheet" href="{{openapi-explorer.js.url.prefix}}default.min.css">
+    <link rel="stylesheet" href="{{openapi-explorer.js.url.prefix}}bootstrap.min.css" crossorigin="anonymous">
+    <link rel="stylesheet" href="{{openapi-explorer.js.url.prefix}}font-awesome.min.css">
+    <script src="{{openapi-explorer.js.url.prefix}}openapi-explorer.min.js" type="module" defer></script>
+    <style>
+        html, body {
+            height: 100%
+        }
+
+        :root {
+            --primary: #1D2F3B;
+            --secondary: #FBAF0B;
+            --dark: #000515;
+            --horizon: #DEE2E6;
+            --light: #FFFFFF;
+            --gray: #465865;
+            --info: #FFFFFF;
+            --border: #98A1A9;
+            --embossed: #A9D2E9;
+            --highlight: #DC7100;
+        }
+
+        :openapi-explorer {
+            --primary: #1D2F3B;
+            --secondary: #FBAF0B;
+            --dark: #000515;
+            --horizon: #DEE2E6;
+            --light: #FFFFFF;
+            --gray: #465865;
+            --info: #FFFFFF;
+            --border: #98A1A9;
+            --embossed: #A9D2E9;
+            --highlight: #DC7100;
+        }
+        openapi-explorer {
+            height: calc(100% - 56px);
+        }
+
+        .fixed-in-bottom-corner {
+            z-index: 100;
+            position: fixed;
+            bottom: .5em;
+            right: 1.5em;
+        }
+
+        .contact-us {
+            cursor: pointer;
+        }
+        .contact-us > * {
+            color: var(--light);
+            background-color: var(--primary) !important;
+        }
+        .badge {
+            font-size: inherit;
+            height: 2rem;
+            border-radius: 100px;
+            padding: 0 0.75rem;
+        }
+    </style>
+</head>
+<body>
+
+
+<nav class="navbar navbar-dark bg-dark">
+    <div class="container-fluid w-100 d-flex justify-content-between align-items-center">
+        <div class="">
+            <div class="navbar-brand d-none d-sm-inline-flex align-items-center" href="#">
+                <span>OpenAPI Explorer</span>
+            </div>
+        </div>
+        <form id="loadSpecForm" class="d-flex">
+            <input id="specUrl" class="form-control me-2" type="search" placeholder="Your OpenAPI url here" aria-label="SpecUrl" style="max-width: 400px">
+            <div class="d-flex align-items-center">
+                <button id="loadButton" class="btn btn-primary btn-sm" type="submit">Load</button>
+            </div>
+        </form>
+    </div>
+</nav>
+<openapi-explorer id="openapi-explorer" {{openapi-explorer.attributes}}>
+    <slot name="overview">
+        <div class="alert alert-primary d-flex align-items-center m-4" role="alert">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-exclamation-triangle-fill flex-shrink-0 me-2" viewBox="0 0 16 16" role="img" aria-label="Warning:">
+                <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/>
+            </svg>
+            <small>
+                The Authress API is an example OpenAPI loaded to show how the OpenAPI Explorer works. Try it out with your own OpenAPI spec, but using the load url in the navigation bar at the top of the screen.
+            </small>
+        </div>
+    </slot>
+</openapi-explorer>
+
+<!--collapse table schema-description-expanded="true" nav-item-spacing="compact" show-components="true" bg-color="#FFFFFF" header-bg-color="#DEE2E6" nav-bg-color="#1D2F3B" text-color="#465865" nav-hover-text-color="#FFFFFF" primary-color="#1D2F3B" secondary-color="#FBAF0B"-->
+<script>
+    const extract = function(v) {
+            return decodeURIComponent(v.replace(/(?:(?:^|.*;\s*)contextPath\s*\=\s*([^;]*).*$)|^.*$/, "$1"));
+        },
+        cookie = extract(document.cookie),
+        contextPath = cookie === '' ? extract(window.location.search.substring(1)) : cookie,
+        openApiExplorer = document.getElementById('openapi-explorer');
+    let specUrl = '{{specURL}}';
+    if (contextPath !== '') {
+        specUrl = contextPath + '{{specURL}}';
+        openApiExplorer.setAttribute('spec-url', specUrl);
+        openApiExplorer.addEventListener('spec-loaded', e => {
+            e.detail.tags.forEach(tag => tag.paths.forEach(path => path.path = contextPath + path.path));
+            openApiExplorer.requestUpdate();
+        });
+    }
+    openApiExplorer.setAttribute('spec-url', specUrl);
+    document.addEventListener('DOMContentLoaded', async () => {
+        const specUrl = document.getElementById('specUrl');
+        const currentSpecUrl = new URLSearchParams(window.location.search);
+        const newSpecUrl = currentSpecUrl.get('specUrl') || currentSpecUrl.get('url') || currentSpecUrl.get('spec');
+        if (newSpecUrl) {
+            document.getElementsByTagName("openapi-explorer")[0].setAttribute('spec-url', newSpecUrl);
+            specUrl.value = newSpecUrl;
+        }
+
+        const loadButton = document.getElementById('loadButton');
+        loadButton.addEventListener('click', () => {
+            try {
+                const newUrl = new URL(window.location);
+                newUrl.searchParams.set('url', specUrl.value);
+                window.location.assign(newUrl.toString());
+                document.getElementsByTagName("openapi-explorer")[0].setAttribute('spec-url', specUrl.value);
+            } catch (error) {
+                console.error('Failed to set spec url into url address bar', error);
+            }
+        });
+    });
+    {{rapipdf.specurl}}
+</script>
+
+</body>
+</html>
