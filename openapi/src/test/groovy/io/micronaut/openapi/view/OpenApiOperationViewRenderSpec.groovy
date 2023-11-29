@@ -385,6 +385,6 @@ class OpenApiOperationViewRenderSpec extends Specification {
 
         then:
         indexText.contains(cfg.getSpecURL(cfg.swaggerUIConfig, null))
-        indexText.contains("urls: [{url: contextPath + '/swagger/swagger.yml, name: '1'}],")
+        indexText.contains("urls: [{url: contextPath + '/swagger/swagger.yml', name: '1'}],")
     }
 }

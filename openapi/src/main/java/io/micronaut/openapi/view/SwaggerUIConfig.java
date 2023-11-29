@@ -295,7 +295,7 @@ final class SwaggerUIConfig extends AbstractViewConfig {
                 result.append(',');
             }
             result.append("{url: contextPath + '").append(url.url())
-                .append(", name: '").append(url.name()).append("'}");
+                .append("', name: '").append(url.name()).append("'}");
             isFirst = false;
         }
         result.append("],");
