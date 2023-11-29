@@ -8,7 +8,7 @@ managed-freemarker = "2.3.32"
 managed-pegdown = "1.6.0"
 
 kotlin = "1.9.21"
-ksp = "1.9.20-1.0.14"
+ksp = "1.9.21-1.0.15"
 jspecify = "0.3.0"
 jdt-annotation = "2.2.700"
 android-annotation = "1.7.0"
