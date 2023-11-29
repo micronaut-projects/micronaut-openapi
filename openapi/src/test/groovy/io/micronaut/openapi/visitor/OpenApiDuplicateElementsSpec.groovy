@@ -69,9 +69,9 @@ paths:
             - write_pets
             - read_pets
 servers:
-  - url: http://petstore.swagger.io/v2
-  - url: http://petstore.swagger.io/v2
-  - url: http://petstore.swagger.io/v2
+  - url: https://petstore.swagger.io/v2
+  - url: https://petstore.swagger.io/v2
+  - url: https://petstore.swagger.io/v2
 components:
   schemas:
     Pet:

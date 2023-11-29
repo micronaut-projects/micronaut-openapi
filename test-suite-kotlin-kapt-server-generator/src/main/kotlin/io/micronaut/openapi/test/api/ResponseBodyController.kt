@@ -84,12 +84,12 @@ open class ResponseBodyController : ResponseBodyApi {
         )
 
         @JvmField
-        val DATE_TIME_INSTANCE = OffsetDateTime.parse("2022-12-04T11:35:00.784Z")
+        val DATE_TIME_INSTANCE: ZonedDateTime = OffsetDateTime.parse("2022-12-04T11:35:00.784Z")
                 .atZoneSameInstant(ZoneId.of("America/Toronto"))
 
         val DATE_MODEL_INSTANCE = DateModel(LocalDate.of(2023, 6, 27), DATE_TIME_INSTANCE)
 
         const val LAST_MODIFIED_STRING = "2023-01-24T10:15:59.100+06:00"
-        val LAST_MODIFIED_DATE = ZonedDateTime.parse(LAST_MODIFIED_STRING)
+        val LAST_MODIFIED_DATE: ZonedDateTime = ZonedDateTime.parse(LAST_MODIFIED_STRING)
     }
 }

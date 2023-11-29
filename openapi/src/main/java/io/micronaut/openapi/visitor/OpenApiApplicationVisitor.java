@@ -569,7 +569,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
     }
 
     private OpenAPI addOpenApiInfo(String group, String version, OpenAPI openApi, Map<Pair<String, String>,
-                                    OpenApiInfo> openApiInfoMap, VisitorContext context) {
+        OpenApiInfo> openApiInfoMap, VisitorContext context) {
         GroupProperties groupProperties = getGroupProperties(group, context);
         boolean hasGroupProperties = groupProperties != null;
 
@@ -1091,21 +1091,19 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                         Utils.setTestJsonReference(writer.toString());
                     }
                 } else {
-                    @SuppressWarnings("OptionalGetWithoutIsPresent")
-                    Path specPath = specFile;
-                    context.info("Writing OpenAPI file to destination: " + specPath);
+                    context.info("Writing OpenAPI file to destination: " + specFile);
                     viewsDestDirs = getViewsDestDir(getDefaultFilePath(openApiInfo.getFilename(), context), context);
                     context.info("Writing OpenAPI views to destination: " + viewsDestDirs);
                     final Path viewsDestDirsFinal = viewsDestDirs;
                     var classesOutputPath = ContextUtils.getClassesOutputPath(context);
                     if (classesOutputPath != null) {
-                        // add relative paths for the specPath, and its parent META-INF/swagger
+                        // add relative paths for the specFile, and its parent META-INF/swagger
                         // so that micronaut-graal visitor knows about them
-                        context.addGeneratedResource(classesOutputPath.relativize(specPath).toString());
-                        context.addGeneratedResource(classesOutputPath.relativize(specPath.getParent()).toString());
+                        context.addGeneratedResource(classesOutputPath.relativize(specFile).toString());
+                        context.addGeneratedResource(classesOutputPath.relativize(specFile.getParent()).toString());
                         context.addGeneratedResource(classesOutputPath.relativize(viewsDestDirsFinal).toString());
                     }
-                    openApiInfo.setSpecFilePath(specPath.getFileName().toString());
+                    openApiInfo.setSpecFilePath(specFile.getFileName().toString());
 
                     if (isAdocModuleInClassPath && isGlobalAdocEnabled && openApiInfo.isAdocEnabled()) {
                         var adocProperties = getAdocProperties(openApiInfo, openApiInfos.size() == 1, context);
@@ -1141,21 +1139,23 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
     private void processEndpoints(VisitorContext context) {
         EndpointsConfiguration endpointsCfg = endpointsConfiguration(context);
         if (endpointsCfg.isEnabled() && CollectionUtils.isNotEmpty(endpointsCfg.getEndpoints())) {
-            OpenApiEndpointVisitor visitor = new OpenApiEndpointVisitor(true);
-            endpointsCfg.getEndpoints().values().stream()
-                .filter(endpoint -> endpoint.getClassElement().isPresent())
-                .forEach(endpoint -> {
-                    ClassElement classEl = endpoint.getClassElement().get();
-                    context.put(MICRONAUT_INTERNAL_OPENAPI_ENDPOINT_CLASS_TAGS, endpoint.getTags());
-                    context.put(MICRONAUT_INTERNAL_OPENAPI_ENDPOINT_SERVERS, endpoint.getServers());
-                    context.put(MICRONAUT_INTERNAL_OPENAPI_ENDPOINT_SECURITY_REQUIREMENTS, endpoint.getSecurityRequirements());
-                    visitor.visitClass(classEl, context);
-                    for (MethodElement methodEl : classEl.getEnclosedElements(ElementQuery.ALL_METHODS
-                        .modifiers(mods -> !mods.contains(ElementModifier.STATIC) && !mods.contains(ElementModifier.PRIVATE))
-                        .named(name -> !name.contains("$")))) {
-                        visitor.visitMethod(methodEl, context);
-                    }
-                });
+            var visitor = new OpenApiEndpointVisitor(true);
+            for (var endpoint : endpointsCfg.getEndpoints().values()) {
+                ClassElement classEl = endpoint.getClassElement();
+                if (classEl == null) {
+                    continue;
+                }
+                context.put(MICRONAUT_INTERNAL_OPENAPI_ENDPOINT_CLASS_TAGS, endpoint.getTags());
+                context.put(MICRONAUT_INTERNAL_OPENAPI_ENDPOINT_SERVERS, endpoint.getServers());
+                context.put(MICRONAUT_INTERNAL_OPENAPI_ENDPOINT_SECURITY_REQUIREMENTS, endpoint.getSecurityRequirements());
+                visitor.visitClass(classEl, context);
+                for (MethodElement methodEl : classEl.getEnclosedElements(ElementQuery.ALL_METHODS
+                    .modifiers(mods -> !mods.contains(ElementModifier.STATIC) && !mods.contains(ElementModifier.PRIVATE))
+                    .named(name -> !name.contains("$")))) {
+                    visitor.visitMethod(methodEl, context);
+                }
+
+            }
         }
     }
 

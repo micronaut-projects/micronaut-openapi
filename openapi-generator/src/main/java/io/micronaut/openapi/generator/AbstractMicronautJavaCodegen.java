@@ -313,7 +313,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
 
         // Get boolean properties
         if (additionalProperties.containsKey(USE_BEANVALIDATION)) {
-            setUseBeanValidation(convertPropertyToBoolean(USE_BEANVALIDATION));
+            useBeanValidation = convertPropertyToBoolean(USE_BEANVALIDATION);
         }
         writePropertyBack(USE_BEANVALIDATION, useBeanValidation);
 
@@ -333,12 +333,12 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
         writePropertyBack(OPT_GENERATED_ANNOTATION, generatedAnnotation);
 
         if (additionalProperties.containsKey(USE_OPTIONAL)) {
-            setUseOptional(convertPropertyToBoolean(USE_OPTIONAL));
+            useOptional = convertPropertyToBoolean(USE_OPTIONAL);
         }
         writePropertyBack(USE_OPTIONAL, useOptional);
 
         if (additionalProperties.containsKey(OPT_VISITABLE)) {
-            setVisitable(convertPropertyToBoolean(OPT_VISITABLE));
+            visitable = convertPropertyToBoolean(OPT_VISITABLE);
         }
         writePropertyBack(OPT_VISITABLE, visitable);
 

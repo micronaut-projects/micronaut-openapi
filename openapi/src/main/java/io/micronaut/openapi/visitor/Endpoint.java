@@ -17,7 +17,6 @@ package io.micronaut.openapi.visitor;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 import io.micronaut.inject.ast.ClassElement;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
@@ -31,7 +30,7 @@ import io.swagger.v3.oas.models.tags.Tag;
  */
 class Endpoint {
 
-    private Optional<ClassElement> element;
+    private ClassElement element;
     private List<Tag> tags = Collections.emptyList();
     private List<Server> servers = Collections.emptyList();
     private List<SecurityRequirement> securityRequirements = Collections.emptyList();
@@ -41,7 +40,7 @@ class Endpoint {
      *
      * @param element A ClassElement,
      */
-    void setClassElement(Optional<ClassElement> element) {
+    void setClassElement(ClassElement element) {
         this.element = element;
     }
 
@@ -59,7 +58,7 @@ class Endpoint {
      *
      * @return A ClassElement.
      */
-    Optional<ClassElement> getClassElement() {
+    ClassElement getClassElement() {
         return element;
     }
 

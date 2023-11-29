@@ -112,7 +112,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
                         description = "desc 0",
                         externalDocs = @ExternalDocumentation(
                                 description = "docs desc0",
-                                url = "http://externaldoc.com",
+                                url = "https://externaldoc.com",
                                 extensions = {
                                         @Extension(
                                                 name = "extdocs.custom1",
@@ -153,7 +153,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
         },
         externalDocs = @ExternalDocumentation(
                 description = "definition docs desc",
-                url = "http://externaldoc.com",
+                url = "https://externaldoc.com",
                 extensions = {
                         @Extension(
                                 name = "extdocs.custom1",
@@ -297,7 +297,7 @@ class MyBean {}
         openAPI.tags.get(0).name == 'Tag 0'
         openAPI.tags.get(0).description == 'desc 0'
         openAPI.tags.get(0).externalDocs.description == 'docs desc0'
-        openAPI.tags.get(0).externalDocs.url == 'http://externaldoc.com'
+        openAPI.tags.get(0).externalDocs.url == 'https://externaldoc.com'
         openAPI.tags.get(0).externalDocs.extensions.size() == 2
         openAPI.tags.get(0).externalDocs.extensions.'x-extdocs.custom1'.prop11 == 'prop11Val'
         openAPI.tags.get(0).externalDocs.extensions.'x-extdocs.custom1'.prop12 == 'prop12Val'
@@ -320,7 +320,7 @@ class MyBean {}
         openAPI.tags.get(3).name == 'Tag 3'
 
         openAPI.externalDocs.description == 'definition docs desc'
-        openAPI.externalDocs.url == 'http://externaldoc.com'
+        openAPI.externalDocs.url == 'https://externaldoc.com'
         openAPI.externalDocs.extensions.size() == 2
         openAPI.externalDocs.extensions.'x-extdocs.custom1'.prop11 == 'prop11Val'
         openAPI.externalDocs.extensions.'x-extdocs.custom1'.prop12 == 'prop12Val'

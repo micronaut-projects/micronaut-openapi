@@ -30,8 +30,8 @@ public class JavadocDescription {
 
     private String methodSummary;
     private String methodDescription;
-    private Map<String, String> parameters = new HashMap<>(4);
     private String returnDescription;
+    private final Map<String, String> parameters = new HashMap<>(4);
 
     /**
      * @return method summary

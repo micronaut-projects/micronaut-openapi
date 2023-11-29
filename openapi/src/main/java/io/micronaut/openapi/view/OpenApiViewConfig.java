@@ -351,7 +351,7 @@ public final class OpenApiViewConfig {
 
         template = cfg.render(template, context);
         template = replacePlaceHolder(template, "specURL", getSpecURL(cfg, context), "");
-        template = replacePlaceHolder(template, "title", getTitle(), "");
+        template = replacePlaceHolder(template, "title", title, "");
         if (!Files.exists(outputDir)) {
             Files.createDirectories(outputDir);
         }

@@ -32,7 +32,7 @@ import com.fasterxml.jackson.databind.ser.ResolvableSerializer;
  */
 public class Schema31Serializer extends JsonSerializer<Schema> implements ResolvableSerializer {
 
-    private JsonSerializer<Object> defaultSerializer;
+    private final JsonSerializer<Object> defaultSerializer;
 
     public Schema31Serializer(JsonSerializer<Object> serializer) {
         defaultSerializer = serializer;

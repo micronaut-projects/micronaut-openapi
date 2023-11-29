@@ -186,31 +186,31 @@ public enum PrimitiveType {
     /**
      * Allows to exclude specific classes from KEY_CLASSES mappings to primitive
      */
-    private static Set<String> customExcludedClasses = ConcurrentHashMap.newKeySet();
+    private static final Set<String> customExcludedClasses = ConcurrentHashMap.newKeySet();
 
     /**
      * Allows to exclude specific classes from EXTERNAL_CLASSES mappings to primitive
      */
-    private static Set<String> customExcludedExternalClasses = ConcurrentHashMap.newKeySet();
+    private static final Set<String> customExcludedExternalClasses = ConcurrentHashMap.newKeySet();
 
 
     /**
      * Adds support for custom mapping of classes to primitive types
      */
-    private static Map<String, PrimitiveType> customClasses = new ConcurrentHashMap<>();
+    private static final Map<String, PrimitiveType> customClasses = new ConcurrentHashMap<>();
 
     /**
      * class qualified names prefixes to be considered as "system" types
      */
-    private static Set<String> systemPrefixes = ConcurrentHashMap.newKeySet();
+    private static final Set<String> systemPrefixes = ConcurrentHashMap.newKeySet();
     /**
      * class qualified names NOT to be considered as "system" types
      */
-    private static Set<String> nonSystemTypes = ConcurrentHashMap.newKeySet();
+    private static final Set<String> nonSystemTypes = ConcurrentHashMap.newKeySet();
     /**
      * package names NOT to be considered as "system" types
      */
-    private static Set<String> nonSystemTypePackages = ConcurrentHashMap.newKeySet();
+    private static final Set<String> nonSystemTypePackages = ConcurrentHashMap.newKeySet();
 
     /**
      * Alternative names for primitive types that have to be supported for
