@@ -91,6 +91,11 @@ final class RapiPDFConfig extends AbstractViewConfig {
 
     boolean enabled; //false
 
+    @Override
+    public boolean isEnabled() {
+        return enabled;
+    }
+
     private RapiPDFConfig(Map<Pair<String, String>, OpenApiInfo> openApiInfos) {
         super("rapipdf.", openApiInfos);
         jsUrl = DEFAULT_RAPIPDF_JS_PATH;
@@ -122,7 +127,7 @@ final class RapiPDFConfig extends AbstractViewConfig {
      * @return The template with placeholders replaced.
      */
     String render(String template, RendererType rendererType, VisitorContext context) {
-        if (enabled) {
+        if (isEnabled()) {
             String style = (String) options.get("style");
             boolean styleUpdated = false;
             if (style == null || style.isBlank()) {
