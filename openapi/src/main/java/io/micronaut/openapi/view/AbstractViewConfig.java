@@ -24,6 +24,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import io.micronaut.core.util.StringUtils;
+import io.micronaut.core.util.Toggleable;
 import io.micronaut.inject.visitor.VisitorContext;
 import io.micronaut.openapi.visitor.ConfigUtils;
 import io.micronaut.openapi.visitor.Pair;
@@ -40,7 +41,7 @@ import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_SERVE
  *
  * @author croudet
  */
-abstract class AbstractViewConfig {
+abstract class AbstractViewConfig implements Toggleable {
 
     protected String prefix;
     protected String jsUrl = "";
