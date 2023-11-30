@@ -15,7 +15,7 @@ class OpenApiOperationViewParseSpec extends Specification {
 
     void "test parse OpenApiView specification, views enabled"() {
         given:
-        String spec = "mapping.path=somewhere,redoc.enabled=true,rapidoc.enabled=true,swagger-ui.enabled=true"
+        String spec = "mapping.path=somewhere,redoc.enabled=true,rapidoc.enabled=true,swagger-ui.enabled=true,openapi-explorer.enabled=true"
         OpenApiViewConfig cfg = OpenApiViewConfig.fromSpecification(spec, null, new Properties(), null)
 
         expect:
@@ -24,6 +24,7 @@ class OpenApiOperationViewParseSpec extends Specification {
         cfg.rapidocConfig != null
         cfg.redocConfig != null
         cfg.swaggerUIConfig != null
+        cfg.openApiExplorerConfig != null
     }
 
     void "test parse OpenApiView specification, redoc enabled"() {
@@ -36,6 +37,7 @@ class OpenApiOperationViewParseSpec extends Specification {
         cfg.mappingPath == "swagger"
         cfg.rapidocConfig == null
         cfg.swaggerUIConfig == null
+        cfg.openApiExplorerConfig == null
         cfg.redocConfig != null
         cfg.redocConfig.jsUrl == "version123"
         cfg.redocConfig.specUrl == "/my/spec/file.yml"
@@ -51,6 +53,7 @@ class OpenApiOperationViewParseSpec extends Specification {
         cfg.mappingPath == "swagger"
         cfg.redocConfig == null
         cfg.swaggerUIConfig == null
+        cfg.openApiExplorerConfig == null
         cfg.rapidocConfig != null
         cfg.rapidocConfig.jsUrl == "version123"
         cfg.rapidocConfig.specUrl == "/my/spec/file.yml"
@@ -68,11 +71,28 @@ class OpenApiOperationViewParseSpec extends Specification {
         cfg.mappingPath == "swagger"
         cfg.redocConfig == null
         cfg.rapidocConfig == null
+        cfg.openApiExplorerConfig == null
         cfg.swaggerUIConfig != null
         cfg.swaggerUIConfig.jsUrl == "version123"
         cfg.swaggerUIConfig.specUrl == "/my/spec/file.yml"
         cfg.swaggerUIConfig.theme == SwaggerUIConfig.Theme.FLATTOP
         cfg.swaggerUIConfig.options['deepLinking'] == false
         cfg.swaggerUIConfig.options['persistAuthorization'] == true
+    }
+
+    void "test parse OpenApiView specification, OpenAPI Explorer enabled"() {
+        given:
+        String spec = "openapi-explorer.enabled=true,openapi-explorer.js.url=version123,openapi-explorer.spec.url=/my/spec/file.yml"
+        OpenApiViewConfig cfg = OpenApiViewConfig.fromSpecification(spec, null, new Properties(), null)
+
+        expect:
+        cfg.enabled == true
+        cfg.mappingPath == "swagger"
+        cfg.rapidocConfig == null
+        cfg.swaggerUIConfig == null
+        cfg.redocConfig == null
+        cfg.openApiExplorerConfig != null
+        cfg.openApiExplorerConfig.jsUrl == "version123"
+        cfg.openApiExplorerConfig.specUrl == "/my/spec/file.yml"
     }
 }

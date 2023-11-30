@@ -669,7 +669,7 @@ abstract class AbstractOpenApiVisitor {
         final Map<CharSequence, Object> arraySchemaMap = new HashMap<>(10);
         // properties
         av.get("arraySchema", AnnotationValue.class).ifPresent(annotationValue ->
-            processAnnotationValue(context, (AnnotationValue<?>) annotationValue, arraySchemaMap, Arrays.asList("ref", "implementation"), Schema.class, null)
+            processAnnotationValue(context, (AnnotationValue<?>) annotationValue, arraySchemaMap, List.of("ref", "implementation"), Schema.class, null)
         );
         // items
         av.get("schema", AnnotationValue.class).ifPresent(annotationValue -> {
@@ -705,7 +705,7 @@ abstract class AbstractOpenApiVisitor {
             }
         });
         // other properties (minItems,...)
-        processAnnotationValue(context, av, arraySchemaMap, Arrays.asList("schema", "arraySchema"), ArraySchema.class, null);
+        processAnnotationValue(context, av, arraySchemaMap, List.of("schema", "arraySchema"), ArraySchema.class, null);
         return arraySchemaMap;
     }
 

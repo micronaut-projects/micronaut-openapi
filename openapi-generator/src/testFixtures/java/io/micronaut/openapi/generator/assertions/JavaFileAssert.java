@@ -119,13 +119,13 @@ public class JavaFileAssert extends AbstractAssert<JavaFileAssert, CompilationUn
 
     public JavaFileAssert hasImports(final String... imports) {
         Assertions.assertThat(actual.getImports().stream().map(NodeWithName::getNameAsString))
-            .containsAll(Arrays.asList(imports));
+            .containsAll(List.of(imports));
         return this;
     }
 
     public JavaFileAssert hasNoImports(final String... imports) {
         Assertions.assertThat(actual.getImports().stream().map(NodeWithName::getNameAsString))
-            .doesNotContainAnyElementsOf(Arrays.asList(imports));
+            .doesNotContainAnyElementsOf(List.of(imports));
         return this;
     }
 

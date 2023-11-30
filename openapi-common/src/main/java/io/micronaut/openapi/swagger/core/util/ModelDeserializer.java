@@ -16,7 +16,6 @@
 package io.micronaut.openapi.swagger.core.util;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -74,7 +73,7 @@ public class ModelDeserializer extends JsonDeserializer<Schema> {
             return new Schema().booleanSchemaValue(node.booleanValue());
         }
 
-        List<String> composed = Arrays.asList("allOf", "anyOf", "oneOf");
+        List<String> composed = List.of("allOf", "anyOf", "oneOf");
         for (String field : composed) {
             if (node.get(field) != null) {
                 return OpenApiUtils.getJsonMapper().convertValue(node, ComposedSchema.class);

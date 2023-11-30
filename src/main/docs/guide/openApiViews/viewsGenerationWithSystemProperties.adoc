@@ -7,7 +7,7 @@ The string syntax is a series of comma-separated key-value pairs, to enable and 
 .System Property
 [source,commandline]
 ----
--Dmicronaut.openapi.views.spec=redoc.enabled=true,rapidoc.enabled=true,swagger-ui.enabled=true,swagger-ui.theme=flattop
+-Dmicronaut.openapi.views.spec=redoc.enabled=true,rapidoc.enabled=true,openapi-explorer.enabled=true,swagger-ui.enabled=true,swagger-ui.theme=flattop
 ----
 
 For instance in Gradle for Kotlin projects:
@@ -15,14 +15,14 @@ For instance in Gradle for Kotlin projects:
 .Gradle
 [source,shell]
 ----
-JAVA_TOOL_OPTIONS=-Dmicronaut.openapi.views.spec=redoc.enabled=true,rapidoc.enabled=true,swagger-ui.enabled=true,swagger-ui.theme=flattop \
+JAVA_TOOL_OPTIONS=-Dmicronaut.openapi.views.spec=redoc.enabled=true,rapidoc.enabled=true,openapi-explorer.enabled=true,swagger-ui.enabled=true,swagger-ui.theme=flattop \
         ./gradlew --no-daemon clean assemble
 ----
 
 or in gradle.properties:
 [source,properties]
 ----
-org.gradle.jvmargs=-Dmicronaut.openapi.views.spec=redoc.enabled=true,rapidoc.enabled=true,swagger-ui.enabled=true,swagger-ui.theme=flattop
+org.gradle.jvmargs=-Dmicronaut.openapi.views.spec=redoc.enabled=true,rapidoc.enabled=true,openapi-explorer.enabled=true,swagger-ui.enabled=true,swagger-ui.theme=flattop
 ----
 
 or in build.gradle as well:
@@ -30,7 +30,7 @@ or in build.gradle as well:
 ----
 kapt {
     arguments {
-        arg("micronaut.openapi.views.spec", "redoc.enabled=true,rapidoc.enabled=true,swagger-ui.enabled=true,swagger-ui.theme=flattop")
+        arg("micronaut.openapi.views.spec", "redoc.enabled=true,rapidoc.enabled=true,openapi-explorer.enabled=true,swagger-ui.enabled=true,swagger-ui.theme=flattop")
     }
 }
 
@@ -42,7 +42,7 @@ or in Gradle for Java projects:
 ----
 tasks.withType(JavaCompile) {
     options.fork = true
-    options.forkOptions.jvmArgs << '-Dmicronaut.openapi.views.spec=rapidoc.enabled=true,swagger-ui.enabled=true,swagger-ui.theme=flattop'
+    options.forkOptions.jvmArgs << '-Dmicronaut.openapi.views.spec=rapidoc.enabled=true,openapi-explorer.enabled=true,swagger-ui.enabled=true,swagger-ui.theme=flattop'
 
     ...
 }
@@ -54,7 +54,7 @@ or in Gradle for Groovy projects:
 ----
 tasks.withType(GroovyCompile) {
     groovyOptions.forkOptions.jvmArgs.add('-Dgroovy.parameters=true')
-    groovyOptions.forkOptions.jvmArgs.add('-Dmicronaut.openapi.views.spec=rapidoc.enabled=true,swagger-ui.enabled=true,swagger-ui.theme=flattop')
+    groovyOptions.forkOptions.jvmArgs.add('-Dmicronaut.openapi.views.spec=rapidoc.enabled=true,openapi-explorer.enabled=true,swagger-ui.enabled=true,swagger-ui.theme=flattop')
     ...
 }
 ----
@@ -72,7 +72,7 @@ or in Maven:
             <configuration>
                 <fork>true</fork>
                 <compilerArgs>
-                    <arg>-Amicronaut.openapi.views.spec=rapidoc.enabled=true,swagger-ui.enabled=true,swagger-ui.theme=flattop</arg>
+                    <arg>-Amicronaut.openapi.views.spec=rapidoc.enabled=true,openapi-explorer.enabled=true,swagger-ui.enabled=true,swagger-ui.theme=flattop</arg>
                     ...
                 </compilerArgs>
             </configuration>
@@ -101,7 +101,7 @@ or in Maven with Groovy:
               <properties>
                 <property>
                   <name>micronaut.openapi.views.spec</name>
-                  <value>rapidoc.enabled=true,swagger-ui.enabled=true,swagger-ui.theme=flattop</value>
+                  <value>rapidoc.enabled=true,openapi-explorer.enabled=true,swagger-ui.enabled=true,swagger-ui.theme=flattop</value>
                 </property>
               </properties>
             </configuration>

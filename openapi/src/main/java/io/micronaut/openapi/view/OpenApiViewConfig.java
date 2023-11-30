@@ -51,13 +51,14 @@ import static io.micronaut.openapi.visitor.FileUtils.resolve;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_SERVER_CONTEXT_PATH;
 
 /**
- * OpenApi view configuration for Swagger-ui, ReDoc and RapiDoc.
+ * OpenApi view configuration for Swagger UI, ReDoc, OpenAPI Explorer and RapiDoc.
  * By default, no views are enabled.
  *
  * @author croudet
- * @see <a href="https://github.com/swagger-api/swagger-ui">Swagger-ui</a>
- * @see <a href="https://github.com/Rebilly/ReDoc">ReDoc</a>
- * @see <a href="https://github.com/mrin9/RapiDoc">RapiDoc</a>
+ * @see <a href="https://github.com/swagger-api/swagger-ui">Swagger UI</a>
+ * @see <a href="https://github.com/Redocly/ReDoc">ReDoc</a>
+ * @see <a href="https://github.com/rapi-doc/RapiDoc">RapiDoc</a>
+ * @see <a href="https://github.com/Authress-Engineering/openapi-explorer">OpenAPI Explorer</a>
  */
 public final class OpenApiViewConfig {
 
@@ -68,12 +69,14 @@ public final class OpenApiViewConfig {
     public static final String TEMPLATES_SWAGGER_UI = "swagger-ui";
     public static final String TEMPLATES_REDOC = "redoc";
     public static final String TEMPLATES_RAPIDOC = "rapidoc";
+    public static final String TEMPLATES_OPENAPI_EXPLORER = "openapi-explorer";
     public static final String SLASH = "/";
 
     private static final String TEMPLATE_INDEX_HTML = "index.html";
     private static final String REDOC = "redoc";
     private static final String RAPIDOC = "rapidoc";
     private static final String SWAGGER_UI = "swagger-ui";
+    private static final String OPENAPI_EXPLORER = "openapi-explorer";
     private static final String TEMPLATE_OAUTH_2_REDIRECT_HTML = "oauth2-redirect.html";
 
     private String mappingPath;
@@ -83,6 +86,7 @@ public final class OpenApiViewConfig {
     private SwaggerUIConfig swaggerUIConfig;
     private RedocConfig redocConfig;
     private RapidocConfig rapidocConfig;
+    private OpenApiExplorerConfig openApiExplorerConfig;
     private final Map<Pair<String, String>, OpenApiInfo> openApiInfos;
 
     /**
@@ -92,7 +96,9 @@ public final class OpenApiViewConfig {
 
         SWAGGER_UI(TEMPLATES_SWAGGER_UI),
         REDOC(TEMPLATES_REDOC),
-        RAPIDOC(TEMPLATES_RAPIDOC);
+        RAPIDOC(TEMPLATES_RAPIDOC),
+        OPENAPI_EXPLORER(TEMPLATES_OPENAPI_EXPLORER),
+        ;
 
         private final String templatePath;
 
@@ -148,6 +154,10 @@ public final class OpenApiViewConfig {
             cfg.rapidocConfig = RapidocConfig.fromProperties(openApiMap, openApiInfos, context);
             cfg.rapidocConfig.rapiPDFConfig = rapiPDFConfig;
         }
+        if ("true".equals(openApiMap.getOrDefault("openapi-explorer.enabled", Boolean.FALSE.toString()))) {
+            cfg.openApiExplorerConfig = OpenApiExplorerConfig.fromProperties(openApiMap, openApiInfos, context);
+            cfg.openApiExplorerConfig.rapiPDFConfig = rapiPDFConfig;
+        }
         if ("true".equals(openApiMap.getOrDefault("swagger-ui.enabled", Boolean.FALSE.toString()))) {
             cfg.swaggerUIConfig = SwaggerUIConfig.fromProperties(openApiMap, openApiInfos, context);
             cfg.swaggerUIConfig.rapiPDFConfig = rapiPDFConfig;
@@ -162,7 +172,7 @@ public final class OpenApiViewConfig {
      * @return true when the generation of views is enabled.
      */
     public boolean isEnabled() {
-        return redocConfig != null || rapidocConfig != null || swaggerUIConfig != null;
+        return redocConfig != null || rapidocConfig != null || swaggerUIConfig != null || openApiExplorerConfig != null;
     }
 
     /**
@@ -179,6 +189,14 @@ public final class OpenApiViewConfig {
         }
         if (rapidocConfig != null) {
             copyResources(outputDir, context, RAPIDOC, TEMPLATES_RAPIDOC, rapidocConfig, rapidocConfig.rapiPDFConfig);
+        }
+        if (openApiExplorerConfig != null) {
+            Path openapiExplorerDir = outputDir.resolve(OPENAPI_EXPLORER);
+            render(openApiExplorerConfig, openapiExplorerDir, TEMPLATES + SLASH + TEMPLATES_OPENAPI_EXPLORER + SLASH + TEMPLATE_INDEX_HTML, context);
+            copyResources(openApiExplorerConfig, openapiExplorerDir, TEMPLATES_OPENAPI_EXPLORER, openApiExplorerConfig.getResources(), context);
+            if (openApiExplorerConfig.rapiPDFConfig.enabled) {
+                copyResources(openApiExplorerConfig.rapiPDFConfig, openapiExplorerDir, TEMPLATES_RAPIPDF, openApiExplorerConfig.rapiPDFConfig.getResources(), context);
+            }
         }
         if (swaggerUIConfig != null) {
             Path swaggerUiDir = copyResources(outputDir, context, SWAGGER_UI, TEMPLATES_SWAGGER_UI, swaggerUIConfig, swaggerUIConfig.rapiPDFConfig);
@@ -461,5 +479,21 @@ public final class OpenApiViewConfig {
         } else {
             return template.replace("{{" + placeHolder + "}}", valuePrefix + value);
         }
+    }
+
+    public SwaggerUIConfig getSwaggerUIConfig() {
+        return swaggerUIConfig;
+    }
+
+    public RedocConfig getRedocConfig() {
+        return redocConfig;
+    }
+
+    public RapidocConfig getRapidocConfig() {
+        return rapidocConfig;
+    }
+
+    public OpenApiExplorerConfig getOpenApiExplorerConfig() {
+        return openApiExplorerConfig;
     }
 }
