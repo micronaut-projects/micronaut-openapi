@@ -207,9 +207,11 @@
         
         <div class="toc-item" style="margin-left:10px" id="toc-item-redoc"><a href="#redoc"><strong>17.5</strong><span>Redoc</span></a></div>
         
-        <div class="toc-item" style="margin-left:10px" id="toc-item-rapidoc"><a href="#rapidoc"><strong>17.6</strong><span>RapiDoc</span></a></div>
+        <div class="toc-item" style="margin-left:10px" id="toc-item-openapiExplorer"><a href="#openapiExplorer"><strong>17.6</strong><span>OpenAPI Explorer</span></a></div>
         
-        <div class="toc-item" style="margin-left:10px" id="toc-item-rapipdf"><a href="#rapipdf"><strong>17.7</strong><span>RapiPdf</span></a></div>
+        <div class="toc-item" style="margin-left:10px" id="toc-item-rapidoc"><a href="#rapidoc"><strong>17.7</strong><span>RapiDoc</span></a></div>
+        
+        <div class="toc-item" style="margin-left:10px" id="toc-item-rapipdf"><a href="#rapipdf"><strong>17.8</strong><span>RapiPdf</span></a></div>
         
         <div class="toc-item" style="margin-left:0px" id="toc-item-convertToAdoc"><a href="#convertToAdoc"><strong>18</strong><span>Conversion to Asciidoc</span></a></div>
         
@@ -2779,7 +2781,7 @@ paths:
 
 
 <div class="paragraph">
-<p>Micronaut can generate views for your generated OpenApi specification. Currently, <a href="https://github.com/swagger-api/swagger-ui">Swagger-ui</a>, <a href="https://github.com/Rebilly/ReDoc">Redoc</a> and <a href="https://github.com/mrin9/RapiDoc">RapiDoc</a> are supported.
+<p>Micronaut can generate views for your generated OpenApi specification. Currently, <a href="https://github.com/swagger-api/swagger-ui">Swagger-ui</a>, <a href="https://github.com/Redocly/redoc">Redoc</a>, <a href="https://github.com/Authress-Engineering/openapi-explorer">OpenAPI Explorer</a> and <a href="https://github.com/rapi-doc/RapiDoc">RapiDoc</a> are supported.
 You can also use <a href="https://mrin9.github.io/RapiPdf/">RapiPdf</a> to generate a PDF from your spec file.</p>
 </div>
 <div class="paragraph">
@@ -2901,10 +2903,11 @@ micronaut.router.static-resources.swagger.mapping=/swaggerYAML/**</code></pre>
 <p>By default, the generation of views is disabled. You can enable views generation with a <a href="#propertiesFileConfiguration">configuration properties file</a>.</p>
 </div>
 <div class="listingblock">
-<div class="title">openapi.properties Example Views Generation Swagger-UI, Redoc, Rapidoc</div>
+<div class="title">openapi.properties Example Views Generation Swagger UI, Redoc, RapiDoc, OpenAPI Explorer</div>
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">micronaut.openapi.views.spec = swagger-ui.enabled=true,\
     redoc.enabled=true, \
+    openapi-explorer.enabled=true, \
     rapidoc.enabled=true, \
     rapidoc.bg-color=#14191f, \
     rapidoc.text-color=#aec2e0, \
@@ -2933,7 +2936,7 @@ micronaut.router.static-resources.swagger.mapping=/swaggerYAML/**</code></pre>
 <div class="listingblock">
 <div class="title">System Property</div>
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-commandline hljs" data-lang="commandline">-Dmicronaut.openapi.views.spec=redoc.enabled=true,rapidoc.enabled=true,swagger-ui.enabled=true,swagger-ui.theme=flattop</code></pre>
+<pre class="highlightjs highlight"><code class="language-commandline hljs" data-lang="commandline">-Dmicronaut.openapi.views.spec=redoc.enabled=true,rapidoc.enabled=true,openapi-explorer.enabled=true,swagger-ui.enabled=true,swagger-ui.theme=flattop</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -2942,7 +2945,7 @@ micronaut.router.static-resources.swagger.mapping=/swaggerYAML/**</code></pre>
 <div class="listingblock">
 <div class="title">Gradle</div>
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">JAVA_TOOL_OPTIONS=-Dmicronaut.openapi.views.spec=redoc.enabled=true,rapidoc.enabled=true,swagger-ui.enabled=true,swagger-ui.theme=flattop \
+<pre class="highlightjs highlight"><code class="language-shell hljs" data-lang="shell">JAVA_TOOL_OPTIONS=-Dmicronaut.openapi.views.spec=redoc.enabled=true,rapidoc.enabled=true,openapi-explorer.enabled=true,swagger-ui.enabled=true,swagger-ui.theme=flattop \
         ./gradlew --no-daemon clean assemble</code></pre>
 </div>
 </div>
@@ -2951,7 +2954,7 @@ micronaut.router.static-resources.swagger.mapping=/swaggerYAML/**</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">org.gradle.jvmargs=-Dmicronaut.openapi.views.spec=redoc.enabled=true,rapidoc.enabled=true,swagger-ui.enabled=true,swagger-ui.theme=flattop</code></pre>
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">org.gradle.jvmargs=-Dmicronaut.openapi.views.spec=redoc.enabled=true,rapidoc.enabled=true,openapi-explorer.enabled=true,swagger-ui.enabled=true,swagger-ui.theme=flattop</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -2961,7 +2964,7 @@ micronaut.router.static-resources.swagger.mapping=/swaggerYAML/**</code></pre>
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-kotlin hljs" data-lang="kotlin">kapt {
     arguments {
-        arg("micronaut.openapi.views.spec", "redoc.enabled=true,rapidoc.enabled=true,swagger-ui.enabled=true,swagger-ui.theme=flattop")
+        arg("micronaut.openapi.views.spec", "redoc.enabled=true,rapidoc.enabled=true,openapi-explorer.enabled=true,swagger-ui.enabled=true,swagger-ui.theme=flattop")
     }
 }</code></pre>
 </div>
@@ -2974,7 +2977,7 @@ micronaut.router.static-resources.swagger.mapping=/swaggerYAML/**</code></pre>
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">tasks.withType(JavaCompile) {
     options.fork = true
-    options.forkOptions.jvmArgs &lt;&lt; '-Dmicronaut.openapi.views.spec=rapidoc.enabled=true,swagger-ui.enabled=true,swagger-ui.theme=flattop'
+    options.forkOptions.jvmArgs &lt;&lt; '-Dmicronaut.openapi.views.spec=rapidoc.enabled=true,openapi-explorer.enabled=true,swagger-ui.enabled=true,swagger-ui.theme=flattop'
 
     ...
 }</code></pre>
@@ -2988,7 +2991,7 @@ micronaut.router.static-resources.swagger.mapping=/swaggerYAML/**</code></pre>
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">tasks.withType(GroovyCompile) {
     groovyOptions.forkOptions.jvmArgs.add('-Dgroovy.parameters=true')
-    groovyOptions.forkOptions.jvmArgs.add('-Dmicronaut.openapi.views.spec=rapidoc.enabled=true,swagger-ui.enabled=true,swagger-ui.theme=flattop')
+    groovyOptions.forkOptions.jvmArgs.add('-Dmicronaut.openapi.views.spec=rapidoc.enabled=true,openapi-explorer.enabled=true,swagger-ui.enabled=true,swagger-ui.theme=flattop')
     ...
 }</code></pre>
 </div>
@@ -3007,7 +3010,7 @@ micronaut.router.static-resources.swagger.mapping=/swaggerYAML/**</code></pre>
             &lt;configuration&gt;
                 &lt;fork&gt;true&lt;/fork&gt;
                 &lt;compilerArgs&gt;
-                    &lt;arg&gt;-Amicronaut.openapi.views.spec=rapidoc.enabled=true,swagger-ui.enabled=true,swagger-ui.theme=flattop&lt;/arg&gt;
+                    &lt;arg&gt;-Amicronaut.openapi.views.spec=rapidoc.enabled=true,openapi-explorer.enabled=true,swagger-ui.enabled=true,swagger-ui.theme=flattop&lt;/arg&gt;
                     ...
                 &lt;/compilerArgs&gt;
             &lt;/configuration&gt;
@@ -3037,7 +3040,7 @@ micronaut.router.static-resources.swagger.mapping=/swaggerYAML/**</code></pre>
               &lt;properties&gt;
                 &lt;property&gt;
                   &lt;name&gt;micronaut.openapi.views.spec&lt;/name&gt;
-                  &lt;value&gt;rapidoc.enabled=true,swagger-ui.enabled=true,swagger-ui.theme=flattop&lt;/value&gt;
+                  &lt;value&gt;rapidoc.enabled=true,openapi-explorer.enabled=true,swagger-ui.enabled=true,swagger-ui.theme=flattop&lt;/value&gt;
                 &lt;/property&gt;
               &lt;/properties&gt;
             &lt;/configuration&gt;
@@ -3649,7 +3652,7 @@ micronaut.router.static-resources.swagger-ui.mapping=/swagger-ui/**</code></pre>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>redoc.js.url</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Override path to use to find the js file. Path must contain a file named redoc.standalone.js. The value can be a URL path like: "https://unpkg.com/redoc/bundles/". Must contain trailing slash.,</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Override path to use to find the js file. Path must contain a file named redoc.standalone.js. The value can be a URL path like: "https://unpkg.com/redoc/bundles/". Must contain trailing slash.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>redoc.spec.url</code></p></td>
@@ -3856,7 +3859,241 @@ micronaut.router.static-resources.redoc.mapping=/redoc/**</code></pre>
 <p>With the above configuration in place when you run your application you can access your Swagger documentation at http://localhost:8080/redoc.</p>
 </div>
 
-<h2 id="rapidoc"><a class="anchor" href="#rapidoc"></a>17.6 RapiDoc</h2>
+<h2 id="openapiExplorer"><a class="anchor" href="#openapiExplorer"></a>17.6 OpenAPI Explorer</h2>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/openApiViews/openapiExplorer.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>Views support <a href="https://github.com/Authress-Engineering/openapi-explorer">OpenAPI Explorer</a>, to enable it use <code>openapi-explorer.enabled=true</code>.</p>
+</div>
+<div class="paragraph">
+<p>The views will be generated to the <code>META-INF/swagger/views/openapi-explorer</code> directory of your project’s class output.</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>openapi-explorer.enabled</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>true</code> or <code>false</code>  When 'true' the OpenAPI Explorer view is generated.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>openapi-explorer.js.url</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Override path to use to find the js and other resource files. Path must contain a file named openapi-explorer.min.js. The value can be a URL path like: "https://unpkg.com/openapi-explorer/dist/browser/". Must contain trailing slash.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>openapi-explorer.spec.url</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Override path in swagger file path line. If you don&#8217;t set, then value will be <code>&lt;context-path&gt;/swagger/&lt;spec_filename&gt;</code>. You can use the placeholder <code>${filename}</code> it will be replaced with the final name of the generated swagger file.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>openapi-explorer.copy-resources</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Copy or not local JS and CSS resources. Set to <code>false</code> if you are using external resources (e.g. <a href="https://unpkg.com/openapi-explorer/dist/browser/openapi-explorer.min.js" class="bare">https://unpkg.com/openapi-explorer/dist/browser/openapi-explorer.min.js</a>). Default <code>true</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>openapi-explorer.expand-single-schema-field</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>openapi-explorer.expand-default-server-variables</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>openapi-explorer.menu-toggle</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>openapi-explorer.only-required-in-samples</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>openapi-explorer.payload-sample-idx</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>openapi-explorer.sort-props-alphabetically</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>openapi-explorer.untrusted-spec</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>openapi-explorer.expand-responses</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>openapi-explorer.show-extensions</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>openapi-explorer.native-scrollbars</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>openapi-explorer.path-in-middle-panel</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>openapi-explorer.suppress-warnings</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>openapi-explorer.hide-hostname</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>openapi-explorer.disable-search</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>openapi-explorer.json-sample-expand-level</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>openapi-explorer.scroll-y-offset</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>openapi-explorer.hide-download-button</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>openapi-explorer.no-auto-auth</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>openapi-explorer.theme</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>openapi-explorer.hide-single-request-sample-tab</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>openapi-explorer.required-props-first</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>openapi-explorer.hide-loading</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>See <a href="https://github.com/Authress-Engineering/openapi-explorer/blob/release/2.1/docs/documentation.md">OpenAPI Explorer Options</a> for a description of the above properties.</p>
+</div>
+<div class="paragraph">
+<p>To expose the <code>openapi-explorer</code> views, you also must expose the generated <code>yaml</code>:</p>
+</div>
+<div class="openblock">
+<div class="title">Exposing Swagger YAML And OpenAPI Explorer Views</div>
+<div class="content">
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">micronaut.router.static-resources.swagger.paths=classpath:META-INF/swagger
+micronaut.router.static-resources.swagger.mapping=/swagger/**
+micronaut.router.static-resources.openapi-explorer.paths=classpath:META-INF/swagger/views/openapi-explorer
+micronaut.router.static-resources.openapi-explorer.mapping=/openapi-explorer/**</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">micronaut:
+  router:
+    static-resources:
+      swagger:
+        paths: classpath:META-INF/swagger
+        mapping: /swagger/**
+      openapi-explorer:
+        paths: classpath:META-INF/swagger/views/openapi-explorer
+        mapping: /openapi-explorer/**</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-toml hljs" data-lang="toml">[micronaut]
+  [micronaut.router]
+    [micronaut.router.static-resources]
+      [micronaut.router.static-resources.swagger]
+        paths="classpath:META-INF/swagger"
+        mapping="/swagger/**"
+      [micronaut.router.static-resources.openapi-explorer]
+        paths="classpath:META-INF/swagger/views/openapi-explorer"
+        mapping="/openapi-explorer/**"</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-groovy-config hljs" data-lang="groovy-config">micronaut {
+  router {
+    staticResources {
+      swagger {
+        paths = "classpath:META-INF/swagger"
+        mapping = "/swagger/**"
+      }
+      openapiExplorer {
+        paths = "classpath:META-INF/swagger/views/openapi-explorer"
+        mapping = "/openapi-explorer/**"
+      }
+    }
+  }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-hocon hljs" data-lang="hocon">{
+  micronaut {
+    router {
+      static-resources {
+        swagger {
+          paths = "classpath:META-INF/swagger"
+          mapping = "/swagger/**"
+        }
+        openapi-explorer {
+          paths = "classpath:META-INF/swagger/views/openapi-explorer"
+          mapping = "/openapi-explorer/**"
+        }
+      }
+    }
+  }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json-config hljs" data-lang="json-config">{
+  "micronaut": {
+    "router": {
+      "static-resources": {
+        "swagger": {
+          "paths": "classpath:META-INF/swagger",
+          "mapping": "/swagger/**"
+        },
+        "openapi-explorer": {
+          "paths": "classpath:META-INF/swagger/views/openapi-explorer",
+          "mapping": "/openapi-explorer/**"
+        }
+      }
+    }
+  }
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>With the above configuration in place when you run your application you can access your Swagger documentation at http://localhost:8080/openapi-explorer.</p>
+</div>
+
+<h2 id="rapidoc"><a class="anchor" href="#rapidoc"></a>17.7 RapiDoc</h2>
 
 <div class='contribute-btn'>
     <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/openApiViews/rapidoc.adoc"'>
@@ -4159,7 +4396,7 @@ micronaut.router.static-resources.rapidoc.mapping=/rapidoc/**</code></pre>
 <p>With the above configuration in place when you run your application you can access your Swagger documentation at http://localhost:8080/rapidoc.</p>
 </div>
 
-<h2 id="rapipdf"><a class="anchor" href="#rapipdf"></a>17.7 RapiPdf</h2>
+<h2 id="rapipdf"><a class="anchor" href="#rapipdf"></a>17.8 RapiPdf</h2>
 
 <div class='contribute-btn'>
     <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/openApiViews/rapipdf.adoc"'>
@@ -4904,7 +5141,7 @@ import io.micronaut.http.filter.HttpServerFilter;
 import io.micronaut.http.filter.ServerFilterChain;
 
 @Requires(property = "micronaut.server.context-path")
-@Filter(methods = {HttpMethod.GET, HttpMethod.HEAD}, patterns = {"/**/rapidoc*", "/**/redoc*", "/**/swagger-ui*"})
+@Filter(methods = {HttpMethod.GET, HttpMethod.HEAD}, patterns = {"/**/rapidoc*", "/**/redoc*", "/**/swagger-ui*", "/**/openapi-explorer*"})
 public class OpenApiViewCookieContextPathFilter implements HttpServerFilter {
 
     private final Cookie contextPathCookie;
@@ -4948,7 +5185,7 @@ import io.micronaut.http.filter.ServerFilterChain;
 
 @Filter(
 	methods = {HttpMethod.GET, HttpMethod.HEAD},
-	patterns = {"/**/rapidoc*", "/**/redoc*", "/**/swagger-ui*"}
+	patterns = {"/**/rapidoc*", "/**/redoc*", "/**/swagger-ui*", "/**/openapi-explorer*"}
 )
 @Requires(property = "micronaut.server.context-path-header")
 public class OpenApiContextPathFilter implements HttpServerFilter {
