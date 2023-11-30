@@ -35,6 +35,7 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
+import io.micronaut.core.annotation.NonNull;
 import io.micronaut.core.io.scan.ClassPathResourceLoader;
 import io.micronaut.core.io.scan.DefaultClassPathResourceLoader;
 import io.micronaut.core.util.CollectionUtils;
@@ -184,20 +185,10 @@ public final class OpenApiViewConfig {
      */
     public void render(Path outputDir, VisitorContext context) throws IOException {
         if (redocConfig != null) {
-            Path redocDir = outputDir.resolve(REDOC);
-            render(redocConfig, redocDir, TEMPLATES + SLASH + TEMPLATES_REDOC + SLASH + TEMPLATE_INDEX_HTML, context);
-            copyResources(redocConfig, redocDir, TEMPLATES_REDOC, redocConfig.getResources(), context);
-            if (redocConfig.rapiPDFConfig.enabled) {
-                copyResources(redocConfig.rapiPDFConfig, redocDir, TEMPLATES_RAPIPDF, redocConfig.rapiPDFConfig.getResources(), context);
-            }
+            copyResources(outputDir, context, REDOC, TEMPLATES_REDOC, redocConfig, redocConfig.rapiPDFConfig);
         }
         if (rapidocConfig != null) {
-            Path rapidocDir = outputDir.resolve(RAPIDOC);
-            render(rapidocConfig, rapidocDir, TEMPLATES + SLASH + TEMPLATES_RAPIDOC + SLASH + TEMPLATE_INDEX_HTML, context);
-            copyResources(rapidocConfig, rapidocDir, TEMPLATES_RAPIDOC, rapidocConfig.getResources(), context);
-            if (rapidocConfig.rapiPDFConfig.enabled) {
-                copyResources(rapidocConfig.rapiPDFConfig, rapidocDir, TEMPLATES_RAPIPDF, rapidocConfig.rapiPDFConfig.getResources(), context);
-            }
+            copyResources(outputDir, context, RAPIDOC, TEMPLATES_RAPIDOC, rapidocConfig, rapidocConfig.rapiPDFConfig);
         }
         if (openApiExplorerConfig != null) {
             Path openapiExplorerDir = outputDir.resolve(OPENAPI_EXPLORER);
@@ -208,17 +199,27 @@ public final class OpenApiViewConfig {
             }
         }
         if (swaggerUIConfig != null) {
-            Path swaggerUiDir = outputDir.resolve(SWAGGER_UI);
-            render(swaggerUIConfig, swaggerUiDir, TEMPLATES + SLASH + TEMPLATES_SWAGGER_UI + SLASH + TEMPLATE_INDEX_HTML, context);
+            Path swaggerUiDir = copyResources(outputDir, context, SWAGGER_UI, TEMPLATES_SWAGGER_UI, swaggerUIConfig, swaggerUIConfig.rapiPDFConfig);
             if (SwaggerUIConfig.hasOauth2Option(swaggerUIConfig.options)) {
                 render(swaggerUIConfig, swaggerUiDir, TEMPLATES + SLASH + TEMPLATES_SWAGGER_UI + SLASH + TEMPLATE_OAUTH_2_REDIRECT_HTML, context);
             }
-            copyResources(swaggerUIConfig, swaggerUiDir, TEMPLATES_SWAGGER_UI, swaggerUIConfig.getResources(), context);
-            if (swaggerUIConfig.rapiPDFConfig.enabled) {
-                copyResources(swaggerUIConfig.rapiPDFConfig, swaggerUiDir, TEMPLATES_RAPIPDF, swaggerUIConfig.rapiPDFConfig.getResources(), context);
-            }
             copySwaggerUiTheme(swaggerUIConfig, swaggerUiDir, TEMPLATES_SWAGGER_UI, context);
         }
+    }
+
+    private Path copyResources(@NonNull Path outputDir,
+                               @NonNull VisitorContext context,
+                               @NonNull String otherDir,
+                               @NonNull String templates,
+                               AbstractViewConfig viewConfig,
+                               AbstractViewConfig rapidPDFConfig) throws IOException {
+        Path dir = outputDir.resolve(otherDir);
+        render(viewConfig, dir, TEMPLATES + SLASH + templates + SLASH + TEMPLATE_INDEX_HTML, context);
+        copyResources(viewConfig, dir, templates, viewConfig.getResources(), context);
+        if (rapidPDFConfig.isEnabled()) {
+            copyResources(rapidPDFConfig, dir, TEMPLATES_RAPIPDF, rapidPDFConfig.getResources(), context);
+        }
+        return dir;
     }
 
     private void copySwaggerUiTheme(SwaggerUIConfig cfg, Path outputDir, String templatesDir, VisitorContext context) throws IOException {
