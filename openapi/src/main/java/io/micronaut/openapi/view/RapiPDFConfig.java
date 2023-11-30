@@ -91,15 +91,15 @@ final class RapiPDFConfig extends AbstractViewConfig {
 
     boolean enabled; //false
 
-    @Override
-    public boolean isEnabled() {
-        return enabled;
-    }
-
     private RapiPDFConfig(Map<Pair<String, String>, OpenApiInfo> openApiInfos) {
         super("rapipdf.", openApiInfos);
         jsUrl = DEFAULT_RAPIPDF_JS_PATH;
         withFinalUrlPrefixCache = false;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return enabled;
     }
 
     /**
