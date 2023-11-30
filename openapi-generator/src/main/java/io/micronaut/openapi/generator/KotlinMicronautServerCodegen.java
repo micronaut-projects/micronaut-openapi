@@ -20,7 +20,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.openapitools.codegen.CliOption;
-import org.openapitools.codegen.CodegenConstants;
 import org.openapitools.codegen.CodegenOperation;
 import org.openapitools.codegen.CodegenParameter;
 import org.openapitools.codegen.CodegenType;
@@ -31,6 +30,8 @@ import org.openapitools.codegen.model.ModelMap;
 import org.openapitools.codegen.model.OperationMap;
 import org.openapitools.codegen.model.OperationsMap;
 import org.openapitools.codegen.utils.StringUtils;
+
+import static org.openapitools.codegen.CodegenConstants.API_PACKAGE;
 
 /**
  * The generator for creating Micronaut servers.
@@ -60,7 +61,7 @@ public class KotlinMicronautServerCodegen extends AbstractMicronautKotlinCodegen
     protected static final String API_PREFIX = "";
     protected static final String API_SUFFIX = "Api";
 
-    protected String apiPackage;
+    protected String apiPackage = "org.openapitools.api";
     protected String controllerPackage = "org.openapitools.controller";
     protected boolean generateImplementationFiles = true;
     protected boolean generateOperationsToReturnNotImplemented = true;
@@ -72,7 +73,6 @@ public class KotlinMicronautServerCodegen extends AbstractMicronautKotlinCodegen
     KotlinMicronautServerCodegen() {
 
         title = "OpenAPI Micronaut Server";
-        apiPackage = "org.openapitools.api";
         apiDocPath = "docs/controllers";
 
         generatorMetadata = GeneratorMetadata.newBuilder(generatorMetadata)
@@ -156,15 +156,15 @@ public class KotlinMicronautServerCodegen extends AbstractMicronautKotlinCodegen
         }
         writePropertyBack(OPT_GENERATE_OPERATIONS_TO_RETURN_NOT_IMPLEMENTED, generateOperationsToReturnNotImplemented);
 
-        if (additionalProperties.containsKey(CodegenConstants.API_PACKAGE)) {
-            apiPackage = (String) additionalProperties.get(CodegenConstants.API_PACKAGE);
+        if (additionalProperties.containsKey(API_PACKAGE)) {
+            apiPackage = (String) additionalProperties.get(API_PACKAGE);
         }
-        additionalProperties.put(CodegenConstants.API_PACKAGE, apiPackage);
+        writePropertyBack(API_PACKAGE, apiPackage);
 
         if (additionalProperties.containsKey(OPT_CONTROLLER_PACKAGE)) {
             controllerPackage = (String) additionalProperties.get(OPT_CONTROLLER_PACKAGE);
         }
-        additionalProperties.put(OPT_CONTROLLER_PACKAGE, controllerPackage);
+        writePropertyBack(OPT_CONTROLLER_PACKAGE, controllerPackage);
 
         // Get all the other properties after superclass processed everything
         if (additionalProperties.containsKey(OPT_GENERATE_CONTROLLER_FROM_EXAMPLES)) {

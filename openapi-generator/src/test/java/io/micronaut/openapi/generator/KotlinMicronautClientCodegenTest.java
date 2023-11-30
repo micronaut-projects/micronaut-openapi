@@ -1,5 +1,7 @@
 package io.micronaut.openapi.generator;
 
+import java.util.List;
+
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.servers.Server;
@@ -212,13 +214,23 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
     @Test
     void testAdditionalClientTypeAnnotations() {
         var codegen = new KotlinMicronautClientCodegen();
-        codegen.additionalProperties().put(KotlinMicronautClientCodegen.ADDITIONAL_CLIENT_TYPE_ANNOTATIONS, "MyAdditionalAnnotation1(1,${param1});MyAdditionalAnnotation2(2,${param2});");
-        String outputPath = generateFiles(codegen, PETSTORE_PATH,
-            CodegenConstants.APIS);
+        codegen.additionalProperties().put(KotlinMicronautClientCodegen.ADDITIONAL_CLIENT_TYPE_ANNOTATIONS, "@MyAdditionalAnnotation1(1,${param1});@MyAdditionalAnnotation2(2,${param2});");
+        String outputPath = generateFiles(codegen, PETSTORE_PATH, CodegenConstants.APIS);
 
         // Micronaut declarative http client should contain custom added annotations
-        assertFileContains(outputPath + "/src/main/kotlin/org/openapitools/api/PetApi.kt", "MyAdditionalAnnotation1(1,${param1})");
-        assertFileContains(outputPath + "/src/main/kotlin/org/openapitools/api/PetApi.kt", "MyAdditionalAnnotation2(2,${param2})");
+        assertFileContains(outputPath + "/src/main/kotlin/org/openapitools/api/PetApi.kt",
+            "@MyAdditionalAnnotation1(1,${param1})", "@MyAdditionalAnnotation2(2,${param2})");
+    }
+
+    @Test
+    void testAdditionalClientTypeAnnotationsFromSetter() {
+        var codegen = new KotlinMicronautClientCodegen();
+        codegen.setAdditionalClientTypeAnnotations(List.of("@MyAdditionalAnnotation1(1,${param1})", "@MyAdditionalAnnotation2(2,${param2})"));
+        String outputPath = generateFiles(codegen, PETSTORE_PATH, CodegenConstants.APIS);
+
+        // Micronaut declarative http client should contain custom added annotations
+        assertFileContains(outputPath + "/src/main/kotlin/org/openapitools/api/PetApi.kt",
+            "@MyAdditionalAnnotation1(1,${param1})", "@MyAdditionalAnnotation2(2,${param2})");
     }
 
     @Test

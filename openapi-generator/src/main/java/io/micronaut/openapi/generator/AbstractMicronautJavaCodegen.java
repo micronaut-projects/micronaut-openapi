@@ -152,6 +152,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
                 )
                 .securityFeatures(EnumSet.of(
                         SecurityFeature.ApiKey,
+                        SecurityFeature.BearerToken,
                         SecurityFeature.BasicAuth,
                         SecurityFeature.OAuth2_Implicit,
                         SecurityFeature.OAuth2_AuthorizationCode,
@@ -367,7 +368,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
         writePropertyBack(OPT_GENERATE_OPERATION_ONLY_FOR_FIRST_TAG, generateOperationOnlyForFirstTag);
 
         maybeSetTestTool();
-        additionalProperties.put(OPT_TEST, testTool);
+        writePropertyBack(OPT_TEST, testTool);
         if (testTool.equals(OPT_TEST_JUNIT)) {
             additionalProperties.put("isTestJunit", true);
         } else if (testTool.equals(OPT_TEST_SPOCK)) {

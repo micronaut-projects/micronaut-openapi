@@ -1,1 +1,1 @@
-{{#isPathParam}}@PathVariable(name = "{{baseName}}"{{#defaultValue}}, defaultValue = "{{{defaultValue}}}"{{/defaultValue}}) {{>common/params/validation}}{{>client/params/type}} {{paramName}}{{/isPathParam}}
+{{#isPathParam}}@PathVariable({{#defaultValue}}name = {{/defaultValue}}"{{baseName}}"{{#defaultValue}}, defaultValue = "{{{defaultValue}}}"{{/defaultValue}}) {{>common/params/validation}}{{>client/params/type}} {{paramName}}{{/isPathParam}}
