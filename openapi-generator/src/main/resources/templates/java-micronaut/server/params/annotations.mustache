@@ -3,7 +3,7 @@
         @QueryValue({{#defaultValue}}value = {{/defaultValue}}"{{{baseName}}}"{{#defaultValue}}, defaultValue = "{{{defaultValue}}}"{{/defaultValue}})
 {{/isQueryParam}}
 {{#isPathParam}}
-        @PathVariable({{#defaultValue}}value = {{/defaultValue}}"{{baseName}}"{{#defaultValue}}, defaultValue = "{{{defaultValue}}}"{{/defaultValue}})
+        @PathVariable({{#defaultValue}}name = {{/defaultValue}}"{{baseName}}"{{#defaultValue}}, defaultValue = "{{{defaultValue}}}"{{/defaultValue}})
 {{/isPathParam}}
 {{#isHeaderParam}}
         @Header({{#defaultValue}}value = {{/defaultValue}}"{{baseName}}"{{#defaultValue}}, defaultValue = "{{{defaultValue}}}"{{/defaultValue}})

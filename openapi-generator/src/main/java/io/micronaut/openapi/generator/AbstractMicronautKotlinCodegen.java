@@ -445,7 +445,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         writePropertyBack(OPT_GENERATE_OPERATION_ONLY_FOR_FIRST_TAG, generateOperationOnlyForFirstTag);
 
         maybeSetTestTool();
-        additionalProperties.put(OPT_TEST, testTool);
+        writePropertyBack(OPT_TEST, testTool);
         if (testTool.equals(OPT_TEST_JUNIT)) {
             additionalProperties.put("isTestJunit", true);
         }

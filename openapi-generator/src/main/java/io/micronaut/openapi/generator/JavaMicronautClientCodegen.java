@@ -100,11 +100,6 @@ public class JavaMicronautClientCodegen extends AbstractMicronautJavaCodegen<Jav
         writePropertyBack(OPT_CONFIGURE_AUTH_FILTER_PATTERN, false);
         writePropertyBack(OPT_CONFIGURE_CLIENT_ID, false);
 
-        if (additionalProperties.containsKey(BASE_PATH_SEPARATOR)) {
-            basePathSeparator = additionalProperties.get(BASE_PATH_SEPARATOR).toString();
-        }
-        writePropertyBack(BASE_PATH_SEPARATOR, basePathSeparator);
-
         final String invokerFolder = (sourceFolder + '/' + invokerPackage).replace(".", "/");
 
         // Authorization files
@@ -119,29 +114,41 @@ public class JavaMicronautClientCodegen extends AbstractMicronautJavaCodegen<Jav
             supportingFiles.add(new SupportingFile("client/auth/configuration/ConfigurableAuthorization.mustache", authConfigurationFolder, "ConfigurableAuthorization.java"));
             supportingFiles.add(new SupportingFile("client/auth/configuration/HttpBasicAuthConfiguration.mustache", authConfigurationFolder, "HttpBasicAuthConfiguration.java"));
 
-            if (additionalProperties.containsKey(AUTHORIZATION_FILTER_PATTERN)) {
-                String pattern = additionalProperties.get(AUTHORIZATION_FILTER_PATTERN).toString();
-                setAuthorizationFilterPattern(pattern);
-                additionalProperties.put(AUTHORIZATION_FILTER_PATTERN, authorizationFilterPattern);
+            var authorizationFilterPattern = additionalProperties.get(AUTHORIZATION_FILTER_PATTERN);
+            if (authorizationFilterPattern != null) {
+                this.authorizationFilterPattern = authorizationFilterPattern.toString();
+            }
+            if (this.authorizationFilterPattern != null) {
+                writePropertyBack(OPT_CONFIGURE_AUTH_FILTER_PATTERN, true);
+            }
+            writePropertyBack(AUTHORIZATION_FILTER_PATTERN, this.authorizationFilterPattern);
+        }
+
+        Object additionalClientAnnotations = additionalProperties.get(ADDITIONAL_CLIENT_TYPE_ANNOTATIONS);
+        if (additionalClientAnnotations != null) {
+            if (additionalClientAnnotations instanceof @SuppressWarnings("rawtypes") List additionalClientAnnotationsAsList) {
+                //noinspection unchecked
+                additionalClientTypeAnnotations = additionalClientAnnotationsAsList;
+            } else {
+                additionalClientTypeAnnotations = Arrays.asList(additionalClientAnnotations.toString().trim().split("\\s*(;|\\r?\\n)\\s*"));
             }
         }
+        writePropertyBack(ADDITIONAL_CLIENT_TYPE_ANNOTATIONS, additionalClientTypeAnnotations);
 
-        if (additionalProperties.containsKey(ADDITIONAL_CLIENT_TYPE_ANNOTATIONS)) {
-            String additionalClientAnnotationsList = additionalProperties.get(ADDITIONAL_CLIENT_TYPE_ANNOTATIONS).toString();
-            additionalClientTypeAnnotations = Arrays.asList(additionalClientAnnotationsList.trim().split("\\s*(;|\\r?\\n)\\s*"));
-            additionalProperties.put(ADDITIONAL_CLIENT_TYPE_ANNOTATIONS, additionalClientTypeAnnotations);
+        var clientId = additionalProperties.get(CLIENT_ID);
+        if (clientId != null) {
+            this.clientId = clientId.toString();
+        }
+        if (this.clientId != null) {
+            writePropertyBack(OPT_CONFIGURE_CLIENT_ID, true);
+            writePropertyBack(CLIENT_ID, this.clientId);
         }
 
-        if (additionalProperties.containsKey(CLIENT_ID)) {
-            String id = additionalProperties.get(CLIENT_ID).toString();
-            setClientId(id);
-            additionalProperties.put(CLIENT_ID, clientId);
+        var basePathSeparator = additionalProperties.get(BASE_PATH_SEPARATOR);
+        if (basePathSeparator != null) {
+            this.basePathSeparator = basePathSeparator.toString();
         }
-
-        if (additionalProperties.containsKey(BASE_PATH_SEPARATOR)) {
-            basePathSeparator = additionalProperties.get(BASE_PATH_SEPARATOR).toString();
-            additionalProperties.put(BASE_PATH_SEPARATOR, basePathSeparator);
-        }
+        writePropertyBack(BASE_PATH_SEPARATOR, this.basePathSeparator);
 
         // Api file
         apiTemplateFiles.clear();
@@ -171,18 +178,16 @@ public class JavaMicronautClientCodegen extends AbstractMicronautJavaCodegen<Jav
         this.additionalClientTypeAnnotations = additionalClientTypeAnnotations;
     }
 
-    public void setAuthorizationFilterPattern(final String pattern) {
-        writePropertyBack(OPT_CONFIGURE_AUTH_FILTER_PATTERN, true);
-        authorizationFilterPattern = pattern;
+    public void setAuthorizationFilterPattern(final String authorizationFilterPattern) {
+        this.authorizationFilterPattern = authorizationFilterPattern;
     }
 
-    public void setClientId(final String id) {
-        writePropertyBack(OPT_CONFIGURE_CLIENT_ID, true);
-        clientId = id;
+    public void setClientId(final String clientId) {
+        this.clientId = clientId;
     }
 
-    public void setBasePathSeparator(final String separator) {
-        basePathSeparator = separator;
+    public void setBasePathSeparator(final String basePathSeparator) {
+        this.basePathSeparator = basePathSeparator;
     }
 
     public void setConfigureAuthorization(boolean configureAuthorization) {
