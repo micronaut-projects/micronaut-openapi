@@ -134,9 +134,11 @@ public class {{classname}} {{#parent}}extends {{{parent}}} {{/parent}}{{#vendorE
 
     {{#requiredPropertiesInConstructor}}
         {{^micronaut_serde_jackson}}
+            {{#vendorExtensions.withRequiredVars}}
     private {{classname}}() {
     }
 
+            {{/vendorExtensions.withRequiredVars}}
         {{/micronaut_serde_jackson}}
         {{#formatNoEmptyLines}}
         {{#vendorExtensions.withRequiredVars}}

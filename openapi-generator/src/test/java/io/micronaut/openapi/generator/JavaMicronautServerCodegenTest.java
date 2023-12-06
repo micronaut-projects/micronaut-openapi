@@ -138,12 +138,13 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
     void doGenerateRequiredPropertiesInConstructor() {
         var codegen = new JavaMicronautServerCodegen();
         codegen.additionalProperties().put(JavaMicronautServerCodegen.OPT_REQUIRED_PROPERTIES_IN_CONSTRUCTOR, "true");
+        codegen.additionalProperties().put(CodegenConstants.SERIALIZATION_LIBRARY, SerializationLibraryKind.JACKSON.name());
         String outputPath = generateFiles(codegen, PETSTORE_PATH, CodegenConstants.MODELS, CodegenConstants.APIS);
 
         // Constructor should have properties
         String modelPath = outputPath + "src/main/java/org/openapitools/model/";
         assertFileContains(modelPath + "Pet.java", "public Pet(String name, List<String> photoUrls)");
-        assertFileNotContains(modelPath + "Pet.java", "public Pet()");
+        assertFileContains(modelPath + "Pet.java", "private Pet()");
     }
 
     @Test
@@ -155,8 +156,11 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
         // Constructor should have properties
         String modelPath = outputPath + "src/main/java/org/openapitools/model/";
         assertFileNotContainsRegex(modelPath + "Pet.java", "public Pet\\([^)]+\\)");
+        assertFileNotContains(modelPath + "Pet.java", "private Pet()");
         assertFileNotContainsRegex(modelPath + "User.java", "public User\\([^)]+\\)");
+        assertFileNotContains(modelPath + "User.java", "private User()");
         assertFileNotContainsRegex(modelPath + "Order.java", "public Order\\([^)]+\\)");
+        assertFileNotContains(modelPath + "Order.java", "private Order()");
     }
 
     @Test
