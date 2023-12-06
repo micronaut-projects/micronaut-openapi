@@ -33,6 +33,8 @@ import io.swagger.v3.oas.models.tags.Tag;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 
+import static io.micronaut.openapi.visitor.ContextUtils.warn;
+
 /**
  * Endpoints configuration.
  *
@@ -90,8 +92,8 @@ public class EndpointsConfiguration {
                     case "security-requirements" -> endpoint.setSecurityRequirements(parseSecurityRequirements(entry.getValue(), context));
                     case "servers" -> endpoint.setServers(parseServers(entry.getValue(), context));
                     case "tags" -> endpoint.setTags(parseTags(entry.getValue()));
-                    case "class" -> endpoint.setClassElement(context.getClassElement(entry.getValue()).orElse(null));
-                    default -> context.warn("Unknown value " + entryType, null);
+                    case "class" -> endpoint.setClassElement(ContextUtils.getClassElement(entry.getValue(), context));
+                    default -> warn("Unknown value " + entryType, context);
                 }
             });
     }
@@ -171,7 +173,7 @@ public class EndpointsConfiguration {
         try {
             return OpenApiUtils.getConvertJsonMapper().readValue(s, typeReference);
         } catch (JsonProcessingException e) {
-            context.warn("Fail to parse " + typeReference.getType().toString() + ": " + s + " - " + e.getMessage(), null);
+            warn("Fail to parse " + typeReference.getType().toString() + ": " + s + " - " + e.getMessage(), context);
         }
         return Collections.emptyList();
     }

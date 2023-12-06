@@ -97,6 +97,12 @@ public interface ContextProperty {
      */
     String MICRONAUT_INTERNAL_OPENAPI_ENABLED = "micronaut.internal.openapi.enabled";
     /**
+     * Loaded micronaut.openapi.generation.spec.enabled value.
+     * <br>
+     * Default: true
+     */
+    String MICRONAUT_INTERNAL_GENERATION_SPEC_ENABLED = "micronaut.internal.generation.spec.enabled";
+    /**
      * Saved generated files.
      */
     String MICRONAUT_INTERNAL_GENERATED_FILE = "micronaut.internal.generated.file";

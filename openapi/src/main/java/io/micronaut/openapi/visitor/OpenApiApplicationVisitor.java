@@ -42,6 +42,7 @@ import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 
 import io.micronaut.context.env.Environment;
+import io.micronaut.core.annotation.Nullable;
 import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.core.util.StringUtils;
 import io.micronaut.inject.ast.ClassElement;
@@ -86,11 +87,15 @@ import static io.micronaut.openapi.visitor.ConfigUtils.getConfigProperty;
 import static io.micronaut.openapi.visitor.ConfigUtils.getEnv;
 import static io.micronaut.openapi.visitor.ConfigUtils.getExpandableProperties;
 import static io.micronaut.openapi.visitor.ConfigUtils.getGroupProperties;
+import static io.micronaut.openapi.visitor.ConfigUtils.isSpecGenerationEnabled;
 import static io.micronaut.openapi.visitor.ConfigUtils.isOpenApiEnabled;
 import static io.micronaut.openapi.visitor.ConfigUtils.readOpenApiConfigFile;
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_OPENAPI_ENDPOINT_CLASS_TAGS;
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_OPENAPI_ENDPOINT_SECURITY_REQUIREMENTS;
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_OPENAPI_ENDPOINT_SERVERS;
+import static io.micronaut.openapi.visitor.ContextUtils.addGeneratedResource;
+import static io.micronaut.openapi.visitor.ContextUtils.info;
+import static io.micronaut.openapi.visitor.ContextUtils.warn;
 import static io.micronaut.openapi.visitor.FileUtils.EXT_JSON;
 import static io.micronaut.openapi.visitor.FileUtils.EXT_YML;
 import static io.micronaut.openapi.visitor.FileUtils.calcFinalFilename;
@@ -131,10 +136,10 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
     public void visitClass(ClassElement element, VisitorContext context) {
         try {
             incrementVisitedElements(context);
-            if (!isOpenApiEnabled(context)) {
+            if (!isOpenApiEnabled(context) || !isSpecGenerationEnabled(context)) {
                 return;
             }
-            context.info("Generating OpenAPI Documentation");
+            info("Generating OpenAPI Documentation", context);
             OpenAPI openApi = readOpenApi(element, context);
 
             // Handle Application securityRequirements schemes
@@ -169,14 +174,13 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             );
             openApi.setServers(servers);
 
-            Optional<OpenAPI> attr = context.get(Utils.ATTR_OPENAPI, OpenAPI.class);
-            if (attr.isPresent()) {
-                OpenAPI existing = attr.get();
+            OpenAPI existing = ContextUtils.get(Utils.ATTR_OPENAPI, OpenAPI.class, context);
+            if (existing != null) {
                 Optional.ofNullable(openApi.getInfo())
                     .ifPresent(existing::setInfo);
                 copyOpenApi(existing, openApi);
             } else {
-                context.put(Utils.ATTR_OPENAPI, openApi);
+                ContextUtils.put(Utils.ATTR_OPENAPI, openApi, context);
             }
 
             if (Utils.isTestMode()) {
@@ -185,7 +189,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
 
             classElement = element;
         } catch (Throwable t) {
-            context.warn("Error with processing class:\n" + Utils.printStackTrace(t), classElement);
+            warn("Error with processing class:\n" + Utils.printStackTrace(t), context, classElement);
         }
     }
 
@@ -201,24 +205,24 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         if (StringUtils.isNotEmpty(additionalSwaggerFiles)) {
             Path directory = resolve(context, Paths.get(additionalSwaggerFiles));
             if (Files.isDirectory(directory)) {
-                context.info("Merging Swagger OpenAPI YAML and JSON files from location: " + directory);
+                info("Merging Swagger OpenAPI YAML and JSON files from location: " + directory, context);
                 try (DirectoryStream<Path> stream = Files.newDirectoryStream(directory, path -> FileUtils.isYaml(path.toString().toLowerCase()) || path.toString().toLowerCase().endsWith(EXT_JSON))) {
                     stream.forEach(path -> {
                         boolean isYaml = FileUtils.isYaml(path.toString().toLowerCase());
-                        context.info("Reading Swagger OpenAPI " + (isYaml ? "YAML" : "JSON") + " file " + path.getFileName());
+                        info("Reading Swagger OpenAPI " + (isYaml ? "YAML" : "JSON") + " file " + path.getFileName(), context);
                         OpenAPI parsedOpenApi = null;
                         try {
                             parsedOpenApi = (isYaml ? OpenApiUtils.getYamlMapper() : OpenApiUtils.getJsonMapper()).readValue(path.toFile(), OpenAPI.class);
                         } catch (IOException e) {
-                            context.warn("Unable to read file " + path.getFileName() + ": " + e.getMessage(), element);
+                            warn("Unable to read file " + path.getFileName() + ": " + e.getMessage(), context, element);
                         }
                         copyOpenApi(openAPI, parsedOpenApi);
                     });
                 } catch (IOException e) {
-                    context.warn("Unable to read  file from " + directory + ": " + e.getMessage(), element);
+                    warn("Unable to read  file from " + directory + ": " + e.getMessage(), context, element);
                 }
             } else {
-                context.warn(directory + " does not exist or is not a directory", element);
+                warn(directory + " does not exist or is not a directory", context, element);
             }
         }
     }
@@ -275,7 +279,9 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         OpenApiViewConfig cfg = OpenApiViewConfig.fromSpecification(viewSpecification, openApiInfos, readOpenApiConfigFile(context), context);
         if (cfg.isEnabled()) {
             cfg.setTitle(title);
-            cfg.setSpecFile(openApiInfos.values().iterator().next().getSpecFilePath());
+            if (CollectionUtils.isNotEmpty(openApiInfos)) {
+                cfg.setSpecFile(openApiInfos.values().iterator().next().getSpecFilePath());
+            }
             cfg.setServerContextPath(getConfigProperty(MICRONAUT_OPENAPI_CONTEXT_SERVER_PATH, context));
             cfg.render(destinationDir, context);
         }
@@ -307,7 +313,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         final String namingStrategyName = getConfigProperty(MICRONAUT_OPENAPI_PROPERTY_NAMING_STRATEGY, context);
         final PropertyNamingStrategies.NamingBase propertyNamingStrategy = fromName(namingStrategyName);
         if (propertyNamingStrategy != null) {
-            context.info("Using " + namingStrategyName + " property naming strategy.");
+            info("Using " + namingStrategyName + " property naming strategy.", context);
             if (openAPI.getComponents() != null && CollectionUtils.isNotEmpty(openAPI.getComponents().getSchemas())) {
                 openAPI.getComponents().getSchemas().values().forEach(model -> {
                     Map<String, Schema> properties = model.getProperties();
@@ -334,7 +340,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         if (serverContextPath == null || serverContextPath.isEmpty()) {
             return;
         }
-        context.info("Applying server context path: " + serverContextPath + " to Paths.");
+        info("Applying server context path: " + serverContextPath + " to Paths.", context);
         io.swagger.v3.oas.models.Paths paths = openAPI.getPaths();
         if (paths == null || paths.isEmpty()) {
             return;
@@ -430,7 +436,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
     private static OpenAPI resolvePropertyPlaceHolders(OpenAPI openAPI, VisitorContext context) {
         List<Pair<String, String>> expandableProperties = getExpandableProperties(context);
         if (CollectionUtils.isNotEmpty(expandableProperties)) {
-            context.info("Expanding properties: " + expandableProperties);
+            info("Expanding properties: " + expandableProperties, context);
         }
         JsonNode root = resolvePlaceholders(OpenApiUtils.getYamlMapper().convertValue(openAPI, ObjectNode.class), s -> expandProperties(s, expandableProperties, context));
         return OpenApiUtils.getYamlMapper().convertValue(root, OpenAPI.class);
@@ -446,48 +452,54 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                 // nothing new visited, avoid rewriting the files.
                 return;
             }
-            Optional<OpenAPI> attr = context.get(Utils.ATTR_OPENAPI, OpenAPI.class);
-            if (attr.isEmpty()) {
-                return;
-            }
-            OpenAPI openApi = attr.get();
-            processEndpoints(context);
 
-            mergeMicronautEndpointInfos(openApi, context);
-            Map<Pair<String, String>, OpenApiInfo> openApiInfos = divideOpenapiByGroupsAndVersions(openApi, context);
-            if (Utils.isTestMode()) {
-                Utils.setTestReferences(openApiInfos);
-            }
-
-            String isJson = getConfigProperty(MICRONAUT_OPENAPI_JSON_FORMAT, context);
-            boolean isYaml = !(StringUtils.isNotEmpty(isJson) && isJson.equalsIgnoreCase(StringUtils.TRUE));
+            Map<Pair<String, String>, OpenApiInfo> openApiInfos = null;
             String documentTitle = "OpenAPI";
 
-            for (Map.Entry<Pair<String, String>, OpenApiInfo> entry : openApiInfos.entrySet()) {
+            if (isSpecGenerationEnabled(context)) {
+                OpenAPI openApi = ContextUtils.get(Utils.ATTR_OPENAPI, OpenAPI.class, context);
+                if (openApi == null) {
+                    return;
+                }
+                processEndpoints(context);
 
-                OpenApiInfo openApiInfo = entry.getValue();
-
-                openApi = openApiInfo.getOpenApi();
-
-                openApi = postProcessOpenApi(openApi, context);
-                openApiInfo.setOpenApi(openApi);
-                // need to set test reference to openApi after post-processing
+                mergeMicronautEndpointInfos(openApi, context);
+                openApiInfos = divideOpenapiByGroupsAndVersions(openApi, context);
                 if (Utils.isTestMode()) {
-                    Utils.setTestReference(openApi);
+                    Utils.setTestReferences(openApiInfos);
                 }
 
-                String ext = isYaml ? EXT_YML : EXT_JSON;
+                String isJson = getConfigProperty(MICRONAUT_OPENAPI_JSON_FORMAT, context);
+                boolean isYaml = !(StringUtils.isNotEmpty(isJson) && isJson.equalsIgnoreCase(StringUtils.TRUE));
 
-                var titleAndFilename = calcFinalFilename(openApiInfo.getFilename(), openApiInfo, openApiInfos.size() == 1, ext, context);
-                documentTitle = titleAndFilename.getFirst();
-                openApiInfo.setFilename(titleAndFilename.getSecond());
+                for (Map.Entry<Pair<String, String>, OpenApiInfo> entry : openApiInfos.entrySet()) {
+
+                    OpenApiInfo openApiInfo = entry.getValue();
+
+                    openApi = openApiInfo.getOpenApi();
+
+                    openApi = postProcessOpenApi(openApi, context);
+                    openApiInfo.setOpenApi(openApi);
+                    // need to set test reference to openApi after post-processing
+                    if (Utils.isTestMode()) {
+                        Utils.setTestReference(openApi);
+                    }
+
+                    String ext = isYaml ? EXT_YML : EXT_JSON;
+
+                    var titleAndFilename = calcFinalFilename(openApiInfo.getFilename(), openApiInfo, openApiInfos.size() == 1, ext, context);
+                    documentTitle = titleAndFilename.getFirst();
+                    openApiInfo.setFilename(titleAndFilename.getSecond());
+                }
+
+                writeYamlToFile(openApiInfos, documentTitle, context, isYaml);
             }
 
-            writeYamlToFile(openApiInfos, documentTitle, context, isYaml);
+            generateViews(documentTitle, openApiInfos, context);
 
             visitedElements = visitedElements(context);
         } catch (Throwable t) {
-            context.warn("Error:\n" + Utils.printStackTrace(t), null);
+            warn("Error:\n" + Utils.printStackTrace(t), context);
             throw t;
         }
     }
@@ -601,7 +613,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             try {
                 openApiCopy = OpenApiUtils.getJsonMapper().treeToValue(OpenApiUtils.getJsonMapper().valueToTree(openApi), OpenAPI.class);
             } catch (JsonProcessingException e) {
-                context.warn("Error\n" + Utils.printStackTrace(e), null);
+                warn("Error\n" + Utils.printStackTrace(e), context);
                 return null;
             }
 
@@ -1064,6 +1076,34 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         }
     }
 
+    private void generateViews(@Nullable String documentTitle, @Nullable Map<Pair<String, String>, OpenApiInfo> openApiInfos, VisitorContext context) {
+        Path viewsDestDirs = getViewsDestDir(getDefaultFilePath("dummy" + System.nanoTime(), context), context);
+        if (viewsDestDirs == null) {
+            return;
+        }
+        if (context != null) {
+            info("Writing OpenAPI views to destination: " + viewsDestDirs, context);
+            var classesOutputPath = ContextUtils.getClassesOutputPath(context);
+            if (classesOutputPath != null) {
+                addGeneratedResource(classesOutputPath.relativize(viewsDestDirs).toString(), context);
+                addGeneratedResource(classesOutputPath.relativize(viewsDestDirs.getParent()).toString(), context);
+            }
+        }
+        try {
+            renderViews(documentTitle, openApiInfos, viewsDestDirs, context);
+        } catch (Exception e) {
+
+            String swaggerFiles = "";
+            if (openApiInfos != null) {
+                swaggerFiles = openApiInfos.values().stream()
+                    .map(OpenApiInfo::getSpecFilePath)
+                    .collect(Collectors.joining(", ", "files ", ""));
+            }
+
+            warn("Unable to render swagger view: " + swaggerFiles + " - " + e.getMessage() + ".\n" + Utils.printStackTrace(e), context, classElement);
+        }
+    }
+
     private void writeYamlToFile(Map<Pair<String, String>, OpenApiInfo> openApiInfos, String documentTitle, VisitorContext context, boolean isYaml) {
 
         Path viewsDestDirs = null;
@@ -1091,17 +1131,13 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                         Utils.setTestJsonReference(writer.toString());
                     }
                 } else {
-                    context.info("Writing OpenAPI file to destination: " + specFile);
-                    viewsDestDirs = getViewsDestDir(getDefaultFilePath(openApiInfo.getFilename(), context), context);
-                    context.info("Writing OpenAPI views to destination: " + viewsDestDirs);
-                    final Path viewsDestDirsFinal = viewsDestDirs;
+                    info("Writing OpenAPI file to destination: " + specFile, context);
                     var classesOutputPath = ContextUtils.getClassesOutputPath(context);
                     if (classesOutputPath != null) {
                         // add relative paths for the specFile, and its parent META-INF/swagger
                         // so that micronaut-graal visitor knows about them
-                        context.addGeneratedResource(classesOutputPath.relativize(specFile).toString());
-                        context.addGeneratedResource(classesOutputPath.relativize(specFile.getParent()).toString());
-                        context.addGeneratedResource(classesOutputPath.relativize(viewsDestDirsFinal).toString());
+                        addGeneratedResource(classesOutputPath.relativize(specFile).toString(), context);
+                        addGeneratedResource(classesOutputPath.relativize(specFile.getParent()).toString(), context);
                     }
                     openApiInfo.setSpecFilePath(specFile.getFileName().toString());
 
@@ -1111,17 +1147,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                     }
                 }
             } catch (Exception e) {
-                context.warn("Unable to generate swagger" + (isYaml ? EXT_YML : EXT_JSON) + ": " + specFile + " - " + e.getMessage() + ".\n" + Utils.printStackTrace(e), classElement);
-            }
-        }
-        if (!Utils.isTestMode() && viewsDestDirs != null) {
-            try {
-                renderViews(documentTitle, openApiInfos, viewsDestDirs, context);
-            } catch (Exception e) {
-                context.warn("Unable to render swagger" + (isYaml ? EXT_YML : EXT_JSON) + ": " + openApiInfos.values()
-                    .stream()
-                    .map(OpenApiInfo::getSpecFilePath)
-                    .collect(Collectors.joining(", ", "files ", "")) + " - " + e.getMessage() + ".\n" + Utils.printStackTrace(e), classElement);
+                warn("Unable to generate swagger" + (isYaml ? EXT_YML : EXT_JSON) + ": " + specFile + " - " + e.getMessage() + ".\n" + Utils.printStackTrace(e), context, classElement);
             }
         }
     }
@@ -1145,9 +1171,9 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                 if (classEl == null) {
                     continue;
                 }
-                context.put(MICRONAUT_INTERNAL_OPENAPI_ENDPOINT_CLASS_TAGS, endpoint.getTags());
-                context.put(MICRONAUT_INTERNAL_OPENAPI_ENDPOINT_SERVERS, endpoint.getServers());
-                context.put(MICRONAUT_INTERNAL_OPENAPI_ENDPOINT_SECURITY_REQUIREMENTS, endpoint.getSecurityRequirements());
+                ContextUtils.put(MICRONAUT_INTERNAL_OPENAPI_ENDPOINT_CLASS_TAGS, endpoint.getTags(), context);
+                ContextUtils.put(MICRONAUT_INTERNAL_OPENAPI_ENDPOINT_SERVERS, endpoint.getServers(), context);
+                ContextUtils.put(MICRONAUT_INTERNAL_OPENAPI_ENDPOINT_SECURITY_REQUIREMENTS, endpoint.getSecurityRequirements(), context);
                 visitor.visitClass(classEl, context);
                 for (MethodElement methodEl : classEl.getEnclosedElements(ElementQuery.ALL_METHODS
                     .modifiers(mods -> !mods.contains(ElementModifier.STATIC) && !mods.contains(ElementModifier.PRIVATE))

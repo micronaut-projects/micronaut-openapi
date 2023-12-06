@@ -258,7 +258,7 @@ final class SwaggerUIConfig extends AbstractViewConfig {
     }
 
     @Override
-    public String render(String template, VisitorContext context) {
+    public String render(String template, @Nullable VisitorContext context) {
 
         String finalUrlPrefix = getFinalUrlPrefix(RendererType.SWAGGER_UI, context);
 

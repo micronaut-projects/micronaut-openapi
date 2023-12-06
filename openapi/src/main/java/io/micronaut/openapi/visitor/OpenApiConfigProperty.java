@@ -225,6 +225,10 @@ public interface OpenApiConfigProperty {
      */
     String MICRONAUT_OPENAPI_ADOC_OPENAPI_PATH = "micronaut.openapi.adoc.openapi.path";
     /**
+     * OpenAPI file path.
+     */
+    String MICRONAUT_OPENAPI_SWAGGER_FILE_GENERATION_ENABLED = "micronaut.openapi.swagger.file.generation.enabled";
+    /**
      * Default openapi config file.
      */
     String OPENAPI_CONFIG_FILE = "openapi.properties";
@@ -256,6 +260,7 @@ public interface OpenApiConfigProperty {
         MICRONAUT_OPENAPI_ADOC_TEMPLATE_FILENAME,
         MICRONAUT_OPENAPI_ADOC_OUTPUT_DIR_PATH,
         MICRONAUT_OPENAPI_ADOC_OUTPUT_FILENAME,
-        MICRONAUT_OPENAPI_ADOC_OPENAPI_PATH
+        MICRONAUT_OPENAPI_ADOC_OPENAPI_PATH,
+        MICRONAUT_OPENAPI_SWAGGER_FILE_GENERATION_ENABLED
     );
 }

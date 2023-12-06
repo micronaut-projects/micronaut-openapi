@@ -34,6 +34,7 @@ import io.micronaut.openapi.annotation.OpenAPIGroupInfo;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.models.OpenAPI;
 
+import static io.micronaut.openapi.visitor.ConfigUtils.isSpecGenerationEnabled;
 import static io.micronaut.openapi.visitor.ConfigUtils.isOpenApiEnabled;
 import static io.micronaut.openapi.visitor.ConvertUtils.toValue;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ENABLED;
@@ -72,7 +73,7 @@ public class OpenApiGroupInfoVisitor implements TypeElementVisitor<Object, Objec
 
     @Override
     public void visitClass(ClassElement classEl, VisitorContext context) {
-        if (!isOpenApiEnabled(context)) {
+        if (!isOpenApiEnabled(context) || !isSpecGenerationEnabled(context)) {
             return;
         }
 

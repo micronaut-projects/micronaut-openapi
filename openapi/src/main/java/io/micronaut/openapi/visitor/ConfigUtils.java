@@ -57,6 +57,7 @@ import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_EN
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_ENVIRONMENT_CREATED;
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_EXPANDABLE_PROPERTIES;
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_EXPANDABLE_PROPERTIES_LOADED;
+import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_GENERATION_SPEC_ENABLED;
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_GROUPS;
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_JACKSON_JSON_VIEW_DEFAULT_INCLUSION;
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_JACKSON_JSON_VIEW_ENABLED;
@@ -70,6 +71,7 @@ import static io.micronaut.openapi.visitor.ContextUtils.ARGUMENT_CUSTOM_SCHEMA_M
 import static io.micronaut.openapi.visitor.ContextUtils.ARGUMENT_GROUP_PROPERTIES_MAP;
 import static io.micronaut.openapi.visitor.ContextUtils.ARGUMENT_SCHEMA_DECORATORS_MAP;
 import static io.micronaut.openapi.visitor.ContextUtils.EXPANDABLE_PROPERTIES_ARGUMENT;
+import static io.micronaut.openapi.visitor.ContextUtils.warn;
 import static io.micronaut.openapi.visitor.FileUtils.calcFinalFilename;
 import static io.micronaut.openapi.visitor.FileUtils.resolve;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.ALL;
@@ -85,6 +87,7 @@ import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENA
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ENABLED;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ENVIRONMENTS;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_EXPAND_PREFIX;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_SWAGGER_FILE_GENERATION_ENABLED;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_GROUPS;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_JSON_VIEW_DEFAULT_INCLUSION;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_PROJECT_DIR;
@@ -119,7 +122,7 @@ public final class ConfigUtils {
 
     public static SchemaDecorator getSchemaDecoration(String packageName, VisitorContext context) {
 
-        Map<String, SchemaDecorator> schemaDecorators = context.get(MICRONAUT_INTERNAL_SCHEMA_DECORATORS, ARGUMENT_SCHEMA_DECORATORS_MAP).orElse(null);
+        Map<String, SchemaDecorator> schemaDecorators = ContextUtils.get(MICRONAUT_INTERNAL_SCHEMA_DECORATORS, ARGUMENT_SCHEMA_DECORATORS_MAP, context);
         if (schemaDecorators != null) {
             return schemaDecorators.get(packageName);
         }
@@ -156,14 +159,14 @@ public final class ConfigUtils {
             }
         }
 
-        context.put(MICRONAUT_INTERNAL_SCHEMA_DECORATORS, schemaDecorators);
+        ContextUtils.put(MICRONAUT_INTERNAL_SCHEMA_DECORATORS, schemaDecorators, context);
 
         return schemaDecorators.get(packageName);
     }
 
     public static ClassElement getCustomSchema(String className, Map<String, ClassElement> typeArgs, VisitorContext context) {
 
-        Map<String, CustomSchema> customSchemas = context.get(MICRONAUT_INTERNAL_CUSTOM_SCHEMAS, ARGUMENT_CUSTOM_SCHEMA_MAP).orElse(null);
+        Map<String, CustomSchema> customSchemas = ContextUtils.get(MICRONAUT_INTERNAL_CUSTOM_SCHEMAS, ARGUMENT_CUSTOM_SCHEMA_MAP, context);
         if (customSchemas != null) {
             String key = getClassNameWithGenerics(className, typeArgs);
 
@@ -196,7 +199,7 @@ public final class ConfigUtils {
             }
         }
 
-        context.put(MICRONAUT_INTERNAL_CUSTOM_SCHEMAS, customSchemas);
+        ContextUtils.put(MICRONAUT_INTERNAL_CUSTOM_SCHEMAS, customSchemas, context);
 
         if (customSchemas.isEmpty()) {
             return null;
@@ -231,25 +234,37 @@ public final class ConfigUtils {
     }
 
     public static boolean isOpenApiEnabled(VisitorContext context) {
-        Boolean loadedValue = context.get(MICRONAUT_INTERNAL_OPENAPI_ENABLED, Boolean.class).orElse(null);
+        Boolean loadedValue = ContextUtils.get(MICRONAUT_INTERNAL_OPENAPI_ENABLED, Boolean.class, context);
         if (loadedValue != null) {
             return loadedValue;
         }
         boolean value = getBooleanProperty(MICRONAUT_OPENAPI_ENABLED, true, context);
-        context.put(MICRONAUT_INTERNAL_OPENAPI_ENABLED, value);
+        ContextUtils.put(MICRONAUT_INTERNAL_OPENAPI_ENABLED, value, context);
 
         System.setProperty(MICRONAUT_OPENAPI_ENABLED, Boolean.toString(value));
         return value;
     }
 
+    public static boolean isSpecGenerationEnabled(VisitorContext context) {
+        Boolean loadedValue = ContextUtils.get(MICRONAUT_INTERNAL_GENERATION_SPEC_ENABLED, Boolean.class, context);
+        if (loadedValue != null) {
+            return loadedValue;
+        }
+        boolean value = getBooleanProperty(MICRONAUT_OPENAPI_SWAGGER_FILE_GENERATION_ENABLED, true, context);
+        ContextUtils.put(MICRONAUT_INTERNAL_GENERATION_SPEC_ENABLED, value, context);
+
+        System.setProperty(MICRONAUT_OPENAPI_SWAGGER_FILE_GENERATION_ENABLED, Boolean.toString(value));
+        return value;
+    }
+
     public static List<Pair<String, String>> getExpandableProperties(VisitorContext context) {
 
-        boolean propertiesLoaded = context.get(MICRONAUT_INTERNAL_EXPANDABLE_PROPERTIES_LOADED, Boolean.class).orElse(false);
-        if (propertiesLoaded) {
-            return context.get(MICRONAUT_INTERNAL_EXPANDABLE_PROPERTIES, EXPANDABLE_PROPERTIES_ARGUMENT).orElse(null);
+        Boolean propertiesLoaded = ContextUtils.get(MICRONAUT_INTERNAL_EXPANDABLE_PROPERTIES_LOADED, Boolean.class, context);
+        if (propertiesLoaded != null) {
+            return ContextUtils.get(MICRONAUT_INTERNAL_EXPANDABLE_PROPERTIES, EXPANDABLE_PROPERTIES_ARGUMENT, context);
         }
 
-        List<Pair<String, String>> expandableProperties = new ArrayList<>();
+        var expandableProperties = new ArrayList<Pair<String, String>>();
 
         // first, check system properties and environments config files
         AnnProcessorEnvironment env = (AnnProcessorEnvironment) getEnv(context);
@@ -258,7 +273,7 @@ public final class ConfigUtils {
             try {
                 propertiesFromEnv = env.getProperties(MICRONAUT_OPENAPI_EXPAND_PREFIX.substring(0, MICRONAUT_OPENAPI_EXPAND_PREFIX.length() - 1), null);
             } catch (Exception e) {
-                context.warn("Error:\n" + Utils.printStackTrace(e), null);
+                warn("Error:\n" + Utils.printStackTrace(e), context);
             }
         }
 
@@ -301,8 +316,8 @@ public final class ConfigUtils {
             }
         }
 
-        context.put(MICRONAUT_INTERNAL_EXPANDABLE_PROPERTIES, expandableProperties);
-        context.put(MICRONAUT_INTERNAL_EXPANDABLE_PROPERTIES_LOADED, true);
+        ContextUtils.put(MICRONAUT_INTERNAL_EXPANDABLE_PROPERTIES, expandableProperties, context);
+        ContextUtils.put(MICRONAUT_INTERNAL_EXPANDABLE_PROPERTIES_LOADED, true, context);
 
         return expandableProperties;
     }
@@ -323,7 +338,7 @@ public final class ConfigUtils {
             try {
                 propertiesFromEnv = env.getProperties(MICRONAUT_OPENAPI_ADOC_TEMPLATE_PREFIX.substring(0, MICRONAUT_OPENAPI_ADOC_TEMPLATE_PREFIX.length() - 1), null);
             } catch (Exception e) {
-                context.warn("Error:\n" + Utils.printStackTrace(e), null);
+                warn("Error:\n" + Utils.printStackTrace(e), context);
             }
         }
 
@@ -362,33 +377,33 @@ public final class ConfigUtils {
 
     public static boolean isJsonViewEnabled(VisitorContext context) {
 
-        Boolean isJsonViewEnabled = context.get(MICRONAUT_INTERNAL_JACKSON_JSON_VIEW_ENABLED, Boolean.class).orElse(null);
+        Boolean isJsonViewEnabled = ContextUtils.get(MICRONAUT_INTERNAL_JACKSON_JSON_VIEW_ENABLED, Boolean.class, context);
         if (isJsonViewEnabled != null) {
             return isJsonViewEnabled;
         }
 
         isJsonViewEnabled = getBooleanProperty(MICRONAUT_JACKSON_JSON_VIEW_ENABLED, false, context);
-        context.put(MICRONAUT_INTERNAL_JACKSON_JSON_VIEW_ENABLED, isJsonViewEnabled);
+        ContextUtils.put(MICRONAUT_INTERNAL_JACKSON_JSON_VIEW_ENABLED, isJsonViewEnabled, context);
 
         return isJsonViewEnabled;
     }
 
     public static boolean isJsonViewDefaultInclusion(VisitorContext context) {
 
-        Boolean isJsonViewDefaultInclusion = context.get(MICRONAUT_INTERNAL_JACKSON_JSON_VIEW_DEFAULT_INCLUSION, Boolean.class).orElse(null);
+        Boolean isJsonViewDefaultInclusion = ContextUtils.get(MICRONAUT_INTERNAL_JACKSON_JSON_VIEW_DEFAULT_INCLUSION, Boolean.class, context);
         if (isJsonViewDefaultInclusion != null) {
             return isJsonViewDefaultInclusion;
         }
 
         isJsonViewDefaultInclusion = getBooleanProperty(MICRONAUT_OPENAPI_JSON_VIEW_DEFAULT_INCLUSION, true, context);
-        context.put(MICRONAUT_INTERNAL_JACKSON_JSON_VIEW_DEFAULT_INCLUSION, isJsonViewDefaultInclusion);
+        ContextUtils.put(MICRONAUT_INTERNAL_JACKSON_JSON_VIEW_DEFAULT_INCLUSION, isJsonViewDefaultInclusion, context);
 
         return isJsonViewDefaultInclusion;
     }
 
     public static SecurityProperties getSecurityProperties(VisitorContext context) {
 
-        SecurityProperties securityProperties = context.get(MICRONAUT_INTERNAL_SECURITY_PROPERTIES, SecurityProperties.class).orElse(null);
+        SecurityProperties securityProperties = ContextUtils.get(MICRONAUT_INTERNAL_SECURITY_PROPERTIES, SecurityProperties.class, context);
         if (securityProperties != null) {
             return securityProperties;
         }
@@ -422,14 +437,14 @@ public final class ConfigUtils {
             getBooleanProperty("micronaut.security.basic-auth.enabled", false, context)
         );
 
-        context.put(MICRONAUT_INTERNAL_SECURITY_PROPERTIES, securityProperties);
+        ContextUtils.put(MICRONAUT_INTERNAL_SECURITY_PROPERTIES, securityProperties, context);
 
         return securityProperties;
     }
 
     public static RouterVersioningProperties getRouterVersioningProperties(VisitorContext context) {
 
-        RouterVersioningProperties routerVersioningProperties = context.get(MICRONAUT_INTERNAL_ROUTER_VERSIONING_PROPERTIES, RouterVersioningProperties.class).orElse(null);
+        RouterVersioningProperties routerVersioningProperties = ContextUtils.get(MICRONAUT_INTERNAL_ROUTER_VERSIONING_PROPERTIES, RouterVersioningProperties.class, context);
         if (routerVersioningProperties != null) {
             return routerVersioningProperties;
         }
@@ -443,7 +458,7 @@ public final class ConfigUtils {
             getListStringsProperty("micronaut.router.versioning.parameter.names", Collections.singletonList(DEFAULT_PARAMETER_NAME), context)
         );
 
-        context.put(MICRONAUT_INTERNAL_ROUTER_VERSIONING_PROPERTIES, routerVersioningProperties);
+        ContextUtils.put(MICRONAUT_INTERNAL_ROUTER_VERSIONING_PROPERTIES, routerVersioningProperties, context);
 
         return routerVersioningProperties;
     }
@@ -481,7 +496,7 @@ public final class ConfigUtils {
         if (context == null) {
             return Collections.emptyMap();
         }
-        Map<String, GroupProperties> groupPropertiesMap = context.get(MICRONAUT_INTERNAL_GROUPS, ARGUMENT_GROUP_PROPERTIES_MAP).orElse(null);
+        Map<String, GroupProperties> groupPropertiesMap = ContextUtils.get(MICRONAUT_INTERNAL_GROUPS, ARGUMENT_GROUP_PROPERTIES_MAP, context);
         if (groupPropertiesMap != null) {
             return groupPropertiesMap;
         }
@@ -510,7 +525,7 @@ public final class ConfigUtils {
 
         Utils.getAllKnownGroups().addAll(groupPropertiesMap.keySet());
 
-        context.put(MICRONAUT_INTERNAL_GROUPS, groupPropertiesMap);
+        ContextUtils.put(MICRONAUT_INTERNAL_GROUPS, groupPropertiesMap, context);
 
         return groupPropertiesMap;
     }
@@ -523,12 +538,12 @@ public final class ConfigUtils {
      * @return The EndpointsConfiguration.
      */
     public static EndpointsConfiguration endpointsConfiguration(VisitorContext context) {
-        Optional<EndpointsConfiguration> cfg = context.get(MICRONAUT_INTERNAL_ENVIRONMENT_CREATED, EndpointsConfiguration.class);
-        if (cfg.isPresent()) {
-            return cfg.get();
+        EndpointsConfiguration cfg = ContextUtils.get(MICRONAUT_INTERNAL_ENVIRONMENT_CREATED, EndpointsConfiguration.class, context);
+        if (cfg != null) {
+            return cfg;
         }
         var conf = new EndpointsConfiguration(context, readOpenApiConfigFile(context));
-        context.put(MICRONAUT_INTERNAL_ENVIRONMENT_CREATED, conf);
+        ContextUtils.put(MICRONAUT_INTERNAL_ENVIRONMENT_CREATED, conf, context);
         return conf;
     }
 
@@ -661,12 +676,12 @@ public final class ConfigUtils {
     }
 
     private static void readCustomSchema(String className, String targetClassName, Map<String, CustomSchema> customSchemas, VisitorContext context) {
-        if (customSchemas.containsKey(className)) {
+        if (customSchemas.containsKey(className) || context == null) {
             return;
         }
-        ClassElement targetClassElement = context.getClassElement(targetClassName).orElse(null);
+        ClassElement targetClassElement = ContextUtils.getClassElement(targetClassName, context);
         if (targetClassElement == null) {
-            context.warn("Can't find class " + targetClassName + " in classpath. Skip it.", null);
+            warn("Can't find class " + targetClassName + " in classpath. Skip it.", context);
             return;
         }
 
@@ -686,25 +701,30 @@ public final class ConfigUtils {
     @Nullable
     public static Path getProjectPath(VisitorContext context) {
 
-        Path projectPath = context.get(MICRONAUT_INTERNAL_OPENAPI_PROJECT_DIR, Path.class).orElse(null);
+        Path projectPath = ContextUtils.get(MICRONAUT_INTERNAL_OPENAPI_PROJECT_DIR, Path.class, context);
         if (projectPath != null) {
             return projectPath;
         }
 
-        String projectDir = context.getOptions().get(MICRONAUT_OPENAPI_PROJECT_DIR);
+        String projectDir = ContextUtils.getOptions(context).get(MICRONAUT_OPENAPI_PROJECT_DIR);
         if (projectDir != null) {
             projectPath = Paths.get(projectDir);
         }
         if (projectPath == null) {
             try {
-                projectPath = context.getProjectDir().orElse(Utils.isTestMode() ? Paths.get(System.getProperty("user.dir")) : null);
+                if (context != null) {
+                    projectPath = context.getProjectDir().orElse(Utils.isTestMode() ? Paths.get(System.getProperty("user.dir")) : null);
+                }
+                if (projectPath == null && Utils.isTestMode()) {
+                    projectPath = Paths.get(System.getProperty("user.dir"));
+                }
             } catch (Exception e) {
                 // Should never happen
                 projectPath = Paths.get(System.getProperty("user.dir"));
             }
         }
 
-        context.put(MICRONAUT_INTERNAL_OPENAPI_PROJECT_DIR, projectPath);
+        ContextUtils.put(MICRONAUT_INTERNAL_OPENAPI_PROJECT_DIR, projectPath, context);
 
         return projectPath;
     }
@@ -712,16 +732,16 @@ public final class ConfigUtils {
     public static String getConfigProperty(String key, VisitorContext context) {
 
         if (context != null) {
-            boolean isLoaded = context.get(key + LOADED_POSTFIX, Boolean.class).orElse(false);
-            if (isLoaded) {
-                return context.get(key + VALUE_POSTFIX, String.class).orElse(null);
+            Boolean isLoaded = ContextUtils.get(key + LOADED_POSTFIX, Boolean.class, context);
+            if (isLoaded != null) {
+                return ContextUtils.get(key + VALUE_POSTFIX, String.class, context);
             }
         }
 
         String value;
         // if this option, need to check context.options
         if (ALL.contains(key) && context != null) {
-            value = context.getOptions().get(key);
+            value = ContextUtils.getOptions(context).get(key);
         } else {
             value = System.getProperty(key);
         }
@@ -736,9 +756,9 @@ public final class ConfigUtils {
         value = environment != null ? environment.get(key, String.class).orElse(null) : null;
 
         if (context != null) {
-            context.put(key + LOADED_POSTFIX, true);
+            ContextUtils.put(key + LOADED_POSTFIX, true, context);
             if (value != null) {
-                context.put(key + VALUE_POSTFIX, value);
+                ContextUtils.put(key + VALUE_POSTFIX, value, context);
             }
         }
 
@@ -754,30 +774,26 @@ public final class ConfigUtils {
     }
 
     public static Properties readOpenApiConfigFile(VisitorContext context) {
-        Optional<Properties> props = context != null ? context.get(MICRONAUT_INTERNAL_OPENAPI_PROPERTIES, Properties.class) : Optional.empty();
-        if (props.isPresent()) {
-            return props.get();
+        Properties props = ContextUtils.get(MICRONAUT_INTERNAL_OPENAPI_PROPERTIES, Properties.class, context);
+        if (props != null) {
+            return props;
         }
         Properties openApiProperties = new Properties();
-        String cfgFile = context != null ? context.getOptions().getOrDefault(MICRONAUT_OPENAPI_CONFIG_FILE, OPENAPI_CONFIG_FILE) : System.getProperty(MICRONAUT_OPENAPI_CONFIG_FILE, OPENAPI_CONFIG_FILE);
+        String cfgFile = context != null ? ContextUtils.getOptions(context).getOrDefault(MICRONAUT_OPENAPI_CONFIG_FILE, OPENAPI_CONFIG_FILE) : System.getProperty(MICRONAUT_OPENAPI_CONFIG_FILE, OPENAPI_CONFIG_FILE);
         if (StringUtils.isNotEmpty(cfgFile)) {
             Path cfg = resolve(context, Paths.get(cfgFile));
             if (Files.isReadable(cfg)) {
                 try (Reader reader = Files.newBufferedReader(cfg)) {
                     openApiProperties.load(reader);
                 } catch (IOException e) {
-                    if (context != null) {
-                        context.warn("Fail to read OpenAPI configuration file: " + e.getMessage(), null);
-                    }
+                    warn("Fail to read OpenAPI configuration file: " + e.getMessage(), null);
                 }
             } else if (Files.exists(cfg)) {
-                if (context != null) {
-                    context.warn("Can not read configuration file: " + cfg, null);
-                }
+                warn("Can not read configuration file: " + cfg, context);
             }
         }
         if (context != null) {
-            context.put(MICRONAUT_INTERNAL_OPENAPI_PROPERTIES, openApiProperties);
+            ContextUtils.put(MICRONAUT_INTERNAL_OPENAPI_PROPERTIES, openApiProperties, context);
         }
         return openApiProperties;
     }
@@ -788,16 +804,14 @@ public final class ConfigUtils {
             return null;
         }
 
-        Boolean envCreated = context != null ? context.get(MICRONAUT_INTERNAL_ENVIRONMENT_CREATED, Boolean.class).orElse(null) : null;
+        Boolean envCreated = ContextUtils.get(MICRONAUT_INTERNAL_ENVIRONMENT_CREATED, Boolean.class, context);
         if (envCreated != null && envCreated) {
-            return context.get(MICRONAUT_INTERNAL_ENVIRONMENT, Environment.class).orElse(null);
+            return ContextUtils.get(MICRONAUT_INTERNAL_ENVIRONMENT, Environment.class, context);
         }
 
         Environment environment = createEnv(context);
-        if (context != null) {
-            context.put(MICRONAUT_INTERNAL_ENVIRONMENT, environment);
-            context.put(MICRONAUT_INTERNAL_ENVIRONMENT_CREATED, true);
-        }
+        ContextUtils.put(MICRONAUT_INTERNAL_ENVIRONMENT, environment, context);
+        ContextUtils.put(MICRONAUT_INTERNAL_ENVIRONMENT_CREATED, true, context);
 
         return environment;
     }
@@ -840,9 +854,7 @@ public final class ConfigUtils {
             environment.start();
             return environment;
         } catch (Exception e) {
-            if (context != null) {
-                context.warn("Can't create environment: " + e.getMessage() + ".\n" + Utils.printStackTrace(e), null);
-            }
+            warn("Can't create environment: " + e.getMessage() + ".\n" + Utils.printStackTrace(e), context);
         }
         return environment;
     }
@@ -874,14 +886,14 @@ public final class ConfigUtils {
         }
 
         boolean isEnabled = true;
-        String isEnabledStr = context.getOptions().get(MICRONAUT_ENVIRONMENT_ENABLED);
+        String isEnabledStr = ContextUtils.getOptions(context).get(MICRONAUT_ENVIRONMENT_ENABLED);
         if (StringUtils.isEmpty(isEnabledStr)) {
             isEnabledStr = readOpenApiConfigFile(context).getProperty(MICRONAUT_ENVIRONMENT_ENABLED);
         }
         if (StringUtils.isNotEmpty(isEnabledStr)) {
             isEnabled = Boolean.parseBoolean(isEnabledStr);
         }
-        context.put(MICRONAUT_ENVIRONMENT_ENABLED, isEnabled);
+        ContextUtils.put(MICRONAUT_ENVIRONMENT_ENABLED, isEnabled, context);
         return isEnabled;
     }
 

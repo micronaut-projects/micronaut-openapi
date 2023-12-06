@@ -134,6 +134,7 @@ import static io.micronaut.openapi.visitor.ConfigUtils.getCustomSchema;
 import static io.micronaut.openapi.visitor.ConfigUtils.getExpandableProperties;
 import static io.micronaut.openapi.visitor.ConfigUtils.getSchemaDecoration;
 import static io.micronaut.openapi.visitor.ConfigUtils.isJsonViewDefaultInclusion;
+import static io.micronaut.openapi.visitor.ContextUtils.warn;
 import static io.micronaut.openapi.visitor.ConvertUtils.parseJsonString;
 import static io.micronaut.openapi.visitor.ConvertUtils.resolveExtensions;
 import static io.micronaut.openapi.visitor.ConvertUtils.setDefaultValueObject;
@@ -186,7 +187,7 @@ abstract class AbstractOpenApiVisitor {
     void incrementVisitedElements(VisitorContext context) {
         VISITED_ELEMENTS_LOCK.lock();
         try {
-            context.put(Utils.ATTR_VISITED_ELEMENTS, ContextUtils.getVisitedElements(context) + 1);
+            ContextUtils.put(Utils.ATTR_VISITED_ELEMENTS, ContextUtils.getVisitedElements(context) + 1, context);
         } finally {
             VISITED_ELEMENTS_LOCK.unlock();
         }
@@ -238,7 +239,7 @@ abstract class AbstractOpenApiVisitor {
         try {
             return Optional.ofNullable(ConvertUtils.treeToValue(node, type, context));
         } catch (JsonProcessingException e) {
-            context.warn("Error converting  [" + node + "]: to " + type + ": " + e.getMessage(), null);
+            warn("Error converting  [" + node + "]: to " + type + ": " + e.getMessage(), context);
         }
         return Optional.empty();
     }
@@ -676,22 +677,22 @@ abstract class AbstractOpenApiVisitor {
             Optional<String> impl = annotationValue.stringValue("implementation");
             Optional<String> type = annotationValue.stringValue("type");
             Optional<String> format = annotationValue.stringValue("format");
-            Optional<ClassElement> classElement = Optional.empty();
+            ClassElement classElement = null;
             PrimitiveType primitiveType = null;
             if (impl.isPresent()) {
-                classElement = context.getClassElement(impl.get());
+                classElement = ContextUtils.getClassElement(impl.get(), context);
             } else if (type.isPresent()) {
                 // if format is "binary", we want PrimitiveType.BINARY
                 primitiveType = PrimitiveType.fromName(format.isPresent() && format.get().equals("binary") ? format.get() : type.get());
                 if (primitiveType == null) {
-                    classElement = context.getClassElement(type.get());
+                    classElement = ContextUtils.getClassElement(type.get(), context);
                 } else {
-                    classElement = context.getClassElement(primitiveType.getKeyClass());
+                    classElement = ContextUtils.getClassElement(primitiveType.getKeyClass().getName(), context);
                 }
             }
-            if (classElement.isPresent()) {
+            if (classElement != null) {
                 if (primitiveType == null) {
-                    final ArraySchema schema = SchemaUtils.arraySchema(resolveSchema(null, classElement.get(), context, Collections.emptyList(), jsonViewClass));
+                    final ArraySchema schema = SchemaUtils.arraySchema(resolveSchema(null, classElement, context, Collections.emptyList(), jsonViewClass));
                     schemaToValueMap(arraySchemaMap, schema);
                 } else {
                     // For primitive type, just copy description field is present.
@@ -785,14 +786,20 @@ abstract class AbstractOpenApiVisitor {
         if (schemaAnnotationValue != null) {
             String impl = schemaAnnotationValue.stringValue("implementation").orElse(null);
             if (StringUtils.isNotEmpty(impl)) {
-                type = context.getClassElement(impl).orElse(type);
+                var typeEl = ContextUtils.getClassElement(impl, context);
+                if (typeEl != null) {
+                    type = typeEl;
+                }
                 isSubstitudedType = true;
             } else {
                 String schemaType = schemaAnnotationValue.stringValue("type").orElse(null);
                 if (StringUtils.isNotEmpty(schemaType) && !(type instanceof EnumElement)) {
                     PrimitiveType primitiveType = PrimitiveType.fromName(schemaType);
                     if (primitiveType != null && primitiveType != PrimitiveType.OBJECT) {
-                        type = context.getClassElement(primitiveType.getKeyClass()).orElse(type);
+                        var typeEl = ContextUtils.getClassElement(primitiveType.getKeyClass().getName(), context);
+                        if (typeEl != null) {
+                            type = typeEl;
+                        }
                         isSubstitudedType = true;
                     }
                 }
@@ -1059,7 +1066,7 @@ abstract class AbstractOpenApiVisitor {
                 }
                 addProperty(parentSchema, propertyName, propertySchema, isRequired);
             } catch (IOException e) {
-                context.warn("Exception cloning property " + e.getMessage(), null);
+                warn("Exception cloning property " + e.getMessage(), context);
             }
         }
     }
@@ -1224,10 +1231,14 @@ abstract class AbstractOpenApiVisitor {
             if (schemaName.isPresent()) {
                 schemaToBind.setName(schemaName.get());
             }
-            elementType = schemaAnn
-                .stringValue("implementation")
-                .flatMap(context::getClassElement)
-                .orElse(elementType);
+
+            var impl = schemaAnn.stringValue("implementation").orElse(null);
+            if (StringUtils.isNotEmpty(impl)) {
+                var implEl = ContextUtils.getClassElement(impl, context);
+                if (implEl != null) {
+                    elementType = implEl;
+                }
+            }
         }
         AnnotationValue<io.swagger.v3.oas.annotations.media.ArraySchema> arraySchemaAnn = element.getAnnotation(io.swagger.v3.oas.annotations.media.ArraySchema.class);
         if (arraySchemaAnn != null) {
@@ -1674,7 +1685,7 @@ abstract class AbstractOpenApiVisitor {
         try {
             schemaToBind = OpenApiUtils.getJsonMapper().readerForUpdating(schemaToBind).readValue(schemaJson);
         } catch (IOException e) {
-            context.warn("Error reading Swagger Schema for element [" + element + "]: " + e.getMessage(), element);
+            warn("Error reading Swagger Schema for element [" + element + "]: " + e.getMessage(), context, element);
         }
 
         String defaultValue = null;
@@ -1711,7 +1722,7 @@ abstract class AbstractOpenApiVisitor {
                     try {
                         schemaToBind.addEnumItemObject(ConvertUtils.normalizeValue(allowableValue, elType, elFormat, context));
                     } catch (IOException e) {
-                        context.warn("Can't convert " + allowableValue + " to " + elType + ", format: " + elFormat + ": " + e.getMessage(), element);
+                        warn("Can't convert " + allowableValue + " to " + elType + ", format: " + elFormat + ": " + e.getMessage(), context, element);
                         schemaToBind.addEnumItemObject(allowableValue);
                     }
                 }
@@ -1751,7 +1762,7 @@ abstract class AbstractOpenApiVisitor {
                     try {
                         schemaToBind.items(OpenApiUtils.getJsonMapper().readerForUpdating(schemaToBind.getItems()).readValue(items));
                     } catch (IOException e) {
-                        context.warn("Error reading Swagger Schema for element [" + element + "]: " + e.getMessage(), element);
+                        warn("Error reading Swagger Schema for element [" + element + "]: " + e.getMessage(), context, element);
                     }
                 }
             }
@@ -1816,7 +1827,7 @@ abstract class AbstractOpenApiVisitor {
                 bindSchemaForClassName(context, valueMap, className, jsonViewClass);
             }
             if (not.isPresent()) {
-                final Schema<?> schemaNot = resolveSchema(null, context.getClassElement(not.get()).get(), context, Collections.emptyList(), jsonViewClass);
+                final Schema<?> schemaNot = resolveSchema(null, ContextUtils.getClassElement(not.get(), context), context, Collections.emptyList(), jsonViewClass);
                 Map<CharSequence, Object> schemaMap = new HashMap<>();
                 schemaToValueMap(schemaMap, schemaNot);
                 valueMap.put("not", schemaMap);
@@ -1833,10 +1844,10 @@ abstract class AbstractOpenApiVisitor {
 
     private void bindSchemaForComposite(VisitorContext context, Map<CharSequence, Object> valueMap, String[] classNames, String key, @Nullable ClassElement jsonViewClass) {
         final List<Map<CharSequence, Object>> namesToSchemas = Arrays.stream(classNames).map(className -> {
-            final Optional<ClassElement> classElement = context.getClassElement(className);
+            ClassElement classElement = ContextUtils.getClassElement(className, context);
             Map<CharSequence, Object> schemaMap = new HashMap<>();
-            if (classElement.isPresent()) {
-                final Schema<?> schema = resolveSchema(null, classElement.get(), context, Collections.emptyList(), jsonViewClass);
+            if (classElement != null) {
+                final Schema<?> schema = resolveSchema(null, classElement, context, Collections.emptyList(), jsonViewClass);
                 schemaToValueMap(schemaMap, schema);
             }
             return schemaMap;
@@ -1845,9 +1856,9 @@ abstract class AbstractOpenApiVisitor {
     }
 
     private void bindSchemaForClassName(VisitorContext context, Map<CharSequence, Object> valueMap, String className, @Nullable ClassElement jsonViewClass) {
-        final Optional<ClassElement> classElement = context.getClassElement(className);
-        if (classElement.isPresent()) {
-            final Schema<?> schema = resolveSchema(null, classElement.get(), context, Collections.emptyList(), jsonViewClass);
+        ClassElement classElement = ContextUtils.getClassElement(className, context);
+        if (classElement != null) {
+            final Schema<?> schema = resolveSchema(null, classElement, context, Collections.emptyList(), jsonViewClass);
             schemaToValueMap(valueMap, schema);
         }
     }
@@ -2035,8 +2046,10 @@ abstract class AbstractOpenApiVisitor {
             String firstSuperTypeName = superTypes.get(0).getName();
             if (superTypes.size() == 1
                 && (firstSuperTypeName.equals(Enum.class.getName()) || firstSuperTypeName.equals(Object.class.getName()))) {
-                schema.setName(schemaName);
-                schemas.put(schemaName, schema);
+                if (schema != null) {
+                    schema.setName(schemaName);
+                    schemas.put(schemaName, schema);
+                }
 
                 return null;
             }
@@ -2111,7 +2124,7 @@ abstract class AbstractOpenApiVisitor {
         OpenAPI openAPI = Utils.resolveOpenApi(context);
         final AnnotationClassValue<?> not = (AnnotationClassValue<?>) annValues.get("not");
         if (not != null) {
-            final Schema<?> schemaNot = resolveSchema(null, context.getClassElement(not.getName()).get(), context, Collections.emptyList(), jsonViewClass);
+            final Schema<?> schemaNot = resolveSchema(null, ContextUtils.getClassElement(not.getName(), context), context, Collections.emptyList(), jsonViewClass);
             schemaToBind.setNot(schemaNot);
         }
         final AnnotationClassValue<?>[] allOf = (AnnotationClassValue<?>[]) annValues.get("allOf");
@@ -2212,7 +2225,7 @@ abstract class AbstractOpenApiVisitor {
                         try {
                             schema.addEnumItemObject(ConvertUtils.normalizeValue(allowableValue, elType, elFormat, context));
                         } catch (IOException e) {
-                            context.warn("Can't convert " + allowableValue + " to " + elType + ": " + e.getMessage(), type);
+                            warn("Can't convert " + allowableValue + " to " + elType + ": " + e.getMessage(), context, type);
                             schema.addEnumItemObject(allowableValue);
                         }
                     }
@@ -2260,7 +2273,7 @@ abstract class AbstractOpenApiVisitor {
                 try {
                     enumValues.add(ConvertUtils.normalizeValue(jacksonValue, schemaType, schemaFormat, context));
                 } catch (JsonProcessingException e) {
-                    context.warn("Error converting jacksonValue " + jacksonValue + " : to " + type + ": " + e.getMessage(), element);
+                    warn("Error converting jacksonValue " + jacksonValue + " : to " + type + ": " + e.getMessage(), context, element);
                     enumValues.add(element.getSimpleName());
                 }
             } else {
@@ -2273,9 +2286,8 @@ abstract class AbstractOpenApiVisitor {
     private List<Schema<?>> namesToSchemas(OpenAPI openAPI, VisitorContext context, AnnotationClassValue<?>[] names, List<MediaType> mediaTypes, @Nullable ClassElement jsonViewClass) {
         return Arrays.stream(names)
             .flatMap((Function<AnnotationClassValue<?>, Stream<Schema<?>>>) classAnn -> {
-                final Optional<ClassElement> classElementOpt = context.getClassElement(classAnn.getName());
-                if (classElementOpt.isPresent()) {
-                    ClassElement classElement = classElementOpt.get();
+                ClassElement classElement = ContextUtils.getClassElement(classAnn.getName(), context);
+                if (classElement != null) {
                     Map<String, ClassElement> classElementTypeArgs = classElement.getTypeArguments();
                     ClassElement customClassElement = getCustomSchema(classElement.getName(), classElementTypeArgs, context);
                     if (customClassElement != null) {
@@ -2436,7 +2448,7 @@ abstract class AbstractOpenApiVisitor {
                     .filter(p -> !"groovy.lang.MetaClass".equals(p.getType().getName()))
                     .toList();
             } catch (Exception e) {
-                context.warn("Error with getting properties for class " + classElement.getName() + ": " + e + "\n" + Utils.printStackTrace(e), classElement);
+                warn("Error with getting properties for class " + classElement.getName() + ": " + e + "\n" + Utils.printStackTrace(e), context, classElement);
                 // Workaround for https://github.com/micronaut-projects/micronaut-openapi/issues/313
                 beanProperties = Collections.emptyList();
             }
@@ -2569,7 +2581,8 @@ abstract class AbstractOpenApiVisitor {
         }
 
         for (String fieldJsonViewClass : fieldJsonViewClasses) {
-            if (jsonViewClassEl.isAssignable(context.getClassElement(fieldJsonViewClass).get())) {
+            var classEl = ContextUtils.getClassElement(fieldJsonViewClass, context);
+            if (classEl != null && jsonViewClassEl.isAssignable(classEl)) {
                 return true;
             }
         }
@@ -2649,9 +2662,9 @@ abstract class AbstractOpenApiVisitor {
 
                     if (SecurityScheme.Type.HTTP.toString().equals(type)) {
                         if (!map.containsKey("scheme")) {
-                            context.warn("Can't use http security scheme without 'scheme' property", null);
+                            warn("Can't use http security scheme without 'scheme' property", context);
                         } else if (!map.get("scheme").equals("bearer") && map.containsKey("bearerFormat")) {
-                            context.warn("Should NOT have a `bearerFormat` property without `scheme: bearer` being set", null);
+                            warn("Should NOT have a `bearerFormat` property without `scheme: bearer` being set", context);
                         }
                     }
 
@@ -2684,7 +2697,7 @@ abstract class AbstractOpenApiVisitor {
 
     private void removeAndWarnSecSchemeProp(Map<CharSequence, Object> map, String prop, VisitorContext context, boolean withWarn) {
         if (map.containsKey(prop) && withWarn) {
-            context.warn("'" + prop + "' property can't set for securityScheme with type " + map.get("type") + ". Skip it", null);
+            warn("'" + prop + "' property can't set for securityScheme with type " + map.get("type") + ". Skip it", context);
         }
         map.remove(prop);
     }

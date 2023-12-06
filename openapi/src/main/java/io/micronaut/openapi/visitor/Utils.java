@@ -201,10 +201,10 @@ public final class Utils {
      * @return The {@link OpenAPI} instance
      */
     public static OpenAPI resolveOpenApi(VisitorContext context) {
-        OpenAPI openAPI = context.get(ATTR_OPENAPI, OpenAPI.class).orElse(null);
+        OpenAPI openAPI = ContextUtils.get(ATTR_OPENAPI, OpenAPI.class, context);
         if (openAPI == null) {
             openAPI = new OpenAPI();
-            context.put(ATTR_OPENAPI, openAPI);
+            ContextUtils.put(ATTR_OPENAPI, openAPI, context);
         }
         return openAPI;
     }
