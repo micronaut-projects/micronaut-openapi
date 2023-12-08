@@ -73,6 +73,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import static io.micronaut.openapi.OpenApiUtils.CONVERT_JSON_MAPPER;
 import static io.micronaut.openapi.OpenApiUtils.JSON_MAPPER;
+import static io.micronaut.openapi.visitor.ContextUtils.warn;
 import static io.micronaut.openapi.visitor.SchemaUtils.TYPE_OBJECT;
 import static io.micronaut.openapi.visitor.SchemaUtils.processExtensions;
 
@@ -105,7 +106,7 @@ public final class ConvertUtils {
         try {
             return ConvertUtils.treeToValue(node, type, context);
         } catch (JsonProcessingException e) {
-            context.warn("Error converting  [" + node + "]: to " + type + ": " + e.getMessage(), null);
+            warn("Error converting  [" + node + "]: to " + type + ": " + e.getMessage(), context);
         }
         return null;
     }
@@ -375,7 +376,7 @@ public final class ConvertUtils {
             }
             schema.setDefault(ConvertUtils.normalizeValue(defaultValue, typeAndFormat.getFirst(), typeAndFormat.getSecond(), context, isMicronautFormat));
         } catch (JsonProcessingException e) {
-            context.warn("Can't convert " + defaultValue + " to " + schemaType + ": " + e.getMessage(), element);
+            warn("Can't convert " + defaultValue + " to " + schemaType + ": " + e.getMessage(), context);
             schema.setDefault(defaultValue);
         }
     }
@@ -401,7 +402,7 @@ public final class ConvertUtils {
         if (CollectionUtils.isNotEmpty(methods)) {
             MethodElement firstMethod = methods.get(0);
             if (methods.size() > 1) {
-                context.warn("Found " + methods.size() + " methods with @JsonValue. Process method " + firstMethod, type);
+                warn("Found " + methods.size() + " methods with @JsonValue. Process method " + firstMethod, context, type);
             }
             ClassElement returnType = firstMethod.getReturnType();
             if (returnType.isEnum()) {
@@ -543,7 +544,7 @@ public final class ConvertUtils {
                 }
             }
         } catch (Exception e) {
-            context.warn("Can't parse value " + valueStr + " with type " + type + " and format " + format, null);
+            warn("Can't parse value " + valueStr + " with type " + type + " and format " + format, context);
         }
 
         return valueStr;

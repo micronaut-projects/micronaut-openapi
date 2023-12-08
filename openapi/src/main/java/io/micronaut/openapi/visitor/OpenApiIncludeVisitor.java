@@ -33,6 +33,7 @@ import io.micronaut.openapi.annotation.OpenAPIIncludes;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import static io.micronaut.openapi.visitor.ConfigUtils.isSpecGenerationEnabled;
 import static io.micronaut.openapi.visitor.ConfigUtils.isOpenApiEnabled;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ENABLED;
 
@@ -46,7 +47,7 @@ public class OpenApiIncludeVisitor implements TypeElementVisitor<OpenAPIIncludes
 
     @Override
     public void visitClass(ClassElement element, VisitorContext context) {
-        if (!isOpenApiEnabled(context)) {
+        if (!isOpenApiEnabled(context) || !isSpecGenerationEnabled(context)) {
             return;
         }
         for (AnnotationValue<OpenAPIInclude> includeAnnotation : element.getAnnotationValuesByType(OpenAPIInclude.class)) {
@@ -62,16 +63,16 @@ public class OpenApiIncludeVisitor implements TypeElementVisitor<OpenAPIIncludes
                 OpenApiControllerVisitor controllerVisitor = new OpenApiControllerVisitor(tags, security, customUri.orElse(null));
                 OpenApiEndpointVisitor endpointVisitor = new OpenApiEndpointVisitor(true, tags.isEmpty() ? null : tags, security.isEmpty() ? null : security);
                 for (String className : classes) {
-                    context.getClassElement(className)
-                        .ifPresent(ce -> {
-                            groupVisitor.visitClass(ce, context);
+                    var classEl = ContextUtils.getClassElement(className, context);
+                    if (classEl != null) {
+                        groupVisitor.visitClass(classEl, context);
 
-                            if (ce.isAnnotationPresent(Controller.class)) {
-                                visit(controllerVisitor, context, ce);
-                            } else if (ce.isAnnotationPresent("io.micronaut.management.endpoint.annotation.Endpoint")) {
-                                visit(endpointVisitor, context, ce);
-                            }
-                        });
+                        if (classEl.isAnnotationPresent(Controller.class)) {
+                            visit(controllerVisitor, context, classEl);
+                        } else if (classEl.isAnnotationPresent("io.micronaut.management.endpoint.annotation.Endpoint")) {
+                            visit(endpointVisitor, context, classEl);
+                        }
+                    }
                 }
             }
         }

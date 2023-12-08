@@ -121,8 +121,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import static io.micronaut.openapi.visitor.ConfigUtils.getGroupsPropertiesMap;
 import static io.micronaut.openapi.visitor.ConfigUtils.getRouterVersioningProperties;
 import static io.micronaut.openapi.visitor.ConfigUtils.getSecurityProperties;
+import static io.micronaut.openapi.visitor.ConfigUtils.isSpecGenerationEnabled;
 import static io.micronaut.openapi.visitor.ConfigUtils.isJsonViewEnabled;
 import static io.micronaut.openapi.visitor.ConfigUtils.isOpenApiEnabled;
+import static io.micronaut.openapi.visitor.ContextUtils.warn;
 import static io.micronaut.openapi.visitor.ElementUtils.isElementNotNullable;
 import static io.micronaut.openapi.visitor.ElementUtils.isFileUpload;
 import static io.micronaut.openapi.visitor.ElementUtils.isNullable;
@@ -166,7 +168,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
      * @param context The visitor context
      */
     public void visitClass(ClassElement element, VisitorContext context) {
-        if (!isOpenApiEnabled(context)) {
+        if (!isOpenApiEnabled(context) || !isSpecGenerationEnabled(context)) {
             return;
         }
         if (ignore(element, context)) {
@@ -176,11 +178,11 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         processSecuritySchemes(element, context);
         processTags(element, context);
         processExternalDocs(element, context);
-        context.remove(CONTEXT_CHILD_PATH);
+        ContextUtils.remove(CONTEXT_CHILD_PATH, context);
 
         if (element.isAnnotationPresent(Controller.class)) {
 
-            element.stringValue(UriMapping.class).ifPresent(url -> context.put(CONTEXT_CHILD_PATH, url));
+            element.stringValue(UriMapping.class).ifPresent(url -> ContextUtils.put(CONTEXT_CHILD_PATH, url, context));
             String prefix = "";
             String suffix = "";
             boolean addAlways = true;
@@ -190,9 +192,9 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                 suffix = apiDecorator.stringValue("opIdSuffix").orElse("");
                 addAlways = apiDecorator.booleanValue("addAlways").orElse(true);
             }
-            context.put(CONTEXT_CHILD_OP_ID_PREFIX, prefix);
-            context.put(CONTEXT_CHILD_OP_ID_SUFFIX, suffix);
-            context.put(CONTEXT_CHILD_OP_ID_SUFFIX_ADD_ALWAYS, addAlways);
+            ContextUtils.put(CONTEXT_CHILD_OP_ID_PREFIX, prefix, context);
+            ContextUtils.put(CONTEXT_CHILD_OP_ID_SUFFIX, suffix, context);
+            ContextUtils.put(CONTEXT_CHILD_OP_ID_SUFFIX_ADD_ALWAYS, addAlways, context);
 
             List<ClassElement> superTypes = new ArrayList<>();
             Collection<ClassElement> parentInterfaces = element.getInterfaces();
@@ -208,19 +210,19 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             }
 
             if (CollectionUtils.isNotEmpty(superTypes)) {
-                context.put(IS_PROCESS_PARENT_CLASS, true);
+                ContextUtils.put(IS_PROCESS_PARENT_CLASS, true, context);
                 List<MethodElement> methods = element.getEnclosedElements(ElementQuery.ALL_METHODS);
                 for (MethodElement method : methods) {
                     visitMethod(method, context);
                 }
-                context.remove(IS_PROCESS_PARENT_CLASS);
+                ContextUtils.remove(IS_PROCESS_PARENT_CLASS, context);
             }
 
-            context.remove(CONTEXT_CHILD_OP_ID_PREFIX);
-            context.remove(CONTEXT_CHILD_OP_ID_SUFFIX);
-            context.remove(CONTEXT_CHILD_OP_ID_SUFFIX_ADD_ALWAYS);
+            ContextUtils.remove(CONTEXT_CHILD_OP_ID_PREFIX, context);
+            ContextUtils.remove(CONTEXT_CHILD_OP_ID_SUFFIX, context);
+            ContextUtils.remove(CONTEXT_CHILD_OP_ID_SUFFIX_ADD_ALWAYS, context);
         }
-        context.remove(CONTEXT_CHILD_PATH);
+        ContextUtils.remove(CONTEXT_CHILD_PATH, context);
     }
 
     private void processTags(ClassElement element, VisitorContext context) {
@@ -363,7 +365,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
      * @param context The visitor context
      */
     public void visitMethod(MethodElement element, VisitorContext context) {
-        if (!isOpenApiEnabled(context)) {
+        if (!isOpenApiEnabled(context) || !isSpecGenerationEnabled(context)) {
             return;
         }
         if (ignore(element, context)) {
@@ -395,7 +397,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             if (jsonViewAnnotation != null) {
                 String jsonViewClassName = jsonViewAnnotation.stringValue().orElse(null);
                 if (jsonViewClassName != null) {
-                    jsonViewClass = context.getClassElement(jsonViewClassName).orElse(null);
+                    jsonViewClass = ContextUtils.getClassElement(jsonViewClassName, context);
                 }
             }
         }
@@ -825,7 +827,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             if (jsonViewAnnotation != null) {
                 String jsonViewClassName = jsonViewAnnotation.stringValue().orElse(null);
                 if (jsonViewClassName != null) {
-                    jsonViewClass = context.getClassElement(jsonViewClassName).orElse(null);
+                    jsonViewClass = ContextUtils.getClassElement(jsonViewClassName, context);
                 }
             }
         }
@@ -872,7 +874,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             String paramName = parameter.getValue(PathVariable.class, String.class).orElse(parameterName);
             UriMatchVariable variable = pathVariables.get(paramName);
             if (variable == null) {
-                context.warn("Path variable name: '" + paramName + "' not found in path, operation: " + swaggerOperation.getOperationId(), parameter);
+                warn("Path variable name: '" + paramName + "' not found in path, operation: " + swaggerOperation.getOperationId(), context, parameter);
                 return null;
             }
             newParameter = new PathParameter();
@@ -1000,7 +1002,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                             }
                         }
                     } catch (Exception e) {
-                        context.warn("Error reading Swagger Parameter for element [" + parameter + "]: " + e.getMessage(), parameter);
+                        warn("Error reading Swagger Parameter for element [" + parameter + "]: " + e.getMessage(), context, parameter);
                     }
                 } else {
                     try {
@@ -1029,7 +1031,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                             newParameter = OpenApiUtils.getConvertJsonMapper().convertValue(target, Parameter.class);
                         }
                     } catch (IOException e) {
-                        context.warn("Error reading Swagger Parameter for element [" + parameter + "]: " + e.getMessage(), parameter);
+                        warn("Error reading Swagger Parameter for element [" + parameter + "]: " + e.getMessage(), context, parameter);
                     }
                 }
 
@@ -1065,7 +1067,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             if (jsonViewAnnotation != null) {
                 String jsonViewClassName = jsonViewAnnotation.stringValue().orElse(null);
                 if (jsonViewClassName != null) {
-                    jsonViewClass = context.getClassElement(jsonViewClassName).orElse(null);
+                    jsonViewClass = ContextUtils.getClassElement(jsonViewClassName, context);
                 }
             }
         }
@@ -1334,9 +1336,9 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                 suffix = apiDecorator.stringValue("opIdSuffix").orElse("");
                 addAlways = apiDecorator.booleanValue("addAlways").orElse(true);
             } else {
-                prefix = context.get(CONTEXT_CHILD_OP_ID_PREFIX, String.class).orElse("");
-                suffix = context.get(CONTEXT_CHILD_OP_ID_SUFFIX, String.class).orElse("");
-                addAlways = context.get(CONTEXT_CHILD_OP_ID_SUFFIX_ADD_ALWAYS, Boolean.class).orElse(true);
+                prefix = ContextUtils.get(CONTEXT_CHILD_OP_ID_PREFIX, String.class, "", context);
+                suffix = ContextUtils.get(CONTEXT_CHILD_OP_ID_SUFFIX, String.class, "", context);
+                addAlways = ContextUtils.get(CONTEXT_CHILD_OP_ID_SUFFIX_ADD_ALWAYS, Boolean.class, true, context);
             }
 
             if (StringUtils.isEmpty(swaggerOperation.getOperationId())) {
@@ -1688,7 +1690,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             if (jsonViewAnnotation != null) {
                 String jsonViewClassName = jsonViewAnnotation.stringValue().orElse(null);
                 if (jsonViewClassName != null) {
-                    jsonViewClass = context.getClassElement(jsonViewClassName).orElse(null);
+                    jsonViewClass = ContextUtils.getClassElement(jsonViewClassName, context);
                 }
             }
         }

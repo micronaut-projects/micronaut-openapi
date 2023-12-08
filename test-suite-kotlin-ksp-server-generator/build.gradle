@@ -14,9 +14,11 @@ dependencies {
     ksp(mnValidation.micronaut.validation.processor)
     ksp(mnSerde.micronaut.serde.processor)
     ksp(mn.micronaut.inject.kotlin)
+    ksp(projects.micronautOpenapi)
 
-    implementation(mn.jackson.annotations)
-    implementation(projects.micronautOpenapiAnnotations)
+    compileOnly(projects.micronautOpenapiAnnotations)
+    compileOnly(mn.jackson.annotations)
+
     implementation(mn.micronaut.http)
     implementation(mnSerde.micronaut.serde.api)
     implementation(mn.micronaut.inject.kotlin)

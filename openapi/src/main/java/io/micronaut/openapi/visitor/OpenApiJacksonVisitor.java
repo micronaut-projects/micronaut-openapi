@@ -35,6 +35,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
+import static io.micronaut.openapi.visitor.ConfigUtils.isSpecGenerationEnabled;
 import static io.micronaut.openapi.visitor.ConfigUtils.isOpenApiEnabled;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ENABLED;
 
@@ -69,7 +70,7 @@ public class OpenApiJacksonVisitor implements TypeElementVisitor<Object, Object>
 
     @Override
     public void visitClass(ClassElement element, VisitorContext context) {
-        if (!isOpenApiEnabled(context)) {
+        if (!isOpenApiEnabled(context) || !isSpecGenerationEnabled(context)) {
             return;
         }
         AnnotationValue<JsonSubTypes> jsonSubTypesDecAnn = element.getDeclaredAnnotation(JsonSubTypes.class);

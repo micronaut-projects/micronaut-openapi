@@ -36,6 +36,7 @@ import java.util.Properties;
 import java.util.stream.Collectors;
 
 import io.micronaut.core.annotation.NonNull;
+import io.micronaut.core.annotation.Nullable;
 import io.micronaut.core.io.scan.ClassPathResourceLoader;
 import io.micronaut.core.io.scan.DefaultClassPathResourceLoader;
 import io.micronaut.core.util.CollectionUtils;
@@ -47,6 +48,9 @@ import io.micronaut.openapi.visitor.group.OpenApiInfo;
 
 import static io.micronaut.openapi.visitor.ConfigUtils.getConfigProperty;
 import static io.micronaut.openapi.visitor.ConfigUtils.getProjectPath;
+import static io.micronaut.openapi.visitor.ContextUtils.addGeneratedResource;
+import static io.micronaut.openapi.visitor.ContextUtils.info;
+import static io.micronaut.openapi.visitor.ContextUtils.warn;
 import static io.micronaut.openapi.visitor.FileUtils.resolve;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_SERVER_CONTEXT_PATH;
 
@@ -242,17 +246,15 @@ public final class OpenApiViewConfig {
             Files.copy(is, Paths.get(resDir.toString(), themeFileName), StandardCopyOption.REPLACE_EXISTING);
             Path file = resDir.resolve(themeFileName);
             if (context != null) {
-                context.info("Writing OpenAPI View Resources to destination: " + file);
+                info("Writing OpenAPI View Resources to destination: " + file, context);
                 var classesOutputPath = ContextUtils.getClassesOutputPath(context);
                 if (classesOutputPath != null) {
                     // add relative path for the file, so that the micronaut-graal visitor knows about it
-                    context.addGeneratedResource(classesOutputPath.relativize(file).toString());
+                    addGeneratedResource(classesOutputPath.relativize(file).toString(), context);
                 }
             }
         } catch (Exception e) {
-            if (context != null) {
-                context.warn("Can't copy resource: " + themeFileName, null);
-            }
+            warn("Can't copy resource: " + themeFileName, context);
             throw new RuntimeException(e);
         }
     }
@@ -277,17 +279,15 @@ public final class OpenApiViewConfig {
                     Path file = outputResDir.resolve(resource);
 
                     if (context != null) {
-                        context.info("Writing OpenAPI View Resources to destination: " + file);
+                        info("Writing OpenAPI View Resources to destination: " + file, context);
                         var classesOutputPath = ContextUtils.getClassesOutputPath(context);
                         if (classesOutputPath != null) {
                             // add relative path for the file, so that the micronaut-graal visitor knows about it
-                            context.addGeneratedResource(classesOutputPath.relativize(file).toString());
+                            addGeneratedResource(classesOutputPath.relativize(file).toString(), context);
                         }
                     }
                 } catch (Exception e) {
-                    if (context != null) {
-                        context.warn("Can't copy resource: " + resource, null);
-                    }
+                    warn("Can't copy resource: " + resource, context);
                     throw new RuntimeException(e);
                 }
             }
@@ -306,9 +306,9 @@ public final class OpenApiViewConfig {
         }
     }
 
-    private String readTemplateFromCustomPath(String customPathStr, VisitorContext context) throws IOException {
+    private String readTemplateFromCustomPath(String customPathStr, @Nullable VisitorContext context) throws IOException {
         String projectDir = StringUtils.EMPTY_STRING;
-        Path projectPath = getProjectPath(context);
+        Path projectPath = context != null ? getProjectPath(context) : null;
         if (projectPath != null) {
             projectDir = projectPath.toString().replaceAll("\\\\", "/");
         }
@@ -359,7 +359,7 @@ public final class OpenApiViewConfig {
         return buf.toString();
     }
 
-    private void render(AbstractViewConfig cfg, Path outputDir, String templateName, VisitorContext context) throws IOException {
+    private void render(AbstractViewConfig cfg, Path outputDir, String templateName, @Nullable VisitorContext context) throws IOException {
 
         String template;
         if (StringUtils.isEmpty(cfg.templatePath)) {
@@ -376,13 +376,11 @@ public final class OpenApiViewConfig {
         }
         String fileName = templateName.substring(templateName.lastIndexOf(SLASH) + 1);
         Path file = outputDir.resolve(fileName);
-        if (context != null) {
-            context.info("Writing OpenAPI View to destination: " + file);
-            var classesOutputPath = ContextUtils.getClassesOutputPath(context);
-            if (classesOutputPath != null) {
-                // add relative path for the file, so that the micronaut-graal visitor knows about it
-                context.addGeneratedResource(classesOutputPath.relativize(file).toString());
-            }
+        info("Writing OpenAPI View to destination: " + file, context);
+        var classesOutputPath = ContextUtils.getClassesOutputPath(context);
+        if (classesOutputPath != null) {
+            // add relative path for the file, so that the micronaut-graal visitor knows about it
+            addGeneratedResource(classesOutputPath.relativize(file).toString(), context);
         }
         try (BufferedWriter writer = Files.newBufferedWriter(file, StandardCharsets.UTF_8,
             StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING)
@@ -426,10 +424,13 @@ public final class OpenApiViewConfig {
      *
      * @return A path.
      */
-    public String getSpecURL(AbstractViewConfig cfg, VisitorContext context) {
+    public String getSpecURL(AbstractViewConfig cfg, @Nullable VisitorContext context) {
 
         if (cfg.specUrl != null) {
             return cfg.specUrl;
+        }
+        if (specFile == null) {
+            return StringUtils.EMPTY_STRING;
         }
 
         String specUrl = StringUtils.prependUri(serverContextPath, StringUtils.prependUri(mappingPath, specFile));

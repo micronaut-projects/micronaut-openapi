@@ -22,6 +22,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.function.Function;
 
+import io.micronaut.core.annotation.Nullable;
 import io.micronaut.inject.visitor.VisitorContext;
 import io.micronaut.openapi.view.OpenApiViewConfig.RendererType;
 import io.micronaut.openapi.visitor.Pair;
@@ -167,7 +168,7 @@ final class RapiPDFConfig extends AbstractViewConfig {
     }
 
     @Override
-    public String render(String template, VisitorContext context) {
+    public String render(String template, @Nullable VisitorContext context) {
         throw new IllegalStateException("RapiPDF doesn't support render");
     }
 }

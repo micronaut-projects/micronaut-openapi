@@ -27,6 +27,9 @@ import io.micronaut.inject.visitor.VisitorContext;
 import io.micronaut.openapi.adoc.OpenApiToAdocConverter;
 import io.micronaut.openapi.visitor.group.OpenApiInfo;
 
+import static io.micronaut.openapi.visitor.ContextUtils.addGeneratedResource;
+import static io.micronaut.openapi.visitor.ContextUtils.info;
+import static io.micronaut.openapi.visitor.ContextUtils.warn;
 import static io.micronaut.openapi.visitor.FileUtils.EXT_ADOC;
 import static io.micronaut.openapi.visitor.FileUtils.EXT_JSON;
 import static io.micronaut.openapi.visitor.FileUtils.EXT_YAML;
@@ -63,12 +66,13 @@ public final class AdocModule {
             var adoc = writer.toString();
 
             var outputPath = getOutputPath(openApiInfo, props, context);
-            context.info("Writing AsciiDoc OpenAPI file to destination: " + outputPath);
-            context.getClassesOutputPath().ifPresent(path -> {
+            info("Writing AsciiDoc OpenAPI file to destination: " + outputPath, context);
+            var classesOutputPath = ContextUtils.getClassesOutputPath(context);
+            if (classesOutputPath != null) {
                 // add relative paths for the specPath, and its parent META-INF/swagger
                 // so that micronaut-graal visitor knows about them
-                context.addGeneratedResource(path.relativize(outputPath).toString());
-            });
+                addGeneratedResource(classesOutputPath.relativize(outputPath).toString(), context);
+            }
 
             if (Files.exists(outputPath)) {
                 Files.writeString(outputPath, adoc, StandardOpenOption.APPEND);
@@ -76,7 +80,7 @@ public final class AdocModule {
                 Files.writeString(outputPath, adoc);
             }
         } catch (Exception e) {
-            context.warn("Can't convert to ADoc format\n" + Utils.printStackTrace(e), null);
+            warn("Can't convert to ADoc format\n" + Utils.printStackTrace(e), context);
         }
     }
 
@@ -102,7 +106,7 @@ public final class AdocModule {
         } else {
             var defaultFilePath = getDefaultFilePath(fileName, context);
             if (defaultFilePath == null) {
-                context.warn("Can't read defaultFilePath property", null);
+                warn("Can't read defaultFilePath property", context);
                 throw new RuntimeException("Can't read defaultFilePath property");
             }
             outputPath = defaultFilePath.getParent();

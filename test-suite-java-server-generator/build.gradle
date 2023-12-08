@@ -12,6 +12,7 @@ dependencies {
 
     annotationProcessor(mnValidation.micronaut.validation.processor)
     annotationProcessor(mnSerde.micronaut.serde.processor)
+    annotationProcessor(projects.micronautOpenapi)
 
     compileOnly(projects.micronautOpenapiAnnotations)
     compileOnly(mn.jackson.annotations)

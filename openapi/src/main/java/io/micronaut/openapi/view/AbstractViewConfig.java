@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import io.micronaut.core.annotation.Nullable;
 import io.micronaut.core.util.StringUtils;
 import io.micronaut.core.util.Toggleable;
 import io.micronaut.inject.visitor.VisitorContext;
@@ -63,6 +64,7 @@ abstract class AbstractViewConfig implements Toggleable {
     protected Boolean withUrls;
     protected List<OpenApiUrl> urls = new ArrayList<>();
     protected Map<String, Object> options = new HashMap<>();
+    @Nullable
     protected Map<Pair<String, String>, OpenApiInfo> openApiInfos;
 
     /**
@@ -91,7 +93,7 @@ abstract class AbstractViewConfig implements Toggleable {
         return templatePath;
     }
 
-    public abstract String render(String template, VisitorContext context);
+    public abstract String render(String template, @Nullable VisitorContext context);
 
     /**
      * Adds an option.

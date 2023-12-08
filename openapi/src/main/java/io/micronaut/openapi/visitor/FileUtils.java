@@ -32,6 +32,7 @@ import io.micronaut.openapi.visitor.group.OpenApiInfo;
 import io.swagger.v3.oas.models.info.Info;
 
 import static io.micronaut.openapi.visitor.ConfigUtils.getConfigProperty;
+import static io.micronaut.openapi.visitor.ContextUtils.warn;
 import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.replacePlaceholders;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_FILENAME;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_TARGET_FILE;
@@ -68,7 +69,7 @@ public final class FileUtils {
             try {
                 Files.createDirectories(f.getParent());
             } catch (IOException e) {
-                context.warn("Fail to create directories for" + f + ": " + e.getMessage(), null);
+                warn("Fail to create directories for" + f + ": " + e.getMessage(), context);
             }
         }
     }
@@ -84,7 +85,7 @@ public final class FileUtils {
             createDirectories(destPath, context);
             return destPath;
         }
-        return defaultSwaggerFilePath.getParent().resolve("views");
+        return defaultSwaggerFilePath != null ? defaultSwaggerFilePath.getParent().resolve("views") : null;
     }
 
     public static Path getDefaultFilePath(String fileName, VisitorContext context) {
@@ -99,7 +100,7 @@ public final class FileUtils {
                 return specPath;
             }
         }
-        context.warn("Unable to get swagger/" + fileName + " file.", null);
+        warn("Unable to get swagger/" + fileName + " file.", context);
         return null;
     }
 
@@ -172,7 +173,7 @@ public final class FileUtils {
             }
         }
         if (fileName.contains(Utils.PLACEHOLDER_PREFIX)) {
-            context.warn("Can't set some placeholders in fileName: " + fileName, null);
+            warn("Can't set some placeholders in fileName: " + fileName, context);
         }
 
         return Pair.of(documentTitle, fileName);

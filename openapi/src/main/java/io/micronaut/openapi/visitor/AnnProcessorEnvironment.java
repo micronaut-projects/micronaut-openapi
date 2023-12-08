@@ -69,7 +69,7 @@ public class AnnProcessorEnvironment extends DefaultEnvironment {
 
         annotationProcessingConfigLocations = new ArrayList<>();
 
-        boolean isEnabled = context != null ? context.get(MICRONAUT_ENVIRONMENT_ENABLED, Boolean.class).orElse(false) : false;
+        boolean isEnabled = ContextUtils.get(MICRONAUT_ENVIRONMENT_ENABLED, Boolean.class, false, context);
         if (isEnabled) {
             Path projectPath = getProjectPath(context);
             if (projectPath != null) {
@@ -77,7 +77,7 @@ public class AnnProcessorEnvironment extends DefaultEnvironment {
                 projectResourcesPath = projectDir + (projectDir.endsWith("/") ? StringUtils.EMPTY_STRING : "/") + "src/main/resources/";
             }
 
-            String configFileLocations = context.getOptions().get(MICRONAUT_CONFIG_FILE_LOCATIONS);
+            String configFileLocations = ContextUtils.getOptions(context).get(MICRONAUT_CONFIG_FILE_LOCATIONS);
             if (projectResourcesPath != null && StringUtils.isEmpty(configFileLocations)) {
                 annotationProcessingConfigLocations.add(projectResourcesPath);
             } else if (StringUtils.isNotEmpty(configFileLocations)) {

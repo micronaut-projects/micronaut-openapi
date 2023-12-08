@@ -1,5 +1,6 @@
 |===
 |`*micronaut.openapi.enabled*` | System property that enables or disables open api annotation processing. | Default: `true`
+|`*micronaut.openapi.swagger.file.generation.enabled*` | System property that enables or disables generation of a swagger (OpenAPI) specification file. This can be used whenever you already have a specification file and that you only need the Swagger UI. | Default: `true`
 |`*micronaut.openapi.config.file*` | System property that enables setting the open api config file. |
 |`*micronaut.openapi.server.context.path*` | System property for server context path. |
 |`*micronaut.openapi.property.naming.strategy*` | System property for naming strategy. One jackson PropertyNamingStrategy. | Default: `LOWER_CAMEL_CASE`
