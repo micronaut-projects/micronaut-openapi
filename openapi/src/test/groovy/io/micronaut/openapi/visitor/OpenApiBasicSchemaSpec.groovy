@@ -1610,4 +1610,50 @@ public class MyBean {}
         openAPI.paths."/test1".post.requestBody.content."application/json".schema.additionalProperties == true
         openAPI.paths."/test1".post.requestBody.content."application/json".schema.default == null
     }
+
+    void "test oneOf schema"() {
+        when:
+        buildBeanDefinition("test.MyBean", '''
+package test;
+
+import java.util.UUID;
+
+import io.micronaut.http.MediaType;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+
+@Controller("/test")
+class TestController {
+
+    @Get
+    @Operation(summary = "summary", description = "description", responses = @ApiResponse(
+          description = "response",
+          content = @Content(
+                  mediaType = MediaType.APPLICATION_JSON,
+                  schema = @Schema(oneOf = {String.class, UUID.class})
+          )
+    ))
+    void test() {
+    }
+}
+
+@jakarta.inject.Singleton
+public class MyBean {}
+''')
+
+        OpenAPI openAPI = Utils.testReference
+        def responseSchema = openAPI.paths."/test".get.responses.'200'.content."application/json".schema
+
+        then:
+
+        responseSchema
+        responseSchema.allOf == null
+        responseSchema.anyOf == null
+        responseSchema.oneOf
+        responseSchema.oneOf.size() == 2
+    }
 }

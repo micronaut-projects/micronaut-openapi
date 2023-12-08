@@ -644,4 +644,117 @@ public final class SchemaUtils {
         return finalSchema;
     }
 
+    /**
+     * Copy information from one {@link OpenAPI} object to another.
+     *
+     * @param to The {@link OpenAPI} object to copy to
+     * @param from The {@link OpenAPI} object to copy from
+     */
+    public static void copyOpenApi(OpenAPI to, OpenAPI from) {
+        if (to == null || from == null) {
+            return;
+        }
+        if (CollectionUtils.isNotEmpty(from.getTags())) {
+            from.getTags().forEach(to::addTagsItem);
+        }
+        if (CollectionUtils.isNotEmpty(from.getServers())) {
+            from.getServers().forEach(to::addServersItem);
+        }
+        if (CollectionUtils.isNotEmpty(from.getSecurity())) {
+            from.getSecurity().forEach(to::addSecurityItem);
+        }
+        if (CollectionUtils.isNotEmpty(from.getPaths())) {
+            from.getPaths().forEach(to::path);
+        }
+        if (from.getExternalDocs() != null) {
+            to.setExternalDocs(from.getExternalDocs());
+        }
+        if (CollectionUtils.isNotEmpty(from.getExtensions())) {
+            from.getExtensions().forEach(to::addExtension);
+        }
+
+        if (from.getComponents() != null) {
+
+            var components = from.getComponents();
+
+            Map<String, Schema> schemas = components.getSchemas();
+            if (CollectionUtils.isNotEmpty(schemas)) {
+                schemas.forEach((k, v) -> {
+                    if (v.getName() == null) {
+                        v.setName(k);
+                    }
+                    to.schema(k, v);
+                });
+            }
+
+            var securitySchemes = components.getSecuritySchemes();
+            if (CollectionUtils.isNotEmpty(securitySchemes)) {
+                securitySchemes.forEach(to::schemaRequirement);
+            }
+            var links = components.getLinks();
+            if (CollectionUtils.isNotEmpty(links)) {
+                if (to.getComponents() == null) {
+                    to.setComponents(new Components());
+                }
+                to.getComponents().links(links);
+            }
+            var callbacks = components.getCallbacks();
+            if (CollectionUtils.isNotEmpty(callbacks)) {
+                if (to.getComponents() == null) {
+                    to.setComponents(new Components());
+                }
+                to.getComponents().callbacks(callbacks);
+            }
+            var headers = components.getHeaders();
+            if (CollectionUtils.isNotEmpty(headers)) {
+                if (to.getComponents() == null) {
+                    to.setComponents(new Components());
+                }
+                to.getComponents().headers(headers);
+            }
+            var parameters = components.getParameters();
+            if (CollectionUtils.isNotEmpty(parameters)) {
+                if (to.getComponents() == null) {
+                    to.setComponents(new Components());
+                }
+                to.getComponents().parameters(parameters);
+            }
+            var responses = components.getResponses();
+            if (CollectionUtils.isNotEmpty(responses)) {
+                if (to.getComponents() == null) {
+                    to.setComponents(new Components());
+                }
+                to.getComponents().responses(responses);
+            }
+            var requestBodies = components.getRequestBodies();
+            if (CollectionUtils.isNotEmpty(requestBodies)) {
+                if (to.getComponents() == null) {
+                    to.setComponents(new Components());
+                }
+                to.getComponents().requestBodies(requestBodies);
+            }
+            var extensions = components.getExtensions();
+            if (CollectionUtils.isNotEmpty(extensions)) {
+                if (to.getComponents() == null) {
+                    to.setComponents(new Components());
+                }
+                to.getComponents().extensions(extensions);
+            }
+            var pathItems = components.getPathItems();
+            if (CollectionUtils.isNotEmpty(extensions)) {
+                if (to.getComponents() == null) {
+                    to.setComponents(new Components());
+                }
+                to.getComponents().pathItems(pathItems);
+            }
+            var examples = components.getExamples();
+            if (CollectionUtils.isNotEmpty(examples)) {
+                if (to.getComponents() == null) {
+                    to.setComponents(new Components());
+                }
+                to.getComponents().examples(examples);
+            }
+
+        }
+    }
 }
