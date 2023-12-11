@@ -62,5 +62,6 @@ serverContext:
   compileResolution: Compile Time Resolution
   serverFilter: HttpServerFilter
   urlParameter: URL Parameter
+openApiGuides: Guides
 repository: Repository
 breaks: Breaking Changes
