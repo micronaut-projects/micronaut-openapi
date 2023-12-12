@@ -52,4 +52,4 @@ micronaut:
 
 With the above configuration in place when you run your application you can access your Swagger documentation at +http://localhost:8080/swagger-ui+.
 
-TIP: See the guide for https://guides.micronaut.io/latest/micronaut-openapi-swagger-ui.html[Visualize with Swagger-UI an OpenAPI specification of your Micronaut application.] to learn more.
+TIP: See the guide for https://guides.micronaut.io/latest/micronaut-openapi-swagger-ui.html[Visualize with Swagger UI an OpenAPI specification of your Micronaut application.] to learn more.
