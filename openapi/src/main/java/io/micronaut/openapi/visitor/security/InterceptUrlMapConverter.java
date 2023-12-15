@@ -66,7 +66,7 @@ public class InterceptUrlMapConverter implements TypeConverter<Map, InterceptUrl
         m = transform(m);
         Optional<String> optionalPattern = conversionService.convert(m.get(PATTERN), String.class);
         if (optionalPattern.isPresent()) {
-            Optional<List<String>> optionalAccessList = conversionService.convert(m.get(ACCESS), Argument.listOf(String.class));
+            Optional<List<String>> optionalAccessList = conversionService.convert(m.get(ACCESS), Argument.LIST_OF_STRING);
             optionalAccessList = optionalAccessList.map(list -> list.stream()
                 .map(o -> conversionService.convert(o, String.class))
                 .filter(Optional::isPresent)

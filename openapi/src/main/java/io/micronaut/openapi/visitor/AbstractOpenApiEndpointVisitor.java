@@ -627,13 +627,13 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                         continue;
                     }
                     if (paramEl.isAnnotationPresent(PathVariable.class)) {
-                        parameter.setIn("path");
+                        parameter.setIn(ParameterIn.PATH.toString());
                     } else if (paramEl.isAnnotationPresent(QueryValue.class)) {
-                        parameter.setIn("query");
+                        parameter.setIn(ParameterIn.QUERY.toString());
                     } else if (paramEl.isAnnotationPresent(CookieValue.class)) {
-                        parameter.setIn("cookie");
+                        parameter.setIn(ParameterIn.COOKIE.toString());
                     } else if (paramEl.isAnnotationPresent(Header.class)) {
-                        parameter.setIn("header");
+                        parameter.setIn(ParameterIn.HEADER.toString());
                     } else {
                         UriMatchVariable pathVariable = pathVariables.get(parameter.getName());
                         // check if this parameter is optional path variable
@@ -645,14 +645,14 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                             }
                         }
                         if (pathVariable != null && !pathVariable.isOptional() && !pathVariable.isQuery() && !pathVariable.isExploded()) {
-                            parameter.setIn("path");
+                            parameter.setIn(ParameterIn.PATH.toString());
                         }
 
                         if (parameter.getIn() == null) {
                             if (httpMethod == HttpMethod.GET) {
                                 // default to QueryValue -
                                 // https://github.com/micronaut-projects/micronaut-openapi/issues/130
-                                parameter.setIn("query");
+                                parameter.setIn(ParameterIn.QUERY.toString());
                             }
                         }
 
@@ -899,11 +899,11 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             newParameter = new HeaderParameter();
             newParameter.setName(headerName);
         } else if (parameter.isAnnotationPresent(CookieValue.class)) {
-            String cookieName = parameter.getValue(CookieValue.class, String.class).orElse(parameterName);
+            String cookieName = parameter.stringValue(CookieValue.class).orElse(parameterName);
             newParameter = new CookieParameter();
             newParameter.setName(cookieName);
         } else if (parameter.isAnnotationPresent(QueryValue.class)) {
-            String queryVar = parameter.getValue(QueryValue.class, String.class).orElse(parameterName);
+            String queryVar = parameter.stringValue(QueryValue.class).orElse(parameterName);
             newParameter = new QueryParameter();
             newParameter.setName(queryVar);
         } else if (parameter.isAnnotationPresent(Part.class) && permitsRequestBody) {
@@ -915,8 +915,9 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         } else if (hasNoBindingAnnotationOrType(parameter)) {
             AnnotationValue<io.swagger.v3.oas.annotations.Parameter> parameterAnnotation = parameter.getAnnotation(io.swagger.v3.oas.annotations.Parameter.class);
             // Skip recognizing parameter if it's manually defined by "in"
+            var paramIn = parameterAnnotation != null ? parameterAnnotation.stringValue("in").orElse(null) : null;
             if (parameterAnnotation == null || !parameterAnnotation.booleanValue("hidden").orElse(false)
-                && parameterAnnotation.stringValue("in").isEmpty()) {
+                && (paramIn == null || paramIn.equals(ParameterIn.DEFAULT.toString()))) {
                 if (permitsRequestBody) {
                     extraBodyParameters.add(parameter);
                     isBodyParameter = true;
@@ -1289,26 +1290,26 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                                 swaggerParam.setName(paramName);
                             }
                             paramAnn.stringValue("description").ifPresent(swaggerParam::setDescription);
-                            Optional<Boolean> required = paramAnn.booleanValue("required");
-                            if (required.isPresent()) {
-                                swaggerParam.setRequired(required.get() ? true : null);
+                            var required = paramAnn.booleanValue("required").orElse(false);
+                            if (required) {
+                                swaggerParam.setRequired(true);
                             }
-                            Optional<Boolean> deprecated = paramAnn.booleanValue("deprecated");
-                            if (deprecated.isPresent()) {
-                                swaggerParam.setDeprecated(deprecated.get() ? true : null);
+                            var deprecated = paramAnn.booleanValue("deprecated").orElse(false);
+                            if (deprecated) {
+                                swaggerParam.setDeprecated(true);
                             }
-                            Optional<Boolean> allowEmptyValue = paramAnn.booleanValue("allowEmptyValue");
-                            if (allowEmptyValue.isPresent()) {
-                                swaggerParam.setAllowEmptyValue(allowEmptyValue.get() ? true : null);
+                            var allowEmptyValue = paramAnn.booleanValue("allowEmptyValue").orElse(false);
+                            if (allowEmptyValue) {
+                                swaggerParam.setAllowEmptyValue(true);
                             }
-                            Optional<Boolean> allowReserved = paramAnn.booleanValue("allowReserved");
-                            if (allowReserved.isPresent()) {
-                                swaggerParam.setAllowReserved(allowReserved.get() ? true : null);
+                            var allowReserved = paramAnn.booleanValue("allowReserved").orElse(false);
+                            if (allowReserved) {
+                                swaggerParam.setAllowReserved(true);
                             }
                             paramAnn.stringValue("example").ifPresent(swaggerParam::setExample);
-                            Optional<ParameterStyle> style = paramAnn.get("style", ParameterStyle.class);
-                            if (style.isPresent()) {
-                                swaggerParam.setStyle(paramStyle(style.get()));
+                            var style = paramAnn.get("style", ParameterStyle.class).orElse(ParameterStyle.DEFAULT);
+                            if (style != ParameterStyle.DEFAULT) {
+                                swaggerParam.setStyle(paramStyle(style));
                             }
                             paramAnn.stringValue("ref").ifPresent(swaggerParam::set$ref);
                             Optional<ParameterIn> in = paramAnn.get("in", ParameterIn.class);
@@ -1731,20 +1732,19 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             return;
         }
         for (AnnotationValue<Callback> callbackAnn : callbackAnnotations) {
-            final Optional<String> name = callbackAnn.stringValue("name");
-            if (name.isEmpty()) {
+            String callbackName = callbackAnn.stringValue("name").orElse(null);
+            if (StringUtils.isEmpty(callbackName)) {
                 continue;
             }
-            String callbackName = name.get();
-            final Optional<String> ref = callbackAnn.stringValue("ref");
-            if (ref.isPresent()) {
-                String refCallback = ref.get().substring(COMPONENTS_CALLBACKS_PREFIX.length());
+            String ref = callbackAnn.stringValue("ref").orElse(null);
+            if (StringUtils.isNotEmpty(ref)) {
+                String refCallback = ref.substring(COMPONENTS_CALLBACKS_PREFIX.length());
                 processCallbackReference(context, swaggerOperation, callbackName, refCallback);
                 continue;
             }
-            final Optional<String> expr = callbackAnn.stringValue("callbackUrlExpression");
-            if (expr.isPresent()) {
-                processUrlCallbackExpression(context, swaggerOperation, callbackAnn, callbackName, expr.get(), jsonViewClass);
+            String expr = callbackAnn.stringValue("callbackUrlExpression").orElse(null);
+            if (StringUtils.isNotEmpty(expr)) {
+                processUrlCallbackExpression(context, swaggerOperation, callbackAnn, callbackName, expr, jsonViewClass);
             } else {
                 processCallbackReference(context, swaggerOperation, callbackName, null);
             }

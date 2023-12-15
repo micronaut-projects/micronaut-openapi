@@ -71,7 +71,6 @@ import io.swagger.v3.oas.models.media.MediaType;
 import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.parameters.Parameter;
 import io.swagger.v3.oas.models.responses.ApiResponse;
-import io.swagger.v3.oas.models.security.SecurityScheme;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -87,8 +86,8 @@ import static io.micronaut.openapi.visitor.ConfigUtils.getConfigProperty;
 import static io.micronaut.openapi.visitor.ConfigUtils.getEnv;
 import static io.micronaut.openapi.visitor.ConfigUtils.getExpandableProperties;
 import static io.micronaut.openapi.visitor.ConfigUtils.getGroupProperties;
-import static io.micronaut.openapi.visitor.ConfigUtils.isSpecGenerationEnabled;
 import static io.micronaut.openapi.visitor.ConfigUtils.isOpenApiEnabled;
+import static io.micronaut.openapi.visitor.ConfigUtils.isSpecGenerationEnabled;
 import static io.micronaut.openapi.visitor.ConfigUtils.readOpenApiConfigFile;
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_OPENAPI_ENDPOINT_CLASS_TAGS;
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_OPENAPI_ENDPOINT_SECURITY_REQUIREMENTS;
@@ -112,6 +111,7 @@ import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENA
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_VIEWS_SPEC;
 import static io.micronaut.openapi.visitor.SchemaUtils.EMPTY_SIMPLE_SCHEMA;
 import static io.micronaut.openapi.visitor.SchemaUtils.TYPE_OBJECT;
+import static io.micronaut.openapi.visitor.SchemaUtils.copyOpenApi;
 import static io.micronaut.openapi.visitor.SchemaUtils.getOperationOnPathItem;
 import static io.micronaut.openapi.visitor.SchemaUtils.setOperationOnPathItem;
 import static io.swagger.v3.oas.models.Components.COMPONENTS_SCHEMAS_REF;
@@ -176,8 +176,9 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
 
             OpenAPI existing = ContextUtils.get(Utils.ATTR_OPENAPI, OpenAPI.class, context);
             if (existing != null) {
-                Optional.ofNullable(openApi.getInfo())
-                    .ifPresent(existing::setInfo);
+                if (openApi.getInfo() != null) {
+                    existing.setInfo(openApi.getInfo());
+                }
                 copyOpenApi(existing, openApi);
             } else {
                 ContextUtils.put(Utils.ATTR_OPENAPI, openApi, context);
@@ -224,39 +225,6 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             } else {
                 warn(directory + " does not exist or is not a directory", context, element);
             }
-        }
-    }
-
-    /**
-     * Copy information from one {@link OpenAPI} object to another.
-     *
-     * @param to The {@link OpenAPI} object to copy to
-     * @param from The {@link OpenAPI} object to copy from
-     */
-    private void copyOpenApi(OpenAPI to, OpenAPI from) {
-        if (to != null && from != null) {
-            Optional.ofNullable(from.getTags()).ifPresent(tags -> tags.forEach(to::addTagsItem));
-            Optional.ofNullable(from.getServers()).ifPresent(servers -> servers.forEach(to::addServersItem));
-            Optional.ofNullable(from.getSecurity()).ifPresent(securityRequirements -> securityRequirements.forEach(to::addSecurityItem));
-            Optional.ofNullable(from.getPaths()).ifPresent(paths -> paths.forEach(to::path));
-            Optional.ofNullable(from.getComponents()).ifPresent(components -> {
-                Map<String, Schema> schemas = components.getSchemas();
-
-                if (CollectionUtils.isNotEmpty(schemas)) {
-                    schemas.forEach((k, v) -> {
-                        if (v.getName() == null) {
-                            v.setName(k);
-                        }
-                    });
-                    schemas.forEach(to::schema);
-                }
-                Map<String, SecurityScheme> securitySchemes = components.getSecuritySchemes();
-                if (securitySchemes != null && !securitySchemes.isEmpty()) {
-                    securitySchemes.forEach(to::schemaRequirement);
-                }
-            });
-            Optional.ofNullable(from.getExternalDocs()).ifPresent(to::externalDocs);
-            Optional.ofNullable(from.getExtensions()).ifPresent(extensions -> extensions.forEach(to::addExtension));
         }
     }
 

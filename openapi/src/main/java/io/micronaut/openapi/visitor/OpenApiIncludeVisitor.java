@@ -16,7 +16,6 @@
 package io.micronaut.openapi.visitor;
 
 import java.util.List;
-import java.util.Optional;
 
 import javax.annotation.processing.SupportedOptions;
 
@@ -33,8 +32,8 @@ import io.micronaut.openapi.annotation.OpenAPIIncludes;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
-import static io.micronaut.openapi.visitor.ConfigUtils.isSpecGenerationEnabled;
 import static io.micronaut.openapi.visitor.ConfigUtils.isOpenApiEnabled;
+import static io.micronaut.openapi.visitor.ConfigUtils.isSpecGenerationEnabled;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ENABLED;
 
 /**
@@ -55,12 +54,12 @@ public class OpenApiIncludeVisitor implements TypeElementVisitor<OpenAPIIncludes
             if (ArrayUtils.isNotEmpty(classes)) {
                 List<AnnotationValue<Tag>> tags = includeAnnotation.getAnnotations("tags", Tag.class);
                 List<AnnotationValue<SecurityRequirement>> security = includeAnnotation.getAnnotations("security", SecurityRequirement.class);
-                Optional<String> customUri = includeAnnotation.stringValue("uri");
+                String customUri = includeAnnotation.stringValue("uri").orElse(null);
                 List<String> groups = List.of(includeAnnotation.stringValues("groups"));
                 List<String> groupsExcluded = List.of(includeAnnotation.stringValues("groupsExcluded"));
 
                 OpenApiGroupInfoVisitor groupVisitor = new OpenApiGroupInfoVisitor(groups, groupsExcluded);
-                OpenApiControllerVisitor controllerVisitor = new OpenApiControllerVisitor(tags, security, customUri.orElse(null));
+                OpenApiControllerVisitor controllerVisitor = new OpenApiControllerVisitor(tags, security, customUri);
                 OpenApiEndpointVisitor endpointVisitor = new OpenApiEndpointVisitor(true, tags.isEmpty() ? null : tags, security.isEmpty() ? null : security);
                 for (String className : classes) {
                     var classEl = ContextUtils.getClassElement(className, context);

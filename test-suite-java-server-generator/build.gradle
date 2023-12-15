@@ -14,9 +14,9 @@ dependencies {
     annotationProcessor(mnSerde.micronaut.serde.processor)
     annotationProcessor(projects.micronautOpenapi)
 
-    compileOnly(projects.micronautOpenapiAnnotations)
     compileOnly(mn.jackson.annotations)
 
+    implementation(projects.micronautOpenapi)
     implementation(mn.micronaut.http)
     implementation(mnSerde.micronaut.serde.api)
     implementation(mn.jakarta.annotation.api)

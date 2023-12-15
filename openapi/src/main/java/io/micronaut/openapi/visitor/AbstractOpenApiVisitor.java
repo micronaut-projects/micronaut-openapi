@@ -60,7 +60,6 @@ import io.micronaut.core.bind.annotation.Bindable;
 import io.micronaut.core.naming.NameUtils;
 import io.micronaut.core.reflect.ClassUtils;
 import io.micronaut.core.reflect.ReflectionUtils;
-import io.micronaut.core.type.Argument;
 import io.micronaut.core.util.ArrayUtils;
 import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.core.util.StringUtils;
@@ -134,6 +133,7 @@ import static io.micronaut.openapi.visitor.ConfigUtils.getCustomSchema;
 import static io.micronaut.openapi.visitor.ConfigUtils.getExpandableProperties;
 import static io.micronaut.openapi.visitor.ConfigUtils.getSchemaDecoration;
 import static io.micronaut.openapi.visitor.ConfigUtils.isJsonViewDefaultInclusion;
+import static io.micronaut.openapi.visitor.ContextUtils.ARGUMENT_BOOLEAN;
 import static io.micronaut.openapi.visitor.ContextUtils.warn;
 import static io.micronaut.openapi.visitor.ConvertUtils.parseJsonString;
 import static io.micronaut.openapi.visitor.ConvertUtils.resolveExtensions;
@@ -1096,7 +1096,7 @@ abstract class AbstractOpenApiVisitor {
             boolean isAutoRequiredMode = true;
             boolean isRequiredDefaultValueSet = false;
             if (schemaAnnotationValue != null) {
-                elementSchemaRequired = schemaAnnotationValue.get("required", Argument.of(Boolean.TYPE));
+                elementSchemaRequired = schemaAnnotationValue.get("required", ARGUMENT_BOOLEAN);
                 isRequiredDefaultValueSet = !schemaAnnotationValue.contains("required");
                 io.swagger.v3.oas.annotations.media.Schema.RequiredMode requiredMode = schemaAnnotationValue.enumValue("requiredMode", io.swagger.v3.oas.annotations.media.Schema.RequiredMode.class).orElse(null);
                 if (requiredMode == io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED) {
@@ -1808,9 +1808,9 @@ abstract class AbstractOpenApiVisitor {
         final Optional<String> impl = av.stringValue("implementation");
         final Optional<String> not = av.stringValue("not");
         final Optional<String> schema = av.stringValue("schema");
-        final Optional<String[]> anyOf = av.get("anyOf", Argument.of(String[].class));
-        final Optional<String[]> oneOf = av.get("oneOf", Argument.of(String[].class));
-        final Optional<String[]> allOf = av.get("allOf", Argument.of(String[].class));
+        var anyOfList = av.stringValues("anyOf");
+        var oneOfList = av.stringValues("oneOf");
+        var allOfList = av.stringValues("allOf");
         // remap keys.
         Object o = valueMap.remove("defaultValue");
         if (o != null) {
@@ -1832,9 +1832,15 @@ abstract class AbstractOpenApiVisitor {
                 schemaToValueMap(schemaMap, schemaNot);
                 valueMap.put("not", schemaMap);
             }
-            anyOf.ifPresent(anyOfList -> bindSchemaForComposite(context, valueMap, anyOfList, "anyOf", jsonViewClass));
-            oneOf.ifPresent(oneOfList -> bindSchemaForComposite(context, valueMap, oneOfList, "oneOf", jsonViewClass));
-            allOf.ifPresent(allOfList -> bindSchemaForComposite(context, valueMap, allOfList, "allOf", jsonViewClass));
+            if (anyOfList.length > 0) {
+                bindSchemaForComposite(context, valueMap, anyOfList, "anyOf", jsonViewClass);
+            }
+            if (oneOfList.length > 0) {
+                bindSchemaForComposite(context, valueMap, oneOfList, "oneOf", jsonViewClass);
+            }
+            if (allOfList.length > 0) {
+                bindSchemaForComposite(context, valueMap, allOfList, "allOf", jsonViewClass);
+            }
         }
         if (DiscriminatorMapping.class.getName().equals(av.getAnnotationName()) && schema.isPresent()) {
             final String className = schema.get();

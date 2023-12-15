@@ -17,6 +17,7 @@ dependencies {
     testImplementation mnTest.micronaut.test.junit5
     testImplementation libs.junit.jupiter.params
 
+    testFixturesImplementation mn.micronaut.inject
     testFixturesImplementation mnTest.assertj.core
     testFixturesImplementation libs.javaparser
     testFixturesImplementation libs.openapi.generator
