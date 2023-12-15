@@ -178,64 +178,70 @@ loadScripts(document, 'script');</script>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static io.swagger.v3.oas.models.media.ArraySchema</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#arraySchema(io.swagger.v3.oas.models.media.Schema)" class="member-name-link">arraySchema</a><wbr>(io.swagger.v3.oas.models.media.Schema&lt;?&gt;&nbsp;schema)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static io.swagger.v3.oas.models.Operation</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#getOperationOnPathItem(io.swagger.v3.oas.models.PathItem,io.micronaut.http.HttpMethod)" class="member-name-link">getOperationOnPathItem</a><wbr>(io.swagger.v3.oas.models.PathItem&nbsp;pathItem,
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#copyOpenApi(io.swagger.v3.oas.models.OpenAPI,io.swagger.v3.oas.models.OpenAPI)" class="member-name-link">copyOpenApi</a><wbr>(io.swagger.v3.oas.models.OpenAPI&nbsp;to,
+ io.swagger.v3.oas.models.OpenAPI&nbsp;from)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">Copy information from one <code>OpenAPI</code> object to another.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static io.swagger.v3.oas.models.Operation</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#getOperationOnPathItem(io.swagger.v3.oas.models.PathItem,io.micronaut.http.HttpMethod)" class="member-name-link">getOperationOnPathItem</a><wbr>(io.swagger.v3.oas.models.PathItem&nbsp;pathItem,
  io.micronaut.http.HttpMethod&nbsp;httpMethod)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static boolean</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#isEmptySchema(io.swagger.v3.oas.models.media.Schema)" class="member-name-link">isEmptySchema</a><wbr>(io.swagger.v3.oas.models.media.Schema&lt;?&gt;&nbsp;schema)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static io.swagger.v3.oas.models.responses.ApiResponse</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#mergeApiResponse(io.swagger.v3.oas.models.responses.ApiResponse,io.swagger.v3.oas.models.responses.ApiResponse)" class="member-name-link">mergeApiResponse</a><wbr>(io.swagger.v3.oas.models.responses.ApiResponse&nbsp;ar1,
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static boolean</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#isEmptySchema(io.swagger.v3.oas.models.media.Schema)" class="member-name-link">isEmptySchema</a><wbr>(io.swagger.v3.oas.models.media.Schema&lt;?&gt;&nbsp;schema)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static io.swagger.v3.oas.models.responses.ApiResponse</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#mergeApiResponse(io.swagger.v3.oas.models.responses.ApiResponse,io.swagger.v3.oas.models.responses.ApiResponse)" class="member-name-link">mergeApiResponse</a><wbr>(io.swagger.v3.oas.models.responses.ApiResponse&nbsp;ar1,
  io.swagger.v3.oas.models.responses.ApiResponse&nbsp;ar2)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static io.swagger.v3.oas.models.media.Content</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#mergeContent(io.swagger.v3.oas.models.media.Content,io.swagger.v3.oas.models.media.Content)" class="member-name-link">mergeContent</a><wbr>(io.swagger.v3.oas.models.media.Content&nbsp;c1,
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static io.swagger.v3.oas.models.media.Content</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#mergeContent(io.swagger.v3.oas.models.media.Content,io.swagger.v3.oas.models.media.Content)" class="member-name-link">mergeContent</a><wbr>(io.swagger.v3.oas.models.media.Content&nbsp;c1,
  io.swagger.v3.oas.models.media.Content&nbsp;c2)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static io.swagger.v3.oas.models.headers.Header</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#mergeHeader(io.swagger.v3.oas.models.headers.Header,io.swagger.v3.oas.models.headers.Header)" class="member-name-link">mergeHeader</a><wbr>(io.swagger.v3.oas.models.headers.Header&nbsp;h1,
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static io.swagger.v3.oas.models.headers.Header</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#mergeHeader(io.swagger.v3.oas.models.headers.Header,io.swagger.v3.oas.models.headers.Header)" class="member-name-link">mergeHeader</a><wbr>(io.swagger.v3.oas.models.headers.Header&nbsp;h1,
  io.swagger.v3.oas.models.headers.Header&nbsp;h2)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static io.swagger.v3.oas.models.links.Link</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#mergeLink(io.swagger.v3.oas.models.links.Link,io.swagger.v3.oas.models.links.Link)" class="member-name-link">mergeLink</a><wbr>(io.swagger.v3.oas.models.links.Link&nbsp;l1,
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static io.swagger.v3.oas.models.links.Link</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#mergeLink(io.swagger.v3.oas.models.links.Link,io.swagger.v3.oas.models.links.Link)" class="member-name-link">mergeLink</a><wbr>(io.swagger.v3.oas.models.links.Link&nbsp;l1,
  io.swagger.v3.oas.models.links.Link&nbsp;l2)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static io.swagger.v3.oas.models.Operation</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#mergeOperations(io.swagger.v3.oas.models.Operation,io.swagger.v3.oas.models.Operation)" class="member-name-link">mergeOperations</a><wbr>(io.swagger.v3.oas.models.Operation&nbsp;op1,
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static io.swagger.v3.oas.models.Operation</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#mergeOperations(io.swagger.v3.oas.models.Operation,io.swagger.v3.oas.models.Operation)" class="member-name-link">mergeOperations</a><wbr>(io.swagger.v3.oas.models.Operation&nbsp;op1,
  io.swagger.v3.oas.models.Operation&nbsp;op2)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static io.swagger.v3.oas.models.parameters.Parameter</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#mergeParameter(io.swagger.v3.oas.models.parameters.Parameter,io.swagger.v3.oas.models.parameters.Parameter)" class="member-name-link">mergeParameter</a><wbr>(io.swagger.v3.oas.models.parameters.Parameter&nbsp;p1,
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static io.swagger.v3.oas.models.parameters.Parameter</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#mergeParameter(io.swagger.v3.oas.models.parameters.Parameter,io.swagger.v3.oas.models.parameters.Parameter)" class="member-name-link">mergeParameter</a><wbr>(io.swagger.v3.oas.models.parameters.Parameter&nbsp;p1,
  io.swagger.v3.oas.models.parameters.Parameter&nbsp;p2)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static io.swagger.v3.oas.models.parameters.RequestBody</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#mergeRequestBody(io.swagger.v3.oas.models.parameters.RequestBody,io.swagger.v3.oas.models.parameters.RequestBody)" class="member-name-link">mergeRequestBody</a><wbr>(io.swagger.v3.oas.models.parameters.RequestBody&nbsp;rb1,
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static io.swagger.v3.oas.models.parameters.RequestBody</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#mergeRequestBody(io.swagger.v3.oas.models.parameters.RequestBody,io.swagger.v3.oas.models.parameters.RequestBody)" class="member-name-link">mergeRequestBody</a><wbr>(io.swagger.v3.oas.models.parameters.RequestBody&nbsp;rb1,
  io.swagger.v3.oas.models.parameters.RequestBody&nbsp;rb2)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static io.swagger.v3.oas.models.media.Schema&lt;?&gt;</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#mergeSchema(io.swagger.v3.oas.models.media.Schema,io.swagger.v3.oas.models.media.Schema)" class="member-name-link">mergeSchema</a><wbr>(io.swagger.v3.oas.models.media.Schema&lt;?&gt;&nbsp;s1,
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static io.swagger.v3.oas.models.media.Schema&lt;?&gt;</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#mergeSchema(io.swagger.v3.oas.models.media.Schema,io.swagger.v3.oas.models.media.Schema)" class="member-name-link">mergeSchema</a><wbr>(io.swagger.v3.oas.models.media.Schema&lt;?&gt;&nbsp;s1,
  io.swagger.v3.oas.models.media.Schema&lt;?&gt;&nbsp;s2)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#prependIfMissing(java.lang.String,java.lang.String)" class="member-name-link">prependIfMissing</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;str,
- <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;prefix)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#processExtensions(java.util.Map,io.micronaut.core.annotation.AnnotationValue)" class="member-name-link">processExtensions</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/CharSequence.html" title="class or interface in java.lang" class="external-link">CharSequence</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&gt;&nbsp;map,
- io.micronaut.core.annotation.AnnotationValue&lt;io.swagger.v3.oas.annotations.extensions.Extension&gt;&nbsp;extension)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>,<wbr>io.swagger.v3.oas.models.media.Schema&gt;</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#resolveSchemas(io.swagger.v3.oas.models.OpenAPI)" class="member-name-link">resolveSchemas</a><wbr>(io.swagger.v3.oas.models.OpenAPI&nbsp;openAPI)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#schemaRef(java.lang.String)" class="member-name-link">schemaRef</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;schemaName)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#prependIfMissing(java.lang.String,java.lang.String)" class="member-name-link">prependIfMissing</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;str,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;prefix)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#setOperationOnPathItem(io.swagger.v3.oas.models.PathItem,io.micronaut.http.HttpMethod,io.swagger.v3.oas.models.Operation)" class="member-name-link">setOperationOnPathItem</a><wbr>(io.swagger.v3.oas.models.PathItem&nbsp;pathItem,
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#processExtensions(java.util.Map,io.micronaut.core.annotation.AnnotationValue)" class="member-name-link">processExtensions</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/CharSequence.html" title="class or interface in java.lang" class="external-link">CharSequence</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&gt;&nbsp;map,
+ io.micronaut.core.annotation.AnnotationValue&lt;io.swagger.v3.oas.annotations.extensions.Extension&gt;&nbsp;extension)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>,<wbr>io.swagger.v3.oas.models.media.Schema&gt;</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#resolveSchemas(io.swagger.v3.oas.models.OpenAPI)" class="member-name-link">resolveSchemas</a><wbr>(io.swagger.v3.oas.models.OpenAPI&nbsp;openAPI)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#schemaRef(java.lang.String)" class="member-name-link">schemaRef</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;schemaName)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#setOperationOnPathItem(io.swagger.v3.oas.models.PathItem,io.micronaut.http.HttpMethod,io.swagger.v3.oas.models.Operation)" class="member-name-link">setOperationOnPathItem</a><wbr>(io.swagger.v3.oas.models.PathItem&nbsp;pathItem,
  io.micronaut.http.HttpMethod&nbsp;httpMethod,
  io.swagger.v3.oas.models.Operation&nbsp;operation)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
 </div>
 </div>
 </div>
@@ -524,6 +530,19 @@ loadScripts(document, 'script');</script>
 <h3>mergeSchema</h3>
 <div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">io.swagger.v3.oas.models.media.Schema&lt;?&gt;</span>&nbsp;<span class="element-name">mergeSchema</span><wbr><span class="parameters">(io.swagger.v3.oas.models.media.Schema&lt;?&gt;&nbsp;s1,
  io.swagger.v3.oas.models.media.Schema&lt;?&gt;&nbsp;s2)</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="copyOpenApi(io.swagger.v3.oas.models.OpenAPI,io.swagger.v3.oas.models.OpenAPI)">
+<h3>copyOpenApi</h3>
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">copyOpenApi</span><wbr><span class="parameters">(io.swagger.v3.oas.models.OpenAPI&nbsp;to,
+ io.swagger.v3.oas.models.OpenAPI&nbsp;from)</span></div>
+<div class="block">Copy information from one <code>OpenAPI</code> object to another.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>to</code> - The <code>OpenAPI</code> object to copy to</dd>
+<dd><code>from</code> - The <code>OpenAPI</code> object to copy from</dd>
+</dl>
 </section>
 </li>
 </ul>
