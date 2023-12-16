@@ -45,6 +45,7 @@ import org.gradle.process.ExecOperations;
  * would do. Must be used with the test entry point.
  */
 public abstract class OpenApiGeneratorTask extends DefaultTask {
+
     @Classpath
     public abstract ConfigurableFileCollection getClasspath();
 
@@ -57,6 +58,9 @@ public abstract class OpenApiGeneratorTask extends DefaultTask {
 
     @Input
     public abstract Property<String> getLang();
+
+    @Input
+    public abstract Property<Boolean> getGeneratedAnnotation();
 
     @OutputDirectory
     public abstract DirectoryProperty getOutputDirectory();
@@ -90,6 +94,7 @@ public abstract class OpenApiGeneratorTask extends DefaultTask {
         var generatedSourcesDir = getGeneratedSourcesDirectory().get().getAsFile();
         var generatedTestSourcesDir = getGeneratedTestSourcesDirectory().get().getAsFile();
         var lang = getLang().get();
+        var generatedAnnotation = getGeneratedAnnotation().get();
         Files.createDirectories(generatedSourcesDir.toPath());
         Files.createDirectories(generatedTestSourcesDir.toPath());
         getProject().getLogger().info("json: {}", getParameterMappings().get());
@@ -104,6 +109,7 @@ public abstract class OpenApiGeneratorTask extends DefaultTask {
             args.add(getParameterMappings().get().toString());
             args.add(getResponseBodyMappings().get().toString());
             args.add(lang.toUpperCase());
+            args.add(Boolean.toString(generatedAnnotation));
             javaexec.args(args);
         });
     }

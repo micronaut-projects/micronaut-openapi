@@ -27,10 +27,7 @@ include 'test-suite-java-server-generator'
 include 'test-suite-kotlin-kapt-client-generator'
 include 'test-suite-kotlin-kapt-server-generator'
 include 'test-suite-kotlin-ksp-client-generator'
-// Skip it. Need to fix issues:
-// https://github.com/micronaut-projects/micronaut-core/issues/10228
-// https://github.com/micronaut-projects/micronaut-core/issues/10227
-//include 'test-suite-kotlin-ksp-server-generator'
+include 'test-suite-kotlin-ksp-server-generator'
 include 'test-suite-generator-util'
 
 dependencyResolutionManagement {

@@ -41,17 +41,19 @@ public class GeneratorMain {
      * The main executable.
      *
      * @param args The argument array, consisting of:
-     *             <ol>
-     *                 <li>Server or client boolean.</li>
-     *                 <li>The definition file path.</li>
-     *                 <li>The output directory.</li>
-     *                 <li>A comma-separated list of output kinds.</li>
-     *             </ol>
+     *     <ol>
+     *         <li>Server or client boolean.</li>
+     *         <li>The definition file path.</li>
+     *         <li>The output directory.</li>
+     *         <li>A comma-separated list of output kinds.</li>
+     *     </ol>
+     *
      * @throws URISyntaxException In case definition file path is incorrect.
      */
     public static void main(String[] args) throws URISyntaxException {
         boolean server = "server".equals(args[0]);
         var lang = GeneratorLanguage.valueOf(args[6].toUpperCase());
+        var generatedAnnotation = Boolean.parseBoolean(args[7]);
         List<ParameterMapping> parameterMappings =
             parseParameterMappings(args[4]);
         List<ResponseBodyMapping> responseBodyMappings =
@@ -84,24 +86,28 @@ public class GeneratorMain {
                     serverOptions.withControllerPackage("io.micronaut.openapi.test.controller");
                     // commented out because currently this would prevent the test project from compiling
                     // because we generate both abstract classes _and_ dummy implementations
-                    serverOptions.withGenerateImplementationFiles(false);
-                    serverOptions.withAuthentication(false);
+                    serverOptions.withGenerateImplementationFiles(false)
+                        .withAuthentication(false)
+                        .withGeneratedAnnotation(generatedAnnotation);
                 });
             } else {
                 builder.forJavaServer(serverOptions -> {
                     serverOptions.withControllerPackage("io.micronaut.openapi.test.controller");
                     // commented out because currently this would prevent the test project from compiling
                     // because we generate both abstract classes _and_ dummy implementations
-                    serverOptions.withGenerateImplementationFiles(false);
-                    serverOptions.withAuthentication(false);
+                    serverOptions.withGenerateImplementationFiles(false)
+                        .withAuthentication(false)
+                        .withGeneratedAnnotation(generatedAnnotation);
                 });
             }
         } else {
             if (lang == GeneratorLanguage.KOTLIN) {
                 builder.forKotlinClient(client -> {
+                    client.withGeneratedAnnotation(generatedAnnotation);
                 });
             } else {
                 builder.forJavaClient(client -> {
+                    client.withGeneratedAnnotation(generatedAnnotation);
                 });
             }
         }
@@ -136,7 +142,7 @@ public class GeneratorMain {
         assert string.charAt(0) == '[';
         int i = 1;
 
-        while(string.charAt(i) != ']') {
+        while (string.charAt(i) != ']') {
             if (string.charAt(i) == ' ') {
                 ++i;
             }
