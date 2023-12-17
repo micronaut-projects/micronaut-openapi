@@ -49,12 +49,14 @@
                 {{/produces}}
             ]{{/baseType}}){{^-last}},{{/-last}}
             {{/responses}}
-        ]{{#hasParams}},
+        ]{{#vendorExtensions.hasNotBodyParam}},
         parameters = [
             {{#vendorExtensions.originalParams}}
+                {{^isBodyParam}}
             Parameter(name = "{{paramName}}"{{#description}}, description = "{{{description}}}"{{/description}}{{#required}}, required = true{{/required}}){{^-last}},{{/-last}}
+                {{/isBodyParam}}
             {{/vendorExtensions.originalParams}}
-        ]{{/hasParams}}{{#hasAuthMethods}},
+        ]{{/vendorExtensions.hasNotBodyParam}}{{#hasAuthMethods}},
         security = [
             {{#authMethods}}
             SecurityRequirement(name = "{{name}}"{{#isOAuth}}, scopes = [{{#scopes}}"{{scope}}"{{^-last}}, {{/-last}}{{/scopes}}]{{/isOAuth}}){{^-last}},{{/-last}}

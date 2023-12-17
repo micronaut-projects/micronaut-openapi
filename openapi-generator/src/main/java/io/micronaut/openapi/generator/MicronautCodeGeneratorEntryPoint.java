@@ -188,6 +188,7 @@ public final class MicronautCodeGeneratorEntryPoint {
             javaServerCodegen.setGenerateControllerFromExamples(javaServerOptions.generateControllerFromExamples());
             javaServerCodegen.setUseAuth(javaServerOptions.useAuth());
             javaServerCodegen.setLombok(javaServerOptions.lombok());
+            javaServerCodegen.setPlural(javaServerOptions.plural());
             javaServerCodegen.setFluxForArrays(javaServerOptions.fluxForArrays());
             javaServerCodegen.setGeneratedAnnotation(javaServerOptions.generatedAnnotation());
         }
@@ -209,6 +210,7 @@ public final class MicronautCodeGeneratorEntryPoint {
             }
             javaClientCodegen.setConfigureAuthorization(javaClientOptions.useAuth());
             javaClientCodegen.setLombok(javaClientOptions.lombok());
+            javaClientCodegen.setPlural(javaClientOptions.plural());
             javaClientCodegen.setFluxForArrays(javaClientOptions.fluxForArrays());
             javaClientCodegen.setGeneratedAnnotation(javaClientOptions.generatedAnnotation());
         }
@@ -224,6 +226,7 @@ public final class MicronautCodeGeneratorEntryPoint {
             kotlinServerCodegen.setGenerateControllerFromExamples(kotlinServerOptions.generateControllerFromExamples());
             kotlinServerCodegen.setGeneratedAnnotation(kotlinServerOptions.generatedAnnotation());
             kotlinServerCodegen.setUseAuth(kotlinServerOptions.useAuth());
+            kotlinServerCodegen.setPlural(kotlinServerOptions.plural());
             kotlinServerCodegen.setFluxForArrays(kotlinServerOptions.fluxForArrays());
         }
     }
@@ -244,6 +247,7 @@ public final class MicronautCodeGeneratorEntryPoint {
             }
             kotlinClientCodegen.setGeneratedAnnotation(kotlinClientOptions.generatedAnnotation());
             kotlinClientCodegen.setConfigureAuthorization(kotlinClientOptions.useAuth());
+            kotlinClientCodegen.setPlural(kotlinClientOptions.plural());
             kotlinClientCodegen.setFluxForArrays(kotlinClientOptions.fluxForArrays());
         }
     }

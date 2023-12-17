@@ -357,4 +357,14 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
         assertFileContains(modelPath + "CountsContainer.java", "private List<@NotEmpty List<@NotNull List<@Size(max = 10) @NotNull String>>> counts;");
         assertFileContains(modelPath + "BooksContainer.java", "private List<@Pattern(regexp = \"[a-zA-Z ]+\") @Size(max = 10) @NotNull String> books;");
     }
+
+    @Test
+    void testPluralBodyParamName() {
+
+        var codegen = new JavaMicronautServerCodegen();
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/plural.yml", CodegenConstants.APIS);
+        String apiPath = outputPath + "src/main/java/org/openapitools/api/";
+
+        assertFileContains(apiPath + "DefaultApi.java", "@Body @NotNull List<@Valid Book> books");
+    }
 }

@@ -203,6 +203,7 @@ public class KotlinMicronautClientCodegen extends AbstractMicronautKotlinCodegen
         private String authorizationFilterPattern;
         private String basePathSeparator;
         private String clientId;
+        private boolean plural;
         private boolean useAuth;
         private boolean fluxForArrays;
         private boolean generatedAnnotation = true;
@@ -244,6 +245,12 @@ public class KotlinMicronautClientCodegen extends AbstractMicronautKotlinCodegen
         }
 
         @Override
+        public KotlinMicronautClientOptionsBuilder withPlural(boolean plural) {
+            this.plural = plural;
+            return this;
+        }
+
+        @Override
         public KotlinMicronautClientOptionsBuilder withGeneratedAnnotation(boolean generatedAnnotation) {
             this.generatedAnnotation = generatedAnnotation;
             return this;
@@ -256,6 +263,7 @@ public class KotlinMicronautClientCodegen extends AbstractMicronautKotlinCodegen
                 basePathSeparator,
                 clientId,
                 useAuth,
+                plural,
                 fluxForArrays,
                 generatedAnnotation
             );
@@ -268,6 +276,7 @@ public class KotlinMicronautClientCodegen extends AbstractMicronautKotlinCodegen
         String basePathSeparator,
         String clientId,
         boolean useAuth,
+        boolean plural,
         boolean fluxForArrays,
         boolean generatedAnnotation
     ) {

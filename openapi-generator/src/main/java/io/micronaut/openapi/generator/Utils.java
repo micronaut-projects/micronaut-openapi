@@ -28,6 +28,8 @@ import org.openapitools.codegen.CodegenProperty;
  */
 public final class Utils {
 
+    public static final String DEFAULT_BODY_PARAM_NAME = "requestBody";
+
     private Utils() {
     }
 
