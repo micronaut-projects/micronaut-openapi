@@ -84,9 +84,11 @@
                                 
                                 <div class="toc-item" style="margin-left:0"><a href="#serverContext"><strong>20</strong><span>Server Context</span></a></div>
                                 
-                                <div class="toc-item" style="margin-left:0"><a href="#repository"><strong>21</strong><span>Repository</span></a></div>
+                                <div class="toc-item" style="margin-left:0"><a href="#openApiGuides"><strong>21</strong><span>Guides</span></a></div>
                                 
-                                <div class="toc-item" style="margin-left:0"><a href="#breaks"><strong>22</strong><span>Breaking Changes</span></a></div>
+                                <div class="toc-item" style="margin-left:0"><a href="#repository"><strong>22</strong><span>Repository</span></a></div>
+                                
+                                <div class="toc-item" style="margin-left:0"><a href="#breaks"><strong>23</strong><span>Breaking Changes</span></a></div>
                                 
                             </div>
                         </div>
@@ -229,9 +231,11 @@
         
         <div class="toc-item" style="margin-left:10px" id="toc-item-urlParameter"><a href="#urlParameter"><strong>20.3</strong><span>URL Parameter</span></a></div>
         
-        <div class="toc-item" style="margin-left:0px" id="toc-item-repository"><a href="#repository"><strong>21</strong><span>Repository</span></a></div>
+        <div class="toc-item" style="margin-left:0px" id="toc-item-openApiGuides"><a href="#openApiGuides"><strong>21</strong><span>Guides</span></a></div>
         
-        <div class="toc-item" style="margin-left:0px" id="toc-item-breaks"><a href="#breaks"><strong>22</strong><span>Breaking Changes</span></a></div>
+        <div class="toc-item" style="margin-left:0px" id="toc-item-repository"><a href="#repository"><strong>22</strong><span>Repository</span></a></div>
+        
+        <div class="toc-item" style="margin-left:0px" id="toc-item-breaks"><a href="#breaks"><strong>23</strong><span>Breaking Changes</span></a></div>
         
         </div>
     </div>
@@ -3290,6 +3294,18 @@ micronaut.router.static-resources.swagger-ui.mapping=/swagger-ui/**</code></pre>
 <div class="paragraph">
 <p>With the above configuration in place when you run your application you can access your Swagger documentation at http://localhost:8080/swagger-ui.</p>
 </div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+See the guide for <a href="https://guides.micronaut.io/latest/micronaut-openapi-swagger-ui.html">Visualize with Swagger UI an OpenAPI specification of your Micronaut application.</a> to learn more.
+</td>
+</tr>
+</table>
+</div>
 
 <h2 id="oauth2"><a class="anchor" href="#oauth2"></a>17.4.1 Swagger UI - OAuth 2.0 configuration</h2>
 
@@ -4572,6 +4588,18 @@ micronaut.router.static-resources.rapidoc.mapping=/rapidoc/**</code></pre>
 </tr>
 </tbody>
 </table>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+See the guide for <a href="https://guides.micronaut.io/latest/micronaut-openapi-adoc.html">Generate API Documentation in AsciiDoc with the generated OpenAPI specification of your Micronaut application.</a> to learn more.
+</td>
+</tr>
+</table>
+</div>
 
 <h1 id="versionsAndGroups"><a class="anchor" href="#versionsAndGroups"></a>19 Versions and groups</h1>
 
@@ -5231,7 +5259,23 @@ public class OpenApiContextPathFilter implements HttpServerFilter {
 <p>Just add a parameter to the view url. For instance if the context path is set to <code>/context/path</code> you will access your view with <code><a href="http://localhost:8080/context/path/swagger-ui?contextPath=%2Fcontext%2Fpath" class="bare">http://localhost:8080/context/path/swagger-ui?contextPath=%2Fcontext%2Fpath</a></code>.</p>
 </div>
 
-<h1 id="repository"><a class="anchor" href="#repository"></a>21 Repository</h1>
+<h1 id="openApiGuides"><a class="anchor" href="#openApiGuides"></a>21 Guides</h1>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/openApiGuides.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>See the following list of guides to learn more about working with OpenAPI in the Micronaut Framework:</p>
+</div>
+<div class="paragraph">
+<p><a href="https://guides.micronaut.io/latest/tag-open_api.html" class="bare">https://guides.micronaut.io/latest/tag-open_api.html</a></p>
+</div>
+
+<h1 id="repository"><a class="anchor" href="#repository"></a>22 Repository</h1>
 
 <div class='contribute-btn'>
     <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/repository.adoc"'>
@@ -5247,7 +5291,7 @@ public class OpenApiContextPathFilter implements HttpServerFilter {
 <p><a href="https://github.com/micronaut-projects/micronaut-openapi">https://github.com/micronaut-projects/micronaut-openapi</a></p>
 </div>
 
-<h1 id="breaks"><a class="anchor" href="#breaks"></a>22 Breaking Changes</h1>
+<h1 id="breaks"><a class="anchor" href="#breaks"></a>23 Breaking Changes</h1>
 
 <div class='contribute-btn'>
     <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/master/src/main/docs/guide/breaks.adoc"'>
