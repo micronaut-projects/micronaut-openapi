@@ -24,52 +24,52 @@ open class RequestBodyController : RequestBodyApi {
         return Mono.empty()
     }
 
-    override fun sendListOfSimpleModels(simpleModels: List<SimpleModel>?): Mono<List<SimpleModel>> {
-        return Mono.just(simpleModels!!)
+    override fun sendListOfSimpleModels(simpleModel: List<SimpleModel>?): Mono<List<SimpleModel>> {
+        return Mono.just(simpleModel!!)
     }
 
-    override fun sendModelWithRequiredProperties(model: ModelWithRequiredProperties?): Mono<ModelWithRequiredProperties> {
-        return Mono.just(model!!)
+    override fun sendModelWithRequiredProperties(modelWithRequiredProperties: ModelWithRequiredProperties?): Mono<ModelWithRequiredProperties> {
+        return Mono.just(modelWithRequiredProperties!!)
     }
 
-    override fun sendDateModel(model: DateModel?): Mono<DateModel> {
-        return Mono.just(model!!)
+    override fun sendDateModel(dateModel: DateModel?): Mono<DateModel> {
+        return Mono.just(dateModel!!)
     }
 
-    override fun sendEnum(color: String): Mono<ColorEnum> {
-        return Mono.just(fromValue(color.replace("\"", "")))
+    override fun sendEnum(body: String): Mono<ColorEnum> {
+        return Mono.just(fromValue(body.replace("\"", "")))
     }
 
-    override fun sendEnumList(availableColors: List<ColorEnum>): Mono<List<ColorEnum>> {
-        return Mono.just(availableColors)
+    override fun sendEnumList(colorEnum: List<ColorEnum>): Mono<List<ColorEnum>> {
+        return Mono.just(colorEnum)
     }
 
-    override fun sendModelWithMapProperty(model: ModelWithMapProperty): Mono<ModelWithMapProperty> {
-        return Mono.just(model)
+    override fun sendModelWithMapProperty(modelWithMapProperty: ModelWithMapProperty): Mono<ModelWithMapProperty> {
+        return Mono.just(modelWithMapProperty)
     }
 
     override fun sendModelWithValidatedListProperty(modelWithValidatedListProperty: ModelWithValidatedListProperty): Mono<Void> {
         return Mono.empty()
     }
 
-    override fun sendNestedModel(model: NestedModel): Mono<NestedModel> {
-        return Mono.just(model)
+    override fun sendNestedModel(nestedModel: NestedModel): Mono<NestedModel> {
+        return Mono.just(nestedModel)
     }
 
-    override fun sendModelWithInnerEnum(model: ModelWithInnerEnum): Mono<ModelWithInnerEnum> {
-        return Mono.just(model)
+    override fun sendModelWithInnerEnum(modelWithInnerEnum: ModelWithInnerEnum): Mono<ModelWithInnerEnum> {
+        return Mono.just(modelWithInnerEnum)
     }
 
-    override fun sendModelWithDiscriminator(model: Animal): Mono<Animal> {
-        return Mono.just(model)
+    override fun sendModelWithDiscriminator(animal: Animal): Mono<Animal> {
+        return Mono.just(animal)
     }
 
-    override fun sendBytes(bytes: ByteArray?): Mono<ByteArray> {
-        return Mono.just(bytes!!)
+    override fun sendBytes(body: ByteArray?): Mono<ByteArray> {
+        return Mono.just(body!!)
     }
 
-    override fun sendModelWithEnumList(model: ModelWithEnumList): Mono<ModelWithEnumList> {
-        return Mono.just(model)
+    override fun sendModelWithEnumList(modelWithEnumList: ModelWithEnumList): Mono<ModelWithEnumList> {
+        return Mono.just(modelWithEnumList)
     }
 
     override fun sendFile(file: CompletedFileUpload?): Mono<ByteArray> {
