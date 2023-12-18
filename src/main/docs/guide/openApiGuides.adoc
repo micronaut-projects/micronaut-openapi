@@ -1,0 +1,3 @@
+See the following list of guides to learn more about working with OpenAPI in the Micronaut Framework:
+
+https://guides.micronaut.io/latest/tag-open_api.html

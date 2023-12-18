@@ -19,3 +19,5 @@ Adoc generator based on Apache Freemarker templates, and you can override full t
 |`micronaut.openapi.adoc.output.filename` | Final `adoc` file name. | Default: the same as openapi spec. filename
 |`micronaut.openapi.adoc.templates.*` | Prefix for custom template names. You can override any of the templates that are used in the default implementation to change only part of the resulting document. |
 |===
+
+TIP: See the guide for https://guides.micronaut.io/latest/micronaut-openapi-adoc.html[Generate API Documentation in AsciiDoc with the generated OpenAPI specification of your Micronaut application.] to learn more.
