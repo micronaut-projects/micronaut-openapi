@@ -21,9 +21,7 @@ dependencies {
 
 def openapiGenerate = tasks.register("generateOpenApi", OpenApiGeneratorTask) {
     lang = "kotlin"
-// Can't use generated annotation before this issue not fixed:
-// https://github.com/micronaut-projects/micronaut-core/issues/10277
-    generatedAnnotation = false
+    generatedAnnotation = true
     classpath.from(configurations.openapiGenerator)
     openApiDefinition.convention(layout.projectDirectory.file("petstore.json"))
     outputDirectory.convention(layout.buildDirectory.dir("generated/openapi"))
