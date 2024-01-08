@@ -25,6 +25,7 @@ public interface JavaMicronautServerOptionsBuilder extends GeneratorOptionsBuild
      * Sets the package name of generated controller classes.
      *
      * @param controllerPackage the package name
+     *
      * @return this builder
      */
     JavaMicronautServerOptionsBuilder withControllerPackage(String controllerPackage);
@@ -33,6 +34,7 @@ public interface JavaMicronautServerOptionsBuilder extends GeneratorOptionsBuild
      * Whether to generate controller implementations that need to be filled in.
      *
      * @param generateImplementationFiles the implementation files flag
+     *
      * @return this builder
      */
     JavaMicronautServerOptionsBuilder withGenerateImplementationFiles(boolean generateImplementationFiles);
@@ -41,6 +43,7 @@ public interface JavaMicronautServerOptionsBuilder extends GeneratorOptionsBuild
      * If set to true, controller operations will return not implemented status.
      *
      * @param generateOperationsToReturnNotImplemented the not implemented flag
+     *
      * @return this builder
      */
     JavaMicronautServerOptionsBuilder withGenerateOperationsToReturnNotImplemented(boolean generateOperationsToReturnNotImplemented);
@@ -49,6 +52,7 @@ public interface JavaMicronautServerOptionsBuilder extends GeneratorOptionsBuild
      * If set to true, controllers will be generated using examples.
      *
      * @param generateControllerFromExamples the examples flag
+     *
      * @return this builder
      */
     JavaMicronautServerOptionsBuilder withGenerateControllerFromExamples(boolean generateControllerFromExamples);
@@ -57,6 +61,7 @@ public interface JavaMicronautServerOptionsBuilder extends GeneratorOptionsBuild
      * If set to true, generated code will add support for authentication.
      *
      * @param useAuth the authentication flag
+     *
      * @return this builder
      */
     JavaMicronautServerOptionsBuilder withAuthentication(boolean useAuth);
@@ -65,14 +70,25 @@ public interface JavaMicronautServerOptionsBuilder extends GeneratorOptionsBuild
      * If set to true, generated code will be with lombok annotations.
      *
      * @param lombok generate code with lombok annotations or not
+     *
      * @return this builder
      */
     JavaMicronautServerOptionsBuilder withLombok(boolean lombok);
 
     /**
+     * If set to true, the generated code will pluralize parameters and properties for arrays.
+     *
+     * @param plural generate pluralized parameters and properties for arrays
+     *
+     * @return this builder
+     */
+    JavaMicronautServerOptionsBuilder withPlural(boolean plural);
+
+    /**
      * If set to true, generated code will be with Flux{@literal <}?> instead Mono{@literal <}List{@literal <}?>>.
      *
      * @param fluxForArrays generate code with Flux{@literal <}?> instead Mono{@literal <}List{@literal <}?>> or not
+     *
      * @return this builder
      */
     JavaMicronautServerOptionsBuilder withFluxForArrays(boolean fluxForArrays);
@@ -81,6 +97,7 @@ public interface JavaMicronautServerOptionsBuilder extends GeneratorOptionsBuild
      * If set to true, generated code will be with jakarta.annotation.Generated annotation.
      *
      * @param generatedAnnotation generate code with jakarta.annotation.Generated annotation or not
+     *
      * @return this builder
      */
     JavaMicronautServerOptionsBuilder withGeneratedAnnotation(boolean generatedAnnotation);
@@ -89,6 +106,7 @@ public interface JavaMicronautServerOptionsBuilder extends GeneratorOptionsBuild
      * If set to true, generated compatible code with micronaut-aot.
      *
      * @param aot generate compatible code with micronaut-aot or not
+     *
      * @return this builder
      */
     JavaMicronautServerOptionsBuilder withAot(boolean aot);

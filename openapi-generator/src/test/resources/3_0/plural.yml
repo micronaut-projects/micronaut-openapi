@@ -1,0 +1,65 @@
+openapi: 3.0.0
+info:
+  description: This is a library API
+  version: 1.0.0
+  title: Library
+  license:
+    name: Apache-2.0
+    url: "https://www.apache.org/licenses/LICENSE-2.0.html"
+paths:
+  /add-books:
+    post:
+      summary: Add a new book
+      operationId: addBooks
+      parameters:
+        - name: test
+          in: cookie
+          schema:
+            type: array
+            items:
+              $ref: "#/components/schemas/Book"
+
+      requestBody:
+        required: true
+        content:
+          "application/json":
+            schema:
+              type: array
+              items:
+                $ref: "#/components/schemas/Book"
+      responses:
+        "200":
+          description: Success
+        "400":
+          description: Bad Request
+  /sendValidatedCollection:
+    post:
+      operationId: sendValidatedCollection
+      description: A method to send a validated collection in body
+      requestBody:
+        content:
+          application/json:
+            schema:
+              title: collection
+              type: array
+              items:
+                type: array
+                items:
+                  type: string
+                  minLength: 3
+                  pattern: "[a-zA-Z]+"
+      responses:
+        "200":
+          description: Success
+        "400":
+          description: Bad Request
+components:
+  schemas:
+    Book:
+      type: object
+      properties:
+        title:
+          type: string
+          maxLength: 10
+      required:
+        - title

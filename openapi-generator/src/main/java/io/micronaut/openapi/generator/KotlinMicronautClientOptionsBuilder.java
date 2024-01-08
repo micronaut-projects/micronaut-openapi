@@ -27,6 +27,7 @@ public interface KotlinMicronautClientOptionsBuilder extends GeneratorOptionsBui
      * If set to true the client will be configured for authorization.
      *
      * @param useAuth the authorization flag
+     *
      * @return this builder
      */
     KotlinMicronautClientOptionsBuilder withAuthorization(boolean useAuth);
@@ -35,6 +36,7 @@ public interface KotlinMicronautClientOptionsBuilder extends GeneratorOptionsBui
      * Sets the authorization filter pattern.
      *
      * @param authorizationFilterPattern the filter pattern
+     *
      * @return this builder
      */
     KotlinMicronautClientOptionsBuilder withAuthorizationFilterPattern(String authorizationFilterPattern);
@@ -43,6 +45,7 @@ public interface KotlinMicronautClientOptionsBuilder extends GeneratorOptionsBui
      * Sets the client id.
      *
      * @param clientId the client id
+     *
      * @return this builder
      */
     KotlinMicronautClientOptionsBuilder withClientId(String clientId);
@@ -51,6 +54,7 @@ public interface KotlinMicronautClientOptionsBuilder extends GeneratorOptionsBui
      * Sets annotations for client type (class level annotations).
      *
      * @param additionalClientTypeAnnotations the type annotations
+     *
      * @return this builder
      */
     KotlinMicronautClientOptionsBuilder withAdditionalClientTypeAnnotations(List<String> additionalClientTypeAnnotations);
@@ -59,6 +63,7 @@ public interface KotlinMicronautClientOptionsBuilder extends GeneratorOptionsBui
      * Sets the separator to use between the application name and base path when referencing the property.
      *
      * @param basePathSeparator the base path separator
+     *
      * @return this builder
      */
     KotlinMicronautClientOptionsBuilder withBasePathSeparator(String basePathSeparator);
@@ -67,14 +72,25 @@ public interface KotlinMicronautClientOptionsBuilder extends GeneratorOptionsBui
      * If set to true, generated code will be with Flux{@literal <}?> instead Mono{@literal <}List{@literal <}?>>.
      *
      * @param fluxForArrays generate code with Flux{@literal <}?> instead Mono{@literal <}List{@literal <}?>> or not
+     *
      * @return this builder
      */
     KotlinMicronautClientOptionsBuilder withFluxForArrays(boolean fluxForArrays);
 
     /**
+     * If set to true, the generated code will pluralize parameters and properties for arrays.
+     *
+     * @param plural generate pluralized parameters and properties for arrays
+     *
+     * @return this builder
+     */
+    KotlinMicronautClientOptionsBuilder withPlural(boolean plural);
+
+    /**
      * If set to true, generated code will be with jakarta.annotation.Generated annotation.
      *
      * @param generatedAnnotation generate code with jakarta.annotation.Generated annotation or not
+     *
      * @return this builder
      */
     KotlinMicronautClientOptionsBuilder withGeneratedAnnotation(boolean generatedAnnotation);

@@ -460,4 +460,14 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
         assertFileContains(modelPath + "CountsContainer.kt", "var counts: List<@NotEmpty List<@NotNull List<@Size(max = 10) @NotNull String>>>");
         assertFileContains(modelPath + "BooksContainer.kt", "var books: List<@Pattern(regexp = \"[a-zA-Z ]+\") @Size(max = 10) @NotNull String>");
     }
+
+    @Test
+    void testPluralBodyParamName() {
+
+        var codegen = new KotlinMicronautServerCodegen();
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/plural.yml", CodegenConstants.APIS);
+        String apiPath = outputPath + "src/main/kotlin/org/openapitools/api/";
+
+        assertFileContains(apiPath + "DefaultApi.kt", "@Body @NotNull books: List<@Valid Book>");
+    }
 }

@@ -13,6 +13,7 @@ dependencies {
     }
     api libs.openapi.generator
     api libs.commons.codec
+    api libs.managed.evo.inflector
 
     testImplementation mnTest.micronaut.test.junit5
     testImplementation libs.junit.jupiter.params

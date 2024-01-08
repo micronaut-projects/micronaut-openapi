@@ -299,6 +299,7 @@ public class KotlinMicronautServerCodegen extends AbstractMicronautKotlinCodegen
         private boolean generateImplementationFiles;
         private boolean generateControllerFromExamples;
         private boolean generateOperationsToReturnNotImplemented = true;
+        private boolean plural = true;
         private boolean useAuth = true;
         private boolean fluxForArrays;
         private boolean generatedAnnotation = true;
@@ -341,6 +342,12 @@ public class KotlinMicronautServerCodegen extends AbstractMicronautKotlinCodegen
         }
 
         @Override
+        public KotlinMicronautServerOptionsBuilder withPlural(boolean plural) {
+            this.plural = plural;
+            return this;
+        }
+
+        @Override
         public KotlinMicronautServerOptionsBuilder withGeneratedAnnotation(boolean generatedAnnotation) {
             this.generatedAnnotation = generatedAnnotation;
             return this;
@@ -359,6 +366,7 @@ public class KotlinMicronautServerCodegen extends AbstractMicronautKotlinCodegen
                 generateOperationsToReturnNotImplemented,
                 generateControllerFromExamples,
                 useAuth,
+                plural,
                 fluxForArrays,
                 generatedAnnotation,
                 aot
@@ -372,6 +380,7 @@ public class KotlinMicronautServerCodegen extends AbstractMicronautKotlinCodegen
         boolean generateOperationsToReturnNotImplemented,
         boolean generateControllerFromExamples,
         boolean useAuth,
+        boolean plural,
         boolean fluxForArrays,
         boolean generatedAnnotation,
         boolean aot

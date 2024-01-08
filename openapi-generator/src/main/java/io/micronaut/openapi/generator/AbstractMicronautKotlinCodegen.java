@@ -39,6 +39,7 @@ import io.swagger.v3.oas.models.parameters.Parameter;
 import io.swagger.v3.oas.models.servers.Server;
 
 import org.apache.commons.lang3.StringUtils;
+import org.atteo.evo.inflector.English;
 import org.openapitools.codegen.CliOption;
 import org.openapitools.codegen.CodegenConstants;
 import org.openapitools.codegen.CodegenModel;
@@ -64,6 +65,7 @@ import org.openapitools.codegen.utils.ModelUtils;
 import com.google.common.collect.ImmutableMap;
 import com.samskivert.mustache.Mustache;
 
+import static io.micronaut.openapi.generator.Utils.DEFAULT_BODY_PARAM_NAME;
 import static io.micronaut.openapi.generator.Utils.processGenericAnnotations;
 import static org.openapitools.codegen.CodegenConstants.INVOKER_PACKAGE;
 import static org.openapitools.codegen.languages.KotlinClientCodegen.DATE_LIBRARY;
@@ -82,6 +84,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
     public static final String OPT_TEST_JUNIT = "junit";
     public static final String OPT_REQUIRED_PROPERTIES_IN_CONSTRUCTOR = "requiredPropertiesInConstructor";
     public static final String OPT_USE_AUTH = "useAuth";
+    public static final String OPT_USE_PLURAL = "plural";
     public static final String OPT_FLUX_FOR_ARRAYS = "fluxForArrays";
     public static final String OPT_GENERATED_ANNOTATION = "generatedAnnotation";
     public static final String OPT_VISITABLE = "visitable";
@@ -111,6 +114,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
     protected String title;
     protected boolean useBeanValidation;
     protected boolean visitable;
+    protected boolean plural = true;
     protected boolean fluxForArrays;
     protected boolean generatedAnnotation = true;
     protected String testTool;
@@ -228,6 +232,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
 
         cliOptions.add(new CliOption(OPT_TITLE, "Client service name").defaultValue(title));
         cliOptions.add(new CliOption(OPT_APPLICATION_NAME, "Micronaut application name (Defaults to the " + CodegenConstants.ARTIFACT_ID + " value)").defaultValue(appName));
+        cliOptions.add(CliOption.newBoolean(OPT_USE_PLURAL, "Whether or not to use plural for request body parameter name", plural));
         cliOptions.add(CliOption.newBoolean(OPT_FLUX_FOR_ARRAYS, "Whether or not to use Flux<?> instead Mono<List<?>> for arrays in generated code", fluxForArrays));
         cliOptions.add(CliOption.newBoolean(OPT_GENERATED_ANNOTATION, "Generate code with \"@Generated\" annotation", generatedAnnotation));
         cliOptions.add(CliOption.newBoolean(USE_BEANVALIDATION, "Use BeanValidation API annotations", useBeanValidation));
@@ -370,6 +375,10 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         updateOption(INVOKER_PACKAGE, packageName);
     }
 
+    public void setPlural(boolean plural) {
+        this.plural = plural;
+    }
+
     public void setFluxForArrays(boolean fluxForArrays) {
         this.fluxForArrays = fluxForArrays;
     }
@@ -404,6 +413,11 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
             useBeanValidation = convertPropertyToBoolean(USE_BEANVALIDATION);
         }
         writePropertyBack(USE_BEANVALIDATION, useBeanValidation);
+
+        if (additionalProperties.containsKey(OPT_USE_PLURAL)) {
+            plural = convertPropertyToBoolean(OPT_USE_PLURAL);
+        }
+        writePropertyBack(OPT_USE_PLURAL, plural);
 
         if (additionalProperties.containsKey(OPT_FLUX_FOR_ARRAYS)) {
             fluxForArrays = convertPropertyToBoolean(OPT_FLUX_FOR_ARRAYS);
@@ -821,8 +835,21 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         }
 
         op.vendorExtensions.put("originalParams", new ArrayList<>(op.allParams));
+        var hasMultipleParams = false;
+        var notBodyParamsSize = 0;
         for (var param : op.allParams) {
-            param.vendorExtensions.put("hasMultipleParams", op.allParams.size() > 1);
+            if (param.isBodyParam) {
+                continue;
+            }
+            notBodyParamsSize++;
+            if (notBodyParamsSize > 1) {
+                hasMultipleParams = true;
+                break;
+            }
+        }
+        for (var param : op.allParams) {
+            param.vendorExtensions.put("hasNotBodyParam", notBodyParamsSize > 0);
+            param.vendorExtensions.put("hasMultipleParams", hasMultipleParams);
         }
         op.vendorExtensions.put("originReturnProperty", op.returnProperty);
         processParametersWithAdditionalMappings(op.allParams, op.imports);
@@ -870,6 +897,12 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
             }
             if (paramWasMapped) {
                 iter.remove();
+            } else {
+                if (plural && param.isArray && param.isBodyParam
+                    && StringUtils.isEmpty(param.getRef())
+                    && !DEFAULT_BODY_PARAM_NAME.equals(param.paramName)) {
+                    param.paramName = English.plural(param.paramName);
+                }
             }
         }
 

@@ -80,12 +80,12 @@
                 {{/produces}}
             {{closebrace}}{{/produces.1}}{{^produces.1}}{{#produces}}@Content(mediaType = "{{{mediaType}}}", schema = @Schema(implementation = {{{baseType}}}.class)){{/produces}}{{/produces.1}}{{/baseType}}){{^-last}},{{/-last}}{{#responses.1}}
             {{/responses.1}}{{/responses}}{{#responses.1}}
-        {{closebrace}}{{/responses.1}}{{#hasParams}},
+        {{closebrace}}{{/responses.1}}{{#vendorExtensions.hasNotBodyParam}},
         parameters = {{#vendorExtensions.originalParams.1}}{{openbrace}}
             {{/vendorExtensions.originalParams.1}}{{#vendorExtensions.originalParams}}{{#vendorExtensions.originalParams.1}}
-            {{/vendorExtensions.originalParams.1}}@Parameter(name = "{{paramName}}"{{#description}}, description = "{{{description}}}"{{/description}}{{#required}}, required = true{{/required}}){{^-last}},{{/-last}}{{#vendorExtensions.hasMultipleParams}}
+            {{/vendorExtensions.originalParams.1}}{{^isBodyParam}}@Parameter(name = "{{paramName}}"{{#description}}, description = "{{{description}}}"{{/description}}{{#required}}, required = true{{/required}}){{^-last}},{{/-last}}{{/isBodyParam}}{{#vendorExtensions.hasMultipleParams}}
             {{/vendorExtensions.hasMultipleParams}}{{/vendorExtensions.originalParams}}{{#vendorExtensions.originalParams.1}}
-        {{closebrace}}{{/vendorExtensions.originalParams.1}}{{/hasParams}}{{#hasAuthMethods}},
+        {{closebrace}}{{/vendorExtensions.originalParams.1}}{{/vendorExtensions.hasNotBodyParam}}{{#hasAuthMethods}},
         security = {{#authMethods.1}}{{openbrace}}
             {{/authMethods.1}}{{#authMethods}}{{#authMethods.1}}
             {{/authMethods.1}}@SecurityRequirement(name = "{{name}}"{{#isOAuth}}, scopes = {{openbrace}}{{#scopes}}"{{scope}}"{{^-last}}, {{/-last}}{{/scopes}}{{closebrace}}{{/isOAuth}}){{^-last}},{{/-last}}
