@@ -35,7 +35,7 @@ import io.micronaut.core.convert.ArgumentConversionContext;
 import io.micronaut.core.convert.DefaultMutableConversionService;
 import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.core.value.PropertyResolver;
-import io.micronaut.http.MediaType;
+import io.micronaut.openapi.http.MediaType;
 import io.micronaut.inject.visitor.VisitorContext;
 import io.micronaut.openapi.javadoc.JavadocParser;
 import io.micronaut.openapi.visitor.group.EndpointInfo;

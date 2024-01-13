@@ -28,7 +28,7 @@ import io.micronaut.core.convert.ConversionService;
 import io.micronaut.core.convert.TypeConverter;
 import io.micronaut.core.naming.conventions.StringConvention;
 import io.micronaut.core.type.Argument;
-import io.micronaut.http.HttpMethod;
+import io.micronaut.openapi.http.HttpMethod;
 
 /**
  * Copy of class io.micronaut.security.config.InterceptUrlMapConverter from micronaut-security.

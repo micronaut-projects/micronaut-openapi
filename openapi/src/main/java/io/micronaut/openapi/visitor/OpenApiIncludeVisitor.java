@@ -21,7 +21,6 @@ import javax.annotation.processing.SupportedOptions;
 
 import io.micronaut.core.annotation.AnnotationValue;
 import io.micronaut.core.util.ArrayUtils;
-import io.micronaut.http.annotation.Controller;
 import io.micronaut.inject.ast.ClassElement;
 import io.micronaut.inject.ast.ElementModifier;
 import io.micronaut.inject.ast.ElementQuery;
@@ -66,7 +65,7 @@ public class OpenApiIncludeVisitor implements TypeElementVisitor<OpenAPIIncludes
                     if (classEl != null) {
                         groupVisitor.visitClass(classEl, context);
 
-                        if (classEl.isAnnotationPresent(Controller.class)) {
+                        if (classEl.isAnnotationPresent("io.micronaut.http.annotation.Controller")) {
                             visit(controllerVisitor, context, classEl);
                         } else if (classEl.isAnnotationPresent("io.micronaut.management.endpoint.annotation.Endpoint")) {
                             visit(endpointVisitor, context, classEl);

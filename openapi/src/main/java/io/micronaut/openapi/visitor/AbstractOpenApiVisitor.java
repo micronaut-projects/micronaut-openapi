@@ -63,10 +63,10 @@ import io.micronaut.core.reflect.ReflectionUtils;
 import io.micronaut.core.util.ArrayUtils;
 import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.core.util.StringUtils;
-import io.micronaut.http.HttpStatus;
-import io.micronaut.http.MediaType;
-import io.micronaut.http.uri.UriMatchTemplate;
-import io.micronaut.http.uri.UriMatchVariable;
+import io.micronaut.openapi.http.HttpStatus;
+import io.micronaut.openapi.http.MediaType;
+import io.micronaut.openapi.http.uri.UriMatchTemplate;
+import io.micronaut.openapi.http.uri.UriMatchVariable;
 import io.micronaut.inject.ast.ClassElement;
 import io.micronaut.inject.ast.Element;
 import io.micronaut.inject.ast.ElementQuery;
@@ -283,7 +283,7 @@ abstract class AbstractOpenApiVisitor {
 
         for (UriMatchTemplate matchTemplate : matchTemplates) {
 
-            StringBuilder result = new StringBuilder();
+            var result = new StringBuilder();
 
             boolean optionalPathVar = false;
             boolean varProcess = false;

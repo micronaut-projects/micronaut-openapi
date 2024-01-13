@@ -34,14 +34,10 @@ import io.micronaut.core.annotation.AnnotationValue;
 import io.micronaut.core.util.ArrayUtils;
 import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.core.util.StringUtils;
-import io.micronaut.http.HttpMethod;
-import io.micronaut.http.MediaType;
-import io.micronaut.http.annotation.Consumes;
-import io.micronaut.http.annotation.Controller;
+import io.micronaut.openapi.http.HttpMethod;
+import io.micronaut.openapi.http.MediaType;
 import io.micronaut.http.annotation.HttpMethodMapping;
-import io.micronaut.http.annotation.Produces;
-import io.micronaut.http.annotation.UriMapping;
-import io.micronaut.http.uri.UriMatchTemplate;
+import io.micronaut.openapi.http.uri.UriMatchTemplate;
 import io.micronaut.inject.ast.ClassElement;
 import io.micronaut.inject.ast.Element;
 import io.micronaut.inject.ast.MethodElement;
@@ -127,7 +123,7 @@ public class OpenApiControllerVisitor extends AbstractOpenApiEndpointVisitor imp
     protected boolean ignore(ClassElement element, VisitorContext context) {
         boolean isParentClass = ContextUtils.get(IS_PROCESS_PARENT_CLASS, Boolean.class, false, context);
 
-        return (!isParentClass && !element.isAnnotationPresent(Controller.class))
+        return (!isParentClass && !element.isAnnotationPresent("io.micronaut.http.annotation.Controller"))
             || element.isAnnotationPresent(Hidden.class)
             || ignoreByRequires(element, context);
     }
@@ -151,7 +147,7 @@ public class OpenApiControllerVisitor extends AbstractOpenApiEndpointVisitor imp
     @Override
     protected HttpMethod httpMethod(MethodElement element) {
         Optional<Class<? extends Annotation>> httpMethodOpt = element
-            .getAnnotationTypeByStereotype(HttpMethodMapping.class);
+            .getAnnotationTypeByStereotype("io.micronaut.http.annotation.HttpMethodMapping");
         if (httpMethodOpt.isEmpty()) {
             return null;
         }
@@ -165,12 +161,12 @@ public class OpenApiControllerVisitor extends AbstractOpenApiEndpointVisitor imp
 
     @Override
     protected List<MediaType> consumesMediaTypes(MethodElement element) {
-        return mediaTypes(element, Consumes.class);
+        return mediaTypes(element, "io.micronaut.http.annotation.Consumes");
     }
 
     @Override
     protected List<MediaType> producesMediaTypes(MethodElement element) {
-        return mediaTypes(element, Produces.class);
+        return mediaTypes(element, "io.micronaut.http.annotation.Produces");
     }
 
     @Override
@@ -178,8 +174,8 @@ public class OpenApiControllerVisitor extends AbstractOpenApiEndpointVisitor imp
         return 50;
     }
 
-    private List<MediaType> mediaTypes(MethodElement element, Class<? extends Annotation> ann) {
-        String[] values = element.stringValues(ann);
+    private List<MediaType> mediaTypes(MethodElement element, String annName) {
+        String[] values = element.stringValues(annName);
         if (ArrayUtils.isEmpty(values)) {
             return DEFAULT_MEDIA_TYPES;
         }
@@ -191,7 +187,8 @@ public class OpenApiControllerVisitor extends AbstractOpenApiEndpointVisitor imp
 
     @Override
     protected List<UriMatchTemplate> uriMatchTemplates(MethodElement element, VisitorContext context) {
-        String controllerValue = element.getOwningType().getValue(UriMapping.class, String.class).orElse(element.getDeclaringType().getValue(UriMapping.class, String.class).orElse("/"));
+        String controllerValue = element.getOwningType().getValue("io.micronaut.http.annotation.UriMapping", String.class)
+            .orElse(element.getDeclaringType().getValue("io.micronaut.http.annotation.UriMapping", String.class).orElse("/"));
         String childClassPath = ContextUtils.get(CONTEXT_CHILD_PATH, String.class, context);
         if (childClassPath != null) {
             controllerValue = childClassPath;
@@ -204,9 +201,9 @@ public class OpenApiControllerVisitor extends AbstractOpenApiEndpointVisitor imp
 
         UriMatchTemplate matchTemplate = UriMatchTemplate.of(controllerValue);
         // check if we have multiple uris
-        String[] uris = element.stringValues(HttpMethodMapping.class, "uris");
+        String[] uris = element.stringValues("io.micronaut.http.annotation.HttpMethodMapping", "uris");
         if (ArrayUtils.isEmpty(uris)) {
-            String methodValue = element.getValue(HttpMethodMapping.class, String.class).orElse("/");
+            String methodValue = element.getValue("io.micronaut.http.annotation.HttpMethodMapping", String.class).orElse("/");
             methodValue = OpenApiApplicationVisitor.replacePlaceholders(methodValue, context);
             return Collections.singletonList(matchTemplate.nest(methodValue));
         }

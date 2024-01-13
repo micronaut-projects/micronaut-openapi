@@ -18,7 +18,7 @@ package io.micronaut.openapi.visitor.group;
 import java.util.List;
 
 import io.micronaut.core.annotation.Internal;
-import io.micronaut.http.HttpMethod;
+import io.micronaut.openapi.http.HttpMethod;
 import io.micronaut.inject.ast.MethodElement;
 import io.swagger.v3.oas.models.Operation;
 

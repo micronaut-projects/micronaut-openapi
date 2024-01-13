@@ -60,9 +60,8 @@ public class RequestBodyController implements RequestBodyApi {
     }
 
     @Override
-    public Mono<List<ColorEnum>> sendEnumList(
-        List<@Valid ColorEnum> availableColors) {
-        return Mono.just(availableColors);
+    public Mono<List<ColorEnum>> sendEnumList(List<@Valid ColorEnum> colorEnums) {
+        return Mono.just(colorEnums);
     }
 
     @Override

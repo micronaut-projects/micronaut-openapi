@@ -4,10 +4,12 @@ plugins {
 
 dependencies {
 
+    annotationProcessor(mn.micronaut.inject.java)
+
     compileOnly(mn.micronaut.core.processor)
     compileOnly(projects.micronautOpenapiAdoc)
 
-    implementation(mn.micronaut.http)
+    implementation(mn.micronaut.core)
 
     api(projects.micronautOpenapiAnnotations)
     api(projects.micronautOpenapiCommon)

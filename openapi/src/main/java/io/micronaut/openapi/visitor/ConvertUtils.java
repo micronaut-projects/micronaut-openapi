@@ -314,7 +314,7 @@ public final class ConvertUtils {
     }
 
     private static void processMediaType(Content result, JsonNode content) throws JsonProcessingException {
-        var mediaType = content.has("mediaType") ? content.get("mediaType").asText() : io.micronaut.http.MediaType.APPLICATION_JSON;
+        var mediaType = content.has("mediaType") ? content.get("mediaType").asText() : io.micronaut.openapi.http.MediaType.APPLICATION_JSON;
         var mediaTypeObj = CONVERT_JSON_MAPPER.treeToValue(content, MediaType.class);
         result.addMediaType(mediaType, mediaTypeObj);
     }

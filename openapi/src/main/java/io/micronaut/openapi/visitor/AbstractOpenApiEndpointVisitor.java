@@ -45,24 +45,11 @@ import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.core.util.PathMatcher;
 import io.micronaut.core.util.StringUtils;
 import io.micronaut.core.version.annotation.Version;
-import io.micronaut.http.HttpHeaders;
-import io.micronaut.http.HttpMethod;
-import io.micronaut.http.HttpRequest;
-import io.micronaut.http.HttpResponse;
-import io.micronaut.http.HttpStatus;
-import io.micronaut.http.MediaType;
-import io.micronaut.http.annotation.Body;
-import io.micronaut.http.annotation.Controller;
-import io.micronaut.http.annotation.CookieValue;
-import io.micronaut.http.annotation.Header;
-import io.micronaut.http.annotation.Part;
-import io.micronaut.http.annotation.PathVariable;
-import io.micronaut.http.annotation.QueryValue;
-import io.micronaut.http.annotation.RequestBean;
-import io.micronaut.http.annotation.Status;
-import io.micronaut.http.annotation.UriMapping;
-import io.micronaut.http.uri.UriMatchTemplate;
-import io.micronaut.http.uri.UriMatchVariable;
+import io.micronaut.openapi.http.HttpMethod;
+import io.micronaut.openapi.http.HttpStatus;
+import io.micronaut.openapi.http.MediaType;
+import io.micronaut.openapi.http.uri.UriMatchTemplate;
+import io.micronaut.openapi.http.uri.UriMatchVariable;
 import io.micronaut.inject.ast.ClassElement;
 import io.micronaut.inject.ast.Element;
 import io.micronaut.inject.ast.ElementQuery;
@@ -121,9 +108,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import static io.micronaut.openapi.visitor.ConfigUtils.getGroupsPropertiesMap;
 import static io.micronaut.openapi.visitor.ConfigUtils.getRouterVersioningProperties;
 import static io.micronaut.openapi.visitor.ConfigUtils.getSecurityProperties;
-import static io.micronaut.openapi.visitor.ConfigUtils.isSpecGenerationEnabled;
 import static io.micronaut.openapi.visitor.ConfigUtils.isJsonViewEnabled;
 import static io.micronaut.openapi.visitor.ConfigUtils.isOpenApiEnabled;
+import static io.micronaut.openapi.visitor.ConfigUtils.isSpecGenerationEnabled;
 import static io.micronaut.openapi.visitor.ContextUtils.warn;
 import static io.micronaut.openapi.visitor.ElementUtils.isElementNotNullable;
 import static io.micronaut.openapi.visitor.ElementUtils.isFileUpload;
@@ -132,6 +119,7 @@ import static io.micronaut.openapi.visitor.SchemaUtils.COMPONENTS_CALLBACKS_PREF
 import static io.micronaut.openapi.visitor.SchemaUtils.COMPONENTS_SCHEMAS_PREFIX;
 import static io.micronaut.openapi.visitor.SchemaUtils.TYPE_OBJECT;
 import static io.micronaut.openapi.visitor.SchemaUtils.getOperationOnPathItem;
+import static io.micronaut.openapi.visitor.SchemaUtils.isIgnoredHeader;
 import static io.micronaut.openapi.visitor.SchemaUtils.setOperationOnPathItem;
 import static io.micronaut.openapi.visitor.Utils.DEFAULT_MEDIA_TYPES;
 
@@ -180,9 +168,9 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         processExternalDocs(element, context);
         ContextUtils.remove(CONTEXT_CHILD_PATH, context);
 
-        if (element.isAnnotationPresent(Controller.class)) {
+        if (element.isAnnotationPresent("io.micronaut.http.annotation.Controller")) {
 
-            element.stringValue(UriMapping.class).ifPresent(url -> ContextUtils.put(CONTEXT_CHILD_PATH, url, context));
+            element.stringValue("io.micronaut.http.annotation.UriMapping").ifPresent(url -> ContextUtils.put(CONTEXT_CHILD_PATH, url, context));
             String prefix = "";
             String suffix = "";
             boolean addAlways = true;
@@ -347,15 +335,16 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
     protected abstract String description(MethodElement element);
 
     private boolean hasNoBindingAnnotationOrType(TypedElement parameter) {
-        return !parameter.isAnnotationPresent(io.swagger.v3.oas.annotations.parameters.RequestBody.class) &&
-            !parameter.isAnnotationPresent(QueryValue.class) &&
-            !parameter.isAnnotationPresent(PathVariable.class) &&
-            !parameter.isAnnotationPresent(Body.class) &&
-            !parameter.isAnnotationPresent(Part.class) &&
-            !parameter.isAnnotationPresent(CookieValue.class) &&
-            !parameter.isAnnotationPresent(Header.class) &&
-            !parameter.isAnnotationPresent(RequestBean.class) &&
-            !isResponseType(parameter.getType());
+        return !parameter.isAnnotationPresent(io.swagger.v3.oas.annotations.parameters.RequestBody.class)
+            && !parameter.isAnnotationPresent("io.micronaut.http.annotation.QueryValue")
+            && !parameter.isAnnotationPresent("io.micronaut.http.annotation.PathVariable")
+            && !parameter.isAnnotationPresent("io.micronaut.http.annotation.Body")
+            && !parameter.isAnnotationPresent("io.micronaut.http.annotation.Part")
+            && !parameter.isAnnotationPresent("io.micronaut.http.annotation.CookieValue")
+            && !parameter.isAnnotationPresent("io.micronaut.http.annotation.Header")
+            && !parameter.isAnnotationPresent("io.micronaut.http.annotation.Headers")
+            && !parameter.isAnnotationPresent("io.micronaut.http.annotation.RequestBean")
+            && !isResponseType(parameter.getType());
     }
 
     /**
@@ -626,13 +615,14 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                     if (!paramEl.getName().equals(parameter.getName())) {
                         continue;
                     }
-                    if (paramEl.isAnnotationPresent(PathVariable.class)) {
+                    if (paramEl.isAnnotationPresent("io.micronaut.http.annotation.PathVariable")) {
                         parameter.setIn(ParameterIn.PATH.toString());
-                    } else if (paramEl.isAnnotationPresent(QueryValue.class)) {
+                    } else if (paramEl.isAnnotationPresent("io.micronaut.http.annotation.QueryValue")) {
                         parameter.setIn(ParameterIn.QUERY.toString());
-                    } else if (paramEl.isAnnotationPresent(CookieValue.class)) {
+                    } else if (paramEl.isAnnotationPresent("io.micronaut.http.annotation.CookieValue")) {
                         parameter.setIn(ParameterIn.COOKIE.toString());
-                    } else if (paramEl.isAnnotationPresent(Header.class)) {
+                    } else if (paramEl.isAnnotationPresent("io.micronaut.http.annotation.Header")
+                        || paramEl.isAnnotationPresent("io.micronaut.http.annotation.Headers")) {
                         parameter.setIn(ParameterIn.HEADER.toString());
                     } else {
                         UriMatchVariable pathVariable = pathVariables.get(parameter.getName());
@@ -689,7 +679,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
 
         consumesMediaTypes = CollectionUtils.isNotEmpty(consumesMediaTypes) ? consumesMediaTypes : DEFAULT_MEDIA_TYPES;
 
-        if (parameter.isAnnotationPresent(Body.class)) {
+        if (parameter.isAnnotationPresent("io.micronaut.http.annotation.Body")) {
             io.swagger.v3.oas.models.Operation existedOperation = null;
             // check existed operations
             for (PathItem pathItem : pathItems) {
@@ -722,7 +712,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
 
                         Schema<?> propertySchema = bindSchemaForElement(context, parameter, parameterType, mediaType.getSchema(), null);
 
-                        AnnotationValue<Body> bodyAnn = parameter.getAnnotation(Body.class);
+                        var bodyAnn = parameter.getAnnotation("io.micronaut.http.annotation.Body");
 
                         String bodyAnnValue = bodyAnn != null ? bodyAnn.getValue(String.class).orElse(null) : null;
                         if (StringUtils.isNotEmpty(bodyAnnValue)) {
@@ -741,7 +731,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             return;
         }
 
-        if (parameter.isAnnotationPresent(RequestBean.class)) {
+        if (parameter.isAnnotationPresent("io.micronaut.http.annotation.RequestBean")) {
             processRequestBean(context, openAPI, swaggerOperation, javadocDescription, permitsRequestBody, pathVariables,
                 consumesMediaTypes, swaggerParameters, parameter, extraBodyParameters, httpMethod, matchTemplates, pathItems);
             return;
@@ -870,8 +860,8 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             if (exploded) {
                 newParameter.setExplode(exploded);
             }
-        } else if (parameter.isAnnotationPresent(PathVariable.class)) {
-            String paramName = parameter.getValue(PathVariable.class, String.class).orElse(parameterName);
+        } else if (parameter.isAnnotationPresent("io.micronaut.http.annotation.PathVariable")) {
+            String paramName = parameter.getValue("io.micronaut.http.annotation.PathVariable", String.class).orElse(parameterName);
             UriMatchVariable variable = pathVariables.get(paramName);
             if (variable == null) {
                 warn("Path variable name: '" + paramName + "' not found in path, operation: " + swaggerOperation.getOperationId(), context, parameter);
@@ -883,30 +873,41 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             if (exploded) {
                 newParameter.setExplode(true);
             }
-        } else if (parameter.isAnnotationPresent(Header.class)) {
-            String headerName = parameter.stringValue(Header.class, "name")
-                .orElse(parameter.stringValue(Header.class)
+        } else if (parameter.isAnnotationPresent("io.micronaut.http.annotation.Header")) {
+            String headerName = parameter.stringValue("io.micronaut.http.annotation.Header", "name")
+                .orElse(parameter.stringValue("io.micronaut.http.annotation.Header")
                     .orElseGet(() -> NameUtils.hyphenate(parameterName)));
-            // Header parameter named "Authorization" are ignored. Use the `securitySchemes` and `security` sections instead to define authorization
-            // Header parameter named "Content-Type" are ignored. The values for the "Content-Type" header are defined by `request.body.content.<media-type>`
-            // Header parameter named "Accept" are ignored. The values for the "Accept" header are defined by `responses.<code>.content.<media-type>`
-            if (HttpHeaders.AUTHORIZATION.equalsIgnoreCase(headerName)
-                || HttpHeaders.CONTENT_TYPE.equalsIgnoreCase(headerName)
-                || HttpHeaders.ACCEPT.equalsIgnoreCase(headerName)
-            ) {
+
+            if (isIgnoredHeader(headerName)) {
                 return null;
             }
+
             newParameter = new HeaderParameter();
             newParameter.setName(headerName);
-        } else if (parameter.isAnnotationPresent(CookieValue.class)) {
-            String cookieName = parameter.stringValue(CookieValue.class).orElse(parameterName);
+        } else if (parameter.isAnnotationPresent("io.micronaut.http.annotation.Headers")) {
+
+            List<AnnotationValue<Annotation>> headerAnnotations = parameter.getAnnotationValuesByName("io.micronaut.http.annotation.Header");
+            if (CollectionUtils.isNotEmpty(headerAnnotations)) {
+                var headerAnn = headerAnnotations.get(0);
+                var headerName = headerAnn.stringValue("name")
+                    .orElse(headerAnn.stringValue()
+                        .orElseGet(() -> NameUtils.hyphenate(parameterName)));
+
+                if (isIgnoredHeader(headerName)) {
+                    return null;
+                }
+                newParameter = new HeaderParameter();
+                newParameter.setName(headerName);
+            }
+        } else if (parameter.isAnnotationPresent("io.micronaut.http.annotation.CookieValue")) {
+            String cookieName = parameter.stringValue("io.micronaut.http.annotation.CookieValue").orElse(parameterName);
             newParameter = new CookieParameter();
             newParameter.setName(cookieName);
-        } else if (parameter.isAnnotationPresent(QueryValue.class)) {
-            String queryVar = parameter.stringValue(QueryValue.class).orElse(parameterName);
+        } else if (parameter.isAnnotationPresent("io.micronaut.http.annotation.QueryValue")) {
+            String queryVar = parameter.stringValue("io.micronaut.http.annotation.QueryValue").orElse(parameterName);
             newParameter = new QueryParameter();
             newParameter.setName(queryVar);
-        } else if (parameter.isAnnotationPresent(Part.class) && permitsRequestBody) {
+        } else if (parameter.isAnnotationPresent("io.micronaut.http.annotation.Part") && permitsRequestBody) {
             extraBodyParameters.add(parameter);
             isBodyParameter = true;
         } else if (parameter.hasAnnotation("io.micronaut.management.endpoint.annotation.Selector")) {
@@ -979,11 +980,12 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
 
                 Map<CharSequence, Object> paramValues = toValueMap(paramAnn.getValues(), context, null);
                 Utils.normalizeEnumValues(paramValues, Collections.singletonMap("in", ParameterIn.class));
-                if (parameter.isAnnotationPresent(Header.class)) {
+                if (parameter.isAnnotationPresent("io.micronaut.http.annotation.Header")
+                    || parameter.isAnnotationPresent("io.micronaut.http.annotation.Headers")) {
                     paramValues.put("in", ParameterIn.HEADER.toString());
-                } else if (parameter.isAnnotationPresent(CookieValue.class)) {
+                } else if (parameter.isAnnotationPresent("io.micronaut.http.annotation.CookieValue")) {
                     paramValues.put("in", ParameterIn.COOKIE.toString());
-                } else if (parameter.isAnnotationPresent(QueryValue.class)) {
+                } else if (parameter.isAnnotationPresent("io.micronaut.http.annotation.QueryValue")) {
                     paramValues.put("in", ParameterIn.QUERY.toString());
                 }
                 processExplode(paramAnn, paramValues);
@@ -1145,7 +1147,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         boolean withMethodResponses = element.hasDeclaredAnnotation(io.swagger.v3.oas.annotations.responses.ApiResponse.class)
             || element.hasDeclaredAnnotation(io.swagger.v3.oas.annotations.responses.ApiResponse.class);
 
-        HttpStatus methodResponseStatus = element.enumValue(Status.class, HttpStatus.class).orElse(HttpStatus.OK);
+        HttpStatus methodResponseStatus = element.enumValue("io.micronaut.http.annotation.Status", HttpStatus.class).orElse(HttpStatus.OK);
         String responseCode = Integer.toString(methodResponseStatus.getCode());
         ApiResponses responses = swaggerOperation.getResponses();
         ApiResponse response = null;
@@ -1360,13 +1362,14 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         String paramName = methodParam.getName();
         Set<String> paramAnnNames = methodParam.getAnnotationNames();
         if (CollectionUtils.isNotEmpty(paramAnnNames)) {
-            if (paramAnnNames.contains(QueryValue.class.getName())) {
+            if (paramAnnNames.contains("io.micronaut.http.annotation.QueryValue")) {
                 return ParameterIn.QUERY.toString();
-            } else if (paramAnnNames.contains(PathVariable.class.getName())) {
+            } else if (paramAnnNames.contains("io.micronaut.http.annotation.PathVariable")) {
                 return ParameterIn.PATH.toString();
-            } else if (paramAnnNames.contains(Header.class.getName())) {
+            } else if (paramAnnNames.contains("io.micronaut.http.annotation.Header")
+                || paramAnnNames.contains("io.micronaut.http.annotation.Headers")) {
                 return ParameterIn.HEADER.toString();
-            } else if (paramAnnNames.contains(CookieValue.class.getName())) {
+            } else if (paramAnnNames.contains("io.micronaut.http.annotation.CookieValue")) {
                 return ParameterIn.COOKIE.toString();
             }
         }
@@ -1572,18 +1575,18 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
     }
 
     private boolean isIgnoredParameterType(ClassElement parameterType) {
-        return parameterType == null ||
-            parameterType.isAssignable(Principal.class) ||
-            parameterType.isAssignable("io.micronaut.session.Session") ||
-            parameterType.isAssignable("io.micronaut.security.authentication.Authentication") ||
-            parameterType.isAssignable("io.micronaut.http.HttpHeaders") ||
-            parameterType.isAssignable("kotlin.coroutines.Continuation") ||
-            parameterType.isAssignable(HttpRequest.class) ||
-            parameterType.isAssignable("io.micronaut.http.BasicAuth");
+        return parameterType == null
+            || parameterType.isAssignable(Principal.class)
+            || parameterType.isAssignable("io.micronaut.session.Session")
+            || parameterType.isAssignable("io.micronaut.security.authentication.Authentication")
+            || parameterType.isAssignable("io.micronaut.http.HttpHeaders")
+            || parameterType.isAssignable("kotlin.coroutines.Continuation")
+            || parameterType.isAssignable("io.micronaut.http.HttpRequest")
+            || parameterType.isAssignable("io.micronaut.http.BasicAuth");
     }
 
     private boolean isResponseType(ClassElement returnType) {
-        return returnType.isAssignable(HttpResponse.class)
+        return returnType.isAssignable("io.micronaut.http.HttpResponse")
             || returnType.isAssignable("org.springframework.http.HttpEntity");
     }
 
