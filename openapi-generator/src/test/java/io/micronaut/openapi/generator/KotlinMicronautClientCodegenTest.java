@@ -169,7 +169,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                 @field:Nullable
                 @field:JsonProperty(JSON_PROPERTY_STATUS)
                 @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
-                var status: Status? = null,
+                var status: PetStatus? = null,
             ) {
             """);
     }
@@ -321,7 +321,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                     @field:Nullable
                     @field:JsonProperty(JSON_PROPERTY_TYPE)
                     @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
-                    open var type: Type? = null,
+                    open var type: BookInfoType? = null,
                 ) {
                 """);
         assertFileContains(apiPath + "ExtendedBookInfo.kt",
@@ -388,7 +388,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                            open var name: String,
                            @field:NotNull
                            @field:JsonProperty(JSON_PROPERTY_TYPE)
-                           open var type: Type? = null,
+                           open var type: BookInfoType? = null,
                        ) {""");
         assertFileContains(apiPath + "BasicBookInfo.kt",
             """

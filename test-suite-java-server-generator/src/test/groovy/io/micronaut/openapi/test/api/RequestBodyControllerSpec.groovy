@@ -14,6 +14,7 @@ import io.micronaut.openapi.test.model.Bird
 import io.micronaut.openapi.test.model.ColorEnum
 import io.micronaut.openapi.test.model.DateModel
 import io.micronaut.openapi.test.model.Mammal
+import io.micronaut.openapi.test.model.MammalOrder
 import io.micronaut.openapi.test.model.ModelWithEnumList
 import io.micronaut.openapi.test.model.ModelWithInnerEnum
 import io.micronaut.openapi.test.model.ModelWithMapProperty
@@ -191,7 +192,7 @@ class RequestBodyControllerSpec extends Specification {
         ModelWithInnerEnum model = new ModelWithInnerEnum()
                 .speciesName("Short-eared rock wallaby")
                 .numRepresentatives(40000L)
-                .mammalOrder(ModelWithInnerEnum.MammalOrderEnum.MARSUPIAL)
+                .mammalOrder(MammalOrder.MARSUPIAL)
         HttpRequest<?> request = HttpRequest.POST("/sendModelWithInnerEnum", model)
                 .contentType(MediaType.APPLICATION_JSON_TYPE)
 

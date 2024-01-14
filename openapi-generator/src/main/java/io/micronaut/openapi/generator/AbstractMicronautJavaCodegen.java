@@ -25,14 +25,15 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import io.micronaut.openapi.generator.Formatting.ReplaceDotsWithUnderscoreLambda;
+import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.media.Schema;
-import io.swagger.v3.oas.models.parameters.Parameter;
 import io.swagger.v3.oas.models.servers.Server;
 
 import org.apache.commons.lang3.StringUtils;
@@ -147,6 +148,8 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
         appName = artifactId;
         generateSwaggerAnnotations = this instanceof JavaMicronautClientCodegen ? OPT_GENERATE_SWAGGER_ANNOTATIONS_FALSE : OPT_GENERATE_SWAGGER_ANNOTATIONS_SWAGGER_2;
         generateOperationOnlyForFirstTag = this instanceof JavaMicronautServerCodegen;
+        openApiNullable = false;
+        inlineSchemaOption.put("RESOLVE_INLINE_ENUMS", "true");
         // CHECKSTYLE:ON
 
         // Set implemented features for user information
@@ -590,6 +593,41 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
     }
 
     @Override
+    public void preprocessOpenAPI(OpenAPI openAPI) {
+
+        if (openAPI.getPaths() != null) {
+            for (var path : openAPI.getPaths().values()) {
+                if (path.getParameters() == null || path.getParameters().isEmpty()) {
+                    continue;
+                }
+
+                for (var op : path.readOperations()) {
+                    if (op.getParameters() == null) {
+                        op.setParameters(new ArrayList<>());
+                    }
+                    for (var param : path.getParameters()) {
+                        var found = false;
+                        for (var opParam : op.getParameters()) {
+                            if (Objects.equals(opParam.getName(), param.getName())) {
+                                found = true;
+                                break;
+                            }
+                        }
+                        if (!found) {
+                            op.getParameters().add(param);
+                        }
+                    }
+                }
+            }
+        }
+
+        var inlineModelResolver = new MicronautInlineModelResolver(openAPI);
+        inlineModelResolver.flattenPaths();
+
+        super.preprocessOpenAPI(openAPI);
+    }
+
+    @Override
     public OperationsMap postProcessOperationsWithModels(OperationsMap objs, List<ModelMap> allModels) {
         objs = super.postProcessOperationsWithModels(objs, allModels);
 
@@ -697,11 +735,6 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
         codegenModel.imports.remove("ApiModelProperty");
         allModels.put(name, codegenModel);
         return codegenModel;
-    }
-
-    @Override
-    public CodegenParameter fromParameter(Parameter param, Set<String> imports) {
-        return super.fromParameter(param, imports);
     }
 
     @Override

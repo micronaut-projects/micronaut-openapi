@@ -367,4 +367,17 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
 
         assertFileContains(apiPath + "DefaultApi.java", "@Body @NotNull List<@Valid Book> books");
     }
+
+    @Test
+    void testControllerEnums() {
+
+        var codegen = new JavaMicronautServerCodegen();
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/controller-enum.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String modelPath = outputPath + "src/main/java/org/openapitools/model/";
+
+        assertFileExists(modelPath + "GetTokenRequestGrantType.java");
+        assertFileExists(modelPath + "GetTokenRequestClientSecret.java");
+        assertFileExists(modelPath + "GetTokenRequestClientId.java");
+        assertFileExists(modelPath + "ArtistsArtistIdDirectAlbumsGetSortByParameter.java");
+    }
 }

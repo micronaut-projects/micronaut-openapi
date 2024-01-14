@@ -116,7 +116,7 @@ class RequestBodyControllerTest(
 
     @Test
     fun testSendModelWithInnerEnum() {
-        val model = ModelWithInnerEnum("Short-eared rock wallaby", 40000L, ModelWithInnerEnum.MammalOrder.MARSUPIAL)
+        val model = ModelWithInnerEnum("Short-eared rock wallaby", 40000L, MammalOrder.MARSUPIAL)
         val request = HttpRequest.POST("/sendModelWithInnerEnum", model)
                 .contentType(MediaType.APPLICATION_JSON_TYPE)
         val response = client.retrieve(request, Argument.of(String::class.java), Argument.of(String::class.java))
