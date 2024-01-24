@@ -28,9 +28,9 @@ import java.util.stream.Stream
 
 @MicronautTest
 class RequestBodyControllerTest(
-    var server: EmbeddedServer,
-    @Client("/api")
-    var reactiveClient: HttpClient,
+        var server: EmbeddedServer,
+        @Client("/api")
+        var reactiveClient: HttpClient,
 ) {
 
     lateinit var client: BlockingHttpClient
@@ -61,12 +61,10 @@ class RequestBodyControllerTest(
         assertEquals(model, response)
     }
 
-    @Disabled
     @MethodSource("models")
     @ParameterizedTest
     fun testSendValidatedSimpleModel(model: SimpleModel, message: String?) {
         val request = HttpRequest.POST("/sendSimpleModel", model)
-        client.retrieve(request, Argument.of(SimpleModel::class.java), Argument.of(String::class.java))
         val e = assertThrows(HttpClientResponseException::class.java) {
             client.retrieve(request, Argument.of(String::class.java), Argument.of(String::class.java))
         }
@@ -160,7 +158,6 @@ class RequestBodyControllerTest(
         assertEquals(model, response)
     }
 
-    @Disabled
     @MethodSource("models2")
     @ParameterizedTest
     fun testSendModelWithValidatedListProperty(model: ModelWithValidatedListProperty, messageContent: String?) {
@@ -180,7 +177,6 @@ class RequestBodyControllerTest(
         assertEquals(model, response)
     }
 
-    @Disabled
     @MethodSource("models3")
     @ParameterizedTest
     fun testSendModelWithValidatedDeepMapProperty(model: ModelWithMapProperty, messageContent: String) {
@@ -193,8 +189,8 @@ class RequestBodyControllerTest(
     fun testSendModelWithDeepMapModelProperty() {
         val model = ModelWithMapProperty(deepObjectMap = mapOf(
                 "polygons" to mapOf(
-                        "triangle" to SimpleModel(numEdges =  3L),
-                        "smallRectangle" to SimpleModel(numEdges =  4L, area = 1F)
+                        "triangle" to SimpleModel(numEdges = 3L),
+                        "smallRectangle" to SimpleModel(numEdges = 4L, area = 1F)
                 )
         ))
         val request = HttpRequest.POST("/sendModelWithMapProperty", model)
@@ -244,26 +240,26 @@ class RequestBodyControllerTest(
         @JvmStatic
         fun models(): Stream<Arguments> =
                 Stream.of(
-                    arguments(SimpleModel(color = "1"), "simpleModel.color: size must be between 2 and 2147483647"),
-                    arguments(SimpleModel(numEdges =  0L), "simpleModel.numEdges: must be greater than or equal to 1"),
-                    arguments(SimpleModel(area =  0f), "simpleModel.area: must be greater than or equal to 0"),
-                    arguments(SimpleModel(points = listOf("0,0")), "simpleModel.points: size must be between 3 and 2147483647")
+                        arguments(SimpleModel(color = "1"), "simpleModel.color: size must be between 2 and 2147483647"),
+                        arguments(SimpleModel(numEdges = 0L), "simpleModel.numEdges: must be greater than or equal to 1"),
+                        arguments(SimpleModel(area = 0f), "simpleModel.area: must be greater than or equal to 0"),
+                        arguments(SimpleModel(points = listOf("0,0")), "simpleModel.points: size must be between 3 and 2147483647")
                 )
 
         @JvmStatic
         fun models2(): Stream<Arguments> =
                 Stream.of(
-                    arguments(ModelWithValidatedListProperty(stringList = listOf("one", "two", "")), "model.stringList[2]: size must be between 3 and 2147483647"),
-                    arguments(ModelWithValidatedListProperty(objectList = listOf(SimpleModel(), SimpleModel(numEdges = 0L))), "model.objectList[1].numEdges: must be greater than or equal to 1"),
-                    arguments(ModelWithValidatedListProperty(objectList = listOf(SimpleModel(), SimpleModel(), SimpleModel())), "model.objectList: size must be between 0 and 2")
+                        arguments(ModelWithValidatedListProperty(stringList = listOf("one", "two", "")), "modelWithValidatedListProperty.stringList[2]: size must be between 3 and 2147483647"),
+                        arguments(ModelWithValidatedListProperty(objectList = listOf(SimpleModel(), SimpleModel(numEdges = 0L))), "modelWithValidatedListProperty.objectList[1].numEdges: must be greater than or equal to 1"),
+                        arguments(ModelWithValidatedListProperty(objectList = listOf(SimpleModel(), SimpleModel(), SimpleModel())), "modelWithValidatedListProperty.objectList: size must be between 0 and 2")
                 )
 
         @JvmStatic
         fun models3(): Stream<Arguments> =
-            Stream.of(
-                    arguments(ModelWithMapProperty(deepMap = mapOf("first" to mapOf("second" to "aa", "third" to "a"))), "model.deepMap[first][third]: size must be between 2 and 2147483647"),
-                    arguments(ModelWithMapProperty(deepObjectMap = mapOf("first" to mapOf("second" to SimpleModel(color = "a")))), "model.deepObjectMap[first][second].color: size must be between 2 and 2147483647")
-            )
+                Stream.of(
+                        arguments(ModelWithMapProperty(deepMap = mapOf("first" to mapOf("second" to "aa", "third" to "a"))), "modelWithMapProperty.deepMap[first][third]: size must be between 2 and 2147483647"),
+                        arguments(ModelWithMapProperty(deepObjectMap = mapOf("first" to mapOf("second" to SimpleModel(color = "a")))), "modelWithMapProperty.deepObjectMap[first][second].color: size must be between 2 and 2147483647")
+                )
 
         @JvmStatic
         fun discriminators(): Stream<Arguments> {
