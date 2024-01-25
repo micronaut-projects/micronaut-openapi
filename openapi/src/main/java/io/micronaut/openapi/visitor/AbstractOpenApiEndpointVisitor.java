@@ -17,7 +17,6 @@ package io.micronaut.openapi.visitor;
 
 import java.io.IOException;
 import java.lang.annotation.Annotation;
-import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -31,7 +30,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import io.micronaut.core.annotation.AnnotationValue;
 import io.micronaut.core.annotation.Nullable;
@@ -45,9 +43,7 @@ import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.core.util.PathMatcher;
 import io.micronaut.core.util.StringUtils;
 import io.micronaut.core.version.annotation.Version;
-import io.micronaut.http.HttpHeaders;
 import io.micronaut.http.HttpMethod;
-import io.micronaut.http.HttpRequest;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.HttpStatus;
 import io.micronaut.http.MediaType;
@@ -55,6 +51,7 @@ import io.micronaut.http.annotation.Body;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.CookieValue;
 import io.micronaut.http.annotation.Header;
+import io.micronaut.http.annotation.Headers;
 import io.micronaut.http.annotation.Part;
 import io.micronaut.http.annotation.PathVariable;
 import io.micronaut.http.annotation.QueryValue;
@@ -85,7 +82,6 @@ import io.micronaut.openapi.visitor.security.InterceptUrlMapPattern;
 import io.micronaut.openapi.visitor.security.SecurityProperties;
 import io.micronaut.openapi.visitor.security.SecurityRule;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
-import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.callbacks.Callback;
 import io.swagger.v3.oas.annotations.callbacks.Callbacks;
@@ -113,7 +109,6 @@ import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import io.swagger.v3.oas.models.servers.Server;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -121,10 +116,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import static io.micronaut.openapi.visitor.ConfigUtils.getGroupsPropertiesMap;
 import static io.micronaut.openapi.visitor.ConfigUtils.getRouterVersioningProperties;
 import static io.micronaut.openapi.visitor.ConfigUtils.getSecurityProperties;
-import static io.micronaut.openapi.visitor.ConfigUtils.isSpecGenerationEnabled;
 import static io.micronaut.openapi.visitor.ConfigUtils.isJsonViewEnabled;
 import static io.micronaut.openapi.visitor.ConfigUtils.isOpenApiEnabled;
+import static io.micronaut.openapi.visitor.ConfigUtils.isSpecGenerationEnabled;
 import static io.micronaut.openapi.visitor.ContextUtils.warn;
+import static io.micronaut.openapi.visitor.ElementUtils.isIgnoredParameter;
 import static io.micronaut.openapi.visitor.ElementUtils.isElementNotNullable;
 import static io.micronaut.openapi.visitor.ElementUtils.isFileUpload;
 import static io.micronaut.openapi.visitor.ElementUtils.isNullable;
@@ -132,6 +128,7 @@ import static io.micronaut.openapi.visitor.SchemaUtils.COMPONENTS_CALLBACKS_PREF
 import static io.micronaut.openapi.visitor.SchemaUtils.COMPONENTS_SCHEMAS_PREFIX;
 import static io.micronaut.openapi.visitor.SchemaUtils.TYPE_OBJECT;
 import static io.micronaut.openapi.visitor.SchemaUtils.getOperationOnPathItem;
+import static io.micronaut.openapi.visitor.SchemaUtils.isIgnoredHeader;
 import static io.micronaut.openapi.visitor.SchemaUtils.setOperationOnPathItem;
 import static io.micronaut.openapi.visitor.Utils.DEFAULT_MEDIA_TYPES;
 
@@ -156,10 +153,6 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
 
     protected List<io.swagger.v3.oas.models.tags.Tag> classTags;
     protected io.swagger.v3.oas.models.ExternalDocumentation classExternalDocs;
-
-    private static boolean isAnnotationPresent(Element element, String className) {
-        return element.findAnnotation(className).isPresent();
-    }
 
     /**
      * Executed when a class is encountered that matches the generic class.
@@ -247,7 +240,12 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
     }
 
     private boolean containsTag(String name, List<io.swagger.v3.oas.models.tags.Tag> tags) {
-        return tags.stream().anyMatch(tag -> name.equals(tag.getName()));
+        for (var tag : tags) {
+            if (name.equals(tag.getName())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -677,7 +675,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                                   List<PathItem> pathItems) {
         ClassElement parameterType = parameter.getGenericType();
 
-        if (ignoreParameter(parameter)) {
+        if (isIgnoredParameter(parameter)) {
             return;
         }
         if (permitsRequestBody && swaggerOperation.getRequestBody() == null) {
@@ -887,17 +885,28 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             String headerName = parameter.stringValue(Header.class, "name")
                 .orElse(parameter.stringValue(Header.class)
                     .orElseGet(() -> NameUtils.hyphenate(parameterName)));
-            // Header parameter named "Authorization" are ignored. Use the `securitySchemes` and `security` sections instead to define authorization
-            // Header parameter named "Content-Type" are ignored. The values for the "Content-Type" header are defined by `request.body.content.<media-type>`
-            // Header parameter named "Accept" are ignored. The values for the "Accept" header are defined by `responses.<code>.content.<media-type>`
-            if (HttpHeaders.AUTHORIZATION.equalsIgnoreCase(headerName)
-                || HttpHeaders.CONTENT_TYPE.equalsIgnoreCase(headerName)
-                || HttpHeaders.ACCEPT.equalsIgnoreCase(headerName)
-            ) {
+
+            if (isIgnoredHeader(headerName)) {
                 return null;
             }
+
             newParameter = new HeaderParameter();
             newParameter.setName(headerName);
+        } else if (parameter.isAnnotationPresent(Headers.class)) {
+
+            List<AnnotationValue<Header>> headerAnnotations = parameter.getAnnotationValuesByType(Header.class);
+            if (CollectionUtils.isNotEmpty(headerAnnotations)) {
+                var headerAnn = headerAnnotations.get(0);
+                var headerName = headerAnn.stringValue("name")
+                    .orElse(headerAnn.stringValue()
+                        .orElseGet(() -> NameUtils.hyphenate(parameterName)));
+
+                if (isIgnoredHeader(headerName)) {
+                    return null;
+                }
+                newParameter = new HeaderParameter();
+                newParameter.setName(headerName);
+            }
         } else if (parameter.isAnnotationPresent(CookieValue.class)) {
             String cookieName = parameter.stringValue(CookieValue.class).orElse(parameterName);
             newParameter = new CookieParameter();
@@ -1557,42 +1566,17 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         }
     }
 
-    private boolean ignoreParameter(TypedElement parameter) {
-
-        AnnotationValue<io.swagger.v3.oas.annotations.media.Schema> schemaAnn = parameter.getAnnotation(io.swagger.v3.oas.annotations.media.Schema.class);
-        boolean isHidden = schemaAnn != null && schemaAnn.booleanValue("hidden").orElse(false);
-
-        return isHidden
-            || parameter.isAnnotationPresent(Hidden.class)
-            || parameter.isAnnotationPresent(JsonIgnore.class)
-            || parameter.booleanValue(io.swagger.v3.oas.annotations.Parameter.class, "hidden")
-            .orElse(false)
-            || isAnnotationPresent(parameter, "io.micronaut.session.annotation.SessionValue")
-            || isIgnoredParameterType(parameter.getType());
-    }
-
-    private boolean isIgnoredParameterType(ClassElement parameterType) {
-        return parameterType == null ||
-            parameterType.isAssignable(Principal.class) ||
-            parameterType.isAssignable("io.micronaut.session.Session") ||
-            parameterType.isAssignable("io.micronaut.security.authentication.Authentication") ||
-            parameterType.isAssignable("io.micronaut.http.HttpHeaders") ||
-            parameterType.isAssignable("kotlin.coroutines.Continuation") ||
-            parameterType.isAssignable(HttpRequest.class) ||
-            parameterType.isAssignable("io.micronaut.http.BasicAuth");
-    }
-
-    private boolean isResponseType(ClassElement returnType) {
-        return returnType.isAssignable(HttpResponse.class)
-            || returnType.isAssignable("org.springframework.http.HttpEntity");
-    }
-
     private boolean isSingleResponseType(ClassElement returnType) {
         return (returnType.isAssignable("io.reactivex.Single")
             || returnType.isAssignable("io.reactivex.rxjava3.core.Single")
             || returnType.isAssignable("org.reactivestreams.Publisher"))
             && returnType.getFirstTypeArgument().isPresent()
             && isResponseType(returnType.getFirstTypeArgument().get());
+    }
+
+    private boolean isResponseType(ClassElement returnType) {
+        return returnType.isAssignable(HttpResponse.class)
+            || returnType.isAssignable("org.springframework.http.HttpEntity");
     }
 
     private void readApiResponses(MethodElement element, VisitorContext context, io.swagger.v3.oas.models.Operation swaggerOperation, @Nullable ClassElement jsonViewClass) {
@@ -1981,20 +1965,21 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
     }
 
     final List<io.swagger.v3.oas.models.tags.Tag> readTags(List<AnnotationValue<Tag>> annotations, VisitorContext context) {
-        return annotations.stream()
-            .map(av -> toValue(av.getValues(), context, io.swagger.v3.oas.models.tags.Tag.class, null))
-            .filter(Optional::isPresent)
-            .map(Optional::get)
-            .collect(Collectors.toList());
+        var tags = new ArrayList<io.swagger.v3.oas.models.tags.Tag>();
+        for (var ann : annotations) {
+            toValue(ann.getValues(), context, io.swagger.v3.oas.models.tags.Tag.class, null)
+                .ifPresent(tags::add);
+        }
+        return tags;
     }
 
     private Content buildContent(Element definingElement, ClassElement type, List<MediaType> mediaTypes, OpenAPI openAPI, VisitorContext context, @Nullable ClassElement jsonViewClass) {
-        Content content = new Content();
-        mediaTypes.forEach(mediaType -> {
-            io.swagger.v3.oas.models.media.MediaType mt = new io.swagger.v3.oas.models.media.MediaType();
+        var content = new Content();
+        for (var mediaType : mediaTypes) {
+            var mt = new io.swagger.v3.oas.models.media.MediaType();
             mt.setSchema(resolveSchema(openAPI, definingElement, type, context, Collections.singletonList(mediaType), jsonViewClass, null, null));
             content.addMediaType(mediaType.toString(), mt);
-        });
+        }
         return content;
     }
 
