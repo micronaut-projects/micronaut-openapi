@@ -59,7 +59,7 @@
         ]{{/vendorExtensions.hasNotBodyParam}}{{#hasAuthMethods}},
         security = [
             {{#authMethods}}
-            SecurityRequirement(name = "{{name}}"{{#isOAuth}}, scopes = [{{#scopes}}"{{scope}}"{{^-last}}, {{/-last}}{{/scopes}}]{{/isOAuth}}){{^-last}},{{/-last}}
+            SecurityRequirement(name = "{{name}}"{{#isOAuth}}{{#scopes.1}}, scopes = [{{#scopes}}"{{scope}}"{{^-last}}, {{/-last}}{{/scopes}}]{{/scopes.1}}{{/isOAuth}}){{^-last}},{{/-last}}
             {{/authMethods}}
         ]{{/hasAuthMethods}}
     )

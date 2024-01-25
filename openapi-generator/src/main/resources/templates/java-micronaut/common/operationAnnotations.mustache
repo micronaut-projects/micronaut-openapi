@@ -88,7 +88,7 @@
         {{closebrace}}{{/vendorExtensions.originalParams.1}}{{/vendorExtensions.hasNotBodyParam}}{{#hasAuthMethods}},
         security = {{#authMethods.1}}{{openbrace}}
             {{/authMethods.1}}{{#authMethods}}{{#authMethods.1}}
-            {{/authMethods.1}}@SecurityRequirement(name = "{{name}}"{{#isOAuth}}, scopes = {{openbrace}}{{#scopes}}"{{scope}}"{{^-last}}, {{/-last}}{{/scopes}}{{closebrace}}{{/isOAuth}}){{^-last}},{{/-last}}
+            {{/authMethods.1}}@SecurityRequirement(name = "{{name}}"{{#isOAuth}}{{#scopes.1}}, scopes = {{openbrace}}{{#scopes}}"{{scope}}"{{^-last}}, {{/-last}}{{/scopes}}{{closebrace}}{{/scopes.1}}{{/isOAuth}}){{^-last}},{{/-last}}
             {{/authMethods}}{{#authMethods.1}}
         {{closebrace}}{{/authMethods.1}}{{/hasAuthMethods}}
     )

@@ -153,10 +153,10 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                 @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
                 var tags: List<@Valid Tag>? = null,
                 @field:Nullable
-                @field:Schema(name = "status", description = "pet status in the store", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+                @field:Schema(name = "status", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
                 @field:JsonProperty(JSON_PROPERTY_STATUS)
                 @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
-                var status: Status? = null,
+                var status: PetStatus? = null,
             ) {
             """);
     }
@@ -369,7 +369,7 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                     @field:Schema(name = "type", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
                     @field:JsonProperty(JSON_PROPERTY_TYPE)
                     @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
-                    open var type: Type? = null,
+                    open var type: BookInfoType? = null,
                 ) {
                     """);
         assertFileContains(apiPath + "ExtendedBookInfo.kt",
@@ -410,7 +410,7 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                     @field:NotNull
                     @field:Schema(name = "type", requiredMode = Schema.RequiredMode.REQUIRED)
                     @field:JsonProperty(JSON_PROPERTY_TYPE)
-                    open var type: Type? = null,
+                    open var type: BookInfoType? = null,
                 ) {
                 """);
         assertFileContains(apiPath + "BasicBookInfo.kt",
@@ -469,5 +469,18 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
         String apiPath = outputPath + "src/main/kotlin/org/openapitools/api/";
 
         assertFileContains(apiPath + "DefaultApi.kt", "@Body @NotNull books: List<@Valid Book>");
+    }
+
+    @Test
+    void testControllerEnums() {
+
+        var codegen = new KotlinMicronautServerCodegen();
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/controller-enum.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String modelPath = outputPath + "src/main/kotlin/org/openapitools/model/";
+
+        assertFileExists(modelPath + "GetTokenRequestGrantType.kt");
+        assertFileExists(modelPath + "GetTokenRequestClientSecret.kt");
+        assertFileExists(modelPath + "GetTokenRequestClientId.kt");
+        assertFileExists(modelPath + "ArtistsArtistIdDirectAlbumsGetSortByParameter.kt");
     }
 }

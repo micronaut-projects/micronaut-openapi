@@ -1,0 +1,113 @@
+openapi: 3.0.1
+info:
+  title: test
+  description: desc
+  version: 0.0.1
+servers:
+  - url: https://cors-proxy.onrender.com/https://api.music.mundex.net:443/
+  - url: https://api.music.mundex.net:443/
+  - url: http://api.music.mundex.net:443/
+tags:
+  - name: "user"
+paths:
+  /token/my/token:
+    servers:
+      - url: https://cors-proxy.onrender.com/https://oauth.mundex.ru
+      - url: https://oauth.mundex.ru
+    post:
+      summary: Get token
+      operationId: getToken
+      tags:
+        - "user"
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required:
+                - "grant_type"
+                - "client_id"
+                - "client_secret"
+                - "username"
+                - "password"
+              properties:
+                grant_type:
+                  type: string
+                  enum: ["password"]
+                client_id:
+                  type: string
+                  enum: ["23cabbbdc6cd418abb4b39c32c41195d"]
+                client_secret:
+                  type: string
+                  enum: ["53bc75238f0c4d08a118e51fe9203300"]
+                username:
+                  type: string
+                password:
+                  type: string
+                obj:
+                  type: object
+                  properties:
+                    prop1:
+                      type: integer
+                    prop2:
+                      type: string
+                    prop3:
+                      type: boolean
+      responses:
+        200:
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - "access_token"
+                  - "expires_in"
+                  - "token_type"
+                  - "uid"
+                properties:
+                  access_token:
+                    type: string
+                  expires_in:
+                    type: number
+                  token_type:
+                    type: string
+                  uid:
+                    type: number
+  /artists/{artistId}/direct-albums:
+    parameters:
+      - in: path
+        required: true
+        name: artistId
+        schema:
+          type: string
+          example: 218099
+      - in: query
+        required: false
+        name: page
+        schema:
+          type: number
+          example: 0
+      - in: query
+        required: false
+        name: page-size
+        schema:
+          type: number
+          example: 20
+      - in: query
+        required: false
+        name: sort-by
+        schema:
+          type: string
+          enum:
+            - "year"
+            - "rating"
+    get:
+      # TODO: add operationId
+      tags:
+        - "artists"
+      responses:
+        200:
+          description: Ok
+          content: {}
