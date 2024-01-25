@@ -21,7 +21,6 @@ swagger-parser-v3 = "2.1.20"
 javaparser = "3.25.8"
 commons-codec = "1.16.0"
 
-micronaut-docs = "2.0.0"
 micronaut = "4.3.1"
 micronaut-platform = "4.2.4"
 micronaut-security = "4.5.0"
