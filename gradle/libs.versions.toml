@@ -34,6 +34,7 @@ micronaut-data = "4.5.0"
 micronaut-test = "4.2.0"
 micronaut-kotlin = "4.2.0"
 micronaut-logging = "1.2.2"
+micronaut-docs = "2.0.0"
 
 [libraries]
 # Core

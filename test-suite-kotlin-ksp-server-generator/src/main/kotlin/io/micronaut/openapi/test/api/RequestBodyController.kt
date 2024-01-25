@@ -24,8 +24,8 @@ open class RequestBodyController : RequestBodyApi {
         return Mono.empty()
     }
 
-    override fun sendListOfSimpleModels(simpleModel: List<SimpleModel>?): Mono<List<SimpleModel>> {
-        return Mono.just(simpleModel!!)
+    override fun sendListOfSimpleModels(simpleModels: List<SimpleModel>?): Mono<List<SimpleModel>> {
+        return Mono.just(simpleModels!!)
     }
 
     override fun sendModelWithRequiredProperties(modelWithRequiredProperties: ModelWithRequiredProperties?): Mono<ModelWithRequiredProperties> {
