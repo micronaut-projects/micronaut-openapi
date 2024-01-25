@@ -18,17 +18,27 @@ package io.micronaut.openapi.visitor;
 import java.io.File;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
+import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CompletionStage;
 import java.util.concurrent.Future;
 
+import io.micronaut.core.annotation.AnnotationValue;
 import io.micronaut.core.annotation.Internal;
 import io.micronaut.core.annotation.Nullable;
+import io.micronaut.http.HttpRequest;
+import io.micronaut.http.multipart.FileUpload;
 import io.micronaut.inject.ast.ClassElement;
 import io.micronaut.inject.ast.Element;
 import io.micronaut.inject.ast.TypedElement;
 import io.micronaut.inject.visitor.VisitorContext;
+import io.swagger.v3.oas.annotations.Hidden;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
@@ -42,6 +52,8 @@ public final class ElementUtils {
     public static final List<String> CONTAINER_TYPES = List.of(
         Optional.class.getName(),
         Future.class.getName(),
+        Callable.class.getName(),
+        CompletionStage.class.getName(),
         "org.reactivestreams.Publisher",
         "io.reactivex.Single",
         "io.reactivex.Observable",
@@ -49,7 +61,8 @@ public final class ElementUtils {
         "io.reactivex.rxjava3.core.Single",
         "io.reactivex.rxjava3.core.Observable",
         "io.reactivex.rxjava3.core.Maybe",
-        "kotlinx.coroutines.flow.Flow"
+        "kotlinx.coroutines.flow.Flow",
+        "org.springframework.web.context.request.async.DeferredResult"
     );
 
     public static final List<String> FILE_TYPES = List.of(
@@ -96,6 +109,10 @@ public final class ElementUtils {
             || element.getType().isOptional();
     }
 
+    public static boolean isAnnotationPresent(Element element, String className) {
+        return element.findAnnotation(className).isPresent();
+    }
+
     /**
      * Checking if the type is file upload type.
      *
@@ -111,10 +128,12 @@ public final class ElementUtils {
             }
         }
         String typeName = type.getName();
-        return "io.micronaut.http.multipart.StreamingFileUpload".equals(typeName)
+        return type.isAssignable(FileUpload.class)
+            || "io.micronaut.http.multipart.StreamingFileUpload".equals(typeName)
             || "io.micronaut.http.multipart.CompletedFileUpload".equals(typeName)
             || "io.micronaut.http.multipart.CompletedPart".equals(typeName)
-            || "io.micronaut.http.multipart.PartData".equals(typeName);
+            || "io.micronaut.http.multipart.PartData".equals(typeName)
+            || "org.springframework.web.multipart.MultipartFile".equals(typeName);
     }
 
     /**
@@ -189,5 +208,48 @@ public final class ElementUtils {
             }
         }
         return false;
+    }
+
+    public static boolean isIgnoredParameter(TypedElement parameter) {
+
+        AnnotationValue<Schema> schemaAnn = parameter.getAnnotation(Schema.class);
+        boolean isHidden = schemaAnn != null && schemaAnn.booleanValue("hidden").orElse(false);
+
+        return isHidden
+            || parameter.isAnnotationPresent(Hidden.class)
+            || parameter.isAnnotationPresent(JsonIgnore.class)
+            || parameter.booleanValue(Parameter.class, "hidden").orElse(false)
+            || isAnnotationPresent(parameter, "io.micronaut.session.annotation.SessionValue")
+            || isAnnotationPresent(parameter, "org.springframework.web.bind.annotation.SessionAttribute")
+            || isAnnotationPresent(parameter, "org.springframework.web.bind.annotation.SessionAttributes")
+            || isIgnoredParameterType(parameter.getType());
+    }
+
+    public static boolean isIgnoredParameterType(ClassElement parameterType) {
+        return parameterType == null
+            || parameterType.isAssignable(Principal.class)
+            || parameterType.isAssignable("io.micronaut.session.Session")
+            || parameterType.isAssignable("io.micronaut.security.authentication.Authentication")
+            || parameterType.isAssignable("io.micronaut.http.HttpHeaders")
+            || parameterType.isAssignable("kotlin.coroutines.Continuation")
+            || parameterType.isAssignable(HttpRequest.class)
+            || parameterType.isAssignable("io.micronaut.http.BasicAuth")
+            // servlet API
+            || parameterType.isAssignable("jakarta.servlet.http.HttpServletRequest")
+            || parameterType.isAssignable("jakarta.servlet.http.HttpServletResponse")
+            || parameterType.isAssignable("jakarta.servlet.http.HttpSession")
+            || parameterType.isAssignable("jakarta.servlet.http.PushBuilder")
+            // spring
+            || parameterType.isAssignable("java.io.Reader")
+            || parameterType.isAssignable("java.io.OutputStream")
+            || parameterType.isAssignable("java.io.Writer")
+            || parameterType.isAssignable("org.springframework.web.util.UriComponentsBuilder")
+            || parameterType.isAssignable("org.springframework.web.bind.support.SessionStatus")
+            || parameterType.isAssignable("org.springframework.web.context.request.RequestAttributes")
+            || parameterType.isAssignable("org.springframework.http.HttpEntity")
+            || parameterType.isAssignable("org.springframework.http.HttpMethod")
+            || parameterType.isAssignable("org.springframework.validation.BindingResult")
+            || parameterType.isAssignable("org.springframework.validation.Errors")
+            ;
     }
 }
