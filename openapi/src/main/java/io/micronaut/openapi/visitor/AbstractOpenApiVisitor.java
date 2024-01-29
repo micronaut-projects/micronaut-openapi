@@ -1384,6 +1384,7 @@ abstract class AbstractOpenApiVisitor {
             if (element.isAnnotationPresent("javax.validation.constraints.Negative$List")
                 || element.isAnnotationPresent("jakarta.validation.constraints.Negative$List")) {
                 schemaToBind.setMaximum(BigDecimal.ZERO);
+                schemaToBind.exclusiveMaximum(true);
             }
             if (element.isAnnotationPresent("javax.validation.constraints.NegativeOrZero$List")
                 || element.isAnnotationPresent("jakarta.validation.constraints.NegativeOrZero$List")) {
@@ -1392,6 +1393,7 @@ abstract class AbstractOpenApiVisitor {
             if (element.isAnnotationPresent("javax.validation.constraints.Positive$List")
                 || element.isAnnotationPresent("jakarta.validation.constraints.Positive$List")) {
                 schemaToBind.setMinimum(BigDecimal.ZERO);
+                schemaToBind.exclusiveMinimum(true);
             }
             if (element.isAnnotationPresent("javax.validation.constraints.PositiveOrZero$List")
                 || element.isAnnotationPresent("jakarta.validation.constraints.PositiveOrZero$List")) {

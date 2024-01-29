@@ -651,6 +651,18 @@ class MyBean {}
         petSchema.properties.contact.format == 'email'
         petSchema.properties.contact.pattern == '.*@.*'
         petSchema.properties.num.pattern == '.'
+
+        petSchema.properties.pos.minimum == 0
+        petSchema.properties.pos.exclusiveMinimum
+
+        petSchema.properties.posOrZero.minimum == 0
+        !petSchema.properties.posOrZero.exclusiveMinimum
+
+        petSchema.properties.neg.maximum == 0
+        petSchema.properties.neg.exclusiveMaximum
+
+        petSchema.properties.negOrZero.maximum == 0
+        !petSchema.properties.negOrZero.exclusiveMaximum
     }
 
     void "test build OpenAPI doc for POJO type with generics non-reactive"() {
