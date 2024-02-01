@@ -65,7 +65,7 @@ final class OpenApiExplorerConfig extends AbstractViewConfig {
         VALID_OPTIONS.put("hide-console", AbstractViewConfig::asBoolean);
         VALID_OPTIONS.put("hide-authentication", AbstractViewConfig::asBoolean);
         VALID_OPTIONS.put("hide-server-selection", AbstractViewConfig::asBoolean);
-        VALID_OPTIONS.put("hide-component", AbstractViewConfig::asBoolean);
+        VALID_OPTIONS.put("hide-components", AbstractViewConfig::asBoolean);
 
         // Custom configuration
         VALID_OPTIONS.put("default-schema-tab", new EnumConverter<>(DefaultSchemaTab.class));
