@@ -20,6 +20,7 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -36,6 +37,7 @@ import io.micronaut.core.convert.DefaultMutableConversionService;
 import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.core.value.PropertyResolver;
 import io.micronaut.http.MediaType;
+import io.micronaut.inject.ast.MethodElement;
 import io.micronaut.inject.visitor.VisitorContext;
 import io.micronaut.openapi.javadoc.JavadocParser;
 import io.micronaut.openapi.visitor.group.EndpointInfo;
@@ -59,6 +61,8 @@ public final class Utils {
     public static final String ATTR_VISITED_ELEMENTS = "io.micronaut.OPENAPI.visited.elements";
 
     public static final List<MediaType> DEFAULT_MEDIA_TYPES = Collections.singletonList(MediaType.APPLICATION_JSON_TYPE);
+
+    private static Map<String, MethodElement> creatorConstructorsCache = new HashMap<>();
 
     private static Set<String> allKnownVersions;
     private static Set<String> allKnownGroups;
@@ -344,6 +348,10 @@ public final class Utils {
         Utils.includedClassesGroupsExcluded = includedClassesGroupsExcluded;
     }
 
+    public static Map<String, MethodElement> getCreatorConstructorsCache() {
+        return creatorConstructorsCache;
+    }
+
     public static void clean() {
         openApis = null;
         endpointInfos = null;
@@ -358,5 +366,6 @@ public final class Utils {
         testFileName = null;
         testYamlReference = null;
         testJsonReference = null;
+        creatorConstructorsCache = new HashMap<>();
     }
 }

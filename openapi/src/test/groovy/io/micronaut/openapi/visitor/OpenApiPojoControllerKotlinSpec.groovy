@@ -220,4 +220,120 @@ class MyBean {}
         schema.required[0] == 'color'
         schema.required[1] == 'propertyClass'
     }
+
+    void "test kotlin constructor annotations"() {
+
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test
+
+import com.fasterxml.jackson.annotation.*
+import com.fasterxml.jackson.annotation.JsonCreator
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import com.fasterxml.jackson.annotation.JsonProperty
+import com.fasterxml.jackson.annotation.JsonTypeInfo
+import com.fasterxml.jackson.annotation.JsonValue
+import io.micronaut.core.annotation.Nullable
+import io.micronaut.http.annotation.Body
+import io.micronaut.http.annotation.Controller
+import io.micronaut.http.annotation.Put
+import io.micronaut.serde.annotation.Serdeable
+import io.swagger.v3.oas.annotations.media.Schema
+import jakarta.validation.Valid
+import jakarta.validation.constraints.*
+import jakarta.validation.constraints.NotNull
+import jakarta.validation.constraints.Size
+import reactor.core.publisher.Mono
+
+@Controller
+class HelloController {
+
+    @Put("/sendModelWithDiscriminator")
+    fun sendModelWithDiscriminator(
+        @Body @NotNull @Valid animal: Animal
+    ): Mono<Animal> = Mono.empty()
+}
+
+/**
+ * Animal
+ *
+ * @param color
+ * @param propertyClass
+ */
+@Serdeable
+@JsonPropertyOrder(
+        Animal.JSON_PROPERTY_PROPERTY_CLASS,
+        Animal.JSON_PROPERTY_COLOR
+)
+open class Animal (
+    @Nullable
+    @Schema(name = "color", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    @JsonProperty(JSON_PROPERTY_COLOR)
+    @JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+    open var color: ColorEnum? = null,
+    @Size(max = 50)
+    @Nullable
+    @Schema(name = "class", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+//    @JsonProperty(JSON_PROPERTY_PROPERTY_CLASS)
+    @JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+    open var propertyClass: String? = null,
+) {
+
+    companion object {
+
+        const val JSON_PROPERTY_PROPERTY_CLASS = "class"
+        const val JSON_PROPERTY_COLOR = "color"
+    }
+}
+
+@Serdeable
+enum class ColorEnum (
+    @get:JsonValue val value: String
+) {
+
+    @JsonProperty("red")
+    RED("red"),
+    @JsonProperty("blue")
+    BLUE("blue"),
+    @JsonProperty("green")
+    GREEN("green"),
+    @JsonProperty("light-blue")
+    LIGHT_BLUE("light-blue"),
+    @JsonProperty("dark-green")
+    DARK_GREEN("dark-green");
+
+    override fun toString(): String {
+        return value
+    }
+
+    companion object {
+
+        @JvmField
+        val VALUE_MAPPING = entries.associateBy { it.value }
+
+        @JsonCreator
+        @JvmStatic
+        fun fromValue(value: String): ColorEnum {
+            require(VALUE_MAPPING.containsKey(value)) { "Unexpected value '$value'" }
+            return VALUE_MAPPING[value]!!
+        }
+    }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        then: "the state is correct"
+        Utils.testReference != null
+
+        when: "The OpenAPI is retrieved"
+        OpenAPI openAPI = Utils.testReference
+        Schema schema = openAPI.components.schemas.Animal
+
+        then: "the components are valid"
+        schema
+        schema.properties.size() == 2
+        schema.properties.class
+        schema.properties.class.maxLength == 50
+    }
 }
