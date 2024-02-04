@@ -1,31 +1,31 @@
     {{>common/params/validation_field}}
 {{#withXml}}
     {{#isXmlAttribute}}
-    @field:XmlAttribute(name = "{{#xmlName}}{{xmlName}}{{/xmlName}}{{^xmlName}}{{baseName}}{{/xmlName}}"
+    @{{{vendorExtensions.fieldAnnPrefix}}}XmlAttribute(name = "{{#xmlName}}{{xmlName}}{{/xmlName}}{{^xmlName}}{{baseName}}{{/xmlName}}"
     {{/isXmlAttribute}}
     {{^isXmlAttribute}}
         {{^isContainer}}
-    @field:XmlElement({{#xmlNamespace}}namespace = "{{xmlNamespace}}", {{/xmlNamespace}}name = "{{#xmlName}}{{xmlName}}{{/xmlName}}{{^xmlName}}{{baseName}}{{/xmlName}}")
+    @{{{vendorExtensions.fieldAnnPrefix}}}XmlElement({{#xmlNamespace}}namespace = "{{xmlNamespace}}", {{/xmlNamespace}}name = "{{#xmlName}}{{xmlName}}{{/xmlName}}{{^xmlName}}{{baseName}}{{/xmlName}}")
         {{/isContainer}}
         {{#isContainer}}
     // Is a container wrapped = {{isXmlWrapped}}
             {{#items}}
     // items.name = {{name}} items.baseName = {{baseName}} items.xmlName = {{xmlName}} items.xmlNamespace = {{xmlNamespace}}
     // items.example = {{example}} items.type = {{dataType}}
-    @field:XmlElement({{#xmlNamespace}}namespace = "{{xmlNamespace}}", {{/xmlNamespace}}name = "{{#xmlName}}{{xmlName}}{{/xmlName}}{{^xmlName}}{{baseName}}{{/xmlName}}")
+    @{{{vendorExtensions.fieldAnnPrefix}}}XmlElement({{#xmlNamespace}}namespace = "{{xmlNamespace}}", {{/xmlNamespace}}name = "{{#xmlName}}{{xmlName}}{{/xmlName}}{{^xmlName}}{{baseName}}{{/xmlName}}")
             {{/items}}
             {{#isXmlWrapped}}
-    @field:XmlElementWrapper({{#xmlNamespace}}namespace = "{{xmlNamespace}}", {{/xmlNamespace}}name = "{{#xmlName}}{{xmlName}}{{/xmlName}}{{^xmlName}}{{baseName}}{{/xmlName}}")
+    @{{{vendorExtensions.fieldAnnPrefix}}}XmlElementWrapper({{#xmlNamespace}}namespace = "{{xmlNamespace}}", {{/xmlNamespace}}name = "{{#xmlName}}{{xmlName}}{{/xmlName}}{{^xmlName}}{{baseName}}{{/xmlName}}")
             {{/isXmlWrapped}}
         {{/isContainer}}
     {{/isXmlAttribute}}
 {{/withXml}}
 {{#generateSwagger2Annotations}}
-    @field:Schema(name = "{{{baseName}}}"{{#isReadOnly}}, accessMode = Schema.AccessMode.READ_ONLY{{/isReadOnly}}{{#example}}, example = "{{{.}}}"{{/example}}{{#description}}, description = "{{{.}}}"{{/description}}, requiredMode = {{#required}}Schema.RequiredMode.REQUIRED{{/required}}{{^required}}Schema.RequiredMode.NOT_REQUIRED{{/required}})
+    @{{{vendorExtensions.fieldAnnPrefix}}}Schema(name = "{{{baseName}}}"{{#isReadOnly}}, accessMode = Schema.AccessMode.READ_ONLY{{/isReadOnly}}{{#example}}, example = "{{{.}}}"{{/example}}{{#description}}, description = "{{{.}}}"{{/description}}, requiredMode = {{#required}}Schema.RequiredMode.REQUIRED{{/required}}{{^required}}Schema.RequiredMode.NOT_REQUIRED{{/required}})
 {{/generateSwagger2Annotations}}
 {{#vendorExtensions.x-is-jackson-optional-nullable}}
 {{!Unannotated, Jackson would pick this up automatically and add it *in addition* to the _JsonNullable getter field}}
-    @field:JsonIgnore
+    @{{{vendorExtensions.fieldAnnPrefix}}}JsonIgnore
 {{/vendorExtensions.x-is-jackson-optional-nullable}}
 {{^vendorExtensions.x-is-jackson-optional-nullable}}
     {{#jackson}}

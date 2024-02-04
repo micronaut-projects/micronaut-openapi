@@ -1,5 +1,5 @@
 plugins {
-    id 'io.micronaut.build.internal.openapi-kotlin-generator-test-suite'
+    id 'io.micronaut.build.internal.openapi-kotlin-kapt-generator-test-suite'
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.kotlin.kapt)
 }

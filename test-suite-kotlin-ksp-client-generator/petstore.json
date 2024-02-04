@@ -208,7 +208,7 @@
           "pet"
         ],
         "summary": "Find pet by ID",
-        "description": "Returns a pet when ID < 10. ID > 10 or nonintegers will simulate API error conditions",
+        "description": "Returns a pet when ID < 10. ID > 10 or non-integers will simulate API error conditions",
         "operationId": "getPetById",
         "produces": [
           "application/json",
@@ -506,7 +506,7 @@
           "store"
         ],
         "summary": "Delete purchase order by ID",
-        "description": "For valid response try integer IDs with value < 1000. Anything above 1000 or nonintegers will generate API errors",
+        "description": "For valid response try integer IDs with value < 1000. Anything above 1000 or non-integers will generate API errors",
         "operationId": "deleteOrder",
         "produces": [
           "application/json",

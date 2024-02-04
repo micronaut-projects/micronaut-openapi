@@ -1,15 +1,15 @@
 
 {{#isNullable}}
-    @field:Nullable
+    @{{{vendorExtensions.fieldAnnPrefix}}}Nullable
 {{/isNullable}}
 {{^isNullable}}
     {{#required}}
         {{#isReadOnly}}
-    @field:Nullable
+    @{{{vendorExtensions.fieldAnnPrefix}}}Nullable
         {{/isReadOnly}}
     {{/required}}
     {{^required}}
-    @field:Nullable
+    @{{{vendorExtensions.fieldAnnPrefix}}}Nullable
     {{/required}}
 {{/isNullable}}
 {{!All the validation}}
@@ -17,75 +17,75 @@
     {{^isNullable}}
         {{#required}}
             {{^isReadOnly}}
-    @field:NotNull
+    @{{{vendorExtensions.fieldAnnPrefix}}}NotNull
             {{/isReadOnly}}
         {{/required}}
     {{/isNullable}}
     {{!Validate all pojos and enums}}
     {{^isContainer}}
         {{#isModel}}
-    @field:Valid
+    @{{{vendorExtensions.fieldAnnPrefix}}}Valid
         {{/isModel}}
     {{/isContainer}}
     {{!Pattern}}
     {{#pattern}}
         {{^isByteArray}}
-    @field:Pattern(regexp = "{{{pattern}}}")
+    @{{{vendorExtensions.fieldAnnPrefix}}}Pattern(regexp = "{{{pattern}}}")
         {{/isByteArray}}
     {{/pattern}}
     {{!Min length && max length}}
     {{#minLength}}
         {{#maxLength}}
-    @field:Size(min = {{minLength}}, max = {{maxLength}})
+    @{{{vendorExtensions.fieldAnnPrefix}}}Size(min = {{minLength}}, max = {{maxLength}})
         {{/maxLength}}
     {{/minLength}}
     {{#minLength}}{{^maxLength}}
-    @field:Size(min = {{minLength}})
+    @{{{vendorExtensions.fieldAnnPrefix}}}Size(min = {{minLength}})
     {{/maxLength}}{{/minLength}}
     {{^minLength}}{{#maxLength}}
-    @field:Size(max = {{maxLength}})
+    @{{{vendorExtensions.fieldAnnPrefix}}}Size(max = {{maxLength}})
     {{/maxLength}}{{/minLength}}
     {{!Size}}
     {{#minItems}}{{#maxItems}}
-    @field:Size(min = {{minItems}}, max = {{maxItems}})
+    @{{{vendorExtensions.fieldAnnPrefix}}}Size(min = {{minItems}}, max = {{maxItems}})
     {{/maxItems}}{{/minItems}}
     {{#minItems}}{{^maxItems}}
-    @field:Size(min = {{minItems}})
+    @{{{vendorExtensions.fieldAnnPrefix}}}Size(min = {{minItems}})
     {{/maxItems}}{{/minItems}}
     {{^minItems}}{{#maxItems}}
-    @field:Size(max = {{maxItems}})
+    @{{{vendorExtensions.fieldAnnPrefix}}}Size(max = {{maxItems}})
     {{/maxItems}}{{/minItems}}
     {{!Email}}
     {{#isEmail}}
-    @field:Email
+    @{{{vendorExtensions.fieldAnnPrefix}}}Email
     {{/isEmail}}
     {{!check for integer or long / all others=decimal type with @Decimal isInteger set}}
     {{#isInteger}}
         {{#minimum}}
-    @field:Min({{minimum}})
+    @{{{vendorExtensions.fieldAnnPrefix}}}Min({{minimum}})
         {{/minimum}}
         {{#maximum}}
-    @field:Max({{maximum}})
+    @{{{vendorExtensions.fieldAnnPrefix}}}Max({{maximum}})
         {{/maximum}}
     {{/isInteger}}
     {{!isLong set}}
     {{#isLong}}
         {{#minimum}}
-    @field:Min({{minimum}}L)
+    @{{{vendorExtensions.fieldAnnPrefix}}}Min({{minimum}}L)
         {{/minimum}}
         {{#maximum}}
-    @field:Max({{maximum}}L)
+    @{{{vendorExtensions.fieldAnnPrefix}}}Max({{maximum}}L)
         {{/maximum}}
     {{/isLong}}
     {{!Not Integer, not Long => we have a decimal value!}}
     {{^isInteger}}
         {{^isLong}}{{!minimum for decimal value}}
             {{#minimum}}
-    @field:DecimalMin({{#exclusiveMinimum}}value = {{/exclusiveMinimum}}"{{minimum}}"{{#exclusiveMinimum}}, inclusive = false{{/exclusiveMinimum}})
+    @{{{vendorExtensions.fieldAnnPrefix}}}DecimalMin({{#exclusiveMinimum}}value = {{/exclusiveMinimum}}"{{minimum}}"{{#exclusiveMinimum}}, inclusive = false{{/exclusiveMinimum}})
             {{/minimum}}
     {{!maximal for decimal value}}
             {{#maximum}}
-    @field:DecimalMax({{#exclusiveMaximum}}value = {{/exclusiveMaximum}}"{{maximum}}"{{#exclusiveMaximum}}, inclusive = false{{/exclusiveMaximum}})
+    @{{{vendorExtensions.fieldAnnPrefix}}}DecimalMax({{#exclusiveMaximum}}value = {{/exclusiveMaximum}}"{{maximum}}"{{#exclusiveMaximum}}, inclusive = false{{/exclusiveMaximum}})
             {{/maximum}}
         {{/isLong}}
     {{/isInteger}}

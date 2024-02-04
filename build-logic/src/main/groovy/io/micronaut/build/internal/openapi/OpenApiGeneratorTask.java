@@ -62,6 +62,9 @@ public abstract class OpenApiGeneratorTask extends DefaultTask {
     @Input
     public abstract Property<Boolean> getGeneratedAnnotation();
 
+    @Input
+    public abstract Property<Boolean> getKsp();
+
     @OutputDirectory
     public abstract DirectoryProperty getOutputDirectory();
 
@@ -95,6 +98,7 @@ public abstract class OpenApiGeneratorTask extends DefaultTask {
         var generatedTestSourcesDir = getGeneratedTestSourcesDirectory().get().getAsFile();
         var lang = getLang().get();
         var generatedAnnotation = getGeneratedAnnotation().get();
+        var ksp = getKsp().get();
         Files.createDirectories(generatedSourcesDir.toPath());
         Files.createDirectories(generatedTestSourcesDir.toPath());
         getProject().getLogger().info("json: {}", getParameterMappings().get());
@@ -110,6 +114,7 @@ public abstract class OpenApiGeneratorTask extends DefaultTask {
             args.add(getResponseBodyMappings().get().toString());
             args.add(lang.toUpperCase());
             args.add(Boolean.toString(generatedAnnotation));
+            args.add(Boolean.toString(ksp));
             javaexec.args(args);
         });
     }

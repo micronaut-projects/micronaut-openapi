@@ -95,7 +95,6 @@ public class KotlinMicronautServerCodegen extends AbstractMicronautKotlinCodegen
         cliOptions.add(CliOption.newBoolean(OPT_GENERATE_STREAMING_FILE_UPLOAD, "Whether to generate StreamingFileUpload type for file request body", generateStreamingFileUpload));
         cliOptions.add(CliOption.newBoolean(OPT_AOT, "Generate compatible code with micronaut-aot", aot));
 
-
         // Set the type mappings
         // It could be also StreamingFileUpload
         typeMapping.put("file", "CompletedFileUpload");
@@ -304,6 +303,7 @@ public class KotlinMicronautServerCodegen extends AbstractMicronautKotlinCodegen
         private boolean fluxForArrays;
         private boolean generatedAnnotation = true;
         private boolean aot;
+        private boolean ksp;
 
         @Override
         public KotlinMicronautServerOptionsBuilder withControllerPackage(String controllerPackage) {
@@ -359,6 +359,12 @@ public class KotlinMicronautServerCodegen extends AbstractMicronautKotlinCodegen
             return this;
         }
 
+        @Override
+        public KotlinMicronautServerOptionsBuilder withKsp(boolean ksp) {
+            this.ksp = ksp;
+            return this;
+        }
+
         ServerOptions build() {
             return new ServerOptions(
                 controllerPackage,
@@ -369,7 +375,8 @@ public class KotlinMicronautServerCodegen extends AbstractMicronautKotlinCodegen
                 plural,
                 fluxForArrays,
                 generatedAnnotation,
-                aot
+                aot,
+                ksp
             );
         }
     }
@@ -383,7 +390,8 @@ public class KotlinMicronautServerCodegen extends AbstractMicronautKotlinCodegen
         boolean plural,
         boolean fluxForArrays,
         boolean generatedAnnotation,
-        boolean aot
+        boolean aot,
+        boolean ksp
     ) {
     }
 }

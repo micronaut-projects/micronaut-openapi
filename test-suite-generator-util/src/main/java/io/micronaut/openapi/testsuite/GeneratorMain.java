@@ -54,6 +54,7 @@ public class GeneratorMain {
         boolean server = "server".equals(args[0]);
         var lang = GeneratorLanguage.valueOf(args[6].toUpperCase());
         var generatedAnnotation = Boolean.parseBoolean(args[7]);
+        var ksp = Boolean.parseBoolean(args[8]);
         List<ParameterMapping> parameterMappings =
             parseParameterMappings(args[4]);
         List<ResponseBodyMapping> responseBodyMappings =
@@ -88,6 +89,7 @@ public class GeneratorMain {
                     // because we generate both abstract classes _and_ dummy implementations
                     serverOptions.withGenerateImplementationFiles(false)
                         .withAuthentication(false)
+                        .withKsp(ksp)
                         .withGeneratedAnnotation(generatedAnnotation);
                 });
             } else {
@@ -103,7 +105,8 @@ public class GeneratorMain {
         } else {
             if (lang == GeneratorLanguage.KOTLIN) {
                 builder.forKotlinClient(client -> {
-                    client.withGeneratedAnnotation(generatedAnnotation);
+                    client.withGeneratedAnnotation(generatedAnnotation)
+                        .withKsp(ksp);
                 });
             } else {
                 builder.forJavaClient(client -> {
