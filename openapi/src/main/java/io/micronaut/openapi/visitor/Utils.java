@@ -92,6 +92,20 @@ public final class Utils {
     }
 
     /**
+     * Get or create MediaType object by name.
+     *
+     * @param mediaTypeName name of mediaType
+     * @return MediaType object
+     */
+    public static MediaType getMediaType(String mediaTypeName) {
+        try {
+            return MediaType.of(mediaTypeName);
+        } catch (Exception e) {
+            return new MediaType(mediaTypeName);
+        }
+    }
+
+    /**
      * @return An Instance of default {@link PropertyPlaceholderResolver} to resolve placeholders.
      */
     public static PropertyPlaceholderResolver getPropertyPlaceholderResolver() {

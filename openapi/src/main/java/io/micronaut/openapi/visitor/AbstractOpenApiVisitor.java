@@ -239,7 +239,7 @@ abstract class AbstractOpenApiVisitor {
         try {
             return Optional.ofNullable(ConvertUtils.treeToValue(node, type, context));
         } catch (JsonProcessingException e) {
-            warn("Error converting  [" + node + "]: to " + type + ": " + e.getMessage(), context);
+            warn("Error converting  [" + node + "]: to " + type + ":\n" + Utils.printStackTrace(e), context);
         }
         return Optional.empty();
     }
@@ -2277,7 +2277,7 @@ abstract class AbstractOpenApiVisitor {
                 try {
                     enumValues.add(ConvertUtils.normalizeValue(jacksonValue, schemaType, schemaFormat, context));
                 } catch (JsonProcessingException e) {
-                    warn("Error converting jacksonValue " + jacksonValue + " : to " + type + ": " + e.getMessage(), context, element);
+                    warn("Error converting jacksonValue " + jacksonValue + " : to " + type + ":\n" + Utils.printStackTrace(e), context, element);
                     enumValues.add(element.getSimpleName());
                 }
             } else {
