@@ -11,6 +11,52 @@ import spock.lang.Issue
 
 class OpenApiControllerVisitorSpec extends AbstractOpenApiTypeElementSpec {
 
+    void "test some ignored parameters"() {
+
+        given:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import java.util.Map;
+
+import io.micronaut.core.annotation.Nullable;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.micronaut.http.annotation.Header;
+import io.micronaut.session.annotation.SessionValue;
+
+@Controller
+class ControllerThree {
+
+    @Get("/myObj")
+    @SessionValue("myAttr")
+    MyObj myMethod(
+            @Header("my-header") String header,
+            @Header Map<String, String> allHeaders,
+            @SessionValue @Nullable MyObj myObj) {
+        return null;
+    }
+}
+
+class MyObj {
+
+    public String myProp;
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        when:
+        def operation = Utils.testReference?.paths?."/myObj"?.get
+
+        then:
+        operation
+        operation.parameters
+        operation.parameters.size() == 1
+        operation.parameters[0].name == "my-header"
+        operation.parameters[0].in == "header"
+    }
+
     void "test hidden endpoint with inheritance"() {
 
         given:

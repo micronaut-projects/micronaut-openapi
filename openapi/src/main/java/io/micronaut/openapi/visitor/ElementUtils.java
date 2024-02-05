@@ -21,6 +21,7 @@ import java.lang.annotation.Annotation;
 import java.nio.ByteBuffer;
 import java.security.Principal;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletionStage;
@@ -30,6 +31,7 @@ import io.micronaut.core.annotation.AnnotationMetadata;
 import io.micronaut.core.annotation.AnnotationValue;
 import io.micronaut.core.annotation.Internal;
 import io.micronaut.http.HttpRequest;
+import io.micronaut.http.annotation.Header;
 import io.micronaut.http.multipart.FileUpload;
 import io.micronaut.inject.annotation.AnnotationMetadataHierarchy;
 import io.micronaut.inject.ast.ClassElement;
@@ -218,15 +220,12 @@ public final class ElementUtils {
         return isHidden
             || parameter.isAnnotationPresent(Hidden.class)
             || parameter.isAnnotationPresent(JsonIgnore.class)
+            || parameter.isAnnotationPresent(Header.class) && parameter.getType().isAssignable(Map.class)
             || parameter.booleanValue(Parameter.class, "hidden").orElse(false)
-            || isParamAnnotationPresent(parameter, "io.micronaut.session.annotation.SessionValue")
-            || isParamAnnotationPresent(parameter, "org.springframework.web.bind.annotation.SessionAttribute")
-            || isParamAnnotationPresent(parameter, "org.springframework.web.bind.annotation.SessionAttributes")
+            || parameter.hasAnnotation("io.micronaut.session.annotation.SessionValue")
+            || parameter.hasAnnotation("org.springframework.web.bind.annotation.SessionAttribute")
+            || parameter.hasAnnotation("org.springframework.web.bind.annotation.SessionAttributes")
             || isIgnoredParameterType(parameter.getType());
-    }
-
-    private static boolean isParamAnnotationPresent(Element element, String className) {
-        return element.findAnnotation(className).isPresent();
     }
 
     public static boolean isIgnoredParameterType(ClassElement parameterType) {
@@ -276,7 +275,7 @@ public final class ElementUtils {
             if (constructorMetadata == null || constructorMetadata.isEmpty()) {
                 return propMetadata;
             }
-            return new AnnotationMetadataHierarchy(true, new AnnotationMetadata[] {propMetadata, constructorMetadata});
+            return new AnnotationMetadataHierarchy(true, propMetadata, constructorMetadata);
         }
         return el.getAnnotationMetadata();
     }

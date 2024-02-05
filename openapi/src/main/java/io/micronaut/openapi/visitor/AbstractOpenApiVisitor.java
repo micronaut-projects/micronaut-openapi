@@ -897,7 +897,7 @@ abstract class AbstractOpenApiVisitor {
                     schema = getPrimitiveType(type, typeName);
                 } else if (!isArray && primitiveType != null) {
                     schema = primitiveType.createProperty();
-                } else if (type.isAssignable(Map.class.getName())) {
+                } else if (type.isAssignable(Map.class)) {
                     schema = new MapSchema();
                     if (CollectionUtils.isEmpty(typeArgs)) {
                         schema.setAdditionalProperties(true);

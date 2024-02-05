@@ -841,6 +841,14 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
             param.vendorExtensions.put("hasMultipleParams", hasMultipleParams);
         }
         op.vendorExtensions.put("originReturnProperty", op.returnProperty);
+        if (op.responses != null && !op.responses.isEmpty()) {
+            for (var resp : op.responses) {
+                if (resp.isDefault) {
+                    resp.code = "default";
+                }
+            }
+        }
+
         processParametersWithAdditionalMappings(op.allParams, op.imports);
         processWithResponseBodyMapping(op);
         processOperationWithResponseWrappers(op);

@@ -274,7 +274,7 @@ open class Animal (
     @Size(max = 50)
     @Nullable
     @Schema(name = "class", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-//    @JsonProperty(JSON_PROPERTY_PROPERTY_CLASS)
+    @JsonProperty(JSON_PROPERTY_PROPERTY_CLASS)
     @JsonInclude(JsonInclude.Include.USE_DEFAULTS)
     open var propertyClass: String? = null,
 ) {
@@ -327,7 +327,7 @@ class MyBean {}
         Utils.testReference != null
 
         when: "The OpenAPI is retrieved"
-        OpenAPI openAPI = Utils.testReference
+        def openAPI = Utils.testReference
         Schema schema = openAPI.components.schemas.Animal
 
         then: "the components are valid"

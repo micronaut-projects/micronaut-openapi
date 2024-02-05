@@ -35,6 +35,7 @@ micronaut-data = "4.6.2"
 micronaut-test = "4.2.1"
 micronaut-kotlin = "4.2.0"
 micronaut-logging = "1.2.3"
+micronaut-session = "4.2.0"
 micronaut-docs = "2.0.0"
 
 [libraries]
@@ -49,6 +50,7 @@ micronaut-reactor = { module = "io.micronaut.reactor:micronaut-reactor-bom", ver
 micronaut-gradle-plugin = { module = "io.micronaut.gradle:micronaut-minimal-plugin", version.ref = "micronaut-gradle-plugin"}
 micronaut-groovy = { module = "io.micronaut.groovy:micronaut-groovy-bom", version.ref = "micronaut-groovy" }
 micronaut-validation = { module = "io.micronaut.validation:micronaut-validation-bom", version.ref = "micronaut-validation" }
+micronaut-session = { module = "io.micronaut.session:micronaut-session-bom", version.ref = "micronaut-session" }
 micronaut-data = { module = "io.micronaut.data:micronaut-data-bom", version.ref = "micronaut-data" }
 micronaut-test = { module = "io.micronaut.test:micronaut-test-bom", version.ref = "micronaut-test" }
 micronaut-kotlin = { module = "io.micronaut.kotlin:micronaut-kotlin-bom", version.ref = "micronaut-kotlin" }
