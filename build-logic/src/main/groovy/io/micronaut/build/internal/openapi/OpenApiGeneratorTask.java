@@ -28,12 +28,14 @@ import org.gradle.api.file.Directory;
 import org.gradle.api.file.DirectoryProperty;
 import org.gradle.api.file.RegularFileProperty;
 import org.gradle.api.provider.ListProperty;
+import org.gradle.api.provider.MapProperty;
 import org.gradle.api.provider.Property;
 import org.gradle.api.provider.Provider;
 import org.gradle.api.tasks.Classpath;
 import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.InputFile;
 import org.gradle.api.tasks.Internal;
+import org.gradle.api.tasks.Optional;
 import org.gradle.api.tasks.OutputDirectory;
 import org.gradle.api.tasks.PathSensitive;
 import org.gradle.api.tasks.PathSensitivity;
@@ -89,6 +91,26 @@ public abstract class OpenApiGeneratorTask extends DefaultTask {
     @Input
     public abstract ListProperty<Map<String, String>> getResponseBodyMappings();
 
+    @Optional
+    @Input
+    public abstract MapProperty<String, String> getNameMapping();
+
+    @Optional
+    @Input
+    public abstract Property<String> getApiNamePrefix();
+
+    @Optional
+    @Input
+    public abstract Property<String> getApiNameSuffix();
+
+    @Optional
+    @Input
+    public abstract Property<String> getModelNamePrefix();
+
+    @Optional
+    @Input
+    public abstract Property<String> getModelNameSuffix();
+
     @Inject
     protected abstract ExecOperations getExecOperations();
 
@@ -99,6 +121,9 @@ public abstract class OpenApiGeneratorTask extends DefaultTask {
         var lang = getLang().get();
         var generatedAnnotation = getGeneratedAnnotation().get();
         var ksp = getKsp().get();
+
+        var apiPrefix =
+
         Files.createDirectories(generatedSourcesDir.toPath());
         Files.createDirectories(generatedTestSourcesDir.toPath());
         getProject().getLogger().info("json: {}", getParameterMappings().get());
@@ -115,6 +140,11 @@ public abstract class OpenApiGeneratorTask extends DefaultTask {
             args.add(lang.toUpperCase());
             args.add(Boolean.toString(generatedAnnotation));
             args.add(Boolean.toString(ksp));
+            args.add(getNameMapping().get().toString());
+            args.add(getApiNamePrefix().isPresent() ? getApiNamePrefix().get() : "");
+            args.add(getApiNameSuffix().isPresent() ? getApiNameSuffix().get() : "");
+            args.add(getModelNamePrefix().isPresent() ? getModelNamePrefix().get() : "");
+            args.add(getModelNameSuffix().isPresent() ? getModelNameSuffix().get() : "");
             javaexec.args(args);
         });
     }

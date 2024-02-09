@@ -51,7 +51,7 @@ public class KotlinMicronautClientCodegen extends AbstractMicronautKotlinCodegen
         title = "OpenAPI Micronaut Client";
 
         generatorMetadata = GeneratorMetadata.newBuilder(generatorMetadata)
-            .stability(Stability.BETA)
+            .stability(Stability.STABLE)
             .build();
         additionalProperties.put("client", "true");
 

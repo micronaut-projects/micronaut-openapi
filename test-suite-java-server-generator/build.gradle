@@ -68,4 +68,5 @@ tasks.named("generateOpenApi") {
             // Ignored header - Does not wrap the response in HttpResponse
             [headerName: "ignored-header"]
     ]
+    nameMapping = [test: "changedTest"]
 }

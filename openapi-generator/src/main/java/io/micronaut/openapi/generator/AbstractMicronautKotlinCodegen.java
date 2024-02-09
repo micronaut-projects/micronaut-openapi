@@ -554,6 +554,42 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         this.responseBodyMappings.addAll(responseBodyMappings);
     }
 
+    public void addSchemaMapping(Map<String, String> schemaMapping) {
+        this.schemaMapping.putAll(schemaMapping);
+    }
+
+    public void addImportMapping(Map<String, String> importMapping) {
+        this.importMapping.putAll(importMapping);
+    }
+
+    public void addNameMapping(Map<String, String> nameMapping) {
+        this.nameMapping.putAll(nameMapping);
+    }
+
+    public void addTypeMapping(Map<String, String> typeMapping) {
+        this.typeMapping.putAll(typeMapping);
+    }
+
+    public void addEnumNameMapping(Map<String, String> enumNameMapping) {
+        this.enumNameMapping.putAll(enumNameMapping);
+    }
+
+    public void addModelNameMapping(Map<String, String> modelNameMapping) {
+        this.modelNameMapping.putAll(modelNameMapping);
+    }
+
+    public void addInlineSchemaNameMapping(Map<String, String> inlineSchemaNameMapping) {
+        this.inlineSchemaNameMapping.putAll(inlineSchemaNameMapping);
+    }
+
+    public void addInlineSchemaOption(Map<String, String> inlineSchemaOption) {
+        this.inlineSchemaOption.putAll(inlineSchemaOption);
+    }
+
+    public void addOpenapiNormalizer(Map<String, String> openapiNormalizer) {
+        this.openapiNormalizer.putAll(openapiNormalizer);
+    }
+
     // CHECKSTYLE:OFF
     private void maybeSetSwagger() {
         if (additionalProperties.containsKey(OPT_GENERATE_SWAGGER_ANNOTATIONS)) {
@@ -812,7 +848,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
 
         if (ModelUtils.isMapSchema(target)) {
             // Note: ModelUtils.isMapSchema(p) returns true when p is a composed schema that also defines
-            // additionalproperties: true
+            // additionalProperties: true
             Schema<?> inner = ModelUtils.getAdditionalProperties(target);
             if (inner == null) {
                 System.err.println("`" + p.getName() + "` (map property) does not have a proper inner type defined. Default to type:string");

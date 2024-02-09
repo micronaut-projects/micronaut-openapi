@@ -895,6 +895,9 @@ components:
         message:
           type: string
           description: The error message
+        test:
+          type: string
+          description: Test prop
 
   parameters:
     PageQueryParam:

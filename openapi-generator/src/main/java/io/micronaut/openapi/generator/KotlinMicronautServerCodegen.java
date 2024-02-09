@@ -76,7 +76,7 @@ public class KotlinMicronautServerCodegen extends AbstractMicronautKotlinCodegen
         apiDocPath = "docs/controllers";
 
         generatorMetadata = GeneratorMetadata.newBuilder(generatorMetadata)
-            .stability(Stability.BETA)
+            .stability(Stability.STABLE)
             .build();
         additionalProperties.put("server", "true");
 
@@ -94,6 +94,9 @@ public class KotlinMicronautServerCodegen extends AbstractMicronautKotlinCodegen
         cliOptions.add(CliOption.newBoolean(OPT_USE_AUTH, "Whether to import authorization and to annotate controller methods accordingly", useAuth));
         cliOptions.add(CliOption.newBoolean(OPT_GENERATE_STREAMING_FILE_UPLOAD, "Whether to generate StreamingFileUpload type for file request body", generateStreamingFileUpload));
         cliOptions.add(CliOption.newBoolean(OPT_AOT, "Generate compatible code with micronaut-aot", aot));
+
+        setApiNamePrefix(API_PREFIX);
+        setApiNameSuffix(API_SUFFIX);
 
         // Set the type mappings
         // It could be also StreamingFileUpload
@@ -188,8 +191,6 @@ public class KotlinMicronautServerCodegen extends AbstractMicronautKotlinCodegen
 
         // Api file
         apiTemplateFiles.clear();
-        setApiNamePrefix(API_PREFIX);
-        setApiNameSuffix(API_SUFFIX);
         apiTemplateFiles.put("server/controller-interface.mustache", ".kt");
 
         apiTestTemplateFiles.clear();
