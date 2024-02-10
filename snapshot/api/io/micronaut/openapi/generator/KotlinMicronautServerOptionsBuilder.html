@@ -134,8 +134,13 @@ extends <a href="GeneratorOptionsBuilder.html" title="interface in io.micronaut.
 <div class="block">If set to true, controller operations will return not implemented status.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="KotlinMicronautServerOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">KotlinMicronautServerOptionsBuilder</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withPlural(boolean)" class="member-name-link">withPlural</a><wbr>(boolean&nbsp;plural)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withKsp(boolean)" class="member-name-link">withKsp</a><wbr>(boolean&nbsp;ksp)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block">If set to true, generated code will be fully compatible with KSP, but not 100% with KAPT.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="KotlinMicronautServerOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">KotlinMicronautServerOptionsBuilder</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withPlural(boolean)" class="member-name-link">withPlural</a><wbr>(boolean&nbsp;plural)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">If set to true, the generated code will pluralize parameters and properties for arrays.</div>
 </div>
 </div>
@@ -264,6 +269,19 @@ extends <a href="GeneratorOptionsBuilder.html" title="interface in io.micronaut.
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>aot</code> - generate compatible code with micronaut-aot or not</dd>
+<dt>Returns:</dt>
+<dd>this builder</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="withKsp(boolean)">
+<h3>withKsp</h3>
+<div class="member-signature"><span class="return-type"><a href="KotlinMicronautServerOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">KotlinMicronautServerOptionsBuilder</a></span>&nbsp;<span class="element-name">withKsp</span><wbr><span class="parameters">(boolean&nbsp;ksp)</span></div>
+<div class="block">If set to true, generated code will be fully compatible with KSP, but not 100% with KAPT.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>ksp</code> - do we need to generate code compatible only with KSP</dd>
 <dt>Returns:</dt>
 <dd>this builder</dd>
 </dl>

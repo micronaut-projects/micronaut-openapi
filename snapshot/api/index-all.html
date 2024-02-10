@@ -1937,6 +1937,8 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Configures options which are specific to the server code.</div>
 </dd>
+<dt><a href="io/micronaut/openapi/generator/AbstractMicronautKotlinCodegen.html#ksp" class="member-name-link">ksp</a> - Variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/AbstractMicronautKotlinCodegen.html" title="class in io.micronaut.openapi.generator">AbstractMicronautKotlinCodegen</a></dt>
+<dd>&nbsp;</dd>
 </dl>
 <h2 class="title" id="I:L">L</h2>
 <dl class="index">
@@ -2772,6 +2774,8 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/generator/AbstractMicronautKotlinCodegen.html#OPT_GENERATED_ANNOTATION" class="member-name-link">OPT_GENERATED_ANNOTATION</a> - Static variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/AbstractMicronautKotlinCodegen.html" title="class in io.micronaut.openapi.generator">AbstractMicronautKotlinCodegen</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/AbstractMicronautKotlinCodegen.html#OPT_KSP" class="member-name-link">OPT_KSP</a> - Static variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/AbstractMicronautKotlinCodegen.html" title="class in io.micronaut.openapi.generator">AbstractMicronautKotlinCodegen</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/generator/AbstractMicronautJavaCodegen.html#OPT_REACTIVE" class="member-name-link">OPT_REACTIVE</a> - Static variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/AbstractMicronautJavaCodegen.html" title="class in io.micronaut.openapi.generator">AbstractMicronautJavaCodegen</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/generator/AbstractMicronautKotlinCodegen.html#OPT_REACTIVE" class="member-name-link">OPT_REACTIVE</a> - Static variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/AbstractMicronautKotlinCodegen.html" title="class in io.micronaut.openapi.generator">AbstractMicronautKotlinCodegen</a></dt>
@@ -3439,6 +3443,8 @@ loadScripts(document, 'script');</script>
 <dt><a href="io/micronaut/openapi/generator/AbstractMicronautKotlinCodegen.html#setInvokerPackage(java.lang.String)" class="member-name-link">setInvokerPackage(String)</a> - Method in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/AbstractMicronautKotlinCodegen.html" title="class in io.micronaut.openapi.generator">AbstractMicronautKotlinCodegen</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/visitor/Utils.html#setJavadocParser(io.micronaut.openapi.javadoc.JavadocParser)" class="member-name-link">setJavadocParser(JavadocParser)</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/Utils.html" title="class in io.micronaut.openapi.visitor">Utils</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/AbstractMicronautKotlinCodegen.html#setKsp(boolean)" class="member-name-link">setKsp(boolean)</a> - Method in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/AbstractMicronautKotlinCodegen.html" title="class in io.micronaut.openapi.generator">AbstractMicronautKotlinCodegen</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/generator/AbstractMicronautJavaCodegen.html#setLombok(boolean)" class="member-name-link">setLombok(boolean)</a> - Method in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/AbstractMicronautJavaCodegen.html" title="class in io.micronaut.openapi.generator">AbstractMicronautJavaCodegen</a></dt>
 <dd>&nbsp;</dd>
@@ -4114,6 +4120,14 @@ the order they are declared.</div>
 <dt><a href="io/micronaut/openapi/generator/MicronautCodeGeneratorOptionsBuilder.html#withInvokerPackage(java.lang.String)" class="member-name-link">withInvokerPackage(String)</a> - Method in interface io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/MicronautCodeGeneratorOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorOptionsBuilder</a></dt>
 <dd>
 <div class="block">Sets the package of the generated invoker classes.</div>
+</dd>
+<dt><a href="io/micronaut/openapi/generator/KotlinMicronautClientOptionsBuilder.html#withKsp(boolean)" class="member-name-link">withKsp(boolean)</a> - Method in interface io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/KotlinMicronautClientOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">KotlinMicronautClientOptionsBuilder</a></dt>
+<dd>
+<div class="block">If set to true, generated code will be fully compatible with KSP, but not 100% with KAPT.</div>
+</dd>
+<dt><a href="io/micronaut/openapi/generator/KotlinMicronautServerOptionsBuilder.html#withKsp(boolean)" class="member-name-link">withKsp(boolean)</a> - Method in interface io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/KotlinMicronautServerOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">KotlinMicronautServerOptionsBuilder</a></dt>
+<dd>
+<div class="block">If set to true, generated code will be fully compatible with KSP, but not 100% with KAPT.</div>
 </dd>
 <dt><a href="io/micronaut/openapi/generator/MicronautCodeGeneratorOptionsBuilder.html#withLang(io.micronaut.openapi.generator.MicronautCodeGeneratorOptionsBuilder.GeneratorLanguage)" class="member-name-link">withLang(MicronautCodeGeneratorOptionsBuilder.GeneratorLanguage)</a> - Method in interface io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/MicronautCodeGeneratorOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorOptionsBuilder</a></dt>
 <dd>
