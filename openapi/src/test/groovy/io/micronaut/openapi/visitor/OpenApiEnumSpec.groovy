@@ -68,6 +68,66 @@ class MyBean {}
         schema.enum.get(1) == 2
     }
 
+    void "test build OpenAPI custom enum jackson JsonValue in field level"() {
+
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonValue;
+
+@Controller
+class OpenApiController {
+    @Get("/currency/{currency}")
+    public void postRaw(MyEnum myEnum) {
+    }
+}
+
+enum MyEnum {
+
+    @JsonProperty("1")
+    FIRST(1),
+    @JsonProperty("2")
+    SECOND(2),
+    ;
+
+    @JsonValue
+    private final int value;
+
+    MyEnum(int value) {
+        this.value = value;
+    }
+
+    public int getValue() {
+        return value;
+    }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        then: "the state is correct"
+        Utils.testReference != null
+
+        when: "The OpenAPI is retrieved"
+        OpenAPI openAPI = Utils.testReference
+        Schema schema = openAPI.components.schemas['MyEnum']
+
+        then: "the components are valid"
+
+        openAPI.components.schemas.size() == 1
+        schema
+        schema.type == PrimitiveType.INT.commonName
+        schema.enum
+        schema.enum.size() == 2
+        schema.enum.get(0) == 1
+        schema.enum.get(1) == 2
+    }
+
     void "test build OpenAPI custom enum with custom schema type"() {
 
         when:

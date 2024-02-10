@@ -76,7 +76,7 @@ public class EndpointsConfiguration {
         servers = parseServers(ConfigUtils.getConfigProperty(ENDPOINTS_SERVERS, context), context);
         securityRequirements = parseSecurityRequirements(ConfigUtils.getConfigProperty(ENDPOINTS_SECURITY_REQUIREMENTS, context), context);
         endpoints = new LinkedHashMap<>();
-        Map<String, String> map = new HashMap<>(properties.size());
+        var map = new HashMap<String, String>(properties.size());
         properties.forEach((key, value) -> map.put((String) key, (String) value));
         map.entrySet().stream()
             .filter(EndpointsConfiguration::validEntry)
@@ -152,12 +152,6 @@ public class EndpointsConfiguration {
         return securityRequirements;
     }
 
-    @Override
-    public String toString() {
-        return "EndpointsConfiguration [enabled=" + enabled + ", path=" + path + ", tags=" + tags + ", endpoints="
-            + endpoints + "]";
-    }
-
     private static List<Server> parseServers(String servers, VisitorContext context) {
         return parseModel(servers, context, TYPE_SERVERS_LIST);
     }
@@ -196,12 +190,12 @@ public class EndpointsConfiguration {
         if (stringTags.length == 0) {
             return Collections.emptyList();
         }
-        List<Tag> tags = new ArrayList<>(stringTags.length);
+        var tags = new ArrayList<Tag>(stringTags.length);
         for (String name : stringTags) {
-            if (name == null || name.isEmpty()) {
+            if (StringUtils.isEmpty(name)) {
                 continue;
             }
-            Tag tag = new Tag();
+            var tag = new Tag();
             tag.setName(name);
             tags.add(tag);
         }
@@ -216,4 +210,9 @@ public class EndpointsConfiguration {
         }
     }
 
+    @Override
+    public String toString() {
+        return "EndpointsConfiguration [enabled=" + enabled + ", path=" + path + ", tags=" + tags + ", endpoints="
+            + endpoints + "]";
+    }
 }

@@ -30,7 +30,6 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -358,9 +357,7 @@ public final class ConvertUtils {
      */
     public static SecurityRequirement mapToSecurityRequirement(AnnotationValue<io.swagger.v3.oas.annotations.security.SecurityRequirement> r) {
         String name = r.getRequiredValue("name", String.class);
-        List<String> scopes = r.get("scopes", String[].class)
-            .map(Arrays::asList)
-            .orElse(Collections.emptyList());
+        List<String> scopes = Arrays.asList(r.stringValues("scopes"));
         var securityRequirement = new SecurityRequirement();
         securityRequirement.addList(name, scopes);
         return securityRequirement;
@@ -408,7 +405,19 @@ public final class ConvertUtils {
             if (returnType.isEnum()) {
                 return checkEnumJsonValueType(context, (EnumElement) returnType, null, null);
             }
-            result = ConvertUtils.getTypeAndFormatByClass(returnType.getName(), firstMethod.getReturnType().isArray());
+            result = ConvertUtils.getTypeAndFormatByClass(returnType.getName(), returnType.isArray());
+        }
+        if (result == null) {
+            // check JsonValue field
+            var fields = type.getEnclosedElements(ElementQuery.ALL_FIELDS.annotated(metadata -> metadata.isAnnotationPresent(JsonValue.class)));
+            if (CollectionUtils.isNotEmpty(fields)) {
+                var firstField = fields.get(0);
+                ClassElement fieldType = firstField.getType();
+                if (fieldType.isEnum()) {
+                    return checkEnumJsonValueType(context, (EnumElement) fieldType, null, null);
+                }
+                result = ConvertUtils.getTypeAndFormatByClass(fieldType.getName(), fieldType.isArray());
+            }
         }
         return result != null ? result : Pair.of(PrimitiveType.STRING.getCommonName(), schemaFormat);
     }

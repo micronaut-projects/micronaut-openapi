@@ -262,11 +262,8 @@ class MyBean {}
         Schema parametersSchema = openAPI.components.schemas['ParametersSchema']
 
         then: "the components are valid"
-        dtoSchema != null
-        parametersSchema != null
-
-        dtoSchema instanceof Schema
-        parametersSchema instanceof Schema
+        dtoSchema
+        parametersSchema
 
         when:
         Operation operation = openAPI.paths.get("/path").post

@@ -380,4 +380,14 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
         assertFileExists(modelPath + "GetTokenRequestClientId.java");
         assertFileExists(modelPath + "ArtistsArtistIdDirectAlbumsGetSortByParameter.java");
     }
+
+    @Test
+    void testFileEndpoint() {
+
+        var codegen = new JavaMicronautServerCodegen();
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/file.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String apiPath = outputPath + "src/main/java/org/openapitools/api/";
+
+        assertFileContains(apiPath + "RequestBodyApi.java", "@HardNullable CompletedFileUpload file");
+    }
 }

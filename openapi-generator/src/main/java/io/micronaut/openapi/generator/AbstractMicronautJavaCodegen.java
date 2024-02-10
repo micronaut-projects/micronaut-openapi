@@ -17,7 +17,6 @@ package io.micronaut.openapi.generator;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -233,11 +232,21 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
         cliOptions.add(serializationLibraryOpt);
 
         // Add reserved words
-        String[] reservedWordsArray = {
+        var micronautReservedWords = List.of(
+            // special words
+            "Object", "List", "File", "OffsetDateTime", "LocalDate", "LocalTime",
                 "Client", "Format", "QueryValue", "QueryParam", "PathVariable", "Header", "Cookie",
                 "Authorization", "Body", "application"
-        };
-        reservedWords.addAll(Arrays.asList(reservedWordsArray));
+        );
+        reservedWords.addAll(micronautReservedWords);
+        List.of(
+            "object",
+            "list",
+            "file",
+            "offsetdatetime",
+            "localdate",
+            "localtime"
+        ).forEach(reservedWords::remove);
 
         importMapping.put("DateTime", "java.time.Instant");
         importMapping.put("LocalDateTime", "java.time.LocalDateTime");
@@ -560,6 +569,11 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
             apiVarName = escapeReservedWord(apiVarName);
         }
         return apiVarName;
+    }
+
+    @Override
+    protected boolean isReservedWord(String word) {
+        return word != null && reservedWords.contains(word);
     }
 
     public boolean isUseBeanValidation() {
