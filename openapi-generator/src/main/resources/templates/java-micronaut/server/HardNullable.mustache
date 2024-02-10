@@ -4,7 +4,10 @@ import io.micronaut.core.annotation.Nullable;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;
+import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
+
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
  * An annotation specifying that a parameter is nullable, that is also inherited.
@@ -14,6 +17,7 @@ import java.lang.annotation.Target;
 @Nullable
 @Inherited
 @Target({ElementType.PARAMETER, ElementType.TYPE_PARAMETER, ElementType.FIELD})
+@Retention(RUNTIME)
 public @interface HardNullable {
 
 }
