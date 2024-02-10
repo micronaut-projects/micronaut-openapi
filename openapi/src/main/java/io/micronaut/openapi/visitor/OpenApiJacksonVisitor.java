@@ -25,6 +25,7 @@ import javax.annotation.processing.SupportedOptions;
 import io.micronaut.core.annotation.AnnotationClassValue;
 import io.micronaut.core.annotation.AnnotationValue;
 import io.micronaut.core.annotation.NonNull;
+import io.micronaut.core.order.Ordered;
 import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.inject.ast.ClassElement;
 import io.micronaut.inject.visitor.TypeElementVisitor;
@@ -50,12 +51,6 @@ import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENA
 public class OpenApiJacksonVisitor implements TypeElementVisitor<Object, Object> {
 
     @Override
-    @NonNull
-    public VisitorKind getVisitorKind() {
-        return VisitorKind.ISOLATING;
-    }
-
-    @Override
     public Set<String> getSupportedAnnotationNames() {
         return CollectionUtils.setOf(
             "com.fasterxml.jackson.annotation.JsonSubTypes",
@@ -65,7 +60,7 @@ public class OpenApiJacksonVisitor implements TypeElementVisitor<Object, Object>
 
     @Override
     public int getOrder() {
-        return -10;
+        return Ordered.LOWEST_PRECEDENCE;
     }
 
     @Override
