@@ -104,6 +104,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
     public static final String OPT_GENERATE_SWAGGER_ANNOTATIONS_TRUE = "true";
     public static final String OPT_GENERATE_SWAGGER_ANNOTATIONS_FALSE = "false";
     public static final String OPT_GENERATE_OPERATION_ONLY_FOR_FIRST_TAG = "generateOperationOnlyForFirstTag";
+    public static final String OPT_KSP = "ksp";
     public static final String CONTENT_TYPE_APPLICATION_FORM_URLENCODED = "application/x-www-form-urlencoded";
     public static final String CONTENT_TYPE_APPLICATION_JSON = "application/json";
     public static final String CONTENT_TYPE_MULTIPART_FORM_DATA = "multipart/form-data";
@@ -124,6 +125,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
     protected boolean reactive;
     protected boolean generateHttpResponseAlways;
     protected boolean generateHttpResponseWhereRequired = true;
+    protected boolean ksp;
     protected String appName;
     protected String generateSwaggerAnnotations;
     protected boolean generateOperationOnlyForFirstTag;
@@ -238,6 +240,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         cliOptions.add(CliOption.newBoolean(OPT_USE_PLURAL, "Whether or not to use plural for request body parameter name", plural));
         cliOptions.add(CliOption.newBoolean(OPT_FLUX_FOR_ARRAYS, "Whether or not to use Flux<?> instead Mono<List<?>> for arrays in generated code", fluxForArrays));
         cliOptions.add(CliOption.newBoolean(OPT_GENERATED_ANNOTATION, "Generate code with \"@Generated\" annotation", generatedAnnotation));
+        cliOptions.add(CliOption.newBoolean(OPT_KSP, "Generate code compatible only with KSP", ksp));
         cliOptions.add(CliOption.newBoolean(USE_BEANVALIDATION, "Use BeanValidation API annotations", useBeanValidation));
         cliOptions.add(CliOption.newBoolean(OPT_VISITABLE, "Generate visitor for subtypes with a discriminator", visitable));
         cliOptions.add(CliOption.newBoolean(OPT_REQUIRED_PROPERTIES_IN_CONSTRUCTOR, "Allow only to create models with all the required properties provided in constructor", requiredPropertiesInConstructor));
@@ -390,6 +393,10 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         this.generatedAnnotation = generatedAnnotation;
     }
 
+    public void setKsp(boolean ksp) {
+        this.ksp = ksp;
+    }
+
     @Override
     public void processOpts() {
         super.processOpts();
@@ -431,6 +438,11 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
             generatedAnnotation = convertPropertyToBoolean(OPT_GENERATED_ANNOTATION);
         }
         writePropertyBack(OPT_GENERATED_ANNOTATION, generatedAnnotation);
+
+        if (additionalProperties.containsKey(OPT_KSP)) {
+            ksp = convertPropertyToBoolean(OPT_KSP);
+        }
+        writePropertyBack(OPT_KSP, ksp);
 
         if (additionalProperties.containsKey(OPT_VISITABLE)) {
             visitable = convertPropertyToBoolean(OPT_VISITABLE);
@@ -1155,6 +1167,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         property.vendorExtensions.put("inRequiredArgsConstructor", !property.isReadOnly || isServer);
         property.vendorExtensions.put("isServer", isServer);
         property.vendorExtensions.put("defaultValueIsNotNull", property.defaultValue != null && !property.defaultValue.equals("null"));
+        property.vendorExtensions.put("fieldAnnPrefix", ksp ? "" : "field:");
         if ("null".equals(property.example)) {
             property.example = null;
         }

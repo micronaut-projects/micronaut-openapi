@@ -101,4 +101,13 @@ public interface KotlinMicronautServerOptionsBuilder extends GeneratorOptionsBui
      * @return this builder
      */
     KotlinMicronautServerOptionsBuilder withAot(boolean aot);
+
+    /**
+     * If set to true, generated code will be fully compatible with KSP, but not 100% with KAPT.
+     *
+     * @param ksp do we need to generate code compatible only with KSP
+     *
+     * @return this builder
+     */
+    KotlinMicronautServerOptionsBuilder withKsp(boolean ksp);
 }

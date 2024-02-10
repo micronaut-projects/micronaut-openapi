@@ -207,6 +207,7 @@ public class KotlinMicronautClientCodegen extends AbstractMicronautKotlinCodegen
         private boolean useAuth;
         private boolean fluxForArrays;
         private boolean generatedAnnotation = true;
+        private boolean ksp;
 
         @Override
         public KotlinMicronautClientOptionsBuilder withAuthorization(boolean useAuth) {
@@ -256,6 +257,12 @@ public class KotlinMicronautClientCodegen extends AbstractMicronautKotlinCodegen
             return this;
         }
 
+        @Override
+        public KotlinMicronautClientOptionsBuilder withKsp(boolean ksp) {
+            this.ksp = ksp;
+            return this;
+        }
+
         ClientOptions build() {
             return new ClientOptions(
                 additionalClientTypeAnnotations,
@@ -265,7 +272,8 @@ public class KotlinMicronautClientCodegen extends AbstractMicronautKotlinCodegen
                 useAuth,
                 plural,
                 fluxForArrays,
-                generatedAnnotation
+                generatedAnnotation,
+                ksp
             );
         }
     }
@@ -278,7 +286,8 @@ public class KotlinMicronautClientCodegen extends AbstractMicronautKotlinCodegen
         boolean useAuth,
         boolean plural,
         boolean fluxForArrays,
-        boolean generatedAnnotation
+        boolean generatedAnnotation,
+        boolean ksp
     ) {
     }
 }
