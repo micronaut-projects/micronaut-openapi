@@ -49,7 +49,6 @@ public final class ContextUtils {
     public static final Argument<Map<String, ConfigUtils.SchemaDecorator>> ARGUMENT_SCHEMA_DECORATORS_MAP = new GenericArgument<>() { };
     public static final Argument<Map<String, ConfigUtils.CustomSchema>> ARGUMENT_CUSTOM_SCHEMA_MAP = new GenericArgument<>() { };
     public static final Argument<Map<String, GroupProperties>> ARGUMENT_GROUP_PROPERTIES_MAP = new GenericArgument<>() { };
-    public static final Argument<Boolean> ARGUMENT_BOOLEAN = Argument.of(Boolean.TYPE);
 
     private ContextUtils() {
     }

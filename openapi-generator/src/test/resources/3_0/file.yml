@@ -1,0 +1,29 @@
+openapi: 3.0.1
+info:
+  title: test
+  description: desc
+  version: 0.0.1
+paths:
+  /sendFile:
+    put:
+      operationId: sendFile
+      tags: [ requestBody ]
+      description: A method to send file as a request body
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: string
+                format: byte

@@ -9,7 +9,7 @@ class OpenApiRecursionSpec extends AbstractOpenApiTypeElementSpec {
 
     void "test OpenAPI handles recursion"() {
         given:
-            buildBeanDefinition('test.MyBean', '''
+        buildBeanDefinition('test.MyBean', '''
 
 package test;
 
@@ -60,19 +60,19 @@ class TestImpl2 implements TestInterface {
 class MyBean {}
 ''')
 
-            OpenAPI openAPI = Utils.testReference
-            Map<String, Schema> schemas = openAPI.getComponents().getSchemas()
+        OpenAPI openAPI = Utils.testReference
+        Map<String, Schema> schemas = openAPI.getComponents().getSchemas()
 
         expect:
-            Schema testImpl1 = schemas.get("TestImpl1")
-            Schema woopsieRef = testImpl1.getProperties()["woopsie"]
-            woopsieRef
-            woopsieRef.$ref == "#/components/schemas/TestInterface"
+        Schema testImpl1 = schemas.get("TestImpl1")
+        Schema woopsieRef = testImpl1.getProperties()["woopsie"]
+        woopsieRef
+        woopsieRef.$ref == "#/components/schemas/TestInterface"
     }
 
     void "test OpenAPI handles recursion when no @Schema annotation"() {
         given:
-            buildBeanDefinition('test.MyBean', '''
+        buildBeanDefinition('test.MyBean', '''
 
 package test;
 
@@ -105,19 +105,19 @@ class TestRecursion {
 class MyBean {}
 ''')
 
-            OpenAPI openAPI = Utils.testReference
-            Map<String, Schema> schemas = openAPI.getComponents().getSchemas()
+        OpenAPI openAPI = Utils.testReference
+        Map<String, Schema> schemas = openAPI.getComponents().getSchemas()
 
         expect:
-            Schema testRecursion = schemas.get("TestRecursion")
-            Schema woopsieRef = testRecursion.getProperties()["woopsie"]
-            woopsieRef
-            woopsieRef.$ref == "#/components/schemas/TestRecursion"
+        Schema testRecursion = schemas.get("TestRecursion")
+        Schema woopsieRef = testRecursion.getProperties()["woopsie"]
+        woopsieRef
+        woopsieRef.$ref == "#/components/schemas/TestRecursion"
     }
 
     void "test OpenAPI handles recursion when recursive item has different name"() {
         given:
-            buildBeanDefinition('test.MyBean', '''
+        buildBeanDefinition('test.MyBean', '''
 
 package test;
 
@@ -169,23 +169,24 @@ class TestImpl2 implements TestInterface {
 class MyBean {}
 ''')
 
-            OpenAPI openAPI = Utils.testReference
-            Map<String, Schema> schemas = openAPI.getComponents().getSchemas()
+        OpenAPI openAPI = Utils.testReference
+        Map<String, Schema> schemas = openAPI.getComponents().getSchemas()
 
         expect:
-            Schema testImpl1 = schemas.get("TestImpl1")
-            Schema woopsieRef = testImpl1.getProperties()["woopsie-id"]
+        Schema testImpl1 = schemas.get("TestImpl1")
+        Schema woopsieRef = testImpl1.getProperties()["woopsie-id"]
 
-            woopsieRef instanceof ComposedSchema
-            ((ComposedSchema) woopsieRef).allOf[0].$ref == "#/components/schemas/woopsie-id"
-            ((ComposedSchema) woopsieRef).allOf[1].description == "woopsie doopsie"
-            Schema woopsie = schemas.get("woopsie-id")
-            woopsie.description == "woopsie doopsie"
+        woopsieRef instanceof ComposedSchema
+        ((ComposedSchema) woopsieRef).allOf[0].$ref == "#/components/schemas/TestInterface"
+        ((ComposedSchema) woopsieRef).allOf[1].description == "woopsie doopsie"
+        Schema woopsie = schemas.get("TestInterface")
+        woopsie
+        !woopsie.description
     }
 
     void "test OpenAPI applies additional annotations to recursive property"() {
         given:
-            buildBeanDefinition('test.MyBean', '''
+        buildBeanDefinition('test.MyBean', '''
 
 package test;
 
@@ -242,17 +243,17 @@ class TestImpl2 implements TestInterface {
 class MyBean {}
 ''')
 
-            OpenAPI openAPI = Utils.testReference
-            Map<String, Schema> schemas = openAPI.getComponents().getSchemas()
+        OpenAPI openAPI = Utils.testReference
+        Map<String, Schema> schemas = openAPI.getComponents().getSchemas()
 
         expect:
-            Schema testImpl1 = schemas.get("TestImpl1")
-            Schema woopsieProperty = testImpl1.getProperties()["woopsie"]
-            woopsieProperty instanceof ComposedSchema
-            ((ComposedSchema) woopsieProperty).deprecated
-            ((ComposedSchema) woopsieProperty).description == "Some docs"
-            ((ComposedSchema) woopsieProperty).nullable
-            ((ComposedSchema) woopsieProperty).allOf[0].$ref == "#/components/schemas/TestInterface"
+        Schema testImpl1 = schemas.get("TestImpl1")
+        Schema woopsieProperty = testImpl1.getProperties()["woopsie"]
+        woopsieProperty instanceof ComposedSchema
+        ((ComposedSchema) woopsieProperty).deprecated
+        ((ComposedSchema) woopsieProperty).description == "Some docs"
+        ((ComposedSchema) woopsieProperty).nullable
+        ((ComposedSchema) woopsieProperty).allOf[0].$ref == "#/components/schemas/TestInterface"
     }
 
 }

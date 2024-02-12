@@ -42,8 +42,8 @@ import io.swagger.v3.oas.models.tags.Tag;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 
 import static io.micronaut.openapi.visitor.ConfigUtils.endpointsConfiguration;
-import static io.micronaut.openapi.visitor.ConfigUtils.isSpecGenerationEnabled;
 import static io.micronaut.openapi.visitor.ConfigUtils.isOpenApiEnabled;
+import static io.micronaut.openapi.visitor.ConfigUtils.isSpecGenerationEnabled;
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_OPENAPI_ENDPOINT_CLASS_TAGS;
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_OPENAPI_ENDPOINT_SECURITY_REQUIREMENTS;
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_OPENAPI_ENDPOINT_SERVERS;
@@ -212,21 +212,21 @@ public class OpenApiEndpointVisitor extends AbstractOpenApiEndpointVisitor imple
 
     @Override
     protected List<Tag> classTags(ClassElement element, VisitorContext context) {
-        List<Tag> allTags = new ArrayList<>(tags);
+        var allTags = new ArrayList<>(tags);
         allTags.addAll(ContextUtils.get(MICRONAUT_INTERNAL_OPENAPI_ENDPOINT_CLASS_TAGS, TAGS_LIST_ARGUMENT, Collections.emptyList(), context));
         return allTags;
     }
 
     @Override
     protected List<Server> methodServers(MethodElement element, VisitorContext context) {
-        List<Server> servers = new ArrayList<>(this.servers);
+        var servers = new ArrayList<>(this.servers);
         servers.addAll(ContextUtils.get(MICRONAUT_INTERNAL_OPENAPI_ENDPOINT_SERVERS, SERVERS_LIST_ARGUMENT, Collections.emptyList(), context));
         return servers;
     }
 
     @Override
     protected List<SecurityRequirement> methodSecurityRequirements(MethodElement element, VisitorContext context) {
-        List<SecurityRequirement> securityRequirements = new ArrayList<>(this.securityRequirements);
+        var securityRequirements = new ArrayList<>(this.securityRequirements);
         securityRequirements.addAll(ContextUtils.get(MICRONAUT_INTERNAL_OPENAPI_ENDPOINT_SECURITY_REQUIREMENTS, List.class, Collections.emptyList(), context));
         return securityRequirements;
     }

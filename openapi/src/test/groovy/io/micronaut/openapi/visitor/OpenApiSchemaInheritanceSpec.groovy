@@ -275,16 +275,11 @@ class MyBean {}
 
 package test;
 
-import io.swagger.v3.oas.annotations.*;
-import io.swagger.v3.oas.annotations.parameters.*;
-import io.swagger.v3.oas.annotations.responses.*;
-import io.swagger.v3.oas.annotations.security.*;
-import io.swagger.v3.oas.annotations.media.*;
-import io.swagger.v3.oas.annotations.enums.*;
-import io.swagger.v3.oas.annotations.links.*;
-import io.micronaut.http.annotation.*;
-import io.micronaut.core.annotation.*;
-import java.util.List;
+import io.micronaut.core.annotation.Introspected;
+import io.micronaut.http.annotation.Body;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Post;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 @Controller("/")
 class MyController {
@@ -338,9 +333,9 @@ class MyBean {}
         expect:
         Schema owner = schemas["Owner"]
         Schema vehicleRef = owner.getProperties()["Owner.Vehicle"]
-        vehicleRef.allOf[0].$ref == "#/components/schemas/Owner.Vehicle"
+        vehicleRef.allOf[0].$ref == "#/components/schemas/Vehicle"
         vehicleRef.allOf[1].description == "Vehicle of the owner. Here a car or bike with a name"
-        Schema ownerVehicle = schemas["Owner.Vehicle"]
+        Schema ownerVehicle = schemas["Vehicle"]
         ownerVehicle.oneOf[0].$ref == '#/components/schemas/Car'
         ownerVehicle.oneOf[1].$ref == '#/components/schemas/Bike'
     }

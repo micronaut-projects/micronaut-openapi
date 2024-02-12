@@ -1,7 +1,6 @@
 package io.micronaut.openapi.visitor
 
 import io.micronaut.annotation.processing.test.AbstractKotlinCompilerSpec
-import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.Operation
 import io.swagger.v3.oas.models.media.Schema
 import io.swagger.v3.oas.models.responses.ApiResponse
@@ -48,15 +47,15 @@ class HelloController {
 }
 
 @jakarta.inject.Singleton
-class MyBean {}
+class MyBean
 ''')
         then: "the state is correct"
         Utils.testReference != null
 
         when: "The OpenAPI is retrieved"
-        OpenAPI openAPI = Utils.testReference
-        Operation operation = openAPI.paths.'/hello'.get
-        Schema schema = openAPI.components.schemas.'HelloController.Channel'
+        def openApi = Utils.testReference
+        Operation operation = openApi.paths.'/hello'.get
+        Schema schema = openApi.components.schemas.'HelloController.Channel'
         ApiResponse response = operation.responses.'200'
 
         then: "the components are valid"
@@ -81,7 +80,7 @@ class MyBean {}
     void "test ksp jackson visitor"() {
 
         when:
-            buildBeanDefinition('test.MyBean', '''
+        buildBeanDefinition('test.MyBean', '''
 package test
 
 import com.fasterxml.jackson.annotation.*
@@ -120,8 +119,9 @@ class HelloController {
         JsonSubTypes.Type(value = Bird::class, name = "ave")
 )
 open class Animal (
+    @field:Schema(name = "color", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     @Nullable
-    open var color: String? = null,
+    open var color: ColorEnum? = null,
     @Nullable
     open var propertyClass: String? = null,
 )
@@ -136,18 +136,25 @@ data class Bird (
     var featherDescription: String? = null,
 ): Animal()
 
+@Serdeable
+enum class ColorEnum {
+
+    @JsonProperty("red")
+    RED
+}
+
 @jakarta.inject.Singleton
-class MyBean {}
+class MyBean
 ''')
         then: "the state is correct"
-            Utils.testReference != null
+        Utils.testReference != null
 
         when: "The OpenAPI is retrieved"
-            OpenAPI openAPI = Utils.testReference
-            def schemas = openAPI.components.schemas
+        def openApi = Utils.testReference
+        def schemas = openApi.components.schemas
 
         then: "the components are valid"
-            schemas.Animal
-            schemas.Bird
+        schemas.Animal
+        schemas.ColorEnum
     }
 }

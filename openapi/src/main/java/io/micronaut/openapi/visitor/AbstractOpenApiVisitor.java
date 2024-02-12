@@ -60,6 +60,7 @@ import io.micronaut.core.bind.annotation.Bindable;
 import io.micronaut.core.naming.NameUtils;
 import io.micronaut.core.reflect.ClassUtils;
 import io.micronaut.core.reflect.ReflectionUtils;
+import io.micronaut.core.type.Argument;
 import io.micronaut.core.util.ArrayUtils;
 import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.core.util.StringUtils;
@@ -133,7 +134,6 @@ import static io.micronaut.openapi.visitor.ConfigUtils.getCustomSchema;
 import static io.micronaut.openapi.visitor.ConfigUtils.getExpandableProperties;
 import static io.micronaut.openapi.visitor.ConfigUtils.getSchemaDecoration;
 import static io.micronaut.openapi.visitor.ConfigUtils.isJsonViewDefaultInclusion;
-import static io.micronaut.openapi.visitor.ContextUtils.ARGUMENT_BOOLEAN;
 import static io.micronaut.openapi.visitor.ContextUtils.warn;
 import static io.micronaut.openapi.visitor.ConvertUtils.parseJsonString;
 import static io.micronaut.openapi.visitor.ConvertUtils.resolveExtensions;
@@ -1096,7 +1096,7 @@ abstract class AbstractOpenApiVisitor {
             boolean isAutoRequiredMode = true;
             boolean isRequiredDefaultValueSet = false;
             if (schemaAnnotationValue != null) {
-                elementSchemaRequired = schemaAnnotationValue.get("required", ARGUMENT_BOOLEAN);
+                elementSchemaRequired = schemaAnnotationValue.get("required", Argument.BOOLEAN);
                 isRequiredDefaultValueSet = !schemaAnnotationValue.contains("required");
                 io.swagger.v3.oas.annotations.media.Schema.RequiredMode requiredMode = schemaAnnotationValue.enumValue("requiredMode", io.swagger.v3.oas.annotations.media.Schema.RequiredMode.class).orElse(null);
                 if (requiredMode == io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED) {
@@ -1694,7 +1694,7 @@ abstract class AbstractOpenApiVisitor {
         String[] allowableValues = null;
         if (schemaAnn != null) {
             defaultValue = schemaAnn.stringValue("defaultValue").orElse(null);
-            allowableValues = schemaAnn.get("allowableValues", String[].class).orElse(null);
+            allowableValues = schemaAnn.stringValues("allowableValues");
             Map<CharSequence, Object> annValues = schemaAnn.getValues();
             Map<CharSequence, Object> valueMap = toValueMap(annValues, context, jsonViewClass);
             bindSchemaIfNecessary(context, schemaAnn, valueMap, jsonViewClass);
@@ -1901,21 +1901,25 @@ abstract class AbstractOpenApiVisitor {
 
         // Here we need to skip Schema annotation on field level, because with micronaut 3.x method getDeclaredAnnotation
         // returned always null and found Schema annotation only on getters and setters
+        var schemaAnnOnField = false;
         AnnotationValue<io.swagger.v3.oas.annotations.media.Schema> schemaValue = null;
         if (definingElement != null) {
             if (definingElement instanceof PropertyElement propertyEl) {
                 var getterOpt = propertyEl.getReadMethod();
                 if (getterOpt.isPresent()) {
                     schemaValue = getterOpt.get().getDeclaredAnnotation(io.swagger.v3.oas.annotations.media.Schema.class);
+                    schemaAnnOnField = schemaValue != null;
                 }
                 if (schemaValue == null) {
                     var setterOpt = propertyEl.getWriteMethod();
                     if (setterOpt.isPresent()) {
                         schemaValue = setterOpt.get().getDeclaredAnnotation(io.swagger.v3.oas.annotations.media.Schema.class);
+                        schemaAnnOnField = schemaValue != null;
                     }
                 }
             } else {
                 schemaValue = definingElement.getDeclaredAnnotation(io.swagger.v3.oas.annotations.media.Schema.class);
+                schemaAnnOnField = schemaValue != null && definingElement instanceof FieldElement;
             }
         }
         if (schemaValue == null) {
@@ -1971,8 +1975,12 @@ abstract class AbstractOpenApiVisitor {
                 return primitiveType.createProperty();
             }
         } else {
-            String schemaName = schemaValue.stringValue("name")
-                .orElse(computeDefaultSchemaName(definingElement, type, typeArgs, context, jsonViewClass));
+            // Schema annotation property `name` on field level means, that this property must be with this name.
+            // This is not a schema name
+            String schemaName = !schemaAnnOnField ? schemaValue.stringValue("name").orElse(null) : null;
+            if (schemaName == null) {
+                schemaName = computeDefaultSchemaName(definingElement, type, typeArgs, context, jsonViewClass);
+            }
             schema = schemas.get(schemaName);
             if (schema == null) {
                 if (inProgressSchemas.contains(schemaName)) {

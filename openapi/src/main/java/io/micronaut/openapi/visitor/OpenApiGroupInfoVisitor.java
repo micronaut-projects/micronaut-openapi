@@ -24,7 +24,7 @@ import javax.annotation.processing.SupportedOptions;
 
 import io.micronaut.core.annotation.AnnotationValue;
 import io.micronaut.core.annotation.Internal;
-import io.micronaut.core.annotation.NonNull;
+import io.micronaut.core.order.Ordered;
 import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.inject.ast.ClassElement;
 import io.micronaut.inject.ast.PackageElement;
@@ -34,8 +34,8 @@ import io.micronaut.openapi.annotation.OpenAPIGroupInfo;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.models.OpenAPI;
 
-import static io.micronaut.openapi.visitor.ConfigUtils.isSpecGenerationEnabled;
 import static io.micronaut.openapi.visitor.ConfigUtils.isOpenApiEnabled;
+import static io.micronaut.openapi.visitor.ConfigUtils.isSpecGenerationEnabled;
 import static io.micronaut.openapi.visitor.ConvertUtils.toValue;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ENABLED;
 
@@ -61,14 +61,8 @@ public class OpenApiGroupInfoVisitor implements TypeElementVisitor<Object, Objec
     }
 
     @Override
-    @NonNull
-    public VisitorKind getVisitorKind() {
-        return VisitorKind.ISOLATING;
-    }
-
-    @Override
     public int getOrder() {
-        return 200;
+        return Ordered.LOWEST_PRECEDENCE;
     }
 
     @Override

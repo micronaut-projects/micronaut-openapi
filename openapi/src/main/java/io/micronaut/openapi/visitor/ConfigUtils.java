@@ -141,20 +141,12 @@ public final class ConfigUtils {
         Environment environment = getEnv(context);
         if (environment != null) {
             for (Map.Entry<String, Object> entry : environment.getProperties(MICRONAUT_OPENAPI_SCHEMA_PREFIX, StringConvention.RAW).entrySet()) {
-                SchemaDecorator decorator = schemaDecorators.get(entry.getKey());
-                if (decorator == null) {
-                    decorator = new SchemaDecorator();
-                    schemaDecorators.put(entry.getKey(), decorator);
-                }
+                SchemaDecorator decorator = schemaDecorators.computeIfAbsent(entry.getKey(), k -> new SchemaDecorator());
                 decorator.setPrefix((String) entry.getValue());
             }
 
             for (Map.Entry<String, Object> entry : environment.getProperties(MICRONAUT_OPENAPI_SCHEMA_POSTFIX, StringConvention.RAW).entrySet()) {
-                SchemaDecorator decorator = schemaDecorators.get(entry.getKey());
-                if (decorator == null) {
-                    decorator = new SchemaDecorator();
-                    schemaDecorators.put(entry.getKey(), decorator);
-                }
+                SchemaDecorator decorator = schemaDecorators.computeIfAbsent(entry.getKey(), k -> new SchemaDecorator());
                 decorator.setPostfix((String) entry.getValue());
             }
         }
@@ -471,7 +463,7 @@ public final class ConfigUtils {
         if (StringUtils.isNotEmpty(strValue)) {
             List<String> result = new ArrayList<>();
             for (String item : strValue.split(",")) {
-                result.add(item.trim());
+                result.add(item.strip());
             }
             return result;
         }
@@ -625,7 +617,7 @@ public final class ConfigUtils {
     }
 
     private static GroupProperties.PackageProperties getPackageProperties(String groupPackage) {
-        groupPackage = groupPackage.trim();
+        groupPackage = groupPackage.strip();
         boolean includeSubpackages = groupPackage.endsWith("*");
         if (includeSubpackages) {
             groupPackage = groupPackage.substring(0, groupPackage.length() - 2);
@@ -650,11 +642,7 @@ public final class ConfigUtils {
             if (StringUtils.isEmpty(packageName)) {
                 continue;
             }
-            SchemaDecorator schemaDecorator = schemaDecorators.get(packageName);
-            if (schemaDecorator == null) {
-                schemaDecorator = new SchemaDecorator();
-                schemaDecorators.put(packageName, schemaDecorator);
-            }
+            SchemaDecorator schemaDecorator = schemaDecorators.computeIfAbsent(packageName, k -> new SchemaDecorator());
             if (isPrefix) {
                 schemaDecorator.setPrefix(props.getProperty(prop));
             } else {
@@ -691,7 +679,7 @@ public final class ConfigUtils {
             String[] generics = className.substring(genericNameStart + 1, className.indexOf('>')).split(",");
             configuredTypeArgs = new ArrayList<>();
             for (String generic : generics) {
-                configuredTypeArgs.add(generic.trim());
+                configuredTypeArgs.add(generic.strip());
             }
         }
 
@@ -897,7 +885,10 @@ public final class ConfigUtils {
         return isEnabled;
     }
 
-    static final class CustomSchema {
+    /**
+     * Custom schema class.
+     */
+    public static final class CustomSchema {
 
         private final List<String> typeArgs;
         private final ClassElement classElement;
