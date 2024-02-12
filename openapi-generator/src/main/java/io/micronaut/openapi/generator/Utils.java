@@ -137,7 +137,7 @@ public final class Utils {
         }
         if (prop.isNullable) {
             if (isGenerateHardNullable) {
-                result.append("@HardNullable ");
+                result.append("@Nullable(inherited = true) ");
             } else {
                 result.append("@Nullable ");
             }

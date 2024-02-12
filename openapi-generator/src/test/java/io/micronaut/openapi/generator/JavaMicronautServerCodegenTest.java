@@ -388,6 +388,6 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
         String outputPath = generateFiles(codegen, "src/test/resources/3_0/file.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
         String apiPath = outputPath + "src/main/java/org/openapitools/api/";
 
-        assertFileContains(apiPath + "RequestBodyApi.java", "@HardNullable CompletedFileUpload file");
+        assertFileContains(apiPath + "RequestBodyApi.java", "@Nullable(inherited = true) CompletedFileUpload file");
     }
 }
