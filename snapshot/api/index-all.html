@@ -240,8 +240,6 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/generator/AbstractMicronautKotlinCodegen.html#appName" class="member-name-link">appName</a> - Variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/AbstractMicronautKotlinCodegen.html" title="class in io.micronaut.openapi.generator">AbstractMicronautKotlinCodegen</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="io/micronaut/openapi/visitor/ContextUtils.html#ARGUMENT_BOOLEAN" class="member-name-link">ARGUMENT_BOOLEAN</a> - Static variable in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/ContextUtils.html" title="class in io.micronaut.openapi.visitor">ContextUtils</a></dt>
-<dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/visitor/ContextUtils.html#ARGUMENT_CUSTOM_SCHEMA_MAP" class="member-name-link">ARGUMENT_CUSTOM_SCHEMA_MAP</a> - Static variable in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/ContextUtils.html" title="class in io.micronaut.openapi.visitor">ContextUtils</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/visitor/ContextUtils.html#ARGUMENT_GROUP_PROPERTIES_MAP" class="member-name-link">ARGUMENT_GROUP_PROPERTIES_MAP</a> - Static variable in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/ContextUtils.html" title="class in io.micronaut.openapi.visitor">ContextUtils</a></dt>
@@ -437,6 +435,10 @@ loadScripts(document, 'script');</script>
 <dt><a href="io/micronaut/openapi/visitor/ConfigUtils.html" class="type-name-link" title="class in io.micronaut.openapi.visitor">ConfigUtils</a> - Class in <a href="io/micronaut/openapi/visitor/package-summary.html">io.micronaut.openapi.visitor</a></dt>
 <dd>
 <div class="block">Configuration utilities methods.</div>
+</dd>
+<dt><a href="io/micronaut/openapi/visitor/ConfigUtils.CustomSchema.html" class="type-name-link" title="class in io.micronaut.openapi.visitor">ConfigUtils.CustomSchema</a> - Class in <a href="io/micronaut/openapi/visitor/package-summary.html">io.micronaut.openapi.visitor</a></dt>
+<dd>
+<div class="block">Custom schema class.</div>
 </dd>
 <dt><a href="io/micronaut/openapi/visitor/ConfigUtils.SchemaDecorator.html" class="type-name-link" title="class in io.micronaut.openapi.visitor">ConfigUtils.SchemaDecorator</a> - Class in <a href="io/micronaut/openapi/visitor/package-summary.html">io.micronaut.openapi.visitor</a></dt>
 <dd>
@@ -1116,6 +1118,8 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/swagger/core/jackson/mixin/OperationMixin.html#getCallbacks()" class="member-name-link">getCallbacks()</a> - Method in class io.micronaut.openapi.swagger.core.jackson.mixin.<a href="io/micronaut/openapi/swagger/core/jackson/mixin/OperationMixin.html" title="class in io.micronaut.openapi.swagger.core.jackson.mixin">OperationMixin</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/visitor/ConfigUtils.CustomSchema.html#getClassElement()" class="member-name-link">getClassElement()</a> - Method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/ConfigUtils.CustomSchema.html" title="class in io.micronaut.openapi.visitor">ConfigUtils.CustomSchema</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/visitor/ContextUtils.html#getClassElement(java.lang.String,io.micronaut.inject.visitor.VisitorContext)" class="member-name-link">getClassElement(String, VisitorContext)</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/ContextUtils.html" title="class in io.micronaut.openapi.visitor">ContextUtils</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/visitor/ContextUtils.html#getClassesOutputPath(io.micronaut.inject.visitor.VisitorContext)" class="member-name-link">getClassesOutputPath(VisitorContext)</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/ContextUtils.html" title="class in io.micronaut.openapi.visitor">ContextUtils</a></dt>
@@ -1486,6 +1490,8 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Detect openapi type and format by java class name.</div>
 </dd>
+<dt><a href="io/micronaut/openapi/visitor/ConfigUtils.CustomSchema.html#getTypeArgs()" class="member-name-link">getTypeArgs()</a> - Method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/ConfigUtils.CustomSchema.html" title="class in io.micronaut.openapi.visitor">ConfigUtils.CustomSchema</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/generator/AbstractMicronautKotlinCodegen.html#getTypeDeclaration(io.swagger.v3.oas.models.media.Schema)" class="member-name-link">getTypeDeclaration(Schema)</a> - Method in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/AbstractMicronautKotlinCodegen.html" title="class in io.micronaut.openapi.generator">AbstractMicronautKotlinCodegen</a></dt>
 <dd>
 <div class="block">Output the type declaration of the property.</div>
@@ -1517,8 +1523,6 @@ loadScripts(document, 'script');</script>
 <dt><a href="io/micronaut/openapi/visitor/FileUtils.html#getViewsDestDir(java.nio.file.Path,io.micronaut.inject.visitor.VisitorContext)" class="member-name-link">getViewsDestDir(Path, VisitorContext)</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/FileUtils.html" title="class in io.micronaut.openapi.visitor">FileUtils</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/visitor/ContextUtils.html#getVisitedElements(io.micronaut.inject.visitor.VisitorContext)" class="member-name-link">getVisitedElements(VisitorContext)</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/ContextUtils.html" title="class in io.micronaut.openapi.visitor">ContextUtils</a></dt>
-<dd>&nbsp;</dd>
-<dt><a href="io/micronaut/openapi/visitor/OpenApiGroupInfoVisitor.html#getVisitorKind()" class="member-name-link">getVisitorKind()</a> - Method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/OpenApiGroupInfoVisitor.html" title="class in io.micronaut.openapi.visitor">OpenApiGroupInfoVisitor</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/swagger/core/jackson/mixin/OpenAPIMixin.html#getWebhooks()" class="member-name-link">getWebhooks()</a> - Method in class io.micronaut.openapi.swagger.core.jackson.mixin.<a href="io/micronaut/openapi/swagger/core/jackson/mixin/OpenAPIMixin.html" title="class in io.micronaut.openapi.swagger.core.jackson.mixin">OpenAPIMixin</a></dt>
 <dd>&nbsp;</dd>
@@ -1816,6 +1820,8 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Checking if the type is void.</div>
 </dd>
+<dt><a href="io/micronaut/openapi/generator/AbstractMicronautJavaCodegen.html#isReservedWord(java.lang.String)" class="member-name-link">isReservedWord(String)</a> - Method in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/AbstractMicronautJavaCodegen.html" title="class in io.micronaut.openapi.generator">AbstractMicronautJavaCodegen</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/visitor/ElementUtils.html#isReturnTypeFile(io.micronaut.inject.ast.ClassElement)" class="member-name-link">isReturnTypeFile(ClassElement)</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/ElementUtils.html" title="class in io.micronaut.openapi.visitor">ElementUtils</a></dt>
 <dd>
 <div class="block">Checking if the type is file.</div>
