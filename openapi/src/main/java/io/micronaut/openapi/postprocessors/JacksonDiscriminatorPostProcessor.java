@@ -41,7 +41,7 @@ public class JacksonDiscriminatorPostProcessor {
      * @param openAPI The OpenAPI object
      */
     public void addMissingDiscriminatorType(OpenAPI openAPI) {
-        if ((openAPI.getComponents() == null || openAPI.getComponents().getSchemas() == null)) {
+        if (openAPI.getComponents() == null || openAPI.getComponents().getSchemas() == null) {
             return;
         }
 

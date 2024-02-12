@@ -88,7 +88,7 @@ components:
           type: string
 
 ''', OpenAPI);
-        visitor.findAndRemoveDuplicates(openApi)
+        OpenApiNormalizeUtils.findAndRemoveDuplicates(openApi)
 
         then:
 

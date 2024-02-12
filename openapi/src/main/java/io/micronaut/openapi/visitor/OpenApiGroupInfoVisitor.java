@@ -32,6 +32,7 @@ import io.micronaut.inject.visitor.TypeElementVisitor;
 import io.micronaut.inject.visitor.VisitorContext;
 import io.micronaut.openapi.annotation.OpenAPIGroupInfo;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.models.OpenAPI;
 
 import static io.micronaut.openapi.visitor.ConfigUtils.isOpenApiEnabled;
@@ -111,23 +112,22 @@ public class OpenApiGroupInfoVisitor implements TypeElementVisitor<Object, Objec
         }
 
         for (AnnotationValue<OpenAPIGroupInfo> infoAnn : annotationValues) {
-            AnnotationValue<OpenAPIDefinition> openApiAnn = infoAnn.getAnnotation("info", OpenAPIDefinition.class).orElse(null);
+            var openApiAnn = infoAnn.getAnnotation("info", OpenAPIDefinition.class).orElse(null);
             if (openApiAnn == null) {
                 continue;
             }
-            OpenAPI openApi = toValue(openApiAnn.getValues(), context, OpenAPI.class);
+            var openApi = toValue(openApiAnn.getValues(), context, OpenAPI.class);
             if (openApi == null) {
                 continue;
             }
-            List<AnnotationValue<io.swagger.v3.oas.annotations.security.SecurityRequirement>> securityRequirementAnns =
-                openApiAnn.getAnnotations("security", io.swagger.v3.oas.annotations.security.SecurityRequirement.class);
-            List<io.swagger.v3.oas.models.security.SecurityRequirement> securityRequirements = new ArrayList<>();
-            for (AnnotationValue<io.swagger.v3.oas.annotations.security.SecurityRequirement> securityRequirementAnn : securityRequirementAnns) {
+            var securityRequirementAnns = openApiAnn.getAnnotations("security", SecurityRequirement.class);
+            var securityRequirements = new ArrayList<io.swagger.v3.oas.models.security.SecurityRequirement>();
+            for (var securityRequirementAnn : securityRequirementAnns) {
                 securityRequirements.add(ConvertUtils.mapToSecurityRequirement(securityRequirementAnn));
             }
             openApi.setSecurity(securityRequirements);
 
-            for (String groupName : infoAnn.stringValues("names")) {
+            for (var groupName : infoAnn.stringValues("names")) {
                 openApis.put(groupName, openApi);
             }
         }

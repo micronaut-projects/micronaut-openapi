@@ -2,7 +2,6 @@ package io.micronaut.openapi.visitor
 
 import io.micronaut.openapi.AbstractOpenApiTypeElementSpec
 import io.swagger.v3.oas.models.OpenAPI
-import io.swagger.v3.oas.models.media.ComposedSchema
 import io.swagger.v3.oas.models.media.Schema
 import spock.lang.Issue
 
@@ -14,10 +13,13 @@ class OpenApiJacksonInheritanceSpec extends AbstractOpenApiTypeElementSpec {
         buildBeanDefinition('test.MyBean', '''
 package test;
 
-import com.fasterxml.jackson.annotation.*;
 import io.micronaut.core.annotation.Introspected;
-import io.micronaut.http.annotation.*;
-import io.swagger.v3.oas.annotations.media.*;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.micronaut.http.annotation.Post;
+
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 @Controller("/pets")
 class PetController {
@@ -47,17 +49,17 @@ class Cat implements Pet {
     private final Integer id;
     private final String name;
 
-    public Cat(Integer id, String name) {
+    Cat(Integer id, String name) {
         this.id = id;
         this.name = name;
     }
 
     @Override
     public Integer getId() {
-        return this.id;
+        return id;
     }
     public String getName() {
-        return this.name;
+        return name;
     }
 }
 
@@ -66,14 +68,14 @@ class Dog implements Pet {
     private final Integer id;
     private final Boolean barking;
 
-    public Dog(Integer id, Boolean barking) {
+    Dog(Integer id, Boolean barking) {
         this.id = id;
         this.barking = barking;
     }
 
     @Override
     public Integer getId() {
-        return this.id;
+        return id;
     }
     public Boolean isBarking() {
         return barking;
