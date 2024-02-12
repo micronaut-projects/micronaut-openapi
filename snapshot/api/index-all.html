@@ -919,6 +919,16 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">File utilities methods.</div>
 </dd>
+<dt><a href="io/micronaut/openapi/visitor/OpenApiNormalizeUtils.html#findAndRemoveDuplicates(io.swagger.v3.oas.models.media.Content)" class="member-name-link">findAndRemoveDuplicates(Content)</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/OpenApiNormalizeUtils.html" title="class in io.micronaut.openapi.visitor">OpenApiNormalizeUtils</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/visitor/OpenApiNormalizeUtils.html#findAndRemoveDuplicates(io.swagger.v3.oas.models.media.Schema)" class="member-name-link">findAndRemoveDuplicates(Schema&lt;?&gt;)</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/OpenApiNormalizeUtils.html" title="class in io.micronaut.openapi.visitor">OpenApiNormalizeUtils</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/visitor/OpenApiNormalizeUtils.html#findAndRemoveDuplicates(io.swagger.v3.oas.models.OpenAPI)" class="member-name-link">findAndRemoveDuplicates(OpenAPI)</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/OpenApiNormalizeUtils.html" title="class in io.micronaut.openapi.visitor">OpenApiNormalizeUtils</a></dt>
+<dd>
+<div class="block">Find and remove duplicates in openApi object.</div>
+</dd>
+<dt><a href="io/micronaut/openapi/visitor/OpenApiNormalizeUtils.html#findAndRemoveDuplicates(io.swagger.v3.oas.models.Operation)" class="member-name-link">findAndRemoveDuplicates(Operation)</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/OpenApiNormalizeUtils.html" title="class in io.micronaut.openapi.visitor">OpenApiNormalizeUtils</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/visitor/Utils.html#findAndRemoveDuplicates(java.util.List,java.util.function.BiPredicate)" class="member-name-link">findAndRemoveDuplicates(List&lt;T&gt;, BiPredicate&lt;T, T&gt;)</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/Utils.html" title="class in io.micronaut.openapi.visitor">Utils</a></dt>
 <dd>
 <div class="block">Find and remove duplicates in lists.</div>
@@ -2433,9 +2443,23 @@ loadScripts(document, 'script');</script>
 </dd>
 <dt><a href="io/micronaut/openapi/adoc/md/ToAsciiDocSerializer.html#normalize(java.lang.String)" class="member-name-link">normalize(String)</a> - Method in class io.micronaut.openapi.adoc.md.<a href="io/micronaut/openapi/adoc/md/ToAsciiDocSerializer.html" title="class in io.micronaut.openapi.adoc.md">ToAsciiDocSerializer</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/visitor/OpenApiNormalizeUtils.html#normalizeContent(io.swagger.v3.oas.models.media.Content)" class="member-name-link">normalizeContent(Content)</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/OpenApiNormalizeUtils.html" title="class in io.micronaut.openapi.visitor">OpenApiNormalizeUtils</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/visitor/Utils.html#normalizeEnumValues(java.util.Map,java.util.Map)" class="member-name-link">normalizeEnumValues(Map&lt;CharSequence, Object&gt;, Map&lt;String, Class&lt;T&gt;&gt;)</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/Utils.html" title="class in io.micronaut.openapi.visitor">Utils</a></dt>
 <dd>
 <div class="block">Normalizes enum values stored in the map.</div>
+</dd>
+<dt><a href="io/micronaut/openapi/visitor/OpenApiNormalizeUtils.html#normalizeExamples(java.util.Map)" class="member-name-link">normalizeExamples(Map&lt;String, Example&gt;)</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/OpenApiNormalizeUtils.html" title="class in io.micronaut.openapi.visitor">OpenApiNormalizeUtils</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/visitor/OpenApiNormalizeUtils.html#normalizeOpenApi(io.swagger.v3.oas.models.OpenAPI)" class="member-name-link">normalizeOpenApi(OpenAPI)</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/OpenApiNormalizeUtils.html" title="class in io.micronaut.openapi.visitor">OpenApiNormalizeUtils</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/visitor/OpenApiNormalizeUtils.html#normalizeOperation(io.swagger.v3.oas.models.Operation)" class="member-name-link">normalizeOperation(Operation)</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/OpenApiNormalizeUtils.html" title="class in io.micronaut.openapi.visitor">OpenApiNormalizeUtils</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/visitor/OpenApiNormalizeUtils.html#normalizeSchema(io.swagger.v3.oas.models.media.Schema)" class="member-name-link">normalizeSchema(Schema&lt;?&gt;)</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/OpenApiNormalizeUtils.html" title="class in io.micronaut.openapi.visitor">OpenApiNormalizeUtils</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/visitor/OpenApiNormalizeUtils.html#normalizeSchemas(java.util.Map)" class="member-name-link">normalizeSchemas(Map&lt;String, Schema&gt;)</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/OpenApiNormalizeUtils.html" title="class in io.micronaut.openapi.visitor">OpenApiNormalizeUtils</a></dt>
+<dd>
+<div class="block">Sort schemas list in allOf block: schemas with ref must be first, next other schemas.</div>
 </dd>
 <dt><a href="io/micronaut/openapi/visitor/ConvertUtils.html#normalizeValue(java.lang.String,java.lang.String,java.lang.String,io.micronaut.inject.visitor.VisitorContext)" class="member-name-link">normalizeValue(String, String, String, VisitorContext)</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/ConvertUtils.html" title="class in io.micronaut.openapi.visitor">ConvertUtils</a></dt>
 <dd>&nbsp;</dd>
@@ -2628,6 +2652,10 @@ loadScripts(document, 'script');</script>
 </dd>
 <dt><a href="io/micronaut/openapi/swagger/core/jackson/mixin/OpenAPIMixin.html#%3Cinit%3E()" class="member-name-link">OpenAPIMixin()</a> - Constructor for class io.micronaut.openapi.swagger.core.jackson.mixin.<a href="io/micronaut/openapi/swagger/core/jackson/mixin/OpenAPIMixin.html" title="class in io.micronaut.openapi.swagger.core.jackson.mixin">OpenAPIMixin</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/visitor/OpenApiNormalizeUtils.html" class="type-name-link" title="class in io.micronaut.openapi.visitor">OpenApiNormalizeUtils</a> - Class in <a href="io/micronaut/openapi/visitor/package-summary.html">io.micronaut.openapi.visitor</a></dt>
+<dd>
+<div class="block">Normalization methods for openAPI obects.</div>
+</dd>
 <dt><a href="io/micronaut/openapi/postprocessors/OpenApiOperationsPostProcessor.html" class="type-name-link" title="class in io.micronaut.openapi.postprocessors">OpenApiOperationsPostProcessor</a> - Class in <a href="io/micronaut/openapi/postprocessors/package-summary.html">io.micronaut.openapi.postprocessors</a></dt>
 <dd>
 <div class="block">A helper class that post process OpenApi operations.</div>
@@ -3064,6 +3092,8 @@ loadScripts(document, 'script');</script>
 <dt><a href="io/micronaut/openapi/adoc/md/ToAsciiDocSerializer.html#references" class="member-name-link">references</a> - Variable in class io.micronaut.openapi.adoc.md.<a href="io/micronaut/openapi/adoc/md/ToAsciiDocSerializer.html" title="class in io.micronaut.openapi.adoc.md">ToAsciiDocSerializer</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/visitor/ContextUtils.html#remove(java.lang.String,io.micronaut.inject.visitor.VisitorContext)" class="member-name-link">remove(String, VisitorContext)</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/ContextUtils.html" title="class in io.micronaut.openapi.visitor">ContextUtils</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/visitor/OpenApiNormalizeUtils.html#removeEmtpyComponents(io.swagger.v3.oas.models.OpenAPI)" class="member-name-link">removeEmtpyComponents(OpenAPI)</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/OpenApiNormalizeUtils.html" title="class in io.micronaut.openapi.visitor">OpenApiNormalizeUtils</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/view/OpenApiViewConfig.html#render(java.nio.file.Path,io.micronaut.inject.visitor.VisitorContext)" class="member-name-link">render(Path, VisitorContext)</a> - Method in class io.micronaut.openapi.view.<a href="io/micronaut/openapi/view/OpenApiViewConfig.html" title="class in io.micronaut.openapi.view">OpenApiViewConfig</a></dt>
 <dd>
@@ -3561,6 +3591,8 @@ loadScripts(document, 'script');</script>
 <dt><a href="io/micronaut/openapi/generator/Formatting.SingleLineFormatter.html#%3Cinit%3E()" class="member-name-link">SingleLineFormatter()</a> - Constructor for class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/Formatting.SingleLineFormatter.html" title="class in io.micronaut.openapi.generator">Formatting.SingleLineFormatter</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/view/OpenApiViewConfig.html#SLASH" class="member-name-link">SLASH</a> - Static variable in class io.micronaut.openapi.view.<a href="io/micronaut/openapi/view/OpenApiViewConfig.html" title="class in io.micronaut.openapi.view">OpenApiViewConfig</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/visitor/OpenApiNormalizeUtils.html#sortComponent(io.swagger.v3.oas.models.Components,java.util.function.Function,java.util.function.BiConsumer)" class="member-name-link">sortComponent(Components, Function&lt;Components, Map&lt;String, T&gt;&gt;, BiConsumer&lt;Components, Map&lt;String, T&gt;&gt;)</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/OpenApiNormalizeUtils.html" title="class in io.micronaut.openapi.visitor">OpenApiNormalizeUtils</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/adoc/md/ToAsciiDocSerializer.html#source" class="member-name-link">source</a> - Variable in class io.micronaut.openapi.adoc.md.<a href="io/micronaut/openapi/adoc/md/ToAsciiDocSerializer.html" title="class in io.micronaut.openapi.adoc.md">ToAsciiDocSerializer</a></dt>
 <dd>&nbsp;</dd>
