@@ -111,6 +111,16 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="MicronautCodeGeneratorOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorOptionsBuilder</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withApiNamePrefix(java.lang.String)" class="member-name-link">withApiNamePrefix</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;apiNamePrefix)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block">Set the api name prefix.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="MicronautCodeGeneratorOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorOptionsBuilder</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withApiNameSuffix(java.lang.String)" class="member-name-link">withApiNameSuffix</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;apiNameSuffix)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block">Set the api name suffix.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="MicronautCodeGeneratorOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorOptionsBuilder</a></code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withApiPackage(java.lang.String)" class="member-name-link">withApiPackage</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;apiPackage)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Sets the package of the generated API classes.</div>
@@ -131,14 +141,34 @@ loadScripts(document, 'script');</script>
 <div class="block">Configure the date-time format.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="MicronautCodeGeneratorOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorOptionsBuilder</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withGenerateHttpResponseAlways(boolean)" class="member-name-link">withGenerateHttpResponseAlways</a><wbr>(boolean&nbsp;generateHttpResponseAlways)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withEnumNameMapping(java.util.Map)" class="member-name-link">withEnumNameMapping</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;&nbsp;enumNameMapping)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
-<div class="block">If true, the generated operation return types will be wrapped in HttpResponse.</div>
+<div class="block">Add the enum name mappings.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="MicronautCodeGeneratorOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorOptionsBuilder</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withGenerateHttpResponseWhereRequired(boolean)" class="member-name-link">withGenerateHttpResponseWhereRequired</a><wbr>(boolean&nbsp;generateHttpResponseWhereRequired)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withGenerateHttpResponseAlways(boolean)" class="member-name-link">withGenerateHttpResponseAlways</a><wbr>(boolean&nbsp;generateHttpResponseAlways)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block">If true, the generated operation return types will be wrapped in HttpResponse.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="MicronautCodeGeneratorOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorOptionsBuilder</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withGenerateHttpResponseWhereRequired(boolean)" class="member-name-link">withGenerateHttpResponseWhereRequired</a><wbr>(boolean&nbsp;generateHttpResponseWhereRequired)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Wrap the operations response in HttpResponse object where non-200 HTTP status codes or additional headers are defined.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="MicronautCodeGeneratorOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorOptionsBuilder</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withImportMapping(java.util.Map)" class="member-name-link">withImportMapping</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;&nbsp;importMapping)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block">Add the import mappings.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="MicronautCodeGeneratorOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorOptionsBuilder</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withInlineSchemaNameMapping(java.util.Map)" class="member-name-link">withInlineSchemaNameMapping</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;&nbsp;inlineSchemaNameMapping)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block">Add the inline schema name mappings.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="MicronautCodeGeneratorOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorOptionsBuilder</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withInlineSchemaOption(java.util.Map)" class="member-name-link">withInlineSchemaOption</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;&nbsp;inlineSchemaOption)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block">Add the inline schema options.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="MicronautCodeGeneratorOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorOptionsBuilder</a></code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withInvokerPackage(java.lang.String)" class="member-name-link">withInvokerPackage</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;invokerPackage)</code></div>
@@ -151,29 +181,59 @@ loadScripts(document, 'script');</script>
 <div class="block">Sets the generator language.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="MicronautCodeGeneratorOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorOptionsBuilder</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withModelPackage(java.lang.String)" class="member-name-link">withModelPackage</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;modelPackage)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withModelNameMapping(java.util.Map)" class="member-name-link">withModelNameMapping</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;&nbsp;modelNameMapping)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block">Add the model name mappings.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="MicronautCodeGeneratorOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorOptionsBuilder</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withModelNamePrefix(java.lang.String)" class="member-name-link">withModelNamePrefix</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;modelNamePrefix)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block">Set the model name prefix.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="MicronautCodeGeneratorOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorOptionsBuilder</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withModelNameSuffix(java.lang.String)" class="member-name-link">withModelNameSuffix</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;modelNameSuffix)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block">Set the model name suffix.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="MicronautCodeGeneratorOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorOptionsBuilder</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withModelPackage(java.lang.String)" class="member-name-link">withModelPackage</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;modelPackage)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Sets the package of the generated model classes.</div>
 </div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="MicronautCodeGeneratorOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorOptionsBuilder</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withNameMapping(java.util.Map)" class="member-name-link">withNameMapping</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;&nbsp;nameMapping)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block">Add the name mappings.</div>
+</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="MicronautCodeGeneratorOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorOptionsBuilder</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withOptional(boolean)" class="member-name-link">withOptional</a><wbr>(boolean&nbsp;optional)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withOpenapiNormalizer(java.util.Map)" class="member-name-link">withOpenapiNormalizer</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;&nbsp;openapiNormalizer)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block">Add the OpenAPi normalizer options.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="MicronautCodeGeneratorOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorOptionsBuilder</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withOptional(boolean)" class="member-name-link">withOptional</a><wbr>(boolean&nbsp;optional)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">If set to true, the generated code will make use of <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Optional.html" title="class or interface in java.util" class="external-link"><code>Optional</code></a>.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="MicronautCodeGeneratorOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorOptionsBuilder</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withParameterMappings(java.util.List)" class="member-name-link">withParameterMappings</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="ParameterMapping.html" title="class in io.micronaut.openapi.generator">ParameterMapping</a>&gt;&nbsp;parameterMappings)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="MicronautCodeGeneratorOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorOptionsBuilder</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withParameterMappings(java.util.List)" class="member-name-link">withParameterMappings</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="ParameterMapping.html" title="class in io.micronaut.openapi.generator">ParameterMapping</a>&gt;&nbsp;parameterMappings)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Add the parameter mappings.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="MicronautCodeGeneratorOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorOptionsBuilder</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withReactive(boolean)" class="member-name-link">withReactive</a><wbr>(boolean&nbsp;reactive)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="MicronautCodeGeneratorOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorOptionsBuilder</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withReactive(boolean)" class="member-name-link">withReactive</a><wbr>(boolean&nbsp;reactive)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">If set to true, the generator will use reactive types.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="MicronautCodeGeneratorOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorOptionsBuilder</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withResponseBodyMappings(java.util.List)" class="member-name-link">withResponseBodyMappings</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="ResponseBodyMapping.html" title="class in io.micronaut.openapi.generator">ResponseBodyMapping</a>&gt;&nbsp;responseBodyMappings)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="MicronautCodeGeneratorOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorOptionsBuilder</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withResponseBodyMappings(java.util.List)" class="member-name-link">withResponseBodyMappings</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="ResponseBodyMapping.html" title="class in io.micronaut.openapi.generator">ResponseBodyMapping</a>&gt;&nbsp;responseBodyMappings)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Add the response body mappings.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="MicronautCodeGeneratorOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorOptionsBuilder</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withSchemaMapping(java.util.Map)" class="member-name-link">withSchemaMapping</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;&nbsp;schemaMapping)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block">Add the schema mappings.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="MicronautCodeGeneratorOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorOptionsBuilder</a></code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withSerializationLibrary(io.micronaut.openapi.generator.SerializationLibraryKind)" class="member-name-link">withSerializationLibrary</a><wbr>(<a href="SerializationLibraryKind.html" title="enum class in io.micronaut.openapi.generator">SerializationLibraryKind</a>&nbsp;library)</code></div>
@@ -184,6 +244,11 @@ loadScripts(document, 'script');</script>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withTestFramework(io.micronaut.openapi.generator.MicronautCodeGeneratorEntryPoint.TestFramework)" class="member-name-link">withTestFramework</a><wbr>(<a href="MicronautCodeGeneratorEntryPoint.TestFramework.html" title="enum class in io.micronaut.openapi.generator">MicronautCodeGeneratorEntryPoint.TestFramework</a>&nbsp;testFramework)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Configures the test framework to use for generated tests.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="MicronautCodeGeneratorOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorOptionsBuilder</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withTypeMapping(java.util.Map)" class="member-name-link">withTypeMapping</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;&nbsp;typeMapping)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block">Add the type mappings.</div>
 </div>
 </div>
 </div>
@@ -285,6 +350,175 @@ loadScripts(document, 'script');</script>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>responseBodyMappings</code> - the response body mappings specified by a <a href="ResponseBodyMapping.html" title="class in io.micronaut.openapi.generator"><code>ResponseBodyMapping</code></a> objects</dd>
+<dt>Returns:</dt>
+<dd>this builder</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="withSchemaMapping(java.util.Map)">
+<h3>withSchemaMapping</h3>
+<div class="member-signature"><span class="return-type"><a href="MicronautCodeGeneratorOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorOptionsBuilder</a></span>&nbsp;<span class="element-name">withSchemaMapping</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;&nbsp;schemaMapping)</span></div>
+<div class="block">Add the schema mappings.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>schemaMapping</code> - the schema mappings</dd>
+<dt>Returns:</dt>
+<dd>this builder</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="withImportMapping(java.util.Map)">
+<h3>withImportMapping</h3>
+<div class="member-signature"><span class="return-type"><a href="MicronautCodeGeneratorOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorOptionsBuilder</a></span>&nbsp;<span class="element-name">withImportMapping</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;&nbsp;importMapping)</span></div>
+<div class="block">Add the import mappings.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>importMapping</code> - the import mappings</dd>
+<dt>Returns:</dt>
+<dd>this builder</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="withNameMapping(java.util.Map)">
+<h3>withNameMapping</h3>
+<div class="member-signature"><span class="return-type"><a href="MicronautCodeGeneratorOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorOptionsBuilder</a></span>&nbsp;<span class="element-name">withNameMapping</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;&nbsp;nameMapping)</span></div>
+<div class="block">Add the name mappings.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>nameMapping</code> - the name mappings</dd>
+<dt>Returns:</dt>
+<dd>this builder</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="withTypeMapping(java.util.Map)">
+<h3>withTypeMapping</h3>
+<div class="member-signature"><span class="return-type"><a href="MicronautCodeGeneratorOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorOptionsBuilder</a></span>&nbsp;<span class="element-name">withTypeMapping</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;&nbsp;typeMapping)</span></div>
+<div class="block">Add the type mappings.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>typeMapping</code> - the type mappings</dd>
+<dt>Returns:</dt>
+<dd>this builder</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="withEnumNameMapping(java.util.Map)">
+<h3>withEnumNameMapping</h3>
+<div class="member-signature"><span class="return-type"><a href="MicronautCodeGeneratorOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorOptionsBuilder</a></span>&nbsp;<span class="element-name">withEnumNameMapping</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;&nbsp;enumNameMapping)</span></div>
+<div class="block">Add the enum name mappings.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>enumNameMapping</code> - the enum name mappings</dd>
+<dt>Returns:</dt>
+<dd>this builder</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="withModelNameMapping(java.util.Map)">
+<h3>withModelNameMapping</h3>
+<div class="member-signature"><span class="return-type"><a href="MicronautCodeGeneratorOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorOptionsBuilder</a></span>&nbsp;<span class="element-name">withModelNameMapping</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;&nbsp;modelNameMapping)</span></div>
+<div class="block">Add the model name mappings.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>modelNameMapping</code> - the model name mappings</dd>
+<dt>Returns:</dt>
+<dd>this builder</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="withInlineSchemaNameMapping(java.util.Map)">
+<h3>withInlineSchemaNameMapping</h3>
+<div class="member-signature"><span class="return-type"><a href="MicronautCodeGeneratorOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorOptionsBuilder</a></span>&nbsp;<span class="element-name">withInlineSchemaNameMapping</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;&nbsp;inlineSchemaNameMapping)</span></div>
+<div class="block">Add the inline schema name mappings.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>inlineSchemaNameMapping</code> - the inline schema name mappings</dd>
+<dt>Returns:</dt>
+<dd>this builder</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="withInlineSchemaOption(java.util.Map)">
+<h3>withInlineSchemaOption</h3>
+<div class="member-signature"><span class="return-type"><a href="MicronautCodeGeneratorOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorOptionsBuilder</a></span>&nbsp;<span class="element-name">withInlineSchemaOption</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;&nbsp;inlineSchemaOption)</span></div>
+<div class="block">Add the inline schema options.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>inlineSchemaOption</code> - the inline schema options</dd>
+<dt>Returns:</dt>
+<dd>this builder</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="withOpenapiNormalizer(java.util.Map)">
+<h3>withOpenapiNormalizer</h3>
+<div class="member-signature"><span class="return-type"><a href="MicronautCodeGeneratorOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorOptionsBuilder</a></span>&nbsp;<span class="element-name">withOpenapiNormalizer</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;&nbsp;openapiNormalizer)</span></div>
+<div class="block">Add the OpenAPi normalizer options.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>openapiNormalizer</code> - the OpenAPi normalizer options</dd>
+<dt>Returns:</dt>
+<dd>this builder</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="withApiNamePrefix(java.lang.String)">
+<h3>withApiNamePrefix</h3>
+<div class="member-signature"><span class="return-type"><a href="MicronautCodeGeneratorOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorOptionsBuilder</a></span>&nbsp;<span class="element-name">withApiNamePrefix</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;apiNamePrefix)</span></div>
+<div class="block">Set the api name prefix.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>apiNamePrefix</code> - the api name prefix</dd>
+<dt>Returns:</dt>
+<dd>this builder</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="withApiNameSuffix(java.lang.String)">
+<h3>withApiNameSuffix</h3>
+<div class="member-signature"><span class="return-type"><a href="MicronautCodeGeneratorOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorOptionsBuilder</a></span>&nbsp;<span class="element-name">withApiNameSuffix</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;apiNameSuffix)</span></div>
+<div class="block">Set the api name suffix.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>apiNameSuffix</code> - the api name suffix</dd>
+<dt>Returns:</dt>
+<dd>this builder</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="withModelNamePrefix(java.lang.String)">
+<h3>withModelNamePrefix</h3>
+<div class="member-signature"><span class="return-type"><a href="MicronautCodeGeneratorOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorOptionsBuilder</a></span>&nbsp;<span class="element-name">withModelNamePrefix</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;modelNamePrefix)</span></div>
+<div class="block">Set the model name prefix.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>modelNamePrefix</code> - the model name prefix</dd>
+<dt>Returns:</dt>
+<dd>this builder</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="withModelNameSuffix(java.lang.String)">
+<h3>withModelNameSuffix</h3>
+<div class="member-signature"><span class="return-type"><a href="MicronautCodeGeneratorOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorOptionsBuilder</a></span>&nbsp;<span class="element-name">withModelNameSuffix</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;modelNameSuffix)</span></div>
+<div class="block">Set the model name suffix.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>modelNameSuffix</code> - the model name suffix</dd>
 <dt>Returns:</dt>
 <dd>this builder</dd>
 </dl>
