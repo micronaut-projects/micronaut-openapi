@@ -1,7 +1,7 @@
 
 {{#isNullable}}
     {{#generateHardNullable}}
-    @HardNullable
+    @Nullable(inherited = true)
     {{/generateHardNullable}}
     {{^generateHardNullable}}
     @Nullable
@@ -12,7 +12,7 @@
         {{#isReadOnly}}
             {{#vendorExtensions.isServer}}
                 {{#generateHardNullable}}
-    @HardNullable
+    @Nullable(inherited = true)
                 {{/generateHardNullable}}
                 {{^generateHardNullable}}
     @Nullable
@@ -25,7 +25,7 @@
     {{/required}}
     {{^required}}
         {{#generateHardNullable}}
-    @HardNullable
+    @Nullable(inherited = true)
         {{/generateHardNullable}}
         {{^generateHardNullable}}
     @Nullable

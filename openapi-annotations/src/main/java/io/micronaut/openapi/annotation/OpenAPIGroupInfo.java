@@ -23,6 +23,7 @@ import java.lang.annotation.Target;
 
 import io.micronaut.context.annotation.AliasFor;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.security.SecurityScheme;
 
 import static java.lang.annotation.RetentionPolicy.SOURCE;
 
@@ -54,5 +55,12 @@ public @interface OpenAPIGroupInfo {
     /**
      * @return OpenAPI object describing information about group.
      */
-    OpenAPIDefinition info();
+    OpenAPIDefinition info() default @OpenAPIDefinition;
+
+    /**
+     * @return Security schemes for OpenAPI group.
+     *
+     * @since 6.6.0
+     */
+    SecurityScheme[] securitySchemes() default {};
 }
