@@ -2387,10 +2387,8 @@ import io.micronaut.http.annotation.Body;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Post;
 import io.micronaut.http.annotation.Status;
-import io.micronaut.validation.Validated;
 
 @Controller("/v1/customers")
-@Validated
 class CustomersController {
 
     @org.jetbrains.annotations.NotNull
