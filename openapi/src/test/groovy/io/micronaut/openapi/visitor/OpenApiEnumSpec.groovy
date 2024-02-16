@@ -392,7 +392,6 @@ package test;
 import io.micronaut.core.annotation.Introspected;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
-import io.micronaut.validation.Validated;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @Controller
@@ -416,7 +415,6 @@ description = "Cloud Provider." +
     "\\n- NA" +
     "<br />Not applicable (Self hosting site)."
 )
-@Validated
 @Introspected
 enum MyEnum  {
 
