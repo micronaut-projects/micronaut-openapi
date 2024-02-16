@@ -1,6 +1,7 @@
 package io.micronaut.openapi.visitor
 
 import io.micronaut.ast.transform.test.AbstractBeanDefinitionSpec
+import io.micronaut.http.MediaType
 import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.media.Schema
 import spock.lang.Issue
@@ -198,5 +199,135 @@ public class MyBean {}
         openAPI.paths."/test1".post.requestBody.content."application/json".schema.type == 'object'
         openAPI.paths."/test1".post.requestBody.content."application/json".schema.additionalProperties == true
         openAPI.paths."/test1".post.requestBody.content."application/json".schema.default == null
+    }
+
+    void "test operation with content groovy"() {
+        when:
+        buildBeanDefinition("test.MyBean", '''
+package test;
+
+import groovy.transform.CompileStatic
+import io.micronaut.http.HttpStatus
+import io.micronaut.http.MediaType
+import io.micronaut.http.annotation.Controller
+import io.micronaut.http.annotation.Post
+import io.micronaut.http.annotation.Status
+import io.micronaut.http.multipart.CompletedFileUpload
+import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.media.Content
+import io.swagger.v3.oas.annotations.media.Encoding
+import io.swagger.v3.oas.annotations.media.ExampleObject
+import io.swagger.v3.oas.annotations.media.Schema
+import io.swagger.v3.oas.annotations.parameters.RequestBody
+import io.swagger.v3.oas.annotations.responses.ApiResponse
+
+@Controller('/file')
+@CompileStatic
+class FileController {
+
+    @Post(value = "/", consumes = MediaType.MULTIPART_FORM_DATA)
+    @Status(HttpStatus.NO_CONTENT)
+    @Operation(
+            operationId = 'UploadFile',
+            summary = 'Upload a file',
+            requestBody = @RequestBody(
+                    description = 'File request',
+                    content = @Content(
+                        mediaType = MediaType.MULTIPART_FORM_DATA,
+                        encoding = [
+                            @Encoding(
+                                name = "file",
+                                contentType = MediaType.APPLICATION_OCTET_STREAM
+                            )
+                        ],
+                        examples = [
+                            @ExampleObject(
+                                name = "example-1",
+                                summary = "sum",
+                                description = "this is description",
+                                value = "{\\"name\\":\\"Charlie\\"}")
+                        ],
+                        schema = @Schema(type = 'object'))
+            ),
+            responses = [
+                    @ApiResponse(responseCode = '204', description = 'OK'),
+            ]
+    )
+    void uploadFile(CompletedFileUpload file) {
+        assert file.bytes
+    }
+
+}
+
+@jakarta.inject.Singleton
+public class MyBean {}
+''')
+
+        OpenAPI openAPI = Utils.testReference
+
+        then:
+        openAPI.paths."/file".post.requestBody.content."multipart/form-data"
+        openAPI.paths."/file".post.requestBody.content."multipart/form-data".schema
+        openAPI.paths."/file".post.requestBody.content."multipart/form-data".encoding.file.contentType == MediaType.APPLICATION_OCTET_STREAM
+    }
+
+    void "test requestBody groovy"() {
+        when:
+        buildBeanDefinition("test.MyBean", '''
+package test
+
+import groovy.transform.CompileStatic
+import io.micronaut.http.HttpStatus
+import io.micronaut.http.MediaType
+import io.micronaut.http.annotation.Controller
+import io.micronaut.http.annotation.Post
+import io.micronaut.http.annotation.Status
+import io.micronaut.http.multipart.CompletedFileUpload
+import io.swagger.v3.oas.annotations.media.Content
+import io.swagger.v3.oas.annotations.media.Encoding
+import io.swagger.v3.oas.annotations.media.ExampleObject
+import io.swagger.v3.oas.annotations.media.Schema
+import io.swagger.v3.oas.annotations.parameters.RequestBody
+
+@Controller('/file')
+@CompileStatic
+class FileController {
+
+    @Post(value = "/", consumes = MediaType.MULTIPART_FORM_DATA)
+    @Status(HttpStatus.NO_CONTENT)
+    void uploadFile(@RequestBody(
+                    description = 'File request',
+                    content = @Content(
+                        mediaType = MediaType.MULTIPART_FORM_DATA,
+                        encoding = [
+                            @Encoding(
+                                name = "file",
+                                contentType = MediaType.APPLICATION_OCTET_STREAM
+                            )
+                        ],
+                        examples = [
+                            @ExampleObject(
+                                name = "example-1",
+                                summary = "sum",
+                                description = "this is description",
+                                value = "{\\"name\\":\\"Charlie\\"}")
+                        ],
+                        schema = @Schema(type = 'object'))
+            ) CompletedFileUpload file) {
+        assert file.bytes
+    }
+
+}
+
+@jakarta.inject.Singleton
+public class MyBean {}
+''')
+
+        OpenAPI openAPI = Utils.testReference
+
+        then:
+        openAPI.paths."/file".post.requestBody.content."multipart/form-data"
+        openAPI.paths."/file".post.requestBody.content."multipart/form-data".schema
+        openAPI.paths."/file".post.requestBody.content."multipart/form-data".encoding.file.contentType == MediaType.APPLICATION_OCTET_STREAM
     }
 }

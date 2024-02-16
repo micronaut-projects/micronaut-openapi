@@ -184,7 +184,7 @@ public class OpenApiControllerVisitor extends AbstractOpenApiEndpointVisitor imp
             return DEFAULT_MEDIA_TYPES;
         }
         return Arrays.stream(values)
-            .map(MediaType::of)
+            .map(Utils::getMediaType)
             .distinct()
             .toList();
     }

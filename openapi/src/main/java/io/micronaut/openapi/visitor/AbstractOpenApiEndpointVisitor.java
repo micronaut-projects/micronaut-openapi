@@ -131,6 +131,7 @@ import static io.micronaut.openapi.visitor.SchemaUtils.getOperationOnPathItem;
 import static io.micronaut.openapi.visitor.SchemaUtils.isIgnoredHeader;
 import static io.micronaut.openapi.visitor.SchemaUtils.setOperationOnPathItem;
 import static io.micronaut.openapi.visitor.Utils.DEFAULT_MEDIA_TYPES;
+import static io.micronaut.openapi.visitor.Utils.getMediaType;
 
 /**
  * A {@link io.micronaut.inject.visitor.TypeElementVisitor} the builds the Swagger model from Micronaut controllers at compile time.
@@ -486,14 +487,14 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         if (HttpMethod.permitsRequestBody(httpMethod) && !extraBodyParameters.isEmpty()) {
             if (requestBody == null) {
                 requestBody = new RequestBody();
-                Content content = new Content();
+                var content = new Content();
                 requestBody.setContent(content);
                 requestBody.setRequired(true);
                 swaggerOperation.setRequestBody(requestBody);
 
                 consumesMediaTypes = CollectionUtils.isEmpty(consumesMediaTypes) ? DEFAULT_MEDIA_TYPES : consumesMediaTypes;
                 consumesMediaTypes.forEach(mediaType -> {
-                    io.swagger.v3.oas.models.media.MediaType mt = new io.swagger.v3.oas.models.media.MediaType();
+                    var mt = new io.swagger.v3.oas.models.media.MediaType();
                     var schema = new Schema<>();
                     schema.setType(TYPE_OBJECT);
                     mt.setSchema(schema);
@@ -501,7 +502,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                 });
             }
         }
-        if (requestBody != null && !extraBodyParameters.isEmpty()) {
+        if (requestBody != null && requestBody.getContent() != null && !extraBodyParameters.isEmpty()) {
             requestBody.getContent().forEach((mediaTypeName, mediaType) -> {
                 var schema = mediaType.getSchema();
                 if (schema == null) {
@@ -523,7 +524,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                 }
                 for (TypedElement parameter : extraBodyParameters) {
                     if (!isRequestBodySchemaSet) {
-                        processBodyParameter(context, openAPI, javadocDescription, MediaType.of(mediaTypeName), schema, parameter);
+                        processBodyParameter(context, openAPI, javadocDescription, getMediaType(mediaTypeName), schema, parameter);
                     }
                     if (mediaTypeName.equals(MediaType.MULTIPART_FORM_DATA)) {
                         if (CollectionUtils.isNotEmpty(schema.getProperties())) {

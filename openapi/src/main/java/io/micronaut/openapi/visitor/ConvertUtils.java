@@ -61,10 +61,17 @@ import io.swagger.v3.oas.annotations.security.OAuthScope;
 import io.swagger.v3.oas.annotations.servers.Server;
 import io.swagger.v3.oas.annotations.servers.ServerVariable;
 import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.Operation;
+import io.swagger.v3.oas.models.examples.Example;
+import io.swagger.v3.oas.models.headers.Header;
 import io.swagger.v3.oas.models.media.Content;
+import io.swagger.v3.oas.models.media.Encoding;
 import io.swagger.v3.oas.models.media.MediaType;
 import io.swagger.v3.oas.models.media.Schema;
+import io.swagger.v3.oas.models.parameters.Parameter;
+import io.swagger.v3.oas.models.parameters.RequestBody;
 import io.swagger.v3.oas.models.responses.ApiResponse;
+import io.swagger.v3.oas.models.responses.ApiResponses;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 
@@ -110,7 +117,7 @@ public final class ConvertUtils {
         try {
             return ConvertUtils.treeToValue(node, type, context);
         } catch (JsonProcessingException e) {
-            warn("Error converting  [" + node + "]: to " + type + ": " + e.getMessage(), context);
+            warn("Error converting  [" + node + "]: to " + type + ":\n" + Utils.printStackTrace(e), context);
         }
         return null;
     }
@@ -255,27 +262,21 @@ public final class ConvertUtils {
      */
     public static <T> T treeToValue(JsonNode jn, Class<T> clazz, VisitorContext context) throws JsonProcessingException {
 
+        var fixed = false;
         T value;
         try {
             value = CONVERT_JSON_MAPPER.treeToValue(jn, clazz);
         } catch (Exception e) {
-            // fix for problem with groovy. Jackson throw exception with ApiResponse class
-            if (clazz == ApiResponse.class && jn.has("content")) {
-                var contentNode = jn.get("content");
-                ((ObjectNode) jn).set("content", null);
-                value = CONVERT_JSON_MAPPER.treeToValue(jn, clazz);
-                var result = new Content();
-                if (contentNode.isArray()) {
-                    for (var content : contentNode) {
-                        processMediaType(result, content);
-                    }
-                } else {
-                    processMediaType(result, contentNode);
-                }
-                ((ApiResponse) value).setContent(result);
+            // maybe exception with groovy
+            if (context.getLanguage() == VisitorContext.Language.GROOVY) {
+                value = fixForGroovy(jn, clazz, null);
+                fixed = true;
             } else {
                 throw e;
             }
+        }
+        if (!fixed && context.getLanguage() == VisitorContext.Language.GROOVY) {
+            value = fixForGroovy(jn, clazz, null);
         }
 
         if (value == null) {
@@ -315,6 +316,112 @@ public final class ConvertUtils {
                 }
             }
             beanMap.put("allowableValues", allowableValues);
+        }
+
+        return value;
+    }
+
+    private static <T> Map<String, T> deserMap(String name, JsonNode jn, Class<T> clazz) throws JsonProcessingException {
+
+        var mapNode = jn.get(name);
+        if (mapNode == null) {
+            return null;
+        }
+        ((ObjectNode) jn).remove(name);
+
+        var iter = mapNode.fieldNames();
+        var result = new HashMap<String, T>();
+        while (iter.hasNext()) {
+            var entryKey = iter.next();
+            var objectNode = mapNode.get(entryKey);
+            var object = CONVERT_JSON_MAPPER.treeToValue(objectNode, clazz);
+            result.put(entryKey, object);
+        }
+        return !result.isEmpty() ? result : null;
+    }
+
+    private static <T> T fixForGroovy(JsonNode jn, Class<T> clazz, Exception e) throws JsonProcessingException {
+
+        // fix for problem with groovy. Jackson throw exception with Operation class with content and mediaType
+        // see https://github.com/micronaut-projects/micronaut-openapi/issues/1418
+        if (clazz == Operation.class) {
+
+            var requestBodyNode = jn.get("requestBody");
+            ((ObjectNode) jn).remove("requestBody");
+            T value = CONVERT_JSON_MAPPER.treeToValue(jn, clazz);
+            var requestBody = fixContentForGroovy(requestBodyNode, RequestBody.class);
+            ((Operation) value).setRequestBody(requestBody);
+
+            var responsesNode = jn.get("responses");
+            ((ObjectNode) jn).remove("responses");
+            ApiResponses responses = null;
+            if (responsesNode != null && !responsesNode.isEmpty()) {
+                responses = new ApiResponses();
+                var iter = responsesNode.fields();
+                while (iter.hasNext()) {
+                    var entry = iter.next();
+                    responses.put(entry.getKey(), fixContentForGroovy(entry.getValue(), ApiResponse.class));
+                }
+            }
+            ((Operation) value).setResponses(responses);
+            return value;
+        } else if (clazz == ApiResponse.class
+            || clazz == Header.class
+            || clazz == Parameter.class
+            || clazz == RequestBody.class) {
+            return fixContentForGroovy(jn, clazz);
+        } else {
+            return CONVERT_JSON_MAPPER.treeToValue(jn, clazz);
+        }
+    }
+
+    private static <T> T fixContentForGroovy(JsonNode parentNode, Class<T> clazz) throws JsonProcessingException {
+        if (parentNode == null) {
+            return null;
+        }
+        Map<String, Example> examples = null;
+        Map<String, Encoding> encoding = null;
+        Map<String, Object> extensions = null;
+        Schema<?> schema = null;
+        JsonNode mediaTypeNode = null;
+
+        var contentNode = parentNode.get("content");
+        if (contentNode != null) {
+            examples = deserMap("examples", contentNode, Example.class);
+            encoding = deserMap("encoding", contentNode, Encoding.class);
+            extensions = deserMap("extensions", contentNode, Object.class);
+            var schemaNode = contentNode.get("schema");
+            if (schemaNode != null) {
+                schema = CONVERT_JSON_MAPPER.treeToValue(schemaNode, Schema.class);
+            }
+
+            mediaTypeNode = contentNode.get("mediaType");
+            ((ObjectNode) contentNode).remove("mediaType");
+        }
+        var value = CONVERT_JSON_MAPPER.treeToValue(parentNode, clazz);
+        Content content = null;
+        if (value instanceof ApiResponse apiResponse) {
+            content = apiResponse.getContent();
+        } else if (value instanceof Header header) {
+            content = header.getContent();
+        } else if (value instanceof Parameter parameter) {
+            content = parameter.getContent();
+        } else if (value instanceof RequestBody requestBody) {
+            content = requestBody.getContent();
+        }
+
+        if (content != null) {
+            var mediaType = content.get("schema");
+            content.remove("schema");
+            if (mediaType == null) {
+                mediaType = new MediaType();
+            }
+            var contentType = mediaTypeNode != null ? mediaTypeNode.textValue() : io.micronaut.http.MediaType.APPLICATION_JSON;
+            content.put(contentType, mediaType);
+            mediaType.setExamples(examples);
+            mediaType.setEncoding(encoding);
+            mediaType.setExtensions(extensions);
+            mediaType.setSchema(schema);
         }
 
         return value;
