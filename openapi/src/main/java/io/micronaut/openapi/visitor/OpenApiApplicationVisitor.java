@@ -49,6 +49,8 @@ import io.micronaut.inject.ast.MethodElement;
 import io.micronaut.inject.visitor.TypeElementVisitor;
 import io.micronaut.inject.visitor.VisitorContext;
 import io.micronaut.openapi.OpenApiUtils;
+import io.micronaut.openapi.annotation.OpenAPIGroupInfo;
+import io.micronaut.openapi.annotation.OpenAPIGroupInfos;
 import io.micronaut.openapi.postprocessors.JacksonDiscriminatorPostProcessor;
 import io.micronaut.openapi.postprocessors.OpenApiOperationsPostProcessor;
 import io.micronaut.openapi.view.OpenApiViewConfig;
@@ -107,6 +109,7 @@ import static io.micronaut.openapi.visitor.OpenApiNormalizeUtils.removeEmtpyComp
 import static io.micronaut.openapi.visitor.SchemaUtils.copyOpenApi;
 import static io.micronaut.openapi.visitor.SchemaUtils.getOperationOnPathItem;
 import static io.micronaut.openapi.visitor.SchemaUtils.setOperationOnPathItem;
+import static io.micronaut.openapi.visitor.Utils.resolveComponents;
 import static io.swagger.v3.oas.models.Components.COMPONENTS_SCHEMAS_REF;
 
 /**
@@ -115,7 +118,7 @@ import static io.swagger.v3.oas.models.Components.COMPONENTS_SCHEMAS_REF;
  * @author graemerocher
  * @since 1.0
  */
-public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements TypeElementVisitor<OpenAPIDefinition, Object> {
+public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements TypeElementVisitor<Object, Object> {
 
     private ClassElement classElement;
     private int visitedElements = -1;
@@ -128,10 +131,14 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
     @Override
     public void visitClass(ClassElement element, VisitorContext context) {
         try {
-            incrementVisitedElements(context);
             if (!isOpenApiEnabled(context) || !isSpecGenerationEnabled(context)) {
                 return;
             }
+            if (ignore(element, context)) {
+                return;
+            }
+            incrementVisitedElements(context);
+
             info("Generating OpenAPI Documentation", context);
             OpenAPI openApi = readOpenApi(element, context);
 
@@ -185,6 +192,13 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         } catch (Throwable t) {
             warn("Error with processing class:\n" + Utils.printStackTrace(t), context, classElement);
         }
+    }
+
+    private boolean ignore(ClassElement element, VisitorContext context) {
+
+        return !element.isAnnotationPresent(OpenAPIDefinition.class)
+            && !element.isAnnotationPresent(OpenAPIGroupInfo.class)
+            && !element.isAnnotationPresent(OpenAPIGroupInfos.class);
     }
 
     /**
@@ -474,10 +488,10 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             return Collections.singletonMap(Pair.NULL_STRING_PAIR, new OpenApiInfo(openApi));
         }
 
-        List<EndpointInfo> commonEndpoints = new ArrayList<>();
+        var commonEndpoints = new ArrayList<EndpointInfo>();
 
         // key version, groupName
-        Map<Pair<String, String>, OpenApiInfo> result = new HashMap<>();
+        var result = new HashMap<Pair<String, String>, OpenApiInfo>();
 
         for (List<EndpointInfo> endpointInfos : endpointInfosMap.values()) {
             for (EndpointInfo endpointInfo : endpointInfos) {
@@ -510,13 +524,13 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                 continue;
             }
 
-            OpenAPI openAPI = entry.getValue().getOpenApi();
+            OpenAPI groupOpenApi = entry.getValue().getOpenApi();
 
             for (EndpointInfo commonEndpoint : commonEndpoints) {
                 if (CollectionUtils.isNotEmpty(commonEndpoint.getExcludedGroups()) && commonEndpoint.getExcludedGroups().contains(group)) {
                     continue;
                 }
-                addOperation(commonEndpoint, openAPI);
+                addOperation(commonEndpoint, groupOpenApi);
             }
         }
 
@@ -541,8 +555,9 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         setOperationOnPathItem(pathItem, endpointInfo.getHttpMethod(), SchemaUtils.mergeOperations(operation, endpointInfo.getOperation()));
     }
 
-    private OpenAPI addOpenApiInfo(String group, String version, OpenAPI openApi, Map<Pair<String, String>,
-        OpenApiInfo> openApiInfoMap, VisitorContext context) {
+    private OpenAPI addOpenApiInfo(String group, String version, OpenAPI openApi,
+                                   Map<Pair<String, String>, OpenApiInfo> openApiInfoMap,
+                                   VisitorContext context) {
         GroupProperties groupProperties = getGroupProperties(group, context);
         boolean hasGroupProperties = groupProperties != null;
 
@@ -586,8 +601,23 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                 newOpenApi.setExternalDocs(openApiCopy.getExternalDocs());
             }
 
-            newOpenApi.setComponents(openApiCopy.getComponents());
+            // if we have SecuritySchemes specified only for group
+            var groupSecuritySchemes = newOpenApi.getComponents() != null ? newOpenApi.getComponents().getSecuritySchemes() : null;
+            if (CollectionUtils.isNotEmpty(groupSecuritySchemes)
+                && openApiCopy.getComponents() != null
+                && CollectionUtils.isNotEmpty(openApiCopy.getComponents().getSecuritySchemes())) {
 
+                for (var entry : openApiCopy.getComponents().getSecuritySchemes().entrySet()) {
+                    if (!groupSecuritySchemes.containsKey(entry.getKey())) {
+                        groupSecuritySchemes.put(entry.getKey(), entry.getValue());
+                    }
+                }
+            }
+
+            newOpenApi.setComponents(openApiCopy.getComponents());
+            if (CollectionUtils.isNotEmpty(groupSecuritySchemes)) {
+                resolveComponents(newOpenApi).setSecuritySchemes(groupSecuritySchemes);
+            }
         } else {
             newOpenApi = openApiInfo.getOpenApi();
         }

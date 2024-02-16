@@ -48,6 +48,7 @@ import io.micronaut.core.annotation.Nullable;
 import io.micronaut.core.beans.BeanMap;
 import io.micronaut.core.util.ArrayUtils;
 import io.micronaut.core.util.CollectionUtils;
+import io.micronaut.core.util.StringUtils;
 import io.micronaut.inject.ast.ClassElement;
 import io.micronaut.inject.ast.Element;
 import io.micronaut.inject.ast.ElementQuery;
@@ -56,13 +57,16 @@ import io.micronaut.inject.ast.MethodElement;
 import io.micronaut.inject.visitor.VisitorContext;
 import io.micronaut.openapi.swagger.core.util.PrimitiveType;
 import io.swagger.v3.oas.annotations.extensions.Extension;
+import io.swagger.v3.oas.annotations.security.OAuthScope;
 import io.swagger.v3.oas.annotations.servers.Server;
 import io.swagger.v3.oas.annotations.servers.ServerVariable;
+import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.media.Content;
 import io.swagger.v3.oas.models.media.MediaType;
 import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
+import io.swagger.v3.oas.models.security.SecurityScheme;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -75,6 +79,7 @@ import static io.micronaut.openapi.OpenApiUtils.JSON_MAPPER;
 import static io.micronaut.openapi.visitor.ContextUtils.warn;
 import static io.micronaut.openapi.visitor.SchemaUtils.TYPE_OBJECT;
 import static io.micronaut.openapi.visitor.SchemaUtils.processExtensions;
+import static io.micronaut.openapi.visitor.Utils.resolveComponents;
 
 /**
  * Convert utilities methods.
@@ -124,7 +129,7 @@ public final class ConvertUtils {
     }
 
     public static Map<CharSequence, Object> toValueMap(Map<CharSequence, Object> values, VisitorContext context) {
-        Map<CharSequence, Object> newValues = new HashMap<>(values.size());
+        var newValues = new HashMap<CharSequence, Object>(values.size());
         for (Map.Entry<CharSequence, Object> entry : values.entrySet()) {
             CharSequence key = entry.getKey();
             Object value = entry.getValue();
@@ -171,6 +176,9 @@ public final class ConvertUtils {
                                     servers.add(variables);
                                 }
                                 newValues.put(key, servers);
+                            } else if (OAuthScope.class.getName().equals(annotationName)) {
+                                Map<String, String> params = toTupleSubMap(a, "name", "description");
+                                newValues.put(key, params);
                             } else if (ServerVariable.class.getName().equals(annotationName)) {
                                 Map<String, Map<CharSequence, Object>> variables = new LinkedHashMap<>();
                                 for (Object o : a) {
@@ -342,6 +350,80 @@ public final class ConvertUtils {
             // Ignore
         }
         return Optional.empty();
+    }
+
+    public static void addSecuritySchemes(OpenAPI openApi,
+                                          List<AnnotationValue<io.swagger.v3.oas.annotations.security.SecurityScheme>> values,
+                                          VisitorContext context) {
+        for (var securityRequirementAnnValue : values) {
+
+            final Map<CharSequence, Object> map = toValueMap(securityRequirementAnnValue.getValues(), context);
+
+            var name = securityRequirementAnnValue.stringValue("name").orElse(null);
+            if (StringUtils.isEmpty(name)) {
+                continue;
+            }
+            if (map.containsKey("paramName")) {
+                map.put("name", map.remove("paramName"));
+            }
+
+            Utils.normalizeEnumValues(map, CollectionUtils.mapOf("type", SecurityScheme.Type.class, "in", SecurityScheme.In.class));
+
+            String type = (String) map.get("type");
+            if (!SecurityScheme.Type.APIKEY.toString().equals(type)) {
+                removeAndWarnSecSchemeProp(map, "name", context, false);
+                removeAndWarnSecSchemeProp(map, "in", context);
+            }
+            if (!SecurityScheme.Type.OAUTH2.toString().equals(type)) {
+                removeAndWarnSecSchemeProp(map, "flows", context);
+            }
+            if (!SecurityScheme.Type.OPENIDCONNECT.toString().equals(type)) {
+                removeAndWarnSecSchemeProp(map, "openIdConnectUrl", context);
+            }
+            if (!SecurityScheme.Type.HTTP.toString().equals(type)) {
+                removeAndWarnSecSchemeProp(map, "scheme", context);
+                removeAndWarnSecSchemeProp(map, "bearerFormat", context);
+            }
+
+            if (SecurityScheme.Type.HTTP.toString().equals(type)) {
+                if (!map.containsKey("scheme")) {
+                    warn("Can't use http security scheme without 'scheme' property", context);
+                } else if (!map.get("scheme").equals("bearer") && map.containsKey("bearerFormat")) {
+                    warn("Should NOT have a `bearerFormat` property without `scheme: bearer` being set", context);
+                }
+            }
+
+            if (map.containsKey("ref") || map.containsKey("$ref")) {
+                Object ref = map.get("ref");
+                if (ref == null) {
+                    ref = map.get("$ref");
+                }
+                map.clear();
+                map.put("$ref", ref);
+            }
+
+            try {
+                JsonNode node = toJson(map, context);
+                SecurityScheme securityScheme = ConvertUtils.treeToValue(node, SecurityScheme.class, context);
+                if (securityScheme != null) {
+                    resolveExtensions(node).ifPresent(extensions -> BeanMap.of(securityScheme).put("extensions", extensions));
+                    resolveComponents(openApi).addSecuritySchemes(name, securityScheme);
+                }
+            } catch (JsonProcessingException e) {
+                // ignore
+            }
+        }
+    }
+
+    private static void removeAndWarnSecSchemeProp(Map<CharSequence, Object> map, String prop, VisitorContext context) {
+        removeAndWarnSecSchemeProp(map, prop, context, true);
+    }
+
+    private static void removeAndWarnSecSchemeProp(Map<CharSequence, Object> map, String prop, VisitorContext context, boolean withWarn) {
+        if (map.containsKey(prop) && withWarn) {
+            warn("'" + prop + "' property can't set for securityScheme with type " + map.get("type") + ". Skip it", context);
+        }
+        map.remove(prop);
     }
 
     /**
@@ -557,5 +639,18 @@ public final class ConvertUtils {
         }
 
         return valueStr;
+    }
+
+    public static Map<String, String> toTupleSubMap(Object[] a, String entryKey, String entryValue) {
+        var params = new LinkedHashMap<String, String>();
+        for (Object o : a) {
+            AnnotationValue<?> sv = (AnnotationValue<?>) o;
+            final Optional<String> n = sv.stringValue(entryKey);
+            final Optional<String> expr = sv.stringValue(entryValue);
+            if (n.isPresent() && expr.isPresent()) {
+                params.put(n.get(), expr.get());
+            }
+        }
+        return params;
     }
 }

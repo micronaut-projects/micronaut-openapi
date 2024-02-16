@@ -101,6 +101,7 @@ import io.swagger.v3.oas.annotations.media.Schema.AccessMode;
 import io.swagger.v3.oas.annotations.media.Schema.AdditionalPropertiesValue;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.OAuthScope;
+import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import io.swagger.v3.oas.annotations.servers.Server;
 import io.swagger.v3.oas.annotations.servers.ServerVariable;
 import io.swagger.v3.oas.models.Components;
@@ -114,7 +115,6 @@ import io.swagger.v3.oas.models.media.MapSchema;
 import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.media.StringSchema;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
-import io.swagger.v3.oas.models.security.SecurityScheme;
 import io.swagger.v3.oas.models.tags.Tag;
 
 import com.fasterxml.jackson.annotation.JsonAnySetter;
@@ -136,8 +136,8 @@ import static io.micronaut.openapi.visitor.ConfigUtils.getSchemaDecoration;
 import static io.micronaut.openapi.visitor.ConfigUtils.isJsonViewDefaultInclusion;
 import static io.micronaut.openapi.visitor.ContextUtils.warn;
 import static io.micronaut.openapi.visitor.ConvertUtils.parseJsonString;
-import static io.micronaut.openapi.visitor.ConvertUtils.resolveExtensions;
 import static io.micronaut.openapi.visitor.ConvertUtils.setDefaultValueObject;
+import static io.micronaut.openapi.visitor.ConvertUtils.toTupleSubMap;
 import static io.micronaut.openapi.visitor.ElementUtils.isElementNotNullable;
 import static io.micronaut.openapi.visitor.ElementUtils.isFileUpload;
 import static io.micronaut.openapi.visitor.ElementUtils.isNullable;
@@ -279,11 +279,11 @@ abstract class AbstractOpenApiVisitor {
             openAPI.setPaths(paths);
         }
 
-        Map<String, List<PathItem>> resultPathItemsMap = new HashMap<>();
+        var resultPathItemsMap = new HashMap<String, List<PathItem>>();
 
         for (UriMatchTemplate matchTemplate : matchTemplates) {
 
-            StringBuilder result = new StringBuilder();
+            var result = new StringBuilder();
 
             boolean optionalPathVar = false;
             boolean varProcess = false;
@@ -347,10 +347,10 @@ abstract class AbstractOpenApiVisitor {
                 resultPath = contextPath + resultPath;
             }
 
-            Map<Integer, String> finalPaths = new HashMap<>();
+            var finalPaths = new HashMap<Integer, String>();
             finalPaths.put(-1, resultPath);
             if (CollectionUtils.isNotEmpty(matchTemplate.getVariables())) {
-                List<String> optionalVars = new ArrayList<>();
+                var optionalVars = new ArrayList<String>();
                 // need check not required path variables
                 for (UriMatchVariable var : matchTemplate.getVariables()) {
                     if (var.isQuery() || !var.isOptional() || var.isExploded()) {
@@ -388,13 +388,14 @@ abstract class AbstractOpenApiVisitor {
     }
 
     private List<String> addOptionalVars(List<String> paths, String var, int level) {
-        List<String> additionalPaths = new ArrayList<>(paths);
+        var additionalPaths = new ArrayList<>(paths);
         if (paths.isEmpty()) {
             additionalPaths.add("/{" + var + '}');
-        } else {
-            for (String path : paths) {
-                additionalPaths.add(path + "/{" + var + '}');
-            }
+            return additionalPaths;
+        }
+
+        for (String path : paths) {
+            additionalPaths.add(path + "/{" + var + '}');
         }
         return additionalPaths;
     }
@@ -409,7 +410,7 @@ abstract class AbstractOpenApiVisitor {
      * @return The map
      */
     protected Map<CharSequence, Object> toValueMap(Map<CharSequence, Object> values, VisitorContext context, @Nullable ClassElement jsonViewClass) {
-        Map<CharSequence, Object> newValues = new HashMap<>(values.size());
+        var newValues = new HashMap<CharSequence, Object>(values.size());
         for (Map.Entry<CharSequence, Object> entry : values.entrySet()) {
             CharSequence key = entry.getKey();
             Object value = entry.getValue();
@@ -721,19 +722,6 @@ abstract class AbstractOpenApiVisitor {
             ));
         }
         return valueMap;
-    }
-
-    private Map<String, String> toTupleSubMap(Object[] a, String entryKey, String entryValue) {
-        Map<String, String> params = new LinkedHashMap<>();
-        for (Object o : a) {
-            AnnotationValue<?> sv = (AnnotationValue<?>) o;
-            final Optional<String> n = sv.stringValue(entryKey);
-            final Optional<String> expr = sv.stringValue(entryValue);
-            if (n.isPresent() && expr.isPresent()) {
-                params.put(n.get(), expr.get());
-            }
-        }
-        return params;
     }
 
     private boolean isTypeNullable(ClassElement type) {
@@ -2638,84 +2626,16 @@ abstract class AbstractOpenApiVisitor {
     }
 
     /**
-     * Processes {@link io.swagger.v3.oas.annotations.security.SecurityScheme}
+     * Processes {@link SecurityScheme}
      * annotations.
      *
      * @param element The element
      * @param context The visitor context
      */
     protected void processSecuritySchemes(ClassElement element, VisitorContext context) {
-        final List<AnnotationValue<io.swagger.v3.oas.annotations.security.SecurityScheme>> values = element
-            .getAnnotationValuesByType(io.swagger.v3.oas.annotations.security.SecurityScheme.class);
-        final OpenAPI openAPI = Utils.resolveOpenApi(context);
-        for (AnnotationValue<io.swagger.v3.oas.annotations.security.SecurityScheme> securityRequirementAnnotationValue : values) {
-
-            final Map<CharSequence, Object> map = toValueMap(securityRequirementAnnotationValue.getValues(), context, null);
-
-            securityRequirementAnnotationValue.stringValue("name")
-                .ifPresent(name -> {
-                    if (map.containsKey("paramName")) {
-                        map.put("name", map.remove("paramName"));
-                    }
-
-                    Utils.normalizeEnumValues(map, CollectionUtils.mapOf("type", SecurityScheme.Type.class, "in", SecurityScheme.In.class));
-
-                    String type = (String) map.get("type");
-                    if (!SecurityScheme.Type.APIKEY.toString().equals(type)) {
-                        removeAndWarnSecSchemeProp(map, "name", context, false);
-                        removeAndWarnSecSchemeProp(map, "in", context);
-                    }
-                    if (!SecurityScheme.Type.OAUTH2.toString().equals(type)) {
-                        removeAndWarnSecSchemeProp(map, "flows", context);
-                    }
-                    if (!SecurityScheme.Type.OPENIDCONNECT.toString().equals(type)) {
-                        removeAndWarnSecSchemeProp(map, "openIdConnectUrl", context);
-                    }
-                    if (!SecurityScheme.Type.HTTP.toString().equals(type)) {
-                        removeAndWarnSecSchemeProp(map, "scheme", context);
-                        removeAndWarnSecSchemeProp(map, "bearerFormat", context);
-                    }
-
-                    if (SecurityScheme.Type.HTTP.toString().equals(type)) {
-                        if (!map.containsKey("scheme")) {
-                            warn("Can't use http security scheme without 'scheme' property", context);
-                        } else if (!map.get("scheme").equals("bearer") && map.containsKey("bearerFormat")) {
-                            warn("Should NOT have a `bearerFormat` property without `scheme: bearer` being set", context);
-                        }
-                    }
-
-                    if (map.containsKey("ref") || map.containsKey("$ref")) {
-                        Object ref = map.get("ref");
-                        if (ref == null) {
-                            ref = map.get("$ref");
-                        }
-                        map.clear();
-                        map.put("$ref", ref);
-                    }
-
-                    try {
-                        JsonNode node = toJson(map, context, null);
-                        SecurityScheme securityScheme = ConvertUtils.treeToValue(node, SecurityScheme.class, context);
-                        if (securityScheme != null) {
-                            resolveExtensions(node).ifPresent(extensions -> BeanMap.of(securityScheme).put("extensions", extensions));
-                            resolveComponents(openAPI).addSecuritySchemes(name, securityScheme);
-                        }
-                    } catch (JsonProcessingException e) {
-                        // ignore
-                    }
-                });
-        }
-    }
-
-    private void removeAndWarnSecSchemeProp(Map<CharSequence, Object> map, String prop, VisitorContext context) {
-        removeAndWarnSecSchemeProp(map, prop, context, true);
-    }
-
-    private void removeAndWarnSecSchemeProp(Map<CharSequence, Object> map, String prop, VisitorContext context, boolean withWarn) {
-        if (map.containsKey(prop) && withWarn) {
-            warn("'" + prop + "' property can't set for securityScheme with type " + map.get("type") + ". Skip it", context);
-        }
-        map.remove(prop);
+        var values = element.getAnnotationValuesByType(SecurityScheme.class);
+        final OpenAPI openApi = Utils.resolveOpenApi(context);
+        ConvertUtils.addSecuritySchemes(openApi, values, context);
     }
 
     /**
