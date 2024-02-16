@@ -33,6 +33,7 @@ import io.micronaut.inject.visitor.VisitorContext;
 import io.micronaut.openapi.annotation.OpenAPIGroupInfo;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import io.swagger.v3.oas.models.OpenAPI;
 
 import static io.micronaut.openapi.visitor.ConfigUtils.isOpenApiEnabled;
@@ -126,6 +127,11 @@ public class OpenApiGroupInfoVisitor implements TypeElementVisitor<Object, Objec
                 securityRequirements.add(ConvertUtils.mapToSecurityRequirement(securityRequirementAnn));
             }
             openApi.setSecurity(securityRequirements);
+
+            var securitySchemeAnns = infoAnn.getAnnotations("securitySchemes", SecurityScheme.class);
+            if (CollectionUtils.isNotEmpty(securitySchemeAnns)) {
+                ConvertUtils.addSecuritySchemes(openApi, securitySchemeAnns, context);
+            }
 
             for (var groupName : infoAnn.stringValues("names")) {
                 openApis.put(groupName, openApi);
