@@ -60,6 +60,13 @@ public class GeneratorMain {
         List<ResponseBodyMapping> responseBodyMappings =
             parseResponseBodyMappings(args[5]);
 
+        Map<String, String> nameMapping = parseNameMapping(args[9]);
+
+        String apiPrefix = args[10];
+        String apiSuffix = args[11];
+        String modelPrefix = args[12];
+        String modelSuffix = args[13];
+
         MicronautCodeGeneratorEntryPoint.OutputKind[] outputKinds
             = Arrays.stream(args[3].split(","))
             .map(MicronautCodeGeneratorEntryPoint.OutputKind::of)
@@ -77,9 +84,14 @@ public class GeneratorMain {
                     .withBeanValidation(true)
                     .withOptional(true)
                     .withReactive(true)
+                    .withApiNamePrefix(apiPrefix)
+                    .withApiNameSuffix(apiSuffix)
+                    .withModelNamePrefix(modelPrefix)
+                    .withModelNameSuffix(modelSuffix)
                     .withTestFramework(lang == JAVA ? MicronautCodeGeneratorEntryPoint.TestFramework.SPOCK : MicronautCodeGeneratorEntryPoint.TestFramework.JUNIT5)
                     .withParameterMappings(parameterMappings)
-                    .withResponseBodyMappings(responseBodyMappings);
+                    .withResponseBodyMappings(responseBodyMappings)
+                    .withNameMapping(nameMapping);
             });
         if (server) {
             if (lang == GeneratorLanguage.KOTLIN) {
@@ -136,6 +148,10 @@ public class GeneratorMain {
         )).toList();
     }
 
+    private static Map<String, String> parseNameMapping(String string) {
+        return parseMap(string);
+    }
+
     private static List<Map<String, String>> parseListOfMaps(String string) {
         List<Map<String, String>> result = new ArrayList<>();
         if (string.isBlank()) {
@@ -178,6 +194,38 @@ public class GeneratorMain {
                 assert string.charAt(i) == ',';
                 ++i;
             }
+        }
+        assert i == string.length() - 1;
+
+        return result;
+    }
+
+    private static Map<String, String> parseMap(String string) {
+        var result = new HashMap<String, String>();
+        if (string.isBlank()) {
+            return result;
+        }
+
+        assert string.charAt(0) == '{';
+        int i = 1;
+
+        int endIndex = string.indexOf('}', i);
+
+        while (i < endIndex) {
+            if (string.charAt(i) == ' ') {
+                ++i;
+            }
+            int nameIndex = string.indexOf('=', i);
+            String name = string.substring(i, nameIndex);
+            i = nameIndex + 1;
+            int valueIndex = string.indexOf(',', i);
+            if (endIndex < valueIndex || valueIndex == -1) {
+                valueIndex = endIndex;
+            }
+            String value = string.substring(i, valueIndex);
+            i = valueIndex + 1;
+
+            result.put(name, value);
         }
         assert i == string.length() - 1;
 

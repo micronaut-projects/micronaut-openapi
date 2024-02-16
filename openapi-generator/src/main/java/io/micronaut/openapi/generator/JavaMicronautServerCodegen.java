@@ -78,7 +78,7 @@ public class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen<Jav
         apiDocPath = "docs/controllers";
 
         generatorMetadata = GeneratorMetadata.newBuilder(generatorMetadata)
-            .stability(Stability.BETA)
+            .stability(Stability.STABLE)
             .build();
         additionalProperties.put("server", "true");
 
@@ -98,6 +98,8 @@ public class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen<Jav
         cliOptions.add(CliOption.newBoolean(OPT_GENERATE_STREAMING_FILE_UPLOAD, "Whether to generate StreamingFileUpload type for file request body", generateStreamingFileUpload));
         cliOptions.add(CliOption.newBoolean(OPT_AOT, "Generate compatible code with micronaut-aot", aot));
 
+        setApiNamePrefix(API_PREFIX);
+        setApiNameSuffix(API_SUFFIX);
 
         // Set the type mappings
         // It could be also StreamingFileUpload
@@ -197,8 +199,6 @@ public class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen<Jav
 
         // Api file
         apiTemplateFiles.clear();
-        setApiNamePrefix(API_PREFIX);
-        setApiNameSuffix(API_SUFFIX);
         apiTemplateFiles.put("server/controller-interface.mustache", ".java");
 
         apiTestTemplateFiles.clear();

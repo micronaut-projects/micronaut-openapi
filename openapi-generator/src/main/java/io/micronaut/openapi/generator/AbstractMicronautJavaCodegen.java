@@ -129,6 +129,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
         // CHECKSTYLE:OFF
         // Set all the fields
         useBeanValidation = true;
+        useJakartaEe = true;
         useOptional = false;
         visitable = false;
         testTool = OPT_TEST_JUNIT;
@@ -288,6 +289,30 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
     public void setApiPackage(String apiPackage) {
         super.setApiPackage(apiPackage);
         updateOption(CodegenConstants.API_PACKAGE, apiPackage);
+    }
+
+    @Override
+    public void setApiNamePrefix(String apiNamePrefix) {
+        super.setApiNamePrefix(apiNamePrefix);
+        updateOption(CodegenConstants.API_NAME_PREFIX, apiNamePrefix);
+    }
+
+    @Override
+    public void setApiNameSuffix(String apiNameSuffix) {
+        super.setApiNameSuffix(apiNameSuffix);
+        updateOption(CodegenConstants.API_NAME_SUFFIX, apiNameSuffix);
+    }
+
+    @Override
+    public void setModelNamePrefix(String modelNamePrefix) {
+        super.setModelNamePrefix(modelNamePrefix);
+        updateOption(CodegenConstants.MODEL_NAME_PREFIX, modelNamePrefix);
+    }
+
+    @Override
+    public void setModelNameSuffix(String modelNameSuffix) {
+        super.setModelNameSuffix(modelNameSuffix);
+        updateOption(CodegenConstants.MODEL_NAME_SUFFIX, modelNameSuffix);
     }
 
     @Override
@@ -479,6 +504,42 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
 
     public void addResponseBodyMappings(List<ResponseBodyMapping> responseBodyMappings) {
         this.responseBodyMappings.addAll(responseBodyMappings);
+    }
+
+    public void addSchemaMapping(Map<String, String> schemaMapping) {
+        this.schemaMapping.putAll(schemaMapping);
+    }
+
+    public void addImportMapping(Map<String, String> importMapping) {
+        this.importMapping.putAll(importMapping);
+    }
+
+    public void addNameMapping(Map<String, String> nameMapping) {
+        this.nameMapping.putAll(nameMapping);
+    }
+
+    public void addTypeMapping(Map<String, String> typeMapping) {
+        this.typeMapping.putAll(typeMapping);
+    }
+
+    public void addEnumNameMapping(Map<String, String> enumNameMapping) {
+        this.enumNameMapping.putAll(enumNameMapping);
+    }
+
+    public void addModelNameMapping(Map<String, String> modelNameMapping) {
+        this.modelNameMapping.putAll(modelNameMapping);
+    }
+
+    public void addInlineSchemaNameMapping(Map<String, String> inlineSchemaNameMapping) {
+        this.inlineSchemaNameMapping.putAll(inlineSchemaNameMapping);
+    }
+
+    public void addInlineSchemaOption(Map<String, String> inlineSchemaOption) {
+        this.inlineSchemaOption.putAll(inlineSchemaOption);
+    }
+
+    public void addOpenapiNormalizer(Map<String, String> openapiNormalizer) {
+        this.openapiNormalizer.putAll(openapiNormalizer);
     }
 
     // CHECKSTYLE:OFF

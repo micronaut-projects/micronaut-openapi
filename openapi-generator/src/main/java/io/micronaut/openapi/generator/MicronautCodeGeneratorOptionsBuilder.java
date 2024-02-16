@@ -16,6 +16,7 @@
 package io.micronaut.openapi.generator;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Builder for generic options that the Micronaut code generator supports.
@@ -79,6 +80,109 @@ public interface MicronautCodeGeneratorOptionsBuilder {
      */
     MicronautCodeGeneratorOptionsBuilder withResponseBodyMappings(List<ResponseBodyMapping> responseBodyMappings);
 
+    /**
+     * Add the schema mappings.
+     *
+     * @param schemaMapping the schema mappings
+     * @return this builder
+     */
+    MicronautCodeGeneratorOptionsBuilder withSchemaMapping(Map<String, String> schemaMapping);
+
+    /**
+     * Add the import mappings.
+     *
+     * @param importMapping the import mappings
+     * @return this builder
+     */
+    MicronautCodeGeneratorOptionsBuilder withImportMapping(Map<String, String> importMapping);
+
+    /**
+     * Add the name mappings.
+     *
+     * @param nameMapping the name mappings
+     * @return this builder
+     */
+    MicronautCodeGeneratorOptionsBuilder withNameMapping(Map<String, String> nameMapping);
+
+    /**
+     * Add the type mappings.
+     *
+     * @param typeMapping the type mappings
+     * @return this builder
+     */
+    MicronautCodeGeneratorOptionsBuilder withTypeMapping(Map<String, String> typeMapping);
+
+    /**
+     * Add the enum name mappings.
+     *
+     * @param enumNameMapping the enum name mappings
+     * @return this builder
+     */
+    MicronautCodeGeneratorOptionsBuilder withEnumNameMapping(Map<String, String> enumNameMapping);
+
+    /**
+     * Add the model name mappings.
+     *
+     * @param modelNameMapping the model name mappings
+     * @return this builder
+     */
+    MicronautCodeGeneratorOptionsBuilder withModelNameMapping(Map<String, String> modelNameMapping);
+
+    /**
+     * Add the inline schema name mappings.
+     *
+     * @param inlineSchemaNameMapping the inline schema name mappings
+     * @return this builder
+     */
+    MicronautCodeGeneratorOptionsBuilder withInlineSchemaNameMapping(Map<String, String> inlineSchemaNameMapping);
+
+    /**
+     * Add the inline schema options.
+     *
+     * @param inlineSchemaOption the inline schema options
+     * @return this builder
+     */
+    MicronautCodeGeneratorOptionsBuilder withInlineSchemaOption(Map<String, String> inlineSchemaOption);
+
+    /**
+     * Add the OpenAPi normalizer options.
+     *
+     * @param openapiNormalizer the OpenAPi normalizer options
+     * @return this builder
+     */
+    MicronautCodeGeneratorOptionsBuilder withOpenapiNormalizer(Map<String, String> openapiNormalizer);
+
+    /**
+     * Set the api name prefix.
+     *
+     * @param apiNamePrefix the api name prefix
+     * @return this builder
+     */
+    MicronautCodeGeneratorOptionsBuilder withApiNamePrefix(String apiNamePrefix);
+
+    /**
+     * Set the api name suffix.
+     *
+     * @param apiNameSuffix the api name suffix
+     * @return this builder
+     */
+    MicronautCodeGeneratorOptionsBuilder withApiNameSuffix(String apiNameSuffix);
+
+    /**
+     * Set the model name prefix.
+     *
+     * @param modelNamePrefix the model name prefix
+     * @return this builder
+     */
+    MicronautCodeGeneratorOptionsBuilder withModelNamePrefix(String modelNamePrefix);
+
+    /**
+     * Set the model name suffix.
+     *
+     * @param modelNameSuffix the model name suffix
+     * @return this builder
+     */
+    MicronautCodeGeneratorOptionsBuilder withModelNameSuffix(String modelNameSuffix);
 
     /**
      * If set to true, the generator will use reactive types.

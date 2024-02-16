@@ -75,11 +75,6 @@ tasks.named("generateOpenApi") {
     ]
 }
 
-// TODO: Wait fix https://github.com/micronaut-projects/micronaut-core/issues/10117
-test {
-    exclude 'io/micronaut/**'
-}
-
 kotlin {
     jvmToolchain(17)
 }

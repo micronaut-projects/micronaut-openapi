@@ -21,6 +21,7 @@ import java.net.URI;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.function.Consumer;
 
@@ -57,7 +58,7 @@ public final class MicronautCodeGeneratorEntryPoint {
                                              JavaMicronautClientCodegen.ClientOptions javaClientOptions,
                                              KotlinMicronautServerCodegen.ServerOptions kotlinServerOptions,
                                              KotlinMicronautClientCodegen.ClientOptions kotlinClientOptions
-                                             ) {
+    ) {
         this.definitionFile = definitionFile;
         this.outputDirectory = outputDirectory;
         this.codeGenerator = codeGenerator;
@@ -141,6 +142,46 @@ public final class MicronautCodeGeneratorEntryPoint {
             if (options.responseBodyMappings != null) {
                 javaCodeGen.addResponseBodyMappings(options.responseBodyMappings);
             }
+            if (options.schemaMapping != null) {
+                javaCodeGen.addSchemaMapping(options.schemaMapping);
+            }
+            if (options.importMapping != null) {
+                javaCodeGen.addImportMapping(options.importMapping);
+            }
+            if (options.nameMapping != null) {
+                javaCodeGen.addNameMapping(options.nameMapping);
+            }
+            if (options.typeMapping != null) {
+                javaCodeGen.addTypeMapping(options.typeMapping);
+            }
+            if (options.enumNameMapping != null) {
+                javaCodeGen.addEnumNameMapping(options.enumNameMapping);
+            }
+            if (options.modelNameMapping != null) {
+                javaCodeGen.addModelNameMapping(options.modelNameMapping);
+            }
+            if (options.inlineSchemaNameMapping != null) {
+                javaCodeGen.addInlineSchemaNameMapping(options.inlineSchemaNameMapping);
+            }
+            if (options.inlineSchemaOption != null) {
+                javaCodeGen.addInlineSchemaOption(options.inlineSchemaOption);
+            }
+            if (options.openapiNormalizer != null) {
+                javaCodeGen.addOpenapiNormalizer(options.openapiNormalizer);
+            }
+            if (options.apiNamePrefix != null && !options.apiNamePrefix.isBlank()) {
+                javaCodeGen.setApiNamePrefix(options.apiNamePrefix);
+            }
+            if (options.apiNameSuffix != null && !options.apiNameSuffix.isBlank()) {
+                javaCodeGen.setApiNameSuffix(options.apiNameSuffix);
+            }
+            if (options.modelNamePrefix != null && !options.modelNamePrefix.isBlank()) {
+                javaCodeGen.setModelNamePrefix(options.modelNamePrefix);
+            }
+            if (options.modelNameSuffix != null && !options.modelNameSuffix.isBlank()) {
+                javaCodeGen.setModelNameSuffix(options.modelNameSuffix);
+            }
+
             javaCodeGen.setReactive(options.reactive);
             javaCodeGen.setGenerateHttpResponseAlways(options.generateHttpResponseAlways);
             javaCodeGen.setGenerateHttpResponseWhereRequired(options.generateHttpResponseWhereRequired);
@@ -165,6 +206,46 @@ public final class MicronautCodeGeneratorEntryPoint {
             if (options.responseBodyMappings != null) {
                 kotlinCodeGen.addResponseBodyMappings(options.responseBodyMappings);
             }
+            if (options.schemaMapping != null) {
+                kotlinCodeGen.addSchemaMapping(options.schemaMapping);
+            }
+            if (options.importMapping != null) {
+                kotlinCodeGen.addImportMapping(options.importMapping);
+            }
+            if (options.nameMapping != null) {
+                kotlinCodeGen.addNameMapping(options.nameMapping);
+            }
+            if (options.typeMapping != null) {
+                kotlinCodeGen.addTypeMapping(options.typeMapping);
+            }
+            if (options.enumNameMapping != null) {
+                kotlinCodeGen.addEnumNameMapping(options.enumNameMapping);
+            }
+            if (options.modelNameMapping != null) {
+                kotlinCodeGen.addModelNameMapping(options.modelNameMapping);
+            }
+            if (options.inlineSchemaNameMapping != null) {
+                kotlinCodeGen.addInlineSchemaNameMapping(options.inlineSchemaNameMapping);
+            }
+            if (options.inlineSchemaOption != null) {
+                kotlinCodeGen.addInlineSchemaOption(options.inlineSchemaOption);
+            }
+            if (options.openapiNormalizer != null) {
+                kotlinCodeGen.addOpenapiNormalizer(options.openapiNormalizer);
+            }
+            if (options.apiNamePrefix != null && !options.apiNamePrefix.isBlank()) {
+                kotlinCodeGen.setApiNamePrefix(options.apiNamePrefix);
+            }
+            if (options.apiNameSuffix != null && !options.apiNameSuffix.isBlank()) {
+                kotlinCodeGen.setApiNameSuffix(options.apiNameSuffix);
+            }
+            if (options.modelNamePrefix != null && !options.modelNamePrefix.isBlank()) {
+                kotlinCodeGen.setModelNamePrefix(options.modelNamePrefix);
+            }
+            if (options.modelNameSuffix != null && !options.modelNameSuffix.isBlank()) {
+                kotlinCodeGen.setModelNameSuffix(options.modelNameSuffix);
+            }
+
             kotlinCodeGen.setReactive(options.reactive);
             kotlinCodeGen.setGenerateHttpResponseAlways(options.generateHttpResponseAlways);
             kotlinCodeGen.setGenerateHttpResponseWhereRequired(options.generateHttpResponseWhereRequired);
@@ -413,6 +494,21 @@ public final class MicronautCodeGeneratorEntryPoint {
             private String modelPackage;
             private List<ParameterMapping> parameterMappings;
             private List<ResponseBodyMapping> responseBodyMappings;
+            private Map<String, String> schemaMapping;
+            private Map<String, String> importMapping;
+            private Map<String, String> nameMapping;
+            private Map<String, String> typeMapping;
+            private Map<String, String> enumNameMapping;
+            private Map<String, String> modelNameMapping;
+            private Map<String, String> inlineSchemaNameMapping;
+            private Map<String, String> inlineSchemaOption;
+            private Map<String, String> openapiNormalizer;
+
+            private String apiNamePrefix;
+            private String apiNameSuffix;
+            private String modelNamePrefix;
+            private String modelNameSuffix;
+
             private boolean optional;
             private boolean reactive = true;
             private boolean generateHttpResponseAlways;
@@ -465,6 +561,84 @@ public final class MicronautCodeGeneratorEntryPoint {
             }
 
             @Override
+            public MicronautCodeGeneratorOptionsBuilder withSchemaMapping(Map<String, String> schemaMapping) {
+                this.schemaMapping = schemaMapping;
+                return this;
+            }
+
+            @Override
+            public MicronautCodeGeneratorOptionsBuilder withImportMapping(Map<String, String> importMapping) {
+                this.importMapping = importMapping;
+                return this;
+            }
+
+            @Override
+            public MicronautCodeGeneratorOptionsBuilder withNameMapping(Map<String, String> nameMapping) {
+                this.nameMapping = nameMapping;
+                return this;
+            }
+
+            @Override
+            public MicronautCodeGeneratorOptionsBuilder withTypeMapping(Map<String, String> typeMapping) {
+                this.typeMapping = typeMapping;
+                return this;
+            }
+
+            @Override
+            public MicronautCodeGeneratorOptionsBuilder withEnumNameMapping(Map<String, String> enumNameMapping) {
+                this.enumNameMapping = enumNameMapping;
+                return this;
+            }
+
+            @Override
+            public MicronautCodeGeneratorOptionsBuilder withModelNameMapping(Map<String, String> modelNameMapping) {
+                this.modelNameMapping = modelNameMapping;
+                return this;
+            }
+
+            @Override
+            public MicronautCodeGeneratorOptionsBuilder withInlineSchemaNameMapping(Map<String, String> inlineSchemaNameMapping) {
+                this.inlineSchemaNameMapping = inlineSchemaNameMapping;
+                return this;
+            }
+
+            @Override
+            public MicronautCodeGeneratorOptionsBuilder withInlineSchemaOption(Map<String, String> inlineSchemaOption) {
+                this.inlineSchemaOption = inlineSchemaOption;
+                return this;
+            }
+
+            @Override
+            public MicronautCodeGeneratorOptionsBuilder withOpenapiNormalizer(Map<String, String> openapiNormalizer) {
+                this.openapiNormalizer = openapiNormalizer;
+                return this;
+            }
+
+            @Override
+            public MicronautCodeGeneratorOptionsBuilder withApiNamePrefix(String apiNamePrefix) {
+                this.apiNamePrefix = apiNamePrefix;
+                return this;
+            }
+
+            @Override
+            public MicronautCodeGeneratorOptionsBuilder withApiNameSuffix(String apiNameSuffix) {
+                this.apiNameSuffix = apiNameSuffix;
+                return this;
+            }
+
+            @Override
+            public MicronautCodeGeneratorOptionsBuilder withModelNamePrefix(String modelNamePrefix) {
+                this.modelNamePrefix = modelNamePrefix;
+                return this;
+            }
+
+            @Override
+            public MicronautCodeGeneratorOptionsBuilder withModelNameSuffix(String modelNameSuffix) {
+                this.modelNameSuffix = modelNameSuffix;
+                return this;
+            }
+
+            @Override
             public MicronautCodeGeneratorOptionsBuilder withReactive(boolean reactive) {
                 this.reactive = reactive;
                 return this;
@@ -513,7 +687,37 @@ public final class MicronautCodeGeneratorEntryPoint {
             }
 
             private Options build() {
-                return new Options(lang, apiPackage, modelPackage, invokerPackage, artifactId, parameterMappings, responseBodyMappings, beanValidation, optional, reactive, generateHttpResponseAlways, generateHttpResponseWhereRequired, testFramework, serializationLibraryKind, dateTimeFormat);
+                return new Options(
+                    lang,
+                    apiPackage,
+                    modelPackage,
+                    invokerPackage,
+                    artifactId,
+                    parameterMappings,
+                    responseBodyMappings,
+                    schemaMapping,
+                    importMapping,
+                    nameMapping,
+                    typeMapping,
+                    enumNameMapping,
+                    modelNameMapping,
+                    inlineSchemaNameMapping,
+                    inlineSchemaOption,
+                    openapiNormalizer,
+
+                    apiNamePrefix,
+                    apiNameSuffix,
+                    modelNamePrefix,
+                    modelNameSuffix,
+
+                    beanValidation,
+                    optional,
+                    reactive,
+                    generateHttpResponseAlways,
+                    generateHttpResponseWhereRequired,
+                    testFramework,
+                    serializationLibraryKind,
+                    dateTimeFormat);
             }
         }
     }
@@ -542,6 +746,21 @@ public final class MicronautCodeGeneratorEntryPoint {
         String artifactId,
         List<ParameterMapping> parameterMappings,
         List<ResponseBodyMapping> responseBodyMappings,
+        Map<String, String> schemaMapping,
+        Map<String, String> importMapping,
+        Map<String, String> nameMapping,
+        Map<String, String> typeMapping,
+        Map<String, String> enumNameMapping,
+        Map<String, String> modelNameMapping,
+        Map<String, String> inlineSchemaNameMapping,
+        Map<String, String> inlineSchemaOption,
+        Map<String, String> openapiNormalizer,
+
+        String apiNamePrefix,
+        String apiNameSuffix,
+        String modelNamePrefix,
+        String modelNameSuffix,
+
         boolean beanValidation,
         boolean optional,
         boolean reactive,
