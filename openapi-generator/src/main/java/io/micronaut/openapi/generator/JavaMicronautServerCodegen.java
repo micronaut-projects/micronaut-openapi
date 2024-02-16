@@ -223,12 +223,6 @@ public class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen<Jav
             }
         }
 
-        // Add HardNullable.java file
-        if (generateHardNullable) {
-            String folder = (sourceFolder + '.' + invokerPackage + ".annotation").replace('.', File.separatorChar);
-            supportingFiles.add(new SupportingFile("server/HardNullable.mustache", folder, "HardNullable.java"));
-        }
-
         if (generateStreamingFileUpload) {
             typeMapping.put("file", "StreamingFileUpload");
         }
