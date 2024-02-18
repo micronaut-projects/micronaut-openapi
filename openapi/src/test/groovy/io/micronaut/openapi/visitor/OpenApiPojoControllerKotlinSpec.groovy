@@ -36,7 +36,7 @@ class HelloController {
 
     @Get
     @Produces(MediaType.TEXT_PLAIN)
-    fun index(@Nullable @QueryValue("channels") channels: Collection<Channel?>) = ""
+    fun index(@Nullable @QueryValue("channels") channels: Collection<Channel?>?) = ""
 
     @Introspected
     enum class Channel {
@@ -156,5 +156,68 @@ class MyBean
         then: "the components are valid"
         schemas.Animal
         schemas.ColorEnum
+    }
+
+    void "test kotlin NotNull on nullable types"() {
+
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test
+
+import io.micronaut.core.annotation.NonNull
+import io.micronaut.http.annotation.Body
+import io.micronaut.http.annotation.Controller
+import io.micronaut.http.annotation.Get
+import io.micronaut.http.annotation.Put
+import io.micronaut.http.annotation.PathVariable
+import io.micronaut.http.annotation.QueryValue
+import io.micronaut.serde.annotation.Serdeable
+import jakarta.validation.Valid
+import jakarta.validation.constraints.*
+import jakarta.validation.constraints.NotNull
+import reactor.core.publisher.Mono
+
+@Controller
+class HelloController {
+
+    @Put("/sendModelWithDiscriminator")
+    fun sendModelWithDiscriminator(
+        @Body @NotNull @Valid animal: Animal
+    ): Mono<Animal> = Mono.empty()
+
+    @Get("/test{/myVar}")
+    fun sendModelWithDiscriminator(
+        @PathVariable myVar: String?,
+        @QueryValue param1: String?
+    ): String = "OK"
+}
+
+@Serdeable
+data class Animal (
+    @NotNull
+    var color: String?,
+    @NonNull
+    var propertyClass: String?,
+)
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        then: "the state is correct"
+        Utils.testReference != null
+
+        when: "The OpenAPI is retrieved"
+        def openAPI = Utils.testReference
+        Schema schema = openAPI.components.schemas.Animal
+
+        then: "the components are valid"
+        schema
+        schema.properties.size() == 2
+        !schema.properties.color.nullable
+        !schema.properties.propertyClass.nullable
+        schema.required
+        schema.required.size() == 2
+        schema.required[0] == 'color'
+        schema.required[1] == 'propertyClass'
     }
 }

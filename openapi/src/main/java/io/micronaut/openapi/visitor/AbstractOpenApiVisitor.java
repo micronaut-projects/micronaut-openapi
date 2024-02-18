@@ -138,7 +138,7 @@ import static io.micronaut.openapi.visitor.ContextUtils.warn;
 import static io.micronaut.openapi.visitor.ConvertUtils.parseJsonString;
 import static io.micronaut.openapi.visitor.ConvertUtils.setDefaultValueObject;
 import static io.micronaut.openapi.visitor.ConvertUtils.toTupleSubMap;
-import static io.micronaut.openapi.visitor.ElementUtils.isElementNotNullable;
+import static io.micronaut.openapi.visitor.ElementUtils.isNotNullable;
 import static io.micronaut.openapi.visitor.ElementUtils.isFileUpload;
 import static io.micronaut.openapi.visitor.ElementUtils.isNullable;
 import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.expandProperties;
@@ -1097,7 +1097,7 @@ abstract class AbstractOpenApiVisitor {
             }
 
             // check field annotations (@NonNull, @Nullable, etc.)
-            boolean isNotNullable = isElementNotNullable(element, classElement);
+            boolean isNotNullable = isNotNullable(element);
             // check as mandatory in constructor
             boolean isMandatoryInConstructor = doesParamExistsMandatoryInConstructor(element, classElement);
             boolean required = elementSchemaRequired.orElse(isNotNullable || isMandatoryInConstructor);
@@ -1266,7 +1266,7 @@ abstract class AbstractOpenApiVisitor {
         }
         // @Schema annotation takes priority over nullability annotations
         Boolean isSchemaNullable = element.booleanValue(io.swagger.v3.oas.annotations.media.Schema.class, "nullable").orElse(null);
-        boolean isNullable = (isSchemaNullable == null && isNullable(element)) || Boolean.TRUE.equals(isSchemaNullable);
+        boolean isNullable = (isSchemaNullable == null && isNullable(element) && !isNotNullable(element)) || Boolean.TRUE.equals(isSchemaNullable);
         if (isNullable) {
             topLevelSchema.setNullable(true);
             notOnlyRef = true;
@@ -2598,7 +2598,7 @@ abstract class AbstractOpenApiVisitor {
         if (schema == null || type == null || type.getAnnotationNames().isEmpty()) {
             return;
         }
-        if (isNullable(type)) {
+        if (isNullable(type) && !isNotNullable(type)) {
             schema.setNullable(true);
         }
         processJavaxValidationAnnotations(type, type, schema);

@@ -25,6 +25,7 @@ import javax.annotation.processing.SupportedOptions;
 import io.micronaut.core.annotation.AnnotationValue;
 import io.micronaut.core.naming.NameUtils;
 import io.micronaut.core.util.ArrayUtils;
+import io.micronaut.core.util.StringUtils;
 import io.micronaut.http.HttpMethod;
 import io.micronaut.http.MediaType;
 import io.micronaut.http.uri.UriMatchTemplate;
@@ -148,9 +149,9 @@ public class OpenApiEndpointVisitor extends AbstractOpenApiEndpointVisitor imple
         }
         if (element.isAnnotationPresent("io.micronaut.management.endpoint.annotation.Endpoint")) {
             AnnotationValue<?> ann = element.getAnnotation("io.micronaut.management.endpoint.annotation.Endpoint");
-            String idAnn = ann.stringValue("id").orElse(NameUtils.hyphenate(element.getSimpleName()));
-            if (idAnn.isEmpty()) {
-                idAnn = ann.stringValue("value").orElse(idAnn);
+            String idAnn = ann.stringValue("id").orElse(ann.stringValue("value").orElse(null));
+            if (StringUtils.isEmpty(idAnn)) {
+                idAnn = NameUtils.hyphenate(element.getSimpleName());
             }
             id = path + idAnn;
             if (id.isEmpty() || id.charAt(0) != '/') {
