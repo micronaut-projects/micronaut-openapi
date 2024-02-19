@@ -27,7 +27,6 @@ import java.util.concurrent.Future;
 
 import io.micronaut.core.annotation.AnnotationValue;
 import io.micronaut.core.annotation.Internal;
-import io.micronaut.core.annotation.Nullable;
 import io.micronaut.http.HttpRequest;
 import io.micronaut.http.multipart.FileUpload;
 import io.micronaut.inject.ast.ClassElement;
@@ -140,11 +139,10 @@ public final class ElementUtils {
      * Checking if the element not nullable.
      *
      * @param element element
-     * @param classElement class element
      *
      * @return true if element is not nullable
      */
-    public static boolean isElementNotNullable(Element element, @Nullable Element classElement) {
+    public static boolean isNotNullable(Element element) {
         return element.isAnnotationPresent("javax.validation.constraints.NotNull$List")
             || element.isAnnotationPresent("jakarta.validation.constraints.NotNull$List")
             || element.isAnnotationPresent("javax.validation.constraints.NotBlank$List")

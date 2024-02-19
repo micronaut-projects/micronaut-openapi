@@ -120,9 +120,9 @@ import static io.micronaut.openapi.visitor.ConfigUtils.isJsonViewEnabled;
 import static io.micronaut.openapi.visitor.ConfigUtils.isOpenApiEnabled;
 import static io.micronaut.openapi.visitor.ConfigUtils.isSpecGenerationEnabled;
 import static io.micronaut.openapi.visitor.ContextUtils.warn;
-import static io.micronaut.openapi.visitor.ElementUtils.isIgnoredParameter;
-import static io.micronaut.openapi.visitor.ElementUtils.isElementNotNullable;
 import static io.micronaut.openapi.visitor.ElementUtils.isFileUpload;
+import static io.micronaut.openapi.visitor.ElementUtils.isIgnoredParameter;
+import static io.micronaut.openapi.visitor.ElementUtils.isNotNullable;
 import static io.micronaut.openapi.visitor.ElementUtils.isNullable;
 import static io.micronaut.openapi.visitor.SchemaUtils.COMPONENTS_CALLBACKS_PREFIX;
 import static io.micronaut.openapi.visitor.SchemaUtils.COMPONENTS_SCHEMAS_PREFIX;
@@ -727,7 +727,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                         if (StringUtils.isNotEmpty(bodyAnnValue)) {
                             var wrapperSchema = new Schema<>();
                             wrapperSchema.setType(TYPE_OBJECT);
-                            if (isElementNotNullable(parameter, parameterType)) {
+                            if (isNotNullable(parameter)) {
                                 wrapperSchema.addRequiredItem(bodyAnnValue);
                             }
                             wrapperSchema.addProperty(bodyAnnValue, propertySchema);
@@ -780,7 +780,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                 newParameter.setName(parameter.getName());
             }
 
-            if (newParameter.getRequired() == null && !isNullable(parameter)) {
+            if (newParameter.getRequired() == null && (!isNullable(parameter) || isNotNullable(parameter))) {
                 newParameter.setRequired(true);
             }
             if (javadocDescription != null && StringUtils.isEmpty(newParameter.getDescription())) {
@@ -837,7 +837,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             Optional<String> description = parameter.stringValue(io.swagger.v3.oas.annotations.Parameter.class, "description");
             description.ifPresent(propertySchema::setDescription);
             processSchemaProperty(context, parameter, parameter.getType(), null, schema, propertySchema);
-            if (isNullable(parameter)) {
+            if (isNullable(parameter) && !isNotNullable(parameter)) {
                 // Keep null if not
                 propertySchema.setNullable(true);
             }
@@ -1060,7 +1060,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             }
         }
 
-        if (newParameter != null && isNullable(parameter)) {
+        if (newParameter != null && isNullable(parameter) && !isNotNullable(parameter)) {
             newParameter.setRequired(null);
         }
 
@@ -1097,7 +1097,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                 requestBody.setDescription(desc.toString());
             }
         }
-        if (requestBody.getRequired() == null && !isNullable(parameterType)) {
+        if (requestBody.getRequired() == null && (!isNullable(parameterType) || isNotNullable(parameterType))) {
             requestBody.setRequired(true);
         }
 
