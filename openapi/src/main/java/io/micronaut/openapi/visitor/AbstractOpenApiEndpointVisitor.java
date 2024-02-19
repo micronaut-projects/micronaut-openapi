@@ -883,26 +883,18 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                 newParameter.setExplode(true);
             }
         } else if (parameter.isAnnotationPresent(Header.class)) {
-            String headerName = parameter.stringValue(Header.class, "name")
-                .orElse(parameter.stringValue(Header.class)
-                    .orElseGet(() -> NameUtils.hyphenate(parameterName)));
-
-            if (isIgnoredHeader(headerName)) {
+            var headerName = getHeaderName(parameter, parameterName);
+            if (headerName == null) {
                 return null;
             }
-
             newParameter = new HeaderParameter();
             newParameter.setName(headerName);
         } else if (parameter.isAnnotationPresent(Headers.class)) {
 
             List<AnnotationValue<Header>> headerAnnotations = parameter.getAnnotationValuesByType(Header.class);
             if (CollectionUtils.isNotEmpty(headerAnnotations)) {
-                var headerAnn = headerAnnotations.get(0);
-                var headerName = headerAnn.stringValue("name")
-                    .orElse(headerAnn.stringValue()
-                        .orElseGet(() -> NameUtils.hyphenate(parameterName)));
-
-                if (isIgnoredHeader(headerName)) {
+                var headerName = getHeaderName(parameter, parameterName);
+                if (headerName == null) {
                     return null;
                 }
                 newParameter = new HeaderParameter();
@@ -1065,6 +1057,26 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         }
 
         return newParameter;
+    }
+
+    private String getHeaderName(TypedElement parameter, String parameterName) {
+        // skip params like this: @Header Map<String, String>
+        if (isIgnoredParameter(parameter)) {
+            return null;
+        }
+        String headerName = parameter.stringValue(Header.class, "name")
+            .orElse(parameter.stringValue(Header.class)
+                .orElseGet(() -> NameUtils.hyphenate(parameterName)));
+
+        if (isIgnoredHeader(headerName)) {
+            return null;
+        }
+
+        return headerName;
+    }
+
+    private boolean isIgnoredHeaderParameter(TypedElement parameter) {
+        return parameter.getType().isAssignable(Map.class);
     }
 
     private void processBody(VisitorContext context, OpenAPI openAPI,

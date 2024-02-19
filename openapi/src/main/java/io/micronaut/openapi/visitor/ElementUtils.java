@@ -17,26 +17,34 @@ package io.micronaut.openapi.visitor;
 
 import java.io.File;
 import java.io.InputStream;
+import java.lang.annotation.Annotation;
 import java.nio.ByteBuffer;
 import java.security.Principal;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.Future;
 
+import io.micronaut.core.annotation.AnnotationMetadata;
 import io.micronaut.core.annotation.AnnotationValue;
 import io.micronaut.core.annotation.Internal;
 import io.micronaut.http.HttpRequest;
+import io.micronaut.http.annotation.Header;
 import io.micronaut.http.multipart.FileUpload;
+import io.micronaut.inject.annotation.AnnotationMetadataHierarchy;
 import io.micronaut.inject.ast.ClassElement;
 import io.micronaut.inject.ast.Element;
+import io.micronaut.inject.ast.MemberElement;
+import io.micronaut.inject.ast.MethodElement;
 import io.micronaut.inject.ast.TypedElement;
 import io.micronaut.inject.visitor.VisitorContext;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -106,10 +114,6 @@ public final class ElementUtils {
     public static boolean isNullable(TypedElement element) {
         return element.isNullable()
             || element.getType().isOptional();
-    }
-
-    public static boolean isAnnotationPresent(Element element, String className) {
-        return element.findAnnotation(className).isPresent();
     }
 
     /**
@@ -216,10 +220,11 @@ public final class ElementUtils {
         return isHidden
             || parameter.isAnnotationPresent(Hidden.class)
             || parameter.isAnnotationPresent(JsonIgnore.class)
+            || parameter.isAnnotationPresent(Header.class) && parameter.getType().isAssignable(Map.class)
             || parameter.booleanValue(Parameter.class, "hidden").orElse(false)
-            || isAnnotationPresent(parameter, "io.micronaut.session.annotation.SessionValue")
-            || isAnnotationPresent(parameter, "org.springframework.web.bind.annotation.SessionAttribute")
-            || isAnnotationPresent(parameter, "org.springframework.web.bind.annotation.SessionAttributes")
+            || parameter.hasAnnotation("io.micronaut.session.annotation.SessionValue")
+            || parameter.hasAnnotation("org.springframework.web.bind.annotation.SessionAttribute")
+            || parameter.hasAnnotation("org.springframework.web.bind.annotation.SessionAttributes")
             || isIgnoredParameterType(parameter.getType());
     }
 
@@ -249,5 +254,145 @@ public final class ElementUtils {
             || parameterType.isAssignable("org.springframework.validation.BindingResult")
             || parameterType.isAssignable("org.springframework.validation.Errors")
             ;
+    }
+
+    public static AnnotationMetadata getAnnotationMetadata(Element el) {
+        if (el == null) {
+            return AnnotationMetadata.EMPTY_METADATA;
+        }
+        if (el instanceof MemberElement memberEl) {
+            var propMetadata = memberEl.getAnnotationMetadata();
+            AnnotationMetadata constructorMetadata = null;
+            var constructor = getCreatorConstructor(memberEl.getOwningType());
+            if (constructor != null) {
+                for (var constructorParam : constructor.getParameters()) {
+                    if (constructorParam.getName().equals(memberEl.getName())) {
+                        constructorMetadata = constructorParam.getAnnotationMetadata();
+                        break;
+                    }
+                }
+            }
+            if (constructorMetadata == null || constructorMetadata.isEmpty()) {
+                return propMetadata;
+            }
+            return new AnnotationMetadataHierarchy(true, propMetadata, constructorMetadata);
+        }
+        return el.getAnnotationMetadata();
+    }
+
+    public static Optional<AnnotationValue<Annotation>> findAnnotation(Element el, String annName) {
+        if (el == null) {
+            return Optional.empty();
+        }
+        if (el instanceof MemberElement memberEl) {
+            var result = memberEl.findAnnotation(annName);
+            if (result.isPresent()) {
+                return result;
+            }
+            var constructor = getCreatorConstructor(memberEl.getOwningType());
+            if (constructor != null) {
+                for (var constructorParam : constructor.getParameters()) {
+                    if (constructorParam.getName().equals(memberEl.getName())) {
+                        return constructorParam.findAnnotation(annName);
+                    }
+                }
+            }
+            return Optional.empty();
+        }
+        return el.findAnnotation(annName);
+    }
+
+    public static <T> boolean isAnnotationPresent(Element el, Class<T> annClass) {
+        return isAnnotationPresent(el, annClass.getName());
+    }
+
+    public static boolean isAnnotationPresent(Element el, String annName) {
+        if (el == null) {
+            return false;
+        }
+        if (el instanceof MemberElement memberEl) {
+            var result = memberEl.isAnnotationPresent(annName);
+            if (result) {
+                return true;
+            }
+            var constructor = getCreatorConstructor(memberEl.getOwningType());
+            if (constructor != null) {
+                for (var constructorParam : constructor.getParameters()) {
+                    if (constructorParam.getName().equals(memberEl.getName())) {
+                        return constructorParam.isAnnotationPresent(annName);
+                    }
+                }
+            }
+            return false;
+        }
+        return el.isAnnotationPresent(annName);
+    }
+
+    public static <T extends Annotation> Optional<String> stringValue(Element el, Class<T> annClass, String member) {
+        if (el == null) {
+            return Optional.empty();
+        }
+        if (el instanceof MemberElement memberEl) {
+            var result = memberEl.stringValue(annClass, member);
+            if (result.isPresent()) {
+                return result;
+            }
+            var constructor = getCreatorConstructor(memberEl.getOwningType());
+            if (constructor != null) {
+                for (var constructorParam : constructor.getParameters()) {
+                    if (constructorParam.getName().equals(memberEl.getName())) {
+                        return constructorParam.stringValue(annClass, member);
+                    }
+                }
+            }
+            return result;
+        }
+        return el.stringValue(annClass, member);
+    }
+
+    public static <T extends Annotation> AnnotationValue<T> getAnnotation(Element el, Class<T> annClass) {
+        return getAnnotation(el, annClass.getName());
+    }
+
+    public static AnnotationValue getAnnotation(Element el, String annName) {
+        if (el == null) {
+            return null;
+        }
+        if (el instanceof MemberElement memberEl) {
+            var result = memberEl.getAnnotation(annName);
+            if (result != null) {
+                return result;
+            }
+            var constructor = getCreatorConstructor(memberEl.getOwningType());
+            if (constructor != null) {
+                for (var constructorParam : constructor.getParameters()) {
+                    if (constructorParam.getName().equals(memberEl.getName())) {
+                        return constructorParam.getAnnotation(annName);
+                    }
+                }
+            }
+            return result;
+        }
+        return el.getAnnotation(annName);
+    }
+
+    private static MethodElement getCreatorConstructor(ClassElement classEl) {
+
+        var cachedConstructor = Utils.getCreatorConstructorsCache().get(classEl.getName());
+        if (cachedConstructor != null) {
+            return cachedConstructor;
+        }
+
+        var creatorConstructor = classEl.getPrimaryConstructor().orElse(null);
+        var constructors = classEl.getAccessibleConstructors();
+        if (constructors.size() > 1) {
+            for (var constructor : constructors) {
+                if (constructor.isDeclaredAnnotationPresent(JsonCreator.class)) {
+                    creatorConstructor = constructor;
+                }
+            }
+        }
+        Utils.getCreatorConstructorsCache().put(classEl.getName(), creatorConstructor);
+        return creatorConstructor;
     }
 }

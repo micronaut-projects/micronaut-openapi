@@ -48,4 +48,5 @@ micronautBuild {
     importMicronautCatalog("micronaut-validation")
     importMicronautCatalog("micronaut-data")
     importMicronautCatalog("micronaut-kotlin")
+    importMicronautCatalog("micronaut-session")
 }

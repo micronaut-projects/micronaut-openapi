@@ -138,9 +138,14 @@ import static io.micronaut.openapi.visitor.ContextUtils.warn;
 import static io.micronaut.openapi.visitor.ConvertUtils.parseJsonString;
 import static io.micronaut.openapi.visitor.ConvertUtils.setDefaultValueObject;
 import static io.micronaut.openapi.visitor.ConvertUtils.toTupleSubMap;
-import static io.micronaut.openapi.visitor.ElementUtils.isNotNullable;
+import static io.micronaut.openapi.visitor.ElementUtils.findAnnotation;
+import static io.micronaut.openapi.visitor.ElementUtils.getAnnotation;
+import static io.micronaut.openapi.visitor.ElementUtils.getAnnotationMetadata;
+import static io.micronaut.openapi.visitor.ElementUtils.isAnnotationPresent;
 import static io.micronaut.openapi.visitor.ElementUtils.isFileUpload;
+import static io.micronaut.openapi.visitor.ElementUtils.isNotNullable;
 import static io.micronaut.openapi.visitor.ElementUtils.isNullable;
+import static io.micronaut.openapi.visitor.ElementUtils.stringValue;
 import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.expandProperties;
 import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.resolvePlaceholders;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_FIELD_VISIBILITY_LEVEL;
@@ -765,10 +770,10 @@ abstract class AbstractOpenApiVisitor {
 
         AnnotationValue<io.swagger.v3.oas.annotations.media.Schema> schemaAnnotationValue = null;
         if (definingElement != null) {
-            schemaAnnotationValue = definingElement.getAnnotation(io.swagger.v3.oas.annotations.media.Schema.class);
+            schemaAnnotationValue = getAnnotation(definingElement, io.swagger.v3.oas.annotations.media.Schema.class);
         }
         if (type != null && schemaAnnotationValue == null) {
-            schemaAnnotationValue = type.getAnnotation(io.swagger.v3.oas.annotations.media.Schema.class);
+            schemaAnnotationValue = getAnnotation(type, io.swagger.v3.oas.annotations.media.Schema.class);
         }
         boolean isSubstitudedType = false;
         if (schemaAnnotationValue != null) {
@@ -892,7 +897,7 @@ abstract class AbstractOpenApiVisitor {
                     schema = getPrimitiveType(type, typeName);
                 } else if (!isArray && primitiveType != null) {
                     schema = primitiveType.createProperty();
-                } else if (type.isAssignable(Map.class.getName())) {
+                } else if (type.isAssignable(Map.class)) {
                     schema = new MapSchema();
                     if (CollectionUtils.isEmpty(typeArgs)) {
                         schema.setAdditionalProperties(true);
@@ -1033,7 +1038,7 @@ abstract class AbstractOpenApiVisitor {
     private void handleUnwrapped(VisitorContext context, Element element, ClassElement elementType, Schema<?> parentSchema, AnnotationValue<JsonUnwrapped> uw) {
         Map<String, Schema> schemas = SchemaUtils.resolveSchemas(Utils.resolveOpenApi(context));
         ClassElement customElementType = getCustomSchema(elementType.getName(), elementType.getTypeArguments(), context);
-        String schemaName = element.stringValue(io.swagger.v3.oas.annotations.media.Schema.class, "name")
+        String schemaName = stringValue(element, io.swagger.v3.oas.annotations.media.Schema.class, "name")
             .orElse(computeDefaultSchemaName(null, customElementType != null ? customElementType : elementType, elementType.getTypeArguments(), context, null));
         Schema<?> wrappedPropertySchema = schemas.get(schemaName);
         Map<String, Schema> properties = wrappedPropertySchema.getProperties();
@@ -1074,12 +1079,12 @@ abstract class AbstractOpenApiVisitor {
         if (propertySchema == null) {
             return;
         }
-        AnnotationValue<JsonUnwrapped> uw = element.getAnnotation(JsonUnwrapped.class);
+        AnnotationValue<JsonUnwrapped> uw = getAnnotation(element, JsonUnwrapped.class);
         if (uw != null && uw.booleanValue("enabled").orElse(Boolean.TRUE)) {
             handleUnwrapped(context, element, elementType, parentSchema, uw);
         } else {
             // check schema required flag
-            AnnotationValue<io.swagger.v3.oas.annotations.media.Schema> schemaAnnotationValue = element.getAnnotation(io.swagger.v3.oas.annotations.media.Schema.class);
+            AnnotationValue<io.swagger.v3.oas.annotations.media.Schema> schemaAnnotationValue = getAnnotation(element, io.swagger.v3.oas.annotations.media.Schema.class);
             Optional<Boolean> elementSchemaRequired = Optional.empty();
             boolean isAutoRequiredMode = true;
             boolean isRequiredDefaultValueSet = false;
@@ -1160,14 +1165,14 @@ abstract class AbstractOpenApiVisitor {
     private String resolvePropertyName(Element element, Element classElement, Schema<?> propertySchema) {
         String name = Optional.ofNullable(propertySchema.getName()).orElse(element.getName());
 
-        if (element.hasAnnotation(io.swagger.v3.oas.annotations.media.Schema.class)) {
-            Optional<String> nameFromSchema = element.stringValue(io.swagger.v3.oas.annotations.media.Schema.class, "name");
+        if (isAnnotationPresent(element, io.swagger.v3.oas.annotations.media.Schema.class)) {
+            Optional<String> nameFromSchema = stringValue(element, io.swagger.v3.oas.annotations.media.Schema.class, "name");
             if (nameFromSchema.isPresent()) {
                 return nameFromSchema.get();
             }
         }
-        if (element.hasAnnotation(JsonProperty.class)) {
-            return element.stringValue(JsonProperty.class, "value").orElse(name);
+        if (isAnnotationPresent(element, JsonProperty.class)) {
+            return stringValue(element, JsonProperty.class, "value").orElse(name);
         }
         if (classElement != null && classElement.hasAnnotation(JsonNaming.class)) {
             // INVESTIGATE: "classValue" doesn't work in this case
@@ -1202,7 +1207,7 @@ abstract class AbstractOpenApiVisitor {
      */
     protected Schema<?> bindSchemaForElement(VisitorContext context, TypedElement element, ClassElement elementType, Schema<?> schemaToBind,
                                              @Nullable ClassElement jsonViewClass) {
-        AnnotationValue<io.swagger.v3.oas.annotations.media.Schema> schemaAnn = element.getAnnotation(io.swagger.v3.oas.annotations.media.Schema.class);
+        AnnotationValue<io.swagger.v3.oas.annotations.media.Schema> schemaAnn = getAnnotation(element, io.swagger.v3.oas.annotations.media.Schema.class);
         Schema<?> originalSchema = schemaToBind;
 
         if (originalSchema.get$ref() != null) {
@@ -1228,7 +1233,7 @@ abstract class AbstractOpenApiVisitor {
                 }
             }
         }
-        AnnotationValue<io.swagger.v3.oas.annotations.media.ArraySchema> arraySchemaAnn = element.getAnnotation(io.swagger.v3.oas.annotations.media.ArraySchema.class);
+        AnnotationValue<io.swagger.v3.oas.annotations.media.ArraySchema> arraySchemaAnn = getAnnotation(element, io.swagger.v3.oas.annotations.media.ArraySchema.class);
         if (arraySchemaAnn != null) {
             schemaToBind = bindArraySchemaAnnotationValue(context, element, schemaToBind, arraySchemaAnn, jsonViewClass);
             Optional<String> schemaName = arraySchemaAnn.stringValue("name");
@@ -1255,11 +1260,11 @@ abstract class AbstractOpenApiVisitor {
         if (StringUtils.isNotEmpty(topLevelSchema.getDescription())) {
             notOnlyRef = true;
         }
-        if (element.isAnnotationPresent(Deprecated.class)) {
+        if (isAnnotationPresent(element, Deprecated.class)) {
             topLevelSchema.setDeprecated(true);
             notOnlyRef = true;
         }
-        final String defaultValue = element.stringValue(Bindable.class, "defaultValue").orElse(null);
+        final String defaultValue = stringValue(element, Bindable.class, "defaultValue").orElse(null);
         if (defaultValue != null && schemaToBind.getDefault() == null) {
             setDefaultValueObject(schemaToBind, defaultValue, elementType, schemaToBind.getType(), schemaToBind.getFormat(), true, context);
             notOnlyRef = true;
@@ -1271,7 +1276,7 @@ abstract class AbstractOpenApiVisitor {
             topLevelSchema.setNullable(true);
             notOnlyRef = true;
         }
-        final String defaultJacksonValue = element.stringValue(JsonProperty.class, "defaultValue").orElse(null);
+        final String defaultJacksonValue = stringValue(element, JsonProperty.class, "defaultValue").orElse(null);
         if (defaultJacksonValue != null && schemaToBind.getDefault() == null) {
             setDefaultValueObject(topLevelSchema, defaultJacksonValue, elementType, schemaToBind.getType(), schemaToBind.getFormat(), false, context);
             notOnlyRef = true;
@@ -1321,46 +1326,46 @@ abstract class AbstractOpenApiVisitor {
         final boolean isIterableOrMap = elementType.isIterable() || elementType.isAssignable(Map.class);
 
         if (isIterableOrMap) {
-            if (element.isAnnotationPresent("javax.validation.constraints.NotEmpty$List")
-                || element.isAnnotationPresent("jakarta.validation.constraints.NotEmpty$List")) {
+            if (isAnnotationPresent(element, "javax.validation.constraints.NotEmpty$List")
+                || isAnnotationPresent(element, "jakarta.validation.constraints.NotEmpty$List")) {
                 schemaToBind.setMinItems(1);
             }
 
-            element.findAnnotation("javax.validation.constraints.Size$List")
+            findAnnotation(element, "javax.validation.constraints.Size$List")
                 .ifPresent(listAnn -> listAnn.getValue(AnnotationValue.class)
                     .ifPresent(ann -> ann.intValue("min")
                         .ifPresent(schemaToBind::setMinItems)));
-            element.findAnnotation("jakarta.validation.constraints.Size$List")
+            findAnnotation(element, "jakarta.validation.constraints.Size$List")
                 .ifPresent(listAnn -> listAnn.getValue(AnnotationValue.class)
                     .ifPresent(ann -> ann.intValue("min")
                         .ifPresent(schemaToBind::setMinItems)));
 
-            element.findAnnotation("javax.validation.constraints.Size$List")
+            findAnnotation(element, "javax.validation.constraints.Size$List")
                 .ifPresent(listAnn -> listAnn.getValue(AnnotationValue.class)
                     .ifPresent(ann -> ann.intValue("max")
                         .ifPresent(schemaToBind::setMaxItems)));
-            element.findAnnotation("jakarta.validation.constraints.Size$List")
+            findAnnotation(element, "jakarta.validation.constraints.Size$List")
                 .ifPresent(listAnn -> listAnn.getValue(AnnotationValue.class)
                     .ifPresent(ann -> ann.intValue("max")
                         .ifPresent(schemaToBind::setMaxItems)));
 
         } else {
             if (PrimitiveType.STRING.getCommonName().equals(schemaToBind.getType())) {
-                if (element.isAnnotationPresent("javax.validation.constraints.NotEmpty$List")
-                    || element.isAnnotationPresent("jakarta.validation.constraints.NotEmpty$List")
-                    || element.isAnnotationPresent("javax.validation.constraints.NotBlank$List")
-                    || element.isAnnotationPresent("jakarta.validation.constraints.NotBlank$List")) {
+                if (isAnnotationPresent(element, "javax.validation.constraints.NotEmpty$List")
+                    || isAnnotationPresent(element, "jakarta.validation.constraints.NotEmpty$List")
+                    || isAnnotationPresent(element, "javax.validation.constraints.NotBlank$List")
+                    || isAnnotationPresent(element, "jakarta.validation.constraints.NotBlank$List")) {
                     schemaToBind.setMinLength(1);
                 }
 
-                element.findAnnotation("javax.validation.constraints.Size$List")
+                findAnnotation(element, "javax.validation.constraints.Size$List")
                     .ifPresent(listAnn -> {
                         for (AnnotationValue<?> ann : listAnn.getAnnotations("value")) {
                             ann.intValue("min").ifPresent(schemaToBind::setMinLength);
                             ann.intValue("max").ifPresent(schemaToBind::setMaxLength);
                         }
                     });
-                element.findAnnotation("jakarta.validation.constraints.Size$List")
+                findAnnotation(element, "jakarta.validation.constraints.Size$List")
                     .ifPresent(listAnn -> {
                         for (AnnotationValue<?> ann : listAnn.getAnnotations("value")) {
                             ann.intValue("min").ifPresent(schemaToBind::setMinLength);
@@ -1369,63 +1374,33 @@ abstract class AbstractOpenApiVisitor {
                     });
             }
 
-            if (element.isAnnotationPresent("javax.validation.constraints.Negative$List")
-                || element.isAnnotationPresent("jakarta.validation.constraints.Negative$List")) {
+            if (isAnnotationPresent(element, "javax.validation.constraints.Negative$List")
+                || isAnnotationPresent(element, "jakarta.validation.constraints.Negative$List")) {
                 schemaToBind.setMaximum(BigDecimal.ZERO);
                 schemaToBind.exclusiveMaximum(true);
             }
-            if (element.isAnnotationPresent("javax.validation.constraints.NegativeOrZero$List")
-                || element.isAnnotationPresent("jakarta.validation.constraints.NegativeOrZero$List")) {
+            if (isAnnotationPresent(element, "javax.validation.constraints.NegativeOrZero$List")
+                || isAnnotationPresent(element, "jakarta.validation.constraints.NegativeOrZero$List")) {
                 schemaToBind.setMaximum(BigDecimal.ZERO);
             }
-            if (element.isAnnotationPresent("javax.validation.constraints.Positive$List")
-                || element.isAnnotationPresent("jakarta.validation.constraints.Positive$List")) {
+            if (isAnnotationPresent(element, "javax.validation.constraints.Positive$List")
+                || isAnnotationPresent(element, "jakarta.validation.constraints.Positive$List")) {
                 schemaToBind.setMinimum(BigDecimal.ZERO);
                 schemaToBind.exclusiveMinimum(true);
             }
-            if (element.isAnnotationPresent("javax.validation.constraints.PositiveOrZero$List")
-                || element.isAnnotationPresent("jakarta.validation.constraints.PositiveOrZero$List")) {
+            if (isAnnotationPresent(element, "javax.validation.constraints.PositiveOrZero$List")
+                || isAnnotationPresent(element, "jakarta.validation.constraints.PositiveOrZero$List")) {
                 schemaToBind.setMinimum(BigDecimal.ZERO);
             }
 
-            element.findAnnotation("javax.validation.constraints.Min$List")
+            findAnnotation(element, "javax.validation.constraints.Min$List")
                 .ifPresent(listAnn -> {
                     for (AnnotationValue<?> ann : listAnn.getAnnotations("value")) {
                         ann.getValue(BigDecimal.class)
                             .ifPresent(schemaToBind::setMinimum);
                     }
                 });
-            element.findAnnotation("jakarta.validation.constraints.Min$List")
-                .ifPresent(listAnn -> {
-                    for (AnnotationValue<?> ann : listAnn.getAnnotations("value")) {
-                        ann.getValue(BigDecimal.class)
-                            .ifPresent(schemaToBind::setMinimum);
-                    }
-                });
-
-            element.findAnnotation("javax.validation.constraints.Max$List")
-                .ifPresent(listAnn -> {
-                    for (AnnotationValue<?> ann : listAnn.getAnnotations("value")) {
-                        ann.getValue(BigDecimal.class)
-                            .ifPresent(schemaToBind::setMaximum);
-                    }
-                });
-            element.findAnnotation("jakarta.validation.constraints.Max$List")
-                .ifPresent(listAnn -> {
-                    for (AnnotationValue<?> ann : listAnn.getAnnotations("value")) {
-                        ann.getValue(BigDecimal.class)
-                            .ifPresent(schemaToBind::setMaximum);
-                    }
-                });
-
-            element.findAnnotation("javax.validation.constraints.DecimalMin$List")
-                .ifPresent(listAnn -> {
-                    for (AnnotationValue<?> ann : listAnn.getAnnotations("value")) {
-                        ann.getValue(BigDecimal.class)
-                            .ifPresent(schemaToBind::setMinimum);
-                    }
-                });
-            element.findAnnotation("jakarta.validation.constraints.DecimalMin$List")
+            findAnnotation(element, "jakarta.validation.constraints.Min$List")
                 .ifPresent(listAnn -> {
                     for (AnnotationValue<?> ann : listAnn.getAnnotations("value")) {
                         ann.getValue(BigDecimal.class)
@@ -1433,14 +1408,14 @@ abstract class AbstractOpenApiVisitor {
                     }
                 });
 
-            element.findAnnotation("javax.validation.constraints.DecimalMax$List")
+            findAnnotation(element, "javax.validation.constraints.Max$List")
                 .ifPresent(listAnn -> {
                     for (AnnotationValue<?> ann : listAnn.getAnnotations("value")) {
                         ann.getValue(BigDecimal.class)
                             .ifPresent(schemaToBind::setMaximum);
                     }
                 });
-            element.findAnnotation("jakarta.validation.constraints.DecimalMax$List")
+            findAnnotation(element, "jakarta.validation.constraints.Max$List")
                 .ifPresent(listAnn -> {
                     for (AnnotationValue<?> ann : listAnn.getAnnotations("value")) {
                         ann.getValue(BigDecimal.class)
@@ -1448,7 +1423,37 @@ abstract class AbstractOpenApiVisitor {
                     }
                 });
 
-            element.findAnnotation("javax.validation.constraints.Email$List")
+            findAnnotation(element, "javax.validation.constraints.DecimalMin$List")
+                .ifPresent(listAnn -> {
+                    for (AnnotationValue<?> ann : listAnn.getAnnotations("value")) {
+                        ann.getValue(BigDecimal.class)
+                            .ifPresent(schemaToBind::setMinimum);
+                    }
+                });
+            findAnnotation(element, "jakarta.validation.constraints.DecimalMin$List")
+                .ifPresent(listAnn -> {
+                    for (AnnotationValue<?> ann : listAnn.getAnnotations("value")) {
+                        ann.getValue(BigDecimal.class)
+                            .ifPresent(schemaToBind::setMinimum);
+                    }
+                });
+
+            findAnnotation(element, "javax.validation.constraints.DecimalMax$List")
+                .ifPresent(listAnn -> {
+                    for (AnnotationValue<?> ann : listAnn.getAnnotations("value")) {
+                        ann.getValue(BigDecimal.class)
+                            .ifPresent(schemaToBind::setMaximum);
+                    }
+                });
+            findAnnotation(element, "jakarta.validation.constraints.DecimalMax$List")
+                .ifPresent(listAnn -> {
+                    for (AnnotationValue<?> ann : listAnn.getAnnotations("value")) {
+                        ann.getValue(BigDecimal.class)
+                            .ifPresent(schemaToBind::setMaximum);
+                    }
+                });
+
+            findAnnotation(element, "javax.validation.constraints.Email$List")
                 .ifPresent(listAnn -> {
                     schemaToBind.setFormat(PrimitiveType.EMAIL.getCommonName());
                     for (AnnotationValue<?> ann : listAnn.getAnnotations("value")) {
@@ -1456,7 +1461,7 @@ abstract class AbstractOpenApiVisitor {
                             .ifPresent(schemaToBind::setPattern);
                     }
                 });
-            element.findAnnotation("jakarta.validation.constraints.Email$List")
+            findAnnotation(element, "jakarta.validation.constraints.Email$List")
                 .ifPresent(listAnn -> {
                     schemaToBind.setFormat(PrimitiveType.EMAIL.getCommonName());
                     for (AnnotationValue<?> ann : listAnn.getAnnotations("value")) {
@@ -1465,14 +1470,14 @@ abstract class AbstractOpenApiVisitor {
                     }
                 });
 
-            element.findAnnotation("javax.validation.constraints.Pattern$List")
+            findAnnotation(element, "javax.validation.constraints.Pattern$List")
                 .ifPresent(listAnn -> {
                     for (AnnotationValue<?> ann : listAnn.getAnnotations("value")) {
                         ann.stringValue("regexp")
                             .ifPresent(schemaToBind::setPattern);
                     }
                 });
-            element.findAnnotation("jakarta.validation.constraints.Pattern$List")
+            findAnnotation(element, "jakarta.validation.constraints.Pattern$List")
                 .ifPresent(listAnn -> {
                     for (AnnotationValue<?> ann : listAnn.getAnnotations("value")) {
                         ann.stringValue("regexp")
@@ -2263,15 +2268,15 @@ abstract class AbstractOpenApiVisitor {
         List<Object> enumValues = new ArrayList<>();
         for (EnumConstantElement element : type.elements()) {
 
-            AnnotationValue<io.swagger.v3.oas.annotations.media.Schema> schemaAnn = element.getAnnotation(io.swagger.v3.oas.annotations.media.Schema.class);
+            AnnotationValue<io.swagger.v3.oas.annotations.media.Schema> schemaAnn = getAnnotation(element, io.swagger.v3.oas.annotations.media.Schema.class);
             boolean isHidden = schemaAnn != null && schemaAnn.booleanValue("hidden").orElse(false);
 
             if (isHidden
-                || element.isAnnotationPresent(Hidden.class)
-                || element.isAnnotationPresent(JsonIgnore.class)) {
+                || isAnnotationPresent(element, Hidden.class)
+                || isAnnotationPresent(element, JsonIgnore.class)) {
                 continue;
             }
-            AnnotationValue<JsonProperty> jsonProperty = element.getAnnotation(JsonProperty.class);
+            AnnotationValue<JsonProperty> jsonProperty = getAnnotation(element, JsonProperty.class);
             String jacksonValue = jsonProperty != null ? jsonProperty.stringValue("value").orElse(null) : null;
             if (StringUtils.hasText(jacksonValue)) {
                 try {
@@ -2520,10 +2525,10 @@ abstract class AbstractOpenApiVisitor {
         }
 
         for (TypedElement publicField : publicFields) {
-            boolean isHidden = publicField.getAnnotationMetadata().booleanValue(io.swagger.v3.oas.annotations.media.Schema.class, "hidden").orElse(false);
-            AnnotationValue<JsonAnySetter> jsonAnySetterAnn = publicField.getAnnotation(JsonAnySetter.class);
-            if (publicField.isAnnotationPresent(JsonIgnore.class)
-                || publicField.isAnnotationPresent(Hidden.class)
+            boolean isHidden = getAnnotationMetadata(publicField).booleanValue(io.swagger.v3.oas.annotations.media.Schema.class, "hidden").orElse(false);
+            AnnotationValue<JsonAnySetter> jsonAnySetterAnn = getAnnotation(publicField, JsonAnySetter.class);
+            if (isAnnotationPresent(publicField, JsonIgnore.class)
+                || isAnnotationPresent(publicField, Hidden.class)
                 || (jsonAnySetterAnn != null && jsonAnySetterAnn.booleanValue("enabled").orElse(true))
                 || isHidden) {
                 continue;
@@ -2576,7 +2581,7 @@ abstract class AbstractOpenApiVisitor {
     }
 
     private boolean allowedByJsonView(TypedElement publicField, String[] classLvlJsonViewClasses, ClassElement jsonViewClassEl, VisitorContext context) {
-        String[] fieldJsonViewClasses = publicField.getAnnotationMetadata().stringValues(JsonView.class);
+        String[] fieldJsonViewClasses = getAnnotationMetadata(publicField).stringValues(JsonView.class);
         if (ArrayUtils.isEmpty(fieldJsonViewClasses)) {
             fieldJsonViewClasses = classLvlJsonViewClasses;
         }

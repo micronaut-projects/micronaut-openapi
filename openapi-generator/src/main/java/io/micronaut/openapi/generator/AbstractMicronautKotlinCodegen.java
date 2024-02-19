@@ -938,6 +938,14 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
             param.vendorExtensions.put("hasMultipleParams", hasMultipleParams);
         }
         op.vendorExtensions.put("originReturnProperty", op.returnProperty);
+        if (op.responses != null && !op.responses.isEmpty()) {
+            for (var resp : op.responses) {
+                if (resp.isDefault) {
+                    resp.code = "default";
+                }
+            }
+        }
+
         processParametersWithAdditionalMappings(op.allParams, op.imports);
         processWithResponseBodyMapping(op);
         processOperationWithResponseWrappers(op);
