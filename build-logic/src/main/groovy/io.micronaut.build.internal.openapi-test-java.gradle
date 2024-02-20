@@ -1,0 +1,14 @@
+plugins {
+    id("io.micronaut.build.internal.openapi-base")
+    id("java-library")
+}
+
+dependencies {
+    testAnnotationProcessor(mn.micronaut.inject.java)
+    testImplementation(mnTest.micronaut.test.junit5)
+    testRuntimeOnly(libs.junit.jupiter.engine)
+    testRuntimeOnly(mnLogging.logback.classic)
+}
+tasks.test {
+    useJUnitPlatform()
+}
