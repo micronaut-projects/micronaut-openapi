@@ -23,6 +23,7 @@ include 'docs-examples:example-groovy'
 include 'docs-examples:example-java'
 include 'docs-examples:example-kotlin'
 include 'test-suite-java-client-generator'
+include 'test-suite-java-jaxrs'
 include 'test-suite-java-server-generator'
 include 'test-suite-kotlin-kapt-client-generator'
 include 'test-suite-kotlin-kapt-server-generator'
@@ -49,4 +50,5 @@ micronautBuild {
     importMicronautCatalog("micronaut-data")
     importMicronautCatalog("micronaut-kotlin")
     importMicronautCatalog("micronaut-session")
+    importMicronautCatalog("micronaut-jaxrs")
 }
