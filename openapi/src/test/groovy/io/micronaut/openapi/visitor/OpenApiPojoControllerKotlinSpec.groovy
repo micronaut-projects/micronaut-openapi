@@ -8,11 +8,13 @@ import io.swagger.v3.oas.models.responses.ApiResponse
 class OpenApiPojoControllerKotlinSpec extends AbstractKotlinCompilerSpec {
 
     def setup() {
+        Utils.clean()
         System.clearProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_ENABLED)
         System.setProperty(Utils.ATTR_TEST_MODE, "true")
     }
 
     def cleanup() {
+        Utils.clean()
         System.clearProperty(Utils.ATTR_TEST_MODE)
     }
 
