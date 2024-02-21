@@ -1,0 +1,52 @@
+openapi: "3.0.0"
+info:
+  version: 1.0.0
+  title: Compute API
+  description: API for the Compute Service
+servers:
+  - url: localhost:8000/api
+    description: The api server
+
+paths:
+  /sendEnum:
+    get:
+      operationId: sendEnum
+      tags: [ parameters ]
+      parameters:
+        - name: name
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/StringEnum"
+        - name: intEnum
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/IntEnum"
+        - name: boolEnum
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/BooleanEnum"
+        - name: decimalEnum
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/DecimalEnum"
+      responses:
+        200:
+          description: Success
+components:
+  schemas:
+    StringEnum:
+      type: string
+      enum: ['starting', 'running', 'stopped', 'deleted']
+    IntEnum:
+      type: integer
+      enum: [1, 2, 3, 4, 5]
+    BooleanEnum:
+      type: boolean
+      enum: ['true', 'false']
+    DecimalEnum:
+      type: number
+      enum: [1.23, 2.45, 34.10]

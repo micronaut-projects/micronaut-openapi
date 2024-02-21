@@ -15,9 +15,11 @@
  */
 package io.micronaut.openapi.generator;
 
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.openapitools.codegen.CodegenModel;
 import org.openapitools.codegen.CodegenParameter;
 import org.openapitools.codegen.CodegenProperty;
 
@@ -206,5 +208,27 @@ public final class Utils {
                 "number", "partial-time", "date", "date-time", "bigdecimal", "biginteger" -> true;
             default -> false;
         };
+    }
+
+    public static void addStrValueToEnum(CodegenModel model) {
+        if (!model.isEnum || model.allowableValues == null) {
+            return;
+        }
+        var enumVars = (List<Object>) model.allowableValues.get("enumVars");
+        for (var enumVar : enumVars) {
+            var varMap = (Map<String, Object>) enumVar;
+            var value = varMap.get("value").toString();
+            if (model.isNumeric) {
+                var argPos = value.indexOf('(');
+                // case for BigDecimal
+                if (argPos >= 0) {
+                    value = value.substring(argPos + 1, value.indexOf(')'));
+                }
+                if (!value.contains("\"")) {
+                    value = "\"" + value + "\"";
+                }
+            }
+            varMap.put("strValue", value);
+        }
     }
 }

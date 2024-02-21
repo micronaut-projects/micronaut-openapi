@@ -68,6 +68,7 @@ import com.google.common.collect.ImmutableMap;
 import com.samskivert.mustache.Mustache;
 
 import static io.micronaut.openapi.generator.Utils.DEFAULT_BODY_PARAM_NAME;
+import static io.micronaut.openapi.generator.Utils.addStrValueToEnum;
 import static io.micronaut.openapi.generator.Utils.processGenericAnnotations;
 import static org.openapitools.codegen.CodegenConstants.INVOKER_PACKAGE;
 import static org.openapitools.codegen.languages.KotlinClientCodegen.DATE_LIBRARY;
@@ -1200,6 +1201,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
             for (var property : model.requiredVars) {
                 processProperty(property, isServer, model, objs);
             }
+            addStrValueToEnum(model);
         }
 
         return objs;
