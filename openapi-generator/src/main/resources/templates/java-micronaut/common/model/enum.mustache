@@ -35,6 +35,9 @@
         {{/enumVars}}
     {{/allowableValues}}
 
+    {{#formatSingleLine}}public final static Map<{{{dataType}}}, {{>common/model/enumName}}> VALUE_MAPPING = Map.copyOf(Arrays.stream(values()){{/formatSingleLine}}
+            .collect(Collectors.toMap(v -> v.value{{#isString}}{{#useEnumCaseInsensitive}}.toLowerCase(){{/useEnumCaseInsensitive}}{{/isString}}, Function.identity())));
+
     private final {{{dataType}}} value;
 {{^lombok}}
 
@@ -58,18 +61,17 @@
         return String.valueOf(value);
     }
 
-    {{#formatSingleLine}}public final static Map<{{{dataType}}}, {{>common/model/enumName}}> VALUE_MAPPING = Map.copyOf(Arrays.stream(values()){{/formatSingleLine}}
-        .collect(Collectors.toMap(v -> v.value{{#isString}}{{#useEnumCaseInsensitive}}.toLowerCase(){{/useEnumCaseInsensitive}}{{/isString}}, v -> v)));
-
     /**
      * Create this enum from a value.
+     *
+     * @param value the value
      *
      * @return The enum
      */
     {{#jackson}}
     @JsonCreator
     {{/jackson}}
-    {{#formatSingleLine}}public static {{>common/model/enumName}} fromValue(String value){{/formatSingleLine}} {
+    {{#formatSingleLine}}public static {{>common/model/enumName}} fromValue({{{dataType}}} value){{/formatSingleLine}} {
         {{^isNullable}}
         if (!VALUE_MAPPING.containsKey(value{{#isString}}{{#useEnumCaseInsensitive}}.toLowerCase(){{/useEnumCaseInsensitive}}{{/isString}})) {
             throw new IllegalArgumentException("Unexpected value '" + value + "'");

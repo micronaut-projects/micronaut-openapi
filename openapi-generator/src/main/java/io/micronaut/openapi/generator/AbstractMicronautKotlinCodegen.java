@@ -342,6 +342,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         importMapping.put("ZonedDateTime", "java.time.ZonedDateTime");
         importMapping.put("LocalDate", "java.time.LocalDate");
         importMapping.put("LocalTime", "java.time.LocalTime");
+        importMapping.put("BigDecimal", "java.math.BigDecimal");
     }
 
     public void setGenerateHttpResponseAlways(boolean generateHttpResponseAlways) {
@@ -824,10 +825,35 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
     }
 
     @Override
+    public String toEnumValue(String value, String datatype) {
+        if ("Integer".equals(datatype)
+            || "Double".equals(datatype)
+            || "Int".equals(datatype)) {
+            return value;
+        } else if ("Long".equals(datatype)) {
+            // add l to number, e.g. 2048 => 2048l
+            return value + "L";
+        } else if ("Float".equals(datatype)) {
+            // add f to number, e.g. 3.14 => 3.14f
+            return value + "F";
+        } else if ("BigDecimal".equals(datatype)) {
+            // use BigDecimal String constructor
+            return "BigDecimal(\"" + value + "\")";
+        } else if ("URI".equals(datatype)) {
+            return "URI.create(\"" + escapeText(value) + "\")";
+        } else {
+            return "\"" + escapeText(value) + "\"";
+        }
+    }
+
+    @Override
     public CodegenModel fromModel(String name, Schema model) {
         CodegenModel codegenModel = super.fromModel(name, model);
         codegenModel.imports.remove("ApiModel");
         codegenModel.imports.remove("ApiModelProperty");
+        if ("BigDecimal".equals(codegenModel.dataType)) {
+            codegenModel.imports.add("BigDecimal");
+        }
         allModels.put(name, codegenModel);
         return codegenModel;
     }
@@ -1406,7 +1432,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         } else if ("ByteArray".equals(dataType)) {
             example = "ByteArray(10)";
         } else if ("BigDecimal".equals(dataType)) {
-            example = "BigDecimal(78)";
+            example = "BigDecimal(\"78\")";
         } else if (allowableValues != null && !allowableValues.isEmpty()) {
             // This is an enum
             Object value = example;

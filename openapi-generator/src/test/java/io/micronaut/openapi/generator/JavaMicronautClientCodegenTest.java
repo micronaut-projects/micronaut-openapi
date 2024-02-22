@@ -366,8 +366,9 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         String outputPath = generateFiles(codegen, "src/test/resources/3_0/enum.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
         String modelPath = outputPath + "src/main/java/org/openapitools/model/";
 
-        assertFileContains(modelPath + "StringEnum.java", "@JsonProperty(\"starting\")");
-        assertFileContains(modelPath + "IntEnum.java", "@JsonProperty(\"1\")");
-        assertFileContains(modelPath + "DecimalEnum.java", "@JsonProperty(\"1.23\")");
+        assertFileContains(modelPath + "StringEnum.java", "@JsonProperty(\"starting\")", "STARTING(\"starting\"),");
+        assertFileContains(modelPath + "IntEnum.java", "@JsonProperty(\"1\")", "NUMBER_1(1),");
+        assertFileContains(modelPath + "LongEnum.java", "@JsonProperty(\"1\")", "NUMBER_3(3L),");
+        assertFileContains(modelPath + "DecimalEnum.java", "@JsonProperty(\"1.23\")", "NUMBER_34_DOT_1(new BigDecimal(\"34.1\"))");
     }
 }

@@ -17,7 +17,7 @@
 {{{.}}}
 {{/additionalEnumTypeAnnotations}}
 {{#nonPublicApi}}internal {{/nonPublicApi}}{{#formatSingleLine}}enum class {{>common/model/enumName}}{{/formatSingleLine}} (
-    @get:JsonValue val value: String
+    @get:JsonValue val value: {{{dataType}}}
 ) {
 
     {{#allowableValues}}
@@ -36,7 +36,7 @@
     {{/allowableValues}}
 
     override fun toString(): String {
-        return value
+        return {{#isString}}value{{/isString}}{{^isString}}"$value"{{/isString}}
     }
 
     companion object {
@@ -53,7 +53,7 @@
          */
         @JsonCreator
         @JvmStatic
-        fun fromValue(value: String): {{>common/model/enumName}}{{#isNullable}}?{{/isNullable}} {
+        fun fromValue(value: {{{dataType}}}): {{>common/model/enumName}}{{#isNullable}}?{{/isNullable}} {
             {{^isNullable}}
             require(VALUE_MAPPING.containsKey(value)) { "Unexpected value '$value'" }
             {{/isNullable}}

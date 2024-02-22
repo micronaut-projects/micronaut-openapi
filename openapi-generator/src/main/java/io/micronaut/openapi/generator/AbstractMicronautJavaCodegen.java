@@ -256,6 +256,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
         importMapping.put("ZonedDateTime", "java.time.ZonedDateTime");
         importMapping.put("LocalDate", "java.time.LocalDate");
         importMapping.put("LocalTime", "java.time.LocalTime");
+        importMapping.put("Function", "java.util.function.Function");
     }
 
     public void setGenerateHttpResponseAlways(boolean generateHttpResponseAlways) {
@@ -814,6 +815,26 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
     }
 
     @Override
+    public String toEnumValue(String value, String datatype) {
+        if ("Integer".equals(datatype) || "Double".equals(datatype)) {
+            return value;
+        } else if ("Long".equals(datatype)) {
+            // add l to number, e.g. 2048 => 2048L
+            return value + "L";
+        } else if ("Float".equals(datatype)) {
+            // add f to number, e.g. 3.14 => 3.14F
+            return value + "F";
+        } else if ("BigDecimal".equals(datatype)) {
+            // use BigDecimal String constructor
+            return "new BigDecimal(\"" + value + "\")";
+        } else if ("URI".equals(datatype)) {
+            return "URI.create(\"" + escapeText(value) + "\")";
+        } else {
+            return "\"" + escapeText(value) + "\"";
+        }
+    }
+
+    @Override
     public CodegenOperation fromOperation(String path, String httpMethod, Operation operation, List<Server> servers) {
         CodegenOperation op = super.fromOperation(path, httpMethod, operation, servers);
 
@@ -1084,6 +1105,9 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
             for (var property : model.requiredVars) {
                 processProperty(property, isServer, objs);
             }
+            if (model.isEnum) {
+                addImport(model, "Function");
+            }
             addStrValueToEnum(model);
         }
 
@@ -1240,7 +1264,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
         } else if ("LocalDateTime".equals(dataType)) {
             example = "LocalDateTime.of(2001, 2, 3, 4, 5)";
         } else if ("BigDecimal".equals(dataType)) {
-            example = "new BigDecimal(78)";
+            example = "new BigDecimal(\"78\")";
         } else if (allowableValues != null && !allowableValues.isEmpty()) {
             // This is an enum
             Object value = example;

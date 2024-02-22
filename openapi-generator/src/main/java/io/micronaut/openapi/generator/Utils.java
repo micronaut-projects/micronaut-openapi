@@ -224,6 +224,12 @@ public final class Utils {
                 if (argPos >= 0) {
                     value = value.substring(argPos + 1, value.indexOf(')'));
                 }
+                var upperValue = value.toUpperCase();
+                if (upperValue.endsWith("F")
+                    || upperValue.endsWith("L")
+                    || upperValue.endsWith("D")) {
+                    value = value.substring(0, value.length() - 1);
+                }
                 if (!value.contains("\"")) {
                     value = "\"" + value + "\"";
                 }
