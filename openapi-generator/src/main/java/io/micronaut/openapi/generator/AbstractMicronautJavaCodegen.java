@@ -1049,7 +1049,38 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
             varName = "" + varName.charAt(0) + Character.toLowerCase(varName.charAt(1)) + varName.substring(2);
         }
 
+        // this fix for properties started with underscores and named by reserved words
+        // For example, _____default
+        var fistNameChar = varName.toCharArray()[0];
+        var underscorePrefix = getUnderscorePrefix(name);
+        varName = getUnderscorePrefix(name)
+            + (fistNameChar == '_' && !underscorePrefix.isEmpty() ? "" : Character.toLowerCase(fistNameChar))
+            + varName.substring(1);
+
         return varName;
+    }
+
+    @Override
+    public String getterAndSetterCapitalize(String name) {
+        var newName = super.getterAndSetterCapitalize(name);
+        if (name.startsWith("_")) {
+            newName = getUnderscorePrefix(name)
+                    + Character.toLowerCase(newName.toCharArray()[0])
+                    + newName.substring(1);
+        }
+        return newName;
+    }
+
+    private String getUnderscorePrefix(String name) {
+        var nameChars = name.toCharArray();
+        var newNameBuilder = new StringBuilder();
+        for (char nameChar : nameChars) {
+            if (nameChar != '_') {
+                break;
+            }
+            newNameBuilder.append('_');
+        }
+        return newNameBuilder.toString();
     }
 
     @Override
