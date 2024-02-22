@@ -439,8 +439,9 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         String outputPath = generateFiles(codegen, "src/test/resources/3_0/enum.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
         String modelPath = outputPath + "src/main/kotlin/org/openapitools/model/";
 
-        assertFileContains(modelPath + "StringEnum.kt", "@JsonProperty(\"starting\")");
-        assertFileContains(modelPath + "IntEnum.kt", "@JsonProperty(\"1\")");
-        assertFileContains(modelPath + "DecimalEnum.kt", "@JsonProperty(\"1.23\")");
+        assertFileContains(modelPath + "StringEnum.kt", "@JsonProperty(\"starting\")", "STARTING(\"starting\"),");
+        assertFileContains(modelPath + "IntEnum.kt", "@JsonProperty(\"1\")", "_1(1),");
+        assertFileContains(modelPath + "LongEnum.kt", "@JsonProperty(\"1\")", "_3(3L),");
+        assertFileContains(modelPath + "DecimalEnum.kt", "@JsonProperty(\"1.23\")", "_34_1(BigDecimal(\"34.1\"))");
     }
 }

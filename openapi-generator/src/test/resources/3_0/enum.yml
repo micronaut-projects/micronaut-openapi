@@ -23,6 +23,11 @@ paths:
           required: true
           schema:
             $ref: "#/components/schemas/IntEnum"
+        - name: longEnum
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/LongEnum"
         - name: boolEnum
           in: query
           required: true
@@ -43,6 +48,10 @@ components:
       enum: ['starting', 'running', 'stopped', 'deleted']
     IntEnum:
       type: integer
+      enum: [1, 2, 3, 4, 5]
+    LongEnum:
+      type: integer
+      format: int64
       enum: [1, 2, 3, 4, 5]
     BooleanEnum:
       type: boolean

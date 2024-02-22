@@ -73,6 +73,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
     {{#models}}
         {{#model}}
             {{#isEnum}}
+import java.util.function.Function;
 
 {{>common/model/enum}}
             {{/isEnum}}
