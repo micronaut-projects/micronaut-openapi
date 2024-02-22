@@ -1,0 +1,30 @@
+openapi: "3.0.0"
+info:
+  version: 1.0.0
+  title: Compute API
+  description: API for the Compute Service
+servers:
+  - url: localhost:8000/api
+    description: The api server
+
+paths:
+  /sendEnum:
+    get:
+      operationId: sendEnum
+      tags: [ parameters ]
+      parameters:
+        - name: name
+          in: _query
+          required: true
+          schema:
+            $ref: "#/components/schemas/MyModel"
+      responses:
+        200:
+          description: Success
+components:
+  schemas:
+    MyModel:
+      type: object
+      properties:
+        _default:
+          type: number

@@ -370,4 +370,17 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         assertFileContains(modelPath + "IntEnum.java", "@JsonProperty(\"1\")");
         assertFileContains(modelPath + "DecimalEnum.java", "@JsonProperty(\"1.23\")");
     }
+
+    @Test
+    void testUnderscore() {
+
+        var codegen = new JavaMicronautClientCodegen();
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/underscore.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String modelPath = outputPath + "src/main/java/org/openapitools/model/";
+
+        assertFileContains(modelPath + "MyModel.java", "private BigDecimal _default;",
+            "public static final String JSON_PROPERTY_DEFAULT = \"_default\";",
+            "public BigDecimal get_default() {",
+            "public void set_default(BigDecimal _default) {");
+    }
 }
