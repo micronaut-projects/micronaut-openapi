@@ -431,4 +431,16 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         assertFileContains(modelPath + "Book.kt", "const val JSON_PROPERTY_TITLE = \"tItle\"",
             "var title: String,");
     }
+
+    @Test
+    void testEnumsWithNonStringTypeValue() {
+
+        var codegen = new KotlinMicronautClientCodegen();
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/enum.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String modelPath = outputPath + "src/main/kotlin/org/openapitools/model/";
+
+        assertFileContains(modelPath + "StringEnum.kt", "@JsonProperty(\"starting\")");
+        assertFileContains(modelPath + "IntEnum.kt", "@JsonProperty(\"1\")");
+        assertFileContains(modelPath + "DecimalEnum.kt", "@JsonProperty(\"1.23\")");
+    }
 }

@@ -58,6 +58,7 @@ import com.google.common.collect.ImmutableMap;
 import com.samskivert.mustache.Mustache;
 
 import static io.micronaut.openapi.generator.Utils.DEFAULT_BODY_PARAM_NAME;
+import static io.micronaut.openapi.generator.Utils.addStrValueToEnum;
 import static io.micronaut.openapi.generator.Utils.processGenericAnnotations;
 import static org.openapitools.codegen.CodegenConstants.INVOKER_PACKAGE;
 
@@ -1083,6 +1084,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
             for (var property : model.requiredVars) {
                 processProperty(property, isServer, objs);
             }
+            addStrValueToEnum(model);
         }
 
         return objs;
