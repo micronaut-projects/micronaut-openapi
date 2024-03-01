@@ -22,6 +22,7 @@ dependencies {
 def openapiGenerate = tasks.register("generateOpenApi", OpenApiGeneratorTask) {
     lang = "java"
     generatedAnnotation = true
+    clientId = "myClient"
     ksp = false
     classpath.from(configurations.openapiGenerator)
     openApiDefinition.convention(layout.projectDirectory.file("petstore.json"))

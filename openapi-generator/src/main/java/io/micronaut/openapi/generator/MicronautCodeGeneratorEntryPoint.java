@@ -280,14 +280,14 @@ public final class MicronautCodeGeneratorEntryPoint {
             if (javaClientOptions.additionalClientTypeAnnotations() != null) {
                 javaClientCodegen.setAdditionalClientTypeAnnotations(javaClientOptions.additionalClientTypeAnnotations());
             }
-            if (javaClientOptions.clientId() != null) {
-                javaClientCodegen.setClientId(javaClientCodegen.clientId);
+            if (javaClientOptions.clientId() != null && !javaClientOptions.clientId().isBlank()) {
+                javaClientCodegen.setClientId(javaClientOptions.clientId());
             }
             if (javaClientOptions.authorizationFilterPattern() != null) {
-                javaClientCodegen.setAuthorizationFilterPattern(javaClientCodegen.authorizationFilterPattern);
+                javaClientCodegen.setAuthorizationFilterPattern(javaClientOptions.authorizationFilterPattern());
             }
             if (javaClientOptions.basePathSeparator() != null) {
-                javaClientCodegen.setBasePathSeparator(javaClientCodegen.basePathSeparator);
+                javaClientCodegen.setBasePathSeparator(javaClientOptions.basePathSeparator());
             }
             javaClientCodegen.setConfigureAuthorization(javaClientOptions.useAuth());
             javaClientCodegen.setLombok(javaClientOptions.lombok());
@@ -318,14 +318,14 @@ public final class MicronautCodeGeneratorEntryPoint {
             if (kotlinClientOptions.additionalClientTypeAnnotations() != null) {
                 kotlinClientCodegen.setAdditionalClientTypeAnnotations(kotlinClientOptions.additionalClientTypeAnnotations());
             }
-            if (kotlinClientOptions.clientId() != null) {
-                kotlinClientCodegen.setClientId(kotlinClientCodegen.clientId);
+            if (kotlinClientOptions.clientId() != null && !kotlinClientOptions.clientId().isBlank()) {
+                kotlinClientCodegen.setClientId(kotlinClientOptions.clientId());
             }
             if (kotlinClientOptions.authorizationFilterPattern() != null) {
-                kotlinClientCodegen.setAuthorizationFilterPattern(kotlinClientCodegen.authorizationFilterPattern);
+                kotlinClientCodegen.setAuthorizationFilterPattern(kotlinClientOptions.authorizationFilterPattern());
             }
             if (kotlinClientOptions.basePathSeparator() != null) {
-                kotlinClientCodegen.setBasePathSeparator(kotlinClientCodegen.basePathSeparator);
+                kotlinClientCodegen.setBasePathSeparator(kotlinClientOptions.basePathSeparator());
             }
             kotlinClientCodegen.setGeneratedAnnotation(kotlinClientOptions.generatedAnnotation());
             kotlinClientCodegen.setKsp(kotlinClientOptions.ksp());

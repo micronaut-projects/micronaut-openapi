@@ -35,6 +35,7 @@ dependencies {
     testRuntimeOnly(mn.micronaut.json.core)
     testRuntimeOnly(mnSerde.micronaut.serde.jackson)
     testRuntimeOnly(mnLogging.logback.classic)
+    testRuntimeOnly(mn.snakeyaml)
 }
 
 sourceSets {
