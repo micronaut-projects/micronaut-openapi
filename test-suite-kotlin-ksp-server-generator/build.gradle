@@ -1,7 +1,7 @@
 plugins {
     id 'io.micronaut.build.internal.openapi-kotlin-ksp-generator-test-suite'
     alias(libs.plugins.kotlin.jvm)
-    alias(libs.plugins.kotlin.ksp)
+    id("com.google.devtools.ksp") version mn.versions.ksp
 }
 
 description = """

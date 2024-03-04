@@ -1,6 +1,6 @@
 plugins {
     alias(libs.plugins.kotlin.jvm)
-    alias(libs.plugins.kotlin.ksp)
+    id("com.google.devtools.ksp") version mn.versions.ksp
     alias(libs.plugins.kotlin.allopen)
 }
 
