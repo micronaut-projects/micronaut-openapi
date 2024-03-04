@@ -46,6 +46,7 @@ dependencies {
     testRuntimeOnly(mnSerde.micronaut.serde.jackson)
     testRuntimeOnly(libs.junit.jupiter.engine)
     testRuntimeOnly(mnLogging.logback.classic)
+    testRuntimeOnly(mn.snakeyaml)
 }
 
 tasks.named("generateOpenApi") {

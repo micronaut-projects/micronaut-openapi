@@ -52,31 +52,35 @@ public class GeneratorMain {
      */
     public static void main(String[] args) throws URISyntaxException {
         boolean server = "server".equals(args[0]);
-        var lang = GeneratorLanguage.valueOf(args[6].toUpperCase());
-        var generatedAnnotation = Boolean.parseBoolean(args[7]);
-        var ksp = Boolean.parseBoolean(args[8]);
+        var definitionFile = new URI(args[1]);
+        var outputDirectory = new File(args[2]);
+
+        var outputKinds = Arrays.stream(args[3].split(","))
+            .map(MicronautCodeGeneratorEntryPoint.OutputKind::of)
+            .toArray(MicronautCodeGeneratorEntryPoint.OutputKind[]::new);
+
         List<ParameterMapping> parameterMappings =
             parseParameterMappings(args[4]);
         List<ResponseBodyMapping> responseBodyMappings =
             parseResponseBodyMappings(args[5]);
+        var lang = GeneratorLanguage.valueOf(args[6].toUpperCase());
+        var generatedAnnotation = Boolean.parseBoolean(args[7]);
+        var ksp = Boolean.parseBoolean(args[8]);
 
         Map<String, String> nameMapping = parseNameMapping(args[9]);
 
-        String apiPrefix = args[10];
-        String apiSuffix = args[11];
-        String modelPrefix = args[12];
-        String modelSuffix = args[13];
+        String clientId = args[10];
 
-        MicronautCodeGeneratorEntryPoint.OutputKind[] outputKinds
-            = Arrays.stream(args[3].split(","))
-            .map(MicronautCodeGeneratorEntryPoint.OutputKind::of)
-            .toArray(MicronautCodeGeneratorEntryPoint.OutputKind[]::new);
+        String apiPrefix = args[11];
+        String apiSuffix = args[12];
+        String modelPrefix = args[13];
+        String modelSuffix = args[14];
 
         var builder = MicronautCodeGeneratorEntryPoint.builder()
-            .withDefinitionFile(new URI(args[1]))
-            .withOutputDirectory(new File(args[2]))
+            .withDefinitionFile(definitionFile)
+            .withOutputDirectory(outputDirectory)
             .withOutputs(outputKinds)
-            .withOptions(options -> {
+            .withOptions(options ->
                 options.withLang(lang)
                     .withInvokerPackage("io.micronaut.openapi.test")
                     .withApiPackage("io.micronaut.openapi.test.api")
@@ -91,39 +95,45 @@ public class GeneratorMain {
                     .withTestFramework(lang == JAVA ? MicronautCodeGeneratorEntryPoint.TestFramework.SPOCK : MicronautCodeGeneratorEntryPoint.TestFramework.JUNIT5)
                     .withParameterMappings(parameterMappings)
                     .withResponseBodyMappings(responseBodyMappings)
-                    .withNameMapping(nameMapping);
-            });
+                    .withNameMapping(nameMapping)
+            );
         if (server) {
             if (lang == GeneratorLanguage.KOTLIN) {
-                builder.forKotlinServer(serverOptions -> {
-                    serverOptions.withControllerPackage("io.micronaut.openapi.test.controller");
-                    // commented out because currently this would prevent the test project from compiling
-                    // because we generate both abstract classes _and_ dummy implementations
-                    serverOptions.withGenerateImplementationFiles(false)
+                builder.forKotlinServer(serverOptions ->
+                    serverOptions
+                        .withControllerPackage("io.micronaut.openapi.test.controller")
+                        // commented out because currently this would prevent the test project from compiling
+                        // because we generate both abstract classes _and_ dummy implementations
+                        .withGenerateImplementationFiles(false)
                         .withAuthentication(false)
                         .withKsp(ksp)
-                        .withGeneratedAnnotation(generatedAnnotation);
-                });
+                        .withGeneratedAnnotation(generatedAnnotation)
+                );
             } else {
-                builder.forJavaServer(serverOptions -> {
-                    serverOptions.withControllerPackage("io.micronaut.openapi.test.controller");
-                    // commented out because currently this would prevent the test project from compiling
-                    // because we generate both abstract classes _and_ dummy implementations
-                    serverOptions.withGenerateImplementationFiles(false)
+                builder.forJavaServer(serverOptions ->
+                    serverOptions
+                        .withControllerPackage("io.micronaut.openapi.test.controller")
+                        // commented out because currently this would prevent the test project from compiling
+                        // because we generate both abstract classes _and_ dummy implementations
+                        .withGenerateImplementationFiles(false)
                         .withAuthentication(false)
-                        .withGeneratedAnnotation(generatedAnnotation);
-                });
+                        .withGeneratedAnnotation(generatedAnnotation)
+                );
             }
         } else {
             if (lang == GeneratorLanguage.KOTLIN) {
-                builder.forKotlinClient(client -> {
-                    client.withGeneratedAnnotation(generatedAnnotation)
-                        .withKsp(ksp);
-                });
+                builder.forKotlinClient(clientOptions ->
+                    clientOptions
+                        .withGeneratedAnnotation(generatedAnnotation)
+                        .withKsp(ksp)
+                        .withClientId(clientId)
+                );
             } else {
-                builder.forJavaClient(client -> {
-                    client.withGeneratedAnnotation(generatedAnnotation);
-                });
+                builder.forJavaClient(clientOptions ->
+                    clientOptions
+                        .withGeneratedAnnotation(generatedAnnotation)
+                        .withClientId(clientId)
+                );
             }
         }
         builder.build().generate();

@@ -67,6 +67,9 @@ public abstract class OpenApiGeneratorTask extends DefaultTask {
     @Input
     public abstract Property<Boolean> getKsp();
 
+    @Input
+    public abstract Property<String> getClientId();
+
     @OutputDirectory
     public abstract DirectoryProperty getOutputDirectory();
 
@@ -120,9 +123,6 @@ public abstract class OpenApiGeneratorTask extends DefaultTask {
         var generatedTestSourcesDir = getGeneratedTestSourcesDirectory().get().getAsFile();
         var lang = getLang().get();
         var generatedAnnotation = getGeneratedAnnotation().get();
-        var ksp = getKsp().get();
-
-        var apiPrefix =
 
         Files.createDirectories(generatedSourcesDir.toPath());
         Files.createDirectories(generatedTestSourcesDir.toPath());
@@ -139,12 +139,13 @@ public abstract class OpenApiGeneratorTask extends DefaultTask {
             args.add(getResponseBodyMappings().get().toString());
             args.add(lang.toUpperCase());
             args.add(Boolean.toString(generatedAnnotation));
-            args.add(Boolean.toString(ksp));
+            args.add(Boolean.toString(getKsp().get()));
             args.add(getNameMapping().get().toString());
-            args.add(getApiNamePrefix().isPresent() ? getApiNamePrefix().get() : "");
-            args.add(getApiNameSuffix().isPresent() ? getApiNameSuffix().get() : "");
-            args.add(getModelNamePrefix().isPresent() ? getModelNamePrefix().get() : "");
-            args.add(getModelNameSuffix().isPresent() ? getModelNameSuffix().get() : "");
+            args.add(getClientId().getOrElse(""));
+            args.add(getApiNamePrefix().getOrElse(""));
+            args.add(getApiNameSuffix().getOrElse(""));
+            args.add(getModelNamePrefix().getOrElse(""));
+            args.add(getModelNameSuffix().getOrElse(""));
             javaexec.args(args);
         });
     }
