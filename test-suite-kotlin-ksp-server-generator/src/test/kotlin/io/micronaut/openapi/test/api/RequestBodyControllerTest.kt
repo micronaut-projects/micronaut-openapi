@@ -41,7 +41,6 @@ class RequestBodyControllerTest(
         client = reactiveClient.toBlocking()
     }
 
-    @Disabled("Not yet supported")
     @Test
     fun testSendValidatedCollection() {
         val request = HttpRequest.POST("/sendValidatedCollection", listOf(listOf("a", "hello", "123")))
