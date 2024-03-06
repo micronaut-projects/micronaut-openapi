@@ -103,4 +103,13 @@ public interface KotlinMicronautClientOptionsBuilder extends GeneratorOptionsBui
      * @return this builder
      */
     KotlinMicronautClientOptionsBuilder withKsp(boolean ksp);
+
+    /**
+     * If set to true, Api annotation {@literal @}Client will be with `path` attribute.
+     *
+     * @param clientPath do we need add path attribute to {@literal @}Client annotation
+     *
+     * @return this builder
+     */
+    KotlinMicronautClientOptionsBuilder withClientPath(boolean clientPath);
 }

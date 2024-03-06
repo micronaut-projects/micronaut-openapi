@@ -10,6 +10,6 @@ class ClientTest {
     @Test
     fun testClientId() {
         assertFileContains("$outputPath/src/main/kotlin/io/micronaut/openapi/test/api/PetApi.kt",
-                "@Client(id = \"myClient\", path = \"\\\${openapi-micronaut-client-base-path}\")")
+                "@Client(id = \"myClient\", path = \"\\\${myClient.base-path}\")")
     }
 }

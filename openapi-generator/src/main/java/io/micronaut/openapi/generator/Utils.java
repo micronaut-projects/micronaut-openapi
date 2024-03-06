@@ -36,7 +36,7 @@ public final class Utils {
     }
 
     public static void processGenericAnnotations(CodegenParameter parameter, boolean useBeanValidation, boolean isGenerateHardNullable,
-                                           boolean isNullable, boolean isRequired, boolean isReadonly, boolean withNullablePostfix) {
+                                                 boolean isNullable, boolean isRequired, boolean isReadonly, boolean withNullablePostfix) {
         CodegenProperty items = parameter.isMap ? parameter.additionalProperties : parameter.items;
         String datatypeWithEnum = parameter.datatypeWithEnum == null ? parameter.dataType : parameter.datatypeWithEnum;
         processGenericAnnotations(parameter.dataType, datatypeWithEnum, parameter.isArray, parameter.isMap, parameter.containerTypeMapped,
@@ -44,7 +44,7 @@ public final class Utils {
     }
 
     public static void processGenericAnnotations(CodegenProperty property, boolean useBeanValidation, boolean isGenerateHardNullable,
-                                           boolean isNullable, boolean isRequired, boolean isReadonly, boolean withNullablePostfix) {
+                                                 boolean isNullable, boolean isRequired, boolean isReadonly, boolean withNullablePostfix) {
         CodegenProperty items = property.isMap ? property.additionalProperties : property.items;
         String datatypeWithEnum = property.datatypeWithEnum == null ? property.dataType : property.datatypeWithEnum;
         processGenericAnnotations(property.dataType, datatypeWithEnum, property.isArray, property.isMap, property.containerTypeMapped,
