@@ -84,17 +84,20 @@ import io.micronaut.openapi.visitor.security.SecurityProperties;
 import io.micronaut.openapi.visitor.security.SecurityRule;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Webhook;
 import io.swagger.v3.oas.annotations.callbacks.Callback;
 import io.swagger.v3.oas.annotations.callbacks.Callbacks;
 import io.swagger.v3.oas.annotations.enums.Explode;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.enums.ParameterStyle;
 import io.swagger.v3.oas.annotations.extensions.Extension;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.tags.Tags;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.PathItem;
+import io.swagger.v3.oas.models.examples.Example;
 import io.swagger.v3.oas.models.media.ComposedSchema;
 import io.swagger.v3.oas.models.media.Content;
 import io.swagger.v3.oas.models.media.Encoding;
@@ -133,8 +136,10 @@ import static io.micronaut.openapi.visitor.SchemaUtils.getOperationOnPathItem;
 import static io.micronaut.openapi.visitor.SchemaUtils.isIgnoredHeader;
 import static io.micronaut.openapi.visitor.SchemaUtils.processExtensions;
 import static io.micronaut.openapi.visitor.SchemaUtils.setOperationOnPathItem;
+import static io.micronaut.openapi.visitor.SchemaUtils.setSpecVersion;
 import static io.micronaut.openapi.visitor.Utils.DEFAULT_MEDIA_TYPES;
 import static io.micronaut.openapi.visitor.Utils.getMediaType;
+import static io.micronaut.openapi.visitor.Utils.resolveWebhooks;
 
 /**
  * A {@link io.micronaut.inject.visitor.TypeElementVisitor} the builds the Swagger model from Micronaut controllers at compile time.
@@ -404,8 +409,16 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             }
         }
 
+        var webhookValue = element.getAnnotation(Webhook.class);
+        var webhookPair = readWebhook(webhookValue, httpMethod, context);
+        if (webhookPair != null) {
+            resolveWebhooks(openAPI).put(webhookPair.getFirst(), webhookPair.getSecond());
+        }
+
         for (Map.Entry<String, List<PathItem>> pathItemEntry : pathItemsMap.entrySet()) {
             List<PathItem> pathItems = pathItemEntry.getValue();
+
+            final OpenAPI openApi = Utils.resolveOpenApi(context);
 
             Map<PathItem, io.swagger.v3.oas.models.Operation> swaggerOperations = readOperations(pathItemEntry.getKey(), httpMethod, pathItems, element, context, jsonViewClass);
 
@@ -466,7 +479,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                         }
                     }
                     // @Parameters declared at method level take precedence over the declared as method arguments, so we process them first
-                    processParameterAnnotationInMethod(element, openAPI, matchTemplate, httpMethod, swaggerOperation, pathVariables);
+                    processParameterAnnotationInMethod(element, openAPI, matchTemplate, httpMethod, swaggerOperation, pathVariables, context);
                 }
 
                 List<TypedElement> extraBodyParameters = new ArrayList<>();
@@ -475,6 +488,10 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                     processExtraBodyParameters(context, httpMethod, openAPI, operation, javadocDescription, isRequestBodySchemaSet, consumesMediaTypes, extraBodyParameters);
 
                     processMicronautVersionAndGroup(operation, pathItemEntry.getKey(), httpMethod, consumesMediaTypes, producesMediaTypes, element, context);
+                }
+
+                if (webhookPair != null) {
+                    SchemaUtils.mergeOperations(getOperationOnPathItem(webhookPair.getSecond(), httpMethod), swaggerOperation);
                 }
             }
         }
@@ -498,7 +515,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                 consumesMediaTypes = CollectionUtils.isEmpty(consumesMediaTypes) ? DEFAULT_MEDIA_TYPES : consumesMediaTypes;
                 consumesMediaTypes.forEach(mediaType -> {
                     var mt = new io.swagger.v3.oas.models.media.MediaType();
-                    var schema = new Schema<>();
+                    var schema = setSpecVersion(new Schema<>());
                     schema.setType(TYPE_OBJECT);
                     mt.setSchema(schema);
                     content.addMediaType(mediaType.toString(), mt);
@@ -509,15 +526,15 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             requestBody.getContent().forEach((mediaTypeName, mediaType) -> {
                 var schema = mediaType.getSchema();
                 if (schema == null) {
-                    schema = new Schema<>();
+                    schema = setSpecVersion(new Schema<>());
                     mediaType.setSchema(schema);
                 }
                 if (schema.get$ref() != null) {
                     if (isRequestBodySchemaSet) {
                         schema = openAPI.getComponents().getSchemas().get(schema.get$ref().substring(COMPONENTS_SCHEMAS_PREFIX.length()));
                     } else {
-                        var composedSchema = new ComposedSchema();
-                        var extraBodyParametersSchema = new Schema<>();
+                        var composedSchema = setSpecVersion(new ComposedSchema());
+                        var extraBodyParametersSchema = setSpecVersion(new Schema<>());
                         // Composition of existing + a new schema where extra body parameters are going to be added
                         composedSchema.addAllOfItem(schema);
                         composedSchema.addAllOfItem(extraBodyParametersSchema);
@@ -594,23 +611,43 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         return false;
     }
 
+    private Map<String, Example> readExamples(List<AnnotationValue<ExampleObject>> exampleAnns,
+                             Element element,
+                             VisitorContext context) {
+        if (CollectionUtils.isEmpty(exampleAnns)) {
+            return null;
+        }
+        var result = new HashMap<String, Example>();
+        for (var exampleAnn : exampleAnns) {
+            try {
+                var exampleMap = toValueMap(exampleAnn.getValues(), context, null);
+                result.put((String) exampleMap.get("name"), Utils.getJsonMapper().convertValue(exampleMap, Example.class));
+            } catch (Exception e) {
+                warn("Error reading Parameter example " + exampleAnn + " for element [" + element + "]: " + e.getMessage(), context, element);
+            }
+        }
+
+        return !result.isEmpty() ? result : null;
+    }
+
     private void processParameterAnnotationInMethod(MethodElement element,
                                                     OpenAPI openAPI,
                                                     UriMatchTemplate matchTemplate,
                                                     HttpMethod httpMethod,
                                                     io.swagger.v3.oas.models.Operation operation,
-                                                    Map<String, UriMatchVariable> pathVariables) {
+                                                    Map<String, UriMatchVariable> pathVariables,
+                                                    VisitorContext context) {
 
         List<AnnotationValue<io.swagger.v3.oas.annotations.Parameter>> parameterAnnotations = element
             .getDeclaredAnnotationValuesByType(io.swagger.v3.oas.annotations.Parameter.class);
 
-        for (AnnotationValue<io.swagger.v3.oas.annotations.Parameter> paramAnn : parameterAnnotations) {
+        for (var paramAnn : parameterAnnotations) {
             if (paramAnn.get("hidden", Boolean.class, false)) {
                 continue;
             }
 
             Parameter parameter = new Parameter();
-            parameter.schema(new Schema<>());
+            parameter.schema(setSpecVersion(new Schema<>()));
 
             paramAnn.stringValue("name").ifPresent(parameter::name);
             paramAnn.enumValue("in", ParameterIn.class).ifPresent(in -> parameter.in(in.toString()));
@@ -622,6 +659,10 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             paramAnn.stringValue("example").ifPresent(parameter::example);
             paramAnn.stringValue("ref").ifPresent(parameter::$ref);
             paramAnn.enumValue("style", ParameterStyle.class).ifPresent(style -> parameter.setStyle(paramStyle(style)));
+            var examples = readExamples(paramAnn.getAnnotations("examples", ExampleObject.class), element, context);
+            if (examples != null) {
+                examples.forEach(parameter::addExample);
+            }
 
             if (parameter.getIn() == null) {
                 for (ParameterElement paramEl : element.getParameters()) {
@@ -728,7 +769,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
 
                         String bodyAnnValue = bodyAnn != null ? bodyAnn.getValue(String.class).orElse(null) : null;
                         if (StringUtils.isNotEmpty(bodyAnnValue)) {
-                            var wrapperSchema = new Schema<>();
+                            var wrapperSchema = setSpecVersion(new Schema<>());
                             wrapperSchema.setType(TYPE_OBJECT);
                             if (isNotNullable(parameter)) {
                                 wrapperSchema.addRequiredItem(bodyAnnValue);
@@ -842,7 +883,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             processSchemaProperty(context, parameter, parameter.getType(), null, schema, propertySchema);
             if (isNullable(parameter) && !isNotNullable(parameter)) {
                 // Keep null if not
-                propertySchema.setNullable(true);
+                SchemaUtils.setNullable(propertySchema);
             }
             if (javadocDescription != null && StringUtils.isEmpty(propertySchema.getDescription())) {
                 String doc = javadocDescription.getParameters().get(parameter.getName());
@@ -993,7 +1034,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                 }
                 processExplode(paramAnn, paramValues);
 
-                JsonNode jsonNode = OpenApiUtils.getJsonMapper().valueToTree(paramValues);
+                JsonNode jsonNode = Utils.getJsonMapper().valueToTree(paramValues);
 
                 if (newParameter == null) {
                     try {
@@ -1004,7 +1045,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                                 if (newParameter == null) {
                                     newParameter = new Parameter();
                                 }
-                                newParameter.schema(new Schema<>().$ref(schemaNode.get("$ref").asText()));
+                                newParameter.schema(setSpecVersion(new Schema<>().$ref(schemaNode.get("$ref").asText())));
                             }
                         }
                     } catch (Exception e) {
@@ -1264,6 +1305,28 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         return javadocDescription;
     }
 
+    public Pair<String, PathItem> readWebhook(@Nullable AnnotationValue<Webhook> webhookAnnValue,
+                                              HttpMethod httpMethod,
+                                              VisitorContext context) {
+        if (webhookAnnValue == null) {
+            return null;
+        }
+        final Map<CharSequence, Object> map = toValueMap(webhookAnnValue.getValues(), context, null);
+
+        var name = webhookAnnValue.stringValue("name").orElse(null);
+        if (StringUtils.isEmpty(name)) {
+            return null;
+        }
+
+        var operationAnn = webhookAnnValue.getAnnotation("operation", io.swagger.v3.oas.annotations.Operation.class);
+        var operation = operationAnn
+            .flatMap(o -> toValue(o.getValues(), context, io.swagger.v3.oas.models.Operation.class, null))
+            .orElse(new io.swagger.v3.oas.models.Operation());
+        var pathItem = new PathItem();
+        setOperationOnPathItem(pathItem, HttpMethod.parse(operationAnn.get().stringValue("method").orElse(httpMethod.name())), operation);
+        return Pair.of(name, pathItem);
+    }
+
     private Map<PathItem, io.swagger.v3.oas.models.Operation> readOperations(String path, HttpMethod httpMethod, List<PathItem> pathItems, MethodElement element, VisitorContext context, @Nullable ClassElement jsonViewClass) {
         Map<PathItem, io.swagger.v3.oas.models.Operation> swaggerOperations = new HashMap<>(pathItems.size());
         final Optional<AnnotationValue<Operation>> operationAnnotation = element.findAnnotation(Operation.class);
@@ -1332,6 +1395,10 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                                 swaggerParam.setAllowReserved(true);
                             }
                             paramAnn.stringValue("example").ifPresent(swaggerParam::setExample);
+                            var examples = readExamples(paramAnn.getAnnotations("examples", ExampleObject.class), element, context);
+                            if (examples != null) {
+                                examples.forEach(swaggerParam::addExample);
+                            }
                             var style = paramAnn.get("style", ParameterStyle.class).orElse(ParameterStyle.DEFAULT);
                             if (style != ParameterStyle.DEFAULT) {
                                 swaggerParam.setStyle(paramStyle(style));
@@ -1946,7 +2013,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             parameter.in(in)
                 .description("API version")
                 .name(parameterName)
-                .schema(PrimitiveType.STRING.createProperty());
+                .schema(setSpecVersion(PrimitiveType.STRING.createProperty()));
 
             swaggerOperation.addParametersItem(parameter);
         }

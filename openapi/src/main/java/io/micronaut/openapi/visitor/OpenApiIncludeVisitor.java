@@ -45,6 +45,11 @@ import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENA
 public class OpenApiIncludeVisitor implements TypeElementVisitor<OpenAPIIncludes, Object> {
 
     @Override
+    public void start(VisitorContext context) {
+        Utils.init(context);
+    }
+
+    @Override
     public void visitClass(ClassElement element, VisitorContext context) {
         if (!isOpenApiEnabled(context) || !isSpecGenerationEnabled(context)) {
             return;

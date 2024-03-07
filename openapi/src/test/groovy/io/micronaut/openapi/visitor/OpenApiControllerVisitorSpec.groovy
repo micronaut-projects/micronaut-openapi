@@ -7,6 +7,7 @@ import io.swagger.v3.oas.models.Operation
 import io.swagger.v3.oas.models.PathItem
 import io.swagger.v3.oas.models.Paths
 import io.swagger.v3.oas.models.media.Schema
+import spock.lang.Ignore
 import spock.lang.Issue
 
 class OpenApiControllerVisitorSpec extends AbstractOpenApiTypeElementSpec {
@@ -1966,5 +1967,219 @@ class MyBean {}
         operation.requestBody.content."application/json".schema.properties.date.format == "date-time"
         operation.requestBody.content."application/json".schema.properties.date.description == "Simple datetime param"
         !operation.parameters
+    }
+
+    void "test parameter examples on method level"() {
+        given:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Post;
+import io.micronaut.http.annotation.QueryValue;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+
+@Controller
+class MyController {
+
+    @Parameter(name = "param",
+        examples = {
+            @ExampleObject(
+                    name = "example1",
+                    summary = "Ex1 summary",
+                    description = "Ex1 description",
+                    value = "{\\"p1\\": \\"v1\\", \\"p2\\": 123}"
+            ),
+            @ExampleObject(
+                    name = "example2",
+                    summary = "Ex2 summary",
+                    description = "Ex2 description",
+                    value = "{\\"p21\\": \\"v1\\", \\"p22\\": 123}"
+            ),
+    })
+    @Post("/model")
+    public String model(@QueryValue String param
+    ) {
+        return null;
+     }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        when:
+        OpenAPI openAPI = Utils.testReference
+        Operation operation = openAPI?.paths?."/model"?.post
+
+        then:
+        operation
+        def examples = operation.parameters[0].examples
+        examples.size() == 2
+        examples.example1
+        examples.example1.summary == "Ex1 summary"
+        examples.example1.description == "Ex1 description"
+        examples.example1.value.p1 == "v1"
+        examples.example1.value.p2 == 123
+
+        examples.example2
+        examples.example2.summary == "Ex2 summary"
+        examples.example2.description == "Ex2 description"
+        examples.example2.value.p21 == "v1"
+        examples.example2.value.p22 == 123
+    }
+
+    void "test parameter examples on parameter level"() {
+        given:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Post;
+import io.micronaut.http.annotation.QueryValue;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+
+@Controller
+class MyController {
+
+    @Post("/model")
+    public String model(
+        @Parameter(
+        examples = {
+            @ExampleObject(
+                    name = "example1",
+                    summary = "Ex1 summary",
+                    description = "Ex1 description",
+                    value = "{\\"p1\\": \\"v1\\", \\"p2\\": 123}"
+            ),
+            @ExampleObject(
+                    name = "example2",
+                    summary = "Ex2 summary",
+                    description = "Ex2 description",
+                    value = "{\\"p21\\": \\"v1\\", \\"p22\\": 123}"
+            ),
+    }) @QueryValue String param
+    ) {
+        return null;
+     }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        when:
+        OpenAPI openAPI = Utils.testReference
+        Operation operation = openAPI?.paths?."/model"?.post
+
+        then:
+        operation
+        def examples = operation.parameters[0].examples
+        examples.size() == 2
+        examples.example1
+        examples.example1.summary == "Ex1 summary"
+        examples.example1.description == "Ex1 description"
+        examples.example1.value.p1 == "v1"
+        examples.example1.value.p2 == 123
+
+        examples.example2
+        examples.example2.summary == "Ex2 summary"
+        examples.example2.description == "Ex2 description"
+        examples.example2.value.p21 == "v1"
+        examples.example2.value.p22 == 123
+    }
+
+    @Ignore("Wait next swagger release")
+    void "test header examples"() {
+        given:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Post;
+import io.micronaut.http.annotation.QueryValue;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.headers.Header;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+
+@Controller
+class MyController {
+
+    @Operation(description = "method", responses = {
+            @ApiResponse(headers = {
+                    @Header(
+                            name = "header2",
+                            description = "header 2"
+                    ),
+            })
+    })
+    @Post("/model")
+    public String model(@QueryValue String param) {
+        return null;
+     }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        when:
+        OpenAPI openAPI = Utils.testReference
+        Operation operation = openAPI?.paths?."/model"?.post
+
+        then:
+        operation
+    }
+
+    void "test content examples"() {
+        given:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Post;
+import io.micronaut.http.annotation.QueryValue;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+
+@Controller
+class MyController {
+
+    @Operation(description = "method", responses = {
+            @ApiResponse(content = @Content(
+                examples = {
+                    @ExampleObject(
+                            name = "example1",
+                            summary = "Ex1 summary",
+                            description = "Ex1 description",
+                            value = "{\\"p1\\": \\"v1\\", \\"p2\\": 123}"
+                    ),
+                    @ExampleObject(
+                            name = "example2",
+                            summary = "Ex2 summary",
+                            description = "Ex2 description",
+                            value = "{\\"p21\\": \\"v1\\", \\"p22\\": 123}"
+                    )
+                }
+            ))
+    })
+    @Post("/model")
+    public String model(@QueryValue String param) {
+        return null;
+     }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        when:
+        OpenAPI openAPI = Utils.testReference
+        Operation operation = openAPI?.paths?."/model"?.post
+
+        then:
+        operation
     }
 }

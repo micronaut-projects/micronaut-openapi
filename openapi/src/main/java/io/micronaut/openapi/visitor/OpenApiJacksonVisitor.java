@@ -50,6 +50,11 @@ import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENA
 public class OpenApiJacksonVisitor implements TypeElementVisitor<Object, Object> {
 
     @Override
+    public void start(VisitorContext context) {
+        Utils.init(context);
+    }
+
+    @Override
     public Set<String> getSupportedAnnotationNames() {
         return CollectionUtils.setOf(
             "com.fasterxml.jackson.annotation.JsonSubTypes",
@@ -96,8 +101,8 @@ public class OpenApiJacksonVisitor implements TypeElementVisitor<Object, Object>
                 return;
             }
 
-            List<AnnotationClassValue<?>> discriminatorClasses = new ArrayList<>();
-            List<AnnotationValue<DiscriminatorMapping>> discriminatorMappings = new ArrayList<>();
+            var discriminatorClasses = new ArrayList<AnnotationClassValue<?>>();
+            var discriminatorMappings = new ArrayList<AnnotationValue<DiscriminatorMapping>>();
             for (AnnotationValue<Annotation> av : jsonSubTypesDecAnn.getAnnotations("value")) {
                 AnnotationClassValue<?> mappingClass = av.annotationClassValue("value").orElse(null);
                 String subTypeName = av.stringValue("name").orElse(null);

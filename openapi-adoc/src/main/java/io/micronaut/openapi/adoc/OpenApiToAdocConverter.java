@@ -188,7 +188,7 @@ public final class OpenApiToAdocConverter {
         var cfg = new Configuration(Configuration.VERSION_2_3_32);
         cfg.setTemplateLoader(templateLoader);
         cfg.setDefaultEncoding(UTF_8.displayName());
-        cfg.setSharedVariable("JSON", OpenApiUtils.getJsonMapper());
+        cfg.setSharedVariable("JSON", OpenApiUtils.YAML_MAPPER);
         return cfg;
     }
 

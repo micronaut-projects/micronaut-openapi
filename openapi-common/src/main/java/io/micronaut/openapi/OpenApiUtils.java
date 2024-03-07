@@ -27,6 +27,8 @@ import io.micronaut.openapi.swagger.core.util.ObjectMapperFactory;
  */
 public final class OpenApiUtils {
 
+    public static final String OPENAPI_31_VERSION = "3.1.0";
+
     /**
      * The JSON mapper.
      */
@@ -48,7 +50,11 @@ public final class OpenApiUtils {
     /**
      * The YAML mapper.
      */
-    private static final ObjectMapper YAML_MAPPER = ObjectMapperFactory.createYaml();
+    public static final ObjectMapper YAML_MAPPER = ObjectMapperFactory.createYaml();
+    /**
+     * The YAML 3.1 mapper.
+     */
+    public static final ObjectMapper YAML_MAPPER_31 = ObjectMapperFactory.createYaml31();
 
     private OpenApiUtils() {
     }
@@ -67,5 +73,9 @@ public final class OpenApiUtils {
 
     public static ObjectMapper getYamlMapper() {
         return YAML_MAPPER;
+    }
+
+    public static ObjectMapper getYamlMapper31() {
+        return YAML_MAPPER_31;
     }
 }

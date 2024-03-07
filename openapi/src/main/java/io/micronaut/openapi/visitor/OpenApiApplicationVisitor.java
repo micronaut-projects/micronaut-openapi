@@ -65,6 +65,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.PathItem;
+import io.swagger.v3.oas.models.SpecVersion;
 import io.swagger.v3.oas.models.media.Schema;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -123,6 +124,11 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
 
     private ClassElement classElement;
     private int visitedElements = -1;
+
+    @Override
+    public void start(VisitorContext context) {
+        Utils.init(context);
+    }
 
     @Override
     public Set<String> getSupportedOptions() {
@@ -221,7 +227,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                         info("Reading Swagger OpenAPI " + (isYaml ? "YAML" : "JSON") + " file " + path.getFileName(), context);
                         OpenAPI parsedOpenApi = null;
                         try {
-                            parsedOpenApi = (isYaml ? OpenApiUtils.getYamlMapper() : OpenApiUtils.getJsonMapper()).readValue(path.toFile(), OpenAPI.class);
+                            parsedOpenApi = (isYaml ? Utils.getYamlMapper() : Utils.getJsonMapper()).readValue(path.toFile(), OpenAPI.class);
                         } catch (IOException e) {
                             warn("Unable to read file " + path.getFileName() + ": " + e.getMessage(), context, element);
                         }
@@ -239,12 +245,17 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
     private OpenAPI readOpenApi(ClassElement element, VisitorContext context) {
         return element.findAnnotation(OpenAPIDefinition.class).flatMap(o -> {
             Optional<OpenAPI> result = toValue(o.getValues(), context, OpenAPI.class, null);
-            result.ifPresent(openAPI -> {
+            result.ifPresent(openApi -> {
+                if (Utils.isOpenapi31()) {
+                    openApi.openapi(OpenApiUtils.OPENAPI_31_VERSION)
+                        .jsonSchemaDialect(ConfigUtils.getJsonSchemaDialect(context))
+                        .specVersion(SpecVersion.V31);
+                }
                 var securityRequirements = new ArrayList<io.swagger.v3.oas.models.security.SecurityRequirement>();
                 for (var secRequirementAnn : o.getAnnotations("security", SecurityRequirement.class)) {
                     securityRequirements.add(ConvertUtils.mapToSecurityRequirement(secRequirementAnn));
                 }
-                openAPI.setSecurity(securityRequirements);
+                openApi.setSecurity(securityRequirements);
             });
             return result;
         }).orElse(new OpenAPI());
@@ -414,8 +425,8 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         if (CollectionUtils.isNotEmpty(expandableProperties)) {
             info("Expanding properties: " + expandableProperties, context);
         }
-        JsonNode root = resolvePlaceholders(OpenApiUtils.getYamlMapper().convertValue(openAPI, ObjectNode.class), s -> expandProperties(s, expandableProperties, context));
-        return OpenApiUtils.getYamlMapper().convertValue(root, OpenAPI.class);
+        JsonNode root = resolvePlaceholders(Utils.getYamlMapper().convertValue(openAPI, ObjectNode.class), s -> expandProperties(s, expandableProperties, context));
+        return Utils.getYamlMapper().convertValue(root, OpenAPI.class);
     }
 
     @Override
@@ -610,7 +621,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
 
             OpenAPI openApiCopy;
             try {
-                openApiCopy = OpenApiUtils.getJsonMapper().treeToValue(OpenApiUtils.getJsonMapper().valueToTree(openApi), OpenAPI.class);
+                openApiCopy = Utils.getJsonMapper().treeToValue(Utils.getJsonMapper().valueToTree(openApi), OpenAPI.class);
             } catch (JsonProcessingException e) {
                 warn("Error\n" + Utils.printStackTrace(e), context);
                 return null;
@@ -691,7 +702,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             if (openApi.getComponents() != null) {
                 Map<String, Schema> schemas = openApi.getComponents().getSchemas();
                 if (CollectionUtils.isNotEmpty(schemas)) {
-                    String openApiJson = OpenApiUtils.getJsonMapper().writeValueAsString(openApi);
+                    String openApiJson = Utils.getJsonMapper().writeValueAsString(openApi);
                     // Create a copy of the keySet so that we can modify the map while in a foreach
                     Set<String> keySet = new HashSet<>(schemas.keySet());
                     for (String schemaName : keySet) {
@@ -759,7 +770,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         for (OpenApiInfo openApiInfo : openApiInfos.values()) {
             Path specFile = openApiSpecFile(openApiInfo.getFilename(), context);
             try (Writer writer = getFileWriter(specFile)) {
-                (isYaml ? OpenApiUtils.getYamlMapper() : OpenApiUtils.getJsonMapper()).writeValue(writer, openApiInfo.getOpenApi());
+                (isYaml ? Utils.getYamlMapper() : Utils.getJsonMapper()).writeValue(writer, openApiInfo.getOpenApi());
                 if (Utils.isTestMode()) {
                     Utils.setTestFileName(openApiInfo.getFilename());
                     if (isYaml) {

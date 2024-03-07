@@ -30,14 +30,15 @@ import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.core.util.StringUtils;
 import io.micronaut.http.HttpHeaders;
 import io.micronaut.http.HttpMethod;
-import io.micronaut.openapi.OpenApiUtils;
 import io.micronaut.openapi.SimpleSchema;
+import io.micronaut.openapi.swagger.core.util.PrimitiveType;
 import io.swagger.v3.oas.annotations.extensions.Extension;
 import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.PathItem;
+import io.swagger.v3.oas.models.SpecVersion;
 import io.swagger.v3.oas.models.headers.Header;
 import io.swagger.v3.oas.models.links.Link;
 import io.swagger.v3.oas.models.media.ArraySchema;
@@ -147,7 +148,7 @@ public final class SchemaUtils {
                 if (key.isEmpty()) {
                     if (propertyAsJson) {
                         try {
-                            processedValue = OpenApiUtils.getJsonMapper().readTree(propertyValue);
+                            processedValue = Utils.getJsonMapper().readTree(propertyValue);
                             map.put(prependIfMissing(propertyName, PREFIX_X), processedValue);
                         } catch (Exception e) {
                             map.put(prependIfMissing(propertyName, PREFIX_X), propertyValue);
@@ -164,7 +165,7 @@ public final class SchemaUtils {
                     @SuppressWarnings("unchecked") final Map<String, Object> mapValue = (Map<String, Object>) value;
                     if (propertyAsJson) {
                         try {
-                            processedValue = OpenApiUtils.getJsonMapper().readTree(propertyValue);
+                            processedValue = Utils.getJsonMapper().readTree(propertyValue);
                             mapValue.put(propertyName, processedValue);
                         } catch (Exception e) {
                             mapValue.put(propertyName, propertyValue);
@@ -194,12 +195,17 @@ public final class SchemaUtils {
         return schemas;
     }
 
+    public static Schema setSpecVersion(Schema schema) {
+        return schema.specVersion(Utils.isOpenapi31() ? SpecVersion.V31 : SpecVersion.V30);
+    }
+
     public static ArraySchema arraySchema(Schema<?> schema) {
         if (schema == null) {
             return null;
         }
-        ArraySchema arraySchema = new ArraySchema();
-        arraySchema.setItems(schema);
+        var arraySchema = new ArraySchema();
+        setSpecVersion(arraySchema);
+        arraySchema.items(schema);
         return arraySchema;
     }
 
@@ -639,7 +645,7 @@ public final class SchemaUtils {
             s1.addOneOfItem(s2);
             return s1;
         }
-        Schema<?> finalSchema = new ComposedSchema();
+        Schema<?> finalSchema = setSpecVersion(new ComposedSchema());
         finalSchema.addOneOfItem(s1);
         finalSchema.addOneOfItem(s2);
         return finalSchema;
@@ -766,5 +772,14 @@ public final class SchemaUtils {
         return HttpHeaders.AUTHORIZATION.equalsIgnoreCase(headerName)
             || HttpHeaders.CONTENT_TYPE.equalsIgnoreCase(headerName)
             || HttpHeaders.ACCEPT.equalsIgnoreCase(headerName);
+    }
+
+    public static void setNullable(Schema<?> schema) {
+        if (Utils.isOpenapi31()) {
+            schema.addType("null");
+            schema.addType(schema.getType() != null ? schema.getType() : TYPE_OBJECT);
+        } else {
+            schema.setNullable(true);
+        }
     }
 }

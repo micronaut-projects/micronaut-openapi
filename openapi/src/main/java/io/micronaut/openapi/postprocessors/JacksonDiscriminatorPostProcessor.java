@@ -24,6 +24,7 @@ import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.media.StringSchema;
 
+import static io.micronaut.openapi.visitor.SchemaUtils.setSpecVersion;
 import static io.swagger.v3.oas.models.Components.COMPONENTS_SCHEMAS_REF;
 
 /**
@@ -48,7 +49,7 @@ public class JacksonDiscriminatorPostProcessor {
         for (Schema<?> schema : openAPI.getComponents().getSchemas().values()) {
             if (schema.getDiscriminator() != null && schema.getDiscriminator().getMapping() != null) {
                 String discriminatorProperty = schema.getDiscriminator().getPropertyName();
-                List<String> schemasToUpdate = new ArrayList<>(schema.getDiscriminator().getMapping().values());
+                var schemasToUpdate = new ArrayList<>(schema.getDiscriminator().getMapping().values());
                 addDiscriminatorProperty(openAPI, schemasToUpdate, discriminatorProperty);
             }
         }
@@ -58,7 +59,7 @@ public class JacksonDiscriminatorPostProcessor {
         for (String s : schemasToUpdate) {
             Schema<?> schema = openAPI.getComponents().getSchemas().get(extractComponentSchemaName(s));
             if (schema.getProperties() != null && !schema.getProperties().containsKey(discriminatorProperty)) {
-                schema.addProperty(discriminatorProperty, new StringSchema());
+                schema.addProperty(discriminatorProperty, setSpecVersion(new StringSchema()));
             }
         }
     }

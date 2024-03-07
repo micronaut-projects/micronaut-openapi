@@ -91,6 +91,11 @@ public class OpenApiEndpointVisitor extends AbstractOpenApiEndpointVisitor imple
     }
 
     @Override
+    public void start(VisitorContext context) {
+        Utils.init(context);
+    }
+
+    @Override
     public void visitClass(ClassElement element, VisitorContext context) {
         if (!isOpenApiEnabled(context) || !isSpecGenerationEnabled(context)) {
             return;
@@ -293,5 +298,4 @@ public class OpenApiEndpointVisitor extends AbstractOpenApiEndpointVisitor imple
                 + Arrays.toString(produces) + ", consumes=" + Arrays.toString(consumes) + "]";
         }
     }
-
 }

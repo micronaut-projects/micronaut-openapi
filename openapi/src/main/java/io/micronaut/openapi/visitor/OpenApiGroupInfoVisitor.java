@@ -63,6 +63,11 @@ public class OpenApiGroupInfoVisitor implements TypeElementVisitor<Object, Objec
     }
 
     @Override
+    public void start(VisitorContext context) {
+        Utils.init(context);
+    }
+
+    @Override
     public int getOrder() {
         return Ordered.LOWEST_PRECEDENCE;
     }

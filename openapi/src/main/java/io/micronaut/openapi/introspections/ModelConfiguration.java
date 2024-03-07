@@ -22,6 +22,7 @@ import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.PathItem;
 import io.swagger.v3.oas.models.Paths;
+import io.swagger.v3.oas.models.SpecVersion;
 
 /**
  * OpenApi introspection configuration for Swagger-model.
@@ -36,6 +37,7 @@ import io.swagger.v3.oas.models.Paths;
     Operation.class,
     PathItem.class,
     Paths.class,
+    SpecVersion.class,
 })
 public class ModelConfiguration {
 }

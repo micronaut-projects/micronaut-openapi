@@ -39,11 +39,18 @@ import io.micronaut.core.value.PropertyResolver;
 import io.micronaut.http.MediaType;
 import io.micronaut.inject.ast.MethodElement;
 import io.micronaut.inject.visitor.VisitorContext;
+import io.micronaut.openapi.OpenApiUtils;
 import io.micronaut.openapi.javadoc.JavadocParser;
 import io.micronaut.openapi.visitor.group.EndpointInfo;
 import io.micronaut.openapi.visitor.group.OpenApiInfo;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.PathItem;
+import io.swagger.v3.oas.models.SpecVersion;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_31_ENABLED;
 
 /**
  * Some util methods.
@@ -64,6 +71,8 @@ public final class Utils {
 
     private static Map<String, MethodElement> creatorConstructorsCache = new HashMap<>();
 
+    private static boolean openapi31;
+    private static boolean inited;
     private static Set<String> allKnownVersions;
     private static Set<String> allKnownGroups;
     private static Map<String, List<EndpointInfo>> endpointInfos;
@@ -93,6 +102,14 @@ public final class Utils {
     private static JavadocParser javadocParser = new JavadocParser();
 
     private Utils() {
+    }
+
+    public static void init(VisitorContext context) {
+        if (inited) {
+            return;
+        }
+        openapi31 = ConfigUtils.getBooleanProperty(MICRONAUT_OPENAPI_31_ENABLED, false, context);
+        inited = true;
     }
 
     /**
@@ -212,6 +229,22 @@ public final class Utils {
     }
 
     /**
+     * Resolve the webhooks.
+     *
+     * @param openAPI The open API
+     *
+     * @return The webhooks
+     */
+    public static Map<String, PathItem> resolveWebhooks(OpenAPI openAPI) {
+        var webhooks = openAPI.getWebhooks();
+        if (webhooks == null) {
+            webhooks = new HashMap<>();
+            openAPI.setWebhooks(webhooks);
+        }
+        return webhooks;
+    }
+
+    /**
      * Resolve the {@link OpenAPI} instance.
      *
      * @param context The context
@@ -219,12 +252,17 @@ public final class Utils {
      * @return The {@link OpenAPI} instance
      */
     public static OpenAPI resolveOpenApi(VisitorContext context) {
-        OpenAPI openAPI = ContextUtils.get(ATTR_OPENAPI, OpenAPI.class, context);
-        if (openAPI == null) {
-            openAPI = new OpenAPI();
-            ContextUtils.put(ATTR_OPENAPI, openAPI, context);
+        var openApi = ContextUtils.get(ATTR_OPENAPI, OpenAPI.class, context);
+        if (openApi == null) {
+            openApi = new OpenAPI();
+            if (Utils.isOpenapi31()) {
+                openApi.openapi(OpenApiUtils.OPENAPI_31_VERSION)
+                    .jsonSchemaDialect(ConfigUtils.getJsonSchemaDialect(context))
+                    .specVersion(SpecVersion.V31);
+            }
+            ContextUtils.put(ATTR_OPENAPI, openApi, context);
         }
-        return openAPI;
+        return openApi;
     }
 
     /**
@@ -352,7 +390,25 @@ public final class Utils {
         return creatorConstructorsCache;
     }
 
+    public static ObjectMapper getJsonMapper() {
+        return openapi31 ? OpenApiUtils.getJsonMapper31() : OpenApiUtils.getJsonMapper();
+    }
+
+    public static ObjectMapper getYamlMapper() {
+        return openapi31 ? OpenApiUtils.getYamlMapper31() : OpenApiUtils.getYamlMapper();
+    }
+
+    public static boolean isOpenapi31() {
+        return openapi31;
+    }
+
+    public static void setOpenapi31(boolean openapi31) {
+        Utils.openapi31 = openapi31;
+    }
+
     public static void clean() {
+        openapi31 = false;
+        inited = false;
         openApis = null;
         endpointInfos = null;
         includedClassesGroups = null;
