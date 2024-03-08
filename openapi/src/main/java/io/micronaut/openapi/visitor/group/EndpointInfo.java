@@ -16,6 +16,7 @@
 package io.micronaut.openapi.visitor.group;
 
 import java.util.List;
+import java.util.Map;
 
 import io.micronaut.core.annotation.Internal;
 import io.micronaut.http.HttpMethod;
@@ -36,10 +37,13 @@ public final class EndpointInfo {
     private final MethodElement method;
     private final Operation operation;
     private final String version;
-    private final List<String> groups;
+    private final Map<String, EndpointGroupInfo> groups;
     private final List<String> excludedGroups;
 
-    public EndpointInfo(String url, HttpMethod httpMethod, MethodElement method, Operation operation, String version, List<String> groups, List<String> excludedGroups) {
+    public EndpointInfo(String url, HttpMethod httpMethod, MethodElement method,
+                        Operation operation, String version,
+                        Map<String, EndpointGroupInfo> groups,
+                        List<String> excludedGroups) {
         this.url = url;
         this.httpMethod = httpMethod;
         this.method = method;
@@ -69,7 +73,7 @@ public final class EndpointInfo {
         return version;
     }
 
-    public List<String> getGroups() {
+    public Map<String, EndpointGroupInfo> getGroups() {
         return groups;
     }
 
