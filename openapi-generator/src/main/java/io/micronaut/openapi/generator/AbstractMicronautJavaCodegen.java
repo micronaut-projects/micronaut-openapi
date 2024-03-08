@@ -1040,8 +1040,12 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
 
     @Override
     public String toVarName(String name) {
-
         var varName = super.toVarName(name);
+
+        if (varName.chars().allMatch(Character::isUpperCase)) {
+            return varName;
+        }
+
         // Micronaut can't process correctly properties like `eTemperature`, when first symbol in lower case
         // and second symbol in upper case.
         // See this: https://github.com/micronaut-projects/micronaut-core/pull/10130
@@ -1051,10 +1055,10 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
 
         // this fix for properties started with underscores and named by reserved words
         // For example, _____default
-        var fistNameChar = varName.toCharArray()[0];
+        var firstNameChar = varName.toCharArray()[0];
         var underscorePrefix = getUnderscorePrefix(name);
         varName = getUnderscorePrefix(name)
-            + (fistNameChar == '_' && !underscorePrefix.isEmpty() ? "" : Character.toLowerCase(fistNameChar))
+            + (firstNameChar == '_' && !underscorePrefix.isEmpty() ? "" : Character.toLowerCase(firstNameChar))
             + varName.substring(1);
 
         return varName;

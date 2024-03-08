@@ -421,15 +421,18 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
     }
 
     @Test
-    void testPropSecondUpperCaseChar() {
-
+    void testDifferentPropertyCase() {
         var codegen = new KotlinMicronautClientCodegen();
         String outputPath = generateFiles(codegen, "src/test/resources/3_0/propWithSecondUpperCaseChar.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
-        String apiPath = outputPath + "src/main/kotlin/org/openapitools/api/";
         String modelPath = outputPath + "src/main/kotlin/org/openapitools/model/";
 
-        assertFileContains(modelPath + "Book.kt", "const val JSON_PROPERTY_TITLE = \"tItle\"",
-            "var title: String,");
+        assertFileContains(
+            modelPath + "Book.kt",
+            "const val JSON_PROPERTY_TITLE = \"tItle\"",
+            "var title: String,",
+            "const val JSON_PROPERTY_I_S_B_N = \"ISBN\"",
+            "var ISBN: String? = null,"
+        );
     }
 
     @Test

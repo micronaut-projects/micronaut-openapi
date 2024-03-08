@@ -346,17 +346,22 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
     }
 
     @Test
-    void testPropSecondUpperCaseChar() {
-
+    void testDifferentPropertyCase() {
         var codegen = new JavaMicronautClientCodegen();
         String outputPath = generateFiles(codegen, "src/test/resources/3_0/propWithSecondUpperCaseChar.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
-        String apiPath = outputPath + "src/main/java/org/openapitools/api/";
         String modelPath = outputPath + "src/main/java/org/openapitools/model/";
 
-        assertFileContains(modelPath + "Book.java", "public static final String JSON_PROPERTY_TITLE = \"tItle\";",
+        assertFileContains(
+            modelPath + "Book.java",
+            "public static final String JSON_PROPERTY_TITLE = \"tItle\";",
+            "public static final String JSON_PROPERTY_I_S_B_N = \"ISBN\";",
             "private String title;",
             "public String getTitle()",
-            "public void setTitle(String title)");
+            "public void setTitle(String title)",
+            "private String ISBN;",
+            "public String getISBN()",
+            "public void setISBN(String ISBN)"
+        );
     }
 
     @Test

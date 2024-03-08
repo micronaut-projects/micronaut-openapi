@@ -34,5 +34,6 @@ components:
         tItle:
           type: string
           maxLength: 10
+        ISBN: { type: string, pattern: "[0-9]{13}" }
       required:
         - tItle
