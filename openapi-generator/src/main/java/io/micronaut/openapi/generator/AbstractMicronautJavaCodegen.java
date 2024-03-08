@@ -1055,10 +1055,10 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
 
         // this fix for properties started with underscores and named by reserved words
         // For example, _____default
-        var fistNameChar = varName.toCharArray()[0];
+        var firstNameChar = varName.toCharArray()[0];
         var underscorePrefix = getUnderscorePrefix(name);
         varName = getUnderscorePrefix(name)
-            + (fistNameChar == '_' && !underscorePrefix.isEmpty() ? "" : Character.toLowerCase(fistNameChar))
+            + (firstNameChar == '_' && !underscorePrefix.isEmpty() ? "" : Character.toLowerCase(firstNameChar))
             + varName.substring(1);
 
         return varName;
