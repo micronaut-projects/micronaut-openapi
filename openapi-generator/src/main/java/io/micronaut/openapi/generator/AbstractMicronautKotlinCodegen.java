@@ -1156,8 +1156,12 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
 
     @Override
     public String toVarName(String name) {
-
         var varName = super.toVarName(name);
+
+        if (varName.chars().allMatch(Character::isUpperCase)) {
+            return varName;
+        }
+
         // Micronaut can't process correctly properties like `eTemperature`, when first symbol in lower case
         // and second symbol in upper case.
         // See this: https://github.com/micronaut-projects/micronaut-core/pull/10130
