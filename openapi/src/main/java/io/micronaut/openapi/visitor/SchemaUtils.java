@@ -15,16 +15,7 @@
  */
 package io.micronaut.openapi.visitor;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-
+import com.fasterxml.jackson.databind.JsonNode;
 import io.micronaut.core.annotation.AnnotationValue;
 import io.micronaut.core.annotation.Internal;
 import io.micronaut.core.util.ArrayUtils;
@@ -70,7 +61,16 @@ import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.servers.Server;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 import static io.micronaut.openapi.visitor.ContextUtils.warn;
 import static io.micronaut.openapi.visitor.Utils.resolveComponents;
@@ -86,7 +86,14 @@ public final class SchemaUtils {
 
     public static final String COMPONENTS_CALLBACKS_PREFIX = "#/components/callbacks/";
     public static final String COMPONENTS_SCHEMAS_PREFIX = "#/components/schemas/";
+
     public static final String TYPE_NULL = "null";
+    public static final String TYPE_OBJECT = "object";
+    public static final String TYPE_ARRAY = "array";
+    public static final String TYPE_STRING = "string";
+    public static final String TYPE_INTEGER = "integer";
+    public static final String TYPE_NUMBER = "number";
+    public static final String TYPE_BOOLEAN = "boolean";
 
     public static final Schema<?> EMPTY_SCHEMA = new Schema<>();
     public static final Schema<?> EMPTY_ARRAY_SCHEMA = new ArraySchema();
@@ -107,8 +114,6 @@ public final class SchemaUtils {
     public static final Schema<?> EMPTY_STRING_SCHEMA = new StringSchema();
     public static final Schema<?> EMPTY_UUID_SCHEMA = new UUIDSchema();
     public static final Schema<?> EMPTY_SIMPLE_SCHEMA = new SimpleSchema();
-
-    public static final String TYPE_OBJECT = "object";
 
     private static final List<Schema<?>> ALL_EMPTY_SCHEMAS = List.of(
         EMPTY_SCHEMA,
@@ -141,25 +146,27 @@ public final class SchemaUtils {
     }
 
     // Copy of io.swagger.v3.core.util.AnnotationsUtils.getExtensions
-    public static void processExtensions(Map<CharSequence, Object> map, AnnotationValue<Extension> extension) {
-        String name = extension.stringValue("name").orElse(StringUtils.EMPTY_STRING);
-        final String key = !name.isEmpty() ? prependIfMissing(name, PREFIX_X) : name;
-        for (AnnotationValue<ExtensionProperty> prop : extension.getAnnotations("properties", ExtensionProperty.class)) {
-            final String propertyName = prop.getRequiredValue("name", String.class);
-            final String propertyValue = prop.getRequiredValue(String.class);
+    public static void processExtensions(Map<String, Object> map, AnnotationValue<Extension> extension) {
+        String extName = extension.stringValue("name").orElse(StringUtils.EMPTY_STRING);
+        String decoratedName = prependIfMissing(extName, PREFIX_X);
+        final String key = !extName.isEmpty() ? decoratedName : extName;
+        for (var propAnn : extension.getAnnotations("properties", ExtensionProperty.class)) {
+            var propertyName = propAnn.getRequiredValue("name", String.class);
+            var propertyValue = propAnn.getRequiredValue(String.class);
             JsonNode processedValue;
-            final boolean propertyAsJson = prop.get("parseValue", boolean.class, false);
+            final boolean propertyAsJson = propAnn.get("parseValue", boolean.class, false);
             if (StringUtils.hasText(propertyName) && StringUtils.hasText(propertyValue)) {
                 if (key.isEmpty()) {
+                    decoratedName = prependIfMissing(propertyName, PREFIX_X);
                     if (propertyAsJson) {
                         try {
                             processedValue = Utils.getJsonMapper().readTree(propertyValue);
-                            map.put(prependIfMissing(propertyName, PREFIX_X), processedValue);
+                            map.put(decoratedName, processedValue);
                         } catch (Exception e) {
-                            map.put(prependIfMissing(propertyName, PREFIX_X), propertyValue);
+                            map.put(decoratedName, propertyValue);
                         }
                     } else {
-                        map.put(prependIfMissing(propertyName, PREFIX_X), propertyValue);
+                        map.put(decoratedName, propertyValue);
                     }
                 } else {
                     Object value = map.get(key);
@@ -167,7 +174,8 @@ public final class SchemaUtils {
                         value = new LinkedHashMap<>();
                         map.put(key, value);
                     }
-                    @SuppressWarnings("unchecked") final Map<String, Object> mapValue = (Map<String, Object>) value;
+                    @SuppressWarnings("unchecked")
+                    var mapValue = (Map<String, Object>) value;
                     if (propertyAsJson) {
                         try {
                             processedValue = Utils.getJsonMapper().readTree(propertyValue);
@@ -200,8 +208,9 @@ public final class SchemaUtils {
         return schemas;
     }
 
-    public static Schema setSpecVersion(Schema schema) {
-        return schema.specVersion(Utils.isOpenapi31() ? SpecVersion.V31 : SpecVersion.V30);
+    public static <T extends Schema> T setSpecVersion(T schema) {
+        schema.specVersion(Utils.isOpenapi31() ? SpecVersion.V31 : SpecVersion.V30);
+        return schema;
     }
 
     public static ArraySchema arraySchema(Schema<?> schema) {
@@ -1015,13 +1024,17 @@ public final class SchemaUtils {
     }
 
     public static String getType(Schema<?> schema) {
-        if (schema.getType() != null) {
-            return schema.getType();
+        return getType(schema.getType(), schema.getTypes());
+    }
+
+    public static String getType(String type, Collection<String> types) {
+        if (type != null) {
+            return type;
         }
-        if (Utils.isOpenapi31() && CollectionUtils.isNotEmpty(schema.getTypes())) {
-            for (var type : schema.getTypes()) {
-                if (!type.equals(TYPE_NULL)) {
-                    return type;
+        if (Utils.isOpenapi31() && CollectionUtils.isNotEmpty(types)) {
+            for (var t : types) {
+                if (!t.equals(TYPE_NULL)) {
+                    return t;
                 }
             }
         }
@@ -1029,11 +1042,11 @@ public final class SchemaUtils {
     }
 
     public static void setAllowableValues(Schema schema, String[] allowableValues, Element element, String elType, String elFormat, VisitorContext context) {
-        if (ArrayUtils.isEmpty(allowableValues) || schema.getEnum() != null) {
+        if (ArrayUtils.isEmpty(allowableValues)) {
             return;
         }
         for (String allowableValue : allowableValues) {
-            if (schema.getEnum().contains(allowableValue)) {
+            if (schema.getEnum() != null && schema.getEnum().contains(allowableValue)) {
                 continue;
             }
             try {
@@ -1043,5 +1056,16 @@ public final class SchemaUtils {
                 schema.addEnumItemObject(allowableValue);
             }
         }
+    }
+
+    public static Schema<?> getSchemaByRef(Schema<?> schema, OpenAPI openApi) {
+        return getSchemaByRef(schema.get$ref(), openApi);
+    }
+
+    public static Schema<?> getSchemaByRef(String schemaRef, OpenAPI openApi) {
+        if (StringUtils.isEmpty(schemaRef)) {
+            return null;
+        }
+        return resolveSchemas(openApi).get(schemaRef.substring(COMPONENTS_SCHEMAS_PREFIX.length()));
     }
 }

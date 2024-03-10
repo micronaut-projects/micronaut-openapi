@@ -7,7 +7,6 @@ import io.swagger.v3.oas.models.Operation
 import io.swagger.v3.oas.models.PathItem
 import io.swagger.v3.oas.models.Paths
 import io.swagger.v3.oas.models.media.Schema
-import spock.lang.Ignore
 import spock.lang.Issue
 
 class OpenApiControllerVisitorSpec extends AbstractOpenApiTypeElementSpec {
@@ -2089,8 +2088,7 @@ class MyBean {}
         examples.example2.value.p22 == 123
     }
 
-    @Ignore("Wait next swagger release")
-    void "test header examples"() {
+    void "test api response header examples"() {
         given:
         buildBeanDefinition('test.MyBean', '''
 package test;
@@ -2111,7 +2109,21 @@ class MyController {
             @ApiResponse(headers = {
                     @Header(
                             name = "header2",
-                            description = "header 2"
+                            description = "header 2",
+                            examples = {
+                                @ExampleObject(
+                                        name = "example1",
+                                        summary = "Ex1 summary",
+                                        description = "Ex1 description",
+                                        value = "{\\"p1\\": \\"v1\\", \\"p2\\": 123}"
+                                ),
+                                @ExampleObject(
+                                        name = "example2",
+                                        summary = "Ex2 summary",
+                                        description = "Ex2 description",
+                                        value = "{\\"p21\\": \\"v1\\", \\"p22\\": 123}"
+                                )
+                            }
                     ),
             })
     })
@@ -2130,6 +2142,19 @@ class MyBean {}
 
         then:
         operation
+        def examples = operation.responses.'200'.headers.header2.examples
+        examples.size() == 2
+        examples.example1
+        examples.example1.summary == "Ex1 summary"
+        examples.example1.description == "Ex1 description"
+        examples.example1.value.p1 == "v1"
+        examples.example1.value.p2 == 123
+
+        examples.example2
+        examples.example2.summary == "Ex2 summary"
+        examples.example2.description == "Ex2 description"
+        examples.example2.value.p21 == "v1"
+        examples.example2.value.p22 == 123
     }
 
     void "test content examples"() {
@@ -2181,5 +2206,18 @@ class MyBean {}
 
         then:
         operation
+        def examples = operation.responses.'200'.content.'application/json'.examples
+        examples.size() == 2
+        examples.example1
+        examples.example1.summary == "Ex1 summary"
+        examples.example1.description == "Ex1 description"
+        examples.example1.value.p1 == "v1"
+        examples.example1.value.p2 == 123
+
+        examples.example2
+        examples.example2.summary == "Ex2 summary"
+        examples.example2.description == "Ex2 description"
+        examples.example2.value.p21 == "v1"
+        examples.example2.value.p22 == 123
     }
 }

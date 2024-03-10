@@ -51,6 +51,7 @@ import io.swagger.v3.oas.models.SpecVersion;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_31_ENABLED;
+import static io.swagger.v3.oas.models.media.Schema.BIND_TYPE_AND_TYPES;
 
 /**
  * Some util methods.
@@ -403,6 +404,7 @@ public final class Utils {
     }
 
     public static void setOpenapi31(boolean openapi31) {
+        System.setProperty(BIND_TYPE_AND_TYPES, "true");
         Utils.openapi31 = openapi31;
     }
 
@@ -423,5 +425,6 @@ public final class Utils {
         testYamlReference = null;
         testJsonReference = null;
         creatorConstructorsCache = new HashMap<>();
+        System.clearProperty(BIND_TYPE_AND_TYPES);
     }
 }

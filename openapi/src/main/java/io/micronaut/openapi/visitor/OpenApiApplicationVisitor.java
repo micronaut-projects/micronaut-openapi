@@ -15,29 +15,12 @@
  */
 package io.micronaut.openapi.visitor;
 
-import java.io.IOException;
-import java.io.Serial;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.nio.file.DirectoryStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.UnaryOperator;
-import java.util.stream.Collectors;
-
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.TextNode;
 import io.micronaut.context.env.Environment;
 import io.micronaut.core.annotation.Nullable;
 import io.micronaut.core.util.CollectionUtils;
@@ -68,12 +51,27 @@ import io.swagger.v3.oas.models.PathItem;
 import io.swagger.v3.oas.models.SpecVersion;
 import io.swagger.v3.oas.models.media.Schema;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.PropertyNamingStrategies;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.node.TextNode;
+import java.io.IOException;
+import java.io.Serial;
+import java.io.StringWriter;
+import java.io.Writer;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.UnaryOperator;
+import java.util.stream.Collectors;
 
 import static io.micronaut.openapi.visitor.ConfigUtils.endpointsConfiguration;
 import static io.micronaut.openapi.visitor.ConfigUtils.getAdocProperties;
@@ -217,28 +215,29 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
      */
     private void mergeAdditionalSwaggerFiles(ClassElement element, VisitorContext context, OpenAPI openAPI) {
         String additionalSwaggerFiles = getConfigProperty(MICRONAUT_OPENAPI_ADDITIONAL_FILES, context);
-        if (StringUtils.isNotEmpty(additionalSwaggerFiles)) {
-            Path directory = resolve(context, Paths.get(additionalSwaggerFiles));
-            if (Files.isDirectory(directory)) {
-                info("Merging Swagger OpenAPI YAML and JSON files from location: " + directory, context);
-                try (DirectoryStream<Path> stream = Files.newDirectoryStream(directory, path -> FileUtils.isYaml(path.toString().toLowerCase()) || path.toString().toLowerCase().endsWith(EXT_JSON))) {
-                    stream.forEach(path -> {
-                        boolean isYaml = FileUtils.isYaml(path.toString().toLowerCase());
-                        info("Reading Swagger OpenAPI " + (isYaml ? "YAML" : "JSON") + " file " + path.getFileName(), context);
-                        OpenAPI parsedOpenApi = null;
-                        try {
-                            parsedOpenApi = (isYaml ? Utils.getYamlMapper() : Utils.getJsonMapper()).readValue(path.toFile(), OpenAPI.class);
-                        } catch (IOException e) {
-                            warn("Unable to read file " + path.getFileName() + ": " + e.getMessage(), context, element);
-                        }
-                        copyOpenApi(openAPI, parsedOpenApi);
-                    });
+        if (StringUtils.isEmpty(additionalSwaggerFiles)) {
+            return;
+        }
+        Path directory = resolve(context, Paths.get(additionalSwaggerFiles));
+        if (!Files.isDirectory(directory)) {
+            warn(directory + " does not exist or is not a directory", context, element);
+            return;
+        }
+        info("Merging Swagger OpenAPI YAML and JSON files from location: " + directory, context);
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(directory, path -> FileUtils.isYaml(path.toString().toLowerCase()) || path.toString().toLowerCase().endsWith(EXT_JSON))) {
+            stream.forEach(path -> {
+                boolean isYaml = FileUtils.isYaml(path.toString().toLowerCase());
+                info("Reading Swagger OpenAPI " + (isYaml ? "YAML" : "JSON") + " file " + path.getFileName(), context);
+                OpenAPI parsedOpenApi = null;
+                try {
+                    parsedOpenApi = (isYaml ? Utils.getYamlMapper() : Utils.getJsonMapper()).readValue(path.toFile(), OpenAPI.class);
                 } catch (IOException e) {
-                    warn("Unable to read  file from " + directory + ": " + e.getMessage(), context, element);
+                    warn("Unable to read file " + path.getFileName() + ": " + e.getMessage(), context, element);
                 }
-            } else {
-                warn(directory + " does not exist or is not a directory", context, element);
-            }
+                copyOpenApi(openAPI, parsedOpenApi);
+            });
+        } catch (IOException e) {
+            warn("Unable to read  file from " + directory + ": " + e.getMessage(), context, element);
         }
     }
 
@@ -332,7 +331,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         if (paths == null || paths.isEmpty()) {
             return;
         }
-        final io.swagger.v3.oas.models.Paths newPaths = new io.swagger.v3.oas.models.Paths();
+        var newPaths = new io.swagger.v3.oas.models.Paths();
         for (Map.Entry<String, PathItem> path : paths.entrySet()) {
             final String mapping = path.getKey();
             String newPath = mapping.startsWith(serverContextPath) ? mapping : StringUtils.prependUri(serverContextPath, mapping);
@@ -356,8 +355,9 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             return onode;
         }
         final ObjectNode newNode = onode.objectNode();
-        for (Iterator<Map.Entry<String, JsonNode>> i = onode.fields(); i.hasNext(); ) {
-            final Map.Entry<String, JsonNode> entry = i.next();
+        var i = onode.fields();
+        while (i.hasNext()) {
+            var entry = i.next();
             newNode.set(propertyExpander.apply(entry.getKey()), resolvePlaceholders(entry.getValue(), propertyExpander));
         }
         return newNode;
@@ -458,6 +458,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
 
                 String isJson = getConfigProperty(MICRONAUT_OPENAPI_JSON_FORMAT, context);
                 boolean isYaml = !(StringUtils.isNotEmpty(isJson) && isJson.equalsIgnoreCase(StringUtils.TRUE));
+                String ext = isYaml ? EXT_YML : EXT_JSON;
 
                 for (Map.Entry<Pair<String, String>, OpenApiInfo> entry : openApiInfos.entrySet()) {
 
@@ -471,8 +472,6 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                     if (Utils.isTestMode()) {
                         Utils.setTestReference(openApi);
                     }
-
-                    String ext = isYaml ? EXT_YML : EXT_JSON;
 
                     var titleAndFilename = calcFinalFilename(openApiInfo.getFilename(), openApiInfo, openApiInfos.size() == 1, ext, context);
                     documentTitle = titleAndFilename.getFirst();
@@ -704,7 +703,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                 if (CollectionUtils.isNotEmpty(schemas)) {
                     String openApiJson = Utils.getJsonMapper().writeValueAsString(openApi);
                     // Create a copy of the keySet so that we can modify the map while in a foreach
-                    Set<String> keySet = new HashSet<>(schemas.keySet());
+                    var keySet = new HashSet<>(schemas.keySet());
                     for (String schemaName : keySet) {
                         if (!openApiJson.contains("\"" + COMPONENTS_SCHEMAS_REF + schemaName + '"')) {
                             schemas.remove(schemaName);
@@ -767,10 +766,12 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             }
         }
 
+        var objectMapper = isYaml ? Utils.getYamlMapper() : Utils.getJsonMapper();
+
         for (OpenApiInfo openApiInfo : openApiInfos.values()) {
             Path specFile = openApiSpecFile(openApiInfo.getFilename(), context);
             try (Writer writer = getFileWriter(specFile)) {
-                (isYaml ? Utils.getYamlMapper() : Utils.getJsonMapper()).writeValue(writer, openApiInfo.getOpenApi());
+                objectMapper.writeValue(writer, openApiInfo.getOpenApi());
                 if (Utils.isTestMode()) {
                     Utils.setTestFileName(openApiInfo.getFilename());
                     if (isYaml) {

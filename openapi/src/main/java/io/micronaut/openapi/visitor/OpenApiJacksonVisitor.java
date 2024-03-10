@@ -71,9 +71,9 @@ public class OpenApiJacksonVisitor implements TypeElementVisitor<Object, Object>
         if (!isOpenApiEnabled(context) || !isSpecGenerationEnabled(context)) {
             return;
         }
-        AnnotationValue<JsonSubTypes> jsonSubTypesDecAnn = element.getDeclaredAnnotation(JsonSubTypes.class);
-        AnnotationValue<JsonTypeInfo> jsonTypeInfoDecAnn = element.getDeclaredAnnotation(JsonTypeInfo.class);
-        AnnotationValue<Schema> schemaAnn = element.getDeclaredAnnotation(Schema.class);
+        var jsonSubTypesDecAnn = element.getDeclaredAnnotation(JsonSubTypes.class);
+        var jsonTypeInfoDecAnn = element.getDeclaredAnnotation(JsonTypeInfo.class);
+        var schemaAnn = element.getDeclaredAnnotation(Schema.class);
 
         /*
         Given the following annotations:

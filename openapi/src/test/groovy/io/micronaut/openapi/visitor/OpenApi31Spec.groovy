@@ -1,6 +1,7 @@
 package io.micronaut.openapi.visitor
 
 import io.micronaut.openapi.AbstractOpenApiTypeElementSpec
+
 import io.micronaut.openapi.OpenApiUtils
 import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.media.Schema
@@ -197,7 +198,7 @@ class Pet {
             minContains = 10,
             maxContains = 20,
             schema = @Schema(
-                    type = "string"
+                    types = {"string", "null"}
             )
     )
     public List<Object> attrs;
@@ -218,11 +219,12 @@ class MyBean {}
         openApi.components.schemas
         openApi.components.schemas.Pet
         openApi.components.schemas.Pet.properties.attrs.contains
-        openApi.components.schemas.Pet.properties.attrs.contains.extensions.types.contains("string")
-        openApi.components.schemas.Pet.properties.attrs.contains.extensions.types.contains("null")
+        openApi.components.schemas.Pet.properties.attrs.contains.types.contains("string")
+        openApi.components.schemas.Pet.properties.attrs.contains.types.contains("null")
         openApi.components.schemas.Pet.properties.attrs.contains.format == "int64"
-        openApi.components.schemas.Pet.properties.attrs.items.types.size() == 1
+        openApi.components.schemas.Pet.properties.attrs.items.types.size() == 2
         openApi.components.schemas.Pet.properties.attrs.items.types.contains('string')
+        openApi.components.schemas.Pet.properties.attrs.items.types.contains('null')
         openApi.components.schemas.Pet.properties.attrs.minContains == 10
         openApi.components.schemas.Pet.properties.attrs.maxContains == 20
 
@@ -458,6 +460,109 @@ class MyBean {}
         petSchema.discriminator.extensions.'x-myExt22'
         petSchema.discriminator.extensions.'x-myExt22'.prop221 == 'prop1Val1'
         petSchema.discriminator.extensions.'x-myExt22'.prop222 == 'prop2Val2'
+
+        cleanup:
+        System.clearProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_31_ENABLED)
+        Utils.clean()
+    }
+
+    void "test json schema OpenAPI 3.1.0"() {
+        setup:
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_31_ENABLED, "true")
+        Utils.clean()
+
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Post;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Schema;
+
+import java.util.List;
+
+@Controller
+class CatController {
+
+    @Post("/pet/cat")
+    public Example save() {
+        return null;
+    }
+}
+
+class Example {
+    @Schema(description = "alpha")
+    public String alpha;
+    @Schema(ref = "./BetaSchema.json")
+    public Object beta;
+    @Schema(description = "sigma")
+    public Double sigma;
+    @ArraySchema(schema = @Schema(oneOf = {Theta.class, Tau.class}))
+    public List<Omega> omega;
+}
+
+class Omega {
+}
+
+@Schema(
+    title = "Theta",
+    description = "Theta",
+    additionalProperties = Schema.AdditionalPropertiesValue.FALSE,
+    ref = "./ThetaSchema.json"
+)
+class Theta extends Omega {
+}
+
+@Schema(
+    title = "Tau",
+    description = "Tau",
+    additionalProperties = Schema.AdditionalPropertiesValue.FALSE,
+    ref = "./TauSchema.json"
+)
+class Tau extends Omega {
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        then: "the state is correct"
+        Utils.testReference != null
+
+        when: "The OpenAPI is retrieved"
+        OpenAPI openAPI = Utils.testReference
+        def exampleSchema = openAPI.components.schemas.Example
+        def tauSchema = openAPI.components.schemas.Tau
+        def thetaSchema = openAPI.components.schemas.Theta
+
+        then: "the components are valid"
+        exampleSchema
+        exampleSchema.properties
+        exampleSchema.properties.alpha.types.size() == 1
+        exampleSchema.properties.alpha.types.contains('string')
+        exampleSchema.properties.beta.$ref == './BetaSchema.json'
+        exampleSchema.properties.sigma.types.size() == 1
+        exampleSchema.properties.sigma.types.contains('number')
+        exampleSchema.properties.sigma.format == 'double'
+        exampleSchema.properties.sigma.description == 'sigma'
+
+        exampleSchema.properties.omega.types.size() == 1
+        exampleSchema.properties.omega.types.contains('array')
+        exampleSchema.properties.omega.items.oneOf.size() == 2
+        exampleSchema.properties.omega.items.oneOf.get(0).$ref == '#/components/schemas/Theta'
+        exampleSchema.properties.omega.items.oneOf.get(1).$ref == '#/components/schemas/Tau'
+
+        tauSchema
+        tauSchema.description == 'Tau'
+        tauSchema.title == 'Tau'
+        tauSchema.allOf.get(0).$ref == '#/components/schemas/Omega'
+        tauSchema.$ref == './TauSchema.json'
+
+        thetaSchema
+        thetaSchema.description == 'Theta'
+        thetaSchema.title == 'Theta'
+        thetaSchema.allOf.get(0).$ref == '#/components/schemas/Omega'
+        thetaSchema.$ref == './ThetaSchema.json'
 
         cleanup:
         System.clearProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_31_ENABLED)

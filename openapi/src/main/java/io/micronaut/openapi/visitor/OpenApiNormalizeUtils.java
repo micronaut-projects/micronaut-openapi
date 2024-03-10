@@ -219,7 +219,7 @@ public final class OpenApiNormalizeUtils {
 
             if (SchemaUtils.isEmptySchema(schema)
                 && (serializedDefaultValue == null || serializedDefaultValue.equals(serializedAllOfDefaultValue))
-                && (type == null || allOfSchema.getType() == null || allOfSchema.getType().equals(type))) {
+                && (type == null || isSameType)) {
                 normalizedSchema = allOfSchema;
             }
             schema.setType(type);
@@ -230,6 +230,7 @@ public final class OpenApiNormalizeUtils {
             }
             return normalizedSchema;
         }
+
         var finalList = new ArrayList<Schema>(allOf.size());
         var schemasWithoutRef = new ArrayList<Schema>(allOf.size() - 1);
         for (Schema<?> schemaAllOf : allOf) {

@@ -55,6 +55,7 @@ import io.micronaut.inject.ast.ElementQuery;
 import io.micronaut.inject.ast.EnumElement;
 import io.micronaut.inject.ast.MethodElement;
 import io.micronaut.inject.visitor.VisitorContext;
+import io.micronaut.openapi.OpenApiUtils;
 import io.micronaut.openapi.swagger.core.util.PrimitiveType;
 import io.swagger.v3.oas.annotations.extensions.Extension;
 import io.swagger.v3.oas.annotations.security.OAuthScope;
@@ -84,7 +85,12 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import static io.micronaut.openapi.OpenApiUtils.CONVERT_JSON_MAPPER;
 import static io.micronaut.openapi.OpenApiUtils.JSON_MAPPER;
 import static io.micronaut.openapi.visitor.ContextUtils.warn;
+import static io.micronaut.openapi.visitor.SchemaUtils.TYPE_ARRAY;
+import static io.micronaut.openapi.visitor.SchemaUtils.TYPE_BOOLEAN;
+import static io.micronaut.openapi.visitor.SchemaUtils.TYPE_INTEGER;
+import static io.micronaut.openapi.visitor.SchemaUtils.TYPE_NUMBER;
 import static io.micronaut.openapi.visitor.SchemaUtils.TYPE_OBJECT;
+import static io.micronaut.openapi.visitor.SchemaUtils.TYPE_STRING;
 import static io.micronaut.openapi.visitor.SchemaUtils.processExtensions;
 import static io.micronaut.openapi.visitor.Utils.resolveComponents;
 
@@ -155,30 +161,30 @@ public final class ConvertUtils {
                         boolean areClassValues = first instanceof AnnotationClassValue;
 
                         if (areClassValues) {
-                            List<Class<?>> classes = new ArrayList<>(a.length);
+                            var classes = new ArrayList<Class<?>>(a.length);
                             for (Object o : a) {
-                                AnnotationClassValue<?> acv = (AnnotationClassValue<?>) o;
+                                var acv = (AnnotationClassValue<?>) o;
                                 acv.getType().ifPresent(classes::add);
                             }
                             newValues.put(key, classes);
                         } else if (areAnnotationValues) {
                             String annotationName = ((AnnotationValue<?>) first).getAnnotationName();
                             if (io.swagger.v3.oas.annotations.security.SecurityRequirement.class.getName().equals(annotationName)) {
-                                List<SecurityRequirement> securityRequirements = new ArrayList<>(a.length);
+                                var securityRequirements = new ArrayList<SecurityRequirement>(a.length);
                                 for (Object o : a) {
                                     securityRequirements.add(ConvertUtils.mapToSecurityRequirement((AnnotationValue<io.swagger.v3.oas.annotations.security.SecurityRequirement>) o));
                                 }
                                 newValues.put(key, securityRequirements);
                             } else if (Extension.class.getName().equals(annotationName)) {
-                                Map<CharSequence, Object> extensions = new HashMap<>();
+                                var extensions = new HashMap<String, Object>();
                                 for (Object o : a) {
                                     processExtensions(extensions, (AnnotationValue<Extension>) o);
                                 }
                                 newValues.put("extensions", extensions);
                             } else if (Server.class.getName().equals(annotationName)) {
-                                List<Map<CharSequence, Object>> servers = new ArrayList<>();
+                                var servers = new ArrayList<Map<CharSequence, Object>>();
                                 for (Object o : a) {
-                                    AnnotationValue<ServerVariable> sv = (AnnotationValue<ServerVariable>) o;
+                                    var sv = (AnnotationValue<ServerVariable>) o;
                                     Map<CharSequence, Object> variables = new LinkedHashMap<>(toValueMap(sv.getValues(), context));
                                     servers.add(variables);
                                 }
@@ -187,9 +193,9 @@ public final class ConvertUtils {
                                 Map<String, String> params = toTupleSubMap(a, "name", "description");
                                 newValues.put(key, params);
                             } else if (ServerVariable.class.getName().equals(annotationName)) {
-                                Map<String, Map<CharSequence, Object>> variables = new LinkedHashMap<>();
+                                var variables = new LinkedHashMap<String, Map<CharSequence, Object>>();
                                 for (Object o : a) {
-                                    AnnotationValue<ServerVariable> sv = (AnnotationValue<ServerVariable>) o;
+                                    var sv = (AnnotationValue<ServerVariable>) o;
                                     sv.stringValue("name").ifPresent(name -> {
                                         Map<CharSequence, Object> map = toValueMap(sv.getValues(), context);
                                         Object dv = map.get("defaultValue");
@@ -206,12 +212,12 @@ public final class ConvertUtils {
                                 newValues.put(key, variables);
                             } else {
                                 if (a.length == 1) {
-                                    final AnnotationValue<?> av = (AnnotationValue<?>) a[0];
+                                    var av = (AnnotationValue<?>) a[0];
                                     final Map<CharSequence, Object> valueMap = toValueMap(av.getValues(), context);
                                     newValues.put(key, toValueMap(valueMap, context));
                                 } else {
 
-                                    List<Object> list = new ArrayList<>();
+                                    var list = new ArrayList<>();
                                     for (Object o : a) {
                                         if (o instanceof AnnotationValue<?> av) {
                                             final Map<CharSequence, Object> valueMap = toValueMap(av.getValues(), context);
@@ -304,7 +310,7 @@ public final class ConvertUtils {
 
         JsonNode allowableValuesNode = jn.get("allowableValues");
         if (allowableValuesNode != null && allowableValuesNode.isArray()) {
-            List<Object> allowableValues = new ArrayList<>(allowableValuesNode.size());
+            var allowableValues = new ArrayList<>(allowableValuesNode.size());
             for (JsonNode allowableValueNode : allowableValuesNode) {
                 if (allowableValueNode == null) {
                     continue;
@@ -420,7 +426,9 @@ public final class ConvertUtils {
             content.put(contentType, mediaType);
             mediaType.setExamples(examples);
             mediaType.setEncoding(encoding);
-            mediaType.setExtensions(extensions);
+            if (extensions != null) {
+                extensions.forEach(mediaType::addExtension);
+            }
             mediaType.setSchema(schema);
         }
 
@@ -476,7 +484,7 @@ public final class ConvertUtils {
 
             Utils.normalizeEnumValues(map, CollectionUtils.mapOf("type", SecurityScheme.Type.class, "in", SecurityScheme.In.class));
 
-            String type = (String) map.get("type");
+            var type = (String) map.get("type");
             if (!SecurityScheme.Type.APIKEY.toString().equals(type)) {
                 removeAndWarnSecSchemeProp(map, "name", context, false);
                 removeAndWarnSecSchemeProp(map, "in", context);
@@ -645,47 +653,47 @@ public final class ConvertUtils {
         if (String.class.getName().equals(className)
             || char.class.getName().equals(className)
             || Character.class.getName().equals(className)) {
-            return Pair.of("string", null);
+            return Pair.of(TYPE_STRING, null);
         } else if (Boolean.class.getName().equals(className)
             || boolean.class.getName().equals(className)) {
-            return Pair.of("boolean", null);
+            return Pair.of(TYPE_BOOLEAN, null);
         } else if (Integer.class.getName().equals(className)
             || int.class.getName().equals(className)
             || Short.class.getName().equals(className)
             || short.class.getName().equals(className)) {
-            return Pair.of("integer", "int32");
+            return Pair.of(TYPE_INTEGER, "int32");
         } else if (BigInteger.class.getName().equals(className)) {
-            return Pair.of("integer", null);
+            return Pair.of(TYPE_INTEGER, null);
         } else if (Long.class.getName().equals(className)
             || long.class.getName().equals(className)) {
-            return Pair.of("integer", "int64");
+            return Pair.of(TYPE_INTEGER, "int64");
         } else if (Float.class.getName().equals(className)
             || float.class.getName().equals(className)) {
-            return Pair.of("number", "float");
+            return Pair.of(TYPE_NUMBER, "float");
         } else if (Double.class.getName().equals(className)
             || double.class.getName().equals(className)) {
-            return Pair.of("number", "double");
+            return Pair.of(TYPE_NUMBER, "double");
         } else if (isArray && (Byte.class.getName().equals(className)
             || byte.class.getName().equals(className))) {
-            return Pair.of("string", "byte");
+            return Pair.of(TYPE_STRING, "byte");
             // swagger doesn't support type byte
         } else if (Byte.class.getName().equals(className)
             || byte.class.getName().equals(className)) {
-            return Pair.of("integer", "int32");
+            return Pair.of(TYPE_INTEGER, "int32");
         } else if (BigDecimal.class.getName().equals(className)) {
-            return Pair.of("number", null);
+            return Pair.of(TYPE_NUMBER, null);
         } else if (URI.class.getName().equals(className)) {
-            return Pair.of("string", "uri");
+            return Pair.of(TYPE_STRING, "uri");
         } else if (URL.class.getName().equals(className)) {
-            return Pair.of("string", "url");
+            return Pair.of(TYPE_STRING, "url");
         } else if (UUID.class.getName().equals(className)) {
-            return Pair.of("string", "uuid");
+            return Pair.of(TYPE_STRING, "uuid");
         } else if (Number.class.getName().equals(className)) {
-            return Pair.of("number", null);
+            return Pair.of(TYPE_NUMBER, null);
         } else if (File.class.getName().equals(className)) {
-            return Pair.of("string", "binary");
+            return Pair.of(TYPE_STRING, "binary");
         } else if (LocalDate.class.getName().equals(className)) {
-            return Pair.of("string", "date");
+            return Pair.of(TYPE_STRING, "date");
         } else if (Date.class.getName().equals(className)
             || Calendar.class.getName().equals(className)
             || Instant.class.getName().equals(className)
@@ -694,9 +702,9 @@ public final class ConvertUtils {
             || XMLGregorianCalendar.class.getName().equals(className)
             || ZonedDateTime.class.getName().equals(className)
         ) {
-            return Pair.of("string", "date-time");
+            return Pair.of(TYPE_STRING, "date-time");
         } else if (LocalTime.class.getName().equals(className)) {
-            return Pair.of("string", "partial-time");
+            return Pair.of(TYPE_STRING, "partial-time");
         } else {
             return Pair.of(TYPE_OBJECT, null);
         }
@@ -719,7 +727,7 @@ public final class ConvertUtils {
         }
 
         // @QueryValue(defaultValue = "")
-        if ("array".equals(type) && isMicronautFormat) {
+        if (TYPE_ARRAY.equals(type) && isMicronautFormat) {
             return valueStr.split(",");
         }
 
@@ -728,7 +736,7 @@ public final class ConvertUtils {
         }
 
         try {
-            if ("string".equals(type)) {
+            if (TYPE_STRING.equals(type)) {
                 if ("uri".equals(format)) {
                     return new URI(valueStr);
                 } else if ("url".equals(format)) {
@@ -738,11 +746,11 @@ public final class ConvertUtils {
                 } else if (format == null) {
                     return valueStr;
                 }
-            } else if ("boolean".equals(type)) {
+            } else if (TYPE_BOOLEAN.equals(type)) {
                 return Boolean.parseBoolean(valueStr);
-            } else if ("array".equals(type)) {
+            } else if (TYPE_ARRAY.equals(type)) {
                 return JSON_MAPPER.readValue(valueStr, List.class);
-            } else if ("integer".equals(type)) {
+            } else if (TYPE_INTEGER.equals(type)) {
                 if ("int32".equals(format)) {
                     return Integer.parseInt(valueStr);
                 } else if ("int64".equals(format)) {
@@ -750,13 +758,19 @@ public final class ConvertUtils {
                 } else {
                     return new BigInteger(valueStr);
                 }
-            } else if ("number".equals(type)) {
+            } else if (TYPE_NUMBER.equals(type)) {
                 if ("float".equals(format)) {
                     return Float.parseFloat(valueStr);
                 } else if ("double".equals(format)) {
                     return Double.parseDouble(valueStr);
                 } else {
                     return new BigDecimal(valueStr);
+                }
+            } else if (TYPE_OBJECT.equals(type) || type == null) {
+                try {
+                    return OpenApiUtils.getConvertJsonMapper().readValue(valueStr, Map.class);
+                } catch (Exception e) {
+                    // do nothing
                 }
             }
         } catch (Exception e) {
@@ -769,7 +783,7 @@ public final class ConvertUtils {
     public static Map<String, String> toTupleSubMap(Object[] a, String entryKey, String entryValue) {
         var params = new LinkedHashMap<String, String>();
         for (Object o : a) {
-            AnnotationValue<?> sv = (AnnotationValue<?>) o;
+            var sv = (AnnotationValue<?>) o;
             final Optional<String> n = sv.stringValue(entryKey);
             final Optional<String> expr = sv.stringValue(entryValue);
             if (n.isPresent() && expr.isPresent()) {

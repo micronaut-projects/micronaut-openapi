@@ -97,9 +97,9 @@ public class OpenApiGroupInfoVisitor implements TypeElementVisitor<Object, Objec
         }
 
         PackageElement packageEl = classEl.getPackage();
-        List<AnnotationValue<OpenAPIGroupInfo>> classAnnotations = classEl.getAnnotationValuesByType(OpenAPIGroupInfo.class);
-        List<AnnotationValue<OpenAPIGroupInfo>> packageAnnotations = packageEl.getAnnotationValuesByType(OpenAPIGroupInfo.class);
-        if (CollectionUtils.isEmpty(classAnnotations) && CollectionUtils.isEmpty(packageAnnotations)) {
+        var classAnns = classEl.getAnnotationValuesByType(OpenAPIGroupInfo.class);
+        var packageAnns = packageEl.getAnnotationValuesByType(OpenAPIGroupInfo.class);
+        if (CollectionUtils.isEmpty(classAnns) && CollectionUtils.isEmpty(packageAnns)) {
             return;
         }
 
@@ -108,8 +108,8 @@ public class OpenApiGroupInfoVisitor implements TypeElementVisitor<Object, Objec
             openApis = new HashMap<>();
             Utils.setOpenApis(openApis);
         }
-        addOpenApis(packageAnnotations, openApis, classEl, context);
-        addOpenApis(classAnnotations, openApis, classEl, context);
+        addOpenApis(packageAnns, openApis, classEl, context);
+        addOpenApis(classAnns, openApis, classEl, context);
     }
 
     private void addOpenApis(List<AnnotationValue<OpenAPIGroupInfo>> annotationValues, Map<String, OpenAPI> openApis, ClassElement classEl, VisitorContext context) {
