@@ -17,7 +17,6 @@ package io.micronaut.openapi.visitor;
 
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 
 import javax.annotation.processing.SupportedOptions;

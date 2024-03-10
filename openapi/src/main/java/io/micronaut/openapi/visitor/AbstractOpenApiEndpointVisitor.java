@@ -1305,7 +1305,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         return javadocDescription;
     }
 
-    public Pair<String, PathItem> readWebhook(@Nullable AnnotationValue<Webhook> webhookAnnValue,
+    private Pair<String, PathItem> readWebhook(@Nullable AnnotationValue<Webhook> webhookAnnValue,
                                               HttpMethod httpMethod,
                                               VisitorContext context) {
         if (webhookAnnValue == null) {

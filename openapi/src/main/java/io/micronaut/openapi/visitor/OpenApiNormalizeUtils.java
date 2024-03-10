@@ -225,6 +225,9 @@ public final class OpenApiNormalizeUtils {
             schema.setType(type);
             schema.setAllOf(allOf);
             schema.setDefault(defaultValue);
+            if (schema.getExample() == null) {
+                schema.setExampleSetFlag(false);
+            }
             return normalizedSchema;
         }
         var finalList = new ArrayList<Schema>(allOf.size());
