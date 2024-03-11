@@ -1,6 +1,10 @@
 plugins {
     id "io.micronaut.build.internal.docs"
     id "io.micronaut.build.internal.quality-reporting"
+
+    alias(libs.plugins.kotlin.jvm) apply(false)
+    alias(libs.plugins.kotlin.kapt) apply(false)
+    id("com.google.devtools.ksp").version(mn.versions.ksp).apply(false)
 }
 
 repositories {
