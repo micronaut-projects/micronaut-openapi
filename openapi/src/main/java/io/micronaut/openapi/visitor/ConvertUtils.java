@@ -582,20 +582,38 @@ public final class ConvertUtils {
         if (schemaType != null && !schemaType.equals(PrimitiveType.STRING.getCommonName())) {
             return Pair.of(schemaType, schemaFormat);
         }
-        Pair<String, String> result = null;
+        MethodElement firstMethod = null;
         // check JsonValue method
         List<MethodElement> methods = type.getEnclosedElements(ElementQuery.ALL_METHODS.annotated(metadata -> metadata.isAnnotationPresent(JsonValue.class)));
         if (CollectionUtils.isNotEmpty(methods)) {
-            MethodElement firstMethod = methods.get(0);
+            firstMethod = methods.get(0);
             if (methods.size() > 1) {
                 warn("Found " + methods.size() + " methods with @JsonValue. Process method " + firstMethod, context, type);
             }
+        } else {
+            // Check interfaces annotations
+            for (var interfaceEl : type.getInterfaces()) {
+                methods = interfaceEl.getEnclosedElements(ElementQuery.ALL_METHODS.annotated(metadata -> metadata.isAnnotationPresent(JsonValue.class)));
+                if (methods.isEmpty()) {
+                    continue;
+                }
+                firstMethod = methods.get(0);
+                if (methods.size() > 1) {
+                    warn("Found " + methods.size() + " methods with @JsonValue. Process method " + firstMethod, context, type);
+                }
+                break;
+            }
+        }
+
+        Pair<String, String> result = null;
+        if (firstMethod != null) {
             ClassElement returnType = firstMethod.getReturnType();
             if (returnType.isEnum()) {
                 return checkEnumJsonValueType(context, (EnumElement) returnType, null, null);
             }
             result = ConvertUtils.getTypeAndFormatByClass(returnType.getName(), returnType.isArray());
         }
+
         if (result == null) {
             // check JsonValue field
             var fields = type.getEnclosedElements(ElementQuery.ALL_FIELDS.annotated(metadata -> metadata.isAnnotationPresent(JsonValue.class)));
