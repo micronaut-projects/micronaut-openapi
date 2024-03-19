@@ -27,6 +27,20 @@ class OpenApiOperationViewParseSpec extends Specification {
         cfg.openApiExplorerConfig != null
     }
 
+    void "test set empty string in mapping.path"() {
+        given:
+        String spec = "redoc.enabled=true,rapidoc.enabled=true,swagger-ui.enabled=true,openapi-explorer.enabled=true,mapping.path="
+        OpenApiViewConfig cfg = OpenApiViewConfig.fromSpecification(spec, null, new Properties(), null)
+
+        expect:
+        cfg.enabled == true
+        cfg.mappingPath == ""
+        cfg.rapidocConfig != null
+        cfg.redocConfig != null
+        cfg.swaggerUIConfig != null
+        cfg.openApiExplorerConfig != null
+    }
+
     void "test parse OpenApiView specification, redoc enabled"() {
         given:
         String spec = "redoc.enabled=true,redoc.js.url=version123,redoc.spec.url=/my/spec/file.yml"

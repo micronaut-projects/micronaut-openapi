@@ -26,14 +26,12 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
-import java.util.stream.Collectors;
 
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.core.annotation.Nullable;
@@ -65,6 +63,8 @@ import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_SERVE
  * @see <a href="https://github.com/Authress-Engineering/openapi-explorer">OpenAPI Explorer</a>
  */
 public final class OpenApiViewConfig {
+
+    public static final String DEFAULT_SPEC_MAPPING_PATH = "swagger";
 
     public static final String RESOURCE_DIR = "res";
     public static final String THEMES_DIR = "theme";
@@ -126,12 +126,21 @@ public final class OpenApiViewConfig {
         if (specification == null) {
             return Collections.emptyMap();
         }
-        return Arrays.stream(specification.split(",")).map(String::strip).filter(s -> !s.isEmpty())
-            .map(s -> s.split("=")).filter(keyValue -> keyValue.length == 2).peek(keyValue -> {
-                keyValue[0] = keyValue[0].strip();
-                keyValue[1] = keyValue[1].strip();
-            }).filter(keyValue -> !keyValue[0].isEmpty() && !keyValue[1].isEmpty())
-            .collect(Collectors.toMap(keyValue -> keyValue[0], keyValue -> keyValue[1]));
+        var result = new HashMap<String, String>();
+        for (var prop : specification.split(",")) {
+            prop = prop.strip();
+            if (prop.isEmpty()) {
+                continue;
+            }
+            var keyValue = prop.split("=", 2);
+            var key = keyValue[0].strip();
+            var value = keyValue.length == 1 ? StringUtils.EMPTY_STRING : keyValue[1].strip();
+            if (key.isEmpty()) {
+                continue;
+            }
+            result.put(key, value);
+        }
+        return result;
     }
 
     /**
@@ -166,7 +175,7 @@ public final class OpenApiViewConfig {
             cfg.swaggerUIConfig = SwaggerUIConfig.fromProperties(openApiMap, openApiInfos, context);
             cfg.swaggerUIConfig.rapiPDFConfig = rapiPDFConfig;
         }
-        cfg.mappingPath = openApiMap.getOrDefault("mapping.path", "swagger");
+        cfg.mappingPath = openApiMap.getOrDefault("mapping.path", DEFAULT_SPEC_MAPPING_PATH);
         return cfg;
     }
 
