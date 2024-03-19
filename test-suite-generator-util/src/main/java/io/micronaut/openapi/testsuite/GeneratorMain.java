@@ -66,15 +66,16 @@ public class GeneratorMain {
         var lang = GeneratorLanguage.valueOf(args[6].toUpperCase());
         var generatedAnnotation = Boolean.parseBoolean(args[7]);
         var ksp = Boolean.parseBoolean(args[8]);
+        var clientPath = Boolean.parseBoolean(args[9]);
 
-        Map<String, String> nameMapping = parseNameMapping(args[9]);
+        Map<String, String> nameMapping = parseNameMapping(args[10]);
 
-        String clientId = args[10];
+        String clientId = args[11];
 
-        String apiPrefix = args[11];
-        String apiSuffix = args[12];
-        String modelPrefix = args[13];
-        String modelSuffix = args[14];
+        String apiPrefix = args[12];
+        String apiSuffix = args[13];
+        String modelPrefix = args[14];
+        String modelSuffix = args[15];
 
         var builder = MicronautCodeGeneratorEntryPoint.builder()
             .withDefinitionFile(definitionFile)
@@ -126,12 +127,14 @@ public class GeneratorMain {
                     clientOptions
                         .withGeneratedAnnotation(generatedAnnotation)
                         .withKsp(ksp)
+                        .withClientPath(clientPath)
                         .withClientId(clientId)
                 );
             } else {
                 builder.forJavaClient(clientOptions ->
                     clientOptions
                         .withGeneratedAnnotation(generatedAnnotation)
+                        .withClientPath(clientPath)
                         .withClientId(clientId)
                 );
             }

@@ -342,7 +342,6 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         importMapping.put("ZonedDateTime", "java.time.ZonedDateTime");
         importMapping.put("LocalDate", "java.time.LocalDate");
         importMapping.put("LocalTime", "java.time.LocalTime");
-        importMapping.put("BigDecimal", "java.math.BigDecimal");
     }
 
     public void setGenerateHttpResponseAlways(boolean generateHttpResponseAlways) {

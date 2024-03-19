@@ -11,6 +11,6 @@ class ClientSpec extends Specification {
     void "test client id"() {
         expect:
         assertFileContains(outputPath + "/src/main/java/io/micronaut/openapi/test/api/PetApi.java",
-                '@Client(id = "myClient", path = "${openapi-micronaut-client-base-path}")');
+                '@Client(id = "myClient", path = "${myClient.base-path}")');
     }
 }

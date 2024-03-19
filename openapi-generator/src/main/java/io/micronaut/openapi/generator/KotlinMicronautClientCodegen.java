@@ -33,6 +33,7 @@ public class KotlinMicronautClientCodegen extends AbstractMicronautKotlinCodegen
     public static final String OPT_CONFIGURE_AUTH = "configureAuth";
     public static final String OPT_CONFIGURE_AUTH_FILTER_PATTERN = "configureAuthFilterPattern";
     public static final String OPT_CONFIGURE_CLIENT_ID = "configureClientId";
+    public static final String OPT_CLIENT_PATH = "clientPath";
     public static final String ADDITIONAL_CLIENT_TYPE_ANNOTATIONS = "additionalClientTypeAnnotations";
     public static final String AUTHORIZATION_FILTER_PATTERN = "authorizationFilterPattern";
     public static final String BASE_PATH_SEPARATOR = "basePathSeparator";
@@ -43,8 +44,9 @@ public class KotlinMicronautClientCodegen extends AbstractMicronautKotlinCodegen
     protected boolean configureAuthorization;
     protected List<String> additionalClientTypeAnnotations;
     protected String authorizationFilterPattern;
-    protected String basePathSeparator = "-";
+    protected String basePathSeparator = ".";
     protected String clientId;
+    protected boolean clientPath;
 
     KotlinMicronautClientCodegen() {
 
@@ -60,6 +62,7 @@ public class KotlinMicronautClientCodegen extends AbstractMicronautKotlinCodegen
         cliOptions.add(CliOption.newString(AUTHORIZATION_FILTER_PATTERN, "Configure the authorization filter pattern for the client. Generally defined when generating clients from multiple specification files"));
         cliOptions.add(CliOption.newString(BASE_PATH_SEPARATOR, "Configure the separator to use between the application name and base path when referencing the property").defaultValue(basePathSeparator));
         cliOptions.add(CliOption.newString(CLIENT_ID, "Configure the service ID for the Client"));
+        cliOptions.add(CliOption.newBoolean(OPT_CLIENT_PATH, "Generate code with @Client annotation path attribute", clientPath));
 
         typeMapping.put("file", "ByteArray");
         typeMapping.put("responseFile", "InputStream");
@@ -144,6 +147,11 @@ public class KotlinMicronautClientCodegen extends AbstractMicronautKotlinCodegen
             writePropertyBack(CLIENT_ID, this.clientId);
         }
 
+        if (additionalProperties.containsKey(OPT_CLIENT_PATH)) {
+            clientPath = convertPropertyToBoolean(OPT_CLIENT_PATH);
+        }
+        writePropertyBack(OPT_CLIENT_PATH, clientPath);
+
         var basePathSeparator = additionalProperties.get(BASE_PATH_SEPARATOR);
         if (basePathSeparator != null) {
             this.basePathSeparator = basePathSeparator.toString();
@@ -184,6 +192,10 @@ public class KotlinMicronautClientCodegen extends AbstractMicronautKotlinCodegen
         this.clientId = clientId;
     }
 
+    public void setClientPath(boolean clientPath) {
+        this.clientPath = clientPath;
+    }
+
     public void setBasePathSeparator(final String basePathSeparator) {
         this.basePathSeparator = basePathSeparator;
     }
@@ -203,6 +215,7 @@ public class KotlinMicronautClientCodegen extends AbstractMicronautKotlinCodegen
         private String authorizationFilterPattern;
         private String basePathSeparator;
         private String clientId;
+        private boolean clientPath;
         private boolean plural;
         private boolean useAuth;
         private boolean fluxForArrays;
@@ -263,12 +276,19 @@ public class KotlinMicronautClientCodegen extends AbstractMicronautKotlinCodegen
             return this;
         }
 
+        @Override
+        public KotlinMicronautClientOptionsBuilder withClientPath(boolean clientPath) {
+            this.clientPath = clientPath;
+            return this;
+        }
+
         ClientOptions build() {
             return new ClientOptions(
                 additionalClientTypeAnnotations,
                 authorizationFilterPattern,
                 basePathSeparator,
                 clientId,
+                clientPath,
                 useAuth,
                 plural,
                 fluxForArrays,
@@ -283,6 +303,7 @@ public class KotlinMicronautClientCodegen extends AbstractMicronautKotlinCodegen
         String authorizationFilterPattern,
         String basePathSeparator,
         String clientId,
+        boolean clientPath,
         boolean useAuth,
         boolean plural,
         boolean fluxForArrays,

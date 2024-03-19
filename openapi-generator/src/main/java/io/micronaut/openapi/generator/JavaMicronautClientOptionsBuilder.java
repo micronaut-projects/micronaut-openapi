@@ -103,4 +103,13 @@ public interface JavaMicronautClientOptionsBuilder extends GeneratorOptionsBuild
      * @return this builder
      */
     JavaMicronautClientOptionsBuilder withGeneratedAnnotation(boolean generatedAnnotation);
+
+    /**
+     * If set to true, Api annotation {@literal @}Client will be with `path` attribute.
+     *
+     * @param clientPath do we need add path attribute to {@literal @}Client annotation
+     *
+     * @return this builder
+     */
+    JavaMicronautClientOptionsBuilder withClientPath(boolean clientPath);
 }

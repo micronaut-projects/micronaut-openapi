@@ -23,6 +23,7 @@ def openapiGenerate = tasks.register("generateOpenApi", OpenApiGeneratorTask) {
     lang = "kotlin"
     generatedAnnotation = true
     clientId = "myClient"
+    clientPath = true
     ksp = false
     classpath.from(configurations.openapiGenerator)
     openApiDefinition.convention(layout.projectDirectory.file("petstore.json"))

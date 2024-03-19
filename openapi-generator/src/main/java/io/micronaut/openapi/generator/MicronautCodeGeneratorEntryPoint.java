@@ -289,11 +289,12 @@ public final class MicronautCodeGeneratorEntryPoint {
             if (javaClientOptions.basePathSeparator() != null) {
                 javaClientCodegen.setBasePathSeparator(javaClientOptions.basePathSeparator());
             }
+            javaClientCodegen.setClientPath(javaClientOptions.clientPath());
+            javaClientCodegen.setGeneratedAnnotation(javaClientOptions.generatedAnnotation());
             javaClientCodegen.setConfigureAuthorization(javaClientOptions.useAuth());
-            javaClientCodegen.setLombok(javaClientOptions.lombok());
             javaClientCodegen.setPlural(javaClientOptions.plural());
             javaClientCodegen.setFluxForArrays(javaClientOptions.fluxForArrays());
-            javaClientCodegen.setGeneratedAnnotation(javaClientOptions.generatedAnnotation());
+            javaClientCodegen.setLombok(javaClientOptions.lombok());
         }
     }
 
@@ -327,11 +328,12 @@ public final class MicronautCodeGeneratorEntryPoint {
             if (kotlinClientOptions.basePathSeparator() != null) {
                 kotlinClientCodegen.setBasePathSeparator(kotlinClientOptions.basePathSeparator());
             }
+            kotlinClientCodegen.setClientPath(kotlinClientOptions.clientPath());
             kotlinClientCodegen.setGeneratedAnnotation(kotlinClientOptions.generatedAnnotation());
-            kotlinClientCodegen.setKsp(kotlinClientOptions.ksp());
             kotlinClientCodegen.setConfigureAuthorization(kotlinClientOptions.useAuth());
             kotlinClientCodegen.setPlural(kotlinClientOptions.plural());
             kotlinClientCodegen.setFluxForArrays(kotlinClientOptions.fluxForArrays());
+            kotlinClientCodegen.setKsp(kotlinClientOptions.ksp());
         }
     }
 
