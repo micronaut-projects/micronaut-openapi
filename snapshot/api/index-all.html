@@ -812,11 +812,17 @@ loadScripts(document, 'script');</script>
 </dd>
 <dt><a href="io/micronaut/openapi/swagger/core/util/EncodingStyleEnumDeserializer.html#%3Cinit%3E()" class="member-name-link">EncodingStyleEnumDeserializer()</a> - Constructor for class io.micronaut.openapi.swagger.core.util.<a href="io/micronaut/openapi/swagger/core/util/EncodingStyleEnumDeserializer.html" title="class in io.micronaut.openapi.swagger.core.util">EncodingStyleEnumDeserializer</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/visitor/group/EndpointGroupInfo.html" class="type-name-link" title="class in io.micronaut.openapi.visitor.group">EndpointGroupInfo</a> - Class in <a href="io/micronaut/openapi/visitor/group/package-summary.html">io.micronaut.openapi.visitor.group</a></dt>
+<dd>
+<div class="block">Entity to storage information about group with specific properties for this operation-group.</div>
+</dd>
+<dt><a href="io/micronaut/openapi/visitor/group/EndpointGroupInfo.html#%3Cinit%3E(java.lang.String)" class="member-name-link">EndpointGroupInfo(String)</a> - Constructor for class io.micronaut.openapi.visitor.group.<a href="io/micronaut/openapi/visitor/group/EndpointGroupInfo.html" title="class in io.micronaut.openapi.visitor.group">EndpointGroupInfo</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/visitor/group/EndpointInfo.html" class="type-name-link" title="class in io.micronaut.openapi.visitor.group">EndpointInfo</a> - Class in <a href="io/micronaut/openapi/visitor/group/package-summary.html">io.micronaut.openapi.visitor.group</a></dt>
 <dd>
 <div class="block">Entity to storage information about same swagger operations, but with different version / group.</div>
 </dd>
-<dt><a href="io/micronaut/openapi/visitor/group/EndpointInfo.html#%3Cinit%3E(java.lang.String,io.micronaut.http.HttpMethod,io.micronaut.inject.ast.MethodElement,io.swagger.v3.oas.models.Operation,java.lang.String,java.util.List,java.util.List)" class="member-name-link">EndpointInfo(String, HttpMethod, MethodElement, Operation, String, List&lt;String&gt;, List&lt;String&gt;)</a> - Constructor for class io.micronaut.openapi.visitor.group.<a href="io/micronaut/openapi/visitor/group/EndpointInfo.html" title="class in io.micronaut.openapi.visitor.group">EndpointInfo</a></dt>
+<dt><a href="io/micronaut/openapi/visitor/group/EndpointInfo.html#%3Cinit%3E(java.lang.String,io.micronaut.http.HttpMethod,io.micronaut.inject.ast.MethodElement,io.swagger.v3.oas.models.Operation,java.lang.String,java.util.Map,java.util.List)" class="member-name-link">EndpointInfo(String, HttpMethod, MethodElement, Operation, String, Map&lt;String, EndpointGroupInfo&gt;, List&lt;String&gt;)</a> - Constructor for class io.micronaut.openapi.visitor.group.<a href="io/micronaut/openapi/visitor/group/EndpointInfo.html" title="class in io.micronaut.openapi.visitor.group">EndpointInfo</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/visitor/EndpointsConfiguration.html#ENDPOINTS_ENABLED" class="member-name-link">ENDPOINTS_ENABLED</a> - Static variable in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/EndpointsConfiguration.html" title="class in io.micronaut.openapi.visitor">EndpointsConfiguration</a></dt>
 <dd>&nbsp;</dd>
@@ -919,6 +925,10 @@ loadScripts(document, 'script');</script>
 <dt><a href="io/micronaut/openapi/annotation/transformers/ExtensionRetentionPolicyAnnotationTransformer.html#%3Cinit%3E()" class="member-name-link">ExtensionRetentionPolicyAnnotationTransformer()</a> - Constructor for class io.micronaut.openapi.annotation.transformers.<a href="io/micronaut/openapi/annotation/transformers/ExtensionRetentionPolicyAnnotationTransformer.html" title="class in io.micronaut.openapi.annotation.transformers">ExtensionRetentionPolicyAnnotationTransformer</a></dt>
 <dd>
 <div class="block">Changes the Retention Policy of the annotation to SOURCE.</div>
+</dd>
+<dt><a href="io/micronaut/openapi/annotation/OpenAPIGroup.html#extensions()" class="member-name-link">extensions()</a> - Element in annotation interface io.micronaut.openapi.annotation.<a href="io/micronaut/openapi/annotation/OpenAPIGroup.html" title="annotation interface in io.micronaut.openapi.annotation">OpenAPIGroup</a></dt>
+<dd>
+<div class="block">The list of optional extensions only for these groups</div>
 </dd>
 <dt><a href="io/micronaut/openapi/swagger/core/jackson/mixin/ExtensionsMixin.html" class="type-name-link" title="class in io.micronaut.openapi.swagger.core.jackson.mixin">ExtensionsMixin</a> - Class in <a href="io/micronaut/openapi/swagger/core/jackson/mixin/package-summary.html">io.micronaut.openapi.swagger.core.jackson.mixin</a></dt>
 <dd>
@@ -1318,6 +1328,8 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/swagger/core/jackson/mixin/SchemaMixin.html#getExtensions()" class="member-name-link">getExtensions()</a> - Method in class io.micronaut.openapi.swagger.core.jackson.mixin.<a href="io/micronaut/openapi/swagger/core/jackson/mixin/SchemaMixin.html" title="class in io.micronaut.openapi.swagger.core.jackson.mixin">SchemaMixin</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/visitor/group/EndpointGroupInfo.html#getExtensions()" class="member-name-link">getExtensions()</a> - Method in class io.micronaut.openapi.visitor.group.<a href="io/micronaut/openapi/visitor/group/EndpointGroupInfo.html" title="class in io.micronaut.openapi.visitor.group">EndpointGroupInfo</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/visitor/group/GroupProperties.html#getFilename()" class="member-name-link">getFilename()</a> - Method in class io.micronaut.openapi.visitor.group.<a href="io/micronaut/openapi/visitor/group/GroupProperties.html" title="class in io.micronaut.openapi.visitor.group">GroupProperties</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/visitor/group/OpenApiInfo.html#getFilename()" class="member-name-link">getFilename()</a> - Method in class io.micronaut.openapi.visitor.group.<a href="io/micronaut/openapi/visitor/group/OpenApiInfo.html" title="class in io.micronaut.openapi.visitor.group">OpenApiInfo</a></dt>
@@ -1413,6 +1425,8 @@ loadScripts(document, 'script');</script>
 <dt><a href="io/micronaut/openapi/generator/KotlinMicronautClientCodegen.html#getName()" class="member-name-link">getName()</a> - Method in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/KotlinMicronautClientCodegen.html" title="class in io.micronaut.openapi.generator">KotlinMicronautClientCodegen</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/generator/KotlinMicronautServerCodegen.html#getName()" class="member-name-link">getName()</a> - Method in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/KotlinMicronautServerCodegen.html" title="class in io.micronaut.openapi.generator">KotlinMicronautServerCodegen</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/visitor/group/EndpointGroupInfo.html#getName()" class="member-name-link">getName()</a> - Method in class io.micronaut.openapi.visitor.group.<a href="io/micronaut/openapi/visitor/group/EndpointGroupInfo.html" title="class in io.micronaut.openapi.visitor.group">EndpointGroupInfo</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/visitor/group/GroupProperties.html#getName()" class="member-name-link">getName()</a> - Method in class io.micronaut.openapi.visitor.group.<a href="io/micronaut/openapi/visitor/group/GroupProperties.html" title="class in io.micronaut.openapi.visitor.group">GroupProperties</a></dt>
 <dd>&nbsp;</dd>
@@ -2666,6 +2680,10 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/visitor/OpenApiGroupInfoVisitor.html#%3Cinit%3E(java.util.List,java.util.List)" class="member-name-link">OpenApiGroupInfoVisitor(List&lt;String&gt;, List&lt;String&gt;)</a> - Constructor for class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/OpenApiGroupInfoVisitor.html" title="class in io.micronaut.openapi.visitor">OpenApiGroupInfoVisitor</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/annotation/OpenAPIGroups.html" class="type-name-link" title="annotation interface in io.micronaut.openapi.annotation">OpenAPIGroups</a> - Annotation Interface in <a href="io/micronaut/openapi/annotation/package-summary.html">io.micronaut.openapi.annotation</a></dt>
+<dd>
+<div class="block">Allows <a href="io/micronaut/openapi/annotation/OpenAPIGroup.html" title="annotation interface in io.micronaut.openapi.annotation"><code>OpenAPIGroup</code></a> to be repeatable.</div>
+</dd>
 <dt><a href="io/micronaut/openapi/annotation/OpenAPIInclude.html" class="type-name-link" title="annotation interface in io.micronaut.openapi.annotation">OpenAPIInclude</a> - Annotation Interface in <a href="io/micronaut/openapi/annotation/package-summary.html">io.micronaut.openapi.annotation</a></dt>
 <dd>
 <div class="block">The annotation can be used to include additional io.micronaut.http.annotation.Controller or
@@ -3882,6 +3900,8 @@ loadScripts(document, 'script');</script>
 <dt><a href="io/micronaut/openapi/annotation/OpenAPIGroupInfo.html#value()" class="member-name-link">value()</a> - Element in annotation interface io.micronaut.openapi.annotation.<a href="io/micronaut/openapi/annotation/OpenAPIGroupInfo.html" title="annotation interface in io.micronaut.openapi.annotation">OpenAPIGroupInfo</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/annotation/OpenAPIGroupInfos.html#value()" class="member-name-link">value()</a> - Element in annotation interface io.micronaut.openapi.annotation.<a href="io/micronaut/openapi/annotation/OpenAPIGroupInfos.html" title="annotation interface in io.micronaut.openapi.annotation">OpenAPIGroupInfos</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/annotation/OpenAPIGroups.html#value()" class="member-name-link">value()</a> - Element in annotation interface io.micronaut.openapi.annotation.<a href="io/micronaut/openapi/annotation/OpenAPIGroups.html" title="annotation interface in io.micronaut.openapi.annotation">OpenAPIGroups</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/annotation/OpenAPIInclude.html#value()" class="member-name-link">value()</a> - Element in annotation interface io.micronaut.openapi.annotation.<a href="io/micronaut/openapi/annotation/OpenAPIInclude.html" title="annotation interface in io.micronaut.openapi.annotation">OpenAPIInclude</a></dt>
 <dd>&nbsp;</dd>
