@@ -75,6 +75,7 @@ import io.micronaut.openapi.annotation.OpenAPIGroup;
 import io.micronaut.openapi.javadoc.JavadocDescription;
 import io.micronaut.openapi.swagger.core.util.PrimitiveType;
 import io.micronaut.openapi.visitor.group.EndpointInfo;
+import io.micronaut.openapi.visitor.group.EndpointGroupInfo;
 import io.micronaut.openapi.visitor.group.GroupProperties;
 import io.micronaut.openapi.visitor.group.GroupProperties.PackageProperties;
 import io.micronaut.openapi.visitor.group.RouterVersioningProperties;
@@ -88,6 +89,7 @@ import io.swagger.v3.oas.annotations.callbacks.Callbacks;
 import io.swagger.v3.oas.annotations.enums.Explode;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.enums.ParameterStyle;
+import io.swagger.v3.oas.annotations.extensions.Extension;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.tags.Tags;
 import io.swagger.v3.oas.models.Components;
@@ -129,6 +131,7 @@ import static io.micronaut.openapi.visitor.SchemaUtils.COMPONENTS_SCHEMAS_PREFIX
 import static io.micronaut.openapi.visitor.SchemaUtils.TYPE_OBJECT;
 import static io.micronaut.openapi.visitor.SchemaUtils.getOperationOnPathItem;
 import static io.micronaut.openapi.visitor.SchemaUtils.isIgnoredHeader;
+import static io.micronaut.openapi.visitor.SchemaUtils.processExtensions;
 import static io.micronaut.openapi.visitor.SchemaUtils.setOperationOnPathItem;
 import static io.micronaut.openapi.visitor.Utils.DEFAULT_MEDIA_TYPES;
 import static io.micronaut.openapi.visitor.Utils.getMediaType;
@@ -1810,8 +1813,8 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             + '#' + CollectionUtils.toString(CollectionUtils.isEmpty(producesMediaTypes) ? DEFAULT_MEDIA_TYPES : producesMediaTypes);
 
         Map<String, GroupProperties> groupPropertiesMap = getGroupsPropertiesMap(context);
-        List<String> groups = new ArrayList<>();
-        List<String> excludedGroups = new ArrayList<>();
+        var groups = new HashMap<String, EndpointGroupInfo>();
+        var excludedGroups = new ArrayList<String>();
 
         ClassElement classEl = methodEl.getDeclaringType();
         PackageElement packageEl = classEl.getPackage();
@@ -1828,7 +1831,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                 for (PackageProperties groupPackage : groupProperties.getPackages()) {
                     boolean isInclude = groupPackage.isIncludeSubpackages() ? packageName.startsWith(groupPackage.getName()) : packageName.equals(groupPackage.getName());
                     if (isInclude) {
-                        groups.add(groupProperties.getName());
+                        groups.put(groupProperties.getName(), new EndpointGroupInfo(groupProperties.getName()));
                     }
                 }
             }
@@ -1881,20 +1884,39 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             excludedGroups));
     }
 
-    private void processGroups(List<String> groups, List<String> excludedGroups, List<AnnotationValue<OpenAPIGroup>> annotationValues, Map<String, GroupProperties> groupPropertiesMap) {
+    private void processGroups(Map<String, EndpointGroupInfo> groups,
+                               List<String> excludedGroups,
+                               List<AnnotationValue<OpenAPIGroup>> annotationValues,
+                               Map<String, GroupProperties> groupPropertiesMap) {
         if (CollectionUtils.isEmpty(annotationValues)) {
             return;
         }
         for (AnnotationValue<OpenAPIGroup> annValue : annotationValues) {
-            groups.addAll(List.of(annValue.stringValues("value")));
             excludedGroups.addAll(List.of(annValue.stringValues("exclude")));
+
+            var extensionAnns = annValue.getAnnotations("extensions");
+            for (var groupName : annValue.stringValues("value")) {
+                var extensions = new HashMap<CharSequence, Object>();
+                if (CollectionUtils.isNotEmpty(extensionAnns)) {
+                    for (Object extensionAnn : extensionAnns) {
+                        processExtensions(extensions, (AnnotationValue<Extension>) extensionAnn);
+                    }
+                }
+                var groupInfo = groups.get(groupName);
+                if (groupInfo == null) {
+                    groupInfo = new EndpointGroupInfo(groupName);
+                    groups.put(groupName, groupInfo);
+                }
+
+                groupInfo.getExtensions().putAll(extensions);
+            }
         }
         Set<String> allKnownGroups = Utils.getAllKnownGroups();
-        allKnownGroups.addAll(groups);
+        allKnownGroups.addAll(groups.keySet());
         allKnownGroups.addAll(excludedGroups);
     }
 
-    private void processGroupsFromIncludedEndpoints(List<String> groups, List<String> excludedGroups, String className, Map<String, GroupProperties> groupPropertiesMap) {
+    private void processGroupsFromIncludedEndpoints(Map<String, EndpointGroupInfo> groups, List<String> excludedGroups, String className, Map<String, GroupProperties> groupPropertiesMap) {
         if (CollectionUtils.isEmpty(Utils.getIncludedClassesGroups()) && CollectionUtils.isEmpty(Utils.getIncludedClassesGroupsExcluded())) {
             return;
         }
@@ -1902,7 +1924,12 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         List<String> classGroups = Utils.getIncludedClassesGroups() != null ? Utils.getIncludedClassesGroups().get(className) : Collections.emptyList();
         List<String> classExcludedGroups = Utils.getIncludedClassesGroupsExcluded() != null ? Utils.getIncludedClassesGroupsExcluded().get(className) : Collections.emptyList();
 
-        groups.addAll(classGroups);
+        for (var classGroup : classGroups) {
+            if (groups.containsKey(classGroup)) {
+                continue;
+            }
+            groups.put(classGroup, new EndpointGroupInfo(classGroup));
+        }
         excludedGroups.addAll(classExcludedGroups);
 
         Set<String> allKnownGroups = Utils.getAllKnownGroups();

@@ -55,6 +55,7 @@ import io.micronaut.openapi.postprocessors.JacksonDiscriminatorPostProcessor;
 import io.micronaut.openapi.postprocessors.OpenApiOperationsPostProcessor;
 import io.micronaut.openapi.view.OpenApiViewConfig;
 import io.micronaut.openapi.visitor.group.EndpointInfo;
+import io.micronaut.openapi.visitor.group.EndpointGroupInfo;
 import io.micronaut.openapi.visitor.group.GroupProperties;
 import io.micronaut.openapi.visitor.group.OpenApiInfo;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
@@ -499,18 +500,18 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                     commonEndpoints.add(endpointInfo);
                     continue;
                 }
-                for (String group : endpointInfo.getGroups()) {
-                    if (CollectionUtils.isNotEmpty(endpointInfo.getExcludedGroups()) && endpointInfo.getExcludedGroups().contains(group)) {
+                for (EndpointGroupInfo endpointGroupInfo : endpointInfo.getGroups().values()) {
+                    if (CollectionUtils.isNotEmpty(endpointInfo.getExcludedGroups()) && endpointInfo.getExcludedGroups().contains(endpointGroupInfo)) {
                         continue;
                     }
-                    OpenAPI newOpenApi = addOpenApiInfo(group, endpointInfo.getVersion(), openApi, result, context);
-                    addOperation(endpointInfo, newOpenApi);
+                    OpenAPI newOpenApi = addOpenApiInfo(endpointGroupInfo.getName(), endpointInfo.getVersion(), openApi, result, context);
+                    addOperation(endpointInfo, newOpenApi, endpointGroupInfo, context);
                 }
 
                 // if we have only versions without groups
                 if (CollectionUtils.isEmpty(endpointInfo.getGroups())) {
                     OpenAPI newOpenApi = addOpenApiInfo(null, endpointInfo.getVersion(), openApi, result, context);
-                    addOperation(endpointInfo, newOpenApi);
+                    addOperation(endpointInfo, newOpenApi, null, context);
                 }
             }
         }
@@ -530,14 +531,14 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                 if (CollectionUtils.isNotEmpty(commonEndpoint.getExcludedGroups()) && commonEndpoint.getExcludedGroups().contains(group)) {
                     continue;
                 }
-                addOperation(commonEndpoint, groupOpenApi);
+                addOperation(commonEndpoint, groupOpenApi, null, context);
             }
         }
 
         return result;
     }
 
-    private void addOperation(EndpointInfo endpointInfo, OpenAPI openApi) {
+    private void addOperation(EndpointInfo endpointInfo, OpenAPI openApi, @Nullable EndpointGroupInfo endpointGroupInfo, VisitorContext context) {
         if (openApi == null) {
             return;
         }
@@ -549,33 +550,55 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         PathItem pathItem = paths.computeIfAbsent(endpointInfo.getUrl(), (pathUrl) -> new PathItem());
         Operation operation = getOperationOnPathItem(pathItem, endpointInfo.getHttpMethod());
         if (operation == null) {
-            setOperationOnPathItem(pathItem, endpointInfo.getHttpMethod(), endpointInfo.getOperation());
+            Operation opCopy = null;
+            try {
+                opCopy = OpenApiUtils.getJsonMapper().treeToValue(OpenApiUtils.getJsonMapper().valueToTree(endpointInfo.getOperation()), Operation.class);
+                if (endpointGroupInfo != null) {
+                    addExtensions(opCopy, endpointGroupInfo.getExtensions());
+                }
+            } catch (JsonProcessingException e) {
+                warn("Error\n" + Utils.printStackTrace(e), context);
+            }
+            setOperationOnPathItem(pathItem, endpointInfo.getHttpMethod(), opCopy != null ? opCopy : endpointInfo.getOperation());
             return;
         }
-        setOperationOnPathItem(pathItem, endpointInfo.getHttpMethod(), SchemaUtils.mergeOperations(operation, endpointInfo.getOperation()));
+        var mergedOp = SchemaUtils.mergeOperations(operation, endpointInfo.getOperation());
+        if (endpointGroupInfo != null) {
+            addExtensions(mergedOp, endpointGroupInfo.getExtensions());
+        }
+        setOperationOnPathItem(pathItem, endpointInfo.getHttpMethod(), mergedOp);
     }
 
-    private OpenAPI addOpenApiInfo(String group, String version, OpenAPI openApi,
+    private void addExtensions(Operation operation, Map<CharSequence, Object> extensions) {
+        if (CollectionUtils.isEmpty(extensions)) {
+            return;
+        }
+        for (var ext : extensions.entrySet()) {
+            operation.addExtension(ext.getKey().toString(), ext.getValue());
+        }
+    }
+
+    private OpenAPI addOpenApiInfo(String groupName, String version, OpenAPI openApi,
                                    Map<Pair<String, String>, OpenApiInfo> openApiInfoMap,
                                    VisitorContext context) {
-        GroupProperties groupProperties = getGroupProperties(group, context);
+        GroupProperties groupProperties = getGroupProperties(groupName, context);
         boolean hasGroupProperties = groupProperties != null;
 
-        var key = Pair.of(group, version);
+        var key = Pair.of(groupName, version);
         OpenApiInfo openApiInfo = openApiInfoMap.get(key);
         OpenAPI newOpenApi;
         if (openApiInfo == null) {
 
             Map<String, OpenAPI> knownOpenApis = Utils.getOpenApis();
-            if (CollectionUtils.isNotEmpty(knownOpenApis) && knownOpenApis.containsKey(group)) {
-                newOpenApi = knownOpenApis.get(group);
+            if (CollectionUtils.isNotEmpty(knownOpenApis) && knownOpenApis.containsKey(groupName)) {
+                newOpenApi = knownOpenApis.get(groupName);
             } else {
                 newOpenApi = new OpenAPI();
             }
 
             openApiInfo = new OpenApiInfo(
                 version,
-                group,
+                groupName,
                 hasGroupProperties ? groupProperties.getDisplayName() : null,
                 hasGroupProperties ? groupProperties.getFilename() : null,
                 !hasGroupProperties || groupProperties.getAdocEnabled() == null || groupProperties.getAdocEnabled(),
@@ -593,12 +616,13 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                 return null;
             }
 
-            if (CollectionUtils.isEmpty(knownOpenApis) || !knownOpenApis.containsKey(group)) {
+            if (CollectionUtils.isEmpty(knownOpenApis) || !knownOpenApis.containsKey(groupName)) {
                 newOpenApi.setTags(openApiCopy.getTags());
                 newOpenApi.setServers(openApiCopy.getServers());
                 newOpenApi.setInfo(openApiCopy.getInfo());
                 newOpenApi.setSecurity(openApiCopy.getSecurity());
                 newOpenApi.setExternalDocs(openApiCopy.getExternalDocs());
+                newOpenApi.setExtensions(openApiCopy.getExtensions());
             }
 
             // if we have SecuritySchemes specified only for group
