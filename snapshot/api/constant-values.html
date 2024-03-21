@@ -55,8 +55,21 @@ loadScripts(document, 'script');</script>
 </ul>
 </section>
 </div>
-<section class="constants-summary" id="io.micronaut.openapi.adoc">
+<section class="constants-summary" id="io.micronaut.openapi">
 <h2 title="io.micronaut">io.micronaut.*</h2>
+<ul class="block-list">
+<li>
+<div class="caption"><span>io.micronaut.openapi.<a href="io/micronaut/openapi/OpenApiUtils.html" title="class in io.micronaut.openapi">OpenApiUtils</a></span></div>
+<div class="summary-table three-column-summary">
+<div class="table-header col-first">Modifier and Type</div>
+<div class="table-header col-second">Constant Field</div>
+<div class="table-header col-last">Value</div>
+<div class="col-first even-row-color"><code id="io.micronaut.openapi.OpenApiUtils.OPENAPI_31_VERSION">public&nbsp;static&nbsp;final&nbsp;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second even-row-color"><code><a href="io/micronaut/openapi/OpenApiUtils.html#OPENAPI_31_VERSION">OPENAPI_31_VERSION</a></code></div>
+<div class="col-last even-row-color"><code>"3.1.0"</code></div>
+</div>
+</li>
+</ul>
 <ul class="block-list">
 <li>
 <div class="caption"><span>io.micronaut.openapi.adoc.<a href="io/micronaut/openapi/adoc/OpenApiToAdocConfigProperty.html" title="interface in io.micronaut.openapi.adoc">OpenApiToAdocConfigProperty</a></span></div>
@@ -766,6 +779,12 @@ loadScripts(document, 'script');</script>
 <div class="col-first even-row-color"><code id="io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_JACKSON_JSON_VIEW_ENABLED">public&nbsp;static&nbsp;final&nbsp;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
 <div class="col-second even-row-color"><code><a href="io/micronaut/openapi/visitor/OpenApiConfigProperty.html#MICRONAUT_JACKSON_JSON_VIEW_ENABLED">MICRONAUT_JACKSON_JSON_VIEW_ENABLED</a></code></div>
 <div class="col-last even-row-color"><code>"jackson.json-view.enabled"</code></div>
+<div class="col-first odd-row-color"><code id="io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_31_ENABLED">public&nbsp;static&nbsp;final&nbsp;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second odd-row-color"><code><a href="io/micronaut/openapi/visitor/OpenApiConfigProperty.html#MICRONAUT_OPENAPI_31_ENABLED">MICRONAUT_OPENAPI_31_ENABLED</a></code></div>
+<div class="col-last odd-row-color"><code>"micronaut.openapi.openapi31.enabled"</code></div>
+<div class="col-first even-row-color"><code id="io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_31_JSON_SCHEMA_DIALECT">public&nbsp;static&nbsp;final&nbsp;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second even-row-color"><code><a href="io/micronaut/openapi/visitor/OpenApiConfigProperty.html#MICRONAUT_OPENAPI_31_JSON_SCHEMA_DIALECT">MICRONAUT_OPENAPI_31_JSON_SCHEMA_DIALECT</a></code></div>
+<div class="col-last even-row-color"><code>"micronaut.openapi.openapi31.json-schema-dialect"</code></div>
 <div class="col-first odd-row-color"><code id="io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ADDITIONAL_FILES">public&nbsp;static&nbsp;final&nbsp;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
 <div class="col-second odd-row-color"><code><a href="io/micronaut/openapi/visitor/OpenApiConfigProperty.html#MICRONAUT_OPENAPI_ADDITIONAL_FILES">MICRONAUT_OPENAPI_ADDITIONAL_FILES</a></code></div>
 <div class="col-last odd-row-color"><code>"micronaut.openapi.additional.files"</code></div>
@@ -876,9 +895,27 @@ loadScripts(document, 'script');</script>
 <div class="col-first odd-row-color"><code id="io.micronaut.openapi.visitor.SchemaUtils.COMPONENTS_SCHEMAS_PREFIX">public&nbsp;static&nbsp;final&nbsp;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
 <div class="col-second odd-row-color"><code><a href="io/micronaut/openapi/visitor/SchemaUtils.html#COMPONENTS_SCHEMAS_PREFIX">COMPONENTS_SCHEMAS_PREFIX</a></code></div>
 <div class="col-last odd-row-color"><code>"#/components/schemas/"</code></div>
-<div class="col-first even-row-color"><code id="io.micronaut.openapi.visitor.SchemaUtils.TYPE_OBJECT">public&nbsp;static&nbsp;final&nbsp;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second even-row-color"><code><a href="io/micronaut/openapi/visitor/SchemaUtils.html#TYPE_OBJECT">TYPE_OBJECT</a></code></div>
-<div class="col-last even-row-color"><code>"object"</code></div>
+<div class="col-first even-row-color"><code id="io.micronaut.openapi.visitor.SchemaUtils.TYPE_ARRAY">public&nbsp;static&nbsp;final&nbsp;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second even-row-color"><code><a href="io/micronaut/openapi/visitor/SchemaUtils.html#TYPE_ARRAY">TYPE_ARRAY</a></code></div>
+<div class="col-last even-row-color"><code>"array"</code></div>
+<div class="col-first odd-row-color"><code id="io.micronaut.openapi.visitor.SchemaUtils.TYPE_BOOLEAN">public&nbsp;static&nbsp;final&nbsp;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second odd-row-color"><code><a href="io/micronaut/openapi/visitor/SchemaUtils.html#TYPE_BOOLEAN">TYPE_BOOLEAN</a></code></div>
+<div class="col-last odd-row-color"><code>"boolean"</code></div>
+<div class="col-first even-row-color"><code id="io.micronaut.openapi.visitor.SchemaUtils.TYPE_INTEGER">public&nbsp;static&nbsp;final&nbsp;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second even-row-color"><code><a href="io/micronaut/openapi/visitor/SchemaUtils.html#TYPE_INTEGER">TYPE_INTEGER</a></code></div>
+<div class="col-last even-row-color"><code>"integer"</code></div>
+<div class="col-first odd-row-color"><code id="io.micronaut.openapi.visitor.SchemaUtils.TYPE_NULL">public&nbsp;static&nbsp;final&nbsp;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second odd-row-color"><code><a href="io/micronaut/openapi/visitor/SchemaUtils.html#TYPE_NULL">TYPE_NULL</a></code></div>
+<div class="col-last odd-row-color"><code>"null"</code></div>
+<div class="col-first even-row-color"><code id="io.micronaut.openapi.visitor.SchemaUtils.TYPE_NUMBER">public&nbsp;static&nbsp;final&nbsp;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second even-row-color"><code><a href="io/micronaut/openapi/visitor/SchemaUtils.html#TYPE_NUMBER">TYPE_NUMBER</a></code></div>
+<div class="col-last even-row-color"><code>"number"</code></div>
+<div class="col-first odd-row-color"><code id="io.micronaut.openapi.visitor.SchemaUtils.TYPE_OBJECT">public&nbsp;static&nbsp;final&nbsp;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second odd-row-color"><code><a href="io/micronaut/openapi/visitor/SchemaUtils.html#TYPE_OBJECT">TYPE_OBJECT</a></code></div>
+<div class="col-last odd-row-color"><code>"object"</code></div>
+<div class="col-first even-row-color"><code id="io.micronaut.openapi.visitor.SchemaUtils.TYPE_STRING">public&nbsp;static&nbsp;final&nbsp;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second even-row-color"><code><a href="io/micronaut/openapi/visitor/SchemaUtils.html#TYPE_STRING">TYPE_STRING</a></code></div>
+<div class="col-last even-row-color"><code>"string"</code></div>
 </div>
 </li>
 <li>
