@@ -104,8 +104,7 @@ class MyBean {}
         loginPathItem.post.requestBody.content['application/json'].schema['$ref'] == '#/components/schemas/UsernamePasswordCredentials'
         loginPathItem.post.responses['200'].content['application/json'].schema.type == 'object'
         openAPI.components.schemas['UsernamePasswordCredentials']
-        // TODO: uncomment when micronaut-security migrate to jakarta.validation
-//        openAPI.components.schemas['UsernamePasswordCredentials'].required.size() == 2
+        openAPI.components.schemas['UsernamePasswordCredentials'].required.size() == 2
         openAPI.components.schemas['UsernamePasswordCredentials'].properties['username']
         openAPI.components.schemas['UsernamePasswordCredentials'].properties['password']
     }
@@ -206,8 +205,7 @@ class MyBean {}
         loginPathItem.post.responses['200'].content['application/json'].schema.type == 'object'
 
         openAPI.components.schemas['UsernamePasswordCredentials']
-        // TODO: uncomment when micronaut-security migrate to jakarta.validation
-//        openAPI.components.schemas['UsernamePasswordCredentials'].required.size() == 2
+        openAPI.components.schemas['UsernamePasswordCredentials'].required.size() == 2
         openAPI.components.schemas['UsernamePasswordCredentials'].properties['username']
         openAPI.components.schemas['UsernamePasswordCredentials'].properties['password']
     }
@@ -330,8 +328,7 @@ class MyBean {}
         logoutPathItem.get.responses['200'].content['application/json'].schema.type == 'object'
 
         openAPI.components.schemas['UsernamePasswordCredentials']
-        // TODO: uncomment when micronaut-security migrate to jakarta.validation
-//        openAPI.components.schemas['UsernamePasswordCredentials'].required.size() == 2
+        openAPI.components.schemas['UsernamePasswordCredentials'].required.size() == 2
         openAPI.components.schemas['UsernamePasswordCredentials'].properties['username']
         openAPI.components.schemas['UsernamePasswordCredentials'].properties['password']
 

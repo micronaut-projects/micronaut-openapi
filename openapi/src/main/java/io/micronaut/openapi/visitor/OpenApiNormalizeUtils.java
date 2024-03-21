@@ -26,7 +26,6 @@ import java.util.function.Function;
 import io.micronaut.core.annotation.Internal;
 import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.core.util.StringUtils;
-import io.micronaut.openapi.OpenApiUtils;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Operation;
@@ -92,6 +91,12 @@ public final class OpenApiNormalizeUtils {
         sortComponent(components, Components::getSecuritySchemes, Components::setSecuritySchemes);
         sortComponent(components, Components::getLinks, Components::setLinks);
         sortComponent(components, Components::getCallbacks, Components::setCallbacks);
+        if (Utils.isOpenapi31()) {
+            sortComponent(components, Components::getPathItems, Components::setPathItems);
+            if (CollectionUtils.isNotEmpty(openAPI.getWebhooks())) {
+                openAPI.setWebhooks(new TreeMap<>(openAPI.getWebhooks()));
+            }
+        }
     }
 
     public static void normalizeOperation(Operation operation) {
@@ -195,7 +200,7 @@ public final class OpenApiNormalizeUtils {
             String type = schema.getType();
             String serializedDefaultValue;
             try {
-                serializedDefaultValue = defaultValue != null ? OpenApiUtils.getJsonMapper().writeValueAsString(defaultValue) : null;
+                serializedDefaultValue = defaultValue != null ? Utils.getJsonMapper().writeValueAsString(defaultValue) : null;
             } catch (JsonProcessingException e) {
                 return null;
             }
@@ -206,7 +211,7 @@ public final class OpenApiNormalizeUtils {
             Object allOfDefaultValue = allOfSchema.getDefault();
             String serializedAllOfDefaultValue;
             try {
-                serializedAllOfDefaultValue = allOfDefaultValue != null ? OpenApiUtils.getJsonMapper().writeValueAsString(allOfDefaultValue) : null;
+                serializedAllOfDefaultValue = allOfDefaultValue != null ? Utils.getJsonMapper().writeValueAsString(allOfDefaultValue) : null;
             } catch (JsonProcessingException e) {
                 return null;
             }
@@ -214,14 +219,18 @@ public final class OpenApiNormalizeUtils {
 
             if (SchemaUtils.isEmptySchema(schema)
                 && (serializedDefaultValue == null || serializedDefaultValue.equals(serializedAllOfDefaultValue))
-                && (type == null || allOfSchema.getType() == null || allOfSchema.getType().equals(type))) {
+                && (type == null || isSameType)) {
                 normalizedSchema = allOfSchema;
             }
             schema.setType(type);
             schema.setAllOf(allOf);
             schema.setDefault(defaultValue);
+            if (schema.getExample() == null) {
+                schema.setExampleSetFlag(false);
+            }
             return normalizedSchema;
         }
+
         var finalList = new ArrayList<Schema>(allOf.size());
         var schemasWithoutRef = new ArrayList<Schema>(allOf.size() - 1);
         for (Schema<?> schemaAllOf : allOf) {
@@ -311,6 +320,11 @@ public final class OpenApiNormalizeUtils {
     }
 
     public static void removeEmtpyComponents(OpenAPI openAPI) {
+
+        if (CollectionUtils.isEmpty(openAPI.getWebhooks())) {
+            openAPI.setWebhooks(null);
+        }
+
         Components components = openAPI.getComponents();
         if (components == null) {
             return;
@@ -345,6 +359,9 @@ public final class OpenApiNormalizeUtils {
         if (CollectionUtils.isEmpty(components.getExtensions())) {
             components.setExtensions(null);
         }
+        if (CollectionUtils.isEmpty(components.getPathItems())) {
+            components.setPathItems(null);
+        }
 
         if (CollectionUtils.isEmpty(components.getSchemas())
             && CollectionUtils.isEmpty(components.getResponses())
@@ -356,6 +373,7 @@ public final class OpenApiNormalizeUtils {
             && CollectionUtils.isEmpty(components.getLinks())
             && CollectionUtils.isEmpty(components.getCallbacks())
             && CollectionUtils.isEmpty(components.getExtensions())
+            && CollectionUtils.isEmpty(components.getPathItems())
         ) {
             openAPI.setComponents(null);
         }

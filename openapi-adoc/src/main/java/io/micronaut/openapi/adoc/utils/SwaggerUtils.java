@@ -41,15 +41,15 @@ public final class SwaggerUtils {
 
     public static OpenAPI readOpenApi(String swaggerFileContent, boolean isJson) {
 
-        ObjectMapper mapper;
-        if (isJson) {
-            mapper = OpenApiUtils.getJsonMapper();
-        } else {
-            mapper = OpenApiUtils.getYamlMapper();
-        }
+        ObjectMapper mapper = isJson ? OpenApiUtils.getJsonMapper() : OpenApiUtils.getYamlMapper();
 
         try {
-            return mapper.readValue(swaggerFileContent, OpenAPI.class);
+            var openApi = mapper.readValue(swaggerFileContent, OpenAPI.class);
+            if (openApi.getOpenapi().equals(OpenApiUtils.OPENAPI_31_VERSION)) {
+                mapper = isJson ? OpenApiUtils.getJsonMapper31() : OpenApiUtils.getYamlMapper31();
+                openApi = mapper.readValue(swaggerFileContent, OpenAPI.class);
+            }
+            return openApi;
         } catch (JsonProcessingException e) {
             throw new IllegalArgumentException("Can't parse swagger file", e);
         }

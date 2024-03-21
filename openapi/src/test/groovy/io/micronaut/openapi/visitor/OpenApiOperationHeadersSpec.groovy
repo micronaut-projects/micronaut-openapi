@@ -111,4 +111,48 @@ class MyBean {}
         requestBody.content["application/json"].schema.properties["phone"]
         requestBody.content["application/json"].schema.properties["name"]
     }
+
+    void "test hidden response header"() {
+        given:
+        buildBeanDefinition('test.MyBean', '''
+
+package test;
+
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Post;
+import io.swagger.v3.oas.annotations.headers.Header;
+import io.swagger.v3.oas.annotations.media.Schema;import io.swagger.v3.oas.annotations.responses.ApiResponse;
+
+@Controller("/")
+class MyController {
+
+    @ApiResponse(headers = {
+            @Header(name = "myHeader", example = """
+                {"name": "this is example", "value": 10}
+            """),
+            @Header(name = "headerHidden", hidden = true)
+    })
+    @Post("/create2")
+    public String create2(String phone, String name) {
+        return name;
+    }
+}
+
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+
+        OpenAPI openAPI = Utils.testReference
+        Operation operation = openAPI.paths?.get("/create2")?.post
+
+        expect:
+        operation
+        def myHeader = operation.responses.'200'.headers.myHeader
+        myHeader
+        myHeader.example
+        myHeader.example.name == 'this is example'
+        myHeader.example.value == 10
+        !operation.responses.'200'.headers.headerHidden
+    }
 }

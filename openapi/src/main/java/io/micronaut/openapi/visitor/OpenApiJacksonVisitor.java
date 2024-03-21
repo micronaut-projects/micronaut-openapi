@@ -17,7 +17,6 @@ package io.micronaut.openapi.visitor;
 
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 
 import javax.annotation.processing.SupportedOptions;
@@ -50,6 +49,11 @@ import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENA
 public class OpenApiJacksonVisitor implements TypeElementVisitor<Object, Object> {
 
     @Override
+    public void start(VisitorContext context) {
+        Utils.init(context);
+    }
+
+    @Override
     public Set<String> getSupportedAnnotationNames() {
         return CollectionUtils.setOf(
             "com.fasterxml.jackson.annotation.JsonSubTypes",
@@ -67,9 +71,9 @@ public class OpenApiJacksonVisitor implements TypeElementVisitor<Object, Object>
         if (!isOpenApiEnabled(context) || !isSpecGenerationEnabled(context)) {
             return;
         }
-        AnnotationValue<JsonSubTypes> jsonSubTypesDecAnn = element.getDeclaredAnnotation(JsonSubTypes.class);
-        AnnotationValue<JsonTypeInfo> jsonTypeInfoDecAnn = element.getDeclaredAnnotation(JsonTypeInfo.class);
-        AnnotationValue<Schema> schemaAnn = element.getDeclaredAnnotation(Schema.class);
+        var jsonSubTypesDecAnn = element.getDeclaredAnnotation(JsonSubTypes.class);
+        var jsonTypeInfoDecAnn = element.getDeclaredAnnotation(JsonTypeInfo.class);
+        var schemaAnn = element.getDeclaredAnnotation(Schema.class);
 
         /*
         Given the following annotations:
@@ -96,8 +100,8 @@ public class OpenApiJacksonVisitor implements TypeElementVisitor<Object, Object>
                 return;
             }
 
-            List<AnnotationClassValue<?>> discriminatorClasses = new ArrayList<>();
-            List<AnnotationValue<DiscriminatorMapping>> discriminatorMappings = new ArrayList<>();
+            var discriminatorClasses = new ArrayList<AnnotationClassValue<?>>();
+            var discriminatorMappings = new ArrayList<AnnotationValue<DiscriminatorMapping>>();
             for (AnnotationValue<Annotation> av : jsonSubTypesDecAnn.getAnnotations("value")) {
                 AnnotationClassValue<?> mappingClass = av.annotationClassValue("value").orElse(null);
                 String subTypeName = av.stringValue("name").orElse(null);

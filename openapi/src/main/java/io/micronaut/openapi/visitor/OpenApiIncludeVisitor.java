@@ -15,11 +15,6 @@
  */
 package io.micronaut.openapi.visitor;
 
-import java.util.List;
-
-import javax.annotation.processing.SupportedOptions;
-
-import io.micronaut.core.annotation.AnnotationValue;
 import io.micronaut.core.util.ArrayUtils;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.inject.ast.ClassElement;
@@ -31,6 +26,9 @@ import io.micronaut.openapi.annotation.OpenAPIInclude;
 import io.micronaut.openapi.annotation.OpenAPIIncludes;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+
+import javax.annotation.processing.SupportedOptions;
+import java.util.List;
 
 import static io.micronaut.openapi.visitor.ConfigUtils.isOpenApiEnabled;
 import static io.micronaut.openapi.visitor.ConfigUtils.isSpecGenerationEnabled;
@@ -45,22 +43,27 @@ import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENA
 public class OpenApiIncludeVisitor implements TypeElementVisitor<OpenAPIIncludes, Object> {
 
     @Override
+    public void start(VisitorContext context) {
+        Utils.init(context);
+    }
+
+    @Override
     public void visitClass(ClassElement element, VisitorContext context) {
         if (!isOpenApiEnabled(context) || !isSpecGenerationEnabled(context)) {
             return;
         }
-        for (AnnotationValue<OpenAPIInclude> includeAnnotation : element.getAnnotationValuesByType(OpenAPIInclude.class)) {
-            String[] classes = includeAnnotation.stringValues();
+        for (var includeAnn : element.getAnnotationValuesByType(OpenAPIInclude.class)) {
+            String[] classes = includeAnn.stringValues();
             if (ArrayUtils.isNotEmpty(classes)) {
-                List<AnnotationValue<Tag>> tags = includeAnnotation.getAnnotations("tags", Tag.class);
-                List<AnnotationValue<SecurityRequirement>> security = includeAnnotation.getAnnotations("security", SecurityRequirement.class);
-                String customUri = includeAnnotation.stringValue("uri").orElse(null);
-                List<String> groups = List.of(includeAnnotation.stringValues("groups"));
-                List<String> groupsExcluded = List.of(includeAnnotation.stringValues("groupsExcluded"));
+                var tagAnns = includeAnn.getAnnotations("tags", Tag.class);
+                var securityAnns = includeAnn.getAnnotations("security", SecurityRequirement.class);
+                String customUri = includeAnn.stringValue("uri").orElse(null);
+                List<String> groups = List.of(includeAnn.stringValues("groups"));
+                List<String> groupsExcluded = List.of(includeAnn.stringValues("groupsExcluded"));
 
-                OpenApiGroupInfoVisitor groupVisitor = new OpenApiGroupInfoVisitor(groups, groupsExcluded);
-                OpenApiControllerVisitor controllerVisitor = new OpenApiControllerVisitor(tags, security, customUri);
-                OpenApiEndpointVisitor endpointVisitor = new OpenApiEndpointVisitor(true, tags.isEmpty() ? null : tags, security.isEmpty() ? null : security);
+                var groupVisitor = new OpenApiGroupInfoVisitor(groups, groupsExcluded);
+                var controllerVisitor = new OpenApiControllerVisitor(tagAnns, securityAnns, customUri);
+                var endpointVisitor = new OpenApiEndpointVisitor(true, tagAnns.isEmpty() ? null : tagAnns, securityAnns.isEmpty() ? null : securityAnns);
                 for (String className : classes) {
                     var classEl = ContextUtils.getClassElement(className, context);
                     if (classEl != null) {

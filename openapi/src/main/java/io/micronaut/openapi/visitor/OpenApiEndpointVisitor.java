@@ -91,6 +91,11 @@ public class OpenApiEndpointVisitor extends AbstractOpenApiEndpointVisitor imple
     }
 
     @Override
+    public void start(VisitorContext context) {
+        Utils.init(context);
+    }
+
+    @Override
     public void visitClass(ClassElement element, VisitorContext context) {
         if (!isOpenApiEnabled(context) || !isSpecGenerationEnabled(context)) {
             return;
@@ -168,11 +173,12 @@ public class OpenApiEndpointVisitor extends AbstractOpenApiEndpointVisitor imple
             return true;
         }
 
-        AnnotationValue<Operation> operationAnn = element.getAnnotation(Operation.class);
+        var operationAnn = element.getAnnotation(Operation.class);
         boolean isHidden = operationAnn != null && operationAnn.booleanValue("hidden").orElse(false);
-        AnnotationValue<JsonAnySetter> jsonAnySetterAnn = element.getAnnotation(JsonAnySetter.class);
+        var jsonAnySetterAnn = element.getAnnotation(JsonAnySetter.class);
 
-        if (isHidden || element.isAnnotationPresent(Hidden.class)
+        if (isHidden
+            || element.isAnnotationPresent(Hidden.class)
             || (jsonAnySetterAnn != null && jsonAnySetterAnn.booleanValue("enabled").orElse(true))) {
             return true;
         }
@@ -293,5 +299,4 @@ public class OpenApiEndpointVisitor extends AbstractOpenApiEndpointVisitor imple
                 + Arrays.toString(produces) + ", consumes=" + Arrays.toString(consumes) + "]";
         }
     }
-
 }

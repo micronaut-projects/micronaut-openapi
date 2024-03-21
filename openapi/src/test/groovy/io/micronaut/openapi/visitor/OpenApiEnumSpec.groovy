@@ -1,6 +1,7 @@
 package io.micronaut.openapi.visitor
 
 import io.micronaut.openapi.AbstractOpenApiTypeElementSpec
+
 import io.micronaut.openapi.swagger.core.util.PrimitiveType
 import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.Operation
@@ -1099,5 +1100,184 @@ class MyBean {}
         parametersSchema.properties.stampAlign.allOf
         parametersSchema.properties.stampAlign.allOf[0].$ref == '#/components/schemas/ParagraphAlignment'
         parametersSchema.properties.stampAlign.allOf[1].default == 'RIGHT'
+    }
+
+    void "test enum in map key"() {
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Post;
+
+import java.util.Map;
+
+@Controller
+class CatController {
+
+    @Post("/pet/cat")
+    public JobDetails save() {
+        return null;
+    }
+}
+
+class JobDetails {
+    public Map<TrainingResource, Integer> trainingCosts;
+}
+
+enum TrainingResource {
+    @JsonProperty("wood")
+    WOOD,
+    FOOD,
+    STONE
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        then: "the state is correct"
+        Utils.testReference != null
+
+        when: "The OpenAPI is retrieved"
+        OpenAPI openAPI = Utils.testReference
+        def jobDetailsSchema = openAPI.components.schemas.JobDetails
+
+        then: "the components are valid"
+        jobDetailsSchema
+        jobDetailsSchema.properties.trainingCosts
+        jobDetailsSchema.properties.trainingCosts.properties.wood.type == 'integer'
+        jobDetailsSchema.properties.trainingCosts.properties.wood.format == 'int32'
+        jobDetailsSchema.properties.trainingCosts.properties.FOOD.type == 'integer'
+        jobDetailsSchema.properties.trainingCosts.properties.FOOD.format == 'int32'
+        jobDetailsSchema.properties.trainingCosts.properties.STONE.type == 'integer'
+        jobDetailsSchema.properties.trainingCosts.properties.STONE.format == 'int32'
+    }
+
+    void "test enum in map key integer type"() {
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonValue;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Post;
+
+import java.util.Map;
+
+@Controller
+class CatController {
+
+    @Post("/pet/cat")
+    public JobDetails save() {
+        return null;
+    }
+}
+
+class JobDetails {
+    public Map<TrainingResource, Integer> trainingCosts;
+}
+
+enum TrainingResource {
+    @JsonProperty("1")
+    WOOD(1),
+    @JsonProperty("2")
+    FOOD(2),
+    @JsonProperty("3")
+    STONE(3);
+
+    private final int value;
+
+    TrainingResource(int value) {
+        this.value = value;
+    }
+
+    @JsonValue
+    public int value() {
+        return value;
+    }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        then: "the state is correct"
+        Utils.testReference != null
+
+        when: "The OpenAPI is retrieved"
+        OpenAPI openAPI = Utils.testReference
+        def jobDetailsSchema = openAPI.components.schemas.JobDetails
+
+        then: "the components are valid"
+        jobDetailsSchema
+        jobDetailsSchema.properties.trainingCosts
+        jobDetailsSchema.properties.trainingCosts.properties.'1'.type == 'integer'
+        jobDetailsSchema.properties.trainingCosts.properties.'1'.format == 'int32'
+        jobDetailsSchema.properties.trainingCosts.properties.'2'.type == 'integer'
+        jobDetailsSchema.properties.trainingCosts.properties.'2'.format == 'int32'
+        jobDetailsSchema.properties.trainingCosts.properties.'3'.type == 'integer'
+        jobDetailsSchema.properties.trainingCosts.properties.'3'.format == 'int32'
+    }
+
+    void "test enum in map key with object value"() {
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Post;
+
+import java.util.Map;
+
+@Controller
+class CatController {
+
+    @Post("/pet/cat")
+    public JobDetails save() {
+        return null;
+    }
+}
+
+class JobDetails {
+    public Map<TrainingResource, MapValue<Integer>> trainingCosts;
+}
+
+enum TrainingResource {
+    @JsonProperty("wood")
+    WOOD,
+    FOOD,
+    STONE
+}
+
+class MapValue<T> {
+
+    public T value;
+    public String prop;
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        then: "the state is correct"
+        Utils.testReference != null
+
+        when: "The OpenAPI is retrieved"
+        OpenAPI openAPI = Utils.testReference
+        def jobDetailsSchema = openAPI.components.schemas.JobDetails
+        def mapValueSchema = openAPI.components.schemas.MapValue_Integer_
+
+        then: "the components are valid"
+        jobDetailsSchema
+        jobDetailsSchema.properties.trainingCosts
+        jobDetailsSchema.properties.trainingCosts.properties.wood.$ref == '#/components/schemas/MapValue_Integer_'
+        jobDetailsSchema.properties.trainingCosts.properties.FOOD.$ref == '#/components/schemas/MapValue_Integer_'
+        jobDetailsSchema.properties.trainingCosts.properties.STONE.$ref == '#/components/schemas/MapValue_Integer_'
+
+        mapValueSchema.type == 'object'
+        mapValueSchema.properties.value.type == 'integer'
+        mapValueSchema.properties.value.format == 'int32'
+        mapValueSchema.properties.prop.type == 'string'
     }
 }

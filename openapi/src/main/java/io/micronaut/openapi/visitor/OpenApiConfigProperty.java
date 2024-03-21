@@ -31,6 +31,16 @@ public interface OpenApiConfigProperty {
      */
     String MICRONAUT_OPENAPI_ENABLED = "micronaut.openapi.enabled";
     /**
+     * System property that enables generating OpenAPI version 3.1.
+     * <br>
+     * Default: false
+     */
+    String MICRONAUT_OPENAPI_31_ENABLED = "micronaut.openapi.openapi31.enabled";
+    /**
+     * System property that specifies jsonSchemaDialect URI.
+     */
+    String MICRONAUT_OPENAPI_31_JSON_SCHEMA_DIALECT = "micronaut.openapi.openapi31.json-schema-dialect";
+    /**
      * System property that enables setting the open api config file.
      */
     String MICRONAUT_OPENAPI_CONFIG_FILE = "micronaut.openapi.config.file";

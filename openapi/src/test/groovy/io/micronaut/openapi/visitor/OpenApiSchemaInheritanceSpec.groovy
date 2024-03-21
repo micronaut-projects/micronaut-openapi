@@ -625,7 +625,7 @@ class Bike extends Vehicle<MyDocument> {
      */
     @Size(min = 10, max = 20)
     @NotEmpty
-    @ArraySchema(schema = @Schema(implementation = Document.class))
+    @ArraySchema(schema = @Schema(implementation = MyDocument.class))
     @Override
     public List<MyDocument> getVehicleField() {
         return super.getVehicleField();
@@ -643,6 +643,7 @@ class Car extends Vehicle<AverageStats> {
     /**
      * Child getter javadoc.
      */
+    @ArraySchema(schema = @Schema(implementation = AverageStats.class))
     @Override
     public List<AverageStats> getVehicleField() {
         return super.getVehicleField();
