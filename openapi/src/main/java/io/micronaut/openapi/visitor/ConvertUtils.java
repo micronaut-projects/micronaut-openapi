@@ -93,6 +93,20 @@ import static io.micronaut.openapi.visitor.SchemaUtils.TYPE_OBJECT;
 import static io.micronaut.openapi.visitor.SchemaUtils.TYPE_STRING;
 import static io.micronaut.openapi.visitor.SchemaUtils.processExtensions;
 import static io.micronaut.openapi.visitor.Utils.resolveComponents;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_$REF;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_ALLOWABLE_VALUES;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_DEFAULT;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_DEFAULT_VALUE;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_DESCRIPTION;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_ENUM;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_EXAMPLES;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_EXTENSIONS;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_IN;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_NAME;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_ONE_FORMAT;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_REF;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_SCHEMA;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_TYPE;
 
 /**
  * Convert utilities methods.
@@ -180,7 +194,7 @@ public final class ConvertUtils {
                                 for (Object o : a) {
                                     processExtensions(extensions, (AnnotationValue<Extension>) o);
                                 }
-                                newValues.put("extensions", extensions);
+                                newValues.put(PROP_EXTENSIONS, extensions);
                             } else if (Server.class.getName().equals(annotationName)) {
                                 var servers = new ArrayList<Map<CharSequence, Object>>();
                                 for (Object o : a) {
@@ -190,21 +204,21 @@ public final class ConvertUtils {
                                 }
                                 newValues.put(key, servers);
                             } else if (OAuthScope.class.getName().equals(annotationName)) {
-                                Map<String, String> params = toTupleSubMap(a, "name", "description");
+                                Map<String, String> params = toTupleSubMap(a, PROP_NAME, PROP_DESCRIPTION);
                                 newValues.put(key, params);
                             } else if (ServerVariable.class.getName().equals(annotationName)) {
                                 var variables = new LinkedHashMap<String, Map<CharSequence, Object>>();
                                 for (Object o : a) {
                                     var sv = (AnnotationValue<ServerVariable>) o;
-                                    sv.stringValue("name").ifPresent(name -> {
+                                    sv.stringValue(PROP_NAME).ifPresent(name -> {
                                         Map<CharSequence, Object> map = toValueMap(sv.getValues(), context);
-                                        Object dv = map.get("defaultValue");
+                                        Object dv = map.get(PROP_DEFAULT_VALUE);
                                         if (dv != null) {
-                                            map.put("default", dv);
+                                            map.put(PROP_DEFAULT, dv);
                                         }
-                                        if (map.containsKey("allowableValues")) {
+                                        if (map.containsKey(PROP_ALLOWABLE_VALUES)) {
                                             // The key in the generated openapi needs to be "enum"
-                                            map.put("enum", map.remove("allowableValues"));
+                                            map.put(PROP_ENUM, map.remove(PROP_ALLOWABLE_VALUES));
                                         }
                                         variables.put(name, map);
                                     });
@@ -291,10 +305,10 @@ public final class ConvertUtils {
 
         var finalValue = value;
 
-        resolveExtensions(jn).ifPresent(extensions -> BeanMap.of(finalValue).put("extensions", extensions));
-        String elType = jn.has("type") ? jn.get("type").textValue() : null;
-        String elFormat = jn.has("format") ? jn.get("format").textValue() : null;
-        JsonNode defaultValueNode = jn.get("defaultValue");
+        resolveExtensions(jn).ifPresent(extensions -> BeanMap.of(finalValue).put(PROP_EXTENSIONS, extensions));
+        String elType = jn.has(PROP_TYPE) ? jn.get(PROP_TYPE).textValue() : null;
+        String elFormat = jn.has(PROP_ONE_FORMAT) ? jn.get(PROP_ONE_FORMAT).textValue() : null;
+        JsonNode defaultValueNode = jn.get(PROP_DEFAULT_VALUE);
         // fix for default value
         Object defaultValue;
         try {
@@ -305,10 +319,10 @@ public final class ConvertUtils {
 
         BeanMap<T> beanMap = BeanMap.of(value);
         if (defaultValue != null) {
-            beanMap.put("default", defaultValue);
+            beanMap.put(PROP_DEFAULT, defaultValue);
         }
 
-        JsonNode allowableValuesNode = jn.get("allowableValues");
+        JsonNode allowableValuesNode = jn.get(PROP_ALLOWABLE_VALUES);
         if (allowableValuesNode != null && allowableValuesNode.isArray()) {
             var allowableValues = new ArrayList<>(allowableValuesNode.size());
             for (JsonNode allowableValueNode : allowableValuesNode) {
@@ -321,7 +335,7 @@ public final class ConvertUtils {
                     allowableValues.add(allowableValueNode.textValue());
                 }
             }
-            beanMap.put("allowableValues", allowableValues);
+            beanMap.put(PROP_ALLOWABLE_VALUES, allowableValues);
         }
 
         return value;
@@ -393,10 +407,10 @@ public final class ConvertUtils {
 
         var contentNode = parentNode.get("content");
         if (contentNode != null) {
-            examples = deserMap("examples", contentNode, Example.class);
+            examples = deserMap(PROP_EXAMPLES, contentNode, Example.class);
             encoding = deserMap("encoding", contentNode, Encoding.class);
-            extensions = deserMap("extensions", contentNode, Object.class);
-            var schemaNode = contentNode.get("schema");
+            extensions = deserMap(PROP_EXTENSIONS, contentNode, Object.class);
+            var schemaNode = contentNode.get(PROP_SCHEMA);
             if (schemaNode != null) {
                 schema = CONVERT_JSON_MAPPER.treeToValue(schemaNode, Schema.class);
             }
@@ -417,8 +431,8 @@ public final class ConvertUtils {
         }
 
         if (content != null) {
-            var mediaType = content.get("schema");
-            content.remove("schema");
+            var mediaType = content.get(PROP_SCHEMA);
+            content.remove(PROP_SCHEMA);
             if (mediaType == null) {
                 mediaType = new MediaType();
             }
@@ -457,7 +471,7 @@ public final class ConvertUtils {
 
     public static Optional<Map<String, Object>> resolveExtensions(JsonNode jn) {
         try {
-            JsonNode extensionsNode = jn.get("extensions");
+            JsonNode extensionsNode = jn.get(PROP_EXTENSIONS);
             if (extensionsNode != null) {
                 return Optional.ofNullable(CONVERT_JSON_MAPPER.convertValue(extensionsNode, MAP_TYPE_REFERENCE));
             }
@@ -474,20 +488,20 @@ public final class ConvertUtils {
 
             final Map<CharSequence, Object> map = toValueMap(securityRequirementAnnValue.getValues(), context);
 
-            var name = securityRequirementAnnValue.stringValue("name").orElse(null);
+            var name = securityRequirementAnnValue.stringValue(PROP_NAME).orElse(null);
             if (StringUtils.isEmpty(name)) {
                 continue;
             }
             if (map.containsKey("paramName")) {
-                map.put("name", map.remove("paramName"));
+                map.put(PROP_NAME, map.remove("paramName"));
             }
 
-            Utils.normalizeEnumValues(map, CollectionUtils.mapOf("type", SecurityScheme.Type.class, "in", SecurityScheme.In.class));
+            Utils.normalizeEnumValues(map, CollectionUtils.mapOf(PROP_TYPE, SecurityScheme.Type.class, PROP_IN, SecurityScheme.In.class));
 
-            var type = (String) map.get("type");
+            var type = (String) map.get(PROP_TYPE);
             if (!SecurityScheme.Type.APIKEY.toString().equals(type)) {
-                removeAndWarnSecSchemeProp(map, "name", context, false);
-                removeAndWarnSecSchemeProp(map, "in", context);
+                removeAndWarnSecSchemeProp(map, PROP_NAME, context, false);
+                removeAndWarnSecSchemeProp(map, PROP_IN, context);
             }
             if (!SecurityScheme.Type.OAUTH2.toString().equals(type)) {
                 removeAndWarnSecSchemeProp(map, "flows", context);
@@ -508,20 +522,20 @@ public final class ConvertUtils {
                 }
             }
 
-            if (map.containsKey("ref") || map.containsKey("$ref")) {
-                Object ref = map.get("ref");
+            if (map.containsKey(PROP_REF) || map.containsKey(PROP_$REF)) {
+                Object ref = map.get(PROP_REF);
                 if (ref == null) {
-                    ref = map.get("$ref");
+                    ref = map.get(PROP_$REF);
                 }
                 map.clear();
-                map.put("$ref", ref);
+                map.put(PROP_$REF, ref);
             }
 
             try {
                 JsonNode node = toJson(map, context);
                 SecurityScheme securityScheme = ConvertUtils.treeToValue(node, SecurityScheme.class, context);
                 if (securityScheme != null) {
-                    resolveExtensions(node).ifPresent(extensions -> BeanMap.of(securityScheme).put("extensions", extensions));
+                    resolveExtensions(node).ifPresent(extensions -> BeanMap.of(securityScheme).put(PROP_EXTENSIONS, extensions));
                     resolveComponents(openApi).addSecuritySchemes(name, securityScheme);
                 }
             } catch (JsonProcessingException e) {
@@ -536,7 +550,7 @@ public final class ConvertUtils {
 
     private static void removeAndWarnSecSchemeProp(Map<CharSequence, Object> map, String prop, VisitorContext context, boolean withWarn) {
         if (map.containsKey(prop) && withWarn) {
-            warn("'" + prop + "' property can't set for securityScheme with type " + map.get("type") + ". Skip it", context);
+            warn("'" + prop + "' property can't set for securityScheme with type " + map.get(PROP_TYPE) + ". Skip it", context);
         }
         map.remove(prop);
     }
@@ -553,7 +567,7 @@ public final class ConvertUtils {
      * @return converted object.
      */
     public static SecurityRequirement mapToSecurityRequirement(AnnotationValue<io.swagger.v3.oas.annotations.security.SecurityRequirement> r) {
-        String name = r.getRequiredValue("name", String.class);
+        String name = r.getRequiredValue(PROP_NAME, String.class);
         List<String> scopes = Arrays.asList(r.stringValues("scopes"));
         var securityRequirement = new SecurityRequirement();
         securityRequirement.addList(name, scopes);

@@ -4,6 +4,7 @@ import io.micronaut.openapi.AbstractOpenApiTypeElementSpec
 import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.Operation
 import io.swagger.v3.oas.models.media.Schema
+import io.swagger.v3.oas.models.parameters.Parameter
 import spock.lang.Issue
 
 import java.time.OffsetDateTime
@@ -1161,7 +1162,7 @@ public class MyBean {}
         buildBeanDefinition("test.MyBean", '''
 package test;
 
-import jakarta.validation.constraints.NegativeOrZero;
+import io.swagger.v3.oas.annotations.enums.ParameterStyle;import jakarta.validation.constraints.NegativeOrZero;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.PositiveOrZero;
 
@@ -1185,11 +1186,13 @@ class PersonController {
             @Parameter(
                 name = "uuid",
                 description = "The identifier",
+                style = ParameterStyle.LABEL,
                 schema = @Schema(implementation = String.class),
                 in = ParameterIn.PATH
             ),
             @Parameter(
                 name = "userUuid",
+                style = ParameterStyle.DEEPOBJECT,
                 description = "The user identifier",
                 schema = @Schema(implementation = String.class),
                 in = ParameterIn.PATH
@@ -1220,6 +1223,7 @@ public class MyBean {}
         op.parameters.get(0).name == 'uuid'
         op.parameters.get(0).schema.type == 'string'
         op.parameters.get(0).in == 'path'
+        op.parameters.get(0).style == Parameter.StyleEnum.LABEL
         op.parameters.get(0).description == 'The identifier'
         op.parameters.get(0).example == null
         op.parameters.get(0).$ref == null
@@ -1227,6 +1231,7 @@ public class MyBean {}
         op.parameters.get(1).name == 'userUuid'
         op.parameters.get(1).schema.type == 'string'
         op.parameters.get(1).in == 'path'
+        op.parameters.get(1).style == Parameter.StyleEnum.DEEPOBJECT
         op.parameters.get(1).description == 'The user identifier'
         op.parameters.get(1).example == null
         op.parameters.get(1).$ref == null

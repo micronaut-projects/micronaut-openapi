@@ -52,6 +52,9 @@ import static io.micronaut.openapi.visitor.ContextUtils.SERVERS_LIST_ARGUMENT;
 import static io.micronaut.openapi.visitor.ContextUtils.TAGS_LIST_ARGUMENT;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ENABLED;
 import static io.micronaut.openapi.visitor.Utils.DEFAULT_MEDIA_TYPES;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_DESCRIPTION;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_HIDDEN;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_VALUE;
 
 /**
  * A {@link TypeElementVisitor} the builds the Swagger model from Micronaut
@@ -107,7 +110,7 @@ public class OpenApiEndpointVisitor extends AbstractOpenApiEndpointVisitor imple
         if (path == null) {
             path = cfg.getPath();
             if (path == null) {
-                path = "/";
+                path = StringUtil.SLASH;
             }
         }
         if (servers == null) {
@@ -154,13 +157,13 @@ public class OpenApiEndpointVisitor extends AbstractOpenApiEndpointVisitor imple
         }
         if (element.isAnnotationPresent("io.micronaut.management.endpoint.annotation.Endpoint")) {
             AnnotationValue<?> ann = element.getAnnotation("io.micronaut.management.endpoint.annotation.Endpoint");
-            String idAnn = ann.stringValue("id").orElse(ann.stringValue("value").orElse(null));
+            String idAnn = ann.stringValue("id").orElse(ann.stringValue(PROP_VALUE).orElse(null));
             if (StringUtils.isEmpty(idAnn)) {
                 idAnn = NameUtils.hyphenate(element.getSimpleName());
             }
             id = path + idAnn;
             if (id.isEmpty() || id.charAt(0) != '/') {
-                id = "/" + id;
+                id = StringUtil.SLASH + id;
             }
             return false;
         }
@@ -174,7 +177,7 @@ public class OpenApiEndpointVisitor extends AbstractOpenApiEndpointVisitor imple
         }
 
         var operationAnn = element.getAnnotation(Operation.class);
-        boolean isHidden = operationAnn != null && operationAnn.booleanValue("hidden").orElse(false);
+        boolean isHidden = operationAnn != null && operationAnn.booleanValue(PROP_HIDDEN).orElse(false);
         var jsonAnySetterAnn = element.getAnnotation(JsonAnySetter.class);
 
         if (isHidden
@@ -268,7 +271,7 @@ public class OpenApiEndpointVisitor extends AbstractOpenApiEndpointVisitor imple
         if (element.isAnnotationPresent(endpointManagementAnnName)) {
             AnnotationValue<?> annotation = element.getAnnotation(endpointManagementAnnName);
             assert annotation != null;
-            return new HttpMethodDescription(httpMethod, annotation.stringValue("description").orElse(null),
+            return new HttpMethodDescription(httpMethod, annotation.stringValue(PROP_DESCRIPTION).orElse(null),
                 annotation.stringValues("produces"), annotation.stringValues("consumes"));
         }
         return null;

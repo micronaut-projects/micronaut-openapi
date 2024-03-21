@@ -45,7 +45,7 @@ import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_SERVE
 abstract class AbstractViewConfig implements Toggleable {
 
     protected String prefix;
-    protected String jsUrl = "";
+    protected String jsUrl = StringUtils.EMPTY_STRING;
     protected String specUrl;
     /**
      * URL prefix from config properties.
@@ -114,8 +114,9 @@ abstract class AbstractViewConfig implements Toggleable {
      * @return A String.
      */
     protected String toHtmlAttributes() {
-        return options.entrySet().stream().map(e -> e.getKey() + "=\"" + e.getValue() + '"')
-            .collect(Collectors.joining(" "));
+        return options.entrySet().stream()
+                .map(e -> e.getKey() + "=\"" + e.getValue() + '"')
+                .collect(Collectors.joining(" "));
     }
 
     protected String getFinalUrlPrefix(OpenApiViewConfig.RendererType rendererType, VisitorContext context) {
@@ -221,7 +222,7 @@ abstract class AbstractViewConfig implements Toggleable {
                 }
 
                 cfg.specUrl = specUrl.replace(Utils.PLACEHOLDER_PREFIX + "filename" + Utils.PLACEHOLDER_POSTFIX,
-                    filenameFromContext != null ? filenameFromContext : "");
+                    filenameFromContext != null ? filenameFromContext : StringUtils.EMPTY_STRING);
             }
         }
 

@@ -15,27 +15,10 @@
  */
 package io.micronaut.openapi.visitor;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.BiPredicate;
-
-import io.micronaut.context.env.DefaultPropertyPlaceholderResolver;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.micronaut.context.env.PropertyPlaceholderResolver;
 import io.micronaut.core.annotation.Internal;
-import io.micronaut.core.annotation.NonNull;
-import io.micronaut.core.convert.ArgumentConversionContext;
-import io.micronaut.core.convert.DefaultMutableConversionService;
 import io.micronaut.core.util.CollectionUtils;
-import io.micronaut.core.value.PropertyResolver;
 import io.micronaut.http.MediaType;
 import io.micronaut.inject.ast.MethodElement;
 import io.micronaut.inject.visitor.VisitorContext;
@@ -48,7 +31,16 @@ import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.PathItem;
 import io.swagger.v3.oas.models.SpecVersion;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.BiPredicate;
 
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_31_ENABLED;
 import static io.swagger.v3.oas.models.media.Schema.BIND_TYPE_AND_TYPES;
@@ -125,37 +117,6 @@ public final class Utils {
         } catch (Exception e) {
             return new MediaType(mediaTypeName);
         }
-    }
-
-    /**
-     * @return An Instance of default {@link PropertyPlaceholderResolver} to resolve placeholders.
-     */
-    public static PropertyPlaceholderResolver getPropertyPlaceholderResolver() {
-        if (propertyPlaceholderResolver == null) {
-            propertyPlaceholderResolver = new DefaultPropertyPlaceholderResolver(new PropertyResolver() {
-                @Override
-                public boolean containsProperty(@NonNull String name) {
-                    return false;
-                }
-
-                @Override
-                public boolean containsProperties(@NonNull String name) {
-                    return false;
-                }
-
-                @NonNull
-                @Override
-                public <T> Optional<T> getProperty(@NonNull String name, @NonNull ArgumentConversionContext<T> conversionContext) {
-                    return Optional.empty();
-                }
-
-                @Override
-                public Collection<List<String>> getPropertyPathMatches(String pathPattern) {
-                    return null;
-                }
-            }, new DefaultMutableConversionService());
-        }
-        return propertyPlaceholderResolver;
     }
 
     /**

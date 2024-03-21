@@ -84,7 +84,7 @@ public class OpenApiIncludeVisitor implements TypeElementVisitor<OpenAPIIncludes
         visitor.visitClass(ce, context);
         ce.getEnclosedElements(ElementQuery.ALL_METHODS
                 .modifiers(mods -> !mods.contains(ElementModifier.STATIC) && !mods.contains(ElementModifier.PRIVATE))
-                .named(name -> !name.contains("$"))
+                .named(name -> !name.contains(StringUtil.DOLLAR))
             )
             .forEach(method -> visitor.visitMethod(method, context));
     }

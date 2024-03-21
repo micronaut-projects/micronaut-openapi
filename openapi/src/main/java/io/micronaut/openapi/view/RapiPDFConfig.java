@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.function.Function;
 
 import io.micronaut.core.annotation.Nullable;
+import io.micronaut.core.util.StringUtils;
 import io.micronaut.inject.visitor.VisitorContext;
 import io.micronaut.openapi.view.OpenApiViewConfig.RendererType;
 import io.micronaut.openapi.visitor.Pair;
@@ -142,18 +143,18 @@ final class RapiPDFConfig extends AbstractViewConfig {
                     options.put("style", DEFAULT_RAPIDOC_STYLE);
                 }
             }
-            String script = OpenApiViewConfig.replacePlaceHolder(LINK, "rapipdf.js.url.prefix", isDefaultJsUrl ? getFinalUrlPrefix(rendererType, context) : jsUrl, "");
-            String rapipdfTag = OpenApiViewConfig.replacePlaceHolder(TAG, "rapipdf.attributes", toHtmlAttributes(), "");
+            String script = OpenApiViewConfig.replacePlaceHolder(LINK, "rapipdf.js.url.prefix", isDefaultJsUrl ? getFinalUrlPrefix(rendererType, context) : jsUrl, StringUtils.EMPTY_STRING);
+            String rapipdfTag = OpenApiViewConfig.replacePlaceHolder(TAG, "rapipdf.attributes", toHtmlAttributes(), StringUtils.EMPTY_STRING);
             if (styleUpdated) {
                 options.remove("style");
             }
-            template = OpenApiViewConfig.replacePlaceHolder(template, "rapipdf.script", script, "");
-            template = OpenApiViewConfig.replacePlaceHolder(template, "rapipdf.specurl", SPEC, "");
-            return OpenApiViewConfig.replacePlaceHolder(template, "rapipdf.tag", rapipdfTag, "");
+            template = OpenApiViewConfig.replacePlaceHolder(template, "rapipdf.script", script, StringUtils.EMPTY_STRING);
+            template = OpenApiViewConfig.replacePlaceHolder(template, "rapipdf.specurl", SPEC, StringUtils.EMPTY_STRING);
+            return OpenApiViewConfig.replacePlaceHolder(template, "rapipdf.tag", rapipdfTag, StringUtils.EMPTY_STRING);
         } else {
-            template = OpenApiViewConfig.replacePlaceHolder(template, "rapipdf.script", "", "");
-            template = OpenApiViewConfig.replacePlaceHolder(template, "rapipdf.specurl", "", "");
-            return OpenApiViewConfig.replacePlaceHolder(template, "rapipdf.tag", "", "");
+            template = OpenApiViewConfig.replacePlaceHolder(template, "rapipdf.script", StringUtils.EMPTY_STRING, StringUtils.EMPTY_STRING);
+            template = OpenApiViewConfig.replacePlaceHolder(template, "rapipdf.specurl", StringUtils.EMPTY_STRING, StringUtils.EMPTY_STRING);
+            return OpenApiViewConfig.replacePlaceHolder(template, "rapipdf.tag", StringUtils.EMPTY_STRING, StringUtils.EMPTY_STRING);
         }
     }
 

@@ -74,6 +74,7 @@ import java.util.Set;
 
 import static io.micronaut.openapi.visitor.ContextUtils.warn;
 import static io.micronaut.openapi.visitor.Utils.resolveComponents;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_NAME;
 import static io.swagger.v3.oas.models.Components.COMPONENTS_SCHEMAS_REF;
 
 /**
@@ -147,11 +148,11 @@ public final class SchemaUtils {
 
     // Copy of io.swagger.v3.core.util.AnnotationsUtils.getExtensions
     public static void processExtensions(Map<String, Object> map, AnnotationValue<Extension> extension) {
-        String extName = extension.stringValue("name").orElse(StringUtils.EMPTY_STRING);
+        String extName = extension.stringValue(PROP_NAME).orElse(StringUtils.EMPTY_STRING);
         String decoratedName = prependIfMissing(extName, PREFIX_X);
         final String key = !extName.isEmpty() ? decoratedName : extName;
         for (var propAnn : extension.getAnnotations("properties", ExtensionProperty.class)) {
-            var propertyName = propAnn.getRequiredValue("name", String.class);
+            var propertyName = propAnn.getRequiredValue(PROP_NAME, String.class);
             var propertyValue = propAnn.getRequiredValue(String.class);
             JsonNode processedValue;
             final boolean propertyAsJson = propAnn.get("parseValue", boolean.class, false);
@@ -663,232 +664,6 @@ public final class SchemaUtils {
         finalSchema.addOneOfItem(s1);
         finalSchema.addOneOfItem(s2);
         return finalSchema;
-    }
-
-    public static Schema mergeSchema2(Schema s1, Schema s2) {
-
-        if (s1 == null) {
-            return s2;
-        }
-        if (s2 == null) {
-            return null;
-        }
-        if (s1.equals(s2)) {
-            return s1;
-        }
-
-        if (s1.get$ref() == null) {
-            s1.set$ref(s2.get$ref());
-        }
-        if (s1.get$ref() != null) {
-            if (Utils.isOpenapi31()) {
-                if (s1.getTitle() == null) {
-                    s1.setTitle(s2.getTitle());
-                }
-                if (s1.getDescription() == null) {
-                    s1.setDescription(s2.getDescription());
-                }
-            }
-            return s1;
-        }
-
-        if (s1.getName() == null) {
-            s1.setName(s2.getName());
-        }
-        if (s1.getTitle() == null) {
-            s1.setTitle(s2.getTitle());
-        }
-        if (s1.getMultipleOf() == null) {
-            s1.setMultipleOf(s2.getMultipleOf());
-        }
-        if (s1.getMaximum() == null) {
-            s1.setMaximum(s2.getMaximum());
-        }
-        if (s1.getExclusiveMaximum() == null) {
-            s1.setExclusiveMaximum(s2.getExclusiveMaximum());
-        }
-        if (s1.getMinimum() == null) {
-            s1.setMinimum(s2.getMinimum());
-        }
-        if (s1.getExclusiveMinimum() == null) {
-            s1.setExclusiveMinimum(s2.getExclusiveMinimum());
-        }
-        if (s1.getMaxLength() == null) {
-            s1.setMaxLength(s2.getMaxLength());
-        }
-        if (s1.getMinLength() == null) {
-            s1.setMinLength(s2.getMinLength());
-        }
-        if (s1.getPattern() == null) {
-            s1.setPattern(s2.getPattern());
-        }
-        if (s1.getMaxItems() == null) {
-            s1.setMaxItems(s2.getMaxItems());
-        }
-        if (s1.getMinItems() == null) {
-            s1.setMinItems(s2.getMinItems());
-        }
-        if (s1.getUniqueItems() == null) {
-            s1.setUniqueItems(s2.getUniqueItems());
-        }
-        if (s1.getMaxProperties() == null) {
-            s1.setMaxProperties(s2.getMaxProperties());
-        }
-        if (s1.getMinProperties() == null) {
-            s1.setMinProperties(s2.getMinProperties());
-        }
-        if (s1.getRequired() == null) {
-            s1.setRequired(s2.getRequired());
-        }
-        if (s1.getType() == null) {
-            s1.setType(s2.getType());
-        }
-        if (s1.getAdditionalProperties() == null) {
-            s1.setAdditionalProperties(s2.getAdditionalProperties());
-        }
-        if (s1.getDescription() == null) {
-            s1.setDescription(s2.getDescription());
-        }
-        if (s1.getFormat() == null) {
-            s1.setFormat(s2.getFormat());
-        }
-        if (s1.getNullable() == null) {
-            s1.setNullable(s2.getNullable());
-        }
-        if (s1.getReadOnly() == null) {
-            s1.setReadOnly(s2.getReadOnly());
-        }
-        if (s1.getWriteOnly() == null) {
-            s1.setWriteOnly(s2.getWriteOnly());
-        }
-        if (s1.getExample() == null) {
-            s1.setExample(s2.getExample());
-        }
-        if (s1.getExternalDocs() == null) {
-            s1.setExternalDocs(s2.getExternalDocs());
-        }
-        if (s1.getDeprecated() == null) {
-            s1.setDeprecated(s2.getDeprecated());
-        }
-        if (s1.getXml() == null) {
-            s1.setXml(s2.getXml());
-        }
-        if (s1.getExtensions() == null) {
-            s1.setExtensions(s2.getExtensions());
-        }
-        if (s1.getEnum() == null) {
-            s1.setEnum(s2.getEnum());
-        }
-        if (s1.getDiscriminator() == null) {
-            s1.setDiscriminator(s2.getDiscriminator());
-        }
-        if (s1.getDefault() == null) {
-            s1.setDefault(s2.getDefault());
-        }
-        if (s1.getNot() == null) {
-            s1.setNot(s2.getNot());
-        }
-        if (s1.getProperties() == null) {
-            s1.setProperties(s2.getProperties());
-        }
-        if (s1.getPrefixItems() == null) {
-            s1.setPrefixItems(s2.getPrefixItems());
-        }
-        if (s1.getAllOf() == null) {
-            s1.setAllOf(s2.getAllOf());
-        }
-        if (s1.getAnyOf() == null) {
-            s1.setAnyOf(s2.getAnyOf());
-        }
-        if (s1.getOneOf() == null) {
-            s1.setOneOf(s2.getOneOf());
-        }
-        if (s1.getItems() == null) {
-            s1.setItems(s2.getItems());
-        }
-        if (s1.getConst() == null) {
-            s1.setConst(s2.getConst());
-        }
-        if (s1.getTypes() == null) {
-            s1.setTypes(s2.getTypes());
-        }
-        if (s1.getPatternProperties() == null) {
-            s1.setPatternProperties(s2.getPatternProperties());
-        }
-        if (s1.getExclusiveMaximumValue() == null) {
-            s1.setExclusiveMaximumValue(s2.getExclusiveMaximumValue());
-        }
-        if (s1.getExclusiveMinimumValue() == null) {
-            s1.setExclusiveMinimumValue(s2.getExclusiveMinimumValue());
-        }
-        if (s1.getContains() == null) {
-            s1.setContains(s2.getContains());
-        }
-        if (s1.get$id() == null) {
-            s1.set$id(s2.get$id());
-        }
-        if (s1.get$schema() == null) {
-            s1.set$schema(s2.get$schema());
-        }
-        if (s1.get$anchor() == null) {
-            s1.set$anchor(s2.get$anchor());
-        }
-        if (s1.get$vocabulary() == null) {
-            s1.set$vocabulary(s2.get$vocabulary());
-        }
-        if (s1.get$dynamicAnchor() == null) {
-            s1.set$dynamicAnchor(s2.get$dynamicAnchor());
-        }
-        if (s1.getContentEncoding() == null) {
-            s1.setContentEncoding(s2.getContentEncoding());
-        }
-        if (s1.getContentMediaType() == null) {
-            s1.setContentMediaType(s2.getContentMediaType());
-        }
-        if (s1.getContentSchema() == null) {
-            s1.setContentSchema(s2.getContentSchema());
-        }
-        if (s1.getPropertyNames() == null) {
-            s1.setPropertyNames(s2.getPropertyNames());
-        }
-        if (s1.getUnevaluatedProperties() == null) {
-            s1.setUnevaluatedProperties(s2.getUnevaluatedProperties());
-        }
-        if (s1.getMaxContains() == null) {
-            s1.setMaxContains(s2.getMaxContains());
-        }
-        if (s1.getAdditionalItems() == null) {
-            s1.setAdditionalItems(s2.getAdditionalItems());
-        }
-        if (s1.getUnevaluatedItems() == null) {
-            s1.setUnevaluatedItems(s2.getUnevaluatedItems());
-        }
-        if (s1.getIf() == null) {
-            s1.setIf(s2.getIf());
-        }
-        if (s1.getElse() == null) {
-            s1.setElse(s2.getElse());
-        }
-        if (s1.getThen() == null) {
-            s1.setThen(s2.getThen());
-        }
-        if (s1.getDependentSchemas() == null) {
-            s1.setDependentSchemas(s2.getDependentSchemas());
-        }
-        if (s1.getDependentRequired() == null) {
-            s1.setDependentRequired(s2.getDependentRequired());
-        }
-        if (s1.get$comment() == null) {
-            s1.set$comment(s2.get$comment());
-        }
-        if (s1.getExamples() == null) {
-            s1.setExamples(s2.getExamples());
-        }
-        if (s1.getBooleanSchemaValue() == null) {
-            s1.setBooleanSchemaValue(s2.getBooleanSchemaValue());
-        }
-
-        return s1;
     }
 
     /**

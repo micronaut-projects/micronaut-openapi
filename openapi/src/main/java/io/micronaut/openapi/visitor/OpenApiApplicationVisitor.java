@@ -42,14 +42,15 @@ import io.micronaut.openapi.visitor.group.EndpointGroupInfo;
 import io.micronaut.openapi.visitor.group.GroupProperties;
 import io.micronaut.openapi.visitor.group.OpenApiInfo;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import io.swagger.v3.oas.annotations.servers.Server;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.PathItem;
+import io.swagger.v3.oas.models.Paths;
 import io.swagger.v3.oas.models.SpecVersion;
 import io.swagger.v3.oas.models.media.Schema;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
+import io.swagger.v3.oas.models.servers.Server;
+import io.swagger.v3.oas.models.tags.Tag;
 
 import java.io.IOException;
 import java.io.Serial;
@@ -58,7 +59,6 @@ import java.io.Writer;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -152,17 +152,17 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
 
             mergeAdditionalSwaggerFiles(element, context, openApi);
             // handle type level tags
-            List<io.swagger.v3.oas.models.tags.Tag> tagList = processOpenApiAnnotation(
+            List<Tag> tagList = processOpenApiAnnotation(
                 element,
                 context,
+                io.swagger.v3.oas.annotations.tags.Tag.class,
                 Tag.class,
-                io.swagger.v3.oas.models.tags.Tag.class,
                 openApi.getTags()
             );
             openApi.setTags(tagList);
 
             // handle type level security requirements
-            List<io.swagger.v3.oas.models.security.SecurityRequirement> securityRequirements = readSecurityRequirements(element);
+            List<SecurityRequirement> securityRequirements = readSecurityRequirements(element);
             if (openApi.getSecurity() != null) {
                 securityRequirements.addAll(openApi.getSecurity());
             }
@@ -170,11 +170,11 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             openApi.setSecurity(securityRequirements);
 
             // handle type level servers
-            List<io.swagger.v3.oas.models.servers.Server> servers = processOpenApiAnnotation(
+            List<Server> servers = processOpenApiAnnotation(
                 element,
                 context,
+                io.swagger.v3.oas.annotations.servers.Server.class,
                 Server.class,
-                io.swagger.v3.oas.models.servers.Server.class,
                 openApi.getServers()
             );
             openApi.setServers(servers);
@@ -218,7 +218,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         if (StringUtils.isEmpty(additionalSwaggerFiles)) {
             return;
         }
-        Path directory = resolve(context, Paths.get(additionalSwaggerFiles));
+        Path directory = resolve(context, java.nio.file.Paths.get(additionalSwaggerFiles));
         if (!Files.isDirectory(directory)) {
             warn(directory + " does not exist or is not a directory", context, element);
             return;
@@ -250,8 +250,8 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                         .jsonSchemaDialect(ConfigUtils.getJsonSchemaDialect(context))
                         .specVersion(SpecVersion.V31);
                 }
-                var securityRequirements = new ArrayList<io.swagger.v3.oas.models.security.SecurityRequirement>();
-                for (var secRequirementAnn : o.getAnnotations("security", SecurityRequirement.class)) {
+                var securityRequirements = new ArrayList<SecurityRequirement>();
+                for (var secRequirementAnn : o.getAnnotations("security", io.swagger.v3.oas.annotations.security.SecurityRequirement.class)) {
                     securityRequirements.add(ConvertUtils.mapToSecurityRequirement(secRequirementAnn));
                 }
                 openApi.setSecurity(securityRequirements);
@@ -327,16 +327,16 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             return;
         }
         info("Applying server context path: " + serverContextPath + " to Paths.", context);
-        io.swagger.v3.oas.models.Paths paths = openAPI.getPaths();
+        Paths paths = openAPI.getPaths();
         if (paths == null || paths.isEmpty()) {
             return;
         }
-        var newPaths = new io.swagger.v3.oas.models.Paths();
+        var newPaths = new Paths();
         for (Map.Entry<String, PathItem> path : paths.entrySet()) {
             final String mapping = path.getKey();
             String newPath = mapping.startsWith(serverContextPath) ? mapping : StringUtils.prependUri(serverContextPath, mapping);
-            if (!newPath.startsWith("/") && !newPath.startsWith("$")) {
-                newPath = "/" + newPath;
+            if (!newPath.startsWith(StringUtil.SLASH) && !newPath.startsWith(StringUtil.DOLLAR)) {
+                newPath = StringUtil.SLASH + newPath;
             }
             newPaths.addPathItem(newPath, path.getValue());
         }
@@ -511,7 +511,8 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                     continue;
                 }
                 for (EndpointGroupInfo endpointGroupInfo : endpointInfo.getGroups().values()) {
-                    if (CollectionUtils.isNotEmpty(endpointInfo.getExcludedGroups()) && endpointInfo.getExcludedGroups().contains(endpointGroupInfo)) {
+                    if (CollectionUtils.isNotEmpty(endpointInfo.getExcludedGroups())
+                        && endpointInfo.getExcludedGroups().contains(endpointGroupInfo.getName())) {
                         continue;
                     }
                     OpenAPI newOpenApi = addOpenApiInfo(endpointGroupInfo.getName(), endpointInfo.getVersion(), openApi, result, context);
@@ -552,9 +553,9 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         if (openApi == null) {
             return;
         }
-        io.swagger.v3.oas.models.Paths paths = openApi.getPaths();
+        Paths paths = openApi.getPaths();
         if (paths == null) {
-            paths = new io.swagger.v3.oas.models.Paths();
+            paths = new Paths();
             openApi.setPaths(paths);
         }
         PathItem pathItem = paths.computeIfAbsent(endpointInfo.getUrl(), (pathUrl) -> new PathItem());
@@ -740,11 +741,11 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             renderViews(documentTitle, openApiInfos, viewsDestDirs, context);
         } catch (Exception e) {
 
-            String swaggerFiles = "";
+            String swaggerFiles = StringUtils.EMPTY_STRING;
             if (openApiInfos != null) {
                 swaggerFiles = openApiInfos.values().stream()
                     .map(OpenApiInfo::getSpecFilePath)
-                    .collect(Collectors.joining(", ", "files ", ""));
+                    .collect(Collectors.joining(", ", "files ", StringUtils.EMPTY_STRING));
             }
 
             warn("Unable to render swagger view: " + swaggerFiles + " - " + e.getMessage() + ".\n" + Utils.printStackTrace(e), context, classElement);
@@ -757,13 +758,11 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         var isAdocModuleInClassPath = false;
         var isGlobalAdocEnabled = getBooleanProperty(MICRONAUT_OPENAPI_ADOC_ENABLED, true, context);
 
-        if (!Utils.isTestMode()) {
-            try {
-                var converterClass = Class.forName("io.micronaut.openapi.adoc.OpenApiToAdocConverter");
-                isAdocModuleInClassPath = true;
-            } catch (ClassNotFoundException e) {
-                //
-            }
+        try {
+            var converterClass = Class.forName("io.micronaut.openapi.adoc.OpenApiToAdocConverter");
+            isAdocModuleInClassPath = true;
+        } catch (ClassNotFoundException e) {
+            // do nothing
         }
 
         var objectMapper = isYaml ? Utils.getYamlMapper() : Utils.getJsonMapper();
@@ -789,11 +788,10 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                         addGeneratedResource(classesOutputPath.relativize(specFile.getParent()).toString(), context);
                     }
                     openApiInfo.setSpecFilePath(specFile.getFileName().toString());
-
-                    if (isAdocModuleInClassPath && isGlobalAdocEnabled && openApiInfo.isAdocEnabled()) {
-                        var adocProperties = getAdocProperties(openApiInfo, openApiInfos.size() == 1, context);
-                        AdocModule.convert(openApiInfo, adocProperties, context);
-                    }
+                }
+                if (isAdocModuleInClassPath && isGlobalAdocEnabled && openApiInfo.isAdocEnabled()) {
+                    var adocProperties = getAdocProperties(openApiInfo, openApiInfos.size() == 1, context);
+                    AdocModule.convert(openApiInfo, adocProperties, context);
                 }
             } catch (Exception e) {
                 warn("Unable to generate swagger" + (isYaml ? EXT_YML : EXT_JSON) + ": " + specFile + " - " + e.getMessage() + ".\n" + Utils.printStackTrace(e), context, classElement);
@@ -826,7 +824,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                 visitor.visitClass(classEl, context);
                 for (MethodElement methodEl : classEl.getEnclosedElements(ElementQuery.ALL_METHODS
                     .modifiers(mods -> !mods.contains(ElementModifier.STATIC) && !mods.contains(ElementModifier.PRIVATE))
-                    .named(name -> !name.contains("$")))) {
+                    .named(name -> !name.contains(StringUtil.DOLLAR)))) {
                     visitor.visitMethod(methodEl, context);
                 }
 

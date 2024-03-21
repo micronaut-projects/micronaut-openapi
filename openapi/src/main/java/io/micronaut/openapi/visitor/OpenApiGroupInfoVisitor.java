@@ -32,9 +32,9 @@ import io.micronaut.inject.visitor.TypeElementVisitor;
 import io.micronaut.inject.visitor.VisitorContext;
 import io.micronaut.openapi.annotation.OpenAPIGroupInfo;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
 
 import static io.micronaut.openapi.visitor.ConfigUtils.isOpenApiEnabled;
 import static io.micronaut.openapi.visitor.ConfigUtils.isSpecGenerationEnabled;
@@ -112,13 +112,13 @@ public class OpenApiGroupInfoVisitor implements TypeElementVisitor<Object, Objec
         addOpenApis(classAnns, openApis, classEl, context);
     }
 
-    private void addOpenApis(List<AnnotationValue<OpenAPIGroupInfo>> annotationValues, Map<String, OpenAPI> openApis, ClassElement classEl, VisitorContext context) {
-        if (CollectionUtils.isEmpty(annotationValues)) {
+    private void addOpenApis(List<AnnotationValue<OpenAPIGroupInfo>> groupInfoAnns, Map<String, OpenAPI> openApis, ClassElement classEl, VisitorContext context) {
+        if (CollectionUtils.isEmpty(groupInfoAnns)) {
             return;
         }
 
-        for (AnnotationValue<OpenAPIGroupInfo> infoAnn : annotationValues) {
-            var openApiAnn = infoAnn.getAnnotation("info", OpenAPIDefinition.class).orElse(null);
+        for (var groupInfoAnn : groupInfoAnns) {
+            var openApiAnn = groupInfoAnn.getAnnotation("info", OpenAPIDefinition.class).orElse(null);
             if (openApiAnn == null) {
                 continue;
             }
@@ -126,19 +126,19 @@ public class OpenApiGroupInfoVisitor implements TypeElementVisitor<Object, Objec
             if (openApi == null) {
                 continue;
             }
-            var securityRequirementAnns = openApiAnn.getAnnotations("security", SecurityRequirement.class);
-            var securityRequirements = new ArrayList<io.swagger.v3.oas.models.security.SecurityRequirement>();
+            var securityRequirementAnns = openApiAnn.getAnnotations("security", io.swagger.v3.oas.annotations.security.SecurityRequirement.class);
+            var securityRequirements = new ArrayList<SecurityRequirement>();
             for (var securityRequirementAnn : securityRequirementAnns) {
                 securityRequirements.add(ConvertUtils.mapToSecurityRequirement(securityRequirementAnn));
             }
             openApi.setSecurity(securityRequirements);
 
-            var securitySchemeAnns = infoAnn.getAnnotations("securitySchemes", SecurityScheme.class);
+            var securitySchemeAnns = groupInfoAnn.getAnnotations("securitySchemes", SecurityScheme.class);
             if (CollectionUtils.isNotEmpty(securitySchemeAnns)) {
                 ConvertUtils.addSecuritySchemes(openApi, securitySchemeAnns, context);
             }
 
-            for (var groupName : infoAnn.stringValues("names")) {
+            for (var groupName : groupInfoAnn.stringValues("names")) {
                 openApis.put(groupName, openApi);
             }
         }

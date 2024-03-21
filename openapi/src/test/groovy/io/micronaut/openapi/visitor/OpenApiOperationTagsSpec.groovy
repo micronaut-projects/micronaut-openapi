@@ -525,4 +525,66 @@ class MyBean {}
         openAPI.tags.get(0).name == "B Tag"
         openAPI.tags.get(0).description == "this is description"
     }
+
+    void "test @Tag annotations"() {
+
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
+@Tag(name = "Interface class Tag")
+interface OpenApiInterface {
+
+    @Tag(name = "Interface Method tag")
+    String processSync();
+}
+
+@Tag(name = "Super Class Tag")
+class OpenApiSuperController {
+
+    @Tag(name = "Super Method tag")
+    @Get(uri = "/200")
+    public String processSync() {
+        return null;
+    }
+}
+
+@Tag(name = "Class Tag")
+@Controller("/path")
+class OpenApiController extends OpenApiSuperController implements OpenApiInterface {
+
+    @Tag(name = "Method tag")
+    @Get(uri = "/200")
+    @Override
+    public String processSync() {
+        return super.processSync();
+    }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        then: "the state is correct"
+        Utils.testReference != null
+
+        when: "The OpenAPI is retrieved"
+        OpenAPI openAPI = Utils.testReference
+        Operation operation = openAPI.paths.get("/path/200").get
+
+        then:
+        operation
+        operation.tags.size() == 6
+        operation.tags.containsAll(List.of(
+                "Class Tag",
+                "Method tag",
+                "Super Class Tag",
+                "Super Method tag",
+                "Interface Method tag",
+                "Interface class Tag"
+        ))
+    }
 }

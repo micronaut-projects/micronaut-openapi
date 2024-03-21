@@ -69,21 +69,20 @@ import io.micronaut.openapi.visitor.group.RouterVersioningProperties;
 import io.micronaut.openapi.visitor.security.InterceptUrlMapPattern;
 import io.micronaut.openapi.visitor.security.SecurityProperties;
 import io.micronaut.openapi.visitor.security.SecurityRule;
-import io.swagger.v3.oas.annotations.ExternalDocumentation;
-import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Webhook;
-import io.swagger.v3.oas.annotations.callbacks.Callback;
 import io.swagger.v3.oas.annotations.callbacks.Callbacks;
 import io.swagger.v3.oas.annotations.enums.Explode;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.enums.ParameterStyle;
 import io.swagger.v3.oas.annotations.extensions.Extension;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.tags.Tags;
 import io.swagger.v3.oas.models.Components;
+import io.swagger.v3.oas.models.ExternalDocumentation;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.PathItem;
+import io.swagger.v3.oas.models.Operation;
+import io.swagger.v3.oas.models.callbacks.Callback;
 import io.swagger.v3.oas.models.examples.Example;
 import io.swagger.v3.oas.models.media.ComposedSchema;
 import io.swagger.v3.oas.models.media.Content;
@@ -100,9 +99,9 @@ import io.swagger.v3.oas.models.responses.ApiResponses;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import io.swagger.v3.oas.models.servers.Server;
+import io.swagger.v3.oas.models.tags.Tag;
 
 import java.io.IOException;
-import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -124,6 +123,7 @@ import static io.micronaut.openapi.visitor.ConfigUtils.isJsonViewEnabled;
 import static io.micronaut.openapi.visitor.ConfigUtils.isOpenApiEnabled;
 import static io.micronaut.openapi.visitor.ConfigUtils.isSpecGenerationEnabled;
 import static io.micronaut.openapi.visitor.ContextUtils.warn;
+import static io.micronaut.openapi.visitor.ElementUtils.getJsonViewClass;
 import static io.micronaut.openapi.visitor.ElementUtils.isFileUpload;
 import static io.micronaut.openapi.visitor.ElementUtils.isIgnoredParameter;
 import static io.micronaut.openapi.visitor.ElementUtils.isNotNullable;
@@ -138,6 +138,18 @@ import static io.micronaut.openapi.visitor.SchemaUtils.setSpecVersion;
 import static io.micronaut.openapi.visitor.Utils.DEFAULT_MEDIA_TYPES;
 import static io.micronaut.openapi.visitor.Utils.getMediaType;
 import static io.micronaut.openapi.visitor.Utils.resolveWebhooks;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_$REF;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_DEFAULT;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_DESCRIPTION;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_EXAMPLE;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_EXAMPLES;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_EXTENSIONS;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_HIDDEN;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_IN;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_NAME;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_REF;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_SCHEMA;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_VALUE;
 
 /**
  * A {@link io.micronaut.inject.visitor.TypeElementVisitor} the builds the Swagger model from Micronaut controllers at compile time.
@@ -158,8 +170,8 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
     private static final int MAX_SUMMARY_LENGTH = 200;
     private static final String THREE_DOTS = "...";
 
-    protected List<io.swagger.v3.oas.models.tags.Tag> classTags;
-    protected io.swagger.v3.oas.models.ExternalDocumentation classExternalDocs;
+    protected List<Tag> classTags;
+    protected ExternalDocumentation classExternalDocs;
 
     /**
      * Executed when a class is encountered that matches the generic class.
@@ -183,20 +195,20 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         if (element.isAnnotationPresent(Controller.class)) {
 
             element.stringValue(UriMapping.class).ifPresent(url -> ContextUtils.put(CONTEXT_CHILD_PATH, url, context));
-            String prefix = "";
-            String suffix = "";
+            String prefix = StringUtils.EMPTY_STRING;
+            String suffix = StringUtils.EMPTY_STRING;
             boolean addAlways = true;
-            AnnotationValue<OpenAPIDecorator> apiDecorator = element.getDeclaredAnnotation(OpenAPIDecorator.class);
-            if (apiDecorator != null) {
-                prefix = apiDecorator.stringValue().orElse("");
-                suffix = apiDecorator.stringValue("opIdSuffix").orElse("");
-                addAlways = apiDecorator.booleanValue("addAlways").orElse(true);
+            var apiDecoratorAnn = element.getDeclaredAnnotation(OpenAPIDecorator.class);
+            if (apiDecoratorAnn != null) {
+                prefix = apiDecoratorAnn.stringValue().orElse(StringUtils.EMPTY_STRING);
+                suffix = apiDecoratorAnn.stringValue("opIdSuffix").orElse(StringUtils.EMPTY_STRING);
+                addAlways = apiDecoratorAnn.booleanValue("addAlways").orElse(true);
             }
             ContextUtils.put(CONTEXT_CHILD_OP_ID_PREFIX, prefix, context);
             ContextUtils.put(CONTEXT_CHILD_OP_ID_SUFFIX, suffix, context);
             ContextUtils.put(CONTEXT_CHILD_OP_ID_SUFFIX_ADD_ALWAYS, addAlways, context);
 
-            List<ClassElement> superTypes = new ArrayList<>();
+            var superTypes = new ArrayList<ClassElement>();
             Collection<ClassElement> parentInterfaces = element.getInterfaces();
             if (element.isInterface() && !parentInterfaces.isEmpty()) {
                 for (ClassElement parentInterface : parentInterfaces) {
@@ -227,11 +239,11 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
 
     private void processTags(ClassElement element, VisitorContext context) {
         classTags = readTags(element, context);
-        List<io.swagger.v3.oas.models.tags.Tag> userDefinedClassTags = classTags(element, context);
+        List<Tag> userDefinedClassTags = classTags(element, context);
         if (CollectionUtils.isEmpty(classTags)) {
             classTags = userDefinedClassTags == null ? Collections.emptyList() : userDefinedClassTags;
         } else if (userDefinedClassTags != null) {
-            for (io.swagger.v3.oas.models.tags.Tag tag : userDefinedClassTags) {
+            for (Tag tag : userDefinedClassTags) {
                 if (!containsTag(tag.getName(), classTags)) {
                     classTags.add(tag);
                 }
@@ -240,13 +252,13 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
     }
 
     private void processExternalDocs(ClassElement element, VisitorContext context) {
-        final Optional<AnnotationValue<ExternalDocumentation>> externalDocsAnn = element.findAnnotation(ExternalDocumentation.class);
+        var externalDocsAnn = element.findAnnotation(io.swagger.v3.oas.annotations.ExternalDocumentation.class);
         classExternalDocs = externalDocsAnn
-            .flatMap(o -> toValue(o.getValues(), context, io.swagger.v3.oas.models.ExternalDocumentation.class, null))
+            .flatMap(o -> toValue(o.getValues(), context, ExternalDocumentation.class, null))
             .orElse(null);
     }
 
-    private boolean containsTag(String name, List<io.swagger.v3.oas.models.tags.Tag> tags) {
+    private boolean containsTag(String name, List<Tag> tags) {
         for (var tag : tags) {
             if (name.equals(tag.getName())) {
                 return true;
@@ -283,7 +295,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
      *
      * @return The class tags.
      */
-    protected abstract List<io.swagger.v3.oas.models.tags.Tag> classTags(ClassElement element, VisitorContext context);
+    protected abstract List<Tag> classTags(ClassElement element, VisitorContext context);
 
     /**
      * Returns true if the specified element should not be processed.
@@ -352,15 +364,15 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
     protected abstract String description(MethodElement element);
 
     private boolean hasNoBindingAnnotationOrType(TypedElement parameter) {
-        return !parameter.isAnnotationPresent(io.swagger.v3.oas.annotations.parameters.RequestBody.class) &&
-            !parameter.isAnnotationPresent(QueryValue.class) &&
-            !parameter.isAnnotationPresent(PathVariable.class) &&
-            !parameter.isAnnotationPresent(Body.class) &&
-            !parameter.isAnnotationPresent(Part.class) &&
-            !parameter.isAnnotationPresent(CookieValue.class) &&
-            !parameter.isAnnotationPresent(Header.class) &&
-            !parameter.isAnnotationPresent(RequestBean.class) &&
-            !isResponseType(parameter.getType());
+        return !parameter.isAnnotationPresent(io.swagger.v3.oas.annotations.parameters.RequestBody.class)
+            && !parameter.isAnnotationPresent(QueryValue.class)
+            && !parameter.isAnnotationPresent(PathVariable.class)
+            && !parameter.isAnnotationPresent(Body.class)
+            && !parameter.isAnnotationPresent(Part.class)
+            && !parameter.isAnnotationPresent(CookieValue.class)
+            && !parameter.isAnnotationPresent(Header.class)
+            && !parameter.isAnnotationPresent(RequestBean.class)
+            && !isResponseType(parameter.getType());
     }
 
     /**
@@ -395,12 +407,12 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
 
         ClassElement jsonViewClass = null;
         if (isJsonViewEnabled(context)) {
-            AnnotationValue<JsonView> jsonViewAnnotation = element.findAnnotation(JsonView.class).orElse(null);
-            if (jsonViewAnnotation == null) {
-                jsonViewAnnotation = element.getOwningType().findAnnotation(JsonView.class).orElse(null);
+            var jsonViewAnn = element.findAnnotation(JsonView.class).orElse(null);
+            if (jsonViewAnn == null) {
+                jsonViewAnn = element.getOwningType().findAnnotation(JsonView.class).orElse(null);
             }
-            if (jsonViewAnnotation != null) {
-                String jsonViewClassName = jsonViewAnnotation.stringValue().orElse(null);
+            if (jsonViewAnn != null) {
+                String jsonViewClassName = jsonViewAnn.stringValue().orElse(null);
                 if (jsonViewClassName != null) {
                     jsonViewClass = ContextUtils.getClassElement(jsonViewClassName, context);
                 }
@@ -418,11 +430,11 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
 
             final OpenAPI openApi = Utils.resolveOpenApi(context);
 
-            Map<PathItem, io.swagger.v3.oas.models.Operation> swaggerOperations = readOperations(pathItemEntry.getKey(), httpMethod, pathItems, element, context, jsonViewClass);
+            Map<PathItem, Operation> swaggerOperations = readOperations(pathItemEntry.getKey(), httpMethod, pathItems, element, context, jsonViewClass);
 
-            for (Map.Entry<PathItem, io.swagger.v3.oas.models.Operation> operationEntry : swaggerOperations.entrySet()) {
-                io.swagger.v3.oas.models.Operation swaggerOperation = operationEntry.getValue();
-                io.swagger.v3.oas.models.ExternalDocumentation externalDocs = readExternalDocs(element, context);
+            for (Map.Entry<PathItem, Operation> operationEntry : swaggerOperations.entrySet()) {
+                Operation swaggerOperation = operationEntry.getValue();
+                ExternalDocumentation externalDocs = readExternalDocs(element, context);
                 if (externalDocs == null) {
                     externalDocs = classExternalDocs;
                 }
@@ -469,7 +481,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
 
                 setOperationOnPathItem(operationEntry.getKey(), httpMethod, swaggerOperation);
 
-                Map<String, UriMatchVariable> pathVariables = new HashMap<>();
+                var pathVariables = new HashMap<String, UriMatchVariable>();
                 for (UriMatchTemplate matchTemplate : matchTemplates) {
                     for (Map.Entry<String, UriMatchVariable> varEntry : pathVariables(matchTemplate).entrySet()) {
                         if (pathItemEntry.getKey().contains("{" + varEntry.getKey() + '}')) {
@@ -480,8 +492,8 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                     processParameterAnnotationInMethod(element, openAPI, matchTemplate, httpMethod, swaggerOperation, pathVariables, context);
                 }
 
-                List<TypedElement> extraBodyParameters = new ArrayList<>();
-                for (io.swagger.v3.oas.models.Operation operation : swaggerOperations.values()) {
+                var extraBodyParameters = new ArrayList<TypedElement>();
+                for (Operation operation : swaggerOperations.values()) {
                     processParameters(element, context, openAPI, operation, javadocDescription, permitsRequestBody, pathVariables, consumesMediaTypes, extraBodyParameters, httpMethod, matchTemplates, pathItems);
                     processExtraBodyParameters(context, httpMethod, openAPI, operation, javadocDescription, isRequestBodySchemaSet, consumesMediaTypes, extraBodyParameters);
 
@@ -496,7 +508,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
     }
 
     private void processExtraBodyParameters(VisitorContext context, HttpMethod httpMethod, OpenAPI openAPI,
-                                            io.swagger.v3.oas.models.Operation swaggerOperation,
+                                            Operation swaggerOperation,
                                             JavadocDescription javadocDescription,
                                             boolean isRequestBodySchemaSet,
                                             List<MediaType> consumesMediaTypes,
@@ -570,7 +582,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
     }
 
     private void processParameters(MethodElement element, VisitorContext context, OpenAPI openAPI,
-                                   io.swagger.v3.oas.models.Operation swaggerOperation, JavadocDescription javadocDescription,
+                                   Operation swaggerOperation, JavadocDescription javadocDescription,
                                    boolean permitsRequestBody,
                                    Map<String, UriMatchVariable> pathVariables,
                                    List<MediaType> consumesMediaTypes,
@@ -619,7 +631,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         for (var exampleAnn : exampleAnns) {
             try {
                 var exampleMap = toValueMap(exampleAnn.getValues(), context, null);
-                result.put((String) exampleMap.get("name"), Utils.getJsonMapper().convertValue(exampleMap, Example.class));
+                result.put((String) exampleMap.get(PROP_NAME), Utils.getJsonMapper().convertValue(exampleMap, Example.class));
             } catch (Exception e) {
                 warn("Error reading Parameter example " + exampleAnn + " for element [" + element + "]: " + e.getMessage(), context, element);
             }
@@ -632,32 +644,31 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                                                     OpenAPI openAPI,
                                                     UriMatchTemplate matchTemplate,
                                                     HttpMethod httpMethod,
-                                                    io.swagger.v3.oas.models.Operation operation,
+                                                    Operation operation,
                                                     Map<String, UriMatchVariable> pathVariables,
                                                     VisitorContext context) {
 
-        List<AnnotationValue<io.swagger.v3.oas.annotations.Parameter>> parameterAnnotations = element
-            .getDeclaredAnnotationValuesByType(io.swagger.v3.oas.annotations.Parameter.class);
+        var parameterAnns = element.getDeclaredAnnotationValuesByType(io.swagger.v3.oas.annotations.Parameter.class);
 
-        for (var paramAnn : parameterAnnotations) {
-            if (paramAnn.get("hidden", Boolean.class, false)) {
+        for (var paramAnn : parameterAnns) {
+            if (paramAnn.get(PROP_HIDDEN, Boolean.class, false)) {
                 continue;
             }
 
-            Parameter parameter = new Parameter();
+            var parameter = new Parameter();
             parameter.schema(setSpecVersion(new Schema<>()));
 
-            paramAnn.stringValue("name").ifPresent(parameter::name);
-            paramAnn.enumValue("in", ParameterIn.class).ifPresent(in -> parameter.in(in.toString()));
-            paramAnn.stringValue("description").ifPresent(parameter::description);
+            paramAnn.stringValue(PROP_NAME).ifPresent(parameter::name);
+            paramAnn.enumValue(PROP_IN, ParameterIn.class).ifPresent(in -> parameter.in(in.toString()));
+            paramAnn.stringValue(PROP_DESCRIPTION).ifPresent(parameter::description);
             paramAnn.booleanValue("required").ifPresent(value -> parameter.setRequired(value ? true : null));
             paramAnn.booleanValue("deprecated").ifPresent(value -> parameter.setDeprecated(value ? true : null));
             paramAnn.booleanValue("allowEmptyValue").ifPresent(value -> parameter.setAllowEmptyValue(value ? true : null));
             paramAnn.booleanValue("allowReserved").ifPresent(value -> parameter.setAllowReserved(value ? true : null));
-            paramAnn.stringValue("example").ifPresent(parameter::example);
-            paramAnn.stringValue("ref").ifPresent(parameter::$ref);
+            paramAnn.stringValue(PROP_EXAMPLE).ifPresent(parameter::example);
+            paramAnn.stringValue(PROP_REF).ifPresent(parameter::$ref);
             paramAnn.enumValue("style", ParameterStyle.class).ifPresent(style -> parameter.setStyle(paramStyle(style)));
-            var examples = readExamples(paramAnn.getAnnotations("examples", ExampleObject.class), element, context);
+            var examples = readExamples(paramAnn.getAnnotations(PROP_EXAMPLES, ExampleObject.class), element, context);
             if (examples != null) {
                 examples.forEach(parameter::addExample);
             }
@@ -709,7 +720,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
     }
 
     private void processParameter(VisitorContext context, OpenAPI openAPI,
-                                  io.swagger.v3.oas.models.Operation swaggerOperation, JavadocDescription javadocDescription,
+                                  Operation swaggerOperation, JavadocDescription javadocDescription,
                                   boolean permitsRequestBody, Map<String, UriMatchVariable> pathVariables, List<MediaType> consumesMediaTypes,
                                   List<Parameter> swaggerParameters, TypedElement parameter,
                                   List<TypedElement> extraBodyParameters,
@@ -731,7 +742,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         consumesMediaTypes = CollectionUtils.isNotEmpty(consumesMediaTypes) ? consumesMediaTypes : DEFAULT_MEDIA_TYPES;
 
         if (parameter.isAnnotationPresent(Body.class)) {
-            io.swagger.v3.oas.models.Operation existedOperation = null;
+            Operation existedOperation = null;
             // check existed operations
             for (PathItem pathItem : pathItems) {
                 existedOperation = getOperationOnPathItem(pathItem, httpMethod);
@@ -763,7 +774,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
 
                         Schema<?> propertySchema = bindSchemaForElement(context, parameter, parameterType, mediaType.getSchema(), null);
 
-                        AnnotationValue<Body> bodyAnn = parameter.getAnnotation(Body.class);
+                        var bodyAnn = parameter.getAnnotation(Body.class);
 
                         String bodyAnnValue = bodyAnn != null ? bodyAnn.getValue(String.class).orElse(null) : null;
                         if (StringUtils.isNotEmpty(bodyAnnValue)) {
@@ -788,7 +799,8 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             return;
         }
 
-        Parameter newParameter = processMethodParameterAnnotation(context, swaggerOperation, permitsRequestBody, pathVariables, parameter, extraBodyParameters, httpMethod, matchTemplates);
+        Parameter newParameter = processMethodParameterAnnotation(context, swaggerOperation, permitsRequestBody,
+            pathVariables, parameter, extraBodyParameters, httpMethod, matchTemplates);
         if (newParameter == null) {
             return;
         }
@@ -806,7 +818,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                 if (CollectionUtils.isNotEmpty(explodedSchema.getProperties())) {
                     Map<String, Schema> props = explodedSchema.getProperties();
                     for (Map.Entry<String, Schema> entry : props.entrySet()) {
-                        Parameter unwrappedParameter = new QueryParameter();
+                        var unwrappedParameter = new QueryParameter();
                         if (CollectionUtils.isNotEmpty(explodedSchema.getRequired()) && explodedSchema.getRequired().contains(entry.getKey())) {
                             unwrappedParameter.setRequired(true);
                         }
@@ -862,22 +874,13 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
     private void processBodyParameter(VisitorContext context, OpenAPI openAPI, JavadocDescription javadocDescription,
                                       MediaType mediaType, Schema schema, TypedElement parameter) {
 
-        ClassElement jsonViewClass = null;
-        if (isJsonViewEnabled(context)) {
-            AnnotationValue<JsonView> jsonViewAnnotation = parameter.findAnnotation(JsonView.class).orElse(null);
-            if (jsonViewAnnotation != null) {
-                String jsonViewClassName = jsonViewAnnotation.stringValue().orElse(null);
-                if (jsonViewClassName != null) {
-                    jsonViewClass = ContextUtils.getClassElement(jsonViewClassName, context);
-                }
-            }
-        }
+        var jsonViewClass = getJsonViewClass(parameter, context);
 
         Schema<?> propertySchema = resolveSchema(openAPI, parameter, parameter.getType(), context, Collections.singletonList(mediaType), jsonViewClass, null, null);
         if (propertySchema != null) {
 
-            Optional<String> description = parameter.stringValue(io.swagger.v3.oas.annotations.Parameter.class, "description");
-            description.ifPresent(propertySchema::setDescription);
+            parameter.stringValue(io.swagger.v3.oas.annotations.Parameter.class, PROP_DESCRIPTION)
+                .ifPresent(propertySchema::setDescription);
             processSchemaProperty(context, parameter, parameter.getType(), null, schema, propertySchema);
             if (isNullable(parameter) && !isNotNullable(parameter)) {
                 // Keep null if not
@@ -892,7 +895,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         }
     }
 
-    private Parameter processMethodParameterAnnotation(VisitorContext context, io.swagger.v3.oas.models.Operation swaggerOperation,
+    private Parameter processMethodParameterAnnotation(VisitorContext context, Operation swaggerOperation,
                                                        boolean permitsRequestBody,
                                                        Map<String, UriMatchVariable> pathVariables, TypedElement parameter,
                                                        List<TypedElement> extraBodyParameters,
@@ -933,8 +936,8 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             newParameter.setName(headerName);
         } else if (parameter.isAnnotationPresent(Headers.class)) {
 
-            List<AnnotationValue<Header>> headerAnnotations = parameter.getAnnotationValuesByType(Header.class);
-            if (CollectionUtils.isNotEmpty(headerAnnotations)) {
+            var headerAnns = parameter.getAnnotationValuesByType(Header.class);
+            if (CollectionUtils.isNotEmpty(headerAnns)) {
                 var headerName = getHeaderName(parameter, parameterName);
                 if (headerName == null) {
                     return null;
@@ -957,10 +960,10 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             newParameter = new PathParameter();
             newParameter.setName(parameterName);
         } else if (hasNoBindingAnnotationOrType(parameter)) {
-            AnnotationValue<io.swagger.v3.oas.annotations.Parameter> parameterAnnotation = parameter.getAnnotation(io.swagger.v3.oas.annotations.Parameter.class);
-            // Skip recognizing parameter if it's manually defined by "in"
-            var paramIn = parameterAnnotation != null ? parameterAnnotation.stringValue("in").orElse(null) : null;
-            if (parameterAnnotation == null || !parameterAnnotation.booleanValue("hidden").orElse(false)
+            var parameterAnn = parameter.getAnnotation(io.swagger.v3.oas.annotations.Parameter.class);
+            // Skip recognizing parameter if it's manually defined by PROP_IN
+            var paramIn = parameterAnn != null ? parameterAnn.stringValue(PROP_IN).orElse(null) : null;
+            if (parameterAnn == null || !parameterAnn.booleanValue(PROP_HIDDEN).orElse(false)
                 && (paramIn == null || paramIn.equals(ParameterIn.DEFAULT.toString()))) {
                 if (permitsRequestBody) {
                     extraBodyParameters.add(parameter);
@@ -1010,86 +1013,82 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             return null;
         }
 
-        if (parameter.isAnnotationPresent(io.swagger.v3.oas.annotations.Parameter.class)) {
-            AnnotationValue<io.swagger.v3.oas.annotations.Parameter> paramAnn = parameter
-                .findAnnotation(io.swagger.v3.oas.annotations.Parameter.class).orElse(null);
+        var paramAnn = parameter.findAnnotation(io.swagger.v3.oas.annotations.Parameter.class).orElse(null);
+        if (paramAnn != null) {
 
-            if (paramAnn != null) {
+            if (paramAnn.get(PROP_HIDDEN, Boolean.class, false)) {
+                // ignore hidden parameters
+                return null;
+            }
 
-                if (paramAnn.get("hidden", Boolean.class, false)) {
-                    // ignore hidden parameters
-                    return null;
+            Map<CharSequence, Object> paramValues = toValueMap(paramAnn.getValues(), context, null);
+            Utils.normalizeEnumValues(paramValues, Collections.singletonMap(PROP_IN, ParameterIn.class));
+            if (parameter.isAnnotationPresent(Header.class)) {
+                paramValues.put(PROP_IN, ParameterIn.HEADER.toString());
+            } else if (parameter.isAnnotationPresent(CookieValue.class)) {
+                paramValues.put(PROP_IN, ParameterIn.COOKIE.toString());
+            } else if (parameter.isAnnotationPresent(QueryValue.class)) {
+                paramValues.put(PROP_IN, ParameterIn.QUERY.toString());
+            }
+            processExplode(paramAnn, paramValues);
+
+            JsonNode jsonNode = Utils.getJsonMapper().valueToTree(paramValues);
+
+            if (newParameter == null) {
+                try {
+                    newParameter = ConvertUtils.treeToValue(jsonNode, Parameter.class, context);
+                    if (jsonNode.has(PROP_SCHEMA)) {
+                        JsonNode schemaNode = jsonNode.get(PROP_SCHEMA);
+                        if (schemaNode.has(PROP_$REF)) {
+                            if (newParameter == null) {
+                                newParameter = new Parameter();
+                            }
+                            newParameter.schema(setSpecVersion(new Schema<>().$ref(schemaNode.get(PROP_$REF).asText())));
+                        }
+                    }
+                } catch (Exception e) {
+                    warn("Error reading Swagger Parameter for element [" + parameter + "]: " + e.getMessage(), context, parameter);
                 }
-
-                Map<CharSequence, Object> paramValues = toValueMap(paramAnn.getValues(), context, null);
-                Utils.normalizeEnumValues(paramValues, Collections.singletonMap("in", ParameterIn.class));
-                if (parameter.isAnnotationPresent(Header.class)) {
-                    paramValues.put("in", ParameterIn.HEADER.toString());
-                } else if (parameter.isAnnotationPresent(CookieValue.class)) {
-                    paramValues.put("in", ParameterIn.COOKIE.toString());
-                } else if (parameter.isAnnotationPresent(QueryValue.class)) {
-                    paramValues.put("in", ParameterIn.QUERY.toString());
-                }
-                processExplode(paramAnn, paramValues);
-
-                JsonNode jsonNode = Utils.getJsonMapper().valueToTree(paramValues);
-
-                if (newParameter == null) {
-                    try {
-                        newParameter = ConvertUtils.treeToValue(jsonNode, Parameter.class, context);
-                        if (jsonNode.has("schema")) {
-                            JsonNode schemaNode = jsonNode.get("schema");
-                            if (schemaNode.has("$ref")) {
-                                if (newParameter == null) {
-                                    newParameter = new Parameter();
-                                }
-                                newParameter.schema(setSpecVersion(new Schema<>().$ref(schemaNode.get("$ref").asText())));
+            } else {
+                try {
+                    Parameter v = ConvertUtils.treeToValue(jsonNode, Parameter.class, context);
+                    if (v == null) {
+                        Map<CharSequence, Object> target = OpenApiUtils.getConvertJsonMapper().convertValue(newParameter, MAP_TYPE);
+                        for (CharSequence name : paramValues.keySet()) {
+                            Object o = paramValues.get(name.toString());
+                            if (o != null) {
+                                target.put(name.toString(), o);
                             }
                         }
-                    } catch (Exception e) {
-                        warn("Error reading Swagger Parameter for element [" + parameter + "]: " + e.getMessage(), context, parameter);
-                    }
-                } else {
-                    try {
-                        Parameter v = ConvertUtils.treeToValue(jsonNode, Parameter.class, context);
-                        if (v == null) {
-                            Map<CharSequence, Object> target = OpenApiUtils.getConvertJsonMapper().convertValue(newParameter, MAP_TYPE);
-                            for (CharSequence name : paramValues.keySet()) {
-                                Object o = paramValues.get(name.toString());
-                                if (o != null) {
-                                    target.put(name.toString(), o);
-                                }
+                        newParameter = OpenApiUtils.getConvertJsonMapper().convertValue(target, Parameter.class);
+                    } else {
+                        // horrible hack because Swagger
+                        // ParameterDeserializer breaks updating
+                        // existing objects
+                        BeanMap<Parameter> beanMap = BeanMap.of(v);
+                        Map<CharSequence, Object> target = OpenApiUtils.getConvertJsonMapper().convertValue(newParameter, MAP_TYPE);
+                        for (CharSequence name : beanMap.keySet()) {
+                            Object o = beanMap.get(name.toString());
+                            if (o != null) {
+                                target.put(name.toString(), o);
                             }
-                            newParameter = OpenApiUtils.getConvertJsonMapper().convertValue(target, Parameter.class);
-                        } else {
-                            // horrible hack because Swagger
-                            // ParameterDeserializer breaks updating
-                            // existing objects
-                            BeanMap<Parameter> beanMap = BeanMap.of(v);
-                            Map<CharSequence, Object> target = OpenApiUtils.getConvertJsonMapper().convertValue(newParameter, MAP_TYPE);
-                            for (CharSequence name : beanMap.keySet()) {
-                                Object o = beanMap.get(name.toString());
-                                if (o != null) {
-                                    target.put(name.toString(), o);
-                                }
-                            }
-                            newParameter = OpenApiUtils.getConvertJsonMapper().convertValue(target, Parameter.class);
                         }
-                    } catch (IOException e) {
-                        warn("Error reading Swagger Parameter for element [" + parameter + "]: " + e.getMessage(), context, parameter);
+                        newParameter = OpenApiUtils.getConvertJsonMapper().convertValue(target, Parameter.class);
                     }
+                } catch (IOException e) {
+                    warn("Error reading Swagger Parameter for element [" + parameter + "]: " + e.getMessage(), context, parameter);
                 }
+            }
 
-                if (newParameter != null && newParameter.get$ref() != null) {
-                    return newParameter;
-                }
+            if (newParameter != null && newParameter.get$ref() != null) {
+                return newParameter;
+            }
 
-                if (newParameter != null) {
-                    final Schema<?> parameterSchema = newParameter.getSchema();
-                    if (paramAnn.contains("schema") && parameterSchema != null) {
-                        paramAnn.get("schema", AnnotationValue.class)
-                            .ifPresent(schemaAnn -> bindSchemaAnnotationValue(context, parameter, parameterSchema, schemaAnn, null));
-                    }
+            if (newParameter != null) {
+                final Schema<?> parameterSchema = newParameter.getSchema();
+                if (paramAnn.contains(PROP_SCHEMA) && parameterSchema != null) {
+                    paramAnn.get(PROP_SCHEMA, AnnotationValue.class)
+                        .ifPresent(schemaAnn -> bindSchemaAnnotationValue(context, parameter, parameterSchema, schemaAnn, null));
                 }
             }
         }
@@ -1106,7 +1105,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         if (isIgnoredParameter(parameter)) {
             return null;
         }
-        String headerName = parameter.stringValue(Header.class, "name")
+        String headerName = parameter.stringValue(Header.class, PROP_NAME)
             .orElse(parameter.stringValue(Header.class)
                 .orElseGet(() -> NameUtils.hyphenate(parameterName)));
 
@@ -1117,25 +1116,12 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         return headerName;
     }
 
-    private boolean isIgnoredHeaderParameter(TypedElement parameter) {
-        return parameter.getType().isAssignable(Map.class);
-    }
-
     private void processBody(VisitorContext context, OpenAPI openAPI,
-                             io.swagger.v3.oas.models.Operation swaggerOperation, JavadocDescription javadocDescription,
+                             Operation swaggerOperation, JavadocDescription javadocDescription,
                              boolean permitsRequestBody, List<MediaType> consumesMediaTypes, TypedElement parameter,
                              ClassElement parameterType) {
 
-        ClassElement jsonViewClass = null;
-        if (isJsonViewEnabled(context)) {
-            AnnotationValue<JsonView> jsonViewAnnotation = parameter.findAnnotation(JsonView.class).orElse(null);
-            if (jsonViewAnnotation != null) {
-                String jsonViewClassName = jsonViewAnnotation.stringValue().orElse(null);
-                if (jsonViewClassName != null) {
-                    jsonViewClass = ContextUtils.getClassElement(jsonViewClassName, context);
-                }
-            }
-        }
+        var jsonViewClass = getJsonViewClass(parameter, context);
 
         if (!permitsRequestBody) {
             return;
@@ -1187,7 +1173,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
     }
 
     private void processRequestBean(VisitorContext context, OpenAPI openAPI,
-                                    io.swagger.v3.oas.models.Operation swaggerOperation, JavadocDescription javadocDescription,
+                                    Operation swaggerOperation, JavadocDescription javadocDescription,
                                     boolean permitsRequestBody, Map<String, UriMatchVariable> pathVariables, List<MediaType> consumesMediaTypes,
                                     List<Parameter> swaggerParameters, TypedElement parameter,
                                     List<TypedElement> extraBodyParameters,
@@ -1204,7 +1190,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
     }
 
     private void readResponse(MethodElement element, VisitorContext context, OpenAPI openAPI,
-                              io.swagger.v3.oas.models.Operation swaggerOperation, JavadocDescription javadocDescription, @Nullable ClassElement jsonViewClass) {
+                              Operation swaggerOperation, JavadocDescription javadocDescription, @Nullable ClassElement jsonViewClass) {
 
         boolean withMethodResponses = element.hasDeclaredAnnotation(io.swagger.v3.oas.annotations.responses.ApiResponse.class)
             || element.hasDeclaredAnnotation(io.swagger.v3.oas.annotations.responses.ApiResponse.class);
@@ -1218,7 +1204,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             responses = new ApiResponses();
             swaggerOperation.setResponses(responses);
         } else {
-            ApiResponse defaultResponse = responses.remove("default");
+            ApiResponse defaultResponse = responses.remove(PROP_DEFAULT);
             response = responses.get(responseCode);
             if (response == null && defaultResponse != null) {
                 response = defaultResponse;
@@ -1270,7 +1256,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
 
     private Map<String, UriMatchVariable> pathVariables(UriMatchTemplate matchTemplate) {
         List<UriMatchVariable> pv = matchTemplate.getVariables();
-        Map<String, UriMatchVariable> pathVariables = new LinkedHashMap<>(pv.size());
+        var pathVariables = new LinkedHashMap<String, UriMatchVariable>(pv.size());
         for (UriMatchVariable variable : pv) {
             pathVariables.put(variable.getName(), variable);
         }
@@ -1278,7 +1264,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
     }
 
     private JavadocDescription getMethodDescription(MethodElement element,
-                                                    io.swagger.v3.oas.models.Operation swaggerOperation) {
+                                                    Operation swaggerOperation) {
         String descr = description(element);
         if (StringUtils.isNotEmpty(descr) && StringUtils.isEmpty(swaggerOperation.getDescription())) {
             swaggerOperation.setDescription(descr);
@@ -1309,30 +1295,34 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         if (webhookAnnValue == null) {
             return null;
         }
-        final Map<CharSequence, Object> map = toValueMap(webhookAnnValue.getValues(), context, null);
-
-        var name = webhookAnnValue.stringValue("name").orElse(null);
+        var name = webhookAnnValue.stringValue(PROP_NAME).orElse(null);
         if (StringUtils.isEmpty(name)) {
             return null;
         }
 
-        var operationAnn = webhookAnnValue.getAnnotation("operation", io.swagger.v3.oas.annotations.Operation.class);
-        var operation = operationAnn
-            .flatMap(o -> toValue(o.getValues(), context, io.swagger.v3.oas.models.Operation.class, null))
-            .orElse(new io.swagger.v3.oas.models.Operation());
+        var operationAnn = webhookAnnValue.getAnnotation("operation", io.swagger.v3.oas.annotations.Operation.class).orElse(null);
+        Operation operation;
+        HttpMethod method;
+        if (operationAnn != null) {
+            operation = toValue(operationAnn.getValues(), context, Operation.class, null).orElse(null);
+            method = HttpMethod.parse(operationAnn.stringValue("method").orElse(httpMethod.name()));
+        } else {
+            operation = new Operation();
+            method = HttpMethod.POST;
+        }
         var pathItem = new PathItem();
-        setOperationOnPathItem(pathItem, HttpMethod.parse(operationAnn.get().stringValue("method").orElse(httpMethod.name())), operation);
+        setOperationOnPathItem(pathItem, method, operation);
         return Pair.of(name, pathItem);
     }
 
-    private Map<PathItem, io.swagger.v3.oas.models.Operation> readOperations(String path, HttpMethod httpMethod, List<PathItem> pathItems, MethodElement element, VisitorContext context, @Nullable ClassElement jsonViewClass) {
-        var swaggerOperations = new HashMap<PathItem, io.swagger.v3.oas.models.Operation>(pathItems.size());
-        var operationAnn = element.findAnnotation(Operation.class);
+    private Map<PathItem, Operation> readOperations(String path, HttpMethod httpMethod, List<PathItem> pathItems, MethodElement element, VisitorContext context, @Nullable ClassElement jsonViewClass) {
+        var swaggerOperations = new HashMap<PathItem, Operation>(pathItems.size());
+        var operationAnn = element.findAnnotation(io.swagger.v3.oas.annotations.Operation.class);
 
         for (PathItem pathItem : pathItems) {
             var swaggerOperation = operationAnn
-                .flatMap(o -> toValue(o.getValues(), context, io.swagger.v3.oas.models.Operation.class, jsonViewClass))
-                .orElse(new io.swagger.v3.oas.models.Operation());
+                .flatMap(o -> toValue(o.getValues(), context, Operation.class, jsonViewClass))
+                .orElse(new Operation());
 
             if (CollectionUtils.isNotEmpty(swaggerOperation.getParameters())) {
                 swaggerOperation.getParameters().removeIf(Objects::isNull);
@@ -1345,7 +1335,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                     for (ParameterElement methodParam : methodParams) {
                         AnnotationValue<io.swagger.v3.oas.annotations.Parameter> paramAnn = null;
                         for (AnnotationValue<io.swagger.v3.oas.annotations.Parameter> param : paramAnns) {
-                            String paramName = param.stringValue("name").orElse(null);
+                            String paramName = param.stringValue(PROP_NAME).orElse(null);
                             if (methodParam.getName().equals(paramName)) {
                                 paramAnn = param;
                                 break;
@@ -1353,8 +1343,8 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                         }
 
                         Parameter swaggerParam = null;
-                        if (paramAnn != null && !paramAnn.booleanValue("hidden").orElse(false)) {
-                            String paramName = paramAnn.stringValue("name").orElse(null);
+                        if (paramAnn != null && !paramAnn.booleanValue(PROP_HIDDEN).orElse(false)) {
+                            String paramName = paramAnn.stringValue(PROP_NAME).orElse(null);
                             if (paramName != null) {
                                 if (CollectionUtils.isNotEmpty(swaggerOperation.getParameters())) {
                                     for (Parameter createdParameter : swaggerOperation.getParameters()) {
@@ -1375,7 +1365,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                             if (paramName != null) {
                                 swaggerParam.setName(paramName);
                             }
-                            paramAnn.stringValue("description").ifPresent(swaggerParam::setDescription);
+                            paramAnn.stringValue(PROP_DESCRIPTION).ifPresent(swaggerParam::setDescription);
                             var required = paramAnn.booleanValue("required").orElse(false);
                             if (required) {
                                 swaggerParam.setRequired(true);
@@ -1392,8 +1382,8 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                             if (allowReserved) {
                                 swaggerParam.setAllowReserved(true);
                             }
-                            paramAnn.stringValue("example").ifPresent(swaggerParam::setExample);
-                            var examples = readExamples(paramAnn.getAnnotations("examples", ExampleObject.class), element, context);
+                            paramAnn.stringValue(PROP_EXAMPLE).ifPresent(swaggerParam::setExample);
+                            var examples = readExamples(paramAnn.getAnnotations(PROP_EXAMPLES, ExampleObject.class), element, context);
                             if (examples != null) {
                                 examples.forEach(swaggerParam::addExample);
                             }
@@ -1401,13 +1391,14 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                             if (style != ParameterStyle.DEFAULT) {
                                 swaggerParam.setStyle(paramStyle(style));
                             }
-                            paramAnn.stringValue("ref").ifPresent(swaggerParam::set$ref);
-                            Optional<ParameterIn> in = paramAnn.get("in", ParameterIn.class);
-                            if (in.isPresent()) {
-                                if (in.get() == ParameterIn.DEFAULT) {
+                            paramAnn.stringValue(PROP_REF).ifPresent(swaggerParam::set$ref);
+                            Optional<ParameterIn> inOpt = paramAnn.get(PROP_IN, ParameterIn.class);
+                            if (inOpt.isPresent()) {
+                                var in = inOpt.get();
+                                if (in == ParameterIn.DEFAULT) {
                                     swaggerParam.setIn(calcIn(path, httpMethod, methodParam));
                                 } else {
-                                    swaggerParam.setIn(in.get().toString());
+                                    swaggerParam.setIn(in.toString());
                                 }
                             }
                         }
@@ -1423,12 +1414,12 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             boolean addAlways;
             var apiDecoratorAnn = element.getDeclaredAnnotation(OpenAPIDecorator.class);
             if (apiDecoratorAnn != null) {
-                prefix = apiDecoratorAnn.stringValue().orElse("");
-                suffix = apiDecoratorAnn.stringValue("opIdSuffix").orElse("");
+                prefix = apiDecoratorAnn.stringValue().orElse(StringUtils.EMPTY_STRING);
+                suffix = apiDecoratorAnn.stringValue("opIdSuffix").orElse(StringUtils.EMPTY_STRING);
                 addAlways = apiDecoratorAnn.booleanValue("addAlways").orElse(true);
             } else {
-                prefix = ContextUtils.get(CONTEXT_CHILD_OP_ID_PREFIX, String.class, "", context);
-                suffix = ContextUtils.get(CONTEXT_CHILD_OP_ID_SUFFIX, String.class, "", context);
+                prefix = ContextUtils.get(CONTEXT_CHILD_OP_ID_PREFIX, String.class, StringUtils.EMPTY_STRING, context);
+                suffix = ContextUtils.get(CONTEXT_CHILD_OP_ID_SUFFIX, String.class, StringUtils.EMPTY_STRING, context);
                 addAlways = ContextUtils.get(CONTEXT_CHILD_OP_ID_SUFFIX_ADD_ALWAYS, Boolean.class, true, context);
             }
 
@@ -1491,15 +1482,15 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         };
     }
 
-    private io.swagger.v3.oas.models.ExternalDocumentation readExternalDocs(MethodElement element, VisitorContext context) {
-        var externalDocsAnn = element.findAnnotation(ExternalDocumentation.class);
+    private ExternalDocumentation readExternalDocs(MethodElement element, VisitorContext context) {
+        var externalDocsAnn = element.findAnnotation(io.swagger.v3.oas.annotations.ExternalDocumentation.class);
 
         return externalDocsAnn
-            .flatMap(o -> toValue(o.getValues(), context, io.swagger.v3.oas.models.ExternalDocumentation.class, null))
+            .flatMap(o -> toValue(o.getValues(), context, ExternalDocumentation.class, null))
             .orElse(null);
     }
 
-    private void readSecurityRequirements(MethodElement element, String path, io.swagger.v3.oas.models.Operation operation, VisitorContext context) {
+    private void readSecurityRequirements(MethodElement element, String path, Operation operation, VisitorContext context) {
         List<SecurityRequirement> securityRequirements = methodSecurityRequirements(element, context);
         if (CollectionUtils.isNotEmpty(securityRequirements)) {
             for (SecurityRequirement securityItem : securityRequirements) {
@@ -1511,7 +1502,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         processMicronautSecurityConfig(element, path, operation, context);
     }
 
-    private void processMicronautSecurityConfig(MethodElement element, String path, io.swagger.v3.oas.models.Operation operation, VisitorContext context) {
+    private void processMicronautSecurityConfig(MethodElement element, String path, Operation operation, VisitorContext context) {
 
         SecurityProperties securityProperties = getSecurityProperties(context);
         if (!securityProperties.isEnabled()
@@ -1563,13 +1554,13 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             }
         }
 
-        AnnotationValue<Annotation> classLevelSecured = element.getOwningType().getAnnotation("io.micronaut.security.annotation.Secured");
-        AnnotationValue<Annotation> methodLevelSecured = element.getAnnotation("io.micronaut.security.annotation.Secured");
+        var classLevelSecuredAnn = element.getOwningType().getAnnotation("io.micronaut.security.annotation.Secured");
+        var methodLevelSecuredAnn = element.getAnnotation("io.micronaut.security.annotation.Secured");
         List<String> access = null;
-        if (methodLevelSecured != null) {
-            access = methodLevelSecured.getValue(Argument.LIST_OF_STRING).orElse(null);
-        } else if (classLevelSecured != null) {
-            access = classLevelSecured.getValue(Argument.LIST_OF_STRING).orElse(null);
+        if (methodLevelSecuredAnn != null) {
+            access = methodLevelSecuredAnn.getValue(Argument.LIST_OF_STRING).orElse(null);
+        } else if (classLevelSecuredAnn != null) {
+            access = classLevelSecuredAnn.getValue(Argument.LIST_OF_STRING).orElse(null);
         }
         processSecurityAccess(securitySchemeName, access, operation);
 
@@ -1586,7 +1577,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         }
     }
 
-    private void processSecurityAccess(String securitySchemeName, List<String> access, io.swagger.v3.oas.models.Operation operation) {
+    private void processSecurityAccess(String securitySchemeName, List<String> access, Operation operation) {
         if (CollectionUtils.isEmpty(access)) {
             return;
         }
@@ -1615,7 +1606,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             if (existedSecList.isEmpty()) {
                 existedSecurityRequirement.put(securitySchemeName, access);
             } else {
-                var finalAccess = new HashSet<String>(existedSecList);
+                var finalAccess = new HashSet<>(existedSecList);
                 finalAccess.addAll(access);
                 existedSecurityRequirement.put(securitySchemeName, new ArrayList<>(finalAccess));
             }
@@ -1628,20 +1619,20 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
 
     private void processExplode(AnnotationValue<io.swagger.v3.oas.annotations.Parameter> paramAnn, Map<CharSequence, Object> paramValues) {
         Optional<Explode> explode = paramAnn.enumValue("explode", Explode.class);
-        if (explode.isPresent()) {
-            Explode ex = explode.get();
-            switch (ex) {
-                case TRUE -> paramValues.put("explode", Boolean.TRUE);
-                case FALSE -> paramValues.put("explode", Boolean.FALSE);
-                default -> {
-                    var in = (String) paramValues.get("in");
-                    if (StringUtils.isEmpty(in)) {
-                        in = "DEFAULT";
-                    }
-                    switch (ParameterIn.valueOf(in.toUpperCase(Locale.US))) {
-                        case COOKIE, QUERY -> paramValues.put("explode", Boolean.TRUE);
-                        default -> paramValues.put("explode", Boolean.FALSE);
-                    }
+        if (explode.isEmpty()) {
+            return;
+        }
+        switch (explode.get()) {
+            case TRUE -> paramValues.put("explode", Boolean.TRUE);
+            case FALSE -> paramValues.put("explode", Boolean.FALSE);
+            default -> {
+                var in = (String) paramValues.get(PROP_IN);
+                if (StringUtils.isEmpty(in)) {
+                    in = PROP_DEFAULT;
+                }
+                switch (ParameterIn.valueOf(in.toUpperCase(Locale.ENGLISH))) {
+                    case COOKIE, QUERY -> paramValues.put("explode", Boolean.TRUE);
+                    default -> paramValues.put("explode", Boolean.FALSE);
                 }
             }
         }
@@ -1660,7 +1651,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             || returnType.isAssignable("org.springframework.http.HttpEntity");
     }
 
-    private void readApiResponses(MethodElement element, VisitorContext context, io.swagger.v3.oas.models.Operation swaggerOperation, @Nullable ClassElement jsonViewClass) {
+    private void readApiResponses(MethodElement element, VisitorContext context, Operation swaggerOperation, @Nullable ClassElement jsonViewClass) {
         var methodResponseAnns = element.getAnnotationValuesByType(io.swagger.v3.oas.annotations.responses.ApiResponse.class);
         processResponses(swaggerOperation, methodResponseAnns, element, context, jsonViewClass);
 
@@ -1668,7 +1659,8 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         processResponses(swaggerOperation, classResponseAnns, element, context, jsonViewClass);
     }
 
-    private void processResponses(io.swagger.v3.oas.models.Operation operation, List<AnnotationValue<io.swagger.v3.oas.annotations.responses.ApiResponse>> responseAnns,
+    private void processResponses(Operation operation,
+                                  List<AnnotationValue<io.swagger.v3.oas.annotations.responses.ApiResponse>> responseAnns,
                                   MethodElement element, VisitorContext context, @Nullable ClassElement jsonViewClass) {
         ApiResponses apiResponses = operation.getResponses();
         if (apiResponses == null) {
@@ -1676,8 +1668,8 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             operation.setResponses(apiResponses);
         }
         if (CollectionUtils.isNotEmpty(responseAnns)) {
-            for (AnnotationValue<io.swagger.v3.oas.annotations.responses.ApiResponse> responseAnn : responseAnns) {
-                String responseCode = responseAnn.stringValue("responseCode").orElse("default");
+            for (var responseAnn : responseAnns) {
+                String responseCode = responseAnn.stringValue("responseCode").orElse(PROP_DEFAULT);
                 if (apiResponses.containsKey(responseCode)) {
                     continue;
                 }
@@ -1719,7 +1711,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                     }
                     try {
                         if (StringUtils.isEmpty(newApiResponse.getDescription())) {
-                            newApiResponse.setDescription(responseCode.equals("default") ? "OK response" : HttpStatus.getDefaultReason(Integer.parseInt(responseCode)));
+                            newApiResponse.setDescription(responseCode.equals(PROP_DEFAULT) ? "OK response" : HttpStatus.getDefaultReason(Integer.parseInt(responseCode)));
                         }
                     } catch (Exception e) {
                         newApiResponse.setDescription("Response " + responseCode);
@@ -1743,22 +1735,13 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
 
         var contentAnn = requestBodyAnn.getAnnotation("content", io.swagger.v3.oas.annotations.media.Content.class).orElse(null);
         if (contentAnn != null) {
-            var schemaAnn = contentAnn.getAnnotation("schema", io.swagger.v3.oas.annotations.media.Schema.class).orElse(null);
+            var schemaAnn = contentAnn.getAnnotation(PROP_SCHEMA, io.swagger.v3.oas.annotations.media.Schema.class).orElse(null);
             if (schemaAnn != null) {
                 hasSchemaImplementation = schemaAnn.stringValue("implementation").orElse(null) != null;
             }
         }
 
-        ClassElement jsonViewClass = null;
-        if (isJsonViewEnabled(context) && element instanceof ParameterElement) {
-            var jsonViewAnn = element.findAnnotation(JsonView.class).orElse(null);
-            if (jsonViewAnn != null) {
-                String jsonViewClassName = jsonViewAnn.stringValue().orElse(null);
-                if (jsonViewClassName != null) {
-                    jsonViewClass = ContextUtils.getClassElement(jsonViewClassName, context);
-                }
-            }
-        }
+        var jsonViewClass = element instanceof ParameterElement ? getJsonViewClass(element, context) : null;
 
         RequestBody requestBody = toValue(requestBodyAnn.getValues(), context, RequestBody.class, jsonViewClass).orElse(null);
         // if media type doesn't set in swagger annotation, check micronaut annotation
@@ -1777,30 +1760,30 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         return Pair.of(requestBody, hasSchemaImplementation);
     }
 
-    private void readServers(MethodElement element, VisitorContext context, io.swagger.v3.oas.models.Operation swaggerOperation) {
+    private void readServers(MethodElement element, VisitorContext context, Operation swaggerOperation) {
         for (Server server : methodServers(element, context)) {
             swaggerOperation.addServersItem(server);
         }
     }
 
     private void readCallbacks(MethodElement element, VisitorContext context,
-                               io.swagger.v3.oas.models.Operation swaggerOperation, @Nullable ClassElement jsonViewClass) {
+                               Operation swaggerOperation, @Nullable ClassElement jsonViewClass) {
         var callbacksAnn = element.getAnnotation(Callbacks.class);
-        List<AnnotationValue<Callback>> callbackAnnotations;
+        List<AnnotationValue<io.swagger.v3.oas.annotations.callbacks.Callback>> callbackAnns;
         if (callbacksAnn != null) {
-            callbackAnnotations = callbacksAnn.getAnnotations("value");
+            callbackAnns = callbacksAnn.getAnnotations(PROP_VALUE);
         } else {
-            callbackAnnotations = element.getAnnotationValuesByType(Callback.class);
+            callbackAnns = element.getAnnotationValuesByType(io.swagger.v3.oas.annotations.callbacks.Callback.class);
         }
-        if (CollectionUtils.isEmpty(callbackAnnotations)) {
+        if (CollectionUtils.isEmpty(callbackAnns)) {
             return;
         }
-        for (AnnotationValue<Callback> callbackAnn : callbackAnnotations) {
-            String callbackName = callbackAnn.stringValue("name").orElse(null);
+        for (var callbackAnn : callbackAnns) {
+            String callbackName = callbackAnn.stringValue(PROP_NAME).orElse(null);
             if (StringUtils.isEmpty(callbackName)) {
                 continue;
             }
-            String ref = callbackAnn.stringValue("ref").orElse(null);
+            String ref = callbackAnn.stringValue(PROP_REF).orElse(null);
             if (StringUtils.isNotEmpty(ref)) {
                 String refCallback = ref.substring(COMPONENTS_CALLBACKS_PREFIX.length());
                 processCallbackReference(context, swaggerOperation, callbackName, refCallback);
@@ -1815,35 +1798,35 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         }
     }
 
-    private void processCallbackReference(VisitorContext context, io.swagger.v3.oas.models.Operation swaggerOperation,
+    private void processCallbackReference(VisitorContext context, Operation swaggerOperation,
                                           String callbackName, String refCallback) {
         Utils.resolveComponents(Utils.resolveOpenApi(context));
-        Map<String, io.swagger.v3.oas.models.callbacks.Callback> callbacks = initCallbacks(swaggerOperation);
-        var callbackRef = new io.swagger.v3.oas.models.callbacks.Callback();
+        Map<String, Callback> callbacks = initCallbacks(swaggerOperation);
+        var callbackRef = new Callback();
         callbackRef.set$ref(refCallback != null ? refCallback : COMPONENTS_CALLBACKS_PREFIX + callbackName);
         callbacks.put(callbackName, callbackRef);
     }
 
     private void processUrlCallbackExpression(VisitorContext context,
-                                              io.swagger.v3.oas.models.Operation operation, AnnotationValue<Callback> callbackAnn,
+                                              Operation operation, AnnotationValue<io.swagger.v3.oas.annotations.callbacks.Callback> callbackAnn,
                                               String callbackName, final String callbackUrl, @Nullable ClassElement jsonViewClass) {
-        var operationAnns = callbackAnn.getAnnotations("operation", Operation.class);
+        var operationAnns = callbackAnn.getAnnotations("operation", io.swagger.v3.oas.annotations.Operation.class);
         var pathItem = new PathItem();
         if (CollectionUtils.isNotEmpty(operationAnns)) {
-            for (AnnotationValue<Operation> operationAnn : operationAnns) {
+            for (var operationAnn : operationAnns) {
                 final Optional<HttpMethod> operationMethod = operationAnn.get("method", HttpMethod.class);
-                operationMethod.ifPresent(httpMethod -> toValue(operationAnn.getValues(), context, io.swagger.v3.oas.models.Operation.class, jsonViewClass)
+                operationMethod.ifPresent(httpMethod -> toValue(operationAnn.getValues(), context, Operation.class, jsonViewClass)
                     .ifPresent(op -> setOperationOnPathItem(pathItem, httpMethod, op)));
             }
         }
-        Map<String, io.swagger.v3.oas.models.callbacks.Callback> callbacks = initCallbacks(operation);
-        var callback = new io.swagger.v3.oas.models.callbacks.Callback();
+        Map<String, Callback> callbacks = initCallbacks(operation);
+        var callback = new Callback();
         callback.addPathItem(callbackUrl, pathItem);
         callbacks.put(callbackName, callback);
     }
 
-    private Map<String, io.swagger.v3.oas.models.callbacks.Callback> initCallbacks(io.swagger.v3.oas.models.Operation swaggerOperation) {
-        Map<String, io.swagger.v3.oas.models.callbacks.Callback> callbacks = swaggerOperation.getCallbacks();
+    private Map<String, Callback> initCallbacks(Operation swaggerOperation) {
+        Map<String, Callback> callbacks = swaggerOperation.getCallbacks();
         if (callbacks == null) {
             callbacks = new LinkedHashMap<>();
             swaggerOperation.setCallbacks(callbacks);
@@ -1851,14 +1834,14 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         return callbacks;
     }
 
-    private void addTagIfNotPresent(String tag, io.swagger.v3.oas.models.Operation swaggerOperation) {
+    private void addTagIfNotPresent(String tag, Operation swaggerOperation) {
         List<String> tags = swaggerOperation.getTags();
         if (tags == null || !tags.contains(tag)) {
             swaggerOperation.addTagsItem(tag);
         }
     }
 
-    private void processMicronautVersionAndGroup(io.swagger.v3.oas.models.Operation swaggerOperation, String url,
+    private void processMicronautVersionAndGroup(Operation swaggerOperation, String url,
                                                  HttpMethod httpMethod,
                                                  List<MediaType> consumesMediaTypes,
                                                  List<MediaType> producesMediaTypes,
@@ -1880,7 +1863,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         processGroups(groups, excludedGroups, methodEl.getAnnotationValuesByType(OpenAPIGroup.class), groupPropertiesMap);
         processGroups(groups, excludedGroups, packageEl.getAnnotationValuesByType(OpenAPIGroup.class), groupPropertiesMap);
 
-        processGroupsFromIncludedEndpoints(groups, excludedGroups, classEl.getName(), groupPropertiesMap);
+        processGroupsFromIncludedEndpoints(groups, excludedGroups, classEl.getName());
 
         // properties from system properties or from environment more priority than annotations
         for (GroupProperties groupProperties : groupPropertiesMap.values()) {
@@ -1949,11 +1932,11 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         if (CollectionUtils.isEmpty(annotationValues)) {
             return;
         }
-        for (AnnotationValue<OpenAPIGroup> annValue : annotationValues) {
-            excludedGroups.addAll(List.of(annValue.stringValues("exclude")));
+        for (AnnotationValue<OpenAPIGroup> groupAnn : annotationValues) {
+            excludedGroups.addAll(List.of(groupAnn.stringValues("exclude")));
 
-            var extensionAnns = annValue.getAnnotations("extensions");
-            for (var groupName : annValue.stringValues("value")) {
+            var extensionAnns = groupAnn.getAnnotations(PROP_EXTENSIONS);
+            for (var groupName : groupAnn.stringValues(PROP_VALUE)) {
                 var extensions = new HashMap<String, Object>();
                 if (CollectionUtils.isNotEmpty(extensionAnns)) {
                     for (Object extensionAnn : extensionAnns) {
@@ -1974,7 +1957,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         allKnownGroups.addAll(excludedGroups);
     }
 
-    private void processGroupsFromIncludedEndpoints(Map<String, EndpointGroupInfo> groups, List<String> excludedGroups, String className, Map<String, GroupProperties> groupPropertiesMap) {
+    private void processGroupsFromIncludedEndpoints(Map<String, EndpointGroupInfo> groups, List<String> excludedGroups, String className) {
         if (CollectionUtils.isEmpty(Utils.getIncludedClassesGroups()) && CollectionUtils.isEmpty(Utils.getIncludedClassesGroupsExcluded())) {
             return;
         }
@@ -1995,7 +1978,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         allKnownGroups.addAll(classExcludedGroups);
     }
 
-    private void addVersionParameters(io.swagger.v3.oas.models.Operation swaggerOperation, List<String> names, boolean isHeader) {
+    private void addVersionParameters(Operation swaggerOperation, List<String> names, boolean isHeader) {
 
         String in = isHeader ? ParameterIn.HEADER.toString() : ParameterIn.QUERY.toString();
 
@@ -2010,18 +1993,18 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         }
     }
 
-    private void readTags(MethodElement element, VisitorContext context, io.swagger.v3.oas.models.Operation swaggerOperation, List<io.swagger.v3.oas.models.tags.Tag> classTags, OpenAPI openAPI) {
-        element.getAnnotationValuesByType(Tag.class)
-            .forEach(av -> av.stringValue("name")
+    private void readTags(MethodElement element, VisitorContext context, Operation swaggerOperation, List<Tag> classTags, OpenAPI openAPI) {
+        element.getAnnotationValuesByType(io.swagger.v3.oas.annotations.tags.Tag.class)
+            .forEach(av -> av.stringValue(PROP_NAME)
                 .ifPresent(swaggerOperation::addTagsItem));
 
         var copyTags = openAPI.getTags() != null ? new ArrayList<>(openAPI.getTags()) : null;
-        var operationTags = processOpenApiAnnotation(element, context, Tag.class, io.swagger.v3.oas.models.tags.Tag.class, copyTags);
+        var operationTags = processOpenApiAnnotation(element, context, io.swagger.v3.oas.annotations.tags.Tag.class, Tag.class, copyTags);
         // find not simple tags (tags with description or other information), such fields need to be described at the openAPI level.
-        List<io.swagger.v3.oas.models.tags.Tag> complexTags = null;
+        List<Tag> complexTags = null;
         if (CollectionUtils.isNotEmpty(operationTags)) {
             complexTags = new ArrayList<>();
-            for (io.swagger.v3.oas.models.tags.Tag operationTag : operationTags) {
+            for (Tag operationTag : operationTags) {
                 if (StringUtils.hasText(operationTag.getDescription())
                     || CollectionUtils.isNotEmpty(operationTag.getExtensions())
                     || operationTag.getExternalDocs() != null) {
@@ -2033,10 +2016,10 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             if (CollectionUtils.isEmpty(openAPI.getTags())) {
                 openAPI.setTags(complexTags);
             } else {
-                for (io.swagger.v3.oas.models.tags.Tag complexTag : complexTags) {
+                for (Tag complexTag : complexTags) {
                     // skip all existed tags
                     boolean alreadyExists = false;
-                    for (io.swagger.v3.oas.models.tags.Tag apiTag : openAPI.getTags()) {
+                    for (Tag apiTag : openAPI.getTags()) {
                         if (apiTag.getName().equals(complexTag.getName())) {
                             alreadyExists = true;
                             break;
@@ -2050,7 +2033,8 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         }
 
         // only way to get inherited tags
-        element.getValues(Tags.class, AnnotationValue.class).forEach((k, v) -> v.stringValue("name").ifPresent(name -> addTagIfNotPresent((String) name, swaggerOperation)));
+        element.getValues(Tags.class, AnnotationValue.class)
+            .forEach((k, v) -> v.stringValue(PROP_NAME).ifPresent(name -> addTagIfNotPresent((String) name, swaggerOperation)));
 
         classTags.forEach(tag -> addTagIfNotPresent(tag.getName(), swaggerOperation));
         if (CollectionUtils.isNotEmpty(swaggerOperation.getTags())) {
@@ -2058,14 +2042,14 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         }
     }
 
-    private List<io.swagger.v3.oas.models.tags.Tag> readTags(ClassElement element, VisitorContext context) {
-        return readTags(element.getAnnotationValuesByType(Tag.class), context);
+    private List<Tag> readTags(ClassElement element, VisitorContext context) {
+        return readTags(element.getAnnotationValuesByType(io.swagger.v3.oas.annotations.tags.Tag.class), context);
     }
 
-    final List<io.swagger.v3.oas.models.tags.Tag> readTags(List<AnnotationValue<Tag>> annotations, VisitorContext context) {
-        var tags = new ArrayList<io.swagger.v3.oas.models.tags.Tag>();
-        for (var ann : annotations) {
-            toValue(ann.getValues(), context, io.swagger.v3.oas.models.tags.Tag.class, null)
+    final List<Tag> readTags(List<AnnotationValue<io.swagger.v3.oas.annotations.tags.Tag>> tagAnns, VisitorContext context) {
+        var tags = new ArrayList<Tag>();
+        for (var tagAnn : tagAnns) {
+            toValue(tagAnn.getValues(), context, Tag.class, null)
                 .ifPresent(tags::add);
         }
         return tags;

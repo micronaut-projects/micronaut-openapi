@@ -37,6 +37,10 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import static io.micronaut.openapi.visitor.ConfigUtils.isOpenApiEnabled;
 import static io.micronaut.openapi.visitor.ConfigUtils.isSpecGenerationEnabled;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ENABLED;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_NAME;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_ONE_OF;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_SCHEMA;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_VALUE;
 
 /**
  * A {@link TypeElementVisitor} that builds appropriate {@link Schema} annotation for the parent class of a hierarchy
@@ -86,7 +90,7 @@ public class OpenApiJacksonVisitor implements TypeElementVisitor<Object, Object>
         This visitor will add the following @Schema (if no previous @Schema already exists):
             @Schema(
                 oneOf = {Cat.class, Dog.class},
-                discriminatorMapping = {
+                discriminatorMappingAnn = {
                     @DiscriminatorMapping(value = "CAT", schema = Cat.class),
                     @DiscriminatorMapping(value = "DOG", schema = Dog.class)
                 },
@@ -101,24 +105,24 @@ public class OpenApiJacksonVisitor implements TypeElementVisitor<Object, Object>
             }
 
             var discriminatorClasses = new ArrayList<AnnotationClassValue<?>>();
-            var discriminatorMappings = new ArrayList<AnnotationValue<DiscriminatorMapping>>();
-            for (AnnotationValue<Annotation> av : jsonSubTypesDecAnn.getAnnotations("value")) {
-                AnnotationClassValue<?> mappingClass = av.annotationClassValue("value").orElse(null);
-                String subTypeName = av.stringValue("name").orElse(null);
+            var discriminatorMappingAnns = new ArrayList<AnnotationValue<DiscriminatorMapping>>();
+            for (AnnotationValue<Annotation> av : jsonSubTypesDecAnn.getAnnotations(PROP_VALUE)) {
+                AnnotationClassValue<?> mappingClass = av.annotationClassValue(PROP_VALUE).orElse(null);
+                String subTypeName = av.stringValue(PROP_NAME).orElse(null);
                 if (mappingClass != null && subTypeName != null) {
-                    AnnotationValue<DiscriminatorMapping> discriminatorMapping = AnnotationValue.builder(DiscriminatorMapping.class)
-                        .member("value", subTypeName)
-                        .member("schema", mappingClass)
+                    var discriminatorMappingAnn = AnnotationValue.builder(DiscriminatorMapping.class)
+                        .member(PROP_VALUE, subTypeName)
+                        .member(PROP_SCHEMA, mappingClass)
                         .build();
-                    discriminatorMappings.add(discriminatorMapping);
+                    discriminatorMappingAnns.add(discriminatorMappingAnn);
                     discriminatorClasses.add(mappingClass);
                 }
             }
 
             element.annotate(Schema.class, builder -> {
-                builder.member("oneOf", discriminatorClasses.toArray(new AnnotationClassValue[0]));
+                builder.member(PROP_ONE_OF, discriminatorClasses.toArray(new AnnotationClassValue[0]));
                 builder.member("discriminatorProperty", discriminatorProp);
-                builder.member("discriminatorMapping", discriminatorMappings.toArray(new AnnotationValue<?>[0]));
+                builder.member("discriminatorMapping", discriminatorMappingAnns.toArray(new AnnotationValue<?>[0]));
             });
         }
     }

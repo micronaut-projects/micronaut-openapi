@@ -157,6 +157,27 @@ import static io.micronaut.openapi.visitor.SchemaUtils.processExtensions;
 import static io.micronaut.openapi.visitor.SchemaUtils.setAllowableValues;
 import static io.micronaut.openapi.visitor.SchemaUtils.setSpecVersion;
 import static io.micronaut.openapi.visitor.Utils.isOpenapi31;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_$REF;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_ALLOWABLE_VALUES;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_ALL_OF;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_ANY_OF;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_DEFAULT;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_DEFAULT_VALUE;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_DESCRIPTION;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_ENUM;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_EXAMPLE;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_EXAMPLES;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_EXTENSIONS;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_HIDDEN;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_IN;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_NAME;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_ONE_FORMAT;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_ONE_OF;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_ONE_TYPES;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_REF;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_SCHEMA;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_TYPE;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_VALUE;
 import static java.util.stream.Collectors.toMap;
 
 /**
@@ -341,15 +362,15 @@ abstract class AbstractOpenApiVisitor {
 
             String resultPath = replacePlaceholders(result.toString(), context);
 
-            if (!resultPath.startsWith("/") && !resultPath.startsWith("$")) {
-                resultPath = "/" + resultPath;
+            if (!resultPath.startsWith(StringUtil.SLASH) && !resultPath.startsWith(StringUtil.DOLLAR)) {
+                resultPath = StringUtil.SLASH + resultPath;
             }
             String contextPath = ConfigUtils.getConfigProperty(MICRONAUT_SERVER_CONTEXT_PATH, context);
             if (StringUtils.isNotEmpty(contextPath)) {
-                if (!contextPath.startsWith("/") && !contextPath.startsWith("$")) {
-                    contextPath = "/" + contextPath;
+                if (!contextPath.startsWith(StringUtil.SLASH) && !contextPath.startsWith(StringUtil.DOLLAR)) {
+                    contextPath = StringUtil.SLASH + contextPath;
                 }
-                if (contextPath.endsWith("/")) {
+                if (contextPath.endsWith(StringUtil.SLASH)) {
                     contextPath = contextPath.substring(0, contextPath.length() - 1);
                 }
                 resultPath = contextPath + resultPath;
@@ -426,7 +447,7 @@ abstract class AbstractOpenApiVisitor {
             if (value instanceof AnnotationValue<?> av) {
                 if (av.getAnnotationName().equals(io.swagger.v3.oas.annotations.media.ArraySchema.class.getName())) {
                     final Map<CharSequence, Object> valueMap = resolveArraySchemaAnnotationValues(context, av, jsonViewClass);
-                    newValues.put("schema", valueMap);
+                    newValues.put(PROP_SCHEMA, valueMap);
                 } else {
                     final Map<CharSequence, Object> valueMap = resolveAnnotationValues(context, av, jsonViewClass);
                     newValues.put(key, valueMap);
@@ -460,57 +481,57 @@ abstract class AbstractOpenApiVisitor {
                                 for (Object o : a) {
                                     processExtensions(extensions, (AnnotationValue<Extension>) o);
                                 }
-                                newValues.put("extensions", extensions);
+                                newValues.put(PROP_EXTENSIONS, extensions);
                             } else if (Encoding.class.getName().equals(annotationName)) {
-                                Map<String, Object> encodings = annotationValueArrayToSubmap(a, "name", context, null);
+                                Map<String, Object> encodings = annotationValueArrayToSubmap(a, PROP_NAME, context, null);
                                 newValues.put(key, encodings);
                             } else if (Content.class.getName().equals(annotationName)) {
                                 Map<String, Object> mediaTypes = annotationValueArrayToSubmap(a, "mediaType", context, jsonViewClass);
                                 newValues.put(key, mediaTypes);
                             } else if (Link.class.getName().equals(annotationName) || Header.class.getName().equals(annotationName)) {
-                                Map<String, Object> linksOrHeaders = annotationValueArrayToSubmap(a, "name", context, jsonViewClass);
+                                Map<String, Object> linksOrHeaders = annotationValueArrayToSubmap(a, PROP_NAME, context, jsonViewClass);
                                 var newLinksOrHeaders = new HashMap<String, Object>(linksOrHeaders.size());
                                 for (var linkOrHeaderEntry : linksOrHeaders.entrySet()) {
                                     var linkOrHeaderMap = (Map<String, Object>) linkOrHeaderEntry.getValue();
-                                    if (linkOrHeaderMap.containsKey("hidden") && (Boolean) linkOrHeaderMap.get("hidden")) {
+                                    if (linkOrHeaderMap.containsKey(PROP_HIDDEN) && (Boolean) linkOrHeaderMap.get(PROP_HIDDEN)) {
                                         continue;
                                     }
-                                    if (linkOrHeaderMap.containsKey("ref")) {
-                                        linkOrHeaderMap.put("$ref", linkOrHeaderMap.remove("ref"));
+                                    if (linkOrHeaderMap.containsKey(PROP_REF)) {
+                                        linkOrHeaderMap.put(PROP_$REF, linkOrHeaderMap.remove(PROP_REF));
                                     }
-                                    if (linkOrHeaderMap.containsKey("schema")) {
-                                        var schemaMap = (Map<String, Object>) linkOrHeaderMap.get("schema");
-                                        if (schemaMap.containsKey("ref")) {
-                                            Object ref = schemaMap.get("ref");
+                                    if (linkOrHeaderMap.containsKey(PROP_SCHEMA)) {
+                                        var schemaMap = (Map<String, Object>) linkOrHeaderMap.get(PROP_SCHEMA);
+                                        if (schemaMap.containsKey(PROP_REF)) {
+                                            Object ref = schemaMap.get(PROP_REF);
                                             schemaMap.clear();
-                                            schemaMap.put("$ref", ref);
+                                            schemaMap.put(PROP_$REF, ref);
                                         }
-                                        if (schemaMap.containsKey("defaultValue")) {
-                                            schemaMap.put("default", schemaMap.remove("defaultValue"));
+                                        if (schemaMap.containsKey(PROP_DEFAULT_VALUE)) {
+                                            schemaMap.put(PROP_DEFAULT, schemaMap.remove(PROP_DEFAULT_VALUE));
                                         }
-                                        if (schemaMap.containsKey("allowableValues")) {
+                                        if (schemaMap.containsKey(PROP_ALLOWABLE_VALUES)) {
                                             // The key in the generated openapi needs to be "enum"
-                                            schemaMap.put("enum", schemaMap.remove("allowableValues"));
+                                            schemaMap.put(PROP_ENUM, schemaMap.remove(PROP_ALLOWABLE_VALUES));
                                         }
                                     }
-                                    if (linkOrHeaderMap.containsKey("example")) {
-                                        var headerExample = linkOrHeaderMap.get("example");
+                                    if (linkOrHeaderMap.containsKey(PROP_EXAMPLE)) {
+                                        var headerExample = linkOrHeaderMap.get(PROP_EXAMPLE);
                                         if (headerExample != null) {
                                             try {
-                                                var headerSchema = (Map<String, Object>) linkOrHeaderMap.get("schema");
+                                                var headerSchema = (Map<String, Object>) linkOrHeaderMap.get(PROP_SCHEMA);
                                                 String type = null;
                                                 String format = null;
                                                 if (headerSchema != null) {
-                                                    type = (String) headerSchema.get("type");
-                                                    format = (String) headerSchema.get("format");
+                                                    type = (String) headerSchema.get(PROP_TYPE);
+                                                    format = (String) headerSchema.get(PROP_ONE_FORMAT);
                                                     if (type == null) {
-                                                        type = SchemaUtils.getType(type, (Collection<String>) headerSchema.get("types"));
+                                                        type = SchemaUtils.getType(type, (Collection<String>) headerSchema.get(PROP_ONE_TYPES));
                                                     }
                                                 }
                                                 var headerExampleStr = OpenApiUtils.getConvertJsonMapper().writeValueAsString(headerExample);
                                                 // need to set placeholders to set correct values and types to example field
                                                 headerExampleStr = replacePlaceholders(headerExampleStr, context);
-                                                linkOrHeaderMap.put("example", ConvertUtils.parseByTypeAndFormat(headerExampleStr, type, format, context, false));
+                                                linkOrHeaderMap.put(PROP_EXAMPLE, ConvertUtils.parseByTypeAndFormat(headerExampleStr, type, format, context, false));
                                             } catch (JsonProcessingException e) {
                                                 // do nothing
                                             }
@@ -520,29 +541,29 @@ abstract class AbstractOpenApiVisitor {
                                 }
                                 newValues.put(key, newLinksOrHeaders);
                             } else if (LinkParameter.class.getName().equals(annotationName)) {
-                                Map<String, String> params = toTupleSubMap(a, "name", "expression");
+                                Map<String, String> params = toTupleSubMap(a, PROP_NAME, "expression");
                                 newValues.put(key, params);
                             } else if (OAuthScope.class.getName().equals(annotationName)) {
-                                Map<String, String> params = toTupleSubMap(a, "name", "description");
+                                Map<String, String> params = toTupleSubMap(a, PROP_NAME, PROP_DESCRIPTION);
                                 newValues.put(key, params);
                             } else if (ApiResponse.class.getName().equals(annotationName)) {
                                 var responses = new LinkedHashMap<String, Map<CharSequence, Object>>();
                                 for (Object o : a) {
                                     var sv = (AnnotationValue<ApiResponse>) o;
-                                    String name = sv.stringValue("responseCode").orElse("default");
+                                    String name = sv.stringValue("responseCode").orElse(PROP_DEFAULT);
                                     Map<CharSequence, Object> map = toValueMap(sv.getValues(), context, jsonViewClass);
-                                    if (map.containsKey("ref")) {
-                                        Object ref = map.get("ref");
+                                    if (map.containsKey(PROP_REF)) {
+                                        Object ref = map.get(PROP_REF);
                                         map.clear();
-                                        map.put("$ref", ref);
+                                        map.put(PROP_$REF, ref);
                                     }
 
                                     try {
-                                        if (!map.containsKey("description")) {
-                                            map.put("description", name.equals("default") ? "OK response" : HttpStatus.valueOf(Integer.parseInt(name)).getReason());
+                                        if (!map.containsKey(PROP_DESCRIPTION)) {
+                                            map.put(PROP_DESCRIPTION, name.equals(PROP_DEFAULT) ? "OK response" : HttpStatus.valueOf(Integer.parseInt(name)).getReason());
                                         }
                                     } catch (Exception e) {
-                                        map.put("description", "Response " + name);
+                                        map.put(PROP_DESCRIPTION, "Response " + name);
                                     }
 
                                     responses.put(name, map);
@@ -552,12 +573,12 @@ abstract class AbstractOpenApiVisitor {
                                 var examples = new LinkedHashMap<String, Map<CharSequence, Object>>();
                                 for (Object o : a) {
                                     var sv = (AnnotationValue<ExampleObject>) o;
-                                    String name = sv.stringValue("name").orElse("example");
+                                    String name = sv.stringValue(PROP_NAME).orElse(PROP_EXAMPLE);
                                     Map<CharSequence, Object> map = toValueMap(sv.getValues(), context, null);
-                                    if (map.containsKey("ref")) {
-                                        Object ref = map.get("ref");
+                                    if (map.containsKey(PROP_REF)) {
+                                        Object ref = map.get(PROP_REF);
                                         map.clear();
-                                        map.put("$ref", ref);
+                                        map.put(PROP_$REF, ref);
                                     }
                                     examples.put(name, map);
                                 }
@@ -574,16 +595,16 @@ abstract class AbstractOpenApiVisitor {
                                 var variables = new LinkedHashMap<String, Map<CharSequence, Object>>();
                                 for (Object o : a) {
                                     var sv = (AnnotationValue<ServerVariable>) o;
-                                    Optional<String> n = sv.stringValue("name");
+                                    Optional<String> n = sv.stringValue(PROP_NAME);
                                     n.ifPresent(name -> {
                                         Map<CharSequence, Object> map = toValueMap(sv.getValues(), context, null);
-                                        Object dv = map.get("defaultValue");
+                                        Object dv = map.get(PROP_DEFAULT_VALUE);
                                         if (dv != null) {
-                                            map.put("default", dv);
+                                            map.put(PROP_DEFAULT, dv);
                                         }
-                                        if (map.containsKey("allowableValues")) {
+                                        if (map.containsKey(PROP_ALLOWABLE_VALUES)) {
                                             // The key in the generated openapi needs to be "enum"
-                                            map.put("enum", map.remove("allowableValues"));
+                                            map.put(PROP_ENUM, map.remove(PROP_ALLOWABLE_VALUES));
                                         }
                                         variables.put(name, map);
                                     });
@@ -595,8 +616,8 @@ abstract class AbstractOpenApiVisitor {
                                 for (Object o : a) {
                                     var dv = (AnnotationValue<DiscriminatorMapping>) o;
                                     final Map<CharSequence, Object> valueMap = resolveAnnotationValues(context, dv, null);
-                                    mappings.put(valueMap.get("value").toString(), valueMap.get("$ref").toString());
-                                    var extValue = (Map<String, Object>) valueMap.get("extensions");
+                                    mappings.put(valueMap.get(PROP_VALUE).toString(), valueMap.get(PROP_$REF).toString());
+                                    var extValue = (Map<String, Object>) valueMap.get(PROP_EXTENSIONS);
                                     if (extValue != null) {
                                         extensions.putAll(extValue);
                                     }
@@ -604,7 +625,7 @@ abstract class AbstractOpenApiVisitor {
                                 final Map<String, Object> discriminatorMap = getDiscriminatorMap(newValues);
                                 discriminatorMap.put("mapping", mappings);
                                 if (CollectionUtils.isNotEmpty(extensions)) {
-                                    discriminatorMap.put("extensions", extensions);
+                                    discriminatorMap.put(PROP_EXTENSIONS, extensions);
                                 }
                                 newValues.put("discriminator", discriminatorMap);
                             } else {
@@ -626,8 +647,8 @@ abstract class AbstractOpenApiVisitor {
                                     newValues.put(key, list);
                                 }
                             }
-                        } else if (key.equals("types") && Utils.isOpenapi31()) {
-                            newValues.put("type", value);
+                        } else if (key.equals(PROP_ONE_TYPES) && Utils.isOpenapi31()) {
+                            newValues.put(PROP_TYPE, value);
                         } else {
                             newValues.put(key, value);
                         }
@@ -640,8 +661,8 @@ abstract class AbstractOpenApiVisitor {
                         // TODO
 //                    } else if (AdditionalPropertiesValue.USE_ADDITIONAL_PROPERTIES_ANNOTATION.toString().equals(value.toString())) {
                     }
-                } else if (key.equals("types") && Utils.isOpenapi31()) {
-                    newValues.put("type", value);
+                } else if (key.equals(PROP_ONE_TYPES) && Utils.isOpenapi31()) {
+                    newValues.put(PROP_TYPE, value);
                 } else if (key.equals("discriminatorProperty")) {
                     final Map<String, Object> discriminatorMap = getDiscriminatorMap(newValues);
                     discriminatorMap.put("propertyName", parseJsonString(value).orElse(value));
@@ -684,8 +705,8 @@ abstract class AbstractOpenApiVisitor {
                             newValues.put(key, encodingStyle.toString());
                         }
                     }
-                } else if (key.equals("ref")) {
-                    newValues.put("$ref", value);
+                } else if (key.equals(PROP_REF)) {
+                    newValues.put(PROP_$REF, value);
                 } else if (key.equals("accessMode")) {
                     if (io.swagger.v3.oas.annotations.media.Schema.AccessMode.READ_ONLY.toString().equals(value)) {
                         newValues.put("readOnly", Boolean.TRUE);
@@ -718,13 +739,13 @@ abstract class AbstractOpenApiVisitor {
         var arraySchemaMap = new HashMap<CharSequence, Object>(10);
         // properties
         av.get("arraySchema", AnnotationValue.class).ifPresent(annotationValue ->
-            processAnnotationValue(context, (AnnotationValue<?>) annotationValue, arraySchemaMap, List.of("ref", "implementation"), Schema.class, null)
+            processAnnotationValue(context, (AnnotationValue<?>) annotationValue, arraySchemaMap, List.of(PROP_REF, "implementation"), Schema.class, null)
         );
         // items
-        av.get("schema", AnnotationValue.class).ifPresent(annotationValue -> {
+        av.get(PROP_SCHEMA, AnnotationValue.class).ifPresent(annotationValue -> {
             Optional<String> impl = annotationValue.stringValue("implementation");
-            Optional<String> type = annotationValue.stringValue("type");
-            Optional<String> format = annotationValue.stringValue("format");
+            Optional<String> type = annotationValue.stringValue(PROP_TYPE);
+            Optional<String> format = annotationValue.stringValue(PROP_ONE_FORMAT);
             ClassElement classElement = null;
             PrimitiveType primitiveType = null;
             if (impl.isPresent()) {
@@ -745,7 +766,7 @@ abstract class AbstractOpenApiVisitor {
                 } else {
                     // For primitive type, just copy description field is present.
                     final Schema<?> items = setSpecVersion(primitiveType.createProperty());
-                    items.setDescription((String) annotationValue.stringValue("description").orElse(null));
+                    items.setDescription((String) annotationValue.stringValue(PROP_DESCRIPTION).orElse(null));
                     final ArraySchema schema = SchemaUtils.arraySchema(items);
                     schemaToValueMap(arraySchemaMap, schema);
                 }
@@ -754,7 +775,7 @@ abstract class AbstractOpenApiVisitor {
             }
         });
         // other properties (minItems,...)
-        processAnnotationValue(context, av, arraySchemaMap, List.of("schema", "arraySchema"), ArraySchema.class, null);
+        processAnnotationValue(context, av, arraySchemaMap, List.of(PROP_SCHEMA, "arraySchema"), ArraySchema.class, null);
         return arraySchemaMap;
     }
 
@@ -764,7 +785,7 @@ abstract class AbstractOpenApiVisitor {
         final String annotationName = av.getAnnotationName();
         if (Parameter.class.getName().equals(annotationName)) {
             Utils.normalizeEnumValues(valueMap, CollectionUtils.mapOf(
-                "in", ParameterIn.class,
+                PROP_IN, ParameterIn.class,
                 "style", ParameterStyle.class
             ));
         }
@@ -827,10 +848,10 @@ abstract class AbstractOpenApiVisitor {
                 }
                 isSubstitudedType = true;
             } else {
-                String typeFromAnn = schemaAnnotationValue.stringValue("type").orElse(null);
+                String typeFromAnn = schemaAnnotationValue.stringValue(PROP_TYPE).orElse(null);
                 List<String> schemaTypes;
                 if (Utils.isOpenapi31() && StringUtils.isEmpty(typeFromAnn)) {
-                    schemaTypes = Arrays.asList(schemaAnnotationValue.stringValues("types"));
+                    schemaTypes = Arrays.asList(schemaAnnotationValue.stringValues(PROP_ONE_TYPES));
                 } else {
                     schemaTypes = Collections.singletonList(typeFromAnn);
                 }
@@ -1116,7 +1137,7 @@ abstract class AbstractOpenApiVisitor {
     private void handleUnwrapped(VisitorContext context, Element element, ClassElement elementType, Schema<?> parentSchema, AnnotationValue<JsonUnwrapped> uw) {
         Map<String, Schema> schemas = SchemaUtils.resolveSchemas(Utils.resolveOpenApi(context));
         ClassElement customElementType = getCustomSchema(elementType.getName(), elementType.getTypeArguments(), context);
-        String schemaName = stringValue(element, io.swagger.v3.oas.annotations.media.Schema.class, "name")
+        String schemaName = stringValue(element, io.swagger.v3.oas.annotations.media.Schema.class, PROP_NAME)
             .orElse(computeDefaultSchemaName(null, customElementType != null ? customElementType : elementType, elementType.getTypeArguments(), context, null));
         Schema<?> wrappedPropertySchema = schemas.get(schemaName);
         Map<String, Schema> properties = wrappedPropertySchema.getProperties();
@@ -1196,10 +1217,10 @@ abstract class AbstractOpenApiVisitor {
             Schema<?> propertySchemaFinal = propertySchema;
             addProperty(parentSchema, propertyName, propertySchema, required);
             if (schemaAnn != null) {
-                schemaAnn.stringValue("defaultValue")
+                schemaAnn.stringValue(PROP_DEFAULT_VALUE)
                     .ifPresent(value -> {
-                        String elType = schemaAnn.stringValue("type").orElse(null);
-                        String elFormat = schemaAnn.stringValue("format").orElse(null);
+                        String elType = schemaAnn.stringValue(PROP_TYPE).orElse(null);
+                        String elFormat = schemaAnn.stringValue(PROP_ONE_FORMAT).orElse(null);
                         if (elType == null && elementType != null) {
                             Pair<String, String> typeAndFormat;
                             if (elementType instanceof EnumElement enumEl) {
@@ -1245,13 +1266,13 @@ abstract class AbstractOpenApiVisitor {
         String name = Optional.ofNullable(propertySchema.getName()).orElse(element.getName());
 
         if (isAnnotationPresent(element, io.swagger.v3.oas.annotations.media.Schema.class)) {
-            Optional<String> nameFromSchema = stringValue(element, io.swagger.v3.oas.annotations.media.Schema.class, "name");
+            Optional<String> nameFromSchema = stringValue(element, io.swagger.v3.oas.annotations.media.Schema.class, PROP_NAME);
             if (nameFromSchema.isPresent()) {
                 return nameFromSchema.get();
             }
         }
         if (isAnnotationPresent(element, JsonProperty.class)) {
-            return stringValue(element, JsonProperty.class, "value").orElse(name);
+            return stringValue(element, JsonProperty.class, PROP_VALUE).orElse(name);
         }
         if (classElement != null && classElement.hasAnnotation(JsonNaming.class)) {
             // INVESTIGATE: "classValue" doesn't work in this case
@@ -1299,7 +1320,7 @@ abstract class AbstractOpenApiVisitor {
             // Apply @Schema annotation only if not $ref since for $ref schemas
             // we already populated values from right @Schema annotation in previous steps
             schemaToBind = bindSchemaAnnotationValue(context, element, schemaToBind, schemaAnn, jsonViewClass);
-            Optional<String> schemaName = schemaAnn.stringValue("name");
+            Optional<String> schemaName = schemaAnn.stringValue(PROP_NAME);
             if (schemaName.isPresent()) {
                 schemaToBind.setName(schemaName.get());
             }
@@ -1315,11 +1336,11 @@ abstract class AbstractOpenApiVisitor {
         var arraySchemaAnn = getAnnotation(element, io.swagger.v3.oas.annotations.media.ArraySchema.class);
         if (arraySchemaAnn != null) {
             schemaToBind = bindArraySchemaAnnotationValue(context, element, schemaToBind, arraySchemaAnn, jsonViewClass);
-            arraySchemaAnn.stringValue("name").ifPresent(schemaToBind::setName);
+            arraySchemaAnn.stringValue(PROP_NAME).ifPresent(schemaToBind::setName);
         }
 
 //        Schema finalSchemaToBind = schemaToBind;
-        processJavaxValidationAnnotations(element, elementType, schemaToBind);
+        processJakartaValidationAnnotations(element, elementType, schemaToBind);
 
         final ComposedSchema composedSchema;
         final Schema<?> topLevelSchema;
@@ -1340,7 +1361,7 @@ abstract class AbstractOpenApiVisitor {
             topLevelSchema.setDeprecated(true);
             notOnlyRef = true;
         }
-        final String defaultValue = stringValue(element, Bindable.class, "defaultValue").orElse(null);
+        final String defaultValue = stringValue(element, Bindable.class, PROP_DEFAULT_VALUE).orElse(null);
         if (defaultValue != null && schemaToBind.getDefault() == null) {
             setDefaultValueObject(schemaToBind, defaultValue, elementType, schemaToBind.getType(), schemaToBind.getFormat(), true, context);
             notOnlyRef = true;
@@ -1352,7 +1373,7 @@ abstract class AbstractOpenApiVisitor {
             SchemaUtils.setNullable(topLevelSchema);
             notOnlyRef = true;
         }
-        final String defaultJacksonValue = stringValue(element, JsonProperty.class, "defaultValue").orElse(null);
+        final String defaultJacksonValue = stringValue(element, JsonProperty.class, PROP_DEFAULT_VALUE).orElse(null);
         if (defaultJacksonValue != null && schemaToBind.getDefault() == null) {
             setDefaultValueObject(topLevelSchema, defaultJacksonValue, elementType, schemaToBind.getType(), schemaToBind.getFormat(), false, context);
             notOnlyRef = true;
@@ -1397,7 +1418,7 @@ abstract class AbstractOpenApiVisitor {
         return originalSchema;
     }
 
-    protected void processJavaxValidationAnnotations(Element element, ClassElement elementType, Schema<?> schemaToBind) {
+    protected void processJakartaValidationAnnotations(Element element, ClassElement elementType, Schema<?> schemaToBind) {
 
         final boolean isIterableOrMap = elementType.isIterable() || elementType.isAssignable(Map.class);
 
@@ -1436,14 +1457,14 @@ abstract class AbstractOpenApiVisitor {
 
                 findAnnotation(element, "javax.validation.constraints.Size$List")
                     .ifPresent(listAnn -> {
-                        for (AnnotationValue<?> ann : listAnn.getAnnotations("value")) {
+                        for (AnnotationValue<?> ann : listAnn.getAnnotations(PROP_VALUE)) {
                             ann.intValue("min").ifPresent(schemaToBind::setMinLength);
                             ann.intValue("max").ifPresent(schemaToBind::setMaxLength);
                         }
                     });
                 findAnnotation(element, "jakarta.validation.constraints.Size$List")
                     .ifPresent(listAnn -> {
-                        for (AnnotationValue<?> ann : listAnn.getAnnotations("value")) {
+                        for (AnnotationValue<?> ann : listAnn.getAnnotations(PROP_VALUE)) {
                             ann.intValue("min").ifPresent(schemaToBind::setMinLength);
                             ann.intValue("max").ifPresent(schemaToBind::setMaxLength);
                         }
@@ -1471,14 +1492,14 @@ abstract class AbstractOpenApiVisitor {
 
             findAnnotation(element, "javax.validation.constraints.Min$List")
                 .ifPresent(listAnn -> {
-                    for (AnnotationValue<?> ann : listAnn.getAnnotations("value")) {
+                    for (AnnotationValue<?> ann : listAnn.getAnnotations(PROP_VALUE)) {
                         ann.getValue(BigDecimal.class)
                             .ifPresent(schemaToBind::setMinimum);
                     }
                 });
             findAnnotation(element, "jakarta.validation.constraints.Min$List")
                 .ifPresent(listAnn -> {
-                    for (AnnotationValue<?> ann : listAnn.getAnnotations("value")) {
+                    for (AnnotationValue<?> ann : listAnn.getAnnotations(PROP_VALUE)) {
                         ann.getValue(BigDecimal.class)
                             .ifPresent(schemaToBind::setMinimum);
                     }
@@ -1486,14 +1507,14 @@ abstract class AbstractOpenApiVisitor {
 
             findAnnotation(element, "javax.validation.constraints.Max$List")
                 .ifPresent(listAnn -> {
-                    for (AnnotationValue<?> ann : listAnn.getAnnotations("value")) {
+                    for (AnnotationValue<?> ann : listAnn.getAnnotations(PROP_VALUE)) {
                         ann.getValue(BigDecimal.class)
                             .ifPresent(schemaToBind::setMaximum);
                     }
                 });
             findAnnotation(element, "jakarta.validation.constraints.Max$List")
                 .ifPresent(listAnn -> {
-                    for (AnnotationValue<?> ann : listAnn.getAnnotations("value")) {
+                    for (AnnotationValue<?> ann : listAnn.getAnnotations(PROP_VALUE)) {
                         ann.getValue(BigDecimal.class)
                             .ifPresent(schemaToBind::setMaximum);
                     }
@@ -1501,14 +1522,14 @@ abstract class AbstractOpenApiVisitor {
 
             findAnnotation(element, "javax.validation.constraints.DecimalMin$List")
                 .ifPresent(listAnn -> {
-                    for (AnnotationValue<?> ann : listAnn.getAnnotations("value")) {
+                    for (AnnotationValue<?> ann : listAnn.getAnnotations(PROP_VALUE)) {
                         ann.getValue(BigDecimal.class)
                             .ifPresent(schemaToBind::setMinimum);
                     }
                 });
             findAnnotation(element, "jakarta.validation.constraints.DecimalMin$List")
                 .ifPresent(listAnn -> {
-                    for (AnnotationValue<?> ann : listAnn.getAnnotations("value")) {
+                    for (AnnotationValue<?> ann : listAnn.getAnnotations(PROP_VALUE)) {
                         ann.getValue(BigDecimal.class)
                             .ifPresent(schemaToBind::setMinimum);
                     }
@@ -1516,14 +1537,14 @@ abstract class AbstractOpenApiVisitor {
 
             findAnnotation(element, "javax.validation.constraints.DecimalMax$List")
                 .ifPresent(listAnn -> {
-                    for (AnnotationValue<?> ann : listAnn.getAnnotations("value")) {
+                    for (AnnotationValue<?> ann : listAnn.getAnnotations(PROP_VALUE)) {
                         ann.getValue(BigDecimal.class)
                             .ifPresent(schemaToBind::setMaximum);
                     }
                 });
             findAnnotation(element, "jakarta.validation.constraints.DecimalMax$List")
                 .ifPresent(listAnn -> {
-                    for (AnnotationValue<?> ann : listAnn.getAnnotations("value")) {
+                    for (AnnotationValue<?> ann : listAnn.getAnnotations(PROP_VALUE)) {
                         ann.getValue(BigDecimal.class)
                             .ifPresent(schemaToBind::setMaximum);
                     }
@@ -1532,7 +1553,7 @@ abstract class AbstractOpenApiVisitor {
             findAnnotation(element, "javax.validation.constraints.Email$List")
                 .ifPresent(listAnn -> {
                     schemaToBind.setFormat(PrimitiveType.EMAIL.getCommonName());
-                    for (AnnotationValue<?> ann : listAnn.getAnnotations("value")) {
+                    for (AnnotationValue<?> ann : listAnn.getAnnotations(PROP_VALUE)) {
                         ann.stringValue("regexp")
                             .ifPresent(schemaToBind::setPattern);
                     }
@@ -1540,7 +1561,7 @@ abstract class AbstractOpenApiVisitor {
             findAnnotation(element, "jakarta.validation.constraints.Email$List")
                 .ifPresent(listAnn -> {
                     schemaToBind.setFormat(PrimitiveType.EMAIL.getCommonName());
-                    for (AnnotationValue<?> ann : listAnn.getAnnotations("value")) {
+                    for (AnnotationValue<?> ann : listAnn.getAnnotations(PROP_VALUE)) {
                         ann.stringValue("regexp")
                             .ifPresent(schemaToBind::setPattern);
                     }
@@ -1548,14 +1569,14 @@ abstract class AbstractOpenApiVisitor {
 
             findAnnotation(element, "javax.validation.constraints.Pattern$List")
                 .ifPresent(listAnn -> {
-                    for (AnnotationValue<?> ann : listAnn.getAnnotations("value")) {
+                    for (AnnotationValue<?> ann : listAnn.getAnnotations(PROP_VALUE)) {
                         ann.stringValue("regexp")
                             .ifPresent(schemaToBind::setPattern);
                     }
                 });
             findAnnotation(element, "jakarta.validation.constraints.Pattern$List")
                 .ifPresent(listAnn -> {
-                    for (AnnotationValue<?> ann : listAnn.getAnnotations("value")) {
+                    for (AnnotationValue<?> ann : listAnn.getAnnotations(PROP_VALUE)) {
                         ann.stringValue("regexp")
                             .ifPresent(schemaToBind::setPattern);
                     }
@@ -1582,14 +1603,14 @@ abstract class AbstractOpenApiVisitor {
                           @NonNull AnnotationValue<io.swagger.v3.oas.annotations.media.Schema> schemaAnn) {
 
         Map<CharSequence, Object> annValues = schemaAnn.getValues();
-        if (annValues.containsKey("name")) {
-            schemaToBind.setName((String) annValues.get("name"));
+        if (annValues.containsKey(PROP_NAME)) {
+            schemaToBind.setName((String) annValues.get(PROP_NAME));
         }
         if (annValues.containsKey("title")) {
             schemaToBind.setTitle((String) annValues.get("title"));
         }
-        if (annValues.containsKey("ref")) {
-            schemaToBind.set$ref((String) annValues.get("ref"));
+        if (annValues.containsKey(PROP_REF)) {
+            schemaToBind.set$ref((String) annValues.get(PROP_REF));
         }
         var schemaMultipleOf = (Double) annValues.get("multipleOf");
         if (schemaMultipleOf != null) {
@@ -1634,12 +1655,12 @@ abstract class AbstractOpenApiVisitor {
             var requiredProperties = (String[]) annValues.get("requiredProperties");
             schemaToBind.setRequired(new ArrayList<>(Arrays.asList(requiredProperties)));
         }
-        if (annValues.containsKey("description")) {
-            schemaToBind.setDescription((String) annValues.get("description"));
+        if (annValues.containsKey(PROP_DESCRIPTION)) {
+            schemaToBind.setDescription((String) annValues.get(PROP_DESCRIPTION));
         }
         String format = null;
-        if (annValues.containsKey("format")) {
-            format = (String) annValues.get("format");
+        if (annValues.containsKey(PROP_ONE_FORMAT)) {
+            format = (String) annValues.get(PROP_ONE_FORMAT);
             schemaToBind.setFormat(format);
         }
         if (annValues.containsKey("nullable")) {
@@ -1676,8 +1697,8 @@ abstract class AbstractOpenApiVisitor {
             schemaToBind.setDeprecated(true);
         }
         String type = null;
-        if (annValues.containsKey("type")) {
-            type = (String) annValues.get("type");
+        if (annValues.containsKey(PROP_TYPE)) {
+            type = (String) annValues.get(PROP_TYPE);
             schemaToBind.setType(type);
         }
 
@@ -1694,11 +1715,11 @@ abstract class AbstractOpenApiVisitor {
         var elType = type != null ? type : typeAndFormat != null ? typeAndFormat.getFirst() : null;
         var elFormat = format != null ? format : typeAndFormat != null ? typeAndFormat.getSecond() : null;
 
-        var allowableValues = schemaAnn.stringValues("allowableValues");
+        var allowableValues = schemaAnn.stringValues(PROP_ALLOWABLE_VALUES);
         setAllowableValues(schemaToBind, allowableValues, element, elType, elFormat, context);
 
         if (Utils.isOpenapi31()) {
-            var schemaExamples = (String[]) annValues.get("examples");
+            var schemaExamples = (String[]) annValues.get(PROP_EXAMPLES);
             if (ArrayUtils.isNotEmpty(schemaExamples)) {
                 for (var schemaExample : schemaExamples) {
                     // need to set placeholders to set correct values and types to example field
@@ -1707,7 +1728,7 @@ abstract class AbstractOpenApiVisitor {
                 }
             }
         } else {
-            var schemaExample = (String) annValues.get("example");
+            var schemaExample = (String) annValues.get(PROP_EXAMPLE);
             if (StringUtils.isNotEmpty(schemaExample)) {
                 // need to set placeholders to set correct values and types to example field
                 schemaExample = replacePlaceholders(schemaExample, context);
@@ -1716,7 +1737,7 @@ abstract class AbstractOpenApiVisitor {
         }
 
 
-        var schemaDefaultValue = (String) annValues.get("defaultValue");
+        var schemaDefaultValue = (String) annValues.get(PROP_DEFAULT_VALUE);
         if (schemaDefaultValue != null) {
             setDefaultValueObject(schemaToBind, schemaDefaultValue, classEl, schemaToBind.getType(), schemaToBind.getFormat(), false, context);
         }
@@ -1731,8 +1752,8 @@ abstract class AbstractOpenApiVisitor {
                 var mappings = new HashMap<String, String>();
                 for (var discriminatorMappingAnn : discriminatorMapping) {
                     final Map<CharSequence, Object> valueMap = resolveAnnotationValues(context, discriminatorMappingAnn, null);
-                    mappings.put(valueMap.get("value").toString(), valueMap.get("$ref").toString());
-                    var extValue = (Map<String, Object>) valueMap.get("extensions");
+                    mappings.put(valueMap.get(PROP_VALUE).toString(), valueMap.get(PROP_$REF).toString());
+                    var extValue = (Map<String, Object>) valueMap.get(PROP_EXTENSIONS);
                     if (extValue != null) {
                         extensions.putAll(extValue);
                     }
@@ -1744,8 +1765,8 @@ abstract class AbstractOpenApiVisitor {
             }
         }
 
-        if (annValues.containsKey("extensions")) {
-            var extensionAnns = (AnnotationValue<Extension>[]) annValues.get("extensions");
+        if (annValues.containsKey(PROP_EXTENSIONS)) {
+            var extensionAnns = (AnnotationValue<Extension>[]) annValues.get(PROP_EXTENSIONS);
             var extensions = new HashMap<String, Object>();
             for (var extensionAnn : extensionAnns) {
                 processExtensions(extensions, extensionAnn);
@@ -1776,8 +1797,8 @@ abstract class AbstractOpenApiVisitor {
                 }
             }
 
-            if (annValues.containsKey("types")) {
-                schemaToBind.setTypes(new HashSet<>((Collection<String>) annValues.get("types")));
+            if (annValues.containsKey(PROP_ONE_TYPES)) {
+                schemaToBind.setTypes(new HashSet<>((Collection<String>) annValues.get(PROP_ONE_TYPES)));
             }
             if (annValues.containsKey("$id")) {
                 schemaToBind.set$id((String) annValues.get("$id"));
@@ -1831,9 +1852,9 @@ abstract class AbstractOpenApiVisitor {
     private void processClassValues(Schema<?> schemaToBind, Map<CharSequence, Object> annValues, List<MediaType> mediaTypes, VisitorContext context, @Nullable ClassElement jsonViewClass) {
         var openApi = Utils.resolveOpenApi(context);
         parseAndSetClassValue("not", Schema::not, annValues, schemaToBind, context);
-        processSchemasArray(schemaToBind, openApi, "allOf", annValues, mediaTypes, jsonViewClass, Schema::getAllOf, Schema::addAllOfItem, context);
-        processSchemasArray(schemaToBind, openApi, "anyOf", annValues, mediaTypes, jsonViewClass, Schema::getAnyOf, Schema::addAnyOfItem, context);
-        processSchemasArray(schemaToBind, openApi, "oneOf", annValues, mediaTypes, jsonViewClass, Schema::getOneOf, Schema::addOneOfItem, context);
+        processSchemasArray(schemaToBind, openApi, PROP_ALL_OF, annValues, mediaTypes, jsonViewClass, Schema::getAllOf, Schema::addAllOfItem, context);
+        processSchemasArray(schemaToBind, openApi, PROP_ANY_OF, annValues, mediaTypes, jsonViewClass, Schema::getAnyOf, Schema::addAnyOfItem, context);
+        processSchemasArray(schemaToBind, openApi, PROP_ONE_OF, annValues, mediaTypes, jsonViewClass, Schema::getOneOf, Schema::addOneOfItem, context);
     }
 
     private void parseAndSetClassValue(String propName,
@@ -1942,8 +1963,8 @@ abstract class AbstractOpenApiVisitor {
 
         JsonNode schemaJson = toJson(schemaAnn.getValues(), context, jsonViewClass);
         return doBindSchemaAnnotationValue(context, element, schemaToBind, schemaJson,
-            schemaAnn.stringValue("type").orElse(typeAndFormat.getFirst()),
-            schemaAnn.stringValue("format").orElse(typeAndFormat.getSecond()),
+            schemaAnn.stringValue(PROP_TYPE).orElse(typeAndFormat.getFirst()),
+            schemaAnn.stringValue(PROP_ONE_FORMAT).orElse(typeAndFormat.getSecond()),
             schemaAnn, jsonViewClass);
     }
 
@@ -1963,8 +1984,8 @@ abstract class AbstractOpenApiVisitor {
         String defaultValue = null;
         String[] allowableValues = null;
         if (schemaAnn != null) {
-            defaultValue = schemaAnn.stringValue("defaultValue").orElse(null);
-            allowableValues = schemaAnn.stringValues("allowableValues");
+            defaultValue = schemaAnn.stringValue(PROP_DEFAULT_VALUE).orElse(null);
+            allowableValues = schemaAnn.stringValues(PROP_ALLOWABLE_VALUES);
             Map<CharSequence, Object> annValues = schemaAnn.getValues();
             Map<CharSequence, Object> valueMap = toValueMap(annValues, context, jsonViewClass);
             bindSchemaIfNecessary(context, schemaAnn, valueMap, jsonViewClass);
@@ -2016,7 +2037,7 @@ abstract class AbstractOpenApiVisitor {
                 objNode.setAll((ObjectNode) arraySchema);
             }
             // remove schema that maps to 'items'
-            JsonNode items = objNode.remove("schema");
+            JsonNode items = objNode.remove(PROP_SCHEMA);
             if (items != null && schemaToBind != null && (schemaToBind.getType() != null && schemaToBind.getType().equals(TYPE_ARRAY))) {
                 try {
                     schemaToBind.items(Utils.getJsonMapper().readerForUpdating(schemaToBind.getItems()).readValue(items));
@@ -2026,8 +2047,8 @@ abstract class AbstractOpenApiVisitor {
             }
         }
 
-        String elType = schemaJson.has("type") ? schemaJson.get("type").textValue() : null;
-        String elFormat = schemaJson.has("format") ? schemaJson.get("format").textValue() : null;
+        String elType = schemaJson.has(PROP_TYPE) ? schemaJson.get(PROP_TYPE).textValue() : null;
+        String elFormat = schemaJson.has(PROP_ONE_FORMAT) ? schemaJson.get(PROP_ONE_FORMAT).textValue() : null;
         return doBindSchemaAnnotationValue(context, element, schemaToBind, schemaJson, elType, elFormat, null, jsonViewClass);
     }
 
@@ -2066,25 +2087,25 @@ abstract class AbstractOpenApiVisitor {
             valueMap.put(entry.getKey(), value);
         }
         if (schema.get$ref() != null) {
-            valueMap.put("$ref", schema.get$ref());
+            valueMap.put(PROP_$REF, schema.get$ref());
         }
     }
 
     private void bindSchemaIfNecessary(VisitorContext context, AnnotationValue<?> av, Map<CharSequence, Object> valueMap, @Nullable ClassElement jsonViewClass) {
         final Optional<String> impl = av.stringValue("implementation");
         final Optional<String> not = av.stringValue("not");
-        final Optional<String> schema = av.stringValue("schema");
-        var anyOfList = av.stringValues("anyOf");
-        var oneOfList = av.stringValues("oneOf");
-        var allOfList = av.stringValues("allOf");
+        final Optional<String> schema = av.stringValue(PROP_SCHEMA);
+        var anyOfList = av.stringValues(PROP_ANY_OF);
+        var oneOfList = av.stringValues(PROP_ONE_OF);
+        var allOfList = av.stringValues(PROP_ALL_OF);
         // remap keys.
-        Object o = valueMap.remove("defaultValue");
+        Object o = valueMap.remove(PROP_DEFAULT_VALUE);
         if (o != null) {
-            valueMap.put("default", o);
+            valueMap.put(PROP_DEFAULT, o);
         }
-        o = valueMap.remove("allowableValues");
+        o = valueMap.remove(PROP_ALLOWABLE_VALUES);
         if (o != null) {
-            valueMap.put("enum", o);
+            valueMap.put(PROP_ENUM, o);
         }
         boolean isSchema = io.swagger.v3.oas.annotations.media.Schema.class.getName().equals(av.getAnnotationName());
         if (isSchema) {
@@ -2094,18 +2115,18 @@ abstract class AbstractOpenApiVisitor {
             }
             if (not.isPresent()) {
                 final Schema<?> schemaNot = resolveSchema(null, ContextUtils.getClassElement(not.get(), context), context, Collections.emptyList(), jsonViewClass);
-                Map<CharSequence, Object> schemaMap = new HashMap<>();
+                var schemaMap = new HashMap<CharSequence, Object>();
                 schemaToValueMap(schemaMap, schemaNot);
                 valueMap.put("not", schemaMap);
             }
             if (anyOfList.length > 0) {
-                bindSchemaForComposite(context, valueMap, anyOfList, "anyOf", jsonViewClass);
+                bindSchemaForComposite(context, valueMap, anyOfList, PROP_ANY_OF, jsonViewClass);
             }
             if (oneOfList.length > 0) {
-                bindSchemaForComposite(context, valueMap, oneOfList, "oneOf", jsonViewClass);
+                bindSchemaForComposite(context, valueMap, oneOfList, PROP_ONE_OF, jsonViewClass);
             }
             if (allOfList.length > 0) {
-                bindSchemaForComposite(context, valueMap, allOfList, "allOf", jsonViewClass);
+                bindSchemaForComposite(context, valueMap, allOfList, PROP_ALL_OF, jsonViewClass);
             }
         }
         if (DiscriminatorMapping.class.getName().equals(av.getAnnotationName()) && schema.isPresent()) {
@@ -2242,7 +2263,7 @@ abstract class AbstractOpenApiVisitor {
         } else {
             // Schema annotation property `name` on field level means, that this property must be with this name.
             // This is not a schema name
-            String schemaName = !schemaAnnOnField ? schemaValue.stringValue("name").orElse(null) : null;
+            String schemaName = !schemaAnnOnField ? schemaValue.stringValue(PROP_NAME).orElse(null) : null;
             if (schemaName == null) {
                 schemaName = computeDefaultSchemaName(definingElement, type, typeArgs, context, jsonViewClass);
             }
@@ -2310,7 +2331,7 @@ abstract class AbstractOpenApiVisitor {
                                         VisitorContext context,
                                         @Nullable ClassElement jsonViewClass) {
 
-        if (type.getName().equals(Object.class.getName())) {
+        if (type == null || type.getName().equals(Object.class.getName())) {
             return null;
         }
 
@@ -2370,7 +2391,7 @@ abstract class AbstractOpenApiVisitor {
     private void readAllInterfaces(OpenAPI openAPI, VisitorContext context, @Nullable Element definingElement, List<MediaType> mediaTypes,
                                    Schema<?> schema, ClassElement superType, Map<String, Schema> schemas, Map<String, ClassElement> superTypeArgs,
                                    @Nullable ClassElement jsonViewClass) {
-        String parentSchemaName = superType.stringValue(io.swagger.v3.oas.annotations.media.Schema.class, "name")
+        String parentSchemaName = superType.stringValue(io.swagger.v3.oas.annotations.media.Schema.class, PROP_NAME)
             .orElse(computeDefaultSchemaName(definingElement, superType, superTypeArgs, context, jsonViewClass));
 
         if (schemas.get(parentSchemaName) != null
@@ -2450,7 +2471,7 @@ abstract class AbstractOpenApiVisitor {
                 schema.setEnum(getEnumValues(enumEl, schema.getType(), schema.getFormat(), context));
             }
         } else {
-            JavadocDescription javadoc = Utils.getJavadocParser().parse(type.getDescription());
+            JavadocDescription javadoc = type != null ? Utils.getJavadocParser().parse(type.getDescription()) : null;
             populateSchemaProperties(openAPI, context, type, typeArgs, schema, mediaTypes, javadoc, jsonViewClass);
             checkAllOf(schema);
         }
@@ -2462,7 +2483,7 @@ abstract class AbstractOpenApiVisitor {
         for (EnumConstantElement element : type.elements()) {
 
             var schemaAnn = getAnnotation(element, io.swagger.v3.oas.annotations.media.Schema.class);
-            boolean isHidden = schemaAnn != null && schemaAnn.booleanValue("hidden").orElse(false);
+            boolean isHidden = schemaAnn != null && schemaAnn.booleanValue(PROP_HIDDEN).orElse(false);
 
             if (isHidden
                 || isAnnotationPresent(element, Hidden.class)
@@ -2470,7 +2491,7 @@ abstract class AbstractOpenApiVisitor {
                 continue;
             }
             var jsonPropertyAnn = getAnnotation(element, JsonProperty.class);
-            String jacksonValue = jsonPropertyAnn != null ? jsonPropertyAnn.stringValue("value").orElse(null) : null;
+            String jacksonValue = jsonPropertyAnn != null ? jsonPropertyAnn.stringValue(PROP_VALUE).orElse(null) : null;
             if (StringUtils.hasText(jacksonValue)) {
                 try {
                     enumValues.add(ConvertUtils.normalizeValue(jacksonValue, schemaType, schemaFormat, context));
@@ -2550,7 +2571,7 @@ abstract class AbstractOpenApiVisitor {
         if (annValue instanceof AnnotationValue aValue) {
             var annName = aValue.getAnnotationName();
             var values = ((Map<String, Object>) aValue.getValues());
-            var endPos = annName.contains("$") ? annName.lastIndexOf('$') : annName.length();
+            var endPos = annName.contains(StringUtil.DOLLAR) ? annName.lastIndexOf('$') : annName.length();
             result.append(annName, annName.lastIndexOf('.') + 1, endPos);
             if (CollectionUtils.isNotEmpty(values)) {
                 result.append('_');
@@ -2572,7 +2593,7 @@ abstract class AbstractOpenApiVisitor {
                 isFirst = false;
             }
         } else {
-            if (memberName != null && !memberName.equals("value")) {
+            if (memberName != null && !memberName.equals(PROP_VALUE)) {
                 result.append(memberName).append('_');
             }
             result.append(annValue);
@@ -2593,7 +2614,7 @@ abstract class AbstractOpenApiVisitor {
                     if (CollectionUtils.isNotEmpty(typeArgAnnotations)) {
                         for (var typeArgAnnName : typeArgAnnotations) {
                             var annValue = ce.getAnnotation(typeArgAnnName);
-                            builder.append(addTypeArgsAnnotations(null, typeArgAnnName.endsWith("$List") ? annValue.getValues().get("value") : annValue));
+                            builder.append(addTypeArgsAnnotations(null, typeArgAnnName.endsWith("$List") ? annValue.getValues().get(PROP_VALUE) : annValue));
                         }
                     }
                 }
@@ -2698,7 +2719,7 @@ abstract class AbstractOpenApiVisitor {
         }
 
         for (TypedElement publicField : publicFields) {
-            boolean isHidden = getAnnotationMetadata(publicField).booleanValue(io.swagger.v3.oas.annotations.media.Schema.class, "hidden").orElse(false);
+            boolean isHidden = getAnnotationMetadata(publicField).booleanValue(io.swagger.v3.oas.annotations.media.Schema.class, PROP_HIDDEN).orElse(false);
             var jsonAnySetterAnn = getAnnotation(publicField, JsonAnySetter.class);
             if (isAnnotationPresent(publicField, JsonIgnore.class)
                 || isAnnotationPresent(publicField, Hidden.class)
@@ -2779,7 +2800,7 @@ abstract class AbstractOpenApiVisitor {
         if (isNullable(type) && !isNotNullable(type)) {
             SchemaUtils.setNullable(schema);
         }
-        processJavaxValidationAnnotations(type, type, schema);
+        processJakartaValidationAnnotations(type, type, schema);
     }
 
     private Schema<?> getPrimitiveType(ClassElement type, String typeName) {
@@ -2837,12 +2858,14 @@ abstract class AbstractOpenApiVisitor {
             }
             for (AnnotationValue<A> tag : annotations) {
                 Map<CharSequence, Object> values;
-                if (tag.getAnnotationName().equals(io.swagger.v3.oas.annotations.security.SecurityRequirement.class.getName()) && !tag.getValues().isEmpty()) {
-                    Object name = tag.getValues().get("name");
-                    Object scopes = Optional.ofNullable(tag.getValues().get("scopes")).orElse(new ArrayList<String>());
+                var tagValues = tag.getValues();
+                if (tag.getAnnotationName().equals(io.swagger.v3.oas.annotations.security.SecurityRequirement.class.getName())
+                    && !tagValues.isEmpty()) {
+                    Object name = tagValues.get(PROP_NAME);
+                    Object scopes = Optional.ofNullable(tagValues.get("scopes")).orElse(new ArrayList<String>());
                     values = Collections.singletonMap((CharSequence) name, scopes);
                 } else {
-                    values = tag.getValues();
+                    values = tagValues;
                 }
                 Optional<T> tagOpt = toValue(values, context, modelType, null);
                 if (tagOpt.isPresent()) {
