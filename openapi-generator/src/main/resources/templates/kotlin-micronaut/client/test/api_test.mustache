@@ -30,16 +30,16 @@ class {{classname}}Test(
     fun {{operationId}}Test() {
         // given
         {{#allParams}}
-        var {{paramName}} = {{{example}}}
+        var {{{paramName}}} = {{{example}}}
         {{/allParams}}
 
         // when
         {{#wrapInHttpResponse}}
-        var response = api.{{operationId}}({{#allParams}}{{paramName}}{{^-last}}, {{/-last}}{{/allParams}}){{#reactive}}.block(){{/reactive}}{{#returnType}}
+        var response = api.{{operationId}}({{#allParams}}{{{paramName}}}{{^-last}}, {{/-last}}{{/allParams}}){{#reactive}}.block(){{/reactive}}{{#returnType}}
         var responseBody: {{{returnType}}} = response.body(){{/returnType}}
         {{/wrapInHttpResponse}}
         {{^wrapInHttpResponse}}
-        {{#returnType}}var responseBody = {{/returnType}}api.{{operationId}}({{#allParams}}{{paramName}}{{^-last}}, {{/-last}}{{/allParams}}){{#reactive}}.block(){{/reactive}}
+        {{#returnType}}var responseBody = {{/returnType}}api.{{operationId}}({{#allParams}}{{{paramName}}}{{^-last}}, {{/-last}}{{/allParams}}){{#reactive}}.block(){{/reactive}}
         {{/wrapInHttpResponse}}
 
         // then

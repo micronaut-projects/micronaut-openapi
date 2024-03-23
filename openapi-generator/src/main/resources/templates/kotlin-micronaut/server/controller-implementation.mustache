@@ -23,7 +23,7 @@ class {{controllerClassname}}: {{classname}} {
 {{#operations}}
     {{#operation}}
     {{!the method definition}}
-    override fun {{nickname}}({{#allParams}}{{paramName}}: {{{vendorExtensions.typeWithGenericAnnotations}}}{{^-last}}, {{/-last}}{{/allParams}}){{#returnType}}: {{{returnType}}}{{/returnType}} {
+    override fun {{nickname}}({{#allParams}}{{{paramName}}}: {{{vendorExtensions.typeWithGenericAnnotations}}}{{^-last}}, {{/-last}}{{/allParams}}){{#returnType}}: {{{returnType}}}{{/returnType}} {
 {{>server/controllerOperationBody}}    }
     {{^-last}}
 

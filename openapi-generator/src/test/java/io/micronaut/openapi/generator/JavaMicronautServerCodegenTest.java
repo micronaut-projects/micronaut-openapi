@@ -390,4 +390,32 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
 
         assertFileContains(apiPath + "RequestBodyApi.java", "@Nullable(inherited = true) CompletedFileUpload file");
     }
+
+    @Test
+    void testReservedWords() {
+
+        var codegen = new JavaMicronautServerCodegen();
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/javaReservedWords.yml",
+            CodegenConstants.APIS,
+            CodegenConstants.MODELS,
+            CodegenConstants.SUPPORTING_FILES,
+            CodegenConstants.MODEL_TESTS,
+            CodegenConstants.MODEL_DOCS,
+            CodegenConstants.API_TESTS,
+            CodegenConstants.API_DOCS
+        );
+        String path = outputPath + "src/main/java/org/openapitools/";
+
+        assertFileContains(path + "api/ParametersApi.java", "Mono<Void> callInterface(",
+            "@QueryValue(\"class\") @NotNull @Valid Package propertyClass,",
+            "@QueryValue(\"while\") @NotNull String _while");
+        assertFileContains(path + "model/Package.java",
+            "public static final String JSON_PROPERTY_FOR = \"for\";",
+            "@JsonProperty(JSON_PROPERTY_FOR)",
+            "private String _for;",
+            "public String get_for() {",
+            "public void set_for(String _for) {");
+        assertFileContains(path + "controller/ParametersController.java",
+            "public Mono<Void> callInterface(Package propertyClass, String _while) {");
+    }
 }

@@ -42,7 +42,7 @@ More information can be found inside [Inversion of Control guide section](https:
 <a id="{{operationId}}"></a>
 # **{{operationId}}**
 ```kotlin
-fun {{classname}}.{{nickname}}({{#allParams}}{{{paramName}}}{{#hasMore}}, {{/hasMore}}{{/allParams}}): {{#returnType}}{{{returnType}}}{{/returnType}}{{^returnType}}Mono<Void>{{/returnType}}
+fun {{classname}}.{{nickname}}({{#allParams}}{{{paramName}}}{{^-last}}, {{/-last}}{{/allParams}}): {{#returnType}}{{{returnType}}}{{/returnType}}{{^returnType}}Mono<Void>{{/returnType}}
 ```
 
 {{summary}}{{#notes}}
@@ -52,7 +52,7 @@ fun {{classname}}.{{nickname}}({{#allParams}}{{{paramName}}}{{#hasMore}}, {{/has
 {{#allParams}}{{#-last}}### Parameters
 | Name | Type | Description  | Notes |
 |------------- | ------------- | ------------- | -------------|
-{{#allParams}}| **{{paramName}}** | {{#isPrimitiveType}}`{{dataType}}`{{/isPrimitiveType}}{{^isPrimitiveType}}{{#isFile}}`{{dataType}}`{{/isFile}}{{^isFile}}[**{{dataType}}**]({{baseType}}.md){{/isFile}}{{/isPrimitiveType}}| {{description}} |{{^required}} [optional parameter]{{/required}}{{#defaultValue}} [default to `{{defaultValue}}`]{{/defaultValue}}{{#allowableValues}} [enum: {{#values}}`{{{.}}}`{{^-last}}, {{/-last}}{{/values}}]{{/allowableValues}} |
+{{#allParams}}| **{{vendorExtensions.realName}}** | {{#isPrimitiveType}}`{{dataType}}`{{/isPrimitiveType}}{{^isPrimitiveType}}{{#isFile}}`{{dataType}}`{{/isFile}}{{^isFile}}[**{{dataType}}**]({{baseType}}.md){{/isFile}}{{/isPrimitiveType}}| {{description}} |{{^required}} [optional parameter]{{/required}}{{#defaultValue}} [default to `{{defaultValue}}`]{{/defaultValue}}{{#allowableValues}} [enum: {{#values}}`{{{.}}}`{{^-last}}, {{/-last}}{{/values}}]{{/allowableValues}} |
 {{/allParams}}{{/-last}}{{/allParams}}
 
 {{#returnType}}### Return type

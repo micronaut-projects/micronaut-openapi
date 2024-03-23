@@ -14,7 +14,7 @@
         {{#-first}}
      *
         {{/-first}}
-     * @param {{paramName}}{{#description}} {{description}}{{/description}}{{#required}} (required){{/required}}{{^required}} (optional{{#defaultValue}}, default to {{{.}}}{{/defaultValue}}){{/required}}
+     * @param {{vendorExtensions.realName}}{{#description}} {{description}}{{/description}}{{#required}} (required){{/required}}{{^required}} (optional{{#defaultValue}}, default to {{{.}}}{{/defaultValue}}){{/required}}
     {{/vendorExtensions.originalParams}}
     {{#returnType}}
         {{^allParams.0}}
@@ -53,7 +53,7 @@
         parameters = [
             {{#vendorExtensions.originalParams}}
                 {{^isBodyParam}}
-            Parameter(name = "{{paramName}}"{{#description}}, description = "{{{description}}}"{{/description}}{{#required}}, required = true{{/required}}){{^-last}},{{/-last}}
+            Parameter(name = "{{vendorExtensions.realName}}"{{#description}}, description = "{{{description}}}"{{/description}}{{#required}}, required = true{{/required}}){{^-last}},{{/-last}}
                 {{/isBodyParam}}
             {{/vendorExtensions.originalParams}}
         ]{{/vendorExtensions.hasNotBodyParam}}{{#hasAuthMethods}},
@@ -67,7 +67,7 @@
     {{#implicitHeadersParams.0}}
         {{#generateSwagger2Annotations}}
             {{#implicitHeadersParams}}
-    @Parameter(name = "{{paramName}}"{{#description}}, description = "{{{description}}}"{{/description}}{{#required}}, required = true{{/required}})
+    @Parameter(name = "{{vendorExtensions.realName}}"{{#description}}, description = "{{{description}}}"{{/description}}{{#required}}, required = true{{/required}})
             {{/implicitHeadersParams}}
         {{/generateSwagger2Annotations}}
     {{/implicitHeadersParams.0}}

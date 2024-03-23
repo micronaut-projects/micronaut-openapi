@@ -29,10 +29,12 @@ import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.google.common.base.CaseFormat;
 import io.micronaut.openapi.generator.Formatting.ReplaceDotsWithUnderscoreLambda;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.media.Schema;
+import io.swagger.v3.oas.models.parameters.Parameter;
 import io.swagger.v3.oas.models.servers.Server;
 
 import org.apache.commons.lang3.StringUtils;
@@ -61,6 +63,7 @@ import static io.micronaut.openapi.generator.Utils.DEFAULT_BODY_PARAM_NAME;
 import static io.micronaut.openapi.generator.Utils.addStrValueToEnum;
 import static io.micronaut.openapi.generator.Utils.processGenericAnnotations;
 import static org.openapitools.codegen.CodegenConstants.INVOKER_PACKAGE;
+import static org.openapitools.codegen.utils.StringUtils.camelize;
 
 /**
  * Base generator for Micronaut.
@@ -609,6 +612,41 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
             return toModelName(name) + "Spec";
         }
         return toModelName(name) + "Test";
+    }
+
+    @Override
+    public CodegenParameter fromParameter(Parameter p, Set<String> imports) {
+        var parameter = super.fromParameter(p, imports);
+        // if name is escaped
+        var realName = parameter.paramName;
+        if (realName.startsWith("_") && !parameter.baseName.startsWith("_") && isReservedWord(parameter.baseName)) {
+            realName = realName.replaceFirst("_", "");
+        }
+        parameter.vendorExtensions.put("realName", realName);
+        return parameter;
+    }
+
+    @Override
+    public CodegenProperty fromProperty(String name, Schema p, boolean required, boolean schemaIsFromAdditionalProperties) {
+        var property = super.fromProperty(name, p, required, schemaIsFromAdditionalProperties);
+
+        // if name is escaped
+        var realName = property.name;
+        if (realName.startsWith("_") && !property.baseName.startsWith("_") && isReservedWord(property.baseName)) {
+            realName = realName.replaceFirst("_", "");
+            property.nameInCamelCase = camelize(realName);
+            property.nameInSnakeCase = CaseFormat.UPPER_CAMEL.to(CaseFormat.UPPER_UNDERSCORE, property.nameInCamelCase);
+            // fix for getters and setters for escaped vars as reserved words and started with '_', like this: '_for'
+            if (!property.getter.startsWith("get_")) {
+                property.getter = "get" + getterAndSetterCapitalize(property.name);
+            }
+            if (!property.setter.startsWith("set_")) {
+                property.setter = "set" + getterAndSetterCapitalize(property.name);
+            }
+        }
+        property.vendorExtensions.put("realName", realName);
+
+        return property;
     }
 
     @Override

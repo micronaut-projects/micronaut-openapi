@@ -12,8 +12,8 @@
         {{!The body is generated to verify that example values are passed correctly}}
         {{#allParams}}
             {{^isFile}}
-        var {{paramName}}Expected: {{{dataType}}} = {{{example}}}
-        assert {{paramName}}.equals({{paramName}}Expected) : "The parameter {{paramName}} was expected to match its example value"
+        var {{vendorExtensions.realName}}Expected: {{{dataType}}} = {{{example}}}
+        assert {{{paramName}}}.equals({{{paramName}}}Expected) : "The parameter {{vendorExtensions.realName}} was expected to match its example value"
             {{/isFile}}
         {{/allParams}}
         {{!

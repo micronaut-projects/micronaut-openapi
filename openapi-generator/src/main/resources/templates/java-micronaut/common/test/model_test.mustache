@@ -12,13 +12,13 @@ import org.junit.jupiter.api.Assertions;
 @MicronautTest
 class {{classname}}Test {
 
-    {{#models}}
+{{#models}}
     {{#model}}
-    {{^vendorExtensions.x-is-one-of-interface}}
-    {{^isEnum}}
+        {{^vendorExtensions.x-is-one-of-interface}}
+            {{^isEnum}}
     private final {{classname}} model = null;
 
-    {{/isEnum}}
+            {{/isEnum}}
     /**
      * Model tests for {{classname}}
      */
@@ -27,7 +27,7 @@ class {{classname}}Test {
         // TODO: test {{classname}}
     }
 
-    {{#allVars}}
+            {{#allVars}}
     /**
      * Test the property '{{name}}'
      */
@@ -36,8 +36,8 @@ class {{classname}}Test {
         // TODO: test {{name}}
     }
 
-    {{/allVars}}
-    {{/vendorExtensions.x-is-one-of-interface}}
+            {{/allVars}}
+        {{/vendorExtensions.x-is-one-of-interface}}
     {{/model}}
-    {{/models}}
+{{/models}}
 }

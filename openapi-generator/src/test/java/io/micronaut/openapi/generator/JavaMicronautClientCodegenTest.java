@@ -400,4 +400,30 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
             "public BigDecimal get_default() {",
             "public void set_default(BigDecimal _default) {");
     }
+
+    @Test
+    void testReservedWords() {
+
+        var codegen = new JavaMicronautClientCodegen();
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/javaReservedWords.yml",
+            CodegenConstants.APIS,
+            CodegenConstants.MODELS,
+            CodegenConstants.SUPPORTING_FILES,
+            CodegenConstants.MODEL_TESTS,
+            CodegenConstants.MODEL_DOCS,
+            CodegenConstants.API_TESTS,
+            CodegenConstants.API_DOCS
+        );
+        String path = outputPath + "src/main/java/org/openapitools/";
+
+        assertFileContains(path + "api/ParametersApi.java", "Mono<Void> callInterface(",
+            "@QueryValue(\"class\") @NotNull @Valid Package propertyClass,",
+            "@QueryValue(\"while\") @NotNull String _while");
+        assertFileContains(path + "model/Package.java",
+            "public static final String JSON_PROPERTY_FOR = \"for\";",
+            "@JsonProperty(JSON_PROPERTY_FOR)",
+            "private String _for;",
+            "public String get_for() {",
+            "public void set_for(String _for) {");
+    }
 }
