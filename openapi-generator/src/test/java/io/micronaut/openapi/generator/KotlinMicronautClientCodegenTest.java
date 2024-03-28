@@ -146,7 +146,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         String modelPath = outputPath + "src/main/kotlin/org/openapitools/model/";
         assertFileContains(modelPath + "Pet.kt",
         """
-            data class Pet (
+            data class Pet(
                 @field:NotNull
                 @field:JsonProperty(JSON_PROPERTY_NAME)
                 var name: String,
@@ -312,7 +312,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
 
         assertFileContains(apiPath + "BookInfo.kt",
             """
-                open class BookInfo (
+                open class BookInfo(
                     @field:NotNull
                     @field:JsonProperty(JSON_PROPERTY_NAME)
                     open var name: String,
@@ -337,7 +337,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                 """);
         assertFileContains(apiPath + "ExtendedBookInfo.kt",
             """
-                data class ExtendedBookInfo (
+                data class ExtendedBookInfo(
                     @field:NotNull
                     @field:Pattern(regexp = "[0-9]{13}")
                     @field:JsonProperty(JSON_PROPERTY_ISBN)
@@ -393,7 +393,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
 
         assertFileContains(apiPath + "BookInfo.kt",
                     """
-                       open class BookInfo (
+                       open class BookInfo(
                            @field:NotNull
                            @field:JsonProperty(JSON_PROPERTY_NAME)
                            open var name: String,
@@ -403,7 +403,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                        ) {""");
         assertFileContains(apiPath + "BasicBookInfo.kt",
             """
-                open class BasicBookInfo (
+                open class BasicBookInfo(
                     @field:NotNull
                     @field:Size(min = 3)
                     @field:JsonProperty(JSON_PROPERTY_AUTHOR)
@@ -415,7 +415,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                 """);
         assertFileContains(apiPath + "DetailedBookInfo.kt",
             """
-                data class DetailedBookInfo (
+                data class DetailedBookInfo(
                     @field:NotNull
                     @field:Pattern(regexp = "[0-9]{13}")
                     @field:JsonProperty(JSON_PROPERTY_ISBN)
@@ -457,5 +457,30 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         assertFileContains(modelPath + "IntEnum.kt", "@JsonProperty(\"1\")", "_1(1),");
         assertFileContains(modelPath + "LongEnum.kt", "@JsonProperty(\"1\")", "_3(3L),");
         assertFileContains(modelPath + "DecimalEnum.kt", "@JsonProperty(\"1.23\")", "_34_1(BigDecimal(\"34.1\"))");
+    }
+
+    @Test
+    void testReservedWords() {
+
+        var codegen = new KotlinMicronautClientCodegen();
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/kotlinReservedWords.yml",
+            CodegenConstants.APIS,
+            CodegenConstants.MODELS,
+            CodegenConstants.SUPPORTING_FILES,
+            CodegenConstants.MODEL_TESTS,
+            CodegenConstants.MODEL_DOCS,
+            CodegenConstants.API_TESTS,
+            CodegenConstants.API_DOCS
+        );
+        String path = outputPath + "src/main/kotlin/org/openapitools/";
+
+        assertFileContains(path + "api/ParametersApi.kt", "fun callInterface(",
+            "@QueryValue(\"name\") @NotNull @Valid name: Class,",
+            "@QueryValue(\"data\") @NotNull `data`: String",
+            "): Mono<Void>");
+        assertFileContains(path + "model/Class.kt",
+            "Class.JSON_PROPERTY_DATA",
+            "@field:JsonProperty(JSON_PROPERTY_DATA)",
+            "var `data`: String,");
     }
 }

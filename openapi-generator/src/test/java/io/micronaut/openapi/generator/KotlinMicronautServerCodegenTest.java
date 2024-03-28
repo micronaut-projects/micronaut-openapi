@@ -127,38 +127,38 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
         String modelPath = outputPath + "src/main/kotlin/org/openapitools/model/";
         assertFileContains(modelPath + "Pet.kt",
             """
-            data class Pet (
-                @field:NotNull
-                @field:Schema(name = "name", example = "doggie", requiredMode = Schema.RequiredMode.REQUIRED)
-                @field:JsonProperty(JSON_PROPERTY_NAME)
-                var name: String,
-                @field:NotNull
-                @field:Schema(name = "photoUrls", requiredMode = Schema.RequiredMode.REQUIRED)
-                @field:JsonProperty(JSON_PROPERTY_PHOTO_URLS)
-                var photoUrls: List<@NotNull String>,
-                @field:Nullable
-                @field:Schema(name = "id", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-                @field:JsonProperty(JSON_PROPERTY_ID)
-                @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
-                var id: Long? = null,
-                @field:Nullable
-                @field:Valid
-                @field:Schema(name = "category", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-                @field:JsonProperty(JSON_PROPERTY_CATEGORY)
-                @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
-                var category: Category? = null,
-                @field:Nullable
-                @field:Schema(name = "tags", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-                @field:JsonProperty(JSON_PROPERTY_TAGS)
-                @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
-                var tags: List<@Valid Tag>? = null,
-                @field:Nullable
-                @field:Schema(name = "status", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-                @field:JsonProperty(JSON_PROPERTY_STATUS)
-                @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
-                var status: PetStatus? = null,
-            ) {
-            """);
+                data class Pet(
+                    @field:NotNull
+                    @field:Schema(name = "name", example = "doggie", requiredMode = Schema.RequiredMode.REQUIRED)
+                    @field:JsonProperty(JSON_PROPERTY_NAME)
+                    var name: String,
+                    @field:NotNull
+                    @field:Schema(name = "photoUrls", requiredMode = Schema.RequiredMode.REQUIRED)
+                    @field:JsonProperty(JSON_PROPERTY_PHOTO_URLS)
+                    var photoUrls: List<@NotNull String>,
+                    @field:Nullable
+                    @field:Schema(name = "id", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+                    @field:JsonProperty(JSON_PROPERTY_ID)
+                    @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                    var id: Long? = null,
+                    @field:Nullable
+                    @field:Valid
+                    @field:Schema(name = "category", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+                    @field:JsonProperty(JSON_PROPERTY_CATEGORY)
+                    @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                    var category: Category? = null,
+                    @field:Nullable
+                    @field:Schema(name = "tags", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+                    @field:JsonProperty(JSON_PROPERTY_TAGS)
+                    @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                    var tags: List<@Valid Tag>? = null,
+                    @field:Nullable
+                    @field:Schema(name = "status", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+                    @field:JsonProperty(JSON_PROPERTY_STATUS)
+                    @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                    var status: PetStatus? = null,
+                ) {
+                """);
     }
 
     @Test
@@ -344,7 +344,7 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
 
         assertFileContains(apiPath + "BookInfo.kt",
             """
-                open class BookInfo (
+                open class BookInfo(
                     @field:NotNull
                     @field:Schema(name = "name", requiredMode = Schema.RequiredMode.REQUIRED)
                     @field:JsonProperty(JSON_PROPERTY_NAME)
@@ -374,7 +374,7 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                     """);
         assertFileContains(apiPath + "ExtendedBookInfo.kt",
             """
-                data class ExtendedBookInfo (
+                data class ExtendedBookInfo(
                     @field:NotNull
                     @field:Pattern(regexp = "[0-9]{13}")
                     @field:Schema(name = "isbn", requiredMode = Schema.RequiredMode.REQUIRED)
@@ -402,7 +402,7 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
 
         assertFileContains(apiPath + "BookInfo.kt",
             """
-                open class BookInfo (
+                open class BookInfo(
                     @field:NotNull
                     @field:Schema(name = "name", requiredMode = Schema.RequiredMode.REQUIRED)
                     @field:JsonProperty(JSON_PROPERTY_NAME)
@@ -415,7 +415,7 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                 """);
         assertFileContains(apiPath + "BasicBookInfo.kt",
             """
-                open class BasicBookInfo (
+                open class BasicBookInfo(
                     @field:NotNull
                     @field:Size(min = 3)
                     @field:Schema(name = "author", requiredMode = Schema.RequiredMode.REQUIRED)
@@ -425,11 +425,11 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                     @field:Schema(name = "name", requiredMode = Schema.RequiredMode.REQUIRED)
                     @field:JsonProperty(JSON_PROPERTY_NAME)
                     override var name: String,
-                ): BookInfo(name)  {
+                ): BookInfo(name) {
                 """);
         assertFileContains(apiPath + "DetailedBookInfo.kt",
             """
-                data class DetailedBookInfo (
+                data class DetailedBookInfo(
                     @field:NotNull
                     @field:Pattern(regexp = "[0-9]{13}")
                     @field:Schema(name = "isbn", requiredMode = Schema.RequiredMode.REQUIRED)
@@ -444,7 +444,7 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                     @field:Schema(name = "name", requiredMode = Schema.RequiredMode.REQUIRED)
                     @field:JsonProperty(JSON_PROPERTY_NAME)
                     override var name: String,
-                ): BasicBookInfo(author, name)  {
+                ): BasicBookInfo(author, name) {
                 """);
     }
 
@@ -482,5 +482,32 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
         assertFileExists(modelPath + "GetTokenRequestClientSecret.kt");
         assertFileExists(modelPath + "GetTokenRequestClientId.kt");
         assertFileExists(modelPath + "ArtistsArtistIdDirectAlbumsGetSortByParameter.kt");
+    }
+
+    @Test
+    void testReservedWords() {
+
+        var codegen = new KotlinMicronautServerCodegen();
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/kotlinReservedWords.yml",
+            CodegenConstants.APIS,
+            CodegenConstants.MODELS,
+            CodegenConstants.SUPPORTING_FILES,
+            CodegenConstants.MODEL_TESTS,
+            CodegenConstants.MODEL_DOCS,
+            CodegenConstants.API_TESTS,
+            CodegenConstants.API_DOCS
+        );
+        String path = outputPath + "src/main/kotlin/org/openapitools/";
+
+        assertFileContains(path + "controller/ParametersController.kt", "override fun callInterface(name: Class, `data`: String): Mono<Void>");
+        assertFileContains(path + "api/ParametersApi.kt", "fun callInterface(",
+            "@QueryValue(\"name\") @NotNull @Valid name: Class,",
+            "@QueryValue(\"data\") @NotNull `data`: String",
+            "): Mono<Void>");
+        assertFileContains(path + "model/Class.kt",
+            "Class.JSON_PROPERTY_DATA",
+            "@field:Schema(name = \"data\", requiredMode = Schema.RequiredMode.REQUIRED)",
+            "@field:JsonProperty(JSON_PROPERTY_DATA)",
+            "var `data`: String,");
     }
 }

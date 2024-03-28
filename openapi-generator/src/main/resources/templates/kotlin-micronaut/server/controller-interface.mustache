@@ -64,7 +64,7 @@ interface {{classname}} {
     {{/useAuth}}
     {{!the method definition}}
     fun {{nickname}}({{#allParams}}
-        {{#formatSingleLine}}{{>server/params/annotations}}{{#indent}}{{>common/params/validation}}{{/indent}}{{#isDateTime}}{{#dateFormat}}@Format("{{{datetimeFormat}}}"){{/dateFormat}}{{/isDateTime}}{{#isDate}}{{#dateTimeFormat}}@Format("{{{dateFormat}}}"){{/dateTimeFormat}}{{/isDate}} {{paramName}}: {{#isEnum}}{{{vendorExtensions.typeWithEnumWithGenericAnnotations}}}{{/isEnum}}{{^isEnum}}{{{vendorExtensions.typeWithGenericAnnotations}}}{{/isEnum}}{{^-last}},{{/-last}}{{/formatSingleLine}}
+        {{#formatSingleLine}}{{>server/params/annotations}}{{#indent}}{{>common/params/validation}}{{/indent}}{{#isDateTime}}{{#dateFormat}}@Format("{{{datetimeFormat}}}"){{/dateFormat}}{{/isDateTime}}{{#isDate}}{{#dateTimeFormat}}@Format("{{{dateFormat}}}"){{/dateTimeFormat}}{{/isDate}} {{{paramName}}}: {{#isEnum}}{{{vendorExtensions.typeWithEnumWithGenericAnnotations}}}{{/isEnum}}{{^isEnum}}{{{vendorExtensions.typeWithGenericAnnotations}}}{{/isEnum}}{{^-last}},{{/-last}}{{/formatSingleLine}}
     {{/allParams}}){{#returnType}}: {{{returnType}}}{{/returnType}}
         {{/formatNoEmptyLines}}
 

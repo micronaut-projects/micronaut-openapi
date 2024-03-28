@@ -7,8 +7,8 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Assertions
 
 /**
-* Model tests for {{classname}}
-*/
+ * Model tests for {{classname}}
+ */
 @MicronautTest
 class {{classname}}Test {
 
@@ -20,8 +20,8 @@ class {{classname}}Test {
 
             {{/isEnum}}
     /**
-    * Model tests for {{classname}}
-    */
+     * Model tests for {{classname}}
+     */
     @Test
     fun test{{classname}}() {
         // TODO: test {{classname}}
@@ -29,11 +29,11 @@ class {{classname}}Test {
 
             {{#allVars}}
     /**
-    * Test the property '{{name}}'
-    */
+     * Test the property '{{vendorExtensions.realName}}'
+     */
     @Test
-    fun {{name}}Test() {
-        // TODO: test {{name}}
+    fun {{vendorExtensions.realName}}Test() {
+        // TODO: test {{vendorExtensions.realName}}
     }
 
             {{/allVars}}

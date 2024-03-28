@@ -15,7 +15,7 @@ import io.micronaut.http.MediaType;
 import io.micronaut.http.uri.UriTemplate;
 import io.micronaut.http.cookie.Cookie;
 import io.micronaut.http.client.multipart.MultipartBody;
-import io.micronaut.core.type.Argument;
+import io.micronaut.core.type.GenericArgument;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Assertions;
@@ -74,7 +74,7 @@ class {{classname}}Test {
         {{/allParams}}
 
         // when
-        {{#returnType}}{{{returnType}}} result = {{/returnType}}controller.{{operationId}}({{#allParams}}{{paramName}}{{^-last}}, {{/-last}}{{/allParams}}){{#reactive}}.block(){{/reactive}}{{#wrapInHttpResponse}}.body(){{/wrapInHttpResponse}};
+        {{#returnType}}var result = {{/returnType}}controller.{{operationId}}({{#allParams}}{{paramName}}{{^-last}}, {{/-last}}{{/allParams}}){{#reactive}}.block(){{/reactive}}{{#wrapInHttpResponse}}.body(){{/wrapInHttpResponse}};
 
         // then
         {{^generateControllerFromExamples}}
@@ -168,7 +168,7 @@ class {{classname}}Test {
         {{/queryParams.0}}
 
         // when
-        HttpResponse<?> response = client.toBlocking().exchange(request{{#returnType}}, {{#returnContainer}}Argument.of({{#isArray}}List{{/isArray}}{{#isMap}}Map{{/isMap}}.class, {{#isMap}}String.class, {{/isMap}}{{{returnBaseType}}}.class){{/returnContainer}}{{^returnContainer}}{{{returnType}}}.class{{/returnContainer}}{{/returnType}});{{^returnType}} // To retrieve body you must specify required type (e.g. Map.class) as second argument {{/returnType}}
+        HttpResponse<?> response = client.toBlocking().exchange(request{{#returnType}}, {{#returnContainer}}new GenericArgument<{{#isArray}}List{{/isArray}}{{#isMap}}Map<String, {{/isMap}}{{{returnType}}}{{#isMap}}>{{/isMap}}>() { }{{/returnContainer}}{{^returnContainer}}{{{returnType}}}.class{{/returnContainer}}{{/returnType}});{{^returnType}} // To retrieve body you must specify required type (e.g. Map.class) as second argument {{/returnType}}
 
         // then
         Assertions.assertEquals(HttpStatus.OK, response.status());

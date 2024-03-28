@@ -18,7 +18,7 @@ The controller class is defined in **[{{classname}}.kt](../../{{{apiFolder}}}/{{
 <a id="{{operationId}}"></a>
 # **{{operationId}}**
 ```kotlin
-fun {{classname}}.{{nickname}}({{#allParams}}{{{paramName}}}{{#hasMore}}, {{/hasMore}}{{/allParams}}): {{#returnType}}Mono<{{{returnType}}}>{{/returnType}}{{^returnType}}Mono<Object>{{/returnType}}
+fun {{classname}}.{{nickname}}({{#allParams}}{{{paramName}}}{{^-last}}, {{/-last}}{{/allParams}}): {{#returnType}}{{{returnType}}}{{/returnType}}{{^returnType}}Mono<Void>{{/returnType}}
 ```
 
 {{summary}}{{#notes}}
@@ -31,7 +31,7 @@ fun {{classname}}.{{nickname}}({{#allParams}}{{{paramName}}}{{#hasMore}}, {{/has
 | Name | Type | Description  | Notes |
 ------------- | ------------- | ------------- | -------------
 {{#allParams}}
-| **{{paramName}}** | {{^isPrimitiveType}}[**{{dataType}}**](../../{{modelDocPath}}/{{baseType}}.md){{/isPrimitiveType}}{{#isPrimitiveType}}`{{dataType}}`{{/isPrimitiveType}} | {{description}} |{{^required}} [optional parameter]{{/required}}{{#defaultValue}} [default to `{{defaultValue}}`]{{/defaultValue}}{{#allowableValues}} [enum: {{#values}}`{{{.}}}`{{^-last}}, {{/-last}}{{/values}}]{{/allowableValues}} |
+| **{{vendorExtensions.realName}}** | {{^isPrimitiveType}}[**{{dataType}}**](../../{{modelDocPath}}/{{baseType}}.md){{/isPrimitiveType}}{{#isPrimitiveType}}`{{dataType}}`{{/isPrimitiveType}} | {{description}} |{{^required}} [optional parameter]{{/required}}{{#defaultValue}} [default to `{{defaultValue}}`]{{/defaultValue}}{{#allowableValues}} [enum: {{#values}}`{{{.}}}`{{^-last}}, {{/-last}}{{/values}}]{{/allowableValues}} |
 {{/allParams}}
     {{/-last}}
 {{/allParams}}

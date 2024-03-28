@@ -30,6 +30,7 @@ import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import com.google.common.base.CaseFormat;
 import io.micronaut.openapi.generator.Formatting.ReplaceDotsWithUnderscoreLambda;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Operation;
@@ -903,7 +904,10 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
             return schemaMapping.get(name);
         }
 
-        String modifiedName = name.replaceAll("\\.", "").replaceAll("-", "_");
+        String modifiedName = name.replaceAll("\\.", "")
+            .replaceAll("-", "_")
+            // if it already escaped reserved word, need to remove quotes
+            .replaceAll("`", "");
 
         String nameWithPrefixSuffix = sanitizeKotlinSpecificNames(modifiedName);
         if (!StringUtils.isEmpty(modelNamePrefix)) {
@@ -935,6 +939,34 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
 
         schemaKeyToModelNameCache.put(name, titleCase(modifiedName));
         return schemaKeyToModelNameCache.get(name);
+    }
+
+    @Override
+    public CodegenParameter fromParameter(Parameter p, Set<String> imports) {
+        var parameter = super.fromParameter(p, imports);
+        // if name is escaped
+        var realName = parameter.paramName;
+        if (realName.contains("`")) {
+            realName = realName.replaceAll("`", "");
+        }
+        parameter.vendorExtensions.put("realName", realName);
+        return parameter;
+    }
+
+    @Override
+    public CodegenProperty fromProperty(String name, Schema p, boolean required, boolean schemaIsFromAdditionalProperties) {
+        var property = super.fromProperty(name, p, required, schemaIsFromAdditionalProperties);
+
+        // if name is escaped
+        var realName = property.name;
+        if (realName.contains("`")) {
+            realName = realName.replaceAll("`", "");
+            property.nameInCamelCase = camelize(realName);
+            property.nameInSnakeCase = CaseFormat.UPPER_CAMEL.to(CaseFormat.UPPER_UNDERSCORE, property.nameInCamelCase);
+        }
+        property.vendorExtensions.put("realName", realName);
+
+        return property;
     }
 
     @Override
