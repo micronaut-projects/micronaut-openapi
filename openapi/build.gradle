@@ -22,6 +22,7 @@ dependencies {
     // this dependency needs to be updated manually. It's used by html2md
     api(libs.managed.jsoup)
 
+    testImplementation(projects.micronautOpenapiAdoc)
     testImplementation(mnSession.micronaut.session)
     testImplementation(mn.micronaut.management)
     testImplementation(mn.micronaut.inject.kotlin.test)

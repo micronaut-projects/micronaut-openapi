@@ -203,8 +203,8 @@ public class EndpointsConfiguration {
     }
 
     private static String parsePath(String path) {
-        if (StringUtils.isNotEmpty(path) && !path.endsWith("/")) {
-            return path + "/";
+        if (StringUtils.isNotEmpty(path) && !path.endsWith(StringUtil.SLASH)) {
+            return path + StringUtil.SLASH;
         } else {
             return path;
         }

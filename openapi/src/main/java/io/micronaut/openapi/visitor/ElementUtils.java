@@ -15,18 +15,10 @@
  */
 package io.micronaut.openapi.visitor;
 
-import java.io.File;
-import java.io.InputStream;
-import java.lang.annotation.Annotation;
-import java.nio.ByteBuffer;
-import java.security.Principal;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.Callable;
-import java.util.concurrent.CompletionStage;
-import java.util.concurrent.Future;
-
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonView;
 import io.micronaut.core.annotation.AnnotationMetadata;
 import io.micronaut.core.annotation.AnnotationValue;
 import io.micronaut.core.annotation.Internal;
@@ -44,9 +36,20 @@ import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import java.io.File;
+import java.io.InputStream;
+import java.lang.annotation.Annotation;
+import java.nio.ByteBuffer;
+import java.security.Principal;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CompletionStage;
+import java.util.concurrent.Future;
+
+import static io.micronaut.openapi.visitor.ConfigUtils.isJsonViewEnabled;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_HIDDEN;
 
 /**
  * Some util methods.
@@ -87,21 +90,6 @@ public final class ElementUtils {
     );
 
     private ElementUtils() {
-    }
-
-    /**
-     * Returns true if classElement is a JavaClassElement.
-     *
-     * @param classElement A ClassElement.
-     * @param context The context.
-     *
-     * @return true if classElement is a JavaClassElement.
-     */
-    public static boolean isJavaElement(ClassElement classElement, VisitorContext context) {
-        return classElement != null
-            && "io.micronaut.annotation.processing.visitor.JavaClassElement".equals(classElement.getClass().getName())
-            && context != null
-            && "io.micronaut.annotation.processing.visitor.JavaVisitorContext".equals(context.getClass().getName());
     }
 
     /**
@@ -215,13 +203,13 @@ public final class ElementUtils {
     public static boolean isIgnoredParameter(TypedElement parameter) {
 
         AnnotationValue<Schema> schemaAnn = parameter.getAnnotation(Schema.class);
-        boolean isHidden = schemaAnn != null && schemaAnn.booleanValue("hidden").orElse(false);
+        boolean isHidden = schemaAnn != null && schemaAnn.booleanValue(PROP_HIDDEN).orElse(false);
 
         return isHidden
             || parameter.isAnnotationPresent(Hidden.class)
             || parameter.isAnnotationPresent(JsonIgnore.class)
             || parameter.isAnnotationPresent(Header.class) && parameter.getType().isAssignable(Map.class)
-            || parameter.booleanValue(Parameter.class, "hidden").orElse(false)
+            || parameter.booleanValue(Parameter.class, PROP_HIDDEN).orElse(false)
             || parameter.hasAnnotation("io.micronaut.session.annotation.SessionValue")
             || parameter.hasAnnotation("org.springframework.web.bind.annotation.SessionAttribute")
             || parameter.hasAnnotation("org.springframework.web.bind.annotation.SessionAttributes")
@@ -394,5 +382,19 @@ public final class ElementUtils {
         }
         Utils.getCreatorConstructorsCache().put(classEl.getName(), creatorConstructor);
         return creatorConstructor;
+    }
+
+    public static ClassElement getJsonViewClass(Element element, VisitorContext context) {
+        if (!isJsonViewEnabled(context)) {
+            return null;
+        }
+        var jsonViewAnn = element.findAnnotation(JsonView.class).orElse(null);
+        if (jsonViewAnn != null) {
+            String jsonViewClassName = jsonViewAnn.stringValue().orElse(null);
+            if (jsonViewClassName != null) {
+                return ContextUtils.getClassElement(jsonViewClassName, context);
+            }
+        }
+        return null;
     }
 }

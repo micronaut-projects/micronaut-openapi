@@ -2,6 +2,7 @@ package io.micronaut.openapi.visitor
 
 import io.micronaut.openapi.AbstractOpenApiTypeElementSpec
 import io.swagger.v3.oas.models.security.SecurityScheme
+import spock.util.environment.RestoreSystemProperties
 
 class OpenApiGroupSpec extends AbstractOpenApiTypeElementSpec {
 
@@ -229,5 +230,76 @@ public class MyBean {}
         opPublicExt.'x-google-apigateway-integration'
         ((Map<String, String>) opPublicExt.'x-google-apigateway-integration').uri == '${google.public.lambda-integration.uri}'
         ((Map<String, String>) opPublicExt.'x-google-apigateway-integration').httpMethod == '${google.public.lambda-integration.http-method}'
+    }
+
+    @RestoreSystemProperties
+    void "test group properties"() {
+
+        given:
+        def group1Title = "Private API"
+        def group2Title = "Public API"
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_GROUPS + ".private.display-name", group1Title)
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_GROUPS + ".private.common-exclude", "true")
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_GROUPS + ".private.adoc-enabled", "true")
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_GROUPS + ".private.adoc-filename", "adocFile.adoc")
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_GROUPS + ".public.display-name", group2Title)
+
+        when:
+        buildBeanDefinition("test.MyBean", '''
+package test;
+
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.micronaut.openapi.annotation.OpenAPIGroup;
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.info.Info;
+
+@Controller
+class MyController {
+
+    @OpenAPIGroup("private")
+    @Get("/id/{id}")
+    String get(String id) {
+        return null;
+    }
+
+    @OpenAPIGroup("public")
+    @Get("/name/{name}")
+    String getByName(String name) {
+        return null;
+    }
+
+    // common
+    @Get("/all")
+    String getAll() {
+        return null;
+    }
+}
+
+@OpenAPIDefinition(
+    info = @Info(
+        title = "Title My API",
+        version = "0.0",
+        description = "My API"
+    )
+)
+class Application {
+}
+
+@jakarta.inject.Singleton
+public class MyBean {}
+
+''')
+
+        then:
+        def openApis = Utils.testReferences
+        openApis
+        openApis.size() == 2
+
+        def apiPrivate = openApis.get(Pair.of("private", null)).getOpenApi()
+        def apiPublic = openApis.get(Pair.of("public", null)).getOpenApi()
+
+        apiPrivate.paths.size() == 1
+        apiPublic.paths.size() == 2
     }
 }

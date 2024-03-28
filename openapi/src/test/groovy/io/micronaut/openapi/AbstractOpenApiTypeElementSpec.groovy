@@ -10,10 +10,12 @@ abstract class AbstractOpenApiTypeElementSpec extends AbstractTypeElementSpec {
         Utils.clean()
         System.clearProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_ENABLED)
         System.setProperty(Utils.ATTR_TEST_MODE, "true")
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_ADOC_ENABLED, "false")
     }
 
     def cleanup() {
         Utils.clean()
         System.clearProperty(Utils.ATTR_TEST_MODE)
+        System.clearProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_ADOC_ENABLED)
     }
 }

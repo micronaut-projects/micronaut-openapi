@@ -178,7 +178,7 @@ import java.time.Instant;
 import io.micronaut.http.annotation.Body;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Post;
-import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.extensions.Extension;import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;import io.swagger.v3.oas.annotations.media.Schema;
 
 @Controller
 class OpenApiController {
@@ -211,13 +211,19 @@ class MyDto {
         minimum = "5",
         maximum = "20",
         accessMode = Schema.AccessMode.READ_ONLY,
-        defaultValue = "{\\"stampWidth\\": 100}",
+        defaultValue = """
+                {"stampWidth": 100}""",
         required = true,
-        example = "{\\n" +
-                "  \\"stampWidth\\": 220,\\n" +
-                "  \\"stampHeight\\": 85,\\n" +
-                "  \\"pageNumber\\": 1\\n" +
-                "}"
+        example = """
+                {
+                    "stampWidth": 220,
+                    "stampHeight": 85,
+                    "pageNumber": 1
+                }""",
+        extensions = {
+                @Extension(name = "ext1", properties = @ExtensionProperty(name = "prop11", value = "val11")),
+                @Extension(name = "ext2", properties = @ExtensionProperty(name = "prop21", value = "val21")),
+        }
 )
 class Parameters {
 
@@ -281,16 +287,24 @@ class MyBean {}
 
         dtoSchema.properties.parameters.get$ref() == "#/components/schemas/ParametersSchema"
         !openAPI.components.schemas.MyDto.required
-        openAPI.components.schemas.ParametersSchema.deprecated
-        openAPI.components.schemas.ParametersSchema.nullable
-        openAPI.components.schemas.ParametersSchema.readOnly
-        openAPI.components.schemas.ParametersSchema.description == 'this is description'
-        openAPI.components.schemas.ParametersSchema.example
-        openAPI.components.schemas.ParametersSchema.example.stampWidth == 220
-        openAPI.components.schemas.ParametersSchema.example.stampHeight == 85
-        openAPI.components.schemas.ParametersSchema.example.pageNumber == 1
-        openAPI.components.schemas.ParametersSchema.default
-        openAPI.components.schemas.ParametersSchema.default.stampWidth == 100
+
+        def schema = openAPI.components.schemas.ParametersSchema
+
+        schema.deprecated
+        schema.nullable
+        schema.readOnly
+        schema.description == 'this is description'
+        schema.example
+        schema.example.stampWidth == 220
+        schema.example.stampHeight == 85
+        schema.example.pageNumber == 1
+        schema.default
+        schema.default.stampWidth == 100
+
+        schema.extensions.'x-ext1'
+        schema.extensions.'x-ext1'.prop11 == 'val11'
+        schema.extensions.'x-ext2'
+        schema.extensions.'x-ext2'.prop21 == 'val21'
     }
 
     void "test schema on property level with default values"() {

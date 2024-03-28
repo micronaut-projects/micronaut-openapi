@@ -86,7 +86,7 @@ public final class OpenApiViewConfig {
     private String mappingPath;
     private String title;
     private String specFile;
-    private String serverContextPath = "";
+    private String serverContextPath = StringUtils.EMPTY_STRING;
     private SwaggerUIConfig swaggerUIConfig;
     private RedocConfig redocConfig;
     private RapidocConfig rapidocConfig;
@@ -378,8 +378,8 @@ public final class OpenApiViewConfig {
         }
 
         template = cfg.render(template, context);
-        template = replacePlaceHolder(template, "specURL", getSpecURL(cfg, context), "");
-        template = replacePlaceHolder(template, "title", title, "");
+        template = replacePlaceHolder(template, "specURL", getSpecURL(cfg, context), StringUtils.EMPTY_STRING);
+        template = replacePlaceHolder(template, "title", title, StringUtils.EMPTY_STRING);
         if (!Files.exists(outputDir)) {
             Files.createDirectories(outputDir);
         }
@@ -485,7 +485,7 @@ public final class OpenApiViewConfig {
      */
     static String replacePlaceHolder(String template, String placeHolder, String value, String valuePrefix) {
         if (StringUtils.isEmpty(value)) {
-            return template.replace("{{" + placeHolder + "}}", "");
+            return template.replace("{{" + placeHolder + "}}", StringUtils.EMPTY_STRING);
         } else {
             return template.replace("{{" + placeHolder + "}}", valuePrefix + value);
         }

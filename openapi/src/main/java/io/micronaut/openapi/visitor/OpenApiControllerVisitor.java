@@ -49,16 +49,17 @@ import io.micronaut.inject.visitor.TypeElementVisitor;
 import io.micronaut.inject.visitor.VisitorContext;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.servers.Server;
 
 import com.fasterxml.jackson.annotation.JsonAnySetter;
+import io.swagger.v3.oas.models.tags.Tag;
 
 import static io.micronaut.openapi.visitor.ConfigUtils.getActiveEnvs;
 import static io.micronaut.openapi.visitor.ConfigUtils.getEnv;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ENABLED;
 import static io.micronaut.openapi.visitor.Utils.DEFAULT_MEDIA_TYPES;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_HIDDEN;
 
 /**
  * A {@link TypeElementVisitor} the builds the Swagger model from Micronaut controllers at compile time.
@@ -70,7 +71,7 @@ import static io.micronaut.openapi.visitor.Utils.DEFAULT_MEDIA_TYPES;
 public class OpenApiControllerVisitor extends AbstractOpenApiEndpointVisitor implements TypeElementVisitor<Object, HttpMethodMapping> {
 
     private final String customUri;
-    private final List<AnnotationValue<Tag>> additionalTags;
+    private final List<AnnotationValue<io.swagger.v3.oas.annotations.tags.Tag>> additionalTags;
     private final List<AnnotationValue<io.swagger.v3.oas.annotations.security.SecurityRequirement>> additionalSecurityRequirements;
 
     public OpenApiControllerVisitor() {
@@ -79,7 +80,7 @@ public class OpenApiControllerVisitor extends AbstractOpenApiEndpointVisitor imp
         customUri = null;
     }
 
-    public OpenApiControllerVisitor(List<AnnotationValue<Tag>> additionalTags,
+    public OpenApiControllerVisitor(List<AnnotationValue<io.swagger.v3.oas.annotations.tags.Tag>> additionalTags,
                                     List<AnnotationValue<io.swagger.v3.oas.annotations.security.SecurityRequirement>> additionalSecurityRequirements,
                                     String customUri) {
         this.additionalTags = additionalTags;
@@ -141,7 +142,7 @@ public class OpenApiControllerVisitor extends AbstractOpenApiEndpointVisitor imp
     protected boolean ignore(MethodElement element, VisitorContext context) {
 
         AnnotationValue<Operation> operationAnn = element.getAnnotation(Operation.class);
-        boolean isHidden = operationAnn != null && operationAnn.booleanValue("hidden").orElse(false);
+        boolean isHidden = operationAnn != null && operationAnn.booleanValue(PROP_HIDDEN).orElse(false);
         AnnotationValue<JsonAnySetter> jsonAnySetterAnn = element.getAnnotation(JsonAnySetter.class);
 
         return isHidden
@@ -196,7 +197,7 @@ public class OpenApiControllerVisitor extends AbstractOpenApiEndpointVisitor imp
 
     @Override
     protected List<UriMatchTemplate> uriMatchTemplates(MethodElement element, VisitorContext context) {
-        String controllerValue = element.getOwningType().getValue(UriMapping.class, String.class).orElse(element.getDeclaringType().getValue(UriMapping.class, String.class).orElse("/"));
+        String controllerValue = element.getOwningType().getValue(UriMapping.class, String.class).orElse(element.getDeclaringType().getValue(UriMapping.class, String.class).orElse(StringUtil.SLASH));
         String childClassPath = ContextUtils.get(CONTEXT_CHILD_PATH, String.class, context);
         if (childClassPath != null) {
             controllerValue = childClassPath;
@@ -211,11 +212,11 @@ public class OpenApiControllerVisitor extends AbstractOpenApiEndpointVisitor imp
         // check if we have multiple uris
         String[] uris = element.stringValues(HttpMethodMapping.class, "uris");
         if (ArrayUtils.isEmpty(uris)) {
-            String methodValue = element.getValue(HttpMethodMapping.class, String.class).orElse("/");
+            String methodValue = element.getValue(HttpMethodMapping.class, String.class).orElse(StringUtil.SLASH);
             methodValue = OpenApiApplicationVisitor.replacePlaceholders(methodValue, context);
             return Collections.singletonList(matchTemplate.nest(methodValue));
         }
-        List<UriMatchTemplate> matchTemplates = new ArrayList<>(uris.length);
+        var matchTemplates = new ArrayList<UriMatchTemplate>(uris.length);
         for (String methodValue : uris) {
             methodValue = OpenApiApplicationVisitor.replacePlaceholders(methodValue, context);
             matchTemplates.add(matchTemplate.nest(methodValue));
@@ -229,7 +230,7 @@ public class OpenApiControllerVisitor extends AbstractOpenApiEndpointVisitor imp
     }
 
     @Override
-    protected List<io.swagger.v3.oas.models.tags.Tag> classTags(ClassElement element, VisitorContext context) {
+    protected List<Tag> classTags(ClassElement element, VisitorContext context) {
         return readTags(additionalTags, context);
     }
 

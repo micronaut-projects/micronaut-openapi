@@ -324,7 +324,7 @@ class Pet {
 }
 
 interface PetOperations {
- @Post
+    @Post
     @Operation(summary = "This method creates a new Pet. " +
             " A successful request returns the response code 200." )
     @Tag(name = "Pet Operations")
