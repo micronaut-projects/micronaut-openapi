@@ -51,6 +51,9 @@ import static io.micronaut.openapi.visitor.ContextUtils.info;
 import static io.micronaut.openapi.visitor.ContextUtils.warn;
 import static io.micronaut.openapi.visitor.FileUtils.resolve;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_SERVER_CONTEXT_PATH;
+import static io.micronaut.openapi.visitor.StringUtil.COMMA;
+import static io.micronaut.openapi.visitor.StringUtil.DOLLAR;
+import static io.micronaut.openapi.visitor.StringUtil.SLASH;
 
 /**
  * OpenApi view configuration for Swagger UI, ReDoc, OpenAPI Explorer and RapiDoc.
@@ -74,7 +77,6 @@ public final class OpenApiViewConfig {
     public static final String TEMPLATES_REDOC = "redoc";
     public static final String TEMPLATES_RAPIDOC = "rapidoc";
     public static final String TEMPLATES_OPENAPI_EXPLORER = "openapi-explorer";
-    public static final String SLASH = "/";
 
     private static final String TEMPLATE_INDEX_HTML = "index.html";
     private static final String REDOC = "redoc";
@@ -127,7 +129,7 @@ public final class OpenApiViewConfig {
             return Collections.emptyMap();
         }
         var result = new HashMap<String, String>();
-        for (var prop : specification.split(",")) {
+        for (var prop : specification.split(COMMA)) {
             prop = prop.strip();
             if (prop.isEmpty()) {
                 continue;
@@ -319,7 +321,7 @@ public final class OpenApiViewConfig {
         String projectDir = StringUtils.EMPTY_STRING;
         Path projectPath = context != null ? getProjectPath(context) : null;
         if (projectPath != null) {
-            projectDir = projectPath.toString().replaceAll("\\\\", "/");
+            projectDir = projectPath.toString().replace("\\\\", SLASH);
         }
         if (customPathStr.startsWith("project:")) {
             customPathStr = customPathStr.replace("project:", projectDir);
@@ -448,13 +450,13 @@ public final class OpenApiViewConfig {
             if (contextPath == null) {
                 contextPath = StringUtils.EMPTY_STRING;
             }
-            if (!contextPath.startsWith("/") && !contextPath.startsWith("$")) {
-                contextPath = "/" + contextPath;
+            if (!contextPath.startsWith(SLASH) && !contextPath.startsWith(DOLLAR)) {
+                contextPath = SLASH + contextPath;
             }
-            if (!contextPath.endsWith("/")) {
-                contextPath += "/";
+            if (!contextPath.endsWith(SLASH)) {
+                contextPath += SLASH;
             }
-            if (specUrl.startsWith("/")) {
+            if (specUrl.startsWith(SLASH)) {
                 specUrl = specUrl.substring(1);
             }
 

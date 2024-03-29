@@ -36,6 +36,9 @@ import io.micronaut.openapi.visitor.group.OpenApiInfo;
 import static io.micronaut.openapi.visitor.ConfigUtils.getGroupProperties;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_CONTEXT_SERVER_PATH;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_SERVER_CONTEXT_PATH;
+import static io.micronaut.openapi.visitor.StringUtil.PLACEHOLDER_POSTFIX;
+import static io.micronaut.openapi.visitor.StringUtil.PLACEHOLDER_PREFIX;
+import static io.micronaut.openapi.visitor.StringUtil.SLASH;
 
 /**
  * Abstract View Config.
@@ -129,9 +132,9 @@ abstract class AbstractViewConfig implements Toggleable {
         if (serverContextPath == null) {
             serverContextPath = StringUtils.EMPTY_STRING;
         }
-        String finalUrl = serverContextPath.startsWith(OpenApiViewConfig.SLASH) ? serverContextPath : OpenApiViewConfig.SLASH + serverContextPath;
-        if (!finalUrl.endsWith(OpenApiViewConfig.SLASH)) {
-            finalUrl += OpenApiViewConfig.SLASH;
+        String finalUrl = serverContextPath.startsWith(SLASH) ? serverContextPath : SLASH + serverContextPath;
+        if (!finalUrl.endsWith(SLASH)) {
+            finalUrl += SLASH;
         }
 
         // process micronaut.server.context-path
@@ -139,18 +142,18 @@ abstract class AbstractViewConfig implements Toggleable {
         if (contextPath == null) {
             contextPath = StringUtils.EMPTY_STRING;
         }
-        finalUrl += contextPath.startsWith(OpenApiViewConfig.SLASH) ? contextPath.substring(1) : contextPath;
-        if (!finalUrl.endsWith(OpenApiViewConfig.SLASH)) {
-            finalUrl += OpenApiViewConfig.SLASH;
+        finalUrl += contextPath.startsWith(SLASH) ? contextPath.substring(1) : contextPath;
+        if (!finalUrl.endsWith(SLASH)) {
+            finalUrl += SLASH;
         }
 
         urlPrefix = finalUrl;
 
         // standard path
         finalUrl += rendererType.getTemplatePath();
-        finalUrl += finalUrl.endsWith(OpenApiViewConfig.SLASH) ? resourcesContextPath.substring(1) : resourcesContextPath;
-        if (!finalUrl.endsWith(OpenApiViewConfig.SLASH)) {
-            finalUrl += OpenApiViewConfig.SLASH;
+        finalUrl += finalUrl.endsWith(SLASH) ? resourcesContextPath.substring(1) : resourcesContextPath;
+        if (!finalUrl.endsWith(SLASH)) {
+            finalUrl += SLASH;
         }
 
         fullUrlPrefix = finalUrl;
@@ -205,7 +208,7 @@ abstract class AbstractViewConfig implements Toggleable {
                 }
 
                 cfg.getFinalUrlPrefix(OpenApiViewConfig.RendererType.SWAGGER_UI, context);
-                String groupUrl = cfg.urlPrefix + (!cfg.urlPrefix.endsWith("/") ? "/swagger/" : "swagger/") + openApiInfo.getFilename();
+                String groupUrl = cfg.urlPrefix + (!cfg.urlPrefix.endsWith(SLASH) ? "/swagger/" : "swagger/") + openApiInfo.getFilename();
                 urls.add(new OpenApiUrl(groupUrl, groupName));
             }
             cfg.urls = urls;
@@ -221,7 +224,7 @@ abstract class AbstractViewConfig implements Toggleable {
                     filenameFromContext = cfg.openApiInfos.get(Pair.NULL_STRING_PAIR).getFilename();
                 }
 
-                cfg.specUrl = specUrl.replace(Utils.PLACEHOLDER_PREFIX + "filename" + Utils.PLACEHOLDER_POSTFIX,
+                cfg.specUrl = specUrl.replace(PLACEHOLDER_PREFIX + "filename" + PLACEHOLDER_POSTFIX,
                     filenameFromContext != null ? filenameFromContext : StringUtils.EMPTY_STRING);
             }
         }
@@ -233,7 +236,7 @@ abstract class AbstractViewConfig implements Toggleable {
         } else {
             String resourcesContextPath = properties.get(cfg.prefix + "resources.context.path");
             if (StringUtils.isNotEmpty(resourcesContextPath)) {
-                cfg.resourcesContextPath = resourcesContextPath.startsWith("/") ? resourcesContextPath : "/" + resourcesContextPath;
+                cfg.resourcesContextPath = resourcesContextPath.startsWith(SLASH) ? resourcesContextPath : SLASH + resourcesContextPath;
             }
         }
 

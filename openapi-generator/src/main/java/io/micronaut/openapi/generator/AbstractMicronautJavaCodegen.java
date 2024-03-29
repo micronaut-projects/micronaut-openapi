@@ -107,6 +107,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
     private static final String MONO_CLASS_NAME = "reactor.core.publisher.Mono";
     private static final String FLUX_CLASS_NAME = "reactor.core.publisher.Flux";
 
+    protected Random random = new Random();
     protected String title;
     protected boolean useBeanValidation;
     protected boolean useOptional;
@@ -677,14 +678,6 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
         return word != null && reservedWords.contains(word);
     }
 
-    public boolean isUseBeanValidation() {
-        return useBeanValidation;
-    }
-
-    public boolean isUseOptional() {
-        return useOptional;
-    }
-
     public boolean isVisitable() {
         return visitable;
     }
@@ -1130,12 +1123,10 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
         objs = super.postProcessAllModels(objs);
 
         var isServer = isServer();
-        var random = new Random();
 
         for (ModelsMap models : objs.values()) {
             CodegenModel model = models.getModels().get(0).getModel();
 
-            var hasParent = model.getParentModel() != null;
             var requiredVarsWithoutDiscriminator = new ArrayList<CodegenProperty>();
             var requiredParentVarsWithoutDiscriminator = new ArrayList<CodegenProperty>();
             var allVars = new ArrayList<CodegenProperty>();
@@ -1216,8 +1207,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
         allVars.addAll(model.vars);
 
         for (var v : model.requiredVars) {
-            boolean isDiscriminator = isDiscriminator(v, model);
-            if (!isDiscriminator(v, model) && !containsProp(v, requiredVarsWithoutDiscriminator)) {
+            if (!isDiscriminator(v, model) && notContainsProp(v, requiredVarsWithoutDiscriminator)) {
                 requiredVarsWithoutDiscriminator.add(v);
             }
         }
@@ -1242,20 +1232,20 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
             boolean isDiscriminator = isDiscriminator(v, model);
             if (v.required && !isDiscriminator) {
                 v.vendorExtensions.put("isServerOrNotReadOnly", !v.isReadOnly || isServer());
-                if (!containsProp(v, requiredParentVarsWithoutDiscriminator)) {
+                if (notContainsProp(v, requiredParentVarsWithoutDiscriminator)) {
                     requiredParentVarsWithoutDiscriminator.add(v);
                 }
             }
         }
     }
 
-    private boolean containsProp(CodegenProperty prop, List<CodegenProperty> props) {
+    private boolean notContainsProp(CodegenProperty prop, List<CodegenProperty> props) {
         for (var p : props) {
             if (prop.name.equals(p.name)) {
-                return true;
+                return false;
             }
         }
-        return false;
+        return true;
     }
 
     private boolean isDiscriminator(CodegenProperty prop, CodegenModel model) {
@@ -1413,7 +1403,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
         if (text == null) {
             return null;
         }
-        return escapeText(text).replaceAll("'", "'");
+        return escapeText(text).replace("'", "\"");
     }
 
     @Override

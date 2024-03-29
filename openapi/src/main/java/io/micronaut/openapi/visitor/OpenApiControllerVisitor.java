@@ -15,18 +15,7 @@
  */
 package io.micronaut.openapi.visitor;
 
-import java.lang.annotation.Annotation;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
-import java.util.Set;
-
-import javax.annotation.processing.SupportedOptions;
-
+import com.fasterxml.jackson.annotation.JsonAnySetter;
 import io.micronaut.context.RequiresCondition;
 import io.micronaut.context.annotation.Requires;
 import io.micronaut.context.env.Environment;
@@ -51,15 +40,26 @@ import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.servers.Server;
-
-import com.fasterxml.jackson.annotation.JsonAnySetter;
 import io.swagger.v3.oas.models.tags.Tag;
+
+import javax.annotation.processing.SupportedOptions;
+import java.lang.annotation.Annotation;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Optional;
+import java.util.Set;
 
 import static io.micronaut.openapi.visitor.ConfigUtils.getActiveEnvs;
 import static io.micronaut.openapi.visitor.ConfigUtils.getEnv;
+import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_CHILD_PATH;
+import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_IS_PROCESS_PARENT_CLASS;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ENABLED;
-import static io.micronaut.openapi.visitor.Utils.DEFAULT_MEDIA_TYPES;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_HIDDEN;
+import static io.micronaut.openapi.visitor.Utils.DEFAULT_MEDIA_TYPES;
 
 /**
  * A {@link TypeElementVisitor} the builds the Swagger model from Micronaut controllers at compile time.
@@ -131,7 +131,7 @@ public class OpenApiControllerVisitor extends AbstractOpenApiEndpointVisitor imp
 
     @Override
     protected boolean ignore(ClassElement element, VisitorContext context) {
-        boolean isParentClass = ContextUtils.get(IS_PROCESS_PARENT_CLASS, Boolean.class, false, context);
+        boolean isParentClass = ContextUtils.get(MICRONAUT_INTERNAL_IS_PROCESS_PARENT_CLASS, Boolean.class, false, context);
 
         return (!isParentClass && !element.isAnnotationPresent(Controller.class))
             || element.isAnnotationPresent(Hidden.class)
@@ -198,7 +198,7 @@ public class OpenApiControllerVisitor extends AbstractOpenApiEndpointVisitor imp
     @Override
     protected List<UriMatchTemplate> uriMatchTemplates(MethodElement element, VisitorContext context) {
         String controllerValue = element.getOwningType().getValue(UriMapping.class, String.class).orElse(element.getDeclaringType().getValue(UriMapping.class, String.class).orElse(StringUtil.SLASH));
-        String childClassPath = ContextUtils.get(CONTEXT_CHILD_PATH, String.class, context);
+        String childClassPath = ContextUtils.get(MICRONAUT_INTERNAL_CHILD_PATH, String.class, context);
         if (childClassPath != null) {
             controllerValue = childClassPath;
         }

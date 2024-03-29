@@ -32,7 +32,7 @@ public final class FileUtils {
     }
 
     public static String loadFileFromClasspath(String location) {
-        String file = location.replaceAll("\\\\", "/");
+        String file = location.replace("\\\\", "/");
 
         var inputStream = FileUtils.class.getResourceAsStream(file);
         if (inputStream == null) {

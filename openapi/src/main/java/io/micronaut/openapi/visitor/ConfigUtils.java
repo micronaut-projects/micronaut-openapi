@@ -62,6 +62,7 @@ import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_GR
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_JACKSON_JSON_VIEW_DEFAULT_INCLUSION;
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_JACKSON_JSON_VIEW_ENABLED;
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_OPENAPI_ENABLED;
+import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_OPENAPI_ENDPOINTS;
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_OPENAPI_PROJECT_DIR;
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_OPENAPI_PROPERTIES;
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_ROUTER_VERSIONING_PROPERTIES;
@@ -99,6 +100,8 @@ import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENA
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_SWAGGER_FILE_GENERATION_ENABLED;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_VERSIONING_ENABLED;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.OPENAPI_CONFIG_FILE;
+import static io.micronaut.openapi.visitor.StringUtil.COMMA;
+import static io.micronaut.openapi.visitor.StringUtil.DOT;
 import static io.micronaut.openapi.visitor.group.RouterVersioningProperties.DEFAULT_HEADER_NAME;
 import static io.micronaut.openapi.visitor.group.RouterVersioningProperties.DEFAULT_PARAMETER_NAME;
 
@@ -467,8 +470,8 @@ public final class ConfigUtils {
             strValue = readOpenApiConfigFile(context).getProperty(property);
         }
         if (StringUtils.isNotEmpty(strValue)) {
-            List<String> result = new ArrayList<>();
-            for (String item : strValue.split(",")) {
+            var result = new ArrayList<String>();
+            for (String item : strValue.split(COMMA)) {
                 result.add(item.strip());
             }
             return result;
@@ -536,12 +539,12 @@ public final class ConfigUtils {
      * @return The EndpointsConfiguration.
      */
     public static EndpointsConfiguration endpointsConfiguration(VisitorContext context) {
-        EndpointsConfiguration cfg = ContextUtils.get(MICRONAUT_INTERNAL_ENVIRONMENT_CREATED, EndpointsConfiguration.class, context);
+        EndpointsConfiguration cfg = ContextUtils.get(MICRONAUT_INTERNAL_OPENAPI_ENDPOINTS, EndpointsConfiguration.class, context);
         if (cfg != null) {
             return cfg;
         }
         var conf = new EndpointsConfiguration(context, readOpenApiConfigFile(context));
-        ContextUtils.put(MICRONAUT_INTERNAL_ENVIRONMENT_CREATED, conf, context);
+        ContextUtils.put(MICRONAUT_INTERNAL_OPENAPI_ENDPOINTS, conf, context);
         return conf;
     }
 
@@ -591,8 +594,8 @@ public final class ConfigUtils {
                 break;
             case "packages":
                 if (groupProperties.getPackages() == null) {
-                    List<GroupProperties.PackageProperties> packages = new ArrayList<>();
-                    for (String groupPackage : valueStr.split(",")) {
+                    var packages = new ArrayList<GroupProperties.PackageProperties>();
+                    for (String groupPackage : valueStr.split(COMMA)) {
                         packages.add(getPackageProperties(groupPackage));
                     }
                     groupProperties.setPackages(packages);
@@ -610,8 +613,8 @@ public final class ConfigUtils {
                 break;
             case "packagesexclude", "packages-exclude":
                 if (groupProperties.getPackagesExclude() == null) {
-                    List<GroupProperties.PackageProperties> packagesExclude = new ArrayList<>();
-                    for (String groupPackage : valueStr.split(",")) {
+                    var packagesExclude = new ArrayList<GroupProperties.PackageProperties>();
+                    for (String groupPackage : valueStr.split(COMMA)) {
                         packagesExclude.add(getPackageProperties(groupPackage));
                     }
                     groupProperties.setPackagesExclude(packagesExclude);
@@ -628,7 +631,7 @@ public final class ConfigUtils {
         if (includeSubpackages) {
             groupPackage = groupPackage.substring(0, groupPackage.length() - 2);
         }
-        if (groupPackage.endsWith(".")) {
+        if (groupPackage.endsWith(DOT)) {
             groupPackage = groupPackage.substring(0, groupPackage.length() - 2);
         }
         return new GroupProperties.PackageProperties(groupPackage, includeSubpackages);
@@ -682,7 +685,7 @@ public final class ConfigUtils {
         List<String> configuredTypeArgs = null;
         int genericNameStart = className.indexOf('<');
         if (genericNameStart > 0) {
-            String[] generics = className.substring(genericNameStart + 1, className.indexOf('>')).split(",");
+            String[] generics = className.substring(genericNameStart + 1, className.indexOf('>')).split(COMMA);
             configuredTypeArgs = new ArrayList<>();
             for (String generic : generics) {
                 configuredTypeArgs.add(generic.strip());
@@ -864,7 +867,7 @@ public final class ConfigUtils {
         if (StringUtils.isNotEmpty(activeEnvStr)) {
             activeEnvs = Stream.of(activeEnvStr)
                 .filter(StringUtils::isNotEmpty)
-                .flatMap(s -> Arrays.stream(s.split(",")))
+                .flatMap(s -> Arrays.stream(s.split(COMMA)))
                 .map(String::trim)
                 .toList();
         } else {

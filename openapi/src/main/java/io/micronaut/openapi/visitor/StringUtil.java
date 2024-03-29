@@ -24,9 +24,20 @@ import io.micronaut.core.annotation.Internal;
  */
 @Internal
 public final class StringUtil {
-    
+
+    public static final String PLACEHOLDER_PREFIX = "${";
+    public static final String PLACEHOLDER_POSTFIX = "}";
+
+    public static final String THREE_DOTS = "...";
+
+    public static final String OPEN_BRACE = "{";
+    public static final String CLOSE_BRACE = "}";
     public static final String SLASH = "/";
     public static final String DOLLAR = "$";
+    public static final String DOT = ".";
+    public static final String COMMA = ",";
+    public static final String UNDERSCORE = "_";
+    public static final String MINUS = "-";
 
     private StringUtil() {
     }

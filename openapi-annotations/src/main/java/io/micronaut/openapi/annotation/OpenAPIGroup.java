@@ -57,7 +57,7 @@ public @interface OpenAPIGroup {
     String[] exclude() default {};
 
     /**
-     * The list of optional extensions only for these groups
+     * The list of optional extensions only for these groups.
      *
      * @return an optional array of extensions
      * @since 6.7.0

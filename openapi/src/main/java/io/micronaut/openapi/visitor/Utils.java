@@ -16,7 +16,6 @@
 package io.micronaut.openapi.visitor;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.micronaut.context.env.PropertyPlaceholderResolver;
 import io.micronaut.core.annotation.Internal;
 import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.http.MediaType;
@@ -53,9 +52,6 @@ import static io.swagger.v3.oas.models.media.Schema.BIND_TYPE_AND_TYPES;
 @Internal
 public final class Utils {
 
-    public static final String PLACEHOLDER_PREFIX = "${";
-    public static final String PLACEHOLDER_POSTFIX = "}";
-
     public static final String ATTR_OPENAPI = "io.micronaut.OPENAPI";
     public static final String ATTR_TEST_MODE = "io.micronaut.OPENAPI_TEST";
     public static final String ATTR_VISITED_ELEMENTS = "io.micronaut.OPENAPI.visited.elements";
@@ -82,7 +78,6 @@ public final class Utils {
      */
     private static Map<String, List<String>> includedClassesGroupsExcluded;
 
-    private static PropertyPlaceholderResolver propertyPlaceholderResolver;
     private static OpenAPI testReference;
     /**
      * OpenAPI objects by key - {@code Pair.of(group, version)}.
@@ -235,9 +230,9 @@ public final class Utils {
      * @return stacktrace
      */
     public static String printStackTrace(Throwable t) {
-        StringWriter sw = new StringWriter();
+        var sw = new StringWriter();
         sw.append(t.getMessage()).append('\n');
-        PrintWriter pw = new PrintWriter(sw);
+        var pw = new PrintWriter(sw);
         t.printStackTrace(pw);
         return sw.toString();
     }

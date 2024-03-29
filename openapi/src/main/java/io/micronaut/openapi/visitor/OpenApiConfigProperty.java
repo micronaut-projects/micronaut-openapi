@@ -15,6 +15,8 @@
  */
 package io.micronaut.openapi.visitor;
 
+import io.micronaut.core.annotation.Internal;
+
 import java.util.Set;
 
 /**
@@ -22,6 +24,7 @@ import java.util.Set;
  *
  * @since 4.10.0
  */
+@Internal
 public interface OpenApiConfigProperty {
 
     /**

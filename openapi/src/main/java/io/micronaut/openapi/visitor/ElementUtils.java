@@ -59,6 +59,8 @@ import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_HIDDEN;
 @Internal
 public final class ElementUtils {
 
+    public static final AnnotationValue<?>[] EMPTY_ANNOTATION_VALUES_ARRAY = new AnnotationValue[0];
+
     public static final List<String> CONTAINER_TYPES = List.of(
         Optional.class.getName(),
         Future.class.getName(),

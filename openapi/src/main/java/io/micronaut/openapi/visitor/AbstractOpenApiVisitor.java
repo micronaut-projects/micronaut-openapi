@@ -149,6 +149,30 @@ import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.replacePlac
 import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.resolvePlaceholders;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_FIELD_VISIBILITY_LEVEL;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_SERVER_CONTEXT_PATH;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.DISCRIMINATOR;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_ACCESS_MODE;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_ADDITIONAL_PROPERTIES;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_ARRAY_SCHEMA;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_DEPRECATED;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_DISCRIMINATOR_MAPPING;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_DISCRIMINATOR_PROPERTY;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_EXPRESSION;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_EXTERNAL_DOCS;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_IMPLEMENTATION;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_MAPPING;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_MEDIA_TYPE;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_NOT;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_NULLABLE;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_PROPERTY_NAME;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_READ_ONLY;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_REQUIRED;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_REQUIRED_MODE;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_REQUIRED_PROPERTIES;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_RESPONSE_CODE;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_SCOPES;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_STYLE;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_TITLE;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_WRITE_ONLY;
 import static io.micronaut.openapi.visitor.SchemaUtils.EMPTY_SCHEMA;
 import static io.micronaut.openapi.visitor.SchemaUtils.TYPE_ARRAY;
 import static io.micronaut.openapi.visitor.SchemaUtils.TYPE_OBJECT;
@@ -156,8 +180,14 @@ import static io.micronaut.openapi.visitor.SchemaUtils.getSchemaByRef;
 import static io.micronaut.openapi.visitor.SchemaUtils.processExtensions;
 import static io.micronaut.openapi.visitor.SchemaUtils.setAllowableValues;
 import static io.micronaut.openapi.visitor.SchemaUtils.setSpecVersion;
+import static io.micronaut.openapi.visitor.StringUtil.CLOSE_BRACE;
+import static io.micronaut.openapi.visitor.StringUtil.DOLLAR;
+import static io.micronaut.openapi.visitor.StringUtil.DOT;
+import static io.micronaut.openapi.visitor.StringUtil.OPEN_BRACE;
+import static io.micronaut.openapi.visitor.StringUtil.SLASH;
+import static io.micronaut.openapi.visitor.StringUtil.UNDERSCORE;
 import static io.micronaut.openapi.visitor.Utils.isOpenapi31;
-import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_$REF;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_REF_DOLLAR;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_ALLOWABLE_VALUES;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_ALL_OF;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_ANY_OF;
@@ -362,12 +392,12 @@ abstract class AbstractOpenApiVisitor {
 
             String resultPath = replacePlaceholders(result.toString(), context);
 
-            if (!resultPath.startsWith(StringUtil.SLASH) && !resultPath.startsWith(StringUtil.DOLLAR)) {
+            if (!resultPath.startsWith(StringUtil.SLASH) && !resultPath.startsWith(DOLLAR)) {
                 resultPath = StringUtil.SLASH + resultPath;
             }
             String contextPath = ConfigUtils.getConfigProperty(MICRONAUT_SERVER_CONTEXT_PATH, context);
             if (StringUtils.isNotEmpty(contextPath)) {
-                if (!contextPath.startsWith(StringUtil.SLASH) && !contextPath.startsWith(StringUtil.DOLLAR)) {
+                if (!contextPath.startsWith(StringUtil.SLASH) && !contextPath.startsWith(DOLLAR)) {
                     contextPath = StringUtil.SLASH + contextPath;
                 }
                 if (contextPath.endsWith(StringUtil.SLASH)) {
@@ -392,7 +422,7 @@ abstract class AbstractOpenApiVisitor {
                     int i = 0;
                     for (String var : optionalVars) {
                         if (finalPaths.isEmpty()) {
-                            finalPaths.put(i, resultPath + "/{" + var + '}');
+                            finalPaths.put(i, resultPath + SLASH + OPEN_BRACE + var + CLOSE_BRACE);
                             i++;
                             continue;
                         }
@@ -400,7 +430,7 @@ abstract class AbstractOpenApiVisitor {
                             if (entry.getKey() + 1 < i) {
                                 continue;
                             }
-                            finalPaths.put(i, entry.getValue() + "/{" + var + '}');
+                            finalPaths.put(i, entry.getValue() + SLASH + OPEN_BRACE + var + CLOSE_BRACE);
                         }
                         i++;
                     }
@@ -419,12 +449,12 @@ abstract class AbstractOpenApiVisitor {
     private List<String> addOptionalVars(List<String> paths, String var, int level) {
         var additionalPaths = new ArrayList<>(paths);
         if (paths.isEmpty()) {
-            additionalPaths.add("/{" + var + '}');
+            additionalPaths.add(SLASH + OPEN_BRACE + var + CLOSE_BRACE);
             return additionalPaths;
         }
 
         for (String path : paths) {
-            additionalPaths.add(path + "/{" + var + '}');
+            additionalPaths.add(path + SLASH + OPEN_BRACE + var + CLOSE_BRACE);
         }
         return additionalPaths;
     }
@@ -486,7 +516,7 @@ abstract class AbstractOpenApiVisitor {
                                 Map<String, Object> encodings = annotationValueArrayToSubmap(a, PROP_NAME, context, null);
                                 newValues.put(key, encodings);
                             } else if (Content.class.getName().equals(annotationName)) {
-                                Map<String, Object> mediaTypes = annotationValueArrayToSubmap(a, "mediaType", context, jsonViewClass);
+                                Map<String, Object> mediaTypes = annotationValueArrayToSubmap(a, PROP_MEDIA_TYPE, context, jsonViewClass);
                                 newValues.put(key, mediaTypes);
                             } else if (Link.class.getName().equals(annotationName) || Header.class.getName().equals(annotationName)) {
                                 Map<String, Object> linksOrHeaders = annotationValueArrayToSubmap(a, PROP_NAME, context, jsonViewClass);
@@ -497,14 +527,14 @@ abstract class AbstractOpenApiVisitor {
                                         continue;
                                     }
                                     if (linkOrHeaderMap.containsKey(PROP_REF)) {
-                                        linkOrHeaderMap.put(PROP_$REF, linkOrHeaderMap.remove(PROP_REF));
+                                        linkOrHeaderMap.put(PROP_REF_DOLLAR, linkOrHeaderMap.remove(PROP_REF));
                                     }
                                     if (linkOrHeaderMap.containsKey(PROP_SCHEMA)) {
                                         var schemaMap = (Map<String, Object>) linkOrHeaderMap.get(PROP_SCHEMA);
                                         if (schemaMap.containsKey(PROP_REF)) {
                                             Object ref = schemaMap.get(PROP_REF);
                                             schemaMap.clear();
-                                            schemaMap.put(PROP_$REF, ref);
+                                            schemaMap.put(PROP_REF_DOLLAR, ref);
                                         }
                                         if (schemaMap.containsKey(PROP_DEFAULT_VALUE)) {
                                             schemaMap.put(PROP_DEFAULT, schemaMap.remove(PROP_DEFAULT_VALUE));
@@ -541,7 +571,7 @@ abstract class AbstractOpenApiVisitor {
                                 }
                                 newValues.put(key, newLinksOrHeaders);
                             } else if (LinkParameter.class.getName().equals(annotationName)) {
-                                Map<String, String> params = toTupleSubMap(a, PROP_NAME, "expression");
+                                Map<String, String> params = toTupleSubMap(a, PROP_NAME, PROP_EXPRESSION);
                                 newValues.put(key, params);
                             } else if (OAuthScope.class.getName().equals(annotationName)) {
                                 Map<String, String> params = toTupleSubMap(a, PROP_NAME, PROP_DESCRIPTION);
@@ -550,12 +580,12 @@ abstract class AbstractOpenApiVisitor {
                                 var responses = new LinkedHashMap<String, Map<CharSequence, Object>>();
                                 for (Object o : a) {
                                     var sv = (AnnotationValue<ApiResponse>) o;
-                                    String name = sv.stringValue("responseCode").orElse(PROP_DEFAULT);
+                                    String name = sv.stringValue(PROP_RESPONSE_CODE).orElse(PROP_DEFAULT);
                                     Map<CharSequence, Object> map = toValueMap(sv.getValues(), context, jsonViewClass);
                                     if (map.containsKey(PROP_REF)) {
                                         Object ref = map.get(PROP_REF);
                                         map.clear();
-                                        map.put(PROP_$REF, ref);
+                                        map.put(PROP_REF_DOLLAR, ref);
                                     }
 
                                     try {
@@ -578,7 +608,7 @@ abstract class AbstractOpenApiVisitor {
                                     if (map.containsKey(PROP_REF)) {
                                         Object ref = map.get(PROP_REF);
                                         map.clear();
-                                        map.put(PROP_$REF, ref);
+                                        map.put(PROP_REF_DOLLAR, ref);
                                     }
                                     examples.put(name, map);
                                 }
@@ -616,18 +646,18 @@ abstract class AbstractOpenApiVisitor {
                                 for (Object o : a) {
                                     var dv = (AnnotationValue<DiscriminatorMapping>) o;
                                     final Map<CharSequence, Object> valueMap = resolveAnnotationValues(context, dv, null);
-                                    mappings.put(valueMap.get(PROP_VALUE).toString(), valueMap.get(PROP_$REF).toString());
+                                    mappings.put(valueMap.get(PROP_VALUE).toString(), valueMap.get(PROP_REF_DOLLAR).toString());
                                     var extValue = (Map<String, Object>) valueMap.get(PROP_EXTENSIONS);
                                     if (extValue != null) {
                                         extensions.putAll(extValue);
                                     }
                                 }
                                 final Map<String, Object> discriminatorMap = getDiscriminatorMap(newValues);
-                                discriminatorMap.put("mapping", mappings);
+                                discriminatorMap.put(PROP_MAPPING, mappings);
                                 if (CollectionUtils.isNotEmpty(extensions)) {
                                     discriminatorMap.put(PROP_EXTENSIONS, extensions);
                                 }
-                                newValues.put("discriminator", discriminatorMap);
+                                newValues.put(DISCRIMINATOR, discriminatorMap);
                             } else {
                                 if (a.length == 1) {
                                     var av = (AnnotationValue<?>) a[0];
@@ -655,19 +685,19 @@ abstract class AbstractOpenApiVisitor {
                     } else {
                         newValues.put(key, a);
                     }
-                } else if (key.equals("additionalProperties")) {
+                } else if (key.equals(PROP_ADDITIONAL_PROPERTIES)) {
                     if (AdditionalPropertiesValue.TRUE.toString().equals(value.toString())) {
-                        newValues.put("additionalProperties", true);
+                        newValues.put(PROP_ADDITIONAL_PROPERTIES, true);
                         // TODO
 //                    } else if (AdditionalPropertiesValue.USE_ADDITIONAL_PROPERTIES_ANNOTATION.toString().equals(value.toString())) {
                     }
                 } else if (key.equals(PROP_ONE_TYPES) && Utils.isOpenapi31()) {
                     newValues.put(PROP_TYPE, value);
-                } else if (key.equals("discriminatorProperty")) {
+                } else if (key.equals(PROP_DISCRIMINATOR_PROPERTY)) {
                     final Map<String, Object> discriminatorMap = getDiscriminatorMap(newValues);
-                    discriminatorMap.put("propertyName", parseJsonString(value).orElse(value));
-                    newValues.put("discriminator", discriminatorMap);
-                } else if (key.equals("style")) {
+                    discriminatorMap.put(PROP_PROPERTY_NAME, parseJsonString(value).orElse(value));
+                    newValues.put(DISCRIMINATOR, discriminatorMap);
+                } else if (key.equals(PROP_STYLE)) {
                     io.swagger.v3.oas.models.parameters.Parameter.StyleEnum paramStyle = null;
                     try {
                         paramStyle = io.swagger.v3.oas.models.parameters.Parameter.StyleEnum.valueOf((String) value);
@@ -706,12 +736,17 @@ abstract class AbstractOpenApiVisitor {
                         }
                     }
                 } else if (key.equals(PROP_REF)) {
-                    newValues.put(PROP_$REF, value);
-                } else if (key.equals("accessMode")) {
-                    if (io.swagger.v3.oas.annotations.media.Schema.AccessMode.READ_ONLY.toString().equals(value)) {
-                        newValues.put("readOnly", Boolean.TRUE);
-                    } else if (io.swagger.v3.oas.annotations.media.Schema.AccessMode.WRITE_ONLY.toString().equals(value)) {
-                        newValues.put("writeOnly", Boolean.TRUE);
+                    newValues.put(PROP_REF_DOLLAR, value);
+                } else if (key.equals(PROP_ACCESS_MODE)) {
+                    if (AccessMode.READ_ONLY.toString().equals(value)) {
+                        newValues.put(PROP_READ_ONLY, Boolean.TRUE);
+                        newValues.remove(PROP_WRITE_ONLY);
+                    } else if (AccessMode.WRITE_ONLY.toString().equals(value)) {
+                        newValues.remove(PROP_READ_ONLY);
+                        newValues.put(PROP_WRITE_ONLY, Boolean.TRUE);
+                    } else if (AccessMode.READ_WRITE.toString().equals(value)) {
+                        newValues.remove(PROP_READ_ONLY);
+                        newValues.remove(PROP_WRITE_ONLY);
                     }
                 } else {
                     newValues.put(key, parseJsonString(value).orElse(value));
@@ -722,7 +757,7 @@ abstract class AbstractOpenApiVisitor {
     }
 
     private Map<String, Object> getDiscriminatorMap(Map<CharSequence, Object> newValues) {
-        return newValues.containsKey("discriminator") ? (Map<String, Object>) newValues.get("discriminator") : new HashMap<>();
+        return newValues.containsKey(DISCRIMINATOR) ? (Map<String, Object>) newValues.get(DISCRIMINATOR) : new HashMap<>();
     }
 
     private <T extends Schema<?>> void processAnnotationValue(VisitorContext context, AnnotationValue<?> annotationValue,
@@ -730,7 +765,7 @@ abstract class AbstractOpenApiVisitor {
                                                               Class<T> type, @Nullable ClassElement jsonViewClass) {
         Map<CharSequence, Object> values = annotationValue.getValues().entrySet().stream()
             .filter(entry -> filters == null || !filters.contains((String) entry.getKey()))
-            .collect(toMap(e -> e.getKey().equals("requiredProperties") ? "required" : e.getKey(), Map.Entry::getValue));
+            .collect(toMap(e -> e.getKey().equals(PROP_REQUIRED_PROPERTIES) ? PROP_REQUIRED : e.getKey(), Map.Entry::getValue));
         toValue(values, context, type, jsonViewClass)
             .ifPresent(s -> schemaToValueMap(arraySchemaMap, s));
     }
@@ -738,12 +773,12 @@ abstract class AbstractOpenApiVisitor {
     private Map<CharSequence, Object> resolveArraySchemaAnnotationValues(VisitorContext context, AnnotationValue<?> av, @Nullable ClassElement jsonViewClass) {
         var arraySchemaMap = new HashMap<CharSequence, Object>(10);
         // properties
-        av.get("arraySchema", AnnotationValue.class).ifPresent(annotationValue ->
-            processAnnotationValue(context, (AnnotationValue<?>) annotationValue, arraySchemaMap, List.of(PROP_REF, "implementation"), Schema.class, null)
+        av.get(PROP_ARRAY_SCHEMA, AnnotationValue.class).ifPresent(annotationValue ->
+            processAnnotationValue(context, (AnnotationValue<?>) annotationValue, arraySchemaMap, List.of(PROP_REF, PROP_IMPLEMENTATION), Schema.class, null)
         );
         // items
         av.get(PROP_SCHEMA, AnnotationValue.class).ifPresent(annotationValue -> {
-            Optional<String> impl = annotationValue.stringValue("implementation");
+            Optional<String> impl = annotationValue.stringValue(PROP_IMPLEMENTATION);
             Optional<String> type = annotationValue.stringValue(PROP_TYPE);
             Optional<String> format = annotationValue.stringValue(PROP_ONE_FORMAT);
             ClassElement classElement = null;
@@ -775,7 +810,7 @@ abstract class AbstractOpenApiVisitor {
             }
         });
         // other properties (minItems,...)
-        processAnnotationValue(context, av, arraySchemaMap, List.of(PROP_SCHEMA, "arraySchema"), ArraySchema.class, null);
+        processAnnotationValue(context, av, arraySchemaMap, List.of(PROP_SCHEMA, PROP_ARRAY_SCHEMA), ArraySchema.class, null);
         return arraySchemaMap;
     }
 
@@ -786,7 +821,7 @@ abstract class AbstractOpenApiVisitor {
         if (Parameter.class.getName().equals(annotationName)) {
             Utils.normalizeEnumValues(valueMap, CollectionUtils.mapOf(
                 PROP_IN, ParameterIn.class,
-                "style", ParameterStyle.class
+                    PROP_STYLE, ParameterStyle.class
             ));
         }
         return valueMap;
@@ -838,15 +873,15 @@ abstract class AbstractOpenApiVisitor {
         if (type != null && schemaAnnotationValue == null) {
             schemaAnnotationValue = getAnnotation(type, io.swagger.v3.oas.annotations.media.Schema.class);
         }
-        boolean isSubstitudedType = false;
+        boolean isSubstitutedType = false;
         if (schemaAnnotationValue != null) {
-            String impl = schemaAnnotationValue.stringValue("implementation").orElse(null);
+            String impl = schemaAnnotationValue.stringValue(PROP_IMPLEMENTATION).orElse(null);
             if (StringUtils.isNotEmpty(impl)) {
                 var typeEl = ContextUtils.getClassElement(impl, context);
                 if (typeEl != null) {
                     type = typeEl;
                 }
-                isSubstitudedType = true;
+                isSubstitutedType = true;
             } else {
                 String typeFromAnn = schemaAnnotationValue.stringValue(PROP_TYPE).orElse(null);
                 List<String> schemaTypes;
@@ -863,7 +898,7 @@ abstract class AbstractOpenApiVisitor {
                             if (typeEl != null) {
                                 type = typeEl;
                             }
-                            isSubstitudedType = true;
+                            isSubstitutedType = true;
                             break;
                         }
                     }
@@ -1042,7 +1077,7 @@ abstract class AbstractOpenApiVisitor {
 
             if (schema != null) {
 
-                if (isSubstitudedType) {
+                if (isSubstitutedType) {
                     processSchemaAnn(schema, context, definingElement, type, schemaAnnotationValue);
                 }
 
@@ -1188,9 +1223,9 @@ abstract class AbstractOpenApiVisitor {
             boolean isAutoRequiredMode = true;
             boolean isRequiredDefaultValueSet = false;
             if (schemaAnn != null) {
-                elementSchemaRequired = schemaAnn.get("required", Argument.BOOLEAN);
-                isRequiredDefaultValueSet = !schemaAnn.contains("required");
-                var requiredMode = schemaAnn.enumValue("requiredMode", io.swagger.v3.oas.annotations.media.Schema.RequiredMode.class)
+                elementSchemaRequired = schemaAnn.get(PROP_REQUIRED, Argument.BOOLEAN);
+                isRequiredDefaultValueSet = !schemaAnn.contains(PROP_REQUIRED);
+                var requiredMode = schemaAnn.enumValue(PROP_REQUIRED_MODE, io.swagger.v3.oas.annotations.media.Schema.RequiredMode.class)
                     .orElse(null);
                 if (requiredMode == io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED) {
                     elementSchemaRequired = Optional.of(true);
@@ -1325,7 +1360,7 @@ abstract class AbstractOpenApiVisitor {
                 schemaToBind.setName(schemaName.get());
             }
 
-            var impl = schemaAnn.stringValue("implementation").orElse(null);
+            var impl = schemaAnn.stringValue(PROP_IMPLEMENTATION).orElse(null);
             if (StringUtils.isNotEmpty(impl)) {
                 var implEl = ContextUtils.getClassElement(impl, context);
                 if (implEl != null) {
@@ -1367,7 +1402,7 @@ abstract class AbstractOpenApiVisitor {
             notOnlyRef = true;
         }
         // @Schema annotation takes priority over nullability annotations
-        Boolean isSchemaNullable = element.booleanValue(io.swagger.v3.oas.annotations.media.Schema.class, "nullable").orElse(null);
+        Boolean isSchemaNullable = element.booleanValue(io.swagger.v3.oas.annotations.media.Schema.class, PROP_NULLABLE).orElse(null);
         boolean isNullable = (isSchemaNullable == null && isNullable(element) && !isNotNullable(element)) || Boolean.TRUE.equals(isSchemaNullable);
         if (isNullable) {
             SchemaUtils.setNullable(topLevelSchema);
@@ -1606,8 +1641,8 @@ abstract class AbstractOpenApiVisitor {
         if (annValues.containsKey(PROP_NAME)) {
             schemaToBind.setName((String) annValues.get(PROP_NAME));
         }
-        if (annValues.containsKey("title")) {
-            schemaToBind.setTitle((String) annValues.get("title"));
+        if (annValues.containsKey(PROP_TITLE)) {
+            schemaToBind.setTitle((String) annValues.get(PROP_TITLE));
         }
         if (annValues.containsKey(PROP_REF)) {
             schemaToBind.set$ref((String) annValues.get(PROP_REF));
@@ -1651,8 +1686,8 @@ abstract class AbstractOpenApiVisitor {
         if (annValues.containsKey("minProperties")) {
             schemaToBind.setMinProperties((Integer) annValues.get("minProperties"));
         }
-        if (annValues.containsKey("requiredProperties")) {
-            var requiredProperties = (String[]) annValues.get("requiredProperties");
+        if (annValues.containsKey(PROP_REQUIRED_PROPERTIES)) {
+            var requiredProperties = (String[]) annValues.get(PROP_REQUIRED_PROPERTIES);
             schemaToBind.setRequired(new ArrayList<>(Arrays.asList(requiredProperties)));
         }
         if (annValues.containsKey(PROP_DESCRIPTION)) {
@@ -1663,12 +1698,12 @@ abstract class AbstractOpenApiVisitor {
             format = (String) annValues.get(PROP_ONE_FORMAT);
             schemaToBind.setFormat(format);
         }
-        if (annValues.containsKey("nullable")) {
+        if (annValues.containsKey(PROP_NULLABLE)) {
             if (!(element instanceof MemberElement)) {
                 SchemaUtils.setNullable(schemaToBind);
             }
         }
-        var accessModeStr = (String) annValues.get("accessMode");
+        var accessModeStr = (String) annValues.get(PROP_ACCESS_MODE);
         if (StringUtils.isNotEmpty(accessModeStr)) {
             var schemaAccessMode = AccessMode.valueOf(accessModeStr);
             if (schemaAccessMode != AccessMode.AUTO) {
@@ -1684,7 +1719,7 @@ abstract class AbstractOpenApiVisitor {
                 }
             }
         }
-        var schemaExtDocs = (AnnotationValue<io.swagger.v3.oas.annotations.ExternalDocumentation>) annValues.get("externalDocs");
+        var schemaExtDocs = (AnnotationValue<io.swagger.v3.oas.annotations.ExternalDocumentation>) annValues.get(PROP_EXTERNAL_DOCS);
         ExternalDocumentation externalDocs = null;
         if (schemaExtDocs != null) {
             externalDocs = toValue(schemaExtDocs.getValues(), context, ExternalDocumentation.class, null).orElse(null);
@@ -1692,7 +1727,7 @@ abstract class AbstractOpenApiVisitor {
         if (externalDocs != null) {
             schemaToBind.setExternalDocs(externalDocs);
         }
-        var schemaDeprecated = (Boolean) annValues.get("deprecated");
+        var schemaDeprecated = (Boolean) annValues.get(PROP_DEPRECATED);
         if (schemaDeprecated != null && schemaDeprecated) {
             schemaToBind.setDeprecated(true);
         }
@@ -1741,18 +1776,18 @@ abstract class AbstractOpenApiVisitor {
         if (schemaDefaultValue != null) {
             setDefaultValueObject(schemaToBind, schemaDefaultValue, classEl, schemaToBind.getType(), schemaToBind.getFormat(), false, context);
         }
-        if (annValues.containsKey("discriminatorProperty")) {
+        if (annValues.containsKey(PROP_DISCRIMINATOR_PROPERTY)) {
             var discriminator = new Discriminator();
             schemaToBind.setDiscriminator(discriminator);
-            discriminator.setPropertyName(annValues.get("discriminatorProperty").toString());
+            discriminator.setPropertyName(annValues.get(PROP_DISCRIMINATOR_PROPERTY).toString());
 
-            if (annValues.containsKey("discriminatorMapping")) {
-                var discriminatorMapping = (AnnotationValue<DiscriminatorMapping>[]) annValues.get("discriminatorMapping");
+            if (annValues.containsKey(PROP_DISCRIMINATOR_MAPPING)) {
+                var discriminatorMapping = (AnnotationValue<DiscriminatorMapping>[]) annValues.get(PROP_DISCRIMINATOR_MAPPING);
                 var extensions = new HashMap<String, Object>();
                 var mappings = new HashMap<String, String>();
                 for (var discriminatorMappingAnn : discriminatorMapping) {
                     final Map<CharSequence, Object> valueMap = resolveAnnotationValues(context, discriminatorMappingAnn, null);
-                    mappings.put(valueMap.get(PROP_VALUE).toString(), valueMap.get(PROP_$REF).toString());
+                    mappings.put(valueMap.get(PROP_VALUE).toString(), valueMap.get(PROP_REF_DOLLAR).toString());
                     var extValue = (Map<String, Object>) valueMap.get(PROP_EXTENSIONS);
                     if (extValue != null) {
                         extensions.putAll(extValue);
@@ -1776,7 +1811,7 @@ abstract class AbstractOpenApiVisitor {
             }
         }
 
-        var addProps = (String) annValues.get("additionalProperties");
+        var addProps = (String) annValues.get(PROP_ADDITIONAL_PROPERTIES);
         if (StringUtils.isNotEmpty(addProps)) {
             var schemaAdditionalProperties = io.swagger.v3.oas.annotations.media.Schema.AdditionalPropertiesValue.valueOf(addProps);
             if (schemaAdditionalProperties == io.swagger.v3.oas.annotations.media.Schema.AdditionalPropertiesValue.TRUE) {
@@ -1851,7 +1886,7 @@ abstract class AbstractOpenApiVisitor {
 
     private void processClassValues(Schema<?> schemaToBind, Map<CharSequence, Object> annValues, List<MediaType> mediaTypes, VisitorContext context, @Nullable ClassElement jsonViewClass) {
         var openApi = Utils.resolveOpenApi(context);
-        parseAndSetClassValue("not", Schema::not, annValues, schemaToBind, context);
+        parseAndSetClassValue(PROP_NOT, Schema::not, annValues, schemaToBind, context);
         processSchemasArray(schemaToBind, openApi, PROP_ALL_OF, annValues, mediaTypes, jsonViewClass, Schema::getAllOf, Schema::addAllOfItem, context);
         processSchemasArray(schemaToBind, openApi, PROP_ANY_OF, annValues, mediaTypes, jsonViewClass, Schema::getAnyOf, Schema::addAnyOfItem, context);
         processSchemasArray(schemaToBind, openApi, PROP_ONE_OF, annValues, mediaTypes, jsonViewClass, Schema::getOneOf, Schema::addOneOfItem, context);
@@ -2030,10 +2065,10 @@ abstract class AbstractOpenApiVisitor {
         JsonNode schemaJson = toJson(schemaAnn.getValues(), context, jsonViewClass);
         if (schemaJson.isObject()) {
             ObjectNode objNode = (ObjectNode) schemaJson;
-            JsonNode arraySchema = objNode.remove("arraySchema");
+            JsonNode arraySchema = objNode.remove(PROP_ARRAY_SCHEMA);
             // flatten
             if (arraySchema != null && arraySchema.isObject()) {
-                ((ObjectNode) arraySchema).remove("implementation");
+                ((ObjectNode) arraySchema).remove(PROP_IMPLEMENTATION);
                 objNode.setAll((ObjectNode) arraySchema);
             }
             // remove schema that maps to 'items'
@@ -2057,7 +2092,7 @@ abstract class AbstractOpenApiVisitor {
         for (Object o : a) {
             AnnotationValue<?> sv = (AnnotationValue<?>) o;
             String name = sv.stringValue(classifier).orElse(null);
-            if (name == null && classifier.equals("mediaType")) {
+            if (name == null && classifier.equals(PROP_MEDIA_TYPE)) {
                 name = MediaType.APPLICATION_JSON;
             }
             if (name != null) {
@@ -2081,19 +2116,19 @@ abstract class AbstractOpenApiVisitor {
             if (entry.getKey().equals("specVersion")) {
                 continue;
             }
-            if (entry.getKey().equals("exampleSetFlag") && "false".equals(value.toString())) {
+            if (entry.getKey().equals("exampleSetFlag") && StringUtils.FALSE.equals(value.toString())) {
                 continue;
             }
             valueMap.put(entry.getKey(), value);
         }
         if (schema.get$ref() != null) {
-            valueMap.put(PROP_$REF, schema.get$ref());
+            valueMap.put(PROP_REF_DOLLAR, schema.get$ref());
         }
     }
 
     private void bindSchemaIfNecessary(VisitorContext context, AnnotationValue<?> av, Map<CharSequence, Object> valueMap, @Nullable ClassElement jsonViewClass) {
-        final Optional<String> impl = av.stringValue("implementation");
-        final Optional<String> not = av.stringValue("not");
+        final Optional<String> impl = av.stringValue(PROP_IMPLEMENTATION);
+        final Optional<String> not = av.stringValue(PROP_NOT);
         final Optional<String> schema = av.stringValue(PROP_SCHEMA);
         var anyOfList = av.stringValues(PROP_ANY_OF);
         var oneOfList = av.stringValues(PROP_ONE_OF);
@@ -2117,7 +2152,7 @@ abstract class AbstractOpenApiVisitor {
                 final Schema<?> schemaNot = resolveSchema(null, ContextUtils.getClassElement(not.get(), context), context, Collections.emptyList(), jsonViewClass);
                 var schemaMap = new HashMap<CharSequence, Object>();
                 schemaToValueMap(schemaMap, schemaNot);
-                valueMap.put("not", schemaMap);
+                valueMap.put(PROP_NOT, schemaMap);
             }
             if (anyOfList.length > 0) {
                 bindSchemaForComposite(context, valueMap, anyOfList, PROP_ANY_OF, jsonViewClass);
@@ -2512,8 +2547,8 @@ abstract class AbstractOpenApiVisitor {
         String jsonViewPostfix = StringUtils.EMPTY_STRING;
         if (jsonViewClass != null) {
             String jsonViewClassName = jsonViewClass.getName();
-            jsonViewClassName = jsonViewClassName.replaceAll("\\$", ".");
-            jsonViewPostfix = "_" + (jsonViewClassName.contains(".") ? jsonViewClassName.substring(jsonViewClassName.lastIndexOf('.') + 1) : jsonViewClassName);
+            jsonViewClassName = jsonViewClassName.replaceAll("\\$", DOT);
+            jsonViewPostfix = UNDERSCORE + (jsonViewClassName.contains(DOT) ? jsonViewClassName.substring(jsonViewClassName.lastIndexOf('.') + 1) : jsonViewClassName);
         }
 
         final String metaAnnName = definingElement == null ? null : definingElement.getAnnotationNameByStereotype(io.swagger.v3.oas.annotations.media.Schema.class).orElse(null);
@@ -2536,7 +2571,7 @@ abstract class AbstractOpenApiVisitor {
         }
 
         SchemaDecorator schemaDecorator = getSchemaDecoration(packageName, context);
-        resultSchemaName = resultSchemaName.replaceAll("\\$", ".") + jsonViewPostfix;
+        resultSchemaName = resultSchemaName.replaceAll("\\$", DOT) + jsonViewPostfix;
         if (schemaDecorator != null) {
             resultSchemaName = (StringUtils.hasText(schemaDecorator.getPrefix()) ? schemaDecorator.getPrefix() : StringUtils.EMPTY_STRING)
                 + resultSchemaName
@@ -2551,7 +2586,7 @@ abstract class AbstractOpenApiVisitor {
             int index = shemaNameSuffixCounterMap.getOrDefault(resultSchemaName, 0);
             index++;
             shemaNameSuffixCounterMap.put(resultSchemaName, index);
-            resultSchemaName += "_" + index;
+            resultSchemaName += UNDERSCORE + index;
         }
         schemaNameToClassNameMap.put(resultSchemaName, fullClassNameWithGenerics);
 
@@ -2571,7 +2606,7 @@ abstract class AbstractOpenApiVisitor {
         if (annValue instanceof AnnotationValue aValue) {
             var annName = aValue.getAnnotationName();
             var values = ((Map<String, Object>) aValue.getValues());
-            var endPos = annName.contains(StringUtil.DOLLAR) ? annName.lastIndexOf('$') : annName.length();
+            var endPos = annName.contains(DOLLAR) ? annName.lastIndexOf(DOLLAR) : annName.length();
             result.append(annName, annName.lastIndexOf('.') + 1, endPos);
             if (CollectionUtils.isNotEmpty(values)) {
                 result.append('_');
@@ -2862,7 +2897,7 @@ abstract class AbstractOpenApiVisitor {
                 if (tag.getAnnotationName().equals(io.swagger.v3.oas.annotations.security.SecurityRequirement.class.getName())
                     && !tagValues.isEmpty()) {
                     Object name = tagValues.get(PROP_NAME);
-                    Object scopes = Optional.ofNullable(tagValues.get("scopes")).orElse(new ArrayList<String>());
+                    Object scopes = Optional.ofNullable(tagValues.get(PROP_SCOPES)).orElse(new ArrayList<String>());
                     values = Collections.singletonMap((CharSequence) name, scopes);
                 } else {
                     values = tagValues;

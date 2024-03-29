@@ -37,6 +37,8 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import static io.micronaut.openapi.visitor.ConfigUtils.isOpenApiEnabled;
 import static io.micronaut.openapi.visitor.ConfigUtils.isSpecGenerationEnabled;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ENABLED;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_DISCRIMINATOR_MAPPING;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_DISCRIMINATOR_PROPERTY;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_NAME;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_ONE_OF;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_SCHEMA;
@@ -121,8 +123,8 @@ public class OpenApiJacksonVisitor implements TypeElementVisitor<Object, Object>
 
             element.annotate(Schema.class, builder -> {
                 builder.member(PROP_ONE_OF, discriminatorClasses.toArray(new AnnotationClassValue[0]));
-                builder.member("discriminatorProperty", discriminatorProp);
-                builder.member("discriminatorMapping", discriminatorMappingAnns.toArray(new AnnotationValue<?>[0]));
+                builder.member(PROP_DISCRIMINATOR_PROPERTY, discriminatorProp);
+                builder.member(PROP_DISCRIMINATOR_MAPPING, discriminatorMappingAnns.toArray(new AnnotationValue<?>[0]));
             });
         }
     }

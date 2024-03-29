@@ -84,10 +84,6 @@ public class JavaMicronautClientCodegen extends AbstractMicronautJavaCodegen<Jav
         return "Generates a Java Micronaut Client.";
     }
 
-    public boolean isConfigureAuthorization() {
-        return configureAuthorization;
-    }
-
     @Override
     public void processOpts() {
         super.processOpts();

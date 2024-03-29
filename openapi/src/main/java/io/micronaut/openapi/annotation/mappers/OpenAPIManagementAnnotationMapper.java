@@ -24,6 +24,10 @@ import io.micronaut.inject.visitor.VisitorContext;
 import io.micronaut.openapi.annotation.OpenAPIInclude;
 import io.micronaut.openapi.annotation.OpenAPIManagement;
 
+import static io.micronaut.openapi.visitor.ElementUtils.EMPTY_ANNOTATION_VALUES_ARRAY;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_SECURITY;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_TAGS;
+
 /**
  * Mapper for management endpoints.
  */
@@ -49,8 +53,8 @@ public class OpenAPIManagementAnnotationMapper implements TypedAnnotationMapper<
                     "io.micronaut.management.endpoint.stop.ServerStopEndpoint",
                     "io.micronaut.management.endpoint.threads.ThreadDumpEndpoint"
                 )
-                .member("tags", annotation.getAnnotations("tags").toArray(new AnnotationValue[0]))
-                .member("security", annotation.getAnnotations("security").toArray(new AnnotationValue[0]))
+                .member(PROP_TAGS, annotation.getAnnotations(PROP_TAGS).toArray(EMPTY_ANNOTATION_VALUES_ARRAY))
+                .member(PROP_SECURITY, annotation.getAnnotations(PROP_SECURITY).toArray(EMPTY_ANNOTATION_VALUES_ARRAY))
                 .build()
         );
     }

@@ -1,5 +1,45 @@
 [
   {
+    "type": "io.micronaut.openapi.visitor.Utils",
+    "member": "Field PLACEHOLDER_POSTFIX",
+    "reason": "Moved to StringUtil class"
+  },
+  {
+    "type": "io.micronaut.openapi.visitor.Utils",
+    "member": "Field PLACEHOLDER_PREFIX",
+    "reason": "Moved to StringUtil class"
+  },
+  {
+    "type": "io.micronaut.openapi.view.OpenApiViewConfig",
+    "member": "Field SLASH",
+    "reason": "Moved to StringUtil class"
+  },
+  {
+    "type": "io.micronaut.openapi.visitor.AbstractOpenApiEndpointVisitor",
+    "member": "Field CONTEXT_CHILD_OP_ID_SUFFIX_ADD_ALWAYS",
+    "reason": "Moved to ContextProperty class"
+  },
+  {
+    "type": "io.micronaut.openapi.visitor.AbstractOpenApiEndpointVisitor",
+    "member": "Field CONTEXT_CHILD_OP_ID_PREFIX",
+    "reason": "Moved to ContextProperty class"
+  },
+  {
+    "type": "io.micronaut.openapi.visitor.AbstractOpenApiEndpointVisitor",
+    "member": "Field IS_PROCESS_PARENT_CLASS",
+    "reason": "Moved to ContextProperty class"
+  },
+  {
+    "type": "io.micronaut.openapi.visitor.AbstractOpenApiEndpointVisitor",
+    "member": "Field CONTEXT_CHILD_PATH",
+    "reason": "Moved to ContextProperty class"
+  },
+  {
+    "type": "io.micronaut.openapi.visitor.AbstractOpenApiEndpointVisitor",
+    "member": "Field CONTEXT_CHILD_OP_ID_SUFFIX",
+    "reason": "Moved to ContextProperty class"
+  },
+  {
     "type": "io.micronaut.openapi.generator.AbstractMicronautJavaCodegen",
     "member": "Field OPT_WRAP_IN_HTTP_RESPONSE",
     "reason": "Removed in M11"

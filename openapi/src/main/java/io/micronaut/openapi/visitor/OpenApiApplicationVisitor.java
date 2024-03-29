@@ -103,12 +103,15 @@ import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENA
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_JSON_FORMAT;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_PROPERTY_NAMING_STRATEGY;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_VIEWS_SPEC;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_SECURITY;
 import static io.micronaut.openapi.visitor.OpenApiNormalizeUtils.findAndRemoveDuplicates;
 import static io.micronaut.openapi.visitor.OpenApiNormalizeUtils.normalizeOpenApi;
 import static io.micronaut.openapi.visitor.OpenApiNormalizeUtils.removeEmtpyComponents;
 import static io.micronaut.openapi.visitor.SchemaUtils.copyOpenApi;
 import static io.micronaut.openapi.visitor.SchemaUtils.getOperationOnPathItem;
 import static io.micronaut.openapi.visitor.SchemaUtils.setOperationOnPathItem;
+import static io.micronaut.openapi.visitor.StringUtil.PLACEHOLDER_POSTFIX;
+import static io.micronaut.openapi.visitor.StringUtil.PLACEHOLDER_PREFIX;
 import static io.micronaut.openapi.visitor.Utils.resolveComponents;
 import static io.swagger.v3.oas.models.Components.COMPONENTS_SCHEMAS_REF;
 
@@ -194,8 +197,8 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             }
 
             classElement = element;
-        } catch (Throwable t) {
-            warn("Error with processing class:\n" + Utils.printStackTrace(t), context, classElement);
+        } catch (Exception e) {
+            warn("Error with processing class:\n" + Utils.printStackTrace(e), context, classElement);
         }
     }
 
@@ -251,7 +254,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                         .specVersion(SpecVersion.V31);
                 }
                 var securityRequirements = new ArrayList<SecurityRequirement>();
-                for (var secRequirementAnn : o.getAnnotations("security", io.swagger.v3.oas.annotations.security.SecurityRequirement.class)) {
+                for (var secRequirementAnn : o.getAnnotations(PROP_SECURITY, io.swagger.v3.oas.annotations.security.SecurityRequirement.class)) {
                     securityRequirements.add(ConvertUtils.mapToSecurityRequirement(secRequirementAnn));
                 }
                 openApi.setSecurity(securityRequirements);
@@ -381,7 +384,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
     }
 
     public static String expandProperties(String s, List<Pair<String, String>> properties, VisitorContext context) {
-        if (StringUtils.isEmpty(s) || !s.contains(Utils.PLACEHOLDER_PREFIX)) {
+        if (StringUtils.isEmpty(s) || !s.contains(PLACEHOLDER_PREFIX)) {
             return s;
         }
 
@@ -396,19 +399,19 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
     }
 
     public static String replacePlaceholders(String value, VisitorContext context) {
-        if (StringUtils.isEmpty(value) || !value.contains(Utils.PLACEHOLDER_PREFIX)) {
+        if (StringUtils.isEmpty(value) || !value.contains(PLACEHOLDER_PREFIX)) {
             return value;
         }
         // system properties
         if (CollectionUtils.isNotEmpty(System.getProperties())) {
             for (Map.Entry<Object, Object> sysProp : System.getProperties().entrySet()) {
-                value = value.replace(Utils.PLACEHOLDER_PREFIX + sysProp.getKey().toString() + Utils.PLACEHOLDER_POSTFIX, sysProp.getValue().toString());
+                value = value.replace(PLACEHOLDER_PREFIX + sysProp.getKey().toString() + PLACEHOLDER_POSTFIX, sysProp.getValue().toString());
             }
         }
 
         // form openapi file
         for (Map.Entry<Object, Object> fileProp : readOpenApiConfigFile(context).entrySet()) {
-            value = value.replace(Utils.PLACEHOLDER_PREFIX + fileProp.getKey().toString() + Utils.PLACEHOLDER_POSTFIX, fileProp.getValue().toString());
+            value = value.replace(PLACEHOLDER_PREFIX + fileProp.getKey().toString() + PLACEHOLDER_POSTFIX, fileProp.getValue().toString());
         }
 
         // from environments
@@ -484,9 +487,9 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             generateViews(documentTitle, openApiInfos, context);
 
             visitedElements = visitedElements(context);
-        } catch (Throwable t) {
-            warn("Error:\n" + Utils.printStackTrace(t), context);
-            throw t;
+        } catch (Exception e) {
+            warn("Error:\n" + Utils.printStackTrace(e), context);
+            throw e;
         }
     }
 

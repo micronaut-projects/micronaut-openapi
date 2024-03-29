@@ -28,6 +28,8 @@ import io.micronaut.openapi.view.OpenApiViewConfig.RendererType;
 import io.micronaut.openapi.visitor.Pair;
 import io.micronaut.openapi.visitor.group.OpenApiInfo;
 
+import static io.micronaut.openapi.visitor.StringUtil.SLASH;
+
 /**
  * ReDoc configuration.
  *
@@ -36,7 +38,7 @@ import io.micronaut.openapi.visitor.group.OpenApiInfo;
 final class RedocConfig extends AbstractViewConfig {
 
     public static final String REDOC_PREFIX = "redoc.";
-    private static final String DEFAULT_REDOC_JS_PATH = OpenApiViewConfig.RESOURCE_DIR + "/";
+    private static final String DEFAULT_REDOC_JS_PATH = OpenApiViewConfig.RESOURCE_DIR + SLASH;
 
     private static final List<String> RESOURCE_FILES = Collections.singletonList(
         DEFAULT_REDOC_JS_PATH + "redoc.standalone.js"

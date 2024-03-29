@@ -34,6 +34,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 
 import static io.micronaut.openapi.visitor.ContextUtils.warn;
+import static io.micronaut.openapi.visitor.StringUtil.COMMA;
 
 /**
  * Endpoints configuration.
@@ -186,7 +187,7 @@ public class EndpointsConfiguration {
         if (StringUtils.isEmpty(stringTagsStr)) {
             return Collections.emptyList();
         }
-        String[] stringTags = stringTagsStr.split(",");
+        String[] stringTags = stringTagsStr.split(COMMA);
         if (stringTags.length == 0) {
             return Collections.emptyList();
         }
