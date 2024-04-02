@@ -23,7 +23,7 @@ commons-codec = "1.16.1"
 
 micronaut = "4.3.13"
 micronaut-platform = "4.3.7"
-micronaut-jaxrs = "4.3.0"
+micronaut-jaxrs = "4.4.0"
 micronaut-security = "4.6.9"
 micronaut-serde = "2.8.2"
 micronaut-rxjava2 = "2.2.1"
