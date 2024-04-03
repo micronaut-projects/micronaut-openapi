@@ -175,7 +175,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Person3\'
+                $ref: "#/components/schemas/Person3"
   /endpoint2/path1:
     get:
       operationId: path1_1
@@ -185,7 +185,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Person1\'
+                $ref: "#/components/schemas/Person1"
   /endpoint2/path2:
     get:
       operationId: path2_1
@@ -195,7 +195,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Person2\'
+                $ref: "#/components/schemas/Person2"
   /endpoint3:
     get:
       operationId: path_1
