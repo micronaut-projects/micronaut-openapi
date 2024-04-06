@@ -152,27 +152,54 @@ import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_SERVE
 import static io.micronaut.openapi.visitor.OpenApiModelProp.DISCRIMINATOR;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_ACCESS_MODE;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_ADDITIONAL_PROPERTIES;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_ALLOWABLE_VALUES;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_ALL_OF;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_ANY_OF;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_ARRAY_SCHEMA;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_DEFAULT;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_DEFAULT_VALUE;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_DEPRECATED;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_DESCRIPTION;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_DISCRIMINATOR_MAPPING;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_DISCRIMINATOR_PROPERTY;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_ENUM;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_EXAMPLE;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_EXAMPLES;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_EXPRESSION;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_EXTENSIONS;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_EXTERNAL_DOCS;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_HIDDEN;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_IMPLEMENTATION;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_IN;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_MAPPING;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_MEDIA_TYPE;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_NAME;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_NOT;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_NULLABLE;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_ONE_FORMAT;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_ONE_OF;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_ONE_TYPES;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_PROPERTY_NAME;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_READ_ONLY;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_REF;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_REF_DOLLAR;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_REQUIRED;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_REQUIRED_MODE;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_REQUIRED_PROPERTIES;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_RESPONSE_CODE;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_SCHEMA;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_SCOPES;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_STYLE;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_TITLE;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_TYPE;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_VALUE;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_WRITE_ONLY;
+import static io.micronaut.openapi.visitor.ProtoUtils.filterProtobufProperties;
+import static io.micronaut.openapi.visitor.ProtoUtils.isProtobufGenerated;
+import static io.micronaut.openapi.visitor.ProtoUtils.isProtobufMessageClass;
+import static io.micronaut.openapi.visitor.ProtoUtils.normalizePropertyName;
+import static io.micronaut.openapi.visitor.ProtoUtils.normalizeProtobufClassName;
+import static io.micronaut.openapi.visitor.ProtoUtils.protobufTypeSchema;
 import static io.micronaut.openapi.visitor.SchemaUtils.EMPTY_SCHEMA;
 import static io.micronaut.openapi.visitor.SchemaUtils.TYPE_ARRAY;
 import static io.micronaut.openapi.visitor.SchemaUtils.TYPE_OBJECT;
@@ -187,27 +214,6 @@ import static io.micronaut.openapi.visitor.StringUtil.OPEN_BRACE;
 import static io.micronaut.openapi.visitor.StringUtil.SLASH;
 import static io.micronaut.openapi.visitor.StringUtil.UNDERSCORE;
 import static io.micronaut.openapi.visitor.Utils.isOpenapi31;
-import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_REF_DOLLAR;
-import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_ALLOWABLE_VALUES;
-import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_ALL_OF;
-import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_ANY_OF;
-import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_DEFAULT;
-import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_DEFAULT_VALUE;
-import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_DESCRIPTION;
-import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_ENUM;
-import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_EXAMPLE;
-import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_EXAMPLES;
-import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_EXTENSIONS;
-import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_HIDDEN;
-import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_IN;
-import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_NAME;
-import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_ONE_FORMAT;
-import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_ONE_OF;
-import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_ONE_TYPES;
-import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_REF;
-import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_SCHEMA;
-import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_TYPE;
-import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_VALUE;
 import static java.util.stream.Collectors.toMap;
 
 /**
@@ -677,7 +683,7 @@ abstract class AbstractOpenApiVisitor {
                                     newValues.put(key, list);
                                 }
                             }
-                        } else if (key.equals(PROP_ONE_TYPES) && Utils.isOpenapi31()) {
+                        } else if (key.equals(PROP_ONE_TYPES) && isOpenapi31()) {
                             newValues.put(PROP_TYPE, value);
                         } else {
                             newValues.put(key, value);
@@ -691,7 +697,7 @@ abstract class AbstractOpenApiVisitor {
                         // TODO
 //                    } else if (AdditionalPropertiesValue.USE_ADDITIONAL_PROPERTIES_ANNOTATION.toString().equals(value.toString())) {
                     }
-                } else if (key.equals(PROP_ONE_TYPES) && Utils.isOpenapi31()) {
+                } else if (key.equals(PROP_ONE_TYPES) && isOpenapi31()) {
                     newValues.put(PROP_TYPE, value);
                 } else if (key.equals(PROP_DISCRIMINATOR_PROPERTY)) {
                     final Map<String, Object> discriminatorMap = getDiscriminatorMap(newValues);
@@ -885,7 +891,7 @@ abstract class AbstractOpenApiVisitor {
             } else {
                 String typeFromAnn = schemaAnnotationValue.stringValue(PROP_TYPE).orElse(null);
                 List<String> schemaTypes;
-                if (Utils.isOpenapi31() && StringUtils.isEmpty(typeFromAnn)) {
+                if (isOpenapi31() && StringUtils.isEmpty(typeFromAnn)) {
                     schemaTypes = Arrays.asList(schemaAnnotationValue.stringValues(PROP_ONE_TYPES));
                 } else {
                     schemaTypes = Collections.singletonList(typeFromAnn);
@@ -904,6 +910,10 @@ abstract class AbstractOpenApiVisitor {
                     }
                 }
             }
+        }
+
+        if (type != null && isProtobufMessageClass(type)) {
+            type = type.getInterfaces().iterator().next();
         }
 
         Boolean isArray = null;
@@ -1000,6 +1010,10 @@ abstract class AbstractOpenApiVisitor {
                     typeName = PrimitiveType.BINARY.name();
                 }
                 PrimitiveType primitiveType = PrimitiveType.fromName(typeName);
+                schema = protobufTypeSchema(type);
+                if (schema != null) {
+                    return schema;
+                }
                 if (!isArray && ClassUtils.isJavaLangType(typeName)) {
                     schema = getPrimitiveType(type, typeName);
                 } else if (!isArray && primitiveType != null) {
@@ -1041,7 +1055,7 @@ abstract class AbstractOpenApiVisitor {
                 } else if (type.isAssignable(Character.class) || type.isAssignable(char.class)) {
                     schema = setSpecVersion(PrimitiveType.STRING.createProperty());
                 } else if (type.isAssignable(Integer.class) || type.isAssignable(int.class)
-                    || type.isAssignable(Short.class) || type.isAssignable(short.class)) {
+                        || type.isAssignable(Short.class) || type.isAssignable(short.class)) {
                     schema = setSpecVersion(PrimitiveType.INT.createProperty());
                 } else if (type.isAssignable(Long.class) || type.isAssignable(long.class)) {
                     schema = setSpecVersion(PrimitiveType.LONG.createProperty());
@@ -1128,18 +1142,18 @@ abstract class AbstractOpenApiVisitor {
         ClassElement keyType = typeArgs.get("K");
         ClassElement valueType = typeArgs.get("V");
         if (keyType.isEnum()) {
-           var enumSchema = getSchemaDefinition(openApi, context, keyType, keyType.getTypeArguments(), null, mediaTypes, null);
-           if (enumSchema != null && enumSchema.get$ref() != null) {
-               enumSchema = getSchemaByRef(enumSchema, openApi);
-               var values = enumSchema.getEnum();
-               if (CollectionUtils.isNotEmpty(values)) {
-                   var valueSchema = getSchemaDefinition(openApi, context, valueType, valueType.getTypeArguments(), null, mediaTypes, jsonViewClass);
-                   for (var value : values) {
-                       schema.addProperty(value.toString(), valueSchema);
-                   }
-               }
-               return schema;
-           }
+            var enumSchema = getSchemaDefinition(openApi, context, keyType, keyType.getTypeArguments(), null, mediaTypes, null);
+            if (enumSchema != null && enumSchema.get$ref() != null) {
+                enumSchema = getSchemaByRef(enumSchema, openApi);
+                var values = enumSchema.getEnum();
+                if (CollectionUtils.isNotEmpty(values)) {
+                    var valueSchema = getSchemaDefinition(openApi, context, valueType, valueType.getTypeArguments(), null, mediaTypes, jsonViewClass);
+                    for (var value : values) {
+                        schema.addProperty(value.toString(), valueSchema);
+                    }
+                }
+                return schema;
+            }
         }
         if (valueType.getName().equals(Object.class.getName())) {
             schema.setAdditionalProperties(true);
@@ -1208,7 +1222,7 @@ abstract class AbstractOpenApiVisitor {
      * @param parentSchema The parent schema
      * @param propertySchema The property schema
      */
-    protected void processSchemaProperty(VisitorContext context, TypedElement element, ClassElement elementType, @Nullable Element classElement,
+    protected void processSchemaProperty(VisitorContext context, TypedElement element, ClassElement elementType, @Nullable ClassElement classElement,
                                          Schema<?> parentSchema, Schema<?> propertySchema) {
         if (propertySchema == null) {
             return;
@@ -1248,6 +1262,7 @@ abstract class AbstractOpenApiVisitor {
 
             propertySchema = bindSchemaForElement(context, element, elementType, propertySchema, null);
             String propertyName = resolvePropertyName(element, classElement, propertySchema);
+            propertyName = normalizePropertyName(propertyName, classElement, elementType);
             propertySchema.setRequired(null);
             Schema<?> propertySchemaFinal = propertySchema;
             addProperty(parentSchema, propertyName, propertySchema, required);
@@ -1392,7 +1407,11 @@ abstract class AbstractOpenApiVisitor {
         if (StringUtils.isNotEmpty(topLevelSchema.getDescription())) {
             notOnlyRef = true;
         }
-        if (isAnnotationPresent(element, Deprecated.class)) {
+        if (isAnnotationPresent(element, Deprecated.class)
+                && !(element instanceof PropertyElement propertyEl
+                    && isProtobufGenerated(propertyEl.getOwningType())
+                    && elementType.getName().equals(Map.class.getName())
+        )) {
             topLevelSchema.setDeprecated(true);
             notOnlyRef = true;
         }
@@ -1655,7 +1674,7 @@ abstract class AbstractOpenApiVisitor {
         if (NumberUtils.isCreatable(schemaMaximum)) {
             schemaToBind.setMaximum(new BigDecimal(schemaMaximum));
         }
-        if (!Utils.isOpenapi31()) {
+        if (!isOpenapi31()) {
             var schemaExclusiveMaximum = (Boolean) annValues.get("exclusiveMaximum");
             if (schemaExclusiveMaximum != null && schemaExclusiveMaximum) {
                 schemaToBind.setExclusiveMaximum(true);
@@ -1665,7 +1684,7 @@ abstract class AbstractOpenApiVisitor {
         if (NumberUtils.isCreatable(schemaMinimum)) {
             schemaToBind.setMinimum(new BigDecimal(schemaMinimum));
         }
-        if (!Utils.isOpenapi31()) {
+        if (!isOpenapi31()) {
             var schemaExclusiveMinimum = (Boolean) annValues.get("exclusiveMinimum");
             if (schemaExclusiveMinimum != null && schemaExclusiveMinimum) {
                 schemaToBind.setExclusiveMinimum(true);
@@ -1753,7 +1772,7 @@ abstract class AbstractOpenApiVisitor {
         var allowableValues = schemaAnn.stringValues(PROP_ALLOWABLE_VALUES);
         setAllowableValues(schemaToBind, allowableValues, element, elType, elFormat, context);
 
-        if (Utils.isOpenapi31()) {
+        if (isOpenapi31()) {
             var schemaExamples = (String[]) annValues.get(PROP_EXAMPLES);
             if (ArrayUtils.isNotEmpty(schemaExamples)) {
                 for (var schemaExample : schemaExamples) {
@@ -1979,7 +1998,6 @@ abstract class AbstractOpenApiVisitor {
      * @param schemaToBind The schema to bind
      * @param schemaAnn The schema annotation
      * @param jsonViewClass Class from JsonView annotation
-     *
      * @return The bound schema
      */
     protected Schema<?> bindSchemaAnnotationValue(VisitorContext context, TypedElement element, Schema<?> schemaToBind,
@@ -2319,7 +2337,7 @@ abstract class AbstractOpenApiVisitor {
                                 schema.setDescription(originalTypeSchema.getDescription());
                             }
                             if ((originalTypeSchema.getNullable() != null && originalTypeSchema.getNullable())
-                                || (Utils.isOpenapi31()
+                                || (isOpenapi31()
                                 && CollectionUtils.isNotEmpty(originalTypeSchema.getTypes())
                                 && originalTypeSchema.getTypes().contains(SchemaUtils.TYPE_NULL))
                             ) {
@@ -2376,13 +2394,19 @@ abstract class AbstractOpenApiVisitor {
         if (classElement.isInterface() && !parentInterfaces.isEmpty()) {
             for (ClassElement parentInterface : parentInterfaces) {
                 if (ClassUtils.isJavaLangType(parentInterface.getName())
+                    || isProtobufGenerated(parentInterface)
                     || parentInterface.getBeanProperties().isEmpty()) {
                     continue;
                 }
                 superTypes.add(parentInterface);
             }
         } else {
-            classElement.getSuperType().ifPresent(superTypes::add);
+            var superType = classElement.getSuperType().orElse(null);
+            if (superType != null
+                    // check protobuf generated classes
+                    && !isProtobufMessageClass(superType)) {
+                superTypes.add(superType);
+            }
         }
         if (!type.isRecord() && !superTypes.isEmpty()) {
             // skip if it is Enum or Object super class
@@ -2559,11 +2583,12 @@ abstract class AbstractOpenApiVisitor {
         String resultSchemaName;
         if (type instanceof TypedElement typedEl && !(type instanceof EnumElement)) {
             ClassElement typeType = typedEl.getType();
+            var isProtobufGenerated = isProtobufGenerated(typeType);
             packageName = typeType.getPackageName();
             if (CollectionUtils.isNotEmpty(typeType.getTypeArguments())) {
-                resultSchemaName = computeNameWithGenerics(typeType, typeArgs, context);
+                resultSchemaName = computeNameWithGenerics(typeType, typeArgs, context, isProtobufGenerated);
             } else {
-                resultSchemaName = computeNameWithGenerics(typeType, Collections.emptyMap(), context);
+                resultSchemaName = computeNameWithGenerics(typeType, Collections.emptyMap(), context, isProtobufGenerated);
             }
         } else {
             resultSchemaName = type.getSimpleName();
@@ -2571,7 +2596,7 @@ abstract class AbstractOpenApiVisitor {
         }
 
         SchemaDecorator schemaDecorator = getSchemaDecoration(packageName, context);
-        resultSchemaName = resultSchemaName.replaceAll("\\$", DOT) + jsonViewPostfix;
+        resultSchemaName = resultSchemaName.replace(DOLLAR, DOT) + jsonViewPostfix;
         if (schemaDecorator != null) {
             resultSchemaName = (StringUtils.hasText(schemaDecorator.getPrefix()) ? schemaDecorator.getPrefix() : StringUtils.EMPTY_STRING)
                 + resultSchemaName
@@ -2593,8 +2618,12 @@ abstract class AbstractOpenApiVisitor {
         return resultSchemaName;
     }
 
-    private String computeNameWithGenerics(ClassElement classElement, Map<String, ClassElement> typeArgs, VisitorContext context) {
-        var builder = new StringBuilder(classElement.getSimpleName());
+    private String computeNameWithGenerics(ClassElement classElement, Map<String, ClassElement> typeArgs, VisitorContext context, boolean isProtobufGenerated) {
+        var className = classElement.getSimpleName();
+        if (isProtobufGenerated) {
+            className = normalizeProtobufClassName(className);
+        }
+        var builder = new StringBuilder(className);
         computeNameWithGenerics(classElement, builder, new HashSet<>(), typeArgs, context);
         return builder.toString();
     }
@@ -2690,6 +2719,7 @@ abstract class AbstractOpenApiVisitor {
                 // Workaround for https://github.com/micronaut-projects/micronaut-openapi/issues/313
                 beanProperties = Collections.emptyList();
             }
+            beanProperties = filterProtobufProperties(classElement, beanProperties);
             processPropertyElements(openAPI, context, type, typeArgs, schema, beanProperties, mediaTypes, classJavadoc, jsonViewClass);
 
             String visibilityLevelProp = getConfigProperty(MICRONAUT_OPENAPI_FIELD_VISIBILITY_LEVEL, context);
@@ -2801,7 +2831,7 @@ abstract class AbstractOpenApiVisitor {
                     context,
                     publicField,
                     fieldType,
-                    type,
+                    classElement,
                     schema,
                     propertySchema
                 );

@@ -791,13 +791,14 @@ public final class SchemaUtils {
             || HttpHeaders.ACCEPT.equalsIgnoreCase(headerName);
     }
 
-    public static void setNullable(Schema<?> schema) {
+    public static Schema setNullable(Schema<?> schema) {
         if (Utils.isOpenapi31()) {
             schema.addType(TYPE_NULL);
             schema.addType(schema.getType() != null ? schema.getType() : TYPE_OBJECT);
         } else {
             schema.setNullable(true);
         }
+        return schema;
     }
 
     public static String getType(Schema<?> schema) {

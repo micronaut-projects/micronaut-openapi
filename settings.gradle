@@ -51,4 +51,5 @@ micronautBuild {
     importMicronautCatalog("micronaut-kotlin")
     importMicronautCatalog("micronaut-session")
     importMicronautCatalog("micronaut-jaxrs")
+    importMicronautCatalog("micronaut-grpc")
 }

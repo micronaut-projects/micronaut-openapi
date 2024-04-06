@@ -15,6 +15,15 @@
  */
 package io.micronaut.openapi.view;
 
+import io.micronaut.core.annotation.Nullable;
+import io.micronaut.core.util.StringUtils;
+import io.micronaut.core.util.Toggleable;
+import io.micronaut.inject.visitor.VisitorContext;
+import io.micronaut.openapi.visitor.ConfigUtils;
+import io.micronaut.openapi.visitor.Pair;
+import io.micronaut.openapi.visitor.group.GroupProperties;
+import io.micronaut.openapi.visitor.group.OpenApiInfo;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -22,16 +31,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-
-import io.micronaut.core.annotation.Nullable;
-import io.micronaut.core.util.StringUtils;
-import io.micronaut.core.util.Toggleable;
-import io.micronaut.inject.visitor.VisitorContext;
-import io.micronaut.openapi.visitor.ConfigUtils;
-import io.micronaut.openapi.visitor.Pair;
-import io.micronaut.openapi.visitor.Utils;
-import io.micronaut.openapi.visitor.group.GroupProperties;
-import io.micronaut.openapi.visitor.group.OpenApiInfo;
 
 import static io.micronaut.openapi.visitor.ConfigUtils.getGroupProperties;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_CONTEXT_SERVER_PATH;
