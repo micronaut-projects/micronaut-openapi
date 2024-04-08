@@ -204,7 +204,7 @@ public final class ElementUtils {
 
     public static boolean isIgnoredParameter(TypedElement parameter) {
 
-        AnnotationValue<Schema> schemaAnn = parameter.getAnnotation(Schema.class);
+        var schemaAnn = parameter.getAnnotation(Schema.class);
         boolean isHidden = schemaAnn != null && schemaAnn.booleanValue(PROP_HIDDEN).orElse(false);
 
         return isHidden

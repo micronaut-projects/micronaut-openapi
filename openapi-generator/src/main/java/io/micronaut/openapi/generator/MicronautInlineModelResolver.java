@@ -199,16 +199,15 @@ public final class MicronautInlineModelResolver {
                 }
             }
             // Check additionalProperties for inline models
-            if (schema.getAdditionalProperties() != null) {
-                if (schema.getAdditionalProperties() instanceof Schema<?> inner) {
-                    String schemaName = resolveModelName(schema.getTitle(), modelPrefix + inlineSchemaOptions.get("MAP_ITEM_SUFFIX"));
-                    // Recurse to create $refs for inner models
-                    gatherInlineModels(inner, schemaName);
-                    if (isModelNeeded(inner)) {
-                        // If this schema should be split into its own model, do so
-                        Schema refSchema = makeSchemaInComponents(schemaName, inner);
-                        schema.setAdditionalProperties(refSchema);
-                    }
+            if (schema.getAdditionalProperties() != null
+                && schema.getAdditionalProperties() instanceof Schema<?> inner) {
+                String schemaName = resolveModelName(schema.getTitle(), modelPrefix + inlineSchemaOptions.get("MAP_ITEM_SUFFIX"));
+                // Recurse to create $refs for inner models
+                gatherInlineModels(inner, schemaName);
+                if (isModelNeeded(inner)) {
+                    // If this schema should be split into its own model, do so
+                    Schema refSchema = makeSchemaInComponents(schemaName, inner);
+                    schema.setAdditionalProperties(refSchema);
                 }
             }
         } else if (schema.getProperties() != null) {

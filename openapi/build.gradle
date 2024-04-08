@@ -36,6 +36,7 @@ dependencies {
     testImplementation(mnRxjava3.micronaut.rxjava3)
     testImplementation(mnData.micronaut.data.model)
     testImplementation(mnValidation.validation)
+    testImplementation(mnGrpc.protobuf.java)
     testImplementation(libs.jspecify)
     testImplementation(libs.jdt.annotation)
     testImplementation(libs.android.annotation)
