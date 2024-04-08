@@ -1011,6 +1011,8 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">File utilities methods.</div>
 </dd>
+<dt><a href="io/micronaut/openapi/visitor/ProtoUtils.html#filterProtobufProperties(io.micronaut.inject.ast.ClassElement,java.util.List)" class="member-name-link">filterProtobufProperties(ClassElement, List&lt;PropertyElement&gt;)</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/ProtoUtils.html" title="class in io.micronaut.openapi.visitor">ProtoUtils</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/visitor/OpenApiNormalizeUtils.html#findAndRemoveDuplicates(io.swagger.v3.oas.models.media.Content)" class="member-name-link">findAndRemoveDuplicates(Content)</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/OpenApiNormalizeUtils.html" title="class in io.micronaut.openapi.visitor">OpenApiNormalizeUtils</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/visitor/OpenApiNormalizeUtils.html#findAndRemoveDuplicates(io.swagger.v3.oas.models.media.Schema)" class="member-name-link">findAndRemoveDuplicates(Schema&lt;?&gt;)</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/OpenApiNormalizeUtils.html" title="class in io.micronaut.openapi.visitor">OpenApiNormalizeUtils</a></dt>
@@ -1958,6 +1960,12 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/visitor/group/RouterVersioningProperties.html#isParameterEnabled()" class="member-name-link">isParameterEnabled()</a> - Method in class io.micronaut.openapi.visitor.group.<a href="io/micronaut/openapi/visitor/group/RouterVersioningProperties.html" title="class in io.micronaut.openapi.visitor.group">RouterVersioningProperties</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/visitor/ProtoUtils.html#isProtobufGenerated(io.micronaut.inject.ast.ClassElement)" class="member-name-link">isProtobufGenerated(ClassElement)</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/ProtoUtils.html" title="class in io.micronaut.openapi.visitor">ProtoUtils</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/visitor/ProtoUtils.html#isProtobufMessageClass(io.micronaut.inject.ast.ClassElement)" class="member-name-link">isProtobufMessageClass(ClassElement)</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/ProtoUtils.html" title="class in io.micronaut.openapi.visitor">ProtoUtils</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/visitor/ProtoUtils.html#isProtobufType(io.micronaut.inject.ast.ClassElement)" class="member-name-link">isProtobufType(ClassElement)</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/ProtoUtils.html" title="class in io.micronaut.openapi.visitor">ProtoUtils</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/visitor/ElementUtils.html#isReactiveAndVoid(io.micronaut.inject.ast.ClassElement)" class="member-name-link">isReactiveAndVoid(ClassElement)</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/ElementUtils.html" title="class in io.micronaut.openapi.visitor">ElementUtils</a></dt>
 <dd>
 <div class="block">Checking if the type is void.</div>
@@ -2603,6 +2611,10 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/visitor/OpenApiNormalizeUtils.html#normalizeOperation(io.swagger.v3.oas.models.Operation)" class="member-name-link">normalizeOperation(Operation)</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/OpenApiNormalizeUtils.html" title="class in io.micronaut.openapi.visitor">OpenApiNormalizeUtils</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/visitor/ProtoUtils.html#normalizePropertyName(java.lang.String,io.micronaut.inject.ast.ClassElement,io.micronaut.inject.ast.ClassElement)" class="member-name-link">normalizePropertyName(String, ClassElement, ClassElement)</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/ProtoUtils.html" title="class in io.micronaut.openapi.visitor">ProtoUtils</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/visitor/ProtoUtils.html#normalizeProtobufClassName(java.lang.String)" class="member-name-link">normalizeProtobufClassName(String)</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/ProtoUtils.html" title="class in io.micronaut.openapi.visitor">ProtoUtils</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/visitor/OpenApiNormalizeUtils.html#normalizeSchema(io.swagger.v3.oas.models.media.Schema)" class="member-name-link">normalizeSchema(Schema&lt;?&gt;)</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/OpenApiNormalizeUtils.html" title="class in io.micronaut.openapi.visitor">OpenApiNormalizeUtils</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/visitor/OpenApiNormalizeUtils.html#normalizeSchemas(java.util.Map)" class="member-name-link">normalizeSchemas(Map&lt;String, Schema&gt;)</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/OpenApiNormalizeUtils.html" title="class in io.micronaut.openapi.visitor">OpenApiNormalizeUtils</a></dt>
@@ -3200,7 +3212,7 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/generator/KotlinMicronautServerCodegen.html#processOpts()" class="member-name-link">processOpts()</a> - Method in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/KotlinMicronautServerCodegen.html" title="class in io.micronaut.openapi.generator">KotlinMicronautServerCodegen</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="io/micronaut/openapi/visitor/AbstractOpenApiEndpointVisitor.html#processSchemaProperty(io.micronaut.inject.visitor.VisitorContext,io.micronaut.inject.ast.TypedElement,io.micronaut.inject.ast.ClassElement,io.micronaut.inject.ast.Element,io.swagger.v3.oas.models.media.Schema,io.swagger.v3.oas.models.media.Schema)" class="member-name-link">processSchemaProperty(VisitorContext, TypedElement, ClassElement, Element, Schema&lt;?&gt;, Schema&lt;?&gt;)</a> - Method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/AbstractOpenApiEndpointVisitor.html" title="class in io.micronaut.openapi.visitor">AbstractOpenApiEndpointVisitor</a></dt>
+<dt><a href="io/micronaut/openapi/visitor/AbstractOpenApiEndpointVisitor.html#processSchemaProperty(io.micronaut.inject.visitor.VisitorContext,io.micronaut.inject.ast.TypedElement,io.micronaut.inject.ast.ClassElement,io.micronaut.inject.ast.ClassElement,io.swagger.v3.oas.models.media.Schema,io.swagger.v3.oas.models.media.Schema)" class="member-name-link">processSchemaProperty(VisitorContext, TypedElement, ClassElement, ClassElement, Schema&lt;?&gt;, Schema&lt;?&gt;)</a> - Method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/AbstractOpenApiEndpointVisitor.html" title="class in io.micronaut.openapi.visitor">AbstractOpenApiEndpointVisitor</a></dt>
 <dd>
 <div class="block">Processes a schema property.</div>
 </dd>
@@ -3350,6 +3362,14 @@ loadScripts(document, 'script');</script>
 <dt><a href="io/micronaut/openapi/adoc/TemplatePaths.html#PROPERTY_DESCRIPTION" class="member-name-link">PROPERTY_DESCRIPTION</a> - Static variable in interface io.micronaut.openapi.adoc.<a href="io/micronaut/openapi/adoc/TemplatePaths.html" title="interface in io.micronaut.openapi.adoc">TemplatePaths</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/visitor/VisibilityLevel.html#PROTECTED" class="member-name-link">PROTECTED</a> - Enum constant in enum class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/VisibilityLevel.html" title="enum class in io.micronaut.openapi.visitor">VisibilityLevel</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/visitor/ProtoUtils.html#protobufTypeSchema(io.micronaut.inject.ast.ClassElement)" class="member-name-link">protobufTypeSchema(ClassElement)</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/ProtoUtils.html" title="class in io.micronaut.openapi.visitor">ProtoUtils</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/visitor/ProtoUtils.html" class="type-name-link" title="class in io.micronaut.openapi.visitor">ProtoUtils</a> - Class in <a href="io/micronaut/openapi/visitor/package-summary.html">io.micronaut.openapi.visitor</a></dt>
+<dd>
+<div class="block">Protobuf util methods.</div>
+</dd>
+<dt><a href="io/micronaut/openapi/visitor/ProtoUtils.html#%3Cinit%3E()" class="member-name-link">ProtoUtils()</a> - Constructor for class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/ProtoUtils.html" title="class in io.micronaut.openapi.visitor">ProtoUtils</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/visitor/VisibilityLevel.html#PUBLIC" class="member-name-link">PUBLIC</a> - Enum constant in enum class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/VisibilityLevel.html" title="enum class in io.micronaut.openapi.visitor">VisibilityLevel</a></dt>
 <dd>&nbsp;</dd>
