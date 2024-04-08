@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import io.swagger.v3.core.util.Json;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.PathItem;
@@ -55,12 +55,13 @@ public final class MicronautInlineModelResolver {
 
     // structure mapper sorts properties alphabetically on write to ensure models are
     // serialized consistently for lookup of existing models
-    private static ObjectMapper structureMapper;
+    private static final ObjectMapper STRUCTURE_MAPPER;
 
     static {
-        structureMapper = Json.mapper().copy();
-        structureMapper.configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true);
-        structureMapper.writer(new DefaultPrettyPrinter());
+        STRUCTURE_MAPPER = JsonMapper.builder()
+                .configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true)
+                .build();
+        STRUCTURE_MAPPER.writer(new DefaultPrettyPrinter());
     }
 
     private OpenAPI openAPI;
@@ -199,17 +200,14 @@ public final class MicronautInlineModelResolver {
             }
             // Check additionalProperties for inline models
             if (schema.getAdditionalProperties() != null) {
-                if (schema.getAdditionalProperties() instanceof Schema) {
-                    Schema inner = (Schema) schema.getAdditionalProperties();
-                    if (inner != null) {
-                        String schemaName = resolveModelName(schema.getTitle(), modelPrefix + inlineSchemaOptions.get("MAP_ITEM_SUFFIX"));
-                        // Recurse to create $refs for inner models
-                        gatherInlineModels(inner, schemaName);
-                        if (isModelNeeded(inner)) {
-                            // If this schema should be split into its own model, do so
-                            Schema refSchema = makeSchemaInComponents(schemaName, inner);
-                            schema.setAdditionalProperties(refSchema);
-                        }
+                if (schema.getAdditionalProperties() instanceof Schema<?> inner) {
+                    String schemaName = resolveModelName(schema.getTitle(), modelPrefix + inlineSchemaOptions.get("MAP_ITEM_SUFFIX"));
+                    // Recurse to create $refs for inner models
+                    gatherInlineModels(inner, schemaName);
+                    if (isModelNeeded(inner)) {
+                        // If this schema should be split into its own model, do so
+                        Schema refSchema = makeSchemaInComponents(schemaName, inner);
+                        schema.setAdditionalProperties(refSchema);
                     }
                 }
             }
@@ -223,9 +221,8 @@ public final class MicronautInlineModelResolver {
             return;
         }
         // Check array items
-        if (schema instanceof ArraySchema) {
-            ArraySchema array = (ArraySchema) schema;
-            Schema items = array.getItems();
+        if (schema instanceof ArraySchema array) {
+            var items = array.getItems();
             if (items == null) {
                 LOGGER.error("Illegal schema found with array type but no items, items must be defined for array schemas:\n {}", schema);
                 return;
@@ -376,7 +373,7 @@ public final class MicronautInlineModelResolver {
         if (existing != null) {
             refSchema = new Schema().$ref(existing);
         } else {
-            if (resolveInlineEnums && schema.getEnum() != null && schema.getEnum().size() > 0) {
+            if (resolveInlineEnums && schema.getEnum() != null && !schema.getEnum().isEmpty()) {
                 LOGGER.warn("Model {} promoted to its own schema due to resolveInlineEnums=true", name);
             }
             name = addSchemas(name, schema);
@@ -405,12 +402,12 @@ public final class MicronautInlineModelResolver {
 
     private String matchGenerated(Schema model) {
         try {
-            String json = structureMapper.writeValueAsString(model);
+            String json = STRUCTURE_MAPPER.writeValueAsString(model);
             if (generatedSignature.containsKey(json)) {
                 return generatedSignature.get(json);
             }
         } catch (JsonProcessingException e) {
-            e.printStackTrace();
+            LOGGER.warn("Error: {}", e.getMessage());
         }
 
         return null;
@@ -489,9 +486,7 @@ public final class MicronautInlineModelResolver {
             if (schema.getAnyOf() != null && !schema.getAnyOf().isEmpty()) {
                 return true;
             }
-            if (schema.getOneOf() != null && !schema.getOneOf().isEmpty()) {
-                return true;
-            }
+            return schema.getOneOf() != null && !schema.getOneOf().isEmpty();
         }
 
         return false;
@@ -524,10 +519,10 @@ public final class MicronautInlineModelResolver {
 
     private void addGenerated(String name, Schema model) {
         try {
-            String json = structureMapper.writeValueAsString(model);
+            String json = STRUCTURE_MAPPER.writeValueAsString(model);
             generatedSignature.put(json, name);
         } catch (JsonProcessingException e) {
-            e.printStackTrace();
+            LOGGER.error("Error: {}", e.getMessage());
         }
     }
 

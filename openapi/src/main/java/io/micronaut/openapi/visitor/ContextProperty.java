@@ -15,11 +15,14 @@
  */
 package io.micronaut.openapi.visitor;
 
+import io.micronaut.core.annotation.Internal;
+
 /**
  * Visitor context properties. Usually these are loaded configuration objects.
  *
  * @since 4.10.0
  */
+@Internal
 public interface ContextProperty {
 
     /**
@@ -110,4 +113,10 @@ public interface ContextProperty {
      * Calculated class output directory path.
      */
     String MICRONAUT_INTERNAL_CLASSPATH_OUTPUT = "micronaut.internal.classpath.output";
+
+    String MICRONAUT_INTERNAL_CHILD_PATH = "micronaut.internal.child.path";
+    String MICRONAUT_INTERNAL_CHILD_OP_ID_PREFIX = "micronaut.internal.opId.prefix";
+    String MICRONAUT_INTERNAL_CHILD_OP_ID_SUFFIX = "micronaut.internal.opId.suffix";
+    String MICRONAUT_INTERNAL_CHILD_OP_ID_SUFFIX_ADD_ALWAYS = "micronaut.internal.opId.suffixes.add.always";
+    String MICRONAUT_INTERNAL_IS_PROCESS_PARENT_CLASS = "micronaut.internal.is.process.parent";
 }

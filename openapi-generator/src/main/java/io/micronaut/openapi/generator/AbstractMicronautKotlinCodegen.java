@@ -67,6 +67,8 @@ import org.openapitools.codegen.utils.ModelUtils;
 
 import com.google.common.collect.ImmutableMap;
 import com.samskivert.mustache.Mustache;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static io.micronaut.openapi.generator.Utils.DEFAULT_BODY_PARAM_NAME;
 import static io.micronaut.openapi.generator.Utils.addStrValueToEnum;
@@ -115,6 +117,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
     private static final String MONO_CLASS_NAME = "reactor.core.publisher.Mono";
     private static final String FLUX_CLASS_NAME = "reactor.core.publisher.Flux";
 
+    protected Random random = new Random();
     protected String dateLibrary;
     protected String title;
     protected boolean useBeanValidation;
@@ -135,6 +138,8 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
     protected List<ParameterMapping> parameterMappings = new ArrayList<>();
     protected List<ResponseBodyMapping> responseBodyMappings = new ArrayList<>();
     protected Map<String, CodegenModel> allModels = new HashMap<>();
+
+    private final Logger log = LoggerFactory.getLogger(getClass());
 
     private final Map<String, String> schemaKeyToModelNameCache = new HashMap<>();
 
@@ -609,11 +614,10 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
 
     private void maybeSetTestTool() {
         if (additionalProperties.containsKey(OPT_TEST)) {
-            switch ((String) additionalProperties.get(OPT_TEST)) {
-                case OPT_TEST_JUNIT ->
-                    testTool = (String) additionalProperties.get(OPT_TEST);
-                default ->
-                    throw new RuntimeException("Test tool \"" + additionalProperties.get(OPT_TEST) + "\" is not supported or misspelled.");
+            if (additionalProperties.get(OPT_TEST).equals(OPT_TEST_JUNIT)) {
+                testTool = (String) additionalProperties.get(OPT_TEST);
+            } else {
+                throw new RuntimeException("Test tool \"" + additionalProperties.get(OPT_TEST) + "\" is not supported or misspelled.");
             }
         }
     }
@@ -661,10 +665,6 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
             apiVarName = escapeReservedWord(apiVarName);
         }
         return apiVarName;
-    }
-
-    public boolean isUseBeanValidation() {
-        return useBeanValidation;
     }
 
     public boolean isVisitable() {
@@ -878,7 +878,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
             // additionalProperties: true
             Schema<?> inner = ModelUtils.getAdditionalProperties(target);
             if (inner == null) {
-                System.err.println("`" + p.getName() + "` (map property) does not have a proper inner type defined. Default to type:string");
+                log.error("`{}` (map property) does not have a proper inner type defined. Default to type:string", p.getName());
                 inner = new StringSchema().description("TODO default missing map inner type to string");
                 p.setAdditionalProperties(inner);
             }
@@ -905,11 +905,11 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         }
 
         String modifiedName = name.replaceAll("\\.", "")
-            .replaceAll("-", "_")
+            .replace("-", "_")
             // if it already escaped reserved word, need to remove quotes
-            .replaceAll("`", "");
+            .replace("`", "");
 
-        String nameWithPrefixSuffix = sanitizeKotlinSpecificNames(modifiedName);
+        String nameWithPrefixSuffix = normalizeKotlinSpecificNames(modifiedName);
         if (!StringUtils.isEmpty(modelNamePrefix)) {
             // add '_' so that model name can be camelized correctly
             nameWithPrefixSuffix = modelNamePrefix + "_" + nameWithPrefixSuffix;
@@ -926,18 +926,18 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         // model name cannot use reserved keyword, e.g. return
         if (isReservedWord(modifiedName)) {
             final String modelName = "Model" + modifiedName;
-            System.out.println("WARN: " + modifiedName + " (reserved word) cannot be used as model name. Renamed to " + modelName);
+            log.warn("{} (reserved word) cannot be used as model name. Renamed to {}", modifiedName, modelName);
             return modelName;
         }
 
         // model name starts with number
         if (modifiedName.matches("^\\d.*")) {
             final String modelName = "Model" + modifiedName; // e.g. 200Response => Model200Response (after camelize)
-            System.out.println("WARN: " + name + " (model name starts with number) cannot be used as model name. Renamed to " + modelName);
+            log.warn("{} (model name starts with number) cannot be used as model name. Renamed to {}", name, modelName);
             return modelName;
         }
 
-        schemaKeyToModelNameCache.put(name, titleCase(modifiedName));
+        schemaKeyToModelNameCache.put(name, firstTitleCase(modifiedName));
         return schemaKeyToModelNameCache.get(name);
     }
 
@@ -947,7 +947,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         // if name is escaped
         var realName = parameter.paramName;
         if (realName.contains("`")) {
-            realName = realName.replaceAll("`", "");
+            realName = realName.replace("`", "");
         }
         parameter.vendorExtensions.put("realName", realName);
         return parameter;
@@ -960,7 +960,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         // if name is escaped
         var realName = property.name;
         if (realName.contains("`")) {
-            realName = realName.replaceAll("`", "");
+            realName = realName.replace("`", "");
             property.nameInCamelCase = camelize(realName);
             property.nameInSnakeCase = CaseFormat.UPPER_CAMEL.to(CaseFormat.UPPER_UNDERSCORE, property.nameInCamelCase);
         }
@@ -1016,7 +1016,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         String modified;
         if (value.isEmpty()) {
             modified = "EMPTY";
-            return sanitizeKotlinSpecificNames(modified);
+            return normalizeKotlinSpecificNames(modified);
         }
         value = value.replaceAll("[^a-zA-Z0-9_]", "_");
         if (isNumeric(value)) {
@@ -1208,12 +1208,10 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         objs = super.postProcessAllModels(objs);
 
         var isServer = isServer();
-        var random = new Random();
 
         for (ModelsMap models : objs.values()) {
             CodegenModel model = models.getModels().get(0).getModel();
 
-            var hasParent = model.getParentModel() != null;
             var requiredVarsWithoutDiscriminator = new ArrayList<CodegenProperty>();
             var requiredParentVarsWithoutDiscriminator = new ArrayList<CodegenProperty>();
             var allVars = new ArrayList<CodegenProperty>();
@@ -1315,9 +1313,8 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
 
     private void processVar(CodegenModel model, List<CodegenProperty> vars, List<CodegenProperty> requiredVarsWithoutDiscriminator, List<CodegenProperty> requiredParentVarsWithoutDiscriminator, boolean processParentModel) {
         for (var v : vars) {
-            boolean isDiscriminator = isDiscriminator(v, model);
             if (!isDiscriminator(v, model) && !containsProp(v, requiredVarsWithoutDiscriminator)) {
-                if (v.isOverridden != null && !v.isOverridden && !v.vendorExtensions.containsKey("overriden") && !containsProp(v, vars)) {
+                if (v.isOverridden != null && !v.isOverridden && !v.vendorExtensions.containsKey("overridden") && !containsProp(v, vars)) {
                     v.isOverridden = true;
                     v.vendorExtensions.put("overridden", true);
                 }
@@ -1559,7 +1556,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
      * @param name string to be sanitize
      * @return sanitized string
      */
-    private String sanitizeKotlinSpecificNames(final String name) {
+    private String normalizeKotlinSpecificNames(final String name) {
         if (typeMapping.containsValue(name)) {
             return name;
         }
@@ -1587,12 +1584,12 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         String replacementChar = specialCharacters.getValue();
         // Underscore is the only special character we'll allow
         if (!specialChar.equals("_") && word.contains(specialChar)) {
-            return replaceCharacters(word, specialChar, replacementChar);
+            return replaceChars(word, specialChar, replacementChar);
         }
         return word;
     }
 
-    private String replaceCharacters(String word, String oldValue, String newValue) {
+    private String replaceChars(String word, String oldValue, String newValue) {
         if (!word.contains(oldValue)) {
             return word;
         }
@@ -1601,20 +1598,20 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         }
         int i = word.indexOf(oldValue);
         String start = word.substring(0, i);
-        String end = recurseOnEndOfWord(word, oldValue, newValue, i);
+        String end = recurseOnEndOfTheWord(word, oldValue, newValue, i);
         return start + newValue + end;
     }
 
-    private String recurseOnEndOfWord(String word, String oldValue, String newValue, int lastReplacedValue) {
+    private String recurseOnEndOfTheWord(String word, String oldValue, String newValue, int lastReplacedValue) {
         String end = word.substring(lastReplacedValue + 1);
         if (!end.isEmpty()) {
-            end = titleCase(end);
-            end = replaceCharacters(end, oldValue, newValue);
+            end = firstTitleCase(end);
+            end = replaceChars(end, oldValue, newValue);
         }
         return end;
     }
 
-    private String titleCase(final String input) {
+    private String firstTitleCase(final String input) {
         return input.substring(0, 1).toUpperCase(Locale.ROOT) + input.substring(1);
     }
 }

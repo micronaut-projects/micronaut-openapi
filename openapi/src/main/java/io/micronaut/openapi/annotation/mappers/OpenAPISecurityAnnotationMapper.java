@@ -24,6 +24,10 @@ import io.micronaut.inject.visitor.VisitorContext;
 import io.micronaut.openapi.annotation.OpenAPIInclude;
 import io.micronaut.openapi.annotation.OpenAPISecurity;
 
+import static io.micronaut.openapi.visitor.ElementUtils.EMPTY_ANNOTATION_VALUES_ARRAY;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_SECURITY;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_TAGS;
+
 /**
  * Mapper for security endpoints.
  */
@@ -44,8 +48,8 @@ public class OpenAPISecurityAnnotationMapper implements TypedAnnotationMapper<Op
                     "io.micronaut.security.token.jwt.endpoints.KeysController",
                     "io.micronaut.security.token.jwt.endpoints.OauthController"
                 )
-                .member("tags", annotation.getAnnotations("tags").toArray(new AnnotationValue[0]))
-                .member("security", annotation.getAnnotations("security").toArray(new AnnotationValue[0]))
+                .member(PROP_TAGS, annotation.getAnnotations(PROP_TAGS).toArray(EMPTY_ANNOTATION_VALUES_ARRAY))
+                .member(PROP_SECURITY, annotation.getAnnotations(PROP_SECURITY).toArray(EMPTY_ANNOTATION_VALUES_ARRAY))
                 .build()
         );
     }

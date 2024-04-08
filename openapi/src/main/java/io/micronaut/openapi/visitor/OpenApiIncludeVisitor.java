@@ -33,6 +33,8 @@ import java.util.List;
 import static io.micronaut.openapi.visitor.ConfigUtils.isOpenApiEnabled;
 import static io.micronaut.openapi.visitor.ConfigUtils.isSpecGenerationEnabled;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ENABLED;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_SECURITY;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_TAGS;
 
 /**
  * A {@link TypeElementVisitor} that builds the Swagger model from Micronaut controllers included by @{@link OpenAPIInclude} at the compile time.
@@ -55,8 +57,8 @@ public class OpenApiIncludeVisitor implements TypeElementVisitor<OpenAPIIncludes
         for (var includeAnn : element.getAnnotationValuesByType(OpenAPIInclude.class)) {
             String[] classes = includeAnn.stringValues();
             if (ArrayUtils.isNotEmpty(classes)) {
-                var tagAnns = includeAnn.getAnnotations("tags", Tag.class);
-                var securityAnns = includeAnn.getAnnotations("security", SecurityRequirement.class);
+                var tagAnns = includeAnn.getAnnotations(PROP_TAGS, Tag.class);
+                var securityAnns = includeAnn.getAnnotations(PROP_SECURITY, SecurityRequirement.class);
                 String customUri = includeAnn.stringValue("uri").orElse(null);
                 List<String> groups = List.of(includeAnn.stringValues("groups"));
                 List<String> groupsExcluded = List.of(includeAnn.stringValues("groupsExcluded"));

@@ -45,6 +45,7 @@ import io.micronaut.inject.visitor.VisitorContext;
 import static io.micronaut.openapi.visitor.ConfigUtils.getProjectPath;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_CONFIG_FILE_LOCATIONS;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_ENVIRONMENT_ENABLED;
+import static io.micronaut.openapi.visitor.StringUtil.COMMA;
 
 /**
  * Specific environment for annotation processing level. Solve problem with access to resources
@@ -73,7 +74,7 @@ public class AnnProcessorEnvironment extends DefaultEnvironment {
         if (isEnabled) {
             Path projectPath = getProjectPath(context);
             if (projectPath != null) {
-                projectDir = "file:" + projectPath.toString().replaceAll("\\\\", StringUtil.SLASH);
+                projectDir = "file:" + projectPath.toString().replace("\\\\", StringUtil.SLASH);
                 projectResourcesPath = projectDir + (projectDir.endsWith(StringUtil.SLASH) ? StringUtils.EMPTY_STRING : StringUtil.SLASH) + "src/main/resources/";
             }
 
@@ -81,7 +82,7 @@ public class AnnProcessorEnvironment extends DefaultEnvironment {
             if (projectResourcesPath != null && StringUtils.isEmpty(configFileLocations)) {
                 annotationProcessingConfigLocations.add(projectResourcesPath);
             } else if (StringUtils.isNotEmpty(configFileLocations)) {
-                for (String configFileLocation : configFileLocations.split(",")) {
+                for (String configFileLocation : configFileLocations.split(COMMA)) {
                     if (!configFileLocation.startsWith("classpath") && !configFileLocation.startsWith("file") && !configFileLocation.startsWith("project")) {
                         throw new ConfigurationException("Unsupported config location format: " + configFileLocation);
                     }
@@ -113,12 +114,12 @@ public class AnnProcessorEnvironment extends DefaultEnvironment {
         String propertySourcesEnv = readPropertySourceListKeyFromEnvironment();
         if (propertySourcesEnv != null) {
             if (propertySourcesEnv.startsWith("project")) {
-                propertySourcesEnv = propertySourcesEnv.replaceAll("project:", projectDir);
+                propertySourcesEnv = propertySourcesEnv.replace("project:", projectDir);
             }
             propertySources.addAll(readPropertySourceListFromFiles(propertySourcesEnv));
         }
         refreshablePropertySources.addAll(propertySources);
-        readConstantPropertySources(name, propertySources);
+        readConstPropertySources(name, propertySources);
 
         propertySources.addAll(this.propertySources.values());
         OrderUtil.sort(propertySources);
@@ -127,7 +128,7 @@ public class AnnProcessorEnvironment extends DefaultEnvironment {
         }
     }
 
-    private void readConstantPropertySources(String name, List<PropertySource> propertySources) {
+    private void readConstPropertySources(String name, List<PropertySource> propertySources) {
         var propertySourceNames = new HashSet<String>(getActiveNames().size() + 1);
         propertySourceNames.add(name);
         for (var activeName : getActiveNames()) {
@@ -169,32 +170,32 @@ public class AnnProcessorEnvironment extends DefaultEnvironment {
             } else {
                 throw new ConfigurationException("Unsupported config location format: " + configLocation);
             }
-            readPropertySourceList(name, resourceLoader, propertySources);
+            readPropSourceList(name, resourceLoader, propertySources);
         }
         return propertySources;
     }
 
-    private void readPropertySourceList(String name, ResourceLoader resourceLoader, List<PropertySource> propertySources) {
+    private void readPropSourceList(String name, ResourceLoader resourceLoader, List<PropertySource> propertySources) {
         Collection<PropertySourceLoader> propertySourceLoaders = getPropertySourceLoaders();
         if (propertySourceLoaders.isEmpty()) {
-            PropertiesPropertySourceLoader propertySourceLoader = new PropertiesPropertySourceLoader(false);
-            loadPropertySourceFromLoader(name, propertySourceLoader, propertySources, resourceLoader);
+            var propertySourceLoader = new PropertiesPropertySourceLoader(false);
+            loadPropSourceFromLoader(name, propertySourceLoader, propertySources, resourceLoader);
         } else {
             for (PropertySourceLoader propertySourceLoader : propertySourceLoaders) {
-                loadPropertySourceFromLoader(name, propertySourceLoader, propertySources, resourceLoader);
+                loadPropSourceFromLoader(name, propertySourceLoader, propertySources, resourceLoader);
             }
         }
     }
 
     @Override
     public Collection<PropertySourceLoader> getPropertySourceLoaders() {
-        List<PropertySourceLoader> loaders = new ArrayList<>(2);
+        var loaders = new ArrayList<PropertySourceLoader>(2);
         loaders.add(new YamlPropertySourceLoader(false));
         loaders.add(new PropertiesPropertySourceLoader(false));
         return loaders;
     }
 
-    private void loadPropertySourceFromLoader(String name, PropertySourceLoader propertySourceLoader, List<PropertySource> propertySources, ResourceLoader resourceLoader) {
+    private void loadPropSourceFromLoader(String name, PropertySourceLoader propertySourceLoader, List<PropertySource> propertySources, ResourceLoader resourceLoader) {
         Optional<PropertySource> defaultPropertySource = propertySourceLoader.load(name, resourceLoader);
         defaultPropertySource.ifPresent(propertySources::add);
         Set<String> activeNames = getActiveNames();

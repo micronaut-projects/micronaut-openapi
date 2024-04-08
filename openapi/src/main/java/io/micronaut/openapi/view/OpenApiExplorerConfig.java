@@ -28,13 +28,15 @@ import io.micronaut.openapi.view.OpenApiViewConfig.RendererType;
 import io.micronaut.openapi.visitor.Pair;
 import io.micronaut.openapi.visitor.group.OpenApiInfo;
 
+import static io.micronaut.openapi.visitor.StringUtil.SLASH;
+
 /**
  * OpenAPI Explorer configuration.
  */
 final class OpenApiExplorerConfig extends AbstractViewConfig {
 
     public static final String OPENAPI_EXPLORER_PREFIX = "openapi-explorer.";
-    private static final String DEFAULT_OPENAPI_EXPLORER_JS_PATH = OpenApiViewConfig.RESOURCE_DIR + "/";
+    private static final String DEFAULT_OPENAPI_EXPLORER_JS_PATH = OpenApiViewConfig.RESOURCE_DIR + SLASH;
 
     private static final List<String> RESOURCE_FILES = List.of(
         DEFAULT_OPENAPI_EXPLORER_JS_PATH + "default.min.css",

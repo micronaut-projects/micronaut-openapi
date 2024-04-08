@@ -40,6 +40,7 @@ import static io.micronaut.openapi.visitor.ConfigUtils.isOpenApiEnabled;
 import static io.micronaut.openapi.visitor.ConfigUtils.isSpecGenerationEnabled;
 import static io.micronaut.openapi.visitor.ConvertUtils.toValue;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ENABLED;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_SECURITY;
 
 /**
  * A {@link TypeElementVisitor} that read the @{@link OpenAPIGroupInfo} annotations at the compile
@@ -126,7 +127,7 @@ public class OpenApiGroupInfoVisitor implements TypeElementVisitor<Object, Objec
             if (openApi == null) {
                 continue;
             }
-            var securityRequirementAnns = openApiAnn.getAnnotations("security", io.swagger.v3.oas.annotations.security.SecurityRequirement.class);
+            var securityRequirementAnns = openApiAnn.getAnnotations(PROP_SECURITY, io.swagger.v3.oas.annotations.security.SecurityRequirement.class);
             var securityRequirements = new ArrayList<SecurityRequirement>();
             for (var securityRequirementAnn : securityRequirementAnns) {
                 securityRequirements.add(ConvertUtils.mapToSecurityRequirement(securityRequirementAnn));

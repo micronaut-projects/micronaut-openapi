@@ -73,6 +73,8 @@ import java.util.Objects;
 import java.util.Set;
 
 import static io.micronaut.openapi.visitor.ContextUtils.warn;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_PARSE_VALUE;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_PROPERTIES;
 import static io.micronaut.openapi.visitor.Utils.resolveComponents;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_NAME;
 import static io.swagger.v3.oas.models.Components.COMPONENTS_SCHEMAS_REF;
@@ -151,11 +153,11 @@ public final class SchemaUtils {
         String extName = extension.stringValue(PROP_NAME).orElse(StringUtils.EMPTY_STRING);
         String decoratedName = prependIfMissing(extName, PREFIX_X);
         final String key = !extName.isEmpty() ? decoratedName : extName;
-        for (var propAnn : extension.getAnnotations("properties", ExtensionProperty.class)) {
+        for (var propAnn : extension.getAnnotations(PROP_PROPERTIES, ExtensionProperty.class)) {
             var propertyName = propAnn.getRequiredValue(PROP_NAME, String.class);
             var propertyValue = propAnn.getRequiredValue(String.class);
             JsonNode processedValue;
-            final boolean propertyAsJson = propAnn.get("parseValue", boolean.class, false);
+            final boolean propertyAsJson = propAnn.get(PROP_PARSE_VALUE, boolean.class, false);
             if (StringUtils.hasText(propertyName) && StringUtils.hasText(propertyValue)) {
                 if (key.isEmpty()) {
                     decoratedName = prependIfMissing(propertyName, PREFIX_X);

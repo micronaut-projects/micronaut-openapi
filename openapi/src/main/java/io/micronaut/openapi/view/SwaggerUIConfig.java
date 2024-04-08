@@ -32,6 +32,9 @@ import io.micronaut.openapi.view.OpenApiViewConfig.RendererType;
 import io.micronaut.openapi.visitor.Pair;
 import io.micronaut.openapi.visitor.group.OpenApiInfo;
 
+import static io.micronaut.openapi.visitor.StringUtil.DOT;
+import static io.micronaut.openapi.visitor.StringUtil.SLASH;
+
 /**
  * Swagger-ui configuration.
  *
@@ -39,7 +42,7 @@ import io.micronaut.openapi.visitor.group.OpenApiInfo;
  */
 final class SwaggerUIConfig extends AbstractViewConfig {
 
-    private static final String DEFAULT_SWAGGER_JS_PATH = OpenApiViewConfig.RESOURCE_DIR + "/";
+    private static final String DEFAULT_SWAGGER_JS_PATH = OpenApiViewConfig.RESOURCE_DIR + SLASH;
 
     private static final List<String> RESOURCE_FILES = List.of(
         DEFAULT_SWAGGER_JS_PATH + "swagger-ui.css",
@@ -53,7 +56,6 @@ final class SwaggerUIConfig extends AbstractViewConfig {
     private static final String OPTION_PRIMARY_NAME = "primaryName";
     private static final String OPTION_URLS = "urls";
     private static final String OPTION_OAUTH2 = "oauth2";
-    private static final String DOT = ".";
     private static final String PREFIX_SWAGGER_UI = "swagger-ui";
     private static final String KEY_VALUE_SEPARATOR = ": ";
     private static final String COMMNA_NEW_LINE = ",\n";

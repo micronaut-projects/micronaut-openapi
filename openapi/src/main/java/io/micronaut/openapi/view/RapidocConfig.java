@@ -29,6 +29,8 @@ import io.micronaut.openapi.view.OpenApiViewConfig.RendererType;
 import io.micronaut.openapi.visitor.Pair;
 import io.micronaut.openapi.visitor.group.OpenApiInfo;
 
+import static io.micronaut.openapi.visitor.StringUtil.SLASH;
+
 /**
  * RapiDoc configuration.
  *
@@ -37,7 +39,7 @@ import io.micronaut.openapi.visitor.group.OpenApiInfo;
 final class RapidocConfig extends AbstractViewConfig {
 
     public static final String RAPIDOC_PREFIX = "rapidoc.";
-    private static final String DEFAULT_RAPIDOC_JS_PATH = OpenApiViewConfig.RESOURCE_DIR + "/";
+    private static final String DEFAULT_RAPIDOC_JS_PATH = OpenApiViewConfig.RESOURCE_DIR + SLASH;
 
     private static final List<String> RESOURCE_FILES = Collections.singletonList(
         DEFAULT_RAPIDOC_JS_PATH + "rapidoc-min.js"

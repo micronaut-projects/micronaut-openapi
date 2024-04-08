@@ -39,7 +39,7 @@ public final class Utils {
                                                  boolean isNullable, boolean isRequired, boolean isReadonly, boolean withNullablePostfix) {
         CodegenProperty items = parameter.isMap ? parameter.additionalProperties : parameter.items;
         String datatypeWithEnum = parameter.datatypeWithEnum == null ? parameter.dataType : parameter.datatypeWithEnum;
-        processGenericAnnotations(parameter.dataType, datatypeWithEnum, parameter.isArray, parameter.isMap, parameter.containerTypeMapped,
+        processGenericAnnotations(parameter.dataType, datatypeWithEnum, parameter.isMap, parameter.containerTypeMapped,
             items, parameter.vendorExtensions, useBeanValidation, isGenerateHardNullable, isNullable, isRequired, isReadonly, withNullablePostfix);
     }
 
@@ -47,17 +47,16 @@ public final class Utils {
                                                  boolean isNullable, boolean isRequired, boolean isReadonly, boolean withNullablePostfix) {
         CodegenProperty items = property.isMap ? property.additionalProperties : property.items;
         String datatypeWithEnum = property.datatypeWithEnum == null ? property.dataType : property.datatypeWithEnum;
-        processGenericAnnotations(property.dataType, datatypeWithEnum, property.isArray, property.isMap, property.containerTypeMapped,
+        processGenericAnnotations(property.dataType, datatypeWithEnum, property.isMap, property.containerTypeMapped,
             items, property.vendorExtensions, useBeanValidation, isGenerateHardNullable, isNullable, isRequired, isReadonly, withNullablePostfix);
     }
 
-    public static void processGenericAnnotations(String dataType, String dataTypeWithEnum, boolean isArray, boolean isMap, String containerType, CodegenProperty itemsProp, Map<String, Object> ext,
+    public static void processGenericAnnotations(String dataType, String dataTypeWithEnum, boolean isMap, String containerType, CodegenProperty itemsProp, Map<String, Object> ext,
                                                  boolean useBeanValidation, boolean isGenerateHardNullable, boolean isNullable,
                                                  boolean isRequired, boolean isReadonly,
                                                  boolean withNullablePostfix) {
         var typeWithGenericAnnotations = dataType;
         var typeWithEnumWithGenericAnnotations = dataTypeWithEnum;
-        var addedGenericAnnotations = false;
         if (useBeanValidation && itemsProp != null && dataType.contains("<")) {
             if (isMap) {
                 var genericAnnotations = genericAnnotations(itemsProp, isGenerateHardNullable);

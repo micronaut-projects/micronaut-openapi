@@ -43,7 +43,7 @@ import static io.micronaut.openapi.visitor.SchemaUtils.EMPTY_SIMPLE_SCHEMA;
 import static io.micronaut.openapi.visitor.SchemaUtils.TYPE_OBJECT;
 
 /**
- * Normalization methods for openAPI obects.
+ * Normalization methods for openAPI objects.
  *
  * @since 6.6.0
  */

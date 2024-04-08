@@ -37,6 +37,8 @@ import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.replacePlac
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_FILENAME;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_TARGET_FILE;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_VIEWS_DEST_DIR;
+import static io.micronaut.openapi.visitor.StringUtil.MINUS;
+import static io.micronaut.openapi.visitor.StringUtil.PLACEHOLDER_PREFIX;
 
 /**
  * File utilities methods.
@@ -157,8 +159,8 @@ public final class FileUtils {
                 // default name: swagger-<version>-<groupName>-<apiVersion>
 
                 fileName = fileName.substring(0, fileName.length() - ext.length())
-                    + (openApiInfo.getGroupName() != null ? "-" + openApiInfo.getGroupName() : StringUtils.EMPTY_STRING)
-                    + (openApiInfo.getVersion() != null ? "-" + openApiInfo.getVersion() : StringUtils.EMPTY_STRING);
+                    + (openApiInfo.getGroupName() != null ? MINUS + openApiInfo.getGroupName() : StringUtils.EMPTY_STRING)
+                    + (openApiInfo.getVersion() != null ? MINUS + openApiInfo.getVersion() : StringUtils.EMPTY_STRING);
             }
 
             fileName = replacePlaceholders(fileName, context) + ext;
@@ -172,7 +174,7 @@ public final class FileUtils {
                 fileName = fileName.replaceAll("\\$\\{group}", openApiInfo.getGroupName() != null ? openApiInfo.getGroupName() : StringUtils.EMPTY_STRING);
             }
         }
-        if (fileName.contains(Utils.PLACEHOLDER_PREFIX)) {
+        if (fileName.contains(PLACEHOLDER_PREFIX)) {
             warn("Can't set some placeholders in fileName: " + fileName, context);
         }
 

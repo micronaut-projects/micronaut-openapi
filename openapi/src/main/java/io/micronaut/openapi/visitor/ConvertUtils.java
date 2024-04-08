@@ -85,6 +85,14 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import static io.micronaut.openapi.OpenApiUtils.CONVERT_JSON_MAPPER;
 import static io.micronaut.openapi.OpenApiUtils.JSON_MAPPER;
 import static io.micronaut.openapi.visitor.ContextUtils.warn;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_BEARER_FORMAT;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_CONTENT;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_FLOWS;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_MEDIA_TYPE;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_OPEN_ID_CONNECT_URL;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_PARAM_NAME;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_SCHEME;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_SCOPES;
 import static io.micronaut.openapi.visitor.SchemaUtils.TYPE_ARRAY;
 import static io.micronaut.openapi.visitor.SchemaUtils.TYPE_BOOLEAN;
 import static io.micronaut.openapi.visitor.SchemaUtils.TYPE_INTEGER;
@@ -92,8 +100,9 @@ import static io.micronaut.openapi.visitor.SchemaUtils.TYPE_NUMBER;
 import static io.micronaut.openapi.visitor.SchemaUtils.TYPE_OBJECT;
 import static io.micronaut.openapi.visitor.SchemaUtils.TYPE_STRING;
 import static io.micronaut.openapi.visitor.SchemaUtils.processExtensions;
+import static io.micronaut.openapi.visitor.StringUtil.COMMA;
 import static io.micronaut.openapi.visitor.Utils.resolveComponents;
-import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_$REF;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_REF_DOLLAR;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_ALLOWABLE_VALUES;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_DEFAULT;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_DEFAULT_VALUE;
@@ -117,6 +126,8 @@ import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_TYPE;
 public final class ConvertUtils {
 
     public static final TypeReference<Map<String, Object>> MAP_TYPE_REFERENCE = new TypeReference<>() {
+    };
+    public static final TypeReference<Map<CharSequence, Object>> MAP_TYPE = new TypeReference<>() {
     };
 
     private ConvertUtils() {
@@ -405,7 +416,7 @@ public final class ConvertUtils {
         Schema<?> schema = null;
         JsonNode mediaTypeNode = null;
 
-        var contentNode = parentNode.get("content");
+        var contentNode = parentNode.get(PROP_CONTENT);
         if (contentNode != null) {
             examples = deserMap(PROP_EXAMPLES, contentNode, Example.class);
             encoding = deserMap("encoding", contentNode, Encoding.class);
@@ -415,8 +426,8 @@ public final class ConvertUtils {
                 schema = CONVERT_JSON_MAPPER.treeToValue(schemaNode, Schema.class);
             }
 
-            mediaTypeNode = contentNode.get("mediaType");
-            ((ObjectNode) contentNode).remove("mediaType");
+            mediaTypeNode = contentNode.get(PROP_MEDIA_TYPE);
+            ((ObjectNode) contentNode).remove(PROP_MEDIA_TYPE);
         }
         var value = CONVERT_JSON_MAPPER.treeToValue(parentNode, clazz);
         Content content = null;
@@ -450,7 +461,7 @@ public final class ConvertUtils {
     }
 
     private static void processMediaType(Content result, JsonNode content) throws JsonProcessingException {
-        var mediaType = content.has("mediaType") ? content.get("mediaType").asText() : io.micronaut.http.MediaType.APPLICATION_JSON;
+        var mediaType = content.has(PROP_MEDIA_TYPE) ? content.get(PROP_MEDIA_TYPE).asText() : io.micronaut.http.MediaType.APPLICATION_JSON;
         var mediaTypeObj = CONVERT_JSON_MAPPER.treeToValue(content, MediaType.class);
         result.addMediaType(mediaType, mediaTypeObj);
     }
@@ -492,8 +503,8 @@ public final class ConvertUtils {
             if (StringUtils.isEmpty(name)) {
                 continue;
             }
-            if (map.containsKey("paramName")) {
-                map.put(PROP_NAME, map.remove("paramName"));
+            if (map.containsKey(PROP_PARAM_NAME)) {
+                map.put(PROP_NAME, map.remove(PROP_PARAM_NAME));
             }
 
             Utils.normalizeEnumValues(map, CollectionUtils.mapOf(PROP_TYPE, SecurityScheme.Type.class, PROP_IN, SecurityScheme.In.class));
@@ -504,31 +515,31 @@ public final class ConvertUtils {
                 removeAndWarnSecSchemeProp(map, PROP_IN, context);
             }
             if (!SecurityScheme.Type.OAUTH2.toString().equals(type)) {
-                removeAndWarnSecSchemeProp(map, "flows", context);
+                removeAndWarnSecSchemeProp(map, PROP_FLOWS, context);
             }
             if (!SecurityScheme.Type.OPENIDCONNECT.toString().equals(type)) {
-                removeAndWarnSecSchemeProp(map, "openIdConnectUrl", context);
+                removeAndWarnSecSchemeProp(map, PROP_OPEN_ID_CONNECT_URL, context);
             }
             if (!SecurityScheme.Type.HTTP.toString().equals(type)) {
-                removeAndWarnSecSchemeProp(map, "scheme", context);
-                removeAndWarnSecSchemeProp(map, "bearerFormat", context);
+                removeAndWarnSecSchemeProp(map, PROP_SCHEME, context);
+                removeAndWarnSecSchemeProp(map, PROP_BEARER_FORMAT, context);
             }
 
             if (SecurityScheme.Type.HTTP.toString().equals(type)) {
-                if (!map.containsKey("scheme")) {
+                if (!map.containsKey(PROP_SCHEME)) {
                     warn("Can't use http security scheme without 'scheme' property", context);
-                } else if (!map.get("scheme").equals("bearer") && map.containsKey("bearerFormat")) {
+                } else if (!map.get(PROP_SCHEME).equals("bearer") && map.containsKey(PROP_BEARER_FORMAT)) {
                     warn("Should NOT have a `bearerFormat` property without `scheme: bearer` being set", context);
                 }
             }
 
-            if (map.containsKey(PROP_REF) || map.containsKey(PROP_$REF)) {
+            if (map.containsKey(PROP_REF) || map.containsKey(PROP_REF_DOLLAR)) {
                 Object ref = map.get(PROP_REF);
                 if (ref == null) {
-                    ref = map.get(PROP_$REF);
+                    ref = map.get(PROP_REF_DOLLAR);
                 }
                 map.clear();
-                map.put(PROP_$REF, ref);
+                map.put(PROP_REF_DOLLAR, ref);
             }
 
             try {
@@ -568,7 +579,7 @@ public final class ConvertUtils {
      */
     public static SecurityRequirement mapToSecurityRequirement(AnnotationValue<io.swagger.v3.oas.annotations.security.SecurityRequirement> r) {
         String name = r.getRequiredValue(PROP_NAME, String.class);
-        List<String> scopes = Arrays.asList(r.stringValues("scopes"));
+        var scopes = Arrays.asList(r.stringValues(PROP_SCOPES));
         var securityRequirement = new SecurityRequirement();
         securityRequirement.addList(name, scopes);
         return securityRequirement;
@@ -742,7 +753,7 @@ public final class ConvertUtils {
 
         // @QueryValue(defaultValue = "")
         if (TYPE_ARRAY.equals(type) && isMicronautFormat) {
-            return valueStr.split(",");
+            return valueStr.split(COMMA);
         }
 
         if (valueStr.isEmpty()) {

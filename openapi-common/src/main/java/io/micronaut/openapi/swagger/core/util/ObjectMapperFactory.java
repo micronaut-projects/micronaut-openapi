@@ -147,8 +147,6 @@ public class ObjectMapperFactory {
                                 return new SchemaSerializer((JsonSerializer<Object>) serializer);
                             } else if (MediaType.class.isAssignableFrom(desc.getBeanClass())) {
                                 return new MediaTypeSerializer((JsonSerializer<Object>) serializer);
-                            } else if (MediaType.class.isAssignableFrom(desc.getBeanClass())) {
-                                return new MediaTypeSerializer((JsonSerializer<Object>) serializer);
                             } else if (Example.class.isAssignableFrom(desc.getBeanClass())) {
                                 return new ExampleSerializer((JsonSerializer<Object>) serializer);
                             }
