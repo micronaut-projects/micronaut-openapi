@@ -35,7 +35,7 @@ micronaut-validation = "4.5.0"
 micronaut-data = "4.6.2"
 micronaut-test = "4.3.0"
 micronaut-kotlin = "4.2.0"
-micronaut-logging = "1.2.3"
+micronaut-logging = "1.3.0"
 micronaut-session = "4.3.0"
 micronaut-docs = "2.0.0"
 
