@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.tags.Tag
 import reactor.core.publisher.Mono
 
 import jakarta.validation.constraints.NotBlank
+
 // end::imports
 // tag::clazz[]
 @Controller("/")
@@ -35,7 +36,7 @@ class HelloController {
     @ApiResponse(responseCode = "404", description = "Person not found")
     @Tag(name = "greeting")
     Mono<String> greetings(@Parameter(description="The name of the person") @NotBlank String name) {
-        return Single.just("Hello $name, How are you doing?")
+        return Mono.just("Hello $name, How are you doing?")
     }
 }
 // end::clazz[]

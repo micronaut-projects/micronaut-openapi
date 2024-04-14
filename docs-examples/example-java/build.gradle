@@ -12,16 +12,13 @@ dependencies {
     testAnnotationProcessor(projects.micronautOpenapi)
 
     testCompileOnly(mn.micronaut.inject.java)
-    testCompileOnly projects.micronautOpenapiAnnotations
+    testCompileOnly(projects.micronautOpenapiAnnotations)
 
     testImplementation(mn.micronaut.http)
-    testImplementation(mn.snakeyaml)
     testImplementation(mn.reactor)
     testImplementation(mnValidation.validation)
-    testImplementation(libs.managed.swagger.annotations)
-    testImplementation(mnTest.micronaut.test.junit5)
 
-    testRuntimeOnly(libs.junit.jupiter.engine)
+    testRuntimeOnly(mnTest.junit.jupiter.engine)
     testRuntimeOnly(mnLogging.logback.classic)
 }
 

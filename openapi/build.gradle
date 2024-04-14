@@ -13,7 +13,7 @@ dependencies {
     api(projects.micronautOpenapiCommon)
     api(mn.jackson.databind)
     api(libs.jackson.dataformat.yaml)
-    api(libs.jackson.datatype.jsr310)
+    api(mn.jackson.datatype.jsr310)
     api(libs.managed.swagger.models)
     api(libs.managed.javadoc.parser)
     api(libs.managed.html2md.converter) {
@@ -41,7 +41,7 @@ dependencies {
     testImplementation(libs.jdt.annotation)
     testImplementation(libs.android.annotation)
     testImplementation(libs.spotbugs.annotations)
-    testImplementation(libs.kotlinx.coroutines.reactor)
+    testImplementation(mn.kotlinx.coroutines.reactor)
 }
 
 configurations.configureEach {
