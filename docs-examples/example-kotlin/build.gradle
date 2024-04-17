@@ -1,7 +1,7 @@
 plugins {
-    alias(libs.plugins.kotlin.jvm)
-    alias(libs.plugins.kotlin.ksp)
-    alias(libs.plugins.kotlin.allopen)
+    alias(mn.plugins.kotlin.jvm)
+    alias(mn.plugins.ksp)
+    alias(mn.plugins.kotlin.allopen)
 }
 
 repositories {
@@ -18,15 +18,12 @@ dependencies {
     testCompileOnly(mn.micronaut.inject.kotlin)
 
     testImplementation(mn.micronaut.http)
-    testImplementation(libs.managed.swagger.annotations)
     testImplementation(mn.reactor)
-    testImplementation(mn.snakeyaml)
     testImplementation(mnValidation.validation)
-    testImplementation(libs.kotlin.stdlib.jdk8)
-    testImplementation(libs.kotlin.reflect)
-    testImplementation(mnTest.micronaut.test.junit5)
+    testImplementation(mn.kotlin.stdlib.jdk8)
+    testImplementation(mn.kotlin.reflect)
 
-    testRuntimeOnly(libs.junit.jupiter.engine)
+    testRuntimeOnly(mnTest.junit.jupiter.engine)
     testRuntimeOnly(mnLogging.logback.classic)
 }
 

@@ -12,11 +12,9 @@ dependencies {
     testCompileOnly(projects.micronautOpenapi)
 
     testImplementation(mn.micronaut.http)
-    testImplementation(mn.snakeyaml)
     testImplementation(mnGroovy.micronaut.runtime.groovy)
     testImplementation(mnValidation.validation)
     testImplementation(mn.reactor)
-    testImplementation(mnTest.micronaut.test.spock)
 
     testRuntimeOnly(mnLogging.logback.classic)
 }

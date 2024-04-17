@@ -12,7 +12,7 @@ micronautBuild {
 dependencies {
     api(mn.jackson.databind)
     api(libs.jackson.dataformat.yaml)
-    api(libs.jackson.datatype.jsr310)
+    api(mn.jackson.datatype.jsr310)
     api(libs.managed.swagger.models)
 }
 

@@ -10,8 +10,8 @@ class TestController {
 
     @GET
     @Path("/{userId}")
-    @Produces({ "application/json" })
-    String getUser(@PathParam("userId") String userId){
+    @Produces("application/json")
+    public String getUser(@PathParam("userId") String userId) {
         return "Pong version " + userId;
     }
 

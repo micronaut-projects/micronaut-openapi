@@ -8,9 +8,6 @@ managed-freemarker = "2.3.32"
 managed-pegdown = "1.6.0"
 managed-evo-inflector = "1.3"
 
-groovy = "4.0.20"
-kotlin = "1.9.23"
-ksp = "1.9.23-1.0.20"
 jspecify = "0.3.0"
 jdt-annotation = "2.3.0"
 android-annotation = "1.7.1"
@@ -22,7 +19,7 @@ javaparser = "3.25.10"
 commons-codec = "1.16.1"
 
 micronaut = "4.4.1"
-micronaut-platform = "4.3.7"
+micronaut-platform = "4.3.8"
 micronaut-jaxrs = "4.4.0"
 micronaut-security = "4.7.0"
 micronaut-serde = "2.9.0"
@@ -32,34 +29,16 @@ micronaut-reactor = "3.3.0"
 micronaut-gradle-plugin = "4.3.6"
 micronaut-groovy = "4.3.0"
 micronaut-validation = "4.5.0"
-micronaut-data = "4.6.2"
+micronaut-data = "4.7.0"
 micronaut-test = "4.3.0"
 micronaut-kotlin = "4.3.0"
 micronaut-logging = "1.3.0"
 micronaut-session = "4.3.0"
-micronaut-grpc = "4.3.0"
+micronaut-grpc = "4.4.0"
 micronaut-docs = "2.0.0"
 
 [libraries]
-# Core
-micronaut-core = { module = 'io.micronaut:micronaut-core-bom', version.ref = 'micronaut' }
-micronaut-jaxrs = { module = "io.micronaut.jaxrs:micronaut-jaxrs-bom", version.ref = "micronaut-jaxrs" }
-micronaut-logging = { module = "io.micronaut.logging:micronaut-logging-bom", version.ref = "micronaut-logging" }
-micronaut-security = { module = "io.micronaut.security:micronaut-security-bom", version.ref = "micronaut-security" }
-micronaut-serde = { module = "io.micronaut.serde:micronaut-serde-bom", version.ref = "micronaut-serde" }
-micronaut-rxjava2 = { module = "io.micronaut.rxjava2:micronaut-rxjava2-bom", version.ref = "micronaut-rxjava2" }
-micronaut-rxjava3 = { module = "io.micronaut.rxjava3:micronaut-rxjava3-bom", version.ref = "micronaut-rxjava3" }
-micronaut-reactor = { module = "io.micronaut.reactor:micronaut-reactor-bom", version.ref = "micronaut-reactor" }
-micronaut-gradle-plugin = { module = "io.micronaut.gradle:micronaut-minimal-plugin", version.ref = "micronaut-gradle-plugin"}
-micronaut-groovy = { module = "io.micronaut.groovy:micronaut-groovy-bom", version.ref = "micronaut-groovy" }
-micronaut-validation = { module = "io.micronaut.validation:micronaut-validation-bom", version.ref = "micronaut-validation" }
-micronaut-session = { module = "io.micronaut.session:micronaut-session-bom", version.ref = "micronaut-session" }
-micronaut-data = { module = "io.micronaut.data:micronaut-data-bom", version.ref = "micronaut-data" }
-micronaut-test = { module = "io.micronaut.test:micronaut-test-bom", version.ref = "micronaut-test" }
-micronaut-kotlin = { module = "io.micronaut.kotlin:micronaut-kotlin-bom", version.ref = "micronaut-kotlin" }
-micronaut-grpc = { module = "io.micronaut.grpc:micronaut-grpc-bom", version.ref = "micronaut-grpc" }
-micronaut-platform = { module = "io.micronaut.platform:micronaut-platform", version.ref = "micronaut-platform"}
-
+# Managed
 managed-swagger-core = { module = "io.swagger.core.v3:swagger-core", version.ref = "managed-swagger" }
 managed-swagger-annotations = { module = "io.swagger.core.v3:swagger-annotations", version.ref = "managed-swagger" }
 managed-swagger-models = { module = "io.swagger.core.v3:swagger-models", version.ref = "managed-swagger" }
@@ -72,15 +51,28 @@ managed-freemarker = { module = "org.freemarker:freemarker", version.ref = "mana
 managed-pegdown = {module = "org.pegdown:pegdown", version.ref = "managed-pegdown"}
 managed-evo-inflector = {module = "org.atteo:evo-inflector", version.ref = "managed-evo-inflector"}
 
-# Versions from BOM
-junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine" }
-junit-jupiter-params = { module = "org.junit.jupiter:junit-jupiter-params" }
-jackson-datatype-jsr310 = { module = "com.fasterxml.jackson.datatype:jackson-datatype-jsr310" }
-jackson-dataformat-yaml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml" }
-kotlinx-coroutines-reactor = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-reactor" }
+# Micronaut
+micronaut-core = { module = 'io.micronaut:micronaut-core-bom', version.ref = 'micronaut' }
+micronaut-jaxrs = { module = "io.micronaut.jaxrs:micronaut-jaxrs-bom", version.ref = "micronaut-jaxrs" }
+micronaut-logging = { module = "io.micronaut.logging:micronaut-logging-bom", version.ref = "micronaut-logging" }
+micronaut-security = { module = "io.micronaut.security:micronaut-security-bom", version.ref = "micronaut-security" }
+micronaut-serde = { module = "io.micronaut.serde:micronaut-serde-bom", version.ref = "micronaut-serde" }
+micronaut-rxjava2 = { module = "io.micronaut.rxjava2:micronaut-rxjava2-bom", version.ref = "micronaut-rxjava2" }
+micronaut-rxjava3 = { module = "io.micronaut.rxjava3:micronaut-rxjava3-bom", version.ref = "micronaut-rxjava3" }
+micronaut-reactor = { module = "io.micronaut.reactor:micronaut-reactor-bom", version.ref = "micronaut-reactor" }
+micronaut-groovy = { module = "io.micronaut.groovy:micronaut-groovy-bom", version.ref = "micronaut-groovy" }
+micronaut-validation = { module = "io.micronaut.validation:micronaut-validation-bom", version.ref = "micronaut-validation" }
+micronaut-session = { module = "io.micronaut.session:micronaut-session-bom", version.ref = "micronaut-session" }
+micronaut-data = { module = "io.micronaut.data:micronaut-data-bom", version.ref = "micronaut-data" }
+micronaut-test = { module = "io.micronaut.test:micronaut-test-bom", version.ref = "micronaut-test" }
+micronaut-kotlin = { module = "io.micronaut.kotlin:micronaut-kotlin-bom", version.ref = "micronaut-kotlin" }
+micronaut-grpc = { module = "io.micronaut.grpc:micronaut-grpc-bom", version.ref = "micronaut-grpc" }
+micronaut-platform = { module = "io.micronaut.platform:micronaut-platform", version.ref = "micronaut-platform"}
+micronaut-gradle-plugin = { module = "io.micronaut.gradle:micronaut-minimal-plugin", version.ref = "micronaut-gradle-plugin"}
 
-kotlin-stdlib-jdk8 = { module = "org.jetbrains.kotlin:kotlin-stdlib-jdk8", version.ref = "kotlin" }
-kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
+# Other
+jackson-dataformat-yaml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml" }
+
 jspecify = { module = "org.jspecify:jspecify", version.ref = "jspecify" }
 spotbugs-annotations = { module = "com.github.spotbugs:spotbugs-annotations", version.ref = "spotbugs-annotations" }
 jdt-annotation = { module = "org.eclipse.jdt:org.eclipse.jdt.annotation", version.ref = "jdt-annotation" }
@@ -91,9 +83,3 @@ commons-codec = { module = "commons-codec:commons-codec", version.ref = "commons
 openapi-generator = { module = "org.openapitools:openapi-generator", version.ref = "openapi-generator" }
 swagger-parser = { module = "io.swagger:swagger-parser", version.ref = "swagger-parser" }
 swagger-parser-v3 = { module = "io.swagger.parser.v3:swagger-parser-v3", version.ref = "swagger-parser-v3" }
-
-[plugins]
-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
-kotlin-ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
-kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
-kotlin-allopen = { id = "org.jetbrains.kotlin.plugin.allopen", version.ref = "kotlin" }
