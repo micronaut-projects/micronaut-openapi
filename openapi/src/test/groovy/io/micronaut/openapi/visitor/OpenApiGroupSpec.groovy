@@ -302,4 +302,138 @@ public class MyBean {}
         apiPrivate.paths.size() == 1
         apiPublic.paths.size() == 2
     }
+
+    void "test group schemas with exclude"() {
+
+        when:
+        buildBeanDefinition("test.MyBean", '''
+package test;
+
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.micronaut.openapi.annotation.OpenAPIGroup;
+import io.micronaut.serde.annotation.Serdeable;
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.info.Info;
+
+@Controller("/demo")
+class MyController {
+
+    @OpenAPIGroup(names = "v1", exclude = "v2")
+    @Get
+    HelloResponseV1 indexV1(String id) {
+        return null;
+    }
+
+    @OpenAPIGroup(names = "v2", exclude = "v1")
+    @Get
+    HelloResponseV2 indexV2(String name) {
+        return null;
+    }
+}
+
+@Serdeable.Serializable
+class HelloResponseV1 {
+    
+    public String message;
+}
+
+@Serdeable.Serializable
+class HelloResponseV2 {
+    
+    public String message;
+}
+
+@OpenAPIDefinition(
+    info = @Info(
+        title = "Title My API",
+        version = "0.0",
+        description = "My API"
+    )
+)
+class Application {
+}
+
+@jakarta.inject.Singleton
+public class MyBean {}
+''')
+
+        then:
+        def openApis = Utils.testReferences
+        openApis
+        openApis.size() == 2
+
+        def apiV1 = openApis.get(Pair.of("v1", null)).getOpenApi()
+        def apiV2 = openApis.get(Pair.of("v2", null)).getOpenApi()
+
+        apiV1.paths.'/demo'.get.responses.'200'.content.'application/json'.schema.$ref == '#/components/schemas/HelloResponseV1'
+        apiV2.paths.'/demo'.get.responses.'200'.content.'application/json'.schema.$ref == '#/components/schemas/HelloResponseV2'
+    }
+
+    void "test group schemas without exclude"() {
+
+        when:
+        buildBeanDefinition("test.MyBean", '''
+package test;
+
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.micronaut.openapi.annotation.OpenAPIGroup;
+import io.micronaut.serde.annotation.Serdeable;
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.info.Info;
+
+@Controller("/demo")
+class MyController {
+
+    @OpenAPIGroup("v1")
+    @Get
+    HelloResponseV1 indexV1(String id) {
+        return null;
+    }
+
+    @OpenAPIGroup("v2")
+    @Get
+    HelloResponseV2 indexV2(String name) {
+        return null;
+    }
+}
+
+@Serdeable.Serializable
+class HelloResponseV1 {
+    
+    public String message;
+}
+
+@Serdeable.Serializable
+class HelloResponseV2 {
+    
+    public String message;
+}
+
+@OpenAPIDefinition(
+    info = @Info(
+        title = "Title My API",
+        version = "0.0",
+        description = "My API"
+    )
+)
+class Application {
+}
+
+@jakarta.inject.Singleton
+public class MyBean {}
+''')
+
+        then:
+        def openApis = Utils.testReferences
+        openApis
+        openApis.size() == 2
+
+        def apiV1 = openApis.get(Pair.of("v1", null)).getOpenApi()
+        def apiV2 = openApis.get(Pair.of("v2", null)).getOpenApi()
+
+        apiV1.paths.'/demo'.get.responses.'200'.content.'application/json'.schema.$ref == '#/components/schemas/HelloResponseV1'
+        apiV2.paths.'/demo'.get.responses.'200'.content.'application/json'.schema.$ref == '#/components/schemas/HelloResponseV2'
+    }
 }
