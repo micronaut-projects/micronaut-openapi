@@ -103,6 +103,7 @@ paths:
           enum:
             - "year"
             - "rating"
+            - "big_rating"
     get:
       # TODO: add operationId
       tags:
