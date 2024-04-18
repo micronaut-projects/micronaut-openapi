@@ -350,7 +350,6 @@ abstract class AbstractOpenApiVisitor {
 
             var result = new StringBuilder();
 
-            boolean optionalPathVar = false;
             boolean varProcess = false;
             boolean valueProcess = false;
             boolean isFirstVarChar = true;
@@ -450,19 +449,6 @@ abstract class AbstractOpenApiVisitor {
         }
 
         return resultPathItemsMap;
-    }
-
-    private List<String> addOptionalVars(List<String> paths, String var, int level) {
-        var additionalPaths = new ArrayList<>(paths);
-        if (paths.isEmpty()) {
-            additionalPaths.add(SLASH + OPEN_BRACE + var + CLOSE_BRACE);
-            return additionalPaths;
-        }
-
-        for (String path : paths) {
-            additionalPaths.add(path + SLASH + OPEN_BRACE + var + CLOSE_BRACE);
-        }
-        return additionalPaths;
     }
 
     /**
@@ -1389,7 +1375,6 @@ abstract class AbstractOpenApiVisitor {
             arraySchemaAnn.stringValue(PROP_NAME).ifPresent(schemaToBind::setName);
         }
 
-//        Schema finalSchemaToBind = schemaToBind;
         processJakartaValidationAnnotations(element, elementType, schemaToBind);
 
         final ComposedSchema composedSchema;

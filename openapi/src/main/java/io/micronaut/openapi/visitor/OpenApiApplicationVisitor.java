@@ -678,7 +678,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                     setOperationOnPathItem(pathItem, endpointInfo.getHttpMethod(), endpointInfo.getOperation());
                     continue;
                 }
-                if (endpointInfo.getVersion() == null) {
+                if (endpointInfo.getVersion() == null && CollectionUtils.isEmpty(endpointInfo.getGroups())) {
                     setOperationOnPathItem(pathItem, endpointInfo.getHttpMethod(), SchemaUtils.mergeOperations(operation, endpointInfo.getOperation()));
                 }
             }

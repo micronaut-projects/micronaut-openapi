@@ -3,6 +3,7 @@ package io.micronaut.openapi.visitor
 import io.micronaut.openapi.AbstractOpenApiTypeElementSpec
 import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.Operation
+import spock.util.environment.RestoreSystemProperties
 
 class OpenApiVersionSpec extends AbstractOpenApiTypeElementSpec {
 
@@ -355,5 +356,77 @@ class MyBean {}
         cleanup:
         System.clearProperty("micronaut.router.versioning.enabled")
         System.clearProperty("micronaut.router.versioning.parameter.enabled")
+    }
+
+    @RestoreSystemProperties
+    void "test group schemas with version"() {
+
+        setup:
+        System.setProperty("micronaut.router.versioning.enabled", "true")
+        System.setProperty("micronaut.router.versioning.parameter.enabled", "true")
+
+        when:
+        buildBeanDefinition("test.MyBean", '''
+package test;
+
+import io.micronaut.core.version.annotation.Version;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.micronaut.serde.annotation.Serdeable;
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.info.Info;
+
+@Controller("/demo")
+class MyController {
+
+    @Version("v1")
+    @Get
+    HelloResponseV1 indexV1(String id) {
+        return null;
+    }
+
+    @Version("v2")
+    @Get
+    HelloResponseV2 indexV2(String name) {
+        return null;
+    }
+}
+
+@Serdeable.Serializable
+class HelloResponseV1 {
+    
+    public String message;
+}
+
+@Serdeable.Serializable
+class HelloResponseV2 {
+    
+    public String message;
+}
+
+@OpenAPIDefinition(
+    info = @Info(
+        title = "Title My API",
+        version = "0.0",
+        description = "My API"
+    )
+)
+class Application {
+}
+
+@jakarta.inject.Singleton
+public class MyBean {}
+''')
+
+        then:
+        def openApis = Utils.testReferences
+        openApis
+        openApis.size() == 2
+
+        def apiV1 = openApis.get(Pair.of(null, "v1")).getOpenApi()
+        def apiV2 = openApis.get(Pair.of(null, "v2")).getOpenApi()
+
+        apiV1.paths.'/demo'.get.responses.'200'.content.'application/json'.schema.$ref == '#/components/schemas/HelloResponseV1'
+        apiV2.paths.'/demo'.get.responses.'200'.content.'application/json'.schema.$ref == '#/components/schemas/HelloResponseV2'
     }
 }
