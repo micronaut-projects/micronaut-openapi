@@ -22,7 +22,6 @@ import io.micronaut.openapi.generator.Formatting.ReplaceDotsWithUnderscoreLambda
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.examples.Example;
-import io.swagger.v3.oas.models.media.ArraySchema;
 import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.media.StringSchema;
 import io.swagger.v3.oas.models.parameters.Parameter;
@@ -867,7 +866,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         Schema<?> schema = unaliasSchema(p);
         Schema<?> target = ModelUtils.isGenerateAliasAsModel() ? p : schema;
         if (ModelUtils.isArraySchema(target)) {
-            Schema<?> items = getSchemaItems((ArraySchema) schema);
+            Schema<?> items = ModelUtils.getSchemaItems(schema);
             return getSchemaType(target) + "<" + getTypeDeclaration(items) + ">";
         }
 
@@ -1187,7 +1186,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
     public String toVarName(String name) {
         var varName = super.toVarName(name);
 
-        if (varName.chars().allMatch(Character::isUpperCase)) {
+        if (varName.chars().allMatch(c -> Character.isUpperCase(c) || c == '_')) {
             return varName;
         }
 

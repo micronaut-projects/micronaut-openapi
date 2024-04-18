@@ -1071,7 +1071,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
     public String toVarName(String name) {
         var varName = super.toVarName(name);
 
-        if (varName.chars().allMatch(Character::isUpperCase)) {
+        if (varName.chars().allMatch(c -> Character.isUpperCase(c) || c == '_')) {
             return varName;
         }
 

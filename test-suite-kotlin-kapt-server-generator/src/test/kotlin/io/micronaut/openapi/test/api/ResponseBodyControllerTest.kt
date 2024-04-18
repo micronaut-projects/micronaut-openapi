@@ -14,6 +14,7 @@ import io.micronaut.test.extensions.junit5.annotation.MicronautTest
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import java.time.ZonedDateTime
 
@@ -112,6 +113,7 @@ class ResponseBodyControllerTest(
         assertEquals(e.status, HttpStatus.NOT_FOUND)
     }
 
+    @Disabled("https://github.com/micronaut-projects/micronaut-core/issues/10733")
     @Test
     fun testGetFile() {
         val request = HttpRequest.GET<Any>("/getFile")

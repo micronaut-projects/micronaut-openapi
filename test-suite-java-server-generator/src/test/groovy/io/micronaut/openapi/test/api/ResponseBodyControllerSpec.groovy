@@ -14,6 +14,7 @@ import io.micronaut.runtime.server.EmbeddedServer
 import io.micronaut.test.extensions.spock.annotation.MicronautTest
 import jakarta.inject.Inject
 import spock.lang.Ignore
+import spock.lang.PendingFeature
 import spock.lang.Specification
 
 import java.time.ZonedDateTime
@@ -157,6 +158,7 @@ class ResponseBodyControllerSpec extends Specification {
         HttpStatus.NOT_FOUND == e.status
     }
 
+    @PendingFeature(reason = "https://github.com/micronaut-projects/micronaut-core/issues/10733")
     void "test get file"() {
         given:
         HttpRequest<?> request = HttpRequest.GET("/getFile")
