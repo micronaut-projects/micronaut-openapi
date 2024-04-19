@@ -158,7 +158,6 @@ class ResponseBodyControllerSpec extends Specification {
         HttpStatus.NOT_FOUND == e.status
     }
 
-    @PendingFeature(reason = "https://github.com/micronaut-projects/micronaut-core/issues/10733")
     void "test get file"() {
         given:
         HttpRequest<?> request = HttpRequest.GET("/getFile")
