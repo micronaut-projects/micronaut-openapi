@@ -21,7 +21,6 @@ import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.Arguments.arguments
 import org.junit.jupiter.params.provider.EnumSource
 import org.junit.jupiter.params.provider.MethodSource
-import spock.lang.Issue
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.OffsetDateTime
@@ -198,8 +197,7 @@ class RequestBodyControllerTest(
         assertEquals(model, response)
     }
 
-    @Issue("https://github.com/micronaut-projects/micronaut-serialization/issues/768")
-    @Disabled
+    @Disabled("https://github.com/micronaut-projects/micronaut-serialization/issues/768")
     @MethodSource("discriminators")
     @ParameterizedTest
     fun testSendModelWithDiscriminatorChild(discriminatorName: String, model: Animal) {
