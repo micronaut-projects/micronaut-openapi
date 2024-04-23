@@ -426,4 +426,19 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
             "public String get_for() {",
             "public void set_for(String _for) {");
     }
+
+    @Test
+    void testCommonPathParametersWithRef() {
+
+        var codegen = new JavaMicronautClientCodegen();
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/openmeteo.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String path = outputPath + "src/main/java/org/openapitools/";
+
+        assertFileContains(path + "api/WeatherForecastApisApi.java", "@Get(\"/v1/forecast/{id}\")",
+                "@PathVariable(\"id\") @NotNull String id,",
+                "@QueryValue(\"hourly\") @Nullable List<@NotNull HourlyEnum> hourly,",
+                "public enum HourlyEnum {",
+                "@JsonProperty(\"temperature_2m\")",
+                "TEMPERATURE_2M(\"temperature_2m\"),");
+    }
 }

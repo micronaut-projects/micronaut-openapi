@@ -483,4 +483,19 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
             "@field:JsonProperty(JSON_PROPERTY_DATA)",
             "var `data`: String,");
     }
+
+    @Test
+    void testCommonPathParametersWithRef() {
+
+        var codegen = new KotlinMicronautClientCodegen();
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/openmeteo.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String path = outputPath + "src/main/kotlin/org/openapitools/";
+
+        assertFileContains(path + "api/WeatherForecastAPIsApi.kt", "@Get(\"/v1/forecast/{id}\")",
+                "@PathVariable(\"id\") @NotNull id: String,",
+                "@QueryValue(\"hourly\") @Nullable hourly: List<@NotNull Hourly>?,",
+                "enum class Hourly (",
+                "@JsonProperty(\"temperature_2m\")",
+                "TEMPERATURE_2M(\"temperature_2m\"),");
+    }
 }

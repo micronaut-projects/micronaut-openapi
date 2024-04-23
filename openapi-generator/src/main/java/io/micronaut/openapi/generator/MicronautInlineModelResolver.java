@@ -210,6 +210,16 @@ public final class MicronautInlineModelResolver {
                     schema.setAdditionalProperties(refSchema);
                 }
             }
+            if (schema.getItems() != null) {
+                String schemaName = resolveModelName(schema.getTitle(), modelPrefix + "Enum");
+                // Recurse to create $refs for inner models
+                gatherInlineModels(schema.getItems(), schemaName);
+                if (isModelNeeded(schema.getItems())) {
+                    // If this schema should be split into its own model, do so
+                    Schema refSchema = makeSchemaInComponents(schemaName, schema.getItems());
+                    schema.setAdditionalProperties(refSchema);
+                }
+            }
         } else if (schema.getProperties() != null) {
             // If non-object type is specified but also properties
             LOGGER.error("Illegal schema found with non-object type combined with properties, no properties should be defined:\n {}", schema);

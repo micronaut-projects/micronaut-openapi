@@ -622,6 +622,9 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
             realName = realName.replaceFirst("_", "");
         }
         parameter.vendorExtensions.put("realName", realName);
+
+        addStrValueToEnum(parameter.items);
+
         return parameter;
     }
 
@@ -714,7 +717,8 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
                     for (var param : path.getParameters()) {
                         var found = false;
                         for (var opParam : op.getParameters()) {
-                            if (Objects.equals(opParam.getName(), param.getName())) {
+                            if (Objects.equals(opParam.getName(), param.getName())
+                                    && Objects.equals(opParam.get$ref(), param.get$ref())) {
                                 found = true;
                                 break;
                             }
@@ -914,7 +918,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
      * @param imports The operation imports.
      */
     private void processParametersWithAdditionalMappings(List<CodegenParameter> params, Set<String> imports) {
-        Map<String, ParameterMapping> additionalMappings = new LinkedHashMap<>();
+        var additionalMappings = new LinkedHashMap<String, ParameterMapping>();
         Iterator<CodegenParameter> iter = params.iterator();
         while (iter.hasNext()) {
             CodegenParameter param = iter.next();
@@ -1084,11 +1088,13 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
 
         // this fix for properties started with underscores and named by reserved words
         // For example, _____default
-        var firstNameChar = varName.toCharArray()[0];
-        var underscorePrefix = getUnderscorePrefix(name);
-        varName = getUnderscorePrefix(name)
-            + (firstNameChar == '_' && !underscorePrefix.isEmpty() ? "" : Character.toLowerCase(firstNameChar))
-            + varName.substring(1);
+        if (varName.startsWith("_")) {
+            var firstNameChar = varName.toCharArray()[0];
+            var underscorePrefix = getUnderscorePrefix(name);
+            varName = underscorePrefix
+                    + (firstNameChar == '_' && !underscorePrefix.isEmpty() ? "" : Character.toLowerCase(firstNameChar))
+                    + varName.substring(1);
+        }
 
         return varName;
     }

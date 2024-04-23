@@ -209,15 +209,27 @@ public final class Utils {
         };
     }
 
+    public static void addStrValueToEnum(CodegenProperty property) {
+        if (property == null || !property.isEnum || property.allowableValues == null) {
+            return;
+        }
+        var enumVars = (List<Object>) property.allowableValues.get("enumVars");
+        addStrValueToEnum(enumVars, property.isNumeric);
+    }
+
     public static void addStrValueToEnum(CodegenModel model) {
-        if (!model.isEnum || model.allowableValues == null) {
+        if (model == null || !model.isEnum || model.allowableValues == null) {
             return;
         }
         var enumVars = (List<Object>) model.allowableValues.get("enumVars");
+        addStrValueToEnum(enumVars, model.isNumeric);
+    }
+
+    public static void addStrValueToEnum(List<Object> enumVars, boolean isNumeric) {
         for (var enumVar : enumVars) {
             var varMap = (Map<String, Object>) enumVar;
             var value = varMap.get("value").toString();
-            if (model.isNumeric) {
+            if (isNumeric) {
                 var argPos = value.indexOf('(');
                 // case for BigDecimal
                 if (argPos >= 0) {
