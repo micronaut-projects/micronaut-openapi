@@ -1,7 +1,7 @@
 {{!
 default type
-}}{{^isDate}}{{^isDateTime}}{{{vendorExtensions.typeWithGenericAnnotations}}}{{/isDateTime}}{{/isDate}}{{!
+}}{{^isDate}}{{^isDateTime}}{{{vendorExtensions.typeWithEnumWithGenericAnnotations}}}{{/isDateTime}}{{/isDate}}{{!
 date-time
-}}{{#isDateTime}}@Format("{{{datetimeFormat}}}") {{{vendorExtensions.typeWithGenericAnnotations}}}{{/isDateTime}}{{!
+}}{{#isDateTime}}@Format("{{{datetimeFormat}}}") {{{vendorExtensions.typeWithEnumWithGenericAnnotations}}}{{/isDateTime}}{{!
 date
-}}{{#isDate}}@Format("{{{dateFormat}}}") {{{vendorExtensions.typeWithGenericAnnotations}}}{{/isDate}}
+}}{{#isDate}}@Format("{{{dateFormat}}}") {{{vendorExtensions.typeWithEnumWithGenericAnnotations}}}{{/isDate}}

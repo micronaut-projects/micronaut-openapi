@@ -52,12 +52,7 @@ import {{javaxPackage}}.validation.Valid;
 {{^micronaut_serde_jackson}}
 import io.micronaut.core.annotation.Introspected;
 {{/micronaut_serde_jackson}}
-{{^generateHardNullable}}
 import io.micronaut.core.annotation.Nullable;
-{{/generateHardNullable}}
-{{#generateHardNullable}}
-import io.micronaut.core.annotation.Nullable;
-{{/generateHardNullable}}
 {{#generatedAnnotation}}
 import {{javaxPackage}}.annotation.Generated;
 {{/generatedAnnotation}}

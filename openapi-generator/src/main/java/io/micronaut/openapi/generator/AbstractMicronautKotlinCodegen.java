@@ -702,7 +702,8 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
                     for (var param : path.getParameters()) {
                         var found = false;
                         for (var opParam : op.getParameters()) {
-                            if (Objects.equals(opParam.getName(), param.getName())) {
+                            if (Objects.equals(opParam.getName(), param.getName())
+                                && Objects.equals(opParam.get$ref(), param.get$ref())) {
                                 found = true;
                                 break;
                             }
@@ -947,6 +948,9 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
             realName = realName.replace("`", "");
         }
         parameter.vendorExtensions.put("realName", realName);
+
+        addStrValueToEnum(parameter.items);
+
         return parameter;
     }
 
