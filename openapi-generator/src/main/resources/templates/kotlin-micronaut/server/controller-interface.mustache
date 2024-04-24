@@ -4,19 +4,10 @@ package {{apiPackage}}
 import io.micronaut.http.annotation.*
 import io.micronaut.core.annotation.Nullable
 import io.micronaut.core.convert.format.Format
-{{#micronaut_serde_jackson}}
-import io.micronaut.serde.annotation.Serdeable
-{{/micronaut_serde_jackson}}
-{{#jackson}}
-import com.fasterxml.jackson.annotation.*
-{{/jackson}}
 {{#useAuth}}
 import io.micronaut.security.annotation.Secured
 import io.micronaut.security.rules.SecurityRule
 {{/useAuth}}
-{{#reactive}}
-import reactor.core.publisher.Flux
-{{/reactive}}
 {{#wrapInHttpResponse}}
 import io.micronaut.http.HttpResponse
 {{/wrapInHttpResponse}}
@@ -75,29 +66,6 @@ interface {{classname}} {
     {{/allParams}}){{#returnType}}: {{{returnType}}}{{/returnType}}
         {{/formatNoEmptyLines}}
 
-    {{/operation}}
-{{/operations}}
-
-{{#operations}}
-    {{#operation}}
-        {{#allParams}}
-            {{#items}}
-                {{#isEnum}}
-                    {{^isContainer}}
-                        {{#indent}}
-                            {{>common/model/enum}}
-                        {{/indent}}
-                    {{/isContainer}}
-                    {{#isContainer}}
-                        {{#mostInnerItems}}
-                            {{#indent}}
-                                {{>common/model/enum}}
-                            {{/indent}}
-                        {{/mostInnerItems}}
-                    {{/isContainer}}
-                {{/isEnum}}
-            {{/items}}
-        {{/allParams}}
     {{/operation}}
 {{/operations}}
 }

@@ -15,15 +15,12 @@
  */
 package io.micronaut.openapi.generator;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
+import com.fasterxml.jackson.databind.MapperFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
+import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.PathItem;
@@ -31,18 +28,27 @@ import io.swagger.v3.oas.models.Paths;
 import io.swagger.v3.oas.models.callbacks.Callback;
 import io.swagger.v3.oas.models.media.ArraySchema;
 import io.swagger.v3.oas.models.media.ComposedSchema;
+import io.swagger.v3.oas.models.media.Content;
+import io.swagger.v3.oas.models.media.MediaType;
 import io.swagger.v3.oas.models.media.Schema;
+import io.swagger.v3.oas.models.media.XML;
 import io.swagger.v3.oas.models.parameters.Parameter;
-
+import io.swagger.v3.oas.models.parameters.RequestBody;
+import io.swagger.v3.oas.models.responses.ApiResponse;
+import io.swagger.v3.oas.models.responses.ApiResponses;
 import org.apache.commons.lang3.StringUtils;
 import org.openapitools.codegen.utils.ModelUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
-import com.fasterxml.jackson.databind.MapperFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Inline model resolver.
@@ -71,6 +77,7 @@ public final class MicronautInlineModelResolver {
     private Map<String, String> inlineSchemaOptions = new HashMap<>();
     private Set<String> inlineSchemaNameMappingValues = new HashSet<>();
     private boolean resolveInlineEnums = true;
+    private boolean skipSchemaReuse = false; // skip reusing inline schema if set to true
     private Boolean refactorAllOfInlineSchemas; // refactor allOf inline schemas into $ref
 
     // a set to keep track of names generated for inline schemas
@@ -78,6 +85,43 @@ public final class MicronautInlineModelResolver {
 
     public MicronautInlineModelResolver(OpenAPI openAPI) {
         this.openAPI = openAPI;
+        this.inlineSchemaOptions.put("ARRAY_ITEM_SUFFIX", "_inner");
+        this.inlineSchemaOptions.put("MAP_ITEM_SUFFIX", "_value");
+    }
+
+    public void setInlineSchemaNameMapping(Map inlineSchemaNameMapping) {
+        this.inlineSchemaNameMapping = inlineSchemaNameMapping;
+        this.inlineSchemaNameMappingValues = new HashSet<>(inlineSchemaNameMapping.values());
+    }
+
+    public void setInlineSchemaOptions(Map inlineSchemaOptions) {
+        this.inlineSchemaOptions.putAll(inlineSchemaOptions);
+
+        if ("true".equalsIgnoreCase(
+                this.inlineSchemaOptions.getOrDefault("SKIP_SCHEMA_REUSE", "false"))) {
+            this.skipSchemaReuse = true;
+        }
+
+        if (this.inlineSchemaOptions.containsKey("REFACTOR_ALLOF_INLINE_SCHEMAS")) {
+            this.refactorAllOfInlineSchemas = Boolean.valueOf(this.inlineSchemaOptions.get("REFACTOR_ALLOF_INLINE_SCHEMAS"));
+        }
+
+        if (this.inlineSchemaOptions.containsKey("RESOLVE_INLINE_ENUMS")) {
+            this.resolveInlineEnums = Boolean.parseBoolean(this.inlineSchemaOptions.get("RESOLVE_INLINE_ENUMS"));
+        }
+    }
+
+    public void flatten() {
+        if (this.openAPI.getComponents() == null) {
+            this.openAPI.setComponents(new Components());
+        }
+
+        if (this.openAPI.getComponents().getSchemas() == null) {
+            this.openAPI.getComponents().setSchemas(new HashMap<>());
+        }
+
+        flattenPaths();
+        flattenComponents();
     }
 
     public void flattenPaths() {
@@ -88,7 +132,10 @@ public final class MicronautInlineModelResolver {
 
         for (Map.Entry<String, PathItem> pathsEntry : paths.entrySet()) {
             PathItem path = pathsEntry.getValue();
-            Map<PathItem.HttpMethod, Operation> operationsMap = new LinkedHashMap<>(path.readOperationsMap());
+            if (path.get$ref() != null) {
+                path = openAPI.getComponents().getPathItems().get(path.get$ref().substring("#/components/pathItems/".length()));
+            }
+            var operationsMap = new LinkedHashMap<>(path.readOperationsMap());
 
             // use path name (e.g. /foo/bar) and HTTP verb to come up with a name
             // in case operationId is not defined later in other methods
@@ -113,6 +160,129 @@ public final class MicronautInlineModelResolver {
                 Operation operation = operationEntry.getValue();
                 String inlineSchemaName = getInlineSchemaName(operationEntry.getKey(), pathname);
                 flattenPathItemParameters(inlineSchemaName, operation, path);
+                flattenParameters(inlineSchemaName, operation);
+                flattenRequestBody(inlineSchemaName, operation);
+                flattenResponses(inlineSchemaName, operation);
+            }
+        }
+    }
+
+    private void flattenResponses(String modelName, Operation operation) {
+        ApiResponses responses = operation.getResponses();
+        if (responses == null) {
+            return;
+        }
+
+        for (Map.Entry<String, ApiResponse> responsesEntry : responses.entrySet()) {
+            String key = responsesEntry.getKey();
+            ApiResponse response = responsesEntry.getValue();
+
+            if (response.get$ref() != null) {
+                response = openAPI.getComponents().getResponses().get(response.get$ref().substring("#/components/responses/".length()));
+            }
+
+            flattenContent(response.getContent(),
+                    (operation.getOperationId() == null ? modelName : operation.getOperationId()) + "_" + key + "_response");
+        }
+    }
+
+    private void flattenRequestBody(String modelName, Operation operation) {
+        RequestBody requestBody = operation.getRequestBody();
+        if (requestBody == null) {
+            return;
+        }
+
+        // unalias $ref
+        if (requestBody.get$ref() != null) {
+            String ref = ModelUtils.getSimpleRef(requestBody.get$ref());
+            requestBody = openAPI.getComponents().getRequestBodies().get(ref);
+
+            if (requestBody == null) {
+                return;
+            }
+        }
+
+        flattenContent(requestBody.getContent(),
+                (operation.getOperationId() == null ? modelName : operation.getOperationId()) + "_request");
+    }
+
+    private void flattenContent(Content content, String name) {
+        if (content == null || content.isEmpty()) {
+            return;
+        }
+
+        for (String contentType : content.keySet()) {
+            MediaType mediaType = content.get(contentType);
+            if (mediaType == null) {
+                continue;
+            }
+            Schema schema = mediaType.getSchema();
+            if (schema == null) {
+                continue;
+            }
+            String schemaName = resolveModelName(schema.getTitle(), name); // name example: testPost_request
+            // Recursively gather/make inline models within this schema if any
+            gatherInlineModels(schema, schemaName);
+            if (isModelNeeded(schema)) {
+                // If this schema should be split into its own model, do so
+                //Schema refSchema = this.makeSchema(schemaName, schema);
+                mediaType.setSchema(this.makeSchemaInComponents(schemaName, schema));
+            }
+            if (schema.getItems() != null && schema.getItems().get$ref() == null) {
+                String itemsSchemaName = resolveModelName(schema.getTitle(), name); // name example: testPost_request
+                // Recursively gather/make inline models within this schema if any
+                gatherInlineModels(schema, itemsSchemaName);
+                if (isModelNeeded(schema)) {
+                    // If this schema should be split into its own model, do so
+                    //Schema refSchema = this.makeSchema(schemaName, schema);
+                    schema.setItems(this.makeSchemaInComponents(itemsSchemaName, schema));
+                }
+            }
+        }
+    }
+
+    private void flattenParameters(String modelName, Operation operation) {
+        List<Parameter> parameters = operation.getParameters();
+        if (parameters == null) {
+            return;
+        }
+
+        for (Parameter parameter : parameters) {
+            Schema parameterSchema = parameter.getSchema();
+            if (parameterSchema == null && parameter.get$ref() == null) {
+                continue;
+            }
+
+            if (parameter.get$ref() != null) {
+                if (openAPI.getComponents().getParameters() != null) {
+                    parameter = openAPI.getComponents().getParameters().get(parameter.get$ref().substring("#/components/parameters/".length()));
+                }
+            }
+            parameterSchema = parameter.getSchema();
+
+            if (parameterSchema == null) {
+                continue;
+            }
+
+            String schemaName = resolveModelName(parameterSchema.getTitle(),
+                    (operation.getOperationId() == null ? modelName : operation.getOperationId()) + "_" + parameter.getName() + "_parameter");
+            // Recursively gather/make inline models within this schema if any
+            gatherInlineModels(parameterSchema, schemaName);
+            if (isModelNeeded(parameterSchema)) {
+                // If this schema should be split into its own model, do so
+                parameter.setSchema(this.makeSchemaInComponents(schemaName, parameterSchema));
+            }
+
+            var parameterItemsSchema = parameterSchema.getItems();
+            if (parameterItemsSchema != null && parameterItemsSchema.get$ref() == null) {
+                String itemsSchemaName = resolveModelName(parameterItemsSchema.getTitle(),
+                        (operation.getOperationId() == null ? modelName : operation.getOperationId()) + "_" + parameter.getName() + "_parameter");
+                // Recursively gather/make inline models within this schema if any
+                gatherInlineModels(parameterItemsSchema, itemsSchemaName);
+                if (isModelNeeded(parameterItemsSchema)) {
+                    // If this schema should be split into its own model, do so
+                    parameterItemsSchema.setItems(this.makeSchemaInComponents(itemsSchemaName, parameterItemsSchema));
+                }
             }
         }
     }
@@ -127,11 +297,19 @@ public final class MicronautInlineModelResolver {
         }
 
         for (Parameter parameter : parameters) {
-            if (parameter.getSchema() == null) {
+            if (parameter.getSchema() == null && parameter.get$ref() == null) {
                 continue;
             }
 
-            Schema parameterSchema = parameter.getSchema();
+            Schema parameterSchema = null;
+            if (parameter.get$ref() != null) {
+                if (openAPI.getComponents().getParameters() != null) {
+                    var param = openAPI.getComponents().getParameters().get(parameter.get$ref().substring("#/components/parameters/".length()));
+                    parameterSchema = param.getSchema();
+                }
+            } else {
+                parameterSchema = parameter.getSchema();
+            }
 
             if (parameterSchema == null) {
                 continue;
@@ -144,6 +322,17 @@ public final class MicronautInlineModelResolver {
                 // If this schema should be split into its own model, do so
                 Schema refSchema = makeSchemaInComponents(schemaName, parameterSchema);
                 parameter.setSchema(refSchema);
+            }
+            var parameterItemsSchema = parameterSchema.getItems();
+            if (parameterItemsSchema != null && parameterItemsSchema.get$ref() == null) {
+                String itemsSchemaName = resolveModelName(parameterItemsSchema.getTitle(),
+                        (operation.getOperationId() == null ? modelName : operation.getOperationId()) + "_" + parameter.getName() + "_parameter");
+                // Recursively gather/make inline models within this schema if any
+                gatherInlineModels(parameterItemsSchema, itemsSchemaName);
+                if (isModelNeeded(parameterItemsSchema)) {
+                    // If this schema should be split into its own model, do so
+                    parameterSchema.setItems(this.makeSchemaInComponents(itemsSchemaName, parameterItemsSchema));
+                }
             }
         }
     }
@@ -210,7 +399,7 @@ public final class MicronautInlineModelResolver {
                     schema.setAdditionalProperties(refSchema);
                 }
             }
-            if (schema.getItems() != null) {
+            if (schema.getItems() != null && schema.getItems().get$ref() == null) {
                 String schemaName = resolveModelName(schema.getTitle(), modelPrefix + "Enum");
                 // Recurse to create $refs for inner models
                 gatherInlineModels(schema.getItems(), schemaName);
@@ -410,6 +599,9 @@ public final class MicronautInlineModelResolver {
     }
 
     private String matchGenerated(Schema model) {
+        if (skipSchemaReuse) { // skip reusing schema
+            return null;
+        }
         try {
             String json = STRUCTURE_MAPPER.writeValueAsString(model);
             if (generatedSignature.containsKey(json)) {
@@ -554,4 +746,254 @@ public final class MicronautInlineModelResolver {
             uniqueName = name + "_" + ++count;
         }
     }
+
+    /**
+     * Flatten inline models in components.
+     */
+    private void flattenComponents() {
+        Map<String, Schema> models = openAPI.getComponents().getSchemas();
+        if (models == null) {
+            return;
+        }
+
+        var modelNames = new ArrayList<>(models.keySet());
+        for (String modelName : modelNames) {
+            Schema model = models.get(modelName);
+            if (model == null) {
+                continue;
+            }
+            if (ModelUtils.isAnyOf(model)) { // contains anyOf only
+                gatherInlineModels(model, modelName);
+            } else if (ModelUtils.isOneOf(model)) { // contains oneOf only
+                gatherInlineModels(model, modelName);
+            } else if (ModelUtils.isComposedSchema(model)) {
+                // inline child schemas
+                flattenComposedChildren(modelName + "_allOf", model.getAllOf(), !Boolean.TRUE.equals(this.refactorAllOfInlineSchemas));
+                flattenComposedChildren(modelName + "_anyOf", model.getAnyOf(), false);
+                flattenComposedChildren(modelName + "_oneOf", model.getOneOf(), false);
+            } else {
+                gatherInlineModels(model, modelName);
+            }
+        }
+    }
+
+    private void flattenComposedChildren(String key, List<Schema> children, boolean skipAllOfInlineSchemas) {
+        if (children == null || children.isEmpty()) {
+            return;
+        }
+        ListIterator<Schema> listIterator = children.listIterator();
+        while (listIterator.hasNext()) {
+            Schema component = listIterator.next();
+            if ((component != null) &&
+                    (component.get$ref() == null) &&
+                    ((component.getProperties() != null && !component.getProperties().isEmpty()) ||
+                            (component.getEnum() != null && !component.getEnum().isEmpty()))) {
+                // If a `title` attribute is defined in the inline schema, codegen uses it to name the
+                // inline schema. Otherwise, we'll use the default naming such as InlineObject1, etc.
+                // We know that this is not the best way to name the model.
+                //
+                // Such naming strategy may result in issues. If the value of the 'title' attribute
+                // happens to match a schema defined elsewhere in the specification, 'innerModelName'
+                // will be the same as that other schema.
+                //
+                // To have complete control of the model naming, one can define the model separately
+                // instead of inline.
+                String innerModelName = resolveModelName(component.getTitle(), key);
+                Schema innerModel = modelFromProperty(openAPI, component, innerModelName);
+                // Recurse to create $refs for inner models
+                gatherInlineModels(innerModel, innerModelName);
+                if (!skipAllOfInlineSchemas) {
+                    String existing = matchGenerated(innerModel);
+                    if (existing == null) {
+                        innerModelName = addSchemas(innerModelName, innerModel);
+                        Schema schema = new Schema().$ref(innerModelName);
+                        schema.setRequired(component.getRequired());
+                        listIterator.set(schema);
+                    } else {
+                        Schema schema = new Schema().$ref(existing);
+                        schema.setRequired(component.getRequired());
+                        listIterator.set(schema);
+                    }
+                } else {
+                    LOGGER.debug("Inline allOf schema {} not refactored into a separate model using $ref.", innerModelName);
+                }
+            }
+        }
+    }
+
+    private Schema modelFromProperty(OpenAPI openAPI, Schema object, String path) {
+        String description = object.getDescription();
+        String example = null;
+        Object obj = object.getExample();
+        if (obj != null) {
+            example = obj.toString();
+        }
+        XML xml = object.getXml();
+        Map<String, Schema> properties = object.getProperties();
+
+        // NOTE:
+        // No need to null check setters below. All defaults in the new'd Schema are null, so setting to null would just be a noop.
+        Schema model = new Schema();
+        model.setType(object.getType());
+
+        // Even though the `format` keyword typically applies to primitive types only,
+        // the JSON schema specification states `format` can be used for any model type instance
+        // including object types.
+        model.setFormat(object.getFormat());
+
+        if (object.getExample() != null) {
+            model.setExample(example);
+        }
+        model.setDescription(description);
+        model.setName(object.getName());
+        model.setXml(xml);
+        model.setRequired(object.getRequired());
+        model.setNullable(object.getNullable());
+        model.setEnum(object.getEnum());
+        model.setType(object.getType());
+        model.setDiscriminator(object.getDiscriminator());
+        model.setWriteOnly(object.getWriteOnly());
+        model.setUniqueItems(object.getUniqueItems());
+        model.setTitle(object.getTitle());
+        model.setReadOnly(object.getReadOnly());
+        model.setPattern(object.getPattern());
+        model.setNot(object.getNot());
+        model.setMinProperties(object.getMinProperties());
+        model.setMinLength(object.getMinLength());
+        model.setMinItems(object.getMinItems());
+        model.setMinimum(object.getMinimum());
+        model.setMaxProperties(object.getMaxProperties());
+        model.setMaxLength(object.getMaxLength());
+        model.setMaxItems(object.getMaxItems());
+        model.setMaximum(object.getMaximum());
+        model.setExternalDocs(object.getExternalDocs());
+        model.setExtensions(object.getExtensions());
+        model.setExclusiveMinimum(object.getExclusiveMinimum());
+        model.setExclusiveMaximum(object.getExclusiveMaximum());
+        // no need to set it again as it's set earlier
+        //model.setExample(object.getExample());
+        model.setDeprecated(object.getDeprecated());
+
+        if (properties != null) {
+            flattenProperties(openAPI, properties, path);
+            model.setProperties(properties);
+        }
+        return model;
+    }
+
+    private void flattenProperties(OpenAPI openAPI, Map<String, Schema> properties, String path) {
+        if (properties == null) {
+            return;
+        }
+        Map<String, Schema> propsToUpdate = new HashMap<>();
+        Map<String, Schema> modelsToAdd = new HashMap<>();
+        for (Map.Entry<String, Schema> propertiesEntry : properties.entrySet()) {
+            String key = propertiesEntry.getKey();
+            Schema property = propertiesEntry.getValue();
+            if (ModelUtils.isObjectSchema(property)) {
+                Schema op = property;
+                String modelName = resolveModelName(op.getTitle(), path + "_" + key);
+                Schema model = modelFromProperty(openAPI, op, modelName);
+                String existing = matchGenerated(model);
+                if (existing != null) {
+                    Schema schema = new Schema().$ref(existing);
+                    schema.setRequired(op.getRequired());
+                    propsToUpdate.put(key, schema);
+                } else {
+                    modelName = addSchemas(modelName, model);
+                    Schema schema = new Schema().$ref(modelName);
+                    schema.setRequired(op.getRequired());
+                    propsToUpdate.put(key, schema);
+                    modelsToAdd.put(modelName, model);
+                }
+            } else if (ModelUtils.isArraySchema(property)) {
+                Schema inner = ModelUtils.getSchemaItems(property);
+                if (ModelUtils.isObjectSchema(inner)) {
+                    Schema op = inner;
+                    if (op.getProperties() != null && op.getProperties().size() > 0) {
+                        flattenProperties(openAPI, op.getProperties(), path);
+                        String modelName = resolveModelName(op.getTitle(), path + "_" + key);
+                        Schema innerModel = modelFromProperty(openAPI, op, modelName);
+                        String existing = matchGenerated(innerModel);
+                        if (existing != null) {
+                            Schema schema = new Schema().$ref(existing);
+                            schema.setRequired(op.getRequired());
+                            property.setItems(schema);
+                        } else {
+                            modelName = addSchemas(modelName, innerModel);
+                            Schema schema = new Schema().$ref(modelName);
+                            schema.setRequired(op.getRequired());
+                            property.setItems(schema);
+                        }
+                    }
+                } else if (ModelUtils.isComposedSchema(inner)) {
+                    String innerModelName = resolveModelName(inner.getTitle(), path + "_" + key);
+                    gatherInlineModels(inner, innerModelName);
+                    innerModelName = addSchemas(innerModelName, inner);
+                    Schema schema = new Schema().$ref(innerModelName);
+                    schema.setRequired(inner.getRequired());
+                    property.setItems(schema);
+                } else {
+                    LOGGER.debug("Schema not yet handled in model resolver: {}", inner);
+                }
+            } else if (ModelUtils.isMapSchema(property)) {
+                Schema inner = ModelUtils.getAdditionalProperties(property);
+                if (ModelUtils.isObjectSchema(inner)) {
+                    Schema op = inner;
+                    if (op.getProperties() != null && op.getProperties().size() > 0) {
+                        flattenProperties(openAPI, op.getProperties(), path);
+                        String modelName = resolveModelName(op.getTitle(), path + "_" + key);
+                        Schema innerModel = modelFromProperty(openAPI, op, modelName);
+                        String existing = matchGenerated(innerModel);
+                        if (existing != null) {
+                            Schema schema = new Schema().$ref(existing);
+                            schema.setRequired(op.getRequired());
+                            property.setAdditionalProperties(schema);
+                        } else {
+                            modelName = addSchemas(modelName, innerModel);
+                            Schema schema = new Schema().$ref(modelName);
+                            schema.setRequired(op.getRequired());
+                            property.setAdditionalProperties(schema);
+                        }
+                    }
+                } else if (ModelUtils.isComposedSchema(inner)) {
+                    String innerModelName = resolveModelName(inner.getTitle(), path + "_" + key);
+                    gatherInlineModels(inner, innerModelName);
+                    innerModelName = addSchemas(innerModelName, inner);
+                    Schema schema = new Schema().$ref(innerModelName);
+                    schema.setRequired(inner.getRequired());
+                    property.setAdditionalProperties(schema);
+                } else {
+                    LOGGER.debug("Schema not yet handled in model resolver: {}", inner);
+                }
+            } else if (ModelUtils.isComposedSchema(property)) { // oneOf, anyOf, allOf etc
+                if (property.getAllOf() != null && property.getAllOf().size() == 1 // allOf with a single item
+                        && (property.getOneOf() == null || property.getOneOf().isEmpty()) // not oneOf
+                        && (property.getAnyOf() == null || property.getAnyOf().isEmpty()) // not anyOf
+                        && (property.getProperties() == null || property.getProperties().isEmpty())) { // no property
+                    // don't do anything if it's allOf with a single item
+                    LOGGER.debug("allOf with a single item (which can be handled by default codegen) skipped by inline model resolver: {}", property);
+                } else {
+                    String propertyModelName = resolveModelName(property.getTitle(), path + "_" + key);
+                    gatherInlineModels(property, propertyModelName);
+                    propertyModelName = addSchemas(propertyModelName, property);
+                    Schema schema = new Schema().$ref(propertyModelName);
+                    schema.setRequired(property.getRequired());
+                    propsToUpdate.put(key, schema);
+                }
+            } else {
+                LOGGER.debug("Schema not yet handled in model resolver: {}", property);
+            }
+        }
+        if (propsToUpdate.size() > 0) {
+            for (String key : propsToUpdate.keySet()) {
+                properties.put(key, propsToUpdate.get(key));
+            }
+        }
+        for (String key : modelsToAdd.keySet()) {
+            openAPI.getComponents().addSchemas(key, modelsToAdd.get(key));
+            this.addedModels.put(key, modelsToAdd.get(key));
+        }
+    }
+
 }

@@ -428,8 +428,10 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
 
         assertFileContains(path + "api/WeatherForecastApisApi.java", "@Get(\"/v1/forecast/{id}\")",
                 "@PathVariable(\"id\") @NotNull String id,",
-                "@QueryValue(\"hourly\") @Nullable(inherited = true) List<@NotNull HourlyEnum> hourly,",
-                "public enum HourlyEnum {",
+                "@QueryValue(\"hourly\") @Nullable(inherited = true) List<V1ForecastIdGetHourlyParameterInner> hourly,");
+
+        assertFileContains(path + "model/V1ForecastIdGetHourlyParameterInner.java",
+                "public enum V1ForecastIdGetHourlyParameterInner {",
                 "@JsonProperty(\"temperature_2m\")",
                 "TEMPERATURE_2M(\"temperature_2m\"),");
     }

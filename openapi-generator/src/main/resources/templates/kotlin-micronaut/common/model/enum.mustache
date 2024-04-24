@@ -16,7 +16,7 @@
 {{#additionalEnumTypeAnnotations}}
 {{{.}}}
 {{/additionalEnumTypeAnnotations}}
-{{#nonPublicApi}}internal {{/nonPublicApi}}{{#formatSingleLine}}enum class {{>common/model/enumName}}{{/formatSingleLine}} (
+{{#nonPublicApi}}internal {{/nonPublicApi}}{{#formatSingleLine}}enum class {{>common/model/enumName}}{{/formatSingleLine}}(
     @get:JsonValue val value: {{{dataType}}}
 ) {
 

@@ -73,6 +73,7 @@ import static io.micronaut.openapi.generator.Utils.processGenericAnnotations;
 import static org.openapitools.codegen.CodegenConstants.INVOKER_PACKAGE;
 import static org.openapitools.codegen.languages.KotlinClientCodegen.DATE_LIBRARY;
 import static org.openapitools.codegen.utils.StringUtils.camelize;
+import static org.openapitools.codegen.utils.StringUtils.underscore;
 
 /**
  * Base generator for Micronaut.
@@ -675,6 +676,21 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         return tag;
     }
 
+    public String superSanitizeTag(String tag) {
+        tag = camelize(underscore(sanitizeName(tag)));
+
+        // tag starts with numbers
+        if (tag.matches("^\\d.*")) {
+            tag = "Class" + tag;
+        }
+        return tag;
+    }
+
+    @Override
+    public String toApiName(String name) {
+        return Utils.toApiName(name, apiNamePrefix, apiNameSuffix);
+    }
+
     @Override
     public void addOperationToGroup(String tag, String resourcePath, Operation operation, CodegenOperation co,
                                     Map<String, List<CodegenOperation>> operations) {
@@ -683,7 +699,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
             return;
         }
 
-        super.addOperationToGroup(super.sanitizeTag(tag), resourcePath, operation, co, operations);
+        super.addOperationToGroup(superSanitizeTag(tag), resourcePath, operation, co, operations);
     }
 
     @Override
@@ -717,7 +733,9 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         }
 
         var inlineModelResolver = new MicronautInlineModelResolver(openAPI);
-        inlineModelResolver.flattenPaths();
+        inlineModelResolver.setInlineSchemaNameMapping(inlineSchemaNameMapping);
+        inlineModelResolver.setInlineSchemaOptions(inlineSchemaOption);
+        inlineModelResolver.flatten();
 
         super.preprocessOpenAPI(openAPI);
     }

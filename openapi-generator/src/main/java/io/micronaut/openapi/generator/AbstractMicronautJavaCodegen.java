@@ -691,6 +691,11 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
     }
 
     @Override
+    public String toApiName(String name) {
+        return Utils.toApiName(name, apiNamePrefix, apiNameSuffix);
+    }
+
+    @Override
     public void addOperationToGroup(String tag, String resourcePath, Operation operation, CodegenOperation co,
                                     Map<String, List<CodegenOperation>> operations) {
         if (generateOperationOnlyForFirstTag && !co.tags.get(0).getName().equals(tag)) {
@@ -732,7 +737,9 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
         }
 
         var inlineModelResolver = new MicronautInlineModelResolver(openAPI);
-        inlineModelResolver.flattenPaths();
+        inlineModelResolver.setInlineSchemaNameMapping(inlineSchemaNameMapping);
+        inlineModelResolver.setInlineSchemaOptions(inlineSchemaOption);
+        inlineModelResolver.flatten();
 
         super.preprocessOpenAPI(openAPI);
     }

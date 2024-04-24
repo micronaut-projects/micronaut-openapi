@@ -248,4 +248,11 @@ public final class Utils {
             varMap.put("strValue", value);
         }
     }
+
+    public static String toApiName(String name, String prefix, String suffix) {
+        if (name.isEmpty()) {
+            return "DefaultApi";
+        }
+        return prefix + name + suffix;
+    }
 }
