@@ -4,12 +4,6 @@ package {{package}};
 import io.micronaut.http.annotation.*;
 import io.micronaut.core.annotation.*;
 import io.micronaut.http.client.annotation.Client;
-{{#micronaut_serde_jackson}}
-import io.micronaut.serde.annotation.Serdeable;
-{{/micronaut_serde_jackson}}
-{{#jackson}}
-import com.fasterxml.jackson.annotation.*;
-{{/jackson}}
 {{#configureAuth}}
 import {{invokerPackage}}.auth.Authorization;
 {{/configureAuth}}
@@ -28,12 +22,9 @@ import {{import}};
 import {{javaxPackage}}.annotation.Generated;
 {{/generatedAnnotation}}
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 {{#useBeanValidation}}
 import {{javaxPackage}}.validation.Valid;
 import {{javaxPackage}}.validation.constraints.*;
@@ -84,29 +75,6 @@ public interface {{classname}} {
         {{#formatSingleLine}}{{>client/params/queryParams}}{{>client/params/pathParams}}{{>client/params/headerParams}}{{>client/params/bodyParams}}{{>client/params/formParams}}{{>client/params/cookieParams}}{{^-last}},{{/-last}}{{/formatSingleLine}}
     {{/allParams}});
     {{/formatNoEmptyLines}}
-    {{/operation}}
-{{/operations}}
-
-{{#operations}}
-    {{#operation}}
-        {{#allParams}}
-            {{#items}}
-                {{#isEnum}}
-                    {{^isContainer}}
-                        {{#indent}}
-                            {{>common/model/enum}}
-                        {{/indent}}
-                    {{/isContainer}}
-                    {{#isContainer}}
-                        {{#mostInnerItems}}
-                            {{#indent}}
-                                {{>common/model/enum}}
-                            {{/indent}}
-                        {{/mostInnerItems}}
-                    {{/isContainer}}
-                {{/isEnum}}
-            {{/items}}
-        {{/allParams}}
     {{/operation}}
 {{/operations}}
 }
