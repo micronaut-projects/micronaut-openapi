@@ -11,8 +11,6 @@ dependency:micronaut-management[scope="ksp", groupId="io.micronaut"]
 or, for those using KAPT add:
 dependency:micronaut-management[scope="kapt", groupId="io.micronaut"]
 
-NOTE: For Kotlin, add the `micronaut-openapi` annotation processor dependency in https://docs.micronaut.io/4.4.3/guide/#kaptOrKsp[kapt or ksp scope], and for Groovy add `micronaut-openapi` in compileOnly scope.
-
 Declare the endpoints in the <<propertiesFileConfiguration, openapi.properties>> file:
 
 [source,properties]
