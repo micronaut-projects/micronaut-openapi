@@ -2,10 +2,9 @@ You also can generate file in Asciidoc format. Then you can convert Asciidoc to 
 
 To enable generation file in adoc format just set property `-Dmicronaut.openapi.adoc.enabled=true` and add micronaut-openapi-adoc dependency to classpath:
 
-[source,groovy]
-----
-annotationProcessor("io.micronaut.openapi:micronaut-openapi-adoc")
-----
+dependency:micronaut-openapi-adoc[scope="annotationProcessor", groupId="io.micronaut.openapi"]
+
+NOTE: For Kotlin, add the `micronaut-openapi-adoc` dependency in https://docs.micronaut.io/4.4.3/guide/#kaptOrKsp[kapt or ksp scope], and for Groovy add `micronaut-openapi-adoc` in compileOnly scope.
 
 Adoc generator based on Apache Freemarker templates, and you can override full template or just customize part of them.
 

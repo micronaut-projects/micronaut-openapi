@@ -1,10 +1,19 @@
-To enable the processing of built-in endpoints (https://docs.micronaut.io/latest/guide/index.html#providedEndpoints), you have to expose `micronaut-management` as annotation processor and runtime dependency:
-
-dependency:micronaut-management[scope="annotationProcessor", groupId="io.micronaut"]
+To enable the processing of built-in endpoints (https://docs.micronaut.io/latest/guide/index.html#providedEndpoints), you have to expose `micronaut-management` as a dependency:
 
 dependency:micronaut-management[scope="implementation", groupId="io.micronaut"]
 
-and declare them in the <<propertiesFileConfiguration, openapi.properties>> file:
+`micronaut-management` additionally needs to be exposed to the annotation processor classpath. For Java projects add:
+dependency:micronaut-management[scope="annotationProcessor", groupId="io.micronaut"]
+
+For Kotlin projects using KSP add:
+dependency:micronaut-management[scope="ksp", groupId="io.micronaut"]
+
+or, for those using KAPT add:
+dependency:micronaut-management[scope="kapt", groupId="io.micronaut"]
+
+NOTE: For Kotlin, add the `micronaut-openapi` annotation processor dependency in https://docs.micronaut.io/4.4.3/guide/#kaptOrKsp[kapt or ksp scope], and for Groovy add `micronaut-openapi` in compileOnly scope.
+
+Declare the endpoints in the <<propertiesFileConfiguration, openapi.properties>> file:
 
 [source,properties]
 ----
