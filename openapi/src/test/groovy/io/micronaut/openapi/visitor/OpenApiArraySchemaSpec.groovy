@@ -138,7 +138,7 @@ class MyController {
 
     @Get("/")
     @Operation(description = "Lists the Pets.")
-    @ApiResponse(responseCode = "200", description = "Returns a list of _Pet_s.", content = @Content(mediaType = MediaType.APPLICATION_JSON, array = @ArraySchema(minItems = 2, arraySchema = @Schema(description = "A list of Pets", example = "[{'name': 'cat'}, {'name': 'dog'}]"), schema = @Schema(implementation = Pet.class))))
+    @ApiResponse(responseCode = "200", description = "Returns a list of _Pet_s.", content = @Content(mediaType = MediaType.APPLICATION_JSON, array = @ArraySchema(minItems = 2, arraySchema = @Schema(description = "A list of Pets", example = "[{\\"name\\": \\"cat\\"}, {\\"name\\": \\"dog\\"}]"), schema = @Schema(implementation = Pet.class))))
     public List<Pet> findPets() {
         return null;
     }
@@ -187,8 +187,8 @@ class MyController {
 
     @Get("/{?names*}")
     @Operation(description = "Lists the Pets.")
-    @ApiResponse(responseCode = "200", description = "Returns a list of _Pet_s.", content = @Content(mediaType = MediaType.APPLICATION_JSON, array = @ArraySchema(minItems = 2, arraySchema = @Schema(description = "A list of Pets", example = "[{'name': 'cat'}, {'name': 'dog'}]"), schema = @Schema(implementation = Pet.class))))
-    public List<Pet> findPets(@Parameter(in = ParameterIn.QUERY, required = true, description = "A list of names", example = "['dog', 'cat']", array = @ArraySchema(minItems = 2, arraySchema = @Schema(description = "A list of _Pet_'s name"), schema = @Schema(type = "string"))) List<String> names) {
+    @ApiResponse(responseCode = "200", description = "Returns a list of _Pet_s.", content = @Content(mediaType = MediaType.APPLICATION_JSON, array = @ArraySchema(minItems = 2, arraySchema = @Schema(description = "A list of Pets", example = "[{\\"name\\": \\"cat\\"}, {\\"name\\": \\"dog\\"}]"), schema = @Schema(implementation = Pet.class))))
+    public List<Pet> findPets(@Parameter(in = ParameterIn.QUERY, required = true, description = "A list of names", example = "[\\"dog\\", \\"cat\\"]", array = @ArraySchema(minItems = 2, arraySchema = @Schema(description = "A list of _Pet_'s name"), schema = @Schema(type = "string"))) List<String> names) {
         return null;
     }
 }
@@ -218,5 +218,47 @@ class MyBean {}
         operation.parameters[0].schema.description == 'A list of _Pet_\'s name'
         operation.parameters[0].schema.minItems == 2
         operation.parameters[0].schema.items.type ==  'string'
+    }
+
+    void "test example for array schema"() {
+        given:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.http.annotation.Body;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Post;
+import io.swagger.v3.oas.annotations.media.Schema;
+
+import java.util.List;
+
+@Controller
+class MyController {
+
+    @Post("/names")
+    public List<Pet> findPets(@Body List<Pet> pets) {
+        return null;
+    }
+}
+
+@Schema(description = "Pet")
+class Pet {
+    @Schema(description = "The name of the pet", example = "[\\"123 Main St\\", \\"Suite 517\\"]")
+    public List<String> lines;
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+
+        OpenAPI openAPI = Utils.testReference
+        def petSchema = openAPI.components?.schemas?.Pet
+
+        expect:
+        petSchema
+        petSchema.properties
+        petSchema.properties.lines.example instanceof List<String>
+        petSchema.properties.lines.example[0] == '123 Main St'
+        petSchema.properties.lines.example[1] == 'Suite 517'
     }
 }

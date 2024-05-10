@@ -106,7 +106,7 @@ import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENA
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_SECURITY;
 import static io.micronaut.openapi.visitor.OpenApiNormalizeUtils.findAndRemoveDuplicates;
 import static io.micronaut.openapi.visitor.OpenApiNormalizeUtils.normalizeOpenApi;
-import static io.micronaut.openapi.visitor.OpenApiNormalizeUtils.removeEmtpyComponents;
+import static io.micronaut.openapi.visitor.OpenApiNormalizeUtils.removeEmptyComponents;
 import static io.micronaut.openapi.visitor.SchemaUtils.copyOpenApi;
 import static io.micronaut.openapi.visitor.SchemaUtils.getOperationOnPathItem;
 import static io.micronaut.openapi.visitor.SchemaUtils.setOperationOnPathItem;
@@ -695,7 +695,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         applyPropertyNamingStrategy(openApi, context);
         applyPropertyServerContextPath(openApi, context);
 
-        normalizeOpenApi(openApi);
+        normalizeOpenApi(openApi, context);
         // Process after sorting so order is stable
         new JacksonDiscriminatorPostProcessor().addMissingDiscriminatorType(openApi);
         new OpenApiOperationsPostProcessor().processOperations(openApi);
@@ -719,7 +719,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             // do nothing
         }
 
-        removeEmtpyComponents(openApi);
+        removeEmptyComponents(openApi);
         findAndRemoveDuplicates(openApi);
 
         openApi = resolvePropertyPlaceHolders(openApi, context);
