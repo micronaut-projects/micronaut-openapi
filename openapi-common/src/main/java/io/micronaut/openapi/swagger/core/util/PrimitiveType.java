@@ -20,7 +20,9 @@ import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -68,13 +70,23 @@ public enum PrimitiveType {
     },
     BYTE(Byte.class, "byte") {
         @Override
-        public ByteArraySchema createProperty() {
+        public Schema createProperty() {
+            if (
+                    (System.getProperty(Schema.BINARY_STRING_CONVERSION_PROPERTY) != null && System.getProperty(Schema.BINARY_STRING_CONVERSION_PROPERTY).equals(Schema.BynaryStringConversion.BINARY_STRING_CONVERSION_STRING_SCHEMA.toString())) ||
+                            (System.getenv(Schema.BINARY_STRING_CONVERSION_PROPERTY) != null && System.getenv(Schema.BINARY_STRING_CONVERSION_PROPERTY).equals(Schema.BynaryStringConversion.BINARY_STRING_CONVERSION_STRING_SCHEMA.toString()))) {
+                return new StringSchema().format("byte");
+            }
             return new ByteArraySchema();
         }
     },
     BINARY(Byte.class, "binary") {
         @Override
-        public BinarySchema createProperty() {
+        public Schema createProperty() {
+            if (
+                    (System.getProperty(Schema.BINARY_STRING_CONVERSION_PROPERTY) != null && System.getProperty(Schema.BINARY_STRING_CONVERSION_PROPERTY).equals(Schema.BynaryStringConversion.BINARY_STRING_CONVERSION_STRING_SCHEMA.toString())) ||
+                            (System.getenv(Schema.BINARY_STRING_CONVERSION_PROPERTY) != null && System.getenv(Schema.BINARY_STRING_CONVERSION_PROPERTY).equals(Schema.BynaryStringConversion.BINARY_STRING_CONVERSION_STRING_SCHEMA.toString()))) {
+                return new StringSchema().format("binary");
+            }
             return new BinarySchema();
         }
     },
@@ -176,6 +188,7 @@ public enum PrimitiveType {
     };
 
     private static final Map<Class<?>, PrimitiveType> KEY_CLASSES;
+    private static final Map<Class<?>, Collection<PrimitiveType>> MULTI_KEY_CLASSES;
     private static final Map<Class<?>, PrimitiveType> BASE_CLASSES;
     /**
      * Adds support of a small number of "well-known" types, specifically for
@@ -268,6 +281,11 @@ public enum PrimitiveType {
         addKeys(keyClasses, FILE, File.class);
         addKeys(keyClasses, OBJECT, Object.class);
         KEY_CLASSES = Collections.unmodifiableMap(keyClasses);
+
+        final Map<Class<?>, Collection<PrimitiveType>> multiKeyClasses = new HashMap<>();
+        addMultiKeys(multiKeyClasses, BYTE, byte[].class);
+        addMultiKeys(multiKeyClasses, BINARY, byte[].class);
+        MULTI_KEY_CLASSES = Collections.unmodifiableMap(multiKeyClasses);
 
         final Map<Class<?>, PrimitiveType> baseClasses = new HashMap<>();
         addKeys(baseClasses, DATE_TIME, Date.class, Calendar.class);
@@ -374,11 +392,33 @@ public enum PrimitiveType {
         return nonSystemTypePackages;
     }
 
+    public static PrimitiveType fromTypeAndFormat(Type type, String format) {
+        final Class<?> raw = TypeFactory.defaultInstance().constructType(type).getRawClass();
+        final Collection<PrimitiveType> keys = MULTI_KEY_CLASSES.get(raw);
+        if (keys == null || keys.isEmpty() || format == null || format.isBlank()) {
+            return fromType(type);
+        } else {
+            return keys
+                    .stream()
+                    .filter(t -> t.getCommonName().equalsIgnoreCase(format))
+                    .findAny()
+                    .orElse(null);
+        }
+    }
+
     public static PrimitiveType fromType(Type type) {
         final Class<?> raw = TypeFactory.defaultInstance().constructType(type).getRawClass();
         final PrimitiveType key = KEY_CLASSES.get(raw);
         if (key != null && !customExcludedClasses.contains(raw.getName())) {
             return key;
+        }
+
+        final Collection<PrimitiveType> keys = MULTI_KEY_CLASSES.get(raw);
+        if (keys != null && !keys.isEmpty()) {
+            final PrimitiveType first = keys.iterator().next();
+            if (!customExcludedClasses.contains(raw.getName())) {
+                return first;
+            }
         }
 
         final PrimitiveType custom = customClasses.get(raw.getName());
@@ -448,6 +488,16 @@ public enum PrimitiveType {
     private static <K> void addKeys(Map<K, PrimitiveType> map, PrimitiveType type, K... keys) {
         for (K key : keys) {
             map.put(key, type);
+        }
+    }
+
+    @SafeVarargs
+    private static <K> void addMultiKeys(Map<K, Collection<PrimitiveType>> map, PrimitiveType type, K... keys) {
+        for (K key : keys) {
+            if (!map.containsKey(key)) {
+                map.put(key, new ArrayList<>());
+            }
+            map.get(key).add(type);
         }
     }
 
