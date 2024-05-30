@@ -10,7 +10,7 @@ managed-evo-inflector = "1.3"
 
 jspecify = "0.3.0"
 jdt-annotation = "2.3.0"
-android-annotation = "1.7.1"
+android-annotation = "1.8.0"
 spotbugs-annotations = "4.8.5"
 openapi-generator = "7.6.0"
 swagger-parser = "1.0.71"
