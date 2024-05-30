@@ -28,7 +28,7 @@ class MyController {
     @Get("/")
     @Operation(description = "Lists the Pets.",
                parameters = {
-                   @Parameter(name = "petType", in = ParameterIn.HEADER, required = true, description = "A pet type", example = "['dog', 'cat']", schema = @Schema(description = "A  _Pet_'s type", type = "string",  allowableValues = {"dog", "cat", "snake"}, defaultValue = "dog"))
+                   @Parameter(name = "petType", in = ParameterIn.HEADER, required = true, description = "A pet type", example = "[\\"dog\\", \\"cat\\"]", schema = @Schema(description = "A  _Pet_'s type", type = "string",  allowableValues = {"dog", "cat", "snake"}, defaultValue = "dog"))
                }
     )
     @ApiResponse(responseCode = "200", description = "Returns a _Pet_.", content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = Pet.class)))

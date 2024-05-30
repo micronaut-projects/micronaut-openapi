@@ -26,6 +26,7 @@ import java.util.function.Function;
 import io.micronaut.core.annotation.Internal;
 import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.core.util.StringUtils;
+import io.micronaut.inject.visitor.VisitorContext;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Operation;
@@ -39,8 +40,10 @@ import io.swagger.v3.oas.models.responses.ApiResponse;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
+import static io.micronaut.openapi.visitor.ContextUtils.warn;
 import static io.micronaut.openapi.visitor.SchemaUtils.EMPTY_SIMPLE_SCHEMA;
 import static io.micronaut.openapi.visitor.SchemaUtils.TYPE_OBJECT;
+import static io.micronaut.openapi.visitor.SchemaUtils.TYPE_STRING;
 
 /**
  * Normalization methods for openAPI objects.
@@ -53,7 +56,7 @@ public final class OpenApiNormalizeUtils {
     private OpenApiNormalizeUtils() {
     }
 
-    public static void normalizeOpenApi(OpenAPI openAPI) {
+    public static void normalizeOpenApi(OpenAPI openAPI, VisitorContext context) {
         // Sort paths
         if (openAPI.getPaths() != null) {
             var sortedPaths = new Paths();
@@ -63,14 +66,14 @@ public final class OpenApiNormalizeUtils {
             }
             openAPI.setPaths(sortedPaths);
             for (PathItem pathItem : sortedPaths.values()) {
-                normalizeOperation(pathItem.getGet());
-                normalizeOperation(pathItem.getPut());
-                normalizeOperation(pathItem.getPost());
-                normalizeOperation(pathItem.getDelete());
-                normalizeOperation(pathItem.getOptions());
-                normalizeOperation(pathItem.getHead());
-                normalizeOperation(pathItem.getPatch());
-                normalizeOperation(pathItem.getTrace());
+                normalizeOperation(pathItem.getGet(), context);
+                normalizeOperation(pathItem.getPut(), context);
+                normalizeOperation(pathItem.getPost(), context);
+                normalizeOperation(pathItem.getDelete(), context);
+                normalizeOperation(pathItem.getOptions(), context);
+                normalizeOperation(pathItem.getHead(), context);
+                normalizeOperation(pathItem.getPatch(), context);
+                normalizeOperation(pathItem.getTrace(), context);
             }
         }
 
@@ -80,7 +83,7 @@ public final class OpenApiNormalizeUtils {
             return;
         }
 
-        normalizeSchemas(components.getSchemas());
+        normalizeSchemas(components.getSchemas(), context);
 
         sortComponent(components, Components::getSchemas, Components::setSchemas);
         sortComponent(components, Components::getResponses, Components::setResponses);
@@ -99,7 +102,7 @@ public final class OpenApiNormalizeUtils {
         }
     }
 
-    public static void normalizeOperation(Operation operation) {
+    public static void normalizeOperation(Operation operation, VisitorContext context) {
         if (operation == null) {
             return;
         }
@@ -112,25 +115,31 @@ public final class OpenApiNormalizeUtils {
                 if (paramSchema == null) {
                     continue;
                 }
-                Schema<?> normalizedSchema = normalizeSchema(paramSchema);
+                Schema<?> normalizedSchema = normalizeSchema(paramSchema, context);
                 if (normalizedSchema != null) {
                     parameter.setSchema(normalizedSchema);
                 } else if (paramSchema.equals(EMPTY_SIMPLE_SCHEMA)) {
                     paramSchema.setType(TYPE_OBJECT);
                 }
+                if (parameter.getExample() != null
+                        && parameter.getExample() instanceof String exampleStr
+                        && parameter.getSchema() != null) {
+                    parameter.setExample(ConvertUtils.parseByTypeAndFormat(exampleStr, parameter.getSchema().getType(), parameter.getSchema().getFormat(), context, false));
+                }
+                normalizeExamples(parameter.getExamples());
             }
         }
         if (operation.getRequestBody() != null) {
-            normalizeContent(operation.getRequestBody().getContent());
+            normalizeContent(operation.getRequestBody().getContent(), context);
         }
         if (CollectionUtils.isNotEmpty(operation.getResponses())) {
             for (ApiResponse apiResponse : operation.getResponses().values()) {
-                normalizeContent(apiResponse.getContent());
+                normalizeContent(apiResponse.getContent(), context);
             }
         }
     }
 
-    public static void normalizeContent(Content content) {
+    public static void normalizeContent(Content content, VisitorContext context) {
         if (CollectionUtils.isEmpty(content)) {
             return;
         }
@@ -139,7 +148,7 @@ public final class OpenApiNormalizeUtils {
             if (mediaTypeSchema == null) {
                 continue;
             }
-            Schema<?> normalizedSchema = normalizeSchema(mediaTypeSchema);
+            Schema<?> normalizedSchema = normalizeSchema(mediaTypeSchema, context);
             if (normalizedSchema != null) {
                 mediaType.setSchema(normalizedSchema);
             } else if (mediaTypeSchema.equals(EMPTY_SIMPLE_SCHEMA)) {
@@ -151,7 +160,7 @@ public final class OpenApiNormalizeUtils {
                 var paramNormalizedSchemas = new HashMap<String, Schema>();
                 for (var paramEntry : paramSchemas.entrySet()) {
                     Schema<?> paramSchema = paramEntry.getValue();
-                    Schema<?> paramNormalizedSchema = normalizeSchema(paramSchema);
+                    Schema<?> paramNormalizedSchema = normalizeSchema(paramSchema, context);
                     if (paramNormalizedSchema != null) {
                         paramNormalizedSchemas.put(paramEntry.getKey(), paramNormalizedSchema);
                     }
@@ -184,112 +193,131 @@ public final class OpenApiNormalizeUtils {
         }
     }
 
-    public static Schema<?> normalizeSchema(Schema<?> schema) {
+    public static Schema<?> normalizeSchema(Schema<?> schema, VisitorContext context) {
         List<Schema> allOf = schema.getAllOf();
-        if (CollectionUtils.isEmpty(allOf)) {
-            return null;
-        }
+        if (CollectionUtils.isNotEmpty(allOf)) {
+            if (allOf.size() == 1) {
 
-        if (allOf.size() == 1) {
+                Schema<?> allOfSchema = allOf.get(0);
 
-            Schema<?> allOfSchema = allOf.get(0);
+                schema.setAllOf(null);
+                // if schema has only allOf block with one item or only defaultValue property or only type
+                Object defaultValue = schema.getDefault();
+                String type = schema.getType();
+                String serializedDefaultValue;
+                try {
+                    serializedDefaultValue = defaultValue != null ? Utils.getJsonMapper().writeValueAsString(defaultValue) : null;
+                } catch (JsonProcessingException e) {
+                    return null;
+                }
+                schema.setDefault(null);
+                schema.setType(null);
+                Schema<?> normalizedSchema = null;
 
-            schema.setAllOf(null);
-            // if schema has only allOf block with one item or only defaultValue property or only type
-            Object defaultValue = schema.getDefault();
-            String type = schema.getType();
-            String serializedDefaultValue;
-            try {
-                serializedDefaultValue = defaultValue != null ? Utils.getJsonMapper().writeValueAsString(defaultValue) : null;
-            } catch (JsonProcessingException e) {
-                return null;
+                Object allOfDefaultValue = allOfSchema.getDefault();
+                String serializedAllOfDefaultValue;
+                try {
+                    serializedAllOfDefaultValue = allOfDefaultValue != null ? Utils.getJsonMapper().writeValueAsString(allOfDefaultValue) : null;
+                } catch (JsonProcessingException e) {
+                    return null;
+                }
+                boolean isSameType = allOfSchema.getType() == null || allOfSchema.getType().equals(type);
+
+                if (SchemaUtils.isEmptySchema(schema)
+                        && (serializedDefaultValue == null || serializedDefaultValue.equals(serializedAllOfDefaultValue))
+                        && (type == null || isSameType)) {
+                    normalizedSchema = allOfSchema;
+                }
+                schema.setType(type);
+                schema.setAllOf(allOf);
+                schema.setDefault(defaultValue);
+                if (schema.getExample() == null) {
+                    schema.setExampleSetFlag(false);
+                } else if (TYPE_STRING.equals(schema.getType()) && schema.getExample() instanceof String exampleStr) {
+                    schema.setExample(ConvertUtils.parseByTypeAndFormat(exampleStr, type, schema.getFormat(), context, false));
+                }
+                normalizeSchemaProperties(schema, context);
+                normalizeSchemaProperties(normalizedSchema, context);
+                return normalizedSchema;
             }
-            schema.setDefault(null);
-            schema.setType(null);
-            Schema<?> normalizedSchema = null;
 
-            Object allOfDefaultValue = allOfSchema.getDefault();
-            String serializedAllOfDefaultValue;
-            try {
-                serializedAllOfDefaultValue = allOfDefaultValue != null ? Utils.getJsonMapper().writeValueAsString(allOfDefaultValue) : null;
-            } catch (JsonProcessingException e) {
-                return null;
-            }
-            boolean isSameType = allOfSchema.getType() == null || allOfSchema.getType().equals(type);
-
-            if (SchemaUtils.isEmptySchema(schema)
-                && (serializedDefaultValue == null || serializedDefaultValue.equals(serializedAllOfDefaultValue))
-                && (type == null || isSameType)) {
-                normalizedSchema = allOfSchema;
-            }
-            schema.setType(type);
-            schema.setAllOf(allOf);
-            schema.setDefault(defaultValue);
-            if (schema.getExample() == null) {
-                schema.setExampleSetFlag(false);
-            }
-            return normalizedSchema;
-        }
-
-        var finalList = new ArrayList<Schema>(allOf.size());
-        var schemasWithoutRef = new ArrayList<Schema>(allOf.size() - 1);
-        for (Schema<?> schemaAllOf : allOf) {
-            Schema<?> normalizedSchema = normalizeSchema(schemaAllOf);
-            if (normalizedSchema != null) {
-                schemaAllOf = normalizedSchema;
-            }
-            Map<String, Schema> paramSchemas = schemaAllOf.getProperties();
-            if (CollectionUtils.isNotEmpty(paramSchemas)) {
-                var paramNormalizedSchemas = new HashMap<String, Schema>();
-                for (var paramEntry : paramSchemas.entrySet()) {
-                    Schema<?> paramSchema = paramEntry.getValue();
-                    Schema<?> paramNormalizedSchema = normalizeSchema(paramSchema);
-                    if (paramNormalizedSchema != null) {
-                        paramNormalizedSchemas.put(paramEntry.getKey(), paramNormalizedSchema);
+            var finalList = new ArrayList<Schema>(allOf.size());
+            var schemasWithoutRef = new ArrayList<Schema>(allOf.size() - 1);
+            for (Schema<?> schemaAllOf : allOf) {
+                Schema<?> normalizedSchema = normalizeSchema(schemaAllOf, context);
+                if (normalizedSchema != null) {
+                    schemaAllOf = normalizedSchema;
+                }
+                Map<String, Schema> paramSchemas = schemaAllOf.getProperties();
+                if (CollectionUtils.isNotEmpty(paramSchemas)) {
+                    var paramNormalizedSchemas = new HashMap<String, Schema>();
+                    for (var paramEntry : paramSchemas.entrySet()) {
+                        Schema<?> paramSchema = paramEntry.getValue();
+                        Schema<?> paramNormalizedSchema = normalizeSchema(paramSchema, context);
+                        if (paramNormalizedSchema != null) {
+                            paramNormalizedSchemas.put(paramEntry.getKey(), paramNormalizedSchema);
+                        }
+                    }
+                    if (CollectionUtils.isNotEmpty(paramNormalizedSchemas)) {
+                        paramSchemas.putAll(paramNormalizedSchemas);
                     }
                 }
-                if (CollectionUtils.isNotEmpty(paramNormalizedSchemas)) {
-                    paramSchemas.putAll(paramNormalizedSchemas);
-                }
-            }
 
-            if (StringUtils.isEmpty(schemaAllOf.get$ref())) {
-                schemasWithoutRef.add(schemaAllOf);
-                // remove all description fields, if it's already set in main schema
-                if (StringUtils.isNotEmpty(schema.getDescription())
-                    && StringUtils.isNotEmpty(schemaAllOf.getDescription())) {
-                    schemaAllOf.setDescription(null);
+                if (StringUtils.isEmpty(schemaAllOf.get$ref())) {
+                    schemasWithoutRef.add(schemaAllOf);
+                    // remove all description fields, if it's already set in main schema
+                    if (StringUtils.isNotEmpty(schema.getDescription())
+                            && StringUtils.isNotEmpty(schemaAllOf.getDescription())) {
+                        schemaAllOf.setDescription(null);
+                    }
+                    // remove duplicate default field
+                    if (schema.getDefault() != null
+                            && schemaAllOf.getDefault() != null && schema.getDefault().equals(schemaAllOf.getDefault())) {
+                        schema.setDefault(null);
+                    }
+                    continue;
                 }
-                // remove duplicate default field
-                if (schema.getDefault() != null
-                    && schemaAllOf.getDefault() != null && schema.getDefault().equals(schemaAllOf.getDefault())) {
-                    schema.setDefault(null);
-                }
-                continue;
+                finalList.add(schemaAllOf);
             }
-            finalList.add(schemaAllOf);
+            finalList.addAll(schemasWithoutRef);
+            schema.setAllOf(finalList);
         }
-        finalList.addAll(schemasWithoutRef);
-        schema.setAllOf(finalList);
+        normalizeSchemaProperties(schema, context);
         return null;
+    }
+
+    private static void normalizeSchemaProperties(Schema<?> schema, VisitorContext context) {
+
+        if (schema == null) {
+            return;
+        }
+
+        String type = schema.getType();
+
+        if (schema.getExample() == null) {
+            schema.setExampleSetFlag(false);
+        } else if (!TYPE_STRING.equals(type) && schema.getExample() instanceof String exampleStr) {
+            schema.setExample(ConvertUtils.parseByTypeAndFormat(exampleStr, type, schema.getFormat(), context, false));
+        }
     }
 
     /**
      * Sort schemas list in allOf block: schemas with ref must be first, next other schemas.
      *
      * @param schemas all schema components
+     * @param context Visitor context
      */
-    public static void normalizeSchemas(Map<String, Schema> schemas) {
+    public static void normalizeSchemas(Map<String, Schema> schemas, VisitorContext context) {
 
         if (CollectionUtils.isEmpty(schemas)) {
             return;
         }
 
-        Map<String, Schema> normalizedSchemas = new HashMap<>();
+        var normalizedSchemas = new HashMap<String, Schema>();
 
         for (Map.Entry<String, Schema> entry : schemas.entrySet()) {
             Schema<?> schema = entry.getValue();
-            Schema<?> normalizedSchema = normalizeSchema(schema);
+            Schema<?> normalizedSchema = normalizeSchema(schema, context);
             if (normalizedSchema != null) {
                 normalizedSchemas.put(entry.getKey(), normalizedSchema);
             } else if (schema.equals(EMPTY_SIMPLE_SCHEMA)) {
@@ -298,10 +326,10 @@ public final class OpenApiNormalizeUtils {
 
             Map<String, Schema> paramSchemas = schema.getProperties();
             if (CollectionUtils.isNotEmpty(paramSchemas)) {
-                Map<String, Schema> paramNormalizedSchemas = new HashMap<>();
+                var paramNormalizedSchemas = new HashMap<String, Schema>();
                 for (Map.Entry<String, Schema> paramEntry : paramSchemas.entrySet()) {
                     Schema<?> paramSchema = paramEntry.getValue();
-                    Schema<?> paramNormalizedSchema = normalizeSchema(paramSchema);
+                    Schema<?> paramNormalizedSchema = normalizeSchema(paramSchema, context);
                     if (paramNormalizedSchema != null) {
                         paramNormalizedSchemas.put(paramEntry.getKey(), paramNormalizedSchema);
                     } else if (paramSchema.equals(EMPTY_SIMPLE_SCHEMA)) {
@@ -319,7 +347,7 @@ public final class OpenApiNormalizeUtils {
         }
     }
 
-    public static void removeEmtpyComponents(OpenAPI openAPI) {
+    public static void removeEmptyComponents(OpenAPI openAPI) {
 
         if (CollectionUtils.isEmpty(openAPI.getWebhooks())) {
             openAPI.setWebhooks(null);
