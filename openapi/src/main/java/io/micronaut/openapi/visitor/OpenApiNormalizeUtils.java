@@ -40,7 +40,6 @@ import io.swagger.v3.oas.models.responses.ApiResponse;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
-import static io.micronaut.openapi.visitor.ContextUtils.warn;
 import static io.micronaut.openapi.visitor.SchemaUtils.EMPTY_SIMPLE_SCHEMA;
 import static io.micronaut.openapi.visitor.SchemaUtils.TYPE_OBJECT;
 import static io.micronaut.openapi.visitor.SchemaUtils.TYPE_STRING;

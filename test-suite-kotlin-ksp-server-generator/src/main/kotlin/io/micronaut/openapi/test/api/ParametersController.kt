@@ -40,11 +40,7 @@ open class ParametersController : ParametersApi {
     }
 
     override fun sendPageQuery(pageable: Pageable): Mono<String> {
-        return Mono.just(
-                "(page: " + pageable.number +
-                        ", size: " + pageable.size +
-                        ", sort: " + sortToString(pageable.sort) + ")"
-        )
+        return Mono.just("(page: ${pageable.number}, size: ${pageable.size}, sort: ${sortToString(pageable.sort)})")
     }
 
     override fun sendMappedParameter(myFilter: MyFilter): Mono<String> {
@@ -52,6 +48,6 @@ open class ParametersController : ParametersApi {
     }
 
     private fun sortToString(sort: Sort): String {
-        return sort.orderBy.joinToString(" ") { order -> order.property + "(dir=" + order.direction + ")" }
+        return sort.orderBy.joinToString(" ") { order -> "${order.property}(dir=${order.direction})" }
     }
 }

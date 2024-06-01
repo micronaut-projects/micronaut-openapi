@@ -703,10 +703,10 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
     }
 
     @Override
-    public void preprocessOpenAPI(OpenAPI openAPI) {
+    public void preprocessOpenAPI(OpenAPI openApi) {
 
-        if (openAPI.getPaths() != null) {
-            for (var path : openAPI.getPaths().values()) {
+        if (openApi.getPaths() != null) {
+            for (var path : openApi.getPaths().values()) {
                 if (path.getParameters() == null || path.getParameters().isEmpty()) {
                     continue;
                 }
@@ -732,12 +732,43 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
             }
         }
 
-        var inlineModelResolver = new MicronautInlineModelResolver(openAPI);
+        var inlineModelResolver = new MicronautInlineModelResolver(openApi);
         inlineModelResolver.setInlineSchemaNameMapping(inlineSchemaNameMapping);
         inlineModelResolver.setInlineSchemaOptions(inlineSchemaOption);
         inlineModelResolver.flatten();
 
-        super.preprocessOpenAPI(openAPI);
+        var pathItems = openApi.getPaths();
+        // fix for ApiResponse with $ref
+        if (pathItems != null) {
+            for (var pathEntry : pathItems.entrySet()) {
+                for (var opEntry : pathEntry.getValue().readOperationsMap().entrySet()) {
+                    // process all response bodies
+                    if (opEntry.getValue().getResponses() != null) {
+                        for (var responseEntry : opEntry.getValue().getResponses().entrySet()) {
+                            var response = responseEntry.getValue();
+                            var refResponse = ModelUtils.getReferencedApiResponse(openApi, response);
+                            if (response.getContent() == null) {
+                                response.setContent(refResponse.getContent());
+                            }
+                            if (response.getDescription() == null) {
+                                response.setDescription(refResponse.getDescription());
+                            }
+                            if (response.getHeaders() == null || response.getHeaders().isEmpty()) {
+                                response.setHeaders(refResponse.getHeaders());
+                            }
+                            if (response.getExtensions() == null || response.getExtensions().isEmpty()) {
+                                response.setExtensions(refResponse.getExtensions());
+                            }
+                            if (response.getLinks() == null || response.getLinks().isEmpty()) {
+                                response.setLinks(refResponse.getLinks());
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        super.preprocessOpenAPI(openApi);
     }
 
     @Override

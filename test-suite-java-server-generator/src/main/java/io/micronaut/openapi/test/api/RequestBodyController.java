@@ -104,7 +104,7 @@ public class RequestBodyController implements RequestBodyApi {
     public Mono<byte[]> sendFile(CompletedFileUpload file) {
         return Mono.fromCallable(() -> {
             InputStream inputStream = file.getInputStream();
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            var outputStream = new ByteArrayOutputStream();
             outputStream.write("name: ".getBytes());
             outputStream.write(file.getFilename().getBytes());
             outputStream.write(", content: ".getBytes());

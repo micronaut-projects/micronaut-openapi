@@ -18,18 +18,18 @@ swagger-parser-v3 = "2.1.22"
 javaparser = "3.25.10"
 commons-codec = "1.17.0"
 
-micronaut = "4.5.0"
-micronaut-platform = "4.4.2"
-micronaut-jaxrs = "4.4.0"
-micronaut-security = "4.7.0"
-micronaut-serde = "2.9.0"
+micronaut = "4.5.1"
+micronaut-platform = "4.4.3"
+micronaut-jaxrs = "4.5.0"
+micronaut-security = "4.9.0"
+micronaut-serde = "2.10.1"
 micronaut-rxjava2 = "2.3.0"
 micronaut-rxjava3 = "3.3.0"
 micronaut-reactor = "3.3.0"
-micronaut-gradle-plugin = "4.3.8"
+micronaut-gradle-plugin = "4.4.0"
 micronaut-groovy = "4.3.0"
-micronaut-validation = "4.5.0"
-micronaut-data = "4.7.0"
+micronaut-validation = "4.6.0"
+micronaut-data = "4.8.0"
 micronaut-test = "4.3.0"
 micronaut-kotlin = "4.3.0"
 micronaut-logging = "1.3.0"
@@ -71,8 +71,6 @@ micronaut-platform = { module = "io.micronaut.platform:micronaut-platform", vers
 micronaut-gradle-plugin = { module = "io.micronaut.gradle:micronaut-minimal-plugin", version.ref = "micronaut-gradle-plugin"}
 
 # Other
-jackson-dataformat-yaml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml" }
-
 jspecify = { module = "org.jspecify:jspecify", version.ref = "jspecify" }
 spotbugs-annotations = { module = "com.github.spotbugs:spotbugs-annotations", version.ref = "spotbugs-annotations" }
 jdt-annotation = { module = "org.eclipse.jdt:org.eclipse.jdt.annotation", version.ref = "jdt-annotation" }

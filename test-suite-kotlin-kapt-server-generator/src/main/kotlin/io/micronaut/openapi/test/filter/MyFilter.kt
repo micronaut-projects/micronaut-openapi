@@ -45,7 +45,7 @@ data class MyFilter(
             fun parse(string: String): Condition {
                 val matcher = CONDITION_PATTERN.matcher(string)
                 if (!matcher.find()) {
-                    throw ParseException("The filter condition must match '${CONDITION_REGEX}' but is '${string}'")
+                    throw ParseException("The filter condition must match '$CONDITION_REGEX' but is '$string'")
                 }
                 return Condition(
                         matcher.group(1),
