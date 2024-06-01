@@ -93,6 +93,7 @@ import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_OPEN_ID_CONNECT
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_PARAM_NAME;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_SCHEME;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_SCOPES;
+import static io.micronaut.openapi.visitor.ProtoUtils.isProtobufGenerated;
 import static io.micronaut.openapi.visitor.SchemaUtils.TYPE_ARRAY;
 import static io.micronaut.openapi.visitor.SchemaUtils.TYPE_BOOLEAN;
 import static io.micronaut.openapi.visitor.SchemaUtils.TYPE_INTEGER;
@@ -658,6 +659,9 @@ public final class ConvertUtils {
                 }
                 result = ConvertUtils.getTypeAndFormatByClass(fieldType.getName(), fieldType.isArray());
             }
+        }
+        if (result == null && isProtobufGenerated(type)) {
+            return Pair.of(PrimitiveType.INT.getCommonName(), schemaFormat);
         }
         return result != null ? result : Pair.of(PrimitiveType.STRING.getCommonName(), schemaFormat);
     }

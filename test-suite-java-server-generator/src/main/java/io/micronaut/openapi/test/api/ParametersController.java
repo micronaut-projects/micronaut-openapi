@@ -76,8 +76,7 @@ public class ParametersController implements ParametersApi {
 
     private String sortToString(Sort sort) {
         return sort.getOrderBy().stream()
-            .map(
-                order -> order.getProperty() + "(dir=" + order.getDirection() + ")"
-            ).collect(Collectors.joining(" "));
+            .map(order -> order.getProperty() + "(dir=" + order.getDirection() + ")")
+            .collect(Collectors.joining(" "));
     }
 }

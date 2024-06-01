@@ -2523,8 +2523,27 @@ abstract class AbstractOpenApiVisitor {
     }
 
     private List<Object> getEnumValues(EnumElement type, String schemaType, String schemaFormat, VisitorContext context) {
+        var isProtobufGenerated = isProtobufGenerated(type);
         var enumValues = new ArrayList<>();
         for (EnumConstantElement element : type.elements()) {
+
+            if (isProtobufGenerated) {
+                Integer protoValue = null;
+                for (var field : type.getFields()) {
+                    if (field.getName().equals(element.getSimpleName() + "_VALUE")) {
+                        try {
+                            protoValue = (Integer) field.getConstantValue();
+                        } catch (Exception e) {
+                            // do nothing
+                        }
+                        break;
+                    }
+                }
+                if (protoValue != null) {
+                    enumValues.add(protoValue);
+                }
+                continue;
+            }
 
             var schemaAnn = getAnnotation(element, io.swagger.v3.oas.annotations.media.Schema.class);
             boolean isHidden = schemaAnn != null && schemaAnn.booleanValue(PROP_HIDDEN).orElse(false);

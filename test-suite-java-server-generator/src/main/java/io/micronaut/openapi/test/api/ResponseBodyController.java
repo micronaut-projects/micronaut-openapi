@@ -74,7 +74,7 @@ public class ResponseBodyController implements ResponseBodyApi {
 
     @Override
     public Mono<Page<SimpleModel>> getPaginatedSimpleModel(Pageable pageable) {
-        return Mono.just(Page.of(SIMPLE_MODELS, pageable, SIMPLE_MODELS.size()));
+        return Mono.just(Page.of(SIMPLE_MODELS, pageable, (long) SIMPLE_MODELS.size()));
     }
 
     @Override

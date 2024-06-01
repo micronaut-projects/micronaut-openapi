@@ -40,6 +40,7 @@ class MyBean {}
         def subObject = openApi.components.schemas.SubObjectProto
         def product = openApi.components.schemas.ProductProto
         def productsList = openApi.components.schemas.ProductsListProto
+        def myEnum = openApi.components.schemas.MyEnum
 
         then:
         subObject
@@ -57,5 +58,10 @@ class MyBean {}
         productsList.properties.size() == 1
         productsList.properties.products.type == 'array'
         productsList.properties.products.items.$ref == "#/components/schemas/ProductProto"
+
+        myEnum.type == 'integer'
+        myEnum.enum.size() == 2
+        myEnum.enum[0] == 0
+        myEnum.enum[1] == 1
     }
 }

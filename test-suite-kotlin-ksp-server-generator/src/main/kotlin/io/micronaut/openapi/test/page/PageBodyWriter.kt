@@ -52,7 +52,7 @@ internal class PageBodyWriter<T>(
         }
         headers.add(PAGE_NUMBER_HEADER, page.pageNumber.toString())
                 .add(PAGE_SIZE_HEADER, page.size.toString())
-                .add(PAGE_COUNT_HEADER, page.getTotalPages().toString())
+                .add(PAGE_COUNT_HEADER, page.totalPages.toString())
                 .add(TOTAL_COUNT_HEADER, page.totalSize.toString())
         bodyWriter.writeTo(bodyType, mediaType, page.content, headers, outputStream)
     }

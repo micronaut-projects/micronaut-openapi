@@ -29,7 +29,7 @@ internal class MyFilterBinder : TypedRequestArgumentBinder<MyFilter> {
             try {
                 return@BindingResult Optional.of<MyFilter>(MyFilter.parse(filter))
             } catch (e: MyFilter.ParseException) {
-                throw HttpStatusException(HttpStatus.BAD_REQUEST, "Could not parse the " + HEADER_NAME + " query parameter. " + e.message)
+                throw HttpStatusException(HttpStatus.BAD_REQUEST, "Could not parse the $HEADER_NAME query parameter. ${e.message}")
             }
         }
     }

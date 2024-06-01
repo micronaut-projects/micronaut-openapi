@@ -527,4 +527,14 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                 "@JsonProperty(\"temperature_2m\")",
                 "TEMPERATURE_2M(\"temperature_2m\"),");
     }
+
+    @Test
+    void testResponseRef() {
+
+        var codegen = new KotlinMicronautServerCodegen();
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/spec.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String path = outputPath + "src/main/kotlin/org/openapitools/";
+
+        assertFileContains(path + "api/ResponseBodyApi.kt", "ApiResponse(responseCode = \"default\", description = \"An unexpected error has occurred\")");
+    }
 }
