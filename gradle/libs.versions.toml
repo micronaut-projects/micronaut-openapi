@@ -4,7 +4,7 @@ managed-javadoc-parser = "0.3.1"
 managed-jsoup = "1.17.2"
 managed-html2md-converter = "0.64.8"
 managed-parboiled = "1.4.1"
-managed-freemarker = "2.3.32"
+managed-freemarker = "2.3.33"
 managed-pegdown = "1.6.0"
 managed-evo-inflector = "1.3"
 
