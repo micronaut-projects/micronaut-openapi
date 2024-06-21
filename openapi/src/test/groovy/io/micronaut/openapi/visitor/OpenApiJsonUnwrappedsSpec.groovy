@@ -8,7 +8,7 @@ class OpenApiJsonUnwrappedsSpec extends AbstractOpenApiTypeElementSpec {
 
     void "test JsonUnwrapped annotation"() {
 
-        given:"An API definition"
+        given: "An API definition"
         when:
         buildBeanDefinition('test.MyBean', '''
 package test;
@@ -91,16 +91,16 @@ class Test {
 @jakarta.inject.Singleton
 class MyBean {}
 ''')
-        then:"the state is correct"
+        then: "the state is correct"
         Utils.testReference != null
 
-        when:"The OpenAPI is retrieved"
+        when: "The OpenAPI is retrieved"
         OpenAPI openAPI = Utils.testReference
         Schema schema = openAPI.components.schemas['Test']
         Schema dummySchema = openAPI.components.schemas['Dummy']
         Schema petSchema = openAPI.components.schemas['Pet']
 
-        then:"the components are valid"
+        then: "the components are valid"
         schema.type == 'object'
         schema.properties.size() == 13
         schema.properties['plain'].$ref == '#/components/schemas/Dummy'
@@ -175,5 +175,51 @@ class MyBean {}
         !exampleSchema.properties.nameInPojo
         exampleSchema.properties.nameInJson.type == 'string'
         exampleSchema.properties.nameInJson.description == 'example field'
+    }
+
+    void "test issue with JsonUnwrapped and wildcard response type"() {
+
+        given: "An API definition"
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Post;
+import io.reactivex.Single;
+
+@Controller("/test")
+interface TestOperations {
+
+    @Post
+    Single<Test<?>> save(String name, int age);
+}
+
+class Base {
+    
+    public String name;
+}
+
+class Test<T extends Base> {
+    @JsonUnwrapped
+    public T wrapped;
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        then: "the state is correct"
+        Utils.testReference != null
+
+        when: "The OpenAPI is retrieved"
+        def openApi = Utils.testReference
+        Schema schema = openApi.components.schemas.Test_Base_
+
+        then: "the components are valid"
+        schema.type == 'object'
+        schema.properties
+        schema.properties.size() == 1
+        schema.properties.name
     }
 }
