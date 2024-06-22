@@ -59,7 +59,12 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static io.micronaut.openapi.generator.Utils.DEFAULT_BODY_PARAM_NAME;
+import static io.micronaut.openapi.generator.Utils.EXT_ANNOTATIONS_CLASS;
+import static io.micronaut.openapi.generator.Utils.EXT_ANNOTATIONS_FIELD;
+import static io.micronaut.openapi.generator.Utils.EXT_ANNOTATIONS_OPERATION;
+import static io.micronaut.openapi.generator.Utils.EXT_ANNOTATIONS_SETTER;
 import static io.micronaut.openapi.generator.Utils.addStrValueToEnum;
+import static io.micronaut.openapi.generator.Utils.normalizeExtraAnnotations;
 import static io.micronaut.openapi.generator.Utils.processGenericAnnotations;
 import static org.openapitools.codegen.CodegenConstants.INVOKER_PACKAGE;
 import static org.openapitools.codegen.utils.StringUtils.camelize;
@@ -795,6 +800,8 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
                     || op.httpMethod.equals("DELETE")
             );
 
+            normalizeExtraAnnotations(EXT_ANNOTATIONS_OPERATION, false, op.vendorExtensions);
+
             // Set response example
             if (op.returnType != null) {
                 String example;
@@ -1199,6 +1206,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
             model.vendorExtensions.put("areRequiredVarsAndReadOnlyVars", !requiredVarsWithoutDiscriminator.isEmpty() && !model.readOnlyVars.isEmpty());
             model.vendorExtensions.put("serialId", random.nextLong());
             model.vendorExtensions.put("withRequiredVars", !model.requiredVars.isEmpty());
+            normalizeExtraAnnotations(EXT_ANNOTATIONS_CLASS, false, model.vendorExtensions);
             if (model.discriminator != null) {
                 model.vendorExtensions.put("hasMappedModels", !model.discriminator.getMappedModels().isEmpty());
                 model.vendorExtensions.put("hasMultipleMappedModels", model.discriminator.getMappedModels().size() > 1);
@@ -1235,6 +1243,9 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
         }
 
         processGenericAnnotations(property, useBeanValidation, isGenerateHardNullable(), false, false, false, false);
+
+        normalizeExtraAnnotations(EXT_ANNOTATIONS_FIELD, false, property.vendorExtensions);
+        normalizeExtraAnnotations(EXT_ANNOTATIONS_SETTER, false, property.vendorExtensions);
     }
 
     public boolean isGenerateHardNullable() {

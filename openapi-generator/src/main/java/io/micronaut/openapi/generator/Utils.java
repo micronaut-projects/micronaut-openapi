@@ -15,13 +15,15 @@
  */
 package io.micronaut.openapi.generator;
 
-import java.util.List;
-import java.util.Map;
-
 import org.apache.commons.lang3.StringUtils;
 import org.openapitools.codegen.CodegenModel;
 import org.openapitools.codegen.CodegenParameter;
 import org.openapitools.codegen.CodegenProperty;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Utilities methods to generators.
@@ -31,6 +33,10 @@ import org.openapitools.codegen.CodegenProperty;
 public final class Utils {
 
     public static final String DEFAULT_BODY_PARAM_NAME = "requestBody";
+    public static final String EXT_ANNOTATIONS_OPERATION = "x-operation-extra-annotation";
+    public static final String EXT_ANNOTATIONS_CLASS = "x-class-extra-annotation";
+    public static final String EXT_ANNOTATIONS_FIELD = "x-field-extra-annotation";
+    public static final String EXT_ANNOTATIONS_SETTER = "x-setter-extra-annotation";
 
     private Utils() {
     }
@@ -40,7 +46,7 @@ public final class Utils {
         CodegenProperty items = parameter.isMap ? parameter.additionalProperties : parameter.items;
         String datatypeWithEnum = parameter.datatypeWithEnum == null ? parameter.dataType : parameter.datatypeWithEnum;
         processGenericAnnotations(parameter.dataType, datatypeWithEnum, parameter.isMap, parameter.containerTypeMapped,
-            items, parameter.vendorExtensions, useBeanValidation, isGenerateHardNullable, isNullable, isRequired, isReadonly, withNullablePostfix);
+                items, parameter.vendorExtensions, useBeanValidation, isGenerateHardNullable, isNullable, isRequired, isReadonly, withNullablePostfix);
     }
 
     public static void processGenericAnnotations(CodegenProperty property, boolean useBeanValidation, boolean isGenerateHardNullable,
@@ -48,7 +54,7 @@ public final class Utils {
         CodegenProperty items = property.isMap ? property.additionalProperties : property.items;
         String datatypeWithEnum = property.datatypeWithEnum == null ? property.dataType : property.datatypeWithEnum;
         processGenericAnnotations(property.dataType, datatypeWithEnum, property.isMap, property.containerTypeMapped,
-            items, property.vendorExtensions, useBeanValidation, isGenerateHardNullable, isNullable, isRequired, isReadonly, withNullablePostfix);
+                items, property.vendorExtensions, useBeanValidation, isGenerateHardNullable, isNullable, isRequired, isReadonly, withNullablePostfix);
     }
 
     public static void processGenericAnnotations(String dataType, String dataTypeWithEnum, boolean isMap, String containerType, CodegenProperty itemsProp, Map<String, Object> ext,
@@ -203,8 +209,9 @@ public final class Utils {
             return false;
         }
         return switch (type) {
-            case "array", "string", "boolean", "byte", "uri", "url", "uuid", "email", "integer", "long", "float", "double",
-                "number", "partial-time", "date", "date-time", "bigdecimal", "biginteger" -> true;
+            case "array", "string", "boolean", "byte", "uri", "url", "uuid", "email", "integer", "long", "float",
+                 "double",
+                 "number", "partial-time", "date", "date-time", "bigdecimal", "biginteger" -> true;
             default -> false;
         };
     }
@@ -237,8 +244,8 @@ public final class Utils {
                 }
                 var upperValue = value.toUpperCase();
                 if (upperValue.endsWith("F")
-                    || upperValue.endsWith("L")
-                    || upperValue.endsWith("D")) {
+                        || upperValue.endsWith("L")
+                        || upperValue.endsWith("D")) {
                     value = value.substring(0, value.length() - 1);
                 }
                 if (!value.contains("\"")) {
@@ -254,5 +261,45 @@ public final class Utils {
             return "DefaultApi";
         }
         return prefix + name + suffix;
+    }
+
+    public static void normalizeExtraAnnotations(String extName, boolean isKotlin, Map<String, Object> vendorExtensions) {
+
+        var ext = vendorExtensions.get(extName);
+        if (ext == null) {
+            return;
+        }
+
+        var prefix = "@";
+        if (isKotlin) {
+            if (extName.equals(EXT_ANNOTATIONS_FIELD)) {
+                prefix = "@field:";
+            } else if (extName.equals(EXT_ANNOTATIONS_SETTER)) {
+                prefix = "@set:";
+            }
+        }
+
+        if (ext instanceof Collection<?> annotations) {
+            ext = normalizeExtraAnnotations(prefix, annotations);
+        } else if (ext instanceof String annotationStr) {
+            ext = normalizeExtraAnnotation(prefix, annotationStr);
+        }
+
+        vendorExtensions.put(extName, ext);
+    }
+
+    private static List<String> normalizeExtraAnnotations(String prefix, Collection<?> annotations) {
+        if (annotations == null || annotations.isEmpty()) {
+            return null;
+        }
+        var result = new ArrayList<String>(annotations.size());
+        for (var annotation : annotations) {
+            result.add(normalizeExtraAnnotation(prefix, annotation.toString()));
+        }
+        return result;
+    }
+
+    private static String normalizeExtraAnnotation(String prefix, String annotationStr) {
+        return prefix + (annotationStr.startsWith("@") ? annotationStr.substring(1) : annotationStr);
     }
 }

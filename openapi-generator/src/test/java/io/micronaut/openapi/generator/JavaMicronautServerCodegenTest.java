@@ -164,7 +164,7 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
     }
 
     @Test
-    void testExtraAnnotations() {
+    void testExtraAnnotations1() {
         var codegen = new JavaMicronautServerCodegen();
         String outputPath = generateFiles(codegen, "src/test/resources/3_0/issue_11772.yml", CodegenConstants.MODELS);
 
@@ -444,5 +444,42 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
         String path = outputPath + "src/main/java/org/openapitools/";
 
         assertFileContains(path + "api/ResponseBodyApi.java", "@ApiResponse(responseCode = \"default\", description = \"An unexpected error has occurred\")");
+    }
+
+    @Test
+    void testExtraAnnotations() {
+
+        var codegen = new JavaMicronautServerCodegen();
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/extra-annotations.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String path = outputPath + "src/main/java/org/openapitools/";
+
+        assertFileContains(path + "api/BooksApi.java",
+                """
+                            @Post("/add-book")
+                            @Secured(SecurityRule.IS_ANONYMOUS)
+                            @NotBlank
+                            Mono<@Valid Book> addBook(
+                        """);
+
+        assertFileContains(path + "model/Book.java",
+                """
+                        @Serializable
+                        public class Book {
+                        """,
+                """
+                            @NotNull
+                            @Size(max = 10)
+                            @Schema(name = "title", requiredMode = Schema.RequiredMode.REQUIRED)
+                            @JsonProperty(JSON_PROPERTY_TITLE)
+                            @jakarta.validation.constraints.NotBlank
+                            private String title;
+                        """,
+                """
+                            @NotEmpty
+                            public void setTitle(String title) {
+                                this.title = title;
+                            }
+                        """
+        );
     }
 }

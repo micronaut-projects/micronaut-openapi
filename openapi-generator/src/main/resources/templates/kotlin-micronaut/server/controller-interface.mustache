@@ -61,6 +61,9 @@ interface {{classname}} {
     @Secured({{#vendorExtensions.x-roles}}{{{.}}}{{^-last}}, {{/-last}}{{/vendorExtensions.x-roles}})
     {{/useAuth}}
     {{!the method definition}}
+    {{#vendorExtensions.x-operation-extra-annotation}}
+    {{{.}}}
+    {{/vendorExtensions.x-operation-extra-annotation}}
     fun {{nickname}}({{#allParams}}
         {{#formatSingleLine}}{{>server/params/annotations}}{{#indent}}{{>common/params/validation}}{{/indent}}{{#isDateTime}}{{#dateFormat}}@Format("{{{datetimeFormat}}}"){{/dateFormat}}{{/isDateTime}}{{#isDate}}{{#dateTimeFormat}}@Format("{{{dateFormat}}}"){{/dateTimeFormat}}{{/isDate}} {{{paramName}}}: {{#isEnum}}{{{vendorExtensions.typeWithEnumWithGenericAnnotations}}}{{/isEnum}}{{^isEnum}}{{{vendorExtensions.typeWithGenericAnnotations}}}{{/isEnum}}{{^-last}},{{/-last}}{{/formatSingleLine}}
     {{/allParams}}){{#returnType}}: {{{returnType}}}{{/returnType}}

@@ -49,7 +49,7 @@
     {{/micronaut_serde_jackson}}
 {{/useBeanValidation}}
 {{#vendorExtensions.x-class-extra-annotation}}
-{{{vendorExtensions.x-class-extra-annotation}}}
+{{{.}}}
 {{/vendorExtensions.x-class-extra-annotation}}
 {{!Declare the class with extends and implements}}
 public class {{classname}} {{#parent}}extends {{{parent}}} {{/parent}}{{#vendorExtensions.x-implements}}{{#-first}}implements {{{.}}}{{/-first}}{{^-first}}, {{{.}}}{{/-first}}{{#-last}} {{/-last}}{{/vendorExtensions.x-implements}}{
@@ -110,7 +110,7 @@ public class {{classname}} {{#parent}}extends {{{parent}}} {{/parent}}{{#vendorE
             {{/jackson}}
         {{/vendorExtensions.x-is-jackson-optional-nullable}}
         {{#vendorExtensions.x-field-extra-annotation}}
-    {{{vendorExtensions.x-field-extra-annotation}}}
+    {{{.}}}
         {{/vendorExtensions.x-field-extra-annotation}}
         {{#vendorExtensions.x-is-jackson-optional-nullable}}
             {{#isContainer}}
@@ -173,7 +173,7 @@ public class {{classname}} {{#parent}}extends {{{parent}}} {{/parent}}{{#vendorE
      * @return the {{name}} property value
      */
     {{#vendorExtensions.x-extra-annotation}}
-        {{{vendorExtensions.x-extra-annotation}}}
+    {{{.}}}
     {{/vendorExtensions.x-extra-annotation}}
     public {{{datatypeWithEnum}}} {{getter}}() {
         {{#vendorExtensions.x-is-jackson-optional-nullable}}
@@ -219,7 +219,7 @@ public class {{classname}} {{#parent}}extends {{{parent}}} {{/parent}}{{#vendorE
      * Set the {{name}} property value
      */
         {{#vendorExtensions.x-setter-extra-annotation}}
-    {{{vendorExtensions.x-setter-extra-annotation}}}
+    {{{.}}}
         {{/vendorExtensions.x-setter-extra-annotation}}
     public void {{setter}}({{{datatypeWithEnum}}} {{name}}) {
             {{#vendorExtensions.x-is-jackson-optional-nullable}}
