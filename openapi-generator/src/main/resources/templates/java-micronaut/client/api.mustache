@@ -71,6 +71,9 @@ public interface {{classname}} {
             {{/authMethods}}
         {{/configureAuth}}
     {{!the method definition}}
+    {{#vendorExtensions.x-operation-extra-annotation}}
+    {{{.}}}
+    {{/vendorExtensions.x-operation-extra-annotation}}
     {{^returnType}}void{{/returnType}}{{#returnType}}{{{returnType}}}{{/returnType}} {{nickname}}({{#allParams}}
         {{#formatSingleLine}}{{>client/params/queryParams}}{{>client/params/pathParams}}{{>client/params/headerParams}}{{>client/params/bodyParams}}{{>client/params/formParams}}{{>client/params/cookieParams}}{{^-last}},{{/-last}}{{/formatSingleLine}}
     {{/allParams}});

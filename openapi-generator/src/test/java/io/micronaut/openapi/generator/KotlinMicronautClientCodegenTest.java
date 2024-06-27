@@ -500,4 +500,31 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                 "@JsonProperty(\"temperature_2m\")",
                 "TEMPERATURE_2M(\"temperature_2m\"),");
     }
+
+    @Test
+    void testExtraAnnotations() {
+
+        var codegen = new KotlinMicronautClientCodegen();
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/extra-annotations.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String path = outputPath + "src/main/kotlin/org/openapitools/";
+
+        assertFileContains(path + "api/BooksApi.kt",
+                """
+                            @Post("/add-book")
+                            @NotBlank
+                            fun addBook(
+                        """);
+
+        assertFileContains(path + "model/Book.kt",
+                """
+                        @Serializable
+                        data class Book(
+                            @field:NotNull
+                            @field:Size(max = 10)
+                            @field:JsonProperty(JSON_PROPERTY_TITLE)
+                            @field:jakarta.validation.constraints.NotBlank
+                            @set:NotEmpty
+                            var title: String,
+                        """);
+    }
 }

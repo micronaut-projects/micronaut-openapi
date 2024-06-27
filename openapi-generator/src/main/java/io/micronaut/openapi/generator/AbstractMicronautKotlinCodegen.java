@@ -68,7 +68,12 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static io.micronaut.openapi.generator.Utils.DEFAULT_BODY_PARAM_NAME;
+import static io.micronaut.openapi.generator.Utils.EXT_ANNOTATIONS_CLASS;
+import static io.micronaut.openapi.generator.Utils.EXT_ANNOTATIONS_FIELD;
+import static io.micronaut.openapi.generator.Utils.EXT_ANNOTATIONS_OPERATION;
+import static io.micronaut.openapi.generator.Utils.EXT_ANNOTATIONS_SETTER;
 import static io.micronaut.openapi.generator.Utils.addStrValueToEnum;
+import static io.micronaut.openapi.generator.Utils.normalizeExtraAnnotations;
 import static io.micronaut.openapi.generator.Utils.processGenericAnnotations;
 import static org.openapitools.codegen.CodegenConstants.INVOKER_PACKAGE;
 import static org.openapitools.codegen.languages.KotlinClientCodegen.DATE_LIBRARY;
@@ -790,6 +795,8 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
                 || op.httpMethod.equals("DELETE")
             );
 
+            normalizeExtraAnnotations(EXT_ANNOTATIONS_OPERATION, true, op.vendorExtensions);
+
             // Set response example
             if (op.returnType != null) {
                 String example;
@@ -1300,6 +1307,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
             model.vendorExtensions.put("optionalVars", optionalVars);
             model.vendorExtensions.put("serialId", random.nextLong());
             model.vendorExtensions.put("withRequiredVars", !model.requiredVars.isEmpty());
+            normalizeExtraAnnotations(EXT_ANNOTATIONS_CLASS, true, model.vendorExtensions);
             if (model.discriminator != null) {
                 model.vendorExtensions.put("hasMappedModels", !model.discriminator.getMappedModels().isEmpty());
                 model.discriminator.getVendorExtensions().put("hasMappedModels", !model.discriminator.getMappedModels().isEmpty());
@@ -1335,6 +1343,9 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
 
         processGenericAnnotations(property, useBeanValidation, false, property.isNullable || property.isDiscriminator,
             property.required, property.isReadOnly, true);
+
+        normalizeExtraAnnotations(EXT_ANNOTATIONS_FIELD, true, property.vendorExtensions);
+        normalizeExtraAnnotations(EXT_ANNOTATIONS_SETTER, true, property.vendorExtensions);
     }
 
     private void processParentModel(CodegenModel model, List<CodegenProperty> requiredVarsWithoutDiscriminator,

@@ -1,0 +1,72 @@
+openapi: 3.0.0
+info:
+  description: This is a library API
+  version: 1.0.0
+  title: Library
+  license:
+    name: Apache-2.0
+    url: "https://www.apache.org/licenses/LICENSE-2.0.html"
+tags:
+  - name: books
+    description: Add books
+paths:
+  /add-book:
+    post:
+      x-operation-extra-annotation:
+        - "@NotBlank"
+      tags: [books]
+      summary: Add a new book
+      operationId: addBook
+      requestBody:
+        required: true
+        content:
+          "application/json":
+            schema:
+              $ref: "#/components/schemas/Book"
+      responses:
+        "200":
+          description: Success
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/Book"
+        "400":
+          description: Bad Request
+components:
+  schemas:
+    Book:
+      type: object
+      x-class-extra-annotation:
+        - "@Serializable"
+      properties:
+        title:
+          x-field-extra-annotation: |-
+            @jakarta.validation.constraints.NotBlank
+          x-setter-extra-annotation:
+            - "@NotEmpty"
+          type: string
+          maxLength: 10
+      required:
+        - title
+    Books:
+      type: array
+      items:
+        $ref: "#/components/schemas/Book"
+    BookContainer:
+      type: object
+      properties:
+        book:
+          $ref: "#/components/schemas/Book"
+      required:
+        - book
+    BooksContainer:
+      type: object
+      properties:
+        books:
+          $ref: "#/components/schemas/Books"
+        strings:
+          type: array
+          items:
+            type: string
+      required:
+        - books
