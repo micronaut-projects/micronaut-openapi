@@ -1,0 +1,100 @@
+openapi: 3.0.0
+info:
+  description: This is a library API
+  version: 1.0.0
+  title: Library
+  license:
+    name: Apache-2.0
+    url: "https://www.apache.org/licenses/LICENSE-2.0.html"
+tags:
+  - name: books
+    description: Add books
+paths:
+  /add-subject:
+    post:
+      tags: [ subjects ]
+      summary: Add a new subject
+      operationId: addSubject
+      requestBody:
+        required: true
+        content:
+          "application/json":
+            schema:
+              $ref: "#/components/schemas/subject"
+      responses:
+        "200":
+          description: Success
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/subject"
+        "400":
+          description: Bad Request
+components:
+  schemas:
+    subject:
+      oneOf:
+        - $ref: '#/components/schemas/organization'
+        - $ref: '#/components/schemas/corporation'
+        - $ref: '#/components/schemas/person'
+      discriminator:
+        propertyName: typeCode
+        mapping:
+          ORG: '#/components/schemas/organization'
+          CORP: '#/components/schemas/corporation'
+          PERS: '#/components/schemas/person'
+    organization:
+      type: object
+      required:
+        - typeCode
+        - orgName
+      description: Organization customer data
+      properties:
+        typeCode:
+          type: string
+          pattern: ^ORG$
+          description: Customer type ORG
+          default: ORG
+          example: ORG
+        orgName:
+          type: string
+    corporation:
+      type: object
+      required:
+        - typeCode
+        - corpName
+        - directorName
+      description: Corporation customer data
+      properties:
+        typeCode:
+          description: Customer type CORP
+          type: string
+          pattern: ^CORP$
+          default: CORP
+          example: CORP
+        corpName:
+          type: string
+          description: Corporation name
+          example: Micronaut
+        directorName:
+          type: string
+          description: Director name
+          example: John
+    person:
+      type: object
+      required:
+        - typeCode
+        - personName
+        - inn
+        - account
+      description: Person customer data
+      properties:
+        typeCode:
+          type: string
+          pattern: ^PERS$
+          default: PERS
+          description: Customer type PERS
+          example: PERS
+        personName:
+          type: string
+          description: Person name

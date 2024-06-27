@@ -182,6 +182,7 @@ public final class MicronautCodeGeneratorEntryPoint {
                 javaCodeGen.setModelNameSuffix(options.modelNameSuffix);
             }
 
+            javaCodeGen.setUseOneOfInterfaces(options.useOneOfInterfaces());
             javaCodeGen.setReactive(options.reactive);
             javaCodeGen.setGenerateHttpResponseAlways(options.generateHttpResponseAlways);
             javaCodeGen.setGenerateHttpResponseWhereRequired(options.generateHttpResponseWhereRequired);
@@ -245,7 +246,7 @@ public final class MicronautCodeGeneratorEntryPoint {
             if (options.modelNameSuffix != null && !options.modelNameSuffix.isBlank()) {
                 kotlinCodeGen.setModelNameSuffix(options.modelNameSuffix);
             }
-
+            kotlinCodeGen.setUseOneOfInterfaces(options.useOneOfInterfaces);
             kotlinCodeGen.setReactive(options.reactive);
             kotlinCodeGen.setGenerateHttpResponseAlways(options.generateHttpResponseAlways);
             kotlinCodeGen.setGenerateHttpResponseWhereRequired(options.generateHttpResponseWhereRequired);
@@ -513,6 +514,7 @@ public final class MicronautCodeGeneratorEntryPoint {
 
             private boolean optional;
             private boolean reactive = true;
+            private boolean useOneOfInterfaces = true;
             private boolean generateHttpResponseAlways;
             private boolean generateHttpResponseWhereRequired = true;
             private TestFramework testFramework = TestFramework.JUNIT5;
@@ -688,6 +690,12 @@ public final class MicronautCodeGeneratorEntryPoint {
                 return this;
             }
 
+            @Override
+            public MicronautCodeGeneratorOptionsBuilder withUseOneOfInterfaces(boolean useOneOfInterfaces) {
+                this.useOneOfInterfaces = useOneOfInterfaces;
+                return this;
+            }
+
             private Options build() {
                 return new Options(
                     lang,
@@ -715,6 +723,7 @@ public final class MicronautCodeGeneratorEntryPoint {
                     beanValidation,
                     optional,
                     reactive,
+                    useOneOfInterfaces,
                     generateHttpResponseAlways,
                     generateHttpResponseWhereRequired,
                     testFramework,
@@ -766,6 +775,7 @@ public final class MicronautCodeGeneratorEntryPoint {
         boolean beanValidation,
         boolean optional,
         boolean reactive,
+        boolean useOneOfInterfaces,
         boolean generateHttpResponseAlways,
         boolean generateHttpResponseWhereRequired,
         TestFramework testFramework,

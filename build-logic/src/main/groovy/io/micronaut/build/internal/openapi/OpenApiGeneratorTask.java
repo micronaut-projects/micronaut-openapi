@@ -68,6 +68,9 @@ public abstract class OpenApiGeneratorTask extends DefaultTask {
     public abstract Property<Boolean> getKsp();
 
     @Input
+    public abstract Property<Boolean> getUseOneOfInterfaces();
+
+    @Input
     public abstract Property<Boolean> getClientPath();
 
     @Input
@@ -144,6 +147,7 @@ public abstract class OpenApiGeneratorTask extends DefaultTask {
             args.add(Boolean.toString(generatedAnnotation));
             args.add(Boolean.toString(getKsp().get()));
             args.add(Boolean.toString(getClientPath().get()));
+            args.add(Boolean.toString(getUseOneOfInterfaces().get()));
             args.add(getNameMapping().get().toString());
             args.add(getClientId().getOrElse(""));
             args.add(getApiNamePrefix().getOrElse(""));

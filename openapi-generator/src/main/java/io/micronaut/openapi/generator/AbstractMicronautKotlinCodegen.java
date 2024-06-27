@@ -55,6 +55,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.security.SecureRandom;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -212,6 +213,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         generateOperationOnlyForFirstTag = this instanceof KotlinMicronautServerCodegen;
         enumPropertyNaming = CodegenConstants.ENUM_PROPERTY_NAMING_TYPE.UPPERCASE;
         inlineSchemaOption.put("RESOLVE_INLINE_ENUMS", "true");
+        useOneOfInterfaces = true;
         // CHECKSTYLE:ON
 
         // Set implemented features for user information
@@ -1274,6 +1276,9 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
             var allVars = new ArrayList<CodegenProperty>();
 
             processParentModel(model, requiredVarsWithoutDiscriminator, requiredParentVarsWithoutDiscriminator, allVars, false);
+            model.allVars = allVars;
+
+            processOneOfModels(model, objs.values());
 
             var withInheritance = model.hasChildren || model.parent != null;
             model.vendorExtensions.put("withInheritance", withInheritance);
@@ -1301,7 +1306,6 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
             if (!requiredVarsWithoutDiscriminator.isEmpty()) {
                 model.vendorExtensions.put("requiredVarsWithoutDiscriminator", requiredVarsWithoutDiscriminator);
             }
-            model.allVars = allVars;
             model.vendorExtensions.put("requiredVars", requiredVars);
             model.vendorExtensions.put("withRequiredOrOptionalVars", !requiredVarsWithoutDiscriminator.isEmpty() || !optionalVars.isEmpty());
             model.vendorExtensions.put("optionalVars", optionalVars);
@@ -1322,6 +1326,44 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         }
 
         return objs;
+    }
+
+    private void processOneOfModels(CodegenModel model, Collection<ModelsMap> models) {
+
+        if (!model.vendorExtensions.containsKey("x-is-one-of-interface")
+                || !Boolean.parseBoolean(model.vendorExtensions.get("x-is-one-of-interface").toString())) {
+            return;
+        }
+
+        var discriminator = model.discriminator;
+        if (discriminator == null) {
+            return;
+        }
+        var oneOfInterfaceName = model.name;
+        for (var modelMap : models) {
+            var m = modelMap.getModels().get(0).getModel();
+
+            if (!m.vendorExtensions.containsKey("x-implements")) {
+                continue;
+            }
+            var xImplements = m.vendorExtensions.get("x-implements");
+            if (!(xImplements instanceof List<?> xImplementsList)) {
+                continue;
+            }
+            for (var implInterface : xImplementsList) {
+                if (!oneOfInterfaceName.equalsIgnoreCase(implInterface.toString())) {
+                    continue;
+                }
+                for (var prop : m.allVars) {
+                    if (prop.name.equals(discriminator.getPropertyName())) {
+                        prop.isDiscriminator = true;
+                        prop.isOverridden = true;
+                        prop.vendorExtensions.put("overridden", true);
+                        break;
+                    }
+                }
+            }
+        }
     }
 
     private void processProperty(CodegenProperty property, boolean isServer, CodegenModel model, Map<String, ModelsMap> models) {

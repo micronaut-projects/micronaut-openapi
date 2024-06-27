@@ -67,15 +67,16 @@ public class GeneratorMain {
         var generatedAnnotation = Boolean.parseBoolean(args[7]);
         var ksp = Boolean.parseBoolean(args[8]);
         var clientPath = Boolean.parseBoolean(args[9]);
+        var useOneOfInterfaces = Boolean.parseBoolean(args[10]);
 
-        Map<String, String> nameMapping = parseNameMapping(args[10]);
+        Map<String, String> nameMapping = parseNameMapping(args[11]);
 
-        String clientId = args[11];
+        String clientId = args[12];
 
-        String apiPrefix = args[12];
-        String apiSuffix = args[13];
-        String modelPrefix = args[14];
-        String modelSuffix = args[15];
+        String apiPrefix = args[13];
+        String apiSuffix = args[14];
+        String modelPrefix = args[15];
+        String modelSuffix = args[16];
 
         var builder = MicronautCodeGeneratorEntryPoint.builder()
             .withDefinitionFile(definitionFile)
@@ -97,6 +98,7 @@ public class GeneratorMain {
                     .withParameterMappings(parameterMappings)
                     .withResponseBodyMappings(responseBodyMappings)
                     .withNameMapping(nameMapping)
+                    .withUseOneOfInterfaces(useOneOfInterfaces)
             );
         if (server) {
             if (lang == GeneratorLanguage.KOTLIN) {

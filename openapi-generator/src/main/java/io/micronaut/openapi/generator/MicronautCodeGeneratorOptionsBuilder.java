@@ -249,6 +249,15 @@ public interface MicronautCodeGeneratorOptionsBuilder {
     MicronautCodeGeneratorOptionsBuilder withDateTimeFormat(DateTimeFormat format);
 
     /**
+     * Flag to indicate whether to use the utils.OneOfImplementorAdditionalData related logic.
+     *
+     * @param useOneOfInterfaces if true, then use the utils.OneOfImplementorAdditionalData related logic.
+     *
+     * @return this builder
+     */
+    MicronautCodeGeneratorOptionsBuilder withUseOneOfInterfaces(boolean useOneOfInterfaces);
+
+    /**
      * The possible date-time formatting configurations.
      */
     enum DateTimeFormat {
