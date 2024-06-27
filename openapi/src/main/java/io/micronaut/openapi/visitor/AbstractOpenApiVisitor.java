@@ -214,6 +214,7 @@ import static io.micronaut.openapi.visitor.StringUtil.OPEN_BRACE;
 import static io.micronaut.openapi.visitor.StringUtil.SLASH;
 import static io.micronaut.openapi.visitor.StringUtil.UNDERSCORE;
 import static io.micronaut.openapi.visitor.Utils.isOpenapi31;
+import static io.micronaut.openapi.visitor.Utils.resolveOpenApi;
 import static java.util.stream.Collectors.toMap;
 
 /**
@@ -1172,9 +1173,14 @@ abstract class AbstractOpenApiVisitor {
     private void handleUnwrapped(VisitorContext context, Element element, ClassElement elementType, Schema<?> parentSchema, AnnotationValue<JsonUnwrapped> uw) {
         Map<String, Schema> schemas = SchemaUtils.resolveSchemas(Utils.resolveOpenApi(context));
         ClassElement customElementType = getCustomSchema(elementType.getName(), elementType.getTypeArguments(), context);
+        var elType = customElementType != null ? customElementType : elementType;
         String schemaName = stringValue(element, io.swagger.v3.oas.annotations.media.Schema.class, PROP_NAME)
-            .orElse(computeDefaultSchemaName(null, customElementType != null ? customElementType : elementType, elementType.getTypeArguments(), context, null));
+            .orElse(computeDefaultSchemaName(null, elType, elementType.getTypeArguments(), context, null));
         Schema<?> wrappedPropertySchema = schemas.get(schemaName);
+        if (wrappedPropertySchema == null) {
+            getSchemaDefinition(resolveOpenApi(context), context, elType, elType.getTypeArguments(), element, Collections.emptyList(), null);
+            wrappedPropertySchema = schemas.get(schemaName);
+        }
         Map<String, Schema> properties = wrappedPropertySchema.getProperties();
         if (CollectionUtils.isEmpty(properties)) {
             return;
