@@ -168,7 +168,7 @@ final class RapidocConfig extends AbstractViewConfig {
         private static final Map<String, NavTagClick> BY_CODE;
 
         static {
-            Map<String, NavTagClick> byCode = new HashMap<>(NavTagClick.values().length);
+            var byCode = new HashMap<String, NavTagClick>(NavTagClick.values().length);
             for (NavTagClick navTagClick : values()) {
                 byCode.put(navTagClick.code, navTagClick);
             }
@@ -207,7 +207,7 @@ final class RapidocConfig extends AbstractViewConfig {
         private static final Map<String, FetchCredentials> BY_CODE;
 
         static {
-            Map<String, FetchCredentials> byCode = new HashMap<>(FetchCredentials.values().length);
+            var byCode = new HashMap<String, FetchCredentials>(FetchCredentials.values().length);
             for (FetchCredentials navTagClick : values()) {
                 byCode.put(navTagClick.code, navTagClick);
             }
@@ -247,7 +247,7 @@ final class RapidocConfig extends AbstractViewConfig {
         private static final Map<String, ShowMethodInNavBar> BY_CODE;
 
         static {
-            Map<String, ShowMethodInNavBar> byCode = new HashMap<>(ShowMethodInNavBar.values().length);
+            var byCode = new HashMap<String, ShowMethodInNavBar>(ShowMethodInNavBar.values().length);
             for (ShowMethodInNavBar showMethodInNavBar : values()) {
                 byCode.put(showMethodInNavBar.code, showMethodInNavBar);
             }

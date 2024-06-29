@@ -116,7 +116,7 @@ final class RapiPDFConfig extends AbstractViewConfig {
      * @return A RapipdfConfig.
      */
     static RapiPDFConfig fromProperties(Map<String, String> properties, Map<Pair<String, String>, OpenApiInfo> openApiInfos, VisitorContext context) {
-        RapiPDFConfig cfg = new RapiPDFConfig(openApiInfos);
+        var cfg = new RapiPDFConfig(openApiInfos);
         cfg.enabled = "true".equals(properties.getOrDefault("rapipdf.enabled", Boolean.FALSE.toString()));
         return AbstractViewConfig.fromProperties(cfg, DEFAULT_OPTIONS, properties, null, context);
     }

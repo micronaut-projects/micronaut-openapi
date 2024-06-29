@@ -13,7 +13,6 @@ class OpenApi31Spec extends AbstractOpenApiTypeElementSpec {
         setup:
         System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_31_ENABLED, "true")
         System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_31_JSON_SCHEMA_DIALECT, "https://json-schema-3-1.org")
-        Utils.clean()
 
         when:
         buildBeanDefinition('test.MyBean', '''
@@ -95,14 +94,12 @@ class MyBean {}
         cleanup:
         System.clearProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_31_ENABLED)
         System.clearProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_31_JSON_SCHEMA_DIALECT)
-        Utils.clean()
     }
 
     void "test Webhooks OpenAPI 3.1.0"() {
 
         setup:
         System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_31_ENABLED, "true")
-        Utils.clean()
 
         when:
         buildBeanDefinition('test.MyBean', '''
@@ -158,14 +155,12 @@ class MyBean {}
 
         cleanup:
         System.clearProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_31_ENABLED)
-        Utils.clean()
     }
 
     void "test min/max contains OpenAPI 3.1.0"() {
 
         setup:
         System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_31_ENABLED, "true")
-        Utils.clean()
 
         when:
         buildBeanDefinition('test.MyBean', '''
@@ -230,13 +225,11 @@ class MyBean {}
 
         cleanup:
         System.clearProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_31_ENABLED)
-        Utils.clean()
     }
 
     void "test discriminator extensions OpenAPI 3.1.0"() {
         setup:
         System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_31_ENABLED, "true")
-        Utils.clean()
 
         when:
         buildBeanDefinition('test.MyBean', '''
@@ -463,13 +456,11 @@ class MyBean {}
 
         cleanup:
         System.clearProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_31_ENABLED)
-        Utils.clean()
     }
 
     void "test json schema OpenAPI 3.1.0"() {
         setup:
         System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_31_ENABLED, "true")
-        Utils.clean()
 
         when:
         buildBeanDefinition('test.MyBean', '''
@@ -566,6 +557,5 @@ class MyBean {}
 
         cleanup:
         System.clearProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_31_ENABLED)
-        Utils.clean()
     }
 }
