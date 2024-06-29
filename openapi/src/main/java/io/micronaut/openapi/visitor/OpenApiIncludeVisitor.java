@@ -37,7 +37,8 @@ import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_SECURITY;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_TAGS;
 
 /**
- * A {@link TypeElementVisitor} that builds the Swagger model from Micronaut controllers included by @{@link OpenAPIInclude} at the compile time.
+ * A {@link TypeElementVisitor} that builds the Swagger model from Micronaut controllers included by @{@link OpenAPIInclude}
+ * at the compile time.
  *
  * @author Denis Stepanov
  */
@@ -56,27 +57,29 @@ public class OpenApiIncludeVisitor implements TypeElementVisitor<OpenAPIIncludes
         }
         for (var includeAnn : element.getAnnotationValuesByType(OpenAPIInclude.class)) {
             String[] classes = includeAnn.stringValues();
-            if (ArrayUtils.isNotEmpty(classes)) {
-                var tagAnns = includeAnn.getAnnotations(PROP_TAGS, Tag.class);
-                var securityAnns = includeAnn.getAnnotations(PROP_SECURITY, SecurityRequirement.class);
-                String customUri = includeAnn.stringValue("uri").orElse(null);
-                List<String> groups = List.of(includeAnn.stringValues("groups"));
-                List<String> groupsExcluded = List.of(includeAnn.stringValues("groupsExcluded"));
+            if (ArrayUtils.isEmpty(classes)) {
+                continue;
+            }
+            var tagAnns = includeAnn.getAnnotations(PROP_TAGS, Tag.class);
+            var securityAnns = includeAnn.getAnnotations(PROP_SECURITY, SecurityRequirement.class);
+            String customUri = includeAnn.stringValue("uri").orElse(null);
+            List<String> groups = List.of(includeAnn.stringValues("groups"));
+            List<String> groupsExcluded = List.of(includeAnn.stringValues("groupsExcluded"));
 
-                var groupVisitor = new OpenApiGroupInfoVisitor(groups, groupsExcluded);
-                var controllerVisitor = new OpenApiControllerVisitor(tagAnns, securityAnns, customUri);
-                var endpointVisitor = new OpenApiEndpointVisitor(true, tagAnns.isEmpty() ? null : tagAnns, securityAnns.isEmpty() ? null : securityAnns);
-                for (String className : classes) {
-                    var classEl = ContextUtils.getClassElement(className, context);
-                    if (classEl != null) {
-                        groupVisitor.visitClass(classEl, context);
+            var groupVisitor = new OpenApiGroupInfoVisitor(groups, groupsExcluded);
+            var controllerVisitor = new OpenApiControllerVisitor(tagAnns, securityAnns, customUri);
+            var endpointVisitor = new OpenApiEndpointVisitor(true, tagAnns.isEmpty() ? null : tagAnns, securityAnns.isEmpty() ? null : securityAnns);
+            for (String className : classes) {
+                var classEl = ContextUtils.getClassElement(className, context);
+                if (classEl == null) {
+                    continue;
+                }
+                groupVisitor.visitClass(classEl, context);
 
-                        if (classEl.isAnnotationPresent(Controller.class)) {
-                            visit(controllerVisitor, context, classEl);
-                        } else if (classEl.isAnnotationPresent("io.micronaut.management.endpoint.annotation.Endpoint")) {
-                            visit(endpointVisitor, context, classEl);
-                        }
-                    }
+                if (classEl.isAnnotationPresent(Controller.class)) {
+                    visit(controllerVisitor, context, classEl);
+                } else if (classEl.isAnnotationPresent("io.micronaut.management.endpoint.annotation.Endpoint")) {
+                    visit(endpointVisitor, context, classEl);
                 }
             }
         }

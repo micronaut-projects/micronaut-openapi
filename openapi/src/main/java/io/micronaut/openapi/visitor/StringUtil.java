@@ -38,6 +38,7 @@ public final class StringUtil {
     public static final String COMMA = ",";
     public static final String UNDERSCORE = "_";
     public static final String MINUS = "-";
+    public static final String WILDCARD = "*";
 
     private StringUtil() {
     }

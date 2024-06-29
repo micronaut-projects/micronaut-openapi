@@ -15,11 +15,6 @@
  */
 package io.micronaut.openapi.visitor;
 
-import java.nio.file.Path;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-
 import io.micronaut.core.annotation.Internal;
 import io.micronaut.core.annotation.Nullable;
 import io.micronaut.core.type.Argument;
@@ -32,8 +27,14 @@ import io.micronaut.openapi.visitor.group.GroupProperties;
 import io.swagger.v3.oas.models.servers.Server;
 import io.swagger.v3.oas.models.tags.Tag;
 
+import java.nio.file.Path;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_CLASSPATH_OUTPUT;
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_GENERATED_FILE;
+import static io.micronaut.openapi.visitor.StringUtil.WILDCARD;
 
 /**
  * Convert utilities methods.
@@ -62,6 +63,7 @@ public final class ContextUtils {
         return visitedElements;
     }
 
+    @Nullable
     public static Path getClassesOutputPath(VisitorContext context) {
 
         if (context == null) {
@@ -76,6 +78,7 @@ public final class ContextUtils {
         return get(MICRONAUT_INTERNAL_CLASSPATH_OUTPUT, Path.class, null, context);
     }
 
+    @Nullable
     public static GeneratedFile visitMetaInfFile(String path, VisitorContext context) {
 
         if (context == null) {
@@ -189,7 +192,13 @@ public final class ContextUtils {
         return Collections.emptyMap();
     }
 
+    @Nullable
     public static ClassElement getClassElement(String className, VisitorContext context) {
         return context != null ? context.getClassElement(className).orElse(null) : null;
+    }
+
+    @Nullable
+    public static ClassElement[] getClassElements(String packageName, VisitorContext context) {
+        return context != null ? context.getClassElements(packageName, WILDCARD) : null;
     }
 }

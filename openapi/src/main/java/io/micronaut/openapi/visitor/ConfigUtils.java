@@ -15,21 +15,6 @@
  */
 package io.micronaut.openapi.visitor;
 
-import java.io.IOException;
-import java.io.Reader;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Properties;
-import java.util.stream.Stream;
-
 import io.micronaut.context.ApplicationContextConfiguration;
 import io.micronaut.context.env.Environment;
 import io.micronaut.core.annotation.Internal;
@@ -52,11 +37,25 @@ import io.micronaut.openapi.visitor.security.InterceptUrlMapConverter;
 import io.micronaut.openapi.visitor.security.InterceptUrlMapPattern;
 import io.micronaut.openapi.visitor.security.SecurityProperties;
 
+import java.io.IOException;
+import java.io.Reader;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Properties;
+
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_CUSTOM_SCHEMAS;
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_ENVIRONMENT;
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_ENVIRONMENT_CREATED;
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_EXPANDABLE_PROPERTIES;
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_EXPANDABLE_PROPERTIES_LOADED;
+import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_EXTRA_SCHEMA_ENABLED;
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_GENERATION_SPEC_ENABLED;
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_GROUPS;
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_JACKSON_JSON_VIEW_DEFAULT_INCLUSION;
@@ -89,6 +88,7 @@ import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENA
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ENABLED;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ENVIRONMENTS;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_EXPAND_PREFIX;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_EXTRA_SCHEMA_ENABLED;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_GROUPS;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_JSON_VIEW_DEFAULT_INCLUSION;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_PROJECT_DIR;
@@ -102,6 +102,7 @@ import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENA
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.OPENAPI_CONFIG_FILE;
 import static io.micronaut.openapi.visitor.StringUtil.COMMA;
 import static io.micronaut.openapi.visitor.StringUtil.DOT;
+import static io.micronaut.openapi.visitor.StringUtil.WILDCARD;
 import static io.micronaut.openapi.visitor.group.RouterVersioningProperties.DEFAULT_HEADER_NAME;
 import static io.micronaut.openapi.visitor.group.RouterVersioningProperties.DEFAULT_PARAMETER_NAME;
 
@@ -213,7 +214,7 @@ public final class ConfigUtils {
     }
 
     private static String getClassNameWithGenerics(String className, Map<String, ClassElement> typeArgs) {
-        StringBuilder key = new StringBuilder(className);
+        var key = new StringBuilder(className);
         if (!typeArgs.isEmpty()) {
             key.append('<');
             boolean isFirst = true;
@@ -255,6 +256,16 @@ public final class ConfigUtils {
         ContextUtils.put(MICRONAUT_INTERNAL_GENERATION_SPEC_ENABLED, value, context);
 
         System.setProperty(MICRONAUT_OPENAPI_SWAGGER_FILE_GENERATION_ENABLED, Boolean.toString(value));
+        return value;
+    }
+
+    public static boolean isExtraSchemasEnabled(VisitorContext context) {
+        Boolean loadedValue = ContextUtils.get(MICRONAUT_INTERNAL_EXTRA_SCHEMA_ENABLED, Boolean.class, context);
+        if (loadedValue != null) {
+            return loadedValue;
+        }
+        boolean value = getBooleanProperty(MICRONAUT_OPENAPI_EXTRA_SCHEMA_ENABLED, true, context);
+        ContextUtils.put(MICRONAUT_INTERNAL_EXTRA_SCHEMA_ENABLED, value, context);
         return value;
     }
 
@@ -627,7 +638,7 @@ public final class ConfigUtils {
 
     private static GroupProperties.PackageProperties getPackageProperties(String groupPackage) {
         groupPackage = groupPackage.strip();
-        boolean includeSubpackages = groupPackage.endsWith("*");
+        boolean includeSubpackages = groupPackage.endsWith(WILDCARD);
         if (includeSubpackages) {
             groupPackage = groupPackage.substring(0, groupPackage.length() - 2);
         }
@@ -775,8 +786,10 @@ public final class ConfigUtils {
         if (props != null) {
             return props;
         }
-        Properties openApiProperties = new Properties();
-        String cfgFile = context != null ? ContextUtils.getOptions(context).getOrDefault(MICRONAUT_OPENAPI_CONFIG_FILE, OPENAPI_CONFIG_FILE) : System.getProperty(MICRONAUT_OPENAPI_CONFIG_FILE, OPENAPI_CONFIG_FILE);
+        var openApiProperties = new Properties();
+        String cfgFile = context != null
+                ? ContextUtils.getOptions(context).getOrDefault(MICRONAUT_OPENAPI_CONFIG_FILE, System.getProperty(MICRONAUT_OPENAPI_CONFIG_FILE, OPENAPI_CONFIG_FILE))
+                : System.getProperty(MICRONAUT_OPENAPI_CONFIG_FILE, OPENAPI_CONFIG_FILE);
         if (StringUtils.isNotEmpty(cfgFile)) {
             Path cfg = resolve(context, Paths.get(cfgFile));
             if (Files.isReadable(cfg)) {
@@ -815,17 +828,17 @@ public final class ConfigUtils {
 
     private static Environment createEnv(VisitorContext context) {
 
-        ApplicationContextConfiguration configuration = new ApplicationContextConfiguration() {
+        var configuration = new ApplicationContextConfiguration() {
             @Override
             public Optional<MutableConversionService> getConversionService() {
-                MutableConversionService conversionService = new DefaultMutableConversionService();
+                var conversionService = new DefaultMutableConversionService();
                 conversionService.addConverter(Map.class, InterceptUrlMapPattern.class, new InterceptUrlMapConverter(conversionService));
                 return Optional.of(conversionService);
             }
 
             @Override
             public ClassPathResourceLoader getResourceLoader() {
-                ClassLoader classLoader = ApplicationContextConfiguration.class.getClassLoader();
+                var classLoader = ApplicationContextConfiguration.class.getClassLoader();
                 if (classLoader == null) {
                     classLoader = Thread.currentThread().getContextClassLoader();
                 }
@@ -863,15 +876,11 @@ public final class ConfigUtils {
         }
 
         String activeEnvStr = System.getProperty(MICRONAUT_OPENAPI_ENVIRONMENTS, readOpenApiConfigFile(context).getProperty(MICRONAUT_OPENAPI_ENVIRONMENTS));
-        List<String> activeEnvs;
+        var activeEnvs = new ArrayList<String>();
         if (StringUtils.isNotEmpty(activeEnvStr)) {
-            activeEnvs = Stream.of(activeEnvStr)
-                .filter(StringUtils::isNotEmpty)
-                .flatMap(s -> Arrays.stream(s.split(COMMA)))
-                .map(String::trim)
-                .toList();
-        } else {
-            activeEnvs = new ArrayList<>();
+            for (var activeEnv : activeEnvStr.split(COMMA)) {
+                activeEnvs.add(activeEnv.strip());
+            }
         }
         return activeEnvs;
     }
@@ -896,24 +905,14 @@ public final class ConfigUtils {
 
     /**
      * Custom schema class.
+     *
+     * @param typeArgs type arguments
+     * @param classElement class element
      */
-    public static final class CustomSchema {
-
-        private final List<String> typeArgs;
-        private final ClassElement classElement;
-
-        private CustomSchema(List<String> typeArgs, ClassElement classElement) {
-            this.typeArgs = typeArgs;
-            this.classElement = classElement;
-        }
-
-        public List<String> getTypeArgs() {
-            return typeArgs;
-        }
-
-        public ClassElement getClassElement() {
-            return classElement;
-        }
+    record CustomSchema(
+            List<String> typeArgs,
+            ClassElement classElement
+    ) {
     }
 
     /**

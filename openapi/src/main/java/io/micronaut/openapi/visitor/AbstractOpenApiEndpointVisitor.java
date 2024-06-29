@@ -30,7 +30,6 @@ import io.micronaut.core.util.PathMatcher;
 import io.micronaut.core.util.StringUtils;
 import io.micronaut.core.version.annotation.Version;
 import io.micronaut.http.HttpMethod;
-import io.micronaut.http.HttpResponse;
 import io.micronaut.http.HttpStatus;
 import io.micronaut.http.MediaType;
 import io.micronaut.http.annotation.Body;
@@ -133,20 +132,19 @@ import static io.micronaut.openapi.visitor.ElementUtils.isFileUpload;
 import static io.micronaut.openapi.visitor.ElementUtils.isIgnoredParameter;
 import static io.micronaut.openapi.visitor.ElementUtils.isNotNullable;
 import static io.micronaut.openapi.visitor.ElementUtils.isNullable;
+import static io.micronaut.openapi.visitor.ElementUtils.isResponseType;
+import static io.micronaut.openapi.visitor.ElementUtils.isSingleResponseType;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_ADD_ALWAYS;
-import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_CALLBACK_URL_EXPRESSION;
-import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_EXCLUDE;
-import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_OP_ID_SUFFIX;
-import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_PARAMETERS;
-import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_REF_DOLLAR;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_ALLOW_EMPTY_VALUE;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_ALLOW_RESERVED;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_CALLBACK_URL_EXPRESSION;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_CONTENT;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_DEFAULT;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_DEPRECATED;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_DESCRIPTION;
-import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_ALLOW_EMPTY_VALUE;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_EXAMPLE;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_EXAMPLES;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_EXCLUDE;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_EXPLODE;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_EXTENSIONS;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_HIDDEN;
@@ -156,7 +154,10 @@ import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_MEDIA_TYPE;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_METHOD;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_NAME;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_OPERATION;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_OP_ID_SUFFIX;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_PARAMETERS;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_REF;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_REF_DOLLAR;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_REQUIRED;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_RESPONSE_CODE;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_SCHEMA;
@@ -172,6 +173,12 @@ import static io.micronaut.openapi.visitor.SchemaUtils.setSpecVersion;
 import static io.micronaut.openapi.visitor.StringUtil.CLOSE_BRACE;
 import static io.micronaut.openapi.visitor.StringUtil.OPEN_BRACE;
 import static io.micronaut.openapi.visitor.StringUtil.THREE_DOTS;
+import static io.micronaut.openapi.visitor.SchemaDefinitionUtils.bindSchemaAnnotationValue;
+import static io.micronaut.openapi.visitor.SchemaDefinitionUtils.bindSchemaForElement;
+import static io.micronaut.openapi.visitor.SchemaDefinitionUtils.processSchemaProperty;
+import static io.micronaut.openapi.visitor.SchemaDefinitionUtils.resolveSchema;
+import static io.micronaut.openapi.visitor.SchemaDefinitionUtils.toValue;
+import static io.micronaut.openapi.visitor.SchemaDefinitionUtils.toValueMap;
 import static io.micronaut.openapi.visitor.Utils.DEFAULT_MEDIA_TYPES;
 import static io.micronaut.openapi.visitor.Utils.getMediaType;
 import static io.micronaut.openapi.visitor.Utils.resolveWebhooks;
@@ -1654,20 +1661,6 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                 }
             }
         }
-    }
-
-    private boolean isSingleResponseType(ClassElement returnType) {
-        return (returnType.isAssignable("io.reactivex.Single")
-            || returnType.isAssignable("io.reactivex.rxjava3.core.Single")
-            || returnType.isAssignable("org.reactivestreams.Publisher"))
-            && returnType.getFirstTypeArgument().isPresent()
-            && isResponseType(returnType.getFirstTypeArgument().orElse(null));
-    }
-
-    private boolean isResponseType(ClassElement returnType) {
-        return returnType != null
-                && (returnType.isAssignable(HttpResponse.class)
-                    || returnType.isAssignable("org.springframework.http.HttpEntity"));
     }
 
     private void readApiResponses(MethodElement element, VisitorContext context, Operation swaggerOperation, @Nullable ClassElement jsonViewClass) {
