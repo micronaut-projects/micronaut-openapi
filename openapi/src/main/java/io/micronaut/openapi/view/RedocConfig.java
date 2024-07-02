@@ -104,7 +104,7 @@ final class RedocConfig extends AbstractViewConfig {
         private static final Map<String, SideNavStyle> BY_CODE;
 
         static {
-            Map<String, SideNavStyle> byCode = new HashMap<>(SideNavStyle.values().length);
+            var byCode = new HashMap<String, SideNavStyle>(SideNavStyle.values().length);
             for (SideNavStyle navTagClick : values()) {
                 byCode.put(navTagClick.code, navTagClick);
             }

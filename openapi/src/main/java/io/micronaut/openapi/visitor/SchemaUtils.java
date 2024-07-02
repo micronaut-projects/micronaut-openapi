@@ -58,8 +58,6 @@ import io.swagger.v3.oas.models.media.UUIDSchema;
 import io.swagger.v3.oas.models.parameters.Parameter;
 import io.swagger.v3.oas.models.parameters.RequestBody;
 import io.swagger.v3.oas.models.responses.ApiResponse;
-import io.swagger.v3.oas.models.security.SecurityRequirement;
-import io.swagger.v3.oas.models.servers.Server;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -70,13 +68,12 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 
 import static io.micronaut.openapi.visitor.ContextUtils.warn;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_NAME;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_PARSE_VALUE;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_PROPERTIES;
 import static io.micronaut.openapi.visitor.Utils.resolveComponents;
-import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_NAME;
 import static io.swagger.v3.oas.models.Components.COMPONENTS_SCHEMAS_REF;
 
 /**
@@ -283,9 +280,9 @@ public final class SchemaUtils {
         if (CollectionUtils.isEmpty(op1.getTags())) {
             op1.setTags(op2.getTags());
         } else if (CollectionUtils.isNotEmpty(op2.getTags())) {
-            Set<String> tagsSet = new HashSet<>(op1.getTags());
+            var tagsSet = new HashSet<>(op1.getTags());
             tagsSet.addAll(op2.getTags());
-            List<String> tags = new ArrayList<>(tagsSet);
+            var tags = new ArrayList<>(tagsSet);
             Collections.sort(tags);
             op1.setTags(tags);
         }
@@ -305,7 +302,7 @@ public final class SchemaUtils {
         if (CollectionUtils.isEmpty(op1.getSecurity())) {
             op1.setSecurity(op2.getSecurity());
         } else if (CollectionUtils.isNotEmpty(op2.getSecurity())) {
-            Set<SecurityRequirement> securityRequirements = new HashSet<>(op1.getSecurity());
+            var securityRequirements = new HashSet<>(op1.getSecurity());
             securityRequirements.addAll(op2.getSecurity());
             op1.setSecurity(new ArrayList<>(securityRequirements));
         }
@@ -335,7 +332,7 @@ public final class SchemaUtils {
         if (CollectionUtils.isEmpty(op1.getServers())) {
             op1.setServers(op2.getServers());
         } else if (CollectionUtils.isNotEmpty(op2.getServers())) {
-            Set<Server> serversSet = new HashSet<>(op1.getServers());
+            var serversSet = new HashSet<>(op1.getServers());
             serversSet.addAll(op2.getServers());
             op1.setServers(new ArrayList<>(serversSet));
         }
@@ -364,7 +361,7 @@ public final class SchemaUtils {
                 }
             }
 
-            Set<Parameter> serversSet = new HashSet<>(op1.getParameters());
+            var serversSet = new HashSet<>(op1.getParameters());
             serversSet.addAll(op2.getParameters());
             op1.setParameters(new ArrayList<>(serversSet));
         }
@@ -819,6 +816,7 @@ public final class SchemaUtils {
         return null;
     }
 
+    @SuppressWarnings("unchecked")
     public static void setAllowableValues(Schema schema, String[] allowableValues, Element element, String elType, String elFormat, VisitorContext context) {
         if (ArrayUtils.isEmpty(allowableValues)) {
             return;

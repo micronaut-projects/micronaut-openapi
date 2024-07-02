@@ -15,14 +15,6 @@
  */
 package io.micronaut.openapi.visitor;
 
-import java.io.IOException;
-import java.net.URI;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Locale;
-import java.util.Optional;
-
 import io.micronaut.context.env.Environment;
 import io.micronaut.core.annotation.Internal;
 import io.micronaut.core.util.StringUtils;
@@ -30,6 +22,14 @@ import io.micronaut.inject.visitor.VisitorContext;
 import io.micronaut.inject.writer.GeneratedFile;
 import io.micronaut.openapi.visitor.group.OpenApiInfo;
 import io.swagger.v3.oas.models.info.Info;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Locale;
 
 import static io.micronaut.openapi.visitor.ConfigUtils.getConfigProperty;
 import static io.micronaut.openapi.visitor.ContextUtils.warn;
@@ -131,7 +131,7 @@ public final class FileUtils {
 
         Info info = openApiInfo.getOpenApi().getInfo();
         if (info != null) {
-            documentTitle = Optional.ofNullable(info.getTitle()).orElse(Environment.DEFAULT_NAME);
+            documentTitle = info.getTitle() != null ? info.getTitle() : Environment.DEFAULT_NAME;
             documentTitle = documentTitle.toLowerCase(Locale.US).replace(' ', '-');
             String version = info.getVersion();
             if (version != null) {
@@ -179,5 +179,14 @@ public final class FileUtils {
         }
 
         return Pair.of(documentTitle, fileName);
+    }
+
+    public static String readFile(BufferedReader reader) throws IOException {
+        var buf = new StringBuilder(1024);
+        String line;
+        while ((line = reader.readLine()) != null) {
+            buf.append(line).append('\n');
+        }
+        return buf.toString();
     }
 }

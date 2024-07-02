@@ -15,6 +15,16 @@
  */
 package io.micronaut.openapi.view;
 
+import io.micronaut.core.annotation.NonNull;
+import io.micronaut.core.annotation.Nullable;
+import io.micronaut.core.io.scan.DefaultClassPathResourceLoader;
+import io.micronaut.core.util.CollectionUtils;
+import io.micronaut.core.util.StringUtils;
+import io.micronaut.inject.visitor.VisitorContext;
+import io.micronaut.openapi.visitor.ContextUtils;
+import io.micronaut.openapi.visitor.Pair;
+import io.micronaut.openapi.visitor.group.OpenApiInfo;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -33,22 +43,12 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 
-import io.micronaut.core.annotation.NonNull;
-import io.micronaut.core.annotation.Nullable;
-import io.micronaut.core.io.scan.ClassPathResourceLoader;
-import io.micronaut.core.io.scan.DefaultClassPathResourceLoader;
-import io.micronaut.core.util.CollectionUtils;
-import io.micronaut.core.util.StringUtils;
-import io.micronaut.inject.visitor.VisitorContext;
-import io.micronaut.openapi.visitor.ContextUtils;
-import io.micronaut.openapi.visitor.Pair;
-import io.micronaut.openapi.visitor.group.OpenApiInfo;
-
 import static io.micronaut.openapi.visitor.ConfigUtils.getConfigProperty;
 import static io.micronaut.openapi.visitor.ConfigUtils.getProjectPath;
 import static io.micronaut.openapi.visitor.ContextUtils.addGeneratedResource;
 import static io.micronaut.openapi.visitor.ContextUtils.info;
 import static io.micronaut.openapi.visitor.ContextUtils.warn;
+import static io.micronaut.openapi.visitor.FileUtils.readFile;
 import static io.micronaut.openapi.visitor.FileUtils.resolve;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_SERVER_CONTEXT_PATH;
 import static io.micronaut.openapi.visitor.StringUtil.COMMA;
@@ -156,10 +156,10 @@ public final class OpenApiViewConfig {
      * @return An OpenApiViewConfig.
      */
     public static OpenApiViewConfig fromSpecification(String specification, Map<Pair<String, String>, OpenApiInfo> openApiInfos, Properties openApiProperties, VisitorContext context) {
-        Map<String, String> openApiMap = new HashMap<>(openApiProperties.size());
+        var openApiMap = new HashMap<String, String>(openApiProperties.size());
         openApiProperties.forEach((key, value) -> openApiMap.put((String) key, (String) value));
         openApiMap.putAll(parse(specification));
-        OpenApiViewConfig cfg = new OpenApiViewConfig(openApiInfos);
+        var cfg = new OpenApiViewConfig(openApiInfos);
         RapiPDFConfig rapiPDFConfig = RapiPDFConfig.fromProperties(openApiMap, openApiInfos, context);
         if ("true".equals(openApiMap.getOrDefault("redoc.enabled", Boolean.FALSE.toString()))) {
             cfg.redocConfig = RedocConfig.fromProperties(openApiMap, openApiInfos, context);
@@ -306,9 +306,8 @@ public final class OpenApiViewConfig {
     }
 
     private String readTemplateFromClasspath(String templateName) throws IOException {
-        StringBuilder buf = new StringBuilder(1024);
         ClassLoader classLoader = getClass().getClassLoader();
-        try (InputStream in = classLoader.getResourceAsStream(templateName);
+        try (var in = classLoader.getResourceAsStream(templateName);
              BufferedReader reader = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8))
         ) {
             return readFile(reader);
@@ -336,13 +335,13 @@ public final class OpenApiViewConfig {
         } else if (customPathStr.startsWith("file:")) {
             customPathStr = customPathStr.substring(5);
         } else if (customPathStr.startsWith("classpath:")) {
-            ClassPathResourceLoader resourceLoader = new DefaultClassPathResourceLoader(getClass().getClassLoader());
+            var resourceLoader = new DefaultClassPathResourceLoader(getClass().getClassLoader());
             Optional<InputStream> inOpt = resourceLoader.getResourceAsStream(customPathStr);
             if (inOpt.isEmpty()) {
                 throw new IOException("Fail to load " + customPathStr);
             }
             try (InputStream in = inOpt.get();
-                 BufferedReader reader = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8))
+                 var reader = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8))
             ) {
                 return readFile(reader);
             } catch (IOException e) {
@@ -359,15 +358,6 @@ public final class OpenApiViewConfig {
         } catch (IOException e) {
             throw new IOException("Fail to load " + customPathStr, e);
         }
-    }
-
-    private String readFile(BufferedReader reader) throws IOException {
-        StringBuilder buf = new StringBuilder(1024);
-        String line;
-        while ((line = reader.readLine()) != null) {
-            buf.append(line).append('\n');
-        }
-        return buf.toString();
     }
 
     private void render(AbstractViewConfig cfg, Path outputDir, String templateName, @Nullable VisitorContext context) throws IOException {

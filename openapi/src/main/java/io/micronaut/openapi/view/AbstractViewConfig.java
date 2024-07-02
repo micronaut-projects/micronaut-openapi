@@ -184,7 +184,7 @@ abstract class AbstractViewConfig implements Toggleable {
         if (cfg.withUrls) {
 
             String primaryName = null;
-            List<OpenApiUrl> urls = new ArrayList<>();
+            var urls = new ArrayList<OpenApiUrl>();
             for (OpenApiInfo openApiInfo : cfg.openApiInfos.values()) {
                 String groupName = openApiInfo.getGroupName();
                 String version = openApiInfo.getVersion();

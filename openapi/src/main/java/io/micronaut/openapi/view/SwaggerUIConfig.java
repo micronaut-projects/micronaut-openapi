@@ -133,7 +133,7 @@ final class SwaggerUIConfig extends AbstractViewConfig {
         private static final Map<String, SyntaxHighlightTheme> BY_CODE;
 
         static {
-            Map<String, SyntaxHighlightTheme> byCode = new HashMap<>(SyntaxHighlightTheme.values().length);
+            var byCode = new HashMap<String, SyntaxHighlightTheme>(SyntaxHighlightTheme.values().length);
             for (SyntaxHighlightTheme navTagClick : values()) {
                 byCode.put(navTagClick.code, navTagClick);
             }
@@ -242,7 +242,7 @@ final class SwaggerUIConfig extends AbstractViewConfig {
      * @return A SwaggerUIConfig.
      */
     static SwaggerUIConfig fromProperties(Map<String, String> properties, Map<Pair<String, String>, OpenApiInfo> openApiInfos, VisitorContext context) {
-        SwaggerUIConfig cfg = new SwaggerUIConfig(openApiInfos);
+        var cfg = new SwaggerUIConfig(openApiInfos);
         cfg.theme = Theme.valueOf(properties.getOrDefault(PREFIX_SWAGGER_UI + ".theme", cfg.theme.name()).toUpperCase(Locale.US));
 
         String copyTheme = properties.get(cfg.prefix + "copy-theme");
