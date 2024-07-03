@@ -527,4 +527,15 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                             var title: String,
                         """);
     }
+
+    @Test
+    void testOneOf() {
+
+        var codegen = new KotlinMicronautClientCodegen();
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/oneof-with-discriminator.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String path = outputPath + "src/main/kotlin/org/openapitools/";
+
+        assertFileContains(path + "model/Subject.kt", "val typeCode: String");
+        assertFileContains(path + "model/Person.kt", "override var typeCode: String = \"PERS\",");
+    }
 }

@@ -6,10 +6,10 @@
 {{>common/generatedAnnotation}}
 {{/generatedAnnotation}}
 {{>common/model/typeInfoAnnotation}}
-{{>common/model/xmlAnnotation}}
-public interface {{classname}} {{#vendorExtensions.x-implements}}{{#-first}}extends {{{.}}}{{/-first}}{{^-first}}, {{{.}}}{{/-first}}{{/vendorExtensions.x-implements}} {
+interface {{classname}}{{#vendorExtensions.x-implements}}{{#-first}} : {{{.}}}{{/-first}}{{^-first}}, {{{.}}}{{/-first}}{{/vendorExtensions.x-implements}} {
 {{/formatNoEmptyLines}}
+
     {{#discriminator}}
-    public {{propertyType}} {{propertyGetter}}()
+    val {{propertyName}}: {{propertyType}}
     {{/discriminator}}
 }

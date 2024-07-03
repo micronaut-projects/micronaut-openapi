@@ -158,6 +158,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
         generateSwaggerAnnotations = this instanceof JavaMicronautClientCodegen ? OPT_GENERATE_SWAGGER_ANNOTATIONS_FALSE : OPT_GENERATE_SWAGGER_ANNOTATIONS_SWAGGER_2;
         generateOperationOnlyForFirstTag = this instanceof JavaMicronautServerCodegen;
         openApiNullable = false;
+        useOneOfInterfaces = true;
         inlineSchemaOption.put("RESOLVE_INLINE_ENUMS", "true");
         // CHECKSTYLE:ON
 
@@ -235,7 +236,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
 
         final CliOption serializationLibraryOpt = CliOption.newString(CodegenConstants.SERIALIZATION_LIBRARY, "Serialization library for model");
         serializationLibraryOpt.defaultValue(SerializationLibraryKind.JACKSON.name());
-        Map<String, String> serializationLibraryOptions = new HashMap<>();
+        var serializationLibraryOptions = new HashMap<String, String>();
         serializationLibraryOptions.put(SerializationLibraryKind.JACKSON.name(), "Jackson as serialization library");
         serializationLibraryOptions.put(SerializationLibraryKind.MICRONAUT_SERDE_JACKSON.name(), "Use micronaut-serialization with Jackson annotations");
         serializationLibraryOpt.setEnum(serializationLibraryOptions);
