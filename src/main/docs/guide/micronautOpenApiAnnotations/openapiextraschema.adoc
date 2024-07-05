@@ -1,0 +1,31 @@
+You can add extra schemas (unused in endpoints) to final specification file. To add unused schemas to openapi file
+you can use `@OpenAPIExtraSchema` annotaion.
+
+To add current class to openapi file just add `@OpenAPIExtraSchema` annotation without any parameters:
+
+[source,java]
+----
+@OpenAPIExtraSchema
+class UnusedSchema {
+
+    public String field1;
+}
+----
+
+Another way, you can set classnames or packages to include / exclude extra schemas from final openapi file:
+
+[source,java]
+----
+@OpenAPIExtraSchema(
+    // classes to add
+    classes = UnusedModel1.class,
+    // excluded classes, which marked with `@OpenAPIExtraSchema` annotation
+    excludeClasses = ExcludedModel.class,
+    // exclude classes by packages
+    excludePackages = "io.micronaut.openapi.exclude",
+    // include classes by packages
+    packages = "io.micronaut.openapi.extra"
+)
+class Application {
+}
+----

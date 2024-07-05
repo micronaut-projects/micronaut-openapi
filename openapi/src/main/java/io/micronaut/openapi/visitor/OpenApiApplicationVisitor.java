@@ -37,8 +37,8 @@ import io.micronaut.openapi.annotation.OpenAPIGroupInfos;
 import io.micronaut.openapi.postprocessors.JacksonDiscriminatorPostProcessor;
 import io.micronaut.openapi.postprocessors.OpenApiOperationsPostProcessor;
 import io.micronaut.openapi.view.OpenApiViewConfig;
-import io.micronaut.openapi.visitor.group.EndpointInfo;
 import io.micronaut.openapi.visitor.group.EndpointGroupInfo;
+import io.micronaut.openapi.visitor.group.EndpointInfo;
 import io.micronaut.openapi.visitor.group.GroupProperties;
 import io.micronaut.openapi.visitor.group.OpenApiInfo;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
@@ -107,8 +107,10 @@ import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_SECURITY;
 import static io.micronaut.openapi.visitor.OpenApiNormalizeUtils.findAndRemoveDuplicates;
 import static io.micronaut.openapi.visitor.OpenApiNormalizeUtils.normalizeOpenApi;
 import static io.micronaut.openapi.visitor.OpenApiNormalizeUtils.removeEmptyComponents;
+import static io.micronaut.openapi.visitor.SchemaDefinitionUtils.toValue;
 import static io.micronaut.openapi.visitor.SchemaUtils.copyOpenApi;
 import static io.micronaut.openapi.visitor.SchemaUtils.getOperationOnPathItem;
+import static io.micronaut.openapi.visitor.SchemaUtils.resolveSchemas;
 import static io.micronaut.openapi.visitor.SchemaUtils.setOperationOnPathItem;
 import static io.micronaut.openapi.visitor.StringUtil.PLACEHOLDER_POSTFIX;
 import static io.micronaut.openapi.visitor.StringUtil.PLACEHOLDER_PREFIX;
@@ -703,15 +705,22 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         // remove unused schemas
         try {
             if (openApi.getComponents() != null) {
+                var extraSchemas = OpenApiExtraSchemaVisitor.getExtraSchemas();
                 Map<String, Schema> schemas = openApi.getComponents().getSchemas();
                 if (CollectionUtils.isNotEmpty(schemas)) {
                     String openApiJson = Utils.getJsonMapper().writeValueAsString(openApi);
                     // Create a copy of the keySet so that we can modify the map while in a foreach
                     var keySet = new HashSet<>(schemas.keySet());
                     for (String schemaName : keySet) {
-                        if (!openApiJson.contains("\"" + COMPONENTS_SCHEMAS_REF + schemaName + '"')) {
+                        if (!openApiJson.contains("\"" + COMPONENTS_SCHEMAS_REF + schemaName + '"')
+                                && !extraSchemas.containsKey(schemaName)
+                        ) {
                             schemas.remove(schemaName);
                         }
+                    }
+                    // check excluded extra schemas also
+                    for (String schemaName : OpenApiExtraSchemaVisitor.getExcludedExtraSchemas()) {
+                        schemas.remove(schemaName);
                     }
                 }
             }
@@ -722,14 +731,35 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         removeEmptyComponents(openApi);
         findAndRemoveDuplicates(openApi);
 
+        addExtraSchemas(openApi, context);
+
         openApi = resolvePropertyPlaceHolders(openApi, context);
 
         return openApi;
     }
 
+    private void addExtraSchemas(OpenAPI openApi, VisitorContext context) {
+       var extraSchemas = OpenApiExtraSchemaVisitor.getExtraSchemas();
+       if (CollectionUtils.isEmpty(extraSchemas)) {
+           return;
+       }
+       var schemas = resolveSchemas(openApi);
+       for (var entry : extraSchemas.entrySet()) {
+           if (schemas.containsKey(entry.getKey())) {
+               continue;
+           }
+           schemas.put(entry.getKey(), entry.getValue());
+       }
+    }
+
     private void generateViews(@Nullable String documentTitle, @Nullable Map<Pair<String, String>, OpenApiInfo> openApiInfos, VisitorContext context) {
         Path viewsDestDirs = getViewsDestDir(getDefaultFilePath("dummy" + System.nanoTime(), context), context);
         if (viewsDestDirs == null) {
+            return;
+        }
+        String viewSpecification = getConfigProperty(MICRONAUT_OPENAPI_VIEWS_SPEC, context);
+        OpenApiViewConfig cfg = OpenApiViewConfig.fromSpecification(viewSpecification, openApiInfos, readOpenApiConfigFile(context), context);
+        if (!cfg.isEnabled()) {
             return;
         }
         if (context != null) {
@@ -757,12 +787,11 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
 
     private void writeYamlToFile(Map<Pair<String, String>, OpenApiInfo> openApiInfos, String documentTitle, VisitorContext context, boolean isYaml) {
 
-        Path viewsDestDirs = null;
         var isAdocModuleInClassPath = false;
         var isGlobalAdocEnabled = getBooleanProperty(MICRONAUT_OPENAPI_ADOC_ENABLED, true, context);
 
         try {
-            var converterClass = Class.forName("io.micronaut.openapi.adoc.OpenApiToAdocConverter");
+            Class.forName("io.micronaut.openapi.adoc.OpenApiToAdocConverter");
             isAdocModuleInClassPath = true;
         } catch (ClassNotFoundException e) {
             // do nothing
@@ -844,6 +873,5 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         public String translate(String propertyName) {
             return propertyName;
         }
-
     }
 }
