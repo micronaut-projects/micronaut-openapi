@@ -76,7 +76,9 @@ import static io.micronaut.openapi.generator.Utils.EXT_ANNOTATIONS_SETTER;
 import static io.micronaut.openapi.generator.Utils.addStrValueToEnum;
 import static io.micronaut.openapi.generator.Utils.normalizeExtraAnnotations;
 import static io.micronaut.openapi.generator.Utils.processGenericAnnotations;
+import static org.openapitools.codegen.CodegenConstants.API_PACKAGE;
 import static org.openapitools.codegen.CodegenConstants.INVOKER_PACKAGE;
+import static org.openapitools.codegen.CodegenConstants.MODEL_PACKAGE;
 import static org.openapitools.codegen.languages.KotlinClientCodegen.DATE_LIBRARY;
 import static org.openapitools.codegen.utils.StringUtils.camelize;
 import static org.openapitools.codegen.utils.StringUtils.underscore;
@@ -422,6 +424,18 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
             packageName = (String) additionalProperties.get(INVOKER_PACKAGE);
         } else {
             additionalProperties.put(INVOKER_PACKAGE, packageName);
+        }
+
+        if (additionalProperties.containsKey(API_PACKAGE)) {
+            apiPackage = (String) additionalProperties.get(API_PACKAGE);
+        } else {
+            additionalProperties.put(API_PACKAGE, apiPackage);
+        }
+
+        if (additionalProperties.containsKey(MODEL_PACKAGE)) {
+            modelPackage = (String) additionalProperties.get(MODEL_PACKAGE);
+        } else {
+            additionalProperties.put(MODEL_PACKAGE, modelPackage);
         }
 
         if (additionalProperties.containsKey(OPT_APPLICATION_NAME)) {

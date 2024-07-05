@@ -66,7 +66,9 @@ import static io.micronaut.openapi.generator.Utils.EXT_ANNOTATIONS_SETTER;
 import static io.micronaut.openapi.generator.Utils.addStrValueToEnum;
 import static io.micronaut.openapi.generator.Utils.normalizeExtraAnnotations;
 import static io.micronaut.openapi.generator.Utils.processGenericAnnotations;
+import static org.openapitools.codegen.CodegenConstants.API_PACKAGE;
 import static org.openapitools.codegen.CodegenConstants.INVOKER_PACKAGE;
+import static org.openapitools.codegen.CodegenConstants.MODEL_PACKAGE;
 import static org.openapitools.codegen.utils.StringUtils.camelize;
 
 /**
@@ -113,7 +115,6 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
 
     protected SecureRandom random = new SecureRandom();
     protected String title;
-    protected boolean useBeanValidation;
     protected boolean useOptional;
     protected boolean visitable;
     protected boolean lombok;
@@ -187,7 +188,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
         updateOption(INVOKER_PACKAGE, getInvokerPackage());
         updateOption(CodegenConstants.ARTIFACT_ID, getArtifactId());
         updateOption(CodegenConstants.API_PACKAGE, apiPackage);
-        updateOption(CodegenConstants.MODEL_PACKAGE, modelPackage);
+        updateOption(MODEL_PACKAGE, modelPackage);
 
         cliOptions.add(new CliOption(OPT_TITLE, "Client service name").defaultValue(title));
         cliOptions.add(new CliOption(OPT_APPLICATION_NAME, "Micronaut application name (Defaults to the " + CodegenConstants.ARTIFACT_ID + " value)").defaultValue(appName));
@@ -293,7 +294,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
     @Override
     public void setModelPackage(String modelPackage) {
         super.setModelPackage(modelPackage);
-        updateOption(CodegenConstants.MODEL_PACKAGE, modelPackage);
+        updateOption(MODEL_PACKAGE, modelPackage);
     }
 
     @Override
@@ -361,6 +362,18 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
             invokerPackage = (String) additionalProperties.get(INVOKER_PACKAGE);
         } else {
             additionalProperties.put(INVOKER_PACKAGE, invokerPackage);
+        }
+
+        if (additionalProperties.containsKey(API_PACKAGE)) {
+            apiPackage = (String) additionalProperties.get(API_PACKAGE);
+        } else {
+            additionalProperties.put(API_PACKAGE, apiPackage);
+        }
+
+        if (additionalProperties.containsKey(MODEL_PACKAGE)) {
+            modelPackage = (String) additionalProperties.get(MODEL_PACKAGE);
+        } else {
+            additionalProperties.put(MODEL_PACKAGE, modelPackage);
         }
 
         if (additionalProperties.containsKey(OPT_APPLICATION_NAME)) {

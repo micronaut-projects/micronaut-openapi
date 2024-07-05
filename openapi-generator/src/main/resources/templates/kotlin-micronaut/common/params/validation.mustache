@@ -22,6 +22,7 @@
         {{/required}}
     {{/isNullable}}
     {{!Validate all pojos and enums}}
+    {{^isUuid}}
     {{^isContainer}}
         {{#isModel}}
     @Valid
@@ -89,4 +90,5 @@
             {{/maximum}}
         {{/isLong}}
     {{/isInteger}}
+    {{/isUuid}}
 {{/useBeanValidation}}
