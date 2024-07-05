@@ -262,22 +262,23 @@ public final class ConvertUtils {
                         newValues.put(key, a);
                     }
                 } else {
-                    newValues.put(key, parseJsonString(value).orElse(value));
+                    var parsedJsonValue = parseJsonString(value);
+                    newValues.put(key, parsedJsonValue != null ? parsedJsonValue : value);
                 }
             }
         }
         return newValues;
     }
 
-    public static Optional<Object> parseJsonString(Object object) {
+    public static Map<String, Object> parseJsonString(Object object) {
         if (object instanceof String string) {
             try {
-                return Optional.of(CONVERT_JSON_MAPPER.readValue(string, Map.class));
+                return CONVERT_JSON_MAPPER.readValue(string, MAP_TYPE_REFERENCE);
             } catch (IOException e) {
-                return Optional.empty();
+                return null;
             }
         }
-        return Optional.empty();
+        return null;
     }
 
     /**
@@ -317,7 +318,10 @@ public final class ConvertUtils {
 
         var finalValue = value;
 
-        resolveExtensions(jn).ifPresent(extensions -> BeanMap.of(finalValue).put(PROP_EXTENSIONS, extensions));
+        var exts = resolveExtensions(jn);
+        if (exts != null) {
+            BeanMap.of(finalValue).put(PROP_EXTENSIONS, exts);
+        }
         String elType = jn.has(PROP_TYPE) ? jn.get(PROP_TYPE).textValue() : null;
         String elFormat = jn.has(PROP_ONE_FORMAT) ? jn.get(PROP_ONE_FORMAT).textValue() : null;
         JsonNode defaultValueNode = jn.get(PROP_DEFAULT_VALUE);
@@ -481,16 +485,16 @@ public final class ConvertUtils {
         return parseByTypeAndFormat(valueStr, type, format, context, isMicronautFormat);
     }
 
-    public static Optional<Map<String, Object>> resolveExtensions(JsonNode jn) {
+    public static Map<String, Object> resolveExtensions(JsonNode jn) {
         try {
             JsonNode extensionsNode = jn.get(PROP_EXTENSIONS);
             if (extensionsNode != null) {
-                return Optional.ofNullable(CONVERT_JSON_MAPPER.convertValue(extensionsNode, MAP_TYPE_REFERENCE));
+                return CONVERT_JSON_MAPPER.convertValue(extensionsNode, MAP_TYPE_REFERENCE);
             }
         } catch (IllegalArgumentException e) {
             // Ignore
         }
-        return Optional.empty();
+        return null;
     }
 
     public static void addSecuritySchemes(OpenAPI openApi,
@@ -547,7 +551,10 @@ public final class ConvertUtils {
                 JsonNode node = toJson(map, context);
                 SecurityScheme securityScheme = ConvertUtils.treeToValue(node, SecurityScheme.class, context);
                 if (securityScheme != null) {
-                    resolveExtensions(node).ifPresent(extensions -> BeanMap.of(securityScheme).put(PROP_EXTENSIONS, extensions));
+                    var exts = resolveExtensions(node);
+                    if (exts != null) {
+                        BeanMap.of(securityScheme).put(PROP_EXTENSIONS, exts);
+                    }
                     resolveComponents(openApi).addSecuritySchemes(name, securityScheme);
                 }
             } catch (JsonProcessingException e) {

@@ -148,7 +148,7 @@ public class AnnProcessorEnvironment extends DefaultEnvironment {
      */
     @Override
     protected List<PropertySource> readPropertySourceList(String name) {
-        List<PropertySource> propertySources = new ArrayList<>();
+        var propertySources = new ArrayList<PropertySource>();
         for (String configLocation : annotationProcessingConfigLocations) {
             ResourceLoader resourceLoader;
             if (configLocation.equals("classpath:/")) {

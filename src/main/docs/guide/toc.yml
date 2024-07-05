@@ -33,6 +33,7 @@ endpoints:
 micronautOpenApiAnnotations:
   title: Micronaut OpenAPI annotations
   openapidecorator: '@OpenAPIDecorator'
+  openapiextraschema: '@OpenAPIExtraSchema'
   openapigroup: '@OpenAPIGroup'
   openapigroupinfo: '@OpenAPIGroupInfo'
   openapiinclude: '@OpenAPIInclude'

@@ -172,15 +172,15 @@ public final class Utils {
     /**
      * Resolve the components.
      *
-     * @param openAPI The open API
+     * @param openApi The open API
      *
      * @return The components
      */
-    public static Components resolveComponents(OpenAPI openAPI) {
-        Components components = openAPI.getComponents();
+    public static Components resolveComponents(OpenAPI openApi) {
+        Components components = openApi.getComponents();
         if (components == null) {
             components = new Components();
-            openAPI.setComponents(components);
+            openApi.setComponents(components);
         }
         return components;
     }
@@ -188,15 +188,15 @@ public final class Utils {
     /**
      * Resolve the webhooks.
      *
-     * @param openAPI The open API
+     * @param openApi The open API
      *
      * @return The webhooks
      */
-    public static Map<String, PathItem> resolveWebhooks(OpenAPI openAPI) {
-        var webhooks = openAPI.getWebhooks();
+    public static Map<String, PathItem> resolveWebhooks(OpenAPI openApi) {
+        var webhooks = openApi.getWebhooks();
         if (webhooks == null) {
             webhooks = new HashMap<>();
-            openAPI.setWebhooks(webhooks);
+            openApi.setWebhooks(webhooks);
         }
         return webhooks;
     }
@@ -382,5 +382,7 @@ public final class Utils {
         testJsonReference = null;
         creatorConstructorsCache = new HashMap<>();
         System.clearProperty(BIND_TYPE_AND_TYPES);
+        SchemaDefinitionUtils.clean();
+        OpenApiExtraSchemaVisitor.clean();
     }
 }

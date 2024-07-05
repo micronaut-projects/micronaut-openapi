@@ -23,6 +23,7 @@ import io.micronaut.core.annotation.AnnotationMetadata;
 import io.micronaut.core.annotation.AnnotationValue;
 import io.micronaut.core.annotation.Internal;
 import io.micronaut.http.HttpRequest;
+import io.micronaut.http.HttpResponse;
 import io.micronaut.http.annotation.Header;
 import io.micronaut.http.multipart.FileUpload;
 import io.micronaut.inject.annotation.AnnotationMetadataHierarchy;
@@ -62,55 +63,67 @@ public final class ElementUtils {
     public static final AnnotationValue<?>[] EMPTY_ANNOTATION_VALUES_ARRAY = new AnnotationValue[0];
 
     public static final List<String> CONTAINER_TYPES = List.of(
-        Optional.class.getName(),
-        Future.class.getName(),
-        Callable.class.getName(),
-        CompletionStage.class.getName(),
-        "org.reactivestreams.Publisher",
-        "io.reactivex.Single",
-        "io.reactivex.Observable",
-        "io.reactivex.Maybe",
-        "io.reactivex.rxjava3.core.Single",
-        "io.reactivex.rxjava3.core.Observable",
-        "io.reactivex.rxjava3.core.Maybe",
-        "kotlinx.coroutines.flow.Flow",
-        "org.springframework.web.context.request.async.DeferredResult"
+            Optional.class.getName(),
+            Future.class.getName(),
+            Callable.class.getName(),
+            CompletionStage.class.getName(),
+            "org.reactivestreams.Publisher",
+            "io.reactivex.Single",
+            "io.reactivex.Observable",
+            "io.reactivex.Maybe",
+            "io.reactivex.rxjava3.core.Single",
+            "io.reactivex.rxjava3.core.Observable",
+            "io.reactivex.rxjava3.core.Maybe",
+            "kotlinx.coroutines.flow.Flow",
+            "org.springframework.web.context.request.async.DeferredResult"
     );
 
     public static final List<String> FILE_TYPES = List.of(
-        // this class from micronaut-http-server
-        "io.micronaut.http.server.types.files.FileCustomizableResponseType",
-        File.class.getName(),
-        InputStream.class.getName(),
-        ByteBuffer.class.getName()
+            // this class from micronaut-http-server
+            "io.micronaut.http.server.types.files.FileCustomizableResponseType",
+            File.class.getName(),
+            InputStream.class.getName(),
+            ByteBuffer.class.getName()
     );
 
     public static final List<String> VOID_TYPES = List.of(
-        void.class.getName(),
-        Void.class.getName(),
-        "kotlin.Unit"
+            void.class.getName(),
+            Void.class.getName(),
+            "kotlin.Unit"
     );
 
     private ElementUtils() {
+    }
+
+    public static boolean isSingleResponseType(ClassElement returnType) {
+        return (returnType.isAssignable("io.reactivex.Single")
+                || returnType.isAssignable("io.reactivex.rxjava3.core.Single")
+                || returnType.isAssignable("org.reactivestreams.Publisher"))
+                && returnType.getFirstTypeArgument().isPresent()
+                && isResponseType(returnType.getFirstTypeArgument().orElse(null));
+    }
+
+    public static boolean isResponseType(ClassElement returnType) {
+        return returnType != null
+                && (returnType.isAssignable(HttpResponse.class)
+                || returnType.isAssignable("org.springframework.http.HttpEntity"));
     }
 
     /**
      * Checks Nullable annotations / optional type to understand that the element can be null.
      *
      * @param element typed element
-     *
      * @return true if element is nullable, false - otherwise.
      */
     public static boolean isNullable(TypedElement element) {
         return element.isNullable()
-            || element.getType().isOptional();
+                || element.getType().isOptional();
     }
 
     /**
      * Checking if the type is file upload type.
      *
      * @param type type element
-     *
      * @return true if this type one of known file upload types
      */
     public static boolean isFileUpload(ClassElement type) {
@@ -122,36 +135,34 @@ public final class ElementUtils {
         }
         String typeName = type.getName();
         return type.isAssignable(FileUpload.class)
-            || "io.micronaut.http.multipart.StreamingFileUpload".equals(typeName)
-            || "io.micronaut.http.multipart.CompletedFileUpload".equals(typeName)
-            || "io.micronaut.http.multipart.CompletedPart".equals(typeName)
-            || "io.micronaut.http.multipart.PartData".equals(typeName)
-            || "org.springframework.web.multipart.MultipartFile".equals(typeName);
+                || "io.micronaut.http.multipart.StreamingFileUpload".equals(typeName)
+                || "io.micronaut.http.multipart.CompletedFileUpload".equals(typeName)
+                || "io.micronaut.http.multipart.CompletedPart".equals(typeName)
+                || "io.micronaut.http.multipart.PartData".equals(typeName)
+                || "org.springframework.web.multipart.MultipartFile".equals(typeName);
     }
 
     /**
      * Checking if the element not nullable.
      *
      * @param element element
-     *
      * @return true if element is not nullable
      */
     public static boolean isNotNullable(Element element) {
         return element.isAnnotationPresent("javax.validation.constraints.NotNull$List")
-            || element.isAnnotationPresent("jakarta.validation.constraints.NotNull$List")
-            || element.isAnnotationPresent("javax.validation.constraints.NotBlank$List")
-            || element.isAnnotationPresent("jakarta.validation.constraints.NotBlank$List")
-            || element.isAnnotationPresent("javax.validation.constraints.NotEmpty$List")
-            || element.isAnnotationPresent("jakarta.validation.constraints.NotEmpty$List")
-            || element.isNonNull()
-            || element.booleanValue(JsonProperty.class, "required").orElse(false);
+                || element.isAnnotationPresent("jakarta.validation.constraints.NotNull$List")
+                || element.isAnnotationPresent("javax.validation.constraints.NotBlank$List")
+                || element.isAnnotationPresent("jakarta.validation.constraints.NotBlank$List")
+                || element.isAnnotationPresent("javax.validation.constraints.NotEmpty$List")
+                || element.isAnnotationPresent("jakarta.validation.constraints.NotEmpty$List")
+                || element.isNonNull()
+                || element.booleanValue(JsonProperty.class, "required").orElse(false);
     }
 
     /**
      * Checking if the type is file.
      *
      * @param type type element
-     *
      * @return true if this type assignable with known file types
      */
     public static boolean isReturnTypeFile(ClassElement type) {
@@ -162,7 +173,6 @@ public final class ElementUtils {
      * Checking if the type is container.
      *
      * @param type type element
-     *
      * @return true if this type assignable with known container types
      */
     public static boolean isContainerType(ClassElement type) {
@@ -173,7 +183,6 @@ public final class ElementUtils {
      * Checking if the type is void.
      *
      * @param type type element
-     *
      * @return true if this type assignable with known void types
      */
     public static boolean isVoid(ClassElement type) {
@@ -184,13 +193,12 @@ public final class ElementUtils {
      * Checking if the type is void.
      *
      * @param type type element
-     *
      * @return true if this type assignable with known container and type argument is void
      */
     public static boolean isReactiveAndVoid(ClassElement type) {
         return type.isAssignable("io.reactivex.Completable")
-            || type.isAssignable("io.reactivex.rxjava3.core.Completable")
-            || (isContainerType(type) && type.getFirstTypeArgument().isPresent() && isVoid(type.getFirstTypeArgument().get()));
+                || type.isAssignable("io.reactivex.rxjava3.core.Completable")
+                || (isContainerType(type) && type.getFirstTypeArgument().isPresent() && isVoid(type.getFirstTypeArgument().get()));
     }
 
     private static boolean findAnyAssignable(ClassElement type, List<String> typeNames) {
@@ -208,42 +216,42 @@ public final class ElementUtils {
         boolean isHidden = schemaAnn != null && schemaAnn.booleanValue(PROP_HIDDEN).orElse(false);
 
         return isHidden
-            || parameter.isAnnotationPresent(Hidden.class)
-            || parameter.isAnnotationPresent(JsonIgnore.class)
-            || parameter.isAnnotationPresent(Header.class) && parameter.getType().isAssignable(Map.class)
-            || parameter.booleanValue(Parameter.class, PROP_HIDDEN).orElse(false)
-            || parameter.hasAnnotation("io.micronaut.session.annotation.SessionValue")
-            || parameter.hasAnnotation("org.springframework.web.bind.annotation.SessionAttribute")
-            || parameter.hasAnnotation("org.springframework.web.bind.annotation.SessionAttributes")
-            || isIgnoredParameterType(parameter.getType());
+                || parameter.isAnnotationPresent(Hidden.class)
+                || parameter.isAnnotationPresent(JsonIgnore.class)
+                || parameter.isAnnotationPresent(Header.class) && parameter.getType().isAssignable(Map.class)
+                || parameter.booleanValue(Parameter.class, PROP_HIDDEN).orElse(false)
+                || parameter.hasAnnotation("io.micronaut.session.annotation.SessionValue")
+                || parameter.hasAnnotation("org.springframework.web.bind.annotation.SessionAttribute")
+                || parameter.hasAnnotation("org.springframework.web.bind.annotation.SessionAttributes")
+                || isIgnoredParameterType(parameter.getType());
     }
 
     public static boolean isIgnoredParameterType(ClassElement parameterType) {
         return parameterType == null
-            || parameterType.isAssignable(Principal.class)
-            || parameterType.isAssignable("io.micronaut.session.Session")
-            || parameterType.isAssignable("io.micronaut.security.authentication.Authentication")
-            || parameterType.isAssignable("io.micronaut.http.HttpHeaders")
-            || parameterType.isAssignable("kotlin.coroutines.Continuation")
-            || parameterType.isAssignable(HttpRequest.class)
-            || parameterType.isAssignable("io.micronaut.http.BasicAuth")
-            // servlet API
-            || parameterType.isAssignable("jakarta.servlet.http.HttpServletRequest")
-            || parameterType.isAssignable("jakarta.servlet.http.HttpServletResponse")
-            || parameterType.isAssignable("jakarta.servlet.http.HttpSession")
-            || parameterType.isAssignable("jakarta.servlet.http.PushBuilder")
-            // spring
-            || parameterType.isAssignable("java.io.Reader")
-            || parameterType.isAssignable("java.io.OutputStream")
-            || parameterType.isAssignable("java.io.Writer")
-            || parameterType.isAssignable("org.springframework.web.util.UriComponentsBuilder")
-            || parameterType.isAssignable("org.springframework.web.bind.support.SessionStatus")
-            || parameterType.isAssignable("org.springframework.web.context.request.RequestAttributes")
-            || parameterType.isAssignable("org.springframework.http.HttpEntity")
-            || parameterType.isAssignable("org.springframework.http.HttpMethod")
-            || parameterType.isAssignable("org.springframework.validation.BindingResult")
-            || parameterType.isAssignable("org.springframework.validation.Errors")
-            ;
+                || parameterType.isAssignable(Principal.class)
+                || parameterType.isAssignable("io.micronaut.session.Session")
+                || parameterType.isAssignable("io.micronaut.security.authentication.Authentication")
+                || parameterType.isAssignable("io.micronaut.http.HttpHeaders")
+                || parameterType.isAssignable("kotlin.coroutines.Continuation")
+                || parameterType.isAssignable(HttpRequest.class)
+                || parameterType.isAssignable("io.micronaut.http.BasicAuth")
+                // servlet API
+                || parameterType.isAssignable("jakarta.servlet.http.HttpServletRequest")
+                || parameterType.isAssignable("jakarta.servlet.http.HttpServletResponse")
+                || parameterType.isAssignable("jakarta.servlet.http.HttpSession")
+                || parameterType.isAssignable("jakarta.servlet.http.PushBuilder")
+                // spring
+                || parameterType.isAssignable("java.io.Reader")
+                || parameterType.isAssignable("java.io.OutputStream")
+                || parameterType.isAssignable("java.io.Writer")
+                || parameterType.isAssignable("org.springframework.web.util.UriComponentsBuilder")
+                || parameterType.isAssignable("org.springframework.web.bind.support.SessionStatus")
+                || parameterType.isAssignable("org.springframework.web.context.request.RequestAttributes")
+                || parameterType.isAssignable("org.springframework.http.HttpEntity")
+                || parameterType.isAssignable("org.springframework.http.HttpMethod")
+                || parameterType.isAssignable("org.springframework.validation.BindingResult")
+                || parameterType.isAssignable("org.springframework.validation.Errors")
+                ;
     }
 
     public static AnnotationMetadata getAnnotationMetadata(Element el) {
