@@ -181,17 +181,19 @@
         
         <div class="toc-item" style="margin-left:10px" id="toc-item-openapidecorator"><a href="#openapidecorator"><strong>15.1</strong><span>@OpenAPIDecorator</span></a></div>
         
-        <div class="toc-item" style="margin-left:10px" id="toc-item-openapigroup"><a href="#openapigroup"><strong>15.2</strong><span>@OpenAPIGroup</span></a></div>
+        <div class="toc-item" style="margin-left:10px" id="toc-item-openapiextraschema"><a href="#openapiextraschema"><strong>15.2</strong><span>@OpenAPIExtraSchema</span></a></div>
         
-        <div class="toc-item" style="margin-left:10px" id="toc-item-openapigroupinfo"><a href="#openapigroupinfo"><strong>15.3</strong><span>@OpenAPIGroupInfo</span></a></div>
+        <div class="toc-item" style="margin-left:10px" id="toc-item-openapigroup"><a href="#openapigroup"><strong>15.3</strong><span>@OpenAPIGroup</span></a></div>
         
-        <div class="toc-item" style="margin-left:10px" id="toc-item-openapiinclude"><a href="#openapiinclude"><strong>15.4</strong><span>@OpenAPIInclude</span></a></div>
+        <div class="toc-item" style="margin-left:10px" id="toc-item-openapigroupinfo"><a href="#openapigroupinfo"><strong>15.4</strong><span>@OpenAPIGroupInfo</span></a></div>
         
-        <div class="toc-item" style="margin-left:10px" id="toc-item-openapimanagement"><a href="#openapimanagement"><strong>15.5</strong><span>@OpenAPIManagement</span></a></div>
+        <div class="toc-item" style="margin-left:10px" id="toc-item-openapiinclude"><a href="#openapiinclude"><strong>15.5</strong><span>@OpenAPIInclude</span></a></div>
         
-        <div class="toc-item" style="margin-left:10px" id="toc-item-openapisecurity"><a href="#openapisecurity"><strong>15.6</strong><span>@OpenAPISecurity</span></a></div>
+        <div class="toc-item" style="margin-left:10px" id="toc-item-openapimanagement"><a href="#openapimanagement"><strong>15.6</strong><span>@OpenAPIManagement</span></a></div>
         
-        <div class="toc-item" style="margin-left:10px" id="toc-item-accessorsStyle"><a href="#accessorsStyle"><strong>15.7</strong><span>@AccessorsStyle</span></a></div>
+        <div class="toc-item" style="margin-left:10px" id="toc-item-openapisecurity"><a href="#openapisecurity"><strong>15.7</strong><span>@OpenAPISecurity</span></a></div>
+        
+        <div class="toc-item" style="margin-left:10px" id="toc-item-accessorsStyle"><a href="#accessorsStyle"><strong>15.8</strong><span>@AccessorsStyle</span></a></div>
         
         <div class="toc-item" style="margin-left:0px" id="toc-item-mergingSchemas"><a href="#mergingSchemas"><strong>16</strong><span>Merging Schemas</span></a></div>
         
@@ -2343,7 +2345,52 @@ interface MyDogsOperations extends Api&lt;MyRequest, MyResponse&gt; {
 </div>
 </div>
 
-<h2 id="openapigroup"><a class="anchor" href="#openapigroup"></a>15.2 @OpenAPIGroup</h2>
+<h2 id="openapiextraschema"><a class="anchor" href="#openapiextraschema"></a>15.2 @OpenAPIExtraSchema</h2>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/6.12.x/src/main/docs/guide/micronautOpenApiAnnotations/openapiextraschema.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>You can add extra schemas (unused in endpoints) to final specification file. To add unused schemas to openapi file
+you can use <code>@OpenAPIExtraSchema</code> annotaion.</p>
+</div>
+<div class="paragraph">
+<p>To add current class to openapi file just add <code>@OpenAPIExtraSchema</code> annotation without any parameters:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@OpenAPIExtraSchema
+class UnusedSchema {
+
+    public String field1;
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Another way, you can set classnames or packages to include / exclude extra schemas from final openapi file:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@OpenAPIExtraSchema(
+    // classes to add
+    classes = UnusedModel1.class,
+    // excluded classes, which marked with `@OpenAPIExtraSchema` annotation
+    excludeClasses = ExcludedModel.class,
+    // exclude classes by packages
+    excludePackages = "io.micronaut.openapi.exclude",
+    // include classes by packages
+    packages = "io.micronaut.openapi.extra"
+)
+class Application {
+}</code></pre>
+</div>
+</div>
+
+<h2 id="openapigroup"><a class="anchor" href="#openapigroup"></a>15.3 @OpenAPIGroup</h2>
 
 <div class='contribute-btn'>
     <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/6.12.x/src/main/docs/guide/micronautOpenApiAnnotations/openapigroup.adoc"'>
@@ -2394,7 +2441,7 @@ the description of the endpoints <code>/save</code> and <code>/save/{id}</code>.
 <p>You can read more about groups here: <a href="../versionsAndGroups.html">Versions and groups</a></p>
 </div>
 
-<h2 id="openapigroupinfo"><a class="anchor" href="#openapigroupinfo"></a>15.3 @OpenAPIGroupInfo</h2>
+<h2 id="openapigroupinfo"><a class="anchor" href="#openapigroupinfo"></a>15.4 @OpenAPIGroupInfo</h2>
 
 <div class='contribute-btn'>
     <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/6.12.x/src/main/docs/guide/micronautOpenApiAnnotations/openapigroupinfo.adoc"'>
@@ -2456,7 +2503,7 @@ public class Application {
 </div>
 </div>
 
-<h2 id="openapiinclude"><a class="anchor" href="#openapiinclude"></a>15.4 @OpenAPIInclude</h2>
+<h2 id="openapiinclude"><a class="anchor" href="#openapiinclude"></a>15.5 @OpenAPIInclude</h2>
 
 <div class='contribute-btn'>
     <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/6.12.x/src/main/docs/guide/micronautOpenApiAnnotations/openapiinclude.adoc"'>
@@ -2502,7 +2549,7 @@ public class Application {
 </div>
 </div>
 
-<h2 id="openapimanagement"><a class="anchor" href="#openapimanagement"></a>15.5 @OpenAPIManagement</h2>
+<h2 id="openapimanagement"><a class="anchor" href="#openapimanagement"></a>15.6 @OpenAPIManagement</h2>
 
 <div class='contribute-btn'>
     <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/6.12.x/src/main/docs/guide/micronautOpenApiAnnotations/openapimanagement.adoc"'>
@@ -2533,7 +2580,7 @@ public class Application {
 </div>
 </div>
 
-<h2 id="openapisecurity"><a class="anchor" href="#openapisecurity"></a>15.6 @OpenAPISecurity</h2>
+<h2 id="openapisecurity"><a class="anchor" href="#openapisecurity"></a>15.7 @OpenAPISecurity</h2>
 
 <div class='contribute-btn'>
     <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/6.12.x/src/main/docs/guide/micronautOpenApiAnnotations/openapisecurity.adoc"'>
@@ -2557,7 +2604,7 @@ public class Application {
 </div>
 </div>
 
-<h2 id="accessorsStyle"><a class="anchor" href="#accessorsStyle"></a>15.7 @AccessorsStyle</h2>
+<h2 id="accessorsStyle"><a class="anchor" href="#accessorsStyle"></a>15.8 @AccessorsStyle</h2>
 
 <div class='contribute-btn'>
     <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/6.12.x/src/main/docs/guide/micronautOpenApiAnnotations/accessorsStyle.adoc"'>
