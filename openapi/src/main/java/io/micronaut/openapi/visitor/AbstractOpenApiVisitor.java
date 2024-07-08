@@ -2729,7 +2729,10 @@ abstract class AbstractOpenApiVisitor {
                                 JsonIgnore.class.getName()
                             ))
                     ).stream()
-                    .filter(p -> !"groovy.lang.MetaClass".equals(p.getType().getName()))
+                    .filter(p ->
+                        !"groovy.lang.MetaClass".equals(p.getType().getName())
+                            && !"java.lang.Class".equals(p.getType().getName())
+                    )
                     .toList();
             } catch (Exception e) {
                 warn("Error with getting properties for class " + classElement.getName() + ": " + e + "\n" + Utils.printStackTrace(e), context, classElement);
