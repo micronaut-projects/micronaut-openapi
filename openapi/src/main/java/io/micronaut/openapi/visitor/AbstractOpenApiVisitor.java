@@ -54,6 +54,7 @@ import io.micronaut.inject.ast.GenericElement;
 import io.micronaut.inject.ast.GenericPlaceholderElement;
 import io.micronaut.inject.ast.MemberElement;
 import io.micronaut.inject.ast.PropertyElement;
+import io.micronaut.inject.ast.PropertyElementQuery;
 import io.micronaut.inject.ast.TypedElement;
 import io.micronaut.inject.ast.WildcardElement;
 import io.micronaut.inject.visitor.VisitorContext;
@@ -2721,8 +2722,17 @@ abstract class AbstractOpenApiVisitor {
         if (classElement != null && !ClassUtils.isJavaLangType(classElement.getName())) {
             List<PropertyElement> beanProperties;
             try {
-                beanProperties = classElement.getBeanProperties().stream()
-                    .filter(p -> !"groovy.lang.MetaClass".equals(p.getType().getName()))
+                beanProperties = classElement.getBeanProperties(
+                        PropertyElementQuery.of(classElement)
+                            .excludedAnnotations(Set.of(
+                                Hidden.class.getName(),
+                                JsonIgnore.class.getName()
+                            ))
+                    ).stream()
+                    .filter(p ->
+                        !"groovy.lang.MetaClass".equals(p.getType().getName())
+                            && !"java.lang.Class".equals(p.getType().getName())
+                    )
                     .toList();
             } catch (Exception e) {
                 warn("Error with getting properties for class " + classElement.getName() + ": " + e + "\n" + Utils.printStackTrace(e), context, classElement);
@@ -2794,14 +2804,7 @@ abstract class AbstractOpenApiVisitor {
         }
 
         for (TypedElement publicField : publicFields) {
-            boolean isHidden = getAnnotationMetadata(publicField).booleanValue(io.swagger.v3.oas.annotations.media.Schema.class, PROP_HIDDEN).orElse(false);
-            var jsonAnySetterAnn = getAnnotation(publicField, JsonAnySetter.class);
-            if (isAnnotationPresent(publicField, JsonIgnore.class)
-                || isAnnotationPresent(publicField, Hidden.class)
-                || (jsonAnySetterAnn != null && jsonAnySetterAnn.booleanValue("enabled").orElse(true))
-                || isHidden) {
-                continue;
-            }
+            if (isHiddenElement(publicField)) continue;
 
             var isGetterOverridden = false;
             JavadocDescription fieldJavadoc = null;
@@ -2847,6 +2850,17 @@ abstract class AbstractOpenApiVisitor {
                 );
             }
         }
+    }
+
+    private static boolean isHiddenElement(TypedElement elementType) {
+        boolean isHidden = getAnnotationMetadata(elementType)
+            .booleanValue(io.swagger.v3.oas.annotations.media.Schema.class, PROP_HIDDEN).orElse(false);
+        var jsonAnySetterAnn = getAnnotation(elementType, JsonAnySetter.class);
+        return elementType.getType().isAssignable(Class.class)
+                || isAnnotationPresent(elementType, JsonIgnore.class)
+                || isAnnotationPresent(elementType, Hidden.class)
+                || (jsonAnySetterAnn != null && jsonAnySetterAnn.booleanValue("enabled").orElse(true))
+                || isHidden;
     }
 
     private boolean allowedByJsonView(TypedElement publicField, String[] classLvlJsonViewClasses, ClassElement jsonViewClassEl, VisitorContext context) {
