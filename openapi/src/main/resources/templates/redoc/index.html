@@ -1,30 +1,37 @@
 <!doctype html>
-<html>
+<html lang="en">
     <head>
         <title>{{title}}</title>
         <meta charset='UTF-8' />
         <meta name='viewport' content='width=device-width, initial-scale=1' />
-        <link href='https://fonts.googleapis.com/css?family=Montserrat:300,400,700|Roboto:300,400,700' rel='stylesheet' />
-        <style>
-          body {
-            margin: 0;
-            padding: 0;
-          }
-        </style>
-        {{rapipdf.script}}
+        <style>body{margin:0;padding:0;} redoc{display:block;}</style>
     </head>
     <body>
         {{rapipdf.tag}}
         <redoc id='redoc' {{redoc.attributes}}></redoc>
-        <script src='{{redoc.js.url.prefix}}redoc.standalone.js'></script>
         <script>
             const extract = function(v) {
-                    return decodeURIComponent(v.replace(/(?:(?:^|.*;\s*)contextPath\s*\=\s*([^;]*).*$)|^.*$/, "$1"));
-                },
-                cookie = extract(document.cookie),
-                contextPath = cookie === '' ? extract(window.location.search.substring(1)) : cookie;
-            Redoc.init(contextPath + '{{specURL}}');
+                return decodeURIComponent(v.replace(/(?:^|.*;\s*)contextPath\s*=\s*([^;]*).*$|^.*$/, "$1"));
+            }
+            const cookie = extract(document.cookie);
+            const contextPath = cookie === '' ? extract(window.location.search.substring(1)) : cookie;
+            const head = document.getElementsByTagName('head')[0];
+            {{rapipdf.script}}
+            const redocJs = script(contextPath + "{{redoc.js.url.prefix}}redoc.standalone.js", head, true);
+            redocJs.onload = function () {
+                Redoc.init(contextPath + '{{specURL}}');
+            }
             {{rapipdf.specurl}}
-         </script>
+
+            function script(src, head, defer) {
+                const el = document.createElement('script');
+                el.src = src;
+                if (defer !== undefined && defer) {
+                    el.setAttribute("defer", "");
+                }
+                head.appendChild(el);
+                return el;
+            }
+        </script>
     </body>
 </html>

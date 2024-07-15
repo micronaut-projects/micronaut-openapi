@@ -4,10 +4,6 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1,user-scalable=yes">
     <title>OpenAPI Explorer</title>
-    <link rel="stylesheet" href="{{openapi-explorer.js.url.prefix}}default.min.css">
-    <link rel="stylesheet" href="{{openapi-explorer.js.url.prefix}}bootstrap.min.css" crossorigin="anonymous">
-    <link rel="stylesheet" href="{{openapi-explorer.js.url.prefix}}font-awesome.min.css">
-    <script src="{{openapi-explorer.js.url.prefix}}openapi-explorer.min.js" type="module" defer></script>
     <style>
         html, body {
             height: 100%
@@ -66,7 +62,6 @@
 </head>
 <body>
 
-
 <nav class="navbar navbar-dark bg-dark">
     <div class="container-fluid w-100 d-flex justify-content-between align-items-center">
         <div class="">
@@ -98,43 +93,75 @@
 <!--collapse table schema-description-expanded="true" nav-item-spacing="compact" show-components="true" bg-color="#FFFFFF" header-bg-color="#DEE2E6" nav-bg-color="#1D2F3B" text-color="#465865" nav-hover-text-color="#FFFFFF" primary-color="#1D2F3B" secondary-color="#FBAF0B"-->
 <script>
     const extract = function(v) {
-            return decodeURIComponent(v.replace(/(?:(?:^|.*;\s*)contextPath\s*\=\s*([^;]*).*$)|^.*$/, "$1"));
-        },
-        cookie = extract(document.cookie),
-        contextPath = cookie === '' ? extract(window.location.search.substring(1)) : cookie,
-        openApiExplorer = document.getElementById('openapi-explorer');
-    let specUrl = '{{specURL}}';
-    if (contextPath !== '') {
-        specUrl = contextPath + '{{specURL}}';
+        return decodeURIComponent(v.replace(/(?:^|.*;\s*)contextPath\s*=\s*([^;]*).*$|^.*$/, "$1"));
+    }
+    const cookie = extract(document.cookie)
+    const contextPath = cookie === '' ? extract(window.location.search.substring(1)) : cookie
+    const openApiExplorer = document.getElementById('openapi-explorer');
+    const head = document.getElementsByTagName('head')[0]
+
+    link(contextPath + "{{openapi-explorer.js.url.prefix}}default.min.css", head, "text/css", "stylesheet")
+    link(contextPath + "{{openapi-explorer.js.url.prefix}}bootstrap.min.css", head, "text/css", "stylesheet", "anonymous")
+    link(contextPath + "{{openapi-explorer.js.url.prefix}}font-awesome.min.css", head, "text/css", "stylesheet")
+    const openapiExplorerJs = script(contextPath + "{{openapi-explorer.js.url.prefix}}openapi-explorer.min.js", head, "module", true)
+
+    openapiExplorerJs.onload = function () {
+        let specUrl = '{{specURL}}';
+        if (contextPath !== '') {
+            specUrl = contextPath + '{{specURL}}';
+            openApiExplorer.setAttribute('spec-url', specUrl);
+            openApiExplorer.addEventListener('spec-loaded', e => {
+                e.detail.tags.forEach(tag => tag.paths.forEach(path => path.path = contextPath + path.path));
+                openApiExplorer.requestUpdate();
+            });
+        }
         openApiExplorer.setAttribute('spec-url', specUrl);
-        openApiExplorer.addEventListener('spec-loaded', e => {
-            e.detail.tags.forEach(tag => tag.paths.forEach(path => path.path = contextPath + path.path));
-            openApiExplorer.requestUpdate();
+        document.addEventListener('DOMContentLoaded', async () => {
+            const specUrl = document.getElementById('specUrl');
+            const currentSpecUrl = new URLSearchParams(window.location.search);
+            const newSpecUrl = currentSpecUrl.get('specUrl') || currentSpecUrl.get('url') || currentSpecUrl.get('spec');
+            if (newSpecUrl) {
+                document.getElementsByTagName("openapi-explorer")[0].setAttribute('spec-url', newSpecUrl);
+                specUrl.value = newSpecUrl;
+            }
+
+            const loadButton = document.getElementById('loadButton');
+            loadButton.addEventListener('click', () => {
+                try {
+                    const newUrl = new URL(window.location);
+                    newUrl.searchParams.set('url', specUrl.value);
+                    window.location.assign(newUrl.toString());
+                    document.getElementsByTagName("openapi-explorer")[0].setAttribute('spec-url', specUrl.value);
+                } catch (error) {
+                    console.error('Failed to set spec url into url address bar', error);
+                }
+            });
         });
     }
-    openApiExplorer.setAttribute('spec-url', specUrl);
-    document.addEventListener('DOMContentLoaded', async () => {
-        const specUrl = document.getElementById('specUrl');
-        const currentSpecUrl = new URLSearchParams(window.location.search);
-        const newSpecUrl = currentSpecUrl.get('specUrl') || currentSpecUrl.get('url') || currentSpecUrl.get('spec');
-        if (newSpecUrl) {
-            document.getElementsByTagName("openapi-explorer")[0].setAttribute('spec-url', newSpecUrl);
-            specUrl.value = newSpecUrl;
-        }
 
-        const loadButton = document.getElementById('loadButton');
-        loadButton.addEventListener('click', () => {
-            try {
-                const newUrl = new URL(window.location);
-                newUrl.searchParams.set('url', specUrl.value);
-                window.location.assign(newUrl.toString());
-                document.getElementsByTagName("openapi-explorer")[0].setAttribute('spec-url', specUrl.value);
-            } catch (error) {
-                console.error('Failed to set spec url into url address bar', error);
-            }
-        });
-    });
-    {{rapipdf.specurl}}
+    function link(href, head, type, rel, crossorigin) {
+        const el = document.createElement('link');
+        el.href = href;
+        el.type = type;
+        el.rel = rel;
+        if (crossorigin !== undefined && crossorigin) {
+            el.crossorigin = crossorigin;
+        }
+        head.appendChild(el);
+    }
+
+    function script(src, head, type, defer) {
+        const el = document.createElement('script');
+        el.src = src;
+        if (type !== undefined && type) {
+            el.type = type;
+        }
+        if (defer !== undefined && defer) {
+            el.setAttribute("defer", "");
+        }
+        head.appendChild(el);
+        return el;
+    }
 </script>
 
 </body>

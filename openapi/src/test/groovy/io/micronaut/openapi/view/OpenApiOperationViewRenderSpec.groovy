@@ -102,7 +102,7 @@ class OpenApiOperationViewRenderSpec extends Specification {
         !Files.exists(outputDir.resolve("redoc").resolve("res").resolve("redoc.standalone.js"))
         Files.exists(outputDir.resolve("redoc").resolve("res").resolve("rapipdf-min.js"))
 
-        outputDir.resolve("redoc").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains("<script src='https://cdn.redoc.ly/redoc/latest/bundles/redoc.standalone.js'></script>")
+        outputDir.resolve("redoc").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains("script(contextPath + \"https://cdn.redoc.ly/redoc/latest/bundles/redoc.standalone.js\", head, true)")
         outputDir.resolve("redoc").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains(cfg.getSpecURL(cfg.redocConfig, null))
     }
 
@@ -129,7 +129,7 @@ class OpenApiOperationViewRenderSpec extends Specification {
         !Files.exists(outputDir.resolve("openapi-explorer").resolve("res").resolve("openapi-explorer.min.js"))
         Files.exists(outputDir.resolve("openapi-explorer").resolve("res").resolve("rapipdf-min.js"))
 
-        outputDir.resolve("openapi-explorer").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains("<script src=\"https://unpkg.com/openapi-explorer/dist/browser/openapi-explorer.min.js\" type=\"module\" defer></script>")
+        outputDir.resolve("openapi-explorer").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains("script(contextPath + \"https://unpkg.com/openapi-explorer/dist/browser/openapi-explorer.min.js\", head, \"module\", true)")
         outputDir.resolve("openapi-explorer").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains(cfg.getSpecURL(cfg.openApiExplorerConfig, null))
     }
 
@@ -162,10 +162,10 @@ class OpenApiOperationViewRenderSpec extends Specification {
         Files.exists(outputDir.resolve("swagger-ui").resolve("res").resolve("rapipdf-min.js"))
 
         outputDir.resolve("swagger-ui").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains(cfg.getSpecURL(cfg.swaggerUIConfig, null))
-        outputDir.resolve("swagger-ui").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains("<script src='https://unpkg.com/swagger-ui-dist/swagger-ui-standalone-preset.js'></script>")
-        outputDir.resolve("swagger-ui").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains("<script src='https://unpkg.com/swagger-ui-dist/swagger-ui-bundle.js'></script>")
-        outputDir.resolve("swagger-ui").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains("<link rel='stylesheet' type='text/css' href='https://unpkg.com/swagger-ui-dist/swagger-ui.css' />")
-        outputDir.resolve("swagger-ui").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains("<link rel='stylesheet' type='text/css' href='https://flattop.com/theme.css' />")
+        outputDir.resolve("swagger-ui").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains("script(contextPath + \"https://unpkg.com/swagger-ui-dist/swagger-ui-standalone-preset.js\", head)")
+        outputDir.resolve("swagger-ui").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains("script(contextPath + \"https://unpkg.com/swagger-ui-dist/swagger-ui-bundle.js\", head)")
+        outputDir.resolve("swagger-ui").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains("link(contextPath + \"https://unpkg.com/swagger-ui-dist/swagger-ui.css\", head, \"text/css\", \"stylesheet\")")
+        outputDir.resolve("swagger-ui").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains("link(contextPath + \"https://flattop.com/theme.css\", head, \"text/css\", \"stylesheet\")")
     }
 
     void "test render OpenApiView specification with server context path"() {

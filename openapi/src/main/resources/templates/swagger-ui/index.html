@@ -4,26 +4,33 @@
 <head>
     <meta charset='UTF-8' />
     <title>{{title}}</title>
-    <link rel='icon' type='image/png' href='{{swagger-ui.js.url.prefix}}favicon-32x32.png' sizes='32x32' />
-    <link rel='icon' type='image/png' href='{{swagger-ui.js.url.prefix}}favicon-16x16.png' sizes='16x16' />
-    <script src='{{swagger-ui.js.url.prefix}}swagger-ui-bundle.js'></script>
-    <script src='{{swagger-ui.js.url.prefix}}swagger-ui-standalone-preset.js'></script>
-    <link rel='stylesheet' type='text/css' href='{{swagger-ui.js.url.prefix}}swagger-ui.css' />
-    {{swagger-ui.theme}}
-    {{rapipdf.script}}
 </head>
 
 <body>
     {{rapipdf.tag}}
     <div id='swagger-ui'></div>
     <script>
+
+        const extract = function(v) {
+            return decodeURIComponent(v.replace(/(?:^|.*;\s*)contextPath\s*=\s*([^;]*).*$|^.*$/, "$1"));
+        };
+        const cookie = extract(document.cookie);
+        const contextPath = cookie === '' ? extract(window.location.search.substring(1)) : cookie;
+        const head = document.getElementsByTagName('head')[0]
+        // link(contextPath + "{{swagger-ui.js.url.prefix}}index.css", head, "text/css", "stylesheet")
+        link(contextPath + "{{swagger-ui.js.url.prefix}}swagger-ui.css", head, "text/css", "stylesheet")
+        link(contextPath + "{{swagger-ui.js.url.prefix}}favicon-16x16.png", head, "image/png", "icon", "16x16")
+        link(contextPath + "{{swagger-ui.js.url.prefix}}favicon-32x32.png", head, "image/png", "icon", "32x32")
+        {{swagger-ui.theme}}
+        {{rapipdf.script}}
+
+
         window.onload = function() {
-            const extract = function(v) {
-                    return decodeURIComponent(v.replace(/(?:(?:^|.*;\s*)contextPath\s*\=\s*([^;]*).*$)|^.*$/, "$1"));
-                },
-                cookie = extract(document.cookie),
-                contextPath = cookie === '' ? extract(window.location.search.substring(1)) : cookie,
-                f = contextPath === '' ? undefined : () => {
+            const swaggerUiBundle = script(contextPath + "{{swagger-ui.js.url.prefix}}swagger-ui-bundle.js", head)
+            script(contextPath + "{{swagger-ui.js.url.prefix}}swagger-ui-standalone-preset.js", head)
+
+            swaggerUiBundle.onload = function() {
+                const f = contextPath === '' ? undefined : () => {
                     return {
                         statePlugins: {
                             spec: {
@@ -41,8 +48,8 @@
                             }
                         }
                     };
-                },
-                ui = SwaggerUIBundle({
+                };
+                const ui = SwaggerUIBundle({
                     url: contextPath + '{{specURL}}',
                     dom_id: '#swagger-ui',
                     presets: [
@@ -58,9 +65,28 @@
                     {{swagger-ui.attributes}}
                 });
                 {{swagger-ui.oauth2}}
-            window.ui = ui;
-            {{rapipdf.specurl}}
+                window.ui = ui;
+                {{rapipdf.specurl}}
+            };
         };
+
+        function link(href, head, type, rel, sizes) {
+            const el = document.createElement('link');
+            el.href = href;
+            el.type = type;
+            el.rel = rel;
+            if (sizes !== undefined && sizes) {
+                el.sizes = sizes;
+            }
+            head.appendChild(el);
+        }
+
+        function script(src, head) {
+            const el = document.createElement('script');
+            el.src = src;
+            head.appendChild(el);
+            return el;
+        }
     </script>
 </body>
 
