@@ -16,11 +16,11 @@ import {{javaxPackage}}.annotation.Generated
 {{/generatedAnnotation}}
 @EachProperty("security.api-key-auth")
 data class ApiKeyAuthConfiguration(
-    @Parameter val name: String,
+    @Parameter override val name: String,
     @NonNull var location: AuthKeyLocation,
     @NonNull var paramName: String,
     @NonNull var apiKey: String
-): ConfigurableAuthorization {
+) : ConfigurableAuthorization {
 
     override fun applyAuthorization(@NonNull request: MutableHttpRequest<*>) {
         when (location) {
@@ -35,8 +35,6 @@ data class ApiKeyAuthConfiguration(
             }
         }
     }
-
-    override fun getName() = name
 
     enum class AuthKeyLocation {
         HEADER,

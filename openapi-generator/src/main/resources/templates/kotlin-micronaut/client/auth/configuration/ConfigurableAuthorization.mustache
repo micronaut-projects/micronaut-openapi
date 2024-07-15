@@ -12,7 +12,7 @@ import {{javaxPackage}}.annotation.Generated
 {{/generatedAnnotation}}
 interface ConfigurableAuthorization {
 
-    fun getName(): String
+    val name: String
 
     fun applyAuthorization(@NonNull request: MutableHttpRequest<*>)
 }

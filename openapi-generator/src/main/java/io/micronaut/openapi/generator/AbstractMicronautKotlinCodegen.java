@@ -79,6 +79,7 @@ import static io.micronaut.openapi.generator.Utils.processGenericAnnotations;
 import static org.openapitools.codegen.CodegenConstants.API_PACKAGE;
 import static org.openapitools.codegen.CodegenConstants.INVOKER_PACKAGE;
 import static org.openapitools.codegen.CodegenConstants.MODEL_PACKAGE;
+import static org.openapitools.codegen.CodegenConstants.PACKAGE_NAME;
 import static org.openapitools.codegen.languages.KotlinClientCodegen.DATE_LIBRARY;
 import static org.openapitools.codegen.utils.StringUtils.camelize;
 import static org.openapitools.codegen.utils.StringUtils.underscore;
@@ -245,6 +246,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
 
         // Set client options that will be presented to user
         updateOption(INVOKER_PACKAGE, packageName);
+        updateOption(PACKAGE_NAME, packageName);
         updateOption(CodegenConstants.ARTIFACT_ID, artifactId);
         updateOption(CodegenConstants.API_PACKAGE, apiPackage);
         updateOption(CodegenConstants.MODEL_PACKAGE, modelPackage);
@@ -391,8 +393,10 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         updateOption(CodegenConstants.API_PACKAGE, apiPackage);
     }
 
-    public void setInvokerPackage(String packageName) {
+    public void setPackageName(String packageName) {
+        super.setPackageName(packageName);
         updateOption(INVOKER_PACKAGE, packageName);
+        updateOption(PACKAGE_NAME, packageName);
     }
 
     public void setPlural(boolean plural) {

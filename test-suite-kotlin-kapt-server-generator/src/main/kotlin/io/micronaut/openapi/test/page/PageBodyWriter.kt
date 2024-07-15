@@ -33,7 +33,7 @@ internal class PageBodyWriter<T>(
     constructor(registry: MessageBodyHandlerRegistry) : this(registry, null, null)
 
     override fun createSpecific(type: Argument<Page<T>>): MessageBodyWriter<Page<T>> {
-        val bt: Argument<List<T>> = Argument.listOf(type.typeParameters[0]) as Argument<List<T>>
+        val bt = Argument.listOf(type.typeParameters[0]) as Argument<List<T>>
         val writer = registry.findWriter(bt, listOf(MediaType.APPLICATION_JSON_TYPE))
                 .orElseThrow { ConfigurationException("No JSON message writer present") }
         return PageBodyWriter(registry, writer, bt)

@@ -12,7 +12,6 @@ import io.micronaut.http.filter.ClientFilterChain
 import io.micronaut.http.filter.HttpClientFilter
 import io.micronaut.inject.qualifiers.Qualifiers
 import io.micronaut.security.oauth2.client.clientcredentials.ClientCredentialsClient
-import io.micronaut.security.oauth2.client.clientcredentials.ClientCredentialsConfiguration
 import io.micronaut.security.oauth2.client.clientcredentials.propagation.ClientCredentialsHttpClientFilter
 import io.micronaut.security.oauth2.client.clientcredentials.propagation.ClientCredentialsTokenPropagator
 import io.micronaut.security.oauth2.configuration.OauthClientConfiguration
@@ -32,7 +31,7 @@ import {{javaxPackage}}.annotation.Generated
 {{/generatedAnnotation}}
 @Filter({{#configureAuthFilterPattern}}"{{authorizationFilterPattern}}"{{/configureAuthFilterPattern}}{{^configureAuthFilterPattern}}Filter.MATCH_ALL_PATTERN{{/configureAuthFilterPattern}})
 open class AuthorizationFilter(
-    defaultTokenPropagator: ClientCredentialsTokenPropagator,
+    var defaultTokenPropagator: ClientCredentialsTokenPropagator?,
     clientConfigurations: Stream<OauthClientConfiguration>,
     configurableAuthorizations: Stream<ConfigurableAuthorization>,
     private val beanContext: BeanContext,
@@ -46,12 +45,12 @@ open class AuthorizationFilter(
 
     init {
         clientConfigurationByName = clientConfigurations
-                .filter { obj: OauthClientConfiguration -> obj.isEnabled }
-                .collect(Collectors.toMap({ obj: OauthClientConfiguration -> obj.name }, { v: OauthClientConfiguration? -> v }))
+                .filter { it.isEnabled }
+                .collect(Collectors.toMap({ it.name }, { it }))
         tokenPropagatorByName = HashMap()
         clientCredentialsClientByName = HashMap()
         authorizationsByName = configurableAuthorizations
-                .collect(Collectors.toMap({ obj: ConfigurableAuthorization -> obj.getName() }, { v: ConfigurableAuthorization? -> v }))
+                .collect(Collectors.toMap({ it.name }, { it }))
     }
 
     override fun doFilter(request: @NonNull MutableHttpRequest<*>, chain: @NonNull ClientFilterChain): Publisher<out HttpResponse<*>?> {
@@ -124,7 +123,7 @@ open class AuthorizationFilter(
 
     protected fun getScope(oauthClient: @NonNull OauthClientConfiguration): @Nullable String? {
         return oauthClient.clientCredentials
-                .flatMap { obj: ClientCredentialsConfiguration -> obj.scope }
+                .flatMap { it.scope }
                 .orElse(null)
     }
 
