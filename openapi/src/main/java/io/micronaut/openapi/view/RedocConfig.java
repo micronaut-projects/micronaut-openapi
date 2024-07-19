@@ -15,18 +15,18 @@
  */
 package io.micronaut.openapi.view;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-
 import io.micronaut.core.annotation.Nullable;
 import io.micronaut.core.util.StringUtils;
 import io.micronaut.inject.visitor.VisitorContext;
 import io.micronaut.openapi.view.OpenApiViewConfig.RendererType;
 import io.micronaut.openapi.visitor.Pair;
 import io.micronaut.openapi.visitor.group.OpenApiInfo;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 
 import static io.micronaut.openapi.visitor.StringUtil.SLASH;
 
@@ -144,7 +144,6 @@ final class RedocConfig extends AbstractViewConfig {
      * @param properties A set of properties.
      * @param openApiInfos Open API info objects.
      * @param context Visitor context.
-     *
      * @return A RedocConfig.
      */
     static RedocConfig fromProperties(Map<String, String> properties, Map<Pair<String, String>, OpenApiInfo> openApiInfos, VisitorContext context) {

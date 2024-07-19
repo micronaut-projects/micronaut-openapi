@@ -15,14 +15,6 @@
  */
 package io.micronaut.openapi.view;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.core.annotation.Nullable;
 import io.micronaut.core.util.CollectionUtils;
@@ -32,6 +24,15 @@ import io.micronaut.openapi.view.OpenApiViewConfig.RendererType;
 import io.micronaut.openapi.visitor.Pair;
 import io.micronaut.openapi.visitor.group.OpenApiInfo;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+import static io.micronaut.openapi.view.OpenApiViewConfig.replacePlaceHolder;
 import static io.micronaut.openapi.visitor.StringUtil.DOT;
 import static io.micronaut.openapi.visitor.StringUtil.SLASH;
 
@@ -45,6 +46,7 @@ final class SwaggerUIConfig extends AbstractViewConfig {
     private static final String DEFAULT_SWAGGER_JS_PATH = OpenApiViewConfig.RESOURCE_DIR + SLASH;
 
     private static final List<String> RESOURCE_FILES = List.of(
+        DEFAULT_SWAGGER_JS_PATH + "index.css",
         DEFAULT_SWAGGER_JS_PATH + "swagger-ui.css",
         DEFAULT_SWAGGER_JS_PATH + "favicon-16x16.png",
         DEFAULT_SWAGGER_JS_PATH + "favicon-32x32.png",
@@ -238,7 +240,6 @@ final class SwaggerUIConfig extends AbstractViewConfig {
      * @param properties A set of properties.
      * @param openApiInfos Open API info objects.
      * @param context Visitor context.
-     *
      * @return A SwaggerUIConfig.
      */
     static SwaggerUIConfig fromProperties(Map<String, String> properties, Map<Pair<String, String>, OpenApiInfo> openApiInfos, VisitorContext context) {
@@ -265,10 +266,10 @@ final class SwaggerUIConfig extends AbstractViewConfig {
         String finalUrlPrefix = getFinalUrlPrefix(RendererType.SWAGGER_UI, context);
 
         template = rapiPDFConfig.render(template, RendererType.SWAGGER_UI, context);
-        template = OpenApiViewConfig.replacePlaceHolder(template, PREFIX_SWAGGER_UI + ".js.url.prefix", isDefaultJsUrl ? finalUrlPrefix : jsUrl, StringUtils.EMPTY_STRING);
-        template = OpenApiViewConfig.replacePlaceHolder(template, PREFIX_SWAGGER_UI + ".attributes", toOptions(), StringUtils.EMPTY_STRING);
+        template = replacePlaceHolder(template, PREFIX_SWAGGER_UI + ".js.url.prefix", isDefaultJsUrl ? finalUrlPrefix : jsUrl, StringUtils.EMPTY_STRING);
+        template = replacePlaceHolder(template, PREFIX_SWAGGER_UI + ".attributes", toOptions(), StringUtils.EMPTY_STRING);
         template = template.replace("{{" + PREFIX_SWAGGER_UI + ".theme}}", theme == null || Theme.CLASSIC == theme ? StringUtils.EMPTY_STRING :
-            "<link rel='stylesheet' type='text/css' href='" + (isDefaultThemeUrl ? finalUrlPrefix + theme.getCss() + ".css" : themeUrl) + "' />");
+            "link(contextPath + \"" + (isDefaultThemeUrl ? finalUrlPrefix + theme.getCss() + ".css" : themeUrl) + "\", head, \"text/css\", \"stylesheet\")");
         template = template.replace("{{" + PREFIX_SWAGGER_UI + DOT + OPTION_OAUTH2 + "}}", hasOauth2Option(options) ? toOauth2Options() : StringUtils.EMPTY_STRING);
         template = template.replace("{{" + PREFIX_SWAGGER_UI + DOT + OPTION_PRIMARY_NAME + "}}", StringUtils.isNotEmpty(primaryName) ? getPrimaryName(context) : StringUtils.EMPTY_STRING);
         template = template.replace("{{" + PREFIX_SWAGGER_UI + DOT + OPTION_URLS + "}}", getUrlStr(context));
