@@ -16,7 +16,7 @@ openapi-generator = "7.7.0"
 swagger-parser = "1.0.71"
 swagger-parser-v3 = "2.1.22"
 javaparser = "3.26.1"
-commons-codec = "1.17.0"
+commons-codec = "1.17.1"
 
 micronaut = "4.5.3"
 micronaut-platform = "4.5.0"
