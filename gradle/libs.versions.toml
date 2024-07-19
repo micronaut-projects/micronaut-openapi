@@ -8,7 +8,7 @@ managed-freemarker = "2.3.33"
 managed-pegdown = "1.6.0"
 managed-evo-inflector = "1.3"
 
-jspecify = "0.3.0"
+jspecify = "1.0.0"
 jdt-annotation = "2.3.0"
 android-annotation = "1.8.0"
 spotbugs-annotations = "4.8.6"
