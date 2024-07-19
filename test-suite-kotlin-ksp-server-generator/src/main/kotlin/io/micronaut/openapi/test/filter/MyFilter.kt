@@ -12,10 +12,10 @@ import java.util.regex.Pattern
  * @param conditions The filtering conditions
  */
 data class MyFilter(
-        val conditions: List<Condition>
+    val conditions: List<Condition>
 ) {
 
-    override fun toString(): String = conditions.joinToString( ",", transform = { it.toString() })
+    override fun toString() = conditions.joinToString(",", transform = { it.toString() })
 
     /**
      * A filtering condition.
@@ -30,9 +30,7 @@ data class MyFilter(
         val value: Any,
     ) {
 
-        override fun toString(): String {
-            return propertyName + comparator + value
-        }
+        override fun toString() = propertyName + comparator + value
 
         companion object {
             /**
@@ -48,9 +46,9 @@ data class MyFilter(
                     throw ParseException("The filter condition must match '$CONDITION_REGEX' but is '$string'")
                 }
                 return Condition(
-                        matcher.group(1),
-                        ConditionComparator.parse(matcher.group(2)),
-                        matcher.group(3)
+                    matcher.group(1),
+                    ConditionComparator.parse(matcher.group(2)),
+                    matcher.group(3)
                 )
             }
         }
@@ -98,6 +96,7 @@ data class MyFilter(
 
     companion object {
         private const val CONDITION_REGEX = "^(.+)([<>=])(.+)$"
+
         /**
          * An implementation with no filtering.
          */
@@ -116,8 +115,7 @@ data class MyFilter(
                 return EMPTY
             }
             val conditions = value.split(",")
-                    .map { Condition.parse(it) }
-                    .toList()
+                .map { Condition.parse(it) }
             return MyFilter(conditions)
         }
     }

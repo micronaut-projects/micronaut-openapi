@@ -40,9 +40,9 @@ public class AuthorizationBinder implements AnnotatedClientRequestBinder<Authori
                 .getAnnotationValuesByType(Authorization.class);
 
         if (CollectionUtils.isNotEmpty(annotations)) {
-            List<String> authorizationNames = new ArrayList<>();
+            var authorizationNames = new ArrayList<String>();
             for (AnnotationValue<Authorization> annotation : annotations) {
-                annotation.get("name", String.class)
+                annotation.stringValue("name")
                         .filter(StringUtils::isNotEmpty)
                         .ifPresent(v -> authorizationNames.add(configurationName(v)));
             }

@@ -34,9 +34,9 @@ open class AuthorizationBinder : AnnotatedClientRequestBinder<Authorization> {
         if (annotations.isNotEmpty()) {
             val authorizationNames = ArrayList<String>()
             for (ann in annotations) {
-                ann.get("name", String::class.java)
-                        .filter{ s -> !s.isNullOrEmpty()}
-                        .ifPresent {v -> authorizationNames.add(configurationName(v))}
+                ann.stringValue("name")
+                        .filter{ s -> !s.isNullOrEmpty() }
+                        .ifPresent { v -> authorizationNames.add(configurationName(v)) }
             }
             request.setAttribute(AUTHORIZATION_NAMES, authorizationNames)
         }

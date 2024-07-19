@@ -196,7 +196,7 @@ public final class MicronautCodeGeneratorEntryPoint {
         } else if (options.lang == GeneratorLanguage.KOTLIN && codeGenerator instanceof AbstractMicronautKotlinCodegen<?> kotlinCodeGen) {
 
             if (options.invokerPackage != null) {
-                kotlinCodeGen.setInvokerPackage(options.invokerPackage);
+                kotlinCodeGen.setPackageName(options.invokerPackage);
             }
             if (options.artifactId != null) {
                 kotlinCodeGen.setArtifactId(options.artifactId);

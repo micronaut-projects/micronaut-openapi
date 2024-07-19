@@ -34,7 +34,7 @@ internal class DatedResponseBodyWriter<T> private constructor(
     override fun createSpecific(
             type: Argument<DatedResponse<T>>
     ): MessageBodyWriter<DatedResponse<T>> {
-        val bt: Argument<T> = type.typeParameters[0] as Argument<T>
+        val bt = type.typeParameters[0] as Argument<T>
         val writer = registry.findWriter(bt, listOf(MediaType.APPLICATION_JSON_TYPE))
                 .orElseThrow { ConfigurationException("No JSON message writer present") }
         return DatedResponseBodyWriter(registry, writer, bt)
