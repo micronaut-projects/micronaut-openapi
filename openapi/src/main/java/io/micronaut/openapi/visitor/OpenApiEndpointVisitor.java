@@ -221,7 +221,7 @@ public class OpenApiEndpointVisitor extends AbstractOpenApiEndpointVisitor imple
     }
 
     @Override
-    protected List<Tag> classTags(ClassElement element, VisitorContext context) {
+    protected List<Tag> getUserDefinedClassTags(ClassElement element, VisitorContext context) {
         var allTags = new ArrayList<>(tags);
         allTags.addAll(ContextUtils.get(MICRONAUT_INTERNAL_OPENAPI_ENDPOINT_CLASS_TAGS, TAGS_LIST_ARGUMENT, Collections.emptyList(), context));
         return allTags;

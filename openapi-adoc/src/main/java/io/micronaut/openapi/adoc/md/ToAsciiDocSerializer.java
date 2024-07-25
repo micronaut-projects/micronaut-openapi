@@ -408,7 +408,6 @@ public class ToAsciiDocSerializer implements Visitor {
 
     @Override
     public void visit(TableCellNode node) {
-//        String tag = inTableHeader ? "th" : "td";
         List<TableColumnNode> columns = currentTableNode.getColumns();
         TableColumnNode column = columns.get(Math.min(currentTableColumn, columns.size() - 1));
 
@@ -439,7 +438,6 @@ public class ToAsciiDocSerializer implements Visitor {
     @Override
     public void visit(TableHeaderNode node) {
         inTableHeader = true;
-//        printIndentedTag(node, "thead");
 
         visitChildren(node);
 
@@ -501,7 +499,6 @@ public class ToAsciiDocSerializer implements Visitor {
         printer.println();
 
         visitChildren(node);
-//        printIndentedTag(node, "tr");
 
         if (inTableHeader) {
             printer.println();

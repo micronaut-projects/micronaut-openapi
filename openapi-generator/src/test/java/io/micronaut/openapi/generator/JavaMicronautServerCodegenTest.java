@@ -24,7 +24,7 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
         codegen.cliOptions()
             .stream()
             .collect(groupingBy(CliOption::getOpt))
-            .forEach((k, v) -> assertEquals(v.size(), 1, k + " is described multiple times"));
+            .forEach((k, v) -> assertEquals(1, v.size(), k + " is described multiple times"));
     }
 
     @Test
@@ -32,20 +32,20 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
         final var codegen = new JavaMicronautServerCodegen();
         codegen.processOpts();
 
-        OpenAPI openAPI = new OpenAPI();
+        var openAPI = new OpenAPI();
         openAPI.addServersItem(new Server().url("https://one.com/v2"));
         openAPI.setInfo(new Info());
         codegen.preprocessOpenAPI(openAPI);
 
-        assertEquals(codegen.additionalProperties().get(CodegenConstants.HIDE_GENERATION_TIMESTAMP), Boolean.FALSE);
+        assertEquals(Boolean.FALSE, codegen.additionalProperties().get(CodegenConstants.HIDE_GENERATION_TIMESTAMP));
         assertFalse(codegen.isHideGenerationTimestamp());
-        assertEquals(codegen.modelPackage(), "org.openapitools.model");
-        assertEquals(codegen.additionalProperties().get(CodegenConstants.MODEL_PACKAGE), "org.openapitools.model");
-        assertEquals(codegen.apiPackage(), "org.openapitools.api");
-        assertEquals(codegen.additionalProperties().get(CodegenConstants.API_PACKAGE), "org.openapitools.api");
-        assertEquals(codegen.additionalProperties().get(JavaMicronautServerCodegen.OPT_CONTROLLER_PACKAGE), "org.openapitools.controller");
-        assertEquals(codegen.getInvokerPackage(), "org.openapitools");
-        assertEquals(codegen.additionalProperties().get(CodegenConstants.INVOKER_PACKAGE), "org.openapitools");
+        assertEquals("org.openapitools.model", codegen.modelPackage());
+        assertEquals("org.openapitools.model", codegen.additionalProperties().get(CodegenConstants.MODEL_PACKAGE));
+        assertEquals("org.openapitools.api", codegen.apiPackage());
+        assertEquals("org.openapitools.api", codegen.additionalProperties().get(CodegenConstants.API_PACKAGE));
+        assertEquals("org.openapitools.controller", codegen.additionalProperties().get(JavaMicronautServerCodegen.OPT_CONTROLLER_PACKAGE));
+        assertEquals("org.openapitools", codegen.getInvokerPackage());
+        assertEquals("org.openapitools", codegen.additionalProperties().get(CodegenConstants.INVOKER_PACKAGE));
     }
 
     @Test

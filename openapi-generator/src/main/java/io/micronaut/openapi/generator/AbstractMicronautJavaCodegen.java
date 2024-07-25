@@ -606,7 +606,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
 
     @Override
     public String apiTestFileFolder() {
-        return testFileFolder() + apiPackage().replaceAll("\\.", "/");
+        return testFileFolder() + apiPackage().replace(".", "/");
     }
 
     @Override
@@ -854,13 +854,13 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
             // is only default "application/json" media type
             if (op.consumes == null
                     || op.consumes.isEmpty()
-                    || op.consumes.size() == 1 && "application/json".equals(op.consumes.get(0).get("mediaType"))) {
+                    || op.consumes.size() == 1 && CONTENT_TYPE_APPLICATION_JSON.equals(op.consumes.get(0).get("mediaType"))) {
                 op.vendorExtensions.put("onlyDefaultConsumeOrEmpty", true);
             }
             // is only default "application/json" media type
             if (op.produces == null
                     || op.produces.isEmpty()
-                    || op.produces.size() == 1 && "application/json".equals(op.produces.get(0).get("mediaType"))) {
+                    || op.produces.size() == 1 && CONTENT_TYPE_APPLICATION_JSON.equals(op.produces.get(0).get("mediaType"))) {
                 op.vendorExtensions.put("onlyDefaultProduceOrEmpty", true);
             }
 

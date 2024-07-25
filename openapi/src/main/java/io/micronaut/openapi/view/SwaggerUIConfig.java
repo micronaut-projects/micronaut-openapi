@@ -32,6 +32,7 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static io.micronaut.core.util.StringUtils.EMPTY_STRING;
 import static io.micronaut.openapi.view.OpenApiViewConfig.replacePlaceHolder;
 import static io.micronaut.openapi.visitor.StringUtil.DOT;
 import static io.micronaut.openapi.visitor.StringUtil.SLASH;
@@ -226,7 +227,7 @@ final class SwaggerUIConfig extends AbstractViewConfig {
         if (StringUtils.hasText(properties)) {
             return "ui.initOAuth({\n" + properties + "\n});";
         } else {
-            return StringUtils.EMPTY_STRING;
+            return EMPTY_STRING;
         }
     }
 
@@ -266,12 +267,17 @@ final class SwaggerUIConfig extends AbstractViewConfig {
         String finalUrlPrefix = getFinalUrlPrefix(RendererType.SWAGGER_UI, context);
 
         template = rapiPDFConfig.render(template, RendererType.SWAGGER_UI, context);
-        template = replacePlaceHolder(template, PREFIX_SWAGGER_UI + ".js.url.prefix", isDefaultJsUrl ? finalUrlPrefix : jsUrl, StringUtils.EMPTY_STRING);
-        template = replacePlaceHolder(template, PREFIX_SWAGGER_UI + ".attributes", toOptions(), StringUtils.EMPTY_STRING);
-        template = template.replace("{{" + PREFIX_SWAGGER_UI + ".theme}}", theme == null || Theme.CLASSIC == theme ? StringUtils.EMPTY_STRING :
-            "link(contextPath + \"" + (isDefaultThemeUrl ? finalUrlPrefix + theme.getCss() + ".css" : themeUrl) + "\", head, \"text/css\", \"stylesheet\")");
-        template = template.replace("{{" + PREFIX_SWAGGER_UI + DOT + OPTION_OAUTH2 + "}}", hasOauth2Option(options) ? toOauth2Options() : StringUtils.EMPTY_STRING);
-        template = template.replace("{{" + PREFIX_SWAGGER_UI + DOT + OPTION_PRIMARY_NAME + "}}", StringUtils.isNotEmpty(primaryName) ? getPrimaryName(context) : StringUtils.EMPTY_STRING);
+        template = replacePlaceHolder(template, PREFIX_SWAGGER_UI + ".js.url.prefix", isDefaultJsUrl ? finalUrlPrefix : jsUrl, EMPTY_STRING);
+        template = replacePlaceHolder(template, PREFIX_SWAGGER_UI + ".attributes", toOptions(), EMPTY_STRING);
+
+        if (theme != null && Theme.CLASSIC != theme) {
+            var themeCssLink =  isDefaultThemeUrl ? finalUrlPrefix + theme.getCss() + ".css" : themeUrl;
+            template = template.replace("{{" + PREFIX_SWAGGER_UI + ".theme}}", "link(contextPath + \"" + themeCssLink + "\", head, \"text/css\", \"stylesheet\")");
+        } else {
+            template = template.replace("{{" + PREFIX_SWAGGER_UI + ".theme}}", EMPTY_STRING);
+        }
+        template = template.replace("{{" + PREFIX_SWAGGER_UI + DOT + OPTION_OAUTH2 + "}}", hasOauth2Option(options) ? toOauth2Options() : EMPTY_STRING);
+        template = template.replace("{{" + PREFIX_SWAGGER_UI + DOT + OPTION_PRIMARY_NAME + "}}", StringUtils.isNotEmpty(primaryName) ? getPrimaryName(context) : EMPTY_STRING);
         template = template.replace("{{" + PREFIX_SWAGGER_UI + DOT + OPTION_URLS + "}}", getUrlStr(context));
         return template;
     }
@@ -279,7 +285,7 @@ final class SwaggerUIConfig extends AbstractViewConfig {
     @NonNull
     private String getPrimaryName(VisitorContext context) {
         if (StringUtils.isEmpty(primaryName)) {
-            return StringUtils.EMPTY_STRING;
+            return EMPTY_STRING;
         }
         return "\"urls.primaryName\":\"" + primaryName + "\",";
     }
@@ -287,7 +293,7 @@ final class SwaggerUIConfig extends AbstractViewConfig {
     @NonNull
     private String getUrlStr(VisitorContext context) {
         if (CollectionUtils.isEmpty(urls) || (withUrls != null && !withUrls)) {
-            return StringUtils.EMPTY_STRING;
+            return EMPTY_STRING;
         }
 
         var isFirst = true;
