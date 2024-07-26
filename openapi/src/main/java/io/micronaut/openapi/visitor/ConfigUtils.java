@@ -50,6 +50,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 
+import static io.micronaut.core.util.StringUtils.EMPTY_STRING;
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_CUSTOM_SCHEMAS;
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_ENVIRONMENT;
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_ENVIRONMENT_CREATED;
@@ -66,6 +67,7 @@ import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_OP
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_OPENAPI_PROPERTIES;
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_ROUTER_VERSIONING_PROPERTIES;
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_SCHEMA_DECORATORS;
+import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_SCHEMA_NAME_SEPARATOR_EMPTY;
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_SECURITY_PROPERTIES;
 import static io.micronaut.openapi.visitor.ContextUtils.ARGUMENT_CUSTOM_SCHEMA_MAP;
 import static io.micronaut.openapi.visitor.ContextUtils.ARGUMENT_GROUP_PROPERTIES_MAP;
@@ -93,6 +95,9 @@ import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENA
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_JSON_VIEW_DEFAULT_INCLUSION;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_PROJECT_DIR;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_SCHEMA;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_SCHEMA_NAME_SEPARATOR_EMPTY;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_SCHEMA_NAME_SEPARATOR_GENERIC;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_SCHEMA_NAME_SEPARATOR_INNER_CLASS;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_SCHEMA_POSTFIX;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_SCHEMA_PREFIX;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_SECURITY_DEFAULT_SCHEMA_NAME;
@@ -102,6 +107,7 @@ import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENA
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.OPENAPI_CONFIG_FILE;
 import static io.micronaut.openapi.visitor.StringUtil.COMMA;
 import static io.micronaut.openapi.visitor.StringUtil.DOT;
+import static io.micronaut.openapi.visitor.StringUtil.UNDERSCORE;
 import static io.micronaut.openapi.visitor.StringUtil.WILDCARD;
 import static io.micronaut.openapi.visitor.group.RouterVersioningProperties.DEFAULT_HEADER_NAME;
 import static io.micronaut.openapi.visitor.group.RouterVersioningProperties.DEFAULT_PARAMETER_NAME;
@@ -240,6 +246,35 @@ public final class ConfigUtils {
 
         System.setProperty(MICRONAUT_OPENAPI_ENABLED, Boolean.toString(value));
         return value;
+    }
+
+    public static boolean isSchemaNameSeparatorEmpty(VisitorContext context) {
+        Boolean loadedValue = ContextUtils.get(MICRONAUT_INTERNAL_SCHEMA_NAME_SEPARATOR_EMPTY, Boolean.class, context);
+        if (loadedValue != null) {
+            return loadedValue;
+        }
+        boolean value = getBooleanProperty(MICRONAUT_OPENAPI_SCHEMA_NAME_SEPARATOR_EMPTY, false, context);
+        ContextUtils.put(MICRONAUT_INTERNAL_SCHEMA_NAME_SEPARATOR_EMPTY, value, context);
+
+        System.setProperty(MICRONAUT_OPENAPI_SCHEMA_NAME_SEPARATOR_EMPTY, Boolean.toString(value));
+        return value;
+    }
+
+    public static String getGenericSeparator(VisitorContext context) {
+        if (isSchemaNameSeparatorEmpty(context)) {
+            return EMPTY_STRING;
+        }
+
+        var value = getConfigProperty(MICRONAUT_OPENAPI_SCHEMA_NAME_SEPARATOR_GENERIC, context);
+        return StringUtils.isNotEmpty(value) ? value : UNDERSCORE;
+    }
+
+    public static String getInnerClassSeparator(VisitorContext context) {
+        if (isSchemaNameSeparatorEmpty(context)) {
+            return EMPTY_STRING;
+        }
+        var value = getConfigProperty(MICRONAUT_OPENAPI_SCHEMA_NAME_SEPARATOR_INNER_CLASS, context);
+        return StringUtils.isNotEmpty(value) ? value : DOT;
     }
 
     public static String getJsonSchemaDialect(VisitorContext context) {

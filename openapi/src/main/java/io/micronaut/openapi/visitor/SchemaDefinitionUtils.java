@@ -116,9 +116,12 @@ import java.util.UUID;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
+import static io.micronaut.core.util.StringUtils.EMPTY_STRING;
 import static io.micronaut.openapi.visitor.ConfigUtils.getConfigProperty;
 import static io.micronaut.openapi.visitor.ConfigUtils.getCustomSchema;
 import static io.micronaut.openapi.visitor.ConfigUtils.getExpandableProperties;
+import static io.micronaut.openapi.visitor.ConfigUtils.getGenericSeparator;
+import static io.micronaut.openapi.visitor.ConfigUtils.getInnerClassSeparator;
 import static io.micronaut.openapi.visitor.ConfigUtils.getSchemaDecoration;
 import static io.micronaut.openapi.visitor.ConfigUtils.isJsonViewDefaultInclusion;
 import static io.micronaut.openapi.visitor.ContextUtils.warn;
@@ -196,7 +199,6 @@ import static io.micronaut.openapi.visitor.SchemaUtils.setAllowableValues;
 import static io.micronaut.openapi.visitor.SchemaUtils.setSpecVersion;
 import static io.micronaut.openapi.visitor.StringUtil.DOLLAR;
 import static io.micronaut.openapi.visitor.StringUtil.DOT;
-import static io.micronaut.openapi.visitor.StringUtil.UNDERSCORE;
 import static io.micronaut.openapi.visitor.Utils.isOpenapi31;
 import static io.micronaut.openapi.visitor.Utils.resolveOpenApi;
 import static java.util.stream.Collectors.toMap;
@@ -441,16 +443,26 @@ public final class SchemaDefinitionUtils {
     public static String computeDefaultSchemaName(Element definingElement, Element type, Map<String, ClassElement> typeArgs, VisitorContext context,
                                                   @Nullable ClassElement jsonViewClass) {
 
-        String jsonViewPostfix = StringUtils.EMPTY_STRING;
+        var genericSeparator = getGenericSeparator(context);
+        var innerClassSeparator = getInnerClassSeparator(context);
+
+        String jsonViewPostfix = EMPTY_STRING;
         if (jsonViewClass != null) {
             String jsonViewClassName = jsonViewClass.getName();
-            jsonViewClassName = jsonViewClassName.replaceAll("\\$", DOT);
-            jsonViewPostfix = UNDERSCORE + (jsonViewClassName.contains(DOT) ? jsonViewClassName.substring(jsonViewClassName.lastIndexOf('.') + 1) : jsonViewClassName);
+            jsonViewClassName = jsonViewClassName.replace(DOLLAR, DOT);
+            jsonViewPostfix = genericSeparator + (jsonViewClassName.contains(DOT) ? jsonViewClassName.substring(jsonViewClassName.lastIndexOf(DOT) + 1) : jsonViewClassName);
         }
 
-        final String metaAnnName = definingElement == null ? null : definingElement.getAnnotationNameByStereotype(io.swagger.v3.oas.annotations.media.Schema.class).orElse(null);
+        String metaAnnName = null;
+        if (definingElement != null) {
+            metaAnnName = definingElement.getAnnotationNameByStereotype(io.swagger.v3.oas.annotations.media.Schema.class).orElse(null);
+        }
         if (metaAnnName != null && !io.swagger.v3.oas.annotations.media.Schema.class.getName().equals(metaAnnName)) {
-            return NameUtils.getSimpleName(metaAnnName) + jsonViewPostfix;
+            var resultSchemaName = NameUtils.getSimpleName(metaAnnName) + jsonViewPostfix;
+            if (!DOT.equals(innerClassSeparator)) {
+                resultSchemaName = resultSchemaName.replace(DOT, innerClassSeparator);
+            }
+            return resultSchemaName;
         }
         String packageName;
         String resultSchemaName;
@@ -469,13 +481,13 @@ public final class SchemaDefinitionUtils {
         }
 
         ConfigUtils.SchemaDecorator schemaDecorator = getSchemaDecoration(packageName, context);
-        resultSchemaName = resultSchemaName.replace(DOLLAR, DOT) + jsonViewPostfix;
+        resultSchemaName = resultSchemaName.replace(DOLLAR, innerClassSeparator) + jsonViewPostfix;
         if (schemaDecorator != null) {
-            resultSchemaName = (StringUtils.hasText(schemaDecorator.getPrefix()) ? schemaDecorator.getPrefix() : StringUtils.EMPTY_STRING)
+            resultSchemaName = (StringUtils.hasText(schemaDecorator.getPrefix()) ? schemaDecorator.getPrefix() : EMPTY_STRING)
                     + resultSchemaName
-                    + (StringUtils.hasText(schemaDecorator.getPostfix()) ? schemaDecorator.getPostfix() : StringUtils.EMPTY_STRING);
+                    + (StringUtils.hasText(schemaDecorator.getPostfix()) ? schemaDecorator.getPostfix() : EMPTY_STRING);
         }
-        String fullClassNameWithGenerics = packageName + '.' + resultSchemaName;
+        String fullClassNameWithGenerics = packageName + DOT + resultSchemaName;
 
         // Check if the class exists in other packages. If so, you need to add a suffix,
         // because there are two classes in different packages, but with the same class name.
@@ -484,7 +496,7 @@ public final class SchemaDefinitionUtils {
             int index = shemaNameSuffixCounterMap.getOrDefault(resultSchemaName, 0);
             index++;
             shemaNameSuffixCounterMap.put(resultSchemaName, index);
-            resultSchemaName += UNDERSCORE + index;
+            resultSchemaName += genericSeparator + index;
         }
         schemaNameToClassNameMap.put(resultSchemaName, fullClassNameWithGenerics);
 
@@ -2545,11 +2557,15 @@ public final class SchemaDefinitionUtils {
     }
 
     private static void computeNameWithGenerics(ClassElement classElement, StringBuilder builder, Set<String> computed, Map<String, ClassElement> typeArgs, VisitorContext context) {
+
+        var genericSeparator = getGenericSeparator(context);
+        var innerClassSeparator = getInnerClassSeparator(context);
+
         computed.add(classElement.getName());
         final Iterator<ClassElement> i = typeArgs.values().iterator();
         if (i.hasNext()) {
 
-            builder.append('_');
+            builder.append(genericSeparator);
             while (i.hasNext()) {
                 ClassElement ce = i.next();
                 if (ClassUtils.isJavaLangType(ce.getName())) {
@@ -2557,7 +2573,7 @@ public final class SchemaDefinitionUtils {
                     if (CollectionUtils.isNotEmpty(typeArgAnnotations)) {
                         for (var typeArgAnnName : typeArgAnnotations) {
                             var annValue = ce.getAnnotation(typeArgAnnName);
-                            builder.append(addTypeArgsAnnotations(null, typeArgAnnName.endsWith("$List") ? annValue.getValues().get(PROP_VALUE) : annValue));
+                            builder.append(addTypeArgsAnnotations(null, typeArgAnnName.endsWith("$List") ? annValue.getValues().get(PROP_VALUE) : annValue, context));
                         }
                     }
                 }
@@ -2571,14 +2587,17 @@ public final class SchemaDefinitionUtils {
                     computeNameWithGenerics(ce, builder, computed, ceTypeArgs, context);
                 }
                 if (i.hasNext()) {
-                    builder.append('.');
+                    builder.append(innerClassSeparator);
                 }
             }
-            builder.append('_');
+            builder.append(genericSeparator);
         }
     }
 
-    private static String addTypeArgsAnnotations(String memberName, Object annValue) {
+    private static String addTypeArgsAnnotations(String memberName, Object annValue, VisitorContext context) {
+
+        var genericSeparator = getGenericSeparator(context);
+        var innerClassSeparator = getInnerClassSeparator(context);
 
         var result = new StringBuilder();
 
@@ -2586,33 +2605,35 @@ public final class SchemaDefinitionUtils {
             var annName = aValue.getAnnotationName();
             var values = ((Map<String, Object>) aValue.getValues());
             var endPos = annName.contains(DOLLAR) ? annName.lastIndexOf(DOLLAR) : annName.length();
-            result.append(annName, annName.lastIndexOf('.') + 1, endPos);
+            result.append(annName, annName.lastIndexOf(DOT) + 1, endPos);
             if (CollectionUtils.isNotEmpty(values)) {
-                result.append('_');
+                result.append(genericSeparator);
                 for (var entry : values.entrySet()) {
-                    result.append(addTypeArgsAnnotations(entry.getKey(), entry.getValue()));
+                    result.append(addTypeArgsAnnotations(entry.getKey(), entry.getValue(), context));
                 }
-                result.append('_');
+                result.append(genericSeparator);
             }
         } else if (annValue instanceof Iterable<?> iterable) {
             var isFirst = true;
             for (var item : iterable) {
                 if (!isFirst) {
-                    result.append('_');
+                    result.append(genericSeparator);
                 }
                 if (memberName != null) {
-                    result.append(memberName).append('_');
+                    result.append(memberName).append(genericSeparator);
                 }
-                result.append(addTypeArgsAnnotations(null, item));
+                result.append(addTypeArgsAnnotations(null, item, context));
                 isFirst = false;
             }
         } else {
             if (memberName != null && !memberName.equals(PROP_VALUE)) {
-                result.append(memberName).append('_');
+                result.append(memberName).append(genericSeparator);
             }
             result.append(annValue);
         }
-        return result.toString();
+        var resultTypeName = result.toString();
+        resultTypeName = resultTypeName.replace(DOT, innerClassSeparator);
+        return resultTypeName;
     }
 
     private static String resolvePropertyName(Element element, Element classElement, Schema<?> propertySchema) {
@@ -2662,8 +2683,8 @@ public final class SchemaDefinitionUtils {
         if (CollectionUtils.isEmpty(properties)) {
             return;
         }
-        String prefix = uw.stringValue("prefix").orElse(StringUtils.EMPTY_STRING);
-        String suffix = uw.stringValue("suffix").orElse(StringUtils.EMPTY_STRING);
+        String prefix = uw.stringValue("prefix").orElse(EMPTY_STRING);
+        String suffix = uw.stringValue("suffix").orElse(EMPTY_STRING);
         for (Map.Entry<String, Schema> prop : properties.entrySet()) {
             try {
                 String propertyName = prop.getKey();

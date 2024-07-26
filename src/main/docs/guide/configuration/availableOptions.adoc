@@ -2,6 +2,9 @@
 |`*micronaut.openapi.enabled*` | System property that enables or disables open api annotation processing. | Default: `true`
 |`*micronaut.openapi.openapi31.enabled*` | System property that enables or disables OpenAPI 3.1.0 format. | Default: `false`
 |`*micronaut.openapi.openapi31.json-schema-dialect*` | System property that set JSON Schema Dialect for OpenAPI 3.1.0 format. | Default: ``
+|`*micronaut.openapi.schema.name.separator.empty*` | If this property true, generic separators and inner class separators in schema name will be empty string. | Default: `false`
+|`*micronaut.openapi.schema.name.separator.generic*` | System property that set generic class separator for schema name generation. | Default: `_`
+|`*micronaut.openapi.schema.name.separator.inner-class*` | System property that set inner class separator for schema name generation. | Default: `.`
 |`*micronaut.openapi.swagger.file.generation.enabled*` | System property that enables or disables generation of a swagger (OpenAPI) specification file. This can be used whenever you already have a specification file and that you only need the Swagger UI. | Default: `true`
 |`*micronaut.openapi.config.file*` | System property that enables setting the open api config file. |
 |`*micronaut.openapi.server.context.path*` | System property for server context path. |
@@ -12,7 +15,7 @@
 |`*micronaut.openapi.additional.files*` | System property that specifies the location of additional swagger YAML and JSON files to read from. |
 |`*micronaut.openapi.project.dir*` | System property that specifies the location of current project. Need to set this property manually if you use kotlin (to save incremental annotation processing) or have some troubles with auto calculation project path. | Default: calculated automatically
 |`*micronaut.openapi.security.default-schema-name*` | System property that specifies the default security schema name, if it's not specified by annotation SecurityScheme. |
-|`*micronaut.openapi.security.enabled*` | Is this property true, micronaut-openapi will process micronaut-security properties and annotations to construct openapi security schema. | Default: `true`
+|`*micronaut.openapi.security.enabled*` | If this property true, micronaut-openapi will process micronaut-security properties and annotations to construct openapi security schema. | Default: `true`
 |`*micronaut.openapi.field.visibility.level*` | System property that specifies the schema classes fields visibility level. By default, only public fields visible. +
 {nbsp} +
 **Available values:** +

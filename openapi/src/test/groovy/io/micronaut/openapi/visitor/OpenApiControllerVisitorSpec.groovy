@@ -390,7 +390,7 @@ class MyController {
      }
 
     @io.micronaut.http.annotation.Error
-    public HttpResponse<JsonError> jsonError(HttpRequest request, JsonParseException jsonParseException) {
+    public HttpResponse<JsonError> jsonError(HttpRequest<?> request, JsonParseException jsonParseException) {
         JsonError error = new JsonError("Invalid JSON: " + jsonParseException.getMessage())
                 .link(Link.SELF, Link.of(request.getUri()));
 
