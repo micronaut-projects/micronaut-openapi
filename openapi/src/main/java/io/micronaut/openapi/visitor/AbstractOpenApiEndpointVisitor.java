@@ -163,6 +163,12 @@ import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_RESPONSE_CODE;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_SCHEMA;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_STYLE;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_VALUE;
+import static io.micronaut.openapi.visitor.SchemaDefinitionUtils.bindSchemaAnnotationValue;
+import static io.micronaut.openapi.visitor.SchemaDefinitionUtils.bindSchemaForElement;
+import static io.micronaut.openapi.visitor.SchemaDefinitionUtils.processSchemaProperty;
+import static io.micronaut.openapi.visitor.SchemaDefinitionUtils.resolveSchema;
+import static io.micronaut.openapi.visitor.SchemaDefinitionUtils.toValue;
+import static io.micronaut.openapi.visitor.SchemaDefinitionUtils.toValueMap;
 import static io.micronaut.openapi.visitor.SchemaUtils.COMPONENTS_CALLBACKS_PREFIX;
 import static io.micronaut.openapi.visitor.SchemaUtils.TYPE_OBJECT;
 import static io.micronaut.openapi.visitor.SchemaUtils.getOperationOnPathItem;
@@ -173,12 +179,6 @@ import static io.micronaut.openapi.visitor.SchemaUtils.setSpecVersion;
 import static io.micronaut.openapi.visitor.StringUtil.CLOSE_BRACE;
 import static io.micronaut.openapi.visitor.StringUtil.OPEN_BRACE;
 import static io.micronaut.openapi.visitor.StringUtil.THREE_DOTS;
-import static io.micronaut.openapi.visitor.SchemaDefinitionUtils.bindSchemaAnnotationValue;
-import static io.micronaut.openapi.visitor.SchemaDefinitionUtils.bindSchemaForElement;
-import static io.micronaut.openapi.visitor.SchemaDefinitionUtils.processSchemaProperty;
-import static io.micronaut.openapi.visitor.SchemaDefinitionUtils.resolveSchema;
-import static io.micronaut.openapi.visitor.SchemaDefinitionUtils.toValue;
-import static io.micronaut.openapi.visitor.SchemaDefinitionUtils.toValueMap;
 import static io.micronaut.openapi.visitor.Utils.DEFAULT_MEDIA_TYPES;
 import static io.micronaut.openapi.visitor.Utils.getMediaType;
 import static io.micronaut.openapi.visitor.Utils.resolveWebhooks;
@@ -295,7 +295,6 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
      *
      * @param element The MethodElement.
      * @param context The context.
-     *
      * @return The security requirements.
      */
     protected abstract List<SecurityRequirement> methodSecurityRequirements(MethodElement element, VisitorContext context);
@@ -305,7 +304,6 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
      *
      * @param element The MethodElement.
      * @param context The context.
-     *
      * @return The servers.
      */
     protected abstract List<Server> methodServers(MethodElement element, VisitorContext context);
@@ -315,7 +313,6 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
      *
      * @param element The ClassElement.
      * @param context The context.
-     *
      * @return The class tags.
      */
     protected abstract List<Tag> classTags(ClassElement element, VisitorContext context);
@@ -325,7 +322,6 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
      *
      * @param element The ClassElement.
      * @param context The context.
-     *
      * @return true if the specified element should not be processed.
      */
     protected abstract boolean ignore(ClassElement element, VisitorContext context);
@@ -335,7 +331,6 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
      *
      * @param element The ClassElement.
      * @param context The context.
-     *
      * @return true if the specified element should not be processed.
      */
     protected abstract boolean ignore(MethodElement element, VisitorContext context);
@@ -344,7 +339,6 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
      * Returns the HttpMethod of the element.
      *
      * @param element The MethodElement.
-     *
      * @return The HttpMethod of the element.
      */
     protected abstract HttpMethod httpMethod(MethodElement element);
@@ -354,7 +348,6 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
      *
      * @param element The MethodElement.
      * @param context The context
-     *
      * @return The uri paths of the element.
      */
     protected abstract List<UriMatchTemplate> uriMatchTemplates(MethodElement element, VisitorContext context);
@@ -363,7 +356,6 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
      * Returns the consumes media types.
      *
      * @param element The MethodElement.
-     *
      * @return The consumes media types.
      */
     protected abstract List<MediaType> consumesMediaTypes(MethodElement element);
@@ -372,7 +364,6 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
      * Returns the produces media types.
      *
      * @param element The MethodElement.
-     *
      * @return The produces media types.
      */
     protected abstract List<MediaType> producesMediaTypes(MethodElement element);
@@ -381,7 +372,6 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
      * Returns the description for the element.
      *
      * @param element The MethodElement.
-     *
      * @return The description for the element.
      */
     protected abstract String description(MethodElement element);
@@ -420,7 +410,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             return;
         }
         incrementVisitedElements(context);
-        OpenAPI openAPI = Utils.resolveOpenApi(context);
+        OpenAPI openApi = Utils.resolveOpenApi(context);
         JavadocDescription javadocDescription;
         boolean permitsRequestBody = HttpMethod.permitsRequestBody(httpMethod);
 
@@ -445,13 +435,11 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         var webhookValue = element.getAnnotation(Webhook.class);
         var webhookPair = readWebhook(webhookValue, httpMethod, context);
         if (webhookPair != null) {
-            resolveWebhooks(openAPI).put(webhookPair.getFirst(), webhookPair.getSecond());
+            resolveWebhooks(openApi).put(webhookPair.getFirst(), webhookPair.getSecond());
         }
 
         for (Map.Entry<String, List<PathItem>> pathItemEntry : pathItemsMap.entrySet()) {
             List<PathItem> pathItems = pathItemEntry.getValue();
-
-            final OpenAPI openApi = Utils.resolveOpenApi(context);
 
             Map<PathItem, Operation> swaggerOperations = readOperations(pathItemEntry.getKey(), httpMethod, pathItems, element, context, jsonViewClass);
 
@@ -465,7 +453,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                     swaggerOperation.setExternalDocs(externalDocs);
                 }
 
-                readTags(element, context, swaggerOperation, classTags == null ? Collections.emptyList() : classTags, openAPI);
+                readTags(element, context, swaggerOperation, classTags == null ? Collections.emptyList() : classTags, openApi);
 
                 readSecurityRequirements(element, pathItemEntry.getKey(), swaggerOperation, context);
 
@@ -481,7 +469,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                     swaggerOperation.setDeprecated(true);
                 }
 
-                readResponse(element, context, openAPI, swaggerOperation, javadocDescription, jsonViewClass);
+                readResponse(element, context, openApi, swaggerOperation, javadocDescription, jsonViewClass);
 
                 boolean isRequestBodySchemaSet = false;
 
@@ -504,23 +492,28 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
 
                 setOperationOnPathItem(operationEntry.getKey(), httpMethod, swaggerOperation);
 
+                var queryParams = new HashMap<String, UriMatchVariable>();
                 var pathVariables = new HashMap<String, UriMatchVariable>();
                 for (UriMatchTemplate matchTemplate : matchTemplates) {
-                    for (Map.Entry<String, UriMatchVariable> varEntry : pathVariables(matchTemplate).entrySet()) {
+                    for (Map.Entry<String, UriMatchVariable> varEntry : uriVariables(matchTemplate).entrySet()) {
                         if (pathItemEntry.getKey().contains(OPEN_BRACE + varEntry.getKey() + CLOSE_BRACE)) {
                             pathVariables.put(varEntry.getKey(), varEntry.getValue());
                         }
+                        if (varEntry.getValue().isQuery()) {
+                            queryParams.put(varEntry.getKey(), varEntry.getValue());
+                        }
                     }
                     // @Parameters declared at method level take precedence over the declared as method arguments, so we process them first
-                    processParameterAnnotationInMethod(element, openAPI, matchTemplate, httpMethod, swaggerOperation, pathVariables, context);
+                    processParameterAnnotationInMethod(element, openApi, matchTemplate, httpMethod, swaggerOperation, pathVariables, context);
                 }
 
                 var extraBodyParameters = new ArrayList<TypedElement>();
                 for (Operation operation : swaggerOperations.values()) {
-                    processParameters(element, context, openAPI, operation, javadocDescription, permitsRequestBody, pathVariables, consumesMediaTypes, extraBodyParameters, httpMethod, matchTemplates, pathItems);
-                    processExtraBodyParameters(context, httpMethod, openAPI, operation, javadocDescription, isRequestBodySchemaSet, consumesMediaTypes, extraBodyParameters);
+                    processParameters(element, context, openApi, operation, javadocDescription, permitsRequestBody, pathVariables, consumesMediaTypes, extraBodyParameters, httpMethod, matchTemplates, pathItems);
+                    processExtraBodyParameters(context, httpMethod, openApi, operation, javadocDescription, isRequestBodySchemaSet, consumesMediaTypes, extraBodyParameters);
 
                     processMicronautVersionAndGroup(operation, pathItemEntry.getKey(), httpMethod, consumesMediaTypes, producesMediaTypes, element, context);
+                    addParamsByUriTemplate(pathItemEntry.getKey(), pathVariables, queryParams, swaggerOperation);
                 }
 
                 if (webhookPair != null) {
@@ -528,6 +521,53 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                 }
             }
         }
+    }
+
+    private void addParamsByUriTemplate(String path, Map<String, UriMatchVariable> pathVariables,
+                                               Map<String, UriMatchVariable> queryParams,
+                                               Operation operation) {
+
+        // check path variables in URL template which do not map to method parameters
+        for (var entry : pathVariables.entrySet()) {
+            var varName = entry.getKey();
+            var pathVar = entry.getValue();
+            if (pathVar.isExploded()
+                || !path.contains(OPEN_BRACE + varName + CLOSE_BRACE)
+                || isAlreadyAdded(varName, operation)) {
+                continue;
+            }
+
+            operation.addParametersItem(new Parameter()
+                .in(ParameterIn.PATH.toString())
+                .name(varName)
+                .required(true)
+                .schema(PrimitiveType.STRING.createProperty()));
+        }
+
+        for (var entry : queryParams.entrySet()) {
+            var varName = entry.getKey();
+            var pathVar = entry.getValue();
+            if (pathVar.isExploded() || isAlreadyAdded(varName, operation)) {
+                continue;
+            }
+
+            operation.addParametersItem(new Parameter()
+                .in(ParameterIn.QUERY.toString())
+                .name(varName)
+                .schema(PrimitiveType.STRING.createProperty()));
+        }
+    }
+
+    private boolean isAlreadyAdded(String paramName, Operation operation) {
+        if (CollectionUtils.isEmpty(operation.getParameters())) {
+            return false;
+        }
+        for (var param : operation.getParameters()) {
+            if (param.getName().equals(paramName)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void processExtraBodyParameters(VisitorContext context, HttpMethod httpMethod, OpenAPI openAPI,
@@ -645,8 +685,8 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
     }
 
     private Map<String, Example> readExamples(List<AnnotationValue<ExampleObject>> exampleAnns,
-                             Element element,
-                             VisitorContext context) {
+                                              Element element,
+                                              VisitorContext context) {
         if (CollectionUtils.isEmpty(exampleAnns)) {
             return null;
         }
@@ -730,7 +770,6 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                                 parameter.setIn(ParameterIn.QUERY.toString());
                             }
                         }
-
                     }
                 }
             }
@@ -1279,7 +1318,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         return returnType;
     }
 
-    private Map<String, UriMatchVariable> pathVariables(UriMatchTemplate matchTemplate) {
+    private Map<String, UriMatchVariable> uriVariables(UriMatchTemplate matchTemplate) {
         List<UriMatchVariable> pv = matchTemplate.getVariables();
         var pathVariables = new LinkedHashMap<String, UriMatchVariable>(pv.size());
         for (UriMatchVariable variable : pv) {
@@ -1315,8 +1354,8 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
     }
 
     private Pair<String, PathItem> readWebhook(@Nullable AnnotationValue<Webhook> webhookAnnValue,
-                                              HttpMethod httpMethod,
-                                              VisitorContext context) {
+                                               HttpMethod httpMethod,
+                                               VisitorContext context) {
         if (webhookAnnValue == null) {
             return null;
         }

@@ -2220,4 +2220,165 @@ class MyBean {}
         examples.example2.value.p21 == "v1"
         examples.example2.value.p22 == 123
     }
+
+    void "test route parameter, but no matching method argument"() {
+        given:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.http.HttpResponse;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Post;
+import jakarta.inject.Singleton;
+
+@Controller("/test")
+class TestController {
+
+    @Post("{id}")
+    HttpResponse<Void> reqPathVar() {
+        return HttpResponse.ok();
+    }
+
+    @Post("endpoint2{/opt1,opt2}")
+    HttpResponse<Void> optPathVars() {
+        return HttpResponse.ok();
+    }
+
+    @Post("endpoint3{?opt1,opt2}")
+    HttpResponse<Void> optQueryParams() {
+        return HttpResponse.ok();
+    }
+}
+
+@Singleton
+class MyBean {}
+''')
+        when: "The OpenAPI is retrieved"
+        def openApi = Utils.testReference
+
+        then: "the state is correct"
+        openApi != null
+
+        when:
+        def reqPathVarOp = openApi.paths.get("/test/{id}").post
+        def optPathVarsOp1 = openApi.paths.get("/test/endpoint2/{opt1}").post
+        def optPathVarsOp2 = openApi.paths.get("/test/endpoint2/{opt1}/{opt2}").post
+        def optQueryParamsOp = openApi.paths.get("/test/endpoint3").post
+
+        then:
+        reqPathVarOp
+        reqPathVarOp.parameters
+        reqPathVarOp.parameters.size() == 1
+        reqPathVarOp.parameters[0].in == "path"
+        reqPathVarOp.parameters[0].name == "id"
+        reqPathVarOp.parameters[0].schema
+        reqPathVarOp.parameters[0].schema.type == "string"
+        reqPathVarOp.parameters[0].required
+
+        optPathVarsOp1
+        optPathVarsOp1.parameters
+        optPathVarsOp1.parameters.size() == 1
+        optPathVarsOp1.parameters[0].in == "path"
+        optPathVarsOp1.parameters[0].name == "opt1"
+        optPathVarsOp1.parameters[0].schema
+        optPathVarsOp1.parameters[0].schema.type == "string"
+        optPathVarsOp1.parameters[0].required
+
+        optPathVarsOp2
+        optPathVarsOp2.parameters
+        optPathVarsOp2.parameters.size() == 2
+        optPathVarsOp2.parameters[0].in == "path"
+        optPathVarsOp2.parameters[0].name == "opt1"
+        optPathVarsOp2.parameters[0].schema
+        optPathVarsOp2.parameters[0].schema.type == "string"
+        optPathVarsOp2.parameters[0].required
+        optPathVarsOp2.parameters[1].in == "path"
+        optPathVarsOp2.parameters[1].name == "opt2"
+        optPathVarsOp2.parameters[1].schema
+        optPathVarsOp2.parameters[1].schema.type == "string"
+        optPathVarsOp2.parameters[1].required
+
+        optQueryParamsOp
+        optQueryParamsOp.parameters
+        optQueryParamsOp.parameters.size() == 2
+        optQueryParamsOp.parameters[0].in == "query"
+        optQueryParamsOp.parameters[0].name == "opt1"
+        optQueryParamsOp.parameters[0].schema
+        optQueryParamsOp.parameters[0].schema.type == "string"
+        !optQueryParamsOp.parameters[0].required
+        optQueryParamsOp.parameters[1].in == "query"
+        optQueryParamsOp.parameters[1].name == "opt2"
+        optQueryParamsOp.parameters[1].schema
+        optQueryParamsOp.parameters[1].schema.type == "string"
+        !optQueryParamsOp.parameters[1].required
+    }
+
+    void "test @Body method argument has precedence over other arguments"() {
+        given:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.core.convert.ArgumentConversionContext;
+import io.micronaut.core.type.Argument;
+import io.micronaut.http.HttpRequest;
+import io.micronaut.http.HttpResponse;
+import io.micronaut.http.annotation.Body;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Post;
+import io.micronaut.http.bind.binders.TypedRequestArgumentBinder;
+import io.micronaut.serde.annotation.Serdeable;
+import io.swagger.v3.oas.annotations.Parameter;import jakarta.inject.Singleton;
+
+import java.util.Optional;
+
+@Serdeable
+record SimpleBody(String value) {}
+
+@Serdeable
+record FilterProvidedArgument(String id) {}
+
+@Singleton
+class TestArgumentBinder implements TypedRequestArgumentBinder<FilterProvidedArgument> {
+  @Override
+  public Argument<FilterProvidedArgument> argumentType() {
+    return Argument.of(FilterProvidedArgument.class);
+  }
+
+  @Override
+  public BindingResult<FilterProvidedArgument> bind(ArgumentConversionContext<FilterProvidedArgument> context, HttpRequest<?> source) {
+    return () -> Optional.of(new FilterProvidedArgument("my-id"));
+  }
+}
+
+@Controller("/test")
+class TestController {
+    @Post
+    HttpResponse<SimpleBody> save(@Body SimpleBody body, @Parameter(hidden = true) FilterProvidedArgument filterProvidedArgument) {
+        return HttpResponse.ok(body);
+    }
+}
+
+@Singleton
+class MyBean {}
+''')
+        when: "The OpenAPI is retrieved"
+        OpenAPI openAPI = Utils.testReference
+
+        then: "the state is correct"
+        openAPI != null
+
+        when:
+        Operation operation = openAPI.paths.get("/test").post
+
+        then:
+        operation
+
+        and:
+        operation.requestBody
+        operation.requestBody.content
+        operation.requestBody.content.size() == 1
+        operation.requestBody.content."application/json"
+        operation.requestBody.content."application/json".schema
+        operation.requestBody.content."application/json".schema.$ref == "#/components/schemas/SimpleBody"
+    }
 }
