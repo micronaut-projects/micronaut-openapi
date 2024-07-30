@@ -1,0 +1,52 @@
+plugins {
+    id("io.micronaut.build.internal.openapi-test-java")
+}
+
+sourceSets {
+    test {
+        java {
+            srcDirs += "$buildDir/classes/java"
+        }
+    }
+}
+
+dependencies {
+
+    annotationProcessor(mnSpring.micronaut.spring.annotation)
+    annotationProcessor(mnSpring.micronaut.spring.web.annotation)
+    annotationProcessor(mnSpring.micronaut.spring.boot.annotation)
+    annotationProcessor(mn.micronaut.inject.java)
+    annotationProcessor(projects.micronautOpenapi)
+
+    compileOnly(projects.micronautOpenapiAnnotations)
+    compileOnly(mn.jackson.annotations)
+    compileOnly(mn.micronaut.inject.java)
+    compileOnly(mnSerde.micronaut.serde.api)
+
+    implementation(spring.spring.springBootStarterWeb)
+    implementation(spring.spring.springBootStarterValidation)
+    implementation(spring.spring.springBootStarterDataRest)
+
+    testCompileOnly(projects.micronautOpenapiAnnotations)
+    testCompileOnly(mn.jackson.annotations)
+    testCompileOnly(mn.micronaut.inject.java)
+    testCompileOnly(mnSerde.micronaut.serde.api)
+
+    testImplementation(spring.spring.springBootStarterTest)
+    testImplementation(mnTest.junit.jupiter.api)
+    testImplementation(projects.micronautOpenapiCommon)
+
+    testRuntimeOnly(mnLogging.logback.classic)
+    testRuntimeOnly(mnTest.junit.jupiter.engine)
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = "UTF-8"
+    options.incremental = true
+    options.fork = true
+    options.compilerArgs = [
+        '-parameters',
+        '-Xlint:unchecked',
+        '-Xlint:deprecation'
+    ]
+}

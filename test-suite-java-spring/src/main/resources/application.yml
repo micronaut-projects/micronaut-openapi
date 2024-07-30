@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: test-suite-java-spring
+  main:
+    banner-mode: off
+
+logging:
+  pattern:
+    console: '%cyan(%d{HH:mm:ss.SSS}) %gray([%thread]) %highlight(%-5level) %magenta(%logger{36}) - %msg%n'
+  level:
+    root: info

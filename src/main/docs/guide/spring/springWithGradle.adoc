@@ -1,0 +1,23 @@
+To use micronaut-openapi with spring in gradle add this code to you `build.gradle`:
+
+.build.gradle
+[source,groovy]
+----
+dependencies {
+
+    // add to annotationProcessor and compileOnly blocks next libraries:
+
+    annotationProcessor("io.micronaut:micronaut-inject-java:$micronautCoreVersion")
+    annotationProcessor("io.micronaut.spring:micronaut-spring-annotation:$micronautSpringVersion")
+    annotationProcessor("io.micronaut.spring:micronaut-spring-web-annotation:$micronautSpringVersion")
+    annotationProcessor("io.micronaut.spring:micronaut-spring-boot-annotation:$micronautSpringVersion")
+    annotationProcessor("io.micronaut.openapi:micronaut-openapi:$micronautOpenapiVersion")
+
+    compileOnly("io.micronaut:micronaut-inject-java:$micronautCoreVersion")
+    compileOnly("io.micronaut.openapi:micronaut-openapi-annotations:$micronautOpenapiVersion")
+    compileOnly("io.micronaut.serde:micronaut-serde-api:$micronautSerdeVersion")
+
+}
+----
+
+For kotlin just change block `annotationProcessor` to `kapt` or `ksp`.
