@@ -57,7 +57,7 @@ class MyBean {}
 
         OpenAPI openAPI = Utils.testReference
         Operation getOp = openAPI.paths?.get("/")?.get
-        Operation getOp2 = openAPI.paths?.get("/test/")?.get
+        Operation getOp2 = openAPI.paths?.get("/test")?.get
 
         Schema schemaAvailabilityRequest = openAPI.components.schemas.AvailabilityRequest
         Schema schemaAvailabilityRequest2 = openAPI.components.schemas.AvailabilityRequest2
