@@ -489,4 +489,16 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         assertFileContains(path + "model/Subject.java", "public String getTypeCode();");
         assertFileContains(path + "model/Person.java", "public String getTypeCode() {");
     }
+
+    @Test
+    void testOneOfWithoutDiscriminator() {
+
+        var codegen = new JavaMicronautClientCodegen();
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/oneof-without-discriminator.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String path = outputPath + "src/main/java/org/openapitools/";
+
+        assertFileNotContains(path + "model/OrderDTOShoppingNotes.java", "@JsonIgnoreProperties(",
+            "@JsonTypeInfo"
+        );
+    }
 }
