@@ -1,0 +1,65 @@
+openapi: 3.0.0
+info:
+  title: 'Order API'
+  version: v6
+servers:
+  -
+    url: 'https://{environment}.com/api/{apiVersion}'
+    variables:
+      environment:
+        enum:
+          - api-dev.test.com
+        default: api.dev.test.com
+      apiVersion:
+        enum:
+          - v1
+          - v2
+          - v3
+          - v4
+          - v5
+          - v6
+          - v7
+        default: v6
+paths:
+  '/orders/{id}':
+    get:
+      tags:
+        - Order
+      operationId: getOrderById
+      parameters:
+        -
+          $ref: '#/components/parameters/OrderId'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderDTO'
+components:
+  parameters:
+    OrderId:
+      name: id
+      in: path
+      description: 'The ID'
+      required: true
+      schema:
+        type: string
+  schemas:
+    OrderDTO:
+      required:
+        - id
+      properties:
+        id:
+          type: string
+        shopping_notes:
+          nullable: true
+          oneOf:
+            - $ref: '#/components/schemas/ShoppingNotesDTO'
+    ShoppingNotesDTO:
+      properties:
+        message:
+          type: string
+        icon_url:
+          type: string
+      type: object

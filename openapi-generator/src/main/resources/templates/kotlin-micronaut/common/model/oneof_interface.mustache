@@ -9,7 +9,7 @@
 interface {{classname}}{{#vendorExtensions.x-implements}}{{#-first}} : {{{.}}}{{/-first}}{{^-first}}, {{{.}}}{{/-first}}{{/vendorExtensions.x-implements}} {
 {{/formatNoEmptyLines}}
 
-    {{#discriminator}}
+{{#discriminator}}
     val {{propertyName}}: {{propertyType}}
-    {{/discriminator}}
+{{/discriminator}}
 }

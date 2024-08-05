@@ -538,4 +538,16 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         assertFileContains(path + "model/Subject.kt", "val typeCode: String");
         assertFileContains(path + "model/Person.kt", "override var typeCode: String = \"PERS\",");
     }
+
+    @Test
+    void testOneOfWithoutDiscriminator() {
+
+        var codegen = new KotlinMicronautClientCodegen();
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/oneof-without-discriminator.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String path = outputPath + "src/main/kotlin/org/openapitools/";
+
+        assertFileNotContains(path + "model/OrderDTOShoppingNotes.kt", "@JsonIgnoreProperties(",
+            "@JsonTypeInfo"
+        );
+    }
 }

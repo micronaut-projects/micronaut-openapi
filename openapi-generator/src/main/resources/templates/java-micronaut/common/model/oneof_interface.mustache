@@ -10,7 +10,7 @@
 public interface {{classname}}{{#vendorExtensions.x-implements}}{{#-first}} extends {{{.}}}{{/-first}}{{^-first}}, {{{.}}}{{/-first}}{{/vendorExtensions.x-implements}} {
 {{/formatNoEmptyLines}}
 
-    {{#discriminator}}
+{{#discriminator}}
     public {{propertyType}} {{propertyGetter}}();
-    {{/discriminator}}
+{{/discriminator}}
 }
