@@ -22,7 +22,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         codegen.cliOptions()
             .stream()
             .collect(groupingBy(CliOption::getOpt))
-            .forEach((k, v) -> assertEquals(v.size(), 1, k + " is described multiple times"));
+            .forEach((k, v) -> assertEquals(1, v.size(), k + " is described multiple times"));
     }
 
     @Test
@@ -35,14 +35,14 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         openAPI.setInfo(new Info());
         codegen.preprocessOpenAPI(openAPI);
 
-        assertEquals(codegen.additionalProperties().get(CodegenConstants.HIDE_GENERATION_TIMESTAMP), Boolean.FALSE);
+        assertEquals(Boolean.FALSE, codegen.additionalProperties().get(CodegenConstants.HIDE_GENERATION_TIMESTAMP));
         assertFalse(codegen.isHideGenerationTimestamp());
-        assertEquals(codegen.modelPackage(), "org.openapitools.model");
-        assertEquals(codegen.additionalProperties().get(CodegenConstants.MODEL_PACKAGE), "org.openapitools.model");
-        assertEquals(codegen.apiPackage(), "org.openapitools.api");
-        assertEquals(codegen.additionalProperties().get(CodegenConstants.API_PACKAGE), "org.openapitools.api");
-        assertEquals(codegen.getPackageName(), "org.openapitools");
-        assertEquals(codegen.additionalProperties().get(CodegenConstants.INVOKER_PACKAGE), "org.openapitools");
+        assertEquals("org.openapitools.model", codegen.modelPackage());
+        assertEquals("org.openapitools.model", codegen.additionalProperties().get(CodegenConstants.MODEL_PACKAGE));
+        assertEquals("org.openapitools.api", codegen.apiPackage());
+        assertEquals("org.openapitools.api", codegen.additionalProperties().get(CodegenConstants.API_PACKAGE));
+        assertEquals("org.openapitools", codegen.getPackageName());
+        assertEquals("org.openapitools", codegen.additionalProperties().get(CodegenConstants.INVOKER_PACKAGE));
     }
 
     @Test

@@ -230,7 +230,7 @@ public class OpenApiControllerVisitor extends AbstractOpenApiEndpointVisitor imp
     }
 
     @Override
-    protected List<Tag> classTags(ClassElement element, VisitorContext context) {
+    protected List<Tag> getUserDefinedClassTags(ClassElement element, VisitorContext context) {
         return readTags(additionalTags, context);
     }
 

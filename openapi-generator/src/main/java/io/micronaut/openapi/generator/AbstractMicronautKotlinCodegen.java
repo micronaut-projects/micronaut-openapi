@@ -393,6 +393,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         updateOption(CodegenConstants.API_PACKAGE, apiPackage);
     }
 
+    @Override
     public void setPackageName(String packageName) {
         super.setPackageName(packageName);
         updateOption(INVOKER_PACKAGE, packageName);
@@ -654,7 +655,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
 
     @Override
     public String apiTestFileFolder() {
-        return testFileFolder() + apiPackage().replaceAll("\\.", "/");
+        return testFileFolder() + apiPackage().replace(".", "/");
     }
 
     @Override
@@ -849,13 +850,13 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
             // is only default "application/json" media type
             if (op.consumes == null
                 || op.consumes.isEmpty()
-                || op.consumes.size() == 1 && "application/json".equals(op.consumes.get(0).get("mediaType"))) {
+                || op.consumes.size() == 1 && CONTENT_TYPE_APPLICATION_JSON.equals(op.consumes.get(0).get("mediaType"))) {
                 op.vendorExtensions.put("onlyDefaultConsumeOrEmpty", true);
             }
             // is only default "application/json" media type
             if (op.produces == null
                 || op.produces.isEmpty()
-                || op.produces.size() == 1 && "application/json".equals(op.produces.get(0).get("mediaType"))) {
+                || op.produces.size() == 1 && CONTENT_TYPE_APPLICATION_JSON.equals(op.produces.get(0).get("mediaType"))) {
                 op.vendorExtensions.put("onlyDefaultProduceOrEmpty", true);
             }
 
@@ -978,7 +979,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
             return schemaMapping.get(name);
         }
 
-        String modifiedName = name.replaceAll("\\.", "")
+        String modifiedName = name.replace(".", "")
             .replace("-", "_")
             // if it already escaped reserved word, need to remove quotes
             .replace("`", "");
@@ -1683,7 +1684,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         }
         String word = name;
         for (Map.Entry<String, String> specialCharacters : specialCharReplacements.entrySet()) {
-            word = replaceSpecialCharacters(word, specialCharacters);
+            word = replaceSpecCharacters(word, specialCharacters);
         }
 
         // Fallback, replace unknowns with underscore.
@@ -1700,7 +1701,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         return word;
     }
 
-    private String replaceSpecialCharacters(String word, Map.Entry<String, String> specialCharacters) {
+    private String replaceSpecCharacters(String word, Map.Entry<String, String> specialCharacters) {
         String specialChar = specialCharacters.getKey();
         String replacementChar = specialCharacters.getValue();
         // Underscore is the only special character we'll allow

@@ -262,7 +262,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
 
     private void processTags(ClassElement element, VisitorContext context) {
         classTags = readTags(element, context);
-        List<Tag> userDefinedClassTags = classTags(element, context);
+        List<Tag> userDefinedClassTags = getUserDefinedClassTags(element, context);
         if (CollectionUtils.isEmpty(classTags)) {
             classTags = userDefinedClassTags == null ? Collections.emptyList() : userDefinedClassTags;
         } else if (userDefinedClassTags != null) {
@@ -315,7 +315,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
      * @param context The context.
      * @return The class tags.
      */
-    protected abstract List<Tag> classTags(ClassElement element, VisitorContext context);
+    protected abstract List<Tag> getUserDefinedClassTags(ClassElement element, VisitorContext context);
 
     /**
      * Returns true if the specified element should not be processed.

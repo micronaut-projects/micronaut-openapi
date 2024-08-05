@@ -870,8 +870,7 @@ public final class MicronautInlineModelResolver {
         model.setExtensions(object.getExtensions());
         model.setExclusiveMinimum(object.getExclusiveMinimum());
         model.setExclusiveMaximum(object.getExclusiveMaximum());
-        // no need to set it again as it's set earlier
-        //model.setExample(object.getExample());
+        // no need to set example again as it's set earlier
         model.setDeprecated(object.getDeprecated());
 
         if (properties != null) {
@@ -977,22 +976,21 @@ public final class MicronautInlineModelResolver {
                     String propertyModelName = resolveModelName(property.getTitle(), path + "_" + key);
                     gatherInlineModels(property, propertyModelName);
                     propertyModelName = addSchemas(propertyModelName, property);
-                    Schema schema = new Schema().$ref(propertyModelName);
-                    schema.setRequired(property.getRequired());
+                    var schema = new Schema<>()
+                        .$ref(propertyModelName)
+                        .required(property.getRequired());
                     propsToUpdate.put(key, schema);
                 }
             } else {
                 LOGGER.debug("Schema not yet handled in model resolver: {}", property);
             }
         }
-        if (propsToUpdate.size() > 0) {
-            for (String key : propsToUpdate.keySet()) {
-                properties.put(key, propsToUpdate.get(key));
-            }
+        if (!propsToUpdate.isEmpty()) {
+            properties.putAll(propsToUpdate);
         }
-        for (String key : modelsToAdd.keySet()) {
-            openAPI.getComponents().addSchemas(key, modelsToAdd.get(key));
-            this.addedModels.put(key, modelsToAdd.get(key));
+        for (var entry : modelsToAdd.entrySet()) {
+            openAPI.getComponents().addSchemas(entry.getKey(), entry.getValue());
+            this.addedModels.put(entry.getKey(), entry.getValue());
         }
     }
 

@@ -444,10 +444,8 @@ public enum PrimitiveType {
             return null;
         }
         PrimitiveType fromName = NAMES.get(name);
-        if (fromName == null) {
-            if (!customExcludedExternalClasses().contains(name)) {
-                fromName = EXTERNAL_CLASSES.get(name);
-            }
+        if (fromName == null && !customExcludedExternalClasses().contains(name)) {
+            fromName = EXTERNAL_CLASSES.get(name);
         }
         return fromName;
     }
