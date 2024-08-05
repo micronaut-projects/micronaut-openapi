@@ -15,11 +15,13 @@
  */
 package io.micronaut.openapi.postprocessors;
 
-import java.util.HashMap;
-
 import io.micronaut.core.util.CollectionUtils;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Operation;
+
+import java.util.HashMap;
+
+import static io.micronaut.openapi.visitor.StringUtil.UNDERSCORE;
 
 /**
  * A helper class that post process OpenApi operations.
@@ -48,7 +50,7 @@ public class OpenApiOperationsPostProcessor {
                 }
                 int nextValue = operationIdsIndex.get(operationId);
 
-                String newOperationId = operationId + '_' + nextValue;
+                String newOperationId = operationId + UNDERSCORE + nextValue;
                 operation.setOperationId(newOperationId);
                 updateResponseDescription(operation, operationId, newOperationId);
 

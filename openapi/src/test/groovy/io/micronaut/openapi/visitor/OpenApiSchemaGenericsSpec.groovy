@@ -4,6 +4,7 @@ import io.micronaut.openapi.AbstractOpenApiTypeElementSpec
 import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.Operation
 import io.swagger.v3.oas.models.media.Schema
+import spock.util.environment.RestoreSystemProperties
 
 class OpenApiSchemaGenericsSpec extends AbstractOpenApiTypeElementSpec {
 
@@ -13,13 +14,13 @@ class OpenApiSchemaGenericsSpec extends AbstractOpenApiTypeElementSpec {
 
 package test;
 
-import java.util.List;
-
 import io.micronaut.core.annotation.Nullable;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
-import jakarta.validation.constraints.NotBlank;import jakarta.validation.constraints.Size;
+import java.util.List;
 
 @Controller
 class MyController {
@@ -818,5 +819,319 @@ class MyBean {}
         schema3.properties.arrayValues.items.type == 'string'
         schema3.properties.iterableValues.type == 'array'
         schema3.properties.iterableValues.items.type == 'string'
+    }
+
+    @RestoreSystemProperties
+    void "my annotations with generics with empty separator"() {
+
+        setup:
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_SCHEMA_NAME_SEPARATOR_EMPTY, "true")
+
+        when:
+        buildBeanDefinition('test.MyBean', '''
+
+package test;
+
+import io.micronaut.core.annotation.Nullable;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+
+import java.util.List;
+
+@Controller
+class MyController {
+
+    @Get
+    public MyDtoImpl doSomeStuff() {
+        return new MyDtoImpl();
+    }
+}
+
+class MyDtoImpl {
+
+    public List<@Nullable String> primitivesList;
+    public List<@Nullable ListItem> objectsList;
+
+    public List<@Nullable @Size(max = 10) List<@Nullable String>> nestedPrimitivesList;
+    public List<@Nullable @Size(max = 10) List<@Nullable ListItem>> nestedObjectsList;
+
+    public GenObject<@Nullable @Size(min = 10) String> genObjectPrimitive;
+    public GenObject<@Size(min = 10) @Nullable String> genObjectPrimitive2;
+    public GenObject<@Size(max = 20) @NotBlank String> genObjectPrimitive3;
+    public GenObject<String> genObjectPrimitive4;
+
+    public GenObject<@Nullable ListItem> genObjectObj;
+    public GenObject<ListItem> genObjectObj2;
+    public GenObject<@Nullable GenObject<@Nullable ListItem>> genObjectObj3;
+
+    public GenObject<@Nullable @Size(max = 10) List<@Nullable String>> nestedGenObjectPrimitive;
+    public GenObject<@Nullable @Size(max = 10) List<@Nullable GenObject<@Nullable ListItem>>> nestedGenObjectObj;
+}
+
+class ListItem {
+
+    public int field;
+}
+
+class GenObject<T> {
+
+    public T field;
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+
+        OpenAPI openAPI = Utils.testReference
+        Operation operation = openAPI.paths?.get("/")?.get
+        Schema schema = openAPI.components.schemas.MyDtoImpl
+
+        then:
+        operation
+        operation.responses.size() == 1
+        schema
+        schema.properties.size() == 13
+
+        schema.properties.primitivesList.type == 'array'
+        schema.properties.primitivesList.items
+        schema.properties.primitivesList.items.type == 'string'
+        schema.properties.primitivesList.items.nullable
+
+        schema.properties.objectsList.type == 'array'
+        schema.properties.objectsList.items
+        schema.properties.objectsList.items.allOf
+        schema.properties.objectsList.items.allOf.size() == 2
+        schema.properties.objectsList.items.allOf[0].$ref == '#/components/schemas/ListItem'
+        schema.properties.objectsList.items.allOf[1].nullable
+
+        schema.properties.nestedPrimitivesList.type == 'array'
+        schema.properties.nestedPrimitivesList.items
+        schema.properties.nestedPrimitivesList.items.allOf
+        schema.properties.nestedPrimitivesList.items.allOf.size() == 2
+        schema.properties.nestedPrimitivesList.items.allOf[0].type == 'array'
+        schema.properties.nestedPrimitivesList.items.allOf[0].items
+        schema.properties.nestedPrimitivesList.items.allOf[0].items.type == 'string'
+        schema.properties.nestedPrimitivesList.items.allOf[0].items.nullable
+        schema.properties.nestedPrimitivesList.items.allOf[1].nullable
+        schema.properties.nestedPrimitivesList.items.allOf[1].maxItems == 10
+
+        schema.properties.nestedObjectsList.type == 'array'
+        schema.properties.nestedObjectsList.items
+        schema.properties.nestedObjectsList.items.allOf
+        schema.properties.nestedObjectsList.items.allOf.size() == 2
+        schema.properties.nestedObjectsList.items.allOf[0].type == 'array'
+        schema.properties.nestedObjectsList.items.allOf[0].items
+        schema.properties.nestedObjectsList.items.allOf[0].items.allOf
+        schema.properties.nestedObjectsList.items.allOf[0].items.allOf.size() == 2
+        schema.properties.nestedObjectsList.items.allOf[0].items.allOf[0].$ref == '#/components/schemas/ListItem'
+        schema.properties.nestedObjectsList.items.allOf[0].items.allOf[1].nullable
+        schema.properties.nestedObjectsList.items.allOf[1].nullable
+        schema.properties.nestedObjectsList.items.allOf[1].maxItems == 10
+
+        schema.properties.genObjectPrimitive.$ref == '#/components/schemas/GenObjectSizemin10NullableString'
+        schema.properties.genObjectPrimitive2.$ref == '#/components/schemas/GenObjectSizemin10NullableString'
+        schema.properties.genObjectPrimitive3.$ref == '#/components/schemas/GenObjectSizemax20NotBlankString'
+        schema.properties.genObjectPrimitive4.$ref == '#/components/schemas/GenObjectString'
+
+        def subSchema1 = openAPI.components.schemas.GenObjectSizemax20NotBlankString
+        subSchema1.properties.field.maxLength == 20
+        subSchema1.properties.field.minLength == 1
+        subSchema1.properties.field.type == 'string'
+
+        def subSchema2 = openAPI.components.schemas.GenObjectSizemin10NullableString
+        subSchema2.properties.field.nullable
+        subSchema2.properties.field.minLength == 10
+        subSchema2.properties.field.type == 'string'
+
+        def subSchema3 = openAPI.components.schemas.GenObjectString
+        subSchema3.properties.field.type == 'string'
+
+        schema.properties.genObjectObj.allOf
+        schema.properties.genObjectObj.allOf.size() == 2
+        schema.properties.genObjectObj.allOf[0].$ref == '#/components/schemas/GenObjectListItem'
+        schema.properties.genObjectObj.allOf[1].nullable
+
+        !schema.properties.genObjectObj2.allOf
+        schema.properties.genObjectObj2.$ref == '#/components/schemas/GenObjectListItem'
+
+        schema.properties.genObjectObj3.allOf
+        schema.properties.genObjectObj3.allOf.size() == 2
+        schema.properties.genObjectObj3.allOf[0].$ref == '#/components/schemas/GenObjectGenObject'
+        schema.properties.genObjectObj3.allOf[1].nullable
+
+        schema.properties.nestedGenObjectPrimitive.allOf
+        schema.properties.nestedGenObjectPrimitive.allOf.size() == 2
+        schema.properties.nestedGenObjectPrimitive.allOf[0].$ref == '#/components/schemas/GenObjectListNullableString'
+        schema.properties.nestedGenObjectPrimitive.allOf[1].maxItems == 10
+        schema.properties.nestedGenObjectPrimitive.allOf[1].nullable
+
+        schema.properties.nestedGenObjectObj.allOf
+        schema.properties.nestedGenObjectObj.allOf.size() == 2
+        schema.properties.nestedGenObjectObj.allOf[0].$ref == '#/components/schemas/GenObjectListGenObject'
+        schema.properties.nestedGenObjectObj.allOf[1].maxItems == 10
+        schema.properties.nestedGenObjectObj.allOf[1].nullable
+    }
+
+    @RestoreSystemProperties
+    void "my annotations with generics with custom separators"() {
+        setup:
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_SCHEMA_NAME_SEPARATOR_GENERIC, "<<<")
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_SCHEMA_NAME_SEPARATOR_INNER_CLASS, "&&&")
+
+        when:
+        buildBeanDefinition('test.MyBean', '''
+
+package test;
+
+import io.micronaut.core.annotation.Nullable;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.micronaut.openapi.PubGenObject;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+
+import java.util.List;
+
+@Controller
+class MyController {
+
+    @Get
+    public MyDtoImpl doSomeStuff() {
+        return new MyDtoImpl();
+    }
+}
+
+class MyDtoImpl {
+
+    public List<@Nullable String> primitivesList;
+    public List<@Nullable ListItem> objectsList;
+
+    public List<@Nullable @Size(max = 10) List<@Nullable String>> nestedPrimitivesList;
+    public List<@Nullable @Size(max = 10) List<@Nullable ListItem>> nestedObjectsList;
+
+    public GenObject<@Nullable @Size(min = 10) String> genObjectPrimitive;
+    public GenObject<@Size(min = 10) @Nullable String> genObjectPrimitive2;
+    public GenObject<@Size(max = 20) @NotBlank String> genObjectPrimitive3;
+    public GenObject<String> genObjectPrimitive4;
+
+    public GenObject<@Nullable ListItem> genObjectObj;
+    public GenObject<ListItem> genObjectObj2;
+    public GenObject<@Nullable GenObject<@Nullable ListItem>> genObjectObj3;
+
+    public GenObject<@Nullable @Size(max = 10) List<@Nullable String>> nestedGenObjectPrimitive;
+    public GenObject<@Nullable @Size(max = 10) List<@Nullable GenObject<@Nullable ListItem>>> nestedGenObjectObj;
+
+    public GenObject<@Nullable @Size(max = 10) List<@Nullable PubGenObject<PubGenObject.ListInnerItem>>> withInnerClass;
+}
+
+class ListItem {
+
+    public int field;
+}
+
+class GenObject<T> {
+
+    public T field;
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+
+        OpenAPI openAPI = Utils.testReference
+        Operation operation = openAPI.paths?.get("/")?.get
+        Schema schema = openAPI.components.schemas.MyDtoImpl
+
+        then:
+        operation
+        operation.responses.size() == 1
+        schema
+        schema.properties.size() == 14
+
+        schema.properties.primitivesList.type == 'array'
+        schema.properties.primitivesList.items
+        schema.properties.primitivesList.items.type == 'string'
+        schema.properties.primitivesList.items.nullable
+
+        schema.properties.objectsList.type == 'array'
+        schema.properties.objectsList.items
+        schema.properties.objectsList.items.allOf
+        schema.properties.objectsList.items.allOf.size() == 2
+        schema.properties.objectsList.items.allOf[0].$ref == '#/components/schemas/ListItem'
+        schema.properties.objectsList.items.allOf[1].nullable
+
+        schema.properties.nestedPrimitivesList.type == 'array'
+        schema.properties.nestedPrimitivesList.items
+        schema.properties.nestedPrimitivesList.items.allOf
+        schema.properties.nestedPrimitivesList.items.allOf.size() == 2
+        schema.properties.nestedPrimitivesList.items.allOf[0].type == 'array'
+        schema.properties.nestedPrimitivesList.items.allOf[0].items
+        schema.properties.nestedPrimitivesList.items.allOf[0].items.type == 'string'
+        schema.properties.nestedPrimitivesList.items.allOf[0].items.nullable
+        schema.properties.nestedPrimitivesList.items.allOf[1].nullable
+        schema.properties.nestedPrimitivesList.items.allOf[1].maxItems == 10
+
+        schema.properties.nestedObjectsList.type == 'array'
+        schema.properties.nestedObjectsList.items
+        schema.properties.nestedObjectsList.items.allOf
+        schema.properties.nestedObjectsList.items.allOf.size() == 2
+        schema.properties.nestedObjectsList.items.allOf[0].type == 'array'
+        schema.properties.nestedObjectsList.items.allOf[0].items
+        schema.properties.nestedObjectsList.items.allOf[0].items.allOf
+        schema.properties.nestedObjectsList.items.allOf[0].items.allOf.size() == 2
+        schema.properties.nestedObjectsList.items.allOf[0].items.allOf[0].$ref == '#/components/schemas/ListItem'
+        schema.properties.nestedObjectsList.items.allOf[0].items.allOf[1].nullable
+        schema.properties.nestedObjectsList.items.allOf[1].nullable
+        schema.properties.nestedObjectsList.items.allOf[1].maxItems == 10
+
+        schema.properties.genObjectPrimitive.$ref == '#/components/schemas/GenObject<<<Size<<<min<<<10<<<NullableString<<<'
+        schema.properties.genObjectPrimitive2.$ref == '#/components/schemas/GenObject<<<Size<<<min<<<10<<<NullableString<<<'
+        schema.properties.genObjectPrimitive3.$ref == '#/components/schemas/GenObject<<<Size<<<max<<<20<<<NotBlankString<<<'
+        schema.properties.genObjectPrimitive4.$ref == '#/components/schemas/GenObject<<<String<<<'
+
+        def subSchema1 = openAPI.components.schemas.'GenObject<<<Size<<<max<<<20<<<NotBlankString<<<'
+        subSchema1.properties.field.maxLength == 20
+        subSchema1.properties.field.minLength == 1
+        subSchema1.properties.field.type == 'string'
+
+        def subSchema2 = openAPI.components.schemas.'GenObject<<<Size<<<min<<<10<<<NullableString<<<'
+        subSchema2.properties.field.nullable
+        subSchema2.properties.field.minLength == 10
+        subSchema2.properties.field.type == 'string'
+
+        def subSchema3 = openAPI.components.schemas.'GenObject<<<String<<<'
+        subSchema3.properties.field.type == 'string'
+
+        schema.properties.genObjectObj.allOf
+        schema.properties.genObjectObj.allOf.size() == 2
+        schema.properties.genObjectObj.allOf[0].$ref == '#/components/schemas/GenObject<<<ListItem<<<'
+        schema.properties.genObjectObj.allOf[1].nullable
+
+        !schema.properties.genObjectObj2.allOf
+        schema.properties.genObjectObj2.$ref == '#/components/schemas/GenObject<<<ListItem<<<'
+
+        schema.properties.genObjectObj3.allOf
+        schema.properties.genObjectObj3.allOf.size() == 2
+        schema.properties.genObjectObj3.allOf[0].$ref == '#/components/schemas/GenObject<<<GenObject<<<'
+        schema.properties.genObjectObj3.allOf[1].nullable
+
+        schema.properties.nestedGenObjectPrimitive.allOf
+        schema.properties.nestedGenObjectPrimitive.allOf.size() == 2
+        schema.properties.nestedGenObjectPrimitive.allOf[0].$ref == '#/components/schemas/GenObject<<<List<<<NullableString<<<<<<'
+        schema.properties.nestedGenObjectPrimitive.allOf[1].maxItems == 10
+        schema.properties.nestedGenObjectPrimitive.allOf[1].nullable
+
+        schema.properties.nestedGenObjectObj.allOf
+        schema.properties.nestedGenObjectObj.allOf.size() == 2
+        schema.properties.nestedGenObjectObj.allOf[0].$ref == '#/components/schemas/GenObject<<<List<<<GenObject<<<<<<'
+        schema.properties.nestedGenObjectObj.allOf[1].maxItems == 10
+        schema.properties.nestedGenObjectObj.allOf[1].nullable
+
+        schema.properties.withInnerClass.allOf
+        schema.properties.withInnerClass.allOf.size() == 2
+        schema.properties.withInnerClass.allOf[0].$ref == "#/components/schemas/GenObject<<<List<<<PubGenObject<<<PubGenObject&&&ListInnerItem<<<<<<<<<"
+        schema.properties.withInnerClass.allOf[1].nullable
     }
 }

@@ -34,6 +34,27 @@ public interface OpenApiConfigProperty {
      */
     String MICRONAUT_OPENAPI_ENABLED = "micronaut.openapi.enabled";
     /**
+     * System property that enables or disables schema name separator for generics and inner classes.
+     * If it's true separators will be skipped. For example, schema name for class with name
+     * {@code MyClass.MyInnerClass<MyGeneric1, MyGeneric2>} will be
+     * {@code MyClassMyInnerClassMyGeneric1MyGeneric2}
+     * <br>
+     * Default: false
+     */
+    String MICRONAUT_OPENAPI_SCHEMA_NAME_SEPARATOR_EMPTY = "micronaut.openapi.schema.name.separator.empty";
+    /**
+     * System property to set custom separator for generic classes. By default, it is "_".
+     * <br>
+     * Default: _
+     */
+    String MICRONAUT_OPENAPI_SCHEMA_NAME_SEPARATOR_GENERIC = "micronaut.openapi.schema.name.separator.generic";
+    /**
+     * System property to set custom separator for inner classes. By default, it is ".".
+     * <br>
+     * Default: .
+     */
+    String MICRONAUT_OPENAPI_SCHEMA_NAME_SEPARATOR_INNER_CLASS = "micronaut.openapi.schema.name.separator.inner-class";
+    /**
      * System property that enables generating OpenAPI version 3.1.
      * <br>
      * Default: false

@@ -100,6 +100,12 @@ public interface ContextProperty {
      */
     String MICRONAUT_INTERNAL_OPENAPI_ENABLED = "micronaut.internal.openapi.enabled";
     /**
+     * Loaded micronaut.openapi.schema-name.separator.empty property value.
+     * <br>
+     * Default: false
+     */
+    String MICRONAUT_INTERNAL_SCHEMA_NAME_SEPARATOR_EMPTY = "micronaut.internal.schema.name.separator.empty";
+    /**
      * Loaded micronaut.openapi.generation.spec.enabled value.
      * <br>
      * Default: true
