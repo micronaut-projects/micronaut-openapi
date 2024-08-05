@@ -15,6 +15,7 @@
  */
 package io.micronaut.openapi;
 
+import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -33,12 +34,14 @@ public final class OpenApiUtils {
      * The JSON mapper.
      */
     public static final ObjectMapper JSON_MAPPER = ObjectMapperFactory.createJson()
-        .enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
+        .enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
+        .enable(JsonParser.Feature.INCLUDE_SOURCE_IN_LOCATION);
     /**
      * The JSON 3.1 mapper.
      */
     public static final ObjectMapper JSON_MAPPER_31 = ObjectMapperFactory.createJson31()
-        .enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
+        .enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
+        .enable(JsonParser.Feature.INCLUDE_SOURCE_IN_LOCATION);
     /**
      * The JSON mapper for security scheme.
      */
@@ -46,7 +49,8 @@ public final class OpenApiUtils {
         .enable(SerializationFeature.WRITE_ENUMS_USING_TO_STRING)
         .disable(SerializationFeature.FAIL_ON_EMPTY_BEANS, SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
         .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-        .enable(DeserializationFeature.READ_ENUMS_USING_TO_STRING, DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
+        .enable(DeserializationFeature.READ_ENUMS_USING_TO_STRING, DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
+        .enable(JsonParser.Feature.INCLUDE_SOURCE_IN_LOCATION);
     /**
      * The YAML mapper.
      */

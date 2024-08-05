@@ -16,6 +16,7 @@
 package io.micronaut.openapi.visitor;
 
 import com.fasterxml.jackson.annotation.JsonAnySetter;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
@@ -1490,6 +1491,7 @@ public final class SchemaDefinitionUtils {
                         PropertyElementQuery.of(classElement)
                             .excludedAnnotations(Set.of(
                                 Hidden.class.getName(),
+                                JsonBackReference.class.getName(),
                                 JsonIgnore.class.getName()
                             ))
                     ).stream()
@@ -2365,6 +2367,7 @@ public final class SchemaDefinitionUtils {
         var jsonAnySetterAnn = getAnnotation(elementType, JsonAnySetter.class);
         return elementType.getType().isAssignable(Class.class)
             || isAnnotationPresent(elementType, JsonIgnore.class)
+            || isAnnotationPresent(elementType, JsonBackReference.class)
             || isAnnotationPresent(elementType, Hidden.class)
             || (jsonAnySetterAnn != null && jsonAnySetterAnn.booleanValue("enabled").orElse(true))
             || isHidden;
