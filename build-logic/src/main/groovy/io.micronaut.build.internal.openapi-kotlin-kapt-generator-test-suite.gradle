@@ -26,6 +26,7 @@ def openapiGenerate = tasks.register("generateOpenApi", OpenApiGeneratorTask) {
     clientPath = true
     ksp = false
     useOneOfInterfaces = false
+    auth = true
     classpath.from(configurations.openapiGenerator)
     openApiDefinition.convention(layout.projectDirectory.file("petstore.json"))
     outputDirectory.convention(layout.buildDirectory.dir("generated/openapi"))

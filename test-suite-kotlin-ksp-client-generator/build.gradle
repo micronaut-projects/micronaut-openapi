@@ -23,6 +23,8 @@ dependencies {
     implementation(mnReactor.micronaut.reactor)
     implementation(mn.kotlin.stdlib.jdk8)
     implementation(mn.kotlin.reflect)
+    // Required when using useAuth=true
+    implementation(mnSecurity.micronaut.security.oauth2)
 
     runtimeOnly(mnLogging.logback.classic)
 

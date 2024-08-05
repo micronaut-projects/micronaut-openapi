@@ -76,6 +76,10 @@ public abstract class OpenApiGeneratorTask extends DefaultTask {
     @Input
     public abstract Property<String> getClientId();
 
+    @Input
+    @Optional
+    public abstract Property<Boolean> getAuth();
+
     @OutputDirectory
     public abstract DirectoryProperty getOutputDirectory();
 
@@ -154,6 +158,7 @@ public abstract class OpenApiGeneratorTask extends DefaultTask {
             args.add(getApiNameSuffix().getOrElse(""));
             args.add(getModelNamePrefix().getOrElse(""));
             args.add(getModelNameSuffix().getOrElse(""));
+            args.add(Boolean.toString(getAuth().getOrElse(false)));
             javaexec.args(args);
         });
     }

@@ -23,6 +23,8 @@ dependencies {
     implementation(mnReactor.micronaut.reactor)
     implementation(mn.kotlin.stdlib.jdk8)
     implementation(mn.kotlin.reflect)
+    // Required when using useAuth=true
+    implementation(mnSecurity.micronaut.security.oauth2)
 
     runtimeOnly(mnLogging.logback.classic)
 
@@ -31,7 +33,6 @@ dependencies {
     kaptTest(mn.micronaut.inject.kotlin)
 
     testImplementation(mnTest.micronaut.test.junit5)
-
     testRuntimeOnly(mnSerde.micronaut.serde.jackson)
     testRuntimeOnly(mnTest.junit.jupiter.engine)
     testRuntimeOnly(mnLogging.logback.classic)

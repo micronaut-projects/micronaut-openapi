@@ -77,6 +77,7 @@ public class GeneratorMain {
         String apiSuffix = args[14];
         String modelPrefix = args[15];
         String modelSuffix = args[16];
+        var auth = Boolean.parseBoolean(args[17]);
 
         var builder = MicronautCodeGeneratorEntryPoint.builder()
             .withDefinitionFile(definitionFile)
@@ -108,7 +109,7 @@ public class GeneratorMain {
                         // commented out because currently this would prevent the test project from compiling
                         // because we generate both abstract classes _and_ dummy implementations
                         .withGenerateImplementationFiles(false)
-                        .withAuthentication(false)
+                        .withAuthentication(auth)
                         .withKsp(ksp)
                         .withGeneratedAnnotation(generatedAnnotation)
                 );
@@ -119,7 +120,7 @@ public class GeneratorMain {
                         // commented out because currently this would prevent the test project from compiling
                         // because we generate both abstract classes _and_ dummy implementations
                         .withGenerateImplementationFiles(false)
-                        .withAuthentication(false)
+                        .withAuthentication(auth)
                         .withGeneratedAnnotation(generatedAnnotation)
                 );
             }
@@ -129,6 +130,7 @@ public class GeneratorMain {
                     clientOptions
                         .withGeneratedAnnotation(generatedAnnotation)
                         .withKsp(ksp)
+                        .withAuthorization(auth)
                         .withClientPath(clientPath)
                         .withClientId(clientId)
                 );
@@ -137,6 +139,7 @@ public class GeneratorMain {
                     clientOptions
                         .withGeneratedAnnotation(generatedAnnotation)
                         .withClientPath(clientPath)
+                        .withAuthorization(auth)
                         .withClientId(clientId)
                 );
             }
