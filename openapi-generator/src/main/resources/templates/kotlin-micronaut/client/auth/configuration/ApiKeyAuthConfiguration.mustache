@@ -15,7 +15,8 @@ import {{javaxPackage}}.annotation.Generated
 {{>common/generatedAnnotation}}
 {{/generatedAnnotation}}
 @EachProperty("security.api-key-auth")
-data class ApiKeyAuthConfiguration(
+data class ApiKeyAuthConfiguration @ConfigurationInject
+constructor(
     @Parameter override val name: String,
     @NonNull var location: AuthKeyLocation,
     @NonNull var paramName: String,
