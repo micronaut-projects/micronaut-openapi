@@ -111,6 +111,12 @@ public final class MicronautInlineModelResolver {
         }
     }
 
+    private void normalizeArraySchema(Schema schema) {
+        if (ModelUtils.isArraySchema(schema)) {
+            schema.setEnum(null);
+        }
+    }
+
     public void flatten() {
         if (this.openAPI.getComponents() == null) {
             this.openAPI.setComponents(new Components());
@@ -220,6 +226,8 @@ public final class MicronautInlineModelResolver {
             if (schema == null) {
                 continue;
             }
+            normalizeArraySchema(schema);
+
             String schemaName = resolveModelName(schema.getTitle(), name); // name example: testPost_request
             // Recursively gather/make inline models within this schema if any
             gatherInlineModels(schema, schemaName);
@@ -263,6 +271,8 @@ public final class MicronautInlineModelResolver {
             if (parameterSchema == null) {
                 continue;
             }
+
+            normalizeArraySchema(parameterSchema);
 
             String schemaName = resolveModelName(parameterSchema.getTitle(),
                     (operation.getOperationId() == null ? modelName : operation.getOperationId()) + "_" + parameter.getName() + "_parameter");
@@ -314,6 +324,9 @@ public final class MicronautInlineModelResolver {
             if (parameterSchema == null) {
                 continue;
             }
+
+            normalizeArraySchema(parameterSchema);
+
             String schemaName = resolveModelName(parameterSchema.getTitle(),
                 (operation.getOperationId() == null ? modelName : operation.getOperationId()) + "_" + parameter.getName() + "_parameter");
             // Recursively gather/make inline models within this schema if any
@@ -368,6 +381,8 @@ public final class MicronautInlineModelResolver {
                     if (prop == null) {
                         continue;
                     }
+
+                    normalizeArraySchema(prop);
 
                     String schemaName = resolveModelName(prop.getTitle(), modelPrefix + "_" + propName);
                     // Recurse to create $refs for inner models
@@ -445,6 +460,9 @@ public final class MicronautInlineModelResolver {
                     if (inner == null) {
                         continue;
                     }
+
+                    normalizeArraySchema((Schema) inner);
+
                     String schemaName = resolveModelName(((Schema) inner).getTitle(), modelPrefix + "_allOf");
                     // Recurse to create $refs for inner models
                     gatherInlineModels((Schema) inner, schemaName);
@@ -479,6 +497,8 @@ public final class MicronautInlineModelResolver {
                     if (inner == null) {
                         continue;
                     }
+
+                    normalizeArraySchema((Schema) inner);
                     String schemaName = resolveModelName(((Schema) inner).getTitle(), modelPrefix + "_anyOf");
                     // Recurse to create $refs for inner models
                     gatherInlineModels((Schema) inner, schemaName);
@@ -497,6 +517,8 @@ public final class MicronautInlineModelResolver {
                     if (inner == null) {
                         continue;
                     }
+
+                    normalizeArraySchema((Schema) inner);
                     String schemaName = resolveModelName(((Schema) inner).getTitle(), modelPrefix + "_oneOf");
                     // Recurse to create $refs for inner models
                     gatherInlineModels((Schema) inner, schemaName);
@@ -762,6 +784,7 @@ public final class MicronautInlineModelResolver {
             if (model == null) {
                 continue;
             }
+            normalizeArraySchema(model);
             if (ModelUtils.isAnyOf(model)) { // contains anyOf only
                 gatherInlineModels(model, modelName);
             } else if (ModelUtils.isOneOf(model)) { // contains oneOf only

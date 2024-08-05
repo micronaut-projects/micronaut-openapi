@@ -1496,4 +1496,8 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
         setDateLibrary(name);
     }
 
+    @Override
+    public boolean getUseInlineModelResolver() {
+        return false;
+    }
 }

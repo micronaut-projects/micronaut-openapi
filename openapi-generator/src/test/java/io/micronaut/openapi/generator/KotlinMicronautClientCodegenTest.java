@@ -1,14 +1,13 @@
 package io.micronaut.openapi.generator;
 
-import java.util.List;
-
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.servers.Server;
-
 import org.junit.jupiter.api.Test;
 import org.openapitools.codegen.CliOption;
 import org.openapitools.codegen.CodegenConstants;
+
+import java.util.List;
 
 import static java.util.stream.Collectors.groupingBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -145,33 +144,33 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         // Constructor should have properties
         String modelPath = outputPath + "src/main/kotlin/org/openapitools/model/";
         assertFileContains(modelPath + "Pet.kt",
-        """
-            data class Pet(
-                @field:NotNull
-                @field:JsonProperty(JSON_PROPERTY_NAME)
-                var name: String,
-                @field:NotNull
-                @field:JsonProperty(JSON_PROPERTY_PHOTO_URLS)
-                var photoUrls: List<@NotNull String>,
-                @field:Nullable
-                @field:JsonProperty(JSON_PROPERTY_ID)
-                @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
-                var id: Long? = null,
-                @field:Nullable
-                @field:Valid
-                @field:JsonProperty(JSON_PROPERTY_CATEGORY)
-                @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
-                var category: Category? = null,
-                @field:Nullable
-                @field:JsonProperty(JSON_PROPERTY_TAGS)
-                @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
-                var tags: List<@Valid Tag>? = null,
-                @field:Nullable
-                @field:JsonProperty(JSON_PROPERTY_STATUS)
-                @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
-                var status: PetStatus? = null,
-            ) {
-            """);
+            """
+                data class Pet(
+                    @field:NotNull
+                    @field:JsonProperty(JSON_PROPERTY_NAME)
+                    var name: String,
+                    @field:NotNull
+                    @field:JsonProperty(JSON_PROPERTY_PHOTO_URLS)
+                    var photoUrls: List<@NotNull String>,
+                    @field:Nullable
+                    @field:JsonProperty(JSON_PROPERTY_ID)
+                    @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                    var id: Long? = null,
+                    @field:Nullable
+                    @field:Valid
+                    @field:JsonProperty(JSON_PROPERTY_CATEGORY)
+                    @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                    var category: Category? = null,
+                    @field:Nullable
+                    @field:JsonProperty(JSON_PROPERTY_TAGS)
+                    @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                    var tags: List<@Valid Tag>? = null,
+                    @field:Nullable
+                    @field:JsonProperty(JSON_PROPERTY_STATUS)
+                    @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                    var status: PetStatus? = null,
+                ) {
+                """);
     }
 
     @Test
@@ -363,9 +362,9 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
 
         assertFileContains(apiPath + "BooksContainer.kt",
             """
-                        @field:JsonProperty(JSON_PROPERTY_BOOKS)
-                        var books: List<@Valid Book>
-                    """);
+                    @field:JsonProperty(JSON_PROPERTY_BOOKS)
+                    var books: List<@Valid Book>
+                """);
     }
 
     @Test
@@ -392,15 +391,15 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         String apiPath = outputPath + "src/main/kotlin/org/openapitools/model/";
 
         assertFileContains(apiPath + "BookInfo.kt",
-                    """
-                       open class BookInfo(
-                           @field:NotNull
-                           @field:JsonProperty(JSON_PROPERTY_NAME)
-                           open var name: String,
-                           @field:NotNull
-                           @field:JsonProperty(JSON_PROPERTY_TYPE)
-                           open var type: BookInfoType? = null,
-                       ) {""");
+            """
+                open class BookInfo(
+                    @field:NotNull
+                    @field:JsonProperty(JSON_PROPERTY_NAME)
+                    open var name: String,
+                    @field:NotNull
+                    @field:JsonProperty(JSON_PROPERTY_TYPE)
+                    open var type: BookInfoType? = null,
+                ) {""");
         assertFileContains(apiPath + "BasicBookInfo.kt",
             """
                 open class BasicBookInfo(
@@ -485,6 +484,16 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
     }
 
     @Test
+    void testControllerEnums2() {
+
+        var codegen = new KotlinMicronautClientCodegen();
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/controller-enum2.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String modelPath = outputPath + "src/main/kotlin/org/openapitools/api/";
+
+        assertFileContains(modelPath + "BusinessCardsApi.kt", "@QueryValue(\"statusCodes\") @Nullable statusCodes: List<@NotNull String>?");
+    }
+
+    @Test
     void testCommonPathParametersWithRef() {
 
         var codegen = new KotlinMicronautClientCodegen();
@@ -492,13 +501,13 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         String path = outputPath + "src/main/kotlin/org/openapitools/";
 
         assertFileContains(path + "api/WeatherForecastApisApi.kt", "@Get(\"/v1/forecast/{id}\")",
-                "@PathVariable(\"id\") @NotNull id: String,",
-                "@QueryValue(\"hourly\") @Nullable hourly: List<V1ForecastIdGetHourlyParameterInner>?,");
+            "@PathVariable(\"id\") @NotNull id: String,",
+            "@QueryValue(\"hourly\") @Nullable hourly: List<V1ForecastIdGetHourlyParameterInner>?,");
 
         assertFileContains(path + "model/V1ForecastIdGetHourlyParameterInner.kt",
-                "enum class V1ForecastIdGetHourlyParameterInner(",
-                "@JsonProperty(\"temperature_2m\")",
-                "TEMPERATURE_2M(\"temperature_2m\"),");
+            "enum class V1ForecastIdGetHourlyParameterInner(",
+            "@JsonProperty(\"temperature_2m\")",
+            "TEMPERATURE_2M(\"temperature_2m\"),");
     }
 
     @Test
@@ -509,23 +518,23 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         String path = outputPath + "src/main/kotlin/org/openapitools/";
 
         assertFileContains(path + "api/BooksApi.kt",
-                """
-                            @Post("/add-book")
-                            @NotBlank
-                            fun addBook(
-                        """);
+            """
+                    @Post("/add-book")
+                    @NotBlank
+                    fun addBook(
+                """);
 
         assertFileContains(path + "model/Book.kt",
-                """
-                        @Serializable
-                        data class Book(
-                            @field:NotNull
-                            @field:Size(max = 10)
-                            @field:JsonProperty(JSON_PROPERTY_TITLE)
-                            @field:jakarta.validation.constraints.NotBlank
-                            @set:NotEmpty
-                            var title: String,
-                        """);
+            """
+                @Serializable
+                data class Book(
+                    @field:NotNull
+                    @field:Size(max = 10)
+                    @field:JsonProperty(JSON_PROPERTY_TITLE)
+                    @field:jakarta.validation.constraints.NotBlank
+                    @set:NotEmpty
+                    var title: String,
+                """);
     }
 
     @Test
