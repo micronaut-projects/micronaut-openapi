@@ -6,7 +6,7 @@
         @PathVariable({{#defaultValue}}name = {{/defaultValue}}"{{baseName}}"{{#defaultValue}}, defaultValue = "{{{defaultValue}}}"{{/defaultValue}})
 {{/isPathParam}}
 {{#isHeaderParam}}
-        @Header({{#defaultValue}}value = {{/defaultValue}}"{{baseName}}"{{#defaultValue}}, defaultValue = "{{{defaultValue}}}"{{/defaultValue}})
+        @Header({{#defaultValue}}name = {{/defaultValue}}"{{baseName}}"{{#defaultValue}}, defaultValue = "{{{defaultValue}}}"{{/defaultValue}})
 {{/isHeaderParam}}
 {{#isBodyParam}}
     {{#isMultipart}}
