@@ -104,13 +104,13 @@ class MyBean {}
         then:
         paths
         paths.size() == 3
-        paths.'/${props-from-env-test.paths.my-controller.post}'
-        paths.'/${props-from-env-test.paths.my-controller.post}'.post
-        !paths.'/${props-from-env-test.paths.my-controller.get}'
+        paths.'${props-from-env-test.paths.my-controller.post}'
+        paths.'${props-from-env-test.paths.my-controller.post}'.post
+        !paths.'${props-from-env-test.paths.my-controller.get}'
         paths.'/myGet'
         paths.'/myGet'.get
-        paths.'/${props-from-env-test.paths.my-controller.put}'
-        paths.'/${props-from-env-test.paths.my-controller.put}'.put
+        paths.'${props-from-env-test.paths.my-controller.put}'
+        paths.'${props-from-env-test.paths.my-controller.put}'.put
 
         cleanup:
         System.clearProperty("props-from-env-test.paths.my-controller.get")

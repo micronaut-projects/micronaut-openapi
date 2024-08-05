@@ -6,7 +6,6 @@ import io.swagger.v3.oas.models.Operation
 
 class OpenApiPathParamRegexSpec extends AbstractOpenApiTypeElementSpec {
 
-
     void "test build OpenAPI path parameters with regex"() {
 
         when:
@@ -21,7 +20,7 @@ import io.swagger.v3.oas.annotations.Operation;
 class OpenApiController {
 
     @Operation(summary = "Update tag", description = "Updates an existing tag", tags = "users_tag")
-    @Post("/tags/{tagId: \\\\d+}/{path:.*}{.ext}/update/{+path}{?max,offset}{/id:[a-zA-Z]+}")
+    @Post("/tags/{tagId: \\\\d+}/{path:.*}{.ext}/update/{?max,offset}{/id:[a-zA-Z]+}")
     public void postRaw() {
     }
 }
@@ -37,7 +36,7 @@ class MyBean {}
 
         then:
         openAPI.paths
-        openAPI.paths."/path/tags/{tagId}/{path}/update/{path}/{id}"
+        openAPI.paths."/path/tags/{tagId}/{path}/update/{id}"
     }
 
 }

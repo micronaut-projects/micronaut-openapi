@@ -590,6 +590,91 @@ class MyBean {}
         pathItem3.get.parameters[3].in == 'query'
     }
 
+    void "test parse optional path variables"() {
+
+        given: "An API definition"
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.core.annotation.Nullable;
+import java.security.Principal;
+import io.micronaut.http.annotation.*;
+import io.micronaut.http.*;
+import io.swagger.v3.oas.annotations.*;
+import io.swagger.v3.oas.annotations.parameters.*;
+import io.swagger.v3.oas.annotations.responses.*;
+import io.swagger.v3.oas.annotations.security.*;
+import io.swagger.v3.oas.annotations.media.*;
+import io.swagger.v3.oas.annotations.enums.*;
+
+/**
+ * @author graemerocher
+ * @since 1.0
+ */
+@Controller("/")
+interface Test {
+    
+    @Get("/hello{/pathVar1,pathVar2}/world")
+    String test8(String pathVar1, String pathVar2, String queryVar, @Nullable String name);
+}
+
+class Greeting {
+    public String message;
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        then: "the state is correct"
+        Utils.testReference != null
+
+        when: "The OpenAPI is retrieved"
+        OpenAPI openAPI = Utils.testReference
+
+        def pathItem1 = openAPI.paths.get("/hello/world")
+        def pathItem2 = openAPI.paths.get("/hello/{pathVar1}/world")
+        def pathItem3 = openAPI.paths.get("/hello/{pathVar1}/{pathVar2}/world")
+
+        then:
+        pathItem1.get.parameters
+        pathItem1.get.parameters.size() == 2
+        pathItem1.get.parameters[0].name == 'queryVar'
+        pathItem1.get.parameters[0].required
+        pathItem1.get.parameters[0].in == 'query'
+        pathItem1.get.parameters[1].name == 'name'
+        !pathItem1.get.parameters[1].required
+        pathItem1.get.parameters[1].in == 'query'
+
+        pathItem2.get.parameters
+        pathItem2.get.parameters.size() == 3
+
+        pathItem2.get.parameters[0].name == 'pathVar1'
+        pathItem2.get.parameters[0].required
+        pathItem2.get.parameters[0].in == 'path'
+        pathItem2.get.parameters[1].name == 'queryVar'
+        pathItem2.get.parameters[1].required
+        pathItem2.get.parameters[1].in == 'query'
+        pathItem2.get.parameters[2].name == 'name'
+        !pathItem2.get.parameters[2].required
+        pathItem2.get.parameters[2].in == 'query'
+
+        pathItem3.get.parameters
+        pathItem3.get.parameters.size() == 4
+        pathItem3.get.parameters[0].name == 'pathVar1'
+        pathItem3.get.parameters[0].required
+        pathItem3.get.parameters[0].in == 'path'
+        pathItem3.get.parameters[1].name == 'pathVar2'
+        pathItem3.get.parameters[1].required
+        pathItem3.get.parameters[1].in == 'path'
+        pathItem3.get.parameters[2].name == 'queryVar'
+        pathItem3.get.parameters[2].required
+        pathItem3.get.parameters[2].in == 'query'
+        pathItem3.get.parameters[3].name == 'name'
+        !pathItem3.get.parameters[3].required
+        pathItem3.get.parameters[3].in == 'query'
+    }
+
     void "test @Parameter in header and explode is true"() {
 
         given: "An API definition"
