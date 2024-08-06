@@ -1,0 +1,75 @@
+openapi: 3.0.0
+info:
+  description: This is a library API
+  version: 1.0.0
+  title: Library
+  license:
+    name: Apache-2.0
+    url: "https://www.apache.org/licenses/LICENSE-2.0.html"
+tags:
+  - name: books
+    description: Add books
+paths:
+  /add-subject:
+    post:
+      tags: [ subjects ]
+      summary: Add a new subject
+      operationId: addSubject
+      requestBody:
+        required: true
+        content:
+          "application/json":
+            schema:
+              $ref: "#/components/schemas/CancellationReasonTypesDTO"
+      responses:
+        "200":
+          description: Success
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/CancellationReasonTypesDTO"
+        "400":
+          description: Bad Request
+components:
+  schemas:
+    CancellationReasonTypesDTO:
+      discriminator:
+        propertyName: version
+        mapping:
+          '-1': '#/components/schemas/CancellationReasonTypesV1'
+          '0': '#/components/schemas/CancellationReasonTypesV2'
+          '1': '#/components/schemas/CancellationReasonTypesV2'
+          '2': '#/components/schemas/CancellationReasonTypesV2'
+          '3': '#/components/schemas/CancellationReasonTypesV2'
+          '4': '#/components/schemas/CancellationReasonTypesV3'
+      oneOf:
+        - $ref: '#/components/schemas/CancellationReasonTypesV1'
+        - $ref: '#/components/schemas/CancellationReasonTypesV2'
+        - $ref: '#/components/schemas/CancellationReasonTypesV3'
+    CancellationReasonTypesV1:
+      type: object
+      properties:
+        version:
+          type: integer
+        title:
+          type: string
+        comments_field_prompt:
+          type: string
+        action_button_title:
+          type: string
+        can_cancel:
+          type: boolean
+    CancellationReasonTypesV2:
+      properties:
+        version:
+          type: integer
+        action_button_title:
+          type: string
+        can_cancel:
+          type: boolean
+    CancellationReasonTypesV3:
+      properties:
+        version:
+          type: integer
+        title:
+          type: string

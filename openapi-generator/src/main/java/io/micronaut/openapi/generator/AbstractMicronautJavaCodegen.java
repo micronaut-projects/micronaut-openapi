@@ -28,6 +28,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.atteo.evo.inflector.English;
 import org.openapitools.codegen.CliOption;
 import org.openapitools.codegen.CodegenConstants;
+import org.openapitools.codegen.CodegenDiscriminator;
 import org.openapitools.codegen.CodegenModel;
 import org.openapitools.codegen.CodegenOperation;
 import org.openapitools.codegen.CodegenParameter;
@@ -43,10 +44,13 @@ import org.openapitools.codegen.model.ModelsMap;
 import org.openapitools.codegen.model.OperationMap;
 import org.openapitools.codegen.model.OperationsMap;
 import org.openapitools.codegen.utils.ModelUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.security.SecureRandom;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -69,6 +73,7 @@ import static io.micronaut.openapi.generator.Utils.processGenericAnnotations;
 import static org.openapitools.codegen.CodegenConstants.API_PACKAGE;
 import static org.openapitools.codegen.CodegenConstants.INVOKER_PACKAGE;
 import static org.openapitools.codegen.CodegenConstants.MODEL_PACKAGE;
+import static org.openapitools.codegen.utils.OnceLogger.once;
 import static org.openapitools.codegen.utils.StringUtils.camelize;
 
 /**
@@ -134,6 +139,8 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
     protected List<ResponseBodyMapping> responseBodyMappings = new ArrayList<>();
     protected Map<String, CodegenModel> allModels = new HashMap<>();
 
+    private final Logger log = LoggerFactory.getLogger(getClass());
+
     protected AbstractMicronautJavaCodegen() {
 
         // CHECKSTYLE:OFF
@@ -144,12 +151,12 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
         visitable = false;
         testTool = OPT_TEST_JUNIT;
         outputFolder = this instanceof JavaMicronautClientCodegen ?
-                "generated-code/java-micronaut-client" : "generated-code/java-micronaut";
+            "generated-code/java-micronaut-client" : "generated-code/java-micronaut";
         apiPackage = "org.openapitools.api";
         modelPackage = "org.openapitools.model";
         invokerPackage = "org.openapitools";
         artifactId = this instanceof JavaMicronautClientCodegen ?
-                "openapi-micronaut-client" : "openapi-micronaut";
+            "openapi-micronaut-client" : "openapi-micronaut";
         embeddedTemplateDir = templateDir = "templates/java-micronaut";
         apiDocPath = "docs/apis";
         modelDocPath = "docs/models";
@@ -165,19 +172,19 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
 
         // Set implemented features for user information
         modifyFeatureSet(features -> features
-                .includeDocumentationFeatures(
-                        DocumentationFeature.Readme
-                )
-                .securityFeatures(EnumSet.of(
-                        SecurityFeature.ApiKey,
-                        SecurityFeature.BearerToken,
-                        SecurityFeature.BasicAuth,
-                        SecurityFeature.OAuth2_Implicit,
-                        SecurityFeature.OAuth2_AuthorizationCode,
-                        SecurityFeature.OAuth2_ClientCredentials,
-                        SecurityFeature.OAuth2_Password,
-                        SecurityFeature.OpenIDConnect
-                ))
+            .includeDocumentationFeatures(
+                DocumentationFeature.Readme
+            )
+            .securityFeatures(EnumSet.of(
+                SecurityFeature.ApiKey,
+                SecurityFeature.BearerToken,
+                SecurityFeature.BasicAuth,
+                SecurityFeature.OAuth2_Implicit,
+                SecurityFeature.OAuth2_AuthorizationCode,
+                SecurityFeature.OAuth2_ClientCredentials,
+                SecurityFeature.OAuth2_Password,
+                SecurityFeature.OpenIDConnect
+            ))
         );
 
         // Set additional properties
@@ -204,7 +211,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
         cliOptions.add(CliOption.newBoolean(OPT_GENERATE_HTTP_RESPONSE_ALWAYS, "Always wrap the operations response in HttpResponse object", generateHttpResponseAlways));
         cliOptions.add(CliOption.newBoolean(OPT_GENERATE_HTTP_RESPONSE_WHERE_REQUIRED, "Wrap the operations response in HttpResponse object where non-200 HTTP status codes or additional headers are defined", generateHttpResponseWhereRequired));
         cliOptions.add(CliOption.newBoolean(OPT_GENERATE_OPERATION_ONLY_FOR_FIRST_TAG, "When false, the operation method will be duplicated in each of the tags if multiple tags are assigned to this operation. " +
-                "If true, each operation will be generated only once in the first assigned tag.", generateOperationOnlyForFirstTag));
+            "If true, each operation will be generated only once in the first assigned tag.", generateOperationOnlyForFirstTag));
         CliOption testToolOption = new CliOption(OPT_TEST, "Specify which test tool to generate files for").defaultValue(testTool);
         Map<String, String> testToolOptionMap = new HashMap<>();
         testToolOptionMap.put(OPT_TEST_JUNIT, "Use JUnit as test tool");
@@ -226,14 +233,14 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
 
         // Modify the DATE_LIBRARY option to only have supported values
         cliOptions.stream()
-                .filter(o -> o.getOpt().equals(DATE_LIBRARY))
-                .findFirst()
-                .ifPresent(opt -> {
-                    Map<String, String> valuesEnum = new HashMap<>();
-                    valuesEnum.put(OPT_DATE_LIBRARY_OFFSET_DATETIME, opt.getEnum().get(OPT_DATE_LIBRARY_OFFSET_DATETIME));
-                    valuesEnum.put(OPT_DATE_LIBRARY_LOCAL_DATETIME, opt.getEnum().get(OPT_DATE_LIBRARY_LOCAL_DATETIME));
-                    opt.setEnum(valuesEnum);
-                });
+            .filter(o -> o.getOpt().equals(DATE_LIBRARY))
+            .findFirst()
+            .ifPresent(opt -> {
+                Map<String, String> valuesEnum = new HashMap<>();
+                valuesEnum.put(OPT_DATE_LIBRARY_OFFSET_DATETIME, opt.getEnum().get(OPT_DATE_LIBRARY_OFFSET_DATETIME));
+                valuesEnum.put(OPT_DATE_LIBRARY_LOCAL_DATETIME, opt.getEnum().get(OPT_DATE_LIBRARY_LOCAL_DATETIME));
+                opt.setEnum(valuesEnum);
+            });
 
         final CliOption serializationLibraryOpt = CliOption.newString(CodegenConstants.SERIALIZATION_LIBRARY, "Serialization library for model");
         serializationLibraryOpt.defaultValue(SerializationLibraryKind.JACKSON.name());
@@ -247,8 +254,8 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
         var micronautReservedWords = List.of(
             // special words
             "Object", "List", "File", "OffsetDateTime", "LocalDate", "LocalTime",
-                "Client", "Format", "QueryValue", "QueryParam", "PathVariable", "Header", "Cookie",
-                "Authorization", "Body", "application"
+            "Client", "Format", "QueryValue", "QueryParam", "PathVariable", "Header", "Cookie",
+            "Authorization", "Body", "application"
         );
         reservedWords.addAll(micronautReservedWords);
         List.of(
@@ -571,14 +578,10 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
         if (additionalProperties.containsKey(OPT_GENERATE_SWAGGER_ANNOTATIONS)) {
             String value = String.valueOf(additionalProperties.get(OPT_GENERATE_SWAGGER_ANNOTATIONS));
             switch (value) {
-                case OPT_GENERATE_SWAGGER_ANNOTATIONS_SWAGGER_1 ->
-                    generateSwaggerAnnotations = OPT_GENERATE_SWAGGER_ANNOTATIONS_SWAGGER_1;
-                case OPT_GENERATE_SWAGGER_ANNOTATIONS_SWAGGER_2, OPT_GENERATE_SWAGGER_ANNOTATIONS_TRUE ->
-                    generateSwaggerAnnotations = OPT_GENERATE_SWAGGER_ANNOTATIONS_SWAGGER_2;
-                case OPT_GENERATE_SWAGGER_ANNOTATIONS_FALSE ->
-                    generateSwaggerAnnotations = OPT_GENERATE_SWAGGER_ANNOTATIONS_FALSE;
-                default ->
-                    throw new RuntimeException("Value \"" + value + "\" for the " + OPT_GENERATE_SWAGGER_ANNOTATIONS + " parameter is unsupported or misspelled");
+                case OPT_GENERATE_SWAGGER_ANNOTATIONS_SWAGGER_1 -> generateSwaggerAnnotations = OPT_GENERATE_SWAGGER_ANNOTATIONS_SWAGGER_1;
+                case OPT_GENERATE_SWAGGER_ANNOTATIONS_SWAGGER_2, OPT_GENERATE_SWAGGER_ANNOTATIONS_TRUE -> generateSwaggerAnnotations = OPT_GENERATE_SWAGGER_ANNOTATIONS_SWAGGER_2;
+                case OPT_GENERATE_SWAGGER_ANNOTATIONS_FALSE -> generateSwaggerAnnotations = OPT_GENERATE_SWAGGER_ANNOTATIONS_FALSE;
+                default -> throw new RuntimeException("Value \"" + value + "\" for the " + OPT_GENERATE_SWAGGER_ANNOTATIONS + " parameter is unsupported or misspelled");
             }
         }
     }
@@ -586,10 +589,8 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
     private void maybeSetTestTool() {
         if (additionalProperties.containsKey(OPT_TEST)) {
             switch ((String) additionalProperties.get(OPT_TEST)) {
-                case OPT_TEST_JUNIT, OPT_TEST_SPOCK ->
-                    testTool = (String) additionalProperties.get(OPT_TEST);
-                default ->
-                    throw new RuntimeException("Test tool \"" + additionalProperties.get(OPT_TEST) + "\" is not supported or misspelled.");
+                case OPT_TEST_JUNIT, OPT_TEST_SPOCK -> testTool = (String) additionalProperties.get(OPT_TEST);
+                default -> throw new RuntimeException("Test tool \"" + additionalProperties.get(OPT_TEST) + "\" is not supported or misspelled.");
             }
         }
     }
@@ -686,6 +687,45 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
     }
 
     @Override
+    protected CodegenDiscriminator createDiscriminator(String schemaName, Schema schema) {
+
+        var discriminator = super.createDiscriminator(schemaName, schema);
+        if (discriminator == null) {
+            return null;
+        }
+
+        for (var entry : discriminator.getMapping().entrySet()) {
+            String name;
+            if (entry.getValue().indexOf('/') < 0) {
+                continue;
+            }
+            name = ModelUtils.getSimpleRef(entry.getValue());
+            var referencedSchema = ModelUtils.getSchema(openAPI, name);
+            if (referencedSchema == null) {
+                once(log).error("Failed to lookup the schema '{}' when processing the discriminator mapping of oneOf/anyOf. Please check to ensure it's defined properly.", name);
+                continue;
+            }
+            if (referencedSchema.getProperties() == null || referencedSchema.getProperties().isEmpty()) {
+                continue;
+            }
+            boolean isDiscriminatorPropTypeFound = false;
+            var props = (Map<String, Schema>) referencedSchema.getProperties();
+            for (var propEntry : props.entrySet()) {
+                if (!propEntry.getKey().equals(discriminator.getPropertyName())) {
+                    continue;
+                }
+                discriminator.setPropertyType(getTypeDeclaration(propEntry.getValue()));
+                isDiscriminatorPropTypeFound = true;
+                break;
+            }
+            if (isDiscriminatorPropTypeFound) {
+                break;
+            }
+        }
+        return discriminator;
+    }
+
+    @Override
     public String toApiVarName(String name) {
         String apiVarName = super.toApiVarName(name);
         if (reservedWords.contains(apiVarName)) {
@@ -743,7 +783,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
                         var found = false;
                         for (var opParam : op.getParameters()) {
                             if (Objects.equals(opParam.getName(), param.getName())
-                                    && Objects.equals(opParam.get$ref(), param.get$ref())) {
+                                && Objects.equals(opParam.get$ref(), param.get$ref())) {
                                 found = true;
                                 break;
                             }
@@ -800,18 +840,18 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
         objs = super.postProcessOperationsWithModels(objs, allModels);
 
         Map<String, CodegenModel> models = allModels.stream()
-                .map(ModelMap::getModel)
-                .collect(Collectors.toMap(v -> v.classname, v -> v));
+            .map(ModelMap::getModel)
+            .collect(Collectors.toMap(v -> v.classname, v -> v));
         OperationMap operations = objs.getOperations();
         List<CodegenOperation> operationList = operations.getOperation();
 
         for (CodegenOperation op : operationList) {
             // Set whether body is supported in request
             op.vendorExtensions.put("methodAllowsBody", op.httpMethod.equals("PUT")
-                    || op.httpMethod.equals("POST")
-                    || op.httpMethod.equals("PATCH")
-                    || op.httpMethod.equals("OPTIONS")
-                    || op.httpMethod.equals("DELETE")
+                || op.httpMethod.equals("POST")
+                || op.httpMethod.equals("PATCH")
+                || op.httpMethod.equals("OPTIONS")
+                || op.httpMethod.equals("DELETE")
             );
 
             normalizeExtraAnnotations(EXT_ANNOTATIONS_OPERATION, false, op.vendorExtensions);
@@ -827,14 +867,14 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
                         allowableValues = (List<Object>) m.allowableValues.get("values");
                     }
                     example = getExampleValue(m.defaultValue, null, m.classname, true,
-                            allowableValues, null, null, m.requiredVars, false, false);
+                        allowableValues, null, null, m.requiredVars, false, false);
                     groovyExample = getExampleValue(m.defaultValue, null, m.classname, true,
-                            allowableValues, null, null, m.requiredVars, true, false);
+                        allowableValues, null, null, m.requiredVars, true, false);
                 } else {
                     example = getExampleValue(null, null, op.returnType, false, null,
-                            op.returnBaseType, null, null, false, false);
+                        op.returnBaseType, null, null, false, false);
                     groovyExample = getExampleValue(null, null, op.returnType, false, null,
-                            op.returnBaseType, null, null, true, false);
+                        op.returnBaseType, null, null, true, false);
                 }
                 op.vendorExtensions.put("example", example);
                 op.vendorExtensions.put("groovyExample", groovyExample);
@@ -845,22 +885,22 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
                 op.vendorExtensions.put("x-contentType", CONTENT_TYPE_APPLICATION_JSON);
             }
             op.consumes = op.consumes == null ? null : op.consumes.stream()
-                    .filter(contentType -> !CONTENT_TYPE_ANY.equals(contentType.get("mediaType")))
-                    .toList();
+                .filter(contentType -> !CONTENT_TYPE_ANY.equals(contentType.get("mediaType")))
+                .toList();
             op.produces = op.produces == null ? null : op.produces.stream()
-                    .filter(contentType -> !CONTENT_TYPE_ANY.equals(contentType.get("mediaType")))
-                    .toList();
+                .filter(contentType -> !CONTENT_TYPE_ANY.equals(contentType.get("mediaType")))
+                .toList();
 
             // is only default "application/json" media type
             if (op.consumes == null
-                    || op.consumes.isEmpty()
-                    || op.consumes.size() == 1 && CONTENT_TYPE_APPLICATION_JSON.equals(op.consumes.get(0).get("mediaType"))) {
+                || op.consumes.isEmpty()
+                || op.consumes.size() == 1 && CONTENT_TYPE_APPLICATION_JSON.equals(op.consumes.get(0).get("mediaType"))) {
                 op.vendorExtensions.put("onlyDefaultConsumeOrEmpty", true);
             }
             // is only default "application/json" media type
             if (op.produces == null
-                    || op.produces.isEmpty()
-                    || op.produces.size() == 1 && CONTENT_TYPE_APPLICATION_JSON.equals(op.produces.get(0).get("mediaType"))) {
+                || op.produces.isEmpty()
+                || op.produces.size() == 1 && CONTENT_TYPE_APPLICATION_JSON.equals(op.produces.get(0).get("mediaType"))) {
                 op.vendorExtensions.put("onlyDefaultProduceOrEmpty", true);
             }
 
@@ -1097,7 +1137,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
 
     private void processOperationWithResponseWrappers(CodegenOperation op) {
         boolean hasNon200StatusCodes = op.responses.stream().anyMatch(
-                response -> !"200".equals(response.code) && response.code.startsWith("2")
+            response -> !"200".equals(response.code) && response.code.startsWith("2")
         );
         boolean hasNonMappedHeaders = !op.responseHeaders.isEmpty();
         boolean requiresHttpResponse = hasNon200StatusCodes || hasNonMappedHeaders;
@@ -1152,8 +1192,8 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
             var firstNameChar = varName.toCharArray()[0];
             var underscorePrefix = getUnderscorePrefix(name);
             varName = underscorePrefix
-                    + (firstNameChar == '_' && !underscorePrefix.isEmpty() ? "" : Character.toLowerCase(firstNameChar))
-                    + varName.substring(1);
+                + (firstNameChar == '_' && !underscorePrefix.isEmpty() ? "" : Character.toLowerCase(firstNameChar))
+                + varName.substring(1);
         }
 
         return varName;
@@ -1164,8 +1204,8 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
         var newName = super.getterAndSetterCapitalize(name);
         if (name.startsWith("_")) {
             newName = getUnderscorePrefix(name)
-                    + Character.toLowerCase(newName.toCharArray()[0])
-                    + newName.substring(1);
+                + Character.toLowerCase(newName.toCharArray()[0])
+                + newName.substring(1);
         }
         return newName;
     }
@@ -1240,7 +1280,54 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
             addStrValueToEnum(model);
         }
 
+        for (ModelsMap models : objs.values()) {
+            CodegenModel model = models.getModels().get(0).getModel();
+            processOneOfModels(model, objs.values());
+        }
+
         return objs;
+    }
+
+    private void processOneOfModels(CodegenModel model, Collection<ModelsMap> models) {
+
+        if (!model.vendorExtensions.containsKey("x-is-one-of-interface")
+            || !Boolean.parseBoolean(model.vendorExtensions.get("x-is-one-of-interface").toString())) {
+            return;
+        }
+
+        var discriminator = model.discriminator;
+        if (discriminator == null) {
+            return;
+        }
+        var oneOfInterfaceName = model.name;
+        for (var modelMap : models) {
+            var m = modelMap.getModels().get(0).getModel();
+
+            if (!m.vendorExtensions.containsKey("x-implements")) {
+                continue;
+            }
+            var xImplements = m.vendorExtensions.get("x-implements");
+            if (!(xImplements instanceof List<?> xImplementsList)) {
+                continue;
+            }
+            for (var implInterface : xImplementsList) {
+                if (!oneOfInterfaceName.equalsIgnoreCase(implInterface.toString())) {
+                    continue;
+                }
+                for (var prop : m.allVars) {
+                    if (prop.name.equals(discriminator.getPropertyName())) {
+                        prop.isDiscriminator = true;
+                        prop.isOverridden = true;
+                        prop.isNullable = false;
+                        prop.isOptional = false;
+                        prop.required = true;
+                        prop.isReadOnly = false;
+                        prop.vendorExtensions.put("overridden", true);
+                        break;
+                    }
+                }
+            }
+        }
     }
 
     private void processProperty(CodegenProperty property, boolean isServer, Map<String, ModelsMap> models) {
@@ -1364,8 +1451,8 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
     }
 
     public String getExampleValue(
-            String defaultValue, String example, String dataType, Boolean isModel, List<Object> allowableValues,
-            String itemsType, String itemsExample, List<CodegenProperty> requiredVars, boolean groovy, boolean isProperty
+        String defaultValue, String example, String dataType, Boolean isModel, List<Object> allowableValues,
+        String itemsType, String itemsExample, List<CodegenProperty> requiredVars, boolean groovy, boolean isProperty
     ) {
         example = defaultValue != null ? defaultValue : example;
         String containerType = dataType == null ? null : dataType.split("<")[0];
@@ -1477,7 +1564,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
     @Override
     protected ImmutableMap.Builder<String, Mustache.Lambda> addMustacheLambdas() {
         return super.addMustacheLambdas()
-                .put("replaceDotsWithUnderscore", new ReplaceDotsWithUnderscoreLambda());
+            .put("replaceDotsWithUnderscore", new ReplaceDotsWithUnderscoreLambda());
     }
 
     public void setSerializationLibrary(final String serializationLibrary) {

@@ -489,7 +489,7 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         String outputPath = generateFiles(codegen, "src/test/resources/3_0/oneof-with-discriminator.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
         String path = outputPath + "src/main/java/org/openapitools/";
 
-        assertFileContains(path + "model/Subject.java", "public String getTypeCode();");
+        assertFileContains(path + "model/Subject.java", "String getTypeCode();");
         assertFileContains(path + "model/Person.java", "public String getTypeCode() {");
     }
 
@@ -503,5 +503,20 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         assertFileNotContains(path + "model/OrderDTOShoppingNotes.java", "@JsonIgnoreProperties(",
             "@JsonTypeInfo"
         );
+    }
+
+    @Test
+    void testDiscriminatorCustomType() {
+
+        var codegen = new JavaMicronautClientCodegen();
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/oneof-with-discriminator2.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String path = outputPath + "src/main/java/org/openapitools/";
+
+        assertFileContains(path + "model/CancellationReasonTypesV2.java", """
+                @NotNull
+                @JsonProperty(JSON_PROPERTY_VERSION)
+                protected Integer version;
+            """);
+        assertFileContains(path + "model/CancellationReasonTypesDTO.java", "Integer getVersion();");
     }
 }

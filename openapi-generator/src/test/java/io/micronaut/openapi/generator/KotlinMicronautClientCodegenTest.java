@@ -550,4 +550,19 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
             "@JsonTypeInfo"
         );
     }
+
+    @Test
+    void testDiscriminatorCustomType() {
+
+        var codegen = new KotlinMicronautClientCodegen();
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/oneof-with-discriminator2.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String path = outputPath + "src/main/kotlin/org/openapitools/";
+
+        assertFileContains(path + "model/CancellationReasonTypesV2.kt", """
+                @field:NotNull
+                @field:JsonProperty(JSON_PROPERTY_VERSION)
+                override var version: Int,
+            """);
+        assertFileContains(path + "model/CancellationReasonTypesDTO.kt", "val version: Int");
+    }
 }
