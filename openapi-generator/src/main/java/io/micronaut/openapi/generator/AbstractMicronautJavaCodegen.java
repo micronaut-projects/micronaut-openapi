@@ -1593,4 +1593,8 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
     public boolean getUseInlineModelResolver() {
         return false;
     }
+    @Override
+    public void postProcess() {
+        // disable output donation suggestion
+    }
 }

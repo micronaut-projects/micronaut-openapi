@@ -15,6 +15,14 @@
  */
 package io.micronaut.openapi.generator;
 
+import io.micronaut.openapi.generator.MicronautCodeGeneratorOptionsBuilder.GeneratorLanguage;
+import io.swagger.parser.OpenAPIParser;
+import io.swagger.v3.parser.core.models.ParseOptions;
+import org.openapitools.codegen.ClientOptInput;
+import org.openapitools.codegen.CodegenConstants;
+import org.openapitools.codegen.DefaultCodegen;
+import org.openapitools.codegen.DefaultGenerator;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -24,15 +32,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Consumer;
-
-import io.micronaut.openapi.generator.MicronautCodeGeneratorOptionsBuilder.GeneratorLanguage;
-import io.swagger.parser.OpenAPIParser;
-import io.swagger.v3.parser.core.models.ParseOptions;
-
-import org.openapitools.codegen.ClientOptInput;
-import org.openapitools.codegen.CodegenConstants;
-import org.openapitools.codegen.DefaultCodegen;
-import org.openapitools.codegen.DefaultGenerator;
 
 /**
  * Main entry point for Micronaut OpenAPI code generation.
