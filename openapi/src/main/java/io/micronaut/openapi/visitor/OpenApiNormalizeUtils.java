@@ -15,14 +15,7 @@
  */
 package io.micronaut.openapi.visitor;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.function.BiConsumer;
-import java.util.function.Function;
-
+import com.fasterxml.jackson.core.JsonProcessingException;
 import io.micronaut.core.annotation.Internal;
 import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.core.util.StringUtils;
@@ -38,8 +31,15 @@ import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.parameters.Parameter;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
 
+import static io.micronaut.openapi.visitor.SchemaUtils.EMPTY_SCHEMA;
 import static io.micronaut.openapi.visitor.SchemaUtils.EMPTY_SIMPLE_SCHEMA;
 import static io.micronaut.openapi.visitor.SchemaUtils.TYPE_OBJECT;
 import static io.micronaut.openapi.visitor.SchemaUtils.TYPE_STRING;
@@ -121,8 +121,8 @@ public final class OpenApiNormalizeUtils {
                     paramSchema.setType(TYPE_OBJECT);
                 }
                 if (parameter.getExample() != null
-                        && parameter.getExample() instanceof String exampleStr
-                        && parameter.getSchema() != null) {
+                    && parameter.getExample() instanceof String exampleStr
+                    && parameter.getSchema() != null) {
                     parameter.setExample(ConvertUtils.parseByTypeAndFormat(exampleStr, parameter.getSchema().getType(), parameter.getSchema().getFormat(), context, false));
                 }
                 normalizeExamples(parameter.getExamples());
@@ -193,6 +193,9 @@ public final class OpenApiNormalizeUtils {
     }
 
     public static Schema<?> normalizeSchema(Schema<?> schema, VisitorContext context) {
+        if (schema == null) {
+            return null;
+        }
         List<Schema> allOf = schema.getAllOf();
         if (CollectionUtils.isNotEmpty(allOf)) {
             if (allOf.size() == 1) {
@@ -223,8 +226,8 @@ public final class OpenApiNormalizeUtils {
                 boolean isSameType = allOfSchema.getType() == null || allOfSchema.getType().equals(type);
 
                 if (SchemaUtils.isEmptySchema(schema)
-                        && (serializedDefaultValue == null || serializedDefaultValue.equals(serializedAllOfDefaultValue))
-                        && (type == null || isSameType)) {
+                    && (serializedDefaultValue == null || serializedDefaultValue.equals(serializedAllOfDefaultValue))
+                    && (type == null || isSameType)) {
                     normalizedSchema = allOfSchema;
                 }
                 schema.setType(type);
@@ -237,6 +240,11 @@ public final class OpenApiNormalizeUtils {
                 }
                 normalizeSchemaProperties(schema, context);
                 normalizeSchemaProperties(normalizedSchema, context);
+                unwrapAllOff(normalizedSchema);
+                normalizeSchema(schema.getItems(), context);
+                if (normalizedSchema != null) {
+                    normalizeSchema(normalizedSchema.getItems(), context);
+                }
                 return normalizedSchema;
             }
 
@@ -266,12 +274,12 @@ public final class OpenApiNormalizeUtils {
                     schemasWithoutRef.add(schemaAllOf);
                     // remove all description fields, if it's already set in main schema
                     if (StringUtils.isNotEmpty(schema.getDescription())
-                            && StringUtils.isNotEmpty(schemaAllOf.getDescription())) {
+                        && StringUtils.isNotEmpty(schemaAllOf.getDescription())) {
                         schemaAllOf.setDescription(null);
                     }
                     // remove duplicate default field
                     if (schema.getDefault() != null
-                            && schemaAllOf.getDefault() != null && schema.getDefault().equals(schemaAllOf.getDefault())) {
+                        && schemaAllOf.getDefault() != null && schema.getDefault().equals(schemaAllOf.getDefault())) {
                         schema.setDefault(null);
                     }
                     continue;
@@ -282,6 +290,8 @@ public final class OpenApiNormalizeUtils {
             schema.setAllOf(finalList);
         }
         normalizeSchemaProperties(schema, context);
+        unwrapAllOff(schema);
+        normalizeSchema(schema.getItems(), context);
         return null;
     }
 
@@ -490,5 +500,78 @@ public final class OpenApiNormalizeUtils {
         schema.setAllOf(Utils.findAndRemoveDuplicates(schema.getAllOf(), (el1, el2) -> el1 != null && el1.equals(el2)));
         schema.setAnyOf(Utils.findAndRemoveDuplicates(schema.getAnyOf(), (el1, el2) -> el1 != null && el1.equals(el2)));
         schema.setOneOf(Utils.findAndRemoveDuplicates(schema.getOneOf(), (el1, el2) -> el1 != null && el1.equals(el2)));
+    }
+
+    private static void unwrapAllOff(Schema<?> schema) {
+
+        if (schema == null || CollectionUtils.isEmpty(schema.getAllOf())) {
+            return;
+        }
+
+        var index = 0;
+        var innerSchemas = new HashMap<Integer, Schema>();
+        for (var s : schema.getAllOf()) {
+            if (StringUtils.isEmpty(s.get$ref())) {
+                innerSchemas.put(index, s);
+            }
+            index++;
+        }
+        if (innerSchemas.isEmpty()) {
+            return;
+        }
+
+        for (var entry : innerSchemas.entrySet()) {
+            var innerSchema = entry.getValue();
+            if (StringUtils.isNotEmpty(innerSchema.getTitle())) {
+                schema.setTitle(innerSchema.getTitle());
+                innerSchema.setTitle(null);
+            }
+            if (StringUtils.isNotEmpty(innerSchema.getDescription())) {
+                schema.setDescription(innerSchema.getDescription());
+                innerSchema.setDescription(null);
+            }
+            if (innerSchema.getDeprecated() != null) {
+                schema.setDeprecated(innerSchema.getDeprecated());
+                if (!schema.getDeprecated()) {
+                    schema.setDeprecated(false);
+                }
+                innerSchema.setDeprecated(null);
+            }
+            if (innerSchema.getNullable() != null) {
+                schema.setNullable(innerSchema.getNullable());
+                if (!schema.getNullable()) {
+                    schema.setNullable(false);
+                }
+                innerSchema.setNullable(null);
+            }
+            if (CollectionUtils.isNotEmpty(innerSchema.getRequired())) {
+                schema.setRequired(innerSchema.getRequired());
+                innerSchema.setRequired(null);
+            }
+            if (innerSchema.getExample() != null) {
+                schema.setExampleSetFlag(innerSchema.getExampleSetFlag());
+                schema.setExample(innerSchema.getExample());
+                innerSchema.setExample(null);
+                innerSchema.setExampleSetFlag(false);
+            }
+            if (CollectionUtils.isNotEmpty(innerSchema.getExamples())) {
+                schema.setExamples(innerSchema.getExamples());
+                innerSchema.setExamples(null);
+            }
+            if (innerSchema.getExternalDocs() != null) {
+                schema.setExternalDocs(innerSchema.getExternalDocs());
+                innerSchema.setExternalDocs(null);
+            }
+            if (innerSchema.getReadOnly() != null) {
+                schema.setReadOnly(innerSchema.getReadOnly());
+                innerSchema.setReadOnly(null);
+            }
+            if (EMPTY_SCHEMA.equals(innerSchema)) {
+                schema.getAllOf().remove(entry.getKey().intValue());
+            }
+            if (schema.getAllOf().isEmpty()) {
+                schema.setAllOf(null);
+            }
+        }
     }
 }

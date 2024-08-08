@@ -67,8 +67,8 @@ class MyBean
         operation.parameters[0].schema
         operation.parameters[0].schema.type == 'array'
         operation.parameters[0].schema.nullable == true
+        operation.parameters[0].schema.items.nullable == true
         operation.parameters[0].schema.items.allOf[0].$ref == '#/components/schemas/HelloController.Channel'
-        operation.parameters[0].schema.items.allOf[1].nullable == true
 
         response.content.'text/plain'.schema.type == 'string'
 

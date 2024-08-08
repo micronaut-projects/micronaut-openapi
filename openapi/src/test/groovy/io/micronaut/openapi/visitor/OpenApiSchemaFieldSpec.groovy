@@ -134,22 +134,21 @@ class MyBean {}
         operation.requestBody.content."application/json".schema instanceof Schema
         ((Schema) operation.requestBody.content."application/json".schema).get$ref() == "#/components/schemas/MyDto"
 
-        dtoSchema.properties.test instanceof ComposedSchema
+        dtoSchema.properties.test.title == 'the title'
+        dtoSchema.properties.test.deprecated
+        dtoSchema.properties.test.readOnly
+        dtoSchema.properties.test.description == 'this is description'
+        dtoSchema.properties.test.externalDocs.description == 'external docs'
+        dtoSchema.properties.test.example
+        dtoSchema.properties.test.example.stampWidth == 220
+        dtoSchema.properties.test.example.stampHeight == 85
+        dtoSchema.properties.test.example.pageNumber == 1
         dtoSchema.properties.test.allOf
         dtoSchema.properties.test.allOf.size() == 2
         dtoSchema.properties.test.allOf.get(0).$ref == "#/components/schemas/Parameters"
-        dtoSchema.properties.test.allOf.get(1).description == 'this is description'
         dtoSchema.properties.test.allOf.get(1).default
         dtoSchema.properties.test.allOf.get(1).default.stampWidth == 100
-        dtoSchema.properties.test.allOf.get(1).example
-        dtoSchema.properties.test.allOf.get(1).example.stampWidth == 220
-        dtoSchema.properties.test.allOf.get(1).example.stampHeight == 85
-        dtoSchema.properties.test.allOf.get(1).example.pageNumber == 1
-        dtoSchema.properties.test.allOf.get(1).deprecated
-        dtoSchema.properties.test.allOf.get(1).readOnly
         dtoSchema.properties.test.allOf.get(1).format == 'binary'
-        dtoSchema.properties.test.allOf.get(1).externalDocs.description == 'external docs'
-        dtoSchema.properties.test.allOf.get(1).title == 'the title'
         dtoSchema.properties.test.allOf.get(1).exclusiveMinimum
         dtoSchema.properties.test.allOf.get(1).exclusiveMaximum
         dtoSchema.properties.test.allOf.get(1).maximum == 100
@@ -409,30 +408,29 @@ class MyBean {}
         operation.requestBody.content."application/json".schema instanceof Schema
         ((Schema) operation.requestBody.content."application/json".schema).get$ref() == "#/components/schemas/MyDto"
 
-        dtoSchema.properties.test instanceof ComposedSchema
+        dtoSchema.properties.test.description == 'this is description'
         dtoSchema.properties.test.allOf
-        dtoSchema.properties.test.allOf.size() == 2
+        dtoSchema.properties.test.allOf.size() == 1
         dtoSchema.properties.test.allOf.get(0).$ref == "#/components/schemas/Parameters"
-        dtoSchema.properties.test.allOf.get(1).description == 'this is description'
-        !dtoSchema.properties.test.allOf.get(1).default
-        !dtoSchema.properties.test.allOf.get(1).example
-        !dtoSchema.properties.test.allOf.get(1).deprecated
-        !dtoSchema.properties.test.allOf.get(1).readOnly
-        !dtoSchema.properties.test.allOf.get(1).format
-        !dtoSchema.properties.test.allOf.get(1).externalDocs
-        !dtoSchema.properties.test.allOf.get(1).title
-        !dtoSchema.properties.test.allOf.get(1).exclusiveMinimum
-        !dtoSchema.properties.test.allOf.get(1).exclusiveMaximum
-        !dtoSchema.properties.test.allOf.get(1).maximum
-        !dtoSchema.properties.test.allOf.get(1).minimum
-        !dtoSchema.properties.test.allOf.get(1).maximum
-        !dtoSchema.properties.test.allOf.get(1).minLength
-        !dtoSchema.properties.test.allOf.get(1).maxLength
-        !dtoSchema.properties.test.allOf.get(1).minProperties
-        !dtoSchema.properties.test.allOf.get(1).maxProperties
-        !dtoSchema.properties.test.allOf.get(1).multipleOf
-        !dtoSchema.properties.test.allOf.get(1).pattern
-        !dtoSchema.properties.test.allOf.get(1).additionalProperties
+        !dtoSchema.properties.test.default
+        !dtoSchema.properties.test.example
+        !dtoSchema.properties.test.deprecated
+        !dtoSchema.properties.test.readOnly
+        !dtoSchema.properties.test.format
+        !dtoSchema.properties.test.externalDocs
+        !dtoSchema.properties.test.title
+        !dtoSchema.properties.test.exclusiveMinimum
+        !dtoSchema.properties.test.exclusiveMaximum
+        !dtoSchema.properties.test.maximum
+        !dtoSchema.properties.test.minimum
+        !dtoSchema.properties.test.maximum
+        !dtoSchema.properties.test.minLength
+        !dtoSchema.properties.test.maxLength
+        !dtoSchema.properties.test.minProperties
+        !dtoSchema.properties.test.maxProperties
+        !dtoSchema.properties.test.multipleOf
+        !dtoSchema.properties.test.pattern
+        !dtoSchema.properties.test.additionalProperties
         !dtoSchema.properties.test.nullable
         !dtoSchema.required
     }
@@ -718,9 +716,9 @@ class MyBean {}
         localParamsSchema.allOf.get(1).properties.stampWidth.type == 'integer'
         localParamsSchema.allOf.get(1).properties.stampWidth.format == 'int32'
 
-        dtoSchema.properties.test instanceof ComposedSchema
+        dtoSchema.properties.test.description == 'this is description'
+        dtoSchema.properties.test.allOf.size() == 1
         dtoSchema.properties.test.allOf.get(0).$ref == '#/components/schemas/LocalParams'
-        dtoSchema.properties.test.allOf.get(1).description == 'this is description'
     }
 
     void "test schema on class level with not/allOf/anyOf/oneOf"() {
@@ -854,11 +852,11 @@ class MyBean {}
         operation.requestBody.content."application/json".schema instanceof Schema
         ((Schema) operation.requestBody.content."application/json".schema).$ref == "#/components/schemas/test"
 
+        dtoSchema.description == 'this is description'
         dtoSchema.not
         dtoSchema.not.$ref == '#/components/schemas/LocalParams'
         dtoSchema.allOf.get(0).$ref == '#/components/schemas/LocalParams'
         dtoSchema.allOf.get(1).properties.parameters.$ref == '#/components/schemas/GlobalParams'
-        dtoSchema.allOf.get(1).description == 'this is description'
         dtoSchema.oneOf.get(0).$ref == '#/components/schemas/LocalParams'
         dtoSchema.anyOf.get(0).$ref == '#/components/schemas/LocalParams'
 
@@ -1082,4 +1080,60 @@ class MyBean {}
         schemas.Bird.allOf[1].properties.numWings.minimum == 10
     }
 
+    void "test unwrap allOf"() {
+
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Put;
+import io.swagger.v3.oas.annotations.media.Schema;
+
+@Controller
+class HelloController {
+
+    @Put("/sendModelWithDiscriminator")
+    MyDto2 sendModelWithDiscriminator() {
+        return null;
+    }
+}
+
+@Schema(description = "A simple DTO")
+class MyDto {
+  @Schema(description = "A string field")
+  public String field1;
+}
+
+@Schema(description = "A DTO containing the other DTO")
+class MyDto2 {
+  @Schema(
+      description = "A field containing another DTO",
+      title = "my title",
+      deprecated = true,
+      nullable = true
+  )
+  public MyDto field2;
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        then: "the state is correct"
+        Utils.testReference != null
+
+        when: "The OpenAPI is retrieved"
+        def openApi = Utils.testReference
+        def schemas = openApi.components.schemas
+
+        then: "the components are valid"
+        schemas.MyDto2
+        schemas.MyDto2.properties.field2.title == "my title"
+        schemas.MyDto2.properties.field2.description == "A field containing another DTO"
+        schemas.MyDto2.properties.field2.deprecated
+        schemas.MyDto2.properties.field2.nullable
+        schemas.MyDto2.properties.field2.allOf
+        schemas.MyDto2.properties.field2.allOf.size() == 1
+        schemas.MyDto2.properties.field2.allOf[0].$ref == '#/components/schemas/MyDto'
+    }
 }
