@@ -514,7 +514,7 @@ public final class MicronautCodeGeneratorEntryPoint {
 
             private boolean optional;
             private boolean reactive = true;
-            private boolean useOneOfInterfaces = true;
+            private boolean useOneOfInterfaces;
             private boolean generateHttpResponseAlways;
             private boolean generateHttpResponseWhereRequired = true;
             private TestFramework testFramework = TestFramework.JUNIT5;

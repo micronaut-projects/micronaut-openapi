@@ -159,7 +159,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
         generateSwaggerAnnotations = this instanceof JavaMicronautClientCodegen ? OPT_GENERATE_SWAGGER_ANNOTATIONS_FALSE : OPT_GENERATE_SWAGGER_ANNOTATIONS_SWAGGER_2;
         generateOperationOnlyForFirstTag = this instanceof JavaMicronautServerCodegen;
         openApiNullable = false;
-        useOneOfInterfaces = true;
+        useOneOfInterfaces = false;
         inlineSchemaOption.put("RESOLVE_INLINE_ENUMS", "true");
         // CHECKSTYLE:ON
 

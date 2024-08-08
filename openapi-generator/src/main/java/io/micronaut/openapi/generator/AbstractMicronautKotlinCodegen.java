@@ -216,7 +216,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         generateOperationOnlyForFirstTag = this instanceof KotlinMicronautServerCodegen;
         enumPropertyNaming = CodegenConstants.ENUM_PROPERTY_NAMING_TYPE.UPPERCASE;
         inlineSchemaOption.put("RESOLVE_INLINE_ENUMS", "true");
-        useOneOfInterfaces = true;
+        useOneOfInterfaces = false;
         // CHECKSTYLE:ON
 
         // Set implemented features for user information
