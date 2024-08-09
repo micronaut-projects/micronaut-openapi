@@ -33,6 +33,7 @@ public final class StringUtil {
     public static final String OPEN_BRACE = "{";
     public static final String CLOSE_BRACE = "}";
     public static final String SLASH = "/";
+    public static final char SLASH_CHAR = '/';
     public static final String DOLLAR = "$";
     public static final String DOT = ".";
     public static final String COMMA = ",";
