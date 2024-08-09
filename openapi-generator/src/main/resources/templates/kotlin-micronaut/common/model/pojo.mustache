@@ -48,12 +48,12 @@
 {{#nonPublicApi}}internal {{/nonPublicApi}}{{#hasChildren}}open{{/hasChildren}}{{^hasChildren}}data{{/hasChildren}} class {{classname}}({{#formatNoEmptyLines}}
 {{#vendorExtensions.requiredVarsWithoutDiscriminator}}
     {{>common/model/field_annotations}}
-    {{#vendorExtensions.overridden}}override {{/vendorExtensions.overridden}}{{^vendorExtensions.overridden}}{{#hasChildren}}open {{/hasChildren}}{{/vendorExtensions.overridden}}var {{{name}}}: {{{vendorExtensions.typeWithEnumWithGenericAnnotations}}}{{#defaultValue}} = {{{.}}}{{/defaultValue}}{{^defaultValue}}{{#isNullable}} = null{{/isNullable}}{{/defaultValue}},
+    {{#vendorExtensions.overridden}}override {{/vendorExtensions.overridden}}{{^vendorExtensions.overridden}}{{#hasChildren}}open {{/hasChildren}}{{/vendorExtensions.overridden}}var {{{name}}}: {{{vendorExtensions.typeWithEnumWithGenericAnnotations}}}{{#vendorExtensions.defaultValueInit}} = {{{.}}}{{/vendorExtensions.defaultValueInit}}{{^vendorExtensions.defaultValueInit}}{{#isNullable}} = null{{/isNullable}}{{/vendorExtensions.defaultValueInit}},
 {{/vendorExtensions.requiredVarsWithoutDiscriminator}}
 {{#vendorExtensions.withInheritance}}
     {{#vendorExtensions.optionalVars}}
     {{>common/model/field_annotations}}
-    {{#vendorExtensions.hasChildren}}open {{/vendorExtensions.hasChildren}}var {{{name}}}: {{{vendorExtensions.typeWithEnumWithGenericAnnotations}}} = {{#defaultValue}}{{{.}}}{{/defaultValue}}{{^defaultValue}}null{{/defaultValue}},
+    {{#vendorExtensions.hasChildren}}open {{/vendorExtensions.hasChildren}}var {{{name}}}: {{{vendorExtensions.typeWithEnumWithGenericAnnotations}}} = {{#vendorExtensions.defaultValueInit}}{{{.}}}{{/vendorExtensions.defaultValueInit}}{{^vendorExtensions.defaultValueInit}}null{{/vendorExtensions.defaultValueInit}},
     {{/vendorExtensions.optionalVars}}
 {{/vendorExtensions.withInheritance}}
 {{/formatNoEmptyLines}}){{#parent}}: {{{parent}}}({{#vendorExtensions.requiredParentVarsWithoutDiscriminator}}{{name}}{{^-last}}, {{/-last}}{{/vendorExtensions.requiredParentVarsWithoutDiscriminator}}) {{/parent}}{{#vendorExtensions.x-implements}}{{#parent}}, {{/parent}}{{^parent}}: {{/parent}}{{^-first}}, {{/-first}}{{{.}}}{{/vendorExtensions.x-implements}} {{openbrace}}

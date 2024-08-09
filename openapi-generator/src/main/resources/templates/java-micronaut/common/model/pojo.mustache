@@ -121,10 +121,10 @@ public class {{classname}} {{#parent}}extends {{{parent}}} {{/parent}}{{#vendorE
         {{/vendorExtensions.x-is-jackson-optional-nullable}}
         {{^vendorExtensions.x-is-jackson-optional-nullable}}
             {{#isContainer}}
-    private {{{vendorExtensions.typeWithEnumWithGenericAnnotations}}} {{name}}{{#required}}{{^requiredPropertiesInConstructor}}{{#vendorExtensions.defaultValueIsNotNull}}{{#defaultValue}} = {{{.}}}{{/defaultValue}}{{/vendorExtensions.defaultValueIsNotNull}}{{/requiredPropertiesInConstructor}}{{/required}};
+    private {{{vendorExtensions.typeWithEnumWithGenericAnnotations}}} {{name}}{{#required}}{{^requiredPropertiesInConstructor}}{{#vendorExtensions.defaultValueIsNotNull}}{{#vendorExtensions.defaultValueInit}} = {{{.}}}{{/vendorExtensions.defaultValueInit}}{{/vendorExtensions.defaultValueIsNotNull}}{{/requiredPropertiesInConstructor}}{{/required}};
             {{/isContainer}}
             {{^isContainer}}
-    {{#isDiscriminator}}protected{{/isDiscriminator}}{{^isDiscriminator}}private{{/isDiscriminator}} {{{datatypeWithEnum}}} {{name}}{{#vendorExtensions.defaultValueIsNotNull}}{{#defaultValue}} = {{{.}}}{{/defaultValue}}{{/vendorExtensions.defaultValueIsNotNull}};
+    {{#isDiscriminator}}protected{{/isDiscriminator}}{{^isDiscriminator}}private{{/isDiscriminator}} {{{datatypeWithEnum}}} {{name}}{{#vendorExtensions.defaultValueIsNotNull}}{{#vendorExtensions.defaultValueInit}} = {{{.}}}{{/vendorExtensions.defaultValueInit}}{{/vendorExtensions.defaultValueIsNotNull}};
             {{/isContainer}}
         {{/vendorExtensions.x-is-jackson-optional-nullable}}
         {{/formatNoEmptyLines}}
@@ -284,7 +284,7 @@ public class {{classname}} {{#parent}}extends {{{parent}}} {{/parent}}{{#vendorE
                 {{^vendorExtensions.x-is-jackson-optional-nullable}}
                     {{^required}}
         if ({{name}} == null) {
-            {{name}} = {{{defaultValue}}}{{^defaultValue}}new {{#uniqueItems}}LinkedHashSet{{/uniqueItems}}{{^uniqueItems}}ArrayList{{/uniqueItems}}<>(){{/defaultValue}};
+            {{name}} = {{#vendorExtensions.defaultValueInit}}{{{.}}}{{/vendorExtensions.defaultValueInit}}{{^vendorExtensions.defaultValueInit}}new {{#uniqueItems}}LinkedHashSet{{/uniqueItems}}{{^uniqueItems}}ArrayList{{/uniqueItems}}<>(){{/vendorExtensions.defaultValueInit}};
         }
                     {{/required}}
         {{name}}.add({{name}}Item);
@@ -313,7 +313,7 @@ public class {{classname}} {{#parent}}extends {{{parent}}} {{/parent}}{{#vendorE
                 {{^vendorExtensions.x-is-jackson-optional-nullable}}
                     {{^required}}
         if ({{name}} == null) {
-            {{name}} = {{{defaultValue}}}{{^defaultValue}}new HashMap<>(){{/defaultValue}};
+            {{name}} = {{#vendorExtensions.defaultValueInit}}{{{.}}}{{/vendorExtensions.defaultValueInit}}{{^vendorExtensions.defaultValueInit}}new HashMap<>(){{/vendorExtensions.defaultValueInit}};
         }
                     {{/required}}
         {{name}}.put(key, {{name}}Item);

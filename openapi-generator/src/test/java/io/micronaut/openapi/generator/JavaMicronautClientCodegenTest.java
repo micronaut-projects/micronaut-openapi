@@ -540,4 +540,17 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
 
         assertFileContains(path + "model/OrderDTODto.java", "private UUID id;");
     }
+
+    @Test
+    void testParamsWithDefaultValue() {
+
+        var codegen = new JavaMicronautClientCodegen();
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/params-with-default-value.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String path = outputPath + "src/main/java/org/openapitools/";
+
+        assertFileContains(path + "api/DefaultApi.java",
+            "@PathVariable(name = \"apiVersion\", defaultValue = \"v5\") @Nullable BrowseSearchOrdersApiVersionParameter apiVersio",
+            "@Header(name = \"Content-Type\", defaultValue = \"application/json\") @Nullable String contentType"
+        );
+    }
 }

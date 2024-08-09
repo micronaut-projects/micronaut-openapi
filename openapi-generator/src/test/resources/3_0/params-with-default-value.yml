@@ -1,0 +1,55 @@
+openapi: 3.0.0
+info:
+  title: 'Order API'
+  version: v6
+paths:
+  '/{apiVersion}/orders':
+    get:
+      summary: 'Browser/search multiple order'
+      operationId: browseSearchOrders
+      parameters:
+        - $ref: '#/components/parameters/XFavorToken'
+        - $ref: '#/components/parameters/ApiVersion'
+        - $ref: '#/components/parameters/ContentType'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: string
+components:
+  parameters:
+    ApiVersion:
+      name: apiVersion
+      in: path
+      description: 'Api Version as a path parameter'
+      required: false
+      schema:
+        type: string
+        default: v5
+        enum:
+          - v1
+          - v2
+          - v3
+          - v4
+          - v5
+          - v6
+          - v7
+    ContentType:
+      name: Content-Type
+      in: header
+      required: false
+      schema:
+        type: string
+        default: application/json
+        nullable: true
+    XFavorToken:
+      name: X-Favor-Token
+      in: header
+      description: 'Legacy token header for v5 and older APIs'
+      required: false
+      schema:
+        type: string
+        default: null
+        nullable: true

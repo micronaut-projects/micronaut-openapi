@@ -15,6 +15,7 @@
  */
 package io.micronaut.openapi.generator;
 
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.google.common.base.CaseFormat;
 import com.google.common.collect.ImmutableMap;
 import com.samskivert.mustache.Mustache;
@@ -22,11 +23,14 @@ import io.micronaut.openapi.generator.Formatting.ReplaceDotsWithUnderscoreLambda
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.examples.Example;
+import io.swagger.v3.oas.models.media.Content;
+import io.swagger.v3.oas.models.media.MediaType;
 import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.media.StringSchema;
 import io.swagger.v3.oas.models.parameters.Parameter;
 import io.swagger.v3.oas.models.servers.Server;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.atteo.evo.inflector.English;
 import org.openapitools.codegen.CliOption;
 import org.openapitools.codegen.CodegenConstants;
@@ -628,12 +632,9 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         if (additionalProperties.containsKey(OPT_GENERATE_SWAGGER_ANNOTATIONS)) {
             String value = String.valueOf(additionalProperties.get(OPT_GENERATE_SWAGGER_ANNOTATIONS));
             switch (value) {
-                case OPT_GENERATE_SWAGGER_ANNOTATIONS_SWAGGER_2, OPT_GENERATE_SWAGGER_ANNOTATIONS_TRUE ->
-                    generateSwaggerAnnotations = OPT_GENERATE_SWAGGER_ANNOTATIONS_SWAGGER_2;
-                case OPT_GENERATE_SWAGGER_ANNOTATIONS_FALSE ->
-                    generateSwaggerAnnotations = OPT_GENERATE_SWAGGER_ANNOTATIONS_FALSE;
-                default ->
-                    throw new RuntimeException("Value \"" + value + "\" for the " + OPT_GENERATE_SWAGGER_ANNOTATIONS + " parameter is unsupported or misspelled");
+                case OPT_GENERATE_SWAGGER_ANNOTATIONS_SWAGGER_2, OPT_GENERATE_SWAGGER_ANNOTATIONS_TRUE -> generateSwaggerAnnotations = OPT_GENERATE_SWAGGER_ANNOTATIONS_SWAGGER_2;
+                case OPT_GENERATE_SWAGGER_ANNOTATIONS_FALSE -> generateSwaggerAnnotations = OPT_GENERATE_SWAGGER_ANNOTATIONS_FALSE;
+                default -> throw new RuntimeException("Value \"" + value + "\" for the " + OPT_GENERATE_SWAGGER_ANNOTATIONS + " parameter is unsupported or misspelled");
             }
         }
     }
@@ -875,10 +876,10 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
                         allowableValues = (List<Object>) m.allowableValues.get("values");
                     }
                     example = getExampleValue(m.defaultValue, null, m.classname, true,
-                        allowableValues, null, null, m.requiredVars,  false);
+                        allowableValues, null, null, m.requiredVars, false);
                 } else {
                     example = getExampleValue(null, null, op.returnType, false, null,
-                        op.returnBaseType, null, null,  false);
+                        op.returnBaseType, null, null, false);
                 }
                 op.vendorExtensions.put("example", example);
             }
@@ -1082,6 +1083,37 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         }
         parameter.vendorExtensions.put("realName", realName);
 
+        Schema parameterSchema;
+        if (p.getSchema() != null) {
+            parameterSchema = unaliasSchema(p.getSchema());
+        } else if (p.getContent() != null) {
+            Content content = p.getContent();
+            if (content.size() > 1) {
+                once(log).warn("Multiple schemas found in content, returning only the first one");
+            }
+            Map.Entry<String, MediaType> entry = content.entrySet().iterator().next();
+            parameterSchema = entry.getValue().getSchema();
+        } else {
+            parameterSchema = null;
+        }
+        if (parameterSchema != null && parameterSchema.get$ref() != null) {
+            parameterSchema = openAPI.getComponents().getSchemas().get(parameterSchema.get$ref().substring("#/components/schemas/".length()));
+        }
+
+        String defaultValueInit;
+        var items = parameter.items;
+        if (items == null) {
+            defaultValueInit = calcDefaultValues(null, null, false, parameterSchema).getLeft();
+        } else {
+            defaultValueInit = calcDefaultValues(items.datatypeWithEnum, items.dataType, items.getIsEnumOrRef(), parameterSchema).getLeft();
+        }
+        if (parameterSchema != null && ModelUtils.isEnumSchema(parameterSchema)) {
+            defaultValueInit = parameter.dataType + "." + toEnumVarName(parameter.defaultValue, parameter.dataType);
+        }
+        if (defaultValueInit != null) {
+            parameter.vendorExtensions.put("defaultValueInit", defaultValueInit);
+        }
+
         addStrValueToEnum(parameter.items);
 
         return parameter;
@@ -1099,6 +1131,24 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
             property.nameInSnakeCase = CaseFormat.UPPER_CAMEL.to(CaseFormat.UPPER_UNDERSCORE, property.nameInCamelCase);
         }
         property.vendorExtensions.put("realName", realName);
+
+        if (p != null && p.get$ref() != null) {
+            p = ModelUtils.getSchemaFromRefToSchemaWithProperties(openAPI, p.get$ref());
+        }
+
+        String defaultValueInit;
+        var items = property.items;
+        if (items == null) {
+            defaultValueInit = calcDefaultValues(null, null, false, p).getLeft();
+        } else {
+            defaultValueInit = calcDefaultValues(items.datatypeWithEnum, items.dataType, items.getIsEnumOrRef(), p).getLeft();
+        }
+        if (p != null && ModelUtils.isEnumSchema(p)) {
+            defaultValueInit = property.dataType + "." + toEnumVarName(property.defaultValue, property.dataType);
+        }
+        if (defaultValueInit != null) {
+            property.vendorExtensions.put("defaultValueInit", defaultValueInit);
+        }
 
         return property;
     }
@@ -1147,6 +1197,9 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
 
     @Override
     public String toEnumVarName(String value, String datatype) {
+        if (value == null) {
+            return null;
+        }
         String modified;
         if (value.isEmpty()) {
             modified = "EMPTY";
@@ -1170,7 +1223,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
      * @param imports The operation imports.
      */
     private void processParametersWithAdditionalMappings(List<CodegenParameter> params, Set<String> imports) {
-        Map<String, ParameterMapping> additionalMappings = new LinkedHashMap<>();
+        var additionalMappings = new LinkedHashMap<String, ParameterMapping>();
         Iterator<CodegenParameter> iter = params.iterator();
         while (iter.hasNext()) {
             CodegenParameter param = iter.next();
@@ -1193,22 +1246,23 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         }
 
         for (ParameterMapping mapping : additionalMappings.values()) {
-            if (mapping.mappedType() != null) {
-                CodegenParameter newParam = new CodegenParameter();
-                newParam.paramName = mapping.mappedName();
-                newParam.required = true;
-                newParam.isModel = mapping.isValidated();
-
-                String typeName = makeSureImported(mapping.mappedType(), imports);
-                newParam.dataType = typeName;
-
-                // Set the paramName if required
-                if (newParam.paramName == null) {
-                    newParam.paramName = toParamName(typeName);
-                }
-
-                params.add(newParam);
+            if (mapping.mappedType() == null) {
+                continue;
             }
+            var newParam = new CodegenParameter();
+            newParam.paramName = mapping.mappedName();
+            newParam.required = true;
+            newParam.isModel = mapping.isValidated();
+
+            String typeName = makeSureImported(mapping.mappedType(), imports);
+            newParam.dataType = typeName;
+
+            // Set the paramName if required
+            if (newParam.paramName == null) {
+                newParam.paramName = toParamName(typeName);
+            }
+
+            params.add(newParam);
         }
     }
 
@@ -1409,7 +1463,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
     private void processOneOfModels(CodegenModel model, Collection<ModelsMap> models) {
 
         if (!model.vendorExtensions.containsKey("x-is-one-of-interface")
-                || !Boolean.parseBoolean(model.vendorExtensions.get("x-is-one-of-interface").toString())) {
+            || !Boolean.parseBoolean(model.vendorExtensions.get("x-is-one-of-interface").toString())) {
             return;
         }
 
@@ -1724,6 +1778,121 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         }
 
         return example;
+    }
+
+    @Override
+    public String toDefaultValue(CodegenProperty cp, Schema schema) {
+        if (cp.items != null) {
+            return calcDefaultValues(cp.items.datatypeWithEnum, cp.items.dataType, cp.items.getIsEnumOrRef(), schema).getRight();
+        } else {
+            return calcDefaultValues(null, null, false, schema).getRight();
+        }
+    }
+
+    private Pair<String, String> calcDefaultValues(String itemsDatatypeWithEnum, String itemsDataType, boolean itemsIsEnumOrRef, Schema schema) {
+        String defaultValueInit = null;
+        String defaultValueStr = null;
+        schema = ModelUtils.getReferencedSchema(this.openAPI, schema);
+        if (ModelUtils.isBooleanSchema(schema)) {
+            if (schema.getDefault() != null) {
+                defaultValueInit = schema.getDefault().toString();
+                defaultValueStr = schema.getDefault().toString();
+            }
+        } else if (ModelUtils.isDateSchema(schema)) {
+            // TODO
+            defaultValueInit = null;
+            defaultValueStr = null;
+        } else if (ModelUtils.isDateTimeSchema(schema)) {
+            // TODO
+            defaultValueInit = null;
+            defaultValueStr = null;
+        } else if (ModelUtils.isNumberSchema(schema)) {
+            if (schema.getDefault() != null) {
+                defaultValueInit = fixNumberValue(schema.getDefault().toString(), schema);
+                defaultValueStr = schema.getDefault().toString();
+            }
+        } else if (ModelUtils.isIntegerSchema(schema)) {
+            if (schema.getDefault() != null) {
+                defaultValueInit = fixNumberValue(schema.getDefault().toString(), schema);
+                defaultValueStr = schema.getDefault().toString();
+            }
+        } else if (ModelUtils.isURISchema(schema)) {
+            if (schema.getDefault() != null) {
+                defaultValueInit = importMapping.get("URI") + ".create(\"" + schema.getDefault() + "\")";
+                defaultValueStr = schema.getDefault().toString();
+            }
+        } else if (ModelUtils.isArraySchema(schema) && itemsDatatypeWithEnum != null) {
+            var pair = toArrayDefaultValue(itemsDatatypeWithEnum, itemsDataType, itemsIsEnumOrRef, schema);
+            defaultValueInit = pair.getLeft();
+            defaultValueStr = pair.getRight();
+        } else if (ModelUtils.isStringSchema(schema)) {
+            if (schema.getDefault() != null) {
+                String def = schema.getDefault().toString();
+                if (schema.getEnum() == null) {
+                    defaultValueInit = "\"" + escapeText(def) + "\"";
+                    defaultValueStr = escapeText(def);
+                } else {
+                    // convert to enum var name later in postProcessModels
+                    defaultValueInit = "\"" + def + "\"";
+                    defaultValueStr = def;
+                }
+            }
+        } else if (ModelUtils.isObjectSchema(schema)) {
+            if (schema.getDefault() != null) {
+                defaultValueInit = super.toDefaultValue(schema);
+                defaultValueStr = super.toDefaultValue(schema);
+            }
+        }
+
+        return Pair.of(defaultValueInit, defaultValueStr);
+    }
+
+    private String fixNumberValue(String number, Schema p) {
+        if (ModelUtils.isFloatSchema(p)) {
+            return number + "F";
+        } else if (ModelUtils.isDoubleSchema(p)) {
+            if (number.contains(".")) {
+                return number;
+            }
+            return number + ".0";
+        } else if (ModelUtils.isLongSchema(p)) {
+            return number + "L";
+        }
+        return number;
+    }
+
+    // left - initStr, right - defaultStr
+    private Pair<String, String> toArrayDefaultValue(String itemsDatatypeWithEnum, String itemsDataType, boolean itemsIsEnumOrRef, Schema schema) {
+        if (schema.getDefault() != null) {
+            String arrInstantiationType = ModelUtils.isSet(schema) ? "set" : "arrayList";
+
+            if (!(schema.getDefault() instanceof ArrayNode def)) {
+                return Pair.of(null, null);
+            }
+            if (def.isEmpty()) {
+                return Pair.of(arrInstantiationType + "Of()", null);
+            }
+
+            var defaultContent = new StringBuilder();
+            Schema<?> itemsSchema = ModelUtils.getSchemaItems(schema);
+            def.elements().forEachRemaining((element) -> {
+                String defaultValue = element.asText();
+                if (defaultValue != null) {
+                    if (itemsIsEnumOrRef) {
+                        String className = itemsDatatypeWithEnum;
+                        String enumVarName = toEnumVarName(defaultValue, itemsDataType);
+                        defaultContent.append(className).append(".").append(enumVarName).append(",");
+                    } else {
+                        itemsSchema.setDefault(defaultValue);
+                        defaultValue = calcDefaultValues(itemsDatatypeWithEnum, itemsDataType, itemsIsEnumOrRef, itemsSchema).getRight();
+                        defaultContent.append(defaultValue).append(",");
+                    }
+                }
+            });
+            defaultContent.deleteCharAt(defaultContent.length() - 1); // remove trailing comma
+            return Pair.of(arrInstantiationType + "Of(" + defaultContent + ")", defaultContent.toString());
+        }
+        return Pair.of(null, null);
     }
 
     @Override
