@@ -574,4 +574,15 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
             """);
         assertFileContains(path + "model/CancellationReasonTypesDTO.kt", "val version: Int");
     }
+
+    @Test
+    void testUuidWithModelNameSuffix() {
+
+        var codegen = new KotlinMicronautClientCodegen();
+        codegen.setModelNameSuffix("Dto");
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/schema-with-uuid.yml", CodegenConstants.MODELS);
+        String path = outputPath + "src/main/kotlin/org/openapitools/";
+
+        assertFileContains(path + "model/OrderDTODto.kt", "var id: UUID,");
+    }
 }
