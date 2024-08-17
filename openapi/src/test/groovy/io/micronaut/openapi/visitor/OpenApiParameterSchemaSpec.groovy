@@ -15,9 +15,10 @@ package test;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
-import io.micronaut.http.annotation.Patch;import io.micronaut.http.annotation.Post;
+import io.micronaut.http.annotation.Post;
 import io.micronaut.http.annotation.Put;
-import io.micronaut.http.annotation.QueryValue;import io.swagger.v3.oas.annotations.Parameter;
+import io.micronaut.http.annotation.QueryValue;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.Period;

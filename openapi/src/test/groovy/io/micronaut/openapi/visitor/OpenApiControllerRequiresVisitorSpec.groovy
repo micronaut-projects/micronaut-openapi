@@ -115,15 +115,10 @@ class MyBean {}
         buildBeanDefinition('test.MyBean', '''
 package test;
 
-import io.micronaut.context.annotation.Parameter;
-import io.micronaut.context.annotation.Requires;import io.swagger.v3.oas.annotations.*;
-import io.swagger.v3.oas.annotations.media.*;
-import io.swagger.v3.oas.annotations.enums.*;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import io.micronaut.http.annotation.*;
-import io.micronaut.http.*;
-import java.util.List;
+import io.micronaut.context.annotation.Requires;
+import io.micronaut.http.HttpResponse;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Post;
 
 @Requires(env="env1",notEnv="env3")
 @Controller
@@ -170,15 +165,10 @@ class MyBean {}
         buildBeanDefinition('test.MyBean', '''
 package test;
 
-import io.micronaut.context.annotation.Parameter;
-import io.micronaut.context.annotation.Requires;import io.swagger.v3.oas.annotations.*;
-import io.swagger.v3.oas.annotations.media.*;
-import io.swagger.v3.oas.annotations.enums.*;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import io.micronaut.http.annotation.*;
-import io.micronaut.http.*;
-import java.util.List;
+import io.micronaut.context.annotation.Requires;
+import io.micronaut.http.HttpResponse;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Post;
 
 @Requires(env={"env1","env2"})
 @Controller
@@ -236,15 +226,10 @@ class MyBean {}
         buildBeanDefinition('test.MyBean', '''
 package test;
 
-import io.micronaut.context.annotation.Parameter;
-import io.micronaut.context.annotation.Requires;import io.swagger.v3.oas.annotations.*;
-import io.swagger.v3.oas.annotations.media.*;
-import io.swagger.v3.oas.annotations.enums.*;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import io.micronaut.http.annotation.*;
-import io.micronaut.http.*;
-import java.util.List;
+import io.micronaut.context.annotation.Requires;
+import io.micronaut.http.HttpResponse;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Post;
 
 @Requires(notEnv={"env1","env2"})
 @Controller
@@ -291,15 +276,10 @@ class MyBean {}
         buildBeanDefinition('test.MyBean', '''
 package test;
 
-import io.micronaut.context.annotation.Parameter;
-import io.micronaut.context.annotation.Requires;import io.swagger.v3.oas.annotations.*;
-import io.swagger.v3.oas.annotations.media.*;
-import io.swagger.v3.oas.annotations.enums.*;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import io.micronaut.http.annotation.*;
-import io.micronaut.http.*;
-import java.util.List;
+import io.micronaut.context.annotation.Requires;
+import io.micronaut.http.HttpResponse;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Post;
 
 @Requires(env="env1")
 @Requires(env={"env2","env3"})

@@ -1,5 +1,7 @@
 micronaut:
   openapi:
-    schema-postfix:
-      io.micronaut.openapi.api.v1_0_0: '1_0_0'
-      io.micronaut.openapi.api.v2_0_1: '2_0_1'
+    schema:
+      decorator:
+        postfix:
+          io.micronaut.openapi.api.v1_0_0: '1_0_0'
+          io.micronaut.openapi.api.v2_0_1: '2_0_1'

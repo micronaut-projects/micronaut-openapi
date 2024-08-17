@@ -1,11 +1,13 @@
 package io.micronaut.openapi.visitor
 
+import io.micronaut.context.exceptions.ConfigurationException
 import io.micronaut.openapi.AbstractOpenApiTypeElementSpec
 import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.Operation
 import io.swagger.v3.oas.models.media.Schema
 import io.swagger.v3.oas.models.parameters.Parameter
 import spock.lang.Issue
+import spock.util.environment.RestoreSystemProperties
 
 import java.time.OffsetDateTime
 
@@ -1162,18 +1164,15 @@ public class MyBean {}
         buildBeanDefinition("test.MyBean", '''
 package test;
 
-import io.swagger.v3.oas.annotations.enums.ParameterStyle;import jakarta.validation.constraints.NegativeOrZero;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.PositiveOrZero;
-
-import io.micronaut.core.annotation.Introspected;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.enums.ParameterStyle;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
 
 @Controller
 class PersonController {
@@ -1582,6 +1581,102 @@ public class MyBean {}
         entityTest33
         entityTest33.properties.fieldC
         entityTest33.properties.fieldC.type == 'string'
+    }
+
+    void "test dto schemas with same name. Mode: auto"() {
+        when:
+        buildBeanDefinition("test.MyBean", '''
+package test;
+
+import io.micronaut.http.annotation.Body;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Post;
+import io.micronaut.openapi.test1.Entity;
+import io.swagger.v3.oas.annotations.media.Schema;
+
+@Controller
+class TestController {
+
+    @Post("test1")
+    String test1(@Body Car1 car1) {
+        return null;
+    }
+
+    @Post("test2")
+    String test2(@Body Car2 car2) {
+        return null;
+    }
+}
+
+@Schema(name="Car")
+record Car1(String p1) {}
+
+@Schema(name="Car")
+record Car2(String p2) {}
+
+@jakarta.inject.Singleton
+public class MyBean {}
+''')
+
+        OpenAPI openAPI = Utils.testReference
+
+        then:
+        openAPI.components.schemas
+        openAPI.components.schemas.size() == 2
+        Schema car1 = openAPI.components.schemas.Car
+        Schema car2 = openAPI.components.schemas.Car_1
+
+        car1
+        car1.properties.p1
+        car1.properties.p1.type == 'string'
+
+        car2
+        car2.properties.p2
+        car2.properties.p2.type == 'string'
+    }
+
+    @RestoreSystemProperties
+    void "test dto schemas with same name. Mode: error"() {
+
+        setup:
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_SCHEMA_DUPLICATE_RESOLUTION, "error")
+
+        when:
+        buildBeanDefinition("test.MyBean", '''
+package test;
+
+import io.micronaut.http.annotation.Body;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Post;
+import io.micronaut.openapi.test1.Entity;
+import io.swagger.v3.oas.annotations.media.Schema;
+
+@Controller
+class TestController {
+
+    @Post("test1")
+    String test1(@Body Car1 car1) {
+        return null;
+    }
+
+    @Post("test2")
+    String test2(@Body Car2 car2) {
+        return null;
+    }
+}
+
+@Schema(name="Car")
+record Car1(String p1) {}
+
+@Schema(name="Car")
+record Car2(String p2) {}
+
+@jakarta.inject.Singleton
+public class MyBean {}
+''')
+        then:
+        def e = thrown(RuntimeException)
+        e.cause.class == ConfigurationException.class
     }
 
     void "test empty default value for Map body type java"() {

@@ -90,11 +90,15 @@ import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENA
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ENABLED;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ENVIRONMENTS;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_EXPAND_PREFIX;
-import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_EXTRA_SCHEMA_ENABLED;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_GROUPS;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_JSON_VIEW_DEFAULT_INCLUSION;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_PROJECT_DIR;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_SCHEMA;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_SCHEMA_DECORATOR_POSTFIX;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_SCHEMA_DECORATOR_PREFIX;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_SCHEMA_DUPLICATE_RESOLUTION;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_SCHEMA_EXTRA_ENABLED;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_SCHEMA_MAPPING;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_SCHEMA_NAME_SEPARATOR_EMPTY;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_SCHEMA_NAME_SEPARATOR_GENERIC;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_SCHEMA_NAME_SEPARATOR_INNER_CLASS;
@@ -160,6 +164,16 @@ public final class ConfigUtils {
                 SchemaDecorator decorator = schemaDecorators.computeIfAbsent(entry.getKey(), k -> new SchemaDecorator());
                 decorator.setPostfix((String) entry.getValue());
             }
+
+            for (Map.Entry<String, Object> entry : environment.getProperties(MICRONAUT_OPENAPI_SCHEMA_DECORATOR_PREFIX, StringConvention.RAW).entrySet()) {
+                SchemaDecorator decorator = schemaDecorators.computeIfAbsent(entry.getKey(), k -> new SchemaDecorator());
+                decorator.setPrefix((String) entry.getValue());
+            }
+
+            for (Map.Entry<String, Object> entry : environment.getProperties(MICRONAUT_OPENAPI_SCHEMA_DECORATOR_POSTFIX, StringConvention.RAW).entrySet()) {
+                SchemaDecorator decorator = schemaDecorators.computeIfAbsent(entry.getKey(), k -> new SchemaDecorator());
+                decorator.setPostfix((String) entry.getValue());
+            }
         }
 
         ContextUtils.put(MICRONAUT_INTERNAL_SCHEMA_DECORATORS, schemaDecorators, context);
@@ -196,6 +210,11 @@ public final class ConfigUtils {
         Environment environment = getEnv(context);
         if (environment != null) {
             for (Map.Entry<String, Object> entry : environment.getProperties(MICRONAUT_OPENAPI_SCHEMA, StringConvention.RAW).entrySet()) {
+                String configuredClassName = entry.getKey();
+                String targetClassName = (String) entry.getValue();
+                readCustomSchema(configuredClassName, targetClassName, customSchemas, context);
+            }
+            for (Map.Entry<String, Object> entry : environment.getProperties(MICRONAUT_OPENAPI_SCHEMA_MAPPING, StringConvention.RAW).entrySet()) {
                 String configuredClassName = entry.getKey();
                 String targetClassName = (String) entry.getValue();
                 readCustomSchema(configuredClassName, targetClassName, customSchemas, context);
@@ -260,6 +279,14 @@ public final class ConfigUtils {
         return value;
     }
 
+    public static DuplicateResolution getSchemaDuplicateResolution(VisitorContext context) {
+        var value = getConfigProperty(MICRONAUT_OPENAPI_SCHEMA_DUPLICATE_RESOLUTION, context);
+        if (StringUtils.isNotEmpty(value) && DuplicateResolution.ERROR.name().equalsIgnoreCase(value)) {
+            return DuplicateResolution.ERROR;
+        }
+        return DuplicateResolution.AUTO;
+    }
+
     public static String getGenericSeparator(VisitorContext context) {
         if (isSchemaNameSeparatorEmpty(context)) {
             return EMPTY_STRING;
@@ -299,7 +326,7 @@ public final class ConfigUtils {
         if (loadedValue != null) {
             return loadedValue;
         }
-        boolean value = getBooleanProperty(MICRONAUT_OPENAPI_EXTRA_SCHEMA_ENABLED, true, context);
+        boolean value = getBooleanProperty(MICRONAUT_OPENAPI_SCHEMA_EXTRA_ENABLED, true, context);
         ContextUtils.put(MICRONAUT_INTERNAL_EXTRA_SCHEMA_ENABLED, value, context);
         return value;
     }
@@ -581,7 +608,6 @@ public final class ConfigUtils {
      * Returns the EndpointsConfiguration.
      *
      * @param context The context.
-     *
      * @return The EndpointsConfiguration.
      */
     public static EndpointsConfiguration endpointsConfiguration(VisitorContext context) {
@@ -693,6 +719,11 @@ public final class ConfigUtils {
                 isPrefix = true;
             } else if (prop.startsWith(MICRONAUT_OPENAPI_SCHEMA_POSTFIX)) {
                 packageName = prop.substring(MICRONAUT_OPENAPI_SCHEMA_POSTFIX.length() + 1);
+            } else if (prop.startsWith(MICRONAUT_OPENAPI_SCHEMA_DECORATOR_PREFIX)) {
+                packageName = prop.substring(MICRONAUT_OPENAPI_SCHEMA_DECORATOR_PREFIX.length() + 1);
+                isPrefix = true;
+            } else if (prop.startsWith(MICRONAUT_OPENAPI_SCHEMA_DECORATOR_POSTFIX)) {
+                packageName = prop.substring(MICRONAUT_OPENAPI_SCHEMA_DECORATOR_POSTFIX.length() + 1);
             }
             if (StringUtils.isEmpty(packageName)) {
                 continue;
@@ -709,10 +740,25 @@ public final class ConfigUtils {
     private static void readCustomSchemas(Properties props, Map<String, CustomSchema> customSchemas, VisitorContext context) {
 
         for (String prop : props.stringPropertyNames()) {
-            if (!prop.startsWith(MICRONAUT_OPENAPI_SCHEMA) || prop.startsWith(MICRONAUT_OPENAPI_SCHEMA_PREFIX) || prop.startsWith(MICRONAUT_OPENAPI_SCHEMA_POSTFIX)) {
+            if (!prop.startsWith(MICRONAUT_OPENAPI_SCHEMA)
+                || prop.startsWith(MICRONAUT_OPENAPI_SCHEMA_PREFIX)
+                || prop.startsWith(MICRONAUT_OPENAPI_SCHEMA_POSTFIX)
+                || prop.startsWith(MICRONAUT_OPENAPI_SCHEMA_DECORATOR_PREFIX)
+                || prop.startsWith(MICRONAUT_OPENAPI_SCHEMA_DECORATOR_POSTFIX)
+                || prop.startsWith(MICRONAUT_OPENAPI_SCHEMA_NAME_SEPARATOR_EMPTY)
+                || prop.startsWith(MICRONAUT_OPENAPI_SCHEMA_NAME_SEPARATOR_GENERIC)
+                || prop.startsWith(MICRONAUT_OPENAPI_SCHEMA_NAME_SEPARATOR_INNER_CLASS)
+                || prop.startsWith(MICRONAUT_OPENAPI_SCHEMA_DUPLICATE_RESOLUTION)
+                || prop.startsWith(MICRONAUT_OPENAPI_SCHEMA_EXTRA_ENABLED)
+            ) {
                 continue;
             }
-            String className = prop.substring(MICRONAUT_OPENAPI_SCHEMA.length() + 1);
+            String className;
+            if (prop.startsWith(MICRONAUT_OPENAPI_SCHEMA_MAPPING)) {
+                className = prop.substring(MICRONAUT_OPENAPI_SCHEMA_MAPPING.length() + 1);
+            } else {
+                className = prop.substring(MICRONAUT_OPENAPI_SCHEMA.length() + 1);
+            }
             String targetClassName = props.getProperty(prop);
             readCustomSchema(className, targetClassName, customSchemas, context);
         }
@@ -823,8 +869,8 @@ public final class ConfigUtils {
         }
         var openApiProperties = new Properties();
         String cfgFile = context != null
-                ? ContextUtils.getOptions(context).getOrDefault(MICRONAUT_OPENAPI_CONFIG_FILE, System.getProperty(MICRONAUT_OPENAPI_CONFIG_FILE, OPENAPI_CONFIG_FILE))
-                : System.getProperty(MICRONAUT_OPENAPI_CONFIG_FILE, OPENAPI_CONFIG_FILE);
+            ? ContextUtils.getOptions(context).getOrDefault(MICRONAUT_OPENAPI_CONFIG_FILE, System.getProperty(MICRONAUT_OPENAPI_CONFIG_FILE, OPENAPI_CONFIG_FILE))
+            : System.getProperty(MICRONAUT_OPENAPI_CONFIG_FILE, OPENAPI_CONFIG_FILE);
         if (StringUtils.isNotEmpty(cfgFile)) {
             Path cfg = resolve(context, Paths.get(cfgFile));
             if (Files.isReadable(cfg)) {
@@ -945,8 +991,8 @@ public final class ConfigUtils {
      * @param classElement class element
      */
     record CustomSchema(
-            List<String> typeArgs,
-            ClassElement classElement
+        List<String> typeArgs,
+        ClassElement classElement
     ) {
     }
 
@@ -973,5 +1019,13 @@ public final class ConfigUtils {
         public void setPostfix(String postfix) {
             this.postfix = postfix;
         }
+    }
+
+    /**
+     * Duplicate schema resolution mode
+     */
+    public enum DuplicateResolution {
+        AUTO,
+        ERROR,
     }
 }

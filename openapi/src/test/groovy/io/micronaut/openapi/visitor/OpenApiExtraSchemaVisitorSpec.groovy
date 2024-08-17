@@ -210,7 +210,7 @@ class MyBean {}
     void "test disable OpenAPI extra schemas"() {
 
         given:
-        System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_EXTRA_SCHEMA_ENABLED, "false")
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_SCHEMA_EXTRA_ENABLED, "false")
 
         when:
         buildBeanDefinition('test.MyBean', '''
@@ -218,7 +218,7 @@ package test;
 
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
-import io.micronaut.http.annotation.Post;import io.micronaut.openapi.annotation.OpenAPIExtraSchema;
+import io.micronaut.openapi.annotation.OpenAPIExtraSchema;
 import jakarta.inject.Singleton;
 
 @OpenAPIExtraSchema(

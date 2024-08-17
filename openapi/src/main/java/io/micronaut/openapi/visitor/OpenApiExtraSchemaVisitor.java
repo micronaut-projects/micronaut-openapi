@@ -181,8 +181,8 @@ public class OpenApiExtraSchemaVisitor implements TypeElementVisitor<OpenAPIExtr
         if (classEl == null) {
             return;
         }
-        String schemaName = stringValue(classEl, io.swagger.v3.oas.annotations.media.Schema.class, PROP_NAME)
-                .orElse(computeDefaultSchemaName(null, classEl, classEl.getTypeArguments(), context, null));
+        String schemaName = computeDefaultSchemaName(stringValue(classEl, io.swagger.v3.oas.annotations.media.Schema.class, PROP_NAME).orElse(null),
+            null, classEl, classEl.getTypeArguments(), context, null);
         var schema = getSchemaDefinition(resolveOpenApi(context), context, classEl, classEl.getTypeArguments(), null, Collections.emptyList(), null);
         if (schema == null) {
             return;

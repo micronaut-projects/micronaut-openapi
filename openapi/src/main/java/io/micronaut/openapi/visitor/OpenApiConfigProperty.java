@@ -28,32 +28,55 @@ import java.util.Set;
 public interface OpenApiConfigProperty {
 
     /**
+     * Properties prefix to set custom schema implementations for selected classes.
+     * For example, if you want to set simple 'java.lang.String' class to some complex 'org.somepackage.MyComplexType' class you need to write:
+     * <p>
+     * micronaut.openapi.schema.org.somepackage.MyComplexType=java.lang.String
+     * <p>
+     * Also, you can set it in your application.yml file like this:
+     * <p>
+     * micronaut:
+     * openapi:
+     * schema:
+     * org.somepackage.MyComplexType: java.lang.String
+     * org.somepackage.MyComplexType2: java.lang.Integer
+     * ...
+     *
+     * @deprecated Use `micronaut.openapi.schema.mapping` property instead
+     */
+    @Deprecated(forRemoval = true)
+    String MICRONAUT_OPENAPI_SCHEMA = "micronaut.openapi.schema";
+    /**
+     * Properties prefix to set schema name prefix or postfix by package.
+     * For example, if you have some classes with same names in different packages you can set postfix like this:
+     * <p>
+     * micronaut.openapi.schema-postfix.org.api.v1_0_0=1_0_0
+     * micronaut.openapi.schema-postfix.org.api.v2_0_0=2_0_0
+     * <p>
+     * Also, you can set it in your application.yml file like this:
+     * <p>
+     * micronaut:
+     * openapi:
+     * schema-postfix:
+     * org.api.v1_0_0: 1_0_0
+     * org.api.v2_0_0: 2_0_0
+     * ...
+     * @deprecated Use `micronaut.openapi.schema.decorator.prefix` property instead
+     */
+    @Deprecated(forRemoval = true)
+    String MICRONAUT_OPENAPI_SCHEMA_PREFIX = "micronaut.openapi.schema-prefix";
+    /**
+     * @deprecated Use `micronaut.openapi.schema.decorator.postfix` property instead
+     */
+    @Deprecated(forRemoval = true)
+    String MICRONAUT_OPENAPI_SCHEMA_POSTFIX = "micronaut.openapi.schema-postfix";
+
+    /**
      * System property that enables or disables open api annotation processing.
      * <br>
      * Default: true
      */
     String MICRONAUT_OPENAPI_ENABLED = "micronaut.openapi.enabled";
-    /**
-     * System property that enables or disables schema name separator for generics and inner classes.
-     * If it's true separators will be skipped. For example, schema name for class with name
-     * {@code MyClass.MyInnerClass<MyGeneric1, MyGeneric2>} will be
-     * {@code MyClassMyInnerClassMyGeneric1MyGeneric2}
-     * <br>
-     * Default: false
-     */
-    String MICRONAUT_OPENAPI_SCHEMA_NAME_SEPARATOR_EMPTY = "micronaut.openapi.schema.name.separator.empty";
-    /**
-     * System property to set custom separator for generic classes. By default, it is "_".
-     * <br>
-     * Default: _
-     */
-    String MICRONAUT_OPENAPI_SCHEMA_NAME_SEPARATOR_GENERIC = "micronaut.openapi.schema.name.separator.generic";
-    /**
-     * System property to set custom separator for inner classes. By default, it is ".".
-     * <br>
-     * Default: .
-     */
-    String MICRONAUT_OPENAPI_SCHEMA_NAME_SEPARATOR_INNER_CLASS = "micronaut.openapi.schema.name.separator.inner-class";
     /**
      * System property that enables generating OpenAPI version 3.1.
      * <br>
@@ -68,10 +91,6 @@ public interface OpenApiConfigProperty {
      * System property that enables setting the open api config file.
      */
     String MICRONAUT_OPENAPI_CONFIG_FILE = "micronaut.openapi.config.file";
-    /**
-     * System property that enables extra schema processing.
-     */
-    String MICRONAUT_OPENAPI_EXTRA_SCHEMA_ENABLED = "micronaut.openapi.extra.schema.enabled";
     /**
      * Prefix for expandable properties.
      */
@@ -181,39 +200,79 @@ public interface OpenApiConfigProperty {
     String MICRONAUT_JACKSON_JSON_VIEW_ENABLED = "jackson.json-view.enabled";
 
     /**
+     * System property that enables extra schema processing.
+     */
+    String MICRONAUT_OPENAPI_SCHEMA_EXTRA_ENABLED = "micronaut.openapi.schema.extra.enabled";
+    /**
+     * System property to set schema duplicate resolution. Available values:
+     *  - auto - micronaut-openapi automatically add index suffix to duplicate schema.
+     *  - error - micronaut-openapi throws an exception when found duplicate schema.
+     * <br>
+     * Default: auto
+     */
+    String MICRONAUT_OPENAPI_SCHEMA_DUPLICATE_RESOLUTION = "micronaut.openapi.schema.duplicate-resolution";
+    /**
+     * System property that enables or disables schema name separator for generics and inner classes.
+     * If it's true separators will be skipped. For example, schema name for class with name
+     * {@code MyClass.MyInnerClass<MyGeneric1, MyGeneric2>} will be
+     * {@code MyClassMyInnerClassMyGeneric1MyGeneric2}
+     * <br>
+     * Default: false
+     */
+    String MICRONAUT_OPENAPI_SCHEMA_NAME_SEPARATOR_EMPTY = "micronaut.openapi.schema.name.separator.empty";
+    /**
+     * System property to set custom separator for generic classes. By default, it is "_".
+     * <br>
+     * Default: _
+     */
+    String MICRONAUT_OPENAPI_SCHEMA_NAME_SEPARATOR_GENERIC = "micronaut.openapi.schema.name.separator.generic";
+    /**
+     * System property to set custom separator for inner classes. By default, it is ".".
+     * <br>
+     * Default: .
+     */
+    String MICRONAUT_OPENAPI_SCHEMA_NAME_SEPARATOR_INNER_CLASS = "micronaut.openapi.schema.name.separator.inner-class";
+
+    /**
      * Properties prefix to set custom schema implementations for selected classes.
      * For example, if you want to set simple 'java.lang.String' class to some complex 'org.somepackage.MyComplexType' class you need to write:
      * <p>
-     * micronaut.openapi.schema.org.somepackage.MyComplexType=java.lang.String
+     * micronaut.openapi.schema.mapping.org.somepackage.MyComplexType=java.lang.String
      * <p>
      * Also, you can set it in your application.yml file like this:
      * <p>
+     * <pre>
      * micronaut:
-     * openapi:
-     * schema:
-     * org.somepackage.MyComplexType: java.lang.String
-     * org.somepackage.MyComplexType2: java.lang.Integer
+     *   openapi:
+     *     schema:
+     *       mapping:
+     *         org.somepackage.MyComplexType: java.lang.String
+     *         org.somepackage.MyComplexType2: java.lang.Integer
+     * </pre>
      * ...
      */
-    String MICRONAUT_OPENAPI_SCHEMA = "micronaut.openapi.schema";
+    String MICRONAUT_OPENAPI_SCHEMA_MAPPING = "micronaut.openapi.schema.mapping";
     /**
      * Properties prefix to set schema name prefix or postfix by package.
      * For example, if you have some classes with same names in different packages you can set postfix like this:
      * <p>
-     * micronaut.openapi.schema-postfix.org.api.v1_0_0=1_0_0
-     * micronaut.openapi.schema-postfix.org.api.v2_0_0=2_0_0
+     * micronaut.openapi.schema.decorator.postfix.org.api.v1_0_0=1_0_0
+     * micronaut.openapi.schema.decorator.postfix.org.api.v2_0_0=2_0_0
      * <p>
      * Also, you can set it in your application.yml file like this:
      * <p>
+     * <pre>
      * micronaut:
-     * openapi:
-     * schema-postfix:
-     * org.api.v1_0_0: 1_0_0
-     * org.api.v2_0_0: 2_0_0
-     * ...
+     *   openapi:
+     *     schema:
+     *       decorator:
+     *         postfix:
+     *           org.api.v1_0_0: 1_0_0
+     *           org.api.v2_0_0: 2_0_0
+     * </pre>
      */
-    String MICRONAUT_OPENAPI_SCHEMA_PREFIX = "micronaut.openapi.schema-prefix";
-    String MICRONAUT_OPENAPI_SCHEMA_POSTFIX = "micronaut.openapi.schema-postfix";
+    String MICRONAUT_OPENAPI_SCHEMA_DECORATOR_PREFIX = "micronaut.openapi.schema.decorator.prefix";
+    String MICRONAUT_OPENAPI_SCHEMA_DECORATOR_POSTFIX = "micronaut.openapi.schema.decorator.postfix";
     /**
      * Properties prefix to set custom schema implementations for selected classes.
      * For example, if you want to set simple 'java.lang.String' class to some complex 'org.somepackage.MyComplexType' class you need to write:
@@ -222,15 +281,16 @@ public interface OpenApiConfigProperty {
      * <p>
      * Also, you can set it in your application.yml file like this:
      * <p>
+     * <pre>
      * micronaut:
-     * openapi:
-     * group:
-     * my-group1:
-     * title: Title 1
-     * filename: swagger-${group}-${apiVersion}-${version}.yml
-     * my-group2:
-     * title: Title 2
-     * ...
+     *   openapi:
+     *     group:
+     *       my-group1:
+     *         title: Title 1
+     *         filename: swagger-${group}-${apiVersion}-${version}.yml
+     *       my-group2:
+     *         title: Title 2
+     * </pre>
      */
     String MICRONAUT_OPENAPI_GROUPS = "micronaut.openapi.groups";
 
@@ -275,31 +335,33 @@ public interface OpenApiConfigProperty {
      * All supported annotation processor properties.
      */
     Set<String> ALL = Set.of(
-            MICRONAUT_OPENAPI_ENABLED,
-            MICRONAUT_OPENAPI_CONTEXT_SERVER_PATH,
-            MICRONAUT_OPENAPI_PROPERTY_NAMING_STRATEGY,
-            MICRONAUT_OPENAPI_VIEWS_SPEC,
-            MICRONAUT_OPENAPI_FILENAME,
-            MICRONAUT_OPENAPI_JSON_FORMAT,
-            MICRONAUT_OPENAPI_ENVIRONMENTS,
-            MICRONAUT_ENVIRONMENT_ENABLED,
-            MICRONAUT_OPENAPI_FIELD_VISIBILITY_LEVEL,
-            MICRONAUT_CONFIG_FILE_LOCATIONS,
-            MICRONAUT_OPENAPI_TARGET_FILE,
-            MICRONAUT_OPENAPI_VIEWS_DEST_DIR,
-            MICRONAUT_OPENAPI_ADDITIONAL_FILES,
-            MICRONAUT_OPENAPI_CONFIG_FILE,
-            MICRONAUT_OPENAPI_SECURITY_ENABLED,
-            MICRONAUT_OPENAPI_VERSIONING_ENABLED,
-            MICRONAUT_OPENAPI_JSON_VIEW_DEFAULT_INCLUSION,
-            MICRONAUT_OPENAPI_PROJECT_DIR,
-            MICRONAUT_OPENAPI_ADOC_ENABLED,
-            MICRONAUT_OPENAPI_ADOC_TEMPLATES_DIR_PATH,
-            MICRONAUT_OPENAPI_ADOC_TEMPLATE_FILENAME,
-            MICRONAUT_OPENAPI_ADOC_OUTPUT_DIR_PATH,
-            MICRONAUT_OPENAPI_ADOC_OUTPUT_FILENAME,
-            MICRONAUT_OPENAPI_ADOC_OPENAPI_PATH,
-            MICRONAUT_OPENAPI_SWAGGER_FILE_GENERATION_ENABLED,
-            MICRONAUT_OPENAPI_EXTRA_SCHEMA_ENABLED
+        MICRONAUT_OPENAPI_ENABLED,
+        MICRONAUT_OPENAPI_CONTEXT_SERVER_PATH,
+        MICRONAUT_OPENAPI_PROPERTY_NAMING_STRATEGY,
+        MICRONAUT_OPENAPI_VIEWS_SPEC,
+        MICRONAUT_OPENAPI_FILENAME,
+        MICRONAUT_OPENAPI_JSON_FORMAT,
+        MICRONAUT_OPENAPI_ENVIRONMENTS,
+        MICRONAUT_ENVIRONMENT_ENABLED,
+        MICRONAUT_OPENAPI_FIELD_VISIBILITY_LEVEL,
+        MICRONAUT_CONFIG_FILE_LOCATIONS,
+        MICRONAUT_OPENAPI_TARGET_FILE,
+        MICRONAUT_OPENAPI_VIEWS_DEST_DIR,
+        MICRONAUT_OPENAPI_ADDITIONAL_FILES,
+        MICRONAUT_OPENAPI_CONFIG_FILE,
+        MICRONAUT_OPENAPI_SECURITY_ENABLED,
+        MICRONAUT_OPENAPI_VERSIONING_ENABLED,
+        MICRONAUT_OPENAPI_JSON_VIEW_DEFAULT_INCLUSION,
+        MICRONAUT_OPENAPI_PROJECT_DIR,
+        MICRONAUT_OPENAPI_ADOC_ENABLED,
+        MICRONAUT_OPENAPI_ADOC_TEMPLATES_DIR_PATH,
+        MICRONAUT_OPENAPI_ADOC_TEMPLATE_FILENAME,
+        MICRONAUT_OPENAPI_ADOC_OUTPUT_DIR_PATH,
+        MICRONAUT_OPENAPI_ADOC_OUTPUT_FILENAME,
+        MICRONAUT_OPENAPI_ADOC_OPENAPI_PATH,
+        MICRONAUT_OPENAPI_SWAGGER_FILE_GENERATION_ENABLED,
+        MICRONAUT_OPENAPI_SCHEMA_EXTRA_ENABLED,
+        MICRONAUT_OPENAPI_SCHEMA_NAME_SEPARATOR_EMPTY,
+        MICRONAUT_OPENAPI_SCHEMA_NAME_SEPARATOR_GENERIC
     );
 }
