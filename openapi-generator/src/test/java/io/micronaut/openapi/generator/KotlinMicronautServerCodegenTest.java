@@ -566,4 +566,14 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                     var title: String,
                 """);
     }
+
+    @Test
+    void testOperationDescription() {
+
+        var codegen = new KotlinMicronautServerCodegen();
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/operation-with-desc.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String path = outputPath + "src/main/kotlin/org/openapitools/";
+
+        assertFileContains(path + "api/DatasetsApi.kt", "description = \"Creates a brand new dataset.\"");
+    }
 }

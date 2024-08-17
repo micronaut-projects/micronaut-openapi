@@ -34,9 +34,9 @@
         {{#summary}}
         summary = "{{{.}}}",
         {{/summary}}
-        {{#description}}
-        description= "{{{.}}}",
-        {{/description}}
+        {{#notes}}
+        description = "{{{.}}}",
+        {{/notes}}
         {{#tags.1}}
         {{!generate only when at least 2 tags}}
         tags = [ {{#tags}}"{{name}}"{{^-last}}, {{/-last}}{{/tags}} ],
