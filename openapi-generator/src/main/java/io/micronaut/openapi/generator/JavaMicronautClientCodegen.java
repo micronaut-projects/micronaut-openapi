@@ -65,8 +65,9 @@ public class JavaMicronautClientCodegen extends AbstractMicronautJavaCodegen<Jav
         cliOptions.add(CliOption.newBoolean(OPT_CLIENT_PATH, "Generate code with @Client annotation path attribute", clientPath));
 
         typeMapping.put("file", "byte[]");
-        typeMapping.put("responseFile", "InputStream");
-        importMapping.put("InputStream", "java.io.InputStream");
+
+        typeMapping.put("responseFile", "StreamedFile");
+        importMapping.put("StreamedFile", "io.micronaut.http.server.types.files.StreamedFile");
     }
 
     @Override
