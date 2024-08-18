@@ -65,8 +65,9 @@ public class KotlinMicronautClientCodegen extends AbstractMicronautKotlinCodegen
         cliOptions.add(CliOption.newBoolean(OPT_CLIENT_PATH, "Generate code with @Client annotation path attribute", clientPath));
 
         typeMapping.put("file", "ByteArray");
-        typeMapping.put("responseFile", "InputStream");
-        importMapping.put("InputStream", "java.io.InputStream");
+
+        typeMapping.put("responseFile", "ByteBuffer<?>");
+        importMapping.put("ByteBuffer<?>", "io.micronaut.core.io.buffer.ByteBuffer");
     }
 
     @Override

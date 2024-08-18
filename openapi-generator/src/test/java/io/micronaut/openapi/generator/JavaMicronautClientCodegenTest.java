@@ -350,16 +350,6 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
     }
 
     @Test
-    void testWrongImportInputStream() {
-
-        var codegen = new JavaMicronautClientCodegen();
-        String outputPath = generateFiles(codegen, "src/test/resources/3_0/inputStream.yml", CodegenConstants.APIS, CodegenConstants.API_TESTS);
-        String apiPath = outputPath + "src/main/java/org/openapitools/api/";
-
-        assertFileContains(apiPath + "DefaultApi.java", "import java.io.InputStream;");
-    }
-
-    @Test
     void testDifferentPropertyCase() {
         var codegen = new JavaMicronautClientCodegen();
         String outputPath = generateFiles(codegen, "src/test/resources/3_0/propWithSecondUpperCaseChar.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
@@ -552,5 +542,15 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
             "@PathVariable(name = \"apiVersion\", defaultValue = \"v5\") @Nullable BrowseSearchOrdersApiVersionParameter apiVersio",
             "@Header(name = \"Content-Type\", defaultValue = \"application/json\") @Nullable String contentType"
         );
+    }
+
+    @Test
+    void testFileDownloadEndpoint() {
+
+        var codegen = new JavaMicronautClientCodegen();
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/file-download.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String apiPath = outputPath + "src/main/java/org/openapitools/api/";
+
+        assertFileContains(apiPath + "DefaultApi.java", "Mono<HttpResponse<@NotNull ByteBuffer<?>>> fetchData(");
     }
 }
