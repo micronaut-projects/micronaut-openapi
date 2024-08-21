@@ -1812,4 +1812,9 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
     public boolean getUseInlineModelResolver() {
         return false;
     }
+
+    @Override
+    public void postProcess() {
+        // disable output donation suggestion
+    }
 }

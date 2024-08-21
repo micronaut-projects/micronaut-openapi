@@ -15,10 +15,6 @@
  */
 package io.micronaut.openapi.generator;
 
-import java.io.File;
-import java.util.Collections;
-import java.util.List;
-
 import org.openapitools.codegen.CliOption;
 import org.openapitools.codegen.CodegenOperation;
 import org.openapitools.codegen.CodegenParameter;
@@ -30,6 +26,10 @@ import org.openapitools.codegen.model.ModelMap;
 import org.openapitools.codegen.model.OperationMap;
 import org.openapitools.codegen.model.OperationsMap;
 import org.openapitools.codegen.utils.StringUtils;
+
+import java.io.File;
+import java.util.Collections;
+import java.util.List;
 
 import static org.openapitools.codegen.CodegenConstants.API_PACKAGE;
 

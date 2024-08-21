@@ -15,14 +15,14 @@
  */
 package io.micronaut.openapi.generator;
 
-import java.util.Arrays;
-import java.util.List;
-
 import org.openapitools.codegen.CliOption;
 import org.openapitools.codegen.CodegenType;
 import org.openapitools.codegen.SupportingFile;
 import org.openapitools.codegen.meta.GeneratorMetadata;
 import org.openapitools.codegen.meta.Stability;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * The generator for creating Micronaut clients.
