@@ -853,6 +853,12 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
                 || op.httpMethod.equals("OPTIONS")
                 || op.httpMethod.equals("DELETE")
             );
+            if (StringUtils.isNotEmpty(op.notes)) {
+                op.notes = op.notes.strip();
+            }
+            if (StringUtils.isNotEmpty(op.summary)) {
+                op.summary = op.summary.strip();
+            }
 
             normalizeExtraAnnotations(EXT_ANNOTATIONS_OPERATION, false, op.vendorExtensions);
 

@@ -1,0 +1,95 @@
+openapi: 3.0.1
+info:
+  title: Test
+  version: 1.0.0
+  description: |
+    Something
+paths:
+  /:
+    post:
+      tags:
+        - Datasets
+      summary: Create empty dataset v5
+      description: |+
+        Creates a brand new dataset.
+      operationId: createDataset
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DatasetCreationRequest"
+            examples:
+              Example Dataset Request:
+                summary: Dataset creation request
+                value:
+                  datasetName: Example Dataset
+                  description: This is an example dataset description
+        required: true
+      responses:
+        "201":
+          description: Dataset successfully created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  datasetKey:
+                    type: string
+                  status:
+                    type: string
+                  datasetName:
+                    type: string
+                  description:
+                    type: string
+        "400":
+          description: Invalid dataset name or description supplied
+        "500":
+          description: Internal server error
+components:
+  schemas:
+    DatasetCreationOutput:
+      required:
+        - datasetCreationProgressUrl
+        - datasetKey
+        - status
+      type: object
+      properties:
+        datasetKey:
+          pattern: "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[4][0-9a-fA-F]{3}-[89aAbB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$"
+          type: string
+          format: uuid
+        status:
+          $ref: "#/components/schemas/DatasetCreationStatus"
+        datasetCreationProgressUrl:
+          type: string
+    DatasetCreationRequest:
+      required:
+        - datasetName
+      type: object
+      properties:
+        datasetName:
+          maximum: 30
+          minimum: 3
+          type: string
+          description: The unique dataset name
+        description:
+          maximum: 150
+          minimum: 3
+          type: string
+          description: The dataset description in plain text
+          nullable: true
+    DatasetCreationStatus:
+      type: string
+      description: |+
+        Status of dataset creation: 
+        
+        * `PENDING` 
+        * `PROCESSING`
+        * `COMPLETED`
+        * `FAILED`
+
+      enum:
+        - PENDING
+        - PROCESSING
+        - COMPLETED
+        - FAILED

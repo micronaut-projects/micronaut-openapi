@@ -4,7 +4,6 @@ import io.micronaut.openapi.generator.assertions.TestUtils;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.servers.Server;
-
 import org.junit.jupiter.api.Test;
 import org.openapitools.codegen.CliOption;
 import org.openapitools.codegen.CodegenConstants;
@@ -427,13 +426,13 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
         String path = outputPath + "src/main/java/org/openapitools/";
 
         assertFileContains(path + "api/WeatherForecastApisApi.java", "@Get(\"/v1/forecast/{id}\")",
-                "@PathVariable(\"id\") @NotNull String id,",
-                "@QueryValue(\"hourly\") @Nullable(inherited = true) List<V1ForecastIdGetHourlyParameterInner> hourly,");
+            "@PathVariable(\"id\") @NotNull String id,",
+            "@QueryValue(\"hourly\") @Nullable(inherited = true) List<V1ForecastIdGetHourlyParameterInner> hourly,");
 
         assertFileContains(path + "model/V1ForecastIdGetHourlyParameterInner.java",
-                "public enum V1ForecastIdGetHourlyParameterInner {",
-                "@JsonProperty(\"temperature_2m\")",
-                "TEMPERATURE_2M(\"temperature_2m\"),");
+            "public enum V1ForecastIdGetHourlyParameterInner {",
+            "@JsonProperty(\"temperature_2m\")",
+            "TEMPERATURE_2M(\"temperature_2m\"),");
     }
 
     @Test
@@ -454,32 +453,42 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
         String path = outputPath + "src/main/java/org/openapitools/";
 
         assertFileContains(path + "api/BooksApi.java",
-                """
-                            @Post("/add-book")
-                            @Secured(SecurityRule.IS_ANONYMOUS)
-                            @NotBlank
-                            Mono<@Valid Book> addBook(
-                        """);
+            """
+                    @Post("/add-book")
+                    @Secured(SecurityRule.IS_ANONYMOUS)
+                    @NotBlank
+                    Mono<@Valid Book> addBook(
+                """);
 
         assertFileContains(path + "model/Book.java",
+            """
+                @Serializable
+                public class Book {
+                """,
+            """
+                    @NotNull
+                    @Size(max = 10)
+                    @Schema(name = "title", requiredMode = Schema.RequiredMode.REQUIRED)
+                    @JsonProperty(JSON_PROPERTY_TITLE)
+                    @jakarta.validation.constraints.NotBlank
+                    private String title;
+                """,
+            """
+                    @NotEmpty
+                    public void setTitle(String title) {
+                        this.title = title;
+                    }
                 """
-                        @Serializable
-                        public class Book {
-                        """,
-                """
-                            @NotNull
-                            @Size(max = 10)
-                            @Schema(name = "title", requiredMode = Schema.RequiredMode.REQUIRED)
-                            @JsonProperty(JSON_PROPERTY_TITLE)
-                            @jakarta.validation.constraints.NotBlank
-                            private String title;
-                        """,
-                """
-                            @NotEmpty
-                            public void setTitle(String title) {
-                                this.title = title;
-                            }
-                        """
         );
+    }
+
+    @Test
+    void testOperationDescription() {
+
+        var codegen = new JavaMicronautServerCodegen();
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/operation-with-desc.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String path = outputPath + "src/main/java/org/openapitools/";
+
+        assertFileContains(path + "api/DatasetsApi.java", "description = \"Creates a brand new dataset.\"");
     }
 }
