@@ -1664,17 +1664,17 @@ class MyBean {}
         backupDto12Schema
         backupDto12Schema.properties
         backupDto12Schema.properties.location
+        !backupDto12Schema.properties.location.type
+        backupDto12Schema.properties.location.description == 'Referenced class. $ref shouldn\'t specify the type of BackupSubObject12'
         backupDto12Schema.properties.location.allOf
-        backupDto12Schema.properties.location.allOf.size() == 2
+        backupDto12Schema.properties.location.allOf.size() == 1
         backupDto12Schema.properties.location.allOf[0].$ref == '#/components/schemas/BackupSubObject12'
-        !backupDto12Schema.properties.location.allOf[1].type
-        backupDto12Schema.properties.location.allOf[1].description == 'Referenced class. $ref shouldn\'t specify the type of BackupSubObject12'
 
         backupDto12Schema.properties.state
+        !backupDto12Schema.properties.state.type
+        backupDto12Schema.properties.state.description == 'Referenced enum. $ref shouldn\'t specify the type of BackupSubEnum12'
         backupDto12Schema.properties.state.allOf
-        backupDto12Schema.properties.state.allOf.size() == 2
+        backupDto12Schema.properties.state.allOf.size() == 1
         backupDto12Schema.properties.state.allOf[0].$ref == '#/components/schemas/BackupSubEnum12'
-        !backupDto12Schema.properties.state.allOf[1].type
-        backupDto12Schema.properties.state.allOf[1].description == 'Referenced enum. $ref shouldn\'t specify the type of BackupSubEnum12'
     }
 }

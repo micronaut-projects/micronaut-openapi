@@ -259,10 +259,10 @@ class MyBean {}
         Map<String, Schema> schemas = openAPI.getComponents().getSchemas()
 
         expect:
-        Schema owner = schemas["Owner"]
-        Schema vehicleRef = owner.getProperties()["vehicle"]
+        Schema owner = schemas.Owner
+        Schema vehicleRef = owner.properties.vehicle
+        vehicleRef.description == "Vehicle of the owner. Here a car or bike with a name"
         vehicleRef.allOf[0].$ref == "#/components/schemas/Vehicle"
-        vehicleRef.allOf[1].description == "Vehicle of the owner. Here a car or bike with a name"
         vehicleRef.allOf[1].oneOf[0].$ref == '#/components/schemas/Car'
         vehicleRef.allOf[1].oneOf[1].$ref == '#/components/schemas/Bike'
         Schema vehicle = schemas["Vehicle"]
@@ -331,11 +331,11 @@ class MyBean {}
         Map<String, Schema> schemas = openAPI.getComponents().getSchemas()
 
         expect:
-        Schema owner = schemas["Owner"]
-        Schema vehicleRef = owner.getProperties()["Owner.Vehicle"]
+        Schema owner = schemas.Owner
+        Schema vehicleRef = owner.properties."Owner.Vehicle"
+        vehicleRef.description == "Vehicle of the owner. Here a car or bike with a name"
         vehicleRef.allOf[0].$ref == "#/components/schemas/Vehicle"
-        vehicleRef.allOf[1].description == "Vehicle of the owner. Here a car or bike with a name"
-        Schema ownerVehicle = schemas["Vehicle"]
+        Schema ownerVehicle = schemas.Vehicle
         ownerVehicle.oneOf[0].$ref == '#/components/schemas/Car'
         ownerVehicle.oneOf[1].$ref == '#/components/schemas/Bike'
     }
@@ -521,16 +521,16 @@ class MyBean {}
         !EmailSendProtocolDtoSchema.required
 
         schemas["ReadEmailOutputLocationDto"].required.containsAll(["protocol"])
-        Schema emailSendProtocolDtoSchemaFromReadEmailOutputLocationDto = schemas["ReadEmailOutputLocationDto"].getProperties()["protocol"]
+        Schema emailSendProtocolDtoSchemaFromReadEmailOutputLocationDto = schemas.ReadEmailOutputLocationDto.properties.protocol
+        emailSendProtocolDtoSchemaFromReadEmailOutputLocationDto.description == "Protocol used for the connection"
         emailSendProtocolDtoSchemaFromReadEmailOutputLocationDto.allOf[0].$ref == "#/components/schemas/EmailSendProtocolDto"
-        emailSendProtocolDtoSchemaFromReadEmailOutputLocationDto.allOf[1].description == "Protocol used for the connection"
         !emailSendProtocolDtoSchemaFromReadEmailOutputLocationDto.nullable
         !emailSendProtocolDtoSchemaFromReadEmailOutputLocationDto.required
 
         schemas["ReadEmailSettingsDto"].required.containsAll(["protocol", "active", "hostname", "port", "senderEmail", "username", "plaintextPassword"])
-        Schema emailSendProtocolDtoSchemaFromReadEmailSettingsDto = schemas["ReadEmailSettingsDto"].getProperties()["protocol"]
+        Schema emailSendProtocolDtoSchemaFromReadEmailSettingsDto = schemas.ReadEmailSettingsDto.properties.protocol
+        emailSendProtocolDtoSchemaFromReadEmailSettingsDto.description == "Protocol used for the connection or null if email sending is disabled"
         emailSendProtocolDtoSchemaFromReadEmailSettingsDto.allOf[0].$ref == "#/components/schemas/EmailSendProtocolDto"
-        emailSendProtocolDtoSchemaFromReadEmailSettingsDto.allOf[1].description == "Protocol used for the connection or null if email sending is disabled"
         emailSendProtocolDtoSchemaFromReadEmailSettingsDto.nullable
         !emailSendProtocolDtoSchemaFromReadEmailSettingsDto.required
     }

@@ -173,13 +173,13 @@ class MyBean {}
         Map<String, Schema> schemas = openAPI.getComponents().getSchemas()
 
         expect:
-        Schema testImpl1 = schemas.get("TestImpl1")
-        Schema woopsieRef = testImpl1.getProperties()["woopsie-id"]
+        Schema testImpl1 = schemas.TestImpl1
+        Schema woopsieRef = testImpl1.properties."woopsie-id"
 
-        woopsieRef instanceof ComposedSchema
-        ((ComposedSchema) woopsieRef).allOf[0].$ref == "#/components/schemas/TestInterface"
-        ((ComposedSchema) woopsieRef).allOf[1].description == "woopsie doopsie"
-        Schema woopsie = schemas.get("TestInterface")
+        woopsieRef.description == "woopsie doopsie"
+        woopsieRef.allOf.size() == 2
+        woopsieRef.allOf[0].$ref == "#/components/schemas/TestInterface"
+        Schema woopsie = schemas.TestInterface
         woopsie
         !woopsie.description
     }

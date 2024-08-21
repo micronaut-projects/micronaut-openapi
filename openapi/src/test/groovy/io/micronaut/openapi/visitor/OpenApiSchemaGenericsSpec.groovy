@@ -83,33 +83,33 @@ class MyBean {}
 
         schema.properties.objectsList.type == 'array'
         schema.properties.objectsList.items
+        schema.properties.objectsList.items.nullable
         schema.properties.objectsList.items.allOf
-        schema.properties.objectsList.items.allOf.size() == 2
+        schema.properties.objectsList.items.allOf.size() == 1
         schema.properties.objectsList.items.allOf[0].$ref == '#/components/schemas/ListItem'
-        schema.properties.objectsList.items.allOf[1].nullable
 
         schema.properties.nestedPrimitivesList.type == 'array'
         schema.properties.nestedPrimitivesList.items
+        schema.properties.nestedPrimitivesList.items.nullable
         schema.properties.nestedPrimitivesList.items.allOf
         schema.properties.nestedPrimitivesList.items.allOf.size() == 2
         schema.properties.nestedPrimitivesList.items.allOf[0].type == 'array'
         schema.properties.nestedPrimitivesList.items.allOf[0].items
         schema.properties.nestedPrimitivesList.items.allOf[0].items.type == 'string'
         schema.properties.nestedPrimitivesList.items.allOf[0].items.nullable
-        schema.properties.nestedPrimitivesList.items.allOf[1].nullable
         schema.properties.nestedPrimitivesList.items.allOf[1].maxItems == 10
 
         schema.properties.nestedObjectsList.type == 'array'
         schema.properties.nestedObjectsList.items
+        schema.properties.nestedObjectsList.items.nullable
         schema.properties.nestedObjectsList.items.allOf
         schema.properties.nestedObjectsList.items.allOf.size() == 2
         schema.properties.nestedObjectsList.items.allOf[0].type == 'array'
         schema.properties.nestedObjectsList.items.allOf[0].items
+        schema.properties.nestedObjectsList.items.allOf[0].items.nullable
         schema.properties.nestedObjectsList.items.allOf[0].items.allOf
-        schema.properties.nestedObjectsList.items.allOf[0].items.allOf.size() == 2
+        schema.properties.nestedObjectsList.items.allOf[0].items.allOf.size() == 1
         schema.properties.nestedObjectsList.items.allOf[0].items.allOf[0].$ref == '#/components/schemas/ListItem'
-        schema.properties.nestedObjectsList.items.allOf[0].items.allOf[1].nullable
-        schema.properties.nestedObjectsList.items.allOf[1].nullable
         schema.properties.nestedObjectsList.items.allOf[1].maxItems == 10
 
         schema.properties.genObjectPrimitive.$ref == '#/components/schemas/GenObject_Size_min_10_NullableString_'
@@ -130,30 +130,30 @@ class MyBean {}
         def subSchema3 = openAPI.components.schemas.GenObject_String_
         subSchema3.properties.field.type == 'string'
 
+        schema.properties.genObjectObj.nullable
         schema.properties.genObjectObj.allOf
-        schema.properties.genObjectObj.allOf.size() == 2
+        schema.properties.genObjectObj.allOf.size() == 1
         schema.properties.genObjectObj.allOf[0].$ref == '#/components/schemas/GenObject_ListItem_'
-        schema.properties.genObjectObj.allOf[1].nullable
 
         !schema.properties.genObjectObj2.allOf
         schema.properties.genObjectObj2.$ref == '#/components/schemas/GenObject_ListItem_'
 
+        schema.properties.genObjectObj3.nullable
         schema.properties.genObjectObj3.allOf
-        schema.properties.genObjectObj3.allOf.size() == 2
+        schema.properties.genObjectObj3.allOf.size() == 1
         schema.properties.genObjectObj3.allOf[0].$ref == '#/components/schemas/GenObject_GenObject_'
-        schema.properties.genObjectObj3.allOf[1].nullable
 
+        schema.properties.nestedGenObjectPrimitive.nullable
         schema.properties.nestedGenObjectPrimitive.allOf
         schema.properties.nestedGenObjectPrimitive.allOf.size() == 2
         schema.properties.nestedGenObjectPrimitive.allOf[0].$ref == '#/components/schemas/GenObject_List_NullableString__'
         schema.properties.nestedGenObjectPrimitive.allOf[1].maxItems == 10
-        schema.properties.nestedGenObjectPrimitive.allOf[1].nullable
 
+        schema.properties.nestedGenObjectObj.nullable
         schema.properties.nestedGenObjectObj.allOf
         schema.properties.nestedGenObjectObj.allOf.size() == 2
         schema.properties.nestedGenObjectObj.allOf[0].$ref == '#/components/schemas/GenObject_List_GenObject__'
         schema.properties.nestedGenObjectObj.allOf[1].maxItems == 10
-        schema.properties.nestedGenObjectObj.allOf[1].nullable
     }
 
     void "Issue #279 - test parse OpenAPI with generics in interface"() {
@@ -710,9 +710,9 @@ class MyBean {}
         get3.parameters[0].schema
         get3.parameters[0].schema.type == 'array'
         get3.parameters[0].schema.nullable
+        get3.parameters[0].schema.items.nullable
         get3.parameters[0].schema.items.allOf
         get3.parameters[0].schema.items.allOf[0].$ref == '#/components/schemas/CommonController.Channel'
-        get3.parameters[0].schema.items.allOf[1].nullable
     }
 
     void "test schema with public fields type arguments"() {
@@ -901,33 +901,33 @@ class MyBean {}
 
         schema.properties.objectsList.type == 'array'
         schema.properties.objectsList.items
+        schema.properties.objectsList.items.nullable
         schema.properties.objectsList.items.allOf
-        schema.properties.objectsList.items.allOf.size() == 2
+        schema.properties.objectsList.items.allOf.size() == 1
         schema.properties.objectsList.items.allOf[0].$ref == '#/components/schemas/ListItem'
-        schema.properties.objectsList.items.allOf[1].nullable
 
         schema.properties.nestedPrimitivesList.type == 'array'
         schema.properties.nestedPrimitivesList.items
+        schema.properties.nestedPrimitivesList.items.nullable
         schema.properties.nestedPrimitivesList.items.allOf
         schema.properties.nestedPrimitivesList.items.allOf.size() == 2
         schema.properties.nestedPrimitivesList.items.allOf[0].type == 'array'
         schema.properties.nestedPrimitivesList.items.allOf[0].items
         schema.properties.nestedPrimitivesList.items.allOf[0].items.type == 'string'
         schema.properties.nestedPrimitivesList.items.allOf[0].items.nullable
-        schema.properties.nestedPrimitivesList.items.allOf[1].nullable
         schema.properties.nestedPrimitivesList.items.allOf[1].maxItems == 10
 
         schema.properties.nestedObjectsList.type == 'array'
         schema.properties.nestedObjectsList.items
+        schema.properties.nestedObjectsList.items.nullable
         schema.properties.nestedObjectsList.items.allOf
         schema.properties.nestedObjectsList.items.allOf.size() == 2
         schema.properties.nestedObjectsList.items.allOf[0].type == 'array'
         schema.properties.nestedObjectsList.items.allOf[0].items
+        schema.properties.nestedObjectsList.items.allOf[0].items.nullable
         schema.properties.nestedObjectsList.items.allOf[0].items.allOf
-        schema.properties.nestedObjectsList.items.allOf[0].items.allOf.size() == 2
+        schema.properties.nestedObjectsList.items.allOf[0].items.allOf.size() == 1
         schema.properties.nestedObjectsList.items.allOf[0].items.allOf[0].$ref == '#/components/schemas/ListItem'
-        schema.properties.nestedObjectsList.items.allOf[0].items.allOf[1].nullable
-        schema.properties.nestedObjectsList.items.allOf[1].nullable
         schema.properties.nestedObjectsList.items.allOf[1].maxItems == 10
 
         schema.properties.genObjectPrimitive.$ref == '#/components/schemas/GenObjectSizemin10NullableString'
@@ -948,30 +948,30 @@ class MyBean {}
         def subSchema3 = openAPI.components.schemas.GenObjectString
         subSchema3.properties.field.type == 'string'
 
+        schema.properties.genObjectObj.nullable
         schema.properties.genObjectObj.allOf
-        schema.properties.genObjectObj.allOf.size() == 2
+        schema.properties.genObjectObj.allOf.size() == 1
         schema.properties.genObjectObj.allOf[0].$ref == '#/components/schemas/GenObjectListItem'
-        schema.properties.genObjectObj.allOf[1].nullable
 
         !schema.properties.genObjectObj2.allOf
         schema.properties.genObjectObj2.$ref == '#/components/schemas/GenObjectListItem'
 
+        schema.properties.genObjectObj3.nullable
         schema.properties.genObjectObj3.allOf
-        schema.properties.genObjectObj3.allOf.size() == 2
+        schema.properties.genObjectObj3.allOf.size() == 1
         schema.properties.genObjectObj3.allOf[0].$ref == '#/components/schemas/GenObjectGenObject'
-        schema.properties.genObjectObj3.allOf[1].nullable
 
+        schema.properties.nestedGenObjectPrimitive.nullable
         schema.properties.nestedGenObjectPrimitive.allOf
         schema.properties.nestedGenObjectPrimitive.allOf.size() == 2
         schema.properties.nestedGenObjectPrimitive.allOf[0].$ref == '#/components/schemas/GenObjectListNullableString'
         schema.properties.nestedGenObjectPrimitive.allOf[1].maxItems == 10
-        schema.properties.nestedGenObjectPrimitive.allOf[1].nullable
 
+        schema.properties.nestedGenObjectObj.nullable
         schema.properties.nestedGenObjectObj.allOf
         schema.properties.nestedGenObjectObj.allOf.size() == 2
         schema.properties.nestedGenObjectObj.allOf[0].$ref == '#/components/schemas/GenObjectListGenObject'
         schema.properties.nestedGenObjectObj.allOf[1].maxItems == 10
-        schema.properties.nestedGenObjectObj.allOf[1].nullable
     }
 
     @RestoreSystemProperties
@@ -1057,33 +1057,33 @@ class MyBean {}
 
         schema.properties.objectsList.type == 'array'
         schema.properties.objectsList.items
+        schema.properties.objectsList.items.nullable
         schema.properties.objectsList.items.allOf
-        schema.properties.objectsList.items.allOf.size() == 2
+        schema.properties.objectsList.items.allOf.size() == 1
         schema.properties.objectsList.items.allOf[0].$ref == '#/components/schemas/ListItem'
-        schema.properties.objectsList.items.allOf[1].nullable
 
         schema.properties.nestedPrimitivesList.type == 'array'
         schema.properties.nestedPrimitivesList.items
+        schema.properties.nestedPrimitivesList.items.nullable
         schema.properties.nestedPrimitivesList.items.allOf
         schema.properties.nestedPrimitivesList.items.allOf.size() == 2
         schema.properties.nestedPrimitivesList.items.allOf[0].type == 'array'
         schema.properties.nestedPrimitivesList.items.allOf[0].items
         schema.properties.nestedPrimitivesList.items.allOf[0].items.type == 'string'
         schema.properties.nestedPrimitivesList.items.allOf[0].items.nullable
-        schema.properties.nestedPrimitivesList.items.allOf[1].nullable
         schema.properties.nestedPrimitivesList.items.allOf[1].maxItems == 10
 
         schema.properties.nestedObjectsList.type == 'array'
         schema.properties.nestedObjectsList.items
+        schema.properties.nestedObjectsList.items.nullable
         schema.properties.nestedObjectsList.items.allOf
         schema.properties.nestedObjectsList.items.allOf.size() == 2
         schema.properties.nestedObjectsList.items.allOf[0].type == 'array'
         schema.properties.nestedObjectsList.items.allOf[0].items
+        schema.properties.nestedObjectsList.items.allOf[0].items.nullable
         schema.properties.nestedObjectsList.items.allOf[0].items.allOf
-        schema.properties.nestedObjectsList.items.allOf[0].items.allOf.size() == 2
+        schema.properties.nestedObjectsList.items.allOf[0].items.allOf.size() == 1
         schema.properties.nestedObjectsList.items.allOf[0].items.allOf[0].$ref == '#/components/schemas/ListItem'
-        schema.properties.nestedObjectsList.items.allOf[0].items.allOf[1].nullable
-        schema.properties.nestedObjectsList.items.allOf[1].nullable
         schema.properties.nestedObjectsList.items.allOf[1].maxItems == 10
 
         schema.properties.genObjectPrimitive.$ref == '#/components/schemas/GenObject<<<Size<<<min<<<10<<<NullableString<<<'
@@ -1104,34 +1104,35 @@ class MyBean {}
         def subSchema3 = openAPI.components.schemas.'GenObject<<<String<<<'
         subSchema3.properties.field.type == 'string'
 
+        schema.properties.genObjectObj.nullable
         schema.properties.genObjectObj.allOf
-        schema.properties.genObjectObj.allOf.size() == 2
+        schema.properties.genObjectObj.allOf.size() == 1
         schema.properties.genObjectObj.allOf[0].$ref == '#/components/schemas/GenObject<<<ListItem<<<'
-        schema.properties.genObjectObj.allOf[1].nullable
 
         !schema.properties.genObjectObj2.allOf
         schema.properties.genObjectObj2.$ref == '#/components/schemas/GenObject<<<ListItem<<<'
 
+        schema.properties.genObjectObj3.nullable
         schema.properties.genObjectObj3.allOf
-        schema.properties.genObjectObj3.allOf.size() == 2
+        schema.properties.genObjectObj3.allOf.size() == 1
         schema.properties.genObjectObj3.allOf[0].$ref == '#/components/schemas/GenObject<<<GenObject<<<'
-        schema.properties.genObjectObj3.allOf[1].nullable
 
+        schema.properties.nestedGenObjectPrimitive.nullable
         schema.properties.nestedGenObjectPrimitive.allOf
         schema.properties.nestedGenObjectPrimitive.allOf.size() == 2
         schema.properties.nestedGenObjectPrimitive.allOf[0].$ref == '#/components/schemas/GenObject<<<List<<<NullableString<<<<<<'
         schema.properties.nestedGenObjectPrimitive.allOf[1].maxItems == 10
-        schema.properties.nestedGenObjectPrimitive.allOf[1].nullable
 
+        schema.properties.nestedGenObjectObj.nullable
         schema.properties.nestedGenObjectObj.allOf
         schema.properties.nestedGenObjectObj.allOf.size() == 2
         schema.properties.nestedGenObjectObj.allOf[0].$ref == '#/components/schemas/GenObject<<<List<<<GenObject<<<<<<'
         schema.properties.nestedGenObjectObj.allOf[1].maxItems == 10
-        schema.properties.nestedGenObjectObj.allOf[1].nullable
 
+        schema.properties.withInnerClass.nullable
         schema.properties.withInnerClass.allOf
         schema.properties.withInnerClass.allOf.size() == 2
         schema.properties.withInnerClass.allOf[0].$ref == "#/components/schemas/GenObject<<<List<<<PubGenObject<<<PubGenObject&&&ListInnerItem<<<<<<<<<"
-        schema.properties.withInnerClass.allOf[1].nullable
+        schema.properties.withInnerClass.allOf[1].maxItems == 10
     }
 }
