@@ -177,6 +177,7 @@ import static io.micronaut.openapi.visitor.SchemaUtils.processExtensions;
 import static io.micronaut.openapi.visitor.SchemaUtils.setOperationOnPathItem;
 import static io.micronaut.openapi.visitor.SchemaUtils.setSpecVersion;
 import static io.micronaut.openapi.visitor.StringUtil.CLOSE_BRACE;
+import static io.micronaut.openapi.visitor.StringUtil.DOLLAR;
 import static io.micronaut.openapi.visitor.StringUtil.OPEN_BRACE;
 import static io.micronaut.openapi.visitor.StringUtil.THREE_DOTS;
 import static io.micronaut.openapi.visitor.Utils.DEFAULT_MEDIA_TYPES;
@@ -533,6 +534,8 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             var pathVar = entry.getValue();
             if (pathVar.isExploded()
                 || !path.contains(OPEN_BRACE + varName + CLOSE_BRACE)
+                // skip placeholders
+                || path.contains(DOLLAR + OPEN_BRACE + varName + CLOSE_BRACE)
                 || isAlreadyAdded(varName, operation)) {
                 continue;
             }

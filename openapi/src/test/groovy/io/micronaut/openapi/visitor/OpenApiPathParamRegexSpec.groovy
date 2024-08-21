@@ -2,7 +2,6 @@ package io.micronaut.openapi.visitor
 
 import io.micronaut.openapi.AbstractOpenApiTypeElementSpec
 import io.swagger.v3.oas.models.OpenAPI
-import io.swagger.v3.oas.models.Operation
 
 class OpenApiPathParamRegexSpec extends AbstractOpenApiTypeElementSpec {
 
@@ -20,7 +19,7 @@ import io.swagger.v3.oas.annotations.Operation;
 class OpenApiController {
 
     @Operation(summary = "Update tag", description = "Updates an existing tag", tags = "users_tag")
-    @Post("/tags/{tagId: \\\\d+}/{path:.*}{.ext}/update/{?max,offset}{/id:[a-zA-Z]+}")
+    @Post("/tags/{tagId: \\\\d+}/{path:.*}{.ext}/update{?max,offset}{/id:[a-zA-Z]+}")
     public void postRaw() {
     }
 }

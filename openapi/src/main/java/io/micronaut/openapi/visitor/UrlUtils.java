@@ -21,8 +21,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static io.micronaut.openapi.visitor.StringUtil.CLOSE_BRACE;
+import static io.micronaut.openapi.visitor.StringUtil.DOLLAR;
 import static io.micronaut.openapi.visitor.StringUtil.OPEN_BRACE;
 import static io.micronaut.openapi.visitor.StringUtil.SLASH;
+import static io.micronaut.openapi.visitor.StringUtil.SLASH_CHAR;
+import static io.micronaut.openapi.visitor.UrlUtils.SegmentType.CONST;
+import static io.micronaut.openapi.visitor.UrlUtils.SegmentType.OPT_VAR;
+import static io.micronaut.openapi.visitor.UrlUtils.SegmentType.PLACEHOLDER;
+import static io.micronaut.openapi.visitor.UrlUtils.SegmentType.REQ_VAR;
 
 /**
  * URL and URL paths util methods.
@@ -48,10 +54,14 @@ public final class UrlUtils {
         var resultStrings = new ArrayList<String>();
         for (var res : results) {
             var url = res.toString();
+            if (url.endsWith(SLASH) && url.length() > 1) {
+                url = url.substring(0, url.length() - SLASH.length());
+            } else if (!url.startsWith(SLASH) && !url.startsWith(DOLLAR)) {
+                url = SLASH + url;
+            } else if (url.startsWith(SLASH + DOLLAR)) {
+                url = url.substring(1);
+            }
             if (!resultStrings.contains(url)) {
-                if (url.endsWith(SLASH)) {
-                    url = url.substring(0, url.length() - SLASH.length());
-                }
                 resultStrings.add(url);
             }
         }
@@ -63,26 +73,21 @@ public final class UrlUtils {
         var type = segment.type;
         var value = segment.value;
         if (results.isEmpty()) {
-            if (type == SegmentType.PLACEHOLDER) {
+            if (type == PLACEHOLDER) {
                 results.add(new StringBuilder(value));
                 return;
             }
-            var builder = new StringBuilder(SLASH).append(value);
-            if (!value.endsWith(SLASH)) {
-                builder.append(SLASH);
-            }
+            var builder = new StringBuilder();
+            builder.append(value);
             results.add(builder);
-            if (type == SegmentType.OPT_VAR) {
-                results.add(new StringBuilder(SLASH));
+            if (type == OPT_VAR) {
+                results.add(new StringBuilder());
             }
             return;
         }
-        if (type == SegmentType.CONST || type == SegmentType.REQ_VAR || type == SegmentType.PLACEHOLDER) {
+        if (type == CONST || type == REQ_VAR || type == PLACEHOLDER) {
             for (var result : results) {
                 result.append(value);
-                if (type != SegmentType.PLACEHOLDER) {
-                    result.append(SLASH);
-                }
             }
             return;
         }
@@ -92,10 +97,10 @@ public final class UrlUtils {
             newResults.add(new StringBuilder(result));
         }
         for (var result : results) {
-            if (prevSegment.type == SegmentType.OPT_VAR && result.indexOf(prevSegment.value + SLASH) < 0) {
+            if (prevSegment.type == OPT_VAR && result.indexOf(prevSegment.value) < 0) {
                 continue;
             }
-            result.append(value).append(SLASH);
+            result.append(SLASH_CHAR).append(value);
         }
         results.addAll(newResults);
     }
@@ -128,12 +133,15 @@ public final class UrlUtils {
 
             // process placeholders
             if (varStartPos >= 1 && pathString.charAt(varStartPos - 1) == '$') {
-                segments.add(new Segment(SegmentType.PLACEHOLDER, pathString.substring(varStartPos - 1, varEndPos + 1)));
+                if (!constSegment.isEmpty()) {
+                    addConstValue(constSegment.substring(0, constSegment.length() - 1), segments);
+                }
+                segments.add(new Segment(PLACEHOLDER, pathString.substring(varStartPos - 1, varEndPos + 1)));
                 startPos = varEndPos + 1;
                 continue;
             }
 
-            SegmentType type = nextChar == '/' ? SegmentType.OPT_VAR : SegmentType.REQ_VAR;
+            SegmentType type = nextChar == '/' ? OPT_VAR : REQ_VAR;
 
             if (!constSegment.isEmpty()) {
                 addConstValue(constSegment, segments);
@@ -159,31 +167,25 @@ public final class UrlUtils {
         }
 
         if (segments.isEmpty()) {
-            segments.add(new Segment(SegmentType.CONST, SLASH));
+            segments.add(new Segment(CONST, SLASH));
         }
 
         return segments;
     }
 
     private static void addConstValue(String constValue, List<Segment> segments) {
-        if (constValue.startsWith(SLASH)) {
-            constValue = constValue.substring(1);
-        }
-        if (constValue.endsWith(SLASH)) {
-            constValue = constValue.substring(0, constValue.length() - SLASH.length());
-        }
         if (!constValue.isEmpty()) {
-            segments.add(new Segment(SegmentType.CONST, constValue));
+            segments.add(new Segment(CONST, constValue));
         }
     }
 
-    private record Segment(
+    public record Segment(
         SegmentType type,
         String value
     ) {
     }
 
-    private enum SegmentType {
+    public enum SegmentType {
         REQ_VAR,
         OPT_VAR,
         CONST,
