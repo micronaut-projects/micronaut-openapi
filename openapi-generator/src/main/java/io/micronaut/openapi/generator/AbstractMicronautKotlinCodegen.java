@@ -1801,4 +1801,9 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
     private String firstTitleCase(final String input) {
         return input.substring(0, 1).toUpperCase(Locale.ROOT) + input.substring(1);
     }
+
+    @Override
+    public boolean getUseInlineModelResolver() {
+        return false;
+    }
 }

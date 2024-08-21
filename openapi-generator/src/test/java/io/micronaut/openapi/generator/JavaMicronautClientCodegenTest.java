@@ -431,6 +431,16 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
     }
 
     @Test
+    void testControllerEnums2() {
+
+        var codegen = new JavaMicronautClientCodegen();
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/controller-enum2.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String modelPath = outputPath + "src/main/java/org/openapitools/api/";
+
+        assertFileContains(modelPath + "BusinessCardsApi.java", "@QueryValue(\"statusCodes\") @Nullable List<@NotNull String> statusCodes");
+    }
+
+    @Test
     void testCommonPathParametersWithRef() {
 
         var codegen = new JavaMicronautClientCodegen();

@@ -107,7 +107,7 @@ public final class MicronautCodeGeneratorEntryPoint {
         input.config(codeGenerator);
 
         // Generate
-        DefaultGenerator generator = new DefaultGenerator();
+        var generator = new DefaultGenerator();
         for (OutputKind outputKind : OutputKind.values()) {
             generator.setGeneratorPropertyDefault(outputKind.generatorProperty, "false");
         }
@@ -459,7 +459,7 @@ public final class MicronautCodeGeneratorEntryPoint {
 
         @Override
         public MicronautCodeGeneratorBuilder withOptions(Consumer<? super MicronautCodeGeneratorOptionsBuilder> optionsConfigurer) {
-            DefaultOptionsBuilder builder = new DefaultOptionsBuilder();
+            var builder = new DefaultOptionsBuilder();
             optionsConfigurer.accept(builder);
             options = builder.build();
             return this;
