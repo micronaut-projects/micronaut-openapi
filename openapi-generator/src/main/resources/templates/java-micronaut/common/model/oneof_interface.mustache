@@ -11,6 +11,6 @@ public interface {{classname}}{{#vendorExtensions.x-implements}}{{#-first}} exte
 {{/formatNoEmptyLines}}
 
 {{#discriminator}}
-    public {{propertyType}} {{propertyGetter}}();
+    {{propertyType}} {{propertyGetter}}();
 {{/discriminator}}
 }

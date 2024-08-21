@@ -30,6 +30,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.atteo.evo.inflector.English;
 import org.openapitools.codegen.CliOption;
 import org.openapitools.codegen.CodegenConstants;
+import org.openapitools.codegen.CodegenDiscriminator;
 import org.openapitools.codegen.CodegenModel;
 import org.openapitools.codegen.CodegenOperation;
 import org.openapitools.codegen.CodegenParameter;
@@ -81,6 +82,7 @@ import static org.openapitools.codegen.CodegenConstants.INVOKER_PACKAGE;
 import static org.openapitools.codegen.CodegenConstants.MODEL_PACKAGE;
 import static org.openapitools.codegen.CodegenConstants.PACKAGE_NAME;
 import static org.openapitools.codegen.languages.KotlinClientCodegen.DATE_LIBRARY;
+import static org.openapitools.codegen.utils.OnceLogger.once;
 import static org.openapitools.codegen.utils.StringUtils.camelize;
 import static org.openapitools.codegen.utils.StringUtils.underscore;
 
@@ -680,6 +682,45 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
 
     public void setVisitable(boolean visitable) {
         this.visitable = visitable;
+    }
+
+    @Override
+    protected CodegenDiscriminator createDiscriminator(String schemaName, Schema schema) {
+
+        var discriminator = super.createDiscriminator(schemaName, schema);
+        if (discriminator == null) {
+            return null;
+        }
+
+        for (var entry : discriminator.getMapping().entrySet()) {
+            String name;
+            if (entry.getValue().indexOf('/') < 0) {
+                continue;
+            }
+            name = ModelUtils.getSimpleRef(entry.getValue());
+            var referencedSchema = ModelUtils.getSchema(openAPI, name);
+            if (referencedSchema == null) {
+                once(log).error("Failed to lookup the schema '{}' when processing the discriminator mapping of oneOf/anyOf. Please check to ensure it's defined properly.", name);
+                continue;
+            }
+            if (referencedSchema.getProperties() == null || referencedSchema.getProperties().isEmpty()) {
+                continue;
+            }
+            boolean isDiscriminatorPropTypeFound = false;
+            var props = (Map<String, Schema>) referencedSchema.getProperties();
+            for (var propEntry : props.entrySet()) {
+                if (!propEntry.getKey().equals(discriminator.getPropertyName())) {
+                    continue;
+                }
+                discriminator.setPropertyType(getTypeDeclaration(propEntry.getValue()));
+                isDiscriminatorPropTypeFound = true;
+                break;
+            }
+            if (isDiscriminatorPropTypeFound) {
+                break;
+            }
+        }
+        return discriminator;
     }
 
     @Override
@@ -1297,8 +1338,6 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
             processParentModel(model, requiredVarsWithoutDiscriminator, requiredParentVarsWithoutDiscriminator, allVars, false);
             model.allVars = allVars;
 
-            processOneOfModels(model, objs.values());
-
             var withInheritance = model.hasChildren || model.parent != null;
             model.vendorExtensions.put("withInheritance", withInheritance);
 
@@ -1344,6 +1383,11 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
             addStrValueToEnum(model);
         }
 
+        for (ModelsMap models : objs.values()) {
+            CodegenModel model = models.getModels().get(0).getModel();
+            processOneOfModels(model, objs.values());
+        }
+
         return objs;
     }
 
@@ -1377,8 +1421,29 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
                     if (prop.name.equals(discriminator.getPropertyName())) {
                         prop.isDiscriminator = true;
                         prop.isOverridden = true;
+                        prop.isNullable = false;
+                        prop.isOptional = false;
+                        prop.required = true;
+                        prop.isReadOnly = false;
+                        prop.vendorExtensions.put("typeWithEnumWithGenericAnnotations", discriminator.getPropertyType());
                         prop.vendorExtensions.put("overridden", true);
                         break;
+                    }
+                }
+                var properties = (ArrayList<CodegenProperty>) m.vendorExtensions.get("requiredVarsWithoutDiscriminator");
+                if (properties != null && !properties.isEmpty()) {
+                    for (var prop : properties) {
+                        if (prop.name.equals(discriminator.getPropertyName())) {
+                            prop.isDiscriminator = true;
+                            prop.isOverridden = true;
+                            prop.isNullable = false;
+                            prop.isOptional = false;
+                            prop.required = true;
+                            prop.isReadOnly = false;
+                            prop.vendorExtensions.put("typeWithEnumWithGenericAnnotations", discriminator.getPropertyType());
+                            prop.vendorExtensions.put("overridden", true);
+                            break;
+                        }
                     }
                 }
             }
