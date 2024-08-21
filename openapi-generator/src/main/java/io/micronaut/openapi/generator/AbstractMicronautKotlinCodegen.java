@@ -973,8 +973,9 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         CodegenModel codegenModel = super.fromModel(name, model);
         codegenModel.imports.remove("ApiModel");
         codegenModel.imports.remove("ApiModelProperty");
-        if ("BigDecimal".equals(codegenModel.dataType)) {
-            codegenModel.imports.add("BigDecimal");
+        if (importMapping.containsKey(codegenModel.dataType)
+            && !codegenModel.imports.contains(codegenModel.dataType)) {
+            codegenModel.imports.add(codegenModel.dataType);
         }
         allModels.put(name, codegenModel);
         return codegenModel;
@@ -1011,19 +1012,27 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
 
     @Override
     public String toModelName(final String name) {
+        // obtain the name from modelNameMapping directly if provided
+        if (modelNameMapping.containsKey(name)) {
+            return modelNameMapping.get(name);
+        }
         // memoization
         if (schemaKeyToModelNameCache.containsKey(name)) {
             return schemaKeyToModelNameCache.get(name);
         }
 
-        // Allow for explicitly configured kotlin.* and java.* types
-        if (name.startsWith("kotlin.") || name.startsWith("java.")) {
-            return name;
-        }
-
         // If schemaMapping contains name, assume this is a legitimate model name.
         if (schemaMapping.containsKey(name)) {
             return schemaMapping.get(name);
+        }
+
+        if (importMapping.containsKey(name)) {
+            return name;
+        }
+
+        // Allow for explicitly configured kotlin.* and java.* types
+        if (name.startsWith("kotlin.") || name.startsWith("java.")) {
+            return name;
         }
 
         String modifiedName = name.replace(".", "")

@@ -529,4 +529,15 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
             """);
         assertFileContains(path + "model/CancellationReasonTypesDTO.java", "Integer getVersion();");
     }
+
+    @Test
+    void testUuidWithModelNameSuffix() {
+
+        var codegen = new JavaMicronautClientCodegen();
+        codegen.setModelNameSuffix("Dto");
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/schema-with-uuid.yml", CodegenConstants.MODELS);
+        String path = outputPath + "src/main/java/org/openapitools/";
+
+        assertFileContains(path + "model/OrderDTODto.java", "private UUID id;");
+    }
 }
