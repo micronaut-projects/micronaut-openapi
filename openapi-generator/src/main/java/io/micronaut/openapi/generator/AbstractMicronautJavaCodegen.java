@@ -15,16 +15,21 @@
  */
 package io.micronaut.openapi.generator;
 
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.google.common.base.CaseFormat;
 import com.google.common.collect.ImmutableMap;
 import com.samskivert.mustache.Mustache;
 import io.micronaut.openapi.generator.Formatting.ReplaceDotsWithUnderscoreLambda;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Operation;
+import io.swagger.v3.oas.models.media.Content;
+import io.swagger.v3.oas.models.media.MediaType;
 import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.parameters.Parameter;
 import io.swagger.v3.oas.models.servers.Server;
+import io.swagger.v3.parser.util.SchemaTypeUtil;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.atteo.evo.inflector.English;
 import org.openapitools.codegen.CliOption;
 import org.openapitools.codegen.CodegenConstants;
@@ -49,8 +54,12 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.security.SecureRandom;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -60,6 +69,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static io.micronaut.openapi.generator.Utils.DEFAULT_BODY_PARAM_NAME;
@@ -644,6 +654,40 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
         }
         parameter.vendorExtensions.put("realName", realName);
 
+        Schema parameterSchema;
+        if (p.getSchema() != null) {
+            parameterSchema = unaliasSchema(p.getSchema());
+        } else if (p.getContent() != null) {
+            Content content = p.getContent();
+            if (content.size() > 1) {
+                once(log).warn("Multiple schemas found in content, returning only the first one");
+            }
+            Map.Entry<String, MediaType> entry = content.entrySet().iterator().next();
+            parameterSchema = entry.getValue().getSchema();
+        } else {
+            parameterSchema = null;
+        }
+        if (parameterSchema != null && parameterSchema.get$ref() != null) {
+            parameterSchema = openAPI.getComponents().getSchemas().get(parameterSchema.get$ref().substring("#/components/schemas/".length()));
+        }
+
+        String defaultValueInit;
+        var items = parameter.items;
+        if (items == null) {
+            defaultValueInit = calcDefaultValues(null, null, false, false,
+                false, false, false, false, false, parameterSchema).getLeft();
+        } else {
+            defaultValueInit = calcDefaultValues(items.datatypeWithEnum, items.dataType, items.getIsEnumOrRef(),
+                parameter.isArray, items.isString, items.isNumeric, items.isFloat, items.isMap, items.isNullable,
+                parameterSchema).getLeft();
+        }
+        if (parameterSchema != null && ModelUtils.isEnumSchema(parameterSchema)) {
+            defaultValueInit = parameter.dataType + ".fromValue(" + defaultValueInit + ")";
+        }
+        if (defaultValueInit != null) {
+            parameter.vendorExtensions.put("defaultValueInit", defaultValueInit);
+        }
+
         addStrValueToEnum(parameter.items);
 
         return parameter;
@@ -669,7 +713,248 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
         }
         property.vendorExtensions.put("realName", realName);
 
+        if (p != null && p.get$ref() != null) {
+            p = ModelUtils.getSchemaFromRefToSchemaWithProperties(openAPI, p.get$ref());
+        }
+
+        String defaultValueInit;
+        var items = property.items;
+        if (items == null) {
+            defaultValueInit = calcDefaultValues(null, null, false, false,
+                false, false, false, false, false, p).getLeft();
+        } else {
+            defaultValueInit = calcDefaultValues(items.datatypeWithEnum, items.dataType, items.getIsEnumOrRef(),
+                property.isArray, items.isString, items.isNumeric, items.isFloat, items.isMap, items.isNullable,
+                p).getLeft();
+        }
+        if (p != null && ModelUtils.isEnumSchema(p)) {
+            defaultValueInit = property.dataType + "." + toEnumVarName(property.defaultValue, property.dataType);
+        }
+        if (defaultValueInit != null) {
+            property.vendorExtensions.put("defaultValueInit", defaultValueInit);
+        }
+
         return property;
+    }
+
+    @Override
+    public String toEnumVarName(String value, String datatype) {
+        if (value == null) {
+            return null;
+        }
+        return super.toEnumVarName(value, datatype);
+    }
+
+    @Override
+    public String toDefaultValue(CodegenProperty cp, Schema schema) {
+
+        if (cp.items != null) {
+            return calcDefaultValues(cp.items.datatypeWithEnum, cp.items.dataType, cp.items.getIsEnumOrRef(),
+                cp.isArray, cp.items.isString, cp.items.isNumeric, cp.items.isFloat, cp.items.isMap, cp.items.isNullable,
+                schema).getRight();
+        } else {
+            return calcDefaultValues(null, null, false,
+                false, false, false, false, false, false, schema).getRight();
+        }
+    }
+
+    private Pair<String, String> calcDefaultValues(String itemsDatatypeWithEnum, String itemsDataType, boolean itemsIsEnumOrRef,
+                                                   boolean isArray, boolean itemsIsString, boolean itemsIsNumeric,
+                                                   boolean itemsIsFloat, boolean itemsIsMap, boolean isNullable, Schema schema) {
+
+        String defaultValueInit = null;
+        String defaultValueStr = null;
+
+        schema = ModelUtils.getReferencedSchema(this.openAPI, schema);
+        if (ModelUtils.isArraySchema(schema)) {
+            if (schema.getDefault() == null) {
+                // nullable or containerDefaultToNull set to true
+                if (isNullable || containerDefaultToNull) {
+                    return Pair.of(null, null);
+                }
+                return getDefaultCollectionType(schema);
+            }
+            return arrayDefaultValue(itemsDatatypeWithEnum, itemsDataType, itemsIsEnumOrRef,
+                isArray, itemsIsString, itemsIsNumeric, itemsIsFloat, itemsIsMap, schema);
+        } else if (ModelUtils.isMapSchema(schema) && !(ModelUtils.isComposedSchema(schema))) {
+            if (schema.getProperties() != null && !schema.getProperties().isEmpty()) {
+                // object is complex object with free-form additional properties
+                if (schema.getDefault() != null) {
+                    defaultValueInit = super.toDefaultValue(schema);
+                    defaultValueStr = super.toDefaultValue(schema);
+                }
+            }
+
+            // nullable or containerDefaultToNull set to true
+            if (isNullable || containerDefaultToNull) {
+                return Pair.of(null, null);
+            }
+
+            if (ModelUtils.getAdditionalProperties(schema) == null) {
+                return Pair.of(null, null);
+            }
+
+            defaultValueInit = String.format(Locale.ROOT, "new %s<>()", instantiationTypes().getOrDefault("map", "HashMap"));
+            defaultValueStr = null;
+        } else if (ModelUtils.isIntegerSchema(schema)) {
+            if (schema.getDefault() != null) {
+                if (SchemaTypeUtil.INTEGER64_FORMAT.equals(schema.getFormat())) {
+                    defaultValueInit = schema.getDefault().toString() + "L";
+                } else {
+                    defaultValueInit = schema.getDefault().toString();
+                }
+                defaultValueStr = schema.getDefault().toString();
+            }
+        } else if (ModelUtils.isNumberSchema(schema)) {
+            if (schema.getDefault() != null) {
+                if (SchemaTypeUtil.FLOAT_FORMAT.equals(schema.getFormat())) {
+                    defaultValueInit = schema.getDefault().toString() + "F";
+                } else if (SchemaTypeUtil.DOUBLE_FORMAT.equals(schema.getFormat())) {
+                    defaultValueInit = schema.getDefault().toString() + "D";
+                } else {
+                    defaultValueInit = "new BigDecimal(\"" + schema.getDefault().toString() + "\")";
+                }
+                defaultValueStr = schema.getDefault().toString();
+            }
+        } else if (ModelUtils.isBooleanSchema(schema)) {
+            if (schema.getDefault() != null) {
+                defaultValueInit = schema.getDefault().toString();
+                defaultValueStr = schema.getDefault().toString();
+            }
+        } else if (ModelUtils.isURISchema(schema)) {
+            if (schema.getDefault() != null) {
+                defaultValueInit = "URI.create(\"" + escapeText(String.valueOf(schema.getDefault())) + "\")";
+                defaultValueStr = schema.getDefault().toString();
+            }
+        } else if (ModelUtils.isStringSchema(schema)) {
+            if (schema.getDefault() != null) {
+                if (schema.getDefault() instanceof Date date) {
+                    if ("java8".equals(getDateLibrary())) {
+                        LocalDate localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+                        defaultValueInit = String.format(Locale.ROOT, "LocalDate.parse(\"%s\")", localDate.toString());
+                        defaultValueStr = localDate.toString();
+                    }
+                } else if (schema.getDefault() instanceof java.time.OffsetDateTime offsetDateTime) {
+                    if ("java8".equals(getDateLibrary())) {
+                        defaultValueInit = String.format(Locale.ROOT, "OffsetDateTime.parse(\"%s\", %s)",
+                            offsetDateTime.atZoneSameInstant(ZoneId.systemDefault()),
+                            "java.time.format.DateTimeFormatter.ISO_ZONED_DATE_TIME.withZone(java.time.ZoneId.systemDefault())");
+                        defaultValueStr = offsetDateTime.toString();
+                    }
+                } else if (schema.getDefault() instanceof UUID) {
+                    defaultValueInit = "UUID.fromString(\"" + schema.getDefault() + "\")";
+                    defaultValueStr = schema.getDefault().toString();
+                } else {
+                    String def = schema.getDefault().toString();
+                    if (schema.getEnum() == null) {
+                        defaultValueInit = "\"" + escapeText(def) + "\"";
+                        defaultValueStr = escapeText(def);
+                    } else {
+                        // convert to enum var name later in postProcessModels
+                        defaultValueInit = "\"" + def + "\"";
+                        defaultValueStr = def;
+                    }
+                }
+            }
+        } else if (ModelUtils.isObjectSchema(schema)) {
+            if (schema.getDefault() != null) {
+                defaultValueInit = super.toDefaultValue(schema);
+                defaultValueStr = super.toDefaultValue(schema);
+            }
+        } else if (ModelUtils.isComposedSchema(schema)) {
+            if (schema.getDefault() != null) {
+                defaultValueInit = super.toDefaultValue(schema);
+                defaultValueStr = super.toDefaultValue(schema);
+            }
+        }
+
+        return Pair.of(defaultValueInit, defaultValueStr);
+    }
+
+    // left - initStr, right - defaultStr
+    public Pair<String, String> arrayDefaultValue(String itemsDatatypeWithEnum, String itemsDataType, boolean itemsIsEnumOrRef,
+                                                  boolean isArray, boolean itemsIsString, boolean itemsIsNumeric,
+                                                  boolean itemsIsFloat, boolean itemsIsMap, Schema schema) {
+        if (schema.getDefault() != null) { // has default value
+            if (isArray) {
+                List<String> values = new ArrayList<>();
+
+                if (schema.getDefault() instanceof ArrayNode arrayNodeDefault) { // array of default values
+                    if (arrayNodeDefault.isEmpty()) { // e.g. default: []
+                        return getDefaultCollectionType(schema);
+                    }
+                    List<String> finalValues = values;
+                    arrayNodeDefault.elements().forEachRemaining((element) -> finalValues.add(element.asText()));
+                } else if (schema.getDefault() instanceof Collection<?> defCollection) {
+                    List<String> finalValues = values;
+                    defCollection.forEach((element) -> finalValues.add(String.valueOf(element)));
+                } else { // single value
+                    values = Collections.singletonList(String.valueOf(schema.getDefault()));
+                }
+
+                String defaultValue;
+                String defaultValueInit;
+
+                if (itemsIsEnumOrRef) { // inline or ref enum
+                    var defaultValues = new ArrayList<String>();
+                    for (String value : values) {
+                        defaultValues.add(itemsDatatypeWithEnum + "." + toEnumVarName(value, itemsDataType));
+                    }
+                    defaultValue = StringUtils.join(defaultValues, ", ");
+                } else if (!values.isEmpty()) {
+                    if (itemsIsString) { // array item is string
+                        defaultValue = String.format(Locale.ROOT, "\"%s\"", StringUtils.join(values, "\", \""));
+                        defaultValueInit = defaultValue;
+                    } else if (itemsIsNumeric) {
+                        defaultValue = String.join(", ", values);
+                        defaultValueInit = values.stream()
+                            .map(v -> {
+                                if ("BigInteger".equals(itemsDataType)) {
+                                    return "new BigInteger(\"" + v + "\")";
+                                } else if ("BigDecimal".equals(itemsDataType)) {
+                                    return "new BigDecimal(\"" + v + "\")";
+                                } else if (itemsIsFloat) {
+                                    return v + "F";
+                                } else {
+                                    return v;
+                                }
+                            })
+                            .collect(Collectors.joining(", "));
+                    } else { // array item is non-string, e.g. integer
+                        defaultValue = StringUtils.join(values, ", ");
+                    }
+                } else {
+                    return getDefaultCollectionType(schema);
+                }
+
+                return getDefaultCollectionType(schema, defaultValue);
+            }
+            if (itemsIsMap) { // map
+                // TODO
+                return Pair.of(null, null);
+            } else {
+                throw new RuntimeException("Error. Codegen Property must be array/set/map: " + schema);
+            }
+        }
+        return Pair.of(null, null);
+    }
+
+    private Pair<String, String> getDefaultCollectionType(Schema schema) {
+        return getDefaultCollectionType(schema, null);
+    }
+
+    private Pair<String, String> getDefaultCollectionType(Schema schema, String defaultValues) {
+        String arrayFormat = "new %s<>(Arrays.asList(%s))";
+        if (defaultValues == null || defaultValues.isEmpty()) {
+            defaultValues = "";
+            arrayFormat = "new %s<>()";
+        }
+
+        if (ModelUtils.isSet(schema)) {
+            return Pair.of(String.format(Locale.ROOT, arrayFormat, instantiationTypes().getOrDefault("set", "LinkedHashSet"),
+                defaultValues), defaultValues);
+        }
+        return Pair.of(String.format(Locale.ROOT, arrayFormat, instantiationTypes().getOrDefault("array", "ArrayList"), defaultValues), defaultValues);
     }
 
     @Override
