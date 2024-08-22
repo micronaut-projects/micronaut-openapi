@@ -781,21 +781,6 @@ public class Application {
 <td class="tableblock halign-left valign-top"><p class="tableblock">Default: ``</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong>micronaut.openapi.schema.name.separator.empty</strong></code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">If this property true, generic separators and inner class separators in schema name will be empty string.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Default: <code>false</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong>micronaut.openapi.schema.name.separator.generic</strong></code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">System property that set generic class separator for schema name generation.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Default: <code>_</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong>micronaut.openapi.schema.name.separator.inner-class</strong></code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">System property that set inner class separator for schema name generation.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Default: <code>.</code></p></td>
-</tr>
-<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong>micronaut.openapi.swagger.file.generation.enabled</strong></code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">System property that enables or disables generation of a swagger (OpenAPI) specification file. This can be used whenever you already have a specification file and that you only need the Swagger UI.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Default: <code>true</code></p></td>
@@ -921,7 +906,77 @@ directory.</p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong>micronaut.openapi.schema.</strong>*</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong>micronaut.openapi.schema.extra.enable</strong></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">If this property true, you can add some extra schemas to final openapi spec file.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Default: <code>false</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong>micronaut.openapi.schema.duplicate-resolution</strong></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">System property to set schema duplicate resolution. Available values:<br>
+<code><strong>auto</strong></code> - micronaut-openapi automatically add index suffix to duplicate schema.<br>
+<code><strong>error</strong></code> - micronaut-openapi throws an exception when found duplicate schema.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Default: <code>auto</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong>micronaut.openapi.schema.name.separator.empty</strong></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">If this property true, generic separators and inner class separators in schema name will be empty string.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Default: <code>false</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong>micronaut.openapi.schema.name.separator.generic</strong></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">System property that set generic class separator for schema name generation.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Default: <code>_</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong>micronaut.openapi.schema.name.separator.inner-class</strong></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">System property that set inner class separator for schema name generation.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Default: <code>.</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong>micronaut.openapi.schema.mapping.</strong>*</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Properties prefix to set custom schema implementations for selected classes.<br>
+For example, if you want to set simple <code>java.lang.String</code> class to some complex <code>org.somepackage.MyComplexType</code> class you need to write:<br>
+&#160;<br>
+micronaut.openapi.schema.org.somepackage.MyComplexType=java.lang.String<br>
+&#160;<br>
+Also, you can set it in your <code>application.yml</code> file like this:<br>
+&#160;<br>
+micronaut:<br>
+&#160;&#160;openapi:<br>
+&#160;&#160;&#160;&#160;schema:<br>
+&#160;&#160;&#160;&#160;&#160;&#160;mapping:<br>
+&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;org.somepackage.MyComplexType: java.lang.String<br>
+&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;org.somepackage.MyComplexType2: java.lang.Integer</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong>micronaut.openapi.schema.decorator.prefix</strong></code><br>
+<code><strong>micronaut.openapi.schema.decorator.postfix.</strong>*</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Properties prefix to set schema name prefix or postfix by package.<br>
+For example, if you have some classes with same names in different packages you can set postfix like this:<br>
+&#160;<br>
+micronaut.openapi.schema.decorator.postfix.org.api.v1_0_0=1_0_0<br>
+micronaut.openapi.schema.decorator.postfix.org.api.v2_0_0=2_0_0<br>
+&#160;<br>
+Also, you can set it in your <code>application.yml</code> file like this:<br>
+&#160;<br>
+micronaut:<br>
+&#160;&#160;openapi:<br>
+&#160;&#160;&#160;&#160;schema:<br>
+&#160;&#160;&#160;&#160;&#160;&#160;decorator:
+&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;postfix:<br>
+&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;org.api.v1_0_0: 1_0_0<br>
+&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;org.api.v2_0_0: 2_0_0<br>
+&#160;&#160;&#160;&#160;&#160;&#160;decorator:
+&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;prefix:<br>
+&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;org.api.v1_0_0: public<br>
+&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;org.api.v2_0_0: private<br>
+&#160;<br></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>*micronaut.openapi.schema.<strong></code><br>
+</strong>DEPRECATED<strong>: Use <code>*micronaut.openapi.schema.mapping.</strong></code> instead</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Properties prefix to set custom schema implementations for selected classes.<br>
 For example, if you want to set simple <code>java.lang.String</code> class to some complex <code>org.somepackage.MyComplexType</code> class you need to write:<br>
 &#160;<br>
@@ -937,8 +992,9 @@ micronaut:<br>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong>micronaut.openapi.schema-prefix</strong></code><br>
-<code><strong>micronaut.openapi.schema-postfix.</strong>*</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong>micronaut.openapi.schema-prefix.<strong></code><br>
+<code>*micronaut.openapi.schema-postfix.</strong></code><br>
+<strong>DEPRECATED</strong>: Use <code>*micronaut.openapi.schema.decorator.prefix.</strong></code> and <code><strong>micronaut.openapi.schema.decorator.postfix.</strong></code> instead</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Properties prefix to set schema name prefix or postfix by package.<br>
 For example, if you have some classes with same names in different packages you can set postfix like this:<br>
 &#160;<br>
