@@ -27,6 +27,7 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.micronaut.context.exceptions.ConfigurationException;
 import io.micronaut.core.annotation.AnnotationClassValue;
 import io.micronaut.core.annotation.AnnotationValue;
 import io.micronaut.core.annotation.Internal;
@@ -124,6 +125,7 @@ import static io.micronaut.openapi.visitor.ConfigUtils.getExpandableProperties;
 import static io.micronaut.openapi.visitor.ConfigUtils.getGenericSeparator;
 import static io.micronaut.openapi.visitor.ConfigUtils.getInnerClassSeparator;
 import static io.micronaut.openapi.visitor.ConfigUtils.getSchemaDecoration;
+import static io.micronaut.openapi.visitor.ConfigUtils.getSchemaDuplicateResolution;
 import static io.micronaut.openapi.visitor.ConfigUtils.isJsonViewDefaultInclusion;
 import static io.micronaut.openapi.visitor.ContextUtils.warn;
 import static io.micronaut.openapi.visitor.ConvertUtils.parseJsonString;
@@ -344,7 +346,7 @@ public final class SchemaDefinitionUtils {
                 primitiveType = null;
             }
             if (primitiveType == null) {
-                String schemaName = computeDefaultSchemaName(definingElement, type, typeArgs, context, jsonViewClass);
+                String schemaName = computeDefaultSchemaName(null, definingElement, type, typeArgs, context, jsonViewClass);
                 schema = schemas.get(schemaName);
                 JavadocDescription javadoc = Utils.getJavadocParser().parse(type.getDocumentation().orElse(null));
                 if (schema == null) {
@@ -382,10 +384,8 @@ public final class SchemaDefinitionUtils {
         } else {
             // Schema annotation property `name` on field level means, that this property must be with this name.
             // This is not a schema name
-            String schemaName = !schemaAnnOnField ? schemaValue.stringValue(PROP_NAME).orElse(null) : null;
-            if (schemaName == null) {
-                schemaName = computeDefaultSchemaName(definingElement, type, typeArgs, context, jsonViewClass);
-            }
+            var schemaName = computeDefaultSchemaName(!schemaAnnOnField ? schemaValue.stringValue(PROP_NAME).orElse(null) : null,
+                definingElement, type, typeArgs, context, jsonViewClass);
             schema = schemas.get(schemaName);
             if (schema == null) {
                 if (inProgressSchemas.contains(schemaName)) {
@@ -441,7 +441,7 @@ public final class SchemaDefinitionUtils {
         return null;
     }
 
-    public static String computeDefaultSchemaName(Element definingElement, Element type, Map<String, ClassElement> typeArgs, VisitorContext context,
+    public static String computeDefaultSchemaName(String defaultSchemaName, Element definingElement, Element type, Map<String, ClassElement> typeArgs, VisitorContext context,
                                                   @Nullable ClassElement jsonViewClass) {
 
         var genericSeparator = getGenericSeparator(context);
@@ -454,19 +454,54 @@ public final class SchemaDefinitionUtils {
             jsonViewPostfix = genericSeparator + (jsonViewClassName.contains(DOT) ? jsonViewClassName.substring(jsonViewClassName.lastIndexOf(DOT) + 1) : jsonViewClassName);
         }
 
-        String metaAnnName = null;
-        if (definingElement != null) {
-            metaAnnName = definingElement.getAnnotationNameByStereotype(io.swagger.v3.oas.annotations.media.Schema.class).orElse(null);
-        }
-        if (metaAnnName != null && !io.swagger.v3.oas.annotations.media.Schema.class.getName().equals(metaAnnName)) {
-            var resultSchemaName = NameUtils.getSimpleName(metaAnnName) + jsonViewPostfix;
-            if (!DOT.equals(innerClassSeparator)) {
-                resultSchemaName = resultSchemaName.replace(DOT, innerClassSeparator);
-            }
-            return resultSchemaName;
-        }
-        String packageName;
+        var pair = computeFullClassNameWithGenerics(type, typeArgs, jsonViewPostfix, context);
+        var fullClassNameWithGenerics = pair.getSecond();
+
         String resultSchemaName;
+        if (defaultSchemaName != null) {
+            resultSchemaName = defaultSchemaName;
+        } else {
+
+            String metaAnnName = null;
+            if (definingElement != null) {
+                metaAnnName = definingElement.getAnnotationNameByStereotype(io.swagger.v3.oas.annotations.media.Schema.class).orElse(null);
+            }
+            if (metaAnnName != null && !io.swagger.v3.oas.annotations.media.Schema.class.getName().equals(metaAnnName)) {
+                resultSchemaName = NameUtils.getSimpleName(metaAnnName) + jsonViewPostfix;
+                if (!DOT.equals(innerClassSeparator)) {
+                    resultSchemaName = resultSchemaName.replace(DOT, innerClassSeparator);
+                }
+            } else {
+                resultSchemaName = pair.getFirst();
+            }
+        }
+
+        String storedClassName = schemaNameToClassNameMap.get(resultSchemaName);
+        // Check if the class exists in other packages. If so, you need to add a suffix,
+        // because there are two classes in different packages, but with the same class name.
+        if (storedClassName != null && !storedClassName.equals(fullClassNameWithGenerics)) {
+            if (getSchemaDuplicateResolution(context) == ConfigUtils.DuplicateResolution.ERROR) {
+                throw new ConfigurationException("Found 2 schemas with same name \"" + resultSchemaName + "\" for classes " + storedClassName + " and " + fullClassNameWithGenerics);
+            }
+            int index = shemaNameSuffixCounterMap.getOrDefault(resultSchemaName, 0);
+            index++;
+            shemaNameSuffixCounterMap.put(resultSchemaName, index);
+            resultSchemaName += genericSeparator + index;
+        }
+        schemaNameToClassNameMap.put(resultSchemaName, fullClassNameWithGenerics);
+
+        return resultSchemaName;
+    }
+
+    /**
+     * @return pair of package name and full className with generics
+     */
+    private static Pair<String, String> computeFullClassNameWithGenerics(Element type, Map<String, ClassElement> typeArgs, String jsonViewPostfix, VisitorContext context) {
+
+        var innerClassSeparator = getInnerClassSeparator(context);
+
+        String resultSchemaName;
+        String packageName;
         if (type instanceof TypedElement typedEl && !(type instanceof EnumElement)) {
             ClassElement typeType = typedEl.getType();
             var isProtobufGenerated = isProtobufGenerated(typeType);
@@ -485,23 +520,11 @@ public final class SchemaDefinitionUtils {
         resultSchemaName = resultSchemaName.replace(DOLLAR, innerClassSeparator) + jsonViewPostfix;
         if (schemaDecorator != null) {
             resultSchemaName = (StringUtils.hasText(schemaDecorator.getPrefix()) ? schemaDecorator.getPrefix() : EMPTY_STRING)
-                    + resultSchemaName
-                    + (StringUtils.hasText(schemaDecorator.getPostfix()) ? schemaDecorator.getPostfix() : EMPTY_STRING);
+                + resultSchemaName
+                + (StringUtils.hasText(schemaDecorator.getPostfix()) ? schemaDecorator.getPostfix() : EMPTY_STRING);
         }
-        String fullClassNameWithGenerics = packageName + DOT + resultSchemaName;
 
-        // Check if the class exists in other packages. If so, you need to add a suffix,
-        // because there are two classes in different packages, but with the same class name.
-        String storedClassName = schemaNameToClassNameMap.get(resultSchemaName);
-        if (storedClassName != null && !storedClassName.equals(fullClassNameWithGenerics)) {
-            int index = shemaNameSuffixCounterMap.getOrDefault(resultSchemaName, 0);
-            index++;
-            shemaNameSuffixCounterMap.put(resultSchemaName, index);
-            resultSchemaName += genericSeparator + index;
-        }
-        schemaNameToClassNameMap.put(resultSchemaName, fullClassNameWithGenerics);
-
-        return resultSchemaName;
+        return Pair.of(resultSchemaName, packageName + DOT + resultSchemaName);
     }
 
     public static List<Object> getEnumValues(EnumElement type, String schemaType, String schemaFormat, VisitorContext context) {
@@ -1639,8 +1662,8 @@ public final class SchemaDefinitionUtils {
     private static void readAllInterfaces(OpenAPI openAPI, VisitorContext context, @Nullable Element definingElement, List<MediaType> mediaTypes,
                                           Schema<?> schema, ClassElement superType, Map<String, Schema> schemas, Map<String, ClassElement> superTypeArgs,
                                           @Nullable ClassElement jsonViewClass) {
-        String parentSchemaName = superType.stringValue(io.swagger.v3.oas.annotations.media.Schema.class, PROP_NAME)
-                .orElse(computeDefaultSchemaName(definingElement, superType, superTypeArgs, context, jsonViewClass));
+        String parentSchemaName = computeDefaultSchemaName(superType.stringValue(io.swagger.v3.oas.annotations.media.Schema.class, PROP_NAME).orElse(null),
+            definingElement, superType, superTypeArgs, context, jsonViewClass);
 
         if (schemas.get(parentSchemaName) != null
                 || getSchemaDefinition(openAPI, context, superType, superTypeArgs, null, mediaTypes, jsonViewClass) != null) {
@@ -2675,8 +2698,8 @@ public final class SchemaDefinitionUtils {
         Map<String, Schema> schemas = SchemaUtils.resolveSchemas(Utils.resolveOpenApi(context));
         ClassElement customElementType = getCustomSchema(elementType.getName(), elementType.getTypeArguments(), context);
         var elType = customElementType != null ? customElementType : elementType;
-        String schemaName = stringValue(element, io.swagger.v3.oas.annotations.media.Schema.class, PROP_NAME)
-                .orElse(computeDefaultSchemaName(null, elType, elementType.getTypeArguments(), context, null));
+        String schemaName = computeDefaultSchemaName(stringValue(element, io.swagger.v3.oas.annotations.media.Schema.class, PROP_NAME).orElse(null),
+            null, elType, elementType.getTypeArguments(), context, null);
         Schema<?> wrappedPropertySchema = schemas.get(schemaName);
         if (wrappedPropertySchema == null) {
             getSchemaDefinition(resolveOpenApi(context), context, elType, elType.getTypeArguments(), element, Collections.emptyList(), null);

@@ -112,7 +112,7 @@ public interface ContextProperty {
      */
     String MICRONAUT_INTERNAL_GENERATION_SPEC_ENABLED = "micronaut.internal.generation.spec.enabled";
     /**
-     * Loaded micronaut.openapi.extra.schema.enabled value.
+     * Loaded micronaut.openapi.schema.extra.enabled value.
      * <br>
      * Default: true
      */

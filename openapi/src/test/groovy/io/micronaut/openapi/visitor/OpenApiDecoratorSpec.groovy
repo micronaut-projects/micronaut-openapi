@@ -13,7 +13,8 @@ package test;
 
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
-import io.micronaut.openapi.annotation.OpenAPIDecorator;import io.swagger.v3.oas.annotations.Operation;
+import io.micronaut.openapi.annotation.OpenAPIDecorator;
+import io.swagger.v3.oas.annotations.Operation;
 
 @OpenAPIDecorator(opIdPrefix = "cats-", opIdSuffix = "-suffix")
 @Controller("/cats")

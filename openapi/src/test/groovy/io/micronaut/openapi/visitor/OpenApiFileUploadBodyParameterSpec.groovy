@@ -16,10 +16,8 @@ class OpenApiFileUploadBodyParameterSpec extends AbstractOpenApiTypeElementSpec 
         buildBeanDefinition('test.MyBean', '''
 package test;
 
-import jakarta.inject.Singleton;
-
 import io.micronaut.http.MediaType;
-import io.micronaut.http.annotation.Body;import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Post;
 import io.micronaut.http.multipart.CompletedFileUpload;
 import io.micronaut.http.multipart.PartData;
@@ -30,6 +28,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.inject.Singleton;
 
 @Singleton
 @Controller("/")

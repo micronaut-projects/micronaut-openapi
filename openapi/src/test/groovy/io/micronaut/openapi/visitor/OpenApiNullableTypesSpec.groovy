@@ -177,12 +177,7 @@ import io.micronaut.core.annotation.Nullable;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
-import io.micronaut.http.annotation.Put;
 import io.micronaut.http.annotation.Post;
-import io.micronaut.http.annotation.Status;import io.swagger.v3.oas.annotations.Parameter;import io.swagger.v3.oas.annotations.enums.ParameterIn;
-
-import java.util.List;
-import java.util.Optional;
 
 class Pet {
     private String name;

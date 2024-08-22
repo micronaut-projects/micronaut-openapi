@@ -540,12 +540,12 @@ class MyBean {}
         buildBeanDefinition('test.MyBean', '''
 package test;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.micronaut.core.annotation.Introspected;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
-import io.swagger.v3.oas.annotations.Hidden;import io.swagger.v3.oas.annotations.media.Schema;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.swagger.v3.oas.annotations.Hidden;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 @Controller
 class OpenApiController {
@@ -606,9 +606,7 @@ package test;
 import io.micronaut.core.annotation.Introspected;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
-import io.swagger.v3.oas.annotations.Hidden;import io.swagger.v3.oas.annotations.media.Schema;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 @Controller
 class OpenApiController {

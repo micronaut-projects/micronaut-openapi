@@ -172,12 +172,12 @@ class MyBean {}
 
 package test;
 
-import java.util.List;
-import java.time.Instant;
 import io.micronaut.http.annotation.Body;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Post;
-import io.swagger.v3.oas.annotations.extensions.Extension;import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.extensions.Extension;
+import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 @Controller
 class OpenApiController {
