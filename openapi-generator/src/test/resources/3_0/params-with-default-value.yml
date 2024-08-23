@@ -8,6 +8,7 @@ paths:
       summary: 'Browser/search multiple order'
       operationId: browseSearchOrders
       parameters:
+        - $ref: '#/components/parameters/ids'
         - $ref: '#/components/parameters/XFavorToken'
         - $ref: '#/components/parameters/ApiVersion'
         - $ref: '#/components/parameters/ContentType'
@@ -36,6 +37,16 @@ components:
           - v5
           - v6
           - v7
+    ids:
+      name: ids
+      in: query
+      required: false
+      description: if passed will return all active orders for a given ids
+      schema:
+        type: array
+        items:
+          type: integer
+        default: null
     ContentType:
       name: Content-Type
       in: header

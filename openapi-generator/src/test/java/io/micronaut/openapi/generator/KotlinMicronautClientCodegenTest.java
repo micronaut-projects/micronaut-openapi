@@ -502,7 +502,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
 
         assertFileContains(path + "api/WeatherForecastApisApi.kt", "@Get(\"/v1/forecast/{id}\")",
             "@PathVariable(\"id\") @NotNull id: String,",
-            "@QueryValue(\"hourly\") @Nullable hourly: List<V1ForecastIdGetHourlyParameterInner>?,");
+            "@QueryValue(\"hourly\") @Nullable hourly: List<V1ForecastIdGetHourlyParameterInner>? = null,");
 
         assertFileContains(path + "model/V1ForecastIdGetHourlyParameterInner.kt",
             "enum class V1ForecastIdGetHourlyParameterInner(",
@@ -594,6 +594,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         String path = outputPath + "src/main/kotlin/org/openapitools/";
 
         assertFileContains(path + "api/DefaultApi.kt",
+            "@QueryValue(\"ids\") @Nullable ids: List<@NotNull Int>? = null,",
             "@Header(\"X-Favor-Token\") @Nullable xFavorToken: String? = null,",
             "@PathVariable(name = \"apiVersion\", defaultValue = \"v5\") @Nullable apiVersion: BrowseSearchOrdersApiVersionParameter? = BrowseSearchOrdersApiVersionParameter.V5,",
             "@Header(name = \"Content-Type\", defaultValue = \"application/json\") @Nullable contentType: String? = \"application/json\""
