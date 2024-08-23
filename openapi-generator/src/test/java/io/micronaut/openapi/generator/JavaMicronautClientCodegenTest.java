@@ -539,6 +539,7 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         String path = outputPath + "src/main/java/org/openapitools/";
 
         assertFileContains(path + "api/DefaultApi.java",
+            "@QueryValue(\"ids\") @Nullable List<@NotNull Integer> ids",
             "@PathVariable(name = \"apiVersion\", defaultValue = \"v5\") @Nullable BrowseSearchOrdersApiVersionParameter apiVersio",
             "@Header(name = \"Content-Type\", defaultValue = \"application/json\") @Nullable String contentType"
         );
