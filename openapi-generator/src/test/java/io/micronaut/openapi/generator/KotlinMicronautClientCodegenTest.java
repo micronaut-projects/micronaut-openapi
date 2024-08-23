@@ -613,4 +613,14 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                 ): Mono<HttpResponse<ByteBuffer<?>>>
             """);
     }
+
+    @Test
+    void testSingleProduceContentType() {
+
+        var codegen = new KotlinMicronautClientCodegen();
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/client-produces-content-type.yml", CodegenConstants.APIS);
+        String path = outputPath + "src/main/kotlin/org/openapitools/";
+
+        assertFileContains(path + "api/FilesApi.kt", "@Produces(\"application/octet-stream\")");
+    }
 }

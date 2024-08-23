@@ -1,0 +1,63 @@
+openapi: 3.0.3
+info:
+  title: File Upload
+  version: 1.0.0
+tags:
+  - name: files
+paths:
+  /:
+    post:
+      tags:
+        - files
+      summary: Upload new file to server
+      operationId: uploadFile
+      parameters:
+        - name: X-file-crc32
+          in: header
+          description: Decimal CRC32B representation of the file
+          required: true
+          schema:
+            type: string
+            nullable: false
+      requestBody:
+        content:
+          application/octet-stream:
+            schema:
+              format: binary
+              type: string
+      responses:
+        "200":
+          description: File was saved on server. Returns serverfilename (UUID) of
+            the file.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/File'
+        "202":
+          description: File was already available on server. Returns serverfilename
+            (UUID) of the file.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/File'
+        "400":
+          description: "Provided checksum, size or file was not provided or uploaded\
+            \ file did not match given values"
+        "401":
+          description: User is not authorized to request this resource
+components:
+  schemas:
+    File:
+      type: object
+      properties:
+        serverFileName:
+          type: string
+        checksum:
+          type: string
+        mimeType:
+          type: string
+        size:
+          format: int64
+          type: integer
+        shaHash:
+          type: string

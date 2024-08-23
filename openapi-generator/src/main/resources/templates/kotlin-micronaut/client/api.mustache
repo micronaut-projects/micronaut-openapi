@@ -50,12 +50,12 @@ interface {{classname}} {
     {{#formatNoEmptyLines}}
 {{>common/operationAnnotations}}{{!
 }}    @{{#lambda.pascalcase}}{{#lambda.lowercase}}{{httpMethod}}{{/lambda.lowercase}}{{/lambda.pascalcase}}("{{{path}}}")
-    {{^vendorExtensions.onlyDefaultConsumeOrEmpty}}
-    {{#produces}}{{#-first}}@Consumes({{/-first}}"{{{mediaType}}}"{{^-last}}, {{/-last}}{{#-last}}){{/-last}}{{/produces}}
-    {{/vendorExtensions.onlyDefaultConsumeOrEmpty}}
     {{^vendorExtensions.onlyDefaultProduceOrEmpty}}
-    {{#consumes}}{{#-first}}@Produces({{/-first}}"{{{mediaType}}}"{{^-last}}, {{/-last}}{{#-last}}){{/-last}}{{/consumes}}
+    {{#produces}}{{#-first}}@Consumes({{/-first}}"{{{mediaType}}}"{{^-last}}, {{/-last}}{{#-last}}){{/-last}}{{/produces}}
     {{/vendorExtensions.onlyDefaultProduceOrEmpty}}
+    {{^vendorExtensions.onlyDefaultConsumeOrEmpty}}
+    {{#consumes}}{{#-first}}@Produces({{/-first}}"{{{mediaType}}}"{{^-last}}, {{/-last}}{{#-last}}){{/-last}}{{/consumes}}
+    {{/vendorExtensions.onlyDefaultConsumeOrEmpty}}
     {{!auth methods}}
         {{#configureAuth}}
             {{#authMethods}}

@@ -58,12 +58,12 @@ public interface {{classname}} {
     {{#formatNoEmptyLines}}
 {{>common/operationAnnotations}}{{!
 }}    @{{#lambda.pascalcase}}{{#lambda.lowercase}}{{httpMethod}}{{/lambda.lowercase}}{{/lambda.pascalcase}}("{{{path}}}")
-    {{^vendorExtensions.onlyDefaultConsumeOrEmpty}}
-    {{#produces}}{{#-first}}@Consumes({{#produces.1}}{{openbrace}}{{/produces.1}}{{/-first}}"{{{mediaType}}}"{{^-last}}, {{/-last}}{{#-last}}{{#produces.1}}{{closebrace}}{{/produces.1}}){{/-last}}{{/produces}}
-    {{/vendorExtensions.onlyDefaultConsumeOrEmpty}}
     {{^vendorExtensions.onlyDefaultProduceOrEmpty}}
-    {{#consumes}}{{#-first}}@Produces({{#consumes.1}}{{openbrace}}{{/consumes.1}}{{/-first}}"{{{mediaType}}}"{{^-last}}, {{/-last}}{{#-last}}{{#consumes.1}}{{closebrace}}{{/consumes.1}}){{/-last}}{{/consumes}}
+    {{#produces}}{{#-first}}@Consumes({{#produces.1}}{{openbrace}}{{/produces.1}}{{/-first}}"{{{mediaType}}}"{{^-last}}, {{/-last}}{{#-last}}{{#produces.1}}{{closebrace}}{{/produces.1}}){{/-last}}{{/produces}}
     {{/vendorExtensions.onlyDefaultProduceOrEmpty}}
+    {{^vendorExtensions.onlyDefaultConsumeOrEmpty}}
+    {{#consumes}}{{#-first}}@Produces({{#consumes.1}}{{openbrace}}{{/consumes.1}}{{/-first}}"{{{mediaType}}}"{{^-last}}, {{/-last}}{{#-last}}{{#consumes.1}}{{closebrace}}{{/consumes.1}}){{/-last}}{{/consumes}}
+    {{/vendorExtensions.onlyDefaultConsumeOrEmpty}}
     {{!auth methods}}
         {{#configureAuth}}
             {{#authMethods}}
