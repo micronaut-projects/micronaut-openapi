@@ -1,14 +1,13 @@
 package io.micronaut.openapi.generator;
 
-import java.util.List;
-
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.servers.Server;
-
 import org.junit.jupiter.api.Test;
 import org.openapitools.codegen.CliOption;
 import org.openapitools.codegen.CodegenConstants;
+
+import java.util.List;
 
 import static java.util.stream.Collectors.groupingBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -20,9 +19,9 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
     void clientOptsUnicity() {
         var codegen = new JavaMicronautClientCodegen();
         codegen.cliOptions()
-                .stream()
-                .collect(groupingBy(CliOption::getOpt))
-                .forEach((k, v) -> assertEquals(1, v.size(), k + " is described multiple times"));
+            .stream()
+            .collect(groupingBy(CliOption::getOpt))
+            .forEach((k, v) -> assertEquals(1, v.size(), k + " is described multiple times"));
     }
 
     @Test
@@ -55,9 +54,9 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         codegen.additionalProperties().put(CodegenConstants.MODEL_PACKAGE, "org.test.test.model");
         codegen.additionalProperties().put(CodegenConstants.API_PACKAGE, "org.test.test.api");
         String outputPath = generateFiles(codegen, PETSTORE_PATH,
-                CodegenConstants.SUPPORTING_FILES,
-                CodegenConstants.APIS,
-                CodegenConstants.MODELS);
+            CodegenConstants.SUPPORTING_FILES,
+            CodegenConstants.APIS,
+            CodegenConstants.MODELS);
 
         String apiFolder = outputPath + "src/main/java/org/test/test/api/";
         assertFileExists(apiFolder + "PetApi.java");
@@ -78,8 +77,8 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         var codegen = new JavaMicronautClientCodegen();
         codegen.additionalProperties().put(JavaMicronautClientCodegen.OPT_CONFIGURE_AUTH, "true");
         String outputPath = generateFiles(codegen, PETSTORE_PATH,
-                CodegenConstants.SUPPORTING_FILES,
-                CodegenConstants.APIS);
+            CodegenConstants.SUPPORTING_FILES,
+            CodegenConstants.APIS);
 
         // Files generated
         assertFileExists(outputPath + "/src/main/java/org/openapitools/auth/Authorization.java");
@@ -92,8 +91,8 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         var codegen = new JavaMicronautClientCodegen();
         codegen.additionalProperties().put(JavaMicronautClientCodegen.OPT_CONFIGURE_AUTH, "false");
         String outputPath = generateFiles(codegen, PETSTORE_PATH,
-                CodegenConstants.SUPPORTING_FILES,
-                CodegenConstants.APIS);
+            CodegenConstants.SUPPORTING_FILES,
+            CodegenConstants.APIS);
 
         // Files are not generated
         assertFileNotExists(outputPath + "/src/main/java/org/openapitools/auth/");
@@ -105,7 +104,7 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         var codegen = new JavaMicronautClientCodegen();
         codegen.additionalProperties().put(JavaMicronautClientCodegen.USE_BEANVALIDATION, "true");
         String outputPath = generateFiles(codegen, PETSTORE_PATH,
-                CodegenConstants.APIS);
+            CodegenConstants.APIS);
 
         // Files are not generated
         assertFileContains(outputPath + "/src/main/java/org/openapitools/api/PetApi.java", "@Valid");
@@ -117,7 +116,7 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         var codegen = new JavaMicronautClientCodegen();
         codegen.additionalProperties().put(JavaMicronautClientCodegen.USE_BEANVALIDATION, "false");
         String outputPath = generateFiles(codegen, PETSTORE_PATH,
-                CodegenConstants.APIS);
+            CodegenConstants.APIS);
 
         // Files are not generated
         assertFileNotContains(outputPath + "/src/main/java/org/openapitools/api/PetApi.java", "@Valid");
@@ -128,10 +127,10 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
     void doGenerateForTestJUnit() {
         var codegen = new JavaMicronautClientCodegen();
         codegen.additionalProperties().put(JavaMicronautClientCodegen.OPT_TEST,
-                JavaMicronautClientCodegen.OPT_TEST_JUNIT);
+            JavaMicronautClientCodegen.OPT_TEST_JUNIT);
         String outputPath = generateFiles(codegen, PETSTORE_PATH,
-                CodegenConstants.SUPPORTING_FILES,
-                CodegenConstants.API_TESTS, CodegenConstants.APIS, CodegenConstants.MODELS);
+            CodegenConstants.SUPPORTING_FILES,
+            CodegenConstants.API_TESTS, CodegenConstants.APIS, CodegenConstants.MODELS);
 
         // Files are not generated
         assertFileExists(outputPath + "src/test/java/");
@@ -143,10 +142,10 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
     void doGenerateForTestSpock() {
         var codegen = new JavaMicronautClientCodegen();
         codegen.additionalProperties().put(JavaMicronautClientCodegen.OPT_TEST,
-                JavaMicronautClientCodegen.OPT_TEST_SPOCK);
+            JavaMicronautClientCodegen.OPT_TEST_SPOCK);
         String outputPath = generateFiles(codegen, PETSTORE_PATH,
-                CodegenConstants.SUPPORTING_FILES,
-                CodegenConstants.API_TESTS, CodegenConstants.APIS, CodegenConstants.MODELS);
+            CodegenConstants.SUPPORTING_FILES,
+            CodegenConstants.API_TESTS, CodegenConstants.APIS, CodegenConstants.MODELS);
 
         // Files are not generated
         assertFileExists(outputPath + "src/test/groovy");
@@ -211,7 +210,7 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
 
         // Micronaut declarative http client should contain custom added annotations
         assertFileContains(outputPath + "/src/main/java/org/openapitools/api/PetApi.java",
-                "@MyAdditionalAnnotation1(1,${param1})", "@MyAdditionalAnnotation2(2,${param2})");
+            "@MyAdditionalAnnotation1(1,${param1})", "@MyAdditionalAnnotation2(2,${param2})");
     }
 
     @Test
@@ -222,7 +221,7 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
 
         // Micronaut declarative http client should contain custom added annotations
         assertFileContains(outputPath + "/src/main/java/org/openapitools/api/PetApi.java",
-                "@MyAdditionalAnnotation1(1,${param1})", "@MyAdditionalAnnotation2(2,${param2})");
+            "@MyAdditionalAnnotation1(1,${param1})", "@MyAdditionalAnnotation2(2,${param2})");
     }
 
     @Test
@@ -315,10 +314,10 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         String apiPath = outputPath + "src/main/java/org/openapitools/model/";
 
         assertFileContains(apiPath + "BooksContainer.java",
-                """
-                            @JsonProperty(JSON_PROPERTY_BOOKS)
-                            private List<@Valid Book> books;
-                        """);
+            """
+                    @JsonProperty(JSON_PROPERTY_BOOKS)
+                    private List<@Valid Book> books;
+                """);
     }
 
     @Test
@@ -340,7 +339,7 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         var codegen = new JavaMicronautClientCodegen();
         codegen.additionalProperties().put(JavaMicronautClientCodegen.OPT_CONFIGURE_AUTH, "true");
         String outputPath = generateFiles(codegen, "src/test/resources/3_0/discriminatorconstructorbug.yml",
-                CodegenConstants.MODELS
+            CodegenConstants.MODELS
         );
         String apiPath = outputPath + "src/main/java/org/openapitools/model/";
 
@@ -356,15 +355,15 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         String modelPath = outputPath + "src/main/java/org/openapitools/model/";
 
         assertFileContains(
-                modelPath + "Book.java",
-                "public static final String JSON_PROPERTY_TITLE = \"tItle\";",
-                "public static final String JSON_PROPERTY_I_S_B_N = \"ISBN\";",
-                "private String title;",
-                "public String getTitle()",
-                "public void setTitle(String title)",
-                "private String ISBN;",
-                "public String getISBN()",
-                "public void setISBN(String ISBN)"
+            modelPath + "Book.java",
+            "public static final String JSON_PROPERTY_TITLE = \"tItle\";",
+            "public static final String JSON_PROPERTY_I_S_B_N = \"ISBN\";",
+            "private String title;",
+            "public String getTitle()",
+            "public void setTitle(String title)",
+            "private String ISBN;",
+            "public String getISBN()",
+            "public void setISBN(String ISBN)"
         );
     }
 
@@ -389,9 +388,9 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         String modelPath = outputPath + "src/main/java/org/openapitools/model/";
 
         assertFileContains(modelPath + "MyModel.java", "private BigDecimal _default;",
-                "public static final String JSON_PROPERTY_DEFAULT = \"_default\";",
-                "public BigDecimal get_default() {",
-                "public void set_default(BigDecimal _default) {");
+            "public static final String JSON_PROPERTY_DEFAULT = \"_default\";",
+            "public BigDecimal get_default() {",
+            "public void set_default(BigDecimal _default) {");
     }
 
     @Test
@@ -399,25 +398,25 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
 
         var codegen = new JavaMicronautClientCodegen();
         String outputPath = generateFiles(codegen, "src/test/resources/3_0/javaReservedWords.yml",
-                CodegenConstants.APIS,
-                CodegenConstants.MODELS,
-                CodegenConstants.SUPPORTING_FILES,
-                CodegenConstants.MODEL_TESTS,
-                CodegenConstants.MODEL_DOCS,
-                CodegenConstants.API_TESTS,
-                CodegenConstants.API_DOCS
+            CodegenConstants.APIS,
+            CodegenConstants.MODELS,
+            CodegenConstants.SUPPORTING_FILES,
+            CodegenConstants.MODEL_TESTS,
+            CodegenConstants.MODEL_DOCS,
+            CodegenConstants.API_TESTS,
+            CodegenConstants.API_DOCS
         );
         String path = outputPath + "src/main/java/org/openapitools/";
 
         assertFileContains(path + "api/ParametersApi.java", "Mono<Void> callInterface(",
-                "@QueryValue(\"class\") @NotNull @Valid Package propertyClass,",
-                "@QueryValue(\"while\") @NotNull String _while");
+            "@QueryValue(\"class\") @NotNull @Valid Package propertyClass,",
+            "@QueryValue(\"while\") @NotNull String _while");
         assertFileContains(path + "model/Package.java",
-                "public static final String JSON_PROPERTY_FOR = \"for\";",
-                "@JsonProperty(JSON_PROPERTY_FOR)",
-                "private String _for;",
-                "public String get_for() {",
-                "public void set_for(String _for) {");
+            "public static final String JSON_PROPERTY_FOR = \"for\";",
+            "@JsonProperty(JSON_PROPERTY_FOR)",
+            "private String _for;",
+            "public String get_for() {",
+            "public void set_for(String _for) {");
     }
 
     @Test
@@ -438,13 +437,13 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         String path = outputPath + "src/main/java/org/openapitools/";
 
         assertFileContains(path + "api/WeatherForecastApisApi.java", "@Get(\"/v1/forecast/{id}\")",
-                "@PathVariable(\"id\") @NotNull String id,",
-                "@QueryValue(\"hourly\") @Nullable List<V1ForecastIdGetHourlyParameterInner> hourly,");
+            "@PathVariable(\"id\") @NotNull String id,",
+            "@QueryValue(\"hourly\") @Nullable List<V1ForecastIdGetHourlyParameterInner> hourly,");
 
         assertFileContains(path + "model/V1ForecastIdGetHourlyParameterInner.java",
-                "public enum V1ForecastIdGetHourlyParameterInner {",
-                "@JsonProperty(\"temperature_2m\")",
-                "TEMPERATURE_2M(\"temperature_2m\"),");
+            "public enum V1ForecastIdGetHourlyParameterInner {",
+            "@JsonProperty(\"temperature_2m\")",
+            "TEMPERATURE_2M(\"temperature_2m\"),");
     }
 
     @Test
@@ -455,30 +454,30 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         String path = outputPath + "src/main/java/org/openapitools/";
 
         assertFileContains(path + "api/BooksApi.java",
-                """
-                            @Post("/add-book")
-                            @NotBlank
-                            Mono<@Valid Book> addBook(
-                        """);
+            """
+                    @Post("/add-book")
+                    @NotBlank
+                    Mono<@Valid Book> addBook(
+                """);
 
         assertFileContains(path + "model/Book.java",
+            """
+                @Serializable
+                public class Book {
+                """,
+            """
+                    @NotNull
+                    @Size(max = 10)
+                    @JsonProperty(JSON_PROPERTY_TITLE)
+                    @jakarta.validation.constraints.NotBlank
+                    private String title;
+                """,
+            """
+                    @NotEmpty
+                    public void setTitle(String title) {
+                        this.title = title;
+                    }
                 """
-                        @Serializable
-                        public class Book {
-                        """,
-                """
-                            @NotNull
-                            @Size(max = 10)
-                            @JsonProperty(JSON_PROPERTY_TITLE)
-                            @jakarta.validation.constraints.NotBlank
-                            private String title;
-                        """,
-                """
-                            @NotEmpty
-                            public void setTitle(String title) {
-                                this.title = title;
-                            }
-                        """
         );
     }
 
@@ -563,5 +562,29 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         String path = outputPath + "src/main/java/org/openapitools/";
 
         assertFileContains(path + "api/FilesApi.java", "@Produces(\"application/octet-stream\")");
+    }
+
+    @Test
+    void testLombok() {
+
+        var codegen = new JavaMicronautClientCodegen();
+        codegen.setLombok(true);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/openmeteo.yml", CodegenConstants.MODELS);
+        String path = outputPath + "src/main/java/org/openapitools/";
+
+        assertFileContains(path + "model/V1ForecastIdGet400Response.java",
+            "import lombok.AllArgsConstructor;",
+            "import lombok.NoArgsConstructor;",
+            "import lombok.RequiredArgsConstructor;",
+            "import lombok.Data;",
+            "import lombok.EqualsAndHashCode;",
+            "import lombok.Getter;",
+            "import lombok.Setter;",
+            "import lombok.ToString;",
+            "import lombok.experimental.Accessors;",
+            "@Accessors(chain = true)",
+            "@NoArgsConstructor",
+            "@AllArgsConstructor",
+            "@Data");
     }
 }
