@@ -599,4 +599,18 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
             "@Header(name = \"Content-Type\", defaultValue = \"application/json\") @Nullable contentType: String? = \"application/json\""
         );
     }
+
+    @Test
+    void testFileDownloadEndpoint() {
+
+        var codegen = new KotlinMicronautClientCodegen();
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/file-download.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String apiPath = outputPath + "src/main/kotlin/org/openapitools/api/";
+
+        assertFileContains(apiPath + "DefaultApi.kt", """
+                fun fetchData(
+                    @PathVariable("id") @NotNull @Min(0L) id: Long
+                ): Mono<HttpResponse<ByteBuffer<?>>>
+            """);
+    }
 }

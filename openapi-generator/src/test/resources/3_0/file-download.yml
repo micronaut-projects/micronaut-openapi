@@ -1,0 +1,30 @@
+openapi: 3.0.1
+info:
+  title: Test resource
+  version: 8.0-SNAPSHOT
+paths:
+  /{id}:
+    get:
+      summary: Fetch data
+      operationId: fetchData
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            format: int64
+            minimum: 0
+            type: integer
+            nullable: false
+      responses:
+        "200":
+          description: Job found
+          headers:
+            Content-Disposition:
+              description: File name for the download
+              style: simple
+          content:
+            application/zip:
+              schema:
+                format: binary
+                type: string
