@@ -728,7 +728,12 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
                 p).getLeft();
         }
         if (p != null && ModelUtils.isEnumSchema(p)) {
-            defaultValueInit = property.dataType + "." + toEnumVarName(property.defaultValue, property.dataType);
+            var enumVarName = toEnumVarName(property.defaultValue, property.dataType);
+            if (enumVarName != null) {
+                defaultValueInit = property.dataType + "." + enumVarName;
+            } else {
+                defaultValueInit = null;
+            }
         }
         if (defaultValueInit != null) {
             property.vendorExtensions.put("defaultValueInit", defaultValueInit);
@@ -898,7 +903,12 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
                 if (itemsIsEnumOrRef) { // inline or ref enum
                     var defaultValues = new ArrayList<String>();
                     for (String value : values) {
-                        defaultValues.add(itemsDatatypeWithEnum + "." + toEnumVarName(value, itemsDataType));
+                        var enumVarName = toEnumVarName(value, itemsDataType);
+                        if (enumVarName == null) {
+                            defaultValues.add(null);
+                        } else {
+                            defaultValues.add(itemsDatatypeWithEnum + "." + enumVarName);
+                        }
                     }
                     defaultValue = StringUtils.join(defaultValues, ", ");
                 } else if (!values.isEmpty()) {

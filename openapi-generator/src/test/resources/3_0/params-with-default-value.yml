@@ -3,7 +3,7 @@ info:
   title: 'Order API'
   version: v6
 paths:
-  '/{apiVersion}/orders':
+  /{apiVersion}/orders:
     get:
       summary: 'Browser/search multiple order'
       operationId: browseSearchOrders
@@ -12,6 +12,18 @@ paths:
         - $ref: '#/components/parameters/XFavorToken'
         - $ref: '#/components/parameters/ApiVersion'
         - $ref: '#/components/parameters/ContentType'
+        - name: algorithm
+          in: query
+          required: false
+          schema:
+            description: The search algorithm to use.
+            type: string
+            enum:
+             - single
+             - multiple
+             - intentional
+            nullable: true
+            default: null
       responses:
         200:
           description: OK

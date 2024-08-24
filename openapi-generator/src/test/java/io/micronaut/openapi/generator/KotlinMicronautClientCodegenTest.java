@@ -597,7 +597,8 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
             "@QueryValue(\"ids\") @Nullable ids: List<@NotNull Int>? = null,",
             "@Header(\"X-Favor-Token\") @Nullable xFavorToken: String? = null,",
             "@PathVariable(name = \"apiVersion\", defaultValue = \"v5\") @Nullable apiVersion: BrowseSearchOrdersApiVersionParameter? = BrowseSearchOrdersApiVersionParameter.V5,",
-            "@Header(name = \"Content-Type\", defaultValue = \"application/json\") @Nullable contentType: String? = \"application/json\""
+            "@Header(name = \"Content-Type\", defaultValue = \"application/json\") @Nullable contentType: String? = \"application/json\"",
+            "@QueryValue(\"algorithm\") @Nullable algorithm: BrowseSearchOrdersAlgorithmParameter? = null"
         );
     }
 
