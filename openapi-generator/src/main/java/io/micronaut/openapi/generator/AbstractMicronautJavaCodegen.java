@@ -35,6 +35,8 @@ import org.openapitools.codegen.CliOption;
 import org.openapitools.codegen.CodegenConstants;
 import org.openapitools.codegen.CodegenDiscriminator;
 import org.openapitools.codegen.CodegenModel;
+import org.openapitools.codegen.CodegenModelFactory;
+import org.openapitools.codegen.CodegenModelType;
 import org.openapitools.codegen.CodegenOperation;
 import org.openapitools.codegen.CodegenParameter;
 import org.openapitools.codegen.CodegenProperty;
@@ -198,6 +200,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
         );
 
         // Set additional properties
+        additionalProperties.put("useOneOfInterfaces", useOneOfInterfaces);
         additionalProperties.put("openbrace", "{");
         additionalProperties.put("closebrace", "}");
 
@@ -1240,12 +1243,33 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
     }
 
     @Override
-    public CodegenModel fromModel(String name, Schema model) {
-        CodegenModel codegenModel = super.fromModel(name, model);
-        codegenModel.imports.remove("ApiModel");
-        codegenModel.imports.remove("ApiModelProperty");
-        allModels.put(name, codegenModel);
-        return codegenModel;
+    public CodegenModel fromModel(String name, Schema schema) {
+        CodegenModel model = super.fromModel(name, schema);
+        if (!model.oneOf.isEmpty()) {
+            if (useOneOfInterfaces) {
+                model.vendorExtensions.put("x-is-one-of-interface", true);
+            }
+            if (ModelUtils.isTypeObjectSchema(schema)) {
+                CodegenModel m = CodegenModelFactory.newInstance(CodegenModelType.MODEL);
+                updateModelForObject(m, schema);
+                model.vars = m.vars;
+                model.allVars = m.allVars;
+                model.requiredVars = m.requiredVars;
+                model.readWriteVars = m.readWriteVars;
+                model.optionalVars = m.optionalVars;
+                model.readOnlyVars = m.readOnlyVars;
+                model.parentVars = m.parentVars;
+                model.nonNullableVars = m.nonNullableVars;
+                model.setRequiredVarsMap(m.getRequiredVarsMap());
+                model.mandatory = m.mandatory;
+                model.allMandatory = m.allMandatory;
+            }
+        }
+
+        model.imports.remove("ApiModel");
+        model.imports.remove("ApiModelProperty");
+        allModels.put(name, model);
+        return model;
     }
 
     private boolean shouldBeImplicitHeader(CodegenParameter parameter) {
@@ -1669,13 +1693,18 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
     private void processParentModel(CodegenModel model, List<CodegenProperty> requiredVarsWithoutDiscriminator,
                                     List<CodegenProperty> requiredParentVarsWithoutDiscriminator,
                                     List<CodegenProperty> allVars) {
-        var parent = model.getParentModel();
+        var parent = model.parentModel;
         var hasParent = parent != null;
 
-        allVars.addAll(model.vars);
+        for (var variable : model.vars) {
+            if (notContainsProp(variable, allVars)) {
+                allVars.add(variable);
+            }
+        }
 
+        var parentIsOneOfInterface = hasParent && Boolean.TRUE.equals(parent.getVendorExtensions().get("x-is-one-of-interface"));
         for (var v : model.requiredVars) {
-            if (!isDiscriminator(v, model) && notContainsProp(v, requiredVarsWithoutDiscriminator)) {
+            if (notContainsProp(v, requiredVarsWithoutDiscriminator) && (!isDiscriminator(v, model) || parentIsOneOfInterface)) {
                 requiredVarsWithoutDiscriminator.add(v);
             }
         }
@@ -1683,9 +1712,27 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
         requiredParentVarsWithoutDiscriminator(model, requiredParentVarsWithoutDiscriminator);
         if (hasParent) {
             model.parentVars = parent.allVars;
-        }
-        if (hasParent) {
             processParentModel(parent, requiredVarsWithoutDiscriminator, requiredParentVarsWithoutDiscriminator, allVars);
+        }
+
+        if (parentIsOneOfInterface) {
+            for (var variable : parent.vars) {
+                if (notContainsProp(variable, model.vars)) {
+                    if (parent.discriminator != null && parent.discriminator.getPropertyName().equals(variable.name)) {
+                        variable.isDiscriminator = true;
+                        variable.isOverridden = true;
+                    }
+                    model.vars.add(variable);
+                }
+            }
+            for (var variable : parent.requiredVars) {
+                if (notContainsProp(variable, model.requiredVars)) {
+                    model.requiredVars.add(variable);
+                }
+            }
+            model.parentModel = null;
+            model.parent = null;
+            model.parentVars = null;
         }
     }
 
@@ -1811,7 +1858,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
                 example = null;
             } else {
                 if (requiredPropertiesInConstructor) {
-                    StringBuilder builder = new StringBuilder();
+                    var builder = new StringBuilder();
                     if (isProperty) {
                         dataType = importMapping.getOrDefault(dataType, modelPackage + '.' + dataType);
                     }
@@ -1894,6 +1941,12 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
 
     public void setDateTimeLibrary(String name) {
         setDateLibrary(name);
+    }
+
+    @Override
+    public void setUseOneOfInterfaces(Boolean useOneOfInterfaces) {
+        super.setUseOneOfInterfaces(useOneOfInterfaces);
+        additionalProperties.put("useOneOfInterfaces", useOneOfInterfaces);
     }
 
     @Override

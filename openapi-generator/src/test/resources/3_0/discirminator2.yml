@@ -1,0 +1,85 @@
+openapi: 3.0.1
+info:
+  title: test
+  description: desc
+  version: 0.0.1
+paths:
+  /:
+    get:
+      responses:
+        200:
+          description: OK
+components:
+  schemas:
+    JsonOp:
+      type: object
+      discriminator:
+        propertyName: op
+        mapping:
+          add: "#/components/schemas/OpAdd"
+          remove: "#/components/schemas/OpRemove"
+          replace: "#/components/schemas/OpReplace"
+          move: "#/components/schemas/OpMove"
+          copy: "#/components/schemas/OpCopy"
+          test: "#/components/schemas/OpTest"
+      required:
+        - path
+        - op
+      properties:
+        path:
+          type: string
+          format: relative-json-pointer
+        op:
+          type: string
+      oneOf:
+        - $ref: "#/components/schemas/OpAdd"
+        - $ref: "#/components/schemas/OpRemove"
+        - $ref: "#/components/schemas/OpReplace"
+        - $ref: "#/components/schemas/OpMove"
+        - $ref: "#/components/schemas/OpCopy"
+        - $ref: "#/components/schemas/OpTest"
+
+    OpAdd:
+      allOf:
+        - $ref: "#/components/schemas/JsonOp"
+        - type: object
+          properties:
+            value: { type: string }
+    #          required: [ value ]
+
+    OpRemove:
+      allOf:
+        - $ref: "#/components/schemas/JsonOp"
+        - type: object
+
+    OpReplace:
+      allOf:
+        - $ref: "#/components/schemas/JsonOp"
+        - type: object
+          properties:
+            value: { type: string }
+    #          required: [ value ]
+
+    OpMove:
+      allOf:
+        - $ref: "#/components/schemas/JsonOp"
+        - type: object
+          properties:
+            from: { type: string, format: relative-json-pointer }
+    #          required: [ from ]
+
+    OpCopy:
+      allOf:
+        - $ref: "#/components/schemas/JsonOp"
+        - type: object
+          properties:
+            from: { type: string, format: relative-json-pointer }
+    #          required: [ from ]
+
+    OpTest:
+      allOf:
+        - $ref: "#/components/schemas/JsonOp"
+        - type: object
+          properties:
+            value: { type: string }
+    #          required: [ value ]

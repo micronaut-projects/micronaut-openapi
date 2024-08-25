@@ -651,4 +651,83 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
             "@Header(name = \"Content-Type\", defaultValue = \"application/json\") @Nullable contentType: String? = \"application/json\""
         );
     }
+
+    @Test
+    void testDiscriminatorWithoutUseOneOfInterfaces() {
+
+        var codegen = new KotlinMicronautClientCodegen();
+        codegen.setUseOneOfInterfaces(false);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/discirminator2.yml", CodegenConstants.MODELS);
+        String path = outputPath + "src/main/kotlin/org/openapitools/";
+
+        assertFileContains(path + "model/JsonOp.kt",
+            """
+                open class JsonOp(
+                    @field:NotNull
+                    @field:JsonProperty(JSON_PROPERTY_PATH)
+                    open var path: String,
+                    @field:NotNull
+                    @field:JsonProperty(JSON_PROPERTY_OP)
+                    open var op: String,
+                ) {
+                """
+        );
+
+        assertFileNotContains(path + "model/JsonOp.kt",
+            "var `value`: String? = null",
+            "var from: String"
+        );
+
+        assertFileContains(path + "model/OpAdd.kt",
+            """
+                data class OpAdd(
+                    @field:Nullable
+                    @field:JsonProperty(JSON_PROPERTY_VALUE)
+                    @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                    var `value`: String? = null,
+                    @field:NotNull
+                    @field:JsonProperty(JSON_PROPERTY_PATH)
+                    override var path: String,
+                    @field:NotNull
+                    @field:JsonProperty(JSON_PROPERTY_OP)
+                    override var op: String,
+                ): JsonOp(path, op)  {
+                """
+        );
+    }
+
+    @Test
+    void testDiscriminatorWithUseOneOfInterfaces() {
+
+        var codegen = new KotlinMicronautClientCodegen();
+        codegen.setUseOneOfInterfaces(true);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/discirminator2.yml", CodegenConstants.MODELS);
+        String path = outputPath + "src/main/kotlin/org/openapitools/";
+
+        assertFileContains(path + "model/JsonOp.kt",
+            """
+                interface JsonOp {
+                
+                    val op: String
+                }
+                """
+        );
+
+        assertFileContains(path + "model/OpAdd.kt",
+            """
+                data class OpAdd(
+                    @field:Nullable
+                    @field:JsonProperty(JSON_PROPERTY_VALUE)
+                    @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                    var `value`: String? = null,
+                    @field:NotNull
+                    @field:JsonProperty(JSON_PROPERTY_PATH)
+                    var path: String,
+                    @field:NotNull
+                    @field:JsonProperty(JSON_PROPERTY_OP)
+                    override var op: String,
+                ): JsonOp {
+                """
+        );
+    }
 }

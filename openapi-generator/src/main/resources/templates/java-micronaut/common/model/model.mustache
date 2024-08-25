@@ -21,10 +21,19 @@ import java.io.Serial;
 import java.io.Serializable;
 {{/serializableModel}}
 {{#lombok}}
+    {{#requiredPropertiesInConstructor}}
+        {{^vendorExtensions.withRequiredVars}}
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import lombok.Data;
+        {{/vendorExtensions.withRequiredVars}}
+    {{/requiredPropertiesInConstructor}}
+    {{^requiredPropertiesInConstructor}}
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import lombok.Data;
+    {{/requiredPropertiesInConstructor}}
+import lombok.RequiredArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;

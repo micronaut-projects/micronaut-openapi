@@ -1,6 +1,6 @@
 swagger: '2.0'
 info:
-  description: Документация FINTECH REST API
+  description: docs FINTECH REST API
   version: '1'
   title: FINTECH
   contact: { }

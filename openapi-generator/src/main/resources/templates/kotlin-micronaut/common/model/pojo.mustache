@@ -14,7 +14,7 @@
  */
 {{#description}}
     {{#generateSwagger2Annotations}}
-@Schema({{#name}}name = "{{name}}", {{/name}}description = "{{{description}}}")
+@Schema({{#vendorExtensions.realName}}name = "{{{vendorExtensions.realName}}}", {{/vendorExtensions.realName}}description = "{{{description}}}")
     {{/generateSwagger2Annotations}}
 {{/description}}
 {{#micronaut_serde_jackson}}
@@ -53,10 +53,10 @@
 {{#vendorExtensions.withInheritance}}
     {{#vendorExtensions.optionalVars}}
     {{>common/model/field_annotations}}
-    {{#vendorExtensions.hasChildren}}open {{/vendorExtensions.hasChildren}}var {{{name}}}: {{{vendorExtensions.typeWithEnumWithGenericAnnotations}}} = {{#vendorExtensions.defaultValueInit}}{{{.}}}{{/vendorExtensions.defaultValueInit}}{{^vendorExtensions.defaultValueInit}}null{{/vendorExtensions.defaultValueInit}},
+    {{#vendorExtensions.overridden}}override {{/vendorExtensions.overridden}}{{^vendorExtensions.overridden}}{{#vendorExtensions.hasChildren}}open {{/vendorExtensions.hasChildren}}{{/vendorExtensions.overridden}}var {{{name}}}: {{{vendorExtensions.typeWithEnumWithGenericAnnotations}}} = {{#vendorExtensions.defaultValueInit}}{{{.}}}{{/vendorExtensions.defaultValueInit}}{{^vendorExtensions.defaultValueInit}}null{{/vendorExtensions.defaultValueInit}},
     {{/vendorExtensions.optionalVars}}
 {{/vendorExtensions.withInheritance}}
-{{/formatNoEmptyLines}}){{#parent}}: {{{parent}}}({{#vendorExtensions.requiredParentVarsWithoutDiscriminator}}{{name}}{{^-last}}, {{/-last}}{{/vendorExtensions.requiredParentVarsWithoutDiscriminator}}) {{/parent}}{{#vendorExtensions.x-implements}}{{#parent}}, {{/parent}}{{^parent}}: {{/parent}}{{^-first}}, {{/-first}}{{{.}}}{{/vendorExtensions.x-implements}} {{openbrace}}
+{{/formatNoEmptyLines}}){{#parent}}: {{{parent}}}({{#vendorExtensions.requiredParentVarsWithoutDiscriminator}}{{{name}}}{{^-last}}, {{/-last}}{{/vendorExtensions.requiredParentVarsWithoutDiscriminator}}) {{/parent}}{{#vendorExtensions.x-implements}}{{#parent}}, {{/parent}}{{^parent}}: {{/parent}}{{^-first}}, {{/-first}}{{{.}}}{{/vendorExtensions.x-implements}} {{openbrace}}
 
     {{#vendorExtensions.withInheritance}}
 
@@ -69,21 +69,21 @@
         other as {{classname}}
 
         {{#vars}}
-        if ({{name}} != other.{{name}}) return false
+        if ({{{name}}} != other.{{{name}}}) return false
         {{/vars}}
 
         return true
     }
 
     override fun hashCode(): Int {
-        var result = {{#parent}}super.hashCode(){{/parent}}{{^parent}}{{#vars.0}}{{name}}{{#isNullable}}?{{/isNullable}}.hashCode(){{#isNullable}} ?: 0{{/isNullable}}{{/vars.0}}{{/parent}}
+        var result = {{#parent}}super.hashCode(){{/parent}}{{^parent}}{{#vars.0}}{{{name}}}{{#isNullable}}?{{/isNullable}}.hashCode(){{#isNullable}} ?: 0{{/isNullable}}{{/vars.0}}{{/parent}}
     {{#vars}}
         {{#parent}}
-        result = 31 * result + {{#isNullable}}({{/isNullable}}{{name}}{{#isNullable}}?{{/isNullable}}.hashCode(){{#isNullable}} ?: 0){{/isNullable}}
+        result = 31 * result + {{#isNullable}}({{/isNullable}}{{{name}}}{{#isNullable}}?{{/isNullable}}.hashCode(){{#isNullable}} ?: 0){{/isNullable}}
         {{/parent}}
         {{^parent}}
             {{^-first}}
-        result = {{#-first}}{{#parent}}31 * result + {{/parent}}{{/-first}}{{^-first}}31 * result + {{/-first}}{{#isNullable}}({{/isNullable}}{{name}}{{#isNullable}}?{{/isNullable}}.hashCode(){{#isNullable}} ?: 0){{/isNullable}}
+        result = {{#-first}}{{#parent}}31 * result + {{/parent}}{{/-first}}{{^-first}}31 * result + {{/-first}}{{#isNullable}}({{/isNullable}}{{{name}}}{{#isNullable}}?{{/isNullable}}.hashCode(){{#isNullable}} ?: 0){{/isNullable}}
             {{/-first}}
         {{/parent}}
     {{/vars}}
@@ -91,7 +91,7 @@
     }
 
     override fun toString(): String {
-        return "{{classname}}({{#allVars}}{{name}}='${{name}}'{{^-last}}, {{/-last}}{{/allVars}})"
+        return "{{classname}}({{#allVars}}{{{vendorExtensions.realName}}}='${{{name}}}'{{^-last}}, {{/-last}}{{/allVars}})"
     }
     {{/vendorExtensions.withInheritance}}
 

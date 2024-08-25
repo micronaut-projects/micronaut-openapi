@@ -575,8 +575,8 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         assertFileContains(path + "model/V1ForecastIdGet400Response.java",
             "import lombok.AllArgsConstructor;",
             "import lombok.NoArgsConstructor;",
-            "import lombok.RequiredArgsConstructor;",
             "import lombok.Data;",
+            "import lombok.RequiredArgsConstructor;",
             "import lombok.EqualsAndHashCode;",
             "import lombok.Getter;",
             "import lombok.Setter;",
@@ -622,5 +622,68 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         String path = outputPath + "src/main/java/org/openapitools/";
 
         assertFileContains(path + "model/CustomerCreateDTO.java", "import java.util.function.Function;");
+    }
+
+    @Test
+    void testDiscriminatorWithoutUseOneOfInterfaces() {
+
+        var codegen = new JavaMicronautClientCodegen();
+        codegen.setUseOneOfInterfaces(false);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/discirminator2.yml", CodegenConstants.MODELS);
+        String path = outputPath + "src/main/java/org/openapitools/";
+
+        assertFileContains(path + "model/JsonOp.java",
+            "private String path;",
+            "private String op;",
+            "public JsonOp(String path, String op) {"
+        );
+
+        assertFileNotContains(path + "model/JsonOp.java",
+            "private String value;",
+            "private String from;"
+        );
+
+        assertFileContains(path + "model/OpAdd.java",
+            "public class OpAdd extends JsonOp {",
+            "private String value;",
+            """
+                    public OpAdd(String path, String op) {
+                        super(path, op);
+                    }
+                """
+        );
+    }
+
+    @Test
+    void testDiscriminatorWithUseOneOfInterfaces() {
+
+        var codegen = new JavaMicronautClientCodegen();
+        codegen.setUseOneOfInterfaces(true);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/discirminator2.yml", CodegenConstants.MODELS);
+        String path = outputPath + "src/main/java/org/openapitools/";
+
+        assertFileContains(path + "model/JsonOp.java",
+            "public interface JsonOp {",
+            "String getOp();"
+        );
+
+        assertFileContains(path + "model/OpAdd.java",
+            "public class OpAdd implements JsonOp {",
+            "private String value;",
+            "private String path;",
+            "protected String op;",
+            """
+                    public OpAdd(String path, String op) {
+                        this.path = path;
+                        this.op = op;
+                    }
+                """,
+            """
+                    @Override
+                    public String getOp() {
+                        return op;
+                    }
+                """
+        );
     }
 }
