@@ -41,13 +41,13 @@ import static java.lang.annotation.RetentionPolicy.SOURCE;
 public @interface OpenAPIGroupInfo {
 
     /**
-     * @return The names of the OpenAPi groups.
+     * @return The names of the OpenAPI groups.
      */
     @AliasFor(member = "names")
     String[] value() default {};
 
     /**
-     * @return The names of the OpenAPi groups.
+     * @return The names of the OpenAPI groups.
      */
     @AliasFor(member = "value")
     String[] names() default {};

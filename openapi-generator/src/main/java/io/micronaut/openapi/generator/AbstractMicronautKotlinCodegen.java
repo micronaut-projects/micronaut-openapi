@@ -121,6 +121,8 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
     public static final String OPT_GENERATE_SWAGGER_ANNOTATIONS_TRUE = "true";
     public static final String OPT_GENERATE_SWAGGER_ANNOTATIONS_FALSE = "false";
     public static final String OPT_GENERATE_OPERATION_ONLY_FOR_FIRST_TAG = "generateOperationOnlyForFirstTag";
+    public static final String OPT_IMPLICIT_HEADERS = "implicitHeaders";
+    public static final String OPT_IMPLICIT_HEADERS_REGEX = "implicitHeadersRegex";
     public static final String OPT_KSP = "ksp";
     public static final String CONTENT_TYPE_APPLICATION_FORM_URLENCODED = "application/x-www-form-urlencoded";
     public static final String CONTENT_TYPE_APPLICATION_JSON = "application/json";
@@ -144,6 +146,8 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
     protected boolean generateHttpResponseAlways;
     protected boolean generateHttpResponseWhereRequired = true;
     protected boolean ksp;
+    protected boolean implicitHeaders = false;
+    protected String implicitHeadersRegex;
     protected String appName;
     protected String generateSwaggerAnnotations;
     protected boolean generateOperationOnlyForFirstTag;
@@ -267,6 +271,8 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         cliOptions.add(CliOption.newBoolean(OPT_VISITABLE, "Generate visitor for subtypes with a discriminator", visitable));
         cliOptions.add(CliOption.newBoolean(OPT_REQUIRED_PROPERTIES_IN_CONSTRUCTOR, "Allow only to create models with all the required properties provided in constructor", requiredPropertiesInConstructor));
         cliOptions.add(CliOption.newBoolean(OPT_REACTIVE, "Make the responses use Reactor Mono as wrapper", reactive));
+        cliOptions.add(CliOption.newBoolean(OPT_IMPLICIT_HEADERS, "Skip header parameters in the generated API methods using @ApiImplicitParams annotation.", implicitHeaders));
+        cliOptions.add(CliOption.newString(OPT_IMPLICIT_HEADERS_REGEX, "Skip header parameters that matches given regex in the generated API methods using @ApiImplicitParams annotation. Note: this parameter is ignored when implicitHeaders=true"));
         cliOptions.add(CliOption.newBoolean(OPT_GENERATE_HTTP_RESPONSE_ALWAYS, "Always wrap the operations response in HttpResponse object", generateHttpResponseAlways));
         cliOptions.add(CliOption.newBoolean(OPT_GENERATE_HTTP_RESPONSE_WHERE_REQUIRED, "Wrap the operations response in HttpResponse object where non-200 HTTP status codes or additional headers are defined", generateHttpResponseWhereRequired));
         cliOptions.add(CliOption.newBoolean(CodegenConstants.HIDE_GENERATION_TIMESTAMP, CodegenConstants.HIDE_GENERATION_TIMESTAMP_DESC, isHideGenerationTimestamp()));
@@ -375,6 +381,14 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
 
     public void setReactive(boolean reactive) {
         this.reactive = reactive;
+    }
+
+    public void setImplicitHeaders(boolean implicitHeaders) {
+        this.implicitHeaders = implicitHeaders;
+    }
+
+    public void setImplicitHeadersRegex(String implicitHeadersRegex) {
+        this.implicitHeadersRegex = implicitHeadersRegex;
     }
 
     public void setTestTool(String testTool) {
@@ -515,6 +529,9 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         if (testTool.equals(OPT_TEST_JUNIT)) {
             additionalProperties.put("isTestJunit", true);
         }
+
+        convertPropertyToBooleanAndWriteBack(OPT_IMPLICIT_HEADERS, this::setImplicitHeaders);
+        convertPropertyToStringAndWriteBack(OPT_IMPLICIT_HEADERS_REGEX, this::setImplicitHeadersRegex);
 
         maybeSetSwagger();
         if (OPT_GENERATE_SWAGGER_ANNOTATIONS_SWAGGER_2.equals(generateSwaggerAnnotations)) {
@@ -850,6 +867,10 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         List<CodegenOperation> operationList = operations.getOperation();
 
         for (CodegenOperation op : operationList) {
+
+            handleImplicitHeaders(op);
+            handleConstantParams(op);
+
             // Set whether body is supported in request
             op.vendorExtensions.put("methodAllowsBody", op.httpMethod.equals("PUT")
                 || op.httpMethod.equals("POST")
@@ -945,6 +966,34 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         }
 
         return objs;
+    }
+
+    /**
+     * This method removes all implicit header parameters from the list of parameters
+     *
+     * @param operation - operation to be processed
+     */
+    protected void handleImplicitHeaders(CodegenOperation operation) {
+        if (operation.allParams.isEmpty()) {
+            return;
+        }
+        final ArrayList<CodegenParameter> copy = new ArrayList<>(operation.allParams);
+        operation.allParams.clear();
+
+        for (CodegenParameter p : copy) {
+            if (p.isHeaderParam && (implicitHeaders || shouldBeImplicitHeader(p))) {
+                operation.implicitHeadersParams.add(p);
+                operation.headerParams.removeIf(header -> header.baseName.equals(p.baseName));
+                once(log).info("Update operation [{}]. Remove header [{}] because it's marked to be implicit", operation.operationId, p.baseName);
+            } else {
+                operation.allParams.add(p);
+            }
+        }
+        operation.hasParams = !operation.allParams.isEmpty();
+    }
+
+    private boolean shouldBeImplicitHeader(CodegenParameter parameter) {
+        return StringUtils.isNotBlank(implicitHeadersRegex) && parameter.baseName.matches(implicitHeadersRegex);
     }
 
     @Override
@@ -1162,19 +1211,28 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
             op.imports.add(op.returnType);
         }
 
-        op.vendorExtensions.put("originalParams", new ArrayList<>(op.allParams));
+        var paramsWithoutImplicitHeaders = new ArrayList<CodegenParameter>();
+        var swaggerParams = new ArrayList<CodegenParameter>();
         var hasMultipleParams = false;
         var notBodyParamsSize = 0;
         for (var param : op.allParams) {
-            if (param.isBodyParam) {
+            if (!param.isHeaderParam || (!implicitHeaders && !shouldBeImplicitHeader(param))) {
+                param.vendorExtensions.computeIfAbsent("realName", k -> param.paramName);
+                paramsWithoutImplicitHeaders.add(param);
+            }
+            if (param.isBodyParam || param.isFormParam) {
                 continue;
             }
+            swaggerParams.add(param);
             notBodyParamsSize++;
             if (notBodyParamsSize > 1) {
                 hasMultipleParams = true;
-                break;
             }
         }
+        op.vendorExtensions.put("swaggerParams", swaggerParams);
+        op.vendorExtensions.put("originalParams", paramsWithoutImplicitHeaders);
+        op.vendorExtensions.put("hasNotBodyParam", notBodyParamsSize > 0);
+        op.vendorExtensions.put("hasMultipleParams", hasMultipleParams);
         for (var param : op.allParams) {
             param.vendorExtensions.put("hasNotBodyParam", notBodyParamsSize > 0);
             param.vendorExtensions.put("hasMultipleParams", hasMultipleParams);
@@ -1989,6 +2047,13 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
     @Override
     public boolean getUseInlineModelResolver() {
         return false;
+    }
+
+    public void setGenerateSwaggerAnnotations(boolean generateSwaggerAnnotations) {
+        this.generateSwaggerAnnotations = Boolean.toString(generateSwaggerAnnotations);
+        if (generateSwaggerAnnotations) {
+            additionalProperties.put("generateSwagger2Annotations", true);
+        }
     }
 
     @Override

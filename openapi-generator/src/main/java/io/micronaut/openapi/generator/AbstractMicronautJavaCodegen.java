@@ -1238,6 +1238,10 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
         return codegenModel;
     }
 
+    private boolean shouldBeImplicitHeader(CodegenParameter parameter) {
+        return StringUtils.isNotBlank(implicitHeadersRegex) && parameter.baseName.matches(implicitHeadersRegex);
+    }
+
     @Override
     public String toEnumValue(String value, String datatype) {
         if ("Integer".equals(datatype) || "Double".equals(datatype)) {
@@ -1269,19 +1273,27 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
             op.imports.add(op.returnType);
         }
 
-        op.vendorExtensions.put("originalParams", new ArrayList<>(op.allParams));
+        var paramsWithoutImplicitHeaders = new ArrayList<CodegenParameter>();
+        var swaggerParams = new ArrayList<CodegenParameter>();
         var hasMultipleParams = false;
         var notBodyParamsSize = 0;
         for (var param : op.allParams) {
-            if (param.isBodyParam) {
+            if (!param.isHeaderParam || (!implicitHeaders && !shouldBeImplicitHeader(param))) {
+                paramsWithoutImplicitHeaders.add(param);
+            }
+            if (param.isBodyParam || param.isFormParam) {
                 continue;
             }
+            swaggerParams.add(param);
             notBodyParamsSize++;
             if (notBodyParamsSize > 1) {
                 hasMultipleParams = true;
-                break;
             }
         }
+        op.vendorExtensions.put("swaggerParams", swaggerParams);
+        op.vendorExtensions.put("originalParams", paramsWithoutImplicitHeaders);
+        op.vendorExtensions.put("hasNotBodyParam", notBodyParamsSize > 0);
+        op.vendorExtensions.put("hasMultipleParams", hasMultipleParams);
         for (var param : op.allParams) {
             param.vendorExtensions.put("hasNotBodyParam", notBodyParamsSize > 0);
             param.vendorExtensions.put("hasMultipleParams", hasMultipleParams);
@@ -1877,6 +1889,13 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
     @Override
     public boolean getUseInlineModelResolver() {
         return false;
+    }
+
+    public void setGenerateSwaggerAnnotations(boolean generateSwaggerAnnotations) {
+        this.generateSwaggerAnnotations = Boolean.toString(generateSwaggerAnnotations);
+        if (generateSwaggerAnnotations) {
+            additionalProperties.put("generateSwagger2Annotations", true);
+        }
     }
 
     @Override
