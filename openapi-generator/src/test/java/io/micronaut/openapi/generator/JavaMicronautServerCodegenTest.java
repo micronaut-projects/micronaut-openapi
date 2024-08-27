@@ -491,4 +491,22 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
 
         assertFileContains(path + "api/DatasetsApi.java", "description = \"Creates a brand new dataset.\"");
     }
+
+    @Test
+    void testSecurity() {
+
+        var codegen = new JavaMicronautServerCodegen();
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/security.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String path = outputPath + "src/main/java/org/openapitools/";
+
+        assertFileContains(path + "api/DefaultApi.java",
+            """
+                    @Secured({"read", "admin"})
+                    Mono<Void> get();
+                """,
+            """
+                    @Secured({"write", "admin"})
+                    Mono<Void> save();
+                """);
+    }
 }

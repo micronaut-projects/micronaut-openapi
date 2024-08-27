@@ -28,7 +28,7 @@ import org.openapitools.codegen.model.OperationsMap;
 import org.openapitools.codegen.utils.StringUtils;
 
 import java.io.File;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.openapitools.codegen.CodegenConstants.API_PACKAGE;
@@ -281,14 +281,29 @@ public class JavaMicronautServerCodegen extends AbstractMicronautJavaCodegen<Jav
         String controllerClassname = StringUtils.camelize(CONTROLLER_PREFIX + "_" + operations.getPathPrefix() + "_" + CONTROLLER_SUFFIX);
         objs.put("controllerClassname", controllerClassname);
 
-        List<CodegenOperation> allOperations = (List<CodegenOperation>) operations.get("operation");
+        var allOperations = (List<CodegenOperation>) operations.get("operation");
         if (useAuth) {
             for (CodegenOperation operation : allOperations) {
                 if (!operation.vendorExtensions.containsKey(EXTENSION_ROLES)) {
-                    String role = operation.hasAuthMethods ? AUTHORIZED_ROLE : ANONYMOUS_ROLE;
-                    operation.vendorExtensions.put(EXTENSION_ROLES, Collections.singletonList(role));
+
+                    var roles = new ArrayList<String>();
+                    var authMethods = operation.authMethods;
+                    if (authMethods != null && !authMethods.isEmpty()) {
+                        var scopes = authMethods.get(0).scopes;
+                        if (scopes != null && !scopes.isEmpty()) {
+                            for (var scope : scopes) {
+                                roles.add("\"" + escapeText(scope.get("scope").toString()) + "\"");
+                            }
+                        } else {
+                            roles.add(AUTHORIZED_ROLE);
+                        }
+                    } else {
+                        roles.add(ANONYMOUS_ROLE);
+                    }
+
+                    operation.vendorExtensions.put(EXTENSION_ROLES, roles);
                 } else {
-                    List<String> roles = (List<String>) operation.vendorExtensions.get(EXTENSION_ROLES);
+                    var roles = (List<String>) operation.vendorExtensions.get(EXTENSION_ROLES);
                     roles = roles.stream().map(role -> switch (role) {
                         case ANONYMOUS_ROLE_KEY -> ANONYMOUS_ROLE;
                         case AUTHORIZED_ROLE_KEY -> AUTHORIZED_ROLE;

@@ -1,0 +1,38 @@
+openapi: 3.0.3
+info:
+  description: This is an example of the openapi documentation
+  title: OpenAPI
+  version: 0.0.0
+paths:
+  /pet:
+    post:
+      operationId: save
+      security:
+        - OAuth2: [ write, admin ]
+      responses:
+        200:
+          description: Successfully saved
+    get:
+      operationId: get
+      security:
+        - OAuth2: [ read, admin ]
+      responses:
+        200:
+          description: Successfully retrieved information
+components:
+  securitySchemes:
+    OAuth2:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: https://example.com/oauth/authorize
+          tokenUrl: https://example.com/oauth/token
+          scopes:
+            read: Grants read access
+            write: Grants write access
+            admin: Grants access to admin operations
+security:
+  - OAuth2:
+      - read
+      - write
+      - admin
