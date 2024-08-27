@@ -3,7 +3,6 @@ package io.micronaut.openapi.generator;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.servers.Server;
-
 import org.junit.jupiter.api.Test;
 import org.openapitools.codegen.CliOption;
 import org.openapitools.codegen.CodegenConstants;
@@ -371,7 +370,7 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                     @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
                     open var type: BookInfoType? = null,
                 ) {
-                    """);
+                """);
         assertFileContains(apiPath + "ExtendedBookInfo.kt",
             """
                 data class ExtendedBookInfo(
@@ -519,13 +518,13 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
         String path = outputPath + "src/main/kotlin/org/openapitools/";
 
         assertFileContains(path + "api/WeatherForecastApisApi.kt", "@Get(\"/v1/forecast/{id}\")",
-                "@PathVariable(\"id\") @NotNull id: String,",
-                "@QueryValue(\"hourly\") @Nullable hourly: List<V1ForecastIdGetHourlyParameterInner>?,");
+            "@PathVariable(\"id\") @NotNull id: String,",
+            "@QueryValue(\"hourly\") @Nullable hourly: List<V1ForecastIdGetHourlyParameterInner>?,");
 
         assertFileContains(path + "model/V1ForecastIdGetHourlyParameterInner.kt",
-                "enum class V1ForecastIdGetHourlyParameterInner(",
-                "@JsonProperty(\"temperature_2m\")",
-                "TEMPERATURE_2M(\"temperature_2m\"),");
+            "enum class V1ForecastIdGetHourlyParameterInner(",
+            "@JsonProperty(\"temperature_2m\")",
+            "TEMPERATURE_2M(\"temperature_2m\"),");
     }
 
     @Test
@@ -546,7 +545,7 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
         String path = outputPath + "src/main/kotlin/org/openapitools/";
 
         assertFileContains(path + "api/BooksApi.kt",
-        """
+            """
                     @Post("/add-book")
                     @Secured(SecurityRule.IS_ANONYMOUS)
                     @NotBlank
@@ -554,7 +553,7 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                 """);
 
         assertFileContains(path + "model/Book.kt",
-        """
+            """
                 @Serializable
                 data class Book(
                     @field:NotNull
@@ -593,5 +592,24 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                     @Secured("write", "admin")
                     fun save(): Mono<Void>
                 """);
+    }
+
+    @Test
+    void testMultipartFormData() {
+
+        var codegen = new KotlinMicronautServerCodegen();
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/multipartdata.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String path = outputPath + "src/main/kotlin/org/openapitools/";
+
+        assertFileContains(path + "api/ResetPasswordApi.kt", """
+                @Consumes("multipart/form-data")
+                @Secured(SecurityRule.IS_ANONYMOUS)
+                fun profilePasswordPost(
+                    @Header("WCToken") @NotNull wcToken: String,
+                    @Header("WCTrustedToken") @NotNull wcTrustedToken: String,
+                    @Part("name") @Nullable name: String?,
+                    @Part("file") @Nullable file: CompletedFileUpload?
+                ): Mono<SuccessResetPassword>
+            """);
     }
 }

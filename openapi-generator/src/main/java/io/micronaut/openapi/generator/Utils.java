@@ -16,14 +16,20 @@
 package io.micronaut.openapi.generator;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.openapitools.codegen.CodegenModel;
+import org.openapitools.codegen.CodegenModelFactory;
+import org.openapitools.codegen.CodegenModelType;
+import org.openapitools.codegen.CodegenOperation;
 import org.openapitools.codegen.CodegenParameter;
 import org.openapitools.codegen.CodegenProperty;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Utilities methods to generators.
@@ -41,12 +47,55 @@ public final class Utils {
     private Utils() {
     }
 
+    /**
+     * Replace multipart data parameters, marked {@literal @}Part annotation to single MultipartBody parameter.
+     *
+     * @param op operation
+     * @param params parameters
+     * @param isKotlin is kotlin generator
+     *
+     * @return Pair with MultipartBody parameter and set of removed parameter names
+     */
+    public static Pair<CodegenParameter, Set<String>> processMultipartBody(CodegenOperation op, Collection<CodegenParameter> params, boolean isKotlin) {
+
+        var removedParams = new HashSet<String>();
+        CodegenParameter multipartBodyParam = null;
+        var i = params.iterator();
+        while (i.hasNext()) {
+            var param = i.next();
+            if (param.isBodyParam && param.vendorExtensions.containsKey("isPart")) {
+                if (multipartBodyParam == null) {
+                    multipartBodyParam = CodegenModelFactory.newInstance(CodegenModelType.PARAMETER);
+                    multipartBodyParam.isBodyParam = true;
+                    multipartBodyParam.baseName = "multipartBody";
+                    multipartBodyParam.paramName = "multipartBody";
+                    multipartBodyParam.dataType = "MultipartBody";
+                    multipartBodyParam.baseType = "MultipartBody";
+                    multipartBodyParam.nameInCamelCase = "multipartBody";
+                    multipartBodyParam.nameInLowerCase = "multipartbody";
+                    multipartBodyParam.nameInPascalCase = "MultipartBody";
+                    multipartBodyParam.nameInSnakeCase = "MULTIPART_BODY";
+                    multipartBodyParam.vendorExtensions.put("typeWithGenericAnnotations", "MultipartBody" + (isKotlin ? "?" : ""));
+                    multipartBodyParam.vendorExtensions.put("typeWithEnumWithGenericAnnotations", "MultipartBody" + (isKotlin ? "?" : ""));
+                    op.imports.add("MultipartBody");
+                }
+                removedParams.add(param.paramName);
+                i.remove();
+            }
+        }
+        if (multipartBodyParam != null) {
+            params.add(multipartBodyParam);
+        }
+
+        return Pair.of(multipartBodyParam, removedParams);
+    }
+
     public static void processGenericAnnotations(CodegenParameter parameter, boolean useBeanValidation, boolean isGenerateHardNullable,
                                                  boolean isNullable, boolean isRequired, boolean isReadonly, boolean withNullablePostfix) {
         CodegenProperty items = parameter.isMap ? parameter.additionalProperties : parameter.items;
         String datatypeWithEnum = parameter.datatypeWithEnum == null ? parameter.dataType : parameter.datatypeWithEnum;
         processGenericAnnotations(parameter.dataType, datatypeWithEnum, parameter.isMap, parameter.containerTypeMapped,
-                items, parameter.vendorExtensions, useBeanValidation, isGenerateHardNullable, isNullable, isRequired, isReadonly, withNullablePostfix);
+            items, parameter.vendorExtensions, useBeanValidation, isGenerateHardNullable, isNullable, isRequired, isReadonly, withNullablePostfix);
     }
 
     public static void processGenericAnnotations(CodegenProperty property, boolean useBeanValidation, boolean isGenerateHardNullable,
@@ -54,7 +103,7 @@ public final class Utils {
         CodegenProperty items = property.isMap ? property.additionalProperties : property.items;
         String datatypeWithEnum = property.datatypeWithEnum == null ? property.dataType : property.datatypeWithEnum;
         processGenericAnnotations(property.dataType, datatypeWithEnum, property.isMap, property.containerTypeMapped,
-                items, property.vendorExtensions, useBeanValidation, isGenerateHardNullable, isNullable, isRequired, isReadonly, withNullablePostfix);
+            items, property.vendorExtensions, useBeanValidation, isGenerateHardNullable, isNullable, isRequired, isReadonly, withNullablePostfix);
     }
 
     public static void processGenericAnnotations(String dataType, String dataTypeWithEnum, boolean isMap, String containerType, CodegenProperty itemsProp, Map<String, Object> ext,
@@ -244,8 +293,8 @@ public final class Utils {
                 }
                 var upperValue = value.toUpperCase();
                 if (upperValue.endsWith("F")
-                        || upperValue.endsWith("L")
-                        || upperValue.endsWith("D")) {
+                    || upperValue.endsWith("L")
+                    || upperValue.endsWith("D")) {
                     value = value.substring(0, value.length() - 1);
                 }
                 if (!value.contains("\"")) {

@@ -1,0 +1,75 @@
+openapi: 3.0.1
+info:
+  title: Test app
+  version: 1.0.0
+paths:
+  /profile/password:
+    post:
+      tags:
+        - Reset Password
+      description: To reset the password of the user
+      parameters:
+        - name: WCToken
+          in: header
+          required: true
+          schema:
+            type: string
+        - name: WCTrustedToken
+          in: header
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                file:
+                  type: string
+                  format: binary
+      responses:
+        200:
+          description: Success.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Success_ResetPassword'
+        400:
+          description: Bad Request. Incorrect Password
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest_ResetPasswordError'
+
+components:
+  schemas:
+    Success_ResetPassword:
+      type: object
+      properties:
+        success:
+          type: string
+      example:
+        success: "true"
+    BadRequest_ResetPasswordError:
+      type: object
+      properties:
+        customer:
+          type: object
+          properties:
+            errors:
+              type: array
+              items:
+                $ref: '#/components/schemas/BadRequest_ResetPassword_ErrorMessage'
+    BadRequest_ResetPassword_ErrorMessage:
+      type: object
+      properties:
+        message:
+          type: string
+        key:
+          type: string
+      example:
+        message: Current password is wrong
+        key: Current password is wrong

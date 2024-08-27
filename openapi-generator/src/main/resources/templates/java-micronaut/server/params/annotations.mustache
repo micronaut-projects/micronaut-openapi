@@ -9,14 +9,17 @@
         @Header({{#defaultValue}}name = {{/defaultValue}}"{{baseName}}"{{#defaultValue}}, defaultValue = "{{{defaultValue}}}"{{/defaultValue}})
 {{/isHeaderParam}}
 {{#isBodyParam}}
-    {{#isMultipart}}
+    {{#vendorExtensions.isPart}}
         @Part("{{baseName}}")
-    {{/isMultipart}}
-    {{^isMultipart}}
+    {{/vendorExtensions.isPart}}
+    {{^vendorExtensions.isPart}}
         @Body
-    {{/isMultipart}}
+    {{/vendorExtensions.isPart}}
 {{/isBodyParam}}
 {{#isFormParam}}
+    {{#vendorExtensions.isPart}}
+        @Part("{{baseName}}")
+    {{/vendorExtensions.isPart}}
 {{/isFormParam}}
 {{#isCookieParam}}
         @CookieValue({{#defaultValue}}value = {{/defaultValue}}"{{baseName}}"{{#defaultValue}}, defaultValue = "{{defaultValue}}"{{/defaultValue}})

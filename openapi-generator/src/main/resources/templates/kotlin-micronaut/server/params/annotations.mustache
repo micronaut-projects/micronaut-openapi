@@ -9,12 +9,12 @@
         @Header({{#defaultValue}}name = {{/defaultValue}}"{{baseName}}"{{#defaultValue}}, defaultValue = "{{{defaultValue}}}"{{/defaultValue}})
 {{/isHeaderParam}}
 {{#isBodyParam}}
-    {{#isMultipart}}
+    {{#vendorExtensions.isPart}}
         @Part("{{baseName}}")
-    {{/isMultipart}}
-    {{^isMultipart}}
+    {{/vendorExtensions.isPart}}
+    {{^vendorExtensions.isPart}}
         @Body
-    {{/isMultipart}}
+    {{/vendorExtensions.isPart}}
 {{/isBodyParam}}
 {{#isFormParam}}
 {{/isFormParam}}

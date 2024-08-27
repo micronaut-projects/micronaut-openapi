@@ -22,6 +22,7 @@ import com.samskivert.mustache.Mustache;
 import io.micronaut.openapi.generator.Formatting.ReplaceDotsWithUnderscoreLambda;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Operation;
+import io.swagger.v3.oas.models.PathItem;
 import io.swagger.v3.oas.models.examples.Example;
 import io.swagger.v3.oas.models.media.Content;
 import io.swagger.v3.oas.models.media.MediaType;
@@ -131,6 +132,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
     public static final String CONTENT_TYPE_APPLICATION_JSON = "application/json";
     public static final String CONTENT_TYPE_MULTIPART_FORM_DATA = "multipart/form-data";
     public static final String CONTENT_TYPE_ANY = "*/*";
+    public static final String EXT_CONTENT_TYPE = "x-content-type";
 
     private static final String MONO_CLASS_NAME = "reactor.core.publisher.Mono";
     private static final String FLUX_CLASS_NAME = "reactor.core.publisher.Flux";
@@ -858,6 +860,35 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         }
 
         super.preprocessOpenAPI(openApi);
+
+        if (openApi.getPaths() != null) {
+            for (Map.Entry<String, PathItem> openAPIGetPathsEntry : openApi.getPaths().entrySet()) {
+                String pathname = openAPIGetPathsEntry.getKey();
+                PathItem path = openAPIGetPathsEntry.getValue();
+                if (path.readOperations() == null) {
+                    continue;
+                }
+                for (Operation operation : path.readOperations()) {
+                    log.info("Processing operation {}", operation.getOperationId());
+                    if (hasBodyParameter(operation) || hasFormParameter(operation)) {
+                        var defaultContentType = hasFormParameter(operation) ? CONTENT_TYPE_APPLICATION_FORM_URLENCODED : CONTENT_TYPE_APPLICATION_JSON;
+                        var consumes = new ArrayList<>(getConsumesInfo(openApi, operation));
+                        String contentType = consumes.isEmpty() ? defaultContentType : consumes.get(0);
+                        operation.addExtension(EXT_CONTENT_TYPE, contentType);
+                    }
+                    String[] accepts = getAccepts(openAPI, operation);
+                    operation.addExtension("x-accepts", accepts);
+                }
+            }
+        }
+    }
+
+    private String[] getAccepts(OpenAPI openAPIArg, Operation operation) {
+        final Set<String> producesInfo = getProducesInfo(openAPIArg, operation);
+        if (producesInfo != null && !producesInfo.isEmpty()) {
+            return producesInfo.toArray(new String[] {});
+        }
+        return new String[] { CONTENT_TYPE_APPLICATION_JSON }; // default media type
     }
 
     @Override
@@ -910,8 +941,8 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
             }
 
             // Remove the "*/*" contentType from operations as it is ambiguous
-            if (CONTENT_TYPE_ANY.equals(op.vendorExtensions.get("x-contentType"))) {
-                op.vendorExtensions.put("x-contentType", CONTENT_TYPE_APPLICATION_JSON);
+            if (CONTENT_TYPE_ANY.equals(op.vendorExtensions.get(EXT_CONTENT_TYPE))) {
+                op.vendorExtensions.put(EXT_CONTENT_TYPE, CONTENT_TYPE_APPLICATION_JSON);
             }
             op.consumes = op.consumes == null ? null : op.consumes.stream()
                 .filter(contentType -> !CONTENT_TYPE_ANY.equals(contentType.get("mediaType")))
@@ -936,18 +967,26 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
             // Force form parameters are only set if the content-type is according
             // formParams correspond to urlencoded type
             // bodyParams correspond to multipart body
-            if (CONTENT_TYPE_APPLICATION_FORM_URLENCODED.equals(op.vendorExtensions.get("x-contentType"))) {
+            if (CONTENT_TYPE_APPLICATION_FORM_URLENCODED.equals(op.vendorExtensions.get(EXT_CONTENT_TYPE))) {
                 op.formParams.addAll(op.bodyParams);
                 op.bodyParams.forEach(p -> {
                     p.isBodyParam = false;
                     p.isFormParam = true;
                 });
                 op.bodyParams.clear();
-            } else if (CONTENT_TYPE_MULTIPART_FORM_DATA.equals(op.vendorExtensions.get("x-contentType"))) {
+            } else if (CONTENT_TYPE_MULTIPART_FORM_DATA.equals(op.vendorExtensions.get(EXT_CONTENT_TYPE))) {
                 op.bodyParams.addAll(op.formParams);
+                for (var param : op.allParams) {
+                    if (param.isFormParam) {
+                        param.isBodyParam = true;
+                        param.isFormParam = false;
+                        param.vendorExtensions.put("isPart", true);
+                    }
+                }
                 op.formParams.forEach(p -> {
                     p.isBodyParam = true;
                     p.isFormParam = false;
+                    p.vendorExtensions.put("isPart", true);
                 });
                 op.formParams.clear();
             }
@@ -1850,6 +1889,8 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
             example = "ByteArray(10)";
         } else if ("BigDecimal".equals(dataType)) {
             example = "BigDecimal(\"78\")";
+        } else if ("MultipartBody".equals(dataType)) {
+            example = "MultipartBody.builder().build()";
         } else if (allowableValues != null && !allowableValues.isEmpty()) {
             // This is an enum
             Object value = example;
