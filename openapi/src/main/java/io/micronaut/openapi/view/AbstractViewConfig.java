@@ -37,6 +37,7 @@ import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENA
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_SERVER_CONTEXT_PATH;
 import static io.micronaut.openapi.visitor.StringUtil.PLACEHOLDER_POSTFIX;
 import static io.micronaut.openapi.visitor.StringUtil.PLACEHOLDER_PREFIX;
+import static io.micronaut.openapi.visitor.StringUtil.QUOTE;
 import static io.micronaut.openapi.visitor.StringUtil.SLASH;
 
 /**
@@ -295,7 +296,7 @@ abstract class AbstractViewConfig implements Toggleable {
      * @return A quoted String.
      */
     static Object asQuotedString(String v) {
-        return v == null ? null : "\"" + v + '"';
+        return v == null ? null : QUOTE + v + QUOTE;
     }
 
     /**
