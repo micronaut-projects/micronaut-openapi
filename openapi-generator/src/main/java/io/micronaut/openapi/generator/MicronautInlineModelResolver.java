@@ -138,7 +138,7 @@ public final class MicronautInlineModelResolver {
 
         for (Map.Entry<String, PathItem> pathsEntry : paths.entrySet()) {
             PathItem path = pathsEntry.getValue();
-            if (path.get$ref() != null) {
+            if (path.get$ref() != null && path.get$ref().startsWith("#/components/pathItems/")) {
                 path = openAPI.getComponents().getPathItems().get(path.get$ref().substring("#/components/pathItems/".length()));
             }
             var operationsMap = new LinkedHashMap<>(path.readOperationsMap());
@@ -183,7 +183,7 @@ public final class MicronautInlineModelResolver {
             String key = responsesEntry.getKey();
             ApiResponse response = responsesEntry.getValue();
 
-            if (response.get$ref() != null) {
+            if (response.get$ref() != null && response.get$ref().startsWith("#/components/responses/")) {
                 response = openAPI.getComponents().getResponses().get(response.get$ref().substring("#/components/responses/".length()));
             }
 
@@ -261,7 +261,7 @@ public final class MicronautInlineModelResolver {
                 continue;
             }
 
-            if (parameter.get$ref() != null) {
+            if (parameter.get$ref() != null && parameter.get$ref().startsWith("#/components/parameters/")) {
                 if (openAPI.getComponents().getParameters() != null) {
                     parameter = openAPI.getComponents().getParameters().get(parameter.get$ref().substring("#/components/parameters/".length()));
                 }
@@ -312,7 +312,7 @@ public final class MicronautInlineModelResolver {
             }
 
             Schema parameterSchema = null;
-            if (parameter.get$ref() != null) {
+            if (parameter.get$ref() != null && parameter.get$ref().startsWith("#/components/parameters/")) {
                 if (openAPI.getComponents().getParameters() != null) {
                     var param = openAPI.getComponents().getParameters().get(parameter.get$ref().substring("#/components/parameters/".length()));
                     parameterSchema = param.getSchema();

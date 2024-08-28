@@ -1,0 +1,8 @@
+openapi: "3.0.0"
+info:
+  version: 1.0.0
+  title: Swagger Sample
+  description: Multi-file for OpenAPI Specification.
+paths:
+  /api/customer/{id}/files:
+    $ref: "./paths/files.yml"

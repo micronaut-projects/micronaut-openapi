@@ -703,4 +703,45 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                 );
             """);
     }
+
+    @Test
+    void testGenerateByMultipleFiles() {
+
+        var codegen = new JavaMicronautClientCodegen();
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/multiple/swagger.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String path = outputPath + "src/main/java/org/openapitools/";
+
+        assertFileContains(path + "api/CustomerApi.java",
+            """
+                    @Post("/api/customer/{id}/files")
+                    Mono<HttpResponse<@NotNull String>> uploadFile(
+                        @PathVariable("id") @NotNull UUID id,
+                        @Body @NotNull @Valid FileCreateDto fileCreateDto
+                    );
+                """);
+        assertFileContains(path + "model/FileCreateDto.java",
+            """
+                public class FileCreateDto {
+                
+                    public static final String JSON_PROPERTY_TYPE_CODE = "typeCode";
+                    public static final String JSON_PROPERTY_ORG_NAME = "orgName";
+                
+                    /**
+                     * Customer type ORG
+                     */
+                    @NotNull
+                    @Pattern(regexp = "^ORG$")
+                    @JsonProperty(JSON_PROPERTY_TYPE_CODE)
+                    private String typeCode = "ORG";
+                
+                    @NotNull
+                    @JsonProperty(JSON_PROPERTY_ORG_NAME)
+                    private String orgName;
+                
+                    public FileCreateDto(String typeCode, String orgName) {
+                        this.typeCode = typeCode;
+                        this.orgName = orgName;
+                    }
+                """);
+    }
 }
