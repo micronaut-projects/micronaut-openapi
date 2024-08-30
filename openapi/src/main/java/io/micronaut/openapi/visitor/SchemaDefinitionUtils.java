@@ -2698,6 +2698,16 @@ public final class SchemaDefinitionUtils {
         Map<String, Schema> schemas = SchemaUtils.resolveSchemas(Utils.resolveOpenApi(context));
         ClassElement customElementType = getCustomSchema(elementType.getName(), elementType.getTypeArguments(), context);
         var elType = customElementType != null ? customElementType : elementType;
+
+        // check schema annotation
+        var schemaAnn = element.getAnnotation(io.swagger.v3.oas.annotations.media.Schema.class);
+        if (schemaAnn != null) {
+            var implClass = schemaAnn.annotationClassValue(PROP_IMPLEMENTATION).orElse(null);
+            if (implClass != null) {
+                elType = context.getClassElement(implClass.getName()).orElse(elType);
+            }
+        }
+
         String schemaName = computeDefaultSchemaName(stringValue(element, io.swagger.v3.oas.annotations.media.Schema.class, PROP_NAME).orElse(null),
             null, elType, elementType.getTypeArguments(), context, null);
         Schema<?> wrappedPropertySchema = schemas.get(schemaName);

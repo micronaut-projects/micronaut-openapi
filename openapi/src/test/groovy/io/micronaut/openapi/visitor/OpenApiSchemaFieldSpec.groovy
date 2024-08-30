@@ -1136,4 +1136,57 @@ class MyBean {}
         schemas.MyDto2.properties.field2.allOf.size() == 1
         schemas.MyDto2.properties.field2.allOf[0].$ref == '#/components/schemas/MyDto'
     }
+
+    void "test unwrap with custom schema implementation"() {
+
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Put;
+import io.swagger.v3.oas.annotations.media.Schema;
+
+@Controller
+class HelloController {
+
+    @Put("/sendModelWithDiscriminator")
+    Car sendModelWithDiscriminator() {
+        return null;
+    }
+}
+
+record Car(
+    String model, 
+    @JsonUnwrapped @Schema(implementation = ResourcePath.class) Resource resource,
+    boolean selected
+) { }
+
+abstract class Resource {
+}
+
+abstract class ResourcePath extends Resource {
+
+  public String resourcePath;
+  public String resourceType;
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        then: "the state is correct"
+        Utils.testReference != null
+
+        when: "The OpenAPI is retrieved"
+        def openApi = Utils.testReference
+        def schemas = openApi.components.schemas
+
+        then: "the components are valid"
+        schemas.Car
+        schemas.Car.properties.model
+        schemas.Car.properties.resourcePath
+        schemas.Car.properties.resourceType
+        schemas.Car.properties.selected
+    }
 }
