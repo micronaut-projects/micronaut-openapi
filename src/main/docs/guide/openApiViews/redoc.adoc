@@ -31,7 +31,7 @@ The views will be generated to the `META-INF/swagger/views/redoc` directory of y
 | `redoc.hide-loading` |
 |===
 
-See https://github.com/Redocly/redoc#redoc-options-object[Redoc Options] for a description of the above properties.
+See https://github.com/Redocly/redoc/blob/main/docs/config.md[Redoc config] for a description of the above properties.
 
 To expose the `redoc` views, you also must expose the generated `yaml`:
 
