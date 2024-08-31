@@ -22,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonView;
 import io.micronaut.core.annotation.AnnotationMetadata;
 import io.micronaut.core.annotation.AnnotationValue;
 import io.micronaut.core.annotation.Internal;
+import io.micronaut.core.reflect.ClassUtils;
 import io.micronaut.http.HttpRequest;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.annotation.Header;
@@ -42,6 +43,15 @@ import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.nio.ByteBuffer;
 import java.security.Principal;
+import java.time.LocalTime;
+import java.time.MonthDay;
+import java.time.OffsetDateTime;
+import java.time.OffsetTime;
+import java.time.Period;
+import java.time.Year;
+import java.time.YearMonth;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -240,6 +250,20 @@ public final class ElementUtils {
             || parameter.hasAnnotation("org.springframework.web.bind.annotation.SessionAttribute")
             || parameter.hasAnnotation("org.springframework.web.bind.annotation.SessionAttributes")
             || isIgnoredParameterType(parameter.getType());
+    }
+
+    public static boolean isJavaBasicType(String typeName) {
+        return ClassUtils.isJavaBasicType(typeName)
+            || LocalTime.class.getName().equals(typeName)
+            || OffsetTime.class.getName().equals(typeName)
+            || OffsetDateTime.class.getName().equals(typeName)
+            || Period.class.getName().equals(typeName)
+            || YearMonth.class.getName().equals(typeName)
+            || Year.class.getName().equals(typeName)
+            || MonthDay.class.getName().equals(typeName)
+            || ZoneId.class.getName().equals(typeName)
+            || ZoneOffset.class.getName().equals(typeName)
+            ;
     }
 
     public static boolean isIgnoredParameterType(ClassElement parameterType) {

@@ -59,7 +59,6 @@ import io.micronaut.inject.ast.TypedElement;
 import io.micronaut.inject.ast.WildcardElement;
 import io.micronaut.inject.visitor.VisitorContext;
 import io.micronaut.openapi.OpenApiUtils;
-import io.micronaut.openapi.annotation.OpenAPIExtraSchema;
 import io.micronaut.openapi.javadoc.JavadocDescription;
 import io.micronaut.openapi.swagger.core.util.PrimitiveType;
 import io.swagger.v3.oas.annotations.Hidden;
@@ -200,6 +199,7 @@ import static io.micronaut.openapi.visitor.ProtoUtils.protobufTypeSchema;
 import static io.micronaut.openapi.visitor.SchemaUtils.EMPTY_SCHEMA;
 import static io.micronaut.openapi.visitor.SchemaUtils.TYPE_ARRAY;
 import static io.micronaut.openapi.visitor.SchemaUtils.TYPE_OBJECT;
+import static io.micronaut.openapi.visitor.SchemaUtils.appendSchema;
 import static io.micronaut.openapi.visitor.SchemaUtils.getSchemaByRef;
 import static io.micronaut.openapi.visitor.SchemaUtils.processExtensions;
 import static io.micronaut.openapi.visitor.SchemaUtils.setAllowableValues;
@@ -271,12 +271,12 @@ public final class SchemaDefinitionUtils {
 
         String elType = SchemaUtils.getType(schema);
         String elFormat = schema.getFormat();
-        if (elType == null && type instanceof TypedElement typedEl) {
+        if (elType == null && type instanceof ClassElement classEl) {
             Pair<String, String> typeAndFormat;
-            if (typedEl instanceof EnumElement enumEl) {
+            if (classEl instanceof EnumElement enumEl) {
                 typeAndFormat = ConvertUtils.checkEnumJsonValueType(context, enumEl, null, elFormat);
             } else {
-                typeAndFormat = ConvertUtils.getTypeAndFormatByClass(typedEl.getName(), typedEl.isArray());
+                typeAndFormat = ConvertUtils.getTypeAndFormatByClass(classEl.getName(), classEl.isArray(), classEl);
             }
             elType = typeAndFormat.getFirst();
             schema.setType(elType);
@@ -335,12 +335,10 @@ public final class SchemaDefinitionUtils {
             schemaValue = type.getDeclaredAnnotation(io.swagger.v3.oas.annotations.media.Schema.class);
         }
 
-        var isExtraSchema = type.getAnnotation(OpenAPIExtraSchema.class) != null;
-
         Schema schema;
         Map<String, Schema> schemas = SchemaUtils.resolveSchemas(openAPI);
         if (schemaValue == null) {
-            final boolean isBasicType = ClassUtils.isJavaBasicType(type.getName());
+            final boolean isBasicType = ElementUtils.isJavaBasicType(type.getName());
             final PrimitiveType primitiveType;
             if (isBasicType) {
                 primitiveType = ClassUtils.forName(type.getName(), SchemaDefinitionUtils.class.getClassLoader())
@@ -589,7 +587,7 @@ public final class SchemaDefinitionUtils {
      * @return The schema or null if it cannot be resolved
      */
     @Nullable
-    public static Schema<?> resolveSchema(@Nullable Element definingElement, ClassElement type, VisitorContext context, List<MediaType> mediaTypes, @Nullable ClassElement jsonViewClass) {
+    public static Schema<?> resolveSchema(@Nullable Element definingElement, @Nullable ClassElement type, VisitorContext context, List<MediaType> mediaTypes, @Nullable ClassElement jsonViewClass) {
         return resolveSchema(Utils.resolveOpenApi(context), definingElement, type, context, mediaTypes, jsonViewClass, null, null);
     }
 
@@ -607,7 +605,7 @@ public final class SchemaDefinitionUtils {
      * @return The schema or null if it cannot be resolved
      */
     @Nullable
-    public static Schema<?> resolveSchema(OpenAPI openApi, @Nullable Element definingElement, ClassElement type, VisitorContext context,
+    public static Schema<?> resolveSchema(OpenAPI openApi, @Nullable Element definingElement, @Nullable ClassElement type, VisitorContext context,
                                           List<MediaType> mediaTypes, @Nullable ClassElement jsonViewClass,
                                           JavadocDescription fieldJavadoc, JavadocDescription classJavadoc) {
 
@@ -1393,14 +1391,17 @@ public final class SchemaDefinitionUtils {
                                                       AnnotationValue<io.swagger.v3.oas.annotations.media.Schema> schemaAnn,
                                                       @Nullable ClassElement jsonViewClass) {
 
-        ClassElement classElement = element.getType();
+        ClassElement classEl = element.getType();
+        if (ElementUtils.isContainerType(classEl)) {
+            classEl = classEl.getFirstTypeArgument().orElse(context.getClassElement("java.lang.Object").orElse(classEl));
+        }
         Pair<String, String> typeAndFormat;
-        if (classElement.isIterable()) {
+        if (classEl.isIterable()) {
             typeAndFormat = Pair.of(TYPE_ARRAY, null);
-        } else if (classElement instanceof EnumElement enumEl) {
+        } else if (classEl instanceof EnumElement enumEl) {
             typeAndFormat = ConvertUtils.checkEnumJsonValueType(context, enumEl, null, null);
         } else {
-            typeAndFormat = ConvertUtils.getTypeAndFormatByClass(classElement.getName(), classElement.isArray());
+            typeAndFormat = ConvertUtils.getTypeAndFormatByClass(classEl.getName(), classEl.isArray(), classEl);
         }
 
         JsonNode schemaJson = toJson(schemaAnn.getValues(), context, jsonViewClass);
@@ -1507,7 +1508,7 @@ public final class SchemaDefinitionUtils {
                             if (elementType instanceof EnumElement enumEl) {
                                 typeAndFormat = ConvertUtils.checkEnumJsonValueType(context, enumEl, null, elFormat);
                             } else {
-                                typeAndFormat = ConvertUtils.getTypeAndFormatByClass(elementType.getName(), elementType.isArray());
+                                typeAndFormat = ConvertUtils.getTypeAndFormatByClass(elementType.getName(), elementType.isArray(), elementType);
                             }
                             elType = typeAndFormat.getFirst();
                             if (elFormat == null) {
@@ -1866,7 +1867,7 @@ public final class SchemaDefinitionUtils {
             } else if (element instanceof EnumElement enumEl) {
                 typeAndFormat = ConvertUtils.checkEnumJsonValueType(context, enumEl, null, null);
             } else {
-                typeAndFormat = ConvertUtils.getTypeAndFormatByClass(classElement.getName(), classElement.isArray());
+                typeAndFormat = ConvertUtils.getTypeAndFormatByClass(classElement.getName(), classElement.isArray(), classElement);
             }
         }
         var elType = type != null ? type : typeAndFormat != null ? typeAndFormat.getFirst() : null;
@@ -2453,6 +2454,11 @@ public final class SchemaDefinitionUtils {
                                                          AnnotationValue<io.swagger.v3.oas.annotations.media.Schema> schemaAnn,
                                                          @Nullable ClassElement jsonViewClass) {
 
+        if (schemaAnn != null && schemaAnn.annotationClassValue(PROP_IMPLEMENTATION).isEmpty()) {
+            var resolvedSchema = resolveSchema(element, element != null ? element.getType() : null, context, List.of(), null);
+            schemaToBind = appendSchema(schemaToBind, resolvedSchema);
+        }
+
         // need to set placeholders to set correct values and types to example field
         schemaJson = resolvePlaceholders(schemaJson, s -> expandProperties(s, getExpandableProperties(context), context));
         try {
@@ -2478,7 +2484,7 @@ public final class SchemaDefinitionUtils {
             if (typeEl instanceof EnumElement enumEl) {
                 typeAndFormat = ConvertUtils.checkEnumJsonValueType(context, enumEl, null, elFormat);
             } else {
-                typeAndFormat = ConvertUtils.getTypeAndFormatByClass(typeEl.getName(), typeEl.isArray());
+                typeAndFormat = ConvertUtils.getTypeAndFormatByClass(typeEl.getName(), typeEl.isArray(), typeEl);
             }
             elType = typeAndFormat.getFirst();
             if (elFormat == null) {
@@ -2490,6 +2496,7 @@ public final class SchemaDefinitionUtils {
             setDefaultValueObject(schemaToBind, defaultValue, element, elType, elFormat, false, context);
         }
         setAllowableValues(schemaToBind, allowableValues, element, elType, elFormat, context);
+
         return schemaToBind;
     }
 

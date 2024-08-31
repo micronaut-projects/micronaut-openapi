@@ -15,22 +15,7 @@
  */
 package io.micronaut.openapi.swagger.core.util;
 
-import java.io.File;
-import java.lang.reflect.Type;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.concurrent.ConcurrentHashMap;
-
+import com.fasterxml.jackson.databind.type.TypeFactory;
 import io.swagger.v3.oas.models.media.BinarySchema;
 import io.swagger.v3.oas.models.media.BooleanSchema;
 import io.swagger.v3.oas.models.media.ByteArraySchema;
@@ -43,7 +28,37 @@ import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.media.StringSchema;
 import io.swagger.v3.oas.models.media.UUIDSchema;
 
-import com.fasterxml.jackson.databind.type.TypeFactory;
+import java.io.File;
+import java.lang.reflect.Type;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.nio.charset.Charset;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.MonthDay;
+import java.time.OffsetDateTime;
+import java.time.OffsetTime;
+import java.time.Period;
+import java.time.Year;
+import java.time.YearMonth;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import java.util.TimeZone;
+import java.util.TreeMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static java.util.Map.entry;
 
@@ -58,22 +73,22 @@ import static java.util.Map.entry;
 public enum PrimitiveType {
     STRING(String.class, "string") {
         @Override
-        public Schema createProperty() {
+        public Schema<?> createProperty() {
             return new StringSchema();
         }
     },
     BOOLEAN(Boolean.class, "boolean") {
         @Override
-        public Schema createProperty() {
+        public Schema<?> createProperty() {
             return new BooleanSchema();
         }
     },
     BYTE(Byte.class, "byte") {
         @Override
-        public Schema createProperty() {
+        public Schema<?> createProperty() {
             if (
-                    (System.getProperty(Schema.BINARY_STRING_CONVERSION_PROPERTY) != null && System.getProperty(Schema.BINARY_STRING_CONVERSION_PROPERTY).equals(Schema.BynaryStringConversion.BINARY_STRING_CONVERSION_STRING_SCHEMA.toString())) ||
-                            (System.getenv(Schema.BINARY_STRING_CONVERSION_PROPERTY) != null && System.getenv(Schema.BINARY_STRING_CONVERSION_PROPERTY).equals(Schema.BynaryStringConversion.BINARY_STRING_CONVERSION_STRING_SCHEMA.toString()))) {
+                (System.getProperty(Schema.BINARY_STRING_CONVERSION_PROPERTY) != null && System.getProperty(Schema.BINARY_STRING_CONVERSION_PROPERTY).equals(Schema.BynaryStringConversion.BINARY_STRING_CONVERSION_STRING_SCHEMA.toString())) ||
+                    (System.getenv(Schema.BINARY_STRING_CONVERSION_PROPERTY) != null && System.getenv(Schema.BINARY_STRING_CONVERSION_PROPERTY).equals(Schema.BynaryStringConversion.BINARY_STRING_CONVERSION_STRING_SCHEMA.toString()))) {
                 return new StringSchema().format("byte");
             }
             return new ByteArraySchema();
@@ -81,10 +96,10 @@ public enum PrimitiveType {
     },
     BINARY(Byte.class, "binary") {
         @Override
-        public Schema createProperty() {
+        public Schema<?> createProperty() {
             if (
-                    (System.getProperty(Schema.BINARY_STRING_CONVERSION_PROPERTY) != null && System.getProperty(Schema.BINARY_STRING_CONVERSION_PROPERTY).equals(Schema.BynaryStringConversion.BINARY_STRING_CONVERSION_STRING_SCHEMA.toString())) ||
-                            (System.getenv(Schema.BINARY_STRING_CONVERSION_PROPERTY) != null && System.getenv(Schema.BINARY_STRING_CONVERSION_PROPERTY).equals(Schema.BynaryStringConversion.BINARY_STRING_CONVERSION_STRING_SCHEMA.toString()))) {
+                (System.getProperty(Schema.BINARY_STRING_CONVERSION_PROPERTY) != null && System.getProperty(Schema.BINARY_STRING_CONVERSION_PROPERTY).equals(Schema.BynaryStringConversion.BINARY_STRING_CONVERSION_STRING_SCHEMA.toString())) ||
+                    (System.getenv(Schema.BINARY_STRING_CONVERSION_PROPERTY) != null && System.getenv(Schema.BINARY_STRING_CONVERSION_PROPERTY).equals(Schema.BynaryStringConversion.BINARY_STRING_CONVERSION_STRING_SCHEMA.toString()))) {
                 return new StringSchema().format("binary");
             }
             return new BinarySchema();
@@ -92,19 +107,19 @@ public enum PrimitiveType {
     },
     URI(java.net.URI.class, "uri") {
         @Override
-        public Schema createProperty() {
+        public Schema<?> createProperty() {
             return new StringSchema().format("uri");
         }
     },
     URL(java.net.URL.class, "url") {
         @Override
-        public Schema createProperty() {
+        public Schema<?> createProperty() {
             return new StringSchema().format("url");
         }
     },
     EMAIL(String.class, "email") {
         @Override
-        public Schema createProperty() {
+        public Schema<?> createProperty() {
             return new StringSchema().format("email");
         }
     },
@@ -122,37 +137,37 @@ public enum PrimitiveType {
     },
     LONG(Long.class, "long") {
         @Override
-        public Schema createProperty() {
+        public Schema<?> createProperty() {
             return new IntegerSchema().format("int64");
         }
     },
     FLOAT(Float.class, "float") {
         @Override
-        public Schema createProperty() {
+        public Schema<?> createProperty() {
             return new NumberSchema().format("float");
         }
     },
     DOUBLE(Double.class, "double") {
         @Override
-        public Schema createProperty() {
+        public Schema<?> createProperty() {
             return new NumberSchema().format("double");
         }
     },
     INTEGER(BigInteger.class) {
         @Override
-        public Schema createProperty() {
+        public Schema<?> createProperty() {
             return new IntegerSchema().format(null);
         }
     },
     DECIMAL(BigDecimal.class, "number") {
         @Override
-        public Schema createProperty() {
+        public Schema<?> createProperty() {
             return new NumberSchema();
         }
     },
     NUMBER(Number.class, "number") {
         @Override
-        public Schema createProperty() {
+        public Schema<?> createProperty() {
             return new NumberSchema();
         }
     },
@@ -170,7 +185,7 @@ public enum PrimitiveType {
     },
     PARTIAL_TIME(LocalTime.class, "partial-time") {
         @Override
-        public Schema createProperty() {
+        public Schema<?> createProperty() {
             return new StringSchema().format("partial-time");
         }
     },
@@ -182,8 +197,8 @@ public enum PrimitiveType {
     },
     OBJECT(Object.class) {
         @Override
-        public Schema createProperty() {
-            return new Schema().type("object");
+        public Schema<?> createProperty() {
+            return new Schema<>().type("object");
         }
     };
 
@@ -238,7 +253,6 @@ public enum PrimitiveType {
     static {
         systemPrefixes.add("java.");
         systemPrefixes.add("javax.");
-        nonSystemTypes.add("java.time.LocalTime");
 
         datatypeMappings = Map.ofEntries(
             entry("integer_int32", "integer"),
@@ -262,9 +276,9 @@ public enum PrimitiveType {
             entry("object_", "object")
         );
 
-        final Map<Class<?>, PrimitiveType> keyClasses = new HashMap<>();
+        final var keyClasses = new HashMap<Class<?>, PrimitiveType>();
         addKeys(keyClasses, BOOLEAN, Boolean.class, Boolean.TYPE);
-        addKeys(keyClasses, STRING, String.class, Character.class, Character.TYPE);
+        addKeys(keyClasses, STRING, String.class, Character.class, CharSequence.class, Character.TYPE);
         addKeys(keyClasses, BYTE, Byte.class, Byte.TYPE);
         addKeys(keyClasses, URL, java.net.URL.class);
         addKeys(keyClasses, URI, java.net.URI.class);
@@ -280,31 +294,48 @@ public enum PrimitiveType {
         addKeys(keyClasses, DATE_TIME, Date.class);
         addKeys(keyClasses, FILE, File.class);
         addKeys(keyClasses, OBJECT, Object.class);
+
+        // OpenAPI specification haven't 'format' for these 'java.time' classes and other 'java.util' classes
+        addKeys(keyClasses, STRING,
+            Duration.class,
+            Period.class,
+            LocalTime.class,
+            OffsetTime.class,
+            YearMonth.class,
+            Year.class,
+            MonthDay.class,
+            ZoneId.class,
+            ZoneOffset.class,
+            TimeZone.class,
+            Charset.class,
+            Locale.class
+        );
+
         KEY_CLASSES = Collections.unmodifiableMap(keyClasses);
 
-        final Map<Class<?>, Collection<PrimitiveType>> multiKeyClasses = new HashMap<>();
+        final var multiKeyClasses = new HashMap<Class<?>, Collection<PrimitiveType>>();
         addMultiKeys(multiKeyClasses, BYTE, byte[].class);
         addMultiKeys(multiKeyClasses, BINARY, byte[].class);
         MULTI_KEY_CLASSES = Collections.unmodifiableMap(multiKeyClasses);
 
-        final Map<Class<?>, PrimitiveType> baseClasses = new HashMap<>();
+        final var baseClasses = new HashMap<Class<?>, PrimitiveType>();
         addKeys(baseClasses, DATE_TIME, Date.class, Calendar.class);
         BASE_CLASSES = Collections.unmodifiableMap(baseClasses);
 
-        final Map<String, PrimitiveType> externalClasses = new HashMap<>();
-        addKeys(externalClasses, DATE, "org.joda.time.LocalDate", "java.time.LocalDate");
+        final var externalClasses = new HashMap<String, PrimitiveType>();
+        addKeys(externalClasses, DATE, "org.joda.time.LocalDate", LocalDate.class.getName());
         addKeys(externalClasses, DATE_TIME,
-            "java.time.LocalDateTime",
-            "java.time.ZonedDateTime",
-            "java.time.OffsetDateTime",
+            LocalDateTime.class.getName(),
+            ZonedDateTime.class.getName(),
+            OffsetDateTime.class.getName(),
+            Instant.class.getName(),
             "javax.xml.datatype.XMLGregorianCalendar",
             "org.joda.time.LocalDateTime",
             "org.joda.time.ReadableDateTime",
-            "org.joda.time.DateTime",
-            "java.time.Instant");
+            "org.joda.time.DateTime");
         EXTERNAL_CLASSES = Collections.unmodifiableMap(externalClasses);
 
-        final Map<String, PrimitiveType> names = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+        var names = new TreeMap<String, PrimitiveType>(String.CASE_INSENSITIVE_ORDER);
         for (PrimitiveType item : values()) {
             final String name = item.commonName;
             if (name != null) {
@@ -330,7 +361,6 @@ public enum PrimitiveType {
      * Adds support for custom mapping of classes to primitive types
      *
      * @return Set of custom classes to primitive type
-     *
      * @since 2.0.6
      */
     public static Set<String> customExcludedClasses() {
@@ -341,7 +371,6 @@ public enum PrimitiveType {
      * Adds support for custom mapping of classes to primitive types
      *
      * @return Set of custom classes to primitive type
-     *
      * @since 2.1.2
      */
     public static Set<String> customExcludedExternalClasses() {
@@ -352,7 +381,6 @@ public enum PrimitiveType {
      * Adds support for custom mapping of classes to primitive types
      *
      * @return Map of custom classes to primitive type
-     *
      * @since 2.0.6
      */
     public static Map<String, PrimitiveType> customClasses() {
@@ -363,7 +391,6 @@ public enum PrimitiveType {
      * class qualified names prefixes to be considered as "system" types
      *
      * @return Mutable set of class qualified names prefixes to be considered as "system" types
-     *
      * @since 2.0.6
      */
     public static Set<String> systemPrefixes() {
@@ -374,7 +401,6 @@ public enum PrimitiveType {
      * class qualified names NOT to be considered as "system" types
      *
      * @return Mutable set of class qualified names NOT to be considered as "system" types
-     *
      * @since 2.0.6
      */
     public static Set<String> nonSystemTypes() {
@@ -385,7 +411,6 @@ public enum PrimitiveType {
      * package names NOT to be considered as "system" types
      *
      * @return Mutable set of package names NOT to be considered as "system" types
-     *
      * @since 2.0.6
      */
     public static Set<String> nonSystemTypePackages() {
@@ -399,10 +424,10 @@ public enum PrimitiveType {
             return fromType(type);
         } else {
             return keys
-                    .stream()
-                    .filter(t -> t.getCommonName().equalsIgnoreCase(format))
-                    .findAny()
-                    .orElse(null);
+                .stream()
+                .filter(t -> t.getCommonName().equalsIgnoreCase(format))
+                .findAny()
+                .orElse(null);
         }
     }
 
@@ -457,12 +482,12 @@ public enum PrimitiveType {
         return fromName(datatypeMappings.get(String.format("%s_%s", type != null && !type.isBlank() ? type : "", format != null && !format.isBlank() ? format : "")));
     }
 
-    public static Schema createProperty(Type type) {
+    public static Schema<?> createProperty(Type type) {
         final PrimitiveType item = fromType(type);
         return item == null ? null : item.createProperty();
     }
 
-    public static Schema createProperty(String name) {
+    public static Schema<?> createProperty(String name) {
         final PrimitiveType item = fromName(name);
         return item == null ? null : item.createProperty();
     }
@@ -480,7 +505,7 @@ public enum PrimitiveType {
         return commonName;
     }
 
-    public abstract Schema createProperty();
+    public abstract Schema<?> createProperty();
 
     @SafeVarargs
     private static <K> void addKeys(Map<K, PrimitiveType> map, PrimitiveType type, K... keys) {
