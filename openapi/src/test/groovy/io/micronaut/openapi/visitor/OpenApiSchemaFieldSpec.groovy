@@ -1402,4 +1402,49 @@ class MyBean {}
         schemas.User.properties.id.format == "int32"
         schemas.User.properties.name.type == "string"
     }
+
+    void "test example set null"() {
+
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Put;import io.swagger.v3.oas.annotations.media.Schema;import jakarta.validation.constraints.Pattern;
+import java.util.List;
+
+@Controller
+class HelloController {
+
+    @Put("/sendModelWithDiscriminator")
+    Parent sendModelWithDiscriminator() {
+        return null;
+    }
+}
+
+class Parent {
+
+    @Schema(nullable = true, example = "null")
+    public Integer id;
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        then: "the state is correct"
+        Utils.testReference != null
+
+        when: "The OpenAPI is retrieved"
+        def openApi = Utils.testReference
+        def schemas = openApi.components.schemas
+
+        then: "the components are valid"
+        schemas.Parent
+        schemas.Parent.properties.id
+        schemas.Parent.properties.id.type == 'integer'
+        schemas.Parent.properties.id.format == 'int32'
+        schemas.Parent.properties.id.nullable
+        schemas.Parent.properties.id.exampleSetFlag
+        schemas.Parent.properties.id.example == null
+    }
 }

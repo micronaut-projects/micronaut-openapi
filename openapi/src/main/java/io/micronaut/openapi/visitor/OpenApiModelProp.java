@@ -34,6 +34,7 @@ public interface OpenApiModelProp {
     String PROP_REF_DOLLAR = "$ref";
     String PROP_HIDDEN = "hidden";
     String PROP_EXAMPLE = "example";
+    String PROP_EXAMPLE_SET_FLAG = "exampleSetFlag";
     String PROP_EXAMPLES = "examples";
     String PROP_NOT = "not";
     String PROP_ALL_OF = "allOf";

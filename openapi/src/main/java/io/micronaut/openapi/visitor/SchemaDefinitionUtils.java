@@ -164,6 +164,7 @@ import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_DISCRIMINATOR_P
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_ENUM;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_EXAMPLE;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_EXAMPLES;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_EXAMPLE_SET_FLAG;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_EXPRESSION;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_EXTENSIONS;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_EXTERNAL_DOCS;
@@ -1336,6 +1337,9 @@ public final class SchemaDefinitionUtils {
                         newValues.remove(PROP_WRITE_ONLY);
                     }
                 } else {
+                    if (key.equals(PROP_EXAMPLE)) {
+                        newValues.put(PROP_EXAMPLE_SET_FLAG, true);
+                    }
                     var parsedJsonValue = parseJsonString(value);
                     newValues.put(key, parsedJsonValue != null ? parsedJsonValue : value);
                 }
@@ -2553,6 +2557,12 @@ public final class SchemaDefinitionUtils {
         } catch (IOException e) {
             warn("Error reading Swagger Schema for element [" + element + "]: " + e.getMessage(), context, element);
         }
+        // fix for example = "null"
+        if (schemaToBind.getExample() == null
+            && !schemaToBind.getExampleSetFlag()
+            && schemaJson.get(PROP_EXAMPLE_SET_FLAG) != null) {
+            schemaToBind.setExampleSetFlag(true);
+        }
 
         String defaultValue = null;
         String[] allowableValues = null;
@@ -2666,7 +2676,7 @@ public final class SchemaDefinitionUtils {
             if (entry.getKey().equals("specVersion")) {
                 continue;
             }
-            if (entry.getKey().equals("exampleSetFlag") && StringUtils.FALSE.equals(value.toString())) {
+            if (entry.getKey().equals(PROP_EXAMPLE_SET_FLAG) && StringUtils.FALSE.equals(value.toString())) {
                 continue;
             }
             valueMap.put(entry.getKey(), value);
