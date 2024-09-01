@@ -121,7 +121,7 @@ class MyBean {}
         parametersSchema instanceof Schema
 
         when:
-        Operation operation = openAPI.paths.get("/path").post
+        Operation operation = openAPI.paths."/path".post
 
         then:
         operation
@@ -143,27 +143,27 @@ class MyBean {}
         dtoSchema.properties.test.example.stampWidth == 220
         dtoSchema.properties.test.example.stampHeight == 85
         dtoSchema.properties.test.example.pageNumber == 1
+        dtoSchema.properties.test.default
+        dtoSchema.properties.test.default.stampWidth == 100
         dtoSchema.properties.test.allOf
         dtoSchema.properties.test.allOf.size() == 2
-        dtoSchema.properties.test.allOf.get(0).$ref == "#/components/schemas/Parameters"
-        dtoSchema.properties.test.allOf.get(1).default
-        dtoSchema.properties.test.allOf.get(1).default.stampWidth == 100
-        dtoSchema.properties.test.allOf.get(1).format == 'binary'
-        dtoSchema.properties.test.allOf.get(1).exclusiveMinimum
-        dtoSchema.properties.test.allOf.get(1).exclusiveMaximum
-        dtoSchema.properties.test.allOf.get(1).maximum == 100
-        dtoSchema.properties.test.allOf.get(1).minimum == 10
-        dtoSchema.properties.test.allOf.get(1).maximum == 100
-        dtoSchema.properties.test.allOf.get(1).minLength == 10
-        dtoSchema.properties.test.allOf.get(1).maxLength == 100
-        dtoSchema.properties.test.allOf.get(1).minProperties == 10
-        dtoSchema.properties.test.allOf.get(1).maxProperties == 100
-        dtoSchema.properties.test.allOf.get(1).multipleOf == 1.5
-        dtoSchema.properties.test.allOf.get(1).pattern == "ppp"
-        dtoSchema.properties.test.allOf.get(1).additionalProperties == true
+        dtoSchema.properties.test.allOf[0].$ref == "#/components/schemas/Parameters"
+        dtoSchema.properties.test.allOf[1].format == 'binary'
+        dtoSchema.properties.test.allOf[1].exclusiveMinimum
+        dtoSchema.properties.test.allOf[1].exclusiveMaximum
+        dtoSchema.properties.test.allOf[1].maximum == 100
+        dtoSchema.properties.test.allOf[1].minimum == 10
+        dtoSchema.properties.test.allOf[1].maximum == 100
+        dtoSchema.properties.test.allOf[1].minLength == 10
+        dtoSchema.properties.test.allOf[1].maxLength == 100
+        dtoSchema.properties.test.allOf[1].minProperties == 10
+        dtoSchema.properties.test.allOf[1].maxProperties == 100
+        dtoSchema.properties.test.allOf[1].multipleOf == 1.5
+        dtoSchema.properties.test.allOf[1].pattern == "ppp"
+        dtoSchema.properties.test.allOf[1].additionalProperties == true
         dtoSchema.properties.test.nullable
         dtoSchema.required.size() == 1
-        dtoSchema.required.get(0) == 'test'
+        dtoSchema.required[0] == 'test'
     }
 
     void "test schema example in class schema"() {
@@ -271,7 +271,7 @@ class MyBean {}
         parametersSchema
 
         when:
-        Operation operation = openAPI.paths.get("/path").post
+        Operation operation = openAPI.paths."/path".post
 
         then:
         operation
@@ -395,7 +395,7 @@ class MyBean {}
         parametersSchema instanceof Schema
 
         when:
-        Operation operation = openAPI.paths.get("/path").post
+        Operation operation = openAPI.paths."/path".post
 
         then:
         operation
@@ -411,7 +411,7 @@ class MyBean {}
         dtoSchema.properties.test.description == 'this is description'
         dtoSchema.properties.test.allOf
         dtoSchema.properties.test.allOf.size() == 1
-        dtoSchema.properties.test.allOf.get(0).$ref == "#/components/schemas/Parameters"
+        dtoSchema.properties.test.allOf[0].$ref == "#/components/schemas/Parameters"
         !dtoSchema.properties.test.default
         !dtoSchema.properties.test.example
         !dtoSchema.properties.test.deprecated
@@ -553,7 +553,7 @@ class MyBean {}
         globalParamsSchema
 
         when:
-        Operation operation = openAPI.paths.get("/path").post
+        Operation operation = openAPI.paths."/path".post
 
         then:
         operation
@@ -567,20 +567,20 @@ class MyBean {}
         ((Schema) operation.requestBody.content."application/json".schema).$ref == "#/components/schemas/MyDto"
 
         dtoSchema.properties.test instanceof ComposedSchema
-        dtoSchema.properties.test.allOf.get(0).$ref == '#/components/schemas/GlobalParams'
-        dtoSchema.properties.test.allOf.get(1).not
-        dtoSchema.properties.test.allOf.get(1).not.$ref == '#/components/schemas/LocalParams'
-        dtoSchema.properties.test.allOf.get(1).allOf.get(0).$ref == '#/components/schemas/LocalParams'
-        dtoSchema.properties.test.allOf.get(1).oneOf.get(0).$ref == '#/components/schemas/LocalParams'
-        dtoSchema.properties.test.allOf.get(1).anyOf.get(0).$ref == '#/components/schemas/LocalParams'
+        dtoSchema.properties.test.allOf[0].$ref == '#/components/schemas/GlobalParams'
+        dtoSchema.properties.test.allOf[1].allOf[0].$ref == '#/components/schemas/LocalParams'
+        dtoSchema.properties.test.not
+        dtoSchema.properties.test.not.$ref == '#/components/schemas/LocalParams'
+        dtoSchema.properties.test.oneOf[0].$ref == '#/components/schemas/LocalParams'
+        dtoSchema.properties.test.anyOf[0].$ref == '#/components/schemas/LocalParams'
 
         globalParamsSchema.properties.globalStampWidth.type == 'integer'
         globalParamsSchema.properties.globalStampWidth.format == 'int32'
 
         localParamsSchema.allOf.size() == 2
-        localParamsSchema.allOf.get(0).$ref == '#/components/schemas/GlobalParams'
-        localParamsSchema.allOf.get(1).properties.stampWidth.type == 'integer'
-        localParamsSchema.allOf.get(1).properties.stampWidth.format == 'int32'
+        localParamsSchema.allOf[0].$ref == '#/components/schemas/GlobalParams'
+        localParamsSchema.allOf[1].properties.stampWidth.type == 'integer'
+        localParamsSchema.allOf[1].properties.stampWidth.format == 'int32'
     }
 
     void "test schema on property level with implementation"() {
@@ -698,7 +698,7 @@ class MyBean {}
         globalParamsSchema
 
         when:
-        Operation operation = openAPI.paths.get("/path").post
+        Operation operation = openAPI.paths."/path".post
 
         then:
         operation
@@ -712,13 +712,13 @@ class MyBean {}
         ((Schema) operation.requestBody.content."application/json".schema).$ref == "#/components/schemas/MyDto"
 
         localParamsSchema.allOf.size() == 2
-        localParamsSchema.allOf.get(0).$ref == '#/components/schemas/GlobalParams'
-        localParamsSchema.allOf.get(1).properties.stampWidth.type == 'integer'
-        localParamsSchema.allOf.get(1).properties.stampWidth.format == 'int32'
+        localParamsSchema.allOf[0].$ref == '#/components/schemas/GlobalParams'
+        localParamsSchema.allOf[1].properties.stampWidth.type == 'integer'
+        localParamsSchema.allOf[1].properties.stampWidth.format == 'int32'
 
         dtoSchema.properties.test.description == 'this is description'
         dtoSchema.properties.test.allOf.size() == 1
-        dtoSchema.properties.test.allOf.get(0).$ref == '#/components/schemas/LocalParams'
+        dtoSchema.properties.test.allOf[0].$ref == '#/components/schemas/LocalParams'
     }
 
     void "test schema on class level with not/allOf/anyOf/oneOf"() {
@@ -839,7 +839,7 @@ class MyBean {}
         globalParamsSchema
 
         when:
-        Operation operation = openAPI.paths.get("/path").post
+        Operation operation = openAPI.paths."/path".post
 
         then:
         operation
@@ -855,18 +855,18 @@ class MyBean {}
         dtoSchema.description == 'this is description'
         dtoSchema.not
         dtoSchema.not.$ref == '#/components/schemas/LocalParams'
-        dtoSchema.allOf.get(0).$ref == '#/components/schemas/LocalParams'
-        dtoSchema.allOf.get(1).properties.parameters.$ref == '#/components/schemas/GlobalParams'
-        dtoSchema.oneOf.get(0).$ref == '#/components/schemas/LocalParams'
-        dtoSchema.anyOf.get(0).$ref == '#/components/schemas/LocalParams'
+        dtoSchema.allOf[0].$ref == '#/components/schemas/LocalParams'
+        dtoSchema.allOf[1].properties.parameters.$ref == '#/components/schemas/GlobalParams'
+        dtoSchema.oneOf[0].$ref == '#/components/schemas/LocalParams'
+        dtoSchema.anyOf[0].$ref == '#/components/schemas/LocalParams'
 
         globalParamsSchema.properties.globalStampWidth.type == 'integer'
         globalParamsSchema.properties.globalStampWidth.format == 'int32'
 
         localParamsSchema.allOf.size() == 2
-        localParamsSchema.allOf.get(0).$ref == '#/components/schemas/GlobalParams'
-        localParamsSchema.allOf.get(1).properties.stampWidth.type == 'integer'
-        localParamsSchema.allOf.get(1).properties.stampWidth.format == 'int32'
+        localParamsSchema.allOf[0].$ref == '#/components/schemas/GlobalParams'
+        localParamsSchema.allOf[1].properties.stampWidth.type == 'integer'
+        localParamsSchema.allOf[1].properties.stampWidth.format == 'int32'
     }
 
     void "test schema on property level with type"() {
@@ -1255,5 +1255,90 @@ class MyBean {}
         then: "the components are valid"
         schemas.AuditSearchCriteria.additionalProperties != null
         schemas.AuditSearchCriteria.additionalProperties == false
+    }
+
+    void "test jackson and swagger annotations together"() {
+
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import com.fasterxml.jackson.annotation.JsonClassDescription;import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyDescription;import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;import io.swagger.v3.oas.annotations.media.Schema;
+
+import java.io.Serializable;
+
+@Controller
+class HelloController {
+
+    @Get
+    ResourceSearchVO sendModelWithDiscriminator() {
+        return null;
+    }
+}
+
+@JsonClassDescription("Jackson schema description")
+class ResourceSearchVO implements Serializable {
+
+    /**
+     * Must be swagger description (javadoc)
+     */
+    @Schema(description = "Must be swagger description (swagger)")
+    @JsonPropertyDescription("Must be swagger description (jackson)")
+    public String swaggerDesc;
+    /**
+     * Must be jackson description (javadoc)
+     */
+    @JsonPropertyDescription("Must be jackson description (jackson)")
+    public String jacksonDesc;
+    /**
+     * Must be javadoc description (javadoc)
+     */
+    public String javadocDesc;
+    
+    @Schema(defaultValue = "VAL1")
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY, defaultValue = "VAL2")
+    public ResourceEnum type;
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY, defaultValue = "VAL2")
+    public ResourceEnum type1;
+    @Schema(accessMode = Schema.AccessMode.READ_ONLY, defaultValue = "VAL2")
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY, defaultValue = "VAL1")
+    public ResourceEnum type2;
+    public ResourceEnum type3;
+}
+
+enum ResourceEnum {
+    VAL1,
+    VAL2
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        then: "the state is correct"
+        Utils.testReference != null
+
+        when: "The OpenAPI is retrieved"
+        def openApi = Utils.testReference
+        def schemas = openApi.components.schemas
+
+        then: "the components are valid"
+        schemas.ResourceSearchVO
+        schemas.ResourceSearchVO.description == 'Jackson schema description'
+        schemas.ResourceSearchVO.properties.swaggerDesc.description == "Must be swagger description (swagger)"
+        schemas.ResourceSearchVO.properties.jacksonDesc.description == 'Must be jackson description (jackson)'
+        schemas.ResourceSearchVO.properties.javadocDesc.description == 'Must be javadoc description (javadoc)'
+        schemas.ResourceSearchVO.properties.type.allOf[0].$ref == '#/components/schemas/ResourceEnum'
+        schemas.ResourceSearchVO.properties.type.writeOnly == true
+        schemas.ResourceSearchVO.properties.type.default == "VAL1"
+        schemas.ResourceSearchVO.properties.type1.allOf[0].$ref == '#/components/schemas/ResourceEnum'
+        schemas.ResourceSearchVO.properties.type1.writeOnly == true
+        schemas.ResourceSearchVO.properties.type1.default == "VAL2"
+        schemas.ResourceSearchVO.properties.type2.allOf[0].$ref == '#/components/schemas/ResourceEnum'
+        schemas.ResourceSearchVO.properties.type2.readOnly == true
+        !schemas.ResourceSearchVO.properties.type2.writeOnly
+        schemas.ResourceSearchVO.properties.type2.default == "VAL2"
+        schemas.ResourceSearchVO.properties.type3.$ref == '#/components/schemas/ResourceEnum'
     }
 }

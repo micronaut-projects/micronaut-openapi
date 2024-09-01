@@ -90,4 +90,6 @@ public interface OpenApiModelProp {
     String PROP_FLOWS = "flows";
     String PROP_OPEN_ID_CONNECT_URL = "openIdConnectUrl";
     String PROP_BEARER_FORMAT = "bearerFormat";
+
+    String PROP_ACCESS = "access";
 }

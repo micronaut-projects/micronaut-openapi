@@ -522,6 +522,7 @@ public final class OpenApiNormalizeUtils {
 
         for (var entry : innerSchemas.entrySet()) {
             var innerSchema = entry.getValue();
+            innerSchema.setName(null);
             if (StringUtils.isNotEmpty(innerSchema.getTitle())) {
                 schema.setTitle(innerSchema.getTitle());
                 innerSchema.setTitle(null);
@@ -543,6 +544,22 @@ public final class OpenApiNormalizeUtils {
                     schema.setNullable(false);
                 }
                 innerSchema.setNullable(null);
+            }
+            if (innerSchema.getDefault() != null) {
+                schema.setDefault(innerSchema.getDefault());
+                innerSchema.setDefault(null);
+            }
+            if (innerSchema.getAnyOf() != null && schema.getAnyOf() == null) {
+                schema.setAnyOf(innerSchema.getAnyOf());
+                innerSchema.setAnyOf(null);
+            }
+            if (innerSchema.getOneOf() != null && schema.getOneOf() == null) {
+                schema.setOneOf(innerSchema.getOneOf());
+                innerSchema.setOneOf(null);
+            }
+            if (innerSchema.getNot() != null && schema.getNot() == null) {
+                schema.setNot(innerSchema.getNot());
+                innerSchema.setNot(null);
             }
             if (CollectionUtils.isNotEmpty(innerSchema.getRequired())) {
                 schema.setRequired(innerSchema.getRequired());

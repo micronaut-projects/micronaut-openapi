@@ -1434,14 +1434,14 @@ public class MyBean {}
         schema.properties.uuid.type == 'string'
         schema.properties.uuid.format == 'uuid'
 
-        // TODO: need to add support custom format for DateTime
         schema.properties.date.default == OffsetDateTime.parse('2007-12-03T10:15:30+01:00')
         schema.properties.date.type == 'string'
         schema.properties.date.format == 'date-time'
 
-        schema.properties.mySubObject.allOf.get(1).default == 'myDefault3'
-        schema.properties.mySubObject.allOf.get(1).type == null
-        schema.properties.mySubObject.allOf.get(1).format == null
+        schema.properties.mySubObject.default == 'myDefault3'
+        !schema.properties.mySubObject.type
+        !schema.properties.mySubObject.format
+        schema.properties.mySubObject.allOf[0].$ref == "#/components/schemas/MySubObject"
     }
 
     @Issue("https://github.com/micronaut-projects/micronaut-openapi/issues/947")

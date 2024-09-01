@@ -31,7 +31,6 @@ import io.micronaut.context.exceptions.ConfigurationException;
 import io.micronaut.core.annotation.AnnotationClassValue;
 import io.micronaut.core.annotation.AnnotationValue;
 import io.micronaut.core.annotation.Internal;
-import io.micronaut.core.annotation.NonNull;
 import io.micronaut.core.annotation.Nullable;
 import io.micronaut.core.beans.BeanMap;
 import io.micronaut.core.bind.annotation.Bindable;
@@ -117,6 +116,7 @@ import java.util.OptionalInt;
 import java.util.OptionalLong;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
@@ -147,6 +147,7 @@ import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.replacePlac
 import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.resolvePlaceholders;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_FIELD_VISIBILITY_LEVEL;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.DISCRIMINATOR;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_ACCESS;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_ACCESS_MODE;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_ADDITIONAL_PROPERTIES;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_ALLOWABLE_VALUES;
@@ -356,7 +357,8 @@ public final class SchemaDefinitionUtils {
                     if (type instanceof EnumElement enumEl) {
                         schema = setSpecVersion(new Schema<>());
                         schema.setName(schemaName);
-                        if (javadoc != null && StringUtils.hasText(javadoc.getMethodDescription())) {
+                        processJacksonDescription(enumEl, schema);
+                        if (schema.getDescription() == null && javadoc != null && StringUtils.hasText(javadoc.getMethodDescription())) {
                             schema.setDescription(javadoc.getMethodDescription());
                         }
                         schemas.put(schemaName, schema);
@@ -372,7 +374,8 @@ public final class SchemaDefinitionUtils {
                         if (schemaWithSuperTypes != null) {
                             schema = schemaWithSuperTypes;
                         }
-                        if (schema != null && javadoc != null && StringUtils.hasText(javadoc.getMethodDescription())) {
+                        processJacksonDescription(type, schema);
+                        if (schema != null && schema.getDescription() == null && javadoc != null && StringUtils.hasText(javadoc.getMethodDescription())) {
                             schema.setDescription(javadoc.getMethodDescription());
                         }
 
@@ -432,7 +435,7 @@ public final class SchemaDefinitionUtils {
             if (externalDocs != null) {
                 schema.setExternalDocs(externalDocs);
             }
-            setSchemaDocumentation(type, schema);
+            setSchemaDescription(type, schema);
             var schemaRef = setSpecVersion(new Schema<>());
             schemaRef.set$ref(SchemaUtils.schemaRef(schema.getName()));
             if (definingElement instanceof ClassElement classEl && classEl.isIterable()) {
@@ -838,6 +841,8 @@ public final class SchemaDefinitionUtils {
                     processSchemaAnn(schema, context, definingElement, type, schemaAnnotationValue);
                 }
 
+                processJacksonDescription(definingElement, schema);
+
                 if (definingElement != null && StringUtils.isEmpty(schema.getDescription())) {
                     if (fieldJavadoc != null) {
                         if (StringUtils.hasText(fieldJavadoc.getMethodDescription())) {
@@ -928,7 +933,7 @@ public final class SchemaDefinitionUtils {
         }
 
         boolean notOnlyRef = false;
-        setSchemaDocumentation(element, topLevelSchema);
+        setSchemaDescription(element, topLevelSchema);
         if (StringUtils.isNotEmpty(topLevelSchema.getDescription())) {
             notOnlyRef = true;
         }
@@ -952,11 +957,14 @@ public final class SchemaDefinitionUtils {
             SchemaUtils.setNullable(topLevelSchema);
             notOnlyRef = true;
         }
-        final String defaultJacksonValue = stringValue(element, JsonProperty.class, PROP_DEFAULT_VALUE).orElse(null);
-        if (defaultJacksonValue != null && schemaToBind.getDefault() == null) {
-            setDefaultValueObject(topLevelSchema, defaultJacksonValue, elementType, schemaToBind.getType(), schemaToBind.getFormat(), false, context);
+        if (processJacksonPropertyAnn(element, elementType, topLevelSchema, schemaAnn, context)) {
             notOnlyRef = true;
         }
+//        final String defaultJacksonValue = stringValue(element, JsonProperty.class, PROP_DEFAULT_VALUE).orElse(null);
+//        if (defaultJacksonValue != null && schemaToBind.getDefault() == null) {
+//            setDefaultValueObject(topLevelSchema, defaultJacksonValue, elementType, schemaToBind.getType(), schemaToBind.getFormat(), false, context);
+//            notOnlyRef = true;
+//        }
 
         boolean addSchemaToBind = !SchemaUtils.isEmptySchema(schemaToBind);
 
@@ -1731,37 +1739,59 @@ public final class SchemaDefinitionUtils {
         composedSchema.addAllOfItem(propSchema);
     }
 
-    private static void setSchemaDocumentation(Element element, Schema<?> schemaToBind) {
-        if (StringUtils.isEmpty(schemaToBind.getDescription())) {
-            // First, find getter method javadoc
-            String doc = element.getDocumentation().orElse(null);
-            if (StringUtils.isEmpty(doc)) {
-                // next, find field javadoc
-                if (element instanceof MemberElement memberEl) {
-                    List<FieldElement> fields = memberEl.getDeclaringType().getFields();
-                    if (CollectionUtils.isNotEmpty(fields)) {
-                        for (FieldElement field : fields) {
-                            if (field.getName().equals(element.getName())) {
-                                doc = field.getDocumentation().orElse(null);
-                                break;
-                            }
+    private static void processJacksonDescription(@Nullable Element element, @Nullable Schema<?> schemaToBind) {
+        if (element == null || schemaToBind == null || StringUtils.isNotEmpty(schemaToBind.getDescription())) {
+            return;
+        }
+        findAnnotation(element, element instanceof ClassElement
+            ? "com.fasterxml.jackson.annotation.JsonClassDescription"
+            : "com.fasterxml.jackson.annotation.JsonPropertyDescription"
+        )
+            .flatMap(ann -> ann.stringValue(PROP_VALUE))
+            .ifPresent(schemaToBind::setDescription);
+    }
+
+    private static void setSchemaDescription(Element element, Schema<?> schemaToBind) {
+        if (StringUtils.isNotEmpty(schemaToBind.getDescription())) {
+            return;
+        }
+
+        processJacksonDescription(element, schemaToBind);
+        if (StringUtils.isNotEmpty(schemaToBind.getDescription())) {
+            return;
+        }
+
+        // First, find getter method javadoc
+        String doc = element.getDocumentation().orElse(null);
+        if (StringUtils.isEmpty(doc)) {
+            // next, find field javadoc
+            if (element instanceof MemberElement memberEl) {
+                List<FieldElement> fields = memberEl.getDeclaringType().getFields();
+                if (CollectionUtils.isNotEmpty(fields)) {
+                    for (FieldElement field : fields) {
+                        if (field.getName().equals(element.getName())) {
+                            doc = field.getDocumentation().orElse(null);
+                            break;
                         }
                     }
                 }
             }
-            if (doc != null) {
-                JavadocDescription desc = Utils.getJavadocParser().parse(doc);
-                if (StringUtils.hasText(desc.getMethodDescription())) {
-                    schemaToBind.setDescription(desc.getMethodDescription());
-                }
+        }
+        if (doc != null) {
+            JavadocDescription desc = Utils.getJavadocParser().parse(doc);
+            if (StringUtils.hasText(desc.getMethodDescription())) {
+                schemaToBind.setDescription(desc.getMethodDescription());
             }
         }
     }
 
     private static void processSchemaAnn(Schema schemaToBind, VisitorContext context, Element element,
                                          @Nullable ClassElement classEl,
-                                         @NonNull AnnotationValue<io.swagger.v3.oas.annotations.media.Schema> schemaAnn) {
+                                         @Nullable AnnotationValue<io.swagger.v3.oas.annotations.media.Schema> schemaAnn) {
 
+        if (schemaAnn == null) {
+            return;
+        }
         Map<CharSequence, Object> annValues = schemaAnn.getValues();
         if (annValues.containsKey(PROP_NAME)) {
             schemaToBind.setName((String) annValues.get(PROP_NAME));
@@ -2134,6 +2164,59 @@ public final class SchemaDefinitionUtils {
             SchemaUtils.setNullable(schema);
         }
         processJakartaValidationAnnotations(type, type, schema);
+    }
+
+    private static boolean processJacksonPropertyAnn(Element element, ClassElement elType, Schema<?> schemaToBind,
+                                                     @Nullable AnnotationValue<io.swagger.v3.oas.annotations.media.Schema> schemaAnn,
+                                                     VisitorContext context) {
+
+        var swaggerAccessMode = schemaAnn != null ? schemaAnn.stringValue(PROP_ACCESS_MODE).orElse(null) : null;
+        var swaggerDefaultValue = schemaAnn != null ? schemaAnn.stringValue(PROP_DEFAULT_VALUE).orElse(null) : null;
+
+        var reference = new AtomicReference<>(false);
+        findAnnotation(element, "com.fasterxml.jackson.annotation.JsonProperty")
+            .ifPresent(ann -> {
+                if (swaggerAccessMode == null) {
+                    ann.get(PROP_ACCESS, JsonProperty.Access.class).ifPresent(access -> {
+                        switch (access) {
+                            case READ_ONLY:
+                                schemaToBind.setWriteOnly(null);
+                                schemaToBind.setReadOnly(true);
+                                reference.set(true);
+                                break;
+                            case WRITE_ONLY:
+                                schemaToBind.setWriteOnly(true);
+                                schemaToBind.setReadOnly(null);
+                                reference.set(true);
+                                break;
+                            case READ_WRITE:
+                                schemaToBind.setWriteOnly(null);
+                                schemaToBind.setReadOnly(null);
+                                break;
+                            default:
+                                break;
+                        }
+                    });
+                }
+                if (swaggerDefaultValue == null) {
+                    ann.stringValue(PROP_DEFAULT_VALUE).ifPresent(defaultValue -> {
+                        Pair<String, String> typeAndFormat;
+                        if (elType.isIterable()) {
+                            typeAndFormat = Pair.of(TYPE_ARRAY, null);
+                        } else if (elType instanceof EnumElement enumEl) {
+                            typeAndFormat = ConvertUtils.checkEnumJsonValueType(context, enumEl, null, null);
+                        } else {
+                            typeAndFormat = ConvertUtils.getTypeAndFormatByClass(elType.getName(), elType.isArray(), elType);
+                        }
+                        setDefaultValueObject(schemaToBind, defaultValue, elType, typeAndFormat.getFirst(), typeAndFormat.getSecond(), false, context);
+                        if (schemaToBind.getDefault() != null) {
+                            reference.set(true);
+                        }
+                    });
+                }
+            });
+
+        return reference.get();
     }
 
     private static void processJakartaValidationAnnotations(Element element, ClassElement elementType, Schema<?> schemaToBind) {

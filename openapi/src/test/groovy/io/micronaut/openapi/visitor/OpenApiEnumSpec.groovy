@@ -1095,9 +1095,9 @@ class MyBean {}
         then:
         operation
         parametersSchema
+        parametersSchema.properties.stampAlign.default == 'RIGHT'
         parametersSchema.properties.stampAlign.allOf
         parametersSchema.properties.stampAlign.allOf[0].$ref == '#/components/schemas/ParagraphAlignment'
-        parametersSchema.properties.stampAlign.allOf[1].default == 'RIGHT'
     }
 
     void "test enum in map key"() {
