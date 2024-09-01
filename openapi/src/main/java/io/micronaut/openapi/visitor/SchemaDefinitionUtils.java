@@ -137,6 +137,7 @@ import static io.micronaut.openapi.visitor.ElementUtils.findAnnotation;
 import static io.micronaut.openapi.visitor.ElementUtils.getAnnotation;
 import static io.micronaut.openapi.visitor.ElementUtils.getAnnotationMetadata;
 import static io.micronaut.openapi.visitor.ElementUtils.isAnnotationPresent;
+import static io.micronaut.openapi.visitor.ElementUtils.isEnum;
 import static io.micronaut.openapi.visitor.ElementUtils.isFileUpload;
 import static io.micronaut.openapi.visitor.ElementUtils.isNotNullable;
 import static io.micronaut.openapi.visitor.ElementUtils.isNullable;
@@ -274,7 +275,7 @@ public final class SchemaDefinitionUtils {
         String elFormat = schema.getFormat();
         if (elType == null && type instanceof ClassElement classEl) {
             Pair<String, String> typeAndFormat;
-            if (classEl instanceof EnumElement enumEl) {
+            if (classEl instanceof EnumElement enumEl && isEnum(enumEl)) {
                 typeAndFormat = ConvertUtils.checkEnumJsonValueType(context, enumEl, null, elFormat);
             } else {
                 typeAndFormat = ConvertUtils.getTypeAndFormatByClass(classEl.getName(), classEl.isArray(), classEl);
@@ -287,7 +288,7 @@ public final class SchemaDefinitionUtils {
             }
         }
 
-        if (type instanceof EnumElement enumEl) {
+        if (type instanceof EnumElement enumEl && isEnum(enumEl)) {
             if (CollectionUtils.isEmpty(schema.getEnum())) {
                 schema.setEnum(getEnumValues(enumEl, schema.getType(), schema.getFormat(), context));
             }
@@ -354,7 +355,7 @@ public final class SchemaDefinitionUtils {
                 JavadocDescription javadoc = Utils.getJavadocParser().parse(type.getDocumentation().orElse(null));
                 if (schema == null) {
 
-                    if (type instanceof EnumElement enumEl) {
+                    if (type instanceof EnumElement enumEl && isEnum(enumEl)) {
                         schema = setSpecVersion(new Schema<>());
                         schema.setName(schemaName);
                         processJacksonDescription(enumEl, schema);
@@ -677,7 +678,7 @@ public final class SchemaDefinitionUtils {
 
         Schema<?> schema = null;
 
-        if (type instanceof EnumElement enumEl) {
+        if (type instanceof EnumElement enumEl && isEnum(enumEl)) {
             schema = getSchemaDefinition(openApi, context, enumEl, typeArgs, definingElement, mediaTypes, jsonViewClass);
             if (isArray != null && isArray) {
                 schema = SchemaUtils.arraySchema(schema);
@@ -1408,7 +1409,7 @@ public final class SchemaDefinitionUtils {
         Pair<String, String> typeAndFormat;
         if (classEl.isIterable()) {
             typeAndFormat = Pair.of(TYPE_ARRAY, null);
-        } else if (classEl instanceof EnumElement enumEl) {
+        } else if (classEl instanceof EnumElement enumEl && isEnum(enumEl)) {
             typeAndFormat = ConvertUtils.checkEnumJsonValueType(context, enumEl, null, null);
         } else {
             typeAndFormat = ConvertUtils.getTypeAndFormatByClass(classEl.getName(), classEl.isArray(), classEl);
@@ -1515,7 +1516,7 @@ public final class SchemaDefinitionUtils {
                         String elFormat = schemaAnn.stringValue(PROP_ONE_FORMAT).orElse(null);
                         if (elType == null && elementType != null) {
                             Pair<String, String> typeAndFormat;
-                            if (elementType instanceof EnumElement enumEl) {
+                            if (elementType instanceof EnumElement enumEl && isEnum(enumEl)) {
                                 typeAndFormat = ConvertUtils.checkEnumJsonValueType(context, enumEl, null, elFormat);
                             } else {
                                 typeAndFormat = ConvertUtils.getTypeAndFormatByClass(elementType.getName(), elementType.isArray(), elementType);
@@ -1636,6 +1637,7 @@ public final class SchemaDefinitionUtils {
         } else {
             var superType = classElement.getSuperType().orElse(null);
             if (superType != null
+                && !Enum.class.getName().equals(superType.getName())
                 // check protobuf generated classes
                 && !isProtobufMessageClass(superType)) {
                 superTypes.add(superType);
@@ -1896,7 +1898,7 @@ public final class SchemaDefinitionUtils {
         if (element instanceof ClassElement classElement) {
             if (classElement.isIterable()) {
                 typeAndFormat = Pair.of(TYPE_ARRAY, null);
-            } else if (element instanceof EnumElement enumEl) {
+            } else if (element instanceof EnumElement enumEl && isEnum(enumEl)) {
                 typeAndFormat = ConvertUtils.checkEnumJsonValueType(context, enumEl, null, null);
             } else {
                 typeAndFormat = ConvertUtils.getTypeAndFormatByClass(classElement.getName(), classElement.isArray(), classElement);
@@ -2401,7 +2403,7 @@ public final class SchemaDefinitionUtils {
         // Case, when map key is enumeration
         ClassElement keyType = typeArgs.get("K");
         ClassElement valueType = typeArgs.get("V");
-        if (keyType.isEnum()) {
+        if (isEnum(keyType)) {
             var enumSchema = getSchemaDefinition(openApi, context, keyType, keyType.getTypeArguments(), null, mediaTypes, null);
             if (enumSchema != null && enumSchema.get$ref() != null) {
                 enumSchema = getSchemaByRef(enumSchema, openApi);
@@ -2566,7 +2568,7 @@ public final class SchemaDefinitionUtils {
         if (elType == null && element != null) {
             ClassElement typeEl = element.getType();
             Pair<String, String> typeAndFormat;
-            if (typeEl instanceof EnumElement enumEl) {
+            if (typeEl instanceof EnumElement enumEl && isEnum(enumEl)) {
                 typeAndFormat = ConvertUtils.checkEnumJsonValueType(context, enumEl, null, elFormat);
             } else {
                 typeAndFormat = ConvertUtils.getTypeAndFormatByClass(typeEl.getName(), typeEl.isArray(), typeEl);
@@ -2842,6 +2844,9 @@ public final class SchemaDefinitionUtils {
 
     private static boolean doesParamExistsMandatoryInConstructor(Element element, @Nullable Element classElement) {
         if (classElement instanceof ClassElement classEl) {
+            if (classEl.isEnum()) {
+                return true;
+            }
             return classEl.getPrimaryConstructor().flatMap(methodElement -> Arrays.stream(methodElement.getParameters())
                     .filter(parameterElement -> parameterElement.getName().equals(element.getName()))
                     .map(parameterElement -> !parameterElement.isNullable())

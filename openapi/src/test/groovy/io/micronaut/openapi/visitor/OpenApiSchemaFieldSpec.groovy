@@ -1341,4 +1341,65 @@ class MyBean {}
         schemas.ResourceSearchVO.properties.type2.default == "VAL2"
         schemas.ResourceSearchVO.properties.type3.$ref == '#/components/schemas/ResourceEnum'
     }
+
+    void "test JsonFormat on enum"() {
+
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;import io.micronaut.core.annotation.Nullable;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.micronaut.http.annotation.QueryValue;
+
+@Controller
+class HelloController {
+
+    @Get("/foo")
+    User getFoo(@QueryValue @Nullable User user) {
+        return null;
+    }
+}
+
+@JsonFormat(shape = JsonFormat.Shape.OBJECT)
+enum User {
+
+    FOO(1, "Foo"),
+    BAR(2, "Bar");
+
+    @JsonProperty("id")
+    public final int id;
+
+    @JsonProperty("name")
+    public final String name;
+
+    User(int id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        then: "the state is correct"
+        Utils.testReference != null
+
+        when: "The OpenAPI is retrieved"
+        def openApi = Utils.testReference
+        def schemas = openApi.components.schemas
+
+        then: "the components are valid"
+        schemas.User
+        schemas.User.type == 'object'
+        schemas.User.required
+        schemas.User.required.size() == 2
+        schemas.User.required[0] == 'id'
+        schemas.User.required[1] == 'name'
+        schemas.User.properties.id.type == "integer"
+        schemas.User.properties.id.format == "int32"
+        schemas.User.properties.name.type == "string"
+    }
 }
