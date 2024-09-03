@@ -1,6 +1,8 @@
 package io.micronaut.openapi.visitor
 
 import io.micronaut.openapi.AbstractOpenApiTypeElementSpec
+import io.micronaut.openapi.OpenApiUtils
+import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.security.SecurityScheme
 import spock.util.environment.RestoreSystemProperties
 
@@ -435,5 +437,84 @@ public class MyBean {}
 
         apiV1.paths.'/demo'.get.responses.'200'.content.'application/json'.schema.$ref == '#/components/schemas/HelloResponseV1'
         apiV2.paths.'/demo'.get.responses.'200'.content.'application/json'.schema.$ref == '#/components/schemas/HelloResponseV2'
+    }
+
+    void "test remove unused schemas"() {
+
+        when:
+        var openApiSpec = """
+openapi: 3.0.1
+info:
+  title: openapi-groups
+  version: "0.0"
+paths:
+  /visible:
+    get:
+      operationId: index
+      responses:
+        "200":
+          description: index 200 response
+          content:
+            application/json:
+              schema:
+                \$ref: "#/components/schemas/VisibleResponse"
+components:
+  schemas:
+    NotVisibleClassKO:
+      type: object
+      properties:
+        test:
+          type: string
+      description: "This class should not appear in the schema, but it does because\\
+        \\ it's a property of NotVisibleResponse"
+    NotVisibleEnumKO:
+      type: string
+      description: "This enum should not appear in the schema, but it does because\\
+        \\ it's a property of NotVisibleResponse"
+      enum:
+      - VALUE1
+      - VALUE2
+    NotVisibleRequest:
+      type: object
+      properties:
+        part:
+          \$ref: "#/components/schemas/NotVisibleRequestPartKO"
+    NotVisibleRequestPartKO:
+      type: object
+      properties:
+        test:
+          type: string
+      description: "This class should not appear in the schema, but it does because\\
+        \\ it's a property of NotVisibleResponse"
+    NotVisibleResponse:
+      type: object
+      properties:
+        test:
+          type: string
+        notVisibleEnumKO:
+          \$ref: "#/components/schemas/NotVisibleEnumKO"
+        notVisibleClassKO:
+          \$ref: "#/components/schemas/NotVisibleClassKO"
+        notVisibleInstantOK:
+          type: string
+          description: "If this getter is uncommented, nothing about Instant will\\
+            \\ be visible in the schema"
+          format: date-time
+    VisibleResponse:
+      required:
+      - visibleField
+      type: object
+      properties:
+        visibleField:
+          type: string
+"""
+        var openApi = OpenApiUtils.getYamlMapper().readValue(openApiSpec, OpenAPI.class)
+        OpenApiApplicationVisitor.removeUnusedSchemas(openApi)
+
+        then:
+        openApi.components
+        openApi.components.schemas
+        openApi.components.schemas.size() == 1
+        openApi.components.schemas.VisibleResponse
     }
 }

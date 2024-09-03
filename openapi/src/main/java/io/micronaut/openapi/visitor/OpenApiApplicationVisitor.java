@@ -114,6 +114,7 @@ import static io.micronaut.openapi.visitor.SchemaUtils.resolveSchemas;
 import static io.micronaut.openapi.visitor.SchemaUtils.setOperationOnPathItem;
 import static io.micronaut.openapi.visitor.StringUtil.PLACEHOLDER_POSTFIX;
 import static io.micronaut.openapi.visitor.StringUtil.PLACEHOLDER_PREFIX;
+import static io.micronaut.openapi.visitor.StringUtil.QUOTE;
 import static io.micronaut.openapi.visitor.Utils.resolveComponents;
 import static io.swagger.v3.oas.models.Components.COMPONENTS_SCHEMAS_REF;
 
@@ -125,6 +126,7 @@ import static io.swagger.v3.oas.models.Components.COMPONENTS_SCHEMAS_REF;
  */
 public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements TypeElementVisitor<Object, Object> {
 
+    private static final int MAX_ITERATIONS = 100;
     private ClassElement classElement;
     private int visitedElements = -1;
 
@@ -284,18 +286,12 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         }
         return switch (name.toUpperCase(Locale.US)) {
             case "LOWER_CAMEL_CASE" -> new LowerCamelCasePropertyNamingStrategy();
-            case "UPPER_CAMEL_CASE" ->
-                (PropertyNamingStrategies.NamingBase) PropertyNamingStrategies.UPPER_CAMEL_CASE;
-            case "SNAKE_CASE" ->
-                (PropertyNamingStrategies.NamingBase) PropertyNamingStrategies.SNAKE_CASE;
-            case "UPPER_SNAKE_CASE" ->
-                (PropertyNamingStrategies.NamingBase) PropertyNamingStrategies.UPPER_SNAKE_CASE;
-            case "LOWER_CASE" ->
-                (PropertyNamingStrategies.NamingBase) PropertyNamingStrategies.LOWER_CASE;
-            case "KEBAB_CASE" ->
-                (PropertyNamingStrategies.NamingBase) PropertyNamingStrategies.KEBAB_CASE;
-            case "LOWER_DOT_CASE" ->
-                (PropertyNamingStrategies.NamingBase) PropertyNamingStrategies.LOWER_DOT_CASE;
+            case "UPPER_CAMEL_CASE" -> (PropertyNamingStrategies.NamingBase) PropertyNamingStrategies.UPPER_CAMEL_CASE;
+            case "SNAKE_CASE" -> (PropertyNamingStrategies.NamingBase) PropertyNamingStrategies.SNAKE_CASE;
+            case "UPPER_SNAKE_CASE" -> (PropertyNamingStrategies.NamingBase) PropertyNamingStrategies.UPPER_SNAKE_CASE;
+            case "LOWER_CASE" -> (PropertyNamingStrategies.NamingBase) PropertyNamingStrategies.LOWER_CASE;
+            case "KEBAB_CASE" -> (PropertyNamingStrategies.NamingBase) PropertyNamingStrategies.KEBAB_CASE;
+            case "LOWER_DOT_CASE" -> (PropertyNamingStrategies.NamingBase) PropertyNamingStrategies.LOWER_DOT_CASE;
             default -> null;
         };
     }
@@ -702,31 +698,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         new JacksonDiscriminatorPostProcessor().addMissingDiscriminatorType(openApi);
         new OpenApiOperationsPostProcessor().processOperations(openApi);
 
-        // remove unused schemas
-        try {
-            if (openApi.getComponents() != null) {
-                var extraSchemas = OpenApiExtraSchemaVisitor.getExtraSchemas();
-                Map<String, Schema> schemas = openApi.getComponents().getSchemas();
-                if (CollectionUtils.isNotEmpty(schemas)) {
-                    String openApiJson = Utils.getJsonMapper().writeValueAsString(openApi);
-                    // Create a copy of the keySet so that we can modify the map while in a foreach
-                    var keySet = new HashSet<>(schemas.keySet());
-                    for (String schemaName : keySet) {
-                        if (!openApiJson.contains("\"" + COMPONENTS_SCHEMAS_REF + schemaName + '"')
-                                && !extraSchemas.containsKey(schemaName)
-                        ) {
-                            schemas.remove(schemaName);
-                        }
-                    }
-                    // check excluded extra schemas also
-                    for (String schemaName : OpenApiExtraSchemaVisitor.getExcludedExtraSchemas()) {
-                        schemas.remove(schemaName);
-                    }
-                }
-            }
-        } catch (JsonProcessingException e) {
-            // do nothing
-        }
+        removeUnusedSchemas(openApi);
 
         removeEmptyComponents(openApi);
         findAndRemoveDuplicates(openApi);
@@ -738,18 +710,60 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         return openApi;
     }
 
+    public static void removeUnusedSchemas(OpenAPI openApi) {
+        int i = 0;
+        // remove unused schemas
+        while (removeUnusedSchemasIter(openApi) && i < MAX_ITERATIONS) {
+            i++;
+        }
+    }
+
+    public static boolean removeUnusedSchemasIter(OpenAPI openApi) {
+        if (openApi.getComponents() == null) {
+            return false;
+        }
+        Map<String, Schema> schemas = openApi.getComponents().getSchemas();
+        if (CollectionUtils.isEmpty(schemas)) {
+            return false;
+        }
+
+        var extraSchemas = OpenApiExtraSchemaVisitor.getExtraSchemas();
+        var removed = false;
+
+        try {
+            String openApiJson = Utils.getJsonMapper().writeValueAsString(openApi);
+            // Create a copy of the keySet so that we can modify the map while in a foreach
+            var keySet = new HashSet<>(schemas.keySet());
+            for (String schemaName : keySet) {
+                if (!openApiJson.contains(QUOTE + COMPONENTS_SCHEMAS_REF + schemaName + QUOTE)
+                    && !extraSchemas.containsKey(schemaName)
+                ) {
+                    schemas.remove(schemaName);
+                    removed = true;
+                }
+            }
+            // check excluded extra schemas also
+            for (String schemaName : OpenApiExtraSchemaVisitor.getExcludedExtraSchemas()) {
+                schemas.remove(schemaName);
+            }
+        } catch (JsonProcessingException e) {
+            // do nothing
+        }
+        return removed;
+    }
+
     private void addExtraSchemas(OpenAPI openApi, VisitorContext context) {
-       var extraSchemas = OpenApiExtraSchemaVisitor.getExtraSchemas();
-       if (CollectionUtils.isEmpty(extraSchemas)) {
-           return;
-       }
-       var schemas = resolveSchemas(openApi);
-       for (var entry : extraSchemas.entrySet()) {
-           if (schemas.containsKey(entry.getKey())) {
-               continue;
-           }
-           schemas.put(entry.getKey(), entry.getValue());
-       }
+        var extraSchemas = OpenApiExtraSchemaVisitor.getExtraSchemas();
+        if (CollectionUtils.isEmpty(extraSchemas)) {
+            return;
+        }
+        var schemas = resolveSchemas(openApi);
+        for (var entry : extraSchemas.entrySet()) {
+            if (schemas.containsKey(entry.getKey())) {
+                continue;
+            }
+            schemas.put(entry.getKey(), entry.getValue());
+        }
     }
 
     private void generateViews(@Nullable String documentTitle, @Nullable Map<Pair<String, String>, OpenApiInfo> openApiInfos, VisitorContext context) {

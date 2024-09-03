@@ -40,6 +40,7 @@ public final class StringUtil {
     public static final String UNDERSCORE = "_";
     public static final String MINUS = "-";
     public static final String WILDCARD = "*";
+    public static final String QUOTE = "\"";
 
     private StringUtil() {
     }
