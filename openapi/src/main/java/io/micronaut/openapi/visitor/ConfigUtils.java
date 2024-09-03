@@ -1022,7 +1022,7 @@ public final class ConfigUtils {
     }
 
     /**
-     * Duplicate schema resolution mode
+     * Duplicate schema resolution mode.
      */
     public enum DuplicateResolution {
         AUTO,

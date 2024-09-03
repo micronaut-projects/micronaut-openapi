@@ -576,4 +576,22 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
 
         assertFileContains(path + "api/DatasetsApi.kt", "description = \"Creates a brand new dataset.\"");
     }
+
+    @Test
+    void testSecurity() {
+
+        var codegen = new KotlinMicronautServerCodegen();
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/security.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String path = outputPath + "src/main/kotlin/org/openapitools/";
+
+        assertFileContains(path + "api/DefaultApi.kt",
+            """
+                    @Secured("read", "admin")
+                    fun get(): Mono<Void>
+                """,
+            """
+                    @Secured("write", "admin")
+                    fun save(): Mono<Void>
+                """);
+    }
 }
