@@ -1713,10 +1713,6 @@ class MyBean {}
         buildBeanDefinition('test.MyBean', '''
 package test;
 
-import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Future;
-
 import io.micronaut.http.annotation.Body;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Post;
@@ -1724,12 +1720,18 @@ import io.reactivex.rxjava3.core.Flowable;
 import io.reactivex.rxjava3.core.Maybe;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.Single;
-
-import org.reactivestreams.Publisher;
-
 import kotlinx.coroutines.flow.Flow;
+import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.util.Optional;
+import java.util.OptionalDouble;
+import java.util.OptionalInt;
+import java.util.OptionalLong;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Controller
 class HelloWorldController {
@@ -1815,11 +1817,41 @@ class HelloWorldController {
         return null;
     }
 
+    @Post("/endpoint29")
+    public AtomicReference<MyDto> endpoint1(@Body AtomicReference<MyDto> body) {
+        return null;
+    }
+
+    @Post("/endpoint210")
+    public com.google.common.base.Optional<MyDto> endpoint1(@Body com.google.common.base.Optional<MyDto> body) {
+        return null;
+    }
+    
+    @Post("/optInt")
+    public OptionalInt optInt(@Body OptionalInt body) {
+        return null;
+    }
+
+    @Post("/optLong")
+    public OptionalLong optLong(@Body OptionalLong body) {
+        return null;
+    }
+
+    @Post("/optDouble")
+    public OptionalDouble optDouble(@Body OptionalDouble body) {
+        return null;
+    }
 }
 
 class MyDto {
 
     public String field;
+    public OptionalInt optInt;
+    public OptionalLong optLong;
+    public OptionalDouble optDouble;
+    public Optional<String> optStr;
+    public com.google.common.base.Optional<String> guavaOptStr;
+    public AtomicReference<String> referenceStr;
 }
 
 @jakarta.inject.Singleton
@@ -1834,16 +1866,59 @@ class MyBean {}
         for (def i = 1; i < 8; i++) {
             def operation = openAPI.paths.get("/endpoint1" + i).post
             assert operation.requestBody.content."application/json".schema.items.$ref == '#/components/schemas/MyDto'
-            assert operation.requestBody.content."application/json".schema.items.$ref == '#/components/schemas/MyDto'
+            assert operation.responses."200".content."application/json".schema.items.$ref == '#/components/schemas/MyDto'
         }
 
         // single
-        for (def i = 1; i < 9; i++) {
+        for (def i = 1; i < 11; i++) {
             def operation = openAPI.paths.get("/endpoint2" + i).post
             assert operation.requestBody.content."application/json".schema.$ref == '#/components/schemas/MyDto'
             assert operation.responses."200".content."application/json".schema.$ref == '#/components/schemas/MyDto'
         }
 
+        // optional primitives
+
+        def optInt = openAPI.paths."/optInt".post
+        optInt.requestBody.content."application/json".schema.type == 'integer'
+        optInt.responses."200".content."application/json".schema.type == 'integer'
+
+        def optLong = openAPI.paths."/optLong".post
+        optLong.requestBody.content."application/json".schema.type == 'integer'
+        optLong.requestBody.content."application/json".schema.format == 'int64'
+        optLong.responses."200".content."application/json".schema.type == 'integer'
+        optLong.responses."200".content."application/json".schema.format == 'int64'
+
+        def optDouble = openAPI.paths."/optDouble".post
+        optDouble.requestBody.content."application/json".schema.type == 'number'
+        optDouble.requestBody.content."application/json".schema.format == 'double'
+        optDouble.responses."200".content."application/json".schema.type == 'number'
+        optDouble.responses."200".content."application/json".schema.format == 'double'
+
+        def myDto = openAPI.components.schemas.MyDto
+        myDto.properties
+        myDto.properties.field
+        myDto.properties.field.type == 'string'
+
+        myDto.properties.optInt.type == 'integer'
+        myDto.properties.optInt.format == 'int32'
+        myDto.properties.optInt.nullable == true
+
+        myDto.properties.optLong.type == 'integer'
+        myDto.properties.optLong.format == 'int64'
+        myDto.properties.optLong.nullable == true
+
+        myDto.properties.optDouble.type == 'number'
+        myDto.properties.optDouble.format == 'double'
+        myDto.properties.optDouble.nullable == true
+
+        myDto.properties.optStr.type == 'string'
+        myDto.properties.optStr.nullable == true
+
+        myDto.properties.guavaOptStr.type == 'string'
+        myDto.properties.guavaOptStr.nullable == true
+
+        myDto.properties.referenceStr.type == 'string'
+        myDto.properties.referenceStr.nullable == true
     }
 
     void "test parse @Part StreamingFileUpload parameter data"() {

@@ -113,6 +113,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.OptionalDouble;
+import java.util.OptionalInt;
+import java.util.OptionalLong;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.BiConsumer;
@@ -138,6 +141,7 @@ import static io.micronaut.openapi.visitor.ElementUtils.isAnnotationPresent;
 import static io.micronaut.openapi.visitor.ElementUtils.isFileUpload;
 import static io.micronaut.openapi.visitor.ElementUtils.isNotNullable;
 import static io.micronaut.openapi.visitor.ElementUtils.isNullable;
+import static io.micronaut.openapi.visitor.ElementUtils.isTypeWithGenericNullable;
 import static io.micronaut.openapi.visitor.ElementUtils.stringValue;
 import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.expandProperties;
 import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.replacePlaceholders;
@@ -247,13 +251,13 @@ public final class SchemaDefinitionUtils {
     /**
      * Reads schema.
      *
-     * @param schemaValue   annotation value
-     * @param openAPI       The OpenApi
-     * @param context       The VisitorContext
-     * @param type          type element
-     * @param typeArgs      type arguments
+     * @param schemaValue annotation value
+     * @param openAPI The OpenApi
+     * @param context The VisitorContext
+     * @param type type element
+     * @param typeArgs type arguments
      * @param definingElement defining element
-     * @param mediaTypes    The media types of schema
+     * @param mediaTypes The media types of schema
      * @param jsonViewClass Class from JsonView annotation
      * @return New schema instance
      */
@@ -340,8 +344,8 @@ public final class SchemaDefinitionUtils {
             final PrimitiveType primitiveType;
             if (isBasicType) {
                 primitiveType = ClassUtils.forName(type.getName(), SchemaDefinitionUtils.class.getClassLoader())
-                        .map(PrimitiveType::fromType)
-                        .orElse(null);
+                    .map(PrimitiveType::fromType)
+                    .orElse(null);
             } else {
                 primitiveType = null;
             }
@@ -403,9 +407,9 @@ public final class SchemaDefinitionUtils {
                                 schema.setDescription(originalTypeSchema.getDescription());
                             }
                             if ((originalTypeSchema.getNullable() != null && originalTypeSchema.getNullable())
-                                    || (isOpenapi31()
-                                    && CollectionUtils.isNotEmpty(originalTypeSchema.getTypes())
-                                    && originalTypeSchema.getTypes().contains(SchemaUtils.TYPE_NULL))
+                                || (isOpenapi31()
+                                && CollectionUtils.isNotEmpty(originalTypeSchema.getTypes())
+                                && originalTypeSchema.getTypes().contains(SchemaUtils.TYPE_NULL))
                             ) {
                                 SchemaUtils.setNullable(schema);
                             }
@@ -554,8 +558,8 @@ public final class SchemaDefinitionUtils {
             boolean isHidden = schemaAnn != null && schemaAnn.booleanValue(PROP_HIDDEN).orElse(false);
 
             if (isHidden
-                    || isAnnotationPresent(element, Hidden.class)
-                    || isAnnotationPresent(element, JsonIgnore.class)) {
+                || isAnnotationPresent(element, Hidden.class)
+                || isAnnotationPresent(element, JsonIgnore.class)) {
                 continue;
             }
             var jsonPropertyAnn = getAnnotation(element, JsonProperty.class);
@@ -578,10 +582,10 @@ public final class SchemaDefinitionUtils {
      * Resolves the schema for the given type element.
      *
      * @param definingElement The defining element
-     * @param type            The type element
-     * @param context         The context
-     * @param mediaTypes      An optional media type
-     * @param jsonViewClass   Class from JsonView annotation
+     * @param type The type element
+     * @param context The context
+     * @param mediaTypes An optional media type
+     * @param jsonViewClass Class from JsonView annotation
      * @return The schema or null if it cannot be resolved
      */
     @Nullable
@@ -592,14 +596,14 @@ public final class SchemaDefinitionUtils {
     /**
      * Resolves the schema for the given type element.
      *
-     * @param openApi         The OpenAPI object
+     * @param openApi The OpenAPI object
      * @param definingElement The defining element
-     * @param type            The type element
-     * @param context         The context
-     * @param mediaTypes      An optional media type
-     * @param fieldJavadoc    Field-level java doc
-     * @param classJavadoc    Class-level java doc
-     * @param jsonViewClass   Class from JsonView annotation
+     * @param type The type element
+     * @param context The context
+     * @param mediaTypes An optional media type
+     * @param fieldJavadoc Field-level java doc
+     * @param classJavadoc Class-level java doc
+     * @param jsonViewClass Class from JsonView annotation
      * @return The schema or null if it cannot be resolved
      */
     @Nullable
@@ -686,23 +690,23 @@ public final class SchemaDefinitionUtils {
             if (type.isAssignable("io.micronaut.http.server.multipart.MultipartBody")) {
                 isPublisher = true;
                 type = type.getInterfaces()
-                        .stream()
-                        .filter(i -> i.isAssignable("org.reactivestreams.Publisher"))
-                        .findFirst()
-                        .flatMap(ClassElement::getFirstTypeArgument)
-                        .orElse(null);
+                    .stream()
+                    .filter(i -> i.isAssignable("org.reactivestreams.Publisher"))
+                    .findFirst()
+                    .flatMap(ClassElement::getFirstTypeArgument)
+                    .orElse(null);
                 // StreamingFileUpload implements Publisher, but it should be not considered as a Publisher in the spec file
             } else if (!type.isAssignable("io.micronaut.http.multipart.StreamingFileUpload") && ElementUtils.isContainerType(type)) {
                 isPublisher = (type.isAssignable("org.reactivestreams.Publisher") || type.isAssignable("kotlinx.coroutines.flow.Flow"))
-                        && !type.isAssignable("reactor.core.publisher.Mono");
+                    && !type.isAssignable("reactor.core.publisher.Mono");
                 isObservable = (type.isAssignable("io.reactivex.Observable") || type.isAssignable("io.reactivex.rxjava3.core.Observable"))
-                        && !type.isAssignable("reactor.core.publisher.Mono");
+                    && !type.isAssignable("reactor.core.publisher.Mono");
                 type = componentType;
                 if (componentType != null) {
                     typeArgs = componentType.getTypeArguments();
                     componentType = componentType.getFirstTypeArgument().orElse(null);
                 }
-            } else if (isTypeNullable(type)) {
+            } else if (isTypeWithGenericNullable(type)) {
                 isNullable = true;
                 type = componentType;
                 if (componentType != null) {
@@ -790,25 +794,31 @@ public final class SchemaDefinitionUtils {
                 } else if (type.isAssignable(Character.class) || type.isAssignable(char.class)) {
                     schema = setSpecVersion(PrimitiveType.STRING.createProperty());
                 } else if (type.isAssignable(Integer.class) || type.isAssignable(int.class)
-                        || type.isAssignable(Short.class) || type.isAssignable(short.class)) {
+                    || type.isAssignable(Short.class) || type.isAssignable(short.class)
+                    || type.isAssignable(OptionalInt.class)
+                ) {
                     schema = setSpecVersion(PrimitiveType.INT.createProperty());
-                } else if (type.isAssignable(Long.class) || type.isAssignable(long.class)) {
+                } else if (type.isAssignable(Long.class) || type.isAssignable(long.class)
+                    || type.isAssignable(OptionalLong.class)
+                ) {
                     schema = setSpecVersion(PrimitiveType.LONG.createProperty());
                 } else if (type.isAssignable(Float.class) || type.isAssignable(float.class)) {
                     schema = setSpecVersion(PrimitiveType.FLOAT.createProperty());
-                } else if (type.isAssignable(Double.class) || type.isAssignable(double.class)) {
+                } else if (type.isAssignable(Double.class) || type.isAssignable(double.class)
+                    || type.isAssignable(OptionalDouble.class)
+                ) {
                     schema = setSpecVersion(PrimitiveType.DOUBLE.createProperty());
                 } else if (type.isAssignable(BigInteger.class)) {
                     schema = setSpecVersion(PrimitiveType.INTEGER.createProperty());
                 } else if (type.isAssignable(BigDecimal.class)) {
                     schema = setSpecVersion(PrimitiveType.DECIMAL.createProperty());
                 } else if (type.isAssignable(Date.class)
-                        || type.isAssignable(Calendar.class)
-                        || type.isAssignable(LocalDateTime.class)
-                        || type.isAssignable(ZonedDateTime.class)
-                        || type.isAssignable(OffsetDateTime.class)
-                        || type.isAssignable(Instant.class)
-                        || type.isAssignable(XMLGregorianCalendar.class)) {
+                    || type.isAssignable(Calendar.class)
+                    || type.isAssignable(LocalDateTime.class)
+                    || type.isAssignable(ZonedDateTime.class)
+                    || type.isAssignable(OffsetDateTime.class)
+                    || type.isAssignable(Instant.class)
+                    || type.isAssignable(XMLGregorianCalendar.class)) {
                     schema = setSpecVersion(new StringSchema().format("date-time"));
                 } else if (type.isAssignable(LocalDate.class)) {
                     schema = setSpecVersion(new StringSchema().format("date"));
@@ -866,17 +876,17 @@ public final class SchemaDefinitionUtils {
     /**
      * Binds the schema for the given element.
      *
-     * @param context       The context
-     * @param element       The element
-     * @param elementType   The element type
-     * @param schemaToBind  The schema to bind
+     * @param context The context
+     * @param element The element
+     * @param elementType The element type
+     * @param schemaToBind The schema to bind
      * @param jsonViewClass Class from JsonView annotation
      * @return The bound schema
      */
     public static Schema<?> bindSchemaForElement(VisitorContext context, TypedElement element, ClassElement elementType, Schema<?> schemaToBind,
                                                  @Nullable ClassElement jsonViewClass) {
         var schemaAnn = getAnnotation(element, io.swagger.v3.oas.annotations.media.Schema.class);
-        Schema<?> originalSchema = schemaToBind;
+        Schema<?> originalSchema = schemaToBind != null ? schemaToBind : new Schema<>();
 
         if (originalSchema.get$ref() != null) {
             Schema<?> schemaFromAnn = schemaFromAnnotation(context, element, elementType, schemaAnn);
@@ -888,9 +898,9 @@ public final class SchemaDefinitionUtils {
             // Apply @Schema annotation only if not $ref since for $ref schemas
             // we already populated values from right @Schema annotation in previous steps
             schemaToBind = bindSchemaAnnotationValue(context, element, schemaToBind, schemaAnn, jsonViewClass);
-            Optional<String> schemaName = schemaAnn.stringValue(PROP_NAME);
-            if (schemaName.isPresent()) {
-                schemaToBind.setName(schemaName.get());
+            var schemaName = schemaAnn.stringValue(PROP_NAME).orElse(null);
+            if (schemaName != null) {
+                schemaToBind.setName(schemaName);
             }
 
             var impl = schemaAnn.stringValue(PROP_IMPLEMENTATION).orElse(null);
@@ -925,9 +935,9 @@ public final class SchemaDefinitionUtils {
             notOnlyRef = true;
         }
         if (isAnnotationPresent(element, Deprecated.class)
-                && !(element instanceof PropertyElement propertyEl
-                && isProtobufGenerated(propertyEl.getOwningType())
-                && elementType.getName().equals(Map.class.getName())
+            && !(element instanceof PropertyElement propertyEl
+            && isProtobufGenerated(propertyEl.getOwningType())
+            && elementType.getName().equals(Map.class.getName())
         )) {
             topLevelSchema.setDeprecated(true);
             notOnlyRef = true;
@@ -976,10 +986,10 @@ public final class SchemaDefinitionUtils {
         }
 
         if (!SchemaUtils.isEmptySchema(composedSchema)
-                && ((CollectionUtils.isNotEmpty(composedSchema.getAllOf()) && composedSchema.getAllOf().size() > 1)
-                || CollectionUtils.isNotEmpty(composedSchema.getOneOf())
-                || CollectionUtils.isNotEmpty(composedSchema.getAnyOf())
-                || notOnlyRef)) {
+            && ((CollectionUtils.isNotEmpty(composedSchema.getAllOf()) && composedSchema.getAllOf().size() > 1)
+            || CollectionUtils.isNotEmpty(composedSchema.getOneOf())
+            || CollectionUtils.isNotEmpty(composedSchema.getAnyOf())
+            || notOnlyRef)) {
             return composedSchema;
         }
         if (CollectionUtils.isNotEmpty(composedSchema.getAllOf()) && composedSchema.getAllOf().size() == 1) {
@@ -992,10 +1002,10 @@ public final class SchemaDefinitionUtils {
     /**
      * Binds the array schema for the given element.
      *
-     * @param context       The context
-     * @param element       The element
-     * @param schemaToBind  The schema to bind
-     * @param schemaAnn     The schema annotation
+     * @param context The context
+     * @param element The element
+     * @param schemaToBind The schema to bind
+     * @param schemaAnn The schema annotation
      * @param jsonViewClass Class from JsonView annotation
      * @return The bound schema
      */
@@ -1030,8 +1040,8 @@ public final class SchemaDefinitionUtils {
     /**
      * Convert the values to a map.
      *
-     * @param values        The values
-     * @param context       The visitor context
+     * @param values The values
+     * @param context The visitor context
      * @param jsonViewClass Class from JsonView annotation
      * @return The map
      */
@@ -1192,19 +1202,19 @@ public final class SchemaDefinitionUtils {
                                 var variables = new LinkedHashMap<String, Map<CharSequence, Object>>();
                                 for (Object o : a) {
                                     var sv = (AnnotationValue<ServerVariable>) o;
-                                    Optional<String> n = sv.stringValue(PROP_NAME);
-                                    n.ifPresent(name -> {
-                                        Map<CharSequence, Object> map = toValueMap(sv.getValues(), context, null);
-                                        Object dv = map.get(PROP_DEFAULT_VALUE);
-                                        if (dv != null) {
-                                            map.put(PROP_DEFAULT, dv);
-                                        }
-                                        if (map.containsKey(PROP_ALLOWABLE_VALUES)) {
-                                            // The key in the generated openapi needs to be "enum"
-                                            map.put(PROP_ENUM, map.remove(PROP_ALLOWABLE_VALUES));
-                                        }
-                                        variables.put(name, map);
-                                    });
+                                    sv.stringValue(PROP_NAME)
+                                        .ifPresent(name -> {
+                                            Map<CharSequence, Object> map = toValueMap(sv.getValues(), context, null);
+                                            Object dv = map.get(PROP_DEFAULT_VALUE);
+                                            if (dv != null) {
+                                                map.put(PROP_DEFAULT, dv);
+                                            }
+                                            if (map.containsKey(PROP_ALLOWABLE_VALUES)) {
+                                                // The key in the generated openapi needs to be "enum"
+                                                map.put(PROP_ENUM, map.remove(PROP_ALLOWABLE_VALUES));
+                                            }
+                                            variables.put(name, map);
+                                        });
                                 }
                                 newValues.put(key, variables);
                             } else if (DiscriminatorMapping.class.getName().equals(annotationName)) {
@@ -1329,7 +1339,7 @@ public final class SchemaDefinitionUtils {
         var arraySchemaMap = new HashMap<CharSequence, Object>(10);
         // properties
         av.get(PROP_ARRAY_SCHEMA, AnnotationValue.class).ifPresent(annotationValue ->
-                processAnnotationValue(context, (AnnotationValue<?>) annotationValue, arraySchemaMap, List.of(PROP_REF, PROP_IMPLEMENTATION), Schema.class, null)
+            processAnnotationValue(context, (AnnotationValue<?>) annotationValue, arraySchemaMap, List.of(PROP_REF, PROP_IMPLEMENTATION), Schema.class, null)
         );
         // items
         av.get(PROP_SCHEMA, AnnotationValue.class).ifPresent(annotationValue -> {
@@ -1372,10 +1382,10 @@ public final class SchemaDefinitionUtils {
     /**
      * Binds the schema for the given element.
      *
-     * @param context       The context
-     * @param element       The element
-     * @param schemaToBind  The schema to bind
-     * @param schemaAnn     The schema annotation
+     * @param context The context
+     * @param element The element
+     * @param schemaToBind The schema to bind
+     * @param schemaAnn The schema annotation
      * @param jsonViewClass Class from JsonView annotation
      * @return The bound schema
      */
@@ -1395,18 +1405,18 @@ public final class SchemaDefinitionUtils {
 
         JsonNode schemaJson = toJson(schemaAnn.getValues(), context, jsonViewClass);
         return doBindSchemaAnnotationValue(context, element, schemaToBind, schemaJson,
-                schemaAnn.stringValue(PROP_TYPE).orElse(typeAndFormat.getFirst()),
-                schemaAnn.stringValue(PROP_ONE_FORMAT).orElse(typeAndFormat.getSecond()),
-                schemaAnn, jsonViewClass);
+            schemaAnn.stringValue(PROP_TYPE).orElse(typeAndFormat.getFirst()),
+            schemaAnn.stringValue(PROP_ONE_FORMAT).orElse(typeAndFormat.getSecond()),
+            schemaAnn, jsonViewClass);
     }
 
     /**
      * Convert the given Map to a JSON node and then to the specified type.
      *
-     * @param <T>           The output class type
-     * @param values        The values
-     * @param context       The visitor context
-     * @param type          The class
+     * @param <T> The output class type
+     * @param values The values
+     * @param context The visitor context
+     * @param type The class
      * @param jsonViewClass Class from JsonView annotation
      * @return The converted instance
      */
@@ -1423,8 +1433,8 @@ public final class SchemaDefinitionUtils {
     /**
      * Convert the given map to a JSON node.
      *
-     * @param values        The values
-     * @param context       The visitor context
+     * @param values The values
+     * @param context The visitor context
      * @param jsonViewClass Class from JsonView annotation
      * @return The node
      */
@@ -1436,11 +1446,11 @@ public final class SchemaDefinitionUtils {
     /**
      * Processes a schema property.
      *
-     * @param context        The visitor context
-     * @param element        The element
-     * @param elementType    The element type
-     * @param classElement   The class element
-     * @param parentSchema   The parent schema
+     * @param context The visitor context
+     * @param element The element
+     * @param elementType The element type
+     * @param classElement The class element
+     * @param parentSchema The parent schema
      * @param propertySchema The property schema
      */
     public static void processSchemaProperty(VisitorContext context, TypedElement element, ClassElement elementType, @Nullable ClassElement classElement,
@@ -1461,7 +1471,7 @@ public final class SchemaDefinitionUtils {
                 elementSchemaRequired = schemaAnn.get(PROP_REQUIRED, Argument.BOOLEAN).orElse(null);
                 isRequiredDefaultValueSet = !schemaAnn.contains(PROP_REQUIRED);
                 var requiredMode = schemaAnn.enumValue(PROP_REQUIRED_MODE, io.swagger.v3.oas.annotations.media.Schema.RequiredMode.class)
-                        .orElse(null);
+                    .orElse(null);
                 if (requiredMode == io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED) {
                     elementSchemaRequired = true;
                     isAutoRequiredMode = false;
@@ -1489,23 +1499,23 @@ public final class SchemaDefinitionUtils {
             addProperty(parentSchema, propertyName, propertySchema, required);
             if (schemaAnn != null) {
                 schemaAnn.stringValue(PROP_DEFAULT_VALUE)
-                        .ifPresent(value -> {
-                            String elType = schemaAnn.stringValue(PROP_TYPE).orElse(null);
-                            String elFormat = schemaAnn.stringValue(PROP_ONE_FORMAT).orElse(null);
-                            if (elType == null && elementType != null) {
-                                Pair<String, String> typeAndFormat;
-                                if (elementType instanceof EnumElement enumEl) {
-                                    typeAndFormat = ConvertUtils.checkEnumJsonValueType(context, enumEl, null, elFormat);
-                                } else {
-                                    typeAndFormat = ConvertUtils.getTypeAndFormatByClass(elementType.getName(), elementType.isArray());
-                                }
-                                elType = typeAndFormat.getFirst();
-                                if (elFormat == null) {
-                                    elFormat = typeAndFormat.getSecond();
-                                }
+                    .ifPresent(value -> {
+                        String elType = schemaAnn.stringValue(PROP_TYPE).orElse(null);
+                        String elFormat = schemaAnn.stringValue(PROP_ONE_FORMAT).orElse(null);
+                        if (elType == null && elementType != null) {
+                            Pair<String, String> typeAndFormat;
+                            if (elementType instanceof EnumElement enumEl) {
+                                typeAndFormat = ConvertUtils.checkEnumJsonValueType(context, enumEl, null, elFormat);
+                            } else {
+                                typeAndFormat = ConvertUtils.getTypeAndFormatByClass(elementType.getName(), elementType.isArray());
                             }
-                            setDefaultValueObject(propertySchemaFinal, value, element, elType, elFormat, false, context);
-                        });
+                            elType = typeAndFormat.getFirst();
+                            if (elFormat == null) {
+                                elFormat = typeAndFormat.getSecond();
+                            }
+                        }
+                        setDefaultValueObject(propertySchemaFinal, value, element, elType, elFormat, false, context);
+                    });
             }
         }
     }
@@ -1561,13 +1571,13 @@ public final class SchemaDefinitionUtils {
                     continue;
                 }
                 if (visibilityLevel == VisibilityLevel.PUBLIC
-                        && !field.isPublic()) {
+                    && !field.isPublic()) {
                     continue;
                 } else if (visibilityLevel == VisibilityLevel.PROTECTED
-                        && (!field.isPublic() && !field.isProtected())) {
+                    && (!field.isPublic() && !field.isProtected())) {
                     continue;
                 } else if (visibilityLevel == VisibilityLevel.PACKAGE
-                        && (!field.isPublic() && !field.isProtected() && !field.isPackagePrivate())) {
+                    && (!field.isPublic() && !field.isProtected() && !field.isPackagePrivate())) {
                     continue;
                 }
                 boolean alreadyProcessed = false;
@@ -1606,8 +1616,8 @@ public final class SchemaDefinitionUtils {
         if (classElement.isInterface() && !parentInterfaces.isEmpty()) {
             for (ClassElement parentInterface : parentInterfaces) {
                 if (ClassUtils.isJavaLangType(parentInterface.getName())
-                        || isProtobufGenerated(parentInterface)
-                        || parentInterface.getBeanProperties().isEmpty()) {
+                    || isProtobufGenerated(parentInterface)
+                    || parentInterface.getBeanProperties().isEmpty()) {
                     continue;
                 }
                 superTypes.add(parentInterface);
@@ -1615,8 +1625,8 @@ public final class SchemaDefinitionUtils {
         } else {
             var superType = classElement.getSuperType().orElse(null);
             if (superType != null
-                    // check protobuf generated classes
-                    && !isProtobufMessageClass(superType)) {
+                // check protobuf generated classes
+                && !isProtobufMessageClass(superType)) {
                 superTypes.add(superType);
             }
         }
@@ -1624,7 +1634,7 @@ public final class SchemaDefinitionUtils {
             // skip if it is Enum or Object super class
             String firstSuperTypeName = superTypes.get(0).getName();
             if (superTypes.size() == 1
-                    && (firstSuperTypeName.equals(Enum.class.getName()) || firstSuperTypeName.equals(Object.class.getName()))) {
+                && (firstSuperTypeName.equals(Enum.class.getName()) || firstSuperTypeName.equals(Object.class.getName()))) {
                 if (schema != null) {
                     schema.setName(schemaName);
                     schemas.put(schemaName, schema);
@@ -1666,7 +1676,7 @@ public final class SchemaDefinitionUtils {
             definingElement, superType, superTypeArgs, context, jsonViewClass);
 
         if (schemas.get(parentSchemaName) != null
-                || getSchemaDefinition(openAPI, context, superType, superTypeArgs, null, mediaTypes, jsonViewClass) != null) {
+            || getSchemaDefinition(openAPI, context, superType, superTypeArgs, null, mediaTypes, jsonViewClass) != null) {
             var parentSchema = setSpecVersion(new Schema<>());
             parentSchema.set$ref(SchemaUtils.schemaRef(parentSchemaName));
             if (schema.getAllOf() == null || !schema.getAllOf().contains(parentSchema)) {
@@ -1676,7 +1686,7 @@ public final class SchemaDefinitionUtils {
         if (superType.isInterface()) {
             for (var interfaceEl : superType.getInterfaces()) {
                 if (ClassUtils.isJavaLangType(interfaceEl.getName())
-                        || interfaceEl.getBeanProperties().isEmpty()) {
+                    || interfaceEl.getBeanProperties().isEmpty()) {
                     continue;
                 }
 
@@ -2129,166 +2139,166 @@ public final class SchemaDefinitionUtils {
 
         if (isIterableOrMap) {
             if (isAnnotationPresent(element, "javax.validation.constraints.NotEmpty$List")
-                    || isAnnotationPresent(element, "jakarta.validation.constraints.NotEmpty$List")) {
+                || isAnnotationPresent(element, "jakarta.validation.constraints.NotEmpty$List")) {
                 schemaToBind.setMinItems(1);
             }
 
             findAnnotation(element, "javax.validation.constraints.Size$List")
-                    .ifPresent(listAnn -> listAnn.getValue(AnnotationValue.class)
-                            .ifPresent(ann -> ann.intValue("min")
-                                    .ifPresent(schemaToBind::setMinItems)));
+                .ifPresent(listAnn -> listAnn.getValue(AnnotationValue.class)
+                    .ifPresent(ann -> ann.intValue("min")
+                        .ifPresent(schemaToBind::setMinItems)));
             findAnnotation(element, "jakarta.validation.constraints.Size$List")
-                    .ifPresent(listAnn -> listAnn.getValue(AnnotationValue.class)
-                            .ifPresent(ann -> ann.intValue("min")
-                                    .ifPresent(schemaToBind::setMinItems)));
+                .ifPresent(listAnn -> listAnn.getValue(AnnotationValue.class)
+                    .ifPresent(ann -> ann.intValue("min")
+                        .ifPresent(schemaToBind::setMinItems)));
 
             findAnnotation(element, "javax.validation.constraints.Size$List")
-                    .ifPresent(listAnn -> listAnn.getValue(AnnotationValue.class)
-                            .ifPresent(ann -> ann.intValue("max")
-                                    .ifPresent(schemaToBind::setMaxItems)));
+                .ifPresent(listAnn -> listAnn.getValue(AnnotationValue.class)
+                    .ifPresent(ann -> ann.intValue("max")
+                        .ifPresent(schemaToBind::setMaxItems)));
             findAnnotation(element, "jakarta.validation.constraints.Size$List")
-                    .ifPresent(listAnn -> listAnn.getValue(AnnotationValue.class)
-                            .ifPresent(ann -> ann.intValue("max")
-                                    .ifPresent(schemaToBind::setMaxItems)));
+                .ifPresent(listAnn -> listAnn.getValue(AnnotationValue.class)
+                    .ifPresent(ann -> ann.intValue("max")
+                        .ifPresent(schemaToBind::setMaxItems)));
 
         } else {
             if (PrimitiveType.STRING.getCommonName().equals(schemaToBind.getType())) {
                 if (isAnnotationPresent(element, "javax.validation.constraints.NotEmpty$List")
-                        || isAnnotationPresent(element, "jakarta.validation.constraints.NotEmpty$List")
-                        || isAnnotationPresent(element, "javax.validation.constraints.NotBlank$List")
-                        || isAnnotationPresent(element, "jakarta.validation.constraints.NotBlank$List")) {
+                    || isAnnotationPresent(element, "jakarta.validation.constraints.NotEmpty$List")
+                    || isAnnotationPresent(element, "javax.validation.constraints.NotBlank$List")
+                    || isAnnotationPresent(element, "jakarta.validation.constraints.NotBlank$List")) {
                     schemaToBind.setMinLength(1);
                 }
 
                 findAnnotation(element, "javax.validation.constraints.Size$List")
-                        .ifPresent(listAnn -> {
-                            for (AnnotationValue<?> ann : listAnn.getAnnotations(PROP_VALUE)) {
-                                ann.intValue("min").ifPresent(schemaToBind::setMinLength);
-                                ann.intValue("max").ifPresent(schemaToBind::setMaxLength);
-                            }
-                        });
+                    .ifPresent(listAnn -> {
+                        for (AnnotationValue<?> ann : listAnn.getAnnotations(PROP_VALUE)) {
+                            ann.intValue("min").ifPresent(schemaToBind::setMinLength);
+                            ann.intValue("max").ifPresent(schemaToBind::setMaxLength);
+                        }
+                    });
                 findAnnotation(element, "jakarta.validation.constraints.Size$List")
-                        .ifPresent(listAnn -> {
-                            for (AnnotationValue<?> ann : listAnn.getAnnotations(PROP_VALUE)) {
-                                ann.intValue("min").ifPresent(schemaToBind::setMinLength);
-                                ann.intValue("max").ifPresent(schemaToBind::setMaxLength);
-                            }
-                        });
+                    .ifPresent(listAnn -> {
+                        for (AnnotationValue<?> ann : listAnn.getAnnotations(PROP_VALUE)) {
+                            ann.intValue("min").ifPresent(schemaToBind::setMinLength);
+                            ann.intValue("max").ifPresent(schemaToBind::setMaxLength);
+                        }
+                    });
             }
 
             if (isAnnotationPresent(element, "javax.validation.constraints.Negative$List")
-                    || isAnnotationPresent(element, "jakarta.validation.constraints.Negative$List")) {
+                || isAnnotationPresent(element, "jakarta.validation.constraints.Negative$List")) {
                 schemaToBind.setMaximum(BigDecimal.ZERO);
                 schemaToBind.exclusiveMaximum(true);
             }
             if (isAnnotationPresent(element, "javax.validation.constraints.NegativeOrZero$List")
-                    || isAnnotationPresent(element, "jakarta.validation.constraints.NegativeOrZero$List")) {
+                || isAnnotationPresent(element, "jakarta.validation.constraints.NegativeOrZero$List")) {
                 schemaToBind.setMaximum(BigDecimal.ZERO);
             }
             if (isAnnotationPresent(element, "javax.validation.constraints.Positive$List")
-                    || isAnnotationPresent(element, "jakarta.validation.constraints.Positive$List")) {
+                || isAnnotationPresent(element, "jakarta.validation.constraints.Positive$List")) {
                 schemaToBind.setMinimum(BigDecimal.ZERO);
                 schemaToBind.exclusiveMinimum(true);
             }
             if (isAnnotationPresent(element, "javax.validation.constraints.PositiveOrZero$List")
-                    || isAnnotationPresent(element, "jakarta.validation.constraints.PositiveOrZero$List")) {
+                || isAnnotationPresent(element, "jakarta.validation.constraints.PositiveOrZero$List")) {
                 schemaToBind.setMinimum(BigDecimal.ZERO);
             }
 
             findAnnotation(element, "javax.validation.constraints.Min$List")
-                    .ifPresent(listAnn -> {
-                        for (AnnotationValue<?> ann : listAnn.getAnnotations(PROP_VALUE)) {
-                            ann.getValue(BigDecimal.class)
-                                    .ifPresent(schemaToBind::setMinimum);
-                        }
-                    });
+                .ifPresent(listAnn -> {
+                    for (AnnotationValue<?> ann : listAnn.getAnnotations(PROP_VALUE)) {
+                        ann.getValue(BigDecimal.class)
+                            .ifPresent(schemaToBind::setMinimum);
+                    }
+                });
             findAnnotation(element, "jakarta.validation.constraints.Min$List")
-                    .ifPresent(listAnn -> {
-                        for (AnnotationValue<?> ann : listAnn.getAnnotations(PROP_VALUE)) {
-                            ann.getValue(BigDecimal.class)
-                                    .ifPresent(schemaToBind::setMinimum);
-                        }
-                    });
+                .ifPresent(listAnn -> {
+                    for (AnnotationValue<?> ann : listAnn.getAnnotations(PROP_VALUE)) {
+                        ann.getValue(BigDecimal.class)
+                            .ifPresent(schemaToBind::setMinimum);
+                    }
+                });
 
             findAnnotation(element, "javax.validation.constraints.Max$List")
-                    .ifPresent(listAnn -> {
-                        for (AnnotationValue<?> ann : listAnn.getAnnotations(PROP_VALUE)) {
-                            ann.getValue(BigDecimal.class)
-                                    .ifPresent(schemaToBind::setMaximum);
-                        }
-                    });
+                .ifPresent(listAnn -> {
+                    for (AnnotationValue<?> ann : listAnn.getAnnotations(PROP_VALUE)) {
+                        ann.getValue(BigDecimal.class)
+                            .ifPresent(schemaToBind::setMaximum);
+                    }
+                });
             findAnnotation(element, "jakarta.validation.constraints.Max$List")
-                    .ifPresent(listAnn -> {
-                        for (AnnotationValue<?> ann : listAnn.getAnnotations(PROP_VALUE)) {
-                            ann.getValue(BigDecimal.class)
-                                    .ifPresent(schemaToBind::setMaximum);
-                        }
-                    });
+                .ifPresent(listAnn -> {
+                    for (AnnotationValue<?> ann : listAnn.getAnnotations(PROP_VALUE)) {
+                        ann.getValue(BigDecimal.class)
+                            .ifPresent(schemaToBind::setMaximum);
+                    }
+                });
 
             findAnnotation(element, "javax.validation.constraints.DecimalMin$List")
-                    .ifPresent(listAnn -> {
-                        for (AnnotationValue<?> ann : listAnn.getAnnotations(PROP_VALUE)) {
-                            ann.getValue(BigDecimal.class)
-                                    .ifPresent(schemaToBind::setMinimum);
-                        }
-                    });
+                .ifPresent(listAnn -> {
+                    for (AnnotationValue<?> ann : listAnn.getAnnotations(PROP_VALUE)) {
+                        ann.getValue(BigDecimal.class)
+                            .ifPresent(schemaToBind::setMinimum);
+                    }
+                });
             findAnnotation(element, "jakarta.validation.constraints.DecimalMin$List")
-                    .ifPresent(listAnn -> {
-                        for (AnnotationValue<?> ann : listAnn.getAnnotations(PROP_VALUE)) {
-                            ann.getValue(BigDecimal.class)
-                                    .ifPresent(schemaToBind::setMinimum);
-                        }
-                    });
+                .ifPresent(listAnn -> {
+                    for (AnnotationValue<?> ann : listAnn.getAnnotations(PROP_VALUE)) {
+                        ann.getValue(BigDecimal.class)
+                            .ifPresent(schemaToBind::setMinimum);
+                    }
+                });
 
             findAnnotation(element, "javax.validation.constraints.DecimalMax$List")
-                    .ifPresent(listAnn -> {
-                        for (AnnotationValue<?> ann : listAnn.getAnnotations(PROP_VALUE)) {
-                            ann.getValue(BigDecimal.class)
-                                    .ifPresent(schemaToBind::setMaximum);
-                        }
-                    });
+                .ifPresent(listAnn -> {
+                    for (AnnotationValue<?> ann : listAnn.getAnnotations(PROP_VALUE)) {
+                        ann.getValue(BigDecimal.class)
+                            .ifPresent(schemaToBind::setMaximum);
+                    }
+                });
             findAnnotation(element, "jakarta.validation.constraints.DecimalMax$List")
-                    .ifPresent(listAnn -> {
-                        for (AnnotationValue<?> ann : listAnn.getAnnotations(PROP_VALUE)) {
-                            ann.getValue(BigDecimal.class)
-                                    .ifPresent(schemaToBind::setMaximum);
-                        }
-                    });
+                .ifPresent(listAnn -> {
+                    for (AnnotationValue<?> ann : listAnn.getAnnotations(PROP_VALUE)) {
+                        ann.getValue(BigDecimal.class)
+                            .ifPresent(schemaToBind::setMaximum);
+                    }
+                });
 
             findAnnotation(element, "javax.validation.constraints.Email$List")
-                    .ifPresent(listAnn -> {
-                        schemaToBind.setFormat(PrimitiveType.EMAIL.getCommonName());
-                        for (AnnotationValue<?> ann : listAnn.getAnnotations(PROP_VALUE)) {
-                            ann.stringValue("regexp")
-                                    .ifPresent(schemaToBind::setPattern);
-                        }
-                    });
+                .ifPresent(listAnn -> {
+                    schemaToBind.setFormat(PrimitiveType.EMAIL.getCommonName());
+                    for (AnnotationValue<?> ann : listAnn.getAnnotations(PROP_VALUE)) {
+                        ann.stringValue("regexp")
+                            .ifPresent(schemaToBind::setPattern);
+                    }
+                });
             findAnnotation(element, "jakarta.validation.constraints.Email$List")
-                    .ifPresent(listAnn -> {
-                        schemaToBind.setFormat(PrimitiveType.EMAIL.getCommonName());
-                        for (AnnotationValue<?> ann : listAnn.getAnnotations(PROP_VALUE)) {
-                            ann.stringValue("regexp")
-                                    .ifPresent(schemaToBind::setPattern);
-                        }
-                    });
+                .ifPresent(listAnn -> {
+                    schemaToBind.setFormat(PrimitiveType.EMAIL.getCommonName());
+                    for (AnnotationValue<?> ann : listAnn.getAnnotations(PROP_VALUE)) {
+                        ann.stringValue("regexp")
+                            .ifPresent(schemaToBind::setPattern);
+                    }
+                });
 
             findAnnotation(element, "javax.validation.constraints.Pattern$List")
-                    .ifPresent(listAnn -> {
-                        for (AnnotationValue<?> ann : listAnn.getAnnotations(PROP_VALUE)) {
-                            ann.stringValue("regexp")
-                                    .ifPresent(schemaToBind::setPattern);
-                        }
-                    });
+                .ifPresent(listAnn -> {
+                    for (AnnotationValue<?> ann : listAnn.getAnnotations(PROP_VALUE)) {
+                        ann.stringValue("regexp")
+                            .ifPresent(schemaToBind::setPattern);
+                    }
+                });
             findAnnotation(element, "jakarta.validation.constraints.Pattern$List")
-                    .ifPresent(listAnn -> {
-                        for (AnnotationValue<?> ann : listAnn.getAnnotations(PROP_VALUE)) {
-                            ann.stringValue("regexp")
-                                    .ifPresent(schemaToBind::setPattern);
-                        }
-                    });
+                .ifPresent(listAnn -> {
+                    for (AnnotationValue<?> ann : listAnn.getAnnotations(PROP_VALUE)) {
+                        ann.stringValue("regexp")
+                            .ifPresent(schemaToBind::setPattern);
+                    }
+                });
 
             element.getValue("io.micronaut.http.annotation.Part", String.class)
-                    .ifPresent(schemaToBind::setName);
+                .ifPresent(schemaToBind::setName);
         }
     }
 
@@ -2385,12 +2395,12 @@ public final class SchemaDefinitionUtils {
                 Schema<?> propertySchema = resolveSchema(openAPI, publicField, fieldType, context, mediaTypes, jsonViewClass, fieldJavadoc, classJavadoc);
 
                 processSchemaProperty(
-                        context,
-                        publicField,
-                        fieldType,
-                        classElement,
-                        schema,
-                        propertySchema
+                    context,
+                    publicField,
+                    fieldType,
+                    classElement,
+                    schema,
+                    propertySchema
                 );
             }
         }
@@ -2666,9 +2676,9 @@ public final class SchemaDefinitionUtils {
         String name = propertySchema.getName() != null ? propertySchema.getName() : element.getName();
 
         if (isAnnotationPresent(element, io.swagger.v3.oas.annotations.media.Schema.class)) {
-            Optional<String> nameFromSchema = stringValue(element, io.swagger.v3.oas.annotations.media.Schema.class, PROP_NAME);
-            if (nameFromSchema.isPresent()) {
-                return nameFromSchema.get();
+            var nameFromSchema = stringValue(element, io.swagger.v3.oas.annotations.media.Schema.class, PROP_NAME).orElse(null);
+            if (nameFromSchema != null) {
+                return nameFromSchema;
             }
         }
         if (isAnnotationPresent(element, JsonProperty.class)) {
@@ -2731,10 +2741,10 @@ public final class SchemaDefinitionUtils {
     private static boolean doesParamExistsMandatoryInConstructor(Element element, @Nullable Element classElement) {
         if (classElement instanceof ClassElement classEl) {
             return classEl.getPrimaryConstructor().flatMap(methodElement -> Arrays.stream(methodElement.getParameters())
-                            .filter(parameterElement -> parameterElement.getName().equals(element.getName()))
-                            .map(parameterElement -> !parameterElement.isNullable())
-                            .findFirst())
-                    .orElse(false);
+                    .filter(parameterElement -> parameterElement.getName().equals(element.getName()))
+                    .map(parameterElement -> !parameterElement.isNullable())
+                    .findFirst())
+                .orElse(false);
         }
 
         return false;
@@ -2751,10 +2761,6 @@ public final class SchemaDefinitionUtils {
         }
     }
 
-    private static boolean isTypeNullable(ClassElement type) {
-        return type.isAssignable(Optional.class);
-    }
-
     private static Map<String, Object> getDiscriminatorMap(Map<CharSequence, Object> newValues) {
         return newValues.containsKey(DISCRIMINATOR) ? (Map<String, Object>) newValues.get(DISCRIMINATOR) : new HashMap<>();
     }
@@ -2763,10 +2769,10 @@ public final class SchemaDefinitionUtils {
                                                                      Map<CharSequence, Object> arraySchemaMap, List<String> filters,
                                                                      Class<T> type, @Nullable ClassElement jsonViewClass) {
         Map<CharSequence, Object> values = annotationValue.getValues().entrySet().stream()
-                .filter(entry -> filters == null || !filters.contains((String) entry.getKey()))
-                .collect(toMap(e -> e.getKey().equals(PROP_REQUIRED_PROPERTIES) ? PROP_REQUIRED : e.getKey(), Map.Entry::getValue));
+            .filter(entry -> filters == null || !filters.contains((String) entry.getKey()))
+            .collect(toMap(e -> e.getKey().equals(PROP_REQUIRED_PROPERTIES) ? PROP_REQUIRED : e.getKey(), Map.Entry::getValue));
         toValue(values, context, type, jsonViewClass)
-                .ifPresent(s -> schemaToValueMap(arraySchemaMap, s));
+            .ifPresent(s -> schemaToValueMap(arraySchemaMap, s));
     }
 
     private static Map<CharSequence, Object> resolveAnnotationValues(VisitorContext context, AnnotationValue<?> av, @Nullable ClassElement jsonViewClass) {
@@ -2775,8 +2781,8 @@ public final class SchemaDefinitionUtils {
         final String annotationName = av.getAnnotationName();
         if (Parameter.class.getName().equals(annotationName)) {
             Utils.normalizeEnumValues(valueMap, CollectionUtils.mapOf(
-                    PROP_IN, ParameterIn.class,
-                    PROP_STYLE, ParameterStyle.class
+                PROP_IN, ParameterIn.class,
+                PROP_STYLE, ParameterStyle.class
             ));
         }
         return valueMap;

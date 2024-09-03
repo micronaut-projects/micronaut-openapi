@@ -17,6 +17,7 @@ swagger-parser = "1.0.71"
 swagger-parser-v3 = "2.1.22"
 javaparser = "3.26.1"
 commons-codec = "1.17.1"
+guava = "33.3.0-jre"
 
 micronaut = "4.6.3"
 micronaut-platform = "4.6.0"
@@ -77,6 +78,7 @@ jdt-annotation = { module = "org.eclipse.jdt:org.eclipse.jdt.annotation", versio
 android-annotation = { module = "androidx.annotation:annotation", version.ref = "android-annotation" }
 javaparser = { module = "com.github.javaparser:javaparser-symbol-solver-core", version.ref = "javaparser" }
 commons-codec = { module = "commons-codec:commons-codec", version.ref = "commons-codec" }
+guava = { module = "com.google.guava:guava", version.ref = "guava" }
 
 openapi-generator = { module = "org.openapitools:openapi-generator", version.ref = "openapi-generator" }
 swagger-parser = { module = "io.swagger:swagger-parser", version.ref = "swagger-parser" }
