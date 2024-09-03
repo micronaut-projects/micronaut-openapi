@@ -1108,7 +1108,10 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
             defaultValueInit = calcDefaultValues(items.datatypeWithEnum, items.dataType, items.getIsEnumOrRef(), parameterSchema).getLeft();
         }
         if (parameterSchema != null && ModelUtils.isEnumSchema(parameterSchema)) {
-            defaultValueInit = parameter.dataType + "." + toEnumVarName(parameter.defaultValue, parameter.dataType);
+            var enumVarName = toEnumVarName(parameter.defaultValue, parameter.dataType);
+            if (enumVarName != null) {
+                defaultValueInit = parameter.dataType + "." + enumVarName;
+            }
         }
         if (defaultValueInit != null) {
             parameter.vendorExtensions.put("defaultValueInit", defaultValueInit);
@@ -1144,7 +1147,10 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
             defaultValueInit = calcDefaultValues(items.datatypeWithEnum, items.dataType, items.getIsEnumOrRef(), p).getLeft();
         }
         if (p != null && ModelUtils.isEnumSchema(p)) {
-            defaultValueInit = property.dataType + "." + toEnumVarName(property.defaultValue, property.dataType);
+            var enumVarName = toEnumVarName(property.defaultValue, property.dataType);
+            if (enumVarName != null) {
+                defaultValueInit = property.dataType + "." + enumVarName;
+            }
         }
         if (defaultValueInit != null) {
             property.vendorExtensions.put("defaultValueInit", defaultValueInit);
@@ -1881,7 +1887,11 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
                     if (itemsIsEnumOrRef) {
                         String className = itemsDatatypeWithEnum;
                         String enumVarName = toEnumVarName(defaultValue, itemsDataType);
-                        defaultContent.append(className).append(".").append(enumVarName).append(",");
+                        if (enumVarName != null) {
+                            defaultContent.append(className).append(".").append(enumVarName).append(",");
+                        } else {
+                            defaultContent.append("null").append(",");
+                        }
                     } else {
                         itemsSchema.setDefault(defaultValue);
                         defaultValue = calcDefaultValues(itemsDatatypeWithEnum, itemsDataType, itemsIsEnumOrRef, itemsSchema).getRight();
