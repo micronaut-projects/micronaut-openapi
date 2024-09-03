@@ -625,4 +625,30 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
 
         assertFileContains(path + "api/FilesApi.kt", "@Produces(\"application/octet-stream\")");
     }
+
+    @Test
+    void testImplicitHeaders() {
+
+        var codegen = new KotlinMicronautClientCodegen();
+        codegen.setImplicitHeaders(true);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/params-with-default-value.yml", CodegenConstants.APIS);
+        String path = outputPath + "src/main/kotlin/org/openapitools/";
+
+        assertFileNotContains(path + "api/DefaultApi.kt", "@Header(\"X-Favor-Token\") @Nullable xFavorToken: String? = null,",
+            "@Header(name = \"Content-Type\", defaultValue = \"application/json\") @Nullable contentType: String? = \"application/json\""
+        );
+    }
+
+    @Test
+    void testImplicitHeadersRegex() {
+
+        var codegen = new KotlinMicronautClientCodegen();
+        codegen.setImplicitHeadersRegex(".*");
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/params-with-default-value.yml", CodegenConstants.APIS);
+        String path = outputPath + "src/main/kotlin/org/openapitools/";
+
+        assertFileNotContains(path + "api/DefaultApi.kt", "@Header(\"X-Favor-Token\") @Nullable xFavorToken: String? = null,",
+            "@Header(name = \"Content-Type\", defaultValue = \"application/json\") @Nullable contentType: String? = \"application/json\""
+        );
+    }
 }

@@ -180,16 +180,21 @@ public final class MicronautCodeGeneratorEntryPoint {
             if (options.modelNameSuffix != null && !options.modelNameSuffix.isBlank()) {
                 javaCodeGen.setModelNameSuffix(options.modelNameSuffix);
             }
+            javaCodeGen.setImplicitHeaders(options.implicitHeaders);
+            if (options.implicitHeadersRegex != null && !options.implicitHeadersRegex.isBlank()) {
+                javaCodeGen.setImplicitHeadersRegex(options.implicitHeadersRegex);
+            }
 
-            javaCodeGen.setUseOneOfInterfaces(options.useOneOfInterfaces());
+            javaCodeGen.setUseOneOfInterfaces(options.useOneOfInterfaces);
             javaCodeGen.setReactive(options.reactive);
             javaCodeGen.setGenerateHttpResponseAlways(options.generateHttpResponseAlways);
             javaCodeGen.setGenerateHttpResponseWhereRequired(options.generateHttpResponseWhereRequired);
             javaCodeGen.setUseOptional(options.optional);
             javaCodeGen.setUseBeanValidation(options.beanValidation);
             javaCodeGen.setTestTool(options.testFramework.value);
-            javaCodeGen.setSerializationLibrary(options.serializationLibraryKind().name());
-            javaCodeGen.setDateTimeLibrary(options.dateTimeFormat().name());
+            javaCodeGen.setSerializationLibrary(options.serializationLibraryKind.name());
+            javaCodeGen.setGenerateSwaggerAnnotations(options.generateSwaggerAnnotations);
+            javaCodeGen.setDateTimeLibrary(options.dateTimeFormat.name());
             configureJavaServerOptions();
             configureJavaClientOptions();
         } else if (options.lang == GeneratorLanguage.KOTLIN && codeGenerator instanceof AbstractMicronautKotlinCodegen<?> kotlinCodeGen) {
@@ -245,14 +250,19 @@ public final class MicronautCodeGeneratorEntryPoint {
             if (options.modelNameSuffix != null && !options.modelNameSuffix.isBlank()) {
                 kotlinCodeGen.setModelNameSuffix(options.modelNameSuffix);
             }
+            kotlinCodeGen.setImplicitHeaders(options.implicitHeaders);
+            if (options.implicitHeadersRegex != null && !options.implicitHeadersRegex.isBlank()) {
+                kotlinCodeGen.setImplicitHeadersRegex(options.implicitHeadersRegex);
+            }
             kotlinCodeGen.setUseOneOfInterfaces(options.useOneOfInterfaces);
             kotlinCodeGen.setReactive(options.reactive);
             kotlinCodeGen.setGenerateHttpResponseAlways(options.generateHttpResponseAlways);
             kotlinCodeGen.setGenerateHttpResponseWhereRequired(options.generateHttpResponseWhereRequired);
+            kotlinCodeGen.setGenerateSwaggerAnnotations(options.generateSwaggerAnnotations);
             kotlinCodeGen.setUseBeanValidation(options.beanValidation);
             kotlinCodeGen.setTestTool(options.testFramework.value);
-            kotlinCodeGen.setSerializationLibrary(options.serializationLibraryKind().name());
-            kotlinCodeGen.setDateTimeLibrary(options.dateTimeFormat().name());
+            kotlinCodeGen.setSerializationLibrary(options.serializationLibraryKind.name());
+            kotlinCodeGen.setDateTimeLibrary(options.dateTimeFormat.name());
             configureKotlinServerOptions();
             configureKotlinClientOptions();
         }
@@ -511,11 +521,15 @@ public final class MicronautCodeGeneratorEntryPoint {
             private String modelNamePrefix;
             private String modelNameSuffix;
 
+            private boolean implicitHeaders;
+            private String implicitHeadersRegex;
+
             private boolean optional;
             private boolean reactive = true;
             private boolean useOneOfInterfaces = true;
             private boolean generateHttpResponseAlways;
             private boolean generateHttpResponseWhereRequired = true;
+            private boolean generateSwaggerAnnotations;
             private TestFramework testFramework = TestFramework.JUNIT5;
             private SerializationLibraryKind serializationLibraryKind = SerializationLibraryKind.MICRONAUT_SERDE_JACKSON;
             private DateTimeFormat dateTimeFormat = DateTimeFormat.ZONED_DATETIME;
@@ -642,6 +656,18 @@ public final class MicronautCodeGeneratorEntryPoint {
             }
 
             @Override
+            public MicronautCodeGeneratorOptionsBuilder withImplicitHeaders(boolean implicitHeaders) {
+                this.implicitHeaders = implicitHeaders;
+                return this;
+            }
+
+            @Override
+            public MicronautCodeGeneratorOptionsBuilder withImplicitHeadersRegex(String implicitHeadersRegex) {
+                this.implicitHeadersRegex = implicitHeadersRegex;
+                return this;
+            }
+
+            @Override
             public MicronautCodeGeneratorOptionsBuilder withReactive(boolean reactive) {
                 this.reactive = reactive;
                 return this;
@@ -656,6 +682,12 @@ public final class MicronautCodeGeneratorEntryPoint {
             @Override
             public MicronautCodeGeneratorOptionsBuilder withGenerateHttpResponseWhereRequired(boolean generateHttpResponseWhereRequired) {
                 this.generateHttpResponseWhereRequired = generateHttpResponseWhereRequired;
+                return this;
+            }
+
+            @Override
+            public MicronautCodeGeneratorOptionsBuilder withGenerateSwaggerAnnotations(boolean generateSwaggerAnnotations) {
+                this.generateSwaggerAnnotations = generateSwaggerAnnotations;
                 return this;
             }
 
@@ -719,12 +751,16 @@ public final class MicronautCodeGeneratorEntryPoint {
                     modelNamePrefix,
                     modelNameSuffix,
 
+                    implicitHeaders,
+                    implicitHeadersRegex,
+
                     beanValidation,
                     optional,
                     reactive,
                     useOneOfInterfaces,
                     generateHttpResponseAlways,
                     generateHttpResponseWhereRequired,
+                    generateSwaggerAnnotations,
                     testFramework,
                     serializationLibraryKind,
                     dateTimeFormat);
@@ -771,12 +807,16 @@ public final class MicronautCodeGeneratorEntryPoint {
         String modelNamePrefix,
         String modelNameSuffix,
 
+        boolean implicitHeaders,
+        String implicitHeadersRegex,
+
         boolean beanValidation,
         boolean optional,
         boolean reactive,
         boolean useOneOfInterfaces,
         boolean generateHttpResponseAlways,
         boolean generateHttpResponseWhereRequired,
+        boolean generateSwaggerAnnotations,
         TestFramework testFramework,
         SerializationLibraryKind serializationLibraryKind,
         MicronautCodeGeneratorOptionsBuilder.DateTimeFormat dateTimeFormat

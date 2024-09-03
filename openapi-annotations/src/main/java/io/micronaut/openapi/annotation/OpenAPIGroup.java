@@ -40,19 +40,19 @@ import static java.lang.annotation.RetentionPolicy.SOURCE;
 public @interface OpenAPIGroup {
 
     /**
-     * @return The names of the OpenAPi groups.
+     * @return The names of the OpenAPI groups.
      */
     @AliasFor(member = "names")
     String[] value() default {};
 
     /**
-     * @return The names of the OpenAPi groups.
+     * @return The names of the OpenAPI groups.
      */
     @AliasFor(member = "value")
     String[] names() default {};
 
     /**
-     * @return The names of the OpenAPi groups to exclude endpoints from.
+     * @return The names of the OpenAPI groups to exclude endpoints from.
      */
     String[] exclude() default {};
 

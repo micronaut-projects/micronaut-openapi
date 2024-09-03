@@ -145,9 +145,9 @@ public interface MicronautCodeGeneratorOptionsBuilder {
     MicronautCodeGeneratorOptionsBuilder withInlineSchemaOption(Map<String, String> inlineSchemaOption);
 
     /**
-     * Add the OpenAPi normalizer options.
+     * Add the OpenAPI normalizer options.
      *
-     * @param openapiNormalizer the OpenAPi normalizer options
+     * @param openapiNormalizer the OpenAPI normalizer options
      * @return this builder
      */
     MicronautCodeGeneratorOptionsBuilder withOpenapiNormalizer(Map<String, String> openapiNormalizer);
@@ -185,6 +185,22 @@ public interface MicronautCodeGeneratorOptionsBuilder {
     MicronautCodeGeneratorOptionsBuilder withModelNameSuffix(String modelNameSuffix);
 
     /**
+     * Set the implicit headers flag.
+     *
+     * @param implicitHeaders implicit headers
+     * @return this builder
+     */
+    MicronautCodeGeneratorOptionsBuilder withImplicitHeaders(boolean implicitHeaders);
+
+    /**
+     * Set the implicit headers regex.
+     *
+     * @param implicitHeadersRegex implicit headers regex
+     * @return this builder
+     */
+    MicronautCodeGeneratorOptionsBuilder withImplicitHeadersRegex(String implicitHeadersRegex);
+
+    /**
      * If set to true, the generator will use reactive types.
      *
      * @param reactive the reactive flag
@@ -207,6 +223,14 @@ public interface MicronautCodeGeneratorOptionsBuilder {
      * @return this builder
      */
     MicronautCodeGeneratorOptionsBuilder withGenerateHttpResponseWhereRequired(boolean generateHttpResponseWhereRequired);
+
+    /**
+     * If set to true, controller and client method will be generated with openAPI annotations.
+     *
+     * @param generateSwaggerAnnotations the generate swagger annotations flag
+     * @return this builder
+     */
+    MicronautCodeGeneratorOptionsBuilder withGenerateSwaggerAnnotations(boolean generateSwaggerAnnotations);
 
     /**
      * If set to true, the generated code will use bean validation.

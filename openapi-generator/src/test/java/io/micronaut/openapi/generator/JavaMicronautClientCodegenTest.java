@@ -587,4 +587,30 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
             "@AllArgsConstructor",
             "@Data");
     }
+
+    @Test
+    void testImplicitHeaders() {
+
+        var codegen = new JavaMicronautClientCodegen();
+        codegen.setImplicitHeaders(true);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/params-with-default-value.yml", CodegenConstants.APIS);
+        String path = outputPath + "src/main/java/org/openapitools/";
+
+        assertFileNotContains(path + "api/DefaultApi.java", "@Header(\"X-Favor-Token\") @Nullable String xFavorToken",
+            "@Header(name = \"Content-Type\", defaultValue = \"application/json\") @Nullable String contentType"
+        );
+    }
+
+    @Test
+    void testImplicitHeadersRegex() {
+
+        var codegen = new JavaMicronautClientCodegen();
+        codegen.setImplicitHeadersRegex(".*");
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/params-with-default-value.yml", CodegenConstants.APIS);
+        String path = outputPath + "src/main/java/org/openapitools/";
+
+        assertFileNotContains(path + "api/DefaultApi.java", "@Header(\"X-Favor-Token\") @Nullable String xFavorToken",
+            "@Header(name = \"Content-Type\", defaultValue = \"application/json\") @Nullable String contentType"
+        );
+    }
 }

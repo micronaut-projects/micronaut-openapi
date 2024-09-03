@@ -51,11 +51,9 @@
             {{/responses}}
         ]{{#vendorExtensions.hasNotBodyParam}},
         parameters = [
-            {{#vendorExtensions.originalParams}}
-                {{^isBodyParam}}
-            Parameter(name = "{{vendorExtensions.realName}}"{{#description}}, description = "{{{description}}}"{{/description}}{{#required}}, required = true{{/required}}){{^-last}},{{/-last}}
-                {{/isBodyParam}}
-            {{/vendorExtensions.originalParams}}
+            {{#vendorExtensions.swaggerParams}}
+            Parameter(name = "{{baseName}}"{{#description}}, description = "{{{description}}}"{{/description}}{{#required}}, required = true{{/required}}, `in` = ParameterIn.{{#isCookieParam}}COOKIE{{/isCookieParam}}{{#isHeaderParam}}HEADER{{/isHeaderParam}}{{#isQueryParam}}QUERY{{/isQueryParam}}{{#isPathParam}}PATH{{/isPathParam}}){{^-last}},{{/-last}}
+            {{/vendorExtensions.swaggerParams}}
         ]{{/vendorExtensions.hasNotBodyParam}}{{#hasAuthMethods}},
         security = [
             {{#authMethods}}
@@ -64,10 +62,3 @@
         ]{{/hasAuthMethods}}
     )
     {{/generateSwagger2Annotations}}
-    {{#implicitHeadersParams.0}}
-        {{#generateSwagger2Annotations}}
-            {{#implicitHeadersParams}}
-    @Parameter(name = "{{vendorExtensions.realName}}"{{#description}}, description = "{{{description}}}"{{/description}}{{#required}}, required = true{{/required}})
-            {{/implicitHeadersParams}}
-        {{/generateSwagger2Annotations}}
-    {{/implicitHeadersParams.0}}

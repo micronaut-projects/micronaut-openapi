@@ -81,11 +81,11 @@
             {{closebrace}}{{/produces.1}}{{^produces.1}}{{#produces}}@Content(mediaType = "{{{mediaType}}}", schema = @Schema(implementation = {{{baseType}}}.class)){{/produces}}{{/produces.1}}{{/baseType}}){{^-last}},{{/-last}}{{#responses.1}}
             {{/responses.1}}{{/responses}}{{#responses.1}}
         {{closebrace}}{{/responses.1}}{{#vendorExtensions.hasNotBodyParam}},
-        parameters = {{#vendorExtensions.originalParams.1}}{{openbrace}}
-            {{/vendorExtensions.originalParams.1}}{{#vendorExtensions.originalParams}}{{#vendorExtensions.originalParams.1}}
-            {{/vendorExtensions.originalParams.1}}{{^isBodyParam}}@Parameter(name = "{{paramName}}"{{#description}}, description = "{{{description}}}"{{/description}}{{#required}}, required = true{{/required}}){{^-last}},{{/-last}}{{/isBodyParam}}{{#vendorExtensions.hasMultipleParams}}
-            {{/vendorExtensions.hasMultipleParams}}{{/vendorExtensions.originalParams}}{{#vendorExtensions.originalParams.1}}
-        {{closebrace}}{{/vendorExtensions.originalParams.1}}{{/vendorExtensions.hasNotBodyParam}}{{#hasAuthMethods}},
+        parameters = {{#vendorExtensions.swaggerParams.1}}{{openbrace}}
+            {{/vendorExtensions.swaggerParams.1}}{{#vendorExtensions.swaggerParams}}{{#vendorExtensions.swaggerParams.1}}
+            {{/vendorExtensions.swaggerParams.1}}@Parameter(name = "{{baseName}}"{{#description}}, description = "{{{description}}}"{{/description}}{{#required}}, required = true{{/required}}, in = ParameterIn.{{#isCookieParam}}COOKIE{{/isCookieParam}}{{#isHeaderParam}}HEADER{{/isHeaderParam}}{{#isQueryParam}}QUERY{{/isQueryParam}}{{#isPathParam}}PATH{{/isPathParam}}){{^-last}},{{/-last}}{{#vendorExtensions.hasMultipleParams}}
+            {{/vendorExtensions.hasMultipleParams}}{{/vendorExtensions.swaggerParams}}{{#vendorExtensions.swaggerParams.1}}
+        {{closebrace}}{{/vendorExtensions.swaggerParams.1}}{{/vendorExtensions.hasNotBodyParam}}{{#hasAuthMethods}},
         security = {{#authMethods.1}}{{openbrace}}
             {{/authMethods.1}}{{#authMethods}}{{#authMethods.1}}
             {{/authMethods.1}}@SecurityRequirement(name = "{{name}}"{{#isOAuth}}{{#scopes.1}}, scopes = {{openbrace}}{{#scopes}}"{{scope}}"{{^-last}}, {{/-last}}{{/scopes}}{{closebrace}}{{/scopes.1}}{{/isOAuth}}){{^-last}},{{/-last}}
@@ -93,23 +93,3 @@
         {{closebrace}}{{/authMethods.1}}{{/hasAuthMethods}}
     )
     {{/generateSwagger2Annotations}}
-    {{#implicitHeadersParams.0}}
-        {{#generateSwagger2Annotations}}
-            {{#implicitHeadersParams.1}}
-    @Parameters({{openbrace}}
-            {{/implicitHeadersParams.1}}
-            {{#implicitHeadersParams}}
-        @Parameter(name = "{{paramName}}"{{#description}}, description = "{{{description}}}"{{/description}}{{#required}}, required = true{{/required}}){{^-last}},{{/-last}}
-            {{/implicitHeadersParams}}
-            {{#implicitHeadersParams.1}}
-    {{closebrace}})
-            {{/implicitHeadersParams.1}}
-        {{/generateSwagger2Annotations}}
-        {{#generateSwagger1Annotations}}
-    @ApiImplicitParams({{openbrace}}
-            {{#implicitHeadersParams}}
-        @ApiImplicitParam(name = "{{{baseName}}}", value = "{{{description}}}", {{#required}}required = true,{{/required}} dataType = "{{{dataType}}}", paramType = "header"){{^-last}},{{/-last}}
-            {{/implicitHeadersParams}}
-    {{closebrace}})
-        {{/generateSwagger1Annotations}}
-    {{/implicitHeadersParams.0}}
