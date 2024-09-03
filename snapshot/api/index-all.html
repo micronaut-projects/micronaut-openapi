@@ -1770,6 +1770,10 @@ loadScripts(document, 'script');</script>
 </dl>
 <h2 class="title" id="I:H">H</h2>
 <dl class="index">
+<dt><a href="io/micronaut/openapi/generator/AbstractMicronautKotlinCodegen.html#handleImplicitHeaders(org.openapitools.codegen.CodegenOperation)" class="member-name-link">handleImplicitHeaders(CodegenOperation)</a> - Method in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/AbstractMicronautKotlinCodegen.html" title="class in io.micronaut.openapi.generator">AbstractMicronautKotlinCodegen</a></dt>
+<dd>
+<div class="block">This method removes all implicit header parameters from the list of parameters</div>
+</dd>
 <dt><a href="io/micronaut/openapi/adoc/md/ToAsciiDocSerializer.html#HARD_LINE_BREAK_MARKDOWN" class="member-name-link">HARD_LINE_BREAK_MARKDOWN</a> - Static variable in class io.micronaut.openapi.adoc.md.<a href="io/micronaut/openapi/adoc/md/ToAsciiDocSerializer.html" title="class in io.micronaut.openapi.adoc.md">ToAsciiDocSerializer</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/generator/ParameterMapping.html#hashCode()" class="member-name-link">hashCode()</a> - Method in record class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/ParameterMapping.html" title="class in io.micronaut.openapi.generator">ParameterMapping</a></dt>
@@ -1850,6 +1854,10 @@ loadScripts(document, 'script');</script>
 <dt><a href="io/micronaut/openapi/visitor/OpenApiControllerVisitor.html#ignore(io.micronaut.inject.ast.MethodElement,io.micronaut.inject.visitor.VisitorContext)" class="member-name-link">ignore(MethodElement, VisitorContext)</a> - Method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/OpenApiControllerVisitor.html" title="class in io.micronaut.openapi.visitor">OpenApiControllerVisitor</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/visitor/OpenApiEndpointVisitor.html#ignore(io.micronaut.inject.ast.MethodElement,io.micronaut.inject.visitor.VisitorContext)" class="member-name-link">ignore(MethodElement, VisitorContext)</a> - Method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/OpenApiEndpointVisitor.html" title="class in io.micronaut.openapi.visitor">OpenApiEndpointVisitor</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/AbstractMicronautKotlinCodegen.html#implicitHeaders" class="member-name-link">implicitHeaders</a> - Variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/AbstractMicronautKotlinCodegen.html" title="class in io.micronaut.openapi.generator">AbstractMicronautKotlinCodegen</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/AbstractMicronautKotlinCodegen.html#implicitHeadersRegex" class="member-name-link">implicitHeadersRegex</a> - Variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/AbstractMicronautKotlinCodegen.html" title="class in io.micronaut.openapi.generator">AbstractMicronautKotlinCodegen</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/generator/Formatting.IndentFormatter.html#%3Cinit%3E(int)" class="member-name-link">IndentFormatter(int)</a> - Constructor for class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/Formatting.IndentFormatter.html" title="class in io.micronaut.openapi.generator">Formatting.IndentFormatter</a></dt>
 <dd>&nbsp;</dd>
@@ -3138,6 +3146,10 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/generator/AbstractMicronautKotlinCodegen.html#OPT_GENERATED_ANNOTATION" class="member-name-link">OPT_GENERATED_ANNOTATION</a> - Static variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/AbstractMicronautKotlinCodegen.html" title="class in io.micronaut.openapi.generator">AbstractMicronautKotlinCodegen</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/AbstractMicronautKotlinCodegen.html#OPT_IMPLICIT_HEADERS" class="member-name-link">OPT_IMPLICIT_HEADERS</a> - Static variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/AbstractMicronautKotlinCodegen.html" title="class in io.micronaut.openapi.generator">AbstractMicronautKotlinCodegen</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/AbstractMicronautKotlinCodegen.html#OPT_IMPLICIT_HEADERS_REGEX" class="member-name-link">OPT_IMPLICIT_HEADERS_REGEX</a> - Static variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/AbstractMicronautKotlinCodegen.html" title="class in io.micronaut.openapi.generator">AbstractMicronautKotlinCodegen</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/generator/AbstractMicronautKotlinCodegen.html#OPT_KSP" class="member-name-link">OPT_KSP</a> - Static variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/AbstractMicronautKotlinCodegen.html" title="class in io.micronaut.openapi.generator">AbstractMicronautKotlinCodegen</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/generator/AbstractMicronautJavaCodegen.html#OPT_REACTIVE" class="member-name-link">OPT_REACTIVE</a> - Static variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/AbstractMicronautJavaCodegen.html" title="class in io.micronaut.openapi.generator">AbstractMicronautJavaCodegen</a></dt>
@@ -3976,9 +3988,17 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/generator/KotlinMicronautServerCodegen.html#setGenerateOperationsToReturnNotImplemented(boolean)" class="member-name-link">setGenerateOperationsToReturnNotImplemented(boolean)</a> - Method in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/KotlinMicronautServerCodegen.html" title="class in io.micronaut.openapi.generator">KotlinMicronautServerCodegen</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/AbstractMicronautJavaCodegen.html#setGenerateSwaggerAnnotations(boolean)" class="member-name-link">setGenerateSwaggerAnnotations(boolean)</a> - Method in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/AbstractMicronautJavaCodegen.html" title="class in io.micronaut.openapi.generator">AbstractMicronautJavaCodegen</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/AbstractMicronautKotlinCodegen.html#setGenerateSwaggerAnnotations(boolean)" class="member-name-link">setGenerateSwaggerAnnotations(boolean)</a> - Method in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/AbstractMicronautKotlinCodegen.html" title="class in io.micronaut.openapi.generator">AbstractMicronautKotlinCodegen</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/visitor/group/OpenApiInfo.html#setGroupName(java.lang.String)" class="member-name-link">setGroupName(String)</a> - Method in class io.micronaut.openapi.visitor.group.<a href="io/micronaut/openapi/visitor/group/OpenApiInfo.html" title="class in io.micronaut.openapi.visitor.group">OpenApiInfo</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/visitor/group/OpenApiInfo.html#setGroupTitle(java.lang.String)" class="member-name-link">setGroupTitle(String)</a> - Method in class io.micronaut.openapi.visitor.group.<a href="io/micronaut/openapi/visitor/group/OpenApiInfo.html" title="class in io.micronaut.openapi.visitor.group">OpenApiInfo</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/AbstractMicronautKotlinCodegen.html#setImplicitHeaders(boolean)" class="member-name-link">setImplicitHeaders(boolean)</a> - Method in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/AbstractMicronautKotlinCodegen.html" title="class in io.micronaut.openapi.generator">AbstractMicronautKotlinCodegen</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/AbstractMicronautKotlinCodegen.html#setImplicitHeadersRegex(java.lang.String)" class="member-name-link">setImplicitHeadersRegex(String)</a> - Method in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/AbstractMicronautKotlinCodegen.html" title="class in io.micronaut.openapi.generator">AbstractMicronautKotlinCodegen</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/visitor/Utils.html#setIncludedClassesGroups(java.util.Map)" class="member-name-link">setIncludedClassesGroups(Map&lt;String, List&lt;String&gt;&gt;)</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/Utils.html" title="class in io.micronaut.openapi.visitor">Utils</a></dt>
 <dd>&nbsp;</dd>
@@ -4827,6 +4847,18 @@ the order they are declared.</div>
 <dd>
 <div class="block">If set to true, controller operations will return not implemented status.</div>
 </dd>
+<dt><a href="io/micronaut/openapi/generator/MicronautCodeGeneratorOptionsBuilder.html#withGenerateSwaggerAnnotations(boolean)" class="member-name-link">withGenerateSwaggerAnnotations(boolean)</a> - Method in interface io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/MicronautCodeGeneratorOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorOptionsBuilder</a></dt>
+<dd>
+<div class="block">If set to true, controller and client method will be generated with openAPI annotations.</div>
+</dd>
+<dt><a href="io/micronaut/openapi/generator/MicronautCodeGeneratorOptionsBuilder.html#withImplicitHeaders(boolean)" class="member-name-link">withImplicitHeaders(boolean)</a> - Method in interface io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/MicronautCodeGeneratorOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorOptionsBuilder</a></dt>
+<dd>
+<div class="block">Set the implicit headers flag.</div>
+</dd>
+<dt><a href="io/micronaut/openapi/generator/MicronautCodeGeneratorOptionsBuilder.html#withImplicitHeadersRegex(java.lang.String)" class="member-name-link">withImplicitHeadersRegex(String)</a> - Method in interface io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/MicronautCodeGeneratorOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorOptionsBuilder</a></dt>
+<dd>
+<div class="block">Set the implicit headers regex.</div>
+</dd>
 <dt><a href="io/micronaut/openapi/generator/MicronautCodeGeneratorOptionsBuilder.html#withImportMapping(java.util.Map)" class="member-name-link">withImportMapping(Map&lt;String, String&gt;)</a> - Method in interface io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/MicronautCodeGeneratorOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorOptionsBuilder</a></dt>
 <dd>
 <div class="block">Add the import mappings.</div>
@@ -4885,7 +4917,7 @@ the order they are declared.</div>
 </dd>
 <dt><a href="io/micronaut/openapi/generator/MicronautCodeGeneratorOptionsBuilder.html#withOpenapiNormalizer(java.util.Map)" class="member-name-link">withOpenapiNormalizer(Map&lt;String, String&gt;)</a> - Method in interface io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/MicronautCodeGeneratorOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorOptionsBuilder</a></dt>
 <dd>
-<div class="block">Add the OpenAPi normalizer options.</div>
+<div class="block">Add the OpenAPI normalizer options.</div>
 </dd>
 <dt><a href="io/micronaut/openapi/generator/MicronautCodeGeneratorOptionsBuilder.html#withOptional(boolean)" class="member-name-link">withOptional(boolean)</a> - Method in interface io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/MicronautCodeGeneratorOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorOptionsBuilder</a></dt>
 <dd>
