@@ -263,8 +263,8 @@ class MyBean {}
         Schema vehicleRef = owner.properties.vehicle
         vehicleRef.description == "Vehicle of the owner. Here a car or bike with a name"
         vehicleRef.allOf[0].$ref == "#/components/schemas/Vehicle"
-        vehicleRef.allOf[1].oneOf[0].$ref == '#/components/schemas/Car'
-        vehicleRef.allOf[1].oneOf[1].$ref == '#/components/schemas/Bike'
+        vehicleRef.oneOf[0].$ref == '#/components/schemas/Car'
+        vehicleRef.oneOf[1].$ref == '#/components/schemas/Bike'
         Schema vehicle = schemas["Vehicle"]
         vehicle.type == 'object'
     }

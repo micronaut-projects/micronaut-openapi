@@ -177,7 +177,7 @@ class MyBean {}
         Schema woopsieRef = testImpl1.properties."woopsie-id"
 
         woopsieRef.description == "woopsie doopsie"
-        woopsieRef.allOf.size() == 2
+        woopsieRef.allOf.size() == 1
         woopsieRef.allOf[0].$ref == "#/components/schemas/TestInterface"
         Schema woopsie = schemas.TestInterface
         woopsie
