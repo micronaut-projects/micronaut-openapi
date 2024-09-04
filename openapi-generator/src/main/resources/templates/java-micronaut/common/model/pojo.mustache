@@ -13,11 +13,29 @@
 {{#lombok}}
     {{#parent}}
 @EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
     {{/parent}}
 @Accessors(chain = true)
+    {{#requiredPropertiesInConstructor}}
+        {{#vendorExtensions.withRequiredVars}}
+            {{^parent}}
+@EqualsAndHashCode
+@ToString
+            {{/parent}}
+@Getter
+@Setter
+        {{/vendorExtensions.withRequiredVars}}
+        {{^vendorExtensions.withRequiredVars}}
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
+        {{/vendorExtensions.withRequiredVars}}
+    {{/requiredPropertiesInConstructor}}
+    {{^requiredPropertiesInConstructor}}
+@NoArgsConstructor
+@AllArgsConstructor
+@Data
+    {{/requiredPropertiesInConstructor}}
 {{/lombok}}
 {{#micronaut_serde_jackson}}
 @Serdeable
@@ -146,6 +164,11 @@ public class {{classname}} {{#parent}}extends {{{parent}}} {{/parent}}{{#vendorE
         {{#vendorExtensions.requiredParentVarsWithoutDiscriminator.0}}super({{/vendorExtensions.requiredParentVarsWithoutDiscriminator.0}}{{#vendorExtensions.requiredParentVarsWithoutDiscriminator}}{{#vendorExtensions.isServerOrNotReadOnly}}{{^-first}}, {{/-first}}{{name}}{{/vendorExtensions.isServerOrNotReadOnly}}{{/vendorExtensions.requiredParentVarsWithoutDiscriminator}}{{#vendorExtensions.requiredParentVarsWithoutDiscriminator.0}});{{/vendorExtensions.requiredParentVarsWithoutDiscriminator.0}}
         {{/parent}}
         {{#vendorExtensions.requiredVars}}
+            {{#isDiscriminator}}
+                {{#useOneOfInterfaces}}
+        this.{{name}} = {{name}};
+                {{/useOneOfInterfaces}}
+            {{/isDiscriminator}}
             {{^isDiscriminator}}
                 {{#isReadOnly}}
                     {{#vendorExtensions.isServer}}
@@ -174,6 +197,16 @@ public class {{classname}} {{#parent}}extends {{{parent}}} {{/parent}}{{#vendorE
     {{#vendorExtensions.x-extra-annotation}}
     {{{.}}}
     {{/vendorExtensions.x-extra-annotation}}
+    {{#isDiscriminator}}
+        {{#parent}}
+    @Override
+        {{/parent}}
+        {{^parent}}
+            {{#isOverridden}}
+    @Override
+            {{/isOverridden}}
+        {{/parent}}
+    {{/isDiscriminator}}
     public {{{datatypeWithEnum}}} {{getter}}() {
         {{#vendorExtensions.x-is-jackson-optional-nullable}}
             {{#isReadOnly}}

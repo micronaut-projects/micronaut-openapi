@@ -36,6 +36,8 @@ import org.openapitools.codegen.CliOption;
 import org.openapitools.codegen.CodegenConstants;
 import org.openapitools.codegen.CodegenDiscriminator;
 import org.openapitools.codegen.CodegenModel;
+import org.openapitools.codegen.CodegenModelFactory;
+import org.openapitools.codegen.CodegenModelType;
 import org.openapitools.codegen.CodegenOperation;
 import org.openapitools.codegen.CodegenParameter;
 import org.openapitools.codegen.CodegenProperty;
@@ -61,6 +63,7 @@ import java.io.File;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -251,6 +254,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         );
 
         // Set additional properties
+        additionalProperties.put("useOneOfInterfaces", useOneOfInterfaces);
         additionalProperties.put("openbrace", "{");
         additionalProperties.put("closebrace", "}");
 
@@ -308,7 +312,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
 
         final CliOption serializationLibraryOpt = CliOption.newString(CodegenConstants.SERIALIZATION_LIBRARY, "Serialization library for model");
         serializationLibraryOpt.defaultValue(SerializationLibraryKind.JACKSON.name());
-        Map<String, String> serializationLibraryOptions = new HashMap<>();
+        var serializationLibraryOptions = new HashMap<String, String>();
         serializationLibraryOptions.put(SerializationLibraryKind.JACKSON.name(), "Jackson as serialization library");
         serializationLibraryOptions.put(SerializationLibraryKind.MICRONAUT_SERDE_JACKSON.name(), "Use micronaut-serialization with Jackson annotations");
         serializationLibraryOpt.setEnum(serializationLibraryOptions);
@@ -328,8 +332,8 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
             "Body",
             "application"
         ));
+//        reservedWords.remove("value");
 
-//        typeMapping = new HashMap<>();
         typeMapping.put("string", "String");
         typeMapping.put("boolean", "Boolean");
         typeMapping.put("integer", "Int");
@@ -1019,16 +1023,36 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
     }
 
     @Override
-    public CodegenModel fromModel(String name, Schema model) {
-        CodegenModel codegenModel = super.fromModel(name, model);
-        codegenModel.imports.remove("ApiModel");
-        codegenModel.imports.remove("ApiModelProperty");
-        if (importMapping.containsKey(codegenModel.dataType)
-            && !codegenModel.imports.contains(codegenModel.dataType)) {
-            codegenModel.imports.add(codegenModel.dataType);
+    public CodegenModel fromModel(String name, Schema schema) {
+        CodegenModel model = super.fromModel(name, schema);
+        if (!model.oneOf.isEmpty()) {
+            if (useOneOfInterfaces) {
+                model.vendorExtensions.put("x-is-one-of-interface", true);
+            }
+            if (ModelUtils.isTypeObjectSchema(schema)) {
+                CodegenModel m = CodegenModelFactory.newInstance(CodegenModelType.MODEL);
+                updateModelForObject(m, schema);
+                model.vars = m.vars;
+                model.allVars = m.allVars;
+                model.requiredVars = m.requiredVars;
+                model.readWriteVars = m.readWriteVars;
+                model.optionalVars = m.optionalVars;
+                model.readOnlyVars = m.readOnlyVars;
+                model.parentVars = m.parentVars;
+                model.nonNullableVars = m.nonNullableVars;
+                model.setRequiredVarsMap(m.getRequiredVarsMap());
+                model.mandatory = m.mandatory;
+                model.allMandatory = m.allMandatory;
+            }
         }
-        allModels.put(name, codegenModel);
-        return codegenModel;
+        model.imports.remove("ApiModel");
+        model.imports.remove("ApiModelProperty");
+        if (importMapping.containsKey(model.dataType)
+            && !model.imports.contains(model.dataType)) {
+            model.imports.add(model.dataType);
+        }
+        allModels.put(name, model);
+        return model;
     }
 
     /**
@@ -1478,13 +1502,13 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
             var requiredVars = new ArrayList<CodegenProperty>();
             for (var v : model.vars) {
                 v.vendorExtensions.put("hasChildren", model.hasChildren);
-                if (containsProp(v, requiredVarsWithoutDiscriminator)
+                if (!notContainsProp(v, requiredVarsWithoutDiscriminator)
                     || (!model.hasChildren || (v.required && !v.isDiscriminator))) {
-                    if (!containsProp(v, requiredVars)) {
+                    if (notContainsProp(v, requiredVars)) {
                         requiredVars.add(v);
                     }
                 } else {
-                    if (!containsProp(v, optionalVars)) {
+                    if (notContainsProp(v, optionalVars)) {
                         optionalVars.add(v);
                     }
                 }
@@ -1494,9 +1518,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
             if (!requiredParentVarsWithoutDiscriminator.isEmpty()) {
                 model.vendorExtensions.put("requiredParentVarsWithoutDiscriminator", requiredParentVarsWithoutDiscriminator);
             }
-            if (!requiredVarsWithoutDiscriminator.isEmpty()) {
-                model.vendorExtensions.put("requiredVarsWithoutDiscriminator", requiredVarsWithoutDiscriminator);
-            }
+            model.vendorExtensions.put("requiredVarsWithoutDiscriminator", requiredVarsWithoutDiscriminator);
             model.vendorExtensions.put("requiredVars", requiredVars);
             model.vendorExtensions.put("withRequiredOrOptionalVars", !requiredVarsWithoutDiscriminator.isEmpty() || !optionalVars.isEmpty());
             model.vendorExtensions.put("optionalVars", optionalVars);
@@ -1611,10 +1633,16 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
                                     List<CodegenProperty> requiredParentVarsWithoutDiscriminator,
                                     List<CodegenProperty> allVars,
                                     boolean processParentModel) {
-        var parent = model.getParentModel();
+        var parent = model.parentModel;
         var hasParent = parent != null;
 
-        allVars.addAll(model.vars);
+        for (var variable : model.vars) {
+            if (notContainsProp(variable, allVars)) {
+                allVars.add(variable);
+            }
+        }
+
+        var parentIsOneOfInterface = hasParent && Boolean.TRUE.equals(parent.getVendorExtensions().get("x-is-one-of-interface"));
 
         if (!processParentModel) {
             processVar(model, model.vars, requiredVarsWithoutDiscriminator, requiredParentVarsWithoutDiscriminator, processParentModel);
@@ -1622,29 +1650,61 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         processVar(model, model.requiredVars, requiredVarsWithoutDiscriminator, requiredParentVarsWithoutDiscriminator, processParentModel);
 
         requiredParentVarsWithoutDiscriminator(model, requiredParentVarsWithoutDiscriminator);
-
         if (hasParent) {
             model.parentVars = parent.allVars;
-        }
-        if (hasParent) {
             processParentModel(parent, requiredVarsWithoutDiscriminator, requiredParentVarsWithoutDiscriminator, allVars, true);
+        }
+
+        if (parentIsOneOfInterface) {
+            for (var variable : parent.vars) {
+                if (notContainsProp(variable, model.vars)) {
+                    if (parent.discriminator != null && parent.discriminator.getPropertyName().equals(variable.name)) {
+                        variable.isDiscriminator = true;
+                        variable.isOverridden = true;
+                    }
+                    model.vars.add(variable);
+                }
+            }
+            for (var variable : parent.requiredVars) {
+                if (notContainsProp(variable, model.requiredVars)) {
+                    model.requiredVars.add(variable);
+                }
+            }
+            model.parentModel = null;
+            model.parent = null;
+            model.parentVars = null;
         }
     }
 
     private void processVar(CodegenModel model, List<CodegenProperty> vars, List<CodegenProperty> requiredVarsWithoutDiscriminator, List<CodegenProperty> requiredParentVarsWithoutDiscriminator, boolean processParentModel) {
+
+        var parent = model.parentModel;
+        var hasParent = parent != null;
+        var parentRequiredVars = hasParent
+            ? (List<CodegenProperty>) parent.vendorExtensions.get("requiredVarsWithoutDiscriminator")
+            : Collections.<CodegenProperty>emptyList();
+        var parentIsOneOfInterface = hasParent && Boolean.TRUE.equals(parent.getVendorExtensions().get("x-is-one-of-interface"));
+
         for (var v : vars) {
-            if (!isDiscriminator(v, model) && !containsProp(v, requiredVarsWithoutDiscriminator)) {
-                if (v.isOverridden != null && !v.isOverridden && !v.vendorExtensions.containsKey("overridden") && !containsProp(v, vars)) {
-                    v.isOverridden = true;
-                    v.vendorExtensions.put("overridden", true);
+
+            if (notContainsProp(v, requiredVarsWithoutDiscriminator) && (!isDiscriminator(v, model) || parentIsOneOfInterface)) {
+                var copyVar = v;
+                if ((hasParent && !useOneOfInterfaces && !notContainsProp(v, parent.allVars))
+                    || (v.isOverridden != null && !v.isOverridden && !v.vendorExtensions.containsKey("overridden") && notContainsProp(v, vars))) {
+                    copyVar = v.clone();
+                    copyVar.isOverridden = true;
+                    copyVar.vendorExtensions.put("overridden", true);
                 }
                 v.vendorExtensions.put("hasChildren", model.hasChildren);
-                if (model.parentModel == null || !containsProp(v, (List<CodegenProperty>) model.parentModel.vendorExtensions.get("requiredVarsWithoutDiscriminator"))) {
-                    requiredVarsWithoutDiscriminator.add(v);
-                }
-                if (processParentModel && containsProp(v, (List<CodegenProperty>) model.vendorExtensions.get("requiredVarsWithoutDiscriminator"))) {
-                    v.isOverridden = true;
-                    v.vendorExtensions.put("overridden", true);
+                if (!hasParent || notContainsProp(v, parentRequiredVars) || parentIsOneOfInterface) {
+                    if (processParentModel) {
+                        copyVar = v.clone();
+                        copyVar.isOverridden = true;
+                    }
+                    if (copyVar.isOverridden != null && copyVar.isOverridden) {
+                        copyVar.vendorExtensions.put("overridden", true);
+                    }
+                    requiredVarsWithoutDiscriminator.add(copyVar);
                 }
             }
             v.isNullable = v.isNullable || (v.required && v.isReadOnly && isServer()) || !v.required;
@@ -1662,23 +1722,28 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
             boolean isDiscriminator = isDiscriminator(v, model);
             if (v.required && !isDiscriminator) {
                 v.vendorExtensions.put("isServerOrNotReadOnly", !v.isReadOnly || isServer());
-                if (!containsProp(v, requiredParentVarsWithoutDiscriminator)) {
-                    requiredParentVarsWithoutDiscriminator.add(v);
+                if (notContainsProp(v, requiredParentVarsWithoutDiscriminator)) {
+                    var childVar = v.clone();
+                    if (!useOneOfInterfaces) {
+                        childVar.isOverridden = true;
+                        childVar.vendorExtensions.put("overridden", true);
+                    }
+                    requiredParentVarsWithoutDiscriminator.add(childVar);
                 }
             }
         }
     }
 
-    private boolean containsProp(CodegenProperty prop, List<CodegenProperty> props) {
-        if (props == null) {
-            return false;
+    private boolean notContainsProp(CodegenProperty prop, List<CodegenProperty> props) {
+        if (props == null || props.isEmpty()) {
+            return true;
         }
         for (var p : props) {
             if (prop.name.equals(p.name)) {
-                return true;
+                return false;
             }
         }
-        return false;
+        return true;
     }
 
     private boolean isDiscriminator(CodegenProperty prop, CodegenModel model) {
@@ -2052,6 +2117,12 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
 
     private String firstTitleCase(final String input) {
         return input.substring(0, 1).toUpperCase(Locale.ROOT) + input.substring(1);
+    }
+
+    @Override
+    public void setUseOneOfInterfaces(Boolean useOneOfInterfaces) {
+        super.setUseOneOfInterfaces(useOneOfInterfaces);
+        additionalProperties.put("useOneOfInterfaces", useOneOfInterfaces);
     }
 
     @Override
