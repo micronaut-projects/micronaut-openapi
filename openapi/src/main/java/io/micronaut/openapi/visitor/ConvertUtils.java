@@ -652,7 +652,7 @@ public final class ConvertUtils {
             if (returnType.isEnum()) {
                 return checkEnumJsonValueType(context, (EnumElement) returnType, null, null);
             }
-            result = ConvertUtils.getTypeAndFormatByClass(returnType.getName(), returnType.isArray());
+            result = ConvertUtils.getTypeAndFormatByClass(returnType.getName(), returnType.isArray(), returnType);
         }
 
         if (result == null) {
@@ -664,7 +664,7 @@ public final class ConvertUtils {
                 if (fieldType.isEnum()) {
                     return checkEnumJsonValueType(context, (EnumElement) fieldType, null, null);
                 }
-                result = ConvertUtils.getTypeAndFormatByClass(fieldType.getName(), fieldType.isArray());
+                result = ConvertUtils.getTypeAndFormatByClass(fieldType.getName(), fieldType.isArray(), fieldType);
             }
         }
         if (result == null && isProtobufGenerated(type)) {
@@ -678,10 +678,11 @@ public final class ConvertUtils {
      *
      * @param className java class name
      * @param isArray is it array
+     * @param classEl class element
      *
      * @return pair with openapi type and format
      */
-    public static Pair<String, String> getTypeAndFormatByClass(String className, boolean isArray) {
+    public static Pair<String, String> getTypeAndFormatByClass(String className, boolean isArray, @Nullable ClassElement classEl) {
         if (className == null) {
             return Pair.of(TYPE_OBJECT, null);
         }
@@ -742,6 +743,12 @@ public final class ConvertUtils {
         } else if (LocalTime.class.getName().equals(className)) {
             return Pair.of(TYPE_STRING, "partial-time");
         } else {
+            if (classEl != null && ElementUtils.isContainerType(classEl)) {
+                var typeArg = classEl.getFirstTypeArgument().orElse(null);
+                if (typeArg != null) {
+                    return getTypeAndFormatByClass(typeArg.getName(), typeArg.isArray(), typeArg);
+                }
+            }
             return Pair.of(TYPE_OBJECT, null);
         }
     }

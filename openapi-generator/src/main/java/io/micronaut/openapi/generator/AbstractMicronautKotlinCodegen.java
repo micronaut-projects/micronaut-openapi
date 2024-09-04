@@ -969,7 +969,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
     }
 
     /**
-     * This method removes all implicit header parameters from the list of parameters
+     * This method removes all implicit header parameters from the list of parameters.
      *
      * @param operation - operation to be processed
      */

@@ -41,6 +41,12 @@ public final class UrlUtils {
     private UrlUtils() {
     }
 
+    /**
+     * Construct all possible URL variants by parsed segments.
+     *
+     * @param segments url template segments
+     * @return all possible URL variants by parsed segments.
+     */
     public static List<String> buildUrls(List<Segment> segments) {
 
         var results = new ArrayList<StringBuilder>();
@@ -105,6 +111,12 @@ public final class UrlUtils {
         results.addAll(newResults);
     }
 
+    /**
+     * Parse path string to list of segments.
+     *
+     * @param pathString path string
+     * @return list of segments
+     */
     public static List<Segment> parsePathSegments(String pathString) {
 
         var segments = new ArrayList<Segment>();
@@ -179,12 +191,21 @@ public final class UrlUtils {
         }
     }
 
+    /**
+     * Segment of urlTemplate.
+     *
+     * @param type segment type
+     * @param value value
+     */
     public record Segment(
         SegmentType type,
         String value
     ) {
     }
 
+    /**
+     * Type of segment.
+     */
     public enum SegmentType {
         REQ_VAR,
         OPT_VAR,
