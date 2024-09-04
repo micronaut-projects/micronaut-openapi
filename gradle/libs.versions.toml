@@ -19,7 +19,7 @@ javaparser = "3.26.2"
 commons-codec = "1.17.1"
 guava = "33.3.0-jre"
 
-micronaut = "4.6.3"
+micronaut = "4.6.4"
 micronaut-platform = "4.6.1"
 micronaut-jaxrs = "4.6.0"
 micronaut-security = "4.10.0"
