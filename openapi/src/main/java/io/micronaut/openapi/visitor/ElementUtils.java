@@ -249,6 +249,7 @@ public final class ElementUtils {
             || parameter.hasAnnotation("io.micronaut.session.annotation.SessionValue")
             || parameter.hasAnnotation("org.springframework.web.bind.annotation.SessionAttribute")
             || parameter.hasAnnotation("org.springframework.web.bind.annotation.SessionAttributes")
+            || parameter.hasAnnotation("jakarta.ws.rs.core.Context")
             || isIgnoredParameterType(parameter.getType());
     }
 
@@ -275,11 +276,26 @@ public final class ElementUtils {
             || parameterType.isAssignable("kotlin.coroutines.Continuation")
             || parameterType.isAssignable(HttpRequest.class)
             || parameterType.isAssignable("io.micronaut.http.BasicAuth")
+
             // servlet API
             || parameterType.isAssignable("jakarta.servlet.http.HttpServletRequest")
             || parameterType.isAssignable("jakarta.servlet.http.HttpServletResponse")
             || parameterType.isAssignable("jakarta.servlet.http.HttpSession")
-            || parameterType.isAssignable("jakarta.servlet.http.PushBuilder")
+            || parameterType.isAssignable("jakarta.servlet.ServletConfig")
+            || parameterType.isAssignable("jakarta.servlet.ServletContext")
+            || parameterType.isAssignable("jakarta.servlet.ServletRequest")
+            || parameterType.isAssignable("jakarta.servlet.ServletResponse")
+
+            // jax-rs
+            || parameterType.isAssignable("jakarta.ws.rs.core.Application")
+            || parameterType.isAssignable("jakarta.ws.rs.core.HttpHeaders")
+            || parameterType.isAssignable("jakarta.ws.rs.core.Request")
+            || parameterType.isAssignable("jakarta.ws.rs.core.SecurityContext")
+            || parameterType.isAssignable("jakarta.ws.rs.core.UriInfo")
+            || parameterType.isAssignable("jakarta.ws.rs.core.Configuration")
+            || parameterType.isAssignable("jakarta.ws.rs.container.ResourceContext")
+            || parameterType.isAssignable("jakarta.ws.rs.ext.Providers")
+
             // spring
             || parameterType.isAssignable("java.io.Reader")
             || parameterType.isAssignable("java.io.OutputStream")
@@ -291,7 +307,7 @@ public final class ElementUtils {
             || parameterType.isAssignable("org.springframework.http.HttpMethod")
             || parameterType.isAssignable("org.springframework.validation.BindingResult")
             || parameterType.isAssignable("org.springframework.validation.Errors")
-            ;
+        ;
     }
 
     public static AnnotationMetadata getAnnotationMetadata(Element el) {
