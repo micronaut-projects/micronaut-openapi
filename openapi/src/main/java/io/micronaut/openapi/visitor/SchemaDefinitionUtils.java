@@ -1265,9 +1265,11 @@ public final class SchemaDefinitionUtils {
                 } else if (key.equals(PROP_ADDITIONAL_PROPERTIES)) {
                     if (io.swagger.v3.oas.annotations.media.Schema.AdditionalPropertiesValue.TRUE.toString().equals(value.toString())) {
                         newValues.put(PROP_ADDITIONAL_PROPERTIES, true);
+                    } else if (io.swagger.v3.oas.annotations.media.Schema.AdditionalPropertiesValue.FALSE.toString().equals(value.toString())) {
+                        newValues.put(PROP_ADDITIONAL_PROPERTIES, false);
+                    }
                         // TODO
 //                    } else if (AdditionalPropertiesValue.USE_ADDITIONAL_PROPERTIES_ANNOTATION.toString().equals(value.toString())) {
-                    }
                 } else if (key.equals(PROP_ONE_TYPES) && isOpenapi31()) {
                     newValues.put(PROP_TYPE, value);
                 } else if (key.equals(PROP_DISCRIMINATOR_PROPERTY)) {
@@ -1939,7 +1941,7 @@ public final class SchemaDefinitionUtils {
             if (schemaAdditionalProperties == io.swagger.v3.oas.annotations.media.Schema.AdditionalPropertiesValue.TRUE) {
                 schemaToBind.additionalProperties(true);
             } else if (schemaAdditionalProperties == io.swagger.v3.oas.annotations.media.Schema.AdditionalPropertiesValue.FALSE) {
-                schemaToBind.additionalProperties(null);
+                schemaToBind.additionalProperties(false);
             }
         }
 

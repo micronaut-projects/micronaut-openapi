@@ -1189,4 +1189,71 @@ class MyBean {}
         schemas.Car.properties.resourceType
         schemas.Car.properties.selected
     }
+
+    void "test schema additionalProperties = false"() {
+
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.core.annotation.Nullable;import io.micronaut.http.annotation.Body;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Post;
+import io.micronaut.http.annotation.QueryValue;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import jakarta.validation.Valid;
+import java.io.Serializable;
+import java.util.List;
+
+@Controller
+class HelloController {
+
+    @Post(value = "/search", consumes = "application/json", produces = "application/json")
+    @Operation(summary = "Returns List of Audit Log records based on the matching search criteria", description = "Returns list of Audit Log records matching the search critera. SLA:500", responses = {
+            @ApiResponse(responseCode = "200", description = "Successful retrieval of list of Audit Log records matching the search criteria", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = AuditLogDTO.class)) }),
+            @ApiResponse(responseCode = "400", description = "Invalid input provided", content = { @Content(mediaType = "application/json")}), 
+            @ApiResponse(responseCode = "401", description = "Unauthorized", content = { @Content(mediaType = "application/json")}),})            
+    public List<AuditLogDTO> searchAuditLog(
+            @Parameter(description = "Page number for the search results", example = "1", required = false) @QueryValue(value = "page", defaultValue = "1") @Nullable Integer page,
+            @Parameter(description = "Size of the page", example = "1", required = false) @QueryValue(value = "size", defaultValue = "100") @Nullable Integer size,
+            @Parameter(description = "Audit Search criteria", example = "1", required = true) @Body @Valid AuditSearchCriteria auditSearchCriteria) {
+        return null;
+    }
+
+}
+
+enum TestEnum {
+    VAL1, VAL2
+}
+
+@Schema(additionalProperties = Schema.AdditionalPropertiesValue.FALSE)
+class AuditSearchCriteria implements Serializable {
+        
+}
+
+record AuditLogDTO(
+    TestEnum field1,
+    @io.swagger.v3.oas.annotations.media.Schema(deprecated = true) TestEnum field2
+) {
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        then: "the state is correct"
+        Utils.testReference != null
+
+        when: "The OpenAPI is retrieved"
+        def openApi = Utils.testReference
+        def schemas = openApi.components.schemas
+
+        then: "the components are valid"
+        schemas.AuditSearchCriteria.additionalProperties != null
+        schemas.AuditSearchCriteria.additionalProperties == false
+    }
 }
