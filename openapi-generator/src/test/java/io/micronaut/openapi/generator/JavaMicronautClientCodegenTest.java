@@ -613,4 +613,14 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
             "@Header(name = \"Content-Type\", defaultValue = \"application/json\") @Nullable String contentType"
         );
     }
+
+    @Test
+    void testInnerEnum() {
+
+        var codegen = new JavaMicronautClientCodegen();
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/inner-enum.yml", CodegenConstants.MODELS);
+        String path = outputPath + "src/main/java/org/openapitools/";
+
+        assertFileContains(path + "model/CustomerCreateDTO.java", "import java.util.function.Function;");
+    }
 }
