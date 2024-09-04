@@ -281,6 +281,8 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/generator/KotlinMicronautServerCodegen.html#apiTestFilename(java.lang.String,java.lang.String)" class="member-name-link">apiTestFilename(String, String)</a> - Method in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/KotlinMicronautServerCodegen.html" title="class in io.micronaut.openapi.generator">KotlinMicronautServerCodegen</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/visitor/SchemaUtils.html#appendSchema(io.swagger.v3.oas.models.media.Schema,io.swagger.v3.oas.models.media.Schema)" class="member-name-link">appendSchema(Schema&lt;?&gt;, Schema&lt;?&gt;)</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/SchemaUtils.html" title="class in io.micronaut.openapi.visitor">SchemaUtils</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/generator/AbstractMicronautJavaCodegen.html#appName" class="member-name-link">appName</a> - Variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/AbstractMicronautJavaCodegen.html" title="class in io.micronaut.openapi.generator">AbstractMicronautJavaCodegen</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/generator/AbstractMicronautKotlinCodegen.html#appName" class="member-name-link">appName</a> - Variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/AbstractMicronautKotlinCodegen.html" title="class in io.micronaut.openapi.generator">AbstractMicronautKotlinCodegen</a></dt>
@@ -371,7 +373,9 @@ loadScripts(document, 'script');</script>
 <dt><a href="io/micronaut/openapi/swagger/core/util/ObjectMapperFactory.html#buildStrictGenericObjectMapper()" class="member-name-link">buildStrictGenericObjectMapper()</a> - Static method in class io.micronaut.openapi.swagger.core.util.<a href="io/micronaut/openapi/swagger/core/util/ObjectMapperFactory.html" title="class in io.micronaut.openapi.swagger.core.util">ObjectMapperFactory</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/visitor/UrlUtils.html#buildUrls(java.util.List)" class="member-name-link">buildUrls(List&lt;UrlUtils.Segment&gt;)</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/UrlUtils.html" title="class in io.micronaut.openapi.visitor">UrlUtils</a></dt>
-<dd>&nbsp;</dd>
+<dd>
+<div class="block">Construct all possible URL variants by parsed segments.</div>
+</dd>
 <dt><a href="io/micronaut/openapi/swagger/core/util/PrimitiveType.html#BYTE" class="member-name-link">BYTE</a> - Enum constant in enum class io.micronaut.openapi.swagger.core.util.<a href="io/micronaut/openapi/swagger/core/util/PrimitiveType.html" title="enum class in io.micronaut.openapi.swagger.core.util">PrimitiveType</a></dt>
 <dd>&nbsp;</dd>
 </dl>
@@ -1697,7 +1701,7 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/visitor/SchemaUtils.html#getType(java.lang.String,java.util.Collection)" class="member-name-link">getType(String, Collection&lt;String&gt;)</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/SchemaUtils.html" title="class in io.micronaut.openapi.visitor">SchemaUtils</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="io/micronaut/openapi/visitor/ConvertUtils.html#getTypeAndFormatByClass(java.lang.String,boolean)" class="member-name-link">getTypeAndFormatByClass(String, boolean)</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/ConvertUtils.html" title="class in io.micronaut.openapi.visitor">ConvertUtils</a></dt>
+<dt><a href="io/micronaut/openapi/visitor/ConvertUtils.html#getTypeAndFormatByClass(java.lang.String,boolean,io.micronaut.inject.ast.ClassElement)" class="member-name-link">getTypeAndFormatByClass(String, boolean, ClassElement)</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/ConvertUtils.html" title="class in io.micronaut.openapi.visitor">ConvertUtils</a></dt>
 <dd>
 <div class="block">Detect openapi type and format by java class name.</div>
 </dd>
@@ -1772,7 +1776,7 @@ loadScripts(document, 'script');</script>
 <dl class="index">
 <dt><a href="io/micronaut/openapi/generator/AbstractMicronautKotlinCodegen.html#handleImplicitHeaders(org.openapitools.codegen.CodegenOperation)" class="member-name-link">handleImplicitHeaders(CodegenOperation)</a> - Method in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/AbstractMicronautKotlinCodegen.html" title="class in io.micronaut.openapi.generator">AbstractMicronautKotlinCodegen</a></dt>
 <dd>
-<div class="block">This method removes all implicit header parameters from the list of parameters</div>
+<div class="block">This method removes all implicit header parameters from the list of parameters.</div>
 </dd>
 <dt><a href="io/micronaut/openapi/adoc/md/ToAsciiDocSerializer.html#HARD_LINE_BREAK_MARKDOWN" class="member-name-link">HARD_LINE_BREAK_MARKDOWN</a> - Static variable in class io.micronaut.openapi.adoc.md.<a href="io/micronaut/openapi/adoc/md/ToAsciiDocSerializer.html" title="class in io.micronaut.openapi.adoc.md">ToAsciiDocSerializer</a></dt>
 <dd>&nbsp;</dd>
@@ -2010,6 +2014,8 @@ loadScripts(document, 'script');</script>
 <dt><a href="io/micronaut/openapi/visitor/ElementUtils.html#isIgnoredParameterType(io.micronaut.inject.ast.ClassElement)" class="member-name-link">isIgnoredParameterType(ClassElement)</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/ElementUtils.html" title="class in io.micronaut.openapi.visitor">ElementUtils</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/visitor/group/GroupProperties.PackageProperties.html#isIncludeSubpackages()" class="member-name-link">isIncludeSubpackages()</a> - Method in class io.micronaut.openapi.visitor.group.<a href="io/micronaut/openapi/visitor/group/GroupProperties.PackageProperties.html" title="class in io.micronaut.openapi.visitor.group">GroupProperties.PackageProperties</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/visitor/ElementUtils.html#isJavaBasicType(java.lang.String)" class="member-name-link">isJavaBasicType(String)</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/ElementUtils.html" title="class in io.micronaut.openapi.visitor">ElementUtils</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/visitor/ConfigUtils.html#isJsonViewDefaultInclusion(io.micronaut.inject.visitor.VisitorContext)" class="member-name-link">isJsonViewDefaultInclusion(VisitorContext)</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/ConfigUtils.html" title="class in io.micronaut.openapi.visitor">ConfigUtils</a></dt>
 <dd>&nbsp;</dd>
@@ -3280,7 +3286,9 @@ loadScripts(document, 'script');</script>
 <dt><a href="io/micronaut/openapi/visitor/ConvertUtils.html#parseJsonString(java.lang.Object)" class="member-name-link">parseJsonString(Object)</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/ConvertUtils.html" title="class in io.micronaut.openapi.visitor">ConvertUtils</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/visitor/UrlUtils.html#parsePathSegments(java.lang.String)" class="member-name-link">parsePathSegments(String)</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/UrlUtils.html" title="class in io.micronaut.openapi.visitor">UrlUtils</a></dt>
-<dd>&nbsp;</dd>
+<dd>
+<div class="block">Parse path string to list of segments.</div>
+</dd>
 <dt><a href="io/micronaut/openapi/swagger/core/util/PrimitiveType.html#PARTIAL_TIME" class="member-name-link">PARTIAL_TIME</a> - Enum constant in enum class io.micronaut.openapi.swagger.core.util.<a href="io/micronaut/openapi/swagger/core/util/PrimitiveType.html" title="enum class in io.micronaut.openapi.swagger.core.util">PrimitiveType</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/adoc/TemplatePaths.html#PATHS" class="member-name-link">PATHS</a> - Static variable in interface io.micronaut.openapi.adoc.<a href="io/micronaut/openapi/adoc/TemplatePaths.html" title="interface in io.micronaut.openapi.adoc">TemplatePaths</a></dt>
@@ -4359,7 +4367,7 @@ loadScripts(document, 'script');</script>
 </dd>
 <dt><a href="io/micronaut/openapi/visitor/UrlUtils.Segment.html#type()" class="member-name-link">type()</a> - Method in record class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/UrlUtils.Segment.html" title="class in io.micronaut.openapi.visitor">UrlUtils.Segment</a></dt>
 <dd>
-<div class="block">Returns the value of the <code>type</code> record component.</div>
+<div class="block">Returns the value of the <a href="./io/micronaut/openapi/visitor/UrlUtils.Segment.html#param-type"><code>type</code></a> record component.</div>
 </dd>
 <dt><a href="io/micronaut/openapi/SimpleSchema.html#type(java.lang.String)" class="member-name-link">type(String)</a> - Method in class io.micronaut.openapi.<a href="io/micronaut/openapi/SimpleSchema.html" title="class in io.micronaut.openapi">SimpleSchema</a></dt>
 <dd>&nbsp;</dd>
@@ -4403,9 +4411,13 @@ loadScripts(document, 'script');</script>
 <div class="block">URL and URL paths util methods.</div>
 </dd>
 <dt><a href="io/micronaut/openapi/visitor/UrlUtils.Segment.html" class="type-name-link" title="class in io.micronaut.openapi.visitor">UrlUtils.Segment</a> - Record Class in <a href="io/micronaut/openapi/visitor/package-summary.html">io.micronaut.openapi.visitor</a></dt>
-<dd>&nbsp;</dd>
+<dd>
+<div class="block">Segment of urlTemplate.</div>
+</dd>
 <dt><a href="io/micronaut/openapi/visitor/UrlUtils.SegmentType.html" class="type-name-link" title="enum class in io.micronaut.openapi.visitor">UrlUtils.SegmentType</a> - Enum Class in <a href="io/micronaut/openapi/visitor/package-summary.html">io.micronaut.openapi.visitor</a></dt>
-<dd>&nbsp;</dd>
+<dd>
+<div class="block">Type of segment.</div>
+</dd>
 <dt><a href="io/micronaut/openapi/generator/JavaMicronautServerCodegen.html#useAuth" class="member-name-link">useAuth</a> - Variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/JavaMicronautServerCodegen.html" title="class in io.micronaut.openapi.generator">JavaMicronautServerCodegen</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/generator/KotlinMicronautServerCodegen.html#useAuth" class="member-name-link">useAuth</a> - Variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/KotlinMicronautServerCodegen.html" title="class in io.micronaut.openapi.generator">KotlinMicronautServerCodegen</a></dt>
@@ -4449,7 +4461,7 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/visitor/UrlUtils.Segment.html#value()" class="member-name-link">value()</a> - Method in record class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/UrlUtils.Segment.html" title="class in io.micronaut.openapi.visitor">UrlUtils.Segment</a></dt>
 <dd>
-<div class="block">Returns the value of the <code>value</code> record component.</div>
+<div class="block">Returns the value of the <a href="./io/micronaut/openapi/visitor/UrlUtils.Segment.html#param-value"><code>value</code></a> record component.</div>
 </dd>
 <dt><a href="io/micronaut/openapi/generator/Formatting.html#valueOf(java.lang.String)" class="member-name-link">valueOf(String)</a> - Static method in enum class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/Formatting.html" title="enum class in io.micronaut.openapi.generator">Formatting</a></dt>
 <dd>

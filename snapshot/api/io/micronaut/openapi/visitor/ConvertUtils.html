@@ -130,8 +130,9 @@ loadScripts(document, 'script');</script>
 <div class="block">Detect openapi type and format for enums.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="Pair.html" title="class in io.micronaut.openapi.visitor">Pair</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#getTypeAndFormatByClass(java.lang.String,boolean)" class="member-name-link">getTypeAndFormatByClass</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;className,
- boolean&nbsp;isArray)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#getTypeAndFormatByClass(java.lang.String,boolean,io.micronaut.inject.ast.ClassElement)" class="member-name-link">getTypeAndFormatByClass</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;className,
+ boolean&nbsp;isArray,
+ @Nullable io.micronaut.inject.ast.ClassElement&nbsp;classEl)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
 <div class="block">Detect openapi type and format by java class name.</div>
 </div>
@@ -411,15 +412,18 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
-<section class="detail" id="getTypeAndFormatByClass(java.lang.String,boolean)">
+<section class="detail" id="getTypeAndFormatByClass(java.lang.String,boolean,io.micronaut.inject.ast.ClassElement)">
 <h3>getTypeAndFormatByClass</h3>
 <div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="Pair.html" title="class in io.micronaut.openapi.visitor">Pair</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;</span>&nbsp;<span class="element-name">getTypeAndFormatByClass</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;className,
- boolean&nbsp;isArray)</span></div>
+ boolean&nbsp;isArray,
+ @Nullable
+ @Nullable io.micronaut.inject.ast.ClassElement&nbsp;classEl)</span></div>
 <div class="block">Detect openapi type and format by java class name.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>className</code> - java class name</dd>
 <dd><code>isArray</code> - is it array</dd>
+<dd><code>classEl</code> - class element</dd>
 <dt>Returns:</dt>
 <dd>pair with openapi type and format</dd>
 </dl>
