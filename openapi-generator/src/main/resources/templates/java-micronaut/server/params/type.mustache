@@ -2,10 +2,10 @@
     {{{vendorExtensions.typeWithGenericAnnotations}}}
 {{/isDate}}{{/isDateTime}}{{/isEnum}}
 {{#isDateTime}}
-    {{#dateFormat}}@Format("{{{datetimeFormat}}}"){{/dateFormat}} {{{dataType}}}
+    {{#vendorExtensions.formatPattern}}@Format("{{{.}}}"){{/vendorExtensions.formatPattern}}{{^vendorExtensions.formatPattern}}{{#dateTimeFormat}}@Format("{{{.}}}"){{/dateTimeFormat}}{{/vendorExtensions.formatPattern}} {{{dataType}}}
 {{/isDateTime}}
 {{#isDate}}
-    {{#dateTimeFormat}}@Format("{{{dateFormat}}}"){{/dateTimeFormat}} {{{dataType}}}
+    {{#vendorExtensions.formatPattern}}@Format("{{{.}}}"){{/vendorExtensions.formatPattern}}{{^vendorExtensions.formatPattern}}{{#dateFormat}}@Format("{{{.}}}"){{/dateFormat}}{{/vendorExtensions.formatPattern}} {{{dataType}}}
 {{/isDate}}
 {{#isEnum}}
     {{{vendorExtensions.typeWithEnumWithGenericAnnotations}}}

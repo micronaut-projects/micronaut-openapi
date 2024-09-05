@@ -1,5 +1,6 @@
 package io.micronaut.openapi.generator;
 
+import io.micronaut.openapi.generator.assertions.TestUtils;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.servers.Server;
@@ -456,7 +457,7 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
         String modelPath = outputPath + "src/main/kotlin/org/openapitools/model/";
 
         assertFileContains(apiPath + "BooksApi.kt", "@Body @NotNull requestBody: List<@Pattern(regexp = \"[a-zA-Z ]+\") @Size(max = 10) @NotNull String>");
-        assertFileContains(modelPath + "CountsContainer.kt", "var counts: List<@NotEmpty List<@NotNull List<@Size(max = 10) @NotNull String>>>");
+        assertFileContains(modelPath + "CountsContainer.kt", "var counts: List<@NotEmpty List<@NotNull List<@Size(max = 10) @NotNull ZonedDateTime>>>");
         assertFileContains(modelPath + "BooksContainer.kt", "var books: List<@Pattern(regexp = \"[a-zA-Z ]+\") @Size(max = 10) @NotNull String>");
     }
 

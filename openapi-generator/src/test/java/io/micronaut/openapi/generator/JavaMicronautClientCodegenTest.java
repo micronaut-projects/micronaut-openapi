@@ -161,7 +161,7 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
 
         // Constructor should have properties
         String modelPath = outputPath + "src/main/java/org/openapitools/model/";
-        assertFileContains(modelPath + "Pet.java", "public Pet(String name, List<String> photoUrls)");
+        assertFileContains(modelPath + "Pet.java", "public Pet(String name, List<@NotNull String> photoUrls)");
         assertFileNotContains(modelPath + "Pet.java", "public Pet()");
     }
 
@@ -328,8 +328,12 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         String apiPath = outputPath + "src/main/java/org/openapitools/api/";
         String modelPath = outputPath + "src/main/java/org/openapitools/model/";
 
-        assertFileContains(apiPath + "BooksApi.java", "List<@Pattern(regexp = \"[a-zA-Z ]+\") @Size(max = 10) @NotNull String> requestBody");
-        assertFileContains(modelPath + "CountsContainer.java", "private List<@NotEmpty List<@NotNull List<@Size(max = 10) @NotNull String>>> counts;");
+        assertFileContains(apiPath + "BooksApi.java",
+            "@QueryValue(\"before\") @NotNull @Format(\"yyyy-MM-dd'T'HH:mm:ss.SSS'Z'\") ZonedDateTime before,",
+            "List<@Pattern(regexp = \"[a-zA-Z ]+\") @Size(max = 10) @NotNull String> requestBody",
+            ""
+        );
+        assertFileContains(modelPath + "CountsContainer.java", "private List<@NotEmpty List<@NotNull List<@Size(max = 10) @NotNull ZonedDateTime>>> counts;");
         assertFileContains(modelPath + "BooksContainer.java", "private List<@Pattern(regexp = \"[a-zA-Z ]+\") @Size(max = 10) @NotNull String> books;");
     }
 

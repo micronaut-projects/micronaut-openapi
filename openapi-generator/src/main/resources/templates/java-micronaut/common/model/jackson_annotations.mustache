@@ -38,26 +38,46 @@
     {{#jackson}}
         {{^micronaut_serde_jackson}}
             {{#isDateTime}}
-                {{#datetimeFormat}}
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "{{{datetimeFormat}}}")
-                {{/datetimeFormat}}
+                {{#vendorExtensions.formatPattern}}
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "{{{vendorExtensions.formatPattern}}}")
+                {{/vendorExtensions.formatPattern}}
+                {{^vendorExtensions.formatPattern}}
+                    {{#dateTimeFormat}}
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "{{{dateTimeFormat}}}")
+                    {{/dateTimeFormat}}
+                {{/vendorExtensions.formatPattern}}
             {{/isDateTime}}
             {{#isDate}}
-                {{#dateFormat}}
+                {{#vendorExtensions.formatPattern}}
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "{{{vendorExtensions.formatPattern}}}")
+                {{/vendorExtensions.formatPattern}}
+                {{^vendorExtensions.formatPattern}}
+                    {{#dateFormat}}
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "{{{dateFormat}}}")
-                {{/dateFormat}}
+                    {{/dateFormat}}
+                {{/vendorExtensions.formatPattern}}
             {{/isDate}}
         {{/micronaut_serde_jackson}}
     {{/jackson}}
     {{#micronaut_serde_jackson}}
         {{#isDateTime}}
-            {{#datatimeFormat}}
-    @JsonFormat(pattern = "{{{datetimeFormat}}}")
-            {{/datatimeFormat}}
+            {{#vendorExtensions.formatPattern}}
+    @JsonFormat(pattern = "{{{vendorExtensions.formatPattern}}}")
+            {{/vendorExtensions.formatPattern}}
+            {{^vendorExtensions.formatPattern}}
+                {{#dateTimeFormat}}
+    @JsonFormat(pattern = "{{{dateTimeFormat}}}")
+                {{/dateTimeFormat}}
+            {{/vendorExtensions.formatPattern}}
         {{/isDateTime}}
         {{#isDate}}
-            {{#dateFormat}}
+            {{#vendorExtensions.formatPattern}}
+    @JsonFormat(pattern = "{{{vendorExtensions.formatPattern}}}")
+            {{/vendorExtensions.formatPattern}}
+            {{^vendorExtensions.formatPattern}}
+                {{#dateFormat}}
     @JsonFormat(pattern = "{{{dateFormat}}}")
-            {{/dateFormat}}
+                {{/dateFormat}}
+            {{/vendorExtensions.formatPattern}}
         {{/isDate}}
     {{/micronaut_serde_jackson}}

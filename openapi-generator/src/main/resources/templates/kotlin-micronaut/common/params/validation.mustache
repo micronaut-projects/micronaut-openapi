@@ -30,9 +30,9 @@
     {{/isContainer}}
     {{!Pattern}}
     {{#pattern}}
-        {{^isByteArray}}
+        {{^isByteArray}}{{^isDate}}{{^isDateTime}}
     @Pattern(regexp = "{{{pattern}}}")
-        {{/isByteArray}}
+        {{/isDateTime}}{{/isDate}}{{/isByteArray}}
     {{/pattern}}
     {{!Min length && max length}}
     {{#minLength}}
