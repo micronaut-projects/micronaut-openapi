@@ -41,6 +41,7 @@ import org.openapitools.codegen.CodegenOperation;
 import org.openapitools.codegen.CodegenParameter;
 import org.openapitools.codegen.CodegenProperty;
 import org.openapitools.codegen.SupportingFile;
+import org.openapitools.codegen.config.GlobalSettings;
 import org.openapitools.codegen.languages.AbstractJavaCodegen;
 import org.openapitools.codegen.languages.features.BeanValidationFeatures;
 import org.openapitools.codegen.languages.features.OptionalFeatures;
@@ -75,6 +76,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static io.micronaut.openapi.generator.Utils.DEFAULT_BODY_PARAM_NAME;
+import static io.micronaut.openapi.generator.Utils.DIVIDE_OPERATIONS_BY_CONTENT_TYPE;
 import static io.micronaut.openapi.generator.Utils.EXT_ANNOTATIONS_CLASS;
 import static io.micronaut.openapi.generator.Utils.EXT_ANNOTATIONS_FIELD;
 import static io.micronaut.openapi.generator.Utils.EXT_ANNOTATIONS_OPERATION;
@@ -185,6 +187,8 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
         useOneOfInterfaces = true;
         inlineSchemaOption.put("RESOLVE_INLINE_ENUMS", "true");
         // CHECKSTYLE:ON
+
+        GlobalSettings.setProperty(DIVIDE_OPERATIONS_BY_CONTENT_TYPE, "true");
 
         // Set implemented features for user information
         modifyFeatureSet(features -> features

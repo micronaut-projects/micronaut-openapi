@@ -528,4 +528,37 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                 );
             """);
     }
+
+    @Test
+    void testMultipleContentTypesEndpoints() {
+
+        var codegen = new JavaMicronautServerCodegen();
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/multiple-content-types.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String path = outputPath + "src/main/java/org/openapitools/";
+
+        assertFileContains(path + "api/DefaultApi.java", """
+                    @Operation(
+                        operationId = "myOp",
+                        responses = @ApiResponse(responseCode = "201", description = "Successfully created")
+                    )
+                    @Post("/multiplecontentpath")
+                    @Secured(SecurityRule.IS_ANONYMOUS)
+                    Mono<HttpResponse<Void>> myOp(
+                        @Body @Nullable(inherited = true) @Valid Coordinates coordinates
+                    );
+                """,
+            """
+                    @Operation(
+                        operationId = "myOp_0",
+                        responses = @ApiResponse(responseCode = "201", description = "Successfully created")
+                    )
+                    @Post("/multiplecontentpath")
+                    @Consumes("multipart/form-data")
+                    @Secured(SecurityRule.IS_ANONYMOUS)
+                    Mono<HttpResponse<Void>> myOp_1(
+                        @Nullable(inherited = true) @Valid Coordinates coordinates,
+                        @Nullable(inherited = true) CompletedFileUpload file
+                    );
+                """);
+    }
 }

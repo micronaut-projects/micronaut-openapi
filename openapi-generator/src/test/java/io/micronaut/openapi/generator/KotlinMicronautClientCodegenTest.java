@@ -779,4 +779,27 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                 ) {
                 """);
     }
+
+    @Test
+    void testMultipleContentTypesEndpoints() {
+
+        var codegen = new KotlinMicronautClientCodegen();
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/multiple-content-types.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String path = outputPath + "src/main/kotlin/org/openapitools/";
+
+        assertFileContains(path + "api/DefaultApi.kt", """
+                    @Post("/multiplecontentpath")
+                    fun myOp(
+                        @Body @Nullable @Valid coordinates: Coordinates?
+                    ): Mono<HttpResponse<Void>>
+                """,
+            """
+                    @Post("/multiplecontentpath")
+                    @Produces("multipart/form-data")
+                    fun myOp_1(
+                        @Nullable @Valid coordinates: Coordinates?,
+                        @Nullable file: ByteArray?
+                    ): Mono<HttpResponse<Void>>
+                """);
+    }
 }
