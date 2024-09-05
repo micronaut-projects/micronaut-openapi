@@ -26,8 +26,10 @@ import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.PathItem;
 import io.swagger.v3.oas.models.Paths;
 import io.swagger.v3.oas.models.examples.Example;
+import io.swagger.v3.oas.models.headers.Header;
 import io.swagger.v3.oas.models.media.Content;
 import io.swagger.v3.oas.models.media.Schema;
+import io.swagger.v3.oas.models.media.StringSchema;
 import io.swagger.v3.oas.models.parameters.Parameter;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 
@@ -43,6 +45,7 @@ import static io.micronaut.openapi.visitor.SchemaUtils.EMPTY_SCHEMA;
 import static io.micronaut.openapi.visitor.SchemaUtils.EMPTY_SIMPLE_SCHEMA;
 import static io.micronaut.openapi.visitor.SchemaUtils.TYPE_OBJECT;
 import static io.micronaut.openapi.visitor.SchemaUtils.TYPE_STRING;
+import static io.micronaut.openapi.visitor.SchemaUtils.setSpecVersion;
 
 /**
  * Normalization methods for openAPI objects.
@@ -134,7 +137,34 @@ public final class OpenApiNormalizeUtils {
         if (CollectionUtils.isNotEmpty(operation.getResponses())) {
             for (ApiResponse apiResponse : operation.getResponses().values()) {
                 normalizeContent(apiResponse.getContent(), context);
+                normalizeHeaders(apiResponse.getHeaders(), context);
             }
+        }
+    }
+
+    public static void normalizeHeaders(Map<String, Header> headers, VisitorContext context) {
+        if (CollectionUtils.isEmpty(headers)) {
+            return;
+        }
+
+        for (var header : headers.values()) {
+            Schema<?> headerSchema = header.getSchema();
+            if (headerSchema == null) {
+                headerSchema = setSpecVersion(new StringSchema());
+                header.setSchema(headerSchema);
+            }
+            Schema<?> normalizedSchema = normalizeSchema(headerSchema, context);
+            if (normalizedSchema != null) {
+                header.setSchema(normalizedSchema);
+            } else if (headerSchema.equals(EMPTY_SIMPLE_SCHEMA)) {
+                headerSchema.setType(TYPE_OBJECT);
+            }
+            if (header.getExample() != null
+                && header.getExample() instanceof String exampleStr) {
+                header.setExample(ConvertUtils.parseByTypeAndFormat(exampleStr, header.getSchema().getType(), header.getSchema().getFormat(), context, false));
+            }
+            normalizeExamples(header.getExamples());
+            normalizeContent(header.getContent(), context);
         }
     }
 
@@ -233,9 +263,7 @@ public final class OpenApiNormalizeUtils {
                 schema.setType(type);
                 schema.setAllOf(allOf);
                 schema.setDefault(defaultValue);
-                if (schema.getExample() == null) {
-                    schema.setExampleSetFlag(false);
-                } else if (TYPE_STRING.equals(schema.getType()) && schema.getExample() instanceof String exampleStr) {
+                if (!TYPE_STRING.equals(schema.getType()) && schema.getExample() instanceof String exampleStr) {
                     schema.setExample(ConvertUtils.parseByTypeAndFormat(exampleStr, type, schema.getFormat(), context, false));
                 }
                 normalizeSchemaProperties(schema, context);
@@ -303,9 +331,7 @@ public final class OpenApiNormalizeUtils {
 
         String type = schema.getType();
 
-        if (schema.getExample() == null) {
-            schema.setExampleSetFlag(false);
-        } else if (!TYPE_STRING.equals(type) && schema.getExample() instanceof String exampleStr) {
+        if (!TYPE_STRING.equals(type) && schema.getExample() instanceof String exampleStr) {
             schema.setExample(ConvertUtils.parseByTypeAndFormat(exampleStr, type, schema.getFormat(), context, false));
         }
     }
