@@ -16,6 +16,7 @@
 package io.micronaut.openapi.visitor;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
@@ -469,5 +470,18 @@ public final class ElementUtils {
             || type.isAssignable("com.google.common.base.Optional")
             || type.isAssignable(AtomicReference.class)
             ;
+    }
+
+    public static boolean isEnum(ClassElement classElement) {
+
+        var isEnum = classElement.isEnum();
+
+        var jsonFormatAnn = classElement.getAnnotation(JsonFormat.class);
+        if (jsonFormatAnn == null) {
+            return isEnum;
+        }
+
+        var jsonShape = jsonFormatAnn.get("shape", JsonFormat.Shape.class).orElse(JsonFormat.Shape.ANY);
+        return jsonShape != JsonFormat.Shape.OBJECT && isEnum;
     }
 }

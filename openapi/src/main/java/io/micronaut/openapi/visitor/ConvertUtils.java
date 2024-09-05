@@ -85,6 +85,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import static io.micronaut.openapi.OpenApiUtils.CONVERT_JSON_MAPPER;
 import static io.micronaut.openapi.OpenApiUtils.JSON_MAPPER;
 import static io.micronaut.openapi.visitor.ContextUtils.warn;
+import static io.micronaut.openapi.visitor.ElementUtils.isEnum;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_BEARER_FORMAT;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_CONTENT;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_FLOWS;
@@ -596,7 +597,7 @@ public final class ConvertUtils {
     public static void setDefaultValueObject(Schema<?> schema, String defaultValue, @Nullable Element element, @Nullable String schemaType, @Nullable String schemaFormat, boolean isMicronautFormat, VisitorContext context) {
         try {
             Pair<String, String> typeAndFormat;
-            if (element instanceof EnumElement enumEl) {
+            if (element instanceof EnumElement enumEl && isEnum(enumEl)) {
                 typeAndFormat = ConvertUtils.checkEnumJsonValueType(context, enumEl, schemaType, schemaFormat);
             } else {
                 typeAndFormat = Pair.of(schemaType, schemaFormat);
@@ -649,7 +650,7 @@ public final class ConvertUtils {
         Pair<String, String> result = null;
         if (firstMethod != null) {
             ClassElement returnType = firstMethod.getReturnType();
-            if (returnType.isEnum()) {
+            if (isEnum(returnType)) {
                 return checkEnumJsonValueType(context, (EnumElement) returnType, null, null);
             }
             result = ConvertUtils.getTypeAndFormatByClass(returnType.getName(), returnType.isArray(), returnType);
@@ -661,7 +662,7 @@ public final class ConvertUtils {
             if (CollectionUtils.isNotEmpty(fields)) {
                 var firstField = fields.get(0);
                 ClassElement fieldType = firstField.getType();
-                if (fieldType.isEnum()) {
+                if (isEnum(fieldType)) {
                     return checkEnumJsonValueType(context, (EnumElement) fieldType, null, null);
                 }
                 result = ConvertUtils.getTypeAndFormatByClass(fieldType.getName(), fieldType.isArray(), fieldType);
