@@ -48,6 +48,8 @@ public final class Utils {
         "LocalDate",
         "LocalTime"
     );
+    public static final String DIVIDE_OPERATIONS_BY_CONTENT_TYPE = "divideOperationsByContentType";
+
     public static final String DEFAULT_BODY_PARAM_NAME = "requestBody";
     public static final String EXT_ANNOTATIONS_OPERATION = "x-operation-extra-annotation";
     public static final String EXT_ANNOTATIONS_CLASS = "x-class-extra-annotation";

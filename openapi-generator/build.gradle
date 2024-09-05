@@ -11,7 +11,9 @@ dependencies {
             because("OpenAPI generator depends on older release which isn't compatible with SnakeYAML")
         }
     }
-    api libs.openapi.generator
+    api(libs.openapi.generator) {
+        exclude group: "org.projectlombok"
+    }
     api libs.commons.codec
     api libs.managed.evo.inflector
 
