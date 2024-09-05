@@ -16,13 +16,23 @@
 package io.micronaut.openapi.generator;
 
 import org.openapitools.codegen.CliOption;
+import org.openapitools.codegen.CodegenOperation;
+import org.openapitools.codegen.CodegenParameter;
 import org.openapitools.codegen.CodegenType;
 import org.openapitools.codegen.SupportingFile;
 import org.openapitools.codegen.meta.GeneratorMetadata;
 import org.openapitools.codegen.meta.Stability;
+import org.openapitools.codegen.model.ModelMap;
+import org.openapitools.codegen.model.OperationMap;
+import org.openapitools.codegen.model.OperationsMap;
 
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+
+import static io.micronaut.openapi.generator.Utils.processMultipartBody;
 
 /**
  * The generator for creating Micronaut clients.
@@ -82,7 +92,53 @@ public class KotlinMicronautClientCodegen extends AbstractMicronautKotlinCodegen
 
     @Override
     public String getHelp() {
-        return "Generates a Java Micronaut Client.";
+        return "Generates a Kotlin Micronaut Client.";
+    }
+
+    private void postProcessMultipartParam(CodegenOperation op, List<CodegenParameter> params, Collection<String> removedParams) {
+        var pair = processMultipartBody(op, params, true);
+        var multipartParam = pair.getLeft();
+        if (multipartParam != null) {
+            setParameterExampleValue(multipartParam);
+        }
+        removedParams.addAll(pair.getRight());
+    }
+
+    @Override
+    public OperationsMap postProcessOperationsWithModels(OperationsMap objs, List<ModelMap> allModels) {
+        objs = super.postProcessOperationsWithModels(objs, allModels);
+
+        OperationMap operations = objs.getOperations();
+        List<CodegenOperation> operationList = operations.getOperation();
+
+        var removedParams = new HashSet<String>();
+
+        for (CodegenOperation op : operationList) {
+            postProcessMultipartParam(op, op.bodyParams, removedParams);
+            postProcessMultipartParam(op, op.allParams, removedParams);
+
+            op.notNullableParams.removeIf(p -> removedParams.contains(p.paramName));
+            op.requiredParams.removeIf(p -> removedParams.contains(p.paramName));
+            op.optionalParams.removeIf(p -> removedParams.contains(p.paramName));
+            op.requiredAndNotNullableParams.removeIf(p -> removedParams.contains(p.paramName));
+            if (op.vendorExtensions.containsKey("originalParams")) {
+                ((List<CodegenParameter>) op.vendorExtensions.get("originalParams")).removeIf(p -> removedParams.contains(p.paramName));
+            }
+
+            if (!removedParams.isEmpty()) {
+                objs.getImports().add(Map.of("import", "io.micronaut.http.client.multipart.MultipartBody", "classname", "MultipartBody"));
+            }
+
+            var hasMultipleParams = !op.allParams.isEmpty();
+            var hasNotBodyParam = hasMultipleParams;
+
+            for (var param : op.allParams) {
+                param.vendorExtensions.put("hasNotBodyParam", hasNotBodyParam);
+                param.vendorExtensions.put("hasMultipleParams", hasMultipleParams);
+            }
+        }
+
+        return objs;
     }
 
     @Override

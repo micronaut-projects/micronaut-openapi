@@ -730,4 +730,21 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                 """
         );
     }
+
+    @Test
+    void testMultipartFormData() {
+
+        var codegen = new KotlinMicronautClientCodegen();
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/multipartdata.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String path = outputPath + "src/main/kotlin/org/openapitools/";
+
+        assertFileContains(path + "api/ResetPasswordApi.kt", """
+                @Produces("multipart/form-data")
+                fun profilePasswordPost(
+                    @Header("WCToken") @NotNull wcToken: String,
+                    @Header("WCTrustedToken") @NotNull wcTrustedToken: String,
+                    @Body @Nullable multipartBody: MultipartBody?
+                ): Mono<SuccessResetPassword>
+            """);
+    }
 }

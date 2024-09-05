@@ -126,6 +126,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
     public static final String CONTENT_TYPE_APPLICATION_JSON = "application/json";
     public static final String CONTENT_TYPE_MULTIPART_FORM_DATA = "multipart/form-data";
     public static final String CONTENT_TYPE_ANY = "*/*";
+    public static final String EXT_CONTENT_TYPE = "x-content-type";
 
     private static final String MONO_CLASS_NAME = "reactor.core.publisher.Mono";
     private static final String FLUX_CLASS_NAME = "reactor.core.publisher.Flux";
@@ -1185,8 +1186,8 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
             }
 
             // Remove the "*/*" contentType from operations as it is ambiguous
-            if (CONTENT_TYPE_ANY.equals(op.vendorExtensions.get("x-contentType"))) {
-                op.vendorExtensions.put("x-contentType", CONTENT_TYPE_APPLICATION_JSON);
+            if (CONTENT_TYPE_ANY.equals(op.vendorExtensions.get(EXT_CONTENT_TYPE))) {
+                op.vendorExtensions.put(EXT_CONTENT_TYPE, CONTENT_TYPE_APPLICATION_JSON);
             }
             op.consumes = op.consumes == null ? null : op.consumes.stream()
                 .filter(contentType -> !CONTENT_TYPE_ANY.equals(contentType.get("mediaType")))
@@ -1211,18 +1212,26 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
             // Force form parameters are only set if the content-type is according
             // formParams correspond to urlencoded type
             // bodyParams correspond to multipart body
-            if (CONTENT_TYPE_APPLICATION_FORM_URLENCODED.equals(op.vendorExtensions.get("x-contentType"))) {
+            if (CONTENT_TYPE_APPLICATION_FORM_URLENCODED.equals(op.vendorExtensions.get(EXT_CONTENT_TYPE))) {
                 op.formParams.addAll(op.bodyParams);
                 op.bodyParams.forEach(p -> {
                     p.isBodyParam = false;
                     p.isFormParam = true;
                 });
                 op.bodyParams.clear();
-            } else if (CONTENT_TYPE_MULTIPART_FORM_DATA.equals(op.vendorExtensions.get("x-contentType"))) {
+            } else if (CONTENT_TYPE_MULTIPART_FORM_DATA.equals(op.vendorExtensions.get(EXT_CONTENT_TYPE))) {
                 op.bodyParams.addAll(op.formParams);
+                for (var param : op.allParams) {
+                    if (param.isFormParam) {
+                        param.isBodyParam = true;
+                        param.isFormParam = false;
+                        param.vendorExtensions.put("isPart", true);
+                    }
+                }
                 op.formParams.forEach(p -> {
                     p.isBodyParam = true;
                     p.isFormParam = false;
+                    p.vendorExtensions.put("isPart", true);
                 });
                 op.formParams.clear();
             }
@@ -1841,6 +1850,8 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
             example = "LocalDate.of(2001, 2, 3)";
         } else if ("LocalDateTime".equals(dataType)) {
             example = "LocalDateTime.of(2001, 2, 3, 4, 5)";
+        } else if ("MultipartBody".equals(dataType)) {
+            example = "MultipartBody.builder().build()";
         } else if ("BigDecimal".equals(dataType)) {
             example = "new BigDecimal(\"78\")";
         } else if (allowableValues != null && !allowableValues.isEmpty()) {

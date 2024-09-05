@@ -509,4 +509,23 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                     Mono<Void> save();
                 """);
     }
+
+    @Test
+    void testMultipartFormData() {
+
+        var codegen = new JavaMicronautServerCodegen();
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/multipartdata.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String path = outputPath + "src/main/java/org/openapitools/";
+
+        assertFileContains(path + "api/ResetPasswordApi.java", """
+                @Consumes("multipart/form-data")
+                @Secured(SecurityRule.IS_ANONYMOUS)
+                Mono<@Valid SuccessResetPassword> profilePasswordPost(
+                    @Header("WCToken") @NotNull String wcToken,
+                    @Header("WCTrustedToken") @NotNull String wcTrustedToken,
+                    @Part("name") @Nullable(inherited = true) String name,
+                    @Part("file") @Nullable(inherited = true) CompletedFileUpload file
+                );
+            """);
+    }
 }

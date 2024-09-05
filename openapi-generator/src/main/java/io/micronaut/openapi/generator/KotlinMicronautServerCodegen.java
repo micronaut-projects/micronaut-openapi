@@ -120,7 +120,7 @@ public class KotlinMicronautServerCodegen extends AbstractMicronautKotlinCodegen
 
     @Override
     public String getHelp() {
-        return "Generates a Java Micronaut Server.";
+        return "Generates a Kotlin Micronaut Server.";
     }
 
     public void setControllerPackage(String controllerPackage) {
