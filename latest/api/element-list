@@ -16,3 +16,4 @@ io.micronaut.openapi.view
 io.micronaut.openapi.visitor
 io.micronaut.openapi.visitor.group
 io.micronaut.openapi.visitor.security
+org.openapitools.codegen

@@ -247,7 +247,7 @@
         <h1>OpenAPI/Swagger Support</h1>
         <p></p>
         <p>Configuration to integrate Micronaut and OpenAPI/Swagger</p>
-        <p><strong>Version:</strong> 6.12.2 </p>
+        <p><strong>Version:</strong> 6.12.3 </p>
     </div>
     
 <h1 id="introduction"><a class="anchor" href="#introduction"></a>1 Introduction</h1>
@@ -808,7 +808,7 @@ public class Application {
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong>micronaut.openapi.target.file</strong></code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">System property that enables setting the target file to write to.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Default: <code>META-INF/swagger/${applicationName}-$6.12.2.yml</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Default: <code>META-INF/swagger/${applicationName}-$6.12.3.yml</code></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong>micronaut.openapi.views.dest.dir</strong></code></p></td>
@@ -1028,7 +1028,7 @@ micronaut:<br>
 &#160;&#160;&#160;&#160;group:<br>
 &#160;&#160;&#160;&#160;&#160;&#160;my-group1:<br>
 &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;title: Title 1<br>
-&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;filename: swagger-${group}-${apiVersion}-$6.12.2.yml<br>
+&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;filename: swagger-${group}-${apiVersion}-$6.12.3.yml<br>
 &#160;&#160;&#160;&#160;&#160;&#160;my-group2:<br>
 &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;title: Title 2<br></p></td>
 <td class="tableblock halign-left valign-top"></td>
@@ -3897,7 +3897,7 @@ micronaut.router.static-resources.swagger-ui.mapping=/swagger-ui/**</code></pre>
 </tbody>
 </table>
 <div class="paragraph">
-<p>See <a href="https://github.com/Redocly/redoc#redoc-options-object">Redoc Options</a> for a description of the above properties.</p>
+<p>See <a href="https://github.com/Redocly/redoc/blob/main/docs/config.md">Redoc config</a> for a description of the above properties.</p>
 </div>
 <div class="paragraph">
 <p>To expose the <code>redoc</code> views, you also must expose the generated <code>yaml</code>:</p>
