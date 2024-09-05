@@ -120,31 +120,35 @@ loadScripts(document, 'script');</script>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#normalizeExamples(java.util.Map)" class="member-name-link">normalizeExamples</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>,<wbr>io.swagger.v3.oas.models.examples.Example&gt;&nbsp;examples)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#normalizeOpenApi(io.swagger.v3.oas.models.OpenAPI,io.micronaut.inject.visitor.VisitorContext)" class="member-name-link">normalizeOpenApi</a><wbr>(io.swagger.v3.oas.models.OpenAPI&nbsp;openAPI,
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#normalizeHeaders(java.util.Map,io.micronaut.inject.visitor.VisitorContext)" class="member-name-link">normalizeHeaders</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>,<wbr>io.swagger.v3.oas.models.headers.Header&gt;&nbsp;headers,
  io.micronaut.inject.visitor.VisitorContext&nbsp;context)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#normalizeOperation(io.swagger.v3.oas.models.Operation,io.micronaut.inject.visitor.VisitorContext)" class="member-name-link">normalizeOperation</a><wbr>(io.swagger.v3.oas.models.Operation&nbsp;operation,
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#normalizeOpenApi(io.swagger.v3.oas.models.OpenAPI,io.micronaut.inject.visitor.VisitorContext)" class="member-name-link">normalizeOpenApi</a><wbr>(io.swagger.v3.oas.models.OpenAPI&nbsp;openAPI,
  io.micronaut.inject.visitor.VisitorContext&nbsp;context)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static io.swagger.v3.oas.models.media.Schema&lt;?&gt;</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#normalizeSchema(io.swagger.v3.oas.models.media.Schema,io.micronaut.inject.visitor.VisitorContext)" class="member-name-link">normalizeSchema</a><wbr>(io.swagger.v3.oas.models.media.Schema&lt;?&gt;&nbsp;schema,
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#normalizeOperation(io.swagger.v3.oas.models.Operation,io.micronaut.inject.visitor.VisitorContext)" class="member-name-link">normalizeOperation</a><wbr>(io.swagger.v3.oas.models.Operation&nbsp;operation,
  io.micronaut.inject.visitor.VisitorContext&nbsp;context)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#normalizeSchemas(java.util.Map,io.micronaut.inject.visitor.VisitorContext)" class="member-name-link">normalizeSchemas</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>,<wbr>io.swagger.v3.oas.models.media.Schema&gt;&nbsp;schemas,
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static io.swagger.v3.oas.models.media.Schema&lt;?&gt;</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#normalizeSchema(io.swagger.v3.oas.models.media.Schema,io.micronaut.inject.visitor.VisitorContext)" class="member-name-link">normalizeSchema</a><wbr>(io.swagger.v3.oas.models.media.Schema&lt;?&gt;&nbsp;schema,
  io.micronaut.inject.visitor.VisitorContext&nbsp;context)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#normalizeSchemas(java.util.Map,io.micronaut.inject.visitor.VisitorContext)" class="member-name-link">normalizeSchemas</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>,<wbr>io.swagger.v3.oas.models.media.Schema&gt;&nbsp;schemas,
+ io.micronaut.inject.visitor.VisitorContext&nbsp;context)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
 <div class="block">Sort schemas list in allOf block: schemas with ref must be first, next other schemas.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#removeEmptyComponents(io.swagger.v3.oas.models.OpenAPI)" class="member-name-link">removeEmptyComponents</a><wbr>(io.swagger.v3.oas.models.OpenAPI&nbsp;openAPI)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static &lt;T&gt;&nbsp;void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#sortComponent(io.swagger.v3.oas.models.Components,java.util.function.Function,java.util.function.BiConsumer)" class="member-name-link">sortComponent</a><wbr>(io.swagger.v3.oas.models.Components&nbsp;components,
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#removeEmptyComponents(io.swagger.v3.oas.models.OpenAPI)" class="member-name-link">removeEmptyComponents</a><wbr>(io.swagger.v3.oas.models.OpenAPI&nbsp;openAPI)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static &lt;T&gt;&nbsp;void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#sortComponent(io.swagger.v3.oas.models.Components,java.util.function.Function,java.util.function.BiConsumer)" class="member-name-link">sortComponent</a><wbr>(io.swagger.v3.oas.models.Components&nbsp;components,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Function.html" title="class or interface in java.util.function" class="external-link">Function</a>&lt;io.swagger.v3.oas.models.Components,<wbr><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>,<wbr>T&gt;&gt;&nbsp;getter,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/BiConsumer.html" title="class or interface in java.util.function" class="external-link">BiConsumer</a>&lt;io.swagger.v3.oas.models.Components,<wbr><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>,<wbr>T&gt;&gt;&nbsp;setter)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
 </div>
 </div>
 </div>
@@ -173,6 +177,13 @@ loadScripts(document, 'script');</script>
 <section class="detail" id="normalizeOperation(io.swagger.v3.oas.models.Operation,io.micronaut.inject.visitor.VisitorContext)">
 <h3>normalizeOperation</h3>
 <div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">normalizeOperation</span><wbr><span class="parameters">(io.swagger.v3.oas.models.Operation&nbsp;operation,
+ io.micronaut.inject.visitor.VisitorContext&nbsp;context)</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="normalizeHeaders(java.util.Map,io.micronaut.inject.visitor.VisitorContext)">
+<h3>normalizeHeaders</h3>
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">normalizeHeaders</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>,<wbr>io.swagger.v3.oas.models.headers.Header&gt;&nbsp;headers,
  io.micronaut.inject.visitor.VisitorContext&nbsp;context)</span></div>
 </section>
 </li>
