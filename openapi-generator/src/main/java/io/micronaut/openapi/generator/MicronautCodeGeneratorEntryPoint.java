@@ -85,8 +85,10 @@ public final class MicronautCodeGeneratorEntryPoint {
      * Performs code generation.
      */
     public void generate() {
+        var opts = new ParseOptions();
+        opts.setResolve(true);
         var openAPI = new OpenAPIParser()
-            .readLocation(definitionFile.toString(), null, new ParseOptions()).getOpenAPI();
+            .readLocation(definitionFile.toString(), null, opts).getOpenAPI();
 
         // Configure codegen
         withPath(outputDirectory, codeGenerator::setOutputDir);

@@ -1,0 +1,28 @@
+post:
+  tags:
+    - Customer
+  operationId: uploadFile
+  summary: Upload customer files
+  description: Save file in customer file repository
+  parameters:
+    - name: id
+      in: path
+      required: true
+      description: Unique identifier of the Customer
+      schema:
+        type: string
+        format: uuid
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../schemas/files.yml#/FileCreateDto'
+
+  responses:
+    201:
+      description: File uploaded correctly
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/files.yml#/FileId'

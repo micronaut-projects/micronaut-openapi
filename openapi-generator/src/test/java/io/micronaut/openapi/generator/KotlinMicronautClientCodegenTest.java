@@ -747,4 +747,33 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                 ): Mono<SuccessResetPassword>
             """);
     }
+
+    @Test
+    void testGenerateByMultipleFiles() {
+
+        var codegen = new KotlinMicronautClientCodegen();
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/multiple/swagger.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String path = outputPath + "src/main/kotlin/org/openapitools/";
+
+        assertFileContains(path + "api/CustomerApi.kt",
+            """
+                    @Post("/api/customer/{id}/files")
+                    fun uploadFile(
+                        @PathVariable("id") @NotNull id: UUID,
+                        @Body @NotNull @Valid fileCreateDto: FileCreateDto
+                    ): Mono<HttpResponse<String>>
+                """);
+        assertFileContains(path + "model/FileCreateDto.kt",
+            """
+                data class FileCreateDto(
+                    @field:NotNull
+                    @field:Pattern(regexp = "^ORG$")
+                    @field:JsonProperty(JSON_PROPERTY_TYPE_CODE)
+                    var typeCode: String = "ORG",
+                    @field:NotNull
+                    @field:JsonProperty(JSON_PROPERTY_ORG_NAME)
+                    var orgName: String,
+                ) {
+                """);
+    }
 }

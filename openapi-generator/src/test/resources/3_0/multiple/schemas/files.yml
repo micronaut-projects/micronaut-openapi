@@ -1,0 +1,18 @@
+FileCreateDto:
+  type: object
+  required:
+    - typeCode
+    - orgName
+  description: Organization customer data
+  properties:
+    typeCode:
+      type: string
+      pattern: ^ORG$
+      description: Customer type ORG
+      default: ORG
+      example: ORG
+    orgName:
+      type: string
+
+FileId:
+  type: string
