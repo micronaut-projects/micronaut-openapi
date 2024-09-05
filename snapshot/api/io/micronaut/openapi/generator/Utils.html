@@ -171,11 +171,18 @@ loadScripts(document, 'script');</script>
  boolean&nbsp;isReadonly,
  boolean&nbsp;withNullablePostfix)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#toApiName(java.lang.String,java.lang.String,java.lang.String)" class="member-name-link">toApiName</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;name,
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static org.apache.commons.lang3.tuple.Pair&lt;org.openapitools.codegen.CodegenParameter,<wbr><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Set.html" title="class or interface in java.util" class="external-link">Set</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;&gt;</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#processMultipartBody(org.openapitools.codegen.CodegenOperation,java.util.Collection,boolean)" class="member-name-link">processMultipartBody</a><wbr>(org.openapitools.codegen.CodegenOperation&nbsp;op,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Collection.html" title="class or interface in java.util" class="external-link">Collection</a>&lt;org.openapitools.codegen.CodegenParameter&gt;&nbsp;params,
+ boolean&nbsp;isKotlin)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">Replace multipart data parameters, marked @Part annotation to single MultipartBody parameter.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#toApiName(java.lang.String,java.lang.String,java.lang.String)" class="member-name-link">toApiName</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;name,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;prefix,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;suffix)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
 </div>
 </div>
 </div>
@@ -271,6 +278,23 @@ loadScripts(document, 'script');</script>
 <section class="method-details" id="method-detail">
 <h2>Method Details</h2>
 <ul class="member-list">
+<li>
+<section class="detail" id="processMultipartBody(org.openapitools.codegen.CodegenOperation,java.util.Collection,boolean)">
+<h3>processMultipartBody</h3>
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">org.apache.commons.lang3.tuple.Pair&lt;org.openapitools.codegen.CodegenParameter,<wbr><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Set.html" title="class or interface in java.util" class="external-link">Set</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;&gt;</span>&nbsp;<span class="element-name">processMultipartBody</span><wbr><span class="parameters">(org.openapitools.codegen.CodegenOperation&nbsp;op,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Collection.html" title="class or interface in java.util" class="external-link">Collection</a>&lt;org.openapitools.codegen.CodegenParameter&gt;&nbsp;params,
+ boolean&nbsp;isKotlin)</span></div>
+<div class="block">Replace multipart data parameters, marked @Part annotation to single MultipartBody parameter.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>op</code> - operation</dd>
+<dd><code>params</code> - parameters</dd>
+<dd><code>isKotlin</code> - is kotlin generator</dd>
+<dt>Returns:</dt>
+<dd>Pair with MultipartBody parameter and set of removed parameter names</dd>
+</dl>
+</section>
+</li>
 <li>
 <section class="detail" id="processGenericAnnotations(org.openapitools.codegen.CodegenParameter,boolean,boolean,boolean,boolean,boolean,boolean)">
 <h3>processGenericAnnotations</h3>
