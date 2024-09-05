@@ -159,7 +159,7 @@ public class {{classname}} {{#parent}}extends {{{parent}}} {{/parent}}{{#vendorE
         {{/micronaut_serde_jackson}}
         {{#formatNoEmptyLines}}
         {{#vendorExtensions.withRequiredVars}}
-    public {{classname}}({{#vendorExtensions.requiredVarsWithoutDiscriminator}}{{#isReadOnly}}{{#vendorExtensions.isServer}}{{^-first}}, {{/-first}}{{{datatypeWithEnum}}} {{name}}{{/vendorExtensions.isServer}}{{/isReadOnly}}{{^isReadOnly}}{{^-first}}, {{/-first}}{{{datatypeWithEnum}}} {{name}}{{/isReadOnly}}{{/vendorExtensions.requiredVarsWithoutDiscriminator}}) {
+    public {{classname}}({{#vendorExtensions.requiredVarsWithoutDiscriminator}}{{#isReadOnly}}{{#vendorExtensions.isServer}}{{^-first}}, {{/-first}}{{{vendorExtensions.typeWithEnumWithGenericAnnotations}}} {{name}}{{/vendorExtensions.isServer}}{{/isReadOnly}}{{^isReadOnly}}{{^-first}}, {{/-first}}{{{vendorExtensions.typeWithEnumWithGenericAnnotations}}} {{name}}{{/isReadOnly}}{{/vendorExtensions.requiredVarsWithoutDiscriminator}}) {
         {{#parent}}
         {{#vendorExtensions.requiredParentVarsWithoutDiscriminator.0}}super({{/vendorExtensions.requiredParentVarsWithoutDiscriminator.0}}{{#vendorExtensions.requiredParentVarsWithoutDiscriminator}}{{#vendorExtensions.isServerOrNotReadOnly}}{{^-first}}, {{/-first}}{{name}}{{/vendorExtensions.isServerOrNotReadOnly}}{{/vendorExtensions.requiredParentVarsWithoutDiscriminator}}{{#vendorExtensions.requiredParentVarsWithoutDiscriminator.0}});{{/vendorExtensions.requiredParentVarsWithoutDiscriminator.0}}
         {{/parent}}
@@ -207,12 +207,12 @@ public class {{classname}} {{#parent}}extends {{{parent}}} {{/parent}}{{#vendorE
             {{/isOverridden}}
         {{/parent}}
     {{/isDiscriminator}}
-    public {{{datatypeWithEnum}}} {{getter}}() {
+    public {{{vendorExtensions.typeWithEnumWithGenericAnnotations}}} {{getter}}() {
         {{#vendorExtensions.x-is-jackson-optional-nullable}}
             {{#isReadOnly}}
             {{! A readonly attribute doesn't have setter => jackson will set null directly if explicitly returned by API, so make sure we have an empty JsonNullable}}
         if ({{name}} == null) {
-            {{name}} = JsonNullable.<{{{datatypeWithEnum}}}>{{#defaultValue}}of({{{.}}}){{/defaultValue}}{{^defaultValue}}undefined(){{/defaultValue}};
+            {{name}} = JsonNullable.<{{{vendorExtensions.typeWithEnumWithGenericAnnotations}}}>{{#defaultValue}}of({{{.}}}){{/defaultValue}}{{^defaultValue}}undefined(){{/defaultValue}};
         }
             {{/isReadOnly}}
         return {{name}}.orElse(null);
@@ -235,7 +235,7 @@ public class {{classname}} {{#parent}}extends {{{parent}}} {{/parent}}{{#vendorE
     {{#jackson}}
     @JsonIgnore
     {{/jackson}}
-    public Optional<{{{datatypeWithEnum}}}> {{getter}}Optional() {
+    public Optional<{{{vendorExtensions.typeWithEnumWithGenericAnnotations}}}> {{getter}}Optional() {
         {{^vendorExtensions.x-is-jackson-optional-nullable}}
         return Optional.ofNullable({{name}});
         {{/vendorExtensions.x-is-jackson-optional-nullable}}
@@ -253,9 +253,9 @@ public class {{classname}} {{#parent}}extends {{{parent}}} {{/parent}}{{#vendorE
         {{#vendorExtensions.x-setter-extra-annotation}}
     {{{.}}}
         {{/vendorExtensions.x-setter-extra-annotation}}
-    public void {{setter}}({{{datatypeWithEnum}}} {{name}}) {
+    public void {{setter}}({{{vendorExtensions.typeWithEnumWithGenericAnnotations}}} {{name}}) {
             {{#vendorExtensions.x-is-jackson-optional-nullable}}
-        this.{{name}} = JsonNullable.<{{{datatypeWithEnum}}}>of({{name}});
+        this.{{name}} = JsonNullable.<{{{vendorExtensions.typeWithEnumWithGenericAnnotations}}}>of({{name}});
             {{/vendorExtensions.x-is-jackson-optional-nullable}}
             {{^vendorExtensions.x-is-jackson-optional-nullable}}
         this.{{name}} = {{name}};
@@ -270,12 +270,12 @@ public class {{classname}} {{#parent}}extends {{{parent}}} {{/parent}}{{#vendorE
      * @return JsonNullable version of {{name}}
      */
 {{>common/model/jackson_annotations}}
-    public JsonNullable<{{{datatypeWithEnum}}}> {{getter}}_JsonNullable() {
+    public JsonNullable<{{{vendorExtensions.typeWithEnumWithGenericAnnotations}}}> {{getter}}_JsonNullable() {
         return {{name}};
     }
 
     @JsonProperty(JSON_PROPERTY_{{nameInSnakeCase}})
-    public void {{setter}}_JsonNullable(JsonNullable<{{{datatypeWithEnum}}}> {{name}}) {
+    public void {{setter}}_JsonNullable(JsonNullable<{{{vendorExtensions.typeWithEnumWithGenericAnnotations}}}> {{name}}) {
     {{! For getters/setters that have name differing from attribute name, we must include setter (albeit private) for jackson to be able to set the attribute}}       this.{{name}} = {{name}};
     }
         {{/vendorExtensions.x-is-jackson-optional-nullable}}
@@ -287,9 +287,9 @@ public class {{classname}} {{#parent}}extends {{{parent}}} {{/parent}}{{#vendorE
      *
      * @return The same instance of {{classname}} for chaining.
      */
-    public {{classname}} {{name}}({{{datatypeWithEnum}}} {{name}}) {
+    public {{classname}} {{name}}({{{vendorExtensions.typeWithEnumWithGenericAnnotations}}} {{name}}) {
             {{#vendorExtensions.x-is-jackson-optional-nullable}}
-        this.{{name}} = JsonNullable.<{{{datatypeWithEnum}}}>of({{name}});
+        this.{{name}} = JsonNullable.<{{{vendorExtensions.typeWithEnumWithGenericAnnotations}}}>of({{name}});
             {{/vendorExtensions.x-is-jackson-optional-nullable}}
             {{^vendorExtensions.x-is-jackson-optional-nullable}}
         this.{{name}} = {{name}};
@@ -303,10 +303,10 @@ public class {{classname}} {{#parent}}extends {{{parent}}} {{/parent}}{{#vendorE
      *
      * @return The same instance of {{classname}} for chaining.
      */
-    public {{classname}} add{{nameInCamelCase}}Item({{{items.datatypeWithEnum}}} {{name}}Item) {
+    public {{classname}} add{{nameInCamelCase}}Item({{{items.vendorExtensions.typeWithEnumWithGenericAnnotations}}} {{name}}Item) {
                 {{#vendorExtensions.x-is-jackson-optional-nullable}}
         if ({{name}} == null || !{{name}}.isPresent()) {
-            {{name}} = JsonNullable.<{{{datatypeWithEnum}}}>of({{{defaultValue}}}{{^defaultValue}}new {{#uniqueItems}}LinkedHashSet{{/uniqueItems}}{{^uniqueItems}}ArrayList{{/uniqueItems}}<>(){{/defaultValue}});
+            {{name}} = JsonNullable.<{{{vendorExtensions.typeWithEnumWithGenericAnnotations}}}>of({{{defaultValue}}}{{^defaultValue}}new {{#uniqueItems}}LinkedHashSet{{/uniqueItems}}{{^uniqueItems}}ArrayList{{/uniqueItems}}<>(){{/defaultValue}});
         }
         try {
             {{name}}.get().add({{name}}Item);
@@ -361,14 +361,14 @@ public class {{classname}} {{#parent}}extends {{{parent}}} {{/parent}}{{#vendorE
     {{#parentVars}}
         {{^isReadOnly}}
     @Override
-    public {{classname}} {{#lombok}}{{{setter}}}{{/lombok}}{{^lombok}}{{name}}{{/lombok}}({{{datatypeWithEnum}}} {{name}}) {
+    public {{classname}} {{#lombok}}{{{setter}}}{{/lombok}}{{^lombok}}{{name}}{{/lombok}}({{{vendorExtensions.typeWithEnumWithGenericAnnotations}}} {{name}}) {
         super.{{{setter}}}({{name}});
         return this;
     }
 
             {{#isArray}}
     @Override
-    public {{classname}} add{{nameInCamelCase}}Item({{{items.datatypeWithEnum}}} {{name}}Item) {
+    public {{classname}} add{{nameInCamelCase}}Item({{{items.vendorExtensions.typeWithEnumWithGenericAnnotations}}} {{name}}Item) {
         super.add{{nameInCamelCase}}Item({{name}}Item);
         return this;
     }
@@ -376,7 +376,7 @@ public class {{classname}} {{#parent}}extends {{{parent}}} {{/parent}}{{#vendorE
 
             {{#isMap}}
     @Override
-    public {{classname}} put{{nameInCamelCase}}Item(String key, {{{items.datatypeWithEnum}}} {{name}}Item) {
+    public {{classname}} put{{nameInCamelCase}}Item(String key, {{{items.vendorExtensions.typeWithEnumWithGenericAnnotations}}} {{name}}Item) {
         super.put{{nameInCamelCase}}Item(key, {{name}}Item);
         return this;
     }
@@ -457,10 +457,10 @@ public class {{classname}} {{#parent}}extends {{{parent}}} {{/parent}}{{#vendorE
             {{/parent}}
             {{#vars}}
                 {{#isPrimitiveType}}
-        {{name}} = ({{{datatypeWithEnum}}})in.readValue(null);
+        {{name}} = ({{{vendorExtensions.typeWithEnumWithGenericAnnotations}}})in.readValue(null);
                 {{/isPrimitiveType}}
                 {{^isPrimitiveType}}
-        {{name}} = ({{{datatypeWithEnum}}})in.readValue({{complexType}}.class.getClassLoader());
+        {{name}} = ({{{vendorExtensions.typeWithEnumWithGenericAnnotations}}})in.readValue({{complexType}}.class.getClassLoader());
                 {{/isPrimitiveType}}
             {{/vars}}
         {{/isArray}}

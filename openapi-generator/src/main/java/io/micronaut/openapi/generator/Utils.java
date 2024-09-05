@@ -38,6 +38,16 @@ import java.util.Set;
  */
 public final class Utils {
 
+    public static final List<String> DATE_TIME_TYPES = List.of(
+        "date",
+        "Date",
+        "DateTime",
+        "LocalDateTime",
+        "OffsetDateTime",
+        "ZonedDateTime",
+        "LocalDate",
+        "LocalTime"
+    );
     public static final String DEFAULT_BODY_PARAM_NAME = "requestBody";
     public static final String EXT_ANNOTATIONS_OPERATION = "x-operation-extra-annotation";
     public static final String EXT_ANNOTATIONS_CLASS = "x-class-extra-annotation";
@@ -143,7 +153,7 @@ public final class Utils {
             return result.toString();
         }
 
-        if (StringUtils.isNotEmpty(prop.pattern)) {
+        if (StringUtils.isNotEmpty(prop.pattern) && !prop.isDate && !prop.isDateTime) {
             if ("email".equals(type)) {
                 result.append("@Email(regexp = \"");
             } else {
@@ -350,5 +360,9 @@ public final class Utils {
 
     private static String normalizeExtraAnnotation(String prefix, String annotationStr) {
         return prefix + (annotationStr.startsWith("@") ? annotationStr.substring(1) : annotationStr);
+    }
+
+    public static boolean isDateType(String type) {
+        return DATE_TIME_TYPES.contains(type);
     }
 }

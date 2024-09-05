@@ -124,6 +124,7 @@ components:
           description: The date the employee accepted the terms of the usage agreement.
           type: string
           format: date
+          pattern: "yyyy-MM-dd"
           example: "2021-02-09"
         termsVersionNumber:
           description: The version number of terms of the usage agreement.

@@ -375,8 +375,11 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         String apiPath = outputPath + "src/main/kotlin/org/openapitools/api/";
         String modelPath = outputPath + "src/main/kotlin/org/openapitools/model/";
 
-        assertFileContains(apiPath + "BooksApi.kt", "requestBody: List<@Pattern(regexp = \"[a-zA-Z ]+\") @Size(max = 10) @NotNull String>");
-        assertFileContains(modelPath + "CountsContainer.kt", "var counts: List<@NotEmpty List<@NotNull List<@Size(max = 10) @NotNull String>>>");
+        assertFileContains(apiPath + "BooksApi.kt",
+            "requestBody: List<@Pattern(regexp = \"[a-zA-Z ]+\") @Size(max = 10) @NotNull String>",
+            "@QueryValue(\"before\") @NotNull @Format(\"yyyy-MM-dd'T'HH:mm:ss.SSS'Z'\") before: ZonedDateTime,"
+        );
+        assertFileContains(modelPath + "CountsContainer.kt", "var counts: List<@NotEmpty List<@NotNull List<@Size(max = 10) @NotNull ZonedDateTime>>>");
         assertFileContains(modelPath + "BooksContainer.kt", "var books: List<@Pattern(regexp = \"[a-zA-Z ]+\") @Size(max = 10) @NotNull String>");
     }
 

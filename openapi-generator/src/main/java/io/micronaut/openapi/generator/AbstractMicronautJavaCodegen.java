@@ -80,6 +80,7 @@ import static io.micronaut.openapi.generator.Utils.EXT_ANNOTATIONS_FIELD;
 import static io.micronaut.openapi.generator.Utils.EXT_ANNOTATIONS_OPERATION;
 import static io.micronaut.openapi.generator.Utils.EXT_ANNOTATIONS_SETTER;
 import static io.micronaut.openapi.generator.Utils.addStrValueToEnum;
+import static io.micronaut.openapi.generator.Utils.isDateType;
 import static io.micronaut.openapi.generator.Utils.normalizeExtraAnnotations;
 import static io.micronaut.openapi.generator.Utils.processGenericAnnotations;
 import static org.openapitools.codegen.CodegenConstants.API_PACKAGE;
@@ -111,7 +112,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
     public static final String OPT_DATE_LIBRARY_OFFSET_DATETIME = "OFFSET_DATETIME";
     public static final String OPT_DATE_LIBRARY_LOCAL_DATETIME = "LOCAL_DATETIME";
     public static final String OPT_DATE_FORMAT = "dateFormat";
-    public static final String OPT_DATETIME_FORMAT = "datetimeFormat";
+    public static final String OPT_DATE_TIME_FORMAT = "dateTimeFormat";
     public static final String OPT_REACTIVE = "reactive";
     public static final String OPT_GENERATE_HTTP_RESPONSE_ALWAYS = "generateHttpResponseAlways";
     public static final String OPT_GENERATE_HTTP_RESPONSE_WHERE_REQUIRED = "generateHttpResponseWhereRequired";
@@ -145,6 +146,8 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
     protected boolean generateHttpResponseAlways;
     protected boolean generateHttpResponseWhereRequired = true;
     protected String appName;
+    protected String dateFormat;
+    protected String dateTimeFormat;
     protected String generateSwaggerAnnotations;
     protected boolean generateOperationOnlyForFirstTag;
     protected String serializationLibrary = SerializationLibraryKind.MICRONAUT_SERDE_JACKSON.name();
@@ -243,14 +246,14 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
         cliOptions.add(generateSwaggerAnnotationsOption);
 
         cliOptions.add(new CliOption(OPT_DATE_FORMAT, "Specify the format pattern of date as a string"));
-        cliOptions.add(new CliOption(OPT_DATETIME_FORMAT, "Specify the format pattern of date-time as a string"));
+        cliOptions.add(new CliOption(OPT_DATE_TIME_FORMAT, "Specify the format pattern of date-time as a string"));
 
         // Modify the DATE_LIBRARY option to only have supported values
         cliOptions.stream()
             .filter(o -> o.getOpt().equals(DATE_LIBRARY))
             .findFirst()
             .ifPresent(opt -> {
-                Map<String, String> valuesEnum = new HashMap<>();
+                var valuesEnum = new HashMap<String, String>();
                 valuesEnum.put(OPT_DATE_LIBRARY_OFFSET_DATETIME, opt.getEnum().get(OPT_DATE_LIBRARY_OFFSET_DATETIME));
                 valuesEnum.put(OPT_DATE_LIBRARY_LOCAL_DATETIME, opt.getEnum().get(OPT_DATE_LIBRARY_LOCAL_DATETIME));
                 opt.setEnum(valuesEnum);
@@ -448,6 +451,21 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
             reactive = convertPropertyToBoolean(OPT_REACTIVE);
         }
         writePropertyBack(OPT_REACTIVE, reactive);
+
+        if (additionalProperties.containsKey(OPT_DATE_FORMAT)) {
+            dateFormat = (String) additionalProperties.get(OPT_DATE_FORMAT);
+        }
+        writePropertyBack(OPT_DATE_FORMAT, dateFormat);
+
+        if (additionalProperties.containsKey(OPT_DATE_TIME_FORMAT)) {
+            dateTimeFormat = (String) additionalProperties.get(OPT_DATE_TIME_FORMAT);
+        }
+        writePropertyBack(OPT_DATE_TIME_FORMAT, dateFormat);
+
+        if (additionalProperties.containsKey(OPT_GENERATE_HTTP_RESPONSE_ALWAYS)) {
+            generateHttpResponseAlways = convertPropertyToBoolean(OPT_GENERATE_HTTP_RESPONSE_ALWAYS);
+        }
+        writePropertyBack(OPT_GENERATE_HTTP_RESPONSE_ALWAYS, generateHttpResponseAlways);
 
         if (additionalProperties.containsKey(OPT_GENERATE_HTTP_RESPONSE_ALWAYS)) {
             generateHttpResponseAlways = convertPropertyToBoolean(OPT_GENERATE_HTTP_RESPONSE_ALWAYS);
@@ -838,18 +856,14 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
         } else if (ModelUtils.isStringSchema(schema)) {
             if (schema.getDefault() != null) {
                 if (schema.getDefault() instanceof Date date) {
-                    if ("java8".equals(getDateLibrary())) {
-                        LocalDate localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-                        defaultValueInit = String.format(Locale.ROOT, "LocalDate.parse(\"%s\")", localDate.toString());
-                        defaultValueStr = localDate.toString();
-                    }
+                    LocalDate localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+                    defaultValueInit = String.format(Locale.ROOT, "LocalDate.parse(\"%s\")", localDate.toString());
+                    defaultValueStr = localDate.toString();
                 } else if (schema.getDefault() instanceof java.time.OffsetDateTime offsetDateTime) {
-                    if ("java8".equals(getDateLibrary())) {
-                        defaultValueInit = String.format(Locale.ROOT, "OffsetDateTime.parse(\"%s\", %s)",
-                            offsetDateTime.atZoneSameInstant(ZoneId.systemDefault()),
-                            "java.time.format.DateTimeFormatter.ISO_ZONED_DATE_TIME.withZone(java.time.ZoneId.systemDefault())");
-                        defaultValueStr = offsetDateTime.toString();
-                    }
+                    defaultValueInit = String.format(Locale.ROOT, "OffsetDateTime.parse(\"%s\", %s)",
+                        offsetDateTime.atZoneSameInstant(ZoneId.systemDefault()),
+                        "java.time.format.DateTimeFormatter.ISO_ZONED_DATE_TIME.withZone(java.time.ZoneId.systemDefault())");
+                    defaultValueStr = offsetDateTime.toString();
                 } else if (schema.getDefault() instanceof UUID) {
                     defaultValueInit = "UUID.fromString(\"" + schema.getDefault() + "\")";
                     defaultValueStr = schema.getDefault().toString();
@@ -1240,6 +1254,11 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
                 processGenericAnnotations(param, useBeanValidation, isGenerateHardNullable(), false, false, false, false);
                 if (useBeanValidation && !param.isContainer && param.isModel) {
                     param.vendorExtensions.put("withValid", true);
+                }
+                // check pattern property for date types: if set, need use this pattern as `@Format` annotation value
+                if (isDateType(param.dataType) && StringUtils.isNotEmpty(param.pattern)) {
+                    param.vendorExtensions.put("formatPattern", param.pattern);
+                    param.pattern = null;
                 }
             }
             if (op.returnProperty != null) {
@@ -1688,6 +1707,11 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
         )) {
             property.vendorExtensions.put("withValid", true);
         }
+        // check pattern property for date types: if set, need use this pattern as `@Format` annotation value
+        if (isDateType(property.dataType) && StringUtils.isNotEmpty(property.pattern)) {
+            property.vendorExtensions.put("formatPattern", property.pattern);
+            property.pattern = null;
+        }
 
         processGenericAnnotations(property, useBeanValidation, isGenerateHardNullable(), false, false, false, false);
 
@@ -1970,6 +1994,16 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
         if (generateSwaggerAnnotations) {
             additionalProperties.put("generateSwagger2Annotations", true);
         }
+    }
+
+    public void setDateFormat(String dateFormat) {
+        this.dateFormat = dateFormat;
+        additionalProperties.put(OPT_DATE_FORMAT, dateFormat);
+    }
+
+    public void setDateTimeFormat(String dateTimeFormat) {
+        this.dateTimeFormat = dateTimeFormat;
+        additionalProperties.put(OPT_DATE_TIME_FORMAT, dateTimeFormat);
     }
 
     @Override

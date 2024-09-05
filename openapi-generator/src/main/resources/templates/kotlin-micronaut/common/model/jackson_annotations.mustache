@@ -38,26 +38,46 @@
     {{#jackson}}
         {{^micronaut_serde_jackson}}
             {{#isDateTime}}
-                {{#datetimeFormat}}
-    @{{{vendorExtensions.fieldAnnPrefix}}}JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "{{{datetimeFormat}}}")
-                {{/datetimeFormat}}
+                {{#vendorExtensions.formatPattern}}
+    @{{{vendorExtensions.fieldAnnPrefix}}}JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "{{{vendorExtensions.formatPattern}}}")
+                {{/vendorExtensions.formatPattern}}
+                {{^vendorExtensions.formatPattern}}
+                    {{#dateTimeFormat}}
+    @{{{vendorExtensions.fieldAnnPrefix}}}JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "{{{dateTimeFormat}}}")
+                    {{/dateTimeFormat}}
+                {{/vendorExtensions.formatPattern}}
             {{/isDateTime}}
             {{#isDate}}
-                {{#dateFormat}}
+                {{#vendorExtensions.formatPattern}}
+    @{{{vendorExtensions.fieldAnnPrefix}}}JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "{{{vendorExtensions.formatPattern}}}")
+                {{/vendorExtensions.formatPattern}}
+                {{^vendorExtensions.formatPattern}}
+                    {{#dateFormat}}
     @{{{vendorExtensions.fieldAnnPrefix}}}JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "{{{dateFormat}}}")
-                {{/dateFormat}}
+                    {{/dateFormat}}
+                {{/vendorExtensions.formatPattern}}
             {{/isDate}}
         {{/micronaut_serde_jackson}}
     {{/jackson}}
     {{#micronaut_serde_jackson}}
         {{#isDateTime}}
-            {{#datatimeFormat}}
-    @{{{vendorExtensions.fieldAnnPrefix}}}JsonFormat(pattern = "{{{datetimeFormat}}}")
-            {{/datatimeFormat}}
+            {{#vendorExtensions.formatPattern}}
+    @{{{vendorExtensions.fieldAnnPrefix}}}JsonFormat(pattern = "{{{vendorExtensions.formatPattern}}}")
+            {{/vendorExtensions.formatPattern}}
+            {{^vendorExtensions.formatPattern}}
+                {{#dateTimeFormat}}
+    @{{{vendorExtensions.fieldAnnPrefix}}}JsonFormat(pattern = "{{{dateTimeFormat}}}")
+                {{/dateTimeFormat}}
+            {{/vendorExtensions.formatPattern}}
         {{/isDateTime}}
         {{#isDate}}
-            {{#dateFormat}}
+            {{#vendorExtensions.formatPattern}}
+    @{{{vendorExtensions.fieldAnnPrefix}}}JsonFormat(pattern = "{{{vendorExtensions.formatPattern}}}")
+            {{/vendorExtensions.formatPattern}}
+            {{^vendorExtensions.formatPattern}}
+                {{#dateFormat}}
     @{{{vendorExtensions.fieldAnnPrefix}}}JsonFormat(pattern = "{{{dateFormat}}}")
-            {{/dateFormat}}
+                {{/dateFormat}}
+            {{/vendorExtensions.formatPattern}}
         {{/isDate}}
     {{/micronaut_serde_jackson}}
