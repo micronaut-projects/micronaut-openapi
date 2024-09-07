@@ -42,22 +42,36 @@
     companion object {
 
         @JvmField
-        val VALUE_MAPPING = entries.associateBy { it.value }
+        val VALUE_MAPPING = entries.associateBy { it.value{{#useEnumCaseInsensitive}}.lowercase(){{/useEnumCaseInsensitive}} }
 
         /**
          * Create this enum from a value.
          *
-         * @param value value for enum
+         * @param value The value
          *
          * @return The enum
          */
         @JsonCreator
         @JvmStatic
-        fun fromValue(value: {{{dataType}}}): {{>common/model/enumName}}{{#isNullable}}?{{/isNullable}} {
+        fun fromValue(value: {{{dataType}}}): {{>common/model/enumName}}{{#isNullable}}?{{/isNullable}} {{openbrace}}{{#formatNoEmptyLines}}
+            {{#isString}}{{#useEnumCaseInsensitive}}
+            val key = value.lowercase()
+            {{/useEnumCaseInsensitive}}{{/isString}}
             {{^isNullable}}
+                {{#isString}}
+                    {{#useEnumCaseInsensitive}}
+            require(VALUE_MAPPING.containsKey(key)) { "Unexpected value '$key'" }
+                    {{/useEnumCaseInsensitive}}
+                    {{^useEnumCaseInsensitive}}
             require(VALUE_MAPPING.containsKey(value)) { "Unexpected value '$value'" }
+                    {{/useEnumCaseInsensitive}}
+                {{/isString}}
+                {{^isString}}
+            require(VALUE_MAPPING.containsKey(value)) { "Unexpected value '$value'" }
+                {{/isString}}
             {{/isNullable}}
-            return VALUE_MAPPING[value{{#isString}}{{#useEnumCaseInsensitive}}.lowerCase(){{/useEnumCaseInsensitive}}{{/isString}}]{{^isNullable}}!!{{/isNullable}}
+            return VALUE_MAPPING[{{#isString}}{{#useEnumCaseInsensitive}}key{{/useEnumCaseInsensitive}}{{^useEnumCaseInsensitive}}value{{/useEnumCaseInsensitive}}{{/isString}}{{^isString}}value{{/isString}}]{{^isNullable}}!!{{/isNullable}}
         }
+{{/formatNoEmptyLines}}
     }
 }

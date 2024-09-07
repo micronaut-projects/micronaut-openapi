@@ -64,19 +64,37 @@
     /**
      * Create this enum from a value.
      *
-     * @param value the value
+     * @param value The value
      *
      * @return The enum
      */
     {{#jackson}}
     @JsonCreator
     {{/jackson}}
-    {{#formatSingleLine}}public static {{>common/model/enumName}} fromValue({{{dataType}}} value){{/formatSingleLine}} {
+    {{#formatSingleLine}}public static {{>common/model/enumName}} fromValue({{{dataType}}} value){{/formatSingleLine}} {{openbrace}}{{#formatNoEmptyLines}}
+        {{#isString}}{{#useEnumCaseInsensitive}}
+        var key = value.toLowerCase();
+        {{/useEnumCaseInsensitive}}{{/isString}}
         {{^isNullable}}
-        if (!VALUE_MAPPING.containsKey(value{{#isString}}{{#useEnumCaseInsensitive}}.toLowerCase(){{/useEnumCaseInsensitive}}{{/isString}})) {
+            {{#isString}}
+                {{#useEnumCaseInsensitive}}
+        if (!VALUE_MAPPING.containsKey(key)) {
+            throw new IllegalArgumentException("Unexpected value '" + key + "'");
+        }
+                {{/useEnumCaseInsensitive}}
+                {{^useEnumCaseInsensitive}}
+        if (!VALUE_MAPPING.containsKey(value)) {
             throw new IllegalArgumentException("Unexpected value '" + value + "'");
         }
+                {{/useEnumCaseInsensitive}}
+            {{/isString}}
+            {{^isString}}
+        if (!VALUE_MAPPING.containsKey(value)) {
+            throw new IllegalArgumentException("Unexpected value '" + value + "'");
+        }
+            {{/isString}}
         {{/isNullable}}
-        return VALUE_MAPPING.get(value{{#isString}}{{#useEnumCaseInsensitive}}.toLowerCase(){{/useEnumCaseInsensitive}}{{/isString}});
+        return VALUE_MAPPING.get({{#isString}}{{#useEnumCaseInsensitive}}key{{/useEnumCaseInsensitive}}{{^useEnumCaseInsensitive}}value{{/useEnumCaseInsensitive}}{{/isString}}{{^isString}}value{{/isString}});
+{{/formatNoEmptyLines}}
     }
 }

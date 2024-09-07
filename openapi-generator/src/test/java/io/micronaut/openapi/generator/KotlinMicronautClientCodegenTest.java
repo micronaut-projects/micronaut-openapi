@@ -455,7 +455,14 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         String outputPath = generateFiles(codegen, "src/test/resources/3_0/enum.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
         String modelPath = outputPath + "src/main/kotlin/org/openapitools/model/";
 
-        assertFileContains(modelPath + "StringEnum.kt", "@JsonProperty(\"starting\")", "STARTING(\"starting\"),");
+        assertFileContains(modelPath + "StringEnum.kt", "@JsonProperty(\"starting\")", "STARTING(\"starting\"),",
+            "val VALUE_MAPPING = entries.associateBy { it.value }",
+            """
+                    fun fromValue(value: String): StringEnum {
+                        require(VALUE_MAPPING.containsKey(value)) { "Unexpected value '$value'" }
+                        return VALUE_MAPPING[value]!!
+                    }
+                """);
         assertFileContains(modelPath + "IntEnum.kt", "@JsonProperty(\"1\")", "_1(1),");
         assertFileContains(modelPath + "LongEnum.kt", "@JsonProperty(\"1\")", "_3(3L),");
         assertFileContains(modelPath + "DecimalEnum.kt", "@JsonProperty(\"1.23\")", "_34_1(BigDecimal(\"34.1\"))");
@@ -800,6 +807,25 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                         @Nullable @Valid coordinates: Coordinates?,
                         @Nullable file: ByteArray?
                     ): Mono<HttpResponse<Void>>
+                """);
+    }
+
+    @Test
+    void testUseEnumCaseInsensitive() {
+
+        var codegen = new KotlinMicronautClientCodegen();
+        codegen.setUseEnumCaseInsensitive(true);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/enum.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String path = outputPath + "src/main/kotlin/org/openapitools/";
+
+        assertFileContains(path + "model/StringEnum.kt",
+            "val VALUE_MAPPING = entries.associateBy { it.value.lowercase() }",
+            """
+                    fun fromValue(value: String): StringEnum {
+                        val key = value.lowercase()
+                        require(VALUE_MAPPING.containsKey(key)) { "Unexpected value '$key'" }
+                        return VALUE_MAPPING[key]!!
+                    }
                 """);
     }
 }

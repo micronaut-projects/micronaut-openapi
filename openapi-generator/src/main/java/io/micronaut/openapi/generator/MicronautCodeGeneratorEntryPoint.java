@@ -193,6 +193,7 @@ public final class MicronautCodeGeneratorEntryPoint {
             javaCodeGen.setGenerateHttpResponseWhereRequired(options.generateHttpResponseWhereRequired);
             javaCodeGen.setUseOptional(options.optional);
             javaCodeGen.setUseBeanValidation(options.beanValidation);
+            javaCodeGen.setUseEnumCaseInsensitive(options.useEnumCaseInsensitive);
             javaCodeGen.setTestTool(options.testFramework.value);
             javaCodeGen.setSerializationLibrary(options.serializationLibraryKind.name());
             javaCodeGen.setGenerateSwaggerAnnotations(options.generateSwaggerAnnotations);
@@ -262,6 +263,7 @@ public final class MicronautCodeGeneratorEntryPoint {
             kotlinCodeGen.setGenerateHttpResponseWhereRequired(options.generateHttpResponseWhereRequired);
             kotlinCodeGen.setGenerateSwaggerAnnotations(options.generateSwaggerAnnotations);
             kotlinCodeGen.setUseBeanValidation(options.beanValidation);
+            kotlinCodeGen.setUseEnumCaseInsensitive(options.useEnumCaseInsensitive);
             kotlinCodeGen.setTestTool(options.testFramework.value);
             kotlinCodeGen.setSerializationLibrary(options.serializationLibraryKind.name());
             kotlinCodeGen.setDateTimeLibrary(options.dateTimeFormat.name());
@@ -504,6 +506,7 @@ public final class MicronautCodeGeneratorEntryPoint {
             private String apiPackage;
             private String artifactId;
             private boolean beanValidation = true;
+            private boolean useEnumCaseInsensitive;
             private String invokerPackage;
             private String modelPackage;
             private List<ParameterMapping> parameterMappings;
@@ -700,6 +703,12 @@ public final class MicronautCodeGeneratorEntryPoint {
             }
 
             @Override
+            public MicronautCodeGeneratorOptionsBuilder withUseEnumCaseInsensitive(boolean useEnumCaseInsensitive) {
+                this.useEnumCaseInsensitive = useEnumCaseInsensitive;
+                return this;
+            }
+
+            @Override
             public MicronautCodeGeneratorOptionsBuilder withOptional(boolean optional) {
                 this.optional = optional;
                 return this;
@@ -757,6 +766,7 @@ public final class MicronautCodeGeneratorEntryPoint {
                     implicitHeadersRegex,
 
                     beanValidation,
+                    useEnumCaseInsensitive,
                     optional,
                     reactive,
                     useOneOfInterfaces,
@@ -813,6 +823,7 @@ public final class MicronautCodeGeneratorEntryPoint {
         String implicitHeadersRegex,
 
         boolean beanValidation,
+        boolean useEnumCaseInsensitive,
         boolean optional,
         boolean reactive,
         boolean useOneOfInterfaces,

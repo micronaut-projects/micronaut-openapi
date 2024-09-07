@@ -378,7 +378,20 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         String outputPath = generateFiles(codegen, "src/test/resources/3_0/enum.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
         String modelPath = outputPath + "src/main/java/org/openapitools/model/";
 
-        assertFileContains(modelPath + "StringEnum.java", "@JsonProperty(\"starting\")", "STARTING(\"starting\"),");
+        assertFileContains(modelPath + "StringEnum.java", "@JsonProperty(\"starting\")", "STARTING(\"starting\"),",
+            """
+                    public final static Map<String, StringEnum> VALUE_MAPPING = Map.copyOf(Arrays.stream(values())
+                            .collect(Collectors.toMap(v -> v.value, Function.identity())));
+                """,
+            """
+                    public static StringEnum fromValue(String value) {
+                        if (!VALUE_MAPPING.containsKey(value)) {
+                            throw new IllegalArgumentException("Unexpected value '" + value + "'");
+                        }
+                        return VALUE_MAPPING.get(value);
+                    }
+                """);
+
         assertFileContains(modelPath + "IntEnum.java", "@JsonProperty(\"1\")", "NUMBER_1(1),");
         assertFileContains(modelPath + "LongEnum.java", "@JsonProperty(\"1\")", "NUMBER_3(3L),");
         assertFileContains(modelPath + "DecimalEnum.java", "@JsonProperty(\"1.23\")", "NUMBER_34_DOT_1(new BigDecimal(\"34.1\"))");
@@ -769,6 +782,30 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                         @Nullable @Valid Coordinates coordinates,
                         @Nullable byte[] file
                     );
+                """);
+    }
+
+    @Test
+    void testUseEnumCaseInsensitive() {
+
+        var codegen = new JavaMicronautClientCodegen();
+        codegen.setUseEnumCaseInsensitive(true);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/enum.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String path = outputPath + "src/main/java/org/openapitools/";
+
+        assertFileContains(path + "model/StringEnum.java",
+            """
+                    public final static Map<String, StringEnum> VALUE_MAPPING = Map.copyOf(Arrays.stream(values())
+                            .collect(Collectors.toMap(v -> v.value.toLowerCase(), Function.identity())));
+                """,
+            """
+                    public static StringEnum fromValue(String value) {
+                        var key = value.toLowerCase();
+                        if (!VALUE_MAPPING.containsKey(key)) {
+                            throw new IllegalArgumentException("Unexpected value '" + key + "'");
+                        }
+                        return VALUE_MAPPING.get(key);
+                    }
                 """);
     }
 }

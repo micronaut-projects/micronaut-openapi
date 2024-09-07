@@ -115,6 +115,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
     public static final String OPT_DATE_LIBRARY_LOCAL_DATETIME = "LOCAL_DATETIME";
     public static final String OPT_DATE_FORMAT = "dateFormat";
     public static final String OPT_DATE_TIME_FORMAT = "dateTimeFormat";
+    public static final String OPT_USE_ENUM_CASE_INSENSITIVE = "useEnumCaseInsensitive";
     public static final String OPT_REACTIVE = "reactive";
     public static final String OPT_GENERATE_HTTP_RESPONSE_ALWAYS = "generateHttpResponseAlways";
     public static final String OPT_GENERATE_HTTP_RESPONSE_WHERE_REQUIRED = "generateHttpResponseWhereRequired";
@@ -145,6 +146,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
     protected String testTool;
     protected boolean requiredPropertiesInConstructor = true;
     protected boolean reactive;
+    protected boolean useEnumCaseInsensitive;
     protected boolean generateHttpResponseAlways;
     protected boolean generateHttpResponseWhereRequired = true;
     protected String appName;
@@ -203,7 +205,9 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
                 SecurityFeature.OAuth2_AuthorizationCode,
                 SecurityFeature.OAuth2_ClientCredentials,
                 SecurityFeature.OAuth2_Password,
-                SecurityFeature.OpenIDConnect
+                SecurityFeature.OpenIDConnect,
+                SecurityFeature.SignatureAuth,
+                SecurityFeature.AWSV4Signature
             ))
         );
 
@@ -233,15 +237,17 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
         cliOptions.add(CliOption.newBoolean(OPT_GENERATE_HTTP_RESPONSE_WHERE_REQUIRED, "Wrap the operations response in HttpResponse object where non-200 HTTP status codes or additional headers are defined", generateHttpResponseWhereRequired));
         cliOptions.add(CliOption.newBoolean(OPT_GENERATE_OPERATION_ONLY_FOR_FIRST_TAG, "When false, the operation method will be duplicated in each of the tags if multiple tags are assigned to this operation. " +
             "If true, each operation will be generated only once in the first assigned tag.", generateOperationOnlyForFirstTag));
-        CliOption testToolOption = new CliOption(OPT_TEST, "Specify which test tool to generate files for").defaultValue(testTool);
-        Map<String, String> testToolOptionMap = new HashMap<>();
+        cliOptions.add(CliOption.newBoolean(OPT_USE_ENUM_CASE_INSENSITIVE, "Use `equalsIgnoreCase` when String for enum comparison", useEnumCaseInsensitive));
+
+        var testToolOption = new CliOption(OPT_TEST, "Specify which test tool to generate files for").defaultValue(testTool);
+        var testToolOptionMap = new HashMap<String, String>();
         testToolOptionMap.put(OPT_TEST_JUNIT, "Use JUnit as test tool");
         testToolOptionMap.put(OPT_TEST_SPOCK, "Use Spock as test tool");
         testToolOption.setEnum(testToolOptionMap);
         cliOptions.add(testToolOption);
 
-        CliOption generateSwaggerAnnotationsOption = new CliOption(OPT_GENERATE_SWAGGER_ANNOTATIONS, "Specify if you want to generate swagger annotations and which version").defaultValue(generateSwaggerAnnotations);
-        Map<String, String> generateSwaggerAnnotationsOptionMap = new HashMap<>();
+        var generateSwaggerAnnotationsOption = new CliOption(OPT_GENERATE_SWAGGER_ANNOTATIONS, "Specify if you want to generate swagger annotations and which version").defaultValue(generateSwaggerAnnotations);
+        var generateSwaggerAnnotationsOptionMap = new HashMap<String, String>();
         generateSwaggerAnnotationsOptionMap.put(OPT_GENERATE_SWAGGER_ANNOTATIONS_SWAGGER_1, "Use io.swagger:swagger-annotations for annotating operations and schemas");
         generateSwaggerAnnotationsOptionMap.put(OPT_GENERATE_SWAGGER_ANNOTATIONS_SWAGGER_2, "Use io.swagger.core.v3:swagger-annotations for annotating operations and schemas");
         generateSwaggerAnnotationsOptionMap.put(OPT_GENERATE_SWAGGER_ANNOTATIONS_TRUE, "Equivalent to \"" + OPT_GENERATE_SWAGGER_ANNOTATIONS_SWAGGER_2 + "\"");
@@ -430,6 +436,11 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
             fluxForArrays = convertPropertyToBoolean(OPT_FLUX_FOR_ARRAYS);
         }
         writePropertyBack(OPT_FLUX_FOR_ARRAYS, fluxForArrays);
+
+        if (additionalProperties.containsKey(OPT_USE_ENUM_CASE_INSENSITIVE)) {
+            useEnumCaseInsensitive = convertPropertyToBoolean(OPT_USE_ENUM_CASE_INSENSITIVE);
+        }
+        writePropertyBack(OPT_USE_ENUM_CASE_INSENSITIVE, useEnumCaseInsensitive);
 
         if (additionalProperties.containsKey(OPT_GENERATED_ANNOTATION)) {
             generatedAnnotation = convertPropertyToBoolean(OPT_GENERATED_ANNOTATION);
@@ -2008,6 +2019,10 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
     public void setDateTimeFormat(String dateTimeFormat) {
         this.dateTimeFormat = dateTimeFormat;
         additionalProperties.put(OPT_DATE_TIME_FORMAT, dateTimeFormat);
+    }
+
+    public void setUseEnumCaseInsensitive(boolean useEnumCaseInsensitive) {
+        this.useEnumCaseInsensitive = useEnumCaseInsensitive;
     }
 
     @Override

@@ -89,6 +89,7 @@ public class GeneratorMain {
                     .withApiPackage("io.micronaut.openapi.test.api")
                     .withModelPackage("io.micronaut.openapi.test.model")
                     .withBeanValidation(true)
+                    .withUseEnumCaseInsensitive(true)
                     .withOptional(true)
                     .withReactive(true)
                     .withApiNamePrefix(apiPrefix)

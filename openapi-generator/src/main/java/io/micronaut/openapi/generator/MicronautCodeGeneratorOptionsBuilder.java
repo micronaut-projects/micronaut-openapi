@@ -241,6 +241,14 @@ public interface MicronautCodeGeneratorOptionsBuilder {
     MicronautCodeGeneratorOptionsBuilder withBeanValidation(boolean beanValidation);
 
     /**
+     * If set to true, the generated enums check enum value with ignoring case.
+     *
+     * @param useEnumCaseInsensitive the useEnumCaseInsensitive flag
+     * @return this builder
+     */
+    MicronautCodeGeneratorOptionsBuilder withUseEnumCaseInsensitive(boolean useEnumCaseInsensitive);
+
+    /**
      * If set to true, the generated code will make use of {@link java.util.Optional}.
      *
      * @param optional the optional flag
