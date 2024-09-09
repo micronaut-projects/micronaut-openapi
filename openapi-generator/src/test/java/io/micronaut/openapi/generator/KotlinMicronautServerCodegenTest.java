@@ -1,6 +1,5 @@
 package io.micronaut.openapi.generator;
 
-import io.micronaut.openapi.generator.assertions.TestUtils;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.servers.Server;
@@ -622,31 +621,28 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
         String path = outputPath + "src/main/kotlin/org/openapitools/";
 
         assertFileContains(path + "api/DefaultApi.kt", """
-                    @Operation(
-                        operationId = "myOp",
-                        responses = [
-                            ApiResponse(responseCode = "201", description = "Successfully created")
-                        ]
-                    )
                     @Post("/multiplecontentpath")
+                    @Consumes("application/json", "application/xml")
                     @Secured(SecurityRule.IS_ANONYMOUS)
                     fun myOp(
                         @Body @Nullable @Valid coordinates: Coordinates?
                     ): Mono<HttpResponse<Void>>
                 """,
             """
-                    @Operation(
-                        operationId = "myOp_0",
-                        responses = [
-                            ApiResponse(responseCode = "201", description = "Successfully created")
-                        ]
-                    )
                     @Post("/multiplecontentpath")
                     @Consumes("multipart/form-data")
                     @Secured(SecurityRule.IS_ANONYMOUS)
                     fun myOp_1(
                         @Nullable @Valid coordinates: Coordinates?,
                         @Nullable file: CompletedFileUpload?
+                    ): Mono<HttpResponse<Void>>
+                """,
+            """
+                    @Post("/multiplecontentpath")
+                    @Consumes("application/yaml", "text/json")
+                    @Secured(SecurityRule.IS_ANONYMOUS)
+                    fun myOp_2(
+                        @Body @Nullable @Valid mySchema: MySchema?
                     ): Mono<HttpResponse<Void>>
                 """);
     }

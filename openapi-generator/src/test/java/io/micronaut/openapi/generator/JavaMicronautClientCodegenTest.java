@@ -771,6 +771,7 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
 
         assertFileContains(path + "api/DefaultApi.java", """
                     @Post("/multiplecontentpath")
+                    @Produces({"application/json", "application/xml"})
                     Mono<HttpResponse<Void>> myOp(
                         @Body @Nullable @Valid Coordinates coordinates
                     );
@@ -781,6 +782,13 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                     Mono<HttpResponse<Void>> myOp_1(
                         @Nullable @Valid Coordinates coordinates,
                         @Nullable byte[] file
+                    );
+                """,
+            """
+                    @Post("/multiplecontentpath")
+                    @Produces({"application/yaml", "text/json"})
+                    Mono<HttpResponse<Void>> myOp_2(
+                        @Body @Nullable @Valid MySchema mySchema
                     );
                 """);
     }

@@ -1181,37 +1181,53 @@ public class DefaultCodegen implements CodegenConfig {
         if (content.size() <= 1) {
             return Collections.emptyList();
         }
+        var firstEntry = content.entrySet().iterator().next();
         var mediaTypesToRemove = new ArrayList<String>();
         for (var entry : content.entrySet()) {
-            if (mediaTypesToRemove.contains(entry.getKey())) {
+            if (mediaTypesToRemove.contains(entry.getKey()) || entry.getKey().equals(firstEntry.getKey()) || entry.getValue().equals(firstEntry.getValue())) {
                 continue;
             }
-            for (var entry2 : content.entrySet()) {
-                if (entry.getKey().equals(entry2.getKey()) || entry.getValue().equals(entry2.getValue())) {
-                    continue;
+            var foundSameOpSignature = false;
+            for (var additionalOp : additionalOps) {
+                RequestBody additionalBody = additionalOp.getRequestBody();
+                if (additionalBody == null || additionalBody.getContent() == null) {
+                    return Collections.emptyList();
                 }
-                additionalOps.add(new Operation()
-                    .deprecated(op.getDeprecated())
-                    .callbacks(op.getCallbacks())
-                    .description(op.getDescription())
-                    .extensions(op.getExtensions())
-                    .externalDocs(op.getExternalDocs())
-                    .operationId(getOrGenerateOperationId(op, path, httpMethod.name()))
-                    .parameters(op.getParameters())
-                    .responses(op.getResponses())
-                    .security(op.getSecurity())
-                    .servers(op.getServers())
-                    .summary(op.getSummary())
-                    .tags(op.getTags())
-                    .requestBody(new RequestBody()
-                        .description(body.getDescription())
-                        .extensions(body.getExtensions())
-                        .content(new Content()
-                            .addMediaType(entry2.getKey(), entry2.getValue()))
-                    )
-                );
-                mediaTypesToRemove.add(entry2.getKey());
+                for (var addContentEntry : additionalBody.getContent().entrySet()) {
+                    if (addContentEntry.getValue().equals(entry.getValue())) {
+                        foundSameOpSignature = true;
+                        break;
+                    }
+                }
+                if (foundSameOpSignature) {
+                    additionalBody.getContent().put(entry.getKey(), entry.getValue());
+                    break;
+                }
             }
+            mediaTypesToRemove.add(entry.getKey());
+            if (foundSameOpSignature) {
+                continue;
+            }
+            additionalOps.add(new Operation()
+                .deprecated(op.getDeprecated())
+                .callbacks(op.getCallbacks())
+                .description(op.getDescription())
+                .extensions(op.getExtensions())
+                .externalDocs(op.getExternalDocs())
+                .operationId(getOrGenerateOperationId(op, path, httpMethod.name()))
+                .parameters(op.getParameters())
+                .responses(op.getResponses())
+                .security(op.getSecurity())
+                .servers(op.getServers())
+                .summary(op.getSummary())
+                .tags(op.getTags())
+                .requestBody(new RequestBody()
+                    .description(body.getDescription())
+                    .extensions(body.getExtensions())
+                    .content(new Content()
+                        .addMediaType(entry.getKey(), entry.getValue()))
+                )
+            );
         }
         if (!mediaTypesToRemove.isEmpty()) {
             content.entrySet().removeIf(stringMediaTypeEntry -> mediaTypesToRemove.contains(stringMediaTypeEntry.getKey()));

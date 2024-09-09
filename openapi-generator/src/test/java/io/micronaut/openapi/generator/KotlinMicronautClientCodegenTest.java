@@ -796,6 +796,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
 
         assertFileContains(path + "api/DefaultApi.kt", """
                     @Post("/multiplecontentpath")
+                    @Produces("application/json", "application/xml")
                     fun myOp(
                         @Body @Nullable @Valid coordinates: Coordinates?
                     ): Mono<HttpResponse<Void>>
@@ -806,6 +807,13 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                     fun myOp_1(
                         @Nullable @Valid coordinates: Coordinates?,
                         @Nullable file: ByteArray?
+                    ): Mono<HttpResponse<Void>>
+                """,
+            """
+                    @Post("/multiplecontentpath")
+                    @Produces("application/yaml", "text/json")
+                    fun myOp_2(
+                        @Body @Nullable @Valid mySchema: MySchema?
                     ): Mono<HttpResponse<Void>>
                 """);
     }
