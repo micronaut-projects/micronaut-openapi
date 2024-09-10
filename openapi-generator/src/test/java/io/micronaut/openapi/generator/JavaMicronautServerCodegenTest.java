@@ -537,27 +537,28 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
         String path = outputPath + "src/main/java/org/openapitools/";
 
         assertFileContains(path + "api/DefaultApi.java", """
-                    @Operation(
-                        operationId = "myOp",
-                        responses = @ApiResponse(responseCode = "201", description = "Successfully created")
-                    )
                     @Post("/multiplecontentpath")
+                    @Consumes({"application/json", "application/xml"})
                     @Secured(SecurityRule.IS_ANONYMOUS)
                     Mono<HttpResponse<Void>> myOp(
                         @Body @Nullable(inherited = true) @Valid Coordinates coordinates
                     );
                 """,
             """
-                    @Operation(
-                        operationId = "myOp_0",
-                        responses = @ApiResponse(responseCode = "201", description = "Successfully created")
-                    )
                     @Post("/multiplecontentpath")
                     @Consumes("multipart/form-data")
                     @Secured(SecurityRule.IS_ANONYMOUS)
                     Mono<HttpResponse<Void>> myOp_1(
                         @Nullable(inherited = true) @Valid Coordinates coordinates,
                         @Nullable(inherited = true) CompletedFileUpload file
+                    );
+                """,
+            """
+                    @Post("/multiplecontentpath")
+                    @Consumes({"application/yaml", "text/json"})
+                    @Secured(SecurityRule.IS_ANONYMOUS)
+                    Mono<HttpResponse<Void>> myOp_2(
+                        @Body @Nullable(inherited = true) @Valid MySchema mySchema
                     );
                 """);
     }

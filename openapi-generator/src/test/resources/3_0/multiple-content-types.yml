@@ -11,6 +11,9 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/coordinates'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/coordinates'
           multipart/form-data:
             schema:
               type: object
@@ -20,6 +23,12 @@ paths:
                 file:
                   type: string
                   format: binary
+          application/yaml:
+            schema:
+              $ref: '#/components/schemas/MySchema'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/MySchema'
       responses:
         201:
           description: Successfully created
@@ -38,4 +47,11 @@ components:
         lat:
           type: number
         long:
+          type: number
+    MySchema:
+      type: object
+      required:
+        - lat
+      properties:
+        lat:
           type: number
