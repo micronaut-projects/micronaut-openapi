@@ -98,3 +98,9 @@ components:
         personName:
           type: string
           description: Person name
+        sex:
+          type: string
+          description: Person sex
+          enum:
+            - male
+            - female

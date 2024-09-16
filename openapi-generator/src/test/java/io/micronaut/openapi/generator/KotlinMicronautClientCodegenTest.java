@@ -8,6 +8,7 @@ import org.openapitools.codegen.CliOption;
 import org.openapitools.codegen.CodegenConstants;
 
 import java.util.List;
+import java.util.Map;
 
 import static java.util.stream.Collectors.groupingBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -835,5 +836,42 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                         return VALUE_MAPPING[key]!!
                     }
                 """);
+    }
+
+    @Test
+    void testAdditionalAnnotations() {
+
+        var codegen = new KotlinMicronautClientCodegen();
+        codegen.setAdditionalClientTypeAnnotations(List.of("@java.io.MyAnnotation1"));
+        codegen.setAdditionalModelTypeAnnotations(List.of("@java.io.MyAnnotation2"));
+        codegen.setAdditionalOneOfTypeAnnotations(List.of("@java.io.MyAnnotation3"));
+        codegen.setAdditionalEnumTypeAnnotations(List.of("@java.io.MyAnnotation4"));
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/oneof-with-discriminator.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String path = outputPath + "src/main/kotlin/org/openapitools/";
+
+        assertFileContains(path + "api/SubjectsApi.kt", "@java.io.MyAnnotation1");
+        assertFileContains(path + "model/Person.kt", "@java.io.MyAnnotation2");
+        assertFileContains(path + "model/Subject.kt", "@java.io.MyAnnotation3");
+        assertFileContains(path + "model/PersonSex.kt", "@java.io.MyAnnotation4");
+    }
+
+    @Test
+    void testAdditionalAnnotations2() {
+
+        var codegen = new KotlinMicronautClientCodegen();
+        codegen.additionalProperties().putAll(Map.of(
+            "additionalClientTypeAnnotations", List.of("@java.io.MyAnnotation1"),
+            "additionalModelTypeAnnotations", List.of("@java.io.MyAnnotation2"),
+            "additionalOneOfTypeAnnotations", List.of("@java.io.MyAnnotation3"),
+            "additionalEnumTypeAnnotations", "@java.io.MyAnnotation41;@java.io.MyAnnotation42;\n@java.io.MyAnnotation43;"
+        ));
+        codegen.processOpts();
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/oneof-with-discriminator.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String path = outputPath + "src/main/kotlin/org/openapitools/";
+
+        assertFileContains(path + "api/SubjectsApi.kt", "@java.io.MyAnnotation1");
+        assertFileContains(path + "model/Person.kt", "@java.io.MyAnnotation2");
+        assertFileContains(path + "model/Subject.kt", "@java.io.MyAnnotation3");
+        assertFileContains(path + "model/PersonSex.kt", "@java.io.MyAnnotation41\n", "@java.io.MyAnnotation42\n", "@java.io.MyAnnotation43\n");
     }
 }

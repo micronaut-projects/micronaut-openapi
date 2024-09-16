@@ -290,6 +290,42 @@ public interface MicronautCodeGeneratorOptionsBuilder {
     MicronautCodeGeneratorOptionsBuilder withUseOneOfInterfaces(boolean useOneOfInterfaces);
 
     /**
+     * Additional annotations for enum type (class level annotations).
+     *
+     * @param additionalEnumTypeAnnotations additional annotations for enum type (class level annotations).
+     *
+     * @return this builder
+     */
+    MicronautCodeGeneratorOptionsBuilder withAdditionalEnumTypeAnnotations(List<String> additionalEnumTypeAnnotations);
+
+    /**
+     * Additional annotations for model type (class level annotations).
+     *
+     * @param additionalModelTypeAnnotations additional annotations for model type (class level annotations).
+     *
+     * @return this builder
+     */
+    MicronautCodeGeneratorOptionsBuilder withAdditionalModelTypeAnnotations(List<String> additionalModelTypeAnnotations);
+
+    /**
+     * Additional annotations for oneOf interfaces (class level annotations).
+     *
+     * @param additionalOneOfTypeAnnotations additional annotations for oneOf interfaces (class level annotations).
+     *
+     * @return this builder
+     */
+    MicronautCodeGeneratorOptionsBuilder withAdditionalOneOfTypeAnnotations(List<String> additionalOneOfTypeAnnotations);
+
+    /**
+     * Additional generator properties.
+     *
+     * @param additionalProperties additional generator properties.
+     *
+     * @return this builder
+     */
+    MicronautCodeGeneratorOptionsBuilder withAdditionalProperties(Map<String, Object> additionalProperties);
+
+    /**
      * The possible date-time formatting configurations.
      */
     enum DateTimeFormat {
