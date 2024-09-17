@@ -1,7 +1,7 @@
 plugins {
-    id 'io.micronaut.build.internal.openapi-base'
-    id 'io.micronaut.build.internal.base-module'
-    id 'java-test-fixtures'
+    id("io.micronaut.build.internal.openapi-base")
+    id("io.micronaut.build.internal.base-module")
+    id("java-test-fixtures")
 }
 
 components.java.withVariantsFromConfiguration(configurations.testFixturesApiElements) { skip() }

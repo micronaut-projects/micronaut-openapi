@@ -3,8 +3,8 @@ repositories {
 }
 
 tasks.withType(Test).configureEach {
+    useJUnitPlatform()
     testLogging {
-        showStandardStreams = true
         exceptionFormat = 'full'
     }
 }

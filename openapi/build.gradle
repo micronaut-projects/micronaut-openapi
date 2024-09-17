@@ -7,7 +7,12 @@ dependencies {
     compileOnly(mn.micronaut.core.processor)
     compileOnly(projects.micronautOpenapiAdoc)
 
-    implementation(mn.micronaut.http)
+    implementation(mn.micronaut.http) {
+        exclude group: "io.micronaut", module: "micronaut-core-reactive"
+        exclude group: "io.micronaut", module: "micronaut-context"
+        exclude group: "io.micronaut", module: "micronaut-context-propagation"
+        exclude group: "io.projectreactor", module: "reactor-core"
+    }
 
     api(projects.micronautOpenapiAnnotations)
     api(projects.micronautOpenapiCommon)
@@ -46,11 +51,10 @@ dependencies {
 }
 
 configurations.configureEach {
-    all*.exclude group: "ch.qos.logback"
+    exclude group: "ch.qos.logback"
 }
 
 test {
-    useJUnitPlatform()
-
-    maxHeapSize = "1024m"
+    maxParallelForks = Runtime.runtime.availableProcessors()
+    maxHeapSize = "2048m"
 }
