@@ -11,6 +11,7 @@ import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
+import spock.util.environment.RestoreSystemProperties
 
 class OpenApiOperationViewRenderSpec extends Specification {
     def cleanup() {
@@ -168,14 +169,15 @@ class OpenApiOperationViewRenderSpec extends Specification {
         outputDir.resolve("swagger-ui").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains("link(contextPath + \"https://flattop.com/theme.css\", head, \"text/css\", \"stylesheet\")")
     }
 
+    @RestoreSystemProperties
     void "test render OpenApiView specification with server context path"() {
         given:
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_CONTEXT_SERVER_PATH, "/context-path")
         String spec = "redoc.enabled=true,rapidoc.enabled=true,swagger-ui.enabled=true,openapi-explorer.enabled=true"
         OpenApiViewConfig cfg = OpenApiViewConfig.fromSpecification(spec, null, new Properties(), null)
         Path outputDir = Paths.get("output")
         cfg.title = "OpenAPI documentation"
         cfg.specFile = "swagger.yml"
-        cfg.serverContextPath = "/context-path"
         cfg.render(outputDir, null)
 
         expect:
@@ -233,14 +235,15 @@ class OpenApiOperationViewRenderSpec extends Specification {
         outputDir.resolve("openapi-explorer").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains(cfg.getSpecURL(cfg.openApiExplorerConfig, null))
     }
 
+    @RestoreSystemProperties
     void "test render OpenApiView specification with custom mapping path and server context path"() {
         given:
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_CONTEXT_SERVER_PATH, "/context-path")
         String spec = "mapping.path=somewhere,redoc.enabled=true,rapidoc.enabled=true,swagger-ui.enabled=true,openapi-explorer.enabled=true"
         OpenApiViewConfig cfg = OpenApiViewConfig.fromSpecification(spec, null, new Properties(), null)
         Path outputDir = Paths.get("output")
         cfg.title = "OpenAPI documentation"
         cfg.specFile = "swagger.yml"
-        cfg.serverContextPath = "/context-path"
         cfg.render(outputDir, null)
 
         expect:

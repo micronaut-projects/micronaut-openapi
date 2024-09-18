@@ -8,6 +8,7 @@ import io.swagger.v3.oas.models.PathItem
 import io.swagger.v3.oas.models.Paths
 import io.swagger.v3.oas.models.media.Schema
 import spock.lang.Issue
+import spock.util.environment.RestoreSystemProperties
 
 class OpenApiControllerVisitorSpec extends AbstractOpenApiTypeElementSpec {
 
@@ -2458,5 +2459,42 @@ class MyBean {}
         operation.requestBody.content."application/json"
         operation.requestBody.content."application/json".schema
         operation.requestBody.content."application/json".schema.$ref == "#/components/schemas/SimpleBody"
+    }
+
+    @RestoreSystemProperties
+    void "test append micronaut.server.context-path to endpoints"() {
+        given:
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_SERVER_CONTEXT_PATH, "/local-path")
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_CONTEXT_SERVER_PATH, "/server-context-path")
+
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import jakarta.inject.Singleton;
+
+@Controller("/test")
+class TestController {
+
+    @Get("/save{/id}")
+    String save() {
+        return null;
+    }
+}
+
+@Singleton
+class MyBean {}
+''')
+        when:
+        OpenAPI openAPI = Utils.testReference
+        def paths = openAPI.paths
+
+        then:
+        paths
+        paths."/server-context-path/local-path/test/save"
+        paths."/server-context-path/local-path/test/save".get
+        paths."/server-context-path/local-path/test/save/{id}"
+        paths."/server-context-path/local-path/test/save/{id}".get
     }
 }

@@ -275,7 +275,6 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             if (CollectionUtils.isNotEmpty(openApiInfos)) {
                 cfg.setSpecFile(openApiInfos.values().iterator().next().getSpecFilePath());
             }
-            cfg.setServerContextPath(getConfigProperty(MICRONAUT_OPENAPI_CONTEXT_SERVER_PATH, context));
             cfg.render(destinationDir, context);
         }
     }
