@@ -1,4 +1,4 @@
-You can also provide some servers for all endpoints with the `endpoints.server=<json array of io.swagger.v3.oas.models.servers.Server>` flag, for instance:
+You can also provide some servers for all endpoints with the `endpoints.servers=<json array of io.swagger.v3.oas.models.servers.Server>` flag, for instance:
 [source,properties]
 ----
 endpoints.servers=[ \
