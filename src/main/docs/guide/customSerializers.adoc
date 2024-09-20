@@ -87,5 +87,7 @@ micronaut:
       io.micronaut.openapi.JAXBElement<test.mypackage.XmlElement3>: io.micronaut.openapi.MyJaxbElement3
 ----
 
-NOTE: Important!
+[IMPORTANT]
+====
 After changing these settings, a complete recompilation of the project is necessary to ensure that the new settings are applied correctly.
+====
