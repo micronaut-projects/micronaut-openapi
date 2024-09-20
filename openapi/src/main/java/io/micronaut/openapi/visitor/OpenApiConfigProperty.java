@@ -191,11 +191,15 @@ public interface OpenApiConfigProperty {
      */
     String MICRONAUT_OPENAPI_JSON_VIEW_DEFAULT_INCLUSION = "micronaut.openapi.json.view.default.inclusion";
     /**
-     * Loaded micronaut-http server context path property.
+     * micronaut-http server context path property.
      */
     String MICRONAUT_SERVER_CONTEXT_PATH = "micronaut.server.context-path";
     /**
-     * Loaded micronaut-http-server-netty property (json-view.enabled).
+     * micronaut-context application name property.
+     */
+    String MICRONAUT_APPLICATION_NAME = "micronaut.application.name";
+    /**
+     * micronaut-http-server-netty property (json-view.enabled).
      */
     String MICRONAUT_JACKSON_JSON_VIEW_ENABLED = "jackson.json-view.enabled";
 
