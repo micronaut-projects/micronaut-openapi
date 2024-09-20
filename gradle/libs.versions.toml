@@ -35,7 +35,7 @@ micronaut-test = "4.5.0"
 micronaut-kotlin = "4.4.0"
 micronaut-logging = "1.4.0"
 micronaut-session = "4.4.0"
-micronaut-grpc = "4.7.0"
+micronaut-grpc = "4.7.1"
 micronaut-docs = "2.0.0"
 
 [libraries]
