@@ -15,11 +15,11 @@
  */
 package io.micronaut.openapi.visitor.security;
 
-import java.util.List;
-
 import io.micronaut.core.annotation.Internal;
 import io.micronaut.core.annotation.Nullable;
 import io.micronaut.http.HttpMethod;
+
+import java.util.List;
 
 /**
  * Copy of class io.micronaut.security.config.InterceptUrlMapPattern from micronaut-security.

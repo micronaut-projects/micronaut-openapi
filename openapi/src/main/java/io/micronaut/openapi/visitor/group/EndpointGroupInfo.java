@@ -15,10 +15,10 @@
  */
 package io.micronaut.openapi.visitor.group;
 
+import io.micronaut.core.annotation.Internal;
+
 import java.util.HashMap;
 import java.util.Map;
-
-import io.micronaut.core.annotation.Internal;
 
 /**
  * Entity to storage information about group with specific properties for this operation-group.

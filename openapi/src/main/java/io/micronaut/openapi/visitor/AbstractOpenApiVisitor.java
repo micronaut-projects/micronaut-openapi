@@ -35,7 +35,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -164,40 +163,38 @@ abstract class AbstractOpenApiVisitor {
      */
     protected <T, A extends Annotation> List<T> processOpenApiAnnotation(Element element, VisitorContext context, Class<A> annotationType, Class<T> modelType, List<T> tagList) {
         List<AnnotationValue<A>> annotations = element.getAnnotationValuesByType(annotationType);
-        if (CollectionUtils.isNotEmpty(annotations)) {
-            if (CollectionUtils.isEmpty(tagList)) {
-                tagList = new ArrayList<>();
+        if (CollectionUtils.isEmpty(tagList)) {
+            tagList = new ArrayList<>();
+        }
+        if (CollectionUtils.isEmpty(annotations)) {
+            return tagList;
+        }
+        for (AnnotationValue<A> tag : annotations) {
+            Map<CharSequence, Object> values;
+            var tagValues = tag.getValues();
+            if (tag.getAnnotationName().equals(io.swagger.v3.oas.annotations.security.SecurityRequirement.class.getName())
+                && !tagValues.isEmpty()) {
+                Object name = tagValues.get(PROP_NAME);
+                Object scopes = tagValues.computeIfAbsent(PROP_SCOPES, (key) -> new ArrayList<String>());
+                values = Collections.singletonMap((CharSequence) name, scopes);
+            } else {
+                values = tagValues;
             }
-            for (AnnotationValue<A> tag : annotations) {
-                Map<CharSequence, Object> values;
-                var tagValues = tag.getValues();
-                if (tag.getAnnotationName().equals(io.swagger.v3.oas.annotations.security.SecurityRequirement.class.getName())
-                    && !tagValues.isEmpty()) {
-                    Object name = tagValues.get(PROP_NAME);
-                    Object scopes = tagValues.get(PROP_SCOPES);
-                    if (scopes == null) {
-                        scopes = new ArrayList<String>();
-                    }
-                    values = Collections.singletonMap((CharSequence) name, scopes);
-                } else {
-                    values = tagValues;
-                }
-                Optional<T> tagOpt = toValue(values, context, modelType, null);
-                if (tagOpt.isPresent()) {
-                    T tagObj = tagOpt.get();
-                    // skip all existed tags
-                    boolean alreadyExists = false;
-                    if (CollectionUtils.isNotEmpty(tagList) && tag.getAnnotationName().equals(io.swagger.v3.oas.annotations.tags.Tag.class.getName())) {
-                        for (T existedTag : tagList) {
-                            if (((Tag) existedTag).getName().equals(((Tag) tagObj).getName())) {
-                                alreadyExists = true;
-                                break;
-                            }
+            T tagObj = toValue(values, context, modelType, null);
+            if (tagObj != null) {
+                // skip all existed tags
+                boolean alreadyExists = false;
+                if (CollectionUtils.isNotEmpty(tagList) && tag.getAnnotationName().equals(io.swagger.v3.oas.annotations.tags.Tag.class.getName())) {
+                    var newTagName = ((Tag) tagObj).getName();
+                    for (T existedTag : tagList) {
+                        if (((Tag) existedTag).getName().equals(newTagName)) {
+                            alreadyExists = true;
+                            break;
                         }
                     }
-                    if (!alreadyExists) {
-                        tagList.add(tagObj);
-                    }
+                }
+                if (!alreadyExists) {
+                    tagList.add(tagObj);
                 }
             }
         }

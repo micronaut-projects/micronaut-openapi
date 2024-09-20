@@ -42,11 +42,11 @@ public final class ProtoUtils {
         var propertiesWithoutProto = new ArrayList<PropertyElement>();
         for (var prop : beanProperties) {
             if (prop.getName().equals("initialized")
-                    || prop.getName().equals("defaultInstanceForType")
-                    || prop.getName().equals("initializationErrorString")
-                    || prop.getName().equals("descriptorForType")
-                    || prop.getName().equals("allFields")
-                    || prop.getName().equals("unknownFields")
+                || prop.getName().equals("defaultInstanceForType")
+                || prop.getName().equals("initializationErrorString")
+                || prop.getName().equals("descriptorForType")
+                || prop.getName().equals("allFields")
+                || prop.getName().equals("unknownFields")
             ) {
                 continue;
             }
@@ -56,15 +56,15 @@ public final class ProtoUtils {
                 var returnType = readMethod.getReturnType();
 
                 if (readMethod.getName().endsWith("OrBuilderList")
-                        || (readMethod.getName().endsWith("Bytes")
-                        && returnType.getName().equals("com.google.protobuf.ByteString"))
+                    || (readMethod.getName().endsWith("Bytes")
+                    && returnType.getName().equals("com.google.protobuf.ByteString"))
                 ) {
                     continue;
                 }
 
                 // process map properties
                 if (returnType.getName().equals("java.util.Map")
-                        && readMethod.getName().endsWith("Map")) {
+                    && readMethod.getName().endsWith("Map")) {
                     continue;
                 }
 
@@ -78,13 +78,13 @@ public final class ProtoUtils {
 
                 // for iterable fields need to skip getCount methods
                 if (readMethod.getName().endsWith("Count")
-                        && classElement.findMethod(readMethod.getName().substring(0, readMethod.getName().lastIndexOf("Count"))).isPresent()) {
+                    && classElement.findMethod(readMethod.getName().substring(0, readMethod.getName().lastIndexOf("Count"))).isPresent()) {
                     continue;
                 }
 
                 // skip protobuf internal properties for objects
                 if (isProtobufGenerated(returnType)
-                        && prop.getName().endsWith("OrBuilder")) {
+                    && prop.getName().endsWith("OrBuilder")) {
                     var propName = prop.getName().substring(0, prop.getName().lastIndexOf("OrBuilder"));
                     var found = false;
                     for (var propWithoutSuffix : beanProperties) {
@@ -174,14 +174,14 @@ public final class ProtoUtils {
 
     public static boolean isProtobufGenerated(ClassElement type) {
         return type != null && (
-                type.isAssignable("com.google.protobuf.MessageOrBuilder")
+            type.isAssignable("com.google.protobuf.MessageOrBuilder")
                 || type.isAssignable("com.google.protobuf.ProtocolMessageEnum")
         );
     }
 
     public static boolean isProtobufMessageClass(ClassElement type) {
         return type != null && (
-                type.isAssignable("com.google.protobuf.GeneratedMessageV3")
+            type.isAssignable("com.google.protobuf.GeneratedMessageV3")
                 || type.isAssignable("com.google.protobuf.GeneratedMessage")
                 || type.isAssignable("com.google.protobuf.GeneratedMessageLite")
         );

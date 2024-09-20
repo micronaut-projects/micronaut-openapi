@@ -80,6 +80,10 @@ public final class FileUtils {
         return path.endsWith(EXT_YML) || path.endsWith(EXT_YAML);
     }
 
+    public static boolean isJson(String path) {
+        return path.endsWith(EXT_JSON);
+    }
+
     public static Path getViewsDestDir(Path defaultSwaggerFilePath, VisitorContext context) {
         String destDir = getConfigProperty(MICRONAUT_OPENAPI_VIEWS_DEST_DIR, context);
         if (StringUtils.isNotEmpty(destDir)) {

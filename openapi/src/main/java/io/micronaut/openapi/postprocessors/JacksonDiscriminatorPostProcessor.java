@@ -15,14 +15,14 @@
  */
 package io.micronaut.openapi.postprocessors;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.core.util.StringUtils;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.media.StringSchema;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static io.micronaut.openapi.visitor.SchemaUtils.setSpecVersion;
 import static io.swagger.v3.oas.models.Components.COMPONENTS_SCHEMAS_REF;

@@ -61,7 +61,7 @@ final class SwaggerUIConfig extends AbstractViewConfig {
     private static final String OPTION_OAUTH2 = "oauth2";
     private static final String PREFIX_SWAGGER_UI = "swagger-ui";
     private static final String KEY_VALUE_SEPARATOR = ": ";
-    private static final String COMMNA_NEW_LINE = ",\n";
+    private static final String COMMA_NEW_LINE = ",\n";
 
     // https://github.com/swagger-api/swagger-ui/blob/HEAD/docs/usage/configuration.md
     private static final Map<String, Function<String, Object>> VALID_OPTIONS = new HashMap<>(30);
@@ -218,7 +218,7 @@ final class SwaggerUIConfig extends AbstractViewConfig {
             .sorted(Map.Entry.comparingByKey())
             .map(e -> ((keyPrefix != null && e.getKey().startsWith(keyPrefix)) ? e.getKey().substring(keyPrefix.length()) : e.getKey())
                 + KEY_VALUE_SEPARATOR + e.getValue())
-            .collect(Collectors.joining(COMMNA_NEW_LINE));
+            .collect(Collectors.joining(COMMA_NEW_LINE));
     }
 
     @NonNull
@@ -271,7 +271,7 @@ final class SwaggerUIConfig extends AbstractViewConfig {
         template = replacePlaceHolder(template, PREFIX_SWAGGER_UI + ".attributes", toOptions(), EMPTY_STRING);
 
         if (theme != null && Theme.CLASSIC != theme) {
-            var themeCssLink =  isDefaultThemeUrl ? finalUrlPrefix + theme.getCss() + ".css" : themeUrl;
+            var themeCssLink = isDefaultThemeUrl ? finalUrlPrefix + theme.getCss() + ".css" : themeUrl;
             template = template.replace("{{" + PREFIX_SWAGGER_UI + ".theme}}", "link(contextPath + \"" + themeCssLink + "\", head, \"text/css\", \"stylesheet\")");
         } else {
             template = template.replace("{{" + PREFIX_SWAGGER_UI + ".theme}}", EMPTY_STRING);

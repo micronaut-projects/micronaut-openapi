@@ -15,14 +15,14 @@
  */
 package io.micronaut.openapi.annotation.mappers;
 
-import java.util.Collections;
-import java.util.List;
-
 import io.micronaut.core.annotation.AnnotationValue;
 import io.micronaut.inject.annotation.TypedAnnotationMapper;
 import io.micronaut.inject.visitor.VisitorContext;
 import io.micronaut.openapi.annotation.OpenAPIInclude;
 import io.micronaut.openapi.annotation.OpenAPISecurity;
+
+import java.util.Collections;
+import java.util.List;
 
 import static io.micronaut.openapi.visitor.ElementUtils.EMPTY_ANNOTATION_VALUES_ARRAY;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_SECURITY;

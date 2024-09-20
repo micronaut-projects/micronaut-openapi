@@ -404,6 +404,7 @@ public class MyBean {}
         openAPI.components.schemas["Person"].properties["totalGoals"].description == "The total number of person's goals."
     }
 
+    @RestoreSystemProperties
     void "test render OpenApiView specification with custom property naming strategy"() {
         given:
         System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_PROPERTY_NAMING_STRATEGY, "SNAKE_CASE")
@@ -415,16 +416,17 @@ package test;
 import io.micronaut.core.annotation.Introspected;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.MediaType;
-import io.micronaut.http.annotation.*;
-
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.NegativeOrZero;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.PositiveOrZero;
 
 @Controller
 class PersonController {
@@ -539,11 +541,9 @@ public class MyBean {}
         openAPI.components.schemas["Person"].properties["total_goals"].type == "integer"
         !openAPI.components.schemas["Person"].properties["total_goals"].exclusiveMinimum
         openAPI.components.schemas["Person"].properties["total_goals"].description == "The total number of person's goals."
-
-        cleanup:
-        System.clearProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_PROPERTY_NAMING_STRATEGY)
     }
 
+    @RestoreSystemProperties
     void "test render OpenApiView specification with LOWER_CAMEL_CASE property naming strategy - Issue #241"() {
         given:
         System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_PROPERTY_NAMING_STRATEGY, "LOWER_CAMEL_CASE")
@@ -555,16 +555,17 @@ package test;
 import io.micronaut.core.annotation.Introspected;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.MediaType;
-import io.micronaut.http.annotation.*;
-
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.NegativeOrZero;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.PositiveOrZero;
 
 @Controller
 class PersonController {
@@ -679,11 +680,9 @@ public class MyBean {}
         openAPI.components.schemas["Person"].properties["totalGoals"].type == "integer"
         !openAPI.components.schemas["Person"].properties["totalGoals"].exclusiveMinimum
         openAPI.components.schemas["Person"].properties["totalGoals"].description == "The total number of person's goals."
-
-        cleanup:
-        System.clearProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_PROPERTY_NAMING_STRATEGY)
     }
 
+    @RestoreSystemProperties
     void "test render OpenApiView specification with custom property naming strategy and required properties - Issue #240"() {
         given:
         System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_PROPERTY_NAMING_STRATEGY, "SNAKE_CASE")
@@ -695,16 +694,18 @@ package test;
 import io.micronaut.core.annotation.Introspected;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.MediaType;
-import io.micronaut.http.annotation.*;
-
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NegativeOrZero;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.PositiveOrZero;
 
 @Controller
 class PersonController {
@@ -836,9 +837,6 @@ public class MyBean {}
         personSchema.required.contains("name")
         personSchema.required.contains("debt_value")
         personSchema.required.contains("total_goals")
-
-        cleanup:
-        System.clearProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_PROPERTY_NAMING_STRATEGY)
     }
 
     void "test READ_ONLY accessMode correctly results in setting readOnly to true"() {

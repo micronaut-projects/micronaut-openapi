@@ -308,7 +308,7 @@ public final class ElementUtils {
             || parameterType.isAssignable("org.springframework.http.HttpMethod")
             || parameterType.isAssignable("org.springframework.validation.BindingResult")
             || parameterType.isAssignable("org.springframework.validation.Errors")
-        ;
+            ;
     }
 
     public static AnnotationMetadata getAnnotationMetadata(Element el) {
