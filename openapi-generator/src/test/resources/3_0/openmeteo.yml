@@ -129,7 +129,7 @@ paths:
                   generationtime_ms:
                     type: number
                     example: 2.2119
-                    description: Generation time of the weather forecast in milli seconds. This is mainly used for performance monitoring and improvements.
+                    description: Generation time of the weather forecast in milliseconds. This is mainly used for performance monitoring and improvements.
                   utc_offset_seconds:
                     type: integer
                     example: 3600
@@ -144,7 +144,7 @@ paths:
                     description: For each selected weather variable, the unit will be listed here.
                   daily:
                     type: DailyResponse
-                    description: For each selected daily weather variable, data will be returned as a floating point array. Additionally a `time` array will be returned with ISO8601 timestamps.
+                    description: For each selected daily weather variable, data will be returned as a floating point array. Additionally, a `time` array will be returned with ISO8601 timestamps.
                   daily_units:
                     type: object
                     additionalProperties:

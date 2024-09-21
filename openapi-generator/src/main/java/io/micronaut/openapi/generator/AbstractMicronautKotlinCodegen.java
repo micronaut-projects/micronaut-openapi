@@ -29,6 +29,7 @@ import io.swagger.v3.oas.models.media.MediaType;
 import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.media.StringSchema;
 import io.swagger.v3.oas.models.parameters.Parameter;
+import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.servers.Server;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -42,7 +43,9 @@ import org.openapitools.codegen.CodegenModelType;
 import org.openapitools.codegen.CodegenOperation;
 import org.openapitools.codegen.CodegenParameter;
 import org.openapitools.codegen.CodegenProperty;
+import org.openapitools.codegen.CodegenResponse;
 import org.openapitools.codegen.DefaultCodegen;
+import org.openapitools.codegen.IJsonSchemaValidationProperties;
 import org.openapitools.codegen.SupportingFile;
 import org.openapitools.codegen.config.GlobalSettings;
 import org.openapitools.codegen.languages.AbstractKotlinCodegen;
@@ -79,6 +82,17 @@ import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import static io.micronaut.openapi.generator.MnSchemaTypeUtil.FORMAT_INT16;
+import static io.micronaut.openapi.generator.MnSchemaTypeUtil.FORMAT_INT8;
+import static io.micronaut.openapi.generator.MnSchemaTypeUtil.FORMAT_SHORT;
+import static io.micronaut.openapi.generator.MnSchemaTypeUtil.TYPE_BYTE;
+import static io.micronaut.openapi.generator.MnSchemaTypeUtil.TYPE_CHAR;
+import static io.micronaut.openapi.generator.MnSchemaTypeUtil.TYPE_CHARACTER;
+import static io.micronaut.openapi.generator.MnSchemaTypeUtil.TYPE_DOUBLE;
+import static io.micronaut.openapi.generator.MnSchemaTypeUtil.TYPE_FLOAT;
+import static io.micronaut.openapi.generator.MnSchemaTypeUtil.TYPE_INT;
+import static io.micronaut.openapi.generator.MnSchemaTypeUtil.TYPE_LONG;
+import static io.micronaut.openapi.generator.MnSchemaTypeUtil.TYPE_SHORT;
 import static io.micronaut.openapi.generator.Utils.DEFAULT_BODY_PARAM_NAME;
 import static io.micronaut.openapi.generator.Utils.DIVIDE_OPERATIONS_BY_CONTENT_TYPE;
 import static io.micronaut.openapi.generator.Utils.EXT_ANNOTATIONS_CLASS;
@@ -90,6 +104,8 @@ import static io.micronaut.openapi.generator.Utils.isDateType;
 import static io.micronaut.openapi.generator.Utils.normalizeExtraAnnotations;
 import static io.micronaut.openapi.generator.Utils.processGenericAnnotations;
 import static io.micronaut.openapi.generator.Utils.readListOfStringsProperty;
+import static io.swagger.v3.parser.util.SchemaTypeUtil.BYTE_FORMAT;
+import static io.swagger.v3.parser.util.SchemaTypeUtil.INTEGER_TYPE;
 import static org.openapitools.codegen.CodegenConstants.API_PACKAGE;
 import static org.openapitools.codegen.CodegenConstants.INVOKER_PACKAGE;
 import static org.openapitools.codegen.CodegenConstants.MODEL_PACKAGE;
@@ -1120,9 +1136,165 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         }
     }
 
+    private void checkPrimitives(IJsonSchemaValidationProperties obj, Schema schema) {
+
+        if (obj == null) {
+            return;
+        }
+
+        CodegenModel model = null;
+        CodegenParameter param = null;
+        CodegenProperty prop = null;
+        CodegenResponse response = null;
+        if (obj instanceof CodegenModel m) {
+            model = m;
+        } else if (obj instanceof CodegenProperty p) {
+            prop = p;
+        } else if (obj instanceof CodegenParameter p) {
+            param = p;
+        } else if (obj instanceof CodegenResponse r) {
+            response = r;
+        }
+        var extMap = model != null ? model.vendorExtensions : param != null ? param.vendorExtensions : prop != null ? prop.vendorExtensions : response.vendorExtensions;
+        var dataType = model != null ? model.dataType : param != null ? param.dataType : prop != null ? prop.dataType : response.dataType;
+        var dataTypeWithEnum = param != null ? param.datatypeWithEnum : prop != null ? prop.datatypeWithEnum : null;
+
+        if (schema == null) {
+            extMap.put("baseType", dataType);
+            return;
+        }
+
+        var isNumeric = model != null ? model.isNumeric : param != null ? param.isNumeric : prop != null ? prop.isNumeric : response.isNumeric;
+        var isNumber = model != null ? model.isNumber : param != null ? param.isNumber : prop != null ? prop.isNumber : response.isNumber;
+        var isShort = model != null ? model.isShort : param != null ? param.isShort : prop != null ? prop.isShort : response.isShort;
+        var isInteger = model != null ? model.isInteger : param != null ? param.isInteger : prop != null ? prop.isInteger : response.isInteger;
+        var isLong = model != null ? model.isLong : param != null ? param.isLong : prop != null ? prop.isLong : response.isLong;
+        var isFloat = model != null ? model.isFloat : param != null ? param.isFloat : prop != null ? prop.isFloat : response.isFloat;
+        var isDouble = model != null ? model.isDouble : param != null ? param.isDouble : prop != null ? prop.isDouble : response.isDouble;
+
+        var extensions = schema.getExtensions();
+        var format = extensions != null ? extensions.get("x-format") : null;
+        if (format == null) {
+            format = schema.getFormat() == null ? "object" : schema.getFormat();
+        }
+        var schemaType = extensions != null ? extensions.get("x-type") : null;
+        if (schemaType == null) {
+            schemaType = schema.getType() == null ? "object" : schema.getType();
+        }
+        var baseType = dataType;
+
+        if (TYPE_CHAR.equals(schemaType) || TYPE_CHARACTER.equals(schemaType)) {
+            baseType = "char";
+            dataType = "Char";
+            dataTypeWithEnum = "Char";
+        } else if (TYPE_BYTE.equals(schemaType)) {
+            baseType = "byte";
+            dataType = "Byte";
+            dataTypeWithEnum = "Byte";
+            isNumeric = true;
+            isNumber = true;
+            isInteger = true;
+        } else if (INTEGER_TYPE.equals(schemaType) && (FORMAT_INT8.equals(format) || BYTE_FORMAT.equals(format))) {
+            baseType = "Byte";
+            dataType = "Byte";
+            dataTypeWithEnum = "Byte";
+            isNumeric = true;
+            isNumber = true;
+            isInteger = true;
+        } else if (TYPE_SHORT.equals(schemaType)) {
+            baseType = "short";
+            dataType = "Short";
+            dataTypeWithEnum = "Short";
+            isNumeric = true;
+            isNumber = true;
+            isShort = true;
+        } else if (INTEGER_TYPE.equals(schemaType) && (FORMAT_INT16.equals(format) || FORMAT_SHORT.equals(format))) {
+            baseType = "Short";
+            dataType = "Short";
+            dataTypeWithEnum = "Short";
+            isNumeric = true;
+            isNumber = true;
+            isShort = true;
+        } else if (TYPE_INT.equals(schemaType)) {
+            baseType = "int";
+            dataType = "Int";
+            dataTypeWithEnum = "Int";
+            isNumeric = true;
+            isNumber = true;
+            isInteger = true;
+        } else if (TYPE_LONG.equals(schemaType)) {
+            baseType = "long";
+            dataType = "Long";
+            dataTypeWithEnum = "Long";
+            isNumeric = true;
+            isNumber = true;
+            isLong = true;
+        } else if (TYPE_FLOAT.equals(schemaType)) {
+            baseType = "float";
+            dataType = "Float";
+            dataTypeWithEnum = "Float";
+            isNumeric = true;
+            isNumber = true;
+            isFloat = true;
+        } else if (TYPE_DOUBLE.equals(schemaType)) {
+            baseType = "double";
+            dataType = "Double";
+            dataTypeWithEnum = "Double";
+            isNumeric = true;
+            isNumber = true;
+            isDouble = true;
+        }
+
+        extMap.put("baseType", baseType);
+        // kotlin has not primitive types
+        extMap.put("isPrimitive", false);
+
+        if (model != null) {
+            model.dataType = dataType;
+            model.isNumeric = isNumeric;
+            model.isNumber = isNumber;
+            model.isShort = isShort;
+            model.isInteger = isInteger;
+            model.isLong = isLong;
+            model.isFloat = isFloat;
+            model.isDouble = isDouble;
+        } else if (prop != null) {
+            prop.dataType = dataType;
+            prop.datatypeWithEnum = dataTypeWithEnum;
+            prop.isNumeric = isNumeric;
+            prop.isNumber = isNumber;
+            prop.isShort = isShort;
+            prop.isInteger = isInteger;
+            prop.isLong = isLong;
+            prop.isFloat = isFloat;
+            prop.isDouble = isDouble;
+        } else if (param != null) {
+            param.dataType = dataType;
+            param.datatypeWithEnum = dataTypeWithEnum;
+            param.isNumeric = isNumeric;
+            param.isNumber = isNumber;
+            param.isShort = isShort;
+            param.isInteger = isInteger;
+            param.isLong = isLong;
+            param.isFloat = isFloat;
+            param.isDouble = isDouble;
+        } else {
+            response.dataType = dataType;
+            response.isNumeric = isNumeric;
+            response.isNumber = isNumber;
+            response.isShort = isShort;
+            response.isInteger = isInteger;
+            response.isLong = isLong;
+            response.isFloat = isFloat;
+            response.isDouble = isDouble;
+        }
+    }
+
     @Override
     public CodegenModel fromModel(String name, Schema schema) {
         CodegenModel model = super.fromModel(name, schema);
+        checkPrimitives(model, unaliasSchema(schema));
+
         if (!model.oneOf.isEmpty()) {
             if (useOneOfInterfaces) {
                 model.vendorExtensions.put("x-is-one-of-interface", true);
@@ -1247,6 +1419,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
     @Override
     public CodegenParameter fromParameter(Parameter p, Set<String> imports) {
         var parameter = super.fromParameter(p, imports);
+        checkPrimitives(parameter, unaliasSchema(p.getSchema()));
         // if name is escaped
         var realName = parameter.paramName;
         if (realName.contains("`")) {
@@ -1294,8 +1467,16 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
     }
 
     @Override
-    public CodegenProperty fromProperty(String name, Schema p, boolean required, boolean schemaIsFromAdditionalProperties) {
-        var property = super.fromProperty(name, p, required, schemaIsFromAdditionalProperties);
+    public CodegenResponse fromResponse(String responseCode, ApiResponse response) {
+        var resp = super.fromResponse(responseCode, response);
+        checkPrimitives(resp, (Schema) resp.schema);
+        return resp;
+    }
+
+    @Override
+    public CodegenProperty fromProperty(String name, Schema schema, boolean required, boolean schemaIsFromAdditionalProperties) {
+        var property = super.fromProperty(name, schema, required, schemaIsFromAdditionalProperties);
+        checkPrimitives(property, unaliasSchema(schema));
 
         // if name is escaped
         var realName = property.name;
@@ -1306,18 +1487,18 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         }
         property.vendorExtensions.put("realName", realName);
 
-        if (p != null && p.get$ref() != null) {
-            p = ModelUtils.getSchemaFromRefToSchemaWithProperties(openAPI, p.get$ref());
+        if (schema != null && schema.get$ref() != null) {
+            schema = ModelUtils.getSchemaFromRefToSchemaWithProperties(openAPI, schema.get$ref());
         }
 
         String defaultValueInit;
         var items = property.items;
         if (items == null) {
-            defaultValueInit = calcDefaultValues(null, null, false, p).getLeft();
+            defaultValueInit = calcDefaultValues(null, null, false, schema).getLeft();
         } else {
-            defaultValueInit = calcDefaultValues(items.datatypeWithEnum, items.dataType, items.getIsEnumOrRef(), p).getLeft();
+            defaultValueInit = calcDefaultValues(items.datatypeWithEnum, items.dataType, items.getIsEnumOrRef(), schema).getLeft();
         }
-        if (p != null && ModelUtils.isEnumSchema(p)) {
+        if (schema != null && ModelUtils.isEnumSchema(schema)) {
             var enumVarName = toEnumVarName(property.defaultValue, property.dataType);
             if (enumVarName != null) {
                 defaultValueInit = property.dataType + "." + enumVarName;
@@ -1391,11 +1572,30 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
             modified = "EMPTY";
             return normalizeKotlinSpecificNames(modified);
         }
-        value = value.replaceAll("[^a-zA-Z0-9_]", "_");
-        if (isNumeric(value)) {
-            value = "_" + value;
+
+        String varName = value;
+
+        // number
+        if ("Int".equalsIgnoreCase(datatype)
+            || "Byte".equalsIgnoreCase(datatype)
+            || "Short".equalsIgnoreCase(datatype)
+            || "Integer".equalsIgnoreCase(datatype)
+            || "Long".equalsIgnoreCase(datatype)
+            || "Float".equalsIgnoreCase(datatype)
+            || "Double".equalsIgnoreCase(datatype)
+            || "BigDecimal".equals(datatype)) {
+            varName = "NUMBER_" + varName;
+            varName = varName.replaceAll("-", "MINUS_");
+            varName = varName.replaceAll("\\+", "PLUS_");
+            varName = varName.replaceAll("\\.", "_DOT_");
         }
-        return super.toEnumVarName(value, datatype);
+        varName = varName.replaceAll("[^a-zA-Z0-9_]", "_");
+
+        if (" ".equals(varName)) {
+            return "SPACE";
+        }
+
+        return super.toEnumVarName(varName, datatype);
     }
 
     public static boolean isNumeric(String str) {
@@ -1661,6 +1861,69 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         }
 
         return objs;
+    }
+
+    @Override
+    protected void updateEnumVarsWithExtensions(List<Map<String, Object>> enumVars, Map<String, Object> vendorExtensions, String dataType) {
+        super.updateEnumVarsWithExtensions(enumVars, vendorExtensions, dataType);
+        if (vendorExtensions == null) {
+            return;
+        }
+        var xDeprecated = (List<Object>) vendorExtensions.get("x-deprecated");
+        if (xDeprecated != null && !xDeprecated.isEmpty()) {
+            for (var deprecatedItem : xDeprecated) {
+                Map<String, Object> foundEnumVar = null;
+                for (var enumVar : enumVars) {
+                    var isString = (boolean) enumVar.get("isString");
+                    var value = (String) enumVar.get("value");
+                    if (!isString) {
+                        if (value.startsWith("(short)")) {
+                            value = value.replace("(short) ", "");
+                        }
+                        var argPos = value.indexOf('(');
+                        // case for BigDecimal
+                        if (argPos >= 0) {
+                            value = value.substring(argPos + 1, value.indexOf(')'));
+                        }
+                        var upperValue = value.toUpperCase();
+                        if (upperValue.endsWith("F")
+                            || upperValue.endsWith("L")
+                            || upperValue.endsWith("D")) {
+                            value = value.substring(0, value.length() - 1);
+                        }
+                        if (!value.contains("'")) {
+                            value = value.replace("'", "");
+                        }
+                        if (!value.contains("\"")) {
+                            value = "\"" + value + "\"";
+                        }
+                    }
+                    if (value.equals("\"" + deprecatedItem + '"')) {
+                        foundEnumVar = enumVar;
+                        break;
+                    }
+                }
+                if (foundEnumVar != null) {
+                    foundEnumVar.put("deprecated", true);
+                }
+            }
+        }
+
+        var baseType = (String) vendorExtensions.get("baseType");
+        for (var enumVar : enumVars) {
+            if ((boolean) enumVar.get("isString")) {
+                continue;
+            }
+            var value = (String) enumVar.get("value");
+            value = value.replace("\"", "");
+            if ("char".equals(baseType) && !value.startsWith("'")) {
+                enumVar.put("value", "'" + value + "'");
+            } else if ("short".equalsIgnoreCase(baseType)) {
+                enumVar.put("value", value);
+            } else if ("byte".equalsIgnoreCase(baseType)) {
+                enumVar.put("value", value);
+            }
+        }
     }
 
     private void processOneOfModels(CodegenModel model, Collection<ModelsMap> models) {

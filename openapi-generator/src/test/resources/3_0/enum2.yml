@@ -1,0 +1,184 @@
+openapi: "3.0.0"
+info:
+  version: 1.0.0
+  title: Compute API
+  description: API for the Compute Service
+servers:
+  - url: localhost:8000/api
+    description: The api server
+
+paths:
+  /sendEnum:
+    get:
+      operationId: sendEnum
+      tags: [ parameters ]
+      parameters:
+        - name: name
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/StringEnum"
+        - name: intEnum
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/IntEnum"
+        - name: longEnum
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/LongEnum"
+        - name: boolEnum
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/BooleanEnum"
+        - name: decimalEnum
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/DecimalEnum"
+        - name: floatEnum
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/FloatEnum"
+        - name: doubleEnum
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/DoubleEnum"
+        - name: bytePrimitiveEnum
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/BytePrimitiveEnum"
+        - name: shortEnum
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/ShortPrimitiveEnum"
+        - name: intEnum
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/IntPrimitiveEnum"
+        - name: longEnum
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/LongPrimitiveEnum"
+        - name: floatPrimitiveEnum
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/FloatPrimitiveEnum"
+        - name: doublePrimitiveEnum
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/DoublePrimitiveEnum"
+        - name: charPrimitiveEnum
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/CharPrimitiveEnum"
+      responses:
+        200:
+          description: Success
+components:
+  schemas:
+    StringEnum:
+      type: string
+      enum: ['starting', 'running', 'stopped', 'deleted']
+      x-deprecated:
+        - starting
+        - running
+    ByteEnum:
+      type: integer
+      format: byte
+      enum: [1, 2, 3, 4]
+    ShortEnum:
+      type: integer
+      format: int16
+      enum: [1, 2, 3, 4, 5]
+    IntEnum:
+      type: integer
+      format: int32
+      enum: [1, 2, 3, 4, 5]
+      x-deprecated:
+        - 2
+        - 5
+      x-enum-varnames:
+        - THE_ONE
+        - THE_TWO
+        - THE_THREE
+        - THE_FOUR
+        - THE_FIVE
+      x-enum-descriptions:
+        - This is one
+        -
+        - This is three
+        - This is four
+        -
+    LongEnum:
+      type: integer
+      format: int64
+      enum: [1, 2, 3, 4, 5]
+      x-deprecated:
+        - 2
+        - 5
+    BooleanEnum:
+      type: boolean
+      enum: ['true', 'false']
+      x-deprecated:
+        - false
+    FloatEnum:
+      type: number
+      format: float
+      enum: [1.23, 2.45, 34.10]
+      x-deprecated:
+        - 34.10
+    DoubleEnum:
+      type: number
+      format: double
+      enum: [1.23, 2.45, 34.10]
+      x-deprecated:
+        - 34.10
+    DecimalEnum:
+      type: number
+      enum: [ 1.23, 2.45, 34.10 ]
+      x-deprecated:
+        - 34.10
+    BytePrimitiveEnum:
+      type: byte
+      enum: [1, 2, 3, 4]
+      x-deprecated:
+        - 4
+    ShortPrimitiveEnum:
+      type: short
+      enum: [1, 2, 3, 4, 5]
+    IntPrimitiveEnum:
+      type: int
+      enum: [1, 2, 3, 4, 5]
+    LongPrimitiveEnum:
+      type: long
+      enum: [1, 2, 3, 4, 5]
+      x-deprecated:
+        - 2
+        - 5
+    FloatPrimitiveEnum:
+      type: float
+      enum: [1.23, 2.45, 34.10]
+      x-deprecated:
+        - 34.10
+    DoublePrimitiveEnum:
+      type: double
+      enum: [1.23, 2.45, 34.10]
+      x-deprecated:
+        - 34.10
+    CharPrimitiveEnum:
+      type: char
+      enum: ['a', 'b', 'c', 'd']
+      x-deprecated:
+        - c

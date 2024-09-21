@@ -61,7 +61,7 @@ class {{classname}}Spec extends Specification {
     def '{{operationId}}() method test'() {
         given:
         {{#allParams}}
-        {{{dataType}}} {{paramName}} = {{{vendorExtensions.groovyExample}}}
+        {{{vendorExtensions.baseType}}} {{paramName}} = {{{vendorExtensions.groovyExample}}}
         {{/allParams}}
 
         when:
@@ -94,7 +94,7 @@ class {{classname}}Spec extends Specification {
         given:
         {{!Create the body}}
         {{#bodyParam}}
-        {{{dataType}}} body = {{{vendorExtensions.groovyExample}}}
+        {{{vendorExtensions.baseType}}} body = {{{vendorExtensions.groovyExample}}}
         {{/bodyParam}}
         {{#formParams.0}}
         var form = [

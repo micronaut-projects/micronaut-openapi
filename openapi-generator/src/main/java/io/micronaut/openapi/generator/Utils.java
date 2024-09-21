@@ -204,14 +204,16 @@ public final class Utils {
                 result.append(") ");
             }
         }
-        if (prop.isNullable) {
-            if (isGenerateHardNullable) {
-                result.append("@Nullable(inherited = true) ");
-            } else {
-                result.append("@Nullable ");
+        if (!(Boolean) prop.vendorExtensions.get("isPrimitive")) {
+            if (prop.isNullable) {
+                if (isGenerateHardNullable) {
+                    result.append("@Nullable(inherited = true) ");
+                } else {
+                    result.append("@Nullable ");
+                }
+            } else if (!containsNotEmpty) {
+                result.append("@NotNull ");
             }
-        } else if (!containsNotEmpty) {
-            result.append("@NotNull ");
         }
         if (StringUtils.isNotEmpty(prop.minimum)) {
             try {
@@ -271,9 +273,8 @@ public final class Utils {
             return false;
         }
         return switch (type) {
-            case "array", "string", "boolean", "byte", "uri", "url", "uuid", "email", "integer", "long", "float",
-                 "double",
-                 "number", "partial-time", "date", "date-time", "bigdecimal", "biginteger" -> true;
+            case "array", "char", "character", "string", "boolean", "byte", "short", "int", "integer", "long", "uri", "url", "uuid", "email", "float",
+                 "double", "number", "partial-time", "date", "date-time", "bigdecimal", "biginteger" -> true;
             default -> false;
         };
     }
@@ -298,6 +299,12 @@ public final class Utils {
         for (var enumVar : enumVars) {
             var varMap = (Map<String, Object>) enumVar;
             var value = varMap.get("value").toString();
+            if (value.startsWith("(short)")) {
+                value = value.replace("(short) ", "");
+            } else if (value.startsWith("(byte)")) {
+                value = value.replace("(byte) ", "");
+            }
+            value = value.replace("'", "");
             if (isNumeric) {
                 var argPos = value.indexOf('(');
                 // case for BigDecimal
@@ -310,9 +317,9 @@ public final class Utils {
                     || upperValue.endsWith("D")) {
                     value = value.substring(0, value.length() - 1);
                 }
-                if (!value.contains("\"")) {
-                    value = "\"" + value + "\"";
-                }
+            }
+            if (!value.contains("\"")) {
+                value = "\"" + value + "\"";
             }
             varMap.put("strValue", value);
         }

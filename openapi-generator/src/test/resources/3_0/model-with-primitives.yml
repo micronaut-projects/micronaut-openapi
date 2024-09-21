@@ -1,0 +1,453 @@
+openapi: "3.0.0"
+info:
+  version: 1.0.0
+  title: Compute API
+  description: API for the Compute Service
+servers:
+  - url: localhost:8000/api
+    description: The api server
+
+paths:
+  /sendByRef:
+    get:
+      tags: [ parameters ]
+      parameters:
+        - name: name
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/StringType"
+        - name: byteType
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/ByteType"
+        - name: byteType2
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/ByteType2"
+        - name: byteType3
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/ByteType3"
+        - name: byteType4
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/ByteType4"
+        - name: shortType
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/ShortType"
+        - name: shortType2
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/ShortType2"
+        - name: shortType3
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/ShortType3"
+        - name: shortType4
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/ShortType4"
+        - name: intType
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/IntType"
+        - name: longType
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/LongType"
+        - name: boolType
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/BooleanType"
+        - name: decimalType
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/DecimalType"
+        - name: floatType
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/FloatType"
+        - name: doubleType
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/DoubleType"
+        - name: bytePrimitiveType
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/BytePrimitiveType"
+        - name: bytePrimitiveType2
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/BytePrimitiveType2"
+        - name: shortPrimitiveType
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/ShortPrimitiveType"
+        - name: shortPrimitiveType2
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/ShortPrimitiveType2"
+        - name: intPrimitiveType
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/IntPrimitiveType"
+        - name: longPrimitiveType
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/LongPrimitiveType"
+        - name: floatPrimitiveType
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/FloatPrimitiveType"
+        - name: doublePrimitiveType
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/DoublePrimitiveType"
+        - name: charPrimitiveType
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/CharPrimitiveType"
+        - name: charPrimitiveType2
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/CharPrimitiveType2"
+
+        - name: bytePrimitiveTypes
+          in: query
+          required: true
+          schema:
+            type: array
+            items:
+              type: byte
+        - name: shortPrimitiveTypes
+          in: query
+          required: true
+          schema:
+            type: array
+            items:
+              type: short
+        - name: intPrimitiveTypes
+          in: query
+          required: true
+          schema:
+            type: array
+            items:
+              type: int
+        - name: longPrimitiveTypes
+          in: query
+          required: true
+          schema:
+            type: array
+            items:
+              type: long
+        - name: floatPrimitiveTypes
+          in: query
+          required: true
+          schema:
+            type: array
+            items:
+              type: float
+        - name: doublePrimitiveTypes
+          in: query
+          required: true
+          schema:
+            type: array
+            items:
+              type: double
+        - name: charPrimitiveTypes
+          in: query
+          required: true
+          schema:
+            type: array
+            items:
+              type: char
+        - name: byteTypes
+          in: query
+          required: true
+          schema:
+            type: array
+            items:
+              type: integer
+              format: byte
+        - name: byteTypes2
+          in: query
+          required: true
+          schema:
+            type: array
+            items:
+              type: integer
+              format: int8
+        - name: shortTypes
+          in: query
+          required: true
+          schema:
+            type: array
+            items:
+              type: integer
+              format: int16
+        - name: shortTypes2
+          in: query
+          required: true
+          schema:
+            type: array
+            items:
+              type: integer
+              format: short
+        - name: intTypes
+          in: query
+          required: true
+          schema:
+            type: array
+            items:
+              type: integer
+              format: int32
+        - name: longTypes
+          in: query
+          required: true
+          schema:
+            type: array
+            items:
+              type: integer
+              format: int64
+
+      responses:
+        200:
+          description: Success
+
+  /send:
+    post:
+      tags: [ parameters ]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Obj"
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Obj"
+components:
+  schemas:
+    StringType:
+      type: string
+    ByteType:
+      type: integer
+      format: byte
+    ByteType2:
+      type: integer
+      format: int8
+    ByteType3:
+      type: integer
+      x-format: byte
+    ByteType4:
+      type: integer
+      x-format: int8
+    ShortType:
+      type: integer
+      format: int16
+    ShortType2:
+      type: integer
+      format: short
+    ShortType3:
+      type: integer
+      x-format: int16
+    ShortType4:
+      type: integer
+      x-format: short
+    IntType:
+      type: integer
+      format: int32
+    LongType:
+      type: integer
+      format: int64
+    BooleanType:
+      type: boolean
+    FloatType:
+      type: number
+      format: float
+    DoubleType:
+      type: number
+      format: double
+    DecimalType:
+      type: number
+    BytePrimitiveType:
+      type: byte
+    ShortPrimitiveType:
+      type: short
+    IntPrimitiveType:
+      type: int
+    LongPrimitiveType:
+      type: long
+    FloatPrimitiveType:
+      type: float
+    DoublePrimitiveType:
+      type: double
+    CharPrimitiveType:
+      type: char
+    CharPrimitiveType2:
+      type: string
+      x-type: char
+    BytePrimitiveType2:
+      type: integer
+      x-type: byte
+    ShortPrimitiveType2:
+      type: integer
+      x-type: short
+    Obj:
+      type: object
+      properties:
+        name:
+          type: string
+        byteType:
+          type: integer
+          format: byte
+        byteType2:
+          type: integer
+          format: int8
+        shortType:
+          type: integer
+          format: int16
+        shortType2:
+          type: integer
+          format: short
+        intType:
+          type: integer
+          format: int32
+        longType:
+          type: integer
+          format: int64
+        boolType:
+          type: boolean
+        decimalType:
+          type: number
+        floatType:
+          type: number
+          format: float
+        doubleType:
+          type: number
+          format: double
+        bytePrimitiveType:
+          type: byte
+        shortPrimitiveType:
+          type: short
+        intPrimitiveType:
+          type: int
+        longPrimitiveType:
+          type: long
+        floatPrimitiveType:
+          type: float
+        doublePrimitiveType:
+          type: double
+        charPrimitiveType:
+          type: char
+        charPrimitiveType2:
+          type: string
+          x-type: char
+        bytePrimitiveType2:
+          type: integer
+          x-type: byte
+        shortPrimitiveType2:
+          type: integer
+          x-type: short
+        bytePrimitiveTypes:
+          type: array
+          items:
+            type: byte
+        shortPrimitiveTypes:
+          type: array
+          items:
+            type: short
+        intPrimitiveTypes:
+          type: array
+          items:
+            type: int
+        longPrimitiveTypes:
+          type: array
+          items:
+            type: long
+        floatPrimitiveTypes:
+          type: array
+          items:
+            type: float
+        doublePrimitiveTypes:
+          type: array
+          items:
+            type: double
+        charPrimitiveTypes:
+          type: array
+          items:
+            type: char
+        charPrimitiveTypes2:
+          type: array
+          items:
+            type: string
+            x-type: char
+        byteTypes:
+          type: array
+          items:
+            type: integer
+            format: byte
+        byteTypes2:
+          type: array
+          items:
+            type: integer
+            format: int8
+        byteTypes3:
+          type: array
+          items:
+            type: integer
+            x-type: byte
+        shortTypes:
+          type: array
+          items:
+            type: integer
+            format: int16
+        shortTypes2:
+          type: array
+          items:
+            type: integer
+            format: short
+        shortTypes3:
+          type: array
+          items:
+            type: integer
+            x-type: short
+        intTypes:
+          type: array
+          items:
+            type: integer
+            format: int32
+        longTypes:
+          type: array
+          items:
+            type: integer
+            format: int64

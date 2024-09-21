@@ -36,7 +36,7 @@ class {{classname}}Spec extends Specification {
     void '{{operationId}}() test'() {
         given:
         {{#allParams}}
-        {{{dataType}}} {{paramName}} = {{{vendorExtensions.groovyExample}}}
+        {{{vendorExtensions.baseType}}} {{paramName}} = {{{vendorExtensions.groovyExample}}}
         {{/allParams}}
 
         when:

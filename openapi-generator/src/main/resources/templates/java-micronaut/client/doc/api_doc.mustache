@@ -52,7 +52,7 @@ More information can be found inside [Inversion of Control guide section](https:
 {{#allParams}}{{#-last}}### Parameters
 | Name | Type | Description  | Notes |
 |------------- | ------------- | ------------- | -------------|
-{{#allParams}}| **{{paramName}}** | {{#isPrimitiveType}}`{{dataType}}`{{/isPrimitiveType}}{{^isPrimitiveType}}{{#isFile}}`{{dataType}}`{{/isFile}}{{^isFile}}[**{{dataType}}**]({{baseType}}.md){{/isFile}}{{/isPrimitiveType}}| {{description}} |{{^required}} [optional parameter]{{/required}}{{#defaultValue}} [default to `{{defaultValue}}`]{{/defaultValue}}{{#allowableValues}} [enum: {{#values}}`{{{.}}}`{{^-last}}, {{/-last}}{{/values}}]{{/allowableValues}} |
+{{#allParams}}| **{{paramName}}** | {{#isPrimitiveType}}`{{vendorExtensions.baseType}}`{{/isPrimitiveType}}{{^isPrimitiveType}}{{#isFile}}`{{dataType}}`{{/isFile}}{{^isFile}}[**{{dataType}}**]({{baseType}}.md){{/isFile}}{{/isPrimitiveType}}| {{description}} |{{^required}} [optional parameter]{{/required}}{{#defaultValue}} [default to `{{defaultValue}}`]{{/defaultValue}}{{#allowableValues}} [enum: {{#values}}`{{{.}}}`{{^-last}}, {{/-last}}{{/values}}]{{/allowableValues}} |
 {{/allParams}}{{/-last}}{{/allParams}}
 
 {{#returnType}}### Return type

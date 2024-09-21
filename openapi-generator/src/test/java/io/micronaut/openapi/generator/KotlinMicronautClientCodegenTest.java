@@ -464,9 +464,9 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                         return VALUE_MAPPING[value]!!
                     }
                 """);
-        assertFileContains(modelPath + "IntEnum.kt", "@JsonProperty(\"1\")", "_1(1),");
-        assertFileContains(modelPath + "LongEnum.kt", "@JsonProperty(\"1\")", "_3(3L),");
-        assertFileContains(modelPath + "DecimalEnum.kt", "@JsonProperty(\"1.23\")", "_34_1(BigDecimal(\"34.1\"))");
+        assertFileContains(modelPath + "IntEnum.kt", "@JsonProperty(\"1\")", "NUMBER_1(1),");
+        assertFileContains(modelPath + "LongEnum.kt", "@JsonProperty(\"1\")", "NUMBER_3(3L),");
+        assertFileContains(modelPath + "DecimalEnum.kt", "@JsonProperty(\"1.23\")", "NUMBER_34_DOT_1(BigDecimal(\"34.1\"))");
     }
 
     @Test
@@ -873,5 +873,173 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         assertFileContains(path + "model/Person.kt", "@java.io.MyAnnotation2");
         assertFileContains(path + "model/Subject.kt", "@java.io.MyAnnotation3");
         assertFileContains(path + "model/PersonSex.kt", "@java.io.MyAnnotation41\n", "@java.io.MyAnnotation42\n", "@java.io.MyAnnotation43\n");
+    }
+
+    @Test
+    void testEnumsExtensions() {
+
+        var codegen = new KotlinMicronautClientCodegen();
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/enum2.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String modelPath = outputPath + "src/main/kotlin/org/openapitools/model/";
+
+        assertFileContains(modelPath + "BytePrimitiveEnum.kt",
+            "NUMBER_1(1),",
+            "@get:JsonValue val value: Byte");
+
+        assertFileContains(modelPath + "CharPrimitiveEnum.kt",
+            "A('a'),",
+            "@get:JsonValue val value: Char");
+
+        assertFileContains(modelPath + "ShortPrimitiveEnum.kt",
+            "NUMBER_1(1),",
+            "@get:JsonValue val value: Short");
+
+        assertFileContains(modelPath + "IntPrimitiveEnum.kt",
+            "NUMBER_1(1),",
+            "@get:JsonValue val value: Int");
+
+        assertFileContains(modelPath + "LongPrimitiveEnum.kt",
+            "NUMBER_1(1L),",
+            "@get:JsonValue val value: Long");
+
+        assertFileContains(modelPath + "FloatPrimitiveEnum.kt",
+            "NUMBER_1_DOT_23(1.23F),",
+            "@get:JsonValue val value: Float");
+
+        assertFileContains(modelPath + "DoublePrimitiveEnum.kt",
+            "NUMBER_1_DOT_23(1.23),",
+            "@get:JsonValue val value: Double");
+
+        assertFileContains(modelPath + "StringEnum.kt",
+            """
+                    @Deprecated("")
+                    @JsonProperty("starting")
+                    STARTING("starting"),
+                """,
+            """
+                    @Deprecated("")
+                    @JsonProperty("running")
+                    RUNNING("running"),
+                """);
+
+        assertFileContains(modelPath + "DecimalEnum.kt",
+            """
+                    @Deprecated("")
+                    @JsonProperty("34.1")
+                    NUMBER_34_DOT_1(BigDecimal("34.1"));
+                """);
+
+        assertFileContains(modelPath + "ByteEnum.kt",
+            "NUMBER_1(1),",
+            "@get:JsonValue val value: Byte");
+
+        assertFileContains(modelPath + "ShortEnum.kt",
+            "NUMBER_1(1),",
+            "@get:JsonValue val value: Short");
+
+        assertFileContains(modelPath + "IntEnum.kt",
+            """
+                    /**
+                     * This is one
+                     */
+                    @JsonProperty("1")
+                    THE_ONE(1),
+                """,
+            """
+                    @Deprecated("")
+                    @JsonProperty("2")
+                    THE_TWO(2),
+                """,
+            """
+                    /**
+                     * This is three
+                     */
+                    @JsonProperty("3")
+                    THE_THREE(3),
+                """
+        );
+
+        assertFileContains(modelPath + "LongEnum.kt",
+            """
+                    @Deprecated("")
+                    @JsonProperty("2")
+                    NUMBER_2(2L),
+                """);
+    }
+
+    @Test
+    void testPrimitives() {
+
+        var codegen = new KotlinMicronautClientCodegen();
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/model-with-primitives.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String basePath = outputPath + "src/main/kotlin/org/openapitools/";
+
+        assertFileContains(basePath + "api/ParametersApi.kt",
+            "@QueryValue(\"name\") @NotNull name: String",
+            "@QueryValue(\"byteType\") @NotNull byteType: Byte",
+            "@QueryValue(\"byteType2\") @NotNull byteType2: Byte",
+            "@QueryValue(\"shortType\") @NotNull shortType: Short",
+            "@QueryValue(\"shortType2\") @NotNull shortType2: Short",
+            "@QueryValue(\"intType\") @NotNull intType: Int",
+            "@QueryValue(\"longType\") @NotNull longType: Long",
+            "@QueryValue(\"boolType\") @NotNull boolType: Boolean",
+            "@QueryValue(\"decimalType\") @NotNull decimalType: BigDecimal",
+            "@QueryValue(\"floatType\") @NotNull floatType: Float",
+            "@QueryValue(\"doubleType\") @NotNull doubleType: Double",
+            "@QueryValue(\"bytePrimitiveType\") @NotNull bytePrimitiveType: Byte",
+            "@QueryValue(\"shortPrimitiveType\") @NotNull shortPrimitiveType: Short",
+            "@QueryValue(\"intPrimitiveType\") @NotNull intPrimitiveType: Int",
+            "@QueryValue(\"longPrimitiveType\") @NotNull longPrimitiveType: Long",
+            "@QueryValue(\"floatPrimitiveType\") @NotNull floatPrimitiveType: Float",
+            "@QueryValue(\"doublePrimitiveType\") @NotNull doublePrimitiveType: Double",
+            "@QueryValue(\"charPrimitiveType\") @NotNull charPrimitiveType: Char",
+            "@QueryValue(\"bytePrimitiveTypes\") @NotNull bytePrimitiveTypes: List<@NotNull Byte>",
+            "@QueryValue(\"shortPrimitiveTypes\") @NotNull shortPrimitiveTypes: List<@NotNull Short>",
+            "@QueryValue(\"intPrimitiveTypes\") @NotNull intPrimitiveTypes: List<@NotNull Int>",
+            "@QueryValue(\"longPrimitiveTypes\") @NotNull longPrimitiveTypes: List<@NotNull Long>",
+            "@QueryValue(\"floatPrimitiveTypes\") @NotNull floatPrimitiveTypes: List<@NotNull Float>",
+            "@QueryValue(\"doublePrimitiveTypes\") @NotNull doublePrimitiveTypes: List<@NotNull Double>",
+            "@QueryValue(\"charPrimitiveTypes\") @NotNull charPrimitiveTypes: List<@NotNull Char>",
+            "@QueryValue(\"byteTypes\") @NotNull byteTypes: List<@NotNull Byte>",
+            "@QueryValue(\"byteTypes2\") @NotNull byteTypes2: List<@NotNull Byte>",
+            "@QueryValue(\"shortTypes\") @NotNull shortTypes: List<@NotNull Short>",
+            "@QueryValue(\"shortTypes2\") @NotNull shortTypes2: List<@NotNull Short>",
+            "@QueryValue(\"intTypes\") @NotNull intTypes: List<@NotNull Int>",
+            "@QueryValue(\"longTypes\") @NotNull longTypes: List<@NotNull Long>"
+        );
+
+        assertFileContains(basePath + "model/Obj.kt",
+            "name: String?",
+            "byteType: Byte?",
+            "byteType2: Byte?",
+            "shortType: Short?",
+            "shortType2: Short?",
+            "intType: Int?",
+            "longType: Long?",
+            "boolType: Boolean?",
+            "decimalType: BigDecimal?",
+            "floatType: Float?",
+            "doubleType: Double?",
+            "bytePrimitiveType: Byte?",
+            "shortPrimitiveType: Short?",
+            "intPrimitiveType: Int?",
+            "longPrimitiveType: Long?",
+            "floatPrimitiveType: Float?",
+            "doublePrimitiveType: Double?",
+            "charPrimitiveType: Char?",
+            "bytePrimitiveTypes: List<@NotNull Byte>?",
+            "shortPrimitiveTypes: List<@NotNull Short>?",
+            "intPrimitiveTypes: List<@NotNull Int>?",
+            "longPrimitiveTypes: List<@NotNull Long>?",
+            "floatPrimitiveTypes: List<@NotNull Float>?",
+            "doublePrimitiveTypes: List<@NotNull Double>?",
+            "charPrimitiveTypes: List<@NotNull Char>?",
+            "byteTypes: List<@NotNull Byte>?",
+            "byteTypes2: List<@NotNull Byte>?",
+            "shortTypes: List<@NotNull Short>?",
+            "shortTypes2: List<@NotNull Short>",
+            "intTypes: List<@NotNull Int>",
+            "longTypes: List<@NotNull Long>"
+        );
     }
 }
