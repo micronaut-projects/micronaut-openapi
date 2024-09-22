@@ -223,6 +223,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
 
         // CHECKSTYLE:OFF
         // Set all the fields
+        useJakartaEe = true;
         useBeanValidation = true;
         visitable = false;
         hideGenerationTimestamp = false;
@@ -580,6 +581,12 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         }
         writePropertyBack(OPT_GENERATE_OPERATION_ONLY_FOR_FIRST_TAG, generateOperationOnlyForFirstTag);
 
+        if (additionalProperties.containsKey(USE_JAKARTA_EE)) {
+            setUseJakartaEe(convertPropertyToBoolean(USE_JAKARTA_EE));
+        }
+        writePropertyBack(USE_JAKARTA_EE, useJakartaEe);
+        writePropertyBack(JAVAX_PACKAGE, useJakartaEe ? "jakarta" : "javax");
+
         maybeSetTestTool();
         writePropertyBack(OPT_TEST, testTool);
         if (testTool.equals(OPT_TEST_JUNIT)) {
@@ -605,9 +612,6 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         // Add all the supporting files
         supportingFiles.add(new SupportingFile("common/configuration/application.yml.mustache", resourcesFolder, "application.yml").doNotOverwrite());
         supportingFiles.add(new SupportingFile("common/configuration/logback.xml.mustache", resourcesFolder, "logback.xml").doNotOverwrite());
-
-        // Use jakarta instead of javax
-        additionalProperties.put("javaxPackage", "jakarta");
 
         // Use the default java time
         switch (dateLibrary) {
