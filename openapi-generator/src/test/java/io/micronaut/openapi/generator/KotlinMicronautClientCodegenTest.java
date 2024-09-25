@@ -1132,4 +1132,152 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                 """
         );
     }
+
+    @Test
+    void testCustomValidationMessages() {
+
+        var codegen = new KotlinMicronautClientCodegen();
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/validation-messages.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String path = outputPath + "src/main/kotlin/org/openapitools/";
+
+        assertFileContains(path + "api/BooksApi.kt",
+            """
+                @QueryValue("emailParam") @NotNull emailParam: List<@Email(regexp = "email@dot.com", message = "This is email pattern message") @Size(min = 5, max = 10, message = "This is min max email length message") @NotNull(message = "This is required email message") String>,
+                """,
+            """
+                @QueryValue("strParam") @NotNull strParam: List<@Pattern(regexp = "my_pattern", message = "This is string pattern message") @Size(min = 5, max = 10, message = "This is min max string length message") @NotNull(message = "This is required string message") String>,
+                """,
+            """
+                @QueryValue("strParam2") @NotNull strParam2: List<@Pattern(regexp = "my_pattern", message = "This is string pattern message") @Size(min = 5, message = "This is min max string length message") @NotNull(message = "This is required string message") String>,
+                """,
+            """
+                @QueryValue("strParam3") @NotNull strParam3: List<@Pattern(regexp = "my_pattern", message = "This is string pattern message") @Size(max = 10, message = "This is min max string length message") @NotNull(message = "This is required string message") String>,
+                """,
+            """
+                @QueryValue("intParam") @NotNull intParam: List<@NotNull(message = "This is required int message") @Min(value = 5, message = "This is min message") @Max(value = 10, message = "This is max message") Int>,
+                """,
+            """
+                @QueryValue("decimalParam") @NotNull decimalParam: List<@NotNull(message = "This is required decimal message") @DecimalMin(value = "5.5", message = "This is decimal min message") @DecimalMax(value = "10.5", message = "This is decimal max message") BigDecimal>,
+                """,
+            """
+                @QueryValue("decimalParam2") @NotNull(message = "This is required param message") decimalParam2: List<@NotNull(message = "This is required decimal message") @DecimalMin(value = "5.5", inclusive = false, message = "This is decimal min message") @DecimalMax(value = "10.5", inclusive = false, message = "This is decimal max message") BigDecimal>,
+                """,
+            """
+                @QueryValue("positiveParam") @NotNull positiveParam: List<@NotNull(message = "This is required int message") @Positive(message = "This is positive message") Int>,
+                """,
+            """
+                @QueryValue("positiveOrZeroParam") @NotNull positiveOrZeroParam: List<@NotNull(message = "This is required int message") @PositiveOrZero(message = "This is positive or zero message") Int>,
+                """,
+            """
+                @QueryValue("negativeParam") @NotNull negativeParam: List<@NotNull(message = "This is required int message") @Negative(message = "This is negative message") Int>,
+                """,
+            """
+                @QueryValue("negativeOrZeroParam") @NotNull negativeOrZeroParam: List<@NotNull(message = "This is required int message") @NegativeOrZero(message = "This is negative or zero message") Int>,
+                """);
+
+        assertFileContains(path + "model/Book.kt",
+            """
+                    @field:NotNull(message = "This is required string message")
+                    @field:Pattern(regexp = "[a-zA-Z ]+", message = "This is string pattern message")
+                    @field:Size(min = 5, max = 10, message = "This is min max string length message")
+                    @field:JsonProperty(JSON_PROPERTY_STR_PROP)
+                    var strProp: String,
+                """,
+            """
+                    @field:NotNull(message = "This is required email message")
+                    @field:Size(min = 5, max = 10, message = "This is min max email length message")
+                    @field:Email(regexp = "email@dot.com", message = "This is email pattern message")
+                    @field:JsonProperty(JSON_PROPERTY_EMAIL_PROP)
+                    var emailProp: String,
+                """,
+            """
+                    @field:NotNull(message = "This is required int message")
+                    @field:Min(value = 5, message = "This is min message")
+                    @field:Max(value = 10, message = "This is max message")
+                    @field:JsonProperty(JSON_PROPERTY_INT_PROP)
+                    var intProp: Int,
+                """,
+            """
+                    @field:Nullable
+                    @field:Pattern(regexp = "[a-zA-Z ]+", message = "This is string pattern message")
+                    @field:Size(min = 5, message = "This is min string length message")
+                    @field:JsonProperty(JSON_PROPERTY_STR_PROP2)
+                    @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                    var strProp2: String? = null,
+                """,
+            """
+                    @field:Nullable
+                    @field:Pattern(regexp = "[a-zA-Z ]+", message = "This is string pattern message")
+                    @field:Size(max = 10, message = "This is min string length message")
+                    @field:JsonProperty(JSON_PROPERTY_STR_PROP3)
+                    @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                    var strProp3: String? = null,
+                """,
+            """
+                    @field:Nullable
+                    @field:Min(value = 0, message = "This is positive message")
+                    @field:JsonProperty(JSON_PROPERTY_POSITIVE_PROP)
+                    @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                    var positiveProp: Int? = null,
+                """,
+            """
+                    @field:Nullable
+                    @field:Min(value = 0, message = "This is positive or zero message")
+                    @field:JsonProperty(JSON_PROPERTY_POSITIVE_OR_ZERO_PROP)
+                    @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                    var positiveOrZeroProp: Int? = null,
+                """,
+            """
+                    @field:Nullable
+                    @field:Max(value = 0, message = "This is negative message")
+                    @field:JsonProperty(JSON_PROPERTY_NEGATIVE_PROP)
+                    @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                    var negativeProp: Int? = null,
+                """,
+            """
+                    @field:Nullable
+                    @field:Max(value = 0, message = "This is negative or zero message")
+                    @field:JsonProperty(JSON_PROPERTY_NEGATIVE_OR_ZERO_PROP)
+                    @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                    var negativeOrZeroProp: Int? = null,
+                """,
+            """
+                    @field:Nullable
+                    @field:DecimalMin(value = "5.5", message = "This is decimal min message")
+                    @field:DecimalMax(value = "10.5", message = "This is decimal max message")
+                    @field:JsonProperty(JSON_PROPERTY_DECIMAL_PROP)
+                    @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                    var decimalProp: BigDecimal? = null,
+                """,
+            """
+                    @field:Nullable
+                    @field:DecimalMin(value = "5.5", inclusive = false, message = "This is decimal min message")
+                    @field:DecimalMax(value = "10.5", inclusive = false, message = "This is decimal max message")
+                    @field:JsonProperty(JSON_PROPERTY_DECIMAL_PROP2)
+                    @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                    var decimalProp2: BigDecimal? = null,
+                """,
+            """
+                    @field:Nullable
+                    @field:Size(min = 5, max = 10, message = "This is min max string length message")
+                    @field:JsonProperty(JSON_PROPERTY_ARRAY_PROP1)
+                    @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                    var arrayProp1: List<@NotNull Int>? = null,
+                """,
+            """
+                    @field:Nullable
+                    @field:Size(min = 5, message = "This is min max string length message")
+                    @field:JsonProperty(JSON_PROPERTY_ARRAY_PROP2)
+                    @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                    var arrayProp2: List<@NotNull Int>? = null,
+                """,
+            """
+                    @field:Nullable
+                    @field:Size(max = 10, message = "This is min max string length message")
+                    @field:JsonProperty(JSON_PROPERTY_ARRAY_PROP3)
+                    @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                    var arrayProp3: List<@NotNull Int>? = null,
+                """
+        );
+    }
 }

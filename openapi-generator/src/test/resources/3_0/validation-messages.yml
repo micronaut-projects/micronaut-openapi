@@ -1,0 +1,292 @@
+openapi: 3.0.0
+info:
+  description: This is a library API
+  version: 1.0.0
+  title: Library
+  license:
+    name: Apache-2.0
+    url: "https://www.apache.org/licenses/LICENSE-2.0.html"
+tags:
+  - name: books
+    description: Add books
+paths:
+  /add-book:
+    post:
+      tags: [books]
+      summary: Add a new book
+      operationId: addBook
+      parameters:
+        - name: emailParam
+          in: query
+          required: true
+          schema:
+            type: array
+            items:
+              type: string
+              format: email
+              pattern: email@dot.com
+              minLength: 5
+              maxLength: 10
+              x-pattern-message: This is email pattern message
+              x-size-message: This is min max email length message
+              x-not-null-message: This is required email message
+
+        - name: strParam
+          in: query
+          required: true
+          schema:
+            type: array
+            items:
+              type: string
+              pattern: my_pattern
+              minLength: 5
+              maxLength: 10
+              x-pattern-message: This is string pattern message
+              x-size-message: This is min max string length message
+              x-not-null-message: This is required string message
+        - name: strParam2
+          in: query
+          required: true
+          schema:
+            type: array
+            items:
+              type: string
+              pattern: my_pattern
+              minLength: 5
+              x-pattern-message: This is string pattern message
+              x-size-message: This is min max string length message
+              x-not-null-message: This is required string message
+
+        - name: strParam3
+          in: query
+          required: true
+          schema:
+            type: array
+            items:
+              type: string
+              pattern: my_pattern
+              maxLength: 10
+              x-pattern-message: This is string pattern message
+              x-size-message: This is min max string length message
+              x-not-null-message: This is required string message
+
+        - name: intParam
+          in: query
+          required: true
+          schema:
+            type: array
+            items:
+              type: integer
+              format: int32
+              minimum: 5
+              maximum: 10
+              x-min-message: This is min message
+              x-max-message: This is max message
+              x-not-null-message: This is required int message
+
+        - name: decimalParam
+          in: query
+          required: true
+          schema:
+            type: array
+            items:
+              type: number
+              minimum: 5.5
+              maximum: 10.5
+              x-min-message: This is decimal min message
+              x-max-message: This is decimal max message
+              x-not-null-message: This is required decimal message
+
+        - name: decimalParam2
+          in: query
+          required: true
+          schema:
+            type: array
+            items:
+              type: number
+              minimum: 5.5
+              exclusiveMinimum: true
+              maximum: 10.5
+              exclusiveMaximum: true
+              x-min-message: This is decimal min message
+              x-max-message: This is decimal max message
+              x-not-null-message: This is required decimal message
+            x-not-null-message: This is required param message
+
+        - name: positiveParam
+          in: query
+          required: true
+          schema:
+            type: array
+            items:
+              type: integer
+              format: int32
+              minimum: 0
+              exclusiveMinimum: true
+              x-min-message: This is positive message
+              x-not-null-message: This is required int message
+
+        - name: positiveOrZeroParam
+          in: query
+          required: true
+          schema:
+            type: array
+            items:
+              type: integer
+              format: int32
+              minimum: 0
+              exclusiveMinimum: false
+              x-min-message: This is positive or zero message
+              x-not-null-message: This is required int message
+
+        - name: negativeParam
+          in: query
+          required: true
+          schema:
+            type: array
+            items:
+              type: integer
+              format: int32
+              maximum: 0
+              exclusiveMaximum: true
+              x-max-message: This is negative message
+              x-not-null-message: This is required int message
+
+        - name: negativeOrZeroParam
+          in: query
+          required: true
+          schema:
+            type: array
+            items:
+              type: integer
+              format: int32
+              maximum: 0
+              exclusiveMaximum: false
+              x-max-message: This is negative or zero message
+              x-not-null-message: This is required int message
+
+      requestBody:
+        required: true
+        content:
+          "application/json":
+            schema:
+              $ref: "#/components/schemas/Book"
+      responses:
+        "200":
+          description: Success
+        "400":
+          description: Bad Request
+components:
+  schemas:
+    Book:
+      type: object
+      required:
+        - strProp
+        - intProp
+        - emailProp
+      properties:
+        strProp:
+          type: string
+          minLength: 5
+          maxLength: 10
+          pattern: "[a-zA-Z ]+"
+          x-pattern-message: This is string pattern message
+          x-size-message: This is min max string length message
+          x-not-null-message: This is required string message
+        strProp2:
+          type: string
+          minLength: 5
+          pattern: "[a-zA-Z ]+"
+          x-pattern-message: This is string pattern message
+          x-size-message: This is min string length message
+          x-not-null-message: This is required string message
+        strProp3:
+          type: string
+          maxLength: 10
+          pattern: "[a-zA-Z ]+"
+          x-pattern-message: This is string pattern message
+          x-size-message: This is min string length message
+          x-not-null-message: This is required string message
+        emailProp:
+          type: string
+          format: email
+          pattern: email@dot.com
+          minLength: 5
+          maxLength: 10
+          x-pattern-message: This is email pattern message
+          x-size-message: This is min max email length message
+          x-not-null-message: This is required email message
+        intProp:
+          type: integer
+          format: int32
+          minimum: 5
+          maximum: 10
+          x-min-message: This is min message
+          x-max-message: This is max message
+          x-not-null-message: This is required int message
+        positiveProp:
+          type: integer
+          format: int32
+          minimum: 0
+          exclusiveMinimum: true
+          x-min-message: This is positive message
+          x-not-null-message: This is required int message
+        positiveOrZeroProp:
+          type: integer
+          format: int32
+          minimum: 0
+          exclusiveMinimum: false
+          x-min-message: This is positive or zero message
+          x-not-null-message: This is required int message
+        negativeProp:
+          type: integer
+          format: int32
+          maximum: 0
+          exclusiveMaximum: true
+          x-max-message: This is negative message
+          x-not-null-message: This is required int message
+        negativeOrZeroProp:
+          type: integer
+          format: int32
+          maximum: 0
+          exclusiveMaximum: false
+          x-max-message: This is negative or zero message
+          x-not-null-message: This is required int message
+        decimalProp:
+          type: number
+          minimum: 5.5
+          maximum: 10.5
+          x-min-message: This is decimal min message
+          x-max-message: This is decimal max message
+          x-not-null-message: This is required decimal message
+        decimalProp2:
+          type: number
+          minimum: 5.5
+          exclusiveMinimum: true
+          maximum: 10.5
+          exclusiveMaximum: true
+          x-min-message: This is decimal min message
+          x-max-message: This is decimal max message
+          x-not-null-message: This is required decimal message
+        arrayProp1:
+          type: array
+          items:
+            type: integer
+          minItems: 5
+          maxItems: 10
+          x-size-message: This is min max string length message
+          x-not-null-message: This is required string message
+        arrayProp2:
+          type: array
+          items:
+            type: integer
+          minItems: 5
+          x-size-message: This is min max string length message
+          x-not-null-message: This is required string message
+        arrayProp3:
+          type: array
+          items:
+            type: integer
+          maxItems: 10
+          x-size-message: This is min max string length message
+          x-not-null-message: This is required string message

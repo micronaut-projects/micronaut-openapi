@@ -156,20 +156,34 @@ public final class Utils {
             return result.toString();
         }
 
+        var patternMsg = (String) prop.vendorExtensions.get("x-pattern-message");
+        var sizeMsg = (String) prop.vendorExtensions.get("x-size-message");
+        var notNullMsg = (String) prop.vendorExtensions.get("x-not-null-message");
+        var minMsg = (String) prop.vendorExtensions.get("x-min-message");
+        var maxMsg = (String) prop.vendorExtensions.get("x-max-message");
+
         if (StringUtils.isNotEmpty(prop.pattern) && !prop.isDate && !prop.isDateTime) {
-            if (prop.isEmail) {
+            if ("email".equals(type) || "email".equalsIgnoreCase(prop.dataFormat) || prop.isEmail) {
                 result.append("@Email(regexp = \"");
             } else {
                 result.append("@Pattern(regexp = \"");
             }
-            result.append(prop.pattern).append("\") ");
+            result.append(prop.pattern).append("\"");
+            if (patternMsg != null) {
+                result.append(", message = \"").append(patternMsg).append("\"");
+            }
+            result.append(") ");
         }
 
         var containsNotEmpty = false;
 
         if (prop.minLength != null || prop.maxLength != null) {
             if (prop.minLength != null && prop.minLength == 1 && prop.maxLength == null && !prop.isNullable) {
-                result.append("@NotEmpty ");
+                result.append("@NotEmpty");
+                if (sizeMsg != null) {
+                    result.append("(message = \"").append(sizeMsg).append("\")");
+                }
+                result.append(' ');
                 containsNotEmpty = true;
             } else {
                 result.append("@Size(");
@@ -181,6 +195,9 @@ public final class Utils {
                         result.append(", ");
                     }
                     result.append("max = ").append(prop.maxLength);
+                }
+                if (sizeMsg != null) {
+                    result.append(", message = \"").append(sizeMsg).append('"');
                 }
                 result.append(") ");
             }
@@ -201,6 +218,9 @@ public final class Utils {
                     }
                     result.append("max = ").append(prop.maxItems);
                 }
+                if (sizeMsg != null) {
+                    result.append(", message = \"").append(sizeMsg).append('"');
+                }
                 result.append(") ");
             }
         }
@@ -212,7 +232,11 @@ public final class Utils {
                     result.append("@Nullable ");
                 }
             } else if (!containsNotEmpty) {
-                result.append("@NotNull ");
+                result.append("@NotNull");
+                if (notNullMsg != null) {
+                    result.append("(message = \"").append(notNullMsg).append("\")");
+                }
+                result.append(" ");
             }
         }
         if (StringUtils.isNotEmpty(prop.minimum)) {
@@ -222,20 +246,42 @@ public final class Utils {
                     longNumber++;
                 }
                 if (longNumber == 0 && StringUtils.isEmpty(prop.maximum)) {
-                    result.append("@PositiveOrZero ");
+                    result.append("@PositiveOrZero");
+                    if (minMsg != null) {
+                        result.append("(message = \"").append(minMsg).append("\")");
+                    }
+                    result.append(" ");
                 } else if (longNumber == 1 && StringUtils.isEmpty(prop.maximum)) {
-                    result.append("@Positive ");
+                    result.append("@Positive");
+                    if (minMsg != null) {
+                        result.append("(message = \"").append(minMsg).append("\")");
+                    }
+                    result.append(" ");
                 } else {
-                    result.append("@Min(").append(longNumber).append(") ");
+                    result.append("@Min(");
+                    if (minMsg != null) {
+                        result.append("value = ");
+                    }
+                    result.append(longNumber);
+                    if (prop.isLong) {
+                        result.append("L");
+                    }
+                    if (minMsg != null) {
+                        result.append(", message = \"").append(minMsg).append("\"");
+                    }
+                    result.append(") ");
                 }
             } catch (Exception e) {
                 result.append("@DecimalMin(");
-                if (prop.exclusiveMinimum) {
+                if (prop.exclusiveMinimum || minMsg != null) {
                     result.append("value = ");
                 }
                 result.append('"').append(prop.minimum).append('"');
                 if (prop.exclusiveMinimum) {
                     result.append(", inclusive = false");
+                }
+                if (minMsg != null) {
+                    result.append(", message = \"").append(minMsg).append("\"");
                 }
                 result.append(") ");
             }
@@ -247,20 +293,43 @@ public final class Utils {
                     longNumber--;
                 }
                 if (longNumber == 0 && StringUtils.isEmpty(prop.minimum)) {
-                    result.append("@NegativeOrZero ");
+                    result.append("@NegativeOrZero");
+                    if (maxMsg != null) {
+                        result.append("(message = \"").append(maxMsg).append("\")");
+                    }
+                    result.append(" ");
                 } else if (longNumber == -1 && StringUtils.isEmpty(prop.minimum)) {
-                    result.append("@Negative ");
+                    result.append("@Negative");
+                    if (maxMsg != null) {
+                        result.append("(message = \"").append(maxMsg).append("\")");
+                    }
+                    result.append(" ");
                 } else {
-                    result.append("@Max(").append(longNumber).append(") ");
+                    result.append("@Max(");
+                    if (maxMsg != null) {
+                        result.append("value = ");
+                    }
+                    result.append(longNumber);
+                    if (prop.isLong) {
+                        result.append("L");
+                    }
+                    if (maxMsg != null) {
+                        result.append(", message = \"").append(maxMsg).append("\"");
+                    }
+                    result.append(") ");
+
                 }
             } catch (Exception e) {
                 result.append("@DecimalMax(");
-                if (prop.exclusiveMaximum) {
+                if (prop.exclusiveMaximum || maxMsg != null) {
                     result.append("value = ");
                 }
                 result.append('"').append(prop.maximum).append('"');
                 if (prop.exclusiveMaximum) {
                     result.append(", inclusive = false");
+                }
+                if (maxMsg != null) {
+                    result.append(", message = \"").append(maxMsg).append("\"");
                 }
                 result.append(") ");
             }
