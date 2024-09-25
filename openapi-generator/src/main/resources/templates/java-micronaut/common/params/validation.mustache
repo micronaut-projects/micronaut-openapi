@@ -50,9 +50,9 @@
     {{/isContainer}}
     {{!Pattern}}
     {{#pattern}}
-        {{^isByteArray}}{{^isDate}}{{^isDateTime}}
+        {{^isByteArray}}{{^isDate}}{{^isDateTime}}{{^isEmail}}
     @Pattern(regexp = "{{{pattern}}}")
-        {{/isDateTime}}{{/isDate}}{{/isByteArray}}
+        {{/isEmail}}{{/isDateTime}}{{/isDate}}{{/isByteArray}}
     {{/pattern}}
     {{!Min length && max length}}
     {{#minLength}}
@@ -78,7 +78,7 @@
     {{/maxItems}}{{/minItems}}
     {{!Email}}
     {{#isEmail}}
-    @Email
+    @Email{{#pattern}}(pattern = "{{{pattern}}}"){{/pattern}}
     {{/isEmail}}
     {{!check for integer or long / all others=decimal type with @Decimal isInteger set}}
     {{#isInteger}}

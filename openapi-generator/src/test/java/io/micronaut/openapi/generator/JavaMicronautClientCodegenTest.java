@@ -1040,4 +1040,123 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
             "private List<@NotNull Long> longTypes"
         );
     }
+
+    @Test
+    void testDeprecated() {
+
+        var codegen = new JavaMicronautClientCodegen();
+        codegen.setGenerateSwaggerAnnotations(true);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/deprecated.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String path = outputPath + "src/main/java/org/openapitools/";
+
+        assertFileContains(path + "api/ParametersApi.java",
+            """
+                    /**
+                     * A method to send primitives as request parameters
+                     *
+                     * @param name (required)
+                     *        Deprecated: Deprecated message2
+                     * @param age (required)
+                     * @param height (required)
+                     *        Deprecated: Deprecated message4
+                     * @return Success (status code 200)
+                     *         or An unexpected error has occurred (status code default)
+                     * @deprecated Deprecated message1
+                     */
+                    @Deprecated
+                    @Operation(
+                        operationId = "sendPrimitives",
+                        description = "A method to send primitives as request parameters",
+                        deprecated = true,
+                        responses = {
+                            @ApiResponse(responseCode = "200", description = "Success", content = @Content(mediaType = "application/json", schema = @Schema(implementation = SendPrimitivesResponse.class))),
+                            @ApiResponse(responseCode = "default", description = "An unexpected error has occurred")
+                        },
+                        parameters = {
+                            @Parameter(name = "name", deprecated = true, required = true, in = ParameterIn.PATH),
+                            @Parameter(name = "age", required = true, in = ParameterIn.QUERY),
+                            @Parameter(name = "height", deprecated = true, required = true, in = ParameterIn.HEADER)
+                        }
+                    )
+                    @Get("/sendPrimitives/{name}")
+                    Mono<@Valid SendPrimitivesResponse> sendPrimitives(
+                        @PathVariable("name") @NotNull @Deprecated String name,
+                        @QueryValue("age") @NotNull BigDecimal age,
+                        @Header("height") @NotNull @Deprecated Float height
+                    );
+                """);
+
+        assertFileContains(path + "model/SendPrimitivesResponse.java",
+            """
+                /**
+                 * SendPrimitivesResponse
+                 *
+                 * @deprecated Deprecated message5
+                 */
+                @Deprecated
+                """,
+            """
+                    /**
+                     * @deprecated Deprecated message6
+                     */
+                    @Deprecated
+                    @Nullable
+                    @Schema(name = "name", requiredMode = Schema.RequiredMode.NOT_REQUIRED, deprecated = true)
+                    @JsonProperty(JSON_PROPERTY_NAME)
+                    @JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                    private String name;
+                """,
+            """
+                    /**
+                     * @return the name property value
+                     *
+                     * @deprecated Deprecated message6
+                     */
+                    @Deprecated
+                    public String getName() {
+                        return name;
+                    }
+                """,
+            """
+                    /**
+                     * Set the name property value
+                     *
+                     * @param name property value to set
+                     *
+                     * @deprecated Deprecated message6
+                     */
+                    @Deprecated
+                    public void setName(String name) {
+                        this.name = name;
+                    }
+                """,
+            """
+                    /**
+                     * Set name in a chainable fashion.
+                     *
+                     * @return The same instance of SendPrimitivesResponse for chaining.
+                     *
+                     * @deprecated Deprecated message6
+                     */
+                    @Deprecated
+                    public SendPrimitivesResponse name(String name) {
+                        this.name = name;
+                        return this;
+                    }
+                """);
+
+        assertFileContains(path + "model/StateEnum.java",
+            """
+                /**
+                 * Gets or Sets StateEnum
+                 *
+                 * @deprecated Deprecated message9
+                 */
+                @Deprecated
+                @Serdeable
+                @Generated("io.micronaut.openapi.generator.JavaMicronautClientCodegen")
+                public enum StateEnum {
+                """
+        );
+    }
 }

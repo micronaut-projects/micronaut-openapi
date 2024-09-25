@@ -47,6 +47,7 @@ import org.openapitools.codegen.CodegenResponse;
 import org.openapitools.codegen.DefaultCodegen;
 import org.openapitools.codegen.IJsonSchemaValidationProperties;
 import org.openapitools.codegen.SupportingFile;
+import org.openapitools.codegen.VendorExtension;
 import org.openapitools.codegen.config.GlobalSettings;
 import org.openapitools.codegen.languages.AbstractKotlinCodegen;
 import org.openapitools.codegen.languages.features.BeanValidationFeatures;
@@ -156,7 +157,6 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
     public static final String CONTENT_TYPE_APPLICATION_JSON = "application/json";
     public static final String CONTENT_TYPE_MULTIPART_FORM_DATA = "multipart/form-data";
     public static final String CONTENT_TYPE_ANY = "*/*";
-    public static final String EXT_CONTENT_TYPE = "x-content-type";
 
     private static final String MONO_CLASS_NAME = "reactor.core.publisher.Mono";
     private static final String FLUX_CLASS_NAME = "reactor.core.publisher.Flux";
@@ -933,21 +933,21 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
 
         if (openApi.getPaths() != null) {
             for (Map.Entry<String, PathItem> openAPIGetPathsEntry : openApi.getPaths().entrySet()) {
-                String pathname = openAPIGetPathsEntry.getKey();
                 PathItem path = openAPIGetPathsEntry.getValue();
-                if (path.readOperations() == null) {
+                var ops = path.readOperations();
+                if (ops == null || ops.isEmpty()) {
                     continue;
                 }
-                for (Operation operation : path.readOperations()) {
+                for (Operation operation : ops) {
                     log.info("Processing operation {}", operation.getOperationId());
                     if (hasBodyParameter(operation) || hasFormParameter(operation)) {
                         var defaultContentType = hasFormParameter(operation) ? CONTENT_TYPE_APPLICATION_FORM_URLENCODED : CONTENT_TYPE_APPLICATION_JSON;
                         var consumes = new ArrayList<>(getConsumesInfo(openApi, operation));
                         String contentType = consumes.isEmpty() ? defaultContentType : consumes.get(0);
-                        operation.addExtension(EXT_CONTENT_TYPE, contentType);
+                        operation.addExtension(VendorExtension.X_CONTENT_TYPE.getName(), contentType);
                     }
-                    String[] accepts = getAccepts(openAPI, operation);
-                    operation.addExtension("x-accepts", accepts);
+                    String[] accepts = getAccepts(openApi, operation);
+                    operation.addExtension(VendorExtension.X_ACCEPTS.getName(), accepts);
                 }
             }
         }
@@ -1011,8 +1011,8 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
             }
 
             // Remove the "*/*" contentType from operations as it is ambiguous
-            if (CONTENT_TYPE_ANY.equals(op.vendorExtensions.get(EXT_CONTENT_TYPE))) {
-                op.vendorExtensions.put(EXT_CONTENT_TYPE, CONTENT_TYPE_APPLICATION_JSON);
+            if (CONTENT_TYPE_ANY.equals(op.vendorExtensions.get(VendorExtension.X_CONTENT_TYPE.getName()))) {
+                op.vendorExtensions.put(VendorExtension.X_CONTENT_TYPE.getName(), CONTENT_TYPE_APPLICATION_JSON);
             }
             op.consumes = op.consumes == null ? null : op.consumes.stream()
                 .filter(contentType -> !CONTENT_TYPE_ANY.equals(contentType.get("mediaType")))
@@ -1037,14 +1037,14 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
             // Force form parameters are only set if the content-type is according
             // formParams correspond to urlencoded type
             // bodyParams correspond to multipart body
-            if (CONTENT_TYPE_APPLICATION_FORM_URLENCODED.equals(op.vendorExtensions.get(EXT_CONTENT_TYPE))) {
+            if (CONTENT_TYPE_APPLICATION_FORM_URLENCODED.equals(op.vendorExtensions.get(VendorExtension.X_CONTENT_TYPE.getName()))) {
                 op.formParams.addAll(op.bodyParams);
                 op.bodyParams.forEach(p -> {
                     p.isBodyParam = false;
                     p.isFormParam = true;
                 });
                 op.bodyParams.clear();
-            } else if (CONTENT_TYPE_MULTIPART_FORM_DATA.equals(op.vendorExtensions.get(EXT_CONTENT_TYPE))) {
+            } else if (CONTENT_TYPE_MULTIPART_FORM_DATA.equals(op.vendorExtensions.get(VendorExtension.X_CONTENT_TYPE.getName()))) {
                 op.bodyParams.addAll(op.formParams);
                 for (var param : op.allParams) {
                     if (param.isFormParam) {

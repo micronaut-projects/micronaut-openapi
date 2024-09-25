@@ -14,7 +14,8 @@
         {{#-first}}
      *
         {{/-first}}
-     * @param {{vendorExtensions.realName}}{{#description}} {{description}}{{/description}}{{#required}} (required){{/required}}{{^required}} (optional{{#defaultValue}}, default to {{{.}}}{{/defaultValue}}){{/required}}
+     * @param {{paramName}}{{#description}} {{description}}{{/description}}{{#required}} (required){{/required}}{{^required}} (optional{{#defaultValue}}, default to {{{.}}}{{/defaultValue}}){{/required}}{{#vendorExtensions.x-deprecated-message}}
+     *        Deprecated: {{{.}}}{{/vendorExtensions.x-deprecated-message}}
     {{/vendorExtensions.originalParams}}
     {{#returnType}}
         {{^allParams.0}}
@@ -22,6 +23,10 @@
         {{/allParams.0}}
      * @return {{returnType}}
     {{/returnType}}
+    {{#isDeprecated}}
+     *
+     * @deprecated{{#vendorExtensions.x-deprecated-message}} {{{.}}}{{/vendorExtensions.x-deprecated-message}}
+    {{/isDeprecated}}
     {{#externalDocs}}
      * {{description}}
      *
@@ -29,6 +34,10 @@
     {{/externalDocs}}
      */
     {{#generateSwagger2Annotations}}
+    @Suppress("DEPRECATED_JAVA_ANNOTATION")
+        {{#isDeprecated}}
+    @Deprecated("{{#vendorExtensions.x-deprecated-message}}{{{.}}}{{/vendorExtensions.x-deprecated-message}}")
+        {{/isDeprecated}}
     @Operation(
         operationId = "{{{operationId}}}",
         {{#summary}}
@@ -52,7 +61,7 @@
         ]{{#vendorExtensions.hasNotBodyParam}},
         parameters = [
             {{#vendorExtensions.swaggerParams}}
-            Parameter(name = "{{baseName}}"{{#description}}, description = "{{{description}}}"{{/description}}{{#required}}, required = true{{/required}}, `in` = ParameterIn.{{#isCookieParam}}COOKIE{{/isCookieParam}}{{#isHeaderParam}}HEADER{{/isHeaderParam}}{{#isQueryParam}}QUERY{{/isQueryParam}}{{#isPathParam}}PATH{{/isPathParam}}){{^-last}},{{/-last}}
+            Parameter(name = "{{baseName}}"{{#isDeprecated}}, deprecated = true{{/isDeprecated}}{{#description}}, description = "{{{description}}}"{{/description}}{{#required}}, required = true{{/required}}, `in` = ParameterIn.{{#isCookieParam}}COOKIE{{/isCookieParam}}{{#isHeaderParam}}HEADER{{/isHeaderParam}}{{#isQueryParam}}QUERY{{/isQueryParam}}{{#isPathParam}}PATH{{/isPathParam}}){{^-last}},{{/-last}}
             {{/vendorExtensions.swaggerParams}}
         ]{{/vendorExtensions.hasNotBodyParam}}{{#hasAuthMethods}},
         security = [

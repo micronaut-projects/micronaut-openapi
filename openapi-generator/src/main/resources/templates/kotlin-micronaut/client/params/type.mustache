@@ -1,2 +1,3 @@
+{{#isDeprecated}}@java.lang.Deprecated{{/isDeprecated}}
 {{#isDateTime}}{{#vendorExtensions.formatPattern}}@Format("{{{vendorExtensions.formatPattern}}}"){{/vendorExtensions.formatPattern}}{{^vendorExtensions.formatPattern}}{{#dateTimeFormat}}@Format("{{{dateTimeFormat}}}"){{/dateTimeFormat}}{{/vendorExtensions.formatPattern}} {{/isDateTime}}
 {{#isDate}}{{#vendorExtensions.formatPattern}}@Format("{{{vendorExtensions.formatPattern}}}"){{/vendorExtensions.formatPattern}}{{^vendorExtensions.formatPattern}}{{#dateFormat}}@Format("{{{dateFormat}}}"){{/dateFormat}}{{/vendorExtensions.formatPattern}} {{/isDate}}

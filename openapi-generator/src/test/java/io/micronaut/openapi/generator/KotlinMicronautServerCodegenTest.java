@@ -665,4 +665,53 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                 """
         );
     }
+
+    @Test
+    void testDeprecated() {
+
+        var codegen = new KotlinMicronautServerCodegen();
+        codegen.setGenerateSwaggerAnnotations(true);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/deprecated.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String path = outputPath + "src/main/kotlin/org/openapitools/";
+
+        assertFileContains(path + "api/ParametersApi.kt",
+            """
+                    /**
+                     * A method to send primitives as request parameters
+                     *
+                     * @param name (required)
+                     *        Deprecated: Deprecated message2
+                     * @param age (required)
+                     * @param height (required)
+                     *        Deprecated: Deprecated message4
+                     * @return Mono&lt;SendPrimitivesResponse&gt;
+                     *
+                     * @deprecated Deprecated message1
+                     */
+                    @Suppress("DEPRECATED_JAVA_ANNOTATION")
+                    @Deprecated("Deprecated message1")
+                    @Operation(
+                        operationId = "sendPrimitives",
+                        description = "A method to send primitives as request parameters",
+                        responses = [
+                            ApiResponse(responseCode = "200", description = "Success", content = [
+                                Content(mediaType = "application/json", schema = Schema(implementation = SendPrimitivesResponse::class))
+                            ]),
+                            ApiResponse(responseCode = "default", description = "An unexpected error has occurred")
+                        ],
+                        parameters = [
+                            Parameter(name = "name", deprecated = true, required = true, `in` = ParameterIn.PATH),
+                            Parameter(name = "age", required = true, `in` = ParameterIn.QUERY),
+                            Parameter(name = "height", deprecated = true, required = true, `in` = ParameterIn.HEADER)
+                        ]
+                    )
+                    @Get("/sendPrimitives/{name}")
+                    @Secured(SecurityRule.IS_ANONYMOUS)
+                    fun sendPrimitives(
+                        @PathVariable("name") @NotNull @java.lang.Deprecated name: String,
+                        @QueryValue("age") @NotNull age: BigDecimal,
+                        @Header("height") @NotNull @java.lang.Deprecated height: Float
+                    ): Mono<SendPrimitivesResponse>
+                """);
+    }
 }

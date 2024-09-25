@@ -2,7 +2,14 @@
  * {{^description}}Gets or Sets {{{name}}}{{/description}}{{#description}}{{description}}{{/description}}
  *
  * @param value The value represented by this enum
+{{#isDeprecated}}
+ *
+ * @deprecated {{#vendorExtensions.x-deprecated-message}} {{{.}}}{{/vendorExtensions.x-deprecated-message}}
+{{/isDeprecated}}
  */
+{{#isDeprecated}}
+@Deprecated("{{#vendorExtensions.x-deprecated-message}}{{{.}}}{{/vendorExtensions.x-deprecated-message}}")
+{{/isDeprecated}}
 {{#withXml}}
 @XmlType(name="{{datatypeWithEnum}}")
 @XmlEnum({{dataType}}.class)

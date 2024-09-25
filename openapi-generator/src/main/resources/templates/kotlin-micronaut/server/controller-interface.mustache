@@ -74,6 +74,9 @@ interface {{classname}} {
             {{#isDateTime}}{{#dateTimeFormat}}@Format("{{{dateTimeFormat}}}"){{/dateTimeFormat}}{{/isDateTime}}
             {{#isDate}}{{#dateFormat}}@Format("{{{dateFormat}}}"){{/dateFormat}}{{/isDate}}
         {{/vendorExtensions.formatPattern}}
+        {{#isDeprecated}}
+            @java.lang.Deprecated
+        {{/isDeprecated}}
  {{{paramName}}}: {{#isEnum}}{{{vendorExtensions.typeWithEnumWithGenericAnnotations}}}{{/isEnum}}{{^isEnum}}{{{vendorExtensions.typeWithGenericAnnotations}}}{{/isEnum}}{{^-last}},{{/-last}}{{/formatSingleLine}}
     {{/allParams}}){{#returnType}}: {{{returnType}}}{{/returnType}}
         {{/formatNoEmptyLines}}
