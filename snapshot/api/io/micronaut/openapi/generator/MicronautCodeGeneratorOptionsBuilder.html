@@ -112,6 +112,26 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="MicronautCodeGeneratorOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorOptionsBuilder</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withAdditionalEnumTypeAnnotations(java.util.List)" class="member-name-link">withAdditionalEnumTypeAnnotations</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;&nbsp;additionalEnumTypeAnnotations)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block">Additional annotations for enum type (class level annotations).</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="MicronautCodeGeneratorOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorOptionsBuilder</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withAdditionalModelTypeAnnotations(java.util.List)" class="member-name-link">withAdditionalModelTypeAnnotations</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;&nbsp;additionalModelTypeAnnotations)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block">Additional annotations for model type (class level annotations).</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="MicronautCodeGeneratorOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorOptionsBuilder</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withAdditionalOneOfTypeAnnotations(java.util.List)" class="member-name-link">withAdditionalOneOfTypeAnnotations</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;&nbsp;additionalOneOfTypeAnnotations)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block">Additional annotations for oneOf interfaces (class level annotations).</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="MicronautCodeGeneratorOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorOptionsBuilder</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withAdditionalProperties(java.util.Map)" class="member-name-link">withAdditionalProperties</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&gt;&nbsp;additionalProperties)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block">Additional generator properties.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="MicronautCodeGeneratorOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorOptionsBuilder</a></code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withApiNamePrefix(java.lang.String)" class="member-name-link">withApiNamePrefix</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;apiNamePrefix)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Set the api name prefix.</div>
@@ -714,6 +734,58 @@ loadScripts(document, 'script');</script>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>useOneOfInterfaces</code> - if true, then use the utils.OneOfImplementorAdditionalData related logic.</dd>
+<dt>Returns:</dt>
+<dd>this builder</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="withAdditionalEnumTypeAnnotations(java.util.List)">
+<h3>withAdditionalEnumTypeAnnotations</h3>
+<div class="member-signature"><span class="return-type"><a href="MicronautCodeGeneratorOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorOptionsBuilder</a></span>&nbsp;<span class="element-name">withAdditionalEnumTypeAnnotations</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;&nbsp;additionalEnumTypeAnnotations)</span></div>
+<div class="block">Additional annotations for enum type (class level annotations).</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>additionalEnumTypeAnnotations</code> - additional annotations for enum type (class level annotations).</dd>
+<dt>Returns:</dt>
+<dd>this builder</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="withAdditionalModelTypeAnnotations(java.util.List)">
+<h3>withAdditionalModelTypeAnnotations</h3>
+<div class="member-signature"><span class="return-type"><a href="MicronautCodeGeneratorOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorOptionsBuilder</a></span>&nbsp;<span class="element-name">withAdditionalModelTypeAnnotations</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;&nbsp;additionalModelTypeAnnotations)</span></div>
+<div class="block">Additional annotations for model type (class level annotations).</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>additionalModelTypeAnnotations</code> - additional annotations for model type (class level annotations).</dd>
+<dt>Returns:</dt>
+<dd>this builder</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="withAdditionalOneOfTypeAnnotations(java.util.List)">
+<h3>withAdditionalOneOfTypeAnnotations</h3>
+<div class="member-signature"><span class="return-type"><a href="MicronautCodeGeneratorOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorOptionsBuilder</a></span>&nbsp;<span class="element-name">withAdditionalOneOfTypeAnnotations</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;&nbsp;additionalOneOfTypeAnnotations)</span></div>
+<div class="block">Additional annotations for oneOf interfaces (class level annotations).</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>additionalOneOfTypeAnnotations</code> - additional annotations for oneOf interfaces (class level annotations).</dd>
+<dt>Returns:</dt>
+<dd>this builder</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="withAdditionalProperties(java.util.Map)">
+<h3>withAdditionalProperties</h3>
+<div class="member-signature"><span class="return-type"><a href="MicronautCodeGeneratorOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorOptionsBuilder</a></span>&nbsp;<span class="element-name">withAdditionalProperties</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&gt;&nbsp;additionalProperties)</span></div>
+<div class="block">Additional generator properties.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>additionalProperties</code> - additional generator properties.</dd>
 <dt>Returns:</dt>
 <dd>this builder</dd>
 </dl>
