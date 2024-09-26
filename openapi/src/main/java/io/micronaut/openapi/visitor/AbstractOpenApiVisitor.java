@@ -124,8 +124,8 @@ abstract class AbstractOpenApiVisitor {
         var resultPathItemsMap = new HashMap<String, List<PathItem>>();
 
         for (UriMatchTemplate matchTemplate : matchTemplates) {
-            var segms = parsePathSegments(matchTemplate.toPathString());
-            var finalPaths = buildUrls(segms);
+            var segments = parsePathSegments(matchTemplate.toPathString());
+            var finalPaths = buildUrls(segments, context);
 
             for (String finalPath : finalPaths) {
                 List<PathItem> resultPathItems = resultPathItemsMap.computeIfAbsent(finalPath, k -> new ArrayList<>());

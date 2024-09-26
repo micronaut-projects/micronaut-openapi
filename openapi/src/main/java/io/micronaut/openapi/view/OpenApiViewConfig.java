@@ -21,6 +21,7 @@ import io.micronaut.core.io.scan.DefaultClassPathResourceLoader;
 import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.core.util.StringUtils;
 import io.micronaut.inject.visitor.VisitorContext;
+import io.micronaut.openapi.visitor.ConfigUtils;
 import io.micronaut.openapi.visitor.ContextUtils;
 import io.micronaut.openapi.visitor.Pair;
 import io.micronaut.openapi.visitor.group.OpenApiInfo;
@@ -43,13 +44,13 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 
-import static io.micronaut.openapi.visitor.ConfigUtils.getConfigProperty;
 import static io.micronaut.openapi.visitor.ConfigUtils.getProjectPath;
 import static io.micronaut.openapi.visitor.ContextUtils.addGeneratedResource;
 import static io.micronaut.openapi.visitor.ContextUtils.info;
 import static io.micronaut.openapi.visitor.ContextUtils.warn;
 import static io.micronaut.openapi.visitor.FileUtils.readFile;
 import static io.micronaut.openapi.visitor.FileUtils.resolve;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_CONTEXT_SERVER_PATH;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_SERVER_CONTEXT_PATH;
 import static io.micronaut.openapi.visitor.StringUtil.COMMA;
 import static io.micronaut.openapi.visitor.StringUtil.DOLLAR;
@@ -88,7 +89,6 @@ public final class OpenApiViewConfig {
     private String mappingPath;
     private String title;
     private String specFile;
-    private String serverContextPath = StringUtils.EMPTY_STRING;
     private SwaggerUIConfig swaggerUIConfig;
     private RedocConfig redocConfig;
     private RapidocConfig rapidocConfig;
@@ -391,15 +391,6 @@ public final class OpenApiViewConfig {
     }
 
     /**
-     * Sets the server context path.
-     *
-     * @param contextPath The server context path.
-     */
-    public void setServerContextPath(String contextPath) {
-        serverContextPath = contextPath == null ? StringUtils.EMPTY_STRING : contextPath;
-    }
-
-    /**
      * Returns the title for the generated views.
      *
      * @return A title.
@@ -434,26 +425,31 @@ public final class OpenApiViewConfig {
             return StringUtils.EMPTY_STRING;
         }
 
-        String specUrl = StringUtils.prependUri(serverContextPath, StringUtils.prependUri(mappingPath, specFile));
-        if (StringUtils.isEmpty(serverContextPath)) {
-            String contextPath = getConfigProperty(MICRONAUT_SERVER_CONTEXT_PATH, context);
-            if (contextPath == null) {
-                contextPath = StringUtils.EMPTY_STRING;
-            }
-            if (!contextPath.startsWith(SLASH) && !contextPath.startsWith(DOLLAR)) {
-                contextPath = SLASH + contextPath;
-            }
-            if (!contextPath.endsWith(SLASH)) {
-                contextPath += SLASH;
-            }
-            if (specUrl.startsWith(SLASH)) {
-                specUrl = specUrl.substring(1);
-            }
-
-            specUrl = contextPath + specUrl;
+        // process micronaut.openapi.server.context.path
+        String serverContextPath = ConfigUtils.getConfigProperty(MICRONAUT_OPENAPI_CONTEXT_SERVER_PATH, context);
+        if (serverContextPath == null) {
+            serverContextPath = StringUtils.EMPTY_STRING;
+        }
+        String finalUrl = serverContextPath.startsWith(SLASH) ? serverContextPath : SLASH + serverContextPath;
+        if (!finalUrl.endsWith(SLASH)) {
+            finalUrl += SLASH;
         }
 
-        return specUrl;
+        // process micronaut.server.context-path
+        String contextPath = ConfigUtils.getConfigProperty(MICRONAUT_SERVER_CONTEXT_PATH, context);
+        if (contextPath == null) {
+            contextPath = StringUtils.EMPTY_STRING;
+        }
+        finalUrl += contextPath.startsWith(SLASH) ? contextPath.substring(1) : contextPath;
+        if (!finalUrl.endsWith(SLASH)) {
+            finalUrl += SLASH;
+        }
+
+        finalUrl = StringUtils.prependUri(finalUrl, StringUtils.prependUri(mappingPath, specFile));
+        if (!finalUrl.startsWith(SLASH) && !finalUrl.startsWith(DOLLAR)) {
+            finalUrl = SLASH + finalUrl;
+        }
+        return finalUrl;
     }
 
     /**

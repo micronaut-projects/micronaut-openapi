@@ -16,10 +16,13 @@
 package io.micronaut.openapi.visitor;
 
 import io.micronaut.core.annotation.Internal;
+import io.micronaut.core.util.StringUtils;
+import io.micronaut.inject.visitor.VisitorContext;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_SERVER_CONTEXT_PATH;
 import static io.micronaut.openapi.visitor.StringUtil.CLOSE_BRACE;
 import static io.micronaut.openapi.visitor.StringUtil.DOLLAR;
 import static io.micronaut.openapi.visitor.StringUtil.OPEN_BRACE;
@@ -47,7 +50,7 @@ public final class UrlUtils {
      * @param segments url template segments
      * @return all possible URL variants by parsed segments.
      */
-    public static List<String> buildUrls(List<Segment> segments) {
+    public static List<String> buildUrls(List<Segment> segments, VisitorContext context) {
 
         var results = new ArrayList<StringBuilder>();
 
@@ -55,6 +58,16 @@ public final class UrlUtils {
         for (var segment : segments) {
             appendSegment(segment, prevSegment, results);
             prevSegment = segment;
+        }
+
+        String contextPath = ConfigUtils.getConfigProperty(MICRONAUT_SERVER_CONTEXT_PATH, context);
+        if (StringUtils.isNotEmpty(contextPath)) {
+            if (!contextPath.startsWith(SLASH) && !contextPath.startsWith(DOLLAR)) {
+                contextPath = SLASH + contextPath;
+            }
+            if (contextPath.endsWith(SLASH)) {
+                contextPath = contextPath.substring(0, contextPath.length() - 1);
+            }
         }
 
         var resultStrings = new ArrayList<String>();
@@ -67,6 +80,11 @@ public final class UrlUtils {
             } else if (url.startsWith(SLASH + DOLLAR)) {
                 url = url.substring(1);
             }
+
+            if (StringUtils.isNotEmpty(contextPath)) {
+                url = contextPath + url;
+            }
+
             if (!resultStrings.contains(url)) {
                 resultStrings.add(url);
             }
