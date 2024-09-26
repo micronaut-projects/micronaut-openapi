@@ -17,14 +17,12 @@
         const cookie = extract(document.cookie);
         const contextPath = cookie === '' ? extract(window.location.search.substring(1)) : cookie;
         const head = document.getElementsByTagName('head')[0]
-        // link(contextPath + "{{swagger-ui.js.url.prefix}}index.css", head, "text/css", "stylesheet")
+
         link(contextPath + "{{swagger-ui.js.url.prefix}}swagger-ui.css", head, "text/css", "stylesheet")
         link(contextPath + "{{swagger-ui.js.url.prefix}}favicon-16x16.png", head, "image/png", "icon", "16x16")
         link(contextPath + "{{swagger-ui.js.url.prefix}}favicon-32x32.png", head, "image/png", "icon", "32x32")
         {{swagger-ui.theme}}
         {{rapipdf.script}}
-
-
         window.onload = function() {
             const swaggerUiBundle = script(contextPath + "{{swagger-ui.js.url.prefix}}swagger-ui-bundle.js", head)
             script(contextPath + "{{swagger-ui.js.url.prefix}}swagger-ui-standalone-preset.js", head)

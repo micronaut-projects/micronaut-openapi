@@ -1,7 +1,8 @@
 import io.micronaut.build.internal.openapi.OpenApiGeneratorTask
 
 plugins {
-    id 'io.micronaut.minimal.application'
+    id("io.micronaut.build.internal.openapi-base")
+    id("io.micronaut.minimal.application")
 }
 
 repositories {

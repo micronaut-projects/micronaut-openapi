@@ -26,12 +26,10 @@ compileJava.options.compilerArgs += '-parameters'
 compileTestJava.options.compilerArgs += '-parameters'
 
 test {
-    useJUnitPlatform()
-
     jvmArgs '-Duser.country=US'
     jvmArgs '-Duser.language=en'
+    useJUnitPlatform()
     testLogging {
-        showStandardStreams = true
         exceptionFormat = 'full'
     }
     failFast = true

@@ -9,6 +9,3 @@ dependencies {
     testRuntimeOnly(mnTest.junit.jupiter.engine)
     testRuntimeOnly(mnLogging.logback.classic)
 }
-tasks.test {
-    useJUnitPlatform()
-}

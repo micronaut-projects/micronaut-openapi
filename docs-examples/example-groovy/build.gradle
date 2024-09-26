@@ -24,13 +24,12 @@ test {
     jvmArgs '-Duser.country=US'
     jvmArgs '-Duser.language=en'
     testLogging {
-        showStandardStreams = true
         exceptionFormat = 'full'
     }
     failFast = true
 }
 
-tasks.withType(GroovyCompile) {
+tasks.withType(GroovyCompile).configureEach {
     groovyOptions.forkOptions.jvmArgs.add('-Dgroovy.parameters=true')
 }
 

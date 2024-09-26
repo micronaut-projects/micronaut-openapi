@@ -3,19 +3,19 @@ plugins {
 }
 
 dependencies {
-    constraints {
-        api(libs.swagger.parser) {
-            because("OpenAPI generator depends on older release which isn't compatible with SnakeYAML")
-        }
-        api(libs.swagger.parser.v3) {
-            because("OpenAPI generator depends on older release which isn't compatible with SnakeYAML")
-        }
-    }
-    api(libs.openapi.generator) {
-        exclude group: "org.projectlombok"
-    }
+    api libs.openapi.generator
+    api libs.swagger.parser
+    api libs.swagger.parser.v3
+    api libs.commons.lang3
+    api libs.commons.text
     api libs.commons.codec
+    api libs.commons.io
     api libs.managed.evo.inflector
+    api libs.jmustache
+    api libs.commonmark
+    api libs.guava
+    api mnLogging.slf4j.ext
+    api mn.snakeyaml
 
     testImplementation mnTest.micronaut.test.junit5
     testImplementation mnTest.junit.jupiter.params
@@ -27,4 +27,30 @@ dependencies {
     testFixturesImplementation mnTest.micronaut.test.junit5
 
     testRuntimeOnly mnTest.junit.jupiter.engine
+}
+
+configurations.configureEach {
+    exclude group: "com.google.code.findbugs", module: "jsr305"
+    exclude group: "javax.validation", module: "validation-api"
+    exclude group: "org.slf4j", module: "slf4j-simple"
+    exclude group: "org.projectlombok"
+    exclude group: "com.google.guava", module: "listenablefuture"
+    exclude group: "com.google.guava", module: "failureaccess"
+    exclude group: "com.google.errorprone", module: "error_prone_annotations"
+    exclude group: "com.google.j2objc", module: "j2objc-annotations"
+    exclude group: "org.checkerframework", module: "checker-qual"
+    exclude group: "com.github.jknack"
+    exclude group: "org.apache.maven.resolver"
+    exclude group: "com.github.mifmif", module: "generex"
+    exclude group: "com.github.curious-odd-man", module: "rgxgen"
+    exclude group: "net.java.dev.jna", module: "jna"
+    exclude group: "commons-cli", module: "commons-cli"
+    exclude group: "com.github.joschi.jackson", module: "jackson-datatype-threetenbp"
+    exclude group: "com.fasterxml.jackson.datatype", module: "jackson-datatype-guava"
+    exclude group: "com.fasterxml.jackson.datatype", module: "jackson-datatype-joda"
+}
+
+test {
+    maxParallelForks = Runtime.runtime.availableProcessors()
+    maxHeapSize = "2048m"
 }
