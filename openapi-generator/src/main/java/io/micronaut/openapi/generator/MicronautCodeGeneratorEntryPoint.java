@@ -123,12 +123,16 @@ public final class MicronautCodeGeneratorEntryPoint {
         if (options == null) {
             return;
         }
+        if (options.additionalProperties != null && !options.additionalProperties.isEmpty()) {
+            codeGenerator.additionalProperties().putAll(options.additionalProperties);
+        }
         if (options.modelPackage != null) {
             codeGenerator.setModelPackage(options.modelPackage);
         }
         if (options.apiPackage != null) {
             codeGenerator.setApiPackage(options.apiPackage);
         }
+
         if ((options.lang == null || options.lang == GeneratorLanguage.JAVA) && codeGenerator instanceof AbstractMicronautJavaCodegen<?> javaCodeGen) {
 
             if (options.invokerPackage != null) {
@@ -185,6 +189,16 @@ public final class MicronautCodeGeneratorEntryPoint {
             javaCodeGen.setImplicitHeaders(options.implicitHeaders);
             if (options.implicitHeadersRegex != null && !options.implicitHeadersRegex.isBlank()) {
                 javaCodeGen.setImplicitHeadersRegex(options.implicitHeadersRegex);
+            }
+
+            if (options.additionalEnumTypeAnnotations != null && !options.additionalEnumTypeAnnotations.isEmpty()) {
+                javaCodeGen.setAdditionalEnumTypeAnnotations(options.additionalEnumTypeAnnotations);
+            }
+            if (options.additionalModelTypeAnnotations != null && !options.additionalModelTypeAnnotations.isEmpty()) {
+                javaCodeGen.setAdditionalModelTypeAnnotations(options.additionalModelTypeAnnotations);
+            }
+            if (options.additionalOneOfTypeAnnotations != null && !options.additionalOneOfTypeAnnotations.isEmpty()) {
+                javaCodeGen.setAdditionalOneOfTypeAnnotations(options.additionalOneOfTypeAnnotations);
             }
 
             javaCodeGen.setUseOneOfInterfaces(options.useOneOfInterfaces);
@@ -257,6 +271,17 @@ public final class MicronautCodeGeneratorEntryPoint {
             if (options.implicitHeadersRegex != null && !options.implicitHeadersRegex.isBlank()) {
                 kotlinCodeGen.setImplicitHeadersRegex(options.implicitHeadersRegex);
             }
+
+            if (options.additionalEnumTypeAnnotations != null && !options.additionalEnumTypeAnnotations.isEmpty()) {
+                kotlinCodeGen.setAdditionalEnumTypeAnnotations(options.additionalEnumTypeAnnotations);
+            }
+            if (options.additionalModelTypeAnnotations != null && !options.additionalModelTypeAnnotations.isEmpty()) {
+                kotlinCodeGen.setAdditionalModelTypeAnnotations(options.additionalModelTypeAnnotations);
+            }
+            if (options.additionalOneOfTypeAnnotations != null && !options.additionalOneOfTypeAnnotations.isEmpty()) {
+                kotlinCodeGen.setAdditionalOneOfTypeAnnotations(options.additionalOneOfTypeAnnotations);
+            }
+
             kotlinCodeGen.setUseOneOfInterfaces(options.useOneOfInterfaces);
             kotlinCodeGen.setReactive(options.reactive);
             kotlinCodeGen.setGenerateHttpResponseAlways(options.generateHttpResponseAlways);
@@ -539,6 +564,10 @@ public final class MicronautCodeGeneratorEntryPoint {
             private SerializationLibraryKind serializationLibraryKind = SerializationLibraryKind.MICRONAUT_SERDE_JACKSON;
             private DateTimeFormat dateTimeFormat = DateTimeFormat.ZONED_DATETIME;
             private GeneratorLanguage lang = GeneratorLanguage.JAVA;
+            private List<String> additionalEnumTypeAnnotations;
+            private List<String> additionalModelTypeAnnotations;
+            private List<String> additionalOneOfTypeAnnotations;
+            private Map<String, Object> additionalProperties;
 
             @Override
             public MicronautCodeGeneratorOptionsBuilder withLang(GeneratorLanguage lang) {
@@ -738,6 +767,30 @@ public final class MicronautCodeGeneratorEntryPoint {
                 return this;
             }
 
+            @Override
+            public MicronautCodeGeneratorOptionsBuilder withAdditionalEnumTypeAnnotations(List<String> additionalEnumTypeAnnotations) {
+                this.additionalEnumTypeAnnotations = additionalEnumTypeAnnotations;
+                return this;
+            }
+
+            @Override
+            public MicronautCodeGeneratorOptionsBuilder withAdditionalModelTypeAnnotations(List<String> additionalModelTypeAnnotations) {
+                this.additionalModelTypeAnnotations = additionalModelTypeAnnotations;
+                return this;
+            }
+
+            @Override
+            public MicronautCodeGeneratorOptionsBuilder withAdditionalOneOfTypeAnnotations(List<String> additionalOneOfTypeAnnotations) {
+                this.additionalOneOfTypeAnnotations = additionalOneOfTypeAnnotations;
+                return this;
+            }
+
+            @Override
+            public MicronautCodeGeneratorOptionsBuilder withAdditionalProperties(Map<String, Object> additionalProperties) {
+                this.additionalProperties = additionalProperties;
+                return this;
+            }
+
             private Options build() {
                 return new Options(
                     lang,
@@ -775,7 +828,12 @@ public final class MicronautCodeGeneratorEntryPoint {
                     generateSwaggerAnnotations,
                     testFramework,
                     serializationLibraryKind,
-                    dateTimeFormat);
+                    dateTimeFormat,
+                    additionalEnumTypeAnnotations,
+                    additionalModelTypeAnnotations,
+                    additionalOneOfTypeAnnotations,
+                    additionalProperties
+                );
             }
         }
     }
@@ -832,7 +890,11 @@ public final class MicronautCodeGeneratorEntryPoint {
         boolean generateSwaggerAnnotations,
         TestFramework testFramework,
         SerializationLibraryKind serializationLibraryKind,
-        MicronautCodeGeneratorOptionsBuilder.DateTimeFormat dateTimeFormat
+        MicronautCodeGeneratorOptionsBuilder.DateTimeFormat dateTimeFormat,
+        List<String> additionalEnumTypeAnnotations,
+        List<String> additionalModelTypeAnnotations,
+        List<String> additionalOneOfTypeAnnotations,
+        Map<String, Object> additionalProperties
     ) {
     }
 

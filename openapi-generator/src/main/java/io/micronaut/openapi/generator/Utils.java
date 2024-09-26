@@ -26,6 +26,7 @@ import org.openapitools.codegen.CodegenProperty;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -366,5 +367,26 @@ public final class Utils {
 
     public static boolean isDateType(String type) {
         return DATE_TIME_TYPES.contains(type);
+    }
+
+    public static List<String> readListOfStringsProperty(String property, Map<String, Object> additionalProperties) {
+        var additionalAnnotations = additionalProperties.get(property);
+        if (additionalAnnotations == null) {
+            return Collections.emptyList();
+        }
+        List<String> additionalOneOfTypeAnnotationsList;
+        if (additionalAnnotations instanceof Collection<?> additionalAnnotationsCol) {
+            additionalOneOfTypeAnnotationsList = new ArrayList<>(additionalAnnotationsCol.size());
+            for (var el : additionalAnnotationsCol) {
+                additionalOneOfTypeAnnotationsList.add(el.toString().strip());
+            }
+        } else {
+            var elements = additionalAnnotations.toString().trim().split("\\s*(;|\\r?\\n)\\s*");
+            additionalOneOfTypeAnnotationsList = new ArrayList<>(elements.length);
+            for (var el : elements) {
+                additionalOneOfTypeAnnotationsList.add(el.strip());
+            }
+        }
+        return additionalOneOfTypeAnnotationsList;
     }
 }

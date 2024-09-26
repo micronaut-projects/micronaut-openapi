@@ -26,13 +26,13 @@ import org.openapitools.codegen.model.ModelMap;
 import org.openapitools.codegen.model.OperationMap;
 import org.openapitools.codegen.model.OperationsMap;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
 import static io.micronaut.openapi.generator.Utils.processMultipartBody;
+import static io.micronaut.openapi.generator.Utils.readListOfStringsProperty;
 
 /**
  * The generator for creating Micronaut clients.
@@ -180,14 +180,8 @@ public class KotlinMicronautClientCodegen extends AbstractMicronautKotlinCodegen
             writePropertyBack(AUTHORIZATION_FILTER_PATTERN, this.authorizationFilterPattern);
         }
 
-        Object additionalClientAnnotations = additionalProperties.get(ADDITIONAL_CLIENT_TYPE_ANNOTATIONS);
-        if (additionalClientAnnotations != null) {
-            if (additionalClientAnnotations instanceof @SuppressWarnings("rawtypes") List additionalClientAnnotationsAsList) {
-                //noinspection unchecked
-                additionalClientTypeAnnotations = additionalClientAnnotationsAsList;
-            } else {
-                additionalClientTypeAnnotations = Arrays.asList(additionalClientAnnotations.toString().trim().split("\\s*(;|\\r?\\n)\\s*"));
-            }
+        if (additionalProperties.containsKey(ADDITIONAL_CLIENT_TYPE_ANNOTATIONS)) {
+            setAdditionalClientTypeAnnotations(readListOfStringsProperty(ADDITIONAL_CLIENT_TYPE_ANNOTATIONS, additionalProperties));
         }
         writePropertyBack(ADDITIONAL_CLIENT_TYPE_ANNOTATIONS, additionalClientTypeAnnotations);
 

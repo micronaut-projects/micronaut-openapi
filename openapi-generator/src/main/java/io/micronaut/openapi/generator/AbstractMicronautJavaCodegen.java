@@ -85,6 +85,7 @@ import static io.micronaut.openapi.generator.Utils.addStrValueToEnum;
 import static io.micronaut.openapi.generator.Utils.isDateType;
 import static io.micronaut.openapi.generator.Utils.normalizeExtraAnnotations;
 import static io.micronaut.openapi.generator.Utils.processGenericAnnotations;
+import static io.micronaut.openapi.generator.Utils.readListOfStringsProperty;
 import static org.openapitools.codegen.CodegenConstants.API_PACKAGE;
 import static org.openapitools.codegen.CodegenConstants.INVOKER_PACKAGE;
 import static org.openapitools.codegen.CodegenConstants.MODEL_PACKAGE;
@@ -385,6 +386,21 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
 
     @Override
     public void processOpts() {
+
+        // need it to add ability to set List<String> in `additionalModelTypeAnnotations` property
+        if (additionalProperties.containsKey(ADDITIONAL_MODEL_TYPE_ANNOTATIONS)) {
+            setAdditionalModelTypeAnnotations(readListOfStringsProperty(ADDITIONAL_MODEL_TYPE_ANNOTATIONS, additionalProperties));
+            additionalProperties.remove(ADDITIONAL_MODEL_TYPE_ANNOTATIONS);
+        }
+        if (additionalProperties.containsKey(ADDITIONAL_ONE_OF_TYPE_ANNOTATIONS)) {
+            setAdditionalOneOfTypeAnnotations(readListOfStringsProperty(ADDITIONAL_ONE_OF_TYPE_ANNOTATIONS, additionalProperties));
+            additionalProperties.remove(ADDITIONAL_ONE_OF_TYPE_ANNOTATIONS);
+        }
+        if (additionalProperties.containsKey(ADDITIONAL_ENUM_TYPE_ANNOTATIONS)) {
+            setAdditionalEnumTypeAnnotations(readListOfStringsProperty(ADDITIONAL_ENUM_TYPE_ANNOTATIONS, additionalProperties));
+            additionalProperties.remove(ADDITIONAL_ENUM_TYPE_ANNOTATIONS);
+        }
+
         super.processOpts();
 
         // Get properties

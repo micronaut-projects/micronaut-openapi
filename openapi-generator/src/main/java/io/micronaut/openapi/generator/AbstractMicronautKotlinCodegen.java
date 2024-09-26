@@ -70,6 +70,7 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -88,6 +89,7 @@ import static io.micronaut.openapi.generator.Utils.addStrValueToEnum;
 import static io.micronaut.openapi.generator.Utils.isDateType;
 import static io.micronaut.openapi.generator.Utils.normalizeExtraAnnotations;
 import static io.micronaut.openapi.generator.Utils.processGenericAnnotations;
+import static io.micronaut.openapi.generator.Utils.readListOfStringsProperty;
 import static org.openapitools.codegen.CodegenConstants.API_PACKAGE;
 import static org.openapitools.codegen.CodegenConstants.INVOKER_PACKAGE;
 import static org.openapitools.codegen.CodegenConstants.MODEL_PACKAGE;
@@ -132,6 +134,8 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
     public static final String OPT_IMPLICIT_HEADERS_REGEX = "implicitHeadersRegex";
     public static final String OPT_USE_ENUM_CASE_INSENSITIVE = "useEnumCaseInsensitive";
     public static final String OPT_KSP = "ksp";
+    public static final String ADDITIONAL_ONE_OF_TYPE_ANNOTATIONS = "additionalOneOfTypeAnnotations";
+    public static final String ADDITIONAL_ENUM_TYPE_ANNOTATIONS = "additionalEnumTypeAnnotations";
     public static final String CONTENT_TYPE_APPLICATION_FORM_URLENCODED = "application/x-www-form-urlencoded";
     public static final String CONTENT_TYPE_APPLICATION_JSON = "application/json";
     public static final String CONTENT_TYPE_MULTIPART_FORM_DATA = "multipart/form-data";
@@ -167,6 +171,8 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
     protected List<ParameterMapping> parameterMappings = new ArrayList<>();
     protected List<ResponseBodyMapping> responseBodyMappings = new ArrayList<>();
     protected Map<String, CodegenModel> allModels = new HashMap<>();
+    protected List<String> additionalOneOfTypeAnnotations = new LinkedList<>();
+    protected List<String> additionalEnumTypeAnnotations = new LinkedList<>();
 
     private final Logger log = LoggerFactory.getLogger(getClass());
 
@@ -280,6 +286,8 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
 
         cliOptions.add(new CliOption(OPT_TITLE, "Client service name").defaultValue(title));
         cliOptions.add(new CliOption(OPT_APPLICATION_NAME, "Micronaut application name (Defaults to the " + CodegenConstants.ARTIFACT_ID + " value)").defaultValue(appName));
+        cliOptions.add(CliOption.newString(ADDITIONAL_ENUM_TYPE_ANNOTATIONS, "Additional annotations for enum type (class level annotations)"));
+        cliOptions.add(CliOption.newString(ADDITIONAL_ONE_OF_TYPE_ANNOTATIONS, "Additional annotations for oneOf interfaces (class level annotations). List separated by semicolon(;) or new line (Linux or Windows)"));
         cliOptions.add(CliOption.newBoolean(OPT_USE_PLURAL, "Whether or not to use plural for request body parameter name", plural));
         cliOptions.add(CliOption.newBoolean(OPT_FLUX_FOR_ARRAYS, "Whether or not to use Flux<?> instead Mono<List<?>> for arrays in generated code", fluxForArrays));
         cliOptions.add(CliOption.newBoolean(OPT_GENERATED_ANNOTATION, "Generate code with \"@Generated\" annotation", generatedAnnotation));
@@ -457,6 +465,21 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
 
     @Override
     public void processOpts() {
+
+        // need it to add ability to set List<String> in `additionalModelTypeAnnotations` property
+        if (additionalProperties.containsKey(ADDITIONAL_MODEL_TYPE_ANNOTATIONS)) {
+            setAdditionalModelTypeAnnotations(readListOfStringsProperty(ADDITIONAL_MODEL_TYPE_ANNOTATIONS, additionalProperties));
+            additionalProperties.remove(ADDITIONAL_MODEL_TYPE_ANNOTATIONS);
+        }
+        if (additionalProperties.containsKey(ADDITIONAL_ONE_OF_TYPE_ANNOTATIONS)) {
+            setAdditionalOneOfTypeAnnotations(readListOfStringsProperty(ADDITIONAL_ONE_OF_TYPE_ANNOTATIONS, additionalProperties));
+            additionalProperties.remove(ADDITIONAL_ONE_OF_TYPE_ANNOTATIONS);
+        }
+        if (additionalProperties.containsKey(ADDITIONAL_ENUM_TYPE_ANNOTATIONS)) {
+            setAdditionalEnumTypeAnnotations(readListOfStringsProperty(ADDITIONAL_ENUM_TYPE_ANNOTATIONS, additionalProperties));
+            additionalProperties.remove(ADDITIONAL_ENUM_TYPE_ANNOTATIONS);
+        }
+
         super.processOpts();
 
         // Get properties
@@ -1554,6 +1577,20 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
     public Map<String, ModelsMap> postProcessAllModels(Map<String, ModelsMap> objs) {
         objs = super.postProcessAllModels(objs);
 
+        if (!additionalOneOfTypeAnnotations.isEmpty()) {
+            for (String modelName : objs.keySet()) {
+                Map<String, Object> models = objs.get(modelName);
+                models.put(ADDITIONAL_ONE_OF_TYPE_ANNOTATIONS, additionalOneOfTypeAnnotations);
+            }
+        }
+
+        if (!additionalEnumTypeAnnotations.isEmpty()) {
+            for (String modelName : objs.keySet()) {
+                Map<String, Object> models = objs.get(modelName);
+                models.put(ADDITIONAL_ENUM_TYPE_ANNOTATIONS, additionalEnumTypeAnnotations);
+            }
+        }
+
         var isServer = isServer();
 
         for (ModelsMap models : objs.values()) {
@@ -2228,6 +2265,14 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
 
     public void setUseEnumCaseInsensitive(boolean useEnumCaseInsensitive) {
         this.useEnumCaseInsensitive = useEnumCaseInsensitive;
+    }
+
+    public void setAdditionalOneOfTypeAnnotations(List<String> additionalOneOfTypeAnnotations) {
+        this.additionalOneOfTypeAnnotations = additionalOneOfTypeAnnotations;
+    }
+
+    public void setAdditionalEnumTypeAnnotations(List<String> additionalEnumTypeAnnotations) {
+        this.additionalEnumTypeAnnotations = additionalEnumTypeAnnotations;
     }
 
     @Override
