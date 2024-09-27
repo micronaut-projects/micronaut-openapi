@@ -1,0 +1,10 @@
+InvoiceCreateDto:
+  type: object
+  properties:
+    message:
+      type: string
+InvoiceIdDto:
+  type: object
+  properties:
+    id:
+      type: string

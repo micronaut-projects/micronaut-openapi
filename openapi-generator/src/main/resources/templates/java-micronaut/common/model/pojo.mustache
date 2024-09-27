@@ -166,7 +166,9 @@ public class {{classname}} {{#parent}}extends {{{parent}}} {{/parent}}{{#vendorE
         {{#vendorExtensions.requiredVars}}
             {{#isDiscriminator}}
                 {{#useOneOfInterfaces}}
+                    {{#vendorExtensions.x-implements}}
         this.{{name}} = {{name}};
+                    {{/vendorExtensions.x-implements}}
                 {{/useOneOfInterfaces}}
             {{/isDiscriminator}}
             {{^isDiscriminator}}

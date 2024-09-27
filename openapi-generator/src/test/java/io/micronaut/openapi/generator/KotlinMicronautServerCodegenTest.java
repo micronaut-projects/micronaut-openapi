@@ -646,4 +646,23 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                     ): Mono<HttpResponse<Void>>
                 """);
     }
+
+    @Test
+    void testPolymorphism() {
+
+        var codegen = new KotlinMicronautServerCodegen();
+        codegen.setUseAuth(false);
+        codegen.setReactive(false);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/1794/openapi.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String path = outputPath + "src/main/kotlin/org/openapitools/";
+
+        assertFileContains(path + "model/CurrencyInvoiceCreateDto.kt", """
+                    @field:NotNull
+                    @field:Size(max = 10)
+                    @field:Schema(name = "sellerVatId", requiredMode = Schema.RequiredMode.REQUIRED)
+                    @field:JsonProperty(JSON_PROPERTY_SELLER_VAT_ID)
+                    override var sellerVatId: String,
+                """
+        );
+    }
 }

@@ -562,4 +562,35 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                     );
                 """);
     }
+
+    @Test
+    void testPolymorphism() {
+
+        var codegen = new JavaMicronautServerCodegen();
+        codegen.setUseAuth(false);
+        codegen.setReactive(false);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/1794/openapi.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String path = outputPath + "src/main/java/org/openapitools/";
+
+        assertFileContains(path + "model/CurrencyInvoiceCreateDto.java", """
+                    @Override
+                    public CurrencyInvoiceCreateDto docType(DocType docType) {
+                        super.setDocType(docType);
+                        return this;
+                    }
+                """,
+            """
+                    @Override
+                    public CurrencyInvoiceCreateDto sellerVatId(String sellerVatId) {
+                        super.setSellerVatId(sellerVatId);
+                        return this;
+                    }
+                """
+        );
+        assertFileNotContains(path + "model/BaseInvoiceDto.java", """
+                        this.docType = docType;
+                        this.sellerVatId = sellerVatId;
+                """
+        );
+    }
 }

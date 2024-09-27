@@ -1665,10 +1665,15 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
             }
             model.vendorExtensions.put("isServer", isServer);
             for (var property : model.vars) {
-                processProperty(property, isServer, objs);
+                processProperty(property, isServer, model, objs);
             }
             for (var property : model.requiredVars) {
-                processProperty(property, isServer, objs);
+                processProperty(property, isServer, model, objs);
+            }
+            if (model.parentVars != null) {
+                for (var property : model.parentVars) {
+                    processProperty(property, isServer, model, objs);
+                }
             }
             if (model.isEnum) {
                 addImport(model, "Function");
@@ -1726,12 +1731,13 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
         }
     }
 
-    private void processProperty(CodegenProperty property, boolean isServer, Map<String, ModelsMap> models) {
+    private void processProperty(CodegenProperty property, boolean isServer, CodegenModel model, Map<String, ModelsMap> models) {
 
         property.vendorExtensions.put("inRequiredArgsConstructor", !property.isReadOnly || isServer);
         property.vendorExtensions.put("isServer", isServer);
         property.vendorExtensions.put("lombok", lombok);
         property.vendorExtensions.put("defaultValueIsNotNull", property.defaultValue != null && !property.defaultValue.equals("null"));
+        property.vendorExtensions.put("x-implements", model.vendorExtensions.get("x-implements"));
         if (useBeanValidation && (
             (!property.isContainer && property.isModel)
                 || (property.getIsArray() && property.getComplexType() != null && models.containsKey(property.getComplexType()))

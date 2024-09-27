@@ -1,0 +1,100 @@
+openapi: 3.0.3
+info:
+  title: Sample App API
+  version: 1.0.0
+tags:
+  - name: Invoice
+paths:
+  /api/invoice:
+    post:
+      tags:
+        - Invoice
+      operationId: createInvoice
+      summary: Creates new sale invoice
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BaseInvoiceDto'
+      responses:
+        201:
+          description: Invoice created correctly
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvoiceIdDto'
+        403:
+          description: No access to cost center with Manager rights
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+components:
+  schemas:
+    DocType:
+      type: string
+      enum: [ FS, FW, FK, FP ]
+      default: "FS"
+    BaseInvoiceDto:
+      type: object
+      required:
+        - sellerVatId
+        - docType
+      properties:
+        docType:
+          $ref: '#/components/schemas/DocType'
+        sellerVatId:
+          type: string
+          maxLength: 10
+      discriminator:
+        propertyName: docType
+        mapping:
+          FS: "#/components/schemas/SalesInvoiceCreateDto"
+          FW: "#/components/schemas/CurrencyInvoiceCreateDto"
+    SalesInvoiceCreateDto:
+      allOf:
+        - $ref: '#/components/schemas/BaseInvoiceDto'
+    CurrencyInvoiceCreateDto:
+      allOf:
+        - $ref: '#/components/schemas/SalesInvoiceCreateDto'
+        - type: object
+          properties:
+            currency:
+              type: string
+              description: "Currency of the invoice"
+              default: "PLN"
+            exchangeRate:
+              type: number
+              description: "Exchange rate for the currency"
+            exchangeDate:
+              type: string
+              format: date
+          required:
+            - currency
+            - exchangeRate
+            - exchangeDate
+    InvoiceIdDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        docNumber:
+          type: string
+    ErrorDTO:
+      type: object
+      properties:
+        message:
+          type: string
+        code:
+          type: integer
+        retryable:
+          type: boolean
+        severity:
+          type: string
+          enum: [ WARN, ERROR, FATAL ]
+        params:
+          type: object
+          additionalProperties:
+            type: string

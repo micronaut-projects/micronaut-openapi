@@ -1643,6 +1643,11 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
             for (var property : model.requiredVars) {
                 processProperty(property, isServer, model, objs);
             }
+            if (model.parentVars != null) {
+                for (var property : model.parentVars) {
+                    processProperty(property, isServer, model, objs);
+                }
+            }
             addStrValueToEnum(model);
         }
 
@@ -1720,6 +1725,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         property.vendorExtensions.put("isServer", isServer);
         property.vendorExtensions.put("defaultValueIsNotNull", property.defaultValue != null && !property.defaultValue.equals("null"));
         property.vendorExtensions.put("fieldAnnPrefix", ksp ? "" : "field:");
+        property.vendorExtensions.put("x-implements", model.vendorExtensions.get("x-implements"));
         if ("null".equals(property.example)) {
             property.example = null;
         }
