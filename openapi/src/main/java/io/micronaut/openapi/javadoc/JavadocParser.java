@@ -18,6 +18,7 @@ package io.micronaut.openapi.javadoc;
 import com.github.chhorz.javadoc.JavaDoc;
 import com.github.chhorz.javadoc.JavaDocParserBuilder;
 import com.github.chhorz.javadoc.OutputType;
+import com.github.chhorz.javadoc.tags.DeprecatedTag;
 import com.github.chhorz.javadoc.tags.ParamTag;
 import com.github.chhorz.javadoc.tags.PropertyTag;
 import com.github.chhorz.javadoc.tags.ReturnTag;
@@ -35,7 +36,7 @@ import java.util.Set;
  */
 public class JavadocParser {
 
-    private static final Set<String> IGNORED = CollectionUtils.setOf("see", "since", "author", "version", "deprecated", "throws", "exception", "category");
+    private static final Set<String> IGNORED = CollectionUtils.setOf("see", "since", "author", "version", "throws", "exception", "category");
 
     private final FlexmarkHtmlConverter htmlToMarkdownConverter = FlexmarkHtmlConverter.builder()
         .build();
@@ -77,6 +78,8 @@ public class JavadocParser {
                 } else if (tag instanceof PropertyTag propertyTag) {
                     String paramDesc = htmlToMarkdownConverter.convert(propertyTag.getParamDescription()).strip();
                     javadocDescription.getParameters().put(propertyTag.getPropertyName(), paramDesc);
+                } else if (tag instanceof DeprecatedTag deprecatedTag) {
+                    javadocDescription.setDeprecatedDescription(htmlToMarkdownConverter.convert(deprecatedTag.getDeprecatedText()).strip());
                 }
             }
         }

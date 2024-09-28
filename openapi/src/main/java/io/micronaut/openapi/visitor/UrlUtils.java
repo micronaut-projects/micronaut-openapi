@@ -48,6 +48,7 @@ public final class UrlUtils {
      * Construct all possible URL variants by parsed segments.
      *
      * @param segments url template segments
+     * @param context visitor context
      * @return all possible URL variants by parsed segments.
      */
     public static List<String> buildUrls(List<Segment> segments, VisitorContext context) {

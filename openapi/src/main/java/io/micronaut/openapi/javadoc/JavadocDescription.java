@@ -31,6 +31,7 @@ public class JavadocDescription {
     private String methodSummary;
     private String methodDescription;
     private String returnDescription;
+    private String deprecatedDescription;
     private final Map<String, String> parameters = new HashMap<>(4);
 
     /**
@@ -90,5 +91,24 @@ public class JavadocDescription {
      */
     public void setReturnDescription(String returnDescription) {
         this.returnDescription = returnDescription;
+    }
+
+    /**
+     * The deprecated description.
+     *
+     * @return The deprecated description
+     */
+    @Nullable
+    public String getDeprecatedDescription() {
+        return deprecatedDescription;
+    }
+
+    /**
+     * Sets the deprecated description.
+     *
+     * @param deprecatedDescription The deprecated description.
+     */
+    public void setDeprecatedDescription(String deprecatedDescription) {
+        this.deprecatedDescription = deprecatedDescription;
     }
 }

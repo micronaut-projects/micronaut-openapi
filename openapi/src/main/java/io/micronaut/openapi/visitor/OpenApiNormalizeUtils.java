@@ -41,10 +41,11 @@ import java.util.TreeMap;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
-import static io.micronaut.openapi.visitor.SchemaUtils.EMPTY_SCHEMA;
 import static io.micronaut.openapi.visitor.SchemaUtils.EMPTY_SIMPLE_SCHEMA;
 import static io.micronaut.openapi.visitor.SchemaUtils.TYPE_OBJECT;
 import static io.micronaut.openapi.visitor.SchemaUtils.TYPE_STRING;
+import static io.micronaut.openapi.visitor.SchemaUtils.appendSchema;
+import static io.micronaut.openapi.visitor.SchemaUtils.isEmptySchema;
 import static io.micronaut.openapi.visitor.SchemaUtils.setSpecVersion;
 
 /**
@@ -59,6 +60,19 @@ public final class OpenApiNormalizeUtils {
     }
 
     public static void normalizeOpenApi(OpenAPI openAPI, VisitorContext context) {
+
+        if (CollectionUtils.isEmpty(openAPI.getExtensions())) {
+            openAPI.setExtensions(null);
+        }
+
+        if (CollectionUtils.isNotEmpty(openAPI.getServers())) {
+            for (var server : openAPI.getServers()) {
+                if (CollectionUtils.isEmpty(server.getExtensions())) {
+                    server.setExtensions(null);
+                }
+            }
+        }
+
         // Sort paths
         if (openAPI.getPaths() != null) {
             var sortedPaths = new Paths();
@@ -68,6 +82,9 @@ public final class OpenApiNormalizeUtils {
             }
             openAPI.setPaths(sortedPaths);
             for (PathItem pathItem : sortedPaths.values()) {
+                if (CollectionUtils.isEmpty(pathItem.getExtensions())) {
+                    pathItem.setExtensions(null);
+                }
                 normalizeOperation(pathItem.getGet(), context);
                 normalizeOperation(pathItem.getPut(), context);
                 normalizeOperation(pathItem.getPost(), context);
@@ -113,6 +130,9 @@ public final class OpenApiNormalizeUtils {
                 if (parameter == null) {
                     continue;
                 }
+                if (CollectionUtils.isEmpty(parameter.getExtensions())) {
+                    parameter.setExtensions(null);
+                }
                 Schema<?> paramSchema = parameter.getSchema();
                 if (paramSchema == null) {
                     continue;
@@ -131,6 +151,10 @@ public final class OpenApiNormalizeUtils {
                 normalizeExamples(parameter.getExamples());
             }
         }
+        if (CollectionUtils.isEmpty(operation.getExtensions())) {
+            operation.setExtensions(null);
+        }
+
         if (operation.getRequestBody() != null) {
             normalizeContent(operation.getRequestBody().getContent(), context);
         }
@@ -138,6 +162,9 @@ public final class OpenApiNormalizeUtils {
             for (ApiResponse apiResponse : operation.getResponses().values()) {
                 normalizeContent(apiResponse.getContent(), context);
                 normalizeHeaders(apiResponse.getHeaders(), context);
+                if (CollectionUtils.isEmpty(apiResponse.getExtensions())) {
+                    apiResponse.setExtensions(null);
+                }
             }
         }
     }
@@ -148,6 +175,9 @@ public final class OpenApiNormalizeUtils {
         }
 
         for (var header : headers.values()) {
+            if (CollectionUtils.isEmpty(header.getExtensions())) {
+                header.setExtensions(null);
+            }
             Schema<?> headerSchema = header.getSchema();
             if (headerSchema == null) {
                 headerSchema = setSpecVersion(new StringSchema());
@@ -173,6 +203,9 @@ public final class OpenApiNormalizeUtils {
             return;
         }
         for (var mediaType : content.values()) {
+            if (CollectionUtils.isEmpty(mediaType.getExtensions())) {
+                mediaType.setExtensions(null);
+            }
             Schema<?> mediaTypeSchema = mediaType.getSchema();
             if (mediaTypeSchema == null) {
                 continue;
@@ -211,6 +244,10 @@ public final class OpenApiNormalizeUtils {
             var example = examples.get(exampleName);
             if (example == null) {
                 iter.remove();
+                continue;
+            }
+            if (CollectionUtils.isEmpty(example.getExtensions())) {
+                example.setExtensions(null);
             }
         }
     }
@@ -226,11 +263,19 @@ public final class OpenApiNormalizeUtils {
         if (schema == null) {
             return null;
         }
+
+        if (CollectionUtils.isEmpty(schema.getExtensions())) {
+            schema.setExtensions(null);
+        }
+
         List<Schema> allOf = schema.getAllOf();
         if (CollectionUtils.isNotEmpty(allOf)) {
             if (allOf.size() == 1) {
 
                 Schema<?> allOfSchema = allOf.get(0);
+                if (CollectionUtils.isEmpty(allOfSchema.getExtensions())) {
+                    allOfSchema.setExtensions(null);
+                }
 
                 schema.setAllOf(null);
                 // if schema has only allOf block with one item or only defaultValue property or only type
@@ -255,7 +300,7 @@ public final class OpenApiNormalizeUtils {
                 }
                 boolean isSameType = allOfSchema.getType() == null || allOfSchema.getType().equals(type);
 
-                if (SchemaUtils.isEmptySchema(schema)
+                if (isEmptySchema(schema)
                     && (serializedDefaultValue == null || serializedDefaultValue.equals(serializedAllOfDefaultValue))
                     && (type == null || isSameType)) {
                     normalizedSchema = allOfSchema;
@@ -534,6 +579,23 @@ public final class OpenApiNormalizeUtils {
             return;
         }
 
+        // trying to merge allOf schemas
+        var mergedAllOf = new ArrayList<Schema>();
+        Schema firstAllOfSchema = null;
+        for (var innerSchema : schema.getAllOf()) {
+            if (innerSchema.get$ref() != null) {
+                mergedAllOf.add(innerSchema);
+                continue;
+            }
+            if (firstAllOfSchema == null) {
+                firstAllOfSchema = innerSchema;
+                mergedAllOf.add(firstAllOfSchema);
+                continue;
+            }
+            appendSchema(firstAllOfSchema, innerSchema);
+        }
+        schema.setAllOf(mergedAllOf);
+
         var index = 0;
         var innerSchemas = new HashMap<Integer, Schema>();
         for (var s : schema.getAllOf()) {
@@ -549,6 +611,16 @@ public final class OpenApiNormalizeUtils {
         for (var entry : innerSchemas.entrySet()) {
             var innerSchema = entry.getValue();
             innerSchema.setName(null);
+            if (CollectionUtils.isNotEmpty(innerSchema.getExtensions())) {
+                innerSchema.getExtensions().forEach((k, v) -> schema.addExtension(k.toString(), v));
+            }
+            innerSchema.setExtensions(null);
+//            appendSchema(schema, innerSchema, false, true);
+
+            if (schema.getType() == null && innerSchema.getType() != null) {
+                schema.setType(innerSchema.getType());
+                innerSchema.setType(null);
+            }
             if (StringUtils.isNotEmpty(innerSchema.getTitle())) {
                 schema.setTitle(innerSchema.getTitle());
                 innerSchema.setTitle(null);
@@ -609,11 +681,39 @@ public final class OpenApiNormalizeUtils {
                 schema.setReadOnly(innerSchema.getReadOnly());
                 innerSchema.setReadOnly(null);
             }
-            if (EMPTY_SCHEMA.equals(innerSchema)) {
+            if (innerSchema.getAdditionalProperties() != null) {
+                schema.setAdditionalProperties(innerSchema.getAdditionalProperties());
+                innerSchema.setAdditionalProperties(null);
+            }
+
+            if (isEmptySchema(innerSchema) && CollectionUtils.isNotEmpty(schema.getAllOf())) {
                 schema.getAllOf().remove(entry.getKey().intValue());
             }
-            if (schema.getAllOf().isEmpty()) {
+            if (CollectionUtils.isEmpty(schema.getAllOf())) {
                 schema.setAllOf(null);
+                // check case, when schema has only 1 element
+//            } else if (schema.getAllOf().size() == 1) {
+//                var allOf = schema.getAllOf();
+//                var inner = allOf.get(0);
+//                schema.setAllOf(null);
+//                var ref = inner.get$ref();
+//                inner.set$ref(null);
+//                if (isEmptySchema(schema)) {
+//                    schema.set$ref(ref);
+////                    if (!isEmptySchema(innerSchema)) {
+////                        appendSchema(schema, innerSchema);
+////                    }
+////                    schema.setAllOf(null);
+//                } else {
+//                    inner.set$ref(ref);
+//                    schema.setAllOf(allOf);
+//                }
+//                if (inner.get$ref() == null) {
+//                    appendSchema(schema, inner, true, true);
+//                    if (CollectionUtils.isEmpty(schema.getAllOf())) {
+//                        schema.setAllOf(null);
+//                    }
+//                }
             }
         }
     }

@@ -35,13 +35,13 @@ public interface OpenApiConfigProperty {
      * <p>
      * Also, you can set it in your application.yml file like this:
      * <p>
+     * <pre>
      * micronaut:
-     * openapi:
-     * schema:
-     * org.somepackage.MyComplexType: java.lang.String
-     * org.somepackage.MyComplexType2: java.lang.Integer
-     * ...
-     *
+     *   openapi:
+     *     schema:
+     *       org.somepackage.MyComplexType: java.lang.String
+     *       org.somepackage.MyComplexType2: java.lang.Integer
+     * </pre>
      * @deprecated Use `micronaut.openapi.schema.mapping` property instead
      */
     @Deprecated(forRemoval = true)
@@ -55,12 +55,13 @@ public interface OpenApiConfigProperty {
      * <p>
      * Also, you can set it in your application.yml file like this:
      * <p>
+     * <pre>
      * micronaut:
-     * openapi:
-     * schema-postfix:
-     * org.api.v1_0_0: 1_0_0
-     * org.api.v2_0_0: 2_0_0
-     * ...
+     *   openapi:
+     *     schema-postfix:
+     *       org.api.v1_0_0: 1_0_0
+     *       org.api.v2_0_0: 2_0_0
+     * </pre>
      * @deprecated Use `micronaut.openapi.schema.decorator.prefix` property instead
      */
     @Deprecated(forRemoval = true)
@@ -70,6 +71,15 @@ public interface OpenApiConfigProperty {
      */
     @Deprecated(forRemoval = true)
     String MICRONAUT_OPENAPI_SCHEMA_POSTFIX = "micronaut.openapi.schema-postfix";
+
+    /**
+     * Loaded micronaut-http server context path property.
+     */
+    String MICRONAUT_SERVER_CONTEXT_PATH = "micronaut.server.context-path";
+    /**
+     * Loaded micronaut-http-server-netty property (json-view.enabled).
+     */
+    String MICRONAUT_JACKSON_JSON_VIEW_ENABLED = "jackson.json-view.enabled";
 
     /**
      * System property that enables or disables open api annotation processing.
@@ -191,18 +201,17 @@ public interface OpenApiConfigProperty {
      */
     String MICRONAUT_OPENAPI_JSON_VIEW_DEFAULT_INCLUSION = "micronaut.openapi.json.view.default.inclusion";
     /**
-     * micronaut-http server context path property.
-     */
-    String MICRONAUT_SERVER_CONTEXT_PATH = "micronaut.server.context-path";
-    /**
      * micronaut-context application name property.
      */
     String MICRONAUT_APPLICATION_NAME = "micronaut.application.name";
     /**
-     * micronaut-http-server-netty property (json-view.enabled).
+     * If this property is 'true', then generated OpenAPI specification will be with extensions for OpenAPI Generator
+     * and the generated client according to this specification will be much more accurate than without it.
+     * For example, enumerations will be described with extensions `x-enum-varnames`, `x-enum-descriptions` and `x-deprecated`.
+     * <br>
+     * Default: false
      */
-    String MICRONAUT_JACKSON_JSON_VIEW_ENABLED = "jackson.json-view.enabled";
-
+    String MICRONAUT_OPENAPI_SWAGGER_FILE_GENERATION_ENABLED = "micronaut.openapi.swagger.file.generation.enabled";
     /**
      * System property that enables extra schema processing.
      */
@@ -236,6 +245,16 @@ public interface OpenApiConfigProperty {
      * Default: .
      */
     String MICRONAUT_OPENAPI_SCHEMA_NAME_SEPARATOR_INNER_CLASS = "micronaut.openapi.schema.name.separator.inner-class";
+
+    /**
+     * If this property is 'true', then generated OpenAPI specification will be with extensions for OpenAPI Generator
+     * and the generated client according to this specification will be much more accurate than without it.
+     * <p>
+     * For example, enumerations will be described with extensions `x-enum-varnames`, `x-enum-descriptions` and `x-deprecated`.
+     * <br>
+     * Default: true
+     */
+    String MICRONAUT_OPENAPI_GENERATOR_EXTENSIONS_ENABLED = "micronaut.openapi.generator.extensions.enabled";
 
     /**
      * Properties prefix to set custom schema implementations for selected classes.
@@ -326,10 +345,6 @@ public interface OpenApiConfigProperty {
      * OpenAPI file path.
      */
     String MICRONAUT_OPENAPI_ADOC_OPENAPI_PATH = "micronaut.openapi.adoc.openapi.path";
-    /**
-     * OpenAPI file path.
-     */
-    String MICRONAUT_OPENAPI_SWAGGER_FILE_GENERATION_ENABLED = "micronaut.openapi.swagger.file.generation.enabled";
     /**
      * Default openapi config file.
      */

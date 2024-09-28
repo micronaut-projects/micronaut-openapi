@@ -666,6 +666,10 @@ public final class SchemaUtils {
     }
 
     public static Schema<?> appendSchema(Schema<?> s1, Schema<?> s2) {
+        return appendSchema(s1, s2, true, false);
+    }
+
+    public static Schema<?> appendSchema(Schema<?> s1, Schema<?> s2, boolean withBlocks, boolean withErase) {
         if (s1 == null) {
             return s2;
         }
@@ -678,201 +682,404 @@ public final class SchemaUtils {
 
         if ((s1.getType() == null || TYPE_OBJECT.equals(s1.getType())) && s2.getType() != null && !TYPE_OBJECT.equals(s2.getType())) {
             s1.setType(s2.getType());
-            if (s1.getFormat() == null && s2.getFormat() != null) {
-                s1.setFormat(s2.getFormat());
+            if (withErase) {
+                s2.setType(null);
+            }
+        }
+        if (s1.getFormat() == null && s2.getFormat() != null) {
+            s1.setFormat(s2.getFormat());
+            if (withErase) {
+                s2.setFormat(null);
             }
         }
         if (s1.getName() == null && s2.getName() != null) {
             s1.setName(s2.getName());
+            if (withErase) {
+                s2.setName(null);
+            }
         }
         if (s1.getTitle() == null && s2.getTitle() != null) {
             s1.setTitle(s2.getTitle());
+            if (withErase) {
+                s2.setTitle(null);
+            }
         }
         if (s1.getMultipleOf() == null && s2.getMultipleOf() != null) {
             s1.setMultipleOf(s2.getMultipleOf());
+            if (withErase) {
+                s2.setMultipleOf(null);
+            }
         }
         if (s1.getMaximum() == null && s2.getMaximum() != null) {
             s1.setMaximum(s2.getMaximum());
+            if (withErase) {
+                s2.setMaximum(null);
+            }
         }
         if (s1.getExclusiveMaximum() == null && s2.getExclusiveMaximum() != null) {
             s1.setExclusiveMaximum(s2.getExclusiveMaximum());
+            if (withErase) {
+                s2.setExclusiveMaximum(null);
+            }
         }
         if (s1.getMinimum() == null && s2.getMinimum() != null) {
             s1.setMinimum(s2.getMinimum());
+            if (withErase) {
+                s2.setMinimum(null);
+            }
         }
         if (s1.getExclusiveMinimum() == null && s2.getExclusiveMinimum() != null) {
             s1.setExclusiveMinimum(s2.getExclusiveMinimum());
+            if (withErase) {
+                s2.setExclusiveMinimum(null);
+            }
         }
         if (s1.getMaxLength() == null && s2.getMaxLength() != null) {
             s1.setMaxLength(s2.getMaxLength());
+            if (withErase) {
+                s2.setMaxLength(null);
+            }
         }
         if (s1.getMinLength() == null && s2.getMinLength() != null) {
             s1.setMinLength(s2.getMinLength());
+            if (withErase) {
+                s2.setMinLength(null);
+            }
         }
         if (s1.getPattern() == null && s2.getPattern() != null) {
             s1.setPattern(s2.getPattern());
+            if (withErase) {
+                s2.setPattern(null);
+            }
         }
         if (s1.getMaxItems() == null && s2.getMaxItems() != null) {
             s1.setMaxItems(s2.getMaxItems());
+            if (withErase) {
+                s2.setMaxItems(null);
+            }
         }
         if (s1.getMinItems() == null && s2.getMinItems() != null) {
             s1.setMinItems(s2.getMinItems());
+            if (withErase) {
+                s2.setMinItems(null);
+            }
         }
         if (s1.getUniqueItems() == null && s2.getUniqueItems() != null) {
             s1.setUniqueItems(s2.getUniqueItems());
+            if (withErase) {
+                s2.setUniqueItems(null);
+            }
         }
         if (s1.getMaxProperties() == null && s2.getMaxProperties() != null) {
             s1.setMaxProperties(s2.getMaxProperties());
+            if (withErase) {
+                s2.setMaxProperties(null);
+            }
         }
         if (s1.getMinProperties() == null && s2.getMinProperties() != null) {
             s1.setMinProperties(s2.getMinProperties());
+            if (withErase) {
+                s2.setMinProperties(null);
+            }
         }
         if (s1.getRequired() == null && s2.getRequired() != null) {
             s1.setRequired(s2.getRequired());
+            if (withErase) {
+                s2.setRequired(null);
+            }
         }
         if (s1.getType() == null && s2.getType() != null) {
             s1.setType(s2.getType());
+            if (withErase) {
+                s2.setType(null);
+            }
         }
         if (s1.getNot() == null && s2.getNot() != null) {
             s1.setNot(s2.getNot());
+            if (withErase) {
+                s2.setNot(null);
+            }
         }
         if (s1.getProperties() == null && s2.getProperties() != null) {
             s1.setProperties(s2.getProperties());
+            if (withErase) {
+                s2.setProperties(null);
+            }
         }
         if (s1.getAdditionalProperties() == null && s2.getAdditionalProperties() != null) {
             s1.setAdditionalProperties(s2.getAdditionalProperties());
+            if (withErase) {
+                s2.setAdditionalProperties(null);
+            }
         }
         if (s1.getDescription() == null && s2.getDescription() != null) {
             s1.setDescription(s2.getDescription());
+            if (withErase) {
+                s2.setDescription(null);
+            }
         }
         if (s1.get$ref() == null && s2.get$ref() != null) {
             s1.set$ref(s2.get$ref());
+            if (withErase) {
+                s2.set$ref(null);
+            }
         }
         if (s1.getNullable() == null && s2.getNullable() != null) {
             s1.setNullable(s2.getNullable());
+            if (withErase) {
+                s2.setNullable(null);
+            }
         }
         if (s1.getReadOnly() == null && s2.getReadOnly() != null) {
             s1.setReadOnly(s2.getReadOnly());
+            if (withErase) {
+                s2.setReadOnly(null);
+            }
         }
         if (s1.getWriteOnly() == null && s2.getWriteOnly() != null) {
             s1.setWriteOnly(s2.getWriteOnly());
+            if (withErase) {
+                s2.setWriteOnly(null);
+            }
+        }
+        if (!s1.getExampleSetFlag() && s2.getExampleSetFlag()) {
+            s1.setExampleSetFlag(s2.getExampleSetFlag());
+            s1.setExample(s2.getExample());
+            if (withErase) {
+                s2.setExample(null);
+                s2.setExampleSetFlag(false);
+            }
         }
         if (s1.getExample() == null && s2.getExample() != null) {
             s1.setExample(s2.getExample());
+            if (withErase) {
+                s2.setExample(null);
+            }
         }
         if (s1.getExternalDocs() == null && s2.getExternalDocs() != null) {
             s1.setExternalDocs(s2.getExternalDocs());
+            if (withErase) {
+                s2.setExternalDocs(null);
+            }
         }
         if (s1.getDeprecated() == null && s2.getDeprecated() != null) {
             s1.setDeprecated(s2.getDeprecated());
+            if (withErase) {
+                s2.setDeprecated(null);
+            }
         }
         if (s1.getXml() == null && s2.getXml() != null) {
             s1.setXml(s2.getXml());
+            if (withErase) {
+                s2.setXml(null);
+            }
         }
         if (s1.getExtensions() == null && s2.getExtensions() != null) {
             s1.setExtensions(s2.getExtensions());
+            if (withErase) {
+                s2.setExtensions(null);
+            }
         }
         if (s1.getDiscriminator() == null && s2.getDiscriminator() != null) {
             s1.setDiscriminator(s2.getDiscriminator());
+            if (withErase) {
+                s2.setDiscriminator(null);
+            }
         }
         if (s1.getPrefixItems() == null && s2.getPrefixItems() != null) {
             s1.setPrefixItems(s2.getPrefixItems());
+            if (withErase) {
+                s2.setPrefixItems(null);
+            }
         }
         if (s1.getElse() == null && s2.getElse() != null) {
             s1.setElse(s2.getElse());
+            if (withErase) {
+                s2.setElse(null);
+            }
         }
-        if (s1.getAnyOf() == null && s2.getAnyOf() != null) {
-            s1.setAnyOf(s2.getAnyOf());
-        }
-        if (s1.getOneOf() == null && s2.getOneOf() != null) {
-            s1.setOneOf(s2.getOneOf());
+        if (withBlocks) {
+            if (s1.getAnyOf() == null && s2.getAnyOf() != null) {
+                s1.setAnyOf(s2.getAnyOf());
+            }
+            if (s1.getOneOf() == null && s2.getOneOf() != null) {
+                s1.setOneOf(s2.getOneOf());
+            }
         }
         if (s1.getItems() == null && s2.getItems() != null) {
             s1.setItems(s2.getItems());
+            if (withErase) {
+                s2.setItems(null);
+            }
         }
         if (s1.getTypes() == null && s2.getTypes() != null) {
             s1.setTypes(s2.getTypes());
+            if (withErase) {
+                s2.setTypes(null);
+            }
         }
+
         if (s1.getPatternProperties() == null && s2.getPatternProperties() != null) {
             s1.setPatternProperties(s2.getPatternProperties());
+            if (withErase) {
+                s2.setPatternProperties(null);
+            }
         }
         if (s1.getExclusiveMaximumValue() == null && s2.getExclusiveMaximumValue() != null) {
             s1.setExclusiveMaximumValue(s2.getExclusiveMaximumValue());
+            if (withErase) {
+                s2.setExclusiveMaximumValue(null);
+            }
         }
         if (s1.getExclusiveMinimumValue() == null && s2.getExclusiveMinimumValue() != null) {
             s1.setExclusiveMinimumValue(s2.getExclusiveMinimumValue());
+            if (withErase) {
+                s2.setExclusiveMinimumValue(null);
+            }
         }
         if (s1.getContains() == null && s2.getContains() != null) {
             s1.setContains(s2.getContains());
+            if (withErase) {
+                s2.setContains(null);
+            }
         }
         if (s1.get$id() == null && s2.get$id() != null) {
             s1.set$id(s2.get$id());
+            if (withErase) {
+                s2.set$id(null);
+            }
         }
         if (s1.get$schema() == null && s2.get$schema() != null) {
             s1.set$schema(s2.get$schema());
+            if (withErase) {
+                s2.set$schema(null);
+            }
         }
         if (s1.get$anchor() == null && s2.get$anchor() != null) {
             s1.set$anchor(s2.get$anchor());
+            if (withErase) {
+                s2.set$anchor(null);
+            }
         }
         if (s1.get$vocabulary() == null && s2.get$vocabulary() != null) {
             s1.set$vocabulary(s2.get$vocabulary());
+            if (withErase) {
+                s2.set$vocabulary(null);
+            }
         }
         if (s1.get$dynamicAnchor() == null && s2.get$dynamicAnchor() != null) {
             s1.set$dynamicAnchor(s2.get$dynamicAnchor());
+            if (withErase) {
+                s2.set$dynamicAnchor(null);
+            }
         }
         if (s1.getContentEncoding() == null && s2.getContentEncoding() != null) {
             s1.setContentEncoding(s2.getContentEncoding());
+            if (withErase) {
+                s2.setContentEncoding(null);
+            }
         }
         if (s1.getContentMediaType() == null && s2.getContentMediaType() != null) {
             s1.setContentMediaType(s2.getContentMediaType());
+            if (withErase) {
+                s2.setContentMediaType(null);
+            }
         }
         if (s1.getContentSchema() == null && s2.getContentSchema() != null) {
             s1.setContentSchema(s2.getContentSchema());
+            if (withErase) {
+                s2.setContentSchema(null);
+            }
         }
         if (s1.getPropertyNames() == null && s2.getPropertyNames() != null) {
             s1.setPropertyNames(s2.getPropertyNames());
+            if (withErase) {
+                s2.setPropertyNames(null);
+            }
         }
         if (s1.getUnevaluatedProperties() == null && s2.getUnevaluatedProperties() != null) {
             s1.setUnevaluatedProperties(s2.getUnevaluatedProperties());
+            if (withErase) {
+                s2.setUnevaluatedProperties(null);
+            }
         }
         if (s1.getMaxContains() == null && s2.getMaxContains() != null) {
             s1.setMaxContains(s2.getMaxContains());
+            if (withErase) {
+                s2.setMaxContains(null);
+            }
         }
         if (s1.getMinContains() == null && s2.getMinContains() != null) {
             s1.setMinContains(s2.getMinContains());
+            if (withErase) {
+                s2.setMinContains(null);
+            }
         }
         if (s1.getAdditionalItems() == null && s2.getAdditionalItems() != null) {
             s1.setAdditionalItems(s2.getAdditionalItems());
+            if (withErase) {
+                s2.setAdditionalItems(null);
+            }
         }
         if (s1.getUnevaluatedItems() == null && s2.getUnevaluatedItems() != null) {
             s1.setUnevaluatedItems(s2.getUnevaluatedItems());
+            if (withErase) {
+                s2.setUnevaluatedItems(null);
+            }
         }
         if (s1.getIf() == null && s2.getIf() != null) {
             s1.setIf(s2.getIf());
+            if (withErase) {
+                s2.setIf(null);
+            }
         }
         if (s1.getThen() == null && s2.getThen() != null) {
             s1.setThen(s2.getThen());
+            if (withErase) {
+                s2.setThen(null);
+            }
         }
         if (s1.getDependentSchemas() == null && s2.getDependentSchemas() != null) {
             s1.setDependentSchemas(s2.getDependentSchemas());
+            if (withErase) {
+                s2.setDependentSchemas(null);
+            }
         }
         if (s1.getDependentRequired() == null && s2.getDependentRequired() != null) {
             s1.setDependentRequired(s2.getDependentRequired());
+            if (withErase) {
+                s2.setDependentRequired(null);
+            }
         }
         if (s1.get$comment() == null && s2.get$comment() != null) {
             s1.set$comment(s2.get$comment());
+            if (withErase) {
+                s2.set$comment(null);
+            }
         }
         if (s1.getExamples() == null && s2.getExamples() != null) {
             s1.setExamples((List) s2.getExamples());
+            if (withErase) {
+                s2.setExamples(null);
+            }
         }
         if (s1.getBooleanSchemaValue() == null && s2.getBooleanSchemaValue() != null) {
             s1.setBooleanSchemaValue(s2.getBooleanSchemaValue());
+            if (withErase) {
+                s2.setBooleanSchemaValue(null);
+            }
         }
         if (s1.getJsonSchema() == null && s2.getJsonSchema() != null) {
             s1.setJsonSchema(s2.getJsonSchema());
+            if (withErase) {
+                s2.setJsonSchema(null);
+            }
         }
         if (s1.getJsonSchemaImpl() == null && s2.getJsonSchemaImpl() != null) {
             s1.setJsonSchemaImpl(s2.getJsonSchemaImpl());
+            if (withErase) {
+                s2.setJsonSchemaImpl(null);
+            }
         }
         return s1;
     }
