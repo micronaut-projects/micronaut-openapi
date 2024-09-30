@@ -8,9 +8,10 @@ dependencies {
     // add to annotationProcessor and compileOnly blocks next libraries:
 
     annotationProcessor("io.micronaut:micronaut-inject-java:$micronautCoreVersion")
-    annotationProcessor("io.micronaut.spring:micronaut-spring-annotation:$micronautSpringVersion")
-    annotationProcessor("io.micronaut.spring:micronaut-spring-web-annotation:$micronautSpringVersion")
-    annotationProcessor("io.micronaut.spring:micronaut-spring-boot-annotation:$micronautSpringVersion")
+    annotationProcessor(platfom("io.micronaut.spring:micronaut-spring-bom:$micronautSpringVersion"))
+    annotationProcessor("io.micronaut.spring:micronaut-spring-annotation")
+    annotationProcessor("io.micronaut.spring:micronaut-spring-web-annotation")
+    annotationProcessor("io.micronaut.spring:micronaut-spring-boot-annotation")
     annotationProcessor("io.micronaut.openapi:micronaut-openapi:$micronautOpenapiVersion")
 
     compileOnly("io.micronaut:micronaut-inject-java:$micronautCoreVersion")

@@ -8,7 +8,6 @@ pluginManagement {
 
 plugins {
     id 'io.micronaut.build.shared.settings' version '7.2.1'
-    id "dev.aga.gradle.version-catalog-generator" version "1.5.0"
 }
 enableFeaturePreview 'TYPESAFE_PROJECT_ACCESSORS'
 
@@ -36,9 +35,6 @@ include 'test-suite-generator-util'
 dependencyResolutionManagement {
     repositories {
         mavenCentral()
-    }
-    versionCatalogs {
-        generator.generate("spring") { from(toml("spring-boot-dependencies")) }
     }
 }
 
