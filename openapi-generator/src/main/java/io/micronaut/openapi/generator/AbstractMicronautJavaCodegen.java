@@ -512,6 +512,12 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
         }
         writePropertyBack(OPT_GENERATE_OPERATION_ONLY_FOR_FIRST_TAG, generateOperationOnlyForFirstTag);
 
+        if (additionalProperties.containsKey(USE_JAKARTA_EE)) {
+            setUseJakartaEe(convertPropertyToBoolean(USE_JAKARTA_EE));
+        }
+        writePropertyBack(USE_JAKARTA_EE, useJakartaEe);
+        writePropertyBack(JAVAX_PACKAGE, useJakartaEe ? "jakarta" : "javax");
+
         maybeSetTestTool();
         writePropertyBack(OPT_TEST, testTool);
         if (testTool.equals(OPT_TEST_JUNIT)) {
@@ -539,9 +545,6 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
         String resourceFolder = projectFolder + "/resources";
         supportingFiles.add(new SupportingFile("common/configuration/application.yml.mustache", resourceFolder, "application.yml").doNotOverwrite());
         supportingFiles.add(new SupportingFile("common/configuration/logback.xml.mustache", resourceFolder, "logback.xml").doNotOverwrite());
-
-        // Use jakarta instead of javax
-        additionalProperties.put("javaxPackage", "jakarta");
 
         // Use the default java time
         switch (dateLibrary) {

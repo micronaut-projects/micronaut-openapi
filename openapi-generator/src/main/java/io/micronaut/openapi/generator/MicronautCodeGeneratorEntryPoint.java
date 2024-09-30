@@ -201,6 +201,7 @@ public final class MicronautCodeGeneratorEntryPoint {
                 javaCodeGen.setAdditionalOneOfTypeAnnotations(options.additionalOneOfTypeAnnotations);
             }
 
+            javaCodeGen.setUseJakartaEe(options.useJakartaEe);
             javaCodeGen.setUseOneOfInterfaces(options.useOneOfInterfaces);
             javaCodeGen.setReactive(options.reactive);
             javaCodeGen.setGenerateHttpResponseAlways(options.generateHttpResponseAlways);
@@ -282,6 +283,7 @@ public final class MicronautCodeGeneratorEntryPoint {
                 kotlinCodeGen.setAdditionalOneOfTypeAnnotations(options.additionalOneOfTypeAnnotations);
             }
 
+            kotlinCodeGen.setUseJakartaEe(options.useJakartaEe);
             kotlinCodeGen.setUseOneOfInterfaces(options.useOneOfInterfaces);
             kotlinCodeGen.setReactive(options.reactive);
             kotlinCodeGen.setGenerateHttpResponseAlways(options.generateHttpResponseAlways);
@@ -530,6 +532,7 @@ public final class MicronautCodeGeneratorEntryPoint {
 
             private String apiPackage;
             private String artifactId;
+            private boolean useJakartaEe = true;
             private boolean beanValidation = true;
             private boolean useEnumCaseInsensitive;
             private String invokerPackage;
@@ -791,6 +794,12 @@ public final class MicronautCodeGeneratorEntryPoint {
                 return this;
             }
 
+            @Override
+            public MicronautCodeGeneratorOptionsBuilder withUseJakartaEe(boolean useJakartaEe) {
+                this.useJakartaEe = useJakartaEe;
+                return this;
+            }
+
             private Options build() {
                 return new Options(
                     lang,
@@ -798,6 +807,7 @@ public final class MicronautCodeGeneratorEntryPoint {
                     modelPackage,
                     invokerPackage,
                     artifactId,
+                    useJakartaEe,
                     parameterMappings,
                     responseBodyMappings,
                     schemaMapping,
@@ -860,6 +870,7 @@ public final class MicronautCodeGeneratorEntryPoint {
         String modelPackage,
         String invokerPackage,
         String artifactId,
+        boolean useJakartaEe,
         List<ParameterMapping> parameterMappings,
         List<ResponseBodyMapping> responseBodyMappings,
         Map<String, String> schemaMapping,

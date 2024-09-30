@@ -326,6 +326,15 @@ public interface MicronautCodeGeneratorOptionsBuilder {
     MicronautCodeGeneratorOptionsBuilder withAdditionalProperties(Map<String, Object> additionalProperties);
 
     /**
+     * Flag to indicate whether to use the "jakarta" or "javax" package.
+     *
+     * @param useJakartaEe if true, then use the "jakarta" package, otherwise - "javax".
+     *
+     * @return this builder
+     */
+    MicronautCodeGeneratorOptionsBuilder withUseJakartaEe(boolean useJakartaEe);
+
+    /**
      * The possible date-time formatting configurations.
      */
     enum DateTimeFormat {
