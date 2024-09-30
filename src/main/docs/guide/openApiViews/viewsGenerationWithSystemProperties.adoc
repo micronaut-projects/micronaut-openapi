@@ -33,7 +33,6 @@ kapt {
         arg("micronaut.openapi.views.spec", "redoc.enabled=true,rapidoc.enabled=true,openapi-explorer.enabled=true,swagger-ui.enabled=true,swagger-ui.theme=flattop")
     }
 }
-
 ----
 or in Gradle for Java projects:
 
