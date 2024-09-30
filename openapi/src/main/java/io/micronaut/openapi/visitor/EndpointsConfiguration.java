@@ -15,14 +15,8 @@
  */
 package io.micronaut.openapi.visitor;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import io.micronaut.core.util.StringUtils;
 import io.micronaut.inject.visitor.VisitorContext;
 import io.micronaut.openapi.OpenApiUtils;
@@ -30,8 +24,13 @@ import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.servers.Server;
 import io.swagger.v3.oas.models.tags.Tag;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
 import static io.micronaut.openapi.visitor.ContextUtils.warn;
 import static io.micronaut.openapi.visitor.StringUtil.COMMA;

@@ -68,8 +68,8 @@ public class OpenApiExtraSchemaVisitor implements TypeElementVisitor<OpenAPIExtr
     @Override
     public Set<String> getSupportedAnnotationNames() {
         return CollectionUtils.setOf(
-                OpenAPIExtraSchema.class.getName(),
-                OpenAPIExtraSchemas.class.getName()
+            OpenAPIExtraSchema.class.getName(),
+            OpenAPIExtraSchemas.class.getName()
         );
     }
 
@@ -139,10 +139,10 @@ public class OpenApiExtraSchemaVisitor implements TypeElementVisitor<OpenAPIExtr
 
             // Classes with annotation without these members we process as extra schema
             if (isEmpty(classes)
-                    && isEmpty(excludeClasses)
-                    && isEmpty(excludeClassNames)
-                    && isEmpty(packages)
-                    && isEmpty(excludePackages)) {
+                && isEmpty(excludeClasses)
+                && isEmpty(excludeClassNames)
+                && isEmpty(packages)
+                && isEmpty(excludePackages)) {
                 processExtraSchemaClass(element, context);
                 continue;
             }

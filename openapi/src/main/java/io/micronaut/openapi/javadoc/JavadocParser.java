@@ -15,10 +15,6 @@
  */
 package io.micronaut.openapi.javadoc;
 
-import java.util.Set;
-
-import io.micronaut.core.util.CollectionUtils;
-
 import com.github.chhorz.javadoc.JavaDoc;
 import com.github.chhorz.javadoc.JavaDocParserBuilder;
 import com.github.chhorz.javadoc.OutputType;
@@ -26,6 +22,9 @@ import com.github.chhorz.javadoc.tags.ParamTag;
 import com.github.chhorz.javadoc.tags.PropertyTag;
 import com.github.chhorz.javadoc.tags.ReturnTag;
 import com.vladsch.flexmark.html2md.converter.FlexmarkHtmlConverter;
+import io.micronaut.core.util.CollectionUtils;
+
+import java.util.Set;
 
 /**
  * Very simple javadoc parser that can used to parse out the first paragraph description and parameter / return descriptions.

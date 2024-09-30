@@ -276,10 +276,11 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
     }
 
     private void processExternalDocs(ClassElement element, VisitorContext context) {
-        var externalDocsAnn = element.findAnnotation(io.swagger.v3.oas.annotations.ExternalDocumentation.class);
-        classExternalDocs = externalDocsAnn
-            .flatMap(o -> toValue(o.getValues(), context, ExternalDocumentation.class, null))
-            .orElse(null);
+        var externalDocsAnn = element.findAnnotation(io.swagger.v3.oas.annotations.ExternalDocumentation.class).orElse(null);
+        if (externalDocsAnn == null) {
+            return;
+        }
+        classExternalDocs = toValue(externalDocsAnn.getValues(), context, ExternalDocumentation.class, null);
     }
 
     private boolean containsTag(String name, List<Tag> tags) {
@@ -525,8 +526,8 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
     }
 
     private void addParamsByUriTemplate(String path, Map<String, UriMatchVariable> pathVariables,
-                                               Map<String, UriMatchVariable> queryParams,
-                                               Operation operation) {
+                                        Map<String, UriMatchVariable> queryParams,
+                                        Operation operation) {
 
         // check path variables in URL template which do not map to method parameters
         for (var entry : pathVariables.entrySet()) {
@@ -1371,7 +1372,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         Operation operation;
         HttpMethod method;
         if (operationAnn != null) {
-            operation = toValue(operationAnn.getValues(), context, Operation.class, null).orElse(null);
+            operation = toValue(operationAnn.getValues(), context, Operation.class, null);
             method = HttpMethod.parse(operationAnn.stringValue(PROP_METHOD).orElse(httpMethod.name()));
         } else {
             operation = new Operation();
@@ -1384,20 +1385,21 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
 
     private Map<PathItem, Operation> readOperations(String path, HttpMethod httpMethod, List<PathItem> pathItems, MethodElement element, VisitorContext context, @Nullable ClassElement jsonViewClass) {
         var swaggerOperations = new HashMap<PathItem, Operation>(pathItems.size());
-        var operationAnn = element.findAnnotation(io.swagger.v3.oas.annotations.Operation.class);
+        var operationAnn = element.findAnnotation(io.swagger.v3.oas.annotations.Operation.class).orElse(null);
 
         for (PathItem pathItem : pathItems) {
-            var swaggerOperation = operationAnn
-                .flatMap(o -> toValue(o.getValues(), context, Operation.class, jsonViewClass))
-                .orElse(new Operation());
+            var swaggerOperation = operationAnn != null ? toValue(operationAnn.getValues(), context, Operation.class, jsonViewClass) : null;
+            if (swaggerOperation == null) {
+                swaggerOperation = new Operation();
+            }
 
             if (CollectionUtils.isNotEmpty(swaggerOperation.getParameters())) {
                 swaggerOperation.getParameters().removeIf(Objects::isNull);
             }
 
             ParameterElement[] methodParams = element.getParameters();
-            if (ArrayUtils.isNotEmpty(methodParams) && operationAnn.isPresent()) {
-                var paramAnns = operationAnn.get().getAnnotations(PROP_PARAMETERS, io.swagger.v3.oas.annotations.Parameter.class);
+            if (ArrayUtils.isNotEmpty(methodParams) && operationAnn != null) {
+                var paramAnns = operationAnn.getAnnotations(PROP_PARAMETERS, io.swagger.v3.oas.annotations.Parameter.class);
                 if (CollectionUtils.isNotEmpty(paramAnns)) {
                     for (ParameterElement methodParam : methodParams) {
                         AnnotationValue<io.swagger.v3.oas.annotations.Parameter> paramAnn = null;
@@ -1550,11 +1552,11 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
     }
 
     private ExternalDocumentation readExternalDocs(MethodElement element, VisitorContext context) {
-        var externalDocsAnn = element.findAnnotation(io.swagger.v3.oas.annotations.ExternalDocumentation.class);
-
-        return externalDocsAnn
-            .flatMap(o -> toValue(o.getValues(), context, ExternalDocumentation.class, null))
-            .orElse(null);
+        var externalDocsAnn = element.findAnnotation(io.swagger.v3.oas.annotations.ExternalDocumentation.class).orElse(null);
+        if (externalDocsAnn == null) {
+            return null;
+        }
+        return toValue(externalDocsAnn.getValues(), context, ExternalDocumentation.class, null);
     }
 
     private void readSecurityRequirements(MethodElement element, String path, Operation operation, VisitorContext context) {
@@ -1727,9 +1729,8 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                 if (apiResponses.containsKey(responseCode)) {
                     continue;
                 }
-                Optional<ApiResponse> newResponse = toValue(responseAnn.getValues(), context, ApiResponse.class, jsonViewClass);
-                if (newResponse.isPresent()) {
-                    ApiResponse newApiResponse = newResponse.get();
+                ApiResponse newApiResponse = toValue(responseAnn.getValues(), context, ApiResponse.class, jsonViewClass);
+                if (newApiResponse != null) {
                     if (responseAnn.booleanValue("useReturnTypeSchema").orElse(false) && element != null) {
                         addResponseContent(element, context, Utils.resolveOpenApi(context), newApiResponse, jsonViewClass);
                     } else {
@@ -1797,7 +1798,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
 
         var jsonViewClass = element instanceof ParameterElement ? getJsonViewClass(element, context) : null;
 
-        RequestBody requestBody = toValue(requestBodyAnn.getValues(), context, RequestBody.class, jsonViewClass).orElse(null);
+        RequestBody requestBody = toValue(requestBodyAnn.getValues(), context, RequestBody.class, jsonViewClass);
         // if media type doesn't set in swagger annotation, check micronaut annotation
         if (contentAnn != null
             && contentAnn.stringValue(PROP_MEDIA_TYPE).isEmpty()
@@ -1868,9 +1869,14 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         var pathItem = new PathItem();
         if (CollectionUtils.isNotEmpty(operationAnns)) {
             for (var operationAnn : operationAnns) {
-                final Optional<HttpMethod> operationMethod = operationAnn.get(PROP_METHOD, HttpMethod.class);
-                operationMethod.ifPresent(httpMethod -> toValue(operationAnn.getValues(), context, Operation.class, jsonViewClass)
-                    .ifPresent(op -> setOperationOnPathItem(pathItem, httpMethod, op)));
+                HttpMethod httpMethod = operationAnn.get(PROP_METHOD, HttpMethod.class).orElse(null);
+                if (httpMethod == null) {
+                    continue;
+                }
+                var op = toValue(operationAnn.getValues(), context, Operation.class, jsonViewClass);
+                if (op != null) {
+                    setOperationOnPathItem(pathItem, httpMethod, op);
+                }
             }
         }
         Map<String, Callback> callbacks = initCallbacks(operation);
@@ -2103,8 +2109,10 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
     final List<Tag> readTags(List<AnnotationValue<io.swagger.v3.oas.annotations.tags.Tag>> tagAnns, VisitorContext context) {
         var tags = new ArrayList<Tag>();
         for (var tagAnn : tagAnns) {
-            toValue(tagAnn.getValues(), context, Tag.class, null)
-                .ifPresent(tags::add);
+            var tag = toValue(tagAnn.getValues(), context, Tag.class, null);
+            if (tag != null) {
+                tags.add(tag);
+            }
         }
         return tags;
     }

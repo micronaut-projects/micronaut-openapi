@@ -15,10 +15,7 @@
  */
 package io.micronaut.openapi.visitor;
 
-import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
 
 /**
  * Helper class for handling two values.
@@ -48,10 +45,6 @@ public final class Pair<S, T> {
 
     public T getSecond() {
         return second;
-    }
-
-    public static <S, T> Collector<Pair<S, T>, ?, Map<S, T>> toMap() {
-        return Collectors.toMap(Pair::getFirst, Pair::getSecond);
     }
 
     @Override

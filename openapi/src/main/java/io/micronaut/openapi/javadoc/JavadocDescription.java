@@ -15,10 +15,10 @@
  */
 package io.micronaut.openapi.javadoc;
 
+import io.micronaut.core.annotation.Nullable;
+
 import java.util.HashMap;
 import java.util.Map;
-
-import io.micronaut.core.annotation.Nullable;
 
 /**
  * A parsed javadoc description.

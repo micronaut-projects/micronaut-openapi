@@ -15,14 +15,14 @@
  */
 package io.micronaut.openapi.annotation.transformers;
 
+import io.micronaut.core.annotation.AnnotationValue;
+import io.micronaut.inject.annotation.TypedAnnotationTransformer;
+import io.micronaut.inject.visitor.VisitorContext;
+
 import java.lang.annotation.Annotation;
 import java.lang.annotation.RetentionPolicy;
 import java.util.Collections;
 import java.util.List;
-
-import io.micronaut.core.annotation.AnnotationValue;
-import io.micronaut.inject.annotation.TypedAnnotationTransformer;
-import io.micronaut.inject.visitor.VisitorContext;
 
 /**
  * Changes the Retention Policy of the annotation to SOURCE.

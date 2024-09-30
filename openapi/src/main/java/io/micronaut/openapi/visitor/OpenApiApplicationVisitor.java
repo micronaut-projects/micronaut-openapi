@@ -53,7 +53,6 @@ import io.swagger.v3.oas.models.servers.Server;
 import io.swagger.v3.oas.models.tags.Tag;
 
 import java.io.IOException;
-import java.io.Serial;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.nio.file.DirectoryStream;
@@ -68,7 +67,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
@@ -218,9 +216,9 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
      *
      * @param element The element
      * @param context The visitor context
-     * @param openAPI The {@link OpenAPI} object for the application
+     * @param openApi The {@link OpenAPI} object for the application
      */
-    private void mergeAdditionalSwaggerFiles(ClassElement element, VisitorContext context, OpenAPI openAPI) {
+    private void mergeAdditionalSwaggerFiles(ClassElement element, VisitorContext context, OpenAPI openApi) {
         String additionalSwaggerFiles = getConfigProperty(MICRONAUT_OPENAPI_ADDITIONAL_FILES, context);
         if (StringUtils.isEmpty(additionalSwaggerFiles)) {
             return;
@@ -231,8 +229,11 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             return;
         }
         info("Merging Swagger OpenAPI YAML and JSON files from location: " + directory, context);
-        try (DirectoryStream<Path> stream = Files.newDirectoryStream(directory, path -> FileUtils.isYaml(path.toString().toLowerCase()) || path.toString().toLowerCase().endsWith(EXT_JSON))) {
-            stream.forEach(path -> {
+        try (DirectoryStream<Path> paths = Files.newDirectoryStream(directory, path -> {
+            var pathStr = path.toString().toLowerCase();
+            return FileUtils.isYaml(pathStr) || FileUtils.isJson(pathStr);
+        })) {
+            for (var path : paths) {
                 boolean isYaml = FileUtils.isYaml(path.toString().toLowerCase());
                 info("Reading Swagger OpenAPI " + (isYaml ? "YAML" : "JSON") + " file " + path.getFileName(), context);
                 OpenAPI parsedOpenApi = null;
@@ -241,30 +242,43 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                 } catch (IOException e) {
                     warn("Unable to read file " + path.getFileName() + ": " + e.getMessage(), context, element);
                 }
-                copyOpenApi(openAPI, parsedOpenApi);
-            });
+                copyOpenApi(openApi, parsedOpenApi);
+            }
         } catch (IOException e) {
             warn("Unable to read  file from " + directory + ": " + e.getMessage(), context, element);
         }
     }
 
     private OpenAPI readOpenApi(ClassElement element, VisitorContext context) {
-        return element.findAnnotation(OpenAPIDefinition.class).flatMap(o -> {
-            Optional<OpenAPI> result = toValue(o.getValues(), context, OpenAPI.class, null);
-            result.ifPresent(openApi -> {
-                if (Utils.isOpenapi31()) {
-                    openApi.openapi(OpenApiUtils.OPENAPI_31_VERSION)
-                        .jsonSchemaDialect(ConfigUtils.getJsonSchemaDialect(context))
-                        .specVersion(SpecVersion.V31);
-                }
-                var securityRequirements = new ArrayList<SecurityRequirement>();
-                for (var secRequirementAnn : o.getAnnotations(PROP_SECURITY, io.swagger.v3.oas.annotations.security.SecurityRequirement.class)) {
-                    securityRequirements.add(ConvertUtils.mapToSecurityRequirement(secRequirementAnn));
-                }
-                openApi.setSecurity(securityRequirements);
-            });
-            return result;
-        }).orElse(new OpenAPI());
+        var openApiDefAnn = element.findAnnotation(OpenAPIDefinition.class).orElse(null);
+        if (openApiDefAnn == null) {
+            var openApi = new OpenAPI();
+            if (Utils.isOpenapi31()) {
+                openApi.openapi(OpenApiUtils.OPENAPI_31_VERSION)
+                    .jsonSchemaDialect(ConfigUtils.getJsonSchemaDialect(context))
+                    .specVersion(SpecVersion.V31);
+            }
+            return openApi;
+        }
+
+        var openApi = toValue(openApiDefAnn.getValues(), context, OpenAPI.class, null);
+        if (openApi == null) {
+            openApi = new OpenAPI();
+        }
+        if (Utils.isOpenapi31()) {
+            openApi.openapi(OpenApiUtils.OPENAPI_31_VERSION)
+                .jsonSchemaDialect(ConfigUtils.getJsonSchemaDialect(context))
+                .specVersion(SpecVersion.V31);
+        }
+        var secRequirementAnns = openApiDefAnn.getAnnotations(PROP_SECURITY, io.swagger.v3.oas.annotations.security.SecurityRequirement.class);
+        if (CollectionUtils.isNotEmpty(secRequirementAnns)) {
+            var securityRequirements = new ArrayList<SecurityRequirement>();
+            for (var secRequirementAnn : secRequirementAnns) {
+                securityRequirements.add(ConvertUtils.mapToSecurityRequirement(secRequirementAnn));
+            }
+            openApi.setSecurity(securityRequirements);
+        }
+        return openApi;
     }
 
     private void renderViews(String title, Map<Pair<String, String>, OpenApiInfo> openApiInfos, Path destinationDir, VisitorContext context) throws IOException {
@@ -283,52 +297,57 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         if (name == null) {
             return null;
         }
-        return switch (name.toUpperCase(Locale.US)) {
-            case "LOWER_CAMEL_CASE" -> new LowerCamelCasePropertyNamingStrategy();
-            case "UPPER_CAMEL_CASE" -> (PropertyNamingStrategies.NamingBase) PropertyNamingStrategies.UPPER_CAMEL_CASE;
-            case "SNAKE_CASE" -> (PropertyNamingStrategies.NamingBase) PropertyNamingStrategies.SNAKE_CASE;
-            case "UPPER_SNAKE_CASE" -> (PropertyNamingStrategies.NamingBase) PropertyNamingStrategies.UPPER_SNAKE_CASE;
-            case "LOWER_CASE" -> (PropertyNamingStrategies.NamingBase) PropertyNamingStrategies.LOWER_CASE;
-            case "KEBAB_CASE" -> (PropertyNamingStrategies.NamingBase) PropertyNamingStrategies.KEBAB_CASE;
-            case "LOWER_DOT_CASE" -> (PropertyNamingStrategies.NamingBase) PropertyNamingStrategies.LOWER_DOT_CASE;
+        var strategy = switch (name.toUpperCase(Locale.ENGLISH)) {
+            case "LOWER_CAMEL_CASE" -> PropertyNamingStrategies.LOWER_CAMEL_CASE;
+            case "UPPER_CAMEL_CASE" -> PropertyNamingStrategies.UPPER_CAMEL_CASE;
+            case "SNAKE_CASE" -> PropertyNamingStrategies.SNAKE_CASE;
+            case "UPPER_SNAKE_CASE" -> PropertyNamingStrategies.UPPER_SNAKE_CASE;
+            case "LOWER_CASE" -> PropertyNamingStrategies.LOWER_CASE;
+            case "KEBAB_CASE" -> PropertyNamingStrategies.KEBAB_CASE;
+            case "LOWER_DOT_CASE" -> PropertyNamingStrategies.LOWER_DOT_CASE;
             default -> null;
         };
+        return (PropertyNamingStrategies.NamingBase) strategy;
     }
 
     private void applyPropertyNamingStrategy(OpenAPI openAPI, VisitorContext context) {
-        final String namingStrategyName = getConfigProperty(MICRONAUT_OPENAPI_PROPERTY_NAMING_STRATEGY, context);
-        final PropertyNamingStrategies.NamingBase propertyNamingStrategy = fromName(namingStrategyName);
-        if (propertyNamingStrategy != null) {
-            info("Using " + namingStrategyName + " property naming strategy.", context);
-            if (openAPI.getComponents() != null && CollectionUtils.isNotEmpty(openAPI.getComponents().getSchemas())) {
-                openAPI.getComponents().getSchemas().values().forEach(model -> {
-                    Map<String, Schema> properties = model.getProperties();
-                    if (properties != null) {
-                        Map<String, Schema> newProperties = properties.entrySet().stream()
-                            .collect(Collectors.toMap(entry -> propertyNamingStrategy.translate(entry.getKey()),
-                                Map.Entry::getValue, (prop1, prop2) -> prop1, LinkedHashMap::new));
-                        model.getProperties().clear();
-                        model.setProperties(newProperties);
-                    }
-                    List<String> required = model.getRequired();
-                    if (required != null) {
-                        List<String> updatedRequired = required.stream().map(propertyNamingStrategy::translate).toList();
-                        required.clear();
-                        required.addAll(updatedRequired);
-                    }
-                });
+        var namingStrategyName = getConfigProperty(MICRONAUT_OPENAPI_PROPERTY_NAMING_STRATEGY, context);
+        var propertyNamingStrategy = fromName(namingStrategyName);
+        if (propertyNamingStrategy == null) {
+            return;
+        }
+        info("Using " + namingStrategyName + " property naming strategy.", context);
+        if (openAPI.getComponents() == null || CollectionUtils.isEmpty(openAPI.getComponents().getSchemas())) {
+            return;
+        }
+        for (var schema : openAPI.getComponents().getSchemas().values()) {
+            Map<String, Schema> properties = schema.getProperties();
+            if (properties != null) {
+                var newProps = new LinkedHashMap<String, Schema>(properties.size());
+                for (var entry : properties.entrySet()) {
+                    newProps.put(propertyNamingStrategy.translate(entry.getKey()), entry.getValue());
+                }
+                schema.setProperties(newProps);
+            }
+            List<String> required = schema.getRequired();
+            if (CollectionUtils.isNotEmpty(required)) {
+                var newRequired = new ArrayList<String>(required.size());
+                for (var req : required) {
+                    newRequired.add(propertyNamingStrategy.translate(req));
+                }
+                schema.setRequired(newRequired);
             }
         }
     }
 
     private void applyPropertyServerContextPath(OpenAPI openAPI, VisitorContext context) {
         final String serverContextPath = getConfigProperty(MICRONAUT_OPENAPI_CONTEXT_SERVER_PATH, context);
-        if (serverContextPath == null || serverContextPath.isEmpty()) {
+        if (StringUtils.isEmpty(serverContextPath)) {
             return;
         }
         info("Applying server context path: " + serverContextPath + " to Paths.", context);
         Paths paths = openAPI.getPaths();
-        if (paths == null || paths.isEmpty()) {
+        if (CollectionUtils.isEmpty(paths)) {
             return;
         }
         var newPaths = new Paths();
@@ -874,17 +893,6 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                 }
 
             }
-        }
-    }
-
-    static class LowerCamelCasePropertyNamingStrategy extends PropertyNamingStrategies.NamingBase {
-
-        @Serial
-        private static final long serialVersionUID = -2750503285679998670L;
-
-        @Override
-        public String translate(String propertyName) {
-            return propertyName;
         }
     }
 }

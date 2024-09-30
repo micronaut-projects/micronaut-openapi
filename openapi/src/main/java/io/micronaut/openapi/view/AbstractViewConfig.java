@@ -118,8 +118,8 @@ abstract class AbstractViewConfig implements Toggleable {
      */
     protected String toHtmlAttributes() {
         return options.entrySet().stream()
-                .map(e -> e.getKey() + "=\"" + e.getValue() + '"')
-                .collect(Collectors.joining(" "));
+            .map(e -> e.getKey() + "=\"" + e.getValue() + '"')
+            .collect(Collectors.joining(" "));
     }
 
     protected String getFinalUrlPrefix(OpenApiViewConfig.RendererType rendererType, VisitorContext context) {
@@ -246,8 +246,11 @@ abstract class AbstractViewConfig implements Toggleable {
         }
 
         cfg.options.putAll(defaultOptions);
-        properties.entrySet().stream().filter(entry -> entry.getKey().startsWith(cfg.prefix))
-            .forEach(cfg::addAttribute);
+        for (var entry : properties.entrySet()) {
+            if (entry.getKey().startsWith(cfg.prefix)) {
+                cfg.addAttribute(entry);
+            }
+        }
         return cfg;
     }
 

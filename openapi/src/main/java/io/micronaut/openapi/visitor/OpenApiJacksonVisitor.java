@@ -15,12 +15,8 @@
  */
 package io.micronaut.openapi.visitor;
 
-import java.lang.annotation.Annotation;
-import java.util.ArrayList;
-import java.util.Set;
-
-import javax.annotation.processing.SupportedOptions;
-
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import io.micronaut.core.annotation.AnnotationClassValue;
 import io.micronaut.core.annotation.AnnotationValue;
 import io.micronaut.core.order.Ordered;
@@ -31,8 +27,10 @@ import io.micronaut.inject.visitor.VisitorContext;
 import io.swagger.v3.oas.annotations.media.DiscriminatorMapping;
 import io.swagger.v3.oas.annotations.media.Schema;
 
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import javax.annotation.processing.SupportedOptions;
+import java.lang.annotation.Annotation;
+import java.util.ArrayList;
+import java.util.Set;
 
 import static io.micronaut.openapi.visitor.ConfigUtils.isOpenApiEnabled;
 import static io.micronaut.openapi.visitor.ConfigUtils.isSpecGenerationEnabled;

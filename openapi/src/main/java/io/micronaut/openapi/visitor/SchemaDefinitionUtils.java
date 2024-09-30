@@ -211,7 +211,6 @@ import static io.micronaut.openapi.visitor.StringUtil.DOLLAR;
 import static io.micronaut.openapi.visitor.StringUtil.DOT;
 import static io.micronaut.openapi.visitor.Utils.isOpenapi31;
 import static io.micronaut.openapi.visitor.Utils.resolveOpenApi;
-import static java.util.stream.Collectors.toMap;
 
 /**
  * Methods to construct OpenPI schema definition.
@@ -432,7 +431,7 @@ public final class SchemaDefinitionUtils {
             var externalDocsValue = type.getDeclaredAnnotation(io.swagger.v3.oas.annotations.ExternalDocumentation.class);
             ExternalDocumentation externalDocs = null;
             if (externalDocsValue != null) {
-                externalDocs = toValue(externalDocsValue.getValues(), context, ExternalDocumentation.class, null).orElse(null);
+                externalDocs = toValue(externalDocsValue.getValues(), context, ExternalDocumentation.class, null);
             }
             if (externalDocs != null) {
                 schema.setExternalDocs(externalDocs);
@@ -1054,6 +1053,9 @@ public final class SchemaDefinitionUtils {
      * @return The map
      */
     public static Map<CharSequence, Object> toValueMap(Map<CharSequence, Object> values, VisitorContext context, @Nullable ClassElement jsonViewClass) {
+        if (CollectionUtils.isEmpty(values)) {
+            return Collections.emptyMap();
+        }
         var newValues = new HashMap<CharSequence, Object>(values.size());
         for (Map.Entry<CharSequence, Object> entry : values.entrySet()) {
             CharSequence key = entry.getKey();
@@ -1276,7 +1278,7 @@ public final class SchemaDefinitionUtils {
                     } else if (io.swagger.v3.oas.annotations.media.Schema.AdditionalPropertiesValue.FALSE.toString().equals(value.toString())) {
                         newValues.put(PROP_ADDITIONAL_PROPERTIES, false);
                     }
-                        // TODO
+                    // TODO
 //                    } else if (AdditionalPropertiesValue.USE_ADDITIONAL_PROPERTIES_ANNOTATION.toString().equals(value.toString())) {
                 } else if (key.equals(PROP_ONE_TYPES) && isOpenapi31()) {
                     newValues.put(PROP_TYPE, value);
@@ -1436,14 +1438,14 @@ public final class SchemaDefinitionUtils {
      * @param jsonViewClass Class from JsonView annotation
      * @return The converted instance
      */
-    public static <T> Optional<T> toValue(Map<CharSequence, Object> values, VisitorContext context, Class<T> type, @Nullable ClassElement jsonViewClass) {
+    public static <T> T toValue(Map<CharSequence, Object> values, VisitorContext context, Class<T> type, @Nullable ClassElement jsonViewClass) {
         JsonNode node = toJson(values, context, jsonViewClass);
         try {
-            return Optional.ofNullable(ConvertUtils.treeToValue(node, type, context));
+            return ConvertUtils.treeToValue(node, type, context);
         } catch (JsonProcessingException e) {
             warn("Error converting  [" + node + "]: to " + type + ":\n" + Utils.printStackTrace(e), context);
         }
-        return Optional.empty();
+        return null;
     }
 
     /**
@@ -1883,7 +1885,7 @@ public final class SchemaDefinitionUtils {
         var schemaExtDocs = (AnnotationValue<io.swagger.v3.oas.annotations.ExternalDocumentation>) annValues.get(PROP_EXTERNAL_DOCS);
         ExternalDocumentation externalDocs = null;
         if (schemaExtDocs != null) {
-            externalDocs = toValue(schemaExtDocs.getValues(), context, ExternalDocumentation.class, null).orElse(null);
+            externalDocs = toValue(schemaExtDocs.getValues(), context, ExternalDocumentation.class, null);
         }
         if (externalDocs != null) {
             schemaToBind.setExternalDocs(externalDocs);
@@ -2857,7 +2859,8 @@ public final class SchemaDefinitionUtils {
             if (classEl.isEnum()) {
                 return true;
             }
-            return classEl.getPrimaryConstructor().flatMap(methodElement -> Arrays.stream(methodElement.getParameters())
+            return classEl.getPrimaryConstructor()
+                .flatMap(methodElement -> Arrays.stream(methodElement.getParameters())
                     .filter(parameterElement -> parameterElement.getName().equals(element.getName()))
                     .map(parameterElement -> !parameterElement.isNullable())
                     .findFirst())
@@ -2885,11 +2888,19 @@ public final class SchemaDefinitionUtils {
     private static <T extends Schema<?>> void processAnnotationValue(VisitorContext context, AnnotationValue<?> annotationValue,
                                                                      Map<CharSequence, Object> arraySchemaMap, List<String> filters,
                                                                      Class<T> type, @Nullable ClassElement jsonViewClass) {
-        Map<CharSequence, Object> values = annotationValue.getValues().entrySet().stream()
-            .filter(entry -> filters == null || !filters.contains((String) entry.getKey()))
-            .collect(toMap(e -> e.getKey().equals(PROP_REQUIRED_PROPERTIES) ? PROP_REQUIRED : e.getKey(), Map.Entry::getValue));
-        toValue(values, context, type, jsonViewClass)
-            .ifPresent(s -> schemaToValueMap(arraySchemaMap, s));
+
+        var values = new LinkedHashMap<CharSequence, Object>();
+        for (var entry : annotationValue.getValues().entrySet()) {
+            var key = entry.getKey();
+            if (filters == null || !filters.contains((String) key)) {
+                values.put(key.equals(PROP_REQUIRED_PROPERTIES) ? PROP_REQUIRED : key, entry.getValue());
+            }
+        }
+
+        var s = toValue(values, context, type, jsonViewClass);
+        if (s != null) {
+            schemaToValueMap(arraySchemaMap, s);
+        }
     }
 
     private static Map<CharSequence, Object> resolveAnnotationValues(VisitorContext context, AnnotationValue<?> av, @Nullable ClassElement jsonViewClass) {

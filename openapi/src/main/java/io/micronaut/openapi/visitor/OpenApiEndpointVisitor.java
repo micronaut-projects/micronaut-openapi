@@ -15,13 +15,7 @@
  */
 package io.micronaut.openapi.visitor;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
-import javax.annotation.processing.SupportedOptions;
-
+import com.fasterxml.jackson.annotation.JsonAnySetter;
 import io.micronaut.core.annotation.AnnotationValue;
 import io.micronaut.core.naming.NameUtils;
 import io.micronaut.core.util.ArrayUtils;
@@ -40,7 +34,11 @@ import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.servers.Server;
 import io.swagger.v3.oas.models.tags.Tag;
 
-import com.fasterxml.jackson.annotation.JsonAnySetter;
+import javax.annotation.processing.SupportedOptions;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import static io.micronaut.openapi.visitor.ConfigUtils.endpointsConfiguration;
 import static io.micronaut.openapi.visitor.ConfigUtils.isOpenApiEnabled;
@@ -51,10 +49,10 @@ import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_OP
 import static io.micronaut.openapi.visitor.ContextUtils.SERVERS_LIST_ARGUMENT;
 import static io.micronaut.openapi.visitor.ContextUtils.TAGS_LIST_ARGUMENT;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ENABLED;
-import static io.micronaut.openapi.visitor.Utils.DEFAULT_MEDIA_TYPES;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_DESCRIPTION;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_HIDDEN;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_VALUE;
+import static io.micronaut.openapi.visitor.Utils.DEFAULT_MEDIA_TYPES;
 
 /**
  * A {@link TypeElementVisitor} the builds the Swagger model from Micronaut

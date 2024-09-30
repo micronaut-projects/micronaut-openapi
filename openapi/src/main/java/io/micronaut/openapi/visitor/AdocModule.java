@@ -15,17 +15,17 @@
  */
 package io.micronaut.openapi.visitor;
 
+import io.micronaut.core.util.StringUtils;
+import io.micronaut.inject.visitor.VisitorContext;
+import io.micronaut.openapi.adoc.OpenApiToAdocConverter;
+import io.micronaut.openapi.visitor.group.OpenApiInfo;
+
 import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.Map;
-
-import io.micronaut.core.util.StringUtils;
-import io.micronaut.inject.visitor.VisitorContext;
-import io.micronaut.openapi.adoc.OpenApiToAdocConverter;
-import io.micronaut.openapi.visitor.group.OpenApiInfo;
 
 import static io.micronaut.openapi.visitor.ContextUtils.addGeneratedResource;
 import static io.micronaut.openapi.visitor.ContextUtils.info;

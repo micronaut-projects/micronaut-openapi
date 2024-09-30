@@ -15,13 +15,13 @@
  */
 package io.micronaut.openapi.visitor;
 
-import java.util.Collections;
-import java.util.List;
-
 import io.micronaut.inject.ast.ClassElement;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.servers.Server;
 import io.swagger.v3.oas.models.tags.Tag;
+
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Endpoint definition.

@@ -15,9 +15,9 @@
  */
 package io.micronaut.openapi.visitor.security;
 
-import java.util.List;
-
 import io.micronaut.core.annotation.Internal;
+
+import java.util.List;
 
 /**
  * Micronaut security properties.
