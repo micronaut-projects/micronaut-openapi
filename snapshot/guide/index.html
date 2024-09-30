@@ -347,7 +347,28 @@
 <i class="fa icon-note" title="Note"></i>
 </td>
 <td class="content">
-For Kotlin the <code>openapi</code> dependency should be in the <code>kapt</code> scope and for Groovy in the <code>compileOnly</code> scope.
+<div class="paragraph">
+<p>For Kotlin the <code>openapi</code> dependency should be in the <code>kapt</code> or <code>ksp</code> scope and for Groovy in the <code>compileOnly</code> scope.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>If you use KSP need to disable incremental processing:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>ksp.incremental=false</pre>
+</div>
+</div>
 </td>
 </tr>
 </table>
@@ -379,12 +400,10 @@ For Kotlin the <code>openapi</code> dependency should be in the <code>kapt</code
 <i class="fa icon-note" title="Note"></i>
 </td>
 <td class="content">
-Also, do not forget that for the correct operation of the annotation processor, the correct parameter
+<div class="paragraph">
+<p>Also, do not forget that for the correct operation of the annotation processor, the correct parameter
 names in the controllers are required, therefore it is recommended that all libraries from which you plan
-to add controllers be compiled with the <code>-parameters</code> flag. For example like this (with gradle build):
-</td>
-</tr>
-</table>
+to add controllers be compiled with the <code>-parameters</code> flag. For example like this (with gradle build):</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -394,6 +413,10 @@ to add controllers be compiled with the <code>-parameters</code> flag. For examp
     ]
 }</code></pre>
 </div>
+</div>
+</td>
+</tr>
+</table>
 </div>
 
 <h1 id="openApiDefinition"><a class="anchor" href="#openApiDefinition"></a>5 OpenAPI Definition</h1>
@@ -622,10 +645,8 @@ info:
 <i class="fa icon-note" title="Note"></i>
 </td>
 <td class="content">
-So, <code>micronaut-openapi</code> expanded properties is old solution, now you can also use any properties for placeholders. For example, if you set properties without prefix <code>micronaut.openapi.expand</code> micronaut-openapi will process them as with this prefix.
-</td>
-</tr>
-</table>
+<div class="paragraph">
+<p>So, <code>micronaut-openapi</code> expanded properties is old solution, now you can also use any properties for placeholders. For example, if you set properties without prefix <code>micronaut.openapi.expand</code> micronaut-openapi will process them as with this prefix.</p>
 </div>
 <div class="listingblock">
 <div class="title">openapi.properties Property Resolution without prefix</div>
@@ -633,6 +654,10 @@ So, <code>micronaut-openapi</code> expanded properties is old solution, now you 
 <pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">api.version=v1.1
 openapi.description=A nice API</code></pre>
 </div>
+</div>
+</td>
+</tr>
+</table>
 </div>
 
 <h2 id="systemPropertyConfiguration"><a class="anchor" href="#systemPropertyConfiguration"></a>6.2 Configuring OpenAPI Processing with system properties</h2>
@@ -1520,15 +1545,16 @@ micronaut.openapi.schema.io.micronaut.openapi.JAXBElement&lt;test.mypackage.XmlE
 </div>
 </div>
 </div>
-<div class="admonitionblock note">
+<div class="admonitionblock important">
 <table>
 <tr>
 <td class="icon">
-<i class="fa icon-note" title="Note"></i>
+<i class="fa icon-important" title="Important"></i>
 </td>
 <td class="content">
-Important!
-After changing these settings, a complete recompilation of the project is necessary to ensure that the new settings are applied correctly.
+<div class="paragraph">
+<p>After changing these settings, a complete recompilation of the project is necessary to ensure that the new settings are applied correctly.</p>
+</div>
 </td>
 </tr>
 </table>
@@ -1631,15 +1657,16 @@ micronaut.openapi.schema-postfix.org.api.v2_0_0=200</code></pre>
 micronaut.openapi.schema-postfix.org.api.v2_0_0=2_0_0</code></pre>
 </div>
 </div>
-<div class="admonitionblock note">
+<div class="admonitionblock important">
 <table>
 <tr>
 <td class="icon">
-<i class="fa icon-note" title="Note"></i>
+<i class="fa icon-important" title="Important"></i>
 </td>
 <td class="content">
-Important!
-After changing these settings, a complete recompilation of the project is necessary to ensure that the new settings are applied correctly.
+<div class="paragraph">
+<p>After changing these settings, a complete recompilation of the project is necessary to ensure that the new settings are applied correctly.</p>
+</div>
 </td>
 </tr>
 </table>
@@ -1667,6 +1694,25 @@ the project directory through the annotation processor setting <code>micronaut.o
     }
 }</code></pre>
 </div>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>If you use KSP need to disable incremental processing:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>ksp.incremental=false</pre>
+</div>
+</div>
+</td>
+</tr>
+</table>
 </div>
 
 <h1 id="swaggerAnnotations"><a class="anchor" href="#swaggerAnnotations"></a>13 Swagger Annotations</h1>
