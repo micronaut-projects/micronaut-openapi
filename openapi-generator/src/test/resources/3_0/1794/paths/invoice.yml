@@ -1,0 +1,18 @@
+post:
+  tags:
+    - Invoice
+  operationId: createInvoice
+  summary: Creates new sale invoice
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../schemas/invoice.yml#/InvoiceCreateDto'
+  responses:
+    201:
+      description: File uploaded correctly
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/invoice.yml#/InvoiceIdDto'
