@@ -4,9 +4,11 @@ import io.micronaut.context.env.Environment
 import io.micronaut.openapi.AbstractOpenApiTypeElementSpec
 import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.security.SecurityScheme
+import spock.util.environment.RestoreSystemProperties
 
 class OpenApiApplicationVisitorSpec extends AbstractOpenApiTypeElementSpec {
 
+    @RestoreSystemProperties
     void "test build OpenAPI doc for simple endpoint"() {
         given:"An API definition"
         System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_CONFIG_FILE, "openapi-endpoints.properties")
@@ -434,9 +436,6 @@ class MyBean {}
         openAPI.paths[uri].post.parameters.size() == 1
         openAPI.paths[uri].post.parameters[0].name ==~ /arg0|name/
         openAPI.paths[uri].post.requestBody
-
-        cleanup:
-        System.clearProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_CONFIG_FILE)
     }
 
     void "test build OpenAPI doc for simple type with generics"() {
@@ -772,11 +771,10 @@ class MyBean {}
         oauth2.scheme == null
     }
 
+    @RestoreSystemProperties
     void "test disable openapi"() {
 
         given: "An API definition"
-        Utils.testReference = null
-        Utils.testReferences = null
         System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_ENABLED, "false")
 
         when:
@@ -835,16 +833,12 @@ class MyBean {}
 ''')
         then: "the state is correct"
         !Utils.testReference
-
-        cleanup:
-        System.clearProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_ENABLED)
     }
 
+    @RestoreSystemProperties
     void "test disable openapi from file"() {
 
         given: "An API definition"
-        Utils.testReference = null
-        Utils.testReferences = null
         System.setProperty(OpenApiConfigProperty.MICRONAUT_CONFIG_FILE_LOCATIONS, "project:/src/test/resources/")
         System.setProperty(Environment.ENVIRONMENTS_PROPERTY, "disabled-openapi")
 
@@ -900,17 +894,12 @@ class MyBean {}
 ''')
         then: "the state is correct"
         !Utils.testReference
-
-        cleanup:
-        System.clearProperty(OpenApiConfigProperty.MICRONAUT_CONFIG_FILE_LOCATIONS)
-        System.clearProperty(Environment.ENVIRONMENTS_PROPERTY)
     }
 
+    @RestoreSystemProperties
     void "test disable openapi from openapi.properties file"() {
 
         given: "An API definition"
-        Utils.testReference = null
-        Utils.testReferences = null
         System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_CONFIG_FILE, "openapi-disabled-openapi.properties")
 
         when:
@@ -965,16 +954,12 @@ class MyBean {}
 ''')
         then: "the state is correct"
         !Utils.testReference
-
-        cleanup:
-        System.clearProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_CONFIG_FILE)
     }
 
+    @RestoreSystemProperties
     void "test build OpenAPIDefinition with placeholders"() {
 
         given: "An API definition"
-        Utils.testReference = null
-        Utils.testReferences = null
         System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_CONFIG_FILE, "openapi-placeholders.properties")
 
         when:
@@ -1008,8 +993,75 @@ class MyBean {}
         openAPI.info.title == "broken-micronaut-openapi-expand"
         openAPI.info.description == 'monkey'
         openAPI.info.version == '2.2.2'
+    }
 
-        cleanup:
-        System.clearProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_CONFIG_FILE)
+    void "test auto generated info block"() {
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+
+@Controller
+class MyController {
+    
+    @Get("/get")
+    public String get() {
+        return null;
+    }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        then:
+        Utils.testReference != null
+
+        when:
+        OpenAPI openAPI = Utils.testReference
+
+        then:
+        openAPI.info
+        openAPI.info.title == OpenApiApplicationVisitor.DEFAULT_OPENAPI_TITLE
+        openAPI.info.version == OpenApiApplicationVisitor.DEFAULT_OPENAPI_VERSION
+    }
+
+    @RestoreSystemProperties
+    void "test auto generated info block with application name"() {
+
+        given:
+        def serviceName = "This is my service"
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_APPLICATION_NAME, serviceName)
+
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+
+@Controller
+class MyController {
+    
+    @Get("/get")
+    public String get() {
+        return null;
+    }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        then:
+        Utils.testReference != null
+
+        when:
+        OpenAPI openAPI = Utils.testReference
+
+        then:
+        openAPI.info
+        openAPI.info.title == serviceName
+        openAPI.info.version == OpenApiApplicationVisitor.DEFAULT_OPENAPI_VERSION
     }
 }

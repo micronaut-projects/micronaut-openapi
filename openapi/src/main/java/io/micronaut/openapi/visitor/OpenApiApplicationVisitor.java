@@ -47,6 +47,7 @@ import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.PathItem;
 import io.swagger.v3.oas.models.Paths;
 import io.swagger.v3.oas.models.SpecVersion;
+import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.servers.Server;
@@ -95,6 +96,7 @@ import static io.micronaut.openapi.visitor.FileUtils.getViewsDestDir;
 import static io.micronaut.openapi.visitor.FileUtils.openApiSpecFile;
 import static io.micronaut.openapi.visitor.FileUtils.resolve;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.ALL;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_APPLICATION_NAME;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ADDITIONAL_FILES;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ADOC_ENABLED;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_CONTEXT_SERVER_PATH;
@@ -123,6 +125,9 @@ import static io.swagger.v3.oas.models.Components.COMPONENTS_SCHEMAS_REF;
  * @since 1.0
  */
 public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements TypeElementVisitor<Object, Object> {
+
+    public static final String DEFAULT_OPENAPI_TITLE = "Service";
+    public static final String DEFAULT_OPENAPI_VERSION = "1.0.0";
 
     private static final int MAX_ITERATIONS = 100;
     private ClassElement classElement;
@@ -708,6 +713,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
 
     private OpenAPI postProcessOpenApi(OpenAPI openApi, VisitorContext context) {
 
+        fixInfoBlockIfNeeded(openApi, context);
         applyPropertyNamingStrategy(openApi, context);
         applyPropertyServerContextPath(openApi, context);
 
@@ -726,6 +732,21 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         openApi = resolvePropertyPlaceHolders(openApi, context);
 
         return openApi;
+    }
+
+    private void fixInfoBlockIfNeeded(OpenAPI openApi, VisitorContext context) {
+
+        if (openApi.getInfo() == null) {
+            openApi.setInfo(new Info());
+        }
+        var info = openApi.getInfo();
+        if (info.getTitle() == null) {
+            String applicationName = ConfigUtils.getConfigProperty(MICRONAUT_APPLICATION_NAME, context);
+            info.setTitle(applicationName != null ? applicationName : DEFAULT_OPENAPI_TITLE);
+        }
+        if (info.getVersion() == null) {
+            info.setVersion(DEFAULT_OPENAPI_VERSION);
+        }
     }
 
     public static void removeUnusedSchemas(OpenAPI openApi) {
