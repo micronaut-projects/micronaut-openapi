@@ -1924,6 +1924,18 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
             if (model.isEnum) {
                 addImport(model, "Function");
             }
+
+            model.hasVars = !requiredVarsWithoutDiscriminator.isEmpty() || !model.vars.isEmpty();
+            // just for tests
+            if (System.getProperty("micronaut.test.no-vars") != null) {
+                model.hasVars = false;
+                model.vendorExtensions.put("requiredVarsWithoutDiscriminator", Collections.emptyList());
+                model.vendorExtensions.put("optionalVars", Collections.emptyList());
+                model.vendorExtensions.put("requiredVars", Collections.emptyList());
+                model.vendorExtensions.put("withRequiredVars", false);
+                model.vars = Collections.emptyList();
+            }
+
             addStrValueToEnum(model);
         }
 

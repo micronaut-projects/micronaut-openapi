@@ -45,16 +45,18 @@
 @Serdeable
 {{/micronaut_serde_jackson}}
 {{#jackson}}
-{{#vendorExtensions.withMultipleVars}}
+    {{#hasVars}}
+        {{#vendorExtensions.withMultipleVars}}
 @JsonPropertyOrder({{openbrace}}
-    {{#vars}}
+            {{#vars}}
     {{classname}}.JSON_PROPERTY_{{nameInSnakeCase}}{{^-last}},{{/-last}}
-    {{/vars}}
+            {{/vars}}
 {{closebrace}})
-{{/vendorExtensions.withMultipleVars}}
-{{^vendorExtensions.withMultipleVars}}
+        {{/vendorExtensions.withMultipleVars}}
+        {{^vendorExtensions.withMultipleVars}}
 @JsonPropertyOrder({{#vars}}{{classname}}.JSON_PROPERTY_{{nameInSnakeCase}}{{/vars}})
-{{/vendorExtensions.withMultipleVars}}
+        {{/vendorExtensions.withMultipleVars}}
+    {{/hasVars}}
 {{/jackson}}
 {{#additionalModelTypeAnnotations}}
 {{{.}}}
@@ -469,11 +471,16 @@ public class {{classname}} {{#parent}}extends {{{parent}}} {{/parent}}{{#vendorE
 
     @Override
     public String toString() {
+    {{#hasVars}}
         return "{{classname}}("
         {{#allVars}}
             + "{{name}}: " + {{{getter}}}(){{^-last}} + ", "{{/-last}}
         {{/allVars}}
             + ")";
+    {{/hasVars}}
+    {{^hasVars}}
+        return "{{classname}}()";
+    {{/hasVars}}
     }
 {{/lombok}}
 

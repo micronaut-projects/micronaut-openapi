@@ -1308,4 +1308,26 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                 """
         );
     }
+
+    @Test
+    void testNoVars() {
+
+        System.setProperty("micronaut.test.no-vars", "true");
+
+        var codegen = new JavaMicronautClientCodegen();
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/extra-annotations.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String path = outputPath + "src/main/java/org/openapitools/";
+
+        assertFileContains(path + "model/Book.java",
+            """
+                    @Serdeable
+                    @Generated("io.micronaut.openapi.generator.JavaMicronautClientCodegen")
+                    @Serializable
+                    public class Book {
+                    
+                        @Override
+                    """);
+
+        System.clearProperty("micronaut.test.no-vars");
+    }
 }
