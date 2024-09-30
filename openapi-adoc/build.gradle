@@ -10,16 +10,16 @@ micronautBuild {
 
 dependencies {
 
-    api libs.managed.pegdown
-    api libs.managed.parboiled
-    api libs.managed.jsoup
-    api libs.managed.freemarker
+    api(libs.managed.pegdown)
+    api(libs.managed.parboiled)
+    api(libs.managed.jsoup)
+    api(libs.managed.freemarker)
 
-    implementation projects.micronautOpenapiCommon
+    implementation(projects.micronautOpenapiCommon)
 
-    testImplementation mnTest.micronaut.test.junit5
+    testImplementation(mnTest.micronaut.test.junit5)
 
-    testRuntimeOnly mnTest.junit.jupiter.engine
+    testRuntimeOnly(mnTest.junit.jupiter.engine)
 }
 
 test {
