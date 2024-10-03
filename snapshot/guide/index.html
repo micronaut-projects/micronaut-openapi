@@ -84,11 +84,13 @@
                                 
                                 <div class="toc-item" style="margin-left:0"><a href="#serverContext"><strong>20</strong><span>Server Context</span></a></div>
                                 
-                                <div class="toc-item" style="margin-left:0"><a href="#openApiGuides"><strong>21</strong><span>Guides</span></a></div>
+                                <div class="toc-item" style="margin-left:0"><a href="#spring"><strong>21</strong><span>Micronaut OpenAPI with Spring</span></a></div>
                                 
-                                <div class="toc-item" style="margin-left:0"><a href="#repository"><strong>22</strong><span>Repository</span></a></div>
+                                <div class="toc-item" style="margin-left:0"><a href="#openApiGuides"><strong>22</strong><span>Guides</span></a></div>
                                 
-                                <div class="toc-item" style="margin-left:0"><a href="#breaks"><strong>23</strong><span>Breaking Changes</span></a></div>
+                                <div class="toc-item" style="margin-left:0"><a href="#repository"><strong>23</strong><span>Repository</span></a></div>
+                                
+                                <div class="toc-item" style="margin-left:0"><a href="#breaks"><strong>24</strong><span>Breaking Changes</span></a></div>
                                 
                             </div>
                         </div>
@@ -233,11 +235,17 @@
         
         <div class="toc-item" style="margin-left:10px" id="toc-item-urlParameter"><a href="#urlParameter"><strong>20.3</strong><span>URL Parameter</span></a></div>
         
-        <div class="toc-item" style="margin-left:0px" id="toc-item-openApiGuides"><a href="#openApiGuides"><strong>21</strong><span>Guides</span></a></div>
+        <div class="toc-item" style="margin-left:0px" id="toc-item-spring"><a href="#spring"><strong>21</strong><span>Micronaut OpenAPI with Spring</span></a></div>
         
-        <div class="toc-item" style="margin-left:0px" id="toc-item-repository"><a href="#repository"><strong>22</strong><span>Repository</span></a></div>
+        <div class="toc-item" style="margin-left:10px" id="toc-item-springWithGradle"><a href="#springWithGradle"><strong>21.1</strong><span>Spring with Gradle</span></a></div>
         
-        <div class="toc-item" style="margin-left:0px" id="toc-item-breaks"><a href="#breaks"><strong>23</strong><span>Breaking Changes</span></a></div>
+        <div class="toc-item" style="margin-left:10px" id="toc-item-springWithMaven"><a href="#springWithMaven"><strong>21.2</strong><span>Spring with Maven</span></a></div>
+        
+        <div class="toc-item" style="margin-left:0px" id="toc-item-openApiGuides"><a href="#openApiGuides"><strong>22</strong><span>Guides</span></a></div>
+        
+        <div class="toc-item" style="margin-left:0px" id="toc-item-repository"><a href="#repository"><strong>23</strong><span>Repository</span></a></div>
+        
+        <div class="toc-item" style="margin-left:0px" id="toc-item-breaks"><a href="#breaks"><strong>24</strong><span>Breaking Changes</span></a></div>
         
         </div>
     </div>
@@ -5428,7 +5436,202 @@ public class OpenApiContextPathFilter implements HttpServerFilter {
 <p>Just add a parameter to the view url. For instance if the context path is set to <code>/context/path</code> you will access your view with <code><a href="http://localhost:8080/context/path/swagger-ui?contextPath=%2Fcontext%2Fpath" class="bare">http://localhost:8080/context/path/swagger-ui?contextPath=%2Fcontext%2Fpath</a></code>.</p>
 </div>
 
-<h1 id="openApiGuides"><a class="anchor" href="#openApiGuides"></a>21 Guides</h1>
+<h1 id="spring"><a class="anchor" href="#spring"></a>21 Micronaut OpenAPI with Spring</h1>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/6.13.x/src/main/docs/guide/spring.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>You can use <code>micronaut-openapi</code> to build openapi specification for <code>Spring</code> / <code>Spring Boot</code> applications. In this case, you do not need to change anything in the code. You can continue to use spring, and use micronaut as a replacement for such libraries as <code>springdoc-openapi</code>, <code>springfox</code>, <code>swagger</code> etc.</p>
+</div>
+
+<h2 id="springWithGradle"><a class="anchor" href="#springWithGradle"></a>21.1 Spring with Gradle</h2>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/6.13.x/src/main/docs/guide/spring/springWithGradle.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>To use micronaut-openapi with spring in gradle add this code to you <code>build.gradle</code>:</p>
+</div>
+<div class="listingblock">
+<div class="title">build.gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-groovy hljs" data-lang="groovy">dependencies {
+
+    // add to annotationProcessor and compileOnly blocks next libraries:
+
+    annotationProcessor("io.micronaut:micronaut-inject-java:$micronautCoreVersion")
+    annotationProcessor(platfom("io.micronaut.spring:micronaut-spring-bom:$micronautSpringVersion"))
+    annotationProcessor("io.micronaut.spring:micronaut-spring-annotation")
+    annotationProcessor("io.micronaut.spring:micronaut-spring-web-annotation")
+    annotationProcessor("io.micronaut.spring:micronaut-spring-boot-annotation")
+    annotationProcessor("io.micronaut.openapi:micronaut-openapi:$micronautOpenapiVersion")
+
+    compileOnly("io.micronaut:micronaut-inject-java:$micronautCoreVersion")
+    compileOnly("io.micronaut.openapi:micronaut-openapi-annotations:$micronautOpenapiVersion")
+    compileOnly("io.micronaut.serde:micronaut-serde-api:$micronautSerdeVersion")
+
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>For kotlin just change block <code>annotationProcessor</code> to <code>kapt</code> or <code>ksp</code>.</p>
+</div>
+
+<h2 id="springWithMaven"><a class="anchor" href="#springWithMaven"></a>21.2 Spring with Maven</h2>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/6.13.x/src/main/docs/guide/spring/springWithMaven.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>To use micronaut-openapi with spring in maven add this code to your <code>pom.xml</code></p>
+</div>
+<div class="listingblock">
+<div class="title">pom.xml</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">    &lt;dependencies&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;io.micronaut&lt;/groupId&gt;
+            &lt;artifactId&gt;micronaut-inject-java&lt;/artifactId&gt;
+            &lt;version&gt;${micronaut.core.version}&lt;/version&gt;
+            &lt;scope&gt;provided&lt;/scope&gt;
+        &lt;/dependency&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;io.micronaut.openapi&lt;/groupId&gt;
+            &lt;artifactId&gt;micronaut-openapi-annotations&lt;/artifactId&gt;
+            &lt;version&gt;${micronaut.openapi.version}&lt;/version&gt;
+            &lt;scope&gt;provided&lt;/scope&gt;
+        &lt;/dependency&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;io.micronaut.serde&lt;/groupId&gt;
+            &lt;artifactId&gt;micronaut-serde-api&lt;/artifactId&gt;
+            &lt;version&gt;${micronaut.serde.version}&lt;/version&gt;
+            &lt;scope&gt;provided&lt;/scope&gt;
+        &lt;/dependency&gt;
+    &lt;/dependencies&gt;
+
+    &lt;build&gt;
+        &lt;plugins&gt;
+            &lt;plugin&gt;
+                &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;
+                &lt;artifactId&gt;maven-compiler-plugin&lt;/artifactId&gt;
+                &lt;configuration&gt;
+                    &lt;annotationProcessorPaths combine.children="append"&gt;
+                        &lt;path&gt;
+                            &lt;groupId&gt;io.micronaut&lt;/groupId&gt;
+                            &lt;artifactId&gt;micronaut-inject-java&lt;/artifactId&gt;
+                            &lt;version&gt;${micronaut.core.version}&lt;/version&gt;
+                        &lt;/path&gt;
+                        &lt;path&gt;
+                            &lt;groupId&gt;io.micronaut.spring&lt;/groupId&gt;
+                            &lt;artifactId&gt;micronaut-spring-annotation&lt;/artifactId&gt;
+                            &lt;version&gt;${micronaut.spring.version}&lt;/version&gt;
+                        &lt;/path&gt;
+                        &lt;path&gt;
+                            &lt;groupId&gt;io.micronaut.spring&lt;/groupId&gt;
+                            &lt;artifactId&gt;micronaut-spring-web-annotation&lt;/artifactId&gt;
+                            &lt;version&gt;${micronaut.spring.version}&lt;/version&gt;
+                        &lt;/path&gt;
+                        &lt;path&gt;
+                            &lt;groupId&gt;io.micronaut.spring&lt;/groupId&gt;
+                            &lt;artifactId&gt;micronaut-spring-boot-annotation&lt;/artifactId&gt;
+                            &lt;version&gt;${micronaut.spring.version}&lt;/version&gt;
+                        &lt;/path&gt;
+                        &lt;path&gt;
+                            &lt;groupId&gt;io.micronaut.openapi&lt;/groupId&gt;
+                            &lt;artifactId&gt;micronaut-openapi&lt;/artifactId&gt;
+                            &lt;version&gt;${micronaut.openapi.version}&lt;/version&gt;
+                        &lt;/path&gt;
+                    &lt;/annotationProcessorPaths&gt;
+                &lt;/configuration&gt;
+            &lt;/plugin&gt;
+        &lt;/plugins&gt;
+    &lt;/build&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>For kotlin
+.pom.xml</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">    &lt;dependencies&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;io.micronaut&lt;/groupId&gt;
+            &lt;artifactId&gt;micronaut-inject-java&lt;/artifactId&gt;
+            &lt;version&gt;${micronaut.core.version}&lt;/version&gt;
+            &lt;scope&gt;provided&lt;/scope&gt;
+        &lt;/dependency&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;io.micronaut.openapi&lt;/groupId&gt;
+            &lt;artifactId&gt;micronaut-openapi-annotations&lt;/artifactId&gt;
+            &lt;version&gt;${micronaut.openapi.version}&lt;/version&gt;
+            &lt;scope&gt;provided&lt;/scope&gt;
+        &lt;/dependency&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;io.micronaut.serde&lt;/groupId&gt;
+            &lt;artifactId&gt;micronaut-serde-api&lt;/artifactId&gt;
+            &lt;version&gt;${micronaut.serde.version}&lt;/version&gt;
+            &lt;scope&gt;provided&lt;/scope&gt;
+        &lt;/dependency&gt;
+    &lt;/dependencies&gt;
+
+    &lt;executions&gt;
+        &lt;execution&gt;
+            &lt;id&gt;kapt&lt;/id&gt;
+            &lt;goals&gt;
+                &lt;goal&gt;kapt&lt;/goal&gt;
+            &lt;/goals&gt;
+            &lt;configuration&gt;
+                &lt;sourceDirs&gt;
+                    &lt;sourceDir&gt;${project.basedir}/src/main/kotlin&lt;/sourceDir&gt;
+                &lt;/sourceDirs&gt;
+                &lt;annotationProcessorPaths combine.self="override"&gt;
+                    &lt;annotationProcessorPath&gt;
+                        &lt;groupId&gt;io.micronaut&lt;/groupId&gt;
+                        &lt;artifactId&gt;micronaut-inject-java&lt;/artifactId&gt;
+                        &lt;version&gt;${micronaut.core.version}&lt;/version&gt;
+                    &lt;/annotationProcessorPath&gt;
+                    &lt;annotationProcessorPath&gt;
+                        &lt;groupId&gt;io.micronaut.spring&lt;/groupId&gt;
+                        &lt;artifactId&gt;micronaut-spring-annotation&lt;/artifactId&gt;
+                        &lt;version&gt;${micronaut.spring.version}&lt;/version&gt;
+                    &lt;/annotationProcessorPath&gt;
+                    &lt;annotationProcessorPath&gt;
+                        &lt;groupId&gt;io.micronaut.spring&lt;/groupId&gt;
+                        &lt;artifactId&gt;micronaut-spring-web-annotation&lt;/artifactId&gt;
+                        &lt;version&gt;${micronaut.spring.version}&lt;/version&gt;
+                    &lt;/annotationProcessorPath&gt;
+                    &lt;annotationProcessorPath&gt;
+                        &lt;groupId&gt;io.micronaut.spring&lt;/groupId&gt;
+                        &lt;artifactId&gt;micronaut-spring-boot-annotation&lt;/artifactId&gt;
+                        &lt;version&gt;${micronaut.spring.version}&lt;/version&gt;
+                    &lt;/annotationProcessorPath&gt;
+                    &lt;annotationProcessorPath&gt;
+                        &lt;groupId&gt;io.micronaut.openapi&lt;/groupId&gt;
+                        &lt;artifactId&gt;micronaut-openapi&lt;/artifactId&gt;
+                        &lt;version&gt;${micronaut.openapi.version}&lt;/version&gt;
+                    &lt;/annotationProcessorPath&gt;
+                &lt;/annotationProcessorPaths&gt;
+           &lt;/configuration&gt;
+        &lt;/execution&gt;
+    &lt;/executions&gt;</code></pre>
+</div>
+</div>
+
+<h1 id="openApiGuides"><a class="anchor" href="#openApiGuides"></a>22 Guides</h1>
 
 <div class='contribute-btn'>
     <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/6.13.x/src/main/docs/guide/openApiGuides.adoc"'>
@@ -5444,7 +5647,7 @@ public class OpenApiContextPathFilter implements HttpServerFilter {
 <p><a href="https://guides.micronaut.io/latest/tag-open_api.html" class="bare">https://guides.micronaut.io/latest/tag-open_api.html</a></p>
 </div>
 
-<h1 id="repository"><a class="anchor" href="#repository"></a>22 Repository</h1>
+<h1 id="repository"><a class="anchor" href="#repository"></a>23 Repository</h1>
 
 <div class='contribute-btn'>
     <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/6.13.x/src/main/docs/guide/repository.adoc"'>
@@ -5460,7 +5663,7 @@ public class OpenApiContextPathFilter implements HttpServerFilter {
 <p><a href="https://github.com/micronaut-projects/micronaut-openapi">https://github.com/micronaut-projects/micronaut-openapi</a></p>
 </div>
 
-<h1 id="breaks"><a class="anchor" href="#breaks"></a>23 Breaking Changes</h1>
+<h1 id="breaks"><a class="anchor" href="#breaks"></a>24 Breaking Changes</h1>
 
 <div class='contribute-btn'>
     <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/6.13.x/src/main/docs/guide/breaks.adoc"'>
