@@ -1405,6 +1405,12 @@ loadScripts(document, 'script');</script>
 </dd>
 <dt><a href="io/micronaut/openapi/generator/ParameterMapping.ParameterLocation.html#FORM" class="member-name-link">FORM</a> - Enum constant in enum class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/ParameterMapping.ParameterLocation.html" title="enum class in io.micronaut.openapi.generator">ParameterMapping.ParameterLocation</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/MnSchemaTypeUtil.html#FORMAT_INT16" class="member-name-link">FORMAT_INT16</a> - Static variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/MnSchemaTypeUtil.html" title="class in io.micronaut.openapi.generator">MnSchemaTypeUtil</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/MnSchemaTypeUtil.html#FORMAT_INT8" class="member-name-link">FORMAT_INT8</a> - Static variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/MnSchemaTypeUtil.html" title="class in io.micronaut.openapi.generator">MnSchemaTypeUtil</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/MnSchemaTypeUtil.html#FORMAT_SHORT" class="member-name-link">FORMAT_SHORT</a> - Static variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/MnSchemaTypeUtil.html" title="class in io.micronaut.openapi.generator">MnSchemaTypeUtil</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/generator/Formatting.html" class="type-name-link" title="enum class in io.micronaut.openapi.generator">Formatting</a> - Enum Class in <a href="io/micronaut/openapi/generator/package-summary.html">io.micronaut.openapi.generator</a></dt>
 <dd>
 <div class="block">A class with lambdas to format mustache-generated code and formatting utility functions.</div>
@@ -1480,6 +1486,10 @@ loadScripts(document, 'script');</script>
 <dt><a href="org/openapitools/codegen/DefaultCodegen.html#fromRequestBody(io.swagger.v3.oas.models.parameters.RequestBody,java.util.Set,java.lang.String)" class="member-name-link">fromRequestBody(RequestBody, Set&lt;String&gt;, String)</a> - Method in class org.openapitools.codegen.<a href="org/openapitools/codegen/DefaultCodegen.html" title="class in org.openapitools.codegen">DefaultCodegen</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="org/openapitools/codegen/DefaultCodegen.html#fromRequestBodyToFormParameters(io.swagger.v3.oas.models.parameters.RequestBody,java.util.Set)" class="member-name-link">fromRequestBodyToFormParameters(RequestBody, Set&lt;String&gt;)</a> - Method in class org.openapitools.codegen.<a href="org/openapitools/codegen/DefaultCodegen.html" title="class in org.openapitools.codegen">DefaultCodegen</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/AbstractMicronautJavaCodegen.html#fromResponse(java.lang.String,io.swagger.v3.oas.models.responses.ApiResponse)" class="member-name-link">fromResponse(String, ApiResponse)</a> - Method in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/AbstractMicronautJavaCodegen.html" title="class in io.micronaut.openapi.generator">AbstractMicronautJavaCodegen</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/AbstractMicronautKotlinCodegen.html#fromResponse(java.lang.String,io.swagger.v3.oas.models.responses.ApiResponse)" class="member-name-link">fromResponse(String, ApiResponse)</a> - Method in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/AbstractMicronautKotlinCodegen.html" title="class in io.micronaut.openapi.generator">AbstractMicronautKotlinCodegen</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="org/openapitools/codegen/DefaultCodegen.html#fromResponse(java.lang.String,io.swagger.v3.oas.models.responses.ApiResponse)" class="member-name-link">fromResponse(String, ApiResponse)</a> - Method in class org.openapitools.codegen.<a href="org/openapitools/codegen/DefaultCodegen.html" title="class in org.openapitools.codegen">DefaultCodegen</a></dt>
 <dd>
@@ -3371,6 +3381,10 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/visitor/StringUtil.html#MINUS" class="member-name-link">MINUS</a> - Static variable in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/StringUtil.html" title="class in io.micronaut.openapi.visitor">StringUtil</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/MnSchemaTypeUtil.html" class="type-name-link" title="class in io.micronaut.openapi.generator">MnSchemaTypeUtil</a> - Class in <a href="io/micronaut/openapi/generator/package-summary.html">io.micronaut.openapi.generator</a></dt>
+<dd>
+<div class="block">Schema type utils and constants.</div>
+</dd>
 <dt><a href="io/micronaut/openapi/generator/MicronautCodeGeneratorEntryPoint.OutputKind.html#MODEL_DOCS" class="member-name-link">MODEL_DOCS</a> - Enum constant in enum class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/MicronautCodeGeneratorEntryPoint.OutputKind.html" title="enum class in io.micronaut.openapi.generator">MicronautCodeGeneratorEntryPoint.OutputKind</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/generator/MicronautCodeGeneratorEntryPoint.OutputKind.html#MODEL_TESTS" class="member-name-link">MODEL_TESTS</a> - Enum constant in enum class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/MicronautCodeGeneratorEntryPoint.OutputKind.html" title="enum class in io.micronaut.openapi.generator">MicronautCodeGeneratorEntryPoint.OutputKind</a></dt>
@@ -5645,13 +5659,29 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/visitor/SchemaUtils.html#TYPE_BOOLEAN" class="member-name-link">TYPE_BOOLEAN</a> - Static variable in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/SchemaUtils.html" title="class in io.micronaut.openapi.visitor">SchemaUtils</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/MnSchemaTypeUtil.html#TYPE_BYTE" class="member-name-link">TYPE_BYTE</a> - Static variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/MnSchemaTypeUtil.html" title="class in io.micronaut.openapi.generator">MnSchemaTypeUtil</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/MnSchemaTypeUtil.html#TYPE_CHAR" class="member-name-link">TYPE_CHAR</a> - Static variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/MnSchemaTypeUtil.html" title="class in io.micronaut.openapi.generator">MnSchemaTypeUtil</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/MnSchemaTypeUtil.html#TYPE_CHARACTER" class="member-name-link">TYPE_CHARACTER</a> - Static variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/MnSchemaTypeUtil.html" title="class in io.micronaut.openapi.generator">MnSchemaTypeUtil</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/MnSchemaTypeUtil.html#TYPE_DOUBLE" class="member-name-link">TYPE_DOUBLE</a> - Static variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/MnSchemaTypeUtil.html" title="class in io.micronaut.openapi.generator">MnSchemaTypeUtil</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/MnSchemaTypeUtil.html#TYPE_FLOAT" class="member-name-link">TYPE_FLOAT</a> - Static variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/MnSchemaTypeUtil.html" title="class in io.micronaut.openapi.generator">MnSchemaTypeUtil</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/MnSchemaTypeUtil.html#TYPE_INT" class="member-name-link">TYPE_INT</a> - Static variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/MnSchemaTypeUtil.html" title="class in io.micronaut.openapi.generator">MnSchemaTypeUtil</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/visitor/SchemaUtils.html#TYPE_INTEGER" class="member-name-link">TYPE_INTEGER</a> - Static variable in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/SchemaUtils.html" title="class in io.micronaut.openapi.visitor">SchemaUtils</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/MnSchemaTypeUtil.html#TYPE_LONG" class="member-name-link">TYPE_LONG</a> - Static variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/MnSchemaTypeUtil.html" title="class in io.micronaut.openapi.generator">MnSchemaTypeUtil</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/visitor/SchemaUtils.html#TYPE_NULL" class="member-name-link">TYPE_NULL</a> - Static variable in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/SchemaUtils.html" title="class in io.micronaut.openapi.visitor">SchemaUtils</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/visitor/SchemaUtils.html#TYPE_NUMBER" class="member-name-link">TYPE_NUMBER</a> - Static variable in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/SchemaUtils.html" title="class in io.micronaut.openapi.visitor">SchemaUtils</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/visitor/SchemaUtils.html#TYPE_OBJECT" class="member-name-link">TYPE_OBJECT</a> - Static variable in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/SchemaUtils.html" title="class in io.micronaut.openapi.visitor">SchemaUtils</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/MnSchemaTypeUtil.html#TYPE_SHORT" class="member-name-link">TYPE_SHORT</a> - Static variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/MnSchemaTypeUtil.html" title="class in io.micronaut.openapi.generator">MnSchemaTypeUtil</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/visitor/SchemaUtils.html#TYPE_STRING" class="member-name-link">TYPE_STRING</a> - Static variable in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/SchemaUtils.html" title="class in io.micronaut.openapi.visitor">SchemaUtils</a></dt>
 <dd>&nbsp;</dd>
@@ -5690,6 +5720,10 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Update datatypeWithEnum for map container</div>
 </dd>
+<dt><a href="io/micronaut/openapi/generator/AbstractMicronautJavaCodegen.html#updateEnumVarsWithExtensions(java.util.List,java.util.Map,java.lang.String)" class="member-name-link">updateEnumVarsWithExtensions(List&lt;Map&lt;String, Object&gt;&gt;, Map&lt;String, Object&gt;, String)</a> - Method in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/AbstractMicronautJavaCodegen.html" title="class in io.micronaut.openapi.generator">AbstractMicronautJavaCodegen</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/AbstractMicronautKotlinCodegen.html#updateEnumVarsWithExtensions(java.util.List,java.util.Map,java.lang.String)" class="member-name-link">updateEnumVarsWithExtensions(List&lt;Map&lt;String, Object&gt;&gt;, Map&lt;String, Object&gt;, String)</a> - Method in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/AbstractMicronautKotlinCodegen.html" title="class in io.micronaut.openapi.generator">AbstractMicronautKotlinCodegen</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="org/openapitools/codegen/DefaultCodegen.html#updateEnumVarsWithExtensions(java.util.List,java.util.Map,java.lang.String)" class="member-name-link">updateEnumVarsWithExtensions(List&lt;Map&lt;String, Object&gt;&gt;, Map&lt;String, Object&gt;, String)</a> - Method in class org.openapitools.codegen.<a href="org/openapitools/codegen/DefaultCodegen.html" title="class in org.openapitools.codegen">DefaultCodegen</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="org/openapitools/codegen/DefaultCodegen.html#updateModelForAnyType(org.openapitools.codegen.CodegenModel,io.swagger.v3.oas.models.media.Schema)" class="member-name-link">updateModelForAnyType(CodegenModel, Schema)</a> - Method in class org.openapitools.codegen.<a href="org/openapitools/codegen/DefaultCodegen.html" title="class in org.openapitools.codegen">DefaultCodegen</a></dt>
