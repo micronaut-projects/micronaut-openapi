@@ -3,7 +3,7 @@
  */
 {{#withXml}}
 @XmlType(name="{{datatypeWithEnum}}")
-@XmlEnum({{dataType}}.class)
+@XmlEnum({{vendorExtensions.baseType}}.class)
 {{/withXml}}
 {{#lombok}}
 @RequiredArgsConstructor
@@ -30,6 +30,9 @@
             {{#withXml}}
     @XmlEnumValue({{#isInteger}}"{{/isInteger}}{{#isDouble}}"{{/isDouble}}{{#isLong}}"{{/isLong}}{{#isFloat}}"{{/isFloat}}{{{value}}}{{#isInteger}}"{{/isInteger}}{{#isDouble}}"{{/isDouble}}{{#isLong}}"{{/isLong}}{{#isFloat}}"{{/isFloat}})
             {{/withXml}}
+            {{#deprecated}}
+    @Deprecated
+            {{/deprecated}}
     @JsonProperty({{{strValue}}})
     {{{name}}}({{{value}}}){{^-last}},{{/-last}}{{#-last}};{{/-last}}
         {{/enumVars}}
@@ -38,10 +41,10 @@
     {{#formatSingleLine}}public final static Map<{{{dataType}}}, {{>common/model/enumName}}> VALUE_MAPPING = Map.copyOf(Arrays.stream(values()){{/formatSingleLine}}
             .collect(Collectors.toMap(v -> v.value{{#isString}}{{#useEnumCaseInsensitive}}.toLowerCase(){{/useEnumCaseInsensitive}}{{/isString}}, Function.identity())));
 
-    private final {{{dataType}}} value;
+    private final {{{vendorExtensions.baseType}}} value;
 {{^lombok}}
 
-    {{#formatSingleLine}}{{>common/model/enumName}}{{/formatSingleLine}}({{{dataType}}} value) {
+    {{#formatSingleLine}}{{>common/model/enumName}}{{/formatSingleLine}}({{{vendorExtensions.baseType}}} value) {
         this.value = value;
     }
 
@@ -51,7 +54,7 @@
     {{#jackson}}
     @JsonValue
     {{/jackson}}
-    public {{{dataType}}} getValue() {
+    public {{{vendorExtensions.baseType}}} getValue() {
         return value;
     }
 {{/lombok}}

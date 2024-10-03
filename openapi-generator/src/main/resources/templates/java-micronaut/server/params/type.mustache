@@ -2,10 +2,10 @@
     {{{vendorExtensions.typeWithGenericAnnotations}}}
 {{/isDate}}{{/isDateTime}}{{/isEnum}}
 {{#isDateTime}}
-    {{#vendorExtensions.formatPattern}}@Format("{{{.}}}"){{/vendorExtensions.formatPattern}}{{^vendorExtensions.formatPattern}}{{#dateTimeFormat}}@Format("{{{.}}}"){{/dateTimeFormat}}{{/vendorExtensions.formatPattern}} {{{dataType}}}
+    {{#vendorExtensions.formatPattern}}@Format("{{{.}}}"){{/vendorExtensions.formatPattern}}{{^vendorExtensions.formatPattern}}{{#dateTimeFormat}}@Format("{{{.}}}"){{/dateTimeFormat}}{{/vendorExtensions.formatPattern}} {{#isEnum}}{{{vendorExtensions.typeWithEnumWithGenericAnnotations}}}{{/isEnum}}{{^isEnum}}{{{vendorExtensions.typeWithGenericAnnotations}}}{{/isEnum}}
 {{/isDateTime}}
 {{#isDate}}
-    {{#vendorExtensions.formatPattern}}@Format("{{{.}}}"){{/vendorExtensions.formatPattern}}{{^vendorExtensions.formatPattern}}{{#dateFormat}}@Format("{{{.}}}"){{/dateFormat}}{{/vendorExtensions.formatPattern}} {{{dataType}}}
+    {{#vendorExtensions.formatPattern}}@Format("{{{.}}}"){{/vendorExtensions.formatPattern}}{{^vendorExtensions.formatPattern}}{{#dateFormat}}@Format("{{{.}}}"){{/dateFormat}}{{/vendorExtensions.formatPattern}} {{#isEnum}}{{{vendorExtensions.typeWithEnumWithGenericAnnotations}}}{{/isEnum}}{{^isEnum}}{{{vendorExtensions.typeWithGenericAnnotations}}}{{/isEnum}}
 {{/isDate}}
 {{#isEnum}}
     {{{vendorExtensions.typeWithEnumWithGenericAnnotations}}}

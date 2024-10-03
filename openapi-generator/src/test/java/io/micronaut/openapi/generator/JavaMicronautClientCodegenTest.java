@@ -854,4 +854,190 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         assertFileContains(path + "model/Subject.java", "@java.io.MyAnnotation3");
         assertFileContains(path + "model/PersonSex.java", "@java.io.MyAnnotation41\n", "@java.io.MyAnnotation42\n", "@java.io.MyAnnotation43\n");
     }
+
+    @Test
+    void testEnumsExtensionsAndPrimitives() {
+
+        var codegen = new JavaMicronautClientCodegen();
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/enum2.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String modelPath = outputPath + "src/main/java/org/openapitools/model/";
+
+        assertFileContains(modelPath + "BytePrimitiveEnum.java",
+            "NUMBER_1((byte) 1),",
+            "private final byte value",
+            "BytePrimitiveEnum(byte value)",
+            "public byte getValue() {");
+
+        assertFileContains(modelPath + "CharPrimitiveEnum.java",
+            "A('a'),",
+            "private final char value",
+            "CharPrimitiveEnum(char value)",
+            "public char getValue() {");
+
+        assertFileContains(modelPath + "ShortPrimitiveEnum.java",
+            "NUMBER_1((short) 1),",
+            "private final short value",
+            "ShortPrimitiveEnum(short value)",
+            "public short getValue() {");
+
+        assertFileContains(modelPath + "IntPrimitiveEnum.java",
+            "NUMBER_1(1),",
+            "private final int value",
+            "IntPrimitiveEnum(int value)",
+            "public int getValue() {");
+
+        assertFileContains(modelPath + "LongPrimitiveEnum.java",
+            "NUMBER_1(1L),",
+            "private final long value",
+            "LongPrimitiveEnum(long value)",
+            "public long getValue() {");
+
+        assertFileContains(modelPath + "FloatPrimitiveEnum.java",
+            "NUMBER_1_DOT_23(1.23F),",
+            "private final float value",
+            "FloatPrimitiveEnum(float value)",
+            "public float getValue() {");
+
+        assertFileContains(modelPath + "DoublePrimitiveEnum.java",
+            "NUMBER_1_DOT_23(1.23),",
+            "private final double value",
+            "DoublePrimitiveEnum(double value)",
+            "public double getValue() {");
+
+        assertFileContains(modelPath + "StringEnum.java",
+            """
+                    @Deprecated
+                    @JsonProperty("starting")
+                    STARTING("starting"),
+                """,
+            """
+                    @Deprecated
+                    @JsonProperty("running")
+                    RUNNING("running"),
+                """);
+
+        assertFileContains(modelPath + "DecimalEnum.java",
+            """
+                    @Deprecated
+                    @JsonProperty("34.1")
+                    NUMBER_34_DOT_1(new BigDecimal("34.1"));
+                """);
+
+        assertFileContains(modelPath + "ByteEnum.java",
+            "NUMBER_1((byte) 1),",
+            "private final Byte value",
+            "ByteEnum(Byte value)",
+            "public Byte getValue() {");
+
+        assertFileContains(modelPath + "ShortEnum.java",
+            "NUMBER_1((short) 1),",
+            "private final Short value",
+            "ShortEnum(Short value)",
+            "public Short getValue() {");
+
+        assertFileContains(modelPath + "IntEnum.java",
+            """
+                    /**
+                     * This is one
+                     */
+                    @JsonProperty("1")
+                    THE_ONE(1),
+                """,
+            """
+                    @Deprecated
+                    @JsonProperty("2")
+                    THE_TWO(2),
+                """,
+            """
+                    /**
+                     * This is three
+                     */
+                    @JsonProperty("3")
+                    THE_THREE(3),
+                """
+            );
+
+        assertFileContains(modelPath + "LongEnum.java",
+            """
+                    @Deprecated
+                    @JsonProperty("2")
+                    NUMBER_2(2L),
+                """);
+    }
+
+    @Test
+    void testPrimitives() {
+
+        var codegen = new JavaMicronautClientCodegen();
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/model-with-primitives.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String basePath = outputPath + "src/main/java/org/openapitools/";
+
+        assertFileContains(basePath + "api/ParametersApi.java",
+            "@QueryValue(\"name\") @NotNull String name",
+                "@QueryValue(\"byteType\") @NotNull Byte byteType",
+                "@QueryValue(\"byteType2\") @NotNull Byte byteType2",
+                "@QueryValue(\"shortType\") @NotNull Short shortType",
+                "@QueryValue(\"shortType2\") @NotNull Short shortType2",
+                "@QueryValue(\"intType\") @NotNull Integer intType",
+                "@QueryValue(\"longType\") @NotNull Long longType",
+                "@QueryValue(\"boolType\") @NotNull Boolean boolType",
+                "@QueryValue(\"decimalType\") @NotNull BigDecimal decimalType",
+                "@QueryValue(\"floatType\") @NotNull Float floatType",
+                "@QueryValue(\"doubleType\") @NotNull Double doubleType",
+                "@QueryValue(\"bytePrimitiveType\") @NotNull Byte bytePrimitiveType",
+                "@QueryValue(\"shortPrimitiveType\") @NotNull Short shortPrimitiveType",
+                "@QueryValue(\"intPrimitiveType\") @NotNull Integer intPrimitiveType",
+                "@QueryValue(\"longPrimitiveType\") @NotNull Long longPrimitiveType",
+                "@QueryValue(\"floatPrimitiveType\") @NotNull Float floatPrimitiveType",
+                "@QueryValue(\"doublePrimitiveType\") @NotNull Double doublePrimitiveType",
+                "@QueryValue(\"charPrimitiveType\") @NotNull Character charPrimitiveType",
+                "@QueryValue(\"bytePrimitiveTypes\") @NotNull List<Byte> bytePrimitiveTypes",
+                "@QueryValue(\"shortPrimitiveTypes\") @NotNull List<Short> shortPrimitiveTypes",
+                "@QueryValue(\"intPrimitiveTypes\") @NotNull List<Integer> intPrimitiveTypes",
+                "@QueryValue(\"longPrimitiveTypes\") @NotNull List<Long> longPrimitiveTypes",
+                "@QueryValue(\"floatPrimitiveTypes\") @NotNull List<Float> floatPrimitiveTypes",
+                "@QueryValue(\"doublePrimitiveTypes\") @NotNull List<Double> doublePrimitiveTypes",
+                "@QueryValue(\"charPrimitiveTypes\") @NotNull List<Character> charPrimitiveTypes",
+                "@QueryValue(\"byteTypes\") @NotNull List<@NotNull Byte> byteTypes",
+                "@QueryValue(\"byteTypes2\") @NotNull List<@NotNull Byte> byteTypes2",
+                "@QueryValue(\"shortTypes\") @NotNull List<@NotNull Short> shortTypes",
+                "@QueryValue(\"shortTypes2\") @NotNull List<@NotNull Short> shortTypes2",
+                "@QueryValue(\"intTypes\") @NotNull List<@NotNull Integer> intTypes",
+                "@QueryValue(\"longTypes\") @NotNull List<@NotNull Long> longTypes"
+        );
+
+        assertFileContains(basePath + "model/Obj.java",
+            "private String name",
+            "private Byte byteType",
+            "private Byte byteType2",
+            "private Short shortType",
+            "private Short shortType2",
+            "private Integer intType",
+            "private Long longType",
+            "private Boolean boolType",
+            "private BigDecimal decimalType",
+            "private Float floatType",
+            "private Double doubleType",
+            "private Byte bytePrimitiveType",
+            "private Short shortPrimitiveType",
+            "private Integer intPrimitiveType",
+            "private Long longPrimitiveType",
+            "private Float floatPrimitiveType",
+            "private Double doublePrimitiveType",
+            "private Character charPrimitiveType",
+            "private List<Byte> bytePrimitiveTypes",
+            "private List<Short> shortPrimitiveTypes",
+            "private List<Integer> intPrimitiveTypes",
+            "private List<Long> longPrimitiveTypes",
+            "private List<Float> floatPrimitiveTypes",
+            "private List<Double> doublePrimitiveTypes",
+            "private List<Character> charPrimitiveTypes",
+            "private List<@NotNull Byte> byteTypes",
+            "private List<@NotNull Byte> byteTypes2",
+            "private List<@NotNull Short> shortTypes",
+            "private List<@NotNull Short> shortTypes2",
+            "private List<@NotNull Integer> intTypes",
+            "private List<@NotNull Long> longTypes"
+        );
+    }
 }

@@ -70,7 +70,7 @@ class {{classname}}Test {
     void {{operationId}}MethodTest() {
         // given
         {{#allParams}}
-        {{{dataType}}} {{paramName}} = {{{example}}};
+        {{{vendorExtensions.baseType}}} {{paramName}} = {{{example}}};
         {{/allParams}}
 
         // when
@@ -103,7 +103,7 @@ class {{classname}}Test {
         // given
         {{!Create the body}}
         {{#bodyParam}}
-        {{{dataType}}} body = {{{example}}};
+        {{{vendorExtensions.baseType}}} body = {{{example}}};
         {{/bodyParam}}
         {{#formParams.0}}
         var form = new HashMap<String, Object>();

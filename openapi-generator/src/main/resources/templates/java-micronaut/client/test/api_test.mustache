@@ -38,7 +38,7 @@ class {{classname}}Test {
     void {{operationId}}Test() {
         // given
         {{#allParams}}
-        {{{dataType}}} {{paramName}} = {{{example}}};
+        {{{vendorExtensions.baseType}}} {{paramName}} = {{{example}}};
         {{/allParams}}
 
         // when
