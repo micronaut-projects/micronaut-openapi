@@ -2481,10 +2481,10 @@ public final class SchemaDefinitionUtils {
 
             if (publicField instanceof MemberElement memberEl && (memberEl.getDeclaringType().getType().getName().equals(type.getName()) || isGetterOverridden)) {
 
-                ClassElement fieldType = publicField.getGenericType();
                 if (withJsonView && !allowedByJsonView(publicField, classLvlJsonViewClasses, jsonViewClass, context)) {
                     continue;
                 }
+                ClassElement fieldType = publicField.getGenericType();
 
                 Schema<?> propertySchema = resolveSchema(openAPI, publicField, fieldType, context, mediaTypes, jsonViewClass, fieldJavadoc, classJavadoc);
 

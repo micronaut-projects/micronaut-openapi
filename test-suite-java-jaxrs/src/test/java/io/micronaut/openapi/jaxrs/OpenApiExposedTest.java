@@ -1,4 +1,4 @@
-package io.micronaut.open.jaxrs;
+package io.micronaut.openapi.jaxrs;
 
 import io.micronaut.http.client.BlockingHttpClient;
 import io.micronaut.http.client.HttpClient;

@@ -1,0 +1,131 @@
+To use micronaut-openapi with spring in maven add this code to your `pom.xml`
+
+.pom.xml
+[source,xml]
+----
+    <dependencies>
+        <dependency>
+            <groupId>io.micronaut</groupId>
+            <artifactId>micronaut-inject-java</artifactId>
+            <version>${micronaut.core.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.micronaut.openapi</groupId>
+            <artifactId>micronaut-openapi-annotations</artifactId>
+            <version>${micronaut.openapi.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.micronaut.serde</groupId>
+            <artifactId>micronaut-serde-api</artifactId>
+            <version>${micronaut.serde.version}</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <annotationProcessorPaths combine.children="append">
+                        <path>
+                            <groupId>io.micronaut</groupId>
+                            <artifactId>micronaut-inject-java</artifactId>
+                            <version>${micronaut.core.version}</version>
+                        </path>
+                        <path>
+                            <groupId>io.micronaut.spring</groupId>
+                            <artifactId>micronaut-spring-annotation</artifactId>
+                            <version>${micronaut.spring.version}</version>
+                        </path>
+                        <path>
+                            <groupId>io.micronaut.spring</groupId>
+                            <artifactId>micronaut-spring-web-annotation</artifactId>
+                            <version>${micronaut.spring.version}</version>
+                        </path>
+                        <path>
+                            <groupId>io.micronaut.spring</groupId>
+                            <artifactId>micronaut-spring-boot-annotation</artifactId>
+                            <version>${micronaut.spring.version}</version>
+                        </path>
+                        <path>
+                            <groupId>io.micronaut.openapi</groupId>
+                            <artifactId>micronaut-openapi</artifactId>
+                            <version>${micronaut.openapi.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+----
+
+For kotlin
+.pom.xml
+[source,xml]
+----
+    <dependencies>
+        <dependency>
+            <groupId>io.micronaut</groupId>
+            <artifactId>micronaut-inject-java</artifactId>
+            <version>${micronaut.core.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.micronaut.openapi</groupId>
+            <artifactId>micronaut-openapi-annotations</artifactId>
+            <version>${micronaut.openapi.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.micronaut.serde</groupId>
+            <artifactId>micronaut-serde-api</artifactId>
+            <version>${micronaut.serde.version}</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+
+    <executions>
+        <execution>
+            <id>kapt</id>
+            <goals>
+                <goal>kapt</goal>
+            </goals>
+            <configuration>
+                <sourceDirs>
+                    <sourceDir>${project.basedir}/src/main/kotlin</sourceDir>
+                </sourceDirs>
+                <annotationProcessorPaths combine.self="override">
+                    <annotationProcessorPath>
+                        <groupId>io.micronaut</groupId>
+                        <artifactId>micronaut-inject-java</artifactId>
+                        <version>${micronaut.core.version}</version>
+                    </annotationProcessorPath>
+                    <annotationProcessorPath>
+                        <groupId>io.micronaut.spring</groupId>
+                        <artifactId>micronaut-spring-annotation</artifactId>
+                        <version>${micronaut.spring.version}</version>
+                    </annotationProcessorPath>
+                    <annotationProcessorPath>
+                        <groupId>io.micronaut.spring</groupId>
+                        <artifactId>micronaut-spring-web-annotation</artifactId>
+                        <version>${micronaut.spring.version}</version>
+                    </annotationProcessorPath>
+                    <annotationProcessorPath>
+                        <groupId>io.micronaut.spring</groupId>
+                        <artifactId>micronaut-spring-boot-annotation</artifactId>
+                        <version>${micronaut.spring.version}</version>
+                    </annotationProcessorPath>
+                    <annotationProcessorPath>
+                        <groupId>io.micronaut.openapi</groupId>
+                        <artifactId>micronaut-openapi</artifactId>
+                        <version>${micronaut.openapi.version}</version>
+                    </annotationProcessorPath>
+                </annotationProcessorPaths>
+           </configuration>
+        </execution>
+    </executions>
+----

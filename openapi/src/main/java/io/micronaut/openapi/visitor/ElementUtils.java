@@ -27,6 +27,7 @@ import io.micronaut.core.reflect.ClassUtils;
 import io.micronaut.http.HttpRequest;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.annotation.Header;
+import io.micronaut.http.annotation.RequestAttribute;
 import io.micronaut.http.multipart.FileUpload;
 import io.micronaut.inject.annotation.AnnotationMetadataHierarchy;
 import io.micronaut.inject.ast.ClassElement;
@@ -246,8 +247,10 @@ public final class ElementUtils {
             || parameter.isAnnotationPresent(Hidden.class)
             || parameter.isAnnotationPresent(JsonIgnore.class)
             || parameter.isAnnotationPresent(Header.class) && parameter.getType().isAssignable(Map.class)
+            || parameter.isAnnotationPresent(RequestAttribute.class)
             || parameter.booleanValue(Parameter.class, PROP_HIDDEN).orElse(false)
             || parameter.hasAnnotation("io.micronaut.session.annotation.SessionValue")
+            || parameter.hasAnnotation("org.springframework.web.bind.annotation.RequestAttribute")
             || parameter.hasAnnotation("org.springframework.web.bind.annotation.SessionAttribute")
             || parameter.hasAnnotation("org.springframework.web.bind.annotation.SessionAttributes")
             || parameter.hasAnnotation("jakarta.ws.rs.core.Context")

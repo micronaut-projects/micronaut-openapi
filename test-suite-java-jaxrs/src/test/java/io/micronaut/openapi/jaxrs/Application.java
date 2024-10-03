@@ -1,4 +1,4 @@
-package io.micronaut.open.jaxrs;
+package io.micronaut.openapi.jaxrs;
 
 import io.micronaut.runtime.Micronaut;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;

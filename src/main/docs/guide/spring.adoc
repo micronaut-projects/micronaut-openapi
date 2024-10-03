@@ -1,0 +1,1 @@
+You can use `micronaut-openapi` to build openapi specification for `Spring` / `Spring Boot` applications. In this case, you do not need to change anything in the code. You can continue to use spring, and use micronaut as a replacement for such libraries as `springdoc-openapi`, `springfox`, `swagger` etc.

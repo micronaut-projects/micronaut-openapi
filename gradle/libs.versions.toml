@@ -41,6 +41,7 @@ micronaut-kotlin = "4.4.0"
 micronaut-logging = "1.4.0"
 micronaut-session = "4.4.0"
 micronaut-grpc = "4.7.1"
+micronaut-spring = "5.8.0"
 micronaut-docs = "2.0.0"
 
 [libraries]
@@ -73,6 +74,7 @@ micronaut-data = { module = "io.micronaut.data:micronaut-data-bom", version.ref 
 micronaut-test = { module = "io.micronaut.test:micronaut-test-bom", version.ref = "micronaut-test" }
 micronaut-kotlin = { module = "io.micronaut.kotlin:micronaut-kotlin-bom", version.ref = "micronaut-kotlin" }
 micronaut-grpc = { module = "io.micronaut.grpc:micronaut-grpc-bom", version.ref = "micronaut-grpc" }
+micronaut-spring = { module = "io.micronaut.spring:micronaut-spring-bom", version.ref = "micronaut-spring" }
 micronaut-platform = { module = "io.micronaut.platform:micronaut-platform", version.ref = "micronaut-platform"}
 micronaut-gradle-plugin = { module = "io.micronaut.gradle:micronaut-minimal-plugin", version.ref = "micronaut-gradle-plugin"}
 
@@ -88,7 +90,10 @@ commons-lang3 = { module = "org.apache.commons:commons-lang3", version.ref = "co
 commons-text = { module = "org.apache.commons:commons-text", version.ref = "commons-text" }
 guava = { module = "com.google.guava:guava", version.ref = "guava" }
 commonmark = { module = "org.commonmark:commonmark", version.ref = "commonmark" }
-
+spring-boot-starter-web = { module = "org.springframework.boot:spring-boot-starter-web" }
+spring-boot-starter-validation = { module = "org.springframework.boot:spring-boot-starter-validation" }
+spring-boot-starter-data-rest = { module = "org.springframework.boot:spring-boot-starter-data-rest" }
+spring-boot-starter-test = { module = "org.springframework.boot:spring-boot-starter-test" }
 openapi-generator = { module = "org.openapitools:openapi-generator", version.ref = "openapi-generator" }
 swagger-parser = { module = "io.swagger:swagger-parser", version.ref = "swagger-parser" }
 swagger-parser-v3 = { module = "io.swagger.parser.v3:swagger-parser-v3", version.ref = "swagger-parser-v3" }

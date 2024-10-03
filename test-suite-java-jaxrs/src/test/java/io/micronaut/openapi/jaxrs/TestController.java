@@ -1,4 +1,4 @@
-package io.micronaut.open.jaxrs;
+package io.micronaut.openapi.jaxrs;
 
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;

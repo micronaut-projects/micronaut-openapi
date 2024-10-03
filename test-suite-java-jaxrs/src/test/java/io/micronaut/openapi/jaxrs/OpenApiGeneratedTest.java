@@ -1,4 +1,4 @@
-package io.micronaut.open.jaxrs;
+package io.micronaut.openapi.jaxrs;
 
 import io.micronaut.core.io.ResourceLoader;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
