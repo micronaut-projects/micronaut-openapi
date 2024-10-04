@@ -120,7 +120,9 @@ implements com.samskivert.mustache.Mustache.Lambda</span></div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#execute(com.samskivert.mustache.Template.Fragment,java.io.Writer)" class="member-name-link">execute</a><wbr>(com.samskivert.mustache.Template.Fragment&nbsp;fragment,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/io/Writer.html" title="class or interface in java.io" class="external-link">Writer</a>&nbsp;writer)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Executes this lambda on the supplied template fragment.</div>
+</div>
 </div>
 </div>
 </div>
@@ -163,9 +165,15 @@ implements com.samskivert.mustache.Mustache.Lambda</span></div>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">execute</span><wbr><span class="parameters">(com.samskivert.mustache.Template.Fragment&nbsp;fragment,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/io/Writer.html" title="class or interface in java.io" class="external-link">Writer</a>&nbsp;writer)</span>
              throws <span class="exceptions"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/io/IOException.html" title="class or interface in java.io" class="external-link">IOException</a></span></div>
+<div class="block"><span class="descfrm-type-label">Description copied from interface:&nbsp;<code>com.samskivert.mustache.Mustache.Lambda</code></span></div>
+<div class="block">Executes this lambda on the supplied template fragment. The lambda should write its
+ results to <code>out</code>.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code>execute</code>&nbsp;in interface&nbsp;<code>com.samskivert.mustache.Mustache.Lambda</code></dd>
+<dt>Parameters:</dt>
+<dd><code>fragment</code> - the fragment of the template that was passed to the lambda.</dd>
+<dd><code>writer</code> - the writer to which the lambda should write its output.</dd>
 <dt>Throws:</dt>
 <dd><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/io/IOException.html" title="class or interface in java.io" class="external-link">IOException</a></code></dd>
 </dl>
