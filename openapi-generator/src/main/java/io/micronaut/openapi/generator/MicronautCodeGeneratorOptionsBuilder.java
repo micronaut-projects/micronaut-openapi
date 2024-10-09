@@ -335,6 +335,83 @@ public interface MicronautCodeGeneratorOptionsBuilder {
     MicronautCodeGeneratorOptionsBuilder withUseJakartaEe(boolean useJakartaEe);
 
     /**
+     * Sort method arguments to place required parameters before optional parameters.
+     * Default: true
+     *
+     * @param sortParamsByRequiredFlag Sort method arguments to place required parameters before optional parameters
+     *
+     * @return this builder
+     */
+    MicronautCodeGeneratorOptionsBuilder withSortParamsByRequiredFlag(boolean sortParamsByRequiredFlag);
+
+    /**
+     * Skip examples defined in operations to avoid out of memory errors.
+     * Default: false
+     *
+     * @param skipOperationExample Skip examples defined in operations to avoid out of memory errors.
+     *
+     * @return this builder
+     */
+    MicronautCodeGeneratorOptionsBuilder withSkipOperationExample(boolean skipOperationExample);
+
+    /**
+     * Skip sorting operations.
+     * Default: false
+     *
+     * @param skipSortingOperations Skip sorting operations
+     * @return this builder
+     */
+    MicronautCodeGeneratorOptionsBuilder withSkipSortingOperations(boolean skipSortingOperations);
+
+    /**
+     * Character to use as a delimiter for the prefix. Default: '_'
+     *
+     * @param removeOperationIdPrefixDelimiter Character to use as a delimiter for the prefix. Default: '_'
+     * @return this builder
+     */
+    MicronautCodeGeneratorOptionsBuilder withRemoveOperationIdPrefixDelimiter(String removeOperationIdPrefixDelimiter);
+
+    /**
+     * Count of delimiter for the prefix. Use -1 for last Default: 1
+     *
+     * @param removeOperationIdPrefixCount Count of delimiter for the prefix. Use -1 for last Default: 1
+     * @return this builder
+     */
+    MicronautCodeGeneratorOptionsBuilder withRemoveOperationIdPrefixCount(int removeOperationIdPrefixCount);
+
+    /**
+     * Sort model properties to place required parameters before optional parameters.
+     *
+     * @param sortModelPropertiesByRequiredFlag Sort model properties to place required parameters before optional parameters.
+     * @return this builder
+     */
+    MicronautCodeGeneratorOptionsBuilder withSortModelPropertiesByRequiredFlag(boolean sortModelPropertiesByRequiredFlag);
+
+    /**
+     * Whether to ensure parameter names are unique in an operation (rename parameters that are not).
+     *
+     * @param ensureUniqueParams Whether to ensure parameter names are unique in an operation (rename parameters that are not).
+     * @return this builder
+     */
+    MicronautCodeGeneratorOptionsBuilder withEnsureUniqueParams(boolean ensureUniqueParams);
+
+    /**
+     * boolean, toggles whether Unicode identifiers are allowed in names or not, default is false.
+     *
+     * @param allowUnicodeIdentifiers toggles whether Unicode identifiers are allowed in names or not, default is false
+     * @return this builder
+     */
+    MicronautCodeGeneratorOptionsBuilder withAllowUnicodeIdentifiers(boolean allowUnicodeIdentifiers);
+
+    /**
+     * Add form or body parameters to the beginning of the parameter list.
+     *
+     * @param prependFormOrBodyParameters Add form or body parameters to the beginning of the parameter list.
+     * @return this builder
+     */
+    MicronautCodeGeneratorOptionsBuilder withPrependFormOrBodyParameters(boolean prependFormOrBodyParameters);
+
+    /**
      * The possible date-time formatting configurations.
      */
     enum DateTimeFormat {

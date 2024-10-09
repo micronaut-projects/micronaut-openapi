@@ -213,6 +213,17 @@ public final class MicronautCodeGeneratorEntryPoint {
             javaCodeGen.setSerializationLibrary(options.serializationLibraryKind.name());
             javaCodeGen.setGenerateSwaggerAnnotations(options.generateSwaggerAnnotations);
             javaCodeGen.setDateTimeLibrary(options.dateTimeFormat.name());
+
+            javaCodeGen.setSortParamsByRequiredFlag(options.sortParamsByRequiredFlag);
+            javaCodeGen.setSkipOperationExample(options.skipOperationExample);
+            javaCodeGen.setSkipSortingOperations(options.skipSortingOperations);
+            javaCodeGen.setRemoveOperationIdPrefixDelimiter(options.removeOperationIdPrefixDelimiter);
+            javaCodeGen.setRemoveOperationIdPrefixCount(options.removeOperationIdPrefixCount);
+            javaCodeGen.setSortModelPropertiesByRequiredFlag(options.sortModelPropertiesByRequiredFlag);
+            javaCodeGen.setEnsureUniqueParams(options.ensureUniqueParams);
+            javaCodeGen.setAllowUnicodeIdentifiers(options.allowUnicodeIdentifiers);
+            javaCodeGen.setPrependFormOrBodyParameters(options.prependFormOrBodyParameters);
+
             configureJavaServerOptions();
             configureJavaClientOptions();
         } else if (options.lang == GeneratorLanguage.KOTLIN && codeGenerator instanceof AbstractMicronautKotlinCodegen<?> kotlinCodeGen) {
@@ -294,6 +305,17 @@ public final class MicronautCodeGeneratorEntryPoint {
             kotlinCodeGen.setTestTool(options.testFramework.value);
             kotlinCodeGen.setSerializationLibrary(options.serializationLibraryKind.name());
             kotlinCodeGen.setDateTimeLibrary(options.dateTimeFormat.name());
+
+            kotlinCodeGen.setSortParamsByRequiredFlag(options.sortParamsByRequiredFlag);
+            kotlinCodeGen.setSkipOperationExample(options.skipOperationExample);
+            kotlinCodeGen.setSkipSortingOperations(options.skipSortingOperations);
+            kotlinCodeGen.setRemoveOperationIdPrefixDelimiter(options.removeOperationIdPrefixDelimiter);
+            kotlinCodeGen.setRemoveOperationIdPrefixCount(options.removeOperationIdPrefixCount);
+            kotlinCodeGen.setSortModelPropertiesByRequiredFlag(options.sortModelPropertiesByRequiredFlag);
+            kotlinCodeGen.setEnsureUniqueParams(options.ensureUniqueParams);
+            kotlinCodeGen.setAllowUnicodeIdentifiers(options.allowUnicodeIdentifiers);
+            kotlinCodeGen.setPrependFormOrBodyParameters(options.prependFormOrBodyParameters);
+
             configureKotlinServerOptions();
             configureKotlinClientOptions();
         }
@@ -572,6 +594,16 @@ public final class MicronautCodeGeneratorEntryPoint {
             private List<String> additionalOneOfTypeAnnotations;
             private Map<String, Object> additionalProperties;
 
+            private boolean sortParamsByRequiredFlag = true;
+            private boolean skipOperationExample;
+            private boolean skipSortingOperations;
+            private String removeOperationIdPrefixDelimiter = "_";
+            private int removeOperationIdPrefixCount = 1;
+            private boolean sortModelPropertiesByRequiredFlag = true;
+            private boolean ensureUniqueParams = true;
+            private boolean allowUnicodeIdentifiers;
+            private boolean prependFormOrBodyParameters;
+
             @Override
             public MicronautCodeGeneratorOptionsBuilder withLang(GeneratorLanguage lang) {
                 this.lang = lang;
@@ -800,6 +832,60 @@ public final class MicronautCodeGeneratorEntryPoint {
                 return this;
             }
 
+            @Override
+            public MicronautCodeGeneratorOptionsBuilder withSortParamsByRequiredFlag(boolean sortParamsByRequiredFlag) {
+                this.sortParamsByRequiredFlag = sortParamsByRequiredFlag;
+                return this;
+            }
+
+            @Override
+            public MicronautCodeGeneratorOptionsBuilder withSkipOperationExample(boolean skipOperationExample) {
+                this.skipOperationExample = skipOperationExample;
+                return this;
+            }
+
+            @Override
+            public MicronautCodeGeneratorOptionsBuilder withSkipSortingOperations(boolean skipSortingOperations) {
+                this.skipSortingOperations = skipSortingOperations;
+                return this;
+            }
+
+            @Override
+            public MicronautCodeGeneratorOptionsBuilder withRemoveOperationIdPrefixDelimiter(String removeOperationIdPrefixDelimiter) {
+                this.removeOperationIdPrefixDelimiter = removeOperationIdPrefixDelimiter;
+                return this;
+            }
+
+            @Override
+            public MicronautCodeGeneratorOptionsBuilder withRemoveOperationIdPrefixCount(int removeOperationIdPrefixCount) {
+                this.removeOperationIdPrefixCount = removeOperationIdPrefixCount;
+                return this;
+            }
+
+            @Override
+            public MicronautCodeGeneratorOptionsBuilder withSortModelPropertiesByRequiredFlag(boolean sortModelPropertiesByRequiredFlag) {
+                this.sortModelPropertiesByRequiredFlag = sortModelPropertiesByRequiredFlag;
+                return this;
+            }
+
+            @Override
+            public MicronautCodeGeneratorOptionsBuilder withEnsureUniqueParams(boolean ensureUniqueParams) {
+                this.ensureUniqueParams = ensureUniqueParams;
+                return this;
+            }
+
+            @Override
+            public MicronautCodeGeneratorOptionsBuilder withAllowUnicodeIdentifiers(boolean allowUnicodeIdentifiers) {
+                this.allowUnicodeIdentifiers = allowUnicodeIdentifiers;
+                return this;
+            }
+
+            @Override
+            public MicronautCodeGeneratorOptionsBuilder withPrependFormOrBodyParameters(boolean prependFormOrBodyParameters) {
+                this.prependFormOrBodyParameters = prependFormOrBodyParameters;
+                return this;
+            }
+
             private Options build() {
                 return new Options(
                     lang,
@@ -842,7 +928,17 @@ public final class MicronautCodeGeneratorEntryPoint {
                     additionalEnumTypeAnnotations,
                     additionalModelTypeAnnotations,
                     additionalOneOfTypeAnnotations,
-                    additionalProperties
+                    additionalProperties,
+
+                    sortParamsByRequiredFlag,
+                    skipOperationExample,
+                    skipSortingOperations,
+                    removeOperationIdPrefixDelimiter,
+                    removeOperationIdPrefixCount,
+                    sortModelPropertiesByRequiredFlag,
+                    ensureUniqueParams,
+                    allowUnicodeIdentifiers,
+                    prependFormOrBodyParameters
                 );
             }
         }
@@ -905,7 +1001,17 @@ public final class MicronautCodeGeneratorEntryPoint {
         List<String> additionalEnumTypeAnnotations,
         List<String> additionalModelTypeAnnotations,
         List<String> additionalOneOfTypeAnnotations,
-        Map<String, Object> additionalProperties
+        Map<String, Object> additionalProperties,
+
+        boolean sortParamsByRequiredFlag,
+        boolean skipOperationExample,
+        boolean skipSortingOperations,
+        String removeOperationIdPrefixDelimiter,
+        int removeOperationIdPrefixCount,
+        boolean sortModelPropertiesByRequiredFlag,
+        boolean ensureUniqueParams,
+        boolean allowUnicodeIdentifiers,
+        boolean prependFormOrBodyParameters
     ) {
     }
 
