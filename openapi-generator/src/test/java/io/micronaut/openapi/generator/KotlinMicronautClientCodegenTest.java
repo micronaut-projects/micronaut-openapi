@@ -777,10 +777,15 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         assertFileContains(path + "model/FileCreateDto.kt",
             """
                 data class FileCreateDto(
+
+                    /**
+                     * Customer type ORG
+                     */
                     @field:NotNull
                     @field:Pattern(regexp = "^ORG$")
                     @field:JsonProperty(JSON_PROPERTY_TYPE_CODE)
                     var typeCode: String = "ORG",
+                
                     @field:NotNull
                     @field:JsonProperty(JSON_PROPERTY_ORG_NAME)
                     var orgName: String,
@@ -1040,6 +1045,91 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
             "shortTypes2: List<@NotNull Short>",
             "intTypes: List<@NotNull Int>",
             "longTypes: List<@NotNull Long>"
+        );
+    }
+
+    @Test
+    void testDeprecated() {
+
+        var codegen = new KotlinMicronautClientCodegen();
+        codegen.setGenerateSwaggerAnnotations(true);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/deprecated.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String path = outputPath + "src/main/kotlin/org/openapitools/";
+
+        assertFileContains(path + "api/ParametersApi.kt",
+            """
+                    /**
+                     * A method to send primitives as request parameters
+                     *
+                     * @param name (required)
+                     *        Deprecated: Deprecated message2
+                     * @param age (required)
+                     * @param height (required)
+                     *        Deprecated: Deprecated message4
+                     * @return Mono&lt;SendPrimitivesResponse&gt;
+                     *
+                     * @deprecated Deprecated message1
+                     */
+                    @Suppress("DEPRECATED_JAVA_ANNOTATION")
+                    @Deprecated("Deprecated message1")
+                    @Operation(
+                        operationId = "sendPrimitives",
+                        description = "A method to send primitives as request parameters",
+                        responses = [
+                            ApiResponse(responseCode = "200", description = "Success", content = [
+                                Content(mediaType = "application/json", schema = Schema(implementation = SendPrimitivesResponse::class))
+                            ]),
+                            ApiResponse(responseCode = "default", description = "An unexpected error has occurred")
+                        ],
+                        parameters = [
+                            Parameter(name = "name", deprecated = true, required = true, `in` = ParameterIn.PATH),
+                            Parameter(name = "age", required = true, `in` = ParameterIn.QUERY),
+                            Parameter(name = "height", deprecated = true, required = true, `in` = ParameterIn.HEADER)
+                        ]
+                    )
+                    @Get("/sendPrimitives/{name}")
+                    fun sendPrimitives(
+                        @PathVariable("name") @NotNull @java.lang.Deprecated name: String,
+                        @QueryValue("age") @NotNull age: BigDecimal,
+                        @Header("height") @NotNull @java.lang.Deprecated height: Float
+                    ): Mono<SendPrimitivesResponse>
+                """);
+
+        assertFileContains(path + "model/SendPrimitivesResponse.kt",
+            """
+                /**
+                 * SendPrimitivesResponse
+                 *
+                 * @deprecated Deprecated message5
+                 */
+                @Deprecated("Deprecated message5")
+                """,
+            """
+                    /**
+                     * @deprecated Deprecated message6
+                     */
+                    @Deprecated("Deprecated message6")
+                    @field:Nullable
+                    @field:Schema(name = "name", requiredMode = Schema.RequiredMode.NOT_REQUIRED, deprecated = true)
+                    @field:JsonProperty(JSON_PROPERTY_NAME)
+                    @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                    var name: String? = null,
+                """);
+
+        assertFileContains(path + "model/StateEnum.kt",
+            """
+                /**
+                 * Gets or Sets StateEnum
+                 *
+                 * @param value The value represented by this enum
+                 *
+                 * @deprecated  Deprecated message9
+                 */
+                @Deprecated("Deprecated message9")
+                @Serdeable
+                @Generated("io.micronaut.openapi.generator.KotlinMicronautClientCodegen")
+                enum class StateEnum(
+                """
         );
     }
 }

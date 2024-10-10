@@ -157,7 +157,7 @@ public final class Utils {
         }
 
         if (StringUtils.isNotEmpty(prop.pattern) && !prop.isDate && !prop.isDateTime) {
-            if ("email".equals(type)) {
+            if (prop.isEmail) {
                 result.append("@Email(regexp = \"");
             } else {
                 result.append("@Pattern(regexp = \"");
@@ -274,7 +274,7 @@ public final class Utils {
         }
         return switch (type) {
             case "array", "char", "character", "string", "boolean", "byte", "short", "int", "integer", "long", "uri", "url", "uuid", "email", "float",
-                 "double", "number", "partial-time", "date", "date-time", "bigdecimal", "biginteger" -> true;
+                 "double", "number", "partial-time", "date", "date-time", "bigdecimal", "decimal", "biginteger" -> true;
             default -> false;
         };
     }

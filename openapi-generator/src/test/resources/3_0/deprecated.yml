@@ -1,0 +1,81 @@
+openapi: "3.0.0"
+info:
+  version: 1.0.0
+  title: Compute API
+  description: API for the Compute Service
+servers:
+  - url: localhost:8000/api
+    description: The api server
+
+paths:
+  /sendPrimitives/{name}:
+    get:
+      deprecated: true
+      x-deprecated-message: Deprecated message1
+      operationId: sendPrimitives
+      tags: [ parameters ]
+      description: A method to send primitives as request parameters
+      parameters:
+        - name: name
+          in: path
+          deprecated: true
+          x-deprecated-message: Deprecated message2
+          required: true
+          schema:
+            type: string
+        - name: age
+          in: query
+          required: true
+          schema:
+            type: number
+        - name: height
+          in: header
+          deprecated: true
+          x-deprecated-message: Deprecated message4
+          required: true
+          schema:
+            type: number
+            format: float
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SendPrimitivesResponse'
+        default:
+          $ref: '#/components/responses/Error'
+components:
+  schemas:
+    SendPrimitivesResponse:
+      type: object
+      deprecated: true
+      x-deprecated-message: Deprecated message5
+      properties:
+        name:
+          type: string
+          deprecated: true
+          x-deprecated-message: Deprecated message6
+        age:
+          type: number
+    SimpleModel:
+      type: object
+      properties:
+        color:
+          type: string
+          minLength: 2
+        size:
+          type: string
+          minLength: 2
+          deprecated: true
+          x-deprecated-message: Deprecated message8
+        state:
+          $ref: '#/components/schemas/StateEnum'
+    StateEnum:
+      type: string
+      deprecated: true
+      x-deprecated-message: Deprecated message9
+      enum: ['starting', 'running', 'stopped', 'deleted']
+  responses:
+    Error:
+      description: An unexpected error has occurred

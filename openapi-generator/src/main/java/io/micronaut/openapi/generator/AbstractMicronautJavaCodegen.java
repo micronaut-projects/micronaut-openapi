@@ -44,6 +44,7 @@ import org.openapitools.codegen.CodegenProperty;
 import org.openapitools.codegen.CodegenResponse;
 import org.openapitools.codegen.IJsonSchemaValidationProperties;
 import org.openapitools.codegen.SupportingFile;
+import org.openapitools.codegen.VendorExtension;
 import org.openapitools.codegen.config.GlobalSettings;
 import org.openapitools.codegen.languages.AbstractJavaCodegen;
 import org.openapitools.codegen.languages.features.BeanValidationFeatures;
@@ -148,7 +149,6 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
     public static final String CONTENT_TYPE_APPLICATION_JSON = "application/json";
     public static final String CONTENT_TYPE_MULTIPART_FORM_DATA = "multipart/form-data";
     public static final String CONTENT_TYPE_ANY = "*/*";
-    public static final String EXT_CONTENT_TYPE = "x-content-type";
 
     private static final String MONO_CLASS_NAME = "reactor.core.publisher.Mono";
     private static final String FLUX_CLASS_NAME = "reactor.core.publisher.Flux";
@@ -282,7 +282,6 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
 
         var generateSwaggerAnnotationsOption = new CliOption(OPT_GENERATE_SWAGGER_ANNOTATIONS, "Specify if you want to generate swagger annotations and which version").defaultValue(generateSwaggerAnnotations);
         var generateSwaggerAnnotationsOptionMap = new HashMap<String, String>();
-        generateSwaggerAnnotationsOptionMap.put(OPT_GENERATE_SWAGGER_ANNOTATIONS_SWAGGER_1, "Use io.swagger:swagger-annotations for annotating operations and schemas");
         generateSwaggerAnnotationsOptionMap.put(OPT_GENERATE_SWAGGER_ANNOTATIONS_SWAGGER_2, "Use io.swagger.core.v3:swagger-annotations for annotating operations and schemas");
         generateSwaggerAnnotationsOptionMap.put(OPT_GENERATE_SWAGGER_ANNOTATIONS_TRUE, "Equivalent to \"" + OPT_GENERATE_SWAGGER_ANNOTATIONS_SWAGGER_2 + "\"");
         generateSwaggerAnnotationsOptionMap.put(OPT_GENERATE_SWAGGER_ANNOTATIONS_FALSE, "Do not generate swagger annotations");
@@ -560,9 +559,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
         }
 
         maybeSetSwagger();
-        if (OPT_GENERATE_SWAGGER_ANNOTATIONS_SWAGGER_1.equals(generateSwaggerAnnotations)) {
-            additionalProperties.put("generateSwagger1Annotations", true);
-        } else if (OPT_GENERATE_SWAGGER_ANNOTATIONS_SWAGGER_2.equals(generateSwaggerAnnotations)) {
+        if (OPT_GENERATE_SWAGGER_ANNOTATIONS_SWAGGER_2.equals(generateSwaggerAnnotations)) {
             additionalProperties.put("generateSwagger2Annotations", true);
         }
 
@@ -677,8 +674,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
         if (additionalProperties.containsKey(OPT_GENERATE_SWAGGER_ANNOTATIONS)) {
             String value = String.valueOf(additionalProperties.get(OPT_GENERATE_SWAGGER_ANNOTATIONS));
             switch (value) {
-                case OPT_GENERATE_SWAGGER_ANNOTATIONS_SWAGGER_1 -> generateSwaggerAnnotations = OPT_GENERATE_SWAGGER_ANNOTATIONS_SWAGGER_1;
-                case OPT_GENERATE_SWAGGER_ANNOTATIONS_SWAGGER_2, OPT_GENERATE_SWAGGER_ANNOTATIONS_TRUE -> generateSwaggerAnnotations = OPT_GENERATE_SWAGGER_ANNOTATIONS_SWAGGER_2;
+                case OPT_GENERATE_SWAGGER_ANNOTATIONS_SWAGGER_1, OPT_GENERATE_SWAGGER_ANNOTATIONS_SWAGGER_2, OPT_GENERATE_SWAGGER_ANNOTATIONS_TRUE -> generateSwaggerAnnotations = OPT_GENERATE_SWAGGER_ANNOTATIONS_SWAGGER_2;
                 case OPT_GENERATE_SWAGGER_ANNOTATIONS_FALSE -> generateSwaggerAnnotations = OPT_GENERATE_SWAGGER_ANNOTATIONS_FALSE;
                 default -> throw new RuntimeException("Value \"" + value + "\" for the " + OPT_GENERATE_SWAGGER_ANNOTATIONS + " parameter is unsupported or misspelled");
             }
@@ -1314,8 +1310,8 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
             }
 
             // Remove the "*/*" contentType from operations as it is ambiguous
-            if (CONTENT_TYPE_ANY.equals(op.vendorExtensions.get(EXT_CONTENT_TYPE))) {
-                op.vendorExtensions.put(EXT_CONTENT_TYPE, CONTENT_TYPE_APPLICATION_JSON);
+            if (CONTENT_TYPE_ANY.equals(op.vendorExtensions.get(VendorExtension.X_CONTENT_TYPE.getName()))) {
+                op.vendorExtensions.put(VendorExtension.X_CONTENT_TYPE.getName(), CONTENT_TYPE_APPLICATION_JSON);
             }
             op.consumes = op.consumes == null ? null : op.consumes.stream()
                 .filter(contentType -> !CONTENT_TYPE_ANY.equals(contentType.get("mediaType")))
@@ -1340,14 +1336,14 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
             // Force form parameters are only set if the content-type is according
             // formParams correspond to urlencoded type
             // bodyParams correspond to multipart body
-            if (CONTENT_TYPE_APPLICATION_FORM_URLENCODED.equals(op.vendorExtensions.get(EXT_CONTENT_TYPE))) {
+            if (CONTENT_TYPE_APPLICATION_FORM_URLENCODED.equals(op.vendorExtensions.get(VendorExtension.X_CONTENT_TYPE.getName()))) {
                 op.formParams.addAll(op.bodyParams);
                 op.bodyParams.forEach(p -> {
                     p.isBodyParam = false;
                     p.isFormParam = true;
                 });
                 op.bodyParams.clear();
-            } else if (CONTENT_TYPE_MULTIPART_FORM_DATA.equals(op.vendorExtensions.get(EXT_CONTENT_TYPE))) {
+            } else if (CONTENT_TYPE_MULTIPART_FORM_DATA.equals(op.vendorExtensions.get(VendorExtension.X_CONTENT_TYPE.getName()))) {
                 op.bodyParams.addAll(op.formParams);
                 for (var param : op.allParams) {
                     if (param.isFormParam) {
