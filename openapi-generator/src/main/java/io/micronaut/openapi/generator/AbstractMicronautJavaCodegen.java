@@ -145,6 +145,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
     public static final String OPT_GENERATE_SWAGGER_ANNOTATIONS_TRUE = "true";
     public static final String OPT_GENERATE_SWAGGER_ANNOTATIONS_FALSE = "false";
     public static final String OPT_GENERATE_OPERATION_ONLY_FOR_FIRST_TAG = "generateOperationOnlyForFirstTag";
+    public static final String OPT_SKIP_SORTING_OPERATIONS = "skipSortingOperations";
     public static final String CONTENT_TYPE_APPLICATION_FORM_URLENCODED = "application/x-www-form-urlencoded";
     public static final String CONTENT_TYPE_APPLICATION_JSON = "application/json";
     public static final String CONTENT_TYPE_MULTIPART_FORM_DATA = "multipart/form-data";
@@ -549,6 +550,8 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
         }
         writePropertyBack(USE_JAKARTA_EE, useJakartaEe);
         writePropertyBack(JAVAX_PACKAGE, useJakartaEe ? "jakarta" : "javax");
+
+        convertPropertyToBooleanAndWriteBack(OPT_SKIP_SORTING_OPERATIONS, this::setSkipSortingOperations);
 
         maybeSetTestTool();
         writePropertyBack(OPT_TEST, testTool);
