@@ -117,11 +117,12 @@ loadScripts(document, 'script');</script>
 <div class="block">Binds the schema for the given element.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static io.swagger.v3.oas.models.media.Schema&lt;?&gt;</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#bindSchemaForElement(io.micronaut.inject.visitor.VisitorContext,io.micronaut.inject.ast.TypedElement,io.micronaut.inject.ast.ClassElement,io.swagger.v3.oas.models.media.Schema,io.micronaut.inject.ast.ClassElement)" class="member-name-link">bindSchemaForElement</a><wbr>(io.micronaut.inject.visitor.VisitorContext&nbsp;context,
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#bindSchemaForElement(io.micronaut.inject.visitor.VisitorContext,io.micronaut.inject.ast.TypedElement,io.micronaut.inject.ast.ClassElement,io.swagger.v3.oas.models.media.Schema,io.micronaut.inject.ast.ClassElement,boolean)" class="member-name-link">bindSchemaForElement</a><wbr>(io.micronaut.inject.visitor.VisitorContext&nbsp;context,
  io.micronaut.inject.ast.TypedElement&nbsp;element,
  io.micronaut.inject.ast.ClassElement&nbsp;elementType,
  io.swagger.v3.oas.models.media.Schema&lt;?&gt;&nbsp;schemaToBind,
- @Nullable io.micronaut.inject.ast.ClassElement&nbsp;jsonViewClass)</code></div>
+ @Nullable io.micronaut.inject.ast.ClassElement&nbsp;jsonViewClass,
+ boolean&nbsp;withProcessDeprecated)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
 <div class="block">Binds the schema for the given element.</div>
 </div>
@@ -373,14 +374,15 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
-<section class="detail" id="bindSchemaForElement(io.micronaut.inject.visitor.VisitorContext,io.micronaut.inject.ast.TypedElement,io.micronaut.inject.ast.ClassElement,io.swagger.v3.oas.models.media.Schema,io.micronaut.inject.ast.ClassElement)">
+<section class="detail" id="bindSchemaForElement(io.micronaut.inject.visitor.VisitorContext,io.micronaut.inject.ast.TypedElement,io.micronaut.inject.ast.ClassElement,io.swagger.v3.oas.models.media.Schema,io.micronaut.inject.ast.ClassElement,boolean)">
 <h3>bindSchemaForElement</h3>
 <div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">io.swagger.v3.oas.models.media.Schema&lt;?&gt;</span>&nbsp;<span class="element-name">bindSchemaForElement</span><wbr><span class="parameters">(io.micronaut.inject.visitor.VisitorContext&nbsp;context,
  io.micronaut.inject.ast.TypedElement&nbsp;element,
  io.micronaut.inject.ast.ClassElement&nbsp;elementType,
  io.swagger.v3.oas.models.media.Schema&lt;?&gt;&nbsp;schemaToBind,
  @Nullable
- @Nullable io.micronaut.inject.ast.ClassElement&nbsp;jsonViewClass)</span></div>
+ @Nullable io.micronaut.inject.ast.ClassElement&nbsp;jsonViewClass,
+ boolean&nbsp;withProcessDeprecated)</span></div>
 <div class="block">Binds the schema for the given element.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
@@ -389,6 +391,7 @@ loadScripts(document, 'script');</script>
 <dd><code>elementType</code> - The element type</dd>
 <dd><code>schemaToBind</code> - The schema to bind</dd>
 <dd><code>jsonViewClass</code> - Class from JsonView annotation</dd>
+<dd><code>withProcessDeprecated</code> - Is need to process deprecates annotation</dd>
 <dt>Returns:</dt>
 <dd>The bound schema</dd>
 </dl>

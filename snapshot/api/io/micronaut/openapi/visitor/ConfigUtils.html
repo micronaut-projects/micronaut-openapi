@@ -191,7 +191,13 @@ loadScripts(document, 'script');</script>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#getSecurityProperties(io.micronaut.inject.visitor.VisitorContext)" class="member-name-link">getSecurityProperties</a><wbr>(io.micronaut.inject.visitor.VisitorContext&nbsp;context)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static boolean</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#isExtraSchemasEnabled(io.micronaut.inject.visitor.VisitorContext)" class="member-name-link">isExtraSchemasEnabled</a><wbr>(io.micronaut.inject.visitor.VisitorContext&nbsp;context)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#isAdocEnabled(io.micronaut.inject.visitor.VisitorContext)" class="member-name-link">isAdocEnabled</a><wbr>(io.micronaut.inject.visitor.VisitorContext&nbsp;context)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static boolean</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#isExtraSchemasEnabled(io.micronaut.inject.visitor.VisitorContext)" class="member-name-link">isExtraSchemasEnabled</a><wbr>(io.micronaut.inject.visitor.VisitorContext&nbsp;context)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static boolean</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#isGeneratorExtensionsEnabled(io.micronaut.inject.visitor.VisitorContext)" class="member-name-link">isGeneratorExtensionsEnabled</a><wbr>(io.micronaut.inject.visitor.VisitorContext&nbsp;context)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static boolean</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#isJsonViewDefaultInclusion(io.micronaut.inject.visitor.VisitorContext)" class="member-name-link">isJsonViewDefaultInclusion</a><wbr>(io.micronaut.inject.visitor.VisitorContext&nbsp;context)</code></div>
@@ -244,6 +250,12 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
+<section class="detail" id="getSchemaDuplicateResolution(io.micronaut.inject.visitor.VisitorContext)">
+<h3>getSchemaDuplicateResolution</h3>
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="ConfigUtils.DuplicateResolution.html" title="enum class in io.micronaut.openapi.visitor">ConfigUtils.DuplicateResolution</a></span>&nbsp;<span class="element-name">getSchemaDuplicateResolution</span><wbr><span class="parameters">(io.micronaut.inject.visitor.VisitorContext&nbsp;context)</span></div>
+</section>
+</li>
+<li>
 <section class="detail" id="isOpenApiEnabled(io.micronaut.inject.visitor.VisitorContext)">
 <h3>isOpenApiEnabled</h3>
 <div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">isOpenApiEnabled</span><wbr><span class="parameters">(io.micronaut.inject.visitor.VisitorContext&nbsp;context)</span></div>
@@ -253,12 +265,6 @@ loadScripts(document, 'script');</script>
 <section class="detail" id="isSchemaNameSeparatorEmpty(io.micronaut.inject.visitor.VisitorContext)">
 <h3>isSchemaNameSeparatorEmpty</h3>
 <div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">isSchemaNameSeparatorEmpty</span><wbr><span class="parameters">(io.micronaut.inject.visitor.VisitorContext&nbsp;context)</span></div>
-</section>
-</li>
-<li>
-<section class="detail" id="getSchemaDuplicateResolution(io.micronaut.inject.visitor.VisitorContext)">
-<h3>getSchemaDuplicateResolution</h3>
-<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="ConfigUtils.DuplicateResolution.html" title="enum class in io.micronaut.openapi.visitor">ConfigUtils.DuplicateResolution</a></span>&nbsp;<span class="element-name">getSchemaDuplicateResolution</span><wbr><span class="parameters">(io.micronaut.inject.visitor.VisitorContext&nbsp;context)</span></div>
 </section>
 </li>
 <li>
@@ -292,6 +298,24 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
+<section class="detail" id="isJsonViewDefaultInclusion(io.micronaut.inject.visitor.VisitorContext)">
+<h3>isJsonViewDefaultInclusion</h3>
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">isJsonViewDefaultInclusion</span><wbr><span class="parameters">(io.micronaut.inject.visitor.VisitorContext&nbsp;context)</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="isGeneratorExtensionsEnabled(io.micronaut.inject.visitor.VisitorContext)">
+<h3>isGeneratorExtensionsEnabled</h3>
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">isGeneratorExtensionsEnabled</span><wbr><span class="parameters">(io.micronaut.inject.visitor.VisitorContext&nbsp;context)</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="isAdocEnabled(io.micronaut.inject.visitor.VisitorContext)">
+<h3>isAdocEnabled</h3>
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">isAdocEnabled</span><wbr><span class="parameters">(io.micronaut.inject.visitor.VisitorContext&nbsp;context)</span></div>
+</section>
+</li>
+<li>
 <section class="detail" id="getExpandableProperties(io.micronaut.inject.visitor.VisitorContext)">
 <h3>getExpandableProperties</h3>
 <div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="Pair.html" title="class in io.micronaut.openapi.visitor">Pair</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;&gt;</span>&nbsp;<span class="element-name">getExpandableProperties</span><wbr><span class="parameters">(io.micronaut.inject.visitor.VisitorContext&nbsp;context)</span></div>
@@ -309,12 +333,6 @@ loadScripts(document, 'script');</script>
 <section class="detail" id="isJsonViewEnabled(io.micronaut.inject.visitor.VisitorContext)">
 <h3>isJsonViewEnabled</h3>
 <div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">isJsonViewEnabled</span><wbr><span class="parameters">(io.micronaut.inject.visitor.VisitorContext&nbsp;context)</span></div>
-</section>
-</li>
-<li>
-<section class="detail" id="isJsonViewDefaultInclusion(io.micronaut.inject.visitor.VisitorContext)">
-<h3>isJsonViewDefaultInclusion</h3>
-<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">isJsonViewDefaultInclusion</span><wbr><span class="parameters">(io.micronaut.inject.visitor.VisitorContext&nbsp;context)</span></div>
 </section>
 </li>
 <li>
