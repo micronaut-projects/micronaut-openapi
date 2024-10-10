@@ -17,12 +17,12 @@
     {{^isNullable}}
         {{#required}}
             {{^isReadOnly}}
-    @{{{vendorExtensions.fieldAnnPrefix}}}NotNull
+    @{{{vendorExtensions.fieldAnnPrefix}}}NotNull{{#vendorExtensions.x-not-null-message}}(message = "{{{.}}}"){{/vendorExtensions.x-not-null-message}}
             {{/isReadOnly}}
         {{/required}}
     {{/isNullable}}
-    {{^isUuid}}
     {{!Validate all pojos and enums}}
+    {{^isUuid}}
     {{^isContainer}}
         {{#isModel}}
     @{{{vendorExtensions.fieldAnnPrefix}}}Valid
@@ -30,63 +30,63 @@
     {{/isContainer}}
     {{!Pattern}}
     {{#pattern}}
-        {{^isByteArray}}
-    @{{{vendorExtensions.fieldAnnPrefix}}}Pattern(regexp = "{{{pattern}}}")
-        {{/isByteArray}}
+        {{^isEmail}}{{^isByteArray}}{{^isDate}}{{^isDateTime}}
+    @{{{vendorExtensions.fieldAnnPrefix}}}Pattern(regexp = "{{{pattern}}}"{{#vendorExtensions.x-pattern-message}}, message = "{{{.}}}"{{/vendorExtensions.x-pattern-message}})
+        {{/isDateTime}}{{/isDate}}{{/isByteArray}}{{/isEmail}}
     {{/pattern}}
     {{!Min length && max length}}
     {{#minLength}}
         {{#maxLength}}
-    @{{{vendorExtensions.fieldAnnPrefix}}}Size(min = {{minLength}}, max = {{maxLength}})
+    @{{{vendorExtensions.fieldAnnPrefix}}}Size(min = {{minLength}}, max = {{maxLength}}{{#vendorExtensions.x-size-message}}, message = "{{{.}}}"{{/vendorExtensions.x-size-message}})
         {{/maxLength}}
     {{/minLength}}
     {{#minLength}}{{^maxLength}}
-    @{{{vendorExtensions.fieldAnnPrefix}}}Size(min = {{minLength}})
+    @{{{vendorExtensions.fieldAnnPrefix}}}Size(min = {{minLength}}{{#vendorExtensions.x-size-message}}, message = "{{{.}}}"{{/vendorExtensions.x-size-message}})
     {{/maxLength}}{{/minLength}}
     {{^minLength}}{{#maxLength}}
-    @{{{vendorExtensions.fieldAnnPrefix}}}Size(max = {{maxLength}})
+    @{{{vendorExtensions.fieldAnnPrefix}}}Size(max = {{maxLength}}{{#vendorExtensions.x-size-message}}, message = "{{{.}}}"{{/vendorExtensions.x-size-message}})
     {{/maxLength}}{{/minLength}}
     {{!Size}}
     {{#minItems}}{{#maxItems}}
-    @{{{vendorExtensions.fieldAnnPrefix}}}Size(min = {{minItems}}, max = {{maxItems}})
+    @{{{vendorExtensions.fieldAnnPrefix}}}Size(min = {{minItems}}, max = {{maxItems}}{{#vendorExtensions.x-size-message}}, message = "{{{.}}}"{{/vendorExtensions.x-size-message}})
     {{/maxItems}}{{/minItems}}
     {{#minItems}}{{^maxItems}}
-    @{{{vendorExtensions.fieldAnnPrefix}}}Size(min = {{minItems}})
+    @{{{vendorExtensions.fieldAnnPrefix}}}Size(min = {{minItems}}{{#vendorExtensions.x-size-message}}, message = "{{{.}}}"{{/vendorExtensions.x-size-message}})
     {{/maxItems}}{{/minItems}}
     {{^minItems}}{{#maxItems}}
-    @{{{vendorExtensions.fieldAnnPrefix}}}Size(max = {{maxItems}})
+    @{{{vendorExtensions.fieldAnnPrefix}}}Size(max = {{maxItems}}{{#vendorExtensions.x-size-message}}, message = "{{{.}}}"{{/vendorExtensions.x-size-message}})
     {{/maxItems}}{{/minItems}}
     {{!Email}}
     {{#isEmail}}
-    @{{{vendorExtensions.fieldAnnPrefix}}}Email
+    @{{{vendorExtensions.fieldAnnPrefix}}}Email{{#pattern}}(regexp = "{{{pattern}}}"{{#vendorExtensions.x-pattern-message}}, message = "{{{.}}}"{{/vendorExtensions.x-pattern-message}}){{/pattern}}{{^pattern}}{{#vendorExtensions.x-pattern-message}}(message = "{{{.}}}"){{/vendorExtensions.x-pattern-message}}{{/pattern}}
     {{/isEmail}}
     {{!check for integer or long / all others=decimal type with @Decimal isInteger set}}
     {{#isInteger}}
         {{#minimum}}
-    @{{{vendorExtensions.fieldAnnPrefix}}}Min({{minimum}})
+    @{{{vendorExtensions.fieldAnnPrefix}}}Min({{#vendorExtensions.x-min-message}}value = {{/vendorExtensions.x-min-message}}{{{.}}}{{#vendorExtensions.x-min-message}}, message = "{{{.}}}"{{/vendorExtensions.x-min-message}})
         {{/minimum}}
         {{#maximum}}
-    @{{{vendorExtensions.fieldAnnPrefix}}}Max({{maximum}})
+    @{{{vendorExtensions.fieldAnnPrefix}}}Max({{#vendorExtensions.x-max-message}}value = {{/vendorExtensions.x-max-message}}{{{.}}}{{#vendorExtensions.x-max-message}}, message = "{{{.}}}"{{/vendorExtensions.x-max-message}})
         {{/maximum}}
     {{/isInteger}}
     {{!isLong set}}
     {{#isLong}}
         {{#minimum}}
-    @{{{vendorExtensions.fieldAnnPrefix}}}Min({{minimum}}L)
+    @{{{vendorExtensions.fieldAnnPrefix}}}Min({{#vendorExtensions.x-min-message}}value = {{/vendorExtensions.x-min-message}}{{{.}}}L{{#vendorExtensions.x-min-message}}, message = "{{{.}}}"{{/vendorExtensions.x-min-message}})
         {{/minimum}}
         {{#maximum}}
-    @{{{vendorExtensions.fieldAnnPrefix}}}Max({{maximum}}L)
+    @{{{vendorExtensions.fieldAnnPrefix}}}Max({{#vendorExtensions.x-max-message}}value = {{/vendorExtensions.x-max-message}}{{{.}}}L{{#vendorExtensions.x-max-message}}, message = "{{{.}}}"{{/vendorExtensions.x-max-message}})
         {{/maximum}}
     {{/isLong}}
     {{!Not Integer, not Long => we have a decimal value!}}
     {{^isInteger}}
         {{^isLong}}{{!minimum for decimal value}}
             {{#minimum}}
-    @{{{vendorExtensions.fieldAnnPrefix}}}DecimalMin({{#exclusiveMinimum}}value = {{/exclusiveMinimum}}"{{minimum}}"{{#exclusiveMinimum}}, inclusive = false{{/exclusiveMinimum}})
+    @{{{vendorExtensions.fieldAnnPrefix}}}DecimalMin({{#exclusiveMinimum}}value = {{/exclusiveMinimum}}{{^exclusiveMinimum}}{{#vendorExtensions.x-min-message}}value = {{/vendorExtensions.x-min-message}}{{/exclusiveMinimum}}"{{minimum}}"{{#exclusiveMinimum}}, inclusive = false{{/exclusiveMinimum}}{{#vendorExtensions.x-min-message}}, message = "{{{.}}}"{{/vendorExtensions.x-min-message}})
             {{/minimum}}
     {{!maximal for decimal value}}
             {{#maximum}}
-    @{{{vendorExtensions.fieldAnnPrefix}}}DecimalMax({{#exclusiveMaximum}}value = {{/exclusiveMaximum}}"{{maximum}}"{{#exclusiveMaximum}}, inclusive = false{{/exclusiveMaximum}})
+    @{{{vendorExtensions.fieldAnnPrefix}}}DecimalMax({{#exclusiveMaximum}}value = {{/exclusiveMaximum}}{{^exclusiveMaximum}}{{#vendorExtensions.x-max-message}}value = {{/vendorExtensions.x-max-message}}{{/exclusiveMaximum}}"{{maximum}}"{{#exclusiveMaximum}}, inclusive = false{{/exclusiveMaximum}}{{#vendorExtensions.x-max-message}}, message = "{{{.}}}"{{/vendorExtensions.x-max-message}})
             {{/maximum}}
         {{/isLong}}
     {{/isInteger}}

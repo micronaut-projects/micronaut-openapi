@@ -640,4 +640,48 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                         );
                     """);
     }
+
+    @Test
+    void testCustomValidationMessages() {
+
+        var codegen = new JavaMicronautServerCodegen();
+        codegen.setUseEnumCaseInsensitive(true);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/validation-messages.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String path = outputPath + "src/main/java/org/openapitools/";
+
+        assertFileContains(path + "api/BooksApi.java",
+            """
+                @QueryValue("emailParam") @NotNull List<@Email(regexp = "email@dot.com", message = "This is email pattern message") @Size(min = 5, max = 10, message = "This is min max email length message") @NotNull(message = "This is required email message") String> emailParam,
+                """,
+            """
+                @QueryValue("strParam") @NotNull List<@Pattern(regexp = "my_pattern", message = "This is string pattern message") @Size(min = 5, max = 10, message = "This is min max string length message") @NotNull(message = "This is required string message") String> strParam,
+                """,
+            """
+                @QueryValue("strParam2") @NotNull List<@Pattern(regexp = "my_pattern", message = "This is string pattern message") @Size(min = 5, message = "This is min max string length message") @NotNull(message = "This is required string message") String> strParam2,
+                """,
+            """
+                @QueryValue("strParam3") @NotNull List<@Pattern(regexp = "my_pattern", message = "This is string pattern message") @Size(max = 10, message = "This is min max string length message") @NotNull(message = "This is required string message") String> strParam3,
+                """,
+            """
+                @QueryValue("intParam") @NotNull List<@NotNull(message = "This is required int message") @Min(value = 5, message = "This is min message") @Max(value = 10, message = "This is max message") Integer> intParam,
+                """,
+            """
+                @QueryValue("decimalParam") @NotNull List<@NotNull(message = "This is required decimal message") @DecimalMin(value = "5.5", message = "This is decimal min message") @DecimalMax(value = "10.5", message = "This is decimal max message") BigDecimal> decimalParam,
+                """,
+            """
+                    @QueryValue("decimalParam2") @NotNull(message = "This is required param message") List<@NotNull(message = "This is required decimal message") @DecimalMin(value = "5.5", inclusive = false, message = "This is decimal min message") @DecimalMax(value = "10.5", inclusive = false, message = "This is decimal max message") BigDecimal> decimalParam2,
+                """,
+            """
+                @QueryValue("positiveParam") @NotNull List<@NotNull(message = "This is required int message") @Positive(message = "This is positive message") Integer> positiveParam,
+                """,
+            """
+                @QueryValue("positiveOrZeroParam") @NotNull List<@NotNull(message = "This is required int message") @PositiveOrZero(message = "This is positive or zero message") Integer> positiveOrZeroParam,
+                """,
+            """
+                @QueryValue("negativeParam") @NotNull List<@NotNull(message = "This is required int message") @Negative(message = "This is negative message") Integer> negativeParam,
+                """,
+            """
+                @QueryValue("negativeOrZeroParam") @NotNull List<@NotNull(message = "This is required int message") @NegativeOrZero(message = "This is negative or zero message") Integer> negativeOrZeroParam,
+                """);
+    }
 }
