@@ -56,18 +56,13 @@ import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_EN
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_ENVIRONMENT_CREATED;
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_EXPANDABLE_PROPERTIES;
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_EXPANDABLE_PROPERTIES_LOADED;
-import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_EXTRA_SCHEMA_ENABLED;
-import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_GENERATION_SPEC_ENABLED;
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_GROUPS;
-import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_JACKSON_JSON_VIEW_DEFAULT_INCLUSION;
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_JACKSON_JSON_VIEW_ENABLED;
-import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_OPENAPI_ENABLED;
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_OPENAPI_ENDPOINTS;
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_OPENAPI_PROJECT_DIR;
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_OPENAPI_PROPERTIES;
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_ROUTER_VERSIONING_PROPERTIES;
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_SCHEMA_DECORATORS;
-import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_SCHEMA_NAME_SEPARATOR_EMPTY;
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_SECURITY_PROPERTIES;
 import static io.micronaut.openapi.visitor.ContextUtils.ARGUMENT_CUSTOM_SCHEMA_MAP;
 import static io.micronaut.openapi.visitor.ContextUtils.ARGUMENT_GROUP_PROPERTIES_MAP;
@@ -80,6 +75,7 @@ import static io.micronaut.openapi.visitor.OpenApiConfigProperty.ALL;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_ENVIRONMENT_ENABLED;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_JACKSON_JSON_VIEW_ENABLED;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_31_JSON_SCHEMA_DIALECT;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ADOC_ENABLED;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ADOC_OPENAPI_PATH;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ADOC_OUTPUT_DIR_PATH;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ADOC_OUTPUT_FILENAME;
@@ -90,6 +86,7 @@ import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENA
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ENABLED;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ENVIRONMENTS;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_EXPAND_PREFIX;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_GENERATOR_EXTENSIONS_ENABLED;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_GROUPS;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_JSON_VIEW_DEFAULT_INCLUSION;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_PROJECT_DIR;
@@ -255,36 +252,24 @@ public final class ConfigUtils {
         return key.toString();
     }
 
-    public static boolean isOpenApiEnabled(VisitorContext context) {
-        Boolean loadedValue = ContextUtils.get(MICRONAUT_INTERNAL_OPENAPI_ENABLED, Boolean.class, context);
-        if (loadedValue != null) {
-            return loadedValue;
-        }
-        boolean value = getBooleanProperty(MICRONAUT_OPENAPI_ENABLED, true, context);
-        ContextUtils.put(MICRONAUT_INTERNAL_OPENAPI_ENABLED, value, context);
-
-        System.setProperty(MICRONAUT_OPENAPI_ENABLED, Boolean.toString(value));
-        return value;
-    }
-
-    public static boolean isSchemaNameSeparatorEmpty(VisitorContext context) {
-        Boolean loadedValue = ContextUtils.get(MICRONAUT_INTERNAL_SCHEMA_NAME_SEPARATOR_EMPTY, Boolean.class, context);
-        if (loadedValue != null) {
-            return loadedValue;
-        }
-        boolean value = getBooleanProperty(MICRONAUT_OPENAPI_SCHEMA_NAME_SEPARATOR_EMPTY, false, context);
-        ContextUtils.put(MICRONAUT_INTERNAL_SCHEMA_NAME_SEPARATOR_EMPTY, value, context);
-
-        System.setProperty(MICRONAUT_OPENAPI_SCHEMA_NAME_SEPARATOR_EMPTY, Boolean.toString(value));
-        return value;
-    }
-
     public static DuplicateResolution getSchemaDuplicateResolution(VisitorContext context) {
         var value = getConfigProperty(MICRONAUT_OPENAPI_SCHEMA_DUPLICATE_RESOLUTION, context);
         if (StringUtils.isNotEmpty(value) && DuplicateResolution.ERROR.name().equalsIgnoreCase(value)) {
             return DuplicateResolution.ERROR;
         }
         return DuplicateResolution.AUTO;
+    }
+
+    public static boolean isOpenApiEnabled(VisitorContext context) {
+        boolean value = getBooleanProperty(MICRONAUT_OPENAPI_ENABLED, true, context);
+        System.setProperty(MICRONAUT_OPENAPI_ENABLED, Boolean.toString(value));
+        return value;
+    }
+
+    public static boolean isSchemaNameSeparatorEmpty(VisitorContext context) {
+        boolean value = getBooleanProperty(MICRONAUT_OPENAPI_SCHEMA_NAME_SEPARATOR_EMPTY, false, context);
+        System.setProperty(MICRONAUT_OPENAPI_SCHEMA_NAME_SEPARATOR_EMPTY, Boolean.toString(value));
+        return value;
     }
 
     public static String getGenericSeparator(VisitorContext context) {
@@ -310,25 +295,25 @@ public final class ConfigUtils {
     }
 
     public static boolean isSpecGenerationEnabled(VisitorContext context) {
-        Boolean loadedValue = ContextUtils.get(MICRONAUT_INTERNAL_GENERATION_SPEC_ENABLED, Boolean.class, context);
-        if (loadedValue != null) {
-            return loadedValue;
-        }
         boolean value = getBooleanProperty(MICRONAUT_OPENAPI_SWAGGER_FILE_GENERATION_ENABLED, true, context);
-        ContextUtils.put(MICRONAUT_INTERNAL_GENERATION_SPEC_ENABLED, value, context);
-
         System.setProperty(MICRONAUT_OPENAPI_SWAGGER_FILE_GENERATION_ENABLED, Boolean.toString(value));
         return value;
     }
 
     public static boolean isExtraSchemasEnabled(VisitorContext context) {
-        Boolean loadedValue = ContextUtils.get(MICRONAUT_INTERNAL_EXTRA_SCHEMA_ENABLED, Boolean.class, context);
-        if (loadedValue != null) {
-            return loadedValue;
-        }
-        boolean value = getBooleanProperty(MICRONAUT_OPENAPI_SCHEMA_EXTRA_ENABLED, true, context);
-        ContextUtils.put(MICRONAUT_INTERNAL_EXTRA_SCHEMA_ENABLED, value, context);
-        return value;
+        return getBooleanProperty(MICRONAUT_OPENAPI_SCHEMA_EXTRA_ENABLED, true, context);
+    }
+
+    public static boolean isJsonViewDefaultInclusion(VisitorContext context) {
+        return getBooleanProperty(MICRONAUT_OPENAPI_JSON_VIEW_DEFAULT_INCLUSION, true, context);
+    }
+
+    public static boolean isGeneratorExtensionsEnabled(VisitorContext context) {
+        return getBooleanProperty(MICRONAUT_OPENAPI_GENERATOR_EXTENSIONS_ENABLED, true, context);
+    }
+
+    public static boolean isAdocEnabled(VisitorContext context) {
+        return getBooleanProperty(MICRONAUT_OPENAPI_ADOC_ENABLED, true, context);
     }
 
     public static List<Pair<String, String>> getExpandableProperties(VisitorContext context) {
@@ -341,7 +326,7 @@ public final class ConfigUtils {
         var expandableProperties = new ArrayList<Pair<String, String>>();
 
         // first, check system properties and environments config files
-        AnnProcessorEnvironment env = (AnnProcessorEnvironment) getEnv(context);
+        var env = (AnnProcessorEnvironment) getEnv(context);
         Map<String, Object> propertiesFromEnv = null;
         if (env != null) {
             try {
@@ -351,7 +336,7 @@ public final class ConfigUtils {
             }
         }
 
-        Map<String, String> expandedPropsMap = new HashMap<>();
+        var expandedPropsMap = new HashMap<String, String>();
         if (CollectionUtils.isNotEmpty(propertiesFromEnv)) {
             for (Map.Entry<String, Object> entry : propertiesFromEnv.entrySet()) {
                 expandedPropsMap.put(entry.getKey(), entry.getValue().toString());
@@ -384,7 +369,7 @@ public final class ConfigUtils {
             if (key.startsWith(MICRONAUT_OPENAPI_EXPAND_PREFIX)) {
                 key = key.substring(MICRONAUT_OPENAPI_EXPAND_PREFIX.length());
             }
-            Pair<String, String> prop = Pair.of("\\$\\{" + key + '}', entry.getValue());
+            var prop = Pair.of("\\$\\{" + key + '}', entry.getValue());
             if (!expandableProperties.contains(prop)) {
                 expandableProperties.add(prop);
             }
@@ -460,19 +445,6 @@ public final class ConfigUtils {
         ContextUtils.put(MICRONAUT_INTERNAL_JACKSON_JSON_VIEW_ENABLED, isJsonViewEnabled, context);
 
         return isJsonViewEnabled;
-    }
-
-    public static boolean isJsonViewDefaultInclusion(VisitorContext context) {
-
-        Boolean isJsonViewDefaultInclusion = ContextUtils.get(MICRONAUT_INTERNAL_JACKSON_JSON_VIEW_DEFAULT_INCLUSION, Boolean.class, context);
-        if (isJsonViewDefaultInclusion != null) {
-            return isJsonViewDefaultInclusion;
-        }
-
-        isJsonViewDefaultInclusion = getBooleanProperty(MICRONAUT_OPENAPI_JSON_VIEW_DEFAULT_INCLUSION, true, context);
-        ContextUtils.put(MICRONAUT_INTERNAL_JACKSON_JSON_VIEW_DEFAULT_INCLUSION, isJsonViewDefaultInclusion, context);
-
-        return isJsonViewDefaultInclusion;
     }
 
     public static SecurityProperties getSecurityProperties(VisitorContext context) {

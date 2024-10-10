@@ -21,6 +21,7 @@ PACKAGE +
 PROTECTED +
 PUBLIC | Default: `PUBLIC`
 |`*micronaut.openapi.json.format*` | Is this property true, output file format will be JSON, otherwise YAML. | Default: `false`
+|`*micronaut.openapi.generator.extensions.enabled*` | If this property is 'true', then the generated OpenAPI specification will include extensions for OpenAPI Generator and the generated client according to this specification will be much more accurate than without it. For example, enumerations will be described with extensions `x-enum-varnames`, `x-enum-descriptions` and `x-deprecated` | Default: `false`
 |`*micronaut.openapi.filename*` | The name of the result swagger file. | Default: `${info.title}-${info.version}.yml`, if info block not set, filename will be `swagger.yml`.
 |`*micronaut.openapi.environments*` | Active micronaut environments which will be used for @Requires annotations. |
 |`*micronaut.openapi.environments.enabled*` | Is this property true, properties wll be loaded in the standard way from application.yml. Also, environments from `micronaut.openapi.environments` property will set as additional environments, if you want to set specific environment name for openAPI generator. | Default: `true`

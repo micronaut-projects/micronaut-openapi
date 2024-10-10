@@ -74,7 +74,6 @@ import java.util.stream.Collectors;
 
 import static io.micronaut.openapi.visitor.ConfigUtils.endpointsConfiguration;
 import static io.micronaut.openapi.visitor.ConfigUtils.getAdocProperties;
-import static io.micronaut.openapi.visitor.ConfigUtils.getBooleanProperty;
 import static io.micronaut.openapi.visitor.ConfigUtils.getConfigProperty;
 import static io.micronaut.openapi.visitor.ConfigUtils.getEnv;
 import static io.micronaut.openapi.visitor.ConfigUtils.getExpandableProperties;
@@ -98,7 +97,6 @@ import static io.micronaut.openapi.visitor.FileUtils.resolve;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.ALL;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_APPLICATION_NAME;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ADDITIONAL_FILES;
-import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ADOC_ENABLED;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_CONTEXT_SERVER_PATH;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_JSON_FORMAT;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_PROPERTY_NAMING_STRATEGY;
@@ -718,6 +716,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         applyPropertyServerContextPath(openApi, context);
 
         normalizeOpenApi(openApi, context);
+        normalizeOpenApi(openApi, context);
         // Process after sorting so order is stable
         new JacksonDiscriminatorPostProcessor().addMissingDiscriminatorType(openApi);
         new OpenApiOperationsPostProcessor().processOperations(openApi);
@@ -841,7 +840,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
     private void writeYamlToFile(Map<Pair<String, String>, OpenApiInfo> openApiInfos, String documentTitle, VisitorContext context, boolean isYaml) {
 
         var isAdocModuleInClassPath = false;
-        var isGlobalAdocEnabled = getBooleanProperty(MICRONAUT_OPENAPI_ADOC_ENABLED, true, context);
+        var isGlobalAdocEnabled = ConfigUtils.isAdocEnabled(context);
 
         try {
             Class.forName("io.micronaut.openapi.adoc.OpenApiToAdocConverter");

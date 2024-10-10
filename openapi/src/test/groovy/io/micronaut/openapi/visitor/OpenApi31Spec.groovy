@@ -5,9 +5,11 @@ import io.micronaut.openapi.AbstractOpenApiTypeElementSpec
 import io.micronaut.openapi.OpenApiUtils
 import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.media.Schema
+import spock.util.environment.RestoreSystemProperties
 
 class OpenApi31Spec extends AbstractOpenApiTypeElementSpec {
 
+    @RestoreSystemProperties
     void "test info OpenAPI 3.1.0"() {
 
         setup:
@@ -90,12 +92,9 @@ class MyBean {}
         openApi.info.license.name == 'Apache 2.0'
         openApi.info.license.url == 'https://foo.bar'
         openApi.info.license.identifier == 'licenseId'
-
-        cleanup:
-        System.clearProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_31_ENABLED)
-        System.clearProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_31_JSON_SCHEMA_DIALECT)
     }
 
+    @RestoreSystemProperties
     void "test Webhooks OpenAPI 3.1.0"() {
 
         setup:
@@ -152,11 +151,9 @@ class MyBean {}
         openApi.webhooks.'controllerWebhook'.post.summary == 'Save a pet'
         openApi.webhooks.'controllerWebhook'.post.description == "The saved pet information is returned"
         openApi.webhooks.'controllerWebhook'.post.requestBody.description == "description"
-
-        cleanup:
-        System.clearProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_31_ENABLED)
     }
 
+    @RestoreSystemProperties
     void "test min/max contains OpenAPI 3.1.0"() {
 
         setup:
@@ -222,11 +219,9 @@ class MyBean {}
         openApi.components.schemas.Pet.properties.attrs.items.types.contains('null')
         openApi.components.schemas.Pet.properties.attrs.minContains == 10
         openApi.components.schemas.Pet.properties.attrs.maxContains == 20
-
-        cleanup:
-        System.clearProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_31_ENABLED)
     }
 
+    @RestoreSystemProperties
     void "test discriminator extensions OpenAPI 3.1.0"() {
         setup:
         System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_31_ENABLED, "true")
@@ -453,11 +448,9 @@ class MyBean {}
         petSchema.discriminator.extensions.'x-myExt22'
         petSchema.discriminator.extensions.'x-myExt22'.prop221 == 'prop1Val1'
         petSchema.discriminator.extensions.'x-myExt22'.prop222 == 'prop2Val2'
-
-        cleanup:
-        System.clearProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_31_ENABLED)
     }
 
+    @RestoreSystemProperties
     void "test json schema OpenAPI 3.1.0"() {
         setup:
         System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_31_ENABLED, "true")
@@ -554,8 +547,5 @@ class MyBean {}
         thetaSchema.title == 'Theta'
         thetaSchema.allOf.get(0).$ref == '#/components/schemas/Omega'
         thetaSchema.$ref == './ThetaSchema.json'
-
-        cleanup:
-        System.clearProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_31_ENABLED)
     }
 }

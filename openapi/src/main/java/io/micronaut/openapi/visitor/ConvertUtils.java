@@ -607,21 +607,30 @@ public final class ConvertUtils {
         }
     }
 
-    /**
-     * Detect openapi type and format for enums.
-     *
-     * @param context visitor context
-     * @param type enum element
-     * @param schemaType type from swagger Schema annotation
-     * @param schemaFormat format from swagger Schema annotation
-     *
-     * @return pair with openapi type and format
-     */
-    @NonNull
-    public static Pair<String, String> checkEnumJsonValueType(VisitorContext context, @NonNull EnumElement type, @Nullable String schemaType, @Nullable String schemaFormat) {
-        if (schemaType != null && !schemaType.equals(PrimitiveType.STRING.getCommonName())) {
-            return Pair.of(schemaType, schemaFormat);
+    public static ClassElement findJsonValueType(EnumElement enumEl, VisitorContext context) {
+        MethodElement firstMethod = findJsonValueMethod(enumEl, context);
+        if (firstMethod != null) {
+            ClassElement returnType = firstMethod.getReturnType();
+            if (isEnum(returnType)) {
+                return findJsonValueType((EnumElement) returnType, context);
+            }
+            return returnType;
         }
+        // check JsonValue field
+        var fields = enumEl.getEnclosedElements(ElementQuery.ALL_FIELDS.annotated(metadata -> metadata.isAnnotationPresent(JsonValue.class)));
+        if (CollectionUtils.isNotEmpty(fields)) {
+            var firstField = fields.get(0);
+            ClassElement fieldType = firstField.getType();
+            if (isEnum(fieldType)) {
+                return findJsonValueType((EnumElement) fieldType, context);
+            }
+            return fieldType;
+        }
+        return null;
+    }
+
+    @Nullable
+    private static MethodElement findJsonValueMethod(@NonNull EnumElement type, VisitorContext context) {
         MethodElement firstMethod = null;
         // check JsonValue method
         List<MethodElement> methods = type.getEnclosedElements(ElementQuery.ALL_METHODS.annotated(metadata -> metadata.isAnnotationPresent(JsonValue.class)));
@@ -644,8 +653,27 @@ public final class ConvertUtils {
                 break;
             }
         }
+        return firstMethod;
+    }
 
+    /**
+     * Detect openapi type and format for enums.
+     *
+     * @param context visitor context
+     * @param type enum element
+     * @param schemaType type from swagger Schema annotation
+     * @param schemaFormat format from swagger Schema annotation
+     *
+     * @return pair with openapi type and format
+     */
+    @NonNull
+    public static Pair<String, String> checkEnumJsonValueType(VisitorContext context, @NonNull EnumElement type, @Nullable String schemaType, @Nullable String schemaFormat) {
+        if (schemaType != null && !schemaType.equals(PrimitiveType.STRING.getCommonName())) {
+            return Pair.of(schemaType, schemaFormat);
+        }
         Pair<String, String> result = null;
+
+        MethodElement firstMethod = findJsonValueMethod(type, context);
         if (firstMethod != null) {
             ClassElement returnType = firstMethod.getReturnType();
             if (isEnum(returnType)) {

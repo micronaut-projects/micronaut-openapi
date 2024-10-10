@@ -66,10 +66,6 @@ public interface ContextProperty {
      */
     String MICRONAUT_INTERNAL_JACKSON_JSON_VIEW_ENABLED = "micronaut.internal.jackson.json-view.enabled";
     /**
-     * Loaded into context micronaut.openapi.json-view.default-inclusion property value.
-     */
-    String MICRONAUT_INTERNAL_JACKSON_JSON_VIEW_DEFAULT_INCLUSION = "micronaut.internal.json-view.default-inclusion";
-    /**
      * Loaded schema decorators settings into context.
      */
     String MICRONAUT_INTERNAL_SCHEMA_DECORATORS = "micronaut.internal.schema-decorators";
@@ -93,30 +89,6 @@ public interface ContextProperty {
      * Loaded micronaut-router and micronaut-openapi router versioning properties.
      */
     String MICRONAUT_INTERNAL_ROUTER_VERSIONING_PROPERTIES = "micronaut.internal.router.versioning.properties";
-    /**
-     * Loaded micronaut.openapi.enabled property value.
-     * <br>
-     * Default: true
-     */
-    String MICRONAUT_INTERNAL_OPENAPI_ENABLED = "micronaut.internal.openapi.enabled";
-    /**
-     * Loaded micronaut.openapi.schema-name.separator.empty property value.
-     * <br>
-     * Default: false
-     */
-    String MICRONAUT_INTERNAL_SCHEMA_NAME_SEPARATOR_EMPTY = "micronaut.internal.schema.name.separator.empty";
-    /**
-     * Loaded micronaut.openapi.generation.spec.enabled value.
-     * <br>
-     * Default: true
-     */
-    String MICRONAUT_INTERNAL_GENERATION_SPEC_ENABLED = "micronaut.internal.generation.spec.enabled";
-    /**
-     * Loaded micronaut.openapi.schema.extra.enabled value.
-     * <br>
-     * Default: true
-     */
-    String MICRONAUT_INTERNAL_EXTRA_SCHEMA_ENABLED = "micronaut.internal.openapi.extra-schemas.enabled";
     /**
      * Saved generated files.
      */

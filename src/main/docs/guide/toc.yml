@@ -11,9 +11,10 @@ configuration:
   availableOptions: Available OpenAPI processing options
 exposingSwaggerOutput: Exposing Swagger Output
 controllers: OpenAPI Generation for Controllers
-namingstrategy: Naming Strategy
+namingStrategy: Naming Strategy
 customSerializers: Custom serializers
 schemaDecorators: Schema decorators
+openApiGeneratorExtensions: OpenAPI Generator extensions
 kotlin: Kotlin specific
 swaggerAnnotations:
   title: Swagger Annotations

@@ -1,0 +1,27 @@
+Micronaut OpenAPI can add extensions to the generated specification to produce more accurate code generation when using link:https://openapi-generator.tech/[OpenAPI Generator].
+To enable the addition of extensions to the final OpenAPI specification, you need to add the following property:
+
+[source,properties]
+----
+micronaut.openapi.generator.extensions.enabled=true
+----
+
+Currently, the following extensions are supported:
+
+.Supported extensions
+[caption=,cols=".^3a,.^4a,.^4a"]
+|===
+| Extension | Scope | Description
+
+| `*x-deprecated-message*` | `Schema`, `Parameter`, `Operation` | Text from the javadoc with tag `@deprecated`. For Kotlin this text is retrieved from annotation value argument
+| `*x-enum-varnames*` | `Schema` *(only enum)* | List of enum items names from code. Generated enum items will be with same names
+| `*x-enum-descriptions*` | `Schema` *(only enum)* | List of javadocs from enum item elements
+| `*x-deprecated*` | `Schema` *(only enum)* | List of deprecated enum items
+| `*x-type*` | `Schema` | If the variable/parameter has a primitive type that is not in the OpenAPI 3 specification, this field will be filled in. Used for primitive java types `byte`, `short`, `int`, `long`, `float`, `double`, `char`
+| `*x-format*` | `Schema` | If the variable/parameter has a type that is not in the OpenAPI 3 specification, this field will be filled in. Used for java types `Byte` (type: integer, `x-format: int8`), `Short` (type: integer, `x-format: int16`), `Char` (type: string, `x-format: char`)
+| `*x-min-message*` | `Schema` | Message from `jakarta.validation` annotations: `@Min`, `@DecimalMin`, `@Negative`, `@NegativeOrZero`, `@Positive`, `@PositiveOrZero`
+| `*x-max-message*` | `Schema` | Message from `jakarta.validation` annotations: `@Max`, `@DecimalMax`
+| `*x-size-message*` | `Schema` | Message from `jakarta.validation` annotations: `@NotEmpty`, `@Size`, `@NotBlank`
+| `*x-pattern-message*` | `Schema` | Message from `jakarta.validation` annotations: `@Pattern`, `@Email`
+| `*x-not-null-message*` | `Schema` | Message from `jakarta.validation` annotation `@NotNull`
+|===

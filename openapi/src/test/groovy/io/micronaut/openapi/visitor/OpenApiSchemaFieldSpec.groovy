@@ -139,6 +139,7 @@ class MyBean {}
         dtoSchema.properties.test.readOnly
         dtoSchema.properties.test.description == 'this is description'
         dtoSchema.properties.test.externalDocs.description == 'external docs'
+        dtoSchema.properties.test.additionalProperties == true
         dtoSchema.properties.test.example
         dtoSchema.properties.test.example.stampWidth == 220
         dtoSchema.properties.test.example.stampHeight == 85
@@ -160,7 +161,6 @@ class MyBean {}
         dtoSchema.properties.test.allOf[1].maxProperties == 100
         dtoSchema.properties.test.allOf[1].multipleOf == 1.5
         dtoSchema.properties.test.allOf[1].pattern == "ppp"
-        dtoSchema.properties.test.allOf[1].additionalProperties == true
         dtoSchema.properties.test.nullable
         dtoSchema.required.size() == 1
         dtoSchema.required[0] == 'test'
@@ -568,7 +568,7 @@ class MyBean {}
 
         dtoSchema.properties.test instanceof ComposedSchema
         dtoSchema.properties.test.allOf[0].$ref == '#/components/schemas/GlobalParams'
-        dtoSchema.properties.test.allOf[1].allOf[0].$ref == '#/components/schemas/LocalParams'
+        dtoSchema.properties.test.allOf[1].$ref == '#/components/schemas/LocalParams'
         dtoSchema.properties.test.not
         dtoSchema.properties.test.not.$ref == '#/components/schemas/LocalParams'
         dtoSchema.properties.test.oneOf[0].$ref == '#/components/schemas/LocalParams'

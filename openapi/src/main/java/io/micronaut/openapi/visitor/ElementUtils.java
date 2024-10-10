@@ -37,6 +37,7 @@ import io.micronaut.inject.ast.MethodElement;
 import io.micronaut.inject.ast.TypedElement;
 import io.micronaut.inject.visitor.VisitorContext;
 import io.swagger.v3.oas.annotations.Hidden;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -66,6 +67,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static io.micronaut.openapi.visitor.ConfigUtils.isJsonViewEnabled;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_DEPRECATED;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_HIDDEN;
 
 /**
@@ -473,6 +475,34 @@ public final class ElementUtils {
             || type.isAssignable("com.google.common.base.Optional")
             || type.isAssignable(AtomicReference.class)
             ;
+    }
+
+    public static boolean isDeprecated(Element el) {
+        if (el == null) {
+            return false;
+        }
+        // schema deprecated flag in swagger annotations is prioritized
+        var schemaAnn = el.getAnnotation(Schema.class);
+        var operationAnn = el.getAnnotation(Operation.class);
+        var parameterAnn = el.getAnnotation(Parameter.class);
+        var headerAnn = el.getAnnotation(Header.class);
+        var deprecatedBySchema = schemaAnn != null ? schemaAnn.booleanValue(PROP_DEPRECATED).orElse(null) : null;
+        var deprecatedByOperation = operationAnn != null ? operationAnn.booleanValue(PROP_DEPRECATED).orElse(null) : null;
+        var deprecatedByParameter = parameterAnn != null ? parameterAnn.booleanValue(PROP_DEPRECATED).orElse(null) : null;
+        var deprecatedByHeader = headerAnn != null ? headerAnn.booleanValue(PROP_DEPRECATED).orElse(null) : null;
+        if ((deprecatedBySchema != null && !deprecatedBySchema)
+            || (deprecatedByOperation != null && !deprecatedByOperation)
+            || (deprecatedByParameter != null && !deprecatedByParameter)
+            || (deprecatedByHeader != null && !deprecatedByHeader)
+        ) {
+            return false;
+        }
+        return deprecatedBySchema != null
+            || deprecatedByOperation != null
+            || deprecatedByParameter != null
+            || deprecatedByHeader != null
+            || el.isAnnotationPresent(Deprecated.class)
+            || el.isAnnotationPresent("kotlin.Deprecated");
     }
 
     public static boolean isEnum(ClassElement classElement) {

@@ -128,12 +128,15 @@ import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_IS
 import static io.micronaut.openapi.visitor.ContextUtils.warn;
 import static io.micronaut.openapi.visitor.ConvertUtils.MAP_TYPE;
 import static io.micronaut.openapi.visitor.ElementUtils.getJsonViewClass;
+import static io.micronaut.openapi.visitor.ElementUtils.isDeprecated;
 import static io.micronaut.openapi.visitor.ElementUtils.isFileUpload;
 import static io.micronaut.openapi.visitor.ElementUtils.isIgnoredParameter;
 import static io.micronaut.openapi.visitor.ElementUtils.isNotNullable;
 import static io.micronaut.openapi.visitor.ElementUtils.isNullable;
 import static io.micronaut.openapi.visitor.ElementUtils.isResponseType;
 import static io.micronaut.openapi.visitor.ElementUtils.isSingleResponseType;
+import static io.micronaut.openapi.visitor.GeneratorUtils.addOperationDeprecatedExtension;
+import static io.micronaut.openapi.visitor.GeneratorUtils.addParameterDeprecatedExtension;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_ADD_ALWAYS;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_ALLOW_EMPTY_VALUE;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_ALLOW_RESERVED;
@@ -467,7 +470,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
 
                 javadocDescription = getMethodDescription(element, swaggerOperation);
 
-                if (element.isAnnotationPresent(Deprecated.class)) {
+                if (isDeprecated(element)) {
                     swaggerOperation.setDeprecated(true);
                 }
 
@@ -838,7 +841,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
 
                         io.swagger.v3.oas.models.media.MediaType mediaType = entry.getValue();
 
-                        Schema<?> propertySchema = bindSchemaForElement(context, parameter, parameterType, mediaType.getSchema(), null);
+                        Schema<?> propertySchema = bindSchemaForElement(context, parameter, parameterType, mediaType.getSchema(), null, false);
 
                         var bodyAnn = parameter.getAnnotation(Body.class);
 
@@ -918,7 +921,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             }
 
             if (schema != null) {
-                schema = bindSchemaForElement(context, parameter, parameterType, schema, null);
+                schema = bindSchemaForElement(context, parameter, parameterType, schema, null, false);
                 newParameter.setSchema(schema);
             }
         }
@@ -943,20 +946,21 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         var jsonViewClass = getJsonViewClass(parameter, context);
 
         Schema<?> propertySchema = resolveSchema(openAPI, parameter, parameter.getType(), context, Collections.singletonList(mediaType), jsonViewClass, null, null);
-        if (propertySchema != null) {
+        if (propertySchema == null) {
+            return;
+        }
 
-            parameter.stringValue(io.swagger.v3.oas.annotations.Parameter.class, PROP_DESCRIPTION)
-                .ifPresent(propertySchema::setDescription);
-            processSchemaProperty(context, parameter, parameter.getType(), null, schema, propertySchema);
-            if (isNullable(parameter) && !isNotNullable(parameter)) {
-                // Keep null if not
-                SchemaUtils.setNullable(propertySchema);
-            }
-            if (javadocDescription != null && StringUtils.isEmpty(propertySchema.getDescription())) {
-                String doc = javadocDescription.getParameters().get(parameter.getName());
-                if (doc != null) {
-                    propertySchema.setDescription(doc);
-                }
+        parameter.stringValue(io.swagger.v3.oas.annotations.Parameter.class, PROP_DESCRIPTION)
+            .ifPresent(propertySchema::setDescription);
+        processSchemaProperty(context, parameter, parameter.getType(), null, schema, propertySchema);
+        if (isNullable(parameter) && !isNotNullable(parameter)) {
+            // Keep null if not
+            SchemaUtils.setNullable(propertySchema);
+        }
+        if (javadocDescription != null && StringUtils.isEmpty(propertySchema.getDescription())) {
+            String doc = javadocDescription.getParameters().get(parameter.getName());
+            if (doc != null) {
+                propertySchema.setDescription(doc);
             }
         }
     }
@@ -1161,6 +1165,11 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
 
         if (newParameter != null && isNullable(parameter) && !isNotNullable(parameter)) {
             newParameter.setRequired(null);
+        }
+
+        if (newParameter != null && isDeprecated(parameter)) {
+            newParameter.setDeprecated(true);
+            addParameterDeprecatedExtension(parameter, newParameter, context);
         }
 
         return newParameter;
@@ -1393,6 +1402,8 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                 swaggerOperation = new Operation();
             }
 
+            addOperationDeprecatedExtension(element, swaggerOperation, context);
+
             if (CollectionUtils.isNotEmpty(swaggerOperation.getParameters())) {
                 swaggerOperation.getParameters().removeIf(Objects::isNull);
             }
@@ -1438,10 +1449,6 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                             var required = paramAnn.booleanValue(PROP_REQUIRED).orElse(false);
                             if (required) {
                                 swaggerParam.setRequired(true);
-                            }
-                            var deprecated = paramAnn.booleanValue(PROP_DEPRECATED).orElse(false);
-                            if (deprecated) {
-                                swaggerParam.setDeprecated(true);
                             }
                             var allowEmptyValue = paramAnn.booleanValue(PROP_ALLOW_EMPTY_VALUE).orElse(false);
                             if (allowEmptyValue) {
@@ -1723,59 +1730,60 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             apiResponses = new ApiResponses();
             operation.setResponses(apiResponses);
         }
-        if (CollectionUtils.isNotEmpty(responseAnns)) {
-            for (var responseAnn : responseAnns) {
-                String responseCode = responseAnn.stringValue(PROP_RESPONSE_CODE).orElse("default");
-                if (apiResponses.containsKey(responseCode)) {
-                    continue;
-                }
-                ApiResponse newApiResponse = toValue(responseAnn.getValues(), context, ApiResponse.class, jsonViewClass);
-                if (newApiResponse != null) {
-                    if (responseAnn.booleanValue("useReturnTypeSchema").orElse(false) && element != null) {
-                        addResponseContent(element, context, Utils.resolveOpenApi(context), newApiResponse, jsonViewClass);
-                    } else {
-
-                        List<MediaType> producesMediaTypes = producesMediaTypes(element);
-
-                        var contentAnns = responseAnn.get(PROP_CONTENT, io.swagger.v3.oas.annotations.media.Content[].class).orElse(null);
-                        var mediaTypes = new ArrayList<String>();
-                        if (ArrayUtils.isNotEmpty(contentAnns)) {
-                            for (io.swagger.v3.oas.annotations.media.Content contentAnn : contentAnns) {
-                                if (StringUtils.isNotEmpty(contentAnn.mediaType())) {
-                                    mediaTypes.add(contentAnn.mediaType());
-                                } else {
-                                    mediaTypes.add(MediaType.APPLICATION_JSON);
-                                }
-                            }
-                        }
-                        Content newContent = newApiResponse.getContent();
-                        if (newContent != null) {
-                            io.swagger.v3.oas.models.media.MediaType defaultMediaType = newContent.get(MediaType.APPLICATION_JSON);
-                            var contentFromProduces = new Content();
-                            for (String mt : mediaTypes) {
-                                if (mt.equals(MediaType.APPLICATION_JSON)) {
-                                    for (MediaType mediaType : producesMediaTypes) {
-                                        contentFromProduces.put(mediaType.toString(), defaultMediaType);
-                                    }
-                                } else {
-                                    contentFromProduces.put(mt, newContent.get(mt));
-                                }
-                            }
-                            newApiResponse.setContent(contentFromProduces);
-                        }
-                    }
-                    try {
-                        if (StringUtils.isEmpty(newApiResponse.getDescription())) {
-                            newApiResponse.setDescription(responseCode.equals(PROP_DEFAULT) ? "OK response" : HttpStatus.getDefaultReason(Integer.parseInt(responseCode)));
-                        }
-                    } catch (Exception e) {
-                        newApiResponse.setDescription("Response " + responseCode);
-                    }
-                    apiResponses.put(responseCode, newApiResponse);
-                }
-            }
-            operation.setResponses(apiResponses);
+        if (CollectionUtils.isEmpty(responseAnns)) {
+            return;
         }
+        for (var responseAnn : responseAnns) {
+            String responseCode = responseAnn.stringValue(PROP_RESPONSE_CODE).orElse("default");
+            if (apiResponses.containsKey(responseCode)) {
+                continue;
+            }
+            ApiResponse newApiResponse = toValue(responseAnn.getValues(), context, ApiResponse.class, jsonViewClass);
+            if (newApiResponse != null) {
+                if (responseAnn.booleanValue("useReturnTypeSchema").orElse(false) && element != null) {
+                    addResponseContent(element, context, Utils.resolveOpenApi(context), newApiResponse, jsonViewClass);
+                } else {
+
+                    List<MediaType> producesMediaTypes = producesMediaTypes(element);
+
+                    var contentAnns = responseAnn.get(PROP_CONTENT, io.swagger.v3.oas.annotations.media.Content[].class).orElse(null);
+                    var mediaTypes = new ArrayList<String>();
+                    if (ArrayUtils.isNotEmpty(contentAnns)) {
+                        for (io.swagger.v3.oas.annotations.media.Content contentAnn : contentAnns) {
+                            if (StringUtils.isNotEmpty(contentAnn.mediaType())) {
+                                mediaTypes.add(contentAnn.mediaType());
+                            } else {
+                                mediaTypes.add(MediaType.APPLICATION_JSON);
+                            }
+                        }
+                    }
+                    Content newContent = newApiResponse.getContent();
+                    if (newContent != null) {
+                        io.swagger.v3.oas.models.media.MediaType defaultMediaType = newContent.get(MediaType.APPLICATION_JSON);
+                        var contentFromProduces = new Content();
+                        for (String mt : mediaTypes) {
+                            if (mt.equals(MediaType.APPLICATION_JSON)) {
+                                for (MediaType mediaType : producesMediaTypes) {
+                                    contentFromProduces.put(mediaType.toString(), defaultMediaType);
+                                }
+                            } else {
+                                contentFromProduces.put(mt, newContent.get(mt));
+                            }
+                        }
+                        newApiResponse.setContent(contentFromProduces);
+                    }
+                }
+                try {
+                    if (StringUtils.isEmpty(newApiResponse.getDescription())) {
+                        newApiResponse.setDescription(responseCode.equals(PROP_DEFAULT) ? "OK response" : HttpStatus.getDefaultReason(Integer.parseInt(responseCode)));
+                    }
+                } catch (Exception e) {
+                    newApiResponse.setDescription("Response " + responseCode);
+                }
+                apiResponses.put(responseCode, newApiResponse);
+            }
+        }
+        operation.setResponses(apiResponses);
     }
 
     // boolean - is swagger schema has implementation
