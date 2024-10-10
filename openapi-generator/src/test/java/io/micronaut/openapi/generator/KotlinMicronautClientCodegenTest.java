@@ -1280,4 +1280,30 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                 """
         );
     }
+
+    @Test
+    void testNoVars() {
+
+        System.setProperty("micronaut.test.no-vars", "true");
+
+        var codegen = new KotlinMicronautClientCodegen();
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/extra-annotations.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String path = outputPath + "src/main/kotlin/org/openapitools/";
+
+        assertFileContains(path + "model/Book.kt",
+            """
+                @Serdeable
+                @Generated("io.micronaut.openapi.generator.KotlinMicronautClientCodegen")
+                @Serializable
+                class Book {
+                
+                    companion object {
+                
+                    }
+                }
+                """);
+
+        System.clearProperty("micronaut.test.no-vars");
+    }
+
 }

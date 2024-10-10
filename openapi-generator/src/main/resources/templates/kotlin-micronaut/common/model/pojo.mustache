@@ -19,11 +19,13 @@
 @Serdeable
 {{/micronaut_serde_jackson}}
 {{#jackson}}
+    {{#hasVars}}
 @JsonPropertyOrder(
     {{#vars}}
         {{classname}}.JSON_PROPERTY_{{nameInSnakeCase}}{{^-last}},{{/-last}}
     {{/vars}}
 )
+    {{/hasVars}}
 {{/jackson}}
 {{#additionalModelTypeAnnotations}}
 {{{.}}}
@@ -43,7 +45,7 @@
 {{/vendorExtensions.x-class-extra-annotation}}
 {{/formatNoEmptyLines}}
 {{!Declare the class with extends and implements}}
-{{#nonPublicApi}}internal {{/nonPublicApi}}{{#hasChildren}}open{{/hasChildren}}{{^hasChildren}}data{{/hasChildren}} class {{classname}}(
+{{#nonPublicApi}}internal {{/nonPublicApi}}{{#hasChildren}}open {{/hasChildren}}{{^hasChildren}}{{#hasVars}}data {{/hasVars}}{{/hasChildren}}class {{classname}}{{#hasVars}}({{/hasVars}}
 {{#vendorExtensions.requiredVarsWithoutDiscriminator}}
 
     {{#formatNoEmptyLines}}
@@ -92,7 +94,7 @@
     {{/formatNoEmptyLines}}
     {{/vendorExtensions.optionalVars}}
 {{/vendorExtensions.withInheritance}}
-){{#parent}}: {{{parent}}}({{#vendorExtensions.requiredParentVarsWithoutDiscriminator}}{{{name}}}{{^-last}}, {{/-last}}{{/vendorExtensions.requiredParentVarsWithoutDiscriminator}}) {{/parent}}{{#vendorExtensions.x-implements}}{{#parent}}, {{/parent}}{{^parent}}: {{/parent}}{{^-first}}, {{/-first}}{{{.}}}{{/vendorExtensions.x-implements}} {{openbrace}}
+{{#hasVars}}){{/hasVars}}{{#parent}}: {{{parent}}}({{#vendorExtensions.requiredParentVarsWithoutDiscriminator}}{{{name}}}{{^-last}}, {{/-last}}{{/vendorExtensions.requiredParentVarsWithoutDiscriminator}}) {{/parent}}{{#vendorExtensions.x-implements}}{{#parent}}, {{/parent}}{{^parent}}: {{/parent}}{{^-first}}, {{/-first}}{{{.}}}{{/vendorExtensions.x-implements}} {{openbrace}}
 
     {{#vendorExtensions.withInheritance}}
 
@@ -103,16 +105,17 @@
         if (!super.equals(other)) return false
     {{/parent}}
         other as {{classname}}
-
+    {{#hasVars}}
         {{#vars}}
         if ({{{name}}} != other.{{{name}}}) return false
         {{/vars}}
-
+    {{/hasVars}}
         return true
     }
 
     override fun hashCode(): Int {
         var result = {{#parent}}super.hashCode(){{/parent}}{{^parent}}{{#vars.0}}{{{name}}}{{#isNullable}}?{{/isNullable}}.hashCode(){{#isNullable}} ?: 0{{/isNullable}}{{/vars.0}}{{/parent}}
+    {{#hasVars}}
     {{#vars}}
         {{#parent}}
         result = 31 * result + {{#isNullable}}({{/isNullable}}{{{name}}}{{#isNullable}}?{{/isNullable}}.hashCode(){{#isNullable}} ?: 0){{/isNullable}}
@@ -123,11 +126,17 @@
             {{/-first}}
         {{/parent}}
     {{/vars}}
+    {{/hasVars}}
         return result
     }
 
     override fun toString(): String {
+    {{#hasVars}}
         return "{{classname}}({{#allVars}}{{{vendorExtensions.realName}}}='${{{name}}}'{{^-last}}, {{/-last}}{{/allVars}})"
+    {{/hasVars}}
+    {{^hasVars}}
+        return "{{classname}}()"
+    {{/hasVars}}
     }
     {{/vendorExtensions.withInheritance}}
 

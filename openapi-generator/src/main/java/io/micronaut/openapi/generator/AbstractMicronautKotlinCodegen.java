@@ -1852,6 +1852,18 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
                     processProperty(property, isServer, model, objs);
                 }
             }
+
+            model.hasVars = !requiredVarsWithoutDiscriminator.isEmpty() || (withInheritance && !optionalVars.isEmpty());
+            // just for tests
+            if (System.getProperty("micronaut.test.no-vars") != null) {
+                model.hasVars = false;
+                model.vendorExtensions.put("requiredVarsWithoutDiscriminator", Collections.emptyList());
+                model.vendorExtensions.put("optionalVars", Collections.emptyList());
+                model.vendorExtensions.put("requiredVars", Collections.emptyList());
+                model.vendorExtensions.put("withRequiredVars", false);
+                model.vars = Collections.emptyList();
+            }
+
             addStrValueToEnum(model);
         }
 
