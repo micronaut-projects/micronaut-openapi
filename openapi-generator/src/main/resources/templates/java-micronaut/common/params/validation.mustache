@@ -83,30 +83,30 @@
     {{!check for integer or long / all others=decimal type with @Decimal isInteger set}}
     {{#isInteger}}
         {{#minimum}}
-    @Min({{#vendorExtensions.x-min-message}}value = {{/vendorExtensions.x-min-message}}{{{.}}}{{#vendorExtensions.x-min-message}}, message = "{{{.}}}"{{/vendorExtensions.x-min-message}})
+    @Min({{#vendorExtensions.x-minimum-message}}value = {{/vendorExtensions.x-minimum-message}}{{{.}}}{{#vendorExtensions.x-minimum-message}}, message = "{{{.}}}"{{/vendorExtensions.x-minimum-message}})
         {{/minimum}}
         {{#maximum}}
-    @Max({{#vendorExtensions.x-max-message}}value = {{/vendorExtensions.x-max-message}}{{{.}}}{{#vendorExtensions.x-max-message}}, message = "{{{.}}}"{{/vendorExtensions.x-max-message}})
+    @Max({{#vendorExtensions.x-maximum-message}}value = {{/vendorExtensions.x-maximum-message}}{{{.}}}{{#vendorExtensions.x-maximum-message}}, message = "{{{.}}}"{{/vendorExtensions.x-maximum-message}})
         {{/maximum}}
     {{/isInteger}}
     {{!isLong set}}
     {{#isLong}}
         {{#minimum}}
-    @Min({{#vendorExtensions.x-min-message}}value = {{/vendorExtensions.x-min-message}}{{{.}}}L{{#vendorExtensions.x-min-message}}, message = "{{{.}}}"{{/vendorExtensions.x-min-message}})
+    @Min({{#vendorExtensions.x-minimum-message}}value = {{/vendorExtensions.x-minimum-message}}{{{.}}}L{{#vendorExtensions.x-minimum-message}}, message = "{{{.}}}"{{/vendorExtensions.x-minimum-message}})
         {{/minimum}}
         {{#maximum}}
-    @Max({{#vendorExtensions.x-max-message}}value = {{/vendorExtensions.x-max-message}}{{{.}}}L{{#vendorExtensions.x-max-message}}, message = "{{{.}}}"{{/vendorExtensions.x-max-message}})
+    @Max({{#vendorExtensions.x-maximum-message}}value = {{/vendorExtensions.x-maximum-message}}{{{.}}}L{{#vendorExtensions.x-maximum-message}}, message = "{{{.}}}"{{/vendorExtensions.x-maximum-message}})
         {{/maximum}}
     {{/isLong}}
     {{!Not Integer, not Long => we have a decimal value!}}
     {{^isInteger}}
         {{^isLong}}{{!minimum for decimal value}}
             {{#minimum}}
-    @DecimalMin({{#exclusiveMinimum}}value = {{/exclusiveMinimum}}{{^exclusiveMinimum}}{{#vendorExtensions.x-min-message}}value = {{/vendorExtensions.x-min-message}}{{/exclusiveMinimum}}"{{minimum}}"{{#exclusiveMinimum}}, inclusive = false{{/exclusiveMinimum}}{{#vendorExtensions.x-min-message}}, message = "{{{.}}}"{{/vendorExtensions.x-min-message}})
+    @DecimalMin({{#exclusiveMinimum}}value = {{/exclusiveMinimum}}{{^exclusiveMinimum}}{{#vendorExtensions.x-minimum-message}}value = {{/vendorExtensions.x-minimum-message}}{{/exclusiveMinimum}}"{{minimum}}"{{#exclusiveMinimum}}, inclusive = false{{/exclusiveMinimum}}{{#vendorExtensions.x-minimum-message}}, message = "{{{.}}}"{{/vendorExtensions.x-minimum-message}})
             {{/minimum}}
     {{!maximal for decimal value}}
             {{#maximum}}
-    @DecimalMax({{#exclusiveMaximum}}value = {{/exclusiveMaximum}}{{^exclusiveMaximum}}{{#vendorExtensions.x-max-message}}value = {{/vendorExtensions.x-max-message}}{{/exclusiveMaximum}}"{{maximum}}"{{#exclusiveMaximum}}, inclusive = false{{/exclusiveMaximum}}{{#vendorExtensions.x-max-message}}, message = "{{{.}}}"{{/vendorExtensions.x-max-message}})
+    @DecimalMax({{#exclusiveMaximum}}value = {{/exclusiveMaximum}}{{^exclusiveMaximum}}{{#vendorExtensions.x-maximum-message}}value = {{/vendorExtensions.x-maximum-message}}{{/exclusiveMaximum}}"{{maximum}}"{{#exclusiveMaximum}}, inclusive = false{{/exclusiveMaximum}}{{#vendorExtensions.x-maximum-message}}, message = "{{{.}}}"{{/vendorExtensions.x-maximum-message}})
             {{/maximum}}
         {{/isLong}}
     {{/isInteger}}
