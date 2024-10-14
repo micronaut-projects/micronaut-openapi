@@ -19,8 +19,8 @@ Currently, the following extensions are supported:
 | `*x-deprecated*` | `Schema` *(only enum)* | List of deprecated enum items
 | `*x-type*` | `Schema` | If the variable/parameter has a primitive type that is not in the OpenAPI 3 specification, this field will be filled in. Used for primitive java types `byte`, `short`, `int`, `long`, `float`, `double`, `char`
 | `*x-format*` | `Schema` | If the variable/parameter has a type that is not in the OpenAPI 3 specification, this field will be filled in. Used for java types `Byte` (type: integer, `x-format: int8`), `Short` (type: integer, `x-format: int16`), `Char` (type: string, `x-format: char`)
-| `*x-min-message*` | `Schema` | Message from `jakarta.validation` annotations: `@Min`, `@DecimalMin`, `@Negative`, `@NegativeOrZero`, `@Positive`, `@PositiveOrZero`
-| `*x-max-message*` | `Schema` | Message from `jakarta.validation` annotations: `@Max`, `@DecimalMax`
+| `*x-minimum-message*` | `Schema` | Message from `jakarta.validation` annotations: `@Min`, `@DecimalMin`, `@Negative`, `@NegativeOrZero`, `@Positive`, `@PositiveOrZero`
+| `*x-maximum-message*` | `Schema` | Message from `jakarta.validation` annotations: `@Max`, `@DecimalMax`
 | `*x-size-message*` | `Schema` | Message from `jakarta.validation` annotations: `@NotEmpty`, `@Size`, `@NotBlank`
 | `*x-pattern-message*` | `Schema` | Message from `jakarta.validation` annotations: `@Pattern`, `@Email`
 | `*x-not-null-message*` | `Schema` | Message from `jakarta.validation` annotation `@NotNull`

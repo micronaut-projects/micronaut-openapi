@@ -31,8 +31,8 @@ public interface GeneratorExt {
     String ENUM_DESCRIPTIONS = "x-enum-descriptions";
     String ENUM_DEPRECATED = "x-deprecated";
     String DEPRECATED_MESSAGE = "x-deprecated-message";
-    String MIN_MESSAGE = "x-min-message";
-    String MAX_MESSAGE = "x-max-message";
+    String MIN_MESSAGE = "x-minimum-message";
+    String MAX_MESSAGE = "x-maximum-message";
     String SIZE_MESSAGE = "x-size-message";
     String PATTERN_MESSAGE = "x-pattern-message";
     String NOT_NULL_MESSAGE = "x-not-null-message";

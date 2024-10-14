@@ -159,8 +159,8 @@ public final class Utils {
         var patternMsg = (String) prop.vendorExtensions.get("x-pattern-message");
         var sizeMsg = (String) prop.vendorExtensions.get("x-size-message");
         var notNullMsg = (String) prop.vendorExtensions.get("x-not-null-message");
-        var minMsg = (String) prop.vendorExtensions.get("x-min-message");
-        var maxMsg = (String) prop.vendorExtensions.get("x-max-message");
+        var minMsg = (String) prop.vendorExtensions.get("x-minimum-message");
+        var maxMsg = (String) prop.vendorExtensions.get("x-maximum-message");
 
         if (StringUtils.isNotEmpty(prop.pattern) && !prop.isDate && !prop.isDateTime) {
             if ("email".equals(type) || "email".equalsIgnoreCase(prop.dataFormat) || prop.isEmail) {
