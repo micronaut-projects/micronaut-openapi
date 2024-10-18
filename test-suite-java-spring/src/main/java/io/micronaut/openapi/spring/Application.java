@@ -9,8 +9,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 @OpenAPIDefinition(
     info = @Info(
-        title = "demo",
-        version = "0.0"
+        version = "${app.version}"
     )
 )
 public class Application {

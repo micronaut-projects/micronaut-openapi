@@ -3,14 +3,20 @@ package io.micronaut.openapi.spring;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.micronaut.openapi.OpenApiUtils;
 import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.parameters.Parameter;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.web.client.RestClient;
 
+import java.util.List;
+
+import static io.micronaut.openapi.spring.TestConfig.APP_NAME;
+import static io.micronaut.openapi.spring.TestConfig.APP_VERSION;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ActiveProfiles("test")
@@ -27,11 +33,13 @@ class TestControllerTest {
     @Test
     void springOpenApiPathTest() throws JsonProcessingException {
         var result = restClient.get()
-            .uri("/swagger/demo-0.0.yml")
+            .uri("/swagger/" + APP_NAME + '-' + APP_VERSION + ".yml")
             .retrieve()
             .body(String.class);
 
         var openApi = OpenApiUtils.getYamlMapper().readValue(result, OpenAPI.class);
+        assertNotNull(openApi.getInfo());
+        assertEquals(APP_VERSION, openApi.getInfo().getVersion());
         assertNotNull(openApi.getPaths());
 
         var userSchema = openApi.getComponents().getSchemas().get("User");
@@ -72,17 +80,30 @@ class TestControllerTest {
         assertNotNull(params);
         assertEquals(2, params.size());
 
-        assertEquals("userId", params.get(0).getName());
-        assertEquals("path", params.get(0).getIn());
-        assertTrue(params.get(0).getRequired());
-        assertNotNull(params.get(0).getSchema());
-        assertEquals("string", params.get(0).getSchema().getType());
+        var userIdParam = getParamByName("userId", params);
+        assertNotNull(userIdParam);
+        assertEquals("userId", userIdParam.getName());
+        assertEquals("path", userIdParam.getIn());
+        assertTrue(userIdParam.getRequired());
+        assertNotNull(userIdParam.getSchema());
+        assertEquals("string", userIdParam.getSchema().getType());
 
-        assertEquals("age", params.get(1).getName());
-        assertEquals("query", params.get(1).getIn());
-        assertNotNull(params.get(1).getSchema());
-        assertEquals("integer", params.get(1).getSchema().getType());
-        assertEquals("int32", params.get(1).getSchema().getFormat());
-        assertTrue(params.get(1).getSchema().getNullable());
+        var ageParam = getParamByName("age", params);
+        assertNotNull(ageParam);
+        assertEquals("age", ageParam.getName());
+        assertEquals("query", ageParam.getIn());
+        assertNotNull(ageParam.getSchema());
+        assertNull(ageParam.getRequired());
+        assertEquals("integer", ageParam.getSchema().getType());
+        assertEquals("int32", ageParam.getSchema().getFormat());
+        assertEquals(123, ageParam.getSchema().getDefault());
+        assertTrue(ageParam.getSchema().getNullable());
+    }
+
+    private Parameter getParamByName(String name, List<Parameter> params) {
+        return params.stream()
+            .filter(p -> name.equals(p.getName()))
+            .findFirst()
+            .orElse(null);
     }
 }

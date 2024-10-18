@@ -986,6 +986,9 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             }
         } else if (parameter.isAnnotationPresent(PathVariable.class)) {
             String paramName = parameter.getValue(PathVariable.class, String.class).orElse(parameterName);
+            if (paramName.isEmpty()) {
+                paramName = parameterName;
+            }
             UriMatchVariable variable = pathVariables.get(paramName);
             if (variable == null) {
                 warn("Path variable name: '" + paramName + "' not found in path, operation: " + swaggerOperation.getOperationId(), context, parameter);
