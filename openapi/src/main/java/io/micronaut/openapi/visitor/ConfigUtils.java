@@ -324,13 +324,14 @@ public final class ConfigUtils {
         }
 
         var expandableProperties = new ArrayList<Pair<String, String>>();
+        var expandPrefix = MICRONAUT_OPENAPI_EXPAND_PREFIX + DOT;
 
         // first, check system properties and environments config files
         var env = (AnnProcessorEnvironment) getEnv(context);
         Map<String, Object> propertiesFromEnv = null;
         if (env != null) {
             try {
-                propertiesFromEnv = env.getProperties(MICRONAUT_OPENAPI_EXPAND_PREFIX.substring(0, MICRONAUT_OPENAPI_EXPAND_PREFIX.length() - 1), null);
+                propertiesFromEnv = env.getProperties(expandPrefix.substring(0, expandPrefix.length() - 1), null);
             } catch (Exception e) {
                 warn("Error:\n" + Utils.printStackTrace(e), context);
             }
@@ -347,7 +348,7 @@ public final class ConfigUtils {
         Properties openapiProps = readOpenApiConfigFile(context);
         for (Map.Entry<Object, Object> entry : openapiProps.entrySet()) {
             String key = entry.getKey().toString();
-            if (!key.startsWith(MICRONAUT_OPENAPI_EXPAND_PREFIX)) {
+            if (!key.startsWith(expandPrefix)) {
                 continue;
             }
             expandedPropsMap.put(key, entry.getValue().toString());
@@ -357,7 +358,7 @@ public final class ConfigUtils {
         if (CollectionUtils.isNotEmpty(System.getProperties())) {
             for (Map.Entry<Object, Object> entry : System.getProperties().entrySet()) {
                 String key = entry.getKey().toString();
-                if (!key.startsWith(MICRONAUT_OPENAPI_EXPAND_PREFIX)) {
+                if (!key.startsWith(expandPrefix)) {
                     continue;
                 }
                 expandedPropsMap.put(key, entry.getValue().toString());
@@ -366,8 +367,8 @@ public final class ConfigUtils {
 
         for (Map.Entry<String, String> entry : expandedPropsMap.entrySet()) {
             String key = entry.getKey();
-            if (key.startsWith(MICRONAUT_OPENAPI_EXPAND_PREFIX)) {
-                key = key.substring(MICRONAUT_OPENAPI_EXPAND_PREFIX.length());
+            if (key.startsWith(expandPrefix)) {
+                key = key.substring(expandPrefix.length());
             }
             var prop = Pair.of("\\$\\{" + key + '}', entry.getValue());
             if (!expandableProperties.contains(prop)) {
@@ -390,6 +391,8 @@ public final class ConfigUtils {
         adocProperties.put(MICRONAUT_OPENAPI_ADOC_OUTPUT_FILENAME, getConfigProperty(MICRONAUT_OPENAPI_ADOC_OUTPUT_FILENAME, context));
         adocProperties.put(MICRONAUT_OPENAPI_ADOC_OPENAPI_PATH, getConfigProperty(MICRONAUT_OPENAPI_ADOC_OPENAPI_PATH, context));
 
+        var expandPrefix = MICRONAUT_OPENAPI_EXPAND_PREFIX + DOT;
+
         // first, check system properties and environments config files
         var env = (AnnProcessorEnvironment) getEnv(context);
         Map<String, Object> propertiesFromEnv = null;
@@ -411,7 +414,7 @@ public final class ConfigUtils {
         Properties openapiProps = readOpenApiConfigFile(context);
         for (Map.Entry<Object, Object> entry : openapiProps.entrySet()) {
             String key = entry.getKey().toString();
-            if (!key.startsWith(MICRONAUT_OPENAPI_EXPAND_PREFIX)) {
+            if (!key.startsWith(expandPrefix)) {
                 continue;
             }
             adocProperties.put(key, entry.getValue().toString());
@@ -421,7 +424,7 @@ public final class ConfigUtils {
         if (CollectionUtils.isNotEmpty(System.getProperties())) {
             for (Map.Entry<Object, Object> entry : System.getProperties().entrySet()) {
                 String key = entry.getKey().toString();
-                if (!key.startsWith(MICRONAUT_OPENAPI_EXPAND_PREFIX)) {
+                if (!key.startsWith(expandPrefix)) {
                     continue;
                 }
                 adocProperties.put(key, entry.getValue().toString());

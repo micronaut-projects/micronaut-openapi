@@ -51,4 +51,5 @@ tasks.withType(JavaCompile).configureEach {
         '-Xlint:unchecked',
         '-Xlint:deprecation'
     ]
+    options.forkOptions.jvmArgs += "-Dapp.version=myVersion"
 }

@@ -1064,4 +1064,42 @@ class MyBean {}
         openAPI.info.title == serviceName
         openAPI.info.version == OpenApiApplicationVisitor.DEFAULT_OPENAPI_VERSION
     }
+
+    @RestoreSystemProperties
+    void "test auto generated info block with spring application name"() {
+
+        given:
+        def serviceName = "This is my service"
+        System.setProperty(OpenApiConfigProperty.SPRING_APPLICATION_NAME, serviceName)
+
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+
+@Controller
+class MyController {
+    
+    @Get("/get")
+    public String get() {
+        return null;
+    }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        then:
+        Utils.testReference != null
+
+        when:
+        OpenAPI openAPI = Utils.testReference
+
+        then:
+        openAPI.info
+        openAPI.info.title == serviceName
+        openAPI.info.version == OpenApiApplicationVisitor.DEFAULT_OPENAPI_VERSION
+    }
 }

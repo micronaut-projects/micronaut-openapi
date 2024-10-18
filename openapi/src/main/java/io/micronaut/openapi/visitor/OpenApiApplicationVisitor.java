@@ -101,6 +101,7 @@ import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENA
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_JSON_FORMAT;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_PROPERTY_NAMING_STRATEGY;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_VIEWS_SPEC;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.SPRING_APPLICATION_NAME;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_SECURITY;
 import static io.micronaut.openapi.visitor.OpenApiNormalizeUtils.findAndRemoveDuplicates;
 import static io.micronaut.openapi.visitor.OpenApiNormalizeUtils.normalizeOpenApi;
@@ -741,6 +742,9 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         var info = openApi.getInfo();
         if (info.getTitle() == null) {
             String applicationName = ConfigUtils.getConfigProperty(MICRONAUT_APPLICATION_NAME, context);
+            if (applicationName == null) {
+                applicationName = ConfigUtils.getConfigProperty(SPRING_APPLICATION_NAME, context);
+            }
             info.setTitle(applicationName != null ? applicationName : DEFAULT_OPENAPI_TITLE);
         }
         if (info.getVersion() == null) {

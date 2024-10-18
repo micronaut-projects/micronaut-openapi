@@ -104,7 +104,7 @@ public interface OpenApiConfigProperty {
     /**
      * Prefix for expandable properties.
      */
-    String MICRONAUT_OPENAPI_EXPAND_PREFIX = "micronaut.openapi.expand.";
+    String MICRONAUT_OPENAPI_EXPAND_PREFIX = "micronaut.openapi.expand";
     /**
      * System property for server context path.
      */
@@ -204,6 +204,10 @@ public interface OpenApiConfigProperty {
      * micronaut-context application name property.
      */
     String MICRONAUT_APPLICATION_NAME = "micronaut.application.name";
+    /**
+     * spring-context application name property.
+     */
+    String SPRING_APPLICATION_NAME = "spring.application.name";
     /**
      * If this property is 'true', then generated OpenAPI specification will be with extensions for OpenAPI Generator
      * and the generated client according to this specification will be much more accurate than without it.
@@ -381,6 +385,7 @@ public interface OpenApiConfigProperty {
         MICRONAUT_OPENAPI_SWAGGER_FILE_GENERATION_ENABLED,
         MICRONAUT_OPENAPI_SCHEMA_EXTRA_ENABLED,
         MICRONAUT_OPENAPI_SCHEMA_NAME_SEPARATOR_EMPTY,
-        MICRONAUT_OPENAPI_SCHEMA_NAME_SEPARATOR_GENERIC
+        MICRONAUT_OPENAPI_SCHEMA_NAME_SEPARATOR_GENERIC,
+        MICRONAUT_OPENAPI_EXPAND_PREFIX
     );
 }

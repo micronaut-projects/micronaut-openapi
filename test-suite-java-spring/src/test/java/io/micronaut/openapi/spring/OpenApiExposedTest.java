@@ -10,6 +10,8 @@ import org.springframework.web.client.RestClient;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static io.micronaut.openapi.spring.TestConfig.APP_NAME;
+import static io.micronaut.openapi.spring.TestConfig.APP_VERSION;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -29,7 +31,7 @@ class OpenApiExposedTest {
     void testOpenApiSpecEndpoint() throws IOException {
 
         String openApiSpec;
-        try (var is = getClass().getResourceAsStream("/META-INF/swagger/demo-0.0.yml")) {
+        try (var is = getClass().getResourceAsStream("/META-INF/swagger/" + APP_NAME + '-' + APP_VERSION + ".yml")) {
             assertNotNull(is);
             openApiSpec = new String(is.readAllBytes());
         }
@@ -37,7 +39,7 @@ class OpenApiExposedTest {
 
         assertDoesNotThrow(() -> {
             var result = restClient.get()
-                .uri("/swagger/demo-0.0.yml")
+                .uri("/swagger/" + APP_NAME + '-' + APP_VERSION + ".yml")
                 .retrieve();
 
             recievedOpenApiSpec.set(result.body(String.class));
