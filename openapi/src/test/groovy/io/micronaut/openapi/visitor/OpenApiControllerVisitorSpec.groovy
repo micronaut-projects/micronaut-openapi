@@ -2497,4 +2497,105 @@ class MyBean {}
         paths."/server-context-path/local-path/test/save/{id}"
         paths."/server-context-path/local-path/test/save/{id}".get
     }
+
+    void "test parameter with incorrect schema type"() {
+
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.http.HttpResponse;
+import io.micronaut.http.MediaType;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.inject.Singleton;
+
+@Controller("/path/to/controller/")
+class ControllerExternal {
+
+    @Get(uri = "user/get2", produces = MediaType.APPLICATION_JSON)
+    @Operation(
+          summary = "This operation is used to test OpenAPI definitions",
+          description =
+                  "In this we call we fake a request to get a user")
+    @ApiResponse(
+          responseCode = "200",
+          description = "When the request is successful",
+          content =
+          @Content(
+                  mediaType = "application/json",
+                  schema = @Schema(implementation = User.class)))
+    @ApiResponse(responseCode = "400", description = "Bad params")
+    @ApiResponse(responseCode = "500", description = "Any other exception that cannot be resolved.")
+    @Tag(name = "getUser2")
+    public HttpResponse<String> getUser2(
+          @Parameter(
+                  name = "id",
+                  description = "Unique identifier",
+                  required = true,
+                  schema = @Schema(
+                          implementation = String.class,
+                          type = "query"
+                  )
+          ) String id) {
+        return HttpResponse.ok();
+      }
+
+}
+
+class User {
+    public String id;
+    public String firstName;
+    public String lastName;
+    public String email;
+    @Schema(hidden=true)
+    public String address;
+    @Schema(hidden=true)
+    public String city;
+    @Schema(hidden=true)
+    public String state;
+    @Schema(hidden=true)
+    public String zipcode;
+    @Schema(hidden=true)
+    public String country;
+    @Schema(hidden=true)
+    public String phoneNumber;
+}
+
+class GetUserClientRequest {
+    private String id;
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+}
+
+@Singleton
+class MyBean {}
+''')
+        when:
+        OpenAPI openAPI = Utils.testReference
+        def paths = openAPI.paths
+
+        then:
+        paths
+        paths."/path/to/controller/user/get2"
+        paths."/path/to/controller/user/get2".get
+        paths."/path/to/controller/user/get2".get.parameters
+        paths."/path/to/controller/user/get2".get.parameters[0]
+        paths."/path/to/controller/user/get2".get.parameters[0].name == "id"
+        paths."/path/to/controller/user/get2".get.parameters[0].required
+        paths."/path/to/controller/user/get2".get.parameters[0].description == "Unique identifier"
+        paths."/path/to/controller/user/get2".get.parameters[0].schema
+        paths."/path/to/controller/user/get2".get.parameters[0].schema.type == "string"
+    }
 }

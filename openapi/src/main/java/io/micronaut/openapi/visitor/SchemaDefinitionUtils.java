@@ -1048,9 +1048,14 @@ public final class SchemaDefinitionUtils {
             JsonNode items = objNode.remove(PROP_SCHEMA);
             if (items != null && schemaToBind != null && (schemaToBind.getType() != null && schemaToBind.getType().equals(TYPE_ARRAY))) {
                 try {
-                    schemaToBind.items(Utils.getJsonMapper().readerForUpdating(schemaToBind.getItems()).readValue(items));
+                    Schema<?> updatedSchema = Utils.getJsonMapper().readerForUpdating(schemaToBind.getItems()).readValue(items);
+                    if (updatedSchema != null) {
+                        schemaToBind.items(updatedSchema);
+                    } else {
+                        warn("Error reading Swagger Schema for element [" + element + "] (items schema): " + items, context, element);
+                    }
                 } catch (IOException e) {
-                    warn("Error reading Swagger Schema for element [" + element + "]: " + e.getMessage(), context, element);
+                    warn("Error reading Swagger Schema for element [" + element + "] (items schema): " + e.getMessage(), context, element);
                 }
             }
         }
@@ -2623,7 +2628,12 @@ public final class SchemaDefinitionUtils {
         // need to set placeholders to set correct values and types to example field
         schemaJson = resolvePlaceholders(schemaJson, s -> expandProperties(s, getExpandableProperties(context), context));
         try {
-            schemaToBind = Utils.getJsonMapper().readerForUpdating(schemaToBind).readValue(schemaJson);
+            Schema<?> updatedSchema = Utils.getJsonMapper().readerForUpdating(schemaToBind).readValue(schemaJson);
+            if (updatedSchema != null) {
+                schemaToBind = updatedSchema;
+            } else {
+                warn("Error reading Swagger Schema for element [" + element + "]: " + schemaJson, context, element);
+            }
         } catch (IOException e) {
             warn("Error reading Swagger Schema for element [" + element + "]: " + e.getMessage(), context, element);
         }
