@@ -34,7 +34,6 @@ import java.util.stream.Collectors;
 
 import static io.micronaut.openapi.visitor.ConfigUtils.getGroupProperties;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_CONTEXT_SERVER_PATH;
-import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_SERVER_CONTEXT_PATH;
 import static io.micronaut.openapi.visitor.StringUtil.PLACEHOLDER_POSTFIX;
 import static io.micronaut.openapi.visitor.StringUtil.PLACEHOLDER_PREFIX;
 import static io.micronaut.openapi.visitor.StringUtil.QUOTE;

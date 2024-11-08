@@ -22,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
 import io.micronaut.core.annotation.AnnotationMetadata;
 import io.micronaut.core.annotation.AnnotationValue;
+import io.micronaut.core.annotation.Creator;
 import io.micronaut.core.annotation.Internal;
 import io.micronaut.core.reflect.ClassUtils;
 import io.micronaut.http.HttpRequest;
@@ -447,7 +448,8 @@ public final class ElementUtils {
         var constructors = classEl.getAccessibleConstructors();
         if (constructors.size() > 1) {
             for (var constructor : constructors) {
-                if (constructor.isDeclaredAnnotationPresent(JsonCreator.class)) {
+                if (constructor.isDeclaredAnnotationPresent(JsonCreator.class)
+                    || constructor.isDeclaredAnnotationPresent(Creator.class)) {
                     creatorConstructor = constructor;
                 }
             }

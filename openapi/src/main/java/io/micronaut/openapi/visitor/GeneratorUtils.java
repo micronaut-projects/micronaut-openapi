@@ -235,7 +235,8 @@ public final class GeneratorUtils {
             }
         }
 
-        if (!enumVarNameList.isEmpty() && !extensions.containsKey(ENUM_VAR_NAMES)) {
+        if (!enumVarNameList.isEmpty() && !extensions.containsKey(ENUM_VAR_NAMES)
+            && !schema.getEnum().equals(enumVarNameList)) {
             extensions.put(ENUM_VAR_NAMES, enumVarNameList);
         }
         if (!enumVarDocList.isEmpty() && !extensions.containsKey(ENUM_DESCRIPTIONS)) {

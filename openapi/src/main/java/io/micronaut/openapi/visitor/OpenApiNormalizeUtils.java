@@ -41,6 +41,7 @@ import java.util.TreeMap;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_DESCRIPTION;
 import static io.micronaut.openapi.visitor.SchemaUtils.EMPTY_SIMPLE_SCHEMA;
 import static io.micronaut.openapi.visitor.SchemaUtils.TYPE_OBJECT;
 import static io.micronaut.openapi.visitor.SchemaUtils.TYPE_STRING;
@@ -266,6 +267,11 @@ public final class OpenApiNormalizeUtils {
 
         if (CollectionUtils.isEmpty(schema.getExtensions())) {
             schema.setExtensions(null);
+        }
+
+        if (CollectionUtils.isEmpty(schema.getTypes())
+            || (schema.getTypes().size() == 1 && schema.getTypes().iterator().next() == null)) {
+            schema.setTypes(null);
         }
 
         List<Schema> allOf = schema.getAllOf();
@@ -628,6 +634,13 @@ public final class OpenApiNormalizeUtils {
             if (StringUtils.isNotEmpty(innerSchema.getDescription())) {
                 schema.setDescription(innerSchema.getDescription());
                 innerSchema.setDescription(null);
+                var jsonSchema = innerSchema.getJsonSchema();
+                if (CollectionUtils.isNotEmpty(jsonSchema)) {
+                    jsonSchema.remove(PROP_DESCRIPTION);
+                }
+                if (CollectionUtils.isEmpty(jsonSchema)) {
+                    innerSchema.setJsonSchema(null);
+                }
             }
             if (innerSchema.getDeprecated() != null) {
                 schema.setDeprecated(innerSchema.getDeprecated());

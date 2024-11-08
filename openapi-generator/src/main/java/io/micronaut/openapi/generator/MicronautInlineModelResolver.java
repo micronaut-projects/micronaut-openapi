@@ -683,7 +683,7 @@ public final class MicronautInlineModelResolver {
 
             if (isSingleAllOf && (isReadOnly || isNullable)) {
                 // Check if this composed schema only contains an allOf and a readOnly or nullable.
-                ComposedSchema c = new ComposedSchema();
+                var c = new ComposedSchema();
                 c.setAllOf(schema.getAllOf());
                 c.setReadOnly(schema.getReadOnly());
                 c.setNullable(schema.getNullable());
