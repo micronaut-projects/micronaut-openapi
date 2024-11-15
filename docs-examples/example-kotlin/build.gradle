@@ -14,7 +14,7 @@ dependencies {
     kspTest(mnValidation.micronaut.validation)
     kspTest(projects.micronautOpenapi)
 
-    testCompileOnly projects.micronautOpenapiAnnotations
+    testCompileOnly(projects.micronautOpenapiAnnotations)
     testCompileOnly(mn.micronaut.inject.kotlin)
 
     testImplementation(mn.micronaut.http)

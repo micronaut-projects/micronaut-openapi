@@ -65,7 +65,6 @@ import io.micronaut.http.cookie.Cookie;
 import io.micronaut.http.filter.HttpServerFilter;
 import io.micronaut.http.filter.ServerFilterChain;
 
-
 @Filter(
 	methods = {HttpMethod.GET, HttpMethod.HEAD},
 	patterns = {"/**/rapidoc*", "/**/redoc*", "/**/swagger-ui*", "/**/openapi-explorer*"}

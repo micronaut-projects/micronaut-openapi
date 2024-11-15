@@ -17,7 +17,6 @@ This is a summary text. This is a description with <b>bold</b> and {@code some c
 @return The {@value return} value
 ''')
 
-
         expect:
         desc.methodSummary
         desc.methodDescription
@@ -51,7 +50,6 @@ And more stuff.
 @param bar The {@code bar} param
 @return The {@value return} value
 ''')
-
 
         expect:
         desc.methodSummary
@@ -145,7 +143,6 @@ Check if the given user has access to RabbitMQ.
 @param bar The {@code bar} param
 @return The {@value return} value
 ''')
-
 
         expect:
         desc.methodSummary

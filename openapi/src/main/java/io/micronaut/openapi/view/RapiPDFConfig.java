@@ -37,7 +37,7 @@ import static io.micronaut.openapi.visitor.StringUtil.SLASH;
  *
  * @author croudet
  */
-final class RapiPDFConfig extends AbstractViewConfig {
+public final class RapiPDFConfig extends AbstractViewConfig {
 
     private static final String DEFAULT_RAPIPDF_JS_PATH = OpenApiViewConfig.RESOURCE_DIR + SLASH;
 

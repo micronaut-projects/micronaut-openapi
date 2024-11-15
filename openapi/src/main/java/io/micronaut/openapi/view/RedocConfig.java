@@ -22,11 +22,13 @@ import io.micronaut.openapi.view.OpenApiViewConfig.RendererType;
 import io.micronaut.openapi.visitor.Pair;
 import io.micronaut.openapi.visitor.group.OpenApiInfo;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static io.micronaut.openapi.visitor.StringUtil.SLASH;
 
@@ -35,7 +37,7 @@ import static io.micronaut.openapi.visitor.StringUtil.SLASH;
  *
  * @author croudet
  */
-final class RedocConfig extends AbstractViewConfig {
+public final class RedocConfig extends AbstractViewConfig {
 
     public static final String REDOC_PREFIX = "redoc.";
     private static final String DEFAULT_REDOC_JS_PATH = OpenApiViewConfig.RESOURCE_DIR + SLASH;
@@ -101,15 +103,8 @@ final class RedocConfig extends AbstractViewConfig {
         ID_ONLY("id-only"),
         ;
 
-        private static final Map<String, SideNavStyle> BY_CODE;
-
-        static {
-            var byCode = new HashMap<String, SideNavStyle>(SideNavStyle.values().length);
-            for (SideNavStyle navTagClick : values()) {
-                byCode.put(navTagClick.code, navTagClick);
-            }
-            BY_CODE = Collections.unmodifiableMap(byCode);
-        }
+        private static final Map<String, SideNavStyle> BY_CODE = Map.copyOf(Arrays.stream(values())
+            .collect(Collectors.toMap(v -> v.code, Function.identity())));
 
         private final String code;
 

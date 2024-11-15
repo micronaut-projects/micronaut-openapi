@@ -60,7 +60,6 @@ class Application {
 
 }
 
-
 @jakarta.inject.Singleton
 class MyBean {}
 ''')

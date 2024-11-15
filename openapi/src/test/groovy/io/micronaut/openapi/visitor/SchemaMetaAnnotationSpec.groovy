@@ -61,7 +61,6 @@ class MyBean {}
 
     void "test that it possible to define custom schema annotations at the type level"() {
 
-
         given:"An API definition"
         when:
         buildBeanDefinition('test.MyBean', '''
@@ -120,9 +119,7 @@ class MyBean {}
         !openAPI.components
     }
 
-
     void "test that it possible to define custom RequestBody annotations at the type level"() {
-
 
         given:"An API definition"
         when:

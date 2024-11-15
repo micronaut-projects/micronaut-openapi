@@ -33,7 +33,7 @@ import static io.micronaut.openapi.visitor.StringUtil.SLASH;
 /**
  * OpenAPI Explorer configuration.
  */
-final class OpenApiExplorerConfig extends AbstractViewConfig {
+public final class OpenApiExplorerConfig extends AbstractViewConfig {
 
     public static final String OPENAPI_EXPLORER_PREFIX = "openapi-explorer.";
     private static final String DEFAULT_OPENAPI_EXPLORER_JS_PATH = OpenApiViewConfig.RESOURCE_DIR + SLASH;

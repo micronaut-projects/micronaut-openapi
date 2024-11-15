@@ -256,7 +256,6 @@ class MyController {
 class Pet implements java.util.function.Consumer<Pet> {
     private PetType type;
 
-
     public void setType(PetType type) {
         this.type = type;
     }
@@ -317,7 +316,6 @@ class MyController {
 class Pet {
     @jakarta.validation.constraints.Min(18)
     private int age;
-
 
     public void setAge(int a) {
         age = a;
@@ -380,7 +378,6 @@ class MyController {
 class Pet {
     @jakarta.validation.constraints.Min(18)
     private int age;
-
 
     public void setAge(int a) {
         age = a;
@@ -445,7 +442,6 @@ class MyController {
 class Pet {
     @jakarta.validation.constraints.Min(18)
     private int age;
-
 
     public void setAge(int a) {
         age = a;

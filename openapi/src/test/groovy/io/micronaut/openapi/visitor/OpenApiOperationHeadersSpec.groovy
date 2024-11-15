@@ -87,7 +87,6 @@ class MyController {
     }
 }
 
-
 @jakarta.inject.Singleton
 class MyBean {}
 ''')
@@ -137,7 +136,6 @@ class MyController {
         return name;
     }
 }
-
 
 @jakarta.inject.Singleton
 class MyBean {}

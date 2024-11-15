@@ -468,7 +468,6 @@ class Pet {
     public void setName(String name) { this.name = name; }
 }
 
-
 @jakarta.inject.Singleton
 class MyBean {}
 ''')
@@ -675,7 +674,6 @@ class MyBean {}
         pathItem.post.requestBody.content
         pathItem.post.requestBody.content.size() == 1
 
-
         when: "the /{slug} path is retrieved"
         pathItem = openAPI.paths.get("/pets/{slug}")
 
@@ -784,7 +782,6 @@ class MyBean {}
         operation.operationId == 'getSubscription'
         operation.parameters.size() == 1
 
-
         when:
         def parameter = operation.parameters[0]
 
@@ -830,7 +827,6 @@ class MyBean {}
         operation.operationId == 'getSubscription'
         operation.parameters.size() == 1
 
-
         when:
         def parameter = operation.parameters[0]
 
@@ -874,7 +870,6 @@ class MyBean {}
         operation != null
         operation.operationId == 'getSubscription'
         operation.parameters.size() == 1
-
 
         when:
         def parameter = operation.parameters[0]

@@ -216,7 +216,6 @@ public class ObjectMapperFactory {
         sourceMixins.put(SecurityScheme.class, ExtensionsMixin.class);
         sourceMixins.put(Callback.class, ExtensionsMixin.class);
 
-
         if (!openapi31) {
             sourceMixins.put(Schema.class, SchemaMixin.class);
             sourceMixins.put(DateSchema.class, DateSchemaMixin.class);

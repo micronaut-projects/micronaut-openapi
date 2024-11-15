@@ -59,4 +59,3 @@ public class MediaTypeSerializer extends JsonSerializer<MediaType> implements Re
     }
 }
 
-

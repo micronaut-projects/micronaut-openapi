@@ -963,7 +963,7 @@ public final class SchemaDefinitionUtils {
             notOnlyRef = true;
         }
         final String defaultValue = stringValue(element, Bindable.class, PROP_DEFAULT_VALUE).orElse(null);
-        if (defaultValue != null && schemaToBind.getDefault() == null) {
+        if (defaultValue != null && schemaToBind != null && schemaToBind.getDefault() == null) {
             setDefaultValueObject(schemaToBind, defaultValue, elementType, schemaToBind.getType(), schemaToBind.getFormat(), true, context);
             notOnlyRef = true;
         }
@@ -998,7 +998,7 @@ public final class SchemaDefinitionUtils {
         } else if (isNullable && CollectionUtils.isEmpty(composedSchema.getAllOf())) {
             composedSchema.addAllOfItem(originalSchema);
         }
-        if (addSchemaToBind && !schemaToBind.equals(originalSchema)) {
+        if (addSchemaToBind && schemaToBind != null && !schemaToBind.equals(originalSchema)) {
             if (TYPE_OBJECT.equals(schemaToBind.getType()) && !(originalSchema instanceof MapSchema)) {
                 if (composedSchema.getType() == null) {
                     composedSchema.setType(TYPE_OBJECT);
@@ -1649,7 +1649,7 @@ public final class SchemaDefinitionUtils {
             return null;
         }
 
-        var classElement = ((TypedElement) type).getType();
+        var classElement = type.getType();
         var superTypes = new ArrayList<ClassElement>();
         Collection<ClassElement> parentInterfaces = classElement.getInterfaces();
         if (classElement.isInterface() && !parentInterfaces.isEmpty()) {
@@ -1954,7 +1954,6 @@ public final class SchemaDefinitionUtils {
                 schemaToBind.setExample(ConvertUtils.parseByTypeAndFormat(schemaExample, elType, elFormat, context, false));
             }
         }
-
 
         var schemaDefaultValue = (String) annValues.get(PROP_DEFAULT_VALUE);
         if (schemaDefaultValue != null) {

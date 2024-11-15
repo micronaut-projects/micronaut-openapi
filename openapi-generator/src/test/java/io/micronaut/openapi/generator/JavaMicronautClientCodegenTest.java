@@ -35,7 +35,7 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         openAPI.setInfo(new Info());
         codegen.preprocessOpenAPI(openAPI);
 
-        assertEquals(codegen.additionalProperties().get(CodegenConstants.HIDE_GENERATION_TIMESTAMP), Boolean.FALSE);
+        assertEquals(Boolean.FALSE, codegen.additionalProperties().get(CodegenConstants.HIDE_GENERATION_TIMESTAMP));
         assertFalse(codegen.isHideGenerationTimestamp());
 
         assertEquals(Boolean.FALSE, codegen.additionalProperties().get(CodegenConstants.HIDE_GENERATION_TIMESTAMP));

@@ -495,7 +495,6 @@ final class JdkVersion {
     }
 }
 
-
 /**
  * The server URL.
  *
@@ -605,7 +604,6 @@ class RequestInfo {
                 }""".formatted(serverURL, currentURL, path, parameters, locale, userAgent);
     }
 }
-
 
 @Singleton
 class MyBean {}

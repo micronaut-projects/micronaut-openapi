@@ -22,12 +22,14 @@ import io.micronaut.openapi.view.OpenApiViewConfig.RendererType;
 import io.micronaut.openapi.visitor.Pair;
 import io.micronaut.openapi.visitor.group.OpenApiInfo;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static io.micronaut.openapi.visitor.StringUtil.SLASH;
 
@@ -36,7 +38,7 @@ import static io.micronaut.openapi.visitor.StringUtil.SLASH;
  *
  * @author croudet
  */
-final class RapidocConfig extends AbstractViewConfig {
+public final class RapidocConfig extends AbstractViewConfig {
 
     public static final String RAPIDOC_PREFIX = "rapidoc.";
     private static final String DEFAULT_RAPIDOC_JS_PATH = OpenApiViewConfig.RESOURCE_DIR + SLASH;
@@ -165,15 +167,8 @@ final class RapidocConfig extends AbstractViewConfig {
         EXPAND_COLLAPSE("expand-collapse"),
         SHOW_DESCRIPTION("show-description");
 
-        private static final Map<String, NavTagClick> BY_CODE;
-
-        static {
-            var byCode = new HashMap<String, NavTagClick>(NavTagClick.values().length);
-            for (NavTagClick navTagClick : values()) {
-                byCode.put(navTagClick.code, navTagClick);
-            }
-            BY_CODE = Collections.unmodifiableMap(byCode);
-        }
+        private static final Map<String, NavTagClick> BY_CODE = Map.copyOf(Arrays.stream(values())
+            .collect(Collectors.toMap(v -> v.code, Function.identity())));
 
         private final String code;
 
@@ -204,15 +199,8 @@ final class RapidocConfig extends AbstractViewConfig {
         INCLUDE("include"),
         ;
 
-        private static final Map<String, FetchCredentials> BY_CODE;
-
-        static {
-            var byCode = new HashMap<String, FetchCredentials>(FetchCredentials.values().length);
-            for (FetchCredentials navTagClick : values()) {
-                byCode.put(navTagClick.code, navTagClick);
-            }
-            BY_CODE = Collections.unmodifiableMap(byCode);
-        }
+        private static final Map<String, FetchCredentials> BY_CODE = Map.copyOf(Arrays.stream(values())
+            .collect(Collectors.toMap(v -> v.code, Function.identity())));
 
         private final String code;
 
@@ -244,15 +232,8 @@ final class RapidocConfig extends AbstractViewConfig {
         AS_COLORED_BLOCK("as-colored-block"),
         ;
 
-        private static final Map<String, ShowMethodInNavBar> BY_CODE;
-
-        static {
-            var byCode = new HashMap<String, ShowMethodInNavBar>(ShowMethodInNavBar.values().length);
-            for (ShowMethodInNavBar showMethodInNavBar : values()) {
-                byCode.put(showMethodInNavBar.code, showMethodInNavBar);
-            }
-            BY_CODE = Collections.unmodifiableMap(byCode);
-        }
+        private static final Map<String, ShowMethodInNavBar> BY_CODE = Map.copyOf(Arrays.stream(values())
+            .collect(Collectors.toMap(v -> v.code, Function.identity())));
 
         private final String code;
 

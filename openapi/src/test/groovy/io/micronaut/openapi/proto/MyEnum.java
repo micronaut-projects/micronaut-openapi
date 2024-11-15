@@ -29,7 +29,6 @@ public enum MyEnum
    */
   public static final int ENUM_VAL2_VALUE = 1;
 
-
   public final int getNumber() {
     if (this == UNRECOGNIZED) {
       throw new IllegalArgumentException(

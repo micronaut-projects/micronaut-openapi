@@ -68,7 +68,6 @@ public class ParameterDeserializer extends JsonDeserializer<Parameter> {
                 mapper = OpenApiUtils.getJsonMapper();
             }
 
-
             if ("query".equals(in)) {
                 reader = mapper.readerFor(QueryParameter.class);
             } else if ("header".equals(in)) {

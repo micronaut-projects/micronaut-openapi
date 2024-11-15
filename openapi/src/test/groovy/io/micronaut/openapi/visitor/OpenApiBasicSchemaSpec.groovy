@@ -393,7 +393,6 @@ public class MyBean {}
         openAPI.components.schemas["Person"].properties["name"].description == "The person full name."
         openAPI.components.schemas["Person"].properties["name"].pattern == "xxxx"
 
-
         openAPI.components.schemas["Person"].properties["debtValue"].type == "integer"
         openAPI.components.schemas["Person"].properties["debtValue"].maximum == 0
         !openAPI.components.schemas["Person"].properties["debtValue"].exclusiveMaximum
@@ -1400,7 +1399,6 @@ class MySubObject {
         this.prop1 = prop1;
     }
 }
-
 
 @jakarta.inject.Singleton
 public class MyBean {}

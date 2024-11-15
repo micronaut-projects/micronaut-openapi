@@ -99,7 +99,6 @@ class Pet {
         return name;
     }
 
-
     /**
      * The Pet Tags
      *
@@ -771,7 +770,6 @@ class MyBean {}
         pathItem.post.requestBody.content
         pathItem.post.requestBody.content.size() == 1
 
-
         when: "the /{slug} path is retrieved"
         pathItem = openAPI.paths.get("/pets/{slug}")
 
@@ -927,7 +925,6 @@ class MyBean {}
         pathItem.post.requestBody.content
         pathItem.post.requestBody.content.size() == 1
 
-
         when: "the /{slug} path is retrieved"
         pathItem = openAPI.paths.get("/pets/{slug}")
 
@@ -965,7 +962,6 @@ class MyBean {}
         pathItem.post.responses['200']
         pathItem.post.responses['200'].description == 'completable 200 response'
         pathItem.post.responses['200'].content == null
-
 
         when: "An observable is returned"
         pathItem = openAPI.paths.get("/pets/observable")
@@ -1131,7 +1127,6 @@ class MyBean {}
         pathItem.post.requestBody.required
         pathItem.post.requestBody.content
         pathItem.post.requestBody.content.size() == 1
-
 
         when: "the /{slug} path is retrieved"
         pathItem = openAPI.paths.get("/pets/{slug}")
@@ -1458,7 +1453,6 @@ class Pet {
         return name;
     }
 
-
     /**
      * The Pet Tags
      *
@@ -1763,7 +1757,6 @@ class Pet {
         return name;
     }
 
-
     /**
      * The Pet Tags
      *
@@ -1867,7 +1860,6 @@ class Pet {
     public String getName() {
         return name;
     }
-
 
     /**
      * The Pet Tags

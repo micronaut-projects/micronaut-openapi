@@ -12,7 +12,6 @@ See the [Documentation](https://micronaut-projects.github.io/micronaut-openapi/l
 
 See the [Snapshot Documentation](https://micronaut-projects.github.io/micronaut-openapi/snapshot/guide/index.html) for the latest development version documentation.
 
-
 ## Examples
 
 You can generate example applications at https://launch.micronaut.io by selecting the `Add Feature` button and the `openapi` feature then generate!

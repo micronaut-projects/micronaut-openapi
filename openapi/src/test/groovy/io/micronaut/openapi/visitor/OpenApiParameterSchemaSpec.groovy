@@ -380,7 +380,6 @@ class MyBean {}
         operationPatch.parameters[0].schema.format == 'uuid'
     }
 
-
     void "test parameters schema with annotation"() {
         given:
         buildBeanDefinition('test.MyBean', '''

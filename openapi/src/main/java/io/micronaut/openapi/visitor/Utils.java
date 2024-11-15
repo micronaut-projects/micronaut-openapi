@@ -61,7 +61,7 @@ public final class Utils {
     private static Map<String, MethodElement> creatorConstructorsCache = new HashMap<>();
 
     private static boolean openapi31;
-    private static boolean inited;
+    private static boolean initialized;
     private static Set<String> allKnownVersions;
     private static Set<String> allKnownGroups;
     private static Map<String, List<EndpointInfo>> endpointInfos;
@@ -93,11 +93,11 @@ public final class Utils {
     }
 
     public static void init(VisitorContext context) {
-        if (inited) {
+        if (initialized) {
             return;
         }
         openapi31 = ConfigUtils.getBooleanProperty(MICRONAUT_OPENAPI_31_ENABLED, false, context);
-        inited = true;
+        initialized = true;
     }
 
     /**
@@ -366,7 +366,7 @@ public final class Utils {
 
     public static void clean() {
         openapi31 = false;
-        inited = false;
+        initialized = false;
         openApis = null;
         endpointInfos = null;
         includedClassesGroups = null;

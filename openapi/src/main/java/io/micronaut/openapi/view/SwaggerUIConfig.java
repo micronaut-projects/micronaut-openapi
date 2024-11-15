@@ -24,7 +24,7 @@ import io.micronaut.openapi.view.OpenApiViewConfig.RendererType;
 import io.micronaut.openapi.visitor.Pair;
 import io.micronaut.openapi.visitor.group.OpenApiInfo;
 
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -42,7 +42,7 @@ import static io.micronaut.openapi.visitor.StringUtil.SLASH;
  *
  * @author croudet
  */
-final class SwaggerUIConfig extends AbstractViewConfig {
+public final class SwaggerUIConfig extends AbstractViewConfig {
 
     private static final String DEFAULT_SWAGGER_JS_PATH = OpenApiViewConfig.RESOURCE_DIR + SLASH;
 
@@ -133,15 +133,8 @@ final class SwaggerUIConfig extends AbstractViewConfig {
         TOMORROW_NIGHT("tomorrow-night"),
         ;
 
-        private static final Map<String, SyntaxHighlightTheme> BY_CODE;
-
-        static {
-            var byCode = new HashMap<String, SyntaxHighlightTheme>(SyntaxHighlightTheme.values().length);
-            for (SyntaxHighlightTheme navTagClick : values()) {
-                byCode.put(navTagClick.code, navTagClick);
-            }
-            BY_CODE = Collections.unmodifiableMap(byCode);
-        }
+        private static final Map<String, SyntaxHighlightTheme> BY_CODE = Map.copyOf(Arrays.stream(values())
+            .collect(Collectors.toMap(v -> v.code, Function.identity())));
 
         private final String code;
 
@@ -175,7 +168,7 @@ final class SwaggerUIConfig extends AbstractViewConfig {
         MONOKAI("monokai"),
         MUTED("muted"),
         NEWSPAPER("newspaper"),
-        OUTLINE("toutline"),
+        OUTLINE("outline"),
         ;
 
         private final String css;

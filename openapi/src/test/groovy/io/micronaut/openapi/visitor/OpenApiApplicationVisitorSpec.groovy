@@ -488,7 +488,6 @@ class Application {
 
 }
 
-
 @jakarta.inject.Singleton
 class MyBean {}
 ''')
@@ -565,7 +564,6 @@ import io.swagger.v3.oas.annotations.security.*;
 class Application {
 
 }
-
 
 @jakarta.inject.Singleton
 class MyBean {}

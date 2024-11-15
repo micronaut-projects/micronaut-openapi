@@ -864,7 +864,6 @@ class UploadItem {
     public Parameters parameters;
 }
 
-
 class Parameters extends HashMap<String, Object> {
 
 }

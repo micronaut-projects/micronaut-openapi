@@ -130,7 +130,6 @@ public class DefaultGenerator implements Generator {
     private String generatorCheck = "spring";
     private String templateCheck = "apiController.mustache";
 
-
     public DefaultGenerator() {
         this(false);
     }
@@ -1122,7 +1121,6 @@ public class DefaultGenerator implements Generator {
                     }
                 }
 
-
                 boolean shouldGenerate = true;
                 if (supportingFilesToGenerate != null && !supportingFilesToGenerate.isEmpty()) {
                     shouldGenerate = supportingFilesToGenerate.contains(support.getDestinationFilename());
@@ -1880,7 +1878,6 @@ public class DefaultGenerator implements Generator {
                         // Ensure inserted AuthMethod only contains scopes of actual operation, and not all of them defined in the Security Component
                         // have to iterate through and create new SecurityScheme objects with the scopes 'fixed/updated'
                         final OAuthFlows securitySchemeFlows = securityScheme.getFlows();
-
 
                         if (securitySchemeFlows.getAuthorizationCode() != null) {
                             OAuthFlow updatedFlow = cloneOAuthFlow(securitySchemeFlows.getAuthorizationCode(), entry.getValue());

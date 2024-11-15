@@ -663,7 +663,6 @@ class MyBean {}
         catSchema.allOf[1].properties['clawSize'].type == 'integer'
     }
 
-
     void "test build OpenAPI doc for POJO with custom annotated inheritance"() {
 
         given: "An API definition"
@@ -1199,7 +1198,6 @@ class MyBean {}
         Schema animalSchema = openAPI.components.schemas['Animal']
         Schema sleeperSchema = openAPI.components.schemas['Sleeper']
         Schema catSchema = openAPI.components.schemas['Cat']
-
 
         then: "the components are valid"
         petSchema != null

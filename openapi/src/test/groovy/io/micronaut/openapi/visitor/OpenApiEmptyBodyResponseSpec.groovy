@@ -6,7 +6,6 @@ import io.swagger.v3.oas.models.Operation
 
 class OpenApiEmptyBodyResponseSpec extends AbstractOpenApiTypeElementSpec {
 
-
     void "test build OpenAPI empty body response"() {
 
         when:

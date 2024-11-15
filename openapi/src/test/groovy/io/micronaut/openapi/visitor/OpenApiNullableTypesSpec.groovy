@@ -88,7 +88,6 @@ class PetController {
         petSchema.properties["name"].nullable
     }
 
-
     void "test build OpenAPI for nullable fields"() {
         when:
         buildBeanDefinition('test.PetController', '''

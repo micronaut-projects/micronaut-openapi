@@ -33,7 +33,6 @@ The views will be generated to the `META-INF/swagger/views/swagger-ui` directory
 
 See https://github.com/swagger-api/swagger-ui/blob/HEAD/docs/usage/configuration.md[Swagger UI Configuration] for a description.
 
-
 To expose the `swagger-ui` views, you also must expose the generated `yaml`:
 
 .Exposing Swagger YAML and Swagger UI Views

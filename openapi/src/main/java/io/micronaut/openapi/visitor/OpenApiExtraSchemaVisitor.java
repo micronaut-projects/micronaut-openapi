@@ -157,10 +157,8 @@ public class OpenApiExtraSchemaVisitor implements TypeElementVisitor<OpenAPIExtr
             }
             if (isNotEmpty(packages)) {
                 for (var packageName : packages) {
-                    var withSubpackages = false;
                     if (packageName.endsWith(".*")) {
                         packageName = packageName.substring(0, packageName.length() - 2);
-                        withSubpackages = true;
                     }
                     var classEls = getClassElements(packageName, context);
                     for (var classEl : classEls) {

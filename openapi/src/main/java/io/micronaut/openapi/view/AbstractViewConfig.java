@@ -44,7 +44,7 @@ import static io.micronaut.openapi.visitor.StringUtil.SLASH;
  *
  * @author croudet
  */
-abstract class AbstractViewConfig implements Toggleable {
+public abstract class AbstractViewConfig implements Toggleable {
 
     protected String prefix;
     protected String jsUrl = StringUtils.EMPTY_STRING;
@@ -91,6 +91,11 @@ abstract class AbstractViewConfig implements Toggleable {
 
     protected abstract List<String> getResources();
 
+    /**
+     * Get template path.
+     *
+     * @return template path
+     */
     public String getTemplatePath() {
         return templatePath;
     }
@@ -121,6 +126,13 @@ abstract class AbstractViewConfig implements Toggleable {
             .collect(Collectors.joining(" "));
     }
 
+    /**
+     * Calculate final URL prefix for resources.
+     *
+     * @param rendererType render type
+     * @param context visitor context
+     * @return final URL prefix for resources
+     */
     protected String getFinalUrlPrefix(OpenApiViewConfig.RendererType rendererType, VisitorContext context) {
         if (fullUrlPrefix != null && withFinalUrlPrefixCache) {
             return fullUrlPrefix;
@@ -250,6 +262,11 @@ abstract class AbstractViewConfig implements Toggleable {
         return cfg;
     }
 
+    /**
+     * Get urls for resources.
+     *
+     * @return urls
+     */
     public List<OpenApiUrl> getUrls() {
         return urls;
     }
@@ -327,6 +344,12 @@ abstract class AbstractViewConfig implements Toggleable {
         }
     }
 
-    record OpenApiUrl(String url, String name) {
+    /**
+     * URL and resource name.
+     *
+     * @param url url
+     * @param name name
+     */
+    public record OpenApiUrl(String url, String name) {
     }
 }

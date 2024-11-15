@@ -432,7 +432,6 @@ public class DefaultCodegen implements CodegenConfig {
         convertPropertyToBooleanAndWriteBack(CodegenConstants.AUTOSET_CONSTANTS, this::setAutosetConstants);
     }
 
-
     /***
      * Preset map builder with commonly used Mustache lambdas.
      *
@@ -2394,7 +2393,6 @@ public class DefaultCodegen implements CodegenConfig {
 
     }
 
-
     protected Schema<?> getSchemaAdditionalProperties(Schema schema) {
         Schema<?> inner = ModelUtils.getAdditionalProperties(schema);
         if (inner == null) {
@@ -3963,7 +3961,6 @@ public class DefaultCodegen implements CodegenConfig {
         return fromProperty(name, p, required, false);
     }
 
-
     /**
      * TODO remove this in 7.0.0 as a breaking change
      * This method was kept when required was added to the fromProperty signature
@@ -5201,7 +5198,6 @@ public class DefaultCodegen implements CodegenConfig {
         postProcessParameter(codegenParameter);
         LOGGER.debug("debugging codegenParameter return: {}", codegenParameter);
     }
-
 
     private void updateParameterForMap(CodegenParameter codegenParameter, Schema parameterSchema, Set<String> imports) {
         CodegenProperty codegenProperty = fromProperty("inner", ModelUtils.getAdditionalProperties(parameterSchema), false);
@@ -6970,7 +6966,6 @@ public class DefaultCodegen implements CodegenConfig {
         return result;
     }
 
-
     /**
      * reads propertyKey from additionalProperties, converts it to a boolean and
      * writes it back to additionalProperties to be usable as a boolean in
@@ -7625,7 +7620,6 @@ public class DefaultCodegen implements CodegenConfig {
                 }
                 innerCp = innerCp.items;
             }
-
 
             if (StringUtils.isEmpty(bodyParameterName)) {
                 codegenParameter.baseName = "request_body";

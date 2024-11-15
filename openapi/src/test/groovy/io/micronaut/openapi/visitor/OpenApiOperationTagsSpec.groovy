@@ -6,7 +6,6 @@ import io.swagger.v3.oas.models.Operation
 
 class OpenApiOperationTagsSpec extends AbstractOpenApiTypeElementSpec {
 
-
     void "test build OpenAPI operation with @Tags"() {
 
         when:

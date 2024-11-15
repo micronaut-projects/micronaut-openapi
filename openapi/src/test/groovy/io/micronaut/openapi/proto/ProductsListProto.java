@@ -706,7 +706,6 @@ private static final long serialVersionUID = 0L;
       return super.mergeUnknownFields(unknownFields);
     }
 
-
     // @@protoc_insertion_point(builder_scope:proto.product.ProductsListProto)
   }
 

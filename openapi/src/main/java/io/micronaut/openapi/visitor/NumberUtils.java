@@ -32,7 +32,7 @@ public final class NumberUtils {
      * numbers marked with a type qualifier (e.g. 123L).</p>
      *
      * <p>Non-hexadecimal strings beginning with a leading zero are
-     * treated as octal values. Thus the string {@code 09} will return
+     * treated as octal values. Thus, the string {@code 09} will return
      * {@code false}, since {@code 9} is not a valid octal value.
      * However, numbers beginning with {@code 0.} are treated as decimal.</p>
      *

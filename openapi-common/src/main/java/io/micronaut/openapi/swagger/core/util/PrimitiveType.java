@@ -221,7 +221,6 @@ public enum PrimitiveType {
      */
     private static final Set<String> customExcludedExternalClasses = ConcurrentHashMap.newKeySet();
 
-
     /**
      * Adds support for custom mapping of classes to primitive types
      */
@@ -355,7 +354,6 @@ public enum PrimitiveType {
         this.keyClass = keyClass;
         this.commonName = commonName;
     }
-
 
     /**
      * Adds support for custom mapping of classes to primitive types

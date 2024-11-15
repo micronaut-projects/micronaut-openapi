@@ -71,7 +71,6 @@ public class InterceptUrlMapConverter implements TypeConverter<Map, InterceptUrl
                 .map(o -> conversionService.convert(o, String.class))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
-                .map(String.class::cast)
                 .collect(Collectors.toList()));
             if (optionalAccessList.isPresent()) {
                 Optional<HttpMethod> httpMethod;

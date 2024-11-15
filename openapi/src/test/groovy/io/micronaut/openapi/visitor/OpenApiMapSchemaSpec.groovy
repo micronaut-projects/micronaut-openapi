@@ -52,7 +52,6 @@ abstract class Pet {
 
     private Map<String, Pet> complexMap;
 
-
     public Pet(Map<String, String> map, Map<String, Pet> complexMap) {
         this.map = map;
         this.complexMap = complexMap;

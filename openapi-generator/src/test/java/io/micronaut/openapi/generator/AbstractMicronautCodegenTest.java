@@ -52,7 +52,6 @@ public abstract class AbstractMicronautCodegenTest {
             .build()
             .generate();
 
-
         // Create parser
         String outputPath = output.getAbsolutePath().replace('\\', '/');
 

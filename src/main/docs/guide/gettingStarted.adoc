@@ -16,7 +16,6 @@ ksp.incremental=false
 ----
 ====
 
-
 To use the https://github.com/swagger-api/swagger-core/wiki/Swagger-2.X---Annotations[Swagger Annotations] or Micronaut OpenAPI annotations add them to compile classpath
 
 dependency:micronaut-openapi-annotations[scope="compileOnly", groupId="io.micronaut.openapi"]

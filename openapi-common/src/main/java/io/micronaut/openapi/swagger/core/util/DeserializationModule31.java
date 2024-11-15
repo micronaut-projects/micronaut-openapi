@@ -53,7 +53,6 @@ public class DeserializationModule31 extends SimpleModule {
         addDeserializer(Paths.class, new Paths31Deserializer());
         addDeserializer(Callback.class, new Callback31Deserializer());
 
-
         setDeserializerModifier(new BeanDeserializerModifier() {
             @Override
             public JsonDeserializer<?> modifyDeserializer(DeserializationConfig config, BeanDescription beanDesc, JsonDeserializer<?> deserializer) {

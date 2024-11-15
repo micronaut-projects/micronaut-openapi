@@ -576,7 +576,6 @@ public class ToAsciiDocSerializer implements Visitor {
         }
     }
 
-
     /**
      * Removes superfluous nodes from the tree.
      *

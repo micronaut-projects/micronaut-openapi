@@ -97,7 +97,7 @@ public final class OpenApiViewConfig {
     /**
      * The Renderer types.
      */
-    enum RendererType {
+    public enum RendererType {
 
         SWAGGER_UI(TEMPLATES_SWAGGER_UI),
         REDOC(TEMPLATES_REDOC),
@@ -250,8 +250,7 @@ public final class OpenApiViewConfig {
         }
 
         ClassLoader classLoader = getClass().getClassLoader();
-        try {
-            InputStream is = classLoader.getResourceAsStream(TEMPLATES + SLASH + templatesDir + SLASH + THEMES_DIR + SLASH + themeFileName);
+        try (var is = classLoader.getResourceAsStream(TEMPLATES + SLASH + templatesDir + SLASH + THEMES_DIR + SLASH + themeFileName)) {
 
             Files.copy(is, Paths.get(resDir.toString(), themeFileName), StandardCopyOption.REPLACE_EXISTING);
             Path file = resDir.resolve(themeFileName);
@@ -283,8 +282,8 @@ public final class OpenApiViewConfig {
 
         if (CollectionUtils.isNotEmpty(resources)) {
             for (String resource : resources) {
-                try {
-                    InputStream is = classLoader.getResourceAsStream(TEMPLATES + SLASH + templateDir + SLASH + resource);
+                try (var is = classLoader.getResourceAsStream(TEMPLATES + SLASH + templateDir + SLASH + resource)) {
+
                     Files.copy(is, Paths.get(outputDir.toString(), resource), StandardCopyOption.REPLACE_EXISTING);
                     Path file = outputResDir.resolve(resource);
 
@@ -307,7 +306,7 @@ public final class OpenApiViewConfig {
     private String readTemplateFromClasspath(String templateName) throws IOException {
         ClassLoader classLoader = getClass().getClassLoader();
         try (var in = classLoader.getResourceAsStream(templateName);
-             BufferedReader reader = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8))
+             var reader = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8))
         ) {
             return readFile(reader);
         } catch (Exception e) {
@@ -468,11 +467,7 @@ public final class OpenApiViewConfig {
      * @return The updated template.
      */
     static String replacePlaceHolder(String template, String placeHolder, String value, String valuePrefix) {
-        if (StringUtils.isEmpty(value)) {
-            return template.replace("{{" + placeHolder + "}}", StringUtils.EMPTY_STRING);
-        } else {
-            return template.replace("{{" + placeHolder + "}}", valuePrefix + value);
-        }
+        return template.replace("{{" + placeHolder + "}}", StringUtils.isNotEmpty(value) ? valuePrefix + value : StringUtils.EMPTY_STRING);
     }
 
     public SwaggerUIConfig getSwaggerUIConfig() {

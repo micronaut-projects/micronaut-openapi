@@ -29,7 +29,6 @@ import io.swagger.v3.oas.annotations.servers.*;
 import io.swagger.v3.oas.annotations.security.*;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 
-
 @OpenAPIDefinition(
         info = @Info(
                 title = "the title",
