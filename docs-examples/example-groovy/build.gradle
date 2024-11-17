@@ -19,7 +19,6 @@ dependencies {
     testRuntimeOnly(mnLogging.logback.classic)
 }
 
-
 test {
     jvmArgs '-Duser.country=US'
     jvmArgs '-Duser.language=en'
