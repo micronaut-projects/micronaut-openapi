@@ -228,9 +228,9 @@ public class {{classname}} {{#parent}}extends {{{parent}}} {{/parent}}{{#vendorE
     @Override
         {{/parent}}
         {{^parent}}
-            {{#isOverridden}}
+            {{#vendorExtensions.overridden}}
     @Override
-            {{/isOverridden}}
+            {{/vendorExtensions.overridden}}
         {{/parent}}
     {{/isDiscriminator}}
     public {{{vendorExtensions.typeWithEnumWithGenericAnnotations}}} {{getter}}() {

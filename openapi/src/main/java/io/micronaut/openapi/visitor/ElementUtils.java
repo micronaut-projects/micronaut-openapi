@@ -296,6 +296,7 @@ public final class ElementUtils {
             // jax-rs
             || parameterType.isAssignable("jakarta.ws.rs.core.Application")
             || parameterType.isAssignable("jakarta.ws.rs.core.HttpHeaders")
+            || parameterType.isAssignable("jakarta.ws.rs.core.Cookie")
             || parameterType.isAssignable("jakarta.ws.rs.core.Request")
             || parameterType.isAssignable("jakarta.ws.rs.core.SecurityContext")
             || parameterType.isAssignable("jakarta.ws.rs.core.UriInfo")

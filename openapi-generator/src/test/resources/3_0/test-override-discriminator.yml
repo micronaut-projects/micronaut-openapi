@@ -1,0 +1,98 @@
+openapi: 3.1.0
+info:
+  version: '1.0.0'
+  title: 'OpenAPI BUG REST API'
+servers:
+  - url: 'localhost:3000'
+
+paths:
+  /api/v1/animals:
+    get:
+      tags: [ my-custom ]
+      operationId: "findAnimals"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AnimalResponse'
+    post:
+      tags: [ my-custom ]
+      operationId: "saveAnimal"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AnimalRequest"
+      responses:
+        "200":
+          description: "OK"
+
+components:
+  schemas:
+
+    AnimalRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        valueType:
+          type: string
+      discriminator:
+        propertyName: valueType
+        mapping:
+          catRq: '#/components/schemas/DogRequest'
+          dogRq: '#/components/schemas/CatRequest'
+
+    DogRequest:
+      allOf:
+        - $ref: '#/components/schemas/AnimalRequest'
+        - type: object
+      properties:
+        dogProperty:
+          type: string
+
+    CatRequest:
+      allOf:
+        - $ref: '#/components/schemas/AnimalRequest'
+        - type: object
+      properties:
+        catProperty:
+          type: string
+
+    AnimalResponse:
+      type: object
+      properties:
+        name:
+          type: string
+        valueType:
+          type: string
+      discriminator:
+        propertyName: valueType
+        mapping:
+          catRs: '#/components/schemas/DogResponse'
+          dogRs: '#/components/schemas/CatResponse'
+
+    DogResponse:
+      allOf:
+        - $ref: '#/components/schemas/AnimalResponse'
+        - type: object
+      properties:
+        dogProperty:
+          type: string
+
+    CatResponse:
+      allOf:
+        - $ref: '#/components/schemas/AnimalResponse'
+        - type: object
+      properties:
+        catProperty:
+          type: string
+
+tags:
+  - name: my-custom
+    description: 'All API operations'
