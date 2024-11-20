@@ -53,20 +53,20 @@
             {{#responses}}
             ApiResponse(responseCode = "{{{code}}}", description = "{{{message}}}"{{#baseType}}, content = [
                 {{#produces}}
-                Content(mediaType = "{{{mediaType}}}", {{#isArray}}array = ArraySchema({{/isArray}}schema = Schema(implementation = {{{baseType}}}::class){{#isArray}}){{/isArray}}){{^-last}},{{/-last}}
+                Content(mediaType = "{{{mediaType}}}", {{#isArray}}array = ArraySchema({{/isArray}}schema = Schema(implementation = {{{baseType}}}::class){{#isArray}}){{/isArray}}),
                 {{/produces}}
-            ]{{/baseType}}){{^-last}},{{/-last}}
+            ]{{/baseType}}),
             {{/responses}}
-        ]{{#vendorExtensions.hasNotBodyParam}},
+        ],{{#vendorExtensions.hasNotBodyParam}}
         parameters = [
             {{#vendorExtensions.swaggerParams}}
-            Parameter(name = "{{baseName}}"{{#isDeprecated}}, deprecated = true{{/isDeprecated}}{{#description}}, description = "{{{description}}}"{{/description}}{{#required}}, required = true{{/required}}, `in` = ParameterIn.{{#isCookieParam}}COOKIE{{/isCookieParam}}{{#isHeaderParam}}HEADER{{/isHeaderParam}}{{#isQueryParam}}QUERY{{/isQueryParam}}{{#isPathParam}}PATH{{/isPathParam}}){{^-last}},{{/-last}}
+            Parameter(name = "{{baseName}}"{{#isDeprecated}}, deprecated = true{{/isDeprecated}}{{#description}}, description = "{{{description}}}"{{/description}}{{#required}}, required = true{{/required}}, `in` = ParameterIn.{{#isCookieParam}}COOKIE{{/isCookieParam}}{{#isHeaderParam}}HEADER{{/isHeaderParam}}{{#isQueryParam}}QUERY{{/isQueryParam}}{{#isPathParam}}PATH{{/isPathParam}}),
             {{/vendorExtensions.swaggerParams}}
-        ]{{/vendorExtensions.hasNotBodyParam}}{{#hasAuthMethods}},
+        ],{{/vendorExtensions.hasNotBodyParam}}{{#hasAuthMethods}}
         security = [
             {{#authMethods}}
-            SecurityRequirement(name = "{{name}}"{{#isOAuth}}{{#scopes.1}}, scopes = [{{#scopes}}"{{scope}}"{{^-last}}, {{/-last}}{{/scopes}}]{{/scopes.1}}{{/isOAuth}}){{^-last}},{{/-last}}
+            SecurityRequirement(name = "{{name}}"{{#isOAuth}}{{#scopes.1}}, scopes = [{{#scopes}}"{{scope}}"{{^-last}}, {{/-last}}{{/scopes}}]{{/scopes.1}}{{/isOAuth}}),
             {{/authMethods}}
-        ]{{/hasAuthMethods}}
+        ],{{/hasAuthMethods}}
     )
     {{/generateSwagger2Annotations}}

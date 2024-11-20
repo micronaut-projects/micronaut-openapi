@@ -24,19 +24,20 @@ open class AuthorizationBinder : AnnotatedClientRequestBinder<Authorization> {
         return Authorization::class.java
     }
 
-    override fun bind(@NonNull context: MethodInvocationContext<Any, Any>,
-             @NonNull uriContext: ClientRequestUriContext,
-             @NonNull request: MutableHttpRequest<*>
+    override fun bind(
+        @NonNull context: MethodInvocationContext<Any, Any>,
+        @NonNull uriContext: ClientRequestUriContext,
+        @NonNull request: MutableHttpRequest<*>,
     ) {
         val annotations: List<AnnotationValue<Authorization>> = context.annotationMetadata
-                .getAnnotationValuesByType(Authorization::class.java)
+            .getAnnotationValuesByType(Authorization::class.java)
 
         if (annotations.isNotEmpty()) {
             val authorizationNames = ArrayList<String>()
             for (ann in annotations) {
                 ann.stringValue("value")
-                        .filter{ s -> !s.isNullOrEmpty() }
-                        .ifPresent { v -> authorizationNames.add(configurationName(v)) }
+                    .filter{ s -> !s.isNullOrEmpty() }
+                    .ifPresent { v -> authorizationNames.add(configurationName(v)) }
             }
             request.setAttribute(AUTHORIZATION_NAMES, authorizationNames)
         }
@@ -47,6 +48,6 @@ open class AuthorizationBinder : AnnotatedClientRequestBinder<Authorization> {
     }
 
     companion object {
-        var AUTHORIZATION_NAMES = "micronaut.security.AUTHORIZATION_NAMES"
+        const val AUTHORIZATION_NAMES = "micronaut.security.AUTHORIZATION_NAMES"
     }
 }

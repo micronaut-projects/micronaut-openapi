@@ -2102,7 +2102,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
                         copyVar = v.clone();
                         copyVar.isOverridden = true;
                     }
-                    if (copyVar.isOverridden != null && copyVar.isOverridden) {
+                    if (copyVar.isOverridden != null && copyVar.isOverridden && (!parentIsOneOfInterface || v.isDiscriminator)) {
                         copyVar.vendorExtensions.put("overridden", true);
                     }
                     requiredVarsWithoutDiscriminator.add(copyVar);

@@ -6,7 +6,7 @@
 {{>common/generatedAnnotation}}
 {{/generatedAnnotation}}
 {{>common/model/typeInfoAnnotation}}
-interface {{classname}}{{#vendorExtensions.x-implements}}{{#-first}} : {{{.}}}{{/-first}}{{^-first}}, {{{.}}}{{/-first}}{{/vendorExtensions.x-implements}}{{/formatNoEmptyLines}}{{#discriminator}} {
+{{/formatNoEmptyLines}}interface {{classname}}{{#vendorExtensions.x-implements}}{{#-first}} : {{{.}}}{{/-first}}{{^-first}}, {{{.}}}{{/-first}}{{/vendorExtensions.x-implements}}{{#discriminator}} {
 
     val {{propertyName}}: {{propertyType}}
 }

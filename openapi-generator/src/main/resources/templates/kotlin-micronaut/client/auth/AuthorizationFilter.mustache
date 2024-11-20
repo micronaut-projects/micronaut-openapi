@@ -45,15 +45,15 @@ open class AuthorizationFilter(
 
     init {
         clientConfigurationByName = clientConfigurations
-                .filter { it.isEnabled }
-                .collect(Collectors.toMap({ it.name }, { it }))
-        tokenPropagatorByName = HashMap()
-        clientCredentialsClientByName = HashMap()
+            .filter { it.isEnabled }
+            .collect(Collectors.toMap({ it.name }, { it }))
+        tokenPropagatorByName = mutableMapOf()
+        clientCredentialsClientByName = mutableMapOf()
         authorizationsByName = configurableAuthorizations
-                .collect(Collectors.toMap({ it.name }, { it }))
+            .collect(Collectors.toMap({ it.name }, { it }))
     }
 
-    override fun doFilter(request: @NonNull MutableHttpRequest<*>, chain: @NonNull ClientFilterChain): Publisher<out HttpResponse<*>?> {
+    override fun doFilter(@NonNull request: MutableHttpRequest<*>, @NonNull chain: ClientFilterChain): Publisher<out HttpResponse<*>?> {
         val names = request.getAttribute(AuthorizationBinder.AUTHORIZATION_NAMES, MutableList::class.java).orElse(null)
         if (names.isNullOrEmpty()) {
             return chain.proceed(request)

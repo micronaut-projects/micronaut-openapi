@@ -608,7 +608,7 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                     @Header("WCToken") @NotNull wcToken: String,
                     @Header("WCTrustedToken") @NotNull wcTrustedToken: String,
                     @Part("name") @Nullable name: String?,
-                    @Part("file") @Nullable file: CompletedFileUpload?
+                    @Part("file") @Nullable file: CompletedFileUpload?,
                 ): Mono<SuccessResetPassword>
             """);
     }
@@ -625,7 +625,7 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                     @Consumes("application/json", "application/xml")
                     @Secured(SecurityRule.IS_ANONYMOUS)
                     fun myOp(
-                        @Body @Nullable @Valid coordinates: Coordinates?
+                        @Body @Nullable @Valid coordinates: Coordinates?,
                     ): Mono<HttpResponse<Void>>
                 """,
             """
@@ -634,7 +634,7 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                     @Secured(SecurityRule.IS_ANONYMOUS)
                     fun myOp_1(
                         @Nullable @Valid coordinates: Coordinates?,
-                        @Nullable file: CompletedFileUpload?
+                        @Nullable file: CompletedFileUpload?,
                     ): Mono<HttpResponse<Void>>
                 """,
             """
@@ -642,7 +642,7 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                     @Consumes("application/yaml", "text/json")
                     @Secured(SecurityRule.IS_ANONYMOUS)
                     fun myOp_2(
-                        @Body @Nullable @Valid mySchema: MySchema?
+                        @Body @Nullable @Valid mySchema: MySchema?,
                     ): Mono<HttpResponse<Void>>
                 """);
     }
@@ -694,22 +694,22 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                         description = "A method to send primitives as request parameters",
                         responses = [
                             ApiResponse(responseCode = "200", description = "Success", content = [
-                                Content(mediaType = "application/json", schema = Schema(implementation = SendPrimitivesResponse::class))
+                                Content(mediaType = "application/json", schema = Schema(implementation = SendPrimitivesResponse::class)),
                             ]),
-                            ApiResponse(responseCode = "default", description = "An unexpected error has occurred")
+                            ApiResponse(responseCode = "default", description = "An unexpected error has occurred"),
                         ],
                         parameters = [
                             Parameter(name = "name", deprecated = true, required = true, `in` = ParameterIn.PATH),
                             Parameter(name = "age", required = true, `in` = ParameterIn.QUERY),
-                            Parameter(name = "height", deprecated = true, required = true, `in` = ParameterIn.HEADER)
-                        ]
+                            Parameter(name = "height", deprecated = true, required = true, `in` = ParameterIn.HEADER),
+                        ],
                     )
                     @Get("/sendPrimitives/{name}")
                     @Secured(SecurityRule.IS_ANONYMOUS)
                     fun sendPrimitives(
                         @PathVariable("name") @NotNull @java.lang.Deprecated name: String,
                         @QueryValue("age") @NotNull age: BigDecimal,
-                        @Header("height") @NotNull @java.lang.Deprecated height: Float
+                        @Header("height") @NotNull @java.lang.Deprecated height: Float,
                     ): Mono<SendPrimitivesResponse>
                 """);
     }
@@ -774,22 +774,22 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                         responses = [
                             ApiResponse(responseCode = "200", description = "successful operation", content = [
                                 Content(mediaType = "application/json", array = ArraySchema(schema = Schema(implementation = Pet::class))),
-                                Content(mediaType = "application/xml", array = ArraySchema(schema = Schema(implementation = Pet::class)))
+                                Content(mediaType = "application/xml", array = ArraySchema(schema = Schema(implementation = Pet::class))),
                             ]),
-                            ApiResponse(responseCode = "400", description = "Invalid status value")
+                            ApiResponse(responseCode = "400", description = "Invalid status value"),
                         ],
                         parameters = [
-                            Parameter(name = "status", description = "Status values that need to be considered for filter", `in` = ParameterIn.QUERY)
+                            Parameter(name = "status", description = "Status values that need to be considered for filter", `in` = ParameterIn.QUERY),
                         ],
                         security = [
-                            SecurityRequirement(name = "petstore_auth", scopes = ["write:pets", "read:pets"])
-                        ]
+                            SecurityRequirement(name = "petstore_auth", scopes = ["write:pets", "read:pets"]),
+                        ],
                     )
                     @Get("/pet/findByStatus")
                     @Produces("application/json", "application/xml")
                     @Secured("write:pets", "read:pets")
                     fun findPetsByStatus(
-                        @QueryValue("status") @Nullable status: List<@NotNull String>?
+                        @QueryValue("status") @Nullable status: List<@NotNull String>?,
                     ): Mono<List<Pet>>
                 """);
     }

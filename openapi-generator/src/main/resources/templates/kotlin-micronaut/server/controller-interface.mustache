@@ -78,7 +78,7 @@ interface {{classname}} {
         {{#isDeprecated}}
             @java.lang.Deprecated
         {{/isDeprecated}}
- {{{paramName}}}: {{#isEnum}}{{{vendorExtensions.typeWithEnumWithGenericAnnotations}}}{{/isEnum}}{{^isEnum}}{{{vendorExtensions.typeWithGenericAnnotations}}}{{/isEnum}}{{^-last}},{{/-last}}{{/formatSingleLine}}
+ {{{paramName}}}: {{#isEnum}}{{{vendorExtensions.typeWithEnumWithGenericAnnotations}}}{{/isEnum}}{{^isEnum}}{{{vendorExtensions.typeWithGenericAnnotations}}}{{/isEnum}},{{/formatSingleLine}}
     {{/allParams}}){{#returnType}}: {{{returnType}}}{{/returnType}}
         {{/formatNoEmptyLines}}
 

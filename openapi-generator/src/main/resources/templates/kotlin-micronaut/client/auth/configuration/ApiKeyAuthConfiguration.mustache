@@ -15,31 +15,28 @@ import {{javaxPackage}}.annotation.Generated
 {{>common/generatedAnnotation}}
 {{/generatedAnnotation}}
 @EachProperty("security.api-key-auth")
-data class ApiKeyAuthConfiguration @ConfigurationInject
-constructor(
-    @Parameter override val name: String,
-    @NonNull var location: AuthKeyLocation,
-    @NonNull var paramName: String,
-    @NonNull var apiKey: String
+data class ApiKeyAuthConfiguration @ConfigurationInject constructor(
+    @Parameter
+    override val name: String,
+    @NonNull
+    var location: AuthKeyLocation,
+    @NonNull
+    var paramName: String,
+    @NonNull
+    var apiKey: String,
 ) : ConfigurableAuthorization {
 
     override fun applyAuthorization(@NonNull request: MutableHttpRequest<*>) {
         when (location) {
-            AuthKeyLocation.HEADER -> {
-                request.header(paramName, apiKey)
-            }
-            AuthKeyLocation.QUERY -> {
-                request.parameters.add(paramName, apiKey)
-            }
-            AuthKeyLocation.COOKIE -> {
-                request.cookie(Cookie.of(paramName, apiKey))
-            }
+            AuthKeyLocation.HEADER -> request.header(paramName, apiKey)
+            AuthKeyLocation.QUERY -> request.parameters.add(paramName, apiKey)
+            AuthKeyLocation.COOKIE -> request.cookie(Cookie.of(paramName, apiKey))
         }
     }
 
     enum class AuthKeyLocation {
         HEADER,
         QUERY,
-        COOKIE
+        COOKIE,
     }
 }
