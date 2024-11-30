@@ -313,22 +313,27 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         assertFileContains(apiPath + "BookInfo.kt",
             """
                 open class BookInfo(
+                
                     @field:NotNull
                     @field:JsonProperty(JSON_PROPERTY_NAME)
                     open var name: String,
+                
                     @field:Nullable
                     @field:JsonProperty(JSON_PROPERTY_REQUIRED_READ_ONLY)
                     @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
-                    open var requiredReadOnly: String?,
+                    open var requiredReadOnly: String? = null,
+                
                     @field:Nullable
                     @field:Size(min = 3)
                     @field:JsonProperty(JSON_PROPERTY_AUTHOR)
                     @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
                     open var author: String? = null,
+                
                     @field:Nullable
                     @field:JsonProperty(JSON_PROPERTY_OPTIONAL_READ_ONLY)
                     @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
                     open var optionalReadOnly: String? = null,
+                
                     @field:Nullable
                     @field:JsonProperty(JSON_PROPERTY_TYPE)
                     @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
@@ -337,19 +342,38 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                 """);
         assertFileContains(apiPath + "ExtendedBookInfo.kt",
             """
-                data class ExtendedBookInfo(
+                class ExtendedBookInfo(
+                
                     @field:NotNull
                     @field:Pattern(regexp = "[0-9]{13}")
                     @field:JsonProperty(JSON_PROPERTY_ISBN)
                     var isbn: String,
-                    @field:NotNull
-                    @field:JsonProperty(JSON_PROPERTY_NAME)
-                    override var name: String,
-                    @field:Nullable
-                    @field:JsonProperty(JSON_PROPERTY_REQUIRED_READ_ONLY)
-                    @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
-                    override var requiredReadOnly: String?,
-                ) : BookInfo(name, requiredReadOnly)  {
+                
+                    @NotNull
+                    @JsonProperty(JSON_PROPERTY_NAME)
+                    name: String,
+                
+                    @Nullable
+                    @JsonProperty(JSON_PROPERTY_REQUIRED_READ_ONLY)
+                    @JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                    requiredReadOnly: String? = null,
+                
+                    @Nullable
+                    @Size(min = 3)
+                    @JsonProperty(JSON_PROPERTY_AUTHOR)
+                    @JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                    author: String? = null,
+                
+                    @Nullable
+                    @JsonProperty(JSON_PROPERTY_OPTIONAL_READ_ONLY)
+                    @JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                    optionalReadOnly: String? = null,
+                
+                    @Nullable
+                    @JsonProperty(JSON_PROPERTY_TYPE)
+                    @JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                    type: BookInfoType? = null,
+                ) : BookInfo(name, requiredReadOnly, author, optionalReadOnly, type) {
                 """);
     }
 
@@ -397,47 +421,56 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         assertFileContains(apiPath + "BookInfo.kt",
             """
                 open class BookInfo(
-
+                
                     @field:NotNull
                     @field:JsonProperty(JSON_PROPERTY_NAME)
                     open var name: String,
-
+                
                     @field:NotNull
                     @field:JsonProperty(JSON_PROPERTY_TYPE)
                     open var type: BookInfoType? = null,
-                ) {""");
+                ) {
+                """);
         assertFileContains(apiPath + "BasicBookInfo.kt",
             """
                 open class BasicBookInfo(
-
+                
                     @field:NotNull
                     @field:Size(min = 3)
                     @field:JsonProperty(JSON_PROPERTY_AUTHOR)
                     open var author: String,
-
-                    @field:NotNull
-                    @field:JsonProperty(JSON_PROPERTY_NAME)
-                    override var name: String,
-                ) : BookInfo(name)  {
+                
+                    @NotNull
+                    @JsonProperty(JSON_PROPERTY_NAME)
+                    name: String,
+                
+                    @Nullable
+                    @JsonProperty(JSON_PROPERTY_TYPE)
+                    type: BookInfoType? = null,
+                ) : BookInfo(name, type) {
                 """);
         assertFileContains(apiPath + "DetailedBookInfo.kt",
             """
-                data class DetailedBookInfo(
-
+                class DetailedBookInfo(
+                
                     @field:NotNull
                     @field:Pattern(regexp = "[0-9]{13}")
                     @field:JsonProperty(JSON_PROPERTY_ISBN)
                     var isbn: String,
-
-                    @field:NotNull
-                    @field:Size(min = 3)
-                    @field:JsonProperty(JSON_PROPERTY_AUTHOR)
-                    override var author: String,
-
-                    @field:NotNull
-                    @field:JsonProperty(JSON_PROPERTY_NAME)
-                    override var name: String,
-                ) : BasicBookInfo(author, name)
+                
+                    @NotNull
+                    @Size(min = 3)
+                    @JsonProperty(JSON_PROPERTY_AUTHOR)
+                    author: String,
+                
+                    @NotNull
+                    @JsonProperty(JSON_PROPERTY_NAME)
+                    name: String,
+                
+                    @Nullable
+                    @JsonProperty(JSON_PROPERTY_TYPE)
+                    type: BookInfoType? = null,
+                ) : BasicBookInfo(author, name, type) {
                 """);
     }
 
@@ -562,8 +595,8 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         String outputPath = generateFiles(codegen, "src/test/resources/3_0/oneof-with-discriminator.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
         String path = outputPath + "src/main/kotlin/org/openapitools/";
 
-        assertFileContains(path + "model/Subject.kt", "val typeCode: String");
-        assertFileContains(path + "model/Person.kt", "override var typeCode: String = \"PERS\",");
+        assertFileContains(path + "model/Subject.kt", "val typeCode: String?");
+        assertFileContains(path + "model/Person.kt", "override var typeCode: String? = \"PERS\",");
     }
 
     @Test
@@ -586,11 +619,11 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         String path = outputPath + "src/main/kotlin/org/openapitools/";
 
         assertFileContains(path + "model/CancellationReasonTypesV2.kt", """
-                @field:NotNull
+                @field:Nullable
                 @field:JsonProperty(JSON_PROPERTY_VERSION)
-                override var version: Int,
+                override var version: Int? = null,
             """);
-        assertFileContains(path + "model/CancellationReasonTypesDTO.kt", "val version: Int");
+        assertFileContains(path + "model/CancellationReasonTypesDTO.kt", "val version: Int?");
     }
 
     @Test
@@ -675,15 +708,17 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
 
         var codegen = new KotlinMicronautClientCodegen();
         codegen.setUseOneOfInterfaces(false);
-        String outputPath = generateFiles(codegen, "src/test/resources/3_0/discirminator2.yml", CodegenConstants.MODELS);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/discriminator2.yml", CodegenConstants.MODELS);
         String path = outputPath + "src/main/kotlin/org/openapitools/";
 
         assertFileContains(path + "model/JsonOp.kt",
             """
                 open class JsonOp(
+                
                     @field:NotNull
                     @field:JsonProperty(JSON_PROPERTY_PATH)
                     open var path: String,
+                
                     @field:NotNull
                     @field:JsonProperty(JSON_PROPERTY_OP)
                     open var op: String,
@@ -698,18 +733,21 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
 
         assertFileContains(path + "model/OpAdd.kt",
             """
-                data class OpAdd(
+                class OpAdd(
+                
                     @field:Nullable
                     @field:JsonProperty(JSON_PROPERTY_VALUE)
                     @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
                     var `value`: String? = null,
-                    @field:NotNull
-                    @field:JsonProperty(JSON_PROPERTY_PATH)
-                    override var path: String,
-                    @field:NotNull
-                    @field:JsonProperty(JSON_PROPERTY_OP)
-                    override var op: String,
-                ) : JsonOp(path, op)  {
+                
+                    @NotNull
+                    @JsonProperty(JSON_PROPERTY_PATH)
+                    path: String,
+                
+                    @NotNull
+                    @JsonProperty(JSON_PROPERTY_OP)
+                    op: String,
+                ) : JsonOp(path, op) {
                 """
         );
     }
@@ -719,32 +757,32 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
 
         var codegen = new KotlinMicronautClientCodegen();
         codegen.setUseOneOfInterfaces(true);
-        String outputPath = generateFiles(codegen, "src/test/resources/3_0/discirminator2.yml", CodegenConstants.MODELS);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/discriminator2.yml", CodegenConstants.MODELS);
         String path = outputPath + "src/main/kotlin/org/openapitools/";
 
         assertFileContains(path + "model/JsonOp.kt",
             """
                 interface JsonOp {
                 
-                    val op: String
+                    val op: String?
                 }
                 """
         );
 
         assertFileContains(path + "model/OpAdd.kt",
             """
-                data class OpAdd(
                     @field:Nullable
                     @field:JsonProperty(JSON_PROPERTY_VALUE)
                     @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
                     var `value`: String? = null,
+                
                     @field:NotNull
                     @field:JsonProperty(JSON_PROPERTY_PATH)
                     var path: String,
-                    @field:NotNull
+                
+                    @field:Nullable
                     @field:JsonProperty(JSON_PROPERTY_OP)
-                    override var op: String,
-                ): JsonOp {
+                    override var op: String? = null,
                 """
         );
     }

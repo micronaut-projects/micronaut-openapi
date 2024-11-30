@@ -647,7 +647,7 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
 
         var codegen = new JavaMicronautClientCodegen();
         codegen.setUseOneOfInterfaces(false);
-        String outputPath = generateFiles(codegen, "src/test/resources/3_0/discirminator2.yml", CodegenConstants.MODELS);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/discriminator2.yml", CodegenConstants.MODELS);
         String path = outputPath + "src/main/java/org/openapitools/";
 
         assertFileContains(path + "model/JsonOp.java",
@@ -677,7 +677,7 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
 
         var codegen = new JavaMicronautClientCodegen();
         codegen.setUseOneOfInterfaces(true);
-        String outputPath = generateFiles(codegen, "src/test/resources/3_0/discirminator2.yml", CodegenConstants.MODELS);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/discriminator2.yml", CodegenConstants.MODELS);
         String path = outputPath + "src/main/java/org/openapitools/";
 
         assertFileContains(path + "model/JsonOp.java",

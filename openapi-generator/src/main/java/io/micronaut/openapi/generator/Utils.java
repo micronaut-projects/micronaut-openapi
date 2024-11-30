@@ -441,6 +441,9 @@ public final class Utils {
     }
 
     private static String normalizeExtraAnnotation(String prefix, String annotationStr) {
+        if (annotationStr.startsWith(prefix)) {
+            return annotationStr;
+        }
         return prefix + (annotationStr.startsWith("@") ? annotationStr.substring(1) : annotationStr);
     }
 
