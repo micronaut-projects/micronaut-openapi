@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
 
     @Test
-    void clientOptsUnicity() {
+    void clientOptsUniqueness() {
         var codegen = new JavaMicronautClientCodegen();
         codegen.cliOptions()
             .stream()
@@ -1459,5 +1459,21 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                     return Objects.hash(super.hashCode());
                 }
             """);
+    }
+
+    @Test
+    void testBodyEnum() {
+
+        var codegen = new JavaMicronautClientCodegen();
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/body-enum.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String path = outputPath + "src/main/java/org/openapitools/";
+
+        assertFileContains(path + "api/MyCustomApi.java", """
+                @Post("/api/v1/colors/{name}")
+                Mono<@NotNull String> selectColor(
+                    @Body @NotNull Color body
+                );
+            """);
+        assertFileContains(path + "model/Color.java", "public enum Color {");
     }
 }

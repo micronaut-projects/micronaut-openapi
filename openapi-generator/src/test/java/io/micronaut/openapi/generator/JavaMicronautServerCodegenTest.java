@@ -18,7 +18,7 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
     static String MULTI_TAGS_TEST_PATH = "src/test/resources/3_0/micronaut/multi-tags-test.yaml";
 
     @Test
-    void clientOptsUnicity() {
+    void clientOptsUniqueness() {
         var codegen = new JavaMicronautServerCodegen();
         codegen.cliOptions()
             .stream()
@@ -716,5 +716,23 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                         @QueryValue(value = "status", defaultValue = "[\\"available\\"]") @Nullable(inherited = true) List<@NotNull String> status
                     );
                 """);
+    }
+
+    @Test
+    void testBodyEnum() {
+
+        var codegen = new JavaMicronautServerCodegen();
+        codegen.setGenerateSwaggerAnnotations(false);
+        codegen.setUseAuth(false);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/body-enum.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String path = outputPath + "src/main/java/org/openapitools/";
+
+        assertFileContains(path + "api/MyCustomApi.java", """
+                @Post("/api/v1/colors/{name}")
+                Mono<@NotNull String> selectColor(
+                    @Body @NotNull Color body
+                );
+            """);
+        assertFileContains(path + "model/Color.java", "public enum Color {");
     }
 }

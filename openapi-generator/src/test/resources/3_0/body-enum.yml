@@ -1,0 +1,42 @@
+openapi: 3.1.0
+info:
+  version: '1.0.0'
+  title: 'OpenAPI BUG REST API'
+servers:
+  - url: 'localhost:3000'
+
+paths:
+  /api/v1/colors/{name}:
+    post:
+      tags: [ my-custom ]
+      operationId: "selectColor"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Color"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: string
+
+components:
+  schemas:
+
+    Color:
+      type: string
+      enum:
+        - GREEN
+        - RED
+        - WHITE
+        - BLACK
+        - YELLOW
+        - BLUE
+
+tags:
+  - name: my-custom
+    description: 'All API operations'
