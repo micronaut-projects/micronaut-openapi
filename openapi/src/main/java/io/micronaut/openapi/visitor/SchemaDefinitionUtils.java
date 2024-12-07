@@ -232,6 +232,15 @@ import static io.micronaut.openapi.visitor.StringUtil.DOT;
 import static io.micronaut.openapi.visitor.Utils.isOpenapi31;
 import static io.micronaut.openapi.visitor.Utils.resolveOpenApi;
 
+/*
+  OpenApiPojoControllerKotlinSpec test kotlin
+  OpenApiArraySchemaSpec test ArraySchema with arraySchema field in class
+  OpenApi31Spec test min/max contains OpenAPI 3.1.0
+  OpenApiSchemaGenericsSpec my annotations with generics
+  OpenApiSchemaGenericsSpec my annotations with generics with empty separator
+  OpenApiPageSpec test openAPI micronaut data page
+ */
+
 /**
  * Methods to construct OpenPI schema definition.
  *
@@ -670,6 +679,7 @@ public final class SchemaDefinitionUtils {
      * @param fieldJavadoc Field-level java doc
      * @param classJavadoc Class-level java doc
      * @param jsonViewClass Class from JsonView annotation
+     * @param schemaAnnValue schema annotation value
      * @return The schema or null if it cannot be resolved
      */
     @Nullable
@@ -893,7 +903,7 @@ public final class SchemaDefinitionUtils {
                         var filteredFields = new ArrayList<FieldElement>();
                         for (var field : type.getFields()) {
                             // for classes extended from java.util.List, java.util.Set etc.
-                            if (isJavaUtilType(field.getDeclaringType()) && type.isIterable()) {
+                            if (isJavaUtilType(field.getDeclaringType()) && field.getDeclaringType().isIterable()) {
                                 continue;
                             }
                             filteredFields.add(field);
