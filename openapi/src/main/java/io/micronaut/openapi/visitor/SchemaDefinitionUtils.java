@@ -110,6 +110,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.OptionalDouble;
 import java.util.OptionalInt;
@@ -140,6 +141,7 @@ import static io.micronaut.openapi.visitor.ElementUtils.isAnnotationPresent;
 import static io.micronaut.openapi.visitor.ElementUtils.isDeprecated;
 import static io.micronaut.openapi.visitor.ElementUtils.isEnum;
 import static io.micronaut.openapi.visitor.ElementUtils.isFileUpload;
+import static io.micronaut.openapi.visitor.ElementUtils.isJavaUtilType;
 import static io.micronaut.openapi.visitor.ElementUtils.isNotNullable;
 import static io.micronaut.openapi.visitor.ElementUtils.isNullable;
 import static io.micronaut.openapi.visitor.ElementUtils.isTypeWithGenericNullable;
@@ -164,6 +166,7 @@ import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_ALLOWABLE_VALUE
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_ALL_OF;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_ANY_OF;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_ARRAY_SCHEMA;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_CONTAINS;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_DEFAULT;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_DEFAULT_VALUE;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_DEPRECATED;
@@ -180,14 +183,20 @@ import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_EXTERNAL_DOCS;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_HIDDEN;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_IMPLEMENTATION;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_IN;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_ITEMS;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_MAPPING;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_MAX_CONTAINS;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_MAX_ITEMS;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_MEDIA_TYPE;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_MIN_CONTAINS;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_MIN_ITEMS;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_NAME;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_NOT;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_NULLABLE;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_ONE_FORMAT;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_ONE_OF;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_ONE_TYPES;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_PREFIX_ITEMS;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_PROPERTY_NAME;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_READ_ONLY;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_REF;
@@ -200,6 +209,8 @@ import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_SCHEMA;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_STYLE;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_TITLE;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_TYPE;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_UNEVALUATED_ITEMS;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_UNIQUE_ITEMS;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_VALUE;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_WRITE_ONLY;
 import static io.micronaut.openapi.visitor.ProtoUtils.filterProtobufProperties;
@@ -320,27 +331,55 @@ public final class SchemaDefinitionUtils {
                                                 @Nullable ClassElement jsonViewClass
     ) {
 
-        // Here we need to skip Schema annotation on field level, because with micronaut 3.x method getDeclaredAnnotation
-        // returned always null and found Schema annotation only on getters and setters
-        var schemaAnnOnField = false;
-        AnnotationValue<io.swagger.v3.oas.annotations.media.Schema> schemaValue = null;
+        AnnotationValue<io.swagger.v3.oas.annotations.media.ArraySchema> arraySchemaAnn = null;
         if (definingElement != null) {
             if (definingElement instanceof PropertyElement propertyEl) {
                 var getterOpt = propertyEl.getReadMethod();
                 if (getterOpt.isPresent()) {
-                    schemaValue = getterOpt.get().getDeclaredAnnotation(io.swagger.v3.oas.annotations.media.Schema.class);
-                    schemaAnnOnField = schemaValue != null;
+                    arraySchemaAnn = getterOpt.get().getDeclaredAnnotation(io.swagger.v3.oas.annotations.media.ArraySchema.class);
                 }
-                if (schemaValue == null) {
+                if (arraySchemaAnn == null) {
                     var setterOpt = propertyEl.getWriteMethod();
                     if (setterOpt.isPresent()) {
-                        schemaValue = setterOpt.get().getDeclaredAnnotation(io.swagger.v3.oas.annotations.media.Schema.class);
-                        schemaAnnOnField = schemaValue != null;
+                        arraySchemaAnn = setterOpt.get().getDeclaredAnnotation(io.swagger.v3.oas.annotations.media.ArraySchema.class);
                     }
                 }
             } else {
-                schemaValue = definingElement.getDeclaredAnnotation(io.swagger.v3.oas.annotations.media.Schema.class);
-                schemaAnnOnField = schemaValue != null && definingElement instanceof FieldElement;
+                arraySchemaAnn = getAnnotation(definingElement, io.swagger.v3.oas.annotations.media.ArraySchema.class);
+            }
+            if (arraySchemaAnn == null) {
+                arraySchemaAnn = type.getDeclaredAnnotation(io.swagger.v3.oas.annotations.media.ArraySchema.class);
+            }
+        }
+
+        var schemaAnnOnField = false;
+        AnnotationValue<io.swagger.v3.oas.annotations.media.Schema> schemaValue = null;
+
+        if (arraySchemaAnn != null) {
+            schemaValue = arraySchemaAnn.getAnnotation(PROP_SCHEMA, io.swagger.v3.oas.annotations.media.Schema.class)
+                .orElse(arraySchemaAnn.getAnnotation(PROP_ITEMS, io.swagger.v3.oas.annotations.media.Schema.class).orElse(null));
+        }
+        if (schemaValue == null) {
+            // Here we need to skip Schema annotation on field level, because with micronaut 3.x method getDeclaredAnnotation
+            // returned always null and found Schema annotation only on getters and setters
+            if (definingElement != null) {
+                if (definingElement instanceof PropertyElement propertyEl) {
+                    var getterOpt = propertyEl.getReadMethod();
+                    if (getterOpt.isPresent()) {
+                        schemaValue = getterOpt.get().getDeclaredAnnotation(io.swagger.v3.oas.annotations.media.Schema.class);
+                        schemaAnnOnField = schemaValue != null;
+                    }
+                    if (schemaValue == null) {
+                        var setterOpt = propertyEl.getWriteMethod();
+                        if (setterOpt.isPresent()) {
+                            schemaValue = setterOpt.get().getDeclaredAnnotation(io.swagger.v3.oas.annotations.media.Schema.class);
+                            schemaAnnOnField = schemaValue != null;
+                        }
+                    }
+                } else {
+                    schemaValue = getAnnotation(definingElement, io.swagger.v3.oas.annotations.media.Schema.class);
+                    schemaAnnOnField = schemaValue != null && definingElement instanceof FieldElement;
+                }
             }
         }
         if (schemaValue == null) {
@@ -360,7 +399,14 @@ public final class SchemaDefinitionUtils {
                 primitiveType = null;
             }
             if (primitiveType == null) {
-                String schemaName = computeDefaultSchemaName(null, definingElement, type, typeArgs, context, jsonViewClass);
+                String defaultName = null;
+                if (arraySchemaAnn != null) {
+                    var schemaAnnForArray = (AnnotationValue<io.swagger.v3.oas.annotations.media.Schema>) arraySchemaAnn.get(PROP_ARRAY_SCHEMA, AnnotationValue.class).orElse(null);
+                    if (schemaAnnForArray != null && schemaAnnForArray.contains(PROP_NAME)) {
+                        defaultName = schemaAnnForArray.stringValue(PROP_NAME).orElse(null);
+                    }
+                }
+                String schemaName = computeDefaultSchemaName(defaultName, definingElement, type, typeArgs, context, jsonViewClass);
                 schema = schemas.get(schemaName);
                 JavadocDescription javadoc = Utils.getJavadocParser().parse(type.getDocumentation().orElse(null));
                 if (schema == null) {
@@ -397,6 +443,9 @@ public final class SchemaDefinitionUtils {
                     if (isDeprecated(type) && schema != null) {
                         schema.setDeprecated(true);
                         addSchemaDeprecatedExtension(type, schema, context);
+                    }
+                    if (arraySchemaAnn != null && (type.isIterable() || type.isArray())) {
+                        processArraySchemaAnn(schema, context, type, type, arraySchemaAnn);
                     }
                 }
             } else {
@@ -479,7 +528,7 @@ public final class SchemaDefinitionUtils {
         var fullClassNameWithGenerics = pair.getSecond();
 
         String resultSchemaName;
-        if (defaultSchemaName != null) {
+        if (defaultSchemaName != null && !defaultSchemaName.isEmpty()) {
             resultSchemaName = defaultSchemaName;
         } else {
 
@@ -607,7 +656,7 @@ public final class SchemaDefinitionUtils {
      */
     @Nullable
     public static Schema<?> resolveSchema(@Nullable Element definingElement, @Nullable ClassElement type, VisitorContext context, List<MediaType> mediaTypes, @Nullable ClassElement jsonViewClass) {
-        return resolveSchema(Utils.resolveOpenApi(context), definingElement, type, context, mediaTypes, jsonViewClass, null, null);
+        return resolveSchema(Utils.resolveOpenApi(context), definingElement, type, context, mediaTypes, jsonViewClass, null, null, null);
     }
 
     /**
@@ -626,42 +675,80 @@ public final class SchemaDefinitionUtils {
     @Nullable
     public static Schema<?> resolveSchema(OpenAPI openApi, @Nullable Element definingElement, @Nullable ClassElement type, VisitorContext context,
                                           List<MediaType> mediaTypes, @Nullable ClassElement jsonViewClass,
-                                          JavadocDescription fieldJavadoc, JavadocDescription classJavadoc) {
+                                          JavadocDescription fieldJavadoc, JavadocDescription classJavadoc,
+                                          @Nullable AnnotationValue<io.swagger.v3.oas.annotations.media.Schema> schemaAnnValue) {
 
-        AnnotationValue<io.swagger.v3.oas.annotations.media.Schema> schemaAnnotationValue = null;
+        var isTypeArraySchemaAnn = false;
+        AnnotationValue<io.swagger.v3.oas.annotations.media.ArraySchema> arraySchemaAnnValue = null;
+        AnnotationValue<io.swagger.v3.oas.annotations.media.ArraySchema> typeArraySchemaAnnValue = null;
         if (definingElement != null) {
-            schemaAnnotationValue = getAnnotation(definingElement, io.swagger.v3.oas.annotations.media.Schema.class);
+            arraySchemaAnnValue = getAnnotation(definingElement, io.swagger.v3.oas.annotations.media.ArraySchema.class);
         }
-        if (type != null && schemaAnnotationValue == null) {
-            schemaAnnotationValue = getAnnotation(type, io.swagger.v3.oas.annotations.media.Schema.class);
+        if (type != null && arraySchemaAnnValue == null) {
+            arraySchemaAnnValue = getAnnotation(type, io.swagger.v3.oas.annotations.media.ArraySchema.class);
+            typeArraySchemaAnnValue = arraySchemaAnnValue;
+            isTypeArraySchemaAnn = true;
         }
+
+        ClassElement componentTypeFromAnn = null;
         boolean isSubstitutedType = false;
-        if (schemaAnnotationValue != null) {
-            String impl = schemaAnnotationValue.stringValue(PROP_IMPLEMENTATION).orElse(null);
+        AnnotationValue<io.swagger.v3.oas.annotations.media.Schema> componentSchemaAnn = null;
+
+        if (arraySchemaAnnValue != null) {
+            String impl = arraySchemaAnnValue.stringValue(PROP_IMPLEMENTATION).orElse(null);
             if (StringUtils.isNotEmpty(impl)) {
                 var typeEl = ContextUtils.getClassElement(impl, context);
                 if (typeEl != null) {
                     type = typeEl;
                 }
                 isSubstitutedType = true;
-            } else {
-                String typeFromAnn = schemaAnnotationValue.stringValue(PROP_TYPE).orElse(null);
-                List<String> schemaTypes;
-                if (isOpenapi31() && StringUtils.isEmpty(typeFromAnn)) {
-                    schemaTypes = Arrays.asList(schemaAnnotationValue.stringValues(PROP_ONE_TYPES));
-                } else {
-                    schemaTypes = Collections.singletonList(typeFromAnn);
+            }
+            componentSchemaAnn = arraySchemaAnnValue.getAnnotation(PROP_SCHEMA, io.swagger.v3.oas.annotations.media.Schema.class)
+                .orElse(arraySchemaAnnValue.getAnnotation(PROP_ITEMS, io.swagger.v3.oas.annotations.media.Schema.class)
+                    .orElse(typeArraySchemaAnnValue != null ? typeArraySchemaAnnValue.getAnnotation(PROP_SCHEMA, io.swagger.v3.oas.annotations.media.Schema.class)
+                        .orElse(arraySchemaAnnValue.getAnnotation(PROP_ITEMS, io.swagger.v3.oas.annotations.media.Schema.class).orElse(null)) : null));
+            if (componentSchemaAnn != null) {
+                String componentImpl = arraySchemaAnnValue.stringValue(PROP_IMPLEMENTATION).orElse(null);
+                if (StringUtils.isNotEmpty(componentImpl)) {
+                    componentTypeFromAnn = ContextUtils.getClassElement(componentImpl, context);
                 }
-                for (var schemaType : schemaTypes) {
-                    if (StringUtils.isNotEmpty(schemaType) && !(type instanceof EnumElement)) {
-                        PrimitiveType primitiveType = PrimitiveType.fromName(schemaType);
-                        if (primitiveType != null && primitiveType != PrimitiveType.OBJECT) {
-                            var typeEl = ContextUtils.getClassElement(primitiveType.getKeyClass().getName(), context);
-                            if (typeEl != null) {
-                                type = typeEl;
+            }
+        } else {
+
+            if (definingElement != null) {
+                schemaAnnValue = getAnnotation(definingElement, io.swagger.v3.oas.annotations.media.Schema.class);
+            }
+            if (type != null && schemaAnnValue == null) {
+                schemaAnnValue = getAnnotation(type, io.swagger.v3.oas.annotations.media.Schema.class);
+            }
+
+            if (schemaAnnValue != null) {
+                String impl = schemaAnnValue.stringValue(PROP_IMPLEMENTATION).orElse(null);
+                if (StringUtils.isNotEmpty(impl)) {
+                    var typeEl = ContextUtils.getClassElement(impl, context);
+                    if (typeEl != null) {
+                        type = typeEl;
+                    }
+                    isSubstitutedType = true;
+                } else {
+                    String typeFromAnn = schemaAnnValue.stringValue(PROP_TYPE).orElse(null);
+                    List<String> schemaTypes;
+                    if (isOpenapi31() && StringUtils.isEmpty(typeFromAnn)) {
+                        schemaTypes = Arrays.asList(schemaAnnValue.stringValues(PROP_ONE_TYPES));
+                    } else {
+                        schemaTypes = Collections.singletonList(typeFromAnn);
+                    }
+                    for (var schemaType : schemaTypes) {
+                        if (StringUtils.isNotEmpty(schemaType) && !(type instanceof EnumElement)) {
+                            var primitiveType = PrimitiveType.fromName(schemaType);
+                            if (primitiveType != null && primitiveType != PrimitiveType.OBJECT) {
+                                var typeEl = ContextUtils.getClassElement(primitiveType.getKeyClass().getName(), context);
+                                if (typeEl != null) {
+                                    type = typeEl;
+                                }
+                                isSubstitutedType = true;
+                                break;
                             }
-                            isSubstitutedType = true;
-                            break;
                         }
                     }
                 }
@@ -777,18 +864,41 @@ public final class SchemaDefinitionUtils {
                 } else if (type.isAssignable(Map.class)) {
                     schema = processMapSchema(type, typeArgs, mediaTypes, openApi, jsonViewClass, classJavadoc, context);
                 } else if (isIterable) {
+
+                    // for classes extended from java.util.List, java.util.Set etc.
+                    var sType = type.getSuperType().orElse(null);
+                    if (sType != null && isJavaUtilType(sType)) {
+                        componentType = sType.getFirstTypeArgument().orElse(null);
+                    }
+                    if (componentTypeFromAnn != null) {
+                        componentType = componentTypeFromAnn;
+                    }
+
                     if (isArray) {
-                        schema = resolveSchema(openApi, type, type.fromArray(), context, mediaTypes, jsonViewClass, null, classJavadoc);
+                        schema = resolveSchema(openApi, type, type.fromArray(), context, mediaTypes, jsonViewClass, null, classJavadoc, componentSchemaAnn);
                         if (schema != null) {
                             schema = SchemaUtils.arraySchema(schema);
                         }
                     } else {
                         if (componentType != null) {
-                            schema = resolveSchema(openApi, type, componentType, context, mediaTypes, jsonViewClass, null, classJavadoc);
+                            var componentSchema = getSchemaDefinition(openApi, context, componentType, componentType.getTypeArguments(), type, mediaTypes, null);
+                            processSchemaAnn(componentSchema, context, definingElement, type, componentSchemaAnn);
+                            schema = resolveSchema(openApi, type, componentType, context, mediaTypes, jsonViewClass, null, classJavadoc, componentSchemaAnn);
+                            if (componentSchema != null && Objects.equals(schema.getType(), TYPE_ARRAY)) {
+                                schema.items(componentSchema);
+                            }
                         } else {
                             schema = getPrimitiveType(null, Object.class.getName(), context);
                         }
-                        List<FieldElement> fields = type.getPackageName().startsWith("java.util") ? Collections.emptyList() : type.getFields();
+                        var filteredFields = new ArrayList<FieldElement>();
+                        for (var field : type.getFields()) {
+                            // for classes extended from java.util.List, java.util.Set etc.
+                            if (isJavaUtilType(field.getDeclaringType()) && type.isIterable()) {
+                                continue;
+                            }
+                            filteredFields.add(field);
+                        }
+                        List<FieldElement> fields = type.getPackageName().startsWith("java.util") ? Collections.emptyList() : filteredFields;
                         if (schema != null && fields.isEmpty()) {
                             schema = processGenericAnnotations(schema, componentType, context);
                             schema = SchemaUtils.arraySchema(schema);
@@ -854,7 +964,10 @@ public final class SchemaDefinitionUtils {
             if (schema != null) {
 
                 if (isSubstitutedType) {
-                    processSchemaAnn(schema, context, definingElement, type, schemaAnnotationValue);
+                    processSchemaAnn(schema, context, definingElement, type, schemaAnnValue);
+                }
+                if ((type.isIterable() || type.isArray()) && arraySchemaAnnValue != null) {
+                    processArraySchemaAnn(schema, context, isTypeArraySchemaAnn ? type : definingElement, type, arraySchemaAnnValue);
                 }
 
                 processJacksonDescription(definingElement, schema);
@@ -931,11 +1044,11 @@ public final class SchemaDefinitionUtils {
                 }
             }
         }
-        var arraySchemaAnn = getAnnotation(element, io.swagger.v3.oas.annotations.media.ArraySchema.class);
-        if (arraySchemaAnn != null) {
-            schemaToBind = bindArraySchemaAnnotationValue(context, element, schemaToBind, arraySchemaAnn, jsonViewClass);
-            arraySchemaAnn.stringValue(PROP_NAME).ifPresent(schemaToBind::setName);
-        }
+//        var arraySchemaAnn = getAnnotation(element, io.swagger.v3.oas.annotations.media.ArraySchema.class);
+//        if (arraySchemaAnn != null) {
+//            schemaToBind = bindArraySchemaAnnotationValue(context, element, schemaToBind, arraySchemaAnn, jsonViewClass);
+//            arraySchemaAnn.stringValue(PROP_NAME).ifPresent(schemaToBind::setName);
+//        }
 
         processJakartaValidationAnnotations(element, elementType, schemaToBind, context);
 
@@ -1568,7 +1681,7 @@ public final class SchemaDefinitionUtils {
             classElement = typedEl.getType();
         }
 
-        if (classElement != null && !ClassUtils.isJavaLangType(classElement.getName())) {
+        if (classElement != null && !ClassUtils.isJavaLangType(classElement.getName()) && !classElement.isIterable()) {
             List<PropertyElement> beanProperties;
             try {
                 beanProperties = classElement.getBeanProperties(
@@ -1649,6 +1762,7 @@ public final class SchemaDefinitionUtils {
             return null;
         }
 
+        ClassElement componentType = null;
         var classElement = type.getType();
         var superTypes = new ArrayList<ClassElement>();
         Collection<ClassElement> parentInterfaces = classElement.getInterfaces();
@@ -1659,22 +1773,30 @@ public final class SchemaDefinitionUtils {
                     || parentInterface.getBeanProperties().isEmpty()) {
                     continue;
                 }
+                if (isJavaUtilType(parentInterface)) {
+                    componentType = parentInterface.getFirstTypeArgument().orElse(null);
+                    continue;
+                }
                 superTypes.add(parentInterface);
             }
         } else {
             var superType = classElement.getSuperType().orElse(null);
-            if (superType != null
-                && !Enum.class.getName().equals(superType.getName())
-                // check protobuf generated classes
-                && !isProtobufMessageClass(superType)) {
-                superTypes.add(superType);
+            if (superType != null) {
+                if (isJavaUtilType(superType)) {
+                    componentType = superType.getFirstTypeArgument().orElse(null);
+                    // check protobuf generated classes
+                } else if (!Enum.class.getName().equals(superType.getName()) && !isProtobufMessageClass(superType)) {
+                    superTypes.add(superType);
+                }
             }
         }
         if (!type.isRecord() && !superTypes.isEmpty()) {
             // skip if it is Enum or Object super class
             String firstSuperTypeName = superTypes.get(0).getName();
             if (superTypes.size() == 1
-                && (firstSuperTypeName.equals(Enum.class.getName()) || firstSuperTypeName.equals(Object.class.getName()))) {
+                && (firstSuperTypeName.equals(Enum.class.getName())
+                || firstSuperTypeName.equals(Object.class.getName())
+            )) {
                 if (schema != null) {
                     schema.setName(schemaName);
                     schemas.put(schemaName, schema);
@@ -1703,6 +1825,15 @@ public final class SchemaDefinitionUtils {
         }
 
         schema.setName(schemaName);
+        if (type.isIterable() || type.isArray()) {
+            schema.type(TYPE_ARRAY);
+            if (componentType != null) {
+                var componentSchema = getSchemaDefinition(openAPI, context, componentType, componentType.getTypeArguments(), definingElement, mediaTypes, jsonViewClass);
+                if (componentSchema != null) {
+                    schema.items(componentSchema);
+                }
+            }
+        }
         schemas.put(schemaName, schema);
 
         return schema;
@@ -1810,6 +1941,71 @@ public final class SchemaDefinitionUtils {
             JavadocDescription desc = Utils.getJavadocParser().parse(doc);
             if (StringUtils.hasText(desc.getMethodDescription())) {
                 schemaToBind.setDescription(desc.getMethodDescription());
+            }
+        }
+    }
+
+    private static void processArraySchemaAnn(Schema schemaToBind, VisitorContext context, Element element,
+                                              @Nullable ClassElement classEl,
+                                              @Nullable AnnotationValue<io.swagger.v3.oas.annotations.media.ArraySchema> arraySchemaAnnValue) {
+
+        if (arraySchemaAnnValue == null) {
+            return;
+        }
+
+        Map<CharSequence, Object> annValues = arraySchemaAnnValue.getValues();
+        if (annValues.containsKey(PROP_MIN_ITEMS)) {
+            schemaToBind.minItems((Integer) annValues.get(PROP_MIN_ITEMS));
+        }
+        if (annValues.containsKey(PROP_MAX_ITEMS)) {
+            schemaToBind.maxItems((Integer) annValues.get(PROP_MAX_ITEMS));
+        }
+        if (annValues.containsKey(PROP_UNIQUE_ITEMS)) {
+            schemaToBind.uniqueItems((Boolean) annValues.get(PROP_UNIQUE_ITEMS));
+        }
+        if (annValues.containsKey(PROP_EXTENSIONS)) {
+            for (var ext : ((Map<CharSequence, Object>) annValues.get(PROP_EXTENSIONS)).entrySet()) {
+                schemaToBind.addExtension(ext.getKey().toString(), ext.getValue());
+            }
+        }
+
+        if (annValues.containsKey(PROP_ARRAY_SCHEMA)) {
+            processSchemaAnn(schemaToBind, context, element, classEl, (AnnotationValue<io.swagger.v3.oas.annotations.media.Schema>) annValues.get(PROP_ARRAY_SCHEMA));
+        }
+
+        if (annValues.containsKey(PROP_ITEMS)) {
+            var itemsSchema = schemaToBind.getItems() != null ? schemaToBind.getItems() : new Schema<>();
+            processSchemaAnn(itemsSchema, context, element,
+                classEl != null ? classEl.getFirstTypeArgument().orElse(null) : null,
+                (AnnotationValue<io.swagger.v3.oas.annotations.media.Schema>) annValues.get(PROP_ITEMS));
+            schemaToBind.setItems(itemsSchema);
+        }
+        if (annValues.containsKey(PROP_SCHEMA)) {
+            var itemsSchema = schemaToBind.getItems() != null ? schemaToBind.getItems() : new Schema<>();
+            processSchemaAnn(itemsSchema, context, element,
+                classEl != null ? classEl.getFirstTypeArgument().orElse(null) : null,
+                (AnnotationValue<io.swagger.v3.oas.annotations.media.Schema>) annValues.get(PROP_SCHEMA));
+            schemaToBind.setItems(itemsSchema);
+        }
+
+        if (isOpenapi31()) {
+
+            if (annValues.containsKey(PROP_CONTAINS)) {
+                if (annValues.containsKey(PROP_MIN_CONTAINS)) {
+                    schemaToBind.setMinContains((Integer) annValues.get(PROP_MIN_CONTAINS));
+                }
+                if (annValues.containsKey(PROP_MAX_CONTAINS)) {
+                    schemaToBind.setMaxContains((Integer) annValues.get(PROP_MAX_CONTAINS));
+                }
+            }
+            if (annValues.containsKey(PROP_UNEVALUATED_ITEMS)) {
+                var unevaluatedSchema = schemaToBind.getUnevaluatedItems() != null ? schemaToBind.getUnevaluatedItems() : new Schema<>();
+                processSchemaAnn(unevaluatedSchema, context, element, classEl, (AnnotationValue<io.swagger.v3.oas.annotations.media.Schema>) annValues.get(PROP_UNEVALUATED_ITEMS));
+                schemaToBind.setItems(unevaluatedSchema);
+            }
+            if (annValues.containsKey(PROP_PREFIX_ITEMS)) {
+                var openApi = Utils.resolveOpenApi(context);
+                processSchemasArray(schemaToBind, openApi, PROP_PREFIX_ITEMS, annValues, Collections.emptyList(), null, Schema::getPrefixItems, Schema::addPrefixItem, context);
             }
         }
     }
@@ -2006,12 +2202,12 @@ public final class SchemaDefinitionUtils {
 
         if (isOpenapi31()) {
 
-            if (annValues.containsKey("contains")) {
-                if (annValues.containsKey("minContains")) {
-                    schemaToBind.setMinContains((Integer) annValues.get("minContains"));
+            if (annValues.containsKey(PROP_CONTAINS)) {
+                if (annValues.containsKey(PROP_MIN_CONTAINS)) {
+                    schemaToBind.setMinContains((Integer) annValues.get(PROP_MIN_CONTAINS));
                 }
-                if (annValues.containsKey("maxContains")) {
-                    schemaToBind.setMaxContains((Integer) annValues.get("maxContains"));
+                if (annValues.containsKey(PROP_MAX_CONTAINS)) {
+                    schemaToBind.setMaxContains((Integer) annValues.get(PROP_MAX_CONTAINS));
                 }
             }
 
@@ -2058,7 +2254,7 @@ public final class SchemaDefinitionUtils {
             parseAndSetClassValue("propertyNames", Schema::propertyNames, annValues, schemaToBind, context);
             parseAndSetClassValue("unevaluatedProperties", Schema::unevaluatedProperties, annValues, schemaToBind, context);
             parseAndSetClassValue("additionalItems", Schema::additionalItems, annValues, schemaToBind, context);
-            parseAndSetClassValue("unevaluatedItems", Schema::unevaluatedItems, annValues, schemaToBind, context);
+            parseAndSetClassValue(PROP_UNEVALUATED_ITEMS, Schema::unevaluatedItems, annValues, schemaToBind, context);
             parseAndSetClassValue("_if", Schema::_if, annValues, schemaToBind, context);
             parseAndSetClassValue("_else", Schema::_else, annValues, schemaToBind, context);
             parseAndSetClassValue("then", Schema::then, annValues, schemaToBind, context);
@@ -2498,7 +2694,7 @@ public final class SchemaDefinitionUtils {
         if (valueType.getName().equals(Object.class.getName())) {
             schema.setAdditionalProperties(true);
         } else {
-            schema.setAdditionalProperties(resolveSchema(openApi, type, valueType, context, mediaTypes, jsonViewClass, null, classJavadoc));
+            schema.setAdditionalProperties(resolveSchema(openApi, type, valueType, context, mediaTypes, jsonViewClass, null, classJavadoc, null));
         }
         return schema;
     }
@@ -2558,7 +2754,7 @@ public final class SchemaDefinitionUtils {
                 }
                 ClassElement fieldType = publicField.getGenericType();
 
-                Schema<?> propertySchema = resolveSchema(openAPI, publicField, fieldType, context, mediaTypes, jsonViewClass, fieldJavadoc, classJavadoc);
+                Schema<?> propertySchema = resolveSchema(openAPI, publicField, fieldType, context, mediaTypes, jsonViewClass, fieldJavadoc, classJavadoc, null);
 
                 processSchemaProperty(
                     context,

@@ -261,4 +261,81 @@ class MyBean {}
         petSchema.properties.lines.example[0] == '123 Main St'
         petSchema.properties.lines.example[1] == 'Suite 517'
     }
+
+    void "test ArraySchema and schema extended ArrayList"() {
+
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@Controller
+interface DefaultApi {
+
+    @Get("/hello")
+    Teste hello();
+}
+
+@Schema(name = "Teste")
+class Teste {
+
+    @ArraySchema(schema = @Schema(name = "array", example = "[\\"Any Example\\"]", implementation = List.class, requiredMode = Schema.RequiredMode.NOT_REQUIRED))
+    public List<String> array = new ArrayList<>();
+
+    @ArraySchema(schema = @Schema(name = "array2", example = "[\\"Any Example\\",\\"Other Example\\"]", implementation = List.class, requiredMode = Schema.RequiredMode.NOT_REQUIRED))
+    @NotNull
+    public List<String> array2 = new ArrayList<>();
+
+    @ArraySchema(schema = @Schema(name = "array3", implementation = LastRetryRecurringPaymentIds.class, requiredMode = Schema.RequiredMode.NOT_REQUIRED))
+    public List<LastRetryRecurringPaymentIds> array3 = new ArrayList<>();
+}
+
+@ArraySchema(arraySchema = @Schema(name = "LastRetryRecurringPaymentIds", example = "[\\"any example\\"]"))
+class LastRetryRecurringPaymentIds extends ArrayList<String> {
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        then:
+        Utils.testReference != null
+
+        when:
+        def openApi = Utils.testReference
+        def schemas = openApi.components.schemas
+
+        then:
+        schemas.Teste
+        schemas.Teste.required.size() == 1
+        schemas.Teste.required[0] == "array2"
+        schemas.Teste.properties.size() == 3
+
+        schemas.Teste.properties.array.type == "array"
+        schemas.Teste.properties.array.items.type == "string"
+        schemas.Teste.properties.array.items.example == "[\"Any Example\"]"
+
+        schemas.Teste.properties.array2.type == "array"
+        schemas.Teste.properties.array2.items.type == "string"
+        schemas.Teste.properties.array2.items.example == "[\"Any Example\",\"Other Example\"]"
+
+        schemas.Teste.properties.array3.type == "array"
+        schemas.Teste.properties.array3.items.type == "array"
+        schemas.Teste.properties.array3.items.example instanceof List
+        ((List<String>) schemas.Teste.properties.array3.items.example)[0] == "any example"
+        schemas.Teste.properties.array3.items.items.$ref == "#/components/schemas/LastRetryRecurringPaymentIds"
+
+        schemas.LastRetryRecurringPaymentIds
+        schemas.LastRetryRecurringPaymentIds.type == "array"
+        schemas.LastRetryRecurringPaymentIds.example instanceof List
+        ((List<String>) schemas.LastRetryRecurringPaymentIds.example)[0] == "any example"
+        schemas.LastRetryRecurringPaymentIds.items.type == "string"
+    }
 }

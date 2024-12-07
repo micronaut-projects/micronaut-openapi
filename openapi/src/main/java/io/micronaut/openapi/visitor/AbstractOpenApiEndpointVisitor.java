@@ -879,7 +879,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         }
 
         if (newParameter.getExplode() != null && newParameter.getExplode() && "query".equals(newParameter.getIn()) && !parameterType.isIterable()) {
-            Schema<?> explodedSchema = resolveSchema(openAPI, parameter, parameterType, context, consumesMediaTypes, null, null, null);
+            Schema<?> explodedSchema = resolveSchema(openAPI, parameter, parameterType, context, consumesMediaTypes, null, null, null, null);
             if (explodedSchema != null) {
                 if (openAPI.getComponents() != null && openAPI.getComponents().getSchemas() != null && StringUtils.isNotEmpty(explodedSchema.get$ref())) {
                     explodedSchema = openAPI.getComponents().getSchemas().get(explodedSchema.get$ref().substring(Components.COMPONENTS_SCHEMAS_REF.length()));
@@ -917,7 +917,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
 
             Schema<?> schema = newParameter.getSchema();
             if (schema == null) {
-                schema = resolveSchema(openAPI, parameter, parameterType, context, consumesMediaTypes, null, null, null);
+                schema = resolveSchema(openAPI, parameter, parameterType, context, consumesMediaTypes, null, null, null, null);
             }
 
             if (schema != null) {
@@ -945,7 +945,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
 
         var jsonViewClass = getJsonViewClass(parameter, context);
 
-        Schema<?> propertySchema = resolveSchema(openAPI, parameter, parameter.getType(), context, Collections.singletonList(mediaType), jsonViewClass, null, null);
+        Schema<?> propertySchema = resolveSchema(openAPI, parameter, parameter.getType(), context, Collections.singletonList(mediaType), jsonViewClass, null, null, null);
         if (propertySchema == null) {
             return;
         }
@@ -2134,7 +2134,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         var content = new Content();
         for (var mediaType : mediaTypes) {
             var mt = new io.swagger.v3.oas.models.media.MediaType();
-            mt.setSchema(resolveSchema(openAPI, definingElement, type, context, Collections.singletonList(mediaType), jsonViewClass, null, null));
+            mt.setSchema(resolveSchema(openAPI, definingElement, type, context, Collections.singletonList(mediaType), jsonViewClass, null, null, null));
             content.addMediaType(mediaType.toString(), mt);
         }
         return content;

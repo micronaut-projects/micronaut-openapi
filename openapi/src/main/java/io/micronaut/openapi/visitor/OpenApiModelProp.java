@@ -30,6 +30,16 @@ public interface OpenApiModelProp {
     String PROP_NAME = "name";
     String PROP_DESCRIPTION = "description";
     String PROP_SCHEMA = "schema";
+    String PROP_ARRAY_SCHEMA = "arraySchema";
+    String PROP_ITEMS = "items";
+    String PROP_MIN_ITEMS = "minItems";
+    String PROP_MAX_ITEMS = "maxItems";
+    String PROP_CONTAINS = "contains";
+    String PROP_MIN_CONTAINS = "minContains";
+    String PROP_MAX_CONTAINS = "maxContains";
+    String PROP_UNIQUE_ITEMS = "uniqueItems";
+    String PROP_UNEVALUATED_ITEMS = "unevaluatedItems";
+    String PROP_PREFIX_ITEMS = "prefixItems";
     String PROP_REF = "ref";
     String PROP_REF_DOLLAR = "$ref";
     String PROP_HIDDEN = "hidden";
@@ -62,7 +72,6 @@ public interface OpenApiModelProp {
     String PROP_ALLOW_EMPTY_VALUE = "allowEmptyValue";
     String PROP_MEDIA_TYPE = "mediaType";
     String PROP_CONTENT = "content";
-    String PROP_ARRAY_SCHEMA = "arraySchema";
     String PROP_RESPONSE_CODE = "responseCode";
     String PROP_METHOD = "method";
     String PROP_EXPLODE = "explode";
