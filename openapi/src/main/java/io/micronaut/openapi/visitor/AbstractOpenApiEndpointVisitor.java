@@ -283,7 +283,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         if (externalDocsAnn == null) {
             return;
         }
-        classExternalDocs = toValue(externalDocsAnn.getValues(), context, ExternalDocumentation.class, null);
+        classExternalDocs = toValue(externalDocsAnn.getAnnotationName(), externalDocsAnn.getValues(), context, ExternalDocumentation.class, null);
     }
 
     private boolean containsTag(String name, List<Tag> tags) {
@@ -700,7 +700,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         var result = new HashMap<String, Example>();
         for (var exampleAnn : exampleAnns) {
             try {
-                var exampleMap = toValueMap(exampleAnn.getValues(), context, null);
+                var exampleMap = toValueMap(exampleAnn.getAnnotationName(), exampleAnn.getValues(), context, null);
                 result.put((String) exampleMap.get(PROP_NAME), Utils.getJsonMapper().convertValue(exampleMap, Example.class));
             } catch (Exception e) {
                 warn("Error reading Parameter example " + exampleAnn + " for element [" + element + "]: " + e.getMessage(), context, element);
@@ -1096,7 +1096,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                 return null;
             }
 
-            Map<CharSequence, Object> paramValues = toValueMap(paramAnn.getValues(), context, null);
+            Map<CharSequence, Object> paramValues = toValueMap(paramAnn.getAnnotationName(), paramAnn.getValues(), context, null);
             Utils.normalizeEnumValues(paramValues, Collections.singletonMap(PROP_IN, ParameterIn.class));
             if (parameter.isAnnotationPresent(Header.class)) {
                 paramValues.put(PROP_IN, ParameterIn.HEADER.toString());
@@ -1386,7 +1386,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         Operation operation;
         HttpMethod method;
         if (operationAnn != null) {
-            operation = toValue(operationAnn.getValues(), context, Operation.class, null);
+            operation = toValue(operationAnn.getAnnotationName(), operationAnn.getValues(), context, Operation.class, null);
             method = HttpMethod.parse(operationAnn.stringValue(PROP_METHOD).orElse(httpMethod.name()));
         } else {
             operation = new Operation();
@@ -1402,7 +1402,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         var operationAnn = element.findAnnotation(io.swagger.v3.oas.annotations.Operation.class).orElse(null);
 
         for (PathItem pathItem : pathItems) {
-            var swaggerOperation = operationAnn != null ? toValue(operationAnn.getValues(), context, Operation.class, jsonViewClass) : null;
+            var swaggerOperation = operationAnn != null ? toValue(operationAnn.getAnnotationName(), operationAnn.getValues(), context, Operation.class, jsonViewClass) : null;
             if (swaggerOperation == null) {
                 swaggerOperation = new Operation();
             }
@@ -1568,7 +1568,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         if (externalDocsAnn == null) {
             return null;
         }
-        return toValue(externalDocsAnn.getValues(), context, ExternalDocumentation.class, null);
+        return toValue(externalDocsAnn.getAnnotationName(), externalDocsAnn.getValues(), context, ExternalDocumentation.class, null);
     }
 
     private void readSecurityRequirements(MethodElement element, String path, Operation operation, VisitorContext context) {
@@ -1743,7 +1743,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             if (apiResponses.containsKey(responseCode)) {
                 continue;
             }
-            ApiResponse newApiResponse = toValue(responseAnn.getValues(), context, ApiResponse.class, jsonViewClass);
+            ApiResponse newApiResponse = toValue(responseAnn.getAnnotationName(), responseAnn.getValues(), context, ApiResponse.class, jsonViewClass);
             if (newApiResponse != null) {
                 if (responseAnn.booleanValue("useReturnTypeSchema").orElse(false) && element != null) {
                     addResponseContent(element, context, Utils.resolveOpenApi(context), newApiResponse, jsonViewClass);
@@ -1811,7 +1811,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
 
         var jsonViewClass = element instanceof ParameterElement ? getJsonViewClass(element, context) : null;
 
-        RequestBody requestBody = toValue(requestBodyAnn.getValues(), context, RequestBody.class, jsonViewClass);
+        RequestBody requestBody = toValue(requestBodyAnn.getAnnotationName(), requestBodyAnn.getValues(), context, RequestBody.class, jsonViewClass);
         // if media type doesn't set in swagger annotation, check micronaut annotation
         if (contentAnn != null
             && contentAnn.stringValue(PROP_MEDIA_TYPE).isEmpty()
@@ -1886,7 +1886,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                 if (httpMethod == null) {
                     continue;
                 }
-                var op = toValue(operationAnn.getValues(), context, Operation.class, jsonViewClass);
+                var op = toValue(operationAnn.getAnnotationName(), operationAnn.getValues(), context, Operation.class, jsonViewClass);
                 if (op != null) {
                     setOperationOnPathItem(pathItem, httpMethod, op);
                 }
@@ -2122,7 +2122,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
     final List<Tag> readTags(List<AnnotationValue<io.swagger.v3.oas.annotations.tags.Tag>> tagAnns, VisitorContext context) {
         var tags = new ArrayList<Tag>();
         for (var tagAnn : tagAnns) {
-            var tag = toValue(tagAnn.getValues(), context, Tag.class, null);
+            var tag = toValue(tagAnn.getAnnotationName(), tagAnn.getValues(), context, Tag.class, null);
             if (tag != null) {
                 tags.add(tag);
             }

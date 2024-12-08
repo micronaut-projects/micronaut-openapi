@@ -180,7 +180,7 @@ abstract class AbstractOpenApiVisitor {
             } else {
                 values = tagValues;
             }
-            T tagObj = toValue(values, context, modelType, null);
+            T tagObj = toValue(tag.getAnnotationName(), values, context, modelType, null);
             if (tagObj != null) {
                 // skip all existed tags
                 boolean alreadyExists = false;

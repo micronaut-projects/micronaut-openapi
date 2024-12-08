@@ -81,8 +81,10 @@ class MyBean {}
         petSchema.properties['pets'].nullable == false
         petSchema.properties['pets'].description == 'a list of Pets'
         petSchema.properties['pets'].minItems == 2
-        petSchema.properties['pets'].items.$ref == '#/components/schemas/Pet'
-        petSchema.properties['pets'].items.nullable == null
+        petSchema.properties['pets'].items.allOf.size() == 1
+        petSchema.properties['pets'].items.allOf[0].$ref == '#/components/schemas/Pet'
+        petSchema.properties['pets'].items.nullable == true
+        petSchema.properties['pets'].items.description == "No"
 
         petSchema.properties['ids'].nullable == false
         petSchema.properties['ids'].description == 'a list of Ids'

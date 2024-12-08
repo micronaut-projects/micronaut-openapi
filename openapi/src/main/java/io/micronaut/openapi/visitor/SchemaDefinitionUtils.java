@@ -110,6 +110,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.OptionalDouble;
 import java.util.OptionalInt;
@@ -230,15 +231,6 @@ import static io.micronaut.openapi.visitor.StringUtil.DOLLAR;
 import static io.micronaut.openapi.visitor.StringUtil.DOT;
 import static io.micronaut.openapi.visitor.Utils.isOpenapi31;
 import static io.micronaut.openapi.visitor.Utils.resolveOpenApi;
-
-/*
-  OpenApiPojoControllerKotlinSpec test kotlin
-  OpenApiArraySchemaSpec test ArraySchema with arraySchema field in class
-  OpenApi31Spec test min/max contains OpenAPI 3.1.0
-  OpenApiSchemaGenericsSpec my annotations with generics
-  OpenApiSchemaGenericsSpec my annotations with generics with empty separator
-  OpenApiPageSpec test openAPI micronaut data page
- */
 
 /**
  * Methods to construct OpenPI schema definition.
@@ -509,7 +501,7 @@ public final class SchemaDefinitionUtils {
             var externalDocsValue = type.getDeclaredAnnotation(io.swagger.v3.oas.annotations.ExternalDocumentation.class);
             ExternalDocumentation externalDocs = null;
             if (externalDocsValue != null) {
-                externalDocs = toValue(externalDocsValue.getValues(), context, ExternalDocumentation.class, null);
+                externalDocs = toValue(externalDocsValue.getAnnotationName(), externalDocsValue.getValues(), context, ExternalDocumentation.class, null);
             }
             if (externalDocs != null) {
                 schema.setExternalDocs(externalDocs);
@@ -517,9 +509,6 @@ public final class SchemaDefinitionUtils {
             setSchemaDescription(type, schema);
             var schemaRef = setSpecVersion(new Schema<>());
             schemaRef.set$ref(SchemaUtils.schemaRef(schema.getName()));
-            if (definingElement instanceof ClassElement classEl && classEl.isIterable()) {
-                schemaRef.setDescription(schema.getDescription());
-            }
             return schemaRef;
         }
         return null;
@@ -542,7 +531,7 @@ public final class SchemaDefinitionUtils {
         var fullClassNameWithGenerics = pair.getSecond();
 
         String resultSchemaName;
-        if (defaultSchemaName != null && !defaultSchemaName.isEmpty()) {
+        if (StringUtils.isNotEmpty(defaultSchemaName)) {
             resultSchemaName = defaultSchemaName;
         } else {
 
@@ -1058,11 +1047,6 @@ public final class SchemaDefinitionUtils {
                 }
             }
         }
-//        var arraySchemaAnn = getAnnotation(element, io.swagger.v3.oas.annotations.media.ArraySchema.class);
-//        if (arraySchemaAnn != null) {
-//            schemaToBind = bindArraySchemaAnnotationValue(context, element, schemaToBind, arraySchemaAnn, jsonViewClass);
-//            arraySchemaAnn.stringValue(PROP_NAME).ifPresent(schemaToBind::setName);
-//        }
 
         processJakartaValidationAnnotations(element, elementType, schemaToBind, context);
 
@@ -1111,6 +1095,10 @@ public final class SchemaDefinitionUtils {
 //        }
 
         boolean addSchemaToBind = !SchemaUtils.isEmptySchema(schemaToBind);
+
+        if (!notOnlyRef && originalSchema.get$ref() != null && Objects.equals(originalSchema.get$ref(), schemaToBind.get$ref())) {
+            return originalSchema;
+        }
 
         if (addSchemaToBind) {
             if (TYPE_OBJECT.equals(originalSchema.getType()) && !(originalSchema instanceof MapSchema)) {
@@ -1162,7 +1150,8 @@ public final class SchemaDefinitionUtils {
     public static Schema<?> bindArraySchemaAnnotationValue(VisitorContext context, TypedElement element, Schema<?> schemaToBind,
                                                            AnnotationValue<io.swagger.v3.oas.annotations.media.ArraySchema> schemaAnn,
                                                            @Nullable ClassElement jsonViewClass) {
-        JsonNode schemaJson = toJson(schemaAnn.getValues(), context, jsonViewClass);
+        Map<CharSequence, Object> annValues = toValueMap(schemaAnn.getAnnotationName(), schemaAnn.getValues(), context, jsonViewClass);
+        JsonNode schemaJson = toJson(annValues);
         if (schemaJson.isObject()) {
             ObjectNode objNode = (ObjectNode) schemaJson;
             JsonNode arraySchema = objNode.remove(PROP_ARRAY_SCHEMA);
@@ -1189,18 +1178,19 @@ public final class SchemaDefinitionUtils {
 
         String elType = schemaJson.has(PROP_TYPE) ? schemaJson.get(PROP_TYPE).textValue() : null;
         String elFormat = schemaJson.has(PROP_ONE_FORMAT) ? schemaJson.get(PROP_ONE_FORMAT).textValue() : null;
-        return doBindSchemaAnnotationValue(context, element, schemaToBind, schemaJson, elType, elFormat, null, jsonViewClass);
+        return doBindSchemaAnnotationValue(context, element, schemaToBind, annValues, schemaJson, elType, elFormat, null, jsonViewClass);
     }
 
     /**
      * Convert the values to a map.
      *
+     * @param annotationName annotation name
      * @param values The values
      * @param context The visitor context
      * @param jsonViewClass Class from JsonView annotation
      * @return The map
      */
-    public static Map<CharSequence, Object> toValueMap(Map<CharSequence, Object> values, VisitorContext context, @Nullable ClassElement jsonViewClass) {
+    public static Map<CharSequence, Object> toValueMap(String annotationName, Map<CharSequence, Object> values, VisitorContext context, @Nullable ClassElement jsonViewClass) {
         if (CollectionUtils.isEmpty(values)) {
             return Collections.emptyMap();
         }
@@ -1234,26 +1224,26 @@ public final class SchemaDefinitionUtils {
                             }
                             newValues.put(key, classes);
                         } else if (first instanceof AnnotationValue<?> annValue) {
-                            String annotationName = annValue.getAnnotationName();
-                            if (io.swagger.v3.oas.annotations.security.SecurityRequirement.class.getName().equals(annotationName)) {
+                            String annName = annValue.getAnnotationName();
+                            if (io.swagger.v3.oas.annotations.security.SecurityRequirement.class.getName().equals(annName)) {
                                 var securityRequirements = new ArrayList<SecurityRequirement>(a.length);
                                 for (Object o : a) {
                                     securityRequirements.add(ConvertUtils.mapToSecurityRequirement((AnnotationValue<io.swagger.v3.oas.annotations.security.SecurityRequirement>) o));
                                 }
                                 newValues.put(key, securityRequirements);
-                            } else if (Extension.class.getName().equals(annotationName)) {
+                            } else if (Extension.class.getName().equals(annName)) {
                                 var extensions = new HashMap<String, Object>();
                                 for (Object o : a) {
                                     processExtensions(extensions, (AnnotationValue<Extension>) o);
                                 }
                                 newValues.put(PROP_EXTENSIONS, extensions);
-                            } else if (Encoding.class.getName().equals(annotationName)) {
+                            } else if (Encoding.class.getName().equals(annName)) {
                                 Map<String, Object> encodings = annotationValueArrayToSubmap(a, PROP_NAME, context, null);
                                 newValues.put(key, encodings);
-                            } else if (Content.class.getName().equals(annotationName)) {
+                            } else if (Content.class.getName().equals(annName)) {
                                 Map<String, Object> mediaTypes = annotationValueArrayToSubmap(a, PROP_MEDIA_TYPE, context, jsonViewClass);
                                 newValues.put(key, mediaTypes);
-                            } else if (Link.class.getName().equals(annotationName) || Header.class.getName().equals(annotationName)) {
+                            } else if (Link.class.getName().equals(annName) || Header.class.getName().equals(annName)) {
                                 Map<String, Object> linksOrHeaders = annotationValueArrayToSubmap(a, PROP_NAME, context, jsonViewClass);
                                 var newLinksOrHeaders = new HashMap<String, Object>(linksOrHeaders.size());
                                 for (var linkOrHeaderEntry : linksOrHeaders.entrySet()) {
@@ -1305,18 +1295,18 @@ public final class SchemaDefinitionUtils {
                                     newLinksOrHeaders.put(linkOrHeaderEntry.getKey(), linkOrHeaderEntry.getValue());
                                 }
                                 newValues.put(key, newLinksOrHeaders);
-                            } else if (LinkParameter.class.getName().equals(annotationName)) {
+                            } else if (LinkParameter.class.getName().equals(annName)) {
                                 Map<String, String> params = toTupleSubMap(a, PROP_NAME, PROP_EXPRESSION);
                                 newValues.put(key, params);
-                            } else if (OAuthScope.class.getName().equals(annotationName)) {
+                            } else if (OAuthScope.class.getName().equals(annName)) {
                                 Map<String, String> params = toTupleSubMap(a, PROP_NAME, PROP_DESCRIPTION);
                                 newValues.put(key, params);
-                            } else if (ApiResponse.class.getName().equals(annotationName)) {
+                            } else if (ApiResponse.class.getName().equals(annName)) {
                                 var responses = new LinkedHashMap<String, Map<CharSequence, Object>>();
                                 for (Object o : a) {
                                     var sv = (AnnotationValue<ApiResponse>) o;
                                     String name = sv.stringValue(PROP_RESPONSE_CODE).orElse(PROP_DEFAULT);
-                                    Map<CharSequence, Object> map = toValueMap(sv.getValues(), context, jsonViewClass);
+                                    Map<CharSequence, Object> map = toValueMap(sv.getAnnotationName(), sv.getValues(), context, jsonViewClass);
                                     if (map.containsKey(PROP_REF)) {
                                         Object ref = map.get(PROP_REF);
                                         map.clear();
@@ -1334,12 +1324,12 @@ public final class SchemaDefinitionUtils {
                                     responses.put(name, map);
                                 }
                                 newValues.put(key, responses);
-                            } else if (ExampleObject.class.getName().equals(annotationName)) {
+                            } else if (ExampleObject.class.getName().equals(annName)) {
                                 var examples = new LinkedHashMap<String, Map<CharSequence, Object>>();
                                 for (Object o : a) {
                                     var sv = (AnnotationValue<ExampleObject>) o;
                                     String name = sv.stringValue(PROP_NAME).orElse(PROP_EXAMPLE);
-                                    Map<CharSequence, Object> map = toValueMap(sv.getValues(), context, null);
+                                    Map<CharSequence, Object> map = toValueMap(sv.getAnnotationName(), sv.getValues(), context, null);
                                     if (map.containsKey(PROP_REF)) {
                                         Object ref = map.get(PROP_REF);
                                         map.clear();
@@ -1348,21 +1338,21 @@ public final class SchemaDefinitionUtils {
                                     examples.put(name, map);
                                 }
                                 newValues.put(key, examples);
-                            } else if (Server.class.getName().equals(annotationName)) {
+                            } else if (Server.class.getName().equals(annName)) {
                                 var servers = new ArrayList<Map<CharSequence, Object>>();
                                 for (Object o : a) {
                                     var sv = (AnnotationValue<ServerVariable>) o;
-                                    var variables = new LinkedHashMap<>(toValueMap(sv.getValues(), context, null));
+                                    var variables = new LinkedHashMap<>(toValueMap(sv.getAnnotationName(), sv.getValues(), context, null));
                                     servers.add(variables);
                                 }
                                 newValues.put(key, servers);
-                            } else if (ServerVariable.class.getName().equals(annotationName)) {
+                            } else if (ServerVariable.class.getName().equals(annName)) {
                                 var variables = new LinkedHashMap<String, Map<CharSequence, Object>>();
                                 for (Object o : a) {
                                     var sv = (AnnotationValue<ServerVariable>) o;
                                     sv.stringValue(PROP_NAME)
                                         .ifPresent(name -> {
-                                            Map<CharSequence, Object> map = toValueMap(sv.getValues(), context, null);
+                                            Map<CharSequence, Object> map = toValueMap(sv.getAnnotationName(), sv.getValues(), context, null);
                                             Object dv = map.get(PROP_DEFAULT_VALUE);
                                             if (dv != null) {
                                                 map.put(PROP_DEFAULT, dv);
@@ -1375,7 +1365,7 @@ public final class SchemaDefinitionUtils {
                                         });
                                 }
                                 newValues.put(key, variables);
-                            } else if (DiscriminatorMapping.class.getName().equals(annotationName)) {
+                            } else if (DiscriminatorMapping.class.getName().equals(annName)) {
                                 var extensions = new HashMap<String, Object>();
                                 var mappings = new HashMap<String, String>();
                                 for (Object o : a) {
@@ -1397,7 +1387,7 @@ public final class SchemaDefinitionUtils {
                                 if (a.length == 1) {
                                     var av = (AnnotationValue<?>) a[0];
                                     final Map<CharSequence, Object> valueMap = resolveAnnotationValues(context, av, jsonViewClass);
-                                    newValues.put(key, toValueMap(valueMap, context, jsonViewClass));
+                                    newValues.put(key, toValueMap(av.getAnnotationName(), valueMap, context, jsonViewClass));
                                 } else {
 
                                     var list = new ArrayList<>();
@@ -1475,6 +1465,18 @@ public final class SchemaDefinitionUtils {
                     }
                 } else if (key.equals(PROP_REF)) {
                     newValues.put(PROP_REF_DOLLAR, value);
+                } else if (key.equals(PROP_TYPE) && io.swagger.v3.oas.annotations.media.Schema.class.getName().equals(annotationName)) {
+                    var primitiveType = PrimitiveType.fromName(value.toString());
+                    if (primitiveType == null) {
+                        warn("Unknown schema type " + value + ". Skip it and try to resolve type by code", context);
+                        newValues.remove(PROP_TYPE);
+                    } else {
+                        newValues.put(PROP_TYPE, value);
+                    }
+                } else if (key.equals(PROP_REQUIRED) && io.swagger.v3.oas.annotations.media.Schema.class.getName().equals(annotationName)) {
+                    newValues.remove(PROP_REQUIRED);
+                } else if (key.equals(PROP_REQUIRED_MODE) && io.swagger.v3.oas.annotations.media.Schema.class.getName().equals(annotationName)) {
+                    newValues.remove(PROP_REQUIRED_MODE);
                 } else if (key.equals(PROP_ACCESS_MODE)) {
                     if (io.swagger.v3.oas.annotations.media.Schema.AccessMode.READ_ONLY.toString().equals(value)) {
                         newValues.put(PROP_READ_ONLY, Boolean.TRUE);
@@ -1569,8 +1571,10 @@ public final class SchemaDefinitionUtils {
             typeAndFormat = ConvertUtils.getTypeAndFormatByClass(classEl.getName(), classEl.isArray(), classEl);
         }
 
-        JsonNode schemaJson = toJson(schemaAnn.getValues(), context, jsonViewClass);
-        return doBindSchemaAnnotationValue(context, element, schemaToBind, schemaJson,
+        Map<CharSequence, Object> annValues = toValueMap(schemaAnn.getAnnotationName(), schemaAnn.getValues(), context, jsonViewClass);
+        JsonNode schemaJson = SchemaDefinitionUtils.toJson(annValues);
+        processSchemaAnn(schemaToBind, context, element, classEl, schemaAnn);
+        return doBindSchemaAnnotationValue(context, element, schemaToBind, annValues, schemaJson,
             schemaAnn.stringValue(PROP_TYPE).orElse(typeAndFormat.getFirst()),
             schemaAnn.stringValue(PROP_ONE_FORMAT).orElse(typeAndFormat.getSecond()),
             schemaAnn, jsonViewClass);
@@ -1580,14 +1584,15 @@ public final class SchemaDefinitionUtils {
      * Convert the given Map to a JSON node and then to the specified type.
      *
      * @param <T> The output class type
+     * @param annotationName annotation name
      * @param values The values
      * @param context The visitor context
      * @param type The class
      * @param jsonViewClass Class from JsonView annotation
      * @return The converted instance
      */
-    public static <T> T toValue(Map<CharSequence, Object> values, VisitorContext context, Class<T> type, @Nullable ClassElement jsonViewClass) {
-        JsonNode node = toJson(values, context, jsonViewClass);
+    public static <T> T toValue(String annotationName, Map<CharSequence, Object> values, VisitorContext context, Class<T> type, @Nullable ClassElement jsonViewClass) {
+        JsonNode node = toJson(annotationName, values, context, jsonViewClass);
         try {
             return ConvertUtils.treeToValue(node, type, context);
         } catch (JsonProcessingException e) {
@@ -1599,14 +1604,19 @@ public final class SchemaDefinitionUtils {
     /**
      * Convert the given map to a JSON node.
      *
+     * @param annotationName annotation name
      * @param values The values
      * @param context The visitor context
      * @param jsonViewClass Class from JsonView annotation
      * @return The node
      */
-    public static JsonNode toJson(Map<CharSequence, Object> values, VisitorContext context, @Nullable ClassElement jsonViewClass) {
-        Map<CharSequence, Object> newValues = toValueMap(values, context, jsonViewClass);
+    public static JsonNode toJson(String annotationName, Map<CharSequence, Object> values, VisitorContext context, @Nullable ClassElement jsonViewClass) {
+        Map<CharSequence, Object> newValues = toValueMap(annotationName, values, context, jsonViewClass);
         return Utils.getJsonMapper().valueToTree(newValues);
+    }
+
+    public static JsonNode toJson(Map<CharSequence, Object> values) {
+        return Utils.getJsonMapper().valueToTree(values);
     }
 
     /**
@@ -1794,10 +1804,6 @@ public final class SchemaDefinitionUtils {
                     || parentInterface.getBeanProperties().isEmpty()) {
                     continue;
                 }
-//                if (isJavaUtilType(parentInterface)) {
-//                    componentType = parentInterface.getFirstTypeArgument().orElse(null);
-//                    continue;
-//                }
                 superTypes.add(parentInterface);
             }
         } else {
@@ -1992,22 +1998,33 @@ public final class SchemaDefinitionUtils {
         }
 
         if (annValues.containsKey(PROP_ARRAY_SCHEMA)) {
-            processSchemaAnn(schemaToBind, context, element, classEl, (AnnotationValue<io.swagger.v3.oas.annotations.media.Schema>) annValues.get(PROP_ARRAY_SCHEMA));
+            processSchemaAnn(schemaToBind, context, element, true, classEl, (AnnotationValue<io.swagger.v3.oas.annotations.media.Schema>) annValues.get(PROP_ARRAY_SCHEMA));
         }
 
+        AnnotationValue<io.swagger.v3.oas.annotations.media.Schema> itemsSchemaAnn = null;
         if (annValues.containsKey(PROP_ITEMS)) {
-            var itemsSchema = schemaToBind.getItems() != null ? schemaToBind.getItems() : setSpecVersion(new Schema());
-            processSchemaAnn(itemsSchema, context, element,
-                classEl != null ? classEl.getFirstTypeArgument().orElse(null) : null,
-                (AnnotationValue<io.swagger.v3.oas.annotations.media.Schema>) annValues.get(PROP_ITEMS));
-            schemaToBind.setItems(itemsSchema);
+            itemsSchemaAnn = (AnnotationValue<io.swagger.v3.oas.annotations.media.Schema>) annValues.get(PROP_ITEMS);
         }
         if (annValues.containsKey(PROP_SCHEMA)) {
-            var itemsSchema = schemaToBind.getItems() != null ? schemaToBind.getItems() : setSpecVersion(new Schema<>());
-            processSchemaAnn(itemsSchema, context, element,
+            itemsSchemaAnn = (AnnotationValue<io.swagger.v3.oas.annotations.media.Schema>) annValues.get(PROP_SCHEMA);
+        }
+        if (itemsSchemaAnn != null) {
+            var itemsSchemaFromAnn = setSpecVersion(new Schema<>());
+            processSchemaAnn(itemsSchemaFromAnn, context, element, true,
                 classEl != null ? classEl.getFirstTypeArgument().orElse(null) : null,
-                (AnnotationValue<io.swagger.v3.oas.annotations.media.Schema>) annValues.get(PROP_SCHEMA));
-            schemaToBind.setItems(itemsSchema);
+                itemsSchemaAnn);
+            if (!SchemaUtils.isEmptySchema(itemsSchemaFromAnn)) {
+                var itemsSchema = schemaToBind.getItems();
+                if (itemsSchemaFromAnn.get$ref() != null || itemsSchema.get$ref() != null) {
+                    var allOf = new ComposedSchema();
+                    allOf.addAllOfItem(itemsSchema);
+                    allOf.addAllOfItem(itemsSchemaFromAnn);
+                    schemaToBind.setItems(allOf);
+                } else {
+                    SchemaUtils.appendSchema(itemsSchemaFromAnn, itemsSchema);
+                    schemaToBind.setItems(itemsSchemaFromAnn);
+                }
+            }
         }
 
         if (isOpenapi31()) {
@@ -2015,7 +2032,7 @@ public final class SchemaDefinitionUtils {
             if (annValues.containsKey(PROP_CONTAINS)) {
 
                 var containsSchema = schemaToBind.getUnevaluatedItems() != null ? schemaToBind.getUnevaluatedItems() : setSpecVersion(new Schema<>());
-                processSchemaAnn(containsSchema, context, element, classEl, (AnnotationValue<io.swagger.v3.oas.annotations.media.Schema>) annValues.get(PROP_CONTAINS));
+                processSchemaAnn(containsSchema, context, element, true, classEl, (AnnotationValue<io.swagger.v3.oas.annotations.media.Schema>) annValues.get(PROP_CONTAINS));
                 schemaToBind.setContains(containsSchema);
 
                 if (annValues.containsKey(PROP_MIN_CONTAINS)) {
@@ -2027,7 +2044,7 @@ public final class SchemaDefinitionUtils {
             }
             if (annValues.containsKey(PROP_UNEVALUATED_ITEMS)) {
                 var unevaluatedSchema = schemaToBind.getUnevaluatedItems() != null ? schemaToBind.getUnevaluatedItems() : setSpecVersion(new Schema<>());
-                processSchemaAnn(unevaluatedSchema, context, element, classEl, (AnnotationValue<io.swagger.v3.oas.annotations.media.Schema>) annValues.get(PROP_UNEVALUATED_ITEMS));
+                processSchemaAnn(unevaluatedSchema, context, element, true, classEl, (AnnotationValue<io.swagger.v3.oas.annotations.media.Schema>) annValues.get(PROP_UNEVALUATED_ITEMS));
                 schemaToBind.setUnevaluatedItems(unevaluatedSchema);
             }
             if (annValues.containsKey(PROP_PREFIX_ITEMS)) {
@@ -2038,6 +2055,13 @@ public final class SchemaDefinitionUtils {
     }
 
     private static void processSchemaAnn(Schema schemaToBind, VisitorContext context, Element element,
+                                         @Nullable ClassElement classEl,
+                                         @Nullable AnnotationValue<io.swagger.v3.oas.annotations.media.Schema> schemaAnn) {
+        processSchemaAnn(schemaToBind, context, element, false, classEl, schemaAnn);
+    }
+
+    private static void processSchemaAnn(Schema schemaToBind, VisitorContext context, Element element,
+                                         boolean isArraySchema,
                                          @Nullable ClassElement classEl,
                                          @Nullable AnnotationValue<io.swagger.v3.oas.annotations.media.Schema> schemaAnn) {
 
@@ -2106,10 +2130,8 @@ public final class SchemaDefinitionUtils {
             schemaToBind.setFormat(format);
         }
         if (annValues.containsKey(PROP_NULLABLE)) {
-            if ((Boolean) annValues.get(PROP_NULLABLE)) {
-                SchemaUtils.setNullable(schemaToBind);
-            } else {
-                schemaToBind.setNullable(false);
+            if (!(element instanceof MemberElement) || isArraySchema) {
+                SchemaUtils.setNullable((Boolean) annValues.get(PROP_NULLABLE), schemaToBind);
             }
         }
         var accessModeStr = (String) annValues.get(PROP_ACCESS_MODE);
@@ -2131,7 +2153,7 @@ public final class SchemaDefinitionUtils {
         var schemaExtDocs = (AnnotationValue<io.swagger.v3.oas.annotations.ExternalDocumentation>) annValues.get(PROP_EXTERNAL_DOCS);
         ExternalDocumentation externalDocs = null;
         if (schemaExtDocs != null) {
-            externalDocs = toValue(schemaExtDocs.getValues(), context, ExternalDocumentation.class, null);
+            externalDocs = toValue(schemaExtDocs.getAnnotationName(), schemaExtDocs.getValues(), context, ExternalDocumentation.class, null);
         }
         if (externalDocs != null) {
             schemaToBind.setExternalDocs(externalDocs);
@@ -2143,7 +2165,12 @@ public final class SchemaDefinitionUtils {
         String type = null;
         if (annValues.containsKey(PROP_TYPE)) {
             type = (String) annValues.get(PROP_TYPE);
-            schemaToBind.setType(type);
+            var primitiveType = PrimitiveType.fromName(type);
+            if (primitiveType == null) {
+                warn("Unknown schema type " + type + ". Skip it and try to resolve type by code", context);
+            } else {
+                schemaToBind.setType(type);
+            }
         }
 
         Pair<String, String> typeAndFormat = null;
@@ -2355,13 +2382,13 @@ public final class SchemaDefinitionUtils {
     private static Map<String, Object> annotationValueArrayToSubmap(Object[] a, String classifier, VisitorContext context, @Nullable ClassElement jsonViewClass) {
         var mediaTypes = new LinkedHashMap<String, Object>();
         for (Object o : a) {
-            AnnotationValue<?> sv = (AnnotationValue<?>) o;
+            var sv = (AnnotationValue<?>) o;
             String name = sv.stringValue(classifier).orElse(null);
             if (name == null && classifier.equals(PROP_MEDIA_TYPE)) {
                 name = MediaType.APPLICATION_JSON;
             }
             if (name != null) {
-                Map<CharSequence, Object> map = toValueMap(sv.getValues(), context, jsonViewClass);
+                Map<CharSequence, Object> map = toValueMap(sv.getAnnotationName(), sv.getValues(), context, jsonViewClass);
                 mediaTypes.put(name, map);
             }
         }
@@ -2844,7 +2871,7 @@ public final class SchemaDefinitionUtils {
     }
 
     private static Schema<?> doBindSchemaAnnotationValue(VisitorContext context, TypedElement element, Schema schemaToBind,
-                                                         JsonNode schemaJson, String elType, String elFormat,
+                                                         Map<CharSequence, Object> annValues, JsonNode schemaJson, String elType, String elFormat,
                                                          AnnotationValue<io.swagger.v3.oas.annotations.media.Schema> schemaAnn,
                                                          @Nullable ClassElement jsonViewClass) {
 
@@ -2877,10 +2904,8 @@ public final class SchemaDefinitionUtils {
         if (schemaAnn != null) {
             defaultValue = schemaAnn.stringValue(PROP_DEFAULT_VALUE).orElse(null);
             allowableValues = schemaAnn.stringValues(PROP_ALLOWABLE_VALUES);
-            Map<CharSequence, Object> annValues = schemaAnn.getValues();
-            Map<CharSequence, Object> valueMap = toValueMap(annValues, context, jsonViewClass);
-            bindSchemaIfNecessary(context, schemaAnn, valueMap, jsonViewClass);
-            processClassValues(schemaToBind, annValues, Collections.emptyList(), context, jsonViewClass);
+            bindSchemaIfNecessary(context, schemaAnn, annValues, jsonViewClass);
+            processClassValues(schemaToBind, schemaAnn.getValues(), Collections.emptyList(), context, jsonViewClass);
         }
 
         if (elType == null && element != null) {
@@ -3214,14 +3239,14 @@ public final class SchemaDefinitionUtils {
             }
         }
 
-        var s = toValue(values, context, type, jsonViewClass);
+        var s = toValue(annotationValue.getAnnotationName(), values, context, type, jsonViewClass);
         if (s != null) {
             schemaToValueMap(arraySchemaMap, s);
         }
     }
 
     private static Map<CharSequence, Object> resolveAnnotationValues(VisitorContext context, AnnotationValue<?> av, @Nullable ClassElement jsonViewClass) {
-        final Map<CharSequence, Object> valueMap = toValueMap(av.getValues(), context, jsonViewClass);
+        final Map<CharSequence, Object> valueMap = toValueMap(av.getAnnotationName(), av.getValues(), context, jsonViewClass);
         bindSchemaIfNecessary(context, av, valueMap, jsonViewClass);
         final String annotationName = av.getAnnotationName();
         if (Parameter.class.getName().equals(annotationName)) {

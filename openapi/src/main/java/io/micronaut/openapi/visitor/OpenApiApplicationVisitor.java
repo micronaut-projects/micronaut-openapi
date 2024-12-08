@@ -265,7 +265,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             return openApi;
         }
 
-        var openApi = toValue(openApiDefAnn.getValues(), context, OpenAPI.class, null);
+        var openApi = toValue(openApiDefAnn.getAnnotationName(), openApiDefAnn.getValues(), context, OpenAPI.class, null);
         if (openApi == null) {
             openApi = new OpenAPI();
         }
