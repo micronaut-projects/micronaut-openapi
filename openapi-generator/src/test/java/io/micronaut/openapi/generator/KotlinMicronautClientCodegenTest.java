@@ -647,7 +647,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         assertFileContains(path + "api/DefaultApi.kt",
             "@QueryValue(\"ids\") @Nullable ids: List<@NotNull Int>? = null,",
             "@Header(\"X-Favor-Token\") @Nullable xFavorToken: String? = null,",
-            "@PathVariable(name = \"apiVersion\", defaultValue = \"v5\") @Nullable apiVersion: BrowseSearchOrdersApiVersionParameter? = BrowseSearchOrdersApiVersionParameter.V5,",
+            "@PathVariable(name = \"apiVersion\", defaultValue = \"v5\") @NotNull apiVersion: BrowseSearchOrdersApiVersionParameter = BrowseSearchOrdersApiVersionParameter.V5,",
             "@Header(name = \"Content-Type\", defaultValue = \"application/json\") @Nullable contentType: String? = \"application/json\"",
             "@QueryValue(\"algorithm\") @Nullable algorithm: BrowseSearchOrdersAlgorithmParameter? = null"
         );
@@ -1446,5 +1446,26 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                 override fun hashCode(): Int =
                     Objects.hash(super.hashCode())
             """);
+    }
+
+    @Test
+    void testOptionalQueryValues() {
+
+        var codegen = new KotlinMicronautClientCodegen();
+        codegen.setGenerateSwaggerAnnotations(false);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/optional-controller-values.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String path = outputPath + "src/main/kotlin/org/openapitools/";
+
+        assertFileContains(path + "api/DefaultApi.kt",
+            """
+                        @Post("/sendPrimitives/{name}")
+                        fun sendPrimitives(
+                            @PathVariable("name") @NotNull name: String,
+                            @QueryValue("brand") @Nullable brand: String? = null,
+                            @CookieValue("coc") @Nullable coc: String? = null,
+                            @Header("head") @Nullable head: String? = null,
+                            @Body @Nullable body: String? = null,
+                        ): Mono<String>
+                     """);
     }
 }

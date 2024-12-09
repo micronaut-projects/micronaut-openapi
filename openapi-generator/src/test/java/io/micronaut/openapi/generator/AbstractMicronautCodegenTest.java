@@ -46,8 +46,7 @@ public abstract class AbstractMicronautCodegenTest {
             .withOutputDirectory(output)
             .withOutputs(Arrays.stream(filesToGenerate)
                 .map(MicronautCodeGeneratorEntryPoint.OutputKind::of)
-                .toList()
-                .toArray(new MicronautCodeGeneratorEntryPoint.OutputKind[0])
+                .toArray(MicronautCodeGeneratorEntryPoint.OutputKind[]::new)
             )
             .build()
             .generate();

@@ -1,0 +1,38 @@
+openapi: "3.0.0"
+info:
+  version: 1.0.0
+  title: Compute API
+  description: API for the Compute Service
+paths:
+  /sendPrimitives/{name}:
+    post:
+      operationId: sendPrimitives
+      parameters:
+        - in: query
+          name: brand
+          schema:
+            type: string
+        - in: path
+          name: name
+          schema:
+            type: string
+        - in: cookie
+          name: coc
+          schema:
+            type: string
+        - in: header
+          name: head
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: string
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: string

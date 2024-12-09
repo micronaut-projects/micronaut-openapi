@@ -544,7 +544,12 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
         );
         String path = outputPath + "src/main/kotlin/org/openapitools/";
 
-        assertFileContains(path + "controller/ParametersController.kt", "override fun callInterface(name: Class, `data`: String): Mono<Void>");
+        assertFileContains(path + "controller/ParametersController.kt", """
+            override fun callInterface(
+                name: Class,
+                `data`: String,
+            ): Mono<Void> {
+        """);
         assertFileContains(path + "api/ParametersApi.kt", "fun callInterface(",
             "@QueryValue(\"name\") @NotNull @Valid name: Class,",
             "@QueryValue(\"data\") @NotNull `data`: String",
@@ -565,7 +570,7 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
 
         assertFileContains(path + "api/WeatherForecastApisApi.kt", "@Get(\"/v1/forecast/{id}\")",
             "@PathVariable(\"id\") @NotNull id: String,",
-            "@QueryValue(\"hourly\") @Nullable hourly: List<V1ForecastIdGetHourlyParameterInner>?,");
+            "@QueryValue(\"hourly\") @Nullable hourly: List<V1ForecastIdGetHourlyParameterInner>? = null,");
 
         assertFileContains(path + "model/V1ForecastIdGetHourlyParameterInner.kt",
             "enum class V1ForecastIdGetHourlyParameterInner(",
@@ -653,8 +658,8 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                 fun profilePasswordPost(
                     @Header("WCToken") @NotNull wcToken: String,
                     @Header("WCTrustedToken") @NotNull wcTrustedToken: String,
-                    @Part("name") @Nullable name: String?,
-                    @Part("file") @Nullable file: CompletedFileUpload?,
+                    @Part("name") @Nullable name: String? = null,
+                    @Part("file") @Nullable file: CompletedFileUpload? = null,
                 ): Mono<SuccessResetPassword>
             """);
     }
@@ -671,7 +676,7 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                     @Consumes("application/json", "application/xml")
                     @Secured(SecurityRule.IS_ANONYMOUS)
                     fun myOp(
-                        @Body @Nullable @Valid coordinates: Coordinates?,
+                        @Body @Nullable @Valid coordinates: Coordinates? = null,
                     ): Mono<HttpResponse<Void>>
                 """,
             """
@@ -679,8 +684,8 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                     @Consumes("multipart/form-data")
                     @Secured(SecurityRule.IS_ANONYMOUS)
                     fun myOp_1(
-                        @Nullable @Valid coordinates: Coordinates?,
-                        @Nullable file: CompletedFileUpload?,
+                        @Nullable @Valid coordinates: Coordinates? = null,
+                        @Nullable file: CompletedFileUpload? = null,
                     ): Mono<HttpResponse<Void>>
                 """,
             """
@@ -688,7 +693,7 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                     @Consumes("application/yaml", "text/json")
                     @Secured(SecurityRule.IS_ANONYMOUS)
                     fun myOp_2(
-                        @Body @Nullable @Valid mySchema: MySchema?,
+                        @Body @Nullable @Valid mySchema: MySchema? = null,
                     ): Mono<HttpResponse<Void>>
                 """);
     }
@@ -835,46 +840,30 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                     @Produces("application/json", "application/xml")
                     @Secured("write:pets", "read:pets")
                     fun findPetsByStatus(
-                        @QueryValue("status") @Nullable status: List<@NotNull String>?,
+                        @QueryValue("status") @Nullable status: List<@NotNull String>? = null,
                     ): Mono<List<Pet>>
                 """);
     }
 
     @Test
-    void testKspMode() {
+    void testOptionalQueryValues() {
 
         var codegen = new KotlinMicronautServerCodegen();
-        codegen.setKsp(true);
         codegen.setGenerateSwaggerAnnotations(false);
-        String outputPath = generateFiles(codegen, "src/test/resources/3_0/spec.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/optional-controller-values.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
         String path = outputPath + "src/main/kotlin/org/openapitools/";
 
-//        assertFileContains(path + "api/PetApi.kt",
-//            """
-//                    @Operation(
-//                        operationId = "findPetsByStatus",
-//                        summary = "Finds Pets by status",
-//                        description = "Multiple status values can be provided with comma separated strings",
-//                        responses = [
-//                            ApiResponse(responseCode = "200", description = "successful operation", content = [
-//                                Content(mediaType = "application/json", array = ArraySchema(schema = Schema(implementation = Pet::class))),
-//                                Content(mediaType = "application/xml", array = ArraySchema(schema = Schema(implementation = Pet::class))),
-//                            ]),
-//                            ApiResponse(responseCode = "400", description = "Invalid status value"),
-//                        ],
-//                        parameters = [
-//                            Parameter(name = "status", description = "Status values that need to be considered for filter", `in` = ParameterIn.QUERY),
-//                        ],
-//                        security = [
-//                            SecurityRequirement(name = "petstore_auth", scopes = ["write:pets", "read:pets"]),
-//                        ],
-//                    )
-//                    @Get("/pet/findByStatus")
-//                    @Produces("application/json", "application/xml")
-//                    @Secured("write:pets", "read:pets")
-//                    fun findPetsByStatus(
-//                        @QueryValue("status") @Nullable status: List<@NotNull String>?,
-//                    ): Mono<List<Pet>>
-//                """);
+        assertFileContains(path + "api/DefaultApi.kt",
+            """
+                        @Post("/sendPrimitives/{name}")
+                        @Secured(SecurityRule.IS_ANONYMOUS)
+                        fun sendPrimitives(
+                            @PathVariable("name") @NotNull name: String,
+                            @QueryValue("brand") @Nullable brand: String? = null,
+                            @CookieValue("coc") @Nullable coc: String? = null,
+                            @Header("head") @Nullable head: String? = null,
+                            @Body @Nullable body: String? = null,
+                        ): Mono<String>
+                    """);
     }
 }

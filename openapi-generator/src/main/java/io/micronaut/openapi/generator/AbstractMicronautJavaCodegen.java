@@ -735,6 +735,11 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
     @Override
     public CodegenParameter fromParameter(Parameter p, Set<String> imports) {
         var parameter = super.fromParameter(p, imports);
+
+        if (parameter.isPathParam && !parameter.required) {
+            parameter.required = true;
+        }
+
         checkPrimitives(parameter, unaliasSchema(p.getSchema()));
         // if name is escaped
         var realName = parameter.paramName;

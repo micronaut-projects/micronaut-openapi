@@ -29,6 +29,7 @@ import io.swagger.v3.oas.models.media.MediaType;
 import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.media.StringSchema;
 import io.swagger.v3.oas.models.parameters.Parameter;
+import io.swagger.v3.oas.models.parameters.RequestBody;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.servers.Server;
 import org.apache.commons.lang3.StringUtils;
@@ -1422,8 +1423,23 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
     }
 
     @Override
+    public CodegenParameter fromRequestBody(RequestBody body, Set<String> imports, String bodyParameterName) {
+        var rqBody = super.fromRequestBody(body, imports, bodyParameterName);
+        if (!rqBody.required) {
+            rqBody.vendorExtensions.put("defaultValueInit", "null");
+        }
+
+        return rqBody;
+    }
+
+    @Override
     public CodegenParameter fromParameter(Parameter p, Set<String> imports) {
         var parameter = super.fromParameter(p, imports);
+
+        if (parameter.isPathParam && !parameter.required) {
+            parameter.required = true;
+        }
+
         checkPrimitives(parameter, unaliasSchema(p.getSchema()));
         // if name is escaped
         var realName = parameter.paramName;
@@ -1461,6 +1477,9 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
             if (enumVarName != null) {
                 defaultValueInit = parameter.dataType + "." + enumVarName;
             }
+        }
+        if (defaultValueInit == null && !parameter.required) {
+            defaultValueInit = "null";
         }
         if (defaultValueInit != null) {
             parameter.vendorExtensions.put("defaultValueInit", defaultValueInit);

@@ -18,12 +18,13 @@ import {{import}}
 {{/imports}}
 
 @Controller
-class {{controllerClassname}}: {{classname}} {
-
+class {{controllerClassname}} : {{classname}} {
 {{#operations}}
-    {{#operation}}
-    {{!the method definition}}
-    override fun {{nickname}}({{#allParams}}{{{paramName}}}: {{{vendorExtensions.typeWithGenericAnnotations}}}{{^-last}}, {{/-last}}{{/allParams}}){{#returnType}}: {{{returnType}}}{{/returnType}} {
+    {{#operation}}{{#formatNoEmptyLines}}
+    override fun {{nickname}}({{#allParams}}
+        {{{paramName}}}: {{#isEnum}}{{{vendorExtensions.typeWithEnumWithGenericAnnotations}}}{{/isEnum}}{{^isEnum}}{{{vendorExtensions.typeWithGenericAnnotations}}}{{/isEnum}}{{#vendorExtensions.defaultValueInit}} = {{{.}}}{{/vendorExtensions.defaultValueInit}},
+{{/allParams}}
+    ){{#returnType}}: {{{returnType}}}{{/returnType}} {{openbrace}}{{/formatNoEmptyLines}}
 {{>server/controllerOperationBody}}    }
     {{^-last}}
 

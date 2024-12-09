@@ -557,7 +557,7 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
 
         assertFileContains(path + "api/DefaultApi.java",
             "@QueryValue(\"ids\") @Nullable List<@NotNull Integer> ids",
-            "@PathVariable(name = \"apiVersion\", defaultValue = \"v5\") @Nullable BrowseSearchOrdersApiVersionParameter apiVersio",
+            "@PathVariable(name = \"apiVersion\", defaultValue = \"v5\") @NotNull BrowseSearchOrdersApiVersionParameter apiVersion",
             "@Header(name = \"Content-Type\", defaultValue = \"application/json\") @Nullable String contentType"
         );
     }
