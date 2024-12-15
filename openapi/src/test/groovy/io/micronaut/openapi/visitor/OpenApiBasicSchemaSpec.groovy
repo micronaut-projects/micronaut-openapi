@@ -1752,4 +1752,68 @@ public class MyBean {}
         responseSchema.oneOf
         responseSchema.oneOf.size() == 2
     }
+
+    @Issue("https://github.com/micronaut-projects/micronaut-openapi/issues/1906")
+    void "test additionalProperties map with NotEmpty"() {
+        when:
+        buildBeanDefinition("test.MyBean", '''
+package test;
+
+import io.micronaut.data.model.Page;
+import io.micronaut.data.model.Pageable;
+import io.micronaut.http.HttpResponse;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.micronaut.http.annotation.Status;
+import io.micronaut.serde.annotation.Serdeable;
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotEmpty;
+
+import java.util.Map;
+
+import static io.micronaut.http.HttpResponse.ok;
+import static io.micronaut.http.HttpStatus.OK;
+import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.NOT_REQUIRED;
+import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
+
+@Controller(MyController.BASE_ENDPOINT)
+class MyController {
+
+    public static final String BASE_ENDPOINT = "/items";
+
+    @Status(OK)
+    @Get("/search")
+    public HttpResponse<Page<MyItem>> searchItems(Pageable pageable) {
+        return ok();
+    }
+}
+
+@Serdeable
+record MyItem(
+    @Schema(description = "My 1st field", requiredMode = REQUIRED)
+    String field1,
+    @Schema(description = "An other field", requiredMode = NOT_REQUIRED)
+    Integer field2,
+    @NotEmpty
+    @Schema
+    Map<String, String> name
+) {
+}
+
+@jakarta.inject.Singleton
+public class MyBean {}
+''')
+
+        OpenAPI openAPI = Utils.testReference
+        def itemSchema = openAPI.components.schemas.MyItem
+
+        then:
+
+        itemSchema
+        itemSchema.properties.name
+        itemSchema.properties.name.additionalProperties
+        itemSchema.properties.name.additionalProperties instanceof Schema
+        itemSchema.properties.name.minProperties == 1
+        ((Schema) itemSchema.properties.name.additionalProperties).type == "string"
+    }
 }

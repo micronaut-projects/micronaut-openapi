@@ -59,8 +59,7 @@ public class ModelDeserializer extends JsonDeserializer<Schema> {
     protected boolean openapi31;
 
     @Override
-    public Schema deserialize(JsonParser jp, DeserializationContext ctxt)
-        throws IOException {
+    public Schema deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException {
         JsonNode node = jp.getCodec().readTree(jp);
 
         Schema schema = null;
