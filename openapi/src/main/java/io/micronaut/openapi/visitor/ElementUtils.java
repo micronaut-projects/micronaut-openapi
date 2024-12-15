@@ -24,12 +24,22 @@ import io.micronaut.core.annotation.AnnotationMetadata;
 import io.micronaut.core.annotation.AnnotationValue;
 import io.micronaut.core.annotation.Creator;
 import io.micronaut.core.annotation.Internal;
+import io.micronaut.core.annotation.NonNull;
 import io.micronaut.core.reflect.ClassUtils;
+import io.micronaut.core.util.StringUtils;
 import io.micronaut.http.HttpRequest;
 import io.micronaut.http.HttpResponse;
+import io.micronaut.http.annotation.Body;
+import io.micronaut.http.annotation.CookieValue;
 import io.micronaut.http.annotation.Header;
+import io.micronaut.http.annotation.Part;
+import io.micronaut.http.annotation.PathVariable;
+import io.micronaut.http.annotation.QueryValue;
 import io.micronaut.http.annotation.RequestAttribute;
+import io.micronaut.http.annotation.RequestBean;
 import io.micronaut.http.multipart.FileUpload;
+import io.micronaut.http.uri.UriMatchTemplate;
+import io.micronaut.http.uri.UriMatchVariable;
 import io.micronaut.inject.annotation.AnnotationMetadataHierarchy;
 import io.micronaut.inject.ast.ClassElement;
 import io.micronaut.inject.ast.Element;
@@ -47,15 +57,6 @@ import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.nio.ByteBuffer;
 import java.security.Principal;
-import java.time.LocalTime;
-import java.time.MonthDay;
-import java.time.OffsetDateTime;
-import java.time.OffsetTime;
-import java.time.Period;
-import java.time.Year;
-import java.time.YearMonth;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -198,6 +199,51 @@ public final class ElementUtils {
             || element.booleanValue(JsonProperty.class, "required").orElse(false);
     }
 
+    public static boolean isWrappedBodyParameter(@NonNull TypedElement parameter) {
+
+        var bodyAnn = parameter.getAnnotation(Body.class);
+        if (bodyAnn != null) {
+            var propertyName = bodyAnn.stringValue().orElse(null);
+            return StringUtils.isNotEmpty(propertyName);
+        }
+        return false;
+    }
+
+    public static boolean isExtraBodyParameter(@NonNull TypedElement parameter, boolean permitsRequestBody,
+                                               List<UriMatchTemplate> matchTemplates,
+                                               Map<String, UriMatchVariable> pathVariables,
+                                               Map<String, UriMatchVariable> queryParams) {
+
+        if (isWrappedBodyParameter(parameter)) {
+            return false;
+        }
+
+        if (pathVariables.containsKey(parameter.getName()) || queryParams.containsKey(parameter.getName())) {
+            return false;
+        }
+
+        for (var template : matchTemplates) {
+            if (template.getVariableNames().contains(parameter.getName())) {
+                return false;
+            }
+        }
+
+        if (!permitsRequestBody) {
+            return false;
+        }
+        if (isIgnoredParameter(parameter)) {
+            return false;
+        }
+
+        return !parameter.hasAnnotation(QueryValue.class)
+            && !parameter.hasAnnotation(CookieValue.class)
+            && !parameter.hasAnnotation(Header.class)
+            && !parameter.hasAnnotation(PathVariable.class)
+            && !parameter.hasAnnotation(Part.class)
+            && !parameter.hasAnnotation(RequestAttribute.class)
+            && !parameter.hasAnnotation(RequestBean.class);
+    }
+
     /**
      * Checking if the type is file.
      *
@@ -249,7 +295,11 @@ public final class ElementUtils {
         return false;
     }
 
-    public static boolean isIgnoredParameter(TypedElement parameter) {
+    public static boolean isJavaBasicType(String typeName) {
+        return ClassUtils.isJavaBasicType(typeName);
+    }
+
+    public static boolean isIgnoredParameter(@NonNull TypedElement parameter) {
 
         var schemaAnn = parameter.getAnnotation(Schema.class);
         boolean isHidden = schemaAnn != null && schemaAnn.booleanValue(PROP_HIDDEN).orElse(false);
@@ -266,20 +316,6 @@ public final class ElementUtils {
             || parameter.hasAnnotation("org.springframework.web.bind.annotation.SessionAttributes")
             || parameter.hasAnnotation("jakarta.ws.rs.core.Context")
             || isIgnoredParameterType(parameter.getType());
-    }
-
-    public static boolean isJavaBasicType(String typeName) {
-        return ClassUtils.isJavaBasicType(typeName)
-            || LocalTime.class.getName().equals(typeName)
-            || OffsetTime.class.getName().equals(typeName)
-            || OffsetDateTime.class.getName().equals(typeName)
-            || Period.class.getName().equals(typeName)
-            || YearMonth.class.getName().equals(typeName)
-            || Year.class.getName().equals(typeName)
-            || MonthDay.class.getName().equals(typeName)
-            || ZoneId.class.getName().equals(typeName)
-            || ZoneOffset.class.getName().equals(typeName)
-            ;
     }
 
     public static boolean isIgnoredParameterType(ClassElement parameterType) {

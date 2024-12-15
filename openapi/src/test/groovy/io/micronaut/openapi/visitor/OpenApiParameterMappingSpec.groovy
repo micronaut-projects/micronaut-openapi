@@ -486,26 +486,26 @@ class MyBean {}
         then:
         pathItem.post.operationId == 'test2'
         !pathItem.post.parameters
-        pathItem.post.requestBody.content['application/json'].schema
-        pathItem.post.requestBody.content['application/json'].schema.properties.size() == 1
-        pathItem.post.requestBody.content['application/json'].schema.properties['name']
+        pathItem.post.requestBody.content.'application/json'.schema
+        pathItem.post.requestBody.content.'application/json'.schema.properties.size() == 1
+        pathItem.post.requestBody.content.'application/json'.schema.properties['name']
 
         when:
-        pathItem = openAPI.paths.get("/test3")
+        pathItem = openAPI.paths."/test3"
 
         then:
         pathItem.get.operationId == 'test3'
         !pathItem.get.parameters
 
         when:
-        pathItem = openAPI.paths.get("/test4")
+        pathItem = openAPI.paths."/test4"
 
         then:
         pathItem.get.operationId == 'test4'
         !pathItem.get.parameters
 
         when:
-        pathItem = openAPI.paths.get("/test5")
+        pathItem = openAPI.paths."/test5"
 
         then:
         pathItem.get.operationId == 'test5'
@@ -533,20 +533,22 @@ class MyBean {}
         pathItem.post.operationId == 'test7'
         !pathItem.post.parameters
         pathItem.post.requestBody.required
-        pathItem.post.requestBody.content['application/json'].schema
-        pathItem.post.requestBody.content['application/json'].schema.allOf[0].$ref == "#/components/schemas/Greeting"
-        pathItem.post.requestBody.content['application/json'].schema.allOf[1].properties.size() == 3
-        pathItem.post.requestBody.content['application/json'].schema.allOf[1].properties['someId']
-        pathItem.post.requestBody.content['application/json'].schema.allOf[1].properties['someId'].nullable == null
-        pathItem.post.requestBody.content['application/json'].schema.allOf[1].properties['someNotRequired']
-        pathItem.post.requestBody.content['application/json'].schema.allOf[1].properties['someNotRequired'].nullable == true
-        pathItem.post.requestBody.content['application/json'].schema.allOf[1].properties['someNotRequired2']
-        pathItem.post.requestBody.content['application/json'].schema.allOf[1].properties['someNotRequired2'].nullable == true
+
+        var schema = pathItem.post.requestBody.content['application/json'].schema
+        schema
+        schema.allOf[0].$ref == "#/components/schemas/Greeting"
+        schema.allOf[1].properties.size() == 3
+        schema.allOf[1].properties.someId
+        schema.allOf[1].properties.someId.nullable == null
+        schema.allOf[1].properties.someNotRequired
+        schema.allOf[1].properties.someNotRequired.nullable == true
+        schema.allOf[1].properties.someNotRequired2
+        schema.allOf[1].properties.someNotRequired2.nullable == true
 
         when:
-        def pathItem1 = openAPI.paths.get("/test8")
-        def pathItem2 = openAPI.paths.get("/test8/{pathVar1}")
-        def pathItem3 = openAPI.paths.get("/test8/{pathVar1}/{pathVar2}")
+        def pathItem1 = openAPI.paths."/test8"
+        def pathItem2 = openAPI.paths."/test8/{pathVar1}"
+        def pathItem3 = openAPI.paths."/test8/{pathVar1}/{pathVar2}"
 
         then:
         pathItem1.get.operationId == 'test8'
@@ -1090,6 +1092,121 @@ class MyBean {}
         withoutWrapperSchema.type == 'string'
         withoutWrapperSchema.minLength == 10
         withoutWrapperSchema.maxLength == 20
+    }
+
+    void "test multiple @Body with member value"() {
+
+        given: "An API definition"
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.http.HttpResponse;
+import io.micronaut.http.annotation.Body;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Post;
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.annotation.Nullable;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
+
+@Controller
+class ParameterController {
+
+    @Post("wrapper")
+    public HttpResponse<Object> save(
+        @Body("nameAnn") @NotBlank @Size(min = 10, max = 20) String name,
+        @Nullable @Positive @Max(100) Integer age
+    ) {
+        return HttpResponse.ok();
+    }
+
+    @Post("wrapperObject")
+    public HttpResponse<Object> save2(
+        @Body("personAnn") @NotNull Person person,
+        @Nullable Pet pet,
+        @Nullable @Positive @Max(100) Integer age
+    ) {
+        return HttpResponse.ok();
+    }
+}
+
+class Person {
+
+    @Size(min = 10, max = 20)
+    public String field1;
+    @Schema(description = "this is description")
+    public String field2;
+}
+
+class Pet {
+
+    @NotBlank
+    public String type;
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+
+        then: 'the state is correct'
+        Utils.testReference != null
+
+        when:
+        OpenAPI openAPI = Utils.testReference
+        PathItem wrapperPathItem = openAPI.paths."/wrapper"
+        PathItem wrapperObjectPathItem = openAPI.paths."/wrapperObject"
+
+        then:
+        wrapperPathItem.post.operationId == 'save'
+        !wrapperPathItem.post.parameters
+        wrapperPathItem.post.requestBody
+        wrapperPathItem.post.requestBody.content
+        wrapperPathItem.post.requestBody.content."application/json"
+
+        Schema wrapperSchema = wrapperPathItem.post.requestBody.content."application/json".schema
+        wrapperSchema
+        wrapperSchema.type == 'object'
+        wrapperSchema.required
+        wrapperSchema.required[0] == 'nameAnn'
+        wrapperSchema.properties.size() == 2
+        wrapperSchema.properties.nameAnn
+        wrapperSchema.properties.nameAnn.type == 'string'
+        wrapperSchema.properties.nameAnn.minLength == 10
+        wrapperSchema.properties.nameAnn.maxLength == 20
+        wrapperSchema.properties.age.minimum == 0
+        wrapperSchema.properties.age.maximum == 100
+        wrapperSchema.properties.age.exclusiveMinimum
+        wrapperSchema.properties.age.type == "integer"
+        wrapperSchema.properties.age.format == "int32"
+        wrapperSchema.properties.age.nullable
+
+        wrapperObjectPathItem.post.operationId == 'save2'
+        !wrapperObjectPathItem.post.parameters
+        wrapperObjectPathItem.post.requestBody
+        wrapperObjectPathItem.post.requestBody.content
+        wrapperObjectPathItem.post.requestBody.content."application/json"
+
+        Schema wrapperObjectSchema = wrapperObjectPathItem.post.requestBody.content."application/json".schema
+        wrapperObjectSchema
+        wrapperObjectSchema.type == 'object'
+        wrapperObjectSchema.required
+        wrapperObjectSchema.required[0] == 'personAnn'
+        wrapperObjectSchema.properties.size() == 3
+        wrapperObjectSchema.properties.personAnn
+        wrapperObjectSchema.properties.personAnn.$ref == '#/components/schemas/Person'
+        wrapperObjectSchema.properties.pet
+        wrapperObjectSchema.properties.pet.nullable
+        wrapperObjectSchema.properties.pet.allOf[0].$ref == '#/components/schemas/Pet'
+        wrapperObjectSchema.properties.age.minimum == 0
+        wrapperObjectSchema.properties.age.maximum == 100
+        wrapperObjectSchema.properties.age.exclusiveMinimum
+        wrapperObjectSchema.properties.age.type == "integer"
+        wrapperObjectSchema.properties.age.format == "int32"
+        wrapperObjectSchema.properties.age.nullable
     }
 
     void "test @Body with multiple media types"() {

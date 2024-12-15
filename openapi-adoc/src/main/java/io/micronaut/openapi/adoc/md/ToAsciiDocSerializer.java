@@ -15,12 +15,6 @@
  */
 package io.micronaut.openapi.adoc.md;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-
 import org.pegdown.LinkRenderer;
 import org.pegdown.Printer;
 import org.pegdown.ast.AbbreviationNode;
@@ -65,7 +59,11 @@ import org.pegdown.ast.VerbatimNode;
 import org.pegdown.ast.Visitor;
 import org.pegdown.ast.WikiLinkNode;
 
-import static org.parboiled.common.Preconditions.checkArgNotNull;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 public class ToAsciiDocSerializer implements Visitor {
 
@@ -92,7 +90,9 @@ public class ToAsciiDocSerializer implements Visitor {
     public ToAsciiDocSerializer(RootNode rootNode, String source) {
         printer = new Printer();
         autoDetectLanguageType = true;
-        checkArgNotNull(rootNode, "rootNode");
+        if (rootNode == null) {
+            throw new NullPointerException("Argument '%s' must not be null".formatted("rootNode"));
+        }
         this.rootNode = rootNode;
         this.source = source;
     }
