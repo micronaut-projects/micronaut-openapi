@@ -14,8 +14,6 @@ class OpenApiSchemaFieldSpec extends AbstractOpenApiTypeElementSpec {
 
 package test;
 
-import java.util.List;
-import java.time.Instant;
 import io.micronaut.http.annotation.Body;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Post;
@@ -312,12 +310,9 @@ class MyBean {}
 
 package test;
 
-import java.util.List;
-import java.time.Instant;
 import io.micronaut.http.annotation.Body;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Post;
-import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @Controller
@@ -441,12 +436,9 @@ class MyBean {}
 
 package test;
 
-import java.util.List;
-import java.time.Instant;
 import io.micronaut.http.annotation.Body;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Post;
-import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @Controller
@@ -589,12 +581,9 @@ class MyBean {}
 
 package test;
 
-import java.util.List;
-import java.time.Instant;
 import io.micronaut.http.annotation.Body;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Post;
-import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @Controller
@@ -727,12 +716,9 @@ class MyBean {}
 
 package test;
 
-import java.util.List;
-import java.time.Instant;
 import io.micronaut.http.annotation.Body;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Post;
-import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @Controller
@@ -875,8 +861,6 @@ class MyBean {}
 
 package test;
 
-import java.time.ZoneId;
-
 import io.micronaut.http.annotation.Body;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Post;
@@ -885,6 +869,8 @@ import io.swagger.v3.oas.annotations.info.Contact;
 import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.info.License;
 import io.swagger.v3.oas.annotations.media.Schema;
+
+import java.time.ZoneId;
 
 @OpenAPIDefinition(
         info = @Info(
@@ -947,25 +933,23 @@ class MyBean {}
         buildBeanDefinition('test.MyBean', '''
 package test;
 
-import java.math.BigDecimal;
-
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import io.micronaut.core.annotation.Nullable;
 import io.micronaut.http.annotation.Body;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Put;
 import io.micronaut.serde.annotation.Serdeable;
 import io.swagger.v3.oas.annotations.media.Schema;
-
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import reactor.core.publisher.Mono;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import java.math.BigDecimal;
 
 @Controller
 class HelloController {
@@ -1196,7 +1180,8 @@ class MyBean {}
         buildBeanDefinition('test.MyBean', '''
 package test;
 
-import io.micronaut.core.annotation.Nullable;import io.micronaut.http.annotation.Body;
+import io.micronaut.core.annotation.Nullable;
+import io.micronaut.http.annotation.Body;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Post;
 import io.micronaut.http.annotation.QueryValue;
@@ -1206,6 +1191,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
+
 import java.io.Serializable;
 import java.util.List;
 
@@ -1213,7 +1199,7 @@ import java.util.List;
 class HelloController {
 
     @Post(value = "/search", consumes = "application/json", produces = "application/json")
-    @Operation(summary = "Returns List of Audit Log records based on the matching search criteria", description = "Returns list of Audit Log records matching the search critera. SLA:500", responses = {
+    @Operation(summary = "Returns List of Audit Log records based on the matching search criteria", description = "Returns list of Audit Log records matching the search criteria. SLA:500", responses = {
             @ApiResponse(responseCode = "200", description = "Successful retrieval of list of Audit Log records matching the search criteria", content = {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = AuditLogDTO.class)) }),
             @ApiResponse(responseCode = "400", description = "Invalid input provided", content = { @Content(mediaType = "application/json")}), 
@@ -1263,9 +1249,12 @@ class MyBean {}
         buildBeanDefinition('test.MyBean', '''
 package test;
 
-import com.fasterxml.jackson.annotation.JsonClassDescription;import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyDescription;import io.micronaut.http.annotation.Controller;
-import io.micronaut.http.annotation.Get;import io.swagger.v3.oas.annotations.media.Schema;
+import com.fasterxml.jackson.annotation.JsonClassDescription;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyDescription;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.io.Serializable;
 
@@ -1349,7 +1338,8 @@ class MyBean {}
 package test;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonProperty;import io.micronaut.core.annotation.Nullable;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import io.micronaut.core.annotation.Nullable;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
 import io.micronaut.http.annotation.QueryValue;
@@ -1410,8 +1400,8 @@ class MyBean {}
 package test;
 
 import io.micronaut.http.annotation.Controller;
-import io.micronaut.http.annotation.Put;import io.swagger.v3.oas.annotations.media.Schema;import jakarta.validation.constraints.Pattern;
-import java.util.List;
+import io.micronaut.http.annotation.Put;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 @Controller
 class HelloController {

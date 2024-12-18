@@ -449,10 +449,10 @@ record ReadEmailSettingsDto(
         @Schema(description = "Flag that indicates whether the email sending is active or not. If set to false, all other values are null", required = true)
         Boolean active,
 
-        @Schema(description = "Hostname or IP of the email server or null if email sending is disabled", required = true, nullable = true)
+        @Schema(description = "Hostname or IP of the email server or null if email sending is disabled", requiredMode = Schema.RequiredMode.REQUIRED, nullable = true, accessMode = Schema.AccessMode.READ_ONLY)
         String hostname,
 
-        @Schema(description = "Port of the email server or null if email sending is disabled", required = true, nullable = true)
+        @Schema(description = "Port of the email server or null if email sending is disabled", required = true, nullable = true, readOnly = true)
         Integer port,
 
         @Schema(description = "Protocol used for the connection or null if email sending is disabled", required = true, nullable = true)

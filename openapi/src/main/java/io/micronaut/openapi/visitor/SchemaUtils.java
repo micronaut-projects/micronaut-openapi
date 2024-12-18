@@ -1208,11 +1208,22 @@ public final class SchemaUtils {
     }
 
     public static Schema setNullable(Schema<?> schema) {
-        if (Utils.isOpenapi31()) {
-            schema.addType(TYPE_NULL);
-            schema.addType(schema.getType() != null ? schema.getType() : TYPE_OBJECT);
+        return setNullable(true, schema);
+    }
+
+    public static Schema setNullable(Boolean value, Schema<?> schema) {
+        if (value == null || !value) {
+            schema.setNullable(value);
+            if (Utils.isOpenapi31() && schema.getTypes() != null) {
+                schema.getTypes().removeIf(TYPE_NULL::equals);
+            }
         } else {
-            schema.setNullable(true);
+            if (Utils.isOpenapi31()) {
+                schema.addType(TYPE_NULL);
+                schema.addType(schema.getType() != null ? schema.getType() : TYPE_OBJECT);
+            } else {
+                schema.setNullable(true);
+            }
         }
         return schema;
     }

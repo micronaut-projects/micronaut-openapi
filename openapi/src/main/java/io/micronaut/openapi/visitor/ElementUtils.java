@@ -116,6 +116,14 @@ public final class ElementUtils {
     private ElementUtils() {
     }
 
+    public static boolean isJavaUtilType(ClassElement classEl) {
+        return classEl.getPackageName().startsWith("java.util");
+    }
+
+    public static boolean isJavaUtilCollectionType(ClassElement classEl) {
+        return isJavaUtilType(classEl) && (classEl.isIterable() || classEl.isArray());
+    }
+
     public static boolean isSingleResponseType(ClassElement returnType) {
         return (returnType.isAssignable("io.reactivex.Single")
             || returnType.isAssignable("io.reactivex.rxjava3.core.Single")
