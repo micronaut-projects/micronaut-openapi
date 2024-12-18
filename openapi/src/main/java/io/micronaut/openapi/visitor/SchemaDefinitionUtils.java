@@ -43,6 +43,7 @@ import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.core.util.StringUtils;
 import io.micronaut.http.HttpStatus;
 import io.micronaut.http.MediaType;
+import io.micronaut.http.annotation.Body;
 import io.micronaut.inject.ast.ClassElement;
 import io.micronaut.inject.ast.Element;
 import io.micronaut.inject.ast.ElementQuery;
@@ -1318,7 +1319,7 @@ public final class SchemaDefinitionUtils {
                                     }
 
                                     try {
-                                        if (!map.containsKey(PROP_DESCRIPTION)) {
+                                        if (!map.containsKey(PROP_DESCRIPTION) || map.get(PROP_DESCRIPTION).toString().isEmpty()) {
                                             map.put(PROP_DESCRIPTION, name.equals(PROP_DEFAULT) ? "OK response" : HttpStatus.valueOf(Integer.parseInt(name)).getReason());
                                         }
                                     } catch (Exception e) {
@@ -1492,6 +1493,8 @@ public final class SchemaDefinitionUtils {
                         newValues.remove(PROP_READ_ONLY);
                         newValues.remove(PROP_WRITE_ONLY);
                     }
+                } else if (key.equals(PROP_DESCRIPTION) && value.toString().isEmpty()) {
+                    newValues.remove(PROP_DESCRIPTION);
                 } else {
                     if (key.equals(PROP_EXAMPLE)) {
                         newValues.put(PROP_EXAMPLE_SET_FLAG, true);
@@ -1535,7 +1538,10 @@ public final class SchemaDefinitionUtils {
                 } else {
                     // For primitive type, just copy description field is present.
                     final Schema<?> items = setSpecVersion(primitiveType.createProperty());
-                    items.setDescription((String) annotationValue.stringValue(PROP_DESCRIPTION).orElse(null));
+                    var description = (String) annotationValue.stringValue(PROP_DESCRIPTION).orElse(null);
+                    if (description != null && !description.isEmpty()) {
+                        items.setDescription(description);
+                    }
                     final ArraySchema schema = SchemaUtils.arraySchema(items);
                     schemaToValueMap(arraySchemaMap, schema);
                 }
@@ -3156,6 +3162,13 @@ public final class SchemaDefinitionUtils {
 
     private static String resolvePropertyName(Element element, Element classElement, Schema<?> propertySchema) {
         String name = propertySchema.getName() != null ? propertySchema.getName() : element.getName();
+
+        if (element.isAnnotationPresent(Body.class)) {
+            var propertyName = element.stringValue(Body.class).orElse(null);
+            if (StringUtils.isNotEmpty(propertyName)) {
+                return propertyName;
+            }
+        }
 
         if (isAnnotationPresent(element, io.swagger.v3.oas.annotations.media.Schema.class)) {
             var nameFromSchema = stringValue(element, io.swagger.v3.oas.annotations.media.Schema.class, PROP_NAME).orElse(null);

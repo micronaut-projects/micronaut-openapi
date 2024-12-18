@@ -14,31 +14,24 @@ class OpenApiComplexSchemaSpec extends AbstractOpenApiTypeElementSpec {
         buildBeanDefinition('test.MyBean', '''
 package test;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import io.micronaut.core.annotation.Introspected;
+import io.micronaut.core.annotation.Nullable;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.MediaType;
 import io.micronaut.http.annotation.Body;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Post;
-import io.reactivex.Single;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-
-import io.micronaut.core.annotation.Nullable;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Min;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Represents the Pet type.
@@ -54,7 +47,8 @@ enum PetType {
 @JsonTypeInfo(include = JsonTypeInfo.As.EXISTING_PROPERTY, use = JsonTypeInfo.Id.NAME, property = "type", visible = true, defaultImpl = PetType.class)
 @JsonSubTypes({
         @JsonSubTypes.Type(value = Cat.class, name = "CAT"),
-        @JsonSubTypes.Type(value = Dog.class, name = "DOG")})
+        @JsonSubTypes.Type(value = Dog.class, name = "DOG")
+})
 @Introspected
 abstract class Pet {
 
@@ -236,20 +230,20 @@ class MyBean {}
         petSchema.type == 'object'
         petSchema.properties.size() == 3
 
-        ((ComposedSchema) catSchema).allOf.size() == 2
-        ((ComposedSchema) catSchema).allOf[0].get$ref() == "#/components/schemas/Pet"
-        ((ComposedSchema) catSchema).allOf[1].properties.size() == 1
-        ((ComposedSchema) catSchema).allOf[1].properties.get("breed") instanceof Schema
-        ((ComposedSchema) catSchema).allOf[1].properties.get("breed").get$ref() == "#/components/schemas/CatBreed"
+        catSchema.allOf.size() == 2
+        catSchema.allOf[0].$ref == "#/components/schemas/Pet"
+        catSchema.allOf[1].properties.size() == 1
+        catSchema.allOf[1].properties.breed instanceof Schema
+        catSchema.allOf[1].properties.breed.$ref == "#/components/schemas/CatBreed"
 
-        ((ComposedSchema) dogSchema).allOf.size() == 2
-        ((ComposedSchema) dogSchema).allOf[0].$ref == '#/components/schemas/Pet'
-        ((ComposedSchema) dogSchema).allOf[1].properties.size() == 1
-        ((ComposedSchema) dogSchema).allOf[1].properties.get("breed") instanceof Schema
-        ((ComposedSchema) dogSchema).allOf[1].properties.get("breed").get$ref() == "#/components/schemas/DogBreed"
+        dogSchema.allOf.size() == 2
+        dogSchema.allOf[0].$ref == '#/components/schemas/Pet'
+        dogSchema.allOf[1].properties.size() == 1
+        dogSchema.allOf[1].properties.breed instanceof Schema
+        dogSchema.allOf[1].properties.breed.$ref == "#/components/schemas/DogBreed"
 
         when:
-        Operation operation = openAPI.paths.get("/pets").post
+        Operation operation = openAPI.paths."/pets".post
 
         then:
         operation
@@ -261,8 +255,8 @@ class MyBean {}
         operation.requestBody.content."application/json".schema
         operation.requestBody.content."application/json".schema.oneOf
         operation.requestBody.content."application/json".schema.oneOf.size() == 2
-        operation.requestBody.content."application/json".schema.oneOf[0].get$ref() == "#/components/schemas/Dog"
-        operation.requestBody.content."application/json".schema.oneOf[1].get$ref() == "#/components/schemas/Cat"
+        operation.requestBody.content."application/json".schema.oneOf[0].$ref == "#/components/schemas/Dog"
+        operation.requestBody.content."application/json".schema.oneOf[1].$ref == "#/components/schemas/Cat"
 
         and:
         operation.responses
@@ -274,7 +268,7 @@ class MyBean {}
 
         operation.responses."200".content."application/json".schema.anyOf
         operation.responses."200".content."application/json".schema.anyOf.size() == 2
-        operation.responses."200".content."application/json".schema.anyOf[0].get$ref() == "#/components/schemas/Dog"
-        operation.responses."200".content."application/json".schema.anyOf[1].get$ref() == "#/components/schemas/Cat"
+        operation.responses."200".content."application/json".schema.anyOf[0].$ref == "#/components/schemas/Dog"
+        operation.responses."200".content."application/json".schema.anyOf[1].$ref == "#/components/schemas/Cat"
     }
 }

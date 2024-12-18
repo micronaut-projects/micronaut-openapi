@@ -129,12 +129,14 @@ import static io.micronaut.openapi.visitor.ContextUtils.warn;
 import static io.micronaut.openapi.visitor.ConvertUtils.MAP_TYPE;
 import static io.micronaut.openapi.visitor.ElementUtils.getJsonViewClass;
 import static io.micronaut.openapi.visitor.ElementUtils.isDeprecated;
+import static io.micronaut.openapi.visitor.ElementUtils.isExtraBodyParameter;
 import static io.micronaut.openapi.visitor.ElementUtils.isFileUpload;
 import static io.micronaut.openapi.visitor.ElementUtils.isIgnoredParameter;
 import static io.micronaut.openapi.visitor.ElementUtils.isNotNullable;
 import static io.micronaut.openapi.visitor.ElementUtils.isNullable;
 import static io.micronaut.openapi.visitor.ElementUtils.isResponseType;
 import static io.micronaut.openapi.visitor.ElementUtils.isSingleResponseType;
+import static io.micronaut.openapi.visitor.ElementUtils.isWrappedBodyParameter;
 import static io.micronaut.openapi.visitor.GeneratorUtils.addOperationDeprecatedExtension;
 import static io.micronaut.openapi.visitor.GeneratorUtils.addParameterDeprecatedExtension;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_ADD_ALWAYS;
@@ -174,6 +176,7 @@ import static io.micronaut.openapi.visitor.SchemaDefinitionUtils.toValue;
 import static io.micronaut.openapi.visitor.SchemaDefinitionUtils.toValueMap;
 import static io.micronaut.openapi.visitor.SchemaUtils.COMPONENTS_CALLBACKS_PREFIX;
 import static io.micronaut.openapi.visitor.SchemaUtils.TYPE_OBJECT;
+import static io.micronaut.openapi.visitor.SchemaUtils.appendSchema;
 import static io.micronaut.openapi.visitor.SchemaUtils.getOperationOnPathItem;
 import static io.micronaut.openapi.visitor.SchemaUtils.isIgnoredHeader;
 import static io.micronaut.openapi.visitor.SchemaUtils.processExtensions;
@@ -514,7 +517,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
 
                 var extraBodyParameters = new ArrayList<TypedElement>();
                 for (Operation operation : swaggerOperations.values()) {
-                    processParameters(element, context, openApi, operation, javadocDescription, permitsRequestBody, pathVariables, consumesMediaTypes, extraBodyParameters, httpMethod, matchTemplates, pathItems);
+                    processParameters(element, context, openApi, operation, javadocDescription, permitsRequestBody, pathVariables, queryParams, consumesMediaTypes, extraBodyParameters, httpMethod, matchTemplates, pathItems);
                     processExtraBodyParameters(context, httpMethod, openApi, operation, javadocDescription, isRequestBodySchemaSet, consumesMediaTypes, extraBodyParameters);
 
                     processMicronautVersionAndGroup(operation, pathItemEntry.getKey(), httpMethod, consumesMediaTypes, producesMediaTypes, element, context);
@@ -583,6 +586,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                                             boolean isRequestBodySchemaSet,
                                             List<MediaType> consumesMediaTypes,
                                             List<TypedElement> extraBodyParameters) {
+
         RequestBody requestBody = swaggerOperation.getRequestBody();
         if (HttpMethod.permitsRequestBody(httpMethod) && !extraBodyParameters.isEmpty()) {
             if (requestBody == null) {
@@ -655,6 +659,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                                    Operation swaggerOperation, JavadocDescription javadocDescription,
                                    boolean permitsRequestBody,
                                    Map<String, UriMatchVariable> pathVariables,
+                                   Map<String, UriMatchVariable> queryParams,
                                    List<MediaType> consumesMediaTypes,
                                    List<TypedElement> extraBodyParameters,
                                    HttpMethod httpMethod,
@@ -670,7 +675,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
 
         for (ParameterElement parameter : element.getParameters()) {
             if (!alreadyProcessedParameter(swaggerParameters, parameter)) {
-                processParameter(context, openAPI, swaggerOperation, javadocDescription, permitsRequestBody, pathVariables,
+                processParameter(context, openAPI, swaggerOperation, javadocDescription, permitsRequestBody, pathVariables, queryParams,
                     consumesMediaTypes, swaggerParameters, parameter, extraBodyParameters, httpMethod, matchTemplates, pathItems);
             }
         }
@@ -790,7 +795,10 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
 
     private void processParameter(VisitorContext context, OpenAPI openAPI,
                                   Operation swaggerOperation, JavadocDescription javadocDescription,
-                                  boolean permitsRequestBody, Map<String, UriMatchVariable> pathVariables, List<MediaType> consumesMediaTypes,
+                                  boolean permitsRequestBody,
+                                  Map<String, UriMatchVariable> pathVariables,
+                                  Map<String, UriMatchVariable> queryParams,
+                                  List<MediaType> consumesMediaTypes,
                                   List<Parameter> swaggerParameters, TypedElement parameter,
                                   List<TypedElement> extraBodyParameters,
                                   HttpMethod httpMethod,
@@ -801,75 +809,32 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         if (isIgnoredParameter(parameter)) {
             return;
         }
+        var hasSwaggerRequestBodyImpl = false;
         if (permitsRequestBody && swaggerOperation.getRequestBody() == null) {
             Pair<RequestBody, Boolean> requestBodyPair = readSwaggerRequestBody(parameter, consumesMediaTypes, context);
-            if (requestBodyPair != null && requestBodyPair.getFirst() != null) {
-                swaggerOperation.setRequestBody(requestBodyPair.getFirst());
+            if (requestBodyPair != null) {
+                if (requestBodyPair.getFirst() != null) {
+                    swaggerOperation.setRequestBody(requestBodyPair.getFirst());
+                }
+                hasSwaggerRequestBodyImpl = requestBodyPair.getSecond();
             }
         }
 
         consumesMediaTypes = CollectionUtils.isNotEmpty(consumesMediaTypes) ? consumesMediaTypes : DEFAULT_MEDIA_TYPES;
 
-        if (parameter.isAnnotationPresent(Body.class)) {
-            Operation existedOperation = null;
-            // check existed operations
-            for (PathItem pathItem : pathItems) {
-                existedOperation = getOperationOnPathItem(pathItem, httpMethod);
-                if (existedOperation != null) {
-//                    swaggerOperation = existedOperation;
-                    break;
-                }
-            }
-
-            processBody(context, openAPI, swaggerOperation, javadocDescription, permitsRequestBody,
-                consumesMediaTypes, parameter, parameterType);
-
-            RequestBody requestBody = swaggerOperation.getRequestBody();
-            if (requestBody != null && requestBody.getContent() != null) {
-                if (existedOperation != null) {
-                    for (Map.Entry<String, io.swagger.v3.oas.models.media.MediaType> entry : existedOperation.getRequestBody().getContent().entrySet()) {
-                        boolean found = false;
-                        for (MediaType mediaType : consumesMediaTypes) {
-                            if (entry.getKey().equals(mediaType.getName())) {
-                                found = true;
-                                break;
-                            }
-                        }
-                        if (!found) {
-                            continue;
-                        }
-
-                        io.swagger.v3.oas.models.media.MediaType mediaType = entry.getValue();
-
-                        Schema<?> propertySchema = bindSchemaForElement(context, parameter, parameterType, mediaType.getSchema(), null, false);
-
-                        var bodyAnn = parameter.getAnnotation(Body.class);
-
-                        String bodyAnnValue = bodyAnn != null ? bodyAnn.getValue(String.class).orElse(null) : null;
-                        if (StringUtils.isNotEmpty(bodyAnnValue)) {
-                            var wrapperSchema = setSpecVersion(new Schema<>());
-                            wrapperSchema.setType(TYPE_OBJECT);
-                            if (isNotNullable(parameter)) {
-                                wrapperSchema.addRequiredItem(bodyAnnValue);
-                            }
-                            wrapperSchema.addProperty(bodyAnnValue, propertySchema);
-                            mediaType.setSchema(wrapperSchema);
-                        }
-                    }
-                }
-            }
-
+        if (parameter.isAnnotationPresent(Body.class) && !hasSwaggerRequestBodyImpl) {
+            processBody(context, openAPI, swaggerOperation, javadocDescription, permitsRequestBody, consumesMediaTypes, parameter, parameterType);
             return;
         }
 
         if (parameter.isAnnotationPresent(RequestBean.class)) {
-            processRequestBean(context, openAPI, swaggerOperation, javadocDescription, permitsRequestBody, pathVariables,
+            processRequestBean(context, openAPI, swaggerOperation, javadocDescription, permitsRequestBody, pathVariables, queryParams,
                 consumesMediaTypes, swaggerParameters, parameter, extraBodyParameters, httpMethod, matchTemplates, pathItems);
             return;
         }
 
         Parameter newParameter = processMethodParameterAnnotation(context, swaggerOperation, permitsRequestBody,
-            pathVariables, parameter, extraBodyParameters, httpMethod, matchTemplates);
+            pathVariables, queryParams, parameter, extraBodyParameters, httpMethod, matchTemplates);
         if (newParameter == null) {
             return;
         }
@@ -967,7 +932,9 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
 
     private Parameter processMethodParameterAnnotation(VisitorContext context, Operation swaggerOperation,
                                                        boolean permitsRequestBody,
-                                                       Map<String, UriMatchVariable> pathVariables, TypedElement parameter,
+                                                       Map<String, UriMatchVariable> pathVariables,
+                                                       Map<String, UriMatchVariable> queryParams,
+                                                       TypedElement parameter,
                                                        List<TypedElement> extraBodyParameters,
                                                        HttpMethod httpMethod,
                                                        List<UriMatchTemplate> matchTemplates) {
@@ -1040,7 +1007,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             var paramIn = parameterAnn != null ? parameterAnn.stringValue(PROP_IN).orElse(null) : null;
             if (parameterAnn == null || !parameterAnn.booleanValue(PROP_HIDDEN).orElse(false)
                 && (paramIn == null || paramIn.equals(ParameterIn.DEFAULT.toString()))) {
-                if (permitsRequestBody) {
+                if (isExtraBodyParameter(parameter, permitsRequestBody, matchTemplates, pathVariables, queryParams)) {
                     extraBodyParameters.add(parameter);
                     isBodyParameter = true;
                 } else {
@@ -1213,7 +1180,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         }
         if (requestBody.getDescription() == null && javadocDescription != null) {
             CharSequence desc = javadocDescription.getParameters().get(parameter.getName());
-            if (desc != null) {
+            if (desc != null && !desc.isEmpty()) {
                 requestBody.setDescription(desc.toString());
             }
         }
@@ -1221,40 +1188,85 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             requestBody.setRequired(true);
         }
 
-        final Content content = buildContent(parameter, parameterType, consumesMediaTypes, openAPI, context, jsonViewClass);
-        if (requestBody.getContent() == null) {
+        var content = requestBody.getContent();
+        if (content == null) {
+            content = new Content();
             requestBody.setContent(content);
-        } else {
-            final Content currentContent = requestBody.getContent();
-            for (Map.Entry<String, io.swagger.v3.oas.models.media.MediaType> entry : content.entrySet()) {
-                io.swagger.v3.oas.models.media.MediaType mediaType = entry.getValue();
-                io.swagger.v3.oas.models.media.MediaType existedMediaType = currentContent.get(entry.getKey());
-                if (existedMediaType == null) {
-                    currentContent.put(entry.getKey(), mediaType);
-                    continue;
+        }
+
+        var isWrappedBodyParam = isWrappedBodyParameter(parameter);
+        var bodyAnn = parameter.getAnnotation(Body.class);
+        String wrappedSchemaPropertyName = bodyAnn != null ? bodyAnn.getValue(String.class).orElse(null) : null;
+
+        for (var mediaType : consumesMediaTypes) {
+            var mt = content.get(mediaType.toString());
+            if (mt == null) {
+                mt = new io.swagger.v3.oas.models.media.MediaType();
+                content.addMediaType(mediaType.toString(), mt);
+            }
+            if (isWrappedBodyParam && wrappedSchemaPropertyName != null) {
+
+                var wrapperSchema = mt.getSchema();
+                if (wrapperSchema == null) {
+                    wrapperSchema = setSpecVersion(new Schema<>());
+                    mt.setSchema(wrapperSchema);
                 }
-                if (existedMediaType.getSchema() == null) {
-                    existedMediaType.setSchema(mediaType.getSchema());
+                wrapperSchema.setType(TYPE_OBJECT);
+                if (isNotNullable(parameter)) {
+                    wrapperSchema.addRequiredItem(wrappedSchemaPropertyName);
                 }
-                if (existedMediaType.getEncoding() == null) {
-                    existedMediaType.setEncoding(mediaType.getEncoding());
+                processBodyParameter(context, openAPI, javadocDescription, mediaType, wrapperSchema, parameter);
+            } else {
+                var needSetSchema = true;
+                var paramSchema = resolveSchema(openAPI, parameter, parameterType, context, Collections.singletonList(mediaType), jsonViewClass, null, null, null);
+                if (mt.getSchema() != null) {
+                    if (mt.getSchema().get$ref() != null
+                        || CollectionUtils.isNotEmpty(mt.getSchema().getAnyOf())
+                        || CollectionUtils.isNotEmpty(mt.getSchema().getAllOf())
+                        || CollectionUtils.isNotEmpty(mt.getSchema().getOneOf())
+                    ) {
+                        needSetSchema = false;
+                    } else {
+                        appendSchema(paramSchema, mt.getSchema());
+                    }
                 }
-                if (existedMediaType.getExtensions() == null) {
-                    existedMediaType.setExtensions(mediaType.getExtensions());
+                if (needSetSchema) {
+                    mt.setSchema(paramSchema);
                 }
-                if (existedMediaType.getExamples() == null) {
-                    existedMediaType.setExamples(mediaType.getExamples());
-                }
-                if (existedMediaType.getExample() == null && mediaType.getExampleSetFlag()) {
-                    existedMediaType.setExample(mediaType.getExample());
-                }
+            }
+        }
+
+        for (Map.Entry<String, io.swagger.v3.oas.models.media.MediaType> entry : content.entrySet()) {
+            io.swagger.v3.oas.models.media.MediaType mediaType = entry.getValue();
+            io.swagger.v3.oas.models.media.MediaType existedMediaType = content.get(entry.getKey());
+            if (existedMediaType == null) {
+                content.put(entry.getKey(), mediaType);
+                continue;
+            }
+            if (existedMediaType.getSchema() == null) {
+                existedMediaType.setSchema(mediaType.getSchema());
+            }
+            if (existedMediaType.getEncoding() == null) {
+                existedMediaType.setEncoding(mediaType.getEncoding());
+            }
+            if (existedMediaType.getExtensions() == null) {
+                existedMediaType.setExtensions(mediaType.getExtensions());
+            }
+            if (existedMediaType.getExamples() == null) {
+                existedMediaType.setExamples(mediaType.getExamples());
+            }
+            if (existedMediaType.getExample() == null && mediaType.getExampleSetFlag()) {
+                existedMediaType.setExample(mediaType.getExample());
             }
         }
     }
 
     private void processRequestBean(VisitorContext context, OpenAPI openAPI,
                                     Operation swaggerOperation, JavadocDescription javadocDescription,
-                                    boolean permitsRequestBody, Map<String, UriMatchVariable> pathVariables, List<MediaType> consumesMediaTypes,
+                                    boolean permitsRequestBody,
+                                    Map<String, UriMatchVariable> pathVariables,
+                                    Map<String, UriMatchVariable> queryParams,
+                                    List<MediaType> consumesMediaTypes,
                                     List<Parameter> swaggerParameters, TypedElement parameter,
                                     List<TypedElement> extraBodyParameters,
                                     HttpMethod httpMethod,
@@ -1264,7 +1276,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             if (field.isStatic()) {
                 continue;
             }
-            processParameter(context, openAPI, swaggerOperation, javadocDescription, permitsRequestBody, pathVariables,
+            processParameter(context, openAPI, swaggerOperation, javadocDescription, permitsRequestBody, pathVariables, queryParams,
                 consumesMediaTypes, swaggerParameters, field, extraBodyParameters, httpMethod, matchTemplates, pathItems);
         }
     }
