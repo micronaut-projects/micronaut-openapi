@@ -123,24 +123,27 @@ public final class Utils {
                                                  boolean useBeanValidation, boolean isGenerateHardNullable, boolean isNullable,
                                                  boolean isRequired, boolean isReadonly,
                                                  boolean withNullablePostfix) {
+        String genericAnnotations = null;
         var typeWithGenericAnnotations = dataType;
         var typeWithEnumWithGenericAnnotations = dataTypeWithEnum;
         if (useBeanValidation && itemsProp != null && dataType.contains("<")) {
             if (isMap) {
-                var genericAnnotations = genericAnnotations(itemsProp, isGenerateHardNullable);
+                genericAnnotations = genericAnnotations(itemsProp, isGenerateHardNullable);
                 processGenericAnnotations(itemsProp, useBeanValidation, isGenerateHardNullable, itemsProp.isNullable, itemsProp.required, itemsProp.isReadOnly, withNullablePostfix);
                 typeWithGenericAnnotations = "Map<String, " + genericAnnotations + itemsProp.vendorExtensions.get("typeWithGenericAnnotations") + ">";
                 typeWithEnumWithGenericAnnotations = "Map<String, " + genericAnnotations + itemsProp.vendorExtensions.get("typeWithEnumWithGenericAnnotations") + ">";
             } else if (containerType != null) {
-                var genericAnnotations = genericAnnotations(itemsProp, isGenerateHardNullable);
+                genericAnnotations = genericAnnotations(itemsProp, isGenerateHardNullable);
                 processGenericAnnotations(itemsProp, useBeanValidation, isGenerateHardNullable, itemsProp.isNullable, itemsProp.required, itemsProp.isReadOnly, withNullablePostfix);
                 typeWithGenericAnnotations = containerType + "<" + genericAnnotations + itemsProp.vendorExtensions.get("typeWithGenericAnnotations") + ">";
                 typeWithEnumWithGenericAnnotations = containerType + "<" + genericAnnotations + itemsProp.vendorExtensions.get("typeWithEnumWithGenericAnnotations") + ">";
             }
         }
 
-        ext.put("typeWithGenericAnnotations", typeWithGenericAnnotations + (withNullablePostfix && (isNullable || isRequired && isReadonly) ? "?" : ""));
-        ext.put("typeWithEnumWithGenericAnnotations", typeWithEnumWithGenericAnnotations + (withNullablePostfix && (isNullable || isRequired && isReadonly) ? "?" : ""));
+        var isNullableType = withNullablePostfix && (isNullable || isRequired && isReadonly || (genericAnnotations != null && !genericAnnotations.contains("NotNull") && !isRequired));
+
+        ext.put("typeWithGenericAnnotations", typeWithGenericAnnotations + (isNullableType ? "?" : ""));
+        ext.put("typeWithEnumWithGenericAnnotations", typeWithEnumWithGenericAnnotations + (isNullableType ? "?" : ""));
     }
 
     private static String genericAnnotations(CodegenProperty prop, boolean isGenerateHardNullable) {
@@ -438,6 +441,9 @@ public final class Utils {
     }
 
     private static String normalizeExtraAnnotation(String prefix, String annotationStr) {
+        if (annotationStr.startsWith(prefix)) {
+            return annotationStr;
+        }
         return prefix + (annotationStr.startsWith("@") ? annotationStr.substring(1) : annotationStr);
     }
 

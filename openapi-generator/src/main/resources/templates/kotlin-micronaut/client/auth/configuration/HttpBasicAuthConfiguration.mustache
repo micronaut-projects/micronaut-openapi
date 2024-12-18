@@ -15,9 +15,12 @@ import {{javaxPackage}}.annotation.Generated
 {{/generatedAnnotation}}
 @EachProperty("security.basic-auth")
 data class HttpBasicAuthConfiguration(
-    @Parameter override val name: String,
-    @NonNull var username: String,
-    @NonNull var password: String
+    @Parameter
+    override val name: String,
+    @NonNull
+    var username: String,
+    @NonNull
+    var password: String,
 ) : ConfigurableAuthorization {
 
     override fun applyAuthorization(@NonNull request: MutableHttpRequest<*>) {

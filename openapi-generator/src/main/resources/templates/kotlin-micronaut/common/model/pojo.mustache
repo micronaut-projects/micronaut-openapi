@@ -45,7 +45,7 @@
 {{/vendorExtensions.x-class-extra-annotation}}
 {{/formatNoEmptyLines}}
 {{!Declare the class with extends and implements}}
-{{#nonPublicApi}}internal {{/nonPublicApi}}{{#hasChildren}}open {{/hasChildren}}{{^hasChildren}}{{#hasVars}}data {{/hasVars}}{{/hasChildren}}class {{classname}}{{#hasVars}}({{/hasVars}}
+{{#nonPublicApi}}internal {{/nonPublicApi}}{{#hasChildren}}open {{/hasChildren}}{{vendorExtensions.dataClass}}class {{classname}}{{#hasVars}}({{/hasVars}}
 {{#vendorExtensions.requiredVarsWithoutDiscriminator}}
 
     {{#formatNoEmptyLines}}
@@ -66,34 +66,9 @@
         {{/deprecated}}
     {{/description}}
     {{>common/model/field_annotations}}
-    {{#vendorExtensions.overridden}}override {{/vendorExtensions.overridden}}{{^vendorExtensions.overridden}}{{#hasChildren}}open {{/hasChildren}}{{/vendorExtensions.overridden}}var {{{name}}}: {{{vendorExtensions.typeWithEnumWithGenericAnnotations}}}{{#vendorExtensions.defaultValueInit}} = {{{.}}}{{/vendorExtensions.defaultValueInit}}{{^vendorExtensions.defaultValueInit}}{{#isNullable}} = null{{/isNullable}}{{/vendorExtensions.defaultValueInit}},
+    {{^vendorExtensions.isParentVar}}{{#vendorExtensions.overridden}}override {{/vendorExtensions.overridden}}{{^vendorExtensions.overridden}}{{#hasChildren}}open {{/hasChildren}}{{/vendorExtensions.overridden}}var {{/vendorExtensions.isParentVar}}{{{name}}}: {{{vendorExtensions.typeWithEnumWithGenericAnnotations}}}{{#vendorExtensions.defaultValueInit}} = {{{.}}}{{/vendorExtensions.defaultValueInit}}{{^vendorExtensions.defaultValueInit}}{{#isNullable}} = null{{/isNullable}}{{/vendorExtensions.defaultValueInit}},
     {{/formatNoEmptyLines}}
 {{/vendorExtensions.requiredVarsWithoutDiscriminator}}
-{{#vendorExtensions.withInheritance}}
-    {{#vendorExtensions.optionalVars}}
-
-        {{#formatNoEmptyLines}}
-        {{#description}}
-    /**
-     * {{description}}
-    {{#deprecated}}
-     *
-     * @deprecated{{#vendorExtensions.x-deprecated-message}} {{{.}}}{{/vendorExtensions.x-deprecated-message}}
-    {{/deprecated}}
-     */
-        {{/description}}
-        {{^description}}
-            {{#deprecated}}
-    /**
-     * @deprecated{{#vendorExtensions.x-deprecated-message}} {{{.}}}{{/vendorExtensions.x-deprecated-message}}
-     */
-            {{/deprecated}}
-        {{/description}}
-    {{>common/model/field_annotations}}
-    {{#vendorExtensions.overridden}}override {{/vendorExtensions.overridden}}{{^vendorExtensions.overridden}}{{#vendorExtensions.hasChildren}}open {{/vendorExtensions.hasChildren}}{{/vendorExtensions.overridden}}var {{{name}}}: {{{vendorExtensions.typeWithEnumWithGenericAnnotations}}} = {{#vendorExtensions.defaultValueInit}}{{{.}}}{{/vendorExtensions.defaultValueInit}}{{^vendorExtensions.defaultValueInit}}null{{/vendorExtensions.defaultValueInit}},
-    {{/formatNoEmptyLines}}
-    {{/vendorExtensions.optionalVars}}
-{{/vendorExtensions.withInheritance}}
 {{#hasVars}}){{/hasVars}}{{#parent}} : {{{parent}}}({{#vendorExtensions.requiredParentVarsWithoutDiscriminator}}{{{name}}}{{^-last}}, {{/-last}}{{/vendorExtensions.requiredParentVarsWithoutDiscriminator}}){{/parent}}{{#vendorExtensions.x-implements}}{{#parent}}, {{/parent}}{{^parent}}: {{/parent}}{{^-first}}, {{/-first}}{{{.}}}{{/vendorExtensions.x-implements}} {{openbrace}}
 
     {{#vendorExtensions.withInheritance}}
@@ -117,7 +92,7 @@
     }
 
     override fun hashCode(): Int =
-        Objects.hash({{#vars}}{{^isByteArray}}{{name}}{{/isByteArray}}{{#isByteArray}}Arrays.hashCode({{name}}){{/isByteArray}}{{^-last}}, {{/-last}}{{/vars}}{{#parent}}{{#vendorExtensions.hasOwnVars}}, {{/vendorExtensions.hasOwnVars}}super.hashCode(){{/parent}})
+        Objects.hash({{#vars}}{{^isByteArray}}{{{name}}}{{/isByteArray}}{{#isByteArray}}Arrays.hashCode({{{name}}}){{/isByteArray}}{{^-last}}, {{/-last}}{{/vars}}{{#parent}}{{#vendorExtensions.hasOwnVars}}, {{/vendorExtensions.hasOwnVars}}super.hashCode(){{/parent}})
 
     override fun toString(): String =
     {{#hasVars}}

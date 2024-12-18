@@ -29,6 +29,7 @@ import io.swagger.v3.oas.models.media.MediaType;
 import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.media.StringSchema;
 import io.swagger.v3.oas.models.parameters.Parameter;
+import io.swagger.v3.oas.models.parameters.RequestBody;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.servers.Server;
 import org.apache.commons.lang3.StringUtils;
@@ -814,6 +815,11 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
                 break;
             }
         }
+        var type = discriminator.getPropertyType();
+        if (!type.endsWith("?")) {
+            type = type + "?";
+        }
+        discriminator.setPropertyType(type);
         return discriminator;
     }
 
@@ -1417,8 +1423,23 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
     }
 
     @Override
+    public CodegenParameter fromRequestBody(RequestBody body, Set<String> imports, String bodyParameterName) {
+        var rqBody = super.fromRequestBody(body, imports, bodyParameterName);
+        if (!rqBody.required) {
+            rqBody.vendorExtensions.put("defaultValueInit", "null");
+        }
+
+        return rqBody;
+    }
+
+    @Override
     public CodegenParameter fromParameter(Parameter p, Set<String> imports) {
         var parameter = super.fromParameter(p, imports);
+
+        if (parameter.isPathParam && !parameter.required) {
+            parameter.required = true;
+        }
+
         checkPrimitives(parameter, unaliasSchema(p.getSchema()));
         // if name is escaped
         var realName = parameter.paramName;
@@ -1456,6 +1477,9 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
             if (enumVarName != null) {
                 defaultValueInit = parameter.dataType + "." + enumVarName;
             }
+        }
+        if (defaultValueInit == null && !parameter.required) {
+            defaultValueInit = "null";
         }
         if (defaultValueInit != null) {
             parameter.vendorExtensions.put("defaultValueInit", defaultValueInit);
@@ -1503,6 +1527,13 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
             if (enumVarName != null) {
                 defaultValueInit = property.dataType + "." + enumVarName;
             }
+        }
+        if (defaultValueInit == null && property.isDiscriminator
+            || property.isNullable
+            || property.required && property.isReadOnly
+            || !property.required
+        ) {
+            defaultValueInit = "null";
         }
         if (defaultValueInit != null) {
             property.vendorExtensions.put("defaultValueInit", defaultValueInit);
@@ -1804,7 +1835,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
             var requiredParentVarsWithoutDiscriminator = new ArrayList<CodegenProperty>();
             var allVars = new ArrayList<CodegenProperty>();
 
-            processParentModel(model, requiredVarsWithoutDiscriminator, requiredParentVarsWithoutDiscriminator, allVars, false);
+            processParentModel(model, requiredVarsWithoutDiscriminator, requiredParentVarsWithoutDiscriminator, allVars, false, objs);
             model.allVars = allVars;
 
             var withInheritance = model.hasChildren || model.parent != null;
@@ -1815,7 +1846,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
             for (var v : model.vars) {
                 v.vendorExtensions.put("hasChildren", model.hasChildren);
                 if (!notContainsProp(v, requiredVarsWithoutDiscriminator)
-                    || (!model.hasChildren || (v.required && !v.isDiscriminator))) {
+                    || (!model.hasChildren || v.required)) {
                     if (notContainsProp(v, requiredVars)) {
                         requiredVars.add(v);
                     }
@@ -1831,6 +1862,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
             if (!requiredParentVarsWithoutDiscriminator.isEmpty()) {
                 model.vendorExtensions.put("requiredParentVarsWithoutDiscriminator", requiredParentVarsWithoutDiscriminator);
             }
+
             model.vendorExtensions.put("requiredVarsWithoutDiscriminator", requiredVarsWithoutDiscriminator);
             model.vendorExtensions.put("requiredVars", requiredVars);
             model.vendorExtensions.put("withRequiredOrOptionalVars", !requiredVarsWithoutDiscriminator.isEmpty() || !optionalVars.isEmpty());
@@ -1851,6 +1883,18 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
             if (model.parentVars != null) {
                 for (var property : model.parentVars) {
                     processProperty(property, isServer, model, objs);
+                    removePropIfContains(property, optionalVars);
+                }
+            }
+
+            for (var parentVar : requiredParentVarsWithoutDiscriminator) {
+                var childVar = findProp(parentVar, requiredVarsWithoutDiscriminator);
+                if (childVar != null) {
+                    var isParentVar = !isParentOneOfInterface(model);
+                    childVar.vendorExtensions.put("isParentVar", isParentVar);
+                    if (isParentVar) {
+                        childVar.vendorExtensions.put("fieldAnnPrefix", "");
+                    }
                 }
             }
 
@@ -1865,6 +1909,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
                 model.vendorExtensions.put("withRequiredVars", false);
                 model.vars = Collections.emptyList();
             }
+            model.vendorExtensions.put("dataClass", !model.hasChildren && model.hasVars && (!withInheritance || model.parentVars.isEmpty()) ? "data " : "");
 
             addStrValueToEnum(model);
         }
@@ -1872,6 +1917,29 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         for (ModelsMap models : objs.values()) {
             CodegenModel model = models.getModels().get(0).getModel();
             processOneOfModels(model, objs.values());
+        }
+
+        for (ModelsMap models : objs.values()) {
+            CodegenModel model = models.getModels().get(0).getModel();
+            var requiredVarsWithoutDiscriminator = (List<CodegenProperty>) model.vendorExtensions.get("requiredVarsWithoutDiscriminator");
+            var requiredParentVarsWithoutDiscriminator = (List<CodegenProperty>) model.vendorExtensions.get("requiredParentVarsWithoutDiscriminator");
+            var optionalVars = (List<CodegenProperty>) model.vendorExtensions.get("optionalVars");
+            var withInheritance = (Boolean) model.vendorExtensions.get("withInheritance");
+
+            if (withInheritance) {
+                for (var optionalVar : optionalVars) {
+                    var found = false;
+                    for (var reqVar : requiredVarsWithoutDiscriminator) {
+                        if (optionalVar.name.equals(reqVar.name)) {
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found) {
+                        requiredVarsWithoutDiscriminator.add(optionalVar);
+                    }
+                }
+            }
         }
 
         return objs;
@@ -1940,6 +2008,20 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         }
     }
 
+    private boolean isParentOneOfInterface(CodegenModel model) {
+        var parentModel = model.parentModel;
+        var parentIsOneOfInterface = parentModel != null && Boolean.TRUE.equals(parentModel.getVendorExtensions().get("x-is-one-of-interface"));
+        if (!parentIsOneOfInterface && model.interfaceModels != null) {
+            for (var interfaceModel : model.interfaceModels) {
+                if (Boolean.TRUE.equals(interfaceModel.getVendorExtensions().get("x-is-one-of-interface"))) {
+                    parentIsOneOfInterface = true;
+                    break;
+                }
+            }
+        }
+        return parentIsOneOfInterface;
+    }
+
     private void processOneOfModels(CodegenModel model, Collection<ModelsMap> models) {
 
         if (!model.vendorExtensions.containsKey("x-is-one-of-interface")
@@ -1970,7 +2052,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
                     if (prop.name.equals(discriminator.getPropertyName())) {
                         prop.isDiscriminator = true;
                         prop.isOverridden = true;
-                        prop.isNullable = false;
+                        prop.isNullable = true;
                         prop.isOptional = false;
                         prop.required = true;
                         prop.isReadOnly = false;
@@ -1985,7 +2067,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
                         if (prop.name.equals(discriminator.getPropertyName())) {
                             prop.isDiscriminator = true;
                             prop.isOverridden = true;
-                            prop.isNullable = false;
+                            prop.isNullable = true;
                             prop.isOptional = false;
                             prop.required = true;
                             prop.isReadOnly = false;
@@ -2005,7 +2087,9 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         property.vendorExtensions.put("inRequiredArgsConstructor", !property.isReadOnly || isServer);
         property.vendorExtensions.put("isServer", isServer);
         property.vendorExtensions.put("defaultValueIsNotNull", property.defaultValue != null && !property.defaultValue.equals("null"));
-        property.vendorExtensions.put("fieldAnnPrefix", ksp ? "" : "field:");
+
+        var isParentVar = (Boolean) property.vendorExtensions.get("isParentVar");
+        property.vendorExtensions.put("fieldAnnPrefix", isParentVar != null && isParentVar ? "" : "field:");
         property.vendorExtensions.put("x-implements", model.vendorExtensions.get("x-implements"));
         if ("null".equals(property.example)) {
             property.example = null;
@@ -2023,6 +2107,10 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
             property.pattern = null;
         }
 
+        if (isDiscriminator(property, model)) {
+            property.isDiscriminator = true;
+        }
+
         processGenericAnnotations(property, useBeanValidation, false, property.isNullable || property.isDiscriminator,
             property.required, property.isReadOnly, true);
 
@@ -2033,7 +2121,8 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
     private void processParentModel(CodegenModel model, List<CodegenProperty> requiredVarsWithoutDiscriminator,
                                     List<CodegenProperty> requiredParentVarsWithoutDiscriminator,
                                     List<CodegenProperty> allVars,
-                                    boolean processParentModel) {
+                                    boolean processParentModel,
+                                    Map<String, ModelsMap> objs) {
         var parent = model.parentModel;
         var hasParent = parent != null;
 
@@ -2046,14 +2135,14 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         var parentIsOneOfInterface = hasParent && Boolean.TRUE.equals(parent.getVendorExtensions().get("x-is-one-of-interface"));
 
         if (!processParentModel) {
-            processVar(model, model.vars, requiredVarsWithoutDiscriminator, requiredParentVarsWithoutDiscriminator, processParentModel);
+            processVar(model, model.vars, requiredVarsWithoutDiscriminator, requiredParentVarsWithoutDiscriminator, processParentModel, objs);
         }
-        processVar(model, model.requiredVars, requiredVarsWithoutDiscriminator, requiredParentVarsWithoutDiscriminator, processParentModel);
+        processVar(model, model.vars, requiredVarsWithoutDiscriminator, requiredParentVarsWithoutDiscriminator, processParentModel, objs);
 
         requiredParentVarsWithoutDiscriminator(model, requiredParentVarsWithoutDiscriminator);
         if (hasParent) {
             model.parentVars = parent.allVars;
-            processParentModel(parent, requiredVarsWithoutDiscriminator, requiredParentVarsWithoutDiscriminator, allVars, true);
+            processParentModel(parent, requiredVarsWithoutDiscriminator, requiredParentVarsWithoutDiscriminator, allVars, true, objs);
         }
 
         if (parentIsOneOfInterface) {
@@ -2077,22 +2166,40 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         }
     }
 
-    private void processVar(CodegenModel model, List<CodegenProperty> vars, List<CodegenProperty> requiredVarsWithoutDiscriminator, List<CodegenProperty> requiredParentVarsWithoutDiscriminator, boolean processParentModel) {
+    private void processVar(CodegenModel model, List<CodegenProperty> vars, List<CodegenProperty> requiredVarsWithoutDiscriminator,
+                            List<CodegenProperty> requiredParentVarsWithoutDiscriminator,
+                            boolean processParentModel,
+                            Map<String, ModelsMap> objs) {
 
         var parent = model.parentModel;
         var hasParent = parent != null;
         var parentRequiredVars = hasParent
             ? (List<CodegenProperty>) parent.vendorExtensions.get("requiredVarsWithoutDiscriminator")
             : Collections.<CodegenProperty>emptyList();
-        var parentIsOneOfInterface = hasParent && Boolean.TRUE.equals(parent.getVendorExtensions().get("x-is-one-of-interface"));
+        var parentIsOneOfInterface = isParentOneOfInterface(model);
+        var isParentVar = !parentIsOneOfInterface;
 
         for (var v : vars) {
 
-            if (notContainsProp(v, requiredVarsWithoutDiscriminator) && (!isDiscriminator(v, model) || parentIsOneOfInterface)) {
+            processProperty(v, isServer(), model, objs);
+
+            if (notContainsProp(v, requiredVarsWithoutDiscriminator)) {
                 var copyVar = v;
+                var isDiscriminator = isDiscriminator(v, model);
+                if (isDiscriminator) {
+                    copyVar.isDiscriminator = true;
+                }
                 if ((hasParent && !useOneOfInterfaces && !notContainsProp(v, parent.allVars))
                     || (v.isOverridden != null && !v.isOverridden && !v.vendorExtensions.containsKey("overridden") && notContainsProp(v, vars))) {
                     copyVar = v.clone();
+                    copyVar.vendorExtensions.put("isParentVar", isParentVar);
+                    if (isParentVar) {
+                        copyVar.vendorExtensions.put("fieldAnnPrefix", "");
+                    }
+                    if (isDiscriminator && !parentIsOneOfInterface) {
+                        copyVar.isNullable = true;
+                        copyVar.vendorExtensions.put("defaultValueInit", "null");
+                    }
                     copyVar.isOverridden = true;
                     copyVar.vendorExtensions.put("overridden", true);
                 }
@@ -2101,14 +2208,22 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
                     if (processParentModel) {
                         copyVar = v.clone();
                         copyVar.isOverridden = true;
+                        copyVar.vendorExtensions.put("isParentVar", isParentVar);
                     }
-                    if (copyVar.isOverridden != null && copyVar.isOverridden) {
-                        copyVar.vendorExtensions.put("overridden", true);
+                    if (copyVar.isOverridden != null && copyVar.isOverridden && (!parentIsOneOfInterface || isDiscriminator)) {
+                        if (isDiscriminator && !parentIsOneOfInterface) {
+                            copyVar.isNullable = true;
+                            copyVar.vendorExtensions.put("defaultValueInit", "null");
+                        }
                     }
                     requiredVarsWithoutDiscriminator.add(copyVar);
                 }
             }
-            v.isNullable = v.isNullable || (v.required && v.isReadOnly && isServer()) || !v.required;
+            if (isDiscriminator(v, model)) {
+                v.isDiscriminator = true;
+            }
+
+            v.isNullable = !v.isDiscriminator && (v.isNullable || (v.required && v.isReadOnly && isServer()) || !v.required);
         }
     }
 
@@ -2118,21 +2233,48 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         if (parent == null) {
             return;
         }
+        var parentIsOneOfInterface = isParentOneOfInterface(model);
+        var isParentVar = !parentIsOneOfInterface;
 
         for (var v : parent.vars) {
-            boolean isDiscriminator = isDiscriminator(v, model);
-            if (v.required && !isDiscriminator) {
-                v.vendorExtensions.put("isServerOrNotReadOnly", !v.isReadOnly || isServer());
-                if (notContainsProp(v, requiredParentVarsWithoutDiscriminator)) {
-                    var childVar = v.clone();
-                    if (!useOneOfInterfaces) {
-                        childVar.isOverridden = true;
-                        childVar.vendorExtensions.put("overridden", true);
-                    }
-                    requiredParentVarsWithoutDiscriminator.add(childVar);
+            if (isDiscriminator(v, model)) {
+                v.isDiscriminator = true;
+                if (!parentIsOneOfInterface) {
+                    v.isNullable = true;
+                    v.vendorExtensions.put("defaultValueInit", "null");
                 }
             }
+            v.vendorExtensions.put("isServerOrNotReadOnly", !v.isReadOnly || isServer());
+            if (notContainsProp(v, requiredParentVarsWithoutDiscriminator)) {
+                var childVar = v.clone();
+                if (!useOneOfInterfaces) {
+                    childVar.vendorExtensions.put("isParentVar", isParentVar);
+                    if (isParentVar) {
+                        childVar.vendorExtensions.put("fieldAnnPrefix", "");
+                    }
+                }
+                requiredParentVarsWithoutDiscriminator.add(childVar);
+            }
         }
+    }
+
+    private void removePropIfContains(CodegenProperty prop, List<CodegenProperty> props) {
+        if (props == null || props.isEmpty()) {
+            return;
+        }
+        props.removeIf(p -> prop.name.equals(p.name));
+    }
+
+    private CodegenProperty findProp(CodegenProperty prop, List<CodegenProperty> props) {
+        if (props == null || props.isEmpty()) {
+            return null;
+        }
+        for (var p : props) {
+            if (prop.name.equals(p.name)) {
+                return p;
+            }
+        }
+        return null;
     }
 
     private boolean notContainsProp(CodegenProperty prop, List<CodegenProperty> props) {

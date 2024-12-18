@@ -13,7 +13,7 @@
         {{#isContainer}}
     // Is a container wrapped = {{isXmlWrapped}}
             {{#items}}
-    // items.name = {{name}} items.baseName = {{baseName}} items.xmlName = {{xmlName}} items.xmlNamespace = {{xmlNamespace}}
+    // items.name = {{{name}}} items.baseName = {{baseName}} items.xmlName = {{xmlName}} items.xmlNamespace = {{xmlNamespace}}
     // items.example = {{example}} items.type = {{dataType}}
     @{{{vendorExtensions.fieldAnnPrefix}}}XmlElement({{#xmlNamespace}}namespace = "{{xmlNamespace}}", {{/xmlNamespace}}name = "{{#xmlName}}{{xmlName}}{{/xmlName}}{{^xmlName}}{{baseName}}{{/xmlName}}")
             {{/items}}

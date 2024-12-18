@@ -344,26 +344,31 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
         assertFileContains(apiPath + "BookInfo.kt",
             """
                 open class BookInfo(
+
                     @field:NotNull
                     @field:Schema(name = "name", requiredMode = Schema.RequiredMode.REQUIRED)
                     @field:JsonProperty(JSON_PROPERTY_NAME)
                     open var name: String,
+
                     @field:Nullable
                     @field:Schema(name = "requiredReadOnly", accessMode = Schema.AccessMode.READ_ONLY, requiredMode = Schema.RequiredMode.REQUIRED)
                     @field:JsonProperty(JSON_PROPERTY_REQUIRED_READ_ONLY)
                     @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
                     open var requiredReadOnly: String? = null,
+
                     @field:Nullable
                     @field:Size(min = 3)
                     @field:Schema(name = "author", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
                     @field:JsonProperty(JSON_PROPERTY_AUTHOR)
                     @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
                     open var author: String? = null,
+
                     @field:Nullable
                     @field:Schema(name = "optionalReadOnly", accessMode = Schema.AccessMode.READ_ONLY, requiredMode = Schema.RequiredMode.NOT_REQUIRED)
                     @field:JsonProperty(JSON_PROPERTY_OPTIONAL_READ_ONLY)
                     @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
                     open var optionalReadOnly: String? = null,
+
                     @field:Nullable
                     @field:Schema(name = "type", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
                     @field:JsonProperty(JSON_PROPERTY_TYPE)
@@ -373,22 +378,44 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                 """);
         assertFileContains(apiPath + "ExtendedBookInfo.kt",
             """
-                data class ExtendedBookInfo(
+                class ExtendedBookInfo(
+                
                     @field:NotNull
                     @field:Pattern(regexp = "[0-9]{13}")
                     @field:Schema(name = "isbn", requiredMode = Schema.RequiredMode.REQUIRED)
                     @field:JsonProperty(JSON_PROPERTY_ISBN)
                     var isbn: String,
-                    @field:NotNull
-                    @field:Schema(name = "name", requiredMode = Schema.RequiredMode.REQUIRED)
-                    @field:JsonProperty(JSON_PROPERTY_NAME)
-                    override var name: String,
-                    @field:Nullable
-                    @field:Schema(name = "requiredReadOnly", accessMode = Schema.AccessMode.READ_ONLY, requiredMode = Schema.RequiredMode.REQUIRED)
-                    @field:JsonProperty(JSON_PROPERTY_REQUIRED_READ_ONLY)
-                    @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
-                    override var requiredReadOnly: String? = null,
-                ) : BookInfo(name, requiredReadOnly)  {
+                
+                    @NotNull
+                    @Schema(name = "name", requiredMode = Schema.RequiredMode.REQUIRED)
+                    @JsonProperty(JSON_PROPERTY_NAME)
+                    name: String,
+                
+                    @Nullable
+                    @Schema(name = "requiredReadOnly", accessMode = Schema.AccessMode.READ_ONLY, requiredMode = Schema.RequiredMode.REQUIRED)
+                    @JsonProperty(JSON_PROPERTY_REQUIRED_READ_ONLY)
+                    @JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                    requiredReadOnly: String? = null,
+                
+                    @Nullable
+                    @Size(min = 3)
+                    @Schema(name = "author", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+                    @JsonProperty(JSON_PROPERTY_AUTHOR)
+                    @JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                    author: String? = null,
+                
+                    @Nullable
+                    @Schema(name = "optionalReadOnly", accessMode = Schema.AccessMode.READ_ONLY, requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+                    @JsonProperty(JSON_PROPERTY_OPTIONAL_READ_ONLY)
+                    @JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                    optionalReadOnly: String? = null,
+                
+                    @Nullable
+                    @Schema(name = "type", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+                    @JsonProperty(JSON_PROPERTY_TYPE)
+                    @JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                    type: BookInfoType? = null,
+                ) : BookInfo(name, requiredReadOnly, author, optionalReadOnly, type) {
                 """);
     }
 
@@ -402,48 +429,67 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
         assertFileContains(apiPath + "BookInfo.kt",
             """
                 open class BookInfo(
+                
                     @field:NotNull
                     @field:Schema(name = "name", requiredMode = Schema.RequiredMode.REQUIRED)
                     @field:JsonProperty(JSON_PROPERTY_NAME)
                     open var name: String,
+                
                     @field:NotNull
                     @field:Schema(name = "type", requiredMode = Schema.RequiredMode.REQUIRED)
                     @field:JsonProperty(JSON_PROPERTY_TYPE)
                     open var type: BookInfoType? = null,
                 ) {
                 """);
+
+
         assertFileContains(apiPath + "BasicBookInfo.kt",
             """
                 open class BasicBookInfo(
+                
                     @field:NotNull
                     @field:Size(min = 3)
                     @field:Schema(name = "author", requiredMode = Schema.RequiredMode.REQUIRED)
                     @field:JsonProperty(JSON_PROPERTY_AUTHOR)
                     open var author: String,
-                    @field:NotNull
-                    @field:Schema(name = "name", requiredMode = Schema.RequiredMode.REQUIRED)
-                    @field:JsonProperty(JSON_PROPERTY_NAME)
-                    override var name: String,
-                ) : BookInfo(name) {
+                
+                    @NotNull
+                    @Schema(name = "name", requiredMode = Schema.RequiredMode.REQUIRED)
+                    @JsonProperty(JSON_PROPERTY_NAME)
+                    name: String,
+                
+                    @Nullable
+                    @Schema(name = "type", requiredMode = Schema.RequiredMode.REQUIRED)
+                    @JsonProperty(JSON_PROPERTY_TYPE)
+                    type: BookInfoType? = null,
+                ) : BookInfo(name, type) {
                 """);
         assertFileContains(apiPath + "DetailedBookInfo.kt",
             """
-                data class DetailedBookInfo(
+                class DetailedBookInfo(
+                
                     @field:NotNull
                     @field:Pattern(regexp = "[0-9]{13}")
                     @field:Schema(name = "isbn", requiredMode = Schema.RequiredMode.REQUIRED)
                     @field:JsonProperty(JSON_PROPERTY_ISBN)
                     var isbn: String,
-                    @field:NotNull
-                    @field:Size(min = 3)
-                    @field:Schema(name = "author", requiredMode = Schema.RequiredMode.REQUIRED)
-                    @field:JsonProperty(JSON_PROPERTY_AUTHOR)
-                    override var author: String,
-                    @field:NotNull
-                    @field:Schema(name = "name", requiredMode = Schema.RequiredMode.REQUIRED)
-                    @field:JsonProperty(JSON_PROPERTY_NAME)
-                    override var name: String,
-                ) : BasicBookInfo(author, name) {
+                
+                    @NotNull
+                    @Size(min = 3)
+                    @Schema(name = "author", requiredMode = Schema.RequiredMode.REQUIRED)
+                    @JsonProperty(JSON_PROPERTY_AUTHOR)
+                    author: String,
+                
+                    @NotNull
+                    @Schema(name = "name", requiredMode = Schema.RequiredMode.REQUIRED)
+                    @JsonProperty(JSON_PROPERTY_NAME)
+                    name: String,
+                
+                    @Nullable
+                    @Schema(name = "type", requiredMode = Schema.RequiredMode.REQUIRED)
+                    @JsonProperty(JSON_PROPERTY_TYPE)
+                    type: BookInfoType? = null,
+                ) : BasicBookInfo(author, name, type) {
                 """);
     }
 
@@ -498,7 +544,12 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
         );
         String path = outputPath + "src/main/kotlin/org/openapitools/";
 
-        assertFileContains(path + "controller/ParametersController.kt", "override fun callInterface(name: Class, `data`: String): Mono<Void>");
+        assertFileContains(path + "controller/ParametersController.kt", """
+            override fun callInterface(
+                name: Class,
+                `data`: String,
+            ): Mono<Void> {
+        """);
         assertFileContains(path + "api/ParametersApi.kt", "fun callInterface(",
             "@QueryValue(\"name\") @NotNull @Valid name: Class,",
             "@QueryValue(\"data\") @NotNull `data`: String",
@@ -519,7 +570,7 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
 
         assertFileContains(path + "api/WeatherForecastApisApi.kt", "@Get(\"/v1/forecast/{id}\")",
             "@PathVariable(\"id\") @NotNull id: String,",
-            "@QueryValue(\"hourly\") @Nullable hourly: List<V1ForecastIdGetHourlyParameterInner>?,");
+            "@QueryValue(\"hourly\") @Nullable hourly: List<V1ForecastIdGetHourlyParameterInner>? = null,");
 
         assertFileContains(path + "model/V1ForecastIdGetHourlyParameterInner.kt",
             "enum class V1ForecastIdGetHourlyParameterInner(",
@@ -607,8 +658,8 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                 fun profilePasswordPost(
                     @Header("WCToken") @NotNull wcToken: String,
                     @Header("WCTrustedToken") @NotNull wcTrustedToken: String,
-                    @Part("name") @Nullable name: String?,
-                    @Part("file") @Nullable file: CompletedFileUpload?
+                    @Part("name") @Nullable name: String? = null,
+                    @Part("file") @Nullable file: CompletedFileUpload? = null,
                 ): Mono<SuccessResetPassword>
             """);
     }
@@ -625,7 +676,7 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                     @Consumes("application/json", "application/xml")
                     @Secured(SecurityRule.IS_ANONYMOUS)
                     fun myOp(
-                        @Body @Nullable @Valid coordinates: Coordinates?
+                        @Body @Nullable @Valid coordinates: Coordinates? = null,
                     ): Mono<HttpResponse<Void>>
                 """,
             """
@@ -633,8 +684,8 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                     @Consumes("multipart/form-data")
                     @Secured(SecurityRule.IS_ANONYMOUS)
                     fun myOp_1(
-                        @Nullable @Valid coordinates: Coordinates?,
-                        @Nullable file: CompletedFileUpload?
+                        @Nullable @Valid coordinates: Coordinates? = null,
+                        @Nullable file: CompletedFileUpload? = null,
                     ): Mono<HttpResponse<Void>>
                 """,
             """
@@ -642,7 +693,7 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                     @Consumes("application/yaml", "text/json")
                     @Secured(SecurityRule.IS_ANONYMOUS)
                     fun myOp_2(
-                        @Body @Nullable @Valid mySchema: MySchema?
+                        @Body @Nullable @Valid mySchema: MySchema? = null,
                     ): Mono<HttpResponse<Void>>
                 """);
     }
@@ -657,11 +708,11 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
         String path = outputPath + "src/main/kotlin/org/openapitools/";
 
         assertFileContains(path + "model/CurrencyInvoiceCreateDto.kt", """
-                @field:NotNull
-                @field:Size(max = 10)
-                @field:Schema(name = "sellerVatId", requiredMode = Schema.RequiredMode.REQUIRED)
-                @field:JsonProperty(JSON_PROPERTY_SELLER_VAT_ID)
-                override var sellerVatId: String,
+                @NotNull
+                @Size(max = 10)
+                @Schema(name = "sellerVatId", requiredMode = Schema.RequiredMode.REQUIRED)
+                @JsonProperty(JSON_PROPERTY_SELLER_VAT_ID)
+                sellerVatId: String,
             """
         );
     }
@@ -694,22 +745,22 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                         description = "A method to send primitives as request parameters",
                         responses = [
                             ApiResponse(responseCode = "200", description = "Success", content = [
-                                Content(mediaType = "application/json", schema = Schema(implementation = SendPrimitivesResponse::class))
+                                Content(mediaType = "application/json", schema = Schema(implementation = SendPrimitivesResponse::class)),
                             ]),
-                            ApiResponse(responseCode = "default", description = "An unexpected error has occurred")
+                            ApiResponse(responseCode = "default", description = "An unexpected error has occurred"),
                         ],
                         parameters = [
                             Parameter(name = "name", deprecated = true, required = true, `in` = ParameterIn.PATH),
                             Parameter(name = "age", required = true, `in` = ParameterIn.QUERY),
-                            Parameter(name = "height", deprecated = true, required = true, `in` = ParameterIn.HEADER)
-                        ]
+                            Parameter(name = "height", deprecated = true, required = true, `in` = ParameterIn.HEADER),
+                        ],
                     )
                     @Get("/sendPrimitives/{name}")
                     @Secured(SecurityRule.IS_ANONYMOUS)
                     fun sendPrimitives(
                         @PathVariable("name") @NotNull @java.lang.Deprecated name: String,
                         @QueryValue("age") @NotNull age: BigDecimal,
-                        @Header("height") @NotNull @java.lang.Deprecated height: Float
+                        @Header("height") @NotNull @java.lang.Deprecated height: Float,
                     ): Mono<SendPrimitivesResponse>
                 """);
     }
@@ -774,23 +825,45 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                         responses = [
                             ApiResponse(responseCode = "200", description = "successful operation", content = [
                                 Content(mediaType = "application/json", array = ArraySchema(schema = Schema(implementation = Pet::class))),
-                                Content(mediaType = "application/xml", array = ArraySchema(schema = Schema(implementation = Pet::class)))
+                                Content(mediaType = "application/xml", array = ArraySchema(schema = Schema(implementation = Pet::class))),
                             ]),
-                            ApiResponse(responseCode = "400", description = "Invalid status value")
+                            ApiResponse(responseCode = "400", description = "Invalid status value"),
                         ],
                         parameters = [
-                            Parameter(name = "status", description = "Status values that need to be considered for filter", `in` = ParameterIn.QUERY)
+                            Parameter(name = "status", description = "Status values that need to be considered for filter", `in` = ParameterIn.QUERY),
                         ],
                         security = [
-                            SecurityRequirement(name = "petstore_auth", scopes = ["write:pets", "read:pets"])
-                        ]
+                            SecurityRequirement(name = "petstore_auth", scopes = ["write:pets", "read:pets"]),
+                        ],
                     )
                     @Get("/pet/findByStatus")
                     @Produces("application/json", "application/xml")
                     @Secured("write:pets", "read:pets")
                     fun findPetsByStatus(
-                        @QueryValue("status") @Nullable status: List<@NotNull String>?
+                        @QueryValue("status") @Nullable status: List<@NotNull String>? = null,
                     ): Mono<List<Pet>>
                 """);
+    }
+
+    @Test
+    void testOptionalQueryValues() {
+
+        var codegen = new KotlinMicronautServerCodegen();
+        codegen.setGenerateSwaggerAnnotations(false);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/optional-controller-values.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String path = outputPath + "src/main/kotlin/org/openapitools/";
+
+        assertFileContains(path + "api/DefaultApi.kt",
+            """
+                        @Post("/sendPrimitives/{name}")
+                        @Secured(SecurityRule.IS_ANONYMOUS)
+                        fun sendPrimitives(
+                            @PathVariable("name") @NotNull name: String,
+                            @QueryValue("brand") @Nullable brand: String? = null,
+                            @CookieValue("coc") @Nullable coc: String? = null,
+                            @Header("head") @Nullable head: String? = null,
+                            @Body @Nullable body: String? = null,
+                        ): Mono<String>
+                    """);
     }
 }

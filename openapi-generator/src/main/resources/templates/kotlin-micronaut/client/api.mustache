@@ -66,7 +66,7 @@ interface {{classname}} {
     {{{.}}}
     {{/vendorExtensions.x-operation-extra-annotation}}
     fun {{nickname}}({{#allParams}}
-        {{#formatSingleLine}}{{>client/params/queryParams}}{{>client/params/pathParams}}{{>client/params/headerParams}}{{>client/params/bodyParams}}{{>client/params/formParams}}{{>client/params/cookieParams}}{{^-last}},{{/-last}}{{/formatSingleLine}}
+        {{#formatSingleLine}}{{>client/params/queryParams}}{{>client/params/pathParams}}{{>client/params/headerParams}}{{>client/params/bodyParams}}{{>client/params/formParams}}{{>client/params/cookieParams}},{{/formatSingleLine}}
     {{/allParams}}){{#returnType}}: {{{returnType}}}{{/returnType}}
     {{/formatNoEmptyLines}}
     {{/operation}}
