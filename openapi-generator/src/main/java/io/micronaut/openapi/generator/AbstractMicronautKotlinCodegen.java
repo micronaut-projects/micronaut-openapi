@@ -1068,6 +1068,9 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
             }
 
             for (var param : op.allParams) {
+                if (param.isEnumRef) {
+                    param.isEnum = true;
+                }
                 processGenericAnnotations(param, useBeanValidation, false, param.isNullable || !param.required,
                     param.required, false, true);
                 param.vendorExtensions.put("isString", "string".equalsIgnoreCase(param.dataType));
@@ -1425,11 +1428,61 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
     @Override
     public CodegenParameter fromRequestBody(RequestBody body, Set<String> imports, String bodyParameterName) {
         var rqBody = super.fromRequestBody(body, imports, bodyParameterName);
+
+        var rqBodySchema = body.getContent() != null && !body.getContent().isEmpty() ? body.getContent().entrySet().iterator().next().getValue().getSchema() : null;
+        CodegenProperty codegenProperty = fromProperty(bodyParameterName, rqBodySchema, false);
+
+        if (rqBodySchema != null) {
+            rqBodySchema = unaliasSchema(rqBodySchema);
+
+            if (getUseInlineModelResolver()) {
+                codegenProperty = fromProperty(bodyParameterName, getReferencedSchemaWhenNotEnum(rqBodySchema), false);
+            } else {
+                codegenProperty = fromProperty(bodyParameterName, rqBodySchema, false);
+            }
+            rqBody.setSchema(codegenProperty);
+        }
+
+        if (Boolean.TRUE.equals(codegenProperty.isModel)) {
+            rqBody.isModel = true;
+        }
+
+        rqBody.dataFormat = codegenProperty.dataFormat;
+        if (body.getRequired() != null) {
+            rqBody.required = body.getRequired();
+        }
         if (!rqBody.required) {
             rqBody.vendorExtensions.put("defaultValueInit", "null");
         }
 
+        // set containerType
+        rqBody.containerType = codegenProperty.containerType;
+        rqBody.containerTypeMapped = codegenProperty.containerTypeMapped;
+
+        // enum
+        updateCodegenPropertyEnum(codegenProperty);
+        rqBody.isEnum = codegenProperty.isEnum;
+        rqBody.isEnumRef = codegenProperty.isEnumRef;
+        rqBody._enum = codegenProperty._enum;
+        rqBody.allowableValues = codegenProperty.allowableValues;
+
+        if (codegenProperty.isEnum || codegenProperty.isEnumRef) {
+            rqBody.datatypeWithEnum = codegenProperty.datatypeWithEnum;
+            rqBody.enumName = codegenProperty.enumName;
+            if (codegenProperty.defaultValue != null) {
+                rqBody.enumDefaultValue = codegenProperty.defaultValue.replace(codegenProperty.enumName + ".", "");
+            }
+        }
+
         return rqBody;
+    }
+
+    private Schema getReferencedSchemaWhenNotEnum(Schema parameterSchema) {
+        Schema referencedSchema = ModelUtils.getReferencedSchema(openAPI, parameterSchema);
+        if (referencedSchema.getEnum() != null && !referencedSchema.getEnum().isEmpty()) {
+            referencedSchema = parameterSchema;
+        }
+        return referencedSchema;
     }
 
     @Override
@@ -1512,7 +1565,11 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         property.vendorExtensions.put("realName", realName);
 
         if (schema != null && schema.get$ref() != null) {
-            schema = ModelUtils.getSchemaFromRefToSchemaWithProperties(openAPI, schema.get$ref());
+            var refSchema = ModelUtils.getSchemaFromRefToSchemaWithProperties(openAPI, schema.get$ref());
+            if (refSchema == null) {
+                refSchema = ModelUtils.getReferencedSchema(openAPI, schema);
+            }
+            schema = refSchema;
         }
 
         String defaultValueInit;

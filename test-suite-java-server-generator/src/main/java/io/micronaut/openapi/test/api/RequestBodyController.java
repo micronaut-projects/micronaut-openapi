@@ -1,9 +1,5 @@
 package io.micronaut.openapi.test.api;
 
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
-import java.util.List;
-
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Post;
 import io.micronaut.http.multipart.CompletedFileUpload;
@@ -17,9 +13,12 @@ import io.micronaut.openapi.test.model.ModelWithRequiredProperties;
 import io.micronaut.openapi.test.model.ModelWithValidatedListProperty;
 import io.micronaut.openapi.test.model.NestedModel;
 import io.micronaut.openapi.test.model.SimpleModel;
-
 import jakarta.validation.Valid;
 import reactor.core.publisher.Mono;
+
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.util.List;
 
 @Controller
 public class RequestBodyController implements RequestBodyApi {
@@ -55,8 +54,8 @@ public class RequestBodyController implements RequestBodyApi {
     }
 
     @Override
-    public Mono<ColorEnum> sendEnum(String color) {
-        return Mono.just(ColorEnum.fromValue(color.replace("\"", "")));
+    public Mono<ColorEnum> sendEnum(ColorEnum color) {
+        return Mono.just(color);
     }
 
     @Override
@@ -91,8 +90,8 @@ public class RequestBodyController implements RequestBodyApi {
     }
 
     @Override
-    public Mono<byte[]> sendBytes(byte[] bytes) {
-        return Mono.just(bytes);
+    public Mono<byte[]> sendBytes(byte[] body) {
+        return Mono.just(body);
     }
 
     @Override

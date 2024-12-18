@@ -4,7 +4,6 @@ import io.micronaut.http.annotation.Controller
 import io.micronaut.http.annotation.Post
 import io.micronaut.http.multipart.CompletedFileUpload
 import io.micronaut.openapi.test.model.*
-import io.micronaut.openapi.test.model.ColorEnum.Companion.fromValue
 import reactor.core.publisher.Mono
 import java.io.ByteArrayOutputStream
 
@@ -36,8 +35,8 @@ open class RequestBodyController : RequestBodyApi {
         return Mono.just(dateModel!!)
     }
 
-    override fun sendEnum(body: String): Mono<ColorEnum> {
-        return Mono.just(fromValue(body.replace("\"", "")))
+    override fun sendEnum(body: ColorEnum): Mono<ColorEnum> {
+        return Mono.just(body)
     }
 
     override fun sendEnumList(colorEnums: List<ColorEnum>): Mono<List<ColorEnum>> {

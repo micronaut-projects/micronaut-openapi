@@ -17,7 +17,7 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
     static String MULTI_TAGS_TEST_PATH = "src/test/resources/3_0/micronaut/multi-tags-test.yaml";
 
     @Test
-    void clientOptsUnicity() {
+    void clientOptsUniqueness() {
         var codegen = new KotlinMicronautServerCodegen();
         codegen.cliOptions()
             .stream()
@@ -865,5 +865,23 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                             @Body @Nullable body: String? = null,
                         ): Mono<String>
                     """);
+    }
+
+    @Test
+    void testBodyEnum() {
+
+        var codegen = new KotlinMicronautServerCodegen();
+        codegen.setGenerateSwaggerAnnotations(false);
+        codegen.setUseAuth(false);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/body-enum.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String path = outputPath + "src/main/kotlin/org/openapitools/";
+
+        assertFileContains(path + "api/MyCustomApi.kt", """
+                    @Post("/api/v1/colors/{name}")
+                    fun selectColor(
+                        @Body @NotNull body: Color,
+                    ): Mono<String>
+                """);
+        assertFileContains(path + "model/Color.kt", "enum class Color(");
     }
 }
