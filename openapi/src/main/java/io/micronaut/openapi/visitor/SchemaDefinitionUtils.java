@@ -1101,6 +1101,10 @@ public final class SchemaDefinitionUtils {
         }
 
         if (addSchemaToBind) {
+            if (originalSchema.getAdditionalProperties() != null) {
+                SchemaUtils.appendSchema(originalSchema, schemaToBind);
+                return originalSchema;
+            }
             if (TYPE_OBJECT.equals(originalSchema.getType()) && !(originalSchema instanceof MapSchema)) {
                 if (composedSchema.getType() == null) {
                     composedSchema.setType(TYPE_OBJECT);
@@ -2505,7 +2509,8 @@ public final class SchemaDefinitionUtils {
 
     private static void processJakartaValidationAnnotations(Element element, ClassElement elementType, Schema<?> schemaToBind, VisitorContext context) {
 
-        final boolean isIterableOrMap = elementType.isIterable() || elementType.isAssignable(Map.class);
+        final boolean isAdditionalPropertiesMap = elementType.isAssignable(Map.class);
+        final boolean isIterableOrMap = elementType.isIterable() || isAdditionalPropertiesMap;
 
         var messages = new HashMap<String, String>();
 
@@ -2515,7 +2520,12 @@ public final class SchemaDefinitionUtils {
         if (isIterableOrMap) {
             if (isAnnotationPresent(element, "javax.validation.constraints.NotEmpty$List")
                 || isAnnotationPresent(element, "jakarta.validation.constraints.NotEmpty$List")) {
-                schemaToBind.setMinItems(1);
+
+                if (isAdditionalPropertiesMap) {
+                    schemaToBind.setMinProperties(1);
+                } else {
+                    schemaToBind.setMinItems(1);
+                }
 
                 addValidationAnnMessage(element, "javax.validation.constraints.NotEmpty$List", SIZE_MESSAGE, messages, context);
                 addValidationAnnMessage(element, "jakarta.validation.constraints.NotEmpty$List", SIZE_MESSAGE, messages, context);
@@ -2527,20 +2537,44 @@ public final class SchemaDefinitionUtils {
             findAnnotation(element, "javax.validation.constraints.Size$List")
                 .ifPresent(listAnn -> listAnn.getValue(AnnotationValue.class)
                     .ifPresent(ann -> ann.intValue("min")
-                        .ifPresent(schemaToBind::setMinItems)));
+                        .ifPresent((v) -> {
+                            if (isAdditionalPropertiesMap) {
+                                schemaToBind.setMinProperties(v);
+                            } else {
+                                schemaToBind.setMinItems(v);
+                            }
+                        })));
             findAnnotation(element, "jakarta.validation.constraints.Size$List")
                 .ifPresent(listAnn -> listAnn.getValue(AnnotationValue.class)
                     .ifPresent(ann -> ann.intValue("min")
-                        .ifPresent(schemaToBind::setMinItems)));
+                        .ifPresent((v) -> {
+                            if (isAdditionalPropertiesMap) {
+                                schemaToBind.setMinProperties(v);
+                            } else {
+                                schemaToBind.setMinItems(v);
+                            }
+                        })));
 
             findAnnotation(element, "javax.validation.constraints.Size$List")
                 .ifPresent(listAnn -> listAnn.getValue(AnnotationValue.class)
                     .ifPresent(ann -> ann.intValue("max")
-                        .ifPresent(schemaToBind::setMaxItems)));
+                        .ifPresent((v) -> {
+                            if (isAdditionalPropertiesMap) {
+                                schemaToBind.setMaxProperties(v);
+                            } else {
+                                schemaToBind.setMaxItems(v);
+                            }
+                        })));
             findAnnotation(element, "jakarta.validation.constraints.Size$List")
                 .ifPresent(listAnn -> listAnn.getValue(AnnotationValue.class)
                     .ifPresent(ann -> ann.intValue("max")
-                        .ifPresent(schemaToBind::setMaxItems)));
+                        .ifPresent((v) -> {
+                            if (isAdditionalPropertiesMap) {
+                                schemaToBind.setMaxProperties(v);
+                            } else {
+                                schemaToBind.setMaxItems(v);
+                            }
+                        })));
 
         } else {
             if (PrimitiveType.STRING.getCommonName().equals(schemaToBind.getType())) {
