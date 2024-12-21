@@ -782,7 +782,7 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                     @Produces("multipart/form-data")
                     Mono<HttpResponse<Void>> myOp_1(
                         @Nullable @Valid Coordinates coordinates,
-                        @Nullable byte[] file
+                        byte @Nullable [] file
                     );
                 """,
             """

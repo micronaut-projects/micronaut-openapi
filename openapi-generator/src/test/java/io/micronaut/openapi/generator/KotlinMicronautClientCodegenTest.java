@@ -857,7 +857,7 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                     @Produces("multipart/form-data")
                     fun myOp_1(
                         @Nullable @Valid coordinates: Coordinates? = null,
-                        @Nullable file: ByteArray? = null,
+                        file: ByteArray? = null,
                     ): Mono<HttpResponse<Void>>
                 """,
             """

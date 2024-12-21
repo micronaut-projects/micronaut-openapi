@@ -1,4 +1,5 @@
 
+{{^vendorExtensions.isPrimitiveArray}}
 {{#isNullable}}
     @Nullable
 {{/isNullable}}
@@ -12,8 +13,10 @@
     @Nullable
     {{/required}}
 {{/isNullable}}
+{{/vendorExtensions.isPrimitiveArray}}
 {{!All the validation}}
 {{#useBeanValidation}}
+    {{^vendorExtensions.isPrimitiveArray}}
     {{^isNullable}}
         {{#required}}
             {{^isReadOnly}}
@@ -21,6 +24,7 @@
             {{/isReadOnly}}
         {{/required}}
     {{/isNullable}}
+    {{/vendorExtensions.isPrimitiveArray}}
     {{!Validate all pojos and enums}}
     {{^isUuid}}
     {{^isContainer}}
