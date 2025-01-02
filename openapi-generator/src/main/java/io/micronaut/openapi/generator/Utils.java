@@ -105,6 +105,10 @@ public final class Utils {
 
     public static void processGenericAnnotations(CodegenParameter parameter, boolean useBeanValidation, boolean isGenerateHardNullable,
                                                  boolean isNullable, boolean isRequired, boolean isReadonly, boolean withNullablePostfix) {
+        var ext = parameter.vendorExtensions;
+        if (!ext.containsKey("isPrimitiveArray")) {
+            ext.put("isPrimitiveArray", isJavaPrimitiveArray(parameter.dataType) || isKotlinPrimitiveArray(parameter.dataType));
+        }
         CodegenProperty items = parameter.isMap ? parameter.additionalProperties : parameter.items;
         String datatypeWithEnum = parameter.datatypeWithEnum == null ? parameter.dataType : parameter.datatypeWithEnum;
         processGenericAnnotations(parameter.dataType, datatypeWithEnum, parameter.isMap, parameter.containerTypeMapped,
@@ -113,10 +117,14 @@ public final class Utils {
 
     public static void processGenericAnnotations(CodegenProperty property, boolean useBeanValidation, boolean isGenerateHardNullable,
                                                  boolean isNullable, boolean isRequired, boolean isReadonly, boolean withNullablePostfix) {
+        var ext = property.vendorExtensions;
+        if (!ext.containsKey("isPrimitiveArray")) {
+            ext.put("isPrimitiveArray", isJavaPrimitiveArray(property.dataType) || isKotlinPrimitiveArray(property.dataType));
+        }
         CodegenProperty items = property.isMap ? property.additionalProperties : property.items;
         String datatypeWithEnum = property.datatypeWithEnum == null ? property.dataType : property.datatypeWithEnum;
         processGenericAnnotations(property.dataType, datatypeWithEnum, property.isMap, property.containerTypeMapped,
-            items, property.vendorExtensions, useBeanValidation, isGenerateHardNullable, isNullable, isRequired, isReadonly, withNullablePostfix);
+            items, ext, useBeanValidation, isGenerateHardNullable, isNullable, isRequired, isReadonly, withNullablePostfix);
     }
 
     public static void processGenericAnnotations(String dataType, String dataTypeWithEnum, boolean isMap, String containerType, CodegenProperty itemsProp, Map<String, Object> ext,
@@ -124,17 +132,17 @@ public final class Utils {
                                                  boolean isRequired, boolean isReadonly,
                                                  boolean withNullablePostfix) {
         String genericAnnotations = null;
+        dataType = addAnnotationsToPrimitiveArray(dataType, isNullable, isRequired, isReadonly, isGenerateHardNullable);
+        dataTypeWithEnum = addAnnotationsToPrimitiveArray(dataTypeWithEnum, isNullable, isRequired, isReadonly, isGenerateHardNullable);
         var typeWithGenericAnnotations = dataType;
         var typeWithEnumWithGenericAnnotations = dataTypeWithEnum;
         if (useBeanValidation && itemsProp != null && dataType.contains("<")) {
+            genericAnnotations = genericAnnotations(itemsProp, isGenerateHardNullable);
+            processGenericAnnotations(itemsProp, useBeanValidation, isGenerateHardNullable, itemsProp.isNullable, itemsProp.required, itemsProp.isReadOnly, withNullablePostfix);
             if (isMap) {
-                genericAnnotations = genericAnnotations(itemsProp, isGenerateHardNullable);
-                processGenericAnnotations(itemsProp, useBeanValidation, isGenerateHardNullable, itemsProp.isNullable, itemsProp.required, itemsProp.isReadOnly, withNullablePostfix);
                 typeWithGenericAnnotations = "Map<String, " + genericAnnotations + itemsProp.vendorExtensions.get("typeWithGenericAnnotations") + ">";
                 typeWithEnumWithGenericAnnotations = "Map<String, " + genericAnnotations + itemsProp.vendorExtensions.get("typeWithEnumWithGenericAnnotations") + ">";
             } else if (containerType != null) {
-                genericAnnotations = genericAnnotations(itemsProp, isGenerateHardNullable);
-                processGenericAnnotations(itemsProp, useBeanValidation, isGenerateHardNullable, itemsProp.isNullable, itemsProp.required, itemsProp.isReadOnly, withNullablePostfix);
                 typeWithGenericAnnotations = containerType + "<" + genericAnnotations + itemsProp.vendorExtensions.get("typeWithGenericAnnotations") + ">";
                 typeWithEnumWithGenericAnnotations = containerType + "<" + genericAnnotations + itemsProp.vendorExtensions.get("typeWithEnumWithGenericAnnotations") + ">";
             }
@@ -146,9 +154,43 @@ public final class Utils {
         ext.put("typeWithEnumWithGenericAnnotations", typeWithEnumWithGenericAnnotations + (isNullableType ? "?" : ""));
     }
 
+    private static String addAnnotationsToPrimitiveArray(String dataType, boolean isNullable, boolean isRequired, boolean isReadOnly, boolean isGenerateHardNullable) {
+        if (!isJavaPrimitiveArray(dataType)) {
+            return dataType;
+        }
+
+        var type = dataType.substring(0, dataType.indexOf('['));
+
+        if (isNullable || !isRequired || isReadOnly) {
+            if (isGenerateHardNullable) {
+                return type + " @Nullable(inherited = true) []";
+            } else {
+                return type + " @Nullable []";
+            }
+        } else {
+            return type + " @NotNull []";
+        }
+    }
+
+    private static boolean isJavaPrimitiveArray(String dataType) {
+        return switch (dataType) {
+            case "byte[]", "short[]", "int[]", "long[]", "boolean[]", "char[]", "float[]", "double[]" -> true;
+            default -> false;
+        };
+    }
+
+    private static boolean isKotlinPrimitiveArray(String dataType) {
+        return switch (dataType) {
+            case "ByteArray", "ShortArray", "IntArray", "LongArray", "BooleanArray", "CharArray", "FloatArray", "DoubleArray" -> true;
+            default -> false;
+        };
+    }
+
     private static String genericAnnotations(CodegenProperty prop, boolean isGenerateHardNullable) {
 
         var type = prop.openApiType == null ? null : prop.openApiType.toLowerCase();
+
+        var isPrimitiveArray = isJavaPrimitiveArray(prop.dataType) || isKotlinPrimitiveArray(prop.dataType);
 
         var result = new StringBuilder();
 
@@ -227,7 +269,7 @@ public final class Utils {
                 result.append(") ");
             }
         }
-        if (!(Boolean) prop.vendorExtensions.get("isPrimitive")) {
+        if (!isPrimitiveArray && !(Boolean) prop.vendorExtensions.get("isPrimitive")) {
             if (prop.isNullable) {
                 if (isGenerateHardNullable) {
                     result.append("@Nullable(inherited = true) ");
