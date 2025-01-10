@@ -26,7 +26,7 @@ dependencies {
     implementation(mnValidation.micronaut.validation)
     implementation(mnReactor.micronaut.reactor)
     implementation(mnData.micronaut.data.runtime)
-    implementation(mn.kotlin.stdlib.jdk8)
+    implementation(mn.kotlin.stdlib.asProvider())
     implementation(mn.kotlin.reflect)
     // Required when using useAuth=true
     implementation(mnSecurity.micronaut.security.oauth2)

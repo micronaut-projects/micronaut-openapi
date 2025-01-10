@@ -176,6 +176,7 @@ import static io.micronaut.openapi.visitor.SchemaDefinitionUtils.toValue;
 import static io.micronaut.openapi.visitor.SchemaDefinitionUtils.toValueMap;
 import static io.micronaut.openapi.visitor.SchemaUtils.COMPONENTS_CALLBACKS_PREFIX;
 import static io.micronaut.openapi.visitor.SchemaUtils.TYPE_OBJECT;
+import static io.micronaut.openapi.visitor.SchemaUtils.TYPE_STRING;
 import static io.micronaut.openapi.visitor.SchemaUtils.appendSchema;
 import static io.micronaut.openapi.visitor.SchemaUtils.getOperationOnPathItem;
 import static io.micronaut.openapi.visitor.SchemaUtils.isIgnoredHeader;
@@ -609,9 +610,13 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         if (requestBody != null && requestBody.getContent() != null && !extraBodyParameters.isEmpty()) {
             requestBody.getContent().forEach((mediaTypeName, mediaType) -> {
                 var schema = mediaType.getSchema();
-                if (schema == null) {
-                    schema = setSpecVersion(new Schema<>());
-                    mediaType.setSchema(schema);
+                if (schema == null || TYPE_STRING.equals(schema.getType())) {
+                    var newSchema = setSpecVersion(new Schema<>());
+                    if (schema != null) {
+                        newSchema.setNullable(schema.getNullable());
+                    }
+                    mediaType.setSchema(newSchema);
+                    schema = newSchema;
                 }
                 if (schema.get$ref() != null) {
                     if (isRequestBodySchemaSet) {

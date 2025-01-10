@@ -145,7 +145,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 interface MyOps {
 
     @Post("/")
-    String save(@MyAnn java.util.UUID uuid);
+    String save(@Body @MyAnn java.util.UUID uuid);
 }
 
 @Documented
