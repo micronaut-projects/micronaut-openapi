@@ -2667,4 +2667,86 @@ class MyBean {}
         paths."/path/to/controller/user/get2".get.parameters[0].schema
         paths."/path/to/controller/user/get2".get.parameters[0].schema.type == "string"
     }
+
+    void "test @RequestBean and @Body together"() {
+
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.core.annotation.Introspected;
+import io.micronaut.core.annotation.Nullable;
+import io.micronaut.http.HttpResponse;
+import io.micronaut.http.annotation.Body;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.PathVariable;
+import io.micronaut.http.annotation.Post;
+import io.micronaut.http.annotation.QueryValue;
+import io.micronaut.http.annotation.RequestBean;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import jakarta.inject.Singleton;
+import java.util.Map;
+
+@Controller
+class ControllerExternal {
+
+    @Post(value = "/example/{beverageId}/{teaId}{?reqId,maxResultCount}", processes = "application/json;charset=UTF-8")
+    public HttpResponse<?> bulkCheck(@RequestBean ExampleRequestBean bean, @Nullable @Body String content) {
+        return HttpResponse.ok();
+    }
+}
+
+@Introspected
+@Nullable
+class ExampleRequestBean {
+
+    @Parameter(hidden = true)
+    public String path;
+
+    @Parameter(hidden = true)
+    public String method;
+
+    @PathVariable
+    public String beverageId;
+
+    @PathVariable
+    public String teaId;
+
+    @Nullable
+    @QueryValue(defaultValue = "0")
+    public Integer maxResultCount;
+
+    @Nullable
+    @QueryValue(defaultValue = "1")
+    public String resultMode;
+
+    @Nullable
+    @QueryValue
+    public String reqId;
+
+    @Nullable
+    @Parameter(in = ParameterIn.QUERY, description = "defines a map of input fields", required = false)
+    public Map<String, String> params;
+
+    public String payload = null;
+}
+
+@Singleton
+class MyBean {}
+''')
+        when:
+        OpenAPI openAPI = Utils.testReference
+        def op = openAPI.paths."/example/{beverageId}/{teaId}".post
+
+        then:
+        op
+        op.requestBody
+        op.requestBody.content."application/json;charset=UTF-8"
+        op.requestBody.content."application/json;charset=UTF-8".schema
+        !op.requestBody.content."application/json;charset=UTF-8".schema.type
+        op.requestBody.content."application/json;charset=UTF-8".schema.nullable
+        op.requestBody.content."application/json;charset=UTF-8".schema.properties
+        op.requestBody.content."application/json;charset=UTF-8".schema.properties.payload
+        op.requestBody.content."application/json;charset=UTF-8".schema.properties.payload.type == 'string'
+    }
 }
