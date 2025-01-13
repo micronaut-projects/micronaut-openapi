@@ -204,7 +204,9 @@ public final class MicronautCodeGeneratorEntryPoint {
             javaCodeGen.setUseJakartaEe(options.useJakartaEe);
             javaCodeGen.setUseOneOfInterfaces(options.useOneOfInterfaces);
             javaCodeGen.setReactive(options.reactive);
+            javaCodeGen.setRequiredPropertiesInConstructor(options.requiredPropertiesInConstructor);
             javaCodeGen.setGenerateHttpResponseAlways(options.generateHttpResponseAlways);
+            javaCodeGen.setGenerateControllerAsAbstract(options.generateControllerAsAbstract);
             javaCodeGen.setGenerateHttpResponseWhereRequired(options.generateHttpResponseWhereRequired);
             javaCodeGen.setUseOptional(options.optional);
             javaCodeGen.setUseBeanValidation(options.beanValidation);
@@ -298,6 +300,7 @@ public final class MicronautCodeGeneratorEntryPoint {
             kotlinCodeGen.setUseOneOfInterfaces(options.useOneOfInterfaces);
             kotlinCodeGen.setReactive(options.reactive);
             kotlinCodeGen.setGenerateHttpResponseAlways(options.generateHttpResponseAlways);
+            kotlinCodeGen.setGenerateControllerAsAbstract(options.generateControllerAsAbstract);
             kotlinCodeGen.setGenerateHttpResponseWhereRequired(options.generateHttpResponseWhereRequired);
             kotlinCodeGen.setGenerateSwaggerAnnotations(options.generateSwaggerAnnotations);
             kotlinCodeGen.setUseBeanValidation(options.beanValidation);
@@ -581,8 +584,10 @@ public final class MicronautCodeGeneratorEntryPoint {
 
             private boolean optional;
             private boolean reactive = true;
+            private boolean requiredPropertiesInConstructor = true;
             private boolean useOneOfInterfaces = true;
             private boolean generateHttpResponseAlways;
+            private boolean generateControllerAsAbstract;
             private boolean generateHttpResponseWhereRequired = true;
             private boolean generateSwaggerAnnotations;
             private TestFramework testFramework = TestFramework.JUNIT5;
@@ -743,8 +748,20 @@ public final class MicronautCodeGeneratorEntryPoint {
             }
 
             @Override
+            public MicronautCodeGeneratorOptionsBuilder withRequiredPropertiesInConstructor(boolean requiredPropertiesInConstructor) {
+                this.requiredPropertiesInConstructor = requiredPropertiesInConstructor;
+                return this;
+            }
+
+            @Override
             public MicronautCodeGeneratorOptionsBuilder withGenerateHttpResponseAlways(boolean generateHttpResponseAlways) {
                 this.generateHttpResponseAlways = generateHttpResponseAlways;
+                return this;
+            }
+
+            @Override
+            public MicronautCodeGeneratorOptionsBuilder withGenerateControllerAsAbstract(boolean generateControllerAsAbstract) {
+                this.generateControllerAsAbstract = generateControllerAsAbstract;
                 return this;
             }
 
@@ -918,8 +935,10 @@ public final class MicronautCodeGeneratorEntryPoint {
                     useEnumCaseInsensitive,
                     optional,
                     reactive,
+                    requiredPropertiesInConstructor,
                     useOneOfInterfaces,
                     generateHttpResponseAlways,
+                    generateControllerAsAbstract,
                     generateHttpResponseWhereRequired,
                     generateSwaggerAnnotations,
                     testFramework,
@@ -991,8 +1010,10 @@ public final class MicronautCodeGeneratorEntryPoint {
         boolean useEnumCaseInsensitive,
         boolean optional,
         boolean reactive,
+        boolean requiredPropertiesInConstructor,
         boolean useOneOfInterfaces,
         boolean generateHttpResponseAlways,
+        boolean generateControllerAsAbstract,
         boolean generateHttpResponseWhereRequired,
         boolean generateSwaggerAnnotations,
         TestFramework testFramework,

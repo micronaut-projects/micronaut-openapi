@@ -2413,15 +2413,16 @@ record FilterProvidedArgument(String id) {}
 
 @Singleton
 class TestArgumentBinder implements TypedRequestArgumentBinder<FilterProvidedArgument> {
-  @Override
-  public Argument<FilterProvidedArgument> argumentType() {
-    return Argument.of(FilterProvidedArgument.class);
-  }
 
-  @Override
-  public BindingResult<FilterProvidedArgument> bind(ArgumentConversionContext<FilterProvidedArgument> context, HttpRequest<?> source) {
-    return () -> Optional.of(new FilterProvidedArgument("my-id"));
-  }
+    @Override
+    public Argument<FilterProvidedArgument> argumentType() {
+        return Argument.of(FilterProvidedArgument.class);
+    }
+    
+    @Override
+    public BindingResult<FilterProvidedArgument> bind(ArgumentConversionContext<FilterProvidedArgument> context, HttpRequest<?> source) {
+        return () -> Optional.of(new FilterProvidedArgument("my-id"));
+    }
 }
 
 @Controller("/test")
@@ -2748,5 +2749,101 @@ class MyBean {}
         op.requestBody.content."application/json;charset=UTF-8".schema.properties
         op.requestBody.content."application/json;charset=UTF-8".schema.properties.payload
         op.requestBody.content."application/json;charset=UTF-8".schema.properties.payload.type == 'string'
+    }
+
+    void "test custom response Status in controller impl"() {
+
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.http.HttpStatus;
+import io.micronaut.http.annotation.Body;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Delete;
+import io.micronaut.http.annotation.Get;
+import io.micronaut.http.annotation.PathVariable;
+import io.micronaut.http.annotation.Post;
+import io.micronaut.http.annotation.Status;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import jakarta.inject.Singleton;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+
+@Controller
+interface ConsentsApi {
+
+    @Status(HttpStatus.ACCEPTED)
+    @Get("/rewriteStatus")
+    void rewriteStatus();
+
+    @Status(HttpStatus.CREATED)
+    @Post("/consents")
+    ConsentResponse createConsent(
+        @Body @NotNull @Valid ConsentRequest consentRequest
+    );
+
+    @ApiResponse(responseCode = "301", description = "sdsd")
+    @ApiResponse(responseCode = "403", description = "sdsd")
+    @Delete("/consents/{consentId}")
+    void deleteConsent(
+        @PathVariable("consentId") @NotNull String consentId
+    );
+}
+
+@Controller
+class ConsentsApiImpl implements ConsentsApi {
+
+    @Status(HttpStatus.PARTIAL_CONTENT)
+    public void rewriteStatus() {
+        
+    }
+
+    @Override
+    public ConsentResponse createConsent(ConsentRequest consentRequest) {
+        return null;
+    }
+
+    @Status(HttpStatus.NO_CONTENT)
+    @Override
+    public void deleteConsent(String consentId) {
+
+    }
+}
+
+
+class ConsentResponse {
+    
+}
+
+class ConsentRequest {
+    
+}
+
+@Singleton
+class MyBean {}
+''')
+        when:
+        OpenAPI openAPI = Utils.testReference
+        def op = openAPI.paths."/consents/{consentId}".delete
+        def op1 = openAPI.paths."/consents".post
+        def op2 = openAPI.paths."/rewriteStatus".get
+
+        then:
+        op
+        op.responses
+        op.responses.size() == 3
+        op.responses["301"]
+        op.responses["403"]
+        op.responses["204"]
+
+        op1
+        op1.responses
+        op1.responses.size() == 1
+        op1.responses["201"]
+
+        op2
+        op2.responses
+        op1.responses.size() == 1
+        op2.responses["206"]
     }
 }

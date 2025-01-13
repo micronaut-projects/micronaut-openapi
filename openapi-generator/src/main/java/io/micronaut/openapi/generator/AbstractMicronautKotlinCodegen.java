@@ -128,7 +128,6 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
     public static final String OPT_TITLE = "title";
     public static final String OPT_TEST = "test";
     public static final String OPT_TEST_JUNIT = "junit";
-    public static final String OPT_REQUIRED_PROPERTIES_IN_CONSTRUCTOR = "requiredPropertiesInConstructor";
     public static final String OPT_USE_AUTH = "useAuth";
     public static final String OPT_USE_PLURAL = "plural";
     public static final String OPT_FLUX_FOR_ARRAYS = "fluxForArrays";
@@ -141,6 +140,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
     public static final String OPT_DATE_TIME_FORMAT = "dateTimeFormat";
     public static final String OPT_REACTIVE = "reactive";
     public static final String OPT_GENERATE_HTTP_RESPONSE_ALWAYS = "generateHttpResponseAlways";
+    public static final String OPT_GENERATE_CONTROLLER_AS_ABSTRACT = "generateControllerAsAbstract";
     public static final String OPT_GENERATE_HTTP_RESPONSE_WHERE_REQUIRED = "generateHttpResponseWhereRequired";
     public static final String OPT_APPLICATION_NAME = "applicationName";
     public static final String OPT_GENERATE_SWAGGER_ANNOTATIONS = "generateSwaggerAnnotations";
@@ -171,10 +171,10 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
     protected boolean fluxForArrays;
     protected boolean generatedAnnotation = true;
     protected String testTool;
-    protected boolean requiredPropertiesInConstructor = true;
     protected boolean reactive;
     protected boolean generateHttpResponseAlways;
     protected boolean generateHttpResponseWhereRequired = true;
+    protected boolean generateControllerAsAbstract;
     protected boolean useEnumCaseInsensitive;
     protected boolean ksp;
     protected boolean implicitHeaders;
@@ -312,11 +312,11 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         cliOptions.add(CliOption.newBoolean(OPT_KSP, "Generate code compatible only with KSP", ksp));
         cliOptions.add(CliOption.newBoolean(USE_BEANVALIDATION, "Use BeanValidation API annotations", useBeanValidation));
         cliOptions.add(CliOption.newBoolean(OPT_VISITABLE, "Generate visitor for subtypes with a discriminator", visitable));
-        cliOptions.add(CliOption.newBoolean(OPT_REQUIRED_PROPERTIES_IN_CONSTRUCTOR, "Allow only to create models with all the required properties provided in constructor", requiredPropertiesInConstructor));
         cliOptions.add(CliOption.newBoolean(OPT_REACTIVE, "Make the responses use Reactor Mono as wrapper", reactive));
         cliOptions.add(CliOption.newBoolean(OPT_IMPLICIT_HEADERS, "Skip header parameters in the generated API methods using @ApiImplicitParams annotation.", implicitHeaders));
         cliOptions.add(CliOption.newString(OPT_IMPLICIT_HEADERS_REGEX, "Skip header parameters that matches given regex in the generated API methods using @ApiImplicitParams annotation. Note: this parameter is ignored when implicitHeaders=true"));
         cliOptions.add(CliOption.newBoolean(OPT_GENERATE_HTTP_RESPONSE_ALWAYS, "Always wrap the operations response in HttpResponse object", generateHttpResponseAlways));
+        cliOptions.add(CliOption.newBoolean(OPT_GENERATE_CONTROLLER_AS_ABSTRACT, "If true, then controller interface will be without @Controller annotation", generateControllerAsAbstract));
         cliOptions.add(CliOption.newBoolean(OPT_GENERATE_HTTP_RESPONSE_WHERE_REQUIRED, "Wrap the operations response in HttpResponse object where non-200 HTTP status codes or additional headers are defined", generateHttpResponseWhereRequired));
         cliOptions.add(CliOption.newBoolean(CodegenConstants.HIDE_GENERATION_TIMESTAMP, CodegenConstants.HIDE_GENERATION_TIMESTAMP_DESC, isHideGenerationTimestamp()));
         cliOptions.add(CliOption.newBoolean(OPT_GENERATE_OPERATION_ONLY_FOR_FIRST_TAG, "When false, the operation method will be duplicated in each of the tags if multiple tags are assigned to this operation. " +
@@ -422,6 +422,10 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
 
     public void setGenerateHttpResponseWhereRequired(boolean generateHttpResponseWhereRequired) {
         this.generateHttpResponseWhereRequired = generateHttpResponseWhereRequired;
+    }
+
+    public void setGenerateControllerAsAbstract(boolean generateControllerAsAbstract) {
+        this.generateControllerAsAbstract = generateControllerAsAbstract;
     }
 
     public void setReactive(boolean reactive) {
@@ -565,11 +569,6 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         }
         writePropertyBack(OPT_VISITABLE, visitable);
 
-        if (additionalProperties.containsKey(OPT_REQUIRED_PROPERTIES_IN_CONSTRUCTOR)) {
-            requiredPropertiesInConstructor = convertPropertyToBoolean(OPT_REQUIRED_PROPERTIES_IN_CONSTRUCTOR);
-        }
-        writePropertyBack(OPT_REQUIRED_PROPERTIES_IN_CONSTRUCTOR, requiredPropertiesInConstructor);
-
         if (additionalProperties.containsKey(OPT_REACTIVE)) {
             reactive = convertPropertyToBoolean(OPT_REACTIVE);
         }
@@ -588,10 +587,16 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
             generateHttpResponseAlways = convertPropertyToBoolean(OPT_GENERATE_HTTP_RESPONSE_ALWAYS);
         }
         writePropertyBack(OPT_GENERATE_HTTP_RESPONSE_ALWAYS, generateHttpResponseAlways);
+
         if (additionalProperties.containsKey(OPT_GENERATE_HTTP_RESPONSE_WHERE_REQUIRED)) {
             generateHttpResponseWhereRequired = convertPropertyToBoolean(OPT_GENERATE_HTTP_RESPONSE_WHERE_REQUIRED);
         }
         writePropertyBack(OPT_GENERATE_HTTP_RESPONSE_WHERE_REQUIRED, generateHttpResponseWhereRequired);
+
+        if (additionalProperties.containsKey(OPT_GENERATE_CONTROLLER_AS_ABSTRACT)) {
+            generateControllerAsAbstract = convertPropertyToBoolean(OPT_GENERATE_CONTROLLER_AS_ABSTRACT);
+        }
+        writePropertyBack(OPT_GENERATE_CONTROLLER_AS_ABSTRACT, generateControllerAsAbstract);
 
         if (additionalProperties.containsKey(OPT_GENERATE_OPERATION_ONLY_FOR_FIRST_TAG)) {
             generateOperationOnlyForFirstTag = convertPropertyToBoolean(OPT_GENERATE_OPERATION_ONLY_FOR_FIRST_TAG);
@@ -2466,23 +2471,19 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
             if (requiredVars == null) {
                 example = null;
             } else {
-                if (requiredPropertiesInConstructor) {
-                    var builder = new StringBuilder();
-                    if (isProperty) {
-                        dataType = importMapping.getOrDefault(dataType, modelPackage + '.' + dataType);
-                    }
-                    builder.append(dataType).append("(");
-                    for (int i = 0; i < requiredVars.size(); ++i) {
-                        if (i != 0) {
-                            builder.append(", ");
-                        }
-                        builder.append(getPropertyExampleValue(requiredVars.get(i)));
-                    }
-                    builder.append(")");
-                    example = builder.toString();
-                } else {
-                    example = dataType + "()";
+                var builder = new StringBuilder();
+                if (isProperty) {
+                    dataType = importMapping.getOrDefault(dataType, modelPackage + '.' + dataType);
                 }
+                builder.append(dataType).append("(");
+                for (int i = 0; i < requiredVars.size(); ++i) {
+                    if (i != 0) {
+                        builder.append(", ");
+                    }
+                    builder.append(getPropertyExampleValue(requiredVars.get(i)));
+                }
+                builder.append(")");
+                example = builder.toString();
             }
         }
 

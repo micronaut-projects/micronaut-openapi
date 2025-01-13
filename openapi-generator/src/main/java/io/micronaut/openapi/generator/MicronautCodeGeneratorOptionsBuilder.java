@@ -209,12 +209,28 @@ public interface MicronautCodeGeneratorOptionsBuilder {
     MicronautCodeGeneratorOptionsBuilder withReactive(boolean reactive);
 
     /**
+     * If set to true, the generator will use reactive types.
+     *
+     * @param requiredPropertiesInConstructor the reactive flag
+     * @return this builder
+     */
+    MicronautCodeGeneratorOptionsBuilder withRequiredPropertiesInConstructor(boolean requiredPropertiesInConstructor);
+
+    /**
      * If true, the generated operation return types will be wrapped in HttpResponse.
      *
      * @param generateHttpResponseAlways the wrapping flag
      * @return this builder
      */
     MicronautCodeGeneratorOptionsBuilder withGenerateHttpResponseAlways(boolean generateHttpResponseAlways);
+
+    /**
+     * If true, the generated controller interface will be without `@Controller` annotation.
+     *
+     * @param generateControllerAsAbstract If true, the generated controller interface will be without `@Controller` annotation.
+     * @return this builder
+     */
+    MicronautCodeGeneratorOptionsBuilder withGenerateControllerAsAbstract(boolean generateControllerAsAbstract);
 
     /**
      * Wrap the operations response in HttpResponse object where non-200 HTTP status codes or additional headers are defined.

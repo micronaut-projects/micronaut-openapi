@@ -139,6 +139,7 @@ import static io.micronaut.openapi.visitor.ElementUtils.isSingleResponseType;
 import static io.micronaut.openapi.visitor.ElementUtils.isWrappedBodyParameter;
 import static io.micronaut.openapi.visitor.GeneratorUtils.addOperationDeprecatedExtension;
 import static io.micronaut.openapi.visitor.GeneratorUtils.addParameterDeprecatedExtension;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.MICRONAUT_EXT_PARENT_RESPONSE;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_ADD_ALWAYS;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_ALLOW_EMPTY_VALUE;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_ALLOW_RESERVED;
@@ -454,6 +455,32 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
 
             for (Map.Entry<PathItem, Operation> operationEntry : swaggerOperations.entrySet()) {
                 Operation swaggerOperation = operationEntry.getValue();
+                Operation existedOperation = null;
+
+                for (var pathEntry : openApi.getPaths().entrySet()) {
+                    if (pathEntry.getKey().equals(pathItemEntry.getKey())) {
+                        var existedPathItem = pathEntry.getValue();
+                        if (httpMethod == HttpMethod.GET) {
+                            existedOperation = existedPathItem.getGet();
+                        } else if (httpMethod == HttpMethod.PUT) {
+                            existedOperation = existedPathItem.getPut();
+                        } else if (httpMethod == HttpMethod.POST) {
+                            existedOperation = existedPathItem.getPost();
+                        } else if (httpMethod == HttpMethod.DELETE) {
+                            existedOperation = existedPathItem.getDelete();
+                        } else if (httpMethod == HttpMethod.OPTIONS) {
+                            existedOperation = existedPathItem.getOptions();
+                        } else if (httpMethod == HttpMethod.HEAD) {
+                            existedOperation = existedPathItem.getHead();
+                        } else if (httpMethod == HttpMethod.PATCH) {
+                            existedOperation = existedPathItem.getPatch();
+                        } else if (httpMethod == HttpMethod.TRACE) {
+                            existedOperation = existedPathItem.getTrace();
+                        }
+                        break;
+                    }
+                }
+
                 ExternalDocumentation externalDocs = readExternalDocs(element, context);
                 if (externalDocs == null) {
                     externalDocs = classExternalDocs;
@@ -478,7 +505,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                     swaggerOperation.setDeprecated(true);
                 }
 
-                readResponse(element, context, openApi, swaggerOperation, javadocDescription, jsonViewClass);
+                readResponse(element, context, openApi, swaggerOperation, existedOperation, javadocDescription, jsonViewClass);
 
                 boolean isRequestBodySchemaSet = false;
 
@@ -1286,15 +1313,22 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         }
     }
 
-    private void readResponse(MethodElement element, VisitorContext context, OpenAPI openAPI,
-                              Operation swaggerOperation, JavadocDescription javadocDescription, @Nullable ClassElement jsonViewClass) {
+    private void readResponse(MethodElement element, VisitorContext context, OpenAPI openAPI, Operation swaggerOperation,
+                              Operation existedOperation, JavadocDescription javadocDescription, @Nullable ClassElement jsonViewClass) {
 
         boolean withMethodResponses = element.hasDeclaredAnnotation(io.swagger.v3.oas.annotations.responses.ApiResponses.class)
             || element.hasDeclaredAnnotation(io.swagger.v3.oas.annotations.responses.ApiResponse.class);
 
-        HttpStatus methodResponseStatus = element.enumValue(Status.class, HttpStatus.class).orElse(HttpStatus.OK);
-        String responseCode = Integer.toString(methodResponseStatus.getCode());
+        ApiResponses existedResponses = existedOperation != null ? existedOperation.getResponses() : null;
         ApiResponses responses = swaggerOperation.getResponses();
+        HttpStatus methodResponseStatus = element.enumValue(Status.class, HttpStatus.class).orElse(null);
+        var responseStatusNotSetOrSetByAnnotation = element.hasAnnotation(Status.class) || methodResponseStatus == null;
+        if (methodResponseStatus == null) {
+            methodResponseStatus = HttpStatus.OK;
+        } else if (existedResponses != null && existedResponses.getExtensions() != null && existedResponses.getExtensions().containsKey(MICRONAUT_EXT_PARENT_RESPONSE)) {
+            existedOperation.setResponses(null);
+        }
+        String responseCode = Integer.toString(methodResponseStatus.getCode());
         ApiResponse response = null;
 
         if (responses == null) {
@@ -1307,6 +1341,9 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                 response = defaultResponse;
                 responses.put(responseCode, response);
             }
+        }
+        if (responseStatusNotSetOrSetByAnnotation) {
+            responses.addExtension(MICRONAUT_EXT_PARENT_RESPONSE, true);
         }
         if (response == null && !withMethodResponses) {
             response = new ApiResponse();

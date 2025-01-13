@@ -138,6 +138,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
     public static final String OPT_USE_ENUM_CASE_INSENSITIVE = "useEnumCaseInsensitive";
     public static final String OPT_REACTIVE = "reactive";
     public static final String OPT_GENERATE_HTTP_RESPONSE_ALWAYS = "generateHttpResponseAlways";
+    public static final String OPT_GENERATE_CONTROLLER_AS_ABSTRACT = "generateControllerAsAbstract";
     public static final String OPT_GENERATE_HTTP_RESPONSE_WHERE_REQUIRED = "generateHttpResponseWhereRequired";
     public static final String OPT_APPLICATION_NAME = "applicationName";
     public static final String OPT_GENERATE_SWAGGER_ANNOTATIONS = "generateSwaggerAnnotations";
@@ -169,6 +170,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
     protected boolean useEnumCaseInsensitive;
     protected boolean generateHttpResponseAlways;
     protected boolean generateHttpResponseWhereRequired = true;
+    protected boolean generateControllerAsAbstract;
     protected String appName;
     protected String dateFormat;
     protected String dateTimeFormat;
@@ -270,6 +272,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
         cliOptions.add(CliOption.newBoolean(OPT_REQUIRED_PROPERTIES_IN_CONSTRUCTOR, "Allow only to create models with all the required properties provided in constructor", requiredPropertiesInConstructor));
         cliOptions.add(CliOption.newBoolean(OPT_REACTIVE, "Make the responses use Reactor Mono as wrapper", reactive));
         cliOptions.add(CliOption.newBoolean(OPT_GENERATE_HTTP_RESPONSE_ALWAYS, "Always wrap the operations response in HttpResponse object", generateHttpResponseAlways));
+        cliOptions.add(CliOption.newBoolean(OPT_GENERATE_CONTROLLER_AS_ABSTRACT, "If true, then controller interface will be without @Controller annotation", generateControllerAsAbstract));
         cliOptions.add(CliOption.newBoolean(OPT_GENERATE_HTTP_RESPONSE_WHERE_REQUIRED, "Wrap the operations response in HttpResponse object where non-200 HTTP status codes or additional headers are defined", generateHttpResponseWhereRequired));
         cliOptions.add(CliOption.newBoolean(OPT_GENERATE_OPERATION_ONLY_FOR_FIRST_TAG, "When false, the operation method will be duplicated in each of the tags if multiple tags are assigned to this operation. " +
             "If true, each operation will be generated only once in the first assigned tag.", generateOperationOnlyForFirstTag));
@@ -340,6 +343,10 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
 
     public void setGenerateHttpResponseAlways(boolean generateHttpResponseAlways) {
         this.generateHttpResponseAlways = generateHttpResponseAlways;
+    }
+
+    public void setGenerateControllerAsAbstract(boolean generateControllerAsAbstract) {
+        this.generateControllerAsAbstract = generateControllerAsAbstract;
     }
 
     public void setGenerateHttpResponseWhereRequired(boolean generateHttpResponseWhereRequired) {
@@ -536,10 +543,16 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
             generateHttpResponseAlways = convertPropertyToBoolean(OPT_GENERATE_HTTP_RESPONSE_ALWAYS);
         }
         writePropertyBack(OPT_GENERATE_HTTP_RESPONSE_ALWAYS, generateHttpResponseAlways);
+
         if (additionalProperties.containsKey(OPT_GENERATE_HTTP_RESPONSE_WHERE_REQUIRED)) {
             generateHttpResponseWhereRequired = convertPropertyToBoolean(OPT_GENERATE_HTTP_RESPONSE_WHERE_REQUIRED);
         }
         writePropertyBack(OPT_GENERATE_HTTP_RESPONSE_WHERE_REQUIRED, generateHttpResponseWhereRequired);
+
+        if (additionalProperties.containsKey(OPT_GENERATE_CONTROLLER_AS_ABSTRACT)) {
+            generateControllerAsAbstract = convertPropertyToBoolean(OPT_GENERATE_CONTROLLER_AS_ABSTRACT);
+        }
+        writePropertyBack(OPT_GENERATE_CONTROLLER_AS_ABSTRACT, generateControllerAsAbstract);
 
         if (additionalProperties.containsKey(OPT_GENERATE_OPERATION_ONLY_FOR_FIRST_TAG)) {
             generateOperationOnlyForFirstTag = convertPropertyToBoolean(OPT_GENERATE_OPERATION_ONLY_FOR_FIRST_TAG);
@@ -2440,6 +2453,10 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
 
     public void setUseEnumCaseInsensitive(boolean useEnumCaseInsensitive) {
         this.useEnumCaseInsensitive = useEnumCaseInsensitive;
+    }
+
+    public void setRequiredPropertiesInConstructor(boolean requiredPropertiesInConstructor) {
+        this.requiredPropertiesInConstructor = requiredPropertiesInConstructor;
     }
 
     @Override
