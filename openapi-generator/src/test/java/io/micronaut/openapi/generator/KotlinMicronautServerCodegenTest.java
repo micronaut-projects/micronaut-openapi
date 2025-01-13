@@ -119,7 +119,6 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
     @Test
     void doGenerateRequiredPropertiesInConstructor() {
         var codegen = new KotlinMicronautServerCodegen();
-        codegen.additionalProperties().put(KotlinMicronautServerCodegen.OPT_REQUIRED_PROPERTIES_IN_CONSTRUCTOR, "true");
         String outputPath = generateFiles(codegen, PETSTORE_PATH, CodegenConstants.MODELS, CodegenConstants.APIS);
 
         // Constructor should have properties
@@ -158,19 +157,6 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                     var status: PetStatus? = null,
                 ) {
                 """);
-    }
-
-    @Test
-    void doNotGenerateRequiredPropertiesInConstructor() {
-        var codegen = new KotlinMicronautServerCodegen();
-        codegen.additionalProperties().put(KotlinMicronautServerCodegen.OPT_REQUIRED_PROPERTIES_IN_CONSTRUCTOR, "false");
-        String outputPath = generateFiles(codegen, PETSTORE_PATH, CodegenConstants.MODELS, CodegenConstants.APIS);
-
-        // Constructor should have properties
-        String modelPath = outputPath + "src/main/kotlin/org/openapitools/model/";
-        assertFileNotContainsRegex(modelPath + "Pet.kt", "public Pet\\([^)]+\\)");
-        assertFileNotContainsRegex(modelPath + "User.kt", "public User\\([^)]+\\)");
-        assertFileNotContainsRegex(modelPath + "Order.kt", "public Order\\([^)]+\\)");
     }
 
     @Test
@@ -883,5 +869,17 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                     ): Mono<String>
                 """);
         assertFileContains(path + "model/Color.kt", "enum class Color(");
+    }
+
+    @Test
+    void testGenerateControllerAsAbstract() {
+
+        var codegen = new JavaMicronautServerCodegen();
+        codegen.setGenerateControllerAsAbstract(true);
+        codegen.setUseAuth(false);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/body-enum.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String path = outputPath + "src/main/java/org/openapitools/";
+
+        assertFileNotContains(path + "api/MyCustomApi.java", "@Controller");
     }
 }

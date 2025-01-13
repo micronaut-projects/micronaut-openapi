@@ -31,7 +31,6 @@ import io.swagger.v3.oas.models.media.Content;
 import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.media.StringSchema;
 import io.swagger.v3.oas.models.parameters.Parameter;
-import io.swagger.v3.oas.models.responses.ApiResponse;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -41,6 +40,7 @@ import java.util.TreeMap;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
+import static io.micronaut.openapi.visitor.OpenApiModelProp.MICRONAUT_EXT_PARENT_RESPONSE;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_DESCRIPTION;
 import static io.micronaut.openapi.visitor.SchemaUtils.EMPTY_SIMPLE_SCHEMA;
 import static io.micronaut.openapi.visitor.SchemaUtils.TYPE_OBJECT;
@@ -159,12 +159,26 @@ public final class OpenApiNormalizeUtils {
         if (operation.getRequestBody() != null) {
             normalizeContent(operation.getRequestBody().getContent(), context);
         }
-        if (CollectionUtils.isNotEmpty(operation.getResponses())) {
-            for (ApiResponse apiResponse : operation.getResponses().values()) {
-                normalizeContent(apiResponse.getContent(), context);
-                normalizeHeaders(apiResponse.getHeaders(), context);
-                if (CollectionUtils.isEmpty(apiResponse.getExtensions())) {
-                    apiResponse.setExtensions(null);
+        var responses = operation.getResponses();
+        if (CollectionUtils.isNotEmpty(responses)) {
+            if (CollectionUtils.isNotEmpty(responses.getExtensions())) {
+                responses.getExtensions().remove(MICRONAUT_EXT_PARENT_RESPONSE);
+            }
+            if (CollectionUtils.isEmpty(responses.getExtensions())) {
+                responses.setExtensions(null);
+            }
+            var iter = responses.keySet().iterator();
+            while (iter.hasNext()) {
+                var responseName = iter.next();
+                var response = responses.get(responseName);
+                if (response == null) {
+                    iter.remove();
+                    continue;
+                }
+                normalizeContent(response.getContent(), context);
+                normalizeHeaders(response.getHeaders(), context);
+                if (CollectionUtils.isEmpty(response.getExtensions())) {
+                    response.setExtensions(null);
                 }
             }
         }

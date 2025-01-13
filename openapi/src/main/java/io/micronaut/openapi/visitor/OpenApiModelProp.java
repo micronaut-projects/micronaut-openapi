@@ -102,4 +102,6 @@ public interface OpenApiModelProp {
     String PROP_BEARER_FORMAT = "bearerFormat";
 
     String PROP_ACCESS = "access";
+
+    String MICRONAUT_EXT_PARENT_RESPONSE = "x-micronaut-parent-response";
 }

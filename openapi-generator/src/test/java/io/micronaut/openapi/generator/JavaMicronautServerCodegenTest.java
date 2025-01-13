@@ -735,4 +735,16 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
             """);
         assertFileContains(path + "model/Color.java", "public enum Color {");
     }
+
+    @Test
+    void testGenerateControllerAsAbstract() {
+
+        var codegen = new JavaMicronautServerCodegen();
+        codegen.setGenerateControllerAsAbstract(true);
+        codegen.setUseAuth(false);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/body-enum.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String path = outputPath + "src/main/java/org/openapitools/";
+
+        assertFileNotContains(path + "api/MyCustomApi.java", "@Controller");
+    }
 }

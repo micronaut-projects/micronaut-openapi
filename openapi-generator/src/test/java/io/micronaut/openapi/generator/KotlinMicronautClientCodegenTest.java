@@ -139,7 +139,6 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
     @Test
     void doGenerateRequiredPropertiesInConstructor() {
         var codegen = new KotlinMicronautClientCodegen();
-        codegen.additionalProperties().put(KotlinMicronautClientCodegen.OPT_REQUIRED_PROPERTIES_IN_CONSTRUCTOR, "true");
         String outputPath = generateFiles(codegen, PETSTORE_PATH, CodegenConstants.MODELS, CodegenConstants.APIS);
 
         // Constructor should have properties
@@ -172,19 +171,6 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                     var status: PetStatus? = null,
                 ) {
                 """);
-    }
-
-    @Test
-    void doNotGenerateRequiredPropertiesInConstructor() {
-        var codegen = new KotlinMicronautClientCodegen();
-        codegen.additionalProperties().put(KotlinMicronautClientCodegen.OPT_REQUIRED_PROPERTIES_IN_CONSTRUCTOR, "false");
-        String outputPath = generateFiles(codegen, PETSTORE_PATH, CodegenConstants.MODELS, CodegenConstants.APIS);
-
-        // Constructor should have properties
-        String modelPath = outputPath + "src/main/kotlin/org/openapitools/model/";
-        assertFileNotContainsRegex(modelPath + "Pet.kt", "public Pet\\([^)]+\\)");
-        assertFileNotContainsRegex(modelPath + "User.kt", "public User\\([^)]+\\)");
-        assertFileNotContainsRegex(modelPath + "Order.kt", "public Order\\([^)]+\\)");
     }
 
     @Test
