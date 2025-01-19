@@ -5,10 +5,12 @@ import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.PathItem
 import io.swagger.v3.oas.models.servers.Server
 import io.swagger.v3.oas.models.tags.Tag
+import spock.lang.Ignore
 import spock.lang.Issue
 
 class OpenApiIncludeVisitorSpec extends AbstractOpenApiTypeElementSpec {
 
+    @Ignore("Enable it, after https://github.com/micronaut-projects/micronaut-security/pull/1916 will be merged")
     void "test build OpenAPI doc for security Login controller"() {
         when:
         buildBeanDefinition('test.MyBean', '''
@@ -109,6 +111,7 @@ class MyBean {}
         openAPI.components.schemas['UsernamePasswordCredentials'].properties['password']
     }
 
+    @Ignore("Enable it, after https://github.com/micronaut-projects/micronaut-security/pull/1916 will be merged")
     void "test build OpenAPI doc for security Login controller with custom uris"() {
         when:
         buildBeanDefinition('test.MyBean', '''
@@ -210,6 +213,7 @@ class MyBean {}
         openAPI.components.schemas['UsernamePasswordCredentials'].properties['password']
     }
 
+    @Ignore("Enable it, after https://github.com/micronaut-projects/micronaut-security/pull/1916 will be merged")
     void "test build OpenAPI doc for security Login controller with custom uris and placeholder"() {
 
         given:

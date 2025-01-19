@@ -155,11 +155,12 @@ public final class ElementUtils {
             || type.isAssignable(AtomicReference.class)
             || type.isAssignable(OptionalInt.class)
             || type.isAssignable(OptionalLong.class)
-            || type.isAssignable(OptionalDouble.class);
+            || type.isAssignable(OptionalDouble.class)
+            ;
     }
 
     /**
-     * Need to check it for kotlin classes, because can be not nullable type with default value
+     * Need to check it for kotlin classes, because can be non-nullable type with default value.
      *
      * @param element typed element
      * @return true if element has nullable annotation, false - otherwise.

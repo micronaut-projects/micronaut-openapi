@@ -5,6 +5,7 @@ import io.micronaut.openapi.AbstractOpenApiTypeElementSpec
 import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.PathItem
 import io.swagger.v3.oas.models.Paths
+import spock.lang.Ignore
 
 class OpenApiPropsFromEnvSpec extends AbstractOpenApiTypeElementSpec {
 
@@ -118,6 +119,7 @@ class MyBean {}
         System.clearProperty(OpenApiConfigProperty.MICRONAUT_ENVIRONMENT_ENABLED)
     }
 
+    @Ignore("Enable it, after https://github.com/micronaut-projects/micronaut-security/pull/1916 will be merged")
     void "test expanded properties with environments"() {
 
         given:
@@ -223,6 +225,7 @@ class MyBean {}
         System.clearProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_CONFIG_FILE)
     }
 
+    @Ignore("Enable it, after https://github.com/micronaut-projects/micronaut-security/pull/1916 will be merged")
     void "test expanded properties from environment"() {
 
         given:
@@ -326,6 +329,7 @@ class MyBean {}
         System.clearProperty(Environment.ENVIRONMENTS_PROPERTY)
     }
 
+    @Ignore("Enable it, after https://github.com/micronaut-projects/micronaut-security/pull/1916 will be merged")
     void "test expanded properties from system properties"() {
 
         given:

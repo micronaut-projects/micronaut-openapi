@@ -164,6 +164,7 @@ class MyBean
         schemas.ColorEnum
     }
 
+    @Ignore("Need to fix issue: https://github.com/micronaut-projects/micronaut-core/issues/11518")
     void "test @NotNull annotation on kotlin nullable types"() {
 
         when:
