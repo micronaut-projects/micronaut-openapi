@@ -71,6 +71,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import static io.micronaut.openapi.visitor.ConfigUtils.isJsonViewEnabled;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_DEPRECATED;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_HIDDEN;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_NULLABLE;
 
 /**
  * Some util methods.
@@ -146,9 +147,7 @@ public final class ElementUtils {
      * @return true if element is nullable, false - otherwise.
      */
     public static boolean isNullable(TypedElement element) {
-
         var type = element.getType();
-
         return element.isNullable()
             || type.isOptional()
             || type.isAssignable(Optional.class)
@@ -156,8 +155,22 @@ public final class ElementUtils {
             || type.isAssignable(AtomicReference.class)
             || type.isAssignable(OptionalInt.class)
             || type.isAssignable(OptionalLong.class)
-            || type.isAssignable(OptionalDouble.class)
-            ;
+            || type.isAssignable(OptionalDouble.class);
+    }
+
+    /**
+     * Need to check it for kotlin classes, because can be not nullable type with default value
+     *
+     * @param element typed element
+     * @return true if element has nullable annotation, false - otherwise.
+     */
+    public static boolean hasNullableAnnotation(TypedElement element) {
+        var schemaNullableProp = element.booleanValue(Schema.class, PROP_NULLABLE).orElse(null);
+        var jsonPropertyRequiredProp = element.booleanValue(JsonProperty.class, "required").orElse(null);
+        return element.isAnnotationPresent("io.micronaut.core.annotation.Nullable")
+            || element.isAnnotationPresent("jakarta.annotation.Nullable")
+            || (jsonPropertyRequiredProp != null && !jsonPropertyRequiredProp)
+            || (schemaNullableProp != null && schemaNullableProp);
     }
 
     /**

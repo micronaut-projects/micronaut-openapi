@@ -128,6 +128,7 @@ import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_IS
 import static io.micronaut.openapi.visitor.ContextUtils.warn;
 import static io.micronaut.openapi.visitor.ConvertUtils.MAP_TYPE;
 import static io.micronaut.openapi.visitor.ElementUtils.getJsonViewClass;
+import static io.micronaut.openapi.visitor.ElementUtils.hasNullableAnnotation;
 import static io.micronaut.openapi.visitor.ElementUtils.isDeprecated;
 import static io.micronaut.openapi.visitor.ElementUtils.isExtraBodyParameter;
 import static io.micronaut.openapi.visitor.ElementUtils.isFileUpload;
@@ -900,7 +901,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                 newParameter.setName(parameter.getName());
             }
 
-            if (newParameter.getRequired() == null && (!isNullable(parameter) || isNotNullable(parameter))) {
+            if (newParameter.getRequired() == null && (!hasNullableAnnotation(parameter) && (!isNullable(parameter) || isNotNullable(parameter)))) {
                 newParameter.setRequired(true);
             }
             if (javadocDescription != null && StringUtils.isEmpty(newParameter.getDescription())) {
@@ -950,7 +951,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         parameter.stringValue(io.swagger.v3.oas.annotations.Parameter.class, PROP_DESCRIPTION)
             .ifPresent(propertySchema::setDescription);
         processSchemaProperty(context, parameter, parameter.getType(), null, schema, propertySchema);
-        if (isNullable(parameter) && !isNotNullable(parameter)) {
+        if (hasNullableAnnotation(parameter) || (isNullable(parameter) && !isNotNullable(parameter))) {
             // Keep null if not
             SchemaUtils.setNullable(propertySchema);
         }
@@ -1167,7 +1168,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             }
         }
 
-        if (newParameter != null && isNullable(parameter) && !isNotNullable(parameter)) {
+        if (newParameter != null && (hasNullableAnnotation(parameter) || (isNullable(parameter) && !isNotNullable(parameter)))) {
             newParameter.setRequired(null);
         }
 
@@ -1216,7 +1217,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                 requestBody.setDescription(desc.toString());
             }
         }
-        if (requestBody.getRequired() == null && (!isNullable(parameterType) || isNotNullable(parameterType))) {
+        if (requestBody.getRequired() == null && (!hasNullableAnnotation(parameterType) && (!isNullable(parameterType) || isNotNullable(parameterType)))) {
             requestBody.setRequired(true);
         }
 
@@ -1244,7 +1245,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                     mt.setSchema(wrapperSchema);
                 }
                 wrapperSchema.setType(TYPE_OBJECT);
-                if (isNotNullable(parameter)) {
+                if (!hasNullableAnnotation(parameter) && isNotNullable(parameter)) {
                     wrapperSchema.addRequiredItem(wrappedSchemaPropertyName);
                 }
                 processBodyParameter(context, openAPI, javadocDescription, mediaType, wrapperSchema, parameter);

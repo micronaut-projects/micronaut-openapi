@@ -164,7 +164,7 @@ class MyBean
         schemas.ColorEnum
     }
 
-    void "test kotlin NotNull on nullable types"() {
+    void "test @NotNull annotation on kotlin nullable types"() {
 
         when:
         buildBeanDefinition('test.MyBean', '''
@@ -223,8 +223,62 @@ class MyBean {}
         !schema.properties.propertyClass.nullable
         schema.required
         schema.required.size() == 2
-        schema.required[0] == 'color'
-        schema.required[1] == 'propertyClass'
+        schema.required.contains('color')
+        schema.required.contains('propertyClass')
+    }
+
+    void "test @Nullable annotation on kotlin not-nullable types"() {
+
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test
+
+import com.fasterxml.jackson.annotation.JsonProperty
+import io.micronaut.http.annotation.Body
+import io.micronaut.http.annotation.Controller
+import io.micronaut.http.annotation.Put
+import io.micronaut.serde.annotation.Serdeable
+import jakarta.validation.Valid
+import jakarta.validation.constraints.*
+import jakarta.validation.constraints.NotNull
+import reactor.core.publisher.Mono
+
+@Controller
+class HelloController {
+
+    @Put("/send")
+    fun send(
+        @Body @NotNull @Valid animal: Animal
+    ): Mono<Animal> = Mono.empty()
+}
+
+@Serdeable
+data class Animal (
+    @field:io.micronaut.core.annotation.Nullable
+    var color: String = "",
+    @field:jakarta.annotation.Nullable
+    var propertyClass: String = "",
+    @field:JsonProperty(required = false)
+    var jsonProp: String = "",
+)
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        then: "the state is correct"
+        Utils.testReference != null
+
+        when: "The OpenAPI is retrieved"
+        def openAPI = Utils.testReference
+        Schema schema = openAPI.components.schemas.Animal
+
+        then: "the components are valid"
+        schema
+        schema.properties.size() == 3
+        schema.properties.color.nullable
+        schema.properties.propertyClass.nullable
+        schema.properties.jsonProp.nullable
+        !schema.required
     }
 
     void "test kotlin constructor annotations"() {

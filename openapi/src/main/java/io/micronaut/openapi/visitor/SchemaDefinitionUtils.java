@@ -138,6 +138,7 @@ import static io.micronaut.openapi.visitor.ConvertUtils.toTupleSubMap;
 import static io.micronaut.openapi.visitor.ElementUtils.findAnnotation;
 import static io.micronaut.openapi.visitor.ElementUtils.getAnnotation;
 import static io.micronaut.openapi.visitor.ElementUtils.getAnnotationMetadata;
+import static io.micronaut.openapi.visitor.ElementUtils.hasNullableAnnotation;
 import static io.micronaut.openapi.visitor.ElementUtils.isAnnotationPresent;
 import static io.micronaut.openapi.visitor.ElementUtils.isDeprecated;
 import static io.micronaut.openapi.visitor.ElementUtils.isEnum;
@@ -1081,7 +1082,8 @@ public final class SchemaDefinitionUtils {
         }
         // @Schema annotation takes priority over nullability annotations
         Boolean isSchemaNullable = element.booleanValue(io.swagger.v3.oas.annotations.media.Schema.class, PROP_NULLABLE).orElse(null);
-        boolean isNullable = (isSchemaNullable == null && isNullable(element) && !isNotNullable(element)) || Boolean.TRUE.equals(isSchemaNullable);
+        boolean isNullable = (isSchemaNullable == null && (hasNullableAnnotation(element) || (isNullable(element) && !isNotNullable(element))))
+            || Boolean.TRUE.equals(isSchemaNullable);
         if (isNullable) {
             SchemaUtils.setNullable(topLevelSchema);
             notOnlyRef = true;
@@ -1668,7 +1670,7 @@ public final class SchemaDefinitionUtils {
             }
 
             // check field annotations (@NonNull, @Nullable, etc.)
-            boolean isNotNullable = isNotNullable(element);
+            boolean isNotNullable = !hasNullableAnnotation(element) && isNotNullable(element);
             // check as mandatory in constructor
             boolean isMandatoryInConstructor = doesParamExistsMandatoryInConstructor(element, classElement);
             boolean required = elementSchemaRequired != null ? elementSchemaRequired : isNotNullable || isMandatoryInConstructor;
@@ -2454,7 +2456,7 @@ public final class SchemaDefinitionUtils {
         if (schema == null || type == null || type.getAnnotationNames().isEmpty()) {
             return;
         }
-        if (isNullable(type) && !isNotNullable(type)) {
+        if (hasNullableAnnotation(type) || (isNullable(type) && !isNotNullable(type))) {
             SchemaUtils.setNullable(schema);
         }
         processJakartaValidationAnnotations(type, type, schema, context);
