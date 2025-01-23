@@ -116,7 +116,6 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentSkipListSet;
-import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -2096,9 +2095,9 @@ public class DefaultCodegen implements CodegenConfig {
         if (ModelUtils.isMapSchema(schema)) {
             Schema additionalProperties = ModelUtils.getAdditionalProperties(schema);
             String inner = getSchemaType(additionalProperties);
-            String mapInstantion = instantiationTypes.get("map");
-            if (mapInstantion != null) {
-                return mapInstantion + "<String, " + inner + ">";
+            String mapInstantiation = instantiationTypes.get("map");
+            if (mapInstantiation != null) {
+                return mapInstantiation + "<String, " + inner + ">";
             }
             return inner;
         } else if (ModelUtils.isArraySchema(schema)) {
@@ -2371,7 +2370,7 @@ public class DefaultCodegen implements CodegenConfig {
      * @return string presentation of the default value of the property
      */
     public String toDefaultValue(CodegenProperty codegenProperty, Schema schema) {
-        // use toDefaultValue(schema) if generator has not overriden this method
+        // use toDefaultValue(schema) if generator has not overridden this method
         return toDefaultValue(schema);
     }
 
@@ -2763,8 +2762,12 @@ public class DefaultCodegen implements CodegenConfig {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
             NamedSchema that = (NamedSchema) o;
             return Objects.equals(required, that.required) &&
                 Objects.equals(name, that.name) &&
@@ -2835,8 +2838,9 @@ public class DefaultCodegen implements CodegenConfig {
         List<Schema> interfaces = ModelUtils.getInterfaces(composed);
         if (!interfaces.isEmpty()) {
             // m.interfaces is for backward compatibility
-            if (m.interfaces == null)
+            if (m.interfaces == null) {
                 m.interfaces = new ArrayList<>();
+            }
 
             for (Schema interfaceSchema : interfaces) {
                 interfaceSchema = unaliasSchema(interfaceSchema);
@@ -3288,9 +3292,13 @@ public class DefaultCodegen implements CodegenConfig {
         Comparator<CodegenProperty> comparator = new Comparator<CodegenProperty>() {
             @Override
             public int compare(CodegenProperty one, CodegenProperty another) {
-                if (one.required == another.required) return 0;
-                else if (one.required) return -1;
-                else return 1;
+                if (one.required == another.required) {
+                    return 0;
+                } else if (one.required) {
+                    return -1;
+                } else {
+                    return 1;
+                }
             }
         };
         Collections.sort(model.vars, comparator);
@@ -4027,29 +4035,8 @@ public class DefaultCodegen implements CodegenConfig {
         }
 
         Schema original = null;
-        // process the dereference schema if it's a ref to allOf with a single item
-        // and certain field(s) (e.g. description, readyOnly, etc) is set
-        if (p.get$ref() != null) {
-            Schema derefSchema = ModelUtils.getReferencedSchema(openAPI, p);
-            if (ModelUtils.isAllOfWithSingleItem(derefSchema) && (
-                derefSchema.getReadOnly() != null ||
-                    derefSchema.getWriteOnly() != null ||
-                    derefSchema.getDeprecated() != null ||
-                    derefSchema.getDescription() != null ||
-                    derefSchema.getMaxLength() != null ||
-                    derefSchema.getMinLength() != null ||
-                    derefSchema.getMinimum() != null ||
-                    derefSchema.getMaximum() != null ||
-                    derefSchema.getMaximum() != null ||
-                    derefSchema.getMinItems() != null ||
-                    derefSchema.getTitle() != null
-            )) {
-                p = ModelUtils.getReferencedSchema(openAPI, p);
-            }
-        }
-
         // check if it's allOf (only 1 sub schema) with or without default/nullable/etc set in the top level
-        if (ModelUtils.isAllOfWithSingleItem(p)) {
+        if (ModelUtils.isAllOf(p) && p.getAllOf().size() == 1) {
             if (p.getAllOf().get(0) instanceof Schema) {
                 original = p;
                 p = (Schema) p.getAllOf().get(0);
@@ -4474,8 +4461,8 @@ public class DefaultCodegen implements CodegenConfig {
         }
 
         if (baseItem != null) {
-            // set both datatype and datetypeWithEnum as only the inner type is enum
-            property.datatypeWithEnum = property.datatypeWithEnum.replace(", " + baseItem.baseType, ", " + toEnumName(baseItem));
+            // set both datatype and datatypeWithEnum as only the inner type is enum
+            property.datatypeWithEnum = property.datatypeWithEnum.replace(baseItem.baseType + ">", toEnumName(baseItem) + ">");
 
             // naming the enum with respect to the language enum naming convention
             // e.g. remove [], {} from array/map of enum
@@ -4622,8 +4609,9 @@ public class DefaultCodegen implements CodegenConfig {
                                           Operation operation,
                                           List<Server> servers) {
         LOGGER.debug("fromOperation => operation: {}", operation);
-        if (operation == null)
+        if (operation == null) {
             throw new RuntimeException("operation cannot be null in fromOperation");
+        }
 
         Map<String, Schema> schemas = ModelUtils.getSchemas(this.openAPI);
         CodegenOperation op = CodegenModelFactory.newInstance(CodegenModelType.OPERATION);
@@ -4955,12 +4943,13 @@ public class DefaultCodegen implements CodegenConfig {
 
     public void SortParametersByRequiredFlag(List<CodegenParameter> parameters) {
         parameters.sort((one, another) -> {
-            if (one.required == another.required)
+            if (one.required == another.required) {
                 return 0;
-            else if (one.required)
+            } else if (one.required) {
                 return -1;
-            else
+            } else {
                 return 1;
+            }
         });
     }
 
@@ -6672,6 +6661,9 @@ public class DefaultCodegen implements CodegenConfig {
             // input.name => input_name
             modifiable = this.sanitizeValue(modifiable, "\\.", "_", exceptions);
 
+            // input:name => input_name
+            modifiable = this.sanitizeValue(modifiable, ":", "_", exceptions);
+
             // input-name => input_name
             modifiable = this.sanitizeValue(modifiable, "-", "_", exceptions);
 
@@ -8151,8 +8143,9 @@ public class DefaultCodegen implements CodegenConfig {
     }
 
     private void addJsonSchemaForBodyRequestInCaseItsNotPresent(CodegenParameter codegenParameter, RequestBody body) {
-        if (codegenParameter.jsonSchema == null)
+        if (codegenParameter.jsonSchema == null) {
             codegenParameter.jsonSchema = Json.pretty(body);
+        }
     }
 
     protected void addOption(String key, String description, String defaultValue) {
@@ -8161,10 +8154,12 @@ public class DefaultCodegen implements CodegenConfig {
 
     protected void addOption(String key, String description, String defaultValue, Map<String, String> enumValues) {
         CliOption option = new CliOption(key, description);
-        if (defaultValue != null)
+        if (defaultValue != null) {
             option.defaultValue(defaultValue);
-        if (enumValues != null)
+        }
+        if (enumValues != null) {
             option.setEnum(enumValues);
+        }
         cliOptions.add(option);
     }
 
@@ -8188,8 +8183,9 @@ public class DefaultCodegen implements CodegenConfig {
 
     protected void addSwitch(String key, String description, Boolean defaultValue) {
         CliOption option = CliOption.newBoolean(key, description);
-        if (defaultValue != null)
+        if (defaultValue != null) {
             option.defaultValue(defaultValue.toString());
+        }
         cliOptions.add(option);
     }
 
@@ -8488,6 +8484,7 @@ public class DefaultCodegen implements CodegenConfig {
 
     public void addImportsToOneOfInterface(List<Map<String, String>> imports) {
     }
+
     //// End of methods related to the "useOneOfInterfaces" feature
 
     protected void modifyFeatureSet(Consumer<FeatureSet.Builder> processor) {
@@ -8530,8 +8527,12 @@ public class DefaultCodegen implements CodegenConfig {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
             SanitizeNameOptions that = (SanitizeNameOptions) o;
             return Objects.equals(getName(), that.getName()) &&
                 Objects.equals(getRemoveCharRegEx(), that.getRemoveCharRegEx()) &&
