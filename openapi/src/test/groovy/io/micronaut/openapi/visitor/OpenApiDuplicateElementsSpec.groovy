@@ -101,4 +101,86 @@ components:
         openApi.paths.'/pets'.post.security.size() == 1
     }
 
+    void "test date enum default value"() {
+
+        when:
+        var openApiSpec = """
+openapi: 3.0.3
+info:
+  version: "1.0.0"
+  title: Simple Inventory API
+paths:
+  /inventory:
+    get:
+      operationId: searchInventory
+      parameters:
+        - in: header
+          name: test
+          schema:
+            type: string
+            format: date
+            enum:
+              - 2023-12-12
+            default: 2023-12-12
+      responses:
+        '200':
+          description: search results matching criteria
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  \$ref: '#/components/schemas/InventoryItem'
+components:
+  schemas:
+    InventoryItem:
+      type: object
+      properties:
+        releaseDate:
+          type: string
+          format: date-time
+          example: '2016-08-29T09:12:33.001Z'
+  """
+        var openApi = OpenApiUtils.getYamlMapper().readValue(openApiSpec, OpenAPI.class)
+        var serializedOpenApi = OpenApiUtils.getYamlMapper().writeValueAsString(openApi)
+
+        then:
+        serializedOpenApi.trim() == """
+openapi: 3.0.3
+info:
+  title: Simple Inventory API
+  version: 1.0.0
+paths:
+  /inventory:
+    get:
+      operationId: searchInventory
+      parameters:
+      - name: test
+        in: header
+        schema:
+          type: string
+          format: date
+          default: 2023-12-12
+          enum:
+          - 2023-12-12
+      responses:
+        "200":
+          description: search results matching criteria
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  \$ref: "#/components/schemas/InventoryItem"
+components:
+  schemas:
+    InventoryItem:
+      type: object
+      properties:
+        releaseDate:
+          type: string
+          format: date-time
+          example: 2016-08-29T09:12:33.001Z
+        """.trim()
+    }
 }
