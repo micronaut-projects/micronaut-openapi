@@ -139,6 +139,7 @@ import static io.micronaut.openapi.visitor.ElementUtils.isSingleResponseType;
 import static io.micronaut.openapi.visitor.ElementUtils.isWrappedBodyParameter;
 import static io.micronaut.openapi.visitor.GeneratorUtils.addOperationDeprecatedExtension;
 import static io.micronaut.openapi.visitor.GeneratorUtils.addParameterDeprecatedExtension;
+import static io.micronaut.openapi.visitor.InternalExt.MICRONAUT_OP_POSTFIX;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.MICRONAUT_EXT_PARENT_RESPONSE;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_ADD_ALWAYS;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_ALLOW_EMPTY_VALUE;
@@ -1558,10 +1559,15 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                 addAlways = ContextUtils.get(MICRONAUT_INTERNAL_CHILD_OP_ID_SUFFIX_ADD_ALWAYS, Boolean.class, true, context);
             }
 
+            String postfix = StringUtils.EMPTY_STRING;
+            if (CollectionUtils.isNotEmpty(pathItem.getExtensions()) && pathItem.getExtensions().containsKey(MICRONAUT_OP_POSTFIX)) {
+                postfix = pathItem.getExtensions().get(MICRONAUT_OP_POSTFIX).toString();
+            }
+
             if (StringUtils.isEmpty(swaggerOperation.getOperationId())) {
-                swaggerOperation.setOperationId(prefix + element.getName() + suffix);
+                swaggerOperation.setOperationId(prefix + element.getName() + postfix + suffix);
             } else if (addAlways) {
-                swaggerOperation.setOperationId(prefix + swaggerOperation.getOperationId() + suffix);
+                swaggerOperation.setOperationId(prefix + swaggerOperation.getOperationId() + postfix + suffix);
             }
 
             if (swaggerOperation.getDescription() != null && swaggerOperation.getDescription().isEmpty()) {

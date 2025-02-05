@@ -2349,6 +2349,7 @@ class MyBean {}
         reqPathVarOp.parameters[0].required
 
         optPathVarsOp1
+        optPathVarsOp1.operationId == "optPathVarsWithOpt1"
         optPathVarsOp1.parameters
         optPathVarsOp1.parameters.size() == 1
         optPathVarsOp1.parameters[0].in == "path"
@@ -2358,6 +2359,7 @@ class MyBean {}
         optPathVarsOp1.parameters[0].required
 
         optPathVarsOp2
+        optPathVarsOp2.operationId == "optPathVarsWithOpt1AndOpt2"
         optPathVarsOp2.parameters
         optPathVarsOp2.parameters.size() == 2
         optPathVarsOp2.parameters[0].in == "path"

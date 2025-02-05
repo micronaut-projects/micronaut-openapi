@@ -561,7 +561,7 @@ class MyBean {}
         !pathItem1.get.parameters[1].required
         pathItem1.get.parameters[1].in == 'query'
 
-        pathItem2.get.operationId == 'test8_1'
+        pathItem2.get.operationId == 'test8WithPathVar1'
         pathItem2.get.parameters
         pathItem2.get.parameters.size() == 3
 
@@ -575,7 +575,7 @@ class MyBean {}
         !pathItem2.get.parameters[2].required
         pathItem2.get.parameters[2].in == 'query'
 
-        pathItem3.get.operationId == 'test8_2'
+        pathItem3.get.operationId == 'test8WithPathVar1AndPathVar2'
         pathItem3.get.parameters
         pathItem3.get.parameters.size() == 4
         pathItem3.get.parameters[0].name == 'pathVar1'
@@ -617,8 +617,12 @@ import io.swagger.v3.oas.annotations.enums.*;
 @Controller("/")
 interface Test {
     
-    @Get("/hello{/pathVar1,pathVar2}/world")
+    @Get("/hello{/pathVar1,pathVar2}/world/{reqVar}/test{/optVar}")
     String test8(String pathVar1, String pathVar2, String queryVar, @Nullable String name);
+
+    @Operation(operationId = "test")
+    @Get("/hello{/pathVar1,pathVar2}")
+    String customOpId(String pathVar1, String pathVar2);
 }
 
 class Greeting {
@@ -634,22 +638,34 @@ class MyBean {}
         when: "The OpenAPI is retrieved"
         OpenAPI openAPI = Utils.testReference
 
-        def pathItem1 = openAPI.paths.get("/hello/world")
-        def pathItem2 = openAPI.paths.get("/hello/{pathVar1}/world")
-        def pathItem3 = openAPI.paths.get("/hello/{pathVar1}/{pathVar2}/world")
+        def pathItem1 = openAPI.paths.get("/hello/world/{reqVar}/test")
+        def pathItem2 = openAPI.paths.get("/hello/{pathVar1}/world/{reqVar}/test")
+        def pathItem3 = openAPI.paths.get("/hello/{pathVar1}/{pathVar2}/world/{reqVar}/test")
+        def pathItem4 = openAPI.paths.get("/hello/world/{reqVar}/test/{optVar}")
+        def pathItem5 = openAPI.paths.get("/hello/{pathVar1}/world/{reqVar}/test/{optVar}")
+        def pathItem6 = openAPI.paths.get("/hello/{pathVar1}/{pathVar2}/world/{reqVar}/test/{optVar}")
+
+        def customOpId1 = openAPI.paths.get("/hello")
+        def customOpId2 = openAPI.paths.get("/hello/{pathVar1}")
+        def customOpId3 = openAPI.paths.get("/hello/{pathVar1}/{pathVar2}")
 
         then:
+        pathItem1.get.operationId == "test8"
         pathItem1.get.parameters
-        pathItem1.get.parameters.size() == 2
+        pathItem1.get.parameters.size() == 3
         pathItem1.get.parameters[0].name == 'queryVar'
         pathItem1.get.parameters[0].required
         pathItem1.get.parameters[0].in == 'query'
         pathItem1.get.parameters[1].name == 'name'
         !pathItem1.get.parameters[1].required
         pathItem1.get.parameters[1].in == 'query'
+        pathItem1.get.parameters[2].name == 'reqVar'
+        pathItem1.get.parameters[2].required
+        pathItem1.get.parameters[2].in == 'path'
 
+        pathItem2.get.operationId == "test8WithPathVar1"
         pathItem2.get.parameters
-        pathItem2.get.parameters.size() == 3
+        pathItem2.get.parameters.size() == 4
 
         pathItem2.get.parameters[0].name == 'pathVar1'
         pathItem2.get.parameters[0].required
@@ -660,9 +676,13 @@ class MyBean {}
         pathItem2.get.parameters[2].name == 'name'
         !pathItem2.get.parameters[2].required
         pathItem2.get.parameters[2].in == 'query'
+        pathItem2.get.parameters[3].name == 'reqVar'
+        pathItem2.get.parameters[3].required
+        pathItem2.get.parameters[3].in == 'path'
 
+        pathItem3.get.operationId == "test8WithPathVar1AndPathVar2"
         pathItem3.get.parameters
-        pathItem3.get.parameters.size() == 4
+        pathItem3.get.parameters.size() == 5
         pathItem3.get.parameters[0].name == 'pathVar1'
         pathItem3.get.parameters[0].required
         pathItem3.get.parameters[0].in == 'path'
@@ -675,6 +695,17 @@ class MyBean {}
         pathItem3.get.parameters[3].name == 'name'
         !pathItem3.get.parameters[3].required
         pathItem3.get.parameters[3].in == 'query'
+        pathItem3.get.parameters[4].name == 'reqVar'
+        pathItem3.get.parameters[4].required
+        pathItem3.get.parameters[4].in == 'path'
+
+        pathItem4.get.operationId == "test8WithOptVar"
+        pathItem5.get.operationId == "test8WithPathVar1AndOptVar"
+        pathItem6.get.operationId == "test8WithPathVar1AndPathVar2AndOptVar"
+
+        customOpId1.get.operationId == "test"
+        customOpId2.get.operationId == "testWithPathVar1"
+        customOpId3.get.operationId == "testWithPathVar1AndPathVar2"
     }
 
     void "test parse URL with :"() {
