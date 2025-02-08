@@ -197,7 +197,6 @@ class RequestBodyControllerTest(
         assertEquals(model, response)
     }
 
-    @Disabled("https://github.com/micronaut-projects/micronaut-serialization/issues/768")
     @MethodSource("discriminators")
     @ParameterizedTest
     fun testSendModelWithDiscriminatorChild(discriminatorName: String, model: Animal) {
