@@ -4,7 +4,6 @@ import io.micronaut.annotation.processing.test.AbstractKotlinCompilerSpec
 import io.swagger.v3.oas.models.Operation
 import io.swagger.v3.oas.models.media.Schema
 import io.swagger.v3.oas.models.responses.ApiResponse
-import spock.lang.Ignore
 
 class OpenApiPojoControllerKotlinSpec extends AbstractKotlinCompilerSpec {
 
@@ -21,7 +20,6 @@ class OpenApiPojoControllerKotlinSpec extends AbstractKotlinCompilerSpec {
         System.clearProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_ADOC_ENABLED)
     }
 
-    @Ignore("Wait micronaut-core 4.8.0 release with fix for kotlin isEnum method: https://github.com/micronaut-projects/micronaut-core/pull/11422")
     void "test kotlin"() {
 
         when:

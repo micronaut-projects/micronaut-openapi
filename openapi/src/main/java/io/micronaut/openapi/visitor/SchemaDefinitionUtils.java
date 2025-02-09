@@ -886,7 +886,13 @@ public final class SchemaDefinitionUtils {
                         }
                     } else {
                         if (componentType != null) {
-                            var componentSchema = getSchemaDefinition(openApi, context, componentType, componentType.getTypeArguments(), type, mediaTypes, null);
+                            // this fix for enum and KotlinTypeArgumentElement
+                            ClassElement realClassEl = componentType;
+                            if (componentType.isEnum()) {
+                                realClassEl = context.getClassElement(componentType.getName()).orElse(componentType);
+                            }
+
+                            var componentSchema = getSchemaDefinition(openApi, context, realClassEl, componentType.getTypeArguments(), type, mediaTypes, null);
                             processSchemaAnn(componentSchema, context, definingElement, type, componentSchemaAnn);
                             schema = resolveSchema(openApi, type, componentType, context, mediaTypes, jsonViewClass, null, classJavadoc, componentSchemaAnn);
                             if (componentSchema != null && TYPE_ARRAY.equals(schema.getType()) && !TYPE_ARRAY.equals(componentSchema.getType())) {
