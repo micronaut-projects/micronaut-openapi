@@ -32,6 +32,7 @@ import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.PathItem;
+import io.swagger.v3.oas.models.Paths;
 import io.swagger.v3.oas.models.SpecVersion;
 import io.swagger.v3.oas.models.headers.Header;
 import io.swagger.v3.oas.models.links.Link;
@@ -63,6 +64,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -73,7 +75,6 @@ import static io.micronaut.openapi.visitor.ContextUtils.warn;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_NAME;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_PARSE_VALUE;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_PROPERTIES;
-import static io.micronaut.openapi.visitor.Utils.resolveComponents;
 import static io.swagger.v3.oas.models.Components.COMPONENTS_SCHEMAS_REF;
 
 /**
@@ -1089,113 +1090,230 @@ public final class SchemaUtils {
      *
      * @param to The {@link OpenAPI} object to copy to
      * @param from The {@link OpenAPI} object to copy from
+     * @param replace replace existed elements or append
      */
-    public static void copyOpenApi(OpenAPI to, OpenAPI from) {
+    public static void copyOpenApi(OpenAPI to, OpenAPI from, boolean replace) {
         if (to == null || from == null) {
             return;
         }
         if (CollectionUtils.isNotEmpty(from.getTags())) {
-            from.getTags().forEach(to::addTagsItem);
+            if (replace) {
+                from.getTags().forEach(to::addTagsItem);
+            } else {
+                var tags = to.getTags();
+                if (tags == null) {
+                    tags = new ArrayList<>();
+                    to.setTags(tags);
+                }
+
+                for (var tag : from.getTags()) {
+                    var found = false;
+                    for (var existedTag : tags) {
+                        if (existedTag.getName().equals(tag.getName())) {
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found) {
+                        tags.add(tag);
+                    }
+                }
+            }
         }
         if (CollectionUtils.isNotEmpty(from.getServers())) {
-            from.getServers().forEach(to::addServersItem);
+            if (replace) {
+                from.getServers().forEach(to::addServersItem);
+            } else {
+                var servers = to.getServers();
+                if (servers == null) {
+                    servers = new ArrayList<>();
+                    to.setServers(servers);
+                }
+
+                for (var server : from.getServers()) {
+                    var found = false;
+                    for (var existedServer : servers) {
+                        if (existedServer.getUrl().equals(server.getUrl())) {
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found) {
+                        servers.add(server);
+                    }
+                }
+            }
         }
         if (CollectionUtils.isNotEmpty(from.getSecurity())) {
-            from.getSecurity().forEach(to::addSecurityItem);
+            if (replace) {
+                from.getSecurity().forEach(to::addSecurityItem);
+            } else {
+                var security = to.getSecurity();
+                if (security == null) {
+                    security = new ArrayList<>();
+                    to.setSecurity(security);
+                }
+
+                for (var securityRequirement : from.getSecurity()) {
+                    var found = false;
+                    for (var existedSecurityRequirement : security) {
+                        if (existedSecurityRequirement.equals(securityRequirement)) {
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found) {
+                        security.add(securityRequirement);
+                    }
+                }
+            }
         }
         if (CollectionUtils.isNotEmpty(from.getPaths())) {
-            from.getPaths().forEach(to::path);
+            if (replace) {
+                from.getPaths().forEach(to::path);
+            } else {
+                var paths = to.getPaths();
+                if (paths == null) {
+                    paths = new Paths();
+                    to.setPaths(paths);
+                }
+
+                for (var pathEntry : from.getPaths().entrySet()) {
+                    paths.putIfAbsent(pathEntry.getKey(), pathEntry.getValue());
+                }
+            }
         }
         if (from.getExternalDocs() != null) {
-            to.setExternalDocs(from.getExternalDocs());
+            if (replace || to.getExternalDocs() == null) {
+                to.setExternalDocs(from.getExternalDocs());
+            }
         }
         if (CollectionUtils.isNotEmpty(from.getExtensions())) {
-            from.getExtensions().forEach(to::addExtension);
+            if (replace) {
+                from.getExtensions().forEach(to::addExtension);
+            } else {
+                var extensions = to.getExtensions();
+                if (extensions == null) {
+                    extensions = new HashMap<>();
+                    to.setExtensions(extensions);
+                }
+
+                for (var extensionEntry : from.getExtensions().entrySet()) {
+                    extensions.putIfAbsent(extensionEntry.getKey(), extensionEntry.getValue());
+                }
+            }
         }
 
         if (from.getComponents() != null) {
 
-            var components = from.getComponents();
+            var fromComponents = from.getComponents();
+            var toComponents = resolveComponents(to);
 
-            Map<String, Schema> schemas = components.getSchemas();
-            if (CollectionUtils.isNotEmpty(schemas)) {
-                schemas.forEach((k, v) -> {
-                    if (v.getName() == null) {
-                        v.setName(k);
+            var fromSchemas = fromComponents.getSchemas();
+            var toSchemas = toComponents.getSchemas();
+            if (toSchemas == null) {
+                toComponents.setSchemas(fromSchemas);
+            } else if (CollectionUtils.isNotEmpty(fromSchemas)) {
+                for (var entry : fromSchemas.entrySet()) {
+                    var value = entry.getValue();
+                    if (value.getName() == null) {
+                        value.setName(entry.getKey());
                     }
-                    to.schema(k, v);
-                });
+                    if (replace || !toSchemas.containsKey(entry.getKey())) {
+                        toSchemas.put(entry.getKey(), value);
+                    }
+                }
             }
 
-            var securitySchemes = components.getSecuritySchemes();
-            if (CollectionUtils.isNotEmpty(securitySchemes)) {
-                securitySchemes.forEach(to::schemaRequirement);
-            }
-            var links = components.getLinks();
-            if (CollectionUtils.isNotEmpty(links)) {
-                if (to.getComponents() == null) {
-                    to.setComponents(new Components());
+            var fromSecuritySchemes = fromComponents.getSecuritySchemes();
+            var toSecuritySchemes = toComponents.getSecuritySchemes();
+            if (toSecuritySchemes == null) {
+                toComponents.setSecuritySchemes(fromSecuritySchemes);
+            } else if (CollectionUtils.isNotEmpty(fromSecuritySchemes)) {
+                for (var entry : fromSecuritySchemes.entrySet()) {
+                    var value = entry.getValue();
+                    if (value.getName() == null) {
+                        value.setName(entry.getKey());
+                    }
+                    if (replace || !toSecuritySchemes.containsKey(entry.getKey())) {
+                        toSecuritySchemes.put(entry.getKey(), value);
+                    }
                 }
-                to.getComponents().links(links);
-            }
-            var callbacks = components.getCallbacks();
-            if (CollectionUtils.isNotEmpty(callbacks)) {
-                if (to.getComponents() == null) {
-                    to.setComponents(new Components());
-                }
-                to.getComponents().callbacks(callbacks);
-            }
-            var headers = components.getHeaders();
-            if (CollectionUtils.isNotEmpty(headers)) {
-                if (to.getComponents() == null) {
-                    to.setComponents(new Components());
-                }
-                to.getComponents().headers(headers);
-            }
-            var parameters = components.getParameters();
-            if (CollectionUtils.isNotEmpty(parameters)) {
-                if (to.getComponents() == null) {
-                    to.setComponents(new Components());
-                }
-                to.getComponents().parameters(parameters);
-            }
-            var responses = components.getResponses();
-            if (CollectionUtils.isNotEmpty(responses)) {
-                if (to.getComponents() == null) {
-                    to.setComponents(new Components());
-                }
-                to.getComponents().responses(responses);
-            }
-            var requestBodies = components.getRequestBodies();
-            if (CollectionUtils.isNotEmpty(requestBodies)) {
-                if (to.getComponents() == null) {
-                    to.setComponents(new Components());
-                }
-                to.getComponents().requestBodies(requestBodies);
-            }
-            var extensions = components.getExtensions();
-            if (CollectionUtils.isNotEmpty(extensions)) {
-                if (to.getComponents() == null) {
-                    to.setComponents(new Components());
-                }
-                to.getComponents().extensions(extensions);
-            }
-            var pathItems = components.getPathItems();
-            if (CollectionUtils.isNotEmpty(extensions)) {
-                if (to.getComponents() == null) {
-                    to.setComponents(new Components());
-                }
-                to.getComponents().pathItems(pathItems);
-            }
-            var examples = components.getExamples();
-            if (CollectionUtils.isNotEmpty(examples)) {
-                if (to.getComponents() == null) {
-                    to.setComponents(new Components());
-                }
-                to.getComponents().examples(examples);
             }
 
+            if (fromComponents.getLinks() != null && toComponents.getLinks() == null) {
+                toComponents.setLinks(fromComponents.getLinks());
+            } else {
+                replaceOrAppendComponents(fromComponents.getLinks(), toComponents.getLinks(), replace);
+            }
+
+            if (fromComponents.getCallbacks() != null && toComponents.getCallbacks() == null) {
+                toComponents.setCallbacks(fromComponents.getCallbacks());
+            } else {
+                replaceOrAppendComponents(fromComponents.getCallbacks(), toComponents.getCallbacks(), replace);
+            }
+
+            if (fromComponents.getHeaders() != null && toComponents.getHeaders() == null) {
+                toComponents.setHeaders(fromComponents.getHeaders());
+            } else {
+                replaceOrAppendComponents(fromComponents.getHeaders(), toComponents.getHeaders(), replace);
+            }
+
+            if (fromComponents.getParameters() != null && toComponents.getParameters() == null) {
+                toComponents.setParameters(fromComponents.getParameters());
+            } else {
+                replaceOrAppendComponents(fromComponents.getParameters(), toComponents.getParameters(), replace);
+            }
+
+            if (fromComponents.getResponses() != null && toComponents.getResponses() == null) {
+                toComponents.setResponses(fromComponents.getResponses());
+            } else {
+                replaceOrAppendComponents(fromComponents.getResponses(), toComponents.getResponses(), replace);
+            }
+
+            if (fromComponents.getRequestBodies() != null && toComponents.getRequestBodies() == null) {
+                toComponents.setRequestBodies(fromComponents.getRequestBodies());
+            } else {
+                replaceOrAppendComponents(fromComponents.getRequestBodies(), toComponents.getRequestBodies(), replace);
+            }
+
+            if (fromComponents.getExtensions() != null && toComponents.getExtensions() == null) {
+                toComponents.setExtensions(fromComponents.getExtensions());
+            } else {
+                replaceOrAppendComponents(fromComponents.getExtensions(), toComponents.getExtensions(), replace);
+            }
+
+            if (fromComponents.getPathItems() != null && toComponents.getPathItems() == null) {
+                toComponents.setPathItems(fromComponents.getPathItems());
+            } else {
+                replaceOrAppendComponents(fromComponents.getPathItems(), toComponents.getPathItems(), replace);
+            }
+
+            if (fromComponents.getExamples() != null && toComponents.getExamples() == null) {
+                toComponents.setExamples(fromComponents.getExamples());
+            } else {
+                replaceOrAppendComponents(fromComponents.getExamples(), toComponents.getExamples(), replace);
+            }
         }
+    }
+
+    private static <T> void replaceOrAppendComponents(Map<String, T> from, Map<String, T> to, boolean replace) {
+        if (CollectionUtils.isEmpty(from)) {
+            return;
+        }
+        for (var entry : from.entrySet()) {
+            var value = entry.getValue();
+            if (replace || !to.containsKey(entry.getKey())) {
+                to.put(entry.getKey(), value);
+            }
+        }
+    }
+
+    private static Components resolveComponents(OpenAPI openApi) {
+        if (openApi.getComponents() == null) {
+            openApi.setComponents(new Components());
+        }
+        return openApi.getComponents();
     }
 
     public static boolean isIgnoredHeader(String headerName) {

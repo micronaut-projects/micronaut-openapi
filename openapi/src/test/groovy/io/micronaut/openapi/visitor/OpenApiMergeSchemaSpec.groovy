@@ -1,5 +1,6 @@
 package io.micronaut.openapi.visitor
 
+import io.micronaut.context.env.Environment
 import io.micronaut.openapi.AbstractOpenApiTypeElementSpec
 import io.swagger.v3.oas.models.Components
 import io.swagger.v3.oas.models.OpenAPI
@@ -11,8 +12,9 @@ class OpenApiMergeSchemaSpec extends AbstractOpenApiTypeElementSpec {
     @RestoreSystemProperties
     void "test merging of additional OpenAPI schema"() {
         given:
-        String additionalSwaggerFilesDir= new File("src/test/resources/swagger").absolutePath
+        String additionalSwaggerFilesDir = new File("src/test/resources/swagger/petstore.yml").absolutePath
         System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_ADDITIONAL_FILES, additionalSwaggerFilesDir)
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_ADDITIONAL_FILES_MERGE_MODE, "append")
 
         when:
         buildBeanDefinition('test.MyBean', '''
@@ -63,13 +65,13 @@ class Application {
 @jakarta.inject.Singleton
 class MyBean {}
 ''')
-        then:"the state is correct"
+        then: "the state is correct"
         Utils.testReference != null
 
-        when:"the /pets path is retrieved"
+        when: "the /pets path is retrieved"
         OpenAPI openAPI = Utils.testReference
 
-        then:"it is included in the OpenAPI doc"
+        then: "it is included in the OpenAPI doc"
         openAPI.info != null
         openAPI.info.title == 'the title'
         openAPI.info.version == '0.0'
@@ -81,8 +83,8 @@ class MyBean {}
         openAPI.tags.first().description == 'desc 1'
         openAPI.externalDocs.description == 'definition docs desc'
         openAPI.security.size() == 2
-        openAPI.security[0] == ["req 1":["a", "b"]]
-        openAPI.security[1] == ["req 2":["b", "c"]]
+        openAPI.security[0] == ["req 1": ["a", "b"]]
+        openAPI.security[1] == ["req 2": ["b", "c"]]
         openAPI.servers.size() == 2
         openAPI.servers[0].description == 'server 1'
         openAPI.servers[0].url == 'https://foo'
@@ -122,8 +124,368 @@ class MyBean {}
 
         then:
         components.schemas.size() == 3
+    }
 
-        cleanup:
-        System.clearProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_ADDITIONAL_FILES)
+    @RestoreSystemProperties
+    void "test merge with additional openapi files: APPEND"() {
+        given:
+        String additionalSwaggerFilesDir = "file:" + new File("src/test/resources/swagger").absolutePath
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_ADDITIONAL_FILES, additionalSwaggerFilesDir)
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_ADDITIONAL_FILES_MERGE_MODE, "append")
+
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.micronaut.management.endpoint.loggers.LoggersEndpoint;
+import io.micronaut.openapi.annotation.OpenAPIInclude;
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import reactor.core.publisher.Mono;
+
+@OpenAPIInclude(classes = LoggersEndpoint.class)
+@OpenAPIDefinition
+class Application {
+
+}
+
+@Controller
+interface DefaultApi {
+
+    /**
+     * exampleRouteGet
+     *
+     * @return Mono&lt;String&gt;
+     */
+    @Get("/example-route")
+    Mono<String> exampleRouteGet();
+}
+
+@Controller
+class ApiImpl implements DefaultApi {
+
+    @Override
+    public Mono<String> exampleRouteGet() {
+        return null;
+    }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+
+        then:
+        Utils.testReference
+
+        when:
+        var openApi = Utils.testReference
+        var op = openApi.paths."/example-route".get
+        var opLoggers = openApi.paths."/loggers".get
+        var opLoggers2 = openApi.paths."/loggers/{name}".get
+        var schemas = openApi.components.schemas
+
+        then:
+        opLoggers
+        opLoggers2
+        op
+        op.responses."200".description == "exampleRouteGet 200 response"
+        schemas
+        schemas.BusinessObject
+        schemas.BusinessObject.type == "string"
+        openApi.servers
+        openApi.servers[0].url == "https://petstore.swagger.io/v1"
+        openApi.paths."/pets".get
+        openApi.paths."/pets".post
+    }
+
+    @RestoreSystemProperties
+    void "test merge with additional openapi files: REPLACE"() {
+        given:
+        String additionalSwaggerFilesDir = new File("src/test/resources/swagger").absolutePath
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_ADDITIONAL_FILES, additionalSwaggerFilesDir)
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_ADDITIONAL_FILES_MERGE_MODE, "replace")
+
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.micronaut.management.endpoint.loggers.LoggersEndpoint;
+import io.micronaut.openapi.annotation.OpenAPIInclude;
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import reactor.core.publisher.Mono;
+
+@OpenAPIInclude(classes = LoggersEndpoint.class)
+@OpenAPIDefinition
+class Application {
+
+}
+
+@Controller
+interface DefaultApi {
+
+    /**
+     * exampleRouteGet
+     *
+     * @return Mono&lt;String&gt;
+     */
+    @Get("/example-route")
+    Mono<String> exampleRouteGet();
+}
+
+@Controller
+class ApiImpl implements DefaultApi {
+
+    @Override
+    public Mono<String> exampleRouteGet() {
+        return null;
+    }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+
+        then:
+        Utils.testReference
+
+        when:
+        var openApi = Utils.testReference
+        var op = openApi.paths."/example-route".get
+        var opLoggers = openApi.paths."/loggers".get
+        var opLoggers2 = openApi.paths."/loggers/{name}".get
+        var schemas = openApi.components.schemas
+
+        then:
+        opLoggers
+        opLoggers2
+        op
+        op.responses."200".description == "this is my unique description"
+        schemas
+        schemas.BusinessObject
+        schemas.BusinessObject.type == "string"
+        openApi.servers
+        openApi.servers[0].url == "https://petstore.swagger.io/v1"
+        openApi.paths."/pets".get
+        openApi.paths."/pets".post
+    }
+
+    @RestoreSystemProperties
+    void "test merge with additional openapi files: REPLACE with classpath"() {
+        given:
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_ADDITIONAL_FILES, "classpath:/swagger/openapi.yml,classpath:/swagger/petstore.yml")
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_ADDITIONAL_FILES_MERGE_MODE, "replace")
+
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.micronaut.management.endpoint.loggers.LoggersEndpoint;
+import io.micronaut.openapi.annotation.OpenAPIInclude;
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import reactor.core.publisher.Mono;
+
+@OpenAPIInclude(classes = LoggersEndpoint.class)
+@OpenAPIDefinition
+class Application {
+
+}
+
+@Controller
+interface DefaultApi {
+
+    /**
+     * exampleRouteGet
+     *
+     * @return Mono&lt;String&gt;
+     */
+    @Get("/example-route")
+    Mono<String> exampleRouteGet();
+}
+
+@Controller
+class ApiImpl implements DefaultApi {
+
+    @Override
+    public Mono<String> exampleRouteGet() {
+        return null;
+    }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+
+        then:
+        Utils.testReference
+
+        when:
+        var openApi = Utils.testReference
+        var op = openApi.paths."/example-route".get
+        var opLoggers = openApi.paths."/loggers".get
+        var opLoggers2 = openApi.paths."/loggers/{name}".get
+        var schemas = openApi.components.schemas
+
+        then:
+        opLoggers
+        opLoggers2
+        op
+        op.responses."200".description == "this is my unique description"
+        schemas
+        schemas.BusinessObject
+        schemas.BusinessObject.type == "string"
+        openApi.servers
+        openApi.servers[0].url == "https://petstore.swagger.io/v1"
+        openApi.paths."/pets".get
+        openApi.paths."/pets".post
+    }
+
+    @RestoreSystemProperties
+    void "test merge with additional openapi files: REPLACE with project"() {
+        given:
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_ADDITIONAL_FILES, "project:src/test/resources/swagger/openapi.yml,classpath:/swagger/petstore.yml")
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_ADDITIONAL_FILES_MERGE_MODE, "replace")
+
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.micronaut.management.endpoint.loggers.LoggersEndpoint;
+import io.micronaut.openapi.annotation.OpenAPIInclude;
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import reactor.core.publisher.Mono;
+
+@OpenAPIInclude(classes = LoggersEndpoint.class)
+@OpenAPIDefinition
+class Application {
+
+}
+
+@Controller
+interface DefaultApi {
+
+    /**
+     * exampleRouteGet
+     *
+     * @return Mono&lt;String&gt;
+     */
+    @Get("/example-route")
+    Mono<String> exampleRouteGet();
+}
+
+@Controller
+class ApiImpl implements DefaultApi {
+
+    @Override
+    public Mono<String> exampleRouteGet() {
+        return null;
+    }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+
+        then:
+        Utils.testReference
+
+        when:
+        var openApi = Utils.testReference
+        var op = openApi.paths."/example-route".get
+        var opLoggers = openApi.paths."/loggers".get
+        var opLoggers2 = openApi.paths."/loggers/{name}".get
+        var schemas = openApi.components.schemas
+
+        then:
+        opLoggers
+        opLoggers2
+        op
+        op.responses."200".description == "this is my unique description"
+        schemas
+        schemas.BusinessObject
+        schemas.BusinessObject.type == "string"
+        openApi.servers
+        openApi.servers[0].url == "https://petstore.swagger.io/v1"
+        openApi.paths."/pets".get
+        openApi.paths."/pets".post
+    }
+
+    @RestoreSystemProperties
+    void "test merge with additional openapi files: APPEND with project and yaml config"() {
+
+        given:
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_CONFIG_FILE_LOCATIONS, "project:/src/test/resources/")
+        System.setProperty(Environment.ENVIRONMENTS_PROPERTY, "additional-files")
+
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.micronaut.management.endpoint.loggers.LoggersEndpoint;
+import io.micronaut.openapi.annotation.OpenAPIInclude;
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import reactor.core.publisher.Mono;
+
+@OpenAPIInclude(classes = LoggersEndpoint.class)
+@OpenAPIDefinition
+class Application {
+
+}
+
+@Controller
+interface DefaultApi {
+
+    /**
+     * exampleRouteGet
+     *
+     * @return Mono&lt;String&gt;
+     */
+    @Get("/example-route")
+    Mono<String> exampleRouteGet();
+}
+
+@Controller
+class ApiImpl implements DefaultApi {
+
+    @Override
+    public Mono<String> exampleRouteGet() {
+        return null;
+    }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+
+        then:
+        Utils.testReference
+
+        when:
+        var openApi = Utils.testReference
+        var op = openApi.paths."/example-route".get
+        var opLoggers = openApi.paths."/loggers".get
+        var opLoggers2 = openApi.paths."/loggers/{name}".get
+        var schemas = openApi.components.schemas
+
+        then:
+        opLoggers
+        opLoggers2
+        op
+        op.responses."200".description == "exampleRouteGet 200 response"
+        schemas
+        schemas.BusinessObject
+        schemas.BusinessObject.type == "string"
+        openApi.servers
+        openApi.servers[0].url == "https://petstore.swagger.io/v1"
+        openApi.paths."/pets".get
+        openApi.paths."/pets".post
     }
 }

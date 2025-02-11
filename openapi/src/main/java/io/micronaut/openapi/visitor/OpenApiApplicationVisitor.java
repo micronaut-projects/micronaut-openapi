@@ -23,6 +23,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import io.micronaut.context.env.Environment;
 import io.micronaut.core.annotation.Nullable;
+import io.micronaut.core.io.scan.DefaultClassPathResourceLoader;
 import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.core.util.StringUtils;
 import io.micronaut.inject.ast.ClassElement;
@@ -53,9 +54,13 @@ import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.servers.Server;
 import io.swagger.v3.oas.models.tags.Tag;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -68,16 +73,25 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 
+import static io.micronaut.openapi.adoc.utils.FileUtils.CLASSPATH_SCHEME;
+import static io.micronaut.openapi.adoc.utils.FileUtils.FILE_SCHEME;
+import static io.micronaut.openapi.adoc.utils.FileUtils.PROJECT_SCHEME;
+import static io.micronaut.openapi.visitor.ConfigUtils.MergeMode.REPLACE;
 import static io.micronaut.openapi.visitor.ConfigUtils.endpointsConfiguration;
+import static io.micronaut.openapi.visitor.ConfigUtils.getAdditionalFiles;
+import static io.micronaut.openapi.visitor.ConfigUtils.getAdditionalFilesMergeMode;
 import static io.micronaut.openapi.visitor.ConfigUtils.getAdocProperties;
 import static io.micronaut.openapi.visitor.ConfigUtils.getConfigProperty;
 import static io.micronaut.openapi.visitor.ConfigUtils.getEnv;
 import static io.micronaut.openapi.visitor.ConfigUtils.getExpandableProperties;
 import static io.micronaut.openapi.visitor.ConfigUtils.getGroupProperties;
+import static io.micronaut.openapi.visitor.ConfigUtils.getProjectPath;
 import static io.micronaut.openapi.visitor.ConfigUtils.isOpenApiEnabled;
 import static io.micronaut.openapi.visitor.ConfigUtils.isSpecGenerationEnabled;
 import static io.micronaut.openapi.visitor.ConfigUtils.readOpenApiConfigFile;
@@ -93,10 +107,10 @@ import static io.micronaut.openapi.visitor.FileUtils.calcFinalFilename;
 import static io.micronaut.openapi.visitor.FileUtils.getDefaultFilePath;
 import static io.micronaut.openapi.visitor.FileUtils.getViewsDestDir;
 import static io.micronaut.openapi.visitor.FileUtils.openApiSpecFile;
+import static io.micronaut.openapi.visitor.FileUtils.readFile;
 import static io.micronaut.openapi.visitor.FileUtils.resolve;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.ALL;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_APPLICATION_NAME;
-import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ADDITIONAL_FILES;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_CONTEXT_SERVER_PATH;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_JSON_FORMAT;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_PROPERTY_NAMING_STRATEGY;
@@ -114,6 +128,7 @@ import static io.micronaut.openapi.visitor.SchemaUtils.setOperationOnPathItem;
 import static io.micronaut.openapi.visitor.StringUtil.PLACEHOLDER_POSTFIX;
 import static io.micronaut.openapi.visitor.StringUtil.PLACEHOLDER_PREFIX;
 import static io.micronaut.openapi.visitor.StringUtil.QUOTE;
+import static io.micronaut.openapi.visitor.StringUtil.SLASH;
 import static io.micronaut.openapi.visitor.Utils.resolveComponents;
 import static io.swagger.v3.oas.models.Components.COMPONENTS_SCHEMAS_REF;
 
@@ -159,7 +174,6 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             // Handle Application securityRequirements schemes
             processSecuritySchemes(element, context);
 
-            mergeAdditionalSwaggerFiles(element, context, openApi);
             // handle type level tags
             List<Tag> tagList = processOpenApiAnnotation(
                 element,
@@ -193,7 +207,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                 if (openApi.getInfo() != null) {
                     existing.setInfo(openApi.getInfo());
                 }
-                copyOpenApi(existing, openApi);
+                copyOpenApi(existing, openApi, false);
             } else {
                 ContextUtils.put(Utils.ATTR_OPENAPI, openApi, context);
             }
@@ -218,39 +232,111 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
     /**
      * Merge the OpenAPI YAML and JSON files into one single file.
      *
-     * @param element The element
-     * @param context The visitor context
      * @param openApi The {@link OpenAPI} object for the application
+     * @param context The visitor context
      */
-    private void mergeAdditionalSwaggerFiles(ClassElement element, VisitorContext context, OpenAPI openApi) {
-        String additionalSwaggerFiles = getConfigProperty(MICRONAUT_OPENAPI_ADDITIONAL_FILES, context);
-        if (StringUtils.isEmpty(additionalSwaggerFiles)) {
+    private void mergeAdditionalOpenApiFiles(OpenAPI openApi, VisitorContext context) {
+        List<String> additionalSwaggerFiles = getAdditionalFiles(context);
+        if (CollectionUtils.isEmpty(additionalSwaggerFiles)) {
             return;
         }
-        Path directory = resolve(context, java.nio.file.Paths.get(additionalSwaggerFiles));
-        if (!Files.isDirectory(directory)) {
-            warn(directory + " does not exist or is not a directory", context, element);
-            return;
-        }
-        info("Merging Swagger OpenAPI YAML and JSON files from location: " + directory, context);
-        try (DirectoryStream<Path> paths = Files.newDirectoryStream(directory, path -> {
-            var pathStr = path.toString().toLowerCase();
-            return FileUtils.isYaml(pathStr) || FileUtils.isJson(pathStr);
-        })) {
-            for (var path : paths) {
-                boolean isYaml = FileUtils.isYaml(path.toString().toLowerCase());
-                info("Reading Swagger OpenAPI " + (isYaml ? "YAML" : "JSON") + " file " + path.getFileName(), context);
-                OpenAPI parsedOpenApi = null;
-                try {
-                    parsedOpenApi = (isYaml ? Utils.getYamlMapper() : Utils.getJsonMapper()).readValue(path.toFile(), OpenAPI.class);
-                } catch (IOException e) {
-                    warn("Unable to read file " + path.getFileName() + ": " + e.getMessage(), context, element);
+
+        for (var additionalSwaggerFile : additionalSwaggerFiles) {
+            additionalSwaggerFile = additionalSwaggerFile.trim();
+
+            if (additionalSwaggerFile.startsWith(CLASSPATH_SCHEME)) {
+                var resourceLoader = new DefaultClassPathResourceLoader(getClass().getClassLoader());
+                additionalSwaggerFile = additionalSwaggerFile.substring(CLASSPATH_SCHEME.length());
+                if (additionalSwaggerFile.startsWith(SLASH)) {
+                    additionalSwaggerFile = additionalSwaggerFile.substring(SLASH.length());
                 }
-                copyOpenApi(openApi, parsedOpenApi);
+                Optional<InputStream> inOpt = resourceLoader.getResourceAsStream(additionalSwaggerFile);
+                if (inOpt.isEmpty()) {
+                    warn("Fail to load " + additionalSwaggerFile, context);
+                    continue;
+                }
+                try (InputStream in = inOpt.get();
+                     var reader = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8))
+                ) {
+                    var openapiFile = readFile(reader);
+                    boolean isYaml = FileUtils.isYaml(additionalSwaggerFile.toLowerCase());
+                    info("Reading OpenAPI " + (isYaml ? "YAML" : "JSON") + " file " + additionalSwaggerFile, context);
+                    OpenAPI parsedOpenApi = null;
+                    try {
+                        parsedOpenApi = (isYaml ? Utils.getYamlMapper() : Utils.getJsonMapper()).readValue(openapiFile, OpenAPI.class);
+                    } catch (IOException e) {
+                        warn("Unable to read file " + additionalSwaggerFile + ": " + e.getMessage(), context);
+                    }
+                    copyOpenApi(openApi, parsedOpenApi, getAdditionalFilesMergeMode(context) == REPLACE);
+
+                } catch (IOException e) {
+                    warn("Fail to load " + additionalSwaggerFile + "\n" + Utils.printStackTrace(e), context);
+                }
+            } else if (additionalSwaggerFile.startsWith(PROJECT_SCHEME)) {
+                additionalSwaggerFile = additionalSwaggerFile.substring(PROJECT_SCHEME.length());
+                String projectDir = StringUtils.EMPTY_STRING;
+                Path projectPath = getProjectPath(context);
+                if (projectPath != null) {
+                    projectDir = projectPath.toString().replace("\\\\", SLASH).replace("\\", SLASH);
+                }
+                if (!projectDir.endsWith(SLASH)) {
+                    projectDir += SLASH;
+                }
+                if (additionalSwaggerFile.startsWith(SLASH)) {
+                    additionalSwaggerFile = additionalSwaggerFile.substring(SLASH.length());
+                }
+                additionalSwaggerFile = projectDir + additionalSwaggerFile;
+            } else {
+                if (additionalSwaggerFile.startsWith(FILE_SCHEME)) {
+                    additionalSwaggerFile = additionalSwaggerFile.substring(FILE_SCHEME.length());
+                }
             }
-        } catch (IOException e) {
-            warn("Unable to read  file from " + directory + ": " + e.getMessage(), context, element);
+
+            Path path = resolve(context, java.nio.file.Paths.get(additionalSwaggerFile));
+            if (!Files.exists(path)) {
+                warn(path + " does not exist", context);
+                continue;
+            }
+
+            if (Files.isDirectory(path)) {
+                info("Merging OpenAPI YAML and JSON files from location: " + path, context);
+                var foundAnyFile = new AtomicBoolean(false);
+                try (DirectoryStream<Path> paths = Files.newDirectoryStream(path, p -> {
+                    var pathStr = p.toString().toLowerCase();
+                    return FileUtils.isYaml(pathStr) || FileUtils.isJson(pathStr);
+                })) {
+                    foundAnyFile.set(true);
+                    for (var pathInDir : paths) {
+                        readAndMergeAdditionalFile(pathInDir, openApi, context);
+                    }
+                } catch (IOException e) {
+                    warn("Unable to read  file from " + path + ": " + e.getMessage(), context);
+                }
+                if (!foundAnyFile.get()) {
+                    warn("Not found any OpenAPI YAML or JSON files in directory " + path, context);
+                }
+            } else {
+                var pathStr = path.toString().toLowerCase();
+                if (!FileUtils.isYaml(pathStr) && !FileUtils.isJson(pathStr)) {
+                    warn("Unknown file type: " + path + ". Must be json, yaml or yml", context);
+                    return;
+                }
+
+                readAndMergeAdditionalFile(path, openApi, context);
+            }
         }
+    }
+
+    private void readAndMergeAdditionalFile(Path path, OpenAPI openApi, VisitorContext context) {
+        boolean isYaml = FileUtils.isYaml(path.toString().toLowerCase());
+        info("Reading OpenAPI " + (isYaml ? "YAML" : "JSON") + " file " + path.getFileName(), context);
+        OpenAPI parsedOpenApi = null;
+        try {
+            parsedOpenApi = (isYaml ? Utils.getYamlMapper() : Utils.getJsonMapper()).readValue(path.toFile(), OpenAPI.class);
+        } catch (IOException e) {
+            warn("Unable to read file " + path.getFileName() + ": " + e.getMessage(), context);
+        }
+        copyOpenApi(openApi, parsedOpenApi, getAdditionalFilesMergeMode(context) == REPLACE);
     }
 
     private OpenAPI readOpenApi(ClassElement element, VisitorContext context) {
@@ -358,8 +444,8 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         for (Map.Entry<String, PathItem> path : paths.entrySet()) {
             final String mapping = path.getKey();
             String newPath = mapping.startsWith(serverContextPath) ? mapping : StringUtils.prependUri(serverContextPath, mapping);
-            if (!newPath.startsWith(StringUtil.SLASH) && !newPath.startsWith(StringUtil.DOLLAR)) {
-                newPath = StringUtil.SLASH + newPath;
+            if (!newPath.startsWith(SLASH) && !newPath.startsWith(StringUtil.DOLLAR)) {
+                newPath = SLASH + newPath;
             }
             newPaths.addPathItem(newPath, path.getValue());
         }
@@ -724,6 +810,8 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
 
         removeUnusedSchemas(openApi);
 
+        mergeAdditionalOpenApiFiles(openApi, context);
+
         removeEmptyComponents(openApi);
         findAndRemoveDuplicates(openApi);
 
@@ -837,7 +925,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                     .collect(Collectors.joining(", ", "files ", StringUtils.EMPTY_STRING));
             }
 
-            warn("Unable to render swagger view: " + swaggerFiles + " - " + e.getMessage() + ".\n" + Utils.printStackTrace(e), context, classElement);
+            warn("Unable to render OpenAPI view: " + swaggerFiles + " - " + e.getMessage() + ".\n" + Utils.printStackTrace(e), context, classElement);
         }
     }
 
@@ -893,7 +981,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         } else if (specFile != null) {
             return Files.newBufferedWriter(specFile, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
         } else {
-            throw new IOException("Swagger spec file location is not present");
+            throw new IOException("OpenAPI spec file location is not present");
         }
     }
 

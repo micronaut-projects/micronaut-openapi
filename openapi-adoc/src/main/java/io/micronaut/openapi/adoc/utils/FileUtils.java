@@ -25,6 +25,7 @@ import java.nio.charset.StandardCharsets;
  */
 public final class FileUtils {
 
+    public static final String PROJECT_SCHEME = "project:";
     public static final String FILE_SCHEME = "file:";
     public static final String CLASSPATH_SCHEME = "classpath:";
 
@@ -32,7 +33,7 @@ public final class FileUtils {
     }
 
     public static String loadFileFromClasspath(String location) {
-        String file = location.replace("\\\\", "/");
+        String file = location.replace("\\\\", "/").replace("\\", "/");
 
         var inputStream = FileUtils.class.getResourceAsStream(file);
         if (inputStream == null) {

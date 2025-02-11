@@ -138,6 +138,18 @@ public interface OpenApiConfigProperty {
      */
     String MICRONAUT_OPENAPI_ADDITIONAL_FILES = "micronaut.openapi.additional.files";
     /**
+     * System property that specifies the mode of merge additional OpenAPI files. Available values: "append" and "replace".
+     * <p>
+     * With "append" mode: If there are duplicate elements in the generated specification and additional specification files,
+     * the element from the generated specification will always be taken.
+     * <p>
+     * With "replace" mode: If there are duplicate elements in the generated specification and additional specification files,
+     * the element from the generated specification will always be replaced by the element from the additional files.
+     * <p>
+     * Default: replace
+     */
+    String MICRONAUT_OPENAPI_ADDITIONAL_FILES_MERGE_MODE = "micronaut.openapi.additional.files-merge-mode";
+    /**
      * System property that specifies the location of current project.
      */
     String MICRONAUT_OPENAPI_PROJECT_DIR = "micronaut.openapi.project.dir";
