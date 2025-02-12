@@ -835,8 +835,27 @@ public class Application {
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong>micronaut.openapi.additional.files</strong></code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">System property that specifies the location of additional swagger YAML and JSON files to read from.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">System property that specifies the location of additional swagger YAML and JSON files to read from.<br>
+&#160;<br>
+You can set comma separated list of paths to directories or to OpenAPI filesYou can set your custom paths separated by <code>,</code>. These paths can be paths to directories or to OpenAPI files. To set absolute paths use prefix <code>file:</code> (or without prefix),
+classpath paths use prefix <code>classpath:</code> or use prefix <code>project:</code> to set paths from project
+directory.<br>
+&#160;<br>
+<strong>Example:</strong><br>
+&#160;<br>
+micronaut.openapi.additional.files = project:src/test/resources/swagger/openapi.yml,classpath:/swagger/petstore.yml</p></td>
 <td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong>micronaut.openapi.additional.files-merge-mode</strong></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">System property that specifies the mode of merge additional OpenAPI files. Available values: <strong>"append"</strong> and <strong>"replace"</strong>.<br>
+&#160;<br>
+With <strong>append</strong> mode: If there are duplicate elements in the generated specification and additional specification files,
+the element from the generated specification will always be taken.<br>
+&#160;<br>
+With <strong>replace</strong> mode: If there are duplicate elements in the generated specification and additional specification files,
+the element from the generated specification will always be replaced by the element from the additional files.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Default: <strong>replace</strong></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong>micronaut.openapi.project.dir</strong></code></p></td>
@@ -897,11 +916,6 @@ PUBLIC</p></td>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong>micronaut.server.context-path</strong></code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>micronaut-http</code> server context path property.</p></td>
-<td class="tableblock halign-left valign-top"></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong>micronaut.internal.openapi.filenames</strong></code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Final calculated openapi filenames.</p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>

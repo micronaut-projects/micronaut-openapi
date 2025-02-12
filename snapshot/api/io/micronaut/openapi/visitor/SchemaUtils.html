@@ -208,8 +208,9 @@ loadScripts(document, 'script');</script>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#arraySchema(io.swagger.v3.oas.models.media.Schema)" class="member-name-link">arraySchema</a><wbr>(io.swagger.v3.oas.models.media.Schema&lt;?&gt;&nbsp;schema)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#copyOpenApi(io.swagger.v3.oas.models.OpenAPI,io.swagger.v3.oas.models.OpenAPI)" class="member-name-link">copyOpenApi</a><wbr>(io.swagger.v3.oas.models.OpenAPI&nbsp;to,
- io.swagger.v3.oas.models.OpenAPI&nbsp;from)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#copyOpenApi(io.swagger.v3.oas.models.OpenAPI,io.swagger.v3.oas.models.OpenAPI,boolean)" class="member-name-link">copyOpenApi</a><wbr>(io.swagger.v3.oas.models.OpenAPI&nbsp;to,
+ io.swagger.v3.oas.models.OpenAPI&nbsp;from,
+ boolean&nbsp;replace)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
 <div class="block">Copy information from one <code>OpenAPI</code> object to another.</div>
 </div>
@@ -705,15 +706,17 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
-<section class="detail" id="copyOpenApi(io.swagger.v3.oas.models.OpenAPI,io.swagger.v3.oas.models.OpenAPI)">
+<section class="detail" id="copyOpenApi(io.swagger.v3.oas.models.OpenAPI,io.swagger.v3.oas.models.OpenAPI,boolean)">
 <h3>copyOpenApi</h3>
 <div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">copyOpenApi</span><wbr><span class="parameters">(io.swagger.v3.oas.models.OpenAPI&nbsp;to,
- io.swagger.v3.oas.models.OpenAPI&nbsp;from)</span></div>
+ io.swagger.v3.oas.models.OpenAPI&nbsp;from,
+ boolean&nbsp;replace)</span></div>
 <div class="block">Copy information from one <code>OpenAPI</code> object to another.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>to</code> - The <code>OpenAPI</code> object to copy to</dd>
 <dd><code>from</code> - The <code>OpenAPI</code> object to copy from</dd>
+<dd><code>replace</code> - replace existed elements or append</dd>
 </dl>
 </section>
 </li>
