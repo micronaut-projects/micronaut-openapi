@@ -42,10 +42,14 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import static io.micronaut.openapi.adoc.utils.FileUtils.CLASSPATH_SCHEME;
+import static io.micronaut.openapi.adoc.utils.FileUtils.FILE_SCHEME;
+import static io.micronaut.openapi.adoc.utils.FileUtils.PROJECT_SCHEME;
 import static io.micronaut.openapi.visitor.ConfigUtils.getProjectPath;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_CONFIG_FILE_LOCATIONS;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_ENVIRONMENT_ENABLED;
 import static io.micronaut.openapi.visitor.StringUtil.COMMA;
+import static io.micronaut.openapi.visitor.StringUtil.SLASH;
 
 /**
  * Specific environment for annotation processing level. Solve problem with access to resources
@@ -74,8 +78,8 @@ public class AnnProcessorEnvironment extends DefaultEnvironment {
         if (isEnabled) {
             Path projectPath = getProjectPath(context);
             if (projectPath != null) {
-                projectDir = "file:" + projectPath.toString().replace("\\\\", StringUtil.SLASH);
-                projectResourcesPath = projectDir + (projectDir.endsWith(StringUtil.SLASH) ? StringUtils.EMPTY_STRING : StringUtil.SLASH) + "src/main/resources/";
+                projectDir = FILE_SCHEME + projectPath.toString().replace("\\\\", SLASH).replace("\\", SLASH);
+                projectResourcesPath = projectDir + (projectDir.endsWith(SLASH) ? StringUtils.EMPTY_STRING : SLASH) + "src/main/resources/";
             }
 
             String configFileLocations = ContextUtils.getOptions(context).get(MICRONAUT_CONFIG_FILE_LOCATIONS);
@@ -83,11 +87,11 @@ public class AnnProcessorEnvironment extends DefaultEnvironment {
                 annotationProcessingConfigLocations.add(projectResourcesPath);
             } else if (StringUtils.isNotEmpty(configFileLocations)) {
                 for (String configFileLocation : configFileLocations.split(COMMA)) {
-                    if (!configFileLocation.startsWith("classpath") && !configFileLocation.startsWith("file") && !configFileLocation.startsWith("project")) {
+                    if (!configFileLocation.startsWith(CLASSPATH_SCHEME) && !configFileLocation.startsWith(FILE_SCHEME) && !configFileLocation.startsWith(PROJECT_SCHEME)) {
                         throw new ConfigurationException("Unsupported config location format: " + configFileLocation);
                     }
-                    if (configFileLocation.startsWith("project")) {
-                        configFileLocation = configFileLocation.replace("project:", projectDir);
+                    if (configFileLocation.startsWith(PROJECT_SCHEME)) {
+                        configFileLocation = configFileLocation.replace(PROJECT_SCHEME, projectDir);
                     }
                     annotationProcessingConfigLocations.add(configFileLocation);
                 }
@@ -106,15 +110,15 @@ public class AnnProcessorEnvironment extends DefaultEnvironment {
         addDefaultPropertySources(propertySources);
         String propertySourcesSystemProperty = CachedEnvironment.getProperty(Environment.PROPERTY_SOURCES_KEY);
         if (propertySourcesSystemProperty != null) {
-            if (propertySourcesSystemProperty.startsWith("project")) {
-                propertySourcesSystemProperty = propertySourcesSystemProperty.replaceAll("project:", projectDir);
+            if (propertySourcesSystemProperty.startsWith(PROJECT_SCHEME)) {
+                propertySourcesSystemProperty = propertySourcesSystemProperty.replaceAll(PROJECT_SCHEME, projectDir);
             }
             propertySources.addAll(readPropertySourceListFromFiles(propertySourcesSystemProperty));
         }
         String propertySourcesEnv = readPropertySourceListKeyFromEnvironment();
         if (propertySourcesEnv != null) {
-            if (propertySourcesEnv.startsWith("project")) {
-                propertySourcesEnv = propertySourcesEnv.replace("project:", projectDir);
+            if (propertySourcesEnv.startsWith(PROJECT_SCHEME)) {
+                propertySourcesEnv = propertySourcesEnv.replace(PROJECT_SCHEME, projectDir);
             }
             propertySources.addAll(readPropertySourceListFromFiles(propertySourcesEnv));
         }
@@ -153,13 +157,13 @@ public class AnnProcessorEnvironment extends DefaultEnvironment {
             ResourceLoader resourceLoader;
             if (configLocation.equals("classpath:/")) {
                 resourceLoader = this;
-            } else if (configLocation.startsWith("classpath:")) {
+            } else if (configLocation.startsWith(CLASSPATH_SCHEME)) {
                 if (this.resourceLoader instanceof DefaultClassPathResourceLoader defClassPathResourceLoader) {
                     resourceLoader = defClassPathResourceLoader.forBase(configLocation, false);
                 } else {
                     resourceLoader = forBase(configLocation);
                 }
-            } else if (configLocation.startsWith("file:")) {
+            } else if (configLocation.startsWith(FILE_SCHEME)) {
                 configLocation = configLocation.substring(5);
                 Path configLocationPath = Paths.get(configLocation);
                 if (Files.exists(configLocationPath) && Files.isDirectory(configLocationPath) && Files.isReadable(configLocationPath)) {

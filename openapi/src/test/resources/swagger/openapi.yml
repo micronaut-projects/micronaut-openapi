@@ -1,0 +1,18 @@
+openapi: 3.1.0
+info:
+  version: "1"
+  title: api
+paths:
+  /example-route:
+    get:
+      responses:
+        "200":
+          content:
+            "application/json":
+              schema:
+                type: string
+          description: this is my unique description
+components:
+  schemas:
+    BusinessObject:
+      type: string

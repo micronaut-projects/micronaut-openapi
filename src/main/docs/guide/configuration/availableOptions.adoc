@@ -9,7 +9,24 @@
 |`*micronaut.openapi.views.spec*` | System property for views specification. |
 |`*micronaut.openapi.target.file*` | System property that enables setting the target file to write to. | Default: `META-INF/swagger/${applicationName}-${version}.yml`
 |`*micronaut.openapi.views.dest.dir*` | System property that specifies the path where the generated UI elements will be located. | Default: `META-INF/swagger/views/`
-|`*micronaut.openapi.additional.files*` | System property that specifies the location of additional swagger YAML and JSON files to read from. |
+|`*micronaut.openapi.additional.files*` | System property that specifies the location of additional swagger YAML and JSON files to read from. +
+{nbsp} +
+You can set comma separated list of paths to directories or to OpenAPI filesYou can set your custom paths separated by `,`. These paths can be paths to directories or to OpenAPI files. To set absolute paths use prefix `file:` (or without prefix),
+classpath paths use prefix `classpath:` or use prefix `project:` to set paths from project
+directory. +
+{nbsp} +
+**Example:** +
+{nbsp} +
+micronaut.openapi.additional.files = project:src/test/resources/swagger/openapi.yml,classpath:/swagger/petstore.yml
+|
+|`*micronaut.openapi.additional.files-merge-mode*` | System property that specifies the mode of merge additional OpenAPI files. Available values: **"append"** and **"replace"**. +
+{nbsp} +
+With **append** mode: If there are duplicate elements in the generated specification and additional specification files,
+the element from the generated specification will always be taken. +
+{nbsp} +
+With **replace** mode: If there are duplicate elements in the generated specification and additional specification files,
+the element from the generated specification will always be replaced by the element from the additional files.
+| Default: **replace**
 |`*micronaut.openapi.project.dir*` | System property that specifies the location of current project. Need to set this property manually if you use kotlin (to save incremental annotation processing) or have some troubles with auto calculation project path. | Default: calculated automatically
 |`*micronaut.openapi.security.default-schema-name*` | System property that specifies the default security schema name, if it's not specified by annotation SecurityScheme. |
 |`*micronaut.openapi.security.enabled*` | If this property true, micronaut-openapi will process micronaut-security properties and annotations to construct openapi security schema. | Default: `true`
@@ -27,7 +44,6 @@ PUBLIC | Default: `PUBLIC`
 |`*micronaut.openapi.environments.enabled*` | Is this property true, properties wll be loaded in the standard way from application.yml. Also, environments from `micronaut.openapi.environments` property will set as additional environments, if you want to set specific environment name for openAPI generator. | Default: `true`
 |`*micronaut.openapi.versioning.enabled*` | Is this property true, micronaut-openapi will process micronaut-router versioning properties and annotations. | Default: `true`
 |`*micronaut.server.context-path*` | `micronaut-http` server context path property. |
-|`*micronaut.internal.openapi.filenames*` | Final calculated openapi filenames. |
 |`*jackson.json-view.enabled*` | `micronaut-http` property (`json-view.enabled`). | Default: `false`
 |`*micronaut.openapi.json.view.default.inclusion*` | Property that determines whether properties that have no view annotations are included in JSON serialization views. If enabled, non-annotated properties will be included; when disabled, they will be excluded. | Default: `true`
 |`*micronaut.openapi.expand.**` | Prefix for expandable properties. These properties can be used only for placeholders. |

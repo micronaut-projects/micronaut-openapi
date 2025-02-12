@@ -1,0 +1,7 @@
+micronaut:
+  openapi:
+    additional:
+      files-merge-mode: append
+      files:
+        - project:src/test/resources/swagger/openapi.yml
+        - classpath:/swagger/petstore.yml

@@ -75,6 +75,8 @@ import static io.micronaut.openapi.visitor.OpenApiConfigProperty.ALL;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_ENVIRONMENT_ENABLED;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_JACKSON_JSON_VIEW_ENABLED;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_31_JSON_SCHEMA_DIALECT;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ADDITIONAL_FILES;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ADDITIONAL_FILES_MERGE_MODE;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ADOC_ENABLED;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ADOC_OPENAPI_PATH;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ADOC_OUTPUT_DIR_PATH;
@@ -868,6 +870,23 @@ public final class ConfigUtils {
         return value;
     }
 
+    public static List<String> getAdditionalFiles(VisitorContext context) {
+        return getListStringsProperty(MICRONAUT_OPENAPI_ADDITIONAL_FILES, null, context);
+    }
+
+    public static MergeMode getAdditionalFilesMergeMode(VisitorContext context) {
+        String str = getConfigProperty(MICRONAUT_OPENAPI_ADDITIONAL_FILES_MERGE_MODE, context);
+        if (StringUtils.isEmpty(str)) {
+            return MergeMode.REPLACE;
+        }
+        try {
+            return MergeMode.valueOf(str.toUpperCase());
+        } catch (Exception e) {
+            warn("Unknown additional files mergeMode value: " + str, context);
+            return MergeMode.REPLACE;
+        }
+    }
+
     public static boolean getBooleanProperty(String property, boolean defaultValue, VisitorContext context) {
         String str = getConfigProperty(property, context);
         if (StringUtils.isEmpty(str)) {
@@ -1041,5 +1060,13 @@ public final class ConfigUtils {
     public enum DuplicateResolution {
         AUTO,
         ERROR,
+    }
+
+    /**
+     * Merge mode for additional OpenAPI specification files.
+     */
+    public enum MergeMode {
+        APPEND,
+        REPLACE,
     }
 }

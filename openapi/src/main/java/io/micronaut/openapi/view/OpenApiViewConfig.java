@@ -44,6 +44,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 
+import static io.micronaut.openapi.adoc.utils.FileUtils.CLASSPATH_SCHEME;
+import static io.micronaut.openapi.adoc.utils.FileUtils.FILE_SCHEME;
+import static io.micronaut.openapi.adoc.utils.FileUtils.PROJECT_SCHEME;
 import static io.micronaut.openapi.visitor.ConfigUtils.getProjectPath;
 import static io.micronaut.openapi.visitor.ContextUtils.addGeneratedResource;
 import static io.micronaut.openapi.visitor.ContextUtils.info;
@@ -320,19 +323,19 @@ public final class OpenApiViewConfig {
         if (projectPath != null) {
             projectDir = projectPath.toString().replace("\\\\", SLASH);
         }
-        if (customPathStr.startsWith("project:")) {
-            customPathStr = customPathStr.replace("project:", projectDir);
-        } else if (!customPathStr.startsWith("file:") && !customPathStr.startsWith("classpath:")) {
+        if (customPathStr.startsWith(PROJECT_SCHEME)) {
+            customPathStr = customPathStr.replace(PROJECT_SCHEME, projectDir);
+        } else if (!customPathStr.startsWith(FILE_SCHEME) && !customPathStr.startsWith(CLASSPATH_SCHEME)) {
             if (!projectDir.endsWith(SLASH)) {
                 projectDir += SLASH;
             }
             if (customPathStr.startsWith(SLASH)) {
-                customPathStr = customPathStr.substring(1);
+                customPathStr = customPathStr.substring(SLASH.length());
             }
             customPathStr = projectDir + customPathStr;
-        } else if (customPathStr.startsWith("file:")) {
-            customPathStr = customPathStr.substring(5);
-        } else if (customPathStr.startsWith("classpath:")) {
+        } else if (customPathStr.startsWith(FILE_SCHEME)) {
+            customPathStr = customPathStr.substring(FILE_SCHEME.length());
+        } else if (customPathStr.startsWith(CLASSPATH_SCHEME)) {
             var resourceLoader = new DefaultClassPathResourceLoader(getClass().getClassLoader());
             Optional<InputStream> inOpt = resourceLoader.getResourceAsStream(customPathStr);
             if (inOpt.isEmpty()) {
