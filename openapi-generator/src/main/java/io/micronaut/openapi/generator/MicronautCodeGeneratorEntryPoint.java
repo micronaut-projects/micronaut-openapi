@@ -204,6 +204,7 @@ public final class MicronautCodeGeneratorEntryPoint {
             javaCodeGen.setUseJakartaEe(options.useJakartaEe);
             javaCodeGen.setUseOneOfInterfaces(options.useOneOfInterfaces);
             javaCodeGen.setReactive(options.reactive);
+            javaCodeGen.setJsonIncludeAlwaysForRequiredFields(options.jsonIncludeAlwaysForRequiredFields);
             javaCodeGen.setRequiredPropertiesInConstructor(options.requiredPropertiesInConstructor);
             javaCodeGen.setGenerateHttpResponseAlways(options.generateHttpResponseAlways);
             javaCodeGen.setGenerateControllerAsAbstract(options.generateControllerAsAbstract);
@@ -299,6 +300,7 @@ public final class MicronautCodeGeneratorEntryPoint {
             kotlinCodeGen.setUseJakartaEe(options.useJakartaEe);
             kotlinCodeGen.setUseOneOfInterfaces(options.useOneOfInterfaces);
             kotlinCodeGen.setReactive(options.reactive);
+            kotlinCodeGen.setJsonIncludeAlwaysForRequiredFields(options.jsonIncludeAlwaysForRequiredFields);
             kotlinCodeGen.setGenerateHttpResponseAlways(options.generateHttpResponseAlways);
             kotlinCodeGen.setGenerateControllerAsAbstract(options.generateControllerAsAbstract);
             kotlinCodeGen.setGenerateHttpResponseWhereRequired(options.generateHttpResponseWhereRequired);
@@ -584,6 +586,7 @@ public final class MicronautCodeGeneratorEntryPoint {
 
             private boolean optional;
             private boolean reactive = true;
+            private boolean jsonIncludeAlwaysForRequiredFields;
             private boolean requiredPropertiesInConstructor = true;
             private boolean useOneOfInterfaces = true;
             private boolean generateHttpResponseAlways;
@@ -744,6 +747,12 @@ public final class MicronautCodeGeneratorEntryPoint {
             @Override
             public MicronautCodeGeneratorOptionsBuilder withReactive(boolean reactive) {
                 this.reactive = reactive;
+                return this;
+            }
+
+            @Override
+            public MicronautCodeGeneratorOptionsBuilder withJsonIncludeAlwaysForRequiredFields(boolean jsonIncludeAlwaysForRequiredFields) {
+                this.jsonIncludeAlwaysForRequiredFields = jsonIncludeAlwaysForRequiredFields;
                 return this;
             }
 
@@ -935,6 +944,7 @@ public final class MicronautCodeGeneratorEntryPoint {
                     useEnumCaseInsensitive,
                     optional,
                     reactive,
+                    jsonIncludeAlwaysForRequiredFields,
                     requiredPropertiesInConstructor,
                     useOneOfInterfaces,
                     generateHttpResponseAlways,
@@ -1010,6 +1020,7 @@ public final class MicronautCodeGeneratorEntryPoint {
         boolean useEnumCaseInsensitive,
         boolean optional,
         boolean reactive,
+        boolean jsonIncludeAlwaysForRequiredFields,
         boolean requiredPropertiesInConstructor,
         boolean useOneOfInterfaces,
         boolean generateHttpResponseAlways,

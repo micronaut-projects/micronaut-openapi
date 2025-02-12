@@ -1,0 +1,66 @@
+openapi: '3.0.3'
+info:
+  title: 'Library API'
+  description: |
+    Example Service
+  contact:
+    name: 'Example Team'
+  version: '1.0'
+tags:
+  - name: texts
+
+security:
+  - BearerAuth: [ ]
+
+paths:
+  /things/:
+    post:
+      tags: [ texts ]
+      summary: send a localized text
+      operationId: sendText
+      requestBody:
+        required: true
+        content:
+          application/json: {
+            schema: {
+              $ref: '#/components/schemas/TextRequestDto'
+            }
+          }
+      responses:
+        '204':
+          description: 'text sent successfully'
+          content:
+            application/json: {
+              schema: {
+                $ref: '#/components/schemas/ResponseDto'
+              }
+            }
+components:
+  schemas:
+    TextRequestDto:
+      type: object
+      required:
+        - text
+        - locale
+      properties:
+        text:
+          type: string
+        locale:
+          type: string
+          minLength: 1
+          maxLength: 20
+    ResponseDto:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
