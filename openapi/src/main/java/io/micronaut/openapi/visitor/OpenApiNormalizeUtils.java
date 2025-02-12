@@ -40,6 +40,7 @@ import java.util.TreeMap;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
+import static io.micronaut.openapi.visitor.InternalExt.MICRONAUT_OP_POSTFIX;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.MICRONAUT_EXT_PARENT_RESPONSE;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_DESCRIPTION;
 import static io.micronaut.openapi.visitor.SchemaUtils.EMPTY_SIMPLE_SCHEMA;
@@ -83,6 +84,9 @@ public final class OpenApiNormalizeUtils {
             }
             openAPI.setPaths(sortedPaths);
             for (PathItem pathItem : sortedPaths.values()) {
+                if (CollectionUtils.isNotEmpty(pathItem.getExtensions())) {
+                    pathItem.getExtensions().remove(MICRONAUT_OP_POSTFIX);
+                }
                 if (CollectionUtils.isEmpty(pathItem.getExtensions())) {
                     pathItem.setExtensions(null);
                 }

@@ -16,6 +16,7 @@
 package io.micronaut.openapi.visitor;
 
 import io.micronaut.core.annotation.Internal;
+import io.micronaut.core.util.StringUtils;
 
 /**
  * String utilities.
@@ -43,5 +44,15 @@ public final class StringUtil {
     public static final String QUOTE = "\"";
 
     private StringUtil() {
+    }
+
+    /**
+     * Return string with first capitalized letter and without braces.
+     *
+     * @param value path variable name with braces
+     * @return capitalized path var name without braces
+     */
+    public static String capitalizedPathVar(final String value) {
+        return StringUtils.capitalize(value.replaceAll("[{}]", StringUtils.EMPTY_STRING));
     }
 }

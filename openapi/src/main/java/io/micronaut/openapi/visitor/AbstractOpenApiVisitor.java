@@ -22,6 +22,7 @@ import io.micronaut.http.uri.UriMatchTemplate;
 import io.micronaut.inject.ast.ClassElement;
 import io.micronaut.inject.ast.Element;
 import io.micronaut.inject.visitor.VisitorContext;
+import io.micronaut.openapi.visitor.UrlUtils.OpPath;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.PathItem;
@@ -38,6 +39,7 @@ import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import static io.micronaut.openapi.visitor.InternalExt.MICRONAUT_OP_POSTFIX;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_NAME;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_SCOPES;
 import static io.micronaut.openapi.visitor.SchemaDefinitionUtils.toValue;
@@ -126,9 +128,14 @@ abstract class AbstractOpenApiVisitor {
             var segments = parsePathSegments(matchTemplate.toPathString());
             var finalPaths = buildUrls(segments, context);
 
-            for (String finalPath : finalPaths) {
-                List<PathItem> resultPathItems = resultPathItemsMap.computeIfAbsent(finalPath, k -> new ArrayList<>());
-                resultPathItems.add(paths.computeIfAbsent(finalPath, key -> new PathItem()));
+            for (OpPath finalPath : finalPaths) {
+                List<PathItem> resultPathItems = resultPathItemsMap.computeIfAbsent(finalPath.url(), k -> new ArrayList<>());
+                var pathItem = paths.computeIfAbsent(finalPath.url(), key -> new PathItem());
+                var opIdPostfix = finalPath.opIdPostfix();
+                if (!opIdPostfix.isEmpty()) {
+                    pathItem.addExtension(MICRONAUT_OP_POSTFIX, opIdPostfix);
+                }
+                resultPathItems.add(pathItem);
             }
         }
 

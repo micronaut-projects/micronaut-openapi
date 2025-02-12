@@ -27,6 +27,7 @@ import static io.micronaut.openapi.visitor.StringUtil.DOLLAR;
 import static io.micronaut.openapi.visitor.StringUtil.OPEN_BRACE;
 import static io.micronaut.openapi.visitor.StringUtil.SLASH;
 import static io.micronaut.openapi.visitor.StringUtil.SLASH_CHAR;
+import static io.micronaut.openapi.visitor.StringUtil.capitalizedPathVar;
 import static io.micronaut.openapi.visitor.UrlUtils.SegmentType.CONST;
 import static io.micronaut.openapi.visitor.UrlUtils.SegmentType.OPT_VAR;
 import static io.micronaut.openapi.visitor.UrlUtils.SegmentType.PLACEHOLDER;
@@ -40,6 +41,9 @@ import static io.micronaut.openapi.visitor.UrlUtils.SegmentType.REQ_VAR;
 @Internal
 public final class UrlUtils {
 
+    private static final String PREFIX_FIRST = "With";
+    private static final String PREFIX_NEXT = "And";
+
     private UrlUtils() {
     }
 
@@ -50,9 +54,9 @@ public final class UrlUtils {
      * @param context visitor context
      * @return all possible URL variants by parsed segments.
      */
-    public static List<String> buildUrls(List<Segment> segments, VisitorContext context) {
+    public static List<OpPath> buildUrls(List<Segment> segments, VisitorContext context) {
 
-        var results = new ArrayList<StringBuilder>();
+        var results = new ArrayList<PathBuilders>();
 
         Segment prevSegment = null;
         for (var segment : segments) {
@@ -70,9 +74,9 @@ public final class UrlUtils {
             }
         }
 
-        var resultStrings = new ArrayList<String>();
+        var resultOpPaths = new ArrayList<OpPath>();
         for (var res : results) {
-            var url = res.toString();
+            var url = res.urlBuilder.toString();
             if (url.endsWith(SLASH) && url.length() > 1) {
                 url = url.substring(0, url.length() - SLASH.length());
             } else if (!url.startsWith(SLASH) && !url.startsWith(DOLLAR)) {
@@ -85,46 +89,65 @@ public final class UrlUtils {
                 url = contextPath + url;
             }
 
-            if (!resultStrings.contains(url)) {
-                resultStrings.add(url);
+            var alreadyAdded = false;
+            for (var opPath : resultOpPaths) {
+                if (opPath.url.equals(url)) {
+                    alreadyAdded = true;
+                    break;
+                }
             }
+            if (alreadyAdded) {
+                continue;
+            }
+
+            resultOpPaths.add(new OpPath(url, res.opIdBuilder.toString()));
         }
 
-        return resultStrings;
+        return resultOpPaths;
     }
 
-    private static void appendSegment(Segment segment, Segment prevSegment, List<StringBuilder> results) {
+    private static void appendSegment(Segment segment, Segment prevSegment, List<PathBuilders> results) {
         var type = segment.type;
         var value = segment.value;
         if (results.isEmpty()) {
             if (type == PLACEHOLDER) {
-                results.add(new StringBuilder(value));
+                results.add(new PathBuilders(new StringBuilder(value), new StringBuilder(), true));
                 return;
             }
-            var builder = new StringBuilder();
-            builder.append(value);
-            results.add(builder);
+
+            var isFirst = true;
+            StringBuilder opIdBuilder;
             if (type == OPT_VAR) {
-                results.add(new StringBuilder());
+                opIdBuilder = new StringBuilder(PREFIX_FIRST).append(capitalizedPathVar(value));
+                isFirst = false;
+            } else {
+                opIdBuilder = new StringBuilder();
+            }
+            results.add(new PathBuilders(new StringBuilder(value), opIdBuilder, isFirst));
+            // case without optional path var
+            if (type == OPT_VAR) {
+                results.add(new PathBuilders(new StringBuilder(), new StringBuilder(), true));
             }
             return;
         }
         if (type == CONST || type == REQ_VAR || type == PLACEHOLDER) {
             for (var result : results) {
-                result.append(value);
+                result.urlBuilder.append(value);
             }
             return;
         }
 
-        var newResults = new ArrayList<StringBuilder>();
+        var newResults = new ArrayList<PathBuilders>();
         for (var result : results) {
-            newResults.add(new StringBuilder(result));
+            newResults.add(new PathBuilders(new StringBuilder(result.urlBuilder), new StringBuilder(result.opIdBuilder), result.isFirst));
         }
         for (var result : results) {
-            if (prevSegment.type == OPT_VAR && result.indexOf(prevSegment.value) < 0) {
+            if (prevSegment.type == OPT_VAR && result.urlBuilder.indexOf(prevSegment.value) < 0) {
                 continue;
             }
-            result.append(SLASH_CHAR).append(value);
+            result.urlBuilder.append(SLASH_CHAR).append(value);
+            result.opIdBuilder.append(result.isFirst ? PREFIX_FIRST : PREFIX_NEXT).append(capitalizedPathVar(value));
+            result.isFirst = false;
         }
         results.addAll(newResults);
     }
@@ -222,9 +245,36 @@ public final class UrlUtils {
     }
 
     /**
+     * Final path and operation ID builders.
+     */
+    static class PathBuilders {
+        StringBuilder urlBuilder;
+        StringBuilder opIdBuilder;
+        boolean isFirst;
+
+        public PathBuilders(StringBuilder urlBuilder, StringBuilder opIdBuilder, boolean isFirst) {
+            this.urlBuilder = urlBuilder;
+            this.opIdBuilder = opIdBuilder;
+            this.isFirst = isFirst;
+        }
+    }
+
+    /**
+     * Final operation path URL and operation ID.
+     *
+     * @param url url
+     * @param opIdPostfix operation ID postfix
+     */
+    public record OpPath(
+        String url,
+        String opIdPostfix
+    ) {
+    }
+
+    /**
      * Type of segment.
      */
-    public enum SegmentType {
+    enum SegmentType {
         REQ_VAR,
         OPT_VAR,
         CONST,
