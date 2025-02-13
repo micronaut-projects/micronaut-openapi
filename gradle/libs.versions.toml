@@ -40,7 +40,7 @@ micronaut-kotlin = "4.5.0"
 micronaut-logging = "1.6.0"
 micronaut-session = "4.5.0"
 micronaut-grpc = "4.8.0"
-micronaut-spring = "5.9.0"
+micronaut-spring = "5.10.0"
 micronaut-docs = "2.0.0"
 sonatype-scan = "3.0.0"
 
