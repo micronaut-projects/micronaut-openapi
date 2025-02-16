@@ -2,4 +2,4 @@
 
 The minimized version of the OpenAPI Explorer is available at:
 
-https://unpkg.com/openapi-explorer/dist/browser/openapi-explorer.min.js
+https://cdn.jsdelivr.net/npm/openapi-explorer/dist/browser/openapi-explorer.min.js

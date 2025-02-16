@@ -4,9 +4,9 @@ The views will be generated to the `META-INF/swagger/views/openapi-explorer` dir
 
 |===
 | `openapi-explorer.enabled` | `true` or `false`  When 'true' the OpenAPI Explorer view is generated.
-| `openapi-explorer.js.url` | Override path to use to find the js and other resource files. Path must contain a file named openapi-explorer.min.js. The value can be a URL path like: "https://unpkg.com/openapi-explorer/dist/browser/". Must contain trailing slash.
+| `openapi-explorer.js.url` | Override path to use to find the js and other resource files. Path must contain a file named openapi-explorer.min.js. The value can be a URL path like: "https://cdn.jsdelivr.net/npm/openapi-explorer/dist/". Must contain trailing slash.
 | `openapi-explorer.spec.url` | Override path in swagger file path line. If you don't set, then value will be `<context-path>/swagger/<spec_filename>`. You can use the placeholder `${filename}` it will be replaced with the final name of the generated swagger file.
-| `openapi-explorer.copy-resources` | Copy or not local JS and CSS resources. Set to `false` if you are using external resources (e.g. https://unpkg.com/openapi-explorer/dist/browser/openapi-explorer.min.js). Default `true`
+| `openapi-explorer.copy-resources` | Copy or not local JS and CSS resources. Set to `false` if you are using external resources (e.g. https://cdn.jsdelivr.net/npm/openapi-explorer/dist/browser/openapi-explorer.min.js). Default `true`
 | `openapi-explorer.expand-single-schema-field` |
 | `openapi-explorer.expand-default-server-variables` |
 | `openapi-explorer.menu-toggle` |

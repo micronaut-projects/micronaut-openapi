@@ -2,4 +2,4 @@
 
 The minimized version of the RapiDoc is available at:
 
-https://unpkg.com/rapidoc/dist/rapidoc-min.js
+https://cdn.jsdelivr.net/npm/rapidoc/dist/rapidoc-min.js
