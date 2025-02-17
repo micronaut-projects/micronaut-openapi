@@ -34,7 +34,9 @@ import java.util.stream.Collectors;
 
 import static io.micronaut.core.util.StringUtils.EMPTY_STRING;
 import static io.micronaut.openapi.view.OpenApiViewConfig.replacePlaceHolder;
+import static io.micronaut.openapi.visitor.StringUtil.COMMA_NEW_LINE;
 import static io.micronaut.openapi.visitor.StringUtil.DOT;
+import static io.micronaut.openapi.visitor.StringUtil.KEY_VALUE_SEPARATOR;
 import static io.micronaut.openapi.visitor.StringUtil.SLASH;
 
 /**
@@ -60,8 +62,6 @@ public final class SwaggerUIConfig extends AbstractViewConfig {
     private static final String OPTION_URLS = "urls";
     private static final String OPTION_OAUTH2 = "oauth2";
     private static final String PREFIX_SWAGGER_UI = "swagger-ui";
-    private static final String KEY_VALUE_SEPARATOR = ": ";
-    private static final String COMMA_NEW_LINE = ",\n";
 
     // https://github.com/swagger-api/swagger-ui/blob/HEAD/docs/usage/configuration.md
     private static final Map<String, Function<String, Object>> VALID_OPTIONS = new HashMap<>(30);

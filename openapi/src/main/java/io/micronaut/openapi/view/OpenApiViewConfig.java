@@ -59,7 +59,7 @@ import static io.micronaut.openapi.visitor.StringUtil.DOLLAR;
 import static io.micronaut.openapi.visitor.StringUtil.SLASH;
 
 /**
- * OpenApi view configuration for Swagger UI, ReDoc, OpenAPI Explorer and RapiDoc.
+ * OpenApi view configuration for Swagger UI, ReDoc, OpenAPI Explorer, Scalar and RapiDoc.
  * By default, no views are enabled.
  *
  * @author croudet
@@ -67,6 +67,7 @@ import static io.micronaut.openapi.visitor.StringUtil.SLASH;
  * @see <a href="https://github.com/Redocly/ReDoc">ReDoc</a>
  * @see <a href="https://github.com/rapi-doc/RapiDoc">RapiDoc</a>
  * @see <a href="https://github.com/Authress-Engineering/openapi-explorer">OpenAPI Explorer</a>
+ * @see <a href="https://github.com/scalar/scalar">Scalar</a>
  */
 public final class OpenApiViewConfig {
 
@@ -80,12 +81,14 @@ public final class OpenApiViewConfig {
     public static final String TEMPLATES_REDOC = "redoc";
     public static final String TEMPLATES_RAPIDOC = "rapidoc";
     public static final String TEMPLATES_OPENAPI_EXPLORER = "openapi-explorer";
+    public static final String TEMPLATES_SCALAR = "scalar";
 
     private static final String TEMPLATE_INDEX_HTML = "index.html";
     private static final String REDOC = "redoc";
     private static final String RAPIDOC = "rapidoc";
     private static final String SWAGGER_UI = "swagger-ui";
     private static final String OPENAPI_EXPLORER = "openapi-explorer";
+    private static final String SCALAR = "scalar";
     private static final String TEMPLATE_OAUTH_2_REDIRECT_HTML = "oauth2-redirect.html";
 
     private String mappingPath;
@@ -95,6 +98,7 @@ public final class OpenApiViewConfig {
     private RedocConfig redocConfig;
     private RapidocConfig rapidocConfig;
     private OpenApiExplorerConfig openApiExplorerConfig;
+    private ScalarConfig scalarConfig;
     private final Map<Pair<String, String>, OpenApiInfo> openApiInfos;
 
     /**
@@ -106,6 +110,7 @@ public final class OpenApiViewConfig {
         REDOC(TEMPLATES_REDOC),
         RAPIDOC(TEMPLATES_RAPIDOC),
         OPENAPI_EXPLORER(TEMPLATES_OPENAPI_EXPLORER),
+        SCALAR(TEMPLATES_SCALAR),
         ;
 
         private final String templatePath;
@@ -175,6 +180,10 @@ public final class OpenApiViewConfig {
             cfg.openApiExplorerConfig = OpenApiExplorerConfig.fromProperties(openApiMap, openApiInfos, context);
             cfg.openApiExplorerConfig.rapiPDFConfig = rapiPDFConfig;
         }
+        if ("true".equals(openApiMap.getOrDefault("scalar.enabled", Boolean.FALSE.toString()))) {
+            cfg.scalarConfig = ScalarConfig.fromProperties(openApiMap, openApiInfos, context);
+            cfg.scalarConfig.rapiPDFConfig = rapiPDFConfig;
+        }
         if ("true".equals(openApiMap.getOrDefault("swagger-ui.enabled", Boolean.FALSE.toString()))) {
             cfg.swaggerUIConfig = SwaggerUIConfig.fromProperties(openApiMap, openApiInfos, context);
             cfg.swaggerUIConfig.rapiPDFConfig = rapiPDFConfig;
@@ -189,7 +198,7 @@ public final class OpenApiViewConfig {
      * @return true when the generation of views is enabled.
      */
     public boolean isEnabled() {
-        return redocConfig != null || rapidocConfig != null || swaggerUIConfig != null || openApiExplorerConfig != null;
+        return redocConfig != null || rapidocConfig != null || swaggerUIConfig != null || openApiExplorerConfig != null || scalarConfig != null;
     }
 
     /**
@@ -213,6 +222,14 @@ public final class OpenApiViewConfig {
             copyResources(openApiExplorerConfig, openapiExplorerDir, TEMPLATES_OPENAPI_EXPLORER, openApiExplorerConfig.getResources(), context);
             if (openApiExplorerConfig.rapiPDFConfig.enabled) {
                 copyResources(openApiExplorerConfig.rapiPDFConfig, openapiExplorerDir, TEMPLATES_RAPIPDF, openApiExplorerConfig.rapiPDFConfig.getResources(), context);
+            }
+        }
+        if (scalarConfig != null) {
+            Path scalarDir = outputDir.resolve(SCALAR);
+            render(scalarConfig, scalarDir, TEMPLATES + SLASH + TEMPLATES_SCALAR + SLASH + TEMPLATE_INDEX_HTML, context);
+            copyResources(scalarConfig, scalarDir, TEMPLATES_SCALAR, scalarConfig.getResources(), context);
+            if (scalarConfig.rapiPDFConfig.enabled) {
+                copyResources(scalarConfig.rapiPDFConfig, scalarDir, TEMPLATES_RAPIPDF, scalarConfig.rapiPDFConfig.getResources(), context);
             }
         }
         if (swaggerUIConfig != null) {
@@ -487,5 +504,9 @@ public final class OpenApiViewConfig {
 
     public OpenApiExplorerConfig getOpenApiExplorerConfig() {
         return openApiExplorerConfig;
+    }
+
+    public ScalarConfig getScalarConfig() {
+        return scalarConfig;
     }
 }

@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang='en'>
+<head>
+    <title>{{title}}</title>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    {{style}}
+</head>
+<body>
+<script id="api-reference"></script>
+<script>
+
+    const extract = function(v) {
+        return decodeURIComponent(v.replace(/(?:^|.*;\s*)contextPath\s*=\s*([^;]*).*$|^.*$/, "$1"));
+    };
+    const cookie = extract(document.cookie);
+    const contextPath = cookie === '' ? extract(window.location.search.substring(1)) : cookie;
+    const configuration = {
+        {{scalar.attributes}}
+    };
+
+    const el = document.getElementById("api-reference");
+    el.setAttribute("data-configuration", JSON.stringify(configuration));
+    el.setAttribute("data-url", contextPath + "{{specURL}}");
+
+    const head = document.getElementsByTagName("head")[0];
+    window.onload = function() {
+        script(contextPath + "{{scalar.js.url.prefix}}standalone.js", head);
+    };
+
+    function script(src, head) {
+        const el = document.createElement("script");
+        el.src = src;
+        head.appendChild(el);
+        return el;
+    }
+</script>
+</body>
+</html>
