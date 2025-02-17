@@ -3,4 +3,4 @@ You can also use https://mrin9.github.io/RapiPdf/[RapiPdf] to generate a PDF fro
 
 You can enable multiple views generation in a single application.
 
-The resources needed to render the views (javascript, css, ...) are loaded from CDNs: https://unpkg.com[unpkg.com] and https://fonts.googleapis.com/[fonts.googleapis.com].
+The resources needed to render the views (javascript, css, ...) are loaded from CDNs: https://cdn.jsdelivr.net[cdn.jsdelivr.net] and https://fonts.googleapis.com/[fonts.googleapis.com].

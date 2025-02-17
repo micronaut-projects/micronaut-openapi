@@ -2,4 +2,4 @@
 
 The minimized version of the Redoc is available at:
 
-https://unpkg.com/redoc/bundles/redoc.standalone.js
+https://cdn.jsdelivr.net/npm/redoc/bundles/redoc.standalone.js

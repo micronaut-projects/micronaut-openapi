@@ -2,4 +2,4 @@
 
 The minimized version of the Swagger UI is available at:
 
-https://unpkg.com/swagger-ui/dist/swagger-ui.js
+https://cdn.jsdelivr.net/npm/swagger-ui/dist/swagger-ui.js
