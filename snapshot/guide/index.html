@@ -3138,7 +3138,7 @@ You can also use <a href="https://mrin9.github.io/RapiPdf/">RapiPdf</a> to gener
 <p>You can enable multiple views generation in a single application.</p>
 </div>
 <div class="paragraph">
-<p>The resources needed to render the views (javascript, css, &#8230;&#8203;) are loaded from CDNs: <a href="https://unpkg.com">unpkg.com</a> and <a href="https://fonts.googleapis.com/">fonts.googleapis.com</a>.</p>
+<p>The resources needed to render the views (javascript, css, &#8230;&#8203;) are loaded from CDNs: <a href="https://cdn.jsdelivr.net">cdn.jsdelivr.net</a> and <a href="https://fonts.googleapis.com/">fonts.googleapis.com</a>.</p>
 </div>
 
 <h2 id="mappingPath"><a class="anchor" href="#mappingPath"></a>18.1 Mapping Path</h2>
@@ -3429,7 +3429,7 @@ micronaut.router.static-resources.swagger.mapping=/swaggerYAML/**</code></pre>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>swagger-ui.js.url</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Override path to use to find the js file. Path must contain a files named swagger-ui.css, swagger-ui-bundle.js, swagger-ui-standalone-present.js. The value can be a URL path like: "https://unpkg.com/swagger-ui-dist/". Must contain trailing slash.,</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Override path to use to find the js file. Path must contain a files named swagger-ui.css, swagger-ui-bundle.js, swagger-ui-standalone-present.js. The value can be a URL path like: "https://cdn.jsdelivr.net/npm/swagger-ui/dist/". Must contain trailing slash.,</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>swagger-ui.spec.url</code></p></td>
@@ -3437,7 +3437,7 @@ micronaut.router.static-resources.swagger.mapping=/swaggerYAML/**</code></pre>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>swagger-ui.copy-resources</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Copy or not local JS and CSS resources. Set to <code>false</code> if you are using external resources (e.g. <a href="https://unpkg.com/swagger-ui-dist/" class="bare">https://unpkg.com/swagger-ui-dist/</a>). Default <code>true</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Copy or not local JS and CSS resources. Set to <code>false</code> if you are using external resources (e.g. <a href="https://cdn.jsdelivr.net/npm/swagger-ui/dist/" class="bare">https://cdn.jsdelivr.net/npm/swagger-ui/dist/</a>). Default <code>true</code></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>swagger-ui.theme</code></p></td>
@@ -4014,7 +4014,7 @@ micronaut.router.static-resources.swagger-ui.mapping=/swagger-ui/**</code></pre>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>redoc.js.url</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Override path to use to find the js file. Path must contain a file named redoc.standalone.js. The value can be a URL path like: "https://unpkg.com/redoc/bundles/". Must contain trailing slash.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Override path to use to find the js file. Path must contain a file named redoc.standalone.js. The value can be a URL path like: "https://cdn.jsdelivr.net/npm/redoc/bundles/". Must contain trailing slash.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>redoc.spec.url</code></p></td>
@@ -4022,7 +4022,7 @@ micronaut.router.static-resources.swagger-ui.mapping=/swagger-ui/**</code></pre>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>redoc.copy-resources</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Copy or not local JS and CSS resources. Set to <code>false</code> if you are using external resources (e.g. <a href="https://unpkg.com/redoc/bundles/" class="bare">https://unpkg.com/redoc/bundles/</a>). Default <code>true</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Copy or not local JS and CSS resources. Set to <code>false</code> if you are using external resources (e.g. <a href="https://cdn.jsdelivr.net/npm/redoc/bundles/" class="bare">https://cdn.jsdelivr.net/npm/redoc/bundles/</a>). Default <code>true</code></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>redoc.expand-single-schema-field</code></p></td>
@@ -4248,7 +4248,7 @@ micronaut.router.static-resources.redoc.mapping=/redoc/**</code></pre>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>openapi-explorer.js.url</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Override path to use to find the js and other resource files. Path must contain a file named openapi-explorer.min.js. The value can be a URL path like: "https://unpkg.com/openapi-explorer/dist/browser/". Must contain trailing slash.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Override path to use to find the js and other resource files. Path must contain a file named openapi-explorer.min.js. The value can be a URL path like: "https://cdn.jsdelivr.net/npm/openapi-explorer/dist/". Must contain trailing slash.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>openapi-explorer.spec.url</code></p></td>
@@ -4256,7 +4256,7 @@ micronaut.router.static-resources.redoc.mapping=/redoc/**</code></pre>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>openapi-explorer.copy-resources</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Copy or not local JS and CSS resources. Set to <code>false</code> if you are using external resources (e.g. <a href="https://unpkg.com/openapi-explorer/dist/browser/openapi-explorer.min.js" class="bare">https://unpkg.com/openapi-explorer/dist/browser/openapi-explorer.min.js</a>). Default <code>true</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Copy or not local JS and CSS resources. Set to <code>false</code> if you are using external resources (e.g. <a href="https://cdn.jsdelivr.net/npm/openapi-explorer/dist/browser/openapi-explorer.min.js" class="bare">https://cdn.jsdelivr.net/npm/openapi-explorer/dist/browser/openapi-explorer.min.js</a>). Default <code>true</code></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>openapi-explorer.expand-single-schema-field</code></p></td>
@@ -4479,7 +4479,7 @@ micronaut.router.static-resources.openapi-explorer.mapping=/openapi-explorer/**<
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapidoc.js.url</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Override path to use to find the js file. Path must contain a file named rapidoc-min.js. The value can be a URL path like: "https://unpkg.com/rapidoc/dist/". Must contain trailing slash.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Override path to use to find the js file. Path must contain a file named rapidoc-min.js. The value can be a URL path like: "https://cdn.jsdelivr.net/npm/rapidoc/dist/". Must contain trailing slash.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapidoc.spec.url</code></p></td>
@@ -4487,7 +4487,7 @@ micronaut.router.static-resources.openapi-explorer.mapping=/openapi-explorer/**<
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapidoc.copy-resources</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Copy or not local JS and CSS resources. Set to <code>false</code> if you are using external resources (e.g. <a href="https://unpkg.com/rapidoc/dist/" class="bare">https://unpkg.com/rapidoc/dist/</a>). Default <code>true</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Copy or not local JS and CSS resources. Set to <code>false</code> if you are using external resources (e.g. <a href="https://cdn.jsdelivr.net/npm/rapidoc/dist/" class="bare">https://cdn.jsdelivr.net/npm/rapidoc/dist/</a>). Default <code>true</code></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapidoc.style</code></p></td>
@@ -4785,7 +4785,7 @@ micronaut.router.static-resources.rapidoc.mapping=/rapidoc/**</code></pre>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapipdf.js.url</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Override path to use to find the js file. Path must contain a file named rapdipdf-min.js.  The value can be a URL path like: "https://unpkg.com/rapipdf/dist/". Must contain trailing slash.,</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Override path to use to find the js file. Path must contain a file named rapdipdf-min.js.  The value can be a URL path like: "https://cdn.jsdelivr.net/npm/rapipd/dist/". Must contain trailing slash.,</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapipdf.spec.url</code></p></td>
@@ -4793,7 +4793,7 @@ micronaut.router.static-resources.rapidoc.mapping=/rapidoc/**</code></pre>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapipdf.copy-resources</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Copy or not local JS and CSS resources. Set to <code>false</code> if you are using external resources (e.g. <a href="https://unpkg.com/rapipdf/dist/" class="bare">https://unpkg.com/rapipdf/dist/</a>). Default <code>true</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Copy or not local JS and CSS resources. Set to <code>false</code> if you are using external resources (e.g. <a href="https://cdn.jsdelivr.net/npm/rapipdf/dist/" class="bare">https://cdn.jsdelivr.net/npm/rapipdf/dist/</a>). Default <code>true</code></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>rapipdf.include-api-details</code></p></td>
