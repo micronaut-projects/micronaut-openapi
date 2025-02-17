@@ -42,6 +42,8 @@ public final class StringUtil {
     public static final String MINUS = "-";
     public static final String WILDCARD = "*";
     public static final String QUOTE = "\"";
+    public static final String KEY_VALUE_SEPARATOR = ": ";
+    public static final String COMMA_NEW_LINE = ",\n";
 
     private StringUtil() {
     }

@@ -1,9 +1,9 @@
-Views support https://github.com/Rebilly/ReDoc[Redoc], to enable it use `redoc.enabled=true`.
+Views support https://github.com/Rebilly/ReDoc[ReDoc], to enable it use `redoc.enabled=true`.
 
 The views will be generated to the `META-INF/swagger/views/redoc` directory of your project’s class output.
 
 |===
-| `redoc.enabled` | `true` or `false`  When 'true' the Redoc view is generated.
+| `redoc.enabled` | `true` or `false`  When 'true' the ReDoc view is generated.
 | `redoc.js.url` | Override path to use to find the js file. Path must contain a file named redoc.standalone.js. The value can be a URL path like: "https://cdn.jsdelivr.net/npm/redoc/bundles/". Must contain trailing slash.
 | `redoc.spec.url` | Override path in swagger file path line. If you don't set, then value will be `<context-path>/swagger/<spec_filename>`. You can use the placeholder `${filename}` it will be replaced with the final name of the generated swagger file.
 | `redoc.copy-resources` | Copy or not local JS and CSS resources. Set to `false` if you are using external resources (e.g. https://cdn.jsdelivr.net/npm/redoc/bundles/). Default `true`
@@ -31,11 +31,11 @@ The views will be generated to the `META-INF/swagger/views/redoc` directory of y
 | `redoc.hide-loading` |
 |===
 
-See https://github.com/Redocly/redoc/blob/main/docs/config.md[Redoc config] for a description of the above properties.
+See https://github.com/Redocly/redoc/blob/main/docs/config.md[ReDoc config] for a description of the above properties.
 
 To expose the `redoc` views, you also must expose the generated `yaml`:
 
-.Exposing Swagger YAML And Redoc Views
+.Exposing Swagger YAML And ReDoc Views
 [configuration]
 ----
 micronaut:

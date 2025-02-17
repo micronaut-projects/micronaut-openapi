@@ -15,7 +15,7 @@ class OpenApiOperationViewParseSpec extends Specification {
 
     void "test parse OpenApiView specification, views enabled"() {
         given:
-        String spec = "mapping.path=somewhere,redoc.enabled=true,rapidoc.enabled=true,swagger-ui.enabled=true,openapi-explorer.enabled=true"
+        String spec = "mapping.path=somewhere,redoc.enabled=true,rapidoc.enabled=true,swagger-ui.enabled=true,openapi-explorer.enabled=true,scalar.enabled=true"
         OpenApiViewConfig cfg = OpenApiViewConfig.fromSpecification(spec, null, new Properties(), null)
 
         expect:
@@ -25,11 +25,12 @@ class OpenApiOperationViewParseSpec extends Specification {
         cfg.redocConfig != null
         cfg.swaggerUIConfig != null
         cfg.openApiExplorerConfig != null
+        cfg.scalarConfig != null
     }
 
     void "test set empty string in mapping.path"() {
         given:
-        String spec = "redoc.enabled=true,rapidoc.enabled=true,swagger-ui.enabled=true,openapi-explorer.enabled=true,mapping.path="
+        String spec = "redoc.enabled=true,rapidoc.enabled=true,swagger-ui.enabled=true,openapi-explorer.enabled=true,scalar.enabled=true,mapping.path="
         OpenApiViewConfig cfg = OpenApiViewConfig.fromSpecification(spec, null, new Properties(), null)
 
         expect:
@@ -39,6 +40,7 @@ class OpenApiOperationViewParseSpec extends Specification {
         cfg.redocConfig != null
         cfg.swaggerUIConfig != null
         cfg.openApiExplorerConfig != null
+        cfg.scalarConfig != null
     }
 
     void "test parse OpenApiView specification, redoc enabled"() {
@@ -52,6 +54,7 @@ class OpenApiOperationViewParseSpec extends Specification {
         cfg.rapidocConfig == null
         cfg.swaggerUIConfig == null
         cfg.openApiExplorerConfig == null
+        cfg.scalarConfig == null
         cfg.redocConfig != null
         cfg.redocConfig.jsUrl == "version123"
         cfg.redocConfig.specUrl == "/my/spec/file.yml"
@@ -68,6 +71,7 @@ class OpenApiOperationViewParseSpec extends Specification {
         cfg.redocConfig == null
         cfg.swaggerUIConfig == null
         cfg.openApiExplorerConfig == null
+        cfg.scalarConfig == null
         cfg.rapidocConfig != null
         cfg.rapidocConfig.jsUrl == "version123"
         cfg.rapidocConfig.specUrl == "/my/spec/file.yml"
@@ -86,6 +90,7 @@ class OpenApiOperationViewParseSpec extends Specification {
         cfg.redocConfig == null
         cfg.rapidocConfig == null
         cfg.openApiExplorerConfig == null
+        cfg.scalarConfig == null
         cfg.swaggerUIConfig != null
         cfg.swaggerUIConfig.jsUrl == "version123"
         cfg.swaggerUIConfig.specUrl == "/my/spec/file.yml"
@@ -105,8 +110,26 @@ class OpenApiOperationViewParseSpec extends Specification {
         cfg.rapidocConfig == null
         cfg.swaggerUIConfig == null
         cfg.redocConfig == null
+        cfg.scalarConfig == null
         cfg.openApiExplorerConfig != null
         cfg.openApiExplorerConfig.jsUrl == "version123"
         cfg.openApiExplorerConfig.specUrl == "/my/spec/file.yml"
+    }
+
+    void "test parse OpenApiView specification, Scalar enabled"() {
+        given:
+        String spec = "scalar.enabled=true,scalar.js.url=version123,scalar.spec.url=/my/spec/file.yml"
+        OpenApiViewConfig cfg = OpenApiViewConfig.fromSpecification(spec, null, new Properties(), null)
+
+        expect:
+        cfg.enabled == true
+        cfg.mappingPath == "swagger"
+        cfg.rapidocConfig == null
+        cfg.swaggerUIConfig == null
+        cfg.redocConfig == null
+        cfg.openApiExplorerConfig == null
+        cfg.scalarConfig != null
+        cfg.scalarConfig.jsUrl == "version123"
+        cfg.scalarConfig.specUrl == "/my/spec/file.yml"
     }
 }

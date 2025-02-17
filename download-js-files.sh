@@ -83,3 +83,15 @@ else
   echo "Failed to download the file"
   exit 1
 fi
+
+SCALAR_INPUT="https://cdn.jsdelivr.net/npm/@scalar/api-reference/dist/browser/standalone.js"
+SCALAR_OUTPUT="openapi/src/main/resources/templates/scalar/res/standalone.js"
+
+curl -L -o "$SCALAR_OUTPUT" "$SCALAR_INPUT"
+
+if [ $? -eq 0 ]; then
+  echo "File downloaded and saved to $SCALAR_OUTPUT"
+else
+  echo "Failed to download the file"
+  exit 1
+fi

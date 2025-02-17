@@ -21,7 +21,7 @@ class OpenApiOperationViewRenderSpec extends Specification {
 
     void "test render OpenApiView specification"() {
         given:
-        String spec = "redoc.enabled=true,rapidoc.enabled=true,swagger-ui.enabled=true,openapi-explorer.enabled=true,rapipdf.enabled=true,swagger-ui.theme=flattop"
+        String spec = "redoc.enabled=true,rapidoc.enabled=true,swagger-ui.enabled=true,openapi-explorer.enabled=true,scalar.enabled=true,rapipdf.enabled=true,swagger-ui.theme=flattop"
         OpenApiViewConfig cfg = OpenApiViewConfig.fromSpecification(spec, null, new Properties(), null)
         Path outputDir = Paths.get("output")
         cfg.title = "OpenAPI documentation"
@@ -60,6 +60,7 @@ class OpenApiOperationViewRenderSpec extends Specification {
         Files.exists(outputDir.resolve("openapi-explorer").resolve("res").resolve("font-awesome.min.css"))
         Files.exists(outputDir.resolve("openapi-explorer").resolve("res").resolve("highlight.min.js"))
         Files.exists(outputDir.resolve("openapi-explorer").resolve("res").resolve("openapi-explorer.min.js"))
+        Files.exists(outputDir.resolve("scalar").resolve("res").resolve("standalone.js"))
 
         outputDir.resolve("redoc").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains("/redoc/res/redoc.standalone.js")
         outputDir.resolve("redoc").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains(cfg.getSpecURL(cfg.redocConfig, null))
@@ -78,6 +79,7 @@ class OpenApiOperationViewRenderSpec extends Specification {
         outputDir.resolve("openapi-explorer").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains("/openapi-explorer/res/default.min.css")
         outputDir.resolve("openapi-explorer").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains("/openapi-explorer/res/font-awesome.min.css")
         outputDir.resolve("openapi-explorer").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains("/openapi-explorer/res/openapi-explorer.min.js")
+        outputDir.resolve("scalar").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains("/scalar/res/standalone.js")
     }
 
     void "test render OpenApiView specification with custom redoc js url"() {
@@ -96,6 +98,7 @@ class OpenApiOperationViewRenderSpec extends Specification {
         cfg.redocConfig != null
         cfg.swaggerUIConfig == null
         cfg.openApiExplorerConfig == null
+        cfg.scalarConfig == null
         cfg.title == "OpenAPI documentation"
         cfg.specFile == "swagger.yml"
         cfg.getSpecURL(cfg.redocConfig, null) == "/swagger/swagger.yml"
@@ -134,6 +137,33 @@ class OpenApiOperationViewRenderSpec extends Specification {
         outputDir.resolve("openapi-explorer").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains(cfg.getSpecURL(cfg.openApiExplorerConfig, null))
     }
 
+    void "test render OpenApiView specification with custom scalar js url"() {
+        given:
+        String spec = "scalar.enabled=true,rapipdf.enabled=true,scalar.copy-resources=false,scalar.js.url=https://cdn.jsdelivr.net/npm/@scalar/api-reference/dist/browser/"
+        OpenApiViewConfig cfg = OpenApiViewConfig.fromSpecification(spec, null, new Properties(), null)
+        Path outputDir = Paths.get("output")
+        cfg.title = "OpenAPI documentation"
+        cfg.specFile = "swagger.yml"
+        cfg.render(outputDir, null)
+
+        expect:
+        cfg.enabled
+        cfg.mappingPath == "swagger"
+        cfg.rapidocConfig == null
+        cfg.redocConfig == null
+        cfg.swaggerUIConfig == null
+        cfg.scalarConfig != null
+        cfg.title == "OpenAPI documentation"
+        cfg.specFile == "swagger.yml"
+        cfg.getSpecURL(cfg.scalarConfig, null) == "/swagger/swagger.yml"
+        Files.exists(outputDir.resolve("scalar").resolve("index.html"))
+        !Files.exists(outputDir.resolve("scalar").resolve("res").resolve("standalone.js"))
+        Files.exists(outputDir.resolve("scalar").resolve("res").resolve("rapipdf-min.js"))
+
+        outputDir.resolve("scalar").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains("script(contextPath + \"https://cdn.jsdelivr.net/npm/@scalar/api-reference/dist/browser/standalone.js\", head)")
+        outputDir.resolve("scalar").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains(cfg.getSpecURL(cfg.scalarConfig, null))
+    }
+
     void "test render OpenApiView specification with custom swagger js and css urls"() {
         given:
         String spec = "swagger-ui.enabled=true,rapipdf.enabled=true,swagger-ui.theme=flattop,swagger-ui.copy-theme=false,swagger-ui.theme.url=https://flattop.com/theme.css,swagger-ui.copy-resources=false,swagger-ui.js.url=https://unpkg.com/swagger-ui-dist/"
@@ -150,6 +180,7 @@ class OpenApiOperationViewRenderSpec extends Specification {
         cfg.redocConfig == null
         cfg.swaggerUIConfig != null
         cfg.openApiExplorerConfig == null
+        cfg.scalarConfig == null
         cfg.title == "OpenAPI documentation"
         cfg.specFile == "swagger.yml"
         cfg.getSpecURL(cfg.swaggerUIConfig, null) == "/swagger/swagger.yml"
@@ -173,7 +204,7 @@ class OpenApiOperationViewRenderSpec extends Specification {
     void "test render OpenApiView specification with server context path"() {
         given:
         System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_CONTEXT_SERVER_PATH, "/context-path")
-        String spec = "redoc.enabled=true,rapidoc.enabled=true,swagger-ui.enabled=true,openapi-explorer.enabled=true"
+        String spec = "redoc.enabled=true,rapidoc.enabled=true,swagger-ui.enabled=true,openapi-explorer.enabled=true,scalar.enabled=true"
         OpenApiViewConfig cfg = OpenApiViewConfig.fromSpecification(spec, null, new Properties(), null)
         Path outputDir = Paths.get("output")
         cfg.title = "OpenAPI documentation"
@@ -193,19 +224,22 @@ class OpenApiOperationViewRenderSpec extends Specification {
         cfg.getSpecURL(cfg.redocConfig, null) == "/context-path/swagger/swagger.yml"
         cfg.getSpecURL(cfg.swaggerUIConfig, null) == "/context-path/swagger/swagger.yml"
         cfg.getSpecURL(cfg.openApiExplorerConfig, null) == "/context-path/swagger/swagger.yml"
+        cfg.getSpecURL(cfg.scalarConfig, null) == "/context-path/swagger/swagger.yml"
         Files.exists(outputDir.resolve("redoc").resolve("index.html"))
         Files.exists(outputDir.resolve("openapi-explorer").resolve("index.html"))
+        Files.exists(outputDir.resolve("scalar").resolve("index.html"))
         Files.exists(outputDir.resolve("rapidoc").resolve("index.html"))
         Files.exists(outputDir.resolve("swagger-ui").resolve("index.html"))
         outputDir.resolve("redoc").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains(cfg.getSpecURL(cfg.redocConfig, null))
         outputDir.resolve("openapi-explorer").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains(cfg.getSpecURL(cfg.openApiExplorerConfig, null))
+        outputDir.resolve("scalar").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains(cfg.getSpecURL(cfg.scalarConfig, null))
         outputDir.resolve("rapidoc").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains(cfg.getSpecURL(cfg.rapidocConfig, null))
         outputDir.resolve("swagger-ui").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains(cfg.getSpecURL(cfg.swaggerUIConfig, null))
     }
 
     void "test render OpenApiView specification custom mapping path"() {
         given:
-        String spec = "mapping.path=somewhere,redoc.enabled=true,rapidoc.enabled=true,swagger-ui.enabled=true,openapi-explorer.enabled=true"
+        String spec = "mapping.path=somewhere,redoc.enabled=true,rapidoc.enabled=true,swagger-ui.enabled=true,openapi-explorer.enabled=true,scalar.enabled=true"
         OpenApiViewConfig cfg = OpenApiViewConfig.fromSpecification(spec, null, new Properties(), null)
         Path outputDir = Paths.get("output")
         cfg.title = "OpenAPI documentation"
@@ -219,27 +253,31 @@ class OpenApiOperationViewRenderSpec extends Specification {
         cfg.redocConfig != null
         cfg.swaggerUIConfig != null
         cfg.openApiExplorerConfig != null
+        cfg.scalarConfig != null
         cfg.title == "OpenAPI documentation"
         cfg.specFile == "swagger.yml"
         cfg.getSpecURL(cfg.rapidocConfig, null) == "/somewhere/swagger.yml"
         cfg.getSpecURL(cfg.redocConfig, null) == "/somewhere/swagger.yml"
         cfg.getSpecURL(cfg.swaggerUIConfig, null) == "/somewhere/swagger.yml"
         cfg.getSpecURL(cfg.openApiExplorerConfig, null) == "/somewhere/swagger.yml"
+        cfg.getSpecURL(cfg.scalarConfig, null) == "/somewhere/swagger.yml"
         Files.exists(outputDir.resolve("redoc").resolve("index.html"))
         Files.exists(outputDir.resolve("rapidoc").resolve("index.html"))
         Files.exists(outputDir.resolve("swagger-ui").resolve("index.html"))
         Files.exists(outputDir.resolve("openapi-explorer").resolve("index.html"))
+        Files.exists(outputDir.resolve("scalar").resolve("index.html"))
         outputDir.resolve("redoc").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains(cfg.getSpecURL(cfg.redocConfig, null))
         outputDir.resolve("rapidoc").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains(cfg.getSpecURL(cfg.rapidocConfig, null))
         outputDir.resolve("swagger-ui").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains(cfg.getSpecURL(cfg.swaggerUIConfig, null))
         outputDir.resolve("openapi-explorer").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains(cfg.getSpecURL(cfg.openApiExplorerConfig, null))
+        outputDir.resolve("scalar").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains(cfg.getSpecURL(cfg.scalarConfig, null))
     }
 
     @RestoreSystemProperties
     void "test render OpenApiView specification with custom mapping path and server context path"() {
         given:
         System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_CONTEXT_SERVER_PATH, "/context-path")
-        String spec = "mapping.path=somewhere,redoc.enabled=true,rapidoc.enabled=true,swagger-ui.enabled=true,openapi-explorer.enabled=true"
+        String spec = "mapping.path=somewhere,redoc.enabled=true,rapidoc.enabled=true,swagger-ui.enabled=true,openapi-explorer.enabled=true,scalar.enabled=true"
         OpenApiViewConfig cfg = OpenApiViewConfig.fromSpecification(spec, null, new Properties(), null)
         Path outputDir = Paths.get("output")
         cfg.title = "OpenAPI documentation"
@@ -253,19 +291,23 @@ class OpenApiOperationViewRenderSpec extends Specification {
         cfg.redocConfig != null
         cfg.swaggerUIConfig != null
         cfg.openApiExplorerConfig != null
+        cfg.scalarConfig != null
         cfg.title == "OpenAPI documentation"
         cfg.specFile == "swagger.yml"
         cfg.getSpecURL(cfg.rapidocConfig, null) == "/context-path/somewhere/swagger.yml"
         cfg.getSpecURL(cfg.redocConfig, null) == "/context-path/somewhere/swagger.yml"
         cfg.getSpecURL(cfg.swaggerUIConfig, null) == "/context-path/somewhere/swagger.yml"
         cfg.getSpecURL(cfg.openApiExplorerConfig, null) == "/context-path/somewhere/swagger.yml"
+        cfg.getSpecURL(cfg.scalarConfig, null) == "/context-path/somewhere/swagger.yml"
         Files.exists(outputDir.resolve("redoc").resolve("index.html"))
         Files.exists(outputDir.resolve("rapidoc").resolve("index.html"))
         Files.exists(outputDir.resolve("swagger-ui").resolve("index.html"))
         Files.exists(outputDir.resolve("openapi-explorer").resolve("index.html"))
+        Files.exists(outputDir.resolve("scalar").resolve("index.html"))
         Files.notExists(outputDir.resolve("swagger-ui").resolve("oauth2-redirect.html"))
         outputDir.resolve("redoc").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains(cfg.getSpecURL(cfg.redocConfig, null))
         outputDir.resolve("openapi-explorer").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains(cfg.getSpecURL(cfg.openApiExplorerConfig, null))
+        outputDir.resolve("scalar").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains(cfg.getSpecURL(cfg.scalarConfig, null))
         outputDir.resolve("rapidoc").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains(cfg.getSpecURL(cfg.rapidocConfig, null))
         outputDir.resolve("swagger-ui").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains(cfg.getSpecURL(cfg.swaggerUIConfig, null))
         !outputDir.resolve("swagger-ui").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains("ui.initOAuth({")
