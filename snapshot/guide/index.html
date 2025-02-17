@@ -215,13 +215,15 @@
         
         <div class="toc-item" style="margin-left:20px" id="toc-item-oauth2"><a href="#oauth2"><strong>18.4.1</strong><span>Swagger UI - OAuth 2.0 configuration</span></a></div>
         
-        <div class="toc-item" style="margin-left:10px" id="toc-item-redoc"><a href="#redoc"><strong>18.5</strong><span>Redoc</span></a></div>
+        <div class="toc-item" style="margin-left:10px" id="toc-item-redoc"><a href="#redoc"><strong>18.5</strong><span>ReDoc</span></a></div>
         
         <div class="toc-item" style="margin-left:10px" id="toc-item-openapiExplorer"><a href="#openapiExplorer"><strong>18.6</strong><span>OpenAPI Explorer</span></a></div>
         
-        <div class="toc-item" style="margin-left:10px" id="toc-item-rapidoc"><a href="#rapidoc"><strong>18.7</strong><span>RapiDoc</span></a></div>
+        <div class="toc-item" style="margin-left:10px" id="toc-item-scalar"><a href="#scalar"><strong>18.7</strong><span>Scalar</span></a></div>
         
-        <div class="toc-item" style="margin-left:10px" id="toc-item-rapipdf"><a href="#rapipdf"><strong>18.8</strong><span>RapiPdf</span></a></div>
+        <div class="toc-item" style="margin-left:10px" id="toc-item-rapidoc"><a href="#rapidoc"><strong>18.8</strong><span>RapiDoc</span></a></div>
+        
+        <div class="toc-item" style="margin-left:10px" id="toc-item-rapipdf"><a href="#rapipdf"><strong>18.9</strong><span>RapiPdf</span></a></div>
         
         <div class="toc-item" style="margin-left:0px" id="toc-item-convertToAdoc"><a href="#convertToAdoc"><strong>19</strong><span>Conversion to Asciidoc</span></a></div>
         
@@ -3131,7 +3133,7 @@ paths:
 
 
 <div class="paragraph">
-<p>Micronaut can generate views for your generated OpenApi specification. Currently, <a href="https://github.com/swagger-api/swagger-ui">Swagger-ui</a>, <a href="https://github.com/Redocly/redoc">Redoc</a>, <a href="https://github.com/Authress-Engineering/openapi-explorer">OpenAPI Explorer</a> and <a href="https://github.com/rapi-doc/RapiDoc">RapiDoc</a> are supported.
+<p>Micronaut can generate views for your generated OpenAPI specification. Currently, <a href="https://github.com/swagger-api/swagger-ui">Swagger-ui</a>, <a href="https://github.com/Redocly/redoc">Redoc</a>, <a href="https://github.com/Authress-Engineering/openapi-explorer">OpenAPI Explorer</a>, <a href="https://github.com/scalar/scalar">Scalar</a> and <a href="https://github.com/rapi-doc/RapiDoc">RapiDoc</a> are supported.
 You can also use <a href="https://mrin9.github.io/RapiPdf/">RapiPdf</a> to generate a PDF from your spec file.</p>
 </div>
 <div class="paragraph">
@@ -3253,11 +3255,12 @@ micronaut.router.static-resources.swagger.mapping=/swaggerYAML/**</code></pre>
 <p>By default, the generation of views is disabled. You can enable views generation with a <a href="#propertiesFileConfiguration">configuration properties file</a>.</p>
 </div>
 <div class="listingblock">
-<div class="title">openapi.properties Example Views Generation Swagger UI, Redoc, RapiDoc, OpenAPI Explorer</div>
+<div class="title">openapi.properties Example Views Generation Swagger UI, ReDoc, RapiDoc, OpenAPI Explorer, Scalar</div>
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">micronaut.openapi.views.spec = swagger-ui.enabled=true,\
     redoc.enabled=true, \
     openapi-explorer.enabled=true, \
+    scalar.enabled=true, \
     rapidoc.enabled=true, \
     rapidoc.bg-color=#14191f, \
     rapidoc.text-color=#aec2e0, \
@@ -3987,7 +3990,7 @@ micronaut.router.static-resources.swagger-ui.mapping=/swagger-ui/**</code></pre>
 <p>The previous sample uses a remote <a href="https://micronaut-projects.github.io/micronaut-security/latest/guide/index.html#jwks">Json Web Key Set</a> to validate the token issued by the authorization server. If you use <a href="https://micronaut-projects.github.io/micronaut-security/latest/guide/index.html#openid">Micronaut Security OpenID Connect support</a> with a server compatible with <a href="https://openid.net/specs/openid-connect-discovery-1_0.html">OpenID Connect Discovery</a>, the JWKS of the authorization server is automatically configured.</p>
 </div>
 
-<h2 id="redoc"><a class="anchor" href="#redoc"></a>18.5 Redoc</h2>
+<h2 id="redoc"><a class="anchor" href="#redoc"></a>18.5 ReDoc</h2>
 
 <div class='contribute-btn'>
     <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/6.14.x/src/main/docs/guide/openApiViews/redoc.adoc"'>
@@ -3997,7 +4000,7 @@ micronaut.router.static-resources.swagger-ui.mapping=/swagger-ui/**</code></pre>
 
 
 <div class="paragraph">
-<p>Views support <a href="https://github.com/Rebilly/ReDoc">Redoc</a>, to enable it use <code>redoc.enabled=true</code>.</p>
+<p>Views support <a href="https://github.com/Rebilly/ReDoc">ReDoc</a>, to enable it use <code>redoc.enabled=true</code>.</p>
 </div>
 <div class="paragraph">
 <p>The views will be generated to the <code>META-INF/swagger/views/redoc</code> directory of your project’s class output.</p>
@@ -4010,7 +4013,7 @@ micronaut.router.static-resources.swagger-ui.mapping=/swagger-ui/**</code></pre>
 <tbody>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>redoc.enabled</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>true</code> or <code>false</code>  When 'true' the Redoc view is generated.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>true</code> or <code>false</code>  When 'true' the ReDoc view is generated.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>redoc.js.url</code></p></td>
@@ -4115,13 +4118,13 @@ micronaut.router.static-resources.swagger-ui.mapping=/swagger-ui/**</code></pre>
 </tbody>
 </table>
 <div class="paragraph">
-<p>See <a href="https://github.com/Redocly/redoc/blob/main/docs/config.md">Redoc config</a> for a description of the above properties.</p>
+<p>See <a href="https://github.com/Redocly/redoc/blob/main/docs/config.md">ReDoc config</a> for a description of the above properties.</p>
 </div>
 <div class="paragraph">
 <p>To expose the <code>redoc</code> views, you also must expose the generated <code>yaml</code>:</p>
 </div>
 <div class="openblock">
-<div class="title">Exposing Swagger YAML And Redoc Views</div>
+<div class="title">Exposing Swagger YAML And ReDoc Views</div>
 <div class="content">
 <div class="listingblock multi-language-sample">
 <div class="content">
@@ -4455,7 +4458,293 @@ micronaut.router.static-resources.openapi-explorer.mapping=/openapi-explorer/**<
 <p>With the above configuration in place when you run your application you can access your Swagger documentation at http://localhost:8080/openapi-explorer.</p>
 </div>
 
-<h2 id="rapidoc"><a class="anchor" href="#rapidoc"></a>18.7 RapiDoc</h2>
+<h2 id="scalar"><a class="anchor" href="#scalar"></a>18.7 Scalar</h2>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/6.14.x/src/main/docs/guide/openApiViews/scalar.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>Views support <a href="https://github.com/scalar/scalar">Scalar</a>, to enable it use <code>scalar.enabled=true</code>.</p>
+</div>
+<div class="paragraph">
+<p>The views will be generated to the <code>META-INF/swagger/views/scalar</code> directory of your project’s class output.</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>scalar.enabled</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>true</code> or <code>false</code>  When 'true' the scalar view is generated.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>scalar.js.url</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Override path to use to find the js file. Path must contain a file named scalar.standalone.js. The value can be a URL path like: "https://cdn.jsdelivr.net/npm/scalar/bundles/". Must contain trailing slash.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>scalar.spec.url</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Override path in swagger file path line. If you don&#8217;t set, then value will be <code>&lt;context-path&gt;/swagger/&lt;spec_filename&gt;</code>. You can use the placeholder <code>${filename}</code> it will be replaced with the final name of the generated swagger file.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>scalar.copy-resources</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Copy or not local JS and CSS resources. Set to <code>false</code> if you are using external resources (e.g. <a href="https://cdn.jsdelivr.net/npm/scalar/bundles/" class="bare">https://cdn.jsdelivr.net/npm/scalar/bundles/</a>). Default <code>true</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>scalar.style</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Custom CSS style description for scalar. Inserted into the block: <code>&lt;style&gt;${scalar.style}&lt;/style&gt;</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>scalar.customDomain</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>scalar.theme</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>scalar.isEditable</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>scalar.spec</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>scalar.proxyUrl</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>scalar.showSidebar</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>scalar.hideModels</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>scalar.hideDownloadButton</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>scalar.hideTestRequestButton</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>scalar.hideSearch</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>scalar.darkMode</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>scalar.forceDarkModeState</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>scalar.hideDarkModeToggle</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>scalar.customCss</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>scalar.searchHotKey</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>scalar.baseServerURL</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>scalar.servers</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>scalar.metadata</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>scalar.favicon</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>scalar.defaultHttpClient</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>scalar.hiddenClients</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>scalar.onSpecUpdate</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>scalar.authentication</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>scalar.generateHeadingSlug</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>scalar.generateModelSlug</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>scalar.generateTagSlug</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>scalar.generateOperationSlug</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>scalar.generateWebhookSlug</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>scalar.onLoaded</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>scalar.withDefaultFonts</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>scalar.defaultOpenAllTags</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>scalar.tagsSorter</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>scalar.operationsSorter</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>scalar.hideClientButton</code></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>See <a href="https://github.com/scalar/scalar/blob/main/documentation/configuration.md">Scalar config</a> for a description of the above properties.</p>
+</div>
+<div class="paragraph">
+<p>To expose the <code>scalar</code> views, you also must expose the generated <code>yaml</code>:</p>
+</div>
+<div class="openblock">
+<div class="title">Exposing Swagger YAML And Scalar Views</div>
+<div class="content">
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">micronaut.router.static-resources.swagger.paths=classpath:META-INF/swagger
+micronaut.router.static-resources.swagger.mapping=/swagger/**
+micronaut.router.static-resources.scalar.paths=classpath:META-INF/swagger/views/scalar
+micronaut.router.static-resources.scalar.mapping=/scalar/**</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">micronaut:
+  router:
+    static-resources:
+      swagger:
+        paths: classpath:META-INF/swagger
+        mapping: /swagger/**
+      scalar:
+        paths: classpath:META-INF/swagger/views/scalar
+        mapping: /scalar/**</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-toml hljs" data-lang="toml">[micronaut]
+  [micronaut.router]
+    [micronaut.router.static-resources]
+      [micronaut.router.static-resources.swagger]
+        paths="classpath:META-INF/swagger"
+        mapping="/swagger/**"
+      [micronaut.router.static-resources.scalar]
+        paths="classpath:META-INF/swagger/views/scalar"
+        mapping="/scalar/**"</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-groovy-config hljs" data-lang="groovy-config">micronaut {
+  router {
+    staticResources {
+      swagger {
+        paths = "classpath:META-INF/swagger"
+        mapping = "/swagger/**"
+      }
+      scalar {
+        paths = "classpath:META-INF/swagger/views/scalar"
+        mapping = "/scalar/**"
+      }
+    }
+  }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-hocon hljs" data-lang="hocon">{
+  micronaut {
+    router {
+      static-resources {
+        swagger {
+          paths = "classpath:META-INF/swagger"
+          mapping = "/swagger/**"
+        }
+        scalar {
+          paths = "classpath:META-INF/swagger/views/scalar"
+          mapping = "/scalar/**"
+        }
+      }
+    }
+  }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock multi-language-sample">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json-config hljs" data-lang="json-config">{
+  "micronaut": {
+    "router": {
+      "static-resources": {
+        "swagger": {
+          "paths": "classpath:META-INF/swagger",
+          "mapping": "/swagger/**"
+        },
+        "scalar": {
+          "paths": "classpath:META-INF/swagger/views/scalar",
+          "mapping": "/scalar/**"
+        }
+      }
+    }
+  }
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>With the above configuration in place when you run your application you can access your Swagger documentation at http://localhost:8080/scalar.</p>
+</div>
+
+<h2 id="rapidoc"><a class="anchor" href="#rapidoc"></a>18.8 RapiDoc</h2>
 
 <div class='contribute-btn'>
     <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/6.14.x/src/main/docs/guide/openApiViews/rapidoc.adoc"'>
@@ -4758,7 +5047,7 @@ micronaut.router.static-resources.rapidoc.mapping=/rapidoc/**</code></pre>
 <p>With the above configuration in place when you run your application you can access your Swagger documentation at http://localhost:8080/rapidoc.</p>
 </div>
 
-<h2 id="rapipdf"><a class="anchor" href="#rapipdf"></a>18.8 RapiPdf</h2>
+<h2 id="rapipdf"><a class="anchor" href="#rapipdf"></a>18.9 RapiPdf</h2>
 
 <div class='contribute-btn'>
     <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/6.14.x/src/main/docs/guide/openApiViews/rapipdf.adoc"'>

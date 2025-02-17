@@ -78,7 +78,7 @@ loadScripts(document, 'script');</script>
 <hr>
 <div class="type-signature"><span class="modifiers">public final class </span><span class="element-name type-name-label">OpenApiViewConfig</span>
 <span class="extends-implements">extends <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></span></div>
-<div class="block">OpenApi view configuration for Swagger UI, ReDoc, OpenAPI Explorer and RapiDoc.
+<div class="block">OpenApi view configuration for Swagger UI, ReDoc, OpenAPI Explorer, Scalar and RapiDoc.
  By default, no views are enabled.</div>
 <dl class="notes">
 <dt>Author:</dt>
@@ -90,6 +90,7 @@ loadScripts(document, 'script');</script>
 <li><a href="https://github.com/Redocly/ReDoc">ReDoc</a></li>
 <li><a href="https://github.com/rapi-doc/RapiDoc">RapiDoc</a></li>
 <li><a href="https://github.com/Authress-Engineering/openapi-explorer">OpenAPI Explorer</a></li>
+<li><a href="https://github.com/scalar/scalar">Scalar</a></li>
 </ul>
 </dd>
 </dl>
@@ -144,11 +145,14 @@ loadScripts(document, 'script');</script>
 <div class="col-second even-row-color"><code><a href="#TEMPLATES_REDOC" class="member-name-link">TEMPLATES_REDOC</a></code></div>
 <div class="col-last even-row-color">&nbsp;</div>
 <div class="col-first odd-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second odd-row-color"><code><a href="#TEMPLATES_SWAGGER_UI" class="member-name-link">TEMPLATES_SWAGGER_UI</a></code></div>
+<div class="col-second odd-row-color"><code><a href="#TEMPLATES_SCALAR" class="member-name-link">TEMPLATES_SCALAR</a></code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
 <div class="col-first even-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second even-row-color"><code><a href="#THEMES_DIR" class="member-name-link">THEMES_DIR</a></code></div>
+<div class="col-second even-row-color"><code><a href="#TEMPLATES_SWAGGER_UI" class="member-name-link">TEMPLATES_SWAGGER_UI</a></code></div>
 <div class="col-last even-row-color">&nbsp;</div>
+<div class="col-first odd-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second odd-row-color"><code><a href="#THEMES_DIR" class="member-name-link">THEMES_DIR</a></code></div>
+<div class="col-last odd-row-color">&nbsp;</div>
 </div>
 </section>
 </li>
@@ -180,39 +184,42 @@ loadScripts(document, 'script');</script>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="RedocConfig.html" title="class in io.micronaut.openapi.view">RedocConfig</a></code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getRedocConfig()" class="member-name-link">getRedocConfig</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getSpecURL(io.micronaut.openapi.view.AbstractViewConfig,io.micronaut.inject.visitor.VisitorContext)" class="member-name-link">getSpecURL</a><wbr>(<a href="AbstractViewConfig.html" title="class in io.micronaut.openapi.view">AbstractViewConfig</a>&nbsp;cfg,
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="ScalarConfig.html" title="class in io.micronaut.openapi.view">ScalarConfig</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getScalarConfig()" class="member-name-link">getScalarConfig</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getSpecURL(io.micronaut.openapi.view.AbstractViewConfig,io.micronaut.inject.visitor.VisitorContext)" class="member-name-link">getSpecURL</a><wbr>(<a href="AbstractViewConfig.html" title="class in io.micronaut.openapi.view">AbstractViewConfig</a>&nbsp;cfg,
  @Nullable io.micronaut.inject.visitor.VisitorContext&nbsp;context)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns the relative openApi specification url path.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="SwaggerUIConfig.html" title="class in io.micronaut.openapi.view">SwaggerUIConfig</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getSwaggerUIConfig()" class="member-name-link">getSwaggerUIConfig</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getTitle()" class="member-name-link">getTitle</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="SwaggerUIConfig.html" title="class in io.micronaut.openapi.view">SwaggerUIConfig</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getSwaggerUIConfig()" class="member-name-link">getSwaggerUIConfig</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getTitle()" class="member-name-link">getTitle</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns the title for the generated views.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#isEnabled()" class="member-name-link">isEnabled</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#isEnabled()" class="member-name-link">isEnabled</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns true when the generation of views is enabled.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#render(java.nio.file.Path,io.micronaut.inject.visitor.VisitorContext)" class="member-name-link">render</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/nio/file/Path.html" title="class or interface in java.nio.file" class="external-link">Path</a>&nbsp;outputDir,
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#render(java.nio.file.Path,io.micronaut.inject.visitor.VisitorContext)" class="member-name-link">render</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/nio/file/Path.html" title="class or interface in java.nio.file" class="external-link">Path</a>&nbsp;outputDir,
  io.micronaut.inject.visitor.VisitorContext&nbsp;context)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Generates the views given this configuration.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setSpecFile(java.lang.String)" class="member-name-link">setSpecFile</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;specFile)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setSpecFile(java.lang.String)" class="member-name-link">setSpecFile</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;specFile)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Sets the generated openApi specification file name.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setTitle(java.lang.String)" class="member-name-link">setTitle</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;title)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setTitle(java.lang.String)" class="member-name-link">setTitle</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;title)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Sets the title for the generated views.</div>
 </div>
 </div>
@@ -358,6 +365,20 @@ loadScripts(document, 'script');</script>
 </dl>
 </section>
 </li>
+<li>
+<section class="detail" id="TEMPLATES_SCALAR">
+<h3>TEMPLATES_SCALAR</h3>
+<div class="member-signature"><span class="modifiers">public static final</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">TEMPLATES_SCALAR</span></div>
+<dl class="notes">
+<dt>See Also:</dt>
+<dd>
+<ul class="see-list">
+<li><a href="../../../../constant-values.html#io.micronaut.openapi.view.OpenApiViewConfig.TEMPLATES_SCALAR">Constant Field Values</a></li>
+</ul>
+</dd>
+</dl>
+</section>
+</li>
 </ul>
 </section>
 </li>
@@ -483,6 +504,12 @@ loadScripts(document, 'script');</script>
 <section class="detail" id="getOpenApiExplorerConfig()">
 <h3>getOpenApiExplorerConfig</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="OpenApiExplorerConfig.html" title="class in io.micronaut.openapi.view">OpenApiExplorerConfig</a></span>&nbsp;<span class="element-name">getOpenApiExplorerConfig</span>()</div>
+</section>
+</li>
+<li>
+<section class="detail" id="getScalarConfig()">
+<h3>getScalarConfig</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="ScalarConfig.html" title="class in io.micronaut.openapi.view">ScalarConfig</a></span>&nbsp;<span class="element-name">getScalarConfig</span>()</div>
 </section>
 </li>
 </ul>
