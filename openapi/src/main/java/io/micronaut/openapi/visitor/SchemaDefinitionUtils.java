@@ -131,6 +131,7 @@ import static io.micronaut.openapi.visitor.ConfigUtils.getInnerClassSeparator;
 import static io.micronaut.openapi.visitor.ConfigUtils.getSchemaDecoration;
 import static io.micronaut.openapi.visitor.ConfigUtils.getSchemaDuplicateResolution;
 import static io.micronaut.openapi.visitor.ConfigUtils.isJsonViewDefaultInclusion;
+import static io.micronaut.openapi.visitor.ContextUtils.info;
 import static io.micronaut.openapi.visitor.ContextUtils.warn;
 import static io.micronaut.openapi.visitor.ConvertUtils.parseJsonString;
 import static io.micronaut.openapi.visitor.ConvertUtils.setDefaultValueObject;
@@ -222,6 +223,7 @@ import static io.micronaut.openapi.visitor.ProtoUtils.normalizeProtobufClassName
 import static io.micronaut.openapi.visitor.ProtoUtils.protobufTypeSchema;
 import static io.micronaut.openapi.visitor.SchemaUtils.TYPE_ARRAY;
 import static io.micronaut.openapi.visitor.SchemaUtils.TYPE_OBJECT;
+import static io.micronaut.openapi.visitor.SchemaUtils.TYPE_STRING;
 import static io.micronaut.openapi.visitor.SchemaUtils.appendSchema;
 import static io.micronaut.openapi.visitor.SchemaUtils.getSchemaByRef;
 import static io.micronaut.openapi.visitor.SchemaUtils.isEmptySchema;
@@ -311,8 +313,7 @@ public final class SchemaDefinitionUtils {
 
         if (type instanceof EnumElement enumEl && isEnum(enumEl)) {
             if (CollectionUtils.isEmpty(schema.getEnum())) {
-                schema.setEnum(getEnumValues(enumEl, schema.getType(), schema.getFormat(), context));
-                addEnumExtensions(enumEl, schema, context);
+                setEnumValues(enumEl, schema, context);
             }
         } else {
             JavadocDescription javadoc = type != null ? Utils.getJavadocParser().parse(type.getDescription()) : null;
@@ -431,8 +432,7 @@ public final class SchemaDefinitionUtils {
                         schema.setType(typeAndFormat.getFirst());
                         schema.setFormat(typeAndFormat.getSecond());
                         if (CollectionUtils.isEmpty(schema.getEnum())) {
-                            schema.setEnum(getEnumValues(enumEl, schema.getType(), schema.getFormat(), context));
-                            addEnumExtensions(enumEl, schema, context);
+                            setEnumValues(enumEl, schema, context);
                         }
                     } else {
                         Schema<?> schemaWithSuperTypes = processSuperTypes(null, schemaName, type, definingElement, openAPI, mediaTypes, schemas, context, jsonViewClass);
@@ -601,9 +601,12 @@ public final class SchemaDefinitionUtils {
         return Pair.of(resultSchemaName, packageName + DOT + resultSchemaName);
     }
 
-    public static List<Object> getEnumValues(EnumElement type, String schemaType, String schemaFormat, VisitorContext context) {
+    public static void setEnumValues(EnumElement type, Schema schema, VisitorContext context) {
         var isProtobufGenerated = isProtobufGenerated(type);
         var enumValues = new ArrayList<>();
+
+        boolean cantDeserializeValues = false;
+
         for (EnumConstantElement element : type.elements()) {
 
             if (isProtobufGenerated) {
@@ -636,16 +639,32 @@ public final class SchemaDefinitionUtils {
             String jacksonValue = jsonPropertyAnn != null ? jsonPropertyAnn.stringValue(PROP_VALUE).orElse(null) : null;
             if (StringUtils.hasText(jacksonValue)) {
                 try {
-                    enumValues.add(ConvertUtils.normalizeValue(jacksonValue, schemaType, schemaFormat, context));
+                    enumValues.add(ConvertUtils.normalizeValue(jacksonValue, schema.getType(), schema.getFormat(), context));
                 } catch (JsonProcessingException e) {
                     warn("Error converting jacksonValue " + jacksonValue + " : to " + type + ":\n" + Utils.printStackTrace(e), context, element);
+                    if (!TYPE_STRING.equals(schema.getType())) {
+                        info("Changing enum type from " + type.getName() + " to " + TYPE_STRING, context, element);
+                    }
                     enumValues.add(element.getSimpleName());
+                    schema.setType(TYPE_STRING);
+                    schema.setFormat(null);
+                    cantDeserializeValues = true;
                 }
             } else {
+                if (!TYPE_STRING.equals(schema.getType())) {
+                    warn("Need to add @JsonProperty annotation for enum constant " + type.getName() + "." + element.getSimpleName(), context, element);
+                    info("Changing enum type from " + type.getName() + " to " + TYPE_STRING, context, element);
+                    schema.setType(TYPE_STRING);
+                    schema.setFormat(null);
+                    cantDeserializeValues = true;
+                }
                 enumValues.add(element.getSimpleName());
             }
         }
-        return !enumValues.isEmpty() ? enumValues : null;
+        if (!enumValues.isEmpty()) {
+            schema.setEnum(enumValues);
+        }
+        addEnumExtensions(type, schema, cantDeserializeValues, context);
     }
 
     /**

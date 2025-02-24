@@ -135,7 +135,7 @@ public final class GeneratorUtils {
         }
     }
 
-    public static void addEnumExtensions(EnumElement enumEl, Schema<?> schema, VisitorContext context) {
+    public static void addEnumExtensions(EnumElement enumEl, Schema<?> schema, boolean cantDeserializeValues, VisitorContext context) {
 
         if (!ConfigUtils.isGeneratorExtensionsEnabled(context) || enumEl == null) {
             return;
@@ -147,41 +147,43 @@ public final class GeneratorUtils {
             schema.setExtensions(extensions);
         }
 
-        String xType = null;
-        String xFormat = null;
+        if (!cantDeserializeValues) {
+            String xType = null;
+            String xFormat = null;
 
-        ClassElement fieldType = findJsonValueType(enumEl, context);
-        if (fieldType != null) {
-            if (fieldType.isPrimitive()) {
-                xType = fieldType.getSimpleName();
-            } else {
-                xType = fieldType.getSimpleName();
-                if (xType.equalsIgnoreCase("byte")) {
-                    xType = null;
-                    xFormat = "int8";
-                } else if (xType.equalsIgnoreCase("short")) {
-                    xType = null;
-                    xFormat = "int16";
-                } else if (xType.equalsIgnoreCase("int")
-                    || xType.equalsIgnoreCase("integer")
-                    || xType.equalsIgnoreCase("long")
-                    || xType.equalsIgnoreCase("float")
-                    || xType.equalsIgnoreCase("double")) {
-                    xType = null;
-                    // because boolean enums generated as Boolean type
-                } else if (xType.equalsIgnoreCase("boolean")) {
-                    xType = null;
-                } else if (xType.equalsIgnoreCase("char") || xType.equalsIgnoreCase("character")) {
-                    xType = "char";
+            ClassElement fieldType = findJsonValueType(enumEl, context);
+            if (fieldType != null) {
+                if (fieldType.isPrimitive()) {
+                    xType = fieldType.getSimpleName();
+                } else {
+                    xType = fieldType.getSimpleName();
+                    if (xType.equalsIgnoreCase("byte")) {
+                        xType = null;
+                        xFormat = "int8";
+                    } else if (xType.equalsIgnoreCase("short")) {
+                        xType = null;
+                        xFormat = "int16";
+                    } else if (xType.equalsIgnoreCase("int")
+                        || xType.equalsIgnoreCase("integer")
+                        || xType.equalsIgnoreCase("long")
+                        || xType.equalsIgnoreCase("float")
+                        || xType.equalsIgnoreCase("double")) {
+                        xType = null;
+                        // because boolean enums generated as Boolean type
+                    } else if (xType.equalsIgnoreCase("boolean")) {
+                        xType = null;
+                    } else if (xType.equalsIgnoreCase("char") || xType.equalsIgnoreCase("character")) {
+                        xType = "char";
+                    }
                 }
             }
-        }
 
-        if (xType != null && !extensions.containsKey(TYPE)) {
-            extensions.put(TYPE, xType);
-        }
-        if (xFormat != null && !extensions.containsKey(FORMAT)) {
-            extensions.put(FORMAT, xFormat);
+            if (xType != null && !extensions.containsKey(TYPE)) {
+                extensions.put(TYPE, xType);
+            }
+            if (xFormat != null && !extensions.containsKey(FORMAT)) {
+                extensions.put(FORMAT, xFormat);
+            }
         }
 
         var enumVarNameList = new ArrayList<String>();

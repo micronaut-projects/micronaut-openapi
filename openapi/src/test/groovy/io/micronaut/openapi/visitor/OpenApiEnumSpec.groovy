@@ -1278,4 +1278,91 @@ class MyBean {}
         mapValueSchema.properties.value.format == 'int32'
         mapValueSchema.properties.prop.type == 'string'
     }
+
+    void "test enum with JsonValue and without JsonProperty"() {
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+
+import java.util.Optional;
+import java.util.stream.Stream;
+
+@Controller("/hello")
+class HelloController {
+
+    @Get("/")
+    public COSEAlgorithmIdentifier index() {
+        return COSEAlgorithmIdentifier.EdDSA;
+    }
+}
+
+/**
+ * A number identifying a cryptographic algorithm. The algorithm identifiers SHOULD be values
+ * registered in the IANA COSE Algorithms registry, for instance, -7 for "ES256" and -257 for
+ * "RS256".
+ *
+ * @see <a
+ *     href="https://www.w3.org/TR/2021/REC-webauthn-2-20210408/#typedefdef-cosealgorithmidentifier">§5.10.5.
+ *     Cryptographic Algorithm Identifier (typedef COSEAlgorithmIdentifier)</a>
+ */
+enum COSEAlgorithmIdentifier {
+  EdDSA(-8),
+  RS1(-65535);
+
+  private final long id;
+
+  @JsonValue
+  public long getId() {
+    return id;
+  }
+
+  COSEAlgorithmIdentifier(long id) {
+    this.id = id;
+  }
+
+  /**
+   * Attempt to parse an integer as a {@link COSEAlgorithmIdentifier}.
+   *
+   * @param id an integer equal to the {@link #getId() id} of a constant in {@link
+   *     COSEAlgorithmIdentifier}
+   * @return The {@link COSEAlgorithmIdentifier} instance whose {@link #getId() id} equals <code>id
+   *     </code>, if any.
+   * @see <a href="https://www.w3.org/TR/2021/REC-webauthn-2-20210408/#sctn-alg-identifier">§5.8.5.
+   *     Cryptographic Algorithm Identifier (typedef COSEAlgorithmIdentifier)</a>
+   */
+  public static Optional<COSEAlgorithmIdentifier> fromId(long id) {
+    return Stream.of(values()).filter(v -> v.id == id).findAny();
+  }
+
+  @JsonCreator
+  private static COSEAlgorithmIdentifier fromJson(long id) {
+    return fromId(id)
+        .orElseThrow(
+            () -> new IllegalArgumentException("Unknown COSE algorithm identifier: " + id));
+  }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        then: "the state is correct"
+        Utils.testReference != null
+
+        when: "The OpenAPI is retrieved"
+        OpenAPI openAPI = Utils.testReference
+        def enumSchema = openAPI.components.schemas.COSEAlgorithmIdentifier
+
+        then: "the components are valid"
+        enumSchema
+        enumSchema.type == "string"
+        !enumSchema.format
+        enumSchema.description == "A number identifying a cryptographic algorithm. The algorithm identifiers SHOULD be values registered in the IANA COSE Algorithms registry, for instance, -7 for \"ES256\" and -257 for \"RS256\"."
+        enumSchema.enum[0] == "EdDSA"
+        enumSchema.enum[1] == "RS1"
+    }
 }
