@@ -148,6 +148,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
     public static final String OPT_GENERATE_SWAGGER_ANNOTATIONS_FALSE = "false";
     public static final String OPT_GENERATE_OPERATION_ONLY_FOR_FIRST_TAG = "generateOperationOnlyForFirstTag";
     public static final String OPT_SKIP_SORTING_OPERATIONS = "skipSortingOperations";
+    public static final String OPT_JSON_INCLUDE_ALWAYS_FOR_REQUIRED_FIELDS = "jsonIncludeAlwaysForRequiredFields";
     public static final String CONTENT_TYPE_APPLICATION_FORM_URLENCODED = "application/x-www-form-urlencoded";
     public static final String CONTENT_TYPE_APPLICATION_JSON = "application/json";
     public static final String CONTENT_TYPE_MULTIPART_FORM_DATA = "multipart/form-data";
@@ -171,6 +172,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
     protected boolean generateHttpResponseAlways;
     protected boolean generateHttpResponseWhereRequired = true;
     protected boolean generateControllerAsAbstract;
+    protected boolean jsonIncludeAlwaysForRequiredFields;
     protected String appName;
     protected String dateFormat;
     protected String dateTimeFormat;
@@ -277,6 +279,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
         cliOptions.add(CliOption.newBoolean(OPT_GENERATE_OPERATION_ONLY_FOR_FIRST_TAG, "When false, the operation method will be duplicated in each of the tags if multiple tags are assigned to this operation. " +
             "If true, each operation will be generated only once in the first assigned tag.", generateOperationOnlyForFirstTag));
         cliOptions.add(CliOption.newBoolean(OPT_USE_ENUM_CASE_INSENSITIVE, "Use `equalsIgnoreCase` when String for enum comparison", useEnumCaseInsensitive));
+        cliOptions.add(CliOption.newBoolean(OPT_JSON_INCLUDE_ALWAYS_FOR_REQUIRED_FIELDS, "If set to true, @JsonInclude annotation will be with value ALWAYS for required properties in POJO's", jsonIncludeAlwaysForRequiredFields));
 
         var testToolOption = new CliOption(OPT_TEST, "Specify which test tool to generate files for").defaultValue(testTool);
         var testToolOptionMap = new HashMap<String, String>();
@@ -478,6 +481,11 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
             useBeanValidation = convertPropertyToBoolean(USE_BEANVALIDATION);
         }
         writePropertyBack(USE_BEANVALIDATION, useBeanValidation);
+
+        if (additionalProperties.containsKey(OPT_JSON_INCLUDE_ALWAYS_FOR_REQUIRED_FIELDS)) {
+            jsonIncludeAlwaysForRequiredFields = convertPropertyToBoolean(OPT_JSON_INCLUDE_ALWAYS_FOR_REQUIRED_FIELDS);
+        }
+        writePropertyBack(OPT_JSON_INCLUDE_ALWAYS_FOR_REQUIRED_FIELDS, jsonIncludeAlwaysForRequiredFields);
 
         if (additionalProperties.containsKey(OPT_USE_LOMBOK)) {
             lombok = convertPropertyToBoolean(OPT_USE_LOMBOK);
@@ -2433,6 +2441,10 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
 
     public void setDateTimeLibrary(String name) {
         setDateLibrary(name);
+    }
+
+    public void setJsonIncludeAlwaysForRequiredFields(boolean jsonIncludeAlwaysForRequiredFields) {
+        this.jsonIncludeAlwaysForRequiredFields = jsonIncludeAlwaysForRequiredFields;
     }
 
     @Override

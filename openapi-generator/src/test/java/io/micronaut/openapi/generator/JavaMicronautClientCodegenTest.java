@@ -1404,32 +1404,32 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
 
         assertFileContains(path + "model/AnimalResponse.java",
             """
-                        /**
-                         * @return the valueType property value
-                         */
-                        public String getValueType() {
-                            return valueType;
-                        }
-                    
-                        /**
-                         * Set the valueType property value
-                         *
-                         * @param valueType property value to set
-                         */
-                        public void setValueType(String valueType) {
-                            this.valueType = valueType;
-                        }
-                    
-                        /**
-                         * Set valueType in a chainable fashion.
-                         *
-                         * @return The same instance of AnimalResponse for chaining.
-                         */
-                        public AnimalResponse valueType(String valueType) {
-                            this.valueType = valueType;
-                            return this;
-                        }
-                    """);
+                    /**
+                     * @return the valueType property value
+                     */
+                    public String getValueType() {
+                        return valueType;
+                    }
+                
+                    /**
+                     * Set the valueType property value
+                     *
+                     * @param valueType property value to set
+                     */
+                    public void setValueType(String valueType) {
+                        this.valueType = valueType;
+                    }
+                
+                    /**
+                     * Set valueType in a chainable fashion.
+                     *
+                     * @return The same instance of AnimalResponse for chaining.
+                     */
+                    public AnimalResponse valueType(String valueType) {
+                        this.valueType = valueType;
+                        return this;
+                    }
+                """);
     }
 
     @Test
@@ -1495,5 +1495,43 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                 @JsonInclude(JsonInclude.Include.USE_DEFAULTS)
                 private ZonedDateTime date;
             """);
+    }
+
+    @Test
+    void testJsonIncludeAlways() {
+
+        var codegen = new JavaMicronautClientCodegen();
+        codegen.setJsonIncludeAlwaysForRequiredFields(true);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/json-include-always.yml", CodegenConstants.MODELS);
+        String path = outputPath + "src/main/java/org/openapitools/";
+
+        assertFileContains(path + "model/TextRequestDto.java",
+            """
+                    @NotNull
+                    @JsonProperty(JSON_PROPERTY_TEXT)
+                    @JsonInclude(JsonInclude.Include.ALWAYS)
+                    private String text;
+                """,
+            """
+                    @NotNull
+                    @Size(min = 1, max = 20)
+                    @JsonProperty(JSON_PROPERTY_LOCALE)
+                    @JsonInclude(JsonInclude.Include.ALWAYS)
+                    private String locale;
+                """);
+
+        assertFileContains(path + "model/ResponseDto.java",
+            """
+                    @NotNull
+                    @JsonProperty(JSON_PROPERTY_MESSAGE)
+                    @JsonInclude(JsonInclude.Include.ALWAYS)
+                    private String message;
+                """,
+            """
+                    @Nullable
+                    @JsonProperty(JSON_PROPERTY_TIMESTAMP)
+                    @JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                    private ZonedDateTime timestamp;
+                """);
     }
 }

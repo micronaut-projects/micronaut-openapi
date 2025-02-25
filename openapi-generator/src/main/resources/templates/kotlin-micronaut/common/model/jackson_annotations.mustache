@@ -9,14 +9,21 @@
         {{#items.isNullable}}
     @{{{vendorExtensions.fieldAnnPrefix}}}JsonInclude(content = JsonInclude.Include.ALWAYS{{^required}}, value = JsonInclude.Include.USE_DEFAULTS{{/required}})
         {{/items.isNullable}}
-        {{^items.isNullable}}{{^required}}
+        {{^items.isNullable}}
+            {{^required}}
     @{{{vendorExtensions.fieldAnnPrefix}}}JsonInclude(JsonInclude.Include.USE_DEFAULTS)
-        {{/required}}{{/items.isNullable}}
+            {{/required}}
+        {{/items.isNullable}}
     {{/isMap}}
     {{^isMap}}
         {{#required}}
             {{#isReadOnly}}
     @{{{vendorExtensions.fieldAnnPrefix}}}JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+            {{/isReadOnly}}
+            {{^isReadOnly}}
+                {{#jsonIncludeAlwaysForRequiredFields}}
+    @{{{vendorExtensions.fieldAnnPrefix}}}JsonInclude(JsonInclude.Include.ALWAYS)
+                {{/jsonIncludeAlwaysForRequiredFields}}
             {{/isReadOnly}}
         {{/required}}
         {{^required}}

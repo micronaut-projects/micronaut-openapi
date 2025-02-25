@@ -1444,15 +1444,15 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
 
         assertFileContains(path + "api/DefaultApi.kt",
             """
-                        @Post("/sendPrimitives/{name}")
-                        fun sendPrimitives(
-                            @PathVariable("name") @NotNull name: String,
-                            @QueryValue("brand") @Nullable brand: String? = null,
-                            @CookieValue("coc") @Nullable coc: String? = null,
-                            @Header("head") @Nullable head: String? = null,
-                            @Body @Nullable body: String? = null,
-                        ): Mono<String>
-                     """);
+                   @Post("/sendPrimitives/{name}")
+                   fun sendPrimitives(
+                       @PathVariable("name") @NotNull name: String,
+                       @QueryValue("brand") @Nullable brand: String? = null,
+                       @CookieValue("coc") @Nullable coc: String? = null,
+                       @Header("head") @Nullable head: String? = null,
+                       @Body @Nullable body: String? = null,
+                   ): Mono<String>
+                """);
     }
 
     @Test
@@ -1489,5 +1489,43 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                 @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
                 var date: ZonedDateTime? = null,
             """);
+    }
+
+    @Test
+    void testJsonIncludeAlways() {
+
+        var codegen = new KotlinMicronautClientCodegen();
+        codegen.setJsonIncludeAlwaysForRequiredFields(true);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/json-include-always.yml", CodegenConstants.MODELS);
+        String path = outputPath + "src/main/kotlin/org/openapitools/";
+
+        assertFileContains(path + "model/TextRequestDto.kt",
+            """
+                    @field:NotNull
+                    @field:JsonProperty(JSON_PROPERTY_TEXT)
+                    @field:JsonInclude(JsonInclude.Include.ALWAYS)
+                    var text: String,
+                """,
+            """
+                    @field:NotNull
+                    @field:Size(min = 1, max = 20)
+                    @field:JsonProperty(JSON_PROPERTY_LOCALE)
+                    @field:JsonInclude(JsonInclude.Include.ALWAYS)
+                    var locale: String,
+                """);
+
+        assertFileContains(path + "model/ResponseDto.kt",
+            """
+                    @field:NotNull
+                    @field:JsonProperty(JSON_PROPERTY_MESSAGE)
+                    @field:JsonInclude(JsonInclude.Include.ALWAYS)
+                    var message: String,
+                """,
+            """
+                    @field:Nullable
+                    @field:JsonProperty(JSON_PROPERTY_TIMESTAMP)
+                    @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                    var timestamp: ZonedDateTime? = null,
+                """);
     }
 }
