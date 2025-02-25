@@ -1,0 +1,47 @@
+openapi: 3.0.1
+info:
+  title: Document API
+  version: 1.0.0
+servers: []
+paths:
+  /documents:
+    get:
+      tags:
+        - Document Resources
+      summary: Gets all documents following the search criteria.
+      description: Returns a list of documents.
+      operationId: getDocuments
+      parameters:
+        - $ref: '#/components/parameters/anlegedatum'
+      responses:
+        '200':
+          description: Returns a list of document ids.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Result'
+components:
+  schemas:
+    Result:
+      type: object
+      description: The result of a document query.
+      properties:
+        id:
+          type: string
+          description: The document id.
+          example: '893648'
+        date:
+          type: string
+          format: date-time
+          maxLength: 14
+          minLength: 14
+  parameters:
+    anlegedatum:
+      name: CREATIONDATE
+      in: query
+      description: The creation date of the document
+      schema:
+        type: string
+        format: date
+        maxLength: 10
+        minLength: 10

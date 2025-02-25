@@ -1085,9 +1085,15 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
                     param.vendorExtensions.put("withValid", true);
                 }
                 // check pattern property for date types: if set, need use this pattern as `@Format` annotation value
-                if (isDateType(param.dataType) && StringUtils.isNotEmpty(param.pattern)) {
-                    param.vendorExtensions.put("formatPattern", param.pattern);
-                    param.pattern = null;
+                if (isDateType(param.dataType)) {
+                    if (StringUtils.isNotEmpty(param.pattern)) {
+                        param.vendorExtensions.put("formatPattern", param.pattern);
+                        param.pattern = null;
+                    }
+                    param.minItems = null;
+                    param.maxItems = null;
+                    param.minLength = null;
+                    param.maxLength = null;
                 }
             }
 
@@ -2164,9 +2170,15 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         }
 
         // check pattern property for date types: if set, need use this pattern as `@Format` annotation value
-        if (isDateType(property.dataType) && StringUtils.isNotEmpty(property.pattern)) {
-            property.vendorExtensions.put("formatPattern", property.pattern);
-            property.pattern = null;
+        if (isDateType(property.dataType)) {
+            if (StringUtils.isNotEmpty(property.pattern)) {
+                property.vendorExtensions.put("formatPattern", property.pattern);
+                property.pattern = null;
+            }
+            property.minItems = null;
+            property.maxItems = null;
+            property.minLength = null;
+            property.maxLength = null;
         }
 
         if (isDiscriminator(property, model)) {

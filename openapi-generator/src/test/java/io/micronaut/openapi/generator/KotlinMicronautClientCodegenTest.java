@@ -1470,4 +1470,24 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
             """);
         assertFileContains(path + "model/Color.kt", "enum class Color(");
     }
+
+    @Test
+    void testDateWithoutSizeAnnotations() {
+
+        var codegen = new KotlinMicronautClientCodegen();
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/date-annotations.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String path = outputPath + "src/main/kotlin/org/openapitools/";
+
+        assertFileContains(path + "api/DocumentResourcesApi.kt", """
+            @QueryValue("CREATIONDATE") @Nullable CREATIONDATE: LocalDate? = null,
+            """);
+        assertFileContains(path + "model/Result.kt", """
+                var id: String? = null,
+            
+                @field:Nullable
+                @field:JsonProperty(JSON_PROPERTY_DATE)
+                @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                var date: ZonedDateTime? = null,
+            """);
+    }
 }
