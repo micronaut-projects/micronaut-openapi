@@ -1476,4 +1476,24 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
             """);
         assertFileContains(path + "model/Color.java", "public enum Color {");
     }
+
+    @Test
+    void testDateWithoutSizeAnnotations() {
+
+        var codegen = new JavaMicronautClientCodegen();
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/date-annotations.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String path = outputPath + "src/main/java/org/openapitools/";
+
+        assertFileContains(path + "api/DocumentResourcesApi.java", """
+            @QueryValue("CREATIONDATE") @Nullable LocalDate CREATIONDATE
+            """);
+        assertFileContains(path + "model/Result.java", """
+                private String id;
+        
+                @Nullable
+                @JsonProperty(JSON_PROPERTY_DATE)
+                @JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                private ZonedDateTime date;
+            """);
+    }
 }

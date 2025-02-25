@@ -747,4 +747,25 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
 
         assertFileNotContains(path + "api/MyCustomApi.java", "@Controller");
     }
+
+    @Test
+    void testDateWithoutSizeAnnotations() {
+
+        var codegen = new JavaMicronautServerCodegen();
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/date-annotations.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String path = outputPath + "src/main/java/org/openapitools/";
+
+        assertFileContains(path + "api/DocumentResourcesApi.java", """
+            @QueryValue("CREATIONDATE") @Nullable(inherited = true) LocalDate CREATIONDATE
+            """);
+        assertFileContains(path + "model/Result.java", """
+                private String id;
+
+                @Nullable(inherited = true)
+                @Schema(name = "date", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+                @JsonProperty(JSON_PROPERTY_DATE)
+                @JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                private ZonedDateTime date;
+            """);
+    }
 }
