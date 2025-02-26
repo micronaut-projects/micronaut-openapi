@@ -115,7 +115,7 @@ Renovate and our workflow will keep sending PRs. You should also create an issue
 
 #### Files sync
 
-We have a [template repo](https://github.com/micronaut-projects/micronaut-project-template) that we use as the single
+We have a [template repo](https://github.com/micronaut-projects/micronaut-projectgen) that we use as the single
 source of truth for certain files. It is used as a template to create new repos, and changes to certain files in the
 template repo will get propagated automatically. The files propagated are:
 
@@ -169,7 +169,7 @@ If you are publishing a milestone or release candidate, check the pre-release ch
 Note that the release tags must be preceded with `v`, e.g.: `v1.2.3`.
 
 Once you publish the GitHub release, the
-[Release GitHub Action workflow](https://github.com/micronaut-projects/micronaut-project-template/blob/master/.github/workflows/release.yml)
+[Release GitHub Action workflow](https://github.com/micronaut-projects/micronaut-projectgen/blob/master/.github/workflows/release.yml)
 will kick off, performing the following steps:
 
 * Pre-release: sets the `projectVersion` property in `gradle.properties` to the release version, and commit and pushes
