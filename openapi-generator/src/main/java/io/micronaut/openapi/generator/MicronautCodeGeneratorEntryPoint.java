@@ -109,6 +109,7 @@ public final class MicronautCodeGeneratorEntryPoint {
 
         // Generate
         var generator = new DefaultGenerator();
+        generator.setGenerateMetadata(false);
         for (OutputKind outputKind : OutputKind.values()) {
             generator.setGeneratorPropertyDefault(outputKind.generatorProperty, "false");
         }
