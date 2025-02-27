@@ -1,0 +1,30 @@
+openapi: 3.0.3
+info:
+  version: "1"
+  title: api
+paths:
+  /example-route:
+    get:
+      responses:
+        "200":
+          description: ""
+          content:
+            "application/json":
+              schema:
+                type: array
+                uniqueItems: true
+                items:
+                  type: string
+  /example-route2:
+    get:
+      responses:
+        "200":
+          description: ""
+          content:
+            "application/json":
+              schema:
+                type: array
+                uniqueItems: true
+                items:
+                  type: string
+                  format: uuid

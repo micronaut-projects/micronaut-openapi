@@ -1528,4 +1528,24 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                     var timestamp: ZonedDateTime? = null,
                 """);
     }
+
+    @Test
+    void testBuiltInModelNamePrefixAndSuffix() {
+
+        var codegen = new KotlinMicronautClientCodegen();
+        codegen.setModelNamePrefix("Api");
+        codegen.setModelNameSuffix("Dto");
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/openapi-built-in-prefix.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String path = outputPath + "src/main/kotlin/org/openapitools/";
+
+        assertFileContains(path + "api/DefaultApi.kt",
+            """
+                    @Get("/example-route2")
+                    fun exampleRoute2Get(): Mono<Set<UUID>>
+                """,
+            """
+                    @Get("/example-route")
+                    fun exampleRouteGet(): Mono<Set<String>>
+                """);
+    }
 }

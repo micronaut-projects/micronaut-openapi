@@ -1489,7 +1489,7 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
             """);
         assertFileContains(path + "model/Result.java", """
                 private String id;
-        
+            
                 @Nullable
                 @JsonProperty(JSON_PROPERTY_DATE)
                 @JsonInclude(JsonInclude.Include.USE_DEFAULTS)
@@ -1532,6 +1532,26 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                     @JsonProperty(JSON_PROPERTY_TIMESTAMP)
                     @JsonInclude(JsonInclude.Include.USE_DEFAULTS)
                     private ZonedDateTime timestamp;
+                """);
+    }
+
+    @Test
+    void testBuiltInModelNamePrefixAndSuffix() {
+
+        var codegen = new JavaMicronautClientCodegen();
+        codegen.setModelNamePrefix("Api");
+        codegen.setModelNameSuffix("Dto");
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/openapi-built-in-prefix.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String path = outputPath + "src/main/java/org/openapitools/";
+
+        assertFileContains(path + "api/DefaultApi.java",
+            """
+                    @Get("/example-route2")
+                    Mono<@NotNull Set<@NotNull UUID>> exampleRoute2Get();
+                """,
+            """
+                    @Get("/example-route")
+                    Mono<@NotNull Set<@NotNull String>> exampleRouteGet();
                 """);
     }
 }
