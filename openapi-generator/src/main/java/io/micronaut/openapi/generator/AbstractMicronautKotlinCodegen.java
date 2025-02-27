@@ -404,6 +404,13 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         typeMapping.put("ZonedDateTime", "ZonedDateTime");
         typeMapping.put("LocalDate", "LocalDate");
         typeMapping.put("LocalTime", "LocalTime");
+        typeMapping.put("int", "Int");
+        typeMapping.put("short", "Short");
+        typeMapping.put("UnsignedInteger", "Int");
+        typeMapping.put("UnsignedLong", "Long");
+        typeMapping.put("char", "String");
+        typeMapping.put("UUID", "UUID");
+        typeMapping.put("URI", "URI");
 
         instantiationTypes.put("array", "ArrayList");
         instantiationTypes.put("list", "ArrayList");
@@ -1379,7 +1386,58 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
             }
             return getSchemaType(target) + "<String, " + getTypeDeclaration(inner) + ">";
         }
-        return super.getTypeDeclaration(target);
+        return getTypeDeclarationSuper(target);
+    }
+
+    private String getTypeDeclarationSuper(Schema schema) {
+        if (schema == null) {
+            return "NULL_SCHEMA_ERR";
+        }
+
+        String oasType = getSchemaType(schema);
+        if (typeMapping.containsKey(oasType)) {
+            return typeMapping.get(oasType);
+        }
+
+        return oasType;
+    }
+
+    @Override
+    public String getSchemaType(Schema p) {
+        String openAPIType = getSchemaTypeSuper(p);
+        String type;
+        // This maps, for example, long -> kotlin.Long based on hashes in this type's constructor
+        if (typeMapping.containsKey(openAPIType)) {
+            return typeMapping.get(openAPIType);
+        } else {
+            type = openAPIType;
+        }
+        return toModelName(type);
+    }
+
+    private String getSchemaTypeSuper(Schema schema) {
+        if (ModelUtils.isComposedSchema(schema)) { // composed schema
+            // Get the interfaces, i.e. the set of elements under 'allOf', 'anyOf' or 'oneOf'.
+            List<Schema> schemas = ModelUtils.getInterfaces(schema);
+
+            List<String> names = new ArrayList<>();
+            // Build a list of the schema types under each interface.
+            // For example, if a 'allOf' composed schema has $ref children,
+            // add the type of each child to the list of names.
+            for (Schema s : schemas) {
+                names.add(getSingleSchemaType(s));
+            }
+
+            if (schema.getAllOf() != null) {
+                return toAllOfName(names, schema);
+            } else if (schema.getAnyOf() != null) { // anyOf
+                return toAnyOfName(names, schema);
+            } else if (schema.getOneOf() != null) { // oneOf
+                return toOneOfName(names, schema);
+            }
+        }
+
+        return getSingleSchemaType(schema);
     }
 
     @Override
@@ -1388,31 +1446,25 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         if (modelNameMapping.containsKey(name)) {
             return modelNameMapping.get(name);
         }
-        // memoization
-        if (schemaKeyToModelNameCache.containsKey(name)) {
-            return schemaKeyToModelNameCache.get(name);
-        }
 
-        // If schemaMapping contains name, assume this is a legitimate model name.
+        // We need to check if schema-mapping has a different model for this class, so we use it
+        // instead of the auto-generated one.
         if (schemaMapping.containsKey(name)) {
             return schemaMapping.get(name);
         }
 
-        if (importMapping.containsKey(name)) {
-            return name;
+        // memoization
+        String origName = name;
+        if (schemaKeyToModelNameCache.containsKey(origName)) {
+            return schemaKeyToModelNameCache.get(origName);
         }
 
-        // Allow for explicitly configured kotlin.* and java.* types
-        if (name.startsWith("kotlin.") || name.startsWith("java.")) {
-            return name;
-        }
-
-        String modifiedName = name.replace(".", "")
+        String sanitizedName = name.replace(".", "")
             .replace("-", "_")
             // if it already escaped reserved word, need to remove quotes
             .replace("`", "");
 
-        String nameWithPrefixSuffix = normalizeKotlinSpecificNames(modifiedName);
+        String nameWithPrefixSuffix = normalizeKotlinSpecificNames(sanitizedName);
         if (!StringUtils.isEmpty(modelNamePrefix)) {
             // add '_' so that model name can be camelized correctly
             nameWithPrefixSuffix = modelNamePrefix + "_" + nameWithPrefixSuffix;
@@ -1423,25 +1475,26 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
             nameWithPrefixSuffix = nameWithPrefixSuffix + "_" + modelNameSuffix;
         }
 
-        // Camelize name of nested properties
-        modifiedName = camelize(nameWithPrefixSuffix);
+        // camelize the model name
+        // phone_number => PhoneNumber
+        final String camelizedName = camelize(nameWithPrefixSuffix);
 
         // model name cannot use reserved keyword, e.g. return
-        if (isReservedWord(modifiedName)) {
-            final String modelName = "Model" + modifiedName;
-            log.warn("{} (reserved word) cannot be used as model name. Renamed to {}", modifiedName, modelName);
+        if (isReservedWord(camelizedName)) {
+            final String modelName = "Model" + camelizedName;
+            schemaKeyToModelNameCache.put(origName, modelName);
             return modelName;
         }
 
         // model name starts with number
-        if (modifiedName.matches("^\\d.*")) {
-            final String modelName = "Model" + modifiedName; // e.g. 200Response => Model200Response (after camelize)
-            log.warn("{} (model name starts with number) cannot be used as model name. Renamed to {}", name, modelName);
+        if (camelizedName.matches("^\\d.*")) {
+            final String modelName = "Model" + camelizedName; // e.g. 200Response => Model200Response (after camelize)
+            schemaKeyToModelNameCache.put(origName, modelName);
             return modelName;
         }
 
-        schemaKeyToModelNameCache.put(name, firstTitleCase(modifiedName));
-        return schemaKeyToModelNameCache.get(name);
+        schemaKeyToModelNameCache.put(origName, firstTitleCase(camelizedName));
+        return camelizedName;
     }
 
     @Override
