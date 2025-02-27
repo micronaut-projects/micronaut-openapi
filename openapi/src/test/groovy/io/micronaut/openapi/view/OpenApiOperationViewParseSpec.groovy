@@ -1,8 +1,29 @@
 package io.micronaut.openapi.view
 
+import io.micronaut.openapi.visitor.Pair
+import io.micronaut.openapi.visitor.group.OpenApiInfo
+import io.swagger.v3.oas.models.OpenAPI
 import spock.lang.Specification
 
 class OpenApiOperationViewParseSpec extends Specification {
+
+    void "test set mapping.path with groups"() {
+        given:
+        var groupOpenApiInfo = new OpenApiInfo(new OpenAPI());
+        groupOpenApiInfo.groupName = "Group1"
+        groupOpenApiInfo.filename = "swagger-group1.yml"
+        String spec = "swagger-ui.enabled=true,mapping.path=/some/papping/path"
+        OpenApiViewConfig cfg = OpenApiViewConfig.fromSpecification(spec, Map.of(
+                Pair.of("group1", null), groupOpenApiInfo
+        ), new Properties(), null)
+
+        expect:
+        cfg.mappingPath == "/some/papping/path"
+        cfg.swaggerUIConfig.urls
+        cfg.swaggerUIConfig.urls.size() == 1
+        cfg.swaggerUIConfig.urls[0].url() == "/some/papping/path/swagger-group1.yml"
+        cfg.swaggerUIConfig.urls[0].name() == "Group1"
+    }
 
     void "test parse empty OpenApiView specification"() {
         given:

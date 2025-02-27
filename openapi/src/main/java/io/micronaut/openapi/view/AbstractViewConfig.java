@@ -32,6 +32,7 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static io.micronaut.openapi.view.OpenApiViewConfig.DEFAULT_SPEC_MAPPING_PATH;
 import static io.micronaut.openapi.visitor.ConfigUtils.getGroupProperties;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_CONTEXT_SERVER_PATH;
 import static io.micronaut.openapi.visitor.StringUtil.PLACEHOLDER_POSTFIX;
@@ -181,7 +182,7 @@ public abstract class AbstractViewConfig implements Toggleable {
      *
      * @return A View config.
      */
-    static <T extends AbstractViewConfig> T fromProperties(T cfg, Map<String, Object> defaultOptions, Map<String, String> properties, OpenApiViewConfig.RendererType rendererType, VisitorContext context) {
+    public static <T extends AbstractViewConfig> T fromProperties(T cfg, Map<String, Object> defaultOptions, Map<String, String> properties, OpenApiViewConfig.RendererType rendererType, VisitorContext context) {
 
         String copyResources = properties.get(cfg.prefix + "copy-resources");
         if (StringUtils.isNotEmpty(copyResources) && "false".equalsIgnoreCase(copyResources)) {
@@ -216,8 +217,20 @@ public abstract class AbstractViewConfig implements Toggleable {
                 }
 
                 cfg.getFinalUrlPrefix(OpenApiViewConfig.RendererType.SWAGGER_UI, context);
-                String groupUrl = cfg.urlPrefix + (!cfg.urlPrefix.endsWith(SLASH) ? "/swagger/" : "swagger/") + openApiInfo.getFilename();
-                urls.add(new OpenApiUrl(groupUrl, groupName));
+                var mappingPath = properties.getOrDefault("mapping.path", DEFAULT_SPEC_MAPPING_PATH);
+                var groupUrl = new StringBuilder(cfg.urlPrefix);
+                if (!cfg.urlPrefix.endsWith(SLASH)) {
+                    groupUrl.append(SLASH);
+                }
+                if (mappingPath.startsWith(SLASH)) {
+                    mappingPath = mappingPath.substring(1);
+                }
+                groupUrl.append(mappingPath);
+                if (!mappingPath.endsWith(SLASH)) {
+                    groupUrl.append(SLASH);
+                }
+                groupUrl.append(openApiInfo.getFilename());
+                urls.add(new OpenApiUrl(groupUrl.toString(), groupName));
             }
             cfg.urls = urls;
             if (primaryName != null) {
@@ -350,6 +363,9 @@ public abstract class AbstractViewConfig implements Toggleable {
      * @param url url
      * @param name name
      */
-    public record OpenApiUrl(String url, String name) {
+    public record OpenApiUrl(
+        String url,
+        String name
+    ) {
     }
 }
