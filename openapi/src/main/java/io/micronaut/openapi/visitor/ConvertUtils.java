@@ -588,7 +588,9 @@ public final class ConvertUtils {
         String name = r.getRequiredValue(PROP_NAME, String.class);
         var scopes = Arrays.asList(r.stringValues(PROP_SCOPES));
         var securityRequirement = new SecurityRequirement();
-        securityRequirement.addList(name, scopes);
+        if (StringUtils.isNotEmpty(name)) {
+            securityRequirement.addList(name, scopes);
+        }
         return securityRequirement;
     }
 

@@ -568,4 +568,59 @@ class MyBean {}
         openAPI.components.securitySchemes['MyScheme']
         openAPI.components.securitySchemes['MyScheme'].name == 'MyScheme'
     }
+
+    void "test process empty @SecurityRequirement"() {
+        given:
+        buildBeanDefinition('test.MyBean', '''
+
+package test;
+
+import io.micronaut.http.annotation.Consumes;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Put;
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeIn;
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.security.SecurityScheme;
+
+@OpenAPIDefinition(
+    security = {
+        @SecurityRequirement(name = "bearerAuth"),
+        @SecurityRequirement(name = "")
+    }
+)
+class Application {
+    
+}
+
+@Controller("/")
+class MyController {
+
+    @Put("/")
+    @Consumes("application/json")
+    public Response updatePet(Pet pet) {
+        return null;
+    }
+}
+
+class Pet {}
+
+class Response {}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+
+        OpenAPI openAPI = Utils.testReference
+
+        expect:
+        openAPI.security
+        openAPI.security.size() == 2
+        openAPI.security[0].bearerAuth.size() == 0
+        openAPI.security[1].isEmpty()
+    }
 }
