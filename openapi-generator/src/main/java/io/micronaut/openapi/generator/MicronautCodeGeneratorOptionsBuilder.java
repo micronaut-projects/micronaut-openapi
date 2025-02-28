@@ -209,7 +209,7 @@ public interface MicronautCodeGeneratorOptionsBuilder {
     MicronautCodeGeneratorOptionsBuilder withReactive(boolean reactive);
 
     /**
-     * If set to true, {@literal @}JsonInclude annotation will be with value ALWAYS for required properties in POJO's
+     * If set to true, {@literal @}JsonInclude annotation will be with value ALWAYS for required properties in POJO's.
      *
      * @param jsonIncludeAlwaysForRequiredFields set value ALWAYS to JsonInclude annotation for required properties or not
      *
