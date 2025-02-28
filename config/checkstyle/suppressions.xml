@@ -4,4 +4,5 @@
         "https://checkstyle.org/dtds/suppressions_1_2.dtd">
 <suppressions>
     <suppress files="io/micronaut/projectgen/core/template/.*" checks="[a-zA-Z0-9]*"/>
+    <suppress files="io/micronaut/projectgen/micronaut/template/.*" checks="[a-zA-Z0-9]*"/>
 </suppressions>
