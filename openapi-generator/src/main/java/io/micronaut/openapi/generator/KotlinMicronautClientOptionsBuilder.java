@@ -112,4 +112,13 @@ public interface KotlinMicronautClientOptionsBuilder extends GeneratorOptionsBui
      * @return this builder
      */
     KotlinMicronautClientOptionsBuilder withClientPath(boolean clientPath);
+
+    /**
+     * If set to true, generated code will be with suspend methods.
+     *
+     * @param coroutines do we need to generate suspend methods
+     *
+     * @return this builder
+     */
+    KotlinMicronautClientOptionsBuilder withCoroutines(boolean coroutines);
 }

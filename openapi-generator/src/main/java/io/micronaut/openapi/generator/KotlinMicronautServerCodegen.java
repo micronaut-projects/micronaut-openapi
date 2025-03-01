@@ -320,6 +320,7 @@ public class KotlinMicronautServerCodegen extends AbstractMicronautKotlinCodegen
         private boolean generatedAnnotation = true;
         private boolean aot;
         private boolean ksp;
+        private boolean coroutines;
 
         @Override
         public KotlinMicronautServerOptionsBuilder withControllerPackage(String controllerPackage) {
@@ -381,6 +382,12 @@ public class KotlinMicronautServerCodegen extends AbstractMicronautKotlinCodegen
             return this;
         }
 
+        @Override
+        public KotlinMicronautServerOptionsBuilder withCoroutines(boolean coroutines) {
+            this.coroutines = coroutines;
+            return this;
+        }
+
         ServerOptions build() {
             return new ServerOptions(
                 controllerPackage,
@@ -392,7 +399,8 @@ public class KotlinMicronautServerCodegen extends AbstractMicronautKotlinCodegen
                 fluxForArrays,
                 generatedAnnotation,
                 aot,
-                ksp
+                ksp,
+                coroutines
             );
         }
     }
@@ -407,7 +415,8 @@ public class KotlinMicronautServerCodegen extends AbstractMicronautKotlinCodegen
         boolean fluxForArrays,
         boolean generatedAnnotation,
         boolean aot,
-        boolean ksp
+        boolean ksp,
+        boolean coroutines
     ) {
     }
 }

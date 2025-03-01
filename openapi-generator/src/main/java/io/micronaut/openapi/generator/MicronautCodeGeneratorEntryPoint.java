@@ -378,6 +378,7 @@ public final class MicronautCodeGeneratorEntryPoint {
             kotlinServerCodegen.setGenerateControllerFromExamples(kotlinServerOptions.generateControllerFromExamples());
             kotlinServerCodegen.setGeneratedAnnotation(kotlinServerOptions.generatedAnnotation());
             kotlinServerCodegen.setKsp(kotlinServerOptions.ksp());
+            kotlinServerCodegen.setCoroutines(kotlinServerOptions.coroutines());
             kotlinServerCodegen.setUseAuth(kotlinServerOptions.useAuth());
             kotlinServerCodegen.setPlural(kotlinServerOptions.plural());
             kotlinServerCodegen.setFluxForArrays(kotlinServerOptions.fluxForArrays());
@@ -404,6 +405,7 @@ public final class MicronautCodeGeneratorEntryPoint {
             kotlinClientCodegen.setPlural(kotlinClientOptions.plural());
             kotlinClientCodegen.setFluxForArrays(kotlinClientOptions.fluxForArrays());
             kotlinClientCodegen.setKsp(kotlinClientOptions.ksp());
+            kotlinClientCodegen.setCoroutines(kotlinClientOptions.coroutines());
         }
     }
 

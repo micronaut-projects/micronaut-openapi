@@ -139,6 +139,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
     public static final String OPT_DATE_FORMAT = "dateFormat";
     public static final String OPT_DATE_TIME_FORMAT = "dateTimeFormat";
     public static final String OPT_REACTIVE = "reactive";
+    public static final String OPT_COROUTINES = "coroutines";
     public static final String OPT_GENERATE_HTTP_RESPONSE_ALWAYS = "generateHttpResponseAlways";
     public static final String OPT_GENERATE_CONTROLLER_AS_ABSTRACT = "generateControllerAsAbstract";
     public static final String OPT_GENERATE_HTTP_RESPONSE_WHERE_REQUIRED = "generateHttpResponseWhereRequired";
@@ -173,6 +174,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
     protected boolean generatedAnnotation = true;
     protected String testTool;
     protected boolean reactive;
+    protected boolean coroutines;
     protected boolean generateHttpResponseAlways;
     protected boolean generateHttpResponseWhereRequired = true;
     protected boolean generateControllerAsAbstract;
@@ -315,6 +317,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         cliOptions.add(CliOption.newBoolean(USE_BEANVALIDATION, "Use BeanValidation API annotations", useBeanValidation));
         cliOptions.add(CliOption.newBoolean(OPT_VISITABLE, "Generate visitor for subtypes with a discriminator", visitable));
         cliOptions.add(CliOption.newBoolean(OPT_REACTIVE, "Make the responses use Reactor Mono as wrapper", reactive));
+        cliOptions.add(CliOption.newBoolean(OPT_COROUTINES, "Make functions suspend", coroutines));
         cliOptions.add(CliOption.newBoolean(OPT_IMPLICIT_HEADERS, "Skip header parameters in the generated API methods using @ApiImplicitParams annotation.", implicitHeaders));
         cliOptions.add(CliOption.newString(OPT_IMPLICIT_HEADERS_REGEX, "Skip header parameters that matches given regex in the generated API methods using @ApiImplicitParams annotation. Note: this parameter is ignored when implicitHeaders=true"));
         cliOptions.add(CliOption.newBoolean(OPT_GENERATE_HTTP_RESPONSE_ALWAYS, "Always wrap the operations response in HttpResponse object", generateHttpResponseAlways));
@@ -440,6 +443,10 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
 
     public void setReactive(boolean reactive) {
         this.reactive = reactive;
+    }
+
+    public void setCoroutines(boolean coroutines) {
+        this.coroutines = coroutines;
     }
 
     public void setImplicitHeaders(boolean implicitHeaders) {
@@ -584,10 +591,21 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         }
         writePropertyBack(OPT_VISITABLE, visitable);
 
-        if (additionalProperties.containsKey(OPT_REACTIVE)) {
-            reactive = convertPropertyToBoolean(OPT_REACTIVE);
+        if (additionalProperties.containsKey(OPT_COROUTINES)) {
+            coroutines = convertPropertyToBoolean(OPT_COROUTINES);
         }
-        writePropertyBack(OPT_REACTIVE, reactive);
+        writePropertyBack(OPT_COROUTINES, coroutines);
+
+        // we can't use croutines with reactive together
+        if (coroutines) {
+            reactive = false;
+            writePropertyBack(OPT_REACTIVE, false);
+        } else {
+            if (additionalProperties.containsKey(OPT_REACTIVE)) {
+                reactive = convertPropertyToBoolean(OPT_REACTIVE);
+            }
+            writePropertyBack(OPT_REACTIVE, reactive);
+        }
 
         if (additionalProperties.containsKey(OPT_DATE_FORMAT)) {
             dateFormat = (String) additionalProperties.get(OPT_DATE_FORMAT);
