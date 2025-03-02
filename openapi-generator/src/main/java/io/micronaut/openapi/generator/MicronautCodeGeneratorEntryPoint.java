@@ -205,6 +205,7 @@ public final class MicronautCodeGeneratorEntryPoint {
             javaCodeGen.setUseJakartaEe(options.useJakartaEe);
             javaCodeGen.setUseOneOfInterfaces(options.useOneOfInterfaces);
             javaCodeGen.setReactive(options.reactive);
+            javaCodeGen.setUseSealed(options.useSealed);
             javaCodeGen.setJsonIncludeAlwaysForRequiredFields(options.jsonIncludeAlwaysForRequiredFields);
             javaCodeGen.setRequiredPropertiesInConstructor(options.requiredPropertiesInConstructor);
             javaCodeGen.setGenerateHttpResponseAlways(options.generateHttpResponseAlways);
@@ -587,6 +588,7 @@ public final class MicronautCodeGeneratorEntryPoint {
 
             private boolean optional;
             private boolean reactive = true;
+            private boolean useSealed;
             private boolean jsonIncludeAlwaysForRequiredFields;
             private boolean requiredPropertiesInConstructor = true;
             private boolean useOneOfInterfaces = true;
@@ -748,6 +750,12 @@ public final class MicronautCodeGeneratorEntryPoint {
             @Override
             public MicronautCodeGeneratorOptionsBuilder withReactive(boolean reactive) {
                 this.reactive = reactive;
+                return this;
+            }
+
+            @Override
+            public MicronautCodeGeneratorOptionsBuilder withUseSealed(boolean useSealed) {
+                this.useSealed = useSealed;
                 return this;
             }
 
@@ -945,6 +953,7 @@ public final class MicronautCodeGeneratorEntryPoint {
                     useEnumCaseInsensitive,
                     optional,
                     reactive,
+                    useSealed,
                     jsonIncludeAlwaysForRequiredFields,
                     requiredPropertiesInConstructor,
                     useOneOfInterfaces,
@@ -1021,6 +1030,7 @@ public final class MicronautCodeGeneratorEntryPoint {
         boolean useEnumCaseInsensitive,
         boolean optional,
         boolean reactive,
+        boolean useSealed,
         boolean jsonIncludeAlwaysForRequiredFields,
         boolean requiredPropertiesInConstructor,
         boolean useOneOfInterfaces,

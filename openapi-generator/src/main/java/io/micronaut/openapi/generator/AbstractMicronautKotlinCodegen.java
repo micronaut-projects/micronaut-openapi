@@ -807,39 +807,43 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
             return null;
         }
 
-        for (var entry : discriminator.getMapping().entrySet()) {
-            String name;
-            if (entry.getValue().indexOf('/') < 0) {
-                continue;
-            }
-            name = ModelUtils.getSimpleRef(entry.getValue());
-            var referencedSchema = ModelUtils.getSchema(openAPI, name);
-            if (referencedSchema == null) {
-                once(log).error("Failed to lookup the schema '{}' when processing the discriminator mapping of oneOf/anyOf. Please check to ensure it's defined properly.", name);
-                continue;
-            }
-            if (referencedSchema.getProperties() == null || referencedSchema.getProperties().isEmpty()) {
-                continue;
-            }
-            boolean isDiscriminatorPropTypeFound = false;
-            var props = (Map<String, Schema>) referencedSchema.getProperties();
-            for (var propEntry : props.entrySet()) {
-                if (!propEntry.getKey().equals(discriminator.getPropertyName())) {
+        if (discriminator.getMapping() != null) {
+            for (var entry : discriminator.getMapping().entrySet()) {
+                String name;
+                if (entry.getValue().indexOf('/') < 0) {
                     continue;
                 }
-                discriminator.setPropertyType(getTypeDeclaration(propEntry.getValue()));
-                isDiscriminatorPropTypeFound = true;
-                break;
-            }
-            if (isDiscriminatorPropTypeFound) {
-                break;
+                name = ModelUtils.getSimpleRef(entry.getValue());
+                var referencedSchema = ModelUtils.getSchema(openAPI, name);
+                if (referencedSchema == null) {
+                    once(log).error("Failed to lookup the schema '{}' when processing the discriminator mapping of oneOf/anyOf. Please check to ensure it's defined properly.", name);
+                    continue;
+                }
+                if (referencedSchema.getProperties() == null || referencedSchema.getProperties().isEmpty()) {
+                    continue;
+                }
+                boolean isDiscriminatorPropTypeFound = false;
+                var props = (Map<String, Schema>) referencedSchema.getProperties();
+                for (var propEntry : props.entrySet()) {
+                    if (!propEntry.getKey().equals(discriminator.getPropertyName())) {
+                        continue;
+                    }
+                    discriminator.setPropertyType(getTypeDeclaration(propEntry.getValue()));
+                    isDiscriminatorPropTypeFound = true;
+                    break;
+                }
+                if (isDiscriminatorPropTypeFound) {
+                    break;
+                }
             }
         }
         var type = discriminator.getPropertyType();
-        if (!type.endsWith("?")) {
-            type = type + "?";
+        if (type != null) {
+            if (!type.endsWith("?")) {
+                type = type + "?";
+            }
+            discriminator.setPropertyType(type);
         }
-        discriminator.setPropertyType(type);
         return discriminator;
     }
 
@@ -1506,11 +1510,11 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
 
         if (rqBodySchema != null) {
             rqBodySchema = unaliasSchema(rqBodySchema);
-
+            var isRequiredBody = body.getRequired() != null && body.getRequired();
             if (getUseInlineModelResolver()) {
-                codegenProperty = fromProperty(bodyParameterName, getReferencedSchemaWhenNotEnum(rqBodySchema), false);
+                codegenProperty = fromProperty(bodyParameterName, getReferencedSchemaWhenNotEnum(rqBodySchema), isRequiredBody);
             } else {
-                codegenProperty = fromProperty(bodyParameterName, rqBodySchema, false);
+                codegenProperty = fromProperty(bodyParameterName, rqBodySchema, isRequiredBody);
             }
             rqBody.setSchema(codegenProperty);
         }
@@ -1525,6 +1529,9 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         }
         if (!rqBody.required) {
             rqBody.vendorExtensions.put("defaultValueInit", "null");
+        } else {
+            codegenProperty.isNullable = false;
+            rqBody.isNullable = false;
         }
 
         // set containerType
@@ -2056,6 +2063,25 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
             var withInheritance = (Boolean) model.vendorExtensions.get("withInheritance");
 
             if (withInheritance) {
+                for (var reqVar : requiredVarsWithoutDiscriminator) {
+                    var parent = model.parentModel;
+                    var isParentVar = (boolean) reqVar.vendorExtensions.getOrDefault("isParentVar", false);
+                    if (isParentVar && parent != null) {
+                        for (var pVar : (List<CodegenProperty>) parent.vendorExtensions.get("requiredVarsWithoutDiscriminator")) {
+                            if (pVar.name.equals(reqVar.name) && pVar.isNullable && !reqVar.isNullable) {
+                                reqVar.isNullable = true;
+                                var type = reqVar.vendorExtensions.get("typeWithGenericAnnotations").toString();
+                                if (!type.endsWith("?")) {
+                                    reqVar.vendorExtensions.put("typeWithGenericAnnotations", type + "?");
+                                }
+                                var type1 = reqVar.vendorExtensions.get("typeWithEnumWithGenericAnnotations").toString();
+                                if (!type1.endsWith("?")) {
+                                    reqVar.vendorExtensions.put("typeWithEnumWithGenericAnnotations", type1 + "?");
+                                }
+                            }
+                        }
+                    }
+                }
                 for (var optionalVar : optionalVars) {
                     var found = false;
                     for (var reqVar : requiredVarsWithoutDiscriminator) {
@@ -2177,6 +2203,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
                 if (!oneOfInterfaceName.equalsIgnoreCase(implInterface.toString())) {
                     continue;
                 }
+                var discriminatorPropFound = false;
                 for (var prop : m.allVars) {
                     if (prop.name.equals(discriminator.getPropertyName())) {
                         prop.isDiscriminator = true;
@@ -2202,9 +2229,36 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
                             prop.isReadOnly = false;
                             prop.vendorExtensions.put("typeWithEnumWithGenericAnnotations", discriminator.getPropertyType());
                             prop.vendorExtensions.put("overridden", true);
+                            discriminatorPropFound = true;
                             break;
                         }
                     }
+                }
+                if (!discriminatorPropFound) {
+                    var discriminatorProp = new CodegenProperty();
+                    discriminatorProp.name = discriminator.getPropertyName();
+                    discriminatorProp.baseName = discriminator.getPropertyName();
+                    discriminatorProp.dataType = discriminator.getPropertyType();
+                    discriminatorProp.vendorExtensions.put("typeWithEnumWithGenericAnnotations", discriminator.getPropertyType());
+                    discriminatorProp.isDiscriminator = true;
+                    discriminatorProp.isOverridden = true;
+                    discriminatorProp.isNullable = true;
+                    discriminatorProp.isOptional = false;
+                    discriminatorProp.required = true;
+                    discriminatorProp.isReadOnly = false;
+                    discriminatorProp.vendorExtensions.put("overridden", true);
+                    var realName = discriminatorProp.name;
+                    realName = realName.replaceFirst("_", "");
+                    discriminatorProp.nameInCamelCase = camelize(realName);
+                    discriminatorProp.nameInSnakeCase = CaseFormat.UPPER_CAMEL.to(CaseFormat.UPPER_UNDERSCORE, discriminatorProp.nameInCamelCase);
+                    // fix for getters and setters for escaped vars as reserved words and started with '_', like this: '_for'
+                    discriminatorProp.getter = "get" + getterAndSetterCapitalize(discriminatorProp.name);
+                    discriminatorProp.setter = "set" + getterAndSetterCapitalize(discriminatorProp.name);
+                    discriminatorProp.vendorExtensions.put("realName", realName);
+                    m.vars.add(discriminatorProp);
+                    m.allVars.add(discriminatorProp);
+                    m.vendorExtensions.put("withMultipleVars", true);
+                    ((ArrayList<CodegenProperty>) m.vendorExtensions.get("requiredVarsWithoutDiscriminator")).add(discriminatorProp);
                 }
             }
         }
@@ -2263,7 +2317,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
 
         for (var variable : model.vars) {
             if (notContainsProp(variable, allVars)) {
-                allVars.add(variable);
+                allVars.add(variable.clone());
             }
         }
 
@@ -2287,7 +2341,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
                         variable.isDiscriminator = true;
                         variable.isOverridden = true;
                     }
-                    model.vars.add(variable);
+                    model.vars.add(variable.clone());
                 }
             }
             for (var variable : parent.requiredVars) {

@@ -137,6 +137,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
     public static final String OPT_DATE_TIME_FORMAT = "dateTimeFormat";
     public static final String OPT_USE_ENUM_CASE_INSENSITIVE = "useEnumCaseInsensitive";
     public static final String OPT_REACTIVE = "reactive";
+    public static final String OPT_USE_SEALED = "useSealed";
     public static final String OPT_GENERATE_HTTP_RESPONSE_ALWAYS = "generateHttpResponseAlways";
     public static final String OPT_GENERATE_CONTROLLER_AS_ABSTRACT = "generateControllerAsAbstract";
     public static final String OPT_GENERATE_HTTP_RESPONSE_WHERE_REQUIRED = "generateHttpResponseWhereRequired";
@@ -168,6 +169,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
     protected String testTool;
     protected boolean requiredPropertiesInConstructor = true;
     protected boolean reactive;
+    protected boolean useSealed;
     protected boolean useEnumCaseInsensitive;
     protected boolean generateHttpResponseAlways;
     protected boolean generateHttpResponseWhereRequired = true;
@@ -273,6 +275,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
         cliOptions.add(CliOption.newBoolean(OPT_VISITABLE, "Generate visitor for subtypes with a discriminator", visitable));
         cliOptions.add(CliOption.newBoolean(OPT_REQUIRED_PROPERTIES_IN_CONSTRUCTOR, "Allow only to create models with all the required properties provided in constructor", requiredPropertiesInConstructor));
         cliOptions.add(CliOption.newBoolean(OPT_REACTIVE, "Make the responses use Reactor Mono as wrapper", reactive));
+        cliOptions.add(CliOption.newBoolean(OPT_USE_SEALED, "Whether to generate sealed model interfaces and classes", useSealed));
         cliOptions.add(CliOption.newBoolean(OPT_GENERATE_HTTP_RESPONSE_ALWAYS, "Always wrap the operations response in HttpResponse object", generateHttpResponseAlways));
         cliOptions.add(CliOption.newBoolean(OPT_GENERATE_CONTROLLER_AS_ABSTRACT, "If true, then controller interface will be without @Controller annotation", generateControllerAsAbstract));
         cliOptions.add(CliOption.newBoolean(OPT_GENERATE_HTTP_RESPONSE_WHERE_REQUIRED, "Wrap the operations response in HttpResponse object where non-200 HTTP status codes or additional headers are defined", generateHttpResponseWhereRequired));
@@ -358,6 +361,10 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
 
     public void setReactive(boolean reactive) {
         this.reactive = reactive;
+    }
+
+    public void setUseSealed(boolean useSealed) {
+        this.useSealed = useSealed;
     }
 
     public void setTestTool(String testTool) {
@@ -531,6 +538,11 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
             reactive = convertPropertyToBoolean(OPT_REACTIVE);
         }
         writePropertyBack(OPT_REACTIVE, reactive);
+
+        if (additionalProperties.containsKey(OPT_USE_SEALED)) {
+            useSealed = convertPropertyToBoolean(OPT_USE_SEALED);
+        }
+        writePropertyBack(OPT_USE_SEALED, useSealed);
 
         if (additionalProperties.containsKey(OPT_DATE_FORMAT)) {
             dateFormat = (String) additionalProperties.get(OPT_DATE_FORMAT);
@@ -763,11 +775,11 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
 
         if (rqBodySchema != null) {
             rqBodySchema = unaliasSchema(rqBodySchema);
-
+            var isRequiredBody = body.getRequired() != null && body.getRequired();
             if (getUseInlineModelResolver()) {
-                codegenProperty = fromProperty(bodyParameterName, getReferencedSchemaWhenNotEnum(rqBodySchema), false);
+                codegenProperty = fromProperty(bodyParameterName, getReferencedSchemaWhenNotEnum(rqBodySchema), isRequiredBody);
             } else {
-                codegenProperty = fromProperty(bodyParameterName, rqBodySchema, false);
+                codegenProperty = fromProperty(bodyParameterName, rqBodySchema, isRequiredBody);
             }
             rqBody.setSchema(codegenProperty);
         }
@@ -1207,32 +1219,34 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
             return null;
         }
 
-        for (var entry : discriminator.getMapping().entrySet()) {
-            String name;
-            if (entry.getValue().indexOf('/') < 0) {
-                continue;
-            }
-            name = ModelUtils.getSimpleRef(entry.getValue());
-            var referencedSchema = ModelUtils.getSchema(openAPI, name);
-            if (referencedSchema == null) {
-                once(log).error("Failed to lookup the schema '{}' when processing the discriminator mapping of oneOf/anyOf. Please check to ensure it's defined properly.", name);
-                continue;
-            }
-            if (referencedSchema.getProperties() == null || referencedSchema.getProperties().isEmpty()) {
-                continue;
-            }
-            boolean isDiscriminatorPropTypeFound = false;
-            var props = (Map<String, Schema>) referencedSchema.getProperties();
-            for (var propEntry : props.entrySet()) {
-                if (!propEntry.getKey().equals(discriminator.getPropertyName())) {
+        if (discriminator.getMapping() != null) {
+            for (var entry : discriminator.getMapping().entrySet()) {
+                String name;
+                if (entry.getValue().indexOf('/') < 0) {
                     continue;
                 }
-                discriminator.setPropertyType(getTypeDeclaration(propEntry.getValue()));
-                isDiscriminatorPropTypeFound = true;
-                break;
-            }
-            if (isDiscriminatorPropTypeFound) {
-                break;
+                name = ModelUtils.getSimpleRef(entry.getValue());
+                var referencedSchema = ModelUtils.getSchema(openAPI, name);
+                if (referencedSchema == null) {
+                    once(log).error("Failed to lookup the schema '{}' when processing the discriminator mapping of oneOf/anyOf. Please check to ensure it's defined properly.", name);
+                    continue;
+                }
+                if (referencedSchema.getProperties() == null || referencedSchema.getProperties().isEmpty()) {
+                    continue;
+                }
+                boolean isDiscriminatorPropTypeFound = false;
+                var props = (Map<String, Schema>) referencedSchema.getProperties();
+                for (var propEntry : props.entrySet()) {
+                    if (!propEntry.getKey().equals(discriminator.getPropertyName())) {
+                        continue;
+                    }
+                    discriminator.setPropertyType(getTypeDeclaration(propEntry.getValue()));
+                    isDiscriminatorPropTypeFound = true;
+                    break;
+                }
+                if (isDiscriminatorPropTypeFound) {
+                    break;
+                }
             }
         }
         return discriminator;
@@ -2139,18 +2153,55 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
                 }
                 for (var prop : m.allVars) {
                     if (prop.name.equals(discriminator.getPropertyName())) {
-                        prop.isDiscriminator = true;
-                        prop.isOverridden = true;
-                        prop.isNullable = false;
-                        prop.isOptional = false;
-                        prop.required = true;
-                        prop.isReadOnly = false;
-                        prop.vendorExtensions.put("overridden", true);
+                        processDiscriminatorProperty(prop);
                         break;
                     }
                 }
+                var discriminatorPropFound = false;
+                for (var prop : m.vars) {
+                    if (prop.name.equals(discriminator.getPropertyName())) {
+                        processDiscriminatorProperty(prop);
+                        discriminatorPropFound = true;
+                        break;
+                    }
+                }
+                if (!discriminatorPropFound) {
+                    var discriminatorProp = new CodegenProperty();
+                    discriminatorProp.name = discriminator.getPropertyName();
+                    discriminatorProp.baseName = discriminator.getPropertyName();
+                    discriminatorProp.dataType = discriminator.getPropertyType();
+                    discriminatorProp.vendorExtensions.put("typeWithEnumWithGenericAnnotations", discriminator.getPropertyType());
+                    discriminatorProp.isDiscriminator = true;
+                    discriminatorProp.isOverridden = true;
+                    discriminatorProp.isNullable = true;
+                    discriminatorProp.isOptional = false;
+                    discriminatorProp.required = true;
+                    discriminatorProp.isReadOnly = false;
+                    discriminatorProp.vendorExtensions.put("overridden", true);
+                    var realName = discriminatorProp.name;
+                    realName = realName.replaceFirst("_", "");
+                    discriminatorProp.nameInCamelCase = camelize(realName);
+                    discriminatorProp.nameInSnakeCase = CaseFormat.UPPER_CAMEL.to(CaseFormat.UPPER_UNDERSCORE, discriminatorProp.nameInCamelCase);
+                    // fix for getters and setters for escaped vars as reserved words and started with '_', like this: '_for'
+                    discriminatorProp.getter = "get" + getterAndSetterCapitalize(discriminatorProp.name);
+                    discriminatorProp.setter = "set" + getterAndSetterCapitalize(discriminatorProp.name);
+                    discriminatorProp.vendorExtensions.put("realName", realName);
+                    m.vars.add(discriminatorProp);
+                    m.allVars.add(discriminatorProp);
+                    m.vendorExtensions.put("withMultipleVars", true);
+                }
             }
         }
+    }
+
+    private void processDiscriminatorProperty(CodegenProperty prop) {
+        prop.isDiscriminator = true;
+        prop.isOverridden = true;
+        prop.isNullable = false;
+        prop.isOptional = false;
+        prop.required = true;
+        prop.isReadOnly = false;
+        prop.vendorExtensions.put("overridden", true);
     }
 
     private void processProperty(CodegenProperty property, boolean isServer, CodegenModel model, Map<String, ModelsMap> models) {
@@ -2196,7 +2247,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
 
         for (var variable : model.vars) {
             if (notContainsProp(variable, allVars)) {
-                allVars.add(variable);
+                allVars.add(variable.clone());
             }
         }
 
@@ -2209,7 +2260,13 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
 
         requiredParentVarsWithoutDiscriminator(model, requiredParentVarsWithoutDiscriminator);
         if (hasParent) {
-            model.parentVars = parent.allVars;
+            var parentVars = new ArrayList<CodegenProperty>();
+            for (var v : parent.allVars) {
+                if (notContainsProp(v, model.vars)) {
+                    parentVars.add(v);
+                }
+            }
+            model.parentVars = parentVars;
             processParentModel(parent, requiredVarsWithoutDiscriminator, requiredParentVarsWithoutDiscriminator, allVars);
         }
 
@@ -2220,7 +2277,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
                         variable.isDiscriminator = true;
                         variable.isOverridden = true;
                     }
-                    model.vars.add(variable);
+                    model.vars.add(variable.clone());
                 }
             }
             for (var variable : parent.requiredVars) {
