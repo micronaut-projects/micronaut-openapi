@@ -617,15 +617,27 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
         switch (dateLibrary) {
             case OPT_DATE_LIBRARY_OFFSET_DATETIME -> {
                 typeMapping.put("DateTime", "OffsetDateTime");
+                typeMapping.put("date-time", "OffsetDateTime");
                 typeMapping.put("date", "LocalDate");
+                importMapping.put("DateTime", "java.time.OffsetDateTime");
+                importMapping.put("date-time", "java.time.OffsetDateTime");
+                importMapping.put("date", "java.time.LocalDate");
             }
             case OPT_DATE_LIBRARY_ZONED_DATETIME -> {
                 typeMapping.put("DateTime", "ZonedDateTime");
+                typeMapping.put("date-time", "ZonedDateTime");
                 typeMapping.put("date", "LocalDate");
+                importMapping.put("DateTime", "java.time.ZonedDateTime");
+                importMapping.put("date-time", "java.time.ZonedDateTime");
+                importMapping.put("date", "java.time.LocalDate");
             }
             case OPT_DATE_LIBRARY_LOCAL_DATETIME -> {
                 typeMapping.put("DateTime", "LocalDateTime");
+                typeMapping.put("date-time", "LocalDateTime");
                 typeMapping.put("date", "LocalDate");
+                importMapping.put("DateTime", "java.time.LocalDateTime");
+                importMapping.put("date-time", "java.time.LocalDateTime");
+                importMapping.put("date", "java.time.LocalDate");
             }
             default -> {
             }
