@@ -4,15 +4,20 @@ import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.servers.Server;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.openapitools.codegen.CliOption;
 import org.openapitools.codegen.CodegenConstants;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.groupingBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
 
@@ -1553,5 +1558,56 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                     @Get("/example-route")
                     Mono<@NotNull Set<@NotNull String>> exampleRouteGet();
                 """);
+    }
+
+    static Stream<Arguments> sealedScenarios() {
+        return Stream.of(
+            arguments("oneOf_polymorphismAndInheritance.yml", Map.of(
+                "Foo.java", "public final class Foo extends Entity implements FooRefOrValue {",
+                "FooRef.java", "public final class FooRef extends EntityRef implements FooRefOrValue {",
+                "FooRefOrValue.java", "public sealed interface FooRefOrValue permits Foo, FooRef {",
+                "Entity.java", "public sealed class Entity permits Bar, BarCreate, Foo, Pasta, Pizza {")),
+            arguments("oneOf_additionalProperties.yml", Map.of(
+                "SchemaA.java", "public final class SchemaA implements PostRequest {",
+                "PostRequest.java", "public sealed interface PostRequest permits SchemaA {")),
+            arguments("oneOf_array.yml", Map.of(
+                "MyExampleGet200Response.java", "public interface MyExampleGet200Response")),
+            arguments("oneOf_duplicateArray.yml", Map.of(
+                "Example.java", "public interface Example {")),
+            arguments("oneOf_nonPrimitive.yml", Map.of(
+                "Example.java", "public interface Example {")),
+            arguments("oneOf_primitive.yml", Map.of(
+                "Child.java", "public final class Child implements Example {",
+                "Example.java", "public sealed interface Example permits Child {")),
+            arguments("oneOf_primitiveAndArray.yml", Map.of(
+                "Example.java", "public interface Example {")),
+            arguments("oneOf_reuseRef.yml", Map.of(
+                "Fruit.java", "public sealed interface Fruit permits Apple, Banana {",
+                "Banana.java", "public final class Banana implements Fruit {",
+                "Apple.java", "public final class Apple implements Fruit {")),
+            arguments("oneOf_twoPrimitives.yml", Map.of(
+                "MyExamplePostRequest.java", "public interface MyExamplePostRequest {")),
+            arguments("oneOf_arrayMapImport.yml", Map.of(
+                "Fruit.java", "public interface Fruit {",
+                "Grape.java", "public final class Grape {",
+                "Apple.java", "public final class Apple {")),
+            arguments("oneOf_discriminator.yml", Map.of(
+                "FruitAllOfDisc.java", "public sealed interface FruitAllOfDisc permits AppleAllOfDisc, BananaAllOfDisc {",
+                "FruitReqDisc.java", "public sealed interface FruitReqDisc permits AppleReqDisc, BananaReqDisc {"))
+        );
+    }
+
+    @MethodSource("sealedScenarios")
+    @ParameterizedTest
+    public void sealedScenarios(String apiFile, Map<String, String> definitions) {
+
+        var codegen = new JavaMicronautClientCodegen();
+        codegen.setUseSealed(true);
+        codegen.setUseOneOfInterfaces(true);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/sealed/" + apiFile, CodegenConstants.APIS, CodegenConstants.MODELS);
+        String path = outputPath + "src/main/java/org/openapitools/model/";
+
+        definitions.forEach((file, check) ->
+            assertFileContains(path + file, check));
     }
 }

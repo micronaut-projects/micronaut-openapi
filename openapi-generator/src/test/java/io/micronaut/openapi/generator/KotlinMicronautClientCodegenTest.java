@@ -4,15 +4,20 @@ import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.servers.Server;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.openapitools.codegen.CliOption;
 import org.openapitools.codegen.CodegenConstants;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.groupingBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
 
@@ -1547,5 +1552,224 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                     @Get("/example-route")
                     fun exampleRouteGet(): Mono<Set<String>>
                 """);
+    }
+
+    static Stream<Arguments> sealedScenarios() {
+        return Stream.of(
+            arguments("oneOf_polymorphismAndInheritance.yml", Map.of(
+                "Bar.kt", """
+                    class Bar(
+
+                        @Nullable
+                        @JsonProperty(JSON_PROPERTY_ID)
+                        id: String? = null,
+
+                        @field:Nullable
+                        @field:JsonProperty(JSON_PROPERTY_BAR_PROP_A)
+                        @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                        var barPropA: String? = null,
+
+                        @field:Nullable
+                        @field:JsonProperty(JSON_PROPERTY_FOO_PROP_B)
+                        @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                        var fooPropB: String? = null,
+
+                        @field:Nullable
+                        @field:Valid
+                        @field:JsonProperty(JSON_PROPERTY_FOO)
+                        @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                        var foo: FooRefOrValue? = null,
+
+                        /**
+                         * When sub-classing, this defines the sub-class Extensible name
+                         */
+                        @Nullable
+                        @JsonProperty(JSON_PROPERTY_AT_TYPE)
+                        atType: String? = null,
+
+                        /**
+                         * Hyperlink reference
+                         */
+                        @Nullable
+                        @JsonProperty(JSON_PROPERTY_HREF)
+                        @JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                        href: String? = null,
+
+                        /**
+                         * A URI to a JSON-Schema file that defines additional attributes and relationships
+                         */
+                        @Nullable
+                        @JsonProperty(JSON_PROPERTY_AT_SCHEMA_LOCATION)
+                        @JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                        atSchemaLocation: String? = null,
+
+                        /**
+                         * When sub-classing, this defines the super-class
+                         */
+                        @Nullable
+                        @JsonProperty(JSON_PROPERTY_AT_BASE_TYPE)
+                        @JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                        atBaseType: String? = null,
+                    ) : Entity(atType, href, id, atSchemaLocation, atBaseType), BarRefOrValue {
+                    """,
+                "Banana.kt", """
+                    data class Banana(
+
+                        @field:NotNull
+                        @field:JsonProperty(JSON_PROPERTY_LENGTH)
+                        var length: Int,
+
+                        @field:Nullable
+                        @field:JsonProperty(JSON_PROPERTY_FRUIT_TYPE)
+                        override var fruitType: FruitType? = null,
+                    ) : Fruit {
+                    """,
+                "Entity.kt", """
+                    open class Entity(
+
+                        /**
+                         * When sub-classing, this defines the sub-class Extensible name
+                         */
+                        @field:NotNull
+                        @field:JsonProperty(JSON_PROPERTY_AT_TYPE)
+                        open var atType: String? = null,
+
+                        /**
+                         * Hyperlink reference
+                         */
+                        @field:Nullable
+                        @field:JsonProperty(JSON_PROPERTY_HREF)
+                        @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                        open var href: String? = null,
+
+                        /**
+                         * unique identifier
+                         */
+                        @field:Nullable
+                        @field:JsonProperty(JSON_PROPERTY_ID)
+                        @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                        open var id: String? = null,
+
+                        /**
+                         * A URI to a JSON-Schema file that defines additional attributes and relationships
+                         */
+                        @field:Nullable
+                        @field:JsonProperty(JSON_PROPERTY_AT_SCHEMA_LOCATION)
+                        @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                        open var atSchemaLocation: String? = null,
+
+                        /**
+                         * When sub-classing, this defines the super-class
+                         */
+                        @field:Nullable
+                        @field:JsonProperty(JSON_PROPERTY_AT_BASE_TYPE)
+                        @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                        open var atBaseType: String? = null,
+                    ) {
+                    """)),
+            arguments("oneOf_additionalProperties.yml", Map.of(
+                "SchemaA.kt", """
+                    data class SchemaA(
+
+                        @field:Nullable
+                        @field:JsonProperty(JSON_PROPERTY_PROP_A)
+                        @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                        var propA: String? = null,
+                    ) : PostRequest {
+                    """,
+                "PostRequest.kt", "interface PostRequest")),
+            arguments("oneOf_array.yml", Map.of(
+                "MyExampleGet200Response.kt", "interface MyExampleGet200Response")),
+            arguments("oneOf_duplicateArray.yml", Map.of(
+                "Example.kt", "interface Example")),
+            arguments("oneOf_nonPrimitive.yml", Map.of(
+                "Example.kt", "interface Example")),
+            arguments("oneOf_primitive.yml", Map.of(
+                "Child.kt", """
+                    data class Child(
+
+                        @field:Nullable
+                        @field:JsonProperty(JSON_PROPERTY_NAME)
+                        @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                        var name: String? = null,
+                    ) : Example {
+                    """,
+                "Example.kt", "interface Example")),
+            arguments("oneOf_primitiveAndArray.yml", Map.of(
+                "Example.kt", "interface Example")),
+            arguments("oneOf_reuseRef.yml", Map.of(
+                "Fruit.kt", "interface Fruit {",
+                "Banana.kt", """
+                    data class Banana(
+
+                        @field:Nullable
+                        @field:JsonProperty(JSON_PROPERTY_LENGTH_CM)
+                        @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                        var lengthCm: BigDecimal? = null,
+
+                        @Nullable
+                        @JsonProperty(JSON_PROPERTY_FRUIT_TYPE)
+                        override var fruitType: String? = null,
+                    ) : Fruit {
+                    """,
+                "Apple.kt", """
+                    data class Apple(
+
+                        @field:Nullable
+                        @field:Pattern(regexp = "^[a-zA-Z\\\\s]*$")
+                        @field:JsonProperty(JSON_PROPERTY_CULTIVAR)
+                        @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                        var cultivar: String? = null,
+
+                        @field:Nullable
+                        @field:Pattern(regexp = "/^[A-Z\\\\s]*$/i")
+                        @field:JsonProperty(JSON_PROPERTY_ORIGIN)
+                        @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                        var origin: String? = null,
+
+                        @Nullable
+                        @JsonProperty(JSON_PROPERTY_FRUIT_TYPE)
+                        override var fruitType: String? = null,
+                    ) : Fruit {
+                    """)),
+            arguments("oneOf_twoPrimitives.yml", Map.of(
+                "MyExamplePostRequest.kt", "interface MyExamplePostRequest")),
+            arguments("oneOf_arrayMapImport.yml", Map.of(
+                "Fruit.kt", "interface Fruit",
+                "Grape.kt", """
+                    data class Grape(
+
+                        @field:Nullable
+                        @field:JsonProperty(JSON_PROPERTY_COLOR)
+                        @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                        var color: String? = null,
+                    ) {
+                    """,
+                "Apple.kt", """
+                    data class Apple(
+
+                        @field:Nullable
+                        @field:JsonProperty(JSON_PROPERTY_KIND)
+                        @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                        var kind: String? = null,
+                    ) {
+                    """)),
+            arguments("oneOf_discriminator.yml", Map.of(
+                "FruitAllOfDisc.kt", "interface FruitAllOfDisc {",
+                "FruitReqDisc.kt", "interface FruitReqDisc {"))
+        );
+    }
+
+    @MethodSource("sealedScenarios")
+    @ParameterizedTest
+    public void sealedScenarios(String apiFile, Map<String, String> definitions) {
+
+        var codegen = new KotlinMicronautClientCodegen();
+        codegen.setUseOneOfInterfaces(true);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/sealed/" + apiFile, CodegenConstants.APIS, CodegenConstants.MODELS);
+        String path = outputPath + "src/main/kotlin/org/openapitools/model/";
+
+        definitions.forEach((file, check) ->
+            assertFileContains(path + file, check));
     }
 }

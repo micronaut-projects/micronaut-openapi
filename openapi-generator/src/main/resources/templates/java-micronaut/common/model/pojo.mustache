@@ -75,7 +75,7 @@
 {{{.}}}
 {{/vendorExtensions.x-class-extra-annotation}}
 {{!Declare the class with extends and implements}}
-public class {{classname}} {{#parent}}extends {{{parent}}} {{/parent}}{{#vendorExtensions.x-implements}}{{#-first}}implements {{{.}}}{{/-first}}{{^-first}}, {{{.}}}{{/-first}}{{#-last}} {{/-last}}{{/vendorExtensions.x-implements}}{
+public {{>common/model/sealed}}class {{classname}}{{#parent}} extends {{{parent}}}{{/parent}}{{#vendorExtensions.x-implements}}{{#-first}} implements {{{.}}}{{/-first}}{{^-first}}, {{{.}}}{{/-first}}{{/vendorExtensions.x-implements}}{{>common/model/permits}} {
 {{/formatNoEmptyLines}}
 
     {{#serializableModel}}

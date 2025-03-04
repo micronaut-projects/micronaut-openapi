@@ -7,7 +7,7 @@
 {{/generatedAnnotation}}
 {{>common/model/typeInfoAnnotation}}
 {{>common/model/xmlAnnotation}}
-public interface {{classname}}{{#vendorExtensions.x-implements}}{{#-first}} extends {{{.}}}{{/-first}}{{^-first}}, {{{.}}}{{/-first}}{{/vendorExtensions.x-implements}} {
+public {{>common/model/sealed}}interface {{classname}}{{#vendorExtensions.x-implements}}{{#-first}} extends {{{.}}}{{/-first}}{{^-first}}, {{{.}}}{{/-first}}{{/vendorExtensions.x-implements}}{{>common/model/permits}} {
 {{/formatNoEmptyLines}}
 
 {{#discriminator}}
