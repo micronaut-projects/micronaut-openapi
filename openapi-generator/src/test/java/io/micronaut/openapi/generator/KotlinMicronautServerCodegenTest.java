@@ -330,31 +330,31 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
         assertFileContains(apiPath + "BookInfo.kt",
             """
                 open class BookInfo(
-
+                
                     @field:NotNull
                     @field:Schema(name = "name", requiredMode = Schema.RequiredMode.REQUIRED)
                     @field:JsonProperty(JSON_PROPERTY_NAME)
                     open var name: String,
-
+                
                     @field:Nullable
                     @field:Schema(name = "requiredReadOnly", accessMode = Schema.AccessMode.READ_ONLY, requiredMode = Schema.RequiredMode.REQUIRED)
                     @field:JsonProperty(JSON_PROPERTY_REQUIRED_READ_ONLY)
                     @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
                     open var requiredReadOnly: String? = null,
-
+                
                     @field:Nullable
                     @field:Size(min = 3)
                     @field:Schema(name = "author", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
                     @field:JsonProperty(JSON_PROPERTY_AUTHOR)
                     @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
                     open var author: String? = null,
-
+                
                     @field:Nullable
                     @field:Schema(name = "optionalReadOnly", accessMode = Schema.AccessMode.READ_ONLY, requiredMode = Schema.RequiredMode.NOT_REQUIRED)
                     @field:JsonProperty(JSON_PROPERTY_OPTIONAL_READ_ONLY)
                     @field:JsonInclude(JsonInclude.Include.USE_DEFAULTS)
                     open var optionalReadOnly: String? = null,
-
+                
                     @field:Nullable
                     @field:Schema(name = "type", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
                     @field:JsonProperty(JSON_PROPERTY_TYPE)
@@ -531,11 +531,11 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
         String path = outputPath + "src/main/kotlin/org/openapitools/";
 
         assertFileContains(path + "controller/ParametersController.kt", """
-            override fun callInterface(
-                name: Class,
-                `data`: String,
-            ): Mono<Void> {
-        """);
+                override fun callInterface(
+                    name: Class,
+                    `data`: String,
+                ): Mono<Void> {
+            """);
         assertFileContains(path + "api/ParametersApi.kt", "fun callInterface(",
             "@QueryValue(\"name\") @NotNull @Valid name: Class,",
             "@QueryValue(\"data\") @NotNull `data`: String",
@@ -841,16 +841,16 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
 
         assertFileContains(path + "api/DefaultApi.kt",
             """
-                        @Post("/sendPrimitives/{name}")
-                        @Secured(SecurityRule.IS_ANONYMOUS)
-                        fun sendPrimitives(
-                            @PathVariable("name") @NotNull name: String,
-                            @QueryValue("brand") @Nullable brand: String? = null,
-                            @CookieValue("coc") @Nullable coc: String? = null,
-                            @Header("head") @Nullable head: String? = null,
-                            @Body @Nullable body: String? = null,
-                        ): Mono<String>
-                    """);
+                    @Post("/sendPrimitives/{name}")
+                    @Secured(SecurityRule.IS_ANONYMOUS)
+                    fun sendPrimitives(
+                        @PathVariable("name") @NotNull name: String,
+                        @QueryValue("brand") @Nullable brand: String? = null,
+                        @CookieValue("coc") @Nullable coc: String? = null,
+                        @Header("head") @Nullable head: String? = null,
+                        @Body @Nullable body: String? = null,
+                    ): Mono<String>
+                """);
     }
 
     @Test
@@ -863,11 +863,11 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
         String path = outputPath + "src/main/kotlin/org/openapitools/";
 
         assertFileContains(path + "api/MyCustomApi.kt", """
-                    @Post("/api/v1/colors/{name}")
-                    fun selectColor(
-                        @Body @NotNull body: Color,
-                    ): Mono<String>
-                """);
+                @Post("/api/v1/colors/{name}")
+                fun selectColor(
+                    @Body @NotNull body: Color,
+                ): Mono<String>
+            """);
         assertFileContains(path + "model/Color.kt", "enum class Color(");
     }
 
@@ -914,5 +914,29 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
         assertFileContains(path + "model/BookInfo.kt",
             "import java.time.ZonedDateTime",
             "var createdAt: ZonedDateTime? = null,");
+    }
+
+    @Test
+    void testCoroutines() {
+
+        var codegen = new KotlinMicronautServerCodegen();
+        codegen.setCoroutines(true);
+        codegen.setReactive(true);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/params-with-default-value.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String path = outputPath + "src/main/kotlin/org/openapitools/";
+
+        assertFileContains(path + "api/DefaultApi.kt",
+            """
+                    @Get("/{apiVersion}/orders")
+                    @Secured(SecurityRule.IS_ANONYMOUS)
+                    suspend fun browseSearchOrders(
+                        @PathVariable(name = "apiVersion", defaultValue = "v5") @NotNull apiVersion: BrowseSearchOrdersApiVersionParameter = BrowseSearchOrdersApiVersionParameter.V5,
+                        @QueryValue("ids") @Nullable ids: List<@NotNull Int>? = null,
+                        @Header("X-Favor-Token") @Nullable xFavorToken: String? = null,
+                        @Header(name = "Content-Type", defaultValue = "application/json") @Nullable contentType: String? = "application/json",
+                        @QueryValue("algorithm") @Nullable algorithm: BrowseSearchOrdersAlgorithmParameter? = null,
+                    ): String
+                """
+        );
     }
 }

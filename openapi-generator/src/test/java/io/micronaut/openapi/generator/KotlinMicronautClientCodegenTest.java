@@ -1772,4 +1772,27 @@ class KotlinMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         definitions.forEach((file, check) ->
             assertFileContains(path + file, check));
     }
+
+    @Test
+    void testCoroutines() {
+
+        var codegen = new KotlinMicronautClientCodegen();
+        codegen.setCoroutines(true);
+        codegen.setReactive(true);
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/params-with-default-value.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String path = outputPath + "src/main/kotlin/org/openapitools/";
+
+        assertFileContains(path + "api/DefaultApi.kt",
+            """
+                    @Get("/{apiVersion}/orders")
+                    suspend fun browseSearchOrders(
+                        @PathVariable(name = "apiVersion", defaultValue = "v5") @NotNull apiVersion: BrowseSearchOrdersApiVersionParameter = BrowseSearchOrdersApiVersionParameter.V5,
+                        @QueryValue("ids") @Nullable ids: List<@NotNull Int>? = null,
+                        @Header("X-Favor-Token") @Nullable xFavorToken: String? = null,
+                        @Header(name = "Content-Type", defaultValue = "application/json") @Nullable contentType: String? = "application/json",
+                        @QueryValue("algorithm") @Nullable algorithm: BrowseSearchOrdersAlgorithmParameter? = null,
+                    ): String
+                """
+        );
+    }
 }

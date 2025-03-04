@@ -110,4 +110,13 @@ public interface KotlinMicronautServerOptionsBuilder extends GeneratorOptionsBui
      * @return this builder
      */
     KotlinMicronautServerOptionsBuilder withKsp(boolean ksp);
+
+    /**
+     * If set to true, generated code will be with suspend methods.
+     *
+     * @param coroutines do we need to generate suspend methods
+     *
+     * @return this builder
+     */
+    KotlinMicronautServerOptionsBuilder withCoroutines(boolean coroutines);
 }
