@@ -842,6 +842,8 @@ loadScripts(document, 'script');</script>
 </dd>
 <dt><a href="io/micronaut/openapi/view/AbstractViewConfig.html#copyResources" class="member-name-link">copyResources</a> - Variable in class io.micronaut.openapi.view.<a href="io/micronaut/openapi/view/AbstractViewConfig.html" title="class in io.micronaut.openapi.view">AbstractViewConfig</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/AbstractMicronautKotlinCodegen.html#coroutines" class="member-name-link">coroutines</a> - Variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/AbstractMicronautKotlinCodegen.html" title="class in io.micronaut.openapi.generator">AbstractMicronautKotlinCodegen</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/visitor/FileUtils.html#createDirectories(java.nio.file.Path,io.micronaut.inject.visitor.VisitorContext)" class="member-name-link">createDirectories(Path, VisitorContext)</a> - Static method in class io.micronaut.openapi.visitor.<a href="io/micronaut/openapi/visitor/FileUtils.html" title="class in io.micronaut.openapi.visitor">FileUtils</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/generator/AbstractMicronautJavaCodegen.html#createDiscriminator(java.lang.String,io.swagger.v3.oas.models.media.Schema)" class="member-name-link">createDiscriminator(String, Schema)</a> - Method in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/AbstractMicronautJavaCodegen.html" title="class in io.micronaut.openapi.generator">AbstractMicronautJavaCodegen</a></dt>
@@ -4074,6 +4076,8 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/generator/KotlinMicronautServerCodegen.html#OPT_CONTROLLER_PACKAGE" class="member-name-link">OPT_CONTROLLER_PACKAGE</a> - Static variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/KotlinMicronautServerCodegen.html" title="class in io.micronaut.openapi.generator">KotlinMicronautServerCodegen</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/AbstractMicronautKotlinCodegen.html#OPT_COROUTINES" class="member-name-link">OPT_COROUTINES</a> - Static variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/AbstractMicronautKotlinCodegen.html" title="class in io.micronaut.openapi.generator">AbstractMicronautKotlinCodegen</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/generator/AbstractMicronautJavaCodegen.html#OPT_DATE_FORMAT" class="member-name-link">OPT_DATE_FORMAT</a> - Static variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/AbstractMicronautJavaCodegen.html" title="class in io.micronaut.openapi.generator">AbstractMicronautJavaCodegen</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/generator/AbstractMicronautKotlinCodegen.html#OPT_DATE_FORMAT" class="member-name-link">OPT_DATE_FORMAT</a> - Static variable in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/AbstractMicronautKotlinCodegen.html" title="class in io.micronaut.openapi.generator">AbstractMicronautKotlinCodegen</a></dt>
@@ -5197,6 +5201,8 @@ loadScripts(document, 'script');</script>
 <dt><a href="io/micronaut/openapi/generator/JavaMicronautServerCodegen.html#setControllerPackage(java.lang.String)" class="member-name-link">setControllerPackage(String)</a> - Method in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/JavaMicronautServerCodegen.html" title="class in io.micronaut.openapi.generator">JavaMicronautServerCodegen</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/generator/KotlinMicronautServerCodegen.html#setControllerPackage(java.lang.String)" class="member-name-link">setControllerPackage(String)</a> - Method in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/KotlinMicronautServerCodegen.html" title="class in io.micronaut.openapi.generator">KotlinMicronautServerCodegen</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="io/micronaut/openapi/generator/AbstractMicronautKotlinCodegen.html#setCoroutines(boolean)" class="member-name-link">setCoroutines(boolean)</a> - Method in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/AbstractMicronautKotlinCodegen.html" title="class in io.micronaut.openapi.generator">AbstractMicronautKotlinCodegen</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="io/micronaut/openapi/generator/AbstractMicronautJavaCodegen.html#setDateFormat(java.lang.String)" class="member-name-link">setDateFormat(String)</a> - Method in class io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/AbstractMicronautJavaCodegen.html" title="class in io.micronaut.openapi.generator">AbstractMicronautJavaCodegen</a></dt>
 <dd>&nbsp;</dd>
@@ -6629,6 +6635,14 @@ the order they are declared.</div>
 <dt><a href="io/micronaut/openapi/generator/KotlinMicronautServerOptionsBuilder.html#withControllerPackage(java.lang.String)" class="member-name-link">withControllerPackage(String)</a> - Method in interface io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/KotlinMicronautServerOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">KotlinMicronautServerOptionsBuilder</a></dt>
 <dd>
 <div class="block">Sets the package name of generated controller classes.</div>
+</dd>
+<dt><a href="io/micronaut/openapi/generator/KotlinMicronautClientOptionsBuilder.html#withCoroutines(boolean)" class="member-name-link">withCoroutines(boolean)</a> - Method in interface io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/KotlinMicronautClientOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">KotlinMicronautClientOptionsBuilder</a></dt>
+<dd>
+<div class="block">If set to true, generated code will be with suspend methods.</div>
+</dd>
+<dt><a href="io/micronaut/openapi/generator/KotlinMicronautServerOptionsBuilder.html#withCoroutines(boolean)" class="member-name-link">withCoroutines(boolean)</a> - Method in interface io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/KotlinMicronautServerOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">KotlinMicronautServerOptionsBuilder</a></dt>
+<dd>
+<div class="block">If set to true, generated code will be with suspend methods.</div>
 </dd>
 <dt><a href="io/micronaut/openapi/generator/MicronautCodeGeneratorOptionsBuilder.html#withDateTimeFormat(io.micronaut.openapi.generator.MicronautCodeGeneratorOptionsBuilder.DateTimeFormat)" class="member-name-link">withDateTimeFormat(MicronautCodeGeneratorOptionsBuilder.DateTimeFormat)</a> - Method in interface io.micronaut.openapi.generator.<a href="io/micronaut/openapi/generator/MicronautCodeGeneratorOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">MicronautCodeGeneratorOptionsBuilder</a></dt>
 <dd>
