@@ -396,7 +396,7 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         typeMapping.put("binary", "ByteArray");
         typeMapping.put("AnyType", "Any");
         typeMapping.put("DateTime", "Instant");
-        typeMapping.put("date-time", "OffsetDateTime");
+        typeMapping.put("date-time", "Instant");
         typeMapping.put("date", "LocalDate");
         typeMapping.put("Date", "LocalDate");
         typeMapping.put("LocalDateTime", "LocalDateTime");
@@ -654,15 +654,27 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         switch (dateLibrary) {
             case OPT_DATE_LIBRARY_OFFSET_DATETIME -> {
                 typeMapping.put("DateTime", "OffsetDateTime");
+                typeMapping.put("date-time", "OffsetDateTime");
                 typeMapping.put("date", "LocalDate");
+                importMapping.put("DateTime", "java.time.OffsetDateTime");
+                importMapping.put("date-time", "java.time.OffsetDateTime");
+                importMapping.put("date", "java.time.LocalDate");
             }
             case OPT_DATE_LIBRARY_ZONED_DATETIME -> {
                 typeMapping.put("DateTime", "ZonedDateTime");
+                typeMapping.put("date-time", "ZonedDateTime");
                 typeMapping.put("date", "LocalDate");
+                importMapping.put("DateTime", "java.time.ZonedDateTime");
+                importMapping.put("date-time", "java.time.ZonedDateTime");
+                importMapping.put("date", "java.time.LocalDate");
             }
             case OPT_DATE_LIBRARY_LOCAL_DATETIME -> {
                 typeMapping.put("DateTime", "LocalDateTime");
+                typeMapping.put("date-time", "LocalDateTime");
                 typeMapping.put("date", "LocalDate");
+                importMapping.put("DateTime", "java.time.LocalDateTime");
+                importMapping.put("date-time", "java.time.LocalDateTime");
+                importMapping.put("date", "java.time.LocalDate");
             }
             default -> {
             }

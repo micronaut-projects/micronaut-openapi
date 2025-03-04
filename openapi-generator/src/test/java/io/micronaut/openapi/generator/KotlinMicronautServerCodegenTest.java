@@ -903,4 +903,16 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                 var date: ZonedDateTime? = null,
             """);
     }
+
+    @Test
+    void testImportZonedDateTime() {
+
+        var codegen = new KotlinMicronautServerCodegen();
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/library-definition.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String path = outputPath + "src/main/kotlin/org/openapitools/";
+
+        assertFileContains(path + "model/BookInfo.kt",
+            "import java.time.ZonedDateTime",
+            "var createdAt: ZonedDateTime? = null,");
+    }
 }

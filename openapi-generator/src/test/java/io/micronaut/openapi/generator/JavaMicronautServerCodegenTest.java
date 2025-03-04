@@ -768,4 +768,16 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                 private ZonedDateTime date;
             """);
     }
+
+    @Test
+    void testImportZonedDateTime() {
+
+        var codegen = new JavaMicronautServerCodegen();
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/library-definition.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String path = outputPath + "src/main/java/org/openapitools/";
+
+        assertFileContains(path + "model/BookInfo.java",
+            "import java.time.ZonedDateTime;",
+            "private ZonedDateTime createdAt;");
+    }
 }
