@@ -1610,4 +1610,14 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         definitions.forEach((file, check) ->
             assertFileContains(path + file, check));
     }
+
+    @Test
+    void testEnumXimplements() {
+
+        var codegen = new JavaMicronautClientCodegen();
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/enum-implements.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String path = outputPath + "src/main/java/org/openapitools/";
+
+        assertFileContains(path + "model/Type.java", "public enum Type implements java.io.Serializable {");
+    }
 }
