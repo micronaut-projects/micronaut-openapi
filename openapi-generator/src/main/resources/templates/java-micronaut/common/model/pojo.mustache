@@ -352,7 +352,7 @@ public {{>common/model/sealed}}class {{classname}}{{#parent}} extends {{{parent}
      *
      * @return The same instance of {{classname}} for chaining.
      */
-    public {{classname}} add{{nameInCamelCase}}Item({{{items.vendorExtensions.typeWithEnumWithGenericAnnotations}}} {{name}}Item) {
+    public {{classname}} add{{nameInPascalCase}}Item({{{items.vendorExtensions.typeWithEnumWithGenericAnnotations}}} {{name}}Item) {
                 {{#vendorExtensions.x-is-jackson-optional-nullable}}
         if ({{name}} == null || !{{name}}.isPresent()) {
             {{name}} = JsonNullable.<{{{vendorExtensions.typeWithEnumWithGenericAnnotations}}}>of({{{defaultValue}}}{{^defaultValue}}new {{#uniqueItems}}LinkedHashSet{{/uniqueItems}}{{^uniqueItems}}ArrayList{{/uniqueItems}}<>(){{/defaultValue}});
@@ -381,7 +381,7 @@ public {{>common/model/sealed}}class {{classname}}{{#parent}} extends {{{parent}
      *
      * @return The same instance of {{classname}} for chaining.
      */
-    public {{classname}} put{{nameInCamelCase}}Item(String key, {{{items.datatypeWithEnum}}} {{name}}Item) {
+    public {{classname}} put{{nameInPascalCase}}Item(String key, {{{items.datatypeWithEnum}}} {{name}}Item) {
                 {{#vendorExtensions.x-is-jackson-optional-nullable}}
         if ({{name}} == null || !{{name}}.isPresent()) {
             {{name}} = JsonNullable.<{{{vendorExtensions.typeWithEnumWithGenericAnnotations}}}>of({{{defaultValue}}}{{^defaultValue}}new HashMap<>(){{/defaultValue}});
@@ -417,16 +417,16 @@ public {{>common/model/sealed}}class {{classname}}{{#parent}} extends {{{parent}
 
             {{#isArray}}
     @Override
-    public {{classname}} add{{nameInCamelCase}}Item({{{items.vendorExtensions.typeWithEnumWithGenericAnnotations}}} {{name}}Item) {
-        super.add{{nameInCamelCase}}Item({{name}}Item);
+    public {{classname}} add{{nameInPascalCase}}Item({{{items.vendorExtensions.typeWithEnumWithGenericAnnotations}}} {{name}}Item) {
+        super.add{{nameInPascalCase}}Item({{name}}Item);
         return this;
     }
             {{/isArray}}
 
             {{#isMap}}
     @Override
-    public {{classname}} put{{nameInCamelCase}}Item(String key, {{{items.vendorExtensions.typeWithEnumWithGenericAnnotations}}} {{name}}Item) {
-        super.put{{nameInCamelCase}}Item(key, {{name}}Item);
+    public {{classname}} put{{nameInPascalCase}}Item(String key, {{{items.vendorExtensions.typeWithEnumWithGenericAnnotations}}} {{name}}Item) {
+        super.put{{nameInPascalCase}}Item(key, {{name}}Item);
         return this;
     }
             {{/isMap}}

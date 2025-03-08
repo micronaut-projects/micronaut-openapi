@@ -107,6 +107,7 @@ import static io.swagger.v3.parser.util.SchemaTypeUtil.INTEGER_TYPE;
 import static org.openapitools.codegen.CodegenConstants.API_PACKAGE;
 import static org.openapitools.codegen.CodegenConstants.INVOKER_PACKAGE;
 import static org.openapitools.codegen.CodegenConstants.MODEL_PACKAGE;
+import static org.openapitools.codegen.utils.CamelizeOption.LOWERCASE_FIRST_LETTER;
 import static org.openapitools.codegen.utils.OnceLogger.once;
 import static org.openapitools.codegen.utils.StringUtils.camelize;
 import static org.openapitools.codegen.utils.StringUtils.underscore;
@@ -905,7 +906,8 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
         var realName = property.name;
         if (realName.startsWith("_") && !property.baseName.startsWith("_") && isReservedWord(property.baseName)) {
             realName = realName.replaceFirst("_", "");
-            property.nameInCamelCase = camelize(realName);
+            property.nameInPascalCase = camelize(realName);
+            property.nameInCamelCase = camelize(realName, LOWERCASE_FIRST_LETTER);
             property.nameInSnakeCase = CaseFormat.UPPER_CAMEL.to(CaseFormat.UPPER_UNDERSCORE, property.nameInCamelCase);
             // fix for getters and setters for escaped vars as reserved words and started with '_', like this: '_for'
             if (!property.getter.startsWith("get_")) {
@@ -2192,7 +2194,8 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
                     discriminatorProp.vendorExtensions.put("overridden", true);
                     var realName = discriminatorProp.name;
                     realName = realName.replaceFirst("_", "");
-                    discriminatorProp.nameInCamelCase = camelize(realName);
+                    discriminatorProp.nameInPascalCase = camelize(realName);
+                    discriminatorProp.nameInCamelCase = camelize(realName, LOWERCASE_FIRST_LETTER);
                     discriminatorProp.nameInSnakeCase = CaseFormat.UPPER_CAMEL.to(CaseFormat.UPPER_UNDERSCORE, discriminatorProp.nameInCamelCase);
                     // fix for getters and setters for escaped vars as reserved words and started with '_', like this: '_for'
                     discriminatorProp.getter = "get" + getterAndSetterCapitalize(discriminatorProp.name);

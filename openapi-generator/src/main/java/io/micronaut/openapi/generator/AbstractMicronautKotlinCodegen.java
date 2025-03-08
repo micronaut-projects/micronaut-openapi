@@ -62,6 +62,7 @@ import org.openapitools.codegen.model.ModelMap;
 import org.openapitools.codegen.model.ModelsMap;
 import org.openapitools.codegen.model.OperationMap;
 import org.openapitools.codegen.model.OperationsMap;
+import org.openapitools.codegen.utils.CamelizeOption;
 import org.openapitools.codegen.utils.ModelUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -113,6 +114,7 @@ import static org.openapitools.codegen.CodegenConstants.INVOKER_PACKAGE;
 import static org.openapitools.codegen.CodegenConstants.MODEL_PACKAGE;
 import static org.openapitools.codegen.CodegenConstants.PACKAGE_NAME;
 import static org.openapitools.codegen.languages.KotlinClientCodegen.DATE_LIBRARY;
+import static org.openapitools.codegen.utils.CamelizeOption.LOWERCASE_FIRST_LETTER;
 import static org.openapitools.codegen.utils.OnceLogger.once;
 import static org.openapitools.codegen.utils.StringUtils.camelize;
 import static org.openapitools.codegen.utils.StringUtils.underscore;
@@ -1668,7 +1670,8 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
         var realName = property.name;
         if (realName.contains("`")) {
             realName = realName.replace("`", "");
-            property.nameInCamelCase = camelize(realName);
+            property.nameInPascalCase = camelize(realName);
+            property.nameInCamelCase = camelize(realName, LOWERCASE_FIRST_LETTER);
             property.nameInSnakeCase = CaseFormat.UPPER_CAMEL.to(CaseFormat.UPPER_UNDERSCORE, property.nameInCamelCase);
         }
         property.vendorExtensions.put("realName", realName);
@@ -2279,7 +2282,8 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
                     discriminatorProp.vendorExtensions.put("overridden", true);
                     var realName = discriminatorProp.name;
                     realName = realName.replaceFirst("_", "");
-                    discriminatorProp.nameInCamelCase = camelize(realName);
+                    discriminatorProp.nameInPascalCase = camelize(realName);
+                    discriminatorProp.nameInCamelCase = camelize(realName, LOWERCASE_FIRST_LETTER);
                     discriminatorProp.nameInSnakeCase = CaseFormat.UPPER_CAMEL.to(CaseFormat.UPPER_UNDERSCORE, discriminatorProp.nameInCamelCase);
                     // fix for getters and setters for escaped vars as reserved words and started with '_', like this: '_for'
                     discriminatorProp.getter = "get" + getterAndSetterCapitalize(discriminatorProp.name);
