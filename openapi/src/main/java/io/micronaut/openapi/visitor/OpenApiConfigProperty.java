@@ -249,6 +249,14 @@ public interface OpenApiConfigProperty {
      */
     String MICRONAUT_OPENAPI_SCHEMA_DUPLICATE_RESOLUTION = "micronaut.openapi.schema.duplicate-resolution";
     /**
+     * If this property true, then successful response will be created from code,
+     * if successful code didn't set in swagger annotations. Otherwise, if swagger annotations are specified,
+     * the code will be ignored and responses will be read only from swagger annotations.
+     * <br>
+     * Default: true
+     */
+    String MICRONAUT_OPENAPI_RESPONSE_READ_SUCCESSFUL_FROM_CODE = "micronaut.openapi.response.read-successful-from-code";
+    /**
      * System property that enables or disables schema name separator for generics and inner classes.
      * If it's true separators will be skipped. For example, schema name for class with name
      * {@code MyClass.MyInnerClass<MyGeneric1, MyGeneric2>} will be
