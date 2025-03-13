@@ -1,0 +1,25 @@
+openapi: '3.0.3'
+info:
+  title: 'Library API'
+  description: |
+    Example Service
+  contact:
+    name: 'Example Team'
+  version: '1.0'
+tags:
+  - name: texts
+
+paths:
+
+components:
+  schemas:
+    DateTimeResponse:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
