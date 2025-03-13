@@ -552,7 +552,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
         if (additionalProperties.containsKey(OPT_DATE_TIME_FORMAT)) {
             dateTimeFormat = (String) additionalProperties.get(OPT_DATE_TIME_FORMAT);
         }
-        writePropertyBack(OPT_DATE_TIME_FORMAT, dateFormat);
+        writePropertyBack(OPT_DATE_TIME_FORMAT, dateTimeFormat);
 
         if (additionalProperties.containsKey(OPT_GENERATE_HTTP_RESPONSE_ALWAYS)) {
             generateHttpResponseAlways = convertPropertyToBoolean(OPT_GENERATE_HTTP_RESPONSE_ALWAYS);
