@@ -1619,7 +1619,7 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         String path = outputPath + "src/main/java/org/openapitools/";
 
         assertFileContains(path + "model/DateTimeResponse.java",
-            """
+                """
                     @NotNull
                     @JsonProperty(JSON_PROPERTY_MESSAGE)
                     private String message;
