@@ -6,6 +6,7 @@
 |`*micronaut.openapi.config.file*` | System property that enables setting the open api config file. |
 |`*micronaut.openapi.server.context.path*` | System property for server context path. |
 |`*micronaut.openapi.property.naming.strategy*` | System property for naming strategy. One jackson PropertyNamingStrategy. | Default: `LOWER_CAMEL_CASE`
+|`*micronaut.openapi.response.read-successful-from-code*` | If this property true, then successful response will be created from code, if successful code didn't set in swagger annotations. Otherwise, if swagger annotations are specified, the code will be ignored and responses will be read only from swagger annotations. | Default: `true`
 |`*micronaut.openapi.views.spec*` | System property for views specification. |
 |`*micronaut.openapi.target.file*` | System property that enables setting the target file to write to. | Default: `META-INF/swagger/${applicationName}-${version}.yml`
 |`*micronaut.openapi.views.dest.dir*` | System property that specifies the path where the generated UI elements will be located. | Default: `META-INF/swagger/views/`
@@ -46,7 +47,7 @@ PUBLIC | Default: `PUBLIC`
 |`*micronaut.server.context-path*` | `micronaut-http` server context path property. |
 |`*jackson.json-view.enabled*` | `micronaut-http` property (`json-view.enabled`). | Default: `false`
 |`*micronaut.openapi.json.view.default.inclusion*` | Property that determines whether properties that have no view annotations are included in JSON serialization views. If enabled, non-annotated properties will be included; when disabled, they will be excluded. | Default: `true`
-|`*micronaut.openapi.expand.**` | Prefix for expandable properties. These properties can be used only for placeholders. |
+|`*micronaut.openapi.expand.+++*+++*` | Prefix for expandable properties. These properties can be used only for placeholders. |
 |`*micronaut.openapi.config.file.locations*` | Config file locations. By default, micronaut-openapi search config in standard path: `<project_path>/src/main/resources/` +
 {nbsp} +
 You can set your custom paths separated by `,`. To set absolute paths use prefix `file:`,
@@ -59,7 +60,7 @@ directory. |
 |`*micronaut.openapi.schema.name.separator.empty*` | If this property true, generic separators and inner class separators in schema name will be empty string. | Default: `false`
 |`*micronaut.openapi.schema.name.separator.generic*` | System property that set generic class separator for schema name generation. | Default: `_`
 |`*micronaut.openapi.schema.name.separator.inner-class*` | System property that set inner class separator for schema name generation. | Default: `.`
-|`*micronaut.openapi.schema.mapping.**` | Properties prefix to set custom schema implementations for selected classes. +
+|`*micronaut.openapi.schema.mapping.+++*+++*` | Properties prefix to set custom schema implementations for selected classes. +
 For example, if you want to set simple `java.lang.String` class to some complex `org.somepackage.MyComplexType` class you need to write: +
 {nbsp} +
 micronaut.openapi.schema.org.somepackage.MyComplexType=java.lang.String +
@@ -73,8 +74,8 @@ micronaut: +
 {nbsp}{nbsp}{nbsp}{nbsp}{nbsp}{nbsp}{nbsp}{nbsp}org.somepackage.MyComplexType: java.lang.String +
 {nbsp}{nbsp}{nbsp}{nbsp}{nbsp}{nbsp}{nbsp}{nbsp}org.somepackage.MyComplexType2: java.lang.Integer
 |
-|`*micronaut.openapi.schema.decorator.prefix*` +
-`*micronaut.openapi.schema.decorator.postfix.**` | Properties prefix to set schema name prefix or postfix by package. +
+|`*micronaut.openapi.schema.decorator.prefix.+++*+++*` +
+`*micronaut.openapi.schema.decorator.postfix.+++*+++*` | Properties prefix to set schema name prefix or postfix by package. +
 For example, if you have some classes with same names in different packages you can set postfix like this: +
 {nbsp} +
 micronaut.openapi.schema.decorator.postfix.org.api.v1_0_0=1_0_0 +
@@ -95,8 +96,8 @@ micronaut: +
 {nbsp}{nbsp}{nbsp}{nbsp}{nbsp}{nbsp}{nbsp}{nbsp}{nbsp}{nbsp}org.api.v2_0_0: private +
 {nbsp} +
 |
-|`*micronaut.openapi.schema.**` +
-**DEPRECATED**: Use `*micronaut.openapi.schema.mapping.**` instead | Properties prefix to set custom schema implementations for selected classes. +
+|`*micronaut.openapi.schema.+++*+++*` +
+**DEPRECATED**: Use `*micronaut.openapi.schema.mapping.+++*+++*` instead | Properties prefix to set custom schema implementations for selected classes. +
 For example, if you want to set simple `java.lang.String` class to some complex `org.somepackage.MyComplexType` class you need to write: +
 {nbsp} +
 micronaut.openapi.schema.org.somepackage.MyComplexType=java.lang.String +
@@ -109,9 +110,9 @@ micronaut: +
 {nbsp}{nbsp}{nbsp}{nbsp}{nbsp}{nbsp}org.somepackage.MyComplexType: java.lang.String +
 {nbsp}{nbsp}{nbsp}{nbsp}{nbsp}{nbsp}org.somepackage.MyComplexType2: java.lang.Integer
 |
-|`*micronaut.openapi.schema-prefix.**` +
-`*micronaut.openapi.schema-postfix.**` +
-**DEPRECATED**: Use `*micronaut.openapi.schema.decorator.prefix.*` and `*micronaut.openapi.schema.decorator.postfix.*` instead | Properties prefix to set schema name prefix or postfix by package. +
+|`*micronaut.openapi.schema-prefix.+++*+++*` +
+`*micronaut.openapi.schema-postfix.+++*+++*` +
+**DEPRECATED**: Use `*micronaut.openapi.schema.decorator.prefix.+++*+++*` and `*micronaut.openapi.schema.decorator.postfix.+++*+++*` instead | Properties prefix to set schema name prefix or postfix by package. +
 For example, if you have some classes with same names in different packages you can set postfix like this: +
 {nbsp} +
 micronaut.openapi.schema-postfix.org.api.v1_0_0=1_0_0 +
@@ -129,7 +130,7 @@ micronaut: +
 {nbsp}{nbsp}{nbsp}{nbsp}{nbsp}{nbsp}org.api.v2_0_0: private +
 {nbsp} +
 |
-|`*micronaut.openapi.groups.**` | Properties prefix to set custom schema implementations for selected classes. +
+|`*micronaut.openapi.groups.+++*+++*` | Properties prefix to set custom schema implementations for selected classes. +
 For example, if you want to set simple 'java.lang.String' class to some complex 'org.somepackage.MyComplexType' class you need to write: +
 {nbsp} +
 -Dmicronaut.openapi.group.my-group1.title="Title 1" +

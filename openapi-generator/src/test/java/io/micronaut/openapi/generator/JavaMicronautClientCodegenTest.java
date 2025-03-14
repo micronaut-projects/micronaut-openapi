@@ -1621,6 +1621,27 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         assertFileContains(path + "model/Type.java", "public enum Type implements java.io.Serializable {");
     }
                            
+    @Test
+    void testPascalCaseInMethodName() {
+
+        var codegen = new JavaMicronautClientCodegen();
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/issue_19393_map_of_inner_enum.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
+        String path = outputPath + "src/main/java/org/openapitools/";
+
+        assertFileContains(path + "model/EmployeeWithMapOfEnum.java",
+            """
+                    public EmployeeWithMapOfEnum putProjectRoleItem(String key, EmployeeWithMapOfEnumProjectRoleValue projectRoleItem) {
+                        if (projectRole == null) {
+                            projectRole = new HashMap<>();
+                        }
+                        projectRole.put(key, projectRoleItem);
+                        return this;
+                    }
+                """
+        );
+    }
+     
+    @Test
     void testDateTimeFormat() {
         var codegen = new JavaMicronautClientCodegen();
         codegen.additionalProperties().put("dateTimeFormat", "yyyy-MM-dd'T'HH:mm:ss.SSSSSSZ");
