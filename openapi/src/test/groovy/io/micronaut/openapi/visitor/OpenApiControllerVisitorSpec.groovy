@@ -10,6 +10,8 @@ import io.swagger.v3.oas.models.media.Schema
 import spock.lang.Issue
 import spock.util.environment.RestoreSystemProperties
 
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_RESPONSE_READ_SUCCESSFUL_FROM_CODE
+
 class OpenApiControllerVisitorSpec extends AbstractOpenApiTypeElementSpec {
 
     void "test some ignored parameters"() {
@@ -2847,5 +2849,154 @@ class MyBean {}
         op2.responses
         op1.responses.size() == 1
         op2.responses["206"]
+    }
+
+    @RestoreSystemProperties
+    void "test read successful ApiResponse from code: enabled"() {
+
+        given:
+        System.setProperty(MICRONAUT_OPENAPI_RESPONSE_READ_SUCCESSFUL_FROM_CODE, "true")
+
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.http.HttpResponse;import io.micronaut.http.HttpStatus;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.micronaut.http.annotation.Status;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+
+@Controller
+interface HelloWorldApi {
+
+    @Status(HttpStatus.RESET_CONTENT)
+    @Get
+    @ApiResponses({
+        @ApiResponse(responseCode = "500", content = @Content(mediaType = "application/json", schema = @Schema(implementation = String.class)))
+    })
+    TestPojo helloWorld();
+
+    @Status(HttpStatus.RESET_CONTENT)
+    @Get("/second")
+    @ApiResponse(responseCode = "205", content = @Content(mediaType = "application/json", schema = @Schema(implementation = String.class)))
+    @ApiResponse(responseCode = "500", content = @Content(mediaType = "application/json", schema = @Schema(implementation = String.class)))
+    TestPojo helloWorld2();
+
+    @Get("/third")
+    @ApiResponse(responseCode = "205", content = @Content(mediaType = "application/json", schema = @Schema(implementation = String.class)))
+    @ApiResponse(responseCode = "500", content = @Content(mediaType = "application/json", schema = @Schema(implementation = String.class)))
+    HttpResponse<TestPojo> helloWorld3();
+}
+
+class TestPojo {
+
+    private String testString;
+
+    public String getTestString() {
+        return testString;
+    }
+
+    public void setTestString(String testString) {
+        this.testString = testString;
+    }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        when:
+        Operation operation = Utils.testReference?.paths?."/"?.get
+        Operation operation2 = Utils.testReference?.paths?."/second"?.get
+        Operation operation3 = Utils.testReference?.paths?."/third"?.get
+
+        then:
+        operation != null
+        operation.operationId == 'helloWorld'
+        operation.responses.size() == 2
+        operation.responses."205".content."application/json".schema.$ref == '#/components/schemas/TestPojo'
+        operation.responses."500".content."application/json".schema.type == 'string'
+
+        operation2 != null
+        operation2.operationId == 'helloWorld2'
+        operation2.responses.size() == 2
+        operation2.responses."205".content."application/json".schema.type == 'string'
+        operation2.responses."500".content."application/json".schema.type == 'string'
+
+        operation3 != null
+        operation3.operationId == 'helloWorld3'
+        operation3.responses.size() == 2
+        operation3.responses."205".content."application/json".schema.type == 'string'
+        operation3.responses."500".content."application/json".schema.type == 'string'
+    }
+
+    @RestoreSystemProperties
+    void "test read successful ApiResponse from code: disabled"() {
+
+        given:
+        System.setProperty(MICRONAUT_OPENAPI_RESPONSE_READ_SUCCESSFUL_FROM_CODE, "false")
+
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.http.HttpStatus;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.micronaut.http.annotation.Status;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+
+@Controller
+interface HelloWorldApi {
+
+    @Status(HttpStatus.RESET_CONTENT)
+    @Get
+    @ApiResponses({
+        @ApiResponse(responseCode = "500", content = @Content(mediaType = "application/json", schema = @Schema(implementation = String.class)))
+    })
+    TestPojo helloWorld();
+
+    @Status(HttpStatus.RESET_CONTENT)
+    @Get("/second")
+    @ApiResponse(responseCode = "205", content = @Content(mediaType = "application/json", schema = @Schema(implementation = String.class)))
+    @ApiResponse(responseCode = "500", content = @Content(mediaType = "application/json", schema = @Schema(implementation = String.class)))
+    TestPojo helloWorld2();
+}
+
+class TestPojo {
+
+    private String testString;
+
+    public String getTestString() {
+        return testString;
+    }
+
+    public void setTestString(String testString) {
+        this.testString = testString;
+    }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        when:
+        Operation operation = Utils.testReference?.paths?."/"?.get
+        Operation operation2 = Utils.testReference?.paths?."/second"?.get
+
+        then:
+        operation != null
+        operation.operationId == 'helloWorld'
+        operation.responses.size() == 1
+        operation.responses."500".content."application/json".schema.type == 'string'
+
+        operation2 != null
+        operation2.operationId == 'helloWorld2'
+        operation2.responses.size() == 2
+        operation2.responses."205".content."application/json".schema.type == 'string'
+        operation2.responses."500".content."application/json".schema.type == 'string'
     }
 }

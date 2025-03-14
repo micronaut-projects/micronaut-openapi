@@ -119,6 +119,7 @@ import static io.micronaut.openapi.visitor.ConfigUtils.getRouterVersioningProper
 import static io.micronaut.openapi.visitor.ConfigUtils.getSecurityProperties;
 import static io.micronaut.openapi.visitor.ConfigUtils.isJsonViewEnabled;
 import static io.micronaut.openapi.visitor.ConfigUtils.isOpenApiEnabled;
+import static io.micronaut.openapi.visitor.ConfigUtils.isResponseReadSuccessfulFromCode;
 import static io.micronaut.openapi.visitor.ConfigUtils.isSpecGenerationEnabled;
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_CHILD_OP_ID_PREFIX;
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_CHILD_OP_ID_SUFFIX;
@@ -1320,6 +1321,8 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         boolean withMethodResponses = element.hasDeclaredAnnotation(io.swagger.v3.oas.annotations.responses.ApiResponses.class)
             || element.hasDeclaredAnnotation(io.swagger.v3.oas.annotations.responses.ApiResponse.class);
 
+        boolean isSuccessfulFromCode = isResponseReadSuccessfulFromCode(context);
+
         ApiResponses existedResponses = existedOperation != null ? existedOperation.getResponses() : null;
         ApiResponses responses = swaggerOperation.getResponses();
         HttpStatus methodResponseStatus = element.enumValue(Status.class, HttpStatus.class).orElse(null);
@@ -1332,6 +1335,8 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         String responseCode = Integer.toString(methodResponseStatus.getCode());
         ApiResponse response = null;
 
+        var responseFromCode = isSuccessfulFromCode;
+
         if (responses == null) {
             responses = new ApiResponses();
             swaggerOperation.setResponses(responses);
@@ -1342,11 +1347,21 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                 response = defaultResponse;
                 responses.put(responseCode, response);
             }
+            var isResponseSetInAnnotation = false;
+            for (var responseCodeFromAnn : responses.keySet()) {
+                if (responseCodeFromAnn.startsWith("2") || responseCodeFromAnn.startsWith("3")) {
+                    isResponseSetInAnnotation = true;
+                    break;
+                }
+            }
+            if (response != null || isResponseSetInAnnotation) {
+                responseFromCode = false;
+            }
         }
         if (responseStatusNotSetOrSetByAnnotation) {
             responses.addExtension(MICRONAUT_EXT_PARENT_RESPONSE, true);
         }
-        if (response == null && !withMethodResponses) {
+        if (response == null && (!withMethodResponses || responseFromCode)) {
             response = new ApiResponse();
             if (javadocDescription == null || StringUtils.isEmpty(javadocDescription.getReturnDescription())) {
                 response.setDescription(swaggerOperation.getOperationId() + StringUtils.SPACE + responseCode + " response");

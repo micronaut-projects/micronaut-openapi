@@ -745,10 +745,10 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         assertFileContains(path + "model/FileCreateDto.java",
             """
                 public class FileCreateDto {
-                
+
                     public static final String JSON_PROPERTY_TYPE_CODE = "typeCode";
                     public static final String JSON_PROPERTY_ORG_NAME = "orgName";
-                
+
                     /**
                      * Customer type ORG
                      */
@@ -756,11 +756,11 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                     @Pattern(regexp = "^ORG$")
                     @JsonProperty(JSON_PROPERTY_TYPE_CODE)
                     private String typeCode = "ORG";
-                
+
                     @NotNull
                     @JsonProperty(JSON_PROPERTY_ORG_NAME)
                     private String orgName;
-                
+
                     public FileCreateDto(String typeCode, String orgName) {
                         this.typeCode = typeCode;
                         this.orgName = orgName;
@@ -1330,7 +1330,7 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                 @Generated("io.micronaut.openapi.generator.JavaMicronautClientCodegen")
                 @Serializable
                 public class Book {
-                
+
                     @Override
                 """);
 
@@ -1386,7 +1386,7 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                     public String getValueType() {
                         return valueType;
                     }
-                
+
                     /**
                      * Set the valueType property value
                      *
@@ -1395,7 +1395,7 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                     public void setValueType(String valueType) {
                         this.valueType = valueType;
                     }
-                
+
                     /**
                      * Set valueType in a chainable fashion.
                      *
@@ -1415,7 +1415,7 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                     public String getValueType() {
                         return valueType;
                     }
-                
+
                     /**
                      * Set the valueType property value
                      *
@@ -1424,7 +1424,7 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                     public void setValueType(String valueType) {
                         this.valueType = valueType;
                     }
-                
+
                     /**
                      * Set valueType in a chainable fashion.
                      *
@@ -1458,7 +1458,7 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                     }
                     return super.equals(o);
                 }
-            
+
                 @Override
                 public int hashCode() {
                     return Objects.hash(super.hashCode());
@@ -1494,7 +1494,7 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
             """);
         assertFileContains(path + "model/Result.java", """
                 private String id;
-            
+
                 @Nullable
                 @JsonProperty(JSON_PROPERTY_DATE)
                 @JsonInclude(JsonInclude.Include.USE_DEFAULTS)
@@ -1629,5 +1629,26 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                     }
                 """
         );
+    }
+                           
+    void testDateTimeFormat() {
+        var codegen = new JavaMicronautClientCodegen();
+        codegen.additionalProperties().put("dateTimeFormat", "yyyy-MM-dd'T'HH:mm:ss.SSSSSSZ");
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/date-time-format.yml", CodegenConstants.MODELS);
+        String path = outputPath + "src/main/java/org/openapitools/";
+
+        assertFileContains(path + "model/DateTimeResponse.java",
+                """
+                    @NotNull
+                    @JsonProperty(JSON_PROPERTY_MESSAGE)
+                    private String message;
+                """,
+                """
+                    @Nullable
+                    @JsonProperty(JSON_PROPERTY_TIMESTAMP)
+                    @JsonInclude(JsonInclude.Include.USE_DEFAULTS)
+                    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSSSSZ")
+                    private ZonedDateTime timestamp;
+                """);
     }
 }
