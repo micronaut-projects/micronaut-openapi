@@ -92,6 +92,7 @@ import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENA
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_GROUPS;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_JSON_VIEW_DEFAULT_INCLUSION;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_PROJECT_DIR;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_RESPONSE_READ_SUCCESSFUL_FROM_CODE;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_SCHEMA;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_SCHEMA_DECORATOR_POSTFIX;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_SCHEMA_DECORATOR_PREFIX;
@@ -304,6 +305,10 @@ public final class ConfigUtils {
             return DuplicateResolution.ERROR;
         }
         return DuplicateResolution.AUTO;
+    }
+
+    public static boolean isResponseReadSuccessfulFromCode(VisitorContext context) {
+        return getBooleanProperty(MICRONAUT_OPENAPI_RESPONSE_READ_SUCCESSFUL_FROM_CODE, true, context);
     }
 
     public static boolean isOpenApiEnabled(VisitorContext context) {
