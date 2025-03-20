@@ -20,7 +20,7 @@ commons-lang3 = "3.17.0"
 commons-codec = "1.18.0"
 commons-io = "2.18.0"
 commons-text = "1.13.0"
-guava = "33.4.0-jre"
+guava = "33.4.5-jre"
 commonmark = "0.24.0"
 
 micronaut = "4.8.7"
