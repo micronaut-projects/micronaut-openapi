@@ -1,1 +1,1 @@
-It is possible to expose management Endpoints in the openapi specification file.
+It is possible to expose management Endpoints in the OpenAPI specification file.

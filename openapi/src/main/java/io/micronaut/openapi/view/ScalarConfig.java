@@ -15,7 +15,9 @@
  */
 package io.micronaut.openapi.view;
 
+import io.micronaut.core.annotation.NonNull;
 import io.micronaut.core.annotation.Nullable;
+import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.core.util.StringUtils;
 import io.micronaut.inject.visitor.VisitorContext;
 import io.micronaut.openapi.view.OpenApiViewConfig.RendererType;
@@ -30,8 +32,10 @@ import java.util.stream.Collectors;
 
 import static io.micronaut.core.util.StringUtils.EMPTY_STRING;
 import static io.micronaut.openapi.view.OpenApiViewConfig.replacePlaceHolder;
+import static io.micronaut.openapi.visitor.StringUtil.CLOSE_BRACE;
 import static io.micronaut.openapi.visitor.StringUtil.COMMA_NEW_LINE;
 import static io.micronaut.openapi.visitor.StringUtil.KEY_VALUE_SEPARATOR;
+import static io.micronaut.openapi.visitor.StringUtil.OPEN_BRACE;
 import static io.micronaut.openapi.visitor.StringUtil.SLASH;
 
 /**
@@ -88,7 +92,7 @@ public final class ScalarConfig extends AbstractViewConfig {
         VALID_OPTIONS.put("hideClientButton", AbstractViewConfig::asBoolean);
 
         DEFAULT_OPTIONS.put("defaultHttpClient", "{targetKey: 'shell', clientKey: 'curl'}");
-        // by default, we have only shell curl (currl), Invoke-WebRequest Powershell (webrequest), java.net.http Java (nethttp), Fetch JavaScript (fetch), Axios JavaScript (axios)
+        // by default, we have only shell curl (curl), Invoke-WebRequest Powershell (webrequest), java.net.http Java (nethttp), Fetch JavaScript (fetch), Axios JavaScript (axios)
         DEFAULT_OPTIONS.put("hiddenClients", "['libcurl', 'clj_http', 'httpclient', 'restsharp', 'native', 'http1.1', 'asynchttp', 'okhttp', 'unirest', 'xhr', 'jquery', 'native', 'request', 'unirest', 'ofetch', 'nsurlsession', 'cohttp', 'guzzle', 'http', 'http1', 'http2', 'restmethod', 'python3', 'requests', 'httr', 'native', 'curl', 'httpie', 'wget', 'nsurlsession', 'undici'],");
     }
 
@@ -126,9 +130,37 @@ public final class ScalarConfig extends AbstractViewConfig {
     @Override
     public String render(String template, @Nullable VisitorContext context) {
         template = rapiPDFConfig.render(template, RendererType.SCALAR, context);
-        template = replacePlaceHolder(template, "scalar.js.url.prefix", isDefaultJsUrl ? getFinalUrlPrefix(RendererType.SCALAR, context) : jsUrl, StringUtils.EMPTY_STRING);
-        template = replacePlaceHolder(template, "style", StringUtils.isNotEmpty(style) ? "<style>" + style + "</style>" : EMPTY_STRING, EMPTY_STRING);
-        return replacePlaceHolder(template, "scalar.attributes", toOptions(), StringUtils.EMPTY_STRING);
+        template = replacePlaceHolder(template, "scalar.js.url.prefix", isDefaultJsUrl ? getFinalUrlPrefix(RendererType.SCALAR, context) : jsUrl);
+        template = replacePlaceHolder(template, "style", StringUtils.isNotEmpty(style) ? "<style>" + style + "</style>" : EMPTY_STRING);
+        template = replacePlaceHolder(template, "scalar.sources", getSourcesStr());
+        return replacePlaceHolder(template, "scalar.attributes", toOptions());
+    }
+
+    @NonNull
+    private String getSourcesStr() {
+        var result = new StringBuilder("sources: [");
+        // case with single document
+        if (CollectionUtils.isEmpty(urls) || (withUrls != null && !withUrls)) {
+            result.append("{url: contextPath + \"").append(specUrl).append("\"}");
+        } else {
+            // case with multiple documents
+            var isFirst = true;
+            for (var url : urls) {
+                if (!isFirst) {
+                    result.append(',');
+                }
+                result.append(OPEN_BRACE)
+                    .append("title: \"").append(url.name()).append("\",")
+                    .append("url: contextPath + \"").append(url.url()).append("\",");
+                if (StringUtils.isNotEmpty(primaryName) && primaryName.equals(url.name())) {
+                    result.append("default: true");
+                }
+                result.append(CLOSE_BRACE);
+                isFirst = false;
+            }
+        }
+        result.append("],");
+        return result.toString();
     }
 
     @Override

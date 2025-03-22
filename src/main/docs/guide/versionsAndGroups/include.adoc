@@ -1,2 +1,2 @@
 [separator=::]
-= OpenAPI groups:: Integration with swagger UI
+= OpenAPI groups:: Integration with Swagger UI

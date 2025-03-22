@@ -7,33 +7,35 @@
     {{style}}
 </head>
 <body>
-<script id="api-reference"></script>
-<script>
 
-    const extract = function(v) {
-        return decodeURIComponent(v.replace(/(?:^|.*;\s*)contextPath\s*=\s*([^;]*).*$|^.*$/, "$1"));
-    };
-    const cookie = extract(document.cookie);
-    const contextPath = cookie === '' ? extract(window.location.search.substring(1)) : cookie;
-    const configuration = {
-        {{scalar.attributes}}
-    };
+    <div id="app"></div>
+    <script>
 
-    const el = document.getElementById("api-reference");
-    el.setAttribute("data-configuration", JSON.stringify(configuration));
-    el.setAttribute("data-url", contextPath + "{{specURL}}");
+        const extract = function(v) {
+            return decodeURIComponent(v.replace(/(?:^|.*;\s*)contextPath\s*=\s*([^;]*).*$|^.*$/, "$1"));
+        };
+        const cookie = extract(document.cookie);
+        const contextPath = cookie === '' ? extract(window.location.search.substring(1)) : cookie;
+        const head = document.getElementsByTagName("head")[0];
 
-    const head = document.getElementsByTagName("head")[0];
-    window.onload = function() {
-        script(contextPath + "{{scalar.js.url.prefix}}standalone.js", head);
-    };
+        window.onload = function() {
 
-    function script(src, head) {
-        const el = document.createElement("script");
-        el.src = src;
-        head.appendChild(el);
-        return el;
-    }
-</script>
+            const apiReferenceScript = script(contextPath + "{{scalar.js.url.prefix}}standalone.js", head);
+
+            apiReferenceScript.onload = function() {
+                Scalar.createApiReference('#app', {
+                    {{scalar.sources}}
+                    {{scalar.attributes}}
+                });
+            }
+        }
+
+        function script(src, head) {
+            const el = document.createElement("script");
+            el.src = src;
+            head.appendChild(el);
+            return el;
+        }
+    </script>
 </body>
 </html>

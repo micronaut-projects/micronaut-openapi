@@ -34,11 +34,11 @@ micronaut:
   openapi:
     groups:
       v1:
-        #The title that will be displayed in the group selector in the UI
+        # The title that will be displayed in the group selector in the UI
         display-name: My API v1
-        # A flag indicating that the swagger UI should select this group in the selector by default.
+        # A flag indicating that the Swagger UI / Scalar should select this group in the selector by default.
         primary: true
-        # The name of the final swagger file. If it is not set, then by default the name will be generated according
+        # The name of the final OpenAPI spec file. If it is not set, then by default the name will be generated according
         # to the following pattern: swagger-<version>-<groupName>-<apiVersion>. version - application version from the main
         # OpenAPIDefinition annotation, api-version - version from micronaut @Version annotation
         filename: myapiv1
@@ -58,13 +58,13 @@ micronaut:
          - com.micronaut.controller
 ----
 
-After processing the annotation processor, you will get 3 different swagger files.
+After processing the annotation processor, you will get 3 different OpenAPI files.
 
 == Integration with UI
 
-In rapidoc and redoc do not support multiple files at the same time,
+In RapiDoc, ReDoc and OpenAPI Explorer do not support multiple files at the same time,
 so for normal API display, you will have to complete the template yourself.
 
-Swagger UI has support for multiple files out of the box. The example above would look something like this:
+*Swagger UI* and *Scalar* support multiple files out of the box. The example above would look something like this:
 
 image::swagger-ui-with-groups.png[]

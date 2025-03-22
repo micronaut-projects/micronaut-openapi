@@ -16,7 +16,6 @@
 package io.micronaut.openapi.view;
 
 import io.micronaut.core.annotation.Nullable;
-import io.micronaut.core.util.StringUtils;
 import io.micronaut.inject.visitor.VisitorContext;
 import io.micronaut.openapi.view.OpenApiViewConfig.RendererType;
 import io.micronaut.openapi.visitor.Pair;
@@ -148,8 +147,8 @@ public final class RedocConfig extends AbstractViewConfig {
     @Override
     public String render(String template, @Nullable VisitorContext context) {
         template = rapiPDFConfig.render(template, RendererType.REDOC, context);
-        template = OpenApiViewConfig.replacePlaceHolder(template, "redoc.js.url.prefix", isDefaultJsUrl ? getFinalUrlPrefix(RendererType.REDOC, context) : jsUrl, StringUtils.EMPTY_STRING);
-        return OpenApiViewConfig.replacePlaceHolder(template, "redoc.attributes", toHtmlAttributes(), StringUtils.EMPTY_STRING);
+        template = OpenApiViewConfig.replacePlaceHolder(template, "redoc.js.url.prefix", isDefaultJsUrl ? getFinalUrlPrefix(RendererType.REDOC, context) : jsUrl);
+        return OpenApiViewConfig.replacePlaceHolder(template, "redoc.attributes", toHtmlAttributes());
     }
 
     @Override

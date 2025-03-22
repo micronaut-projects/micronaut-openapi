@@ -44,6 +44,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 
+import static io.micronaut.core.util.StringUtils.EMPTY_STRING;
 import static io.micronaut.openapi.adoc.utils.FileUtils.CLASSPATH_SCHEME;
 import static io.micronaut.openapi.adoc.utils.FileUtils.FILE_SCHEME;
 import static io.micronaut.openapi.adoc.utils.FileUtils.PROJECT_SCHEME;
@@ -143,7 +144,7 @@ public final class OpenApiViewConfig {
             }
             var keyValue = prop.split("=", 2);
             var key = keyValue[0].strip();
-            var value = keyValue.length == 1 ? StringUtils.EMPTY_STRING : keyValue[1].strip();
+            var value = keyValue.length == 1 ? EMPTY_STRING : keyValue[1].strip();
             if (key.isEmpty()) {
                 continue;
             }
@@ -335,7 +336,7 @@ public final class OpenApiViewConfig {
     }
 
     private String readTemplateFromCustomPath(String customPathStr, @Nullable VisitorContext context) throws IOException {
-        String projectDir = StringUtils.EMPTY_STRING;
+        String projectDir = EMPTY_STRING;
         Path projectPath = context != null ? getProjectPath(context) : null;
         if (projectPath != null) {
             projectDir = projectPath.toString().replace("\\\\", SLASH);
@@ -387,9 +388,10 @@ public final class OpenApiViewConfig {
             template = readTemplateFromCustomPath(cfg.templatePath, context);
         }
 
+        cfg.specUrl = getSpecURL(cfg, context);
         template = cfg.render(template, context);
-        template = replacePlaceHolder(template, "specURL", getSpecURL(cfg, context), StringUtils.EMPTY_STRING);
-        template = replacePlaceHolder(template, "title", title, StringUtils.EMPTY_STRING);
+        template = replacePlaceHolder(template, "specURL", cfg.specUrl);
+        template = replacePlaceHolder(template, "title", title);
         if (!Files.exists(outputDir)) {
             Files.createDirectories(outputDir);
         }
@@ -440,13 +442,13 @@ public final class OpenApiViewConfig {
             return cfg.specUrl;
         }
         if (specFile == null) {
-            return StringUtils.EMPTY_STRING;
+            return EMPTY_STRING;
         }
 
         // process micronaut.openapi.server.context.path
         String serverContextPath = ConfigUtils.getConfigProperty(MICRONAUT_OPENAPI_CONTEXT_SERVER_PATH, context);
         if (serverContextPath == null) {
-            serverContextPath = StringUtils.EMPTY_STRING;
+            serverContextPath = EMPTY_STRING;
         }
         String finalUrl = serverContextPath.startsWith(SLASH) ? serverContextPath : SLASH + serverContextPath;
         if (!finalUrl.endsWith(SLASH)) {
@@ -482,12 +484,11 @@ public final class OpenApiViewConfig {
      * @param template A template.
      * @param placeHolder The placeholder to replace.
      * @param value The value that will replace the placeholder.
-     * @param valuePrefix A prefix.
      *
      * @return The updated template.
      */
-    static String replacePlaceHolder(String template, String placeHolder, String value, String valuePrefix) {
-        return template.replace("{{" + placeHolder + "}}", StringUtils.isNotEmpty(value) ? valuePrefix + value : StringUtils.EMPTY_STRING);
+    public static String replacePlaceHolder(String template, String placeHolder, String value) {
+        return template.replace("{{" + placeHolder + "}}", StringUtils.isNotEmpty(value) ? value : EMPTY_STRING);
     }
 
     public SwaggerUIConfig getSwaggerUIConfig() {
