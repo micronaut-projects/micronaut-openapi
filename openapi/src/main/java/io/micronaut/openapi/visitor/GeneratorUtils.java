@@ -31,6 +31,7 @@ import io.swagger.v3.oas.models.parameters.Parameter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import static io.micronaut.openapi.visitor.ConvertUtils.findJsonValueType;
@@ -240,7 +241,7 @@ public final class GeneratorUtils {
         // check if upper case values equals with enum var names
         var generatedEnumVarNames = new ArrayList<String>(schema.getEnum().size());
         for (var enumVal : schema.getEnum()) {
-            generatedEnumVarNames.add(enumVal.toString().toUpperCase());
+            generatedEnumVarNames.add(enumVal.toString().toUpperCase(Locale.ENGLISH));
         }
 
         if (!enumVarNameList.isEmpty() && !extensions.containsKey(ENUM_VAR_NAMES)

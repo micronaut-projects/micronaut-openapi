@@ -1,0 +1,107 @@
+Typically, tags are set at the controller level, using annotations, to group multiple endpoints into a logical group, something like this:
+
+[source,java]
+----
+/**
+ * User main operations.
+ */
+@Tag("user-operations") // don't need to add this annotation anymore
+@Controller
+public class UserOperationsController {
+
+    @Get("/read/{id}")
+    public String read(String id) {
+        return "OK!";
+    }
+
+    @Post("/save/{id}")
+    public String save2(String id, Object body) {
+        return "OK!";
+    }
+
+    @Post("/save")
+    public String save(Object body) {
+        return "OK!";
+    }
+}
+----
+
+Now you can enable auto-generation of tags by class name or by package. Just enable it by property:
+
+.openapi.properties
+[source,properties]
+----
+micronaut.openapi.tag.generation.by.class.enabled=true
+
+# If you want to remove some prefixes or postfixes from the class/package name, you can
+# specify them separated by commas. This way the first found prefix/postfix will be
+# removed from the file/package name. By default, the postfixes to be removed are: Api, Controller, Endpoints, Endpoint
+micronaut.openapi.tag.generation.remove.prefixes=
+micronaut.openapi.tag.generation.remove.postfixes=Api, Controller
+
+# to enable tags generation by package uncomment this property
+# micronaut.openapi.tag.generation.by.package.enabled=true
+
+# If you want tag names to follow a specific naming strategy, set it. Otherwise, the
+# name will be calculated from the class "as is", most likely in UPPER_CAMEL_CASE
+micronaut.openapi.tag.generation.naming.strategy=KEBAB_CASE
+----
+
+With these properties you don't need to set `@Tag` annotation. Tag `user-operations` will be added to global tags with description for javadoc from controller. Generated OpenAPI specification will be like this:
+
+[source,yaml]
+.openapi/swagger.yml
+----
+openapi: 3.0.1
+info:
+  title: swagger
+  version: "1.0"
+tags:
+  - name: user-operations
+    description: User main operations.
+paths:
+  /read/{id}:
+    get:
+      tags:
+        - user-operations
+      operationId: read
+      parameters:
+        - name: id
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Ok
+  /save/{id}:
+    post:
+      tags:
+        - user-operations
+      operationId: save2
+      parameters:
+        - name: id
+          in: path
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Ok
+  /save:
+    post:
+      tags:
+        - user-operations
+      operationId: save
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Ok
+----

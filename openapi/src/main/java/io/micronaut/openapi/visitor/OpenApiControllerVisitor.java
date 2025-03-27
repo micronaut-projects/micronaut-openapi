@@ -59,6 +59,8 @@ import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_CH
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_IS_PROCESS_PARENT_CLASS;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ENABLED;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_HIDDEN;
+import static io.micronaut.openapi.visitor.TagUtils.processOpenApiAnnotation;
+import static io.micronaut.openapi.visitor.TagUtils.readTags;
 import static io.micronaut.openapi.visitor.Utils.DEFAULT_MEDIA_TYPES;
 
 /**

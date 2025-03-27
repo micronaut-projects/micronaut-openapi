@@ -17,7 +17,6 @@ package io.micronaut.openapi.visitor;
 
 import io.micronaut.core.annotation.AnnotationValue;
 import io.micronaut.core.annotation.Internal;
-import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.http.uri.UriMatchTemplate;
 import io.micronaut.inject.ast.ClassElement;
 import io.micronaut.inject.ast.Element;
@@ -28,11 +27,8 @@ import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.PathItem;
 import io.swagger.v3.oas.models.Paths;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
-import io.swagger.v3.oas.models.tags.Tag;
 
-import java.lang.annotation.Annotation;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,9 +36,6 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import static io.micronaut.openapi.visitor.InternalExt.MICRONAUT_OP_POSTFIX;
-import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_NAME;
-import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_SCOPES;
-import static io.micronaut.openapi.visitor.SchemaDefinitionUtils.toValue;
 import static io.micronaut.openapi.visitor.UrlUtils.buildUrls;
 import static io.micronaut.openapi.visitor.UrlUtils.parsePathSegments;
 
@@ -153,58 +146,5 @@ abstract class AbstractOpenApiVisitor {
         var values = element.getAnnotationValuesByType(SecurityScheme.class);
         final OpenAPI openApi = Utils.resolveOpenApi(context);
         ConvertUtils.addSecuritySchemes(openApi, values, context);
-    }
-
-    /**
-     * Converts annotation to model.
-     *
-     * @param <T> The model type.
-     * @param <A> The annotation type.
-     * @param element The element to process.
-     * @param context The context.
-     * @param annotationType The annotation type.
-     * @param modelType The model type.
-     * @param tagList The initial list of models.
-     *
-     * @return A list of model objects.
-     */
-    protected <T, A extends Annotation> List<T> processOpenApiAnnotation(Element element, VisitorContext context, Class<A> annotationType, Class<T> modelType, List<T> tagList) {
-        List<AnnotationValue<A>> annotations = element.getAnnotationValuesByType(annotationType);
-        if (CollectionUtils.isEmpty(tagList)) {
-            tagList = new ArrayList<>();
-        }
-        if (CollectionUtils.isEmpty(annotations)) {
-            return tagList;
-        }
-        for (AnnotationValue<A> tag : annotations) {
-            Map<CharSequence, Object> values;
-            var tagValues = tag.getValues();
-            if (tag.getAnnotationName().equals(io.swagger.v3.oas.annotations.security.SecurityRequirement.class.getName())
-                && !tagValues.isEmpty()) {
-                Object name = tagValues.get(PROP_NAME);
-                Object scopes = tagValues.computeIfAbsent(PROP_SCOPES, (key) -> new ArrayList<String>());
-                values = Collections.singletonMap((CharSequence) name, scopes);
-            } else {
-                values = tagValues;
-            }
-            T tagObj = toValue(tag.getAnnotationName(), values, context, modelType, null);
-            if (tagObj != null) {
-                // skip all existed tags
-                boolean alreadyExists = false;
-                if (CollectionUtils.isNotEmpty(tagList) && tag.getAnnotationName().equals(io.swagger.v3.oas.annotations.tags.Tag.class.getName())) {
-                    var newTagName = ((Tag) tagObj).getName();
-                    for (T existedTag : tagList) {
-                        if (((Tag) existedTag).getName().equals(newTagName)) {
-                            alreadyExists = true;
-                            break;
-                        }
-                    }
-                }
-                if (!alreadyExists) {
-                    tagList.add(tagObj);
-                }
-            }
-        }
-        return tagList;
     }
 }

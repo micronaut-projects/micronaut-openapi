@@ -172,7 +172,7 @@ class PetController {
  */
 @Serdeable
 record Pet(
-        @NotBlank
+    @NotBlank
     @Size(max = 200)
     String name) {}
 

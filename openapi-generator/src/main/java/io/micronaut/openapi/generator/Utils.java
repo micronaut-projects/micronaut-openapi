@@ -29,6 +29,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -425,7 +426,7 @@ public final class Utils {
                 if (argPos >= 0) {
                     value = value.substring(argPos + 1, value.indexOf(')'));
                 }
-                var upperValue = value.toUpperCase();
+                var upperValue = value.toUpperCase(Locale.ENGLISH);
                 if (upperValue.endsWith("F")
                     || upperValue.endsWith("L")
                     || upperValue.endsWith("D")) {

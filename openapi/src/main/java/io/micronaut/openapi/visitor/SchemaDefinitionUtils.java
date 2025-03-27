@@ -110,6 +110,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -316,7 +317,7 @@ public final class SchemaDefinitionUtils {
                 setEnumValues(enumEl, schema, context);
             }
         } else {
-            JavadocDescription javadoc = type != null ? Utils.getJavadocParser().parse(type.getDescription()) : null;
+            JavadocDescription javadoc = type != null ? Utils.getJavadocParser().parse(type.getDocumentation().orElse(null)) : null;
             populateSchemaProperties(openAPI, context, type, typeArgs, schema, mediaTypes, javadoc, jsonViewClass);
             checkAllOf(schema);
         }
@@ -1771,7 +1772,7 @@ public final class SchemaDefinitionUtils {
             var visibilityLevel = VisibilityLevel.PUBLIC;
             if (StringUtils.hasText(visibilityLevelProp)) {
                 try {
-                    visibilityLevel = VisibilityLevel.valueOf(visibilityLevelProp.toUpperCase());
+                    visibilityLevel = VisibilityLevel.valueOf(visibilityLevelProp.toUpperCase(Locale.ENGLISH));
                 } catch (Exception e) {
                     throw new IllegalStateException("Wrong value for visibility level property: " + getConfigProperty(MICRONAUT_OPENAPI_FIELD_VISIBILITY_LEVEL, context));
                 }
