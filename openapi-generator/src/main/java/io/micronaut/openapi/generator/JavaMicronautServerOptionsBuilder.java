@@ -22,6 +22,15 @@ package io.micronaut.openapi.generator;
 public interface JavaMicronautServerOptionsBuilder extends GeneratorOptionsBuilder {
 
     /**
+     * Generate or not public no-args constructor always.
+     *
+     * @param noArgsConstructor generate or not public no-args constructor always
+     *
+     * @return this builder
+     */
+    JavaMicronautServerOptionsBuilder withNoArgsConstructor(boolean noArgsConstructor);
+
+    /**
      * Sets the package name of generated controller classes.
      *
      * @param controllerPackage the package name

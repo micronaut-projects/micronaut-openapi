@@ -272,6 +272,13 @@ public class JavaMicronautClientCodegen extends AbstractMicronautJavaCodegen<Jav
         private boolean plural;
         private boolean fluxForArrays;
         private boolean generatedAnnotation = true;
+        private boolean noArgsConstructor;
+
+        @Override
+        public JavaMicronautClientOptionsBuilder withNoArgsConstructor(boolean noArgsConstructor) {
+            this.noArgsConstructor = noArgsConstructor;
+            return this;
+        }
 
         @Override
         public JavaMicronautClientOptionsBuilder withAuthorization(boolean useAuth) {
@@ -344,7 +351,8 @@ public class JavaMicronautClientCodegen extends AbstractMicronautJavaCodegen<Jav
                 lombok,
                 plural,
                 fluxForArrays,
-                generatedAnnotation
+                generatedAnnotation,
+                noArgsConstructor
             );
         }
     }
@@ -359,7 +367,8 @@ public class JavaMicronautClientCodegen extends AbstractMicronautJavaCodegen<Jav
         boolean lombok,
         boolean plural,
         boolean fluxForArrays,
-        boolean generatedAnnotation
+        boolean generatedAnnotation,
+        boolean noArgsConstructor
     ) {
     }
 }

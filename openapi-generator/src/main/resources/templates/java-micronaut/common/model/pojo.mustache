@@ -167,11 +167,27 @@ public {{>common/model/sealed}}class {{classname}}{{#parent}} extends {{{parent}
     {{/vars}}
 
     {{#requiredPropertiesInConstructor}}
+        {{#micronaut_serde_jackson}}
+            {{#vendorExtensions.withRequiredVars}}
+                {{#noArgsConstructor}}
+    public {{classname}}() {
+    }
+
+                {{/noArgsConstructor}}
+            {{/vendorExtensions.withRequiredVars}}
+        {{/micronaut_serde_jackson}}
         {{^micronaut_serde_jackson}}
             {{#vendorExtensions.withRequiredVars}}
+                {{#noArgsConstructor}}
+    public {{classname}}() {
+    }
+
+                {{/noArgsConstructor}}
+                {{^noArgsConstructor}}
     private {{classname}}() {
     }
 
+                {{/noArgsConstructor}}
             {{/vendorExtensions.withRequiredVars}}
         {{/micronaut_serde_jackson}}
         {{#formatNoEmptyLines}}
