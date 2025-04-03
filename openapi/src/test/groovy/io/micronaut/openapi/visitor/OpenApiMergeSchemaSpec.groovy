@@ -5,6 +5,7 @@ import io.micronaut.openapi.AbstractOpenApiTypeElementSpec
 import io.swagger.v3.oas.models.Components
 import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.Operation
+import spock.lang.Issue
 import spock.util.environment.RestoreSystemProperties
 
 class OpenApiMergeSchemaSpec extends AbstractOpenApiTypeElementSpec {
@@ -487,5 +488,262 @@ class MyBean {}
         openApi.servers[0].url == "https://petstore.swagger.io/v1"
         openApi.paths."/pets".get
         openApi.paths."/pets".post
+    }
+
+    @Issue("https://github.com/micronaut-projects/micronaut-openapi/issues/2070")
+    @RestoreSystemProperties
+    void "test merge with additional openapi file path with different methods: APPEND mode"() {
+
+        given:
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_CONFIG_FILE_LOCATIONS, "project:/src/test/resources/")
+        System.setProperty(Environment.ENVIRONMENTS_PROPERTY, "additional-files2")
+
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.micronaut.http.annotation.PathVariable;
+
+@Controller
+class DemoController {
+
+  @Get("/resources/{id}")
+  public String getResource(@PathVariable String id) {
+    return "The resource id is: " + id;
+  }
+
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        then:
+        Utils.testReference
+
+        when:
+        var openApi = Utils.testReference
+        var pathItem = openApi.paths."/resources/{id}"
+
+        then:
+        openApi
+        pathItem.get
+        pathItem.get.parameters
+        pathItem.get.parameters[0].name == 'id'
+
+        pathItem.options
+        pathItem.options.operationId == 'resourcesOptions'
+        pathItem.options.responses
+        pathItem.options.responses."200"
+        pathItem.options.responses."200".headers.size() == 4
+    }
+
+    @RestoreSystemProperties
+    void "test merge with additional openapi file path with different methods: REPLACE mode"() {
+
+        given:
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_CONFIG_FILE_LOCATIONS, "project:/src/test/resources/")
+        System.setProperty(Environment.ENVIRONMENTS_PROPERTY, "additional-files2")
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_ADDITIONAL_FILES_MERGE_MODE, "replace")
+
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.micronaut.http.annotation.PathVariable;
+
+@Controller
+class DemoController {
+
+  @Get("/resources/{id}")
+  public String getResource(@PathVariable String id) {
+    return "The resource id is: " + id;
+  }
+
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        then:
+        Utils.testReference
+
+        when:
+        var openApi = Utils.testReference
+        var pathItem = openApi.paths."/resources/{id}"
+
+        then:
+        openApi
+        pathItem.get
+        pathItem.get.parameters
+        pathItem.get.parameters[0].name == 'id'
+
+        pathItem.options
+        pathItem.options.operationId == 'resourcesOptions'
+        pathItem.options.responses
+        pathItem.options.responses."200"
+        pathItem.options.responses."200".headers.size() == 4
+    }
+
+    @RestoreSystemProperties
+    void "test merge with additional openapi file path with different content types: APPEND mode"() {
+
+        given:
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_CONFIG_FILE_LOCATIONS, "project:/src/test/resources/")
+        System.setProperty(Environment.ENVIRONMENTS_PROPERTY, "additional-files3")
+
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.http.MediaType;
+import io.micronaut.http.annotation.Body;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.PathVariable;
+import io.micronaut.http.annotation.Post;
+
+@Controller
+class DemoController {
+
+  @Post("/resources/{id}")
+  public String getResource(@PathVariable String id, @Body String body) {
+    return "The resource id is: " + id;
+  }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        then:
+        Utils.testReference
+
+        when:
+        var openApi = Utils.testReference
+        var op = openApi.paths."/resources/{id}".post
+
+        then:
+        op
+        op.requestBody.content."application/json".schema.type == "string"
+        !op.requestBody.content."application/json".schema.properties
+        op.requestBody.content."text/xml".schema.properties
+        op.requestBody.content."text/xml".schema.properties.prop1
+        op.requestBody.content."text/xml".schema.properties.prop2
+
+        op.responses."200".content."application/json".schema.type == "string"
+        !op.responses."200".content."application/json".schema.properties
+        op.responses."200".content."text/xml".schema.properties
+        op.responses."200".content."text/xml".schema.properties.prop1
+        op.responses."200".content."text/xml".schema.properties.prop2
+    }
+
+    @RestoreSystemProperties
+    void "test merge with additional openapi file path with different content types: REPLACE mode"() {
+
+        given:
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_CONFIG_FILE_LOCATIONS, "project:/src/test/resources/")
+        System.setProperty(Environment.ENVIRONMENTS_PROPERTY, "additional-files3")
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_ADDITIONAL_FILES_MERGE_MODE, "replace")
+
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.http.MediaType;
+import io.micronaut.http.annotation.Body;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.PathVariable;
+import io.micronaut.http.annotation.Post;
+
+@Controller
+class DemoController {
+
+  @Post("/resources/{id}")
+  public String getResource(@PathVariable String id, @Body String body) {
+    return "The resource id is: " + id;
+  }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        then:
+        Utils.testReference
+
+        when:
+        var openApi = Utils.testReference
+        var op = openApi.paths."/resources/{id}".post
+
+        then:
+        op
+        op.requestBody.content."application/json".schema.properties
+        op.requestBody.content."application/json".schema.properties.prop1
+        op.requestBody.content."application/json".schema.properties.prop2
+        op.requestBody.content."text/xml".schema.properties
+        op.requestBody.content."text/xml".schema.properties.prop1
+        op.requestBody.content."text/xml".schema.properties.prop2
+
+        op.responses."200".content."application/json".schema.properties
+        op.responses."200".content."application/json".schema.properties.prop1
+        op.responses."200".content."application/json".schema.properties.prop2
+        op.responses."200".content."text/xml".schema.properties
+        op.responses."200".content."text/xml".schema.properties.prop1
+        op.responses."200".content."text/xml".schema.properties.prop2
+    }
+
+    @RestoreSystemProperties
+    void "test merge with additional openapi file path with different content types: APPEND mode2"() {
+
+        given:
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_CONFIG_FILE_LOCATIONS, "project:/src/test/resources/")
+        System.setProperty(Environment.ENVIRONMENTS_PROPERTY, "additional-files3")
+
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.http.MediaType;
+import io.micronaut.http.annotation.Body;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.PathVariable;
+import io.micronaut.http.annotation.Post;
+
+@Controller
+class DemoController {
+
+  @Post(value = "/resources/{id}", consumes = MediaType.TEXT_XML, produces = MediaType.TEXT_XML)
+  public String getResource(@PathVariable String id, @Body String body) {
+    return "The resource id is: " + id;
+  }
+
+  @Post("/resources/{id}")
+  public String getResource2(@PathVariable String id, @Body String body) {
+    return "The resource id is: " + id;
+  }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        then:
+        Utils.testReference
+
+        when:
+        var openApi = Utils.testReference
+        var op = openApi.paths."/resources/{id}".post
+
+        then:
+        op
+        op.requestBody.content."application/json".schema.type == "string"
+        !op.requestBody.content."application/json".schema.properties
+        op.requestBody.content."text/xml".schema.type == "string"
+        !op.requestBody.content."text/xml".schema.properties
+
+        op.responses."200".content."application/json".schema.type == "string"
+        !op.responses."200".content."application/json".schema.properties
+        op.responses."200".content."text/xml".schema.type == "string"
+        !op.responses."200".content."text/xml".schema.properties
     }
 }
