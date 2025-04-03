@@ -127,6 +127,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
     public static final String OPT_REQUIRED_PROPERTIES_IN_CONSTRUCTOR = "requiredPropertiesInConstructor";
     public static final String OPT_USE_AUTH = "useAuth";
     public static final String OPT_USE_LOMBOK = "lombok";
+    public static final String OPT_NO_ARGS_CONSTRUCTOR = "noArgsConstructor";
     public static final String OPT_USE_PLURAL = "plural";
     public static final String OPT_FLUX_FOR_ARRAYS = "fluxForArrays";
     public static final String OPT_GENERATED_ANNOTATION = "generatedAnnotation";
@@ -164,6 +165,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
     protected boolean useOptional;
     protected boolean visitable;
     protected boolean lombok;
+    protected boolean noArgsConstructor;
     protected boolean fluxForArrays;
     protected boolean plural = true;
     protected boolean generatedAnnotation = true;
@@ -268,6 +270,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
         cliOptions.add(new CliOption(OPT_TITLE, "Client service name").defaultValue(title));
         cliOptions.add(new CliOption(OPT_APPLICATION_NAME, "Micronaut application name (Defaults to the " + CodegenConstants.ARTIFACT_ID + " value)").defaultValue(appName));
         cliOptions.add(CliOption.newBoolean(OPT_USE_LOMBOK, "Whether or not to use lombok annotations in generated code", lombok));
+        cliOptions.add(CliOption.newBoolean(OPT_NO_ARGS_CONSTRUCTOR, "Generate or not no-args constructor for each POJO", noArgsConstructor));
         cliOptions.add(CliOption.newBoolean(OPT_USE_PLURAL, "Whether or not to use plural for request body parameter name", plural));
         cliOptions.add(CliOption.newBoolean(OPT_FLUX_FOR_ARRAYS, "Whether or not to use Flux<?> instead Mono<List<?>> for arrays in generated code", fluxForArrays));
         cliOptions.add(CliOption.newBoolean(OPT_GENERATED_ANNOTATION, "Generate code with \"@Generated\" annotation", generatedAnnotation));
@@ -424,6 +427,10 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
         this.lombok = lombok;
     }
 
+    public void setNoArgsConstructor(boolean noArgsConstructor) {
+        this.noArgsConstructor = noArgsConstructor;
+    }
+
     public void setPlural(boolean plural) {
         this.plural = plural;
     }
@@ -499,6 +506,11 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
             lombok = convertPropertyToBoolean(OPT_USE_LOMBOK);
         }
         writePropertyBack(OPT_USE_LOMBOK, lombok);
+
+        if (additionalProperties.containsKey(OPT_NO_ARGS_CONSTRUCTOR)) {
+            noArgsConstructor = convertPropertyToBoolean(OPT_NO_ARGS_CONSTRUCTOR);
+        }
+        writePropertyBack(OPT_NO_ARGS_CONSTRUCTOR, noArgsConstructor);
 
         if (additionalProperties.containsKey(OPT_USE_PLURAL)) {
             plural = convertPropertyToBoolean(OPT_USE_PLURAL);

@@ -24,6 +24,15 @@ import java.util.List;
 public interface JavaMicronautClientOptionsBuilder extends GeneratorOptionsBuilder {
 
     /**
+     * Generate or not public no-args constructor always.
+     *
+     * @param noArgsConstructor generate or not public no-args constructor always
+     *
+     * @return this builder
+     */
+    JavaMicronautClientOptionsBuilder withNoArgsConstructor(boolean noArgsConstructor);
+
+    /**
      * If set to true the client will be configured for authorization.
      *
      * @param useAuth the authorization flag
