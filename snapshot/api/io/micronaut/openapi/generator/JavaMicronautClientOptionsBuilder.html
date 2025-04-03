@@ -140,8 +140,13 @@ extends <a href="GeneratorOptionsBuilder.html" title="interface in io.micronaut.
 <div class="block">If set to true, generated code will be with lombok annotations.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="JavaMicronautClientOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">JavaMicronautClientOptionsBuilder</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withPlural(boolean)" class="member-name-link">withPlural</a><wbr>(boolean&nbsp;plural)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withNoArgsConstructor(boolean)" class="member-name-link">withNoArgsConstructor</a><wbr>(boolean&nbsp;noArgsConstructor)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block">Generate or not public no-args constructor always.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="JavaMicronautClientOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">JavaMicronautClientOptionsBuilder</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#withPlural(boolean)" class="member-name-link">withPlural</a><wbr>(boolean&nbsp;plural)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">If set to true, the generated code will pluralize parameters and properties for arrays.</div>
 </div>
 </div>
@@ -158,6 +163,19 @@ extends <a href="GeneratorOptionsBuilder.html" title="interface in io.micronaut.
 <section class="method-details" id="method-detail">
 <h2>Method Details</h2>
 <ul class="member-list">
+<li>
+<section class="detail" id="withNoArgsConstructor(boolean)">
+<h3>withNoArgsConstructor</h3>
+<div class="member-signature"><span class="return-type"><a href="JavaMicronautClientOptionsBuilder.html" title="interface in io.micronaut.openapi.generator">JavaMicronautClientOptionsBuilder</a></span>&nbsp;<span class="element-name">withNoArgsConstructor</span><wbr><span class="parameters">(boolean&nbsp;noArgsConstructor)</span></div>
+<div class="block">Generate or not public no-args constructor always.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>noArgsConstructor</code> - generate or not public no-args constructor always</dd>
+<dt>Returns:</dt>
+<dd>this builder</dd>
+</dl>
+</section>
+</li>
 <li>
 <section class="detail" id="withAuthorization(boolean)">
 <h3>withAuthorization</h3>
