@@ -1169,17 +1169,23 @@ public final class SchemaUtils {
             }
         }
         if (CollectionUtils.isNotEmpty(from.getPaths())) {
-            if (replace) {
-                from.getPaths().forEach(to::path);
-            } else {
-                var paths = to.getPaths();
-                if (paths == null) {
-                    paths = new Paths();
-                    to.setPaths(paths);
-                }
 
-                for (var pathEntry : from.getPaths().entrySet()) {
-                    paths.putIfAbsent(pathEntry.getKey(), pathEntry.getValue());
+            var toPaths = to.getPaths();
+            if (toPaths == null) {
+                toPaths = new Paths();
+                to.setPaths(toPaths);
+            }
+
+            for (var fromPathEntry : from.getPaths().entrySet()) {
+                if (!toPaths.containsKey(fromPathEntry.getKey())) {
+                    toPaths.put(fromPathEntry.getKey(), fromPathEntry.getValue());
+                    continue;
+                }
+                // if we found existed path, need to check every method and content-type
+                // can exist same path, but with different content type or method - it's different endpoints
+                var fromPathItem = fromPathEntry.getValue();
+                for (var method : PathItem.HttpMethod.values()) {
+                    replaceOrAppendOperation(method, fromPathItem, toPaths.get(fromPathEntry.getKey()), replace);
                 }
             }
         }
@@ -1297,6 +1303,127 @@ public final class SchemaUtils {
         }
     }
 
+    private static void replaceOrAppendOperation(PathItem.HttpMethod method, PathItem from, PathItem to, boolean replace) {
+        var fromOp = from.readOperationsMap().get(method);
+        var toOp = to.readOperationsMap().get(method);
+        if (fromOp == null) {
+            return;
+        }
+        if (toOp == null) {
+            to.operation(method, fromOp);
+            return;
+        }
+
+        var fromRb = fromOp.getRequestBody();
+        var toRb = toOp.getRequestBody();
+        if (fromRb != null) {
+            if (toRb == null) {
+                toOp.setRequestBody(fromRb);
+            } else {
+                var fromContent = fromRb.getContent();
+                var toContent = toRb.getContent();
+                if (fromContent != null) {
+                    if (toContent == null) {
+                        toRb.setContent(fromContent);
+                    } else {
+
+                        for (var fromMediaTypeEntry : fromContent.entrySet()) {
+                            if (toContent.containsKey(fromMediaTypeEntry.getKey())) {
+                                if (!replace) {
+                                    continue;
+                                }
+                            }
+                            toContent.put(fromMediaTypeEntry.getKey(), fromMediaTypeEntry.getValue());
+                        }
+                    }
+                }
+                if (toRb.getDescription() == null || replace) {
+                    toRb.description(fromRb.getDescription());
+                }
+                if (toRb.getRequired() == null || replace) {
+                    toRb.required(fromRb.getRequired());
+                }
+                if (toRb.getExtensions() == null || replace) {
+                    toRb.extensions(fromRb.getExtensions());
+                }
+            }
+        }
+        var fromResponses = fromOp.getResponses();
+        var toResponses = toOp.getResponses();
+        if (fromResponses != null) {
+            if (toResponses == null) {
+                toOp.setResponses(fromResponses);
+            } else {
+                for (var fromResponseEntry : fromResponses.entrySet()) {
+                    var fromResponse = fromResponseEntry.getValue();
+                    var toResponse = toResponses.get(fromResponseEntry.getKey());
+                    if (toResponse == null) {
+                        if (!replace) {
+                            continue;
+                        }
+                        toResponses.put(fromResponseEntry.getKey(), fromResponseEntry.getValue());
+                        continue;
+                    }
+                    var fromContent = fromResponse.getContent();
+                    var toContent = toResponse.getContent();
+                    if (fromContent != null) {
+                        if (toContent == null) {
+                            toResponse.setContent(fromContent);
+                        } else {
+
+                            for (var fromMediaTypeEntry : fromContent.entrySet()) {
+                                if (toContent.containsKey(fromMediaTypeEntry.getKey())) {
+                                    if (!replace) {
+                                        continue;
+                                    }
+                                }
+                                toContent.put(fromMediaTypeEntry.getKey(), fromMediaTypeEntry.getValue());
+                            }
+                        }
+                    }
+
+                    if (toResponse.getHeaders() == null || replace) {
+                        toResponse.headers(fromResponse.getHeaders());
+                    }
+                    if (toResponse.getDescription() == null || replace) {
+                        toResponse.description(fromResponse.getDescription());
+                    }
+                    if (toResponse.getExtensions() == null || replace) {
+                        toResponse.extensions(fromResponse.getExtensions());
+                    }
+                }
+            }
+        }
+
+        if (toOp.getDeprecated() == null || replace) {
+            toOp.deprecated(fromOp.getDeprecated());
+        }
+        if (toOp.getSummary() == null || replace) {
+            toOp.summary(fromOp.getSummary());
+        }
+        if (toOp.getDescription() == null || replace) {
+            toOp.description(fromOp.getDescription());
+        }
+        if (toOp.getExternalDocs() == null || replace) {
+            toOp.externalDocs(fromOp.getExternalDocs());
+        }
+        if (toOp.getParameters() == null || replace) {
+            toOp.parameters(fromOp.getParameters());
+        }
+        if (toOp.getCallbacks() == null || replace) {
+            toOp.callbacks(fromOp.getCallbacks());
+        }
+        if (toOp.getSecurity() == null || replace) {
+            toOp.security(fromOp.getSecurity());
+        }
+        if (toOp.getServers() == null || replace) {
+            toOp.servers(fromOp.getServers());
+        }
+        if (toOp.getExtensions() == null || replace) {
+            toOp.extensions(fromOp.getExtensions());
+        }
+    }
+
     private static <T> void replaceOrAppendComponents(Map<String, T> from, Map<String, T> to, boolean replace) {
         if (CollectionUtils.isEmpty(from)) {
             return;
@@ -1317,9 +1444,9 @@ public final class SchemaUtils {
     }
 
     public static boolean isIgnoredHeader(String headerName) {
-        // Header parameter named "Authorization" are ignored. Use the `securitySchemes` and `security` sections instead to define authorization
-        // Header parameter named "Content-Type" are ignored. The values for the "Content-Type" header are defined by `request.body.content.<media-type>`
-        // Header parameter named "Accept" are ignored. The values for the "Accept" header are defined by `responses.<code>.content.<media-type>`
+        // Header parameter named "Authorization" is ignored. Use the `securitySchemes` and `security` sections instead to define authorization
+        // Header parameter named "Content-Type" is ignored. The values for the "Content-Type" header are defined by `request.body.content.<media-type>`
+        // Header parameter named "Accept" is ignored. The values for the "Accept" header are defined by `responses.<code>.content.<media-type>`
         return HttpHeaders.AUTHORIZATION.equalsIgnoreCase(headerName)
             || HttpHeaders.CONTENT_TYPE.equalsIgnoreCase(headerName)
             || HttpHeaders.ACCEPT.equalsIgnoreCase(headerName);

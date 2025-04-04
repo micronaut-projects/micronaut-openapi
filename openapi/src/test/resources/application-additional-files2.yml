@@ -1,0 +1,6 @@
+micronaut:
+  openapi:
+    additional:
+      files-merge-mode: append
+      files:
+        - project:src/test/resources/merge/option-endpoints.yml

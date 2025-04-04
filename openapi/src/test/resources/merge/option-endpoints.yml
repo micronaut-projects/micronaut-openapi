@@ -1,0 +1,26 @@
+openapi: 3.0.1
+info:
+  title: demo
+  version: "0.0"
+paths:
+  /resources/{id}:
+    options:
+      operationId: resourcesOptions
+      responses:
+        "200":
+          description: Success
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+            Access-Control-Allow-Credentials:
+              schema:
+                type: string
+            Access-Control-Allow-Methods:
+              schema:
+                type: string
+            Access-Control-Allow-Headers:
+              schema:
+                type: string
+          content:
+            application/json: {}
