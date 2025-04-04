@@ -32,11 +32,11 @@ public final class GroupProperties {
      */
     private final String name;
     /**
-     * Group title for swagger-ui selector.
+     * Group title for Swagger UI / Scalar selector.
      */
     private String displayName;
     /**
-     * Is this group primary for swagger-ui.
+     * Is this group primary for Swagger UI / Scalar.
      */
     private Boolean primary;
     /**

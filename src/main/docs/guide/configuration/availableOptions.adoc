@@ -53,7 +53,7 @@ PUBLIC | Default: `PUBLIC`
 You can set your custom paths separated by `,`. To set absolute paths use prefix `file:`,
 classpath paths use prefix `classpath:` or use prefix `project:` to set paths from project
 directory. |
-|`*micronaut.openapi.schema.extra.enable*` | If this property true, you can add some extra schemas to final openapi spec file. | Default: `false`
+|`*micronaut.openapi.schema.extra.enable*` | If this property true, you can add some extra schemas to final OpenAPI spec file. | Default: `false`
 |`*micronaut.openapi.schema.duplicate-resolution*` | System property to set schema duplicate resolution. Available values: +
 `*auto*` - micronaut-openapi automatically add index suffix to duplicate schema. +
 `*error*` - micronaut-openapi throws an exception when found duplicate schema. | Default: `auto`

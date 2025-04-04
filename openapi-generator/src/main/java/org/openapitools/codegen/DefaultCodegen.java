@@ -4576,7 +4576,7 @@ public class DefaultCodegen implements CodegenConfig {
      * Set op's returnBaseType, returnType, examples etc.
      *
      * @param operation      endpoint Operation
-     * @param schemas        a map of the schemas in the openapi spec
+     * @param schemas        a map of the schemas in the OpenAPI spec
      * @param op             endpoint CodegenOperation
      * @param methodResponse the default ApiResponse for the endpoint
      */
@@ -4591,7 +4591,7 @@ public class DefaultCodegen implements CodegenConfig {
      * Set op's returnBaseType, returnType, examples etc.
      *
      * @param operation      endpoint Operation
-     * @param schemas        a map of the schemas in the openapi spec
+     * @param schemas        a map of the schemas in the OpenAPI spec
      * @param op             endpoint CodegenOperation
      * @param methodResponse the default ApiResponse for the endpoint
      * @param schemaMappings mappings of external types to be omitted by unaliasing

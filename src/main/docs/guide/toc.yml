@@ -48,7 +48,7 @@ openApiViews:
   viewsGenerationWithPropertiesFile: Enable Views Generation with a properties file
   viewsGenerationWithSystemProperties: Enable Views Generation with system properties
   swaggerui:
-    title: Swagger-UI
+    title: Swagger UI
     oauth2: Swagger UI - OAuth 2.0 configuration
   redoc: ReDoc
   openapiExplorer: OpenAPI Explorer

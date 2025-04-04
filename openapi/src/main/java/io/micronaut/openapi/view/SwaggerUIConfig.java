@@ -34,13 +34,15 @@ import java.util.stream.Collectors;
 
 import static io.micronaut.core.util.StringUtils.EMPTY_STRING;
 import static io.micronaut.openapi.view.OpenApiViewConfig.replacePlaceHolder;
+import static io.micronaut.openapi.visitor.StringUtil.CLOSE_BRACE;
 import static io.micronaut.openapi.visitor.StringUtil.COMMA_NEW_LINE;
 import static io.micronaut.openapi.visitor.StringUtil.DOT;
 import static io.micronaut.openapi.visitor.StringUtil.KEY_VALUE_SEPARATOR;
+import static io.micronaut.openapi.visitor.StringUtil.OPEN_BRACE;
 import static io.micronaut.openapi.visitor.StringUtil.SLASH;
 
 /**
- * Swagger-ui configuration.
+ * Swagger UI configuration.
  *
  * @author croudet
  */
@@ -157,7 +159,7 @@ public final class SwaggerUIConfig extends AbstractViewConfig {
     }
 
     /**
-     * Swagger-ui themes. <a href="https://github.com/ilyamixaltik/swagger-themes">link</a>
+     * Swagger UI themes. <a href="https://github.com/ilyamixaltik/swagger-themes">link</a>
      */
     enum Theme {
         CLASSIC("classic"),
@@ -260,23 +262,23 @@ public final class SwaggerUIConfig extends AbstractViewConfig {
         String finalUrlPrefix = getFinalUrlPrefix(RendererType.SWAGGER_UI, context);
 
         template = rapiPDFConfig.render(template, RendererType.SWAGGER_UI, context);
-        template = replacePlaceHolder(template, PREFIX_SWAGGER_UI + ".js.url.prefix", isDefaultJsUrl ? finalUrlPrefix : jsUrl, EMPTY_STRING);
-        template = replacePlaceHolder(template, PREFIX_SWAGGER_UI + ".attributes", toOptions(), EMPTY_STRING);
+        template = replacePlaceHolder(template, PREFIX_SWAGGER_UI + ".js.url.prefix", isDefaultJsUrl ? finalUrlPrefix : jsUrl);
+        template = replacePlaceHolder(template, PREFIX_SWAGGER_UI + ".attributes", toOptions());
 
         if (theme != null && Theme.CLASSIC != theme) {
             var themeCssLink = isDefaultThemeUrl ? finalUrlPrefix + theme.getCss() + ".css" : themeUrl;
-            template = template.replace("{{" + PREFIX_SWAGGER_UI + ".theme}}", "link(contextPath + \"" + themeCssLink + "\", head, \"text/css\", \"stylesheet\")");
+            template = replacePlaceHolder(template, PREFIX_SWAGGER_UI + ".theme", "link(contextPath + \"" + themeCssLink + "\", head, \"text/css\", \"stylesheet\")");
         } else {
-            template = template.replace("{{" + PREFIX_SWAGGER_UI + ".theme}}", EMPTY_STRING);
+            template = replacePlaceHolder(template, PREFIX_SWAGGER_UI + ".theme", EMPTY_STRING);
         }
-        template = template.replace("{{" + PREFIX_SWAGGER_UI + DOT + OPTION_OAUTH2 + "}}", hasOauth2Option(options) ? toOauth2Options() : EMPTY_STRING);
-        template = template.replace("{{" + PREFIX_SWAGGER_UI + DOT + OPTION_PRIMARY_NAME + "}}", StringUtils.isNotEmpty(primaryName) ? getPrimaryName(context) : EMPTY_STRING);
-        template = template.replace("{{" + PREFIX_SWAGGER_UI + DOT + OPTION_URLS + "}}", getUrlStr(context));
+        template = replacePlaceHolder(template, PREFIX_SWAGGER_UI + DOT + OPTION_OAUTH2, hasOauth2Option(options) ? toOauth2Options() : EMPTY_STRING);
+        template = replacePlaceHolder(template, PREFIX_SWAGGER_UI + DOT + OPTION_PRIMARY_NAME, StringUtils.isNotEmpty(primaryName) ? getPrimaryName() : EMPTY_STRING);
+        template = replacePlaceHolder(template, PREFIX_SWAGGER_UI + DOT + OPTION_URLS, getUrlStr());
         return template;
     }
 
     @NonNull
-    private String getPrimaryName(VisitorContext context) {
+    private String getPrimaryName() {
         if (StringUtils.isEmpty(primaryName)) {
             return EMPTY_STRING;
         }
@@ -284,7 +286,7 @@ public final class SwaggerUIConfig extends AbstractViewConfig {
     }
 
     @NonNull
-    private String getUrlStr(VisitorContext context) {
+    private String getUrlStr() {
         if (CollectionUtils.isEmpty(urls) || (withUrls != null && !withUrls)) {
             return EMPTY_STRING;
         }
@@ -295,8 +297,10 @@ public final class SwaggerUIConfig extends AbstractViewConfig {
             if (!isFirst) {
                 result.append(',');
             }
-            result.append("{url: contextPath + '").append(url.url())
-                .append("', name: '").append(url.name()).append("'}");
+            result.append(OPEN_BRACE)
+                .append("name: \"").append(url.name()).append("\",")
+                .append("url: contextPath + \"").append(url.url()).append('\"')
+                .append(CLOSE_BRACE);
             isFirst = false;
         }
         result.append("],");

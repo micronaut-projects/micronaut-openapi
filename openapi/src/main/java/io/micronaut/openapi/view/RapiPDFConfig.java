@@ -144,18 +144,18 @@ public final class RapiPDFConfig extends AbstractViewConfig {
                     options.put("style", DEFAULT_RAPIDOC_STYLE);
                 }
             }
-            String script = replacePlaceHolder(SCRIPT_RAPIPDF, "rapipdf.js.url.prefix", isDefaultJsUrl ? getFinalUrlPrefix(rendererType, context) : jsUrl, StringUtils.EMPTY_STRING);
-            String rapipdfTag = replacePlaceHolder(TAG, "rapipdf.attributes", toHtmlAttributes(), StringUtils.EMPTY_STRING);
+            String script = replacePlaceHolder(SCRIPT_RAPIPDF, "rapipdf.js.url.prefix", isDefaultJsUrl ? getFinalUrlPrefix(rendererType, context) : jsUrl);
+            String rapipdfTag = replacePlaceHolder(TAG, "rapipdf.attributes", toHtmlAttributes());
             if (styleUpdated) {
                 options.remove("style");
             }
-            template = replacePlaceHolder(template, "rapipdf.script", script, StringUtils.EMPTY_STRING);
-            template = replacePlaceHolder(template, "rapipdf.specurl", SPEC, StringUtils.EMPTY_STRING);
-            return replacePlaceHolder(template, "rapipdf.tag", rapipdfTag, StringUtils.EMPTY_STRING);
+            template = replacePlaceHolder(template, "rapipdf.script", script);
+            template = replacePlaceHolder(template, "rapipdf.specurl", SPEC);
+            return replacePlaceHolder(template, "rapipdf.tag", rapipdfTag);
         } else {
-            template = replacePlaceHolder(template, "rapipdf.script", StringUtils.EMPTY_STRING, StringUtils.EMPTY_STRING);
-            template = replacePlaceHolder(template, "rapipdf.specurl", StringUtils.EMPTY_STRING, StringUtils.EMPTY_STRING);
-            return replacePlaceHolder(template, "rapipdf.tag", StringUtils.EMPTY_STRING, StringUtils.EMPTY_STRING);
+            template = replacePlaceHolder(template, "rapipdf.script", StringUtils.EMPTY_STRING);
+            template = replacePlaceHolder(template, "rapipdf.specurl", StringUtils.EMPTY_STRING);
+            return replacePlaceHolder(template, "rapipdf.tag", StringUtils.EMPTY_STRING);
         }
     }
 

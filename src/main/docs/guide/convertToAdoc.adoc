@@ -16,7 +16,7 @@ Adoc generator based on Apache Freemarker templates, and you can override full t
 |`micronaut.openapi.adoc.template.dir` | Template directory path. | Default: `classpath:/template`
 |`micronaut.openapi.adoc.template.filename` | Main template filename. | Default: `openApiDoc.ftl` (in classpath)
 |`micronaut.openapi.adoc.output.dir` | Output directory path. | Default: standard micronaut openapi output directory path
-|`micronaut.openapi.adoc.output.filename` | Final `adoc` file name. | Default: the same as openapi spec. filename
+|`micronaut.openapi.adoc.output.filename` | Final `adoc` file name. | Default: the same as OpenAPI spec. filename
 |`micronaut.openapi.adoc.templates.*` | Prefix for custom template names. You can override any of the templates that are used in the default implementation to change only part of the resulting document. |
 |===
 

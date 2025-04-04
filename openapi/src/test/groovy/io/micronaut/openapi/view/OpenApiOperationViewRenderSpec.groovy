@@ -160,8 +160,9 @@ class OpenApiOperationViewRenderSpec extends Specification {
         !Files.exists(outputDir.resolve("scalar").resolve("res").resolve("standalone.js"))
         Files.exists(outputDir.resolve("scalar").resolve("res").resolve("rapipdf-min.js"))
 
-        outputDir.resolve("scalar").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains("script(contextPath + \"https://cdn.jsdelivr.net/npm/@scalar/api-reference/dist/browser/standalone.js\", head)")
-        outputDir.resolve("scalar").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains(cfg.getSpecURL(cfg.scalarConfig, null))
+        var content = outputDir.resolve("scalar").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name())
+        content.contains("const apiReferenceScript = script(contextPath + \"https://cdn.jsdelivr.net/npm/@scalar/api-reference/dist/browser/standalone.js\", head);")
+        content.contains(cfg.getSpecURL(cfg.scalarConfig, null))
     }
 
     void "test render OpenApiView specification with custom swagger js and css urls"() {
@@ -193,11 +194,12 @@ class OpenApiOperationViewRenderSpec extends Specification {
         !Files.exists(outputDir.resolve("swagger-ui").resolve("res").resolve("flattop.css"))
         Files.exists(outputDir.resolve("swagger-ui").resolve("res").resolve("rapipdf-min.js"))
 
-        outputDir.resolve("swagger-ui").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains(cfg.getSpecURL(cfg.swaggerUIConfig, null))
-        outputDir.resolve("swagger-ui").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains("script(contextPath + \"https://unpkg.com/swagger-ui-dist/swagger-ui-standalone-preset.js\", head)")
-        outputDir.resolve("swagger-ui").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains("script(contextPath + \"https://unpkg.com/swagger-ui-dist/swagger-ui-bundle.js\", head)")
-        outputDir.resolve("swagger-ui").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains("link(contextPath + \"https://unpkg.com/swagger-ui-dist/swagger-ui.css\", head, \"text/css\", \"stylesheet\")")
-        outputDir.resolve("swagger-ui").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name()).contains("link(contextPath + \"https://flattop.com/theme.css\", head, \"text/css\", \"stylesheet\")")
+        var content = outputDir.resolve("swagger-ui").resolve("index.html").toFile().getText(StandardCharsets.UTF_8.name())
+        content.contains(cfg.getSpecURL(cfg.swaggerUIConfig, null))
+        content.contains("script(contextPath + \"https://unpkg.com/swagger-ui-dist/swagger-ui-standalone-preset.js\", head)")
+        content.contains("script(contextPath + \"https://unpkg.com/swagger-ui-dist/swagger-ui-bundle.js\", head)")
+        content.contains("link(contextPath + \"https://unpkg.com/swagger-ui-dist/swagger-ui.css\", head, \"text/css\", \"stylesheet\")")
+        content.contains("link(contextPath + \"https://flattop.com/theme.css\", head, \"text/css\", \"stylesheet\")")
     }
 
     @RestoreSystemProperties
@@ -527,6 +529,6 @@ class OpenApiOperationViewRenderSpec extends Specification {
 
         then:
         indexText.contains(cfg.getSpecURL(cfg.swaggerUIConfig, null))
-        indexText.contains("urls: [{url: contextPath + '/swagger/swagger.yml', name: '1'}],")
+        indexText.contains("urls: [{name: \"1\",url: contextPath + \"/swagger/swagger.yml\"}],")
     }
 }
