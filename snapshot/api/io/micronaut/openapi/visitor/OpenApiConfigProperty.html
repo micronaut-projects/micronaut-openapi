@@ -1158,14 +1158,14 @@ loadScripts(document, 'script');</script>
 <div class="block">Properties prefix to set custom schema implementations for selected classes.
  For example, if you want to set simple 'java.lang.String' class to some complex 'org.somepackage.MyComplexType' class you need to write:
  <p>
- -Dmicronaut.openapi.group.my-group1.title="Title 1"
+ -Dmicronaut.openapi.groups.my-group1.title="Title 1"
  <p>
  Also, you can set it in your application.yml file like this:
  <p>
  <pre>
  micronaut:
    openapi:
-     group:
+     groups:
        my-group1:
          title: Title 1
          filename: swagger-${group}-${apiVersion}-${version}.yml

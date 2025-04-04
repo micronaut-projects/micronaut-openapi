@@ -211,7 +211,7 @@
         
         <div class="toc-item" style="margin-left:10px" id="toc-item-viewsGenerationWithSystemProperties"><a href="#viewsGenerationWithSystemProperties"><strong>18.3</strong><span>Enable Views Generation with system properties</span></a></div>
         
-        <div class="toc-item" style="margin-left:10px" id="toc-item-swaggerui"><a href="#swaggerui"><strong>18.4</strong><span>Swagger-UI</span></a></div>
+        <div class="toc-item" style="margin-left:10px" id="toc-item-swaggerui"><a href="#swaggerui"><strong>18.4</strong><span>Swagger UI</span></a></div>
         
         <div class="toc-item" style="margin-left:20px" id="toc-item-oauth2"><a href="#oauth2"><strong>18.4.1</strong><span>Swagger UI - OAuth 2.0 configuration</span></a></div>
         
@@ -951,7 +951,7 @@ directory.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong>micronaut.openapi.schema.extra.enable</strong></code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">If this property true, you can add some extra schemas to final openapi spec file.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">If this property true, you can add some extra schemas to final OpenAPI spec file.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Default: <code>false</code></p></td>
 </tr>
 <tr>
@@ -2369,7 +2369,7 @@ class Owner {
 
 
 <div class="paragraph">
-<p>It is possible to expose management Endpoints in the openapi specification file.</p>
+<p>It is possible to expose management Endpoints in the OpenAPI specification file.</p>
 </div>
 
 <h2 id="enableendpoints"><a class="anchor" href="#enableendpoints"></a>15.1 Enable Endpoints</h2>
@@ -3138,7 +3138,7 @@ paths:
 
 
 <div class="paragraph">
-<p>Micronaut can generate views for your generated OpenAPI specification. Currently, <a href="https://github.com/swagger-api/swagger-ui">Swagger-ui</a>, <a href="https://github.com/Redocly/redoc">Redoc</a>, <a href="https://github.com/Authress-Engineering/openapi-explorer">OpenAPI Explorer</a>, <a href="https://github.com/scalar/scalar">Scalar</a> and <a href="https://github.com/rapi-doc/RapiDoc">RapiDoc</a> are supported.
+<p>Micronaut can generate views for your generated OpenAPI specification. Currently, <a href="https://github.com/swagger-api/swagger-ui">Swagger Ui</a>, <a href="https://github.com/Redocly/redoc">Redoc</a>, <a href="https://github.com/Authress-Engineering/openapi-explorer">OpenAPI Explorer</a>, <a href="https://github.com/scalar/scalar">Scalar</a> and <a href="https://github.com/rapi-doc/RapiDoc">RapiDoc</a> are supported.
 You can also use <a href="https://mrin9.github.io/RapiPdf/">RapiPdf</a> to generate a PDF from your spec file.</p>
 </div>
 <div class="paragraph">
@@ -3410,7 +3410,7 @@ micronaut.router.static-resources.swagger.mapping=/swaggerYAML/**</code></pre>
 </div>
 </div>
 
-<h2 id="swaggerui"><a class="anchor" href="#swaggerui"></a>18.4 Swagger-UI</h2>
+<h2 id="swaggerui"><a class="anchor" href="#swaggerui"></a>18.4 Swagger UI</h2>
 
 <div class='contribute-btn'>
     <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/6.15.x/src/main/docs/guide/openApiViews/swaggerui.adoc"'>
@@ -3433,7 +3433,7 @@ micronaut.router.static-resources.swagger.mapping=/swaggerYAML/**</code></pre>
 <tbody>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>swagger-ui.enabled</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>true</code> or <code>false</code> When 'true' the Swagger-ui view is generated.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>true</code> or <code>false</code> When 'true' the Swagger UI view is generated.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>swagger-ui.js.url</code></p></td>
@@ -5209,7 +5209,7 @@ micronaut.router.static-resources.rapidoc.mapping=/rapidoc/**</code></pre>
 <p>Final <code>adoc</code> file name.</p>
 </div></div></td>
 <td class="tableblock halign-left valign-middle"><div class="content"><div class="paragraph">
-<p>Default: the same as openapi spec. filename</p>
+<p>Default: the same as OpenAPI spec. filename</p>
 </div></div></td>
 </tr>
 <tr>
@@ -5567,11 +5567,11 @@ micronaut.openapi.groups.v3.testv3group.packages-exclude[1]=com.micronaut.contro
   openapi:
     groups:
       v1:
-        #The title that will be displayed in the group selector in the UI
+        # The title that will be displayed in the group selector in the UI
         display-name: My API v1
-        # A flag indicating that the swagger UI should select this group in the selector by default.
+        # A flag indicating that the Swagger UI / Scalar should select this group in the selector by default.
         primary: true
-        # The name of the final swagger file. If it is not set, then by default the name will be generated according
+        # The name of the final OpenAPI spec file. If it is not set, then by default the name will be generated according
         # to the following pattern: swagger-&lt;version&gt;-&lt;groupName&gt;-&lt;apiVersion&gt;. version - application version from the main
         # OpenAPIDefinition annotation, api-version - version from micronaut @Version annotation
         filename: myapiv1
@@ -5694,17 +5694,17 @@ micronaut.openapi.groups.v3.testv3group.packages-exclude[1]=com.micronaut.contro
 </div>
 </div>
 <div class="paragraph">
-<p>After processing the annotation processor, you will get 3 different swagger files.</p>
+<p>After processing the annotation processor, you will get 3 different OpenAPI files.</p>
 </div>
 <div class="sect1">
 <h2 id="_integration_with_ui">Integration with UI</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>In rapidoc and redoc do not support multiple files at the same time,
+<p>In RapiDoc, ReDoc and OpenAPI Explorer do not support multiple files at the same time,
 so for normal API display, you will have to complete the template yourself.</p>
 </div>
 <div class="paragraph">
-<p>Swagger UI has support for multiple files out of the box. The example above would look something like this:</p>
+<p><strong>Swagger UI</strong> and <strong>Scalar</strong> support multiple files out of the box. The example above would look something like this:</p>
 </div>
 <div class="imageblock">
 <div class="content">
@@ -5903,7 +5903,7 @@ public class OpenApiContextPathFilter implements HttpServerFilter {
 
 
 <div class="paragraph">
-<p>You can use <code>micronaut-openapi</code> to build openapi specification for <code>Spring</code> / <code>Spring Boot</code> applications. In this case, you do not need to change anything in the code. You can continue to use spring, and use micronaut as a replacement for such libraries as <code>springdoc-openapi</code>, <code>springfox</code>, <code>swagger</code> etc.</p>
+<p>You can use <code>micronaut-openapi</code> to build OpenAPI specification for <code>Spring</code> / <code>Spring Boot</code> applications. In this case, you do not need to change anything in the code. You can continue to use spring, and use micronaut as a replacement for such libraries as <code>springdoc-openapi</code>, <code>springfox</code>, <code>swagger</code> etc.</p>
 </div>
 
 <h2 id="springWithGradle"><a class="anchor" href="#springWithGradle"></a>22.1 Spring with Gradle</h2>
