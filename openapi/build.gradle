@@ -58,3 +58,32 @@ test {
     maxParallelForks = Runtime.runtime.availableProcessors()
     maxHeapSize = "2048m"
 }
+
+def downloadResources = tasks.register("downloadResources") {
+    description = "Downloads all external resources"
+}
+
+def t = tasks
+[
+        "npm/swagger-ui@${libs.versions.js.swagger.ui.get()}/dist/swagger-ui-bundle.js": ["SwaggerUIBundle", "swagger-ui/res/swagger-ui-bundle.js"],
+        "npm/swagger-ui@${libs.versions.js.swagger.ui.get()}/dist/swagger-ui-standalone-preset.js": ["SwaggerUIPreset", "swagger-ui/res/swagger-ui-standalone-preset.js"],
+        "npm/swagger-ui@${libs.versions.js.swagger.ui.get()}/dist/swagger-ui.css": ["SwaggerUICss", "swagger-ui/res/swagger-ui.css"],
+        "npm/openapi-explorer@${libs.versions.js.openapi.explorer.get()}/dist/browser/openapi-explorer.min.js": ["OpenApiExplorer", "openapi-explorer/res/openapi-explorer.min.js"],
+        "npm/redoc@${libs.versions.js.redoc.get()}/bundles/redoc.standalone.js": ["Redoc", "redoc/res/redoc.standalone.js"],
+        "npm/rapidoc@${libs.versions.js.rapidoc.get()}/dist/rapidoc-min.js": ["Rapidoc", "rapidoc/res/rapidoc-min.js"],
+        "npm/rapipdf@${libs.versions.js.rapipdf.get()}/dist/rapipdf-min.js": ["Rapipdf", "rapipdf/res/rapipdf-min.js"],
+        "npm/@scalar/api-reference@${libs.versions.js.scalar.get()}/dist/browser/standalone.js": ["Scalar", "scalar/res/standalone.js"],
+].each { file, info -> {
+    def taskName = "download${info[0]}".toString()
+    def targetPath = info[1]
+    def download = t.register(taskName, io.micronaut.build.internal.openapi.RemoteDownloadTask) {
+        baseUrl = "https://cdn.jsdelivr.net"
+        contentPath = file
+        outputPath = "templates/$targetPath"
+        outputDirectory = layout.buildDirectory.dir("downloads/$taskName")
+    }
+    downloadResources.configure {
+        dependsOn(download)
+    }
+    sourceSets.main.resources.srcDir(download)
+}}
