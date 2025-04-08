@@ -129,6 +129,7 @@ import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_IS
 import static io.micronaut.openapi.visitor.ContextUtils.warn;
 import static io.micronaut.openapi.visitor.ConvertUtils.MAP_TYPE;
 import static io.micronaut.openapi.visitor.ElementUtils.getJsonViewClass;
+import static io.micronaut.openapi.visitor.ElementUtils.hasNoBindingAnnotationOrType;
 import static io.micronaut.openapi.visitor.ElementUtils.isDeprecated;
 import static io.micronaut.openapi.visitor.ElementUtils.isExtraBodyParameter;
 import static io.micronaut.openapi.visitor.ElementUtils.isFileUpload;
@@ -387,18 +388,6 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
      * @return The description for the element.
      */
     protected abstract String description(MethodElement element);
-
-    private boolean hasNoBindingAnnotationOrType(TypedElement parameter) {
-        return !parameter.isAnnotationPresent(io.swagger.v3.oas.annotations.parameters.RequestBody.class)
-            && !parameter.isAnnotationPresent(QueryValue.class)
-            && !parameter.isAnnotationPresent(PathVariable.class)
-            && !parameter.isAnnotationPresent(Body.class)
-            && !parameter.isAnnotationPresent(Part.class)
-            && !parameter.isAnnotationPresent(CookieValue.class)
-            && !parameter.isAnnotationPresent(Header.class)
-            && !parameter.isAnnotationPresent(RequestBean.class)
-            && !isResponseType(parameter.getType());
-    }
 
     /**
      * Executed when a method is encountered that matches the generic element.

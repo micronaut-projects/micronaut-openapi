@@ -1,0 +1,48 @@
+If you use wrapped request data for controller method, you need to add annotation `@RequestBean` (`io.micronaut.http.annotation.RequestBean`) for this parameter.
+
+.Example Swagger UI resources routing config
+snippet::io.micronaut.openapi.spring.MyController[tags="imports,clazz", project-base="test-suite-java-spring"]
+
+For this controller will be created this OpenAPI specification:
+
+[source,yaml]
+----
+  /my-api/testMultipart/{pathVar}:
+    post:
+      operationId: testMultipart
+      parameters:
+      - name: pathVar
+        in: path
+        required: true
+        schema:
+          type: string
+          description: This is path variable
+      - name: queryVar
+        in: query
+        required: true
+        schema:
+          type: string
+          description: This is request param
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                fileName:
+                  type: string
+                  description: This is fileName request body part
+                file:
+                  type: string
+                  description: This is file request body part
+                  format: binary
+            encoding:
+              fileName:
+                contentType: application/octet-stream
+              file:
+                contentType: application/octet-stream
+        required: true
+      responses:
+        "200":
+          description: testMultipart 200 response
+----
