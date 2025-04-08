@@ -25,7 +25,7 @@ import io.micronaut.http.HttpHeaders;
 import io.micronaut.http.HttpMethod;
 import io.micronaut.inject.ast.Element;
 import io.micronaut.inject.visitor.VisitorContext;
-import io.micronaut.openapi.SimpleSchema;
+import io.micronaut.openapi.swagger.core.util.PrimitiveType;
 import io.swagger.v3.oas.annotations.extensions.Extension;
 import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
 import io.swagger.v3.oas.models.Components;
@@ -36,6 +36,7 @@ import io.swagger.v3.oas.models.Paths;
 import io.swagger.v3.oas.models.SpecVersion;
 import io.swagger.v3.oas.models.headers.Header;
 import io.swagger.v3.oas.models.links.Link;
+import io.swagger.v3.oas.models.media.ArbitrarySchema;
 import io.swagger.v3.oas.models.media.ArraySchema;
 import io.swagger.v3.oas.models.media.BinarySchema;
 import io.swagger.v3.oas.models.media.BooleanSchema;
@@ -76,6 +77,7 @@ import static io.micronaut.openapi.visitor.ContextUtils.warn;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_NAME;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_PARSE_VALUE;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_PROPERTIES;
+import static io.micronaut.openapi.visitor.Utils.isOpenapi31;
 import static io.swagger.v3.oas.models.Components.COMPONENTS_SCHEMAS_REF;
 
 /**
@@ -100,6 +102,7 @@ public final class SchemaUtils {
     public static final String TYPE_BOOLEAN = "boolean";
 
     public static final Schema<?> EMPTY_SCHEMA = new Schema<>();
+    public static final Schema<?> EMPTY_ARBITRARY_SCHEMA = new ArbitrarySchema();
     public static final Schema<?> EMPTY_ARRAY_SCHEMA = new ArraySchema();
     public static final Schema<?> EMPTY_BINARY_SCHEMA = new BinarySchema();
     public static final Schema<?> EMPTY_BOOLEAN_SCHEMA = new BooleanSchema();
@@ -117,7 +120,6 @@ public final class SchemaUtils {
     public static final Schema<?> EMPTY_PASSWORD_SCHEMA = new PasswordSchema();
     public static final Schema<?> EMPTY_STRING_SCHEMA = new StringSchema();
     public static final Schema<?> EMPTY_UUID_SCHEMA = new UUIDSchema();
-    public static final Schema<?> EMPTY_SIMPLE_SCHEMA = new SimpleSchema();
 
     private static final List<Schema<?>> ALL_EMPTY_SCHEMAS = List.of(
         EMPTY_SCHEMA,
@@ -138,7 +140,7 @@ public final class SchemaUtils {
         EMPTY_PASSWORD_SCHEMA,
         EMPTY_STRING_SCHEMA,
         EMPTY_UUID_SCHEMA,
-        EMPTY_SIMPLE_SCHEMA
+        EMPTY_ARBITRARY_SCHEMA
     );
 
     private SchemaUtils() {
@@ -212,8 +214,16 @@ public final class SchemaUtils {
     }
 
     public static <T extends Schema> T setSpecVersion(T schema) {
-        schema.specVersion(Utils.isOpenapi31() ? SpecVersion.V31 : SpecVersion.V30);
+        schema.specVersion(isOpenapi31() ? SpecVersion.V31 : SpecVersion.V30);
         return schema;
+    }
+
+    public static Schema createSchema() {
+        return PrimitiveType.OBJECT.createProperty(isOpenapi31());
+    }
+
+    public static ComposedSchema createComposedSchema() {
+        return setSpecVersion(new ComposedSchema());
     }
 
     public static ArraySchema arraySchema(Schema<?> schema) {
@@ -753,7 +763,7 @@ public final class SchemaUtils {
             s1.addOneOfItem(s2);
             return s1;
         }
-        Schema<?> finalSchema = setSpecVersion(new ComposedSchema());
+        Schema<?> finalSchema = createComposedSchema();
         finalSchema.addOneOfItem(s1);
         finalSchema.addOneOfItem(s2);
         return finalSchema;
@@ -1065,6 +1075,12 @@ public final class SchemaUtils {
             s1.set$dynamicAnchor(s2.get$dynamicAnchor());
             if (withErase) {
                 s2.set$dynamicAnchor(null);
+            }
+        }
+        if (s1.get$dynamicRef() == null && s2.get$dynamicRef() != null) {
+            s1.set$dynamicRef(s2.get$dynamicRef());
+            if (withErase) {
+                s2.set$dynamicRef(null);
             }
         }
         if (s1.getContentEncoding() == null && s2.getContentEncoding() != null) {
@@ -1552,11 +1568,11 @@ public final class SchemaUtils {
     public static Schema setNullable(Boolean value, Schema<?> schema) {
         if (value == null || !value) {
             schema.setNullable(value);
-            if (Utils.isOpenapi31() && schema.getTypes() != null) {
+            if (isOpenapi31() && schema.getTypes() != null) {
                 schema.getTypes().removeIf(TYPE_NULL::equals);
             }
         } else {
-            if (Utils.isOpenapi31()) {
+            if (isOpenapi31()) {
                 schema.addType(TYPE_NULL);
                 schema.addType(schema.getType() != null ? schema.getType() : TYPE_OBJECT);
             } else {
@@ -1574,7 +1590,7 @@ public final class SchemaUtils {
         if (type != null) {
             return type;
         }
-        if (Utils.isOpenapi31() && CollectionUtils.isNotEmpty(types)) {
+        if (isOpenapi31() && CollectionUtils.isNotEmpty(types)) {
             for (var t : types) {
                 if (!t.equals(TYPE_NULL)) {
                     return t;

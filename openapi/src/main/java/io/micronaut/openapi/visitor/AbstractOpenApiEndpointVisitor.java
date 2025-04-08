@@ -67,7 +67,6 @@ import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.PathItem;
 import io.swagger.v3.oas.models.callbacks.Callback;
 import io.swagger.v3.oas.models.examples.Example;
-import io.swagger.v3.oas.models.media.ComposedSchema;
 import io.swagger.v3.oas.models.media.Content;
 import io.swagger.v3.oas.models.media.Encoding;
 import io.swagger.v3.oas.models.media.Schema;
@@ -168,6 +167,8 @@ import static io.micronaut.openapi.visitor.SchemaUtils.COMPONENTS_CALLBACKS_PREF
 import static io.micronaut.openapi.visitor.SchemaUtils.TYPE_OBJECT;
 import static io.micronaut.openapi.visitor.SchemaUtils.TYPE_STRING;
 import static io.micronaut.openapi.visitor.SchemaUtils.appendSchema;
+import static io.micronaut.openapi.visitor.SchemaUtils.createComposedSchema;
+import static io.micronaut.openapi.visitor.SchemaUtils.createSchema;
 import static io.micronaut.openapi.visitor.SchemaUtils.getOperationOnPathItem;
 import static io.micronaut.openapi.visitor.SchemaUtils.getSchemaByRef;
 import static io.micronaut.openapi.visitor.SchemaUtils.setOperationOnPathItem;
@@ -590,7 +591,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                 .in(ParameterIn.PATH.toString())
                 .name(varName)
                 .required(true)
-                .schema(PrimitiveType.STRING.createProperty()));
+                .schema(PrimitiveType.STRING.createProperty(Utils.isOpenapi31())));
         }
 
         for (var entry : queryParams.entrySet()) {
@@ -603,7 +604,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             operation.addParametersItem(new Parameter()
                 .in(ParameterIn.QUERY.toString())
                 .name(varName)
-                .schema(PrimitiveType.STRING.createProperty()));
+                .schema(PrimitiveType.STRING.createProperty(Utils.isOpenapi31())));
         }
     }
 
@@ -638,7 +639,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                 consumesMediaTypes = CollectionUtils.isEmpty(consumesMediaTypes) ? DEFAULT_MEDIA_TYPES : consumesMediaTypes;
                 consumesMediaTypes.forEach(mediaType -> {
                     var mt = new io.swagger.v3.oas.models.media.MediaType();
-                    var schema = setSpecVersion(new Schema<>());
+                    var schema = createSchema();
                     schema.setType(TYPE_OBJECT);
                     mt.setSchema(schema);
                     content.addMediaType(mediaType.toString(), mt);
@@ -649,7 +650,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             requestBody.getContent().forEach((mediaTypeName, mediaType) -> {
                 var schema = mediaType.getSchema();
                 if (schema == null || TYPE_STRING.equals(schema.getType())) {
-                    var newSchema = setSpecVersion(new Schema<>());
+                    var newSchema = createSchema();
                     if (schema != null) {
                         newSchema.setNullable(schema.getNullable());
                     }
@@ -660,8 +661,8 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                     if (isRequestBodySchemaSet) {
                         schema = getSchemaByRef(schema, openAPI);
                     } else {
-                        var composedSchema = setSpecVersion(new ComposedSchema());
-                        var extraBodyParametersSchema = setSpecVersion(new Schema<>());
+                        var composedSchema = createComposedSchema();
+                        var extraBodyParametersSchema = createSchema();
                         // Composition of existing + a new schema where extra body parameters are going to be added
                         composedSchema.addAllOfItem(schema);
                         composedSchema.addAllOfItem(extraBodyParametersSchema);
@@ -784,7 +785,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             }
 
             var parameter = new Parameter();
-            parameter.schema(setSpecVersion(new Schema<>()));
+            parameter.schema(createSchema());
 
             paramAnn.stringValue(PROP_NAME).ifPresent(parameter::name);
             paramAnn.enumValue(PROP_IN, ParameterIn.class).ifPresent(in -> parameter.in(in.toString()));
@@ -1161,7 +1162,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                             if (newParameter == null) {
                                 newParameter = new Parameter();
                             }
-                            newParameter.schema(setSpecVersion(new Schema<>().$ref(schemaNode.get(PROP_REF_DOLLAR).asText())));
+                            newParameter.schema(createSchema().$ref(schemaNode.get(PROP_REF_DOLLAR).asText()));
                         }
                     }
                 } catch (Exception e) {
@@ -1282,7 +1283,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
 
                 var wrapperSchema = mt.getSchema();
                 if (wrapperSchema == null) {
-                    wrapperSchema = setSpecVersion(new Schema<>());
+                    wrapperSchema = createSchema();
                     mt.setSchema(wrapperSchema);
                 }
                 wrapperSchema.setType(TYPE_OBJECT);

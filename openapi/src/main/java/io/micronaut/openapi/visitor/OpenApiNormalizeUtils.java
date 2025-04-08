@@ -20,6 +20,7 @@ import io.micronaut.core.annotation.Internal;
 import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.core.util.StringUtils;
 import io.micronaut.inject.visitor.VisitorContext;
+import io.micronaut.openapi.swagger.core.util.PrimitiveType;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Operation;
@@ -29,7 +30,6 @@ import io.swagger.v3.oas.models.examples.Example;
 import io.swagger.v3.oas.models.headers.Header;
 import io.swagger.v3.oas.models.media.Content;
 import io.swagger.v3.oas.models.media.Schema;
-import io.swagger.v3.oas.models.media.StringSchema;
 import io.swagger.v3.oas.models.parameters.Parameter;
 
 import java.util.ArrayList;
@@ -43,12 +43,11 @@ import java.util.function.Function;
 import static io.micronaut.openapi.visitor.InternalExt.MICRONAUT_OP_POSTFIX;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.MICRONAUT_EXT_PARENT_RESPONSE;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_DESCRIPTION;
-import static io.micronaut.openapi.visitor.SchemaUtils.EMPTY_SIMPLE_SCHEMA;
+import static io.micronaut.openapi.visitor.SchemaUtils.EMPTY_ARBITRARY_SCHEMA;
 import static io.micronaut.openapi.visitor.SchemaUtils.TYPE_OBJECT;
 import static io.micronaut.openapi.visitor.SchemaUtils.TYPE_STRING;
 import static io.micronaut.openapi.visitor.SchemaUtils.appendSchema;
 import static io.micronaut.openapi.visitor.SchemaUtils.isEmptySchema;
-import static io.micronaut.openapi.visitor.SchemaUtils.setSpecVersion;
 
 /**
  * Normalization methods for openAPI objects.
@@ -145,7 +144,7 @@ public final class OpenApiNormalizeUtils {
                 Schema<?> normalizedSchema = normalizeSchema(paramSchema, context);
                 if (normalizedSchema != null) {
                     parameter.setSchema(normalizedSchema);
-                } else if (paramSchema.equals(EMPTY_SIMPLE_SCHEMA)) {
+                } else if (paramSchema.equals(EMPTY_ARBITRARY_SCHEMA)) {
                     paramSchema.setType(TYPE_OBJECT);
                 }
                 if (parameter.getExample() != null
@@ -199,13 +198,13 @@ public final class OpenApiNormalizeUtils {
             }
             Schema<?> headerSchema = header.getSchema();
             if (headerSchema == null) {
-                headerSchema = setSpecVersion(new StringSchema());
+                headerSchema = PrimitiveType.STRING.createProperty(Utils.isOpenapi31());
                 header.setSchema(headerSchema);
             }
             Schema<?> normalizedSchema = normalizeSchema(headerSchema, context);
             if (normalizedSchema != null) {
                 header.setSchema(normalizedSchema);
-            } else if (headerSchema.equals(EMPTY_SIMPLE_SCHEMA)) {
+            } else if (headerSchema.equals(EMPTY_ARBITRARY_SCHEMA)) {
                 headerSchema.setType(TYPE_OBJECT);
             }
             if (header.getExample() != null
@@ -232,7 +231,7 @@ public final class OpenApiNormalizeUtils {
             Schema<?> normalizedSchema = normalizeSchema(mediaTypeSchema, context);
             if (normalizedSchema != null) {
                 mediaType.setSchema(normalizedSchema);
-            } else if (mediaTypeSchema.equals(EMPTY_SIMPLE_SCHEMA)) {
+            } else if (mediaTypeSchema.equals(EMPTY_ARBITRARY_SCHEMA)) {
                 mediaTypeSchema.setType(TYPE_OBJECT);
             }
             normalizeExamples(mediaType.getExamples());
@@ -424,7 +423,7 @@ public final class OpenApiNormalizeUtils {
             Schema<?> normalizedSchema = normalizeSchema(schema, context);
             if (normalizedSchema != null) {
                 normalizedSchemas.put(entry.getKey(), normalizedSchema);
-            } else if (schema.equals(EMPTY_SIMPLE_SCHEMA)) {
+            } else if (schema.equals(EMPTY_ARBITRARY_SCHEMA)) {
                 schema.setType(TYPE_OBJECT);
             }
 
@@ -436,7 +435,7 @@ public final class OpenApiNormalizeUtils {
                     Schema<?> paramNormalizedSchema = normalizeSchema(paramSchema, context);
                     if (paramNormalizedSchema != null) {
                         paramNormalizedSchemas.put(paramEntry.getKey(), paramNormalizedSchema);
-                    } else if (paramSchema.equals(EMPTY_SIMPLE_SCHEMA)) {
+                    } else if (paramSchema.equals(EMPTY_ARBITRARY_SCHEMA)) {
                         paramSchema.setType(TYPE_OBJECT);
                     }
                 }

@@ -228,6 +228,8 @@ import static io.micronaut.openapi.visitor.SchemaUtils.TYPE_ARRAY;
 import static io.micronaut.openapi.visitor.SchemaUtils.TYPE_OBJECT;
 import static io.micronaut.openapi.visitor.SchemaUtils.TYPE_STRING;
 import static io.micronaut.openapi.visitor.SchemaUtils.appendSchema;
+import static io.micronaut.openapi.visitor.SchemaUtils.createComposedSchema;
+import static io.micronaut.openapi.visitor.SchemaUtils.createSchema;
 import static io.micronaut.openapi.visitor.SchemaUtils.getSchemaByRef;
 import static io.micronaut.openapi.visitor.SchemaUtils.isEmptySchema;
 import static io.micronaut.openapi.visitor.SchemaUtils.processExtensions;
@@ -295,7 +297,7 @@ public final class SchemaDefinitionUtils {
                                        @Nullable Element definingElement, List<MediaType> mediaTypes,
                                        @Nullable ClassElement jsonViewClass) {
 
-        var schema = setSpecVersion(new Schema<>());
+        var schema = createSchema();
         processSchemaAnn(schema, context, definingElement, (ClassElement) type, schemaValue);
 
         String elType = SchemaUtils.getType(schema);
@@ -404,7 +406,7 @@ public final class SchemaDefinitionUtils {
                 return setSpecVersion(new Schema<>())
                     .type(TYPE_ARRAY);
             } else if (Object.class.getName().equals(type.getName())) {
-                return setSpecVersion(new Schema<>());
+                return createSchema();
             } else {
                 primitiveType = null;
             }
@@ -423,7 +425,7 @@ public final class SchemaDefinitionUtils {
                 if (schema == null) {
 
                     if (type instanceof EnumElement enumEl && isEnum(enumEl)) {
-                        schema = setSpecVersion(new Schema<>());
+                        schema = createSchema();
                         schema.setName(schemaName);
                         processJacksonDescription(enumEl, schema);
                         if (schema.getDescription() == null && javadoc != null && StringUtils.hasText(javadoc.getMethodDescription())) {
@@ -459,7 +461,7 @@ public final class SchemaDefinitionUtils {
                     }
                 }
             } else {
-                return setSpecVersion(primitiveType.createProperty());
+                return primitiveType.createProperty(Utils.isOpenapi31());
             }
         } else {
             // Schema annotation property `name` on field level means, that this property must be with this name.
@@ -470,7 +472,7 @@ public final class SchemaDefinitionUtils {
             if (schema == null) {
                 if (inProgressSchemas.contains(schemaName)) {
                     // Break recursion
-                    return setSpecVersion(new Schema<>().$ref(SchemaUtils.schemaRef(schemaName)));
+                    return createSchema().$ref(SchemaUtils.schemaRef(schemaName));
                 }
                 inProgressSchemas.add(schemaName);
                 try {
@@ -511,9 +513,8 @@ public final class SchemaDefinitionUtils {
                 schema.setExternalDocs(externalDocs);
             }
             setSchemaDescription(type, schema);
-            var schemaRef = setSpecVersion(new Schema<>());
-            schemaRef.set$ref(SchemaUtils.schemaRef(schema.getName()));
-            return schemaRef;
+            return createSchema()
+                .$ref(SchemaUtils.schemaRef(schema.getName()));
         }
         return null;
     }
@@ -755,6 +756,7 @@ public final class SchemaDefinitionUtils {
             typeArraySchemaAnnValue = arraySchemaAnnValue;
         }
 
+        var openapi31 = Utils.isOpenapi31();
         ClassElement componentTypeFromAnn = null;
         boolean isSubstitutedType = false;
         AnnotationValue<io.swagger.v3.oas.annotations.media.Schema> componentSchemaAnn = null;
@@ -818,7 +820,7 @@ public final class SchemaDefinitionUtils {
             } else {
                 String typeFromAnn = schemaAnnValue.stringValue(PROP_TYPE).orElse(null);
                 List<String> schemaTypes;
-                if (isOpenapi31() && StringUtils.isEmpty(typeFromAnn)) {
+                if (openapi31 && StringUtils.isEmpty(typeFromAnn)) {
                     schemaTypes = Arrays.asList(schemaAnnValue.stringValues(PROP_ONE_TYPES));
                 } else {
                     schemaTypes = Collections.singletonList(typeFromAnn);
@@ -946,7 +948,7 @@ public final class SchemaDefinitionUtils {
                 if (!isArray && ClassUtils.isJavaLangType(typeName)) {
                     schema = getPrimitiveType(type, typeName, context);
                 } else if (!isArray && primitiveType != null) {
-                    schema = setSpecVersion(primitiveType.createProperty());
+                    schema = primitiveType.createProperty(openapi31);
                 } else if (type.isAssignable(Map.class)) {
                     schema = processMapSchema(type, typeArgs, mediaTypes, openApi, jsonViewClass, classJavadoc, context);
                 } else if (isIterable) {
@@ -998,38 +1000,38 @@ public final class SchemaDefinitionUtils {
                         }
                     }
                 } else if (ElementUtils.isReturnTypeFile(type)) {
-                    schema = setSpecVersion(PrimitiveType.FILE.createProperty());
+                    schema = PrimitiveType.FILE.createProperty(openapi31);
                 } else if (type.isAssignable(Boolean.class) || type.isAssignable(boolean.class)) {
-                    schema = setSpecVersion(PrimitiveType.BOOLEAN.createProperty());
+                    schema = PrimitiveType.BOOLEAN.createProperty(openapi31);
                 } else if (type.isAssignable(Byte.class) || type.isAssignable(byte.class)) {
-                    schema = setSpecVersion(PrimitiveType.BYTE.createProperty());
+                    schema = PrimitiveType.BYTE.createProperty(openapi31);
                 } else if (type.isAssignable(UUID.class)) {
-                    schema = setSpecVersion(PrimitiveType.UUID.createProperty());
+                    schema = PrimitiveType.UUID.createProperty(openapi31);
                 } else if (type.isAssignable(URL.class)) {
-                    schema = setSpecVersion(PrimitiveType.URL.createProperty());
+                    schema = PrimitiveType.URL.createProperty(openapi31);
                 } else if (type.isAssignable(URI.class)) {
-                    schema = setSpecVersion(PrimitiveType.URI.createProperty());
+                    schema = PrimitiveType.URI.createProperty(openapi31);
                 } else if (type.isAssignable(Character.class) || type.isAssignable(char.class)) {
-                    schema = setSpecVersion(PrimitiveType.STRING.createProperty());
+                    schema = PrimitiveType.STRING.createProperty(openapi31);
                 } else if (type.isAssignable(Integer.class) || type.isAssignable(int.class)
                     || type.isAssignable(Short.class) || type.isAssignable(short.class)
                     || type.isAssignable(OptionalInt.class)
                 ) {
-                    schema = setSpecVersion(PrimitiveType.INT.createProperty());
+                    schema = PrimitiveType.INT.createProperty(openapi31);
                 } else if (type.isAssignable(Long.class) || type.isAssignable(long.class)
                     || type.isAssignable(OptionalLong.class)
                 ) {
-                    schema = setSpecVersion(PrimitiveType.LONG.createProperty());
+                    schema = PrimitiveType.LONG.createProperty(openapi31);
                 } else if (type.isAssignable(Float.class) || type.isAssignable(float.class)) {
-                    schema = setSpecVersion(PrimitiveType.FLOAT.createProperty());
+                    schema = PrimitiveType.FLOAT.createProperty(openapi31);
                 } else if (type.isAssignable(Double.class) || type.isAssignable(double.class)
                     || type.isAssignable(OptionalDouble.class)
                 ) {
-                    schema = setSpecVersion(PrimitiveType.DOUBLE.createProperty());
+                    schema = PrimitiveType.DOUBLE.createProperty(openapi31);
                 } else if (type.isAssignable(BigInteger.class)) {
-                    schema = setSpecVersion(PrimitiveType.INTEGER.createProperty());
+                    schema = PrimitiveType.INTEGER.createProperty(openapi31);
                 } else if (type.isAssignable(BigDecimal.class)) {
-                    schema = setSpecVersion(PrimitiveType.DECIMAL.createProperty());
+                    schema = PrimitiveType.DECIMAL.createProperty(openapi31);
                 } else if (type.isAssignable(Date.class)
                     || type.isAssignable(Calendar.class)
                     || type.isAssignable(LocalDateTime.class)
@@ -1037,15 +1039,15 @@ public final class SchemaDefinitionUtils {
                     || type.isAssignable(OffsetDateTime.class)
                     || type.isAssignable(Instant.class)
                     || type.isAssignable(XMLGregorianCalendar.class)) {
-                    schema = setSpecVersion(new StringSchema().format("date-time"));
+                    schema = openapi31 ? PrimitiveType.DATE_TIME.createProperty31() : new StringSchema().format("date-time");
                 } else if (type.isAssignable(LocalDate.class)) {
-                    schema = setSpecVersion(new StringSchema().format("date"));
+                    schema = openapi31 ? PrimitiveType.DATE.createProperty31() : new StringSchema().format("date");
                 } else if (type.isAssignable(LocalTime.class)) {
-                    schema = setSpecVersion(new StringSchema().format("partial-time"));
+                    schema = PrimitiveType.PARTIAL_TIME.createProperty(openapi31);
                 } else if (type.isAssignable(Number.class)) {
-                    schema = setSpecVersion(PrimitiveType.NUMBER.createProperty());
+                    schema = PrimitiveType.NUMBER.createProperty(openapi31);
                 } else if (type.getName().equals(Object.class.getName())) {
-                    schema = setSpecVersion(PrimitiveType.OBJECT.createProperty());
+                    schema = PrimitiveType.OBJECT.createProperty(openapi31);
                 } else {
                     schema = getSchemaDefinition(openApi, context, type, typeArgs, definingElement, mediaTypes, jsonViewClass);
                     schema = processGenericAnnotations(schema, componentType, context);
@@ -1118,7 +1120,7 @@ public final class SchemaDefinitionUtils {
                 schemaAnn = arraySchemaAnn.getAnnotation(PROP_ARRAY_SCHEMA, io.swagger.v3.oas.annotations.media.Schema.class).orElse(null);
             }
         }
-        Schema<?> originalSchema = schemaToBind != null ? schemaToBind : setSpecVersion(new Schema<>());
+        Schema<?> originalSchema = schemaToBind != null ? schemaToBind : createSchema();
 
         if (originalSchema.get$ref() != null) {
             Schema<?> schemaFromAnn = schemaFromAnnotation(context, element, elementType, schemaAnn);
@@ -1149,10 +1151,10 @@ public final class SchemaDefinitionUtils {
         final ComposedSchema composedSchema;
         final Schema<?> topLevelSchema;
         if (originalSchema.get$ref() != null) {
-            composedSchema = setSpecVersion(new ComposedSchema());
+            composedSchema = createComposedSchema();
             topLevelSchema = composedSchema;
         } else {
-            composedSchema = setSpecVersion(new ComposedSchema());
+            composedSchema = createComposedSchema();
             topLevelSchema = schemaToBind;
         }
 
@@ -1583,7 +1585,7 @@ public final class SchemaDefinitionUtils {
                     schemaToValueMap(arraySchemaMap, schema);
                 } else {
                     // For primitive type, just copy description field is present.
-                    final Schema<?> items = setSpecVersion(primitiveType.createProperty());
+                    final Schema<?> items = primitiveType.createProperty(Utils.isOpenapi31());
                     var description = (String) annotationValue.stringValue(PROP_DESCRIPTION).orElse(null);
                     if (description != null && !description.isEmpty()) {
                         items.setDescription(description);
@@ -1890,7 +1892,7 @@ public final class SchemaDefinitionUtils {
             }
 
             if (schema == null) {
-                schema = setSpecVersion(new ComposedSchema());
+                schema = createComposedSchema();
                 schema.setType(TYPE_OBJECT);
             }
             for (ClassElement sType : superTypes) {
@@ -1903,7 +1905,7 @@ public final class SchemaDefinitionUtils {
             }
         } else {
             if (schema == null) {
-                schema = setSpecVersion(new Schema<>());
+                schema = createSchema();
                 schema.setType(TYPE_OBJECT);
             }
         }
@@ -1932,7 +1934,7 @@ public final class SchemaDefinitionUtils {
 
         if (schemas.get(parentSchemaName) != null
             || getSchemaDefinition(openAPI, context, superType, superTypeArgs, null, mediaTypes, jsonViewClass) != null) {
-            var parentSchema = setSpecVersion(new Schema<>());
+            var parentSchema = createSchema();
             parentSchema.set$ref(SchemaUtils.schemaRef(parentSchemaName));
             if (schema.getAllOf() == null || !schema.getAllOf().contains(parentSchema)) {
                 schema.addAllOfItem(parentSchema);
@@ -1972,7 +1974,7 @@ public final class SchemaDefinitionUtils {
             composedSchema.setType(TYPE_OBJECT);
         }
         // put all properties as siblings of allOf
-        var propSchema = setSpecVersion(new Schema<>());
+        var propSchema = createSchema();
         propSchema.properties(composedSchema.getProperties());
         propSchema.setDescription(composedSchema.getDescription());
         propSchema.setRequired(composedSchema.getRequired());
@@ -2065,14 +2067,14 @@ public final class SchemaDefinitionUtils {
             itemsSchemaAnn = (AnnotationValue<io.swagger.v3.oas.annotations.media.Schema>) annValues.get(PROP_SCHEMA);
         }
         if (itemsSchemaAnn != null) {
-            var itemsSchemaFromAnn = setSpecVersion(new Schema<>());
+            var itemsSchemaFromAnn = createSchema();
             processSchemaAnn(itemsSchemaFromAnn, context, element, true,
                 classEl != null ? classEl.getFirstTypeArgument().orElse(null) : null,
                 itemsSchemaAnn);
             if (!SchemaUtils.isEmptySchema(itemsSchemaFromAnn)) {
                 var itemsSchema = schemaToBind.getItems();
                 if (itemsSchemaFromAnn.get$ref() != null || itemsSchema.get$ref() != null) {
-                    var allOf = new ComposedSchema();
+                    var allOf = createComposedSchema();
                     allOf.addAllOfItem(itemsSchema);
                     allOf.addAllOfItem(itemsSchemaFromAnn);
                     schemaToBind.setItems(allOf);
@@ -2087,7 +2089,7 @@ public final class SchemaDefinitionUtils {
 
             if (annValues.containsKey(PROP_CONTAINS)) {
 
-                var containsSchema = schemaToBind.getUnevaluatedItems() != null ? schemaToBind.getUnevaluatedItems() : setSpecVersion(new Schema<>());
+                var containsSchema = schemaToBind.getUnevaluatedItems() != null ? schemaToBind.getUnevaluatedItems() : createSchema();
                 processSchemaAnn(containsSchema, context, element, true, classEl, (AnnotationValue<io.swagger.v3.oas.annotations.media.Schema>) annValues.get(PROP_CONTAINS));
                 schemaToBind.setContains(containsSchema);
 
@@ -2099,7 +2101,7 @@ public final class SchemaDefinitionUtils {
                 }
             }
             if (annValues.containsKey(PROP_UNEVALUATED_ITEMS)) {
-                var unevaluatedSchema = schemaToBind.getUnevaluatedItems() != null ? schemaToBind.getUnevaluatedItems() : setSpecVersion(new Schema<>());
+                var unevaluatedSchema = schemaToBind.getUnevaluatedItems() != null ? schemaToBind.getUnevaluatedItems() : createSchema();
                 processSchemaAnn(unevaluatedSchema, context, element, true, classEl, (AnnotationValue<io.swagger.v3.oas.annotations.media.Schema>) annValues.get(PROP_UNEVALUATED_ITEMS));
                 schemaToBind.setUnevaluatedItems(unevaluatedSchema);
             }
@@ -2335,6 +2337,9 @@ public final class SchemaDefinitionUtils {
             if (annValues.containsKey("$anchor")) {
                 schemaToBind.set$anchor((String) annValues.get("$anchor"));
             }
+            if (annValues.containsKey("$dynamicRef")) {
+                schemaToBind.set$dynamicRef((String) annValues.get("$dynamicRef"));
+            }
             if (annValues.containsKey("$vocabulary")) {
                 schemaToBind.set$vocabulary((String) annValues.get("$vocabulary"));
             }
@@ -2463,7 +2468,7 @@ public final class SchemaDefinitionUtils {
 
             var primitiveType = PrimitiveType.fromType(wrapperType);
             if (primitiveType != null) {
-                schema = setSpecVersion(primitiveType.createProperty());
+                schema = primitiveType.createProperty(Utils.isOpenapi31());
             }
         }
 
@@ -2478,12 +2483,12 @@ public final class SchemaDefinitionUtils {
         }
         var primitiveComponentType = getPrimitiveType(componentType, componentType.getName(), context);
         if (primitiveComponentType == null) {
-            var schemaFromTypeArgAnnotations = setSpecVersion(new Schema<>());
+            var schemaFromTypeArgAnnotations = createSchema();
             processArgTypeAnnotations(componentType, schemaFromTypeArgAnnotations, context);
             if (isEmptySchema(schemaFromTypeArgAnnotations)) {
                 return schema;
             }
-            var composedSchema = setSpecVersion(new ComposedSchema());
+            var composedSchema = createComposedSchema();
             if (TYPE_ARRAY.equals(schema.getType())) {
                 appendSchema(schema, schemaFromTypeArgAnnotations);
                 return schema;
@@ -2815,9 +2820,9 @@ public final class SchemaDefinitionUtils {
                                               OpenAPI openApi, ClassElement jsonViewClass,
                                               JavadocDescription classJavadoc,
                                               VisitorContext context) {
-        var schema = setSpecVersion(new Schema<>());
+        var schema = createSchema();
         if (CollectionUtils.isEmpty(typeArgs)) {
-            schema.setAdditionalProperties(PrimitiveType.OBJECT.createProperty());
+            schema.setAdditionalProperties(PrimitiveType.OBJECT.createProperty(Utils.isOpenapi31()));
             return schema;
         }
         // Case, when map key is enumeration
@@ -2838,7 +2843,7 @@ public final class SchemaDefinitionUtils {
             }
         }
         if (valueType.getName().equals(Object.class.getName())) {
-            schema.setAdditionalProperties(setSpecVersion(PrimitiveType.OBJECT.createProperty()));
+            schema.setAdditionalProperties(setSpecVersion(PrimitiveType.OBJECT.createProperty(Utils.isOpenapi31())));
         } else {
             schema.setAdditionalProperties(resolveSchema(openApi, type, valueType, context, mediaTypes, jsonViewClass, null, classJavadoc, null));
         }
@@ -2950,7 +2955,7 @@ public final class SchemaDefinitionUtils {
             return null;
         }
 
-        var schemaToBind = setSpecVersion(new Schema<>());
+        var schemaToBind = createSchema();
         processSchemaAnn(schemaToBind, context, element, type, schemaAnn);
 
         return schemaToBind;
