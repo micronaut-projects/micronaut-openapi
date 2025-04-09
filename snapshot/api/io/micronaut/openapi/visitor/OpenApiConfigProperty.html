@@ -317,6 +317,36 @@ loadScripts(document, 'script');</script>
  and the generated client according to this specification will be much more accurate than without it.</div>
 </div>
 <div class="col-first even-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second even-row-color"><code><a href="#MICRONAUT_OPENAPI_TAG_GENERATION_BY_CLASS_ENABLED" class="member-name-link">MICRONAUT_OPENAPI_TAG_GENERATION_BY_CLASS_ENABLED</a></code></div>
+<div class="col-last even-row-color">
+<div class="block">System property that enables tag generation by controller class name.</div>
+</div>
+<div class="col-first odd-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second odd-row-color"><code><a href="#MICRONAUT_OPENAPI_TAG_GENERATION_BY_PACKAGE_ENABLED" class="member-name-link">MICRONAUT_OPENAPI_TAG_GENERATION_BY_PACKAGE_ENABLED</a></code></div>
+<div class="col-last odd-row-color">
+<div class="block">System property that enables tag generation by package name.</div>
+</div>
+<div class="col-first even-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second even-row-color"><code><a href="#MICRONAUT_OPENAPI_TAG_GENERATION_DESCRIPTION_MAX_LENGTH" class="member-name-link">MICRONAUT_OPENAPI_TAG_GENERATION_DESCRIPTION_MAX_LENGTH</a></code></div>
+<div class="col-last even-row-color">
+<div class="block">Maximal generated tag description length.</div>
+</div>
+<div class="col-first odd-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second odd-row-color"><code><a href="#MICRONAUT_OPENAPI_TAG_GENERATION_NAMING_STRATEGY" class="member-name-link">MICRONAUT_OPENAPI_TAG_GENERATION_NAMING_STRATEGY</a></code></div>
+<div class="col-last odd-row-color">
+<div class="block">Naming strategy for generated tags.</div>
+</div>
+<div class="col-first even-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second even-row-color"><code><a href="#MICRONAUT_OPENAPI_TAG_GENERATION_REMOVE_POSTFIXES" class="member-name-link">MICRONAUT_OPENAPI_TAG_GENERATION_REMOVE_POSTFIXES</a></code></div>
+<div class="col-last even-row-color">
+<div class="block">List of postfixes which need to remove for generated tags.</div>
+</div>
+<div class="col-first odd-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second odd-row-color"><code><a href="#MICRONAUT_OPENAPI_TAG_GENERATION_REMOVE_PREFIXES" class="member-name-link">MICRONAUT_OPENAPI_TAG_GENERATION_REMOVE_PREFIXES</a></code></div>
+<div class="col-last odd-row-color">
+<div class="block">List of prefixes which need to remove for generated tags.</div>
+</div>
+<div class="col-first even-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
 <div class="col-second even-row-color"><code><a href="#MICRONAUT_OPENAPI_TARGET_FILE" class="member-name-link">MICRONAUT_OPENAPI_TARGET_FILE</a></code></div>
 <div class="col-last even-row-color">
 <div class="block">System property that enables setting the target file to write to.</div>
@@ -1177,6 +1207,98 @@ loadScripts(document, 'script');</script>
 <dd>
 <ul class="see-list">
 <li><a href="../../../../constant-values.html#io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_GROUPS">Constant Field Values</a></li>
+</ul>
+</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="MICRONAUT_OPENAPI_TAG_GENERATION_BY_CLASS_ENABLED">
+<h3>MICRONAUT_OPENAPI_TAG_GENERATION_BY_CLASS_ENABLED</h3>
+<div class="member-signature"><span class="modifiers">static final</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">MICRONAUT_OPENAPI_TAG_GENERATION_BY_CLASS_ENABLED</span></div>
+<div class="block">System property that enables tag generation by controller class name.</div>
+<dl class="notes">
+<dt>See Also:</dt>
+<dd>
+<ul class="see-list">
+<li><a href="../../../../constant-values.html#io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_TAG_GENERATION_BY_CLASS_ENABLED">Constant Field Values</a></li>
+</ul>
+</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="MICRONAUT_OPENAPI_TAG_GENERATION_BY_PACKAGE_ENABLED">
+<h3>MICRONAUT_OPENAPI_TAG_GENERATION_BY_PACKAGE_ENABLED</h3>
+<div class="member-signature"><span class="modifiers">static final</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">MICRONAUT_OPENAPI_TAG_GENERATION_BY_PACKAGE_ENABLED</span></div>
+<div class="block">System property that enables tag generation by package name.</div>
+<dl class="notes">
+<dt>See Also:</dt>
+<dd>
+<ul class="see-list">
+<li><a href="../../../../constant-values.html#io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_TAG_GENERATION_BY_PACKAGE_ENABLED">Constant Field Values</a></li>
+</ul>
+</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="MICRONAUT_OPENAPI_TAG_GENERATION_DESCRIPTION_MAX_LENGTH">
+<h3>MICRONAUT_OPENAPI_TAG_GENERATION_DESCRIPTION_MAX_LENGTH</h3>
+<div class="member-signature"><span class="modifiers">static final</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">MICRONAUT_OPENAPI_TAG_GENERATION_DESCRIPTION_MAX_LENGTH</span></div>
+<div class="block">Maximal generated tag description length. Description generated by java-doc on controller class level.</div>
+<dl class="notes">
+<dt>See Also:</dt>
+<dd>
+<ul class="see-list">
+<li><a href="../../../../constant-values.html#io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_TAG_GENERATION_DESCRIPTION_MAX_LENGTH">Constant Field Values</a></li>
+</ul>
+</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="MICRONAUT_OPENAPI_TAG_GENERATION_NAMING_STRATEGY">
+<h3>MICRONAUT_OPENAPI_TAG_GENERATION_NAMING_STRATEGY</h3>
+<div class="member-signature"><span class="modifiers">static final</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">MICRONAUT_OPENAPI_TAG_GENERATION_NAMING_STRATEGY</span></div>
+<div class="block">Naming strategy for generated tags. One jackson PropertyNamingStrategy.</div>
+<dl class="notes">
+<dt>See Also:</dt>
+<dd>
+<ul class="see-list">
+<li><a href="../../../../constant-values.html#io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_TAG_GENERATION_NAMING_STRATEGY">Constant Field Values</a></li>
+</ul>
+</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="MICRONAUT_OPENAPI_TAG_GENERATION_REMOVE_PREFIXES">
+<h3>MICRONAUT_OPENAPI_TAG_GENERATION_REMOVE_PREFIXES</h3>
+<div class="member-signature"><span class="modifiers">static final</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">MICRONAUT_OPENAPI_TAG_GENERATION_REMOVE_PREFIXES</span></div>
+<div class="block">List of prefixes which need to remove for generated tags. For example, if you generate tags by package,
+ you need to remove package prefix like this `com.mycompany.myservice.controller`.</div>
+<dl class="notes">
+<dt>See Also:</dt>
+<dd>
+<ul class="see-list">
+<li><a href="../../../../constant-values.html#io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_TAG_GENERATION_REMOVE_PREFIXES">Constant Field Values</a></li>
+</ul>
+</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="MICRONAUT_OPENAPI_TAG_GENERATION_REMOVE_POSTFIXES">
+<h3>MICRONAUT_OPENAPI_TAG_GENERATION_REMOVE_POSTFIXES</h3>
+<div class="member-signature"><span class="modifiers">static final</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">MICRONAUT_OPENAPI_TAG_GENERATION_REMOVE_POSTFIXES</span></div>
+<div class="block">List of postfixes which need to remove for generated tags. For example, if you generate tags by class,
+ you need to remove postfixes like `Controller` or `Api`.</div>
+<dl class="notes">
+<dt>See Also:</dt>
+<dd>
+<ul class="see-list">
+<li><a href="../../../../constant-values.html#io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_TAG_GENERATION_REMOVE_POSTFIXES">Constant Field Values</a></li>
 </ul>
 </dd>
 </dl>

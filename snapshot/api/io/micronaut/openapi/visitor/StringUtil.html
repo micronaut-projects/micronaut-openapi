@@ -163,6 +163,12 @@ loadScripts(document, 'script');</script>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
 <div class="block">Return string with first capitalized letter and without braces.</div>
 </div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#left(java.lang.String,int)" class="member-name-link">left</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;str,
+ int&nbsp;len)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">Gets the leftmost <code>len</code> characters of a String.</div>
+</div>
 </div>
 </div>
 </div>
@@ -422,6 +428,34 @@ loadScripts(document, 'script');</script>
 <dd><code>value</code> - path variable name with braces</dd>
 <dt>Returns:</dt>
 <dd>capitalized path var name without braces</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="left(java.lang.String,int)">
+<h3>left</h3>
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">left</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;str,
+ int&nbsp;len)</span></div>
+<div class="block">Gets the leftmost <code>len</code> characters of a String.
+
+ <p>If <code>len</code> characters are not available, or the
+ String is <code>null</code>, the String will be returned without
+ an exception. An empty String is returned if len is negative.</p>
+
+ <pre>
+ StringUtil.left(null, *)    = null
+ StringUtil.left(*, -ve)     = ""
+ StringUtil.left("", *)      = ""
+ StringUtil.left("abc", 0)   = ""
+ StringUtil.left("abc", 2)   = "ab"
+ StringUtil.left("abc", 4)   = "abc"
+ </pre></div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>str</code> - the String to get the leftmost characters from, may be null</dd>
+<dd><code>len</code> - the length of the required String</dd>
+<dt>Returns:</dt>
+<dd>the leftmost characters, <code>null</code> if null String input</dd>
 </dl>
 </section>
 </li>
