@@ -105,6 +105,12 @@ loadScripts(document, 'script');</script>
 <div class="col-first even-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;</code></div>
 <div class="col-second even-row-color"><code><a href="#FILE_TYPES" class="member-name-link">FILE_TYPES</a></code></div>
 <div class="col-last even-row-color">&nbsp;</div>
+<div class="col-first odd-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second odd-row-color"><code><a href="#TYPE_ARG_MAP_KEY" class="member-name-link">TYPE_ARG_MAP_KEY</a></code></div>
+<div class="col-last odd-row-color">&nbsp;</div>
+<div class="col-first even-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second even-row-color"><code><a href="#TYPE_ARG_MAP_VALUE" class="member-name-link">TYPE_ARG_MAP_VALUE</a></code></div>
+<div class="col-last even-row-color">&nbsp;</div>
 <div class="col-first odd-row-color"><code>static final <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;</code></div>
 <div class="col-second odd-row-color"><code><a href="#VOID_TYPES" class="member-name-link">VOID_TYPES</a></code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
@@ -182,13 +188,25 @@ loadScripts(document, 'script');</script>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#isIgnoredParameterType(io.micronaut.inject.ast.ClassElement)" class="member-name-link">isIgnoredParameterType</a><wbr>(io.micronaut.inject.ast.ClassElement&nbsp;parameterType)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static boolean</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#isJavaBasicType(java.lang.String)" class="member-name-link">isJavaBasicType</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;typeName)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#isIterableOfMultipartFiles(io.micronaut.inject.ast.TypedElement)" class="member-name-link">isIterableOfMultipartFiles</a><wbr>(io.micronaut.inject.ast.TypedElement&nbsp;el)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static boolean</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#isJavaUtilCollectionType(io.micronaut.inject.ast.ClassElement)" class="member-name-link">isJavaUtilCollectionType</a><wbr>(io.micronaut.inject.ast.ClassElement&nbsp;classEl)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#isJavaBasicType(java.lang.String)" class="member-name-link">isJavaBasicType</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;typeName)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static boolean</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#isJavaUtilType(io.micronaut.inject.ast.ClassElement)" class="member-name-link">isJavaUtilType</a><wbr>(io.micronaut.inject.ast.ClassElement&nbsp;classEl)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#isJavaUtilCollectionType(io.micronaut.inject.ast.ClassElement)" class="member-name-link">isJavaUtilCollectionType</a><wbr>(io.micronaut.inject.ast.ClassElement&nbsp;classEl)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static boolean</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#isJavaUtilType(io.micronaut.inject.ast.ClassElement)" class="member-name-link">isJavaUtilType</a><wbr>(io.micronaut.inject.ast.ClassElement&nbsp;classEl)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static boolean</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#isMapOfListOfMultipartFiles(io.micronaut.inject.ast.TypedElement)" class="member-name-link">isMapOfListOfMultipartFiles</a><wbr>(io.micronaut.inject.ast.TypedElement&nbsp;el)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static boolean</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#isMapOfMultipartFiles(io.micronaut.inject.ast.TypedElement)" class="member-name-link">isMapOfMultipartFiles</a><wbr>(io.micronaut.inject.ast.TypedElement&nbsp;el)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static boolean</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#isMapOfStrings(io.micronaut.inject.ast.TypedElement)" class="member-name-link">isMapOfStrings</a><wbr>(io.micronaut.inject.ast.TypedElement&nbsp;el)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static boolean</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#isNotNullable(io.micronaut.inject.ast.Element)" class="member-name-link">isNotNullable</a><wbr>(io.micronaut.inject.ast.Element&nbsp;element)</code></div>
@@ -249,6 +267,34 @@ loadScripts(document, 'script');</script>
 <section class="field-details" id="field-detail">
 <h2>Field Details</h2>
 <ul class="member-list">
+<li>
+<section class="detail" id="TYPE_ARG_MAP_KEY">
+<h3>TYPE_ARG_MAP_KEY</h3>
+<div class="member-signature"><span class="modifiers">public static final</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">TYPE_ARG_MAP_KEY</span></div>
+<dl class="notes">
+<dt>See Also:</dt>
+<dd>
+<ul class="see-list">
+<li><a href="../../../../constant-values.html#io.micronaut.openapi.visitor.ElementUtils.TYPE_ARG_MAP_KEY">Constant Field Values</a></li>
+</ul>
+</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="TYPE_ARG_MAP_VALUE">
+<h3>TYPE_ARG_MAP_VALUE</h3>
+<div class="member-signature"><span class="modifiers">public static final</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">TYPE_ARG_MAP_VALUE</span></div>
+<dl class="notes">
+<dt>See Also:</dt>
+<dd>
+<ul class="see-list">
+<li><a href="../../../../constant-values.html#io.micronaut.openapi.visitor.ElementUtils.TYPE_ARG_MAP_VALUE">Constant Field Values</a></li>
+</ul>
+</dd>
+</dl>
+</section>
+</li>
 <li>
 <section class="detail" id="EMPTY_ANNOTATION_VALUES_ARRAY">
 <h3>EMPTY_ANNOTATION_VALUES_ARRAY</h3>
@@ -513,6 +559,30 @@ loadScripts(document, 'script');</script>
 <section class="detail" id="isEnum(io.micronaut.inject.ast.ClassElement)">
 <h3>isEnum</h3>
 <div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">isEnum</span><wbr><span class="parameters">(io.micronaut.inject.ast.ClassElement&nbsp;classElement)</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="isIterableOfMultipartFiles(io.micronaut.inject.ast.TypedElement)">
+<h3>isIterableOfMultipartFiles</h3>
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">isIterableOfMultipartFiles</span><wbr><span class="parameters">(io.micronaut.inject.ast.TypedElement&nbsp;el)</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="isMapOfListOfMultipartFiles(io.micronaut.inject.ast.TypedElement)">
+<h3>isMapOfListOfMultipartFiles</h3>
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">isMapOfListOfMultipartFiles</span><wbr><span class="parameters">(io.micronaut.inject.ast.TypedElement&nbsp;el)</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="isMapOfMultipartFiles(io.micronaut.inject.ast.TypedElement)">
+<h3>isMapOfMultipartFiles</h3>
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">isMapOfMultipartFiles</span><wbr><span class="parameters">(io.micronaut.inject.ast.TypedElement&nbsp;el)</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="isMapOfStrings(io.micronaut.inject.ast.TypedElement)">
+<h3>isMapOfStrings</h3>
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">isMapOfStrings</span><wbr><span class="parameters">(io.micronaut.inject.ast.TypedElement&nbsp;el)</span></div>
 </section>
 </li>
 </ul>
