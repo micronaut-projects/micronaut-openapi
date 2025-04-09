@@ -235,13 +235,21 @@ public final class ElementUtils {
             return false;
         }
 
-        return !parameter.hasAnnotation(QueryValue.class)
-            && !parameter.hasAnnotation(CookieValue.class)
-            && !parameter.hasAnnotation(Header.class)
-            && !parameter.hasAnnotation(PathVariable.class)
-            && !parameter.hasAnnotation(Part.class)
+        return hasNoBindingAnnotationOrType(parameter)
             && !parameter.hasAnnotation(RequestAttribute.class)
-            && !parameter.hasAnnotation(RequestBean.class);
+            ;
+    }
+
+    public static boolean hasNoBindingAnnotationOrType(TypedElement parameter) {
+        return !parameter.isAnnotationPresent(io.swagger.v3.oas.annotations.parameters.RequestBody.class)
+            && !parameter.isAnnotationPresent(QueryValue.class)
+            && !parameter.isAnnotationPresent(PathVariable.class)
+            && !parameter.isAnnotationPresent(Body.class)
+            && !parameter.isAnnotationPresent(Part.class)
+            && !parameter.isAnnotationPresent(CookieValue.class)
+            && !parameter.isAnnotationPresent(Header.class)
+            && !parameter.isAnnotationPresent(RequestBean.class)
+            && !isResponseType(parameter.getType());
     }
 
     /**

@@ -69,6 +69,7 @@ spring:
   title: Micronaut OpenAPI with Spring
   springWithGradle: Spring with Gradle
   springWithMaven: Spring with Maven
+  springWithWrappedRequestData: Spring with wrapped request data
 openApiGuides: Guides
 repository: Repository
 breaks: Breaking Changes
