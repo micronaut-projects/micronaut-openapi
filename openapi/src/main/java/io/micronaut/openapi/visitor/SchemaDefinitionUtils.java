@@ -137,6 +137,8 @@ import static io.micronaut.openapi.visitor.ContextUtils.warn;
 import static io.micronaut.openapi.visitor.ConvertUtils.parseJsonString;
 import static io.micronaut.openapi.visitor.ConvertUtils.setDefaultValueObject;
 import static io.micronaut.openapi.visitor.ConvertUtils.toTupleSubMap;
+import static io.micronaut.openapi.visitor.ElementUtils.TYPE_ARG_MAP_KEY;
+import static io.micronaut.openapi.visitor.ElementUtils.TYPE_ARG_MAP_VALUE;
 import static io.micronaut.openapi.visitor.ElementUtils.findAnnotation;
 import static io.micronaut.openapi.visitor.ElementUtils.getAnnotation;
 import static io.micronaut.openapi.visitor.ElementUtils.getAnnotationMetadata;
@@ -2801,8 +2803,8 @@ public final class SchemaDefinitionUtils {
             return schema;
         }
         // Case, when map key is enumeration
-        ClassElement keyType = typeArgs.get("K");
-        ClassElement valueType = typeArgs.get("V");
+        ClassElement keyType = typeArgs.get(TYPE_ARG_MAP_KEY);
+        ClassElement valueType = typeArgs.get(TYPE_ARG_MAP_VALUE);
         if (isEnum(keyType)) {
             var enumSchema = getSchemaDefinition(openApi, context, keyType, keyType.getTypeArguments(), null, mediaTypes, null);
             if (enumSchema != null && enumSchema.get$ref() != null) {

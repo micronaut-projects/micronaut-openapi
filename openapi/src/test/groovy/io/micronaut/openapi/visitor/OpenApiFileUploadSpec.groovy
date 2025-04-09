@@ -223,6 +223,7 @@ interface PetOperations<T extends Pet> {
     @Post("/")
     T saveByUpload(@Body T pet);
 }
+
 class Pet {
     private int age;
     private String name;
@@ -261,6 +262,7 @@ class Pet {
         this.tags = tags;
     }
 }
+
 @jakarta.inject.Singleton
 class MyBean {}
 ''')
@@ -283,4 +285,124 @@ class MyBean {}
         operation.requestBody.content['application/x-www-form-urlencoded'].schema
     }
 
+    void "test converted spring boot controller to micronaut controller with multipart form data"() {
+        given:
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.http.MediaType;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Post;
+import io.micronaut.http.annotation.QueryValue;
+import io.micronaut.http.multipart.CompletedFileUpload;
+import io.swagger.v3.oas.annotations.Parameter;
+
+import java.util.List;
+import java.util.Map;
+
+import static io.swagger.v3.oas.annotations.enums.ParameterIn.QUERY;
+
+@Controller
+class TestController {
+
+    @Post(value = "/file", consumes = MediaType.MULTIPART_FORM_DATA)
+    // Query value, because for Spring Boot need to set annotation `@RequestParam` and it's mapped to `@QueryValue`
+    // `json` parameter must be ignored, because it is map fo all query parameters, and we can't interpret it correct
+    public void endpoint(@QueryValue Map<String, CompletedFileUpload> files, @QueryValue @Parameter(in = QUERY) Map<String, String> json) {
+    }
+    
+    @Post(value = "/file", consumes = MediaType.MULTIPART_FORM_DATA)
+    public void endpoint2(@QueryValue Map<String, CompletedFileUpload> files) {
+    }
+
+    @Post(value = "/fileWithJson", consumes = MediaType.MULTIPART_FORM_DATA)
+    // Query value, because for Spring Boot need to set annotation `@RequestParam` and it's mapped to `@QueryValue`
+    // in this case json will be interpreted as a part of multipart request 
+    public void endpoint2(@QueryValue Map<String, CompletedFileUpload> files, @QueryValue Map<String, String> json) {
+    }
+
+    @Post(value = "/fileArray", consumes = MediaType.MULTIPART_FORM_DATA)
+    public void endpoint3(CompletedFileUpload[] files) {
+    }
+
+    @Post(value = "/fileList", consumes = MediaType.MULTIPART_FORM_DATA)
+    public void endpoint4(List<CompletedFileUpload> files) {
+    }
+
+    @Post(value = "/fileMapOfList", consumes = MediaType.MULTIPART_FORM_DATA)
+    public void endpoint5(Map<String, List<CompletedFileUpload>> files) {
+    }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        then:
+        Utils.testReference != null
+
+        when:
+        OpenAPI openAPI = Utils.testReference
+        Operation fileOp = openAPI.paths?."/file"?.post
+        Operation fileWithJsonOp = openAPI.paths?."/fileWithJson"?.post
+        Operation fileArrayOp = openAPI.paths?."/fileArray"?.post
+        Operation fileListOp = openAPI.paths?."/fileList"?.post
+
+        then:
+        fileOp.requestBody
+        fileOp.requestBody.content
+        fileOp.requestBody.content."multipart/form-data"
+        fileOp.requestBody.content."multipart/form-data".schema
+        fileOp.requestBody.content."multipart/form-data".schema.type == "object"
+        fileOp.requestBody.content."multipart/form-data".schema.properties.size() == 1
+        fileOp.requestBody.content."multipart/form-data".schema.properties.files.type == "string"
+        fileOp.requestBody.content."multipart/form-data".schema.properties.files.format == "binary"
+
+        fileOp.requestBody.content."multipart/form-data".encoding.size() == 1
+        fileOp.requestBody.content."multipart/form-data".encoding.files.contentType == "application/octet-stream"
+
+        fileWithJsonOp.requestBody
+        fileWithJsonOp.requestBody.content
+        fileWithJsonOp.requestBody.content."multipart/form-data"
+        fileWithJsonOp.requestBody.content."multipart/form-data".schema
+        fileWithJsonOp.requestBody.content."multipart/form-data".schema.type == "object"
+        fileWithJsonOp.requestBody.content."multipart/form-data".schema.properties.size() == 2
+        fileWithJsonOp.requestBody.content."multipart/form-data".schema.properties.files.type == "string"
+        fileWithJsonOp.requestBody.content."multipart/form-data".schema.properties.files.format == "binary"
+        fileWithJsonOp.requestBody.content."multipart/form-data".schema.properties.json.type == "string"
+
+        fileWithJsonOp.requestBody.content."multipart/form-data".encoding.size() == 2
+        fileWithJsonOp.requestBody.content."multipart/form-data".encoding.files.contentType == "application/octet-stream"
+        fileWithJsonOp.requestBody.content."multipart/form-data".encoding.json.contentType == "text/plain"
+
+        fileArrayOp.requestBody
+        fileArrayOp.requestBody.content
+        fileArrayOp.requestBody.content."multipart/form-data"
+        fileArrayOp.requestBody.content."multipart/form-data".schema
+        fileArrayOp.requestBody.content."multipart/form-data".schema.type == "object"
+        fileArrayOp.requestBody.content."multipart/form-data".schema.properties.size() == 1
+        fileArrayOp.requestBody.content."multipart/form-data".schema.properties.files.type == "array"
+        fileArrayOp.requestBody.content."multipart/form-data".schema.properties.files.items
+        fileArrayOp.requestBody.content."multipart/form-data".schema.properties.files.items.type == "string"
+        fileArrayOp.requestBody.content."multipart/form-data".schema.properties.files.items.format == "binary"
+
+        fileArrayOp.requestBody.content."multipart/form-data".encoding.size() == 1
+        fileArrayOp.requestBody.content."multipart/form-data".encoding.files.contentType == "application/octet-stream"
+        fileArrayOp.requestBody.content."multipart/form-data".encoding.files.explode
+
+        fileListOp.requestBody
+        fileListOp.requestBody.content
+        fileListOp.requestBody.content."multipart/form-data"
+        fileListOp.requestBody.content."multipart/form-data".schema
+        fileListOp.requestBody.content."multipart/form-data".schema.type == "object"
+        fileListOp.requestBody.content."multipart/form-data".schema.properties.size() == 1
+        fileListOp.requestBody.content."multipart/form-data".schema.properties.files.type == "array"
+        fileListOp.requestBody.content."multipart/form-data".schema.properties.files.items
+        fileListOp.requestBody.content."multipart/form-data".schema.properties.files.items.type == "string"
+        fileListOp.requestBody.content."multipart/form-data".schema.properties.files.items.format == "binary"
+
+        fileListOp.requestBody.content."multipart/form-data".encoding.size() == 1
+        fileListOp.requestBody.content."multipart/form-data".encoding.files.contentType == "application/octet-stream"
+        fileListOp.requestBody.content."multipart/form-data".encoding.files.explode
+    }
 }

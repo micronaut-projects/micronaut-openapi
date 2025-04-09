@@ -80,6 +80,9 @@ import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_HIDDEN;
 @Internal
 public final class ElementUtils {
 
+    public static final String TYPE_ARG_MAP_KEY = "K";
+    public static final String TYPE_ARG_MAP_VALUE = "V";
+
     public static final AnnotationValue<?>[] EMPTY_ANNOTATION_VALUES_ARRAY = new AnnotationValue[0];
 
     public static final List<String> CONTAINER_TYPES = List.of(
@@ -572,4 +575,89 @@ public final class ElementUtils {
         var jsonShape = jsonFormatAnn.get("shape", JsonFormat.Shape.class).orElse(JsonFormat.Shape.ANY);
         return jsonShape != JsonFormat.Shape.OBJECT && isEnum;
     }
+
+    public static boolean isIterableOfMultipartFiles(TypedElement el) {
+        var type = el.getGenericType();
+        if (type.isArray()) {
+            return isFileUpload(type);
+        }
+        if (type.isAssignable("org.springframework.util.MultiValueMap")) {
+            var typeArgs = el.getGenericType().getTypeArguments();
+            if (typeArgs.size() == 2) {
+                var typeArgType = typeArgs.get(TYPE_ARG_MAP_VALUE);
+                return isFileUpload(typeArgType);
+            }
+            return false;
+        }
+        if (!type.isIterable()) {
+            if (!type.isAssignable(Map.class)) {
+                return false;
+            }
+            // case for Map<String, List<MultipartFile>>
+            var typeArgs = el.getGenericType().getTypeArguments();
+            if (typeArgs.size() == 2) {
+                var typeArgType = typeArgs.get(TYPE_ARG_MAP_VALUE);
+                if (typeArgType.isIterable()) {
+                    type = typeArgType.getGenericType();
+                }
+            }
+        }
+        var typeArg = type.getFirstTypeArgument().orElse(null);
+        if (typeArg == null) {
+            return false;
+        }
+        return isFileUpload(typeArg);
+    }
+
+    public static boolean isMapOfListOfMultipartFiles(TypedElement el) {
+        ClassElement typeArgType = null;
+        var type = el.getGenericType();
+        if (type.isAssignable("org.springframework.util.MultiValueMap")) {
+            var typeArgs = el.getGenericType().getTypeArguments();
+            if (typeArgs.size() != 2) {
+                return false;
+            }
+            typeArgType = typeArgs.get(TYPE_ARG_MAP_VALUE);
+        } else if (type.isAssignable(Map.class)) {
+            // case for Map<String, List<MultipartFile>>
+            var typeArgs = el.getGenericType().getTypeArguments();
+            if (typeArgs.size() != 2) {
+                return false;
+            }
+            typeArgType = typeArgs.get(TYPE_ARG_MAP_VALUE);
+            if (typeArgType == null || !typeArgType.isIterable()) {
+                return false;
+            }
+            typeArgType = typeArgType.getGenericType().getFirstTypeArgument().orElse(null);
+        }
+        if (typeArgType == null) {
+            return false;
+        }
+        return isFileUpload(typeArgType);
+    }
+
+    public static boolean isMapOfMultipartFiles(TypedElement el) {
+        if (!el.getType().isAssignable(Map.class)) {
+            return false;
+        }
+        var typeArgs = el.getGenericType().getTypeArguments();
+        if (typeArgs.size() != 2) {
+            return false;
+        }
+        var valueType = typeArgs.get(TYPE_ARG_MAP_VALUE);
+        return isFileUpload(valueType);
+    }
+
+    public static boolean isMapOfStrings(TypedElement el) {
+        if (!el.getType().isAssignable(Map.class)) {
+            return false;
+        }
+        var typeArgs = el.getGenericType().getTypeArguments();
+        if (typeArgs.size() != 2) {
+            return false;
+        }
+        var valueType = typeArgs.get(TYPE_ARG_MAP_VALUE);
+        return valueType.getType().isAssignable(CharSequence.class);
+    }
+
 }

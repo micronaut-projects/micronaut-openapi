@@ -132,6 +132,10 @@ import static io.micronaut.openapi.visitor.ElementUtils.isDeprecated;
 import static io.micronaut.openapi.visitor.ElementUtils.isExtraBodyParameter;
 import static io.micronaut.openapi.visitor.ElementUtils.isFileUpload;
 import static io.micronaut.openapi.visitor.ElementUtils.isIgnoredParameter;
+import static io.micronaut.openapi.visitor.ElementUtils.isIterableOfMultipartFiles;
+import static io.micronaut.openapi.visitor.ElementUtils.isMapOfListOfMultipartFiles;
+import static io.micronaut.openapi.visitor.ElementUtils.isMapOfMultipartFiles;
+import static io.micronaut.openapi.visitor.ElementUtils.isMapOfStrings;
 import static io.micronaut.openapi.visitor.ElementUtils.isNotNullable;
 import static io.micronaut.openapi.visitor.ElementUtils.isNullable;
 import static io.micronaut.openapi.visitor.ElementUtils.isResponseType;
@@ -667,11 +671,21 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                                 // if content type doesn't set by annotation,
                                 // we can set application/octet-stream for file upload classes
                                 Encoding encoding = encodings.get(prop);
-                                if (encoding == null && isFileUpload(parameter.getType())) {
-                                    encoding = new Encoding();
-                                    encodings.put(prop, encoding);
+                                if (encoding == null) {
+                                    if (isFileUpload(parameter.getType())
+                                        || isMapOfMultipartFiles(parameter)
+                                        || isMapOfListOfMultipartFiles(parameter)
+                                        || isIterableOfMultipartFiles(parameter)) {
 
-                                    encoding.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+                                        encodings.put(prop, new Encoding()
+                                            .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                                            .explode(isIterableOfMultipartFiles(parameter) || isMapOfListOfMultipartFiles(parameter)));
+                                    } else if (isMapOfStrings(parameter)) {
+                                        encodings.put(parameter.getName(), new Encoding()
+                                            .contentType(MediaType.TEXT_PLAIN));
+                                        // also need to replace ObjectSchema to StringSchema
+                                        schema.getProperties().put(prop, PrimitiveType.STRING.createProperty());
+                                    }
                                 }
                             }
                         }
@@ -940,6 +954,9 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         if (propertySchema == null) {
             return;
         }
+        if (isMapOfMultipartFiles(parameter) || isMapOfListOfMultipartFiles(parameter)) {
+            propertySchema = (Schema) propertySchema.getAdditionalProperties();
+        }
 
         parameter.stringValue(io.swagger.v3.oas.annotations.Parameter.class, PROP_DESCRIPTION)
             .ifPresent(propertySchema::setDescription);
@@ -1018,9 +1035,30 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             newParameter = new CookieParameter();
             newParameter.setName(cookieName);
         } else if (parameter.isAnnotationPresent(QueryValue.class)) {
-            String queryVar = parameter.stringValue(QueryValue.class).orElse(parameterName);
-            newParameter = new QueryParameter();
-            newParameter.setName(queryVar);
+
+            var isExtraBodyParam = false;
+            // Fix for Spring boot controller endpoints for Map with MultipartFile like this:
+            // @PostMapping(value = "/file", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+            // public void endpoint2(@RequestParam Map<String, MultipartFile> files)
+            // because, `@RequestParam` annotation mapped to `@QueryValue`, but it's required for Spring Boot
+            // fix only for Map<String, MultipartFile>
+            if (isMapOfMultipartFiles(parameter) || isMapOfListOfMultipartFiles(parameter) || isIterableOfMultipartFiles(parameter)) {
+                extraBodyParameters.add(parameter);
+                isExtraBodyParam = true;
+            } else if (isMapOfStrings(parameter)) {
+                var parameterAnn = parameter.getAnnotation(io.swagger.v3.oas.annotations.Parameter.class);
+                var paramIn = parameterAnn != null ? parameterAnn.stringValue(PROP_IN).orElse(null) : null;
+                if (paramIn != null) {
+                    return null;
+                }
+                extraBodyParameters.add(parameter);
+                isExtraBodyParam = true;
+            }
+            if (!isExtraBodyParam) {
+                String queryVar = parameter.stringValue(QueryValue.class).orElse(parameterName);
+                newParameter = new QueryParameter();
+                newParameter.setName(queryVar);
+            }
         } else if (parameter.isAnnotationPresent(Part.class) && permitsRequestBody) {
             extraBodyParameters.add(parameter);
             isBodyParameter = true;
