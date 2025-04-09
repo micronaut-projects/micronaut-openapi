@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import io.micronaut.openapi.generator.MicronautCodeGeneratorEntryPoint;
@@ -63,7 +64,7 @@ public class GeneratorMain {
             parseParameterMappings(args[4]);
         List<ResponseBodyMapping> responseBodyMappings =
             parseResponseBodyMappings(args[5]);
-        var lang = GeneratorLanguage.valueOf(args[6].toUpperCase());
+        var lang = GeneratorLanguage.valueOf(args[6].toUpperCase(Locale.ENGLISH));
         var generatedAnnotation = Boolean.parseBoolean(args[7]);
         var ksp = Boolean.parseBoolean(args[8]);
         var clientPath = Boolean.parseBoolean(args[9]);

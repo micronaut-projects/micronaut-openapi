@@ -74,7 +74,6 @@ import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.enums.ParameterStyle;
 import io.swagger.v3.oas.annotations.extensions.Extension;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
-import io.swagger.v3.oas.annotations.tags.Tags;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.ExternalDocumentation;
 import io.swagger.v3.oas.models.OpenAPI;
@@ -103,7 +102,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -191,6 +189,8 @@ import static io.micronaut.openapi.visitor.StringUtil.CLOSE_BRACE;
 import static io.micronaut.openapi.visitor.StringUtil.DOLLAR;
 import static io.micronaut.openapi.visitor.StringUtil.OPEN_BRACE;
 import static io.micronaut.openapi.visitor.StringUtil.THREE_DOTS;
+import static io.micronaut.openapi.visitor.TagUtils.generationTags;
+import static io.micronaut.openapi.visitor.TagUtils.readTags;
 import static io.micronaut.openapi.visitor.Utils.DEFAULT_MEDIA_TYPES;
 import static io.micronaut.openapi.visitor.Utils.getMediaType;
 import static io.micronaut.openapi.visitor.Utils.resolveWebhooks;
@@ -283,6 +283,9 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                     classTags.add(tag);
                 }
             }
+        }
+        if (CollectionUtils.isEmpty(classTags)) {
+            classTags = generationTags(element, context);
         }
     }
 
@@ -1971,13 +1974,6 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         return callbacks;
     }
 
-    private void addTagIfNotPresent(String tag, Operation swaggerOperation) {
-        List<String> tags = swaggerOperation.getTags();
-        if (tags == null || !tags.contains(tag)) {
-            swaggerOperation.addTagsItem(tag);
-        }
-    }
-
     private void processMicronautVersionAndGroup(Operation swaggerOperation, String url,
                                                  HttpMethod httpMethod,
                                                  List<MediaType> consumesMediaTypes,
@@ -2128,70 +2124,6 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
 
             swaggerOperation.addParametersItem(parameter);
         }
-    }
-
-    private void readTags(MethodElement element, VisitorContext context, Operation swaggerOperation, List<Tag> classTags, OpenAPI openAPI) {
-        element.getAnnotationValuesByType(io.swagger.v3.oas.annotations.tags.Tag.class)
-            .forEach(av -> av.stringValue(PROP_NAME)
-                .ifPresent(swaggerOperation::addTagsItem));
-
-        var copyTags = openAPI.getTags() != null ? new ArrayList<>(openAPI.getTags()) : null;
-        var operationTags = processOpenApiAnnotation(element, context, io.swagger.v3.oas.annotations.tags.Tag.class, Tag.class, copyTags);
-        // find not simple tags (tags with description or other information), such fields need to be described at the openAPI level.
-        List<Tag> complexTags = null;
-        if (CollectionUtils.isNotEmpty(operationTags)) {
-            complexTags = new ArrayList<>();
-            for (Tag operationTag : operationTags) {
-                if (StringUtils.hasText(operationTag.getDescription())
-                    || CollectionUtils.isNotEmpty(operationTag.getExtensions())
-                    || operationTag.getExternalDocs() != null) {
-                    complexTags.add(operationTag);
-                }
-            }
-        }
-        if (CollectionUtils.isNotEmpty(complexTags)) {
-            if (CollectionUtils.isEmpty(openAPI.getTags())) {
-                openAPI.setTags(complexTags);
-            } else {
-                for (Tag complexTag : complexTags) {
-                    // skip all existed tags
-                    boolean alreadyExists = false;
-                    for (Tag apiTag : openAPI.getTags()) {
-                        if (apiTag.getName().equals(complexTag.getName())) {
-                            alreadyExists = true;
-                            break;
-                        }
-                    }
-                    if (!alreadyExists) {
-                        openAPI.getTags().add(complexTag);
-                    }
-                }
-            }
-        }
-
-        // only way to get inherited tags
-        element.getValues(Tags.class, AnnotationValue.class)
-            .forEach((k, v) -> v.stringValue(PROP_NAME).ifPresent(name -> addTagIfNotPresent((String) name, swaggerOperation)));
-
-        classTags.forEach(tag -> addTagIfNotPresent(tag.getName(), swaggerOperation));
-        if (CollectionUtils.isNotEmpty(swaggerOperation.getTags())) {
-            swaggerOperation.getTags().sort(Comparator.naturalOrder());
-        }
-    }
-
-    private List<Tag> readTags(ClassElement element, VisitorContext context) {
-        return readTags(element.getAnnotationValuesByType(io.swagger.v3.oas.annotations.tags.Tag.class), context);
-    }
-
-    final List<Tag> readTags(List<AnnotationValue<io.swagger.v3.oas.annotations.tags.Tag>> tagAnns, VisitorContext context) {
-        var tags = new ArrayList<Tag>();
-        for (var tagAnn : tagAnns) {
-            var tag = toValue(tagAnn.getAnnotationName(), tagAnn.getValues(), context, Tag.class, null);
-            if (tag != null) {
-                tags.add(tag);
-            }
-        }
-        return tags;
     }
 
     private Content buildContent(Element definingElement, ClassElement type, List<MediaType> mediaTypes, OpenAPI openAPI, VisitorContext context, @Nullable ClassElement jsonViewClass) {

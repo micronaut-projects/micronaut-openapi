@@ -78,6 +78,14 @@ public interface ContextProperty {
      */
     String MICRONAUT_INTERNAL_EXPANDABLE_PROPERTIES = "micronaut.internal.expandable.props";
     /**
+     * Loaded tag generation remove prefixes list.
+     */
+    String MICRONAUT_INTERNAL_TAG_GENERATION_REMOVE_PREFIXES = "micronaut.internal.tag.generation.remove.prefixes";
+    /**
+     * Loaded tag generation remove postfixes list.
+     */
+    String MICRONAUT_INTERNAL_TAG_GENERATION_REMOVE_POSTFIXES = "micronaut.internal.tag.generation.remove.postfixes";
+    /**
      * Flag that shows that the expandable properties are already loaded into the context.
      */
     String MICRONAUT_INTERNAL_EXPANDABLE_PROPERTIES_LOADED = "micronaut.internal.expandable.props.loaded";

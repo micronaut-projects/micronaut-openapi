@@ -7,4 +7,4 @@ the following *jackson*'s `PropertyNamingStrategy`:
 * *UPPER_SNAKE_CASE*
 * *LOWER_CASE*
 * *KEBAB_CASE*
-* *LOWER_DOT_CASE*.
+* *LOWER_DOT_CASE*

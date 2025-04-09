@@ -17,7 +17,6 @@ package io.micronaut.openapi.visitor;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
@@ -71,7 +70,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -92,6 +90,7 @@ import static io.micronaut.openapi.visitor.ConfigUtils.getEnv;
 import static io.micronaut.openapi.visitor.ConfigUtils.getExpandableProperties;
 import static io.micronaut.openapi.visitor.ConfigUtils.getGroupProperties;
 import static io.micronaut.openapi.visitor.ConfigUtils.getProjectPath;
+import static io.micronaut.openapi.visitor.ConfigUtils.getPropertyNamingStrategy;
 import static io.micronaut.openapi.visitor.ConfigUtils.isOpenApiEnabled;
 import static io.micronaut.openapi.visitor.ConfigUtils.isSpecGenerationEnabled;
 import static io.micronaut.openapi.visitor.ConfigUtils.readOpenApiConfigFile;
@@ -113,7 +112,6 @@ import static io.micronaut.openapi.visitor.OpenApiConfigProperty.ALL;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_APPLICATION_NAME;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_CONTEXT_SERVER_PATH;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_JSON_FORMAT;
-import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_PROPERTY_NAMING_STRATEGY;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_VIEWS_SPEC;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.SPRING_APPLICATION_NAME;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_SECURITY;
@@ -129,6 +127,7 @@ import static io.micronaut.openapi.visitor.StringUtil.PLACEHOLDER_POSTFIX;
 import static io.micronaut.openapi.visitor.StringUtil.PLACEHOLDER_PREFIX;
 import static io.micronaut.openapi.visitor.StringUtil.QUOTE;
 import static io.micronaut.openapi.visitor.StringUtil.SLASH;
+import static io.micronaut.openapi.visitor.TagUtils.processOpenApiAnnotation;
 import static io.micronaut.openapi.visitor.Utils.resolveComponents;
 import static io.swagger.v3.oas.models.Components.COMPONENTS_SCHEMAS_REF;
 
@@ -383,30 +382,12 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         }
     }
 
-    private static PropertyNamingStrategies.NamingBase fromName(String name) {
-        if (name == null) {
-            return null;
-        }
-        var strategy = switch (name.toUpperCase(Locale.ENGLISH)) {
-            case "LOWER_CAMEL_CASE" -> PropertyNamingStrategies.LOWER_CAMEL_CASE;
-            case "UPPER_CAMEL_CASE" -> PropertyNamingStrategies.UPPER_CAMEL_CASE;
-            case "SNAKE_CASE" -> PropertyNamingStrategies.SNAKE_CASE;
-            case "UPPER_SNAKE_CASE" -> PropertyNamingStrategies.UPPER_SNAKE_CASE;
-            case "LOWER_CASE" -> PropertyNamingStrategies.LOWER_CASE;
-            case "KEBAB_CASE" -> PropertyNamingStrategies.KEBAB_CASE;
-            case "LOWER_DOT_CASE" -> PropertyNamingStrategies.LOWER_DOT_CASE;
-            default -> null;
-        };
-        return (PropertyNamingStrategies.NamingBase) strategy;
-    }
-
     private void applyPropertyNamingStrategy(OpenAPI openAPI, VisitorContext context) {
-        var namingStrategyName = getConfigProperty(MICRONAUT_OPENAPI_PROPERTY_NAMING_STRATEGY, context);
-        var propertyNamingStrategy = fromName(namingStrategyName);
+        var propertyNamingStrategy = getPropertyNamingStrategy(context);
         if (propertyNamingStrategy == null) {
             return;
         }
-        info("Using " + namingStrategyName + " property naming strategy.", context);
+        info("Using " + propertyNamingStrategy.getClass().getSimpleName() + " property naming strategy.", context);
         if (openAPI.getComponents() == null || CollectionUtils.isEmpty(openAPI.getComponents().getSchemas())) {
             return;
         }

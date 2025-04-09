@@ -42,6 +42,7 @@ micronautOpenApiAnnotations:
   openapisecurity: '@OpenAPISecurity'
   accessorsStyle: '@AccessorsStyle'
 mergingSchemas: Merging Schemas
+tagsGeneration: Tags generation
 openApiViews:
   title: Generating OpenAPI Views
   mappingPath: Mapping Path

@@ -4,8 +4,6 @@ import io.micronaut.openapi.AbstractOpenApiTypeElementSpec
 import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.Operation
 import io.swagger.v3.oas.models.media.ArraySchema
-import io.swagger.v3.oas.models.media.BinarySchema
-import io.swagger.v3.oas.models.media.ObjectSchema
 import io.swagger.v3.oas.models.parameters.RequestBody
 
 class OpenApiFileUploadSpec extends AbstractOpenApiTypeElementSpec {
@@ -16,8 +14,6 @@ class OpenApiFileUploadSpec extends AbstractOpenApiTypeElementSpec {
         buildBeanDefinition('test.MyBean', '''
 package test;
 
-import jakarta.inject.Singleton;
-
 import io.micronaut.http.MediaType;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Post;
@@ -27,6 +23,7 @@ import io.micronaut.http.multipart.StreamingFileUpload;
 import io.reactivex.Flowable;
 import io.reactivex.Single;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.inject.Singleton;
 
 @Singleton
 @Controller("/")
@@ -201,15 +198,15 @@ class MyBean {}
         when:
         buildBeanDefinition('test.MyBean', '''
 package test;
+
+import io.micronaut.http.MediaType;
+import io.micronaut.http.annotation.Body;
+import io.micronaut.http.annotation.Consumes;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Post;
-import io.micronaut.http.annotation.Body;
-import io.micronaut.http.MediaType;
-import io.micronaut.http.annotation.Consumes;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.enums.ParameterIn;
+
 import java.util.List;
+
 @Controller("/pets")
 interface PetOperations<T extends Pet> {
     /**

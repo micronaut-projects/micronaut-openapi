@@ -18,6 +18,7 @@ package io.micronaut.build.internal.openapi;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -147,7 +148,7 @@ public abstract class OpenApiGeneratorTask extends DefaultTask {
             args.add(String.join(",", getOutputKinds().get()));
             args.add(getParameterMappings().get().toString());
             args.add(getResponseBodyMappings().get().toString());
-            args.add(lang.toUpperCase());
+            args.add(lang.toUpperCase(Locale.ENGLISH));
             args.add(Boolean.toString(generatedAnnotation));
             args.add(Boolean.toString(getKsp().get()));
             args.add(Boolean.toString(getClientPath().get()));

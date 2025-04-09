@@ -137,3 +137,12 @@ micronaut.openapi.additional.files=openapi
 ----
 
 Micronaut includes the endpoints defined in those files in the generated output.
+
+Also, you can set `merge-mode` for these files like this:
+
+.openapi.properties
+[source,properties]
+----
+micronaut.openapi.additional.files-merge-mode=append
+----
+Available values: `append`, `replace`

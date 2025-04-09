@@ -7,7 +7,7 @@ class JavadocParserSpec extends Specification {
     void 'test parse basic javadoc'() {
 
         given:
-        JavadocParser parser = new JavadocParser()
+        var parser = new JavadocParser()
         JavadocDescription desc = parser.parse('''
 This is a summary text. This is a description with <b>bold</b> and {@code some code}
 
@@ -39,7 +39,7 @@ value'''
     void 'test parse multiline javadoc'() {
 
         given:
-        JavadocParser parser = new JavadocParser()
+        var parser = new JavadocParser()
         JavadocDescription desc = parser.parse('''
 <p>This is a description with <b>bold</b> and {@code some code}.</p>
 
@@ -73,7 +73,7 @@ value'''
     void 'test parse multiline return value javadoc'() {
 
         given:
-        JavadocParser parser = new JavadocParser()
+        var parser = new JavadocParser()
         JavadocDescription desc = parser.parse('''
 <p>This is a description with <b>bold</b> and {@code some code}.</p>
 
@@ -111,7 +111,7 @@ value with more return description as it is multiline'''
     void 'test parse multiline javadoc param'() {
 
         given:
-        JavadocParser parser = new JavadocParser()
+        var parser = new JavadocParser()
         JavadocDescription desc = parser.parse('''
 Check if the given user has access to RabbitMQ.
 
@@ -134,7 +134,7 @@ Check if the given user has access to RabbitMQ.
     void 'test parse javadoc with summary tag'() {
 
         given:
-        JavadocParser parser = new JavadocParser()
+        var parser = new JavadocParser()
         JavadocDescription desc = parser.parse('''
 {@summary This is a summary text.} This is a description with <b>bold</b> and {@code some code}
 
@@ -166,7 +166,7 @@ value'''
     void 'test parse javadoc with complex javadoc'() {
 
         given:
-        JavadocParser parser = new JavadocParser()
+        var parser = new JavadocParser()
         JavadocDescription desc = parser.parse('''
 Values separated with commas ",". In case of iterables, the values are converted to {@link String} and joined
 with comma delimiter. In case of {@link Map} or a POJO {@link Object} the keys and values are alternating and all

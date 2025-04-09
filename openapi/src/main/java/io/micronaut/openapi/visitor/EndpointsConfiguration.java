@@ -195,9 +195,7 @@ public class EndpointsConfiguration {
             if (StringUtils.isEmpty(name)) {
                 continue;
             }
-            var tag = new Tag();
-            tag.setName(name);
-            tags.add(tag);
+            tags.add(new Tag().name(name));
         }
         return tags;
     }

@@ -2110,7 +2110,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
                         if (argPos >= 0) {
                             value = value.substring(argPos + 1, value.indexOf(')'));
                         }
-                        var upperValue = value.toUpperCase();
+                        var upperValue = value.toUpperCase(Locale.ENGLISH);
                         if (upperValue.endsWith("F")
                             || upperValue.endsWith("L")
                             || upperValue.endsWith("D")) {

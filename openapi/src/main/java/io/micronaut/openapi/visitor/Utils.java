@@ -29,6 +29,7 @@ import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.PathItem;
 import io.swagger.v3.oas.models.SpecVersion;
+import io.swagger.v3.oas.models.tags.Tag;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -199,6 +200,22 @@ public final class Utils {
             openApi.setWebhooks(webhooks);
         }
         return webhooks;
+    }
+
+    /**
+     * Resolve tags.
+     *
+     * @param openApi The open API
+     *
+     * @return The tags
+     */
+    public static List<Tag> resolveTags(OpenAPI openApi) {
+        var tags = openApi.getTags();
+        if (tags == null) {
+            tags = new ArrayList<>();
+            openApi.setTags(tags);
+        }
+        return tags;
     }
 
     /**
