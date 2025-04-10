@@ -161,6 +161,8 @@ public final class ConfigUtils {
     private static final String LOADED_POSTFIX = ".loaded";
     private static final String VALUE_POSTFIX = ".value";
 
+    public static final String ALL_ENDPOINTS_NAME = "all";
+
     private static final List<String> DEFAULT_PREFIXES = List.of("");
     private static final List<String> DEFAULT_POSTFIXES = List.of("controller", "api", "endpoints", "endpoint");
 
