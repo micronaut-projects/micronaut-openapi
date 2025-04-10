@@ -232,6 +232,13 @@ public final class UrlUtils {
         }
     }
 
+    public static String parsePath(String path) {
+        if (StringUtils.isNotEmpty(path) && !path.endsWith(StringUtil.SLASH)) {
+            return path + StringUtil.SLASH;
+        }
+        return path;
+    }
+
     /**
      * Segment of urlTemplate.
      *

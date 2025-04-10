@@ -97,7 +97,7 @@ public final class Utils {
         if (initialized) {
             return;
         }
-        openapi31 = ConfigUtils.getBooleanProperty(MICRONAUT_OPENAPI_31_ENABLED, false, context);
+        setOpenapi31(ConfigUtils.getBooleanProperty(MICRONAUT_OPENAPI_31_ENABLED, false, context));
         initialized = true;
     }
 

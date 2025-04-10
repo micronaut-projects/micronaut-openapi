@@ -34,6 +34,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import static io.micronaut.core.naming.NameUtils.camelCase;
@@ -186,14 +187,15 @@ public final class TagUtils {
      * Generating tags by class name or/and by package name.
      *
      * @param element element
+     * @param classDescription custom class description
      * @param context visitor context
      * @return generated tags by controller name or/and by package class name
      */
-    public static List<Tag> generationTags(ClassElement element, VisitorContext context) {
+    public static List<Tag> generationTags(ClassElement element, String classDescription, VisitorContext context) {
 
         Tag tagByClass = null;
         if (isTagGenerationByClassEnabled(context)) {
-            tagByClass = generateTag(element.getSimpleName(), element.getDocumentation().orElse(null), false, context);
+            tagByClass = generateTag(element.getSimpleName(), StringUtils.isNotEmpty(classDescription) ? classDescription : element.getDocumentation().orElse(null), false, context);
         }
         Tag tagByPackage = null;
         if (isTagGenerationByPackageEnabled(context)) {
@@ -247,7 +249,7 @@ public final class TagUtils {
     private static Tag generateTag(String elementName, String javadocStr, boolean isPackageName, VisitorContext context) {
 
         var tagName = elementName;
-        var tagNameLower = tagName.toLowerCase();
+        var tagNameLower = tagName.toLowerCase(Locale.ENGLISH);
 
         var prefixes = getTagGenerationRemovePrefixes(context);
         if (CollectionUtils.isNotEmpty(prefixes)) {
@@ -261,7 +263,7 @@ public final class TagUtils {
                 }
             }
         }
-        tagNameLower = tagName.toLowerCase();
+        tagNameLower = tagName.toLowerCase(Locale.ENGLISH);
 
         var postfixes = getTagGenerationRemovePostfixes(context);
         if (CollectionUtils.isNotEmpty(postfixes)) {

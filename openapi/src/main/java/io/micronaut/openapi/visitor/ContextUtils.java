@@ -24,6 +24,7 @@ import io.micronaut.inject.ast.Element;
 import io.micronaut.inject.visitor.VisitorContext;
 import io.micronaut.inject.writer.GeneratedFile;
 import io.micronaut.openapi.visitor.group.GroupProperties;
+import io.micronaut.openapi.visitor.management.EndpointProperties;
 import io.swagger.v3.oas.models.servers.Server;
 import io.swagger.v3.oas.models.tags.Tag;
 
@@ -34,6 +35,7 @@ import java.util.Map;
 
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_CLASSPATH_OUTPUT;
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_GENERATED_FILE;
+import static io.micronaut.openapi.visitor.OpenApiApplicationVisitor.PREFIX_DUMMY_FILE;
 import static io.micronaut.openapi.visitor.StringUtil.WILDCARD;
 
 /**
@@ -46,10 +48,12 @@ public final class ContextUtils {
 
     public static final Argument<List<Tag>> TAGS_LIST_ARGUMENT = new GenericArgument<>() { };
     public static final Argument<List<Server>> SERVERS_LIST_ARGUMENT = new GenericArgument<>() { };
+    public static final Argument<Map<String, Object>> EXTENSIONS_MAP_ARGUMENT = new GenericArgument<>() { };
     public static final Argument<List<Pair<String, String>>> EXPANDABLE_PROPERTIES_ARGUMENT = new GenericArgument<>() { };
     public static final Argument<Map<String, ConfigUtils.SchemaDecorator>> ARGUMENT_SCHEMA_DECORATORS_MAP = new GenericArgument<>() { };
     public static final Argument<Map<String, ConfigUtils.CustomSchema>> ARGUMENT_CUSTOM_SCHEMA_MAP = new GenericArgument<>() { };
     public static final Argument<Map<String, GroupProperties>> ARGUMENT_GROUP_PROPERTIES_MAP = new GenericArgument<>() { };
+    public static final Argument<Map<String, EndpointProperties>> ARGUMENT_ENDPOINT_PROPERTIES_MAP = new GenericArgument<>() { };
 
     private ContextUtils() {
     }
@@ -74,7 +78,7 @@ public final class ContextUtils {
         if (outputPath != null) {
             return outputPath;
         }
-        visitMetaInfFile("dummy" + System.nanoTime(), context);
+        visitMetaInfFile(PREFIX_DUMMY_FILE + System.nanoTime(), context);
         return get(MICRONAUT_INTERNAL_CLASSPATH_OUTPUT, Path.class, null, context);
     }
 

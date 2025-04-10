@@ -25,6 +25,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -117,7 +118,7 @@ public final class RedocConfig extends AbstractViewConfig {
         }
 
         public static SideNavStyle byCode(String code) {
-            SideNavStyle value = BY_CODE.get(code.toLowerCase());
+            SideNavStyle value = BY_CODE.get(code.toLowerCase(Locale.ENGLISH));
             if (value == null) {
                 throw new IllegalArgumentException("Unknown value " + code);
             }

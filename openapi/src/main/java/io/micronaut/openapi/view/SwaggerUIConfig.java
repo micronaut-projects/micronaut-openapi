@@ -150,7 +150,7 @@ public final class SwaggerUIConfig extends AbstractViewConfig {
         }
 
         public static SyntaxHighlightTheme byCode(String code) {
-            SyntaxHighlightTheme value = BY_CODE.get(code.toLowerCase());
+            SyntaxHighlightTheme value = BY_CODE.get(code.toLowerCase(Locale.ENGLISH));
             if (value == null) {
                 throw new IllegalArgumentException("Unknown value " + code);
             }

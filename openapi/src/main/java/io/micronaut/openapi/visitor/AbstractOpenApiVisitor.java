@@ -17,18 +17,23 @@ package io.micronaut.openapi.visitor;
 
 import io.micronaut.core.annotation.AnnotationValue;
 import io.micronaut.core.annotation.Internal;
+import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.http.uri.UriMatchTemplate;
 import io.micronaut.inject.ast.ClassElement;
 import io.micronaut.inject.ast.Element;
 import io.micronaut.inject.visitor.VisitorContext;
 import io.micronaut.openapi.visitor.UrlUtils.OpPath;
+import io.swagger.v3.oas.annotations.extensions.Extension;
+import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.PathItem;
 import io.swagger.v3.oas.models.Paths;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
+import org.parboiled.common.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,6 +41,12 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import static io.micronaut.openapi.visitor.InternalExt.MICRONAUT_OP_POSTFIX;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_NAME;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_PARSE_VALUE;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_PROPERTIES;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_VALUE;
+import static io.micronaut.openapi.visitor.SchemaUtils.PREFIX_X;
+import static io.micronaut.openapi.visitor.SchemaUtils.prependIfMissing;
 import static io.micronaut.openapi.visitor.UrlUtils.buildUrls;
 import static io.micronaut.openapi.visitor.UrlUtils.parsePathSegments;
 
@@ -95,6 +106,48 @@ abstract class AbstractOpenApiVisitor {
         var result = new ArrayList<SecurityRequirement>(annotations.size());
         for (var ann : annotations) {
             result.add(ConvertUtils.mapToSecurityRequirement(ann));
+        }
+        return result;
+    }
+
+    Map<String, Object> readExtensions(List<AnnotationValue<Extension>> annotations) {
+        if (CollectionUtils.isEmpty(annotations)) {
+            return Collections.emptyMap();
+        }
+        var result = new HashMap<String, Object>(annotations.size());
+        for (var ann : annotations) {
+            var extensionProps = ann.getAnnotations(PROP_PROPERTIES, ExtensionProperty.class);
+            if (extensionProps.isEmpty()) {
+                continue;
+            }
+
+            var name = ann.stringValue(PROP_NAME).orElse(null);
+            if (name == null) {
+                continue;
+            }
+            name = prependIfMissing(name, PREFIX_X);
+
+            var extMap = new HashMap<String, Object>(extensionProps.size());
+            for (var prop : extensionProps) {
+                var propName = prop.stringValue(PROP_NAME).orElse(null);
+                var propValue = prop.stringValue(PROP_VALUE).orElse(null);
+                if (StringUtils.isEmpty(propName) || StringUtils.isEmpty(propValue)) {
+                    continue;
+                }
+                Object processedValue = propValue;
+                var propertyAsJson = prop.get(PROP_PARSE_VALUE, boolean.class, false);
+                if (propertyAsJson) {
+                    try {
+                        processedValue = Utils.getJsonMapper().readTree(propValue);
+                        extMap.put(propName, processedValue);
+                    } catch (Exception e) {
+                        extMap.put(propName, processedValue);
+                    }
+                } else {
+                    extMap.put(propName, processedValue);
+                }
+            }
+            result.put(name, extMap);
         }
         return result;
     }
