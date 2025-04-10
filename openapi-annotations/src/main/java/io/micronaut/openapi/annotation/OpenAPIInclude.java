@@ -15,15 +15,16 @@
  */
 package io.micronaut.openapi.annotation;
 
+import io.micronaut.context.annotation.AliasFor;
+import io.swagger.v3.oas.annotations.extensions.Extension;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
-
-import io.micronaut.context.annotation.AliasFor;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import io.swagger.v3.oas.annotations.tags.Tag;
 
 import static java.lang.annotation.RetentionPolicy.SOURCE;
 
@@ -92,4 +93,18 @@ public @interface OpenAPIInclude {
      * @return the array of servers used for this API
      */
     SecurityRequirement[] security() default {};
+
+    /**
+     * @return Description for auto-generated tags (if class is controller) or for operation if class is Endpoint.
+     *
+     * @since 4.16.0
+     */
+    String description() default "";
+
+    /**
+     * @return extensions for endpoint operation or controller endpoints.
+     *
+     * @since 4.16.0
+     */
+    Extension[] extensions() default {};
 }

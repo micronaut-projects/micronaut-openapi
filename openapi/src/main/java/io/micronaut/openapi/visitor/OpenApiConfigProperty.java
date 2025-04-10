@@ -405,6 +405,28 @@ public interface OpenApiConfigProperty {
      */
     String MICRONAUT_OPENAPI_ADOC_OPENAPI_PATH = "micronaut.openapi.adoc.openapi.path";
     /**
+     * Is this property true, properties wll be loaded in the standard way from application.yml.
+     * Also, environments from "micronaut.openapi.environments" property will set as additional environments,
+     * if you want to set specific environment name for openAPI generator.
+     * <br>
+     * Default value is "true".
+     */
+    String MICRONAUT_ENDPOINTS_PREFIX = "endpoints";
+    /**
+     * Is this property true, properties wll be loaded in the standard way from application.yml.
+     * Also, environments from "micronaut.openapi.environments" property will set as additional environments,
+     * if you want to set specific environment name for openAPI generator.
+     * <br>
+     * Default value is "true".
+     */
+    String MICRONAUT_ENDPOINTS_ENABLED = "endpoints.enabled";
+    String ENDPOINTS_TAGS = "endpoints.tags";
+    String ENDPOINTS_PATH = "endpoints.path";
+    String ENDPOINTS_SERVERS = "endpoints.servers";
+    String ENDPOINTS_SECURITY_REQUIREMENTS = "endpoints.security-requirements";
+    String ENDPOINTS_EXTENSIONS = "endpoints.extensions";
+
+    /**
      * Default openapi config file.
      */
     String OPENAPI_CONFIG_FILE = "openapi.properties";

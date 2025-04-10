@@ -192,6 +192,7 @@ import static io.micronaut.openapi.visitor.SchemaUtils.setOperationOnPathItem;
 import static io.micronaut.openapi.visitor.SchemaUtils.setSpecVersion;
 import static io.micronaut.openapi.visitor.StringUtil.CLOSE_BRACE;
 import static io.micronaut.openapi.visitor.StringUtil.DOLLAR;
+import static io.micronaut.openapi.visitor.StringUtil.DOT;
 import static io.micronaut.openapi.visitor.StringUtil.OPEN_BRACE;
 import static io.micronaut.openapi.visitor.StringUtil.THREE_DOTS;
 import static io.micronaut.openapi.visitor.TagUtils.generationTags;
@@ -290,7 +291,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             }
         }
         if (CollectionUtils.isEmpty(classTags)) {
-            classTags = generationTags(element, context);
+            classTags = generationTags(element, getClassDescription(context), context);
         }
     }
 
@@ -328,6 +329,15 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
      * @return The servers.
      */
     protected abstract List<Server> methodServers(MethodElement element, VisitorContext context);
+
+    /**
+     * Returns the extensions at method level.
+     *
+     * @param element The MethodElement.
+     * @param context The context.
+     * @return The extensions.
+     */
+    protected abstract Map<String, Object> operationExtensions(MethodElement element, VisitorContext context);
 
     /**
      * Returns the class tags.
@@ -390,12 +400,20 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
     protected abstract List<MediaType> producesMediaTypes(MethodElement element);
 
     /**
-     * Returns the description for the element.
+     * Returns the description for the class.
      *
-     * @param element The MethodElement.
-     * @return The description for the element.
+     * @param context the visitor context
+     * @return The description for the class.
      */
-    protected abstract String description(MethodElement element);
+    protected abstract String getClassDescription(VisitorContext context);
+
+    /**
+     * Returns the description for the method.
+     *
+     * @param context the visitor context
+     * @return The description for the method.
+     */
+    protected abstract String getMethodDescription(VisitorContext context);
 
     /**
      * Executed when a method is encountered that matches the generic element.
@@ -495,10 +513,11 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
                 readApiResponses(element, context, swaggerOperation, jsonViewClass);
 
                 readServers(element, context, swaggerOperation);
+                readExtensions(element, context, swaggerOperation);
 
                 readCallbacks(element, context, swaggerOperation, jsonViewClass);
 
-                javadocDescription = getMethodDescription(element, swaggerOperation);
+                javadocDescription = getMethodDescription(element, swaggerOperation, context);
 
                 if (isDeprecated(element)) {
                     swaggerOperation.setDeprecated(true);
@@ -1446,12 +1465,11 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
         return pathVariables;
     }
 
-    private JavadocDescription getMethodDescription(MethodElement element,
-                                                    Operation swaggerOperation) {
-        String descr = description(element);
+    private JavadocDescription getMethodDescription(MethodElement element, Operation swaggerOperation, VisitorContext context) {
+        String descr = getMethodDescription(context);
         if (StringUtils.isNotEmpty(descr) && StringUtils.isEmpty(swaggerOperation.getDescription())) {
             swaggerOperation.setDescription(descr);
-            String summary = descr.substring(0, descr.indexOf('.') + 1);
+            String summary = descr.contains(DOT) ? descr.substring(0, descr.indexOf('.') + 1) : descr;
             if (summary.length() > MAX_SUMMARY_LENGTH) {
                 summary = summary.substring(0, MAX_SUMMARY_LENGTH) + THREE_DOTS;
             }
@@ -1937,6 +1955,12 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
     private void readServers(MethodElement element, VisitorContext context, Operation swaggerOperation) {
         for (Server server : methodServers(element, context)) {
             swaggerOperation.addServersItem(server);
+        }
+    }
+
+    private void readExtensions(MethodElement element, VisitorContext context, Operation swaggerOperation) {
+        for (var entry : operationExtensions(element, context).entrySet()) {
+            swaggerOperation.addExtension(entry.getKey(), entry.getValue());
         }
     }
 

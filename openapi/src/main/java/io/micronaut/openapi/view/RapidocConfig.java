@@ -181,7 +181,7 @@ public final class RapidocConfig extends AbstractViewConfig {
         }
 
         public static NavTagClick byCode(String code) {
-            NavTagClick value = BY_CODE.get(code.toLowerCase());
+            NavTagClick value = BY_CODE.get(code.toLowerCase(Locale.ENGLISH));
             if (value == null) {
                 throw new IllegalArgumentException("Unknown value " + code);
             }
@@ -213,7 +213,7 @@ public final class RapidocConfig extends AbstractViewConfig {
         }
 
         public static FetchCredentials byCode(String code) {
-            FetchCredentials value = BY_CODE.get(code.toLowerCase());
+            FetchCredentials value = BY_CODE.get(code.toLowerCase(Locale.ENGLISH));
             if (value == null) {
                 throw new IllegalArgumentException("Unknown value " + code);
             }
@@ -246,7 +246,7 @@ public final class RapidocConfig extends AbstractViewConfig {
         }
 
         public static ShowMethodInNavBar byCode(String code) {
-            ShowMethodInNavBar value = BY_CODE.get(code.toLowerCase());
+            ShowMethodInNavBar value = BY_CODE.get(code.toLowerCase(Locale.ENGLISH));
             if (value == null) {
                 throw new IllegalArgumentException("Unknown value " + code);
             }

@@ -177,6 +177,7 @@ import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_DEPRECATED;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_DESCRIPTION;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_DISCRIMINATOR_MAPPING;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_DISCRIMINATOR_PROPERTY;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_ENABLED;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_ENUM;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_EXAMPLE;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_EXAMPLES;
@@ -1651,7 +1652,7 @@ public final class SchemaDefinitionUtils {
             return;
         }
         var jsonUnwrappedAnn = getAnnotation(element, JsonUnwrapped.class);
-        if (jsonUnwrappedAnn != null && jsonUnwrappedAnn.booleanValue("enabled").orElse(Boolean.TRUE)) {
+        if (jsonUnwrappedAnn != null && jsonUnwrappedAnn.booleanValue(PROP_ENABLED).orElse(Boolean.TRUE)) {
             handleUnwrapped(context, element, elementType, parentSchema, jsonUnwrappedAnn);
         } else {
             // check schema required flag
@@ -2882,7 +2883,7 @@ public final class SchemaDefinitionUtils {
             || isAnnotationPresent(elementType, JsonIgnore.class)
             || isAnnotationPresent(elementType, JsonBackReference.class)
             || isAnnotationPresent(elementType, Hidden.class)
-            || (jsonAnySetterAnn != null && jsonAnySetterAnn.booleanValue("enabled").orElse(true))
+            || (jsonAnySetterAnn != null && jsonAnySetterAnn.booleanValue(PROP_ENABLED).orElse(true))
             || isHidden;
     }
 

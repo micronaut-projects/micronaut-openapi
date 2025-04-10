@@ -85,6 +85,8 @@ import static io.swagger.v3.oas.models.Components.COMPONENTS_SCHEMAS_REF;
 @Internal
 public final class SchemaUtils {
 
+    public static final String PREFIX_X = "x-";
+
     public static final String COMPONENTS_CALLBACKS_PREFIX = "#/components/callbacks/";
     public static final String COMPONENTS_SCHEMAS_PREFIX = "#/components/schemas/";
 
@@ -137,7 +139,6 @@ public final class SchemaUtils {
         EMPTY_UUID_SCHEMA,
         EMPTY_SIMPLE_SCHEMA
     );
-    private static final String PREFIX_X = "x-";
 
     private SchemaUtils() {
     }

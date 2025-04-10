@@ -1,11 +1,13 @@
 package io.micronaut.openapi.visitor
 
+import io.micronaut.context.env.Environment
 import io.micronaut.openapi.AbstractOpenApiTypeElementSpec
 import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.PathItem
 import io.swagger.v3.oas.models.servers.Server
 import io.swagger.v3.oas.models.tags.Tag
 import spock.lang.Issue
+import spock.util.environment.RestoreSystemProperties
 
 class OpenApiIncludeVisitorSpec extends AbstractOpenApiTypeElementSpec {
 
@@ -497,6 +499,50 @@ class MyBean {}
     }
 
     void "test build OpenAPI for management endpoints"() {
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.openapi.annotation.OpenAPIManagement;
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
+import jakarta.inject.Singleton;
+
+@OpenAPIDefinition
+@OpenAPIManagement(tags = @Tag(name = "Micronaut Management"))
+class Application {
+}
+
+@Singleton
+class MyBean {}
+''')
+        then:
+        Utils.testReference != null
+
+        when:
+        OpenAPI openAPI = Utils.testReference
+
+        then:
+        openAPI.paths['/health']
+        openAPI.paths['/health'].get.tags[0] == "Micronaut Management"
+        openAPI.paths['/beans']
+        openAPI.paths['/env']
+        openAPI.paths['/info']
+        openAPI.paths['/loggers']
+        openAPI.paths['/refresh']
+        openAPI.paths['/routes']
+        openAPI.paths['/stop']
+        openAPI.paths['/threaddump']
+    }
+
+    @RestoreSystemProperties
+    void "test build OpenAPI for management endpoints disabled"() {
+
+        given:
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_CONFIG_FILE_LOCATIONS, "project:/src/test/resources/")
+        System.setProperty(Environment.ENVIRONMENTS_PROPERTY, "endpoints")
+
         when:
         buildBeanDefinition('test.MyBean', '''
 package test;

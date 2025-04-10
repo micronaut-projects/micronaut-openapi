@@ -48,11 +48,23 @@ public interface ContextProperty {
     /**
      * The name of the entry for Endpoint class tags in the context.
      */
+    String MICRONAUT_INTERNAL_OPENAPI_ENDPOINT_PROPS = "micronaut.internal.openapi.endpoint.props";
+    /**
+     * The name of the entry for Endpoint class tags in the context.
+     */
     String MICRONAUT_INTERNAL_OPENAPI_ENDPOINT_CLASS_TAGS = "micronaut.internal.openapi.endpoint.class.tags";
     /**
      * The name of the entry for Endpoint servers in the context.
      */
     String MICRONAUT_INTERNAL_OPENAPI_ENDPOINT_SERVERS = "micronaut.internal.openapi.endpoint.servers";
+    /**
+     * The name of the entry for Endpoint description in the context.
+     */
+    String MICRONAUT_INTERNAL_OPENAPI_ENDPOINT_DESCRIPTION = "micronaut.internal.openapi.endpoint.description";
+    /**
+     * The name of the entry for Endpoint extensions in the context.
+     */
+    String MICRONAUT_INTERNAL_OPENAPI_ENDPOINT_EXTENSIONS = "micronaut.internal.openapi.endpoint.extensions";
     /**
      * The name of the entry for Endpoint security requirements in the context.
      */
