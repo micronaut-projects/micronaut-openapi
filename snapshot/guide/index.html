@@ -127,6 +127,8 @@
         
         <div class="toc-item" style="margin-left:0px" id="toc-item-introduction"><a href="#introduction"><strong>1</strong><span>Introduction</span></a></div>
         
+        <div class="toc-item" style="margin-left:10px" id="toc-item-openApiGenerator"><a href="#openApiGenerator"><strong>1.1</strong><span>OpenAPI Generator</span></a></div>
+        
         <div class="toc-item" style="margin-left:0px" id="toc-item-releaseHistory"><a href="#releaseHistory"><strong>2</strong><span>Release History</span></a></div>
         
         <div class="toc-item" style="margin-left:0px" id="toc-item-cli"><a href="#cli"><strong>3</strong><span>Using the Micronaut CLI</span></a></div>
@@ -285,8 +287,33 @@
 <div class="paragraph">
 <p>You can customize the generated Swagger using the standard <a href="#swaggerAnnotations">Swagger Annotations</a>.</p>
 </div>
+
+<h2 id="openApiGenerator"><a class="anchor" href="#openApiGenerator"></a>1.1 OpenAPI Generator</h2>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/6.16.x/src/main/docs/guide/openApiGenerator.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
 <div class="paragraph">
-<p>If you wish to generate Micronaut projects from OpenAPI definition files, utilize the <a href="https://openapi-generator.tech/">OpenAPI Generator</a>'s Micronaut support. Refer to the <a href="https://guides.micronaut.io/latest/micronaut-openapi-generator-server">"Micronaut server generation with OpenAPI" guide</a> or the <a href="https://guides.micronaut.io/latest/micronaut-openapi-generator-client">"Micronaut Client generation with OpenAPI" guide</a> for details.</p>
+<p>If you wish to generate Micronaut code (e.g. Client/Server) from OpenAPI definition files, utilize the <a href="https://micronaut-projects.github.io/micronaut-gradle-plugin/latest/#_openapi_code_generation">Micronaut OpenAPI Gradle Plugin</a>. Refer to the <a href="https://guides.micronaut.io/latest/micronaut-openapi-generator-server">"Micronaut server generation with OpenAPI" guide</a> or the <a href="https://guides.micronaut.io/latest/micronaut-openapi-generator-client">"Micronaut Client generation with OpenAPI" guide</a> for details.</p>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Micronaut stopped contributing to <a href="https://openapi-generator.tech/">OpenAPIGenerator</a> with Micronaut 3.X. You will
+notice the <code>helpTxt</code> in the <a href="https://openapi-generator.tech/docs/generators/java-micronaut-client/">generators</a> have been updated to reflect this. You must use the <a href="https://micronaut-projects.github.io/micronaut-gradle-plugin/latest/#_openapi_code_generation">Micronaut OpenAPI Gradle Plugin</a>.</p>
+</div>
+</td>
+</tr>
+</table>
 </div>
 
 <h1 id="releaseHistory"><a class="anchor" href="#releaseHistory"></a>2 Release History</h1>
