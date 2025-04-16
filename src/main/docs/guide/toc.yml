@@ -1,4 +1,6 @@
-introduction: Introduction
+introduction:
+  title: Introduction
+  openApiGenerator: OpenAPI Generator
 releaseHistory: Release History
 cli: Using the Micronaut CLI
 gettingStarted: Dependencies
