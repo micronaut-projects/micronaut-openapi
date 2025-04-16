@@ -202,6 +202,8 @@ public final class MicronautCodeGeneratorEntryPoint {
                 javaCodeGen.setAdditionalOneOfTypeAnnotations(options.additionalOneOfTypeAnnotations);
             }
 
+            javaCodeGen.setUseTags(options.useTags);
+            javaCodeGen.setGenerateOperationOnlyForFirstTag(options.generateOperationOnlyForFirstTag);
             javaCodeGen.setUseJakartaEe(options.useJakartaEe);
             javaCodeGen.setUseOneOfInterfaces(options.useOneOfInterfaces);
             javaCodeGen.setReactive(options.reactive);
@@ -299,6 +301,8 @@ public final class MicronautCodeGeneratorEntryPoint {
                 kotlinCodeGen.setAdditionalOneOfTypeAnnotations(options.additionalOneOfTypeAnnotations);
             }
 
+            kotlinCodeGen.setUseTags(options.useTags);
+            kotlinCodeGen.setGenerateOperationOnlyForFirstTag(options.generateOperationOnlyForFirstTag);
             kotlinCodeGen.setUseJakartaEe(options.useJakartaEe);
             kotlinCodeGen.setUseOneOfInterfaces(options.useOneOfInterfaces);
             kotlinCodeGen.setReactive(options.reactive);
@@ -563,6 +567,8 @@ public final class MicronautCodeGeneratorEntryPoint {
 
             private String apiPackage;
             private String artifactId;
+            private boolean useTags = true;
+            private boolean generateOperationOnlyForFirstTag = true;
             private boolean useJakartaEe = true;
             private boolean beanValidation = true;
             private boolean useEnumCaseInsensitive;
@@ -864,6 +870,18 @@ public final class MicronautCodeGeneratorEntryPoint {
             }
 
             @Override
+            public MicronautCodeGeneratorOptionsBuilder withUseTags(boolean useTags) {
+                this.useTags = useTags;
+                return null;
+            }
+
+            @Override
+            public MicronautCodeGeneratorOptionsBuilder withGenerateOperationOnlyForFirstTag(boolean generateOperationOnlyForFirstTag) {
+                this.generateOperationOnlyForFirstTag = generateOperationOnlyForFirstTag;
+                return null;
+            }
+
+            @Override
             public MicronautCodeGeneratorOptionsBuilder withUseJakartaEe(boolean useJakartaEe) {
                 this.useJakartaEe = useJakartaEe;
                 return this;
@@ -930,6 +948,8 @@ public final class MicronautCodeGeneratorEntryPoint {
                     modelPackage,
                     invokerPackage,
                     artifactId,
+                    useTags,
+                    generateOperationOnlyForFirstTag,
                     useJakartaEe,
                     parameterMappings,
                     responseBodyMappings,
@@ -1007,6 +1027,8 @@ public final class MicronautCodeGeneratorEntryPoint {
         String modelPackage,
         String invokerPackage,
         String artifactId,
+        boolean useTags,
+        boolean generateOperationOnlyForFirstTag,
         boolean useJakartaEe,
         List<ParameterMapping> parameterMappings,
         List<ResponseBodyMapping> responseBodyMappings,

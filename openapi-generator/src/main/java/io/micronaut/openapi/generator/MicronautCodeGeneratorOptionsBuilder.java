@@ -359,6 +359,24 @@ public interface MicronautCodeGeneratorOptionsBuilder {
     MicronautCodeGeneratorOptionsBuilder withAdditionalProperties(Map<String, Object> additionalProperties);
 
     /**
+     * Whether to use tags for creating interface and controller class names.
+     *
+     * @param useTags Whether to use tags for creating interface and controller class names.
+     *
+     * @return this builder
+     */
+    MicronautCodeGeneratorOptionsBuilder withUseTags(boolean useTags);
+
+    /**
+     * If `true` operations wil be generated only for first tag, otherwise - for every tag.
+     *
+     * @param generateOperationOnlyForFirstTag If `true` operations wil be generated only for first tag, otherwise - for every tag.
+     *
+     * @return this builder
+     */
+    MicronautCodeGeneratorOptionsBuilder withGenerateOperationOnlyForFirstTag(boolean generateOperationOnlyForFirstTag);
+
+    /**
      * Flag to indicate whether to use the "jakarta" or "javax" package.
      *
      * @param useJakartaEe if true, then use the "jakarta" package, otherwise - "javax".
