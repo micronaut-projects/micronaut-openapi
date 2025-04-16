@@ -1,0 +1,8 @@
+If you wish to generate Micronaut code (e.g. Client/Server) from OpenAPI definition files, utilize the https://micronaut-projects.github.io/micronaut-gradle-plugin/latest/#_openapi_code_generation[Micronaut OpenAPI Gradle Plugin]. Refer to the https://guides.micronaut.io/latest/micronaut-openapi-generator-server["Micronaut server generation with OpenAPI" guide] or the https://guides.micronaut.io/latest/micronaut-openapi-generator-client["Micronaut Client generation with OpenAPI" guide] for details.
+
+
+[WARNING]
+====
+Micronaut stopped contributing to https://openapi-generator.tech/[OpenAPIGenerator] with Micronaut 3.X. You will
+notice the `helpTxt` in the https://openapi-generator.tech/docs/generators/java-micronaut-client/[generators] have been updated to reflect this. You must use the https://micronaut-projects.github.io/micronaut-gradle-plugin/latest/#_openapi_code_generation[Micronaut OpenAPI Gradle Plugin].
+====
