@@ -2945,7 +2945,11 @@ public final class SchemaDefinitionUtils {
 
         if (schemaAnn != null && schemaAnn.annotationClassValue(PROP_IMPLEMENTATION).isEmpty()) {
             var resolvedSchema = resolveSchema(element, element != null ? element.getType() : null, context, List.of(), null);
-            schemaToBind = appendSchema(schemaToBind, resolvedSchema);
+            if (resolvedSchema.get$ref() != null && schemaToBind.getEnum() != null) {
+                schemaToBind = appendSchema(schemaToBind, getSchemaByRef(resolvedSchema, resolveOpenApi(context)));
+            } else {
+                schemaToBind = appendSchema(schemaToBind, resolvedSchema);
+            }
         }
 
         // need to set placeholders to set correct values and types to example field
