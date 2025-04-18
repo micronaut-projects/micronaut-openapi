@@ -40,10 +40,9 @@ import static io.micronaut.openapi.visitor.ConfigUtils.isExtraSchemasEnabled;
 import static io.micronaut.openapi.visitor.ConfigUtils.isOpenApiEnabled;
 import static io.micronaut.openapi.visitor.ConfigUtils.isSpecGenerationEnabled;
 import static io.micronaut.openapi.visitor.ContextUtils.getClassElements;
-import static io.micronaut.openapi.visitor.ElementUtils.stringValue;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ENABLED;
-import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_NAME;
 import static io.micronaut.openapi.visitor.SchemaDefinitionUtils.computeDefaultSchemaName;
+import static io.micronaut.openapi.visitor.SchemaDefinitionUtils.getNameFromAnn;
 import static io.micronaut.openapi.visitor.SchemaDefinitionUtils.getSchemaDefinition;
 import static io.micronaut.openapi.visitor.SchemaUtils.COMPONENTS_SCHEMAS_PREFIX;
 import static io.micronaut.openapi.visitor.SchemaUtils.resolveSchemas;
@@ -179,8 +178,9 @@ public class OpenApiExtraSchemaVisitor implements TypeElementVisitor<OpenAPIExtr
         if (classEl == null) {
             return;
         }
-        String schemaName = computeDefaultSchemaName(stringValue(classEl, io.swagger.v3.oas.annotations.media.Schema.class, PROP_NAME).orElse(null),
-            null, classEl, classEl.getTypeArguments(), context, null);
+
+        var nameFromAnn = getNameFromAnn(classEl);
+        String schemaName = computeDefaultSchemaName(nameFromAnn, null, classEl, classEl.getTypeArguments(), context, null);
         var schema = getSchemaDefinition(resolveOpenApi(context), context, classEl, classEl.getTypeArguments(), null, Collections.emptyList(), null);
         if (schema == null) {
             return;
