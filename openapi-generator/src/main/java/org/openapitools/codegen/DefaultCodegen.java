@@ -678,7 +678,7 @@ public class DefaultCodegen implements CodegenConfig {
                 }
 
                 parent.hasChildren = true;
-                Schema parentSchema = this.openAPI.getComponents().getSchemas().get(parent.schemaName);
+                Schema<?> parentSchema = this.openAPI.getComponents().getSchemas().get(parent.schemaName);
                 if (parentSchema == null) {
                     LOGGER.warn("Failed to look up parent schema: {}", parent.schemaName);
                     parent = null;

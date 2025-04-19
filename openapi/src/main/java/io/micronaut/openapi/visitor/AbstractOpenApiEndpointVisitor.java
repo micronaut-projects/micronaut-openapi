@@ -185,6 +185,7 @@ import static io.micronaut.openapi.visitor.SchemaUtils.TYPE_OBJECT;
 import static io.micronaut.openapi.visitor.SchemaUtils.TYPE_STRING;
 import static io.micronaut.openapi.visitor.SchemaUtils.appendSchema;
 import static io.micronaut.openapi.visitor.SchemaUtils.getOperationOnPathItem;
+import static io.micronaut.openapi.visitor.SchemaUtils.getSchemaByRef;
 import static io.micronaut.openapi.visitor.SchemaUtils.isIgnoredHeader;
 import static io.micronaut.openapi.visitor.SchemaUtils.processExtensions;
 import static io.micronaut.openapi.visitor.SchemaUtils.setOperationOnPathItem;
@@ -887,7 +888,7 @@ public abstract class AbstractOpenApiEndpointVisitor extends AbstractOpenApiVisi
             Schema<?> explodedSchema = resolveSchema(openAPI, parameter, parameterType, context, consumesMediaTypes, null, null, null, null);
             if (explodedSchema != null) {
                 if (openAPI.getComponents() != null && openAPI.getComponents().getSchemas() != null && StringUtils.isNotEmpty(explodedSchema.get$ref())) {
-                    explodedSchema = openAPI.getComponents().getSchemas().get(explodedSchema.get$ref().substring(Components.COMPONENTS_SCHEMAS_REF.length()));
+                    explodedSchema = getSchemaByRef(explodedSchema, openAPI);
                 }
                 if (CollectionUtils.isNotEmpty(explodedSchema.getProperties())) {
                     Map<String, Schema> props = explodedSchema.getProperties();

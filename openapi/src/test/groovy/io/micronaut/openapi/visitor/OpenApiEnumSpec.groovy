@@ -1365,4 +1365,65 @@ class MyBean {}
         enumSchema.enum[0] == "EdDSA"
         enumSchema.enum[1] == "RS1"
     }
+
+    void "test enum allowable values inside Parameter annotation"() {
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import io.micronaut.http.HttpResponse;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.micronaut.http.annotation.QueryValue;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
+
+import java.util.Map;
+
+@Controller("/example")
+class ExampleController {
+
+    @Get
+    public HttpResponse<String> fooBar(
+            @Parameter(
+                    description = "Subset of supported enum values",
+                    schema = @Schema(
+                            type = "string",
+                            allowableValues = {
+                                    "TYPE1", "TYPE2"
+                            }
+                    )
+            )
+            @QueryValue("e") FooBar.Type fooBar
+    ) {
+        return HttpResponse.ok("foobar: " + fooBar);
+    }
+}
+
+class FooBar {
+    @Schema(name = "FooBarType")
+    public enum Type {
+        TYPE1,
+        TYPE2,
+        TYPE3,
+        TYPE4,
+        TYPE5
+    }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        then:
+        Utils.testReference != null
+
+        when:
+        var openApi = Utils.testReference
+
+        then:
+        openApi.paths."/example".get.parameters[0].schema.enum.size() == 2
+        openApi.paths."/example".get.parameters[0].schema.enum.contains("TYPE1")
+        openApi.paths."/example".get.parameters[0].schema.enum.contains("TYPE2")
+    }
 }
