@@ -45,12 +45,12 @@ micronaut-docs = "2.0.0"
 sonatype-scan = "3.0.0"
 
 # javascript libraries
-js-swagger-ui="5.21.0"
-js-openapi-explorer="2.2.734"
-js-redoc="2.5.0"
-js-rapidoc="9.3.8"
-js-rapipdf="2.2.1"
-js-scalar="1.28.24"
+js-swagger-ui = "5.21.0"
+js-openapi-explorer = "2.2.734"
+js-redoc = "2.5.0"
+js-rapidoc = "9.3.8"
+js-rapipdf = "2.2.1"
+js-scalar = "1.28.24"
 
 [libraries]
 # Managed
@@ -63,8 +63,8 @@ managed-html2md-converter = { module = "com.vladsch.flexmark:flexmark-html2md-co
 managed-jsoup = { module = "org.jsoup:jsoup", version.ref = "managed-jsoup" }
 managed-parboiled = { module = "org.parboiled:parboiled-java", version.ref = "managed-parboiled" }
 managed-freemarker = { module = "org.freemarker:freemarker", version.ref = "managed-freemarker" }
-managed-pegdown = {module = "org.pegdown:pegdown", version.ref = "managed-pegdown"}
-managed-evo-inflector = {module = "org.atteo:evo-inflector", version.ref = "managed-evo-inflector"}
+managed-pegdown = { module = "org.pegdown:pegdown", version.ref = "managed-pegdown" }
+managed-evo-inflector = { module = "org.atteo:evo-inflector", version.ref = "managed-evo-inflector" }
 
 # Micronaut
 micronaut-core = { module = 'io.micronaut:micronaut-core-bom', version.ref = 'micronaut' }
@@ -83,8 +83,8 @@ micronaut-test = { module = "io.micronaut.test:micronaut-test-bom", version.ref 
 micronaut-kotlin = { module = "io.micronaut.kotlin:micronaut-kotlin-bom", version.ref = "micronaut-kotlin" }
 micronaut-grpc = { module = "io.micronaut.grpc:micronaut-grpc-bom", version.ref = "micronaut-grpc" }
 micronaut-spring = { module = "io.micronaut.spring:micronaut-spring-bom", version.ref = "micronaut-spring" }
-micronaut-platform = { module = "io.micronaut.platform:micronaut-platform", version.ref = "micronaut-platform"}
-micronaut-gradle-plugin = { module = "io.micronaut.gradle:micronaut-minimal-plugin", version.ref = "micronaut-gradle-plugin"}
+micronaut-platform = { module = "io.micronaut.platform:micronaut-platform", version.ref = "micronaut-platform" }
+micronaut-gradle-plugin = { module = "io.micronaut.gradle:micronaut-minimal-plugin", version.ref = "micronaut-gradle-plugin" }
 
 # Other
 jspecify = { module = "org.jspecify:jspecify", version.ref = "jspecify" }
@@ -102,6 +102,7 @@ spring-boot-starter-web = { module = "org.springframework.boot:spring-boot-start
 spring-boot-starter-validation = { module = "org.springframework.boot:spring-boot-starter-validation" }
 spring-boot-starter-data-rest = { module = "org.springframework.boot:spring-boot-starter-data-rest" }
 spring-boot-starter-test = { module = "org.springframework.boot:spring-boot-starter-test" }
+spring-boot-starter-actuator = { module = "org.springframework.boot:spring-boot-starter-actuator" }
 openapi-generator = { module = "org.openapitools:openapi-generator", version.ref = "openapi-generator" }
 swagger-parser = { module = "io.swagger:swagger-parser", version.ref = "swagger-parser" }
 swagger-parser-v3 = { module = "io.swagger.parser.v3:swagger-parser-v3", version.ref = "swagger-parser-v3" }

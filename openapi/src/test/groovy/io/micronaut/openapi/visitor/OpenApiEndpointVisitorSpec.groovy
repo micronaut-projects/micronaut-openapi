@@ -107,4 +107,78 @@ class MyBean {}
         !openAPI.paths['/internal/health']
         !openAPI.paths['/internal/routes']
     }
+
+    @RestoreSystemProperties
+    void 'test build OpenAPI endpoints with groups'() {
+        given: 'An API definition'
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_CONFIG_FILE, "openapi-endpoints-with-groups.properties")
+
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.micronaut.openapi.annotation.OpenAPIGroup;
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.info.Info;
+
+@OpenAPIGroup("v1")
+@Controller
+class MyControllerV1 {
+    
+    @Get("/v1/path1")
+    String path1() {
+        return null;
+    }
+}
+
+@OpenAPIGroup("v2")
+@Controller
+class MyControllerV2 {
+    
+    @Get("/v2/path1")
+    String path1() {
+        return null;
+    }
+}
+
+@OpenAPIDefinition(
+        info = @Info(
+                title = "the title",
+                version = "0.0"
+        )
+)
+class Application {
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+
+        then: 'the state is correct'
+        Utils.testReferences != null
+
+        when:
+        var openApis = Utils.testReferences
+
+        then:
+        openApis
+        openApis.size() == 3
+
+        var v1OpenApi = openApis.get(Pair.of("v1", null)).openApi
+        var v2OpenApi = openApis.get(Pair.of("v2", null)).openApi
+        var managementOpenApi = openApis.get(Pair.of("management", null)).openApi
+
+        v1OpenApi.paths."/beans"
+        v1OpenApi.paths."/v1/path1"
+        !v1OpenApi.paths."/refresh"
+
+        !v2OpenApi.paths."/beans"
+        v2OpenApi.paths."/v2/path1"
+
+        managementOpenApi.paths."/beans"
+        managementOpenApi.paths."/env"
+        !managementOpenApi.paths."/refresh"
+    }
 }

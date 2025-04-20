@@ -30,6 +30,10 @@ public interface ContextProperty {
      */
     String MICRONAUT_INTERNAL_ENVIRONMENT = "micronaut.internal.environment";
     /**
+     * Loaded spring openapi endpoints settings.
+     */
+    String MICRONAUT_INTERNAL_SPRING_OPENAPI_ENDPOINTS = "micronaut.internal.spring.openapi.endpoints";
+    /**
      * Loaded micronaut openapi endpoints settings.
      */
     String MICRONAUT_INTERNAL_OPENAPI_ENDPOINTS = "micronaut.internal.openapi.endpoints";

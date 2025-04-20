@@ -8,3 +8,14 @@ endpoints:
     description: This is test description
     extensions:
       ext1: '{"prop1": true, "prop2": 123, "prop3": "value"}'
+
+
+management:
+  endpoints:
+    web:
+      path-mapping:
+        health: /test
+      base-path: /actuator
+  server:
+    base-path: /my
+    port: 9090

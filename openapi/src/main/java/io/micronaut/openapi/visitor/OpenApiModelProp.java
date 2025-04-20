@@ -84,6 +84,9 @@ public interface OpenApiModelProp {
     String PROP_PROPERTY_NAME = "propertyName";
     String PROP_TAGS = "tags";
     String PROP_SECURITY = "security";
+    String PROP_GROUPS = "groups";
+    String PROP_GROUPS_EXCLUDED = "groupsExcluded";
+    String PROP_URI = "uri";
     String PROP_READ_ONLY = "readOnly";
     String PROP_WRITE_ONLY = "writeOnly";
     String PROP_EXTERNAL_DOCS = "externalDocs";

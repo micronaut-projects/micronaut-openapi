@@ -57,6 +57,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Properties;
 
@@ -85,6 +86,8 @@ import static io.micronaut.openapi.visitor.FileUtils.calcFinalFilename;
 import static io.micronaut.openapi.visitor.FileUtils.resolve;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.ALL;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.ENDPOINTS_EXTENSIONS;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.ENDPOINTS_GROUPS;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.ENDPOINTS_GROUPS_EXCLUDED;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.ENDPOINTS_PATH;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.ENDPOINTS_SECURITY_REQUIREMENTS;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.ENDPOINTS_SERVERS;
@@ -147,6 +150,8 @@ import static io.micronaut.openapi.visitor.StringUtil.WILDCARD;
 import static io.micronaut.openapi.visitor.UrlUtils.parsePath;
 import static io.micronaut.openapi.visitor.group.RouterVersioningProperties.DEFAULT_HEADER_NAME;
 import static io.micronaut.openapi.visitor.group.RouterVersioningProperties.DEFAULT_PARAMETER_NAME;
+import static io.micronaut.openapi.visitor.management.EndpointUtils.ALL_MICRONAUT_MANAGEMENT_ENDPOINTS;
+import static io.micronaut.openapi.visitor.management.SpringActuatorConfigUtils.mergeWithActuatorProperties;
 
 /**
  * Configuration utilities methods.
@@ -157,11 +162,10 @@ import static io.micronaut.openapi.visitor.group.RouterVersioningProperties.DEFA
 public final class ConfigUtils {
 
     public static final String ALL_ENDPOINTS_NAME = "all";
+    public static final String ALL_SPRING_ACTUATOR_ENDPOINTS_NAME = "*";
 
     private static final String LOADED_POSTFIX = ".loaded";
     private static final String VALUE_POSTFIX = ".value";
-
-    public static final String ALL_ENDPOINTS_NAME = "all";
 
     private static final List<String> DEFAULT_PREFIXES = List.of("");
     private static final List<String> DEFAULT_POSTFIXES = List.of("controller", "api", "endpoints", "endpoint");
@@ -200,22 +204,22 @@ public final class ConfigUtils {
         // third read environments properties
         Environment environment = getEnv(context);
         if (environment != null) {
-            for (Map.Entry<String, Object> entry : environment.getProperties(MICRONAUT_OPENAPI_SCHEMA_PREFIX, StringConvention.RAW).entrySet()) {
+            for (Entry<String, Object> entry : environment.getProperties(MICRONAUT_OPENAPI_SCHEMA_PREFIX, StringConvention.RAW).entrySet()) {
                 SchemaDecorator decorator = schemaDecorators.computeIfAbsent(entry.getKey(), k -> new SchemaDecorator());
                 decorator.setPrefix((String) entry.getValue());
             }
 
-            for (Map.Entry<String, Object> entry : environment.getProperties(MICRONAUT_OPENAPI_SCHEMA_POSTFIX, StringConvention.RAW).entrySet()) {
+            for (Entry<String, Object> entry : environment.getProperties(MICRONAUT_OPENAPI_SCHEMA_POSTFIX, StringConvention.RAW).entrySet()) {
                 SchemaDecorator decorator = schemaDecorators.computeIfAbsent(entry.getKey(), k -> new SchemaDecorator());
                 decorator.setPostfix((String) entry.getValue());
             }
 
-            for (Map.Entry<String, Object> entry : environment.getProperties(MICRONAUT_OPENAPI_SCHEMA_DECORATOR_PREFIX, StringConvention.RAW).entrySet()) {
+            for (Entry<String, Object> entry : environment.getProperties(MICRONAUT_OPENAPI_SCHEMA_DECORATOR_PREFIX, StringConvention.RAW).entrySet()) {
                 SchemaDecorator decorator = schemaDecorators.computeIfAbsent(entry.getKey(), k -> new SchemaDecorator());
                 decorator.setPrefix((String) entry.getValue());
             }
 
-            for (Map.Entry<String, Object> entry : environment.getProperties(MICRONAUT_OPENAPI_SCHEMA_DECORATOR_POSTFIX, StringConvention.RAW).entrySet()) {
+            for (Entry<String, Object> entry : environment.getProperties(MICRONAUT_OPENAPI_SCHEMA_DECORATOR_POSTFIX, StringConvention.RAW).entrySet()) {
                 SchemaDecorator decorator = schemaDecorators.computeIfAbsent(entry.getKey(), k -> new SchemaDecorator());
                 decorator.setPostfix((String) entry.getValue());
             }
@@ -254,7 +258,7 @@ public final class ConfigUtils {
         // third read environments properties
         Environment environment = getEnv(context);
         if (environment != null) {
-            for (Map.Entry<String, Object> entry : environment.getProperties(MICRONAUT_OPENAPI_SCHEMA, StringConvention.RAW).entrySet()) {
+            for (Entry<String, Object> entry : environment.getProperties(MICRONAUT_OPENAPI_SCHEMA, StringConvention.RAW).entrySet()) {
 
                 String configuredClassName = entry.getKey();
                 // Remove this check, after we remove MICRONAUT_OPENAPI_SCHEMA property
@@ -266,7 +270,7 @@ public final class ConfigUtils {
                 String targetClassName = (String) entry.getValue();
                 readCustomSchema(configuredClassName, targetClassName, customSchemas, context);
             }
-            for (Map.Entry<String, Object> entry : environment.getProperties(MICRONAUT_OPENAPI_SCHEMA_MAPPING, StringConvention.RAW).entrySet()) {
+            for (Entry<String, Object> entry : environment.getProperties(MICRONAUT_OPENAPI_SCHEMA_MAPPING, StringConvention.RAW).entrySet()) {
                 String configuredClassName = entry.getKey();
 
                 // Remove this check, after we remove MICRONAUT_OPENAPI_SCHEMA property
@@ -512,14 +516,14 @@ public final class ConfigUtils {
 
         var expandedPropsMap = new HashMap<String, String>();
         if (CollectionUtils.isNotEmpty(propertiesFromEnv)) {
-            for (Map.Entry<String, Object> entry : propertiesFromEnv.entrySet()) {
+            for (Entry<String, Object> entry : propertiesFromEnv.entrySet()) {
                 expandedPropsMap.put(entry.getKey(), entry.getValue().toString());
             }
         }
 
         // next, read openapi.properties file
         Properties openapiProps = readOpenApiConfigFile(context);
-        for (Map.Entry<Object, Object> entry : openapiProps.entrySet()) {
+        for (Entry<Object, Object> entry : openapiProps.entrySet()) {
             String key = entry.getKey().toString();
             if (!key.startsWith(expandPrefix)) {
                 continue;
@@ -529,7 +533,7 @@ public final class ConfigUtils {
 
         // next, read system properties
         if (CollectionUtils.isNotEmpty(System.getProperties())) {
-            for (Map.Entry<Object, Object> entry : System.getProperties().entrySet()) {
+            for (Entry<Object, Object> entry : System.getProperties().entrySet()) {
                 String key = entry.getKey().toString();
                 if (!key.startsWith(expandPrefix)) {
                     continue;
@@ -538,7 +542,7 @@ public final class ConfigUtils {
             }
         }
 
-        for (Map.Entry<String, String> entry : expandedPropsMap.entrySet()) {
+        for (Entry<String, String> entry : expandedPropsMap.entrySet()) {
             String key = entry.getKey();
             if (key.startsWith(expandPrefix)) {
                 key = key.substring(expandPrefix.length());
@@ -585,7 +589,7 @@ public final class ConfigUtils {
 
         // next, read openapi.properties file
         Properties openapiProps = readOpenApiConfigFile(context);
-        for (Map.Entry<Object, Object> entry : openapiProps.entrySet()) {
+        for (Entry<Object, Object> entry : openapiProps.entrySet()) {
             String key = entry.getKey().toString();
             if (!key.startsWith(expandPrefix)) {
                 continue;
@@ -595,7 +599,7 @@ public final class ConfigUtils {
 
         // next, read system properties
         if (CollectionUtils.isNotEmpty(System.getProperties())) {
-            for (Map.Entry<Object, Object> entry : System.getProperties().entrySet()) {
+            for (Entry<Object, Object> entry : System.getProperties().entrySet()) {
                 String key = entry.getKey().toString();
                 if (!key.startsWith(expandPrefix)) {
                     continue;
@@ -723,7 +727,7 @@ public final class ConfigUtils {
         // third read environments properties
         Environment environment = getEnv(context);
         if (environment != null) {
-            for (Map.Entry<String, Object> entry : environment.getProperties(MICRONAUT_OPENAPI_GROUPS, StringConvention.RAW).entrySet()) {
+            for (Entry<String, Object> entry : environment.getProperties(MICRONAUT_OPENAPI_GROUPS, StringConvention.RAW).entrySet()) {
                 String entryKey = entry.getKey();
                 String[] propParts = entryKey.split("\\.");
                 String propName = propParts[propParts.length - 1];
@@ -823,21 +827,25 @@ public final class ConfigUtils {
      * @return The EndpointsConfiguration.
      */
     public static EndpointsConfig getEndpointsConfig(VisitorContext context) {
-        var cfg = ContextUtils.get(MICRONAUT_INTERNAL_OPENAPI_ENDPOINTS, EndpointsConfig.class, context);
-        if (cfg != null) {
-            return cfg;
+        var endpointsConfig = ContextUtils.get(MICRONAUT_INTERNAL_OPENAPI_ENDPOINTS, EndpointsConfig.class, context);
+        if (endpointsConfig != null) {
+            return endpointsConfig;
         }
 
-        cfg = new EndpointsConfig(isEndpointsEnabled(context));
-        cfg.setPath(parsePath(getConfigProperty(ENDPOINTS_PATH, context)));
-        cfg.setTags(parseTags(getConfigProperty(ENDPOINTS_TAGS, context)));
-        cfg.setServers(parseServers(getConfigProperty(ENDPOINTS_SERVERS, context), context));
-        cfg.setSecurityRequirements(parseSecurityRequirements(getConfigProperty(ENDPOINTS_SECURITY_REQUIREMENTS, context), context));
-        cfg.setExtensions(parseExtensions(getConfigProperty(ENDPOINTS_EXTENSIONS, context), context));
-        cfg.setEndpoints(endpointsProperties(context));
+        endpointsConfig = new EndpointsConfig(isEndpointsEnabled(context));
+        endpointsConfig.setPath(parsePath(getConfigProperty(ENDPOINTS_PATH, context)));
+        endpointsConfig.setTags(parseTags(getConfigProperty(ENDPOINTS_TAGS, context)));
+        endpointsConfig.setServers(parseServers(getConfigProperty(ENDPOINTS_SERVERS, context), context));
+        endpointsConfig.setSecurityRequirements(parseSecurityRequirements(getConfigProperty(ENDPOINTS_SECURITY_REQUIREMENTS, context), context));
+        endpointsConfig.setExtensions(parseExtensions(getConfigProperty(ENDPOINTS_EXTENSIONS, context), context));
+        endpointsConfig.setGroups(getListStringsProperty(ENDPOINTS_GROUPS, Collections.emptyList(), context));
+        endpointsConfig.setGroupsExcluded(getListStringsProperty(ENDPOINTS_GROUPS_EXCLUDED, Collections.emptyList(), context));
+        endpointsConfig.setEndpoints(endpointsProperties(context));
 
-        ContextUtils.put(MICRONAUT_INTERNAL_OPENAPI_ENDPOINTS, cfg, context);
-        return cfg;
+        mergeWithActuatorProperties(endpointsConfig, context);
+
+        ContextUtils.put(MICRONAUT_INTERNAL_OPENAPI_ENDPOINTS, endpointsConfig, context);
+        return endpointsConfig;
     }
 
     public static Map<String, EndpointProperties> endpointsProperties(VisitorContext context) {
@@ -855,12 +863,31 @@ public final class ConfigUtils {
         // third read environments properties
         Environment environment = getEnv(context);
         if (environment != null) {
-            for (Map.Entry<String, Object> entry : environment.getProperties(MICRONAUT_ENDPOINTS_PREFIX, StringConvention.RAW).entrySet()) {
+            for (Entry<String, Object> entry : environment.getProperties(MICRONAUT_ENDPOINTS_PREFIX, StringConvention.RAW).entrySet()) {
                 String entryKey = entry.getKey();
                 String endpointName = entryKey.substring(0, entryKey.indexOf('.'));
                 String propName = entryKey.substring(endpointName.length() + 1);
                 setEndpointProperty(endpointName, propName, entry.getValue(), endpointPropertiesMap, context);
             }
+        }
+
+        // set standard endpoints implementations, if not set in config
+        for (var entry : ALL_MICRONAUT_MANAGEMENT_ENDPOINTS.entrySet()) {
+            var endpointName = entry.getKey();
+            var endpointProperties = endpointPropertiesMap.get(endpointName);
+            if (endpointProperties == null) {
+                endpointProperties = new EndpointProperties(endpointName);
+                endpointPropertiesMap.put(endpointName, endpointProperties);
+            }
+            if (endpointProperties.getElement() != null) {
+                continue;
+            }
+            var className = entry.getValue();
+            if (className == null) {
+                continue;
+            }
+            var classEl = ContextUtils.getClassElement(className, context);
+            endpointProperties.setElement(classEl);
         }
 
         return endpointPropertiesMap;

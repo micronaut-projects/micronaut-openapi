@@ -82,11 +82,11 @@ import static io.micronaut.openapi.adoc.utils.FileUtils.FILE_SCHEME;
 import static io.micronaut.openapi.adoc.utils.FileUtils.PROJECT_SCHEME;
 import static io.micronaut.openapi.visitor.ConfigUtils.ALL_ENDPOINTS_NAME;
 import static io.micronaut.openapi.visitor.ConfigUtils.MergeMode.REPLACE;
-import static io.micronaut.openapi.visitor.ConfigUtils.getEndpointsConfig;
 import static io.micronaut.openapi.visitor.ConfigUtils.getAdditionalFiles;
 import static io.micronaut.openapi.visitor.ConfigUtils.getAdditionalFilesMergeMode;
 import static io.micronaut.openapi.visitor.ConfigUtils.getAdocProperties;
 import static io.micronaut.openapi.visitor.ConfigUtils.getConfigProperty;
+import static io.micronaut.openapi.visitor.ConfigUtils.getEndpointsConfig;
 import static io.micronaut.openapi.visitor.ConfigUtils.getEnv;
 import static io.micronaut.openapi.visitor.ConfigUtils.getExpandableProperties;
 import static io.micronaut.openapi.visitor.ConfigUtils.getGroupProperties;
@@ -134,6 +134,7 @@ import static io.micronaut.openapi.visitor.StringUtil.QUOTE;
 import static io.micronaut.openapi.visitor.StringUtil.SLASH;
 import static io.micronaut.openapi.visitor.TagUtils.processOpenApiAnnotation;
 import static io.micronaut.openapi.visitor.Utils.resolveComponents;
+import static io.micronaut.openapi.visitor.management.EndpointUtils.SPECIFIC_ENDPOINTS;
 import static io.swagger.v3.oas.models.Components.COMPONENTS_SCHEMAS_REF;
 
 /**
@@ -984,6 +985,8 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
         var allEndpointsProps = endpointsConfig.getEndpoints().get(ALL_ENDPOINTS_NAME);
         var isAllEnabled = allEndpointsProps != null && allEndpointsProps.getEnabled() != null ? allEndpointsProps.getEnabled() : true;
         var visitor = new OpenApiEndpointVisitor(true);
+        var groupVisitor = new OpenApiGroupInfoVisitor(endpointsConfig.getGroups(), endpointsConfig.getGroupsExcluded());
+
         for (var endpointProps : endpointsConfig.getEndpoints().values()) {
             if (!isAllEnabled || (endpointProps.getEnabled() != null && !endpointProps.getEnabled())) {
                 continue;
@@ -992,6 +995,10 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             if (classEl == null) {
                 continue;
             }
+            if (!canProcessEndpoint(classEl, context)) {
+                continue;
+            }
+
             var tags = new ArrayList<>(endpointsConfig.getTags());
             tags.addAll(endpointProps.getTags());
             ContextUtils.put(MICRONAUT_INTERNAL_OPENAPI_ENDPOINT_CLASS_TAGS, tags, context);
@@ -1010,13 +1017,25 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
 
             ContextUtils.put(MICRONAUT_INTERNAL_OPENAPI_ENDPOINT_DESCRIPTION, endpointProps.getDescription(), context);
             ContextUtils.put(MICRONAUT_INTERNAL_OPENAPI_ENDPOINT_PROPS, endpointProps, context);
+
+            groupVisitor.visitClass(classEl, context);
+
             visitor.visitClass(classEl, context);
             for (MethodElement methodEl : classEl.getEnclosedElements(ElementQuery.ALL_METHODS
                 .modifiers(mods -> !mods.contains(ElementModifier.STATIC) && !mods.contains(ElementModifier.PRIVATE))
                 .named(name -> !name.contains(StringUtil.DOLLAR)))) {
+
                 visitor.visitMethod(methodEl, context);
             }
-
         }
+    }
+
+    private boolean canProcessEndpoint(ClassElement classEl, VisitorContext context) {
+        var classToCheck = SPECIFIC_ENDPOINTS.get(classEl.getName());
+        if (classToCheck == null) {
+            return true;
+        }
+        var checkedClassEl = ContextUtils.getClassElement(classToCheck, context);
+        return checkedClassEl != null;
     }
 }

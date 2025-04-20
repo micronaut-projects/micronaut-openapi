@@ -73,6 +73,7 @@ spring:
   springWithGradle: Spring with Gradle
   springWithMaven: Spring with Maven
   springWithWrappedRequestData: Spring with wrapped request data
+  springBootActuator: Spring Boot Actuator endpoints
 openApiGuides: Guides
 repository: Repository
 breaks: Breaking Changes

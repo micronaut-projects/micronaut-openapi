@@ -153,4 +153,12 @@ micronaut: +
 {nbsp}{nbsp}{nbsp}{nbsp}{nbsp}{nbsp}my-group2: +
 {nbsp}{nbsp}{nbsp}{nbsp}{nbsp}{nbsp}{nbsp}{nbsp}title: Title 2 +
 |
+|`*endpoints.enabled*` | Process or not endpoints (micronaut-management / spring-boot-actuator / custom endpoints) | Default: `false`
+|`*endpoints.tags*` | Specific tags for all endpoints |
+|`*endpoints.path*` | Specific path for all endpoints |
+|`*endpoints.servers*` | Specific servers for all endpoints |
+|`*endpoints.security-requirements*` | Specific security requirements for endpoints servers |
+|`*endpoints.extensions*` | Specific Open API extensions for all endpoints |
+|`*endpoints.groups*` | Specific groups for all endpoints |
+|`*endpoints.groups-excluded*` | Specific excluded groups for all endpoints |
 |===

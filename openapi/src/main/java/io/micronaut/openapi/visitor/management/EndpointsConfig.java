@@ -38,6 +38,8 @@ public final class EndpointsConfig {
     private List<Server> servers = Collections.emptyList();
     private List<SecurityRequirement> securityRequirements = Collections.emptyList();
     private Map<String, EndpointProperties> endpoints = Collections.emptyMap();
+    private List<String> groups = Collections.emptyList();
+    private List<String> groupsExcluded = Collections.emptyList();
     /**
      * Extensions to add to the Endpoint entry in the spec file.
      */
@@ -101,5 +103,21 @@ public final class EndpointsConfig {
 
     public void setExtensions(Map<String, Object> extensions) {
         this.extensions = extensions;
+    }
+
+    public List<String> getGroups() {
+        return groups;
+    }
+
+    public void setGroups(List<String> groups) {
+        this.groups = groups;
+    }
+
+    public List<String> getGroupsExcluded() {
+        return groupsExcluded;
+    }
+
+    public void setGroupsExcluded(List<String> groupsExcluded) {
+        this.groupsExcluded = groupsExcluded;
     }
 }

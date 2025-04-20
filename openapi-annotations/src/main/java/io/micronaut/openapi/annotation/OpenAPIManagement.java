@@ -50,4 +50,17 @@ public @interface OpenAPIManagement {
      */
     SecurityRequirement[] security() default {};
 
+    /**
+     * @return Array of groups to which this controller should be included.
+     *
+     * @since 4.16.0
+     */
+    String[] groups() default {};
+
+    /**
+     * @return Array of groups to which this controller should not be included.
+     *
+     * @since 4.16.0
+     */
+    String[] groupsExcluded() default {};
 }

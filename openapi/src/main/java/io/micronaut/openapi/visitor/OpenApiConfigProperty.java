@@ -73,10 +73,6 @@ public interface OpenApiConfigProperty {
     String MICRONAUT_OPENAPI_SCHEMA_POSTFIX = "micronaut.openapi.schema-postfix";
 
     /**
-     * Loaded micronaut-http server context path property.
-     */
-    String MICRONAUT_SERVER_CONTEXT_PATH = "micronaut.server.context-path";
-    /**
      * Context path property for spring boot applications.
      */
     String SPRING_SERVER_CONTEXT_PATH = "server.servlet.context-path";
@@ -84,6 +80,23 @@ public interface OpenApiConfigProperty {
      * Context path property for reactive spring boot applications.
      */
     String SPRING_WEBFLUX_BASE_PATH = "spring.webflux.base-path";
+    /**
+     * Properties for endpoints in spring boot application config.
+     */
+    String SPRING_ENDPOINTS_PREFIX = "management.endpoints.web";
+    /**
+     * Property for Spring Boot actuator server context path.
+     */
+    String SPRING_ENDPOINTS_CONTEXT_PATH = "management.server.base-path";
+    /**
+     * spring-context application name property.
+     */
+    String SPRING_APPLICATION_NAME = "spring.application.name";
+
+    /**
+     * Loaded micronaut-http server context path property.
+     */
+    String MICRONAUT_SERVER_CONTEXT_PATH = "micronaut.server.context-path";
     /**
      * Loaded micronaut-http-server-netty property (json-view.enabled).
      */
@@ -224,10 +237,6 @@ public interface OpenApiConfigProperty {
      * micronaut-context application name property.
      */
     String MICRONAUT_APPLICATION_NAME = "micronaut.application.name";
-    /**
-     * spring-context application name property.
-     */
-    String SPRING_APPLICATION_NAME = "spring.application.name";
     /**
      * If this property is 'true', then generated OpenAPI specification will be with extensions for OpenAPI Generator
      * and the generated client according to this specification will be much more accurate than without it.
@@ -405,26 +414,41 @@ public interface OpenApiConfigProperty {
      */
     String MICRONAUT_OPENAPI_ADOC_OPENAPI_PATH = "micronaut.openapi.adoc.openapi.path";
     /**
-     * Is this property true, properties wll be loaded in the standard way from application.yml.
-     * Also, environments from "micronaut.openapi.environments" property will set as additional environments,
-     * if you want to set specific environment name for openAPI generator.
-     * <br>
-     * Default value is "true".
+     * Prefix for endpoints configuration.
      */
     String MICRONAUT_ENDPOINTS_PREFIX = "endpoints";
     /**
-     * Is this property true, properties wll be loaded in the standard way from application.yml.
-     * Also, environments from "micronaut.openapi.environments" property will set as additional environments,
-     * if you want to set specific environment name for openAPI generator.
-     * <br>
-     * Default value is "true".
+     * Process or not endpoints (micronaut-management / spring-boot-actuator / custom endpoints).
      */
     String MICRONAUT_ENDPOINTS_ENABLED = "endpoints.enabled";
+    /**
+     * Specific tags for all endpoints.
+     */
     String ENDPOINTS_TAGS = "endpoints.tags";
+    /**
+     * Context-path for all endpoints. Will be prepended for each endpoint path.
+     */
     String ENDPOINTS_PATH = "endpoints.path";
+    /**
+     * Specific servers for endpoints.
+     */
     String ENDPOINTS_SERVERS = "endpoints.servers";
+    /**
+     * Specific security requirements for endpoints servers.
+     */
     String ENDPOINTS_SECURITY_REQUIREMENTS = "endpoints.security-requirements";
+    /**
+     * Specific Open API extensions for all endpoints.
+     */
     String ENDPOINTS_EXTENSIONS = "endpoints.extensions";
+    /**
+     * Specific groups for all endpoints.
+     */
+    String ENDPOINTS_GROUPS = "endpoints.groups";
+    /**
+     * Specific excluded groups for all endpoints.
+     */
+    String ENDPOINTS_GROUPS_EXCLUDED = "endpoints.groups-excluded";
 
     /**
      * Default openapi config file.

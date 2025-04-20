@@ -1,0 +1,5 @@
+If you use `spring-boot-actuator` and want to see actuator endpoints in your Open API specification file - just enable endpoints processing by property `enpoints.enabled = true`.
+
+By default, all standard Spring Boot Actuator endpoints will be processed. It will also take into account your configuration and what endpoints you currently have enabled. You can also exclude unnecessary endpoints from the specification if you don't need them.
+
+More information you can read in <<micronautendpoints,Endpoints>> section
