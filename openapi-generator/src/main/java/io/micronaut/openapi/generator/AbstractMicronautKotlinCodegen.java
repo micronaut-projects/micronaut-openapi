@@ -379,9 +379,8 @@ public abstract class AbstractMicronautKotlinCodegen<T extends GeneratorOptionsB
             "Cookie",
             "Authorization",
             "Body",
-            "application"
+            "Application"
         ));
-//        reservedWords.remove("value");
 
         typeMapping.put("string", "String");
         typeMapping.put("boolean", "Boolean");
