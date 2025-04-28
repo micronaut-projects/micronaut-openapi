@@ -522,7 +522,7 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         String outputPath = generateFiles(codegen, "src/test/resources/3_0/oneof-without-discriminator.yml", CodegenConstants.APIS, CodegenConstants.MODELS);
         String path = outputPath + "src/main/java/org/openapitools/";
 
-        assertFileNotContains(path + "model/OrderDTOShoppingNotes.java", "@JsonIgnoreProperties(",
+        assertFileNotContains(path + "model/ShoppingNotesDTO.java", "@JsonIgnoreProperties(",
             "@JsonTypeInfo"
         );
     }
@@ -1571,7 +1571,7 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                 "SchemaA.java", "public final class SchemaA implements PostRequest {",
                 "PostRequest.java", "public sealed interface PostRequest permits SchemaA {")),
             arguments("oneOf_array.yml", Map.of(
-                "MyExampleGet200Response.java", "public interface MyExampleGet200Response")),
+                "OneOf1.java", "public final class OneOf1 {")),
             arguments("oneOf_duplicateArray.yml", Map.of(
                 "Example.java", "public interface Example {")),
             arguments("oneOf_nonPrimitive.yml", Map.of(
