@@ -87,6 +87,7 @@ import org.openapitools.codegen.templating.mustache.SnakecaseLambda;
 import org.openapitools.codegen.templating.mustache.TitlecaseLambda;
 import org.openapitools.codegen.templating.mustache.UncamelizeLambda;
 import org.openapitools.codegen.templating.mustache.UppercaseLambda;
+import org.openapitools.codegen.utils.ExamplesUtils;
 import org.openapitools.codegen.utils.ModelUtils;
 import org.openapitools.codegen.utils.OneOfImplementorAdditionalData;
 import org.slf4j.Logger;
@@ -583,6 +584,7 @@ public class DefaultCodegen implements CodegenConfig {
      * This usually occurs when the data type is different.
      * We can also consider discriminators as new because the derived class discriminator will have to be defined again
      * to contain a new value. Doing so prevents having to include the discriminator in the constructor.
+     *
      * @param model
      * @param property
      * @return
@@ -911,8 +913,8 @@ public class DefaultCodegen implements CodegenConfig {
     /**
      * Return the enum default value in the language specified format
      *
-     * @param property  The codegen property to create the default for.
-     * @param value     Enum variable name
+     * @param property The codegen property to create the default for.
+     * @param value    Enum variable name
      * @return the default value for the enum
      */
     public String toEnumDefaultValue(CodegenProperty property, String value) {
@@ -1284,6 +1286,7 @@ public class DefaultCodegen implements CodegenConfig {
 
     /**
      * This method escapes text to be used in a single quoted string
+     *
      * @param input the input string
      * @return the escaped string
      */
@@ -2489,6 +2492,10 @@ public class DefaultCodegen implements CodegenConfig {
         return ModelUtils.unaliasSchema(this.openAPI, schema, schemaMapping);
     }
 
+    private List<Map<String, Object>> unaliasExamples(Map<String, Example> examples){
+        return ExamplesUtils.unaliasExamples(this.openAPI, examples);
+    }
+
     /**
      * Return a string representation of the schema type, resolving aliasing and references if necessary.
      *
@@ -3433,7 +3440,7 @@ public class DefaultCodegen implements CodegenConfig {
         }
 
         if (refSchema.getProperties() != null && refSchema.getProperties().get(discPropName) != null) {
-            Schema discSchema = ModelUtils.getReferencedSchema(openAPI, (Schema)refSchema.getProperties().get(discPropName));
+            Schema discSchema = ModelUtils.getReferencedSchema(openAPI, (Schema) refSchema.getProperties().get(discPropName));
             CodegenProperty cp = new CodegenProperty();
             if (ModelUtils.isStringSchema(discSchema)) {
                 cp.isString = true;
@@ -5076,9 +5083,14 @@ public class DefaultCodegen implements CodegenConfig {
         }
         r.schema = responseSchema;
         r.message = escapeText(response.getDescription());
-        // TODO need to revise and test examples in responses
-        // ApiResponse does not support examples at the moment
-        //r.examples = toExamples(response.getExamples());
+
+        // adding examples to API responses
+        Map<String, Example> examples = ExamplesUtils.getExamplesFromResponse(openAPI, response);
+
+        if (examples != null && !examples.isEmpty()) {
+            r.examples = unaliasExamples(examples);
+        }
+
         r.jsonSchema = Json.pretty(response);
         if (response.getExtensions() != null && !response.getExtensions().isEmpty()) {
             r.vendorExtensions.putAll(response.getExtensions());
@@ -5811,6 +5823,7 @@ public class DefaultCodegen implements CodegenConfig {
      */
     protected String getOrGenerateOperationId(Operation operation, String path, String httpMethod) {
         String operationId = operation.getOperationId();
+
         if (StringUtils.isBlank(operationId)) {
             String tmpPath = path;
             tmpPath = tmpPath.replaceAll("\\{", "");
@@ -5835,6 +5848,10 @@ public class DefaultCodegen implements CodegenConfig {
             LOGGER.warn("Empty operationId found for path: {} {}. Renamed to auto-generated operationId: {}", httpMethod, path, operationId);
         }
 
+        if (operationIdNameMapping.containsKey(operationId)) {
+            return operationIdNameMapping.get(operationId);
+        }
+
         // remove prefix in operationId
         if (removeOperationIdPrefix) {
             // The prefix is everything before the removeOperationIdPrefixCount occurrence of removeOperationIdPrefixDelimiter
@@ -5847,13 +5864,8 @@ public class DefaultCodegen implements CodegenConfig {
                 operationId = String.join(removeOperationIdPrefixDelimiter, Arrays.copyOfRange(components, component_number, components.length));
             }
         }
-        operationId = removeNonNameElementToCamelCase(operationId);
 
-        if (operationIdNameMapping.containsKey(operationId)) {
-            return operationIdNameMapping.get(operationId);
-        } else {
-            return toOperationId(operationId);
-        }
+        return toOperationId(removeNonNameElementToCamelCase(operationId));
     }
 
     /**
@@ -7058,7 +7070,7 @@ public class DefaultCodegen implements CodegenConfig {
      * writes it back to additionalProperties to be usable as a boolean in
      * mustache files.
      *
-     * @param propertyKey property key
+     * @param propertyKey   property key
      * @param booleanSetter the setter function reference
      * @return property value as boolean or false if it does not exist
      */
@@ -7077,7 +7089,7 @@ public class DefaultCodegen implements CodegenConfig {
      * writes it back to additionalProperties to be usable as a string in
      * mustache files.
      *
-     * @param propertyKey property key
+     * @param propertyKey  property key
      * @param stringSetter the setter function reference
      * @return property value as String or null if not found
      */
@@ -7090,7 +7102,7 @@ public class DefaultCodegen implements CodegenConfig {
      * writes it back to additionalProperties to be usable as T in
      * mustache files.
      *
-     * @param propertyKey property key
+     * @param propertyKey       property key
      * @param genericTypeSetter the setter function reference
      * @return property value as instance of type T or null if not found
      */
@@ -7350,7 +7362,7 @@ public class DefaultCodegen implements CodegenConfig {
         Schema original = null;
         // check if it's allOf (only 1 sub schema) with or without default/nullable/etc set in the top level
         if (ModelUtils.isAllOf(schema) && schema.getAllOf().size() == 1 &&
-            ModelUtils.getType(schema) == null) {
+            (ModelUtils.getType(schema) == null || "object".equals(ModelUtils.getType(schema)))) {
             if (schema.getAllOf().get(0) instanceof Schema) {
                 original = schema;
                 schema = (Schema) schema.getAllOf().get(0);
@@ -8002,7 +8014,7 @@ public class DefaultCodegen implements CodegenConfig {
         Schema original = null;
         // check if it's allOf (only 1 sub schema) with or without default/nullable/etc set in the top level
         if (ModelUtils.isAllOf(schema) && schema.getAllOf().size() == 1 &&
-            ModelUtils.getType(schema) == null) {
+            (ModelUtils.getType(schema) == null || "object".equals(ModelUtils.getType(schema)))) {
             if (schema.getAllOf().get(0) instanceof Schema) {
                 original = schema;
                 schema = (Schema) schema.getAllOf().get(0);
@@ -8549,7 +8561,7 @@ public class DefaultCodegen implements CodegenConfig {
     public void addImportsToOneOfInterface(List<Map<String, String>> imports) {
     }
 
-    //// End of methods related to the "useOneOfInterfaces" feature
+    /// / End of methods related to the "useOneOfInterfaces" feature
 
     protected void modifyFeatureSet(Consumer<FeatureSet.Builder> processor) {
         FeatureSet.Builder builder = getFeatureSet().modify();

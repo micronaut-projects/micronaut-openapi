@@ -121,8 +121,8 @@ public class DefaultGenerator implements Generator {
     private String contextPath;
     private Map<String, String> generatorPropertyDefaults = new HashMap<>();
     /**
-     *  Retrieves an instance to the configured template processor, available after user-defined options are
-     *  applied via
+     * Retrieves an instance to the configured template processor, available after user-defined options are
+     * applied via
      */
     protected TemplateProcessor templateProcessor = null;
 
@@ -294,7 +294,7 @@ public class DefaultGenerator implements Generator {
                 if (version.atLeast("3.1.0")) {
                     config.openapiNormalizer().put("NORMALIZE_31SPEC", "true");
                 }
-                OpenAPINormalizer openapiNormalizer = new OpenAPINormalizer(openAPI, config.openapiNormalizer());
+                OpenAPINormalizer openapiNormalizer = OpenAPINormalizer.createNormalizer(openAPI, config.openapiNormalizer());
                 openapiNormalizer.normalize();
             }
         } catch (Exception e) {
@@ -1240,9 +1240,9 @@ public class DefaultGenerator implements Generator {
      * <p>
      * Examples:
      * <p>
-     *   boolean hasOAuthMethods
+     * boolean hasOAuthMethods
      * <p>
-     *   List&lt;CodegenSecurity&gt; oauthMethods
+     * List&lt;CodegenSecurity&gt; oauthMethods
      *
      * @param bundle the map which the booleans and collections will be added
      */
