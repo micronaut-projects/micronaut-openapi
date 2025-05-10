@@ -42,7 +42,7 @@ micronaut-session = "4.6.0"
 micronaut-grpc = "4.9.0"
 micronaut-spring = "5.10.0"
 micronaut-docs = "2.0.0"
-sonatype-scan = "3.1.0"
+sonatype-scan = "3.1.1"
 
 # javascript libraries
 js-swagger-ui="5.21.0"
