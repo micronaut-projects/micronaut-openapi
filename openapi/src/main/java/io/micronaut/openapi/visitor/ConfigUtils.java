@@ -107,6 +107,7 @@ import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENA
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ADOC_TEMPLATE_FILENAME;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ADOC_TEMPLATE_PREFIX;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_CONFIG_FILE;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_CONSTRUCTOR_ARGUMENTS_AS_REQUIRED;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ENABLED;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ENVIRONMENTS;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_EXPAND_PREFIX;
@@ -351,6 +352,10 @@ public final class ConfigUtils {
             return DuplicateResolution.ERROR;
         }
         return DuplicateResolution.AUTO;
+    }
+
+    public static boolean isConstructorArgumentsAsRequired(VisitorContext context) {
+        return getBooleanProperty(MICRONAUT_OPENAPI_CONSTRUCTOR_ARGUMENTS_AS_REQUIRED, true, context);
     }
 
     public static boolean isResponseReadSuccessfulFromCode(VisitorContext context) {

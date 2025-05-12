@@ -4,6 +4,8 @@ import io.micronaut.openapi.AbstractOpenApiTypeElementSpec
 import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.Operation
 import io.swagger.v3.oas.models.media.Schema
+import spock.lang.Issue
+import spock.util.environment.RestoreSystemProperties
 
 class OpenApiSchemaWithNotNullSpec extends AbstractOpenApiTypeElementSpec {
 
@@ -85,5 +87,89 @@ class MyBean {}
         dtoSchema.required.size() == 2
         dtoSchema.required.contains("id")
         dtoSchema.required.contains("idJavadoc")
+    }
+
+    @RestoreSystemProperties
+    @Issue("https://github.com/micronaut-projects/micronaut-openapi/issues/2116")
+    void "test build OpenAPI spec with @NonNull / @Nullable / simple properties"() {
+
+        given:
+        System.setProperty(OpenApiConfigProperty.MICRONAUT_OPENAPI_CONSTRUCTOR_ARGUMENTS_AS_REQUIRED, "false")
+
+        when:
+        buildBeanDefinition('test.MyBean', '''
+package test;
+
+import io.micronaut.core.annotation.NonNull;
+import io.micronaut.core.annotation.Nullable;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+
+@Controller("/hello")
+class HelloController {
+
+    @Get
+    public HelloClass hello() {
+        return new HelloClass("Not Null Value", "Nullable");
+    }
+}
+
+class HelloClass {
+
+    @NonNull
+    private String notNullProperty;
+    @Nullable
+    private String nullableProperty;
+    private String plainProperty;
+
+    public HelloClass(@NonNull String notNullProperty, @Nullable String nullableProperty) {
+        this.notNullProperty = notNullProperty;
+        this.nullableProperty = nullableProperty;
+    }
+
+    @NonNull
+    public String getNotNullProperty() {
+        return notNullProperty;
+    }
+
+    public void setNotNullProperty(@NonNull String notNullProperty) {
+        this.notNullProperty = notNullProperty;
+    }
+
+    @Nullable
+    public String getNullableProperty() {
+        return nullableProperty;
+    }
+
+    public void setNullableProperty(@Nullable String nullableProperty) {
+        this.nullableProperty = nullableProperty;
+    }
+
+    public String getPlainProperty() {
+        return plainProperty;
+    }
+
+    public void setPlainProperty(String plainProperty) {
+        this.plainProperty = plainProperty;
+    }
+}
+
+@jakarta.inject.Singleton
+class MyBean {}
+''')
+        then: "the state is correct"
+        Utils.testReference != null
+
+        when: "The OpenAPI is retrieved"
+        OpenAPI openAPI = Utils.testReference
+        Operation operation = openAPI.paths."/hello".get
+        Schema dtoSchema = openAPI.components.schemas.HelloClass
+
+        then:
+        operation
+        dtoSchema
+        dtoSchema.required.size() == 1
+        dtoSchema.required.contains("notNullProperty")
+        dtoSchema.properties.nullableProperty.nullable
     }
 }

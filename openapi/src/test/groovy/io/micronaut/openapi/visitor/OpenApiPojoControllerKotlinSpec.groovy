@@ -205,7 +205,7 @@ data class Animal (
 )
 
 @jakarta.inject.Singleton
-class MyBean {}
+class MyBean
 ''')
         then: "the state is correct"
         Utils.testReference != null
@@ -325,7 +325,7 @@ enum class ColorEnum (
 }
 
 @jakarta.inject.Singleton
-class MyBean {}
+class MyBean
 ''')
         then: "the state is correct"
         Utils.testReference != null
@@ -424,7 +424,7 @@ open class MyEntity2Controller {
 }
 
 @jakarta.inject.Singleton
-class MyBean {}
+class MyBean
 ''')
         then: "the state is correct"
         Utils.testReference != null

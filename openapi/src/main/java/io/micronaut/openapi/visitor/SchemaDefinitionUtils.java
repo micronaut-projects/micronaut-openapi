@@ -130,6 +130,7 @@ import static io.micronaut.openapi.visitor.ConfigUtils.getGenericSeparator;
 import static io.micronaut.openapi.visitor.ConfigUtils.getInnerClassSeparator;
 import static io.micronaut.openapi.visitor.ConfigUtils.getSchemaDecoration;
 import static io.micronaut.openapi.visitor.ConfigUtils.getSchemaDuplicateResolution;
+import static io.micronaut.openapi.visitor.ConfigUtils.isConstructorArgumentsAsRequired;
 import static io.micronaut.openapi.visitor.ConfigUtils.isJsonViewDefaultInclusion;
 import static io.micronaut.openapi.visitor.ContextUtils.info;
 import static io.micronaut.openapi.visitor.ContextUtils.warn;
@@ -1677,7 +1678,7 @@ public final class SchemaDefinitionUtils {
             // check field annotations (@NonNull, @Nullable, etc.)
             boolean isNotNullable = isNotNullable(element);
             // check as mandatory in constructor
-            boolean isMandatoryInConstructor = doesParamExistsMandatoryInConstructor(element, classElement);
+            boolean isMandatoryInConstructor = doesParamExistsMandatoryInConstructor(element, classElement, context);
             boolean required = elementSchemaRequired != null ? elementSchemaRequired : isNotNullable || isMandatoryInConstructor;
 
             if (isRequiredDefaultValueSet && isAutoRequiredMode && isNotNullable) {
@@ -3254,7 +3255,7 @@ public final class SchemaDefinitionUtils {
         }
     }
 
-    private static boolean doesParamExistsMandatoryInConstructor(Element element, @Nullable Element classElement) {
+    private static boolean doesParamExistsMandatoryInConstructor(Element element, @Nullable Element classElement, VisitorContext context) {
         if (classElement instanceof ClassElement classEl) {
             if (classEl.isEnum()) {
                 return true;
@@ -3262,7 +3263,7 @@ public final class SchemaDefinitionUtils {
             return classEl.getPrimaryConstructor()
                 .flatMap(methodElement -> Arrays.stream(methodElement.getParameters())
                     .filter(parameterElement -> parameterElement.getName().equals(element.getName()))
-                    .map(parameterElement -> !parameterElement.isNullable())
+                    .map(paramEl ->  isConstructorArgumentsAsRequired(context) ? !ElementUtils.isNullable(paramEl) : ElementUtils.isNotNullable(paramEl))
                     .findFirst())
                 .orElse(false);
         }

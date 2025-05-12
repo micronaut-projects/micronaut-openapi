@@ -359,6 +359,12 @@ public interface OpenApiConfigProperty {
     String MICRONAUT_OPENAPI_GROUPS = "micronaut.openapi.groups";
 
     /**
+     * System property that enables interpret primary constructor arguments as required properties.
+     * <p>
+     * Default: true
+     */
+    String MICRONAUT_OPENAPI_CONSTRUCTOR_ARGUMENTS_AS_REQUIRED = "micronaut.openapi.constructor-arguments-as-required";
+    /**
      * System property that enables tag generation by controller class name.
      */
     String MICRONAUT_OPENAPI_TAG_GENERATION_BY_CLASS_ENABLED = "micronaut.openapi.tag.generation.by.class.enabled";
