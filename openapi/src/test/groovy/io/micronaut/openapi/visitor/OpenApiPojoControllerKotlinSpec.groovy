@@ -1,9 +1,11 @@
 package io.micronaut.openapi.visitor
 
 import io.micronaut.annotation.processing.test.AbstractKotlinCompilerSpec
+import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.Operation
 import io.swagger.v3.oas.models.media.Schema
 import io.swagger.v3.oas.models.responses.ApiResponse
+import spock.lang.Issue
 
 class OpenApiPojoControllerKotlinSpec extends AbstractKotlinCompilerSpec {
 
@@ -205,7 +207,7 @@ data class Animal (
 )
 
 @jakarta.inject.Singleton
-class MyBean {}
+class MyBean
 ''')
         then: "the state is correct"
         Utils.testReference != null
@@ -325,7 +327,7 @@ enum class ColorEnum (
 }
 
 @jakarta.inject.Singleton
-class MyBean {}
+class MyBean
 ''')
         then: "the state is correct"
         Utils.testReference != null
@@ -424,7 +426,7 @@ open class MyEntity2Controller {
 }
 
 @jakarta.inject.Singleton
-class MyBean {}
+class MyBean
 ''')
         then: "the state is correct"
         Utils.testReference != null

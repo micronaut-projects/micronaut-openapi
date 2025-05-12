@@ -3261,7 +3261,7 @@ public final class SchemaDefinitionUtils {
             return classEl.getPrimaryConstructor()
                 .flatMap(methodElement -> Arrays.stream(methodElement.getParameters())
                     .filter(parameterElement -> parameterElement.getName().equals(element.getName()))
-                    .map(parameterElement -> !parameterElement.isNullable())
+                    .map(ElementUtils::isNotNullable)
                     .findFirst())
                 .orElse(false);
         }
