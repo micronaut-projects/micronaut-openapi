@@ -760,7 +760,7 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
             """);
         assertFileContains(path + "model/Result.java", """
                 private String id;
-
+            
                 @Nullable(inherited = true)
                 @Schema(name = "date", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
                 @JsonProperty(JSON_PROPERTY_DATE)
@@ -779,5 +779,20 @@ class JavaMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
         assertFileContains(path + "model/BookInfo.java",
             "import java.time.ZonedDateTime;",
             "private ZonedDateTime createdAt;");
+    }
+
+    @Test
+    void testReadOnlyRequiredPropertyInConstructor() {
+        var codegen = new JavaMicronautServerCodegen();
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/oas.yml", CodegenConstants.MODELS, CodegenConstants.APIS);
+        String path = outputPath + "src/main/java/org/openapitools/";
+
+        assertFileContains(path + "model/CategoryObject.java", """
+                public CategoryObject(Integer id, String locale, String name) {
+                    this.id = id;
+                    this.locale = locale;
+                    this.name = name;
+                }
+            """);
     }
 }

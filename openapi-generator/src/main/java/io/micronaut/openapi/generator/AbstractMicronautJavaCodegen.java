@@ -2032,6 +2032,16 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
             }
             if (!requiredVarsWithoutDiscriminator.isEmpty()) {
                 model.vendorExtensions.put("requiredVarsWithoutDiscriminator", requiredVarsWithoutDiscriminator);
+                var requiredVarsWithoutDiscriminatorAndReadOnly = new ArrayList<CodegenProperty>();
+                for (var prop : requiredVarsWithoutDiscriminator) {
+                    if (!isServer && prop.isReadOnly) {
+                        continue;
+                    }
+                    requiredVarsWithoutDiscriminatorAndReadOnly.add(prop);
+                }
+                if (!requiredVarsWithoutDiscriminatorAndReadOnly.isEmpty()) {
+                    model.vendorExtensions.put("requiredVarsWithoutDiscriminatorAndReadOnly", requiredVarsWithoutDiscriminatorAndReadOnly);
+                }
             }
             model.allVars = allVars;
             model.vendorExtensions.put("requiredVars", requiredVars);

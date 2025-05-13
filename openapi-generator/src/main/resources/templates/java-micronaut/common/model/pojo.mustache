@@ -192,7 +192,7 @@ public {{>common/model/sealed}}class {{classname}}{{#parent}} extends {{{parent}
         {{/micronaut_serde_jackson}}
         {{#formatNoEmptyLines}}
         {{#vendorExtensions.withRequiredVars}}
-    public {{classname}}({{#vendorExtensions.requiredVarsWithoutDiscriminator}}{{#isReadOnly}}{{#vendorExtensions.isServer}}{{^-first}}, {{/-first}}{{{vendorExtensions.typeWithEnumWithGenericAnnotations}}} {{name}}{{/vendorExtensions.isServer}}{{/isReadOnly}}{{^isReadOnly}}{{^-first}}, {{/-first}}{{{vendorExtensions.typeWithEnumWithGenericAnnotations}}} {{name}}{{/isReadOnly}}{{/vendorExtensions.requiredVarsWithoutDiscriminator}}) {
+    public {{classname}}({{#vendorExtensions.requiredVarsWithoutDiscriminatorAndReadOnly}}{{^-first}}, {{/-first}}{{{vendorExtensions.typeWithEnumWithGenericAnnotations}}} {{name}}{{/vendorExtensions.requiredVarsWithoutDiscriminatorAndReadOnly}}) {
         {{#parent}}
         {{#vendorExtensions.requiredParentVarsWithoutDiscriminator.0}}super({{/vendorExtensions.requiredParentVarsWithoutDiscriminator.0}}{{#vendorExtensions.requiredParentVarsWithoutDiscriminator}}{{#vendorExtensions.isServerOrNotReadOnly}}{{^-first}}, {{/-first}}{{name}}{{/vendorExtensions.isServerOrNotReadOnly}}{{/vendorExtensions.requiredParentVarsWithoutDiscriminator}}{{#vendorExtensions.requiredParentVarsWithoutDiscriminator.0}});{{/vendorExtensions.requiredParentVarsWithoutDiscriminator.0}}
         {{/parent}}

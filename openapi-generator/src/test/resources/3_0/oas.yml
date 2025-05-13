@@ -1,0 +1,182 @@
+openapi: 3.0.2
+info:
+  title: Help Center API
+  description: Help Center v2 REST API
+  version: 2.0.0
+tags:
+  - name: Articles
+  - name: Article Labels
+  - name: Article Attachments
+  - name: Translations
+  - name: Categories
+  - name: Sections
+  - name: Sessions
+  - name: Votes
+  - name: User Segments
+  - name: Article Comments
+  - name: Search
+  - name: Topics
+  - name: Posts
+  - name: Post Comments
+  - name: Content Subscriptions
+  - name: User Subscriptions
+  - name: User Images
+paths:
+  /api/v2/help_center/{locale}/categories:
+    get:
+      operationId: ListCategories
+      tags:
+        - Categories
+      summary: List Categories
+      description: |
+        **Note**: `{/locale}` is an optional parameter for admins and agents. End users and anonymous users must provide the parameter.
+
+        #### Allowed for
+
+        * Anonymous users
+
+        The response will list only the categories that the agent, end user, or
+        anonymous user can view in the help center.
+
+        #### Pagination
+
+        * Cursor pagination (recommended)
+        * Offset pagination
+
+        See [Pagination](/api-reference/introduction/pagination/).
+
+        #### Sorting
+
+        You can sort the results with the `sort_by` and `sort_order` query string parameters.
+
+        ```
+        GET /api/v2/help_center/en-us/categories.json?sort_by=updated_at&sort_order=asc
+        ```
+
+        The `sort_by` parameter can have one of the following values:
+
+        | value         | description
+        | ------------- | -----------
+        | `position`    | order set manually using the Arrange Content page. Default order
+        | `created_at`  | order by creation time
+        | `updated_at`  | order by update time
+
+        The `sort_order` parameter can have one of the following values:
+
+        | value   | description
+        | ------- | -----------
+        | `asc`   | ascending order
+        | `desc`  | descending order
+
+        #### Sideloads
+
+        The following sideloads are supported:
+
+        | Name          | Will sideload
+        |---------------|--------------
+        | translations  | the category translations, if any
+
+        Translations are embedded within the category because they're
+        not shared between resources.
+      parameters:
+        - name: sort_by
+          in: query
+          description: Sorts the results by one of the accepted values
+          schema:
+            type: string
+            enum:
+              - position
+              - created_at
+              - updated_at
+        - name: sort_order
+          in: query
+          description: Selects the order of the results.
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+      responses:
+        "200":
+          description: description
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoriesResponse'
+components:
+  schemas:
+    CategoriesResponse:
+      type: object
+      properties:
+        categories:
+          type: array
+          items:
+            $ref: '#/components/schemas/CategoryObject'
+    CategoryObject:
+      type: object
+      properties:
+        created_at:
+          type: string
+          format: date-time
+          description: The time at which the category was created
+          readOnly: true
+        description:
+          type: string
+          description: The description of the category
+        html_url:
+          type: string
+          description: The url of this category in Help Center
+          readOnly: true
+        id:
+          type: integer
+          description: Automatically assigned when creating categories
+          readOnly: true
+        locale:
+          type: string
+          description: The locale where the category is displayed
+        name:
+          type: string
+          description: The name of the category
+        outdated:
+          type: boolean
+          description: Whether the category is out of date
+          readOnly: true
+        position:
+          type: integer
+          description: The position of this category relative to other categories
+        source_locale:
+          type: string
+          description: The source (default) locale of the category
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          description: The time at which the category was last updated
+          readOnly: true
+        url:
+          type: string
+          description: The API url of this category
+          readOnly: true
+      example:
+        description: ""
+        html_url: https://company.zendesk.com/hc/en-us/categories/354362577
+        id: 1635
+        locale: en-us
+        name: Self Help Articles
+        source_locale: en-us
+        url: https://company.zendesk.com/api/v2/help_center/categories/354362577
+      required:
+        - id
+        - name
+        - locale
+    CategoryResponse:
+      type: object
+      properties:
+        category:
+          $ref: '#/components/schemas/CategoryObject'
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+security:
+  - basicAuth: []
