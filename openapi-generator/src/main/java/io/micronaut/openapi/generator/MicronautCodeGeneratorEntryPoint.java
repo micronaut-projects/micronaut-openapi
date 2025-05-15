@@ -358,6 +358,10 @@ public final class MicronautCodeGeneratorEntryPoint {
             javaServerCodegen.setPlural(javaServerOptions.plural());
             javaServerCodegen.setFluxForArrays(javaServerOptions.fluxForArrays());
             javaServerCodegen.setGeneratedAnnotation(javaServerOptions.generatedAnnotation());
+            javaServerCodegen.setGenerateHardNullable(javaServerOptions.generateHardNullable());
+            javaServerCodegen.setGenerateStreamingFileUpload(javaServerOptions.generateStreamingFileUpload());
+            javaServerCodegen.setAot(javaServerOptions.aot());
+            javaServerCodegen.setNoArgsConstructor(javaServerOptions.noArgsConstructor());
         }
     }
 
@@ -369,18 +373,32 @@ public final class MicronautCodeGeneratorEntryPoint {
             if (javaClientOptions.clientId() != null && !javaClientOptions.clientId().isBlank()) {
                 javaClientCodegen.setClientId(javaClientOptions.clientId());
             }
+            if (javaClientOptions.authConfigName() != null && !javaClientOptions.authConfigName().isBlank()) {
+                javaClientCodegen.setAuthConfigName(javaClientOptions.authConfigName());
+            }
             if (javaClientOptions.authorizationFilterPattern() != null) {
                 javaClientCodegen.setAuthorizationFilterPattern(javaClientOptions.authorizationFilterPattern());
+            }
+            if (javaClientOptions.authorizationFilterPatternStyle() != null) {
+                javaClientCodegen.setAuthorizationFilterPatternStyle(javaClientOptions.authorizationFilterPatternStyle());
             }
             if (javaClientOptions.basePathSeparator() != null) {
                 javaClientCodegen.setBasePathSeparator(javaClientOptions.basePathSeparator());
             }
             javaClientCodegen.setClientPath(javaClientOptions.clientPath());
+            javaClientCodegen.setAuthFilterClientIds(javaClientOptions.authFilterClientIds());
+            javaClientCodegen.setAuthFilterExcludedClientIds(javaClientOptions.authFilterExcludedClientIds());
             javaClientCodegen.setGeneratedAnnotation(javaClientOptions.generatedAnnotation());
             javaClientCodegen.setConfigureAuthorization(javaClientOptions.useAuth());
+            javaClientCodegen.setGenerateAuthClasses(javaClientOptions.generateAuthClasses());
+            javaClientCodegen.setUseOauth(javaClientOptions.useOauth());
+            javaClientCodegen.setUseBasicAuth(javaClientOptions.useBasicAuth());
+            javaClientCodegen.setUseApiKeyAuth(javaClientOptions.useApiKeyAuth());
+            javaClientCodegen.setAuthFilter(javaClientOptions.authFilter());
             javaClientCodegen.setPlural(javaClientOptions.plural());
             javaClientCodegen.setFluxForArrays(javaClientOptions.fluxForArrays());
             javaClientCodegen.setLombok(javaClientOptions.lombok());
+            javaClientCodegen.setNoArgsConstructor(javaClientOptions.noArgsConstructor());
         }
     }
 
@@ -398,6 +416,8 @@ public final class MicronautCodeGeneratorEntryPoint {
             kotlinServerCodegen.setUseAuth(kotlinServerOptions.useAuth());
             kotlinServerCodegen.setPlural(kotlinServerOptions.plural());
             kotlinServerCodegen.setFluxForArrays(kotlinServerOptions.fluxForArrays());
+            kotlinServerCodegen.setGenerateStreamingFileUpload(kotlinServerOptions.generateStreamingFileUpload());
+            kotlinServerCodegen.setAot(kotlinServerOptions.aot());
         }
     }
 
@@ -409,15 +429,28 @@ public final class MicronautCodeGeneratorEntryPoint {
             if (kotlinClientOptions.clientId() != null && !kotlinClientOptions.clientId().isBlank()) {
                 kotlinClientCodegen.setClientId(kotlinClientOptions.clientId());
             }
+            if (kotlinClientOptions.authConfigName() != null && !kotlinClientOptions.authConfigName().isBlank()) {
+                kotlinClientCodegen.setAuthConfigName(kotlinClientOptions.authConfigName());
+            }
             if (kotlinClientOptions.authorizationFilterPattern() != null) {
                 kotlinClientCodegen.setAuthorizationFilterPattern(kotlinClientOptions.authorizationFilterPattern());
+            }
+            if (kotlinClientOptions.authorizationFilterPatternStyle() != null) {
+                kotlinClientCodegen.setAuthorizationFilterPatternStyle(kotlinClientOptions.authorizationFilterPatternStyle());
             }
             if (kotlinClientOptions.basePathSeparator() != null) {
                 kotlinClientCodegen.setBasePathSeparator(kotlinClientOptions.basePathSeparator());
             }
             kotlinClientCodegen.setClientPath(kotlinClientOptions.clientPath());
+            kotlinClientCodegen.setAuthFilterClientIds(kotlinClientOptions.authFilterClientIds());
+            kotlinClientCodegen.setAuthFilterExcludedClientIds(kotlinClientOptions.authFilterExcludedClientIds());
             kotlinClientCodegen.setGeneratedAnnotation(kotlinClientOptions.generatedAnnotation());
             kotlinClientCodegen.setConfigureAuthorization(kotlinClientOptions.useAuth());
+            kotlinClientCodegen.setGenerateAuthClasses(kotlinClientOptions.generateAuthClasses());
+            kotlinClientCodegen.setUseOauth(kotlinClientOptions.useOauth());
+            kotlinClientCodegen.setUseBasicAuth(kotlinClientOptions.useBasicAuth());
+            kotlinClientCodegen.setUseApiKeyAuth(kotlinClientOptions.useApiKeyAuth());
+            kotlinClientCodegen.setAuthFilter(kotlinClientOptions.authFilter());
             kotlinClientCodegen.setPlural(kotlinClientOptions.plural());
             kotlinClientCodegen.setFluxForArrays(kotlinClientOptions.fluxForArrays());
             kotlinClientCodegen.setKsp(kotlinClientOptions.ksp());

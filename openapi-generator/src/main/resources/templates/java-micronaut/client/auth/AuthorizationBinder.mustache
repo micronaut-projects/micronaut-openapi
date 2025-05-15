@@ -23,7 +23,7 @@ import {{javaxPackage}}.annotation.Generated;
 @Singleton
 public class AuthorizationBinder implements AnnotatedClientRequestBinder<Authorization> {
 
-    public static final CharSequence AUTHORIZATION_NAMES = "micronaut.security.AUTHORIZATION_NAMES";
+    public static final CharSequence AUTHORIZATION_NAMES = "micronaut.security{{#authConfigName}}.{{{authConfigName}}}{{/authConfigName}}.AUTHORIZATION_NAMES";
 
     @NonNull
     @Override
@@ -32,22 +32,23 @@ public class AuthorizationBinder implements AnnotatedClientRequestBinder<Authori
     }
 
     @Override
-    public void bind(@NonNull MethodInvocationContext<Object, Object> context,
-                     @NonNull ClientRequestUriContext uriContext,
-                     @NonNull MutableHttpRequest<?> request
+    public void bind(
+        @NonNull MethodInvocationContext<Object, Object> context,
+        @NonNull ClientRequestUriContext uriContext,
+        @NonNull MutableHttpRequest<?> request
     ) {
-        List<AnnotationValue<Authorization>> annotations = context.getAnnotationMetadata()
-                .getAnnotationValuesByType(Authorization.class);
-
-        if (CollectionUtils.isNotEmpty(annotations)) {
-            var authorizationNames = new ArrayList<String>();
-            for (AnnotationValue<Authorization> annotation : annotations) {
-                annotation.stringValue("name")
-                        .filter(StringUtils::isNotEmpty)
-                        .ifPresent(v -> authorizationNames.add(configurationName(v)));
-            }
-            request.setAttribute(AUTHORIZATION_NAMES, authorizationNames);
+        List<AnnotationValue<Authorization>> annotations = context.getAnnotationValuesByType(Authorization.class);
+        if (CollectionUtils.isEmpty(annotations)) {
+            return;
         }
+
+        var authorizationNames = new ArrayList<String>();
+        for (var annotation : annotations) {
+            annotation.stringValue("value")
+                .filter(StringUtils::isNotEmpty)
+                .ifPresent(v -> authorizationNames.add(configurationName(v)));
+        }
+        request.setAttribute(AUTHORIZATION_NAMES, authorizationNames);
     }
 
     private String configurationName(String name) {

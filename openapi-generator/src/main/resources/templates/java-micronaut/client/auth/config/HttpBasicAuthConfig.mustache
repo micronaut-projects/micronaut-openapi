@@ -1,5 +1,5 @@
 {{>common/licenseInfo}}
-package {{invokerPackage}}.auth.configuration;
+package {{invokerPackage}}.auth.config;
 
 import io.micronaut.context.annotation.ConfigurationInject;
 import io.micronaut.context.annotation.EachProperty;
@@ -21,15 +21,15 @@ import lombok.Setter;
 @Getter
 @Setter
 {{/lombok}}
-@EachProperty("security.basic-auth")
-public class HttpBasicAuthConfiguration implements ConfigurableAuthorization {
+@EachProperty("security{{#authConfigName}}.{{{authConfigName}}}{{/authConfigName}}.basic-auth")
+public class HttpBasicAuthConfig implements ConfigurableAuthorization {
 
     private final String name;
     private String username;
     private String password;
 
     @ConfigurationInject
-    public HttpBasicAuthConfiguration(
+    public HttpBasicAuthConfig(
             @Parameter String name,
             @NonNull String username,
             @NonNull String password

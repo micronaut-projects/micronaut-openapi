@@ -143,6 +143,14 @@ public class KotlinMicronautServerCodegen extends AbstractMicronautKotlinCodegen
         this.useAuth = useAuth;
     }
 
+    public void setGenerateStreamingFileUpload(boolean generateStreamingFileUpload) {
+        this.generateStreamingFileUpload = generateStreamingFileUpload;
+    }
+
+    public void setAot(boolean aot) {
+        this.aot = aot;
+    }
+
     @Override
     public void processOpts() {
         super.processOpts();
@@ -321,6 +329,7 @@ public class KotlinMicronautServerCodegen extends AbstractMicronautKotlinCodegen
         private boolean aot;
         private boolean ksp;
         private boolean coroutines;
+        private boolean generateStreamingFileUpload;
 
         @Override
         public KotlinMicronautServerOptionsBuilder withControllerPackage(String controllerPackage) {
@@ -388,6 +397,12 @@ public class KotlinMicronautServerCodegen extends AbstractMicronautKotlinCodegen
             return this;
         }
 
+        @Override
+        public KotlinMicronautServerOptionsBuilder withGenerateStreamingFileUpload(boolean generateStreamingFileUpload) {
+            this.generateStreamingFileUpload = generateStreamingFileUpload;
+            return this;
+        }
+
         ServerOptions build() {
             return new ServerOptions(
                 controllerPackage,
@@ -400,7 +415,8 @@ public class KotlinMicronautServerCodegen extends AbstractMicronautKotlinCodegen
                 generatedAnnotation,
                 aot,
                 ksp,
-                coroutines
+                coroutines,
+                generateStreamingFileUpload
             );
         }
     }
@@ -416,7 +432,8 @@ public class KotlinMicronautServerCodegen extends AbstractMicronautKotlinCodegen
         boolean generatedAnnotation,
         boolean aot,
         boolean ksp,
-        boolean coroutines
+        boolean coroutines,
+        boolean generateStreamingFileUpload
     ) {
     }
 }

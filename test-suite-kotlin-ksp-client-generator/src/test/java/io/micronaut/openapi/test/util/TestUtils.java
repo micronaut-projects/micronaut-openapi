@@ -77,7 +77,7 @@ public final class TestUtils {
         }
     }
 
-    public static void assertFileNotExists(String path) {
+    public static void assertFileDoesntExist(String path) {
         assertFalse(Paths.get(path).toFile().exists(), "File \"" + path + "\" should not exist");
     }
 

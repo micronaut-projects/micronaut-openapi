@@ -24,15 +24,6 @@ import java.util.List;
 public interface JavaMicronautClientOptionsBuilder extends GeneratorOptionsBuilder {
 
     /**
-     * Generate or not public no-args constructor always.
-     *
-     * @param noArgsConstructor generate or not public no-args constructor always
-     *
-     * @return this builder
-     */
-    JavaMicronautClientOptionsBuilder withNoArgsConstructor(boolean noArgsConstructor);
-
-    /**
      * If set to true the client will be configured for authorization.
      *
      * @param useAuth the authorization flag
@@ -42,13 +33,102 @@ public interface JavaMicronautClientOptionsBuilder extends GeneratorOptionsBuild
     JavaMicronautClientOptionsBuilder withAuthorization(boolean useAuth);
 
     /**
-     * Sets the authorization filter pattern.
+     * Generate authorization classes or not.
+     *
+     * @param generateAuthorizationClasses Generate authorization classes or not.
+     *
+     * @return this builder
+     */
+    JavaMicronautClientOptionsBuilder withGenerateAuthClasses(boolean generateAuthorizationClasses);
+
+    /**
+     * Generate AuthorizationFilter or not.
+     *
+     * @param authFilter Generate AuthorizationFilter or not.
+     *
+     * @return this builder
+     */
+    JavaMicronautClientOptionsBuilder withAuthFilter(boolean authFilter);
+
+    /**
+     * Generate AuthorizationFilter with support OAuth2.0 or not.
+     *
+     * @param useOauth if true, then AuthorizationFilter will be created with support OAuth2.0
+     *
+     * @return this builder
+     */
+    JavaMicronautClientOptionsBuilder withUseOauth(boolean useOauth);
+
+    /**
+     * Generate HttpBasicAuthConfig class or not.
+     *
+     * @param useBasicAuth if true, then HttpBasicAuthConfig class will be generated
+     *
+     * @return this builder
+     */
+    JavaMicronautClientOptionsBuilder withUseBasicAuth(boolean useBasicAuth);
+
+    /**
+     * Generate ApiKeyAuthConfig config or not.
+     *
+     * @param useApiKeyAuth if true, then ApiKeyAuthConfig class will be generated
+     *
+     * @return this builder
+     */
+    JavaMicronautClientOptionsBuilder withUseApiKeyAuth(boolean useApiKeyAuth);
+
+    /**
+     * Sets the authorization filter pattern. Can be a list of strings, or single string with `;` separator
      *
      * @param authorizationFilterPattern the filter pattern
      *
      * @return this builder
      */
     JavaMicronautClientOptionsBuilder withAuthorizationFilterPattern(String authorizationFilterPattern);
+
+    /**
+     * Sets the authorization filter pattern style. Available values: ANT, REGEX.
+     * <p>
+     * Default: ANT
+     *
+     * @param authorizationFilterPatternStyle the filter pattern style. Default: ANT
+     *
+     * @return this builder
+     */
+    JavaMicronautClientOptionsBuilder withAuthorizationFilterPatternStyle(String authorizationFilterPatternStyle);
+
+    /**
+     * Sets serviceId annotation property for AuthorizationFilter. Usefully, when use one filter for several clients.
+     * Can be a list of strings, or single string with `;` separator.
+     * <p>
+     * By default, if you don't set any authFilterClientIds, value will be a list with one element - `clientId` property value.
+     * If you don't want to add any serviceId annotation property for AuthorizationFilter, just set empty list (not null!).
+     *
+     * @param authFilterClientIds the list of client IDs, for which this filter will be used
+     *
+     * @return this builder
+     */
+    JavaMicronautClientOptionsBuilder withAuthFilterClientIds(List<String> authFilterClientIds);
+
+    /**
+     * The list of client IDs, for which this filter will NOT be used. Can be a list of strings,
+     * or single string with `;` separator (if you set this property, by additionalProperties)
+     *
+     * @param authFilterExcludedClientIds the list of client IDs, for which this filter will NOT be used
+     *
+     * @return this builder
+     */
+    JavaMicronautClientOptionsBuilder withAuthFilterExcludedClientIds(List<String> authFilterExcludedClientIds);
+
+    /**
+     * Authorization config name. Using in config properties for HttpBasicAuthConfig and ApiKeyAuthConfig.
+     * If not set, clientId value will be used.
+     *
+     * @param authConfigName the client id
+     *
+     * @return this builder
+     */
+    JavaMicronautClientOptionsBuilder withAuthConfigName(String authConfigName);
 
     /**
      * Sets the client id.
@@ -60,7 +140,7 @@ public interface JavaMicronautClientOptionsBuilder extends GeneratorOptionsBuild
     JavaMicronautClientOptionsBuilder withClientId(String clientId);
 
     /**
-     * Sets annotations for client type (class level annotations).
+     * Sets annotations for client type (class level annotations). Can be a list of strings, or single string with `;` separator
      *
      * @param additionalClientTypeAnnotations the type annotations
      *
@@ -76,15 +156,6 @@ public interface JavaMicronautClientOptionsBuilder extends GeneratorOptionsBuild
      * @return this builder
      */
     JavaMicronautClientOptionsBuilder withBasePathSeparator(String basePathSeparator);
-
-    /**
-     * If set to true, generated code will be with lombok annotations.
-     *
-     * @param lombok generate code with lombok annotations or not
-     *
-     * @return this builder
-     */
-    JavaMicronautClientOptionsBuilder withLombok(boolean lombok);
 
     /**
      * If set to true, the generated code will pluralize parameters and properties for arrays.
@@ -121,4 +192,22 @@ public interface JavaMicronautClientOptionsBuilder extends GeneratorOptionsBuild
      * @return this builder
      */
     JavaMicronautClientOptionsBuilder withClientPath(boolean clientPath);
+
+    /**
+     * Generate or not public no-args constructor always.
+     *
+     * @param noArgsConstructor generate or not public no-args constructor always
+     *
+     * @return this builder
+     */
+    JavaMicronautClientOptionsBuilder withNoArgsConstructor(boolean noArgsConstructor);
+
+    /**
+     * If set to true, generated code will be with lombok annotations.
+     *
+     * @param lombok generate code with lombok annotations or not
+     *
+     * @return this builder
+     */
+    JavaMicronautClientOptionsBuilder withLombok(boolean lombok);
 }

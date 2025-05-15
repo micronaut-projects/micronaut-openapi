@@ -1,5 +1,5 @@
 {{>common/licenseInfo}}
-package {{invokerPackage}}.auth.configuration
+package {{invokerPackage}}.auth.config
 
 import io.micronaut.context.annotation.ConfigurationInject
 import io.micronaut.context.annotation.EachProperty
@@ -14,8 +14,8 @@ import {{javaxPackage}}.annotation.Generated
 {{#generatedAnnotation}}
 {{>common/generatedAnnotation}}
 {{/generatedAnnotation}}
-@EachProperty("security.api-key-auth")
-data class ApiKeyAuthConfiguration @ConfigurationInject constructor(
+@EachProperty("security{{#authConfigName}}.{{{authConfigName}}}{{/authConfigName}}.api-key-auth")
+class ApiKeyAuthConfig @ConfigurationInject constructor(
     @Parameter
     override val name: String,
     @NonNull

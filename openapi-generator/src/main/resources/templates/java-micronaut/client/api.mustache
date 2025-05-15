@@ -62,7 +62,7 @@ public interface {{classname}} {
     {{!auth methods}}
         {{#configureAuth}}
             {{#authMethods}}
-    @Authorization(name = "{{{name}}}"{{!scopes}}{{#isOAuth}}, scopes = {{#scopes.1}}{{openbrace}}{{/scopes.1}}{{#scopes}}"{{{scope}}}"{{^-last}}, {{/-last}}{{/scopes}}{{#scopes.1}}{{closebrace}}{{/scopes.1}}{{/isOAuth}})
+    @Authorization({{#isOAuth}}name = {{/isOAuth}}"{{{name}}}"{{#isOAuth}}, scopes = {{#scopes.1}}{{openbrace}}{{/scopes.1}}{{#scopes}}"{{{scope}}}"{{^-last}}, {{/-last}}{{/scopes}}{{#scopes.1}}{{closebrace}}{{/scopes.1}}{{/isOAuth}})
             {{/authMethods}}
         {{/configureAuth}}
     {{!the method definition}}

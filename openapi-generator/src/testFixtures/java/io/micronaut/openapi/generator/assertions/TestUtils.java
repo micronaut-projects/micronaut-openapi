@@ -152,7 +152,7 @@ public class TestUtils {
         }
     }
 
-    public static void assertFileNotExists(Path path) {
+    public static void assertFileDoesntExist(Path path) {
         try {
             Files.readString(path);
             fail("File exists when it should not: " + path);

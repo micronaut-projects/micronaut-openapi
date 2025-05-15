@@ -522,24 +522,39 @@ public final class Utils {
     }
 
     public static List<String> readListOfStringsProperty(String property, Map<String, Object> additionalProperties) {
-        var additionalAnnotations = additionalProperties.get(property);
-        if (additionalAnnotations == null) {
+        var value = additionalProperties.get(property);
+        if (value == null) {
             return Collections.emptyList();
         }
-        List<String> additionalOneOfTypeAnnotationsList;
-        if (additionalAnnotations instanceof Collection<?> additionalAnnotationsCol) {
-            additionalOneOfTypeAnnotationsList = new ArrayList<>(additionalAnnotationsCol.size());
-            for (var el : additionalAnnotationsCol) {
-                additionalOneOfTypeAnnotationsList.add(el.toString().strip());
+        return readListOfStringsProperty(value);
+    }
+
+    public static List<String> readListOfStringsProperty(Object value) {
+        if (value == null) {
+            return Collections.emptyList();
+        }
+        List<String> parsedValues;
+        if (value instanceof Collection<?> valueCol) {
+            parsedValues = new ArrayList<>(valueCol.size());
+            for (var el : valueCol) {
+                var str = el.toString().strip();
+                if (str.isEmpty()) {
+                    continue;
+                }
+                parsedValues.add(str);
             }
         } else {
-            var elements = additionalAnnotations.toString().trim().split("\\s*(;|\\r?\\n)\\s*");
-            additionalOneOfTypeAnnotationsList = new ArrayList<>(elements.length);
+            var elements = value.toString().trim().split("\\s*(;|\\r?\\n)\\s*");
+            parsedValues = new ArrayList<>(elements.length);
             for (var el : elements) {
-                additionalOneOfTypeAnnotationsList.add(el.strip());
+                var str = el.strip();
+                if (str.isEmpty()) {
+                    continue;
+                }
+                parsedValues.add(str);
             }
         }
-        return additionalOneOfTypeAnnotationsList;
+        return parsedValues;
     }
 
     public static boolean readBooleanProperty(String propertyKey, Map<String, Object> additionalProperties, boolean defaultValue) {

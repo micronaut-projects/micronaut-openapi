@@ -1,7 +1,6 @@
 {{>common/licenseInfo}}
 package {{invokerPackage}}.auth
 
-import io.micronaut.context.BeanContext
 import io.micronaut.core.annotation.NonNull
 import io.micronaut.core.annotation.Nullable
 import io.micronaut.http.HttpRequest
@@ -9,19 +8,23 @@ import io.micronaut.http.HttpResponse
 import io.micronaut.http.MutableHttpRequest
 import io.micronaut.http.annotation.Filter
 import io.micronaut.http.filter.ClientFilterChain
+{{#authorizationFilterPatternStyle}}
+import io.micronaut.http.filter.FilterPatternStyle;
+{{/authorizationFilterPatternStyle}}
 import io.micronaut.http.filter.HttpClientFilter
+{{#useOauth}}
+import io.micronaut.context.BeanContext
 import io.micronaut.inject.qualifiers.Qualifiers
 import io.micronaut.security.oauth2.client.clientcredentials.ClientCredentialsClient
-import io.micronaut.security.oauth2.client.clientcredentials.propagation.ClientCredentialsHttpClientFilter
 import io.micronaut.security.oauth2.client.clientcredentials.propagation.ClientCredentialsTokenPropagator
 import io.micronaut.security.oauth2.configuration.OauthClientConfiguration
-import {{invokerPackage}}.auth.configuration.ConfigurableAuthorization
-import org.reactivestreams.Publisher
 import org.slf4j.LoggerFactory
+import org.slf4j.Logger
+{{/useOauth}}
+import {{invokerPackage}}.auth.config.ConfigurableAuthorization
+import org.reactivestreams.Publisher
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
-import java.util.stream.Collectors
-import java.util.stream.Stream
 {{#generatedAnnotation}}
 import {{javaxPackage}}.annotation.Generated
 {{/generatedAnnotation}}
@@ -29,29 +32,27 @@ import {{javaxPackage}}.annotation.Generated
 {{#generatedAnnotation}}
 {{>common/generatedAnnotation}}
 {{/generatedAnnotation}}
-@Filter({{#configureAuthFilterPattern}}"{{authorizationFilterPattern}}"{{/configureAuthFilterPattern}}{{^configureAuthFilterPattern}}Filter.MATCH_ALL_PATTERN{{/configureAuthFilterPattern}})
+@Filter({{#authFilterClientIds.0}}serviceId = [{{#authFilterClientIds}}"{{{.}}}"{{^-last}}, {{/-last}}{{/authFilterClientIds}}], {{/authFilterClientIds.0}}{{#authFilterExcludedClientIds.0}}excludeServiceId = [{{#authFilterExcludedClientIds}}"{{{.}}}"{{^-last}}, {{/-last}}{{/authFilterExcludedClientIds}}], {{/authFilterExcludedClientIds.0}}{{#authorizationFilterPatternStyle}}patternStyle = FilterPatternStyle.{{{authorizationFilterPatternStyle}}}, {{/authorizationFilterPatternStyle}}patterns = [{{#configureAuthFilterPattern}}{{#authorizationFilterPattern}}"{{{.}}}"{{^-last}}, {{/-last}}{{/authorizationFilterPattern}}{{/configureAuthFilterPattern}}{{^configureAuthFilterPattern}}Filter.MATCH_ALL_PATTERN{{/configureAuthFilterPattern}}])
 open class AuthorizationFilter(
-    var defaultTokenPropagator: ClientCredentialsTokenPropagator?,
-    clientConfigurations: Stream<OauthClientConfiguration>,
-    configurableAuthorizations: Stream<ConfigurableAuthorization>,
+{{#useOauth}}
+    val defaultTokenPropagator: ClientCredentialsTokenPropagator,
     private val beanContext: BeanContext,
+    clientConfigurations: List<OauthClientConfiguration>,
+{{/useOauth}}
+    @Nullable
+    configurableAuthorizations: List<ConfigurableAuthorization>?,
 ) : HttpClientFilter {
 
-    val authorizationsByName: Map<String, ConfigurableAuthorization?>
+    private val authorizationsByName = configurableAuthorizations?.associateBy { it.name } ?: emptyMap()
+{{#useOauth}}
 
-    private val clientConfigurationByName: Map<String, OauthClientConfiguration?>
-    private val tokenPropagatorByName: MutableMap<String, ClientCredentialsTokenPropagator>
-    private val clientCredentialsClientByName: MutableMap<String, ClientCredentialsClient>
+    private val clientConfigurationByName = clientConfigurations
+        .filter { it.isEnabled }
+        .associateBy { it.name }
 
-    init {
-        clientConfigurationByName = clientConfigurations
-            .filter { it.isEnabled }
-            .collect(Collectors.toMap({ it.name }, { it }))
-        tokenPropagatorByName = mutableMapOf()
-        clientCredentialsClientByName = mutableMapOf()
-        authorizationsByName = configurableAuthorizations
-            .collect(Collectors.toMap({ it.name }, { it }))
-    }
+    private val tokenPropagatorByName = mutableMapOf<String, ClientCredentialsTokenPropagator>()
+    private val clientCredentialsClientByName = mutableMapOf<String, ClientCredentialsClient>()
+{{/useOauth}}
 
     override fun doFilter(@NonNull request: MutableHttpRequest<*>, @NonNull chain: ClientFilterChain): Publisher<out HttpResponse<*>?> {
         val names = request.getAttribute(AuthorizationBinder.AUTHORIZATION_NAMES, MutableList::class.java).orElse(null)
@@ -59,75 +60,79 @@ open class AuthorizationFilter(
             return chain.proceed(request)
         }
 
-        val authorizers = ArrayList<Publisher<HttpRequest<*>?>>(names.size)
-        for (nameObject in names) {
-            if (nameObject !is String) {
+        val authorizers = ArrayList<Publisher<HttpRequest<*>>>(names.size)
+        for (name in names) {
+            if (name !is String) {
                 continue
             }
 
             // Check if other authorizations have the key
-            if (authorizationsByName.containsKey(nameObject)) {
-                val authorizer = authorizationsByName[nameObject]!!
-                authorizers.add(Mono.fromCallable {
-                    authorizer.applyAuthorization(request)
-                    request
-                })
+            if (authorizationsByName.containsKey(name)) {
+                authorizationsByName[name].let {
+                    authorizers.add(Mono.fromCallable {
+                        it!!.applyAuthorization(request)
+                        request
+                    })
+                }
+{{#useOauth}}
                 continue
+{{/useOauth}}
             }
+{{#useOauth}}
 
             // Perform OAuth authorization
-            val clientConfiguration = clientConfigurationByName[nameObject] ?: continue
-            val clientCredentialsClient = getClientCredentialsClient(nameObject)
+            val clientConfiguration = clientConfigurationByName[name] ?: continue
+            val clientCredentialsClient = getClientCredentialsClient(name)
             if (clientCredentialsClient == null) {
-                log.trace("Could not retrieve client credentials client for OAuth 2.0 client {}", nameObject)
+                log.trace("Could not retrieve client credentials client for OAuth 2.0 client {}", name)
                 continue
             }
-            val tokenHandler = getTokenPropagator(nameObject)
-            val authorizer = Flux.from(clientCredentialsClient
-                    .requestToken(getScope(clientConfiguration)))
-                    .map<HttpRequest<*>?> { tokenResponse ->
-                        val accessToken = tokenResponse.accessToken
-                        if (!accessToken.isNullOrEmpty()) {
-                            tokenHandler!!.writeToken(request, accessToken)
-                        }
-                        request
+            val tokenHandler = getTokenPropagator(name)
+            val authorizer = Flux.from(clientCredentialsClient.requestToken(getScope(clientConfiguration)))
+                .map<HttpRequest<*>> { tokenResponse ->
+                    val accessToken = tokenResponse.accessToken
+                    if (!accessToken.isNullOrEmpty()) {
+                        tokenHandler.writeToken(request, accessToken)
                     }
+                    request
+                }
             authorizers.add(authorizer)
+{{/useOauth}}
         }
         return Flux.concat(authorizers)
                 .switchMap { chain.proceed(request) }
     }
+{{#useOauth}}
 
-    protected fun getTokenPropagator(name: String): ClientCredentialsTokenPropagator? {
-        var tokenPropagator = tokenPropagatorByName[name]
-        if (tokenPropagator == null) {
-            tokenPropagator = beanContext.findBean(ClientCredentialsTokenPropagator::class.java, Qualifiers.byName(name))
-                    .orElse(defaultTokenPropagator)
-            if (tokenPropagator != null) {
-                tokenPropagatorByName[name] = tokenPropagator
+    protected fun getTokenPropagator(name: String): ClientCredentialsTokenPropagator =
+        tokenPropagatorByName[name]
+            ?: synchronized(tokenPropagatorByName) {
+                val tokenPropagator = beanContext.findBean(ClientCredentialsTokenPropagator::class.java, Qualifiers.byName(name)).orElse(defaultTokenPropagator)
+                if (tokenPropagator != null) {
+                    tokenPropagatorByName[name] = tokenPropagator
+                }
+                tokenPropagator
             }
-        }
-        return tokenPropagator
-    }
 
-    protected fun getClientCredentialsClient(name: String): ClientCredentialsClient? {
-        var client = clientCredentialsClientByName[name]
-        if (client == null) {
-            client = beanContext.findBean(ClientCredentialsClient::class.java, Qualifiers.byName(name)).orElse(null)
-            if (client != null) {
-                clientCredentialsClientByName[name] = client
+    protected fun getClientCredentialsClient(name: String): ClientCredentialsClient? =
+        clientCredentialsClientByName[name]
+            ?: synchronized(clientCredentialsClientByName) {
+                val client = beanContext.findBean(ClientCredentialsClient::class.java, Qualifiers.byName(name)).orElse(null)
+                if (client != null) {
+                    clientCredentialsClientByName[name] = client
+                }
+                client
             }
-        }
-        return client
-    }
 
-    protected fun getScope(oauthClient: @NonNull OauthClientConfiguration): @Nullable String? {
-        return oauthClient.clientCredentials
-                .flatMap { it.scope }
-                .orElse(null)
-    }
+    protected fun getScope(oauthClient: OauthClientConfiguration): String? =
+        oauthClient.clientCredentials
+            .flatMap { it.scope }
+            .orElse(null)
 
     companion object {
-        private val log = LoggerFactory.getLogger(ClientCredentialsHttpClientFilter::class.java)
+
+        @JvmField
+        val log: Logger = LoggerFactory.getLogger(this::class.java)
     }
+{{/useOauth}}
 }

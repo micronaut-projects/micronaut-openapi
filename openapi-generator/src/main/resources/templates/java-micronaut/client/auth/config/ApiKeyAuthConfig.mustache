@@ -1,5 +1,5 @@
 {{>common/licenseInfo}}
-package {{invokerPackage}}.auth.configuration;
+package {{invokerPackage}}.auth.config;
 
 import io.micronaut.context.annotation.ConfigurationInject;
 import io.micronaut.context.annotation.EachProperty;
@@ -22,8 +22,8 @@ import lombok.Setter;
 @Getter
 @Setter
 {{/lombok}}
-@EachProperty("security.api-key-auth")
-public class ApiKeyAuthConfiguration implements ConfigurableAuthorization {
+@EachProperty("security{{#authConfigName}}.{{{authConfigName}}}{{/authConfigName}}.api-key-auth")
+public class ApiKeyAuthConfig implements ConfigurableAuthorization {
 
     private final String name;
     private AuthKeyLocation location;
@@ -31,7 +31,7 @@ public class ApiKeyAuthConfiguration implements ConfigurableAuthorization {
     private String apiKey;
 
     @ConfigurationInject
-    public ApiKeyAuthConfiguration(
+    public ApiKeyAuthConfig(
             @Parameter String name,
             @NonNull AuthKeyLocation location,
             @NonNull String paramName,
@@ -64,20 +64,20 @@ public class ApiKeyAuthConfiguration implements ConfigurableAuthorization {
         return location;
     }
 
-    public String getParamName() {
-        return paramName;
-    }
-
-    public String getApiKey() {
-        return apiKey;
-    }
-
     public void setLocation(AuthKeyLocation location) {
         this.location = location;
     }
 
+    public String getParamName() {
+        return paramName;
+    }
+
     public void setParamName(String paramName) {
         this.paramName = paramName;
+    }
+
+    public String getApiKey() {
+        return apiKey;
     }
 
     public void setApiKey(String apiKey) {
@@ -88,6 +88,6 @@ public class ApiKeyAuthConfiguration implements ConfigurableAuthorization {
     public enum AuthKeyLocation {
         HEADER,
         QUERY,
-        COOKIE
+        COOKIE,
     }
 }

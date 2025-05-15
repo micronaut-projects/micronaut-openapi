@@ -9,6 +9,7 @@ import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
+import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 {{#generatedAnnotation}}
@@ -18,10 +19,10 @@ import {{javaxPackage}}.annotation.Generated;
 {{#generatedAnnotation}}
 {{>common/generatedAnnotation}}
 {{/generatedAnnotation}}
+@Bindable
 @Documented
 @Retention(RUNTIME)
-@Target(METHOD)
-@Bindable
+@Target({METHOD, ANNOTATION_TYPE})
 @Repeatable(Authorizations.class)
 public @interface Authorization {
 

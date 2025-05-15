@@ -829,7 +829,7 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                     @Produces("application/json", "application/xml")
                     @Secured("write:pets", "read:pets")
                     fun findPetsByStatus(
-                        @QueryValue(value = "status", defaultValue = "available") @Nullable @Format(FORMAT_MULTI) status: List<@NotNull String>? = arrayListOf("available"),
+                        @QueryValue("status", defaultValue = "available") @Nullable @Format(FORMAT_MULTI) status: List<@NotNull String>? = arrayListOf("available"),
                     ): Mono<List<Pet>>
                 """);
     }
@@ -933,10 +933,10 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
                     @Get("/{apiVersion}/orders")
                     @Secured(SecurityRule.IS_ANONYMOUS)
                     suspend fun browseSearchOrders(
-                        @PathVariable(name = "apiVersion", defaultValue = "v5") @NotNull apiVersion: BrowseSearchOrdersApiVersionParameter = BrowseSearchOrdersApiVersionParameter.V5,
+                        @PathVariable("apiVersion", defaultValue = "v5") @NotNull apiVersion: BrowseSearchOrdersApiVersionParameter = BrowseSearchOrdersApiVersionParameter.V5,
                         @QueryValue("ids") @Nullable @Format(FORMAT_MULTI) ids: List<@NotNull Int>? = null,
                         @Header("X-Favor-Token") @Nullable xFavorToken: String? = null,
-                        @Header(name = "Content-Type", defaultValue = "application/json") @Nullable contentType: String? = "application/json",
+                        @Header("Content-Type", defaultValue = "application/json") @Nullable contentType: String? = "application/json",
                         @QueryValue("algorithm") @Nullable algorithm: BrowseSearchOrdersAlgorithmParameter? = null,
                     ): String
                 """
@@ -1008,7 +1008,7 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
 
         assertFileExists(path + "api/PetApi.kt");
         assertFileContains(path + "api/PetApi.kt",
-            "@QueryValue(value = \"status\", defaultValue = \"available\") @Nullable @Format(FORMAT_MULTI) status: List<@NotNull String>? = arrayListOf(\"available\"),");
+            "@QueryValue(\"status\", defaultValue = \"available\") @Nullable @Format(FORMAT_MULTI) status: List<@NotNull String>? = arrayListOf(\"available\"),");
     }
 
     @Test
@@ -1020,7 +1020,7 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
 
         assertFileExists(path + "api/PetApi.kt");
         assertFileContains(path + "api/PetApi.kt",
-            "@QueryValue(value = \"status\", defaultValue = \"available\") @Nullable @Format(FORMAT_MULTI) status: List<@NotNull String>? = arrayListOf(\"available\"),");
+            "@QueryValue(\"status\", defaultValue = \"available\") @Nullable @Format(FORMAT_MULTI) status: List<@NotNull String>? = arrayListOf(\"available\"),");
     }
 
     @Test
@@ -1031,10 +1031,10 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
         String path = outputPath + "src/main/kotlin/org/openapitools/";
 
         assertFileContains(path + "api/DefaultApi.kt",
-            "@QueryValue(value = \"reqParamWithDefault\", defaultValue = \"test-req\") @NotNull reqParamWithDefault: String = \"test-req\",",
+            "@QueryValue(\"reqParamWithDefault\", defaultValue = \"test-req\") @NotNull reqParamWithDefault: String = \"test-req\",",
             "@QueryValue(\"reqParam\") @NotNull reqParam: String,",
             "@Body @NotNull @Valid teSTRequest: TESTRequest,",
-            "@QueryValue(value = \"optParamWithDefault\", defaultValue = \"test\") optParamWithDefault: String = \"test\",",
+            "@QueryValue(\"optParamWithDefault\", defaultValue = \"test\") optParamWithDefault: String = \"test\",",
             "@QueryValue(\"optParam\") @Nullable optParam: String? = null,"
         );
 
@@ -1061,10 +1061,10 @@ class KotlinMicronautServerCodegenTest extends AbstractMicronautCodegenTest {
         String path = outputPath + "src/main/kotlin/org/openapitools/";
 
         assertFileContains(path + "api/DefaultApi.kt",
-            "@QueryValue(value = \"reqParamWithDefault\", defaultValue = \"test-req\") @NotNull reqParamWithDefault: String = \"test-req\",",
+            "@QueryValue(\"reqParamWithDefault\", defaultValue = \"test-req\") @NotNull reqParamWithDefault: String = \"test-req\",",
             "@QueryValue(\"reqParam\") @NotNull reqParam: String,",
             "@Body @NotNull @Valid teSTRequest: TESTRequest,",
-            "@QueryValue(value = \"optParamWithDefault\", defaultValue = \"test\") @Nullable optParamWithDefault: String? = \"test\",",
+            "@QueryValue(\"optParamWithDefault\", defaultValue = \"test\") @Nullable optParamWithDefault: String? = \"test\",",
             "@QueryValue(\"optParam\") @Nullable optParam: String? = null,"
         );
 

@@ -119,4 +119,13 @@ public interface KotlinMicronautServerOptionsBuilder extends GeneratorOptionsBui
      * @return this builder
      */
     KotlinMicronautServerOptionsBuilder withCoroutines(boolean coroutines);
+
+    /**
+     * Whether to generate StreamingFileUpload type for file request body.
+     *
+     * @param generateStreamingFileUpload whether to generate StreamingFileUpload type for file request body
+     *
+     * @return this builder
+     */
+    KotlinMicronautServerOptionsBuilder withGenerateStreamingFileUpload(boolean generateStreamingFileUpload);
 }

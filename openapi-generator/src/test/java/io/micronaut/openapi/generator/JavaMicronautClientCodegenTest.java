@@ -237,7 +237,7 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         String outputPath = generateFiles(codegen, PETSTORE_PATH, CodegenConstants.SUPPORTING_FILES, CodegenConstants.APIS);
 
         // Micronaut AuthorizationFilter should default to match all patterns
-        assertFileContains(outputPath + "/src/main/java/org/openapitools/auth/AuthorizationFilter.java", "@Filter(Filter.MATCH_ALL_PATTERN)");
+        assertFileContains(outputPath + "/src/main/java/org/openapitools/auth/AuthorizationFilter.java", "@Filter(patterns = Filter.MATCH_ALL_PATTERN)");
     }
 
     @Test
@@ -248,7 +248,7 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
         String outputPath = generateFiles(codegen, PETSTORE_PATH, CodegenConstants.SUPPORTING_FILES, CodegenConstants.APIS);
 
         // Micronaut AuthorizationFilter should match the provided pattern
-        assertFileContains(outputPath + "/src/main/java/org/openapitools/auth/AuthorizationFilter.java", "@Filter(\"pet/**\")");
+        assertFileContains(outputPath + "/src/main/java/org/openapitools/auth/AuthorizationFilter.java", "@Filter(patterns = \"pet/**\")");
     }
 
     @Test
@@ -1712,5 +1712,193 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
             "@QueryValue(\"fieldsPipes\") @NotNull @Format(FORMAT_PIPES) Map<String, @NotNull String> fieldsPipes",
             "@QueryValue(\"fieldsDeepObject\") @NotNull @Format(FORMAT_DEEP_OBJECT) Map<String, @NotNull String> fieldsDeepObject"
         );
+    }
+
+    @Test
+    void testUseOauth() {
+        var codegen = new JavaMicronautClientCodegen();
+        codegen.setConfigureAuthorization(true);
+        codegen.setUseOauth(false);
+        String outputPath = generateFiles(codegen, PETSTORE_PATH, CodegenConstants.MODELS, CodegenConstants.APIS, CodegenConstants.SUPPORTING_FILES);
+        String path = outputPath + "src/main/java/org/openapitools/";
+
+        assertFileNotContains(path + "auth/AuthorizationFilter.java",
+            "import org.slf4j.Logger;",
+            "import org.slf4j.LoggerFactory;",
+            "import io.micronaut.context.BeanContext;",
+            "import io.micronaut.core.util.StringUtils;",
+            "import io.micronaut.core.util.Toggleable;",
+            "import io.micronaut.inject.qualifiers.Qualifiers;",
+            "import io.micronaut.security.oauth2.client.clientcredentials.ClientCredentialsClient;",
+            "import io.micronaut.security.oauth2.client.clientcredentials.ClientCredentialsConfiguration;",
+            "import io.micronaut.security.oauth2.client.clientcredentials.propagation.ClientCredentialsTokenPropagator;",
+            "import io.micronaut.security.oauth2.configuration.OauthClientConfiguration;",
+            "import java.util.HashMap;",
+            "private static final Logger log = LoggerFactory.getLogger(AuthorizationFilter.class);",
+            "protected ClientCredentialsTokenPropagator defaultTokenPropagator;",
+            "private final BeanContext beanContext;",
+            "private final Map<String, OauthClientConfiguration> clientConfigurationByName;",
+            "private final Map<String, ClientCredentialsTokenPropagator> tokenPropagatorByName;",
+            "private final Map<String, ClientCredentialsClient> clientCredentialsClientByName;",
+            "ClientCredentialsClient",
+            "Flux<HttpRequest<?>> authorizer = Flux.from(clientCredentialsClient"
+        );
+    }
+
+    @Test
+    void testUseBasicAuth() {
+        var codegen = new JavaMicronautClientCodegen();
+        codegen.setConfigureAuthorization(true);
+        codegen.setUseBasicAuth(false);
+        String outputPath = generateFiles(codegen, PETSTORE_PATH, CodegenConstants.MODELS, CodegenConstants.APIS, CodegenConstants.SUPPORTING_FILES);
+        String path = outputPath + "src/main/java/org/openapitools/";
+
+        assertFileExists(path + "auth/config/ConfigurableAuthorization.java");
+        assertFileExists(path + "auth/config/ApiKeyAuthConfig.java");
+        assertFileDoesntExist(path + "auth/config/HttpBasicAuthConfig.java");
+        assertFileExists(path + "auth/AuthorizationFilter.java");
+    }
+
+    @Test
+    void testUseApiKeyAuth() {
+        var codegen = new JavaMicronautClientCodegen();
+        codegen.setConfigureAuthorization(true);
+        codegen.setUseApiKeyAuth(false);
+        String outputPath = generateFiles(codegen, PETSTORE_PATH, CodegenConstants.MODELS, CodegenConstants.APIS, CodegenConstants.SUPPORTING_FILES);
+        String path = outputPath + "src/main/java/org/openapitools/";
+
+        assertFileExists(path + "auth/config/ConfigurableAuthorization.java");
+        assertFileDoesntExist(path + "auth/config/ApiKeyAuthConfig.java");
+        assertFileExists(path + "auth/config/HttpBasicAuthConfig.java");
+        assertFileExists(path + "auth/AuthorizationFilter.java");
+    }
+
+    @Test
+    void testAuthFilter() {
+        var codegen = new JavaMicronautClientCodegen();
+        codegen.setConfigureAuthorization(true);
+        codegen.setAuthFilter(false);
+        String outputPath = generateFiles(codegen, PETSTORE_PATH, CodegenConstants.MODELS, CodegenConstants.APIS, CodegenConstants.SUPPORTING_FILES);
+        String path = outputPath + "src/main/java/org/openapitools/";
+
+        assertFileExists(path + "auth/config/ConfigurableAuthorization.java");
+        assertFileExists(path + "auth/config/ApiKeyAuthConfig.java");
+        assertFileExists(path + "auth/config/HttpBasicAuthConfig.java");
+        assertFileDoesntExist(path + "auth/AuthorizationFilter.java");
+    }
+
+    @Test
+    void testGenerateAuthClasses() {
+        var codegen = new JavaMicronautClientCodegen();
+        codegen.setConfigureAuthorization(true);
+        codegen.setGenerateAuthClasses(false);
+        String outputPath = generateFiles(codegen, PETSTORE_PATH, CodegenConstants.MODELS, CodegenConstants.APIS, CodegenConstants.SUPPORTING_FILES);
+        String path = outputPath + "src/main/java/org/openapitools/";
+
+        assertFileDoesntExist(path + "auth/config/ConfigurableAuthorization.java");
+        assertFileDoesntExist(path + "auth/config/ApiKeyAuthConfig.java");
+        assertFileDoesntExist(path + "auth/config/HttpBasicAuthConfig.java");
+        assertFileDoesntExist(path + "auth/AuthorizationFilter.java");
+        assertFileDoesntExist(path + "auth/Authorizations.java");
+        assertFileDoesntExist(path + "auth/AuthorizationBinder.java");
+        assertFileDoesntExist(path + "auth/Authorization.java");
+    }
+
+    @Test
+    void testAuthWithClientIdAndMultiplePatterns() {
+        var codegen = new JavaMicronautClientCodegen();
+        codegen.setConfigureAuthorization(true);
+        codegen.setClientId("myApiClient");
+        codegen.setAuthorizationFilterPattern("/v1/user/**;/v1/company/**;/v1/payment/**");
+        String outputPath = generateFiles(codegen, PETSTORE_PATH, CodegenConstants.MODELS, CodegenConstants.APIS, CodegenConstants.SUPPORTING_FILES);
+        String path = outputPath + "src/main/java/org/openapitools/";
+
+        assertFileContains(path + "auth/AuthorizationFilter.java",
+            "@Filter(serviceId = \"myApiClient\", patterns = {\"/v1/user/**\", \"/v1/company/**\", \"/v1/payment/**\"})");
+        assertFileContains(path + "auth/AuthorizationBinder.java",
+            "public static final CharSequence AUTHORIZATION_NAMES = \"micronaut.security.myApiClient.AUTHORIZATION_NAMES\";");
+        assertFileContains(path + "auth/config/ApiKeyAuthConfig.java",
+            "@EachProperty(\"security.myApiClient.api-key-auth\")");
+        assertFileContains(path + "auth/config/HttpBasicAuthConfig.java",
+            "@EachProperty(\"security.myApiClient.basic-auth\")");
+    }
+
+    @Test
+    void testAuthWithAuthConfigName() {
+        var codegen = new JavaMicronautClientCodegen();
+        codegen.setConfigureAuthorization(true);
+        codegen.setClientId("myApiClient");
+        codegen.setAuthConfigName("test");
+        String outputPath = generateFiles(codegen, PETSTORE_PATH, CodegenConstants.MODELS, CodegenConstants.APIS, CodegenConstants.SUPPORTING_FILES);
+        String path = outputPath + "src/main/java/org/openapitools/";
+
+        assertFileContains(path + "auth/AuthorizationFilter.java",
+            "@Filter(serviceId = \"myApiClient\", patterns = Filter.MATCH_ALL_PATTERN)");
+        assertFileContains(path + "auth/AuthorizationBinder.java",
+            "public static final CharSequence AUTHORIZATION_NAMES = \"micronaut.security.test.AUTHORIZATION_NAMES\";");
+        assertFileContains(path + "auth/config/ApiKeyAuthConfig.java",
+            "@EachProperty(\"security.test.api-key-auth\")");
+        assertFileContains(path + "auth/config/HttpBasicAuthConfig.java",
+            "@EachProperty(\"security.test.basic-auth\")");
+    }
+
+    @Test
+    void testAuthWithAuthFilterClientIds() {
+        var codegen = new JavaMicronautClientCodegen();
+        codegen.setConfigureAuthorization(true);
+        codegen.setClientId("myApiClient");
+        codegen.setAuthFilterClientIds(List.of("test1", "test2", "test3"));
+        codegen.setAuthorizationFilterPattern("/v1/user/**;/v1/company/**;/v1/payment/**");
+        String outputPath = generateFiles(codegen, PETSTORE_PATH, CodegenConstants.MODELS, CodegenConstants.APIS, CodegenConstants.SUPPORTING_FILES);
+        String path = outputPath + "src/main/java/org/openapitools/";
+
+        assertFileContains(path + "auth/AuthorizationFilter.java",
+            "@Filter(serviceId = {\"test1\", \"test2\", \"test3\"}, patterns = {\"/v1/user/**\", \"/v1/company/**\", \"/v1/payment/**\"})");
+    }
+
+    @Test
+    void testAuthWithAuthFilterExcludedClientIds() {
+        var codegen = new JavaMicronautClientCodegen();
+        codegen.setConfigureAuthorization(true);
+        codegen.setClientId("myApiClient");
+        codegen.setAuthFilterExcludedClientIds(List.of("test1", "test2", "test3"));
+        codegen.setAuthorizationFilterPattern("/v1/user/**;/v1/company/**;/v1/payment/**");
+        String outputPath = generateFiles(codegen, PETSTORE_PATH, CodegenConstants.MODELS, CodegenConstants.APIS, CodegenConstants.SUPPORTING_FILES);
+        String path = outputPath + "src/main/java/org/openapitools/";
+
+        assertFileContains(path + "auth/AuthorizationFilter.java",
+            "@Filter(serviceId = \"myApiClient\", excludeServiceId = {\"test1\", \"test2\", \"test3\"}, patterns = {\"/v1/user/**\", \"/v1/company/**\", \"/v1/payment/**\"})");
+    }
+
+    @Test
+    void testAuthWithAuthFilterExcludedClientIdsAndEmptyAuthFilterClientIds() {
+        var codegen = new JavaMicronautClientCodegen();
+        codegen.setConfigureAuthorization(true);
+        codegen.setClientId("myApiClient");
+        codegen.setAuthFilterClientIds(List.of());
+        codegen.setAuthFilterExcludedClientIds(List.of("test1", "test2", "test3"));
+        codegen.setAuthorizationFilterPattern("/v1/user/**;/v1/company/**;/v1/payment/**");
+        String outputPath = generateFiles(codegen, PETSTORE_PATH, CodegenConstants.MODELS, CodegenConstants.APIS, CodegenConstants.SUPPORTING_FILES);
+        String path = outputPath + "src/main/java/org/openapitools/";
+
+        assertFileContains(path + "auth/AuthorizationFilter.java",
+            "@Filter(excludeServiceId = {\"test1\", \"test2\", \"test3\"}, patterns = {\"/v1/user/**\", \"/v1/company/**\", \"/v1/payment/**\"})");
+    }
+
+    @Test
+    void testAuthWithAuthorizationFilterPatternStyle() {
+        var codegen = new JavaMicronautClientCodegen();
+        codegen.setConfigureAuthorization(true);
+        codegen.setClientId("myApiClient");
+        codegen.setAuthFilterClientIds(List.of());
+        codegen.setAuthFilterExcludedClientIds(List.of("test1", "test2", "test3"));
+        codegen.setAuthorizationFilterPattern("/v1/user/**;/v1/company/**;/v1/payment/**");
+        codegen.setAuthorizationFilterPatternStyle("regex");
+        String outputPath = generateFiles(codegen, PETSTORE_PATH, CodegenConstants.MODELS, CodegenConstants.APIS, CodegenConstants.SUPPORTING_FILES);
+        String path = outputPath + "src/main/java/org/openapitools/";
+
+        assertFileContains(path + "auth/AuthorizationFilter.java",
+            "import io.micronaut.http.filter.FilterPatternStyle;",
+            "@Filter(excludeServiceId = {\"test1\", \"test2\", \"test3\"}, patternStyle = FilterPatternStyle.REGEX, patterns = {\"/v1/user/**\", \"/v1/company/**\", \"/v1/payment/**\"})");
     }
 }

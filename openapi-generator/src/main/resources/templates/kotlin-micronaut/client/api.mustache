@@ -58,7 +58,7 @@ interface {{classname}} {
     {{!auth methods}}
         {{#configureAuth}}
             {{#authMethods}}
-    @Authorization(value = "{{{name}}}"{{!scopes}}{{#isOAuth}}, scopes = [{{#scopes}}"{{{scope}}}"{{^-last}}, {{/-last}}{{/scopes}}]{{/isOAuth}})
+    @Authorization("{{{name}}}"{{#isOAuth}}, scopes = [{{#scopes}}"{{{scope}}}"{{^-last}}, {{/-last}}{{/scopes}}]{{/isOAuth}})
             {{/authMethods}}
         {{/configureAuth}}
     {{!the method definition}}

@@ -8,10 +8,10 @@ import io.micronaut.core.naming.NameUtils
 import io.micronaut.http.MutableHttpRequest
 import io.micronaut.http.client.bind.AnnotatedClientRequestBinder
 import io.micronaut.http.client.bind.ClientRequestUriContext
-import {{javaxPackage}}.inject.Singleton
 {{#generatedAnnotation}}
 import {{javaxPackage}}.annotation.Generated
 {{/generatedAnnotation}}
+import {{javaxPackage}}.inject.Singleton
 
 {{#generatedAnnotation}}
 {{>common/generatedAnnotation}}
@@ -20,34 +20,33 @@ import {{javaxPackage}}.annotation.Generated
 open class AuthorizationBinder : AnnotatedClientRequestBinder<Authorization> {
 
     @NonNull
-    override fun getAnnotationType(): Class<Authorization> {
-        return Authorization::class.java
-    }
+    override fun getAnnotationType(): Class<Authorization> =
+        Authorization::class.java
 
     override fun bind(
         @NonNull context: MethodInvocationContext<Any, Any>,
         @NonNull uriContext: ClientRequestUriContext,
         @NonNull request: MutableHttpRequest<*>,
     ) {
-        val annotations: List<AnnotationValue<Authorization>> = context.annotationMetadata
-            .getAnnotationValuesByType(Authorization::class.java)
-
-        if (annotations.isNotEmpty()) {
-            val authorizationNames = ArrayList<String>()
-            for (ann in annotations) {
-                ann.stringValue("value")
-                    .filter{ s -> !s.isNullOrEmpty() }
-                    .ifPresent { v -> authorizationNames.add(configurationName(v)) }
-            }
-            request.setAttribute(AUTHORIZATION_NAMES, authorizationNames)
+        val annotations: List<AnnotationValue<Authorization>> = context.getAnnotationValuesByType(Authorization::class.java)
+        if (annotations.isEmpty()) {
+            return
         }
+
+        val authorizationNames = ArrayList<String>()
+        for (ann in annotations) {
+            ann.stringValue("value")
+                .filter { !it.isNullOrEmpty() }
+                .ifPresent { authorizationNames.add(configurationName(it)) }
+        }
+        request.setAttribute(AUTHORIZATION_NAMES, authorizationNames)
     }
 
-    private fun configurationName(name: String): String {
-        return NameUtils.hyphenate(name.replace('.', '_'), true)
-    }
+    private fun configurationName(name: String): String =
+        NameUtils.hyphenate(name.replace('.', '_'), true)
 
     companion object {
-        const val AUTHORIZATION_NAMES = "micronaut.security.AUTHORIZATION_NAMES"
+
+        const val AUTHORIZATION_NAMES = "micronaut.security{{#authConfigName}}.{{{authConfigName}}}{{/authConfigName}}.AUTHORIZATION_NAMES"
     }
 }
