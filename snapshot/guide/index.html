@@ -255,6 +255,8 @@
         
         <div class="toc-item" style="margin-left:10px" id="toc-item-springWithWrappedRequestData"><a href="#springWithWrappedRequestData"><strong>23.3</strong><span>Spring with wrapped request data</span></a></div>
         
+        <div class="toc-item" style="margin-left:10px" id="toc-item-springBootActuator"><a href="#springBootActuator"><strong>23.4</strong><span>Spring Boot Actuator endpoints</span></a></div>
+        
         <div class="toc-item" style="margin-left:0px" id="toc-item-openApiGuides"><a href="#openApiGuides"><strong>24</strong><span>Guides</span></a></div>
         
         <div class="toc-item" style="margin-left:0px" id="toc-item-repository"><a href="#repository"><strong>25</strong><span>Repository</span></a></div>
@@ -1140,6 +1142,46 @@ micronaut:<br>
 &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;title: Title 2<br></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong>endpoints.enabled</strong></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Process or not endpoints (micronaut-management / spring-boot-actuator / custom endpoints)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Default: <code>false</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong>endpoints.tags</strong></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Specific tags for all endpoints</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong>endpoints.path</strong></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Specific path for all endpoints</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong>endpoints.servers</strong></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Specific servers for all endpoints</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong>endpoints.security-requirements</strong></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Specific security requirements for endpoints servers</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong>endpoints.extensions</strong></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Specific Open API extensions for all endpoints</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong>endpoints.groups</strong></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Specific groups for all endpoints</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong>endpoints.groups-excluded</strong></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Specific excluded groups for all endpoints</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
 </tbody>
 </table>
 
@@ -1937,25 +1979,6 @@ the project directory through the annotation processor setting <code>micronaut.o
 }</code></pre>
 </div>
 </div>
-<div class="admonitionblock important">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-important" title="Important"></i>
-</td>
-<td class="content">
-<div class="paragraph">
-<p>If you use KSP need to disable incremental processing:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>ksp.incremental=false</pre>
-</div>
-</div>
-</td>
-</tr>
-</table>
-</div>
 
 <h1 id="swaggerAnnotations"><a class="anchor" href="#swaggerAnnotations"></a>14 Swagger Annotations</h1>
 
@@ -2530,11 +2553,17 @@ class Owner {
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-properties hljs" data-lang="properties">endpoints.enabled=true
 endpoints.tags=Management Endpoints
+
+# You need to set these classes only if you use custom endpoints or replace
+# standard micronaut endpoint implementations
 endpoints.routes.class=io.micronaut.management.endpoint.routes.RoutesEndpoint
 endpoints.beans.class=io.micronaut.management.endpoint.beans.BeansEndpoint
 endpoints.health.class=io.micronaut.management.endpoint.health.HealthEndpoint
 endpoints.loggers.class=io.micronaut.management.endpoint.loggers.LoggersEndpoint
-endpoints.refresh.class=io.micronaut.management.endpoint.refresh.RefreshEndpoint</code></pre>
+endpoints.refresh.class=io.micronaut.management.endpoint.refresh.RefreshEndpoint
+
+# if you want to move endpoints to different file / files
+endpoints.groups=management</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -6341,6 +6370,25 @@ public class OpenApiContextPathFilter implements HttpServerFilter {
         "200":
           description: testMultipart 200 response</code></pre>
 </div>
+</div>
+
+<h2 id="springBootActuator"><a class="anchor" href="#springBootActuator"></a>23.4 Spring Boot Actuator endpoints</h2>
+
+<div class='contribute-btn'>
+    <button type='button' class='btn btn-default' onclick='window.location.href="https://github.com/micronaut-projects/micronaut-openapi/edit/6.16.x/src/main/docs/guide/spring/springBootActuator.adoc"'>
+        <i class='fa fa-pencil-square-o'></i> Improve this doc
+    </button>
+</div>
+
+
+<div class="paragraph">
+<p>If you use <code>spring-boot-actuator</code> and want to see actuator endpoints in your Open API specification file - just enable endpoints processing by property <code>enpoints.enabled = true</code>.</p>
+</div>
+<div class="paragraph">
+<p>By default, all standard Spring Boot Actuator endpoints will be processed. It will also take into account your configuration and what endpoints you currently have enabled. You can also exclude unnecessary endpoints from the specification if you don&#8217;t need them.</p>
+</div>
+<div class="paragraph">
+<p>More information you can read in <a href="#micronautendpoints">Endpoints</a> section</p>
 </div>
 
 <h1 id="openApiGuides"><a class="anchor" href="#openApiGuides"></a>24 Guides</h1>

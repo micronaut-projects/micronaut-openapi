@@ -127,7 +127,9 @@ implements io.micronaut.inject.visitor.TypeElementVisitor&lt;<a href="https://do
 <div class="table-header col-last">Description</div>
 <div class="col-constructor-name even-row-color"><code><a href="#%3Cinit%3E()" class="member-name-link">OpenApiControllerVisitor</a>()</code></div>
 <div class="col-last even-row-color">&nbsp;</div>
-<div class="col-constructor-name odd-row-color"><code><a href="#%3Cinit%3E(java.util.List,java.util.List,java.lang.String)" class="member-name-link">OpenApiControllerVisitor</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;io.micronaut.core.annotation.AnnotationValue&lt;io.swagger.v3.oas.annotations.tags.Tag&gt;&gt;&nbsp;additionalTags,
+<div class="col-constructor-name odd-row-color"><code><a href="#%3Cinit%3E(java.lang.String,java.util.List,java.util.List,java.util.List,java.lang.String)" class="member-name-link">OpenApiControllerVisitor</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;description,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;io.micronaut.core.annotation.AnnotationValue&lt;io.swagger.v3.oas.annotations.extensions.Extension&gt;&gt;&nbsp;additionalExtensions,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;io.micronaut.core.annotation.AnnotationValue&lt;io.swagger.v3.oas.annotations.tags.Tag&gt;&gt;&nbsp;additionalTags,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;io.micronaut.core.annotation.AnnotationValue&lt;io.swagger.v3.oas.annotations.security.SecurityRequirement&gt;&gt;&nbsp;additionalSecurityRequirements,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;customUri)</code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
@@ -151,47 +153,58 @@ implements io.micronaut.inject.visitor.TypeElementVisitor&lt;<a href="https://do
 <div class="block">Returns the consumes media types.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>protected <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#description(io.micronaut.inject.ast.MethodElement)" class="member-name-link">description</a><wbr>(io.micronaut.inject.ast.MethodElement&nbsp;element)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getClassDescription(io.micronaut.inject.visitor.VisitorContext)" class="member-name-link">getClassDescription</a><wbr>(io.micronaut.inject.visitor.VisitorContext&nbsp;context)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Returns the description for the element.</div>
+<div class="block">Returns the description for the class.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>int</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getOrder()" class="member-name-link">getOrder</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>protected <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;io.swagger.v3.oas.models.tags.Tag&gt;</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getUserDefinedClassTags(io.micronaut.inject.ast.ClassElement,io.micronaut.inject.visitor.VisitorContext)" class="member-name-link">getUserDefinedClassTags</a><wbr>(io.micronaut.inject.ast.ClassElement&nbsp;element,
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>protected <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getMethodDescription(io.micronaut.inject.visitor.VisitorContext)" class="member-name-link">getMethodDescription</a><wbr>(io.micronaut.inject.visitor.VisitorContext&nbsp;context)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Returns the description for the method.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>int</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getOrder()" class="member-name-link">getOrder</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>protected <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;io.swagger.v3.oas.models.tags.Tag&gt;</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getUserDefinedClassTags(io.micronaut.inject.ast.ClassElement,io.micronaut.inject.visitor.VisitorContext)" class="member-name-link">getUserDefinedClassTags</a><wbr>(io.micronaut.inject.ast.ClassElement&nbsp;element,
  io.micronaut.inject.visitor.VisitorContext&nbsp;context)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns the class tags.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>protected io.micronaut.http.HttpMethod</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#httpMethod(io.micronaut.inject.ast.MethodElement)" class="member-name-link">httpMethod</a><wbr>(io.micronaut.inject.ast.MethodElement&nbsp;element)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>protected io.micronaut.http.HttpMethod</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#httpMethod(io.micronaut.inject.ast.MethodElement)" class="member-name-link">httpMethod</a><wbr>(io.micronaut.inject.ast.MethodElement&nbsp;element)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns the HttpMethod of the element.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>protected boolean</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#ignore(io.micronaut.inject.ast.ClassElement,io.micronaut.inject.visitor.VisitorContext)" class="member-name-link">ignore</a><wbr>(io.micronaut.inject.ast.ClassElement&nbsp;element,
- io.micronaut.inject.visitor.VisitorContext&nbsp;context)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Returns true if the specified element should not be processed.</div>
-</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>protected boolean</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#ignore(io.micronaut.inject.ast.MethodElement,io.micronaut.inject.visitor.VisitorContext)" class="member-name-link">ignore</a><wbr>(io.micronaut.inject.ast.MethodElement&nbsp;element,
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#ignore(io.micronaut.inject.ast.ClassElement,io.micronaut.inject.visitor.VisitorContext)" class="member-name-link">ignore</a><wbr>(io.micronaut.inject.ast.ClassElement&nbsp;element,
  io.micronaut.inject.visitor.VisitorContext&nbsp;context)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns true if the specified element should not be processed.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>protected <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;io.swagger.v3.oas.models.security.SecurityRequirement&gt;</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#methodSecurityRequirements(io.micronaut.inject.ast.MethodElement,io.micronaut.inject.visitor.VisitorContext)" class="member-name-link">methodSecurityRequirements</a><wbr>(io.micronaut.inject.ast.MethodElement&nbsp;element,
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>protected boolean</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#ignore(io.micronaut.inject.ast.MethodElement,io.micronaut.inject.visitor.VisitorContext)" class="member-name-link">ignore</a><wbr>(io.micronaut.inject.ast.MethodElement&nbsp;element,
  io.micronaut.inject.visitor.VisitorContext&nbsp;context)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Returns true if the specified element should not be processed.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>protected <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;io.swagger.v3.oas.models.security.SecurityRequirement&gt;</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#methodSecurityRequirements(io.micronaut.inject.ast.MethodElement,io.micronaut.inject.visitor.VisitorContext)" class="member-name-link">methodSecurityRequirements</a><wbr>(io.micronaut.inject.ast.MethodElement&nbsp;element,
+ io.micronaut.inject.visitor.VisitorContext&nbsp;context)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns the security requirements at method level.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>protected <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;io.swagger.v3.oas.models.servers.Server&gt;</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#methodServers(io.micronaut.inject.ast.MethodElement,io.micronaut.inject.visitor.VisitorContext)" class="member-name-link">methodServers</a><wbr>(io.micronaut.inject.ast.MethodElement&nbsp;element,
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>protected <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;io.swagger.v3.oas.models.servers.Server&gt;</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#methodServers(io.micronaut.inject.ast.MethodElement,io.micronaut.inject.visitor.VisitorContext)" class="member-name-link">methodServers</a><wbr>(io.micronaut.inject.ast.MethodElement&nbsp;element,
+ io.micronaut.inject.visitor.VisitorContext&nbsp;context)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Returns the servers at method level.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>protected <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&gt;</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#operationExtensions(io.micronaut.inject.ast.MethodElement,io.micronaut.inject.visitor.VisitorContext)" class="member-name-link">operationExtensions</a><wbr>(io.micronaut.inject.ast.MethodElement&nbsp;element,
  io.micronaut.inject.visitor.VisitorContext&nbsp;context)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Returns the servers at method level.</div>
+<div class="block">Returns the extensions at method level.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>protected void</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#processSecuritySchemes(io.micronaut.inject.ast.ClassElement,io.micronaut.inject.visitor.VisitorContext)" class="member-name-link">processSecuritySchemes</a><wbr>(io.micronaut.inject.ast.ClassElement&nbsp;element,
@@ -247,9 +260,11 @@ implements io.micronaut.inject.visitor.TypeElementVisitor&lt;<a href="https://do
 </section>
 </li>
 <li>
-<section class="detail" id="&lt;init&gt;(java.util.List,java.util.List,java.lang.String)">
+<section class="detail" id="&lt;init&gt;(java.lang.String,java.util.List,java.util.List,java.util.List,java.lang.String)">
 <h3>OpenApiControllerVisitor</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="element-name">OpenApiControllerVisitor</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;io.micronaut.core.annotation.AnnotationValue&lt;io.swagger.v3.oas.annotations.tags.Tag&gt;&gt;&nbsp;additionalTags,
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="element-name">OpenApiControllerVisitor</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;description,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;io.micronaut.core.annotation.AnnotationValue&lt;io.swagger.v3.oas.annotations.extensions.Extension&gt;&gt;&nbsp;additionalExtensions,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;io.micronaut.core.annotation.AnnotationValue&lt;io.swagger.v3.oas.annotations.tags.Tag&gt;&gt;&nbsp;additionalTags,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;io.micronaut.core.annotation.AnnotationValue&lt;io.swagger.v3.oas.annotations.security.SecurityRequirement&gt;&gt;&nbsp;additionalSecurityRequirements,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;customUri)</span></div>
 </section>
@@ -385,18 +400,34 @@ implements io.micronaut.inject.visitor.TypeElementVisitor&lt;<a href="https://do
 </section>
 </li>
 <li>
-<section class="detail" id="description(io.micronaut.inject.ast.MethodElement)">
-<h3>description</h3>
-<div class="member-signature"><span class="modifiers">protected</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">description</span><wbr><span class="parameters">(io.micronaut.inject.ast.MethodElement&nbsp;element)</span></div>
-<div class="block"><span class="descfrm-type-label">Description copied from class:&nbsp;<code><a href="AbstractOpenApiEndpointVisitor.html#description(io.micronaut.inject.ast.MethodElement)">AbstractOpenApiEndpointVisitor</a></code></span></div>
-<div class="block">Returns the description for the element.</div>
+<section class="detail" id="getClassDescription(io.micronaut.inject.visitor.VisitorContext)">
+<h3>getClassDescription</h3>
+<div class="member-signature"><span class="modifiers">protected</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">getClassDescription</span><wbr><span class="parameters">(io.micronaut.inject.visitor.VisitorContext&nbsp;context)</span></div>
+<div class="block"><span class="descfrm-type-label">Description copied from class:&nbsp;<code><a href="AbstractOpenApiEndpointVisitor.html#getClassDescription(io.micronaut.inject.visitor.VisitorContext)">AbstractOpenApiEndpointVisitor</a></code></span></div>
+<div class="block">Returns the description for the class.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
-<dd><code><a href="AbstractOpenApiEndpointVisitor.html#description(io.micronaut.inject.ast.MethodElement)">description</a></code>&nbsp;in class&nbsp;<code><a href="AbstractOpenApiEndpointVisitor.html" title="class in io.micronaut.openapi.visitor">AbstractOpenApiEndpointVisitor</a></code></dd>
+<dd><code><a href="AbstractOpenApiEndpointVisitor.html#getClassDescription(io.micronaut.inject.visitor.VisitorContext)">getClassDescription</a></code>&nbsp;in class&nbsp;<code><a href="AbstractOpenApiEndpointVisitor.html" title="class in io.micronaut.openapi.visitor">AbstractOpenApiEndpointVisitor</a></code></dd>
 <dt>Parameters:</dt>
-<dd><code>element</code> - The MethodElement.</dd>
+<dd><code>context</code> - the visitor context</dd>
 <dt>Returns:</dt>
-<dd>The description for the element.</dd>
+<dd>The description for the class.</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="getMethodDescription(io.micronaut.inject.visitor.VisitorContext)">
+<h3>getMethodDescription</h3>
+<div class="member-signature"><span class="modifiers">protected</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">getMethodDescription</span><wbr><span class="parameters">(io.micronaut.inject.visitor.VisitorContext&nbsp;context)</span></div>
+<div class="block"><span class="descfrm-type-label">Description copied from class:&nbsp;<code><a href="AbstractOpenApiEndpointVisitor.html#getMethodDescription(io.micronaut.inject.visitor.VisitorContext)">AbstractOpenApiEndpointVisitor</a></code></span></div>
+<div class="block">Returns the description for the method.</div>
+<dl class="notes">
+<dt>Specified by:</dt>
+<dd><code><a href="AbstractOpenApiEndpointVisitor.html#getMethodDescription(io.micronaut.inject.visitor.VisitorContext)">getMethodDescription</a></code>&nbsp;in class&nbsp;<code><a href="AbstractOpenApiEndpointVisitor.html" title="class in io.micronaut.openapi.visitor">AbstractOpenApiEndpointVisitor</a></code></dd>
+<dt>Parameters:</dt>
+<dd><code>context</code> - the visitor context</dd>
+<dt>Returns:</dt>
+<dd>The description for the method.</dd>
 </dl>
 </section>
 </li>
@@ -415,6 +446,24 @@ implements io.micronaut.inject.visitor.TypeElementVisitor&lt;<a href="https://do
 <dd><code>context</code> - The context.</dd>
 <dt>Returns:</dt>
 <dd>The class tags.</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="operationExtensions(io.micronaut.inject.ast.MethodElement,io.micronaut.inject.visitor.VisitorContext)">
+<h3>operationExtensions</h3>
+<div class="member-signature"><span class="modifiers">protected</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&gt;</span>&nbsp;<span class="element-name">operationExtensions</span><wbr><span class="parameters">(io.micronaut.inject.ast.MethodElement&nbsp;element,
+ io.micronaut.inject.visitor.VisitorContext&nbsp;context)</span></div>
+<div class="block"><span class="descfrm-type-label">Description copied from class:&nbsp;<code><a href="AbstractOpenApiEndpointVisitor.html#operationExtensions(io.micronaut.inject.ast.MethodElement,io.micronaut.inject.visitor.VisitorContext)">AbstractOpenApiEndpointVisitor</a></code></span></div>
+<div class="block">Returns the extensions at method level.</div>
+<dl class="notes">
+<dt>Specified by:</dt>
+<dd><code><a href="AbstractOpenApiEndpointVisitor.html#operationExtensions(io.micronaut.inject.ast.MethodElement,io.micronaut.inject.visitor.VisitorContext)">operationExtensions</a></code>&nbsp;in class&nbsp;<code><a href="AbstractOpenApiEndpointVisitor.html" title="class in io.micronaut.openapi.visitor">AbstractOpenApiEndpointVisitor</a></code></dd>
+<dt>Parameters:</dt>
+<dd><code>element</code> - The MethodElement.</dd>
+<dd><code>context</code> - The context.</dd>
+<dt>Returns:</dt>
+<dd>The extensions.</dd>
 </dl>
 </section>
 </li>
