@@ -1681,4 +1681,18 @@ class JavaMicronautClientCodegenTest extends AbstractMicronautCodegenTest {
                 }
             """);
     }
+
+    @Test
+    void testReadOnlyRequiredPropertyInConstructor() {
+        var codegen = new JavaMicronautClientCodegen();
+        String outputPath = generateFiles(codegen, "src/test/resources/3_0/oas.yml", CodegenConstants.MODELS, CodegenConstants.APIS);
+        String path = outputPath + "src/main/java/org/openapitools/";
+
+        assertFileContains(path + "model/CategoryObject.java", """
+                public CategoryObject(String locale, String name) {
+                    this.locale = locale;
+                    this.name = name;
+                }
+            """);
+    }
 }
