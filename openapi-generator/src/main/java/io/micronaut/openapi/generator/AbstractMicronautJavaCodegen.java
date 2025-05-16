@@ -330,7 +330,7 @@ public abstract class AbstractMicronautJavaCodegen<T extends GeneratorOptionsBui
             // special words
             "Object", "List", "File", "OffsetDateTime", "LocalDate", "LocalTime",
             "Client", "Format", "QueryValue", "QueryParam", "PathVariable", "Header", "Cookie",
-            "Authorization", "Body", "application"
+            "Authorization", "Body", "Application"
         );
         reservedWords.addAll(micronautReservedWords);
         List.of(
