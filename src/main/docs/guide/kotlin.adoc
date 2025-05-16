@@ -10,12 +10,3 @@ kapt {
     }
 }
 ----
-
-[IMPORTANT]
-====
-If you use KSP need to disable incremental processing:
-[properties]
-----
-ksp.incremental=false
-----
-====

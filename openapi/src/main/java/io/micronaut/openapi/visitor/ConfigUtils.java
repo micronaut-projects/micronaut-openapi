@@ -15,6 +15,8 @@
  */
 package io.micronaut.openapi.visitor;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import io.micronaut.context.ApplicationContextConfiguration;
 import io.micronaut.context.env.Environment;
@@ -31,12 +33,18 @@ import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.core.util.StringUtils;
 import io.micronaut.inject.ast.ClassElement;
 import io.micronaut.inject.visitor.VisitorContext;
+import io.micronaut.openapi.OpenApiUtils;
 import io.micronaut.openapi.visitor.group.GroupProperties;
 import io.micronaut.openapi.visitor.group.OpenApiInfo;
 import io.micronaut.openapi.visitor.group.RouterVersioningProperties;
+import io.micronaut.openapi.visitor.management.EndpointProperties;
+import io.micronaut.openapi.visitor.management.EndpointsConfig;
 import io.micronaut.openapi.visitor.security.InterceptUrlMapConverter;
 import io.micronaut.openapi.visitor.security.InterceptUrlMapPattern;
 import io.micronaut.openapi.visitor.security.SecurityProperties;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
+import io.swagger.v3.oas.models.servers.Server;
+import io.swagger.v3.oas.models.tags.Tag;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -49,6 +57,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Properties;
 
@@ -60,7 +69,6 @@ import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_EN
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_EXPANDABLE_PROPERTIES;
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_EXPANDABLE_PROPERTIES_LOADED;
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_GROUPS;
-import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_JACKSON_JSON_VIEW_ENABLED;
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_OPENAPI_ENDPOINTS;
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_OPENAPI_PROJECT_DIR;
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_OPENAPI_PROPERTIES;
@@ -77,6 +85,15 @@ import static io.micronaut.openapi.visitor.ContextUtils.warn;
 import static io.micronaut.openapi.visitor.FileUtils.calcFinalFilename;
 import static io.micronaut.openapi.visitor.FileUtils.resolve;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.ALL;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.ENDPOINTS_EXTENSIONS;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.ENDPOINTS_GROUPS;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.ENDPOINTS_GROUPS_EXCLUDED;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.ENDPOINTS_PATH;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.ENDPOINTS_SECURITY_REQUIREMENTS;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.ENDPOINTS_SERVERS;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.ENDPOINTS_TAGS;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_ENDPOINTS_ENABLED;
+import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_ENDPOINTS_PREFIX;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_ENVIRONMENT_ENABLED;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_JACKSON_JSON_VIEW_ENABLED;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_31_JSON_SCHEMA_DIALECT;
@@ -124,12 +141,17 @@ import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_SERVE
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.OPENAPI_CONFIG_FILE;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.SPRING_SERVER_CONTEXT_PATH;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.SPRING_WEBFLUX_BASE_PATH;
+import static io.micronaut.openapi.visitor.SchemaUtils.PREFIX_X;
+import static io.micronaut.openapi.visitor.SchemaUtils.prependIfMissing;
 import static io.micronaut.openapi.visitor.StringUtil.COMMA;
 import static io.micronaut.openapi.visitor.StringUtil.DOT;
 import static io.micronaut.openapi.visitor.StringUtil.UNDERSCORE;
 import static io.micronaut.openapi.visitor.StringUtil.WILDCARD;
+import static io.micronaut.openapi.visitor.UrlUtils.parsePath;
 import static io.micronaut.openapi.visitor.group.RouterVersioningProperties.DEFAULT_HEADER_NAME;
 import static io.micronaut.openapi.visitor.group.RouterVersioningProperties.DEFAULT_PARAMETER_NAME;
+import static io.micronaut.openapi.visitor.management.EndpointUtils.ALL_MICRONAUT_MANAGEMENT_ENDPOINTS;
+import static io.micronaut.openapi.visitor.management.SpringActuatorConfigUtils.mergeWithActuatorProperties;
 
 /**
  * Configuration utilities methods.
@@ -138,6 +160,9 @@ import static io.micronaut.openapi.visitor.group.RouterVersioningProperties.DEFA
  */
 @Internal
 public final class ConfigUtils {
+
+    public static final String ALL_ENDPOINTS_NAME = "all";
+    public static final String ALL_SPRING_ACTUATOR_ENDPOINTS_NAME = "*";
 
     private static final String LOADED_POSTFIX = ".loaded";
     private static final String VALUE_POSTFIX = ".value";
@@ -149,6 +174,12 @@ public final class ConfigUtils {
      * Default autogenerated security schema name.
      */
     private static final String DEFAULT_SECURITY_SCHEMA_NAME = "Authorization";
+    private static final TypeReference<Map<String, Object>> TYPE_EXTENSIONS = new TypeReference<>() {
+    };
+    private static final TypeReference<List<Server>> TYPE_SERVERS_LIST = new TypeReference<>() {
+    };
+    private static final TypeReference<List<SecurityRequirement>> TYPE_SECURITY_REQUIREMENTS_LIST = new TypeReference<>() {
+    };
 
     private ConfigUtils() {
     }
@@ -173,22 +204,22 @@ public final class ConfigUtils {
         // third read environments properties
         Environment environment = getEnv(context);
         if (environment != null) {
-            for (Map.Entry<String, Object> entry : environment.getProperties(MICRONAUT_OPENAPI_SCHEMA_PREFIX, StringConvention.RAW).entrySet()) {
+            for (Entry<String, Object> entry : environment.getProperties(MICRONAUT_OPENAPI_SCHEMA_PREFIX, StringConvention.RAW).entrySet()) {
                 SchemaDecorator decorator = schemaDecorators.computeIfAbsent(entry.getKey(), k -> new SchemaDecorator());
                 decorator.setPrefix((String) entry.getValue());
             }
 
-            for (Map.Entry<String, Object> entry : environment.getProperties(MICRONAUT_OPENAPI_SCHEMA_POSTFIX, StringConvention.RAW).entrySet()) {
+            for (Entry<String, Object> entry : environment.getProperties(MICRONAUT_OPENAPI_SCHEMA_POSTFIX, StringConvention.RAW).entrySet()) {
                 SchemaDecorator decorator = schemaDecorators.computeIfAbsent(entry.getKey(), k -> new SchemaDecorator());
                 decorator.setPostfix((String) entry.getValue());
             }
 
-            for (Map.Entry<String, Object> entry : environment.getProperties(MICRONAUT_OPENAPI_SCHEMA_DECORATOR_PREFIX, StringConvention.RAW).entrySet()) {
+            for (Entry<String, Object> entry : environment.getProperties(MICRONAUT_OPENAPI_SCHEMA_DECORATOR_PREFIX, StringConvention.RAW).entrySet()) {
                 SchemaDecorator decorator = schemaDecorators.computeIfAbsent(entry.getKey(), k -> new SchemaDecorator());
                 decorator.setPrefix((String) entry.getValue());
             }
 
-            for (Map.Entry<String, Object> entry : environment.getProperties(MICRONAUT_OPENAPI_SCHEMA_DECORATOR_POSTFIX, StringConvention.RAW).entrySet()) {
+            for (Entry<String, Object> entry : environment.getProperties(MICRONAUT_OPENAPI_SCHEMA_DECORATOR_POSTFIX, StringConvention.RAW).entrySet()) {
                 SchemaDecorator decorator = schemaDecorators.computeIfAbsent(entry.getKey(), k -> new SchemaDecorator());
                 decorator.setPostfix((String) entry.getValue());
             }
@@ -227,7 +258,7 @@ public final class ConfigUtils {
         // third read environments properties
         Environment environment = getEnv(context);
         if (environment != null) {
-            for (Map.Entry<String, Object> entry : environment.getProperties(MICRONAUT_OPENAPI_SCHEMA, StringConvention.RAW).entrySet()) {
+            for (Entry<String, Object> entry : environment.getProperties(MICRONAUT_OPENAPI_SCHEMA, StringConvention.RAW).entrySet()) {
 
                 String configuredClassName = entry.getKey();
                 // Remove this check, after we remove MICRONAUT_OPENAPI_SCHEMA property
@@ -239,7 +270,7 @@ public final class ConfigUtils {
                 String targetClassName = (String) entry.getValue();
                 readCustomSchema(configuredClassName, targetClassName, customSchemas, context);
             }
-            for (Map.Entry<String, Object> entry : environment.getProperties(MICRONAUT_OPENAPI_SCHEMA_MAPPING, StringConvention.RAW).entrySet()) {
+            for (Entry<String, Object> entry : environment.getProperties(MICRONAUT_OPENAPI_SCHEMA_MAPPING, StringConvention.RAW).entrySet()) {
                 String configuredClassName = entry.getKey();
 
                 // Remove this check, after we remove MICRONAUT_OPENAPI_SCHEMA property
@@ -430,7 +461,7 @@ public final class ConfigUtils {
             result = new ArrayList<>();
             var values = configPropStr.split(COMMA);
             for (var value : values) {
-                result.add(value.trim().toLowerCase());
+                result.add(value.trim().toLowerCase(Locale.ENGLISH));
             }
         }
         ContextUtils.put(cacheProp, result, context);
@@ -452,6 +483,14 @@ public final class ConfigUtils {
 
     public static boolean isAdocEnabled(VisitorContext context) {
         return getBooleanProperty(MICRONAUT_OPENAPI_ADOC_ENABLED, true, context);
+    }
+
+    public static boolean isJsonViewEnabled(VisitorContext context) {
+        return getBooleanProperty(MICRONAUT_JACKSON_JSON_VIEW_ENABLED, false, context);
+    }
+
+    public static boolean isEndpointsEnabled(VisitorContext context) {
+        return getBooleanProperty(MICRONAUT_ENDPOINTS_ENABLED, false, context);
     }
 
     public static List<Pair<String, String>> getExpandableProperties(VisitorContext context) {
@@ -477,14 +516,14 @@ public final class ConfigUtils {
 
         var expandedPropsMap = new HashMap<String, String>();
         if (CollectionUtils.isNotEmpty(propertiesFromEnv)) {
-            for (Map.Entry<String, Object> entry : propertiesFromEnv.entrySet()) {
+            for (Entry<String, Object> entry : propertiesFromEnv.entrySet()) {
                 expandedPropsMap.put(entry.getKey(), entry.getValue().toString());
             }
         }
 
         // next, read openapi.properties file
         Properties openapiProps = readOpenApiConfigFile(context);
-        for (Map.Entry<Object, Object> entry : openapiProps.entrySet()) {
+        for (Entry<Object, Object> entry : openapiProps.entrySet()) {
             String key = entry.getKey().toString();
             if (!key.startsWith(expandPrefix)) {
                 continue;
@@ -494,7 +533,7 @@ public final class ConfigUtils {
 
         // next, read system properties
         if (CollectionUtils.isNotEmpty(System.getProperties())) {
-            for (Map.Entry<Object, Object> entry : System.getProperties().entrySet()) {
+            for (Entry<Object, Object> entry : System.getProperties().entrySet()) {
                 String key = entry.getKey().toString();
                 if (!key.startsWith(expandPrefix)) {
                     continue;
@@ -503,7 +542,7 @@ public final class ConfigUtils {
             }
         }
 
-        for (Map.Entry<String, String> entry : expandedPropsMap.entrySet()) {
+        for (Entry<String, String> entry : expandedPropsMap.entrySet()) {
             String key = entry.getKey();
             if (key.startsWith(expandPrefix)) {
                 key = key.substring(expandPrefix.length());
@@ -550,7 +589,7 @@ public final class ConfigUtils {
 
         // next, read openapi.properties file
         Properties openapiProps = readOpenApiConfigFile(context);
-        for (Map.Entry<Object, Object> entry : openapiProps.entrySet()) {
+        for (Entry<Object, Object> entry : openapiProps.entrySet()) {
             String key = entry.getKey().toString();
             if (!key.startsWith(expandPrefix)) {
                 continue;
@@ -560,7 +599,7 @@ public final class ConfigUtils {
 
         // next, read system properties
         if (CollectionUtils.isNotEmpty(System.getProperties())) {
-            for (Map.Entry<Object, Object> entry : System.getProperties().entrySet()) {
+            for (Entry<Object, Object> entry : System.getProperties().entrySet()) {
                 String key = entry.getKey().toString();
                 if (!key.startsWith(expandPrefix)) {
                     continue;
@@ -573,19 +612,6 @@ public final class ConfigUtils {
         var titleAndFilename = calcFinalFilename(openApiInfo.getAdocFilename(), openApiInfo, isSingleGroup, "adoc", context);
 
         return adocProperties;
-    }
-
-    public static boolean isJsonViewEnabled(VisitorContext context) {
-
-        Boolean isJsonViewEnabled = ContextUtils.get(MICRONAUT_INTERNAL_JACKSON_JSON_VIEW_ENABLED, Boolean.class, context);
-        if (isJsonViewEnabled != null) {
-            return isJsonViewEnabled;
-        }
-
-        isJsonViewEnabled = getBooleanProperty(MICRONAUT_JACKSON_JSON_VIEW_ENABLED, false, context);
-        ContextUtils.put(MICRONAUT_INTERNAL_JACKSON_JSON_VIEW_ENABLED, isJsonViewEnabled, context);
-
-        return isJsonViewEnabled;
     }
 
     public static SecurityProperties getSecurityProperties(VisitorContext context) {
@@ -701,7 +727,7 @@ public final class ConfigUtils {
         // third read environments properties
         Environment environment = getEnv(context);
         if (environment != null) {
-            for (Map.Entry<String, Object> entry : environment.getProperties(MICRONAUT_OPENAPI_GROUPS, StringConvention.RAW).entrySet()) {
+            for (Entry<String, Object> entry : environment.getProperties(MICRONAUT_OPENAPI_GROUPS, StringConvention.RAW).entrySet()) {
                 String entryKey = entry.getKey();
                 String[] propParts = entryKey.split("\\.");
                 String propName = propParts[propParts.length - 1];
@@ -715,22 +741,6 @@ public final class ConfigUtils {
         ContextUtils.put(MICRONAUT_INTERNAL_GROUPS, groupPropertiesMap, context);
 
         return groupPropertiesMap;
-    }
-
-    /**
-     * Returns the EndpointsConfiguration.
-     *
-     * @param context The context.
-     * @return The EndpointsConfiguration.
-     */
-    public static EndpointsConfiguration endpointsConfiguration(VisitorContext context) {
-        EndpointsConfiguration cfg = ContextUtils.get(MICRONAUT_INTERNAL_OPENAPI_ENDPOINTS, EndpointsConfiguration.class, context);
-        if (cfg != null) {
-            return cfg;
-        }
-        var conf = new EndpointsConfiguration(context, readOpenApiConfigFile(context));
-        ContextUtils.put(MICRONAUT_INTERNAL_OPENAPI_ENDPOINTS, conf, context);
-        return conf;
     }
 
     private static void readGroupsProperties(Properties props, Map<String, GroupProperties> groupPropertiesMap, VisitorContext context) {
@@ -756,7 +766,7 @@ public final class ConfigUtils {
         }
         String valueStr = value.toString();
         GroupProperties groupProperties = groupPropertiesMap.computeIfAbsent(groupName, GroupProperties::new);
-        switch (propertyName.toLowerCase()) {
+        switch (propertyName.toLowerCase(Locale.ENGLISH)) {
             case "display-name", "displayname":
                 if (groupProperties.getDisplayName() == null) {
                     groupProperties.setDisplayName(valueStr);
@@ -791,12 +801,12 @@ public final class ConfigUtils {
                     groupProperties.setPrimary(Boolean.valueOf(valueStr));
                 }
                 break;
-            case "commonexclude", "common-exclude":
+            case "common-exclude", "commonexclude":
                 if (groupProperties.getCommonExclude() == null) {
                     groupProperties.setCommonExclude(Boolean.valueOf(valueStr));
                 }
                 break;
-            case "packagesexclude", "packages-exclude":
+            case "packages-exclude", "packagesexclude":
                 if (groupProperties.getPackagesExclude() == null) {
                     var packagesExclude = new ArrayList<GroupProperties.PackageProperties>();
                     for (String groupPackage : valueStr.split(COMMA)) {
@@ -808,6 +818,217 @@ public final class ConfigUtils {
             default:
                 break;
         }
+    }
+
+    /**
+     * Returns the EndpointsConfiguration.
+     *
+     * @param context The context.
+     * @return The EndpointsConfiguration.
+     */
+    public static EndpointsConfig getEndpointsConfig(VisitorContext context) {
+        var endpointsConfig = ContextUtils.get(MICRONAUT_INTERNAL_OPENAPI_ENDPOINTS, EndpointsConfig.class, context);
+        if (endpointsConfig != null) {
+            return endpointsConfig;
+        }
+
+        endpointsConfig = new EndpointsConfig(isEndpointsEnabled(context));
+        endpointsConfig.setPath(parsePath(getConfigProperty(ENDPOINTS_PATH, context)));
+        endpointsConfig.setTags(parseTags(getConfigProperty(ENDPOINTS_TAGS, context)));
+        endpointsConfig.setServers(parseServers(getConfigProperty(ENDPOINTS_SERVERS, context), context));
+        endpointsConfig.setSecurityRequirements(parseSecurityRequirements(getConfigProperty(ENDPOINTS_SECURITY_REQUIREMENTS, context), context));
+        endpointsConfig.setExtensions(parseExtensions(getConfigProperty(ENDPOINTS_EXTENSIONS, context), context));
+        endpointsConfig.setGroups(getListStringsProperty(ENDPOINTS_GROUPS, Collections.emptyList(), context));
+        endpointsConfig.setGroupsExcluded(getListStringsProperty(ENDPOINTS_GROUPS_EXCLUDED, Collections.emptyList(), context));
+        endpointsConfig.setEndpoints(endpointsProperties(context));
+
+        mergeWithActuatorProperties(endpointsConfig, context);
+
+        ContextUtils.put(MICRONAUT_INTERNAL_OPENAPI_ENDPOINTS, endpointsConfig, context);
+        return endpointsConfig;
+    }
+
+    public static Map<String, EndpointProperties> endpointsProperties(VisitorContext context) {
+
+        var endpointPropertiesMap = new HashMap<String, EndpointProperties>();
+
+        // first read system properties
+        Properties sysProps = System.getProperties();
+        readEndpointsProperties(sysProps, endpointPropertiesMap, context);
+
+        // second read openapi.properties file
+        Properties fileProps = readOpenApiConfigFile(context);
+        readEndpointsProperties(fileProps, endpointPropertiesMap, context);
+
+        // third read environments properties
+        Environment environment = getEnv(context);
+        if (environment != null) {
+            for (Entry<String, Object> entry : environment.getProperties(MICRONAUT_ENDPOINTS_PREFIX, StringConvention.RAW).entrySet()) {
+                String entryKey = entry.getKey();
+                String endpointName = entryKey.substring(0, entryKey.indexOf('.'));
+                String propName = entryKey.substring(endpointName.length() + 1);
+                setEndpointProperty(endpointName, propName, entry.getValue(), endpointPropertiesMap, context);
+            }
+        }
+
+        // set standard endpoints implementations, if not set in config
+        for (var entry : ALL_MICRONAUT_MANAGEMENT_ENDPOINTS.entrySet()) {
+            var endpointName = entry.getKey();
+            var endpointProperties = endpointPropertiesMap.get(endpointName);
+            if (endpointProperties == null) {
+                endpointProperties = new EndpointProperties(endpointName);
+                endpointPropertiesMap.put(endpointName, endpointProperties);
+            }
+            if (endpointProperties.getElement() != null) {
+                continue;
+            }
+            var className = entry.getValue();
+            if (className == null) {
+                continue;
+            }
+            var classEl = ContextUtils.getClassElement(className, context);
+            endpointProperties.setElement(classEl);
+        }
+
+        return endpointPropertiesMap;
+    }
+
+    private static void readEndpointsProperties(Properties props, Map<String, EndpointProperties> endpointPropertiesMap, VisitorContext context) {
+        for (String prop : props.stringPropertyNames()) {
+            if (!prop.startsWith(MICRONAUT_ENDPOINTS_PREFIX)) {
+                continue;
+            }
+            int endpointNameIndexEnd = prop.indexOf('.', MICRONAUT_ENDPOINTS_PREFIX.length() + 1);
+            if (endpointNameIndexEnd < 0) {
+                continue;
+            }
+            String endpointName = prop.substring(MICRONAUT_ENDPOINTS_PREFIX.length() + 1, endpointNameIndexEnd);
+            String propertyName = prop.substring(endpointNameIndexEnd + 1);
+            String value = props.getProperty(prop);
+            setEndpointProperty(endpointName, propertyName, value, endpointPropertiesMap, context);
+        }
+    }
+
+    private static void setEndpointProperty(String endpointName, String propertyName, Object value, Map<String, EndpointProperties> endpointPropertiesMap, VisitorContext context) {
+        if (value == null) {
+            return;
+        }
+        String valueStr = value.toString();
+        var simplePropName = propertyName.toLowerCase(Locale.ENGLISH);
+        if (propertyName.contains(DOT)) {
+            simplePropName = propertyName.substring(0, propertyName.indexOf(DOT)).toLowerCase(Locale.ENGLISH);
+        }
+        EndpointProperties endpointProperties = endpointPropertiesMap.computeIfAbsent(endpointName, EndpointProperties::new);
+        switch (simplePropName) {
+            case "enabled":
+                if (endpointProperties.getEnabled() == null) {
+                    endpointProperties.setEnabled(Boolean.parseBoolean(valueStr));
+                }
+                break;
+            case "path":
+                if (endpointProperties.getPath() == null) {
+                    endpointProperties.setPath(valueStr);
+                }
+                break;
+            case "context-path", "contextpath":
+                if (ALL_ENDPOINTS_NAME.equals(endpointName) && endpointProperties.getContextPath() == null) {
+                    endpointProperties.setContextPath(valueStr);
+                }
+                break;
+            case "sensitive":
+                if (endpointProperties.getSensitive() == null) {
+                    endpointProperties.setSensitive(Boolean.parseBoolean(valueStr));
+                }
+                break;
+            case "description":
+                if (endpointProperties.getDescription() == null) {
+                    endpointProperties.setDescription(valueStr);
+                }
+                break;
+            case "extensions":
+                if (CollectionUtils.isEmpty(endpointProperties.getExtensions())) {
+                    endpointProperties.setExtensions(new HashMap<>());
+                }
+                var extName = propertyName.substring("extensions".length() + 1);
+                endpointProperties.getExtensions().put(prependIfMissing(extName, PREFIX_X), parseExtensions(valueStr, context));
+                break;
+            case "security-requirements", "securityrequirements":
+                if (CollectionUtils.isEmpty(endpointProperties.getSecurityRequirements())) {
+                    endpointProperties.setSecurityRequirements(new ArrayList<>());
+                }
+                endpointProperties.getSecurityRequirements().addAll(parseSecurityRequirements(valueStr, context));
+                break;
+            case "servers":
+                if (CollectionUtils.isEmpty(endpointProperties.getServers())) {
+                    endpointProperties.setServers(new ArrayList<>());
+                }
+                endpointProperties.getServers().addAll(parseServers(valueStr, context));
+                break;
+            case "tags":
+                if (CollectionUtils.isEmpty(endpointProperties.getTags())) {
+                    endpointProperties.setTags(new ArrayList<>());
+                }
+                endpointProperties.getTags().addAll(parseTags(valueStr));
+                break;
+            case "class":
+                if (endpointProperties.getElement() == null) {
+                    endpointProperties.setElement(ContextUtils.getClassElement(valueStr, context));
+                }
+                break;
+            default:
+                break;
+        }
+    }
+
+    public static Map<String, Object> parseExtensions(String value, VisitorContext context) {
+        if (StringUtils.isEmpty(value)) {
+            return Collections.emptyMap();
+        }
+        try {
+            return OpenApiUtils.getConvertJsonMapper().readValue(value, TYPE_EXTENSIONS);
+        } catch (JsonProcessingException e) {
+            warn("Fail to parse " + TYPE_EXTENSIONS.getType().toString() + ": " + value + " - " + e.getMessage(), context);
+        }
+        return Collections.emptyMap();
+    }
+
+    public static List<Server> parseServers(String servers, VisitorContext context) {
+        return parseModel(servers, context, TYPE_SERVERS_LIST);
+    }
+
+    public static List<SecurityRequirement> parseSecurityRequirements(String securityRequirements, VisitorContext context) {
+        return parseModel(securityRequirements, context, TYPE_SECURITY_REQUIREMENTS_LIST);
+    }
+
+    private static <T> List<T> parseModel(String s, VisitorContext context, TypeReference<List<T>> typeReference) {
+        if (StringUtils.isEmpty(s) || (!s.startsWith("[") && !s.endsWith("]"))) {
+            return Collections.emptyList();
+        }
+        try {
+            return OpenApiUtils.getConvertJsonMapper().readValue(s, typeReference);
+        } catch (JsonProcessingException e) {
+            warn("Fail to parse " + typeReference.getType().toString() + ": " + s + " - " + e.getMessage(), context);
+        }
+        return Collections.emptyList();
+    }
+
+    public static List<Tag> parseTags(String stringTagsStr) {
+
+        if (StringUtils.isEmpty(stringTagsStr)) {
+            return Collections.emptyList();
+        }
+        String[] stringTags = stringTagsStr.split(COMMA);
+        if (stringTags.length == 0) {
+            return Collections.emptyList();
+        }
+        var tags = new ArrayList<Tag>(stringTags.length);
+        for (String name : stringTags) {
+            if (StringUtils.isEmpty(name)) {
+                continue;
+            }
+            tags.add(new Tag().name(name));
+        }
+        return tags;
     }
 
     private static GroupProperties.PackageProperties getPackageProperties(String groupPackage) {

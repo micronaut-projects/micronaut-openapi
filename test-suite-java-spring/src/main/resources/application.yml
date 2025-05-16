@@ -4,6 +4,18 @@ spring:
   main:
     banner-mode: off
 
+management:
+  endpoints:
+    web:
+      path-mapping:
+        health: /test
+      base-path: /actuator
+      exposure:
+        include: health, beans, metrics
+  server:
+    base-path: /my
+    port: 9090
+
 logging:
   pattern:
     console: '%cyan(%d{HH:mm:ss.SSS}) %gray([%thread]) %highlight(%-5level) %magenta(%logger{36}) - %msg%n'

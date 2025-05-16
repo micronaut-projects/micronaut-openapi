@@ -26,8 +26,10 @@ import io.micronaut.core.annotation.Internal;
 public interface OpenApiModelProp {
 
     String PROP_EXTENSIONS = "extensions";
+    String PROP_ID = "id";
     String PROP_VALUE = "value";
     String PROP_NAME = "name";
+    String PROP_ENABLED = "enabled";
     String PROP_DESCRIPTION = "description";
     String PROP_SCHEMA = "schema";
     String PROP_ARRAY_SCHEMA = "arraySchema";
@@ -82,6 +84,9 @@ public interface OpenApiModelProp {
     String PROP_PROPERTY_NAME = "propertyName";
     String PROP_TAGS = "tags";
     String PROP_SECURITY = "security";
+    String PROP_GROUPS = "groups";
+    String PROP_GROUPS_EXCLUDED = "groupsExcluded";
+    String PROP_URI = "uri";
     String PROP_READ_ONLY = "readOnly";
     String PROP_WRITE_ONLY = "writeOnly";
     String PROP_EXTERNAL_DOCS = "externalDocs";

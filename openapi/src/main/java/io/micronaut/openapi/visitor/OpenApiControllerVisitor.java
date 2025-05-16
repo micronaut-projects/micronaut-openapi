@@ -38,6 +38,7 @@ import io.micronaut.inject.visitor.TypeElementVisitor;
 import io.micronaut.inject.visitor.VisitorContext;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.extensions.Extension;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.servers.Server;
 import io.swagger.v3.oas.models.tags.Tag;
@@ -50,6 +51,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -58,6 +60,7 @@ import static io.micronaut.openapi.visitor.ConfigUtils.getEnv;
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_CHILD_PATH;
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_IS_PROCESS_PARENT_CLASS;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ENABLED;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_ENABLED;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_HIDDEN;
 import static io.micronaut.openapi.visitor.TagUtils.processOpenApiAnnotation;
 import static io.micronaut.openapi.visitor.TagUtils.readTags;
@@ -73,6 +76,9 @@ import static io.micronaut.openapi.visitor.Utils.DEFAULT_MEDIA_TYPES;
 public class OpenApiControllerVisitor extends AbstractOpenApiEndpointVisitor implements TypeElementVisitor<Object, HttpMethodMapping> {
 
     private final String customUri;
+    private String description;
+    private Map<String, Object> extensions;
+    private List<AnnotationValue<Extension>> additionalExtensions;
     private final List<AnnotationValue<io.swagger.v3.oas.annotations.tags.Tag>> additionalTags;
     private final List<AnnotationValue<io.swagger.v3.oas.annotations.security.SecurityRequirement>> additionalSecurityRequirements;
 
@@ -82,9 +88,14 @@ public class OpenApiControllerVisitor extends AbstractOpenApiEndpointVisitor imp
         customUri = null;
     }
 
-    public OpenApiControllerVisitor(List<AnnotationValue<io.swagger.v3.oas.annotations.tags.Tag>> additionalTags,
-                                    List<AnnotationValue<io.swagger.v3.oas.annotations.security.SecurityRequirement>> additionalSecurityRequirements,
-                                    String customUri) {
+    public OpenApiControllerVisitor(
+        String description,
+        List<AnnotationValue<Extension>> additionalExtensions,
+        List<AnnotationValue<io.swagger.v3.oas.annotations.tags.Tag>> additionalTags,
+        List<AnnotationValue<io.swagger.v3.oas.annotations.security.SecurityRequirement>> additionalSecurityRequirements,
+        String customUri
+    ) {
+        this.additionalExtensions = additionalExtensions;
         this.additionalTags = additionalTags;
         this.additionalSecurityRequirements = additionalSecurityRequirements;
         this.customUri = customUri;
@@ -152,7 +163,7 @@ public class OpenApiControllerVisitor extends AbstractOpenApiEndpointVisitor imp
             || element.isPrivate()
             || element.isStatic()
             || element.isAnnotationPresent(Hidden.class)
-            || (jsonAnySetterAnn != null && jsonAnySetterAnn.booleanValue("enabled").orElse(true))
+            || (jsonAnySetterAnn != null && jsonAnySetterAnn.booleanValue(PROP_ENABLED).orElse(true))
             || ignoreByRequires(element, context);
     }
 
@@ -227,13 +238,23 @@ public class OpenApiControllerVisitor extends AbstractOpenApiEndpointVisitor imp
     }
 
     @Override
-    protected String description(MethodElement element) {
+    protected String getClassDescription(VisitorContext context) {
+        return StringUtils.isNotEmpty(description) ? description : null;
+    }
+
+    @Override
+    protected String getMethodDescription(VisitorContext context) {
         return null;
     }
 
     @Override
     protected List<Tag> getUserDefinedClassTags(ClassElement element, VisitorContext context) {
         return readTags(additionalTags, context);
+    }
+
+    @Override
+    protected Map<String, Object> operationExtensions(MethodElement element, VisitorContext context) {
+        return readExtensions(additionalExtensions);
     }
 
     @Override

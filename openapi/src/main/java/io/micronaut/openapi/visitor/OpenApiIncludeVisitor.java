@@ -24,6 +24,7 @@ import io.micronaut.inject.visitor.TypeElementVisitor;
 import io.micronaut.inject.visitor.VisitorContext;
 import io.micronaut.openapi.annotation.OpenAPIInclude;
 import io.micronaut.openapi.annotation.OpenAPIIncludes;
+import io.swagger.v3.oas.annotations.extensions.Extension;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
@@ -33,8 +34,13 @@ import java.util.List;
 import static io.micronaut.openapi.visitor.ConfigUtils.isOpenApiEnabled;
 import static io.micronaut.openapi.visitor.ConfigUtils.isSpecGenerationEnabled;
 import static io.micronaut.openapi.visitor.OpenApiConfigProperty.MICRONAUT_OPENAPI_ENABLED;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_DESCRIPTION;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_EXTENSIONS;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_GROUPS;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_GROUPS_EXCLUDED;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_SECURITY;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_TAGS;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_URI;
 
 /**
  * A {@link TypeElementVisitor} that builds the Swagger model from Micronaut controllers included by @{@link OpenAPIInclude}
@@ -60,15 +66,29 @@ public class OpenApiIncludeVisitor implements TypeElementVisitor<OpenAPIIncludes
             if (ArrayUtils.isEmpty(classes)) {
                 continue;
             }
+            var description = includeAnn.stringValue(PROP_DESCRIPTION).orElse(null);
+            var extensionAnns = includeAnn.getAnnotations(PROP_EXTENSIONS, Extension.class);
             var tagAnns = includeAnn.getAnnotations(PROP_TAGS, Tag.class);
             var securityAnns = includeAnn.getAnnotations(PROP_SECURITY, SecurityRequirement.class);
-            String customUri = includeAnn.stringValue("uri").orElse(null);
-            List<String> groups = List.of(includeAnn.stringValues("groups"));
-            List<String> groupsExcluded = List.of(includeAnn.stringValues("groupsExcluded"));
+            String customUri = includeAnn.stringValue(PROP_URI).orElse(null);
+            List<String> groups = List.of(includeAnn.stringValues(PROP_GROUPS));
+            List<String> groupsExcluded = List.of(includeAnn.stringValues(PROP_GROUPS_EXCLUDED));
 
             var groupVisitor = new OpenApiGroupInfoVisitor(groups, groupsExcluded);
-            var controllerVisitor = new OpenApiControllerVisitor(tagAnns, securityAnns, customUri);
-            var endpointVisitor = new OpenApiEndpointVisitor(true, tagAnns.isEmpty() ? null : tagAnns, securityAnns.isEmpty() ? null : securityAnns);
+            var controllerVisitor = new OpenApiControllerVisitor(
+                description,
+                extensionAnns.isEmpty() ? null : extensionAnns,
+                tagAnns,
+                securityAnns,
+                customUri
+            );
+            var endpointVisitor = new OpenApiEndpointVisitor(
+                true,
+                description,
+                extensionAnns.isEmpty() ? null : extensionAnns,
+                tagAnns.isEmpty() ? null : tagAnns,
+                securityAnns.isEmpty() ? null : securityAnns
+            );
             for (String className : classes) {
                 var classEl = ContextUtils.getClassElement(className, context);
                 if (classEl == null) {

@@ -25,8 +25,11 @@ import java.util.Collections;
 import java.util.List;
 
 import static io.micronaut.openapi.visitor.ElementUtils.EMPTY_ANNOTATION_VALUES_ARRAY;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_GROUPS;
+import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_GROUPS_EXCLUDED;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_SECURITY;
 import static io.micronaut.openapi.visitor.OpenApiModelProp.PROP_TAGS;
+import static io.micronaut.openapi.visitor.management.EndpointUtils.ALL_MANAGEMENT_ENDPOINT_CLASSES_ARRAY;
 
 /**
  * Mapper for management endpoints.
@@ -40,21 +43,14 @@ public class OpenAPIManagementAnnotationMapper implements TypedAnnotationMapper<
 
     @Override
     public List<AnnotationValue<?>> map(AnnotationValue<OpenAPIManagement> annotation, VisitorContext context) {
+
         return Collections.singletonList(
             AnnotationValue.builder(OpenAPIInclude.class)
-                .values(
-                    "io.micronaut.management.endpoint.beans.BeansEndpoint",
-                    "io.micronaut.management.endpoint.env.EnvironmentEndpoint",
-                    "io.micronaut.management.endpoint.health.HealthEndpoint",
-                    "io.micronaut.management.endpoint.info.InfoEndpoint",
-                    "io.micronaut.management.endpoint.loggers.LoggersEndpoint",
-                    "io.micronaut.management.endpoint.refresh.RefreshEndpoint",
-                    "io.micronaut.management.endpoint.routes.RoutesEndpoint",
-                    "io.micronaut.management.endpoint.stop.ServerStopEndpoint",
-                    "io.micronaut.management.endpoint.threads.ThreadDumpEndpoint"
-                )
+                .values(ALL_MANAGEMENT_ENDPOINT_CLASSES_ARRAY)
                 .member(PROP_TAGS, annotation.getAnnotations(PROP_TAGS).toArray(EMPTY_ANNOTATION_VALUES_ARRAY))
                 .member(PROP_SECURITY, annotation.getAnnotations(PROP_SECURITY).toArray(EMPTY_ANNOTATION_VALUES_ARRAY))
+                .member(PROP_GROUPS, annotation.stringValues(PROP_GROUPS))
+                .member(PROP_GROUPS_EXCLUDED, annotation.stringValues(PROP_GROUPS_EXCLUDED))
                 .build()
         );
     }

@@ -80,21 +80,26 @@ import java.util.stream.Collectors;
 import static io.micronaut.openapi.adoc.utils.FileUtils.CLASSPATH_SCHEME;
 import static io.micronaut.openapi.adoc.utils.FileUtils.FILE_SCHEME;
 import static io.micronaut.openapi.adoc.utils.FileUtils.PROJECT_SCHEME;
+import static io.micronaut.openapi.visitor.ConfigUtils.ALL_ENDPOINTS_NAME;
 import static io.micronaut.openapi.visitor.ConfigUtils.MergeMode.REPLACE;
-import static io.micronaut.openapi.visitor.ConfigUtils.endpointsConfiguration;
 import static io.micronaut.openapi.visitor.ConfigUtils.getAdditionalFiles;
 import static io.micronaut.openapi.visitor.ConfigUtils.getAdditionalFilesMergeMode;
 import static io.micronaut.openapi.visitor.ConfigUtils.getAdocProperties;
 import static io.micronaut.openapi.visitor.ConfigUtils.getConfigProperty;
+import static io.micronaut.openapi.visitor.ConfigUtils.getEndpointsConfig;
 import static io.micronaut.openapi.visitor.ConfigUtils.getEnv;
 import static io.micronaut.openapi.visitor.ConfigUtils.getExpandableProperties;
 import static io.micronaut.openapi.visitor.ConfigUtils.getGroupProperties;
 import static io.micronaut.openapi.visitor.ConfigUtils.getProjectPath;
 import static io.micronaut.openapi.visitor.ConfigUtils.getPropertyNamingStrategy;
+import static io.micronaut.openapi.visitor.ConfigUtils.isEndpointsEnabled;
 import static io.micronaut.openapi.visitor.ConfigUtils.isOpenApiEnabled;
 import static io.micronaut.openapi.visitor.ConfigUtils.isSpecGenerationEnabled;
 import static io.micronaut.openapi.visitor.ConfigUtils.readOpenApiConfigFile;
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_OPENAPI_ENDPOINT_CLASS_TAGS;
+import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_OPENAPI_ENDPOINT_DESCRIPTION;
+import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_OPENAPI_ENDPOINT_EXTENSIONS;
+import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_OPENAPI_ENDPOINT_PROPS;
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_OPENAPI_ENDPOINT_SECURITY_REQUIREMENTS;
 import static io.micronaut.openapi.visitor.ContextProperty.MICRONAUT_INTERNAL_OPENAPI_ENDPOINT_SERVERS;
 import static io.micronaut.openapi.visitor.ContextUtils.addGeneratedResource;
@@ -129,6 +134,7 @@ import static io.micronaut.openapi.visitor.StringUtil.QUOTE;
 import static io.micronaut.openapi.visitor.StringUtil.SLASH;
 import static io.micronaut.openapi.visitor.TagUtils.processOpenApiAnnotation;
 import static io.micronaut.openapi.visitor.Utils.resolveComponents;
+import static io.micronaut.openapi.visitor.management.EndpointUtils.SPECIFIC_ENDPOINTS;
 import static io.swagger.v3.oas.models.Components.COMPONENTS_SCHEMAS_REF;
 
 /**
@@ -141,6 +147,8 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
 
     public static final String DEFAULT_OPENAPI_TITLE = "Service";
     public static final String DEFAULT_OPENAPI_VERSION = "1.0.0";
+    public static final String DEFAULT_DOCUMENT_TITLE = "OpenAPI";
+    public static final String PREFIX_DUMMY_FILE = "dummy";
 
     private static final int MAX_ITERATIONS = 100;
     private ClassElement classElement;
@@ -531,7 +539,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
             }
 
             Map<Pair<String, String>, OpenApiInfo> openApiInfos = null;
-            String documentTitle = "OpenAPI";
+            String documentTitle = DEFAULT_DOCUMENT_TITLE;
 
             if (isSpecGenerationEnabled(context)) {
                 OpenAPI openApi = ContextUtils.get(Utils.ATTR_OPENAPI, OpenAPI.class, context);
@@ -547,7 +555,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
                 }
 
                 String isJson = getConfigProperty(MICRONAUT_OPENAPI_JSON_FORMAT, context);
-                boolean isYaml = !(StringUtils.isNotEmpty(isJson) && isJson.equalsIgnoreCase(StringUtils.TRUE));
+                boolean isYaml = StringUtils.isEmpty(isJson) || !isJson.equalsIgnoreCase(StringUtils.TRUE);
                 String ext = isYaml ? EXT_YML : EXT_JSON;
 
                 for (Map.Entry<Pair<String, String>, OpenApiInfo> entry : openApiInfos.entrySet()) {
@@ -878,7 +886,7 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
     }
 
     private void generateViews(@Nullable String documentTitle, @Nullable Map<Pair<String, String>, OpenApiInfo> openApiInfos, VisitorContext context) {
-        Path viewsDestDirs = getViewsDestDir(getDefaultFilePath("dummy" + System.nanoTime(), context), context);
+        Path viewsDestDirs = getViewsDestDir(getDefaultFilePath(PREFIX_DUMMY_FILE + System.nanoTime(), context), context);
         if (viewsDestDirs == null) {
             return;
         }
@@ -967,25 +975,67 @@ public class OpenApiApplicationVisitor extends AbstractOpenApiVisitor implements
     }
 
     private void processEndpoints(VisitorContext context) {
-        EndpointsConfiguration endpointsCfg = endpointsConfiguration(context);
-        if (endpointsCfg.isEnabled() && CollectionUtils.isNotEmpty(endpointsCfg.getEndpoints())) {
-            var visitor = new OpenApiEndpointVisitor(true);
-            for (var endpoint : endpointsCfg.getEndpoints().values()) {
-                ClassElement classEl = endpoint.getClassElement();
-                if (classEl == null) {
-                    continue;
-                }
-                ContextUtils.put(MICRONAUT_INTERNAL_OPENAPI_ENDPOINT_CLASS_TAGS, endpoint.getTags(), context);
-                ContextUtils.put(MICRONAUT_INTERNAL_OPENAPI_ENDPOINT_SERVERS, endpoint.getServers(), context);
-                ContextUtils.put(MICRONAUT_INTERNAL_OPENAPI_ENDPOINT_SECURITY_REQUIREMENTS, endpoint.getSecurityRequirements(), context);
-                visitor.visitClass(classEl, context);
-                for (MethodElement methodEl : classEl.getEnclosedElements(ElementQuery.ALL_METHODS
-                    .modifiers(mods -> !mods.contains(ElementModifier.STATIC) && !mods.contains(ElementModifier.PRIVATE))
-                    .named(name -> !name.contains(StringUtil.DOLLAR)))) {
-                    visitor.visitMethod(methodEl, context);
-                }
+        if (!isEndpointsEnabled(context)) {
+            return;
+        }
+        var endpointsConfig = getEndpointsConfig(context);
+        if (CollectionUtils.isEmpty(endpointsConfig.getEndpoints())) {
+            return;
+        }
+        var allEndpointsProps = endpointsConfig.getEndpoints().get(ALL_ENDPOINTS_NAME);
+        var isAllEnabled = allEndpointsProps != null && allEndpointsProps.getEnabled() != null ? allEndpointsProps.getEnabled() : true;
+        var visitor = new OpenApiEndpointVisitor(true);
+        var groupVisitor = new OpenApiGroupInfoVisitor(endpointsConfig.getGroups(), endpointsConfig.getGroupsExcluded());
 
+        for (var endpointProps : endpointsConfig.getEndpoints().values()) {
+            if (!isAllEnabled || (endpointProps.getEnabled() != null && !endpointProps.getEnabled())) {
+                continue;
+            }
+            ClassElement classEl = endpointProps.getElement();
+            if (classEl == null) {
+                continue;
+            }
+            if (!canProcessEndpoint(classEl, context)) {
+                continue;
+            }
+
+            var tags = new ArrayList<>(endpointsConfig.getTags());
+            tags.addAll(endpointProps.getTags());
+            ContextUtils.put(MICRONAUT_INTERNAL_OPENAPI_ENDPOINT_CLASS_TAGS, tags, context);
+
+            var servers = new ArrayList<>(endpointsConfig.getServers());
+            servers.addAll(endpointProps.getServers());
+            ContextUtils.put(MICRONAUT_INTERNAL_OPENAPI_ENDPOINT_SERVERS, servers, context);
+
+            var securityRequirements = new ArrayList<>(endpointsConfig.getSecurityRequirements());
+            securityRequirements.addAll(endpointProps.getSecurityRequirements());
+            ContextUtils.put(MICRONAUT_INTERNAL_OPENAPI_ENDPOINT_SECURITY_REQUIREMENTS, securityRequirements, context);
+
+            var extensions = new HashMap<>(endpointsConfig.getExtensions());
+            extensions.putAll(endpointProps.getExtensions());
+            ContextUtils.put(MICRONAUT_INTERNAL_OPENAPI_ENDPOINT_EXTENSIONS, extensions, context);
+
+            ContextUtils.put(MICRONAUT_INTERNAL_OPENAPI_ENDPOINT_DESCRIPTION, endpointProps.getDescription(), context);
+            ContextUtils.put(MICRONAUT_INTERNAL_OPENAPI_ENDPOINT_PROPS, endpointProps, context);
+
+            groupVisitor.visitClass(classEl, context);
+
+            visitor.visitClass(classEl, context);
+            for (MethodElement methodEl : classEl.getEnclosedElements(ElementQuery.ALL_METHODS
+                .modifiers(mods -> !mods.contains(ElementModifier.STATIC) && !mods.contains(ElementModifier.PRIVATE))
+                .named(name -> !name.contains(StringUtil.DOLLAR)))) {
+
+                visitor.visitMethod(methodEl, context);
             }
         }
+    }
+
+    private boolean canProcessEndpoint(ClassElement classEl, VisitorContext context) {
+        var classToCheck = SPECIFIC_ENDPOINTS.get(classEl.getName());
+        if (classToCheck == null) {
+            return true;
+        }
+        var checkedClassEl = ContextUtils.getClassElement(classToCheck, context);
+        return checkedClassEl != null;
     }
 }

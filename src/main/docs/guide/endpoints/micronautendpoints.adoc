@@ -10,11 +10,17 @@ and declare them in the <<propertiesFileConfiguration, openapi.properties>> file
 ----
 endpoints.enabled=true
 endpoints.tags=Management Endpoints
+
+# You need to set these classes only if you use custom endpoints or replace
+# standard micronaut endpoint implementations
 endpoints.routes.class=io.micronaut.management.endpoint.routes.RoutesEndpoint
 endpoints.beans.class=io.micronaut.management.endpoint.beans.BeansEndpoint
 endpoints.health.class=io.micronaut.management.endpoint.health.HealthEndpoint
 endpoints.loggers.class=io.micronaut.management.endpoint.loggers.LoggersEndpoint
 endpoints.refresh.class=io.micronaut.management.endpoint.refresh.RefreshEndpoint
+
+# if you want to move endpoints to different file / files
+endpoints.groups=management
 ----
 
 The syntax is the following: `endpoints.<name>.class=<full class name of the endpoint>` where `name` is an arbitrary name.
